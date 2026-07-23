@@ -1,0 +1,871 @@
+var e=`meta:
+  packages:
+  - altair
+  - pandas
+  id: altair_08
+  title: 다중뷰연결
+  order: 8
+  category: altair
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  tags:
+  - hconcat
+  - vconcat
+  - repeat
+  - linked
+  - iris
+  seo:
+    title: Altair 다중 뷰 - 차트 연결과 조합
+    description: Altair로 여러 차트를 연결합니다. hconcat, vconcat, repeat로 다중 뷰 대시보드를 만듭니다.
+    keywords:
+    - altair concat
+    - hconcat
+    - vconcat
+    - repeat
+    - linked brush
+intro:
+  emoji: 🔗
+  goal: 여러 차트를 가로/세로로 배치하고 브러싱으로 연결해 다중 뷰 대시보드를 만듭니다.
+  description: hconcat(|), vconcat(&), repeat로 차트를 조합하고, 선택을 공유해 차트 간 연동을 구현합니다.
+  direction: 다중뷰연결에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.
+  benefits:
+  - 정리된 테이블 확인 후 채널 인코딩에 맞는 코드 입력을 고릅니다.
+  - 다중뷰연결 결과를 스케일과 마크 매핑 기준으로 즉시 점검합니다.
+  - 완료한 코드를 선언형 대시보드에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(정리된 테이블)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 가로 배치 처리 실행
+      detail: 채널 인코딩 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 세로 배치 결과 검증
+      detail: 스케일과 마크 매핑 기준으로 실행 결과를 비교합니다.
+    - label: 다중뷰연결 재사용
+      detail: 완성 코드를 선언형 대시보드에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 선언형 차트 환경
+      detail: altair, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 다중뷰연결 실행
+      detail: 셀을 실행해 스케일과 마크 매핑와 예외 상태를 확인합니다.
+    - label: 다중뷰연결 완료
+      detail: 검증된 코드를 선언형 대시보드로 남깁니다.
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  structuredPrimary: true
+  subtitle: seaborn-data
+  goal: 1단계. 데이터 불러오기에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: Codaro 로컬 데이터셋에서 iris(붓꽃) 데이터를 불러옵니다. 붓꽃 3가지 품종(setosa, versicolor, virginica)의 꽃잎과 꽃받침
+    크기를 측정한 유명한 데이터셋입니다. sepal은 꽃받침(꽃잎을 감싸는 초록색 부분), petal은 꽃잎(색깔 있는 부분)입니다. length는 길이, width는 너비, species는
+    품종입니다. 이 데이터로 여러 차트를 동시에 그리고 서로 연결하는 방법을 배웁니다. 한 차트를 조작하면 다른 차트도 함께 반응합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import altair as alt
+    import pandas as pd
+    import warnings
+    warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+    from codaro.curriculum.localData import loadLocalDataset
+
+    iris = loadLocalDataset("iris")
+  exercise:
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import altair as alt
+      import pandas as pd
+      import warnings
+      warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+      from codaro.curriculum.localData import loadLocalDataset
+
+      iris = loadLocalDataset("iris")
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step2_hconcat
+  title: 2단계. 가로 배치
+  structuredPrimary: true
+  subtitle: hconcat (|)
+  goal: 2단계. 가로 배치에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    지금까지는 차트를 하나씩 그렸습니다. 이번에는 여러 차트를 한 화면에 배치하는 방법을 배웁니다. | 연산자(파이프 기호)는 차트를 가로로 나란히 붙이는 역할을 합니다. chart1 | chart2는 "차트1 옆에 차트2를 배치하라"는 뜻입니다. hconcat()도 같은 기능입니다(h는 horizontal, 가로). 먼저 각 차트를 변수에 저장한 뒤, | 연산자로 연결하면 두 차트가 가로로 나란히 표시됩니다.
+
+    | 기호는 키보드에서 Shift + ₩(원화 기호) 또는 Shift + \\(백슬래시)를 누르면 입력됩니다. | 연산자는 alt.hconcat()의 단축 표현입니다. concat은 concatenate(연결하다)의 줄임말입니다. 두 차트를 가로로 연결해 나란히 배치합니다.
+  tips:
+  - '| 기호는 키보드에서 Shift + ₩(원화 기호) 또는 Shift + \\(백슬래시)를 누르면 입력됩니다. | 연산자는 alt.hconcat()의 단축 표현입니다. concat은
+    concatenate(연결하다)의 줄임말입니다. 두 차트를 가로로 연결해 나란히 배치합니다.'
+  snippet: |-
+    chartPetal = alt.Chart(iris).mark_point().encode(
+        x='petal_length:Q',
+        y='petal_width:Q',
+        color='species:N'
+    ).properties(width=200, height=200, title='꽃잎')
+
+    chartSepal = alt.Chart(iris).mark_point().encode(
+        x='sepal_length:Q',
+        y='sepal_width:Q',
+        color='species:N'
+    ).properties(width=200, height=200, title='꽃받침')
+
+    chartHconcat = chartPetal | chartSepal
+    chartHconcat
+  exercise:
+    prompt: 2단계. 가로 배치 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      chartPetal = alt.Chart(iris).mark_point().encode(
+          x='petal_length:Q',
+          y='petal_width:Q',
+          color='species:N'
+      ).properties(width=200, height=200, title='꽃잎')
+
+      chartSepal = alt.Chart(iris).mark_point().encode(
+          x='sepal_length:Q',
+          y='sepal_width:Q',
+          color='species:N'
+      ).properties(width=200, height=200, title='꽃받침')
+
+      chartHconcat = chartPetal | chartSepal
+      chartHconcat
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 2단계. 가로 배치의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 가로 배치의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step3_vconcat
+  title: 3단계. 세로 배치
+  structuredPrimary: true
+  subtitle: vconcat (&)
+  goal: 3단계. 세로 배치에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    가로 배치를 배웠으니 이번에는 세로 배치를 해봅니다. & 연산자는 차트를 위아래로 쌓는 역할을 합니다. chart1 & chart2는 "차트1 아래에 차트2를 배치하라"는 뜻입니다. vconcat()도 같은 기능입니다(v는 vertical, 세로). | 는 옆으로 붙이고, &는 아래로 쌓는다고 기억하면 됩니다.
+
+    & 연산자는 alt.vconcat()의 단축 표현입니다. 차트들이 세로로 쌓입니다.
+  snippet: |-
+    chartVconcat = chartPetal & chartSepal
+    chartVconcat
+  exercise:
+    prompt: 3단계. 세로 배치 예제에서 \`chartVconcat\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      chartVconcat = chartPetal & chartSepal
+      chartVconcat
+    hints:
+    - 바꿀 지점은 \`chartVconcat = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`chartVconcat\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 3단계. 세로 배치에서 \`chartVconcat\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 세로 배치 실행 뒤 \`chartVconcat\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step4_grid
+  title: 4단계. 그리드 배치
+  structuredPrimary: true
+  subtitle: 가로+세로 조합
+  goal: 4단계. 그리드 배치에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: '| 와 & 를 동시에 사용하면 복잡한 레이아웃을 만들 수 있습니다. 괄호로 순서를 정해주면 2x2, 3x3 같은 그리드를 만들 수 있습니다. (chart1
+    | chart2)는 먼저 차트1과 차트2를 가로로 붙입니다. (chart3 | chart4)도 가로로 붙입니다. 그 다음 두 묶음을 & 로 세로로 쌓으면 2행 2열 그리드가 됩니다.
+    괄호가 중요합니다. 수학 계산처럼 괄호 안을 먼저 처리합니다.'
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    chart1 = alt.Chart(iris).mark_point().encode(
+        x='sepal_length:Q', y='sepal_width:Q', color='species:N'
+    ).properties(width=180, height=180, title='꽃받침 L vs W')
+
+    chart2 = alt.Chart(iris).mark_point().encode(
+        x='petal_length:Q', y='petal_width:Q', color='species:N'
+    ).properties(width=180, height=180, title='꽃잎 L vs W')
+
+    chart3 = alt.Chart(iris).mark_point().encode(
+        x='sepal_length:Q', y='petal_length:Q', color='species:N'
+    ).properties(width=180, height=180, title='길이 비교')
+
+    chart4 = alt.Chart(iris).mark_point().encode(
+        x='sepal_width:Q', y='petal_width:Q', color='species:N'
+    ).properties(width=180, height=180, title='너비 비교')
+
+    chartGrid = (chart1 | chart2) & (chart3 | chart4)
+    chartGrid
+  exercise:
+    prompt: 4단계. 그리드 배치 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      chart1 = alt.Chart(iris).mark_point().encode(
+          x='sepal_length:Q', y='sepal_width:Q', color='species:N'
+      ).properties(width=180, height=180, title='꽃받침 L vs W')
+
+      chart2 = alt.Chart(iris).mark_point().encode(
+          x='petal_length:Q', y='petal_width:Q', color='species:N'
+      ).properties(width=180, height=180, title='꽃잎 L vs W')
+
+      chart3 = alt.Chart(iris).mark_point().encode(
+          x='sepal_length:Q', y='petal_length:Q', color='species:N'
+      ).properties(width=180, height=180, title='길이 비교')
+
+      chart4 = alt.Chart(iris).mark_point().encode(
+          x='sepal_width:Q', y='petal_width:Q', color='species:N'
+      ).properties(width=180, height=180, title='너비 비교')
+
+      chartGrid = (chart1 | chart2) & (chart3 | chart4)
+      chartGrid
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 4단계. 그리드 배치의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 그리드 배치의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step5_linked_brush
+  title: 5단계. 연결된 브러싱
+  structuredPrimary: true
+  subtitle: 선택 공유
+  goal: 5단계. 연결된 브러싱에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    이제 핵심 기능을 배웁니다. 여러 차트가 서로 연결되어 동시에 반응하게 만드는 방법입니다. 같은 brush 변수(selection_interval)를 기준 차트에 add_params()로 추가하고, 다른 차트는 그 선택 값을 참조하면 한 차트에서 드래그한 선택이 다른 차트에도 적용됩니다. 왼쪽 차트에서 영역을 드래그하면, 오른쪽 차트에서도 똑같은 데이터 포인트가 강조됩니다. 마치 두 차트가 대화하는 것처럼 연동됩니다.
+
+    brush 객체는 기준 차트에만 등록하고 두 차트가 같은 조건을 참조합니다. 한 쪽에서 선택하면 다른 쪽에서도 같은 데이터가 강조됩니다.
+  snippet: |-
+    brush = alt.selection_interval(name='linkedBrush')
+
+    linkedPetal = alt.Chart(iris).mark_point().encode(
+        x='petal_length:Q',
+        y='petal_width:Q',
+        color=alt.when(brush).then('species:N').otherwise(alt.value('lightgray'))
+    ).properties(width=250, height=250, title='꽃잎 (드래그로 선택)').add_params(brush)
+
+    linkedSepal = alt.Chart(iris).mark_point().encode(
+        x='sepal_length:Q',
+        y='sepal_width:Q',
+        color=alt.when(brush).then('species:N').otherwise(alt.value('lightgray'))
+    ).properties(width=250, height=250, title='꽃받침 (연동됨)')
+
+    chartLinked = linkedPetal | linkedSepal
+    chartLinked
+  exercise:
+    prompt: 5단계. 연결된 브러싱 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      brush = alt.selection_interval(name='linkedBrush')
+
+      linkedPetal = alt.Chart(iris).mark_point().encode(
+          x='petal_length:Q',
+          y='petal_width:Q',
+          color=alt.when(brush).then('species:N').otherwise(alt.value('lightgray'))
+      ).properties(width=250, height=250, title='꽃잎 (드래그로 선택)').add_params(brush)
+
+      linkedSepal = alt.Chart(iris).mark_point().encode(
+          x='sepal_length:Q',
+          y='sepal_width:Q',
+          color=alt.when(brush).then('species:N').otherwise(alt.value('lightgray'))
+      ).properties(width=250, height=250, title='꽃받침 (연동됨)')
+
+      chartLinked = linkedPetal | linkedSepal
+      chartLinked
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 5단계. 연결된 브러싱의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 연결된 브러싱의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step6_repeat
+  title: 6단계. repeat 차트
+  structuredPrimary: true
+  subtitle: 변수 조합 자동화
+  goal: 6단계. repeat 차트에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    지금까지는 차트를 하나하나 만들어서 조합했습니다. repeat()를 사용하면 변수 조합을 자동으로 만들어줍니다. repeat()는 "반복하다"라는 뜻입니다. row와 column에 변수 리스트를 지정하면, 모든 조합의 차트를 자동으로 생성합니다. alt.repeat('column')은 "column 리스트의 변수를 반복해서 사용하라"는 의미입니다. row에 2개, column에 2개 변수를 주면 2×2=4개 차트가 자동 생성됩니다.
+
+    alt.X(alt.repeat('column'), type='quantitative')는 "X축에 column 리스트의 변수를 반복해서 넣고, 타입은 수량형으로 하라"는 뜻입니다. repeat()에 row=['A', 'B'], column=['C', 'D']를 지정하면, A-C, A-D, B-C, B-D 총 4개 조합이 자동으로 만들어집니다. 일일이 차트를 만들 필요가 없어 편리합니다.
+  tips:
+  - alt.X(alt.repeat('column'), type='quantitative')는 "X축에 column 리스트의 변수를 반복해서 넣고, 타입은 수량형으로 하라"는 뜻입니다.
+    repeat()에 row=['A', 'B'], column=['C', 'D']를 지정하면, A-C, A-D, B-C, B-D 총 4개 조합이 자동으로 만들어집니다. 일일이 차트를
+    만들 필요가 없어 편리합니다.
+  snippet: |-
+    chartRepeat = alt.Chart(iris).mark_point().encode(
+        alt.X(alt.repeat('column'), type='quantitative'),
+        alt.Y(alt.repeat('row'), type='quantitative'),
+        color='species:N'
+    ).properties(
+        width=150,
+        height=150
+    ).repeat(
+        row=['sepal_length', 'sepal_width'],
+        column=['petal_length', 'petal_width']
+    )
+    chartRepeat
+  exercise:
+    prompt: 6단계. repeat 차트 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      chartRepeat = alt.Chart(iris).mark_point().encode(
+          alt.X(alt.repeat('column'), type='quantitative'),
+          alt.Y(alt.repeat('row'), type='quantitative'),
+          color='species:N'
+      ).properties(
+          width=150,
+          height=150
+      ).repeat(
+          row=['sepal_length', 'sepal_width'],
+          column=['petal_length', 'petal_width']
+      )
+      chartRepeat
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 6단계. repeat 차트의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. repeat 차트의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step7_repeat_linked
+  title: 7단계. repeat + 연결 브러싱
+  structuredPrimary: true
+  subtitle: 그리드 전체 연동
+  goal: 7단계. repeat + 연결 브러싱에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: repeat 차트에도 연결된 브러싱을 적용할 수 있습니다. add_params(brush)를 추가하면 모든 패널에서 동일한 선택이 공유됩니다. 한 패널에서
+    드래그하면 모든 패널이 동시에 연동되어 해당 데이터가 강조됩니다. 여러 변수 조합을 동시에 탐색할 때 매우 유용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    brushRepeat = alt.selection_interval(name='repeatBrush')
+
+    chartRepeatLinked = alt.Chart(iris).mark_point().encode(
+        alt.X(alt.repeat('column'), type='quantitative'),
+        alt.Y(alt.repeat('row'), type='quantitative'),
+        color=alt.when(brushRepeat).then('species:N').otherwise(alt.value('lightgray'))
+    ).properties(
+        width=140,
+        height=140
+    ).add_params(brushRepeat).repeat(
+        row=['sepal_length', 'petal_length'],
+        column=['sepal_width', 'petal_width']
+    )
+    chartRepeatLinked
+  exercise:
+    prompt: 7단계. repeat + 연결 브러싱 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      brushRepeat = alt.selection_interval(name='repeatBrush')
+
+      chartRepeatLinked = alt.Chart(iris).mark_point().encode(
+          alt.X(alt.repeat('column'), type='quantitative'),
+          alt.Y(alt.repeat('row'), type='quantitative'),
+          color=alt.when(brushRepeat).then('species:N').otherwise(alt.value('lightgray'))
+      ).properties(
+          width=140,
+          height=140
+      ).add_params(brushRepeat).repeat(
+          row=['sepal_length', 'petal_length'],
+          column=['sepal_width', 'petal_width']
+      )
+      chartRepeatLinked
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 7단계. repeat + 연결 브러싱의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. repeat + 연결 브러싱의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step8_scatter_matrix
+  title: 8단계. 산점도 매트릭스
+  structuredPrimary: true
+  subtitle: SPLOM
+  goal: 8단계. 산점도 매트릭스에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 같은 변수 리스트를 row와 column에 지정하면 산점도 매트릭스(SPLOM, Scatterplot Matrix)가 됩니다. 4개 변수를 지정하면 4×4=16개
+    패널이 생성됩니다. 대각선은 같은 변수끼리의 조합이므로 점들이 일직선에 놓입니다. 나머지 패널에서는 모든 변수 쌍의 상관관계를 한눈에 파악할 수 있어 탐색적 데이터 분석에 유용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    brushMatrix = alt.selection_interval(name='matrixBrush')
+    variables = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']
+
+    chartMatrix = alt.Chart(iris).mark_circle(size=30).encode(
+        alt.X(alt.repeat('column'), type='quantitative'),
+        alt.Y(alt.repeat('row'), type='quantitative'),
+        color=alt.when(brushMatrix).then('species:N').otherwise(alt.value('lightgray')),
+        opacity=alt.when(brushMatrix).then(alt.value(0.8)).otherwise(alt.value(0.3))
+    ).properties(
+        width=100,
+        height=100
+    ).add_params(brushMatrix).repeat(
+        row=variables,
+        column=variables
+    )
+    chartMatrix
+  exercise:
+    prompt: 8단계. 산점도 매트릭스 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      brushMatrix = alt.selection_interval(name='matrixBrush')
+      variables = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']
+
+      chartMatrix = alt.Chart(iris).mark_circle(size=30).encode(
+          alt.X(alt.repeat('column'), type='quantitative'),
+          alt.Y(alt.repeat('row'), type='quantitative'),
+          color=alt.when(brushMatrix).then('species:N').otherwise(alt.value('lightgray')),
+          opacity=alt.when(brushMatrix).then(alt.value(0.8)).otherwise(alt.value(0.3))
+      ).properties(
+          width=100,
+          height=100
+      ).add_params(brushMatrix).repeat(
+          row=variables,
+          column=variables
+      )
+      chartMatrix
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 8단계. 산점도 매트릭스의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 산점도 매트릭스의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step9_final
+  title: 9단계. 최종 결과물
+  structuredPrimary: true
+  subtitle: 다중 뷰 대시보드
+  goal: 9단계. 최종 결과물에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    지금까지 배운 모든 개념을 종합해 다중 뷰 대시보드를 완성합니다. 산점도와 막대 차트를 조합하고 연결된 브러싱을 적용합니다.
+
+    산점도에서 영역을 선택하면 해당 데이터 포인트가 강조되고, 막대 차트에서도 해당 품종이 강조됩니다. 두 차트가 연동되어 데이터 탐색이 용이합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    brushFinal = alt.selection_interval(name='finalBrush')
+
+    scatterFinal = alt.Chart(iris).mark_circle(size=60).encode(
+        x=alt.X('petal_length:Q', title='꽃잎 길이'),
+        y=alt.Y('petal_width:Q', title='꽃잎 너비'),
+        color=alt.when(brushFinal).then('species:N').otherwise(alt.value('lightgray')),
+        tooltip=['species', 'petal_length', 'petal_width']
+    ).properties(
+        width=350,
+        height=300,
+        title='꽃잎 특성 (드래그로 선택)'
+    )
+
+    barFinal = alt.Chart(iris).mark_bar().encode(
+        x='count()',
+        y=alt.Y('species:N', title='품종'),
+        color=alt.when(brushFinal).then('species:N').otherwise(alt.value('lightgray'))
+    ).properties(
+        width=350,
+        height=100,
+        title='품종별 개수'
+    ).add_params(brushFinal)
+
+    chartFinal = scatterFinal & barFinal
+    chartFinal
+  exercise:
+    prompt: 9단계. 최종 결과물 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      brushFinal = alt.selection_interval(name='finalBrush')
+
+      scatterFinal = alt.Chart(iris).mark_circle(size=60).encode(
+          x=alt.X('petal_length:Q', title='꽃잎 길이'),
+          y=alt.Y('petal_width:Q', title='꽃잎 너비'),
+          color=alt.when(brushFinal).then('species:N').otherwise(alt.value('lightgray')),
+          tooltip=['species', 'petal_length', 'petal_width']
+      ).properties(
+          width=350,
+          height=300,
+          title='꽃잎 특성 (드래그로 선택)'
+      )
+
+      barFinal = alt.Chart(iris).mark_bar().encode(
+          x='count()',
+          y=alt.Y('species:N', title='품종'),
+          color=alt.when(brushFinal).then('species:N').otherwise(alt.value('lightgray'))
+      ).properties(
+          width=350,
+          height=100,
+          title='품종별 개수'
+      ).add_params(brushFinal)
+
+      chartFinal = scatterFinal & barFinal
+      chartFinal
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 9단계. 최종 결과물의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 최종 결과물의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 다중 뷰 프로젝트
+  goal: 실습에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    이 프로젝트에서 배운 내용을 정리하면: | 연산자로 가로 배치, & 연산자로 세로 배치, 괄호로 그리드 레이아웃, 같은 selection 변수를 공유해 차트 연동, repeat()로 변수 조합 자동화, alt.repeat()로 변수 참조입니다. 이제 배운 개념들을 조합해 다중 뷰 차트를 만들어봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import altair as alt
+    import pandas as pd
+    from codaro.curriculum.localData import loadLocalDataset
+    flower = loadLocalDataset("iris")
+    brushLen = alt.selection_interval(name='lengthBrush')
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import altair as alt
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+      flower = loadLocalDataset("iris")
+      brushLen = alt.selection_interval(name='lengthBrush')
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Altair로 다중 뷰 대시보드를 마스터했습니다!
+  - type: list
+    items:
+    - chart1 | chart2 (hconcat) - 가로 배치
+    - chart1 & chart2 (vconcat) - 세로 배치
+    - (a | b) & (c | d) - 그리드 레이아웃
+    - repeat(row=[...], column=[...]) - 변수 조합 자동화
+    - alt.repeat('column'), alt.repeat('row') - repeat 변수 참조
+    - 같은 selection 공유 - 연결된 브러싱
+  - type: text
+    content: 다음 프로젝트에서는 고급 데이터 변환 기법을 배웁니다.
+  goal: 정리에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+- id: workflow_validation
+  title: 10단계. 다중 뷰 연결 검증 루프
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  goal: 10단계. 다중 뷰 연결 검증 루프에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    다중 뷰는 한 차트의 선택이 다른 차트와 연결되는 구조입니다. concat 구조와 selection parameter가 spec에 남는지 확인해야 합니다.
+
+    다중 뷰 레슨은 화면 배치보다 selection parameter가 실제 spec에 연결됐는지를 확인해야 합니다.
+  snippet: |-
+    import altair as alt
+    from codaro.curriculum.localData import loadLocalDataset
+
+    irisFlow = loadLocalDataset("iris")
+    requiredColumns = {"sepal_length", "sepal_width", "petal_length", "petal_width", "species"}
+    missingColumns = requiredColumns - set(irisFlow.columns)
+
+    assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+    assert irisFlow["species"].nunique() == 3
+    assert irisFlow.loc[irisFlow["species"] == "setosa", "petal_length"].max() < irisFlow.loc[irisFlow["species"] != "setosa", "petal_length"].min()
+  exercise:
+    prompt: 10단계. 다중 뷰 연결 검증 루프 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import altair as alt
+      from codaro.curriculum.localData import loadLocalDataset
+
+      irisFlow = loadLocalDataset("iris")
+      requiredColumns = {"sepal_length", "sepal_width", "petal_length", "petal_width", "species"}
+      missingColumns = requiredColumns - set(irisFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert irisFlow["species"].nunique() == 3
+      assert irisFlow.loc[irisFlow["species"] == "setosa", "petal_length"].max() < irisFlow.loc[irisFlow["species"] != "setosa", "petal_length"].min()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 10단계. 다중 뷰 연결 검증 루프의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 10단계. 다중 뷰 연결 검증 루프의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: altair_08-linked-multiview-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: 다중 view 연결 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 선택이 서로 다른 grain의 view에 올바르게 전파되는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_linked_multiview(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_linked_multiview(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_linked_multiview(rows):
+            required = ['period', 'metric', 'view']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'view'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['period'] for row in usable]
+            y_values = [row['metric'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.altair.altair_08.linked-multiview-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.altair.altair_08.linked-multiview-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_linked_multiview
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - period: 1
+              metric: 10
+              view: overview
+            - period: 2
+              metric: 15
+              view: overview
+            - period: 1
+              metric: 3
+              view: detail
+          expectedReturn:
+            usableCount: 3
+            excludedCount: 0
+            groupCounts:
+              detail: 1
+              overview: 2
+            xExtent:
+            - 1
+            - 2
+            yExtent:
+            - 3
+            - 15
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: altair_08-linked-multiview-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - altair_08-linked-multiview-data-evidence-mastery
+    title: 다중 view 연결 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: overview 기간 brush가 category summary와 row detail에 같은 scope로 전달된다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_linked_multiview(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_linked_multiview(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_linked_multiview(candidate):
+            expected = {'mark': 'linked-views', 'x': 'period', 'y': 'metric', 'group': 'view', 'transforms': ['grain-contract', 'shared-selection'], 'interaction': 'linked-filter'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.altair.altair_08.linked-multiview-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.altair.altair_08.linked-multiview-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_linked_multiview
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: linked-views
+              x: period
+              y: metric
+              group: view
+              transforms:
+              - grain-contract
+              - shared-selection
+              interaction: linked-filter
+              description: overview 기간 brush가 category summary와 row detail에 같은 scope로 전달된다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: linked-views
+              x: period
+              y: metric
+              group: view
+              transforms:
+              - grain-contract
+              - shared-selection
+              interaction: linked-filter
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: metric
+              y: period
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - interaction
+            - description
+            encoding:
+              mark: linked-views
+              x: period
+              y: metric
+              group: view
+              transforms:
+              - grain-contract
+              - shared-selection
+              interaction: linked-filter
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: altair_08-linked-multiview-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - altair_08-linked-multiview-encoding-transfer-transfer
+    title: 다중 view 연결 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 선택이 서로 다른 grain의 view에 올바르게 전파되는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_linked_multiview(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_linked_multiview(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_linked_multiview(situation):
+            table = {'overview-to-detail': {'encoding': 'brush filter', 'evidence': 'scope count per view', 'risk': 'grain mismatch'}, 'highlight-only': {'encoding': 'conditional opacity', 'evidence': 'unselected context remains', 'risk': 'filter confusion'}, 'independent-views': {'encoding': 'separate parameters', 'evidence': 'named controls', 'risk': 'parameter collision'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.altair.altair_08.linked-multiview-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.altair.altair_08.linked-multiview-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_linked_multiview
+        cases:
+        - id: recalls-overview-to-detail
+          arguments:
+          - value: overview-to-detail
+          expectedReturn:
+            encoding: brush filter
+            evidence: scope count per view
+            risk: grain mismatch
+        - id: recalls-highlight-only
+          arguments:
+          - value: highlight-only
+          expectedReturn:
+            encoding: conditional opacity
+            evidence: unselected context remains
+            risk: filter confusion
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,864 @@
+var e=`meta:
+  packages:
+  - polars
+  id: polars_05
+  title: 음악스트리밍분석
+  order: 5
+  category: polars
+  difficulty: ⭐⭐
+  badge: 기초
+  dataSource: codaro-local:spotify_songs
+  tags:
+  - spotify
+  - str.contains
+  - over
+  - rank
+  - window
+  seo:
+    title: Polars 문자열 처리와 윈도우 함수 - 아티스트별 인기 순위 분석
+    description: Spotify 차트 데이터로 문자열 포함(str.contains), 소문자 변환(str.to_lowercase), 윈도우 함수(over, rank)를 배웁니다.
+    keywords:
+    - polars str.contains
+    - polars over
+    - polars rank
+    - 윈도우 함수
+    - spotify 분석
+intro:
+  emoji: 🎵
+  goal: Spotify 차트 데이터에서 "아티스트별 인기도 순위"를 분석합니다.
+  description: 문자열 처리와 윈도우 함수를 배웁니다. str.contains로 특정 키워드를 찾고, over + rank로 그룹 내 순위를 계산합니다.
+  direction: 음악스트리밍분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - Polars DataFrame 확인 후 컬럼 선택/필터/집계에 맞는 코드 입력을 고릅니다.
+  - 음악스트리밍분석 결과를 행 수, 컬럼 값, 집계 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 대용량 데이터 분석 파이프라인에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(Polars DataFrame)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 미리보기 처리 실행
+      detail: 컬럼 선택/필터/집계 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 인기도 필터링 결과 검증
+      detail: 행 수, 컬럼 값, 집계 결과 기준으로 실행 결과를 비교합니다.
+    - label: 음악스트리밍분석 재사용
+      detail: 완성 코드를 대용량 데이터 분석 파이프라인에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 컬럼형 표 분석 환경
+      detail: polars 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 음악스트리밍분석 실행
+      detail: 셀을 실행해 행 수, 컬럼 값, 집계 결과와 예외 상태를 확인합니다.
+    - label: 음악스트리밍분석 완료
+      detail: 검증된 코드를 대용량 데이터 분석 파이프라인로 남깁니다.
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  structuredPrimary: true
+  subtitle: Spotify 차트 데이터
+  goal: 1단계. 데이터 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    Spotify 음악 스트리밍 데이터를 분석합니다. 수천 개의 트랙에 대한 정보가 담겨 있으며, 곡명, 아티스트, 장르, 인기도(popularity) 등의 정보를 포함합니다. 이번 프로젝트에서는 문자열 처리(str.contains, str.to_lowercase)와 윈도우 함수(over, rank)를 배웁니다. over()는 그룹별 계산을 하되 원본 행을 유지하는 강력한 기능이고, rank()는 순위를 매기는 함수입니다. 이 두 개를 조합하면 "아티스트별로 가장 인기 있는 곡"처럼 그룹 내 순위를 구할 수 있습니다.
+
+    이 데이터셋은 수만 개의 곡 정보를 포함하고 있어 대용량 데이터 처리 연습에 적합합니다. Polars는 이런 규모의 데이터도 빠르게 필터링하고 그룹화할 수 있습니다.
+  snippet: |-
+    import polars as pl
+    from io import StringIO
+    from codaro.curriculum.localData import loadLocalDataset
+
+    spotifyCsv = loadLocalDataset("spotify_songs").to_csv(index=False)
+    spotify = pl.read_csv(StringIO(spotifyCsv))
+    spotify.shape
+  exercise:
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import polars as pl
+      from io import StringIO
+      from codaro.curriculum.localData import loadLocalDataset
+
+      spotifyCsv = loadLocalDataset("spotify_songs").to_csv(index=False)
+      spotify = pl.read_csv(StringIO(spotifyCsv))
+      spotify.shape
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step2_head
+  title: 2단계. 미리보기
+  structuredPrimary: true
+  subtitle: 데이터 구조 파악
+  goal: 2단계. 미리보기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: track_name(곡명), track_artist(아티스트), track_popularity(인기도), playlist_genre(장르) 등이 있습니다.
+    track_popularity는 0~100 사이의 값으로, 높을수록 최근에 많이 재생된 인기곡입니다. 이 데이터는 실제 Spotify 차트 데이터를 기반으로 합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: spotify.select("track_name", "track_artist", "track_popularity", "playlist_genre").head()
+  exercise:
+    prompt: 2단계. 미리보기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: spotify.select("track_name", "track_artist", "track_popularity", "playlist_genre").head()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 미리보기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 미리보기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_filter
+  title: 3단계. 인기도 필터링
+  structuredPrimary: true
+  subtitle: 복습 - filter
+  goal: 3단계. 인기도 필터링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 인기도 80 이상인 곡만 필터링합니다. 이전에 배운 filter를 복습하며, 비교 연산자(>=)를 사용해 조건을 만듭니다. 80점 이상이면 상위 약 20%에
+    해당하는 인기곡입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: spotify.filter(pl.col("track_popularity") >= 80).select("track_name", "track_artist", "track_popularity")
+  exercise:
+    prompt: 3단계. 인기도 필터링 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: spotify.filter(pl.col("track_popularity") >= 80).select("track_name", "track_artist",
+      "track_popularity")
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 인기도 필터링의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 3단계. 인기도 필터링의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step4_groupby
+  title: 4단계. 아티스트별 평균 인기도
+  structuredPrimary: true
+  subtitle: 복습 - group_by + mean
+  goal: 4단계. 아티스트별 평균 인기도에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 아티스트별 평균 인기도를 계산합니다. 이전에 배운 group_by와 mean을 복습하며, sort로 내림차순 정렬하면 가장 인기 있는 아티스트 순으로 볼 수
+    있습니다. 꾸준히 높은 인기도를 유지하는 아티스트가 상위에 위치합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    spotify.group_by("track_artist").agg(
+        pl.col("track_popularity").mean().alias("avgPopularity")
+    ).sort("avgPopularity", descending=True).head(10)
+  exercise:
+    prompt: 4단계. 아티스트별 평균 인기도 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      spotify.group_by("track_artist").agg(
+          pl.col("track_popularity").mean().alias("avgPopularity")
+      ).sort("avgPopularity", descending=True).head(10)
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 아티스트별 평균 인기도의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 4단계. 아티스트별 평균 인기도의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step5_str_contains
+  title: 5단계. 문자열 포함 검색
+  structuredPrimary: true
+  subtitle: str.contains
+  goal: 5단계. 문자열 포함 검색에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    데이터 분석에서 문자열 검색은 매우 자주 사용됩니다. "Love"라는 단어가 들어간 곡만 찾고 싶을 때 str.contains()를 사용합니다. str은 문자열(string) 관련 메서드에 접근하는 accessor이고, contains()는 "포함하다"의 의미입니다. pl.col("track_name").str.contains("Love")는 track_name 컬럼에서 "Love"가 포함된 행은 True, 아니면 False를 반환합니다. filter()와 함께 사용하면 True인 행만 선택됩니다.
+
+    str.contains("키워드")는 해당 키워드가 포함된 행을 찾습니다. "Love Story"처럼 단어 전체가 아니라 일부만 일치해도 찾습니다. 정규표현식(regex)도 지원하여 복잡한 패턴 검색이 가능합니다. 대소문자를 구분하므로 주의하세요.
+  tips:
+  - str.contains("키워드")는 해당 키워드가 포함된 행을 찾습니다. "Love Story"처럼 단어 전체가 아니라 일부만 일치해도 찾습니다. 정규표현식(regex)도 지원하여
+    복잡한 패턴 검색이 가능합니다. 대소문자를 구분하므로 주의하세요.
+  snippet: |-
+    spotify.filter(
+        pl.col("track_name").str.contains("Love")
+    ).select("track_name", "track_artist", "track_popularity").head(10)
+  exercise:
+    prompt: 5단계. 문자열 포함 검색 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      spotify.filter(
+          pl.col("track_name").str.contains("Love")
+      ).select("track_name", "track_artist", "track_popularity").head(10)
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 문자열 포함 검색의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 5단계. 문자열 포함 검색의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step6_str_lowercase
+  title: 6단계. 소문자 변환
+  structuredPrimary: true
+  subtitle: str.to_lowercase
+  goal: 6단계. 소문자 변환에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    대소문자 구분 없이 검색하려면 소문자로 변환 후 비교합니다. "Love", "LOVE", "love"를 모두 찾으려면 먼저 str.to_lowercase()로 소문자로 통일한 뒤 str.contains("love")를 적용합니다.
+
+    문자열 처리 팁
+    str.to_lowercase()는 모든 문자를 소문자로 변환합니다. 대소문자 구분 없는 검색에 유용합니다.
+  tips:
+  - 문자열 처리 팁 str.to_lowercase()는 모든 문자를 소문자로 변환합니다. 대소문자 구분 없는 검색에 유용합니다.
+  snippet: |-
+    spotify.filter(
+        pl.col("track_name").str.to_lowercase().str.contains("love")
+    ).select("track_name", "track_artist", "track_popularity").head(10)
+  exercise:
+    prompt: 6단계. 소문자 변환 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      spotify.filter(
+          pl.col("track_name").str.to_lowercase().str.contains("love")
+      ).select("track_name", "track_artist", "track_popularity").head(10)
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 소문자 변환의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 6단계. 소문자 변환의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step7_genre_filter
+  title: 7단계. 장르별 필터링
+  structuredPrimary: true
+  subtitle: 문자열 조건 조합
+  goal: 7단계. 장르별 필터링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: pop 장르에서 dance가 포함된 곡을 찾습니다. 장르 조건과 문자열 조건을 &(AND)로 연결하여 복합 필터를 만듭니다. 이렇게 여러 조건을 조합하면 원하는
+    데이터를 정확하게 추출할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    spotify.filter(
+        (pl.col("playlist_genre") == "pop") &
+        (pl.col("track_name").str.to_lowercase().str.contains("dance"))
+    ).select("track_name", "track_artist", "track_popularity")
+  exercise:
+    prompt: 7단계. 장르별 필터링 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      spotify.filter(
+          (pl.col("playlist_genre") == "pop") &
+          (pl.col("track_name").str.to_lowercase().str.contains("dance"))
+      ).select("track_name", "track_artist", "track_popularity")
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 장르별 필터링의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 7단계. 장르별 필터링의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step8_over
+  title: 8단계. 윈도우 함수 소개
+  structuredPrimary: true
+  subtitle: over()
+  goal: 8단계. 윈도우 함수 소개에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    over()는 이번 프로젝트의 핵심 개념입니다. group_by()는 그룹별 통계를 계산하지만 행 수가 줄어듭니다(그룹 개수만큼만 남음). 하지만 때로는 "그룹별 평균을 계산하되, 원본 데이터는 그대로 유지"하고 싶을 때가 있습니다. over()는 이 문제를 해결합니다. pl.col("값").mean().over("그룹")은 그룹별 평균을 계산한 후 그 값을 해당 그룹의 모든 행에 붙여줍니다. SQL의 윈도우 함수(Window Function)와 동일한 개념으로, 매우 강력한 기능입니다.
+
+    over("그룹")은 그룹별 계산을 하되 행 수를 유지합니다. group_by()는 그룹 개수만큼 행이 줄지만, over()는 원본 행 수 그대로 유지하면서 각 행에 그룹 통계를 추가합니다. "개별 값과 그룹 평균을 동시에 보고 싶을 때" 필수적인 기능입니다.
+  tips:
+  - over("그룹")은 그룹별 계산을 하되 행 수를 유지합니다. group_by()는 그룹 개수만큼 행이 줄지만, over()는 원본 행 수 그대로 유지하면서 각 행에 그룹 통계를
+    추가합니다. "개별 값과 그룹 평균을 동시에 보고 싶을 때" 필수적인 기능입니다.
+  snippet: |-
+    spotify.select(
+        "track_name",
+        "playlist_genre",
+        "track_popularity",
+        pl.col("track_popularity").mean().over("playlist_genre").alias("genreAvg")
+    ).head(10)
+  exercise:
+    prompt: 8단계. 윈도우 함수 소개 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      spotify.select(
+          "track_name",
+          "playlist_genre",
+          "track_popularity",
+          pl.col("track_popularity").mean().over("playlist_genre").alias("genreAvg")
+      ).head(10)
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 윈도우 함수 소개의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 8단계. 윈도우 함수 소개의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step9_over_vs_groupby
+  title: 9단계. over vs group_by 비교
+  structuredPrimary: true
+  subtitle: 차이점 이해
+  goal: 9단계. over vs groupby 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: group_by는 그룹 수만큼 행이 줄어들고, over는 원본 행 수를 유지합니다. 아래 코드에서 group_by 결과는 장르 수(6개 정도)만큼의 행이 되지만,
+    over를 사용한 이전 예제에서는 수만 개의 원본 행이 그대로 유지됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    spotify.group_by("playlist_genre").agg(
+        pl.col("track_popularity").mean().alias("genreAvg")
+    )
+  exercise:
+    prompt: 9단계. over vs groupby 비교 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      spotify.group_by("playlist_genre").agg(
+          pl.col("track_popularity").mean().alias("genreAvg")
+      )
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. over vs groupby 비교의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 9단계. over vs groupby 비교의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step10_rank
+  title: 10단계. 순위 계산
+  structuredPrimary: true
+  subtitle: rank()
+  goal: 10단계. 순위 계산에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    rank()는 값에 순위를 매기는 함수입니다. 인기도가 높은 곡부터 1위, 2위, 3위... 순으로 번호를 매기는 것입니다. method="ordinal"은 같은 값이어도 다른 순위를 부여하는 방식입니다(동점 처리 안 함). descending=True는 내림차순 정렬로, 큰 값이 1위가 됩니다. 인기도가 100인 곡이 1위, 99인 곡이 2위가 되는 식입니다. 이 함수는 다음 단계에서 over()와 조합하여 더욱 강력해집니다.
+
+    rank()는 순위를 매깁니다. method="ordinal"은 동점도 다른 순위, "dense"는 동점은 같은 순위지만 다음 순위가 연속, "min"은 동점은 같은 순위이고 다음 순위는 건너뛰기입니다. descending=True는 큰 값이 상위 순위(1위)가 됩니다.
+  tips:
+  - rank()는 순위를 매깁니다. method="ordinal"은 동점도 다른 순위, "dense"는 동점은 같은 순위지만 다음 순위가 연속, "min"은 동점은 같은 순위이고
+    다음 순위는 건너뛰기입니다. descending=True는 큰 값이 상위 순위(1위)가 됩니다.
+  snippet: |-
+    spotify.select(
+        "track_name",
+        "track_artist",
+        "track_popularity",
+        pl.col("track_popularity").rank(method="ordinal", descending=True).alias("overallRank")
+    ).sort("overallRank").head(10)
+  exercise:
+    prompt: 10단계. 순위 계산 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      spotify.select(
+          "track_name",
+          "track_artist",
+          "track_popularity",
+          pl.col("track_popularity").rank(method="ordinal", descending=True).alias("overallRank")
+      ).sort("overallRank").head(10)
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 순위 계산의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 10단계. 순위 계산의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step11_rank_over
+  title: 11단계. 그룹 내 순위
+  structuredPrimary: true
+  subtitle: rank + over 조합
+  goal: 11단계. 그룹 내 순위에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    드디어 rank()와 over()를 조합합니다. pl.col("값").rank().over("그룹")은 "각 그룹 내에서의 순위"를 매깁니다. 예를 들어 아티스트별로 곡에 순위를 매기면, "아티스트 A의 1위 곡, 2위 곡", "아티스트 B의 1위 곡, 2위 곡"을 구할 수 있습니다. 이것은 "각 아티스트의 대표곡(1위 곡)만 추출"하는 등 실전에서 매우 유용한 기법입니다. Polars와 SQL의 가장 강력한 기능 중 하나입니다.
+
+    rank().over("그룹")은 그룹별로 독립적인 순위를 매깁니다. 아티스트별, 장르별, 연도별 TOP N을 구할 때 필수입니다. filter(artistRank == 1)로 각 그룹의 1위만 추출하는 패턴은 실전에서 매우 자주 사용됩니다.
+  tips:
+  - rank().over("그룹")은 그룹별로 독립적인 순위를 매깁니다. 아티스트별, 장르별, 연도별 TOP N을 구할 때 필수입니다. filter(artistRank == 1)로
+    각 그룹의 1위만 추출하는 패턴은 실전에서 매우 자주 사용됩니다.
+  snippet: |-
+    spotify.select(
+        "track_name",
+        "track_artist",
+        "track_popularity",
+        pl.col("track_popularity").rank(method="ordinal", descending=True).over("track_artist").alias("artistRank")
+    ).filter(pl.col("artistRank") == 1).sort("track_popularity", descending=True).head(10)
+  exercise:
+    prompt: 11단계. 그룹 내 순위 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      spotify.select(
+          "track_name",
+          "track_artist",
+          "track_popularity",
+          pl.col("track_popularity").rank(method="ordinal", descending=True).over("track_artist").alias("artistRank")
+      ).filter(pl.col("artistRank") == 1).sort("track_popularity", descending=True).head(10)
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 그룹 내 순위의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 11단계. 그룹 내 순위의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step12_genre_rank
+  title: 12단계. 장르별 TOP 3
+  structuredPrimary: true
+  subtitle: 실전 활용
+  goal: 12단계. 장르별 TOP 3에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 각 장르에서 인기도 TOP 3 곡을 뽑습니다. rank().over("playlist_genre")로 장르별 순위를 계산한 뒤 filter로 3위 이하만 선택하면
+    각 장르의 대표곡을 추출할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    spotify.select(
+        "track_name",
+        "track_artist",
+        "playlist_genre",
+        "track_popularity",
+        pl.col("track_popularity").rank(method="ordinal", descending=True).over("playlist_genre").alias("genreRank")
+    ).filter(pl.col("genreRank") <= 3).sort("playlist_genre", "genreRank")
+  exercise:
+    prompt: 12단계. 장르별 TOP 3 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      spotify.select(
+          "track_name",
+          "track_artist",
+          "playlist_genre",
+          "track_popularity",
+          pl.col("track_popularity").rank(method="ordinal", descending=True).over("playlist_genre").alias("genreRank")
+      ).filter(pl.col("genreRank") <= 3).sort("playlist_genre", "genreRank")
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 12단계. 장르별 TOP 3의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 12단계. 장르별 TOP 3의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step13_complex
+  title: 13단계. 종합 분석
+  structuredPrimary: true
+  subtitle: 모든 개념 조합
+  goal: 13단계. 종합 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: love가 포함된 곡 중 장르별 인기도 1위를 찾습니다. 먼저 filter로 "love"가 포함된 곡을 추출하고, rank().over()로 그 중에서 장르별
+    순위를 계산합니다. str.contains, over, rank를 모두 조합하는 고급 기법입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    spotify.filter(
+        pl.col("track_name").str.to_lowercase().str.contains("love")
+    ).select(
+        "track_name",
+        "track_artist",
+        "playlist_genre",
+        "track_popularity",
+        pl.col("track_popularity").rank(method="ordinal", descending=True).over("playlist_genre").alias("genreRank")
+    ).filter(pl.col("genreRank") == 1).sort("track_popularity", descending=True)
+  exercise:
+    prompt: 13단계. 종합 분석 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      spotify.filter(
+          pl.col("track_name").str.to_lowercase().str.contains("love")
+      ).select(
+          "track_name",
+          "track_artist",
+          "playlist_genre",
+          "track_popularity",
+          pl.col("track_popularity").rank(method="ordinal", descending=True).over("playlist_genre").alias("genreRank")
+      ).filter(pl.col("genreRank") == 1).sort("track_popularity", descending=True)
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 13단계. 종합 분석의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 13단계. 종합 분석의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 음악 스트리밍 분석 프로젝트
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    배운 모든 내용을 활용해서 분석해봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import polars as pl
+    from io import StringIO
+    from codaro.curriculum.localData import loadLocalDataset
+
+    tracks = pl.read_csv(StringIO(loadLocalDataset("spotify_songs").to_csv(index=False)))
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import polars as pl
+      from io import StringIO
+      from codaro.curriculum.localData import loadLocalDataset
+
+      tracks = pl.read_csv(StringIO(loadLocalDataset("spotify_songs").to_csv(index=False)))
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 문자열 처리와 윈도우 함수를 배웠습니다.
+  - type: list
+    items:
+    - pl.col("컬럼").str.contains("키워드") - 문자열 포함 검색
+    - pl.col("컬럼").str.to_lowercase() - 소문자 변환
+    - pl.col("값").mean().over("그룹") - 그룹별 계산 (행 유지)
+    - pl.col("값").rank().over("그룹") - 그룹 내 순위
+  - type: text
+    content: 다음 시간에는 부동산 데이터로 조건부 변환(when-then)과 조인을 배웁니다.
+  goal: 정리에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 주문 매출 파이프라인
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: Polars는 빠른 집계만 배우면 부족합니다. 업무에서는 입력 스키마를 먼저 확인하고, 잘못된 수량이나 단가를 명확한 오류로 막고, 예측한 상위 채널이 실제
+    집계와 맞는지 검증해야 합니다. 마지막에는 기준값을 바꾸는 변주로 결론이 얼마나 안정적인지 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import polars as pl
+
+    orderFrame = pl.DataFrame({
+        "orderId": [1001, 1002, 1003, 1004, 1005, 1006],
+        "channel": ["web", "store", "web", "partner", "store", "web"],
+        "quantity": [3, 2, 5, 1, 4, 2],
+        "unitPrice": [12000, 18000, 9000, 40000, 15000, 22000],
+        "refund": [0, 0, 1, 0, 0, 0],
+    })
+
+    def validateOrderFrame(frame: pl.DataFrame) -> bool:
+        requiredColumns = {"orderId", "channel", "quantity", "unitPrice", "refund"}
+        missingColumns = requiredColumns - set(frame.columns)
+        if missingColumns:
+            raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+        if frame.select((pl.col("quantity") <= 0).any()).item():
+            raise ValueError("quantity는 0보다 커야 합니다.")
+        if frame.select((pl.col("unitPrice") <= 0).any()).item():
+            raise ValueError("unitPrice는 0보다 커야 합니다.")
+        return True
+
+    validateOrderFrame(orderFrame)
+    orderFrame
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      revenueByChannel = (
+          orderFrame.filter(pl.col("refund") == 0)
+          .with_columns((pl.col("quantity") * pl.col("unitPrice")).alias("netRevenue"))
+          .group_by("channel")
+          .agg(pl.col("netRevenue").sum())
+      )
+
+      thresholdFrame = pl.DataFrame({"threshold": [20000, 50000, 80000]}).with_columns(
+          pl.col("threshold").map_elements(
+              lambda threshold: revenueByChannel.filter(pl.col("netRevenue") >= threshold).height,
+              return_dtype=pl.Int64,
+          ).alias("qualifiedChannels")
+      )
+
+      assert thresholdFrame.select((pl.col("qualifiedChannels").diff().fill_null(0) <= 0).all()).item()
+      thresholdFrame
+    solution: |-
+      import polars as pl
+
+      orderFrame = pl.DataFrame({
+          "orderId": [1001, 1002, 1003, 1004, 1005, 1006],
+          "channel": ["web", "store", "web", "partner", "store", "web"],
+          "quantity": [3, 2, 5, 1, 4, 2],
+          "unitPrice": [12000, 18000, 9000, 40000, 15000, 22000],
+          "refund": [0, 0, 1, 0, 0, 0],
+      })
+
+      def validateOrderFrame(frame: pl.DataFrame) -> bool:
+          requiredColumns = {"orderId", "channel", "quantity", "unitPrice", "refund"}
+          missingColumns = requiredColumns - set(frame.columns)
+          if missingColumns:
+              raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+          if frame.select((pl.col("quantity") <= 0).any()).item():
+              raise ValueError("quantity는 0보다 커야 합니다.")
+          if frame.select((pl.col("unitPrice") <= 0).any()).item():
+              raise ValueError("unitPrice는 0보다 커야 합니다.")
+          return True
+
+      validateOrderFrame(orderFrame)
+      orderFrame
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 업무 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: polars_05-streaming-session-rank-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: 음악 청취 event를 사용자별 재생 수·시간으로 집계하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: user·track group 집계와 사용자 안 rank를 한 결과로 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - event row를 바로 rank하지 말고 user·track으로 먼저 집계하세요.
+    - rank는 사용자마다 1부터 다시 시작합니다.
+    exercise:
+      prompt: rank_streaming_tracks(events)를 완성해 user별 track, plays, seconds, rank를 반환하세요.
+      starterCode: |-
+        def rank_streaming_tracks(events):
+            raise NotImplementedError
+      solution: |
+        def rank_streaming_tracks(events):
+            grouped = {}
+            for event in events:
+                key = (event["user"], event["track"])
+                bucket = grouped.setdefault(key, {"plays": 0, "seconds": 0})
+                bucket["plays"] += 1
+                bucket["seconds"] += event["seconds"]
+            users = sorted({key[0] for key in grouped})
+            result = []
+            for user in users:
+                tracks = [(track, grouped[(user, track)]) for owner, track in grouped if owner == user]
+                tracks.sort(key=lambda item: (-item[1]["seconds"], -item[1]["plays"], item[0]))
+                for index, (track, values) in enumerate(tracks, start=1):
+                    result.append({"user": user, "track": track, **values, "rank": index})
+            return result
+      hints: *id001
+    check:
+      id: python.polars.polars_05.streaming-session-rank.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_05.streaming-session-rank.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: rank_streaming_tracks
+        cases:
+        - id: aggregates-before-user-rank
+          arguments:
+          - value:
+            - user: u1
+              track: A
+              seconds: 30
+            - user: u1
+              track: A
+              seconds: 20
+            - user: u1
+              track: B
+              seconds: 60
+            - user: u2
+              track: A
+              seconds: 10
+          expectedReturn:
+          - user: u1
+            track: B
+            plays: 1
+            seconds: 60
+            rank: 1
+          - user: u1
+            track: A
+            plays: 2
+            seconds: 50
+            rank: 2
+          - user: u2
+            track: A
+            plays: 1
+            seconds: 10
+            rank: 1
+        - id: handles-empty-events
+          arguments:
+          - value: []
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: polars_05-sessionize-events-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_05-streaming-session-rank-mastery
+    title: 새 event stream을 시간 gap 기준 session으로 나누기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 사용자 group window를 gap이 threshold보다 큰 지점에서 session id 증가로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - user별 time 정렬 뒤 gap을 계산하세요.
+    - gap == threshold는 같은 session에 남깁니다.
+    exercise:
+      prompt: sessionize_events(events, gap_threshold)를 완성해 user, time, session 목록을 반환하세요.
+      starterCode: |-
+        def sessionize_events(events, gap_threshold):
+            raise NotImplementedError
+      solution: |
+        def sessionize_events(events, gap_threshold):
+            if gap_threshold < 0:
+                raise ValueError("gap threshold must be nonnegative")
+            grouped = {}
+            for event in events:
+                grouped.setdefault(event["user"], []).append(event)
+            result = []
+            for user, group in sorted(grouped.items()):
+                previous = None
+                session = 0
+                for event in sorted(group, key=lambda item: item["time"]):
+                    if previous is None or event["time"] - previous > gap_threshold:
+                        session += 1
+                    result.append({"user": user, "time": event["time"], "session": session})
+                    previous = event["time"]
+            return result
+      hints: *id002
+    check:
+      id: python.polars.polars_05.sessionize-events.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_05.sessionize-events.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: sessionize_events
+        cases:
+        - id: splits-on-large-gap-per-user
+          arguments:
+          - value:
+            - user: a
+              time: 20
+            - user: a
+              time: 0
+            - user: a
+              time: 5
+            - user: b
+              time: 100
+          - value: 10
+          expectedReturn:
+          - user: a
+            time: 0
+            session: 1
+          - user: a
+            time: 5
+            session: 1
+          - user: a
+            time: 20
+            session: 2
+          - user: b
+            time: 100
+            session: 1
+        - id: handles-empty-stream
+          arguments:
+          - value: []
+          - value: 10
+          expectedReturn: []
+        - id: rejects-negative-gap
+          arguments:
+          - value: []
+          - value: -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: polars_05-streaming-group-rule-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_05-sessionize-events-transfer
+    title: event stream 집계 단위 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: event, user-track aggregate, session 수준의 key와 증거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 질문에 맞는 row grain을 먼저 고정하세요.
+    - session 결과에는 사용한 gap threshold를 반드시 남기세요.
+    exercise:
+      prompt: choose_streaming_grain(situation)를 완성해 grain, key, evidence를 반환하세요.
+      starterCode: |-
+        def choose_streaming_grain(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_streaming_grain(situation):
+            table = {'raw-play': {'grain': 'event', 'key': 'event id', 'evidence': 'timestamp and duration'}, 'favorite-track': {'grain': 'user-track aggregate', 'key': 'user, track', 'evidence': 'play and second totals'}, 'visit-behavior': {'grain': 'session', 'key': 'user, session id', 'evidence': 'gap threshold'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.polars.polars_05.streaming-group-rule.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_05.streaming-group-rule.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_streaming_grain
+        cases:
+        - id: recalls-raw-play
+          arguments:
+          - value: raw-play
+          expectedReturn:
+            grain: event
+            key: event id
+            evidence: timestamp and duration
+        - id: recalls-favorite-track
+          arguments:
+          - value: favorite-track
+          expectedReturn:
+            grain: user-track aggregate
+            key: user, track
+            evidence: play and second totals
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

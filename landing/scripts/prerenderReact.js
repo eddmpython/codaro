@@ -21,6 +21,10 @@ const landingRoot = resolve(__dirname, "..");
 const buildRoot = resolve(landingRoot, "build");
 const shellPath = resolve(buildRoot, "index.html");
 const shell = readFileSync(shellPath, "utf-8");
+const interactiveRunShellPath = resolve(buildRoot, "run", "index.html");
+const interactiveRunShell = existsSync(interactiveRunShellPath)
+  ? readFileSync(interactiveRunShellPath, "utf-8")
+  : null;
 const basePath = "/codaro";
 
 const docsContentEntries = await Promise.all(
@@ -155,6 +159,10 @@ const routes = [
 ];
 
 for (const route of routes) {
+  if (interactiveRunShell && route.routeData?.kind === "public-lesson") {
+    writeRoute(route.path, renderInteractiveLessonShell(route));
+    continue;
+  }
   route.body = renderApplication(route.path, route.routeData || null);
   writeRoute(route.path, renderShell(route));
 }
@@ -273,6 +281,111 @@ function renderShell(route) {
     .replace(/<meta\s+name="twitter:image:alt"\s+content="[^"]*"\s*\/?>/s, () => `<meta name="twitter:image:alt" content="${escapeHtml(imageAlt)}" />`)
     .replace(/<\/head>/, () => `${jsonLdBlocks}${routeDataScript}</head>`)
     .replace(/<div id="root"><\/div>/, () => `<div id="root">${route.body}</div>`);
+}
+
+function renderInteractiveLessonShell(route) {
+  const lesson = route.routeData.lesson;
+  const baseTitle = `${route.title} - Codaro`;
+  const description = route.description || lesson.direction || brand.description;
+  const canonical = normalizeCanonical(route.path);
+  const image = resolveRouteImage(route);
+  const imageAlt = route.imageAlt || `${route.title} · Codaro`;
+  const runtimeTier = lesson.runtimeTier === "local" ? "local" : "browser";
+  const breadcrumb = buildBreadcrumbJsonLd(route.path, route.title);
+  const initialDocument = lessonInitialDocumentHtml(lesson);
+  const metadata = [
+    `<meta name="description" content="${escapeHtml(description)}" />`,
+    `<meta name="codaro-runtime-tier" content="web" />`,
+    `<meta name="codaro-lesson-runtime-tier" content="${runtimeTier}" />`,
+    `<meta name="codaro-canonical-lesson" content="${escapeHtml(`${lesson.track}/${lesson.id}`)}" />`,
+    `<link rel="canonical" href="${escapeHtml(canonical)}" />`,
+    `<link rel="alternate" hreflang="ko" href="${escapeHtml(canonical)}" />`,
+    `<link rel="alternate" hreflang="x-default" href="${escapeHtml(canonical)}" />`,
+    `<meta property="og:type" content="article" />`,
+    `<meta property="og:title" content="${escapeHtml(baseTitle)}" />`,
+    `<meta property="og:description" content="${escapeHtml(description)}" />`,
+    `<meta property="og:url" content="${escapeHtml(canonical)}" />`,
+    `<meta property="og:image" content="${escapeHtml(image)}" />`,
+    `<meta property="og:image:secure_url" content="${escapeHtml(image)}" />`,
+    `<meta property="og:image:alt" content="${escapeHtml(imageAlt)}" />`,
+    `<meta name="twitter:card" content="summary_large_image" />`,
+    `<meta name="twitter:title" content="${escapeHtml(baseTitle)}" />`,
+    `<meta name="twitter:description" content="${escapeHtml(description)}" />`,
+    `<meta name="twitter:image" content="${escapeHtml(image)}" />`,
+    `<meta name="twitter:image:alt" content="${escapeHtml(imageAlt)}" />`,
+    breadcrumb ? `<script id="codaro-breadcrumb-jsonld" type="application/ld+json">${scriptSafeJson(breadcrumb)}</script>` : "",
+    route.jsonLd ? `<script id="codaro-route-jsonld" type="application/ld+json">${scriptSafeJson(route.jsonLd)}</script>` : "",
+    `<script id="codaro-route-data" type="application/json">${scriptSafeJson(route.routeData)}</script>`,
+    `<script id="codaro-lesson-initial-data" type="application/json">${scriptSafeJson(lesson)}</script>`,
+    `<style id="codaro-lesson-initial-style">${lessonInitialDocumentCss()}</style>`,
+  ].join("");
+
+  return interactiveRunShell
+    .replace(/<html lang="[^"]*"/, () => `<html lang="ko"`)
+    .replace(/<title>.*?<\/title>/s, () => `<title>${escapeHtml(baseTitle)}</title>`)
+    .replace(/<\/head>/, () => `${metadata}</head>`)
+    .replace(/<div id="root"><\/div>/, () => `<div id="root">${initialDocument}</div>`);
+}
+
+function lessonInitialDocumentHtml(lesson) {
+  const firstSection = lesson.sections?.[0] || null;
+  const localRuntime = lesson.runtimeTier === "local";
+  const outcomes = Array.isArray(lesson.outcome) ? lesson.outcome.slice(0, 4) : [];
+  const points = lesson.intro?.points?.length
+    ? lesson.intro.points.slice(0, 4)
+    : lesson.intro?.benefits?.slice(0, 4) || [];
+  const snippet = firstSection?.snippet || firstSection?.exercise?.starterCode || "";
+  const prompt = firstSection?.exercise?.prompt || firstSection?.goal || "";
+  return [
+    `<main class="lessonInitialDocument" data-initial-lesson-ref="${escapeHtml(`${lesson.track}/${lesson.id}`)}" data-public-lesson="${escapeHtml(`${lesson.track}/${lesson.id}`)}">`,
+    `<header class="lessonInitialHeader">`,
+    `<span>${escapeHtml(lesson.domainLabel || "Codaro Learn")} · ${escapeHtml(String(lesson.estimatedMinutes || 0))}분</span>`,
+    `<h1>${escapeHtml(lesson.title)}</h1>`,
+    `<p>${escapeHtml(lesson.intro?.direction || lesson.seo?.description || "")}</p>`,
+    `</header>`,
+    `<div class="lessonInitialRuntime" data-runtime-tier="${localRuntime ? "local" : "browser"}">`,
+    `<strong>${localRuntime ? "Web에서 개념과 코드 학습" : "Web에서 바로 편집·실행"}</strong>`,
+    `<span>${localRuntime ? "운영체제 권한이 필요한 실행은 Local에서 이어집니다." : "실행 뒤 강한 검증이 자동으로 이어집니다."}</span>`,
+    `</div>`,
+    `<section class="lessonInitialOutcomes" aria-label="학습 목표">${outcomes.map((outcome) => `<span>${escapeHtml(outcome)}</span>`).join("")}</section>`,
+    `<section class="lessonInitialBody">`,
+    `<div>`,
+    `<span class="lessonInitialIndex">01</span>`,
+    `<h2>${escapeHtml(firstSection?.title || "첫 실습")}</h2>`,
+    firstSection?.goal ? `<p>${escapeHtml(firstSection.goal)}</p>` : "",
+    points.length ? `<ul>${points.map((point) => `<li>${escapeHtml(point)}</li>`).join("")}</ul>` : "",
+    `</div>`,
+    `<div class="lessonInitialExercise">`,
+    `<span>직접 해보기</span>`,
+    prompt ? `<strong>${escapeHtml(prompt)}</strong>` : "",
+    snippet ? `<pre><code>${escapeHtml(snippet)}</code></pre>` : "",
+    `<small>편집기를 준비하고 있습니다.</small>`,
+    `</div>`,
+    `</section>`,
+    `</main>`,
+  ].join("");
+}
+
+function lessonInitialDocumentCss() {
+  return `
+    .lessonInitialDocument{min-height:100vh;overflow:auto;padding:56px max(24px,calc((100vw - 960px)/2));background:var(--color-background-body,light-dark(#f5f6f8,#151619));color:var(--color-text-primary,light-dark(#18191d,#f5f6f8));font-family:var(--font-family-body,system-ui,sans-serif)}
+    .lessonInitialHeader{display:grid;max-width:720px;gap:12px}
+    .lessonInitialHeader>span,.lessonInitialIndex{color:var(--color-text-accent,light-dark(#6d2857,#e4a9d2));font:700 12px/18px var(--font-family-code,monospace)}
+    .lessonInitialHeader h1{margin:0;font:700 32px/40px var(--font-family-heading,system-ui,sans-serif)}
+    .lessonInitialHeader p{margin:0;max-width:64ch;color:var(--color-text-secondary,light-dark(#5d626d,#aeb3bd));font-size:16px;line-height:26px}
+    .lessonInitialRuntime{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:24px;padding:12px 14px;border-left:3px solid var(--color-border-brand,light-dark(#8a356d,#e4a9d2));background:var(--color-background-muted,light-dark(#eceff3,#202226));font-size:13px;line-height:20px}
+    .lessonInitialRuntime span{color:var(--color-text-secondary,light-dark(#5d626d,#aeb3bd))}
+    .lessonInitialOutcomes{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px;padding-block:16px;border-block:1px solid var(--color-border,light-dark(#d9dde3,#34373d))}
+    .lessonInitialOutcomes span{padding:4px 8px;border-radius:6px;background:var(--color-background-muted,light-dark(#eceff3,#202226));font-size:13px;line-height:20px}
+    .lessonInitialBody{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,.8fr);gap:48px;margin-top:40px}
+    .lessonInitialBody h2{margin:6px 0 10px;font-size:24px;line-height:32px}
+    .lessonInitialBody p,.lessonInitialBody li{font-size:16px;line-height:26px}
+    .lessonInitialExercise{display:grid;align-content:start;gap:10px;padding:18px;border:1px solid var(--color-border-emphasized,light-dark(#b7bdc7,#535760));border-radius:8px;background:var(--color-background-card,light-dark(#fff,#1b1c20))}
+    .lessonInitialExercise>span{color:var(--color-text-accent,light-dark(#6d2857,#e4a9d2));font-size:12px;font-weight:700}
+    .lessonInitialExercise pre{overflow:auto;margin:2px 0 0;padding:16px;border-radius:6px;background:var(--color-syntax-background,light-dark(#f8f9fa,#17181b));font-size:14px;line-height:22px}
+    .lessonInitialExercise small{color:var(--color-text-secondary,light-dark(#5d626d,#aeb3bd));font-size:12px;line-height:18px}
+    @media(max-width:700px){.lessonInitialDocument{padding:32px 20px}.lessonInitialHeader h1{font-size:26px;line-height:34px}.lessonInitialBody{grid-template-columns:1fr;gap:24px;margin-top:28px}}
+  `;
 }
 
 function scriptSafeJson(value) {

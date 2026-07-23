@@ -1,0 +1,626 @@
+var e=`meta:
+  packages:
+  - sympy
+  id: sympy_04
+  title: 미분기초
+  order: 4
+  category: sympy
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - sympy
+  - diff
+  - 미분
+  - 도함수
+  - 접선
+  - 편미분
+  seo:
+    title: SymPy 미분 - diff 사용법과 접선의 방정식
+    description: SymPy로 함수를 미분하고 접선의 방정식을 구합니다. diff()로 도함수를 구하고 고차 미분, 편미분을 배웁니다.
+    keywords:
+    - sympy
+    - diff
+    - 미분
+    - 도함수
+    - derivative
+    - 접선
+intro:
+  emoji: 📐
+  goal: diff()로 함수를 미분하고 접선의 방정식을 구합니다.
+  description: 미분은 함수의 순간 변화율을 구하는 연산으로, 미적분학의 핵심입니다. 속도, 가속도, 기울기, 최적화 등 수많은 응용이 있습니다. SymPy의 diff()는
+    x²을 2x로, sin(x)를 cos(x)로 정확하게 미분합니다. 손으로 계산하면 연쇄법칙, 곱의 미분에서 실수하기 쉬운데, SymPy는 어떤 복잡한 함수도 정확하게 처리합니다.
+    이 프로젝트를 완료하면 도함수 계산, 접선의 방정식, 극값 찾기까지 할 수 있게 됩니다.
+  direction: 미분기초에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 수식과 기호 확인 후 기호 계산에 맞는 코드 입력을 고릅니다.
+  - 미분기초 결과를 간소화식, 해, 미분/적분 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 수학 계산 검증 루틴에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(수식과 기호)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 기본 미분 처리 실행
+      detail: 기호 계산 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 미분 규칙 결과 검증
+      detail: 간소화식, 해, 미분/적분 결과 기준으로 실행 결과를 비교합니다.
+    - label: 미분기초 재사용
+      detail: 완성 코드를 수학 계산 검증 루틴에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기호 계산 환경
+      detail: sympy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 미분기초 실행
+      detail: 셀을 실행해 간소화식, 해, 미분/적분 결과와 예외 상태를 확인합니다.
+    - label: 미분기초 완료
+      detail: 검증된 코드를 수학 계산 검증 루틴로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 미분에 필요한 함수들을 불러옵니다. diff()가 핵심 함수이며, sin, cos, tan은 삼각함수, exp는 지수함수 eˣ, log는 자연로그 ln(x)입니다.
+    이 함수들의 미분은 미적분학에서 가장 기본적인 공식으로, SymPy가 모두 정확하게 처리합니다. simplify와 expand는 미분 결과를 정리할 때 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from sympy import symbols, diff, simplify, expand, solve, Eq
+    from sympy import sin, cos, tan, exp, log, sqrt, pi
+    from sympy import init_printing
+    init_printing()
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from sympy import symbols, diff, simplify, expand, solve, Eq
+      from sympy import sin, cos, tan, exp, log, sqrt, pi
+      from sympy import init_printing
+      init_printing()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 1단계. 라이브러리 불러오기의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step2_diff_basic
+  title: 2단계. 기본 미분
+  structuredPrimary: true
+  subtitle: diff()
+  goal: 2단계. 기본 미분에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    diff()는 differentiate(미분하다)의 줄임말로, 함수의 도함수를 구합니다. diff(f, x)는 f를 x에 대해 미분합니다. 기본 공식 xⁿ의 미분은 n×xⁿ⁻¹입니다. x²을 미분하면 2x, x³을 미분하면 3x²가 됩니다. 상수의 미분은 0입니다. 이 규칙들을 diff()가 자동으로 적용합니다.
+
+    diff(수식, 변수)로 미분합니다. 다항식 xⁿ의 미분은 n×xⁿ⁻¹입니다. 상수의 미분은 0입니다.
+  snippet: x = symbols('x')
+  exercise:
+    prompt: 2단계. 기본 미분 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: x = symbols('x')
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 2단계. 기본 미분의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 기본 미분 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step3_rules
+  title: 3단계. 미분 규칙
+  structuredPrimary: true
+  subtitle: 합, 곱, 몫
+  goal: 3단계. 미분 규칙에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    SymPy는 미분의 기본 규칙들을 자동으로 적용합니다. 합의 미분 (f+g)' = f'+g'는 각 항을 따로 미분합니다. 곱의 미분 (fg)' = f'g + fg'는 라이프니츠 규칙입니다. 몫의 미분 (f/g)' = (f'g - fg')/g²도 자동 적용됩니다. 손으로 계산하면 부호 실수가 잦은 이 규칙들을 SymPy가 정확하게 처리합니다.
+
+    곱의 미분은 (fg)' = f'g + fg'입니다. 몫의 미분은 (f/g)' = (f'g - fg')/g²입니다. SymPy가 자동 적용합니다.
+  snippet: |-
+    h = x**2 + 3*x + 1
+    dh = diff(h, x)
+    dh
+  exercise:
+    prompt: 3단계. 미분 규칙 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      h = x**2 + 3*x + 1
+      dh = diff(h, x)
+      dh
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 3단계. 미분 규칙의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 미분 규칙 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step4_special
+  title: 4단계. 특수 함수 미분
+  structuredPrimary: true
+  subtitle: sin, cos, exp, log
+  goal: 4단계. 특수 함수 미분에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    삼각함수, 지수함수, 로그함수는 특별한 미분 공식을 가집니다. (sin x)' = cos x, (cos x)' = -sin x로 삼각함수끼리 순환합니다. (eˣ)' = eˣ로 지수함수는 자기 자신이 도함수입니다. (ln x)' = 1/x로 로그함수는 역수가 됩니다. 이 공식들은 미적분학의 기본으로, 반드시 암기해야 합니다. SymPy로 검증하면서 익히세요.
+
+    (sin x)' = cos x, (cos x)' = -sin x, (eˣ)' = eˣ, (ln x)' = 1/x입니다. 이것은 암기해야 할 기본 공식입니다.
+  snippet: |-
+    dsin = diff(sin(x), x)
+    dcos = diff(cos(x), x)
+    dsin, dcos
+  exercise:
+    prompt: 4단계. 특수 함수 미분 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      dsin = diff(sin(x), x)
+      dcos = diff(cos(x), x)
+      dsin, dcos
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 4단계. 특수 함수 미분의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 특수 함수 미분 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step5_chain
+  title: 5단계. 연쇄 법칙
+  structuredPrimary: true
+  subtitle: 합성함수 미분
+  goal: 5단계. 연쇄 법칙에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 연쇄 법칙(chain rule)은 합성함수 f(g(x))를 미분하는 규칙입니다. 바깥 함수를 미분하고 안쪽 함수의 미분을 곱합니다. sin(x²)의 미분은
+    cos(x²)×2x = 2x·cos(x²)입니다. e^(3x)의 미분은 e^(3x)×3 = 3e^(3x)입니다. 복잡한 합성함수일수록 연쇄 법칙을 손으로 적용하기 어려운데, SymPy는
+    아무리 복잡해도 정확하게 처리합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    comp1 = sin(x**2)
+    dcomp1 = diff(comp1, x)
+    dcomp1
+  exercise:
+    prompt: 5단계. 연쇄 법칙 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      comp1 = sin(x**2)
+      dcomp1 = diff(comp1, x)
+      dcomp1
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 5단계. 연쇄 법칙의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 연쇄 법칙 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step6_higher
+  title: 6단계. 고차 미분
+  structuredPrimary: true
+  subtitle: 2차, 3차 미분
+  goal: 6단계. 고차 미분에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    고차 미분은 도함수를 다시 미분하는 것입니다. diff(f, x, 2)는 f를 x로 두 번 미분하여 2차 도함수 f''를 구합니다. x³을 미분하면 3x², 한 번 더 미분하면 6x, 세 번째는 6, 네 번째는 0입니다. 물리학에서 위치의 1차 미분은 속도, 2차 미분은 가속도입니다. sin(x)는 4번 미분하면 다시 sin(x)로 돌아오는 재미있는 패턴이 있습니다.
+
+    sin x를 4번 미분하면 다시 sin x가 됩니다. 주기가 4입니다. diff(f, x, n)으로 n차 미분을 한 번에 계산합니다.
+  snippet: |-
+    func = x**3
+    d1 = diff(func, x)
+    d2 = diff(func, x, 2)
+    d1, d2
+  exercise:
+    prompt: 6단계. 고차 미분 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      func = x**3
+      d1 = diff(func, x)
+      d2 = diff(func, x, 2)
+      d1, d2
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 6단계. 고차 미분의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 고차 미분 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step7_partial
+  title: 7단계. 편미분
+  structuredPrimary: true
+  subtitle: 다변수 함수
+  goal: 7단계. 편미분에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    편미분(partial derivative)은 여러 변수가 있는 함수에서 특정 변수만 미분하고 나머지는 상수로 취급하는 것입니다. f(x,y) = x²y + xy²에서 x로 편미분하면 y를 상수로 보고 2xy + y²가 됩니다. y로 편미분하면 x를 상수로 보고 x² + 2xy가 됩니다. 다변수 함수의 그래디언트, 경제학의 한계효용, 열역학의 상태방정식 등에서 편미분이 필수입니다.
+
+    편미분에서 다른 변수는 상수로 취급합니다. diff(f, x, y)는 먼저 x로, 그 다음 y로 미분합니다.
+  snippet: |-
+    y = symbols('y')
+    fxy = x**2 * y + x * y**2
+    fxy
+  exercise:
+    prompt: 7단계. 편미분 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      y = symbols('y')
+      fxy = x**2 * y + x * y**2
+      fxy
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 7단계. 편미분의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 편미분 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step8_tangent
+  title: 8단계. 접선의 방정식
+  structuredPrimary: true
+  subtitle: 미분의 응용
+  goal: 8단계. 접선의 방정식에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    접선의 방정식은 미분의 가장 대표적인 응용입니다. 곡선 y=f(x) 위의 점 (a, f(a))에서 접선의 기울기는 그 점에서의 미분값 f'(a)입니다. 접선의 방정식은 y = f'(a)(x-a) + f(a)입니다. 예를 들어 y=x²에서 x=2일 때, f(2)=4, f'(2)=4이므로 접선은 y=4(x-2)+4=4x-4입니다. 물리학의 순간 속도, 경제학의 한계 비용 등이 모두 이 개념입니다.
+
+    접선의 기울기는 그 점에서의 미분값입니다. y = f'(a)(x - a) + f(a) 공식을 사용합니다.
+  snippet: |-
+    func = x**2
+    dfunc = diff(func, x)
+    func, dfunc
+  exercise:
+    prompt: 8단계. 접선의 방정식 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      func = x**2
+      dfunc = diff(func, x)
+      func, dfunc
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 8단계. 접선의 방정식의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 접선의 방정식 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step9_extrema
+  title: 9단계. 극값 찾기
+  structuredPrimary: true
+  subtitle: 미분으로 최대/최소
+  goal: 9단계. 극값 찾기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    함수의 극대점(local maximum)과 극소점(local minimum)은 도함수가 0인 점에서 발생합니다. 먼저 solve(f', x)로 임계점(critical point)을 찾습니다. 그 다음 2차 도함수 f''를 이용해 판별합니다. f''(a) > 0이면 아래로 볼록하여 극소, f''(a) < 0이면 위로 볼록하여 극대입니다. 최적화 문제에서 비용을 최소화하거나 수익을 최대화하는 점을 찾을 때 이 방법을 사용합니다.
+
+    f''(a) > 0이면 극소, f''(a) < 0이면 극대입니다. x=-1에서 극대, x=1에서 극소입니다.
+  snippet: |-
+    cubic = x**3 - 3*x
+    dcubic = diff(cubic, x)
+    cubic, dcubic
+  exercise:
+    prompt: 9단계. 극값 찾기 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      cubic = x**3 - 3*x
+      dcubic = diff(cubic, x)
+      cubic, dcubic
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 9단계. 극값 찾기의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 극값 찾기 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step10_velocity
+  title: 10단계. 속도와 가속도
+  structuredPrimary: true
+  subtitle: 물리적 의미
+  goal: 10단계. 속도와 가속도에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 물리학에서 미분의 가장 직관적인 응용은 운동입니다. 위치 함수 s(t)를 시간 t로 미분하면 순간 속도 v(t) = ds/dt가 됩니다. 속도를 한 번 더
+    미분하면 가속도 a(t) = dv/dt = d²s/dt²가 됩니다. s(t) = t³-6t²+9t일 때 속도 v(t) = 3t²-12t+9, 가속도 a(t) = 6t-12입니다.
+    v(t)=0인 시점에서 물체가 정지합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    t = symbols('t')
+    position = t**3 - 6*t**2 + 9*t
+    position
+  exercise:
+    prompt: 10단계. 속도와 가속도 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      t = symbols('t')
+      position = t**3 - 6*t**2 + 9*t
+      position
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 10단계. 속도와 가속도의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 속도와 가속도 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 미분 연습
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    지금까지 배운 diff, solve, subs를 모두 활용하여 실전 문제를 풀어봅시다. 미션1은 다항식, 삼각함수, 지수로그함수를 미분하는 기본 연습입니다. 미션2는 접선의 방정식을 구하고 임계점을 찾아 극값을 판별합니다. 각 미션은 독립적으로 실행 가능하므로 원하는 것부터 시작하세요.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    from sympy import symbols, diff, sin, cos, exp, log, simplify
+
+    v = symbols('v')
+
+    poly = v**4 - 3*v**2 + 2*v
+    dpoly = diff(poly, v)
+    dpoly
+  exercise:
+    prompt: 실습 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from sympy import symbols, diff, sin, cos, exp, log, simplify
+
+      v = symbols('v')
+
+      poly = v**4 - 3*v**2 + 2*v
+      dpoly = diff(poly, v)
+      dpoly
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 실습의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 실습 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기'
+  structuredPrimary: true
+  subtitle: 예측 → 수식 구성 → 오류 수정 → 결과 검증 → 실무 변주
+  goal: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: SymPy는 계산기를 대신하는 도구가 아니라, 업무 규칙을 수식으로 고정하고 전제 조건을 검증하는 도구입니다. 여기서는 고정비와 단위 이익으로 손익분기점을
+    구하고, 잘못된 계수를 먼저 실패시킨 뒤, 기준 변경 실험을 수행합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import sympy as sp
+
+    x = sp.symbols('x', nonnegative=True)
+    fixedCost = 120000
+    unitPrice = 5000
+    unitCost = 2000
+
+    revenueExpr = unitPrice * x
+    costExpr = fixedCost + unitCost * x
+    profitExpr = sp.simplify(revenueExpr - costExpr)
+    breakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]
+
+    assert profitExpr == 3000 * x - 120000
+    assert breakEvenQuantity == 40
+    profitExpr, breakEvenQuantity
+  exercise:
+    prompt: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    starterCode: |-
+      import sympy as sp
+
+      x = sp.symbols('x', nonnegative=True)
+      fixedCost = 120000
+      unitPrice = 5000
+      unitCost = 2000
+
+      revenueExpr = unitPrice * x
+      costExpr = fixedCost + unitCost * x
+      profitExpr = sp.simplify(revenueExpr - costExpr)
+      breakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]
+
+      assert profitExpr == 3000 * x - 120000
+      assert breakEvenQuantity == 40
+      profitExpr, breakEvenQuantity
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.'
+    resultCheck: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sympy_04-polynomial-derivative-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 다항식 미분 계수 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: power rule로 coefficient 배열의 도함수를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 배열 index가 power입니다.
+    - 상수항의 미분은 0이며 표현에서 제거합니다.
+    exercise:
+      prompt: differentiate(coefficients)를 완성하세요.
+      starterCode: |-
+        def differentiate(coefficients):
+            raise NotImplementedError
+      solution: |
+        def differentiate(coefficients):
+            result = [power * coefficient for power, coefficient in enumerate(coefficients)][1:]
+            while result and result[-1] == 0: result.pop()
+            return result
+      hints: *id001
+    check:
+      id: python.sympy.sympy_04.polynomial-derivative.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_04.polynomial-derivative.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: differentiate
+        cases:
+        - id: applies-power-rule
+          arguments:
+          - value:
+            - 3
+            - 2
+            - 5
+          expectedReturn:
+          - 2
+          - 10
+        - id: constant-derivative-zero
+          arguments:
+          - value:
+            - 7
+          expectedReturn: []
+        - id: handles-zero-tail
+          arguments:
+          - value:
+            - 1
+            - 0
+            - 0
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sympy_04-marginal-change-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sympy_04-polynomial-derivative-mastery
+    title: 새 비용 함수에 미분 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: quadratic 비용의 marginal cost와 stationary point를 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 도함수는 순간 변화율이지 실제 유한 변화량이 아닙니다.
+    - stationary point 존재와 최소값 여부를 구분하세요.
+    exercise:
+      prompt: quadratic_sensitivity(a, b, c, x)를 완성하세요.
+      starterCode: |-
+        def quadratic_sensitivity(a, b, c, x):
+            raise NotImplementedError
+      solution: |
+        def quadratic_sensitivity(a, b, c, x):
+            derivative = 2*a*x + b
+            stationary = None if a == 0 else -b/(2*a)
+            return {"value": a*x*x+b*x+c, "derivative": derivative, "stationary": stationary}
+      hints: *id002
+    check:
+      id: python.sympy.sympy_04.marginal-change.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_04.marginal-change.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: quadratic_sensitivity
+        cases:
+        - id: computes-sensitivity
+          arguments:
+          - value: 2
+          - value: -8
+          - value: 3
+          - value: 1
+          expectedReturn:
+            value: -3
+            derivative: -4
+            stationary: 2.0
+        - id: handles-linear
+          arguments:
+          - value: 0
+          - value: 3
+          - value: 1
+          - value: 2
+          expectedReturn:
+            value: 7
+            derivative: 3
+            stationary: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sympy_04-derivative-meaning-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sympy_04-marginal-change-transfer
+    title: 미분 의미 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 기울기·최적점·수치 근사를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 기호 계산의 가정과 정의역을 결과와 함께 남기세요.
+    - 소수 근삿값과 exact 결과를 구분하세요.
+    exercise:
+      prompt: choose_derivative(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_derivative(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_derivative(situation):
+            table = {'symbolic-slope': {'method': 'differentiate', 'evidence': 'power rule and simplification', 'risk': 'missing domain'}, 'stationary-point': {'method': 'solve derivative equals zero', 'evidence': 'second derivative', 'risk': 'maximum or saddle'}, 'black-box-function': {'method': 'finite difference', 'evidence': 'step sensitivity', 'risk': 'roundoff'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sympy.sympy_04.derivative-meaning.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_04.derivative-meaning.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_derivative
+        cases:
+        - id: recalls-symbolic-slope
+          arguments:
+          - value: symbolic-slope
+          expectedReturn:
+            method: differentiate
+            evidence: power rule and simplification
+            risk: missing domain
+        - id: recalls-stationary-point
+          arguments:
+          - value: stationary-point
+          expectedReturn:
+            method: solve derivative equals zero
+            evidence: second derivative
+            risk: maximum or saddle
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

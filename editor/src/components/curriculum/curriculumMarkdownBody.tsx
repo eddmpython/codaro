@@ -21,7 +21,7 @@ export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
     const subtitle = payloadText(payload, "subtitle") || block.description;
     return (
       <div className="min-w-0 max-w-3xl">
-        <h2 className="text-lg font-semibold text-foreground">{stripMarkdown(title)}</h2>
+        <h2 className="text-lg font-bold text-foreground">{stripMarkdown(title)}</h2>
         {subtitle ? <p className="mt-1 text-sm leading-6 text-muted-foreground">{stripMarkdown(subtitle)}</p> : null}
       </div>
     );
@@ -37,8 +37,8 @@ export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
     return (
       <div className="space-y-4">
         <div className="min-w-0 max-w-3xl">
-          <h2 className="text-lg font-semibold text-foreground">{stripMarkdown(title)}</h2>
-          {subtitle ? <p className="mt-1.5 text-md text-foreground">{stripMarkdown(subtitle)}</p> : null}
+          <h2 className="text-lg font-bold text-foreground">{stripMarkdown(title)}</h2>
+          {subtitle ? <p className="mt-1.5 text-md font-normal text-foreground">{stripMarkdown(subtitle)}</p> : null}
           {description ? <p className="mt-1.5 text-sm leading-6 text-muted-foreground">{stripMarkdown(description)}</p> : null}
         </div>
         {points.length ? <TopRuleGrid items={points.slice(0, 6)} /> : null}
@@ -118,7 +118,7 @@ export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
       <div className="space-y-3">
         <div className="min-w-0 max-w-3xl">
           <div className="text-xs font-medium text-muted-foreground">확인 문제</div>
-          <div className="mt-1 text-[15px] font-semibold leading-6 text-foreground">{stripMarkdown(question)}</div>
+          <div className="mt-1 text-[15px] font-bold leading-6 text-foreground">{stripMarkdown(question)}</div>
         </div>
         <div className="grid max-w-3xl gap-2">
           {options.map((option, index) => (

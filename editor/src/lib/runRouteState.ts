@@ -20,7 +20,7 @@ export type RunRoutePatch = Partial<Omit<RunRouteState, "schemaVersion" | "runti
 export type RunRouteNavigationMode = "push" | "replace";
 export type RunRouteLessonRef = { category: string; contentId: string };
 
-type RouteLocation = Pick<Location, "hash" | "search">;
+type RouteLocation = Pick<Location, "hash" | "search"> & Partial<Pick<Location, "pathname">>;
 
 type ReadRunRouteOptions = {
   fallbackSurface: RunRouteSurface;
@@ -78,7 +78,8 @@ export function runRouteStateFromLocation(
   options: ParseRunRouteOptions,
 ): RunRouteState {
   const params = new URLSearchParams(location.search);
-  const hasExplicitRoute = ROUTE_PARAM_NAMES.some((name) => params.has(name));
+  const pathLessonKey = lessonKeyFromPathname(location.pathname);
+  const hasExplicitRoute = Boolean(pathLessonKey) || ROUTE_PARAM_NAMES.some((name) => params.has(name));
   if (!hasExplicitRoute && options.resumeState) {
     return normalizeRunRouteState(
       { ...options.resumeState, runtimeTier },
@@ -87,7 +88,7 @@ export function runRouteStateFromLocation(
     );
   }
 
-  const lessonKey = lessonKeyFromParams(params);
+  const lessonKey = lessonKeyFromParams(params) || pathLessonKey;
   const requestedSurface = normalizeRoutePart(params.get("surface"));
   const hashSurface = normalizeRoutePart(location.hash.replace(/^#/, ""));
   const surface = isRunRouteSurface(requestedSurface)
@@ -166,6 +167,7 @@ export function writeRunRouteState(state: RunRouteState, mode: RunRouteNavigatio
   const runtimeTier = runRouteRuntimeTier();
   const normalized = normalizeRunRouteState(state, runtimeTier, state.surface);
   const url = new URL(window.location.href);
+  url.pathname = runRoutePathname(normalized, url.pathname);
   url.search = runRouteSearchParams(normalized, url.search).toString();
   url.hash = normalized.surface;
   const nextLocation = `${url.pathname}${url.search}${url.hash}`;
@@ -176,6 +178,15 @@ export function writeRunRouteState(state: RunRouteState, mode: RunRouteNavigatio
   else window.history.replaceState(historyState, "", nextLocation);
   storeRunRouteState(normalized);
   return normalized;
+}
+
+export function runRoutePathname(state: RunRouteState, currentPathname: string): string {
+  if (state.runtimeTier !== "web") return currentPathname;
+  const currentLessonKey = lessonKeyFromPathname(currentPathname);
+  if (!currentLessonKey) return currentPathname;
+  if (state.surface === "curriculum" && state.lessonKey) return currentPathname;
+  const basePath = webBasePath(currentPathname);
+  return `${basePath}/run/`;
 }
 
 export function runRouteStatesEqual(left: RunRouteState, right: RunRouteState): boolean {
@@ -199,6 +210,23 @@ function lessonKeyFromParams(params: URLSearchParams): string | null {
   if (category && contentId) return lessonKeyFromRef(category, contentId);
   if (!category && contentId?.includes("/")) return normalizeLessonKey(contentId);
   return explicitLessonKey;
+}
+
+function lessonKeyFromPathname(pathname: string | undefined): string | null {
+  if (!pathname) return null;
+  const match = pathname.match(/(?:^|\/)learn\/lesson\/([^/]+)\/([^/]+)\/?$/);
+  if (!match) return null;
+  try {
+    return lessonKeyFromRef(decodeURIComponent(match[1]), decodeURIComponent(match[2]));
+  } catch {
+    return null;
+  }
+}
+
+function webBasePath(pathname: string): string {
+  const marker = pathname.match(/^(.*?)(?:\/(?:learn\/lesson|run|app))(?:\/|$)/);
+  const basePath = marker?.[1]?.replace(/\/+$/, "") || "";
+  return basePath;
 }
 
 function normalizeLessonKey(value: unknown): string | null {

@@ -1,0 +1,432 @@
+var e=`meta:
+  id: openpyxl_00
+  title: openpyxl 소개
+  order: 0
+  category: openpyxl
+  packages:
+  - openpyxl
+  tags:
+  - openpyxl
+  - 엑셀
+  - 파일자동화
+  - 로컬Python
+  seo:
+    title: openpyxl 소개 - 파일 기반 엑셀 자동화의 표준
+    description: Excel 앱을 켜지 않고 .xlsx 파일을 직접 만들고 읽는 openpyxl 라이브러리의 위치, 장점, 한계, 10개 프로젝트 학습 흐름을 정리합니다.
+    keywords:
+    - openpyxl
+    - xlsx 자동화
+    - 엑셀 파이썬
+    - 리포트 자동화
+intro:
+  direction: openpyxl은 Excel 프로그램과 무관하게 .xlsx 파일 자체를 코드로 만들고 읽는 라이브러리입니다. 서버, CI, macOS, Linux 어디서든 같은 코드가 돕니다.
+  benefits:
+  - 워크북·시트·셀·수식·차트·서식까지 파일 안의 모든 구조를 코드로 제어합니다.
+  - Excel 앱 설치가 필요 없으므로 서버 자동화와 GitHub Actions에서도 그대로 실행됩니다.
+  - 10개 프로젝트를 끝내면 월간 매출 리포트를 데이터에서 한 번에 생성하는 도구를 만들 수 있습니다.
+  diagram:
+    steps:
+    - label: 1. 워크북·시트·셀
+      detail: Workbook → Worksheet → Cell의 3단 구조를 손에 익힌다.
+    - label: 2. 수식·서식·차트
+      detail: 사람이 직접 만들던 수식, 서식, 차트를 코드로 재현한다.
+    - label: 3. 표·검증·이미지
+      detail: 표 스타일, 데이터 검증, 이미지/하이퍼링크로 업무 양식을 완성한다.
+    - label: 4. 자동 리포트 생성기
+      detail: 데이터에서 다중 시트 보고서를 한 번에 만든다.
+    runtime:
+    - label: 로컬 Python
+      detail: uv 환경에서 openpyxl만 있으면 충분하다. Excel 앱은 필요 없다.
+    - label: 결과 검증
+      detail: 저장한 파일을 다시 load_workbook으로 열어 셀 값과 구조를 assert로 확인한다.
+sections:
+- id: runtime_check
+  title: 라이브러리 실행 확인
+  structuredPrimary: true
+  subtitle: import와 워크북 생성 확인
+  goal: openpyxl을 import하고 Workbook 객체를 만들어 현재 로컬 Python에서 바로 쓸 수 있는지 확인한다.
+  why: 이후 강의는 파일 생성과 재열기를 반복하므로 첫 셀에서 라이브러리와 기본 객체를 고정해야 합니다.
+  explanation: 상단 라이브러리 패널이 openpyxl 준비 상태를 확인하고, 이 셀은 준비된 라이브러리가 실제 코드에서 동작하는지 검증합니다.
+  tips:
+  - 패키지 준비는 상단 라이브러리 패널이 맡고, 학습 셀은 import와 작은 객체 생성에 집중합니다.
+  - Workbook을 만든 뒤 셀 값을 하나 쓰고 다시 읽으면 최소 실행 계약을 빠르게 확인할 수 있습니다.
+  snippet: |-
+    import openpyxl
+    from openpyxl import Workbook
+
+    book = Workbook()
+    sheet = book.active
+    sheet["A1"] = "ready"
+
+    assert sheet["A1"].value == "ready"
+    print(openpyxl.__version__)
+  exercise:
+    prompt: A1 대신 B2에 다른 값을 넣고, 같은 값을 다시 읽는 assert를 직접 확인하세요.
+    starterCode: |-
+      import openpyxl
+      from openpyxl import Workbook
+
+      book = Workbook()
+      sheet = book.active
+      sheet["B2"] = "report"
+
+      assert sheet["B2"].value == "report"
+      print(openpyxl.__version__)
+    solution: |-
+      import openpyxl
+      from openpyxl import Workbook
+
+      book = Workbook()
+      sheet = book.active
+      sheet["B2"] = "report"
+
+      assert sheet["B2"].value == "report"
+      print(openpyxl.__version__)
+    hints:
+    - Workbook()으로 새 파일 구조를 메모리에 만듭니다.
+    - 셀 주소 문자열을 바꾸면 같은 패턴으로 다른 위치를 검증할 수 있습니다.
+  check:
+    type: noError
+    noError: openpyxl import, Workbook 생성, 셀 쓰기와 읽기가 오류 없이 끝나야 합니다.
+    resultCheck: 출력에 openpyxl 버전이 보이고 assert가 통과해야 합니다.
+- id: openpyxl_position
+  title: 1. openpyxl이 서 있는 자리
+  blocks:
+  - type: text
+    content: |-
+      Excel 파일(.xlsx)은 사실 XML 문서들을 zip으로 묶은 형식입니다. openpyxl은 이 zip 안의 XML을 직접 읽고 쓰는 라이브러리이므로 Excel 프로그램이 깔려 있지 않아도 동작합니다. 사람이 Excel을 켜고 수식을 적고 차트를 그리던 작업을 그대로 코드로 옮길 수 있고, Linux 서버나 CI 환경에서도 같은 결과를 만듭니다.
+  - type: text
+    content: |-
+      파이썬에는 엑셀을 다루는 도구가 여럿 있지만 역할이 다릅니다. pandas의 read_excel/to_excel은 표 데이터의 입출력에 강하지만 차트·서식·시트 구조는 거의 다루지 못합니다. xlwings는 Excel 앱을 실제로 띄워 매크로처럼 조작하므로 Windows/macOS에 Excel이 설치돼야 합니다. openpyxl은 파일 자체를 직접 생산·수정하므로 가장 환경 의존이 적고, 서버 자동화의 기본 도구가 됩니다.
+- id: when_to_use
+  title: 2. 언제 openpyxl을 선택하는가
+  blocks:
+  - type: list
+    style: check
+    items:
+    - 데이터프레임을 단순히 저장하기만 하면 충분할 때는 pandas.to_excel로 시작합니다.
+    - 셀 색, 굵기, 테두리, 숫자 포맷 등 사람이 보는 표 형식이 중요할 때 openpyxl을 씁니다.
+    - 시트가 여러 개이고, 합계 수식과 차트가 포함된 양식 파일을 자동 생성해야 하면 openpyxl이 기본입니다.
+    - 이미 만들어진 엑셀 템플릿을 데이터로 채워야 할 때(셀 좌표 기반) openpyxl을 씁니다.
+    - 반대로 사용자가 열어둔 Excel 창을 실시간으로 조작해야 하면 xlwings, 매크로 호환이 필요하면 win32com을 봅니다.
+- id: capability_map
+  title: 3. 이 커리큘럼이 다루는 능력 지도
+  blocks:
+  - type: table
+    headers: ["프로젝트", "능력", "산출물"]
+    rows:
+    - ["01 워크북과 시트 만들기", "Workbook/Worksheet 생성·저장·다시 열기", "다중 시트 빈 보고서 파일"]
+    - ["02 셀 읽기와 쓰기", "cell()·['A1']·append·좌표 변환", "통계 dict → 정렬된 셀 표"]
+    - ["03 범위 순회와 다중 시트", "iter_rows·범위 슬라이스·시트 분리", "카테고리별로 분리된 보고서"]
+    - ["04 수식과 이름 영역", "SUM/IF/VLOOKUP·DefinedName·data_only", "수식 기반 인보이스"]
+    - ["05 셀 서식과 숫자 포맷", "Font/Fill/Border/Alignment/숫자포맷", "스타일링된 매출 보고서 헤더"]
+    - ["06 조건부 서식", "ColorScale·DataBar·CellIs·FormulaRule", "KPI 신호등 대시보드"]
+    - ["07 차트 삽입", "BarChart/LineChart/PieChart·Reference", "지역별 매출 차트 묶음"]
+    - ["08 이미지와 하이퍼링크", "add_image·cell.hyperlink·Comment", "이미지 포함 상품 카탈로그"]
+    - ["09 표와 데이터 검증", "Table·TableStyleInfo·DataValidation", "드롭다운 검증된 주문 양식"]
+    - ["10 월간 매출 리포트 생성기", "통합 자동 리포트 파이프라인", "CSV → 다중 시트 완성 보고서"]
+- id: contract
+  title: 4. 학습 계약
+  blocks:
+  - type: list
+    style: bullet
+    items:
+    - 모든 코드는 임시 디렉터리(TemporaryDirectory)에 파일을 저장하고, load_workbook으로 다시 열어 검증합니다. 로컬 파일을 어지럽히지 않습니다.
+    - 각 강의의 마지막 단계에는 \`assert\`로 자동 검증되는 검증 루프가 있습니다. 눈으로 확인하지 않아도 결과가 맞는지 코드가 알려줍니다.
+    - 실습은 카드 한 개에 하나의 변경 지점만 다룹니다. 한 줄을 바꾸고 결과가 어떻게 달라지는지 즉시 확인하는 것이 핵심입니다.
+    - 모든 강의는 openpyxl만으로 또는 openpyxl + pandas 조합으로 돕니다. Excel 앱이 없어도 실행됩니다.
+  - type: tip
+    content: openpyxl은 매크로(.xlsm)나 차트 데이터 라벨의 일부 고급 기능을 손실 없이 보존하지 못할 수 있습니다. 매크로가 필수면 xlwings/win32com을 봐야 합니다. 이 커리큘럼은 일반 .xlsx 보고서·양식 자동화에 집중합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: openpyxl_00-workbook-artifact-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - runtime_check
+    - contract
+    title: Excel workbook의 sheet·formula·table 산출물 계약 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 저장 전에 필요한 workbook 구조와 검증 evidence를 명시한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 파일명뿐 아니라 sheet·formula·table 기대값을 먼저 계약으로 만드세요.
+    - 저장 후 같은 라이브러리로 재개방해 구조를 검증하세요.
+    exercise:
+      prompt: audit_workbook_contract(contract)를 완성하세요.
+      starterCode: |-
+        def audit_workbook_contract(contract):
+            raise NotImplementedError
+      solution: |
+        def audit_workbook_contract(contract):
+            required = {"fileName", "sheets", "expectedFormulas", "expectedTables", "reopenVerification"}
+            missing = sorted(required - set(contract))
+            failures = []
+            if not str(contract.get("fileName", "")).lower().endswith(".xlsx"):
+                failures.append("extension")
+            if not contract.get("sheets") or len(contract.get("sheets", [])) != len(set(contract.get("sheets", []))):
+                failures.append("sheets")
+            if not contract.get("reopenVerification", False):
+                failures.append("reopen")
+            return {"ready": not missing and not failures, "missing": missing, "failures": failures, "evidence": ["workbook descriptor", "reopened structure", "business reconciliation"]}
+      hints: *id001
+    check:
+      id: python.openpyxl.openpyxl_00.workbook-artifact-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_00.workbook-artifact-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_workbook_contract
+        cases:
+        - id: accepts-explicit-workbook-contract
+          arguments:
+          - value:
+              fileName: sales.xlsx
+              sheets:
+              - Raw
+              - Summary
+              expectedFormulas:
+              - Summary!B2
+              expectedTables:
+              - Raw!Sales
+              reopenVerification: true
+          expectedReturn:
+            ready: true
+            missing: []
+            failures: []
+            evidence:
+            - workbook descriptor
+            - reopened structure
+            - business reconciliation
+        - id: reports-extension-duplicates-and-reopen
+          arguments:
+          - value:
+              fileName: sales.xls
+              sheets:
+              - Data
+              - Data
+              expectedFormulas: []
+              expectedTables: []
+              reopenVerification: false
+          expectedReturn:
+            ready: false
+            missing: []
+            failures:
+            - extension
+            - sheets
+            - reopen
+            evidence:
+            - workbook descriptor
+            - reopened structure
+            - business reconciliation
+        - id: reports-missing-contract-fields
+          arguments:
+          - value:
+              fileName: book.xlsx
+          expectedReturn:
+            ready: false
+            missing:
+            - expectedFormulas
+            - expectedTables
+            - reopenVerification
+            - sheets
+            failures:
+            - sheets
+            - reopen
+            evidence:
+            - workbook descriptor
+            - reopened structure
+            - business reconciliation
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: openpyxl_00-excel-runtime-tier-plan-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - openpyxl_00-workbook-artifact-contract-mastery
+    title: 새 Excel 과제에 Web·Local 역할 분리 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 수식 판단과 실제 workbook artifact 생성을 capability로 구분한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - Web 학습을 패키지 실행처럼 위장하지 말고 문서 판단을 강하게 평가하세요.
+    - 실제 workbook과 Desktop Excel capability는 Local 실습으로 연결하세요.
+    exercise:
+      prompt: plan_excel_runtime(requirements)를 완성하세요.
+      starterCode: |-
+        def plan_excel_runtime(requirements):
+            raise NotImplementedError
+      solution: |
+        def plan_excel_runtime(requirements):
+            local_reasons = []
+            if requirements.get("createWorkbook"):
+                local_reasons.append("xlsx-artifact")
+            if requirements.get("reopenWorkbook"):
+                local_reasons.append("artifact-reopen")
+            if requirements.get("desktopExcel"):
+                local_reasons.append("desktop-application")
+            return {"tier": "local" if local_reasons else "web", "localReasons": local_reasons, "webPractice": ["sheet schema", "formula contract", "business reconciliation"]}
+      hints: *id002
+    check:
+      id: python.openpyxl.openpyxl_00.excel-runtime-tier-plan.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_00.excel-runtime-tier-plan.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_excel_runtime
+        cases:
+        - id: keeps-contract-practice-on-web
+          arguments:
+          - value: {}
+          expectedReturn:
+            tier: web
+            localReasons: []
+            webPractice:
+            - sheet schema
+            - formula contract
+            - business reconciliation
+        - id: requires-local-for-workbook-artifact
+          arguments:
+          - value:
+              createWorkbook: true
+              reopenWorkbook: true
+          expectedReturn:
+            tier: local
+            localReasons:
+            - xlsx-artifact
+            - artifact-reopen
+            webPractice:
+            - sheet schema
+            - formula contract
+            - business reconciliation
+        - id: requires-local-for-desktop-excel
+          arguments:
+          - value:
+              desktopExcel: true
+          expectedReturn:
+            tier: local
+            localReasons:
+            - desktop-application
+            webPractice:
+            - sheet schema
+            - formula contract
+            - business reconciliation
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: openpyxl_00-openpyxl-foundation-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - openpyxl_00-excel-runtime-tier-plan-transfer
+    title: openpyxl artifact 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 저장·재개방·업무 reconciliation 근거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Workbook 저장 성공과 업무 값·수식·표시의 정확성을 분리해 검증하세요.
+    - Web에서는 문서 계약을 검증하고 Local에서는 재개방한 artifact evidence를 남기세요.
+    exercise:
+      prompt: choose_workbook_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_workbook_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_workbook_evidence(situation):
+            table = {'save': {'action': 'write bounded xlsx artifact', 'evidence': 'path size hash', 'risk': 'partial file'}, 'reopen': {'action': 'load and inspect workbook structure', 'evidence': 'sheets formulas tables', 'risk': 'corrupt package'}, 'reconcile': {'action': 'compare workbook totals with source', 'evidence': 'business checks', 'risk': 'valid file with wrong numbers'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.openpyxl.openpyxl_00.openpyxl-foundation-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_00.openpyxl-foundation-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_workbook_evidence
+        cases:
+        - id: recalls-save
+          arguments:
+          - value: save
+          expectedReturn:
+            action: write bounded xlsx artifact
+            evidence: path size hash
+            risk: partial file
+        - id: recalls-reopen
+          arguments:
+          - value: reopen
+          expectedReturn:
+            action: load and inspect workbook structure
+            evidence: sheets formulas tables
+            risk: corrupt package
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

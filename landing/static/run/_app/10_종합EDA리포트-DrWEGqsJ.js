@@ -1,0 +1,1071 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - pandas
+  - seaborn
+  id: seaborn_10
+  title: 종합EDA리포트
+  order: 10
+  category: seaborn
+  difficulty: ⭐⭐⭐
+  badge: 심화
+  outcomes: ["viz.edaReport"]
+  prerequisites: ["viz.regression","viz.heatmap","viz.distribution"]
+  estimatedMinutes: 90
+  tags:
+  - seaborn
+  - EDA
+  - FacetGrid
+  - set_theme
+  - penguins
+  - 종합분석
+  seo:
+    title: Seaborn 종합 EDA - 펭귄 데이터 탐색적 분석
+    description: Seaborn의 모든 기능을 활용하여 펭귄 데이터셋의 완전한 EDA 리포트를 작성합니다. FacetGrid, 테마 설정, 다양한 차트 유형을 종합합니다.
+    keywords:
+    - seaborn
+    - EDA
+    - FacetGrid
+    - set_theme
+    - penguins
+    - 종합분석
+intro:
+  emoji: 📊
+  goal: penguins 데이터로 지금까지 배운 모든 Seaborn 기능을 종합하여 완전한 EDA 리포트를 작성합니다.
+  description: 이 프로젝트에서는 테마 설정, countplot, histplot, boxplot, violinplot, scatterplot, pairplot, heatmap,
+    jointplot, lmplot, FacetGrid 등 모든 Seaborn 기능을 활용합니다. 이전에 배운 모든 개념을 종합하여 실전 EDA를 수행합니다.
+  direction: 종합EDA리포트에서 정리된 데이터를 통계 차트로 보고 분포와 관계를 검증합니다.
+  benefits:
+  - 분석용 테이블 확인 후 통계 차트 구성에 맞는 코드 입력을 고릅니다.
+  - 종합EDA리포트 결과를 분포, 그룹, 관계 패턴 기준으로 즉시 점검합니다.
+  - 완료한 코드를 탐색 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리와 테마 설 입력 확인
+      detail: 입력 기준(분석용 테이블)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 기초 통계 처리 실행
+      detail: 통계 차트 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 종별 개체 수 결과 검증
+      detail: 분포, 그룹, 관계 패턴 기준으로 실행 결과를 비교합니다.
+    - label: 종합EDA리포트 재사용
+      detail: 완성 코드를 탐색 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 통계 시각화 환경
+      detail: matplotlib, pandas, seaborn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 종합EDA리포트 실행
+      detail: 셀을 실행해 분포, 그룹, 관계 패턴와 예외 상태를 확인합니다.
+    - label: 종합EDA리포트 완료
+      detail: 검증된 코드를 탐색 리포트로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리와 테마 설정
+  structuredPrimary: true
+  subtitle: set_theme()
+  goal: 1단계. 라이브러리와 테마 설정에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    데이터를 로드하고 Seaborn 테마를 설정합니다. set_theme()으로 전역 스타일을 지정합니다.
+
+    set_theme()은 전역 스타일을 설정합니다. style은 'white', 'dark', 'whitegrid', 'darkgrid', 'ticks' 중 선택합니다. palette는 색상 팔레트, font_scale은 글꼴 크기 배율입니다.
+  tips:
+  - set_theme()은 전역 스타일을 설정합니다. style은 'white', 'dark', 'whitegrid', 'darkgrid', 'ticks' 중 선택합니다. palette는
+    색상 팔레트, font_scale은 글꼴 크기 배율입니다.
+  snippet: |-
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    sns.set_theme(style='whitegrid', palette='Set2', font_scale=1.1)
+    penguins = loadLocalDataset('penguins').dropna()
+    penguins
+  exercise:
+    prompt: 1단계. 라이브러리와 테마 설정 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      sns.set_theme(style='whitegrid', palette='Set2', font_scale=1.1)
+      penguins = loadLocalDataset('penguins').dropna()
+      penguins
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 라이브러리와 테마 설정의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 라이브러리와 테마 설정의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step2_describe
+  title: 2단계. 기초 통계
+  structuredPrimary: true
+  subtitle: describe()
+  goal: 2단계. 기초 통계에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+  explanation: 데이터 기본 정보를 확인합니다. describe()로 수치형 변수의 통계량을 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: penguins.describe()
+  exercise:
+    prompt: 2단계. 기초 통계 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    starterCode: penguins.describe()
+    hints:
+    - 바꿀 지점은 분석용 테이블을 만드는 첫 줄과 통계 차트 구성 줄에서 찾으세요.
+    - 실행 뒤 분포, 그룹, 관계 패턴 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 기초 통계의 수정 코드가 통계 차트 구성 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 2단계. 기초 통계 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step3_countplot
+  title: 3단계. 종별 개체 수
+  structuredPrimary: true
+  subtitle: sns.countplot()
+  goal: 3단계. 종별 개체 수에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 종별 개체 수를 countplot으로 확인합니다. hue로 성별을 구분합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figCount, axCount = plt.subplots(figsize=(8, 5))
+    sns.countplot(data=penguins, x='species', hue='sex', palette='Set2', ax=axCount)
+    axCount.set_title('Penguin Count by Species and Sex')
+    figCount
+  exercise:
+    prompt: 3단계. 종별 개체 수 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figCount, axCount = plt.subplots(figsize=(8, 5))
+      sns.countplot(data=penguins, x='species', hue='sex', palette='Set2', ax=axCount)
+      axCount.set_title('Penguin Count by Species and Sex')
+      figCount
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 종별 개체 수의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 종별 개체 수 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step4_island
+  title: 4단계. 섬별 분포
+  structuredPrimary: true
+  subtitle: 그룹별 비교
+  goal: 4단계. 섬별 분포에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 섬별 종 분포를 확인합니다. 각 섬에 어떤 종이 서식하는지 파악합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figIsland, axIsland = plt.subplots(figsize=(10, 5))
+    sns.countplot(data=penguins, x='island', hue='species', palette='Set2', ax=axIsland)
+    axIsland.set_title('Species Distribution by Island')
+    figIsland
+  exercise:
+    prompt: 4단계. 섬별 분포 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figIsland, axIsland = plt.subplots(figsize=(10, 5))
+      sns.countplot(data=penguins, x='island', hue='species', palette='Set2', ax=axIsland)
+      axIsland.set_title('Species Distribution by Island')
+      figIsland
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 섬별 분포의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 섬별 분포 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step5_histplot
+  title: 5단계. 체중 분포
+  structuredPrimary: true
+  subtitle: sns.histplot()
+  goal: 5단계. 체중 분포에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 체중 분포를 종별로 비교합니다. kde=True로 밀도 곡선을 추가합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figMass, axMass = plt.subplots(figsize=(10, 5))
+    sns.histplot(data=penguins, x='body_mass_g', hue='species', kde=True, palette='Set2', ax=axMass)
+    axMass.set_title('Body Mass Distribution by Species')
+    figMass
+  exercise:
+    prompt: 5단계. 체중 분포 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figMass, axMass = plt.subplots(figsize=(10, 5))
+      sns.histplot(data=penguins, x='body_mass_g', hue='species', kde=True, palette='Set2', ax=axMass)
+      axMass.set_title('Body Mass Distribution by Species')
+      figMass
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 체중 분포의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 체중 분포 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step6_boxplot
+  title: 6단계. 부리 길이 박스플롯
+  structuredPrimary: true
+  subtitle: sns.boxplot()
+  goal: 6단계. 부리 길이 박스플롯에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 박스플롯으로 부리 길이 분포를 비교합니다. 중앙값, 사분위수, 이상치를 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figBox, axBox = plt.subplots(figsize=(10, 5))
+    sns.boxplot(data=penguins, x='species', y='bill_length_mm', hue='sex', palette='Set2', ax=axBox)
+    axBox.set_title('Bill Length by Species and Sex')
+    figBox
+  exercise:
+    prompt: 6단계. 부리 길이 박스플롯 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figBox, axBox = plt.subplots(figsize=(10, 5))
+      sns.boxplot(data=penguins, x='species', y='bill_length_mm', hue='sex', palette='Set2', ax=axBox)
+      axBox.set_title('Bill Length by Species and Sex')
+      figBox
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 부리 길이 박스플롯의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 부리 길이 박스플롯 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step7_violinplot
+  title: 7단계. 날개 길이 바이올린
+  structuredPrimary: true
+  subtitle: sns.violinplot()
+  goal: 7단계. 날개 길이 바이올린에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 바이올린 플롯으로 날개 길이 분포를 확인합니다. split=True로 성별을 양쪽에 표시합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figViolin, axViolin = plt.subplots(figsize=(10, 5))
+    sns.violinplot(data=penguins, x='species', y='flipper_length_mm', hue='sex', split=True, palette='Set2', ax=axViolin)
+    axViolin.set_title('Flipper Length Distribution')
+    figViolin
+  exercise:
+    prompt: 7단계. 날개 길이 바이올린 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figViolin, axViolin = plt.subplots(figsize=(10, 5))
+      sns.violinplot(data=penguins, x='species', y='flipper_length_mm', hue='sex', split=True, palette='Set2', ax=axViolin)
+      axViolin.set_title('Flipper Length Distribution')
+      figViolin
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 날개 길이 바이올린의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 날개 길이 바이올린 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step8_scatterplot
+  title: 8단계. 다차원 산점도
+  structuredPrimary: true
+  subtitle: size, style
+  goal: 8단계. 다차원 산점도에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 부리 길이와 깊이의 관계를 산점도로 분석합니다. hue, style, size로 4개 변수를 동시에 표현합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figScatter, axScatter = plt.subplots(figsize=(10, 6))
+    sns.scatterplot(data=penguins, x='bill_length_mm', y='bill_depth_mm', hue='species', style='sex', size='body_mass_g', sizes=(50, 300), palette='Set2', alpha=0.7, ax=axScatter)
+    axScatter.legend(bbox_to_anchor=(1.02, 1), loc='upper left')
+    axScatter.set_title('Bill Dimensions with Size = Body Mass')
+    figScatter
+  exercise:
+    prompt: 8단계. 다차원 산점도 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figScatter, axScatter = plt.subplots(figsize=(10, 6))
+      sns.scatterplot(data=penguins, x='bill_length_mm', y='bill_depth_mm', hue='species', style='sex', size='body_mass_g', sizes=(50, 300), palette='Set2', alpha=0.7, ax=axScatter)
+      axScatter.legend(bbox_to_anchor=(1.02, 1), loc='upper left')
+      axScatter.set_title('Bill Dimensions with Size = Body Mass')
+      figScatter
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 다차원 산점도의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 다차원 산점도 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step9_pairplot
+  title: 9단계. pairplot
+  structuredPrimary: true
+  subtitle: 전체 변수 관계
+  goal: 9단계. pairplot에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: pairplot으로 모든 수치 변수 관계를 탐색합니다. 대각선에는 KDE, 비대각선에는 산점도가 표시됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    gPair = sns.pairplot(penguins, hue='species', diag_kind='kde', palette='Set2', height=2.5)
+    gPair.figure.suptitle('Penguin Measurements Pairplot', y=1.02)
+    gPair.figure
+  exercise:
+    prompt: 9단계. pairplot 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      gPair = sns.pairplot(penguins, hue='species', diag_kind='kde', palette='Set2', height=2.5)
+      gPair.figure.suptitle('Penguin Measurements Pairplot', y=1.02)
+      gPair.figure
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. pairplot의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. pairplot의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step10_heatmap
+  title: 10단계. 상관계수 히트맵
+  structuredPrimary: true
+  subtitle: sns.heatmap()
+  goal: 10단계. 상관계수 히트맵에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 상관계수 히트맵을 그립니다. 변수 간 선형 관계 강도를 색상으로 표현합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    penguinsNumeric = penguins[['bill_length_mm', 'bill_depth_mm', 'flipper_length_mm', 'body_mass_g']]
+    corrMatrix = penguinsNumeric.corr()
+    figCorr, axCorr = plt.subplots(figsize=(8, 6))
+    sns.heatmap(corrMatrix, annot=True, fmt='.2f', cmap='RdYlBu_r', vmin=-1, vmax=1, center=0, linewidths=0.5, ax=axCorr)
+    axCorr.set_title('Correlation Matrix')
+    figCorr
+  exercise:
+    prompt: 10단계. 상관계수 히트맵 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      penguinsNumeric = penguins[['bill_length_mm', 'bill_depth_mm', 'flipper_length_mm', 'body_mass_g']]
+      corrMatrix = penguinsNumeric.corr()
+      figCorr, axCorr = plt.subplots(figsize=(8, 6))
+      sns.heatmap(corrMatrix, annot=True, fmt='.2f', cmap='RdYlBu_r', vmin=-1, vmax=1, center=0, linewidths=0.5, ax=axCorr)
+      axCorr.set_title('Correlation Matrix')
+      figCorr
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 상관계수 히트맵의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 상관계수 히트맵의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step11_jointplot
+  title: 11단계. jointplot
+  structuredPrimary: true
+  subtitle: 상세 2변수 분석
+  goal: 11단계. jointplot에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: jointplot으로 날개 길이와 체중 관계를 상세 분석합니다. 중앙에 산점도, 양 축에 분포를 표시합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    gJoint = sns.jointplot(data=penguins, x='flipper_length_mm', y='body_mass_g', hue='species', kind='scatter', palette='Set2', height=7)
+    gJoint.figure.suptitle('Flipper Length vs Body Mass', y=1.02)
+    gJoint.figure
+  exercise:
+    prompt: 11단계. jointplot 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      gJoint = sns.jointplot(data=penguins, x='flipper_length_mm', y='body_mass_g', hue='species', kind='scatter', palette='Set2', height=7)
+      gJoint.figure.suptitle('Flipper Length vs Body Mass', y=1.02)
+      gJoint.figure
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. jointplot의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 11단계. jointplot의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step12_lmplot
+  title: 12단계. lmplot 회귀
+  structuredPrimary: true
+  subtitle: 그룹별 회귀
+  goal: 12단계. lmplot 회귀에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: lmplot으로 종별 회귀 분석을 수행합니다. col로 성별 패널을 분리합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    gLm = sns.lmplot(data=penguins, x='flipper_length_mm', y='body_mass_g', hue='species', col='sex', palette='Set2', height=4)
+    gLm.figure.suptitle('Regression by Species and Sex', y=1.02)
+    gLm.figure
+  exercise:
+    prompt: 12단계. lmplot 회귀 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      gLm = sns.lmplot(data=penguins, x='flipper_length_mm', y='body_mass_g', hue='species', col='sex', palette='Set2', height=4)
+      gLm.figure.suptitle('Regression by Species and Sex', y=1.02)
+      gLm.figure
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 12단계. lmplot 회귀의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 12단계. lmplot 회귀의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step13_facetgrid
+  title: 13단계. FacetGrid 기본
+  structuredPrimary: true
+  subtitle: 커스텀 다중 패널
+  goal: 13단계. FacetGrid 기본에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    FacetGrid를 사용하여 커스텀 다중 패널을 만듭니다. col, row, hue를 조합하여 다차원 비교가 가능합니다.
+
+    FacetGrid는 가장 유연한 다중 패널 도구입니다. col, row로 그리드를 정의하고, map()으로 각 패널에 그릴 플롯 함수를 지정합니다. Axes-level 함수만 사용 가능합니다.
+  tips:
+  - FacetGrid는 가장 유연한 다중 패널 도구입니다. col, row로 그리드를 정의하고, map()으로 각 패널에 그릴 플롯 함수를 지정합니다. Axes-level 함수만
+    사용 가능합니다.
+  snippet: |-
+    gFacet = sns.FacetGrid(penguins, col='species', row='sex', hue='island', palette='Set2', height=3, aspect=1.2)
+    gFacet.map(sns.scatterplot, 'bill_length_mm', 'bill_depth_mm', alpha=0.7)
+    gFacet.add_legend()
+    gFacet.figure.suptitle('Bill Dimensions by Species, Sex, and Island', y=1.02)
+    gFacet.figure
+  exercise:
+    prompt: 13단계. FacetGrid 기본 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      gFacet = sns.FacetGrid(penguins, col='species', row='sex', hue='island', palette='Set2', height=3, aspect=1.2)
+      gFacet.map(sns.scatterplot, 'bill_length_mm', 'bill_depth_mm', alpha=0.7)
+      gFacet.add_legend()
+      gFacet.figure.suptitle('Bill Dimensions by Species, Sex, and Island', y=1.02)
+      gFacet.figure
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 13단계. FacetGrid 기본의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 13단계. FacetGrid 기본의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step14_facetgrid_hist
+  title: 14단계. FacetGrid 히스토그램
+  structuredPrimary: true
+  subtitle: map() 활용
+  goal: 14단계. FacetGrid 히스토그램에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: FacetGrid에 히스토그램을 적용합니다. map()에 다양한 플롯 함수를 전달할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    gFacetHist = sns.FacetGrid(penguins, col='species', hue='sex', palette='Set2', height=4)
+    gFacetHist.map(sns.histplot, 'body_mass_g', kde=True, alpha=0.6)
+    gFacetHist.add_legend()
+    gFacetHist.figure.suptitle('Body Mass Distribution by Species and Sex', y=1.02)
+    gFacetHist.figure
+  exercise:
+    prompt: 14단계. FacetGrid 히스토그램 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      gFacetHist = sns.FacetGrid(penguins, col='species', hue='sex', palette='Set2', height=4)
+      gFacetHist.map(sns.histplot, 'body_mass_g', kde=True, alpha=0.6)
+      gFacetHist.add_legend()
+      gFacetHist.figure.suptitle('Body Mass Distribution by Species and Sex', y=1.02)
+      gFacetHist.figure
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 14단계. FacetGrid 히스토그램의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 14단계. FacetGrid 히스토그램의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step15_style_compare
+  title: 15단계. 스타일 비교
+  structuredPrimary: true
+  subtitle: axes_style()
+  goal: 15단계. 스타일 비교에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    다양한 스타일을 비교해봅니다. axes_style()은 컨텍스트 매니저로 특정 플롯에만 스타일을 적용합니다.
+
+    axes_style()은 컨텍스트 매니저로 특정 플롯에만 스타일을 적용합니다. with 문 안에서만 해당 스타일이 적용되고 이후에는 원래 스타일로 돌아갑니다.
+  snippet: |-
+    styles = ['white', 'dark', 'whitegrid', 'darkgrid', 'ticks']
+    figStyles, axesStyles = plt.subplots(1, 5, figsize=(20, 4))
+    for idx, styleName in enumerate(styles):
+        with sns.axes_style(styleName):
+            sns.boxplot(data=penguins, x='species', y='body_mass_g', hue='species', palette='Set2', legend=False, ax=axesStyles[idx])
+            axesStyles[idx].set_title(styleName)
+            axesStyles[idx].set_xlabel('')
+    figStyles.suptitle('Seaborn Style Comparison', y=1.02)
+    figStyles.tight_layout()
+    figStyles
+  exercise:
+    prompt: 15단계. 스타일 비교 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      styles = ['white', 'dark', 'whitegrid', 'darkgrid', 'ticks']
+      figStyles, axesStyles = plt.subplots(1, 5, figsize=(20, 4))
+      for idx, styleName in enumerate(styles):
+          with sns.axes_style(styleName):
+              sns.boxplot(data=penguins, x='species', y='body_mass_g', hue='species', palette='Set2', legend=False, ax=axesStyles[idx])
+              axesStyles[idx].set_title(styleName)
+              axesStyles[idx].set_xlabel('')
+      figStyles.suptitle('Seaborn Style Comparison', y=1.02)
+      figStyles.tight_layout()
+      figStyles
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 15단계. 스타일 비교의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 15단계. 스타일 비교 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step16_context
+  title: 16단계. 컨텍스트 비교
+  structuredPrimary: true
+  subtitle: plotting_context()
+  goal: 16단계. 컨텍스트 비교에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    컨텍스트 크기를 비교합니다. 출력 목적에 맞는 크기를 선택합니다.
+
+    plotting_context()로 출력 목적에 맞는 크기를 설정합니다. 'paper'(논문), 'notebook'(기본), 'talk'(발표), 'poster'(포스터) 순으로 요소 크기가 커집니다.
+  tips:
+  - plotting_context()로 출력 목적에 맞는 크기를 설정합니다. 'paper'(논문), 'notebook'(기본), 'talk'(발표), 'poster'(포스터) 순으로
+    요소 크기가 커집니다.
+  snippet: |-
+    contexts = ['paper', 'notebook', 'talk', 'poster']
+    figContext, axesContext = plt.subplots(2, 2, figsize=(12, 10))
+    axesFlat = axesContext.flatten()
+    for idx, contextName in enumerate(contexts):
+        with sns.plotting_context(contextName):
+            sns.barplot(data=penguins, x='species', y='body_mass_g', hue='species', palette='Set2', legend=False, ax=axesFlat[idx])
+            axesFlat[idx].set_title(f'Context: {contextName}')
+    figContext.suptitle('Seaborn Context Comparison', y=1.02)
+    figContext.tight_layout()
+    figContext
+  exercise:
+    prompt: 16단계. 컨텍스트 비교 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      contexts = ['paper', 'notebook', 'talk', 'poster']
+      figContext, axesContext = plt.subplots(2, 2, figsize=(12, 10))
+      axesFlat = axesContext.flatten()
+      for idx, contextName in enumerate(contexts):
+          with sns.plotting_context(contextName):
+              sns.barplot(data=penguins, x='species', y='body_mass_g', hue='species', palette='Set2', legend=False, ax=axesFlat[idx])
+              axesFlat[idx].set_title(f'Context: {contextName}')
+      figContext.suptitle('Seaborn Context Comparison', y=1.02)
+      figContext.tight_layout()
+      figContext
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 16단계. 컨텍스트 비교의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 16단계. 컨텍스트 비교 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: workflow_validation
+  title: 17단계. 종합 EDA 리포트 검증 루프
+  structuredPrimary: true
+  subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
+  goal: 17단계. 종합 EDA 리포트 검증 루프에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    종합 리포트는 차트를 많이 넣는 것이 아니라 질문, 데이터 계약, 핵심 지표, 검증 가능한 차트를 일관되게 묶는 일입니다. 펭귄 데이터로 보고서에 들어갈 주장과 차트를 같이 검증합니다.
+
+    종합 EDA의 품질은 차트 수가 아니라, 입력 검증과 주장 검증이 리포트 안에 남아 있는지로 판단합니다.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    edaPenguins = loadLocalDataset("penguins").dropna()
+    requiredColumns = {"species", "island", "bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g", "sex"}
+    missingColumns = requiredColumns - set(edaPenguins.columns)
+
+    assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+    assert not edaPenguins[list(requiredColumns)].isna().any().any()
+
+    summaryClaim = edaPenguins.groupby("species")["body_mass_g"].mean().sort_values(ascending=False)
+    assert summaryClaim.index[0] == "Gentoo"
+    summaryClaim.round(1)
+  exercise:
+    prompt: 17단계. 종합 EDA 리포트 검증 루프 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      edaPenguins = loadLocalDataset("penguins").dropna()
+      requiredColumns = {"species", "island", "bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g", "sex"}
+      missingColumns = requiredColumns - set(edaPenguins.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert not edaPenguins[list(requiredColumns)].isna().any().any()
+
+      summaryClaim = edaPenguins.groupby("species")["body_mass_g"].mean().sort_values(ascending=False)
+      assert summaryClaim.index[0] == "Gentoo"
+      summaryClaim.round(1)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 17단계. 종합 EDA 리포트 검증 루프의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 17단계. 종합 EDA 리포트 검증 루프의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 종합 EDA
+  goal: 실습에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+    import matplotlib.pyplot as plt
+
+    sns.set_theme(style='whitegrid', palette='husl')
+    data = loadLocalDataset('tips')
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import matplotlib.pyplot as plt
+
+      sns.set_theme(style='whitegrid', palette='husl')
+      data = loadLocalDataset('tips')
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: seaborn_10-eda-evidence-report-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - practice
+    title: 종합 EDA report 데이터·preview 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 탐색 결과를 해석하기 전에 모든 입력 행의 포함 상태와 panel별 표본 수를 재현 가능한 표·이미지로 남긴다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - CSV의 status로 NULL 때문에 preview에서 제외된 행을 숨기지 마세요.
+    - 빈 입력도 header-only table과 명시적인 empty-state preview를 모두 남기세요.
+    exercise:
+      prompt: prepare_eda_evidence_report(rows, table_path, image_path)를 완성하세요. table_path에는 feature, metric, panel, status
+        열의 CSV를 저장하고, 제공된 helper로 image_path에 panel별 usable count를 그린 PNG preview를 저장한 뒤 usable·excluded 분모와 축 범위를 반환하세요.
+      starterCode: |
+        import csv
+        import struct
+        import zlib
+        from pathlib import Path
+
+
+        def _write_preview_png(output_path, group_counts):
+            width, height = 320, 180
+            pixels = [bytearray([248, 250, 252] * width) for _ in range(height)]
+
+            def fill_rect(left, top, right, bottom, color):
+                for y in range(max(0, top), min(height, bottom)):
+                    for x in range(max(0, left), min(width, right)):
+                        offset = x * 3
+                        pixels[y][offset:offset + 3] = bytes(color)
+
+            fill_rect(20, 18, 300, 156, (255, 255, 255))
+            fill_rect(39, 28, 41, 146, (51, 65, 85))
+            fill_rect(39, 144, 294, 146, (51, 65, 85))
+            items = sorted(group_counts.items())[:8]
+            if items:
+                maximum = max(count for _, count in items)
+                slot = 240 // len(items)
+                bar_width = min(36, max(8, slot - 10))
+                palette = [(17, 138, 178), (6, 148, 162), (239, 108, 86), (255, 183, 3)]
+                for index, (_, count) in enumerate(items):
+                    bar_height = max(2, round(100 * count / maximum))
+                    left = 47 + index * slot + (slot - bar_width) // 2
+                    fill_rect(left, 145 - bar_height, left + bar_width, 145, palette[index % len(palette)])
+            else:
+                fill_rect(88, 76, 232, 80, (148, 163, 184))
+                fill_rect(158, 48, 162, 108, (148, 163, 184))
+
+            def chunk(kind, data):
+                checksum = zlib.crc32(kind + data) & 0xFFFFFFFF
+                return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", checksum)
+
+            raw = b"".join(b"\\x00" + bytes(row) for row in pixels)
+            payload = (
+                b"\\x89PNG\\r\\n\\x1a\\n"
+                + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0))
+                + chunk(b"IDAT", zlib.compress(raw, 9))
+                + chunk(b"IEND", b"")
+            )
+            target = Path(output_path)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(payload)
+
+
+        def prepare_eda_evidence_report(rows, table_path=None, image_path=None):
+            raise NotImplementedError
+      solution: |
+        import csv
+        import struct
+        import zlib
+        from pathlib import Path
+
+
+        def _write_preview_png(output_path, group_counts):
+            width, height = 320, 180
+            pixels = [bytearray([248, 250, 252] * width) for _ in range(height)]
+
+            def fill_rect(left, top, right, bottom, color):
+                for y in range(max(0, top), min(height, bottom)):
+                    for x in range(max(0, left), min(width, right)):
+                        offset = x * 3
+                        pixels[y][offset:offset + 3] = bytes(color)
+
+            fill_rect(20, 18, 300, 156, (255, 255, 255))
+            fill_rect(39, 28, 41, 146, (51, 65, 85))
+            fill_rect(39, 144, 294, 146, (51, 65, 85))
+            items = sorted(group_counts.items())[:8]
+            if items:
+                maximum = max(count for _, count in items)
+                slot = 240 // len(items)
+                bar_width = min(36, max(8, slot - 10))
+                palette = [(17, 138, 178), (6, 148, 162), (239, 108, 86), (255, 183, 3)]
+                for index, (_, count) in enumerate(items):
+                    bar_height = max(2, round(100 * count / maximum))
+                    left = 47 + index * slot + (slot - bar_width) // 2
+                    fill_rect(left, 145 - bar_height, left + bar_width, 145, palette[index % len(palette)])
+            else:
+                fill_rect(88, 76, 232, 80, (148, 163, 184))
+                fill_rect(158, 48, 162, 108, (148, 163, 184))
+
+            def chunk(kind, data):
+                checksum = zlib.crc32(kind + data) & 0xFFFFFFFF
+                return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", checksum)
+
+            raw = b"".join(b"\\x00" + bytes(row) for row in pixels)
+            payload = (
+                b"\\x89PNG\\r\\n\\x1a\\n"
+                + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0))
+                + chunk(b"IDAT", zlib.compress(raw, 9))
+                + chunk(b"IEND", b"")
+            )
+            target = Path(output_path)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(payload)
+
+
+        def prepare_eda_evidence_report(rows, table_path=None, image_path=None):
+            required = ["feature", "metric", "panel"]
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            for row in usable:
+                key = str(row["panel"])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row["feature"] for row in usable]
+            y_values = [row["metric"] for row in usable]
+            result = {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+            empty = not rows
+            table_path = table_path or ("output/empty-eda-report.csv" if empty else "output/eda-report.csv")
+            image_path = image_path or ("output/empty-eda-preview.png" if empty else "output/eda-preview.png")
+            target = Path(table_path)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            columns = ["feature", "metric", "panel", "status"]
+            with target.open("w", encoding="utf-8", newline="") as stream:
+                writer = csv.DictWriter(stream, fieldnames=columns)
+                writer.writeheader()
+                for row in rows:
+                    writer.writerow({
+                        "feature": row["feature"],
+                        "metric": row["metric"],
+                        "panel": row["panel"],
+                        "status": "usable" if all(row[name] is not None for name in required) else "excluded",
+                    })
+            _write_preview_png(image_path, groups)
+            return result
+      hints: *id001
+    check:
+      id: python.seaborn.seaborn_10.eda-evidence-report-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.seaborn.seaborn_10.eda-evidence-report-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_eda_evidence_report
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - feature: age
+              metric: 0.1
+              panel: missing
+            - feature: fare
+              metric: 0.7
+              panel: correlation
+            - feature: score
+              metric: null
+              panel: distribution
+          - value: output/eda-report.csv
+          - value: output/eda-preview.png
+          expectedReturn:
+            usableCount: 2
+            excludedCount: 1
+            groupCounts:
+              correlation: 1
+              missing: 1
+            xExtent:
+            - age
+            - fare
+            yExtent:
+            - 0.1
+            - 0.7
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          - value: output/empty-eda-report.csv
+          - value: output/empty-eda-preview.png
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths:
+        - path: output/eda-report.csv
+          kind: table
+          origin: created
+          format: csv
+          columns:
+          - feature
+          - metric
+          - panel
+          - status
+        - path: output/eda-preview.png
+          kind: image
+          origin: created
+          mediaType: image/png
+          width: 320
+          height: 180
+        - path: output/empty-eda-report.csv
+          kind: table
+          origin: created
+          format: csv
+          columns:
+          - feature
+          - metric
+          - panel
+          - status
+        - path: output/empty-eda-preview.png
+          kind: image
+          origin: created
+          mediaType: image/png
+          width: 320
+          height: 180
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: seaborn_10-eda-evidence-report-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - seaborn_10-eda-evidence-report-data-evidence-mastery
+    title: 종합 EDA report 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 고객 이탈 데이터 EDA를 품질, 단변량, 관계, 한계 panel로 재현한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_eda_evidence_report(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_eda_evidence_report(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_eda_evidence_report(candidate):
+            expected = {'mark': 'eda-panels', 'x': 'feature', 'y': 'metric', 'group': 'panel', 'transforms': ['distribution', 'quality-summary', 'relationship'], 'interaction': 'none'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.seaborn.seaborn_10.eda-evidence-report-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.seaborn.seaborn_10.eda-evidence-report-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_eda_evidence_report
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: eda-panels
+              x: feature
+              y: metric
+              group: panel
+              transforms:
+              - distribution
+              - quality-summary
+              - relationship
+              interaction: none
+              description: 고객 이탈 데이터 EDA를 품질, 단변량, 관계, 한계 panel로 재현한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: eda-panels
+              x: feature
+              y: metric
+              group: panel
+              transforms:
+              - distribution
+              - quality-summary
+              - relationship
+              interaction: none
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: metric
+              y: feature
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - description
+            encoding:
+              mark: eda-panels
+              x: feature
+              y: metric
+              group: panel
+              transforms:
+              - distribution
+              - quality-summary
+              - relationship
+              interaction: none
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: seaborn_10-eda-evidence-report-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - seaborn_10-eda-evidence-report-encoding-transfer-transfer
+    title: 종합 EDA report 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 탐색 결과가 품질·분포·관계·한계 순서로 재현되는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_eda_evidence_report(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_eda_evidence_report(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_eda_evidence_report(situation):
+            table = {'quality-first': {'encoding': 'missingness table', 'evidence': 'row and field denominators', 'risk': 'silent drop'}, 'distribution-next': {'encoding': 'type-appropriate plots', 'evidence': 'n and domain', 'risk': 'default bins'}, 'relationship-last': {'encoding': 'hypothesis-linked plots', 'evidence': 'claim scope', 'risk': 'causal overreach'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.seaborn.seaborn_10.eda-evidence-report-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.seaborn.seaborn_10.eda-evidence-report-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_eda_evidence_report
+        cases:
+        - id: recalls-quality-first
+          arguments:
+          - value: quality-first
+          expectedReturn:
+            encoding: missingness table
+            evidence: row and field denominators
+            risk: silent drop
+        - id: recalls-distribution-next
+          arguments:
+          - value: distribution-next
+          expectedReturn:
+            encoding: type-appropriate plots
+            evidence: n and domain
+            risk: default bins
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

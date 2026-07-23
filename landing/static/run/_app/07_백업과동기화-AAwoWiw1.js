@@ -1,0 +1,837 @@
+var e=`meta:
+  id: fileOps_07
+  title: 백업과 동기화
+  order: 7
+  category: fileOps
+  difficulty: easy
+  audience: 파일 자동화에 입문하는 Python 학습자
+  packages: []
+  tags:
+    - hashlib
+    - mtime
+    - shutil
+intro:
+  direction: tempfile 격리 폴더에서 mtime과 SHA-256 해시를 기준으로 변경된 파일만 골라 동기화하는 작은 백업 함수를 만든다.
+  benefits:
+    - stat의 mtime을 비교해 새로 만들어진 파일만 옮긴다.
+    - SHA-256 해시로 내용이 같은 파일은 다시 복사하지 않는다.
+    - 동기화 결과를 added, updated, skipped 세 카테고리로 분류한다.
+    - 동일 동기화를 두 번 호출해도 멱등하게 동작한다.
+  diagram:
+    steps:
+      - label: 원본 디렉터리 준비
+        detail: source와 backup 두 폴더를 만들고 초기 파일을 source에 둔다.
+      - label: 해시 함수 정의
+        detail: hashlib.sha256으로 파일 내용을 청크 단위로 읽어 해시 문자열을 만든다.
+      - label: 증분 복사 판단
+        detail: 백업에 같은 해시가 있으면 건너뛰고 새로 만들거나 다르면 복사한다.
+      - label: 결과 카테고리 묶기
+        detail: added, updated, skipped 키를 가진 dict로 한 사이클의 결과를 정리한다.
+    runtime:
+      - label: 표준 라이브러리만
+        detail: hashlib, shutil, pathlib, tempfile만 사용한다.
+      - label: assert 기반 비교
+        detail: 첫 번째와 두 번째 동기화 결과를 assert로 비교해 멱등성을 확인한다.
+sections:
+  - id: hash-content
+    title: 파일 내용 해시 만들기
+    structuredPrimary: true
+    subtitle: hashlib.sha256 청크 읽기
+    goal: 큰 파일도 메모리에 한 번에 올리지 않고 청크 단위로 SHA-256 해시를 만든다.
+    why: 자동화 백업은 큰 파일을 다뤄야 할 수 있으므로 메모리 친화적인 해시 함수가 표준이다.
+    explanation: 'hashlib.sha256은 객체를 만들고 update로 바이트를 누적한 뒤 hexdigest로 16진수 문자열을 받는다. with open(..., "rb")로 열고 iter(lambda: f.read(8192), b"")로 청크를 반복하면 큰 파일도 안전하다. 같은 내용이면 항상 동일한 해시가 나오므로 내용 비교의 기준이 된다.'
+    tips:
+      - 청크 크기는 8KB 정도가 일반적이며 8192보다 작아도 동작한다.
+      - 같은 바이트라면 운영체제에 상관없이 같은 해시가 나온다.
+    snippet: |-
+      import hashlib
+      import tempfile
+      from pathlib import Path
+
+
+      def sha256OfFile(path: Path) -> str:
+          hasher = hashlib.sha256()
+          with open(path, "rb") as f:
+              for chunk in iter(lambda: f.read(8192), b""):
+                  hasher.update(chunk)
+          return hasher.hexdigest()
+
+
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td)
+          first = base / "first.bin"
+          second = base / "second.bin"
+          first.write_bytes(b"codaro")
+          second.write_bytes(b"codaro")
+          summary = {"sameContent": sha256OfFile(first) == sha256OfFile(second)}
+
+      assert summary == {"sameContent": True}
+      summary
+    exercise:
+      prompt: a.bin과 b.bin 두 파일이 서로 다른 바이트일 때 sha256OfFile의 결과가 달라지는지 검증하세요.
+      starterCode: |-
+        import hashlib
+        import tempfile
+        from pathlib import Path
+
+
+        def sha256OfFile(path: Path) -> str:
+            hasher = hashlib.sha256()
+            with open(path, "rb") as f:
+                for chunk in iter(lambda: f.read(8192), b""):
+                    hasher.update(chunk)
+            return hasher.___()
+
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            a = base / "a.bin"
+            b = base / "b.bin"
+            a.write_bytes(b"___")
+            b.write_bytes(b"second-bytes")
+            summary = {"differ": sha256OfFile(a) != sha256OfFile(b)}
+
+        assert summary == {"differ": True}
+        summary
+      solution: |-
+        import hashlib
+        import tempfile
+        from pathlib import Path
+
+
+        def sha256OfFile(path: Path) -> str:
+            hasher = hashlib.sha256()
+            with open(path, "rb") as f:
+                for chunk in iter(lambda: f.read(8192), b""):
+                    hasher.update(chunk)
+            return hasher.hexdigest()
+
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            a = base / "a.bin"
+            b = base / "b.bin"
+            a.write_bytes(b"first-bytes")
+            b.write_bytes(b"second-bytes")
+            summary = {"differ": sha256OfFile(a) != sha256OfFile(b)}
+
+        assert summary == {"differ": True}
+        summary
+      hints:
+        - hashlib.sha256은 hexdigest 메서드로 사람이 읽을 수 있는 문자열을 만든다.
+        - 두 파일의 바이트가 다르면 해시 결과도 반드시 달라진다.
+      check:
+        type: noError
+        noError: sha256OfFile 함수와 두 파일 해시 비교가 끝나야 한다.
+        resultCheck: summary 딕셔너리의 differ 값이 True여야 한다.
+    check:
+      noError: hashlib 호출과 청크 반복이 한 흐름에서 끝나야 한다.
+      resultCheck: summary의 sameContent가 True여야 두 동일 파일이 같은 해시로 나타난다.
+  - id: mtime-window
+    title: mtime으로 변경 감지
+    structuredPrimary: true
+    subtitle: stat.st_mtime 비교
+    goal: 원본과 백업의 수정 시각을 비교해 새로 옮겨야 할 파일인지 판단한다.
+    why: 해시 계산보다 mtime 비교가 훨씬 빠르므로 1차 필터로 mtime을 사용하면 큰 트리에서 자동화 시간이 크게 줄어든다.
+    explanation: Path.stat의 st_mtime은 파일 수정 시각을 초 단위 부동소수로 돌려준다. 운영체제 정밀도에 따라 1초 이내 차이는 같은 값으로 보일 수 있다. 동기화에서는 원본이 더 최근이면 복사하고 같으면 건너뛰는 단순 규칙이 1차 판단으로 충분하다.
+    tips:
+      - mtime은 사용자가 수동으로 touch하면 바뀔 수 있으므로 1차 필터로만 쓴다.
+      - 의심스러운 경우에는 해시 비교로 확정한다.
+    snippet: |-
+      import os
+      import tempfile
+      import time
+      from pathlib import Path
+
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td)
+          source = base / "source.txt"
+          source.write_text("initial", encoding="utf-8")
+          backup = base / "backup.txt"
+          backup.write_text("initial", encoding="utf-8")
+          os.utime(backup, (source.stat().st_mtime - 60, source.stat().st_mtime - 60))
+          newer = source.stat().st_mtime > backup.stat().st_mtime
+          decision = "copy" if newer else "skip"
+
+      assert newer is True
+      assert decision == "copy"
+      {"newer": newer, "decision": decision}
+    exercise:
+      prompt: source.txt를 60초 미래로 utime을 옮겨 newer가 True가 되고 decision이 "copy"로 결정되는지 검증하세요.
+      starterCode: |-
+        import os
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            source = base / "source.txt"
+            source.write_text("initial", encoding="utf-8")
+            backup = base / "backup.txt"
+            backup.write_text("initial", encoding="utf-8")
+            future = source.stat().st_mtime + ___
+            os.utime(source, (future, future))
+            newer = source.stat().st_mtime > backup.stat().st_mtime
+            decision = "copy" if newer else "skip"
+
+        assert newer is True
+        assert decision == "copy"
+        {"newer": newer, "decision": decision}
+      solution: |-
+        import os
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            source = base / "source.txt"
+            source.write_text("initial", encoding="utf-8")
+            backup = base / "backup.txt"
+            backup.write_text("initial", encoding="utf-8")
+            future = source.stat().st_mtime + 60
+            os.utime(source, (future, future))
+            newer = source.stat().st_mtime > backup.stat().st_mtime
+            decision = "copy" if newer else "skip"
+
+        assert newer is True
+        assert decision == "copy"
+        {"newer": newer, "decision": decision}
+      hints:
+        - os.utime의 두 번째 인자는 (atime, mtime) 튜플로 받는다.
+        - 60초를 더해야 부동소수 정밀도와 무관하게 newer가 True가 된다.
+      check:
+        type: noError
+        noError: os.utime과 stat 호출이 PermissionError 없이 끝나야 한다.
+        resultCheck: newer가 True이고 decision이 "copy" 문자열이어야 한다.
+    check:
+      noError: source와 backup 양쪽 stat 비교가 정상적으로 끝나야 한다.
+      resultCheck: decision 값이 "copy"여서 후속 단계가 복사를 수행하도록 신호를 줘야 한다.
+  - id: incremental-copy
+    title: 해시 기반 증분 복사
+    structuredPrimary: true
+    subtitle: 다른 내용만 옮기기
+    goal: 백업에 같은 해시가 있으면 건너뛰고 다르거나 없는 경우에만 복사한다.
+    why: 동일한 자동화 백업을 매일 돌려도 변경된 파일만 옮기면 자원과 시간을 크게 절약한다.
+    explanation: mtime 1차 필터를 통과한 파일에 대해 SHA-256을 비교해 최종 판단을 한다. 새 파일은 added, 같은 이름이지만 해시가 다르면 updated, 동일하면 skipped로 분류한다. 결과 dict는 자동화 리포트의 표준 입력이 된다.
+    tips:
+      - 매우 큰 트리에서는 mtime 1차 필터만으로도 대부분 결정이 끝난다.
+      - hash 캐시를 같은 함수 호출 안에서만 유지하면 멱등성과 단순함을 모두 잡을 수 있다.
+    snippet: |-
+      import hashlib
+      import shutil
+      import tempfile
+      from pathlib import Path
+
+
+      def syncOnce(source: Path, backup: Path) -> dict:
+          report = {"added": [], "updated": [], "skipped": []}
+          backup.mkdir(exist_ok=True)
+          for src in sorted(source.rglob("*")):
+              if src.is_dir():
+                  continue
+              relative = src.relative_to(source)
+              dst = backup / relative
+              dst.parent.mkdir(parents=True, exist_ok=True)
+              if not dst.exists():
+                  shutil.copy2(src, dst)
+                  report["added"].append(relative.as_posix())
+                  continue
+              srcHash = hashlib.sha256(src.read_bytes()).hexdigest()
+              dstHash = hashlib.sha256(dst.read_bytes()).hexdigest()
+              if srcHash == dstHash:
+                  report["skipped"].append(relative.as_posix())
+              else:
+                  shutil.copy2(src, dst)
+                  report["updated"].append(relative.as_posix())
+          return report
+
+
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td)
+          source = base / "source"
+          backup = base / "backup"
+          source.mkdir()
+          (source / "a.txt").write_text("first", encoding="utf-8")
+          (source / "b.txt").write_text("first", encoding="utf-8")
+          firstReport = syncOnce(source, backup)
+          (source / "a.txt").write_text("changed", encoding="utf-8")
+          secondReport = syncOnce(source, backup)
+
+      assert firstReport == {"added": ["a.txt", "b.txt"], "updated": [], "skipped": []}
+      assert secondReport == {"added": [], "updated": ["a.txt"], "skipped": ["b.txt"]}
+      secondReport
+    exercise:
+      prompt: 같은 syncOnce 함수를 두 번 호출했을 때 두 번째 호출에서 추가된 파일은 없고 skipped에 두 파일이 모이는지 멱등성을 검증하세요.
+      starterCode: |-
+        import hashlib
+        import shutil
+        import tempfile
+        from pathlib import Path
+
+
+        def syncOnce(source: Path, backup: Path) -> dict:
+            report = {"added": [], "updated": [], "skipped": []}
+            backup.mkdir(exist_ok=True)
+            for src in sorted(source.rglob("*")):
+                if src.is_dir():
+                    continue
+                relative = src.relative_to(source)
+                dst = backup / relative
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                if not dst.exists():
+                    shutil.copy2(src, dst)
+                    report["added"].append(relative.as_posix())
+                    continue
+                srcHash = hashlib.sha256(src.read_bytes()).hexdigest()
+                dstHash = hashlib.sha256(dst.read_bytes()).hexdigest()
+                if srcHash == dstHash:
+                    report["skipped"].append(relative.as_posix())
+                else:
+                    shutil.copy2(src, dst)
+                    report["updated"].append(relative.as_posix())
+            return report
+
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            source = base / "source"
+            backup = base / "backup"
+            source.mkdir()
+            (source / "x.txt").write_text("hello", encoding="utf-8")
+            (source / "y.txt").write_text("world", encoding="utf-8")
+            firstReport = syncOnce(source, backup)
+            secondReport = syncOnce(source, backup)
+
+        assert firstReport == {"added": ["___", "___"], "updated": [], "skipped": []}
+        assert secondReport == {"added": [], "updated": [], "skipped": ["x.txt", "y.txt"]}
+        secondReport
+      solution: |-
+        import hashlib
+        import shutil
+        import tempfile
+        from pathlib import Path
+
+
+        def syncOnce(source: Path, backup: Path) -> dict:
+            report = {"added": [], "updated": [], "skipped": []}
+            backup.mkdir(exist_ok=True)
+            for src in sorted(source.rglob("*")):
+                if src.is_dir():
+                    continue
+                relative = src.relative_to(source)
+                dst = backup / relative
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                if not dst.exists():
+                    shutil.copy2(src, dst)
+                    report["added"].append(relative.as_posix())
+                    continue
+                srcHash = hashlib.sha256(src.read_bytes()).hexdigest()
+                dstHash = hashlib.sha256(dst.read_bytes()).hexdigest()
+                if srcHash == dstHash:
+                    report["skipped"].append(relative.as_posix())
+                else:
+                    shutil.copy2(src, dst)
+                    report["updated"].append(relative.as_posix())
+            return report
+
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            source = base / "source"
+            backup = base / "backup"
+            source.mkdir()
+            (source / "x.txt").write_text("hello", encoding="utf-8")
+            (source / "y.txt").write_text("world", encoding="utf-8")
+            firstReport = syncOnce(source, backup)
+            secondReport = syncOnce(source, backup)
+
+        assert firstReport == {"added": ["x.txt", "y.txt"], "updated": [], "skipped": []}
+        assert secondReport == {"added": [], "updated": [], "skipped": ["x.txt", "y.txt"]}
+        secondReport
+      hints:
+        - 첫 호출에서 added는 두 파일 이름이 정렬된 상태로 들어간다.
+        - 두 번째 호출은 같은 두 파일이 skipped로 분류되어 멱등하다.
+      check:
+        type: noError
+        noError: 두 번의 syncOnce 호출이 PermissionError 없이 끝나야 한다.
+        resultCheck: firstReport의 added와 secondReport의 skipped가 같은 두 파일 이름을 담아야 한다.
+    check:
+      noError: 두 번의 동기화 호출이 격리 공간에서 정상 끝나야 한다.
+      resultCheck: secondReport의 updated가 ["a.txt"]이고 skipped가 ["b.txt"]여야 한다.
+  - id: idempotent-summary
+    title: 멱등성 종합 정리
+    structuredPrimary: true
+    subtitle: 두 번 호출 결과 비교
+    goal: 같은 입력에 대해 syncOnce를 반복 호출하면 두 번째 결과부터는 added와 updated가 비어 있어야 한다.
+    why: 자동화는 같은 트리거에서 여러 번 실행될 수 있어 두 번째 실행이 손상 없는 멱등 상태로 끝나는 것이 운영 안전의 기본이다.
+    explanation: 마지막 섹션은 syncOnce를 두 번 호출해 두 번째 보고서가 added와 updated 모두 비어 있고 skipped만 채워지는 멱등 상태를 검증한다. 이 형태가 운영 환경의 정상 사이클이고 added나 updated가 다시 채워졌다면 외부 변경이 있었음을 알린다.
+    tips:
+      - 멱등 검사는 자동화 스케줄의 첫 번째 신뢰 신호다.
+      - 두 번째 보고서의 added가 비어 있지 않다면 누군가 백업을 따로 지웠음을 의미한다.
+    snippet: |-
+      import hashlib
+      import shutil
+      import tempfile
+      from pathlib import Path
+
+
+      def syncOnce(source: Path, backup: Path) -> dict:
+          report = {"added": [], "updated": [], "skipped": []}
+          backup.mkdir(exist_ok=True)
+          for src in sorted(source.rglob("*")):
+              if src.is_dir():
+                  continue
+              relative = src.relative_to(source)
+              dst = backup / relative
+              dst.parent.mkdir(parents=True, exist_ok=True)
+              if not dst.exists():
+                  shutil.copy2(src, dst)
+                  report["added"].append(relative.as_posix())
+                  continue
+              srcHash = hashlib.sha256(src.read_bytes()).hexdigest()
+              dstHash = hashlib.sha256(dst.read_bytes()).hexdigest()
+              if srcHash == dstHash:
+                  report["skipped"].append(relative.as_posix())
+              else:
+                  shutil.copy2(src, dst)
+                  report["updated"].append(relative.as_posix())
+          return report
+
+
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td)
+          source = base / "source"
+          backup = base / "backup"
+          source.mkdir()
+          (source / "alpha.txt").write_text("a", encoding="utf-8")
+          (source / "beta.txt").write_text("b", encoding="utf-8")
+          firstReport = syncOnce(source, backup)
+          secondReport = syncOnce(source, backup)
+          thirdReport = syncOnce(source, backup)
+          summary = {
+              "firstAdded": firstReport["added"],
+              "stableAfter": secondReport["added"] == thirdReport["added"] == [],
+              "skippedAfter": secondReport["skipped"],
+          }
+
+      assert summary == {
+          "firstAdded": ["alpha.txt", "beta.txt"],
+          "stableAfter": True,
+          "skippedAfter": ["alpha.txt", "beta.txt"],
+      }
+      summary
+    exercise:
+      prompt: 같은 syncOnce를 세 번 호출했을 때 두 번째와 세 번째 보고서의 updated가 모두 비어 있고 skipped만 일치하는지 종합 검증하세요.
+      starterCode: |-
+        import hashlib
+        import shutil
+        import tempfile
+        from pathlib import Path
+
+
+        def syncOnce(source: Path, backup: Path) -> dict:
+            report = {"added": [], "updated": [], "skipped": []}
+            backup.mkdir(exist_ok=True)
+            for src in sorted(source.rglob("*")):
+                if src.is_dir():
+                    continue
+                relative = src.relative_to(source)
+                dst = backup / relative
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                if not dst.exists():
+                    shutil.copy2(src, dst)
+                    report["added"].append(relative.as_posix())
+                    continue
+                srcHash = hashlib.sha256(src.read_bytes()).hexdigest()
+                dstHash = hashlib.sha256(dst.read_bytes()).hexdigest()
+                if srcHash == dstHash:
+                    report["skipped"].append(relative.as_posix())
+                else:
+                    shutil.copy2(src, dst)
+                    report["updated"].append(relative.as_posix())
+            return report
+
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            source = base / "source"
+            backup = base / "backup"
+            source.mkdir()
+            (source / "one.txt").write_text("uno", encoding="utf-8")
+            (source / "two.txt").write_text("dos", encoding="utf-8")
+            syncOnce(source, backup)
+            second = syncOnce(source, backup)
+            third = syncOnce(source, backup)
+            summary = {
+                "secondAdded": second["added"],
+                "secondUpdated": second["updated"],
+                "stableSkipped": second["___"] == third["skipped"],
+            }
+
+        assert summary == {"secondAdded": [], "secondUpdated": [], "stableSkipped": True}
+        summary
+      solution: |-
+        import hashlib
+        import shutil
+        import tempfile
+        from pathlib import Path
+
+
+        def syncOnce(source: Path, backup: Path) -> dict:
+            report = {"added": [], "updated": [], "skipped": []}
+            backup.mkdir(exist_ok=True)
+            for src in sorted(source.rglob("*")):
+                if src.is_dir():
+                    continue
+                relative = src.relative_to(source)
+                dst = backup / relative
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                if not dst.exists():
+                    shutil.copy2(src, dst)
+                    report["added"].append(relative.as_posix())
+                    continue
+                srcHash = hashlib.sha256(src.read_bytes()).hexdigest()
+                dstHash = hashlib.sha256(dst.read_bytes()).hexdigest()
+                if srcHash == dstHash:
+                    report["skipped"].append(relative.as_posix())
+                else:
+                    shutil.copy2(src, dst)
+                    report["updated"].append(relative.as_posix())
+            return report
+
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            source = base / "source"
+            backup = base / "backup"
+            source.mkdir()
+            (source / "one.txt").write_text("uno", encoding="utf-8")
+            (source / "two.txt").write_text("dos", encoding="utf-8")
+            syncOnce(source, backup)
+            second = syncOnce(source, backup)
+            third = syncOnce(source, backup)
+            summary = {
+                "secondAdded": second["added"],
+                "secondUpdated": second["updated"],
+                "stableSkipped": second["skipped"] == third["skipped"],
+            }
+
+        assert summary == {"secondAdded": [], "secondUpdated": [], "stableSkipped": True}
+        summary
+      hints:
+        - 두 번째와 세 번째 보고서는 added와 updated가 모두 비어 있어야 한다.
+        - dict 키 이름은 skipped를 그대로 사용해 안정성을 비교한다.
+      check:
+        type: noError
+        noError: 세 번의 syncOnce 호출이 격리 공간에서 끝나야 한다.
+        resultCheck: summary 딕셔너리의 모든 키가 종합 결과로 멱등성을 확인해야 한다.
+    check:
+      noError: 멱등 검사 전체 흐름이 격리 공간에서 끝나야 한다.
+      resultCheck: 두 번째 호출부터 added가 비어 있고 skipped 리스트가 일정해야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: fileOps_07-backup-sync-plan-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - hash-content
+    - idempotent-summary
+    title: source·backup inventory로 증분 backup 계획 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: content hash 기준 copy·update·unchanged와 삭제 보존을 계산한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - backup 기본 정책은 source에서 사라진 파일도 보존하도록 두세요.
+    - mirror 삭제는 별도 명시된 경우에만 plan에 포함하세요.
+    exercise:
+      prompt: plan_backup_sync(source, backup, mirror_deletes)를 완성하세요.
+      starterCode: |-
+        def plan_backup_sync(source, backup, mirror_deletes):
+            raise NotImplementedError
+      solution: |
+        def plan_backup_sync(source, backup, mirror_deletes):
+            source_map = {item["path"]: item["hash"] for item in source}
+            backup_map = {item["path"]: item["hash"] for item in backup}
+            copy = sorted(set(source_map) - set(backup_map))
+            update = sorted(path for path in set(source_map) & set(backup_map) if source_map[path] != backup_map[path])
+            unchanged = sorted(path for path in set(source_map) & set(backup_map) if source_map[path] == backup_map[path])
+            backup_only = sorted(set(backup_map) - set(source_map))
+            delete = backup_only if mirror_deletes else []
+            preserve = [] if mirror_deletes else backup_only
+            return {"copy": copy, "update": update, "delete": delete, "preserve": preserve, "unchanged": unchanged}
+      hints: *id001
+    check:
+      id: python.fileops.fileOps_07.backup-sync-plan.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_07.backup-sync-plan.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_backup_sync
+        cases:
+        - id: plans-incremental-backup-with-preserve
+          arguments:
+          - value:
+            - path: new
+              hash: n
+            - path: change
+              hash: b
+            - path: same
+              hash: s
+          - value:
+            - path: old
+              hash: o
+            - path: change
+              hash: a
+            - path: same
+              hash: s
+          - value: false
+          expectedReturn:
+            copy:
+            - new
+            update:
+            - change
+            delete: []
+            preserve:
+            - old
+            unchanged:
+            - same
+        - id: plans-explicit-mirror-delete
+          arguments:
+          - value: []
+          - value:
+            - path: old
+              hash: o
+          - value: true
+          expectedReturn:
+            copy: []
+            update: []
+            delete:
+            - old
+            preserve: []
+            unchanged: []
+        - id: handles-identical-inventories
+          arguments:
+          - value:
+            - path: a
+              hash: x
+          - value:
+            - path: a
+              hash: x
+          - value: false
+          expectedReturn:
+            copy: []
+            update: []
+            delete: []
+            preserve: []
+            unchanged:
+            - a
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: fileOps_07-backup-restore-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - fileOps_07-backup-sync-plan-mastery
+    title: 새 backup에 restore sample 검증 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 선택된 sample의 backup hash와 복원 hash, metadata를 비교한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - backup 생성 success가 아니라 실제 restore sample로 복구 가능성을 검증하세요.
+    - 복원된 파일의 content hash와 size를 함께 비교하세요.
+    exercise:
+      prompt: audit_restore_samples(samples, minimum_samples)를 완성하세요.
+      starterCode: |-
+        def audit_restore_samples(samples, minimum_samples):
+            raise NotImplementedError
+      solution: |
+        def audit_restore_samples(samples, minimum_samples):
+            if minimum_samples <= 0:
+                raise ValueError("minimum samples must be positive")
+            failures = []
+            mismatches = []
+            for sample in samples:
+                reasons = []
+                if sample.get("backupHash") != sample.get("restoredHash"):
+                    reasons.append("hash")
+                if sample.get("expectedSize") != sample.get("restoredSize"):
+                    reasons.append("size")
+                if reasons:
+                    mismatches.append({"path": sample["path"], "reasons": reasons})
+            if len(samples) < minimum_samples:
+                failures.append("sample-count")
+            if mismatches:
+                failures.append("restore-mismatch")
+            return {"passed": not failures, "failures": failures, "sampleCount": len(samples), "mismatches": mismatches}
+      hints: *id002
+    check:
+      id: python.fileops.fileOps_07.backup-restore-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_07.backup-restore-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_restore_samples
+        cases:
+        - id: accepts-two-restored-samples
+          arguments:
+          - value:
+            - path: a
+              backupHash: x
+              restoredHash: x
+              expectedSize: 1
+              restoredSize: 1
+            - path: b
+              backupHash: y
+              restoredHash: y
+              expectedSize: 2
+              restoredSize: 2
+          - value: 2
+          expectedReturn:
+            passed: true
+            failures: []
+            sampleCount: 2
+            mismatches: []
+        - id: reports-sample-count-and-mismatch
+          arguments:
+          - value:
+            - path: a
+              backupHash: x
+              restoredHash: bad
+              expectedSize: 1
+              restoredSize: 2
+          - value: 2
+          expectedReturn:
+            passed: false
+            failures:
+            - sample-count
+            - restore-mismatch
+            sampleCount: 1
+            mismatches:
+            - path: a
+              reasons:
+              - hash
+              - size
+        - id: rejects-zero-minimum
+          arguments:
+          - value: []
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: fileOps_07-backup-sync-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - fileOps_07-backup-restore-audit-transfer
+    title: backup·동기화 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 증분 plan·삭제 정책·restore evidence를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 파일 action 전에 root·충돌·dry run 계약을 확인하세요.
+    - 실행 횟수가 아니라 source와 destination artifact identity로 결과를 판정하세요.
+    exercise:
+      prompt: choose_backup_policy(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_backup_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_backup_policy(situation):
+            table = {'incremental': {'action': 'compare path and content hashes', 'evidence': 'copy update unchanged plan', 'risk': 'metadata-only change'}, 'delete': {'action': 'preserve unless mirror explicitly enabled', 'evidence': 'delete policy', 'risk': 'propagated loss'}, 'restore': {'action': 'test sampled restore', 'evidence': 'restored hash and size', 'risk': 'unusable backup'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.fileops.fileOps_07.backup-sync-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_07.backup-sync-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_backup_policy
+        cases:
+        - id: recalls-incremental
+          arguments:
+          - value: incremental
+          expectedReturn:
+            action: compare path and content hashes
+            evidence: copy update unchanged plan
+            risk: metadata-only change
+        - id: recalls-delete
+          arguments:
+          - value: delete
+          expectedReturn:
+            action: preserve unless mirror explicitly enabled
+            evidence: delete policy
+            risk: propagated loss
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

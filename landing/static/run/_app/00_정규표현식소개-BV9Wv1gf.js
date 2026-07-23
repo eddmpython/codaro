@@ -1,0 +1,816 @@
+var e=`meta:
+  id: regex_00
+  title: 정규표현식소개
+  order: 0
+  category: regex
+  badge: 소개
+  source: eddmpython
+  sourceUrl: https://eddmpython.com
+  tags:
+  - 정규표현식
+  - regex
+  - re
+  - 패턴 매칭
+  - 텍스트 처리
+  - 비정형 데이터
+  seo:
+    title: Python 정규표현식(re) 입문 - 비정형 데이터 마스터
+    description: Python re 모듈로 정규표현식을 배우세요. 이메일 추출, 텍스트 정제, LLM 전처리까지 실전 프로젝트로 마스터합니다.
+    keywords:
+    - 정규표현식
+    - regex
+    - Python re
+    - 패턴 매칭
+    - 텍스트 처리
+    - LLM 전처리
+intro:
+  direction: 정규표현식소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 샘플 문자열 확인 후 패턴 매칭과 치환에 맞는 코드 입력을 고릅니다.
+  - 정규표현식소개 결과를 매치 그룹, 추출 목록, 치환 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 로그/문서 정제 자동화에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 연락처 텍스트 정제 파이프라인 입력 확인
+      detail: 입력 기준(샘플 문자열)과 필요한 조건을 먼저 고정합니다.
+    - label: 패턴 매칭과 치환 처리 실행
+      detail: 패턴 매칭과 치환 코드를 실행해 중간 결과를 확인합니다.
+    - label: 매치 그룹, 추출 목록, 치환 결과 검증
+      detail: 매치 그룹, 추출 목록, 치환 결과 기준으로 실행 결과를 비교합니다.
+    - label: 정규표현식소개 재사용
+      detail: 완성 코드를 로그/문서 정제 자동화에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 텍스트 정제 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 정규표현식소개 실행
+      detail: 셀을 실행해 매치 그룹, 추출 목록, 치환 결과와 예외 상태를 확인합니다.
+    - label: 정규표현식소개 완료
+      detail: 검증된 코드를 로그/문서 정제 자동화로 남깁니다.
+sections:
+- id: intro
+  blocks:
+  - type: mainHeader
+    emoji: 🔍
+    title: 정규표현식??
+    subtitle: 비정형 텍스트를 어떻게 다루지?
+  - type: hero
+    emoji: 🎯
+    title: 패턴으로 텍스트 정복
+    subtitle: 비정형 데이터 처리의 핵심 도구
+    points:
+    - emoji: 📧
+      title: 이메일 주소 한 번에 추출
+    - emoji: 📱
+      title: 전화번호 형식 자동 통일
+    - emoji: 🔐
+      title: 개인정보 자동 마스킹
+    - emoji: 🤖
+      title: LLM 토큰 30% 절약
+  goal: 정규표현식??에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+- id: why_regex
+  blocks:
+  - type: sectionHeader
+    title: 🤔 왜 정규표현식을 배워야 하나요?
+    subtitle: 실무에서 매일 마주치는 문제들
+  - type: text
+    content: |-
+      데이터는 항상 깔끔하지 않습니다. 실제 현장에서는 비정형 텍스트를 다루는 일이 훨씬 많습니다.
+
+      - 웹 크롤링한 HTML에서 순수 텍스트만 추출하고 싶다면?
+      - 로그 파일에서 에러 메시지만 찾아내고 싶다면?
+      - 수천 개의 문서에서 이메일 주소를 한 번에 추출하고 싶다면?
+      - 다양한 날짜 형식을 통일된 형태로 변환하고 싶다면?
+
+      정규표현식은 이 모든 문제를 한 줄의 패턴으로 해결합니다.
+  - type: compare
+    left:
+      title: 수동 처리
+      subtitle: 전통적인 방식
+      icon: ✋
+      color: gray
+      items:
+      - if/else 수십 줄 작성
+      - 모든 경우의 수 체크
+      - 새로운 형식마다 코드 수정
+      - 느리고 에러 발생 쉬움
+      - 유지보수 어려움
+      infoBox: 비효율적이고 시간 낭비
+    right:
+      title: 정규표현식
+      subtitle: 현대적인 방식
+      icon: 🎯
+      color: green
+      items:
+      - 패턴 한 줄로 끝
+      - 다양한 형식 한 번에 처리
+      - 패턴만 수정하면 됨
+      - 빠르고 정확함
+      - 간결하고 재사용 가능
+      infoBox: 효율적이고 강력한 도구
+  goal: 🤔 왜 정규표현식을 배워야 하나요?에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+- id: llm_era
+  blocks:
+  - type: sectionHeader
+    title: 🤖 LLM 시대의 정규표현식
+    subtitle: 토큰 비용을 30% 절약하는 비결
+  - type: text
+    content: |-
+      ChatGPT, Claude 같은 LLM API를 사용할 때 토큰 수가 곧 비용입니다. 하지만 대부분의 웹 데이터는 노이즈 투성이죠.
+
+      HTML 태그, 특수문자, 불필요한 공백... 이런 것들이 토큰을 낭비합니다.
+  - type: featureCards
+    cards:
+    - emoji: 🗑️
+      title: 노이즈 제거
+      description: HTML 태그, 특수문자 제거로 토큰 30% 이상 절감
+    - emoji: 🎯
+      title: 정보 추출
+      description: 필요한 부분만 정확히 추출하여 프롬프트 최소화
+    - emoji: 🔄
+      title: 형식 통일
+      description: 다양한 형식을 정규화하여 LLM 이해도 향상
+    - emoji: 💰
+      title: 비용 절감
+      description: 전처리로 API 호출 비용 크게 감소
+  - type: note
+    style: tip
+    title: 실제 사례
+    content: |-
+      100KB HTML 문서를 정규표현식으로 전처리하면 20KB 순수 텍스트만 남습니다.
+      토큰 수: 25,000 → 5,000 (80% 절감!)
+      비용: $0.50 → $0.10 (API 비용 5배 절약)
+  goal: 🤖 LLM 시대의 정규표현식에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+- id: real_world_uses
+  blocks:
+  - type: sectionHeader
+    title: 💼 실무 활용 사례
+    subtitle: 어디에 쓰이나요?
+  - type: table
+    headers:
+    - 직무
+    - 활용 예시
+    - 효과
+    rows:
+    - - 데이터 엔지니어
+      - 로그 파싱, ETL 파이프라인
+      - 처리 시간 90% 단축
+    - - 백엔드 개발자
+      - 입력 검증, 포맷 변환
+      - 보안 취약점 사전 차단
+    - - 데이터 분석가
+      - 텍스트 정제, 패턴 발견
+      - 분석 품질 향상
+    - - AI/ML 엔지니어
+      - NLP 전처리, 특성 추출
+      - 모델 성능 개선
+    - - 웹 개발자
+      - 폼 검증, URL 파싱
+      - 사용자 경험 개선
+  - type: note
+    style: info
+    title: 프로그래밍 언어 공통 기술
+    content: 정규표현식은 Python뿐 아니라 JavaScript, Java, Go, Rust 등 모든 언어에서 사용됩니다. 한 번 배우면 어디서나 활용 가능합니다.
+  goal: 💼 실무 활용 사례에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+- id: key_concepts
+  blocks:
+  - type: sectionHeader
+    title: 🎯 핵심 개념 미리보기
+    subtitle: 10개 프로젝트로 배울 내용
+  - type: featureCards
+    cards:
+    - emoji: 🔤
+      title: 기본 패턴
+      description: ., ^, $, \\d, \\w, \\s 등 기초 메타문자
+    - emoji: 🔢
+      title: 수량자
+      description: '*, +, ?, {n,m}으로 반복 횟수 지정'
+    - emoji: 📦
+      title: 그룹과 캡처
+      description: (pattern)으로 패턴 묶기, (?P<name>)으로 이름 지정
+    - emoji: 🔧
+      title: re 모듈 함수
+      description: search, findall, sub, split 등 핵심 함수
+    - emoji: 🚩
+      title: 플래그
+      description: re.IGNORECASE, re.MULTILINE 등 옵션
+    - emoji: 🎓
+      title: 고급 기능
+      description: lookahead, lookbehind로 복잡한 조건 매칭
+  goal: 🎯 핵심 개념 미리보기에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+- id: projects_preview
+  blocks:
+  - type: sectionHeader
+    title: 🗺️ 10개 프로젝트 로드맵
+    subtitle: 난이도별 개념 누적 학습
+  - type: table
+    headers:
+    - 단계
+    - 프로젝트
+    - 배울 내용
+    - 데이터 소스
+    rows:
+    - - 입문
+      - 01 이메일주소추출
+      - 기본 패턴, 문자 클래스, findall
+      - 로컬 사용자 JSON
+    - - 입문
+      - 02 전화번호형식통일
+      - 그룹 캡처, sub, 형식 변환
+      - 로컬 전화번호 샘플
+    - - 기초
+      - 03 URL구조분해
+      - 이름 있는 그룹, 복잡한 패턴
+      - 로컬 웹사이트 샘플
+    - - 기초
+      - 04 HTML태그제거
+      - 비탐욕적 매칭, DOTALL 플래그
+      - 코드 내 샘플
+    - - 기초
+      - 05 로그파일분석
+      - 멀티라인, 타임스탬프 파싱
+      - 코드 내 로그
+    - - 중급
+      - 06 날짜형식변환
+      - 복잡한 패턴, 다양한 형식 처리
+      - 코드 내 샘플
+    - - 중급
+      - 07 개인정보마스킹
+      - 역참조, 부분 치환
+      - 코드 내 샘플
+    - - 중급
+      - 08 텍스트정제토큰화
+      - split, 노이즈 제거, LLM 전처리
+      - 로컬 노이즈 텍스트
+    - - 심화
+      - 09 고급패턴매칭
+      - lookahead, lookbehind, 조건부
+      - 코드 내 샘플
+    - - 심화
+      - 10 LLM전처리파이프라인
+      - 모든 개념 종합, 실전 자동화
+      - 로컬 게시글 + HTML
+  - type: note
+    style: info
+    title: 프로젝트 기반 학습
+    content: 각 프로젝트는 완성된 결과물을 만듭니다. 이전 프로젝트의 개념을 반복 사용하면서 새로운 개념을 추가로 배웁니다.
+  goal: 🗺️ 10개 프로젝트 로드맵에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+- id: pattern_examples
+  blocks:
+  - type: sectionHeader
+    title: ✨ 실제 패턴 맛보기
+    subtitle: 정규표현식의 강력함을 느껴보세요
+  - type: table
+    headers:
+    - 찾고 싶은 것
+    - 패턴
+    - 설명
+    rows:
+    - - 이메일
+      - \\w+@\\w+\\.\\w+
+      - 단어@단어.단어 형식
+    - - 전화번호
+      - \\d{2,3}-\\d{3,4}-\\d{4}
+      - 2~3자리-3~4자리-4자리
+    - - URL
+      - https?://[\\w.-]+
+      - http 또는 https로 시작
+    - - 날짜
+      - \\d{4}-\\d{2}-\\d{2}
+      - YYYY-MM-DD 형식
+    - - 주민번호
+      - \\d{6}-[1-4]\\d{6}
+      - 6자리-1~4로 시작하는 7자리
+    - - HTML 태그
+      - <[^>]+>
+      - < 와 > 사이의 모든 문자
+  - type: note
+    style: tip
+    title: 패턴은 언어입니다
+    content: 정규표현식은 텍스트 패턴을 표현하는 작은 언어입니다. 처음엔 어렵지만 10개 프로젝트를 완료하면 자유자재로 사용할 수 있습니다.
+  goal: ✨ 실제 패턴 맛보기에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+- id: vs_other_methods
+  blocks:
+  - type: sectionHeader
+    title: ⚖️ 다른 방법과 비교
+    subtitle: 정규표현식 vs 다른 텍스트 처리 방법
+  - type: table
+    headers:
+    - 방법
+    - 장점
+    - 단점
+    - 추천 상황
+    rows:
+    - - 정규표현식
+      - 강력, 간결, 빠름
+      - 학습 곡선 있음
+      - 패턴이 명확한 텍스트
+    - - 문자열 메서드
+      - 쉬움, 직관적
+      - 복잡한 패턴 처리 어려움
+      - 단순한 문자열 조작
+    - - 파서 라이브러리
+      - 정확, 구조화
+      - 특정 형식만 지원
+      - HTML, XML, JSON
+    - - LLM API
+      - 유연, 맥락 이해
+      - 비용, 느림
+      - 복잡한 자연어 처리
+  - type: note
+    style: info
+    title: 조합이 최고
+    content: 정규표현식으로 전처리 → LLM으로 분석하면 비용은 줄이고 정확도는 높일 수 있습니다.
+  goal: ⚖️ 다른 방법과 비교에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+- id: performance
+  blocks:
+  - type: sectionHeader
+    title: ⚡ 성능 비교
+    subtitle: 정규표현식은 얼마나 빠를까?
+  - type: featureCards
+    cards:
+    - emoji: 🐢
+      title: 반복문 + if/else
+      description: '100만 줄 처리 시간: 15초'
+    - emoji: 🚗
+      title: 문자열 메서드
+      description: '100만 줄 처리 시간: 5초'
+    - emoji: 🚀
+      title: 정규표현식
+      description: '100만 줄 처리 시간: 0.5초'
+  - type: note
+    style: tip
+    title: C로 구현된 고성능 엔진
+    content: Python re 모듈은 C로 작성되어 매우 빠릅니다. 대용량 텍스트 처리에 최적화되어 있습니다.
+  goal: ⚡ 성능 비교에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+- id: learning_path
+  blocks:
+  - type: sectionHeader
+    title: 🎓 학습 로드맵
+    subtitle: 어떻게 배우나요?
+  - type: featureCards
+    cards:
+    - emoji: 1️⃣
+      title: 입문 (01-02)
+      description: 기본 패턴, 문자 클래스, 간단한 추출/치환
+    - emoji: 2️⃣
+      title: 기초 (03-05)
+      description: 그룹, 플래그, 복잡한 패턴 조합
+    - emoji: 3️⃣
+      title: 중급 (06-08)
+      description: 고급 패턴, 전처리 파이프라인 구축
+    - emoji: 4️⃣
+      title: 심화 (09-10)
+      description: lookaround, 실전 프로젝트 자동화
+  - type: note
+    style: info
+    title: 개념 누적 방식
+    content: 각 프로젝트는 이전 프로젝트의 개념을 반복 사용하면서 새로운 개념을 추가합니다. 10개 프로젝트를 완료하면 정규표현식의 모든 핵심 개념을 마스터하게 됩니다.
+  goal: 🎓 학습 로드맵에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+- id: tools
+  blocks:
+  - type: sectionHeader
+    title: 🛠️ 유용한 도구
+    subtitle: 정규표현식 학습과 테스트
+  - type: featureCards
+    cards:
+    - emoji: 🌐
+      title: regex101.com
+      description: 온라인 정규표현식 테스터. 패턴 설명, 매칭 확인
+    - emoji: 🔍
+      title: regexr.com
+      description: 비주얼 정규표현식 에디터. 실시간 매칭 확인
+    - emoji: 📚
+      title: regexlearn.com
+      description: 인터랙티브 정규표현식 튜토리얼
+    - emoji: 🎮
+      title: regexcrossword.com
+      description: 정규표현식 퍼즐 게임으로 재미있게 학습
+  goal: 🛠️ 유용한 도구에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+- id: common_mistakes
+  blocks:
+  - type: sectionHeader
+    title: ⚠️ 흔한 실수
+    subtitle: 초보자가 자주 하는 실수들
+  - type: table
+    headers:
+    - 실수
+    - 문제
+    - 해결
+    rows:
+    - - 특수문자 이스케이프 안 함
+      - . 이 모든 문자 매칭
+      - \\. 으로 이스케이프
+    - - 탐욕적 매칭
+      - .* 가 너무 많이 매칭
+      - .*? 비탐욕적 사용
+    - - 플래그 미사용
+      - 대소문자 구분으로 놓침
+      - re.IGNORECASE 사용
+    - - 그룹 번호 혼동
+      - \\1, \\2 순서 틀림
+      - (?P<name>) 이름 사용
+    - - 패턴 검증 안 함
+      - 예상치 못한 매칭
+      - regex101에서 테스트
+  - type: note
+    style: warning
+    title: 처음엔 어렵습니다
+    content: 정규표현식은 암호처럼 보일 수 있습니다. 하지만 10개 프로젝트를 따라하다 보면 자연스럽게 익숙해집니다. 포기하지 마세요!
+  goal: ⚠️ 흔한 실수에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+- id: resources
+  blocks:
+  - type: sectionHeader
+    title: 📚 참고 자료
+    subtitle: 더 깊이 공부하고 싶다면
+  - type: links
+    items:
+    - text: Python re 공식 문서
+      url: https://docs.python.org/ko/3/library/re.html
+      icon: 🔗
+    - text: 정규식 HOWTO (한글)
+      url: https://docs.python.org/ko/3/howto/regex.html
+      icon: 🔗
+    - text: Regular Expressions Info
+      url: https://www.regular-expressions.info/
+      icon: 🔗
+    - text: regex101 (온라인 테스터)
+      url: https://regex101.com/
+      icon: 🔗
+  goal: 📚 참고 자료에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+- id: next
+  blocks:
+  - type: hero
+    emoji: 👉
+    title: '다음: 이메일 주소 추출'
+    subtitle: 로컬 사용자 샘플에서 다양한 형식의 이메일을 추출하는 첫 프로젝트를 시작합니다
+  goal: '다음: 이메일 주소 추출에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.'
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인'
+  structuredPrimary: true
+  subtitle: 예측 → 패턴 실행 → 오류 수정 → 검증 → 실무 변주
+  goal: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를
+    추출하고, 잘못된 패턴과 빈 입력을 안전하게 처리합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import re
+
+    contactText = '''
+    김개발 <kim@example.com> 010-1234-5678
+    lee@company.co.kr / 02-987-6543
+    잘못된 주소: hello@ / 번호: 12345
+    '''
+
+    emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}')
+    phonePattern = re.compile(r'(?:010-\\d{4}-\\d{4}|02-\\d{3}-\\d{4})')
+
+    emails = emailPattern.findall(contactText)
+    phones = phonePattern.findall(contactText)
+
+    assert emails == ['kim@example.com', 'lee@company.co.kr']
+    assert phones == ['010-1234-5678', '02-987-6543']
+    emails, phones
+  exercise:
+    prompt: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    starterCode: |-
+      import re
+
+      contactText = '''
+      김개발 <kim@example.com> 010-1234-5678
+      lee@company.co.kr / 02-987-6543
+      잘못된 주소: hello@ / 번호: 12345
+      '''
+
+      emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}')
+      phonePattern = re.compile(r'(?:010-\\d{4}-\\d{4}|02-\\d{3}-\\d{4})')
+
+      emails = emailPattern.findall(contactText)
+      phones = phonePattern.findall(contactText)
+
+      assert emails == ['kim@example.com', 'lee@company.co.kr']
+      assert phones == ['010-1234-5678', '02-987-6543']
+      emails, phones
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인의 정규식 패턴이 컴파일되고 입력 텍스트가 매치 단계까지 도달해야 합니다.'
+    resultCheck: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인 결과의 추출 개수와 매치 문자열이 본문 기대값과 같아야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: regex_00-regex-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - workflow_validation
+    title: 정규표현식의 anchor·group·fixture 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: pattern이 전체 입력 계약과 필요한 named group을 표현하는지 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 부분 검색과 전체 형식 검증을 같은 \`match\`로 취급하지 마세요.
+    - 숫자 group 번호 대신 업무 의미가 드러나는 named group을 사용하세요.
+    exercise:
+      prompt: audit_regex_contract(pattern, required_groups, samples)를 완성하세요.
+      starterCode: |-
+        def audit_regex_contract(pattern, required_groups, samples):
+            raise NotImplementedError
+      solution: |
+        def audit_regex_contract(pattern, required_groups, samples):
+            import re
+            compiled = re.compile(pattern)
+            failures = []
+            if not pattern.startswith("^") or not pattern.endswith("$"):
+                failures.append("anchors")
+            missing_groups = sorted(set(required_groups) - set(compiled.groupindex))
+            if missing_groups:
+                failures.append("groups")
+            mismatches = []
+            for sample in samples:
+                matched = compiled.fullmatch(sample["text"]) is not None
+                if matched != sample["valid"]:
+                    mismatches.append(sample["id"])
+            if mismatches:
+                failures.append("fixtures")
+            return {"accepted": not failures, "failures": failures, "missingGroups": missing_groups, "mismatches": mismatches}
+      hints: *id001
+    check:
+      id: python.regex.regex_00.regex-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_00.regex-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_regex_contract
+        cases:
+        - id: accepts-anchored-named-pattern
+          arguments:
+          - value: ^(?P<code>[A-Z]{2})-(?P<number>\\d{3})$
+          - value:
+            - code
+            - number
+          - value:
+            - id: ok
+              text: AB-123
+              valid: true
+            - id: bad
+              text: xAB-123
+              valid: false
+          expectedReturn:
+            accepted: true
+            failures: []
+            missingGroups: []
+            mismatches: []
+        - id: reports-anchor-group-and-fixture
+          arguments:
+          - value: '[A-Z]+'
+          - value:
+            - code
+          - value:
+            - id: digits
+              text: '123'
+              valid: true
+          expectedReturn:
+            accepted: false
+            failures:
+            - anchors
+            - groups
+            - fixtures
+            missingGroups:
+            - code
+            mismatches:
+            - digits
+        - id: reports-only-fixture-gap
+          arguments:
+          - value: ^(?P<value>\\d+)$
+          - value:
+            - value
+          - value:
+            - id: letters
+              text: abc
+              valid: true
+          expectedReturn:
+            accepted: false
+            failures:
+            - fixtures
+            missingGroups: []
+            mismatches:
+            - letters
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: regex_00-regex-risk-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_00-regex-contract-audit-mastery
+    title: 새 pattern에 성능·가독성 위험 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 중첩 반복, 무제한 wildcard, fixture 한계를 휴리스틱으로 보고한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 중첩 quantifier는 긴 실패 입력에서 반드시 별도 benchmark하세요.
+    - 평균 길이 fixture만 두지 말고 허용 최대 길이를 포함하세요.
+    exercise:
+      prompt: audit_regex_risks(pattern, maximum_length, fixture_lengths)를 완성하세요.
+      starterCode: |-
+        def audit_regex_risks(pattern, maximum_length, fixture_lengths):
+            raise NotImplementedError
+      solution: |
+        def audit_regex_risks(pattern, maximum_length, fixture_lengths):
+            import re
+            if maximum_length <= 0:
+                raise ValueError("maximum length must be positive")
+            risks = []
+            if re.search(r"\\([^)]*[+*][^)]*\\)[+*]", pattern):
+                risks.append("nested-quantifier")
+            if ".*" in pattern and not pattern.startswith("^"):
+                risks.append("unbounded-prefix")
+            if not fixture_lengths or max(fixture_lengths) < maximum_length:
+                risks.append("boundary-not-tested")
+            return {"safeToBenchmark": "nested-quantifier" not in risks, "risks": risks, "maximumLength": maximum_length}
+      hints: *id002
+    check:
+      id: python.regex.regex_00.regex-risk-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_00.regex-risk-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_regex_risks
+        cases:
+        - id: accepts-bounded-tested-pattern
+          arguments:
+          - value: ^[A-Z]{1,4}\\d{1,6}$
+          - value: 20
+          - value:
+            - 0
+            - 5
+            - 20
+          expectedReturn:
+            safeToBenchmark: true
+            risks: []
+            maximumLength: 20
+        - id: reports-nested-and-boundary
+          arguments:
+          - value: ^(a+)+$
+          - value: 100
+          - value:
+            - 10
+          expectedReturn:
+            safeToBenchmark: false
+            risks:
+            - nested-quantifier
+            - boundary-not-tested
+            maximumLength: 100
+        - id: reports-unbounded-prefix
+          arguments:
+          - value: .*token=(\\w+)$
+          - value: 50
+          - value:
+            - 50
+          expectedReturn:
+            safeToBenchmark: true
+            risks:
+            - unbounded-prefix
+            maximumLength: 50
+        - id: rejects-invalid-bound
+          arguments:
+          - value: ^x$
+          - value: 0
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: regex_00-regex-foundation-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_00-regex-risk-audit-transfer
+    title: 정규표현식 적용 경계 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 검색·전체 검증·구조 parser 사용 시점을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - match 수만 보지 말고 정규화 뒤 보존된 의미와 거부된 입력을 함께 확인하세요.
+    - regex가 아닌 전용 parser가 필요한 구조에서는 경계를 명시하세요.
+    exercise:
+      prompt: choose_regex_boundary(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_regex_boundary(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_regex_boundary(situation):
+            table = {'search': {'action': 'find explicit token pattern', 'evidence': 'span and named groups', 'risk': 'false positive'}, 'validate': {'action': 'fullmatch bounded format', 'evidence': 'valid and invalid fixtures', 'risk': 'partial match'}, 'structured-data': {'action': 'use dedicated parser', 'evidence': 'parsed structure', 'risk': 'regex grammar drift'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.regex.regex_00.regex-foundation-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_00.regex-foundation-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_regex_boundary
+        cases:
+        - id: recalls-search
+          arguments:
+          - value: search
+          expectedReturn:
+            action: find explicit token pattern
+            evidence: span and named groups
+            risk: false positive
+        - id: recalls-validate
+          arguments:
+          - value: validate
+          expectedReturn:
+            action: fullmatch bounded format
+            evidence: valid and invalid fixtures
+            risk: partial match
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

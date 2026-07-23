@@ -1,0 +1,906 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - numpy
+  - pandas
+  - scikit-learn
+  id: sklearn_07
+  title: 소나신호분류
+  order: 7
+  category: sklearn
+  difficulty: ⭐⭐⭐
+  badge: 심화
+  tags:
+  - sklearn
+  - RandomForest
+  - 앙상블
+  - 특성중요도
+  - 소나
+  seo:
+    title: Sklearn RandomForest - 소나 신호 분류
+    description: RandomForest로 소나 신호를 분류하고 특성 중요도를 분석합니다. 앙상블 학습과 변수 해석을 배웁니다.
+    keywords:
+    - sklearn
+    - RandomForest
+    - 앙상블
+    - feature importance
+    - 소나
+intro:
+  emoji: 📡
+  goal: RandomForest로 소나 신호를 광물/바위로 분류하고 특성 중요도를 분석합니다.
+  description: 소나 데이터는 60개 주파수 대역의 에너지 값으로 구성됩니다. RandomForest는 여러 결정트리를 결합한 앙상블 기법으로, 과적합에 강하고 특성 중요도를
+    제공합니다.
+  direction: 소나신호분류에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 소나신호분류 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 로딩 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 준비 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 스케일링 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 소나신호분류 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: matplotlib, numpy, pandas, scikit-learn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 소나신호분류 실행
+      detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
+    - label: 소나신호분류 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+sections:
+- id: step1_data
+  title: 1단계. 데이터 로딩
+  structuredPrimary: true
+  subtitle: 소나 데이터
+  goal: 1단계. 데이터 로딩에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    소나 데이터를 로딩합니다. Codaro 로컬 데이터셋은 60개 주파수 대역 에너지와 M(광물)/R(바위) 레이블로 구성되어 있어 이후 분할, 스케일링, 모델 평가 흐름을 안정적으로 연습할 수 있습니다.
+
+    소나 데이터는 60개 주파수 대역(f0~f59)의 에너지 값을 담고 있습니다. label이 M이면 광물(Mine), R이면 바위(Rock)입니다.
+  snippet: |-
+    import pandas as pd
+    import numpy as np
+    from sklearn.model_selection import train_test_split
+    from sklearn.preprocessing import StandardScaler, LabelEncoder
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+    import matplotlib.pyplot as plt
+    from codaro.curriculum.localData import loadLocalDataset
+
+    sonar = loadLocalDataset("sonar")
+    sonar
+  exercise:
+    prompt: 1단계. 데이터 로딩 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      import numpy as np
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler, LabelEncoder
+      from sklearn.ensemble import RandomForestClassifier
+      from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+      import matplotlib.pyplot as plt
+      from codaro.curriculum.localData import loadLocalDataset
+
+      sonar = loadLocalDataset("sonar")
+      sonar
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 데이터 로딩의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 로딩의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step2_prep
+  title: 2단계. 데이터 준비
+  structuredPrimary: true
+  subtitle: 레이블 인코딩
+  goal: 2단계. 데이터 준비에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    문자열 레이블을 숫자로 변환하고 학습/테스트 데이터로 분할합니다.
+
+    LabelEncoder는 문자열 레이블을 0, 1 등 정수로 변환합니다. stratify로 클래스 비율을 유지합니다.
+  snippet: |-
+    X = sonar.drop("label", axis=1)
+    y = sonar["label"]
+
+    le = LabelEncoder()
+    yEnc = le.fit_transform(y)
+
+    xTrain, xTest, yTrain, yTest = train_test_split(
+        X, yEnc, test_size=0.2, random_state=42, stratify=yEnc
+    )
+    xTrain.shape, xTest.shape
+  exercise:
+    prompt: 2단계. 데이터 준비 예제에서 test_size나 random_state 값을 바꾸고 분할 결과(shape)가 달라지는지 확인하세요.
+    starterCode: |-
+      X = sonar.drop("label", axis=1)
+      y = sonar["label"]
+
+      le = LabelEncoder()
+      yEnc = le.fit_transform(y)
+
+      xTrain, xTest, yTrain, yTest = train_test_split(
+          X, yEnc, test_size=0.2, random_state=42, stratify=yEnc
+      )
+      xTrain.shape, xTest.shape
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 준비에서 \`X\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. 데이터 준비 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step3_scale
+  title: 3단계. 스케일링
+  structuredPrimary: true
+  subtitle: StandardScaler
+  goal: 3단계. 스케일링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 60개 특성의 스케일을 맞춥니다. RandomForest는 스케일에 덜 민감하지만 일관성을 위해 적용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    scaler = StandardScaler()
+    xTrainSc = scaler.fit_transform(xTrain)
+    xTestSc = scaler.transform(xTest)
+    xTrainSc.shape
+  exercise:
+    prompt: 3단계. 스케일링 예제에서 \`scaler\`, \`xTrainSc\`, \`xTestSc\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      scaler = StandardScaler()
+      xTrainSc = scaler.fit_transform(xTrain)
+      xTestSc = scaler.transform(xTest)
+      xTrainSc.shape
+    hints:
+    - 바꿀 지점은 \`scaler = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`scaler\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 3단계. 스케일링에서 \`scaler\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 스케일링 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step4_rf
+  title: 4단계. RandomForest 학습
+  structuredPrimary: true
+  subtitle: 앙상블 학습
+  goal: 4단계. RandomForest 학습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    RandomForest는 여러 결정트리를 학습하고 투표로 예측합니다. n_estimators로 트리 개수를 지정합니다.
+
+    RandomForest는 Bootstrap Aggregating(Bagging) 기반입니다. 각 트리는 무작위 샘플과 특성 부분집합으로 학습하여 다양성을 확보합니다.
+  snippet: |-
+    rf = RandomForestClassifier(n_estimators=100, random_state=42)
+    rf.fit(xTrainSc, yTrain)
+    rf
+  exercise:
+    prompt: 4단계. RandomForest 학습 예제에서 \`rf\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      rf = RandomForestClassifier(n_estimators=100, random_state=42)
+      rf.fit(xTrainSc, yTrain)
+      rf
+    hints:
+    - 바꿀 지점은 \`rf = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`rf\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 4단계. RandomForest 학습에서 \`rf\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 4단계. RandomForest 학습 실행 뒤 \`rf\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step5_eval
+  title: 5단계. 모델 평가
+  structuredPrimary: true
+  subtitle: 분류 성능
+  goal: 5단계. 모델 평가에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  explanation: 테스트 데이터로 정확도와 상세 지표를 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    yPred = rf.predict(xTestSc)
+    acc = accuracy_score(yTest, yPred)
+    print(f"Accuracy: {acc:.4f}")
+  exercise:
+    prompt: 5단계. 모델 평가 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
+    starterCode: |-
+      yPred = rf.predict(xTestSc)
+      acc = accuracy_score(yTest, yPred)
+      print(f"Accuracy: {acc:.4f}")
+    hints:
+    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
+    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+  check:
+    noError: 5단계. 모델 평가의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
+    resultCheck: 5단계. 모델 평가 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+- id: step6_cm
+  title: 6단계. 혼동행렬
+  structuredPrimary: true
+  subtitle: 오분류 분석
+  goal: 6단계. 혼동행렬에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 혼동행렬로 광물/바위 분류 오류를 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    cm = confusion_matrix(yTest, yPred)
+    figCm, axCm = plt.subplots(figsize=(6, 5))
+    im = axCm.imshow(cm, cmap="Blues")
+    axCm.set_xticks([0, 1])
+    axCm.set_yticks([0, 1])
+    axCm.set_xticklabels(le.classes_)
+    axCm.set_yticklabels(le.classes_)
+    axCm.set_xlabel("Predicted")
+    axCm.set_ylabel("Actual")
+    axCm.set_title("Confusion Matrix")
+    for i in range(2):
+        for j in range(2):
+            axCm.text(j, i, cm[i, j], ha="center", va="center", fontsize=14)
+    plt.colorbar(im, ax=axCm)
+    figCm
+  exercise:
+    prompt: 6단계. 혼동행렬 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      cm = confusion_matrix(yTest, yPred)
+      figCm, axCm = plt.subplots(figsize=(6, 5))
+      im = axCm.imshow(cm, cmap="Blues")
+      axCm.set_xticks([0, 1])
+      axCm.set_yticks([0, 1])
+      axCm.set_xticklabels(le.classes_)
+      axCm.set_yticklabels(le.classes_)
+      axCm.set_xlabel("Predicted")
+      axCm.set_ylabel("Actual")
+      axCm.set_title("Confusion Matrix")
+      for i in range(2):
+          for j in range(2):
+              axCm.text(j, i, cm[i, j], ha="center", va="center", fontsize=14)
+      plt.colorbar(im, ax=axCm)
+      figCm
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 6단계. 혼동행렬의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 6단계. 혼동행렬 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step7_importance
+  title: 7단계. 특성 중요도
+  structuredPrimary: true
+  subtitle: feature_importances_
+  goal: 7단계. 특성 중요도에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    RandomForest는 각 특성의 중요도를 제공합니다. 어떤 주파수 대역이 분류에 중요한지 확인합니다.
+
+    feature_importances_는 각 특성이 불순도 감소에 기여한 정도를 나타냅니다. 값이 클수록 분류에 중요한 특성입니다.
+  snippet: |-
+    imp = rf.feature_importances_
+    impDf = pd.DataFrame({"feature": X.columns, "importance": imp})
+    impDf = impDf.sort_values("importance", ascending=False).head(20)
+    impDf
+  exercise:
+    prompt: 7단계. 특성 중요도 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      imp = rf.feature_importances_
+      impDf = pd.DataFrame({"feature": X.columns, "importance": imp})
+      impDf = impDf.sort_values("importance", ascending=False).head(20)
+      impDf
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 7단계. 특성 중요도의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 7단계. 특성 중요도의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step8_trees
+  title: 8단계. 트리 개수 비교
+  structuredPrimary: true
+  subtitle: n_estimators 튜닝
+  goal: 8단계. 트리 개수 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    트리 개수에 따른 성능 변화를 확인합니다. 트리가 많을수록 안정적이지만 속도는 느려집니다.
+
+    트리 개수가 늘어나면 성능이 안정화되지만, 일정 수준 이상에서는 개선폭이 줄어듭니다. 100개 정도가 일반적인 시작점입니다.
+  snippet: |-
+    nTrees = [10, 30, 50, 100, 150]
+    accList = []
+    for n in nTrees:
+        rfTemp = RandomForestClassifier(n_estimators=n, random_state=42)
+        rfTemp.fit(xTrainSc, yTrain)
+        predTemp = rfTemp.predict(xTestSc)
+        accList.append(accuracy_score(yTest, predTemp))
+
+    figTrees, axTrees = plt.subplots(figsize=(8, 5))
+    axTrees.plot(nTrees, accList, "o-", color="steelblue")
+    axTrees.set_xlabel("Number of Trees")
+    axTrees.set_ylabel("Accuracy")
+    axTrees.set_title("Accuracy vs Number of Trees")
+    axTrees.set_xticks(nTrees)
+    figTrees
+  exercise:
+    prompt: 8단계. 트리 개수 비교 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      nTrees = [10, 30, 50, 100, 150]
+      accList = []
+      for n in nTrees:
+          rfTemp = RandomForestClassifier(n_estimators=n, random_state=42)
+          rfTemp.fit(xTrainSc, yTrain)
+          predTemp = rfTemp.predict(xTestSc)
+          accList.append(accuracy_score(yTest, predTemp))
+
+      figTrees, axTrees = plt.subplots(figsize=(8, 5))
+      axTrees.plot(nTrees, accList, "o-", color="steelblue")
+      axTrees.set_xlabel("Number of Trees")
+      axTrees.set_ylabel("Accuracy")
+      axTrees.set_title("Accuracy vs Number of Trees")
+      axTrees.set_xticks(nTrees)
+      figTrees
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 8단계. 트리 개수 비교의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 8단계. 트리 개수 비교 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step9_depth
+  title: 9단계. 트리 깊이 조절
+  structuredPrimary: true
+  subtitle: max_depth
+  goal: 9단계. 트리 깊이 조절에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    max_depth로 트리 깊이를 제한하면 과적합을 방지할 수 있습니다.
+
+    max_depth=None이면 노드가 순수해질 때까지 분할합니다. 깊이를 제한하면 단순한 모델이 되어 과적합을 줄일 수 있습니다.
+  snippet: |-
+    depths = [3, 5, 7, 10, 15, None]
+    accDepth = []
+    for d in depths:
+        rfD = RandomForestClassifier(n_estimators=100, max_depth=d, random_state=42)
+        rfD.fit(xTrainSc, yTrain)
+        predD = rfD.predict(xTestSc)
+        accDepth.append(accuracy_score(yTest, predD))
+
+    depthLabels = [str(d) if d else "None" for d in depths]
+    figDepth, axDepth = plt.subplots(figsize=(8, 5))
+    axDepth.bar(depthLabels, accDepth, color="coral")
+    axDepth.set_xlabel("Max Depth")
+    axDepth.set_ylabel("Accuracy")
+    axDepth.set_title("Accuracy vs Max Depth")
+    figDepth
+  exercise:
+    prompt: 9단계. 트리 깊이 조절 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      depths = [3, 5, 7, 10, 15, None]
+      accDepth = []
+      for d in depths:
+          rfD = RandomForestClassifier(n_estimators=100, max_depth=d, random_state=42)
+          rfD.fit(xTrainSc, yTrain)
+          predD = rfD.predict(xTestSc)
+          accDepth.append(accuracy_score(yTest, predD))
+
+      depthLabels = [str(d) if d else "None" for d in depths]
+      figDepth, axDepth = plt.subplots(figsize=(8, 5))
+      axDepth.bar(depthLabels, accDepth, color="coral")
+      axDepth.set_xlabel("Max Depth")
+      axDepth.set_ylabel("Accuracy")
+      axDepth.set_title("Accuracy vs Max Depth")
+      figDepth
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 9단계. 트리 깊이 조절의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 9단계. 트리 깊이 조절 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step10_oob
+  title: 10단계. OOB 스코어
+  structuredPrimary: true
+  subtitle: Out-of-Bag 평가
+  goal: 10단계. OOB 스코어에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  explanation: |-
+    RandomForest는 OOB(Out-of-Bag) 샘플로 검증이 가능합니다. 별도 검증 세트 없이 성능을 추정합니다.
+
+    부트스트랩 샘플링에서 제외된 샘플(약 37%)로 평가합니다. 교차검증 없이 모델 성능을 빠르게 추정할 수 있습니다.
+  snippet: |-
+    rfOob = RandomForestClassifier(n_estimators=100, oob_score=True, random_state=42)
+    rfOob.fit(xTrainSc, yTrain)
+    print(f"OOB Score: {rfOob.oob_score_:.4f}")
+    print(f"Test Score: {accuracy_score(yTest, rfOob.predict(xTestSc)):.4f}")
+  exercise:
+    prompt: 10단계. OOB 스코어 예제에서 출력 문장 하나를 바꾸고 출력 줄 순서와 바뀐 줄을 확인하세요.
+    starterCode: |-
+      rfOob = RandomForestClassifier(n_estimators=100, oob_score=True, random_state=42)
+      rfOob.fit(xTrainSc, yTrain)
+      print(f"OOB Score: {rfOob.oob_score_:.4f}")
+      print(f"Test Score: {accuracy_score(yTest, rfOob.predict(xTestSc)):.4f}")
+    hints:
+    - 바꿀 지점은 각 print()의 따옴표 안 문구나 출력 변수에서 찾으세요.
+    - 실행 뒤 줄 수와 순서가 유지되고, 수정한 줄만 의도대로 바뀌었는지 보세요.
+  check:
+    noError: 10단계. OOB 스코어의 각 print() 호출이 따옴표와 괄호 조건을 만족하고 순서대로 출력되어야 합니다.
+    resultCheck: 10단계. OOB 스코어 출력 줄 수와 순서가 유지되고, 바꾼 줄의 문구가 출력 영역에 나타나야 합니다.
+- id: step11_compare
+  title: 11단계. 모델 비교
+  structuredPrimary: true
+  subtitle: 단일트리 vs 앙상블
+  goal: 11단계. 모델 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    단일 결정트리와 RandomForest 성능을 비교합니다. 앙상블의 효과를 확인합니다.
+
+    RandomForest는 여러 트리의 예측을 결합하여 단일 트리보다 안정적이고 일반화 성능이 좋습니다.
+  snippet: |-
+    from sklearn.tree import DecisionTreeClassifier
+
+    dt = DecisionTreeClassifier(random_state=42)
+    dt.fit(xTrainSc, yTrain)
+    dtPred = dt.predict(xTestSc)
+    dtAcc = accuracy_score(yTest, dtPred)
+
+    rfAcc = accuracy_score(yTest, rf.predict(xTestSc))
+
+    figComp, axComp = plt.subplots(figsize=(6, 4))
+    axComp.bar(["DecisionTree", "RandomForest"], [dtAcc, rfAcc], color=["gray", "steelblue"])
+    axComp.set_ylabel("Accuracy")
+    axComp.set_title("Single Tree vs Ensemble")
+    axComp.set_ylim(0.5, 1.0)
+    for i, v in enumerate([dtAcc, rfAcc]):
+        axComp.text(i, v + 0.02, f"{v:.3f}", ha="center")
+    figComp
+  exercise:
+    prompt: 11단계. 모델 비교 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      from sklearn.tree import DecisionTreeClassifier
+
+      dt = DecisionTreeClassifier(random_state=42)
+      dt.fit(xTrainSc, yTrain)
+      dtPred = dt.predict(xTestSc)
+      dtAcc = accuracy_score(yTest, dtPred)
+
+      rfAcc = accuracy_score(yTest, rf.predict(xTestSc))
+
+      figComp, axComp = plt.subplots(figsize=(6, 4))
+      axComp.bar(["DecisionTree", "RandomForest"], [dtAcc, rfAcc], color=["gray", "steelblue"])
+      axComp.set_ylabel("Accuracy")
+      axComp.set_title("Single Tree vs Ensemble")
+      axComp.set_ylim(0.5, 1.0)
+      for i, v in enumerate([dtAcc, rfAcc]):
+          axComp.text(i, v + 0.02, f"{v:.3f}", ha="center")
+      figComp
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 11단계. 모델 비교의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 11단계. 모델 비교 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 앙상블 분류
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import pandas as pd
+    import numpy as np
+    from sklearn.datasets import load_iris
+    from sklearn.model_selection import train_test_split
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.metrics import accuracy_score
+    import matplotlib.pyplot as plt
+
+    iris = load_iris()
+    xIris = pd.DataFrame(iris.data, columns=iris.feature_names)
+    yIris = iris.target
+
+    xTr, xTe, yTr, yTe = train_test_split(xIris, yIris, test_size=0.2, random_state=42)
+    rfIris = RandomForestClassifier(n_estimators=100, random_state=42)
+    rfIris.fit(xTr, yTr)
+    predIris = rfIris.predict(xTe)
+    print(f"Accuracy: {accuracy_score(yTe, predIris):.4f}")
+
+    impIris = pd.DataFrame({"feature": xIris.columns, "importance": rfIris.feature_importances_})
+    impIris = impIris.sort_values("importance", ascending=True)
+    figM1, axM1 = plt.subplots(figsize=(8, 4))
+    axM1.barh(impIris["feature"], impIris["importance"], color="forestgreen")
+    axM1.set_xlabel("Importance")
+    axM1.set_title("Iris Feature Importances")
+    figM1
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      import numpy as np
+      from sklearn.datasets import load_iris
+      from sklearn.model_selection import train_test_split
+      from sklearn.ensemble import RandomForestClassifier
+      from sklearn.metrics import accuracy_score
+      import matplotlib.pyplot as plt
+
+      iris = load_iris()
+      xIris = pd.DataFrame(iris.data, columns=iris.feature_names)
+      yIris = iris.target
+
+      xTr, xTe, yTr, yTe = train_test_split(xIris, yIris, test_size=0.2, random_state=42)
+      rfIris = RandomForestClassifier(n_estimators=100, random_state=42)
+      rfIris.fit(xTr, yTr)
+      predIris = rfIris.predict(xTe)
+      print(f"Accuracy: {accuracy_score(yTe, predIris):.4f}")
+
+      impIris = pd.DataFrame({"feature": xIris.columns, "importance": rfIris.feature_importances_})
+      impIris = impIris.sort_values("importance", ascending=True)
+      figM1, axM1 = plt.subplots(figsize=(8, 4))
+      axM1.barh(impIris["feature"], impIris["importance"], color="forestgreen")
+      axM1.set_xlabel("Importance")
+      axM1.set_title("Iris Feature Importances")
+      figM1
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 예측 모델 품질 게이트
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고,
+    정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from sklearn.datasets import make_classification
+    from sklearn.model_selection import train_test_split
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import accuracy_score, f1_score
+
+    features, target = make_classification(
+        n_samples=240,
+        n_features=6,
+        n_informative=4,
+        n_redundant=0,
+        class_sep=1.4,
+        random_state=42,
+    )
+    xTrain, xTest, yTrain, yTest = train_test_split(
+        features, target, test_size=0.25, random_state=42, stratify=target
+    )
+
+    riskPipeline = Pipeline([
+        ("scaler", StandardScaler()),
+        ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
+    ])
+
+    def fitRiskModel(pipeline, featureMatrix, labels):
+        pipeline.fit(featureMatrix, labels)
+        return pipeline
+
+    riskModel = fitRiskModel(riskPipeline, xTrain, yTrain)
+    riskPred = riskModel.predict(xTest)
+    riskAccuracy = accuracy_score(yTest, riskPred)
+    riskF1 = f1_score(yTest, riskPred)
+    xTrain.shape, xTest.shape
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      conservativePipeline = Pipeline([
+          ("scaler", StandardScaler()),
+          ("classifier", LogisticRegression(C=0.3, max_iter=1000, random_state=42)),
+      ])
+      conservativeModel = fitRiskModel(conservativePipeline, xTrain, yTrain)
+      conservativePred = conservativeModel.predict(xTest)
+      conservativeAccuracy = accuracy_score(yTest, conservativePred)
+      conservativeF1 = f1_score(yTest, conservativePred)
+
+      assert conservativeAccuracy >= 0.75
+      {
+          "baselineAccuracy": round(riskAccuracy, 3),
+          "baselineF1": round(riskF1, 3),
+          "conservativeAccuracy": round(conservativeAccuracy, 3),
+          "conservativeF1": round(conservativeF1, 3),
+          "accuracyDelta": round(conservativeAccuracy - riskAccuracy, 3),
+      }
+    solution: |-
+      from sklearn.datasets import make_classification
+      from sklearn.model_selection import train_test_split
+      from sklearn.pipeline import Pipeline
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score, f1_score
+
+      features, target = make_classification(
+          n_samples=240,
+          n_features=6,
+          n_informative=4,
+          n_redundant=0,
+          class_sep=1.4,
+          random_state=42,
+      )
+      xTrain, xTest, yTrain, yTest = train_test_split(
+          features, target, test_size=0.25, random_state=42, stratify=target
+      )
+
+      riskPipeline = Pipeline([
+          ("scaler", StandardScaler()),
+          ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
+      ])
+      xTrain.shape, xTest.shape
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증에서 \`conservativePipeline\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sklearn_07-stratified-count-plan-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_data
+    - workflow_validation
+    title: 소나 이진분류의 stratified split 수 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: class별 test count를 최소 1개 보존해 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 각 class가 train과 test 양쪽에 남아야 합니다.
+    - 작은 class에서 비율 반올림 결과를 검토하세요.
+    exercise:
+      prompt: stratified_test_counts(class_counts, test_ratio)를 완성하세요.
+      starterCode: |-
+        def stratified_test_counts(class_counts, test_ratio):
+            raise NotImplementedError
+      solution: |
+        def stratified_test_counts(class_counts, test_ratio):
+            if not 0 < test_ratio < 1 or any(count < 2 for count in class_counts.values()): raise ValueError("cannot stratify")
+            result={}
+            for label,count in sorted(class_counts.items()):
+                test=max(1,min(count-1,round(count*test_ratio)))
+                result[str(label)]={"train":count-test,"test":test}
+            return result
+      hints: *id001
+    check:
+      id: python.sklearn.sklearn_07.stratified-count-plan.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_07.stratified-count-plan.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: stratified_test_counts
+        cases:
+        - id: preserves-both-classes
+          arguments:
+          - value:
+              rock: 8
+              mine: 2
+          - value: 0.25
+          expectedReturn:
+            mine:
+              train: 1
+              test: 1
+            rock:
+              train: 6
+              test: 2
+        - id: handles-small-ratio
+          arguments:
+          - value:
+              0: 3
+              1: 3
+          - value: 0.1
+          expectedReturn:
+            '0':
+              train: 2
+              test: 1
+            '1':
+              train: 2
+              test: 1
+        - id: rejects-singleton-class
+          arguments:
+          - value:
+              0: 1
+              1: 5
+          - value: 0.2
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sklearn_07-signal-feature-range-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_07-stratified-count-plan-mastery
+    title: 새 신호 feature에 train range 점검 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: test feature가 train min/max 밖에 있는 비율을 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - scaler를 적용하기 전 원 feature range shift를 기록하세요.
+    - 범위 밖 값은 자동 오류가 아니라 외부 검토 신호입니다.
+    exercise:
+      prompt: feature_range_shift(train_rows, test_rows)를 완성하세요.
+      starterCode: |-
+        def feature_range_shift(train_rows, test_rows):
+            raise NotImplementedError
+      solution: |
+        def feature_range_shift(train_rows, test_rows):
+            if not train_rows or not test_rows or any(len(row)!=len(train_rows[0]) for row in train_rows+test_rows): raise ValueError("shape mismatch")
+            ranges=[(min(row[index] for row in train_rows),max(row[index] for row in train_rows)) for index in range(len(train_rows[0]))]
+            outside=[sum(value<ranges[index][0] or value>ranges[index][1] for index,value in enumerate(row)) for row in test_rows]
+            total=len(test_rows)*len(ranges)
+            return {"ranges":[list(pair) for pair in ranges],"outsideCount":sum(outside),"outsideRate":round(sum(outside)/total,4)}
+      hints: *id002
+    check:
+      id: python.sklearn.sklearn_07.signal-feature-range.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_07.signal-feature-range.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: feature_range_shift
+        cases:
+        - id: detects-range-shift
+          arguments:
+          - value:
+            - - 0
+              - 10
+            - - 2
+              - 8
+          - value:
+            - - 1
+              - 9
+            - - 3
+              - 20
+          expectedReturn:
+            ranges:
+            - - 0
+              - 2
+            - - 8
+              - 10
+            outsideCount: 2
+            outsideRate: 0.5
+        - id: accepts-inside-range
+          arguments:
+          - value:
+            - - 0
+            - - 2
+          - value:
+            - - 1
+          expectedReturn:
+            ranges:
+            - - 0
+              - 2
+            outsideCount: 0
+            outsideRate: 0.0
+        - id: rejects-empty
+          arguments:
+          - value: []
+          - value:
+            - - 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sklearn_07-sonar-classification-evidence-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_07-signal-feature-range-transfer
+    title: 신호 분류 검증 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: class split·scale·shift를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 학습 데이터와 평가 데이터의 경계를 먼저 확인하세요.
+    - 한 metric이나 예측을 실제 진단·인과 결론으로 확대하지 마세요.
+    exercise:
+      prompt: choose_signal_classifier_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_signal_classifier_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_signal_classifier_evidence(situation):
+            table = {'imbalanced-labels': {'method': 'stratified split', 'evidence': 'class counts per split', 'risk': 'singleton class'}, 'many-amplitudes': {'method': 'train-fitted scaler', 'evidence': 'feature ranges', 'risk': 'test fit'}, 'new-device': {'method': 'external device holdout', 'evidence': 'range shift and metrics', 'risk': 'sensor shift'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sklearn.sklearn_07.sonar-classification-evidence.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_07.sonar-classification-evidence.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_signal_classifier_evidence
+        cases:
+        - id: recalls-imbalanced-labels
+          arguments:
+          - value: imbalanced-labels
+          expectedReturn:
+            method: stratified split
+            evidence: class counts per split
+            risk: singleton class
+        - id: recalls-many-amplitudes
+          arguments:
+          - value: many-amplitudes
+          expectedReturn:
+            method: train-fitted scaler
+            evidence: feature ranges
+            risk: test fit
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,800 @@
+var e=`meta:
+  id: regex_05
+  title: 로그파일분석
+  order: 5
+  category: regex
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - 로그
+  - 멀티라인
+  - MULTILINE
+  - 타임스탬프
+  - 에러 파싱
+  seo:
+    title: 정규표현식 기초 - 로그 파일 분석
+    description: 정규표현식으로 서버 로그를 파싱합니다. 멀티라인 모드, ^$ 앵커, 타임스탬프 추출을 배웁니다.
+    keywords:
+    - 정규표현식
+    - regex
+    - 로그 파싱
+    - re.MULTILINE
+    - 타임스탬프
+intro:
+  emoji: 📋
+  goal: 서버 로그에서 에러 메시지, 타임스탬프, IP 주소를 추출합니다.
+  description: 실무에서 가장 많이 사용하는 정규표현식 활용 사례입니다. 멀티라인 모드와 앵커(^$)를 배워 로그 분석을 마스터합니다.
+  direction: 로그파일분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 샘플 문자열 확인 후 패턴 매칭과 치환에 맞는 코드 입력을 고릅니다.
+  - 로그파일분석 결과를 매치 그룹, 추출 목록, 치환 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 로그/문서 정제 자동화에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(샘플 문자열)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 로그 데이터 준비 처리 실행
+      detail: 패턴 매칭과 치환 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 에러 로그만 추출 결과 검증
+      detail: 매치 그룹, 추출 목록, 치환 결과 기준으로 실행 결과를 비교합니다.
+    - label: 로그파일분석 재사용
+      detail: 완성 코드를 로그/문서 정제 자동화에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 텍스트 정제 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 로그파일분석 실행
+      detail: 셀을 실행해 매치 그룹, 추출 목록, 치환 결과와 예외 상태를 확인합니다.
+    - label: 로그파일분석 완료
+      detail: 검증된 코드를 로그/문서 정제 자동화로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: 1단계. 라이브러리 불러오기의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: import re
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: import re
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
+- id: step2_prepare_log
+  title: 2단계. 로그 데이터 준비
+  structuredPrimary: true
+  subtitle: 실제 서버 로그 형식
+  goal: 2단계. 로그 데이터 준비에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    실제 서버 로그 형식을 재현한 샘플 데이터를 만듭니다. 서버 로그는 날짜, 시간, 로그 레벨, IP 주소, 메시지 등 정형화된 구조를 가지고 있어 정규표현식 파싱에 적합합니다. 시스템 관리자와 DevOps 엔지니어가 가장 많이 사용하는 정규표현식 활용 사례입니다.
+
+    로그 형식: - 타임스탬프: YYYY-MM-DD HH:MM:SS - 로그 레벨: INFO, WARNING, ERROR - IP 주소: [192.168.1.xxx] - 메시지: 실제 로그 내용
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    serverLog = """
+    2025-12-26 10:15:30 INFO [192.168.1.100] User login successful
+    2025-12-26 10:16:45 ERROR [192.168.1.101] Database connection failed: timeout
+    2025-12-26 10:17:12 WARNING [192.168.1.102] High memory usage: 85%
+    2025-12-26 10:18:03 INFO [192.168.1.100] User logout
+    2025-12-26 10:19:55 ERROR [192.168.1.103] File not found: /var/log/app.log
+    2025-12-26 10:20:30 ERROR [192.168.1.101] Connection reset by peer
+    2025-12-26 10:21:15 INFO [192.168.1.104] Request completed in 120ms
+    """
+    serverLog
+  exercise:
+    prompt: 2단계. 로그 데이터 준비 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      serverLog = """
+      2025-12-26 10:15:30 INFO [192.168.1.100] User login successful
+      2025-12-26 10:16:45 ERROR [192.168.1.101] Database connection failed: timeout
+      2025-12-26 10:17:12 WARNING [192.168.1.102] High memory usage: 85%
+      2025-12-26 10:18:03 INFO [192.168.1.100] User logout
+      2025-12-26 10:19:55 ERROR [192.168.1.103] File not found: /var/log/app.log
+      2025-12-26 10:20:30 ERROR [192.168.1.101] Connection reset by peer
+      2025-12-26 10:21:15 INFO [192.168.1.104] Request completed in 120ms
+      """
+      serverLog
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 로그 데이터 준비의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 로그 데이터 준비의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: step3_extract_errors
+  title: 3단계. 에러 로그만 추출
+  structuredPrimary: true
+  subtitle: ERROR 레벨 필터링
+  goal: 3단계. 에러 로그만 추출에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    먼저 ERROR 레벨의 로그만 찾아봅시다. 에러 로그는 시스템 문제를 진단하는 데 가장 중요한 정보입니다. 수천 줄의 로그에서 에러만 빠르게 필터링하면 문제 해결 시간을 크게 단축할 수 있습니다.
+
+    잘 작동합니다! 하지만 줄 단위로 더 정확하게 찾는 방법이 있습니다. 앵커(anchor)를 사용하면 줄의 시작과 끝을 명시적으로 지정할 수 있어, 부분 매칭이 아닌 전체 줄을 정확하게 추출할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    pattern = r".*ERROR.*"
+
+    errors = re.findall(pattern, serverLog)
+    errors
+  exercise:
+    prompt: 3단계. 에러 로그만 추출 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      pattern = r".*ERROR.*"
+
+      errors = re.findall(pattern, serverLog)
+      errors
+    hints:
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 에러 로그만 추출의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 에러 로그만 추출의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: step4_line_anchors
+  title: 4단계. 줄 앵커 사용하기
+  structuredPrimary: true
+  subtitle: ^ 와 $ 메타문자
+  goal: 4단계. 줄 앵커 사용하기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    ^ 는 줄의 시작, $ 는 줄의 끝을 나타내는 앵커(anchor) 메타문자입니다. 하지만 기본적으로는 전체 문자열의 시작과 끝만 매칭합니다. re.MULTILINE 플래그를 사용해야 각 줄마다 ^와 $가 작동합니다.
+
+    re.MULTILINE (re.M)
+    **re.MULTILINE** 또는 **re.M** 플래그: - \`^\` 가 각 줄의 시작을 매칭 - \`$\` 가 각 줄의 끝을 매칭 - 기본값은 전체 문자열의 시작/끝만 로그 파일처럼 여러 줄 텍스트를 다룰 때 필수!
+  tips:
+  - 're.MULTILINE (re.M) **re.MULTILINE** 또는 **re.M** 플래그: - \`^\` 가 각 줄의 시작을 매칭 - \`$\` 가 각 줄의 끝을 매칭 - 기본값은
+    전체 문자열의 시작/끝만 로그 파일처럼 여러 줄 텍스트를 다룰 때 필수!'
+  snippet: |-
+    pattern = r"ERROR.*"
+    re.findall(pattern, serverLog)
+  exercise:
+    prompt: 4단계. 줄 앵커 사용하기 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      pattern = r"ERROR.*"
+      re.findall(pattern, serverLog)
+    hints:
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 줄 앵커 사용하기의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 줄 앵커 사용하기의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: step5_parse_timestamp
+  title: 5단계. 타임스탬프 추출
+  structuredPrimary: true
+  subtitle: 날짜/시간 패턴
+  goal: 5단계. 타임스탬프 추출에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    각 에러 로그의 타임스탬프를 추출합니다.
+
+    타임스탬프 패턴 해석
+    - \`\\d{4}\` : 연도 4자리 - \`-\` : 하이픈 리터럴 - \`\\d{2}\` : 월/일 2자리 - \` \` : 공백 - \`\\d{2}:\\d{2}:\\d{2}\` : 시:분:초
+  tips:
+  - '타임스탬프 패턴 해석 - \`\\d{4}\` : 연도 4자리 - \`-\` : 하이픈 리터럴 - \`\\d{2}\` : 월/일 2자리 - \` \` : 공백 - \`\\d{2}:\\d{2}:\\d{2}\`
+    : 시:분:초'
+  snippet: |-
+    pattern = r"(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})"
+
+    timestamps = re.findall(pattern, serverLog)
+    timestamps
+  exercise:
+    prompt: 5단계. 타임스탬프 추출 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      pattern = r"(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})"
+
+      timestamps = re.findall(pattern, serverLog)
+      timestamps
+    hints:
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 타임스탬프 추출의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 타임스탬프 추출의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: step6_structured_parsing
+  title: 6단계. 구조화된 로그 파싱
+  structuredPrimary: true
+  subtitle: 모든 정보를 한 번에
+  goal: 6단계. 구조화된 로그 파싱에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    타임스탬프, 레벨, IP, 메시지를 모두 추출하는 완전한 패턴을 만듭니다.
+
+    re.finditer() 사용
+    **re.finditer(패턴, 텍스트)**: - findall과 비슷하지만 Match 객체들을 반환 - 각 Match에서 .groupdict() 사용 가능 - 메모리 효율적 (제너레이터)
+  tips:
+  - 're.finditer() 사용 **re.finditer(패턴, 텍스트)**: - findall과 비슷하지만 Match 객체들을 반환 - 각 Match에서 .groupdict()
+    사용 가능 - 메모리 효율적 (제너레이터)'
+  snippet: |-
+    pattern = r"^(?P<timestamp>\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}) (?P<level>\\w+) \\[(?P<ip>[\\d.]+)\\] (?P<message>.+)$"
+
+    matches = re.finditer(pattern, serverLog, flags=re.MULTILINE)
+
+    parsedLogs = [match.groupdict() for match in matches]
+    parsedLogs[:3]
+  exercise:
+    prompt: 6단계. 구조화된 로그 파싱 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      pattern = r"^(?P<timestamp>\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}) (?P<level>\\w+) \\[(?P<ip>[\\d.]+)\\] (?P<message>.+)$"
+
+      matches = re.finditer(pattern, serverLog, flags=re.MULTILINE)
+
+      parsedLogs = [match.groupdict() for match in matches]
+      parsedLogs[:3]
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 구조화된 로그 파싱의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 6단계. 구조화된 로그 파싱 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step7_filter_errors
+  title: 7단계. 에러만 필터링
+  structuredPrimary: true
+  subtitle: 조건부 추출
+  goal: 7단계. 에러만 필터링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: 파싱한 로그에서 ERROR 레벨만 필터링합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    matches = re.finditer(pattern, serverLog, flags=re.MULTILINE)
+    parsedLogs = [match.groupdict() for match in matches]
+
+    errorLogs = [log for log in parsedLogs if log['level'] == 'ERROR']
+    errorLogs
+  exercise:
+    prompt: 7단계. 에러만 필터링 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      matches = re.finditer(pattern, serverLog, flags=re.MULTILINE)
+      parsedLogs = [match.groupdict() for match in matches]
+
+      errorLogs = [log for log in parsedLogs if log['level'] == 'ERROR']
+      errorLogs
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 에러만 필터링의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 7단계. 에러만 필터링 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step8_ip_analysis
+  title: 8단계. IP 주소 분석
+  structuredPrimary: true
+  subtitle: 에러 발생 IP 통계
+  goal: 8단계. IP 주소 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    어느 IP에서 에러가 가장 많이 발생했는지 확인합니다.
+
+    192.168.1.101에서 에러가 2번 발생했네요. 이 서버를 점검해야겠습니다!
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    ipCount = {}
+    for error in errorLogs:
+        ip = error['ip']
+        ipCount[ip] = ipCount.get(ip, 0) + 1
+
+    ipCount
+  exercise:
+    prompt: 8단계. IP 주소 분석 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      ipCount = {}
+      for error in errorLogs:
+          ip = error['ip']
+          ipCount[ip] = ipCount.get(ip, 0) + 1
+
+      ipCount
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. IP 주소 분석의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 8단계. IP 주소 분석 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step9_advanced_pattern
+  title: 9단계. 특정 에러 검색
+  structuredPrimary: true
+  subtitle: 메시지 내용 기반 필터링
+  goal: 9단계. 특정 에러 검색에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    특정 키워드가 포함된 에러만 찾아봅시다. 예를 들어 "connection" 관련 에러.
+
+    re.IGNORECASE (re.I)
+    **re.IGNORECASE** 또는 **re.I** 플래그: - 대소문자 구분 안 함 - connection, Connection, CONNECTION 모두 매칭 **플래그 조합**: \`re.MULTILINE | re.IGNORECASE\`
+  tips:
+  - 're.IGNORECASE (re.I) **re.IGNORECASE** 또는 **re.I** 플래그: - 대소문자 구분 안 함 - connection, Connection, CONNECTION
+    모두 매칭 **플래그 조합**: \`re.MULTILINE | re.IGNORECASE\`'
+  snippet: |-
+    pattern = r"^(?P<timestamp>[\\d\\-: ]+) ERROR .* (?P<message>.*connection.*)$"
+
+    matches = re.finditer(pattern, serverLog, flags=re.MULTILINE | re.IGNORECASE)
+
+    connectionErrors = [match.groupdict() for match in matches]
+    connectionErrors
+  exercise:
+    prompt: 9단계. 특정 에러 검색 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      pattern = r"^(?P<timestamp>[\\d\\-: ]+) ERROR .* (?P<message>.*connection.*)$"
+
+      matches = re.finditer(pattern, serverLog, flags=re.MULTILINE | re.IGNORECASE)
+
+      connectionErrors = [match.groupdict() for match in matches]
+      connectionErrors
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 특정 에러 검색의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 9단계. 특정 에러 검색 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: workflow_validation
+  title: 10단계. 운영 로그 검증 루프
+  structuredPrimary: true
+  subtitle: 파싱 결과를 업무 기준으로 검증
+  goal: 10단계. 운영 로그 검증 루프에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 로그 파서는 "대충 몇 줄 보인다"가 아니라 기대한 줄 수, 로그 레벨 분포, 에러 IP 집계가 모두 맞는지 확인해야 운영에서 믿고 사용할 수 있습니다. 여기서는
+    파싱 결과를 검증하고, 일부러 잘못된 패턴을 넣어 어떤 문제가 잡히는지 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    logPattern = re.compile(
+        r"^(?P<timestamp>\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}) "
+        r"(?P<level>INFO|WARNING|ERROR) "
+        r"\\[(?P<ip>\\d{1,3}(?:\\.\\d{1,3}){3})\\] "
+        r"(?P<message>.+)$",
+        flags=re.MULTILINE,
+    )
+
+    parsedLogs = [match.groupdict() for match in logPattern.finditer(serverLog)]
+    errorLogs = [log for log in parsedLogs if log["level"] == "ERROR"]
+
+    def validateParsedLogs(logs):
+        levelCounts = {}
+        for log in logs:
+            levelCounts[log["level"]] = levelCounts.get(log["level"], 0) + 1
+
+        errorIpCounts = {}
+        for log in logs:
+            if log["level"] == "ERROR":
+                errorIpCounts[log["ip"]] = errorIpCounts.get(log["ip"], 0) + 1
+
+        assert len(logs) == 7, f"파싱된 로그 수가 다릅니다: {len(logs)}"
+        assert levelCounts == {"INFO": 3, "ERROR": 3, "WARNING": 1}, levelCounts
+        assert len(errorLogs) == 3, f"ERROR 로그 수가 다릅니다: {len(errorLogs)}"
+        assert errorIpCounts["192.168.1.101"] == 2, errorIpCounts
+
+        return {
+            "totalLogs": len(logs),
+            "levelCounts": levelCounts,
+            "errorIpCounts": errorIpCounts,
+        }
+
+    validationReport = validateParsedLogs(parsedLogs)
+    validationReport
+  exercise:
+    prompt: 10단계. 운영 로그 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      logPattern = re.compile(
+          r"^(?P<timestamp>\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}) "
+          r"(?P<level>INFO|WARNING|ERROR) "
+          r"\\[(?P<ip>\\d{1,3}(?:\\.\\d{1,3}){3})\\] "
+          r"(?P<message>.+)$",
+          flags=re.MULTILINE,
+      )
+
+      parsedLogs = [match.groupdict() for match in logPattern.finditer(serverLog)]
+      errorLogs = [log for log in parsedLogs if log["level"] == "ERROR"]
+
+      def validateParsedLogs(logs):
+          levelCounts = {}
+          for log in logs:
+              levelCounts[log["level"]] = levelCounts.get(log["level"], 0) + 1
+
+          errorIpCounts = {}
+          for log in logs:
+              if log["level"] == "ERROR":
+                  errorIpCounts[log["ip"]] = errorIpCounts.get(log["ip"], 0) + 1
+
+          assert len(logs) == 7, f"파싱된 로그 수가 다릅니다: {len(logs)}"
+          assert levelCounts == {"INFO": 3, "ERROR": 3, "WARNING": 1}, levelCounts
+          assert len(errorLogs) == 3, f"ERROR 로그 수가 다릅니다: {len(errorLogs)}"
+          assert errorIpCounts["192.168.1.101"] == 2, errorIpCounts
+
+          return {
+              "totalLogs": len(logs),
+              "levelCounts": levelCounts,
+              "errorIpCounts": errorIpCounts,
+          }
+
+      validationReport = validateParsedLogs(parsedLogs)
+      validationReport
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 운영 로그 검증 루프의 정규식 패턴이 컴파일되고 입력 텍스트가 매치 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 운영 로그 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 로그 분석 프로젝트
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    서버 관리자가 되어 로그 파일을 분석합니다. 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import re
+
+    log = """
+    2025-12-26 10:17:12 WARNING [192.168.1.102] High memory usage: 85%
+    2025-12-26 10:25:30 WARNING [192.168.1.105] High CPU usage: 92%
+    2025-12-26 10:30:45 WARNING [192.168.1.102] High memory usage: 91%
+    """
+
+    pat = r"^(?P<timestamp>[\\d\\-: ]+) WARNING .* memory usage: (?P<percent>\\d+)%"
+    matches = re.finditer(pat, log, flags=re.MULTILINE | re.IGNORECASE)
+
+    result = [
+        {"시간": m.group('timestamp'), "사용률": m.group('percent') + "%"}
+        for m in matches
+    ]
+    result
+  exercise:
+    prompt: 실습 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import re
+
+      log = """
+      2025-12-26 10:17:12 WARNING [192.168.1.102] High memory usage: 85%
+      2025-12-26 10:25:30 WARNING [192.168.1.105] High CPU usage: 92%
+      2025-12-26 10:30:45 WARNING [192.168.1.102] High memory usage: 91%
+      """
+
+      pat = r"^(?P<timestamp>[\\d\\-: ]+) WARNING .* memory usage: (?P<percent>\\d+)%"
+      matches = re.finditer(pat, log, flags=re.MULTILINE | re.IGNORECASE)
+
+      result = [
+          {"시간": m.group('timestamp'), "사용률": m.group('percent') + "%"}
+          for m in matches
+      ]
+      result
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 실습 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: summary
+  title: 정리
+  subtitle: 다섯 번째 프로젝트 완료!
+  blocks:
+  - type: text
+    content: 이번 프로젝트에서는 멀티라인 모드와 줄 앵커를 배웠습니다. 서버 로그를 파싱하고 분석할 수 있습니다.
+  - type: list
+    items:
+    - ^, $ - 줄 시작/끝 앵커
+    - re.MULTILINE - 줄마다 앵커 적용
+    - re.IGNORECASE - 대소문자 무시
+    - re.finditer() - Match 객체 반환
+  - type: text
+    content: 이제 기초 단계를 완료했습니다! 다음부터는 중급 프로젝트가 시작됩니다!
+  goal: 정리에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: regex_05-structured-log-parse-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - summary
+    title: 로그 줄을 timestamp·level·message로 구조화하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 형식 오류 줄을 누락시키지 않고 rejected 근거로 분리한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 파싱 실패 줄을 버리지 말고 원래 line number와 함께 격리하세요.
+    - level count의 분모가 accepted line인지 전체 line인지 명시하세요.
+    exercise:
+      prompt: parse_log_lines(lines)를 완성하세요.
+      starterCode: |-
+        def parse_log_lines(lines):
+            raise NotImplementedError
+      solution: |
+        def parse_log_lines(lines):
+            import re
+            pattern = re.compile(r"^(?P<timestamp>\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z) \\[(?P<level>INFO|WARN|ERROR)\\] (?P<message>.+)$")
+            records = []
+            rejected = []
+            for index, line in enumerate(lines):
+                match = pattern.fullmatch(line)
+                if not match:
+                    rejected.append({"line": index + 1, "text": line})
+                else:
+                    records.append(match.groupdict())
+            counts = {level: sum(record["level"] == level for record in records) for level in ["INFO", "WARN", "ERROR"]}
+            return {"records": records, "rejected": rejected, "counts": counts}
+      hints: *id001
+    check:
+      id: python.regex.regex_05.structured-log-parse.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_05.structured-log-parse.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: parse_log_lines
+        cases:
+        - id: parses-and-counts-levels
+          arguments:
+          - value:
+            - 2026-07-22T00:00:00Z [INFO] ready
+            - 2026-07-22T00:00:01Z [ERROR] failed
+          expectedReturn:
+            records:
+            - timestamp: '2026-07-22T00:00:00Z'
+              level: INFO
+              message: ready
+            - timestamp: '2026-07-22T00:00:01Z'
+              level: ERROR
+              message: failed
+            rejected: []
+            counts:
+              INFO: 1
+              WARN: 0
+              ERROR: 1
+        - id: reports-malformed-line-number
+          arguments:
+          - value:
+            - bad line
+            - 2026-07-22T00:00:00Z [WARN] slow
+          expectedReturn:
+            records:
+            - timestamp: '2026-07-22T00:00:00Z'
+              level: WARN
+              message: slow
+            rejected:
+            - line: 1
+              text: bad line
+            counts:
+              INFO: 0
+              WARN: 1
+              ERROR: 0
+        - id: rejects-empty-message
+          arguments:
+          - value:
+            - '2026-07-22T00:00:00Z [INFO] '
+          expectedReturn:
+            records: []
+            rejected:
+            - line: 1
+              text: '2026-07-22T00:00:00Z [INFO] '
+            counts:
+              INFO: 0
+              WARN: 0
+              ERROR: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: regex_05-log-incident-window-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_05-structured-log-parse-mastery
+    title: 새 로그 흐름에 오류 incident 묶기 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 시간 간격 threshold 안의 ERROR를 같은 incident로 집계한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - ERROR 줄 수와 실제 incident 수를 같은 지표로 부르지 마세요.
+    - 묶음 threshold를 report에 남겨 재집계 가능하게 하세요.
+    exercise:
+      prompt: group_error_incidents(events, maximum_gap_seconds)를 완성하세요.
+      starterCode: |-
+        def group_error_incidents(events, maximum_gap_seconds):
+            raise NotImplementedError
+      solution: |
+        def group_error_incidents(events, maximum_gap_seconds):
+            if maximum_gap_seconds < 0:
+                raise ValueError("negative gap")
+            errors = sorted((event for event in events if event["level"] == "ERROR"), key=lambda event: event["at"])
+            incidents = []
+            for event in errors:
+                if not incidents or event["at"] - incidents[-1]["end"] > maximum_gap_seconds:
+                    incidents.append({"start": event["at"], "end": event["at"], "messages": [event["message"]]})
+                else:
+                    incidents[-1]["end"] = event["at"]
+                    incidents[-1]["messages"].append(event["message"])
+            return {"incidentCount": len(incidents), "incidents": incidents}
+      hints: *id002
+    check:
+      id: python.regex.regex_05.log-incident-window.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_05.log-incident-window.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: group_error_incidents
+        cases:
+        - id: groups-nearby-errors
+          arguments:
+          - value:
+            - at: 0
+              level: ERROR
+              message: a
+            - at: 5
+              level: WARN
+              message: w
+            - at: 8
+              level: ERROR
+              message: b
+          - value: 10
+          expectedReturn:
+            incidentCount: 1
+            incidents:
+            - start: 0
+              end: 8
+              messages:
+              - a
+              - b
+        - id: splits-distant-errors
+          arguments:
+          - value:
+            - at: 1
+              level: ERROR
+              message: a
+            - at: 20
+              level: ERROR
+              message: b
+          - value: 5
+          expectedReturn:
+            incidentCount: 2
+            incidents:
+            - start: 1
+              end: 1
+              messages:
+              - a
+            - start: 20
+              end: 20
+              messages:
+              - b
+        - id: rejects-negative-gap
+          arguments:
+          - value: []
+          - value: -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: regex_05-log-analysis-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_05-log-incident-window-transfer
+    title: 로그 분석 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 파싱 품질·level 집계·incident 집계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - match 수만 보지 말고 정규화 뒤 보존된 의미와 거부된 입력을 함께 확인하세요.
+    - regex가 아닌 전용 parser가 필요한 구조에서는 경계를 명시하세요.
+    exercise:
+      prompt: choose_log_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_log_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_log_evidence(situation):
+            table = {'parse': {'action': 'fullmatch structured line', 'evidence': 'accepted and rejected counts', 'risk': 'silent drop'}, 'levels': {'action': 'count accepted records', 'evidence': 'level denominator', 'risk': 'malformed bias'}, 'incidents': {'action': 'group errors by explicit gap', 'evidence': 'start end messages', 'risk': 'alert count inflation'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.regex.regex_05.log-analysis-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_05.log-analysis-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_log_evidence
+        cases:
+        - id: recalls-parse
+          arguments:
+          - value: parse
+          expectedReturn:
+            action: fullmatch structured line
+            evidence: accepted and rejected counts
+            risk: silent drop
+        - id: recalls-levels
+          arguments:
+          - value: levels
+          expectedReturn:
+            action: count accepted records
+            evidence: level denominator
+            risk: malformed bias
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

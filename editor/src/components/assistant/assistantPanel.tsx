@@ -29,6 +29,7 @@ import {
   providerProfileName,
   providerProfileReady,
 } from "@/lib/providerProfile";
+import { resolvePublicAsset } from "@/lib/publicAsset";
 import {
   providerAssistantDisplayContent,
   shouldOfferProviderSettings,
@@ -589,7 +590,7 @@ function CodaroAiAvatar({ className }: { className?: string }) {
       alt=""
       aria-hidden="true"
       className={cn("rounded-sm object-contain", className)}
-      src="/brand/avatar-small.png"
+      src={resolvePublicAsset("/brand/avatar-small.png")}
     />
   );
 }

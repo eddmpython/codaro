@@ -1,0 +1,922 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - numpy
+  - pandas
+  - scikit-learn
+  id: sklearn_06
+  title: 고객세분화
+  order: 6
+  category: sklearn
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  tags:
+  - 클러스터링
+  - KMeans
+  - 엘보우
+  - 실루엣
+  - 세분화
+  seo:
+    title: scikit-learn 클러스터링 - K-Means 고객 세분화
+    description: K-Means로 고객을 군집화합니다. 엘보우 방법과 실루엣 점수로 최적 K를 찾습니다.
+    keywords:
+    - scikit-learn
+    - KMeans
+    - 클러스터링
+    - 엘보우
+    - 실루엣
+intro:
+  emoji: 👥
+  goal: K-Means 클러스터링으로 고객을 세분화합니다.
+  description: 비지도 학습의 대표 알고리즘인 K-Means를 배웁니다. 엘보우 방법과 실루엣 점수로 최적의 군집 수를 찾고, PCA로 결과를 시각화합니다. 이전 프로젝트의
+    StandardScaler, PCA를 복습하고 클러스터링을 새로 배웁니다.
+  direction: 고객세분화에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 고객세분화 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 합성 데이터 생성 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 스케일링 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 고객세분화 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: matplotlib, numpy, pandas, scikit-learn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 고객세분화 실행
+      detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
+    - label: 고객세분화 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: 클러스터링에 필요한 라이브러리를 불러옵니다. KMeans와 실루엣 점수를 추가로 임포트합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from sklearn.datasets import make_blobs, make_moons
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.cluster import KMeans
+    from sklearn.metrics import silhouette_score
+    from sklearn.decomposition import PCA
+    import pandas as pd
+    import numpy as np
+    import matplotlib.pyplot as plt
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: |-
+      from sklearn.datasets import make_blobs, make_moons
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.cluster import KMeans
+      from sklearn.metrics import silhouette_score
+      from sklearn.decomposition import PCA
+      import pandas as pd
+      import numpy as np
+      import matplotlib.pyplot as plt
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
+- id: step2_data
+  title: 2단계. 합성 데이터 생성
+  structuredPrimary: true
+  subtitle: make_blobs
+  goal: 2단계. 합성 데이터 생성에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    make_blobs()로 군집이 있는 합성 데이터를 생성합니다. 실제 고객 데이터 대신 학습용으로 사용합니다. 4개의 군집, 각 군집당 200개 샘플을 생성합니다.
+
+    make_blobs는 중심점(centers)과 표준편차(cluster_std)를 지정하여 군집 데이터를 생성합니다. yTrue는 실제 군집 레이블이지만, 클러스터링은 레이블 없이 학습하는 비지도 학습입니다.
+  tips:
+  - make_blobs는 중심점(centers)과 표준편차(cluster_std)를 지정하여 군집 데이터를 생성합니다. yTrue는 실제 군집 레이블이지만, 클러스터링은 레이블 없이
+    학습하는 비지도 학습입니다.
+  snippet: |-
+    X, yTrue = make_blobs(n_samples=800, centers=4, cluster_std=1.0, random_state=42)
+    X.shape
+  exercise:
+    prompt: 2단계. 합성 데이터 생성 예제에서 \`X\`, \`yTrue\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      X, yTrue = make_blobs(n_samples=800, centers=4, cluster_std=1.0, random_state=42)
+      X.shape
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 합성 데이터 생성에서 \`X\`, \`yTrue\` 할당 개수와 값 순서가 맞아야 합니다.
+    resultCheck: 2단계. 합성 데이터 생성 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step3_scale
+  title: 3단계. 스케일링
+  structuredPrimary: true
+  subtitle: StandardScaler
+  goal: 3단계. 스케일링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: K-Means는 유클리드 거리를 사용하므로 스케일링이 중요합니다. 특성 간 스케일이 다르면 거리 계산이 왜곡됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    scaler = StandardScaler()
+    xSc = scaler.fit_transform(X)
+  exercise:
+    prompt: 3단계. 스케일링 예제에서 \`scaler\`, \`xSc\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      scaler = StandardScaler()
+      xSc = scaler.fit_transform(X)
+    hints:
+    - 바꿀 지점은 \`scaler = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`scaler\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 스케일링에서 \`scaler\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 스케일링 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step4_kmeans
+  title: 4단계. K-Means 기본
+  structuredPrimary: true
+  subtitle: n_clusters=4
+  goal: 4단계. KMeans 기본에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    K-Means는 K개의 군집 중심(centroid)을 찾아 데이터를 가장 가까운 중심에 할당합니다. n_clusters로 군집 수를 지정합니다. 실제로는 최적 K를 모르므로 여러 값을 시도해야 합니다.
+
+    fit_predict()는 fit()과 predict()를 한 번에 수행합니다. n_init=10은 서로 다른 초기화로 10번 실행하여 가장 좋은 결과를 선택합니다.
+  snippet: |-
+    kmeans = KMeans(n_clusters=4, random_state=42, n_init=10)
+    labels = kmeans.fit_predict(xSc)
+    labels[:20]
+  exercise:
+    prompt: 4단계. KMeans 기본 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      kmeans = KMeans(n_clusters=4, random_state=42, n_init=10)
+      labels = kmeans.fit_predict(xSc)
+      labels[:20]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. KMeans 기본에서 \`kmeans\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 4단계. KMeans 기본 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step5_visualize
+  title: 5단계. 결과 시각화
+  structuredPrimary: true
+  subtitle: 군집과 중심점
+  goal: 5단계. 결과 시각화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 클러스터링 결과를 시각화합니다. 군집 중심(centroid)도 함께 표시합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    fig, ax = plt.subplots(figsize=(8, 6))
+    scatter = ax.scatter(xSc[:, 0], xSc[:, 1], c=labels, cmap='viridis', alpha=0.6)
+    centers = kmeans.cluster_centers_
+    ax.scatter(centers[:, 0], centers[:, 1], c='red', marker='X', s=200, label='Centroids')
+    ax.set_xlabel('Feature 1')
+    ax.set_ylabel('Feature 2')
+    ax.set_title('K-Means Clustering Result')
+    ax.legend()
+    fig
+  exercise:
+    prompt: 5단계. 결과 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      fig, ax = plt.subplots(figsize=(8, 6))
+      scatter = ax.scatter(xSc[:, 0], xSc[:, 1], c=labels, cmap='viridis', alpha=0.6)
+      centers = kmeans.cluster_centers_
+      ax.scatter(centers[:, 0], centers[:, 1], c='red', marker='X', s=200, label='Centroids')
+      ax.set_xlabel('Feature 1')
+      ax.set_ylabel('Feature 2')
+      ax.set_title('K-Means Clustering Result')
+      ax.legend()
+      fig
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 결과 시각화의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 결과 시각화의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step6_inertia
+  title: 6단계. Inertia
+  structuredPrimary: true
+  subtitle: 군집 내 거리 합
+  goal: 6단계. Inertia에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    Inertia는 각 데이터 포인트와 해당 군집 중심 사이 거리의 제곱합입니다. 값이 작을수록 군집이 촘촘합니다. K가 증가하면 inertia는 항상 감소합니다.
+
+    Inertia = Σ(각 점과 군집 중심 사이 거리²). K=n이면 inertia=0이 됩니다. 따라서 inertia만으로 최적 K를 정하면 안 됩니다.
+  snippet: |-
+    inertia = kmeans.inertia_
+    f"Inertia: {inertia:.2f}"
+  exercise:
+    prompt: 6단계. Inertia 예제에서 \`inertia\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      inertia = kmeans.inertia_
+      f"Inertia: {inertia:.2f}"
+    hints:
+    - 바꿀 지점은 \`inertia = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`inertia\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. Inertia에서 \`inertia\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. Inertia 실행 뒤 \`inertia\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step7_elbow
+  title: 7단계. 엘보우 방법
+  structuredPrimary: true
+  subtitle: 최적 K 찾기
+  goal: 7단계. 엘보우 방법에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    엘보우 방법은 K를 1부터 증가시키며 inertia를 그래프로 그립니다. 급격히 감소하다가 완만해지는 지점(팔꿈치)이 최적 K입니다.
+
+    그래프에서 "팔꿈치" 모양이 나타나는 지점을 찾습니다. 이 예시에서는 K=4 근처에서 기울기가 완만해집니다. 명확하지 않을 때는 실루엣 점수를 함께 사용합니다.
+  snippet: |-
+    inertias = []
+    kRange = range(1, 11)
+
+    for k in kRange:
+        km = KMeans(n_clusters=k, random_state=42, n_init=10)
+        km.fit(xSc)
+        inertias.append(km.inertia_)
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.plot(kRange, inertias, 'bo-')
+    ax.set_xlabel('Number of Clusters (K)')
+    ax.set_ylabel('Inertia')
+    ax.set_title('Elbow Method')
+    fig
+  exercise:
+    prompt: 7단계. 엘보우 방법 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      inertias = []
+      kRange = range(1, 11)
+
+      for k in kRange:
+          km = KMeans(n_clusters=k, random_state=42, n_init=10)
+          km.fit(xSc)
+          inertias.append(km.inertia_)
+
+      fig, ax = plt.subplots(figsize=(8, 5))
+      ax.plot(kRange, inertias, 'bo-')
+      ax.set_xlabel('Number of Clusters (K)')
+      ax.set_ylabel('Inertia')
+      ax.set_title('Elbow Method')
+      fig
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 엘보우 방법의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 7단계. 엘보우 방법 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step8_silhouette
+  title: 8단계. 실루엣 점수
+  structuredPrimary: true
+  subtitle: 군집 품질 평가
+  goal: 8단계. 실루엣 점수에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    실루엣 점수는 군집이 얼마나 잘 분리되어 있는지 측정합니다. -1~1 사이 값으로, 1에 가까울수록 군집이 잘 나뉘어 있습니다. 0은 군집 경계에 있음, 음수는 잘못된 군집을 의미합니다.
+
+    실루엣 점수가 가장 높은 K를 선택합니다. 엘보우와 실루엣이 다른 K를 제안하면, 도메인 지식과 함께 판단합니다.
+  snippet: |-
+    silScore = silhouette_score(xSc, labels)
+    f"실루엣 점수: {silScore:.4f}"
+  exercise:
+    prompt: 8단계. 실루엣 점수 예제에서 \`silScore\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      silScore = silhouette_score(xSc, labels)
+      f"실루엣 점수: {silScore:.4f}"
+    hints:
+    - 바꿀 지점은 \`silScore = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`silScore\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 실루엣 점수에서 \`silScore\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 8단계. 실루엣 점수 실행 뒤 \`silScore\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step9_optimal
+  title: 9단계. 최적 K 선택
+  structuredPrimary: true
+  subtitle: 종합 분석
+  goal: 9단계. 최적 K 선택에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 엘보우와 실루엣 결과를 종합하여 최적 K를 선택합니다. 두 방법이 같은 K를 제안하면 더 신뢰할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    kRange2 = range(2, 11)
+    silScores = []
+    for k in kRange2:
+        km = KMeans(n_clusters=k, random_state=42, n_init=10)
+        kLabels = km.fit_predict(xSc)
+        silScores.append(silhouette_score(xSc, kLabels))
+
+    optimalK = list(kRange2)[silScores.index(max(silScores))]
+
+    resultDf = pd.DataFrame({
+        'K': list(kRange2),
+        'Silhouette': silScores,
+        'Inertia': inertias[1:]
+    })
+    resultDf
+  exercise:
+    prompt: 9단계. 최적 K 선택 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      kRange2 = range(2, 11)
+      silScores = []
+      for k in kRange2:
+          km = KMeans(n_clusters=k, random_state=42, n_init=10)
+          kLabels = km.fit_predict(xSc)
+          silScores.append(silhouette_score(xSc, kLabels))
+
+      optimalK = list(kRange2)[silScores.index(max(silScores))]
+
+      resultDf = pd.DataFrame({
+          'K': list(kRange2),
+          'Silhouette': silScores,
+          'Inertia': inertias[1:]
+      })
+      resultDf
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 9단계. 최적 K 선택의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 9단계. 최적 K 선택의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step10_moons
+  title: 10단계. 비선형 데이터
+  structuredPrimary: true
+  subtitle: make_moons
+  goal: 10단계. 비선형 데이터에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    K-Means는 구형 군집에 적합합니다. 초승달 모양처럼 비선형 군집에는 잘 작동하지 않습니다. DBSCAN 같은 다른 알고리즘이 필요합니다.
+
+    K-Means는 군집 중심(centroid)을 기준으로 하므로 볼록한(convex) 군집에만 잘 작동합니다. 복잡한 형태의 군집에는 DBSCAN, Spectral Clustering 등을 사용합니다.
+  tips:
+  - K-Means는 군집 중심(centroid)을 기준으로 하므로 볼록한(convex) 군집에만 잘 작동합니다. 복잡한 형태의 군집에는 DBSCAN, Spectral Clustering
+    등을 사용합니다.
+  snippet: |-
+    xMoon, yMoon = make_moons(n_samples=500, noise=0.1, random_state=42)
+    scMoon = StandardScaler()
+    xMoonSc = scMoon.fit_transform(xMoon)
+
+    kmMoon = KMeans(n_clusters=2, random_state=42, n_init=10)
+    moonLabels = kmMoon.fit_predict(xMoonSc)
+
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+    axes[0].scatter(xMoon[:, 0], xMoon[:, 1], c=yMoon, cmap='viridis', alpha=0.6)
+    axes[0].set_title('Ground Truth')
+    axes[1].scatter(xMoon[:, 0], xMoon[:, 1], c=moonLabels, cmap='viridis', alpha=0.6)
+    axes[1].set_title('K-Means Result')
+    fig
+  exercise:
+    prompt: 10단계. 비선형 데이터 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      xMoon, yMoon = make_moons(n_samples=500, noise=0.1, random_state=42)
+      scMoon = StandardScaler()
+      xMoonSc = scMoon.fit_transform(xMoon)
+
+      kmMoon = KMeans(n_clusters=2, random_state=42, n_init=10)
+      moonLabels = kmMoon.fit_predict(xMoonSc)
+
+      fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+      axes[0].scatter(xMoon[:, 0], xMoon[:, 1], c=yMoon, cmap='viridis', alpha=0.6)
+      axes[0].set_title('Ground Truth')
+      axes[1].scatter(xMoon[:, 0], xMoon[:, 1], c=moonLabels, cmap='viridis', alpha=0.6)
+      axes[1].set_title('K-Means Result')
+      fig
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 비선형 데이터의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 비선형 데이터의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step11_pca
+  title: 11단계. 고차원 클러스터링
+  structuredPrimary: true
+  subtitle: PCA로 시각화
+  goal: 11단계. 고차원 클러스터링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 실제 데이터는 고차원인 경우가 많습니다. 클러스터링 결과를 PCA로 2차원에 투영하여 시각화합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    xHigh, yHigh = make_blobs(n_samples=500, n_features=5, centers=3, random_state=42)
+    scHigh = StandardScaler()
+    xHighSc = scHigh.fit_transform(xHigh)
+
+    kmHigh = KMeans(n_clusters=3, random_state=42, n_init=10)
+    highLabels = kmHigh.fit_predict(xHighSc)
+
+    pca = PCA(n_components=2)
+    xHighPca = pca.fit_transform(xHighSc)
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+    scatter = ax.scatter(xHighPca[:, 0], xHighPca[:, 1], c=highLabels, cmap='viridis', alpha=0.6)
+    ax.set_xlabel('PC1')
+    ax.set_ylabel('PC2')
+    ax.set_title('5D Data Clustered, Visualized in 2D')
+    plt.colorbar(scatter, ax=ax)
+    fig
+  exercise:
+    prompt: 11단계. 고차원 클러스터링 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      xHigh, yHigh = make_blobs(n_samples=500, n_features=5, centers=3, random_state=42)
+      scHigh = StandardScaler()
+      xHighSc = scHigh.fit_transform(xHigh)
+
+      kmHigh = KMeans(n_clusters=3, random_state=42, n_init=10)
+      highLabels = kmHigh.fit_predict(xHighSc)
+
+      pca = PCA(n_components=2)
+      xHighPca = pca.fit_transform(xHighSc)
+
+      fig, ax = plt.subplots(figsize=(8, 6))
+      scatter = ax.scatter(xHighPca[:, 0], xHighPca[:, 1], c=highLabels, cmap='viridis', alpha=0.6)
+      ax.set_xlabel('PC1')
+      ax.set_ylabel('PC2')
+      ax.set_title('5D Data Clustered, Visualized in 2D')
+      plt.colorbar(scatter, ax=ax)
+      fig
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 고차원 클러스터링의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 11단계. 고차원 클러스터링의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step12_summary
+  title: 12단계. 정리
+  structuredPrimary: true
+  subtitle: 클러스터링 완료
+  goal: 12단계. 정리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 이번 프로젝트에서는 K-Means 클러스터링으로 데이터를 군집화하는 방법을 배웠습니다. 엘보우 방법과 실루엣 점수로 최적 K를 찾고, PCA로 결과를 시각화했습니다.
+    비지도 학습의 핵심 개념을 익혔습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    summary = pd.DataFrame({
+        'Item': ['Algorithm', 'Optimal K', 'Silhouette', 'Method'],
+        'Value': ['K-Means', str(optimalK), f'{max(silScores):.4f}', 'Elbow + Silhouette']
+    })
+    summary
+  exercise:
+    prompt: 12단계. 정리 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      summary = pd.DataFrame({
+          'Item': ['Algorithm', 'Optimal K', 'Silhouette', 'Method'],
+          'Value': ['K-Means', str(optimalK), f'{max(silScores):.4f}', 'Elbow + Silhouette']
+      })
+      summary
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 12단계. 정리의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 12단계. 정리의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 고객 세분화 프로젝트
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    마케팅 분석가가 되어 고객 세분화 시스템을 구축합니다. 각 미션은 데이터 생성부터 클러스터링, 평가까지 전 과정을 독립적으로 수행합니다. make_blobs, StandardScaler, KMeans, silhouette_score, PCA를 모두 활용합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    from sklearn.datasets import make_blobs
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.cluster import KMeans
+    from sklearn.metrics import silhouette_score
+    import pandas as pd
+
+    results = []
+    centersList = [3, 5, 7]
+
+    for c in centersList:
+        xData, yData = make_blobs(n_samples=600, centers=c, cluster_std=1.0, random_state=42)
+        sc = StandardScaler()
+        xSc = sc.fit_transform(xData)
+
+        silScores = []
+        for k in range(2, 10):
+            km = KMeans(n_clusters=k, random_state=42, n_init=10)
+            pred = km.fit_predict(xSc)
+            silScores.append(silhouette_score(xSc, pred))
+
+        optK = range(2, 10)[silScores.index(max(silScores))]
+        results.append({'True Centers': c, 'Optimal K': optK, 'Best Silhouette': max(silScores)})
+
+    pd.DataFrame(results)
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from sklearn.datasets import make_blobs
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.cluster import KMeans
+      from sklearn.metrics import silhouette_score
+      import pandas as pd
+
+      results = []
+      centersList = [3, 5, 7]
+
+      for c in centersList:
+          xData, yData = make_blobs(n_samples=600, centers=c, cluster_std=1.0, random_state=42)
+          sc = StandardScaler()
+          xSc = sc.fit_transform(xData)
+
+          silScores = []
+          for k in range(2, 10):
+              km = KMeans(n_clusters=k, random_state=42, n_init=10)
+              pred = km.fit_predict(xSc)
+              silScores.append(silhouette_score(xSc, pred))
+
+          optK = range(2, 10)[silScores.index(max(silScores))]
+          results.append({'True Centers': c, 'Optimal K': optK, 'Best Silhouette': max(silScores)})
+
+      pd.DataFrame(results)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 실습 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 예측 모델 품질 게이트
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고,
+    정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from sklearn.datasets import make_classification
+    from sklearn.model_selection import train_test_split
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import accuracy_score, f1_score
+
+    features, target = make_classification(
+        n_samples=240,
+        n_features=6,
+        n_informative=4,
+        n_redundant=0,
+        class_sep=1.4,
+        random_state=42,
+    )
+    xTrain, xTest, yTrain, yTest = train_test_split(
+        features, target, test_size=0.25, random_state=42, stratify=target
+    )
+
+    riskPipeline = Pipeline([
+        ("scaler", StandardScaler()),
+        ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
+    ])
+
+    def fitRiskModel(pipeline, featureMatrix, labels):
+        pipeline.fit(featureMatrix, labels)
+        return pipeline
+
+    riskModel = fitRiskModel(riskPipeline, xTrain, yTrain)
+    riskPred = riskModel.predict(xTest)
+    riskAccuracy = accuracy_score(yTest, riskPred)
+    riskF1 = f1_score(yTest, riskPred)
+    xTrain.shape, xTest.shape
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      conservativePipeline = Pipeline([
+          ("scaler", StandardScaler()),
+          ("classifier", LogisticRegression(C=0.3, max_iter=1000, random_state=42)),
+      ])
+      conservativeModel = fitRiskModel(conservativePipeline, xTrain, yTrain)
+      conservativePred = conservativeModel.predict(xTest)
+      conservativeAccuracy = accuracy_score(yTest, conservativePred)
+      conservativeF1 = f1_score(yTest, conservativePred)
+
+      assert conservativeAccuracy >= 0.75
+      {
+          "baselineAccuracy": round(riskAccuracy, 3),
+          "baselineF1": round(riskF1, 3),
+          "conservativeAccuracy": round(conservativeAccuracy, 3),
+          "conservativeF1": round(conservativeF1, 3),
+          "accuracyDelta": round(conservativeAccuracy - riskAccuracy, 3),
+      }
+    solution: |-
+      from sklearn.datasets import make_classification
+      from sklearn.model_selection import train_test_split
+      from sklearn.pipeline import Pipeline
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score, f1_score
+
+      features, target = make_classification(
+          n_samples=240,
+          n_features=6,
+          n_informative=4,
+          n_redundant=0,
+          class_sep=1.4,
+          random_state=42,
+      )
+      xTrain, xTest, yTrain, yTest = train_test_split(
+          features, target, test_size=0.25, random_state=42, stratify=target
+      )
+
+      riskPipeline = Pipeline([
+          ("scaler", StandardScaler()),
+          ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
+      ])
+      xTrain.shape, xTest.shape
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증에서 \`conservativePipeline\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sklearn_06-cluster-assignment-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 고객을 nearest centroid에 배정하고 거리 근거 남기기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 동점 규칙과 squared distance를 명시한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 거리 metric과 feature scale이 cluster를 결정합니다.
+    - 동점 tie-breaker를 고정해 재현 가능하게 만드세요.
+    exercise:
+      prompt: assign_clusters(points, centroids)를 완성하세요.
+      starterCode: |-
+        def assign_clusters(points, centroids):
+            raise NotImplementedError
+      solution: |
+        def assign_clusters(points, centroids):
+            if not centroids or any(len(point)!=len(centroids[0]) for point in points) or any(len(center)!=len(centroids[0]) for center in centroids): raise ValueError("shape mismatch")
+            result=[]
+            for point in points:
+                distances=[sum((value-center[index])**2 for index,value in enumerate(point)) for center in centroids]
+                cluster=min(range(len(distances)),key=lambda index:(distances[index],index))
+                result.append({"cluster":cluster,"squaredDistance":round(distances[cluster],6)})
+            return result
+      hints: *id001
+    check:
+      id: python.sklearn.sklearn_06.cluster-assignment.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_06.cluster-assignment.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: assign_clusters
+        cases:
+        - id: assigns-nearest-centroid
+          arguments:
+          - value:
+            - - 0
+              - 0
+            - - 9
+              - 9
+          - value:
+            - - 0
+              - 1
+            - - 10
+              - 10
+          expectedReturn:
+          - cluster: 0
+            squaredDistance: 1
+          - cluster: 1
+            squaredDistance: 2
+        - id: breaks-tie-by-index
+          arguments:
+          - value:
+            - - 1
+          - value:
+            - - 0
+            - - 2
+          expectedReturn:
+          - cluster: 0
+            squaredDistance: 1
+        - id: rejects-empty-centroids
+          arguments:
+          - value:
+            - - 1
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sklearn_06-cluster-profile-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_06-cluster-assignment-mastery
+    title: 새 segment에 cluster profile 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: cluster별 count와 feature mean을 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - cluster 이름은 profile을 본 뒤 업무적으로 해석하세요.
+    - segment label을 사람의 본질적 유형으로 표현하지 마세요.
+    exercise:
+      prompt: profile_clusters(points, assignments)를 완성하세요.
+      starterCode: |-
+        def profile_clusters(points, assignments):
+            raise NotImplementedError
+      solution: |
+        def profile_clusters(points, assignments):
+            if len(points)!=len(assignments) or not points: raise ValueError("invalid cluster rows")
+            grouped={}
+            for point,label in zip(points,assignments): grouped.setdefault(label,[]).append(point)
+            return {str(label):{"count":len(rows),"means":[round(sum(row[index] for row in rows)/len(rows),4) for index in range(len(rows[0]))]} for label,rows in sorted(grouped.items())}
+      hints: *id002
+    check:
+      id: python.sklearn.sklearn_06.cluster-profile.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_06.cluster-profile.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: profile_clusters
+        cases:
+        - id: profiles-segments
+          arguments:
+          - value:
+            - - 1
+              - 2
+            - - 3
+              - 4
+            - - 10
+              - 20
+          - value:
+            - 0
+            - 0
+            - 1
+          expectedReturn:
+            '0':
+              count: 2
+              means:
+              - 2.0
+              - 3.0
+            '1':
+              count: 1
+              means:
+              - 10.0
+              - 20.0
+        - id: profiles-one-cluster
+          arguments:
+          - value:
+            - - 2
+              - 4
+          - value:
+            - 5
+          expectedReturn:
+            '5':
+              count: 1
+              means:
+              - 2.0
+              - 4.0
+        - id: rejects-length-mismatch
+          arguments:
+          - value:
+            - - 1
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sklearn_06-clustering-evidence-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_06-cluster-profile-transfer
+    title: 군집화 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 거리·k·해석 안정성을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 학습 데이터와 평가 데이터의 경계를 먼저 확인하세요.
+    - 한 metric이나 예측을 실제 진단·인과 결론으로 확대하지 마세요.
+    exercise:
+      prompt: choose_clustering_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_clustering_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_clustering_evidence(situation):
+            table = {'numeric-segments': {'method': 'scaled k-means', 'evidence': 'inertia silhouette profiles', 'risk': 'scale dominance'}, 'choose-k': {'method': 'stability and business utility', 'evidence': 'multiple seeds', 'risk': 'single elbow'}, 'segment-label': {'method': 'post-hoc profile', 'evidence': 'feature means counts', 'risk': 'stereotyping'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sklearn.sklearn_06.clustering-evidence.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_06.clustering-evidence.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_clustering_evidence
+        cases:
+        - id: recalls-numeric-segments
+          arguments:
+          - value: numeric-segments
+          expectedReturn:
+            method: scaled k-means
+            evidence: inertia silhouette profiles
+            risk: scale dominance
+        - id: recalls-choose-k
+          arguments:
+          - value: choose-k
+          expectedReturn:
+            method: stability and business utility
+            evidence: multiple seeds
+            risk: single elbow
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

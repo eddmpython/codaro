@@ -1,0 +1,713 @@
+var e=`meta:
+  packages:
+  - pandas
+  id: pandas_08
+  title: 교통사고원인분석
+  order: 8
+  category: pandas
+  difficulty: ⭐⭐⭐⭐
+  badge: 중급
+  dataSource: codaro-local:car_crashes
+  tags:
+  - car_crashes
+  - 지역비교
+  - rank
+  - 시각화
+  - heatmap
+  - 검증
+  - 지역비교
+  seo:
+    title: pandas 지역별 비교 분석 - 미국 교통사고 데이터
+    description: 미국 주별 교통사고 데이터로 지역 비교를 배웁니다. rank 순위, 상관관계 히트맵, 위험도 점수 계산을 실습합니다.
+    keywords:
+    - pandas rank
+    - 지역비교
+    - 상관분석
+    - car_crashes
+    - 히트맵
+intro:
+  emoji: 🚗
+  goal: 미국 주별 교통사고 데이터에서 "가장 위험한 주는 어디인가?"를 분석합니다.
+  description: 지역별 비교 분석을 배웁니다. 순위를 매기고, 여러 지표를 종합해서 위험도를 계산합니다.
+  direction: 교통사고원인분석에서 표 데이터를 불러오고 정제, 집계, 검증 결과까지 연결합니다.
+  benefits:
+  - DataFrame 입력 확인 후 정제와 집계에 맞는 코드 입력을 고릅니다.
+  - 교통사고원인분석 결과를 행/열 수와 요약값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 데이터 리포트 자동화에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(DataFrame 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 미리보기 처리 실행
+      detail: 정제와 집계 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 인덱스 설정 결과 검증
+      detail: 행/열 수와 요약값 기준으로 실행 결과를 비교합니다.
+    - label: 교통사고원인분석 재사용
+      detail: 완성 코드를 데이터 리포트 자동화에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 표 데이터 환경
+      detail: pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 교통사고원인분석 실행
+      detail: 셀을 실행해 행/열 수와 요약값와 예외 상태를 확인합니다.
+    - label: 교통사고원인분석 완료
+      detail: 검증된 코드를 데이터 리포트 자동화로 남깁니다.
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  structuredPrimary: true
+  subtitle: 51개 주 교통사고 통계
+  goal: 1단계. 데이터 불러오기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 미국 51개 주(워싱턴DC 포함)의 교통사고 원인별 통계입니다. 로컬 실행에서는 네트워크가 없어도 지역 비교, 순위, 종합 점수 흐름을 연습할 수 있도록 주요
+    주 약자를 포함한 샘플 데이터를 함께 둡니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import pandas as pd
+    from codaro.curriculum.localData import loadLocalDataset
+
+    crashes = loadLocalDataset("car_crashes")
+    crashes.shape
+  exercise:
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+
+      crashes = loadLocalDataset("car_crashes")
+      crashes.shape
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step2_head
+  title: 2단계. 미리보기
+  structuredPrimary: true
+  subtitle: 데이터 구조 파악
+  goal: 2단계. 미리보기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: total(총 사고), speeding(과속), alcohol(음주), not_distracted(집중), ins_premium(보험료), abbrev(주
+    약자)
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: crashes.head()
+  exercise:
+    prompt: 2단계. 미리보기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: crashes.head()
+    hints:
+    - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
+    - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 미리보기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 미리보기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_set_index
+  title: 3단계. 인덱스 설정
+  structuredPrimary: true
+  subtitle: 주 약자를 인덱스로
+  goal: 3단계. 인덱스 설정에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    주 약자(abbrev)를 인덱스로 설정하면 'CA', 'TX'처럼 이름으로 접근할 수 있습니다. 인덱스를 의미있는 값으로 설정하면 데이터 조회가 직관적이고 편리해집니다.
+
+    set_index()는 특정 컬럼을 인덱스로 설정합니다. 인덱스는 각 행을 식별하는 라벨입니다. 기본 인덱스(0, 1, 2...)보다 의미있는 값(주 이름, 날짜 등)을 인덱스로 설정하면 loc으로 직관적인 조회가 가능합니다.
+  tips:
+  - set_index()는 특정 컬럼을 인덱스로 설정합니다. 인덱스는 각 행을 식별하는 라벨입니다. 기본 인덱스(0, 1, 2...)보다 의미있는 값(주 이름, 날짜 등)을 인덱스로
+    설정하면 loc으로 직관적인 조회가 가능합니다.
+  snippet: |-
+    indexed = crashes.set_index('abbrev')
+    indexed.head()
+  exercise:
+    prompt: 3단계. 인덱스 설정 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      indexed = crashes.set_index('abbrev')
+      indexed.head()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 인덱스 설정의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 3단계. 인덱스 설정의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step4_loc
+  title: 4단계. 특정 주 조회
+  structuredPrimary: true
+  subtitle: loc으로 이름 접근
+  goal: 4단계. 특정 주 조회에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 인덱스를 설정하면 주 이름으로 바로 조회할 수 있습니다. 인덱스 기반 조회는 속도도 빠릅니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: indexed.loc['CA']
+  exercise:
+    prompt: 4단계. 특정 주 조회 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: indexed.loc['CA']
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 특정 주 조회의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 4단계. 특정 주 조회 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step5_multi_loc
+  title: 5단계. 여러 주 비교
+  structuredPrimary: true
+  subtitle: 리스트로 여러 행 조회
+  goal: 5단계. 여러 주 비교에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 리스트를 넣으면 여러 주를 동시에 비교할 수 있습니다. 관심있는 주들만 선택해서 볼 수 있어 편리합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: indexed.loc[['CA', 'TX', 'NY']]
+  exercise:
+    prompt: 5단계. 여러 주 비교 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: indexed.loc[['CA', 'TX', 'NY']]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 여러 주 비교의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 5단계. 여러 주 비교 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step6_rank
+  title: 6단계. 순위 매기기
+  structuredPrimary: true
+  subtitle: rank()
+  goal: 6단계. 순위 매기기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    rank()는 값의 순위를 매깁니다. ascending=False로 큰 값이 1위가 됩니다. 순위를 매기면 상대적인 위치를 쉽게 파악할 수 있습니다.
+
+    rank()는 값의 순위를 매깁니다. ascending=False면 큰 값이 1위(낮은 순위 번호), True면 작은 값이 1위입니다. 기본값은 True입니다. 동점이 있으면 method 파라미터로 처리 방식을 선택할 수 있습니다(average, min, max 등).
+  tips:
+  - rank()는 값의 순위를 매깁니다. ascending=False면 큰 값이 1위(낮은 순위 번호), True면 작은 값이 1위입니다. 기본값은 True입니다. 동점이 있으면
+    method 파라미터로 처리 방식을 선택할 수 있습니다(average, min, max 등).
+  snippet: |-
+    ranked = indexed.copy()
+    ranked['totalRank'] = ranked['total'].rank(ascending=False)
+    ranked[['total', 'totalRank']].sort_values('totalRank').head(10)
+  exercise:
+    prompt: 6단계. 순위 매기기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      ranked = indexed.copy()
+      ranked['totalRank'] = ranked['total'].rank(ascending=False)
+      ranked[['total', 'totalRank']].sort_values('totalRank').head(10)
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 순위 매기기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 6단계. 순위 매기기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step7_alcohol_rank
+  title: 7단계. 음주사고 순위
+  structuredPrimary: true
+  subtitle: 다른 지표에도 적용
+  goal: 7단계. 음주사고 순위에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 음주사고율이 높은 주의 순위를 매깁니다. 여러 지표의 순위를 비교하면 주별 특성을 파악할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    ranked['alcoholRank'] = ranked['alcohol'].rank(ascending=False)
+    ranked[['alcohol', 'alcoholRank']].sort_values('alcoholRank').head(10)
+  exercise:
+    prompt: 7단계. 음주사고 순위 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      ranked['alcoholRank'] = ranked['alcohol'].rank(ascending=False)
+      ranked[['alcohol', 'alcoholRank']].sort_values('alcoholRank').head(10)
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 음주사고 순위의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 7단계. 음주사고 순위 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step8_corr
+  title: 8단계. 상관관계 분석
+  structuredPrimary: true
+  subtitle: 원인들 사이의 관계
+  goal: 8단계. 상관관계 분석에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 음주사고가 총 사고율과 0.85로 높은 상관관계를 보입니다. 상관관계 분석으로 어떤 요인들이 함께 움직이는지 파악할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: indexed[['total', 'speeding', 'alcohol', 'not_distracted']].corr()
+  exercise:
+    prompt: 8단계. 상관관계 분석 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: indexed[['total', 'speeding', 'alcohol', 'not_distracted']].corr()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 상관관계 분석의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 8단계. 상관관계 분석 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step9_normalize_func
+  title: 9단계. 정규화 함수
+  structuredPrimary: true
+  subtitle: 0~1 스케일로 변환
+  goal: 9단계. 정규화 함수에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    여러 지표를 종합하려면 같은 스케일로 맞춰야 합니다. 과속은 0~20, 음주는 0~10처럼 범위가 다르면 단순히 더할 수 없습니다. 모든 값을 0~1 사이로 정규화하면 공정하게 비교할 수 있습니다. Min-Max 정규화 방식을 사용합니다.
+
+    함수 정의 (def)
+    def는 '함수를 정의한다'는 뜻입니다. 함수는 특정 작업을 수행하는 코드 묶음으로, 한 번 정의하면 여러 번 재사용할 수 있습니다. def 함수명(입력값): 형태로 작성하고, return으로 결과를 반환합니다. 아래 코드에서 normalize(series)처럼 함수명과 괄호 안에 입력값을 넣으면 함수가 실행됩니다. 함수를 사용하면 같은 계산을 여러 컬럼에 반복 적용할 때 코드가 깔끔해지고, 수정할 때도 한 곳만 바꾸면 됩니다.
+  tips:
+  - '함수 정의 (def) def는 ''함수를 정의한다''는 뜻입니다. 함수는 특정 작업을 수행하는 코드 묶음으로, 한 번 정의하면 여러 번 재사용할 수 있습니다. def 함수명(입력값):
+    형태로 작성하고, return으로 결과를 반환합니다. 아래 코드에서 normalize(series)처럼 함수명과 괄호 안에 입력값을 넣으면 함수가 실행됩니다. 함수를 사용하면
+    같은 계산을 여러 컬럼에 반복 적용할 때 코드가 깔끔해지고, 수정할 때도 한 곳만 바꾸면 됩니다.'
+  snippet: |-
+    def normalize(series):
+        return (series - series.min()) / (series.max() - series.min())
+  exercise:
+    prompt: 9단계. 정규화 함수 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def normalize(series):
+          return (series - series.min()) / (series.max() - series.min())
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 정규화 함수의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 9단계. 정규화 함수 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: step10_danger_score
+  title: 10단계. 위험도 점수 계산
+  structuredPrimary: true
+  subtitle: 여러 지표 종합
+  goal: 10단계. 위험도 점수 계산에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 과속, 음주, 산만 운전을 종합해서 위험도 점수를 계산합니다. not_distracted는 높을수록 안전하므로 1에서 빼서 위험도로 변환합니다. 세 가지를
+    더한 뒤 3으로 나누면 평균 위험도 점수가 됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    danger = indexed.copy()
+    danger['dangerScore'] = (
+        normalize(danger['speeding']) +
+        normalize(danger['alcohol']) +
+        (1 - normalize(danger['not_distracted']))
+    ) / 3
+    danger[['dangerScore']].sort_values('dangerScore', ascending=False).head(10)
+  exercise:
+    prompt: 10단계. 위험도 점수 계산 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      danger = indexed.copy()
+      danger['dangerScore'] = (
+          normalize(danger['speeding']) +
+          normalize(danger['alcohol']) +
+          (1 - normalize(danger['not_distracted']))
+      ) / 3
+      danger[['dangerScore']].sort_values('dangerScore', ascending=False).head(10)
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 위험도 점수 계산의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 10단계. 위험도 점수 계산의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step11_top_dangerous
+  title: 11단계. 가장 위험한 주
+  structuredPrimary: true
+  subtitle: nlargest 활용
+  goal: 11단계. 가장 위험한 주에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 종합 위험도 상위 5개 주를 확인합니다. nlargest는 가장 큰 값을 빠르게 찾습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: danger.nlargest(5, 'dangerScore')[['total', 'speeding', 'alcohol', 'dangerScore']]
+  exercise:
+    prompt: 11단계. 가장 위험한 주 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: danger.nlargest(5, 'dangerScore')[['total', 'speeding', 'alcohol', 'dangerScore']]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 가장 위험한 주의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 11단계. 가장 위험한 주 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step12_safest
+  title: 12단계. 가장 안전한 주
+  structuredPrimary: true
+  subtitle: nsmallest 활용
+  goal: 12단계. 가장 안전한 주에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    종합 위험도가 가장 낮은 5개 주입니다. nsmallest는 가장 작은 값을 빠르게 찾습니다.
+
+    nlargest(n, column)와 nsmallest(n, column)은 특정 컬럼 기준으로 상위/하위 n개 행을 빠르게 찾습니다. sort_values()로 정렬한 뒤 head()를 쓰는 것보다 성능이 좋습니다. 대용량 데이터에서 TOP N을 찾을 때 유용합니다.
+  tips:
+  - nlargest(n, column)와 nsmallest(n, column)은 특정 컬럼 기준으로 상위/하위 n개 행을 빠르게 찾습니다. sort_values()로 정렬한 뒤 head()를
+    쓰는 것보다 성능이 좋습니다. 대용량 데이터에서 TOP N을 찾을 때 유용합니다.
+  snippet: danger.nsmallest(5, 'dangerScore')[['total', 'speeding', 'alcohol', 'dangerScore']]
+  exercise:
+    prompt: 12단계. 가장 안전한 주 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: danger.nsmallest(5, 'dangerScore')[['total', 'speeding', 'alcohol', 'dangerScore']]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 12단계. 가장 안전한 주의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 12단계. 가장 안전한 주 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 지역별 사고 위험도 산정'
+  structuredPrimary: true
+  subtitle: rank, nlargest, nsmallest, 실패 케이스
+  goal: '현업 흐름 검증: 지역별 사고 위험도 산정에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    종합 위험 점수는 가중치가 바뀌면 순위가 바뀝니다. 점수 계산식과 상위/하위 지역을 assert로 고정해 리포트 정책을 명확히 하세요.
+
+    변주 실험
+    음주 사고 가중치를 3에서 5로 올리면 가장 위험한 지역이 바뀌는지 확인하세요.
+  tips:
+  - 변주 실험 음주 사고 가중치를 3에서 5로 올리면 가장 위험한 지역이 바뀌는지 확인하세요.
+  snippet: |-
+    import pandas as pd
+
+    crashes = pd.DataFrame({
+        "state": ["A", "B", "C"],
+        "total": [20, 12, 18],
+        "speeding": [5, 2, 7],
+        "alcohol": [4, 1, 2],
+    }).set_index("state")
+
+    crashes["dangerScore"] = crashes["total"] + crashes["speeding"] * 2 + crashes["alcohol"] * 3
+    top = crashes.nlargest(1, "dangerScore")
+    safe = crashes.nsmallest(1, "dangerScore")
+
+    assert top.index.tolist() == ["A"]
+    assert safe.index.tolist() == ["B"]
+    assert crashes["dangerScore"].rank(ascending=False).loc["A"] == 1
+  exercise:
+    prompt: '현업 흐름 검증: 지역별 사고 위험도 산정 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.'
+    starterCode: |-
+      import pandas as pd
+
+      crashes = pd.DataFrame({
+          "state": ["A", "B", "C"],
+          "total": [20, 12, 18],
+          "speeding": [5, 2, 7],
+          "alcohol": [4, 1, 2],
+      }).set_index("state")
+
+      crashes["dangerScore"] = crashes["total"] + crashes["speeding"] * 2 + crashes["alcohol"] * 3
+      top = crashes.nlargest(1, "dangerScore")
+      safe = crashes.nsmallest(1, "dangerScore")
+
+      assert top.index.tolist() == ["A"]
+      assert safe.index.tolist() == ["B"]
+      assert crashes["dangerScore"].rank(ascending=False).loc["A"] == 1
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 지역별 사고 위험도 산정의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.'
+    resultCheck: '현업 흐름 검증: 지역별 사고 위험도 산정의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.'
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 교통안전 분석 프로젝트
+  goal: 실습에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    교통안전 분석가가 되어 주별 위험도를 분석해봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import pandas as pd
+    from codaro.curriculum.localData import loadLocalDataset
+
+    data = loadLocalDataset("car_crashes")
+    dataIndexed = data.set_index("abbrev")
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+
+      data = loadLocalDataset("car_crashes")
+      dataIndexed = data.set_index("abbrev")
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  subtitle: 중급 과정 완료!
+  blocks:
+  - type: text
+    content: pandas 중급 과정을 모두 마쳤습니다!
+  - type: list
+    items:
+    - set_index() - 의미있는 인덱스 설정
+    - rank() - 순위 매기기
+    - 정규화 - 0~1 사이로 스케일 조정
+    - 종합 점수 - 여러 지표를 하나로
+  - type: text
+    content: 다음 시간부터는 심화 과정입니다. 여러 데이터를 합치는 merge를 배웁니다.
+  goal: 정리에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pandas_08-normalized-crash-rate-rank-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - summary
+    title: 주별 교통사고 수를 주행 거리로 정규화해 순위 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 규모가 다른 지역을 비교하도록 사고 수를 노출량으로 나누고 재현 가능한 순위를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 사고 건수만 정렬하지 말고 crashes / miles로 노출량을 보정하세요.
+    - 동률은 state 이름으로 정렬해 순위 흔들림을 막으세요.
+    exercise:
+      prompt: rank_crash_rates(rows, scale)를 완성해 state, rate 목록을 높은 순서로 반환하세요.
+      starterCode: |-
+        def rank_crash_rates(rows, scale):
+            raise NotImplementedError
+      solution: |
+        def rank_crash_rates(rows, scale):
+            if scale <= 0:
+                raise ValueError("scale must be positive")
+            ranked = []
+            for row in rows:
+                if row["miles"] <= 0:
+                    raise ValueError("miles must be positive")
+                ranked.append({"state": row["state"], "rate": round(row["crashes"] / row["miles"] * scale, 3)})
+            return sorted(ranked, key=lambda row: (-row["rate"], row["state"]))
+      hints: *id001
+    check:
+      id: python.pandas.pandas_08.normalized-crash-rate-rank.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_08.normalized-crash-rate-rank.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: rank_crash_rates
+        cases:
+        - id: ranks-normalized-rates
+          arguments:
+          - value:
+            - state: A
+              crashes: 10
+              miles: 1000
+            - state: B
+              crashes: 8
+              miles: 400
+          - value: 100
+          expectedReturn:
+          - state: B
+            rate: 2.0
+          - state: A
+            rate: 1.0
+        - id: handles-no-states
+          arguments:
+          - value: []
+          - value: 100
+          expectedReturn: []
+        - id: rejects-zero-exposure
+          arguments:
+          - value:
+            - state: X
+              crashes: 1
+              miles: 0
+          - value: 100
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pandas_08-incident-rate-comparison-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_08-normalized-crash-rate-rank-mastery
+    title: 새 사업장 데이터에서 근로시간당 사고율 비교하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 주행 거리 정규화를 임의의 사건 수와 노출량 열에 전이해 최고 위험 그룹을 찾는다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 분자는 사건 수, 분모는 위험에 노출된 양이어야 합니다.
+    - 보고서에는 사용한 scale을 제목이나 설명에 함께 표시하세요.
+    exercise:
+      prompt: compare_incident_rates(rows, event_key, exposure_key, scale)를 완성해 rates와 highestRisk를 반환하세요.
+      starterCode: |-
+        def compare_incident_rates(rows, event_key, exposure_key, scale):
+            raise NotImplementedError
+      solution: |
+        def compare_incident_rates(rows, event_key, exposure_key, scale):
+            rates = {}
+            for row in rows:
+                if row[exposure_key] <= 0:
+                    raise ValueError("exposure must be positive")
+                rates[row["group"]] = round(row[event_key] / row[exposure_key] * scale, 3)
+            leader = max(rates, key=lambda key: (rates[key], key)) if rates else None
+            return {"rates": {key: rates[key] for key in sorted(rates)}, "highestRisk": leader}
+      hints: *id002
+    check:
+      id: python.pandas.pandas_08.incident-rate-comparison.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_08.incident-rate-comparison.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: compare_incident_rates
+        cases:
+        - id: compares-workplace-risk
+          arguments:
+          - value:
+            - group: plant-a
+              incidents: 3
+              hours: 300
+            - group: plant-b
+              incidents: 5
+              hours: 1000
+          - value: incidents
+          - value: hours
+          - value: 1000
+          expectedReturn:
+            rates:
+              plant-a: 10.0
+              plant-b: 5.0
+            highestRisk: plant-a
+        - id: handles-empty-groups
+          arguments:
+          - value: []
+          - value: incidents
+          - value: hours
+          - value: 1000
+          expectedReturn:
+            rates: {}
+            highestRisk: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pandas_08-count-versus-rate-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_08-incident-rate-comparison-transfer
+    title: 건수와 비율 중 맞는 비교 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 업무 질문의 규모 차이 여부에 따라 metric과 필수 증거를 선택한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 규모가 다른 집단을 비교할 때는 반드시 노출량 분모가 필요합니다.
+    - ‘가장 많다’와 ‘발생률이 가장 높다’를 같은 말로 쓰지 마세요.
+    exercise:
+      prompt: choose_risk_metric(question)를 완성해 metric, denominator, evidence를 반환하세요.
+      starterCode: |-
+        def choose_risk_metric(question):
+            raise NotImplementedError
+      solution: |
+        def choose_risk_metric(question):
+            table = {
+                "total-events-this-month": {"metric": "count", "denominator": None, "evidence": "time window"},
+                "compare-different-size-groups": {"metric": "rate", "denominator": "exposure", "evidence": "count, exposure, and scale"},
+                "share-of-all-events": {"metric": "proportion", "denominator": "all events", "evidence": "numerator and total"},
+            }
+            if question not in table:
+                raise ValueError("unknown risk question")
+            return table[question]
+      hints: *id003
+    check:
+      id: python.pandas.pandas_08.count-versus-rate-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_08.count-versus-rate-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_risk_metric
+        cases:
+        - id: recalls-rate-for-size-difference
+          arguments:
+          - value: compare-different-size-groups
+          expectedReturn:
+            metric: rate
+            denominator: exposure
+            evidence: count, exposure, and scale
+        - id: recalls-count-window
+          arguments:
+          - value: total-events-this-month
+          expectedReturn:
+            metric: count
+            denominator: null
+            evidence: time window
+        - id: rejects-vague-risk-question
+          arguments:
+          - value: most-dangerous
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

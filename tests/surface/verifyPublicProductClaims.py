@@ -127,9 +127,9 @@ def validateRenderedClaims(
         runtimeTier = str(lesson.get("runtimeTier", ""))
         runtimeCounts[runtimeTier] += 1
         required = (
-            ("Web에서 실행", "Web 자동 강검증", "이 레슨 실행")
+            ("Web에서 바로 편집·실행", "강한 검증이 자동으로 이어집니다.", "직접 해보기")
             if runtimeTier == "browser"
-            else ("Local 런타임 필요", "Local 강검증", "Local에서 실습")
+            else ("Web에서 개념과 코드 학습", "운영체제 권한이 필요한 실행", "Local에서 이어집니다.")
         )
         for token in required:
             if token not in text:

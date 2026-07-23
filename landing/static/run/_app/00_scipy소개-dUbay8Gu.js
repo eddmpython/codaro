@@ -1,0 +1,762 @@
+var e=`meta:
+  packages:
+  - numpy
+  - scipy
+  id: scipy_00
+  title: scipy소개
+  order: 0
+  category: scipy
+  badge: 소개
+  source: eddmpython
+  sourceUrl: https://eddmpython.com
+  tags:
+  - scipy
+  - 과학계산
+  - 최적화
+  - 통계검정
+  - 신호처리
+  seo:
+    title: SciPy 입문 - Python 과학 계산의 핵심
+    description: SciPy로 최적화, 통계검정, 신호처리, 보간법을 시작하세요. NumPy를 확장한 고급 과학 계산 라이브러리입니다.
+    keywords:
+    - scipy
+    - 과학계산
+    - 최적화
+    - 통계검정
+    - 보간
+    - 신호처리
+intro:
+  direction: scipy소개에서 수치 데이터를 모델에 넣고 계산 결과와 오차를 검증합니다.
+  benefits:
+  - 첫 실행 셀은 assert로 핵심 결과를 고정해 실습 코드가 깨지지 않았는지 확인합니다.
+  - 수치 입력 확인 후 최적화/적분/신호 처리에 맞는 코드 입력을 고릅니다.
+  - scipy소개 결과를 오차와 결과 범위 기준으로 즉시 점검합니다.
+  - 완료한 코드를 과학 계산 루틴에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 업무 흐름 검증 입력 확인
+      detail: 입력 기준(수치 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 최적화/적분/신호 처리 처리 실행
+      detail: 최적화/적분/신호 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 오차와 결과 범위 결과 검증
+      detail: 오차와 결과 범위 기준으로 실행 결과를 비교합니다.
+    - label: scipy소개 재사용
+      detail: 완성 코드를 과학 계산 루틴에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 과학 계산 환경
+      detail: numpy, scipy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: scipy소개 실행
+      detail: 셀을 실행해 오차와 결과 범위와 예외 상태를 확인합니다.
+    - label: scipy소개 완료
+      detail: 검증된 코드를 과학 계산 루틴로 남깁니다.
+sections:
+- id: intro
+  blocks:
+  - type: mainHeader
+    emoji: 🔬
+    title: SciPy란?
+    subtitle: Python 과학 계산의 핵심 라이브러리
+  - type: hero
+    emoji: ⚗️
+    title: NumPy를 확장한 고급 과학 도구
+    subtitle: 수학, 과학, 공학 문제를 해결하는 알고리즘 모음
+    points:
+    - emoji: 📈
+      title: 최적화
+    - emoji: 📊
+      title: 통계 검정
+    - emoji: 🔊
+      title: 신호 처리
+    - emoji: 📐
+      title: 수치 적분
+  goal: SciPy란?에서 수치 입력을 바꿨을 때 오차와 결과 범위가 어떻게 달라지는지 확인한다.
+  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+- id: what_is_scipy
+  blocks:
+  - type: sectionHeader
+    title: 🤔 SciPy가 뭔가요?
+    subtitle: 과학 계산을 위한 스위스 군용 칼
+  - type: note
+    style: info
+    title: NumPy vs SciPy
+    content: NumPy는 배열 연산의 기초입니다. 행렬 곱셈, 인덱싱, 기본 통계는 NumPy로 충분합니다. SciPy는 NumPy 위에 구축된 고급 알고리즘 모음입니다.
+      최적화, 적분, 보간, 신호처리, 통계검정 등 전문적인 과학 계산 기능을 제공합니다. NumPy가 기초 수학이라면, SciPy는 응용 수학입니다.
+  - type: featureCards
+    cards:
+    - emoji: 🎯
+      title: scipy.optimize
+      description: 함수 최소화, 방정식 풀이, 곡선 피팅
+    - emoji: 📊
+      title: scipy.stats
+      description: 확률분포, 가설검정, 기술통계
+    - emoji: 🔊
+      title: scipy.signal
+      description: 필터 설계, FFT, 스펙트럼 분석
+    - emoji: 📐
+      title: scipy.integrate
+      description: 수치적분, 미분방정식
+  goal: 🤔 SciPy가 뭔가요?에서 수치 입력을 바꿨을 때 오차와 결과 범위가 어떻게 달라지는지 확인한다.
+  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+- id: why_scipy
+  blocks:
+  - type: sectionHeader
+    title: 🌟 왜 SciPy가 필요한가요?
+    subtitle: 기존 라이브러리와의 차이
+  - type: note
+    style: info
+    title: 전문 알고리즘의 보고
+    content: 직접 구현하면 수백 줄이 필요한 알고리즘을 한 줄로 호출할 수 있습니다. 최적화 문제에서 minimize() 한 번이면 복잡한 경사하강법을 실행합니다. 통계검정에서
+      ttest_ind() 한 번이면 t-검정 결과를 얻습니다. FORTRAN과 C로 작성된 검증된 알고리즘을 Python에서 편리하게 사용할 수 있습니다.
+  - type: featureCards
+    cards:
+    - emoji: ⚡
+      title: 검증된 알고리즘
+      description: 수십 년간 검증된 수치해석 코드
+    - emoji: 🚀
+      title: 최적화된 성능
+      description: C/FORTRAN 기반 고속 연산
+    - emoji: 📚
+      title: 풍부한 문서
+      description: 상세한 API 문서와 예제
+    - emoji: 🔧
+      title: NumPy 호환
+      description: ndarray 기반 일관된 인터페이스
+  goal: 🌟 왜 SciPy가 필요한가요?에서 수치 입력을 바꿨을 때 오차와 결과 범위가 어떻게 달라지는지 확인한다.
+  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+- id: scipy_modules
+  blocks:
+  - type: sectionHeader
+    title: 📦 SciPy 주요 모듈
+    subtitle: 어떤 기능이 있나요?
+  - type: table
+    headers:
+    - 모듈
+    - 기능
+    - 대표 함수
+    rows:
+    - - scipy.optimize
+      - 최적화, 방정식
+      - minimize, curve_fit, root
+    - - scipy.stats
+      - 통계, 확률분포
+      - ttest_ind, norm, describe
+    - - scipy.interpolate
+      - 보간법
+      - interp1d, griddata
+    - - scipy.integrate
+      - 적분, 미분방정식
+      - quad, odeint
+    - - scipy.signal
+      - 신호처리
+      - butter, filtfilt, spectrogram
+    - - scipy.linalg
+      - 선형대수
+      - solve, eig, svd
+    - - scipy.sparse
+      - 희소행렬
+      - csr_matrix, linalg.spsolve
+    - - scipy.spatial
+      - 공간 알고리즘
+      - distance, KDTree
+  - type: note
+    style: tip
+    title: 모듈별 import
+    content: SciPy는 모듈별로 import합니다. from scipy import optimize처럼 필요한 모듈만 불러옵니다. scipy 전체를 import하면 느리고
+      메모리를 많이 사용합니다. 각 모듈은 독립적이므로 필요한 것만 선택적으로 사용하세요.
+  goal: 📦 SciPy 주요 모듈에서 수치 입력을 바꿨을 때 오차와 결과 범위가 어떻게 달라지는지 확인한다.
+  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+- id: scipy_vs_others
+  blocks:
+  - type: sectionHeader
+    title: 🆚 SciPy vs 다른 라이브러리
+    subtitle: 언제 무엇을 쓸까?
+  - type: compare
+    left:
+      title: NumPy
+      subtitle: 배열 연산 기초
+      icon: 🔢
+      color: blue
+      items:
+      - 배열 생성, 인덱싱
+      - 기본 수학 연산
+      - 선형대수 기초
+      - 난수 생성
+      infoBox: SciPy의 기반, 항상 함께 사용
+    right:
+      title: SciPy
+      subtitle: 고급 과학 계산
+      icon: 🔬
+      color: green
+      items:
+      - 최적화, 피팅
+      - 통계 검정
+      - 신호처리, FFT
+      - 수치적분, ODE
+      infoBox: NumPy 확장, 전문 알고리즘
+  - type: compare
+    left:
+      title: statsmodels
+      subtitle: 통계 모델링
+      icon: 📊
+      color: purple
+      items:
+      - 회귀분석 summary
+      - 시계열 ARIMA
+      - p-value, 신뢰구간
+      - 모델 진단
+      infoBox: 통계적 추론, 해석 중심
+    right:
+      title: scipy.stats
+      subtitle: 확률/검정 도구
+      icon: 🎲
+      color: green
+      items:
+      - 확률분포 계산
+      - 가설검정 함수
+      - 기술통계량
+      - 난수 샘플링
+      infoBox: 기본 통계 함수, statsmodels 보완
+  goal: 🆚 SciPy vs 다른 라이브러리에서 수치 입력을 바꿨을 때 오차와 결과 범위가 어떻게 달라지는지 확인한다.
+  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+- id: core_concepts
+  blocks:
+  - type: sectionHeader
+    title: 🧩 핵심 개념
+    subtitle: SciPy로 무엇을 할 수 있나요?
+  - type: featureCards
+    cards:
+    - emoji: 1️⃣
+      title: 최적화 (Optimization)
+      description: 함수의 최소값/최대값 찾기, 비용 최소화
+    - emoji: 2️⃣
+      title: 통계 검정 (Statistical Test)
+      description: 두 집단 비교, 정규성 검정, 상관분석
+    - emoji: 3️⃣
+      title: 보간법 (Interpolation)
+      description: 데이터 사이 값 추정, 곡선 연결
+    - emoji: 4️⃣
+      title: 곡선 피팅 (Curve Fitting)
+      description: 데이터에 수식 맞추기, 모델 파라미터 추정
+    - emoji: 5️⃣
+      title: 신호 처리 (Signal Processing)
+      description: 노이즈 제거, 주파수 분석
+    - emoji: 6️⃣
+      title: 수치 적분 (Integration)
+      description: 면적 계산, 누적량 산출
+  goal: 🧩 핵심 개념에서 수치 입력을 바꿨을 때 오차와 결과 범위가 어떻게 달라지는지 확인한다.
+  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+- id: use_cases
+  blocks:
+  - type: sectionHeader
+    title: 💼 실전 활용 사례
+    subtitle: SciPy로 해결하는 문제들
+  - type: featureCards
+    cards:
+    - emoji: 💰
+      title: 투자 포트폴리오 최적화
+      description: 위험 대비 수익 최대화 자산 배분
+    - emoji: 🧪
+      title: A/B 테스트 분석
+      description: 두 버전의 성과 차이 검정
+    - emoji: 📈
+      title: 성장 곡선 피팅
+      description: 사용자 증가율 모델링
+    - emoji: 🔊
+      title: 오디오 필터링
+      description: 노이즈 제거, 이퀄라이저
+    - emoji: 🌡️
+      title: 센서 데이터 보간
+      description: 결측 구간 값 추정
+    - emoji: 📊
+      title: 분포 적합도 검정
+      description: 데이터가 정규분포인지 확인
+  goal: 💼 실전 활용 사례에서 수치 입력을 바꿨을 때 오차와 결과 범위가 어떻게 달라지는지 확인한다.
+  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+- id: projects_preview
+  blocks:
+  - type: sectionHeader
+    title: 🗺️ 앞으로 배울 내용
+    subtitle: 10개 프로젝트로 마스터하기
+  - type: table
+    headers:
+    - 단계
+    - 프로젝트
+    - 배울 내용
+    - 실용 가치
+    rows:
+    - - 입문
+      - 확률분포 탐색기
+      - norm, uniform, 확률밀도함수
+      - 통계 기초 이해
+    - - 입문
+      - A/B 테스트 분석
+      - ttest_ind, p-value 해석
+      - 마케팅 의사결정
+    - - 기초
+      - 데이터 보간기
+      - interp1d, 스플라인
+      - 결측값 처리
+    - - 기초
+      - 곡선 피팅 마스터
+      - curve_fit, 비선형 회귀
+      - 성장률 모델링
+    - - 기초
+      - 정규성 검정기
+      - shapiro, normaltest
+      - 분석 전제 확인
+    - - 중급
+      - 포트폴리오 최적화
+      - minimize, 제약조건
+      - 투자 전략
+    - - 중급
+      - 신호 필터링
+      - butter, filtfilt
+      - 센서 데이터 정제
+    - - 중급
+      - 수치 적분기
+      - quad, 면적 계산
+      - 물리량 계산
+    - - 심화
+      - 스펙트럼 분석기
+      - fft, spectrogram
+      - 주파수 분석
+    - - 심화
+      - 종합 과학 프로젝트
+      - 모든 모듈 통합
+      - 실전 문제 해결
+  - type: note
+    style: info
+    title: 프로젝트 기반 학습
+    content: 각 프로젝트는 실제 문제를 해결합니다. A/B 테스트로 마케팅 결정을 내리고, 포트폴리오 최적화로 투자 전략을 수립하고, 신호 필터링으로 센서 데이터를 정제합니다.
+      10개 프로젝트를 완료하면 과학/공학 계산의 핵심 도구를 모두 다룰 수 있게 됩니다.
+  goal: 🗺️ 앞으로 배울 내용에서 수치 입력을 바꿨을 때 오차와 결과 범위가 어떻게 달라지는지 확인한다.
+  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+- id: local_runtime_note
+  blocks:
+  - type: sectionHeader
+    title: ⚠️ Codaro 로컬 Python 환경 참고사항
+    subtitle: 로컬 실행 시 확인할 점
+  - type: note
+    style: warning
+    title: 제한사항
+    content: SciPy는 Codaro 로컬 Python에서 실행됩니다. optimize, stats, interpolate, signal 같은 핵심 모듈을 로컬 패키지 환경에서
+      바로 실습할 수 있습니다.
+  - type: featureCards
+    cards:
+    - emoji: ✅
+      title: 정상 작동
+      description: optimize, stats, interpolate, signal, integrate
+    - emoji: ⚠️
+      title: 주의 필요
+      description: sparse 일부 기능, 대용량 연산
+    - emoji: 📦
+      title: 로컬 준비
+      description: meta.packages 기준 uv run
+  goal: ⚠️ Codaro 로컬 Python 환경 참고사항에서 수치 입력을 바꿨을 때 오차와 결과 범위가 어떻게 달라지는지 확인한다.
+  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+- id: package_ready
+  blocks:
+  - type: sectionHeader
+    title: 📦 준비 확인과 시작
+    subtitle: Codaro 로컬 Python 환경에서 바로 사용
+  - type: note
+    style: info
+    title: 로컬에서 바로 실행
+    content: 이 강의는 Codaro 로컬 Python 환경에서 실행됩니다. 필요한 패키지는 YAML meta.packages와 프로젝트 의존성 기준으로 uv가 준비하고, 레슨
+      안에서는 import가 성공하는지 확인합니다.
+  - type: featureCards
+    cards:
+    - emoji: 🌐
+      title: Codaro 로컬 Python 환경
+      description: 로컬 Python 실행
+    - emoji: 📦
+      title: 패키지 준비
+      description: meta.packages 기준 uv run
+    - emoji: 🚀
+      title: 바로 시작
+      description: from scipy import optimize, stats
+  goal: 📦 준비 확인과 시작에서 수치 입력을 바꿨을 때 오차와 결과 범위가 어떻게 달라지는지 확인한다.
+  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+- id: resources
+  blocks:
+  - type: sectionHeader
+    title: 📚 참고 자료
+    subtitle: 더 깊이 공부하고 싶다면
+  - type: links
+    items:
+    - text: SciPy 공식 문서
+      url: https://docs.scipy.org/doc/scipy/
+      icon: 🔗
+    - text: SciPy Tutorial
+      url: https://docs.scipy.org/doc/scipy/tutorial/
+      icon: 🔗
+    - text: SciPy API Reference
+      url: https://docs.scipy.org/doc/scipy/reference/
+      icon: 🔗
+  goal: 📚 참고 자료에서 수치 입력을 바꿨을 때 오차와 결과 범위가 어떻게 달라지는지 확인한다.
+  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+- id: next
+  blocks:
+  - type: hero
+    emoji: 👉
+    title: '다음: 확률분포 탐색기'
+    subtitle: scipy.stats로 정규분포, 균등분포를 시각화하고 확률을 계산합니다
+  goal: '다음: 확률분포 탐색기에서 수치 입력을 바꿨을 때 오차와 결과 범위가 어떻게 달라지는지 확인한다.'
+  why: 과학 계산은 수학 모델을 코드로 실행하고 결과 신뢰도를 확인하는 과정입니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: SLA 지연시간 통계 게이트
+  goal: 업무 흐름 검증에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한
+    신뢰구간과 개선 기준을 함께 제시해야 합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import numpy as np
+    from scipy import optimize, stats
+
+    latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+    def validateLatencySamples(samples):
+        values = np.asarray(samples, dtype=float)
+        if values.size < 5:
+            raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+        if not np.isfinite(values).all():
+            raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+        if (values <= 0).any():
+            raise ValueError("지연시간은 0보다 커야 합니다.")
+        return values
+
+    cleanLatency = validateLatencySamples(latencySamples)
+    cleanLatency.mean(), cleanLatency.std(ddof=1)
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 기대 문자열이나 실제 출력 문구를 바꾸고 assert 비교가 맞는지 확인하세요.
+    starterCode: |-
+      allowedMean = 264
+      capThreshold = optimize.brentq(
+          lambda threshold: np.clip(cleanLatency, None, threshold).mean() - allowedMean,
+          cleanLatency.min(),
+          cleanLatency.max(),
+      )
+      cappedMean = np.clip(cleanLatency, None, capThreshold).mean()
+
+      assert abs(cappedMean - allowedMean) < 1e-6
+      {
+          "allowedMean": allowedMean,
+          "capThreshold": round(float(capThreshold), 2),
+          "cappedMean": round(float(cappedMean), 2),
+      }
+    solution: |-
+      import numpy as np
+      from scipy import optimize, stats
+
+      latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+      def validateLatencySamples(samples):
+          values = np.asarray(samples, dtype=float)
+          if values.size < 5:
+              raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+          if not np.isfinite(values).all():
+              raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+          if (values <= 0).any():
+              raise ValueError("지연시간은 0보다 커야 합니다.")
+          return values
+
+      cleanLatency = validateLatencySamples(latencySamples)
+      cleanLatency.mean(), cleanLatency.std(ddof=1)
+    hints:
+    - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
+    - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증에서 \`allowedMean\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: scipy_00-scientific-method-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - workflow_validation
+    title: 과학 계산 문제의 방법·가정 계약 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 문제 종류와 입력 제약을 검사해 필요한 증거를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 성공 flag 전에 표본 수·가정·허용 오차를 고정하세요.
+    - 결과와 residual 또는 uncertainty를 한 증거 묶음으로 만드세요.
+    exercise:
+      prompt: audit_scientific_task(task)를 완성하세요.
+      starterCode: |-
+        def audit_scientific_task(task):
+            raise NotImplementedError
+      solution: |
+        def audit_scientific_task(task):
+            required = {"kind", "sampleCount", "assumptions", "tolerance"}
+            missing = sorted(required - set(task))
+            failures = []
+            if task.get("sampleCount", 0) <= 0: failures.append("sampleCount")
+            if task.get("tolerance", 0) <= 0: failures.append("tolerance")
+            if not task.get("assumptions"): failures.append("assumptions")
+            return {"valid": not missing and not failures, "missing": missing, "failures": failures, "evidence": ["input contract", "method result", "residual or uncertainty"]}
+      hints: *id001
+    check:
+      id: python.scipy.scipy_00.scientific-method-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_00.scientific-method-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_scientific_task
+        cases:
+        - id: accepts-complete-task
+          arguments:
+          - value:
+              kind: integration
+              sampleCount: 20
+              assumptions:
+              - smooth
+              tolerance: 1.0e-06
+          expectedReturn:
+            valid: true
+            missing: []
+            failures: []
+            evidence:
+            - input contract
+            - method result
+            - residual or uncertainty
+        - id: reports-invalid-task
+          arguments:
+          - value:
+              kind: fit
+              sampleCount: 0
+              assumptions: []
+              tolerance: 0
+          expectedReturn:
+            valid: false
+            missing: []
+            failures:
+            - sampleCount
+            - tolerance
+            - assumptions
+            evidence:
+            - input contract
+            - method result
+            - residual or uncertainty
+        - id: reports-missing-fields
+          arguments:
+          - value:
+              kind: test
+          expectedReturn:
+            valid: false
+            missing:
+            - assumptions
+            - sampleCount
+            - tolerance
+            failures:
+            - sampleCount
+            - tolerance
+            - assumptions
+            evidence:
+            - input contract
+            - method result
+            - residual or uncertainty
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: scipy_00-solver-result-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_00-scientific-method-contract-mastery
+    title: 새 solver 결과에 검산 계약 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 수렴 여부, residual, iteration budget을 함께 판정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - solver의 success 필드와 독립적으로 residual을 검사하세요.
+    - iteration 초과도 재현성·비용 실패로 남기세요.
+    exercise:
+      prompt: audit_solver_result(result, tolerance, iteration_budget)를 완성하세요.
+      starterCode: |-
+        def audit_solver_result(result, tolerance, iteration_budget):
+            raise NotImplementedError
+      solution: |
+        def audit_solver_result(result, tolerance, iteration_budget):
+            failures = []
+            if not result.get("converged", False): failures.append("not-converged")
+            if abs(result.get("residual", float("inf"))) > tolerance: failures.append("residual")
+            if result.get("iterations", iteration_budget + 1) > iteration_budget: failures.append("iteration-budget")
+            return {"accepted": not failures, "failures": failures, "residual": result.get("residual"), "iterations": result.get("iterations")}
+      hints: *id002
+    check:
+      id: python.scipy.scipy_00.solver-result-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_00.solver-result-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_solver_result
+        cases:
+        - id: accepts-verified-result
+          arguments:
+          - value:
+              converged: true
+              residual: 1.0e-08
+              iterations: 8
+          - value: 1.0e-06
+          - value: 20
+          expectedReturn:
+            accepted: true
+            failures: []
+            residual: 1.0e-08
+            iterations: 8
+        - id: rejects-false-success
+          arguments:
+          - value:
+              converged: true
+              residual: 0.2
+              iterations: 4
+          - value: 0.01
+          - value: 10
+          expectedReturn:
+            accepted: false
+            failures:
+            - residual
+            residual: 0.2
+            iterations: 4
+        - id: reports-budget-and-convergence
+          arguments:
+          - value:
+              converged: false
+              residual: 1
+              iterations: 30
+          - value: 0.1
+          - value: 20
+          expectedReturn:
+            accepted: false
+            failures:
+            - not-converged
+            - residual
+            - iteration-budget
+            residual: 1
+            iterations: 30
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: scipy_00-scientific-method-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_00-solver-result-audit-transfer
+    title: 과학 계산 방법 선택 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 문제 구조에 맞는 scipy 영역을 고른다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 수치 방법의 입력 가정과 오차 근거를 함께 남기세요.
+    - p-value나 최적화 성공 flag 하나를 결론으로 사용하지 마세요.
+    exercise:
+      prompt: choose_scientific_method(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_scientific_method(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_scientific_method(situation):
+            table = {'continuous-integral': {'method': 'integrate with error estimate', 'evidence': 'value and error', 'risk': 'singularity'}, 'parameter-fit': {'method': 'optimize with residual audit', 'evidence': 'parameters and residuals', 'risk': 'local optimum'}, 'sample-distribution': {'method': 'stats with assumptions', 'evidence': 'effect and interval', 'risk': 'p-value only'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.scipy.scipy_00.scientific-method-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_00.scientific-method-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_scientific_method
+        cases:
+        - id: recalls-continuous-integral
+          arguments:
+          - value: continuous-integral
+          expectedReturn:
+            method: integrate with error estimate
+            evidence: value and error
+            risk: singularity
+        - id: recalls-parameter-fit
+          arguments:
+          - value: parameter-fit
+          expectedReturn:
+            method: optimize with residual audit
+            evidence: parameters and residuals
+            risk: local optimum
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

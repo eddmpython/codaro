@@ -1,0 +1,897 @@
+var e=`meta:
+  packages:
+  - numpy
+  - opencv-python
+  - scikit-learn
+  id: opencv_09
+  title: 컨투어탐지기
+  order: 9
+  category: opencv
+  difficulty: ⭐⭐⭐⭐
+  badge: 심화
+  tags:
+  - OpenCV
+  - findContours
+  - drawContours
+  - contourArea
+  - 컨투어
+  seo:
+    title: OpenCV 심화 - 컨투어 탐지기
+    description: OpenCV의 findContours로 객체 윤곽을 검출하고 면적·둘레·외접 사각형으로 분류와 필터링을 정량 처리합니다.
+    keywords:
+    - OpenCV
+    - findContours
+    - drawContours
+    - contourArea
+    - 컨투어
+intro:
+  emoji: 🔍
+  goal: findContours로 객체 윤곽을 찾고, 면적/둘레/외접 사각형/꼭짓점 수로 객체를 정량 분류하는 컨투어 분석 파이프라인 한 줄을 만듭니다.
+  description: 컨투어는 이진 이미지의 흰색 영역 경계입니다. 객체별 점 리스트로 돌아와 면적, 둘레, 외접 도형 같은 기하학 분석의 입력이 됩니다.
+  direction: 합성 입력에 사각형/원/타원 세 도형을 그리고 findContours → 면적 측정 → 분류 → 외접 도형 그리기 흐름을 정량 검증합니다.
+  benefits:
+  - findContours의 (contours, hierarchy) 튜플 반환 형식과 RETR_EXTERNAL 효과를 손으로 확인합니다.
+  - contourArea/arcLength로 객체 크기 측정과 면적 기준 필터링을 짭니다.
+  - boundingRect/minEnclosingCircle로 외접 도형을 그려 위치/크기 추정의 출력을 만듭니다.
+  - approxPolyDP의 꼭짓점 수로 도형 분류(삼각형/사각형/원)를 구현합니다.
+  diagram:
+    steps:
+    - label: 합성 입력 만들기
+      detail: 사각형/원/타원 세 도형을 그려 정답 객체 수를 정합니다.
+    - label: findContours
+      detail: 이진화 후 findContours로 객체 수, 각 컨투어 점 개수를 확인합니다.
+    - label: 면적/둘레 측정
+      detail: contourArea와 arcLength로 각 객체의 기하 특성을 dict로 정리합니다.
+    - label: 외접 도형
+      detail: boundingRect로 AABB를 그리고 area_ratio로 객체 채움 정도를 측정합니다.
+    - label: approxPolyDP 분류
+      detail: 꼭짓점 수로 도형을 자동 분류하는 함수를 만듭니다.
+    runtime:
+    - label: opencv-python 패키지
+      detail: meta.packages의 opencv-python이 가상환경에 있어야 findContours가 import됩니다.
+    - label: 이진 입력
+      detail: findContours는 단채널 이진 입력만 받습니다. 흰색이 객체로 해석됩니다.
+    - label: hierarchy 옵션
+      detail: RETR_EXTERNAL/LIST/CCOMP/TREE의 hierarchy 구조 차이는 응용에 따라 다르게 활용됩니다.
+sections:
+- id: step1_create
+  title: 1단계. 합성 도형 입력
+  structuredPrimary: true
+  subtitle: 사각형 + 원 + 타원 세 객체
+  goal: 흑백 캔버스 위에 사각형/원/타원 세 도형을 그려 객체 수 3개의 합성 이진 입력을 만들고, 흰 픽셀 수와 도형 위치를 명시적으로 기록합니다.
+  why: 컨투어 검출 결과의 정답은 사람이 미리 알 수 있어야 검증이 됩니다. 합성 입력은 객체 수 3, 각 객체의 면적/위치를 모두 명시적으로 알 수 있어 알고리즘 회귀 테스트의 기준이 됩니다.
+  explanation: |-
+    np.zeros((H, W), dtype=np.uint8)로 빈 캔버스를 만들고 cv2.rectangle/circle/ellipse 세 도형을 그립니다. thickness=-1로 채워서 findContours가 외곽선을 명확히 잡게 합니다.
+    각 도형의 면적은 도형 공식으로 계산할 수 있어 contourArea의 결과를 직접 검증할 수 있습니다. 예를 들어 (100, 100) 정사각형의 면적은 100*100=10000, 반지름 30 원은 π*30²≈2827입니다.
+    이 입력 한 개가 이후 모든 컨투어 셀의 공통 입력입니다.
+  tips:
+  - cv2.ellipse(image, center, axes, angle, startAngle, endAngle, color, thickness)에서 axes는 (장축, 단축) 반지름입니다.
+  - 도형들이 겹치면 findContours가 한 객체로 인식합니다. 검증 단순화를 위해 겹치지 않게 배치하세요.
+  snippet: |-
+    import cv2
+    import numpy as np
+
+    contourCanvas = np.zeros((300, 400), dtype=np.uint8)
+    cv2.rectangle(contourCanvas, (50, 50), (150, 150), 255, -1)
+    cv2.circle(contourCanvas, (280, 100), 30, 255, -1)
+    cv2.ellipse(contourCanvas, (200, 220), (60, 30), 0, 0, 360, 255, -1)
+
+    {
+        'shape': contourCanvas.shape,
+        'whitePixels': int((contourCanvas == 255).sum()),
+        'expectedRectArea': 100 * 100,
+        'expectedCircleArea': round(3.14159 * 30 * 30, 0),
+        'expectedEllipseArea': round(3.14159 * 60 * 30, 0),
+    }
+  exercise:
+    prompt: 같은 캔버스에 작은 사각형 (10, 10)~(20, 20)을 추가해 객체가 총 4개가 되는 입력을 만드세요. 흰 픽셀 수가 step1보다 증가해야 합니다.
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+      fourCanvas = np.zeros((300, 400), dtype=np.uint8)
+      cv2.rectangle(fourCanvas, (50, 50), (150, 150), 255, -1)
+      cv2.circle(fourCanvas, (280, 100), 30, 255, -1)
+      cv2.ellipse(fourCanvas, (200, 220), (60, 30), 0, 0, 360, 255, -1)
+      cv2.rectangle(fourCanvas, (10, 10), (20, 20), ___, -1)
+
+      {'whitePixels': int((fourCanvas == 255).sum())}
+    hints:
+    - 객체 픽셀 값은 255입니다.
+    - 빈칸에는 255가 들어갑니다.
+    check:
+      noError: cv2.rectangle 호출이 끝나야 합니다.
+      resultCheck: whitePixels가 양의 정수여야 합니다.
+  check:
+    noError: 합성 입력 생성과 통계 계산이 끝나야 합니다.
+    resultCheck: shape가 (300, 400), whitePixels가 양수여야 합니다.
+- id: step2_find
+  title: 2단계. findContours 호출
+  structuredPrimary: true
+  subtitle: RETR_EXTERNAL + CHAIN_APPROX_SIMPLE
+  goal: 합성 입력에 cv2.findContours를 호출해 contours 리스트 길이가 정답 객체 수와 같은지, 각 컨투어의 점 개수가 도형 형태와 일치하는지 확인합니다.
+  why: findContours가 의도한 객체 수를 모두 찾았는지 확인하는 것은 컨투어 분석의 출발점입니다. 객체 수가 안 맞으면 이진화 임계값이나 전처리에 문제가 있다는 신호입니다.
+  explanation: |-
+    cv2.findContours(image, mode, method)는 (contours, hierarchy) 튜플을 돌려줍니다. contours는 객체별 점 리스트, hierarchy는 객체 간 부모-자식 관계입니다.
+    mode=RETR_EXTERNAL은 가장 바깥 컨투어만 돌려줍니다. RETR_TREE는 중첩 구조까지 모두 보고합니다. 단순 객체 검출에는 EXTERNAL이 충분합니다.
+    method=CHAIN_APPROX_SIMPLE은 직선 부분의 끝점만 저장해 메모리를 절약합니다. CHAIN_APPROX_NONE은 모든 점을 저장합니다. 사각형은 SIMPLE에서 4점, 원은 많은 점이 나옵니다.
+  tips:
+  - findContours는 OpenCV 4.x에서 contours/hierarchy 두 값만 돌려줍니다. 3.x에는 첫 번째 반환값이 image였지만 4.x에서 제거됐습니다.
+  - 입력 이미지를 in-place로 수정할 수 있어 원본 보존이 필요하면 .copy()를 먼저 만들어야 합니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+
+    findCanvas = np.zeros((300, 400), dtype=np.uint8)
+    cv2.rectangle(findCanvas, (50, 50), (150, 150), 255, -1)
+    cv2.circle(findCanvas, (280, 100), 30, 255, -1)
+    cv2.ellipse(findCanvas, (200, 220), (60, 30), 0, 0, 360, 255, -1)
+
+    contours, hierarchy = cv2.findContours(findCanvas, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    {
+        'objectCount': len(contours),
+        'isThree': len(contours) == 3,
+        'pointCountsPerObject': [len(c) for c in contours],
+        'hierarchyShape': hierarchy.shape if hierarchy is not None else None,
+    }
+  exercise:
+    prompt: method를 CHAIN_APPROX_NONE으로 바꿔 호출해 사각형의 점 개수가 SIMPLE보다 명백히 많아지는지 확인하세요.
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+      noneCanvas = np.zeros((300, 400), dtype=np.uint8)
+      cv2.rectangle(noneCanvas, (50, 50), (150, 150), 255, -1)
+      cv2.circle(noneCanvas, (280, 100), 30, 255, -1)
+      cv2.ellipse(noneCanvas, (200, 220), (60, 30), 0, 0, 360, 255, -1)
+
+      noneContours, _ = cv2.findContours(noneCanvas, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX____)
+      simpleContours, _ = cv2.findContours(noneCanvas, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+      {'nonePoints': sum(len(c) for c in noneContours), 'simplePoints': sum(len(c) for c in simpleContours), 'noneIsLarger': sum(len(c) for c in noneContours) > sum(len(c) for c in simpleContours)}
+    hints:
+    - CHAIN_APPROX_NONE은 모든 점을 저장합니다.
+    - 빈칸에는 NONE이 들어갑니다.
+    check:
+      noError: 두 findContours 호출이 끝나야 합니다.
+      resultCheck: noneIsLarger가 True이고 nonePoints > simplePoints여야 합니다.
+  check:
+    noError: findContours 호출과 dict 구성이 끝나야 합니다.
+    resultCheck: isThree가 True이고 objectCount가 3이어야 합니다.
+- id: step3_draw
+  title: 3단계. drawContours로 시각 검증
+  structuredPrimary: true
+  subtitle: contourIdx=-1 전체 그리기
+  goal: 컨투어를 컬러 이미지 위에 녹색으로 그려서 각 객체의 윤곽이 정확히 잡혔는지 시각으로 확인하고, 결과 이미지의 녹색 픽셀 수가 양수인지 검증합니다.
+  why: 시각 검증은 컨투어 검출의 정합성을 확인하는 가장 빠른 방법입니다. 그린 윤곽이 객체와 일치하지 않으면 이진화나 모폴로지 전처리에 문제가 있다는 신호입니다.
+  explanation: |-
+    cv2.drawContours(image, contours, contourIdx, color, thickness)에서 image는 컬러여야 합니다. 단채널이면 결과도 단채널이 되어 컬러 표시가 안 됩니다.
+    contourIdx=-1은 모든 컨투어를 그립니다. 0, 1 같은 인덱스를 주면 그 객체만 그립니다.
+    color는 BGR 튜플입니다. (0, 255, 0)이 녹색입니다. thickness가 양수면 윤곽선, -1이면 채우기입니다.
+    검증은 결과 이미지에 정말 녹색(또는 지정한 색) 픽셀이 존재하는지를 채널 비교로 확인합니다.
+  tips:
+  - drawContours는 in-place로 동작합니다. 원본 보존을 위해 .copy()를 먼저 만드세요.
+  - 컨투어 한 개만 두껍게 그리려면 contourIdx와 thickness를 조정해 강조 효과를 줄 수 있습니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+
+    drawCanvas = np.zeros((300, 400), dtype=np.uint8)
+    cv2.rectangle(drawCanvas, (50, 50), (150, 150), 255, -1)
+    cv2.circle(drawCanvas, (280, 100), 30, 255, -1)
+    cv2.ellipse(drawCanvas, (200, 220), (60, 30), 0, 0, 360, 255, -1)
+
+    drawContoursList, _ = cv2.findContours(drawCanvas, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    colorCanvas = cv2.cvtColor(drawCanvas, cv2.COLOR_GRAY2BGR)
+    cv2.drawContours(colorCanvas, drawContoursList, -1, (0, 255, 0), 2)
+
+    greenMask = (colorCanvas[..., 1] == 255) & (colorCanvas[..., 0] == 0) & (colorCanvas[..., 2] == 0)
+
+    {
+        'shape': colorCanvas.shape,
+        'greenPixelCount': int(greenMask.sum()),
+        'hasGreenOutline': int(greenMask.sum()) > 0,
+    }
+  exercise:
+    prompt: 한 객체(인덱스 0)만 두께 5로 빨강(0, 0, 255)으로 그리세요. 빨강 픽셀 수가 다른 객체 그리기 케이스보다 적어야 합니다.
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+      oneCanvas = np.zeros((300, 400), dtype=np.uint8)
+      cv2.rectangle(oneCanvas, (50, 50), (150, 150), 255, -1)
+      cv2.circle(oneCanvas, (280, 100), 30, 255, -1)
+
+      oneContours, _ = cv2.findContours(oneCanvas, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+      oneColor = cv2.cvtColor(oneCanvas, cv2.COLOR_GRAY2BGR)
+      cv2.drawContours(oneColor, oneContours, 0, (0, 0, ___), 5)
+
+      redMask = (oneColor[..., 2] == 255) & (oneColor[..., 0] == 0) & (oneColor[..., 1] == 0)
+      {'redCount': int(redMask.sum()), 'hasRed': int(redMask.sum()) > 0}
+    hints:
+    - BGR 빨강은 (0, 0, 255)입니다.
+    - 빈칸에는 255가 들어갑니다.
+    check:
+      noError: drawContours 호출이 끝나야 합니다.
+      resultCheck: hasRed가 True이고 redCount가 양수여야 합니다.
+  check:
+    noError: drawContours 호출과 마스크 계산이 끝나야 합니다.
+    resultCheck: hasGreenOutline이 True이고 greenPixelCount가 양수여야 합니다.
+- id: step4_area
+  title: 4단계. 면적과 둘레로 객체 분류
+  structuredPrimary: true
+  subtitle: contourArea, arcLength
+  goal: 각 컨투어의 면적과 둘레를 측정해 도형 공식으로 계산한 기대값과 어느 정도 일치하는지 확인하고, 원형도(4π·면적/둘레²)로 도형의 둥근 정도를 분류합니다.
+  why: 컨투어를 단순 시각화만 하는 게 아니라 면적과 둘레로 객체를 분류해야 자동화에 쓸모가 있습니다. 원형도는 면적과 둘레만으로 도형의 "둥근 정도"를 한 숫자로 표현하는 표준 지표입니다.
+  explanation: |-
+    cv2.contourArea(contour)는 컨투어가 둘러싼 영역의 면적(픽셀 수)을 돌려줍니다. cv2.arcLength(contour, closed)는 둘레 길이를 돌려줍니다. closed=True가 일반적입니다.
+    원형도는 4π·면적/둘레²로 정의되며, 완전한 원에서 1, 길쭉할수록 0에 가까워집니다. 정사각형은 약 0.785, 가로로 긴 타원은 0.4~0.6 정도입니다.
+    합성 입력에서 도형별 면적의 합은 step1의 흰 픽셀 수와 거의 일치해야 합니다(작은 차이는 컨투어가 정확히 둘레가 아닌 픽셀 중심을 따라가서 생김).
+  tips:
+  - contourArea는 부동소수점을 돌려줍니다. 정수가 필요하면 int()로 명시 변환합니다.
+  - 원형도가 1을 약간 초과할 수도 있습니다(0.99~1.05 범위). OpenCV의 둘레 계산이 약간 보수적이라 그렇습니다.
+  snippet: |-
+    import cv2
+    import math
+    import numpy as np
+
+    areaCanvas = np.zeros((300, 400), dtype=np.uint8)
+    cv2.rectangle(areaCanvas, (50, 50), (150, 150), 255, -1)
+    cv2.circle(areaCanvas, (280, 100), 30, 255, -1)
+    cv2.ellipse(areaCanvas, (200, 220), (60, 30), 0, 0, 360, 255, -1)
+
+    contours, _ = cv2.findContours(areaCanvas, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    summary = []
+    for cnt in contours:
+        area = float(cv2.contourArea(cnt))
+        perimeter = float(cv2.arcLength(cnt, True))
+        circularity = round(4 * math.pi * area / (perimeter ** 2), 3) if perimeter > 0 else 0.0
+        summary.append({'area': round(area, 0), 'perimeter': round(perimeter, 1), 'circularity': circularity})
+
+    {
+        'objectCount': len(summary),
+        'summary': summary,
+        'totalAreaCloseToCanvas': abs(sum(s['area'] for s in summary) - int((areaCanvas == 255).sum())) < 200,
+    }
+  exercise:
+    prompt: 원형도가 0.8 이상인 객체만 골라 리스트로 만드세요. 합성 입력에서는 원(circularity≈1)만 통과해야 합니다.
+    starterCode: |-
+      import cv2
+      import math
+      import numpy as np
+
+      circleFilterCanvas = np.zeros((300, 400), dtype=np.uint8)
+      cv2.rectangle(circleFilterCanvas, (50, 50), (150, 150), 255, -1)
+      cv2.circle(circleFilterCanvas, (280, 100), 30, 255, -1)
+      cv2.ellipse(circleFilterCanvas, (200, 220), (60, 30), 0, 0, 360, 255, -1)
+
+      cnts, _ = cv2.findContours(circleFilterCanvas, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+      circulars = [
+          float(4 * math.pi * cv2.contourArea(c) / (cv2.arcLength(c, True) ** 2))
+          for c in cnts
+          if cv2.arcLength(c, True) > 0
+      ]
+      rounds = [round(x, 3) for x in circulars if x >= ___]
+      {'roundsCount': len(rounds), 'rounds': rounds}
+    hints:
+    - 원형도 0.8 이상이 둥근 객체 기준입니다.
+    - 빈칸에는 0.8이 들어갑니다.
+    check:
+      noError: 컨투어 검출과 원형도 계산이 끝나야 합니다.
+      resultCheck: roundsCount가 1이상이고 모든 rounds 값이 0.8 이상이어야 합니다.
+  check:
+    noError: 컨투어 검출과 면적/둘레 계산이 끝나야 합니다.
+    resultCheck: objectCount가 3이고 totalAreaCloseToCanvas가 True여야 합니다.
+- id: step5_bound
+  title: 5단계. 외접 사각형으로 위치 추정
+  structuredPrimary: true
+  subtitle: boundingRect (x, y, w, h)
+  goal: 각 객체에 cv2.boundingRect를 적용해 (x, y, w, h) 튜플을 얻고, 면적 대비 외접 사각형 면적 비율(extent)로 객체가 사각형에 얼마나 가까운지 분류합니다.
+  why: 외접 사각형은 객체 위치(x, y)와 크기(w, h)를 정수 4개로 정리해 다음 단계로 넘기는 표준 형식입니다. extent(객체 면적/사각형 면적)는 사각형은 1에 가까운 반면 원이나 타원은 0.78~0.85 정도라 형태 분류에 쓸 수 있습니다.
+  explanation: |-
+    cv2.boundingRect(contour)는 x, y, w, h 4-tuple을 돌려줍니다. (x, y)는 좌상단 좌표, w, h는 가로/세로 크기입니다.
+    extent = contourArea / (w * h)는 객체가 외접 사각형을 얼마나 채우는지의 비율입니다. 정확한 사각형은 1, 원은 π/4 ≈ 0.785, 길쭉한 모양은 0.5 이하로 떨어집니다.
+    AABB(축 정렬 외접 사각형)는 회전을 고려하지 않습니다. 회전 객체에는 minAreaRect가 더 좋지만 인터페이스가 복잡합니다.
+  tips:
+  - 외접 사각형 그리기는 cv2.rectangle(image, (x, y), (x+w, y+h), color, thickness)로 두 모서리를 지정합니다.
+  - extent로 객체를 정렬하면 사각형에 가까운 순으로 처리할 수 있습니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+
+    boundCanvas = np.zeros((300, 400), dtype=np.uint8)
+    cv2.rectangle(boundCanvas, (50, 50), (150, 150), 255, -1)
+    cv2.circle(boundCanvas, (280, 100), 30, 255, -1)
+    cv2.ellipse(boundCanvas, (200, 220), (60, 30), 0, 0, 360, 255, -1)
+
+    contours, _ = cv2.findContours(boundCanvas, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    boundingReport = []
+    for cnt in contours:
+        x, y, w, h = cv2.boundingRect(cnt)
+        area = float(cv2.contourArea(cnt))
+        extent = round(area / (w * h), 3) if w * h > 0 else 0.0
+        boundingReport.append({'xywh': (int(x), int(y), int(w), int(h)), 'extent': extent})
+
+    {
+        'count': len(boundingReport),
+        'report': boundingReport,
+        'allHavePositiveSize': all(b['xywh'][2] > 0 and b['xywh'][3] > 0 for b in boundingReport),
+    }
+  exercise:
+    prompt: extent가 0.95 이상인 객체만 골라 사각형으로 분류된 객체 수를 돌려주세요. 합성 입력의 정사각형 한 개만 통과해야 합니다.
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+      filterCanvas = np.zeros((300, 400), dtype=np.uint8)
+      cv2.rectangle(filterCanvas, (50, 50), (150, 150), 255, -1)
+      cv2.circle(filterCanvas, (280, 100), 30, 255, -1)
+      cv2.ellipse(filterCanvas, (200, 220), (60, 30), 0, 0, 360, 255, -1)
+
+      filterContours, _ = cv2.findContours(filterCanvas, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+      filterRects = []
+      for cnt in filterContours:
+          x, y, w, h = cv2.boundingRect(cnt)
+          area = float(cv2.contourArea(cnt))
+          extent = area / (w * h) if w * h > 0 else 0
+          if extent >= ___:
+              filterRects.append({'xywh': (int(x), int(y), int(w), int(h)), 'extent': round(extent, 3)})
+
+      {'rectCount': len(filterRects)}
+    hints:
+    - 정사각형에 가까운 기준은 extent >= 0.95입니다.
+    - 빈칸에는 0.95가 들어갑니다.
+    check:
+      noError: 컨투어 검출과 boundingRect 호출이 끝나야 합니다.
+      resultCheck: rectCount가 1이고 통과한 객체가 정사각형이어야 합니다.
+  check:
+    noError: 컨투어 검출과 boundingRect 호출이 끝나야 합니다.
+    resultCheck: count가 3이고 allHavePositiveSize가 True여야 합니다.
+- id: step6_approx
+  title: 6단계. approxPolyDP로 도형 분류
+  structuredPrimary: true
+  subtitle: 꼭짓점 수 → 도형 이름
+  goal: cv2.approxPolyDP로 각 컨투어를 단순화해 꼭짓점 수를 얻고, 그 수로 도형 이름(triangle/rectangle/pentagon/circle)을 매핑하는 분류 함수를 만듭니다.
+  why: 도형 분류는 자동화의 흔한 첫 단계입니다. 꼭짓점 수 4면 사각형, 3이면 삼각형, 많으면 원이라는 휴리스틱이 단순하고 강력합니다. epsilon만 잘 조정하면 80% 이상의 도형이 잡힙니다.
+  explanation: |-
+    cv2.approxPolyDP(curve, epsilon, closed)는 Douglas-Peucker 알고리즘으로 곡선을 단순화합니다. epsilon은 허용 오차이고, 작으면 원본에 가깝고 크면 직선화됩니다.
+    epsilon = arcLength * 0.02 같은 비율 기반 값이 일반적입니다. 도형 크기가 달라도 같은 분류 결과를 줘 안정적입니다.
+    꼭짓점 수가 3이면 삼각형, 4면 사각형, 5면 오각형, 그 이상이면 원에 가깝다고 봅니다. 원은 보통 8~20개 점을 가집니다.
+  tips:
+  - epsilon 비율을 너무 작게 하면 원이 사각형으로 잘못 잡힙니다. 0.02~0.04가 안전한 시작점입니다.
+  - 비대칭 도형(별 모양 등)은 휴리스틱이 약합니다. 모멘트나 Hu 모멘트 같은 고급 분석이 필요합니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+
+
+    def classifyShape(contour: np.ndarray) -> str:
+        perimeter = cv2.arcLength(contour, True)
+        if perimeter <= 0:
+            return 'unknown'
+        approx = cv2.approxPolyDP(contour, 0.04 * perimeter, True)
+        vertexCount = len(approx)
+        if vertexCount == 3:
+            return 'triangle'
+        if vertexCount == 4:
+            return 'rectangle'
+        if vertexCount == 5:
+            return 'pentagon'
+        return 'circle'
+
+
+    classifyCanvas = np.zeros((300, 400), dtype=np.uint8)
+    cv2.rectangle(classifyCanvas, (50, 50), (150, 150), 255, -1)
+    cv2.circle(classifyCanvas, (280, 100), 30, 255, -1)
+    cv2.ellipse(classifyCanvas, (200, 220), (60, 30), 0, 0, 360, 255, -1)
+
+    contours, _ = cv2.findContours(classifyCanvas, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    classifications = [classifyShape(c) for c in contours]
+
+    {
+        'classifications': classifications,
+        'rectangleCount': classifications.count('rectangle'),
+        'circleCount': classifications.count('circle'),
+    }
+  exercise:
+    prompt: 삼각형 객체를 추가한 입력에서 classifyShape가 'triangle'을 한 번 반환하는지 확인하세요. cv2.fillPoly로 삼각형을 그릴 수 있습니다.
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+
+      def classifyShape(contour):
+          perimeter = cv2.arcLength(contour, True)
+          if perimeter <= 0:
+              return 'unknown'
+          approx = cv2.approxPolyDP(contour, 0.04 * perimeter, True)
+          vertexCount = len(approx)
+          if vertexCount == 3:
+              return 'triangle'
+          if vertexCount == 4:
+              return 'rectangle'
+          return 'circle'
+
+
+      triCanvas = np.zeros((200, 300), dtype=np.uint8)
+      cv2.fillPoly(triCanvas, [np.array([[50, 30], [120, 30], [85, 100]])], ___)
+
+      triContours, _ = cv2.findContours(triCanvas, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+      triResult = [classifyShape(c) for c in triContours]
+      {'triResult': triResult, 'hasTriangle': 'triangle' in triResult}
+    hints:
+    - 흰색 채우기 값은 255입니다.
+    - 빈칸에는 255가 들어갑니다.
+    check:
+      noError: classifyShape 정의와 호출이 끝나야 합니다.
+      resultCheck: hasTriangle이 True여야 합니다.
+  check:
+    noError: classifyShape 정의와 호출이 끝나야 합니다.
+    resultCheck: rectangleCount가 1 이상, circleCount가 1 이상이어야 합니다.
+- id: practice
+  title: 실습 - Canny → findContours 파이프라인
+  structuredPrimary: true
+  subtitle: 실제 사진의 객체 검출
+  goal: flower 사진에 Canny → findContours를 적용해 검출된 객체 수와 면적 합을 dict로 정리하고, 면적이 작은 객체를 필터링하는 함수를 만듭니다.
+  why: 실제 사진의 컨투어는 노이즈로 인한 자잘한 객체가 많이 섞입니다. 면적 기준 필터링은 그 노이즈를 한 번에 정리해 의미 있는 객체만 남기는 표준 후처리입니다.
+  explanation: |-
+    Canny → findContours가 사진의 객체 검출 표준 파이프라인입니다. Canny가 만든 이진 에지 맵에 findContours를 호출하면 각 에지 곡선이 하나의 컨투어로 잡힙니다.
+    실제 사진은 노이즈로 자잘한 컨투어가 수십~수백 개 나옵니다. minArea 기준으로 필터링하면 의미 있는 객체만 남습니다.
+    filterByArea 함수로 minArea 인자를 받아 필터링 결과를 dict로 정리합니다. 자동화 코드에서 그대로 호출할 수 있는 형태입니다.
+  tips:
+  - Canny 임계값을 조정하면 검출되는 컨투어 수가 크게 달라집니다. 임계값이 낮으면 노이즈 컨투어가 늘어납니다.
+  - 면적 기준 외에 둘레, 종횡비, 원형도로도 필터링할 수 있습니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+    from sklearn.datasets import load_sample_image
+
+
+    def filterByArea(contoursIn, minArea: float) -> list:
+        return [c for c in contoursIn if cv2.contourArea(c) >= minArea]
+
+
+    flowerBgr = cv2.cvtColor(load_sample_image('flower.jpg'), cv2.COLOR_RGB2BGR)
+    flowerGray = cv2.cvtColor(flowerBgr, cv2.COLOR_BGR2GRAY)
+    flowerEdge = cv2.Canny(flowerGray, 50, 150)
+    flowerContours, _ = cv2.findContours(flowerEdge, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    bigContours = filterByArea(flowerContours, 100)
+
+    {
+        'totalCount': len(flowerContours),
+        'filteredCount': len(bigContours),
+        'totalArea': round(sum(float(cv2.contourArea(c)) for c in flowerContours), 0),
+        'filteredArea': round(sum(float(cv2.contourArea(c)) for c in bigContours), 0),
+    }
+  exercise:
+    prompt: filterByArea minArea를 500으로 더 엄격하게 하면 필터링된 객체 수가 minArea=100보다 더 작은지 확인하세요.
+    starterCode: |-
+      import cv2
+      import numpy as np
+      from sklearn.datasets import load_sample_image
+
+
+      def filterByArea(contoursIn, minArea):
+          return [c for c in contoursIn if cv2.contourArea(c) >= minArea]
+
+
+      strictBgr = cv2.cvtColor(load_sample_image('flower.jpg'), cv2.COLOR_RGB2BGR)
+      strictGray = cv2.cvtColor(strictBgr, cv2.COLOR_BGR2GRAY)
+      strictEdge = cv2.Canny(strictGray, 50, 150)
+      strictContours, _ = cv2.findContours(strictEdge, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+      strictFiltered = filterByArea(strictContours, ___)
+      {'strictCount': len(strictFiltered), 'fewerThan100': len(strictFiltered) < len([c for c in strictContours if cv2.contourArea(c) >= 100])}
+    hints:
+    - 더 엄격한 minArea는 500입니다.
+    - 빈칸에는 500이 들어갑니다.
+    check:
+      noError: filterByArea 정의와 호출이 끝나야 합니다.
+      resultCheck: fewerThan100이 True이고 strictCount가 minArea=100 케이스보다 작아야 합니다.
+  check:
+    noError: Canny와 findContours 호출이 끝나야 합니다.
+    resultCheck: filteredCount가 totalCount 이하이고 filteredArea가 totalArea 이하여야 합니다.
+- id: workflow_validation
+  title: 7단계. 컨투어 분석 가드 함수
+  structuredPrimary: true
+  subtitle: minArea 검증 + 객체 수 보장
+  goal: validateMinArea 함수가 양수 검증을 하고, analyzeContours 함수가 정상 입력에서 의미 있는 결과 dict를 돌려주는지 검증합니다.
+  why: 컨투어 분석은 잘못된 입력에 조용히 실패하는 경향이 있습니다(객체가 0이거나 비정상 결과). 함수 입구에서 입력 검증 + 결과의 sanity check를 두면 운영에서 이상 결과를 즉시 감지할 수 있습니다.
+  explanation: |-
+    validateMinArea는 minArea가 양수인지만 검사합니다. 0 이하면 의미가 없어 ValueError로 차단합니다.
+    analyzeContours는 합성 입력에 대해 객체 수, 평균 면적, 최대 면적을 측정합니다. 이 값들이 운영에서 비정상 범위(객체 0, 평균 음수 등)면 자동화의 후속 처리가 깨질 신호입니다.
+    두 함수를 결합하면 잘못된 호출과 잘못된 결과 모두 한 셀에서 감지됩니다.
+  tips:
+  - 검증 함수와 분석 함수를 분리하면 단위 테스트가 쉬워집니다.
+  - 객체 수 0은 보통 이진화 임계값이 잘못됐거나 입력이 비었다는 신호입니다. 명시적인 경고 메시지를 넣어 두면 디버깅이 빨라집니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+
+
+    def validateMinArea(minArea: float) -> bool:
+        if minArea <= 0:
+            raise ValueError(f"최소 면적은 양수여야 합니다: {minArea}")
+        return True
+
+
+    def analyzeContours(image: np.ndarray, minArea: float) -> dict:
+        validateMinArea(minArea)
+        contours, _ = cv2.findContours(image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        areas = [float(cv2.contourArea(c)) for c in contours if cv2.contourArea(c) >= minArea]
+        return {
+            'objectCount': len(areas),
+            'meanArea': round(sum(areas) / len(areas), 1) if areas else 0.0,
+            'maxArea': round(max(areas), 1) if areas else 0.0,
+        }
+
+
+    analyzeCanvas = np.zeros((140, 180), dtype=np.uint8)
+    cv2.rectangle(analyzeCanvas, (25, 30), (80, 95), 255, -1)
+    cv2.circle(analyzeCanvas, (130, 70), 28, 255, -1)
+
+    okResult = analyzeContours(analyzeCanvas, 100)
+
+    try:
+        analyzeContours(analyzeCanvas, 0)
+        zeroMessage = 'unexpected pass'
+    except ValueError as exc:
+        zeroMessage = str(exc)
+
+    {
+        'okResult': okResult,
+        'zeroMessage': zeroMessage,
+    }
+  exercise:
+    prompt: validateMinArea에 음수 -50을 넣으면 ValueError가 잡히고 메시지에 '-50' 단서가 포함되는지 확인하세요.
+    starterCode: |-
+      def validateMinArea(minArea):
+          if minArea <= 0:
+              raise ValueError(f"최소 면적은 양수여야 합니다: {minArea}")
+          return True
+
+
+      try:
+          validateMinArea(___)
+          negMessage = 'unexpected pass'
+      except ValueError as exc:
+          negMessage = str(exc)
+
+      {'negMessage': negMessage, 'hasNegHint': '-50' in negMessage}
+    hints:
+    - 음수 -50을 인자에 넣습니다.
+    - 빈칸에는 -50이 들어갑니다.
+    check:
+      noError: validateMinArea 정의와 호출이 끝나야 합니다.
+      resultCheck: hasNegHint가 True여야 합니다.
+  check:
+    noError: validateMinArea와 analyzeContours 정의가 끝나야 합니다.
+    resultCheck: okResult의 objectCount가 1 이상이고 zeroMessage에 '양수' 단서가 포함되어야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: opencv_09-contour-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_create
+    - workflow_validation
+    title: 컨투어 탐지기 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: retrieval mode·approximation·면적 threshold를 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_contour_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_contour_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_contour_contract(value):
+            required = ['retrievalMode', 'approximation', 'minArea', 'maxContours']
+            rules = [{'id': 'retrieval', 'field': 'retrievalMode', 'kind': 'enum', 'values': ['external', 'list', 'tree']}, {'id': 'approximation', 'field': 'approximation', 'kind': 'enum', 'values': ['simple', 'none']}, {'id': 'min-area', 'field': 'minArea', 'kind': 'range', 'min': 0, 'max': 100000000}, {'id': 'max-contours', 'field': 'maxContours', 'kind': 'range', 'min': 1, 'max': 10000}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'contour', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.opencv.opencv_09.contour-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.opencv.opencv_09.contour-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_contour_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              retrievalMode: external
+              approximation: simple
+              minArea: 100
+              maxContours: 1000
+          expectedReturn:
+            accepted: true
+            topic: contour
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              approximation: simple
+              minArea: 100
+              maxContours: 1000
+          expectedReturn:
+            accepted: false
+            topic: contour
+            missing:
+            - retrievalMode
+            violations:
+            - retrieval
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              retrievalMode: all-magic
+              approximation: curve
+              minArea: -1
+              maxContours: 0
+          expectedReturn:
+            accepted: false
+            topic: contour
+            missing: []
+            violations:
+            - approximation
+            - max-contours
+            - min-area
+            - retrieval
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: opencv_09-contour-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - opencv_09-contour-contract-audit-mastery
+    title: 컨투어 탐지기 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_contour_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_contour_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_contour_result(expected, observed):
+            identity = ['sourceHash', 'contourConfig']
+            metrics = {'acceptedContours': 0}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'contour', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.opencv.opencv_09.contour-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.opencv.opencv_09.contour-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_contour_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              sourceHash: co1
+              contourConfig: ext-a100
+              acceptedContours: 12
+          - value:
+              sourceHash: co1
+              contourConfig: ext-a100
+              acceptedContours: 12
+          expectedReturn:
+            passed: true
+            topic: contour
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              sourceHash: co1
+              contourConfig: ext-a100
+              acceptedContours: 12
+          - value:
+              sourceHash: co2
+              contourConfig: tree
+              acceptedContours: 50
+          expectedReturn:
+            passed: false
+            topic: contour
+            missing: []
+            identityMismatch:
+            - contourConfig
+            - sourceHash
+            metricDrift:
+            - acceptedContours
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              sourceHash: co1
+              contourConfig: ext-a100
+              acceptedContours: 12
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: contour
+            missing:
+            - acceptedContours
+            - contourConfig
+            - sourceHash
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: opencv_09-contour-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - opencv_09-contour-result-reconciliation-transfer
+    title: 컨투어 탐지기 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_contour_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_contour_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_contour_evidence(stage):
+            stages = {'source': {'action': 'validate contour source', 'evidence': 'binary source and retrieval config', 'risk': 'invalid image contract'}, 'operation': {'action': 'run bounded contour operation', 'evidence': 'hierarchy and area trace', 'risk': 'unstable parameters'}, 'result': {'action': 'reconcile contour result', 'evidence': 'accepted contour geometry', 'risk': 'wrong visual inference'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.opencv.opencv_09.contour-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.opencv.opencv_09.contour-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_contour_evidence
+        cases:
+        - id: recalls-source
+          arguments:
+          - value: source
+          expectedReturn:
+            action: validate contour source
+            evidence: binary source and retrieval config
+            risk: invalid image contract
+        - id: recalls-operation
+          arguments:
+          - value: operation
+          expectedReturn:
+            action: run bounded contour operation
+            evidence: hierarchy and area trace
+            risk: unstable parameters
+        - id: recalls-result
+          arguments:
+          - value: result
+          expectedReturn:
+            action: reconcile contour result
+            evidence: accepted contour geometry
+            risk: wrong visual inference
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

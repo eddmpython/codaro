@@ -1,0 +1,622 @@
+var e=`meta:
+  id: visionBasics_05
+  title: 슬라이싱과 ROI
+  order: 5
+  category: visionBasics
+  difficulty: ⭐⭐
+  badge: 기초
+  packages:
+  - matplotlib
+  - numpy
+  - scikit-learn
+  tags:
+  - numpy
+  - 슬라이싱
+  - ROI
+  - 영역추출
+  - 합성
+  seo:
+    title: 이미지 비전 기초 - 슬라이싱과 ROI
+    description: 슬라이싱으로 이미지의 관심 영역을 추출하고 다른 위치에 붙입니다. view와 copy의 차이도 정리합니다.
+    keywords:
+    - numpy
+    - 슬라이싱
+    - ROI
+    - 이미지
+    - 영역
+intro:
+  emoji: ✂️
+  goal: 사진의 관심 영역을 잘라 다른 위치에 붙이는 방법과 view/copy의 차이를 익힙니다.
+  description: |-
+    얼굴 인식, 객체 탐지, 워터마크 - 거의 모든 비전 작업이 "사진의 특정 사각형 영역에 무언가를 한다"는 패턴입니다. 이 패턴이 numpy 슬라이싱입니다. 이 강의는 슬라이싱으로 ROI(Region of Interest)를 추출하고 다른 사진에 붙이고 모자이크를 만들어 봅니다.
+  direction: 사진의 일부를 잘라 다른 자리에 붙이고, 슬라이싱이 원본을 공유하는 view인지 독립 사본인지를 확인합니다.
+  benefits:
+  - 사진의 사각형 영역 한 번에 추출할 수 있습니다.
+  - 여러 영역을 격자로 모아 모자이크나 비교 이미지를 만들 수 있습니다.
+  - view와 copy의 차이를 알고 의도치 않은 원본 손상을 피할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 영역 추출
+      detail: 사각형 좌표로 ROI를 잘라냅니다.
+    - label: 2단계. ROI 붙여넣기
+      detail: 같은 크기의 영역에 ROI를 대입해 합성합니다.
+    - label: 3단계. view와 copy 차이
+      detail: 슬라이싱이 원본을 공유하는지 확인합니다.
+    - label: 4단계. 모자이크 만들기
+      detail: 여러 ROI를 격자에 모읍니다.
+    - label: 5단계. 단순 모자이크 익명화
+      detail: 영역을 축소·확대해 모자이크 효과를 적용합니다.
+    runtime:
+    - label: numpy 환경
+      detail: 모든 작업이 슬라이싱과 대입만으로 이뤄집니다.
+    - label: 검증 흐름
+      detail: assert와 시각 비교로 학습 결과가 기대값과 같은지 확인합니다.
+sections:
+- id: extract_roi
+  title: 1단계. ROI 추출
+  structuredPrimary: true
+  subtitle: 사각형 영역 잘라내기
+  goal: 사진에서 사각형 영역만 잘라낸 별도 이미지를 만듭니다.
+  why: 관심 영역에 집중해야 분석이 빨라지고 코드가 단순해집니다.
+  explanation: |-
+    \`img[y0:y1, x0:x1]\` 는 (y0~y1-1, x0~x1-1) 사각형을 가리키는 슬라이스입니다. 변수에 대입하면 그 영역만 담은 ndarray가 됩니다. shape은 \`(y1-y0, x1-x0, 채널)\` 입니다.
+
+    사진의 정중앙 영역을 자르려면 중심 좌표를 구한 뒤 반경을 더하고 빼는 방식이 자연스럽습니다.
+  tips:
+  - ROI는 단순 변수이지만 원본의 메모리를 공유합니다. 다음 섹션에서 그 점을 확인합니다.
+  snippet: |-
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from sklearn.datasets import load_sample_image
+
+    flower = load_sample_image('flower.jpg')
+    h, w = flower.shape[:2]
+    roi = flower[h // 4: h * 3 // 4, w // 4: w * 3 // 4]
+    roi.shape
+  exercise:
+    prompt: china 이미지에서 좌상단 200x200 픽셀 영역을 잘라 cornerRoi로 만들고 imshow로 확인하세요.
+    starterCode: |-
+      china = load_sample_image('china.jpg')
+      cornerRoi = china[0:___, 0:___]
+      fig = plt.figure(figsize=(4, 4))
+      plt.imshow(cornerRoi)
+      plt.axis('off')
+      fig
+    hints:
+    - 좌상단은 행 0부터, 열 0부터 시작하는 영역입니다.
+    - 결과 shape의 첫 두 차원이 200이어야 합니다.
+  check:
+    noError: 슬라이싱과 imshow가 오류 없이 끝나야 합니다.
+    resultCheck: cornerRoi.shape의 첫 두 차원이 (200, 200)이어야 합니다.
+- id: paste_roi
+  title: 2단계. ROI 붙여넣기
+  structuredPrimary: true
+  subtitle: 같은 크기의 영역에 대입
+  goal: 추출한 ROI를 다른 위치에 붙여 합성을 만듭니다.
+  why: 워터마크와 객체 합성은 모두 "같은 크기의 영역에 다른 ROI를 대입한다"는 한 줄 패턴입니다.
+  explanation: |-
+    같은 크기의 슬라이스에 다른 배열을 대입하면 그 영역만 교체됩니다. 모양이 다르면 numpy가 ValueError를 발생시킵니다. 합성 전 항상 두 영역의 shape을 확인하는 것이 안전합니다.
+
+    원본을 보존하려면 \`.copy()\` 로 사본을 만들고 그 사본에 붙이는 패턴이 표준입니다.
+  tips:
+  - 붙여넣을 영역의 크기가 ROI와 다르면 사전에 resize가 필요한데, 이 트랙에서는 다루지 않고 다음 트랙(opencv)에서 학습합니다.
+  snippet: |-
+    canvas = flower.copy()
+    canvas[0:roi.shape[0], 0:roi.shape[1]] = roi
+    fig = plt.figure(figsize=(6, 4))
+    plt.imshow(canvas)
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: cornerRoi를 china의 우하단(끝에서 200x200 영역)에 붙여 patched를 만들세요.
+    starterCode: |-
+      patched = china.copy()
+      patched[___:, ___:] = cornerRoi
+      fig2 = plt.figure(figsize=(6, 4))
+      plt.imshow(patched)
+      plt.axis('off')
+      fig2
+    hints:
+    - 우하단 시작 인덱스는 (높이 - 200, 너비 - 200)입니다.
+    - 음수 인덱스(-200:) 로 표현해도 됩니다.
+  check:
+    noError: 대입과 imshow가 오류 없이 끝나야 합니다.
+    resultCheck: patched의 우하단 200x200 픽셀이 cornerRoi와 같아야 합니다.
+- id: view_vs_copy
+  title: 3단계. view와 copy의 차이
+  structuredPrimary: true
+  subtitle: 원본 공유 여부
+  goal: 슬라이싱이 원본 메모리를 공유한다는 사실을 직접 확인합니다.
+  why: view를 모르면 ROI 한쪽을 수정했는데 원본이 같이 바뀌는 버그가 자주 생깁니다.
+  explanation: |-
+    \`roiView = img[10:50, 10:50]\` 는 원본의 일부를 가리키는 view입니다. \`roiView[:] = 0\` 으로 검정으로 채우면 원본도 같은 영역이 검정이 됩니다.
+
+    독립 사본이 필요하면 \`roiCopy = img[10:50, 10:50].copy()\` 처럼 명시적으로 복사합니다. \`roiCopy\`는 별도 메모리이므로 수정해도 원본은 그대로입니다.
+  tips:
+  - "\`.base\` 속성이 None이 아니면 view, None이면 독립 배열입니다. 디버깅에 유용합니다."
+  snippet: |-
+    sample = flower.copy()
+    viewRoi = sample[100:200, 100:200]
+    viewRoi[:] = 0
+    sample[150, 150]
+  exercise:
+    prompt: 새 사본 sampleTwo를 만들어 ROI를 .copy() 로 추출한 뒤 검정으로 채우고, 원본 sampleTwo가 영향받지 않음을 확인하세요.
+    starterCode: |-
+      sampleTwo = flower.copy()
+      copiedRoi = sampleTwo[100:200, 100:200].___()
+      copiedRoi[:] = 0
+      sampleTwo[150, 150]
+    hints:
+    - 빈칸은 메서드 이름 한 단어입니다.
+    - 원본 픽셀은 변하지 않아야 합니다.
+  check:
+    noError: 메서드 호출과 인덱싱이 오류 없이 끝나야 합니다.
+    resultCheck: sampleTwo[150, 150]이 0이 아니어야 합니다(원본 보존됨).
+- id: mosaic_grid
+  title: 4단계. 모자이크 그리드 만들기
+  structuredPrimary: true
+  subtitle: 같은 크기 영역들 모으기
+  goal: 한 사진을 같은 크기의 격자로 잘라 새 격자판에 다시 배열합니다.
+  why: 격자 모자이크는 데이터셋 미리보기, 비교 시각화 등에 자주 쓰입니다.
+  explanation: |-
+    높이와 너비를 격자 수로 나눠 각 셀의 크기를 정하고, 두 개의 for 루프로 셀을 잘라 새 캔버스의 같은 위치에 붙입니다. 같은 모양을 보장하기 위해 격자 수로 나누어 떨어지는 크기로 자릅니다.
+  tips:
+  - 격자 모자이크의 셀 크기를 너무 작게 하면 안에 무엇이 있는지 알아볼 수 없습니다.
+  snippet: |-
+    cropped = flower[: h // 4 * 4, : w // 4 * 4]
+    cellH = cropped.shape[0] // 4
+    cellW = cropped.shape[1] // 4
+    mosaic = np.zeros_like(cropped)
+    for rowIdx in range(4):
+        for colIdx in range(4):
+            cell = cropped[
+                rowIdx * cellH:(rowIdx + 1) * cellH,
+                colIdx * cellW:(colIdx + 1) * cellW,
+            ]
+            mosaic[
+                rowIdx * cellH:(rowIdx + 1) * cellH,
+                colIdx * cellW:(colIdx + 1) * cellW,
+            ] = cell[::-1, ::-1]
+    fig = plt.figure(figsize=(6, 4))
+    plt.imshow(mosaic)
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: 셀을 좌우 반전만 시킨 mosaicFlip을 만드세요(상하 반전 없음).
+    starterCode: |-
+      mosaicFlip = np.zeros_like(cropped)
+      for rowIdx in range(4):
+          for colIdx in range(4):
+              cell = cropped[
+                  rowIdx * cellH:(rowIdx + 1) * cellH,
+                  colIdx * cellW:(colIdx + 1) * cellW,
+              ]
+              mosaicFlip[
+                  rowIdx * cellH:(rowIdx + 1) * cellH,
+                  colIdx * cellW:(colIdx + 1) * cellW,
+              ] = cell[:, ___]
+      fig2 = plt.figure(figsize=(6, 4))
+      plt.imshow(mosaicFlip)
+      plt.axis('off')
+      fig2
+    hints:
+    - 좌우 반전은 두 번째 축을 뒤집는 [::-1]입니다.
+    - 첫 번째 축은 그대로 슬라이싱합니다.
+  check:
+    noError: 두 for문이 오류 없이 끝나야 합니다.
+    resultCheck: mosaicFlip의 shape이 cropped와 같아야 합니다.
+- id: pixelate
+  title: 5단계. 모자이크 익명화
+  structuredPrimary: true
+  subtitle: 영역을 거칠게 만들기
+  goal: ROI를 작은 격자 색으로 평균화해 모자이크 효과를 만듭니다.
+  why: 모자이크 익명화는 얼굴 가리기, 차량 번호판 처리 같은 실무 작업의 시작점입니다.
+  explanation: |-
+    영역을 정사각형 셀로 나누고 각 셀의 평균 색으로 그 셀 전체를 채우면 픽셀화(pixelate) 효과가 됩니다. 셀이 클수록 거칠게 보입니다.
+
+    이 강의에서는 작은 ROI에만 효과를 적용하고 원본의 나머지 부분은 그대로 둡니다.
+  tips:
+  - 셀 평균 색은 셀의 mean(axis=(0, 1))로 한 번에 구합니다.
+  snippet: |-
+    target = flower.copy()
+    px = 20
+    region = target[h // 3: h // 3 + 200, w // 3: w // 3 + 200].copy()
+    for rowIdx in range(0, region.shape[0], px):
+        for colIdx in range(0, region.shape[1], px):
+            cell = region[rowIdx:rowIdx + px, colIdx:colIdx + px]
+            region[rowIdx:rowIdx + px, colIdx:colIdx + px] = cell.mean(axis=(0, 1)).astype(np.uint8)
+    target[h // 3: h // 3 + 200, w // 3: w // 3 + 200] = region
+    fig = plt.figure(figsize=(6, 4))
+    plt.imshow(target)
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: 셀 크기 px를 8과 40으로 각각 바꿔 보고, 시각적으로 어떤 차이가 나는지 확인하세요(코드는 region 부분만 바꿔도 됩니다).
+    starterCode: |-
+      coarse = flower.copy()
+      bigPx = ___
+      bigRegion = coarse[h // 3: h // 3 + 200, w // 3: w // 3 + 200].copy()
+      for rowIdx in range(0, bigRegion.shape[0], bigPx):
+          for colIdx in range(0, bigRegion.shape[1], bigPx):
+              cell = bigRegion[rowIdx:rowIdx + bigPx, colIdx:colIdx + bigPx]
+              bigRegion[rowIdx:rowIdx + bigPx, colIdx:colIdx + bigPx] = cell.mean(axis=(0, 1)).astype(np.uint8)
+      coarse[h // 3: h // 3 + 200, w // 3: w // 3 + 200] = bigRegion
+      fig2 = plt.figure(figsize=(6, 4))
+      plt.imshow(coarse)
+      plt.axis('off')
+      fig2
+    hints:
+    - bigPx를 40 정도로 두면 정말 거칠어집니다.
+    - 셀이 ROI 크기를 정확히 나누지 않으면 마지막 행/열 셀이 더 작아집니다.
+  check:
+    noError: 모자이크 처리가 오류 없이 끝나야 합니다.
+    resultCheck: coarse의 가운데 200x200 영역과 flower의 같은 영역이 달라야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 슬라이싱 자유 연습
+  goal: 슬라이싱·합성·익명화를 종합한 두 미션을 풉니다.
+  why: 학습한 패턴을 한 번에 묶어 새 결과물을 만들어 봐야 손에 남습니다.
+  explanation: |-
+    각 미션은 import문부터 시작하지만, 위 예제를 실행했다면 import는 생략해도 됩니다.
+  tips:
+  - ROI의 크기를 변수로 고정해 두면 같은 ROI를 여러 위치에 복사할 때 코드가 짧아집니다.
+  snippet: |-
+    china = load_sample_image('china.jpg')
+
+    swap = flower.copy()
+    half = h // 2
+    top = swap[:half].copy()
+    bottom = swap[half:half * 2].copy()
+    swap[:half] = bottom
+    swap[half:half * 2] = top
+    fig = plt.figure(figsize=(5, 4))
+    plt.imshow(swap)
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: "미션1: china의 좌측 절반과 우측 절반을 서로 바꾼 mirrorChina를 만드세요(슬라이싱과 .copy만 사용). 미션2: china의 가운데 60x60 영역만 px=12 모자이크로 익명화한 anonyChina를 만드세요."
+    starterCode: |-
+      mirrorChina = china.copy()
+      midCol = mirrorChina.shape[1] // 2
+      leftSide = china[:, :midCol].copy()
+      rightSide = china[:, midCol:].copy()
+      mirrorChina[:, :midCol] = rightSide[:, :midCol]
+      mirrorChina[:, midCol:] = leftSide[:, :midCol]
+      mirrorFig = plt.figure(figsize=(5, 4))
+      plt.imshow(mirrorChina)
+      plt.axis('off')
+      mirrorFig
+    hints:
+    - 좌우의 크기가 다를 수 있으니 같은 너비만 잘라 대입하세요.
+    - 두 절반의 너비가 다르면 슬라이스 너비를 맞추는 [:midCol] 트릭이 필요합니다.
+  check:
+    noError: 좌우 교체가 오류 없이 끝나야 합니다.
+    resultCheck: mirrorChina와 china의 가운데 픽셀(중심 행, midCol) 색이 서로 달라야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: visionBasics_05-roi_slice-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - extract_roi
+    - practice
+    title: 슬라이싱과 ROI 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 반개구간 ROI 좌표의 순서와 범위를 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_roi_slice_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_roi_slice_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_roi_slice_contract(value):
+            required = ['x0', 'x1', 'y0', 'y1', 'coordinateOrder']
+            rules = [{'id': 'x-start', 'field': 'x0', 'kind': 'range', 'min': 0, 'max': 4095}, {'id': 'x-order', 'field': 'x0', 'kind': 'ordered', 'other': 'x1'}, {'id': 'y-start', 'field': 'y0', 'kind': 'range', 'min': 0, 'max': 4095}, {'id': 'y-order', 'field': 'y0', 'kind': 'ordered', 'other': 'y1'}, {'id': 'coordinate-order', 'field': 'coordinateOrder', 'kind': 'enum', 'values': ['yx']}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'roi_slice', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.vision-basics.visionBasics_05.roi_slice-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_05.roi_slice-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_roi_slice_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              x0: 10
+              x1: 110
+              y0: 20
+              y1: 80
+              coordinateOrder: yx
+          expectedReturn:
+            accepted: true
+            topic: roi_slice
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              x1: 110
+              y0: 20
+              y1: 80
+              coordinateOrder: yx
+          expectedReturn:
+            accepted: false
+            topic: roi_slice
+            missing:
+            - x0
+            violations:
+            - x-order
+            - x-start
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              x0: 100
+              x1: 10
+              y0: 80
+              y1: 20
+              coordinateOrder: xy
+          expectedReturn:
+            accepted: false
+            topic: roi_slice
+            missing: []
+            violations:
+            - coordinate-order
+            - x-order
+            - y-order
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: visionBasics_05-roi_slice-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionBasics_05-roi_slice-contract-audit-mastery
+    title: 슬라이싱과 ROI 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_roi_slice_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_roi_slice_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_roi_slice_result(expected, observed):
+            identity = ['sourceHash', 'roiId']
+            metrics = {'area': 0}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'roi_slice', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.vision-basics.visionBasics_05.roi_slice-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_05.roi_slice-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_roi_slice_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              sourceHash: r1
+              roiId: face
+              area: 6000
+          - value:
+              sourceHash: r1
+              roiId: face
+              area: 6000
+          expectedReturn:
+            passed: true
+            topic: roi_slice
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              sourceHash: r1
+              roiId: face
+              area: 6000
+          - value:
+              sourceHash: r2
+              roiId: background
+              area: 5500
+          expectedReturn:
+            passed: false
+            topic: roi_slice
+            missing: []
+            identityMismatch:
+            - roiId
+            - sourceHash
+            metricDrift:
+            - area
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              sourceHash: r1
+              roiId: face
+              area: 6000
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: roi_slice
+            missing:
+            - area
+            - roiId
+            - sourceHash
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: visionBasics_05-roi_slice-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionBasics_05-roi_slice-result-reconciliation-transfer
+    title: 슬라이싱과 ROI 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_roi_slice_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_roi_slice_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_roi_slice_evidence(stage):
+            stages = {'input': {'action': 'validate ROI input contract', 'evidence': 'half-open coordinate box', 'risk': 'misinterpreted pixels'}, 'process': {'action': 'apply bounded ROI operation', 'evidence': 'slice shape trace', 'risk': 'silent shape or range drift'}, 'result': {'action': 'reconcile ROI result', 'evidence': 'ROI area and identity', 'risk': 'plausible but wrong image'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.vision-basics.visionBasics_05.roi_slice-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_05.roi_slice-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_roi_slice_evidence
+        cases:
+        - id: recalls-input
+          arguments:
+          - value: input
+          expectedReturn:
+            action: validate ROI input contract
+            evidence: half-open coordinate box
+            risk: misinterpreted pixels
+        - id: recalls-process
+          arguments:
+          - value: process
+          expectedReturn:
+            action: apply bounded ROI operation
+            evidence: slice shape trace
+            risk: silent shape or range drift
+        - id: recalls-result
+          arguments:
+          - value: result
+          expectedReturn:
+            action: reconcile ROI result
+            evidence: ROI area and identity
+            risk: plausible but wrong image
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

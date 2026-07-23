@@ -1,0 +1,769 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - networkx
+  id: networkx_03
+  title: 최단경로찾기
+  order: 3
+  category: networkx
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - networkx
+  - 최단경로
+  - shortest_path
+  - 다익스트라
+  - 경로탐색
+  seo:
+    title: NetworkX 최단 경로 - shortest_path와 다익스트라
+    description: NetworkX로 두 노드 사이 최단 경로를 찾습니다. 가중치 없는 경로와 다익스트라 알고리즘을 배웁니다.
+    keywords:
+    - networkx
+    - 최단경로
+    - shortest_path
+    - 다익스트라
+    - dijkstra
+    - 경로
+intro:
+  emoji: 🛤️
+  goal: 두 노드 사이 최단 경로를 찾고 경로 관련 함수를 활용합니다.
+  description: 최단 경로는 네트워크 분석의 핵심입니다. shortest_path()로 경로를 찾고, has_path()로 연결 여부를 확인합니다. 가중치가 있으면 다익스트라
+    알고리즘이 적용됩니다. 지하철 노선도 예제로 실습합니다.
+  direction: 최단경로찾기에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.
+  benefits:
+  - 관계 데이터 확인 후 그래프 알고리즘에 맞는 코드 입력을 고릅니다.
+  - 최단경로찾기 결과를 노드/엣지와 지표 값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 관계 분석 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(관계 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 기본 최단 경로 처리 실행
+      detail: 그래프 알고리즘 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 연결 확인 결과 검증
+      detail: 노드/엣지와 지표 값 기준으로 실행 결과를 비교합니다.
+    - label: 최단경로찾기 재사용
+      detail: 완성 코드를 관계 분석 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 그래프 분석 환경
+      detail: matplotlib, networkx 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 최단경로찾기 실행
+      detail: 셀을 실행해 노드/엣지와 지표 값와 예외 상태를 확인합니다.
+    - label: 최단경로찾기 완료
+      detail: 검증된 코드를 관계 분석 리포트로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: NetworkX와 matplotlib을 불러옵니다. NetworkX는 그래프 알고리즘을 제공하고, matplotlib은 경로 시각화에 사용됩니다. 최단 경로
+    알고리즘은 네트워크 분석의 핵심으로, 내비게이션, 소셜 네트워크의 관계 거리, 통신망 라우팅 등 다양한 분야에서 활용됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import networkx as nx
+    import matplotlib.pyplot as plt
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+    hints:
+    - 바꿀 지점은 관계 데이터을 만드는 첫 줄과 그래프 알고리즘 줄에서 찾으세요.
+    - 실행 뒤 노드/엣지와 지표 값 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 노드/엣지와 지표 값 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step2_simple_path
+  title: 2단계. 기본 최단 경로
+  structuredPrimary: true
+  subtitle: shortest_path()
+  goal: 2단계. 기본 최단 경로에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    shortest_path(G, source, target)로 두 노드 사이 최단 경로를 찾습니다. 가중치가 없으면 BFS(너비 우선 탐색)를 사용하여 엣지 수가 가장 적은 경로를 반환합니다. 최단 경로는 출발 노드부터 도착 노드까지 거쳐가는 노드들의 리스트로 반환됩니다. shortest_path_length()는 경로의 길이(엣지 수)만 반환하여 메모리를 절약할 수 있습니다.
+
+    경로 길이는 경로에 포함된 엣지의 수입니다. 노드 수 - 1과 같습니다.
+  snippet: |-
+    G = nx.Graph()
+    G.add_edges_from([
+        (1, 2), (1, 3), (2, 3), (2, 4),
+        (3, 4), (3, 5), (4, 5), (4, 6), (5, 6)
+    ])
+    list(G.edges())
+  exercise:
+    prompt: 2단계. 기본 최단 경로 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      G = nx.Graph()
+      G.add_edges_from([
+          (1, 2), (1, 3), (2, 3), (2, 4),
+          (3, 4), (3, 5), (4, 5), (4, 6), (5, 6)
+      ])
+      list(G.edges())
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 2단계. 기본 최단 경로에서 \`G\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. 기본 최단 경로 실행 뒤 \`G\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step3_has_path
+  title: 3단계. 연결 확인
+  structuredPrimary: true
+  subtitle: has_path()
+  goal: 3단계. 연결 확인에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    has_path()로 두 노드가 연결되어 있는지 확인합니다. 그래프가 여러 컴포넌트로 분리된 경우, 서로 다른 컴포넌트에 속한 노드 사이에는 경로가 존재하지 않습니다. shortest_path()를 호출하기 전에 has_path()로 연결 여부를 먼저 확인하면 NetworkXNoPath 예외를 방지할 수 있습니다. 대규모 네트워크에서는 이 확인이 중요합니다.
+
+    연결되지 않은 노드 사이에 shortest_path()를 호출하면 NetworkXNoPath 예외가 발생합니다.
+  snippet: |-
+    G2 = nx.Graph()
+    G2.add_edges_from([(1, 2), (2, 3)])
+    G2.add_edges_from([(4, 5), (5, 6)])
+    list(G2.edges())
+  exercise:
+    prompt: 3단계. 연결 확인 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      G2 = nx.Graph()
+      G2.add_edges_from([(1, 2), (2, 3)])
+      G2.add_edges_from([(4, 5), (5, 6)])
+      list(G2.edges())
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 3단계. 연결 확인에서 \`G2\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 연결 확인 실행 뒤 \`G2\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step4_all_paths
+  title: 4단계. 모든 경로 찾기
+  structuredPrimary: true
+  subtitle: all_simple_paths()
+  goal: 4단계. 모든 경로 찾기에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    all_simple_paths()로 두 노드 사이의 모든 단순 경로를 찾습니다. 단순 경로(simple path)는 같은 노드를 두 번 방문하지 않는 경로입니다. 이 함수는 제너레이터를 반환하므로 메모리 효율적입니다. 큰 그래프에서는 경로 수가 기하급수적으로 증가할 수 있어 cutoff 파라미터로 최대 경로 길이를 제한하는 것이 권장됩니다.
+
+    큰 그래프에서는 경로 수가 폭발적으로 증가합니다. cutoff 파라미터로 최대 길이를 제한하세요.
+  snippet: |-
+    allPaths = list(nx.all_simple_paths(G, source=1, target=6))
+    allPaths
+  exercise:
+    prompt: 4단계. 모든 경로 찾기 예제에서 \`allPaths\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      allPaths = list(nx.all_simple_paths(G, source=1, target=6))
+      allPaths
+    hints:
+    - 바꿀 지점은 \`allPaths = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`allPaths\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 4단계. 모든 경로 찾기에서 \`allPaths\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 4단계. 모든 경로 찾기 실행 뒤 \`allPaths\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step5_weighted
+  title: 5단계. 가중치 최단 경로
+  structuredPrimary: true
+  subtitle: 다익스트라 알고리즘
+  goal: 5단계. 가중치 최단 경로에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    가중치 그래프에서는 엣지 수가 아닌 가중치 합이 최소인 경로를 찾습니다. weight 파라미터로 엣지 속성 이름을 지정하면 다익스트라(Dijkstra) 알고리즘이 자동으로 적용됩니다. 다익스트라 알고리즘은 1956년 에츠허르 다익스트라가 개발한 알고리즘으로, 음수가 아닌 가중치를 가진 그래프에서 최적의 경로를 보장합니다. GPS 내비게이션, 네트워크 라우팅 프로토콜(OSPF) 등에서 핵심적으로 사용됩니다.
+
+    weight="weight"를 지정하면 다익스트라 알고리즘이 적용됩니다. 가중치 합이 최소인 경로를 찾습니다.
+  snippet: |-
+    cities = nx.Graph()
+    cities.add_edge("Seoul", "Daejeon", weight=140)
+    cities.add_edge("Seoul", "Wonju", weight=120)
+    cities.add_edge("Daejeon", "Daegu", weight=120)
+    cities.add_edge("Wonju", "Daegu", weight=180)
+    cities.add_edge("Daegu", "Busan", weight=90)
+    cities.add_edge("Daejeon", "Gwangju", weight=150)
+    cities.edges(data=True)
+  exercise:
+    prompt: 5단계. 가중치 최단 경로 예제에서 \`cities\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      cities = nx.Graph()
+      cities.add_edge("Seoul", "Daejeon", weight=140)
+      cities.add_edge("Seoul", "Wonju", weight=120)
+      cities.add_edge("Daejeon", "Daegu", weight=120)
+      cities.add_edge("Wonju", "Daegu", weight=180)
+      cities.add_edge("Daegu", "Busan", weight=90)
+      cities.add_edge("Daejeon", "Gwangju", weight=150)
+      cities.edges(data=True)
+    hints:
+    - 바꿀 지점은 \`cities = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`cities\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 5단계. 가중치 최단 경로에서 \`cities\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 가중치 최단 경로 실행 뒤 \`cities\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step6_visualize_path
+  title: 6단계. 경로 시각화
+  structuredPrimary: true
+  subtitle: 경로 강조 표시
+  goal: 6단계. 경로 시각화에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    최단 경로를 시각화에서 강조하면 결과를 직관적으로 이해할 수 있습니다. 노드 리스트로 된 경로를 엣지 리스트로 변환한 뒤, draw_networkx_edges()로 해당 엣지만 다른 색상이나 두께로 그립니다. 배경 그래프는 연한 색으로, 경로는 눈에 띄는 색으로 표현하는 것이 효과적입니다.
+
+    draw_networkx_edges()와 draw_networkx_nodes()로 특정 엣지나 노드만 다르게 그릴 수 있습니다.
+  snippet: |-
+    pathSB = nx.shortest_path(cities, "Seoul", "Busan", weight="weight")
+    pathEdges = list(zip(pathSB[:-1], pathSB[1:]))
+    pathEdges
+  exercise:
+    prompt: 6단계. 경로 시각화 예제에서 출발/도착 도시를 바꾸고 경로 엣지 리스트가 달라지는지 확인하세요.
+    starterCode: |-
+      pathSB = nx.shortest_path(cities, "Seoul", "Busan", weight="weight")
+      pathEdges = list(zip(pathSB[:-1], pathSB[1:]))
+      pathEdges
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 6단계. 경로 시각화에서 \`pathEdges\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 경로 시각화 실행 뒤 \`pathEdges\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step7_all_shortest
+  title: 7단계. 모든 최단 경로
+  structuredPrimary: true
+  subtitle: 한 노드에서 모든 노드로
+  goal: 7단계. 모든 최단 경로에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    source만 지정하고 target을 생략하면 해당 노드에서 도달 가능한 모든 노드까지의 최단 경로를 한 번에 계산합니다. 결과는 딕셔너리 형태로 반환되어 각 목적지별 경로를 쉽게 조회할 수 있습니다. 이 방식은 개별적으로 여러 번 호출하는 것보다 효율적이며, 한 지점에서 전체 네트워크로의 접근성을 분석할 때 유용합니다.
+
+    target을 생략하면 source에서 도달 가능한 모든 노드까지의 경로/거리를 반환합니다.
+  snippet: |-
+    allFromSeoul = nx.shortest_path(cities, source="Seoul", weight="weight")
+    allFromSeoul
+  exercise:
+    prompt: 7단계. 모든 최단 경로 예제에서 \`allFromSeoul\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      allFromSeoul = nx.shortest_path(cities, source="Seoul", weight="weight")
+      allFromSeoul
+    hints:
+    - 바꿀 지점은 \`allFromSeoul = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`allFromSeoul\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 7단계. 모든 최단 경로에서 \`allFromSeoul\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. 모든 최단 경로 실행 뒤 \`allFromSeoul\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step8_subway
+  title: 8단계. 지하철 노선도
+  structuredPrimary: true
+  subtitle: 실제 예제
+  goal: 8단계. 지하철 노선도에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: 지하철 노선도를 그래프로 모델링합니다. 각 역은 노드로, 역 사이 구간은 엣지로, 이동 소요시간은 엣지의 가중치로 표현합니다. 이런 모델링을 통해 최단 시간
+    경로, 최소 환승 경로 등 다양한 경로 탐색 문제를 해결할 수 있습니다. 실제 지하철 앱들도 이와 유사한 그래프 알고리즘을 사용하여 경로를 추천합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    subway = nx.Graph()
+    subwayEdges = [
+        ("Gangnam", "Yeoksam", 2),
+        ("Yeoksam", "Seolleung", 2),
+        ("Seolleung", "Samsung", 3),
+        ("Samsung", "Jamsil", 5),
+        ("Gangnam", "Express", 3),
+        ("Express", "Sinnonhyeon", 2),
+        ("Sinnonhyeon", "Nonhyeon", 2),
+        ("Nonhyeon", "Hakdong", 2),
+        ("Hakdong", "Samsung", 4)
+    ]
+    for u, v, t in subwayEdges:
+        subway.add_edge(u, v, time=t)
+    subway.edges(data=True)
+  exercise:
+    prompt: 8단계. 지하철 노선도 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      subway = nx.Graph()
+      subwayEdges = [
+          ("Gangnam", "Yeoksam", 2),
+          ("Yeoksam", "Seolleung", 2),
+          ("Seolleung", "Samsung", 3),
+          ("Samsung", "Jamsil", 5),
+          ("Gangnam", "Express", 3),
+          ("Express", "Sinnonhyeon", 2),
+          ("Sinnonhyeon", "Nonhyeon", 2),
+          ("Nonhyeon", "Hakdong", 2),
+          ("Hakdong", "Samsung", 4)
+      ]
+      for u, v, t in subwayEdges:
+          subway.add_edge(u, v, time=t)
+      subway.edges(data=True)
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 8단계. 지하철 노선도의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 8단계. 지하철 노선도 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step9_diameter
+  title: 9단계. 그래프 지름
+  structuredPrimary: true
+  subtitle: 가장 먼 두 노드
+  goal: 9단계. 그래프 지름에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    그래프의 지름(diameter)은 모든 노드 쌍 중 최단 경로가 가장 긴 것의 길이입니다. 네트워크의 '최대 거리'를 나타내며, 두 노드가 최악의 경우에도 몇 단계 내에 연결되는지를 의미합니다. 반지름(radius)은 중심 노드에서 가장 먼 노드까지의 거리입니다. 중심(center)은 이심률이 반지름과 같은 노드들로, 네트워크에서 가장 접근성이 좋은 위치입니다.
+
+    중심(center)은 모든 노드까지의 최대 거리가 최소인 노드입니다. 네트워크에서 가장 접근성이 좋은 위치입니다.
+  snippet: |-
+    diameter = nx.diameter(G)
+    diameter
+  exercise:
+    prompt: 9단계. 그래프 지름 예제에서 \`diameter\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      diameter = nx.diameter(G)
+      diameter
+    hints:
+    - 바꿀 지점은 \`diameter = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`diameter\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 9단계. 그래프 지름에서 \`diameter\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 9단계. 그래프 지름 실행 뒤 \`diameter\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step10_eccentricity
+  title: 10단계. 이심률
+  structuredPrimary: true
+  subtitle: eccentricity
+  goal: 10단계. 이심률에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    이심률(eccentricity)은 한 노드에서 가장 먼 노드까지의 최단 경로 길이입니다. 각 노드가 네트워크에서 얼마나 중심에 있는지 또는 외곽에 있는지를 나타냅니다. 모든 노드의 이심률 중 최대가 지름(diameter), 최소가 반지름(radius)입니다. periphery(주변부)는 이심률이 지름과 같은 노드들로, 네트워크의 가장 바깥에 위치합니다.
+
+    periphery는 이심률이 지름과 같은 노드들입니다. 네트워크의 가장 바깥에 위치합니다.
+  snippet: |-
+    ecc = nx.eccentricity(G)
+    ecc
+  exercise:
+    prompt: 10단계. 이심률 예제에서 \`ecc\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      ecc = nx.eccentricity(G)
+      ecc
+    hints:
+    - 바꿀 지점은 \`ecc = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`ecc\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 10단계. 이심률에서 \`ecc\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 10단계. 이심률 실행 뒤 \`ecc\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 경로 탐색
+  goal: 실습에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    지금까지 배운 최단 경로 알고리즘을 활용하여 실전 미션을 수행해봅시다. 항공 네트워크에서 최적 경로를 찾고, 게임 맵에서 보스까지의 경로를 탐색합니다. 실제 응용에서 어떻게 활용되는지 경험해보세요.
+
+    각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  snippet: |-
+    import networkx as nx
+    import matplotlib.pyplot as plt
+
+    flight = nx.Graph()
+    flightRoutes = [
+        ("ICN", "NRT", 2),
+        ("ICN", "PEK", 2),
+        ("ICN", "HKG", 3),
+        ("NRT", "LAX", 11),
+        ("PEK", "LAX", 12),
+        ("HKG", "SIN", 4),
+        ("SIN", "SYD", 8),
+        ("LAX", "JFK", 5),
+        ("LAX", "SYD", 15)
+    ]
+    for u, v, h in flightRoutes:
+        flight.add_edge(u, v, hours=h)
+    flight.edges(data=True)
+  exercise:
+    prompt: 실습 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+
+      flight = nx.Graph()
+      flightRoutes = [
+          ("ICN", "NRT", 2),
+          ("ICN", "PEK", 2),
+          ("ICN", "HKG", 3),
+          ("NRT", "LAX", 11),
+          ("PEK", "LAX", 12),
+          ("HKG", "SIN", 4),
+          ("SIN", "SYD", 8),
+          ("LAX", "JFK", 5),
+          ("LAX", "SYD", 15)
+      ]
+      for u, v, h in flightRoutes:
+          flight.add_edge(u, v, hours=h)
+      flight.edges(data=True)
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 실습의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 실습 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 인수인계 네트워크
+  goal: 업무 흐름 검증에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 실무 네트워크 분석은 그래프를 그리는 데서 끝나지 않습니다. 먼저 병목 후보를 예측하고, 로컬 Python에서 실행한 뒤, 잘못된 노드나 끊어진 경로를 예외로
+    처리하고, 핵심 지표를 assert로 검증해야 합니다. 아래 흐름은 영업, 지원, 운영, 재무, 엔지니어링 사이의 인수인계 비용을 네트워크로 보고 개선안을 비교합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import networkx as nx
+
+    handoffEdges = [
+        ("sales", "support", 1),
+        ("support", "ops", 2),
+        ("ops", "finance", 1),
+        ("ops", "engineering", 1),
+        ("engineering", "infra", 2),
+        ("support", "customer_success", 2),
+    ]
+
+    workflowGraph = nx.Graph()
+    workflowGraph.add_weighted_edges_from(handoffEdges)
+
+    expectedNodes = {"sales", "support", "ops", "finance", "engineering", "infra", "customer_success"}
+    if set(workflowGraph.nodes()) != expectedNodes:
+        raise ValueError("인수인계 네트워크의 부서 목록이 예상과 다릅니다.")
+    if any(data["weight"] <= 0 for _, _, data in workflowGraph.edges(data=True)):
+        raise ValueError("인수인계 비용은 0보다 커야 합니다.")
+
+    salesToFinanceCost = nx.shortest_path_length(workflowGraph, "sales", "finance", weight="weight")
+    betweenness = nx.betweenness_centrality(workflowGraph, weight="weight")
+
+    workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      experimentGraph = workflowGraph.copy()
+      experimentGraph.add_edge("sales", "finance", weight=2)
+
+      improvedCost = nx.shortest_path_length(experimentGraph, "sales", "finance", weight="weight")
+      improvedBetweenness = nx.betweenness_centrality(experimentGraph, weight="weight")
+      improvement = salesToFinanceCost - improvedCost
+
+      assert improvement > 0
+      {
+          "beforeCost": salesToFinanceCost,
+          "afterCost": improvedCost,
+          "costImprovement": improvement,
+          "opsBetweennessBefore": round(betweenness["ops"], 3),
+          "opsBetweennessAfter": round(improvedBetweenness["ops"], 3),
+      }
+    solution: |-
+      import networkx as nx
+
+      handoffEdges = [
+          ("sales", "support", 1),
+          ("support", "ops", 2),
+          ("ops", "finance", 1),
+          ("ops", "engineering", 1),
+          ("engineering", "infra", 2),
+          ("support", "customer_success", 2),
+      ]
+
+      workflowGraph = nx.Graph()
+      workflowGraph.add_weighted_edges_from(handoffEdges)
+
+      expectedNodes = {"sales", "support", "ops", "finance", "engineering", "infra", "customer_success"}
+      if set(workflowGraph.nodes()) != expectedNodes:
+          raise ValueError("인수인계 네트워크의 부서 목록이 예상과 다릅니다.")
+      if any(data["weight"] <= 0 for _, _, data in workflowGraph.edges(data=True)):
+          raise ValueError("인수인계 비용은 0보다 커야 합니다.")
+
+      workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 업무 흐름 검증에서 \`experimentGraph\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: networkx_03-bfs-shortest-path-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: unweighted graph 최단 경로 찾기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: BFS로 최소 edge 수 경로와 방문 수를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - BFS queue는 전체 path를 보존해야 합니다.
+    - neighbor 정렬로 동률 경로를 재현 가능하게 만드세요.
+    exercise:
+      prompt: shortest_unweighted(edges, start, goal)를 완성하세요.
+      starterCode: |-
+        def shortest_unweighted(edges, start, goal):
+            raise NotImplementedError
+      solution: |
+        def shortest_unweighted(edges, start, goal):
+            adjacency = {}
+            for source, target in edges:
+                adjacency.setdefault(source, set()).add(target)
+                adjacency.setdefault(target, set()).add(source)
+            queue = [[start]]
+            visited = {start}
+            while queue:
+                path = queue.pop(0)
+                node = path[-1]
+                if node == goal:
+                    return {"path": path, "hops": len(path) - 1, "visited": len(visited)}
+                for neighbor in sorted(adjacency.get(node, [])):
+                    if neighbor not in visited:
+                        visited.add(neighbor)
+                        queue.append(path + [neighbor])
+            return {"path": None, "hops": None, "visited": len(visited)}
+      hints: *id001
+    check:
+      id: python.networkx.networkx_03.bfs-shortest-path.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_03.bfs-shortest-path.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: shortest_unweighted
+        cases:
+        - id: finds-minimum-hops
+          arguments:
+          - value:
+            - - a
+              - b
+            - - b
+              - d
+            - - a
+              - c
+            - - c
+              - d
+          - value: a
+          - value: d
+          expectedReturn:
+            path:
+            - a
+            - b
+            - d
+            hops: 2
+            visited: 4
+        - id: reports-unreachable
+          arguments:
+          - value:
+            - - a
+              - b
+            - - c
+              - d
+          - value: a
+          - value: d
+          expectedReturn:
+            path: null
+            hops: null
+            visited: 2
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: networkx_03-dijkstra-distance-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_03-bfs-shortest-path-mastery
+    title: 새 도로망에 가중 최단 경로 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 음이 아닌 거리에서 Dijkstra로 비용과 경로를 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 최소 hop과 최소 weight는 다른 문제입니다.
+    - 음수 weight에서는 Dijkstra를 사용하지 마세요.
+    exercise:
+      prompt: shortest_weighted(edges, start, goal)를 완성하세요.
+      starterCode: |-
+        def shortest_weighted(edges, start, goal):
+            raise NotImplementedError
+      solution: |
+        def shortest_weighted(edges, start, goal):
+            import heapq
+            adjacency = {}
+            for source, target, weight in edges:
+                if weight < 0:
+                    raise ValueError("negative weight")
+                adjacency.setdefault(source, []).append((target, weight))
+                adjacency.setdefault(target, []).append((source, weight))
+            heap = [(0, [start], start)]
+            best = {}
+            while heap:
+                cost, path, node = heapq.heappop(heap)
+                if node in best:
+                    continue
+                best[node] = cost
+                if node == goal:
+                    return {"path": path, "cost": cost}
+                for neighbor, weight in adjacency.get(node, []):
+                    if neighbor not in best:
+                        heapq.heappush(heap, (cost + weight, path + [neighbor], neighbor))
+            return {"path": None, "cost": None}
+      hints: *id002
+    check:
+      id: python.networkx.networkx_03.dijkstra-distance.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_03.dijkstra-distance.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: shortest_weighted
+        cases:
+        - id: prefers-lower-cost-not-hops
+          arguments:
+          - value:
+            - - a
+              - b
+              - 10
+            - - a
+              - c
+              - 2
+            - - c
+              - b
+              - 2
+          - value: a
+          - value: b
+          expectedReturn:
+            path:
+            - a
+            - c
+            - b
+            cost: 4
+        - id: reports-unreachable
+          arguments:
+          - value: []
+          - value: a
+          - value: b
+          expectedReturn:
+            path: null
+            cost: null
+        - id: rejects-negative
+          arguments:
+          - value:
+            - - a
+              - b
+              - -1
+          - value: a
+          - value: b
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: networkx_03-shortest-path-method-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_03-dijkstra-distance-transfer
+    title: 최단 경로 알고리즘 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: weight 가정에 맞는 알고리즘을 고른다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 그래프 알고리즘의 입력 가정과 반환 의미를 함께 기록하세요.
+    - 시각적 모양만으로 구조적 결론을 내리지 마세요.
+    exercise:
+      prompt: choose_shortest_path(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_shortest_path(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_shortest_path(situation):
+            table = {'unweighted': {'method': 'BFS', 'evidence': 'hop count', 'risk': 'ignoring cost'}, 'nonnegative-weight': {'method': 'Dijkstra', 'evidence': 'weight unit', 'risk': 'negative edge'}, 'negative-weight': {'method': 'Bellman-Ford', 'evidence': 'cycle check', 'risk': 'negative cycle'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.networkx.networkx_03.shortest-path-method.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_03.shortest-path-method.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_shortest_path
+        cases:
+        - id: recalls-unweighted
+          arguments:
+          - value: unweighted
+          expectedReturn:
+            method: BFS
+            evidence: hop count
+            risk: ignoring cost
+        - id: recalls-nonnegative-weight
+          arguments:
+          - value: nonnegative-weight
+          expectedReturn:
+            method: Dijkstra
+            evidence: weight unit
+            risk: negative edge
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

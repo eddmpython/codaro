@@ -1,0 +1,636 @@
+var e=`meta:
+  id: email_07
+  title: 규칙 기반 자동 분류
+  order: 7
+  category: email
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  packages: []
+  tags:
+    - IMAP MOVE
+    - 발신자 룰
+    - 자동 분류
+  outcomes:
+    - automation.email.classify
+  prerequisites:
+    - automation.email.receive
+  estimatedMinutes: 50
+  seo:
+    title: "메일 룰 기반 자동 분류 - 발신자/제목 → 폴더 이동"
+    description: "발신자와 제목 룰을 정의해 받은 메일을 자동으로 폴더 분류. inbox zero를 코드로 달성."
+    keywords:
+      - 메일 자동 분류
+      - IMAP MOVE
+      - inbox zero
+
+intro:
+  direction: "발신자·제목 룰로 메일을 자동 폴더에 분류한다. 사장님의 매일 30분 분류 작업이 5초로 줄어든다."
+  benefits:
+    - "발신자별 자동 폴더 분류로 inbox zero를 코드로 달성."
+    - "룰 dict 한 번 정의로 모든 받은 메일에 일관 적용."
+    - "본인 IMAP 계정에서만 실 동작. 환경 가드로 CI 안전."
+  diagram:
+    steps:
+      - label: "1. 룰 정의"
+        detail: "{발신자/제목 키워드: 목적 폴더} dict."
+      - label: "2. 메일 순회"
+        detail: "INBOX의 최근 UID 리스트 → fetch."
+      - label: "3. 룰 매칭"
+        detail: "From, Subject에서 룰 키워드 검색."
+      - label: "4. MOVE/COPY"
+        detail: "매칭되면 conn.move 또는 copy+expunge."
+    runtime:
+      - label: "본인 메일 계정 필요"
+        detail: "환경 가드로 CI에서는 룰 매칭 로직만 단위 검증."
+      - label: "안전 정책"
+        detail: "INBOX 메일은 이동만, 삭제 절대 금지. dry-run 옵션 제공."
+
+sections:
+  - id: step1_rules
+    title: "1단계. 분류 룰 정의"
+    structuredPrimary: true
+    subtitle: "dict 기반 룰셋"
+    goal: "발신자·제목 키워드 → 목적 폴더 매핑 dict를 정의한다."
+    why: "룰 자체를 코드와 분리하면 정책 변경이 쉽습니다. dict 한 곳만 고치면 됩니다."
+    explanation: |-
+      rules = [{"keyword": "@gov.kr", "field": "from", "folder": "Government"}, ...] 형태. field는 'from' 또는 'subject'. 우선 매칭 룰부터 적용.
+    tips:
+      - "리스트는 우선순위. 위에서부터 매칭되는 첫 룰 적용. 더 구체적 룰을 위로."
+    snippet: |-
+      rules = [
+          {"keyword": "@nts.go.kr", "field": "from", "folder": "TaxOffice"},
+          {"keyword": "세금계산서", "field": "subject", "folder": "Invoices"},
+          {"keyword": "@vendor.com", "field": "from", "folder": "Vendors"},
+      ]
+
+      def matchRule(rules, sender, subject):
+          for rule in rules:
+              if rule["field"] == "from" and rule["keyword"] in sender:
+                  return rule["folder"]
+              if rule["field"] == "subject" and rule["keyword"] in subject:
+                  return rule["folder"]
+          return None
+
+      matchRule(rules, "office@nts.go.kr", "민원 통보"), matchRule(rules, "billing@vendor.com", "월간 세금계산서 첨부")
+    exercise:
+      prompt: "matchRule 함수를 직접 작성하세요. rules 리스트를 순회하며 field='from'이면 sender, field='subject'이면 subject에 keyword가 포함되는지 검사하고, 첫 매치의 folder를 반환합니다. 매치가 없으면 None. 두 룰과 세 케이스로 검증합니다."
+      starterCode: |-
+        rules = [
+            {"keyword": "@nts.go.kr", "field": "from", "folder": "TaxOffice"},
+            {"keyword": "@codaro.dev", "field": "from", "folder": "Codaro"},
+        ]
+
+        def matchRule(rules, sender, subject):
+            ___
+
+        assert matchRule(rules, "office@nts.go.kr", "x") == "TaxOffice"
+        assert matchRule(rules, "team@codaro.dev", "x") == "Codaro"
+        assert matchRule(rules, "stranger@example.com", "x") is None
+        matchRule(rules, "team@codaro.dev", "안내")
+      hints:
+        - "for rule in rules: 안에서 field 분기 후 keyword in sender/subject 시 folder 반환. 끝까지 못 찾으면 return None."
+    check:
+      noError: "dict 키는 문자열."
+      resultCheck: "출력 'Codaro'."
+
+  - id: step2_classify
+    title: "2단계. 분류 흐름"
+    structuredPrimary: true
+    subtitle: "환경 가드 + 룰 적용"
+    goal: "환경 가드와 룰을 결합해 분류 함수 골격을 정의한다."
+    why: "환경 가드로 CI에서 안전하게 단위 검증, 본인 계정에서는 실제 IMAP 호출 흐름이 같은 함수에 들어갑니다."
+    explanation: |-
+      classifyInbox(rules, dryRun=True)이 환경 가드 후 IMAP 연결, 최근 메일 순회, 매칭 룰 적용. dryRun=True에서는 매칭 결과만 돌려주고 실제 MOVE는 dryRun=False일 때만.
+    tips:
+      - "본인 계정에서 dryRun=True 결과를 먼저 출력해 검토한 후 dryRun=False로 실행."
+    snippet: |-
+      import imaplib
+      import os
+      from email.parser import BytesParser
+      from email.policy import default
+
+      IMAP_HOST = "imap.gmail.com"
+
+      def classifyInbox(rules, dryRun=True, folder="INBOX/CodaroTest"):
+          user = os.environ.get("IMAP_USER")
+          appPass = os.environ.get("IMAP_APP_PASS")
+          if not user or not appPass:
+              return []
+          conn = imaplib.IMAP4_SSL(IMAP_HOST)
+          conn.login(user, appPass)
+          conn.select(folder)
+          status, uidData = conn.search(None, "ALL")
+          plan = []
+          if status == "OK":
+              for uid in uidData[0].split():
+                  fStatus, fData = conn.fetch(uid, "(BODY[HEADER.FIELDS (FROM SUBJECT)])")
+                  if fStatus != "OK":
+                      continue
+                  headers = BytesParser(policy=default).parsebytes(fData[0][1])
+                  target = matchRule(rules, headers.get("From", ""), headers.get("Subject", ""))
+                  if target:
+                      plan.append({"uid": uid.decode(), "target": target})
+                      if not dryRun:
+                          conn.move(uid, target)
+          conn.logout()
+          return plan
+
+      def matchRule(rules, sender, subject):
+          for rule in rules:
+              if rule["field"] == "from" and rule["keyword"] in sender:
+                  return rule["folder"]
+              if rule["field"] == "subject" and rule["keyword"] in subject:
+                  return rule["folder"]
+          return None
+
+      "function defined"
+    exercise:
+      prompt: "함수 기본값 folder를 'INBOX/CodaroLesson'으로 바꾸세요."
+      starterCode: |-
+        import os
+
+        def classifyInbox(rules, dryRun=True, folder=___):
+            if not os.environ.get("IMAP_USER"):
+                return []
+            return []
+
+        classifyInbox([])
+      hints:
+        - "문자열 'INBOX/CodaroLesson'."
+    check:
+      noError: "기본값은 문자열."
+      resultCheck: "출력 []."
+
+  - id: validation
+    title: "3단계. 검증 루프 - 룰 매칭 단위 검증"
+    structuredPrimary: true
+    subtitle: "matchRule을 단위 assert"
+    goal: "다양한 발신자/제목 조합으로 matchRule이 의도대로 분류하는지 검증한다."
+    why: "IMAP 본문 검증은 환경 의존이지만 matchRule은 순수 함수라 깔끔히 검증 가능합니다."
+    explanation: |-
+      여러 (발신자, 제목, 기대 폴더) 케이스로 matchRule을 호출해 결과를 한 묶음 assert.
+    tips:
+      - "엣지 케이스: 룰 매칭 없는 메일은 None을 반환해야 합니다."
+    snippet: |-
+      def matchRule(rules, sender, subject):
+          for rule in rules:
+              if rule["field"] == "from" and rule["keyword"] in sender:
+                  return rule["folder"]
+              if rule["field"] == "subject" and rule["keyword"] in subject:
+                  return rule["folder"]
+          return None
+
+      rules = [
+          {"keyword": "@nts.go.kr", "field": "from", "folder": "TaxOffice"},
+          {"keyword": "세금계산서", "field": "subject", "folder": "Invoices"},
+      ]
+      cases = [
+          ("office@nts.go.kr", "민원", "TaxOffice"),
+          ("billing@vendor.com", "월간 세금계산서", "Invoices"),
+          ("friend@example.com", "안부", None),
+      ]
+      for sender, subject, expected in cases:
+          result = matchRule(rules, sender, subject)
+          assert result == expected, f"{sender}/{subject} -> {result} != {expected}"
+      "all rules pass"
+    exercise:
+      prompt: "추가 룰(@codaro.dev → 'Codaro')과 케이스를 추가해 검증을 통과시키세요."
+      starterCode: |-
+        def matchRule(rules, sender, subject):
+            for rule in rules:
+                if rule["field"] == "from" and rule["keyword"] in sender:
+                    return rule["folder"]
+                if rule["field"] == "subject" and rule["keyword"] in subject:
+                    return rule["folder"]
+            return None
+
+        rules = [
+            {"keyword": "@nts.go.kr", "field": "from", "folder": "TaxOffice"},
+            {"keyword": ___, "field": "from", "folder": ___},
+        ]
+        cases = [
+            ("office@nts.go.kr", "x", "TaxOffice"),
+            ("dev@codaro.dev", "x", "Codaro"),
+        ]
+        for sender, subject, expected in cases:
+            assert matchRule(rules, sender, subject) == expected
+        "ok"
+      hints:
+        - "두 문자열: '@codaro.dev', 'Codaro'."
+    check:
+      noError: "리스트 dict 키 일치."
+      resultCheck: "'ok' 출력."
+
+  - id: practice
+    title: "실습 - 종합 미션"
+    subtitle: "발신자 도메인별 자동 분류 도구"
+    goal: "발신자 도메인을 자동 추출해 폴더로 분류하는 함수를 만든다."
+    why: "1인 사장님이 매일 30분씩 손으로 받은 메일을 폴더로 옮기는 사이클이 사라집니다. 발신자 도메인 → 폴더 룰 하나로 거래처·관공서·뉴스레터 분류가 한 번에 끝나고, 본 트랙 후반의 dryRun → 실행 패턴과 결합하면 inbox zero가 코드로 매일 자동 유지됩니다."
+    explanation: |-
+      미션: classifyByDomain(rules, sender) -> str. 발신자 이메일의 @ 뒤 도메인을 추출해 룰 dict와 매칭.
+    tips:
+      - "발신자 형식이 'Name <email@domain>'일 수 있습니다. email.utils.parseaddr 활용."
+    snippet: |-
+      from email.utils import parseaddr
+    exercise:
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "함수: classifyByDomain(rules, sender) -> str"
+    check:
+      noError: "parseaddr 활용."
+      resultCheck: "도메인 추출 후 룰 매칭."
+    blocks:
+      - type: expansion
+        title: "미션: 도메인별 분류"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from email.utils import parseaddr
+
+              def classifyByDomain(rules, sender):
+                  _, address = parseaddr(sender)
+                  if "@" not in address:
+                      return None
+                  domain = address.split("@", 1)[1].lower()
+                  return rules.get(domain)
+
+              rules = {
+                  "nts.go.kr": "TaxOffice",
+                  "codaro.dev": "Codaro",
+                  "vendor.com": "Vendors",
+              }
+              cases = [
+                  ("office@nts.go.kr", "TaxOffice"),
+                  ("Codaro Team <team@codaro.dev>", "Codaro"),
+                  ("billing@vendor.com", "Vendors"),
+                  ("friend@example.com", None),
+              ]
+              for sender, expected in cases:
+                  assert classifyByDomain(rules, sender) == expected
+              [classifyByDomain(rules, s) for s, _ in cases]
+      - type: expansion
+        title: "미션2: dryRun 분류 플랜 생성기"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from email.utils import parseaddr
+
+              def planMoves(messages, rules, default="Inbox/Misc"):
+                  plan = []
+                  for entry in messages:
+                      _, address = parseaddr(entry.get("from", ""))
+                      domain = address.split("@", 1)[-1].lower() if "@" in address else ""
+                      folder = rules.get(domain, default)
+                      plan.append({"uid": entry["uid"], "from": entry["from"], "target": folder})
+                  return plan
+
+              rules = {"nts.go.kr": "TaxOffice", "vendor.com": "Vendors"}
+              sample = [
+                  {"uid": "101", "from": "office@nts.go.kr"},
+                  {"uid": "102", "from": "Vendor <billing@vendor.com>"},
+                  {"uid": "103", "from": "friend@example.com"},
+              ]
+              plan = planMoves(sample, rules)
+              assert plan[0]["target"] == "TaxOffice"
+              assert plan[1]["target"] == "Vendors"
+              assert plan[2]["target"] == "Inbox/Misc"
+              [(p["uid"], p["target"]) for p in plan]
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: list
+        style: bullet
+        items:
+          - "발신자 화이트리스트/블랙리스트 룰"
+          - "특정 키워드(긴급, 장애) → 우선순위 폴더로"
+          - "첨부 유무에 따라 다른 분류"
+          - "LLM 분류로 업그레이드 (llmBasics 트랙 결합)"
+          - "분류 결과를 매일 보고서로 메일 발송 (08강 알림 패턴 결합)"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: email_07-mail-classification-rules-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_rules
+    - extensions
+    title: 규칙 기반 메일 분류의 priority·충돌 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 한 메일에 적용될 rule을 priority와 specificity로 결정하고 모호성을 보고한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 여러 rule이 같게 매치되면 목록 순서로 숨기지 말고 Review로 보내세요.
+    - priority와 condition specificity를 분리해 결정 규칙을 남기세요.
+    exercise:
+      prompt: classify_mail(message, rules)를 완성하세요.
+      starterCode: |-
+        def classify_mail(message, rules):
+            raise NotImplementedError
+      solution: |
+        def classify_mail(message, rules):
+            matches = []
+            for rule in rules:
+                conditions = rule.get("conditions", {})
+                matched = True
+                if "senderDomain" in conditions:
+                    matched = matched and message["from"].lower().endswith("@" + conditions["senderDomain"].lower())
+                if "subjectContains" in conditions:
+                    matched = matched and conditions["subjectContains"].lower() in message.get("subject", "").lower()
+                if matched:
+                    matches.append(rule)
+            if not matches:
+                return {"folder": "Unclassified", "rule": None, "ambiguous": []}
+            matches.sort(key=lambda rule: (-rule["priority"], -len(rule.get("conditions", {})), rule["id"]))
+            best = matches[0]
+            ambiguous = sorted(rule["id"] for rule in matches[1:] if rule["priority"] == best["priority"] and len(rule.get("conditions", {})) == len(best.get("conditions", {})))
+            return {"folder": best["folder"] if not ambiguous else "Review", "rule": best["id"], "ambiguous": ambiguous}
+      hints: *id001
+    check:
+      id: python.email.email_07.mail-classification-rules.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_07.mail-classification-rules.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: classify_mail
+        cases:
+        - id: selects-specific-high-priority-rule
+          arguments:
+          - value:
+              from: a@example.test
+              subject: Invoice July
+          - value:
+            - id: domain
+              priority: 1
+              conditions:
+                senderDomain: example.test
+              folder: Example
+            - id: invoice
+              priority: 2
+              conditions:
+                senderDomain: example.test
+                subjectContains: invoice
+              folder: Invoices
+          expectedReturn:
+            folder: Invoices
+            rule: invoice
+            ambiguous: []
+        - id: reports-ambiguous-equal-rules
+          arguments:
+          - value:
+              from: a@example.test
+              subject: Hello
+          - value:
+            - id: a
+              priority: 1
+              conditions:
+                senderDomain: example.test
+              folder: A
+            - id: b
+              priority: 1
+              conditions:
+                senderDomain: example.test
+              folder: B
+          expectedReturn:
+            folder: Review
+            rule: a
+            ambiguous:
+            - b
+        - id: leaves-unmatched-mail-unclassified
+          arguments:
+          - value:
+              from: a@other.test
+              subject: Hello
+          - value:
+            - id: a
+              priority: 1
+              conditions:
+                senderDomain: example.test
+              folder: A
+          expectedReturn:
+            folder: Unclassified
+            rule: null
+            ambiguous: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: email_07-classification-confusion-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - email_07-mail-classification-rules-mastery
+    title: 새 분류 rule set에 confusion·coverage 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 검수 fixture의 expected와 predicted folder로 정확도와 미분류를 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - rule 수가 아니라 검수 fixture의 expected/predicted confusion을 확인하세요.
+    - Unclassified는 정확도와 별도로 coverage blocker로 처리하세요.
+    exercise:
+      prompt: audit_classification_fixtures(fixtures, minimum_accuracy)를 완성하세요.
+      starterCode: |-
+        def audit_classification_fixtures(fixtures, minimum_accuracy):
+            raise NotImplementedError
+      solution: |
+        def audit_classification_fixtures(fixtures, minimum_accuracy):
+            if not 0 <= minimum_accuracy <= 1:
+                raise ValueError("invalid accuracy threshold")
+            correct = []
+            errors = []
+            unclassified = []
+            for fixture in fixtures:
+                if fixture["predicted"] == "Unclassified":
+                    unclassified.append(fixture["id"])
+                if fixture["predicted"] == fixture["expected"]:
+                    correct.append(fixture["id"])
+                else:
+                    errors.append({"id": fixture["id"], "expected": fixture["expected"], "predicted": fixture["predicted"]})
+            accuracy = 0.0 if not fixtures else round(len(correct) / len(fixtures), 4)
+            return {"accepted": accuracy >= minimum_accuracy and not unclassified, "accuracy": accuracy, "correct": correct, "errors": errors, "unclassified": unclassified}
+      hints: *id002
+    check:
+      id: python.email.email_07.classification-confusion-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_07.classification-confusion-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_classification_fixtures
+        cases:
+        - id: accepts-perfect-fixtures
+          arguments:
+          - value:
+            - id: a
+              expected: Invoice
+              predicted: Invoice
+            - id: b
+              expected: Alert
+              predicted: Alert
+          - value: 1.0
+          expectedReturn:
+            accepted: true
+            accuracy: 1.0
+            correct:
+            - a
+            - b
+            errors: []
+            unclassified: []
+        - id: reports-error-and-unclassified
+          arguments:
+          - value:
+            - id: a
+              expected: Invoice
+              predicted: Other
+            - id: b
+              expected: Alert
+              predicted: Unclassified
+          - value: 0.5
+          expectedReturn:
+            accepted: false
+            accuracy: 0.0
+            correct: []
+            errors:
+            - id: a
+              expected: Invoice
+              predicted: Other
+            - id: b
+              expected: Alert
+              predicted: Unclassified
+            unclassified:
+            - b
+        - id: handles-empty-fixture-set
+          arguments:
+          - value: []
+          - value: 0.0
+          expectedReturn:
+            accepted: true
+            accuracy: 0.0
+            correct: []
+            errors: []
+            unclassified: []
+        - id: rejects-invalid-threshold
+          arguments:
+          - value: []
+          - value: 2.0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: email_07-mail-classification-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - email_07-classification-confusion-audit-transfer
+    title: 규칙 기반 메일 분류 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: priority·ambiguity·fixture confusion 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 메일 API 성공과 올바른 수신자·내용·첨부 전달을 분리해 검증하세요.
+    - 실제 발송 전 dry run과 idempotency identity, 비밀정보 redaction을 적용하세요.
+    exercise:
+      prompt: choose_mail_classification_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_mail_classification_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_mail_classification_evidence(situation):
+            table = {'resolve': {'action': 'rank priority and specificity', 'evidence': 'matched rule list', 'risk': 'rule order dependence'}, 'ambiguity': {'action': 'route equal matches to review', 'evidence': 'ambiguous rule IDs', 'risk': 'wrong folder'}, 'validate': {'action': 'run labeled fixtures', 'evidence': 'accuracy errors unclassified', 'risk': 'untested rule drift'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.email.email_07.mail-classification-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_07.mail-classification-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_mail_classification_evidence
+        cases:
+        - id: recalls-resolve
+          arguments:
+          - value: resolve
+          expectedReturn:
+            action: rank priority and specificity
+            evidence: matched rule list
+            risk: rule order dependence
+        - id: recalls-ambiguity
+          arguments:
+          - value: ambiguity
+          expectedReturn:
+            action: route equal matches to review
+            evidence: ambiguous rule IDs
+            risk: wrong folder
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,774 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - networkx
+  id: networkx_09
+  title: 랜덤그래프모델
+  order: 9
+  category: networkx
+  difficulty: ⭐⭐⭐⭐
+  badge: 심화
+  tags:
+  - networkx
+  - 랜덤그래프
+  - Erdos-Renyi
+  - Barabasi-Albert
+  - 스몰월드
+  seo:
+    title: NetworkX 랜덤 그래프 모델 - ER, BA, WS
+    description: NetworkX로 다양한 랜덤 그래프를 생성합니다. Erdős-Rényi, Barabási-Albert, Watts-Strogatz 모델을 배웁니다.
+    keywords:
+    - networkx
+    - 랜덤그래프
+    - Erdos-Renyi
+    - Barabasi-Albert
+    - Watts-Strogatz
+intro:
+  emoji: 🎲
+  goal: 다양한 랜덤 그래프 모델을 생성하고 특성을 분석합니다.
+  description: 랜덤 그래프 모델은 실제 네트워크의 특성을 이해하는 도구입니다. Erdős-Rényi는 완전 랜덤, Barabási-Albert는 척도없는 네트워크, Watts-Strogatz는
+    스몰월드 네트워크를 생성합니다. 각 모델의 차수 분포, 클러스터링, 경로 길이를 비교합니다.
+  direction: 랜덤그래프모델에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.
+  benefits:
+  - 관계 데이터 확인 후 그래프 알고리즘에 맞는 코드 입력을 고릅니다.
+  - 랜덤그래프모델 결과를 노드/엣지와 지표 값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 관계 분석 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(관계 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. ErdősRényi 처리 실행
+      detail: 그래프 알고리즘 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. ER 차수 분포 결과 검증
+      detail: 노드/엣지와 지표 값 기준으로 실행 결과를 비교합니다.
+    - label: 랜덤그래프모델 재사용
+      detail: 완성 코드를 관계 분석 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 그래프 분석 환경
+      detail: matplotlib, networkx 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 랜덤그래프모델 실행
+      detail: 셀을 실행해 노드/엣지와 지표 값와 예외 상태를 확인합니다.
+    - label: 랜덤그래프모델 완료
+      detail: 검증된 코드를 관계 분석 리포트로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: NetworkX와 matplotlib을 불러옵니다. 랜덤 그래프 모델은 실제 네트워크의 형성 메커니즘과 특성을 이해하기 위한 이론적 도구입니다. 왜 어떤 네트워크에는
+    허브가 존재하는지, 왜 '6단계 분리'가 가능한지 등의 질문에 답할 수 있습니다. 이 장에서는 세 가지 대표적인 랜덤 그래프 모델을 배웁니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import networkx as nx
+    import matplotlib.pyplot as plt
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+    hints:
+    - 바꿀 지점은 관계 데이터을 만드는 첫 줄과 그래프 알고리즘 줄에서 찾으세요.
+    - 실행 뒤 노드/엣지와 지표 값 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 노드/엣지와 지표 값 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step2_erdos_renyi
+  title: 2단계. Erdős-Rényi 모델
+  structuredPrimary: true
+  subtitle: erdos_renyi_graph()
+  goal: 2단계. ErdősRényi 모델에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    Erdős-Rényi(ER) 모델은 1959년 헝가리 수학자 Paul Erdős와 Alfréd Rényi가 제안한 가장 고전적인 랜덤 그래프입니다. n개의 노드가 있을 때, 가능한 모든 노드 쌍이 확률 p로 독립적으로 연결됩니다. 수학적으로 분석이 용이하여 그래프 이론의 기초가 되었지만, 실제 네트워크와는 다른 특성을 보입니다.
+
+    ER 모델의 예상 엣지 수는 n(n-1)/2 × p입니다. p가 1/(n-1)보다 크면 거대 컴포넌트가 형성됩니다.
+  snippet: |-
+    erGraph = nx.erdos_renyi_graph(n=50, p=0.1, seed=42)
+    numNodesER = erGraph.number_of_nodes()
+    numEdgesER = erGraph.number_of_edges()
+    numNodesER, numEdgesER
+  exercise:
+    prompt: 2단계. ErdősRényi 모델 예제에서 \`erGraph\`, \`numNodesER\`, \`numEdgesER\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      erGraph = nx.erdos_renyi_graph(n=50, p=0.1, seed=42)
+      numNodesER = erGraph.number_of_nodes()
+      numEdgesER = erGraph.number_of_edges()
+      numNodesER, numEdgesER
+    hints:
+    - 바꿀 지점은 \`erGraph = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`erGraph\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 2단계. ErdősRényi 모델에서 \`erGraph\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. ErdősRényi 모델 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step3_er_degree
+  title: 3단계. ER 차수 분포
+  structuredPrimary: true
+  subtitle: 포아송 분포
+  goal: 3단계. ER 차수 분포에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: ER 그래프의 차수 분포는 포아송(Poisson) 분포에 가깝습니다. 평균 차수 주변에 대부분의 노드가 모여 있고, 극단적으로 높거나 낮은 차수를 가진 노드는
+    거의 없습니다. 이는 실제 소셜 네트워크나 웹 그래프와 다른 특성으로, ER 모델이 실제 네트워크를 잘 설명하지 못하는 이유 중 하나입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    degreesER = [d for n, d in erGraph.degree()]
+
+    fig2, ax2 = plt.subplots(figsize=(8, 5))
+    ax2.hist(degreesER, bins=range(max(degreesER)+2), align='left',
+             color='skyblue', edgecolor='black')
+    ax2.set_xlabel('Degree')
+    ax2.set_ylabel('Count')
+    ax2.set_title('ER Graph Degree Distribution')
+    fig2
+  exercise:
+    prompt: 3단계. ER 차수 분포 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      degreesER = [d for n, d in erGraph.degree()]
+
+      fig2, ax2 = plt.subplots(figsize=(8, 5))
+      ax2.hist(degreesER, bins=range(max(degreesER)+2), align='left',
+               color='skyblue', edgecolor='black')
+      ax2.set_xlabel('Degree')
+      ax2.set_ylabel('Count')
+      ax2.set_title('ER Graph Degree Distribution')
+      fig2
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 3단계. ER 차수 분포의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 3단계. ER 차수 분포 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step4_barabasi_albert
+  title: 4단계. Barabási-Albert 모델
+  structuredPrimary: true
+  subtitle: barabasi_albert_graph()
+  goal: 4단계. BarabásiAlbert 모델에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    Barabási-Albert(BA) 모델은 1999년 물리학자 Albert-László Barabási와 Réka Albert가 제안한 모델로, '부익부' 현상을 반영합니다. 네트워크가 성장할 때 새 노드는 이미 연결이 많은 노드에 더 연결되려는 경향이 있습니다(선호적 연결, Preferential Attachment). 이 메커니즘은 월드와이드웹, 인용 네트워크, 소셜 네트워크 등에서 관찰되는 허브의 존재를 설명합니다.
+
+    BA 모델은 척도없는(scale-free) 네트워크를 생성합니다. 소수의 허브가 많은 연결을 가집니다.
+  snippet: |-
+    baGraph = nx.barabasi_albert_graph(n=50, m=2, seed=42)
+    numNodesBA = baGraph.number_of_nodes()
+    numEdgesBA = baGraph.number_of_edges()
+    numNodesBA, numEdgesBA
+  exercise:
+    prompt: 4단계. BarabásiAlbert 모델 예제에서 \`baGraph\`, \`numNodesBA\`, \`numEdgesBA\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지
+      확인하세요.
+    starterCode: |-
+      baGraph = nx.barabasi_albert_graph(n=50, m=2, seed=42)
+      numNodesBA = baGraph.number_of_nodes()
+      numEdgesBA = baGraph.number_of_edges()
+      numNodesBA, numEdgesBA
+    hints:
+    - 바꿀 지점은 \`baGraph = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`baGraph\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 4단계. BarabásiAlbert 모델에서 \`baGraph\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 4단계. BarabásiAlbert 모델 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step5_ba_degree
+  title: 5단계. BA 차수 분포
+  structuredPrimary: true
+  subtitle: 멱법칙 분포
+  goal: 5단계. BA 차수 분포에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    BA 그래프의 차수 분포는 멱법칙(Power-law)을 따릅니다. P(k) ∝ k^(-γ) 형태로, 로그-로그 그래프에서 직선으로 나타납니다. 대부분의 노드는 적은 연결을 가지지만, 소수의 허브는 매우 많은 연결을 가집니다. 이러한 '척도없는(Scale-free)' 특성은 네트워크가 특정 규모에 구애받지 않고 자기유사성을 보임을 의미합니다.
+
+    멱법칙 분포는 롱테일(long tail)입니다. 대부분은 적은 연결, 극소수가 매우 많은 연결을 가집니다.
+  snippet: |-
+    degListBA = [d for n, d in baGraph.degree()]
+
+    fig4, ax4 = plt.subplots(figsize=(8, 5))
+    ax4.hist(degListBA, bins=range(max(degListBA)+2), align='left',
+             color='salmon', edgecolor='black')
+    ax4.set_xlabel('Degree')
+    ax4.set_ylabel('Count')
+    ax4.set_title('BA Graph Degree Distribution')
+    fig4
+  exercise:
+    prompt: 5단계. BA 차수 분포 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      degListBA = [d for n, d in baGraph.degree()]
+
+      fig4, ax4 = plt.subplots(figsize=(8, 5))
+      ax4.hist(degListBA, bins=range(max(degListBA)+2), align='left',
+               color='salmon', edgecolor='black')
+      ax4.set_xlabel('Degree')
+      ax4.set_ylabel('Count')
+      ax4.set_title('BA Graph Degree Distribution')
+      fig4
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 5단계. BA 차수 분포의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 5단계. BA 차수 분포 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step6_watts_strogatz
+  title: 6단계. Watts-Strogatz 모델
+  structuredPrimary: true
+  subtitle: watts_strogatz_graph()
+  goal: 6단계. WattsStrogatz 모델에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    Watts-Strogatz(WS) 모델은 1998년 Duncan Watts와 Steven Strogatz가 제안한 스몰월드 네트워크 모델입니다. 규칙적인 격자에서 시작하여 일부 엣지를 무작위로 재연결합니다. 이렇게 하면 지역적으로는 높은 클러스터링(친구의 친구가 친구)을 유지하면서, 전역적으로는 짧은 평균 경로(소수의 단계로 누구든 도달 가능)를 가지게 됩니다.
+
+    p=0이면 규칙 격자(높은 클러스터링, 긴 경로), p=1이면 랜덤 그래프(낮은 클러스터링, 짧은 경로)입니다.
+  snippet: |-
+    wsGraph = nx.watts_strogatz_graph(n=50, k=4, p=0.3, seed=42)
+    numNodesWS = wsGraph.number_of_nodes()
+    numEdgesWS = wsGraph.number_of_edges()
+    numNodesWS, numEdgesWS
+  exercise:
+    prompt: 6단계. WattsStrogatz 모델 예제에서 \`wsGraph\`, \`numNodesWS\`, \`numEdgesWS\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지
+      확인하세요.
+    starterCode: |-
+      wsGraph = nx.watts_strogatz_graph(n=50, k=4, p=0.3, seed=42)
+      numNodesWS = wsGraph.number_of_nodes()
+      numEdgesWS = wsGraph.number_of_edges()
+      numNodesWS, numEdgesWS
+    hints:
+    - 바꿀 지점은 \`wsGraph = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`wsGraph\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 6단계. WattsStrogatz 모델에서 \`wsGraph\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. WattsStrogatz 모델 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step7_small_world
+  title: 7단계. 스몰월드 특성
+  structuredPrimary: true
+  subtitle: 클러스터링과 경로 길이
+  goal: 7단계. 스몰월드 특성에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    스몰월드 네트워크는 '6단계 분리(Six Degrees of Separation)' 현상을 설명합니다. 세상 누구나 평균 6단계의 아는 사람 관계로 연결된다는 개념입니다. 스몰월드 네트워크는 높은 클러스터링(지역적 밀집)과 짧은 평균 경로(전역적 연결)를 동시에 가집니다. 이 두 특성의 조합이 실제 소셜 네트워크, 신경망, 전력망 등에서 관찰됩니다.
+
+    WS 모델은 높은 클러스터링(지역 연결)과 짧은 경로(전역 도달)를 모두 달성합니다. 실제 소셜 네트워크와 유사합니다.
+  snippet: |-
+    clustER = nx.average_clustering(erGraph)
+    clustBA = nx.average_clustering(baGraph)
+    clustWS = nx.average_clustering(wsGraph)
+    round(clustER, 3), round(clustBA, 3), round(clustWS, 3)
+  exercise:
+    prompt: 7단계. 스몰월드 특성 예제에서 \`clustER\`, \`clustBA\`, \`clustWS\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      clustER = nx.average_clustering(erGraph)
+      clustBA = nx.average_clustering(baGraph)
+      clustWS = nx.average_clustering(wsGraph)
+      round(clustER, 3), round(clustBA, 3), round(clustWS, 3)
+    hints:
+    - 바꿀 지점은 \`clustER = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`clustER\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 7단계. 스몰월드 특성에서 \`clustER\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. 스몰월드 특성 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step8_degree_dist_compare
+  title: 8단계. 차수 분포 비교
+  structuredPrimary: true
+  subtitle: 세 모델 시각화
+  goal: 8단계. 차수 분포 비교에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 세 가지 모델의 차수 분포를 한 그림에서 비교합니다. ER 모델은 포아송 분포(종 모양), BA 모델은 멱법칙 분포(롱테일), WS 모델은 거의 균일한 분포를
+    보입니다. 차수 분포의 형태만으로도 네트워크가 어떤 메커니즘으로 형성되었는지 추론할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    degWS = [d for n, d in wsGraph.degree()]
+
+    fig6, axes = plt.subplots(1, 3, figsize=(14, 4))
+
+    axes[0].hist(degreesER, bins=range(max(degreesER)+2), align='left',
+                 color='skyblue', edgecolor='black')
+    axes[0].set_title('ER')
+    axes[0].set_xlabel('Degree')
+
+    axes[1].hist(degListBA, bins=range(max(degListBA)+2), align='left',
+                 color='salmon', edgecolor='black')
+    axes[1].set_title('BA')
+    axes[1].set_xlabel('Degree')
+
+    axes[2].hist(degWS, bins=range(max(degWS)+2), align='left',
+                 color='lightgreen', edgecolor='black')
+    axes[2].set_title('WS')
+    axes[2].set_xlabel('Degree')
+
+    fig6.suptitle('Degree Distribution Comparison')
+    fig6.tight_layout()
+    fig6
+  exercise:
+    prompt: 8단계. 차수 분포 비교 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      degWS = [d for n, d in wsGraph.degree()]
+
+      fig6, axes = plt.subplots(1, 3, figsize=(14, 4))
+
+      axes[0].hist(degreesER, bins=range(max(degreesER)+2), align='left',
+                   color='skyblue', edgecolor='black')
+      axes[0].set_title('ER')
+      axes[0].set_xlabel('Degree')
+
+      axes[1].hist(degListBA, bins=range(max(degListBA)+2), align='left',
+                   color='salmon', edgecolor='black')
+      axes[1].set_title('BA')
+      axes[1].set_xlabel('Degree')
+
+      axes[2].hist(degWS, bins=range(max(degWS)+2), align='left',
+                   color='lightgreen', edgecolor='black')
+      axes[2].set_title('WS')
+      axes[2].set_xlabel('Degree')
+
+      fig6.suptitle('Degree Distribution Comparison')
+      fig6.tight_layout()
+      fig6
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 8단계. 차수 분포 비교의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 8단계. 차수 분포 비교 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step9_real_world
+  title: 9단계. 실제 네트워크와 비교
+  structuredPrimary: true
+  subtitle: 가라테 클럽
+  goal: 9단계. 실제 네트워크와 비교에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    실제 네트워크(가라테 클럽)의 특성을 랜덤 그래프 모델들과 비교합니다. 동일한 노드 수와 엣지 수를 가진 각 모델의 랜덤 그래프를 생성하고, 클러스터링 계수와 평균 경로 길이를 비교합니다. 어떤 모델이 실제 네트워크와 가장 유사한 특성을 보이는지 확인합니다.
+
+    실제 소셜 네트워크는 보통 BA(허브 존재)와 WS(높은 클러스터링)의 특성을 함께 보입니다.
+  snippet: |-
+    karate = nx.karate_club_graph()
+    nK = karate.number_of_nodes()
+    mK = karate.number_of_edges()
+    clustK = nx.average_clustering(karate)
+    pathK = nx.average_shortest_path_length(karate)
+    nK, mK, round(clustK, 3), round(pathK, 2)
+  exercise:
+    prompt: 9단계. 실제 네트워크와 비교 예제에서 \`karate\`, \`nK\`, \`mK\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      karate = nx.karate_club_graph()
+      nK = karate.number_of_nodes()
+      mK = karate.number_of_edges()
+      clustK = nx.average_clustering(karate)
+      pathK = nx.average_shortest_path_length(karate)
+      nK, mK, round(clustK, 3), round(pathK, 2)
+    hints:
+    - 바꿀 지점은 \`karate = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`karate\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 9단계. 실제 네트워크와 비교에서 \`karate\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 9단계. 실제 네트워크와 비교 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step10_summary
+  title: 10단계. 모델 요약
+  structuredPrimary: true
+  subtitle: 어떤 모델을 사용할까
+  goal: 10단계. 모델 요약에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 각 랜덤 그래프 모델의 특징과 적합한 사용 상황을 정리합니다. ER 모델은 기준선(baseline)으로, BA 모델은 허브가 있는 네트워크(웹, 인용) 시뮬레이션에,
+    WS 모델은 높은 클러스터링의 소셜 네트워크 시뮬레이션에 적합합니다. 실제 네트워크를 분석할 때 이 모델들과 비교하면 네트워크의 특성을 이해하는 데 도움이 됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    modelSummary = {
+        'Erdős-Rényi': {
+            'degree_dist': 'Poisson',
+            'clustering': 'Low',
+            'use_case': 'Baseline, Random structure'
+        },
+        'Barabási-Albert': {
+            'degree_dist': 'Power-law',
+            'clustering': 'Low-Medium',
+            'use_case': 'Web, Citation, Hub networks'
+        },
+        'Watts-Strogatz': {
+            'degree_dist': 'Regular',
+            'clustering': 'High',
+            'use_case': 'Social networks, Small-world'
+        }
+    }
+    modelSummary
+  exercise:
+    prompt: 10단계. 모델 요약 예제에서 \`modelSummary\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      modelSummary = {
+          'Erdős-Rényi': {
+              'degree_dist': 'Poisson',
+              'clustering': 'Low',
+              'use_case': 'Baseline, Random structure'
+          },
+          'Barabási-Albert': {
+              'degree_dist': 'Power-law',
+              'clustering': 'Low-Medium',
+              'use_case': 'Web, Citation, Hub networks'
+          },
+          'Watts-Strogatz': {
+              'degree_dist': 'Regular',
+              'clustering': 'High',
+              'use_case': 'Social networks, Small-world'
+          }
+      }
+      modelSummary
+    hints:
+    - 바꿀 지점은 \`modelSummary = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`modelSummary\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 10단계. 모델 요약에서 \`modelSummary\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 10단계. 모델 요약 실행 뒤 \`modelSummary\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 랜덤 그래프
+  goal: 실습에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    지금까지 배운 랜덤 그래프 모델을 활용하여 실전 미션을 수행해봅시다. 파라미터를 변경하며 그래프 특성의 변화를 관찰하고, 재연결 확률에 따른 스몰월드 특성을 탐구합니다.
+
+    각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  snippet: |-
+    import networkx as nx
+    import matplotlib.pyplot as plt
+
+    ba1 = nx.barabasi_albert_graph(100, 1, seed=42)
+    ba2 = nx.barabasi_albert_graph(100, 3, seed=42)
+    ba3 = nx.barabasi_albert_graph(100, 5, seed=42)
+
+    maxDeg1 = max(d for n, d in ba1.degree())
+    maxDeg2 = max(d for n, d in ba2.degree())
+    maxDeg3 = max(d for n, d in ba3.degree())
+    maxDeg1, maxDeg2, maxDeg3
+  exercise:
+    prompt: 실습 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+
+      ba1 = nx.barabasi_albert_graph(100, 1, seed=42)
+      ba2 = nx.barabasi_albert_graph(100, 3, seed=42)
+      ba3 = nx.barabasi_albert_graph(100, 5, seed=42)
+
+      maxDeg1 = max(d for n, d in ba1.degree())
+      maxDeg2 = max(d for n, d in ba2.degree())
+      maxDeg3 = max(d for n, d in ba3.degree())
+      maxDeg1, maxDeg2, maxDeg3
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 실습의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 실습 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 인수인계 네트워크
+  goal: 업무 흐름 검증에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 실무 네트워크 분석은 그래프를 그리는 데서 끝나지 않습니다. 먼저 병목 후보를 예측하고, 로컬 Python에서 실행한 뒤, 잘못된 노드나 끊어진 경로를 예외로
+    처리하고, 핵심 지표를 assert로 검증해야 합니다. 아래 흐름은 영업, 지원, 운영, 재무, 엔지니어링 사이의 인수인계 비용을 네트워크로 보고 개선안을 비교합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import networkx as nx
+
+    handoffEdges = [
+        ("sales", "support", 1),
+        ("support", "ops", 2),
+        ("ops", "finance", 1),
+        ("ops", "engineering", 1),
+        ("engineering", "infra", 2),
+        ("support", "customer_success", 2),
+    ]
+
+    workflowGraph = nx.Graph()
+    workflowGraph.add_weighted_edges_from(handoffEdges)
+
+    expectedNodes = {"sales", "support", "ops", "finance", "engineering", "infra", "customer_success"}
+    if set(workflowGraph.nodes()) != expectedNodes:
+        raise ValueError("인수인계 네트워크의 부서 목록이 예상과 다릅니다.")
+    if any(data["weight"] <= 0 for _, _, data in workflowGraph.edges(data=True)):
+        raise ValueError("인수인계 비용은 0보다 커야 합니다.")
+
+    salesToFinanceCost = nx.shortest_path_length(workflowGraph, "sales", "finance", weight="weight")
+    betweenness = nx.betweenness_centrality(workflowGraph, weight="weight")
+
+    workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      experimentGraph = workflowGraph.copy()
+      experimentGraph.add_edge("sales", "finance", weight=2)
+
+      improvedCost = nx.shortest_path_length(experimentGraph, "sales", "finance", weight="weight")
+      improvedBetweenness = nx.betweenness_centrality(experimentGraph, weight="weight")
+      improvement = salesToFinanceCost - improvedCost
+
+      assert improvement > 0
+      {
+          "beforeCost": salesToFinanceCost,
+          "afterCost": improvedCost,
+          "costImprovement": improvement,
+          "opsBetweennessBefore": round(betweenness["ops"], 3),
+          "opsBetweennessAfter": round(improvedBetweenness["ops"], 3),
+      }
+    solution: |-
+      import networkx as nx
+
+      handoffEdges = [
+          ("sales", "support", 1),
+          ("support", "ops", 2),
+          ("ops", "finance", 1),
+          ("ops", "engineering", 1),
+          ("engineering", "infra", 2),
+          ("support", "customer_success", 2),
+      ]
+
+      workflowGraph = nx.Graph()
+      workflowGraph.add_weighted_edges_from(handoffEdges)
+
+      expectedNodes = {"sales", "support", "ops", "finance", "engineering", "infra", "customer_success"}
+      if set(workflowGraph.nodes()) != expectedNodes:
+          raise ValueError("인수인계 네트워크의 부서 목록이 예상과 다릅니다.")
+      if any(data["weight"] <= 0 for _, _, data in workflowGraph.edges(data=True)):
+          raise ValueError("인수인계 비용은 0보다 커야 합니다.")
+
+      workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 업무 흐름 검증에서 \`experimentGraph\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: networkx_09-random-model-expectation-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 랜덤 graph 모델의 기대 통계 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: Erdos-Renyi n,p의 기대 edge 수와 평균 degree를 계산한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - undirected 가능한 edge 수는 n(n-1)/2입니다.
+    - 기대값은 한 번 생성한 graph의 실제값과 다를 수 있습니다.
+    exercise:
+      prompt: er_expectation(n, probability)를 완성하세요.
+      starterCode: |-
+        def er_expectation(n, probability):
+            raise NotImplementedError
+      solution: |
+        def er_expectation(n, probability):
+            if n < 0 or not 0 <= probability <= 1:
+                raise ValueError("invalid model parameters")
+            expected_edges = n * (n - 1) / 2 * probability
+            return {"expectedEdges": round(expected_edges, 3), "expectedMeanDegree": round(max(0, n - 1) * probability, 3)}
+      hints: *id001
+    check:
+      id: python.networkx.networkx_09.random-model-expectation.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_09.random-model-expectation.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: er_expectation
+        cases:
+        - id: computes-er-expectation
+          arguments:
+          - value: 5
+          - value: 0.5
+          expectedReturn:
+            expectedEdges: 5.0
+            expectedMeanDegree: 2.0
+        - id: handles-empty-model
+          arguments:
+          - value: 0
+          - value: 0.7
+          expectedReturn:
+            expectedEdges: 0.0
+            expectedMeanDegree: 0.0
+        - id: rejects-probability
+          arguments:
+          - value: 3
+          - value: 1.1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: networkx_09-degree-model-gap-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_09-random-model-expectation-mastery
+    title: 새 관측 graph와 random baseline 비교하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 관측 평균 degree와 model 기대값의 차이를 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - undirected 평균 degree는 2m/n입니다.
+    - 한 summary gap만으로 생성 모델을 확정하지 마세요.
+    exercise:
+      prompt: compare_degree_baseline(node_count, edge_count, probability)를 완성하세요.
+      starterCode: |-
+        def compare_degree_baseline(node_count, edge_count, probability):
+            raise NotImplementedError
+      solution: |
+        def compare_degree_baseline(node_count, edge_count, probability):
+            if node_count < 0 or edge_count < 0 or not 0 <= probability <= 1:
+                raise ValueError("invalid graph summary")
+            observed = 0.0 if node_count == 0 else 2 * edge_count / node_count
+            expected = max(0, node_count - 1) * probability
+            return {"observedMeanDegree": round(observed, 3), "expectedMeanDegree": round(expected, 3), "gap": round(observed - expected, 3)}
+      hints: *id002
+    check:
+      id: python.networkx.networkx_09.degree-model-gap.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_09.degree-model-gap.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: compare_degree_baseline
+        cases:
+        - id: compares-to-baseline
+          arguments:
+          - value: 10
+          - value: 20
+          - value: 0.2
+          expectedReturn:
+            observedMeanDegree: 4.0
+            expectedMeanDegree: 1.8
+            gap: 2.2
+        - id: handles-zero-nodes
+          arguments:
+          - value: 0
+          - value: 0
+          - value: 0.5
+          expectedReturn:
+            observedMeanDegree: 0.0
+            expectedMeanDegree: 0.0
+            gap: 0.0
+        - id: rejects-negative-edge
+          arguments:
+          - value: 2
+          - value: -1
+          - value: 0.2
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: networkx_09-random-graph-model-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_09-degree-model-gap-transfer
+    title: 랜덤 graph 모델 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: baseline 생성 가정과 실제 구조를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 그래프 알고리즘의 입력 가정과 반환 의미를 함께 기록하세요.
+    - 시각적 모양만으로 구조적 결론을 내리지 마세요.
+    exercise:
+      prompt: choose_random_model(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_random_model(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_random_model(situation):
+            table = {'independent-edges': {'method': 'Erdos-Renyi', 'evidence': 'n and p', 'risk': 'no clustering'}, 'fixed-degree-sequence': {'method': 'configuration model', 'evidence': 'degree distribution', 'risk': 'parallel edges'}, 'preferential-growth': {'method': 'Barabasi-Albert', 'evidence': 'growth process', 'risk': 'mechanism overclaim'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.networkx.networkx_09.random-graph-model.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_09.random-graph-model.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_random_model
+        cases:
+        - id: recalls-independent-edges
+          arguments:
+          - value: independent-edges
+          expectedReturn:
+            method: Erdos-Renyi
+            evidence: n and p
+            risk: no clustering
+        - id: recalls-fixed-degree-sequence
+          arguments:
+          - value: fixed-degree-sequence
+          expectedReturn:
+            method: configuration model
+            evidence: degree distribution
+            risk: parallel edges
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

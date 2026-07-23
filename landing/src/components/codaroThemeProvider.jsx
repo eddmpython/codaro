@@ -1,23 +1,51 @@
 import { Theme } from "@astryxdesign/core/theme";
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from "react";
 
 import { codaroTheme } from "../styles/generated/codaro.js";
-import { resolveDensity } from "../styles/generated/codaroTheme.ts";
+import { resolveDensity, themeCanvasColors } from "../styles/generated/codaroTheme.ts";
 
 const themeStorageKey = "codaro-theme";
 const darkMediaQuery = "(prefers-color-scheme: dark)";
 const reducedMotionQuery = "(prefers-reduced-motion: reduce)";
 const themeModes = ["system", "light", "dark"];
 const CodaroThemeContext = createContext(null);
+const useBrowserLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 function readStoredTheme() {
   if (typeof window === "undefined") return "system";
-  const stored = window.localStorage.getItem(themeStorageKey);
-  return themeModes.includes(stored) ? stored : "system";
+  try {
+    const stored = window.localStorage.getItem(themeStorageKey);
+    return themeModes.includes(stored) ? stored : "system";
+  } catch {
+    return "system";
+  }
+}
+
+function readMediaQuery(query) {
+  return typeof window !== "undefined" && typeof window.matchMedia === "function"
+    ? window.matchMedia(query).matches
+    : false;
+}
+
+function storeThemeMode(mode) {
+  try {
+    if (mode === "system") window.localStorage.removeItem(themeStorageKey);
+    else window.localStorage.setItem(themeStorageKey, mode);
+  } catch {
+    // The selected mode still applies for this session when storage is unavailable.
+  }
 }
 
 function useMediaQuery(query) {
-  const [matches, setMatches] = useState(false);
+  const [matches, setMatches] = useState(() => readMediaQuery(query));
 
   useEffect(() => {
     if (!window.matchMedia) return undefined;
@@ -32,40 +60,35 @@ function useMediaQuery(query) {
 }
 
 export function CodaroThemeProvider({ children, initialSurface = "landing" }) {
-  const [themeMode, setThemeModeState] = useState("system");
+  const [themeMode, setThemeModeState] = useState(readStoredTheme);
   const [designSurface, setDesignSurface] = useState(initialSurface);
   const prefersDark = useMediaQuery(darkMediaQuery);
   const reducedMotion = useMediaQuery(reducedMotionQuery);
   const resolvedTheme = themeMode === "system" ? (prefersDark ? "dark" : "light") : themeMode;
   const densityMode = resolveDensity(designSurface);
 
-  useEffect(() => {
-    setThemeModeState(readStoredTheme());
-  }, []);
-
   const setThemeMode = useCallback((nextMode) => {
     const normalized = themeModes.includes(nextMode) ? nextMode : "system";
     setThemeModeState(normalized);
-    if (normalized === "system") {
-      window.localStorage.removeItem(themeStorageKey);
-    } else {
-      window.localStorage.setItem(themeStorageKey, normalized);
-    }
+    storeThemeMode(normalized);
   }, []);
 
   const cycleThemeMode = useCallback(() => {
     setThemeMode(themeModes[(themeModes.indexOf(themeMode) + 1) % themeModes.length]);
   }, [setThemeMode, themeMode]);
 
-  useEffect(() => {
+  useBrowserLayoutEffect(() => {
     const root = document.documentElement;
+    const canvasColor = themeCanvasColors[resolvedTheme];
+    root.dataset.theme = resolvedTheme;
     root.dataset.resolvedTheme = resolvedTheme;
     root.dataset.density = densityMode;
     root.dataset.accent = "plum";
     root.classList.toggle("dark", resolvedTheme === "dark");
+    root.style.colorScheme = resolvedTheme;
+    root.style.backgroundColor = canvasColor;
     const themeColor = document.querySelector('meta[name="theme-color"]');
-    const canvasColor = window.getComputedStyle(root).getPropertyValue("--color-background-body").trim();
-    if (canvasColor) themeColor?.setAttribute("content", canvasColor);
+    themeColor?.setAttribute("content", canvasColor);
   }, [densityMode, resolvedTheme]);
 
   const value = useMemo(
@@ -87,7 +110,6 @@ export function CodaroThemeProvider({ children, initialSurface = "landing" }) {
       <Theme mode={themeMode} theme={codaroTheme}>
         <div
           data-accent="plum"
-          data-astryx-theme="codaro"
           data-density={densityMode}
           style={{ display: "contents" }}
         >

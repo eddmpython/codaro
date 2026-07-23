@@ -1,0 +1,892 @@
+var e=`meta:
+  packages:
+  - altair
+  - matplotlib
+  - numpy
+  - pandas
+  - seaborn
+  - statsmodels
+  id: statsmodels_06
+  title: 다중회귀심화
+  order: 6
+  category: statsmodels
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  dataSource: codaro-local:advertising
+  tags:
+  - 다중회귀
+  - VIF
+  - 다중공선성
+  - 특성선택
+  - 모델비교
+  seo:
+    title: statsmodels 다중회귀 심화 - 다중공선성과 특성 선택
+    description: 다중회귀의 고급 기법을 배웁니다. VIF로 다중공선성을 진단하고 최적 변수를 선택합니다.
+    keywords:
+    - statsmodels
+    - 다중회귀
+    - VIF
+    - 다중공선성
+    - 특성선택
+    - 모델비교
+intro:
+  emoji: 📊
+  goal: 여러 광고 매체를 동시에 분석하여 최적 조합 찾기
+  description: 3개 광고 매체(TV, Radio, Newspaper)를 모두 사용한 다중회귀 모델을 만들고, VIF로 다중공선성을 진단하며, 최적 변수 조합을 찾습니다.
+  direction: 다중회귀심화에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 다중회귀심화 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 변수 간 상관관계 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 다중회귀 모델 학습 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 다중회귀심화 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: altair, matplotlib, numpy, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 다중회귀심화 실행
+      detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
+    - label: 다중회귀심화 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  structuredPrimary: true
+  subtitle: 광고비 데이터 준비
+  goal: 1단계. 데이터 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    01 프로젝트에서 사용한 Advertising 데이터를 다시 불러옵니다. 이번에는 TV 한 가지가 아니라 Radio, Newspaper 광고비도 모두 활용하여 매출을 예측하는 다중회귀 모델을 만듭니다. 01 프로젝트의 단순회귀는 독립변수가 하나뿐이었지만, 다중회귀는 여러 독립변수를 동시에 고려하므로 각 변수의 '순수한' 영향을 분리하고 더 정확한 예측이 가능합니다. 이 프로젝트에서는 VIF(다중공선성 진단), 변수 선택, 상호작용 효과 등 다중회귀의 심화 개념을 배웁니다.
+
+    index_col=0은 첫 번째 컬럼을 인덱스로 사용합니다. shape은 (행, 열) 튜플로 데이터 크기를 반환하며, 200개 시장과 4개 컬럼(TV, Radio, Newspaper, Sales)을 확인할 수 있습니다.
+  tips:
+  - index_col=0은 첫 번째 컬럼을 인덱스로 사용합니다. shape은 (행, 열) 튜플로 데이터 크기를 반환하며, 200개 시장과 4개 컬럼(TV, Radio, Newspaper,
+    Sales)을 확인할 수 있습니다.
+  snippet: |-
+    import pandas as pd
+    import numpy as np
+    import statsmodels.api as sm
+    from codaro.curriculum.localData import loadLocalDataset
+
+    adData = loadLocalDataset("advertising")
+    adData.shape
+  exercise:
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      import numpy as np
+      import statsmodels.api as sm
+      from codaro.curriculum.localData import loadLocalDataset
+
+      adData = loadLocalDataset("advertising")
+      adData.shape
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step2_correlation
+  title: 2단계. 변수 간 상관관계
+  structuredPrimary: true
+  subtitle: 다중공선성 예비 확인
+  goal: 2단계. 변수 간 상관관계에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: |-
+    다중회귀를 하기 전 독립변수들 간의 상관관계를 확인하는 것은 필수입니다. 상관계수는 -1에서 1 사이 값으로, 절대값이 0.8 이상이면 강한 상관관계를 의미하며 다중공선성(multicollinearity) 문제가 발생할 수 있습니다. 다중공선성은 독립변수들끼리 높은 상관관계를 가질 때 발생하며, 회귀 계수가 불안정해지고 해석이 어려워집니다. 02 프로젝트에서 배운 상관관계 분석 기법을 다중회귀 준비에 활용합니다.
+
+    corr()는 모든 변수 쌍의 피어슨 상관계수를 계산합니다. 대각선은 자기 자신과의 상관이므로 항상 1.0입니다. TV와 Radio는 0.05로 거의 무상관이지만, TV와 Newspaper는 0.06으로 약한 양의 상관입니다. Sales와 각 광고비의 상관을 보면 TV(0.78), Radio(0.58), Newspaper(0.23) 순으로 높습니다.
+  tips:
+  - corr()는 모든 변수 쌍의 피어슨 상관계수를 계산합니다. 대각선은 자기 자신과의 상관이므로 항상 1.0입니다. TV와 Radio는 0.05로 거의 무상관이지만, TV와 Newspaper는
+    0.06으로 약한 양의 상관입니다. Sales와 각 광고비의 상관을 보면 TV(0.78), Radio(0.58), Newspaper(0.23) 순으로 높습니다.
+  snippet: adData.corr()
+  exercise:
+    prompt: 2단계. 변수 간 상관관계 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    starterCode: adData.corr()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 변수 간 상관관계의 수정 코드가 핵심 처리 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 2단계. 변수 간 상관관계 실행 결과가 출력과 상태 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step3_multiple_regression
+  title: 3단계. 다중회귀 모델 학습
+  structuredPrimary: true
+  subtitle: 3개 변수 모두 사용
+  goal: 3단계. 다중회귀 모델 학습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    TV, Radio, Newspaper 광고비를 모두 독립변수로 사용하여 매출을 예측합니다. 다중회귀식은 y = β₀ + β₁X₁ + β₂X₂ + β₃X₃ 형태로, 각 변수의 계수 β는 '다른 변수를 고정했을 때' 해당 변수의 순수 효과를 나타냅니다. 예를 들어 TV 계수가 0.046이면 Radio와 Newspaper 광고비가 같을 때 TV 광고비 1천 달러 증가 시 매출이 46개 증가한다는 뜻입니다. 01 프로젝트의 단순회귀와 코드는 같지만 X DataFrame에 여러 컬럼을 포함한다는 차이가 있습니다.
+
+    adData[['TV', 'Radio', 'Newspaper']]는 대괄호 2개로 여러 컬럼을 선택하여 DataFrame을 반환합니다. add_constant()는 절편용 const 컬럼을 추가하며, 01 프로젝트에서 배운 필수 단계입니다. OLS(y, X).fit()으로 최소제곱법으로 3개 계수를 동시에 추정합니다.
+  tips:
+  - adData[['TV', 'Radio', 'Newspaper']]는 대괄호 2개로 여러 컬럼을 선택하여 DataFrame을 반환합니다. add_constant()는 절편용 const
+    컬럼을 추가하며, 01 프로젝트에서 배운 필수 단계입니다. OLS(y, X).fit()으로 최소제곱법으로 3개 계수를 동시에 추정합니다.
+  snippet: |-
+    XRaw = adData[['TV', 'Radio', 'Newspaper']]
+    y = adData['Sales']
+    X = sm.add_constant(XRaw)
+
+    modelAll = sm.OLS(y, X).fit()
+    modelAll.summary()
+  exercise:
+    prompt: 3단계. 다중회귀 모델 학습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      XRaw = adData[['TV', 'Radio', 'Newspaper']]
+      y = adData['Sales']
+      X = sm.add_constant(XRaw)
+
+      modelAll = sm.OLS(y, X).fit()
+      modelAll.summary()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 다중회귀 모델 학습에서 \`XRaw\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 다중회귀 모델 학습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step4_interpret_coefficients
+  title: 4단계. 계수 해석
+  structuredPrimary: true
+  subtitle: 각 광고 매체의 효과
+  goal: 4단계. 계수 해석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: |-
+    다중회귀 계수는 '다른 변수를 고정했을 때'라는 중요한 조건이 붙습니다. TV 계수 0.046은 Radio와 Newspaper 광고비가 같을 때 TV 광고비 1천 달러 증가 시 매출 46개 증가를 의미합니다. 01 프로젝트의 단순회귀 TV 계수(0.048)와 다중회귀 TV 계수(0.046)가 다른 이유는 다른 변수의 영향을 통제(control)했기 때문입니다. 특히 Newspaper 계수가 0에 가깝거나 음수라면, Radio와 TV를 고려했을 때 Newspaper의 순수 효과는 미미하다는 뜻입니다.
+
+    params는 절편(const)과 각 변수의 기울기를 보여줍니다. TV 계수가 0.046이면 다른 광고비를 고정하고 TV 광고비만 1천 달러 늘리면 매출이 46개 증가합니다. Newspaper 계수가 음수나 0에 가까우면 Newspaper 광고는 다른 매체를 고려했을 때 효과가 미미하다는 뜻입니다.
+  tips:
+  - params는 절편(const)과 각 변수의 기울기를 보여줍니다. TV 계수가 0.046이면 다른 광고비를 고정하고 TV 광고비만 1천 달러 늘리면 매출이 46개 증가합니다.
+    Newspaper 계수가 음수나 0에 가까우면 Newspaper 광고는 다른 매체를 고려했을 때 효과가 미미하다는 뜻입니다.
+  snippet: modelAll.params
+  exercise:
+    prompt: 4단계. 계수 해석 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    starterCode: modelAll.params
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 계수 해석의 수정 코드가 핵심 처리 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 4단계. 계수 해석 실행 결과가 출력과 상태 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step5_rsquared_comparison
+  title: 5단계. R² 비교
+  structuredPrimary: true
+  subtitle: 단순회귀 vs 다중회귀
+  goal: 5단계. R² 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    다중회귀의 R²는 단순회귀보다 항상 크거나 같습니다. 변수를 추가하면 R²는 자동으로 증가하므로, Adjusted R²(조정된 R²)로 비교해야 합니다. Adjusted R²는 변수 개수에 페널티를 부여하여 변수 추가가 실제로 모델을 개선하는지 판단합니다. 02 프로젝트에서 배운 Adjusted R² 개념을 모델 비교에 활용합니다.
+
+    rsquared는 R², rsquared_adj는 Adjusted R²입니다. TV만 사용한 모델의 R²가 0.61, 3개 변수 모델이 0.90이면 설명력이 크게 향상되었습니다. Adjusted R²도 함께 증가하면 변수 추가가 실제로 도움이 되는 것입니다.
+  tips:
+  - rsquared는 R², rsquared_adj는 Adjusted R²입니다. TV만 사용한 모델의 R²가 0.61, 3개 변수 모델이 0.90이면 설명력이 크게 향상되었습니다.
+    Adjusted R²도 함께 증가하면 변수 추가가 실제로 도움이 되는 것입니다.
+  snippet: |-
+    XTvRaw = adData[['TV']]
+    XTv = sm.add_constant(XTvRaw)
+    modelTv = sm.OLS(y, XTv).fit()
+
+    f"TV만: R² = {modelTv.rsquared:.4f}, Adj R² = {modelTv.rsquared_adj:.4f}"
+    f"전체: R² = {modelAll.rsquared:.4f}, Adj R² = {modelAll.rsquared_adj:.4f}"
+  exercise:
+    prompt: 5단계. R² 비교 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      XTvRaw = adData[['TV']]
+      XTv = sm.add_constant(XTvRaw)
+      modelTv = sm.OLS(y, XTv).fit()
+
+      f"TV만: R² = {modelTv.rsquared:.4f}, Adj R² = {modelTv.rsquared_adj:.4f}"
+      f"전체: R² = {modelAll.rsquared:.4f}, Adj R² = {modelAll.rsquared_adj:.4f}"
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. R² 비교에서 \`XTvRaw\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. R² 비교 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step6_vif
+  title: 6단계. VIF로 다중공선성 진단
+  structuredPrimary: true
+  subtitle: 변수 독립성 확인
+  goal: 6단계. VIF로 다중공선성 진단에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    VIF(Variance Inflation Factor, 분산팽창인자)는 다중공선성을 정량적으로 측정하는 지표입니다. VIF=1은 완전 독립, VIF>10이면 심각한 다중공선성으로 변수 제거를 고려해야 합니다. VIF는 각 독립변수를 다른 독립변수들로 회귀했을 때 R²를 사용하여 VIF = 1/(1-R²)로 계산됩니다. 예를 들어 TV를 Radio와 Newspaper로 예측했을 때 R²=0.9이면 VIF=10으로 높은 다중공선성을 의미합니다.
+
+    variance_inflation_factor(X, i)는 i번째 변수의 VIF를 계산합니다. XRaw.values는 DataFrame을 numpy 배열로 변환하며, range(XRaw.shape[1])은 컬럼 개수만큼 반복합니다. VIF < 5면 문제없음, 5-10이면 주의, >10이면 다중공선성 문제가 있어 변수 제거를 고려해야 합니다.
+  tips:
+  - variance_inflation_factor(X, i)는 i번째 변수의 VIF를 계산합니다. XRaw.values는 DataFrame을 numpy 배열로 변환하며, range(XRaw.shape[1])은
+    컬럼 개수만큼 반복합니다. VIF < 5면 문제없음, 5-10이면 주의, >10이면 다중공선성 문제가 있어 변수 제거를 고려해야 합니다.
+  snippet: |-
+    from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+    vifData = pd.DataFrame()
+    vifData['Feature'] = XRaw.columns
+    vifData['VIF'] = [variance_inflation_factor(XRaw.values, i) for i in range(XRaw.shape[1])]
+    vifData
+  exercise:
+    prompt: 6단계. VIF로 다중공선성 진단 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+      vifData = pd.DataFrame()
+      vifData['Feature'] = XRaw.columns
+      vifData['VIF'] = [variance_inflation_factor(XRaw.values, i) for i in range(XRaw.shape[1])]
+      vifData
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. VIF로 다중공선성 진단의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 6단계. VIF로 다중공선성 진단 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step7_vif_viz
+  title: 7단계. VIF 시각화
+  structuredPrimary: true
+  subtitle: 다중공선성 시각화
+  goal: 7단계. VIF 시각화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    VIF를 막대 그래프로 시각화하면 어떤 변수가 다중공선성 문제가 있는지 한눈에 파악할 수 있습니다. VIF < 5면 녹색(안전), 5-10이면 노란색(주의), > 10이면 빨간색(위험)으로 표시합니다.
+
+    녹색(VIF < 5)은 안전, 노란색(5-10)은 주의, 빨간색(> 10)은 변수 제거 고려입니다. 점선은 5와 10 기준선입니다.
+  snippet: |-
+    import altair as alt
+
+    vifData['Risk'] = vifData['VIF'].apply(lambda x: 'Safe' if x < 5 else ('Warning' if x < 10 else 'Danger'))
+
+    vifChart = alt.Chart(vifData).mark_bar().encode(
+        x=alt.X('VIF:Q', title='VIF', scale=alt.Scale(domain=[0, 12])),
+        y=alt.Y('Feature:N', sort='-x', title='Variable'),
+        color=alt.Color('Risk:N', scale=alt.Scale(domain=['Safe', 'Warning', 'Danger'], range=['#2ecc71', '#f39c12', '#e74c3c']))
+    ).properties(width=400, height=150, title='VIF by Variable')
+
+    threshLine = alt.Chart(pd.DataFrame({'x': [5, 10]})).mark_rule(strokeDash=[3, 3]).encode(
+        x='x:Q', color=alt.value('gray')
+    )
+    vifChart + threshLine
+  exercise:
+    prompt: 7단계. VIF 시각화 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import altair as alt
+
+      vifData['Risk'] = vifData['VIF'].apply(lambda x: 'Safe' if x < 5 else ('Warning' if x < 10 else 'Danger'))
+
+      vifChart = alt.Chart(vifData).mark_bar().encode(
+          x=alt.X('VIF:Q', title='VIF', scale=alt.Scale(domain=[0, 12])),
+          y=alt.Y('Feature:N', sort='-x', title='Variable'),
+          color=alt.Color('Risk:N', scale=alt.Scale(domain=['Safe', 'Warning', 'Danger'], range=['#2ecc71', '#f39c12', '#e74c3c']))
+      ).properties(width=400, height=150, title='VIF by Variable')
+
+      threshLine = alt.Chart(pd.DataFrame({'x': [5, 10]})).mark_rule(strokeDash=[3, 3]).encode(
+          x='x:Q', color=alt.value('gray')
+      )
+      vifChart + threshLine
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 7단계. VIF 시각화의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
+    resultCheck: 7단계. VIF 시각화 분기 결과가 바꾼 조건값에 맞게 달라져야 합니다.
+- id: step8_pvalues
+  title: 8단계. p-value로 변수 유의성 확인
+  structuredPrimary: true
+  subtitle: 통계적 유의성 검정
+  goal: 8단계. pvalue로 변수 유의성 확인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: |-
+    p-value는 해당 변수가 종속변수에 실제로 영향을 미치는지 통계적으로 검정하는 지표입니다. 귀무가설(H₀)은 '계수가 0이다(영향 없음)'이며, p-value < 0.05면 귀무가설을 기각하여 95% 신뢰수준에서 유의미한 영향이 있다고 판단합니다. 0.05 이상이면 우연일 가능성이 높아 변수 제거를 고려합니다. summary()의 P>|t| 컬럼이 p-value이며, Newspaper의 p-value가 0.86으로 높으면 다른 변수를 고려했을 때 Newspaper는 통계적으로 유의미한 효과가 없다는 뜻입니다.
+
+    pvalues는 각 변수의 p-value를 Series로 반환합니다. drop('const')는 절편을 제외하고 독립변수만 확인합니다. p-value가 0.000이면 거의 확실히 영향을 미치며, 0.860이면 86% 확률로 우연이므로 효과가 없을 가능성이 높습니다.
+  tips:
+  - pvalues는 각 변수의 p-value를 Series로 반환합니다. drop('const')는 절편을 제외하고 독립변수만 확인합니다. p-value가 0.000이면 거의 확실히
+    영향을 미치며, 0.860이면 86% 확률로 우연이므로 효과가 없을 가능성이 높습니다.
+  snippet: modelAll.pvalues.drop('const')
+  exercise:
+    prompt: 8단계. pvalue로 변수 유의성 확인 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    starterCode: modelAll.pvalues.drop('const')
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. pvalue로 변수 유의성 확인의 수정 코드가 핵심 처리 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 8단계. pvalue로 변수 유의성 확인 실행 결과가 출력과 상태 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step9_remove_newspaper
+  title: 9단계. 유의미하지 않은 변수 제거
+  structuredPrimary: true
+  subtitle: TV + Radio 모델
+  goal: 9단계. 유의미하지 않은 변수 제거에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    Newspaper의 p-value가 0.05보다 높으면 이 변수를 제거하고 TV와 Radio만으로 모델을 다시 학습합니다. 변수 제거 후 R²는 약간 감소할 수 있지만, Adjusted R²가 유지되거나 오히려 증가하면 제거한 변수는 불필요했다는 증거입니다. 더 간결한 모델은 해석이 쉽고, 불필요한 변수를 제거하면 과적합(overfitting)을 방지하여 새로운 데이터에 대한 예측 안정성이 향상됩니다. 이것이 '파시모니(parsimony) 원칙', 즉 간결한 모델이 좋은 모델이라는 통계학의 핵심 원칙입니다.
+
+    변수를 제거했는데 Adjusted R²가 거의 같거나 증가하면 제거한 변수는 불필요했다는 뜻입니다. R²는 0.90에서 0.897로 약간 감소했지만 Adjusted R²는 거의 유지되면 TV+Radio 모델이 더 간결하고 실용적입니다.
+  tips:
+  - 변수를 제거했는데 Adjusted R²가 거의 같거나 증가하면 제거한 변수는 불필요했다는 뜻입니다. R²는 0.90에서 0.897로 약간 감소했지만 Adjusted R²는 거의
+    유지되면 TV+Radio 모델이 더 간결하고 실용적입니다.
+  snippet: |-
+    XTvRadioRaw = adData[['TV', 'Radio']]
+    XTvRadio = sm.add_constant(XTvRadioRaw)
+    modelTvRadio = sm.OLS(y, XTvRadio).fit()
+
+    f"전체(3개): R² = {modelAll.rsquared:.4f}, Adj R² = {modelAll.rsquared_adj:.4f}"
+    f"TV+Radio: R² = {modelTvRadio.rsquared:.4f}, Adj R² = {modelTvRadio.rsquared_adj:.4f}"
+  exercise:
+    prompt: 9단계. 유의미하지 않은 변수 제거 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      XTvRadioRaw = adData[['TV', 'Radio']]
+      XTvRadio = sm.add_constant(XTvRadioRaw)
+      modelTvRadio = sm.OLS(y, XTvRadio).fit()
+
+      f"전체(3개): R² = {modelAll.rsquared:.4f}, Adj R² = {modelAll.rsquared_adj:.4f}"
+      f"TV+Radio: R² = {modelTvRadio.rsquared:.4f}, Adj R² = {modelTvRadio.rsquared_adj:.4f}"
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 유의미하지 않은 변수 제거에서 \`XTvRadioRaw\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 9단계. 유의미하지 않은 변수 제거 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step10_interaction
+  title: 10단계. 상호작용 효과
+  structuredPrimary: true
+  subtitle: TV × Radio
+  goal: 10단계. 상호작용 효과에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    상호작용(interaction)은 두 변수가 함께 작용할 때 발생하는 추가 효과입니다. TV와 Radio 광고를 동시에 집행하면 시너지 효과로 개별 효과의 합보다 더 큰 매출 증가가 발생할 수 있습니다. 예를 들어 TV만 보던 소비자가 Radio에서 같은 광고를 들으면 기억이 강화되어 구매 전환율이 높아집니다. 상호작용항은 TV × Radio를 새로운 변수로 추가하며, 계수가 양수면 시너지 효과(1+1>2), 음수면 상쇄 효과(1+1<2)를 의미합니다. 마케팅 믹스 최적화에서 매우 중요한 개념입니다.
+
+    adData['TV'] * adData['Radio']는 요소별 곱셈으로 새로운 컬럼을 만듭니다. 상호작용 계수가 0.001이면 TV와 Radio를 각각 100씩 증가시킬 때 개별 효과 외에 추가로 0.001×100×100=10개 매출 증가가 발생합니다. R²가 증가하고 p-value < 0.05면 상호작용이 유의미합니다.
+  tips:
+  - adData['TV'] * adData['Radio']는 요소별 곱셈으로 새로운 컬럼을 만듭니다. 상호작용 계수가 0.001이면 TV와 Radio를 각각 100씩 증가시킬 때
+    개별 효과 외에 추가로 0.001×100×100=10개 매출 증가가 발생합니다. R²가 증가하고 p-value < 0.05면 상호작용이 유의미합니다.
+  snippet: |-
+    adDataInteraction = adData.copy()
+    adDataInteraction['TV_Radio'] = adDataInteraction['TV'] * adDataInteraction['Radio']
+
+    XInteractionRaw = adDataInteraction[['TV', 'Radio', 'TV_Radio']]
+    XInteraction = sm.add_constant(XInteractionRaw)
+    modelInteraction = sm.OLS(y, XInteraction).fit()
+
+    f"상호작용 R²: {modelInteraction.rsquared:.4f}"
+    f"TV_Radio 계수: {modelInteraction.params['TV_Radio']:.6f}"
+  exercise:
+    prompt: 10단계. 상호작용 효과 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      adDataInteraction = adData.copy()
+      adDataInteraction['TV_Radio'] = adDataInteraction['TV'] * adDataInteraction['Radio']
+
+      XInteractionRaw = adDataInteraction[['TV', 'Radio', 'TV_Radio']]
+      XInteraction = sm.add_constant(XInteractionRaw)
+      modelInteraction = sm.OLS(y, XInteraction).fit()
+
+      f"상호작용 R²: {modelInteraction.rsquared:.4f}"
+      f"TV_Radio 계수: {modelInteraction.params['TV_Radio']:.6f}"
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 상호작용 효과에서 \`adDataInteraction\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 10단계. 상호작용 효과 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step11_coef_comparison
+  title: 11단계. 모델별 계수 비교
+  structuredPrimary: true
+  subtitle: 시각화
+  goal: 11단계. 모델별 계수 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    단순회귀와 다중회귀의 계수를 비교하면 변수 추가가 각 계수에 미치는 영향을 파악할 수 있습니다. Newspaper 계수가 단순회귀에서는 양수였다가 다중회귀에서 0에 가까워지면, 다른 변수를 통제했을 때 실제 효과가 없다는 뜻입니다.
+
+    파란색은 단순회귀 계수, 주황색은 다중회귀 계수입니다. Newspaper가 다중회귀에서 0에 가까워지면 다른 변수 효과를 통제했을 때 실제 효과가 미미하다는 뜻입니다.
+  snippet: |-
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+
+    coefCompare = pd.DataFrame({
+        'Variable': ['TV', 'Radio', 'Newspaper'],
+        'Simple': [modelTv.params['TV'], radioModel.params['Radio'] if 'radioModel' in dir() else 0.2, 0.055],
+        'Multiple': [modelAll.params['TV'], modelAll.params['Radio'], modelAll.params['Newspaper']]
+    })
+
+    coefMelt = coefCompare.melt(id_vars='Variable', var_name='Model', value_name='Coefficient')
+    coefFig, coefAx = plt.subplots(figsize=(8, 4))
+    sns.barplot(data=coefMelt, x='Variable', y='Coefficient', hue='Model', ax=coefAx)
+    coefAx.set_title('Simple vs Multiple Regression Coefficients')
+    coefAx.axhline(y=0, color='gray', linestyle='--', alpha=0.5)
+    coefFig
+  exercise:
+    prompt: 11단계. 모델별 계수 비교 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import seaborn as sns
+      import matplotlib.pyplot as plt
+
+      coefCompare = pd.DataFrame({
+          'Variable': ['TV', 'Radio', 'Newspaper'],
+          'Simple': [modelTv.params['TV'], radioModel.params['Radio'] if 'radioModel' in dir() else 0.2, 0.055],
+          'Multiple': [modelAll.params['TV'], modelAll.params['Radio'], modelAll.params['Newspaper']]
+      })
+
+      coefMelt = coefCompare.melt(id_vars='Variable', var_name='Model', value_name='Coefficient')
+      coefFig, coefAx = plt.subplots(figsize=(8, 4))
+      sns.barplot(data=coefMelt, x='Variable', y='Coefficient', hue='Model', ax=coefAx)
+      coefAx.set_title('Simple vs Multiple Regression Coefficients')
+      coefAx.axhline(y=0, color='gray', linestyle='--', alpha=0.5)
+      coefFig
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 모델별 계수 비교의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
+    resultCheck: 11단계. 모델별 계수 비교 분기 결과가 바꾼 조건값에 맞게 달라져야 합니다.
+- id: step12_predict
+  title: 12단계. 최종 모델로 예측
+  structuredPrimary: true
+  subtitle: 새로운 광고 예산 시나리오
+  goal: 12단계. 최종 모델로 예측에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    최종 선택한 TV+Radio 모델로 새로운 광고 예산 시나리오의 매출을 예측합니다. 예를 들어 TV 광고비 200천 달러, Radio 30천 달러 투입 시 예상 매출을 계산하여 마케팅 예산 배분 의사결정에 활용합니다. 01 프로젝트에서 배운 predict() 사용법을 다중회귀에 적용하며, 여러 변수 값을 포함한 DataFrame을 입력합니다. 다양한 시나리오를 시뮬레이션하면 최적 예산 배분을 찾을 수 있습니다.
+
+    predict()는 학습된 계수로 y = β₀ + β₁X₁ + β₂X₂를 계산합니다. newScenario는 모델 학습 시 X와 같은 컬럼(const, TV, Radio)을 가져야 하며, 순서는 상관없지만 이름은 정확히 일치해야 합니다. [0]은 예측값 배열의 첫 번째 원소를 추출합니다.
+  tips:
+  - predict()는 학습된 계수로 y = β₀ + β₁X₁ + β₂X₂를 계산합니다. newScenario는 모델 학습 시 X와 같은 컬럼(const, TV, Radio)을 가져야
+    하며, 순서는 상관없지만 이름은 정확히 일치해야 합니다. [0]은 예측값 배열의 첫 번째 원소를 추출합니다.
+  snippet: |-
+    newScenario = pd.DataFrame({'const': [1], 'TV': [200], 'Radio': [30]})
+    predictedSales = modelTvRadio.predict(newScenario)[0]
+    f"예상 매출: {predictedSales:.2f}천 개"
+  exercise:
+    prompt: 12단계. 최종 모델로 예측 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      newScenario = pd.DataFrame({'const': [1], 'TV': [200], 'Radio': [30]})
+      predictedSales = modelTvRadio.predict(newScenario)[0]
+      f"예상 매출: {predictedSales:.2f}천 개"
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 12단계. 최종 모델로 예측의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 12단계. 최종 모델로 예측의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 다중회귀 마스터 프로젝트
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    마케팅 전략 분석가가 되어 최적 광고 믹스를 찾아냅니다. 각 미션은 데이터 로딩부터 다중회귀 모델링, VIF 분석, 최적화까지 전체 과정을 독립적으로 수행합니다. 01-05 프로젝트에서 배운 모든 기법과 이번 프로젝트의 심화 내용을 활용합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import pandas as pd
+    import statsmodels.api as sm
+    from codaro.curriculum.localData import loadLocalDataset
+
+    cmpData = loadLocalDataset("advertising")
+    cmpY = cmpData['Sales']
+
+    tvX = sm.add_constant(cmpData[['TV']])
+    radioX = sm.add_constant(cmpData[['Radio']])
+    newsX = sm.add_constant(cmpData[['Newspaper']])
+
+    tvModel = sm.OLS(cmpY, tvX).fit()
+    radioModel = sm.OLS(cmpY, radioX).fit()
+    newsModel = sm.OLS(cmpY, newsX).fit()
+    tvModel.rsquared
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      import statsmodels.api as sm
+      from codaro.curriculum.localData import loadLocalDataset
+
+      cmpData = loadLocalDataset("advertising")
+      cmpY = cmpData['Sales']
+
+      tvX = sm.add_constant(cmpData[['TV']])
+      radioX = sm.add_constant(cmpData[['Radio']])
+      newsX = sm.add_constant(cmpData[['Newspaper']])
+
+      tvModel = sm.OLS(cmpY, tvX).fit()
+      radioModel = sm.OLS(cmpY, radioX).fit()
+      newsModel = sm.OLS(cmpY, newsX).fit()
+      tvModel.rsquared
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  subtitle: 여섯 번째 프로젝트 완료!
+  blocks:
+  - type: text
+    content: 이번 프로젝트에서는 Advertising 데이터로 TV, Radio, Newspaper 3개 광고 매체를 모두 사용한 다중회귀 모델을 만들었습니다. VIF로 다중공선성을
+      진단하고, p-value로 Newspaper가 유의미하지 않음을 확인하여 TV+Radio 모델을 최종 선택했습니다. 상호작용 효과도 분석하여 TV와 Radio의 시너지를 발견했으며,
+      Adjusted R² 0.897로 높은 설명력을 달성했습니다. 이제 다중회귀의 핵심 개념인 변수 선택, 다중공선성 진단, 모델 비교를 활용하여 실전 마케팅 의사결정을 수행할
+      수 있습니다.
+  - type: list
+    items:
+    - 다중회귀 - 여러 독립변수로 동시 예측
+    - VIF - 다중공선성 정량적 측정 (>10이면 문제)
+    - p-value - 변수 유의성 검정 (<0.05면 유의미)
+    - Adjusted R² - 변수 개수 고려한 모델 평가
+    - 상호작용 - 변수 간 시너지 효과 분석
+    - 변수 선택 - 불필요한 변수 제거로 간결한 모델
+  - type: text
+    content: 다음 프로젝트에서는 시계열 데이터를 다룹니다. 지금까지 배운 회귀분석 기법과 시계열 특성을 결합하여 시간에 따라 변하는 패턴을 분석하고 미래를 예측하는 고급 기법을
+      익힙니다.
+  goal: 정리에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 회귀 리포트 품질 게이트
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: statsmodels 학습의 핵심은 모델을 만들고 summary를 보는 데서 끝나지 않는 것입니다. 먼저 어떤 변수가 유의할지 예측하고, 로컬 데이터의 컬럼과
+    결측치를 검증하고, 회귀 결과가 보고서에 들어갈 수준인지 R², F-test, 잔차 진단으로 확인해야 합니다. 마지막에는 변수를 빼는 변주로 모델 선택의 근거를 비교합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import pandas as pd
+    import statsmodels.api as sm
+    from statsmodels.stats.diagnostic import het_breuschpagan
+    from codaro.curriculum.localData import loadLocalDataset
+
+    marketingData = loadLocalDataset("advertising")
+    requiredColumns = ["TV", "Radio", "Newspaper", "Sales"]
+
+    missingColumns = [column for column in requiredColumns if column not in marketingData.columns]
+    if missingColumns:
+        raise ValueError(f"필수 컬럼이 없습니다: {missingColumns}")
+    if marketingData[requiredColumns].isna().any().any():
+        raise ValueError("회귀분석 전 결측치를 처리해야 합니다.")
+
+    reportY = marketingData["Sales"]
+    reportX = sm.add_constant(marketingData[["TV", "Radio", "Newspaper"]])
+    reportModel = sm.OLS(reportY, reportX).fit()
+
+    marketingData[requiredColumns].head()
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      compactX = sm.add_constant(marketingData[["TV", "Radio"]])
+      compactModel = sm.OLS(reportY, compactX).fit()
+      r2Drop = reportModel.rsquared - compactModel.rsquared
+
+      assert compactModel.rsquared >= 0.95
+      {
+          "fullR2": round(reportModel.rsquared, 3),
+          "compactR2": round(compactModel.rsquared, 3),
+          "r2Drop": round(r2Drop, 3),
+          "fullAIC": round(reportModel.aic, 1),
+          "compactAIC": round(compactModel.aic, 1),
+      }
+    solution: |-
+      import pandas as pd
+      import statsmodels.api as sm
+      from statsmodels.stats.diagnostic import het_breuschpagan
+      from codaro.curriculum.localData import loadLocalDataset
+
+      marketingData = loadLocalDataset("advertising")
+      requiredColumns = ["TV", "Radio", "Newspaper", "Sales"]
+
+      missingColumns = [column for column in requiredColumns if column not in marketingData.columns]
+      if missingColumns:
+          raise ValueError(f"필수 컬럼이 없습니다: {missingColumns}")
+      if marketingData[requiredColumns].isna().any().any():
+          raise ValueError("회귀분석 전 결측치를 처리해야 합니다.")
+
+      marketingData[requiredColumns].head()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증에서 \`compactX\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: statsmodels_06-multicollinearity-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: 다중회귀 predictor 상관과 condition 위험 점검하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 상관 pair와 threshold를 기준으로 고위험 쌍을 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - pairwise correlation은 VIF 전체를 대체하지 않습니다.
+    - 높은 상관은 coefficient 불안정 위험이지 자동 삭제 명령이 아닙니다.
+    exercise:
+      prompt: audit_predictor_correlations(correlations, threshold)를 완성하세요.
+      starterCode: |-
+        def audit_predictor_correlations(correlations, threshold):
+            raise NotImplementedError
+      solution: |
+        def audit_predictor_correlations(correlations, threshold):
+            if not 0<threshold<=1: raise ValueError("invalid threshold")
+            flagged=[]
+            for row in correlations:
+                if row["left"]==row["right"]: continue
+                if abs(row["correlation"])>=threshold:
+                    pair=sorted([row["left"],row["right"]]); flagged.append({"pair":pair,"correlation":row["correlation"]})
+            unique={tuple(item["pair"]):item for item in flagged}
+            return {"flagged":[unique[key] for key in sorted(unique)],"count":len(unique)}
+      hints: *id001
+    check:
+      id: python.statsmodels.statsmodels_06.multicollinearity-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.statsmodels.statsmodels_06.multicollinearity-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_predictor_correlations
+        cases:
+        - id: flags-high-correlation
+          arguments:
+          - value:
+            - left: area
+              right: rooms
+              correlation: 0.9
+            - left: rooms
+              right: area
+              correlation: 0.9
+            - left: age
+              right: area
+              correlation: -0.2
+          - value: 0.8
+          expectedReturn:
+            flagged:
+            - pair:
+              - area
+              - rooms
+              correlation: 0.9
+            count: 1
+        - id: returns-none-below-threshold
+          arguments:
+          - value:
+            - left: a
+              right: b
+              correlation: 0.5
+          - value: 0.8
+          expectedReturn:
+            flagged: []
+            count: 0
+        - id: rejects-threshold
+          arguments:
+          - value: []
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: statsmodels_06-coefficient-stability-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - statsmodels_06-multicollinearity-audit-mastery
+    title: 새 specification에 계수 안정성 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 여러 model specification의 coefficient sign·range를 비교한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 한 specification의 p-value보다 계수 안정성을 확인하세요.
+    - 변수 선택 과정도 불확실성의 일부입니다.
+    exercise:
+      prompt: coefficient_stability(estimates)를 완성하세요.
+      starterCode: |-
+        def coefficient_stability(estimates):
+            raise NotImplementedError
+      solution: |
+        def coefficient_stability(estimates):
+            if not estimates: raise ValueError("no estimates")
+            names=sorted(set().union(*(set(model) for model in estimates))); result={}
+            for name in names:
+                values=[model[name] for model in estimates if name in model]
+                signs={0 if value==0 else 1 if value>0 else -1 for value in values}
+                result[name]={"models":len(values),"minimum":min(values),"maximum":max(values),"signStable":len(signs)<=1}
+            return result
+      hints: *id002
+    check:
+      id: python.statsmodels.statsmodels_06.coefficient-stability.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.statsmodels.statsmodels_06.coefficient-stability.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: coefficient_stability
+        cases:
+        - id: detects-sign-flip
+          arguments:
+          - value:
+            - x: 1
+              z: 2
+            - x: -0.5
+              z: 3
+          expectedReturn:
+            x:
+              models: 2
+              minimum: -0.5
+              maximum: 1
+              signStable: false
+            z:
+              models: 2
+              minimum: 2
+              maximum: 3
+              signStable: true
+        - id: handles-missing-predictor
+          arguments:
+          - value:
+            - x: 1
+            - y: 2
+          expectedReturn:
+            x:
+              models: 1
+              minimum: 1
+              maximum: 1
+              signStable: true
+            y:
+              models: 1
+              minimum: 2
+              maximum: 2
+              signStable: true
+        - id: rejects-empty
+          arguments:
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: statsmodels_06-multiregression-diagnostics-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - statsmodels_06-coefficient-stability-transfer
+    title: 다중회귀 진단 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 공선성·specification·해석을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 계수·불확실성·가정 진단을 한 묶음으로 해석하세요.
+    - 통계적 연관을 인과 효과나 개인 확정 예측으로 확대하지 마세요.
+    exercise:
+      prompt: choose_multi_regression_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_multi_regression_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_multi_regression_evidence(situation):
+            table = {'correlated-predictors': {'method': 'VIF and condition diagnostics', 'evidence': 'design matrix', 'risk': 'unstable coefficients'}, 'model-specifications': {'method': 'coefficient stability', 'evidence': 'sign and interval across models', 'risk': 'selective reporting'}, 'prediction-only': {'method': 'held-out error plus diagnostics', 'evidence': 'baseline and residuals', 'risk': 'coefficient overinterpretation'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.statsmodels.statsmodels_06.multiregression-diagnostics.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.statsmodels.statsmodels_06.multiregression-diagnostics.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_multi_regression_evidence
+        cases:
+        - id: recalls-correlated-predictors
+          arguments:
+          - value: correlated-predictors
+          expectedReturn:
+            method: VIF and condition diagnostics
+            evidence: design matrix
+            risk: unstable coefficients
+        - id: recalls-model-specifications
+          arguments:
+          - value: model-specifications
+          expectedReturn:
+            method: coefficient stability
+            evidence: sign and interval across models
+            risk: selective reporting
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

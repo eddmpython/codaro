@@ -1,0 +1,769 @@
+var e=`meta:
+  id: 07_functools
+  title: functools - 함수형 프로그래밍
+  category: builtins
+  tags:
+  - functools
+  - partial
+  - reduce
+  - lru_cache
+  - wraps
+  seo:
+    title: 파이썬 functools 모듈 완전 정복
+    description: functools 모듈의 partial, reduce, lru_cache, wraps 등 함수형 프로그래밍 도구를 배웁니다.
+    keywords:
+    - functools
+    - partial
+    - reduce
+    - lru_cache
+    - 데코레이터
+    - 함수형프로그래밍
+intro:
+  emoji: 🔧
+  points:
+  - partial로 함수 인자 고정
+  - reduce로 누적 연산
+  - lru_cache로 성능 최적화
+  - wraps로 데코레이터 작성
+  direction: functools 함수형 프로그래밍에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 작은 샘플 입력 확인 후 모듈 함수 호출에 맞는 코드 입력을 고릅니다.
+  - functools 함수형 프로그래밍 결과를 반환값, stdout, 객체 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 표준 라이브러리 유틸리티에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: functools 모듈 불러오 입력 확인
+      detail: 입력 기준(작은 샘플 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: partial 부분 적용 함수 처리 실행
+      detail: 모듈 함수 호출 코드를 실행해 중간 결과를 확인합니다.
+    - label: reduce 누적 연산 결과 검증
+      detail: 반환값, stdout, 객체 상태 기준으로 실행 결과를 비교합니다.
+    - label: functools 함수형 프로 재사용
+      detail: 완성 코드를 표준 라이브러리 유틸리티에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 표준 라이브러리 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: functools 함수형 프로 실행
+      detail: 셀을 실행해 반환값, stdout, 객체 상태와 예외 상태를 확인합니다.
+    - label: functools 함수형 프로 완료
+      detail: 검증된 코드를 표준 라이브러리 유틸리티로 남깁니다.
+sections:
+- id: module_import
+  title: functools 모듈 불러오기
+  structuredPrimary: true
+  subtitle: ⚠️ 가장 먼저 실행하세요
+  goal: functools 모듈 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표준 라이브러리는 외부 의존성 없이 파일, 시간, 문자열, 직렬화 같은 업무 코드를 구성하는 기반입니다.
+  explanation: |-
+    functools은 파이썬 표준 라이브러리입니다. 고차 함수와 함수형 프로그래밍 도구를 제공하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
+
+    이 섹션을 먼저 실행하면 아래 모든 예제에서 functools 모듈을 사용할 수 있습니다.
+  snippet: |-
+    from functools import partial, reduce, lru_cache, wraps, total_ordering, cmp_to_key
+
+    # 모듈 로드 확인
+    'functools 모듈이 정상적으로 로드되었습니다'
+  exercise:
+    prompt: functools 모듈 불러오기 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    starterCode: |-
+      from functools import partial, reduce, lru_cache, wraps, total_ordering, cmp_to_key
+
+      # 모듈 로드 확인
+      'functools 모듈이 정상적으로 로드되었습니다'
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: functools 모듈 불러오기의 수정 코드가 모듈 함수 호출 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: functools 모듈 불러오기 실행 결과가 반환값, stdout, 객체 상태 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: partial
+  title: partial - 부분 적용 함수
+  structuredPrimary: true
+  subtitle: 인자를 미리 고정하기
+  goal: partial 부분 적용 함수에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    partial은 함수의 일부 인자를 미리 고정한 새 함수를 만듭니다. 같은 함수를 다른 기본값으로 여러 번 사용할 때 코드 중복을 줄이고, 콜백 함수나 이벤트 핸들러에서 추가 인자를 전달할 때 유용합니다.
+
+    partial은 람다보다 명확하고 디버깅이 쉽습니다. lambda x: func(2, x) 대신 partial(func, 2)를 사용하세요.
+  snippet: |-
+    def multiply(x, y):
+        return x * y
+
+    double = partial(multiply, 2)
+    output = double(5)
+    output
+  exercise:
+    prompt: partial 부분 적용 함수 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def multiply(x, y):
+          return x * y
+
+      double = partial(multiply, 2)
+      output = double(5)
+      output
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: partial 부분 적용 함수의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: partial 부분 적용 함수 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: reduce
+  title: reduce - 누적 연산
+  structuredPrimary: true
+  subtitle: 반복 가능한 객체 축소하기
+  goal: reduce 누적 연산에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    reduce는 이항 함수를 누적 적용하여 반복 가능한 객체를 단일 값으로 줄입니다. 리스트의 모든 요소를 합치거나, 곱하거나, 최댓값을 찾는 등 누적 연산에 사용됩니다. Python 3에서는 functools 모듈로 이동되었습니다.
+
+    sum(), max(), min()이 있다면 reduce보다 그것을 사용하는 것이 더 명확합니다.
+  snippet: |-
+    seq = [1, 2, 3, 4, 5]
+    total = reduce(lambda x, y: x + y, seq)
+    total
+  exercise:
+    prompt: reduce 누적 연산 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      seq = [1, 2, 3, 4, 5]
+      total = reduce(lambda x, y: x + y, seq)
+      total
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: reduce 누적 연산에서 \`seq\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: reduce 누적 연산 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: lru_cache
+  title: lru_cache - 메모이제이션
+  structuredPrimary: true
+  subtitle: 함수 결과 캐싱하기
+  goal: lrucache 메모이제이션에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    lru_cache는 함수 호출 결과를 캐싱하여 같은 인자로 다시 호출될 때 저장된 값을 반환합니다. LRU(Least Recently Used) 알고리즘으로 캐시 크기를 관리하며, 재귀 함수나 비용이 큰 계산의 성능을 크게 향상시킵니다.
+
+    Python 3.9+에서는 @cache 데코레이터를 사용하면 무제한 캐시를 더 간단히 만들 수 있습니다.
+  snippet: |-
+    @lru_cache(maxsize=128)
+    def fibonacci(n):
+        if n < 2:
+            return n
+        return fibonacci(n - 1) + fibonacci(n - 2)
+
+    fib10 = fibonacci(10)
+    fib10
+  exercise:
+    prompt: lrucache 메모이제이션 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      @lru_cache(maxsize=128)
+      def fibonacci(n):
+          if n < 2:
+              return n
+          return fibonacci(n - 1) + fibonacci(n - 2)
+
+      fib10 = fibonacci(10)
+      fib10
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: lrucache 메모이제이션의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: lrucache 메모이제이션 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: wraps
+  title: wraps - 데코레이터 작성
+  structuredPrimary: true
+  subtitle: 함수 메타데이터 보존하기
+  goal: wraps 데코레이터 작성에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    wraps는 데코레이터를 만들 때 원본 함수의 메타데이터(__name__, __doc__ 등)를 보존합니다. 데코레이터로 함수를 감쌀 때 함수의 이름과 문서가 바뀌는 것을 방지하여 디버깅과 문서화를 돕습니다.
+
+    데코레이터를 만들 때는 항상 @wraps를 사용하여 원본 함수 정보를 보존하세요.
+  snippet: |-
+    import time
+    def timer(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            start = time.time()
+            result = func(*args, **kwargs)
+            elapsed = time.time() - start
+            return result
+        return wrapper
+
+    @timer
+    def slowFunc():
+        time.sleep(0.1)
+        return 'done'
+
+    slowFunc.__name__
+  exercise:
+    prompt: wraps 데코레이터 작성 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      import time
+      def timer(func):
+          @wraps(func)
+          def wrapper(*args, **kwargs):
+              start = time.time()
+              result = func(*args, **kwargs)
+              elapsed = time.time() - start
+              return result
+          return wrapper
+
+      @timer
+      def slowFunc():
+          time.sleep(0.1)
+          return 'done'
+
+      slowFunc.__name__
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: wraps 데코레이터 작성의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: wraps 데코레이터 작성 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: ordering
+  title: total_ordering - 비교 연산자
+  structuredPrimary: true
+  subtitle: 클래스에 순서 부여하기
+  goal: totalordering 비교 연산자에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    total_ordering은 클래스에 __eq__와 하나의 비교 메서드만 정의하면 나머지 비교 연산자를 자동 생성합니다. <, <=, >, >= 중 하나와 ==만 구현하면 되므로 코드를 줄이고 일관성을 보장합니다.
+
+    성능이 중요하다면 모든 비교 메서드를 직접 구현하는 것이 더 빠를 수 있습니다.
+  snippet: |-
+    @total_ordering
+    class Student:
+        def __init__(self, name, score):
+            self.name = name
+            self.score = score
+        def __eq__(self, other):
+            return self.score == other.score
+        def __lt__(self, other):
+            return self.score < other.score
+
+    alice = Student('Alice', 90)
+    bob = Student('Bob', 85)
+    alice > bob
+  exercise:
+    prompt: totalordering 비교 연산자 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      @total_ordering
+      class Student:
+          def __init__(self, name, score):
+              self.name = name
+              self.score = score
+          def __eq__(self, other):
+              return self.score == other.score
+          def __lt__(self, other):
+              return self.score < other.score
+
+      alice = Student('Alice', 90)
+      bob = Student('Bob', 85)
+      alice > bob
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: totalordering 비교 연산자의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: totalordering 비교 연산자 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: practical
+  title: 실전 활용
+  structuredPrimary: true
+  subtitle: functools 실무 패턴
+  goal: 실전 활용에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    실무에서 자주 사용하는 functools 활용 패턴을 살펴봅니다. 성능 최적화, 데코레이터 체이닝, 함수 조합, 재사용 가능한 유틸리티 작성 등 다양한 문제를 functools로 해결할 수 있습니다.
+
+    여러 데코레이터를 조합할 때 @wraps는 가장 안쪽(함수에 가장 가까운 곳)에 위치해야 합니다.
+  snippet: |-
+    def retry(times, exceptionTypes=(RuntimeError,)):
+        def decorator(func):
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                for attempt in range(times):
+                    try:
+                        return func(*args, **kwargs)
+                    except exceptionTypes as exc:
+                        if attempt == times - 1:
+                            raise RuntimeError("재시도 횟수를 모두 사용했습니다.") from exc
+                return None
+            return wrapper
+        return decorator
+
+    @retry(3)
+    def unstable():
+        return 'success'
+
+    unstable()
+  exercise:
+    prompt: 실전 활용 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def retry(times, exceptionTypes=(RuntimeError,)):
+          def decorator(func):
+              @wraps(func)
+              def wrapper(*args, **kwargs):
+                  for attempt in range(times):
+                      try:
+                          return func(*args, **kwargs)
+                      except exceptionTypes as exc:
+                          if attempt == times - 1:
+                              raise RuntimeError("재시도 횟수를 모두 사용했습니다.") from exc
+                  return None
+              return wrapper
+          return decorator
+
+      @retry(3)
+      def unstable():
+          return 'success'
+
+      unstable()
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 실전 활용의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 실전 활용 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: workflow_validation
+  title: '검증 루프: 함수형 업무 파이프라인'
+  structuredPrimary: true
+  subtitle: partial, reduce, cache, wraps 검증
+  goal: '검증 루프: 함수형 업무 파이프라인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    functools는 함수형 문법 자체보다 재사용 가능한 업무 파이프라인을 만들 때 가치가 큽니다. 부분 적용으로 설정을 고정하고, reduce로 집계하고, lru_cache와 wraps가 실제로 기대한 효과를 내는지 검증합니다.
+
+    변주 실험
+    환율표를 함수 인자로 받도록 바꾸고, \`lru_cache\`를 붙일 때 dict가 해시 불가능하다는 점을 어떻게 우회할지 실험하세요.
+  tips:
+  - 변주 실험 환율표를 함수 인자로 받도록 바꾸고, \`lru_cache\`를 붙일 때 dict가 해시 불가능하다는 점을 어떻게 우회할지 실험하세요.
+  snippet: |-
+    exchangeRates = {"USD": 1350.0, "JPY": 9.0, "EUR": 1450.0}
+
+    def convertToKrw(amount, currency, feeRate):
+        return round(amount * exchangeRates[currency] * (1 + feeRate), 2)
+
+    usdToKrwWithFee = partial(convertToKrw, currency="USD", feeRate=0.015)
+    jpyToKrwWithoutFee = partial(convertToKrw, currency="JPY", feeRate=0.0)
+
+    assert usdToKrwWithFee(10) == 13702.5
+    assert jpyToKrwWithoutFee(1000) == 9000.0
+
+    {"usd": usdToKrwWithFee(10), "jpy": jpyToKrwWithoutFee(1000)}
+  exercise:
+    prompt: '검증 루프: 함수형 업무 파이프라인 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
+    starterCode: |-
+      exchangeRates = {"USD": 1350.0, "JPY": 9.0, "EUR": 1450.0}
+
+      def convertToKrw(amount, currency, feeRate):
+          return round(amount * exchangeRates[currency] * (1 + feeRate), 2)
+
+      usdToKrwWithFee = partial(convertToKrw, currency="USD", feeRate=0.015)
+      jpyToKrwWithoutFee = partial(convertToKrw, currency="JPY", feeRate=0.0)
+
+      assert usdToKrwWithFee(10) == 13702.5
+      assert jpyToKrwWithoutFee(1000) == 9000.0
+
+      {"usd": usdToKrwWithFee(10), "jpy": jpyToKrwWithoutFee(1000)}
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '검증 루프: 함수형 업무 파이프라인의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '검증 루프: 함수형 업무 파이프라인 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+- id: practice
+  title: functools 모듈 종합 복습
+  structuredPrimary: true
+  subtitle: 함수형 프로그래밍 마스터하기
+  goal: functools 모듈 종합 복습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: functools 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def add(a, b):
+        return a + b
+
+    add5 = partial(add, 5)
+    add5(3)
+  exercise:
+    prompt: functools 모듈 종합 복습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def add(a, b):
+          return a + b
+
+      add5 = partial(add, 5)
+      add5(3)
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: functools 모듈 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: functools 모듈 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 07_functools-currency-orders-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - partial
+    - workflow_validation
+    - practice
+    title: 통화별 주문 금액을 원화로 변환하기
+    subtitle: partial로 환율과 수수료 고정
+    goal: 주문 행에서 특정 통화만 골라 고정된 환율과 수수료로 KRW 값과 합계를 반환한다.
+    why: partial은 같은 변환 규칙을 여러 행에 재사용할 때 설정값을 함수 호출마다 반복하지 않게 해줍니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 주문 목록과 환율표로 다시 호출합니다.
+    tips:
+    - convert_to_krw에 currency, fee_rate, rates를 partial로 고정하세요.
+    - 반환값은 변환된 개별 값과 합계를 모두 담아야 합니다.
+    exercise:
+      prompt: summarize_currency_orders(rows, currency, fee_rate, rates)가 currency, count, values, totalKrw를 담은 dict를 반환하도록
+        완성하세요.
+      starterCode: |-
+        def summarize_currency_orders(rows, currency, fee_rate, rates):
+            raise NotImplementedError
+      solution: |-
+        from functools import partial
+
+        def convert_to_krw(amount, currency, fee_rate, rates):
+            return round(amount * rates[currency] * (1 + fee_rate), 2)
+
+        def summarize_currency_orders(rows, currency, fee_rate, rates):
+            converter = partial(convert_to_krw, currency=currency, fee_rate=fee_rate, rates=rates)
+            converted = [converter(row["amount"]) for row in rows if row["currency"] == currency]
+            return {
+                "currency": currency,
+                "count": len(converted),
+                "values": converted,
+                "totalKrw": round(sum(converted), 2),
+            }
+      hints:
+      - 필터링할 통화와 변환할 통화를 같은 currency 인자로 맞추세요.
+      - fee_rate는 0.015처럼 비율 값으로 들어옵니다.
+    check:
+      id: python.builtins.functools.currency-orders.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.functools.currency-orders.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_currency_orders
+        cases:
+        - id: usd-with-fee
+          arguments:
+          - value:
+            - amount: 10
+              currency: USD
+            - amount: 1000
+              currency: JPY
+            - amount: 3
+              currency: USD
+          - value: USD
+          - value: 0.015
+          - value:
+              USD: 1350.0
+              JPY: 9.0
+              EUR: 1450.0
+          expectedReturn:
+            currency: USD
+            count: 2
+            values:
+            - 13702.5
+            - 4110.75
+            totalKrw: 17813.25
+        - id: eur-with-fee
+          arguments:
+          - value:
+            - amount: 2
+              currency: EUR
+            - amount: 5
+              currency: USD
+            - amount: 1.5
+              currency: EUR
+          - value: EUR
+          - value: 0.02
+          - value:
+              USD: 1350.0
+              JPY: 9.0
+              EUR: 1450.0
+          expectedReturn:
+            currency: EUR
+            count: 2
+            values:
+            - 2958.0
+            - 2218.5
+            totalKrw: 5176.5
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 07_functools-weighted-signals-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - 07_functools-currency-orders-mastery
+    title: 가중 신호 점수 계산하기
+    subtitle: reduce를 집계 계약에 적용
+    goal: 신호 목록의 weight와 score를 누적해 weightedScore를 반환하고 총 weight 0은 거부한다.
+    why: reduce는 단순 합보다 "누적 상태를 어떤 규칙으로 줄이는가"가 드러날 때 학습 가치가 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 통화 변환이 아니라 다른 집계 계약에 누적 개념을 옮기세요.
+    tips:
+    - totalWeight와 weightedTotal을 별도로 누적하세요.
+    - totalWeight가 0이면 나눌 수 없으므로 ValueError를 일으키세요.
+    exercise:
+      prompt: score_weighted_signals(signals)가 signalCount, totalWeight, weightedScore를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def score_weighted_signals(signals):
+            raise NotImplementedError
+      solution: |-
+        from functools import reduce
+
+        def score_weighted_signals(signals):
+            total_weight = reduce(lambda total, row: total + row["weight"], signals, 0)
+            if total_weight == 0:
+                raise ValueError("total weight must be positive")
+            weighted_total = reduce(
+                lambda total, row: total + row["score"] * row["weight"],
+                signals,
+                0,
+            )
+            return {
+                "signalCount": len(signals),
+                "totalWeight": total_weight,
+                "weightedScore": round(weighted_total / total_weight, 2),
+            }
+      hints:
+      - reduce의 세 번째 인자는 빈 목록에도 안전한 초기값입니다.
+      - weightedScore는 소수점 둘째 자리까지 반올림하세요.
+    check:
+      id: python.builtins.functools.weighted-signals.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.functools.weighted-signals.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: score_weighted_signals
+        cases:
+        - id: integer-weights
+          arguments:
+          - value:
+            - score: 80
+              weight: 2
+            - score: 95
+              weight: 1
+            - score: 70
+              weight: 3
+          expectedReturn:
+            signalCount: 3
+            totalWeight: 6
+            weightedScore: 77.5
+        - id: fractional-weights
+          arguments:
+          - value:
+            - score: 100
+              weight: 1.5
+            - score: 60
+              weight: 0.5
+          expectedReturn:
+            signalCount: 2
+            totalWeight: 2.0
+            weightedScore: 90.0
+        - id: rejects-zero-weight
+          arguments:
+          - value:
+            - score: 100
+              weight: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 07_functools-route-cache-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 07_functools-weighted-signals-transfer
+    title: 반복 경로 비용을 캐시로 줄이기
+    subtitle: lru_cache의 hit와 miss 확인
+    goal: 반복 route 요청의 거리 조회를 캐시하고 비용 목록과 cache hit, miss 수를 반환한다.
+    why: 캐시는 붙이는 것으로 끝이 아니라 같은 인자 재호출에서 실제 조회가 줄었는지 증거로 확인해야 합니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. 해시 가능한 start, end 인자만 cached 함수에 넘기세요.
+    tips:
+    - 거리표 dict는 cached 함수 바깥 closure에 두고, cached 함수 인자는 start와 end만 사용하세요.
+    - cache_info().hits와 misses를 반환값에 포함하세요.
+    exercise:
+      prompt: summarize_route_costs(distance_pairs, route_requests, cost_per_km)가 costs, cacheHits, cacheMisses, rawLookups를
+        담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def summarize_route_costs(distance_pairs, route_requests, cost_per_km):
+            raise NotImplementedError
+      solution: |-
+        from functools import lru_cache
+
+        def summarize_route_costs(distance_pairs, route_requests, cost_per_km):
+            distance_map = {(start, end): km for start, end, km in distance_pairs}
+            lookup_counter = {"count": 0}
+
+            @lru_cache(maxsize=None)
+            def route_distance(start, end):
+                lookup_counter["count"] += 1
+                return distance_map[(start, end)]
+
+            costs = []
+            for start, end in route_requests:
+                km = route_distance(start, end)
+                costs.append({
+                    "route": f"{start}->{end}",
+                    "km": km,
+                    "cost": round(km * cost_per_km, 2),
+                })
+            cache_info = route_distance.cache_info()
+            return {
+                "costs": costs,
+                "cacheHits": cache_info.hits,
+                "cacheMisses": cache_info.misses,
+                "rawLookups": lookup_counter["count"],
+            }
+      hints:
+      - 같은 start, end가 두 번째로 나오면 raw lookup이 늘지 않아야 합니다.
+      - dict나 list를 cached 함수 인자로 넘기면 해시할 수 없어 실패합니다.
+    check:
+      id: python.builtins.functools.route-cache.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.functools.route-cache.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_route_costs
+        cases:
+        - id: repeated-route
+          arguments:
+          - value:
+            - - A
+              - B
+              - 12.5
+            - - B
+              - C
+              - 8.0
+          - value:
+            - - A
+              - B
+            - - B
+              - C
+            - - A
+              - B
+          - value: 1200
+          expectedReturn:
+            costs:
+            - route: A->B
+              km: 12.5
+              cost: 15000.0
+            - route: B->C
+              km: 8.0
+              cost: 9600.0
+            - route: A->B
+              km: 12.5
+              cost: 15000.0
+            cacheHits: 1
+            cacheMisses: 2
+            rawLookups: 2
+        - id: two-repeated-routes
+          arguments:
+          - value:
+            - - home
+              - hub
+              - 3.2
+            - - hub
+              - office
+              - 5.5
+          - value:
+            - - home
+              - hub
+            - - home
+              - hub
+            - - hub
+              - office
+            - - hub
+              - office
+          - value: 900
+          expectedReturn:
+            costs:
+            - route: home->hub
+              km: 3.2
+              cost: 2880.0
+            - route: home->hub
+              km: 3.2
+              cost: 2880.0
+            - route: hub->office
+              km: 5.5
+              cost: 4950.0
+            - route: hub->office
+              km: 5.5
+              cost: 4950.0
+            cacheHits: 2
+            cacheMisses: 2
+            rawLookups: 2
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending
+`;export{e as default};

@@ -1,0 +1,830 @@
+var e=`meta:
+  id: pdf_02
+  title: PDF 병합과 분할
+  order: 2
+  category: pdf
+  difficulty: ⭐
+  badge: 입문
+  packages:
+    - pypdf
+    - reportlab
+  tags:
+    - pypdf
+    - PdfWriter
+    - merge
+    - split
+  outcomes:
+    - automation.pdf.merge
+  prerequisites:
+    - automation.pdf.read
+    - python.functions
+  estimatedMinutes: 40
+  seo:
+    title: "pypdf PdfWriter - PDF 병합과 분할 자동화"
+    description: "여러 PDF를 코드로 묶고, 한 PDF를 단원별로 자르는 흐름. PdfWriter.add_page와 write의 기본 패턴을 손에 익힌다."
+    keywords:
+      - pypdf 병합
+      - pypdf 분할
+      - PdfWriter
+      - PDF 자동 묶기
+
+intro:
+  direction: "여러 PDF를 한 PDF로 묶고, 한 PDF를 단원별로 자르는 작업을 코드로 처리한다. 협력사 PDF 50종 분리·통합 반복 작업이 40분에서 5초로 줄어드는 흐름이다."
+  benefits:
+    - "총무 박과장의 협력사 PDF 50종 정리 작업을 40분에서 5초로 줄인다."
+    - "PdfWriter.add_page와 write 패턴 한 가지로 합치기·자르기를 모두 처리한다."
+    - "01강에서 만든 inspectPdfFolder 패턴을 그대로 재사용해 결과를 자동 검증한다."
+  diagram:
+    steps:
+      - label: "1. PdfWriter 만들기"
+        detail: "빈 PdfWriter() 객체에 페이지를 하나씩 add_page로 누적."
+      - label: "2. 여러 PDF 병합"
+        detail: "각 PDF의 reader.pages를 순회하며 writer.add_page."
+      - label: "3. 한 PDF 분할"
+        detail: "특정 페이지 인덱스만 새 PdfWriter에 add_page."
+      - label: "4. 검증"
+        detail: "결과 PDF를 다시 열어 페이지 수와 첫 줄 텍스트로 assert."
+    runtime:
+      - label: "샘플 PDF"
+        detail: "reportlab으로 강의 시작에 페이지 수가 다른 PDF 3개를 즉석 생성."
+      - label: "결과 보존"
+        detail: "병합·분할 결과는 TemporaryDirectory에 저장. PdfReader로 재오픈해 검증."
+
+sections:
+  - id: step1_writer
+    title: "1단계. PdfWriter 만들고 빈 결과 저장"
+    structuredPrimary: true
+    subtitle: "PdfWriter(), writer.write(path)"
+    goal: "PdfWriter 객체를 만들고 한 페이지짜리 결과 PDF를 임시 폴더에 저장한다."
+    why: "총무·결재 부서는 협력사 PDF 다섯 장을 한 묶음 결재용 PDF로 합치는 작업을 매주 반복합니다. PdfWriter는 그 결재용 PDF의 빈 그릇이고, add_page로 페이지를 누적해야 의미가 생깁니다. 빈 그릇만 정확히 만들 수 있어도 02강의 병합·분할·발췌가 전부 같은 패턴으로 풀립니다."
+    explanation: |-
+      reportlab으로 1페이지 PDF를 만들고, 그 페이지를 PdfReader로 읽어 PdfWriter에 넘긴 뒤 writer.write(outPath)로 저장합니다. write 인자는 파일 핸들 또는 경로 문자열입니다.
+    tips:
+      - "writer.write(path)는 'wb' 바이너리 모드 파일을 자동으로 열어 닫습니다. 직접 open할 필요 없습니다."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader, PdfWriter
+      from reportlab.pdfgen.canvas import Canvas
+
+      workdir = TemporaryDirectory()
+      srcPath = Path(workdir.name) / "src.pdf"
+      outPath = Path(workdir.name) / "out.pdf"
+
+      canvas = Canvas(str(srcPath))
+      canvas.drawString(72, 720, "source page")
+      canvas.showPage()
+      canvas.save()
+
+      writer = PdfWriter()
+      writer.add_page(PdfReader(srcPath).pages[0])
+      writer.write(str(outPath))
+
+      len(PdfReader(outPath).pages)
+    exercise:
+      prompt: "src.pdf에 페이지를 3개로 늘리고, 그 중 첫 두 페이지만 out.pdf에 담으세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader, PdfWriter
+        from reportlab.pdfgen.canvas import Canvas
+
+        workdir = TemporaryDirectory()
+        srcPath = Path(workdir.name) / "src.pdf"
+        outPath = Path(workdir.name) / "out.pdf"
+
+        canvas = Canvas(str(srcPath))
+        for idx in range(___):
+            canvas.drawString(72, 720, f"page {idx + 1}")
+            canvas.showPage()
+        canvas.save()
+
+        writer = PdfWriter()
+        for page in PdfReader(srcPath).pages[___]:
+            writer.add_page(page)
+        writer.write(str(outPath))
+
+        len(PdfReader(outPath).pages)
+      hints:
+        - "슬라이스 [:2]로 처음 두 페이지만 추출."
+    check:
+      noError: "writer.write는 str(path)를 받습니다. Path 직접 넘기면 일부 버전에서 실패."
+      resultCheck: "출력값이 2여야 합니다."
+
+  - id: step2_merge
+    title: "2단계. 여러 PDF 한 PDF로 병합"
+    structuredPrimary: true
+    subtitle: "여러 reader의 pages를 writer로 누적"
+    goal: "3개의 임시 PDF를 한 PDF로 묶고 페이지 수가 합과 같은지 확인한다."
+    why: "협력사가 PDF 5개를 보냈고 한 묶음으로 결재 올려야 한다면 손으로는 매번 Acrobat을 켜야 합니다. 코드로는 함수 호출 한 번입니다."
+    explanation: |-
+      mergePdfs(sources, outPath) 함수가 sources의 모든 페이지를 누적해 outPath로 저장합니다. PdfReader.pages는 그대로 add_page에 넘길 수 있습니다.
+    tips:
+      - "병합 순서는 sources 리스트 순서 그대로입니다. 파일명 정렬을 따르려면 sorted()로 미리 정렬하세요."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader, PdfWriter
+      from reportlab.pdfgen.canvas import Canvas
+
+      def makePages(path, pageCount):
+          canvas = Canvas(str(path))
+          for idx in range(pageCount):
+              canvas.drawString(72, 720, f"{path.stem}-{idx + 1}")
+              canvas.showPage()
+          canvas.save()
+
+      def mergePdfs(sources, outPath):
+          writer = PdfWriter()
+          for source in sources:
+              for page in PdfReader(source).pages:
+                  writer.add_page(page)
+          writer.write(str(outPath))
+
+      workdir = TemporaryDirectory()
+      base = Path(workdir.name)
+      makePages(base / "a.pdf", 2)
+      makePages(base / "b.pdf", 3)
+      makePages(base / "c.pdf", 1)
+      merged = base / "merged.pdf"
+      mergePdfs([base / "a.pdf", base / "b.pdf", base / "c.pdf"], merged)
+
+      len(PdfReader(merged).pages)
+    exercise:
+      prompt: "PDF 4개(각 1, 4, 2, 3 페이지)를 만들고 한 묶음으로 합쳐 총 페이지 수를 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader, PdfWriter
+        from reportlab.pdfgen.canvas import Canvas
+
+        def makePages(path, pageCount):
+            canvas = Canvas(str(path))
+            for idx in range(pageCount):
+                canvas.drawString(72, 720, f"{path.stem}-{idx + 1}")
+                canvas.showPage()
+            canvas.save()
+
+        def mergePdfs(sources, outPath):
+            writer = PdfWriter()
+            for source in sources:
+                for page in PdfReader(source).pages:
+                    writer.add_page(page)
+            writer.write(str(outPath))
+
+        workdir = TemporaryDirectory()
+        base = Path(workdir.name)
+        for name, pages in [("a", ___), ("b", ___), ("c", ___), ("d", ___)]:
+            makePages(base / f"{name}.pdf", pages)
+
+        merged = base / "merged.pdf"
+        mergePdfs(sorted(base.glob("*.pdf")), merged)
+        len(PdfReader(merged).pages)
+      hints:
+        - "1+4+2+3 = 10."
+    check:
+      noError: "리스트 컴프리헨션에서 각 페이지 수가 정수로 들어가야 합니다."
+      resultCheck: "출력이 10이어야 합니다."
+
+  - id: step3_split
+    title: "3단계. 한 PDF 분할"
+    structuredPrimary: true
+    subtitle: "특정 페이지 범위만 새 PDF로"
+    goal: "10페이지 PDF에서 5-7페이지만 추출해 별도 파일로 저장한다."
+    why: "긴 보고서에서 특정 단원만 발췌해 공유하는 작업은 자주 발생합니다. 페이지 범위 선택은 합치기와 같은 패턴 한 줄로 됩니다."
+    explanation: |-
+      splitPdf(source, outPath, startIndex, endIndex)에서 reader.pages[startIndex:endIndex]를 그대로 writer에 add_page합니다. 인덱스는 0 기준이고 endIndex는 슬라이스 관행대로 미포함입니다.
+    tips:
+      - "사용자에게는 1-based 페이지 번호가 익숙합니다. 함수 표면을 1-based로 받고 내부에서 -1 하는 게 친절합니다."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader, PdfWriter
+      from reportlab.pdfgen.canvas import Canvas
+
+      def makeLong(path, pageCount):
+          canvas = Canvas(str(path))
+          for idx in range(pageCount):
+              canvas.drawString(72, 720, f"p{idx + 1}")
+              canvas.showPage()
+          canvas.save()
+
+      def splitByRange(source, outPath, startPage, endPage):
+          writer = PdfWriter()
+          for page in PdfReader(source).pages[startPage - 1:endPage]:
+              writer.add_page(page)
+          writer.write(str(outPath))
+
+      workdir = TemporaryDirectory()
+      base = Path(workdir.name)
+      bigPath = base / "report.pdf"
+      makeLong(bigPath, 10)
+      slicedPath = base / "chapter2.pdf"
+      splitByRange(bigPath, slicedPath, 5, 7)
+
+      len(PdfReader(slicedPath).pages)
+    exercise:
+      prompt: "20페이지 PDF에서 11-15페이지만 분할해 결과 페이지 수가 5인지 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader, PdfWriter
+        from reportlab.pdfgen.canvas import Canvas
+
+        def makeLong(path, pageCount):
+            canvas = Canvas(str(path))
+            for idx in range(pageCount):
+                canvas.drawString(72, 720, f"p{idx + 1}")
+                canvas.showPage()
+            canvas.save()
+
+        def splitByRange(source, outPath, startPage, endPage):
+            writer = PdfWriter()
+            for page in PdfReader(source).pages[startPage - 1:endPage]:
+                writer.add_page(page)
+            writer.write(str(outPath))
+
+        workdir = TemporaryDirectory()
+        base = Path(workdir.name)
+        bigPath = base / "report.pdf"
+        makeLong(bigPath, ___)
+        slicedPath = base / "chapter.pdf"
+        splitByRange(bigPath, slicedPath, ___, ___)
+        len(PdfReader(slicedPath).pages)
+      hints:
+        - "20페이지를 만들고 11-15 범위 추출 = 5페이지."
+    check:
+      noError: "startPage, endPage 모두 정수."
+      resultCheck: "출력이 5여야 합니다."
+
+  - id: validation
+    title: "4단계. 검증 루프 - 병합·분할 결과 자동 비교"
+    structuredPrimary: true
+    subtitle: "원본 페이지 합 = 병합 결과, 분할 합 = 원본"
+    goal: "여러 PDF를 병합한 결과의 페이지 합과 원본 합이 일치하는지, 분할 결과 합이 원본과 같은지 한 셀에서 검증한다."
+    why: "병합·분할 작업은 페이지가 누락되거나 중복되는 사고가 잦습니다. assert 한 줄이 사고를 사전에 차단합니다."
+    explanation: |-
+      mergePdfs와 splitByRange를 함께 호출해 결과의 페이지 수가 의도와 일치하는지 검증합니다. 이 패턴은 10강 청구서 생성기의 검증 골격이 됩니다.
+    tips:
+      - "검증은 함수 호출 직후에 두는 게 안전합니다. 한 셀 안에서 모두 끝내야 디버깅이 쉽습니다."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader, PdfWriter
+      from reportlab.pdfgen.canvas import Canvas
+
+      def makePages(path, pageCount):
+          canvas = Canvas(str(path))
+          for idx in range(pageCount):
+              canvas.drawString(72, 720, f"{path.stem}-{idx + 1}")
+              canvas.showPage()
+          canvas.save()
+
+      def mergePdfs(sources, outPath):
+          writer = PdfWriter()
+          for source in sources:
+              for page in PdfReader(source).pages:
+                  writer.add_page(page)
+          writer.write(str(outPath))
+
+      vault = TemporaryDirectory()
+      vaultBase = Path(vault.name)
+      makePages(vaultBase / "x.pdf", 3)
+      makePages(vaultBase / "y.pdf", 5)
+      makePages(vaultBase / "z.pdf", 2)
+
+      mergedPath = vaultBase / "merged.pdf"
+      mergePdfs(sorted(vaultBase.glob("*.pdf")), mergedPath)
+
+      originalTotal = sum(len(PdfReader(p).pages) for p in sorted(vaultBase.glob("*.pdf")) if p.name != "merged.pdf")
+      mergedTotal = len(PdfReader(mergedPath).pages)
+      assert mergedTotal == originalTotal == 10
+      mergedTotal, originalTotal
+    exercise:
+      prompt: "mergePdfs 함수 본문을 직접 작성하세요. sources 리스트의 모든 PDF 페이지를 한 PdfWriter에 누적해 outPath에 저장해야 합니다."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader, PdfWriter
+        from reportlab.pdfgen.canvas import Canvas
+
+        def makePages(path, pageCount):
+            canvas = Canvas(str(path))
+            for idx in range(pageCount):
+                canvas.drawString(72, 720, f"{path.stem}-{idx + 1}")
+                canvas.showPage()
+            canvas.save()
+
+        def mergePdfs(sources, outPath):
+            writer = PdfWriter()
+            ___  # 각 source의 모든 페이지를 writer.add_page로 누적 후 writer.write(str(outPath))
+
+        vault = TemporaryDirectory()
+        vaultBase = Path(vault.name)
+        sizes = [2, 4, 1, 3, 6]
+        for idx, size in enumerate(sizes, start=1):
+            makePages(vaultBase / f"{idx}.pdf", size)
+
+        mergedPath = vaultBase / "out.pdf"
+        mergePdfs(sorted(vaultBase.glob("*.pdf")), mergedPath)
+
+        merged = len(PdfReader(mergedPath).pages)
+        assert merged == sum(sizes) == 16
+        merged
+      hints:
+        - "for source in sources: for page in PdfReader(source).pages: writer.add_page(page)"
+        - "마지막에 writer.write(str(outPath))."
+    check:
+      noError: "리스트 합산이 정수여야 assert가 통과합니다."
+      resultCheck: "출력이 16이어야 합니다."
+
+  - id: misconception
+    title: "5단계. 흔한 오개념 차단"
+    subtitle: "병합 시 annotation·하이퍼링크 손실 가능성"
+    goal: "병합 후에 원본의 일부 부가 정보가 손실될 수 있다는 점을 인지한다."
+    why: "PdfWriter.add_page는 페이지 콘텐츠를 복사하지만 hyperlink, form field, bookmark 같은 상위 구조는 복사 보장이 없습니다."
+    explanation: |-
+      pypdf의 add_page는 페이지 자체를 옮기지만 PDF 문서 수준의 outline(bookmark), 일부 annotation은 기본 동작에서 누락되거나 변형될 수 있습니다. 사내에서 표지·목차가 중요한 문서는 텍스트로 그대로 보이지만 클릭 가능한 링크가 사라질 수 있다는 점을 인지하고, 중요한 문서는 결과 PDF를 한 번 눈으로 확인하세요.
+    tips:
+      - "form field가 핵심인 PDF 병합이 필요하면 PdfWriter.append(reader, import_outline=True) 옵션을 검토하거나 09강 AcroForm 패턴을 봅니다."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader, PdfWriter
+      from reportlab.pdfgen.canvas import Canvas
+
+      workdir = TemporaryDirectory()
+      base = Path(workdir.name)
+      srcPath = base / "linked.pdf"
+      canvas = Canvas(str(srcPath))
+      canvas.drawString(72, 720, "see codaro.dev")
+      canvas.linkURL("https://codaro.dev", (72, 715, 220, 730))
+      canvas.showPage()
+      canvas.save()
+
+      writer = PdfWriter()
+      writer.add_page(PdfReader(srcPath).pages[0])
+      outPath = base / "merged.pdf"
+      writer.write(str(outPath))
+
+      reader = PdfReader(outPath)
+      reader.pages[0].extract_text()
+    exercise:
+      prompt: "병합 후 텍스트는 유지되지만 hyperlink 클릭 동작 보존은 보장 안 된다는 점을 문장으로 적고 실행하세요."
+      starterCode: |-
+        note = ___
+        note
+      hints:
+        - "문자열 하나를 적습니다. 예: '병합 후 텍스트는 유지되지만 hyperlink는 보장되지 않음'"
+    check:
+      noError: "note가 문자열이어야 합니다."
+      resultCheck: "문자열이 출력되어야 합니다."
+
+  - id: practice
+    title: "실습 - 종합 미션 2개"
+    subtitle: "협력사별 묶음, 단원별 분할 도구"
+    goal: "병합과 분할 패턴을 결합한 작은 도구 두 개를 직접 작성한다."
+    why: "한 함수 안에 PdfReader + PdfWriter + Path 처리가 모두 들어와야 자동화 도구가 완성됩니다."
+    explanation: |-
+      미션1은 폴더 내 PDF를 작성자별로 묶어 각각 별도 PDF로 저장하는 함수, 미션2는 한 PDF를 N페이지마다 잘라 여러 분할 PDF로 저장하는 함수입니다.
+    tips:
+      - "각 미션 import는 위 예제 실행 후 생략 가능."
+      - "변수 prefix: grp*(미션1), chunk*(미션2)."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader, PdfWriter
+      from reportlab.pdfgen.canvas import Canvas
+    exercise:
+      prompt: "두 미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader, PdfWriter
+        from reportlab.pdfgen.canvas import Canvas
+
+        ___
+      hints:
+        - "미션1: groupByAuthor(folder, outFolder) -> dict[author, Path]"
+        - "미션2: splitEveryN(source, outFolder, n) -> list[Path]"
+    check:
+      noError: "함수가 모두 정의되고 호출 결과가 dict/list여야 합니다."
+      resultCheck: "결과 파일들이 실제로 임시 폴더에 생성되어야 합니다."
+    blocks:
+      - type: tip
+        content: "병합·분할은 같은 add_page 패턴의 응용입니다. 둘을 한 흐름으로 보면 코드가 짧아집니다."
+      - type: expansion
+        title: "미션1: 작성자별 묶음"
+        blocks:
+          - type: code
+            title: "데이터 준비"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from pypdf import PdfReader, PdfWriter
+              from reportlab.pdfgen.canvas import Canvas
+
+              def makeAuthored(path, author):
+                  canvas = Canvas(str(path))
+                  canvas.setAuthor(author)
+                  canvas.drawString(72, 720, path.stem)
+                  canvas.showPage()
+                  canvas.save()
+
+              grpDir = TemporaryDirectory()
+              grpBase = Path(grpDir.name)
+              for idx, author in enumerate(["김대리", "박과장", "김대리", "박과장", "이주임"], start=1):
+                  makeAuthored(grpBase / f"{idx}.pdf", author)
+              grpOut = grpBase / "grouped"
+              grpOut.mkdir()
+              sorted(p.name for p in grpBase.glob("*.pdf"))
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              def groupByAuthor(folder, outFolder):
+                  buckets = {}
+                  for path in sorted(Path(folder).glob("*.pdf")):
+                      meta = PdfReader(path).metadata
+                      author = meta.author if meta else "unknown"
+                      buckets.setdefault(author, []).append(path)
+                  results = {}
+                  for author, paths in buckets.items():
+                      writer = PdfWriter()
+                      for source in paths:
+                          for page in PdfReader(source).pages:
+                              writer.add_page(page)
+                      outPath = Path(outFolder) / f"{author}.pdf"
+                      writer.write(str(outPath))
+                      results[author] = outPath
+                  return results
+
+              groups = groupByAuthor(grpBase, grpOut)
+              assert set(groups.keys()) == {"김대리", "박과장", "이주임"}
+              assert all(p.exists() for p in groups.values())
+              sorted(groups.keys())
+      - type: expansion
+        title: "미션2: N페이지마다 분할"
+        blocks:
+          - type: code
+            title: "데이터 준비"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from pypdf import PdfReader, PdfWriter
+              from reportlab.pdfgen.canvas import Canvas
+
+              def makeLongChunk(path, pageCount):
+                  canvas = Canvas(str(path))
+                  for idx in range(pageCount):
+                      canvas.drawString(72, 720, f"p{idx + 1}")
+                      canvas.showPage()
+                  canvas.save()
+
+              chunkDir = TemporaryDirectory()
+              chunkBase = Path(chunkDir.name)
+              chunkSrc = chunkBase / "long.pdf"
+              makeLongChunk(chunkSrc, 11)
+              chunkOut = chunkBase / "chunks"
+              chunkOut.mkdir()
+              len(PdfReader(chunkSrc).pages)
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              def splitEveryN(source, outFolder, n):
+                  pages = list(PdfReader(source).pages)
+                  outputs = []
+                  for chunkIdx, start in enumerate(range(0, len(pages), n)):
+                      writer = PdfWriter()
+                      for page in pages[start:start + n]:
+                          writer.add_page(page)
+                      outPath = Path(outFolder) / f"chunk_{chunkIdx + 1:02d}.pdf"
+                      writer.write(str(outPath))
+                      outputs.append(outPath)
+                  return outputs
+
+              chunks = splitEveryN(chunkSrc, chunkOut, 5)
+              assert len(chunks) == 3
+              assert len(PdfReader(chunks[-1]).pages) == 1
+              [p.name for p in chunks]
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: text
+        content: |-
+          본 강의의 병합·분할 패턴을 실무에 응용하는 아이디어입니다.
+      - type: list
+        style: bullet
+        items:
+          - "협력사가 보낸 PDF 50개를 자동으로 한 결재용 묶음으로 통합"
+          - "긴 사업계획서를 단원별 PDF로 분할해 협업 도구에 개별 첨부"
+          - "월별 보고서 PDF를 1분기·2분기 단위로 자동 묶음"
+          - "특정 페이지만 빼고 합치기 (목차·표지 제거 후 본문만)"
+          - "한 PDF의 짝수 페이지만 또는 홀수 페이지만 추출"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pdf_02-pdf-merge-plan-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_writer
+    - extensions
+    title: PDF 병합의 source page provenance 계획하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 각 output page가 정확히 하나의 source page를 참조하는지 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - output 순서마다 source document와 source page를 기록하세요.
+    - 병합에서 누락·중복·범위 밖 page를 모두 검사하세요.
+    exercise:
+      prompt: audit_merge_plan(sources, output_pages)를 완성하세요.
+      starterCode: |-
+        def audit_merge_plan(sources, output_pages):
+            raise NotImplementedError
+      solution: |
+        def audit_merge_plan(sources, output_pages):
+            available = {(source["id"], page) for source in sources for page in range(1, source["pageCount"] + 1)}
+            references = [(page["sourceId"], page["sourcePage"]) for page in output_pages]
+            invalid = sorted([list(reference) for reference in references if reference not in available])
+            duplicates = sorted([list(reference) for reference in set(references) if references.count(reference) > 1])
+            missing = sorted([list(reference) for reference in available - set(references)])
+            return {"accepted": not invalid and not duplicates and not missing, "invalid": invalid, "duplicates": duplicates, "missing": missing, "outputPageCount": len(output_pages)}
+      hints: *id001
+    check:
+      id: python.pdf.pdf_02.pdf-merge-plan.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_02.pdf-merge-plan.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_merge_plan
+        cases:
+        - id: accepts-complete-two-source-merge
+          arguments:
+          - value:
+            - id: a
+              pageCount: 2
+            - id: b
+              pageCount: 1
+          - value:
+            - sourceId: a
+              sourcePage: 1
+            - sourceId: a
+              sourcePage: 2
+            - sourceId: b
+              sourcePage: 1
+          expectedReturn:
+            accepted: true
+            invalid: []
+            duplicates: []
+            missing: []
+            outputPageCount: 3
+        - id: reports-duplicate-and-missing-page
+          arguments:
+          - value:
+            - id: a
+              pageCount: 2
+          - value:
+            - sourceId: a
+              sourcePage: 1
+            - sourceId: a
+              sourcePage: 1
+          expectedReturn:
+            accepted: false
+            invalid: []
+            duplicates:
+            - - a
+              - 1
+            missing:
+            - - a
+              - 2
+            outputPageCount: 2
+        - id: reports-invalid-reference
+          arguments:
+          - value:
+            - id: a
+              pageCount: 1
+          - value:
+            - sourceId: a
+              sourcePage: 2
+          expectedReturn:
+            accepted: false
+            invalid:
+            - - a
+              - 2
+            duplicates: []
+            missing:
+            - - a
+              - 1
+            outputPageCount: 1
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pdf_02-pdf-split-plan-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_02-pdf-merge-plan-mastery
+    title: 새 PDF 분할에 page coverage·파일명 충돌 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 모든 source page가 정확히 한 output part에 속하는지 판정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 분할 plan에서 source page 전체 coverage를 집합으로 검사하세요.
+    - output filename 충돌도 실제 write 전에 차단하세요.
+    exercise:
+      prompt: audit_split_plan(page_count, parts)를 완성하세요.
+      starterCode: |-
+        def audit_split_plan(page_count, parts):
+            raise NotImplementedError
+      solution: |
+        def audit_split_plan(page_count, parts):
+            assignments = []
+            names = []
+            for part in parts:
+                names.append(part["fileName"])
+                assignments.extend((page, part["fileName"]) for page in part["pages"])
+            page_numbers = [page for page, _ in assignments]
+            missing = sorted(set(range(1, page_count + 1)) - set(page_numbers))
+            duplicates = sorted({page for page in page_numbers if page_numbers.count(page) > 1})
+            invalid = sorted({page for page in page_numbers if page < 1 or page > page_count})
+            duplicate_names = sorted({name for name in names if names.count(name) > 1})
+            return {"accepted": not missing and not duplicates and not invalid and not duplicate_names, "missing": missing, "duplicates": duplicates, "invalid": invalid, "duplicateNames": duplicate_names}
+      hints: *id002
+    check:
+      id: python.pdf.pdf_02.pdf-split-plan.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_02.pdf-split-plan.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_split_plan
+        cases:
+        - id: accepts-full-split-coverage
+          arguments:
+          - value: 3
+          - value:
+            - fileName: part1.pdf
+              pages:
+              - 1
+              - 2
+            - fileName: part2.pdf
+              pages:
+              - 3
+          expectedReturn:
+            accepted: true
+            missing: []
+            duplicates: []
+            invalid: []
+            duplicateNames: []
+        - id: reports-missing-and-duplicate-page
+          arguments:
+          - value: 3
+          - value:
+            - fileName: a.pdf
+              pages:
+              - 1
+              - 1
+          expectedReturn:
+            accepted: false
+            missing:
+            - 2
+            - 3
+            duplicates:
+            - 1
+            invalid: []
+            duplicateNames: []
+        - id: reports-invalid-page-and-name-collision
+          arguments:
+          - value: 1
+          - value:
+            - fileName: a.pdf
+              pages:
+              - 1
+            - fileName: a.pdf
+              pages:
+              - 2
+          expectedReturn:
+            accepted: false
+            missing: []
+            duplicates: []
+            invalid:
+            - 2
+            duplicateNames:
+            - a.pdf
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pdf_02-pdf-merge-split-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_02-pdf-split-plan-transfer
+    title: PDF 병합·분할 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: source provenance·coverage·output collision 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - PDF 저장 성공과 페이지 내용·geometry·업무 값의 정확성을 분리해 검증하세요.
+    - Web에서는 문서 판단을 연습하고 Local에서는 재개방·render artifact evidence를 남기세요.
+    exercise:
+      prompt: choose_pdf_page_operation(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_pdf_page_operation(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_pdf_page_operation(situation):
+            table = {'merge': {'action': 'map each output page to source page', 'evidence': 'page provenance manifest', 'risk': 'missing or duplicate page'}, 'split': {'action': 'partition full source page set', 'evidence': 'part page lists', 'risk': 'coverage gap'}, 'write': {'action': 'check output filename collisions', 'evidence': 'destination plan', 'risk': 'overwrite'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.pdf.pdf_02.pdf-merge-split-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_02.pdf-merge-split-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_pdf_page_operation
+        cases:
+        - id: recalls-merge
+          arguments:
+          - value: merge
+          expectedReturn:
+            action: map each output page to source page
+            evidence: page provenance manifest
+            risk: missing or duplicate page
+        - id: recalls-split
+          arguments:
+          - value: split
+          expectedReturn:
+            action: partition full source page set
+            evidence: part page lists
+            risk: coverage gap
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

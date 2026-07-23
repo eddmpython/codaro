@@ -1,0 +1,601 @@
+var e=`meta:
+  id: procCtl_02
+  title: 인자 전달과 셸 인용
+  order: 2
+  category: procCtl
+  difficulty: easy
+  audience: 프로세스 자동화에 입문하는 Python 학습자
+  packages: []
+  tags:
+    - subprocess
+    - shell
+    - quoting
+intro:
+  direction: subprocess 인자를 리스트로 전달하는 안전한 방식과 shell=True의 함정을 비교해 인용 사고 없이 외부 명령을 호출한다.
+  benefits:
+    - 인자 리스트가 운영체제 인용을 어떻게 회피하는지 이해한다.
+    - 공백이 포함된 경로와 인자를 자연스럽게 처리한다.
+    - shell=True의 위험성과 적합한 사용 사례를 구분한다.
+    - 셸 메타문자가 들어간 입력에서 명령 주입을 막는다.
+  diagram:
+    steps:
+      - label: 리스트 인자 전달
+        detail: 첫 인자는 실행 파일이고 나머지는 인자로 그대로 전달된다.
+      - label: 공백 포함 인자
+        detail: 공백이 들어간 한 문자열도 한 인자로 안전히 전달된다.
+      - label: shell=True의 함정
+        detail: 같은 문자열이 셸에 의해 토큰 분리되어 의도가 달라질 수 있다.
+      - label: 안전한 명령 조립
+        detail: 입력 변수는 인자 위치에만 두고 셸 메타문자는 자동으로 회피한다.
+    runtime:
+      - label: 표준 라이브러리만
+        detail: subprocess와 sys만 사용해 외부 패키지가 필요 없다.
+      - label: assert 기반 검증
+        detail: 인자 전달 결과 문자열을 assert로 비교해 인용 사고를 확인한다.
+sections:
+  - id: list-args
+    title: 인자 리스트 전달
+    structuredPrimary: true
+    subtitle: shell 없이 안전하게
+    goal: subprocess.run에 리스트 인자를 넘겨 인용 문제 없이 한 명령을 실행한다.
+    why: 인자 리스트는 운영체제 수준에서 그대로 자식 프로세스에 전달되므로 셸 토큰 분리 위험을 원천 차단한다.
+    explanation: subprocess.run의 첫 인자가 리스트이면 첫 요소가 실행 파일, 나머지가 인자로 그대로 전달된다. 셸을 거치지 않으므로 따옴표, 공백, 메타문자가 의도대로 보존된다. 자동화에서는 리스트 인자가 항상 기본이다.
+    tips:
+      - 리스트 인자는 공백을 신경 쓰지 않아도 인자 경계가 보존된다.
+      - sys.executable로 받은 절대 경로는 공백이 포함된 경로에서도 안전하다.
+    snippet: |-
+      import subprocess
+      import sys
+
+      completed = subprocess.run(
+          [sys.executable, "-X", "utf8", "-c", "import sys; print(sys.argv[1])", "hello world"],
+          capture_output=True,
+          text=True,
+          encoding="utf-8",
+      )
+
+      assert completed.stdout.strip() == "hello world"
+      completed.stdout.strip()
+    exercise:
+      prompt: 자식에 "안녕 하세요" 한 문자열을 한 인자로 전달해 print(sys.argv[1])이 그대로 출력하는지 검증하세요.
+      starterCode: |-
+        import subprocess
+        import sys
+
+        completed = subprocess.run(
+            [sys.executable, "-X", "utf8", "-c", "import sys; print(sys.argv[1])", "___"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+
+        assert completed.stdout.strip() == "안녕 하세요"
+        completed.stdout.strip()
+      solution: |-
+        import subprocess
+        import sys
+
+        completed = subprocess.run(
+            [sys.executable, "-X", "utf8", "-c", "import sys; print(sys.argv[1])", "안녕 하세요"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+
+        assert completed.stdout.strip() == "안녕 하세요"
+        completed.stdout.strip()
+      hints:
+        - 공백이 들어간 한국어도 리스트 인자 한 슬롯에 그대로 넣으면 된다.
+        - 자식 코드는 sys.argv[1]을 읽어 출력하면 충분하다.
+      check:
+        type: noError
+        noError: 인자 리스트 전달과 stdout 캡처가 끝나야 한다.
+        resultCheck: stdout이 본문에서 넘긴 한국어 문자열과 동일해야 한다.
+    check:
+      noError: 리스트 인자 전달 호출이 OSError 없이 끝나야 한다.
+      resultCheck: stdout이 정확히 "hello world"여야 한다.
+  - id: shell-pitfall
+    title: shell=True의 토큰 분리
+    structuredPrimary: true
+    subtitle: 인자가 셸에 의해 쪼개진다
+    goal: shell=True에서는 같은 문자열도 셸이 공백을 기준으로 토큰 분리한다는 사실을 직접 확인한다.
+    why: 자동화 코드에서 shell=True를 무심코 쓰면 사용자 입력이 의도하지 않은 명령 인자가 될 수 있다.
+    explanation: shell=True를 켜면 첫 인자가 문자열이어야 하고 셸이 그 문자열을 토큰 분리한다. 공백이 들어간 변수가 인자 자리에 그대로 들어가면 분리가 어긋난다. 자동화에서는 가능하면 shell=True를 피하고 리스트 인자를 쓴다.
+    tips:
+      - 인용을 정확히 하면 shell=True로도 동작하지만 코드가 복잡해진다.
+      - 단순 파이프 표현이 필요할 때만 shell=True를 고려한다.
+    snippet: |-
+      import subprocess
+      import sys
+
+      cmd = f'{sys.executable} -c "import sys; print(len(sys.argv))"'
+      completed = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+      tokenCount = int(completed.stdout.strip())
+
+      assert tokenCount == 1
+      tokenCount
+    exercise:
+      prompt: shell=True로 같은 명령을 호출하되 추가 인자 "ab cd"를 셸 토큰으로 넘기면 sys.argv 길이가 3이 되는지 검증하세요.
+      starterCode: |-
+        import subprocess
+        import sys
+
+        cmd = f'{sys.executable} -c "import sys; print(len(sys.argv))" ab cd'
+        completed = subprocess.run(cmd, shell=___, capture_output=True, text=True)
+        tokenCount = int(completed.stdout.strip())
+
+        assert tokenCount == 3
+        tokenCount
+      solution: |-
+        import subprocess
+        import sys
+
+        cmd = f'{sys.executable} -c "import sys; print(len(sys.argv))" ab cd'
+        completed = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        tokenCount = int(completed.stdout.strip())
+
+        assert tokenCount == 3
+        tokenCount
+      hints:
+        - '"ab"와 "cd"는 셸 토큰 분리에서 두 인자로 쪼개진다.'
+        - sys.argv의 첫 요소는 -c로 받는 코드 표시자 자체다.
+      check:
+        type: noError
+        noError: shell=True 호출이 정상적으로 끝나야 한다.
+        resultCheck: tokenCount가 정확히 3이어야 한다.
+    check:
+      noError: shell 호출과 stdout 변환이 차례로 끝나야 한다.
+      resultCheck: tokenCount가 정확히 1이어서 같은 인자가 한 토큰으로 들어갔음을 확인해야 한다.
+  - id: path-with-space
+    title: 공백 포함 경로 다루기
+    structuredPrimary: true
+    subtitle: tempfile 경로로 안전 호출
+    goal: 임시 폴더가 공백을 포함하더라도 리스트 인자로 깔끔하게 자식을 호출한다.
+    why: Windows와 macOS의 사용자 폴더는 공백이 들어 있는 경우가 많아 인자 리스트 패턴이 가장 안전하다.
+    explanation: tempfile.TemporaryDirectory가 만든 경로는 OS에 따라 공백이 들어 있을 수 있다. 리스트 인자로 직접 넘기면 셸 인용 없이도 정확히 전달된다. 자식 코드에서 sys.argv[1]으로 받아 Path로 감싸면 그대로 사용 가능하다.
+    tips:
+      - 자동화는 항상 공백이 들어간 경로를 가정해야 사용자 환경에서 안전하다.
+      - Path 객체는 str로 변환하면 OS 표준 표기로 직렬화된다.
+    snippet: |-
+      import subprocess
+      import sys
+      import tempfile
+      from pathlib import Path
+
+      with tempfile.TemporaryDirectory() as td:
+          target = Path(td) / "a folder" / "note.txt"
+          target.parent.mkdir()
+          target.write_text("ok", encoding="utf-8")
+          completed = subprocess.run(
+              [sys.executable, "-c", "import sys, pathlib; print(pathlib.Path(sys.argv[1]).read_text(encoding='utf-8'))", str(target)],
+              capture_output=True,
+              text=True,
+          )
+
+      assert completed.returncode == 0
+      assert completed.stdout.strip() == "ok"
+      completed.stdout.strip()
+    exercise:
+      prompt: tempfile 안에 "with space" 폴더와 daily report.txt 파일을 만든 뒤 자식이 그 텍스트를 그대로 출력하도록 검증하세요.
+      starterCode: |-
+        import subprocess
+        import sys
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            target = Path(td) / "with space" / "___"
+            target.parent.mkdir()
+            target.write_text("good", encoding="utf-8")
+            completed = subprocess.run(
+                [sys.executable, "-c", "import sys, pathlib; print(pathlib.Path(sys.argv[1]).read_text(encoding='utf-8'))", ___(target)],
+                capture_output=True,
+                text=True,
+            )
+
+        assert completed.returncode == 0
+        assert completed.stdout.strip() == "good"
+        completed.stdout.strip()
+      solution: |-
+        import subprocess
+        import sys
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            target = Path(td) / "with space" / "daily report.txt"
+            target.parent.mkdir()
+            target.write_text("good", encoding="utf-8")
+            completed = subprocess.run(
+                [sys.executable, "-c", "import sys, pathlib; print(pathlib.Path(sys.argv[1]).read_text(encoding='utf-8'))", str(target)],
+                capture_output=True,
+                text=True,
+            )
+
+        assert completed.returncode == 0
+        assert completed.stdout.strip() == "good"
+        completed.stdout.strip()
+      hints:
+        - 파일 이름은 공백을 포함한 "daily report.txt"여야 한다.
+        - Path 객체를 인자로 넘길 때는 str()로 변환해야 OS 표준 표기로 전달된다.
+      check:
+        type: noError
+        noError: tempfile 안 파일 작성과 자식 실행이 모두 끝나야 한다.
+        resultCheck: stdout이 "good"이고 returncode가 0이어야 한다.
+    check:
+      noError: 공백 포함 경로에서 read_text 호출이 자식 안에서 끝나야 한다.
+      resultCheck: stdout이 "ok"여서 파일 내용을 정확히 읽어 왔음을 확인해야 한다.
+  - id: injection-defense
+    title: 명령 주입 방어 종합 정리
+    structuredPrimary: true
+    subtitle: 사용자 입력은 인자로만
+    goal: 사용자 입력에 셸 메타문자가 들어가도 리스트 인자 패턴이 의도하지 않은 명령을 실행하지 않게 한다.
+    why: 자동화 자동화에서 외부 입력이 명령 일부로 들어가는 순간 보안 사고로 이어질 수 있어 방어 패턴을 종합으로 익혀야 한다.
+    explanation: 마지막 섹션은 사용자 입력에 "; rm -rf /" 같은 셸 명령 흉내 문자열을 섞은 채 자식에 전달해도 단순 인자 한 개로 다뤄지는지 검증한다. 자식은 단순히 입력 문자열의 길이를 출력하므로 어떤 셸 명령도 실행되지 않는다. 이것이 인자 리스트 패턴의 핵심 보호 효과다.
+    tips:
+      - 자동화 코드에서 외부 입력은 항상 인자 위치에만 두고 명령 문자열을 직접 조립하지 않는다.
+      - shutil.which 같은 보조 함수로 실행 파일을 미리 확인하면 의도와 다른 바이너리 실행을 막을 수 있다.
+    snippet: |-
+      import subprocess
+      import sys
+
+      malicious = "; print('hacked');"
+      completed = subprocess.run(
+          [sys.executable, "-c", "import sys; print(len(sys.argv[1]))", malicious],
+          capture_output=True,
+          text=True,
+      )
+
+      assert completed.stdout.strip() == str(len(malicious))
+      assert "hacked" not in completed.stdout
+      {"length": completed.stdout.strip(), "stdout": completed.stdout}
+    exercise:
+      prompt: 사용자 입력으로 "$(whoami)" 같은 명령 치환 문자열을 넘기더라도 자식이 단순 인자 길이만 출력하고 셸 명령은 실행되지 않는지 종합 검증하세요.
+      starterCode: |-
+        import subprocess
+        import sys
+
+        userInput = "___"
+        completed = subprocess.run(
+            [sys.executable, "-c", "import sys; print(len(sys.argv[1]))", userInput],
+            capture_output=True,
+            text=True,
+        )
+
+        assert completed.stdout.strip() == str(len(userInput))
+        assert "whoami" not in completed.stdout
+        completed.stdout.strip()
+      solution: |-
+        import subprocess
+        import sys
+
+        userInput = "$(whoami)"
+        completed = subprocess.run(
+            [sys.executable, "-c", "import sys; print(len(sys.argv[1]))", userInput],
+            capture_output=True,
+            text=True,
+        )
+
+        assert completed.stdout.strip() == str(len(userInput))
+        assert "whoami" not in completed.stdout
+        completed.stdout.strip()
+      hints:
+        - '"$(whoami)"는 셸 치환 시도이지만 리스트 인자로 넘기면 그대로 문자열로 다뤄진다.'
+        - 자식은 단순히 인자 길이만 출력하므로 결과는 정수 문자열이 된다.
+      check:
+        type: noError
+        noError: 인자 리스트 호출이 OSError 없이 끝나야 한다.
+        resultCheck: stdout이 입력 길이와 같은 정수 문자열이고 whoami 결과가 포함되지 않아야 한다.
+    check:
+      noError: 종합 정리 자식 호출이 정상적으로 끝나야 한다.
+      resultCheck: stdout이 입력 문자열의 길이와 같은 정수이고 "hacked" 같은 셸 치환 흔적이 없어야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: procCtl_02-argv-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - list-args
+    - injection-defense
+    title: 명령 argv를 shell 문자열 없이 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 빈 인자·secret 노출·shell metacharacter 의존을 찾아 실행을 차단한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 공백이 있는 path도 argv 한 항목으로 전달하고 직접 quote 문자를 넣지 마세요.
+    - secret은 argv나 process 목록에 노출하지 말고 별도 secret channel을 사용하세요.
+    exercise:
+      prompt: audit_argv(argv, secret_values)를 완성하세요.
+      starterCode: |-
+        def audit_argv(argv, secret_values):
+            raise NotImplementedError
+      solution: |
+        def audit_argv(argv, secret_values):
+            if not argv:
+                raise ValueError("empty argv")
+            failures = []
+            empty_indices = [index for index, value in enumerate(argv) if value == ""]
+            if empty_indices:
+                failures.append("empty-argument")
+            leaked_indices = [index for index, value in enumerate(argv) if any(secret and secret in value for secret in secret_values)]
+            if leaked_indices:
+                failures.append("secret-in-argv")
+            shell_indices = [index for index, value in enumerate(argv) if value in {"|", ">", ">>", "&&", ";"}]
+            if shell_indices:
+                failures.append("shell-metacharacter")
+            return {"ready": not failures, "failures": failures, "emptyIndices": empty_indices, "secretIndices": leaked_indices, "shellIndices": shell_indices}
+      hints: *id001
+    check:
+      id: python.procctl.procCtl_02.argv-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_02.argv-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_argv
+        cases:
+        - id: accepts-literal-argument-with-space
+          arguments:
+          - value:
+            - tool
+            - --name
+            - Quarterly Report
+          - value: []
+          expectedReturn:
+            ready: true
+            failures: []
+            emptyIndices: []
+            secretIndices: []
+            shellIndices: []
+        - id: reports-secret-and-pipe
+          arguments:
+          - value:
+            - tool
+            - --token=abc
+            - '|'
+            - next
+          - value:
+            - abc
+          expectedReturn:
+            ready: false
+            failures:
+            - secret-in-argv
+            - shell-metacharacter
+            emptyIndices: []
+            secretIndices:
+            - 1
+            shellIndices:
+            - 2
+        - id: reports-empty-argument
+          arguments:
+          - value:
+            - tool
+            - ''
+          - value: []
+          expectedReturn:
+            ready: false
+            failures:
+            - empty-argument
+            emptyIndices:
+            - 1
+            secretIndices: []
+            shellIndices: []
+        - id: rejects-empty-argv
+          arguments:
+          - value: []
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: procCtl_02-argument-schema-build-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - procCtl_02-argv-contract-audit-mastery
+    title: 새 도구 wrapper에 typed argument schema 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 허용 option과 값 type을 검사해 결정적 argv를 만든다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 사용자 문자열을 command template에 끼우지 말고 option schema에서 argv를 만드세요.
+    - required option 누락과 type 오류를 process 실행 전에 실패시키세요.
+    exercise:
+      prompt: build_argv(executable, schema, values)를 완성하세요.
+      starterCode: |-
+        def build_argv(executable, schema, values):
+            raise NotImplementedError
+      solution: |
+        def build_argv(executable, schema, values):
+            unknown = sorted(set(values) - set(schema))
+            if unknown:
+                raise ValueError("unknown option")
+            argv = [executable]
+            omitted = []
+            for name in sorted(schema):
+                contract = schema[name]
+                if name not in values:
+                    if contract.get("required"):
+                        omitted.append(name)
+                    continue
+                value = values[name]
+                if contract["type"] == "bool":
+                    if value:
+                        argv.append(contract["flag"])
+                elif contract["type"] == "int":
+                    if not isinstance(value, int):
+                        raise ValueError("invalid integer option")
+                    argv.extend([contract["flag"], str(value)])
+                else:
+                    argv.extend([contract["flag"], str(value)])
+            return {"ready": not omitted, "argv": argv, "omitted": omitted}
+      hints: *id002
+    check:
+      id: python.procctl.procCtl_02.argument-schema-build.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_02.argument-schema-build.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_argv
+        cases:
+        - id: builds-sorted-typed-argv
+          arguments:
+          - value: tool
+          - value:
+              count:
+                flag: --count
+                type: int
+                required: true
+              verbose:
+                flag: --verbose
+                type: bool
+          - value:
+              verbose: true
+              count: 3
+          expectedReturn:
+            ready: true
+            argv:
+            - tool
+            - --count
+            - '3'
+            - --verbose
+            omitted: []
+        - id: reports-omitted-required-option
+          arguments:
+          - value: tool
+          - value:
+              input:
+                flag: --input
+                type: str
+                required: true
+          - value: {}
+          expectedReturn:
+            ready: false
+            argv:
+            - tool
+            omitted:
+            - input
+        - id: rejects-unknown-option
+          arguments:
+          - value: tool
+          - value: {}
+          - value:
+              extra: 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: procCtl_02-argv-boundary-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - procCtl_02-argument-schema-build-transfer
+    title: 인자 전달 안전 경계 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 공백·shell 기능·secret 전달 방식을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - process 실행 성공과 업무 결과물 성공을 같은 것으로 처리하지 마세요.
+    - 명령 identity·제한 시간·산출물 evidence·남는 risk를 함께 기록하세요.
+    exercise:
+      prompt: choose_argv_policy(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_argv_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_argv_policy(situation):
+            table = {'space': {'action': 'single literal argv item', 'evidence': 'argument list', 'risk': 'manual quoting'}, 'pipeline': {'action': 'connect processes explicitly', 'evidence': 'separate argv and pipe handles', 'risk': 'shell injection'}, 'secret': {'action': 'approved secret channel', 'evidence': 'redacted process manifest', 'risk': 'process-list exposure'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.procctl.procCtl_02.argv-boundary-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_02.argv-boundary-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_argv_policy
+        cases:
+        - id: recalls-space
+          arguments:
+          - value: space
+          expectedReturn:
+            action: single literal argv item
+            evidence: argument list
+            risk: manual quoting
+        - id: recalls-pipeline
+          arguments:
+          - value: pipeline
+          expectedReturn:
+            action: connect processes explicitly
+            evidence: separate argv and pipe handles
+            risk: shell injection
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

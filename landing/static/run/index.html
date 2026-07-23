@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#0a0a0a" />
-    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#f5f6f8" />
+    <meta name="color-scheme" content="light dark" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -13,31 +13,43 @@
     <link rel="apple-touch-icon" href="/codaro/run/favicon.png" />
     <script>
       (function () {
+        var root = document.documentElement;
+        var mode = "system";
+        var accent = "plum";
         try {
-          var mode = localStorage.getItem("codaro-theme") || "system";
-          var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-          var resolved = mode === "system" ? (prefersDark ? "dark" : "light") : mode;
-          var accent = localStorage.getItem("codaro-accent");
+          var storedMode = window.localStorage.getItem("codaro-theme");
+          if (storedMode === "light" || storedMode === "dark") mode = storedMode;
+          accent = window.localStorage.getItem("codaro-accent");
           if (accent !== "blue" && accent !== "teal") accent = "plum";
-          document.documentElement.classList.toggle("dark", resolved === "dark");
-          document.documentElement.dataset.resolvedTheme = resolved;
-          document.documentElement.dataset.accent = accent;
-          document.documentElement.dataset.density = "studioDense";
-        } catch (storageError) {}
+        } catch (storageError) {
+          mode = "system";
+          accent = "plum";
+        }
+        var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        var resolved = mode === "system" ? (prefersDark ? "dark" : "light") : mode;
+        var canvas = resolved === "dark" ? "#151619" : "#f5f6f8";
+        root.classList.toggle("dark", resolved === "dark");
+        root.dataset.theme = resolved;
+        root.dataset.resolvedTheme = resolved;
+        root.dataset.accent = accent;
+        root.dataset.density = "studioDense";
+        root.style.colorScheme = resolved;
+        root.style.backgroundColor = canvas;
+        document.querySelector('meta[name="theme-color"]').setAttribute("content", canvas);
       })();
     </script>
     <title>Codaro</title>
-    <script type="module" crossorigin src="/codaro/run/_app/index-lotEV7Zw.js"></script>
+    <script type="module" crossorigin src="/codaro/run/_app/index-DnXIeFVM.js"></script>
     <link rel="modulepreload" crossorigin href="/codaro/run/_app/rolldown-runtime-QTnfLwEv.js">
-    <link rel="modulepreload" crossorigin href="/codaro/run/_app/yaml-D7qTo-hJ.js">
-    <link rel="modulepreload" crossorigin href="/codaro/run/_app/curriculumSurface-BQBNJfwO.js">
-    <link rel="modulepreload" crossorigin href="/codaro/run/_app/icons-BKRph3bF.js">
-    <link rel="modulepreload" crossorigin href="/codaro/run/_app/vendor-C6vUqHFS.js">
-    <link rel="modulepreload" crossorigin href="/codaro/run/_app/radix-NhxMn7n7.js">
+    <link rel="modulepreload" crossorigin href="/codaro/run/_app/yaml-DvrLWLwK.js">
+    <link rel="modulepreload" crossorigin href="/codaro/run/_app/curriculumSurface-B9TYhEu8.js">
+    <link rel="modulepreload" crossorigin href="/codaro/run/_app/icons-ClhTmGVS.js">
+    <link rel="modulepreload" crossorigin href="/codaro/run/_app/vendor-BNq0_UX0.js">
+    <link rel="modulepreload" crossorigin href="/codaro/run/_app/radix-DDRH_7-_.js">
     <link rel="modulepreload" crossorigin href="/codaro/run/_app/xterm-CqT7F6QM.js">
     <link rel="stylesheet" crossorigin href="/codaro/run/_app/vendor-BylNkWiU.css">
     <link rel="stylesheet" crossorigin href="/codaro/run/_app/xterm-kHJ-D0s7.css">
-    <link rel="stylesheet" crossorigin href="/codaro/run/_app/index-CusNO6tB.css">
+    <link rel="stylesheet" crossorigin href="/codaro/run/_app/index-CWPvf3-h.css">
   </head>
   <body>
     <div id="root"></div>

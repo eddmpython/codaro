@@ -1,0 +1,1068 @@
+var e=`meta:
+  packages:
+  - numpy
+  - pandas
+  - plotly
+  - statsmodels
+  id: statsmodels_04
+  title: 항공수요예측
+  order: 4
+  category: statsmodels
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  dataSource: codaro-local:airline_passengers
+  tags:
+  - 시계열
+  - ARIMA
+  - 계절성
+  - 추세
+  - 항공수요
+  seo:
+    title: statsmodels ARIMA 시계열 예측 - 항공 승객 수요 예측
+    description: ARIMA 모델로 월별 항공 승객 수를 예측합니다. 시계열 분해, ACF, PACF를 배웁니다.
+    keywords:
+    - statsmodels
+    - ARIMA
+    - 시계열예측
+    - 계절성분해
+    - 항공수요
+    - ACF
+    - PACF
+intro:
+  emoji: ✈️
+  goal: 월별 항공 승객 수를 시계열 분석으로 예측합니다.
+  description: 1949년부터 1960년까지 12년간의 월별 승객 데이터로 추세와 계절성을 파악하고 ARIMA로 미래 수요를 예측합니다. 항공사의 용량 계획과 인력 배치에
+    활용할 수 있습니다.
+  direction: 항공수요예측에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 항공수요예측 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 미리보기 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 날짜 인덱스 설정 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 항공수요예측 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: numpy, pandas, plotly, statsmodels 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 항공수요예측 실행
+      detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
+    - label: 항공수요예측 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  structuredPrimary: true
+  subtitle: 항공 승객 시계열 데이터
+  goal: 1단계. 데이터 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    AirPassengers 데이터셋은 1949년 1월부터 1960년 12월까지 144개월간의 국제 항공 승객 수(월별, 천 명 단위)를 담고 있습니다. 시계열 분석의 대표적인 벤치마크 데이터로, 장기적인 상승 추세(항공 산업 성장)와 연간 계절성(여름 성수기)이 명확히 나타납니다. 이 데이터로 시계열 분해, ARIMA 모델링, 미래 예측을 학습하면 항공사 용량 계획, 인력 배치, 가격 책정 등 실무에 적용할 수 있습니다.
+
+    시계열 분석을 위해 여러 모듈을 import 합니다. seasonal_decompose는 시계열을 추세/계절/잔차로 분해, plot_acf/plot_pacf는 자기상관 그래프, ARIMA는 시계열 예측 모델입니다. 한 번에 필요한 모듈을 모두 불러오면 나중에 편리합니다.
+  tips:
+  - 시계열 분석을 위해 여러 모듈을 import 합니다. seasonal_decompose는 시계열을 추세/계절/잔차로 분해, plot_acf/plot_pacf는 자기상관 그래프,
+    ARIMA는 시계열 예측 모델입니다. 한 번에 필요한 모듈을 모두 불러오면 나중에 편리합니다.
+  snippet: |-
+    import pandas as pd
+    import numpy as np
+    import statsmodels.api as sm
+    from statsmodels.tsa.seasonal import seasonal_decompose
+    from statsmodels.tsa.arima.model import ARIMA
+    from codaro.curriculum.localData import loadLocalDataset
+
+    airData = loadLocalDataset("airline_passengers")
+    airData.shape
+  exercise:
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      import numpy as np
+      import statsmodels.api as sm
+      from statsmodels.tsa.seasonal import seasonal_decompose
+      from statsmodels.tsa.arima.model import ARIMA
+      from codaro.curriculum.localData import loadLocalDataset
+
+      airData = loadLocalDataset("airline_passengers")
+      airData.shape
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step2_head
+  title: 2단계. 데이터 미리보기
+  structuredPrimary: true
+  subtitle: 컬럼 구조 확인
+  goal: 2단계. 데이터 미리보기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: Month 컬럼은 '1949-01' 형태의 날짜 문자열이고, Passengers는 해당 월의 승객 수(천 명 단위)입니다. 시계열 분석을 위해서는 Month를
+    datetime 타입(날짜 자료형)으로 변환하고 DataFrame의 인덱스로 설정해야 합니다. pandas는 datetime 인덱스를 인식하면 resample()(시간 단위 집계),
+    shift()(시차 이동), rolling()(이동평균) 등 시계열 전용 기능을 자동으로 활성화합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: airData.head()
+  exercise:
+    prompt: 2단계. 데이터 미리보기 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    starterCode: airData.head()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 미리보기의 수정 코드가 핵심 처리 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 2단계. 데이터 미리보기 실행 결과가 출력과 상태 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step3_datetime
+  title: 3단계. 날짜 인덱스 설정
+  structuredPrimary: true
+  subtitle: datetime 변환
+  goal: 3단계. 날짜 인덱스 설정에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    to_datetime()으로 Month 컬럼을 날짜 타입으로 변환하고 인덱스로 설정합니다. 날짜 인덱스 설정은 시계열 분석의 필수 전처리 단계입니다. 인덱스가 날짜로 설정되면 plot(), resample()(집계), shift()(시차 이동), rolling()(이동평균) 등 pandas의 시계열 전용 함수들을 사용할 수 있으며, 날짜 기반 슬라이싱(예: df['1950':'1955'])도 가능해집니다. 02 프로젝트에서 배운 set_index() 개념을 날짜에 적용합니다.
+
+    to_datetime()은 문자열('1949-01')을 datetime 타입(날짜 자료형)으로 변환하는 pandas 함수입니다. datetime 타입은 연산과 정렬이 가능한 특수한 날짜 형식으로, '1949-01', '1949/01/01', 'Jan 1949' 등 다양한 형식을 자동으로 인식합니다. set_index()는 특정 컬럼을 DataFrame의 인덱스(행 이름)로 설정하는 메서드로, 02 프로젝트에서 배운 개념입니다. 날짜를 인덱스로 하면 resample()(집계), shift()(이동), rolling()(이동평균) 같은 시계열 전용 기능을 사용할 수 있습니다. ()는 함수나 메서드를 호출하는 기호입니다.
+  tips:
+  - to_datetime()은 문자열('1949-01')을 datetime 타입(날짜 자료형)으로 변환하는 pandas 함수입니다. datetime 타입은 연산과 정렬이 가능한 특수한
+    날짜 형식으로, '1949-01', '1949/01/01', 'Jan 1949' 등 다양한 형식을 자동으로 인식합니다. set_index()는 특정 컬럼을 DataFrame의
+    인덱스(행 이름)로 설정하는 메서드로, 02 프로젝트에서 배운 개념입니다. 날짜를 인덱스로 하면 resample()(집계), shift()(이동), rolling()(이동평균)
+    같은 시계열 전용 기능을 사용할 수 있습니다. ()는 함수나 메서드를 호출하는 기호입니다.
+  snippet: |-
+    airDataWithDate = airData.copy()
+    airDataWithDate['Month'] = pd.to_datetime(airDataWithDate['Month'])
+    airIndexed = airDataWithDate.set_index('Month')
+    airIndexed.head()
+  exercise:
+    prompt: 3단계. 날짜 인덱스 설정 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      airDataWithDate = airData.copy()
+      airDataWithDate['Month'] = pd.to_datetime(airDataWithDate['Month'])
+      airIndexed = airDataWithDate.set_index('Month')
+      airIndexed.head()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 날짜 인덱스 설정의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 3단계. 날짜 인덱스 설정의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step4_plot
+  title: 4단계. 시계열 플롯
+  structuredPrimary: true
+  subtitle: 전체 추세 확인
+  goal: 4단계. 시계열 플롯에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    시계열 데이터를 시각화하면 전체 패턴을 한눈에 파악할 수 있으며, 이는 모델 선택의 중요한 근거가 됩니다. 시계열 그래프는 X축이 시간, Y축이 관측값인 선 그래프로, 이 데이터에서는 승객 수가 시간에 따라 지속적으로 증가하는 추세(trend)와 매년 여름(6~8월)에 정점을 찍는 계절 패턴(seasonality)이 명확히 보입니다. 추세는 장기적인 증가/감소 경향을, 계절성은 일정 주기로 반복되는 패턴을 의미합니다. 예를 들어 1949년 평균 승객은 약 120명이었지만 1960년에는 약 400명으로 3배 이상 증가했고, 매년 7월에 가장 많은 승객이 이용합니다. 이런 패턴을 파악하면 ARIMA 모델의 파라미터(p, d, q)를 결정하고 계절성 처리 여부를 판단할 수 있습니다.
+
+    plotly.express의 px.line()은 선 그래프를 그리며, x에 날짜 인덱스를 지정하면 자동으로 날짜 형식으로 표시됩니다. update_xaxes()와 update_yaxes()로 축 제목을 설정하고, plotly 그래프는 마우스로 드래그하여 특정 기간을 확대할 수 있어 계절 패턴을 자세히 분석할 수 있습니다. 예를 들어 1950년대 후반 구간만 확대하면 여름 성수기와 겨울 비수기의 차이를 정확히 확인할 수 있습니다.
+  tips:
+  - plotly.express의 px.line()은 선 그래프를 그리며, x에 날짜 인덱스를 지정하면 자동으로 날짜 형식으로 표시됩니다. update_xaxes()와 update_yaxes()로
+    축 제목을 설정하고, plotly 그래프는 마우스로 드래그하여 특정 기간을 확대할 수 있어 계절 패턴을 자세히 분석할 수 있습니다. 예를 들어 1950년대 후반 구간만 확대하면
+    여름 성수기와 겨울 비수기의 차이를 정확히 확인할 수 있습니다.
+  snippet: |-
+    import plotly.express as px
+
+    timeseriesFig = px.line(airIndexed, x=airIndexed.index, y='Passengers',
+                            title='Monthly Airline Passengers (1949-1960)',
+                            labels={'x': 'Date', 'Passengers': 'Number of Passengers'})
+    timeseriesFig.update_xaxes(title_text='Date')
+    timeseriesFig.update_yaxes(title_text='Passengers')
+    timeseriesFig.show()
+  exercise:
+    prompt: 4단계. 시계열 플롯 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      import plotly.express as px
+
+      timeseriesFig = px.line(airIndexed, x=airIndexed.index, y='Passengers',
+                              title='Monthly Airline Passengers (1949-1960)',
+                              labels={'x': 'Date', 'Passengers': 'Number of Passengers'})
+      timeseriesFig.update_xaxes(title_text='Date')
+      timeseriesFig.update_yaxes(title_text='Passengers')
+      timeseriesFig.show()
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 시계열 플롯의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 시계열 플롯의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step5_decompose
+  title: 5단계. 시계열 분해
+  structuredPrimary: true
+  subtitle: 추세 + 계절성 + 잔차
+  goal: 5단계. 시계열 분해에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    seasonal_decompose()는 시계열을 추세(Trend), 계절성(Seasonal), 잔차(Residual) 3개 성분으로 분해하는 함수입니다. 추세는 장기적인 증가/감소 패턴으로 전반적인 방향성을 보여주고, 계절성은 일정 주기로 반복되는 패턴(예: 매년 여름 증가), 잔차는 추세와 계절성으로 설명되지 않는 불규칙한 변동(랜덤 노이즈)입니다. model='multiplicative'는 시계열이 곱셈 관계(Y = Trend × Seasonal × Residual)를 따른다는 뜻으로, 승객 수가 증가할수록 계절 변동의 크기도 커지는 경우에 사용합니다. 반대로 계절 변동이 일정하면 'additive'(덧셈 모델)를 사용합니다. 분해 결과를 보면 추세 성분은 꾸준히 상승하고, 계절 성분은 매년 같은 패턴을 반복하며, 잔차는 거의 랜덤하게 분포하여 모델이 데이터를 잘 설명함을 알 수 있습니다.
+
+    period=12는 계절 주기를 12개월로 설정하며, 월별 데이터는 12, 분기별은 4, 주별은 52를 사용합니다. make_subplots(rows=4, cols=1)은 4개 그래프를 세로로 배치하고, add_trace()로 각 행에 그래프를 추가합니다. row=1, col=1은 첫 번째 행, row=2, col=1은 두 번째 행을 의미합니다. height=900으로 전체 높이를 조정하여 각 그래프가 충분한 공간을 가지도록 하며, 마우스로 특정 구간을 확대하면 계절 패턴의 세부 사항을 분석할 수 있습니다.
+  tips:
+  - period=12는 계절 주기를 12개월로 설정하며, 월별 데이터는 12, 분기별은 4, 주별은 52를 사용합니다. make_subplots(rows=4, cols=1)은 4개
+    그래프를 세로로 배치하고, add_trace()로 각 행에 그래프를 추가합니다. row=1, col=1은 첫 번째 행, row=2, col=1은 두 번째 행을 의미합니다. height=900으로
+    전체 높이를 조정하여 각 그래프가 충분한 공간을 가지도록 하며, 마우스로 특정 구간을 확대하면 계절 패턴의 세부 사항을 분석할 수 있습니다.
+  snippet: |-
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
+
+    decomposition = seasonal_decompose(airIndexed['Passengers'], model='multiplicative', period=12)
+
+    decompFig = make_subplots(rows=4, cols=1, subplot_titles=['Original', 'Trend', 'Seasonal', 'Residual'])
+    decompFig.add_trace(go.Scatter(x=airIndexed.index, y=airIndexed['Passengers'], mode='lines', name='Original'), row=1, col=1)
+    decompFig.add_trace(go.Scatter(x=airIndexed.index, y=decomposition.trend, mode='lines', name='Trend'), row=2, col=1)
+    decompFig.add_trace(go.Scatter(x=airIndexed.index, y=decomposition.seasonal, mode='lines', name='Seasonal'), row=3, col=1)
+    decompFig.add_trace(go.Scatter(x=airIndexed.index, y=decomposition.resid, mode='lines', name='Residual'), row=4, col=1)
+    decompFig.update_layout(height=900, showlegend=False, title_text='Time Series Decomposition')
+    decompFig.show()
+  exercise:
+    prompt: 5단계. 시계열 분해 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      import plotly.graph_objects as go
+      from plotly.subplots import make_subplots
+
+      decomposition = seasonal_decompose(airIndexed['Passengers'], model='multiplicative', period=12)
+
+      decompFig = make_subplots(rows=4, cols=1, subplot_titles=['Original', 'Trend', 'Seasonal', 'Residual'])
+      decompFig.add_trace(go.Scatter(x=airIndexed.index, y=airIndexed['Passengers'], mode='lines', name='Original'), row=1, col=1)
+      decompFig.add_trace(go.Scatter(x=airIndexed.index, y=decomposition.trend, mode='lines', name='Trend'), row=2, col=1)
+      decompFig.add_trace(go.Scatter(x=airIndexed.index, y=decomposition.seasonal, mode='lines', name='Seasonal'), row=3, col=1)
+      decompFig.add_trace(go.Scatter(x=airIndexed.index, y=decomposition.resid, mode='lines', name='Residual'), row=4, col=1)
+      decompFig.update_layout(height=900, showlegend=False, title_text='Time Series Decomposition')
+      decompFig.show()
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 시계열 분해의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 시계열 분해의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step6_stationarity
+  title: 6단계. 정상성 확인
+  structuredPrimary: true
+  subtitle: ADF 검정
+  goal: 6단계. 정상성 확인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 조건 분기는 입력값에 따라 실행 경로가 바뀌므로 결과를 바로 확인해야 합니다.
+  explanation: |-
+    ARIMA 모델은 정상성(stationarity)을 가정하며, 이는 시계열 분석의 가장 중요한 전제 조건입니다. 정상 시계열(stationary time series)은 (1) 평균이 시간에 따라 일정하고, (2) 분산이 시간에 따라 일정하며, (3) 공분산이 시차에만 의존하고 시간에 독립적인 특성을 가집니다. ADF(Augmented Dickey-Fuller) 검정은 단위근(unit root)이 있는지 확인하는 통계 검정으로, 귀무가설은 '비정상 시계열'입니다. p-value가 0.05보다 작으면 귀무가설을 기각하여 정상 시계열로 판단하고, 0.05 이상이면 비정상으로 차분(differencing)이 필요합니다. 예를 들어 이 항공 데이터는 추세가 있어 비정상이므로 1차 차분으로 추세를 제거하여 정상화해야 합니다. 정상성이 중요한 이유는 비정상 시계열은 과거 패턴이 미래에 반복되지 않아 예측이 불가능하기 때문입니다.
+
+    adfuller()는 ADF 검정을 수행합니다. 반환값은 튜플로, [0]은 검정 통계량, [1]은 p-value입니다. p-value < 0.05면 정상 시계열, >= 0.05면 비정상 시계열입니다. 비정상이면 차분을 적용하여 정상화해야 합니다.
+  tips:
+  - adfuller()는 ADF 검정을 수행합니다. 반환값은 튜플로, [0]은 검정 통계량, [1]은 p-value입니다. p-value < 0.05면 정상 시계열, >= 0.05면
+    비정상 시계열입니다. 비정상이면 차분을 적용하여 정상화해야 합니다.
+  snippet: |-
+    from statsmodels.tsa.stattools import adfuller
+
+    adfResult = adfuller(airIndexed['Passengers'])
+    f"ADF Statistic: {adfResult[0]:.4f}"
+    f"p-value: {adfResult[1]:.4f}"
+    f"정상성: {'정상' if adfResult[1] < 0.05 else '비정상'}"
+  exercise:
+    prompt: 6단계. 정상성 확인 예제에서 조건값을 바꾸고 선택되는 분기와 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from statsmodels.tsa.stattools import adfuller
+
+      adfResult = adfuller(airIndexed['Passengers'])
+      f"ADF Statistic: {adfResult[0]:.4f}"
+      f"p-value: {adfResult[1]:.4f}"
+      f"정상성: {'정상' if adfResult[1] < 0.05 else '비정상'}"
+    hints:
+    - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
+    - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
+  check:
+    type: noError
+    noError: 6단계. 정상성 확인의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
+    resultCheck: 6단계. 정상성 확인 분기 결과가 바꾼 조건값에 맞게 달라져야 합니다.
+- id: step7_diff
+  title: 7단계. 차분으로 정상화
+  structuredPrimary: true
+  subtitle: 1차 차분 적용
+  goal: 7단계. 차분으로 정상화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    차분(differencing)은 현재 값에서 이전 값을 뺀 것으로, 시계열의 추세를 제거하여 정상성을 만드는 가장 간단하고 효과적인 방법입니다. diff() 함수는 각 시점에서 바로 전 시점의 값을 빼며, 예를 들어 [112, 118, 132]는 [NaN, 6, 14]가 됩니다. 1차 차분은 선형 추세를, 2차 차분(diff().diff())은 곡선 추세를 제거합니다. dropna()는 첫 번째 결측값(NaN)을 제거하여 분석 가능한 데이터로 만듭니다. 차분 후 ADF 검정을 다시 수행하여 p-value가 0.05 이하로 떨어지면 정상 시계열로 변환된 것이며, 이제 ARIMA 모델을 적용할 수 있습니다. 차분 횟수는 ARIMA의 d 파라미터가 되어, 1차 차분이면 d=1입니다.
+
+    diff()는 현재 값에서 이전 값을 빼는 연산(차분, differencing)을 수행하는 pandas 메서드입니다. 예를 들어 승객 수가 [112, 118, 132]이면 diff() 결과는 [NaN, 6, 14]가 되며, 첫 번째 값은 이전 값이 없어 NaN(Not a Number, 결측값)이 됩니다. dropna()는 NaN을 제거하는 메서드로, 분석 가능한 데이터만 남깁니다. 차분은 추세(장기적 증가/감소)를 제거하는 가장 간단하고 효과적인 방법으로, ARIMA 모델의 d(차분 차수) 파라미터와 직접 연결됩니다. -(빼기)는 수학 연산자이며, .method()는 객체의 메서드를 호출하는 문법입니다.
+  tips:
+  - diff()는 현재 값에서 이전 값을 빼는 연산(차분, differencing)을 수행하는 pandas 메서드입니다. 예를 들어 승객 수가 [112, 118, 132]이면 diff()
+    결과는 [NaN, 6, 14]가 되며, 첫 번째 값은 이전 값이 없어 NaN(Not a Number, 결측값)이 됩니다. dropna()는 NaN을 제거하는 메서드로, 분석 가능한
+    데이터만 남깁니다. 차분은 추세(장기적 증가/감소)를 제거하는 가장 간단하고 효과적인 방법으로, ARIMA 모델의 d(차분 차수) 파라미터와 직접 연결됩니다. -(빼기)는 수학
+    연산자이며, .method()는 객체의 메서드를 호출하는 문법입니다.
+  snippet: |-
+    import plotly.express as px
+
+    airDiff = airIndexed['Passengers'].diff().dropna()
+
+    diffDf = pd.DataFrame({'Date': airDiff.index, 'Differenced': airDiff.values})
+    diffFig = px.line(diffDf, x='Date', y='Differenced',
+                      title='First Difference',
+                      labels={'Differenced': 'Differenced Passengers'})
+    diffFig.show()
+
+    adfDiff = adfuller(airDiff)
+    f"차분 후 p-value: {adfDiff[1]:.4f}"
+  exercise:
+    prompt: 7단계. 차분으로 정상화 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import plotly.express as px
+
+      airDiff = airIndexed['Passengers'].diff().dropna()
+
+      diffDf = pd.DataFrame({'Date': airDiff.index, 'Differenced': airDiff.values})
+      diffFig = px.line(diffDf, x='Date', y='Differenced',
+                        title='First Difference',
+                        labels={'Differenced': 'Differenced Passengers'})
+      diffFig.show()
+
+      adfDiff = adfuller(airDiff)
+      f"차분 후 p-value: {adfDiff[1]:.4f}"
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 차분으로 정상화의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 7단계. 차분으로 정상화의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step8_acf_pacf
+  title: 8단계. ACF와 PACF 플롯
+  structuredPrimary: true
+  subtitle: ARIMA 파라미터 선택
+  goal: 8단계. ACF와 PACF 플롯에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    ACF(AutoCorrelation Function, 자기상관함수)는 시계열이 과거 자신과 얼마나 상관이 있는지 시차(lag)별로 측정하는 도구입니다. 시차(lag)는 시간 간격으로, lag=1은 1개월 전, lag=12는 12개월(1년) 전 값과의 상관관계를 의미합니다. PACF(Partial ACF, 부분 자기상관함수)는 중간 시차의 영향을 제거한 순수한 직접 상관관계를 보여줍니다. ARIMA(p,d,q) 모델에서 p(자기회귀 차수)는 PACF 그래프에서 유의미한 막대 개수로, q(이동평균 차수)는 ACF 그래프에서 유의미한 막대 개수로 결정합니다. 파란 영역(신뢰구간)을 벗어나는 막대는 통계적으로 유의미한 상관이 있다는 뜻으로, 해당 시차를 모델에 포함해야 합니다. 예를 들어 PACF에서 lag 1, 2가 영역을 벗어나면 p=2를 사용합니다.
+
+    ACF(AutoCorrelation Function)는 시차 k만큼 떨어진 값들의 상관계수(-1~1)를 계산하는 함수입니다. 예를 들어 ACF(lag=1)은 이번 달과 지난달의 상관관계를 측정합니다. PACF(Partial ACF)는 중간 시차(lag 1, 2, ... k-1)의 간접 영향을 제거하고 lag k의 순수한 직접 영향만 측정합니다. lags=40은 40개 시차(40개월 전)까지 확인하며, 숫자가 크면 장기 패턴을 볼 수 있지만 데이터가 부족하면 신뢰도가 낮아집니다. ARIMA(p,d,q)에서 p(AR 차수)는 PACF가 신뢰구간을 벗어나는 지점, q(MA 차수)는 ACF가 신뢰구간을 벗어나는 지점을 보고 결정합니다. plot_acf()와 plot_pacf()는 matplotlib 기반 그래프를 그리는 statsmodels 함수입니다.
+  tips:
+  - ACF(AutoCorrelation Function)는 시차 k만큼 떨어진 값들의 상관계수(-1~1)를 계산하는 함수입니다. 예를 들어 ACF(lag=1)은 이번 달과 지난달의
+    상관관계를 측정합니다. PACF(Partial ACF)는 중간 시차(lag 1, 2, ... k-1)의 간접 영향을 제거하고 lag k의 순수한 직접 영향만 측정합니다. lags=40은
+    40개 시차(40개월 전)까지 확인하며, 숫자가 크면 장기 패턴을 볼 수 있지만 데이터가 부족하면 신뢰도가 낮아집니다. ARIMA(p,d,q)에서 p(AR 차수)는 PACF가
+    신뢰구간을 벗어나는 지점, q(MA 차수)는 ACF가 신뢰구간을 벗어나는 지점을 보고 결정합니다. plot_acf()와 plot_pacf()는 matplotlib 기반 그래프를
+    그리는 statsmodels 함수입니다.
+  snippet: |-
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
+    from statsmodels.tsa.stattools import acf, pacf
+
+    acfVals = acf(airDiff, nlags=40)
+    pacfVals = pacf(airDiff, nlags=40)
+
+    acfFig = make_subplots(rows=1, cols=2, subplot_titles=('ACF', 'PACF'))
+
+    acfFig.add_trace(go.Bar(x=list(range(len(acfVals))), y=acfVals, name='ACF'), row=1, col=1)
+    acfFig.add_hline(y=1.96/np.sqrt(len(airDiff)), line_dash='dash', line_color='blue', row=1, col=1)
+    acfFig.add_hline(y=-1.96/np.sqrt(len(airDiff)), line_dash='dash', line_color='blue', row=1, col=1)
+
+    acfFig.add_trace(go.Bar(x=list(range(len(pacfVals))), y=pacfVals, name='PACF'), row=1, col=2)
+    acfFig.add_hline(y=1.96/np.sqrt(len(airDiff)), line_dash='dash', line_color='blue', row=1, col=2)
+    acfFig.add_hline(y=-1.96/np.sqrt(len(airDiff)), line_dash='dash', line_color='blue', row=1, col=2)
+
+    acfFig.update_xaxes(title_text='Lag', row=1, col=1)
+    acfFig.update_xaxes(title_text='Lag', row=1, col=2)
+    acfFig.update_yaxes(title_text='Correlation', row=1, col=1)
+    acfFig.update_yaxes(title_text='Correlation', row=1, col=2)
+
+    acfFig.show()
+  exercise:
+    prompt: 8단계. ACF와 PACF 플롯 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      import plotly.graph_objects as go
+      from plotly.subplots import make_subplots
+      from statsmodels.tsa.stattools import acf, pacf
+
+      acfVals = acf(airDiff, nlags=40)
+      pacfVals = pacf(airDiff, nlags=40)
+
+      acfFig = make_subplots(rows=1, cols=2, subplot_titles=('ACF', 'PACF'))
+
+      acfFig.add_trace(go.Bar(x=list(range(len(acfVals))), y=acfVals, name='ACF'), row=1, col=1)
+      acfFig.add_hline(y=1.96/np.sqrt(len(airDiff)), line_dash='dash', line_color='blue', row=1, col=1)
+      acfFig.add_hline(y=-1.96/np.sqrt(len(airDiff)), line_dash='dash', line_color='blue', row=1, col=1)
+
+      acfFig.add_trace(go.Bar(x=list(range(len(pacfVals))), y=pacfVals, name='PACF'), row=1, col=2)
+      acfFig.add_hline(y=1.96/np.sqrt(len(airDiff)), line_dash='dash', line_color='blue', row=1, col=2)
+      acfFig.add_hline(y=-1.96/np.sqrt(len(airDiff)), line_dash='dash', line_color='blue', row=1, col=2)
+
+      acfFig.update_xaxes(title_text='Lag', row=1, col=1)
+      acfFig.update_xaxes(title_text='Lag', row=1, col=2)
+      acfFig.update_yaxes(title_text='Correlation', row=1, col=1)
+      acfFig.update_yaxes(title_text='Correlation', row=1, col=2)
+
+      acfFig.show()
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. ACF와 PACF 플롯의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. ACF와 PACF 플롯의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step9_arima_model
+  title: 9단계. ARIMA 모델 학습
+  structuredPrimary: true
+  subtitle: (p, d, q) 파라미터 설정
+  goal: 9단계. ARIMA 모델 학습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    ARIMA(p, d, q) 모델을 구축합니다. ARIMA는 AutoRegressive Integrated Moving Average의 약자로, 시계열 예측의 대표적인 모델입니다. p는 AR(AutoRegressive, 자기회귀) 차수로 과거 p개 시점의 값을 사용하며, d는 차분(Differencing) 차수로 추세 제거를 위해 몇 번 차분했는지, q는 MA(Moving Average, 이동평균) 차수로 과거 q개 시점의 예측 오차를 사용합니다. 예를 들어 ARIMA(1,1,1)은 1차 차분 후 1개월 전 값과 1개월 전 오차를 사용한다는 뜻입니다. ACF/PACF 플롯을 보고 p=1, q=1로 시작하고, d=1은 7단계에서 1차 차분을 적용했기 때문입니다. order=(p,d,q)는 튜플(값의 묶음)로 파라미터를 전달하며, 01, 02, 03 프로젝트에서 배운 fit() 개념을 시계열에 적용합니다.
+
+    ARIMA(data, order=(p,d,q))로 시계열 모델을 정의합니다. order는 튜플(tuple, 괄호로 묶인 값의 순서쌍)로 (p, d, q) 순서를 지켜야 합니다. 튜플은 리스트[]와 비슷하지만 ()를 사용하며 값 수정이 불가능합니다. fit()으로 최대우도추정법(Maximum Likelihood Estimation)으로 계수를 학습하고, summary()로 통계량을 확인하는 방법은 01 프로젝트의 OLS().fit()과 사용법이 같습니다. AIC(Akaike Information Criterion)는 모델 복잡도를 고려한 성능 지표로, 값이 낮을수록 좋은 모델이며, 여러 (p,d,q) 조합을 비교할 때 사용합니다.
+  tips:
+  - ARIMA(data, order=(p,d,q))로 시계열 모델을 정의합니다. order는 튜플(tuple, 괄호로 묶인 값의 순서쌍)로 (p, d, q) 순서를 지켜야 합니다.
+    튜플은 리스트[]와 비슷하지만 ()를 사용하며 값 수정이 불가능합니다. fit()으로 최대우도추정법(Maximum Likelihood Estimation)으로 계수를 학습하고,
+    summary()로 통계량을 확인하는 방법은 01 프로젝트의 OLS().fit()과 사용법이 같습니다. AIC(Akaike Information Criterion)는 모델 복잡도를
+    고려한 성능 지표로, 값이 낮을수록 좋은 모델이며, 여러 (p,d,q) 조합을 비교할 때 사용합니다.
+  snippet: |-
+    arimaModel = ARIMA(airIndexed['Passengers'], order=(1, 1, 1))
+    arimaFit = arimaModel.fit()
+    arimaFit.summary()
+  exercise:
+    prompt: 9단계. ARIMA 모델 학습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      arimaModel = ARIMA(airIndexed['Passengers'], order=(1, 1, 1))
+      arimaFit = arimaModel.fit()
+      arimaFit.summary()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. ARIMA 모델 학습에서 \`arimaModel\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 9단계. ARIMA 모델 학습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step10_predict
+  title: 10단계. 미래 예측
+  structuredPrimary: true
+  subtitle: 12개월 예측
+  goal: 10단계. 미래 예측에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    학습된 ARIMA 모델로 데이터에 없는 미래 12개월을 예측합니다. forecast(steps=12)는 마지막 날짜(1960년 12월) 이후 1961년 1월~12월의 예측값을 반환합니다. 01-03 프로젝트의 predict()는 기존 데이터에 대한 예측(in-sample)이고, forecast()는 미래에 대한 예측(out-of-sample)이라는 차이가 있습니다. 예측값은 점 추정치이며, 실제 시계열 분석에서는 신뢰구간도 함께 확인하여 예측의 불확실성을 고려합니다.
+
+    forecast(steps=12)는 미래 12개 시점(12개월)을 예측하는 ARIMA 메서드입니다. steps는 예측할 기간 개수를 의미하며, 시계열에서는 steps 파라미터를, 일반 회귀에서는 newdata를 사용한다는 차이가 있습니다. forecast()는 예측값을 Series(1차원 배열)로 반환하며, 마지막 날짜부터 자동으로 날짜 인덱스를 생성합니다. 예를 들어 데이터가 1960년 12월까지면 1961년 1월~12월의 예측값을 반환합니다. 01-03 프로젝트의 predict()는 기존 데이터에 대한 예측, forecast()는 미래에 대한 예측이라는 차이가 있습니다.
+  tips:
+  - forecast(steps=12)는 미래 12개 시점(12개월)을 예측하는 ARIMA 메서드입니다. steps는 예측할 기간 개수를 의미하며, 시계열에서는 steps 파라미터를,
+    일반 회귀에서는 newdata를 사용한다는 차이가 있습니다. forecast()는 예측값을 Series(1차원 배열)로 반환하며, 마지막 날짜부터 자동으로 날짜 인덱스를 생성합니다.
+    예를 들어 데이터가 1960년 12월까지면 1961년 1월~12월의 예측값을 반환합니다. 01-03 프로젝트의 predict()는 기존 데이터에 대한 예측, forecast()는
+    미래에 대한 예측이라는 차이가 있습니다.
+  snippet: |-
+    forecastResult = arimaFit.forecast(steps=12)
+    forecastResult
+  exercise:
+    prompt: 10단계. 미래 예측 예제에서 \`forecastResult\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      forecastResult = arimaFit.forecast(steps=12)
+      forecastResult
+    hints:
+    - 바꿀 지점은 \`forecastResult = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`forecastResult\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 미래 예측에서 \`forecastResult\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 10단계. 미래 예측 실행 뒤 \`forecastResult\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step11_visualize
+  title: 11단계. 예측 결과 시각화
+  structuredPrimary: true
+  subtitle: 실제 vs 예측
+  goal: 11단계. 예측 결과 시각화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 원본 데이터(파란색)와 미래 예측값(빨간 점선)을 한 그래프에 그려서 모델 성능을 시각적으로 확인합니다. 좋은 모델은 예측값이 기존 추세와 계절 패턴을 자연스럽게
+    이어가야 합니다. 01, 02 프로젝트에서 배운 plotly 시각화 기법을 시계열에 적용하며, 여러 trace를 겹쳐서 비교 분석이 가능합니다. 이 그래프는 경영진이나 고객에게
+    예측 결과를 설명할 때 매우 효과적입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import plotly.graph_objects as go
+
+    forecastFig = go.Figure()
+
+    forecastFig.add_trace(go.Scatter(x=airIndexed.index, y=airIndexed['Passengers'],
+                                      mode='lines', name='Actual', line=dict(color='blue')))
+
+    forecastFig.add_trace(go.Scatter(x=forecastResult.index, y=forecastResult,
+                                      mode='lines', name='Forecast',
+                                      line=dict(color='red', dash='dash')))
+
+    forecastFig.update_layout(title='ARIMA Forecast',
+                              xaxis_title='Date',
+                              yaxis_title='Passengers')
+
+    forecastFig.show()
+  exercise:
+    prompt: 11단계. 예측 결과 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      import plotly.graph_objects as go
+
+      forecastFig = go.Figure()
+
+      forecastFig.add_trace(go.Scatter(x=airIndexed.index, y=airIndexed['Passengers'],
+                                        mode='lines', name='Actual', line=dict(color='blue')))
+
+      forecastFig.add_trace(go.Scatter(x=forecastResult.index, y=forecastResult,
+                                        mode='lines', name='Forecast',
+                                        line=dict(color='red', dash='dash')))
+
+      forecastFig.update_layout(title='ARIMA Forecast',
+                                xaxis_title='Date',
+                                yaxis_title='Passengers')
+
+      forecastFig.show()
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 예측 결과 시각화의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 11단계. 예측 결과 시각화의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step12_residual
+  title: 12단계. 잔차 분석
+  structuredPrimary: true
+  subtitle: 모델 진단
+  goal: 12단계. 잔차 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    ARIMA 모델의 잔차(실제값 - 예측값)를 확인하여 모델 적합성을 진단합니다. 좋은 모델의 잔차는 (1) 0 주변에서 랜덤하게 변동하고, (2) 특정 패턴이나 추세가 없으며, (3) 정규분포에 가깝게 분포해야 합니다. 잔차에 패턴이 보이면 모델이 포착하지 못한 정보가 있다는 뜻으로, 파라미터 조정이나 SARIMA 같은 다른 모델이 필요합니다. 02 프로젝트에서 배운 잔차 분석 개념을 시계열에 적용합니다.
+
+    arimaFit.resid는 잔차(실제값 - 예측값)입니다. 02 프로젝트의 model.resid와 같습니다. plot(kind='hist')는 히스토그램을 그립니다. 잔차가 정규분포를 따르고 0 중심이면 모델이 잘 맞는 것입니다.
+  tips:
+  - arimaFit.resid는 잔차(실제값 - 예측값)입니다. 02 프로젝트의 model.resid와 같습니다. plot(kind='hist')는 히스토그램을 그립니다. 잔차가
+    정규분포를 따르고 0 중심이면 모델이 잘 맞는 것입니다.
+  snippet: |-
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
+
+    residuals = arimaFit.resid
+
+    residFig = make_subplots(rows=1, cols=2, subplot_titles=('Residuals', 'Residual Distribution'))
+
+    residFig.add_trace(go.Scatter(x=residuals.index, y=residuals, mode='lines', name='Residuals'), row=1, col=1)
+    residFig.add_hline(y=0, line_dash='dash', line_color='red', row=1, col=1)
+
+    residFig.add_trace(go.Histogram(x=residuals, nbinsx=30, name='Distribution'), row=1, col=2)
+
+    residFig.update_xaxes(title_text='Date', row=1, col=1)
+    residFig.update_xaxes(title_text='Residuals', row=1, col=2)
+    residFig.update_yaxes(title_text='Residuals', row=1, col=1)
+    residFig.update_yaxes(title_text='Frequency', row=1, col=2)
+
+    residFig.show()
+  exercise:
+    prompt: 12단계. 잔차 분석 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      import plotly.graph_objects as go
+      from plotly.subplots import make_subplots
+
+      residuals = arimaFit.resid
+
+      residFig = make_subplots(rows=1, cols=2, subplot_titles=('Residuals', 'Residual Distribution'))
+
+      residFig.add_trace(go.Scatter(x=residuals.index, y=residuals, mode='lines', name='Residuals'), row=1, col=1)
+      residFig.add_hline(y=0, line_dash='dash', line_color='red', row=1, col=1)
+
+      residFig.add_trace(go.Histogram(x=residuals, nbinsx=30, name='Distribution'), row=1, col=2)
+
+      residFig.update_xaxes(title_text='Date', row=1, col=1)
+      residFig.update_xaxes(title_text='Residuals', row=1, col=2)
+      residFig.update_yaxes(title_text='Residuals', row=1, col=1)
+      residFig.update_yaxes(title_text='Frequency', row=1, col=2)
+
+      residFig.show()
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 12단계. 잔차 분석의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 12단계. 잔차 분석의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step13_auto_arima
+  title: 13단계. 최적 파라미터 찾기
+  structuredPrimary: true
+  subtitle: 그리드 서치
+  goal: 13단계. 최적 파라미터 찾기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    여러 (p, d, q) 조합을 시도하여 AIC가 가장 낮은 모델을 찾습니다. AIC(Akaike Information Criterion)는 모델의 예측 성능과 복잡도(파라미터 수)를 동시에 고려하는 지표로, 값이 낮을수록 좋은 모델입니다. for 반복문으로 p=0~2, d=0~1, q=0~2의 모든 조합(18개)을 테스트하고, AIC가 최소인 조합을 선택합니다. 일부 조합은 수렴하지 않아 에러가 발생할 수 있으므로 try-except로 처리합니다. 실무에서는 pmdarima의 auto_arima() 함수로 자동화할 수 있습니다.
+
+    float('inf')는 무한대를 의미합니다. 비교 시작값으로 사용하여 첫 번째 값보다 작은 값을 찾습니다. try-except는 에러 처리로, 일부 파라미터 조합은 학습에 실패할 수 있습니다. continue는 에러 발생 시 다음 반복으로 넘어갑니다.
+  tips:
+  - float('inf')는 무한대를 의미합니다. 비교 시작값으로 사용하여 첫 번째 값보다 작은 값을 찾습니다. try-except는 에러 처리로, 일부 파라미터 조합은 학습에 실패할
+    수 있습니다. continue는 에러 발생 시 다음 반복으로 넘어갑니다.
+  snippet: |-
+    bestAic = float('inf')
+    bestOrder = None
+
+    for p in range(0, 3):
+        for d in range(0, 2):
+            for q in range(0, 3):
+                try:
+                    model = ARIMA(airIndexed['Passengers'], order=(p, d, q))
+                    fit = model.fit()
+                    if fit.aic < bestAic:
+                        bestAic = fit.aic
+                        bestOrder = (p, d, q)
+                except (ValueError, np.linalg.LinAlgError):
+                    continue
+
+    f"최적 파라미터: {bestOrder}"
+    f"AIC: {bestAic:.2f}"
+  exercise:
+    prompt: 13단계. 최적 파라미터 찾기 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      bestAic = float('inf')
+      bestOrder = None
+
+      for p in range(0, 3):
+          for d in range(0, 2):
+              for q in range(0, 3):
+                  try:
+                      model = ARIMA(airIndexed['Passengers'], order=(p, d, q))
+                      fit = model.fit()
+                      if fit.aic < bestAic:
+                          bestAic = fit.aic
+                          bestOrder = (p, d, q)
+                  except (ValueError, np.linalg.LinAlgError):
+                      continue
+
+      f"최적 파라미터: {bestOrder}"
+      f"AIC: {bestAic:.2f}"
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 13단계. 최적 파라미터 찾기의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 13단계. 최적 파라미터 찾기 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step14_seasonal_arima
+  title: 14단계. SARIMA 소개
+  structuredPrimary: true
+  subtitle: 계절성 고려
+  goal: 14단계. SARIMA 소개에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    SARIMA(Seasonal ARIMA)는 계절성을 명시적으로 모델링하는 ARIMA의 확장 버전입니다. SARIMA(p,d,q)(P,D,Q,s)에서 소문자(p,d,q)는 일반 파라미터, 대문자(P,D,Q)는 계절 파라미터, s는 계절 주기(월별=12, 분기별=4)입니다. 예를 들어 SARIMA(1,1,1)(1,1,1,12)는 12개월 계절성을 고려한 모델입니다. ARIMA보다 계절 패턴이 강한 데이터(예: 항공, 소매, 에너지)에서 예측 정확도가 크게 향상되며, AIC로 두 모델을 비교할 수 있습니다.
+
+    SARIMAX는 SARIMA의 확장판으로 외생변수(X)도 포함할 수 있습니다. seasonal_order=(P, D, Q, s)는 계절 파라미터입니다. s=12는 12개월 주기, s=4는 4분기 주기입니다. SARIMA가 ARIMA보다 AIC가 낮으면 계절성이 중요하다는 뜻입니다.
+  tips:
+  - SARIMAX는 SARIMA의 확장판으로 외생변수(X)도 포함할 수 있습니다. seasonal_order=(P, D, Q, s)는 계절 파라미터입니다. s=12는 12개월 주기,
+    s=4는 4분기 주기입니다. SARIMA가 ARIMA보다 AIC가 낮으면 계절성이 중요하다는 뜻입니다.
+  snippet: |-
+    from statsmodels.tsa.statespace.sarimax import SARIMAX
+
+    sarimaModel = SARIMAX(airIndexed['Passengers'],
+                          order=(1, 1, 1),
+                          seasonal_order=(1, 1, 1, 12))
+    sarimaFit = sarimaModel.fit()
+    f"SARIMA AIC: {sarimaFit.aic:.2f}"
+  exercise:
+    prompt: 14단계. SARIMA 소개 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from statsmodels.tsa.statespace.sarimax import SARIMAX
+
+      sarimaModel = SARIMAX(airIndexed['Passengers'],
+                            order=(1, 1, 1),
+                            seasonal_order=(1, 1, 1, 12))
+      sarimaFit = sarimaModel.fit()
+      f"SARIMA AIC: {sarimaFit.aic:.2f}"
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 14단계. SARIMA 소개에서 \`sarimaModel\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 14단계. SARIMA 소개 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 항공 수요 분석 프로젝트
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    항공사 수요 분석가가 되어 승객 수요를 예측하고 용량 계획을 수립합니다. 각 미션은 데이터 로딩부터 시계열 분해, ARIMA 모델링, 예측까지 전체 과정을 독립적으로 수행합니다. 01-03 프로젝트의 회귀 기법과 이번 프로젝트의 시계열 분석을 모두 활용합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import pandas as pd
+    import numpy as np
+    from statsmodels.tsa.arima.model import ARIMA
+    from codaro.curriculum.localData import loadLocalDataset
+
+    logData = loadLocalDataset("airline_passengers")
+    logData['Month'] = pd.to_datetime(logData['Month'])
+    logData = logData.set_index('Month')
+    logData['LogPassengers'] = np.log(logData['Passengers'])
+    logData.head()
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      import numpy as np
+      from statsmodels.tsa.arima.model import ARIMA
+      from codaro.curriculum.localData import loadLocalDataset
+
+      logData = loadLocalDataset("airline_passengers")
+      logData['Month'] = pd.to_datetime(logData['Month'])
+      logData = logData.set_index('Month')
+      logData['LogPassengers'] = np.log(logData['Passengers'])
+      logData.head()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  subtitle: 네 번째 프로젝트 완료!
+  blocks:
+  - type: text
+    content: 이번 프로젝트에서는 1949-1960년 항공 승객 데이터로 시계열 분석을 수행했습니다. seasonal_decompose()로 추세와 계절성을 분리하고, ARIMA(1,1,1)
+      모델로 미래 12개월을 예측했으며, ACF/PACF로 최적 파라미터를 선택했습니다. 잔차 분석으로 모델 적합성을 확인하고, SARIMA로 계절성을 명시적으로 다루는 방법도
+      배웠습니다. 이제 항공사 용량 계획, 스케줄 최적화, 인력 배치에 시계열 예측을 활용할 수 있습니다.
+  - type: list
+    items:
+    - 시계열 분해 - 추세, 계절성, 잔차로 분리
+    - ADF 검정 - 정상성 확인
+    - 차분 - 비정상 시계열을 정상화
+    - ACF/PACF - ARIMA 파라미터 선택
+    - ARIMA(p,d,q) - 시계열 예측 모델
+    - forecast() - 미래 값 예측
+    - AIC - 모델 선택 기준
+    - SARIMA - 계절성 명시적 처리
+  - type: text
+    content: 다음 프로젝트에서는 소매 매출 데이터로 외생변수를 포함한 시계열 회귀를 배웁니다. 날씨, 프로모션 같은 외부 요인으로 매출을 예측해봅니다.
+  goal: 정리에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 회귀 리포트 품질 게이트
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: statsmodels 학습의 핵심은 모델을 만들고 summary를 보는 데서 끝나지 않는 것입니다. 먼저 어떤 변수가 유의할지 예측하고, 로컬 데이터의 컬럼과
+    결측치를 검증하고, 회귀 결과가 보고서에 들어갈 수준인지 R², F-test, 잔차 진단으로 확인해야 합니다. 마지막에는 변수를 빼는 변주로 모델 선택의 근거를 비교합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import pandas as pd
+    import statsmodels.api as sm
+    from statsmodels.stats.diagnostic import het_breuschpagan
+    from codaro.curriculum.localData import loadLocalDataset
+
+    marketingData = loadLocalDataset("advertising")
+    requiredColumns = ["TV", "Radio", "Newspaper", "Sales"]
+
+    missingColumns = [column for column in requiredColumns if column not in marketingData.columns]
+    if missingColumns:
+        raise ValueError(f"필수 컬럼이 없습니다: {missingColumns}")
+    if marketingData[requiredColumns].isna().any().any():
+        raise ValueError("회귀분석 전 결측치를 처리해야 합니다.")
+
+    reportY = marketingData["Sales"]
+    reportX = sm.add_constant(marketingData[["TV", "Radio", "Newspaper"]])
+    reportModel = sm.OLS(reportY, reportX).fit()
+
+    marketingData[requiredColumns].head()
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      compactX = sm.add_constant(marketingData[["TV", "Radio"]])
+      compactModel = sm.OLS(reportY, compactX).fit()
+      r2Drop = reportModel.rsquared - compactModel.rsquared
+
+      assert compactModel.rsquared >= 0.95
+      {
+          "fullR2": round(reportModel.rsquared, 3),
+          "compactR2": round(compactModel.rsquared, 3),
+          "r2Drop": round(r2Drop, 3),
+          "fullAIC": round(reportModel.aic, 1),
+          "compactAIC": round(compactModel.aic, 1),
+      }
+    solution: |-
+      import pandas as pd
+      import statsmodels.api as sm
+      from statsmodels.stats.diagnostic import het_breuschpagan
+      from codaro.curriculum.localData import loadLocalDataset
+
+      marketingData = loadLocalDataset("advertising")
+      requiredColumns = ["TV", "Radio", "Newspaper", "Sales"]
+
+      missingColumns = [column for column in requiredColumns if column not in marketingData.columns]
+      if missingColumns:
+          raise ValueError(f"필수 컬럼이 없습니다: {missingColumns}")
+      if marketingData[requiredColumns].isna().any().any():
+          raise ValueError("회귀분석 전 결측치를 처리해야 합니다.")
+
+      marketingData[requiredColumns].head()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증에서 \`compactX\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: statsmodels_04-time-series-autocorrelation-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: 항공 수요 residual의 lag-1 autocorrelation 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 시간 순서를 보존해 residual mean과 lag covariance를 계산한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - residual 순서를 섞지 마세요.
+    - lag-1 하나만으로 모든 시계열 구조가 설명되지는 않습니다.
+    exercise:
+      prompt: lag_one_autocorrelation(residuals)를 완성하세요.
+      starterCode: |-
+        def lag_one_autocorrelation(residuals):
+            raise NotImplementedError
+      solution: |
+        def lag_one_autocorrelation(residuals):
+            if len(residuals)<2: raise ValueError("need time residuals")
+            mean=sum(residuals)/len(residuals); denominator=sum((value-mean)**2 for value in residuals)
+            if denominator==0: raise ValueError("zero residual variance")
+            numerator=sum((residuals[index]-mean)*(residuals[index-1]-mean) for index in range(1,len(residuals)))
+            return {"lag":1,"autocorrelation":round(numerator/denominator,4),"count":len(residuals)}
+      hints: *id001
+    check:
+      id: python.statsmodels.statsmodels_04.time-series-autocorrelation.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.statsmodels.statsmodels_04.time-series-autocorrelation.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: lag_one_autocorrelation
+        cases:
+        - id: detects-positive-dependence
+          arguments:
+          - value:
+            - -2
+            - -1
+            - 1
+            - 2
+          expectedReturn:
+            lag: 1
+            autocorrelation: 0.3
+            count: 4
+        - id: detects-alternation
+          arguments:
+          - value:
+            - 1
+            - -1
+            - 1
+            - -1
+          expectedReturn:
+            lag: 1
+            autocorrelation: -0.75
+            count: 4
+        - id: rejects-zero-variance
+          arguments:
+          - value:
+            - 1
+            - 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: statsmodels_04-rolling-origin-splits-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - statsmodels_04-time-series-autocorrelation-mastery
+    title: 새 수요 예측에 rolling-origin 검증 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: minimum train과 horizon으로 시간 split 원장을 만든다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 각 validation은 train보다 미래여야 합니다.
+    - 여러 origin의 error 분포를 보존하세요.
+    exercise:
+      prompt: rolling_origin_splits(length, minimum_train, horizon)를 완성하세요.
+      starterCode: |-
+        def rolling_origin_splits(length, minimum_train, horizon):
+            raise NotImplementedError
+      solution: |
+        def rolling_origin_splits(length, minimum_train, horizon):
+            if minimum_train<=0 or horizon<=0 or minimum_train+horizon>length: raise ValueError("invalid rolling split")
+            result=[]; train_end=minimum_train
+            while train_end+horizon<=length:
+                result.append({"train":[0,train_end],"validation":[train_end,train_end+horizon]}); train_end+=horizon
+            return result
+      hints: *id002
+    check:
+      id: python.statsmodels.statsmodels_04.rolling-origin-splits.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.statsmodels.statsmodels_04.rolling-origin-splits.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: rolling_origin_splits
+        cases:
+        - id: builds-expanding-splits
+          arguments:
+          - value: 10
+          - value: 4
+          - value: 2
+          expectedReturn:
+          - train:
+            - 0
+            - 4
+            validation:
+            - 4
+            - 6
+          - train:
+            - 0
+            - 6
+            validation:
+            - 6
+            - 8
+          - train:
+            - 0
+            - 8
+            validation:
+            - 8
+            - 10
+        - id: builds-one-split
+          arguments:
+          - value: 5
+          - value: 3
+          - value: 2
+          expectedReturn:
+          - train:
+            - 0
+            - 3
+            validation:
+            - 3
+            - 5
+        - id: rejects-oversized
+          arguments:
+          - value: 5
+          - value: 4
+          - value: 2
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: statsmodels_04-air-demand-time-model-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - statsmodels_04-rolling-origin-splits-transfer
+    title: 항공 수요 모델 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 추세·계절·residual dependence를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 계수·불확실성·가정 진단을 한 묶음으로 해석하세요.
+    - 통계적 연관을 인과 효과나 개인 확정 예측으로 확대하지 마세요.
+    exercise:
+      prompt: choose_time_model_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_time_model_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_time_model_evidence(situation):
+            table = {'future-demand': {'method': 'rolling-origin validation', 'evidence': 'forecast horizons', 'risk': 'random split'}, 'seasonality': {'method': 'seasonal terms or SARIMA', 'evidence': 'period and residual ACF', 'risk': 'calendar drift'}, 'correlated-errors': {'method': 'time-series error model', 'evidence': 'residual autocorrelation', 'risk': 'OLS independent errors'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.statsmodels.statsmodels_04.air-demand-time-model.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.statsmodels.statsmodels_04.air-demand-time-model.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_time_model_evidence
+        cases:
+        - id: recalls-future-demand
+          arguments:
+          - value: future-demand
+          expectedReturn:
+            method: rolling-origin validation
+            evidence: forecast horizons
+            risk: random split
+        - id: recalls-seasonality
+          arguments:
+          - value: seasonality
+          expectedReturn:
+            method: seasonal terms or SARIMA
+            evidence: period and residual ACF
+            risk: calendar drift
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

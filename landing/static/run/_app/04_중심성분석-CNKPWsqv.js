@@ -1,0 +1,741 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - networkx
+  - scipy
+  id: networkx_04
+  title: 중심성분석
+  order: 4
+  category: networkx
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - networkx
+  - 중심성
+  - degree
+  - betweenness
+  - closeness
+  - pagerank
+  seo:
+    title: NetworkX 중심성 분석 - 중요 노드 찾기
+    description: NetworkX로 네트워크에서 중요한 노드를 찾습니다. 연결, 매개, 근접, 고유벡터 중심성과 PageRank를 배웁니다.
+    keywords:
+    - networkx
+    - 중심성
+    - centrality
+    - degree
+    - betweenness
+    - pagerank
+intro:
+  emoji: 🎯
+  goal: 네트워크에서 중요한 노드를 찾는 다양한 중심성 지표를 학습합니다.
+  description: 중심성(Centrality)은 네트워크에서 노드의 중요도를 측정합니다. 연결 중심성은 연결 수, 매개 중심성은 다리 역할, 근접 중심성은 접근성을 측정합니다.
+    PageRank는 구글 검색의 기반이 된 알고리즘입니다.
+  direction: 중심성분석에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.
+  benefits:
+  - 관계 데이터 확인 후 그래프 알고리즘에 맞는 코드 입력을 고릅니다.
+  - 중심성분석 결과를 노드/엣지와 지표 값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 관계 분석 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(관계 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 샘플 그래프 처리 실행
+      detail: 그래프 알고리즘 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 연결 중심성 결과 검증
+      detail: 노드/엣지와 지표 값 기준으로 실행 결과를 비교합니다.
+    - label: 중심성분석 재사용
+      detail: 완성 코드를 관계 분석 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 그래프 분석 환경
+      detail: matplotlib, networkx, scipy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 중심성분석 실행
+      detail: 셀을 실행해 노드/엣지와 지표 값와 예외 상태를 확인합니다.
+    - label: 중심성분석 완료
+      detail: 검증된 코드를 관계 분석 리포트로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: NetworkX와 matplotlib을 불러옵니다. 중심성(Centrality) 분석은 네트워크에서 '중요한' 노드를 찾는 핵심 기법입니다. 소셜 네트워크의
+    인플루언서, 교통망의 허브 역, 조직의 핵심 인물 등을 식별하는 데 사용됩니다. 중심성에는 여러 종류가 있으며, 각각 '중요함'을 다른 관점에서 정의합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import networkx as nx
+    import matplotlib.pyplot as plt
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+    hints:
+    - 바꿀 지점은 관계 데이터을 만드는 첫 줄과 그래프 알고리즘 줄에서 찾으세요.
+    - 실행 뒤 노드/엣지와 지표 값 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 노드/엣지와 지표 값 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step2_sample_graph
+  title: 2단계. 샘플 그래프
+  structuredPrimary: true
+  subtitle: 분석용 네트워크
+  goal: 2단계. 샘플 그래프에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 중심성 분석을 위한 샘플 네트워크를 생성합니다. 이 그래프는 두 개의 밀집된 영역이 브릿지 노드로 연결된 구조입니다. 왼쪽에는 A를 중심으로 한 허브 구조가,
+    오른쪽에는 F, G, H, I로 이루어진 클러스터가 있습니다. E와 F가 두 영역을 연결하는 브릿지 역할을 합니다. 이 구조에서 각 중심성 지표가 어떤 노드를 '중요'하다고 평가하는지
+    비교해봅니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    G = nx.Graph()
+    G.add_edges_from([
+        ("A", "B"), ("A", "C"), ("A", "D"), ("A", "E"),
+        ("B", "C"), ("D", "E"),
+        ("E", "F"), ("F", "G"), ("F", "H"),
+        ("G", "H"), ("G", "I"), ("H", "I")
+    ])
+    G.number_of_nodes(), G.number_of_edges()
+  exercise:
+    prompt: 2단계. 샘플 그래프 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      G = nx.Graph()
+      G.add_edges_from([
+          ("A", "B"), ("A", "C"), ("A", "D"), ("A", "E"),
+          ("B", "C"), ("D", "E"),
+          ("E", "F"), ("F", "G"), ("F", "H"),
+          ("G", "H"), ("G", "I"), ("H", "I")
+      ])
+      G.number_of_nodes(), G.number_of_edges()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 2단계. 샘플 그래프에서 \`G\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. 샘플 그래프 실행 뒤 \`G\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step3_degree
+  title: 3단계. 연결 중심성
+  structuredPrimary: true
+  subtitle: degree_centrality()
+  goal: 3단계. 연결 중심성에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    연결 중심성(Degree Centrality)은 가장 직관적인 중심성 지표입니다. 노드의 연결 수(degree)를 전체 노드 수 - 1로 나누어 0~1 사이로 정규화합니다. 많은 이웃과 직접 연결된 노드가 높은 값을 가집니다. 소셜 네트워크에서 '친구가 많은 사람', 공항 네트워크에서 '노선이 많은 공항'을 찾을 때 유용합니다.
+
+    연결 중심성 = (연결 수) / (노드 수 - 1)입니다. 0과 1 사이 값으로 정규화됩니다.
+  snippet: |-
+    degCent = nx.degree_centrality(G)
+    degCent
+  exercise:
+    prompt: 3단계. 연결 중심성 예제에서 \`degCent\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      degCent = nx.degree_centrality(G)
+      degCent
+    hints:
+    - 바꿀 지점은 \`degCent = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`degCent\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 3단계. 연결 중심성에서 \`degCent\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 연결 중심성 실행 뒤 \`degCent\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step4_betweenness
+  title: 4단계. 매개 중심성
+  structuredPrimary: true
+  subtitle: betweenness_centrality()
+  goal: 4단계. 매개 중심성에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    매개 중심성(Betweenness Centrality)은 노드가 네트워크의 '정보 흐름'에서 얼마나 중요한 위치에 있는지를 측정합니다. 모든 노드 쌍 사이의 최단 경로를 계산하고, 해당 노드가 그 경로에 얼마나 자주 포함되는지를 집계합니다. 서로 다른 그룹을 연결하는 브릿지 역할의 노드가 높은 값을 가집니다. 조직에서 부서 간 소통을 담당하는 사람, 네트워크의 병목점을 찾을 때 유용합니다.
+
+    매개 중심성이 높은 노드를 제거하면 네트워크가 분리될 수 있습니다. 정보 흐름의 병목점입니다.
+  snippet: |-
+    betCent = nx.betweenness_centrality(G)
+    betCent
+  exercise:
+    prompt: 4단계. 매개 중심성 예제에서 \`betCent\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      betCent = nx.betweenness_centrality(G)
+      betCent
+    hints:
+    - 바꿀 지점은 \`betCent = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`betCent\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 4단계. 매개 중심성에서 \`betCent\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 4단계. 매개 중심성 실행 뒤 \`betCent\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step5_closeness
+  title: 5단계. 근접 중심성
+  structuredPrimary: true
+  subtitle: closeness_centrality()
+  goal: 5단계. 근접 중심성에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    근접 중심성(Closeness Centrality)은 한 노드에서 네트워크의 다른 모든 노드에 얼마나 빠르게 도달할 수 있는지를 측정합니다. (노드 수 - 1)을 모든 최단 거리의 합으로 나눈 값입니다. 네트워크의 지리적 중심에 위치한 노드가 높은 값을 가집니다. 정보를 빠르게 전파하거나 받을 수 있는 위치, 물류 센터의 최적 위치를 찾을 때 유용합니다.
+
+    근접 중심성 = (노드 수 - 1) / (모든 최단 거리의 합)입니다. 네트워크의 중앙에 위치한 노드가 높습니다.
+  snippet: |-
+    closeCent = nx.closeness_centrality(G)
+    closeCent
+  exercise:
+    prompt: 5단계. 근접 중심성 예제에서 \`closeCent\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      closeCent = nx.closeness_centrality(G)
+      closeCent
+    hints:
+    - 바꿀 지점은 \`closeCent = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`closeCent\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 5단계. 근접 중심성에서 \`closeCent\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 근접 중심성 실행 뒤 \`closeCent\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step6_eigenvector
+  title: 6단계. 고유벡터 중심성
+  structuredPrimary: true
+  subtitle: eigenvector_centrality()
+  goal: 6단계. 고유벡터 중심성에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    고유벡터 중심성(Eigenvector Centrality)은 '누구와 연결되어 있는가'를 중시합니다. 단순히 연결 수가 많은 것이 아니라, 중요한 노드들과 연결되어 있을수록 높은 값을 가집니다. 인접행렬의 주요 고유벡터에서 계산되며, 반복적으로 이웃의 중심성을 합산하는 방식으로 수렴합니다. 학계에서 저명한 학자들에게 인용받는 논문, VIP 고객과 연결된 서비스 담당자를 찾을 때 유용합니다.
+
+    고유벡터 중심성은 인접행렬의 고유벡터에서 계산됩니다. 많이 연결된 노드와 연결되면 중심성이 높아집니다.
+  snippet: |-
+    eigCent = nx.eigenvector_centrality(G)
+    eigCent
+  exercise:
+    prompt: 6단계. 고유벡터 중심성 예제에서 \`eigCent\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      eigCent = nx.eigenvector_centrality(G)
+      eigCent
+    hints:
+    - 바꿀 지점은 \`eigCent = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`eigCent\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 6단계. 고유벡터 중심성에서 \`eigCent\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 고유벡터 중심성 실행 뒤 \`eigCent\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step7_pagerank
+  title: 7단계. PageRank
+  structuredPrimary: true
+  subtitle: pagerank()
+  goal: 7단계. PageRank에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    PageRank는 1998년 래리 페이지와 세르게이 브린이 구글 검색 엔진의 기초로 개발한 알고리즘입니다. 랜덤 서퍼 모델에 기반하며, 임의의 사용자가 링크를 따라 웹을 탐색할 때 각 페이지에 도달할 확률을 계산합니다. 중요한 페이지에서 링크를 많이 받을수록 PageRank가 높아집니다. 주로 방향 그래프에서 사용하지만, 무방향 그래프에도 적용 가능합니다.
+
+    PageRank는 random surfer model 기반입니다. 임의의 웹서퍼가 각 페이지에 도달할 확률을 계산합니다.
+  snippet: |-
+    pr = nx.pagerank(G)
+    pr
+  exercise:
+    prompt: 7단계. PageRank 예제에서 \`pr\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      pr = nx.pagerank(G)
+      pr
+    hints:
+    - 바꿀 지점은 \`pr = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`pr\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 7단계. PageRank에서 \`pr\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. PageRank 실행 뒤 \`pr\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step8_visualize_centrality
+  title: 8단계. 중심성 시각화
+  structuredPrimary: true
+  subtitle: 노드 크기/색상 매핑
+  goal: 8단계. 중심성 시각화에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 중심성 값을 노드의 크기나 색상에 매핑하면 결과를 직관적으로 파악할 수 있습니다. 노드 크기로 연결 중심성을 표현하면 허브가 크게 보이고, 색상 그라디언트로
+    매개 중심성을 표현하면 브릿지 노드가 강조됩니다. matplotlib의 컬러맵과 결합하여 다양한 시각화가 가능합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    pos = nx.spring_layout(G, seed=42)
+    nodeSizes = [3000 * degCent[n] for n in G.nodes()]
+
+    fig2, ax2 = plt.subplots(figsize=(8, 6))
+    nx.draw(G, pos=pos, with_labels=True, node_color='lightblue',
+            node_size=nodeSizes, font_size=10, ax=ax2)
+    ax2.set_title('Node Size by Degree Centrality')
+    fig2
+  exercise:
+    prompt: 8단계. 중심성 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      pos = nx.spring_layout(G, seed=42)
+      nodeSizes = [3000 * degCent[n] for n in G.nodes()]
+
+      fig2, ax2 = plt.subplots(figsize=(8, 6))
+      nx.draw(G, pos=pos, with_labels=True, node_color='lightblue',
+              node_size=nodeSizes, font_size=10, ax=ax2)
+      ax2.set_title('Node Size by Degree Centrality')
+      fig2
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 8단계. 중심성 시각화의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 8단계. 중심성 시각화 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step9_compare
+  title: 9단계. 중심성 비교
+  structuredPrimary: true
+  subtitle: 다양한 관점
+  goal: 9단계. 중심성 비교에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    각 중심성 지표는 서로 다른 관점에서 '중요함'을 정의합니다. 연결 중심성은 직접적인 영향력, 매개 중심성은 정보 흐름 통제력, 근접 중심성은 접근성, 고유벡터 중심성은 연결의 질, PageRank는 추천받는 정도를 측정합니다. 같은 노드라도 중심성 종류에 따라 순위가 달라질 수 있으므로, 분석 목적에 맞는 지표를 선택하는 것이 중요합니다.
+
+    연결 중심성 1위는 허브, 매개 중심성 1위는 브릿지, 근접 중심성 1위는 중앙에 위치한 노드입니다.
+  snippet: |-
+    comparison = {}
+    for n in G.nodes():
+        comparison[n] = {
+            'degree': round(degCent[n], 3),
+            'betweenness': round(betCent[n], 3),
+            'closeness': round(closeCent[n], 3),
+            'eigenvector': round(eigCent[n], 3),
+            'pagerank': round(pr[n], 3)
+        }
+    comparison
+  exercise:
+    prompt: 9단계. 중심성 비교 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      comparison = {}
+      for n in G.nodes():
+          comparison[n] = {
+              'degree': round(degCent[n], 3),
+              'betweenness': round(betCent[n], 3),
+              'closeness': round(closeCent[n], 3),
+              'eigenvector': round(eigCent[n], 3),
+              'pagerank': round(pr[n], 3)
+          }
+      comparison
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 9단계. 중심성 비교의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 9단계. 중심성 비교 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step10_influence
+  title: 10단계. 영향력 분석
+  structuredPrimary: true
+  subtitle: 실제 응용
+  goal: 10단계. 영향력 분석에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 소셜 네트워크에서 영향력 있는 인플루언서를 찾는 실제 응용 예제입니다. 바이럴 마케팅에서는 연결 중심성이 높은 사람에게 제품을 홍보하면 많은 사람에게 직접
+    전달됩니다. 정보 확산 속도를 최대화하려면 근접 중심성이 높은 사람을, 서로 다른 커뮤니티에 메시지를 전파하려면 매개 중심성이 높은 사람을 타겟팅합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    social = nx.Graph()
+    social.add_edges_from([
+        ("Influencer", "User1"), ("Influencer", "User2"),
+        ("Influencer", "User3"), ("Influencer", "User4"),
+        ("User1", "User5"), ("User1", "User6"),
+        ("User2", "User7"), ("User3", "User8"),
+        ("User4", "User9"), ("User4", "User10"),
+        ("User5", "User6"), ("User9", "User10")
+    ])
+    social.number_of_nodes(), social.number_of_edges()
+  exercise:
+    prompt: 10단계. 영향력 분석 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      social = nx.Graph()
+      social.add_edges_from([
+          ("Influencer", "User1"), ("Influencer", "User2"),
+          ("Influencer", "User3"), ("Influencer", "User4"),
+          ("User1", "User5"), ("User1", "User6"),
+          ("User2", "User7"), ("User3", "User8"),
+          ("User4", "User9"), ("User4", "User10"),
+          ("User5", "User6"), ("User9", "User10")
+      ])
+      social.number_of_nodes(), social.number_of_edges()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 10단계. 영향력 분석에서 \`social\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 10단계. 영향력 분석 실행 뒤 \`social\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 중심성 분석
+  goal: 실습에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    지금까지 배운 중심성 분석 기법을 활용하여 실전 미션을 수행해봅시다. 학교 친구 네트워크에서 인기 있는 학생과 그룹 간 연결자를 찾고, 웹 페이지에 PageRank를 적용하여 중요도 순위를 매겨봅니다.
+
+    각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  snippet: |-
+    import networkx as nx
+    import matplotlib.pyplot as plt
+
+    school = nx.Graph()
+    school.add_edges_from([
+        ("Kim", "Lee"), ("Kim", "Park"), ("Kim", "Choi"),
+        ("Lee", "Park"), ("Lee", "Jung"),
+        ("Park", "Choi"), ("Park", "Kang"),
+        ("Choi", "Kang"), ("Jung", "Kang"),
+        ("Kang", "Oh"), ("Oh", "Yoon")
+    ])
+    school.number_of_nodes(), school.number_of_edges()
+  exercise:
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+
+      school = nx.Graph()
+      school.add_edges_from([
+          ("Kim", "Lee"), ("Kim", "Park"), ("Kim", "Choi"),
+          ("Lee", "Park"), ("Lee", "Jung"),
+          ("Park", "Choi"), ("Park", "Kang"),
+          ("Choi", "Kang"), ("Jung", "Kang"),
+          ("Kang", "Oh"), ("Oh", "Yoon")
+      ])
+      school.number_of_nodes(), school.number_of_edges()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 실습에서 \`school\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 \`school\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 인수인계 네트워크
+  goal: 업무 흐름 검증에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 실무 네트워크 분석은 그래프를 그리는 데서 끝나지 않습니다. 먼저 병목 후보를 예측하고, 로컬 Python에서 실행한 뒤, 잘못된 노드나 끊어진 경로를 예외로
+    처리하고, 핵심 지표를 assert로 검증해야 합니다. 아래 흐름은 영업, 지원, 운영, 재무, 엔지니어링 사이의 인수인계 비용을 네트워크로 보고 개선안을 비교합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import networkx as nx
+
+    handoffEdges = [
+        ("sales", "support", 1),
+        ("support", "ops", 2),
+        ("ops", "finance", 1),
+        ("ops", "engineering", 1),
+        ("engineering", "infra", 2),
+        ("support", "customer_success", 2),
+    ]
+
+    workflowGraph = nx.Graph()
+    workflowGraph.add_weighted_edges_from(handoffEdges)
+
+    expectedNodes = {"sales", "support", "ops", "finance", "engineering", "infra", "customer_success"}
+    if set(workflowGraph.nodes()) != expectedNodes:
+        raise ValueError("인수인계 네트워크의 부서 목록이 예상과 다릅니다.")
+    if any(data["weight"] <= 0 for _, _, data in workflowGraph.edges(data=True)):
+        raise ValueError("인수인계 비용은 0보다 커야 합니다.")
+
+    salesToFinanceCost = nx.shortest_path_length(workflowGraph, "sales", "finance", weight="weight")
+    betweenness = nx.betweenness_centrality(workflowGraph, weight="weight")
+
+    workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      experimentGraph = workflowGraph.copy()
+      experimentGraph.add_edge("sales", "finance", weight=2)
+
+      improvedCost = nx.shortest_path_length(experimentGraph, "sales", "finance", weight="weight")
+      improvedBetweenness = nx.betweenness_centrality(experimentGraph, weight="weight")
+      improvement = salesToFinanceCost - improvedCost
+
+      assert improvement > 0
+      {
+          "beforeCost": salesToFinanceCost,
+          "afterCost": improvedCost,
+          "costImprovement": improvement,
+          "opsBetweennessBefore": round(betweenness["ops"], 3),
+          "opsBetweennessAfter": round(improvedBetweenness["ops"], 3),
+      }
+    solution: |-
+      import networkx as nx
+
+      handoffEdges = [
+          ("sales", "support", 1),
+          ("support", "ops", 2),
+          ("ops", "finance", 1),
+          ("ops", "engineering", 1),
+          ("engineering", "infra", 2),
+          ("support", "customer_success", 2),
+      ]
+
+      workflowGraph = nx.Graph()
+      workflowGraph.add_weighted_edges_from(handoffEdges)
+
+      expectedNodes = {"sales", "support", "ops", "finance", "engineering", "infra", "customer_success"}
+      if set(workflowGraph.nodes()) != expectedNodes:
+          raise ValueError("인수인계 네트워크의 부서 목록이 예상과 다릅니다.")
+      if any(data["weight"] <= 0 for _, _, data in workflowGraph.edges(data=True)):
+          raise ValueError("인수인계 비용은 0보다 커야 합니다.")
+
+      workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 업무 흐름 검증에서 \`experimentGraph\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: networkx_04-degree-centrality-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: degree centrality의 분모 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: simple graph에서 degree/(n-1)를 계산하고 isolated node를 보존한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - simple graph degree 분모는 n-1입니다.
+    - 높은 연결 수와 영향력은 같은 개념이 아닙니다.
+    exercise:
+      prompt: degree_centrality(nodes, edges)를 완성하세요.
+      starterCode: |-
+        def degree_centrality(nodes, edges):
+            raise NotImplementedError
+      solution: |
+        def degree_centrality(nodes, edges):
+            neighbors = {node: set() for node in nodes}
+            for source, target in edges:
+                neighbors[source].add(target)
+                neighbors[target].add(source)
+            denominator = max(1, len(nodes) - 1)
+            return {node: round(len(neighbors[node]) / denominator, 3) for node in sorted(nodes)}
+      hints: *id001
+    check:
+      id: python.networkx.networkx_04.degree-centrality.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_04.degree-centrality.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: degree_centrality
+        cases:
+        - id: normalizes-by-n-minus-one
+          arguments:
+          - value:
+            - a
+            - b
+            - c
+          - value:
+            - - a
+              - b
+            - - a
+              - c
+          expectedReturn:
+            a: 1.0
+            b: 0.5
+            c: 0.5
+        - id: handles-single-node
+          arguments:
+          - value:
+            - x
+          - value: []
+          expectedReturn:
+            x: 0.0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: networkx_04-closeness-reachability-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_04-degree-centrality-mastery
+    title: 새 조직망에 closeness 개념 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 도달 가능한 거리 합과 전체 graph coverage를 함께 반환한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - distance 합뿐 아니라 전체 node 중 도달 가능한 비율을 반영하세요.
+    - 서로 다른 component의 centrality 비교 한계를 남기세요.
+    exercise:
+      prompt: closeness_scores(nodes, edges)를 완성하세요.
+      starterCode: |-
+        def closeness_scores(nodes, edges):
+            raise NotImplementedError
+      solution: |
+        def closeness_scores(nodes, edges):
+            adjacency = {node: set() for node in nodes}
+            for a, b in edges:
+                adjacency[a].add(b); adjacency[b].add(a)
+            result = {}
+            for start in nodes:
+                distance = {start: 0}; queue = [start]
+                while queue:
+                    node = queue.pop(0)
+                    for neighbor in adjacency[node]:
+                        if neighbor not in distance:
+                            distance[neighbor] = distance[node] + 1; queue.append(neighbor)
+                reachable = len(distance) - 1
+                score = 0.0 if not reachable else round((reachable / sum(distance.values())) * (reachable / max(1, len(nodes) - 1)), 3)
+                result[start] = {"score": score, "reachable": reachable}
+            return {node: result[node] for node in sorted(result)}
+      hints: *id002
+    check:
+      id: python.networkx.networkx_04.closeness-reachability.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_04.closeness-reachability.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: closeness_scores
+        cases:
+        - id: penalizes-disconnected-coverage
+          arguments:
+          - value:
+            - a
+            - b
+            - c
+          - value:
+            - - a
+              - b
+          expectedReturn:
+            a:
+              score: 0.5
+              reachable: 1
+            b:
+              score: 0.5
+              reachable: 1
+            c:
+              score: 0.0
+              reachable: 0
+        - id: scores-line-center-higher
+          arguments:
+          - value:
+            - a
+            - b
+            - c
+          - value:
+            - - a
+              - b
+            - - b
+              - c
+          expectedReturn:
+            a:
+              score: 0.667
+              reachable: 2
+            b:
+              score: 1.0
+              reachable: 2
+            c:
+              score: 0.667
+              reachable: 2
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: networkx_04-centrality-meaning-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_04-closeness-reachability-transfer
+    title: 중심성 의미 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 질문에 맞는 중심성 지표를 고른다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 그래프 알고리즘의 입력 가정과 반환 의미를 함께 기록하세요.
+    - 시각적 모양만으로 구조적 결론을 내리지 마세요.
+    exercise:
+      prompt: choose_centrality(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_centrality(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_centrality(situation):
+            table = {'many-direct-links': {'method': 'degree', 'evidence': 'neighbor count', 'risk': 'popularity as authority'}, 'broker-between-groups': {'method': 'betweenness', 'evidence': 'shortest-path share', 'risk': 'path model assumption'}, 'quick-reach': {'method': 'closeness', 'evidence': 'distance and reachability', 'risk': 'disconnected graph'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.networkx.networkx_04.centrality-meaning.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_04.centrality-meaning.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_centrality
+        cases:
+        - id: recalls-many-direct-links
+          arguments:
+          - value: many-direct-links
+          expectedReturn:
+            method: degree
+            evidence: neighbor count
+            risk: popularity as authority
+        - id: recalls-broker-between-groups
+          arguments:
+          - value: broker-between-groups
+          expectedReturn:
+            method: betweenness
+            evidence: shortest-path share
+            risk: path model assumption
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

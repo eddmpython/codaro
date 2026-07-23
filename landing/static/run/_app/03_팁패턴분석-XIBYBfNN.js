@@ -1,0 +1,864 @@
+var e=`meta:
+  packages:
+  - duckdb
+  - pandas
+  id: duckdb_03
+  title: 팁패턴분석
+  order: 3
+  category: duckdb
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - tips
+  - CASE WHEN
+  - ORDER BY
+  - GROUP BY
+  - 조건분류
+  seo:
+    title: DuckDB CASE WHEN 조건분류 - 팁 패턴 분석
+    description: 레스토랑 팁 데이터로 조건부 분류를 학습합니다. CASE WHEN으로 팁 등급을 나누고 ORDER BY로 다중 정렬을 수행합니다.
+    keywords:
+    - DuckDB CASE WHEN
+    - ORDER BY
+    - GROUP BY
+    - 팁 분석
+    - 조건부 분류
+intro:
+  emoji: 💵
+  goal: 팁을 등급(낮음/중간/높음)으로 분류하고 요일/시간별 패턴을 분석합니다.
+  description: CASE WHEN으로 조건부 값을 만들고, 복합 정렬로 데이터를 정리합니다. 이전에 배운 GROUP BY, AVG, ROUND를 함께 활용합니다.
+  direction: 팁패턴분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 테이블과 SQL 쿼리 확인 후 SELECT/WHERE/GROUP BY/CTE에 맞는 코드 입력을 고릅니다.
+  - 팁패턴분석 결과를 쿼리 결과 행, 컬럼, 집계값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 로컬 분석 SQL 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(테이블과 SQL 쿼리)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 팁 분포 확인 처리 실행
+      detail: SELECT/WHERE/GROUP BY/CTE 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 팁 등급 분류 결과 검증
+      detail: 쿼리 결과 행, 컬럼, 집계값 기준으로 실행 결과를 비교합니다.
+    - label: 팁패턴분석 재사용
+      detail: 완성 코드를 로컬 분석 SQL 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: SQL 분석 환경
+      detail: duckdb, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 팁패턴분석 실행
+      detail: 셀을 실행해 쿼리 결과 행, 컬럼, 집계값와 예외 상태를 확인합니다.
+    - label: 팁패턴분석 완료
+      detail: 검증된 코드를 로컬 분석 SQL 리포트로 남깁니다.
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  structuredPrimary: true
+  subtitle: tips 데이터 준비
+  goal: 1단계. 데이터 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: 레스토랑 팁 데이터를 DuckDB에 로드합니다. tips 데이터셋은 고객의 결제 금액, 팁, 요일, 시간대, 파티 크기 등의 정보를 담고 있습니다. 이 데이터로
+    팁 패턴을 분석하여 매출 증대 인사이트를 얻을 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import pandas as pd
+    from codaro.curriculum.localData import loadLocalDataset
+    import duckdb
+
+    df = loadLocalDataset("tips")
+    tips = duckdb.from_df(df)
+  exercise:
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+      import duckdb
+
+      df = loadLocalDataset("tips")
+      tips = duckdb.from_df(df)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 1단계. 데이터 불러오기의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 1단계. 데이터 불러오기 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step2_explore
+  title: 2단계. 팁 분포 확인
+  structuredPrimary: true
+  subtitle: 팁 통계 보기
+  goal: 2단계. 팁 분포 확인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: 팁의 최소, 최대, 평균을 확인하여 등급 기준을 설정합니다. MIN, MAX, AVG 함수로 데이터의 범위와 중심 경향을 파악하면 어떤 기준으로 low/mid/high를
+    나눌지 합리적으로 결정할 수 있습니다. 탐색적 분석의 첫 단계로 데이터의 전체적인 분포를 이해하는 것이 중요합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            MIN(tip) AS minTip,
+            MAX(tip) AS maxTip,
+            ROUND(AVG(tip), 2) AS avgTip
+        FROM tips
+    """)
+  exercise:
+    prompt: 2단계. 팁 분포 확인 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              MIN(tip) AS minTip,
+              MAX(tip) AS maxTip,
+              ROUND(AVG(tip), 2) AS avgTip
+          FROM tips
+      """)
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 2단계. 팁 분포 확인의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 2단계. 팁 분포 확인 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step3_case_when
+  title: 3단계. 팁 등급 분류
+  structuredPrimary: true
+  subtitle: CASE WHEN 사용
+  goal: 3단계. 팁 등급 분류에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: |-
+    CASE WHEN 구문으로 팁을 3등급(low/mid/high)으로 분류합니다. SQL에서 조건부 값을 생성하는 가장 강력한 도구로, 복잡한 비즈니스 로직을 쿼리 안에서 처리할 수 있습니다. 2달러 미만은 low, 4달러 이상은 high, 그 사이는 mid로 분류하여 고객 세그먼트를 만듭니다.
+
+    CASE WHEN 조건 THEN 값 ELSE 기본값 END 형태로 조건부 값을 만듭니다. 여러 조건은 WHEN을 추가합니다.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            total_bill,
+            tip,
+            CASE
+                WHEN tip < 2 THEN 'low'
+                WHEN tip >= 4 THEN 'high'
+                ELSE 'mid'
+            END AS tipLevel
+        FROM tips
+        LIMIT 10
+    """)
+  exercise:
+    prompt: 3단계. 팁 등급 분류 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              total_bill,
+              tip,
+              CASE
+                  WHEN tip < 2 THEN 'low'
+                  WHEN tip >= 4 THEN 'high'
+                  ELSE 'mid'
+              END AS tipLevel
+          FROM tips
+          LIMIT 10
+      """)
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 3단계. 팁 등급 분류의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 3단계. 팁 등급 분류 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step4_count_level
+  title: 4단계. 등급별 건수
+  structuredPrimary: true
+  subtitle: 그룹화 집계
+  goal: 4단계. 등급별 건수에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: 각 등급에 몇 건이 있는지 세어봅니다. COUNT(*)로 등급별 건수를 집계하면 팁 분포를 한눈에 파악할 수 있습니다. 이를 통해 어떤 등급의 고객이 가장
+    많은지, 등급 불균형이 있는지 확인할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            CASE
+                WHEN tip < 2 THEN 'low'
+                WHEN tip >= 4 THEN 'high'
+                ELSE 'mid'
+            END AS tipLevel,
+            COUNT(*) AS cnt
+        FROM tips
+        GROUP BY tipLevel
+    """)
+  exercise:
+    prompt: 4단계. 등급별 건수 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              CASE
+                  WHEN tip < 2 THEN 'low'
+                  WHEN tip >= 4 THEN 'high'
+                  ELSE 'mid'
+              END AS tipLevel,
+              COUNT(*) AS cnt
+          FROM tips
+          GROUP BY tipLevel
+      """)
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 4단계. 등급별 건수의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 4단계. 등급별 건수 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step5_order_single
+  title: 5단계. 단일 정렬
+  structuredPrimary: true
+  subtitle: ORDER BY 기본
+  goal: 5단계. 단일 정렬에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: 팁이 높은 순서대로 정렬합니다. ORDER BY tip DESC를 사용하면 가장 후한 팁을 준 고객부터 확인할 수 있습니다. 내림차순(DESC) 정렬로 최댓값을
+    먼저 보여줍니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT total_bill, tip, day, time
+        FROM tips
+        ORDER BY tip DESC
+        LIMIT 10
+    """)
+  exercise:
+    prompt: 5단계. 단일 정렬 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT total_bill, tip, day, time
+          FROM tips
+          ORDER BY tip DESC
+          LIMIT 10
+      """)
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 5단계. 단일 정렬의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 5단계. 단일 정렬 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step6_order_multi
+  title: 6단계. 다중 정렬
+  structuredPrimary: true
+  subtitle: 여러 기준 정렬
+  goal: 6단계. 다중 정렬에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: |-
+    다중 컬럼 정렬로 데이터를 더 세밀하게 정리합니다. 먼저 요일로 정렬한 후 같은 요일 내에서 팁이 높은 순으로 정렬하면 요일별로 그룹화된 상태에서 최고 팁을 쉽게 찾을 수 있습니다. 실무에서 리포트 작성 시 이런 다중 정렬이 자주 사용됩니다.
+
+    ORDER BY col1, col2 DESC는 col1 오름차순 후 col2 내림차순입니다. 각 컬럼마다 ASC/DESC를 지정할 수 있습니다.
+  snippet: |-
+    duckdb.sql("""
+        SELECT day, time, total_bill, tip
+        FROM tips
+        ORDER BY day, tip DESC
+        LIMIT 15
+    """)
+  exercise:
+    prompt: 6단계. 다중 정렬 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT day, time, total_bill, tip
+          FROM tips
+          ORDER BY day, tip DESC
+          LIMIT 15
+      """)
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 6단계. 다중 정렬의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 6단계. 다중 정렬 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step7_day_avg
+  title: 7단계. 요일별 평균 팁
+  structuredPrimary: true
+  subtitle: 요일 패턴 분석
+  goal: 7단계. 요일별 평균 팁에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: 요일별로 평균 팁을 구하고 높은 순으로 정렬합니다. GROUP BY day로 요일별로 묶은 후 AVG(tip)으로 평균을 계산합니다. 어느 요일에 팁이 가장
+    많이 나오는지 파악하여 마케팅 전략을 수립할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            day,
+            ROUND(AVG(tip), 2) AS avgTip,
+            COUNT(*) AS cnt
+        FROM tips
+        GROUP BY day
+        ORDER BY avgTip DESC
+    """)
+  exercise:
+    prompt: 7단계. 요일별 평균 팁 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              day,
+              ROUND(AVG(tip), 2) AS avgTip,
+              COUNT(*) AS cnt
+          FROM tips
+          GROUP BY day
+          ORDER BY avgTip DESC
+      """)
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 7단계. 요일별 평균 팁의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 7단계. 요일별 평균 팁 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step8_time_pattern
+  title: 8단계. 시간대별 패턴
+  structuredPrimary: true
+  subtitle: 점심 vs 저녁
+  goal: 8단계. 시간대별 패턴에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: 점심과 저녁 시간대별 팁 패턴을 비교합니다. time 컬럼으로 그룹화하면 Lunch와 Dinner의 평균 팁과 결제 금액을 비교할 수 있습니다. 이를 통해
+    시간대별 매출 특성과 고객 성향을 파악합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            time,
+            ROUND(AVG(tip), 2) AS avgTip,
+            ROUND(AVG(total_bill), 2) AS avgBill,
+            COUNT(*) AS cnt
+        FROM tips
+        GROUP BY time
+        ORDER BY avgTip DESC
+    """)
+  exercise:
+    prompt: 8단계. 시간대별 패턴 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              time,
+              ROUND(AVG(tip), 2) AS avgTip,
+              ROUND(AVG(total_bill), 2) AS avgBill,
+              COUNT(*) AS cnt
+          FROM tips
+          GROUP BY time
+          ORDER BY avgTip DESC
+      """)
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 8단계. 시간대별 패턴의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 8단계. 시간대별 패턴 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step9_day_time
+  title: 9단계. 요일+시간대 분석
+  structuredPrimary: true
+  subtitle: 이중 그룹화
+  goal: 9단계. 요일+시간대 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: 요일과 시간대를 함께 고려해 더 세밀하게 분석합니다. GROUP BY day, time으로 다중 그룹화하면 '목요일 저녁', '토요일 점심' 같은 세부 패턴을
+    발견할 수 있습니다. 이는 요일만, 시간대만 본 것보다 훨씬 정교한 인사이트를 제공합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            day,
+            time,
+            ROUND(AVG(tip), 2) AS avgTip,
+            COUNT(*) AS cnt
+        FROM tips
+        GROUP BY day, time
+        ORDER BY day, avgTip DESC
+    """)
+  exercise:
+    prompt: 9단계. 요일+시간대 분석 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              day,
+              time,
+              ROUND(AVG(tip), 2) AS avgTip,
+              COUNT(*) AS cnt
+          FROM tips
+          GROUP BY day, time
+          ORDER BY day, avgTip DESC
+      """)
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 9단계. 요일+시간대 분석의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 9단계. 요일+시간대 분석 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step10_level_pattern
+  title: 10단계. 등급별 요일 패턴
+  structuredPrimary: true
+  subtitle: 종합 분석
+  goal: 10단계. 등급별 요일 패턴에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: 팁 등급별로 어느 요일에 많이 나오는지 분석합니다. CASE WHEN으로 만든 등급과 요일을 함께 그룹화하면 '높은 팁은 주말에 많다' 같은 패턴을 발견할
+    수 있습니다. 등급별 평균 결제 금액도 함께 보면 고객 세그먼트를 이해하는 데 도움이 됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            CASE
+                WHEN tip < 2 THEN 'low'
+                WHEN tip >= 4 THEN 'high'
+                ELSE 'mid'
+            END AS tipLevel,
+            day,
+            COUNT(*) AS cnt,
+            ROUND(AVG(total_bill), 2) AS avgBill
+        FROM tips
+        GROUP BY tipLevel, day
+        ORDER BY tipLevel, cnt DESC
+    """)
+  exercise:
+    prompt: 10단계. 등급별 요일 패턴 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              CASE
+                  WHEN tip < 2 THEN 'low'
+                  WHEN tip >= 4 THEN 'high'
+                  ELSE 'mid'
+              END AS tipLevel,
+              day,
+              COUNT(*) AS cnt,
+              ROUND(AVG(total_bill), 2) AS avgBill
+          FROM tips
+          GROUP BY tipLevel, day
+          ORDER BY tipLevel, cnt DESC
+      """)
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 10단계. 등급별 요일 패턴의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 10단계. 등급별 요일 패턴 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step11_final
+  title: 11단계. 최종 결과물
+  structuredPrimary: true
+  subtitle: 팁 패턴 종합 리포트
+  goal: 11단계. 최종 결과물에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: 요일/시간대별로 팁 등급 분포와 평균을 보여주는 종합 리포트입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            day,
+            time,
+            ROUND(AVG(tip), 2) AS avgTip,
+            ROUND(AVG(total_bill), 2) AS avgBill,
+            SUM(CASE WHEN tip < 2 THEN 1 ELSE 0 END) AS lowCnt,
+            SUM(CASE WHEN tip >= 2 AND tip < 4 THEN 1 ELSE 0 END) AS midCnt,
+            SUM(CASE WHEN tip >= 4 THEN 1 ELSE 0 END) AS highCnt,
+            COUNT(*) AS totalCnt
+        FROM tips
+        GROUP BY day, time
+        ORDER BY day, time
+    """)
+  exercise:
+    prompt: 11단계. 최종 결과물 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              day,
+              time,
+              ROUND(AVG(tip), 2) AS avgTip,
+              ROUND(AVG(total_bill), 2) AS avgBill,
+              SUM(CASE WHEN tip < 2 THEN 1 ELSE 0 END) AS lowCnt,
+              SUM(CASE WHEN tip >= 2 AND tip < 4 THEN 1 ELSE 0 END) AS midCnt,
+              SUM(CASE WHEN tip >= 4 THEN 1 ELSE 0 END) AS highCnt,
+              COUNT(*) AS totalCnt
+          FROM tips
+          GROUP BY day, time
+          ORDER BY day, time
+      """)
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 11단계. 최종 결과물의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 11단계. 최종 결과물 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: workflow_validation
+  title: 12단계. 실무 CASE 리포트 검증
+  structuredPrimary: true
+  subtitle: 예측 → SQL 오류 확인 → 집계 검증 → 기준 실험
+  goal: 12단계. 실무 CASE 리포트 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: CASE WHEN 리포트는 결과 표가 그럴듯해 보여도 분류 기준이 빠지거나 행 수가 틀어질 수 있습니다. 실무에서는 쿼리 오류를 명확히 잡고, 등급별 합계가
+    전체 건수와 맞는지 검증해야 합니다. 이번 단계에서는 팁 비율이 가장 높은 요일·시간대를 먼저 예상하고, 잘못된 컬럼명을 쓴 SQL을 일부러 실패시킵니다. 그다음 CASE WHEN
+    리포트의 행 수와 등급 합계를 검증하고, high 기준을 바꿔 세그먼트가 어떻게 줄어드는지 실험합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    workflowCon = duckdb.connect()
+    workflowCon.register("tipsWorkflow", df)
+
+    tipRatePrediction = workflowCon.sql("""
+        SELECT
+            day,
+            time,
+            ROUND(AVG(tip / total_bill), 4) AS avgTipRate,
+            COUNT(*) AS cnt
+        FROM tipsWorkflow
+        GROUP BY day, time
+        ORDER BY avgTipRate DESC
+    """).df()
+
+    predictedBestSegment = tipRatePrediction.iloc[0]
+    print(
+        "예상 최고 팁 비율:",
+        predictedBestSegment["day"],
+        predictedBestSegment["time"],
+        predictedBestSegment["avgTipRate"],
+    )
+  exercise:
+    prompt: 12단계. 실무 CASE 리포트 검증 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      workflowCon = duckdb.connect()
+      workflowCon.register("tipsWorkflow", df)
+
+      tipRatePrediction = workflowCon.sql("""
+          SELECT
+              day,
+              time,
+              ROUND(AVG(tip / total_bill), 4) AS avgTipRate,
+              COUNT(*) AS cnt
+          FROM tipsWorkflow
+          GROUP BY day, time
+          ORDER BY avgTipRate DESC
+      """).df()
+
+      predictedBestSegment = tipRatePrediction.iloc[0]
+      print(
+          "예상 최고 팁 비율:",
+          predictedBestSegment["day"],
+          predictedBestSegment["time"],
+          predictedBestSegment["avgTipRate"],
+      )
+    hints:
+    - 바꿀 지점은 SELECT 컬럼, WHERE 비교값, GROUP BY/HAVING 기준입니다.
+    - 실행 뒤 결과 행 수, 컬럼명, 집계값이 바꾼 쿼리 조건과 맞는지 보세요.
+  check:
+    noError: 12단계. 실무 CASE 리포트 검증의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 12단계. 실무 CASE 리포트 검증 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 팁 패턴 분석 프로젝트
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: |-
+    CASE WHEN과 ORDER BY를 활용해 팁 데이터를 분석합니다. 조건부 분류로 복잡한 비즈니스 로직을 구현하고, 정렬로 우선순위를 명확히 합니다. 이 두 개념을 마스터하면 실무에서 대부분의 데이터 분류와 정렬 요구사항을 처리할 수 있습니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import pandas as pd
+    import duckdb
+    data = pd.DataFrame({
+        "total_bill": [16.99, 24.59, 32.40, 10.34, 40.17, 21.01, 18.78, 29.85],
+        "tip": [1.01, 3.61, 5.15, 1.66, 6.50, 3.50, 2.00, 4.20],
+        "sex": ["Female", "Male", "Male", "Female", "Male", "Female", "Female", "Male"],
+        "smoker": ["No", "No", "Yes", "No", "Yes", "No", "Yes", "No"],
+        "day": ["Sun", "Sat", "Sat", "Thur", "Sun", "Fri", "Thur", "Sat"],
+        "time": ["Dinner", "Dinner", "Dinner", "Lunch", "Dinner", "Lunch", "Lunch", "Dinner"],
+        "size": [2, 4, 3, 2, 5, 2, 2, 3],
+    })
+    tbl1 = duckdb.from_df(data)
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      import duckdb
+      data = pd.DataFrame({
+          "total_bill": [16.99, 24.59, 32.40, 10.34, 40.17, 21.01, 18.78, 29.85],
+          "tip": [1.01, 3.61, 5.15, 1.66, 6.50, 3.50, 2.00, 4.20],
+          "sex": ["Female", "Male", "Male", "Female", "Male", "Female", "Female", "Male"],
+          "smoker": ["No", "No", "Yes", "No", "Yes", "No", "Yes", "No"],
+          "day": ["Sun", "Sat", "Sat", "Thur", "Sun", "Fri", "Thur", "Sat"],
+          "time": ["Dinner", "Dinner", "Dinner", "Lunch", "Dinner", "Lunch", "Lunch", "Dinner"],
+          "size": [2, 4, 3, 2, 5, 2, 2, 3],
+      })
+      tbl1 = duckdb.from_df(data)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 실습의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 실습 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 조건부 분류와 복합 정렬을 마스터했습니다.
+  - type: list
+    items:
+    - CASE WHEN 조건 THEN 값 ELSE 기본값 END - 조건부 값 생성
+    - ORDER BY col1, col2 DESC - 다중 컬럼 정렬
+    - GROUP BY + CASE WHEN - 조건부 집계
+    - SUM(CASE WHEN ...) - 조건별 카운트
+  - type: text
+    content: 다음 시간에는 WHERE와 HAVING으로 조건 필터링을 배웁니다.
+  goal: 정리에서 SQL 조건과 집계 결과가 어떻게 연결되는지 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: duckdb_03-tip-tier-case-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - summary
+    title: CASE WHEN 팁 등급과 정렬 규칙 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: tip rate 경계를 겹치지 않게 분류하고 rate 내림차순으로 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 높은 threshold부터 CASE 조건을 배치하세요.
+    - tip rate 분모가 0인 행은 명시적으로 거부하세요.
+    exercise:
+      prompt: classify_tips(rows)를 완성하세요.
+      starterCode: |-
+        def classify_tips(rows):
+            raise NotImplementedError
+      solution: |
+        def classify_tips(rows):
+            result = []
+            for row in rows:
+                if row["total"] <= 0:
+                    raise ValueError("non-positive total")
+                rate = row["tip"] / row["total"]
+                tier = "high" if rate >= 0.2 else "standard" if rate >= 0.15 else "low"
+                result.append({"id": row["id"], "rate": round(rate, 3), "tier": tier})
+            return sorted(result, key=lambda row: (-row["rate"], row["id"]))
+      hints: *id001
+    check:
+      id: python.duckdb.duckdb_03.tip-tier-case.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_03.tip-tier-case.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: classify_tips
+        cases:
+        - id: classifies-boundaries
+          arguments:
+          - value:
+            - id: 2
+              total: 20
+              tip: 3
+            - id: 1
+              total: 10
+              tip: 2
+          expectedReturn:
+          - id: 1
+            rate: 0.2
+            tier: high
+          - id: 2
+            rate: 0.15
+            tier: standard
+        - id: classifies-low-tip
+          arguments:
+          - value:
+            - id: 3
+              total: 40
+              tip: 4
+          expectedReturn:
+          - id: 3
+            rate: 0.1
+            tier: low
+        - id: rejects-zero-total
+          arguments:
+          - value:
+            - id: 1
+              total: 0
+              tip: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: duckdb_03-shipping-service-tier-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - duckdb_03-tip-tier-case-mastery
+    title: 새 배송 데이터에 조건 분류 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 배송 지연일과 파손 여부를 우선순위가 있는 service tier로 분류한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 서로 겹치는 조건은 업무상 우선순위가 높은 것부터 평가하세요.
+    - 경계값 0과 3을 별도 사례로 확인하세요.
+    exercise:
+      prompt: classify_shipping(rows)를 완성해 id와 tier를 반환하세요.
+      starterCode: |-
+        def classify_shipping(rows):
+            raise NotImplementedError
+      solution: |
+        def classify_shipping(rows):
+            result = []
+            for row in rows:
+                if row["damaged"]:
+                    tier = "critical"
+                elif row["delay_days"] >= 3:
+                    tier = "late"
+                elif row["delay_days"] > 0:
+                    tier = "watch"
+                else:
+                    tier = "on-time"
+                result.append({"id": row["id"], "tier": tier})
+            return sorted(result, key=lambda row: row["id"])
+      hints: *id002
+    check:
+      id: python.duckdb.duckdb_03.shipping-service-tier.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_03.shipping-service-tier.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: classify_shipping
+        cases:
+        - id: prioritizes-damage
+          arguments:
+          - value:
+            - id: 2
+              delay_days: 5
+              damaged: true
+            - id: 1
+              delay_days: 3
+              damaged: false
+          expectedReturn:
+          - id: 1
+            tier: late
+          - id: 2
+            tier: critical
+        - id: separates-watch-and-on-time
+          arguments:
+          - value:
+            - id: 4
+              delay_days: 1
+              damaged: false
+            - id: 3
+              delay_days: 0
+              damaged: false
+          expectedReturn:
+          - id: 3
+            tier: on-time
+          - id: 4
+            tier: watch
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: duckdb_03-case-order-policy-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - duckdb_03-shipping-service-tier-transfer
+    title: CASE WHEN 조건 순서 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 겹치는 범위, NULL, fallback 처리 원칙을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - CASE는 첫 번째 참인 분기에서 멈춥니다.
+    - ELSE가 어떤 데이터를 숨기는지 측정하세요.
+    exercise:
+      prompt: choose_case_policy(situation)를 완성하세요.
+      starterCode: |-
+        def choose_case_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_case_policy(situation):
+            table = {'overlapping-thresholds': {'policy': 'most specific first', 'evidence': 'boundary cases', 'risk': 'unreachable branch'}, 'nullable-input': {'policy': 'explicit NULL branch', 'evidence': 'missing count', 'risk': 'silent ELSE'}, 'unexpected-category': {'policy': 'named ELSE or reject', 'evidence': 'unknown count', 'risk': 'misclassification'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.duckdb.duckdb_03.case-order-policy.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_03.case-order-policy.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_case_policy
+        cases:
+        - id: recalls-overlapping-thresholds
+          arguments:
+          - value: overlapping-thresholds
+          expectedReturn:
+            policy: most specific first
+            evidence: boundary cases
+            risk: unreachable branch
+        - id: recalls-nullable-input
+          arguments:
+          - value: nullable-input
+          expectedReturn:
+            policy: explicit NULL branch
+            evidence: missing count
+            risk: silent ELSE
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

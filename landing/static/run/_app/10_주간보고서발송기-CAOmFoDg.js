@@ -1,0 +1,831 @@
+var e=`meta:
+  id: email_10
+  title: 주간 보고서 자동 발송기
+  order: 10
+  category: email
+  difficulty: ⭐⭐⭐⭐⭐
+  badge: 심화
+  packages:
+    - pandas
+    - matplotlib
+    - reportlab
+    - pypdf
+    - aiosmtpd
+  tags:
+    - 종합프로젝트
+    - 주간보고서
+    - aiosmtpd
+    - 통합
+  outcomes:
+    - automation.email.report
+  prerequisites:
+    - automation.email.bulk
+    - automation.email.notify
+    - automation.email.credentials
+  estimatedMinutes: 90
+  seo:
+    title: "주간 보고서 자동 발송기 - CSV → HTML+PDF → 다수 발송 + 알림"
+    description: "Email 트랙의 모든 패턴을 한 사이클에 결합. CSV → 차트 → HTML 본문 + PDF 첨부 → 다수 발송 + 알림 통합."
+    keywords:
+      - 주간 보고서 자동화
+      - aiosmtpd 검증
+      - 이메일 통합 발송기
+
+intro:
+  direction: "01-09강의 모든 패턴을 한 사이클에 묶는다. CSV 데이터 → 차트 + PDF → HTML 메일 → 다수 발송 → 알림 모니터링. aiosmtpd로 실 발송 통합 검증."
+  benefits:
+    - "운영 김대리의 주간 보고서 발송 90분을 30초로 줄인다."
+    - "PDF 트랙 10강 청구서 + Email 트랙 모든 패턴이 한 함수에 결합."
+    - "aiosmtpd 로컬 SMTP 서버로 실 발송 흐름을 외부 의존 없이 통합 검증."
+  diagram:
+    steps:
+      - label: "1. 데이터 → 차트"
+        detail: "pandas + matplotlib로 주간 차트 PNG."
+      - label: "2. 차트 → PDF"
+        detail: "reportlab으로 차트 포함 한 페이지 보고서 PDF."
+      - label: "3. HTML 메일 구성"
+        detail: "표 + 인라인 차트 + PDF 첨부."
+      - label: "4. 다수 발송 + 알림"
+        detail: "수신자 리스트 순회 + 예외 시 알림."
+    runtime:
+      - label: "aiosmtpd 통합 검증"
+        detail: "dev dep 단 하나. 로컬 SMTP 서버에 자기 자신 발송 후 수신함 검증."
+      - label: "외부 발송 옵션"
+        detail: "환경변수 SMTP_USER/SMTP_APP_PASS 설정 + dryRun=False로 실 발송 가능."
+
+sections:
+  - id: step1_data_chart
+    title: "1단계. 데이터 → 차트 PNG"
+    structuredPrimary: true
+    subtitle: "pandas + matplotlib"
+    goal: "주간 매출 CSV에서 막대 차트 PNG를 생성한다."
+    why: "보고서의 시각화 핵심입니다. matplotlib png 한 번이 모든 후속 단계의 자료."
+    explanation: |-
+      df.groupby('region').sum().plot.bar()로 한 줄 차트, fig.savefig로 PNG 저장.
+    tips:
+      - "Agg 백엔드를 강제하면 디스플레이 없는 CI에서도 동작."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      import matplotlib
+      matplotlib.use("Agg")
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      workdir = TemporaryDirectory()
+      base = Path(workdir.name)
+      df = pd.DataFrame({
+          "region": ["Seoul", "Busan", "Daegu", "Incheon"],
+          "amount": [1200000, 800000, 600000, 550000],
+      })
+      fig, ax = plt.subplots(figsize=(8, 4))
+      df.plot.bar(x="region", y="amount", ax=ax, legend=False)
+      ax.set_title("Weekly Sales")
+      ax.set_ylabel("amount")
+      pngPath = base / "chart.png"
+      fig.savefig(pngPath, bbox_inches="tight")
+      plt.close(fig)
+      pngPath.stat().st_size > 0
+    exercise:
+      prompt: "df에 Daejeon 480000 행을 추가하고 차트 png가 만들어지는지 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        import pandas as pd
+
+        workdir = TemporaryDirectory()
+        df = pd.DataFrame({
+            "region": ["Seoul", "Busan", "Daegu", ___],
+            "amount": [1200000, 800000, 600000, ___],
+        })
+        fig, ax = plt.subplots(figsize=(8, 4))
+        df.plot.bar(x="region", y="amount", ax=ax, legend=False)
+        pngPath = Path(workdir.name) / "c.png"
+        fig.savefig(pngPath)
+        plt.close(fig)
+        pngPath.stat().st_size > 0
+      hints:
+        - "문자열 'Daejeon', 정수 480000."
+    check:
+      noError: "리스트 길이 같아야 합니다."
+      resultCheck: "True 출력."
+
+  - id: step2_pdf_report
+    title: "2단계. 차트 포함 PDF 보고서"
+    structuredPrimary: true
+    subtitle: "reportlab Platypus + Image"
+    goal: "차트 PNG와 데이터 표가 들어간 한 페이지 PDF를 만든다."
+    why: "PDF 트랙 07강 패턴을 그대로 재사용. 트랙 간 결합이 자연스러움."
+    explanation: |-
+      SimpleDocTemplate + Image(차트) + Table(데이터) + Paragraph 헤더로 한 페이지 보고서.
+    tips:
+      - "본 함수가 PDF 트랙 10강의 청구서 빌더와 같은 패턴입니다. 한 함수 재사용 가능."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader
+      from reportlab.lib import colors
+      from reportlab.lib.pagesizes import A4
+      from reportlab.lib.styles import getSampleStyleSheet
+      from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+      import matplotlib
+      matplotlib.use("Agg")
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      def buildWeeklyPdf(path, df, chartPath):
+          styles = getSampleStyleSheet()
+          data = [["region", "amount"]] + [[row.region, f"{row.amount:,}"] for row in df.itertuples()]
+          doc = SimpleDocTemplate(str(path), pagesize=A4)
+          doc.build([
+              Paragraph("Weekly Sales Report", styles["Heading1"]),
+              Spacer(1, 12),
+              Image(str(chartPath), width=400, height=200),
+              Spacer(1, 12),
+              Table(data, colWidths=[200, 100], style=TableStyle([
+                  ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+                  ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+              ])),
+          ])
+
+      workdir = TemporaryDirectory()
+      base = Path(workdir.name)
+      df = pd.DataFrame({"region": ["Seoul", "Busan"], "amount": [1200000, 800000]})
+      fig, ax = plt.subplots(figsize=(6, 3))
+      df.plot.bar(x="region", y="amount", ax=ax, legend=False)
+      chartPath = base / "c.png"
+      fig.savefig(chartPath)
+      plt.close(fig)
+
+      pdfPath = base / "report.pdf"
+      buildWeeklyPdf(pdfPath, df, chartPath)
+      body = PdfReader(pdfPath).pages[0].extract_text() or ""
+      "Weekly Sales" in body and "Seoul" in body
+    exercise:
+      prompt: "df에 Daegu 600000 행을 추가하고 PDF 본문에 'Daegu'가 포함되는지 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        import pandas as pd
+
+        def buildWeeklyPdf(path, df, chartPath):
+            styles = getSampleStyleSheet()
+            data = [["region", "amount"]] + [[r.region, f"{r.amount:,}"] for r in df.itertuples()]
+            doc = SimpleDocTemplate(str(path), pagesize=A4)
+            doc.build([
+                Paragraph("Weekly Sales", styles["Heading1"]),
+                Image(str(chartPath), width=400, height=200),
+                Table(data, colWidths=[200, 100], style=TableStyle([("GRID", (0,0), (-1,-1), 0.5, colors.black)])),
+            ])
+
+        workdir = TemporaryDirectory()
+        base = Path(workdir.name)
+        df = pd.DataFrame({"region": ["Seoul", "Busan", ___], "amount": [1200000, 800000, ___]})
+        fig, ax = plt.subplots(figsize=(6, 3))
+        df.plot.bar(x="region", y="amount", ax=ax, legend=False)
+        chartPath = base / "c.png"
+        fig.savefig(chartPath)
+        plt.close(fig)
+        pdfPath = base / "r.pdf"
+        buildWeeklyPdf(pdfPath, df, chartPath)
+        "Daegu" in (PdfReader(pdfPath).pages[0].extract_text() or "")
+      hints:
+        - "문자열 'Daegu', 정수 600000."
+    check:
+      noError: "리스트 길이 같아야."
+      resultCheck: "True 출력."
+
+  - id: step3_combine_email
+    title: "3단계. PDF + HTML + 차트 → 메일"
+    structuredPrimary: true
+    subtitle: "한 함수에 모든 패턴 결합"
+    goal: "표 HTML + 인라인 차트 + PDF 첨부 메일을 한 함수에서 만든다."
+    why: "본 강의의 핵심 통합 함수. 데이터 한 번으로 보고용 PDF와 안내용 메일이 동시에 나옵니다."
+    explanation: |-
+      buildWeeklyMail(toAddr, df, chartPath, pdfPath)이 표 + 인라인 차트 + PDF 첨부를 한 EmailMessage로 묶음.
+    tips:
+      - "PDF 첨부 파일명을 '주간보고서_YYYYMMDD.pdf'로 동적 생성하면 수신자가 정리하기 쉬움."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from email.message import EmailMessage
+      import matplotlib
+      matplotlib.use("Agg")
+      import matplotlib.pyplot as plt
+      import pandas as pd
+      from pypdf import PdfReader
+      from reportlab.lib import colors
+      from reportlab.lib.pagesizes import A4
+      from reportlab.lib.styles import getSampleStyleSheet
+      from reportlab.platypus import Paragraph, SimpleDocTemplate, Table, TableStyle
+
+      def buildWeeklyMail(toAddr, df, chartPath, pdfPath):
+          msg = EmailMessage()
+          msg["From"] = "ops@example.com"
+          msg["To"] = toAddr
+          msg["Subject"] = "주간 보고서"
+          msg.set_content("HTML 미지원 클라이언트용 본문", charset="utf-8")
+          tableHtml = df.to_html(index=False, border=1)
+          msg.add_alternative(
+              f'<h2>주간 보고서</h2>{tableHtml}<p><img src="cid:chart"></p>',
+              subtype="html",
+          )
+          msg.add_attachment(Path(chartPath).read_bytes(), maintype="image", subtype="png", cid="<chart>")
+          msg.add_attachment(
+              Path(pdfPath).read_bytes(),
+              maintype="application",
+              subtype="pdf",
+              filename="주간보고서.pdf",
+          )
+          return msg
+
+      workdir = TemporaryDirectory()
+      base = Path(workdir.name)
+      df = pd.DataFrame({"region": ["Seoul", "Busan"], "amount": [1200000, 800000]})
+      fig, ax = plt.subplots(figsize=(6, 3))
+      df.plot.bar(x="region", y="amount", ax=ax, legend=False)
+      chartPath = base / "c.png"
+      fig.savefig(chartPath)
+      plt.close(fig)
+      pdfPath = base / "r.pdf"
+      styles = getSampleStyleSheet()
+      doc = SimpleDocTemplate(str(pdfPath), pagesize=A4)
+      doc.build([Paragraph("Weekly", styles["Heading1"]), Table([["a"], ["b"]])])
+
+      mail = buildWeeklyMail("팀장@example.com", df, chartPath, pdfPath)
+      mail["Subject"], [p.get_filename() for p in mail.iter_attachments()]
+    exercise:
+      prompt: "buildWeeklyMail을 직접 작성하세요. ccAddr이 리스트면 콤마 결합, 문자열이면 그대로 'Cc' 헤더에 넣고, None이면 Cc 헤더를 만들지 마세요. 세 경우(list/str/None)를 한 번에 검증합니다."
+      starterCode: |-
+        from email.message import EmailMessage
+
+        def buildWeeklyMail(toAddr, ccAddr=None):
+            msg = EmailMessage()
+            msg["From"] = "ops@example.com"
+            msg["To"] = toAddr
+            ___
+            msg["Subject"] = "주간"
+            msg.set_content("body", charset="utf-8")
+            return msg
+
+        listMail = buildWeeklyMail("lead@example.com", ccAddr=["a@x.com", "b@x.com"])
+        strMail = buildWeeklyMail("lead@example.com", ccAddr="cc@example.com")
+        noneMail = buildWeeklyMail("lead@example.com")
+        assert listMail["Cc"] == "a@x.com, b@x.com"
+        assert strMail["Cc"] == "cc@example.com"
+        assert noneMail["Cc"] is None
+        (listMail["Cc"], strMail["Cc"], noneMail["Cc"])
+      hints:
+        - "if ccAddr: msg['Cc'] = ', '.join(ccAddr) if isinstance(ccAddr, list) else ccAddr."
+    check:
+      noError: "헤더 키는 'Cc'."
+      resultCheck: "출력 'cc@example.com'."
+
+  - id: validation
+    title: "4단계. 검증 루프 - aiosmtpd 통합 검증"
+    structuredPrimary: true
+    subtitle: "로컬 SMTP에 자기 자신 발송"
+    goal: "aiosmtpd로 로컬 SMTP 서버를 띄우고 자기 자신에게 발송해 수신함 검증."
+    why: "외부 메일 서버 없이 실 발송 흐름을 통합 검증. CI에서도 동작."
+    explanation: |-
+      Controller(handler).start()로 127.0.0.1:8025에 SMTP 서버. smtplib.SMTP(host, port).send_message로 그 서버에 발송. handler에 누적된 메시지를 검증.
+    tips:
+      - "aiosmtpd가 설치 안 된 환경에서는 ImportError를 잡아 skip 가능한 패턴으로."
+    snippet: |-
+      import asyncio
+      from email.message import EmailMessage
+
+      try:
+          from aiosmtpd.controller import Controller
+          available = True
+      except ImportError:
+          available = False
+
+      if available:
+          received = []
+
+          class Handler:
+              async def handle_DATA(self, server, session, envelope):
+                  received.append(envelope.content)
+                  return "250 OK"
+
+          controller = Controller(Handler(), hostname="127.0.0.1", port=8025)
+          controller.start()
+          try:
+              import smtplib
+              msg = EmailMessage()
+              msg["From"] = "me@example.com"
+              msg["To"] = "me@example.com"
+              msg["Subject"] = "aiosmtpd integration"
+              msg.set_content("hello", charset="utf-8")
+              with smtplib.SMTP("127.0.0.1", 8025) as smtp:
+                  smtp.send_message(msg)
+              assert len(received) == 1
+              status = "received"
+          finally:
+              controller.stop()
+      else:
+          status = "skipped (aiosmtpd not installed)"
+      status
+    exercise:
+      prompt: "발송 메시지 2개를 보내고 received 길이가 2인지 확인하세요."
+      starterCode: |-
+        try:
+            from aiosmtpd.controller import Controller
+            available = True
+        except ImportError:
+            available = False
+
+        if available:
+            received = []
+
+            class Handler:
+                async def handle_DATA(self, server, session, envelope):
+                    received.append(envelope.content)
+                    return "250 OK"
+
+            controller = Controller(Handler(), hostname="127.0.0.1", port=8025)
+            controller.start()
+            try:
+                import smtplib
+                from email.message import EmailMessage
+
+                for idx in range(___):
+                    msg = EmailMessage()
+                    msg["From"] = "me@example.com"
+                    msg["To"] = "me@example.com"
+                    msg["Subject"] = f"msg {idx}"
+                    msg.set_content("body", charset="utf-8")
+                    with smtplib.SMTP("127.0.0.1", 8025) as smtp:
+                        smtp.send_message(msg)
+                result = len(received)
+            finally:
+                controller.stop()
+        else:
+            result = 0
+        result
+      hints:
+        - "정수 2."
+    check:
+      noError: "Controller start/stop 짝맞춤."
+      resultCheck: "출력 2 (aiosmtpd 설치 시) 또는 0."
+
+  - id: practice
+    title: "실습 - 통합 발송기"
+    subtitle: "데이터 → 보고서 → 다수 발송 전 파이프라인"
+    goal: "01-09강의 모든 패턴을 한 함수에 결합한 주간 보고서 발송기를 완성한다."
+    why: "운영 김대리의 매주 90분 업무가 본 함수 한 번 실행으로 끝납니다."
+    explanation: |-
+      미션: weeklyDispatch(df, recipients, dryRun=True) 함수. 데이터 → 차트 → PDF → 메일 → 수신자별 발송 → 실패 시 알림.
+    tips:
+      - "dryRun=True에서 모든 메시지를 검토할 수 있어야 안전합니다."
+    snippet: |-
+      from email.message import EmailMessage
+    exercise:
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "함수: weeklyDispatch(df, recipients, dryRun=True) -> list[EmailMessage]"
+    check:
+      noError: "통합 함수 정의."
+      resultCheck: "각 수신자별 메시지가 만들어지고 첨부 PDF가 포함."
+    blocks:
+      - type: tip
+        content: "본 강의가 본 트랙의 마지막입니다. 본 함수를 본인 팀 데이터로 변주해 실제 도구로 만드세요."
+      - type: expansion
+        title: "미션: 주간 보고서 발송기"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              import traceback
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from email.message import EmailMessage
+              import matplotlib
+              matplotlib.use("Agg")
+              import matplotlib.pyplot as plt
+              import pandas as pd
+              from reportlab.lib import colors
+              from reportlab.lib.pagesizes import A4
+              from reportlab.lib.styles import getSampleStyleSheet
+              from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+              def weeklyDispatch(df, recipients, dryRun=True):
+                  workdir = TemporaryDirectory()
+                  base = Path(workdir.name)
+                  fig, ax = plt.subplots(figsize=(8, 4))
+                  df.plot.bar(x="region", y="amount", ax=ax, legend=False)
+                  ax.set_title("Weekly Sales")
+                  chartPath = base / "chart.png"
+                  fig.savefig(chartPath, bbox_inches="tight")
+                  plt.close(fig)
+
+                  pdfPath = base / "weekly.pdf"
+                  styles = getSampleStyleSheet()
+                  rows = [["region", "amount"]] + [[r.region, f"{r.amount:,}"] for r in df.itertuples()]
+                  doc = SimpleDocTemplate(str(pdfPath), pagesize=A4)
+                  doc.build([
+                      Paragraph("Weekly Sales Report", styles["Heading1"]),
+                      Image(str(chartPath), width=400, height=200),
+                      Spacer(1, 12),
+                      Table(rows, colWidths=[200, 100], style=TableStyle([
+                          ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+                          ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+                      ])),
+                  ])
+
+                  messages = []
+                  for recipient in recipients:
+                      msg = EmailMessage()
+                      msg["From"] = "ops@example.com"
+                      msg["To"] = recipient
+                      msg["Subject"] = "주간 보고서"
+                      msg.set_content("HTML 미지원 클라이언트용 본문", charset="utf-8")
+                      tableHtml = df.to_html(index=False, border=1)
+                      msg.add_alternative(
+                          f'<h2>주간 매출</h2>{tableHtml}<p><img src="cid:chart"></p>',
+                          subtype="html",
+                      )
+                      msg.add_attachment(chartPath.read_bytes(), maintype="image", subtype="png", cid="<chart>")
+                      msg.add_attachment(pdfPath.read_bytes(), maintype="application", subtype="pdf", filename="주간보고서.pdf")
+                      messages.append(msg)
+                  return messages
+
+              missionDf = pd.DataFrame({"region": ["Seoul", "Busan", "Daegu"], "amount": [1200000, 800000, 600000]})
+              recipients = ["lead@example.com", "manager@example.com"]
+              messages = weeklyDispatch(missionDf, recipients, dryRun=True)
+              assert len(messages) == 2
+              for m in messages:
+                  assert m["Subject"] == "주간 보고서"
+                  attachments = list(m.iter_attachments())
+                  assert any(att.get_filename() == "주간보고서.pdf" for att in attachments)
+              [m["To"] for m in messages]
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: list
+        style: bullet
+        items:
+          - "수신자별 다른 데이터 cut (지역장별 자기 지역 보고서)"
+          - "발송 결과 로그를 Google Sheets 또는 Slack으로 별도 알림"
+          - "월간/분기 보고서 자동 분기"
+          - "PDF 트랙 10강 청구서 PDF를 첨부에 결합"
+          - "Word 트랙 회의록 docx와 동시 첨부"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: email_10-weekly-report-send-capstone-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_data_chart
+    - extensions
+    title: 주간 report 발송의 source·recipient·attachment reconciliation 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 현재 주차 source와 수신자, report artifact, dry run preview를 함께 판정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 현재 주차 source hash와 report artifact를 idempotency key에 묶으세요.
+    - 실제 발송 전에 모든 recipient의 dry-run preview를 통과시키세요.
+    exercise:
+      prompt: audit_weekly_report_send(plan, required_recipients, current_week_hash)를 완성하세요.
+      starterCode: |-
+        def audit_weekly_report_send(plan, required_recipients, current_week_hash):
+            raise NotImplementedError
+      solution: |
+        def audit_weekly_report_send(plan, required_recipients, current_week_hash):
+            failures = []
+            recipients = set(plan.get("recipients", []))
+            missing_recipients = sorted(set(required_recipients) - recipients)
+            unexpected_recipients = sorted(recipients - set(required_recipients))
+            if missing_recipients or unexpected_recipients:
+                failures.append("recipients")
+            if plan.get("sourceHash") != current_week_hash:
+                failures.append("source")
+            artifact = plan.get("reportArtifact", {})
+            if not artifact.get("contentHash") or artifact.get("byteLength", 0) <= 0:
+                failures.append("artifact")
+            if not plan.get("dryRunPreviewPassed", False):
+                failures.append("preview")
+            if not plan.get("idempotencyKey"):
+                failures.append("idempotency")
+            return {"ready": not failures, "failures": failures, "missingRecipients": missing_recipients, "unexpectedRecipients": unexpected_recipients}
+      hints: *id001
+    check:
+      id: python.email.email_10.weekly-report-send-capstone.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_10.weekly-report-send-capstone.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_weekly_report_send
+        cases:
+        - id: accepts-current-previewed-report
+          arguments:
+          - value:
+              recipients:
+              - a@example.test
+              sourceHash: week1
+              reportArtifact:
+                contentHash: r
+                byteLength: 100
+              dryRunPreviewPassed: true
+              idempotencyKey: week1:a
+          - value:
+            - a@example.test
+          - value: week1
+          expectedReturn:
+            ready: true
+            failures: []
+            missingRecipients: []
+            unexpectedRecipients: []
+        - id: reports-all-capstone-gaps
+          arguments:
+          - value:
+              recipients:
+              - b@example.test
+              sourceHash: old
+              reportArtifact: {}
+              dryRunPreviewPassed: false
+              idempotencyKey: ''
+          - value:
+            - a@example.test
+          - value: week1
+          expectedReturn:
+            ready: false
+            failures:
+            - recipients
+            - source
+            - artifact
+            - preview
+            - idempotency
+            missingRecipients:
+            - a@example.test
+            unexpectedRecipients:
+            - b@example.test
+        - id: reports-zero-byte-artifact
+          arguments:
+          - value:
+              recipients: []
+              sourceHash: w
+              reportArtifact:
+                contentHash: x
+                byteLength: 0
+              dryRunPreviewPassed: true
+              idempotencyKey: w
+          - value: []
+          - value: w
+          expectedReturn:
+            ready: false
+            failures:
+            - artifact
+            missingRecipients: []
+            unexpectedRecipients: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: email_10-weekly-report-delivery-release-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - email_10-weekly-report-send-capstone-mastery
+    title: 새 주간 report의 delivery·중복 release gate 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: recipient별 provider ID와 같은 idempotency key 중복 발송을 검사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - recipient별 provider message ID를 delivery evidence로 남기세요.
+    - 같은 idempotency key가 두 번 사용되면 결과가 accepted여도 release를 막으세요.
+    exercise:
+      prompt: decide_weekly_delivery_release(attempts, expected_recipients)를 완성하세요.
+      starterCode: |-
+        def decide_weekly_delivery_release(attempts, expected_recipients):
+            raise NotImplementedError
+      solution: |
+        def decide_weekly_delivery_release(attempts, expected_recipients):
+            delivered = {}
+            duplicate_keys = []
+            seen_keys = set()
+            for attempt in attempts:
+                key = attempt["idempotencyKey"]
+                if key in seen_keys:
+                    duplicate_keys.append(key)
+                seen_keys.add(key)
+                if attempt.get("status") == "accepted" and attempt.get("providerMessageId"):
+                    delivered[attempt["recipient"]] = attempt["providerMessageId"]
+            missing = sorted(set(expected_recipients) - set(delivered))
+            unexpected = sorted(set(delivered) - set(expected_recipients))
+            failures = []
+            if missing:
+                failures.append("missing")
+            if unexpected:
+                failures.append("unexpected")
+            if duplicate_keys:
+                failures.append("duplicate")
+            return {"releaseReady": not failures, "failures": failures, "missing": missing, "unexpected": unexpected, "duplicateKeys": sorted(set(duplicate_keys)), "delivered": dict(sorted(delivered.items()))}
+      hints: *id002
+    check:
+      id: python.email.email_10.weekly-report-delivery-release.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_10.weekly-report-delivery-release.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: decide_weekly_delivery_release
+        cases:
+        - id: accepts-one-delivery-per-recipient
+          arguments:
+          - value:
+            - recipient: a
+              idempotencyKey: w:a
+              status: accepted
+              providerMessageId: m1
+            - recipient: b
+              idempotencyKey: w:b
+              status: accepted
+              providerMessageId: m2
+          - value:
+            - a
+            - b
+          expectedReturn:
+            releaseReady: true
+            failures: []
+            missing: []
+            unexpected: []
+            duplicateKeys: []
+            delivered:
+              a: m1
+              b: m2
+        - id: reports-missing-and-duplicate
+          arguments:
+          - value:
+            - recipient: a
+              idempotencyKey: w:a
+              status: accepted
+              providerMessageId: m1
+            - recipient: a
+              idempotencyKey: w:a
+              status: accepted
+              providerMessageId: m2
+          - value:
+            - a
+            - b
+          expectedReturn:
+            releaseReady: false
+            failures:
+            - missing
+            - duplicate
+            missing:
+            - b
+            unexpected: []
+            duplicateKeys:
+            - w:a
+            delivered:
+              a: m2
+        - id: reports-unexpected-recipient
+          arguments:
+          - value:
+            - recipient: x
+              idempotencyKey: w:x
+              status: accepted
+              providerMessageId: mx
+          - value: []
+          expectedReturn:
+            releaseReady: false
+            failures:
+            - unexpected
+            missing: []
+            unexpected:
+            - x
+            duplicateKeys: []
+            delivered:
+              x: mx
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: email_10-weekly-mail-capstone-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - email_10-weekly-report-delivery-release-transfer
+    title: 주간 report 발송 종료 조건 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: source·preview·artifact·delivery·dedupe 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 메일 API 성공과 올바른 수신자·내용·첨부 전달을 분리해 검증하세요.
+    - 실제 발송 전 dry run과 idempotency identity, 비밀정보 redaction을 적용하세요.
+    exercise:
+      prompt: choose_weekly_mail_gate(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_weekly_mail_gate(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_weekly_mail_gate(situation):
+            table = {'prepare': {'action': 'bind current source recipients and artifact', 'evidence': 'send manifest', 'risk': 'stale or wrong report'}, 'preview': {'action': 'render per-recipient dry run', 'evidence': 'isolated previews', 'risk': 'personal data leak'}, 'release': {'action': 'reconcile provider IDs and idempotency', 'evidence': 'delivery ledger', 'risk': 'missing or duplicate mail'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.email.email_10.weekly-mail-capstone-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_10.weekly-mail-capstone-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_weekly_mail_gate
+        cases:
+        - id: recalls-prepare
+          arguments:
+          - value: prepare
+          expectedReturn:
+            action: bind current source recipients and artifact
+            evidence: send manifest
+            risk: stale or wrong report
+        - id: recalls-preview
+          arguments:
+          - value: preview
+          expectedReturn:
+            action: render per-recipient dry run
+            evidence: isolated previews
+            risk: personal data leak
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

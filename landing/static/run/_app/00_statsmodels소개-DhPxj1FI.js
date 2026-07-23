@@ -1,0 +1,791 @@
+var e=`meta:
+  packages:
+  - pandas
+  - scipy
+  - statsmodels
+  id: statsmodels_00
+  title: statsmodels소개
+  order: 0
+  category: statsmodels
+  badge: 소개
+  source: eddmpython
+  sourceUrl: https://eddmpython.com
+  tags:
+  - statsmodels
+  - 통계분석
+  - 회귀분석
+  - 시계열
+  - 가설검정
+  seo:
+    title: statsmodels 입문 - Python 통계 분석의 표준
+    description: statsmodels로 회귀분석, 시계열, 가설검정을 시작하세요. R 수준의 통계 분석을 Python에서 수행할 수 있습니다.
+    keywords:
+    - statsmodels
+    - 통계분석
+    - 회귀분석
+    - 시계열
+    - OLS
+    - ARIMA
+intro:
+  direction: statsmodels소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 첫 실행 셀은 assert로 핵심 결과를 고정해 실습 코드가 깨지지 않았는지 확인합니다.
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - statsmodels소개 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 업무 흐름 검증 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 핵심 처리 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 출력과 상태 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: statsmodels소개 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: pandas, scipy, statsmodels 기준으로 로컬 Python 실행을 준비합니다.
+    - label: statsmodels소개 실행
+      detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
+    - label: statsmodels소개 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+sections:
+- id: intro
+  blocks:
+  - type: mainHeader
+    emoji: 📊
+    title: statsmodels란?
+    subtitle: Python 통계 분석의 대표 외부 패키지
+  - type: hero
+    emoji: 🔬
+    title: 통계적 추론을 위한 라이브러리
+    subtitle: 예측이 아닌 이해를 위한 분석
+    points:
+    - emoji: 📈
+      title: 회귀분석에 특화
+    - emoji: 📉
+      title: 시계열 모델링
+    - emoji: 🧪
+      title: 가설 검정
+    - emoji: 📊
+      title: R 수준의 통계량
+  goal: statsmodels란?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: what_is_statsmodels
+  blocks:
+  - type: sectionHeader
+    title: 🤔 statsmodels가 뭔가요?
+    subtitle: 통계적 추론을 위한 도구
+  - type: note
+    style: info
+    title: 예측 vs 추론
+    content: 머신러닝(sklearn)은 "예측"에 집중합니다. 미래 값을 맞추는 것이 목표입니다. 하지만 statsmodels는 "이해"에 집중합니다. "왜 이런 결과가 나왔는가?",
+      "이 변수는 통계적으로 유의미한가?"를 답합니다. p-value, 신뢰구간, R² 같은 통계량으로 데이터의 본질을 파악합니다. 비즈니스 의사결정에서는 예측만큼이나 이해가 중요합니다.
+  - type: featureCards
+    cards:
+    - emoji: 📐
+      title: OLS 회귀분석
+      description: 최소제곱법으로 변수 간 관계 분석
+    - emoji: 🎯
+      title: 통계적 유의성
+      description: p-value, t-검정, F-검정
+    - emoji: 📊
+      title: 모델 진단
+      description: 잔차 분석, 이상치 탐지
+    - emoji: ⏱️
+      title: 시계열 분석
+      description: ARIMA, 계절성 분해
+  goal: 🤔 statsmodels가 뭔가요?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: why_statsmodels
+  blocks:
+  - type: sectionHeader
+    title: 🌟 왜 statsmodels가 필요한가요?
+    subtitle: sklearn과의 차이
+  - type: note
+    style: info
+    title: sklearn vs statsmodels
+    content: sklearn의 LinearRegression은 계수만 반환합니다. 하지만 statsmodels의 OLS는 p-value, R², 표준오차, 신뢰구간, F-통계량
+      등 30개 이상의 통계량을 제공합니다. "이 변수가 정말 중요한가?"를 판단할 수 있습니다. 논문, 리포트, 비즈니스 분석에서는 이런 통계적 근거가 필수입니다.
+  - type: featureCards
+    cards:
+    - emoji: 📋
+      title: 상세한 summary
+      description: R과 동일한 수준의 통계 리포트
+    - emoji: 🔍
+      title: 잔차 진단
+      description: 정규성, 등분산성, 자기상관 검정
+    - emoji: 📊
+      title: 회귀 종류 다양
+      description: OLS, Logit, Probit, GLM, Robust
+    - emoji: ⏰
+      title: 시계열 특화
+      description: ARIMA, SARIMA, VAR, 상태공간
+    - emoji: 🧮
+      title: 가설 검정 도구
+      description: t-test, ANOVA, chi-square, 정규성 검정
+    - emoji: 📈
+      title: 비즈니스 활용
+      description: 매출 예측, A/B 테스트, 인과 분석
+  goal: 🌟 왜 statsmodels가 필요한가요?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: statsmodels_vs_others
+  blocks:
+  - type: sectionHeader
+    title: 🆚 statsmodels vs 다른 라이브러리
+    subtitle: 언제 무엇을 쓸까?
+  - type: compare
+    left:
+      title: sklearn
+      subtitle: 머신러닝, 예측
+      icon: 🤖
+      color: blue
+      items:
+      - 예측 정확도 최우선
+      - 복잡한 모델 (RandomForest, XGBoost)
+      - 교차검증, 하이퍼파라미터 튜닝
+      - 통계량 최소
+      - 프로덕션 배포
+      infoBox: 미래 값을 맞추는 것이 목표
+    right:
+      title: statsmodels
+      subtitle: 통계 분석, 추론
+      icon: 📊
+      color: green
+      items:
+      - 통계적 유의성 최우선
+      - 단순하고 해석 가능한 모델
+      - p-value, 신뢰구간, R²
+      - 통계량 30개 이상
+      - 리포트, 논문 작성
+      infoBox: 왜 이런 결과인지 이해하는 것이 목표
+  - type: compare
+    left:
+      title: scipy.stats
+      subtitle: 기본 통계
+      icon: 🔢
+      color: purple
+      items:
+      - t-test, chi-square 등 개별 검정
+      - 확률분포 계산
+      - 기술통계량
+      - 단순 함수 호출
+      infoBox: 기본 통계 계산용
+    right:
+      title: statsmodels
+      subtitle: 고급 통계 모델
+      icon: 📊
+      color: green
+      items:
+      - 회귀 모델 종합 분석
+      - 시계열 예측
+      - 모델 진단 도구
+      - 객체지향 API
+      infoBox: 복잡한 통계 모델링용
+  - type: note
+    style: tip
+    title: 용도별 선택 가이드
+    content: 예측 정확도가 중요하면 sklearn, 통계적 근거가 필요하면 statsmodels를 사용하세요. 비즈니스 리포트에서 "광고비가 매출에 미치는 영향이 통계적으로
+      유의미한가?"를 증명하려면 statsmodels의 p-value가 필수입니다. 반대로 "내일 매출을 최대한 정확히 예측"하려면 sklearn의 앙상블 모델이 좋습니다.
+  goal: 🆚 statsmodels vs 다른 라이브러리에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: core_concepts
+  blocks:
+  - type: sectionHeader
+    title: 🧩 핵심 개념
+    subtitle: statsmodels로 무엇을 할 수 있나요?
+  - type: featureCards
+    cards:
+    - emoji: 1️⃣
+      title: 단순선형회귀 (OLS)
+      description: 한 변수로 다른 변수 예측. y = a + bx
+    - emoji: 2️⃣
+      title: 다중회귀
+      description: 여러 변수로 예측. y = a + b₁x₁ + b₂x₂ + ...
+    - emoji: 3️⃣
+      title: 로지스틱 회귀
+      description: 확률 예측. 이탈/비이탈, 구매/미구매
+    - emoji: 4️⃣
+      title: 시계열 분해
+      description: 추세, 계절성, 잔차로 분리
+    - emoji: 5️⃣
+      title: ARIMA
+      description: 과거 패턴으로 미래 예측
+    - emoji: 6️⃣
+      title: 가설 검정
+      description: t-test, ANOVA, chi-square
+  goal: 🧩 핵심 개념에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: workflow
+  blocks:
+  - type: sectionHeader
+    title: 🔄 statsmodels 분석 흐름
+    subtitle: 데이터에서 인사이트까지
+  - type: note
+    style: info
+    title: 전형적인 분석 단계
+    content: |-
+      1. 데이터 준비: pandas로 전처리
+      2. 모델 정의: sm.OLS(y, X), sm.Logit(y, X) 등
+      3. 학습: .fit()으로 모델 추정
+      4. 평가: .summary()로 통계량 확인
+      5. 진단: 잔차 분석, 정규성 검정
+      6. 예측: .predict()로 미래 값 계산
+      7. 해석: p-value, 계수로 의사결정
+  - type: featureCards
+    cards:
+    - emoji: 📦
+      title: 1. 데이터 로드
+      description: loadLocalDataset()과 pandas로 데이터 준비
+    - emoji: 🔧
+      title: 2. 전처리
+      description: 결측치 처리, 더미 변수 생성
+    - emoji: 📐
+      title: 3. 모델 정의
+      description: sm.OLS(y, X), sm.add_constant(X)
+    - emoji: 🎯
+      title: 4. 모델 학습
+      description: .fit()으로 계수 추정
+    - emoji: 📊
+      title: 5. 결과 확인
+      description: .summary() 통계량 분석
+    - emoji: 🔍
+      title: 6. 진단
+      description: 잔차 플롯, 정규성 검정
+  goal: 🔄 statsmodels 분석 흐름에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: key_outputs
+  blocks:
+  - type: sectionHeader
+    title: 📋 주요 출력물
+    subtitle: statsmodels가 제공하는 정보
+  - type: table
+    headers:
+    - 통계량
+    - 의미
+    - 해석
+    rows:
+    - - R²
+      - 결정계수, 모델 설명력
+      - 0~1 사이, 1에 가까울수록 좋음
+    - - p-value
+      - 통계적 유의성
+      - < 0.05면 유의미
+    - - coef
+      - 회귀 계수 (기울기)
+      - 변수 1 증가시 y 변화량
+    - - std err
+      - 표준오차
+      - 계수 추정의 불확실성
+    - - t
+      - t-통계량
+      - 계수 / 표준오차
+    - - F-statistic
+      - 모델 전체 유의성
+      - p-value가 낮으면 모델 유의미
+    - - AIC/BIC
+      - 모델 선택 기준
+      - 낮을수록 좋은 모델
+  - type: note
+    style: tip
+    title: p-value 해석
+    content: p-value < 0.05는 "이 변수가 우연히 이런 관계를 보일 확률이 5% 미만"이라는 뜻입니다. 즉 통계적으로 유의미한 관계입니다. p-value < 0.01이면
+      더 강력한 증거입니다. 비즈니스 의사결정에서 "광고비를 늘려야 할까?"를 판단할 때 p-value가 근거가 됩니다.
+  goal: 📋 주요 출력물에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: use_cases
+  blocks:
+  - type: sectionHeader
+    title: 💼 실전 활용 사례
+    subtitle: statsmodels로 해결하는 비즈니스 문제
+  - type: featureCards
+    cards:
+    - emoji: 📺
+      title: 마케팅 ROI 분석
+      description: 광고비가 매출에 미치는 영향 정량화
+    - emoji: 🏠
+      title: 가격 책정 전략
+      description: 부동산, 보험료 등 가격 결정 요인 분석
+    - emoji: 👥
+      title: 고객 이탈 예측
+      description: 어떤 요인이 이탈에 영향을 미치는지 파악
+    - emoji: 📈
+      title: 매출 예측
+      description: 시계열 데이터로 다음 분기 매출 예상
+    - emoji: 🧪
+      title: A/B 테스트 검정
+      description: 두 그룹 간 차이가 유의미한지 통계 검정
+    - emoji: 👔
+      title: HR 분석
+      description: 퇴사 요인, 급여 결정 요인 분석
+  goal: 💼 실전 활용 사례에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: projects_preview
+  blocks:
+  - type: sectionHeader
+    title: 🗺️ 앞으로 배울 내용
+    subtitle: 10개 프로젝트로 마스터하기
+  - type: table
+    headers:
+    - 단계
+    - 프로젝트
+    - 배울 내용
+    - 비즈니스 가치
+    rows:
+    - - 입문
+      - 광고비 매출 예측
+      - 단순회귀, summary, R²
+      - 마케팅 ROI 최적화
+    - - 입문
+      - 부동산 가격 예측
+      - 다중회귀, 잔차분석
+      - 부동산 가격 책정
+    - - 기초
+      - 매출 다중요인 분석
+      - VIF, 다중공선성
+      - 매출 드라이버 파악
+    - - 기초
+      - 보험료 가격책정
+      - 더미 변수, 범주형
+      - 보험 상품 가격 책정
+    - - 기초
+      - 고객 이탈 예측
+      - 로지스틱 회귀, ROC
+      - 고객 유지 전략
+    - - 중급
+      - 항공 수요 시계열
+      - 시계열 분해, 계절성
+      - 항공사 용량 계획
+    - - 중급
+      - 월마트 매출 예측
+      - 외생변수, SARIMA
+      - 소매 수요 예측
+    - - 중급
+      - 직원 퇴사 예측
+      - 가설 검정, t-test
+      - 인재 유지, 채용 계획
+    - - 심화
+      - 자전거 수요 ARIMA
+      - ARIMA, ACF, PACF
+      - 자전거 배치 최적화
+    - - 심화
+      - 경제지표 종합분석
+      - VAR, 모든 개념 종합
+      - 경제 예측, 정책 분석
+  - type: note
+    style: info
+    title: 프로젝트 기반 학습
+    content: 각 프로젝트는 실제 비즈니스 문제를 해결합니다. 단순히 문법을 배우는 것이 아니라, "광고비를 얼마나 늘려야 할까?", "고객 이탈을 줄이려면 어떤 요인을 개선해야
+      할까?" 같은 실전 질문에 답합니다. 10개 프로젝트를 완료하면 데이터로 비즈니스 의사결정을 지원할 수 있는 역량을 갖추게 됩니다.
+  goal: 🗺️ 앞으로 배울 내용에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: statsmodels_vs_r
+  blocks:
+  - type: sectionHeader
+    title: 🔄 R 사용자를 위한 안내
+    subtitle: R에서 Python으로
+  - type: note
+    style: info
+    title: R과의 호환성
+    content: statsmodels는 R의 통계 모델을 Python에 구현한 것입니다. lm(), glm(), arima()와 유사한 API를 제공하며, summary() 출력도
+      거의 동일합니다. R 경험자라면 쉽게 적응할 수 있습니다. 차이점은 R은 함수형, statsmodels는 객체지향이라는 점입니다.
+  - type: table
+    headers:
+    - R
+    - statsmodels
+    - 설명
+    rows:
+    - - lm(y ~ x, data)
+      - sm.OLS(y, sm.add_constant(X)).fit()
+      - 선형회귀
+    - - glm(..., family=binomial)
+      - sm.Logit(y, X).fit()
+      - 로지스틱 회귀
+    - - summary(model)
+      - model.summary()
+      - 모델 요약
+    - - predict(model, newdata)
+      - model.predict(new_X)
+      - 예측
+    - - arima(y, order=c(1,0,1))
+      - sm.tsa.ARIMA(y, order=(1,0,1)).fit()
+      - ARIMA
+  goal: 🔄 R 사용자를 위한 안내에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: package_ready
+  blocks:
+  - type: sectionHeader
+    title: 📦 준비 확인과 시작
+    subtitle: Codaro 로컬 Python 환경에서 바로 사용
+  - type: note
+    style: info
+    title: 로컬에서 바로 실행
+    content: 이 강의는 Codaro 로컬 Python 환경에서 실행됩니다. 필요한 패키지는 YAML meta.packages와 프로젝트 의존성 기준으로 uv가 준비하고, 레슨
+      안에서는 import가 성공하는지 확인합니다.
+  - type: featureCards
+    cards:
+    - emoji: 🌐
+      title: Codaro 로컬 Python 환경
+      description: 로컬 Python 실행
+    - emoji: 📦
+      title: 패키지 준비
+      description: meta.packages 기준 uv run
+    - emoji: 🚀
+      title: 바로 시작
+      description: import statsmodels.api as sm
+  goal: 📦 준비 확인과 시작에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: resources
+  blocks:
+  - type: sectionHeader
+    title: 📚 참고 자료
+    subtitle: 더 깊이 공부하고 싶다면
+  - type: links
+    items:
+    - text: statsmodels 공식 문서
+      url: https://www.statsmodels.org/
+      icon: 🔗
+    - text: statsmodels API Reference
+      url: https://www.statsmodels.org/stable/api.html
+      icon: 🔗
+    - text: statsmodels Examples
+      url: https://www.statsmodels.org/stable/examples/index.html
+      icon: 🔗
+  goal: 📚 참고 자료에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: next
+  blocks:
+  - type: hero
+    emoji: 👉
+    title: '다음: 광고비 매출 예측'
+    subtitle: 단순선형회귀로 첫 번째 통계 모델을 만들어봅니다
+  goal: '다음: 광고비 매출 예측에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.'
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 회귀 리포트 품질 게이트
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: statsmodels 학습의 핵심은 모델을 만들고 summary를 보는 데서 끝나지 않는 것입니다. 먼저 어떤 변수가 유의할지 예측하고, 로컬 데이터의 컬럼과
+    결측치를 검증하고, 회귀 결과가 보고서에 들어갈 수준인지 R², F-test, 잔차 진단으로 확인해야 합니다. 마지막에는 변수를 빼는 변주로 모델 선택의 근거를 비교합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import pandas as pd
+    import statsmodels.api as sm
+    from statsmodels.stats.diagnostic import het_breuschpagan
+    from codaro.curriculum.localData import loadLocalDataset
+
+    marketingData = loadLocalDataset("advertising")
+    requiredColumns = ["TV", "Radio", "Newspaper", "Sales"]
+
+    missingColumns = [column for column in requiredColumns if column not in marketingData.columns]
+    if missingColumns:
+        raise ValueError(f"필수 컬럼이 없습니다: {missingColumns}")
+    if marketingData[requiredColumns].isna().any().any():
+        raise ValueError("회귀분석 전 결측치를 처리해야 합니다.")
+
+    reportY = marketingData["Sales"]
+    reportX = sm.add_constant(marketingData[["TV", "Radio", "Newspaper"]])
+    reportModel = sm.OLS(reportY, reportX).fit()
+
+    marketingData[requiredColumns].head()
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      compactX = sm.add_constant(marketingData[["TV", "Radio"]])
+      compactModel = sm.OLS(reportY, compactX).fit()
+      r2Drop = reportModel.rsquared - compactModel.rsquared
+
+      assert compactModel.rsquared >= 0.95
+      {
+          "fullR2": round(reportModel.rsquared, 3),
+          "compactR2": round(compactModel.rsquared, 3),
+          "r2Drop": round(r2Drop, 3),
+          "fullAIC": round(reportModel.aic, 1),
+          "compactAIC": round(compactModel.aic, 1),
+      }
+    solution: |-
+      import pandas as pd
+      import statsmodels.api as sm
+      from statsmodels.stats.diagnostic import het_breuschpagan
+      from codaro.curriculum.localData import loadLocalDataset
+
+      marketingData = loadLocalDataset("advertising")
+      requiredColumns = ["TV", "Radio", "Newspaper", "Sales"]
+
+      missingColumns = [column for column in requiredColumns if column not in marketingData.columns]
+      if missingColumns:
+          raise ValueError(f"필수 컬럼이 없습니다: {missingColumns}")
+      if marketingData[requiredColumns].isna().any().any():
+          raise ValueError("회귀분석 전 결측치를 처리해야 합니다.")
+
+      marketingData[requiredColumns].head()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증에서 \`compactX\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: statsmodels_00-inference-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - workflow_validation
+    title: 통계 모델의 estimand·가정·진단 계약 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 질문, target, predictors, estimand, covariance, diagnostics를 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 무엇을 추정하는지 estimand를 먼저 적으세요.
+    - 표준오차 방식과 residual diagnostic을 명시하세요.
+    exercise:
+      prompt: audit_inference_contract(contract)를 완성하세요.
+      starterCode: |-
+        def audit_inference_contract(contract):
+            raise NotImplementedError
+      solution: |
+        def audit_inference_contract(contract):
+            required={"question","target","predictors","estimand","covariance","diagnostics"}
+            missing=sorted(required-set(contract)); failures=[]
+            if contract.get("target") in contract.get("predictors",[]): failures.append("target-leakage")
+            if not contract.get("diagnostics"): failures.append("diagnostics")
+            if contract.get("covariance") not in {"nonrobust","HC3","HAC","cluster"}: failures.append("covariance")
+            return {"valid":not missing and not failures,"missing":missing,"failures":failures,"evidence":["design matrix","coefficient interval","residual diagnostics","claim scope"]}
+      hints: *id001
+    check:
+      id: python.statsmodels.statsmodels_00.inference-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.statsmodels.statsmodels_00.inference-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_inference_contract
+        cases:
+        - id: accepts-regression-contract
+          arguments:
+          - value:
+              question: association
+              target: sales
+              predictors:
+              - ads
+              estimand: slope
+              covariance: HC3
+              diagnostics:
+              - residuals
+          expectedReturn:
+            valid: true
+            missing: []
+            failures: []
+            evidence:
+            - design matrix
+            - coefficient interval
+            - residual diagnostics
+            - claim scope
+        - id: reports-contract-errors
+          arguments:
+          - value:
+              question: x
+              target: y
+              predictors:
+              - y
+              estimand: effect
+              covariance: default
+              diagnostics: []
+          expectedReturn:
+            valid: false
+            missing: []
+            failures:
+            - target-leakage
+            - diagnostics
+            - covariance
+            evidence:
+            - design matrix
+            - coefficient interval
+            - residual diagnostics
+            - claim scope
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: statsmodels_00-coefficient-interval-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - statsmodels_00-inference-contract-mastery
+    title: 새 계수 결과에 신뢰구간 검산 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: estimate와 standard error로 대칭 구간과 sign stability를 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - estimate와 interval width를 함께 보여주세요.
+    - 0 제외 여부를 효과 크기나 실무 중요성과 혼동하지 마세요.
+    exercise:
+      prompt: coefficient_interval(estimate, standard_error, critical_value)를 완성하세요.
+      starterCode: |-
+        def coefficient_interval(estimate, standard_error, critical_value):
+            raise NotImplementedError
+      solution: |
+        def coefficient_interval(estimate, standard_error, critical_value):
+            if standard_error < 0 or critical_value <= 0: raise ValueError("invalid interval inputs")
+            lower=estimate-critical_value*standard_error; upper=estimate+critical_value*standard_error
+            return {"estimate":estimate,"lower":round(lower,6),"upper":round(upper,6),"excludesZero":lower>0 or upper<0,"width":round(upper-lower,6)}
+      hints: *id002
+    check:
+      id: python.statsmodels.statsmodels_00.coefficient-interval.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.statsmodels.statsmodels_00.coefficient-interval.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: coefficient_interval
+        cases:
+        - id: computes-positive-interval
+          arguments:
+          - value: 2
+          - value: 0.5
+          - value: 1.96
+          expectedReturn:
+            estimate: 2
+            lower: 1.02
+            upper: 2.98
+            excludesZero: true
+            width: 1.96
+        - id: keeps-uncertain-sign
+          arguments:
+          - value: 0.2
+          - value: 0.3
+          - value: 1.96
+          expectedReturn:
+            estimate: 0.2
+            lower: -0.388
+            upper: 0.788
+            excludesZero: false
+            width: 1.176
+        - id: rejects-negative-se
+          arguments:
+          - value: 1
+          - value: -1
+          - value: 2
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: statsmodels_00-inference-model-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - statsmodels_00-coefficient-interval-transfer
+    title: 통계 모델 선택 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: outcome 종류와 dependence에 맞는 모델을 고른다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 계수·불확실성·가정 진단을 한 묶음으로 해석하세요.
+    - 통계적 연관을 인과 효과나 개인 확정 예측으로 확대하지 마세요.
+    exercise:
+      prompt: choose_inference_model(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_inference_model(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_inference_model(situation):
+            table = {'continuous-outcome': {'method': 'OLS with residual diagnostics', 'evidence': 'coefficients intervals residuals', 'risk': 'nonlinearity'}, 'binary-outcome': {'method': 'logistic regression', 'evidence': 'odds ratio calibration', 'risk': 'probability interpretation'}, 'count-outcome': {'method': 'Poisson or negative binomial', 'evidence': 'exposure dispersion', 'risk': 'overdispersion'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.statsmodels.statsmodels_00.inference-model-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.statsmodels.statsmodels_00.inference-model-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_inference_model
+        cases:
+        - id: recalls-continuous-outcome
+          arguments:
+          - value: continuous-outcome
+          expectedReturn:
+            method: OLS with residual diagnostics
+            evidence: coefficients intervals residuals
+            risk: nonlinearity
+        - id: recalls-binary-outcome
+          arguments:
+          - value: binary-outcome
+          expectedReturn:
+            method: logistic regression
+            evidence: odds ratio calibration
+            risk: probability interpretation
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

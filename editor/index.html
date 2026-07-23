@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#0a0a0a" />
-    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#f5f6f8" />
+    <meta name="color-scheme" content="light dark" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -13,17 +13,29 @@
     <link rel="apple-touch-icon" href="/favicon.png" />
     <script>
       (function () {
+        var root = document.documentElement;
+        var mode = "system";
+        var accent = "plum";
         try {
-          var mode = localStorage.getItem("codaro-theme") || "system";
-          var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-          var resolved = mode === "system" ? (prefersDark ? "dark" : "light") : mode;
-          var accent = localStorage.getItem("codaro-accent");
+          var storedMode = window.localStorage.getItem("codaro-theme");
+          if (storedMode === "light" || storedMode === "dark") mode = storedMode;
+          accent = window.localStorage.getItem("codaro-accent");
           if (accent !== "blue" && accent !== "teal") accent = "plum";
-          document.documentElement.classList.toggle("dark", resolved === "dark");
-          document.documentElement.dataset.resolvedTheme = resolved;
-          document.documentElement.dataset.accent = accent;
-          document.documentElement.dataset.density = "studioDense";
-        } catch (storageError) {}
+        } catch (storageError) {
+          mode = "system";
+          accent = "plum";
+        }
+        var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        var resolved = mode === "system" ? (prefersDark ? "dark" : "light") : mode;
+        var canvas = resolved === "dark" ? "#151619" : "#f5f6f8";
+        root.classList.toggle("dark", resolved === "dark");
+        root.dataset.theme = resolved;
+        root.dataset.resolvedTheme = resolved;
+        root.dataset.accent = accent;
+        root.dataset.density = "studioDense";
+        root.style.colorScheme = resolved;
+        root.style.backgroundColor = canvas;
+        document.querySelector('meta[name="theme-color"]').setAttribute("content", canvas);
       })();
     </script>
     <title>Codaro</title>

@@ -1,0 +1,968 @@
+var e=`meta:
+  packages:
+  - pydantic
+  id: pydantic_04
+  title: 타입변환기
+  order: 4
+  category: pydantic
+  difficulty: ⭐⭐
+  badge: 기본
+  tags:
+  - pydantic
+  - coercion
+  - 타입변환
+  - strict
+  - serializer
+  seo:
+    title: Pydantic 타입 변환 - 자동 변환과 엄격 모드
+    description: Pydantic의 타입 변환 동작을 이해합니다. 자동 강제 변환, 엄격 모드, 커스텀 직렬화를 배웁니다.
+    keywords:
+    - pydantic
+    - 타입변환
+    - coercion
+    - strict
+    - serializer
+intro:
+  emoji: 🔄
+  goal: Pydantic의 타입 변환과 직렬화를 제어합니다.
+  description: 자동 타입 강제 변환의 동작을 이해하고, 엄격 모드와 커스텀 직렬화기로 세밀하게 제어합니다.
+  direction: 타입변환기에서 입력 스키마를 정의하고 검증된 데이터만 처리 흐름에 넘김합니다.
+  benefits:
+  - 외부 입력 확인 후 스키마 검증에 맞는 코드 입력을 고릅니다.
+  - 타입변환기 결과를 성공 모델과 오류 메시지 기준으로 즉시 점검합니다.
+  - 완료한 코드를 API/자동화 입력 계약에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. pydantic import 확인
+      detail: 입력 기준(외부 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 자동 타입 변환 처리 실행
+      detail: 스키마 검증 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 엄격 모드 결과 검증
+      detail: 성공 모델과 오류 메시지 기준으로 실행 결과를 비교합니다.
+    - label: 타입변환기 재사용
+      detail: 완성 코드를 API/자동화 입력 계약에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 데이터 계약 환경
+      detail: pydantic 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 타입변환기 실행
+      detail: 셀을 실행해 성공 모델과 오류 메시지와 예외 상태를 확인합니다.
+    - label: 타입변환기 완료
+      detail: 검증된 코드를 API/자동화 입력 계약로 남깁니다.
+sections:
+- id: step1_package_ready
+  title: 1단계. pydantic import 확인
+  structuredPrimary: true
+  subtitle: pydantic 모듈
+  goal: 1단계. pydantic import 확인에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: Pydantic은 가능한 경우 입력값을 대상 타입으로 자동 변환합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: import pydantic
+  exercise:
+    prompt: 1단계. pydantic import 확인 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: import pydantic
+    hints:
+    - 바꿀 지점은 외부 입력을 만드는 첫 줄과 스키마 검증 줄에서 찾으세요.
+    - 실행 뒤 성공 모델과 오류 메시지 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. pydantic import 확인의 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. pydantic import 확인 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
+- id: step2_auto_coercion
+  title: 2단계. 자동 타입 변환
+  structuredPrimary: true
+  subtitle: 기본 동작
+  goal: 2단계. 자동 타입 변환에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    Pydantic v2는 문자열 숫자를 int/float로, 1/0 같은 값을 bool로 변환하지만 숫자를 문자열로 자동 변환하지는 않습니다. 문자열 필드는 실제 문자열을 넣어야 합니다.
+
+    1, "1", "true", "yes", "on"은 True로, 0, "0", "false", "no", "off"는 False로 변환됩니다. int를 str로 받고 싶다면 직접 str(value)를 호출하거나 field_validator(mode='before')로 변환 규칙을 명시하세요.
+  tips:
+  - 1, "1", "true", "yes", "on"은 True로, 0, "0", "false", "no", "off"는 False로 변환됩니다. int를 str로 받고 싶다면 직접
+    str(value)를 호출하거나 field_validator(mode='before')로 변환 규칙을 명시하세요.
+  snippet: |-
+    from pydantic import BaseModel
+
+    class Data(BaseModel):
+        intVal: int
+        floatVal: float
+        strVal: str
+        boolVal: bool
+
+    data1 = Data(intVal="123", floatVal="45.67", strVal="999", boolVal=1)
+    data1
+  exercise:
+    prompt: 2단계. 자동 타입 변환 예제에서 \`data1\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from pydantic import BaseModel
+
+      class Data(BaseModel):
+          intVal: int
+          floatVal: float
+          strVal: str
+          boolVal: bool
+
+      data1 = Data(intVal="123", floatVal="45.67", strVal="999", boolVal=1)
+      data1
+    hints:
+    - 바꿀 지점은 \`data1 = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`data1\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 자동 타입 변환에서 \`data1\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. 자동 타입 변환 실행 뒤 \`data1\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step3_strict_mode
+  title: 3단계. 엄격 모드
+  structuredPrimary: true
+  subtitle: strict=True
+  goal: model_config의 strict=True로 타입 강제 변환을 끄고, 문자열 "5"가 int 필드에 들어갈 때 ValidationError가 나는지 확인합니다.
+  why: 자동 변환은 편하지만 운영에서 "5"가 의도된 입력인지 실수인지 구분하지 못합니다. 엄격 모드는 입력 타입을 명시적으로 요구해 데이터 계약을 더 강하게 만듭니다.
+  explanation: |-
+    model_config에서 strict=True를 설정하면 타입 강제 변환이 비활성화됩니다.
+
+    엄격 모드에서는 정확한 타입만 허용됩니다. int 필드에 문자열 "123"을 넣으면 실패합니다.
+  snippet: |-
+    class StrictData(BaseModel):
+        model_config = {"strict": True}
+        intVal: int
+        strVal: str
+
+    strictData = StrictData(intVal=123, strVal="hello")
+    strictData
+  exercise:
+    prompt: 3단계. 엄격 모드 예제에서 입력 타입을 바꾸고 strict=True가 자동 변환을 막는지 확인하세요.
+    starterCode: |-
+      class StrictData(BaseModel):
+          model_config = {"strict": True}
+          intVal: int
+          strVal: str
+
+      strictData = StrictData(intVal=123, strVal="hello")
+      strictData
+    hints:
+    - 바꿀 지점은 strict 필드 선언과 모델 생성 입력 타입입니다.
+    - 실행 뒤 자동 변환이 허용되는 값과 거부되는 값이 의도대로 갈리는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 엄격 모드의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 엄격 모드의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step4_field_strict
+  title: 4단계. 필드별 엄격 모드
+  structuredPrimary: true
+  subtitle: Field(strict=True)
+  goal: 4단계. 필드별 엄격 모드에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 특정 필드만 엄격 모드로 설정할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from pydantic import Field
+
+    class MixedData(BaseModel):
+        flexibleInt: int
+        strictInt: int = Field(strict=True)
+        flexibleStr: str
+
+    mixed1 = MixedData(flexibleInt="100", strictInt=200, flexibleStr="300")
+    mixed1
+  exercise:
+    prompt: 4단계. 필드별 엄격 모드 예제에서 \`mixed1\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from pydantic import Field
+
+      class MixedData(BaseModel):
+          flexibleInt: int
+          strictInt: int = Field(strict=True)
+          flexibleStr: str
+
+      mixed1 = MixedData(flexibleInt="100", strictInt=200, flexibleStr="300")
+      mixed1
+    hints:
+    - 바꿀 지점은 \`mixed1 = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`mixed1\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 필드별 엄격 모드에서 \`mixed1\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 4단계. 필드별 엄격 모드 실행 뒤 \`mixed1\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step5_datetime
+  title: 5단계. 날짜/시간 변환
+  structuredPrimary: true
+  subtitle: datetime 타입
+  goal: 5단계. 날짜/시간 변환에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: Pydantic은 문자열을 datetime, date, time 객체로 자동 변환합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from datetime import datetime, date, time
+
+    class Event(BaseModel):
+        eventName: str
+        eventDate: date
+        startTime: time
+        createdAt: datetime
+
+    event1 = Event(
+        eventName="Conference",
+        eventDate="2024-06-15",
+        startTime="09:30:00",
+        createdAt="2024-01-01T12:00:00"
+    )
+    event1
+  exercise:
+    prompt: 5단계. 날짜/시간 변환 예제에서 \`event1\`, \`eventName\`, \`eventDate\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      from datetime import datetime, date, time
+
+      class Event(BaseModel):
+          eventName: str
+          eventDate: date
+          startTime: time
+          createdAt: datetime
+
+      event1 = Event(
+          eventName="Conference",
+          eventDate="2024-06-15",
+          startTime="09:30:00",
+          createdAt="2024-01-01T12:00:00"
+      )
+      event1
+    hints:
+    - 바꿀 지점은 \`event1 = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`event1\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 날짜/시간 변환에서 \`event1\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 날짜/시간 변환 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step6_enum
+  title: 6단계. Enum 타입
+  structuredPrimary: true
+  subtitle: 열거형 변환
+  goal: 6단계. Enum 타입에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: Enum 타입은 문자열이나 값으로 자동 변환됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from enum import Enum
+
+    class Status(str, Enum):
+        PENDING = "pending"
+        ACTIVE = "active"
+        COMPLETED = "completed"
+
+    class Task(BaseModel):
+        taskId: str
+        status: Status
+
+    task1 = Task(taskId="T001", status="active")
+    task1
+  exercise:
+    prompt: 6단계. Enum 타입 예제에서 \`PENDING\`, \`ACTIVE\`, \`COMPLETED\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      from enum import Enum
+
+      class Status(str, Enum):
+          PENDING = "pending"
+          ACTIVE = "active"
+          COMPLETED = "completed"
+
+      class Task(BaseModel):
+          taskId: str
+          status: Status
+
+      task1 = Task(taskId="T001", status="active")
+      task1
+    hints:
+    - 바꿀 지점은 \`PENDING = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`PENDING\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. Enum 타입에서 \`PENDING\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. Enum 타입 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step7_literal
+  title: 7단계. Literal 타입
+  structuredPrimary: true
+  subtitle: 특정 값만 허용
+  goal: 7단계. Literal 타입에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: Literal로 필드가 가질 수 있는 값을 제한합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from typing import Literal
+
+    class Priority(BaseModel):
+        level: Literal["low", "medium", "high"]
+        score: Literal[1, 2, 3, 4, 5]
+
+    priority1 = Priority(level="high", score=5)
+    priority1
+  exercise:
+    prompt: 7단계. Literal 타입 예제에서 허용값과 입력값을 바꾸고 검증 성공/실패가 달라지는지 확인하세요.
+    starterCode: |-
+      from typing import Literal
+
+      class Priority(BaseModel):
+          level: Literal["low", "medium", "high"]
+          score: Literal[1, 2, 3, 4, 5]
+
+      priority1 = Priority(level="high", score=5)
+      priority1
+    hints:
+    - 바꿀 지점은 \`Literal[...]\`의 허용값과 모델 생성 입력입니다.
+    - 실행 뒤 허용된 값은 통과하고 벗어난 값은 검증 오류로 잡히는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. Literal 타입에서 \`priority1\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. Literal 타입 실행 뒤 \`priority1\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step8_serializer
+  title: 8단계. 필드 직렬화기
+  structuredPrimary: true
+  subtitle: field_serializer
+  goal: 8단계. 필드 직렬화기에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: field_serializer로 필드의 직렬화 방식을 커스터마이즈합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from pydantic import field_serializer
+
+    class Article(BaseModel):
+        title: str
+        publishedAt: datetime
+
+        @field_serializer('publishedAt')
+        def serializeDate(self, v: datetime) -> str:
+            return v.strftime("%Y년 %m월 %d일")
+
+    article1 = Article(title="뉴스 기사", publishedAt="2024-03-15T10:30:00")
+    article1.model_dump()
+  exercise:
+    prompt: 8단계. 필드 직렬화기 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      from pydantic import field_serializer
+
+      class Article(BaseModel):
+          title: str
+          publishedAt: datetime
+
+          @field_serializer('publishedAt')
+          def serializeDate(self, v: datetime) -> str:
+              return v.strftime("%Y년 %m월 %d일")
+
+      article1 = Article(title="뉴스 기사", publishedAt="2024-03-15T10:30:00")
+      article1.model_dump()
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 필드 직렬화기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 8단계. 필드 직렬화기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: step9_computed
+  title: 9단계. 계산 필드 직렬화
+  structuredPrimary: true
+  subtitle: computed_field
+  goal: 9단계. 계산 필드 직렬화에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: computed_field로 다른 필드에서 계산된 값을 직렬화에 포함합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from pydantic import computed_field
+
+    class Invoice(BaseModel):
+        itemPrice: float
+        quantity: int
+        taxRate: float = 10
+
+        @computed_field
+        @property
+        def subtotal(self) -> float:
+            return self.itemPrice * self.quantity
+
+        @computed_field
+        @property
+        def tax(self) -> float:
+            return self.subtotal * self.taxRate / 100
+
+        @computed_field
+        @property
+        def total(self) -> float:
+            return self.subtotal + self.tax
+
+    invoice1 = Invoice(itemPrice=10000, quantity=3)
+    invoice1.model_dump()
+  exercise:
+    prompt: 9단계. 계산 필드 직렬화 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      from pydantic import computed_field
+
+      class Invoice(BaseModel):
+          itemPrice: float
+          quantity: int
+          taxRate: float = 10
+
+          @computed_field
+          @property
+          def subtotal(self) -> float:
+              return self.itemPrice * self.quantity
+
+          @computed_field
+          @property
+          def tax(self) -> float:
+              return self.subtotal * self.taxRate / 100
+
+          @computed_field
+          @property
+          def total(self) -> float:
+              return self.subtotal + self.tax
+
+      invoice1 = Invoice(itemPrice=10000, quantity=3)
+      invoice1.model_dump()
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 계산 필드 직렬화의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 9단계. 계산 필드 직렬화 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: step10_mode
+  title: 10단계. 직렬화 모드
+  structuredPrimary: true
+  subtitle: mode 파라미터
+  goal: 10단계. 직렬화 모드에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    model_dump의 mode 파라미터로 직렬화 형식을 제어합니다.
+
+    mode='python'은 Python 객체를 유지하고, mode='json'은 JSON 직렬화 가능한 형태로 변환합니다.
+  snippet: |-
+    class Sample(BaseModel):
+        createdAt: datetime
+        price: float
+
+    sample1 = Sample(createdAt="2024-01-15T10:00:00", price=99.99)
+    pythonMode = sample1.model_dump(mode='python')
+    pythonMode
+  exercise:
+    prompt: 10단계. 직렬화 모드 예제에서 \`sample1\`, \`pythonMode\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      class Sample(BaseModel):
+          createdAt: datetime
+          price: float
+
+      sample1 = Sample(createdAt="2024-01-15T10:00:00", price=99.99)
+      pythonMode = sample1.model_dump(mode='python')
+      pythonMode
+    hints:
+    - 바꿀 지점은 \`sample1 = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`sample1\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 직렬화 모드에서 \`sample1\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 10단계. 직렬화 모드 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step11_exclude
+  title: 11단계. 필드 제외
+  structuredPrimary: true
+  subtitle: exclude, include
+  goal: 11단계. 필드 제외에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: model_dump에서 특정 필드를 제외하거나 포함할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class UserProfile(BaseModel):
+        userId: str
+        username: str
+        password: str
+        email: str
+
+    profile1 = UserProfile(userId="U001", username="alice", password="secret123", email="alice@mail.com")
+    safeProfile = profile1.model_dump(exclude={"password"})
+    safeProfile
+  exercise:
+    prompt: 11단계. 필드 제외 예제에서 \`profile1\`, \`safeProfile\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      class UserProfile(BaseModel):
+          userId: str
+          username: str
+          password: str
+          email: str
+
+      profile1 = UserProfile(userId="U001", username="alice", password="secret123", email="alice@mail.com")
+      safeProfile = profile1.model_dump(exclude={"password"})
+      safeProfile
+    hints:
+    - 바꿀 지점은 \`profile1 = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`profile1\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 필드 제외에서 \`profile1\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 11단계. 필드 제외 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step12_alias_serial
+  title: 12단계. 별칭 직렬화
+  structuredPrimary: true
+  subtitle: by_alias
+  goal: 12단계. 별칭 직렬화에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: by_alias=True로 직렬화 시 별칭을 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class ApiData(BaseModel):
+        userId: int = Field(alias="user_id")
+        userName: str = Field(alias="user_name")
+
+    apiData1 = ApiData(user_id=1, user_name="Alice")
+
+    normalDump = apiData1.model_dump()
+    aliasDump = apiData1.model_dump(by_alias=True)
+    normalDump, aliasDump
+  exercise:
+    prompt: 12단계. 별칭 직렬화 예제에서 \`apiData1\`, \`normalDump\`, \`aliasDump\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      class ApiData(BaseModel):
+          userId: int = Field(alias="user_id")
+          userName: str = Field(alias="user_name")
+
+      apiData1 = ApiData(user_id=1, user_name="Alice")
+
+      normalDump = apiData1.model_dump()
+      aliasDump = apiData1.model_dump(by_alias=True)
+      normalDump, aliasDump
+    hints:
+    - 바꿀 지점은 \`apiData1 = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`apiData1\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 12단계. 별칭 직렬화에서 \`apiData1\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 12단계. 별칭 직렬화 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 타입 변환 프로젝트
+  goal: 실습에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: 다양한 타입 변환과 직렬화를 적용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from pydantic import BaseModel, Field, field_serializer, computed_field
+    from datetime import datetime
+    from typing import Literal
+
+    class ApiResponse(BaseModel):
+        statusCode: int = Field(alias="status_code")
+        message: str
+        timestamp: datetime
+        responseTime: float = Field(alias="response_time_ms")
+
+        @field_serializer('timestamp')
+        def formatTimestamp(self, v: datetime) -> str:
+            return v.isoformat()
+
+        @computed_field
+        @property
+        def isSuccess(self) -> bool:
+            return 200 <= self.statusCode < 300
+
+    resp = ApiResponse(
+        status_code=200,
+        message="Success",
+        timestamp="2024-03-15T10:30:00",
+        response_time_ms=45.5
+    )
+    respOutput = {
+        "normal": resp.model_dump(),
+        "alias": resp.model_dump(by_alias=True)
+    }
+    respOutput
+  exercise:
+    prompt: 실습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      from pydantic import BaseModel, Field, field_serializer, computed_field
+      from datetime import datetime
+      from typing import Literal
+
+      class ApiResponse(BaseModel):
+          statusCode: int = Field(alias="status_code")
+          message: str
+          timestamp: datetime
+          responseTime: float = Field(alias="response_time_ms")
+
+          @field_serializer('timestamp')
+          def formatTimestamp(self, v: datetime) -> str:
+              return v.isoformat()
+
+          @computed_field
+          @property
+          def isSuccess(self) -> bool:
+              return 200 <= self.statusCode < 300
+
+      resp = ApiResponse(
+          status_code=200,
+          message="Success",
+          timestamp="2024-03-15T10:30:00",
+          response_time_ms=45.5
+      )
+      respOutput = {
+          "normal": resp.model_dump(),
+          "alias": resp.model_dump(by_alias=True)
+      }
+      respOutput
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 실습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 주문 입력 계약과 배치 검증'
+  structuredPrimary: true
+  subtitle: 예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주
+  goal: '현업 흐름 검증: 주문 입력 계약과 배치 검증에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고,
+    잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from typing import Literal
+    from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+    class OrderInput(BaseModel):
+        orderId: str
+        customer: str
+        amount: int = Field(gt=0)
+        status: Literal['paid', 'pending', 'cancelled']
+
+        @field_validator('orderId', 'customer')
+        @classmethod
+        def stripRequiredText(cls, value):
+            cleaned = value.strip()
+            if not cleaned:
+                raise ValueError('text field must not be empty')
+            return cleaned
+
+        @computed_field
+        @property
+        def isRevenue(self) -> bool:
+            return self.status == 'paid'
+
+    validOrder = OrderInput.model_validate({
+        'orderId': ' A-100 ',
+        'customer': ' kim ',
+        'amount': '120000',
+        'status': 'paid',
+    })
+
+    assert validOrder.orderId == 'A-100'
+    assert validOrder.amount == 120000
+    assert validOrder.isRevenue is True
+    validOrder.model_dump()
+  exercise:
+    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
+    starterCode: |-
+      from typing import Literal
+      from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+      class OrderInput(BaseModel):
+          orderId: str
+          customer: str
+          amount: int = Field(gt=0)
+          status: Literal['paid', 'pending', 'cancelled']
+
+          @field_validator('orderId', 'customer')
+          @classmethod
+          def stripRequiredText(cls, value):
+              cleaned = value.strip()
+              if not cleaned:
+                  raise ValueError('text field must not be empty')
+              return cleaned
+
+          @computed_field
+          @property
+          def isRevenue(self) -> bool:
+              return self.status == 'paid'
+
+      validOrder = OrderInput.model_validate({
+          'orderId': ' A-100 ',
+          'customer': ' kim ',
+          'amount': '120000',
+          'status': 'paid',
+      })
+
+      assert validOrder.orderId == 'A-100'
+      assert validOrder.amount == 120000
+      assert validOrder.isRevenue is True
+      validOrder.model_dump()
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pydantic_04-explicit-type-coercion-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_package_ready
+    - workflow_validation
+    title: 문자열 입력을 명시적 bool·int·float 계약으로 변환하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 허용한 문자열 표현만 typed 값으로 변환하고 나머지는 거절한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - bool('false')는 True이므로 직접 허용 목록을 만드세요.
+    - 변환 뒤에도 범위 검증을 수행하세요.
+    exercise:
+      prompt: coerce_fields(payload)를 완성해 enabled, retries, threshold를 반환하세요.
+      starterCode: |-
+        def coerce_fields(payload):
+            raise NotImplementedError
+      solution: |
+        def coerce_fields(payload):
+            bool_map = {"true": True, "false": False, "1": True, "0": False}
+            raw_enabled = str(payload.get("enabled", "")).strip().lower()
+            if raw_enabled not in bool_map:
+                raise ValueError("invalid boolean")
+            try:
+                retries = int(payload["retries"])
+                threshold = float(payload["threshold"])
+            except (KeyError, TypeError, ValueError) as error:
+                raise ValueError("invalid numeric value") from error
+            if retries < 0 or not 0 <= threshold <= 1:
+                raise ValueError("value out of range")
+            return {"enabled": bool_map[raw_enabled], "retries": retries, "threshold": threshold}
+      hints: *id001
+    check:
+      id: python.pydantic.pydantic_04.explicit-type-coercion.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_04.explicit-type-coercion.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: coerce_fields
+        cases:
+        - id: coerces-explicit-values
+          arguments:
+          - value:
+              enabled: ' TRUE '
+              retries: '3'
+              threshold: '0.75'
+          expectedReturn:
+            enabled: true
+            retries: 3
+            threshold: 0.75
+        - id: keeps-zero-false
+          arguments:
+          - value:
+              enabled: '0'
+              retries: 0
+              threshold: 0
+          expectedReturn:
+            enabled: false
+            retries: 0
+            threshold: 0.0
+        - id: rejects-ambiguous-bool
+          arguments:
+          - value:
+              enabled: 'yes'
+              retries: 1
+              threshold: 0.5
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pydantic_04-query-parameter-coercion-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pydantic_04-explicit-type-coercion-mastery
+    title: 새 URL query 값을 pagination 계약으로 변환하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: field 변환을 page·limit·tags query 입력으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - query는 문자열로 들어올 수 있으므로 변환과 범위를 모두 검사하세요.
+    - 단일 tag와 tag 목록을 같은 내부 list로 정규화하세요.
+    exercise:
+      prompt: normalize_query(params)를 완성해 page, limit, tags, offset을 반환하세요.
+      starterCode: |-
+        def normalize_query(params):
+            raise NotImplementedError
+      solution: |
+        def normalize_query(params):
+            try:
+                page = int(params.get("page", 1))
+                limit = int(params.get("limit", 20))
+            except (TypeError, ValueError) as error:
+                raise ValueError("invalid pagination") from error
+            if page < 1 or not 1 <= limit <= 100:
+                raise ValueError("pagination out of range")
+            raw_tags = params.get("tags", [])
+            tags = [tag.strip().lower() for tag in (raw_tags if isinstance(raw_tags, list) else [raw_tags]) if tag.strip()]
+            return {"page": page, "limit": limit, "tags": tags, "offset": (page - 1) * limit}
+      hints: *id002
+    check:
+      id: python.pydantic.pydantic_04.query-parameter-coercion.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_04.query-parameter-coercion.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: normalize_query
+        cases:
+        - id: normalizes-query-list
+          arguments:
+          - value:
+              page: '3'
+              limit: '10'
+              tags:
+              - ' Python '
+              - WEB
+          expectedReturn:
+            page: 3
+            limit: 10
+            tags:
+            - python
+            - web
+            offset: 20
+        - id: applies-defaults
+          arguments:
+          - value: {}
+          expectedReturn:
+            page: 1
+            limit: 20
+            tags: []
+            offset: 0
+        - id: rejects-large-limit
+          arguments:
+          - value:
+              page: 1
+              limit: 1000
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pydantic_04-strict-versus-coerce-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pydantic_04-query-parameter-coercion-transfer
+    title: 엄격 타입과 안전한 변환의 경계 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 식별자, 사용자 query, 계산 결과에 맞는 타입 정책을 선택한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 입력 편의가 필요한 경계와 identity가 중요한 경계를 구분하세요.
+    - coerce를 허용해도 허용 표현과 범위는 좁게 정의하세요.
+    exercise:
+      prompt: choose_type_policy(situation)를 완성해 policy, accepts, risk를 반환하세요.
+      starterCode: |-
+        def choose_type_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_type_policy(situation):
+            table = {'database-identifier': {'policy': 'strict', 'accepts': 'integer only', 'risk': 'identity ambiguity'}, 'url-query-page': {'policy': 'coerce then range-check', 'accepts': 'digit string or integer', 'risk': 'invalid pagination'}, 'computed-probability': {'policy': 'strict range', 'accepts': 'number from 0 to 1', 'risk': 'invalid metric'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.pydantic.pydantic_04.strict-versus-coerce.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_04.strict-versus-coerce.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_type_policy
+        cases:
+        - id: recalls-database-identifier
+          arguments:
+          - value: database-identifier
+          expectedReturn:
+            policy: strict
+            accepts: integer only
+            risk: identity ambiguity
+        - id: recalls-url-query-page
+          arguments:
+          - value: url-query-page
+          expectedReturn:
+            policy: coerce then range-check
+            accepts: digit string or integer
+            risk: invalid pagination
+        - id: rejects-unknown-situation
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,626 @@
+var e=`meta:
+  id: visionApps_09
+  title: 화면 캡처 분석
+  order: 9
+  category: visionApps
+  difficulty: ⭐⭐⭐
+  badge: 기초
+  packages:
+  - matplotlib
+  - numpy
+  - opencv-python
+  - mss
+  tags:
+  - mss
+  - 화면캡처
+  - 모니터링
+  - 응용
+  seo:
+    title: 비전 응용 - 화면 캡처 분석
+    description: mss로 화면 일부를 캡처해 opencv로 분석합니다.
+    keywords:
+    - 화면캡처
+    - mss
+    - 모니터링
+    - 응용
+intro:
+  emoji: 🖥
+  goal: mss로 화면 영역을 캡처해 opencv로 분석하는 응용 패턴을 익힙니다.
+  description: |-
+    화면의 특정 영역을 정기적으로 캡처해 변화를 감지하거나 색을 분석하는 응용은 데스크톱 자동화의 핵심입니다. mss는 빠르고 가벼운 화면 캡처 라이브러리로 모든 OS에서 동작합니다. 이 강의는 mss 사용법과 캡처 결과를 opencv 입력으로 다루는 흐름을 익힙니다.
+  direction: mss로 화면 일부를 캡처한 뒤 색 분석과 변화 감지를 적용합니다.
+  benefits:
+  - mss.mss 컨텍스트로 화면 캡처를 한 줄로 호출합니다.
+  - 캡처 결과를 numpy 배열 → opencv 입력으로 변환합니다.
+  - 캡처 후 평균 색, 통계, 차분을 적용해 모니터링 응용을 구현합니다.
+  diagram:
+    steps:
+    - label: 1단계. mss 사용
+      detail: 모니터 정보와 기본 캡처.
+    - label: 2단계. 영역 캡처
+      detail: top, left, width, height.
+    - label: 3단계. 캡처 → numpy
+      detail: BGRA 결과를 BGR로.
+    - label: 4단계. 단순 분석
+      detail: 평균 색, 통계.
+    - label: 5단계. 반복 캡처와 변화 감지
+      detail: absdiff로 시계열.
+    runtime:
+    - label: 비전 환경
+      detail: mss가 헤드리스(서버) 환경에서 동작하지 않을 수 있습니다. 데스크톱 환경에서 학습하세요.
+    - label: 검증 흐름
+      detail: 캡처된 이미지 크기와 변화 감지 결과를 assert와 시각 비교로 기대값과 같은지 확인합니다.
+sections:
+- id: mss_intro
+  title: 1단계. mss 사용
+  structuredPrimary: true
+  subtitle: 모니터 정보
+  goal: mss 컨텍스트를 만들고 모니터 목록을 확인합니다.
+  why: 캡처할 모니터와 영역을 정확히 지정해야 합니다.
+  explanation: |-
+    \`with mss.mss() as sct:\` 가 표준 패턴입니다. \`sct.monitors\` 는 모든 모니터의 정보 dict 리스트입니다. 0번 인덱스는 전체 가상 화면, 1번부터가 개별 모니터입니다.
+
+    헤드리스 환경(예: CI 서버) 에서는 mss가 디스플레이를 찾지 못해 예외를 발생시킵니다. 그럴 때는 학습 환경을 데스크톱으로 옮기세요.
+  tips:
+  - mss는 가볍고 빠르지만 일부 OS에서 추가 의존성이 필요할 수 있습니다(macOS의 권한 설정 등).
+  snippet: |-
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import cv2
+
+    try:
+        import mss
+        with mss.mss() as sct:
+            monitorsInfo = list(sct.monitors)
+        mssStatus = 'ready'
+    except Exception as exc:
+        monitorsInfo = []
+        mssStatus = f"failed: {exc.__class__.__name__}"
+    mssStatus, len(monitorsInfo)
+  exercise:
+    prompt: 첫 번째 실제 모니터(인덱스 1) 의 크기 정보를 출력하세요.
+    starterCode: |-
+      if len(monitorsInfo) > 1:
+          firstMonitor = monitorsInfo[___]
+      else:
+          firstMonitor = None
+      firstMonitor
+    hints:
+    - 빈칸은 정수 1 입니다.
+    - 결과는 dict 또는 None입니다.
+  check:
+    noError: mss 초기화 시도가 오류 없이 끝나야 합니다.
+    resultCheck: mssStatus가 문자열이어야 합니다.
+- id: capture_area
+  title: 2단계. 영역 캡처
+  structuredPrimary: true
+  subtitle: top, left, width, height
+  goal: 화면의 특정 영역을 dict로 지정해 캡처합니다.
+  why: 응용에서는 화면 전체가 아닌 특정 영역만 모니터링하는 경우가 일반적입니다.
+  explanation: |-
+    \`sct.grab({"top": 100, "left": 100, "width": 300, "height": 200})\` 가 영역 캡처입니다. 결과는 mss의 ScreenShot 객체로 width, height, raw 속성을 가집니다.
+
+    화면에 그 영역이 존재해야 합니다(다른 모니터 너머의 좌표를 지정하면 빈 캡처가 됩니다).
+  tips:
+  - 영역 좌표는 모니터 단위가 아닌 가상 데스크톱 좌표입니다. 여러 모니터에서는 음수 좌표가 나올 수도 있습니다.
+  snippet: |-
+    if mssStatus == 'ready':
+        with mss.mss() as sct:
+            shot = sct.grab({"top": 0, "left": 0, "width": 300, "height": 200})
+        shotInfo = (shot.width, shot.height)
+    else:
+        shot = None
+        shotInfo = None
+    shotInfo
+  exercise:
+    prompt: 캡처 영역을 (400, 300) 으로 키운 bigShot을 시도하세요.
+    starterCode: |-
+      if mssStatus == 'ready':
+          with mss.mss() as sct:
+              bigShot = sct.grab({"top": 0, "left": 0, "width": ___, "height": 300})
+          bigShotInfo = (bigShot.width, bigShot.height)
+      else:
+          bigShot = None
+          bigShotInfo = None
+      bigShotInfo
+    hints:
+    - 빈칸은 정수 400 입니다.
+    - 결과는 (400, 300) 입니다.
+  check:
+    noError: 캡처 시도가 오류 없이 끝나야 합니다.
+    resultCheck: mssStatus가 'ready' 일 때 shotInfo가 (300, 200) 이어야 합니다.
+- id: to_numpy
+  title: 3단계. 캡처 → numpy
+  structuredPrimary: true
+  subtitle: BGRA → BGR
+  goal: ScreenShot 객체를 numpy 배열로 변환하고 BGRA 채널 순서를 BGR로 통일합니다.
+  why: opencv의 다른 함수는 BGR을 기대하므로 채널 순서를 맞춰야 합니다.
+  explanation: |-
+    \`np.array(shot)\` 는 (H, W, 4) BGRA 배열을 만듭니다. \`cv2.cvtColor(arr, cv2.COLOR_BGRA2BGR)\` 로 알파 채널을 제거하면 표준 BGR 배열이 됩니다.
+
+    matplotlib 표시를 위해서는 마지막에 BGR → RGB 한 번 더 변환합니다.
+  tips:
+  - 화면 캡처의 알파 채널은 보통 의미가 없습니다. 즉시 제거하는 것이 일반적입니다.
+  snippet: |-
+    if shot is not None:
+        arr = np.array(shot)
+        bgr = cv2.cvtColor(arr, cv2.COLOR_BGRA2BGR)
+        rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
+    else:
+        arr = None
+        bgr = None
+        rgb = None
+    None if rgb is None else rgb.shape
+  exercise:
+    prompt: rgb가 None이 아니면 시각화하세요(헤드리스에서는 그냥 통과).
+    starterCode: |-
+      if rgb is not None:
+          fig = plt.figure(figsize=(6, 4))
+          plt.imshow(rgb)
+          plt.axis('___')
+      else:
+          fig = None
+      fig
+    hints:
+    - 빈칸은 'off' 입니다.
+    - 캡처한 화면 영역이 보여야 합니다.
+  check:
+    noError: 캡처 변환이 오류 없이 끝나야 합니다.
+    resultCheck: mssStatus가 'ready' 일 때 bgr이 ndarray여야 합니다.
+- id: analyze
+  title: 4단계. 단순 분석
+  structuredPrimary: true
+  subtitle: 평균 색과 통계
+  goal: 캡처한 영역의 평균 색과 통계를 계산합니다.
+  why: 응용은 캡처 자체가 아니라 캡처에서 정보를 추출하는 데 의의가 있습니다.
+  explanation: |-
+    visionBasics 9강의 패턴이 그대로 적용됩니다. 평균 색은 영역의 전반적인 색감을, 표준편차는 영역의 복잡도를 알려줍니다.
+
+    이 정보를 시계열로 모으면 화면 영역의 변화 패턴을 추적할 수 있습니다.
+  tips:
+  - 캡처한 화면 영역의 평균 색은 모니터의 색감, 환경에 따라 다릅니다.
+  snippet: |-
+    if rgb is not None:
+        stats = {
+            "mean": rgb.mean(axis=(0, 1)).tolist(),
+            "std": float(rgb.std()),
+        }
+    else:
+        stats = None
+    stats
+  exercise:
+    prompt: rgb가 있으면 채널별 표준편차도 출력하세요.
+    starterCode: |-
+      if rgb is not None:
+          channelStd = rgb.std(axis=(___, ___)).tolist()
+      else:
+          channelStd = None
+      channelStd
+    hints:
+    - axis 인자는 (0, 1) 입니다.
+    - 결과는 길이 3 리스트입니다.
+  check:
+    noError: 통계 계산이 오류 없이 끝나야 합니다.
+    resultCheck: mssStatus가 'ready' 일 때 stats에 mean 키가 있어야 합니다.
+- id: monitor_loop
+  title: 5단계. 반복 캡처와 변화 감지
+  structuredPrimary: true
+  subtitle: absdiff로 시계열
+  goal: 짧은 간격으로 두 캡처를 떠 차분을 계산합니다.
+  why: 응용은 보통 정기적으로 화면을 캡처해 변화를 감지합니다.
+  explanation: |-
+    실시간 무한 루프는 학습용으로 부적합합니다. 여기서는 두 번 캡처해 단일 차분만 확인합니다. 실제 응용에서는 time.sleep + 루프로 정기 캡처를 합니다.
+  tips:
+  - 캡처 사이에 변화가 없는 화면이면 차분이 0에 가깝습니다.
+  snippet: |-
+    if mssStatus == 'ready':
+        with mss.mss() as sct:
+            firstShot = np.array(sct.grab({"top": 0, "left": 0, "width": 300, "height": 200}))
+            secondShot = np.array(sct.grab({"top": 0, "left": 0, "width": 300, "height": 200}))
+        diff = cv2.absdiff(firstShot, secondShot)
+        diffMean = float(diff.mean())
+    else:
+        diffMean = None
+    diffMean
+  exercise:
+    prompt: 캡처 영역을 (200, 150) 으로 줄여 같은 차분 계산을 하세요.
+    starterCode: |-
+      if mssStatus == 'ready':
+          with mss.mss() as sct:
+              shotA = np.array(sct.grab({"top": 0, "left": 0, "width": ___, "height": 150}))
+              shotB = np.array(sct.grab({"top": 0, "left": 0, "width": 200, "height": 150}))
+          smallDiff = float(cv2.absdiff(shotA, shotB).mean())
+      else:
+          smallDiff = None
+      smallDiff
+    hints:
+    - 빈칸은 정수 200 입니다.
+    - 결과는 작은 부동소수입니다.
+  check:
+    noError: 차분 계산이 오류 없이 끝나야 합니다.
+    resultCheck: diffMean이 None 또는 부동소수여야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 응용 함수
+  goal: 영역 dict → 분석 결과 dict의 응용 함수를 만듭니다.
+  why: 함수로 묶어 두면 자동화 스크립트에서 즉시 호출할 수 있습니다.
+  explanation: |-
+    각 미션은 import문부터 시작하지만, 위 예제를 실행했다면 import는 생략해도 됩니다.
+  tips:
+  - 응용 함수는 헤드리스 환경에서도 깨지지 않게 try/except로 감싸는 것이 안전합니다.
+  snippet: |-
+    def analyzeRegion(region):
+        try:
+            with mss.mss() as sctLocal:
+                shotLocal = np.array(sctLocal.grab(region))
+            bgrLocal = cv2.cvtColor(shotLocal, cv2.COLOR_BGRA2BGR)
+            return {
+                "shape": bgrLocal.shape,
+                "mean": bgrLocal.mean(axis=(0, 1)).tolist(),
+                "std": float(bgrLocal.std()),
+            }
+        except Exception as exc:
+            return {"error": exc.__class__.__name__}
+
+    analyzeRegion({"top": 0, "left": 0, "width": 250, "height": 180})
+  exercise:
+    prompt: "미션1: 두 영역에 함수를 적용해 결과를 dict로 합치세요. 미션2: 두 캡처 결과의 평균 색 차이를 출력하세요."
+    starterCode: |-
+      regions = {
+          "topLeft": {"top": 0, "left": 0, "width": 200, "height": 150},
+          "topMid": {"top": 0, "left": 200, "width": 200, "height": 150},
+      }
+      compare = {name: analyzeRegion(area) for name, area in ___.items()}
+      compare
+    hints:
+    - 빈칸은 regions 변수입니다.
+    - 결과는 두 영역의 분석 dict가 들어 있는 dict입니다.
+  check:
+    noError: 응용 함수가 오류 없이 끝나야 합니다.
+    resultCheck: analyzeRegion 결과가 dict여야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: visionApps_09-screen_analysis-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - mss_intro
+    - practice
+    title: 화면 캡처 분석 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 사용자 승인·capture region·privacy mask·retention 계약을 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_screen_analysis_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_screen_analysis_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_screen_analysis_contract(value):
+            required = ['consent', 'region', 'privacyMasks', 'retentionSeconds']
+            rules = [{'id': 'consent', 'field': 'consent', 'kind': 'enum', 'values': ['current-session']}, {'id': 'region', 'field': 'region', 'kind': 'length', 'value': 4}, {'id': 'masks', 'field': 'privacyMasks', 'kind': 'nonempty'}, {'id': 'retention', 'field': 'retentionSeconds', 'kind': 'range', 'min': 0, 'max': 86400}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'screen_analysis', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.vision-apps.visionApps_09.screen_analysis-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-apps.visionApps_09.screen_analysis-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_screen_analysis_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              consent: current-session
+              region:
+              - 0
+              - 0
+              - 1280
+              - 720
+              privacyMasks:
+              - password
+              - notification
+              retentionSeconds: 0
+          expectedReturn:
+            accepted: true
+            topic: screen_analysis
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              region:
+              - 0
+              - 0
+              - 1280
+              - 720
+              privacyMasks:
+              - password
+              - notification
+              retentionSeconds: 0
+          expectedReturn:
+            accepted: false
+            topic: screen_analysis
+            missing:
+            - consent
+            violations:
+            - consent
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              consent: background
+              region:
+              - 0
+              - 0
+              privacyMasks: []
+              retentionSeconds: 999999
+          expectedReturn:
+            accepted: false
+            topic: screen_analysis
+            missing: []
+            violations:
+            - consent
+            - masks
+            - region
+            - retention
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: visionApps_09-screen_analysis-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionApps_09-screen_analysis-contract-audit-mastery
+    title: 화면 캡처 분석 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_screen_analysis_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_screen_analysis_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_screen_analysis_result(expected, observed):
+            identity = ['captureHash', 'maskPolicyHash', 'sessionId']
+            metrics = {'visibleRegionCount': 0}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'screen_analysis', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.vision-apps.visionApps_09.screen_analysis-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-apps.visionApps_09.screen_analysis-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_screen_analysis_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              captureHash: sc1
+              maskPolicyHash: mask-a
+              sessionId: s1
+              visibleRegionCount: 5
+          - value:
+              captureHash: sc1
+              maskPolicyHash: mask-a
+              sessionId: s1
+              visibleRegionCount: 5
+          expectedReturn:
+            passed: true
+            topic: screen_analysis
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              captureHash: sc1
+              maskPolicyHash: mask-a
+              sessionId: s1
+              visibleRegionCount: 5
+          - value:
+              captureHash: sc2
+              maskPolicyHash: none
+              sessionId: s2
+              visibleRegionCount: 20
+          expectedReturn:
+            passed: false
+            topic: screen_analysis
+            missing: []
+            identityMismatch:
+            - captureHash
+            - maskPolicyHash
+            - sessionId
+            metricDrift:
+            - visibleRegionCount
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              captureHash: sc1
+              maskPolicyHash: mask-a
+              sessionId: s1
+              visibleRegionCount: 5
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: screen_analysis
+            missing:
+            - captureHash
+            - maskPolicyHash
+            - sessionId
+            - visibleRegionCount
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: visionApps_09-screen_analysis-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionApps_09-screen_analysis-result-reconciliation-transfer
+    title: 화면 캡처 분석 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_screen_analysis_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_screen_analysis_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_screen_analysis_evidence(stage):
+            stages = {'admission': {'action': 'admit screen analysis input safely', 'evidence': 'session consent region masks', 'risk': 'privacy or source error'}, 'process': {'action': 'run bounded screen analysis workflow', 'evidence': 'capture-redact-analyze trace', 'risk': 'unbounded or wrong transformation'}, 'release': {'action': 'release verified screen analysis result', 'evidence': 'redaction residual audit', 'risk': 'wrong or sensitive output'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.vision-apps.visionApps_09.screen_analysis-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-apps.visionApps_09.screen_analysis-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_screen_analysis_evidence
+        cases:
+        - id: recalls-admission
+          arguments:
+          - value: admission
+          expectedReturn:
+            action: admit screen analysis input safely
+            evidence: session consent region masks
+            risk: privacy or source error
+        - id: recalls-process
+          arguments:
+          - value: process
+          expectedReturn:
+            action: run bounded screen analysis workflow
+            evidence: capture-redact-analyze trace
+            risk: unbounded or wrong transformation
+        - id: recalls-release
+          arguments:
+          - value: release
+          expectedReturn:
+            action: release verified screen analysis result
+            evidence: redaction residual audit
+            risk: wrong or sensitive output
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

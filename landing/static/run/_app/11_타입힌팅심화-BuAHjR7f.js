@@ -1,0 +1,872 @@
+var e=`meta:
+  id: '11'
+  title: 타입 힌팅 심화
+  day: 11
+  category: advancedPython
+  tags:
+  - typing
+  - Generic
+  - TypeVar
+  - Protocol
+  - overload
+  - 검증
+  - 타입계약
+  seo:
+    title: 파이썬 타입 힌팅 심화 - Generic, TypeVar, Protocol 완벽 가이드
+    description: 고급 타입 힌팅을 마스터합니다. Generic 클래스, TypeVar, Protocol, @overload, Callable 타입 힌팅.
+    keywords:
+    - Generic
+    - TypeVar
+    - Protocol
+    - overload
+    - Callable
+    - 타입힌팅
+intro:
+  emoji: 🏷️
+  points:
+  - Generic과 TypeVar로 타입 파라미터화
+  - Protocol로 구조적 서브타이핑
+  - '@overload로 함수 오버로딩 힌팅'
+  - Callable로 함수 타입 표현
+  direction: 타입 힌팅 심화에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.
+  benefits:
+  - 작은 함수와 상태 확인 후 추상화 패턴에 맞는 코드 입력을 고릅니다.
+  - 타입 힌팅 심화 결과를 호출 결과와 예외 경계 기준으로 즉시 점검합니다.
+  - 완료한 코드를 라이브러리성 유틸리티에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: Generic 클래스 입력 확인
+      detail: 입력 기준(작은 함수와 상태)과 필요한 조건을 먼저 고정합니다.
+    - label: TypeVar 처리 실행
+      detail: 추상화 패턴 코드를 실행해 중간 결과를 확인합니다.
+    - label: Protocol 결과 검증
+      detail: 호출 결과와 예외 경계 기준으로 실행 결과를 비교합니다.
+    - label: 타입 힌팅 심화 재사용
+      detail: 완성 코드를 라이브러리성 유틸리티에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 고급 설계 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 타입 힌팅 심화 실행
+      detail: 셀을 실행해 호출 결과와 예외 경계와 예외 상태를 확인합니다.
+    - label: 타입 힌팅 심화 완료
+      detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
+sections:
+- id: generic_class
+  title: Generic 클래스
+  structuredPrimary: true
+  subtitle: 타입 파라미터화
+  goal: Generic 클래스에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    Generic은 타입을 파라미터로 받는 클래스를 정의합니다. List[int], Dict[str, int]처럼 구체적인 타입을 지정할 수 있게 합니다. typing.Generic을 상속받고 TypeVar로 정의한 타입 변수를 사용합니다. Generic 클래스는 여러 타입 파라미터를 가질 수 있습니다. 타입 체커(mypy, pyright)가 타입 일관성을 검증합니다. 런타임에는 타입 정보가 지워지지만(type erasure), 개발 시 타입 안전성을 보장합니다.
+
+    Python 3.9+에서는 list[int], dict[str, int]처럼 내장 타입을 직접 Generic으로 사용할 수 있습니다.
+  snippet: |-
+    from typing import Generic, TypeVar
+
+    T = TypeVar('T')
+
+    class Box(Generic[T]):
+        def __init__(self, item: T):
+            self.item = item
+
+        def get(self) -> T:
+            return self.item
+
+    intBox: Box[int] = Box(42)
+    strBox: Box[str] = Box("hello")
+    intBox.get(), strBox.get()
+  exercise:
+    prompt: Generic 클래스 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      from typing import Generic, TypeVar
+
+      T = TypeVar('T')
+
+      class Box(Generic[T]):
+          def __init__(self, item: T):
+              self.item = item
+
+          def get(self) -> T:
+              return self.item
+
+      intBox: Box[int] = Box(42)
+      strBox: Box[str] = Box("hello")
+      intBox.get(), strBox.get()
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: Generic 클래스의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: Generic 클래스 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: typevar
+  title: TypeVar
+  structuredPrimary: true
+  subtitle: 타입 변수
+  goal: TypeVar에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    TypeVar는 타입 변수를 정의합니다. 함수나 클래스에서 같은 타입을 여러 곳에서 참조할 때 사용합니다. bound 파라미터로 상한 타입을 지정할 수 있습니다. constraints로 허용되는 타입을 제한할 수 있습니다. covariant=True는 공변성을, contravariant=True는 반공변성을 지정합니다. TypeVar는 타입 힌팅에만 사용되며 런타임에 영향을 주지 않습니다.
+
+    bound는 해당 타입과 서브타입을 허용하고, constraints는 정확히 나열된 타입만 허용합니다.
+  snippet: |-
+    from typing import TypeVar, List
+
+    T = TypeVar('T')
+
+    def first(items: List[T]) -> T:
+        return items[0]
+
+    first([1, 2, 3]), first(["a", "b", "c"])
+  exercise:
+    prompt: TypeVar 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      from typing import TypeVar, List
+
+      T = TypeVar('T')
+
+      def first(items: List[T]) -> T:
+          return items[0]
+
+      first([1, 2, 3]), first(["a", "b", "c"])
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: TypeVar의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: TypeVar 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: protocol_typing
+  title: Protocol
+  structuredPrimary: true
+  subtitle: 구조적 서브타이핑
+  goal: Protocol에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    Protocol은 구조적 서브타이핑(structural subtyping)을 제공합니다. 명시적으로 상속하지 않아도 필요한 메서드를 가지면 해당 타입으로 인정됩니다. 덕 타이핑을 정적 타입 검사와 결합합니다. @runtime_checkable을 추가하면 isinstance()로 검사할 수 있습니다. Protocol에 속성, 메서드, 클래스 메서드를 정의할 수 있습니다. 기존 클래스를 수정하지 않고 타입 호환성을 만들 수 있습니다.
+
+    @runtime_checkable은 메서드/속성 존재만 확인하며 시그니처는 검사하지 않습니다.
+  snippet: |-
+    from typing import Protocol
+
+    class Renderable(Protocol):
+        def render(self) -> str:
+            ...
+
+    class Button:
+        def render(self) -> str:
+            return "<button>Click</button>"
+
+    class TextField:
+        def render(self) -> str:
+            return "<input type='text'/>"
+
+    def display(widget: Renderable) -> str:
+        return widget.render()
+
+    display(Button()), display(TextField())
+  exercise:
+    prompt: Protocol 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      from typing import Protocol
+
+      class Renderable(Protocol):
+          def render(self) -> str:
+              ...
+
+      class Button:
+          def render(self) -> str:
+              return "<button>Click</button>"
+
+      class TextField:
+          def render(self) -> str:
+              return "<input type='text'/>"
+
+      def display(widget: Renderable) -> str:
+          return widget.render()
+
+      display(Button()), display(TextField())
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: Protocol의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: Protocol 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: overload
+  title: '@overload'
+  structuredPrimary: true
+  subtitle: 함수 오버로딩
+  goal: '@overload에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    @overload 데코레이터는 함수의 여러 시그니처를 타입 체커에게 알려줍니다. 실제 구현은 @overload 없이 마지막에 정의합니다. @overload 함수는 런타임에 호출되지 않습니다. 입력 타입에 따라 다른 반환 타입을 명시할 때 유용합니다. Union 반환보다 더 정확한 타입 추론이 가능합니다. typing_extensions에서도 사용할 수 있습니다.
+
+    @overload 함수는 ...로 본문을 비워두고, 실제 구현만 런타임에 실행됩니다.
+  snippet: |-
+    from typing import overload, Union
+
+    @overload
+    def process(x: int) -> int: ...
+
+    @overload
+    def process(x: str) -> str: ...
+
+    def process(x: Union[int, str]) -> Union[int, str]:
+        if isinstance(x, int):
+            return x * 2
+        return x.upper()
+
+    process(5), process("hello")
+  exercise:
+    prompt: '@overload 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
+    starterCode: |-
+      from typing import overload, Union
+
+      @overload
+      def process(x: int) -> int: ...
+
+      @overload
+      def process(x: str) -> str: ...
+
+      def process(x: Union[int, str]) -> Union[int, str]:
+          if isinstance(x, int):
+              return x * 2
+          return x.upper()
+
+      process(5), process("hello")
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '@overload의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '@overload 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+- id: callable
+  title: Callable
+  structuredPrimary: true
+  subtitle: 함수 타입 힌팅
+  goal: Callable에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    Callable은 호출 가능한 객체(함수, 메서드, 람다 등)의 타입을 표현합니다. Callable[[인자타입들], 반환타입] 형식으로 사용합니다. 인자가 없으면 Callable[[], 반환타입]입니다. 모든 인자를 허용하려면 Callable[..., 반환타입]을 사용합니다. 고차 함수(함수를 받거나 반환하는 함수)를 정의할 때 필수적입니다. ParamSpec을 사용하면 더 정교한 함수 시그니처를 표현할 수 있습니다.
+
+    Python 3.10+에서는 Callable 대신 (int, str) -> bool 형식의 문법도 사용할 수 있습니다.
+  snippet: |-
+    from typing import Callable, List
+
+    def applyToAll(func: Callable[[int], int], items: List[int]) -> List[int]:
+        return [func(x) for x in items]
+
+    applyToAll(lambda x: x * 2, [1, 2, 3, 4])
+  exercise:
+    prompt: Callable 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      from typing import Callable, List
+
+      def applyToAll(func: Callable[[int], int], items: List[int]) -> List[int]:
+          return [func(x) for x in items]
+
+      applyToAll(lambda x: x * 2, [1, 2, 3, 4])
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: Callable의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: Callable 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: advanced_types
+  title: 고급 타입
+  structuredPrimary: true
+  subtitle: Union, Optional, Any
+  goal: 고급 타입에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    Union은 여러 타입 중 하나를 허용합니다. Optional[T]는 Union[T, None]의 축약입니다. Any는 모든 타입과 호환되며 타입 검사를 우회합니다. Python 3.10+에서는 X | Y 문법으로 Union을 대체할 수 있습니다. Never(NoReturn)는 함수가 정상적으로 반환하지 않음을 표시합니다. 이런 타입들을 적절히 조합하면 복잡한 타입도 표현할 수 있습니다.
+
+    Any는 타입 검사를 무력화하므로 꼭 필요한 경우에만 사용하세요.
+  snippet: |-
+    from typing import Union, List
+
+    def normalize(value: Union[int, str, List[int]]) -> str:
+        if isinstance(value, int):
+            return str(value)
+        elif isinstance(value, str):
+            return value
+        else:
+            return ",".join(str(v) for v in value)
+
+    normalize(42), normalize("hello"), normalize([1, 2, 3])
+  exercise:
+    prompt: 고급 타입 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      from typing import Union, List
+
+      def normalize(value: Union[int, str, List[int]]) -> str:
+          if isinstance(value, int):
+              return str(value)
+          elif isinstance(value, str):
+              return value
+          else:
+              return ",".join(str(v) for v in value)
+
+      normalize(42), normalize("hello"), normalize([1, 2, 3])
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 고급 타입의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 고급 타입 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 타입 힌트로 주문 저장소 계약 표현하기'
+  structuredPrimary: true
+  subtitle: Generic, Protocol, Callable, overload가 실제 코드 계약을 어떻게 돕는지 확인합니다
+  goal: '현업 흐름 검증: 타입 힌트로 주문 저장소 계약 표현하기에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    타입 힌트는 실행 속도를 높이는 기능이 아니라, 저장소·필터·조회 함수 사이의 계약을 명확히 하는 장치입니다. 먼저 어떤 객체가 저장 가능한지 예측하고, 로컬 Python에서 실행한 뒤, 잘못된 조건은 좁힌 예외로 막아보세요.
+
+    변주 실험
+    status 대신 amount 기준 필터를 추가하고, \`Repository[OrderRecord]\`에 key 메서드가 없는 객체를 넣으면 타입 체커와 런타임에서 각각 어떤 신호가 나는지 비교하세요.
+  tips:
+  - 변주 실험 status 대신 amount 기준 필터를 추가하고, \`Repository[OrderRecord]\`에 key 메서드가 없는 객체를 넣으면 타입 체커와 런타임에서 각각
+    어떤 신호가 나는지 비교하세요.
+  snippet: |-
+    from typing import Callable, Generic, Protocol, TypeVar, overload
+
+    class HasKey(Protocol):
+        def key(self) -> str:
+            ...
+
+    T = TypeVar("T", bound=HasKey)
+
+    class Repository(Generic[T]):
+        def __init__(self) -> None:
+            self._items: dict[str, T] = {}
+
+        def add(self, item: T) -> None:
+            self._items[item.key()] = item
+
+        def all(self) -> list[T]:
+            return list(self._items.values())
+
+        @overload
+        def get(self, key: str) -> T | None:
+            ...
+
+        @overload
+        def get(self, key: str, default: T) -> T:
+            ...
+
+        def get(self, key: str, default: T | None = None) -> T | None:
+            return self._items.get(key, default)
+
+    class OrderRecord:
+        def __init__(self, orderId: str, amount: int, status: str) -> None:
+            self.orderId = orderId
+            self.amount = amount
+            self.status = status
+
+        def key(self) -> str:
+            return self.orderId
+
+    def pick(records: list[T], predicate: Callable[[T], bool]) -> list[T]:
+        if not callable(predicate):
+            raise TypeError("predicate must be callable")
+        return [record for record in records if predicate(record)]
+
+    orders = Repository[OrderRecord]()
+    orders.add(OrderRecord("A-100", 48_000, "paid"))
+    orders.add(OrderRecord("A-101", 0, "draft"))
+
+    paidOrders = pick(orders.all(), lambda order: order.status == "paid")
+    fallback = OrderRecord("missing", 0, "missing")
+
+    assert [order.orderId for order in paidOrders] == ["A-100"]
+    assert orders.get("A-100").amount == 48_000
+    assert orders.get("not-found", fallback).status == "missing"
+  exercise:
+    prompt: '현업 흐름 검증: 타입 힌트로 주문 저장소 계약 표현하기 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
+    starterCode: |-
+      from typing import Callable, Generic, Protocol, TypeVar, overload
+
+      class HasKey(Protocol):
+          def key(self) -> str:
+              ...
+
+      T = TypeVar("T", bound=HasKey)
+
+      class Repository(Generic[T]):
+          def __init__(self) -> None:
+              self._items: dict[str, T] = {}
+
+          def add(self, item: T) -> None:
+              self._items[item.key()] = item
+
+          def all(self) -> list[T]:
+              return list(self._items.values())
+
+          @overload
+          def get(self, key: str) -> T | None:
+              ...
+
+          @overload
+          def get(self, key: str, default: T) -> T:
+              ...
+
+          def get(self, key: str, default: T | None = None) -> T | None:
+              return self._items.get(key, default)
+
+      class OrderRecord:
+          def __init__(self, orderId: str, amount: int, status: str) -> None:
+              self.orderId = orderId
+              self.amount = amount
+              self.status = status
+
+          def key(self) -> str:
+              return self.orderId
+
+      def pick(records: list[T], predicate: Callable[[T], bool]) -> list[T]:
+          if not callable(predicate):
+              raise TypeError("predicate must be callable")
+          return [record for record in records if predicate(record)]
+
+      orders = Repository[OrderRecord]()
+      orders.add(OrderRecord("A-100", 48_000, "paid"))
+      orders.add(OrderRecord("A-101", 0, "draft"))
+
+      paidOrders = pick(orders.all(), lambda order: order.status == "paid")
+      fallback = OrderRecord("missing", 0, "missing")
+
+      assert [order.orderId for order in paidOrders] == ["A-100"]
+      assert orders.get("A-100").amount == 48_000
+      assert orders.get("not-found", fallback).status == "missing"
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: '현업 흐름 검증: 타입 힌트로 주문 저장소 계약 표현하기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 타입 힌트로 주문 저장소 계약 표현하기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+- id: practice
+  title: 종합 복습
+  structuredPrimary: true
+  subtitle: 타입 힌팅 심화 마스터하기
+  goal: 종합 복습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: Day 11에서 배운 고급 타입 힌팅을 난이도별로 복습합니다. Generic과 TypeVar로 타입을 파라미터화하고, Protocol로 구조적 서브타이핑을
+    구현하며, @overload로 정밀한 함수 시그니처를 정의합니다. Callable은 고차 함수의 타입을 표현하는 핵심 도구입니다. 🟢 기본 문제로 Generic, Protocol,
+    Callable의 기본 사용법을 익히고, 🟡 응용 문제로 bound TypeVar, Protocol 상속을 연습하세요. 🔴 심화 문제에서는 ParamSpec, TypeGuard,
+    재귀 타입 등 최신 타입 시스템을 다룹니다. 타입 힌팅은 IDE 지원, 버그 예방, 문서화 효과를 동시에 제공하므로 적극 활용하세요.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from typing import Generic, TypeVar
+
+    T = TypeVar('T')
+
+    class Container(Generic[T]):
+        def __init__(self, value: T):
+            self.value = value
+
+    Container(42).value, Container("hello").value
+  exercise:
+    prompt: 종합 복습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      from typing import Generic, TypeVar
+
+      T = TypeVar('T')
+
+      class Container(Generic[T]):
+          def __init__(self, value: T):
+              self.value = value
+
+      Container(42).value, Container("hello").value
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 11_advanced_typing-repository-contract-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - generic_class
+    - typevar
+    - protocol_typing
+    - workflow_validation
+    title: Generic 저장소와 Callable 필터로 주문 조회 계약 검증하기
+    subtitle: typed repository behavior
+    goal: 주문 record 목록과 status를 받아 Generic repository, Protocol key 계약, Callable 필터가 만든 결과를 반환한다.
+    why: 타입 힌트는 런타임을 대신하지 않으므로, 타입으로 표현한 계약과 실행 검증이 같은 규칙을 말하는지 확인해야 합니다.
+    explanation: run_typed_order_repository(records, status)를 완성해 key가 있는 record만 저장하고, status 필터와 overload get의 fallback
+      흐름을 검증하세요.
+    tips:
+    - Repository의 TypeVar는 key()를 가진 객체로 제한하세요.
+    - Callable이 아닌 predicate는 TypeError로 막아야 합니다.
+    exercise:
+      prompt: run_typed_order_repository(records, status)를 완성해 keys, pickedIds, fallbackStatus, predicateRejected를 반환하세요.
+      starterCode: |-
+        def run_typed_order_repository(records, status):
+            raise NotImplementedError
+      solution: |-
+        def run_typed_order_repository(records, status):
+            from typing import Callable, Generic, Protocol, TypeVar, overload
+
+            class HasKey(Protocol):
+                def key(self) -> str:
+                    ...
+
+            T = TypeVar("T", bound=HasKey)
+
+            class Repository(Generic[T]):
+                def __init__(self):
+                    self._items: dict[str, T] = {}
+
+                def add(self, item: T) -> None:
+                    self._items[item.key()] = item
+
+                def all(self) -> list[T]:
+                    return list(self._items.values())
+
+                @overload
+                def get(self, key: str) -> T | None:
+                    ...
+
+                @overload
+                def get(self, key: str, default: T) -> T:
+                    ...
+
+                def get(self, key: str, default: T | None = None) -> T | None:
+                    return self._items.get(key, default)
+
+            class OrderRecord:
+                def __init__(self, order_id: str, amount: int, status: str):
+                    self.order_id = order_id
+                    self.amount = amount
+                    self.status = status
+
+                def key(self) -> str:
+                    return self.order_id
+
+            def pick(items: list[T], predicate: Callable[[T], bool]) -> list[T]:
+                if not callable(predicate):
+                    raise TypeError("predicate must be callable")
+                return [item for item in items if predicate(item)]
+
+            repo = Repository[OrderRecord]()
+            for record in records:
+                repo.add(OrderRecord(record["orderId"], record["amount"], record["status"]))
+
+            picked = pick(repo.all(), lambda order: order.status == status)
+            fallback = OrderRecord("missing", 0, "missing")
+            predicate_rejected = False
+            try:
+                pick(repo.all(), "not-callable")
+            except TypeError:
+                predicate_rejected = True
+
+            return {
+                "keys": sorted(item.key() for item in repo.all()),
+                "pickedIds": [item.order_id for item in picked],
+                "fallbackStatus": repo.get("not-found", fallback).status,
+                "predicateRejected": predicate_rejected,
+            }
+      hints:
+      - TypeVar bound는 정적 힌트이고, 런타임에서는 key 호출 실패를 직접 보게 됩니다.
+      - '@overload 정의 뒤 실제 구현은 한 번만 작성합니다.'
+    check:
+      id: python.advanced.typing.repository-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.typing.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: run_typed_order_repository
+        cases:
+        - id: stores-and-filters-typed-records
+          arguments:
+          - value:
+            - orderId: A-100
+              amount: 48000
+              status: paid
+            - orderId: A-101
+              amount: 0
+              status: draft
+            - orderId: A-102
+              amount: 25000
+              status: paid
+          - value: paid
+          expectedReturn:
+            keys:
+            - A-100
+            - A-101
+            - A-102
+            pickedIds:
+            - A-100
+            - A-102
+            fallbackStatus: missing
+            predicateRejected: true
+        - id: rejects-record-without-key-field
+          arguments:
+          - value:
+            - amount: 1000
+              status: paid
+          - value: paid
+          expectedException: KeyError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 11_advanced_typing-renderable-pipeline-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - protocol_typing
+    - callable
+    - overload
+    title: Protocol과 Callable로 렌더링 파이프라인 계약 만들기
+    subtitle: structural rendering pipeline
+    goal: widget spec 목록을 받아 render 메서드를 가진 객체만 렌더링하고 transform Callable을 적용한 결과를 반환한다.
+    why: 전이 과제에서는 저장소 예시 밖에서 Protocol과 Callable을 조합해, 상속하지 않은 객체도 구조가 맞으면 파이프라인에 들어올 수 있음을 확인합니다.
+    explanation: render_widget_specs(specs, uppercase=False)를 완성해 Label과 Button 객체를 만들고, 모르는 kind는 ValueError로 거부하세요.
+    tips:
+    - runtime_checkable Protocol은 메서드 존재만 확인합니다.
+    - transform은 Callable로 받고, uppercase 옵션에 따라 다른 함수를 넣으세요.
+    exercise:
+      prompt: render_widget_specs(specs, uppercase=False)를 완성해 html, protocolChecks, count를 반환하세요.
+      starterCode: |-
+        def render_widget_specs(specs, uppercase=False):
+            raise NotImplementedError
+      solution: |-
+        def render_widget_specs(specs, uppercase=False):
+            from typing import Callable, Protocol, runtime_checkable
+
+            @runtime_checkable
+            class Renderable(Protocol):
+                def render(self) -> str:
+                    ...
+
+            class Label:
+                def __init__(self, text):
+                    self.text = text
+
+                def render(self) -> str:
+                    return f"<span>{self.text}</span>"
+
+            class Button:
+                def __init__(self, text):
+                    self.text = text
+
+                def render(self) -> str:
+                    return f"<button>{self.text}</button>"
+
+            def apply(items: list[Renderable], transform: Callable[[str], str]) -> list[str]:
+                if not callable(transform):
+                    raise TypeError("transform must be callable")
+                return [transform(item.render()) for item in items]
+
+            widgets = []
+            for spec in specs:
+                if spec["kind"] == "label":
+                    widgets.append(Label(spec["text"]))
+                elif spec["kind"] == "button":
+                    widgets.append(Button(spec["text"]))
+                else:
+                    raise ValueError("unknown widget kind")
+
+            transform = str.upper if uppercase else (lambda value: value)
+            return {
+                "html": apply(widgets, transform),
+                "protocolChecks": [isinstance(widget, Renderable) for widget in widgets],
+                "count": len(widgets),
+            }
+      hints:
+      - Label과 Button은 Renderable을 상속하지 않아도 render가 있으면 통과합니다.
+      - uppercase가 true면 transform 함수만 바꾸고 객체 모델은 유지하세요.
+    check:
+      id: python.advanced.typing.renderable-pipeline.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.typing.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: render_widget_specs
+        cases:
+        - id: renders-structural-protocol-objects
+          arguments:
+          - value:
+            - kind: label
+              text: Total
+            - kind: button
+              text: Save
+          - value: false
+          expectedReturn:
+            html:
+            - <span>Total</span>
+            - <button>Save</button>
+            protocolChecks:
+            - true
+            - true
+            count: 2
+        - id: applies-callable-transform
+          arguments:
+          - value:
+            - kind: label
+              text: Total
+          - value: true
+          expectedReturn:
+            html:
+            - <SPAN>TOTAL</SPAN>
+            protocolChecks:
+            - true
+            count: 1
+        - id: rejects-unknown-widget-kind
+          arguments:
+          - value:
+            - kind: input
+              text: Name
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 11_advanced_typing-tool-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 11_advanced_typing-renderable-pipeline-transfer
+    title: Generic, TypeVar, Protocol, overload, Callable 선택 기준 회상하기
+    subtitle: typing tool recall
+    goal: 목적 이름을 받아 적절한 typing 도구와 런타임 영향 여부를 반환한다.
+    why: 시간이 지나도 남아야 할 지식은 타입 도구 이름보다, 같은 타입 관계를 보존할지, 구조적 계약을 받을지, 함수 시그니처를 표현할지의 판단 기준입니다.
+    explanation: choose_typing_tool(goal)를 완성해 preserve-item-type, structural-contract, value-specific-return, function-parameter
+      목적별 도구를 고르세요.
+    tips:
+    - TypeVar는 입력과 출력의 타입 관계를 보존할 때 씁니다.
+    - overload는 타입 체커 힌트이며 실제 구현은 별도로 필요합니다.
+    exercise:
+      prompt: choose_typing_tool(goal)를 완성해 목적별 typing 도구 선택 결과를 반환하세요.
+      starterCode: |-
+        def choose_typing_tool(goal):
+            raise NotImplementedError
+      solution: |-
+        def choose_typing_tool(goal):
+            table = {
+                "preserve-item-type": {
+                    "tool": "TypeVar with Generic",
+                    "runtimeEffect": False,
+                    "useWhen": "container or function returns the same logical item type",
+                },
+                "structural-contract": {
+                    "tool": "Protocol",
+                    "runtimeEffect": False,
+                    "useWhen": "object only needs required attributes or methods",
+                },
+                "value-specific-return": {
+                    "tool": "overload",
+                    "runtimeEffect": False,
+                    "useWhen": "return type changes by argument type or literal value",
+                },
+                "function-parameter": {
+                    "tool": "Callable",
+                    "runtimeEffect": False,
+                    "useWhen": "a function accepts another callable",
+                },
+            }
+            if goal not in table:
+                raise ValueError("unknown typing goal")
+            return table[goal]
+      hints:
+      - 대부분의 typing 도구는 런타임 검증을 자동으로 제공하지 않습니다.
+      - Protocol도 runtime_checkable 없이는 isinstance에 사용할 수 없습니다.
+    check:
+      id: python.advanced.typing.tool-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.typing.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_typing_tool
+        cases:
+        - id: recalls-typevar-for-preserved-item-type
+          arguments:
+          - value: preserve-item-type
+          expectedReturn:
+            tool: TypeVar with Generic
+            runtimeEffect: false
+            useWhen: container or function returns the same logical item type
+        - id: recalls-protocol-for-structural-contract
+          arguments:
+          - value: structural-contract
+          expectedReturn:
+            tool: Protocol
+            runtimeEffect: false
+            useWhen: object only needs required attributes or methods
+        - id: rejects-unknown-goal
+          arguments:
+          - value: enforce-runtime-schema
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending
+`;export{e as default};

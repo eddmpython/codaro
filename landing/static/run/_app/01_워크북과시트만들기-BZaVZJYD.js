@@ -1,0 +1,700 @@
+var e=`meta:
+  id: openpyxl_01
+  title: 워크북과 시트 만들기
+  order: 1
+  category: openpyxl
+  difficulty: ⭐
+  badge: 입문
+  packages:
+  - openpyxl
+  tags:
+  - openpyxl
+  - Workbook
+  - Worksheet
+  - 파일저장
+  - 검증
+  seo:
+    title: openpyxl 워크북과 시트 만들기 - 다중 시트 파일 생성
+    description: Workbook과 Worksheet 객체로 시트를 만들고 이름을 바꾸고 저장한 뒤 load_workbook으로 다시 열어 구조를 검증합니다.
+    keywords:
+    - openpyxl Workbook
+    - create_sheet
+    - load_workbook
+    - 시트 이름 변경
+intro:
+  direction: 워크북을 만들고 시트를 추가·정렬·삭제한 뒤 .xlsx 파일로 저장하고, 다시 열어 시트 구조를 코드로 검증합니다.
+  benefits:
+  - Workbook · Worksheet · save · load의 4박자를 자동화의 출발점으로 익힙니다.
+  - 기본 시트(Sheet)를 그대로 두지 않고 명시적인 이름을 부여하는 습관을 만듭니다.
+  - 결과 파일을 load_workbook으로 다시 열어 시트 이름 목록을 assert로 확인합니다.
+  diagram:
+    steps:
+    - label: Workbook 생성
+      detail: 비어 있는 워크북을 메모리에 만든다.
+    - label: 시트 구성
+      detail: active 시트의 이름을 바꾸고 create_sheet로 추가한다.
+    - label: 저장
+      detail: TemporaryDirectory 안의 경로로 save 한다.
+    - label: 다시 열어 검증
+      detail: load_workbook으로 열어 sheetnames를 비교한다.
+    runtime:
+    - label: openpyxl 패키지 준비
+      detail: uv run python으로 openpyxl만 import해도 워크북·시트 생성이 모두 동작한다.
+    - label: 임시 디렉터리 저장과 재오픈
+      detail: TemporaryDirectory 안의 .xlsx 경로에 save 후 load_workbook으로 다시 열어 sheetnames를 assert로 확인한다.
+sections:
+- id: step1_create_workbook
+  title: 1단계. 빈 워크북 만들기
+  structuredPrimary: true
+  subtitle: Workbook() 호출
+  goal: Workbook을 만들고 active 시트의 기본값을 직접 눈으로 확인한다.
+  why: 새 워크북은 항상 "Sheet" 라는 익명 시트 하나로 시작합니다. 이 사실을 알지 못하면 빈 시트가 남는 보고서가 만들어집니다.
+  explanation: |-
+    \`Workbook()\`은 메모리에 새 .xlsx 구조를 만듭니다. 이 시점에는 디스크 파일이 없습니다. \`workbook.active\`는 처음 만들어진 기본 시트(Worksheet) 객체를 돌려주고, 기본 이름은 "Sheet"입니다. \`workbook.sheetnames\`는 현재 들어 있는 시트 이름의 리스트입니다.
+  tips:
+  - workbook.active와 workbook['Sheet']는 같은 객체입니다. 같은 시트를 두 변수로 잡을 뿐, 시트가 두 개 생기지 않습니다.
+  snippet: |-
+    from openpyxl import Workbook
+
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title, workbook.sheetnames
+  exercise:
+    prompt: workbook.active.title을 "raw"로 바꾼 뒤, sheetnames가 ["raw"]가 되는지 확인하세요.
+    starterCode: |-
+      from openpyxl import Workbook
+
+      workbook = Workbook()
+      sheet = workbook.active
+      sheet.title = ___
+      workbook.sheetnames
+    hints:
+    - sheet.title은 그냥 문자열 속성입니다. 대입하면 즉시 sheetnames에 반영됩니다.
+  check:
+    noError: Workbook() 호출과 sheet.title 대입이 ImportError/AttributeError 없이 실행되어야 합니다.
+    resultCheck: sheet.title을 바꾼 뒤 workbook.sheetnames가 바뀐 이름 리스트와 같아야 합니다.
+- id: step2_add_sheets
+  title: 2단계. 시트 추가하기
+  structuredPrimary: true
+  subtitle: create_sheet(title, index)
+  goal: create_sheet의 title과 index 파라미터로 시트 순서를 제어한다.
+  why: 보고서는 시트 순서가 의미를 갖습니다. summary가 첫 번째인지 마지막인지에 따라 사용자 경험이 완전히 달라집니다.
+  explanation: |-
+    \`create_sheet(title=...)\`는 새 워크시트를 끝에 추가합니다. \`index=0\`을 주면 맨 앞에 끼워 넣을 수 있습니다. 음수 인덱스도 동작합니다(\`index=-1\`은 마지막). 만든 시트는 반환값으로 받아 변수에 묶어 두면 이후에 셀을 채울 때 편합니다.
+  tips:
+  - 같은 이름의 시트를 두 번 만들면 openpyxl이 자동으로 뒤에 "1", "2" 같은 숫자를 붙입니다. 의도와 다르게 시트가 늘면 이 동작을 의심하세요.
+  snippet: |-
+    from openpyxl import Workbook
+
+    book = Workbook()
+    book.active.title = "summary"
+    detail = book.create_sheet(title="detail")
+    raw = book.create_sheet(title="raw", index=0)
+    book.sheetnames
+  exercise:
+    prompt: raw 시트를 가장 마지막으로 옮기려면 index를 어떻게 줘야 할지 직접 바꿔 확인하세요.
+    starterCode: |-
+      from openpyxl import Workbook
+
+      book = Workbook()
+      book.active.title = "summary"
+      detail = book.create_sheet(title="detail")
+      raw = book.create_sheet(title="raw", index=___)
+      book.sheetnames
+    hints:
+    - index를 생략하면 끝에 추가됩니다. 0이면 맨 앞입니다. 의도하는 위치의 정수 인덱스를 적어 보세요.
+  check:
+    noError: create_sheet 호출에 사용된 index 값이 정수 또는 None이어야 합니다.
+    resultCheck: book.sheetnames의 raw 위치가 바꾼 index 의도와 맞아야 합니다.
+- id: step3_remove_sheet
+  title: 3단계. 시트 삭제하기
+  structuredPrimary: true
+  subtitle: del workbook[title]
+  goal: 불필요한 기본 "Sheet"를 정리해 빈 시트가 남지 않게 한다.
+  why: pandas나 다른 도구가 만든 임시 시트가 결과 파일에 그대로 남으면, 사용자가 받는 보고서가 어지러워집니다.
+  explanation: |-
+    시트는 \`del book[title]\` 또는 \`book.remove(book[title])\`로 지웁니다. 두 방식은 같은 결과를 만듭니다. 시트가 하나도 없는 상태로 저장하면 파일이 열리지 않으므로, 삭제 전후 \`sheetnames\`로 한 번 더 확인하는 습관을 가집시다.
+  tips:
+  - 시트 객체를 변수로 잡고 있을 때 del로 시트를 삭제하면 그 변수는 더 이상 워크북 안의 시트가 아니라 "고아 객체"가 됩니다. 다시 쓰지 마세요.
+  snippet: |-
+    from openpyxl import Workbook
+
+    book = Workbook()
+    book.create_sheet("summary", 0)
+    del book["Sheet"]
+    book.sheetnames
+  exercise:
+    prompt: del 대신 book.remove(book["Sheet"])로 같은 동작을 만들고 결과가 같은지 확인하세요.
+    starterCode: |-
+      from openpyxl import Workbook
+
+      book = Workbook()
+      book.create_sheet("summary", 0)
+      book.remove(book[___])
+      book.sheetnames
+    hints:
+    - 삭제 대상 시트의 이름을 문자열로 전달하면 됩니다. del과 결과가 같아야 합니다.
+  check:
+    noError: 삭제 대상 시트가 sheetnames에 존재해야 KeyError가 나지 않습니다.
+    resultCheck: 삭제 후 sheetnames에 "Sheet"가 없어야 합니다.
+- id: step4_save_and_load
+  title: 4단계. 저장하고 다시 열어 검증하기
+  structuredPrimary: true
+  subtitle: save와 load_workbook
+  goal: 저장한 .xlsx 파일을 다시 열어 시트 구조가 코드의 의도와 일치하는지 자동으로 확인한다.
+  why: 파일 저장은 성공해도 안의 구조가 비어 있을 수 있습니다. 결과를 다시 열어 보지 않으면 자동화는 신뢰하기 어렵습니다.
+  explanation: |-
+    \`workbook.save(path)\`는 .xlsx를 디스크에 씁니다. \`load_workbook(path)\`은 그 파일을 다시 메모리로 읽습니다. 임시 디렉터리(\`TemporaryDirectory\`)를 쓰면 로컬 파일을 어지럽히지 않고도 같은 흐름을 재현할 수 있습니다.
+  tips:
+  - load_workbook의 sheetnames와 저장 직전 sheetnames를 비교하면 시트 구조가 손상 없이 보존됐는지 한 번에 확인됩니다.
+  snippet: |-
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    from openpyxl import Workbook, load_workbook
+
+    workdir = TemporaryDirectory()
+    target = Path(workdir.name) / "report.xlsx"
+
+    book = Workbook()
+    book.active.title = "summary"
+    book.create_sheet("detail")
+    book.save(target)
+
+    reopened = load_workbook(target)
+    reopened.sheetnames
+  exercise:
+    prompt: detail 시트 뒤에 "raw"를 더 추가해 저장하고, reopened.sheetnames가 길이 3인지 assert로 확인하세요.
+    starterCode: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from openpyxl import Workbook, load_workbook
+
+      workdir = TemporaryDirectory()
+      target = Path(workdir.name) / "report.xlsx"
+
+      book = Workbook()
+      book.active.title = "summary"
+      book.create_sheet("detail")
+      book.create_sheet(___)
+      book.save(target)
+
+      reopened = load_workbook(target)
+      assert len(reopened.sheetnames) == ___
+      reopened.sheetnames
+    hints:
+    - create_sheet의 첫 인자는 시트 이름 문자열입니다. assert의 숫자는 시트 개수와 같아야 합니다.
+  check:
+    noError: save와 load_workbook 사이에 경로 문자열이 동일해야 FileNotFoundError가 나지 않습니다.
+    resultCheck: reopened.sheetnames의 길이와 내용이 저장 직전 의도와 일치해야 합니다.
+- id: step5_default_sheet_pitfall
+  title: 5단계. 자주 만나는 함정 - 빈 기본 시트
+  structuredPrimary: true
+  subtitle: 기본 "Sheet"가 보고서에 남는 문제
+  goal: 빈 기본 시트를 명시적으로 정리하지 않으면 보고서에 의도치 않은 시트가 남는다는 것을 직접 확인한다.
+  why: 실무 보고서에서 "Sheet1"이 결과 파일에 끼어 있으면 신뢰도가 즉시 떨어집니다. 빈 시트는 코드가 의도적으로 지워야 합니다.
+  explanation: |-
+    Workbook()이 만든 기본 시트의 이름을 명시적으로 바꾸지 않으면 보고서에 "Sheet"라는 의미 없는 탭이 그대로 남습니다. 깔끔한 자동화의 첫 번째 규칙은 "익명 시트를 절대 저장하지 않는다"입니다.
+  tips:
+  - 패턴화하세요. (1) Workbook() (2) active.title을 의미 있는 이름으로 변경 (3) 필요 시트 추가 (4) 저장.
+  snippet: |-
+    from openpyxl import Workbook
+
+    bad = Workbook()
+    bad.create_sheet("summary")
+    bad.create_sheet("detail")
+    assert "Sheet" in bad.sheetnames
+    bad.sheetnames
+  exercise:
+    prompt: 'Sheet 이름이 sheetnames 리스트에 절대 들어가지 않도록 코드를 한 줄 추가하세요.'
+    starterCode: |-
+      from openpyxl import Workbook
+
+      good = Workbook()
+      good.active.title = ___
+      good.create_sheet("detail")
+      assert "Sheet" not in good.sheetnames
+      good.sheetnames
+    hints:
+    - active.title을 의미 있는 이름("summary" 등)으로 즉시 덮어쓰면 됩니다.
+  check:
+    noError: active.title 대입이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 최종 sheetnames에 "Sheet"가 없어야 assert를 통과합니다.
+- id: validation
+  title: 6단계. 검증 루프 - 보고서 구조 계약
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 검증
+  goal: 보고서 양식을 생성하는 함수가 "summary/detail/raw 3시트로 시작한다"는 계약을 깨지 않는지 자동 검증한다.
+  why: 자동화는 함수 단위로 책임을 묶고, 그 함수가 만든 산출물의 구조를 코드로 확인할 때 비로소 재사용 가능해집니다.
+  explanation: |-
+    \`buildReportSkeleton\`은 빈 보고서 양식을 만드는 함수입니다. 시트 이름과 순서를 계약으로 고정하고, 그 계약을 함수 안에서 직접 assert로 확인합니다. 호출 측에서도 한 번 더 확인합니다. 같은 검증을 두 번 하는 것은 비용이 아니라 안전망입니다.
+  tips:
+  - 계약을 깨고 싶으면 expectedSheets 리스트의 순서를 바꿔 보세요. 어디서 실패가 나는지가 자동 검증의 가치입니다.
+  snippet: |-
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    from openpyxl import Workbook, load_workbook
+
+    def buildReportSkeleton(path):
+        book = Workbook()
+        book.active.title = "summary"
+        book.create_sheet("detail")
+        book.create_sheet("raw")
+        expectedSheets = ["summary", "detail", "raw"]
+        assert book.sheetnames == expectedSheets, book.sheetnames
+        book.save(path)
+        return path
+
+    workdir = TemporaryDirectory()
+    skeletonPath = buildReportSkeleton(Path(workdir.name) / "skeleton.xlsx")
+    reopened = load_workbook(skeletonPath)
+    assert reopened.sheetnames == ["summary", "detail", "raw"]
+    reopened.sheetnames
+  exercise:
+    prompt: expectedSheets의 순서를 ["raw", "detail", "summary"]로 바꾸고, assert가 실패하는지 직접 확인하세요.
+    starterCode: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from openpyxl import Workbook, load_workbook
+
+      def buildReportSkeleton(path):
+          book = Workbook()
+          book.active.title = "summary"
+          book.create_sheet("detail")
+          book.create_sheet("raw")
+          expectedSheets = ___
+          assert book.sheetnames == expectedSheets, book.sheetnames
+          book.save(path)
+          return path
+
+      workdir = TemporaryDirectory()
+      skeletonPath = buildReportSkeleton(Path(workdir.name) / "skeleton.xlsx")
+      reopened = load_workbook(skeletonPath)
+      reopened.sheetnames
+    hints:
+    - assert가 실패하면 책임 라인이 어디인지 즉시 보입니다. 그 다음 의도한 순서로 다시 맞추세요.
+  check:
+    noError: buildReportSkeleton 호출이 ValueError 없이 끝나야 합니다.
+    resultCheck: reopened.sheetnames가 ["summary", "detail", "raw"]과 같아야 합니다.
+- id: practice
+  title: 실습 - 종합 미션 2개
+  structuredPrimary: true
+  subtitle: import부터 검증까지 독립 실행
+  goal: 워크북 생성·시트 구성·저장·재오픈 검증의 4박자를 두 가지 실무 시나리오에 직접 적용한다.
+  why: 단계 별 작은 변경 너머, 처음부터 끝까지 직접 만들어 봐야 자동화 함수로 응축됩니다.
+  explanation: |-
+    아래 두 미션은 모두 import부터 검증까지 독립 실행 가능합니다. 미션1은 이번 강의 핵심(시트 생성·순서·삭제) 단독 적용, 미션2는 이름 정제·재오픈 비교까지 결합합니다.
+  tips:
+  - 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  - 미션 간 변수가 겹치지 않도록 각각 다른 변수명(\`q*\`, \`team*\`)을 사용했습니다.
+  snippet: |-
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    from openpyxl import Workbook, load_workbook
+  exercise:
+    prompt: 아래 두 미션의 expansion 블록을 펼치기 전에 직접 작성해 본 뒤 정답과 비교하세요.
+    starterCode: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from openpyxl import Workbook, load_workbook
+
+      workdir = TemporaryDirectory()
+      target = Path(workdir.name) / "mission.xlsx"
+      ___
+    hints:
+    - 미션1은 Q1~Q4 + raw 5시트, 미션2는 부서명 5개 시트입니다.
+    - 모든 저장 후 load_workbook으로 다시 열어 sheetnames를 assert로 비교하세요.
+  check:
+    noError: 두 미션의 save와 load_workbook 경로가 일치해야 합니다.
+    resultCheck: 재오픈한 워크북의 sheetnames가 의도한 순서와 같아야 합니다.
+  blocks:
+  - type: tip
+    content: 각 미션은 import부터 시작합니다. 변수명은 미션 간 겹치지 않게 prefix를 다르게 두었습니다.
+  - type: expansion
+    title: "미션1: 분기별 보고서 양식 (Q1~Q4 + raw 5시트)"
+    blocks:
+    - type: code
+      title: 양식 생성과 시트 순서
+      content: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from openpyxl import Workbook, load_workbook
+
+        qDir = TemporaryDirectory()
+        qPath = Path(qDir.name) / "quarterly.xlsx"
+
+        qBook = Workbook()
+        qBook.active.title = "Q1"
+        for label in ["Q2", "Q3", "Q4"]:
+            qBook.create_sheet(label)
+        qBook.create_sheet("raw", 0)
+        qBook.save(qPath)
+        qBook.sheetnames
+    - type: code
+      title: 재오픈 검증
+      content: |-
+        qReopen = load_workbook(qPath)
+        expectedQ = ["raw", "Q1", "Q2", "Q3", "Q4"]
+        assert qReopen.sheetnames == expectedQ
+        qReopen.sheetnames
+  - type: expansion
+    title: "미션2: 영업팀 5개 부서 양식 + 빈 기본 시트 제거"
+    blocks:
+    - type: code
+      title: 부서 이름 정제 후 시트 생성
+      content: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from openpyxl import Workbook, load_workbook
+
+        teamDir = TemporaryDirectory()
+        teamPath = Path(teamDir.name) / "teams.xlsx"
+        rawTeams = ["서울 1팀", "서울 2팀", "부산팀", "대구팀", "광주팀"]
+        cleanTeams = [name.replace(" ", "_") for name in rawTeams]
+
+        teamBook = Workbook()
+        teamBook.active.title = cleanTeams[0]
+        for name in cleanTeams[1:]:
+            teamBook.create_sheet(name)
+        assert "Sheet" not in teamBook.sheetnames
+        teamBook.save(teamPath)
+        teamBook.sheetnames
+    - type: code
+      title: 재오픈 후 부서 이름 검증
+      content: |-
+        teamReopen = load_workbook(teamPath)
+        assert teamReopen.sheetnames == cleanTeams
+        assert len(teamReopen.sheetnames) == 5
+        teamReopen.sheetnames
+- id: summary
+  title: 정리
+  subtitle: 보고서의 뼈대를 코드로
+  blocks:
+  - type: text
+    content: |-
+      이번 강의에서 Workbook → 시트 정리 → 저장 → 재오픈 검증의 4단계 흐름을 완주했습니다. 모든 자동 보고서는 이 흐름 위에 셀, 수식, 차트가 얹힙니다.
+  - type: list
+    style: bullet
+    items:
+    - Workbook() - 메모리에 빈 .xlsx 구조 생성
+    - workbook.active.title - 기본 시트 이름을 즉시 바꿔 "Sheet" 잔재 제거
+    - create_sheet(title, index) - 시트 순서까지 의도적으로 제어
+    - save(path) / load_workbook(path) - 저장과 재오픈을 짝으로 사용
+    - 시트 이름 리스트(sheetnames)는 보고서의 계약이고, assert로 잠가 둔다
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: openpyxl_01-sheet-plan-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_create_workbook
+    - summary
+    title: 워크북 sheet 이름·순서·visibility·active 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 중복·금지 문자·숨김-only workbook을 차단한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - sheet 이름의 Excel 제한과 전역 유일성을 저장 전에 검사하세요.
+    - 최소 한 sheet는 visible이어야 하며 active sheet도 visible이어야 합니다.
+    exercise:
+      prompt: audit_sheet_plan(sheets, active_sheet)를 완성하세요.
+      starterCode: |-
+        def audit_sheet_plan(sheets, active_sheet):
+            raise NotImplementedError
+      solution: |
+        def audit_sheet_plan(sheets, active_sheet):
+            failures = []
+            names = [sheet["name"] for sheet in sheets]
+            duplicates = sorted({name for name in names if names.count(name) > 1})
+            invalid = sorted(name for name in names if not name or len(name) > 31 or any(character in name for character in "[]:*?/\\\\"))
+            visible = [sheet["name"] for sheet in sheets if sheet.get("visibility", "visible") == "visible"]
+            if duplicates:
+                failures.append("duplicates")
+            if invalid:
+                failures.append("names")
+            if not visible:
+                failures.append("visibility")
+            if active_sheet not in visible:
+                failures.append("active")
+            return {"accepted": not failures, "failures": failures, "duplicates": duplicates, "invalidNames": invalid, "visibleSheets": visible}
+      hints: *id001
+    check:
+      id: python.openpyxl.openpyxl_01.sheet-plan-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_01.sheet-plan-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_sheet_plan
+        cases:
+        - id: accepts-visible-ordered-sheets
+          arguments:
+          - value:
+            - name: Raw
+              visibility: visible
+            - name: Summary
+              visibility: visible
+          - value: Summary
+          expectedReturn:
+            accepted: true
+            failures: []
+            duplicates: []
+            invalidNames: []
+            visibleSheets:
+            - Raw
+            - Summary
+        - id: reports-duplicates-and-hidden-active
+          arguments:
+          - value:
+            - name: Data
+              visibility: hidden
+            - name: Data
+              visibility: hidden
+          - value: Data
+          expectedReturn:
+            accepted: false
+            failures:
+            - duplicates
+            - visibility
+            - active
+            duplicates:
+            - Data
+            invalidNames: []
+            visibleSheets: []
+        - id: reports-invalid-sheet-name
+          arguments:
+          - value:
+            - name: Bad/Name
+              visibility: visible
+          - value: Bad/Name
+          expectedReturn:
+            accepted: false
+            failures:
+            - names
+            duplicates: []
+            invalidNames:
+            - Bad/Name
+            visibleSheets:
+            - Bad/Name
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: openpyxl_01-sheet-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - openpyxl_01-sheet-plan-audit-mastery
+    title: 새 workbook의 실제 sheet 구조 reconciliation 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 계획한 이름·순서·visibility와 재개방 결과를 대조한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - sheet 집합만 보지 말고 순서와 visibility를 함께 대조하세요.
+    - 재개방한 workbook의 active sheet도 계획과 비교하세요.
+    exercise:
+      prompt: reconcile_sheet_result(planned, observed, planned_active, observed_active)를 완성하세요.
+      starterCode: |-
+        def reconcile_sheet_result(planned, observed, planned_active, observed_active):
+            raise NotImplementedError
+      solution: |
+        def reconcile_sheet_result(planned, observed, planned_active, observed_active):
+            failures = []
+            planned_names = [item["name"] for item in planned]
+            observed_names = [item["name"] for item in observed]
+            if planned_names != observed_names:
+                failures.append("order")
+            planned_visibility = {item["name"]: item.get("visibility", "visible") for item in planned}
+            observed_visibility = {item["name"]: item.get("visibility", "visible") for item in observed}
+            visibility_mismatch = sorted(name for name in set(planned_visibility) & set(observed_visibility) if planned_visibility[name] != observed_visibility[name])
+            if visibility_mismatch:
+                failures.append("visibility")
+            if planned_active != observed_active:
+                failures.append("active")
+            return {"passed": not failures, "failures": failures, "plannedNames": planned_names, "observedNames": observed_names, "visibilityMismatch": visibility_mismatch}
+      hints: *id002
+    check:
+      id: python.openpyxl.openpyxl_01.sheet-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_01.sheet-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_sheet_result
+        cases:
+        - id: accepts-exact-reopened-structure
+          arguments:
+          - value:
+            - name: Raw
+            - name: Summary
+          - value:
+            - name: Raw
+            - name: Summary
+          - value: Summary
+          - value: Summary
+          expectedReturn:
+            passed: true
+            failures: []
+            plannedNames:
+            - Raw
+            - Summary
+            observedNames:
+            - Raw
+            - Summary
+            visibilityMismatch: []
+        - id: reports-order-and-active
+          arguments:
+          - value:
+            - name: Raw
+            - name: Summary
+          - value:
+            - name: Summary
+            - name: Raw
+          - value: Summary
+          - value: Raw
+          expectedReturn:
+            passed: false
+            failures:
+            - order
+            - active
+            plannedNames:
+            - Raw
+            - Summary
+            observedNames:
+            - Summary
+            - Raw
+            visibilityMismatch: []
+        - id: reports-visibility-mismatch
+          arguments:
+          - value:
+            - name: Data
+              visibility: hidden
+          - value:
+            - name: Data
+              visibility: visible
+          - value: Data
+          - value: Data
+          expectedReturn:
+            passed: false
+            failures:
+            - visibility
+            plannedNames:
+            - Data
+            observedNames:
+            - Data
+            visibilityMismatch:
+            - Data
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: openpyxl_01-sheet-structure-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - openpyxl_01-sheet-result-reconciliation-transfer
+    title: 워크북 sheet 구조 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 이름·순서·visibility·active evidence를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Workbook 저장 성공과 업무 값·수식·표시의 정확성을 분리해 검증하세요.
+    - Web에서는 문서 계약을 검증하고 Local에서는 재개방한 artifact evidence를 남기세요.
+    exercise:
+      prompt: choose_sheet_structure(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_sheet_structure(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_sheet_structure(situation):
+            table = {'name': {'action': 'validate Excel constraints and uniqueness', 'evidence': 'ordered sheet names', 'risk': 'invalid or duplicate name'}, 'visibility': {'action': 'keep at least one visible sheet', 'evidence': 'visibility map', 'risk': 'unopenable workbook'}, 'reopen': {'action': 'reconcile observed order and active', 'evidence': 'reopened workbook structure', 'risk': 'save drift'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.openpyxl.openpyxl_01.sheet-structure-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_01.sheet-structure-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_sheet_structure
+        cases:
+        - id: recalls-name
+          arguments:
+          - value: name
+          expectedReturn:
+            action: validate Excel constraints and uniqueness
+            evidence: ordered sheet names
+            risk: invalid or duplicate name
+        - id: recalls-visibility
+          arguments:
+          - value: visibility
+          expectedReturn:
+            action: keep at least one visible sheet
+            evidence: visibility map
+            risk: unopenable workbook
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

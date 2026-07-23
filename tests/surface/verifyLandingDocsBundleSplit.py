@@ -133,10 +133,12 @@ def verifyLandingHomeProductSeo() -> dict[str, Any]:
         (
             "landing/src/pages/home.jsx",
             (
-                "Windows 로컬 앱 다운로드",
-                "브라우저에서 시작",
+                "웹에서 바로 학습",
+                "Windows Local 받기",
                 "brand.launcherDownloadUrl",
-                "releaseLinks",
+                "homeHeroWorkbench",
+                "homeRuntimeBand",
+                "brand.releaseUrl",
             ),
         ),
         (
@@ -176,7 +178,9 @@ def verifyLandingHomeProductSeo() -> dict[str, Any]:
                 ".homeShell",
                 ".homeProductHero",
                 ".homeHeroActions",
-                ".homeReleaseLinks",
+                ".homeHeroWorkbench",
+                ".homeProofLoop",
+                ".homeTrustBand",
             ),
         ),
         (

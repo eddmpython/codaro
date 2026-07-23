@@ -1,0 +1,608 @@
+var e=`meta:
+  packages:
+  - sympy
+  id: sympy_05
+  title: 적분기초
+  order: 5
+  category: sympy
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - sympy
+  - integrate
+  - 적분
+  - 정적분
+  - 부정적분
+  - 넓이
+  seo:
+    title: SymPy 적분 - integrate 사용법과 넓이 계산
+    description: SymPy로 부정적분과 정적분을 계산합니다. integrate()로 넓이와 부피를 구하는 방법을 배웁니다.
+    keywords:
+    - sympy
+    - integrate
+    - 적분
+    - 정적분
+    - 부정적분
+    - 넓이
+intro:
+  emoji: 📊
+  goal: integrate()로 부정적분과 정적분을 계산하고 넓이를 구합니다.
+  description: 적분은 미분의 역연산이자 '누적'의 개념입니다. 속도를 적분하면 이동거리, 밀도를 적분하면 질량이 됩니다. 부정적분은 미분하면 원래 함수가 되는 원시함수를
+    찾고, 정적분은 곡선 아래의 넓이를 정확하게 계산합니다. 손으로 적분하면 치환, 부분적분 등 복잡한 기법을 적용해야 하지만, SymPy의 integrate()는 이 모든 과정을
+    자동으로 처리합니다. 이 프로젝트를 완료하면 넓이, 부피, 두 곡선 사이 넓이까지 구할 수 있게 됩니다.
+  direction: 적분기초에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 수식과 기호 확인 후 기호 계산에 맞는 코드 입력을 고릅니다.
+  - 적분기초 결과를 간소화식, 해, 미분/적분 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 수학 계산 검증 루틴에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(수식과 기호)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 부정적분 처리 실행
+      detail: 기호 계산 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 거듭제곱 적분 결과 검증
+      detail: 간소화식, 해, 미분/적분 결과 기준으로 실행 결과를 비교합니다.
+    - label: 적분기초 재사용
+      detail: 완성 코드를 수학 계산 검증 루틴에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기호 계산 환경
+      detail: sympy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 적분기초 실행
+      detail: 셀을 실행해 간소화식, 해, 미분/적분 결과와 예외 상태를 확인합니다.
+    - label: 적분기초 완료
+      detail: 검증된 코드를 수학 계산 검증 루틴로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 적분에 필요한 함수들을 불러옵니다. integrate()가 핵심 함수이며, diff()로 적분 결과를 검증할 수 있습니다. oo는 무한대(infinity)를
+    나타내며 이상적분에 사용합니다. Rational은 분수 계수를 정확하게 표현합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from sympy import symbols, integrate, diff, simplify, expand
+    from sympy import sin, cos, exp, log, sqrt, pi, oo, Rational
+    from sympy import init_printing
+    init_printing()
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from sympy import symbols, integrate, diff, simplify, expand
+      from sympy import sin, cos, exp, log, sqrt, pi, oo, Rational
+      from sympy import init_printing
+      init_printing()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 1단계. 라이브러리 불러오기의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step2_indefinite
+  title: 2단계. 부정적분
+  structuredPrimary: true
+  subtitle: 원시함수 찾기
+  goal: 2단계. 부정적분에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    부정적분(indefinite integral)은 미분하면 원래 함수가 되는 원시함수(antiderivative)를 찾습니다. ∫x²dx = x³/3 + C인데, SymPy는 적분상수 C를 생략합니다. 적분 결과를 미분하면 원래 함수가 되어야 하므로, diff(F, x) == f인지 확인하면 검증할 수 있습니다. 부정적분은 정적분의 기초가 됩니다.
+
+    ∫xⁿdx = xⁿ⁺¹/(n+1)입니다. x²을 적분하면 x³/3이 됩니다. 적분상수 +C는 SymPy에서 생략합니다.
+  snippet: x = symbols('x')
+  exercise:
+    prompt: 2단계. 부정적분 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: x = symbols('x')
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 2단계. 부정적분의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 부정적분 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step3_power
+  title: 3단계. 거듭제곱 적분
+  structuredPrimary: true
+  subtitle: 다항식
+  goal: 3단계. 거듭제곱 적분에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 거듭제곱 함수 xⁿ의 적분은 xⁿ⁺¹/(n+1)입니다(n≠-1). 다항식은 각 항을 따로 적분하고 더합니다. 3x² + 2x + 1을 적분하면 x³ + x²
+    + x가 됩니다. 음의 거듭제곱 1/x²도 같은 규칙으로 -1/x가 됩니다. 제곱근 √x = x^(1/2)도 (2/3)x^(3/2)로 적분됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    poly = 3*x**2 + 2*x + 1
+    ipoly = integrate(poly, x)
+    ipoly
+  exercise:
+    prompt: 3단계. 거듭제곱 적분 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      poly = 3*x**2 + 2*x + 1
+      ipoly = integrate(poly, x)
+      ipoly
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 3단계. 거듭제곱 적분의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 거듭제곱 적분 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step4_special
+  title: 4단계. 특수 함수 적분
+  structuredPrimary: true
+  subtitle: sin, cos, exp, 1/x
+  goal: 4단계. 특수 함수 적분에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    삼각함수와 지수함수의 적분은 미분의 역과정입니다. ∫sin(x)dx = -cos(x), ∫cos(x)dx = sin(x)입니다(미분의 부호가 바뀝니다). ∫eˣdx = eˣ로 지수함수는 자기 자신이 적분입니다. ∫(1/x)dx = ln|x|로 역수의 적분은 자연로그가 됩니다. 이 공식들은 미분 공식과 쌍을 이루어 암기해야 합니다.
+
+    ∫sin x dx = -cos x, ∫cos x dx = sin x, ∫eˣdx = eˣ, ∫(1/x)dx = ln|x|입니다. 미분의 역입니다.
+  snippet: |-
+    isin = integrate(sin(x), x)
+    icos = integrate(cos(x), x)
+    isin, icos
+  exercise:
+    prompt: 4단계. 특수 함수 적분 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      isin = integrate(sin(x), x)
+      icos = integrate(cos(x), x)
+      isin, icos
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 4단계. 특수 함수 적분의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 특수 함수 적분 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step5_definite
+  title: 5단계. 정적분
+  structuredPrimary: true
+  subtitle: 구간 적분
+  goal: 5단계. 정적분에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    정적분(definite integral)은 구간 [a, b]에서 곡선 아래의 넓이를 계산합니다. integrate(f, (x, a, b))로 구간을 지정합니다. 미적분학의 기본 정리에 따라 ∫[a,b]f(x)dx = F(b) - F(a)입니다. 물리학에서 속도를 시간에 대해 정적분하면 이동거리, 힘을 거리에 대해 정적분하면 일(work)이 됩니다.
+
+    정적분 ∫[a,b] f(x)dx = F(b) - F(a)입니다. integrate(f, (x, a, b))로 계산합니다. 결과는 수치입니다.
+  snippet: |-
+    dint = integrate(x**2, (x, 0, 1))
+    dint
+  exercise:
+    prompt: 5단계. 정적분 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      dint = integrate(x**2, (x, 0, 1))
+      dint
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 5단계. 정적분의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 정적분 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step6_improper
+  title: 6단계. 이상적분
+  structuredPrimary: true
+  subtitle: 무한 구간
+  goal: 6단계. 이상적분에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    이상적분(improper integral)은 적분 구간이 무한대까지 확장된 경우입니다. oo를 사용하여 ∫[0,∞]e⁻ˣdx = 1처럼 계산합니다. 함수가 충분히 빨리 0으로 감소해야 수렴하여 유한한 값이 나옵니다. 가우스 적분 ∫[-∞,∞]e⁻ˣ²dx = √π는 확률론과 통계학의 기초가 되는 유명한 결과입니다.
+
+    e⁻ˣ² 의 적분은 √π입니다. 이것은 유명한 가우스 적분으로, 확률론과 통계학에서 중요합니다.
+  snippet: |-
+    improper1 = integrate(exp(-x), (x, 0, oo))
+    improper1
+  exercise:
+    prompt: 6단계. 이상적분 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      improper1 = integrate(exp(-x), (x, 0, oo))
+      improper1
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 6단계. 이상적분의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 이상적분 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step7_substitution
+  title: 7단계. 치환적분
+  structuredPrimary: true
+  subtitle: 합성함수 적분
+  goal: 7단계. 치환적분에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    치환적분(substitution)은 합성함수 형태를 적분하는 기법입니다. ∫2x·e^(x²)dx에서 u=x²로 치환하면 ∫eᵘdu = eᵘ = e^(x²)가 됩니다. 손으로 하면 u=..., du/dx=... 과정이 복잡하지만, SymPy는 자동으로 적절한 치환을 찾아 적용합니다. 1/(1+x²)의 적분은 arctan(x)로, 역삼각함수가 등장합니다.
+
+    1/(1+x²)의 적분은 arctan(x)입니다. SymPy에서는 atan(x)로 표시됩니다. 역삼각함수의 미분과 연결됩니다.
+  snippet: |-
+    subst1 = 2*x * exp(x**2)
+    intSubst1 = integrate(subst1, x)
+    intSubst1
+  exercise:
+    prompt: 7단계. 치환적분 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      subst1 = 2*x * exp(x**2)
+      intSubst1 = integrate(subst1, x)
+      intSubst1
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 7단계. 치환적분의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 치환적분 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step8_parts
+  title: 8단계. 부분적분
+  structuredPrimary: true
+  subtitle: 곱의 적분
+  goal: 8단계. 부분적분에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 부분적분(integration by parts)은 곱의 적분 기법입니다. ∫u·dv = uv - ∫v·du 공식을 적용합니다. ∫x·eˣdx처럼 다항식×지수함수,
+    ∫x·sin(x)dx처럼 다항식×삼각함수 형태에 유용합니다. ∫ln(x)dx는 u=ln(x), dv=dx로 놓아 x·ln(x)-x가 됩니다. SymPy는 적절한 u와 dv를 자동으로
+    선택합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    parts1 = x * exp(x)
+    intParts1 = integrate(parts1, x)
+    intParts1
+  exercise:
+    prompt: 8단계. 부분적분 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      parts1 = x * exp(x)
+      intParts1 = integrate(parts1, x)
+      intParts1
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 8단계. 부분적분의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 부분적분 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step9_double
+  title: 9단계. 이중적분
+  structuredPrimary: true
+  subtitle: 넓이와 부피
+  goal: 9단계. 이중적분에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    이중적분(double integral)은 두 변수에 대해 연속으로 적분합니다. ∬f(x,y)dxdy로 평면 영역의 넓이나 3D 입체의 부피를 계산합니다. integrate(f, (x, a, b), (y, c, d))는 먼저 x로 적분(내부)하고 그 결과를 y로 적분(외부)합니다. 단위원의 넓이 ∬1 dA = π를 이중적분으로 확인할 수 있습니다.
+
+    integrate(f, (x, a, b), (y, c, d))는 먼저 x로, 다음 y로 적분합니다. 순서대로 내부에서 외부로 계산합니다.
+  snippet: y = symbols('y')
+  exercise:
+    prompt: 9단계. 이중적분 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: y = symbols('y')
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 9단계. 이중적분의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 이중적분 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step10_area
+  title: 10단계. 곡선 사이 넓이
+  structuredPrimary: true
+  subtitle: 응용 문제
+  goal: 10단계. 곡선 사이 넓이에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    두 곡선 y=f(x)와 y=g(x) 사이의 넓이는 ∫[a,b](위쪽-아래쪽)dx로 계산합니다. 먼저 solve(f-g, x)로 교점을 구해 적분 구간 [a,b]를 결정합니다. y=x²와 y=x의 교점은 x=0, x=1이고, 그 사이 넓이는 ∫[0,1](x-x²)dx = 1/6입니다. 경제학에서 소비자잉여, 생산자잉여 계산에 이 기법을 사용합니다.
+
+    두 곡선 사이 넓이 = ∫[a,b] |f(x) - g(x)| dx입니다. 위쪽 함수에서 아래쪽 함수를 빼고 적분합니다.
+  snippet: |-
+    from sympy import solve
+    f1 = x**2
+    f2 = x
+    f1, f2
+  exercise:
+    prompt: 10단계. 곡선 사이 넓이 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from sympy import solve
+      f1 = x**2
+      f2 = x
+      f1, f2
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 10단계. 곡선 사이 넓이의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 곡선 사이 넓이 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 적분 연습
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    지금까지 배운 integrate, diff, solve를 모두 활용하여 실전 문제를 풀어봅시다. 미션1은 다항식, 삼각함수, 지수함수의 적분과 정적분 계산입니다. 미션2는 두 곡선의 교점을 찾고 그 사이 넓이를 계산합니다. 반원의 넓이를 적분으로 확인하는 문제도 포함되어 있습니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    from sympy import symbols, integrate, sin, cos, exp, sqrt, pi
+
+    r = symbols('r')
+
+    poly = integrate(r**3 - 2*r + 1, r)
+    poly
+  exercise:
+    prompt: 실습 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from sympy import symbols, integrate, sin, cos, exp, sqrt, pi
+
+      r = symbols('r')
+
+      poly = integrate(r**3 - 2*r + 1, r)
+      poly
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 실습의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 실습 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기'
+  structuredPrimary: true
+  subtitle: 예측 → 수식 구성 → 오류 수정 → 결과 검증 → 실무 변주
+  goal: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: SymPy는 계산기를 대신하는 도구가 아니라, 업무 규칙을 수식으로 고정하고 전제 조건을 검증하는 도구입니다. 여기서는 고정비와 단위 이익으로 손익분기점을
+    구하고, 잘못된 계수를 먼저 실패시킨 뒤, 기준 변경 실험을 수행합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import sympy as sp
+
+    x = sp.symbols('x', nonnegative=True)
+    fixedCost = 120000
+    unitPrice = 5000
+    unitCost = 2000
+
+    revenueExpr = unitPrice * x
+    costExpr = fixedCost + unitCost * x
+    profitExpr = sp.simplify(revenueExpr - costExpr)
+    breakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]
+
+    assert profitExpr == 3000 * x - 120000
+    assert breakEvenQuantity == 40
+    profitExpr, breakEvenQuantity
+  exercise:
+    prompt: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    starterCode: |-
+      import sympy as sp
+
+      x = sp.symbols('x', nonnegative=True)
+      fixedCost = 120000
+      unitPrice = 5000
+      unitCost = 2000
+
+      revenueExpr = unitPrice * x
+      costExpr = fixedCost + unitCost * x
+      profitExpr = sp.simplify(revenueExpr - costExpr)
+      breakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]
+
+      assert profitExpr == 3000 * x - 120000
+      assert breakEvenQuantity == 40
+      profitExpr, breakEvenQuantity
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.'
+    resultCheck: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sympy_05-power-integral-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 거듭제곱 부정적분 계수 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: n!=-1인 항의 power와 coefficient를 올바르게 변환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - x^-1은 일반 power rule의 예외입니다.
+    - 부정적분에는 임의 상수가 있음을 해석에서 남기세요.
+    exercise:
+      prompt: integrate_power(coefficient, power)를 완성하세요.
+      starterCode: |-
+        def integrate_power(coefficient, power):
+            raise NotImplementedError
+      solution: |
+        def integrate_power(coefficient, power):
+            if power == -1: return {"kind": "log", "coefficient": coefficient}
+            return {"kind": "power", "coefficient": coefficient/(power+1), "power": power+1}
+      hints: *id001
+    check:
+      id: python.sympy.sympy_05.power-integral.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_05.power-integral.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: integrate_power
+        cases:
+        - id: integrates-polynomial-term
+          arguments:
+          - value: 6
+          - value: 2
+          expectedReturn:
+            kind: power
+            coefficient: 2.0
+            power: 3
+        - id: handles-reciprocal
+          arguments:
+          - value: 3
+          - value: -1
+          expectedReturn:
+            kind: log
+            coefficient: 3
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sympy_05-definite-polynomial-area-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sympy_05-power-integral-mastery
+    title: 새 누적량 문제에 정적분 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 다항식의 부호 있는 정적분을 exact formula로 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 정적분은 일반적으로 기하학적 절대 면적이 아니라 부호 있는 누적량입니다.
+    - 적분 구간 순서를 명시하세요.
+    exercise:
+      prompt: definite_integral(coefficients, lower, upper)를 완성하세요.
+      starterCode: |-
+        def definite_integral(coefficients, lower, upper):
+            raise NotImplementedError
+      solution: |
+        def definite_integral(coefficients, lower, upper):
+            if lower > upper: raise ValueError("reversed interval")
+            def antiderivative(x): return sum(coefficient*x**(power+1)/(power+1) for power, coefficient in enumerate(coefficients))
+            return antiderivative(upper)-antiderivative(lower)
+      hints: *id002
+    check:
+      id: python.sympy.sympy_05.definite-polynomial-area.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_05.definite-polynomial-area.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: definite_integral
+        cases:
+        - id: integrates-linear-polynomial
+          arguments:
+          - value:
+            - 0
+            - 2
+          - value: 0
+          - value: 3
+          expectedReturn: 9.0
+        - id: keeps-signed-area
+          arguments:
+          - value:
+            - -1
+          - value: 0
+          - value: 2
+          expectedReturn: -2.0
+        - id: rejects-reversed
+          arguments:
+          - value:
+            - 1
+          - value: 2
+          - value: 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sympy_05-integral-meaning-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sympy_05-definite-polynomial-area-transfer
+    title: 적분 의미 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 부정적분·정적분·절대면적을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 기호 계산의 가정과 정의역을 결과와 함께 남기세요.
+    - 소수 근삿값과 exact 결과를 구분하세요.
+    exercise:
+      prompt: choose_integral(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_integral(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_integral(situation):
+            table = {'family-antiderivative': {'method': 'indefinite integral', 'evidence': 'differentiate result', 'risk': 'missing constant'}, 'net-accumulation': {'method': 'definite integral', 'evidence': 'bounds and units', 'risk': 'signed result'}, 'geometric-area': {'method': 'integral of absolute value', 'evidence': 'zero crossings', 'risk': 'cancellation'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sympy.sympy_05.integral-meaning.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_05.integral-meaning.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_integral
+        cases:
+        - id: recalls-family-antiderivative
+          arguments:
+          - value: family-antiderivative
+          expectedReturn:
+            method: indefinite integral
+            evidence: differentiate result
+            risk: missing constant
+        - id: recalls-net-accumulation
+          arguments:
+          - value: net-accumulation
+          expectedReturn:
+            method: definite integral
+            evidence: bounds and units
+            risk: signed result
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,809 @@
+var e=`meta:
+  id: openpyxl_06
+  title: 조건부 서식
+  order: 6
+  category: openpyxl
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  packages:
+  - openpyxl
+  outcomes: ["automation.excel.conditional"]
+  prerequisites: ["automation.excel.styles"]
+  estimatedMinutes: 55
+  tags:
+  - openpyxl
+  - 조건부서식
+  - ColorScale
+  - DataBar
+  - FormulaRule
+  seo:
+    title: openpyxl 조건부 서식 - ColorScale·DataBar·CellIs·FormulaRule
+    description: KPI 신호등, 데이터바, 수식 기반 조건 강조까지 - openpyxl의 4가지 조건부 서식 규칙을 실무 보고서 패턴으로 정리합니다.
+    keywords:
+    - openpyxl 조건부서식
+    - ColorScaleRule
+    - DataBarRule
+    - CellIsRule
+    - FormulaRule
+intro:
+  direction: 셀 값에 따라 색을 자동으로 입히는 조건부 서식을 KPI 대시보드 관점에서 익힙니다. 사람이 표를 읽기 전에 색만으로 결론이 보이게 만듭니다.
+  benefits:
+  - ColorScaleRule로 값 분포에 따른 그라데이션 신호등을 만듭니다.
+  - DataBarRule로 셀 안에 막대 그래프를 그려 비교 직관을 높입니다.
+  - CellIsRule과 FormulaRule로 임계값/복합 조건 강조를 제어합니다.
+  diagram:
+    steps:
+    - label: ColorScale
+      detail: 값 분포 그라데이션. 빨강·노랑·초록 신호등.
+    - label: DataBar
+      detail: 셀 안 미니 막대로 상대 크기 비교.
+    - label: CellIs
+      detail: ">=, between 등 단순 비교."
+    - label: Formula
+      detail: 복합 조건. 다른 셀 값 비교까지.
+    runtime:
+    - label: openpyxl 패키지 준비
+      detail: openpyxl.formatting.rule에서 ColorScaleRule/DataBarRule/CellIsRule/FormulaRule을 직접 import해 사용한다.
+    - label: 규칙 보존 재오픈
+      detail: 저장한 .xlsx를 load_workbook으로 다시 열어 _cf_rules의 영역 키가 보존됐는지 assert로 확인한다.
+sections:
+- id: step1_color_scale
+  title: 1단계. ColorScaleRule
+  structuredPrimary: true
+  subtitle: 값 분포 → 색 그라데이션
+  goal: 매출 금액에 따라 빨강·노랑·초록으로 변하는 신호등을 자동으로 적용한다.
+  why: 이번 달 어느 지역이 잘 됐는가라는 질문은 색 그라데이션 한 번으로 즉답이 나옵니다. 표를 정렬하지 않아도 됩니다.
+  explanation: |-
+    \`from openpyxl.formatting.rule import ColorScaleRule\` 후, \`ws.conditional_formatting.add(range_string, rule)\`로 적용합니다. start/mid/end 세 지점에 값 기준(min/percentile/num)과 색을 줍니다. 3색 신호등은 빨강(낮음) → 노랑(중간) → 초록(높음)이 보편적입니다.
+  tips:
+  - "start_type='min'은 셀 영역 안의 최솟값을 기준으로 잡습니다. 데이터가 추가되면 자동으로 다시 계산되므로 보고서 자동화에 잘 맞습니다."
+  snippet: |-
+    from openpyxl import Workbook
+    from openpyxl.formatting.rule import ColorScaleRule
+
+    book = Workbook()
+    sheet = book.active
+    sheet.append(["region", "amount"])
+    for region, amount in [("Seoul", 120000), ("Busan", 80000), ("Daegu", 30000), ("Incheon", 65000)]:
+        sheet.append([region, amount])
+
+    rule = ColorScaleRule(
+        start_type="min", start_color="FFF8696B",
+        mid_type="percentile", mid_value=50, mid_color="FFFFEB84",
+        end_type="max", end_color="FF63BE7B",
+    )
+    sheet.conditional_formatting.add("B2:B5", rule)
+    list(sheet.conditional_formatting._cf_rules.keys())
+  exercise:
+    prompt: mid_value를 30으로 바꿔 노란색이 더 빨리 등장하도록 만들고, rule이 같은 영역에 적용됐는지 확인하세요.
+    starterCode: |-
+      from openpyxl import Workbook
+      from openpyxl.formatting.rule import ColorScaleRule
+
+      book = Workbook()
+      sheet = book.active
+      sheet.append(["region", "amount"])
+      for region, amount in [("Seoul", 120000), ("Busan", 80000), ("Daegu", 30000), ("Incheon", 65000)]:
+          sheet.append([region, amount])
+
+      rule = ColorScaleRule(
+          start_type="min", start_color="FFF8696B",
+          mid_type="percentile", mid_value=___, mid_color="FFFFEB84",
+          end_type="max", end_color="FF63BE7B",
+      )
+      sheet.conditional_formatting.add("B2:B5", rule)
+      list(sheet.conditional_formatting._cf_rules.keys())
+    hints:
+    - mid_value는 0~100 사이 백분위입니다. 작을수록 노란색 지점이 낮은 값에 잡힙니다.
+  check:
+    noError: ColorScaleRule의 세 type/color 인자가 모두 적절히 전달되어야 합니다.
+    resultCheck: 결과 키 리스트에 "B2:B5" 영역이 포함되어야 합니다.
+- id: step2_data_bar
+  title: 2단계. DataBarRule
+  structuredPrimary: true
+  subtitle: 셀 안 막대 그래프
+  goal: 금액 값에 비례한 셀 내부 막대를 자동으로 그려 한눈에 상대 크기를 비교한다.
+  why: ColorScale은 색으로, DataBar는 길이로 크기를 알려 줍니다. 두 표현은 보완 관계입니다.
+  explanation: |-
+    \`DataBarRule(start_type="min", end_type="max", color="FF638EC6", showValue=True)\`. showValue=False를 주면 값을 가리고 막대만 보입니다. 마찬가지로 영역에 add합니다.
+  tips:
+  - "두 규칙을 같은 영역에 동시에 적용하면 색은 ColorScale, 막대는 DataBar로 둘 다 나타납니다. 단, 시각적 과잉이 될 수 있으니 신중하게 쓰세요."
+  snippet: |-
+    from openpyxl import Workbook
+    from openpyxl.formatting.rule import DataBarRule
+
+    book = Workbook()
+    sheet = book.active
+    sheet.append(["region", "amount"])
+    for region, amount in [("Seoul", 120000), ("Busan", 80000), ("Daegu", 30000), ("Incheon", 65000)]:
+        sheet.append([region, amount])
+
+    rule = DataBarRule(
+        start_type="min", end_type="max",
+        color="FF638EC6", showValue=True,
+    )
+    sheet.conditional_formatting.add("B2:B5", rule)
+    "B2:B5" in sheet.conditional_formatting._cf_rules
+  exercise:
+    prompt: showValue를 False로 바꿔 값이 가려진 막대만 나오게 하세요.
+    starterCode: |-
+      from openpyxl import Workbook
+      from openpyxl.formatting.rule import DataBarRule
+
+      book = Workbook()
+      sheet = book.active
+      sheet.append(["region", "amount"])
+      for region, amount in [("Seoul", 120000), ("Busan", 80000), ("Daegu", 30000), ("Incheon", 65000)]:
+          sheet.append([region, amount])
+
+      rule = DataBarRule(
+          start_type="min", end_type="max",
+          color="FF638EC6", showValue=___,
+      )
+      sheet.conditional_formatting.add("B2:B5", rule)
+      rule.showValue
+    hints:
+    - showValue는 불리언입니다. True/False 둘 중 하나입니다.
+  check:
+    noError: DataBarRule 인자 이름이 정확해야 합니다.
+    resultCheck: rule.showValue가 False여야 합니다.
+- id: step3_cell_is
+  title: 3단계. CellIsRule
+  structuredPrimary: true
+  subtitle: 임계값 기반 강조
+  goal: "특정 임계값을 넘는 셀에 즉시 빨강 배경을 입힌다."
+  why: 일정 금액 이상 주문 같은 비즈니스 임계값은 색으로 강조해야 실무자가 즉시 보고 행동합니다.
+  explanation: |-
+    \`from openpyxl.formatting.rule import CellIsRule\`, \`from openpyxl.styles import PatternFill\`. \`CellIsRule(operator="greaterThanOrEqual", formula=["100000"], fill=PatternFill(start_color="FFF8696B", end_color="FFF8696B", fill_type="solid"))\`. operator는 lessThan, between, equal, notEqual 등 Excel의 비교 연산자 영문명을 그대로 사용합니다.
+  tips:
+  - "formula는 리스트입니다. between은 두 값이 필요하므로 formula=['50000','100000'] 처럼 두 개를 줍니다."
+  snippet: |-
+    from openpyxl import Workbook
+    from openpyxl.formatting.rule import CellIsRule
+    from openpyxl.styles import PatternFill
+
+    book = Workbook()
+    sheet = book.active
+    sheet.append(["region", "amount"])
+    for region, amount in [("Seoul", 120000), ("Busan", 80000), ("Daegu", 30000), ("Incheon", 65000)]:
+        sheet.append([region, amount])
+
+    redFill = PatternFill(start_color="FFF8696B", end_color="FFF8696B", fill_type="solid")
+    rule = CellIsRule(operator="greaterThanOrEqual", formula=["100000"], fill=redFill)
+    sheet.conditional_formatting.add("B2:B5", rule)
+    rule.operator, rule.formula
+  exercise:
+    prompt: between 연산자로 50000~99999 사이만 노란색으로 강조하는 규칙을 추가하세요.
+    starterCode: |-
+      from openpyxl import Workbook
+      from openpyxl.formatting.rule import CellIsRule
+      from openpyxl.styles import PatternFill
+
+      book = Workbook()
+      sheet = book.active
+      sheet.append(["region", "amount"])
+      for region, amount in [("Seoul", 120000), ("Busan", 80000), ("Daegu", 30000), ("Incheon", 65000)]:
+          sheet.append([region, amount])
+
+      yellowFill = PatternFill(start_color="FFFFEB84", end_color="FFFFEB84", fill_type="solid")
+      rule = CellIsRule(operator=___, formula=___, fill=yellowFill)
+      sheet.conditional_formatting.add("B2:B5", rule)
+      rule.operator, rule.formula
+    hints:
+    - between은 ["50000","99999"] 두 값 리스트입니다.
+  check:
+    noError: operator는 Excel 비교 키워드 영문 이름이어야 합니다.
+    resultCheck: rule.operator가 "between"이고 formula가 두 요소 리스트여야 합니다.
+- id: step4_formula_rule
+  title: 4단계. FormulaRule
+  structuredPrimary: true
+  subtitle: 복합 조건 + 다른 셀 비교
+  goal: 다른 컬럼 값에 따라 같은 행 전체에 색을 입히는 행 단위 강조를 만든다.
+  why: 환불 발생 행 전체를 분홍색으로 칠하는 패턴은 CellIs로는 어렵습니다. 수식 기반이 필요합니다.
+  explanation: |-
+    \`FormulaRule(formula=["$C2=\\"refund\\""], fill=...)\`. 영역(\`A2:C5\`)에 적용하면 각 행에서 같은 수식이 행 번호만 바뀌어 평가됩니다. 절대 컬럼($C)·상대 행(2)으로 적어야 같은 행의 C 값을 보는 동작이 됩니다.
+  tips:
+  - "$ 위치가 핵심입니다. $C2는 'C 컬럼은 고정, 행은 평가 위치에 따라'. C$2는 반대입니다."
+  snippet: |-
+    from openpyxl import Workbook
+    from openpyxl.formatting.rule import FormulaRule
+    from openpyxl.styles import PatternFill
+
+    book = Workbook()
+    sheet = book.active
+    sheet.append(["region", "amount", "status"])
+    sheet.append(["Seoul", 120000, "ok"])
+    sheet.append(["Busan", 80000, "refund"])
+    sheet.append(["Daegu", 30000, "ok"])
+
+    pinkFill = PatternFill(start_color="FFFFC7CE", end_color="FFFFC7CE", fill_type="solid")
+    rule = FormulaRule(formula=["$C2=\\"refund\\""], fill=pinkFill)
+    sheet.conditional_formatting.add("A2:C4", rule)
+    rule.formula
+  exercise:
+    prompt: 환불이면서 금액이 50000 이상인 행만 강조하도록 AND를 추가한 수식으로 바꾸세요.
+    starterCode: |-
+      from openpyxl import Workbook
+      from openpyxl.formatting.rule import FormulaRule
+      from openpyxl.styles import PatternFill
+
+      book = Workbook()
+      sheet = book.active
+      sheet.append(["region", "amount", "status"])
+      sheet.append(["Seoul", 120000, "ok"])
+      sheet.append(["Busan", 80000, "refund"])
+      sheet.append(["Daegu", 30000, "ok"])
+
+      pinkFill = PatternFill(start_color="FFFFC7CE", end_color="FFFFC7CE", fill_type="solid")
+      rule = FormulaRule(formula=[___], fill=pinkFill)
+      sheet.conditional_formatting.add("A2:C4", rule)
+      rule.formula
+    hints:
+    - "Excel 수식: AND($C2=\\"refund\\", $B2>=50000)"
+  check:
+    noError: 수식 문자열의 따옴표가 짝을 맞춰야 합니다.
+    resultCheck: rule.formula에 AND가 포함되어야 합니다.
+- id: validation
+  title: 5단계. 검증 루프 - KPI 대시보드 계약
+  structuredPrimary: true
+  subtitle: 저장 → 재오픈 → 규칙 보존 확인
+  goal: 조건부 서식 규칙이 저장 후 다시 열어도 보존되는지 확인한다.
+  why: 조건부 서식은 XML 구조 안에서 따로 저장됩니다. 잘못된 영역 문자열이나 규칙 객체를 쓰면 저장 후 사라질 수 있어 재오픈 검증이 필수입니다.
+  explanation: |-
+    \`buildKpiDashboard\`는 매출 + 신호등 + 환불 행 강조까지 묶은 KPI 대시보드를 만듭니다. 저장 후 다시 열어 규칙이 적용된 영역 키가 그대로 있는지 확인합니다.
+  tips:
+  - "조건부 서식 규칙 객체는 _cf_rules dict에 영역 문자열을 키로 저장됩니다. private 속성이지만 검증 용도로는 가장 직접적입니다."
+  snippet: |-
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    from openpyxl import Workbook, load_workbook
+    from openpyxl.formatting.rule import ColorScaleRule, FormulaRule
+    from openpyxl.styles import PatternFill
+
+    def buildKpiDashboard(path, rows):
+        book = Workbook()
+        sheet = book.active
+        sheet.title = "kpi"
+        sheet.append(["region", "amount", "status"])
+        for row in rows:
+            sheet.append(list(row))
+        endRow = len(rows) + 1
+
+        sheet.conditional_formatting.add(
+            f"B2:B{endRow}",
+            ColorScaleRule(
+                start_type="min", start_color="FFF8696B",
+                mid_type="percentile", mid_value=50, mid_color="FFFFEB84",
+                end_type="max", end_color="FF63BE7B",
+            ),
+        )
+        sheet.conditional_formatting.add(
+            f"A2:C{endRow}",
+            FormulaRule(
+                formula=["$C2=\\"refund\\""],
+                fill=PatternFill(start_color="FFFFC7CE", end_color="FFFFC7CE", fill_type="solid"),
+            ),
+        )
+        book.save(path)
+        return path, endRow
+
+    workdir = TemporaryDirectory()
+    samples = [
+        ("Seoul", 120000, "ok"),
+        ("Busan", 80000, "refund"),
+        ("Daegu", 30000, "ok"),
+        ("Incheon", 65000, "ok"),
+    ]
+    dashboardPath, endRow = buildKpiDashboard(
+        Path(workdir.name) / "kpi.xlsx", samples
+    )
+
+    reopened = load_workbook(dashboardPath)
+    ruleKeys = list(reopened["kpi"].conditional_formatting._cf_rules.keys())
+    ranges = [str(key.sqref) for key in ruleKeys]
+    assert f"B2:B{endRow}" in ranges
+    assert f"A2:C{endRow}" in ranges
+    ranges
+  exercise:
+    prompt: samples에 ("Daejeon", 95000, "ok") 한 줄을 추가하면 endRow가 6이 되고 두 규칙 영역도 같이 늘어나는지 확인하세요.
+    starterCode: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from openpyxl import Workbook, load_workbook
+      from openpyxl.formatting.rule import ColorScaleRule, FormulaRule
+      from openpyxl.styles import PatternFill
+
+      def buildKpiDashboard(path, rows):
+          book = Workbook()
+          sheet = book.active
+          sheet.title = "kpi"
+          sheet.append(["region", "amount", "status"])
+          for row in rows:
+              sheet.append(list(row))
+          endRow = len(rows) + 1
+          sheet.conditional_formatting.add(
+              f"B2:B{endRow}",
+              ColorScaleRule(
+                  start_type="min", start_color="FFF8696B",
+                  mid_type="percentile", mid_value=50, mid_color="FFFFEB84",
+                  end_type="max", end_color="FF63BE7B",
+              ),
+          )
+          sheet.conditional_formatting.add(
+              f"A2:C{endRow}",
+              FormulaRule(
+                  formula=["$C2=\\"refund\\""],
+                  fill=PatternFill(start_color="FFFFC7CE", end_color="FFFFC7CE", fill_type="solid"),
+              ),
+          )
+          book.save(path)
+          return path, endRow
+
+      workdir = TemporaryDirectory()
+      samples = [
+          ("Seoul", 120000, "ok"),
+          ("Busan", 80000, "refund"),
+          ("Daegu", 30000, "ok"),
+          ("Incheon", 65000, "ok"),
+          ___,
+      ]
+      dashboardPath, endRow = buildKpiDashboard(Path(workdir.name) / "kpi.xlsx", samples)
+      assert endRow == ___
+      endRow
+    hints:
+    - 행 5 + 헤더 1 = endRow 6입니다.
+  check:
+    noError: buildKpiDashboard가 ValueError 없이 끝나야 합니다.
+    resultCheck: endRow가 추가된 행 수에 맞게 6이어야 합니다.
+- id: practice
+  title: 실습 - 종합 미션 2개
+  structuredPrimary: true
+  subtitle: import부터 검증까지 독립 실행
+  goal: ColorScale·CellIs·FormulaRule을 두 가지 현실 시나리오에 결합한다.
+  why: 조건부 서식은 데이터 분포에 따라 색이 어떻게 도와주는지 직접 만들어 봐야 감각이 잡힙니다.
+  explanation: |-
+    미션1은 시험 점수 표에 ColorScale 신호등과 60점 미만 빨강 강조를 함께 적용합니다. 미션2는 예산 vs 실제 표에서 초과한 행 전체를 FormulaRule로 분홍색 강조합니다.
+  tips:
+  - 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  - 변수 prefix는 \`exam*\`(미션1), \`budget*\`(미션2)로 격리됩니다.
+  snippet: |-
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    from openpyxl import Workbook, load_workbook
+    from openpyxl.formatting.rule import CellIsRule, ColorScaleRule, FormulaRule
+    from openpyxl.styles import PatternFill
+  exercise:
+    prompt: 두 미션을 직접 작성한 뒤 expansion 정답과 비교하세요.
+    starterCode: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from openpyxl import Workbook, load_workbook
+      from openpyxl.formatting.rule import CellIsRule, ColorScaleRule, FormulaRule
+      from openpyxl.styles import PatternFill
+
+      workdir = TemporaryDirectory()
+      target = Path(workdir.name) / "mission.xlsx"
+      ___
+    hints:
+    - 미션1 ColorScale은 점수 영역만, CellIs는 같은 영역에 lessThan 60.
+    - 미션2 FormulaRule은 $C2>$B2(실제 > 예산) 같은 절대-상대 혼합 참조.
+  check:
+    noError: 조건부 서식 영역 문자열이 유효해야 합니다.
+    resultCheck: 재오픈 후 두 규칙이 _cf_rules에 보존되어 있어야 합니다.
+  blocks:
+  - type: tip
+    content: ColorScale과 CellIs를 같은 영역에 함께 적용해 색과 강조를 동시에 줄 수 있습니다.
+  - type: expansion
+    title: "미션1: 시험 점수 - ColorScale + 60점 미만 빨강"
+    blocks:
+    - type: code
+      title: 점수표와 두 규칙 적용
+      content: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from openpyxl import Workbook, load_workbook
+        from openpyxl.formatting.rule import CellIsRule, ColorScaleRule
+        from openpyxl.styles import PatternFill
+
+        examDir = TemporaryDirectory()
+        examPath = Path(examDir.name) / "exam.xlsx"
+
+        examBook = Workbook()
+        examSheet = examBook.active
+        examSheet.title = "scores"
+        examSheet.append(["student", "score"])
+        examRows = [("Alice", 92), ("Bob", 55), ("Carol", 78), ("Dan", 45), ("Eve", 88)]
+        for row in examRows:
+            examSheet.append(list(row))
+
+        examSheet.conditional_formatting.add(
+            "B2:B6",
+            ColorScaleRule(
+                start_type="min", start_color="FFF8696B",
+                mid_type="percentile", mid_value=50, mid_color="FFFFEB84",
+                end_type="max", end_color="FF63BE7B",
+            ),
+        )
+        examRed = PatternFill(start_color="FFFFC7CE", end_color="FFFFC7CE", fill_type="solid")
+        examSheet.conditional_formatting.add(
+            "B2:B6",
+            CellIsRule(operator="lessThan", formula=["60"], fill=examRed),
+        )
+        examBook.save(examPath)
+        list(examSheet.conditional_formatting._cf_rules.keys())
+    - type: code
+      title: 규칙 보존 검증
+      content: |-
+        examReopen = load_workbook(examPath)
+        examBack = examReopen["scores"]
+        examRanges = [str(key.sqref) for key in examBack.conditional_formatting._cf_rules.keys()]
+        assert "B2:B6" in examRanges
+        examRanges
+  - type: expansion
+    title: "미션2: 예산 vs 실제 - FormulaRule로 초과 행 강조"
+    blocks:
+    - type: code
+      title: 예산 표 + FormulaRule 적용
+      content: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from openpyxl import Workbook, load_workbook
+        from openpyxl.formatting.rule import FormulaRule
+        from openpyxl.styles import PatternFill
+
+        budgetDir = TemporaryDirectory()
+        budgetPath = Path(budgetDir.name) / "budget.xlsx"
+
+        budgetBook = Workbook()
+        budgetSheet = budgetBook.active
+        budgetSheet.title = "budget"
+        budgetSheet.append(["item", "budget", "actual"])
+        budgetRows = [
+            ("Marketing", 5000000, 4800000),
+            ("RnD", 8000000, 9200000),
+            ("Ops", 3000000, 2900000),
+            ("Travel", 1500000, 1800000),
+        ]
+        for row in budgetRows:
+            budgetSheet.append(list(row))
+
+        budgetPink = PatternFill(start_color="FFFFC7CE", end_color="FFFFC7CE", fill_type="solid")
+        budgetSheet.conditional_formatting.add(
+            "A2:C5",
+            FormulaRule(formula=["$C2>$B2"], fill=budgetPink),
+        )
+        budgetBook.save(budgetPath)
+        list(budgetSheet.conditional_formatting._cf_rules.keys())
+    - type: code
+      title: 규칙 보존 검증
+      content: |-
+        budgetReopen = load_workbook(budgetPath)
+        budgetBack = budgetReopen["budget"]
+        budgetRanges = [str(key.sqref) for key in budgetBack.conditional_formatting._cf_rules.keys()]
+        assert "A2:C5" in budgetRanges
+        rule = list(budgetBack.conditional_formatting._cf_rules.values())[0][0]
+        assert "$C2>$B2" in rule.formula[0]
+        budgetRanges
+- id: summary
+  title: 정리
+  subtitle: 색이 데이터를 말한다
+  blocks:
+  - type: text
+    content: |-
+      조건부 서식은 사람의 눈이 표를 읽기 전에 결론을 미리 그려 주는 도구입니다. ColorScale은 분포, DataBar는 상대 크기, CellIs는 임계값, FormulaRule은 복합 조건 - 네 가지를 상황에 맞게 골라 쓰세요.
+  - type: list
+    style: bullet
+    items:
+    - ColorScaleRule - 분포 기반 신호등(3색이 표준)
+    - DataBarRule - 셀 안 막대 그래프
+    - CellIsRule - operator + formula 리스트로 임계값 강조
+    - FormulaRule - 다른 셀을 보는 복합 조건, $ 위치가 핵심
+    - 조건부 서식은 _cf_rules에 영역 문자열 키로 저장되므로 재오픈 검증이 가능
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: openpyxl_06-conditional-format-rule-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_color_scale
+    - summary
+    title: 조건부서식 rule의 range·priority·formula 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 중복 priority와 빈 range, formula 누락을 차단한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 조건부서식 rule priority를 전역에서 유일하게 관리하세요.
+    - formula rule은 \`=\` prefix와 적용 range를 함께 검사하세요.
+    exercise:
+      prompt: audit_conditional_rules(rules)를 완성하세요.
+      starterCode: |-
+        def audit_conditional_rules(rules):
+            raise NotImplementedError
+      solution: |
+        def audit_conditional_rules(rules):
+            failures = []
+            priorities = [rule["priority"] for rule in rules]
+            duplicate_priorities = sorted({value for value in priorities if priorities.count(value) > 1})
+            invalid = []
+            for rule in rules:
+                reasons = []
+                if not rule.get("range"):
+                    reasons.append("range")
+                if rule.get("type") == "formula" and not str(rule.get("formula", "")).startswith("="):
+                    reasons.append("formula")
+                if reasons:
+                    invalid.append({"id": rule["id"], "reasons": reasons})
+            if duplicate_priorities:
+                failures.append("priority")
+            if invalid:
+                failures.append("rules")
+            return {"accepted": not failures, "failures": failures, "duplicatePriorities": duplicate_priorities, "invalidRules": invalid}
+      hints: *id001
+    check:
+      id: python.openpyxl.openpyxl_06.conditional-format-rule-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_06.conditional-format-rule-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_conditional_rules
+        cases:
+        - id: accepts-prioritized-rules
+          arguments:
+          - value:
+            - id: negative
+              priority: 1
+              range: B2:B10
+              type: formula
+              formula: =B2<0
+            - id: high
+              priority: 2
+              range: B2:B10
+              type: cellIs
+          expectedReturn:
+            accepted: true
+            failures: []
+            duplicatePriorities: []
+            invalidRules: []
+        - id: reports-duplicate-priority
+          arguments:
+          - value:
+            - id: a
+              priority: 1
+              range: A1
+              type: cellIs
+            - id: b
+              priority: 1
+              range: B1
+              type: cellIs
+          expectedReturn:
+            accepted: false
+            failures:
+            - priority
+            duplicatePriorities:
+            - 1
+            invalidRules: []
+        - id: reports-empty-range-and-formula
+          arguments:
+          - value:
+            - id: bad
+              priority: 1
+              range: ''
+              type: formula
+              formula: A1>0
+          expectedReturn:
+            accepted: false
+            failures:
+            - rules
+            duplicatePriorities: []
+            invalidRules:
+            - id: bad
+              reasons:
+              - range
+              - formula
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: openpyxl_06-conditional-format-coverage-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - openpyxl_06-conditional-format-rule-audit-mastery
+    title: 새 조건부서식에 data range coverage 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 필수 data cells가 최소 한 rule에 포함되고 header는 제외되는지 판정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - data cell coverage와 header exclusion을 함께 검사하세요.
+    - 여러 rule이 겹치는 cell은 priority 검토 대상으로 별도 보고하세요.
+    exercise:
+      prompt: audit_conditional_coverage(required_cells, header_cells, rule_cells)를 완성하세요.
+      starterCode: |-
+        def audit_conditional_coverage(required_cells, header_cells, rule_cells):
+            raise NotImplementedError
+      solution: |
+        def audit_conditional_coverage(required_cells, header_cells, rule_cells):
+            covered = set()
+            for cells in rule_cells.values():
+                covered.update(cells)
+            missing = sorted(set(required_cells) - covered)
+            header_overlap = sorted(set(header_cells) & covered)
+            duplicated = sorted(cell for cell in required_cells if sum(cell in cells for cells in rule_cells.values()) > 1)
+            return {"accepted": not missing and not header_overlap, "missing": missing, "headerOverlap": header_overlap, "multipleRules": duplicated}
+      hints: *id002
+    check:
+      id: python.openpyxl.openpyxl_06.conditional-format-coverage.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_06.conditional-format-coverage.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_conditional_coverage
+        cases:
+        - id: accepts-complete-data-coverage
+          arguments:
+          - value:
+            - B2
+            - B3
+          - value:
+            - B1
+          - value:
+              negative:
+              - B2
+              positive:
+              - B3
+          expectedReturn:
+            accepted: true
+            missing: []
+            headerOverlap: []
+            multipleRules: []
+        - id: reports-missing-and-header-overlap
+          arguments:
+          - value:
+            - B2
+            - B3
+          - value:
+            - B1
+          - value:
+              rule:
+              - B1
+              - B2
+          expectedReturn:
+            accepted: false
+            missing:
+            - B3
+            headerOverlap:
+            - B1
+            multipleRules: []
+        - id: reports-multiple-rules-without-blocking
+          arguments:
+          - value:
+            - B2
+          - value: []
+          - value:
+              a:
+              - B2
+              b:
+              - B2
+          expectedReturn:
+            accepted: true
+            missing: []
+            headerOverlap: []
+            multipleRules:
+            - B2
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: openpyxl_06-conditional-format-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - openpyxl_06-conditional-format-coverage-transfer
+    title: 조건부서식 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: rule·priority·coverage evidence를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Workbook 저장 성공과 업무 값·수식·표시의 정확성을 분리해 검증하세요.
+    - Web에서는 문서 계약을 검증하고 Local에서는 재개방한 artifact evidence를 남기세요.
+    exercise:
+      prompt: choose_conditional_format_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_conditional_format_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_conditional_format_evidence(situation):
+            table = {'rule': {'action': 'validate type formula and range', 'evidence': 'rule manifest', 'risk': 'invalid expression'}, 'priority': {'action': 'order overlapping rules explicitly', 'evidence': 'priority list', 'risk': 'unexpected style'}, 'coverage': {'action': 'compare data and header cells', 'evidence': 'missing overlap matrix', 'risk': 'unstyled data or styled header'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.openpyxl.openpyxl_06.conditional-format-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_06.conditional-format-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_conditional_format_evidence
+        cases:
+        - id: recalls-rule
+          arguments:
+          - value: rule
+          expectedReturn:
+            action: validate type formula and range
+            evidence: rule manifest
+            risk: invalid expression
+        - id: recalls-priority
+          arguments:
+          - value: priority
+          expectedReturn:
+            action: order overlapping rules explicitly
+            evidence: priority list
+            risk: unexpected style
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

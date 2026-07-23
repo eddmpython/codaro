@@ -1,0 +1,821 @@
+var e=`meta:
+  packages:
+  - opencv-python
+  - numpy
+  id: opencv_00
+  title: OpenCV소개
+  order: 0
+  category: opencv
+  badge: 소개
+  tags:
+  - OpenCV
+  - cv2
+  - 컴퓨터비전
+  - 이미지처리
+  - 에지검출
+  - 컨투어
+  seo:
+    title: OpenCV 소개 - 파이썬 컴퓨터 비전 라이브러리
+    description: OpenCV로 이미지 분석, 에지 검출, 컨투어 추출 등 컴퓨터 비전의 기초를 배웁니다.
+    keywords:
+    - OpenCV
+    - cv2
+    - 컴퓨터비전
+    - 에지검출
+    - Canny
+    - 컨투어
+intro:
+  direction: OpenCV는 이미지를 NumPy 배열로 다루는 컴퓨터 비전 라이브러리입니다. 이 트랙은 배열 shape/dtype/채널을 매 단계마다 확인하면서 검출 결과까지 검증하는 흐름을 배웁니다.
+  benefits:
+  - 이미지가 (높이, 너비, 채널) ndarray로 표현된다는 사실을 코드로 확인합니다.
+  - BGR/Gray/HSV 색공간 차이와 변환 시 채널 수가 어떻게 달라지는지 파악합니다.
+  - Canny 에지, findContours 컨투어, morphologyEx 모폴로지 같은 핵심 함수의 입력/출력 계약을 이해합니다.
+  - 첫 실행 셀에서 shape, dtype, edgePixelCount를 assert로 고정해 검출 흐름을 확인합니다.
+  - 검출 결과를 픽셀 수, 컨투어 개수처럼 수치로 검증하는 습관을 들입니다.
+  diagram:
+    steps:
+    - label: 합성 이미지로 입력 만들기
+      detail: np.zeros + cv2.rectangle 등으로 정답을 알고 있는 입력을 만듭니다.
+    - label: cv2 함수 실행
+      detail: cvtColor / Canny / findContours 같은 핵심 함수를 적용합니다.
+    - label: 수치로 결과 검증
+      detail: shape, dtype, 채널 수, 검출된 컨투어 개수로 결과를 비교합니다.
+    - label: 파이프라인 재사용
+      detail: 검증된 처리 단계를 다음 강의에서 그대로 호출합니다.
+    runtime:
+    - label: 컴퓨터 비전 환경
+      detail: opencv-python, numpy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: OpenCV 셀 실행
+      detail: 셀을 실행해 shape, dtype, 채널 수와 예외 상태를 확인합니다.
+    - label: 다음 강의로 연결
+      detail: 검증된 결과를 다음 비전 처리 단계의 입력으로 넘깁니다.
+sections:
+- id: intro
+  blocks:
+  - type: mainHeader
+    emoji: 👁️
+    title: OpenCV
+    subtitle: 파이썬 컴퓨터 비전 라이브러리
+  - type: hero
+    emoji: 🔍
+    title: 이미지를 분석하고 이해하다
+    subtitle: 에지 검출부터 객체 인식까지
+    points:
+    - emoji: 📐
+      title: 에지 검출
+    - emoji: 🔲
+      title: 컨투어 추출
+    - emoji: 🎨
+      title: 색공간 변환
+    - emoji: ⚙️
+      title: 형태학적 연산
+  goal: 트랙 전체에서 다룰 네 가지 축(에지/컨투어/색공간/모폴로지)을 한눈에 정리한다.
+  why: OpenCV는 함수 수가 많아 처음에는 어디서 무엇을 쓰는지 헷갈리기 쉽습니다. 네 영역으로 묶어두면 새 함수를 만났을 때 어디에 속하는지 빠르게 분류할 수 있습니다.
+- id: opencv_history
+  blocks:
+  - type: sectionHeader
+    title: 🏛️ OpenCV란?
+    subtitle: 컴퓨터 비전의 표준
+  - type: text
+    content: OpenCV(Open Source Computer Vision Library)는 2000년 인텔에서 시작된 오픈소스 컴퓨터 비전 라이브러리입니다. 현재 2500개
+      이상의 최적화된 알고리즘을 제공하며, 얼굴 인식, 객체 추적, 의료 영상 분석 등 다양한 분야에서 활용됩니다. C++로 작성되어 매우 빠르고, Python 바인딩(cv2)으로
+      쉽게 사용할 수 있습니다.
+  - type: featureCards
+    cards:
+    - emoji: ⚡
+      title: 고성능
+      description: C++로 작성되어 실시간 영상 처리가 가능한 속도를 제공합니다
+    - emoji: 🔬
+      title: 풍부한 알고리즘
+      description: 에지 검출, 특징점 추출, 객체 인식 등 2500+ 알고리즘을 제공합니다
+    - emoji: 🌐
+      title: 크로스 플랫폼
+      description: Windows, Linux, macOS, Android, iOS 등 다양한 플랫폼을 지원합니다
+  goal: cv2 모듈이 어떤 배경에서 만들어졌고 왜 C++ 백엔드에 Python 바인딩이 얹힌 구조인지 이해한다.
+  why: 동일 연산을 NumPy로 직접 짜는 것보다 cv2 함수가 수십 배 빠른 이유를 알아야 어떤 작업을 직접 짜고 어떤 작업을 cv2에 위임할지 판단할 수 있습니다.
+- id: why_opencv
+  blocks:
+  - type: sectionHeader
+    title: 🚀 왜 OpenCV인가?
+    subtitle: 이미지 처리를 넘어 비전으로
+  - type: text
+    content: Pillow가 이미지 편집에 특화되어 있다면, OpenCV는 이미지 분석과 컴퓨터 비전에 특화되어 있습니다. 이미지에서 경계선을 찾고, 물체의 윤곽을 추출하고,
+      특정 색상 영역을 분리하는 등 '이미지를 이해'하는 작업에 강점이 있습니다.
+  - type: note
+    title: 컴퓨터 비전이란?
+    content: 컴퓨터가 디지털 이미지나 비디오를 '보고' 이해하도록 하는 기술입니다. 단순히 픽셀 값을 조작하는 것을 넘어, 이미지에서 의미 있는 정보를 추출합니다. 예를 들어
+      사진에서 얼굴 위치를 찾거나, 자동차 번호판 문자를 인식하거나, 불량품을 검출하는 것이 컴퓨터 비전입니다.
+  goal: 편집(Pillow) vs 분석(OpenCV)의 경계를 구분한다.
+  why: 같은 작업도 어떤 라이브러리로 푸는 게 자연스러운지 미리 알면 도구 선택에 시간을 낭비하지 않습니다. 워터마크는 Pillow가, 객체 검출은 OpenCV가 한 줄 차이로 갈립니다.
+- id: bgr_order
+  blocks:
+  - type: sectionHeader
+    title: 🔴🟢🔵 BGR 색순서
+    subtitle: OpenCV의 특징
+  - type: text
+    content: OpenCV는 역사적 이유로 RGB가 아닌 BGR 순서를 사용합니다. 이미지를 읽으면 Blue, Green, Red 순서로 채널이 배치됩니다. matplotlib이나
+      다른 라이브러리와 함께 사용할 때는 cvtColor()로 RGB로 변환해야 올바른 색상이 표시됩니다.
+  - type: table
+    headers:
+    - 라이브러리
+    - 색순서
+    - 변환 필요
+    rows:
+    - - OpenCV (cv2)
+      - BGR
+      - matplotlib 출력 시 RGB로 변환
+    - - Pillow
+      - RGB
+      - 변환 불필요
+    - - matplotlib
+      - RGB
+      - 변환 불필요
+    - - NumPy (sklearn 이미지)
+      - RGB
+      - cv2 사용 시 BGR로 변환
+  - type: note
+    title: 왜 BGR인가?
+    content: OpenCV가 처음 개발될 당시(2000년경) 널리 사용되던 카메라와 비디오 장치들이 BGR 순서를 사용했기 때문입니다. 호환성을 위해 이 순서가 유지되고 있습니다.
+  goal: cv2의 채널 순서가 다른 라이브러리와 반대라는 사실과 변환 지점을 미리 익혀둔다.
+  why: BGR/RGB 혼동은 OpenCV 초보가 가장 흔히 겪는 버그입니다. 빨간 사과가 파랗게 표시되면 거의 색순서 문제이며, cvtColor(image, cv2.COLOR_BGR2RGB) 한 줄로 해결됩니다.
+- id: ndarray
+  blocks:
+  - type: sectionHeader
+    title: 📦 이미지 = NumPy 배열
+    subtitle: OpenCV의 데이터 구조
+  - type: text
+    content: OpenCV에서 이미지는 NumPy의 ndarray입니다. Pillow의 Image 객체와 달리, NumPy 배열이므로 배열 연산을 직접 적용할 수 있습니다.
+      shape은 (높이, 너비, 채널) 순서이고, dtype은 보통 uint8(0-255)입니다.
+  - type: table
+    headers:
+    - 속성
+    - 의미
+    - 예시
+    rows:
+    - - shape
+      - (높이, 너비, 채널)
+      - (480, 640, 3)
+    - - dtype
+      - 데이터 타입
+      - uint8
+    - - size
+      - 전체 픽셀 수
+      - 921600 (480×640×3)
+    - - ndim
+      - 차원 수
+      - 3 (컬러), 2 (흑백)
+  goal: cv2 이미지가 곧 ndarray라는 사실과 (height, width) 순서가 Pillow의 (width, height)와 반대인 점을 분명히 한다.
+  why: shape이 (h, w)이고 size가 (w, h)인 차이는 자르기 좌표, 리사이즈 인자, 회전 행렬에서 매번 등장합니다. 처음에 한 번 외워두면 이후 모든 강의에서 인덱싱 오류가 줄어듭니다.
+- id: features
+  blocks:
+  - type: sectionHeader
+    title: 🛠️ OpenCV 주요 기능
+    subtitle: 컴퓨터 비전의 모든 것
+  - type: text
+    content: OpenCV가 제공하는 주요 기능을 살펴봅시다. 기본적인 이미지 처리부터 고급 컴퓨터 비전까지 폭넓게 지원합니다.
+  - type: table
+    headers:
+    - 기능
+    - 설명
+    - 함수
+    rows:
+    - - 색공간 변환
+      - BGR, RGB, Gray, HSV 등 변환
+      - cvtColor()
+    - - 기하학적 변환
+      - 크기 조절, 회전, 뒤집기
+      - resize(), rotate(), flip()
+    - - 필터링
+      - 블러, 샤프닝, 노이즈 제거
+      - blur(), GaussianBlur(), medianBlur()
+    - - 에지 검출
+      - 경계선 찾기
+      - Canny(), Sobel(), Laplacian()
+    - - 임계값 처리
+      - 이진화, 적응형 임계값
+      - threshold(), adaptiveThreshold()
+    - - 모폴로지
+      - 침식, 팽창, 열기, 닫기
+      - erode(), dilate(), morphologyEx()
+    - - 컨투어
+      - 윤곽선 검출 및 분석
+      - findContours(), drawContours()
+    - - 히스토그램
+      - 밝기 분포 분석
+      - calcHist(), equalizeHist()
+  goal: 트랙의 10개 강의에서 다룰 주요 함수 카테고리를 한 표로 본다.
+  why: 함수가 어느 카테고리에 속하는지 알면 모르는 함수를 만났을 때 비슷한 카테고리의 다른 함수에서 사용법을 유추할 수 있습니다.
+- id: edge_detection
+  blocks:
+  - type: sectionHeader
+    title: 📐 에지 검출
+    subtitle: 경계를 찾아내다
+  - type: text
+    content: 에지(edge)는 이미지에서 밝기가 급격히 변하는 곳입니다. 물체의 경계, 텍스처의 변화 등이 에지로 나타납니다. 에지 검출은 컴퓨터 비전의 가장 기본적인 작업
+      중 하나이며, 객체 인식의 첫 단계로 자주 사용됩니다.
+  - type: table
+    headers:
+    - 알고리즘
+    - 특징
+    - 용도
+    rows:
+    - - Canny
+      - 가장 널리 사용, 두 개의 임계값 사용
+      - 범용 에지 검출
+    - - Sobel
+      - X 또는 Y 방향 미분
+      - 방향성 에지 검출
+    - - Laplacian
+      - 2차 미분, 모든 방향
+      - 세밀한 에지 검출
+  goal: 에지 검출 3대장(Canny/Sobel/Laplacian)이 어떻게 다른지 미리 파악한다.
+  why: 같은 입력 이미지에서 알고리즘마다 결과가 완전히 다릅니다. 어떤 알고리즘을 언제 쓰는지 알면 시행착오 횟수가 줄어듭니다 - Canny는 윤곽선, Sobel은 방향, Laplacian은 노이즈에 민감.
+- id: contour
+  blocks:
+  - type: sectionHeader
+    title: 🔲 컨투어
+    subtitle: 물체의 윤곽
+  - type: text
+    content: 컨투어(contour)는 같은 색이나 밝기를 가진 연속적인 점들의 곡선입니다. 이진화된 이미지에서 물체의 외곽선을 추출할 때 사용합니다. 컨투어를 분석하면 물체의
+      면적, 둘레, 무게중심 등을 계산할 수 있습니다.
+  - type: table
+    headers:
+    - 함수
+    - 기능
+    rows:
+    - - findContours()
+      - 이진 이미지에서 컨투어 검출
+    - - drawContours()
+      - 컨투어를 이미지에 그리기
+    - - contourArea()
+      - 컨투어 면적 계산
+    - - arcLength()
+      - 컨투어 둘레 계산
+    - - boundingRect()
+      - 컨투어를 감싸는 사각형
+    - - minEnclosingCircle()
+      - 컨투어를 감싸는 최소 원
+  goal: 컨투어가 단순한 점 리스트가 아니라 면적/둘레/형태 분석으로 이어진다는 사실을 본다.
+  why: findContours로 끝나는 게 아니라 그 뒤의 contourArea, boundingRect까지가 한 세트입니다. 객체 개수 세기, 크기 필터링은 모두 이 조합으로 해결됩니다.
+- id: morphology
+  blocks:
+  - type: sectionHeader
+    title: ⚙️ 모폴로지 연산
+    subtitle: 형태학적 변환
+  - type: text
+    content: 모폴로지(morphology) 연산은 이진 이미지의 형태를 변형하는 연산입니다. 노이즈 제거, 물체 분리, 구멍 채우기 등에 사용됩니다. 기본 연산인 침식과 팽창을
+      조합하여 열기, 닫기 등의 연산을 수행합니다.
+  - type: table
+    headers:
+    - 연산
+    - 효과
+    - 용도
+    rows:
+    - - 침식 (Erosion)
+      - 물체 경계를 깎아냄
+      - 노이즈 제거, 물체 분리
+    - - 팽창 (Dilation)
+      - 물체 경계를 확장
+      - 구멍 채우기, 연결
+    - - 열기 (Opening)
+      - 침식 후 팽창
+      - 작은 돌출부 제거
+    - - 닫기 (Closing)
+      - 팽창 후 침식
+      - 작은 구멍 채우기
+  goal: 침식/팽창의 조합으로 열기/닫기가 만들어진다는 구조를 파악한다.
+  why: 모폴로지는 이진화 결과의 노이즈를 정리하는 마무리 단계입니다. 점 노이즈는 열기로, 구멍은 닫기로 - 이 두 패턴만 알아도 컨투어 검출 품질이 크게 개선됩니다.
+- id: comparison
+  blocks:
+  - type: sectionHeader
+    title: ⚖️ OpenCV vs Pillow
+    subtitle: 목적에 맞는 선택
+  - type: table
+    headers:
+    - 항목
+    - OpenCV
+    - Pillow
+    rows:
+    - - 주요 용도
+      - 컴퓨터 비전, 분석
+      - 이미지 편집
+    - - 색순서
+      - BGR
+      - RGB
+    - - 자료형
+      - numpy.ndarray
+      - PIL.Image
+    - - 에지 검출
+      - Canny, Sobel, Laplacian
+      - FIND_EDGES (기본만)
+    - - 컨투어
+      - findContours (강력)
+      - 미지원
+    - - 모폴로지
+      - erode, dilate, morphologyEx
+      - 미지원
+    - - 텍스트 삽입
+      - putText (기본 폰트)
+      - ImageDraw (폰트 지원)
+    - - 학습 난이도
+      - 중간
+      - 쉬움
+  goal: 두 라이브러리의 강점이 정확히 반대 영역이라는 점을 표로 확인한다.
+  why: 둘 다 쓸 일이 많고 함께 쓰는 일도 많습니다. cv2로 검출하고 Pillow로 텍스트 박는 식의 조합이 흔합니다 - 어느 단계에서 어느 도구를 쓸지 미리 결정해두면 코드가 단순해집니다.
+- id: usecases
+  blocks:
+  - type: sectionHeader
+    title: 💡 활용 분야
+    subtitle: OpenCV가 사용되는 곳
+  - type: text
+    content: OpenCV는 산업, 의료, 보안, 자율주행 등 다양한 분야에서 활용됩니다.
+  - type: table
+    headers:
+    - 분야
+    - 활용 예시
+    rows:
+    - - 제조업
+      - 불량품 검출, 부품 검사, 치수 측정
+    - - 의료
+      - X-ray 분석, 세포 계수, 종양 검출
+    - - 보안
+      - 얼굴 인식, 움직임 감지, 번호판 인식
+    - - 자율주행
+      - 차선 인식, 표지판 인식, 장애물 감지
+    - - 농업
+      - 작물 상태 분석, 수확 시기 판단
+    - - 문서 처리
+      - OCR 전처리, 문서 스캔 보정
+  goal: 학습한 함수들이 어떤 실제 시스템에서 어떻게 결합되는지 머릿속에 그린다.
+  why: 트랙을 마친 뒤 자기 프로젝트를 떠올릴 때 출발점이 됩니다. 불량품 검출이라면 이진화 → 모폴로지 → 컨투어 → 면적 필터링 같은 식으로 함수 조합이 떠오릅니다.
+- id: local_runtime_note
+  blocks:
+  - type: sectionHeader
+    title: 📋 시각화 안내
+    subtitle: Codaro 로컬 Python 환경에서의 출력
+  - type: note
+    title: matplotlib으로 출력
+    content: 이 커리큘럼은 Codaro 로컬 Python 환경에서 실행됩니다. 결과 확인은 배열 shape, 픽셀 통계, 저장 파일, matplotlib 출력처럼 재현 가능한
+      방식으로 진행합니다. 컬러 이미지를 matplotlib으로 볼 때는 BGR을 RGB로 변환해야 올바른 색상이 표시됩니다.
+  goal: 결과 확인은 imshow GUI가 아니라 수치 + matplotlib + 저장 파일로 한다는 학습 방식을 짚는다.
+  why: cv2.imshow는 로컬 데스크톱 환경에서 동작하지만 노트북에서는 일관되지 않습니다. shape/통계/저장으로 검증하는 습관이 자동화·테스트로 그대로 이어집니다.
+- id: curriculum
+  blocks:
+  - type: sectionHeader
+    title: 📚 커리큘럼
+    subtitle: 10개 프로젝트로 마스터
+  - type: text
+    content: 이 커리큘럼에서는 10개의 프로젝트를 통해 OpenCV를 배웁니다.
+  - type: table
+    headers:
+    - 프로젝트
+    - 데이터
+    - 핵심 개념
+    rows:
+    - - 01. 이미지 구조 탐색기
+      - sklearn flower
+      - shape, dtype, BGR/RGB
+    - - 02. 색공간 변환기
+      - sklearn china
+      - cvtColor, Gray, HSV
+    - - 03. 기하학적 변환기
+      - Lorem Picsum
+      - resize, rotate, flip
+    - - 04. 이미지 필터 랩
+      - Lorem Picsum
+      - blur, GaussianBlur
+    - - 05. 에지 검출기
+      - sklearn china
+      - Canny, Sobel, Laplacian
+    - - 06. 이진화 스튜디오
+      - Lorem Picsum
+      - threshold, adaptiveThreshold
+    - - 07. 모폴로지 연산기
+      - 합성 이미지
+      - erode, dilate, morphologyEx
+    - - 08. 히스토그램 분석기
+      - sklearn flower
+      - calcHist, equalizeHist
+    - - 09. 컨투어 탐지기
+      - 합성 이미지
+      - findContours, drawContours
+    - - 10. 종합 비전 프로젝트
+      - 복합
+      - 전체 개념 종합
+  goal: 10개 강의가 입력 구조 → 변환 → 필터 → 검출 → 종합 순서로 쌓이는 흐름을 확인한다.
+  why: 강의 순서는 무작위가 아니라 의존성 그래프입니다. 02 색공간이 05 에지의 입력, 06 이진화가 07 모폴로지의 입력, 모든 과정이 10 종합 프로젝트로 모입니다.
+- id: start
+  blocks:
+  - type: sectionHeader
+    title: 🎯 시작하기
+    subtitle: 첫 번째 프로젝트로
+  - type: text
+    content: OpenCV를 배우면 이미지를 단순히 보는 것을 넘어 분석하고 이해할 수 있습니다. 에지 검출로 물체의 경계를 찾고, 컨투어로 윤곽을 추출하고, 색상 필터링으로
+      특정 영역을 분리하는 등 컴퓨터 비전의 핵심 기술을 익힐 수 있습니다. 첫 번째 프로젝트에서 이미지가 NumPy 배열로 어떻게 표현되는지 알아봅시다.
+  goal: 다음 강의(01 이미지 구조 탐색기)로 자연스럽게 넘어갈 마음의 준비를 한다.
+  why: 첫 번째 강의는 shape/dtype/픽셀 인덱싱부터 시작합니다. OpenCV의 모든 기능은 결국 ndarray 위에서 일어난다는 사실을 잡고 들어가야 이후 강의가 빨라집니다.
+- id: workflow_validation
+  title: 로컬 비전 검증 루프
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  goal: 합성 이미지를 만들고 cv2 함수를 통과시킨 뒤 결과 shape/dtype/검출 개수를 assert로 확정한다.
+  why: OpenCV 학습의 핵심은 함수 결과를 눈으로만 확인하지 않고 수치로 검증하는 습관입니다. 입력 조건을 알고 있는 합성 이미지를 쓰면 회귀 테스트처럼 결과를 고정할 수 있습니다.
+  explanation: |-
+    OpenCV는 화면에 이미지를 띄우는 도구가 아니라 배열을 입력받아 검증 가능한 결과를 만드는 로컬 비전 파이프라인입니다. 이 트랙의 모든 강의는 합성 입력을 만들고, cv2 함수를 통과시킨 다음, shape/dtype/픽셀 합/검출 개수 같은 수치로 결과를 확정합니다.
+
+    예제에서는 96x144 검정 캔버스에 흰 사각형을 그리고, validateBgrImage 가드로 입력 계약(uint8 + 3채널)을 확인합니다. 그다음 BGR을 그레이로 변환해 채널 수가 3에서 사라지는지, Canny로 에지를 뽑아 흰색 픽셀이 0보다 많은지를 assert로 확인합니다.
+
+    이 패턴은 다음 강의들에서 그대로 반복됩니다 - 입력 만들기 → cv2 함수 → assert로 결과 확정.
+  tips:
+  - 합성 이미지(np.zeros + cv2.rectangle 등)는 정답을 알고 있어 회귀 테스트로 쓰기 좋습니다.
+  - shape이 (h, w, c)인지 (h, w)인지 매번 확인하면 채널 수 실수를 미리 잡을 수 있습니다.
+  - cv2 함수는 dtype에 민감합니다. Canny 같은 함수는 uint8을 요구하므로 dtype을 먼저 확인하세요.
+  snippet: |-
+    import cv2
+    import numpy as np
+
+    introImage = np.zeros((96, 144, 3), dtype=np.uint8)
+    cv2.rectangle(introImage, (20, 24), (124, 72), (255, 255, 255), -1)
+    cv2.line(introImage, (20, 24), (124, 72), (0, 0, 255), 3)
+
+    def validateBgrImage(image):
+        if image.dtype != np.uint8:
+            raise ValueError(f"uint8 이미지가 아닙니다: {image.dtype}")
+        if image.ndim != 3 or image.shape[2] != 3:
+            raise ValueError(f"BGR 3채널 이미지가 아닙니다: {image.shape}")
+        return True
+
+    validateBgrImage(introImage)
+
+    gray = cv2.cvtColor(introImage, cv2.COLOR_BGR2GRAY)
+    edges = cv2.Canny(gray, 80, 160)
+
+    assert gray.shape == (96, 144), f"gray shape: {gray.shape}"
+    assert gray.ndim == 2, f"gray ndim: {gray.ndim}"
+    assert edges.dtype == np.uint8, f"edges dtype: {edges.dtype}"
+    assert int((edges > 0).sum()) > 0, "에지 픽셀이 검출되지 않았습니다"
+
+    report = {
+        "inputShape": tuple(introImage.shape),
+        "grayShape": tuple(gray.shape),
+        "edgePixelCount": int((edges > 0).sum()),
+    }
+    report
+  exercise:
+    prompt: 사각형 좌표나 Canny 임계값을 바꾸고 edgePixelCount가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+      introImage = np.zeros((96, 144, 3), dtype=np.uint8)
+      cv2.rectangle(introImage, (20, 24), (124, 72), (255, 255, 255), -1)
+      cv2.line(introImage, (20, 24), (124, 72), (0, 0, 255), 3)
+
+      def validateBgrImage(image):
+          if image.dtype != np.uint8:
+              raise ValueError(f"uint8 이미지가 아닙니다: {image.dtype}")
+          if image.ndim != 3 or image.shape[2] != 3:
+              raise ValueError(f"BGR 3채널 이미지가 아닙니다: {image.shape}")
+          return True
+
+      validateBgrImage(introImage)
+
+      gray = cv2.cvtColor(introImage, cv2.COLOR_BGR2GRAY)
+      edges = cv2.Canny(gray, ___, ___)
+
+      assert gray.shape == (96, 144)
+      assert gray.ndim == 2
+      assert int((edges > 0).sum()) > 0
+
+      report = {
+          "edgePixelCount": int((edges > 0).sum()),
+          "low": ___,
+          "high": ___,
+      }
+      report
+    hints:
+    - Canny는 low/high 두 임계값을 받습니다. 보통 high가 low의 2~3배입니다.
+    - 임계값을 낮추면 약한 에지도 잡혀 edgePixelCount가 늘어납니다.
+  check:
+    noError: 합성 이미지가 uint8 BGR 3채널이고 Canny가 정상적으로 에지를 반환해야 합니다.
+    resultCheck: edgePixelCount가 0보다 크고, 임계값을 바꾸면 그 값이 달라져야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: opencv_00-opencv_runtime-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - workflow_validation
+    title: OpenCV 실행 계약 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: BGR image·dtype·pixel budget를 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_opencv_runtime_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_opencv_runtime_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_opencv_runtime_contract(value):
+            required = ['colorOrder', 'dtype', 'maxPixels']
+            rules = [{'id': 'color-order', 'field': 'colorOrder', 'kind': 'enum', 'values': ['BGR', 'GRAY']}, {'id': 'dtype', 'field': 'dtype', 'kind': 'enum', 'values': ['uint8', 'float32']}, {'id': 'pixel-budget', 'field': 'maxPixels', 'kind': 'range', 'min': 1, 'max': 100000000}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'opencv_runtime', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.opencv.opencv_00.opencv_runtime-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.opencv.opencv_00.opencv_runtime-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_opencv_runtime_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              colorOrder: BGR
+              dtype: uint8
+              maxPixels: 20000000
+          expectedReturn:
+            accepted: true
+            topic: opencv_runtime
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              dtype: uint8
+              maxPixels: 20000000
+          expectedReturn:
+            accepted: false
+            topic: opencv_runtime
+            missing:
+            - colorOrder
+            violations:
+            - color-order
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              colorOrder: RGB
+              dtype: int64
+              maxPixels: 0
+          expectedReturn:
+            accepted: false
+            topic: opencv_runtime
+            missing: []
+            violations:
+            - color-order
+            - dtype
+            - pixel-budget
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: opencv_00-opencv_runtime-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - opencv_00-opencv_runtime-contract-audit-mastery
+    title: OpenCV 실행 계약 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_opencv_runtime_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_opencv_runtime_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_opencv_runtime_result(expected, observed):
+            identity = ['sourceHash', 'decoder']
+            metrics = {'decodedPixels': 0}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'opencv_runtime', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.opencv.opencv_00.opencv_runtime-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.opencv.opencv_00.opencv_runtime-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_opencv_runtime_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              sourceHash: o0
+              decoder: opencv
+              decodedPixels: 1000000
+          - value:
+              sourceHash: o0
+              decoder: opencv
+              decodedPixels: 1000000
+          expectedReturn:
+            passed: true
+            topic: opencv_runtime
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              sourceHash: o0
+              decoder: opencv
+              decodedPixels: 1000000
+          - value:
+              sourceHash: o1
+              decoder: browser
+              decodedPixels: 120000000
+          expectedReturn:
+            passed: false
+            topic: opencv_runtime
+            missing: []
+            identityMismatch:
+            - decoder
+            - sourceHash
+            metricDrift:
+            - decodedPixels
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              sourceHash: o0
+              decoder: opencv
+              decodedPixels: 1000000
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: opencv_runtime
+            missing:
+            - decodedPixels
+            - decoder
+            - sourceHash
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: opencv_00-opencv_runtime-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - opencv_00-opencv_runtime-result-reconciliation-transfer
+    title: OpenCV 실행 계약 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_opencv_runtime_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_opencv_runtime_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_opencv_runtime_evidence(stage):
+            stages = {'source': {'action': 'validate OpenCV source', 'evidence': 'decoder shape dtype', 'risk': 'invalid image contract'}, 'operation': {'action': 'run bounded OpenCV operation', 'evidence': 'decode trace', 'risk': 'unstable parameters'}, 'result': {'action': 'reconcile OpenCV result', 'evidence': 'reopened geometry and hash', 'risk': 'wrong visual inference'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.opencv.opencv_00.opencv_runtime-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.opencv.opencv_00.opencv_runtime-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_opencv_runtime_evidence
+        cases:
+        - id: recalls-source
+          arguments:
+          - value: source
+          expectedReturn:
+            action: validate OpenCV source
+            evidence: decoder shape dtype
+            risk: invalid image contract
+        - id: recalls-operation
+          arguments:
+          - value: operation
+          expectedReturn:
+            action: run bounded OpenCV operation
+            evidence: decode trace
+            risk: unstable parameters
+        - id: recalls-result
+          arguments:
+          - value: result
+          expectedReturn:
+            action: reconcile OpenCV result
+            evidence: reopened geometry and hash
+            risk: wrong visual inference
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

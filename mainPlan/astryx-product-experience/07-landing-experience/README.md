@@ -2,7 +2,13 @@
 
 상태: 진행
 
-현재 Home hero는 실제 Run 학습 캡처를 desktop/mobile source로 사용하고 첫 CTA를 웹 학습으로 연결한다. 공개 `/learn`은 총량·도메인 카드 대신 설치 없이 실행하고 자동 검사한 뒤 같은 코드를 Local로 이어가는 가치와 읽히는 lesson row catalog를 보여 준다. 472개 canonical lesson route가 route별 본문 module, 제목·description·breadcrumb·JSON-LD, sitemap과 검색 index로 prerender되며 hydration 전후 root/meta/JSON-LD 안정성과 CLS 0을 검사한다. Home·Learn 390px/1440px 감사에서 image/text overlap을 제거하고 mobile 첫 viewport에 다음 band가 보이도록 hero 높이를 조정했다. source build와 대표 browser case는 green이지만 현재 GitHub Pages에는 이전 download-first build가 배포돼 canonical lesson과 `/run/`이 404다. 실제 배포 smoke, 검색 index 유입, 수동 접근성 검수와 모든 outcome visual이 남아 있어 상태는 `진행`이며 `_done`이 아니다.
+## 작업 폴더
+
+- [Proof Studio Landing](00-proof-studio-landing/)
+
+이 폴더의 machine gate와 사람 화면 검수, 실제 Pages 배포 증거가 모두 같은 commit을 가리킬 때만 `_done` 전이를 검토한다.
+
+현재 Home은 실제 product capture 위에 code, output, verification을 읽을 수 있는 Proof Studio workbench를 두고 첫 CTA를 canonical interactive lesson으로 연결한다. 공개 `/learn`은 총량·도메인 카드 대신 이어하기, 검색, 여섯 outcome path와 Web 310개·Local 162개의 capability 경계를 보여 준다. 472개 canonical lesson route가 route별 본문 module, 제목·description·breadcrumb·JSON-LD, sitemap과 검색 index로 prerender되며 같은 URL에서 interactive editor가 시작된다. hydration 전후 root/meta/JSON-LD 안정성과 CLS를 검사하고 Home·Learn 390px/1440px Light/Dark 감사에서 image load, text/control overlap과 horizontal overflow 0을 확인했다. source build와 대표 browser case는 green이지만 push된 commit의 실제 Pages 배포 smoke, 검색 index 유입, 수동 접근성 검수와 사람 브랜드 검수가 남아 있어 상태는 `진행`이며 `_done`이 아니다.
 
 ## 목표
 
@@ -12,22 +18,20 @@
 
 - H1: `Codaro`
 - supporting copy: Python을 배우고, 실행하고, 반복 업무로 확장하는 programmable studio
-- primary action: `웹에서 시작` -> `/learn`
-- secondary action: `Run 열기` -> `/run/`
+- primary action: `웹에서 바로 학습` -> 첫 canonical interactive lesson
+- secondary action: `학습 경로 둘러보기` -> `/learn/`
 - tertiary text link: `Local 다운로드`
-- background media: seeded Web Run fixture에서 캡처한 `runLearningHero` 실제 screenshot. copy는 manifest `safeTextRegion`에만 배치한다.
-- 다음 proof band: overlay 없는 `runLearningDetail` figure에서 code·result·strong check를 실제로 읽게 한다.
+- background media: 실제 Run product capture를 full-bleed 배경으로 사용하고 code·result·verification은 접근 가능한 실제 DOM으로 읽게 한다.
+- 다음 proof band: 이해, 수정, 실행, 자동 검증이 한 흐름으로 이어지는 learning proof를 보여 준다.
 - desktop과 mobile 모두 첫 viewport 아래에 다음 capability band의 시작이 보이게 한다.
 
 ## 페이지 구조
 
-1. Hero: 제품명, 한 문장, 웹 시작, 실제 Run 이미지
-2. Proof strip: 브라우저 Python, 강한 검증, 진행 저장, Local 자동화
-3. Learning outcomes: 대표 6경로의 결과 이미지와 예상 결과
-4. Run to Local: 같은 문서가 웹 학습에서 로컬 자동화로 이어지는 단계
-5. Automation proof: task, schedule, audit, E-Stop 실제 화면
-6. Trust: source, privacy, release checksum, runtime tier 설명
-7. FAQ와 footer
+1. Hero: 제품명, code, output, verification과 canonical lesson 진입
+2. Learning proof: 이해, 수정, 실행, 자동 검증
+3. Outcome paths: 대표 6경로의 결과 이미지와 Web/Local 범위
+4. Web to Local: 같은 학습 문서가 강한 자동화로 확장되는 경계
+5. Trust: source, privacy, runtime tier와 footer
 
 ## Public navigation 계약
 

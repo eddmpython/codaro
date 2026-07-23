@@ -1,0 +1,805 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - pandas
+  - seaborn
+  id: matplotlib_03
+  title: 붓꽃품종산점도
+  order: 3
+  category: matplotlib
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - matplotlib
+  - scatter
+  - marker
+  - legend
+  - iris
+  - 산점도
+  seo:
+    title: Matplotlib 산점도 - 붓꽃 품종별 특성 시각화
+    description: Matplotlib으로 붓꽃 데이터의 품종별 특성을 산점도로 시각화합니다. scatter, marker, legend, text 사용법을 배웁니다.
+    keywords:
+    - matplotlib
+    - scatter
+    - 산점도
+    - iris
+    - marker
+    - 품종분류
+intro:
+  emoji: 🌸
+  goal: 붓꽃 품종별 꽃잎/꽃받침 특성을 산점도로 시각화합니다.
+  description: 산점도로 두 변수 간의 관계를 파악하고, 색상과 마커로 그룹을 구분합니다. 이전에 배운 plot, hist, subplots 개념을 함께 활용합니다.
+  direction: 붓꽃품종산점도에서 분석 데이터를 차트로 만들고 축, 범례, 저장 결과를 검증합니다.
+  benefits:
+  - 시각화할 데이터 확인 후 차트 구성에 맞는 코드 입력을 고릅니다.
+  - 붓꽃품종산점도 결과를 축/범례/파일 출력 기준으로 즉시 점검합니다.
+  - 완료한 코드를 보고서 차트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(시각화할 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 11단계. 한글 폰트 설정 처리 실행
+      detail: 차트 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 2단계. 데이터 로드 결과 검증
+      detail: 축/범례/파일 출력 기준으로 실행 결과를 비교합니다.
+    - label: 붓꽃품종산점도 재사용
+      detail: 완성 코드를 보고서 차트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 시각 리포트 환경
+      detail: matplotlib, pandas, seaborn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 붓꽃품종산점도 실행
+      detail: 셀을 실행해 축/범례/파일 출력와 예외 상태를 확인합니다.
+    - label: 붓꽃품종산점도 완료
+      detail: 검증된 코드를 보고서 차트로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: |-
+    iris(붓꽃) 데이터셋은 머신러닝의 가장 유명한 예제 데이터입니다. 3가지 품종(setosa, versicolor, virginica)의 꽃잎(petal)과 꽃받침(sepal)의 길이와 너비를 담고 있습니다. 품종 분류 문제의 대표적인 데이터셋으로, 시각화를 통해 품종별 특성 차이를 명확하게 파악할 수 있습니다.
+
+    import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. seaborn은 sns로, pandas는 pd로 줄여 쓰는 것이 데이터 과학 커뮤니티의 표준입니다.
+  tips:
+  - import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. seaborn은 sns로, pandas는
+    pd로 줄여 쓰는 것이 데이터 과학 커뮤니티의 표준입니다.
+  snippet: |-
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+    import pandas as pd
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import pandas as pd
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 라이브러리 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 축/범례/파일 출력 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step1_font
+  title: 1-1단계. 한글 폰트 설정
+  structuredPrimary: true
+  subtitle: Codaro 로컬 Python 환경 폰트
+  goal: 11단계. 한글 폰트 설정에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    Codaro 로컬 Python에서는 실행 환경에 따라 기본 폰트에 한글 글리프가 없을 수 있습니다. CDN 또는 로컬 폰트 파일을 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
+
+    font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
+  tips:
+  - font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스
+    기호가 깨지는 것을 방지합니다.
+  snippet: |-
+    from matplotlib import font_manager
+
+    fontCandidates = ["Malgun Gothic", "AppleGothic", "NanumGothic", "DejaVu Sans"]
+    availableFonts = {font.name for font in font_manager.fontManager.ttflist}
+    for fontName in fontCandidates:
+        if fontName in availableFonts:
+            plt.rcParams["font.family"] = fontName
+            break
+    plt.rcParams["axes.unicode_minus"] = False
+  exercise:
+    prompt: 11단계. 한글 폰트 설정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      from matplotlib import font_manager
+
+      fontCandidates = ["Malgun Gothic", "AppleGothic", "NanumGothic", "DejaVu Sans"]
+      availableFonts = {font.name for font in font_manager.fontManager.ttflist}
+      for fontName in fontCandidates:
+          if fontName in availableFonts:
+              plt.rcParams["font.family"] = fontName
+              break
+      plt.rcParams["axes.unicode_minus"] = False
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 한글 폰트 설정의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 11단계. 한글 폰트 설정 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step2_data
+  title: 2단계. 데이터 로드
+  structuredPrimary: true
+  subtitle: iris 데이터
+  goal: 2단계. 데이터 로드에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: loadLocalDataset()으로 iris 데이터를 불러옵니다. 150개의 샘플이 있으며, 각 품종당 50개씩 균등하게 분포되어 있습니다. 4개의 수치형
+    특성과 1개의 범주형 특성(species)으로 구성됩니다. 로컬 데이터라 인터넷 연결과 무관하게 재현됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    iris = loadLocalDataset('iris')
+    iris.head()
+  exercise:
+    prompt: 2단계. 데이터 로드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      iris = loadLocalDataset('iris')
+      iris.head()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 로드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 로드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_explore
+  title: 3단계. 품종 확인
+  structuredPrimary: true
+  subtitle: unique()
+  goal: 3단계. 품종 확인에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  explanation: species 컬럼의 고유값을 확인하여 어떤 품종이 있는지 파악합니다. 3가지 품종이 있으며, 각각 다른 특성을 가지고 있어 산점도에서 군집으로 나타납니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: iris['species'].unique()
+  exercise:
+    prompt: 3단계. 품종 확인 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: iris['species'].unique()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 품종 확인의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 3단계. 품종 확인 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step4_scatter
+  title: 4단계. 기본 산점도
+  structuredPrimary: true
+  subtitle: ax.scatter()
+  goal: 4단계. 기본 산점도에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    산점도는 두 변수 간의 관계를 점으로 표시하는 차트입니다. x축에 꽃받침 길이, y축에 꽃받침 너비를 배치하면 두 변수의 상관관계를 파악할 수 있습니다. 점들이 어떤 패턴을 보이는지 관찰해봅시다.
+
+    ax.scatter(x, y)로 산점도를 그립니다. x와 y에는 같은 길이의 배열이나 Series를 전달합니다. plot()과 달리 점들을 선으로 연결하지 않고 개별 점으로 표시합니다.
+  snippet: |-
+    figScatter, axScatter = plt.subplots(figsize=(10, 7))
+    axScatter.scatter(iris['sepal_length'], iris['sepal_width'])
+    axScatter.set_title('꽃받침 길이 vs 너비', fontsize=14)
+    axScatter.set_xlabel('꽃받침 길이 (cm)', fontsize=12)
+    axScatter.set_ylabel('꽃받침 너비 (cm)', fontsize=12)
+    figScatter
+  exercise:
+    prompt: 4단계. 기본 산점도 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figScatter, axScatter = plt.subplots(figsize=(10, 7))
+      axScatter.scatter(iris['sepal_length'], iris['sepal_width'])
+      axScatter.set_title('꽃받침 길이 vs 너비', fontsize=14)
+      axScatter.set_xlabel('꽃받침 길이 (cm)', fontsize=12)
+      axScatter.set_ylabel('꽃받침 너비 (cm)', fontsize=12)
+      figScatter
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 기본 산점도의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 4단계. 기본 산점도 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step5_color
+  title: 5단계. 품종별 색상 구분
+  structuredPrimary: true
+  subtitle: c 파라미터
+  goal: 5단계. 품종별 색상 구분에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 품종별로 다른 색상을 지정하면 그룹 간 차이를 명확하게 볼 수 있습니다. 각 품종을 순서대로 플롯하고 다른 색상과 라벨을 지정합니다. 이렇게 하면 setosa가
+    다른 품종과 명확히 구분되는 것을 알 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figColor, axColor = plt.subplots(figsize=(10, 7))
+
+    speciesColor = ['setosa', 'versicolor', 'virginica']
+    colorsColor = ['#E74C3C', '#27AE60', '#3498DB']
+  exercise:
+    prompt: 5단계. 품종별 색상 구분 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figColor, axColor = plt.subplots(figsize=(10, 7))
+
+      speciesColor = ['setosa', 'versicolor', 'virginica']
+      colorsColor = ['#E74C3C', '#27AE60', '#3498DB']
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 품종별 색상 구분의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 품종별 색상 구분의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step6_marker
+  title: 6단계. 마커 스타일 변경
+  structuredPrimary: true
+  subtitle: marker 파라미터
+  goal: 6단계. 마커 스타일 변경에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    색상뿐만 아니라 마커 모양도 다르게 설정하면 흑백 인쇄에서도 구분이 가능합니다. 'o'(원), 's'(사각형), '^'(삼각형), 'd'(다이아몬드) 등 다양한 마커를 사용할 수 있습니다. 학술 논문에서는 색상과 마커를 함께 사용하는 것이 권장됩니다.
+
+    marker 파라미터로 점의 모양을 지정합니다. 주요 마커: 'o'(원), 's'(사각형), '^'(위 삼각형), 'v'(아래 삼각형), 'd'(다이아몬드), 'x'(X표), '+'(플러스). s 파라미터는 마커 크기입니다.
+  tips:
+  - 'marker 파라미터로 점의 모양을 지정합니다. 주요 마커: ''o''(원), ''s''(사각형), ''^''(위 삼각형), ''v''(아래 삼각형), ''d''(다이아몬드),
+    ''x''(X표), ''+''(플러스). s 파라미터는 마커 크기입니다.'
+  snippet: |-
+    figMarker, axMarker = plt.subplots(figsize=(10, 7))
+
+    speciesMarker = ['setosa', 'versicolor', 'virginica']
+    colorsMarker = ['#E74C3C', '#27AE60', '#3498DB']
+    markersMarker = ['o', 's', '^']
+  exercise:
+    prompt: 6단계. 마커 스타일 변경 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figMarker, axMarker = plt.subplots(figsize=(10, 7))
+
+      speciesMarker = ['setosa', 'versicolor', 'virginica']
+      colorsMarker = ['#E74C3C', '#27AE60', '#3498DB']
+      markersMarker = ['o', 's', '^']
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 마커 스타일 변경의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 마커 스타일 변경의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step7_text
+  title: 7단계. 텍스트 추가
+  structuredPrimary: true
+  subtitle: ax.text()
+  goal: 7단계. 텍스트 추가에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    차트에 텍스트를 추가하면 중요한 정보를 직접 표시할 수 있습니다. 예를 들어 각 품종 군집의 중심에 품종명을 표시하거나, 특이값에 주석을 달 수 있습니다. text() 함수로 원하는 위치에 텍스트를 배치합니다.
+
+    ax.text(x, y, '텍스트')로 지정한 좌표에 텍스트를 표시합니다. ha(horizontal alignment)와 va(vertical alignment)로 정렬을 설정합니다. bbox로 텍스트 배경 상자를 추가할 수 있습니다.
+  tips:
+  - ax.text(x, y, '텍스트')로 지정한 좌표에 텍스트를 표시합니다. ha(horizontal alignment)와 va(vertical alignment)로 정렬을 설정합니다.
+    bbox로 텍스트 배경 상자를 추가할 수 있습니다.
+  snippet: |-
+    figText, axText = plt.subplots(figsize=(10, 7))
+
+    speciesText = ['setosa', 'versicolor', 'virginica']
+    colorsText = ['#E74C3C', '#27AE60', '#3498DB']
+    markersText = ['o', 's', '^']
+  exercise:
+    prompt: 7단계. 텍스트 추가 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figText, axText = plt.subplots(figsize=(10, 7))
+
+      speciesText = ['setosa', 'versicolor', 'virginica']
+      colorsText = ['#E74C3C', '#27AE60', '#3498DB']
+      markersText = ['o', 's', '^']
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 텍스트 추가의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 텍스트 추가의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step8_petal
+  title: 8단계. 꽃잎 특성 산점도
+  structuredPrimary: true
+  subtitle: 다른 변수 조합
+  goal: 8단계. 꽃잎 특성 산점도에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 꽃받침(sepal) 대신 꽃잎(petal) 특성으로 산점도를 그려봅니다. 꽃잎 특성에서는 품종 간 구분이 더 명확하게 나타납니다. 특히 setosa는 꽃잎이
+    작아서 다른 품종과 완전히 분리됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figPetal, axPetal = plt.subplots(figsize=(10, 7))
+
+    speciesPetal = ['setosa', 'versicolor', 'virginica']
+    colorsPetal = ['#E74C3C', '#27AE60', '#3498DB']
+    markersPetal = ['o', 's', '^']
+  exercise:
+    prompt: 8단계. 꽃잎 특성 산점도 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figPetal, axPetal = plt.subplots(figsize=(10, 7))
+
+      speciesPetal = ['setosa', 'versicolor', 'virginica']
+      colorsPetal = ['#E74C3C', '#27AE60', '#3498DB']
+      markersPetal = ['o', 's', '^']
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 꽃잎 특성 산점도의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 꽃잎 특성 산점도의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step9_subplot
+  title: 9단계. 2개 산점도 비교
+  structuredPrimary: true
+  subtitle: subplots로 비교
+  goal: 9단계. 2개 산점도 비교에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 꽃받침과 꽃잎 특성을 나란히 비교하면 어느 특성이 품종 구분에 더 유용한지 파악할 수 있습니다. 이전에 배운 subplots를 활용하여 두 차트를 한 Figure에
+    배치합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figCompare, (axSepal, axPetalCompare) = plt.subplots(1, 2, figsize=(14, 6))
+
+    speciesCompare = ['setosa', 'versicolor', 'virginica']
+    colorsCompare = ['#E74C3C', '#27AE60', '#3498DB']
+  exercise:
+    prompt: 9단계. 2개 산점도 비교 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figCompare, (axSepal, axPetalCompare) = plt.subplots(1, 2, figsize=(14, 6))
+
+      speciesCompare = ['setosa', 'versicolor', 'virginica']
+      colorsCompare = ['#E74C3C', '#27AE60', '#3498DB']
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 2개 산점도 비교의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 2개 산점도 비교의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step10_final
+  title: 10단계. 최종 시각화
+  structuredPrimary: true
+  subtitle: 완성된 산점도
+  goal: 10단계. 최종 시각화에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 지금까지 배운 모든 요소를 종합하여 완성도 높은 품종 분류 산점도를 만듭니다. 그리드, 범례, 마커 스타일을 모두 적용하고 tight_layout으로 레이아웃을
+    정리합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figFinal, axFinal = plt.subplots(figsize=(11, 8))
+
+    speciesFinal = ['setosa', 'versicolor', 'virginica']
+    colorsFinal = ['#E74C3C', '#27AE60', '#3498DB']
+    markersFinal = ['o', 's', '^']
+    labelsFinal = ['Setosa', 'Versicolor', 'Virginica']
+  exercise:
+    prompt: 10단계. 최종 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figFinal, axFinal = plt.subplots(figsize=(11, 8))
+
+      speciesFinal = ['setosa', 'versicolor', 'virginica']
+      colorsFinal = ['#E74C3C', '#27AE60', '#3498DB']
+      markersFinal = ['o', 's', '^']
+      labelsFinal = ['Setosa', 'Versicolor', 'Virginica']
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 최종 시각화의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 최종 시각화의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 붓꽃 데이터 분석 프로젝트
+  goal: 실습에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    지금까지 배운 내용을 활용해서 붓꽃 데이터를 다양한 관점에서 분석해봅시다. scatter, marker, text, legend, subplots 등 모든 개념을 종합적으로 활용합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+
+    iris2 = loadLocalDataset('iris')
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+
+      iris2 = loadLocalDataset('iris')
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 산점도로 붓꽃 품종별 특성을 분석했습니다.
+  - type: list
+    items:
+    - ax.scatter(x, y) - 산점도로 두 변수 관계 시각화
+    - c, color - 점의 색상 지정
+    - marker - 점의 모양 지정 (o, s, ^, d 등)
+    - s - 점의 크기 지정
+    - ax.text(x, y, text) - 차트에 텍스트 추가
+    - alpha - 투명도 설정
+    - legend(title) - 범례에 제목 추가
+  - type: text
+    content: 다음 시간에는 막대 그래프로 대륙별 인구를 비교합니다.
+  goal: 정리에서 시각화할 데이터을 바꿨을 때 축/범례/파일 출력가 어떻게 달라지는지 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 보고서 차트 품질 게이트
+  goal: 업무 흐름 검증에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고,
+    제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import pandas as pd
+    import matplotlib.pyplot as plt
+
+    reportData = pd.DataFrame({
+        "month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+        "revenue": [82, 91, 105, 112, 121, 130],
+        "cost": [55, 58, 62, 64, 68, 72],
+        "target": [100, 100, 100, 100, 100, 100],
+    })
+
+    def validateChartFrame(frame: pd.DataFrame) -> bool:
+        requiredColumns = {"month", "revenue", "cost", "target"}
+        missingColumns = requiredColumns - set(frame.columns)
+        if missingColumns:
+            raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+        if frame[["revenue", "cost", "target"]].lt(0).any().any():
+            raise ValueError("금액 컬럼은 음수가 될 수 없습니다.")
+        return True
+
+    validateChartFrame(reportData)
+    reportData
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      targetScenario = pd.DataFrame({"target": [95, 100, 115]}).assign(
+          monthsPassed=lambda frame: frame["target"].map(lambda target: int((reportData["revenue"] >= target).sum()))
+      )
+
+      assert targetScenario["monthsPassed"].is_monotonic_decreasing
+      targetScenario
+    solution: |-
+      import pandas as pd
+      import matplotlib.pyplot as plt
+
+      reportData = pd.DataFrame({
+          "month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+          "revenue": [82, 91, 105, 112, 121, 130],
+          "cost": [55, 58, 62, 64, 68, 72],
+          "target": [100, 100, 100, 100, 100, 100],
+      })
+
+      def validateChartFrame(frame: pd.DataFrame) -> bool:
+          requiredColumns = {"month", "revenue", "cost", "target"}
+          missingColumns = requiredColumns - set(frame.columns)
+          if missingColumns:
+              raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+          if frame[["revenue", "cost", "target"]].lt(0).any().any():
+              raise ValueError("금액 컬럼은 음수가 될 수 없습니다.")
+          return True
+
+      validateChartFrame(reportData)
+      reportData
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 업무 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: matplotlib_03-iris-scatter-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 붓꽃 산점도 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 두 수치 변수 관계와 품종 그룹을 분리했는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_iris_scatter(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_iris_scatter(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_iris_scatter(rows):
+            required = ['petalLength', 'petalWidth', 'species']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'species'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['petalLength'] for row in usable]
+            y_values = [row['petalWidth'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.matplotlib.matplotlib_03.iris-scatter-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.matplotlib.matplotlib_03.iris-scatter-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_iris_scatter
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - petalLength: 1.4
+              petalWidth: 0.2
+              species: setosa
+            - petalLength: 4.5
+              petalWidth: 1.5
+              species: versicolor
+            - petalLength: null
+              petalWidth: 2.0
+              species: virginica
+          expectedReturn:
+            usableCount: 2
+            excludedCount: 1
+            groupCounts:
+              setosa: 1
+              versicolor: 1
+            xExtent:
+            - 1.4
+            - 4.5
+            yExtent:
+            - 0.2
+            - 1.5
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: matplotlib_03-iris-scatter-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - matplotlib_03-iris-scatter-data-evidence-mastery
+    title: 붓꽃 산점도 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 두 센서 측정값 관계를 장비 유형별 scatter로 비교한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_iris_scatter(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_iris_scatter(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_iris_scatter(candidate):
+            expected = {'mark': 'scatter', 'x': 'petalLength', 'y': 'petalWidth', 'group': 'species', 'transforms': [], 'interaction': 'none'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.matplotlib.matplotlib_03.iris-scatter-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.matplotlib.matplotlib_03.iris-scatter-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_iris_scatter
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: scatter
+              x: petalLength
+              y: petalWidth
+              group: species
+              transforms: []
+              interaction: none
+              description: 두 센서 측정값 관계를 장비 유형별 scatter로 비교한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: scatter
+              x: petalLength
+              y: petalWidth
+              group: species
+              transforms: []
+              interaction: none
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: petalWidth
+              y: petalLength
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - description
+            encoding:
+              mark: scatter
+              x: petalLength
+              y: petalWidth
+              group: species
+              transforms: []
+              interaction: none
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: matplotlib_03-iris-scatter-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - matplotlib_03-iris-scatter-encoding-transfer-transfer
+    title: 붓꽃 산점도 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 두 수치 변수 관계와 품종 그룹을 분리했는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_iris_scatter(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_iris_scatter(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_iris_scatter(situation):
+            table = {'two-numeric-features': {'encoding': 'scatter', 'evidence': 'axis ranges and n', 'risk': 'overplotting'}, 'species-separation': {'encoding': 'color plus marker', 'evidence': 'group counts', 'risk': 'color-only encoding'}, 'causal-claim': {'encoding': 'none sufficient', 'evidence': 'study design', 'risk': 'correlation as causation'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.matplotlib.matplotlib_03.iris-scatter-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.matplotlib.matplotlib_03.iris-scatter-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_iris_scatter
+        cases:
+        - id: recalls-two-numeric-features
+          arguments:
+          - value: two-numeric-features
+          expectedReturn:
+            encoding: scatter
+            evidence: axis ranges and n
+            risk: overplotting
+        - id: recalls-species-separation
+          arguments:
+          - value: species-separation
+          expectedReturn:
+            encoding: color plus marker
+            evidence: group counts
+            risk: color-only encoding
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

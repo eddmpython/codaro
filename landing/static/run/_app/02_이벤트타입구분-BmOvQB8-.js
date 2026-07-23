@@ -1,0 +1,868 @@
+var e=`meta:
+  id: watchSched_02
+  title: 이벤트 타입 구분
+  order: 2
+  category: watchSched
+  difficulty: easy
+  audience: 폴더 이벤트와 스케줄 자동화에 입문하는 Python 학습자
+  packages:
+    - watchdog
+  outcomes: ["automation.watchSched"]
+  prerequisites: ["automation.watchSched"]
+  estimatedMinutes: 35
+  tags:
+    - watchdog
+    - events
+    - classify
+intro:
+  direction: watchdog의 on_created, on_modified, on_deleted, on_moved 콜백을 모두 구현해 한 폴더 안에서 일어나는 모든 변화를 분류한다.
+  benefits:
+    - 네 가지 이벤트 타입을 분리해 분류 dict를 만든다.
+    - 자식 디렉터리 이벤트와 파일 이벤트를 구분한다.
+    - 자동화 보고용 표준 이벤트 dict 구조를 정한다.
+    - 종합 감시 함수가 모든 이벤트 타입을 한 번에 처리한다.
+  diagram:
+    steps:
+      - label: 분류 핸들러 정의
+        detail: FileSystemEventHandler를 상속해 네 콜백을 모두 구현한다.
+      - label: 파일 생성과 수정
+        detail: write_text 두 번으로 created와 modified를 함께 발생시킨다.
+      - label: 삭제와 이동
+        detail: unlink와 rename으로 deleted와 moved를 발생시킨다.
+      - label: 종합 분류 결과
+        detail: 모인 이벤트를 type별 리스트로 묶은 dict로 종합 정리한다.
+    runtime:
+      - label: watchdog 패키지 필요
+        detail: meta.packages의 watchdog이 로컬 가상환경에 준비되어야 한다.
+      - label: assert 기반 검증
+        detail: 분류 dict의 각 키 리스트와 기대값을 assert로 비교한다.
+sections:
+  - id: classify-handler
+    title: 분류 핸들러 만들기
+    structuredPrimary: true
+    subtitle: 네 콜백 한 곳에서
+    goal: 네 가지 이벤트 콜백을 가진 단일 핸들러로 모든 변화를 한 dict에 분류한다.
+    why: 자동화 감시는 이벤트 타입별로 다른 처리를 해야 하므로 분류 핸들러가 표준 시작점이다.
+    explanation: FileSystemEventHandler의 네 메서드를 모두 오버라이드해 같은 events dict에 type별 리스트로 누적한다. 각 콜백은 type 이름 키에 src_path를 append한다. 이 dict가 종합 보고서의 표준 입력이 된다.
+    tips:
+      - 콜백 안에서는 무거운 작업을 피하고 데이터 수집만 한다.
+      - is_directory가 True인 이벤트는 별도 처리할지 결정한다.
+    snippet: |-
+      from watchdog.events import FileSystemEventHandler
+
+
+      class EventClassifier(FileSystemEventHandler):
+          def __init__(self) -> None:
+              super().__init__()
+              self.events = {"created": [], "modified": [], "deleted": [], "moved": []}
+
+          def on_created(self, event):
+              self.events["created"].append(event.src_path)
+
+          def on_modified(self, event):
+              self.events["modified"].append(event.src_path)
+
+          def on_deleted(self, event):
+              self.events["deleted"].append(event.src_path)
+
+          def on_moved(self, event):
+              self.events["moved"].append((event.src_path, event.dest_path))
+
+
+      classifier = EventClassifier()
+      classifier.on_created(type("E", (), {"src_path": "a"})())
+      classifier.on_deleted(type("E", (), {"src_path": "a"})())
+
+      assert classifier.events["created"] == ["a"]
+      assert classifier.events["deleted"] == ["a"]
+      classifier.events
+    exercise:
+      prompt: EventClassifier로 modified와 moved 콜백을 한 번씩 호출해 두 키 리스트가 본문 기대값과 같은지 검증하세요.
+      starterCode: |-
+        from watchdog.events import FileSystemEventHandler
+
+
+        class EventClassifier(FileSystemEventHandler):
+            def __init__(self) -> None:
+                super().__init__()
+                self.events = {"created": [], "modified": [], "deleted": [], "moved": []}
+
+            def on_created(self, event):
+                self.events["created"].append(event.src_path)
+
+            def on_modified(self, event):
+                self.events["___"].append(event.src_path)
+
+            def on_deleted(self, event):
+                self.events["deleted"].append(event.src_path)
+
+            def on_moved(self, event):
+                self.events["moved"].append((event.src_path, event.dest_path))
+
+
+        classifier = EventClassifier()
+        classifier.on_modified(type("E", (), {"src_path": "x"})())
+        classifier.on_moved(type("E", (), {"src_path": "x", "dest_path": "y"})())
+
+        assert classifier.events["modified"] == ["x"]
+        assert classifier.events["moved"] == [("x", "y")]
+        classifier.events
+      solution: |-
+        from watchdog.events import FileSystemEventHandler
+
+
+        class EventClassifier(FileSystemEventHandler):
+            def __init__(self) -> None:
+                super().__init__()
+                self.events = {"created": [], "modified": [], "deleted": [], "moved": []}
+
+            def on_created(self, event):
+                self.events["created"].append(event.src_path)
+
+            def on_modified(self, event):
+                self.events["modified"].append(event.src_path)
+
+            def on_deleted(self, event):
+                self.events["deleted"].append(event.src_path)
+
+            def on_moved(self, event):
+                self.events["moved"].append((event.src_path, event.dest_path))
+
+
+        classifier = EventClassifier()
+        classifier.on_modified(type("E", (), {"src_path": "x"})())
+        classifier.on_moved(type("E", (), {"src_path": "x", "dest_path": "y"})())
+
+        assert classifier.events["modified"] == ["x"]
+        assert classifier.events["moved"] == [("x", "y")]
+        classifier.events
+      hints:
+        - modified 키는 events dict에서 동일 문자열 modified다.
+        - moved 콜백은 src와 dest를 튜플로 모은다.
+      check:
+        noError: 분류 핸들러 메서드 호출이 정상적으로 끝나야 한다.
+        resultCheck: events dict의 modified와 moved가 기대값과 같아야 한다.
+    check:
+      noError: 분류 핸들러 콜백 두 번 호출이 끝나야 한다.
+      resultCheck: events dict의 created와 deleted가 한 src_path씩 담아야 한다.
+  - id: create-modify
+    title: 파일 생성과 수정 감지
+    structuredPrimary: true
+    subtitle: write_text 두 번
+    goal: 같은 파일에 두 번 write_text를 호출해 created와 modified 이벤트가 모두 발생하는지 확인한다.
+    why: 자동화는 같은 파일이 새로 만들어졌는지 갱신됐는지 구분해야 하므로 두 이벤트 차이를 직접 확인한다.
+    explanation: 첫 write_text는 파일이 없으면 created를 발생시키고, 같은 파일을 한 번 더 쓰면 modified가 발생한다. Observer는 두 이벤트를 모두 핸들러에 전달한다. 파일 시스템 캐시에 따라 modified가 여러 번 발생할 수도 있어 in 비교로 검증한다.
+    tips:
+      - sleep 시간을 1초 가까이 두면 이벤트 전파가 안정적이다.
+      - modified 이벤트는 OS에 따라 여러 번 발생할 수 있어 set 비교가 안전하다.
+    snippet: |-
+      import tempfile
+      import time
+      from pathlib import Path
+
+      from watchdog.events import FileSystemEventHandler
+      from watchdog.observers import Observer
+
+
+      class EventClassifier(FileSystemEventHandler):
+          def __init__(self):
+              super().__init__()
+              self.events = {"created": [], "modified": [], "deleted": [], "moved": []}
+
+          def on_created(self, event):
+              self.events["created"].append(Path(event.src_path).name)
+
+          def on_modified(self, event):
+              if not event.is_directory:
+                  self.events["modified"].append(Path(event.src_path).name)
+
+          def on_deleted(self, event):
+              self.events["deleted"].append(Path(event.src_path).name)
+
+          def on_moved(self, event):
+              self.events["moved"].append((Path(event.src_path).name, Path(event.dest_path).name))
+
+
+      classifier = EventClassifier()
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td)
+          observer = Observer()
+          observer.schedule(classifier, str(base), recursive=False)
+          observer.start()
+          try:
+              (base / "note.txt").write_text("first", encoding="utf-8")
+              time.sleep(0.6)
+              (base / "note.txt").write_text("second", encoding="utf-8")
+              time.sleep(0.6)
+          finally:
+              observer.stop()
+              observer.join()
+
+      assert "note.txt" in classifier.events["created"]
+      assert "note.txt" in classifier.events["modified"]
+      classifier.events["modified"][:3]
+    exercise:
+      prompt: 같은 흐름으로 daily.log 파일에 두 번 write_text를 호출해 created와 modified 양쪽에서 daily.log가 발견되는지 검증하세요.
+      starterCode: |-
+        import tempfile
+        import time
+        from pathlib import Path
+
+        from watchdog.events import FileSystemEventHandler
+        from watchdog.observers import Observer
+
+
+        class EventClassifier(FileSystemEventHandler):
+            def __init__(self):
+                super().__init__()
+                self.events = {"created": [], "modified": [], "deleted": [], "moved": []}
+
+            def on_created(self, event):
+                self.events["created"].append(Path(event.src_path).name)
+
+            def on_modified(self, event):
+                if not event.is_directory:
+                    self.events["modified"].append(Path(event.src_path).name)
+
+            def on_deleted(self, event):
+                self.events["deleted"].append(Path(event.src_path).name)
+
+            def on_moved(self, event):
+                self.events["moved"].append((Path(event.src_path).name, Path(event.dest_path).name))
+
+
+        classifier = EventClassifier()
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            observer = Observer()
+            observer.schedule(classifier, str(base), recursive=False)
+            observer.start()
+            try:
+                (base / "___").write_text("a", encoding="utf-8")
+                time.sleep(0.6)
+                (base / "daily.log").write_text("b", encoding="utf-8")
+                time.sleep(0.6)
+            finally:
+                observer.stop()
+                observer.join()
+
+        assert "daily.log" in classifier.events["created"]
+        assert "daily.log" in classifier.events["modified"]
+        classifier.events["modified"][:3]
+      solution: |-
+        import tempfile
+        import time
+        from pathlib import Path
+
+        from watchdog.events import FileSystemEventHandler
+        from watchdog.observers import Observer
+
+
+        class EventClassifier(FileSystemEventHandler):
+            def __init__(self):
+                super().__init__()
+                self.events = {"created": [], "modified": [], "deleted": [], "moved": []}
+
+            def on_created(self, event):
+                self.events["created"].append(Path(event.src_path).name)
+
+            def on_modified(self, event):
+                if not event.is_directory:
+                    self.events["modified"].append(Path(event.src_path).name)
+
+            def on_deleted(self, event):
+                self.events["deleted"].append(Path(event.src_path).name)
+
+            def on_moved(self, event):
+                self.events["moved"].append((Path(event.src_path).name, Path(event.dest_path).name))
+
+
+        classifier = EventClassifier()
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            observer = Observer()
+            observer.schedule(classifier, str(base), recursive=False)
+            observer.start()
+            try:
+                (base / "daily.log").write_text("a", encoding="utf-8")
+                time.sleep(0.6)
+                (base / "daily.log").write_text("b", encoding="utf-8")
+                time.sleep(0.6)
+            finally:
+                observer.stop()
+                observer.join()
+
+        assert "daily.log" in classifier.events["created"]
+        assert "daily.log" in classifier.events["modified"]
+        classifier.events["modified"][:3]
+      hints:
+        - 두 write_text 모두 daily.log 동일 파일에 대해 호출되어야 한다.
+        - 첫 write는 created를, 두 번째 write는 modified를 발생시킨다.
+      check:
+        noError: 두 번의 write_text와 Observer 정리가 끝나야 한다.
+        resultCheck: classifier.events["created"]와 ["modified"] 모두 daily.log를 포함해야 한다.
+    check:
+      noError: Observer 흐름과 두 번의 write_text가 정상적으로 끝나야 한다.
+      resultCheck: events의 created와 modified 모두 note.txt를 포함해야 한다.
+  - id: delete-move
+    title: 삭제와 이동 감지
+    structuredPrimary: true
+    subtitle: unlink와 rename
+    goal: unlink와 rename으로 deleted와 moved 이벤트를 각각 발생시키고 분류 dict에 모인다.
+    why: 자동화 감시는 파일이 사라지거나 이동했을 때도 정확히 추적해야 운영자가 사고를 빨리 파악할 수 있다.
+    explanation: Path.unlink는 deleted 이벤트, Path.rename은 moved 이벤트를 발생시킨다. moved 이벤트는 src와 dest 두 경로를 포함하므로 핸들러가 튜플로 모은다. 짧은 sleep 후 정리하면 두 이벤트가 모두 전달된다.
+    tips:
+      - rename은 OS에 따라 deleted와 created 두 이벤트로 표현될 수도 있다.
+      - moved 콜백이 호출되지 않으면 deleted와 created 두 이벤트를 합쳐 처리한다.
+    snippet: |-
+      import tempfile
+      import time
+      from pathlib import Path
+
+      from watchdog.events import FileSystemEventHandler
+      from watchdog.observers import Observer
+
+
+      class EventClassifier(FileSystemEventHandler):
+          def __init__(self):
+              super().__init__()
+              self.events = {"created": [], "modified": [], "deleted": [], "moved": []}
+
+          def on_created(self, event):
+              self.events["created"].append(Path(event.src_path).name)
+
+          def on_deleted(self, event):
+              self.events["deleted"].append(Path(event.src_path).name)
+
+          def on_moved(self, event):
+              self.events["moved"].append((Path(event.src_path).name, Path(event.dest_path).name))
+
+
+      classifier = EventClassifier()
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td)
+          target = base / "ticket.md"
+          target.write_text("draft", encoding="utf-8")
+          time.sleep(0.4)
+          observer = Observer()
+          observer.schedule(classifier, str(base), recursive=False)
+          observer.start()
+          try:
+              target.rename(base / "ticket.archived.md")
+              time.sleep(0.6)
+              (base / "ticket.archived.md").unlink()
+              time.sleep(0.6)
+          finally:
+              observer.stop()
+              observer.join()
+      summary = {
+          "movedFound": bool(classifier.events["moved"] or "ticket.md" in classifier.events["deleted"]),
+          "deletedFound": "ticket.archived.md" in classifier.events["deleted"] or "ticket.md" in classifier.events["deleted"],
+      }
+
+      assert summary["movedFound"] is True
+      assert summary["deletedFound"] is True
+      summary
+    exercise:
+      prompt: 같은 핸들러로 stale.log를 만들고 rename과 unlink를 호출해 분류 결과의 movedFound와 deletedFound가 모두 True가 되는지 검증하세요.
+      starterCode: |-
+        import tempfile
+        import time
+        from pathlib import Path
+
+        from watchdog.events import FileSystemEventHandler
+        from watchdog.observers import Observer
+
+
+        class EventClassifier(FileSystemEventHandler):
+            def __init__(self):
+                super().__init__()
+                self.events = {"created": [], "modified": [], "deleted": [], "moved": []}
+
+            def on_created(self, event):
+                self.events["created"].append(Path(event.src_path).name)
+
+            def on_deleted(self, event):
+                self.events["deleted"].append(Path(event.src_path).name)
+
+            def on_moved(self, event):
+                self.events["moved"].append((Path(event.src_path).name, Path(event.dest_path).name))
+
+
+        classifier = EventClassifier()
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            target = base / "___"
+            target.write_text("draft", encoding="utf-8")
+            time.sleep(0.4)
+            observer = Observer()
+            observer.schedule(classifier, str(base), recursive=False)
+            observer.start()
+            try:
+                target.rename(base / "stale.archived.log")
+                time.sleep(0.6)
+                (base / "stale.archived.log").unlink()
+                time.sleep(0.6)
+            finally:
+                observer.stop()
+                observer.join()
+        summary = {
+            "movedFound": bool(classifier.events["moved"] or "stale.log" in classifier.events["deleted"]),
+            "deletedFound": "stale.archived.log" in classifier.events["deleted"] or "stale.log" in classifier.events["deleted"],
+        }
+
+        assert summary == {"movedFound": True, "deletedFound": True}
+        summary
+      solution: |-
+        import tempfile
+        import time
+        from pathlib import Path
+
+        from watchdog.events import FileSystemEventHandler
+        from watchdog.observers import Observer
+
+
+        class EventClassifier(FileSystemEventHandler):
+            def __init__(self):
+                super().__init__()
+                self.events = {"created": [], "modified": [], "deleted": [], "moved": []}
+
+            def on_created(self, event):
+                self.events["created"].append(Path(event.src_path).name)
+
+            def on_deleted(self, event):
+                self.events["deleted"].append(Path(event.src_path).name)
+
+            def on_moved(self, event):
+                self.events["moved"].append((Path(event.src_path).name, Path(event.dest_path).name))
+
+
+        classifier = EventClassifier()
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            target = base / "stale.log"
+            target.write_text("draft", encoding="utf-8")
+            time.sleep(0.4)
+            observer = Observer()
+            observer.schedule(classifier, str(base), recursive=False)
+            observer.start()
+            try:
+                target.rename(base / "stale.archived.log")
+                time.sleep(0.6)
+                (base / "stale.archived.log").unlink()
+                time.sleep(0.6)
+            finally:
+                observer.stop()
+                observer.join()
+        summary = {
+            "movedFound": bool(classifier.events["moved"] or "stale.log" in classifier.events["deleted"]),
+            "deletedFound": "stale.archived.log" in classifier.events["deleted"] or "stale.log" in classifier.events["deleted"],
+        }
+
+        assert summary == {"movedFound": True, "deletedFound": True}
+        summary
+      hints:
+        - 첫 파일 이름을 stale.log로 두면 rename 결과는 stale.archived.log가 된다.
+        - OS에 따라 moved 또는 deleted/created 분기 둘 다 허용해야 안정적이다.
+      check:
+        noError: rename과 unlink 호출이 Observer 안에서 끝나야 한다.
+        resultCheck: summary의 두 키가 모두 True여야 한다.
+    check:
+      noError: 삭제와 이동 호출이 한 Observer 사이클에서 끝나야 한다.
+      resultCheck: summary의 movedFound와 deletedFound가 True여야 한다.
+  - id: classify-summary
+    title: 분류 결과 종합 정리
+    structuredPrimary: true
+    subtitle: 한 dict로 모든 이벤트
+    goal: 한 사이클의 모든 이벤트를 type별 dict로 묶어 자동화 보고의 표준 형태를 완성한다.
+    why: 종합 정리는 다음 자동화 단계가 같은 dict 구조를 신뢰할 수 있게 만드므로 핵심 표준이다.
+    explanation: 마지막 섹션은 classify 결과를 종합 리포트로 만든다. created, modified, deleted, moved 키를 모두 가지며 빈 리스트라도 그대로 두어 후속 코드의 KeyError를 막는다. 같은 핸들러는 두 번 호출해도 같은 dict 형태를 유지한다.
+    tips:
+      - 종합 리포트의 빈 리스트는 일부 이벤트가 발생하지 않았다는 명확한 신호다.
+      - 운영자는 modified 길이가 비정상적으로 길다면 자동화 입력에 문제가 있음을 알 수 있다.
+    snippet: |-
+      from watchdog.events import FileSystemEventHandler
+
+
+      class EventClassifier(FileSystemEventHandler):
+          def __init__(self):
+              super().__init__()
+              self.events = {"created": [], "modified": [], "deleted": [], "moved": []}
+
+          def on_created(self, event):
+              self.events["created"].append("c")
+
+          def on_modified(self, event):
+              self.events["modified"].append("m")
+
+          def on_deleted(self, event):
+              self.events["deleted"].append("d")
+
+          def on_moved(self, event):
+              self.events["moved"].append(("s", "t"))
+
+
+      classifier = EventClassifier()
+      classifier.on_created(None)
+      classifier.on_modified(None)
+      classifier.on_deleted(None)
+      classifier.on_moved(None)
+      summary = {key: len(value) for key, value in classifier.events.items()}
+
+      assert summary == {"created": 1, "modified": 1, "deleted": 1, "moved": 1}
+      summary
+    exercise:
+      prompt: 같은 분류 핸들러에 created를 두 번, deleted를 한 번 호출해 종합 summary가 created 2, deleted 1, 나머지는 0이 되는지 검증하세요.
+      starterCode: |-
+        from watchdog.events import FileSystemEventHandler
+
+
+        class EventClassifier(FileSystemEventHandler):
+            def __init__(self):
+                super().__init__()
+                self.events = {"created": [], "modified": [], "deleted": [], "moved": []}
+
+            def on_created(self, event):
+                self.events["created"].append("c")
+
+            def on_modified(self, event):
+                self.events["modified"].append("m")
+
+            def on_deleted(self, event):
+                self.events["deleted"].append("d")
+
+            def on_moved(self, event):
+                self.events["moved"].append(("s", "t"))
+
+
+        classifier = EventClassifier()
+        classifier.on_created(None)
+        classifier.on_created(None)
+        classifier.on_deleted(None)
+        summary = {key: len(value) for key, value in classifier.events.___()}
+
+        assert summary == {"created": 2, "modified": 0, "deleted": 1, "moved": 0}
+        summary
+      solution: |-
+        from watchdog.events import FileSystemEventHandler
+
+
+        class EventClassifier(FileSystemEventHandler):
+            def __init__(self):
+                super().__init__()
+                self.events = {"created": [], "modified": [], "deleted": [], "moved": []}
+
+            def on_created(self, event):
+                self.events["created"].append("c")
+
+            def on_modified(self, event):
+                self.events["modified"].append("m")
+
+            def on_deleted(self, event):
+                self.events["deleted"].append("d")
+
+            def on_moved(self, event):
+                self.events["moved"].append(("s", "t"))
+
+
+        classifier = EventClassifier()
+        classifier.on_created(None)
+        classifier.on_created(None)
+        classifier.on_deleted(None)
+        summary = {key: len(value) for key, value in classifier.events.items()}
+
+        assert summary == {"created": 2, "modified": 0, "deleted": 1, "moved": 0}
+        summary
+      hints:
+        - dict의 (key, value) 쌍 이터레이션은 items 메서드로 얻는다.
+        - 발생하지 않은 이벤트의 길이는 0이 된다.
+      check:
+        noError: 분류 핸들러 호출과 dict 컴프리헨션이 끝나야 한다.
+        resultCheck: summary가 created 2와 deleted 1, 나머지는 0을 정확히 담아야 한다.
+    check:
+      noError: 분류 핸들러 호출과 dict 압축이 한 흐름에서 끝나야 한다.
+      resultCheck: summary가 네 키 모두 1로 채워져 종합 분류가 표준 형태로 완성되어야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: watchSched_02-watch-event-normalization-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - classify-handler
+    - classify-summary
+    title: filesystem event를 source·destination identity로 정규화하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: created·modified·moved·deleted event에 필요한 path 필드를 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - moved event는 source와 destination을 모두 identity에 포함하세요.
+    - event kind마다 허용 path 필드를 엄격하게 검사하세요.
+    exercise:
+      prompt: normalize_watch_event(event)를 완성하세요.
+      starterCode: |-
+        def normalize_watch_event(event):
+            raise NotImplementedError
+      solution: |
+        def normalize_watch_event(event):
+            kind = event.get("kind")
+            if kind not in {"created", "modified", "moved", "deleted"}:
+                raise ValueError("unknown event kind")
+            source = event.get("source")
+            destination = event.get("destination")
+            if not source:
+                raise ValueError("source path required")
+            if kind == "moved" and not destination:
+                raise ValueError("destination path required")
+            if kind != "moved" and destination:
+                raise ValueError("unexpected destination")
+            identity = f"{kind}:{source}" + (f"->{destination}" if destination else "")
+            return {"kind": kind, "source": source, "destination": destination, "identity": identity}
+      hints: *id001
+    check:
+      id: python.watchsched.watchSched_02.watch-event-normalization.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.watchsched.watchSched_02.watch-event-normalization.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: normalize_watch_event
+        cases:
+        - id: normalizes-created
+          arguments:
+          - value:
+              kind: created
+              source: /in/a.txt
+          expectedReturn:
+            kind: created
+            source: /in/a.txt
+            destination: null
+            identity: created:/in/a.txt
+        - id: normalizes-moved
+          arguments:
+          - value:
+              kind: moved
+              source: /in/a.tmp
+              destination: /in/a.csv
+          expectedReturn:
+            kind: moved
+            source: /in/a.tmp
+            destination: /in/a.csv
+            identity: moved:/in/a.tmp->/in/a.csv
+        - id: rejects-moved-without-destination
+          arguments:
+          - value:
+              kind: moved
+              source: /in/a
+          expectedException: ValueError
+        - id: rejects-destination-on-modified
+          arguments:
+          - value:
+              kind: modified
+              source: /in/a
+              destination: /in/b
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: watchSched_02-watch-event-sequence-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - watchSched_02-watch-event-normalization-mastery
+    title: 새 event sequence에 불가능한 lifecycle 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 파일별 created·modified·deleted 순서를 상태기계로 판정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - event 수만 세지 말고 path별 lifecycle state를 유지하세요.
+    - 불가능한 순서를 조용히 보정하지 말고 event ID와 이전 state를 남기세요.
+    exercise:
+      prompt: audit_event_sequence(events)를 완성하세요.
+      starterCode: |-
+        def audit_event_sequence(events):
+            raise NotImplementedError
+      solution: |
+        def audit_event_sequence(events):
+            states = {}
+            failures = []
+            for event in events:
+                path = event["path"]
+                state = states.get(path, "absent")
+                kind = event["kind"]
+                valid = (state, kind) in {("absent", "created"), ("present", "modified"), ("present", "deleted")}
+                if not valid:
+                    failures.append({"id": event["id"], "state": state, "kind": kind})
+                    continue
+                states[path] = "absent" if kind == "deleted" else "present"
+            return {"accepted": not failures, "failures": failures, "states": dict(sorted(states.items()))}
+      hints: *id002
+    check:
+      id: python.watchsched.watchSched_02.watch-event-sequence-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.watchsched.watchSched_02.watch-event-sequence-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_event_sequence
+        cases:
+        - id: accepts-create-modify-delete
+          arguments:
+          - value:
+            - id: '1'
+              path: /a
+              kind: created
+            - id: '2'
+              path: /a
+              kind: modified
+            - id: '3'
+              path: /a
+              kind: deleted
+          expectedReturn:
+            accepted: true
+            failures: []
+            states:
+              /a: absent
+        - id: reports-modify-before-create
+          arguments:
+          - value:
+            - id: '1'
+              path: /a
+              kind: modified
+          expectedReturn:
+            accepted: false
+            failures:
+            - id: '1'
+              state: absent
+              kind: modified
+            states: {}
+        - id: keeps-independent-path-states
+          arguments:
+          - value:
+            - id: '1'
+              path: /b
+              kind: created
+            - id: '2'
+              path: /a
+              kind: created
+          expectedReturn:
+            accepted: true
+            failures: []
+            states:
+              /a: present
+              /b: present
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: watchSched_02-watch-event-types-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - watchSched_02-watch-event-sequence-audit-transfer
+    title: 파일 event 종류별 identity 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 생성·수정·이동·삭제의 path 근거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - event나 시간이 발생했다는 사실보다 처리 identity와 결과 evidence를 검증하세요.
+    - 중복·지연·재시작 상황에서 같은 업무 결과가 보존되는지 확인하세요.
+    exercise:
+      prompt: choose_event_identity(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_event_identity(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_event_identity(situation):
+            table = {'created-modified': {'action': 'bind source path and file fingerprint', 'evidence': 'event kind and source', 'risk': 'duplicate callback'}, 'moved': {'action': 'bind source and destination', 'evidence': 'move identity', 'risk': 'treating as two unrelated files'}, 'deleted': {'action': 'retain pre-delete identity', 'evidence': 'last known descriptor', 'risk': 'missing artifact'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.watchsched.watchSched_02.watch-event-types-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.watchsched.watchSched_02.watch-event-types-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_event_identity
+        cases:
+        - id: recalls-created-modified
+          arguments:
+          - value: created-modified
+          expectedReturn:
+            action: bind source path and file fingerprint
+            evidence: event kind and source
+            risk: duplicate callback
+        - id: recalls-moved
+          arguments:
+          - value: moved
+          expectedReturn:
+            action: bind source and destination
+            evidence: move identity
+            risk: treating as two unrelated files
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

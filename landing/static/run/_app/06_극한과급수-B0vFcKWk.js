@@ -1,0 +1,630 @@
+var e=`meta:
+  packages:
+  - sympy
+  id: sympy_06
+  title: 극한과급수
+  order: 6
+  category: sympy
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  tags:
+  - sympy
+  - limit
+  - series
+  - summation
+  - 극한
+  - 테일러급수
+  seo:
+    title: SymPy 극한과 급수 - limit, series 사용법
+    description: SymPy로 극한값을 계산하고 테일러 급수를 전개합니다. limit()와 series()로 해석학의 기초를 배웁니다.
+    keywords:
+    - sympy
+    - limit
+    - series
+    - summation
+    - 극한
+    - 테일러급수
+intro:
+  emoji: ∞
+  goal: limit()로 극한값을 계산하고 series()로 급수 전개를 수행합니다.
+  description: 극한(limit)은 해석학의 기초로, 함수가 특정 점에 가까워질 때의 값을 정의합니다. (x²-1)/(x-1)은 x=1에서 0/0이지만 극한값은 2입니다.
+    급수(series)는 무한 합을 다루고, 테일러 급수는 sin(x), eˣ 같은 함수를 다항식으로 근사합니다. 이 개념들은 미분과 적분의 엄밀한 정의, 함수의 근사, 수치 계산의
+    기초가 됩니다. 이 프로젝트를 완료하면 극한값 계산, 급수 전개, 무한급수의 합까지 다룰 수 있게 됩니다.
+  direction: 극한과급수에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 수식과 기호 확인 후 기호 계산에 맞는 코드 입력을 고릅니다.
+  - 극한과급수 결과를 간소화식, 해, 미분/적분 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 수학 계산 검증 루틴에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(수식과 기호)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 기본 극한 처리 실행
+      detail: 기호 계산 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 무한대 극한 결과 검증
+      detail: 간소화식, 해, 미분/적분 결과 기준으로 실행 결과를 비교합니다.
+    - label: 극한과급수 재사용
+      detail: 완성 코드를 수학 계산 검증 루틴에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기호 계산 환경
+      detail: sympy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 극한과급수 실행
+      detail: 셀을 실행해 간소화식, 해, 미분/적분 결과와 예외 상태를 확인합니다.
+    - label: 극한과급수 완료
+      detail: 검증된 코드를 수학 계산 검증 루틴로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 극한과 급수에 필요한 함수들을 불러옵니다. limit()는 극한값을 계산하고, series()는 테일러 급수를 전개합니다. summation()은 유한/무한
+    합을 계산하고, factorial(n)은 n! = n×(n-1)×...×1입니다. oo는 무한대를 나타냅니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from sympy import symbols, limit, series, summation, Sum
+    from sympy import sin, cos, exp, log, sqrt, pi, oo, Rational
+    from sympy import simplify, factorial
+    from sympy import init_printing
+    init_printing()
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from sympy import symbols, limit, series, summation, Sum
+      from sympy import sin, cos, exp, log, sqrt, pi, oo, Rational
+      from sympy import simplify, factorial
+      from sympy import init_printing
+      init_printing()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 1단계. 라이브러리 불러오기의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step2_limit_basic
+  title: 2단계. 기본 극한
+  structuredPrimary: true
+  subtitle: limit()
+  goal: 2단계. 기본 극한에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    limit(f, x, a)는 x가 a에 가까워질 때 f(x)의 극한값을 계산합니다. x=a에서 함수값이 정의되지 않아도 극한은 존재할 수 있습니다. (x²-1)/(x-1)에 x=1을 대입하면 0/0이지만, 인수분해하면 x+1이 되어 극한값은 2입니다. limit()는 이런 부정형을 자동으로 처리합니다.
+
+    (x²-1)/(x-1)에 x=1을 대입하면 0/0이지만, 인수분해하면 x+1이 되어 극한값은 2입니다. limit()가 자동 처리합니다.
+  snippet: x = symbols('x')
+  exercise:
+    prompt: 2단계. 기본 극한 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: x = symbols('x')
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 2단계. 기본 극한의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 기본 극한 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step3_infinity
+  title: 3단계. 무한대 극한
+  structuredPrimary: true
+  subtitle: x → ∞
+  goal: 3단계. 무한대 극한에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: x가 무한대로 갈 때의 극한은 함수의 장기적 행동을 보여줍니다. limit(1/x, x, oo) = 0으로 x가 커지면 1/x는 0에 가까워집니다. 유리함수
+    (2x+1)/(x+3)의 극한은 최고차항 계수의 비인 2입니다. 발산하는 경우 oo 또는 -oo가 반환됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    lim3 = limit(1/x, x, oo)
+    lim3
+  exercise:
+    prompt: 3단계. 무한대 극한 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      lim3 = limit(1/x, x, oo)
+      lim3
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 3단계. 무한대 극한의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 무한대 극한 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step4_sided
+  title: 4단계. 좌극한과 우극한
+  structuredPrimary: true
+  subtitle: 방향 지정
+  goal: 4단계. 좌극한과 우극한에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    함수가 불연속인 점에서는 왼쪽에서 접근하는 값(좌극한)과 오른쪽에서 접근하는 값(우극한)이 다를 수 있습니다. 1/x의 x→0 극한은 오른쪽에서 +∞, 왼쪽에서 -∞입니다. limit(f, x, a, '+')는 우극한, limit(f, x, a, '-')는 좌극한입니다. 좌극한과 우극한이 같을 때만 극한이 존재합니다.
+
+    dir='+' 또는 '+'는 오른쪽(양의 방향)에서 접근합니다. dir='-' 또는 '-'는 왼쪽(음의 방향)에서 접근합니다.
+  snippet: |-
+    lright = limit(1/x, x, 0, '+')
+    lright
+  exercise:
+    prompt: 4단계. 좌극한과 우극한 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      lright = limit(1/x, x, 0, '+')
+      lright
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 4단계. 좌극한과 우극한의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 좌극한과 우극한 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step5_special
+  title: 5단계. 특수 극한
+  structuredPrimary: true
+  subtitle: 유명한 극한
+  goal: 5단계. 특수 극한에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 미적분에서 반복적으로 등장하는 유명한 극한들이 있습니다. lim[x→0] sin(x)/x = 1은 삼각함수 미분의 기초입니다. lim[n→∞] (1+1/n)ⁿ
+    = e는 자연상수 e의 정의입니다. lim[x→0] (eˣ-1)/x = 1은 지수함수 미분에 사용됩니다. 이 극한들은 암기할 가치가 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    lsin = limit(sin(x)/x, x, 0)
+    lsin
+  exercise:
+    prompt: 5단계. 특수 극한 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      lsin = limit(sin(x)/x, x, 0)
+      lsin
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 5단계. 특수 극한의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 특수 극한 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step6_series
+  title: 6단계. 테일러 급수
+  structuredPrimary: true
+  subtitle: series()
+  goal: 6단계. 테일러 급수에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    테일러 급수(Taylor series)는 함수를 다항식으로 근사합니다. eˣ = 1 + x + x²/2! + x³/3! + ..., sin(x) = x - x³/6 + x⁵/120 - ...입니다. series(f, x, 0, n)은 x=0에서 n항까지 전개합니다. 결과에 O(xⁿ)은 오차항을 나타냅니다. 컴퓨터가 삼각함수를 계산할 때 실제로 테일러 급수를 사용합니다.
+
+    series(f, x, 0, n)은 x=0에서 n항까지 전개합니다. O(x^n)은 나머지 오차항입니다. removeO()로 제거할 수 있습니다.
+  snippet: |-
+    sexp = series(exp(x), x, 0, 6)
+    sexp
+  exercise:
+    prompt: 6단계. 테일러 급수 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      sexp = series(exp(x), x, 0, 6)
+      sexp
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 6단계. 테일러 급수의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 테일러 급수 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step7_remove_o
+  title: 7단계. 급수 활용
+  structuredPrimary: true
+  subtitle: 다항식 추출
+  goal: 7단계. 급수 활용에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    series() 결과에서 removeO()를 호출하면 오차항 O(xⁿ)을 제거하고 순수한 다항식을 얻습니다. 이 다항식으로 원래 함수를 근사할 수 있습니다. sin(0.5)의 정확한 값 0.479...과 테일러 다항식의 근사값을 비교하면 매우 가깝습니다. 항이 많을수록 더 넓은 범위에서 정확하게 근사합니다.
+
+    테일러 다항식은 중심 근처에서 원래 함수를 잘 근사합니다. 항이 많을수록 더 넓은 범위에서 정확합니다.
+  snippet: |-
+    spoly = series(sin(x), x, 0, 7).removeO()
+    spoly
+  exercise:
+    prompt: 7단계. 급수 활용 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      spoly = series(sin(x), x, 0, 7).removeO()
+      spoly
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 7단계. 급수 활용의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 급수 활용 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step8_summation
+  title: 8단계. 급수 합
+  structuredPrimary: true
+  subtitle: summation()
+  goal: 8단계. 급수 합에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    summation()은 Σ 기호로 표현되는 급수의 합을 계산합니다. summation(k, (k, 1, 10))은 1+2+...+10 = 55입니다. 변수 n을 사용하면 1+2+...+n = n(n+1)/2 같은 공식을 유도합니다. 무한급수도 수렴하면 정확한 값을 반환합니다. 기하급수 Σ(1/2)ᵏ = 2입니다.
+
+    summation(f, (k, a, b))는 k=a부터 k=b까지의 합입니다. b=oo로 무한급수를 계산합니다. 수렴하면 값을 반환합니다.
+  snippet: |-
+    n, k = symbols('n k')
+    fsum = summation(k, (k, 1, 10))
+    fsum
+  exercise:
+    prompt: 8단계. 급수 합 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      n, k = symbols('n k')
+      fsum = summation(k, (k, 1, 10))
+      fsum
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 8단계. 급수 합의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 급수 합 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step9_famous
+  title: 9단계. 유명한 급수
+  structuredPrimary: true
+  subtitle: 바젤 문제 등
+  goal: 9단계. 유명한 급수에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 수학사에서 중요한 급수들을 SymPy로 검증합니다. 바젤 문제 Σ(1/n²)은 1735년 오일러가 π²/6임을 증명하여 수학계를 놀라게 했습니다. 조화급수
+    Σ(1/n)은 발산하여 무한대가 됩니다. 1/n²은 수렴하는데 1/n은 발산하는 이유는 항의 감소 속도 차이 때문입니다. 교대급수 Σ((-1)ⁿ/n)은 ln(2)에 수렴합니다.
+    이런 급수들은 해석학의 기초 예제로 널리 사용됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    basel = summation(1/n**2, (n, 1, oo))
+    basel
+  exercise:
+    prompt: 9단계. 유명한 급수 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      basel = summation(1/n**2, (n, 1, oo))
+      basel
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 9단계. 유명한 급수의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 유명한 급수 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step10_combine
+  title: 10단계. 극한과 급수 연결
+  structuredPrimary: true
+  subtitle: 종합
+  goal: 10단계. 극한과 급수 연결에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 극한과 급수는 미적분학의 근간입니다. 미분의 정의 f'(x) = lim[h→0] (f(x+h)-f(x))/h는 극한으로 정의됩니다. x=2에서 x²의 미분값
+    4를 극한 정의로 계산하면 limit((f(2+h)-f(2))/h, h, 0) = 4입니다. 자연상수 e도 급수 Σ(1/n!)으로 정의됩니다. SymPy는 미분을 극한 정의 없이
+    diff()로 바로 계산하지만, 극한 정의를 이해하면 미분의 본질을 알 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from sympy import diff
+    h = symbols('h')
+    f = x**2
+    ddef = limit((f.subs(x, 2+h) - f.subs(x, 2))/h, h, 0)
+    ddef
+  exercise:
+    prompt: 10단계. 극한과 급수 연결 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      from sympy import diff
+      h = symbols('h')
+      f = x**2
+      ddef = limit((f.subs(x, 2+h) - f.subs(x, 2))/h, h, 0)
+      ddef
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: 10단계. 극한과 급수 연결의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 극한과 급수 연결 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 극한과 급수 연습
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    이제 limit(), series(), summation()을 종합적으로 활용합니다. 미션1에서는 다양한 부정형 극한을 계산합니다. (1-cos(u))/u²은 0/0형태이고, u·log(u)는 0·(-∞)형태입니다. 미션2에서는 ln(1+v)와 √(1+v)의 테일러 급수를 구하고, 1/k⁴의 무한합이 π⁴/90임을 확인합니다. 이런 계산은 물리학의 근사 계산, 수치해석의 오차 분석에 필수적입니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    from sympy import symbols, limit, sin, cos, exp, log, oo
+
+    u = symbols('u')
+
+    val1 = limit((1 - cos(u))/u**2, u, 0)
+    val1
+  exercise:
+    prompt: 실습 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from sympy import symbols, limit, sin, cos, exp, log, oo
+
+      u = symbols('u')
+
+      val1 = limit((1 - cos(u))/u**2, u, 0)
+      val1
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 실습의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 실습 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기'
+  structuredPrimary: true
+  subtitle: 예측 → 수식 구성 → 오류 수정 → 결과 검증 → 실무 변주
+  goal: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: SymPy는 계산기를 대신하는 도구가 아니라, 업무 규칙을 수식으로 고정하고 전제 조건을 검증하는 도구입니다. 여기서는 고정비와 단위 이익으로 손익분기점을
+    구하고, 잘못된 계수를 먼저 실패시킨 뒤, 기준 변경 실험을 수행합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import sympy as sp
+
+    x = sp.symbols('x', nonnegative=True)
+    fixedCost = 120000
+    unitPrice = 5000
+    unitCost = 2000
+
+    revenueExpr = unitPrice * x
+    costExpr = fixedCost + unitCost * x
+    profitExpr = sp.simplify(revenueExpr - costExpr)
+    breakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]
+
+    assert profitExpr == 3000 * x - 120000
+    assert breakEvenQuantity == 40
+    profitExpr, breakEvenQuantity
+  exercise:
+    prompt: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    starterCode: |-
+      import sympy as sp
+
+      x = sp.symbols('x', nonnegative=True)
+      fixedCost = 120000
+      unitPrice = 5000
+      unitCost = 2000
+
+      revenueExpr = unitPrice * x
+      costExpr = fixedCost + unitCost * x
+      profitExpr = sp.simplify(revenueExpr - costExpr)
+      breakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]
+
+      assert profitExpr == 3000 * x - 120000
+      assert breakEvenQuantity == 40
+      profitExpr, breakEvenQuantity
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.'
+    resultCheck: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sympy_06-geometric-series-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 등비급수 부분합과 수렴 판단하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 첫 항·공비·항 수로 부분합과 무한 수렴값을 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 부분합과 무한합을 같은 값으로 부르지 마세요.
+    - 무한 등비급수는 |r|<1일 때만 수렴합니다.
+    exercise:
+      prompt: geometric_series(first, ratio, count)를 완성하세요.
+      starterCode: |-
+        def geometric_series(first, ratio, count):
+            raise NotImplementedError
+      solution: |
+        def geometric_series(first, ratio, count):
+            if count < 0: raise ValueError("negative count")
+            partial = sum(first*ratio**index for index in range(count))
+            limit = first/(1-ratio) if abs(ratio) < 1 else None
+            return {"partial": partial, "converges": abs(ratio) < 1, "limit": limit}
+      hints: *id001
+    check:
+      id: python.sympy.sympy_06.geometric-series.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_06.geometric-series.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: geometric_series
+        cases:
+        - id: computes-convergent-series
+          arguments:
+          - value: 1
+          - value: 0.5
+          - value: 3
+          expectedReturn:
+            partial: 1.75
+            converges: true
+            limit: 2.0
+        - id: marks-divergent
+          arguments:
+          - value: 2
+          - value: 1
+          - value: 4
+          expectedReturn:
+            partial: 8
+            converges: false
+            limit: null
+        - id: rejects-negative-count
+          arguments:
+          - value: 1
+          - value: 0
+          - value: -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sympy_06-rational-leading-limit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sympy_06-geometric-series-mastery
+    title: 새 유리함수 극한에 차수 비교 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: x→infinity에서 분자·분모 leading term으로 극한을 판정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 최고차항의 차수를 먼저 비교하세요.
+    - 양방향 infinity와 x→+infinity를 구분하세요.
+    exercise:
+      prompt: rational_infinity_limit(num_degree, num_lead, den_degree, den_lead)를 완성하세요.
+      starterCode: |-
+        def rational_infinity_limit(num_degree, num_lead, den_degree, den_lead):
+            raise NotImplementedError
+      solution: |
+        def rational_infinity_limit(num_degree, num_lead, den_degree, den_lead):
+            if den_lead == 0 or num_degree < 0 or den_degree < 0: raise ValueError("invalid leading term")
+            if num_degree < den_degree: return 0.0
+            if num_degree == den_degree: return num_lead/den_lead
+            sign = 1 if num_lead/den_lead > 0 else -1
+            return "infinity" if sign > 0 else "-infinity"
+      hints: *id002
+    check:
+      id: python.sympy.sympy_06.rational-leading-limit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_06.rational-leading-limit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: rational_infinity_limit
+        cases:
+        - id: lower-degree-goes-zero
+          arguments:
+          - value: 1
+          - value: 2
+          - value: 2
+          - value: 3
+          expectedReturn: 0.0
+        - id: equal-degree-ratio
+          arguments:
+          - value: 2
+          - value: 6
+          - value: 2
+          - value: 3
+          expectedReturn: 2.0
+        - id: higher-degree-diverges
+          arguments:
+          - value: 3
+          - value: -1
+          - value: 1
+          - value: 2
+          expectedReturn: -infinity
+        - id: rejects-zero-denominator-lead
+          arguments:
+          - value: 1
+          - value: 1
+          - value: 2
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sympy_06-limit-series-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sympy_06-rational-leading-limit-transfer
+    title: 극한과 급수 판단 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 수렴 조건과 계산 방법을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 기호 계산의 가정과 정의역을 결과와 함께 남기세요.
+    - 소수 근삿값과 exact 결과를 구분하세요.
+    exercise:
+      prompt: choose_limit_method(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_limit_method(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_limit_method(situation):
+            table = {'geometric-sum': {'method': 'ratio test', 'evidence': 'absolute ratio below one', 'risk': 'partial sum as limit'}, 'rational-infinity': {'method': 'leading degrees', 'evidence': 'leading coefficients', 'risk': 'lower terms'}, 'indeterminate-form': {'method': "simplify or L'Hopital with conditions", 'evidence': 'form after substitution', 'risk': 'automatic rule'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sympy.sympy_06.limit-series-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_06.limit-series-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_limit_method
+        cases:
+        - id: recalls-geometric-sum
+          arguments:
+          - value: geometric-sum
+          expectedReturn:
+            method: ratio test
+            evidence: absolute ratio below one
+            risk: partial sum as limit
+        - id: recalls-rational-infinity
+          arguments:
+          - value: rational-infinity
+          expectedReturn:
+            method: leading degrees
+            evidence: leading coefficients
+            risk: lower terms
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

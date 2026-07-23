@@ -1,0 +1,635 @@
+var e=`meta:
+  id: '32'
+  title: 제너레이터 심화
+  day: 32
+  category: advancedPython
+  tags:
+  - 제너레이터
+  - yield from
+  - send
+  - throw
+  - close
+  - 코루틴
+  - 파이프라인
+  seo:
+    title: 파이썬 제너레이터 심화 - yield from, send, throw, 파이프라인
+    description: 30days의 제너레이터 입문을 이어 yield from으로 위임하고, send/throw/close로 외부 제어하는 흐름을 다룹니다.
+    keywords:
+    - yield from
+    - generator.send
+    - generator.throw
+    - generator pipeline
+    - lazy evaluation
+intro:
+  emoji: ⚙️
+  points:
+  - yield from으로 하위 제너레이터에 위임
+  - send로 외부에서 값 주입
+  - throw로 외부에서 예외 발생, close로 정상 종료
+  - filter→map→take 파이프라인을 lazy하게 구성
+  - itertools와 결합해 무한 시퀀스를 다루기
+  direction: 제너레이터 심화에서 외부와 양방향으로 통신하는 흐름과 lazy 파이프라인을 코드로 확인합니다.
+  benefits:
+  - 메모리에 다 올리지 않고 큰 데이터를 한 번에 한 항목씩 처리합니다.
+  - 코루틴 기반 데이터 파이프라인의 기본 흐름을 익혀 비동기 코드의 기초로 연결합니다.
+  - yield from으로 중첩된 제너레이터를 한 자리에서 평탄화합니다.
+  diagram:
+    steps:
+    - label: 제너레이터 객체 생성 입력 확인
+      detail: 함수 호출은 즉시 값을 만들지 않고 제너레이터 객체를 돌려줍니다.
+    - label: next/send 처리 실행
+      detail: 호출자가 next 또는 send로 값을 꺼내며 yield 지점에서 함수가 멈춥니다.
+    - label: throw/close 결과 검증
+      detail: 외부 신호로 제너레이터를 멈추거나 예외를 주입하고 정리 코드가 실행되는지 확인합니다.
+    - label: 제너레이터 파이프라인 재사용
+      detail: filter, map, take 같은 빌딩 블록을 합쳐 새 데이터 처리에 그대로 붙입니다.
+    runtime:
+    - label: 표준 라이브러리 환경
+      detail: itertools와 collections만 사용해 추가 패키지 없이 실행합니다.
+    - label: 제너레이터 심화 실행
+      detail: 셀을 실행해 next/send/throw 호출과 yield 지점의 값을 확인합니다.
+    - label: 제너레이터 심화 완료
+      detail: 검증된 코드를 lazy 파이프라인 유틸리티로 남깁니다.
+sections:
+- id: yield-from
+  title: yield from으로 하위 제너레이터에 위임
+  structuredPrimary: true
+  subtitle: 중첩 제너레이터 평탄화
+  goal: yield from으로 다른 제너레이터의 값을 그대로 전달하고 호출 깊이를 평탄하게 만듭니다.
+  why: yield from 없이 for 루프와 yield를 직접 쓰면 중첩 제너레이터에서 send/throw가 올바르게 위임되지 않아 코루틴 패턴이 깨집니다.
+  explanation: yield from <iterable>은 하위 iterable이 끝날 때까지 그 값을 호출자에게 넘기고, send/throw/close도 하위 제너레이터로 전파합니다. 반환값(return value)은 yield from 표현식의 결과값이 됩니다.
+  tips:
+  - 단순 평탄화면 yield from list_of_lists로 두 단계 중첩을 풀 수 있습니다.
+  - 하위 제너레이터의 return 값은 yield from 표현식의 결과로 잡힙니다.
+  snippet: |-
+    def innerRange(start, end):
+        for value in range(start, end):
+            yield value
+        return f"inner:{start}-{end}"
+
+    def chained():
+        firstReturn = yield from innerRange(0, 3)
+        secondReturn = yield from innerRange(10, 12)
+        return [firstReturn, secondReturn]
+
+    gen = chained()
+    yielded = list(gen)
+
+    yielded
+  exercise:
+    prompt: chained 제너레이터를 next로 한 번에 하나씩 꺼내고, StopIteration의 value 속성에 두 inner의 return 값이 모이는지 확인하세요.
+    starterCode: |-
+      def innerRange(start, end):
+          for value in range(start, end):
+              yield value
+          return f"inner:{start}-{end}"
+
+      def chained():
+          firstReturn = yield from innerRange(0, 3)
+          secondReturn = yield from innerRange(10, 12)
+          return [firstReturn, secondReturn]
+
+      gen = chained()
+      collected = []
+      try:
+          while True:
+              collected.append(next(gen))
+      except StopIteration as stop:
+          finalValue = stop.value
+
+      {"yielded": collected, "final": finalValue}
+    hints:
+    - StopIteration은 제너레이터가 끝났을 때 발생하고 .value에 return 값이 담깁니다.
+    - yield from은 하위의 return 값을 위 단계의 표현식에 그대로 전달합니다.
+  check:
+    type: noError
+    noError: innerRange와 chained 정의가 NameError나 TypeError 없이 실행되어야 합니다.
+    resultCheck: yielded 리스트는 [0,1,2,10,11]이고 final 리스트는 [inner:0-3, inner:10-12]로 두 단계의 return 값이 모두 보존되어야 합니다.
+- id: send-coroutine
+  title: send로 값을 주입하는 코루틴 기초
+  structuredPrimary: true
+  subtitle: '제너레이터의 양방향 통신: yield의 표현식 값'
+  goal: send 호출이 yield의 표현식 값으로 들어오는 흐름을 코드로 확인하고 간단한 평균기를 만듭니다.
+  why: 제너레이터는 yield에서 멈추는 동시에 외부에서 보내는 값을 받을 수 있어 상태를 가진 처리기를 함수처럼 간결하게 표현할 수 있습니다.
+  explanation: yield는 단순히 값을 내보내는 것뿐 아니라 표현식 자체가 send로 들어온 값으로 평가됩니다. 첫 호출은 next 또는 send(None)로 함수 본문이 첫 yield까지 진행되도록 해야 합니다.
+  tips:
+  - 첫 호출은 반드시 next() 또는 send(None)이어야 합니다. 처음부터 send(값)을 보내면 TypeError가 납니다.
+  - 코루틴 패턴에서 send의 반환값은 다음 yield가 내보내는 값입니다.
+  snippet: |-
+    def runningAverage():
+        total = 0
+        count = 0
+        average = None
+        while True:
+            value = yield average
+            total += value
+            count += 1
+            average = total / count
+
+    avg = runningAverage()
+    next(avg)
+    results = [avg.send(10), avg.send(20), avg.send(60)]
+
+    results
+  exercise:
+    prompt: runningAverage에 send(0)을 추가로 보내 평균이 어떻게 변하는지 확인하고, 첫 next()를 빼면 어떤 에러가 나는지 검증해 보세요.
+    starterCode: |-
+      def runningAverage():
+          total = 0
+          count = 0
+          average = None
+          while True:
+              value = yield average
+              total += value
+              count += 1
+              average = total / count
+
+      avg = runningAverage()
+      primed = next(avg)
+      results = [avg.send(10), avg.send(20), avg.send(60), avg.send(0)]
+
+      {"primed": primed, "results": results}
+    hints:
+    - send 직후 yield 표현식이 받은 값으로 평가되고 다음 yield가 새 평균을 돌려줍니다.
+    - primed는 첫 next의 반환값으로 yield의 초기 표현식(average=None)이 보여야 합니다.
+  check:
+    type: noError
+    noError: runningAverage와 send 호출이 NameError나 TypeError 없이 실행되어야 합니다.
+    resultCheck: primed가 None이고 results가 [10.0, 15.0, 30.0, 22.5]처럼 누적 평균이 정확히 갱신되어야 합니다.
+- id: throw-close
+  title: throw와 close로 외부 제어
+  structuredPrimary: true
+  subtitle: 제너레이터의 라이프사이클 끝내기
+  goal: 외부에서 throw로 예외를 주입하거나 close로 정상 종료를 신호하고 finally 정리 코드가 실행됨을 확인합니다.
+  why: 장시간 실행되는 제너레이터(스트림 처리기, 백그라운드 워커)는 중단 신호와 예외 주입을 안전하게 받을 수 있어야 합니다.
+  explanation: gen.throw(ExcType)은 yield 지점에서 ExcType 예외를 발생시키고, gen.close()는 GeneratorExit을 주입합니다. 제너레이터 본문의 try/finally 블록이 정상 종료/예외 종료 양쪽에서 실행되어 자원 정리를 보장합니다.
+  tips:
+  - GeneratorExit을 일부러 catch해서 무시하면 RuntimeError가 발생합니다. 정리만 하고 다시 raise하거나 빠져나가세요.
+  - throw로 받은 예외를 제너레이터 안에서 잡아 처리하면 yield는 다음 값을 돌려줍니다.
+  snippet: |-
+    def streamProcessor(label, log):
+        log.append(f"start:{label}")
+        try:
+            while True:
+                item = yield
+                log.append(f"got:{item}")
+        except GeneratorExit:
+            log.append(f"close:{label}")
+            raise
+        except ValueError as exc:
+            log.append(f"error:{exc}")
+
+    log = []
+    proc = streamProcessor("stream", log)
+    next(proc)
+    proc.send("apple")
+    proc.send("banana")
+    proc.throw(ValueError, "bad item")
+
+    proc.close()
+    log
+  exercise:
+    prompt: streamProcessor에 또 다른 예외(KeyError)를 throw로 주입해 정의되지 않은 분기에서는 예외가 어떻게 전파되는지 확인하세요.
+    starterCode: |-
+      def streamProcessor(label, log):
+          log.append(f"start:{label}")
+          try:
+              while True:
+                  item = yield
+                  log.append(f"got:{item}")
+          except GeneratorExit:
+              log.append(f"close:{label}")
+              raise
+          except ValueError as exc:
+              log.append(f"error:{exc}")
+
+      log = []
+      proc = streamProcessor("stream", log)
+      next(proc)
+      proc.send("apple")
+      try:
+          proc.throw(KeyError, "missing")
+      except KeyError as exc:
+          log.append(f"escaped:{exc}")
+
+      log
+    hints:
+    - 잡지 못한 예외는 throw 호출자에게 그대로 전파됩니다.
+    - try/except 가 ValueError만 잡으므로 KeyError는 빠져나옵니다.
+  check:
+    type: noError
+    noError: streamProcessor 정의와 throw/close 호출이 NameError나 TypeError 없이 실행되어야 합니다.
+    resultCheck: log 리스트가 start, got:apple, escaped 순서로 채워져 잡히지 않은 예외가 호출자로 빠져나오는 흐름이 보여야 합니다.
+- id: pipeline
+  title: 제너레이터 파이프라인
+  structuredPrimary: true
+  subtitle: filter / map / take를 lazy 빌딩 블록으로
+  goal: 작은 제너레이터 함수를 합쳐 큰 데이터셋을 한 항목씩 처리하는 lazy 파이프라인을 구성합니다.
+  why: 리스트 컴프리헨션은 결과를 한꺼번에 만들어 메모리를 많이 씁니다. 제너레이터를 단계로 연결하면 필요한 만큼만 평가되어 큰 데이터에 안전합니다.
+  explanation: 각 단계가 iterable을 받아 yield로 한 항목씩 내보내는 함수면, 그 함수들의 호출을 차곡차곡 합칠 수 있습니다. take처럼 앞에서 N개만 꺼내는 단계로 무한 시퀀스도 처리 가능합니다.
+  tips:
+  - 각 단계는 입력 iterable이 끝날 때까지 yield해야 합니다.
+  - take로 잘라야 itertools.count 같은 무한 시퀀스도 안전합니다.
+  snippet: |-
+    from itertools import count
+
+    def keepWhen(predicate, source):
+        for item in source:
+            if predicate(item):
+                yield item
+
+    def transformBy(func, source):
+        for item in source:
+            yield func(item)
+
+    def takeFirst(limit, source):
+        taken = 0
+        for item in source:
+            if taken >= limit:
+                return
+            yield item
+            taken += 1
+
+    pipeline = takeFirst(5, transformBy(lambda x: x * x, keepWhen(lambda x: x % 2 == 1, count(1))))
+    list(pipeline)
+  exercise:
+    prompt: pipeline에 추가 단계로 transformBy(lambda x - x + 100, ...)를 끼워 넣고 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from itertools import count
+
+      def keepWhen(predicate, source):
+          for item in source:
+              if predicate(item):
+                  yield item
+
+      def transformBy(func, source):
+          for item in source:
+              yield func(item)
+
+      def takeFirst(limit, source):
+          taken = 0
+          for item in source:
+              if taken >= limit:
+                  return
+              yield item
+              taken += 1
+
+      base = keepWhen(lambda x: x % 2 == 1, count(1))
+      squared = transformBy(lambda x: x * x, base)
+      offset = transformBy(lambda x: x + 100, squared)
+      limited = takeFirst(5, offset)
+
+      list(limited)
+    hints:
+    - 각 단계는 호출 즉시 데이터를 만들지 않고, list()로 소비할 때 평가됩니다.
+    - offset 단계가 빠지면 결과가 100씩 작아집니다.
+  check:
+    type: noError
+    noError: keepWhen, transformBy, takeFirst 정의와 파이프라인 합성이 NameError나 TypeError 없이 실행되어야 합니다.
+    resultCheck: list 결과가 [101, 109, 125, 149, 181]처럼 홀수 제곱에 100을 더한 5개 값이어야 lazy 합성이 맞는 것입니다.
+- id: itertools-combine
+  title: itertools와 결합한 lazy 처리
+  structuredPrimary: true
+  subtitle: groupby, accumulate, islice 활용
+  goal: 직접 만든 제너레이터와 itertools 함수를 합쳐 그룹 집계와 누적 합을 lazy하게 계산합니다.
+  why: itertools는 표준 라이브러리에 구현된 lazy 빌딩 블록 모음입니다. 직접 구현보다 빠르고 정확하며, 제너레이터와 자연스럽게 결합됩니다.
+  explanation: groupby는 인접한 동일 키를 묶고, accumulate는 누적 합/최댓값 등을 yield하며, islice는 슬라이싱을 lazy하게 합니다. 모두 iterable을 받아 iterable을 돌려주는 형태라 직접 만든 제너레이터 단계와 그대로 합칠 수 있습니다.
+  tips:
+  - groupby는 정렬된 입력에 사용해야 의도한 그룹이 만들어집니다.
+  - accumulate는 두 번째 인자로 함수를 받아 max, min, 곱 등 다양한 누적을 만듭니다.
+  snippet: |-
+    from itertools import accumulate, groupby, islice
+
+    sales = [
+        ("a", 10), ("a", 20), ("a", 30),
+        ("b", 5), ("b", 15),
+        ("c", 100),
+    ]
+
+    def groupSums(rows):
+        for key, group in groupby(rows, key=lambda item: item[0]):
+            total = sum(amount for _, amount in group)
+            yield key, total
+
+    def runningTotal(rows):
+        amounts = (amount for _, amount in rows)
+        yield from accumulate(amounts)
+
+    summary = list(groupSums(sales))
+    cumulative = list(islice(runningTotal(sales), 4))
+
+    {"summary": summary, "cumulativeFirst4": cumulative}
+  exercise:
+    prompt: groupSums의 정렬되지 않은 입력에 itertools.groupby가 의도한 그룹을 만들지 않는 것을 확인하고, sorted를 앞에 끼워 고치세요.
+    starterCode: |-
+      from itertools import accumulate, groupby
+
+      mixed = [
+          ("a", 10), ("b", 5), ("a", 20), ("c", 100), ("a", 30), ("b", 15),
+      ]
+
+      def groupSums(rows):
+          for key, group in groupby(rows, key=lambda item: item[0]):
+              total = sum(amount for _, amount in group)
+              yield key, total
+
+      rawGroups = list(groupSums(mixed))
+      sortedGroups = list(groupSums(sorted(mixed, key=lambda item: item[0])))
+
+      {"rawGroups": rawGroups, "sortedGroups": sortedGroups}
+    hints:
+    - groupby는 인접한 동일 키만 묶기 때문에 정렬되지 않은 입력에서는 같은 키가 여러 그룹으로 쪼개집니다.
+    - sortedGroups는 [(a, 60), (b, 20), (c, 100)]가 되어야 의도한 결과입니다.
+  check:
+    type: noError
+    noError: groupSums와 itertools 호출이 NameError나 TypeError 없이 실행되어야 합니다.
+    resultCheck: sortedGroups가 [(a, 60), (b, 20), (c, 100)]이고 rawGroups는 키별 합이 분산되어 sorted를 앞에 두는 것이 왜 필요한지 보여야 합니다.
+assessment:
+  masteryVariants:
+  - id: 32_advanced_generators-lazy-pipeline-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - yield-from
+    - pipeline
+    - itertools-combine
+    title: lazy 파이프라인으로 홀수 제곱 offset 만들기
+    subtitle: lazy generator pipeline
+    goal: build_lazy_offsets(start, count)를 완성해 홀수만 필터링하고 제곱한 뒤 100을 더한 count개 값을 반환한다.
+    why: 제너레이터의 핵심은 yield 문법이 아니라, 큰 입력을 한꺼번에 만들지 않고 단계별 변환을 필요할 때만 소비하는 흐름입니다.
+    explanation: start부터 증가하는 정수 흐름에서 홀수만 남기고, 제곱한 뒤 100을 더해 count개만 리스트로 반환하세요.
+    tips:
+    - 각 단계는 generator를 반환하고 마지막 take 단계에서만 소비하세요.
+    - count가 음수이면 ValueError로 거부합니다.
+    exercise:
+      prompt: build_lazy_offsets(start, count)를 완성해 count개 offset 값을 반환하세요.
+      starterCode: |-
+        def build_lazy_offsets(start, count):
+            raise NotImplementedError
+      solution: |-
+        def build_lazy_offsets(start, count):
+            if count < 0:
+                raise ValueError("count must be non-negative")
+
+            def numbers():
+                current = start
+                while True:
+                    yield current
+                    current += 1
+
+            def keep_odd(values):
+                for value in values:
+                    if value % 2 == 1:
+                        yield value
+
+            def transform(values):
+                for value in values:
+                    yield value * value + 100
+
+            result = []
+            for value in transform(keep_odd(numbers())):
+                if len(result) == count:
+                    break
+                result.append(value)
+            return result
+      hints:
+      - 무한 numbers generator를 만들 수 있지만 count개만 소비해야 합니다.
+      - 필터와 변환을 분리하면 pipeline 단계가 보입니다.
+    check:
+      id: python.advanced.generators.lazy-pipeline.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.generators.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_lazy_offsets
+        cases:
+        - id: returns-first-five-odd-square-offsets
+          arguments:
+          - value: 1
+          - value: 5
+          expectedReturn:
+          - 101
+          - 109
+          - 125
+          - 149
+          - 181
+        - id: rejects-negative-count
+          arguments:
+          - value: 1
+          - value: -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 32_advanced_generators-batch-stream-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - send-coroutine
+    - throw-close
+    - itertools-combine
+    title: 이벤트 스트림을 고정 크기 batch로 흘려보내기
+    subtitle: generator batching transfer
+    goal: batch_event_stream(events, batch_size)를 완성해 입력 이벤트를 batch_size 단위로 묶은 리스트를 반환한다.
+    why: lazy pipeline을 배치 처리로 옮기면, 파일·로그·API 응답처럼 긴 흐름을 한 번에 메모리에 올리지 않는 설계 감각이 생깁니다.
+    explanation: batch_size는 양수여야 합니다. 마지막 batch는 크기가 작아도 반환하세요.
+    tips:
+    - 내부 generator에서 batch가 가득 찰 때 yield하면 됩니다.
+    - 남은 batch는 반복이 끝난 뒤 한 번 더 yield해야 합니다.
+    exercise:
+      prompt: batch_event_stream(events, batch_size)를 완성해 batch 목록을 반환하세요.
+      starterCode: |-
+        def batch_event_stream(events, batch_size):
+            raise NotImplementedError
+      solution: |-
+        def batch_event_stream(events, batch_size):
+            if batch_size <= 0:
+                raise ValueError("batch_size must be positive")
+
+            def batches():
+                batch = []
+                for event in events:
+                    batch.append(event)
+                    if len(batch) == batch_size:
+                        yield batch
+                        batch = []
+                if batch:
+                    yield batch
+
+            return list(batches())
+      hints:
+      - batch를 yield한 뒤에는 새 리스트로 바꿔야 이전 batch가 변하지 않습니다.
+      - 마지막에 남은 batch를 놓치지 마세요.
+    check:
+      id: python.advanced.generators.batch-stream.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.generators.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: batch_event_stream
+        cases:
+        - id: emits-full-and-final-partial-batches
+          arguments:
+          - value:
+            - O-1
+            - O-2
+            - O-3
+            - O-4
+            - O-5
+          - value: 2
+          expectedReturn:
+          - - O-1
+            - O-2
+          - - O-3
+            - O-4
+          - - O-5
+        - id: rejects-zero-batch-size
+          arguments:
+          - value: []
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 32_advanced_generators-tool-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 32_advanced_generators-batch-stream-transfer
+    title: 제너레이터 도구 선택 기준 회상하기
+    subtitle: generator tool recall
+    goal: choose_generator_tool(need)를 완성해 lazy 처리 상황별 도구와 주의점을 반환한다.
+    why: 제너레이터 고급 기능은 쓰는 순간 멋있어 보이지만, 소비 시점, 외부 제어, 종료 처리, itertools 조합을 구분하지 못하면 버그가 숨어듭니다.
+    explanation: delegate-subgenerator, inject-value, abort-stream, lazy-pipeline, stdlib-lazy-combine 상황별 도구를 선택하세요.
+    tips:
+    - yield from은 하위 generator에 위임할 때 씁니다.
+    - close와 throw는 finally 정리와 함께 생각해야 합니다.
+    exercise:
+      prompt: choose_generator_tool(need)를 완성해 tool, useWhen, caution을 반환하세요.
+      starterCode: |-
+        def choose_generator_tool(need):
+            raise NotImplementedError
+      solution: |-
+        def choose_generator_tool(need):
+            table = {
+                "delegate-subgenerator": {
+                    "tool": "yield-from",
+                    "useWhen": "one generator should expose another generator output",
+                    "caution": "return values and exceptions are delegated too",
+                },
+                "inject-value": {
+                    "tool": "send",
+                    "useWhen": "the consumer should push data back into the generator",
+                    "caution": "prime the generator before first non-None send",
+                },
+                "abort-stream": {
+                    "tool": "throw-or-close",
+                    "useWhen": "the consumer needs to stop or signal failure",
+                    "caution": "cleanup belongs in finally",
+                },
+                "lazy-pipeline": {
+                    "tool": "generator-pipeline",
+                    "useWhen": "large data should move through small transformations",
+                    "caution": "iterators are consumed once",
+                },
+                "stdlib-lazy-combine": {
+                    "tool": "itertools",
+                    "useWhen": "standard lazy grouping, slicing, or accumulation is needed",
+                    "caution": "groupby only groups adjacent keys",
+                },
+            }
+            if need not in table:
+                raise ValueError("unknown generator need")
+            return table[need]
+      hints:
+      - 먼저 데이터가 언제 소비되는지 확인하세요.
+      - itertools는 표준 도구지만 전제 조건을 모르면 결과가 틀릴 수 있습니다.
+    check:
+      id: python.advanced.generators.tool-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.generators.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_generator_tool
+        cases:
+        - id: recalls-pipeline-for-large-data
+          arguments:
+          - value: lazy-pipeline
+          expectedReturn:
+            tool: generator-pipeline
+            useWhen: large data should move through small transformations
+            caution: iterators are consumed once
+        - id: recalls-itertools-groupby-warning
+          arguments:
+          - value: stdlib-lazy-combine
+          expectedReturn:
+            tool: itertools
+            useWhen: standard lazy grouping, slicing, or accumulation is needed
+            caution: groupby only groups adjacent keys
+        - id: rejects-unknown-need
+          arguments:
+          - value: infinite-list
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending
+`;export{e as default};

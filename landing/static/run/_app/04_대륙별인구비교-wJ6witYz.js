@@ -1,0 +1,848 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - pandas
+  id: matplotlib_04
+  title: 대륙별인구비교
+  order: 4
+  category: matplotlib
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - matplotlib
+  - bar
+  - barh
+  - xticks
+  - annotate
+  - gapminder
+  seo:
+    title: Matplotlib 막대 그래프 - 대륙별 인구 비교
+    description: Matplotlib으로 gapminder 데이터의 대륙별 인구를 막대 그래프로 시각화합니다. bar, barh, xticks, annotate 사용법을
+      배웁니다.
+    keywords:
+    - matplotlib
+    - bar
+    - 막대그래프
+    - gapminder
+    - annotate
+    - 인구
+intro:
+  emoji: 🌍
+  goal: 대륙별 인구를 막대 그래프로 비교 분석합니다.
+  description: 막대 그래프로 카테고리별 수치를 비교하고, annotate로 주석을 추가합니다. 이전에 배운 plot, hist, scatter, subplots 개념을 함께
+    활용합니다.
+  direction: 대륙별인구비교에서 분석 데이터를 차트로 만들고 축, 범례, 저장 결과를 검증합니다.
+  benefits:
+  - 시각화할 데이터 확인 후 차트 구성에 맞는 코드 입력을 고릅니다.
+  - 대륙별인구비교 결과를 축/범례/파일 출력 기준으로 즉시 점검합니다.
+  - 완료한 코드를 보고서 차트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(시각화할 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 11단계. 한글 폰트 설정 처리 실행
+      detail: 차트 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 2단계. 데이터 로드 결과 검증
+      detail: 축/범례/파일 출력 기준으로 실행 결과를 비교합니다.
+    - label: 대륙별인구비교 재사용
+      detail: 완성 코드를 보고서 차트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 시각 리포트 환경
+      detail: matplotlib, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 대륙별인구비교 실행
+      detail: 셀을 실행해 축/범례/파일 출력와 예외 상태를 확인합니다.
+    - label: 대륙별인구비교 완료
+      detail: 검증된 코드를 보고서 차트로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: |-
+    gapminder 데이터를 사용하여 대륙별 인구를 분석합니다. 이 데이터는 세계 각국의 발전 지표를 담고 있으며, Codaro 로컬 데이터셋에서 직접 불러와 인터넷 연결 없이 실행할 수 있습니다.
+
+    import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. pandas는 pd로 줄여 쓰는 것이 데이터 과학 커뮤니티의 표준입니다.
+  tips:
+  - import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. pandas는 pd로 줄여 쓰는
+    것이 데이터 과학 커뮤니티의 표준입니다.
+  snippet: |-
+    import matplotlib.pyplot as plt
+    import pandas as pd
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: |-
+      import matplotlib.pyplot as plt
+      import pandas as pd
+    hints:
+    - 바꿀 지점은 시각화할 데이터을 만드는 첫 줄과 차트 구성 줄에서 찾으세요.
+    - 실행 뒤 축/범례/파일 출력 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 축/범례/파일 출력 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step1_font
+  title: 1-1단계. 한글 폰트 설정
+  structuredPrimary: true
+  subtitle: Codaro 로컬 Python 환경 폰트
+  goal: 11단계. 한글 폰트 설정에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    Codaro 로컬 Python에서는 실행 환경에 따라 기본 폰트에 한글 글리프가 없을 수 있습니다. CDN 또는 로컬 폰트 파일을 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
+
+    font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
+  tips:
+  - font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스
+    기호가 깨지는 것을 방지합니다.
+  snippet: |-
+    from matplotlib import font_manager
+
+    fontCandidates = ["Malgun Gothic", "AppleGothic", "NanumGothic", "DejaVu Sans"]
+    availableFonts = {font.name for font in font_manager.fontManager.ttflist}
+    for fontName in fontCandidates:
+        if fontName in availableFonts:
+            plt.rcParams["font.family"] = fontName
+            break
+    plt.rcParams["axes.unicode_minus"] = False
+  exercise:
+    prompt: 11단계. 한글 폰트 설정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      from matplotlib import font_manager
+
+      fontCandidates = ["Malgun Gothic", "AppleGothic", "NanumGothic", "DejaVu Sans"]
+      availableFonts = {font.name for font in font_manager.fontManager.ttflist}
+      for fontName in fontCandidates:
+          if fontName in availableFonts:
+              plt.rcParams["font.family"] = fontName
+              break
+      plt.rcParams["axes.unicode_minus"] = False
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 한글 폰트 설정의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 11단계. 한글 폰트 설정 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step2_data
+  title: 2단계. 데이터 로드
+  structuredPrimary: true
+  subtitle: Codaro 로컬 데이터셋에서 로드
+  goal: 2단계. 데이터 로드에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: gapminder 데이터를 Codaro 로컬 데이터셋에서 불러옵니다. 이 데이터는 세계 각국의 기대수명, 인구, GDP 정보를 담고 있어 대륙별 비교 연습에
+    적합합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    gapminder = loadLocalDataset("gapminder")
+    gapminder.head()
+  exercise:
+    prompt: 2단계. 데이터 로드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      gapminder = loadLocalDataset("gapminder")
+      gapminder.head()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 로드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 로드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_filter
+  title: 3단계. 2007년 데이터 필터링
+  structuredPrimary: true
+  subtitle: 최근 연도 선택
+  goal: 3단계. 2007년 데이터 필터링에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 대륙별 비교를 위해 가장 최근 연도인 2007년 데이터만 추출합니다. 불리언 인덱싱으로 year 컬럼이 2007인 행만 선택합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    data2007 = gapminder[gapminder['year'] == 2007]
+    data2007.shape
+  exercise:
+    prompt: 3단계. 2007년 데이터 필터링 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      data2007 = gapminder[gapminder['year'] == 2007]
+      data2007.shape
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 2007년 데이터 필터링에서 \`data2007\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 2007년 데이터 필터링 실행 뒤 \`data2007\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step4_groupby
+  title: 4단계. 대륙별 인구 집계
+  structuredPrimary: true
+  subtitle: groupby().sum()
+  goal: 4단계. 대륙별 인구 집계에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 대륙(continent)별로 인구(pop)를 합산합니다. groupby로 그룹화하고 sum()으로 합계를 구한 후, reset_index()로 DataFrame
+    형태로 변환합니다. 억 단위로 표시하기 위해 10억으로 나눕니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    popByContinent = data2007.groupby('continent')['pop'].sum().reset_index()
+    popByContinent['popBillion'] = popByContinent['pop'] / 1e9
+    popByContinent
+  exercise:
+    prompt: 4단계. 대륙별 인구 집계 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      popByContinent = data2007.groupby('continent')['pop'].sum().reset_index()
+      popByContinent['popBillion'] = popByContinent['pop'] / 1e9
+      popByContinent
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 대륙별 인구 집계에서 \`popByContinent\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 4단계. 대륙별 인구 집계 실행 뒤 \`popByContinent\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step5_bar
+  title: 5단계. 기본 막대 그래프
+  structuredPrimary: true
+  subtitle: ax.bar()
+  goal: 5단계. 기본 막대 그래프에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    ax.bar()로 수직 막대 그래프를 그립니다. 첫 번째 인자는 x축 위치(카테고리), 두 번째 인자는 막대 높이(수치)입니다. 대륙별 인구를 한눈에 비교할 수 있습니다.
+
+    ax.bar(x, height)로 수직 막대 그래프를 그립니다. x는 카테고리(문자열 배열), height는 막대 높이(숫자 배열)입니다. width 파라미터로 막대 너비를 조절할 수 있습니다(기본값 0.8).
+  tips:
+  - ax.bar(x, height)로 수직 막대 그래프를 그립니다. x는 카테고리(문자열 배열), height는 막대 높이(숫자 배열)입니다. width 파라미터로 막대 너비를 조절할
+    수 있습니다(기본값 0.8).
+  snippet: |-
+    figBar, axBar = plt.subplots(figsize=(10, 6))
+    axBar.bar(popByContinent['continent'], popByContinent['popBillion'])
+    axBar.set_title('2007년 대륙별 인구', fontsize=14)
+    axBar.set_xlabel('대륙', fontsize=12)
+    axBar.set_ylabel('인구 (10억 명)', fontsize=12)
+    figBar
+  exercise:
+    prompt: 5단계. 기본 막대 그래프 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figBar, axBar = plt.subplots(figsize=(10, 6))
+      axBar.bar(popByContinent['continent'], popByContinent['popBillion'])
+      axBar.set_title('2007년 대륙별 인구', fontsize=14)
+      axBar.set_xlabel('대륙', fontsize=12)
+      axBar.set_ylabel('인구 (10억 명)', fontsize=12)
+      figBar
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 기본 막대 그래프의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 5단계. 기본 막대 그래프 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step6_color
+  title: 6단계. 색상 설정
+  structuredPrimary: true
+  subtitle: color 파라미터
+  goal: 6단계. 색상 설정에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 각 막대에 다른 색상을 지정하면 시각적 구분이 명확해집니다. color 파라미터에 색상 리스트를 전달하면 각 막대에 순서대로 색상이 적용됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figColor, axColor = plt.subplots(figsize=(10, 6))
+    colorsBasic = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
+    axColor.bar(popByContinent['continent'], popByContinent['popBillion'], color=colorsBasic)
+    axColor.set_title('2007년 대륙별 인구', fontsize=14)
+    axColor.set_xlabel('대륙', fontsize=12)
+    axColor.set_ylabel('인구 (10억 명)', fontsize=12)
+    figColor
+  exercise:
+    prompt: 6단계. 색상 설정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figColor, axColor = plt.subplots(figsize=(10, 6))
+      colorsBasic = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
+      axColor.bar(popByContinent['continent'], popByContinent['popBillion'], color=colorsBasic)
+      axColor.set_title('2007년 대륙별 인구', fontsize=14)
+      axColor.set_xlabel('대륙', fontsize=12)
+      axColor.set_ylabel('인구 (10억 명)', fontsize=12)
+      figColor
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 색상 설정의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 색상 설정의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step7_xticks
+  title: 7단계. x축 눈금 조정
+  structuredPrimary: true
+  subtitle: set_xticks(), rotation
+  goal: 7단계. x축 눈금 조정에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    x축 라벨이 길거나 많을 때는 회전시키면 겹침을 방지할 수 있습니다. tick_params의 rotation으로 라벨 각도를 조정합니다. 한글 라벨로 변경하여 가독성을 높입니다.
+
+    ax.tick_params(axis='x', rotation=45)로 x축 라벨을 45도 회전합니다. labelsize로 글꼴 크기도 조절 가능합니다. set_xticklabels()로 라벨 텍스트를 직접 지정할 수도 있습니다.
+  tips:
+  - ax.tick_params(axis='x', rotation=45)로 x축 라벨을 45도 회전합니다. labelsize로 글꼴 크기도 조절 가능합니다. set_xticklabels()로
+    라벨 텍스트를 직접 지정할 수도 있습니다.
+  snippet: |-
+    figTicks, axTicks = plt.subplots(figsize=(10, 6))
+    colorsTicks = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
+    continentKrTicks = ['아프리카', '아메리카', '아시아', '유럽', '오세아니아']
+
+    barsTicks = axTicks.bar(continentKrTicks, popByContinent['popBillion'], color=colorsTicks)
+    axTicks.set_title('2007년 대륙별 인구', fontsize=14)
+    axTicks.set_xlabel('대륙', fontsize=12)
+    axTicks.set_ylabel('인구 (10억 명)', fontsize=12)
+    axTicks.tick_params(axis='x', rotation=0)
+    figTicks
+  exercise:
+    prompt: 7단계. x축 눈금 조정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figTicks, axTicks = plt.subplots(figsize=(10, 6))
+      colorsTicks = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
+      continentKrTicks = ['아프리카', '아메리카', '아시아', '유럽', '오세아니아']
+
+      barsTicks = axTicks.bar(continentKrTicks, popByContinent['popBillion'], color=colorsTicks)
+      axTicks.set_title('2007년 대륙별 인구', fontsize=14)
+      axTicks.set_xlabel('대륙', fontsize=12)
+      axTicks.set_ylabel('인구 (10억 명)', fontsize=12)
+      axTicks.tick_params(axis='x', rotation=0)
+      figTicks
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. x축 눈금 조정의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. x축 눈금 조정의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step8_annotate
+  title: 8단계. 막대 위에 값 표시
+  structuredPrimary: true
+  subtitle: ax.annotate()
+  goal: 8단계. 막대 위에 값 표시에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    각 막대 위에 정확한 수치를 표시하면 정보 전달력이 높아집니다. annotate()로 지정한 위치에 텍스트를 추가합니다. 막대의 x좌표와 높이를 이용해 위치를 계산합니다.
+
+    ax.annotate(text, xy=(x, y))로 텍스트를 추가합니다. xy는 텍스트 위치, ha(horizontal alignment)와 va(vertical alignment)로 정렬을 설정합니다. bar.get_x()와 bar.get_height()로 막대의 좌표와 높이를 얻습니다.
+  tips:
+  - ax.annotate(text, xy=(x, y))로 텍스트를 추가합니다. xy는 텍스트 위치, ha(horizontal alignment)와 va(vertical alignment)로
+    정렬을 설정합니다. bar.get_x()와 bar.get_height()로 막대의 좌표와 높이를 얻습니다.
+  snippet: |-
+    figAnnotate, axAnnotate = plt.subplots(figsize=(10, 6))
+    colorsAnnotate = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
+    continentKrAnnotate = ['아프리카', '아메리카', '아시아', '유럽', '오세아니아']
+    valuesAnnotate = popByContinent['popBillion'].values
+
+    barsAnnotate = axAnnotate.bar(continentKrAnnotate, valuesAnnotate, color=colorsAnnotate)
+    figAnnotate
+  exercise:
+    prompt: 8단계. 막대 위에 값 표시 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figAnnotate, axAnnotate = plt.subplots(figsize=(10, 6))
+      colorsAnnotate = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
+      continentKrAnnotate = ['아프리카', '아메리카', '아시아', '유럽', '오세아니아']
+      valuesAnnotate = popByContinent['popBillion'].values
+
+      barsAnnotate = axAnnotate.bar(continentKrAnnotate, valuesAnnotate, color=colorsAnnotate)
+      figAnnotate
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 막대 위에 값 표시의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 막대 위에 값 표시의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step9_barh
+  title: 9단계. 수평 막대 그래프
+  structuredPrimary: true
+  subtitle: ax.barh()
+  goal: 9단계. 수평 막대 그래프에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    카테고리명이 길거나 비교 항목이 많을 때는 수평 막대 그래프가 더 읽기 쉽습니다. barh()를 사용하면 막대가 수평으로 그려집니다. 인구가 많은 순서로 정렬하면 순위를 쉽게 파악할 수 있습니다.
+
+    ax.barh(y, width)로 수평 막대 그래프를 그립니다. y는 카테고리, width는 막대 길이입니다. 데이터를 정렬(sort_values)한 후 그리면 순위를 쉽게 파악할 수 있습니다.
+  tips:
+  - ax.barh(y, width)로 수평 막대 그래프를 그립니다. y는 카테고리, width는 막대 길이입니다. 데이터를 정렬(sort_values)한 후 그리면 순위를 쉽게 파악할
+    수 있습니다.
+  snippet: |-
+    figBarh, axBarh = plt.subplots(figsize=(10, 6))
+
+    popSortedBarh = popByContinent.sort_values('popBillion', ascending=True)
+    continentKrSorted = ['오세아니아', '유럽', '아프리카', '아메리카', '아시아']
+    colorsSorted = ['#9B59B6', '#F39C12', '#3498DB', '#E74C3C', '#27AE60']
+
+    barsBarh = axBarh.barh(continentKrSorted, popSortedBarh['popBillion'], color=colorsSorted)
+    figBarh
+  exercise:
+    prompt: 9단계. 수평 막대 그래프 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figBarh, axBarh = plt.subplots(figsize=(10, 6))
+
+      popSortedBarh = popByContinent.sort_values('popBillion', ascending=True)
+      continentKrSorted = ['오세아니아', '유럽', '아프리카', '아메리카', '아시아']
+      colorsSorted = ['#9B59B6', '#F39C12', '#3498DB', '#E74C3C', '#27AE60']
+
+      barsBarh = axBarh.barh(continentKrSorted, popSortedBarh['popBillion'], color=colorsSorted)
+      figBarh
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 수평 막대 그래프의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 수평 막대 그래프의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step10_final
+  title: 10단계. 최종 시각화
+  structuredPrimary: true
+  subtitle: 완성된 막대 그래프
+  goal: 10단계. 최종 시각화에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 지금까지 배운 모든 요소를 종합하여 완성도 높은 대륙별 인구 비교 차트를 만듭니다. 그리드, 스파인 제거, 값 레이블을 모두 적용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figFinal, axFinal = plt.subplots(figsize=(11, 7))
+
+    popSortedFinal = popByContinent.sort_values('popBillion', ascending=True)
+    continentKrFinal = ['오세아니아', '유럽', '아프리카', '아메리카', '아시아']
+    colorsFinal = ['#9B59B6', '#F39C12', '#3498DB', '#E74C3C', '#27AE60']
+
+    barsFinal = axFinal.barh(continentKrFinal, popSortedFinal['popBillion'], color=colorsFinal, height=0.6)
+    figFinal
+  exercise:
+    prompt: 10단계. 최종 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figFinal, axFinal = plt.subplots(figsize=(11, 7))
+
+      popSortedFinal = popByContinent.sort_values('popBillion', ascending=True)
+      continentKrFinal = ['오세아니아', '유럽', '아프리카', '아메리카', '아시아']
+      colorsFinal = ['#9B59B6', '#F39C12', '#3498DB', '#E74C3C', '#27AE60']
+
+      barsFinal = axFinal.barh(continentKrFinal, popSortedFinal['popBillion'], color=colorsFinal, height=0.6)
+      figFinal
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 최종 시각화의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 최종 시각화의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 대륙별 데이터 분석 프로젝트
+  goal: 실습에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    지금까지 배운 내용을 활용해서 gapminder 데이터를 다양한 관점에서 분석해봅시다. bar, barh, xticks, annotate 등 모든 개념을 종합적으로 활용합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import matplotlib.pyplot as plt
+    import pandas as pd
+    from codaro.curriculum.localData import loadLocalDataset
+
+    data = loadLocalDataset("gapminder")
+
+    year2007 = data[data['year'] == 2007]
+    lifeByContinent = year2007.groupby('continent')['lifeExp'].mean().reset_index()
+    lifeSorted = lifeByContinent.sort_values('lifeExp', ascending=True)
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import matplotlib.pyplot as plt
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+
+      data = loadLocalDataset("gapminder")
+
+      year2007 = data[data['year'] == 2007]
+      lifeByContinent = year2007.groupby('continent')['lifeExp'].mean().reset_index()
+      lifeSorted = lifeByContinent.sort_values('lifeExp', ascending=True)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 막대 그래프로 대륙별 인구를 비교 분석했습니다.
+  - type: list
+    items:
+    - ax.bar(x, height) - 수직 막대 그래프
+    - ax.barh(y, width) - 수평 막대 그래프
+    - color - 막대 색상 지정
+    - tick_params(rotation) - 축 라벨 회전
+    - ax.annotate(text, xy) - 막대 위에 값 표시
+    - sort_values() - 데이터 정렬로 순위 시각화
+    - spines[].set_visible(False) - 테두리 제거
+  - type: text
+    content: 다음 시간에는 펭귄 데이터로 바이올린 플롯과 박스플롯을 비교합니다.
+  goal: 정리에서 시각화할 데이터을 바꿨을 때 축/범례/파일 출력가 어떻게 달라지는지 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 보고서 차트 품질 게이트
+  goal: 업무 흐름 검증에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고,
+    제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import pandas as pd
+    import matplotlib.pyplot as plt
+
+    reportData = pd.DataFrame({
+        "month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+        "revenue": [82, 91, 105, 112, 121, 130],
+        "cost": [55, 58, 62, 64, 68, 72],
+        "target": [100, 100, 100, 100, 100, 100],
+    })
+
+    def validateChartFrame(frame: pd.DataFrame) -> bool:
+        requiredColumns = {"month", "revenue", "cost", "target"}
+        missingColumns = requiredColumns - set(frame.columns)
+        if missingColumns:
+            raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+        if frame[["revenue", "cost", "target"]].lt(0).any().any():
+            raise ValueError("금액 컬럼은 음수가 될 수 없습니다.")
+        return True
+
+    validateChartFrame(reportData)
+    reportData
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      targetScenario = pd.DataFrame({"target": [95, 100, 115]}).assign(
+          monthsPassed=lambda frame: frame["target"].map(lambda target: int((reportData["revenue"] >= target).sum()))
+      )
+
+      assert targetScenario["monthsPassed"].is_monotonic_decreasing
+      targetScenario
+    solution: |-
+      import pandas as pd
+      import matplotlib.pyplot as plt
+
+      reportData = pd.DataFrame({
+          "month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+          "revenue": [82, 91, 105, 112, 121, 130],
+          "cost": [55, 58, 62, 64, 68, 72],
+          "target": [100, 100, 100, 100, 100, 100],
+      })
+
+      def validateChartFrame(frame: pd.DataFrame) -> bool:
+          requiredColumns = {"month", "revenue", "cost", "target"}
+          missingColumns = requiredColumns - set(frame.columns)
+          if missingColumns:
+              raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+          if frame[["revenue", "cost", "target"]].lt(0).any().any():
+              raise ValueError("금액 컬럼은 음수가 될 수 없습니다.")
+          return True
+
+      validateChartFrame(reportData)
+      reportData
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 업무 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: matplotlib_04-continent-population-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 대륙별 인구 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 범주별 합계와 0 기준선을 정확히 비교하는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_continent_population(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_continent_population(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_continent_population(rows):
+            required = ['continent', 'population']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = None
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['continent'] for row in usable]
+            y_values = [row['population'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.matplotlib.matplotlib_04.continent-population-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.matplotlib.matplotlib_04.continent-population-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_continent_population
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - continent: Asia
+              population: 60
+            - continent: Asia
+              population: 40
+            - continent: Europe
+              population: 30
+          expectedReturn:
+            usableCount: 3
+            excludedCount: 0
+            groupCounts:
+              all: 3
+            xExtent:
+            - Asia
+            - Europe
+            yExtent:
+            - 30
+            - 60
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: matplotlib_04-continent-population-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - matplotlib_04-continent-population-data-evidence-mastery
+    title: 대륙별 인구 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 부서별 총 예산을 0 기준 bar로 비교한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_continent_population(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_continent_population(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_continent_population(candidate):
+            expected = {'mark': 'bar', 'x': 'continent', 'y': 'population', 'group': None, 'transforms': ['sort-y-desc', 'sum-y'], 'interaction': 'none'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.matplotlib.matplotlib_04.continent-population-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.matplotlib.matplotlib_04.continent-population-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_continent_population
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: bar
+              x: continent
+              y: population
+              group: null
+              transforms:
+              - sort-y-desc
+              - sum-y
+              interaction: none
+              description: 부서별 총 예산을 0 기준 bar로 비교한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: bar
+              x: continent
+              y: population
+              group: null
+              transforms:
+              - sort-y-desc
+              - sum-y
+              interaction: none
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: population
+              y: continent
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - transforms
+            - description
+            encoding:
+              mark: bar
+              x: continent
+              y: population
+              group: null
+              transforms:
+              - sort-y-desc
+              - sum-y
+              interaction: none
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: matplotlib_04-continent-population-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - matplotlib_04-continent-population-encoding-transfer-transfer
+    title: 대륙별 인구 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 범주별 합계와 0 기준선을 정확히 비교하는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_continent_population(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_continent_population(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_continent_population(situation):
+            table = {'category-total': {'encoding': 'bar', 'evidence': 'aggregation and zero baseline', 'risk': 'truncated axis'}, 'part-of-whole': {'encoding': '100 percent stacked bar', 'evidence': 'same denominator', 'risk': 'different totals'}, 'many-categories': {'encoding': 'sorted horizontal bar', 'evidence': 'label legibility', 'risk': 'alphabetical clutter'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.matplotlib.matplotlib_04.continent-population-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.matplotlib.matplotlib_04.continent-population-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_continent_population
+        cases:
+        - id: recalls-category-total
+          arguments:
+          - value: category-total
+          expectedReturn:
+            encoding: bar
+            evidence: aggregation and zero baseline
+            risk: truncated axis
+        - id: recalls-part-of-whole
+          arguments:
+          - value: part-of-whole
+          expectedReturn:
+            encoding: 100 percent stacked bar
+            evidence: same denominator
+            risk: different totals
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,714 @@
+var e=`meta:
+  id: email_01
+  title: 첫 메일 발송
+  order: 1
+  category: email
+  difficulty: ⭐
+  badge: 입문
+  packages: []
+  tags:
+    - smtplib
+    - EmailMessage
+    - dryRun
+  outcomes:
+    - automation.email.send
+  prerequisites:
+    - automation.email.intro
+  estimatedMinutes: 40
+  seo:
+    title: "smtplib 첫 메일 발송 - EmailMessage + dryRun 안전 패턴"
+    description: "smtplib.SMTP_SSL과 EmailMessage로 자기 자신에게 메일을 보낸다. dryRun 안전 패턴으로 학습 중 오발송 차단."
+    keywords:
+      - smtplib SMTP_SSL
+      - EmailMessage
+      - dryRun
+
+intro:
+  direction: "smtplib.SMTP_SSL과 email.message.EmailMessage 두 객체로 첫 메일 발송 함수를 만든다. dryRun 안전 패턴을 처음부터 의무로 적용한다."
+  benefits:
+    - "이메일 자동화 전체의 기본 골격이 완성된다. 02-10강이 모두 이 형태에서 확장."
+    - "EmailMessage 객체 단위 단위 검증 패턴을 익혀 외부 서버 없이 발송 로직 회귀를 잡는다."
+    - "dryRun 안전 패턴 한 줄로 학습 중 오발송 사고를 사전 차단."
+  diagram:
+    steps:
+      - label: "1. EmailMessage 구성"
+        elong: "From·To·Subject·본문을 set_content로 채운다."
+      - label: "2. dryRun 패턴"
+        elong: "발송 함수는 기본 dryRun=True. 실 발송은 명시 필요."
+      - label: "3. SMTP_SSL 발송"
+        elong: "smtplib.SMTP_SSL + login + send_message 3 줄."
+      - label: "4. assert로 검증"
+        elong: "EmailMessage 헤더와 콘텐츠를 단위 assert."
+    runtime:
+      - label: "환경변수"
+        detail: "SMTP_USER, SMTP_APP_PASS 두 변수만 있으면 실제 발송 가능. 미설정 시 dryRun 모드로 검증."
+      - label: "검증"
+        detail: "외부 서버 없이 EmailMessage 객체 자체에 assert."
+
+sections:
+  - id: step1_email_message
+    title: "1단계. EmailMessage 만들기"
+    structuredPrimary: true
+    subtitle: "EmailMessage, set_content"
+    goal: "From·To·Subject·본문이 채워진 EmailMessage 객체를 만든다."
+    why: "실제 발송 전에 메시지 객체를 정확히 만드는 것이 본 트랙의 모든 강의의 출발점입니다."
+    explanation: |-
+      EmailMessage()로 객체를 만들고 msg['From']·msg['To']·msg['Subject']에 헤더를 대입한 뒤 msg.set_content(본문, charset='utf-8')로 본문을 채웁니다. 한글 본문은 charset 지정이 안전합니다.
+    tips:
+      - "set_content의 charset 인자를 빼면 일부 메일 클라이언트에서 한글이 깨질 수 있습니다."
+    snippet: |-
+      from email.message import EmailMessage
+
+      msg = EmailMessage()
+      msg["From"] = "me@example.com"
+      msg["To"] = "me@example.com"
+      msg["Subject"] = "Codaro 첫 메일"
+      msg.set_content("본문입니다. Codaro PDF 트랙 발송 테스트.", charset="utf-8")
+
+      msg["From"], msg["To"], msg["Subject"], msg.get_content().strip()
+    exercise:
+      prompt: "Subject를 '월간 보고서 발송'으로 바꾸고 본문 끝에 자기 이름을 추가하세요."
+      starterCode: |-
+        from email.message import EmailMessage
+
+        msg = EmailMessage()
+        msg["From"] = "me@example.com"
+        msg["To"] = "me@example.com"
+        msg["Subject"] = ___
+        msg.set_content("월간 보고서를 전달합니다. - 김대리", charset="utf-8")
+        msg["Subject"], msg.get_content().strip()
+      hints:
+        - "Subject 문자열 '월간 보고서 발송'."
+    check:
+      noError: "헤더 키는 대소문자 구분합니다 - 'Subject'."
+      resultCheck: "출력 첫 원소가 '월간 보고서 발송'."
+
+  - id: step2_dryrun
+    title: "2단계. dryRun 안전 패턴"
+    structuredPrimary: true
+    subtitle: "dryRun=True 기본값, 실 발송은 명시"
+    goal: "buildMessage 함수와 sendMessage 함수를 분리하고, sendMessage는 기본 dryRun=True."
+    why: "본 트랙의 핵심 안전 패턴입니다. 마케팅 정주임이 100명 명단으로 dryRun 없이 발송 코드를 돌리면 사고 회수가 불가능합니다. dryRun=True 기본값과 buildMessage/sendMessage 분리가 학습 중 오발송과 실무 사고를 모두 사전 차단하는 같은 패턴이 됩니다."
+    explanation: |-
+      buildMessage(to, subject, body) -> EmailMessage가 메시지를 만들고, sendMessage(msg, dryRun=True)가 dryRun이면 메시지 객체만 돌려주고 실 발송은 dryRun=False 명시 시에만 수행합니다.
+    tips:
+      - "dryRun=True 결과를 검증해 헤더/본문이 의도대로 구성됐는지 확인한 뒤에만 실 발송을 켜는 워크플로를 권장합니다."
+    snippet: |-
+      from email.message import EmailMessage
+
+      def buildMessage(toAddr, subject, body):
+          msg = EmailMessage()
+          msg["From"] = "me@example.com"
+          msg["To"] = toAddr
+          msg["Subject"] = subject
+          msg.set_content(body, charset="utf-8")
+          return msg
+
+      def sendMessage(msg, dryRun=True):
+          if dryRun:
+              return msg
+          import smtplib, os, ssl
+          ctx = ssl.create_default_context()
+          with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ctx) as smtp:
+              smtp.login(os.environ["SMTP_USER"], os.environ["SMTP_APP_PASS"])
+              smtp.send_message(msg)
+          return msg
+
+      built = buildMessage("me@example.com", "test", "hello")
+      dryResult = sendMessage(built, dryRun=True)
+      dryResult["Subject"], dryResult.get_content().strip()
+    exercise:
+      prompt: "sendMessage 본문을 직접 완성하세요. dryRun=True이면 (사고 차단을 위해) 즉시 msg를 반환하고, dryRun=False이면 SMTP 연결을 시도해야 한다는 표식으로 RuntimeError('실 발송 경로')를 raise하세요. dryRun=True 호출이 EmailMessage 객체를 돌려주는지 검증합니다."
+      starterCode: |-
+        from email.message import EmailMessage
+
+        def buildMessage(toAddr, subject, body):
+            msg = EmailMessage()
+            msg["From"] = "me@example.com"
+            msg["To"] = toAddr
+            msg["Subject"] = subject
+            msg.set_content(body, charset="utf-8")
+            return msg
+
+        def sendMessage(msg, dryRun=True):
+            if ___:
+                return ___
+            ___
+
+        built = buildMessage("a@b.com", "s", "b")
+        result = sendMessage(built, dryRun=True)
+        assert isinstance(result, EmailMessage)
+        try:
+            sendMessage(built, dryRun=False)
+            blocked = False
+        except RuntimeError:
+            blocked = True
+        isinstance(result, EmailMessage) and blocked
+      hints:
+        - "if 조건은 dryRun, return은 msg, 마지막 줄은 raise RuntimeError('실 발송 경로')."
+    check:
+      noError: "두 분기 모두 정의돼야 합니다."
+      resultCheck: "True 출력."
+
+  - id: step3_send
+    title: "3단계. SMTP_SSL 실 발송 흐름"
+    structuredPrimary: true
+    subtitle: "smtplib.SMTP_SSL, login, send_message"
+    goal: "실 발송 코드를 작성하되 dryRun=True로 호출해 안전하게 흐름만 확인한다."
+    why: "실제 발송 시도는 환경변수 설정이 필수입니다. 본 강의에서는 코드 작성과 dryRun 검증까지만 학습합니다."
+    explanation: |-
+      smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ssl.create_default_context())로 SSL 연결, login(이메일, 앱비밀번호)로 인증, send_message(msg)로 발송. 세 호출이 한 with 블록에 들어갑니다.
+    tips:
+      - "Gmail은 465(SSL)/587(STARTTLS) 두 포트를 지원합니다. SSL 직결이 가장 단순해 465 권장."
+    snippet: |-
+      import os
+      import smtplib
+      import ssl
+      from email.message import EmailMessage
+
+      def sendViaGmail(toAddr, subject, body, dryRun=True):
+          msg = EmailMessage()
+          msg["From"] = os.environ.get("SMTP_USER", "me@example.com")
+          msg["To"] = toAddr
+          msg["Subject"] = subject
+          msg.set_content(body, charset="utf-8")
+          if dryRun:
+              return msg
+          ctx = ssl.create_default_context()
+          with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ctx) as smtp:
+              smtp.login(os.environ["SMTP_USER"], os.environ["SMTP_APP_PASS"])
+              smtp.send_message(msg)
+          return msg
+
+      dryResult = sendViaGmail("me@example.com", "dry test", "hello dry", dryRun=True)
+      dryResult["Subject"], dryResult.get_content().strip()
+    exercise:
+      prompt: "sendViaGmail을 dryRun=True로 호출해 결과를 받고 To 헤더가 입력값과 같은지 확인하세요."
+      starterCode: |-
+        import os
+        from email.message import EmailMessage
+
+        def sendViaGmail(toAddr, subject, body, dryRun=True):
+            msg = EmailMessage()
+            msg["From"] = os.environ.get("SMTP_USER", "me@example.com")
+            msg["To"] = toAddr
+            msg["Subject"] = subject
+            msg.set_content(body, charset="utf-8")
+            if dryRun:
+                return msg
+            return msg
+
+        result = sendViaGmail("test@example.com", "hi", "body", dryRun=___)
+        result["To"] == "test@example.com"
+      hints:
+        - "dryRun=True 키워드."
+    check:
+      noError: "함수가 dryRun 인자를 받아야 합니다."
+      resultCheck: "True 출력."
+
+  - id: validation
+    title: "4단계. 검증 루프 - EmailMessage 단위 assert"
+    structuredPrimary: true
+    subtitle: "헤더 + 본문 통합 assert"
+    goal: "buildMessage가 만든 객체의 From·To·Subject·본문이 모두 의도와 같은지 한 셀에서 검증한다."
+    why: "외부 서버 없이도 발송 로직의 정확성을 단위 검증으로 보장할 수 있습니다."
+    explanation: |-
+      EmailMessage의 헤더 4개와 본문을 한 묶음 assert로 확인. 본 트랙의 핵심 검증 패턴.
+    tips:
+      - "본문을 strip()으로 비교하면 charset 처리 과정에서 추가된 줄바꿈에 흔들리지 않습니다."
+    snippet: |-
+      from email.message import EmailMessage
+
+      def buildMessage(toAddr, subject, body, fromAddr="me@example.com"):
+          msg = EmailMessage()
+          msg["From"] = fromAddr
+          msg["To"] = toAddr
+          msg["Subject"] = subject
+          msg.set_content(body, charset="utf-8")
+          return msg
+
+      built = buildMessage("partner@example.com", "월간 보고서", "첨부 확인 부탁드립니다.", "me@example.com")
+      assert built["From"] == "me@example.com"
+      assert built["To"] == "partner@example.com"
+      assert built["Subject"] == "월간 보고서"
+      assert "첨부" in built.get_content()
+      built["Subject"]
+    exercise:
+      prompt: "Subject를 '주간 보고서'로, 본문에 '검토 부탁드립니다'를 포함하도록 만들고 검증을 통과시키세요."
+      starterCode: |-
+        from email.message import EmailMessage
+
+        def buildMessage(toAddr, subject, body, fromAddr="me@example.com"):
+            msg = EmailMessage()
+            msg["From"] = fromAddr
+            msg["To"] = toAddr
+            msg["Subject"] = subject
+            msg.set_content(body, charset="utf-8")
+            return msg
+
+        built = buildMessage("partner@example.com", ___, ___)
+        assert built["Subject"] == "주간 보고서"
+        assert "검토" in built.get_content()
+        built["Subject"]
+      hints:
+        - "두 문자열: '주간 보고서', '검토 부탁드립니다'."
+    check:
+      noError: "set_content 본문은 문자열."
+      resultCheck: "출력 '주간 보고서'."
+
+  - id: misconception
+    title: "5단계. 흔한 오개념 차단"
+    subtitle: "코드에 평문 비밀번호, 호스트 오타"
+    goal: "두 가지 흔한 함정을 차단한다."
+    why: "평문 비밀번호 커밋은 보안 사고, smtp 호스트 오타는 디버깅 시간 낭비입니다."
+    explanation: |-
+      함정1: 코드에 비밀번호를 직접 적으면 git 커밋 시 영구 노출. 항상 os.environ. 함정2: 'smtp.gmail.com' 오타 (smtps, gmail.smtp 같은 오류)는 connect 단계에서 실패. 호스트 상수는 모듈 상단에.
+    tips:
+      - "환경변수 미설정 시 KeyError가 나야 함. os.environ.get으로 폴백을 두면 빈 문자열로 잘못 발송 시도할 수 있어 위험."
+    snippet: |-
+      import os
+
+      SMTP_HOST = "smtp.gmail.com"
+      SMTP_PORT = 465
+
+      def getCredentials():
+          user = os.environ.get("SMTP_USER")
+          appPass = os.environ.get("SMTP_APP_PASS")
+          if not user or not appPass:
+              raise EnvironmentError("환경변수 SMTP_USER/SMTP_APP_PASS 미설정")
+          return user, appPass
+
+      try:
+          user, appPass = getCredentials()
+          state = "ready"
+      except EnvironmentError:
+          state = "missing env vars"
+      state
+    exercise:
+      prompt: "SMTP_HOST 상수를 'smtp.naver.com'으로 바꿔 Naver 발송 준비를 하세요."
+      starterCode: |-
+        SMTP_HOST = ___
+        SMTP_PORT = 465
+        SMTP_HOST.endswith("naver.com")
+      hints:
+        - "문자열 'smtp.naver.com'."
+    check:
+      noError: "상수는 문자열."
+      resultCheck: "True 출력."
+
+  - id: practice
+    title: "실습 - 종합 미션 2개"
+    subtitle: "메시지 빌더와 안전한 발송 래퍼"
+    goal: "buildMessage와 sendMessage를 직접 작성해 dryRun 패턴이 일관되는지 확인한다."
+    why: "두 함수가 본 트랙의 모든 강의에서 재사용되는 핵심 빌딩 블록입니다."
+    explanation: |-
+      미션1은 다양한 인자(여러 수신자·CC·BCC 포함)를 받는 buildMessage 확장, 미션2는 dryRun에서 실제 발송 결정 로직을 분리한 sendMessage 래퍼입니다.
+    tips:
+      - "변수 prefix: bld*(미션1), snd*(미션2)."
+    snippet: |-
+      import os
+      from email.message import EmailMessage
+    exercise:
+      prompt: "두 미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "미션1: buildMessage(toAddr, subject, body, cc=None, bcc=None) -> EmailMessage"
+        - "미션2: sendMessage(msg, dryRun=True, host='smtp.gmail.com', port=465) -> EmailMessage"
+    check:
+      noError: "함수 정의 + dryRun 검증."
+      resultCheck: "CC/BCC 헤더가 정확히 세팅돼야 합니다."
+    blocks:
+      - type: tip
+        content: "CC와 BCC는 헤더 키가 'Cc', 'Bcc'입니다. 대소문자 주의."
+      - type: expansion
+        title: "미션1: buildMessage 확장"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from email.message import EmailMessage
+
+              def buildMessage(toAddr, subject, body, cc=None, bcc=None, fromAddr="me@example.com"):
+                  msg = EmailMessage()
+                  msg["From"] = fromAddr
+                  msg["To"] = toAddr
+                  if cc:
+                      msg["Cc"] = ", ".join(cc) if isinstance(cc, list) else cc
+                  if bcc:
+                      msg["Bcc"] = ", ".join(bcc) if isinstance(bcc, list) else bcc
+                  msg["Subject"] = subject
+                  msg.set_content(body, charset="utf-8")
+                  return msg
+
+              built = buildMessage(
+                  "partner@example.com",
+                  "월간 보고서",
+                  "검토 부탁드립니다",
+                  cc=["lead@example.com", "manager@example.com"],
+                  bcc="auditor@example.com",
+              )
+              assert built["Cc"] == "lead@example.com, manager@example.com"
+              assert built["Bcc"] == "auditor@example.com"
+              built["Cc"], built["Bcc"]
+      - type: expansion
+        title: "미션2: sendMessage 래퍼"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              import os
+              import smtplib
+              import ssl
+              from email.message import EmailMessage
+
+              def sendMessage(msg, dryRun=True, host="smtp.gmail.com", port=465):
+                  if dryRun:
+                      return msg
+                  user = os.environ["SMTP_USER"]
+                  appPass = os.environ["SMTP_APP_PASS"]
+                  ctx = ssl.create_default_context()
+                  with smtplib.SMTP_SSL(host, port, context=ctx) as smtp:
+                      smtp.login(user, appPass)
+                      smtp.send_message(msg)
+                  return msg
+
+              demo = EmailMessage()
+              demo["From"] = "me@example.com"
+              demo["To"] = "me@example.com"
+              demo["Subject"] = "dry test"
+              demo.set_content("body", charset="utf-8")
+
+              result = sendMessage(demo, dryRun=True)
+              assert isinstance(result, EmailMessage)
+              assert result["Subject"] == "dry test"
+              result["Subject"]
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: list
+        style: bullet
+        items:
+          - "buildMessage에 Reply-To 헤더 추가 (회신 주소 분리)"
+          - "Naver 메일 SMTP 호스트로 전환 (smtp.naver.com)"
+          - "회사 사내 SMTP 릴레이 (인증 없이) 패턴"
+          - "발송 결과를 로그 파일에 append (성공/실패 시간 기록)"
+          - "dryRun=True 결과를 .eml 파일로 저장해 검토 후 발송"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: email_01-mail-send-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_email_message
+    - extensions
+    title: 첫 메일의 발신·수신·제목·dry run 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 허용 domain과 빈 제목, 중복 수신자, idempotency key를 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - SMTP 연결 전에 수신자 domain과 중복 identity를 검사하세요.
+    - 첫 실행은 dry run이며 업무 idempotency key를 필수로 두세요.
+    exercise:
+      prompt: audit_mail_send(message, allowed_domains)를 완성하세요.
+      starterCode: |-
+        def audit_mail_send(message, allowed_domains):
+            raise NotImplementedError
+      solution: |
+        def audit_mail_send(message, allowed_domains):
+            failures = []
+            recipients = [value.lower() for value in message.get("to", [])]
+            duplicates = sorted({value for value in recipients if recipients.count(value) > 1})
+            disallowed = sorted(value for value in recipients if value.rsplit("@", 1)[-1] not in allowed_domains)
+            if not recipients:
+                failures.append("recipients")
+            if duplicates:
+                failures.append("duplicates")
+            if disallowed:
+                failures.append("domains")
+            if not str(message.get("subject", "")).strip():
+                failures.append("subject")
+            if not message.get("dryRun", False):
+                failures.append("dry-run")
+            if not message.get("idempotencyKey"):
+                failures.append("idempotency")
+            return {"ready": not failures, "failures": failures, "duplicates": duplicates, "disallowed": disallowed}
+      hints: *id001
+    check:
+      id: python.email.email_01.mail-send-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_01.mail-send-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_mail_send
+        cases:
+        - id: accepts-bounded-dry-run
+          arguments:
+          - value:
+              to:
+              - a@example.test
+              subject: Report
+              dryRun: true
+              idempotencyKey: report-1
+          - value:
+            - example.test
+          expectedReturn:
+            ready: true
+            failures: []
+            duplicates: []
+            disallowed: []
+        - id: reports-all-send-gaps
+          arguments:
+          - value:
+              to:
+              - A@other.test
+              - a@OTHER.test
+              subject: ' '
+              dryRun: false
+              idempotencyKey: ''
+          - value:
+            - example.test
+          expectedReturn:
+            ready: false
+            failures:
+            - duplicates
+            - domains
+            - subject
+            - dry-run
+            - idempotency
+            duplicates:
+            - a@other.test
+            disallowed:
+            - a@other.test
+            - a@other.test
+        - id: reports-empty-recipient-list
+          arguments:
+          - value:
+              to: []
+              subject: Hello
+              dryRun: true
+              idempotencyKey: x
+          - value:
+            - example.test
+          expectedReturn:
+            ready: false
+            failures:
+            - recipients
+            duplicates: []
+            disallowed: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: email_01-mail-delivery-result-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - email_01-mail-send-contract-mastery
+    title: 새 메일 발송 결과에 envelope·provider ID 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 계획 수신자와 accepted/rejected envelope를 대조한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - send 함수 반환만 보지 말고 envelope 수신자별 결과를 대조하세요.
+    - provider message ID를 sealed delivery evidence에 포함하세요.
+    exercise:
+      prompt: audit_mail_delivery(planned_recipients, result)를 완성하세요.
+      starterCode: |-
+        def audit_mail_delivery(planned_recipients, result):
+            raise NotImplementedError
+      solution: |
+        def audit_mail_delivery(planned_recipients, result):
+            planned = {value.lower() for value in planned_recipients}
+            accepted = {value.lower() for value in result.get("accepted", [])}
+            rejected = {value.lower() for value in result.get("rejected", [])}
+            missing = sorted(planned - accepted - rejected)
+            unexpected = sorted((accepted | rejected) - planned)
+            failures = []
+            if rejected:
+                failures.append("rejected")
+            if missing:
+                failures.append("missing")
+            if unexpected:
+                failures.append("unexpected")
+            if not result.get("providerMessageId"):
+                failures.append("provider-id")
+            return {"passed": not failures, "failures": failures, "rejected": sorted(rejected), "missing": missing, "unexpected": unexpected}
+      hints: *id002
+    check:
+      id: python.email.email_01.mail-delivery-result.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_01.mail-delivery-result.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_mail_delivery
+        cases:
+        - id: accepts-delivered-envelope
+          arguments:
+          - value:
+            - a@example.test
+          - value:
+              accepted:
+              - A@example.test
+              rejected: []
+              providerMessageId: m1
+          expectedReturn:
+            passed: true
+            failures: []
+            rejected: []
+            missing: []
+            unexpected: []
+        - id: reports-rejected-and-missing-provider-id
+          arguments:
+          - value:
+            - a@example.test
+          - value:
+              accepted: []
+              rejected:
+              - a@example.test
+          expectedReturn:
+            passed: false
+            failures:
+            - rejected
+            - provider-id
+            rejected:
+            - a@example.test
+            missing: []
+            unexpected: []
+        - id: reports-missing-and-unexpected-envelope
+          arguments:
+          - value:
+            - a@example.test
+          - value:
+              accepted:
+              - b@example.test
+              rejected: []
+              providerMessageId: m2
+          expectedReturn:
+            passed: false
+            failures:
+            - missing
+            - unexpected
+            rejected: []
+            missing:
+            - a@example.test
+            unexpected:
+            - b@example.test
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: email_01-first-mail-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - email_01-mail-delivery-result-transfer
+    title: 첫 메일 발송 안전 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 사전 계약·envelope·provider evidence를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 메일 API 성공과 올바른 수신자·내용·첨부 전달을 분리해 검증하세요.
+    - 실제 발송 전 dry run과 idempotency identity, 비밀정보 redaction을 적용하세요.
+    exercise:
+      prompt: choose_mail_send_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_mail_send_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_mail_send_evidence(situation):
+            table = {'before': {'action': 'validate recipients subject and dry run', 'evidence': 'message manifest', 'risk': 'wrong recipient'}, 'send': {'action': 'use idempotency identity', 'evidence': 'attempt ledger', 'risk': 'duplicate mail'}, 'after': {'action': 'reconcile envelope and provider ID', 'evidence': 'accepted rejected recipients', 'risk': 'partial delivery'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.email.email_01.first-mail-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_01.first-mail-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_mail_send_evidence
+        cases:
+        - id: recalls-before
+          arguments:
+          - value: before
+          expectedReturn:
+            action: validate recipients subject and dry run
+            evidence: message manifest
+            risk: wrong recipient
+        - id: recalls-send
+          arguments:
+          - value: send
+          expectedReturn:
+            action: use idempotency identity
+            evidence: attempt ledger
+            risk: duplicate mail
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

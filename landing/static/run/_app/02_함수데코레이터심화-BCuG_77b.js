@@ -1,0 +1,868 @@
+var e=`meta:
+  id: '02'
+  title: 함수 데코레이터 심화
+  day: 2
+  category: advancedPython
+  tags:
+  - decorator
+  - functools
+  - wraps
+  - 메타프로그래밍
+  - 검증
+  - 운영자동화
+  seo:
+    title: 파이썬 데코레이터 심화 - 인자 있는 데코레이터와 클래스 데코레이터
+    description: 데코레이터의 내부 동작 원리를 완벽히 이해하고 인자 있는 데코레이터, 다중 데코레이터, 클래스 데코레이터를 마스터합니다.
+    keywords:
+    - decorator
+    - functools
+    - wraps
+    - 클래스데코레이터
+    - 메타프로그래밍
+intro:
+  emoji: 🎭
+  points:
+  - 데코레이터의 내부 동작 원리 완벽 이해
+  - 인자를 받는 데코레이터 구현
+  - 다중 데코레이터의 실행 순서
+  - functools.wraps로 메타데이터 보존
+  direction: 함수 데코레이터 심화에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.
+  benefits:
+  - 작은 함수와 상태 확인 후 추상화 패턴에 맞는 코드 입력을 고릅니다.
+  - 함수 데코레이터 심화 결과를 호출 결과와 예외 경계 기준으로 즉시 점검합니다.
+  - 완료한 코드를 라이브러리성 유틸리티에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 데코레이터 복습 입력 확인
+      detail: 입력 기준(작은 함수와 상태)과 필요한 조건을 먼저 고정합니다.
+    - label: 인자 있는 데코레이터 처리 실행
+      detail: 추상화 패턴 코드를 실행해 중간 결과를 확인합니다.
+    - label: 다중 데코레이터 결과 검증
+      detail: 호출 결과와 예외 경계 기준으로 실행 결과를 비교합니다.
+    - label: 함수 데코레이터 심화 재사용
+      detail: 완성 코드를 라이브러리성 유틸리티에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 고급 설계 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 함수 데코레이터 심화 실행
+      detail: 셀을 실행해 호출 결과와 예외 경계와 예외 상태를 확인합니다.
+    - label: 함수 데코레이터 심화 완료
+      detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
+sections:
+- id: decorator_review
+  title: 데코레이터 복습
+  structuredPrimary: true
+  subtitle: 기본 패턴 이해
+  goal: 데코레이터 복습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    데코레이터는 함수를 인자로 받아 새로운 함수를 반환하는 고차 함수입니다. @decorator 문법은 func = decorator(func)의 문법적 설탕(syntactic sugar)입니다. 데코레이터는 원본 함수를 감싸는 wrapper 함수를 만들어 원본 함수 호출 전후에 추가 동작을 수행합니다. 이 패턴으로 로깅, 인증, 캐싱, 타이밍 측정 등 다양한 횡단 관심사(cross-cutting concerns)를 구현할 수 있습니다. 데코레이터는 함수를 수정하지 않고 기능을 확장하는 개방-폐쇄 원칙(OCP)의 좋은 예입니다.
+
+    *args와 **kwargs를 사용하면 어떤 시그니처의 함수에도 적용할 수 있는 범용 데코레이터를 만들 수 있습니다.
+  snippet: |-
+    def simpleDecorator(func):
+        def wrapper(*args, **kwargs):
+            result = func(*args, **kwargs)
+            return result
+        return wrapper
+
+    @simpleDecorator
+    def greet(name):
+        return f"Hello, {name}!"
+
+    greet("Python")
+  exercise:
+    prompt: 데코레이터 복습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def simpleDecorator(func):
+          def wrapper(*args, **kwargs):
+              result = func(*args, **kwargs)
+              return result
+          return wrapper
+
+      @simpleDecorator
+      def greet(name):
+          return f"Hello, {name}!"
+
+      greet("Python")
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 데코레이터 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 데코레이터 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: parameterized
+  title: 인자 있는 데코레이터
+  structuredPrimary: true
+  subtitle: 데코레이터 팩토리 패턴
+  goal: 인자 있는 데코레이터에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    인자를 받는 데코레이터는 3중 중첩 함수 구조로 구현합니다. 가장 바깥 함수가 데코레이터 인자를 받고, 중간 함수가 실제 데코레이터(함수를 받음), 가장 안쪽 함수가 wrapper입니다. @decorator(arg)는 decorator(arg)를 먼저 호출하여 실제 데코레이터를 얻고, 그 데코레이터가 함수에 적용됩니다. 이 패턴을 '데코레이터 팩토리'라고 부릅니다. 데코레이터에 설정값을 전달하거나 동작을 커스터마이징할 때 사용합니다.
+
+    인자 없이도 사용할 수 있게 하려면 인자 유무를 감지하는 추가 로직이 필요합니다.
+  snippet: |-
+    def repeat(times):
+        def decorator(func):
+            def wrapper(*args, **kwargs):
+                results = []
+                for _ in range(times):
+                    results.append(func(*args, **kwargs))
+                return results
+            return wrapper
+        return decorator
+
+    @repeat(3)
+    def sayHello():
+        return "Hello!"
+
+    sayHello()
+  exercise:
+    prompt: 인자 있는 데코레이터 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def repeat(times):
+          def decorator(func):
+              def wrapper(*args, **kwargs):
+                  results = []
+                  for _ in range(times):
+                      results.append(func(*args, **kwargs))
+                  return results
+              return wrapper
+          return decorator
+
+      @repeat(3)
+      def sayHello():
+          return "Hello!"
+
+      sayHello()
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 인자 있는 데코레이터의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 인자 있는 데코레이터 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: multiple_decorators
+  title: 다중 데코레이터
+  structuredPrimary: true
+  subtitle: 데코레이터 스택
+  goal: 다중 데코레이터에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    하나의 함수에 여러 데코레이터를 적용할 수 있습니다. 데코레이터는 아래에서 위로 적용되고, 호출은 위에서 아래로 진행됩니다. @A @B @C def func()는 A(B(C(func)))와 같습니다. 즉 C가 먼저 func를 감싸고, B가 그 결과를 감싸고, A가 최종적으로 감쌉니다. 실행 시에는 A의 wrapper가 먼저 시작하고, 그 안에서 B의 wrapper, 그 안에서 C의 wrapper가 호출됩니다. 이 순서를 이해하는 것이 다중 데코레이터를 올바르게 사용하는 핵심입니다.
+
+    데코레이터 순서가 중요한 경우 주석으로 의도를 명확히 남기세요.
+  snippet: |-
+    executionOrder = []
+
+    def deco1(func):
+        def wrapper(*args, **kwargs):
+            executionOrder.append("deco1 start")
+            result = func(*args, **kwargs)
+            executionOrder.append("deco1 end")
+            return result
+        return wrapper
+
+    def deco2(func):
+        def wrapper(*args, **kwargs):
+            executionOrder.append("deco2 start")
+            result = func(*args, **kwargs)
+            executionOrder.append("deco2 end")
+            return result
+        return wrapper
+
+    @deco1
+    @deco2
+    def testFunc():
+        executionOrder.append("function")
+        return "done"
+
+    testFunc()
+    executionOrder
+  exercise:
+    prompt: 다중 데코레이터 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      executionOrder = []
+
+      def deco1(func):
+          def wrapper(*args, **kwargs):
+              executionOrder.append("deco1 start")
+              result = func(*args, **kwargs)
+              executionOrder.append("deco1 end")
+              return result
+          return wrapper
+
+      def deco2(func):
+          def wrapper(*args, **kwargs):
+              executionOrder.append("deco2 start")
+              result = func(*args, **kwargs)
+              executionOrder.append("deco2 end")
+              return result
+          return wrapper
+
+      @deco1
+      @deco2
+      def testFunc():
+          executionOrder.append("function")
+          return "done"
+
+      testFunc()
+      executionOrder
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 다중 데코레이터의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 다중 데코레이터 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: functools_wraps
+  title: functools.wraps
+  structuredPrimary: true
+  subtitle: 메타데이터 보존
+  goal: functools.wraps에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    데코레이터로 함수를 감싸면 원본 함수의 __name__, __doc__, __annotations__ 등의 메타데이터가 wrapper 함수의 것으로 덮어씌워집니다. 이는 디버깅, 문서화, 인트로스펙션에서 문제가 됩니다. functools.wraps 데코레이터를 wrapper 함수에 적용하면 원본 함수의 메타데이터를 wrapper로 복사합니다. 이것은 데코레이터를 작성할 때 반드시 적용해야 하는 모범 사례입니다. wraps는 __wrapped__ 속성도 설정하여 원본 함수에 접근할 수 있게 해줍니다.
+
+    항상 @wraps를 사용하세요. 이것은 파이썬 커뮤니티의 표준 관행입니다.
+  snippet: |-
+    def badDecorator(func):
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+        return wrapper
+
+    @badDecorator
+    def originalFunc():
+        """원본 함수의 독스트링"""
+        return "original"
+
+    originalFunc.__name__, originalFunc.__doc__
+  exercise:
+    prompt: functools.wraps 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def badDecorator(func):
+          def wrapper(*args, **kwargs):
+              return func(*args, **kwargs)
+          return wrapper
+
+      @badDecorator
+      def originalFunc():
+          """원본 함수의 독스트링"""
+          return "original"
+
+      originalFunc.__name__, originalFunc.__doc__
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: functools.wraps의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: functools.wraps 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: class_decorator
+  title: 클래스 데코레이터
+  structuredPrimary: true
+  subtitle: 클래스를 수정하는 데코레이터
+  goal: 클래스 데코레이터에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    데코레이터는 함수뿐만 아니라 클래스에도 적용할 수 있습니다. 클래스 데코레이터는 클래스를 인자로 받아 수정된 클래스나 새로운 클래스를 반환합니다. 클래스에 메서드를 추가하거나, 속성을 수정하거나, 클래스를 래핑하는 등의 작업을 할 수 있습니다. @dataclass, @total_ordering 같은 표준 라이브러리 데코레이터가 클래스 데코레이터의 예입니다. 메타클래스보다 간단하고 직관적인 방법으로 클래스를 수정할 수 있습니다.
+
+    클래스 데코레이터는 메타클래스보다 이해하기 쉽고 대부분의 경우 충분합니다.
+  snippet: |-
+    def addRepr(cls):
+        def customRepr(self):
+            attrs = ", ".join(f"{k}={v}" for k, v in self.__dict__.items())
+            return f"{cls.__name__}({attrs})"
+        cls.__repr__ = customRepr
+        return cls
+
+    @addRepr
+    class Person:
+        def __init__(self, name, age):
+            self.name = name
+            self.age = age
+
+    p = Person("Alice", 30)
+    repr(p)
+  exercise:
+    prompt: 클래스 데코레이터 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def addRepr(cls):
+          def customRepr(self):
+              attrs = ", ".join(f"{k}={v}" for k, v in self.__dict__.items())
+              return f"{cls.__name__}({attrs})"
+          cls.__repr__ = customRepr
+          return cls
+
+      @addRepr
+      class Person:
+          def __init__(self, name, age):
+              self.name = name
+              self.age = age
+
+      p = Person("Alice", 30)
+      repr(p)
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 클래스 데코레이터의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 클래스 데코레이터 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: method_decorator
+  title: 메서드 데코레이터
+  structuredPrimary: true
+  subtitle: self 처리하기
+  goal: 메서드 데코레이터에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    클래스의 메서드에 데코레이터를 적용할 때는 self 인자를 올바르게 처리해야 합니다. 일반 함수 데코레이터와 동일하게 *args, **kwargs를 사용하면 self도 자동으로 전달됩니다. 그러나 self에 접근해야 하는 경우에는 첫 번째 인자를 명시적으로 self로 받을 수 있습니다. classmethod나 staticmethod와 함께 사용할 때는 데코레이터 순서에 주의해야 합니다. 일반적으로 @classmethod나 @staticmethod가 가장 안쪽(함수에 가장 가깝게)에 위치해야 합니다.
+
+    @property에 데코레이터를 적용하려면 property 객체를 반환하도록 특별히 처리해야 합니다.
+  snippet: |-
+    from functools import wraps
+
+    def logMethod(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            result = func(self, *args, **kwargs)
+            return result
+        return wrapper
+
+    class Calculator:
+        @logMethod
+        def add(self, a, b):
+            return a + b
+
+    calc = Calculator()
+    calc.add(3, 5)
+  exercise:
+    prompt: 메서드 데코레이터 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      from functools import wraps
+
+      def logMethod(func):
+          @wraps(func)
+          def wrapper(self, *args, **kwargs):
+              result = func(self, *args, **kwargs)
+              return result
+          return wrapper
+
+      class Calculator:
+          @logMethod
+          def add(self, a, b):
+              return a + b
+
+      calc = Calculator()
+      calc.add(3, 5)
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 메서드 데코레이터의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 메서드 데코레이터 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 데코레이터로 권한, 감사 로그, 입력 검증 묶기'
+  structuredPrimary: true
+  subtitle: 예측 → 래핑 → 오류 확인 → 메타데이터 검증
+  goal: '현업 흐름 검증: 데코레이터로 권한, 감사 로그, 입력 검증 묶기에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    데코레이터는 반복되는 운영 규칙을 함수 바깥으로 분리하는 도구입니다. 권한 확인, 감사 로그, 입력 검증처럼 여러 함수에 공통으로 붙는 규칙을 한 번에 검증합니다.
+
+    변주 실험
+    권한 검사를 감사 로그보다 먼저 실행할지 나중에 실행할지 데코레이터 순서를 바꾸고, 실패한 요청도 로그에 남길지 assert로 정책을 고정하세요.
+  tips:
+  - 변주 실험 권한 검사를 감사 로그보다 먼저 실행할지 나중에 실행할지 데코레이터 순서를 바꾸고, 실패한 요청도 로그에 남길지 assert로 정책을 고정하세요.
+  snippet: |-
+    from functools import wraps
+
+    auditLog = []
+
+    def requireRole(requiredRole):
+        def decorator(func):
+            @wraps(func)
+            def wrapper(user, *args, **kwargs):
+                if requiredRole not in user.get("roles", []):
+                    raise PermissionError(f"{requiredRole} role required")
+                return func(user, *args, **kwargs)
+            return wrapper
+        return decorator
+
+    def auditAction(actionName):
+        def decorator(func):
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                result = func(*args, **kwargs)
+                auditLog.append({"action": actionName, "result": result})
+                return result
+            return wrapper
+        return decorator
+
+    def requirePositiveAmount(func):
+        @wraps(func)
+        def wrapper(user, amount):
+            if amount <= 0:
+                raise ValueError("amount must be positive")
+            return func(user, amount)
+        return wrapper
+
+    @auditAction("refund")
+    @requireRole("finance")
+    @requirePositiveAmount
+    def approveRefund(user, amount):
+        return {"user": user["name"], "amount": amount, "status": "approved"}
+
+    financeUser = {"name": "Kim", "roles": ["finance", "operator"]}
+    viewerUser = {"name": "Lee", "roles": ["viewer"]}
+
+    result = approveRefund(financeUser, 30000)
+    assert result == {"user": "Kim", "amount": 30000, "status": "approved"}
+    assert auditLog == [{"action": "refund", "result": result}]
+    assert approveRefund.__name__ == "approveRefund"
+
+    try:
+        approveRefund(viewerUser, 10000)
+    except PermissionError as exc:
+        assert "finance" in str(exc)
+
+    try:
+        approveRefund(financeUser, 0)
+    except ValueError as exc:
+        assert "positive" in str(exc)
+
+    print("데코레이터 운영 규칙 통과")
+  exercise:
+    prompt: '현업 흐름 검증: 데코레이터로 권한, 감사 로그, 입력 검증 묶기 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
+    starterCode: |-
+      from functools import wraps
+
+      auditLog = []
+
+      def requireRole(requiredRole):
+          def decorator(func):
+              @wraps(func)
+              def wrapper(user, *args, **kwargs):
+                  if requiredRole not in user.get("roles", []):
+                      raise PermissionError(f"{requiredRole} role required")
+                  return func(user, *args, **kwargs)
+              return wrapper
+          return decorator
+
+      def auditAction(actionName):
+          def decorator(func):
+              @wraps(func)
+              def wrapper(*args, **kwargs):
+                  result = func(*args, **kwargs)
+                  auditLog.append({"action": actionName, "result": result})
+                  return result
+              return wrapper
+          return decorator
+
+      def requirePositiveAmount(func):
+          @wraps(func)
+          def wrapper(user, amount):
+              if amount <= 0:
+                  raise ValueError("amount must be positive")
+              return func(user, amount)
+          return wrapper
+
+      @auditAction("refund")
+      @requireRole("finance")
+      @requirePositiveAmount
+      def approveRefund(user, amount):
+          return {"user": user["name"], "amount": amount, "status": "approved"}
+
+      financeUser = {"name": "Kim", "roles": ["finance", "operator"]}
+      viewerUser = {"name": "Lee", "roles": ["viewer"]}
+
+      result = approveRefund(financeUser, 30000)
+      assert result == {"user": "Kim", "amount": 30000, "status": "approved"}
+      assert auditLog == [{"action": "refund", "result": result}]
+      assert approveRefund.__name__ == "approveRefund"
+
+      try:
+          approveRefund(viewerUser, 10000)
+      except PermissionError as exc:
+          assert "finance" in str(exc)
+
+      try:
+          approveRefund(financeUser, 0)
+      except ValueError as exc:
+          assert "positive" in str(exc)
+
+      print("데코레이터 운영 규칙 통과")
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 데코레이터로 권한, 감사 로그, 입력 검증 묶기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 데코레이터로 권한, 감사 로그, 입력 검증 묶기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+- id: practice
+  title: 종합 복습
+  structuredPrimary: true
+  subtitle: 데코레이터 심화 마스터하기
+  goal: 종합 복습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: Day 2에서 배운 데코레이터 심화 내용을 난이도별로 복습합니다. 데코레이터는 함수나 클래스의 동작을 수정하는 강력한 메타프로그래밍 도구입니다. 기본 데코레이터부터
+    인자를 받는 데코레이터, 클래스 데코레이터까지 단계별로 학습했습니다. 🟢 기본 문제로 래퍼 함수 작성법을 익히고, 🟡 응용 문제로 functools.wraps와 다중 데코레이터를
+    연습하세요. 🔴 심화 문제에서는 메모이제이션, 검증, 로깅 등 실무 패턴을 직접 구현해봅니다. 프레임워크와 라이브러리에서 데코레이터는 핵심 API이므로 완벽히 이해해두면 코드
+    품질이 크게 향상됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def addBrackets(func):
+        def wrapper(*args, **kwargs):
+            return f"[{func(*args, **kwargs)}]"
+        return wrapper
+
+    @addBrackets
+    def getText():
+        return "content"
+
+    getText()
+  exercise:
+    prompt: 종합 복습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def addBrackets(func):
+          def wrapper(*args, **kwargs):
+              return f"[{func(*args, **kwargs)}]"
+          return wrapper
+
+      @addBrackets
+      def getText():
+          return "content"
+
+      getText()
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 02_advanced_decorator-audit-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - parameterized
+    - functools_wraps
+    - workflow_validation
+    title: 인자 있는 데코레이터로 권한과 감사 로그를 함께 검증하기
+    subtitle: parameterized guard decorator
+    goal: 사용자 역할과 필요 역할을 받아 데코레이터 팩토리, wraps, 예외 처리를 포함한 감사 결과를 반환한다.
+    why: 데코레이터는 프레임워크 문법을 외우는 주제가 아니라, 반복되는 운영 규칙을 한 곳에서 검증하게 만드는 설계 도구입니다.
+    explanation: run_guarded_action(user_role, required_role, amount)를 완성해 역할 확인, 성공/거부 이벤트, 원본 함수 메타데이터 보존을 함께 확인하세요.
+    tips:
+    - '@wraps를 쓰지 않으면 functionName과 doc 검증을 통과할 수 없습니다.'
+    - 권한 실패도 events에 남겨 호출 순서를 확인하세요.
+    exercise:
+      prompt: run_guarded_action(user_role, required_role, amount)를 완성해 권한 검사 결과와 감사 이벤트를 반환하세요.
+      starterCode: |-
+        def run_guarded_action(user_role, required_role, amount):
+            raise NotImplementedError
+      solution: |-
+        def run_guarded_action(user_role, required_role, amount):
+            from functools import wraps
+
+            events = []
+
+            def require_role(role):
+                def decorator(func):
+                    @wraps(func)
+                    def wrapper(*args, **kwargs):
+                        events.append(f"check:{role}")
+                        if user_role != role:
+                            events.append("denied")
+                            raise PermissionError("role denied")
+                        events.append("allowed")
+                        return func(*args, **kwargs)
+                    return wrapper
+                return decorator
+
+            @require_role(required_role)
+            def approve_payment(value):
+                """Approve one payment."""
+                events.append(f"approve:{value}")
+                return {"approved": True, "amount": value}
+
+            try:
+                result = approve_payment(amount)
+                status = "ok"
+            except PermissionError as exc:
+                result = {"approved": False, "reason": str(exc)}
+                status = "denied"
+            return {
+                "status": status,
+                "result": result,
+                "events": events,
+                "functionName": approve_payment.__name__,
+                "doc": approve_payment.__doc__,
+            }
+      hints:
+      - 가장 바깥 함수는 role을 받고, 중간 함수는 func를 받습니다.
+      - wrapper 안에서 예외를 내고 바깥 try에서 결과로 바꾸면 테스트하기 쉽습니다.
+    check:
+      id: python.advanced.decorator.audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.decorator.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: run_guarded_action
+        cases:
+        - id: allows-required-role-and-preserves-metadata
+          arguments:
+          - value: admin
+          - value: admin
+          - value: 9000
+          expectedReturn:
+            status: ok
+            result:
+              approved: true
+              amount: 9000
+            events:
+            - check:admin
+            - allowed
+            - approve:9000
+            functionName: approve_payment
+            doc: Approve one payment.
+        - id: denies-wrong-role-with-audit-event
+          arguments:
+          - value: viewer
+          - value: admin
+          - value: 9000
+          expectedReturn:
+            status: denied
+            result:
+              approved: false
+              reason: role denied
+            events:
+            - check:admin
+            - denied
+            functionName: approve_payment
+            doc: Approve one payment.
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 02_advanced_decorator-stack-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - multiple_decorators
+    - method_decorator
+    - workflow_validation
+    title: 다중 데코레이터 호출 순서와 반환값 변화를 추적하기
+    subtitle: decorator stack trace
+    goal: 두 개의 데코레이터가 감싼 함수의 시작, 본문, 종료 순서와 반환값 변화를 trace로 반환한다.
+    why: 다중 데코레이터는 예외가 없어도 순서를 틀리면 인증, 로깅, 트랜잭션 정책이 뒤집히기 때문에 호출 순서를 증명해야 합니다.
+    explanation: trace_decorator_stack(value)를 완성해 outer와 inner의 시작/종료 이벤트, 본문 실행, 최종 반환값을 검증하세요.
+    tips:
+    - 적용은 아래에서 위, 호출은 바깥 wrapper부터 시작합니다.
+    - 음수 입력은 본문까지 가지 않게 ValueError로 거부하세요.
+    exercise:
+      prompt: trace_decorator_stack(value)를 완성해 decorator stack의 이벤트 순서와 최종 result를 반환하세요.
+      starterCode: |-
+        def trace_decorator_stack(value):
+            raise NotImplementedError
+      solution: |-
+        def trace_decorator_stack(value):
+            if value < 0:
+                raise ValueError("value must be non-negative")
+
+            events = []
+
+            def outer(func):
+                def wrapper(amount):
+                    events.append("outer:start")
+                    result = func(amount)
+                    events.append("outer:end")
+                    return result + 1
+                return wrapper
+
+            def inner(func):
+                def wrapper(amount):
+                    events.append("inner:start")
+                    result = func(amount)
+                    events.append("inner:end")
+                    return result * 2
+                return wrapper
+
+            @outer
+            @inner
+            def base(amount):
+                events.append("body")
+                return amount + 3
+
+            result = base(value)
+            return {
+                "events": events,
+                "result": result,
+                "callOrder": "outer-inner-body-inner-outer",
+            }
+      hints:
+      - '@outer가 @inner가 감싼 함수를 다시 감쌉니다.'
+      - result 계산은 body 결과가 inner에서 두 배, outer에서 1 증가합니다.
+    check:
+      id: python.advanced.decorator.stack.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.decorator.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: trace_decorator_stack
+        cases:
+        - id: traces-wrapper-order-and-return-transform
+          arguments:
+          - value: 4
+          expectedReturn:
+            events:
+            - outer:start
+            - inner:start
+            - body
+            - inner:end
+            - outer:end
+            result: 15
+            callOrder: outer-inner-body-inner-outer
+        - id: rejects-negative-input-before-wrapping
+          arguments:
+          - value: -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 02_advanced_decorator-role-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 02_advanced_decorator-stack-transfer
+    title: 데코레이터 문법, 팩토리, wraps 역할 회상하기
+    subtitle: syntax, factory, metadata
+    goal: 개념 이름을 받아 @ 문법의 의미, 데코레이터 팩토리 필요 여부, 메타데이터 보존 여부를 반환한다.
+    why: 시간이 지나도 남아야 할 지식은 문법 모양보다 func = decorator(func), decorator(arg)의 2단계, wraps의 역할입니다.
+    explanation: recall_decorator_concept(concept)를 완성해 syntax, factory, wraps 개념별 핵심 정보를 반환하세요.
+    tips:
+    - '@decorator는 함수 정의 뒤 재할당되는 문법입니다.'
+    - '@decorator(arg)는 arg를 받은 함수가 실제 decorator를 반환해야 합니다.'
+    exercise:
+      prompt: recall_decorator_concept(concept)를 완성해 데코레이터 핵심 개념을 구조화해 반환하세요.
+      starterCode: |-
+        def recall_decorator_concept(concept):
+            raise NotImplementedError
+      solution: |-
+        def recall_decorator_concept(concept):
+            table = {
+                "syntax": {
+                    "meaning": "func = decorator(func)",
+                    "needsFactory": False,
+                    "preservesMetadata": False,
+                },
+                "factory": {
+                    "meaning": "decorator(arg) returns the real decorator",
+                    "needsFactory": True,
+                    "preservesMetadata": False,
+                },
+                "wraps": {
+                    "meaning": "copy original function metadata to wrapper",
+                    "needsFactory": False,
+                    "preservesMetadata": True,
+                },
+            }
+            if concept not in table:
+                raise ValueError("unknown decorator concept")
+            return table[concept]
+      hints:
+      - factory는 인자 있는 데코레이터에서 필요합니다.
+      - wraps는 __name__과 __doc__ 같은 정보를 보존합니다.
+    check:
+      id: python.advanced.decorator.role.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.decorator.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: recall_decorator_concept
+        cases:
+        - id: recalls-parameterized-decorator-factory
+          arguments:
+          - value: factory
+          expectedReturn:
+            meaning: decorator(arg) returns the real decorator
+            needsFactory: true
+            preservesMetadata: false
+        - id: recalls-wraps-metadata-role
+          arguments:
+          - value: wraps
+          expectedReturn:
+            meaning: copy original function metadata to wrapper
+            needsFactory: false
+            preservesMetadata: true
+        - id: rejects-unknown-concept
+          arguments:
+          - value: monkeypatch
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending
+`;export{e as default};

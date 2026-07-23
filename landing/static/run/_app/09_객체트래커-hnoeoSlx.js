@@ -1,0 +1,633 @@
+var e=`meta:
+  id: visionFeatures_09
+  title: 객체 트래커
+  order: 9
+  category: visionFeatures
+  difficulty: ⭐⭐⭐⭐
+  badge: 심화
+  packages:
+  - matplotlib
+  - numpy
+  - opencv-contrib-python
+  tags:
+  - opencv
+  - 트래커
+  - CSRT
+  - KCF
+  - 객체추적
+  seo:
+    title: 비전 특징점 - 객체 트래커
+    description: cv2 TrackerCSRT, TrackerKCF로 영상에서 한 객체를 끝까지 추적합니다.
+    keywords:
+    - 트래커
+    - CSRT
+    - KCF
+    - 객체추적
+    - opencv
+intro:
+  emoji: 🎯
+  goal: 영상의 한 객체에 bounding box를 잡아 끝까지 따라가는 트래커를 익힙니다.
+  description: |-
+    광학 흐름은 점 단위 추적이고 객체 트래커는 영역 단위 추적입니다. 박스로 객체를 한 번 표시하면 트래커는 매 프레임 박스를 갱신합니다. 이 강의는 CSRT와 KCF 두 트래커를 같은 영상에 적용해 비교합니다.
+  direction: 첫 프레임에서 박스를 정해 트래커를 초기화하고, 매 프레임 박스를 갱신해 시각화합니다.
+  benefits:
+  - cv2.TrackerCSRT, TrackerKCF의 init/update 흐름을 익힙니다.
+  - 두 트래커의 정확도와 속도 차이를 직접 확인합니다.
+  - 추적 박스 시퀀스를 시각화하고 분석합니다.
+  diagram:
+    steps:
+    - label: 1단계. 영상과 초기 박스
+      detail: 첫 프레임에서 객체 박스를 정합니다.
+    - label: 2단계. CSRT 트래커 초기화
+      detail: init 한 번이면 끝입니다.
+    - label: 3단계. 프레임별 update
+      detail: 매 프레임 새 박스를 받습니다.
+    - label: 4단계. KCF 트래커와 비교
+      detail: 같은 영상에 다른 트래커를 적용합니다.
+    - label: 5단계. 박스 시퀀스 시각화
+      detail: 매 프레임 박스를 그려 결과를 확인합니다.
+    runtime:
+    - label: 비전 환경
+      detail: opencv-python의 TrackerCSRT_create, TrackerKCF_create를 사용합니다.
+    - label: 검증 흐름
+      detail: assert와 시각 비교로 학습 결과가 기대값과 같은지 확인합니다.
+sections:
+- id: initial_box
+  title: 1단계. 영상과 초기 박스
+  structuredPrimary: true
+  subtitle: 첫 프레임 객체 박스
+  goal: 첫 프레임에서 추적할 객체의 (x, y, w, h) 박스를 정합니다.
+  why: 트래커는 초기 박스를 기준으로 외형 모델을 학습합니다. 박스가 부정확하면 추적도 부정확합니다.
+  explanation: |-
+    OpenCV 트래커의 박스 형식은 \`(x, y, w, h)\` 입니다. 화면 좌표 x, y가 좌상단이고 w, h는 가로·세로 크기입니다.
+
+    합성 영상의 노란 원은 첫 프레임에 (60, 120) 중심, 반지름 20입니다. 따라서 박스 (40, 100, 40, 40) 정도가 적당합니다.
+  tips:
+  - 트래커마다 초기 박스를 약간 크게 또는 작게 잡았을 때 결과가 크게 달라질 수 있습니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import tempfile
+    from pathlib import Path
+
+    videoPath = Path(tempfile.gettempdir()) / 'codaro_demo.mp4'
+    if not videoPath.exists():
+        width, height = 320, 240
+        fps = 24
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        writer = cv2.VideoWriter(str(videoPath), fourcc, fps, (width, height))
+        for idx in range(60):
+            frame = np.zeros((height, width, 3), dtype=np.uint8)
+            intensity = int(255 * idx / 59)
+            frame[:] = (intensity, 100, 255 - intensity)
+            cv2.circle(frame, (60 + idx * 4, 120), 20, (0, 255, 255), -1)
+            writer.write(frame)
+        writer.release()
+
+    cap = cv2.VideoCapture(str(videoPath))
+    ok, firstFrame = cap.read()
+    cap.release()
+    initialBox = (40, 100, 40, 40)
+    initialBox
+  exercise:
+    prompt: 첫 프레임에 박스를 그려 위치가 의도와 맞는지 확인하세요.
+    starterCode: |-
+      preview = firstFrame.copy()
+      x, y, w, h = initialBox
+      cv2.rectangle(preview, (x, y), (x + w, y + h), (0, 255, 0), 2)
+      fig = plt.figure(figsize=(5, 4))
+      plt.imshow(cv2.cvtColor(preview, ___))
+      plt.axis('off')
+      fig
+    hints:
+    - 빈칸은 색공간 상수입니다.
+    - 박스가 노란 원을 감싸야 합니다.
+  check:
+    noError: 박스 그리기가 오류 없이 끝나야 합니다.
+    resultCheck: initialBox의 길이가 4여야 합니다.
+- id: csrt_init
+  title: 2단계. CSRT 트래커 초기화
+  structuredPrimary: true
+  subtitle: 정확도 중심 트래커
+  goal: TrackerCSRT_create와 init 호출로 트래커를 초기화합니다.
+  why: CSRT는 OpenCV가 제공하는 트래커 중 정확도가 가장 높습니다.
+  explanation: |-
+    \`cv2.TrackerCSRT_create()\` 로 객체를 만들고 \`tracker.init(firstFrame, initialBox)\` 로 첫 프레임의 박스를 학습시킵니다. init 호출은 한 번뿐이고 이후에는 update만 호출합니다.
+
+    OpenCV 버전에 따라 일부 트래커는 cv2.legacy 네임스페이스에 있을 수 있습니다. CSRT는 cv2 메인에서 보통 사용 가능합니다.
+  tips:
+  - init 직후 첫 update의 결과는 입력 박스와 거의 같습니다. 모델이 처음 적용되는 시점입니다.
+  snippet: |-
+    tracker = cv2.TrackerCSRT_create()
+    tracker.init(firstFrame, initialBox)
+    type(tracker).__name__
+  exercise:
+    prompt: 같은 트래커 객체를 다시 만들어 새 박스(60, 110, 30, 30)로 초기화한 secondaryTracker를 만드세요.
+    starterCode: |-
+      secondaryTracker = cv2.TrackerCSRT_create()
+      secondaryTracker.init(firstFrame, (60, ___, 30, 30))
+      type(secondaryTracker).__name__
+    hints:
+    - 빈칸은 정수 110입니다.
+    - init은 부울을 반환하지만 보통은 무시합니다.
+  check:
+    noError: 트래커 초기화가 오류 없이 끝나야 합니다.
+    resultCheck: 트래커 타입 이름에 'CSRT'가 들어가야 합니다.
+- id: update_loop
+  title: 3단계. 프레임별 update
+  structuredPrimary: true
+  subtitle: 매 프레임 박스 갱신
+  goal: 영상의 모든 프레임을 돌면서 tracker.update로 새 박스를 받습니다.
+  why: 추적 결과를 모아 시각화하거나 분석할 수 있습니다.
+  explanation: |-
+    \`ok, box = tracker.update(frame)\` 가 표준 호출입니다. ok가 False면 추적 실패입니다. box는 float 튜플 \`(x, y, w, h)\` 입니다.
+
+    실패 후에도 update를 계속 호출하면 잘못된 결과가 누적될 수 있습니다. 보통은 추적 실패 시 객체를 다시 검출하는 재초기화 로직을 둡니다.
+  tips:
+  - 박스 좌표가 영상 경계를 벗어나면 그리기 전에 clip 처리를 하는 것이 안전합니다.
+  snippet: |-
+    cap = cv2.VideoCapture(str(videoPath))
+    boxesCsrt = []
+    while True:
+        ok, frame = cap.read()
+        if not ok:
+            break
+        success, box = tracker.update(frame)
+        boxesCsrt.append((bool(success), tuple(int(round(value)) for value in box)))
+    cap.release()
+    len(boxesCsrt), boxesCsrt[0], boxesCsrt[-1]
+  exercise:
+    prompt: 추적 실패가 한 번이라도 있었는지 확인하세요.
+    starterCode: |-
+      failures = [b for ok, b in boxesCsrt if not ___]
+      len(failures)
+    hints:
+    - 빈칸은 ok 변수입니다.
+    - 합성 영상은 객체가 단순해 실패가 없을 가능성이 높습니다.
+  check:
+    noError: 트래커 update 루프가 오류 없이 끝나야 합니다.
+    resultCheck: len(boxesCsrt) 가 0보다 커야 합니다.
+- id: kcf_compare
+  title: 4단계. KCF 트래커
+  structuredPrimary: true
+  subtitle: 속도 중심 트래커
+  goal: TrackerKCF_create로 같은 영상에 KCF를 적용해 결과를 비교합니다.
+  why: 두 트래커의 결과 차이를 비교해야 응용 상황에 맞는 트래커를 고를 수 있습니다.
+  explanation: |-
+    \`cv2.TrackerKCF_create()\` 로 객체를 만들고 같은 init/update 흐름을 따릅니다. KCF는 CSRT보다 빠르지만 외형 변화에 약합니다.
+
+    합성 영상은 외형 변화가 거의 없으므로 두 트래커가 비슷한 결과를 낼 수 있습니다. 실제 영상에서는 차이가 분명해집니다.
+  tips:
+  - KCF가 일부 환경에서 cv2.legacy.TrackerKCF_create로만 제공되는 경우가 있습니다. 에러가 나면 그 네임스페이스를 시도하세요.
+  snippet: |-
+    kcfTracker = cv2.TrackerKCF_create()
+    kcfTracker.init(firstFrame, initialBox)
+    cap = cv2.VideoCapture(str(videoPath))
+    boxesKcf = []
+    while True:
+        ok, frame = cap.read()
+        if not ok:
+            break
+        success, box = kcfTracker.update(frame)
+        boxesKcf.append((bool(success), tuple(int(round(value)) for value in box)))
+    cap.release()
+    len(boxesKcf), boxesKcf[0], boxesKcf[-1]
+  exercise:
+    prompt: 두 트래커의 마지막 프레임 박스 중심을 비교하세요.
+    starterCode: |-
+      def center(box):
+          x, y, w, h = box
+          return (x + w / 2, y + h / 2)
+
+      csrtCenter = center(boxesCsrt[-1][1])
+      kcfCenter = center(boxesKcf[-1][1])
+      csrtCenter, ___
+    hints:
+    - 빈칸은 kcfCenter 변수명입니다.
+    - 두 중심이 매우 가까우면 합성 영상에서 두 트래커가 비슷하게 동작한 것입니다.
+  check:
+    noError: KCF 적용이 오류 없이 끝나야 합니다.
+    resultCheck: len(boxesKcf) 가 len(boxesCsrt) 와 같아야 합니다.
+- id: visualize
+  title: 5단계. 박스 시퀀스 시각화
+  structuredPrimary: true
+  subtitle: 시간순으로 박스 보기
+  goal: 영상의 일부 프레임에 추적 박스를 그려 시간순으로 시각화합니다.
+  why: 트래킹의 품질은 시각화로 한눈에 평가됩니다.
+  explanation: |-
+    같은 영상에서 첫·중간·마지막 프레임을 가져와 박스를 그립니다. 박스가 객체를 잘 따라가면 트래커가 잘 동작한 것입니다.
+  tips:
+  - 박스가 객체 밖으로 새는 경우 init 박스가 너무 작거나 너무 크지 않은지 다시 검토하세요.
+  snippet: |-
+    cap = cv2.VideoCapture(str(videoPath))
+    snapshots = {}
+    targetIdx = {0, 30, 59}
+    idx = 0
+    while True:
+        ok, frame = cap.read()
+        if not ok:
+            break
+        if idx in targetIdx:
+            snapshots[idx] = frame
+        idx += 1
+    cap.release()
+    fig, axes = plt.subplots(1, 3, figsize=(12, 4))
+    for axis, key in zip(axes, sorted(snapshots)):
+        previewFrame = snapshots[key].copy()
+        ok, box = boxesCsrt[key]
+        x, y, w, h = box
+        cv2.rectangle(previewFrame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        axis.imshow(cv2.cvtColor(previewFrame, cv2.COLOR_BGR2RGB))
+        axis.set_title(f'CSRT frame {key}')
+        axis.axis('off')
+    fig
+  exercise:
+    prompt: 같은 세 프레임에 KCF 박스를 그려 1x3 그리드로 비교 출력하세요.
+    starterCode: |-
+      fig2, axes2 = plt.subplots(1, 3, figsize=(12, 4))
+      for axis, key in zip(axes2, sorted(snapshots)):
+          previewFrame = snapshots[key].copy()
+          ok, box = boxesKcf[___]
+          x, y, w, h = box
+          cv2.rectangle(previewFrame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+          axis.imshow(cv2.cvtColor(previewFrame, cv2.COLOR_BGR2RGB))
+          axis.set_title(f'KCF frame {key}')
+          axis.axis('off')
+      fig2
+    hints:
+    - 빈칸은 key 변수입니다.
+    - CSRT는 녹색, KCF는 빨강으로 구분합니다.
+  check:
+    noError: 시각화가 오류 없이 끝나야 합니다.
+    resultCheck: snapshots에 0, 30, 59 키가 모두 있어야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 트래커 비교 보고서
+  goal: 두 트래커의 박스 중심을 시계열로 그려 비교합니다.
+  why: 시계열 비교는 시각 비교보다 정량적입니다.
+  explanation: |-
+    각 미션은 import문부터 시작하지만, 위 예제를 실행했다면 import는 생략해도 됩니다.
+  tips:
+  - 시계열 차이가 크면 두 트래커 중 어느 쪽이 진실에 더 가까운지 분리해 평가해야 합니다.
+  snippet: |-
+    csrtCenters = np.array([(b[0] + b[2] / 2, b[1] + b[3] / 2) for _, b in boxesCsrt])
+    kcfCenters = np.array([(b[0] + b[2] / 2, b[1] + b[3] / 2) for _, b in boxesKcf])
+    fig = plt.figure(figsize=(8, 3))
+    plt.plot(csrtCenters[:, 0], label='CSRT x', color='green')
+    plt.plot(kcfCenters[:, 0], label='KCF x', color='red')
+    plt.xlabel('frame')
+    plt.ylabel('center x')
+    plt.legend()
+    fig
+  exercise:
+    prompt: "미션1: y 중심도 같은 차트에 비교 그리세요(점선 등으로 구분). 미션2: 두 트래커의 박스 면적(w*h)을 시계열로 그리세요."
+    starterCode: |-
+      fig = plt.figure(figsize=(8, 3))
+      plt.plot(csrtCenters[:, 1], label='CSRT y', color='green', linestyle='dotted')
+      plt.plot(kcfCenters[:, 1], label='KCF y', color='red', linestyle='dotted')
+      plt.xlabel('frame')
+      plt.ylabel('center y')
+      plt.legend()
+      fig
+    hints:
+    - linestyle 인자로 점선을 만들 수 있습니다.
+    - 면적은 list comprehension 한 줄로 계산할 수 있습니다.
+  check:
+    noError: 시계열 그리기가 오류 없이 끝나야 합니다.
+    resultCheck: csrtCenters와 kcfCenters의 모양이 같아야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: visionFeatures_09-object_tracker-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - initial_box
+    - practice
+    title: 객체 트래커 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: tracker 종류·초기 bbox·confidence 재시작 기준을 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_object_tracker_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_object_tracker_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_object_tracker_contract(value):
+            required = ['tracker', 'initialBox', 'reinitializeBelow', 'maxLostFrames']
+            rules = [{'id': 'tracker', 'field': 'tracker', 'kind': 'enum', 'values': ['KCF', 'CSRT', 'MOSSE', 'MIL']}, {'id': 'initial-box', 'field': 'initialBox', 'kind': 'length', 'value': 4}, {'id': 'reinit', 'field': 'reinitializeBelow', 'kind': 'unit-interval'}, {'id': 'lost-budget', 'field': 'maxLostFrames', 'kind': 'range', 'min': 0, 'max': 1000}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'object_tracker', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.vision-features.visionFeatures_09.object_tracker-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-features.visionFeatures_09.object_tracker-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_object_tracker_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              tracker: CSRT
+              initialBox:
+              - 100
+              - 80
+              - 200
+              - 160
+              reinitializeBelow: 0.4
+              maxLostFrames: 10
+          expectedReturn:
+            accepted: true
+            topic: object_tracker
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              initialBox:
+              - 100
+              - 80
+              - 200
+              - 160
+              reinitializeBelow: 0.4
+              maxLostFrames: 10
+          expectedReturn:
+            accepted: false
+            topic: object_tracker
+            missing:
+            - tracker
+            violations:
+            - tracker
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              tracker: MAGIC
+              initialBox:
+              - 100
+              - 80
+              reinitializeBelow: -1
+              maxLostFrames: 2000
+          expectedReturn:
+            accepted: false
+            topic: object_tracker
+            missing: []
+            violations:
+            - initial-box
+            - lost-budget
+            - reinit
+            - tracker
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: visionFeatures_09-object_tracker-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionFeatures_09-object_tracker-contract-audit-mastery
+    title: 객체 트래커 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_object_tracker_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_object_tracker_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_object_tracker_result(expected, observed):
+            identity = ['videoHash', 'trackId']
+            metrics = {'successfulFrames': 1}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'object_tracker', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.vision-features.visionFeatures_09.object_tracker-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-features.visionFeatures_09.object_tracker-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_object_tracker_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              videoHash: tr1
+              trackId: person-1
+              successfulFrames: 290
+          - value:
+              videoHash: tr1
+              trackId: person-1
+              successfulFrames: 291
+          expectedReturn:
+            passed: true
+            topic: object_tracker
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              videoHash: tr1
+              trackId: person-1
+              successfulFrames: 290
+          - value:
+              videoHash: tr2
+              trackId: person-2
+              successfulFrames: 120
+          expectedReturn:
+            passed: false
+            topic: object_tracker
+            missing: []
+            identityMismatch:
+            - trackId
+            - videoHash
+            metricDrift:
+            - successfulFrames
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              videoHash: tr1
+              trackId: person-1
+              successfulFrames: 290
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: object_tracker
+            missing:
+            - successfulFrames
+            - trackId
+            - videoHash
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: visionFeatures_09-object_tracker-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionFeatures_09-object_tracker-result-reconciliation-transfer
+    title: 객체 트래커 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_object_tracker_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_object_tracker_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_object_tracker_evidence(stage):
+            stages = {'source': {'action': 'validate tracker frames', 'evidence': 'video track identity bbox', 'risk': 'wrong frame identity'}, 'estimate': {'action': 'estimate bounded tracker', 'evidence': 'per-frame update ledger', 'risk': 'unstable geometry'}, 'verify': {'action': 'verify tracker result', 'evidence': 'success count and drift review', 'risk': 'confident but wrong tracking'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.vision-features.visionFeatures_09.object_tracker-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-features.visionFeatures_09.object_tracker-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_object_tracker_evidence
+        cases:
+        - id: recalls-source
+          arguments:
+          - value: source
+          expectedReturn:
+            action: validate tracker frames
+            evidence: video track identity bbox
+            risk: wrong frame identity
+        - id: recalls-estimate
+          arguments:
+          - value: estimate
+          expectedReturn:
+            action: estimate bounded tracker
+            evidence: per-frame update ledger
+            risk: unstable geometry
+        - id: recalls-verify
+          arguments:
+          - value: verify
+          expectedReturn:
+            action: verify tracker result
+            evidence: success count and drift review
+            risk: confident but wrong tracking
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

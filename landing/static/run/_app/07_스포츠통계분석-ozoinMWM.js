@@ -1,0 +1,921 @@
+var e=`meta:
+  packages:
+  - polars
+  id: polars_07
+  title: 스포츠통계분석
+  order: 7
+  category: polars
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  dataSource: codaro-local:fifa_players
+  tags:
+  - FIFA
+  - exclude
+  - concat
+  - pivot
+  - 능력치분석
+  seo:
+    title: Polars 피벗과 결합 - FIFA 선수 능력치 분석
+    description: FIFA 선수 데이터로 포지션별 능력치를 비교합니다. exclude로 열 제외, concat으로 결합, pivot으로 피벗 테이블을 만듭니다.
+    keywords:
+    - polars pivot
+    - polars concat
+    - polars exclude
+    - FIFA 데이터
+    - 선수 능력치
+intro:
+  emoji: ⚽
+  goal: FIFA 선수 데이터에서 "포지션별 능력치"를 비교하는 피벗 테이블을 만듭니다.
+  description: 스포츠 데이터 분석의 핵심! 특정 열을 제외하고, 데이터를 결합하고, 피벗 테이블로 요약합니다. exclude, concat, pivot을 익힙니다.
+  direction: 스포츠통계분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - Polars DataFrame 확인 후 컬럼 선택/필터/집계에 맞는 코드 입력을 고릅니다.
+  - 스포츠통계분석 결과를 행 수, 컬럼 값, 집계 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 대용량 데이터 분석 파이프라인에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(Polars DataFrame)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 스키마 확인 처리 실행
+      detail: 컬럼 선택/필터/집계 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 미리보기 결과 검증
+      detail: 행 수, 컬럼 값, 집계 결과 기준으로 실행 결과를 비교합니다.
+    - label: 스포츠통계분석 재사용
+      detail: 완성 코드를 대용량 데이터 분석 파이프라인에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 컬럼형 표 분석 환경
+      detail: polars 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 스포츠통계분석 실행
+      detail: 셀을 실행해 행 수, 컬럼 값, 집계 결과와 예외 상태를 확인합니다.
+    - label: 스포츠통계분석 완료
+      detail: 검증된 코드를 대용량 데이터 분석 파이프라인로 남깁니다.
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  structuredPrimary: true
+  subtitle: FIFA 선수 데이터
+  goal: 1단계. 데이터 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    FIFA 게임의 선수 능력치 데이터를 불러옵니다. 이 데이터는 18,000명 이상의 실제 축구 선수들의 게임 내 능력치를 포함하고 있으며, 이름(Name), 포지션(Position), 종합능력치(Overall), 속도(Pace), 슈팅(Shooting), 패스(Passing), 드리블(Dribbling), 수비(Defending), 피지컬(Physical) 등 다양한 스탯이 포함됩니다. EA Sports의 FIFA 게임은 실제 선수 데이터를 기반으로 하므로 스포츠 데이터 분석의 훌륭한 연습 소재입니다. Polars의 빠른 CSV 읽기 성능으로 대용량 선수 데이터도 순식간에 로드할 수 있습니다.
+
+    FIFA 데이터는 실제 스포츠 분석에서 자주 사용되는 구조를 가지고 있습니다. 선수(Entity), 포지션(Category), 능력치(Metrics)의 조합으로 구성되어 있어, 실무 스포츠 데이터 분석과 동일한 패턴을 연습할 수 있습니다.
+  tips:
+  - FIFA 데이터는 실제 스포츠 분석에서 자주 사용되는 구조를 가지고 있습니다. 선수(Entity), 포지션(Category), 능력치(Metrics)의 조합으로 구성되어 있어,
+    실무 스포츠 데이터 분석과 동일한 패턴을 연습할 수 있습니다.
+  snippet: |-
+    import polars as pl
+    from io import StringIO
+    from codaro.curriculum.localData import loadLocalDataset
+
+    fifaCsv = loadLocalDataset("fifa_players").to_csv(index=False)
+    df = pl.read_csv(StringIO(fifaCsv))
+    df.shape
+  exercise:
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import polars as pl
+      from io import StringIO
+      from codaro.curriculum.localData import loadLocalDataset
+
+      fifaCsv = loadLocalDataset("fifa_players").to_csv(index=False)
+      df = pl.read_csv(StringIO(fifaCsv))
+      df.shape
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step2_schema
+  title: 2단계. 스키마 확인
+  structuredPrimary: true
+  subtitle: 컬럼과 타입 파악
+  goal: 2단계. 스키마 확인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    DataFrame의 스키마를 확인하여 어떤 컬럼이 있고 각각의 데이터 타입이 무엇인지 파악합니다. FIFA 데이터는 선수 정보(Name, Nationality, Club), 포지션 정보(Position), 능력치(Overall, Pace, Shooting 등), 신체 정보(Height, Weight) 등 다양한 카테고리의 컬럼을 포함합니다. 스키마 확인은 데이터 분석의 첫 단계로, 어떤 분석이 가능한지 계획을 세우는 데 필수적입니다. Polars는 정수는 Int64, 실수는 Float64, 문자열은 Utf8로 명확하게 타입을 구분합니다.
+
+    .schema는 컬럼명과 타입의 딕셔너리를 반환합니다. .columns로 컬럼명 리스트만 확인하거나, .dtypes로 타입 리스트만 확인할 수도 있습니다. 대용량 데이터에서는 .head()보다 .schema를 먼저 확인하는 것이 효율적입니다.
+  tips:
+  - .schema는 컬럼명과 타입의 딕셔너리를 반환합니다. .columns로 컬럼명 리스트만 확인하거나, .dtypes로 타입 리스트만 확인할 수도 있습니다. 대용량 데이터에서는
+    .head()보다 .schema를 먼저 확인하는 것이 효율적입니다.
+  snippet: df.schema
+  exercise:
+    prompt: 2단계. 스키마 확인 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: df.schema
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 스키마 확인의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 스키마 확인의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_head
+  title: 3단계. 미리보기
+  structuredPrimary: true
+  subtitle: 상위 데이터 확인
+  goal: 3단계. 미리보기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    실제 데이터가 어떻게 생겼는지 확인합니다. head() 메서드는 상위 5개 행을 반환하여 데이터의 구조와 값을 빠르게 파악할 수 있게 해줍니다. 스키마만으로는 알 수 없는 실제 값의 형태, 범위, 패턴을 확인할 수 있습니다.
+
+    head(n)으로 상위 n개 행을 볼 수 있습니다. tail(n)은 하위 n개 행을 반환합니다. 기본값은 5입니다. sample(n)으로 무작위 샘플링도 가능합니다.
+  snippet: df.head()
+  exercise:
+    prompt: 3단계. 미리보기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: df.head()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 미리보기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 3단계. 미리보기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step4_select_basic
+  title: 4단계. 필요한 열 선택
+  structuredPrimary: true
+  subtitle: 분석에 필요한 열만
+  goal: 4단계. 필요한 열 선택에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    분석에 필요한 핵심 컬럼만 선택하여 작업 효율을 높입니다. FIFA 데이터는 100개 이상의 컬럼을 포함하지만, 포지션별 능력치 비교에는 Name, Position과 6개 핵심 능력치만 있으면 충분합니다. 불필요한 컬럼을 제거하면 메모리 사용량이 줄어들고 연산 속도가 빨라집니다. select()는 여러 컬럼을 리스트로 전달받아 새로운 DataFrame을 반환합니다.
+
+    select()는 원본 DataFrame을 변경하지 않고 새로운 DataFrame을 반환합니다. Codaro 환경에서는 새 변수명(stats)에 할당하여 사용합니다. pl.col("컬럼명")은 컬럼을 선택하는 표현식입니다.
+  tips:
+  - select()는 원본 DataFrame을 변경하지 않고 새로운 DataFrame을 반환합니다. Codaro 환경에서는 새 변수명(stats)에 할당하여 사용합니다. pl.col("컬럼명")은
+    컬럼을 선택하는 표현식입니다.
+  snippet: |-
+    stats = df.select([
+        pl.col("Name"),
+        pl.col("Position"),
+        pl.col("Overall"),
+        pl.col("Pace"),
+        pl.col("Shooting"),
+        pl.col("Passing"),
+        pl.col("Dribbling"),
+        pl.col("Defending"),
+        pl.col("Physical")
+    ])
+    stats.head()
+  exercise:
+    prompt: 4단계. 필요한 열 선택 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      stats = df.select([
+          pl.col("Name"),
+          pl.col("Position"),
+          pl.col("Overall"),
+          pl.col("Pace"),
+          pl.col("Shooting"),
+          pl.col("Passing"),
+          pl.col("Dribbling"),
+          pl.col("Defending"),
+          pl.col("Physical")
+      ])
+      stats.head()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 필요한 열 선택의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 4단계. 필요한 열 선택의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step5_exclude
+  title: 5단계. 특정 열 제외하기
+  structuredPrimary: true
+  subtitle: pl.all().exclude()
+  goal: 5단계. 특정 열 제외하기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    선택할 컬럼이 많고 제외할 컬럼이 적을 때는 exclude()가 더 효율적입니다. pl.all()은 모든 컬럼을 선택하는 표현식이고, exclude()는 특정 컬럼을 제외합니다. FIFA 데이터의 경우 ID, Photo, Flag, Club Logo처럼 분석에 불필요한 메타데이터나 URL 컬럼을 제거할 때 유용합니다. 특히 컬럼이 100개 이상인 경우 필요한 컬럼을 일일이 나열하는 것보다 제외할 컬럼만 지정하는 것이 훨씬 간결합니다.
+
+    pl.all().exclude([열 목록])은 지정한 열만 제외하고 나머지 전부를 선택합니다. 열이 많을 때 유용하며, pandas의 df.drop(columns=[...])과 유사하지만 Polars는 select 내에서 표현식으로 처리합니다. 정규표현식으로 패턴 매칭도 가능합니다.
+  tips:
+  - pl.all().exclude([열 목록])은 지정한 열만 제외하고 나머지 전부를 선택합니다. 열이 많을 때 유용하며, pandas의 df.drop(columns=[...])과
+    유사하지만 Polars는 select 내에서 표현식으로 처리합니다. 정규표현식으로 패턴 매칭도 가능합니다.
+  snippet: |-
+    df.select(
+        pl.all().exclude(["ID", "Photo", "Flag", "Club Logo"])
+    ).head()
+  exercise:
+    prompt: 5단계. 특정 열 제외하기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      df.select(
+          pl.all().exclude(["ID", "Photo", "Flag", "Club Logo"])
+      ).head()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 특정 열 제외하기의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 5단계. 특정 열 제외하기 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step6_filter_position
+  title: 6단계. 포지션 필터링
+  structuredPrimary: true
+  subtitle: 주요 포지션만
+  goal: 6단계. 포지션 필터링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    FIFA에는 27개 이상의 포지션이 있지만, 핵심 분석을 위해 대표적인 4개 포지션만 선택합니다. ST(Striker, 공격수)는 득점, CM(Central Midfielder, 중앙 미드필더)은 패스와 조율, CB(Center Back, 중앙 수비수)는 수비, GK(Goalkeeper, 골키퍼)는 골문 방어를 담당합니다. is_in() 메서드는 SQL의 IN 연산자와 동일하며, 지정한 값 목록에 포함되는 행만 필터링합니다. 이렇게 포지션을 제한하면 각 포지션의 특성이 명확히 드러납니다.
+
+    is_in([값 목록])은 여러 값 중 하나와 일치하는 행을 선택합니다. pandas의 df[df['col'].isin([...])]과 동일합니다. 반대로 is_not_in()으로 제외할 수도 있습니다.
+  tips:
+  - is_in([값 목록])은 여러 값 중 하나와 일치하는 행을 선택합니다. pandas의 df[df['col'].isin([...])]과 동일합니다. 반대로 is_not_in()으로
+    제외할 수도 있습니다.
+  snippet: |-
+    positions = ["ST", "CM", "CB", "GK"]
+    filtered = stats.filter(pl.col("Position").is_in(positions))
+    filtered.shape
+  exercise:
+    prompt: 6단계. 포지션 필터링 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      positions = ["ST", "CM", "CB", "GK"]
+      filtered = stats.filter(pl.col("Position").is_in(positions))
+      filtered.shape
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 포지션 필터링의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 6단계. 포지션 필터링의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step7_groupby
+  title: 7단계. 포지션별 평균 능력치
+  structuredPrimary: true
+  subtitle: group_by + agg
+  goal: 7단계. 포지션별 평균 능력치에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    각 포지션별로 능력치 평균을 계산하여 포지션 특성을 파악합니다. group_by("Position")은 Position 값이 같은 행들을 그룹으로 묶고, agg()는 각 그룹에 집계 함수를 적용합니다. 예를 들어 ST(공격수)는 Shooting과 Pace가 높고, CB(수비수)는 Defending과 Physical이 높으며, GK(골키퍼)는 다른 능력치보다 골키핑 능력치가 중요합니다. 이렇게 그룹별 평균을 비교하면 각 포지션이 요구하는 핵심 능력을 명확히 알 수 있습니다.
+
+    group_by().agg()는 Polars의 핵심 패턴입니다. agg() 안에 여러 집계 표현식을 리스트로 전달하면 한 번에 여러 통계를 계산할 수 있습니다. pandas의 groupby().agg()와 유사하지만 Polars가 훨씬 빠릅니다.
+  tips:
+  - group_by().agg()는 Polars의 핵심 패턴입니다. agg() 안에 여러 집계 표현식을 리스트로 전달하면 한 번에 여러 통계를 계산할 수 있습니다. pandas의
+    groupby().agg()와 유사하지만 Polars가 훨씬 빠릅니다.
+  snippet: |-
+    positionStats = filtered.group_by("Position").agg([
+        pl.col("Overall").mean().alias("avgOverall"),
+        pl.col("Pace").mean().alias("avgPace"),
+        pl.col("Shooting").mean().alias("avgShooting"),
+        pl.col("Passing").mean().alias("avgPassing"),
+        pl.col("Dribbling").mean().alias("avgDribbling"),
+        pl.col("Defending").mean().alias("avgDefending"),
+        pl.col("Physical").mean().alias("avgPhysical")
+    ])
+    positionStats
+  exercise:
+    prompt: 7단계. 포지션별 평균 능력치 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      positionStats = filtered.group_by("Position").agg([
+          pl.col("Overall").mean().alias("avgOverall"),
+          pl.col("Pace").mean().alias("avgPace"),
+          pl.col("Shooting").mean().alias("avgShooting"),
+          pl.col("Passing").mean().alias("avgPassing"),
+          pl.col("Dribbling").mean().alias("avgDribbling"),
+          pl.col("Defending").mean().alias("avgDefending"),
+          pl.col("Physical").mean().alias("avgPhysical")
+      ])
+      positionStats
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 포지션별 평균 능력치의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 7단계. 포지션별 평균 능력치의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step8_with_columns
+  title: 8단계. 등급 컬럼 추가
+  structuredPrimary: true
+  subtitle: with_columns
+  goal: 8단계. 등급 컬럼 추가에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: Overall 점수에 따라 등급을 부여합니다. when-then-otherwise 구문으로 85점 이상 Elite, 75점 이상 Good, 65점 이상 Average,
+    그 외는 Developing으로 분류합니다. 이렇게 연속형 변수를 범주형으로 변환하면 등급별 분석이 가능해집니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    graded = stats.with_columns(
+        pl.when(pl.col("Overall") >= 85).then(pl.lit("Elite"))
+        .when(pl.col("Overall") >= 75).then(pl.lit("Good"))
+        .when(pl.col("Overall") >= 65).then(pl.lit("Average"))
+        .otherwise(pl.lit("Developing"))
+        .alias("Grade")
+    )
+    graded.head(10)
+  exercise:
+    prompt: 8단계. 등급 컬럼 추가 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      graded = stats.with_columns(
+          pl.when(pl.col("Overall") >= 85).then(pl.lit("Elite"))
+          .when(pl.col("Overall") >= 75).then(pl.lit("Good"))
+          .when(pl.col("Overall") >= 65).then(pl.lit("Average"))
+          .otherwise(pl.lit("Developing"))
+          .alias("Grade")
+      )
+      graded.head(10)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 등급 컬럼 추가의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 8단계. 등급 컬럼 추가의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step9_concat_intro
+  title: 9단계. 데이터 결합
+  structuredPrimary: true
+  subtitle: pl.concat
+  goal: 9단계. 데이터 결합에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    여러 DataFrame을 하나로 결합하는 연습을 합니다. 공격수(ST)와 수비수(CB) 데이터를 각각 추출한 뒤 수직으로 합쳐봅니다. 실무에서는 여러 파일에서 읽어온 데이터나, 서로 다른 조건으로 필터링한 데이터를 다시 합칠 때 concat을 사용합니다. concat은 여러 DataFrame을 행 방향(수직)으로 쌓는 기능으로, SQL의 UNION ALL과 유사합니다.
+
+    실무에서는 월별 데이터 파일을 각각 읽어온 후 concat으로 통합하는 경우가 많습니다. 예를 들어 2024년 1월~12월 파일을 각각 읽고 pl.concat()으로 연간 데이터를 만듭니다.
+  tips:
+  - 실무에서는 월별 데이터 파일을 각각 읽어온 후 concat으로 통합하는 경우가 많습니다. 예를 들어 2024년 1월~12월 파일을 각각 읽고 pl.concat()으로 연간 데이터를
+    만듭니다.
+  snippet: |-
+    strikers = stats.filter(pl.col("Position") == "ST").head(5)
+    defenders = stats.filter(pl.col("Position") == "CB").head(5)
+    strikers.shape, defenders.shape
+  exercise:
+    prompt: 9단계. 데이터 결합 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      strikers = stats.filter(pl.col("Position") == "ST").head(5)
+      defenders = stats.filter(pl.col("Position") == "CB").head(5)
+      strikers.shape, defenders.shape
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 데이터 결합의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 9단계. 데이터 결합의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step10_concat
+  title: 10단계. 수직 결합
+  structuredPrimary: true
+  subtitle: concat으로 합치기
+  goal: 10단계. 수직 결합에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    pl.concat()은 여러 DataFrame을 수직으로 쌓아 하나의 DataFrame으로 만듭니다. 리스트로 전달된 DataFrame들의 행을 순서대로 이어붙이며, 모든 DataFrame의 컬럼 구조가 동일해야 합니다. how 파라미터로 동작 방식을 제어할 수 있으며, 기본값 'vertical'은 행을 쌓고, 'horizontal'은 열을 옆으로 붙입니다. concat은 pandas의 pd.concat()과 유사하지만 Polars가 더 빠릅니다.
+
+    pl.concat([df1, df2, df3, ...])는 여러 DataFrame을 한 번에 결합할 수 있습니다. how='vertical'이 기본값이며, 컬럼이 다르면 에러가 발생합니다. how='diagonal'로 컬럼이 다른 DataFrame도 결합 가능하며, 없는 컬럼은 null로 채워집니다.
+  tips:
+  - pl.concat([df1, df2, df3, ...])는 여러 DataFrame을 한 번에 결합할 수 있습니다. how='vertical'이 기본값이며, 컬럼이 다르면 에러가
+    발생합니다. how='diagonal'로 컬럼이 다른 DataFrame도 결합 가능하며, 없는 컬럼은 null로 채워집니다.
+  snippet: |-
+    combined = pl.concat([strikers, defenders])
+    combined
+  exercise:
+    prompt: 10단계. 수직 결합 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      combined = pl.concat([strikers, defenders])
+      combined
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 수직 결합의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 10단계. 수직 결합의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step11_pivot_prep
+  title: 11단계. 피벗 준비
+  structuredPrimary: true
+  subtitle: 데이터 구조 변환
+  goal: 11단계. 피벗 준비에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 피벗 테이블을 만들기 위해 포지션별 능력치 평균 데이터를 준비합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    pivotData = filtered.group_by("Position").agg([
+        pl.col("Pace").mean().round(1).alias("Pace"),
+        pl.col("Shooting").mean().round(1).alias("Shooting"),
+        pl.col("Passing").mean().round(1).alias("Passing"),
+        pl.col("Dribbling").mean().round(1).alias("Dribbling"),
+        pl.col("Defending").mean().round(1).alias("Defending"),
+        pl.col("Physical").mean().round(1).alias("Physical")
+    ])
+    pivotData
+  exercise:
+    prompt: 11단계. 피벗 준비 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      pivotData = filtered.group_by("Position").agg([
+          pl.col("Pace").mean().round(1).alias("Pace"),
+          pl.col("Shooting").mean().round(1).alias("Shooting"),
+          pl.col("Passing").mean().round(1).alias("Passing"),
+          pl.col("Dribbling").mean().round(1).alias("Dribbling"),
+          pl.col("Defending").mean().round(1).alias("Defending"),
+          pl.col("Physical").mean().round(1).alias("Physical")
+      ])
+      pivotData
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 피벗 준비의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 11단계. 피벗 준비의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step12_unpivot
+  title: 12단계. 언피벗
+  structuredPrimary: true
+  subtitle: 넓은 형태를 긴 형태로
+  goal: 12단계. 언피벗에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    피벗(pivot)을 이해하려면 먼저 언피벗(unpivot)을 알아야 합니다. 언피벗은 넓은 형태(wide format)의 데이터를 긴 형태(long format)로 변환하는 작업입니다. 여러 컬럼에 흩어져 있던 값들을 하나의 변수(variable)와 값(value) 컬럼으로 모읍니다. Pace, Shooting, Passing 등 6개 능력치 컬럼을 Stat(능력치명)과 Value(값) 2개 컬럼으로 변환하면, 포지션 × 능력치 조합이 각각 하나의 행이 됩니다. 이는 데이터 시각화나 피벗 테이블 생성에 유용한 형태입니다.
+
+    unpivot(index=고정할컬럼, variable_name=변수명컬럼, value_name=값컬럼)은 여러 컬럼을 하나로 모읍니다. pandas의 melt()와 동일한 기능입니다. index에 지정하지 않은 모든 컬럼이 변환 대상이 됩니다.
+  tips:
+  - unpivot(index=고정할컬럼, variable_name=변수명컬럼, value_name=값컬럼)은 여러 컬럼을 하나로 모읍니다. pandas의 melt()와 동일한 기능입니다.
+    index에 지정하지 않은 모든 컬럼이 변환 대상이 됩니다.
+  snippet: |-
+    longData = pivotData.unpivot(
+        index="Position",
+        variable_name="Stat",
+        value_name="Value"
+    )
+    longData.head(12)
+  exercise:
+    prompt: 12단계. 언피벗 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      longData = pivotData.unpivot(
+          index="Position",
+          variable_name="Stat",
+          value_name="Value"
+      )
+      longData.head(12)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 12단계. 언피벗의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 12단계. 언피벗의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step13_pivot
+  title: 13단계. 피벗 테이블
+  structuredPrimary: true
+  subtitle: 긴 형태를 넓게
+  goal: 13단계. 피벗 테이블에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    이제 피벗(pivot)으로 긴 형태를 다시 넓은 형태로 변환합니다. 피벗은 특정 컬럼의 고유값들을 새로운 컬럼으로 만들어 데이터를 재구조화합니다. Position의 고유값(ST, CM, CB, GK)이 새로운 컬럼이 되고, Stat(능력치명)이 행 인덱스가 되어, 각 포지션별 능력치를 한눈에 비교할 수 있는 테이블이 완성됩니다. 이는 엑셀의 피벗 테이블, pandas의 pivot_table()과 동일한 개념으로, 스포츠 데이터 분석에서 매우 유용합니다.
+
+    pivot(on=열이될컬럼, index=행이될컬럼, values=값컬럼)으로 피벗 테이블을 만듭니다. on에 지정한 컬럼의 고유값들이 새 컬럼이 됩니다. aggregate_function 파라미터로 집계 함수(mean, sum 등)를 지정할 수 있습니다.
+  tips:
+  - pivot(on=열이될컬럼, index=행이될컬럼, values=값컬럼)으로 피벗 테이블을 만듭니다. on에 지정한 컬럼의 고유값들이 새 컬럼이 됩니다. aggregate_function
+    파라미터로 집계 함수(mean, sum 등)를 지정할 수 있습니다.
+  snippet: |-
+    pivotTable = longData.pivot(
+        on="Position",
+        index="Stat",
+        values="Value"
+    )
+    pivotTable
+  exercise:
+    prompt: 13단계. 피벗 테이블 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      pivotTable = longData.pivot(
+          on="Position",
+          index="Stat",
+          values="Value"
+      )
+      pivotTable
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 13단계. 피벗 테이블의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 13단계. 피벗 테이블의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step14_viz
+  title: 14단계. 결과물 - 포지션별 능력치 비교
+  structuredPrimary: true
+  subtitle: 피벗 테이블 결과
+  goal: 14단계. 결과물 포지션별 능력치 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    최종 결과물인 피벗 테이블이 완성되었습니다. 이 테이블은 포지션(ST, CM, CB, GK)을 열로, 능력치(Pace, Shooting, Passing, Dribbling, Defending, Physical)를 행으로 배치하여, 각 포지션이 어떤 능력에 특화되어 있는지 한눈에 비교할 수 있습니다. 예를 들어 ST는 Shooting이 높고 Defending이 낮으며, CB는 그 반대입니다. 이러한 인사이트는 축구 게임 전략 수립, 선수 영입 결정, 포메이션 설계 등 실무 스포츠 분석에 직접 활용됩니다.
+
+    피벗 테이블은 데이터를 요약하고 비교하는 가장 효과적인 방법입니다. 실무에서는 이 테이블을 그래프(히트맵, 레이더 차트 등)로 시각화하면 더욱 직관적인 인사이트를 얻을 수 있습니다.
+  snippet: pivotTable
+  exercise:
+    prompt: 14단계. 결과물 포지션별 능력치 비교 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: pivotTable
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 14단계. 결과물 포지션별 능력치 비교의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 14단계. 결과물 포지션별 능력치 비교의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: FIFA 데이터 분석 프로젝트
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    스포츠 데이터 분석가가 되어 배운 모든 개념을 종합적으로 활용해봅시다. exclude로 불필요한 컬럼 제거, concat으로 여러 포지션 데이터 결합, pivot으로 비교 테이블 생성, group_by로 심층 집계를 모두 사용합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import polars as pl
+    from io import StringIO
+    from codaro.curriculum.localData import loadLocalDataset
+
+    fifaRaw = pl.read_csv(StringIO(loadLocalDataset("fifa_players").to_csv(index=False)))
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import polars as pl
+      from io import StringIO
+      from codaro.curriculum.localData import loadLocalDataset
+
+      fifaRaw = pl.read_csv(StringIO(loadLocalDataset("fifa_players").to_csv(index=False)))
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 스포츠 데이터 분석의 핵심 기법을 마스터했습니다. exclude, concat, pivot은 실무에서 매우 자주 사용되는 필수 기능입니다.
+  - type: list
+    items:
+    - pl.all().exclude([열]) - 특정 열 제외하고 나머지 전부 선택, 컬럼이 많을 때 효율적
+    - pl.concat([df1, df2, ...]) - 여러 DataFrame 수직 결합, how='vertical'/'horizontal'/'diagonal'
+    - unpivot(index, variable_name, value_name) - 넓은 형태를 긴 형태로, pandas melt()와 동일
+    - pivot(on, index, values) - 긴 형태를 넓게, 피벗 테이블 생성으로 비교 분석
+    - group_by().agg() - 포지션별 평균 능력치 계산, 그룹별 집계
+    - is_in([값 목록]) - 여러 조건 필터링, SQL IN과 동일
+  - type: text
+    content: 다음 시간에는 소셜미디어 데이터로 over, rolling, unpivot을 활용한 복잡한 표현식 체이닝을 배웁니다.
+  goal: 정리에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 주문 매출 파이프라인
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: Polars는 빠른 집계만 배우면 부족합니다. 업무에서는 입력 스키마를 먼저 확인하고, 잘못된 수량이나 단가를 명확한 오류로 막고, 예측한 상위 채널이 실제
+    집계와 맞는지 검증해야 합니다. 마지막에는 기준값을 바꾸는 변주로 결론이 얼마나 안정적인지 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import polars as pl
+
+    orderFrame = pl.DataFrame({
+        "orderId": [1001, 1002, 1003, 1004, 1005, 1006],
+        "channel": ["web", "store", "web", "partner", "store", "web"],
+        "quantity": [3, 2, 5, 1, 4, 2],
+        "unitPrice": [12000, 18000, 9000, 40000, 15000, 22000],
+        "refund": [0, 0, 1, 0, 0, 0],
+    })
+
+    def validateOrderFrame(frame: pl.DataFrame) -> bool:
+        requiredColumns = {"orderId", "channel", "quantity", "unitPrice", "refund"}
+        missingColumns = requiredColumns - set(frame.columns)
+        if missingColumns:
+            raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+        if frame.select((pl.col("quantity") <= 0).any()).item():
+            raise ValueError("quantity는 0보다 커야 합니다.")
+        if frame.select((pl.col("unitPrice") <= 0).any()).item():
+            raise ValueError("unitPrice는 0보다 커야 합니다.")
+        return True
+
+    validateOrderFrame(orderFrame)
+    orderFrame
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      revenueByChannel = (
+          orderFrame.filter(pl.col("refund") == 0)
+          .with_columns((pl.col("quantity") * pl.col("unitPrice")).alias("netRevenue"))
+          .group_by("channel")
+          .agg(pl.col("netRevenue").sum())
+      )
+
+      thresholdFrame = pl.DataFrame({"threshold": [20000, 50000, 80000]}).with_columns(
+          pl.col("threshold").map_elements(
+              lambda threshold: revenueByChannel.filter(pl.col("netRevenue") >= threshold).height,
+              return_dtype=pl.Int64,
+          ).alias("qualifiedChannels")
+      )
+
+      assert thresholdFrame.select((pl.col("qualifiedChannels").diff().fill_null(0) <= 0).all()).item()
+      thresholdFrame
+    solution: |-
+      import polars as pl
+
+      orderFrame = pl.DataFrame({
+          "orderId": [1001, 1002, 1003, 1004, 1005, 1006],
+          "channel": ["web", "store", "web", "partner", "store", "web"],
+          "quantity": [3, 2, 5, 1, 4, 2],
+          "unitPrice": [12000, 18000, 9000, 40000, 15000, 22000],
+          "refund": [0, 0, 1, 0, 0, 0],
+      })
+
+      def validateOrderFrame(frame: pl.DataFrame) -> bool:
+          requiredColumns = {"orderId", "channel", "quantity", "unitPrice", "refund"}
+          missingColumns = requiredColumns - set(frame.columns)
+          if missingColumns:
+              raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+          if frame.select((pl.col("quantity") <= 0).any()).item():
+              raise ValueError("quantity는 0보다 커야 합니다.")
+          if frame.select((pl.col("unitPrice") <= 0).any()).item():
+              raise ValueError("unitPrice는 0보다 커야 합니다.")
+          return True
+
+      validateOrderFrame(orderFrame)
+      orderFrame
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 업무 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: polars_07-sports-team-standings-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: 경기 결과에서 팀별 승·패·득실차 순위 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: home·away 점수를 양쪽 팀 record로 펼쳐 points와 goal difference를 집계한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 한 경기를 home·away 두 팀 관점의 row로 생각하세요.
+    - points 동률이면 goalDiff, team 순서로 tie-break하세요.
+    exercise:
+      prompt: build_team_standings(matches)를 완성해 team, wins, losses, points, goalDiff 목록을 반환하세요.
+      starterCode: |-
+        def build_team_standings(matches):
+            raise NotImplementedError
+      solution: |
+        def build_team_standings(matches):
+            teams = {}
+            for match in matches:
+                for side, other in (("home", "away"), ("away", "home")):
+                    name = match[side]
+                    scored = match[f"{side}Score"]
+                    conceded = match[f"{other}Score"]
+                    row = teams.setdefault(name, {"wins": 0, "losses": 0, "points": 0, "goalDiff": 0})
+                    row["goalDiff"] += scored - conceded
+                    if scored > conceded:
+                        row["wins"] += 1
+                        row["points"] += 3
+                    elif scored < conceded:
+                        row["losses"] += 1
+            result = [{"team": team, **values} for team, values in teams.items()]
+            return sorted(result, key=lambda row: (-row["points"], -row["goalDiff"], row["team"]))
+      hints: *id001
+    check:
+      id: python.polars.polars_07.sports-team-standings.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_07.sports-team-standings.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_team_standings
+        cases:
+        - id: aggregates-both-sides
+          arguments:
+          - value:
+            - home: A
+              away: B
+              homeScore: 2
+              awayScore: 1
+            - home: B
+              away: C
+              homeScore: 0
+              awayScore: 3
+          expectedReturn:
+          - team: C
+            wins: 1
+            losses: 0
+            points: 3
+            goalDiff: 3
+          - team: A
+            wins: 1
+            losses: 0
+            points: 3
+            goalDiff: 1
+          - team: B
+            wins: 0
+            losses: 2
+            points: 0
+            goalDiff: -4
+        - id: handles-empty-season
+          arguments:
+          - value: []
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: polars_07-player-window-ranking-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_07-sports-team-standings-mastery
+    title: 새 선수 기록에서 팀 내 득점 rank 만들기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 팀 standings 집계를 partition별 dense rank와 동률 처리로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - rank는 team partition마다 다시 시작합니다.
+    - 같은 score는 같은 rank를 받고 다음 rank에는 gap이 생깁니다.
+    exercise:
+      prompt: rank_players_within_team(players)를 완성해 team, player, score, rank 목록을 반환하세요.
+      starterCode: |-
+        def rank_players_within_team(players):
+            raise NotImplementedError
+      solution: |
+        def rank_players_within_team(players):
+            grouped = {}
+            for player in players:
+                grouped.setdefault(player["team"], []).append(player)
+            result = []
+            for team, group in sorted(grouped.items()):
+                ordered = sorted(group, key=lambda row: (-row["score"], row["player"]))
+                previous_score = None
+                rank = 0
+                for index, row in enumerate(ordered, start=1):
+                    if row["score"] != previous_score:
+                        rank = index
+                    result.append({"team": team, "player": row["player"], "score": row["score"], "rank": rank})
+                    previous_score = row["score"]
+            return result
+      hints: *id002
+    check:
+      id: python.polars.polars_07.player-window-ranking.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_07.player-window-ranking.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: rank_players_within_team
+        cases:
+        - id: ranks-with-ties-per-team
+          arguments:
+          - value:
+            - team: A
+              player: Mina
+              score: 10
+            - team: A
+              player: Jun
+              score: 10
+            - team: A
+              player: Sol
+              score: 5
+            - team: B
+              player: Ara
+              score: 7
+          expectedReturn:
+          - team: A
+            player: Jun
+            score: 10
+            rank: 1
+          - team: A
+            player: Mina
+            score: 10
+            rank: 1
+          - team: A
+            player: Sol
+            score: 5
+            rank: 3
+          - team: B
+            player: Ara
+            score: 7
+            rank: 1
+        - id: handles-empty-roster
+          arguments:
+          - value: []
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: polars_07-sports-window-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_07-player-window-ranking-transfer
+    title: 스포츠 통계 window 연산 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 팀 내 rank, 이전 경기, 시즌 누적에 맞는 partition·order를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - window 질문에는 group key와 order key가 모두 필요합니다.
+    - rank와 row number의 동률 처리 차이를 확인하세요.
+    exercise:
+      prompt: choose_sports_window(situation)를 완성해 partitionBy, orderBy, operation을 반환하세요.
+      starterCode: |-
+        def choose_sports_window(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_sports_window(situation):
+            table = {'rank-player-in-team': {'partitionBy': 'team', 'orderBy': 'score desc', 'operation': 'rank'}, 'previous-match-score': {'partitionBy': 'team', 'orderBy': 'date', 'operation': 'shift'}, 'season-running-points': {'partitionBy': 'team', 'orderBy': 'date', 'operation': 'cum_sum'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.polars.polars_07.sports-window-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_07.sports-window-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_sports_window
+        cases:
+        - id: recalls-rank-player-in-team
+          arguments:
+          - value: rank-player-in-team
+          expectedReturn:
+            partitionBy: team
+            orderBy: score desc
+            operation: rank
+        - id: recalls-previous-match-score
+          arguments:
+          - value: previous-match-score
+          expectedReturn:
+            partitionBy: team
+            orderBy: date
+            operation: shift
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

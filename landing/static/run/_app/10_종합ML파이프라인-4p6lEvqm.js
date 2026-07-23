@@ -1,0 +1,918 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - numpy
+  - pandas
+  - scikit-learn
+  id: sklearn_10
+  title: 종합ML파이프라인
+  order: 10
+  category: sklearn
+  difficulty: ⭐⭐⭐⭐
+  badge: 고급
+  tags:
+  - sklearn
+  - Pipeline
+  - ColumnTransformer
+  - 전처리
+  - 워크플로우
+  seo:
+    title: Sklearn Pipeline - 종합 ML 워크플로우
+    description: Pipeline과 ColumnTransformer로 전처리부터 모델 학습까지 통합합니다. 재현 가능한 ML 워크플로우를 구축합니다.
+    keywords:
+    - sklearn
+    - Pipeline
+    - ColumnTransformer
+    - workflow
+    - preprocessing
+intro:
+  emoji: 🔧
+  goal: Pipeline으로 전처리와 모델 학습을 통합하고 재현 가능한 ML 워크플로우를 구축합니다.
+  description: Pipeline은 여러 변환 단계와 모델을 하나로 연결합니다. ColumnTransformer는 수치형/범주형 컬럼에 다른 전처리를 적용합니다. 이전에 배운
+    모든 개념을 통합하여 실전 ML 파이프라인을 구축합니다.
+  direction: 종합ML파이프라인에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 종합ML파이프라인 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 로딩 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 탐색 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 특성 선택 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 종합ML파이프라인 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: matplotlib, numpy, pandas, scikit-learn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 종합ML파이프라인 실행
+      detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
+    - label: 종합ML파이프라인 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+sections:
+- id: step1_data
+  title: 1단계. 데이터 로딩
+  structuredPrimary: true
+  subtitle: 타이타닉 데이터
+  goal: 1단계. 데이터 로딩에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    타이타닉 생존 데이터를 사용합니다. 수치형과 범주형 변수가 혼합되어 있어 Pipeline 실습에 적합합니다. Codaro 로컬 데이터셋에는 결측치, 수치형/범주형 컬럼, 생존 타깃이 모두 포함되어 Pipeline과 GridSearch 흐름을 끝까지 실행할 수 있습니다.
+
+    타이타닉 데이터는 Pclass(좌석등급), Sex(성별), Age(나이), SibSp(형제자매), Parch(부모자녀), Fare(요금), Embarked(승선항) 등으로 Survived(생존) 여부를 예측합니다.
+  tips:
+  - 타이타닉 데이터는 Pclass(좌석등급), Sex(성별), Age(나이), SibSp(형제자매), Parch(부모자녀), Fare(요금), Embarked(승선항) 등으로 Survived(생존)
+    여부를 예측합니다.
+  snippet: |-
+    import pandas as pd
+    import numpy as np
+    from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
+    from sklearn.preprocessing import StandardScaler, OneHotEncoder
+    from sklearn.impute import SimpleImputer
+    from sklearn.compose import ColumnTransformer
+    from sklearn.pipeline import Pipeline
+    from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import accuracy_score, classification_report, roc_auc_score
+    import matplotlib.pyplot as plt
+    from codaro.curriculum.localData import loadLocalDataset
+
+    titanic = loadLocalDataset("titanic_passengers")
+    titanic.head()
+  exercise:
+    prompt: 1단계. 데이터 로딩 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      import numpy as np
+      from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
+      from sklearn.preprocessing import StandardScaler, OneHotEncoder
+      from sklearn.impute import SimpleImputer
+      from sklearn.compose import ColumnTransformer
+      from sklearn.pipeline import Pipeline
+      from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score, classification_report, roc_auc_score
+      import matplotlib.pyplot as plt
+      from codaro.curriculum.localData import loadLocalDataset
+
+      titanic = loadLocalDataset("titanic_passengers")
+      titanic.head()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 데이터 로딩의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 로딩의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step2_eda
+  title: 2단계. 데이터 탐색
+  structuredPrimary: true
+  subtitle: 결측치와 분포
+  goal: 2단계. 데이터 탐색에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 결측치 현황과 생존 분포를 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    missingDf = pd.DataFrame({
+        "missing": titanic.isnull().sum(),
+        "percent": (titanic.isnull().sum() / len(titanic) * 100).round(2)
+    })
+    missingDf[missingDf["missing"] > 0]
+  exercise:
+    prompt: 2단계. 데이터 탐색 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      missingDf = pd.DataFrame({
+          "missing": titanic.isnull().sum(),
+          "percent": (titanic.isnull().sum() / len(titanic) * 100).round(2)
+      })
+      missingDf[missingDf["missing"] > 0]
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 탐색의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 탐색의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_select
+  title: 3단계. 특성 선택
+  structuredPrimary: true
+  subtitle: 수치형/범주형 분류
+  goal: 3단계. 특성 선택에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    분석에 사용할 특성을 선택하고 수치형/범주형으로 분류합니다.
+
+    Age와 Embarked에 결측치가 있습니다. Pipeline에서 SimpleImputer로 자동 처리합니다.
+  snippet: |-
+    numCols = ["Age", "SibSp", "Parch", "Fare"]
+    catCols = ["Pclass", "Sex", "Embarked"]
+
+    featureCols = numCols + catCols
+    X = titanic[featureCols].copy()
+    y = titanic["Survived"].copy()
+    X.shape, y.shape
+  exercise:
+    prompt: 3단계. 특성 선택 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      numCols = ["Age", "SibSp", "Parch", "Fare"]
+      catCols = ["Pclass", "Sex", "Embarked"]
+
+      featureCols = numCols + catCols
+      X = titanic[featureCols].copy()
+      y = titanic["Survived"].copy()
+      X.shape, y.shape
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 특성 선택에서 \`numCols\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 특성 선택 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step4_split
+  title: 4단계. 데이터 분할
+  structuredPrimary: true
+  subtitle: 학습/테스트 분리
+  goal: 4단계. 데이터 분할에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    학습/테스트 데이터로 분할합니다. 파이프라인 구축 전에 분할하여 데이터 누수를 방지합니다.
+
+    전처리(스케일링, 인코딩)는 반드시 분할 후 학습 데이터에만 fit하고 테스트 데이터에는 transform만 적용합니다. Pipeline이 이를 자동으로 처리합니다.
+  snippet: |-
+    xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+    xTrain.shape, xTest.shape
+  exercise:
+    prompt: 4단계. 데이터 분할 예제에서 \`xTrain\`, \`xTest\`, \`yTrain\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+      xTrain.shape, xTest.shape
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 데이터 분할에서 \`xTrain\`, \`xTest\`, \`yTrain\` 할당 개수와 값 순서가 맞아야 합니다.
+    resultCheck: 4단계. 데이터 분할 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step5_preprocessor
+  title: 5단계. 전처리 파이프라인
+  structuredPrimary: true
+  subtitle: ColumnTransformer
+  goal: 5단계. 전처리 파이프라인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    ColumnTransformer로 수치형/범주형 컬럼에 다른 전처리를 적용합니다.
+
+    ColumnTransformer는 컬럼별로 다른 변환을 적용합니다. remainder='passthrough'로 나머지 컬럼을 유지하거나 'drop'으로 제거할 수 있습니다.
+  snippet: |-
+    numPipeline = Pipeline([
+        ("imputer", SimpleImputer(strategy="median")),
+        ("scaler", StandardScaler())
+    ])
+    catPipeline = Pipeline([
+        ("imputer", SimpleImputer(strategy="most_frequent")),
+        ("encoder", OneHotEncoder(handle_unknown="ignore"))
+    ])
+    preprocessor = ColumnTransformer([
+        ("num", numPipeline, numCols),
+        ("cat", catPipeline, catCols)
+    ])
+    preprocessor
+  exercise:
+    prompt: 5단계. 전처리 파이프라인 예제에서 numCols/catCols에 적용할 변환 단계를 바꾸고 preprocessor 구성이 달라지는지 확인하세요.
+    starterCode: |-
+      numPipeline = Pipeline([
+          ("imputer", SimpleImputer(strategy="median")),
+          ("scaler", StandardScaler())
+      ])
+      catPipeline = Pipeline([
+          ("imputer", SimpleImputer(strategy="most_frequent")),
+          ("encoder", OneHotEncoder(handle_unknown="ignore"))
+      ])
+      preprocessor = ColumnTransformer([
+          ("num", numPipeline, numCols),
+          ("cat", catPipeline, catCols)
+      ])
+      preprocessor
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 전처리 파이프라인에서 \`numPipeline\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 전처리 파이프라인 실행 뒤 \`numPipeline\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step6_fullpipe
+  title: 6단계. 전체 파이프라인
+  structuredPrimary: true
+  subtitle: 전처리 + 모델
+  goal: 6단계. 전체 파이프라인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    전처리와 모델을 하나의 파이프라인으로 연결합니다. fit과 predict가 한 번에 실행됩니다.
+
+    Pipeline.fit()은 모든 전처리 단계의 fit_transform()과 마지막 모델의 fit()을 순차적으로 실행합니다. predict()도 마찬가지입니다.
+  snippet: |-
+    fullPipeline = Pipeline([
+        ("preprocessor", preprocessor),
+        ("classifier", RandomForestClassifier(n_estimators=100, random_state=42))
+    ])
+    fullPipeline
+  exercise:
+    prompt: 6단계. 전체 파이프라인 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      fullPipeline = Pipeline([
+          ("preprocessor", preprocessor),
+          ("classifier", RandomForestClassifier(n_estimators=100, random_state=42))
+      ])
+      fullPipeline
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 6단계. 전체 파이프라인에서 \`fullPipeline\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 전체 파이프라인 실행 뒤 \`fullPipeline\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step7_cv
+  title: 7단계. 교차검증
+  structuredPrimary: true
+  subtitle: 파이프라인 CV
+  goal: 7단계. 교차검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  explanation: |-
+    파이프라인 전체에 교차검증을 적용합니다. 각 폴드에서 전처리도 다시 수행됩니다.
+
+    파이프라인에 교차검증을 적용하면 각 폴드에서 전처리가 독립적으로 수행되어 데이터 누수를 완벽히 방지합니다.
+  snippet: |-
+    cvScores = cross_val_score(fullPipeline, xTrain, yTrain, cv=5, scoring="accuracy")
+    print(f"CV Scores: {cvScores}")
+    print(f"Mean: {cvScores.mean():.4f} (+/- {cvScores.std() * 2:.4f})")
+  exercise:
+    prompt: 7단계. 교차검증 예제에서 출력 문장 하나를 바꾸고 출력 줄 순서와 바뀐 줄을 확인하세요.
+    starterCode: |-
+      cvScores = cross_val_score(fullPipeline, xTrain, yTrain, cv=5, scoring="accuracy")
+      print(f"CV Scores: {cvScores}")
+      print(f"Mean: {cvScores.mean():.4f} (+/- {cvScores.std() * 2:.4f})")
+    hints:
+    - 바꿀 지점은 각 print()의 따옴표 안 문구나 출력 변수에서 찾으세요.
+    - 실행 뒤 줄 수와 순서가 유지되고, 수정한 줄만 의도대로 바뀌었는지 보세요.
+  check:
+    noError: 7단계. 교차검증의 각 print() 호출이 따옴표와 괄호 조건을 만족하고 순서대로 출력되어야 합니다.
+    resultCheck: 7단계. 교차검증 출력 줄 수와 순서가 유지되고, 바꾼 줄의 문구가 출력 영역에 나타나야 합니다.
+- id: step8_grid
+  title: 8단계. 파이프라인 GridSearch
+  structuredPrimary: true
+  subtitle: 하이퍼파라미터 튜닝
+  goal: 8단계. 파이프라인 GridSearch에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    파이프라인의 모델 파라미터를 GridSearchCV로 튜닝합니다. 파라미터명에 단계명을 접두사로 붙입니다.
+
+    파이프라인 파라미터명 형식: '단계명__파라미터명'. classifier__n_estimators는 classifier 단계의 n_estimators 파라미터입니다.
+  snippet: |-
+    paramGrid = {
+        "classifier__n_estimators": [50, 100],
+        "classifier__max_depth": [5, 10, None],
+        "classifier__min_samples_split": [2, 5]
+    }
+
+    gridSearch = GridSearchCV(fullPipeline, paramGrid, cv=5, scoring="accuracy")
+    gridSearch.fit(xTrain, yTrain)
+    print(f"Best params: {gridSearch.best_params_}")
+    print(f"Best CV score: {gridSearch.best_score_:.4f}")
+  exercise:
+    prompt: 8단계. 파이프라인 GridSearch 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      paramGrid = {
+          "classifier__n_estimators": [50, 100],
+          "classifier__max_depth": [5, 10, None],
+          "classifier__min_samples_split": [2, 5]
+      }
+
+      gridSearch = GridSearchCV(fullPipeline, paramGrid, cv=5, scoring="accuracy")
+      gridSearch.fit(xTrain, yTrain)
+      print(f"Best params: {gridSearch.best_params_}")
+      print(f"Best CV score: {gridSearch.best_score_:.4f}")
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 파이프라인 GridSearch에서 \`paramGrid\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 8단계. 파이프라인 GridSearch 실행 뒤 \`paramGrid\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step9_models
+  title: 9단계. 모델 비교
+  structuredPrimary: true
+  subtitle: 여러 알고리즘
+  goal: 9단계. 모델 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: 동일한 전처리로 여러 모델의 성능을 비교합니다. 파이프라인을 재사용하면 효율적입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    models = {
+        "LogisticRegression": LogisticRegression(max_iter=1000, random_state=42),
+        "RandomForest": RandomForestClassifier(n_estimators=100, random_state=42),
+        "GradientBoosting": GradientBoostingClassifier(n_estimators=100, random_state=42)
+    }
+
+    results = {}
+    for name, model in models.items():
+        pipe = Pipeline([
+            ("preprocessor", preprocessor),
+            ("classifier", model)
+        ])
+        scores = cross_val_score(pipe, xTrain, yTrain, cv=5, scoring="accuracy")
+        results[name] = {"mean": scores.mean(), "std": scores.std()}
+        print(f"{name}: {scores.mean():.4f} (+/- {scores.std() * 2:.4f})")
+  exercise:
+    prompt: 9단계. 모델 비교 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      models = {
+          "LogisticRegression": LogisticRegression(max_iter=1000, random_state=42),
+          "RandomForest": RandomForestClassifier(n_estimators=100, random_state=42),
+          "GradientBoosting": GradientBoostingClassifier(n_estimators=100, random_state=42)
+      }
+
+      results = {}
+      for name, model in models.items():
+          pipe = Pipeline([
+              ("preprocessor", preprocessor),
+              ("classifier", model)
+          ])
+          scores = cross_val_score(pipe, xTrain, yTrain, cv=5, scoring="accuracy")
+          results[name] = {"mean": scores.mean(), "std": scores.std()}
+          print(f"{name}: {scores.mean():.4f} (+/- {scores.std() * 2:.4f})")
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 9단계. 모델 비교의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 9단계. 모델 비교 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step10_final
+  title: 10단계. 최종 평가
+  structuredPrimary: true
+  subtitle: 테스트 성능
+  goal: 10단계. 최종 평가에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  explanation: 최적 모델로 테스트 데이터 성능을 평가합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    bestPipe = gridSearch.best_estimator_
+    yPredFinal = bestPipe.predict(xTest)
+    accFinal = accuracy_score(yTest, yPredFinal)
+    print(f"Test Accuracy: {accFinal:.4f}")
+  exercise:
+    prompt: 10단계. 최종 평가 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
+    starterCode: |-
+      bestPipe = gridSearch.best_estimator_
+      yPredFinal = bestPipe.predict(xTest)
+      accFinal = accuracy_score(yTest, yPredFinal)
+      print(f"Test Accuracy: {accFinal:.4f}")
+    hints:
+    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
+    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+  check:
+    noError: 10단계. 최종 평가의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
+    resultCheck: 10단계. 최종 평가 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+- id: step11_proba
+  title: 11단계. 확률 예측
+  structuredPrimary: true
+  subtitle: ROC-AUC
+  goal: 11단계. 확률 예측에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  explanation: 생존 확률을 예측하고 ROC-AUC로 성능을 평가합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    yProba = bestPipe.predict_proba(xTest)[:, 1]
+    auc = roc_auc_score(yTest, yProba)
+    print(f"ROC-AUC: {auc:.4f}")
+  exercise:
+    prompt: 11단계. 확률 예측 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
+    starterCode: |-
+      yProba = bestPipe.predict_proba(xTest)[:, 1]
+      auc = roc_auc_score(yTest, yProba)
+      print(f"ROC-AUC: {auc:.4f}")
+    hints:
+    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
+    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+  check:
+    noError: 11단계. 확률 예측의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
+    resultCheck: 11단계. 확률 예측 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+- id: step12_importance
+  title: 12단계. 특성 중요도
+  structuredPrimary: true
+  subtitle: 모델 해석
+  goal: 12단계. 특성 중요도에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    파이프라인에서 특성 중요도를 추출합니다. OneHotEncoder로 생성된 특성명을 복원합니다.
+
+    타이타닉 생존 예측에서 Sex(성별), Fare(요금), Age(나이), Pclass(좌석등급)가 중요한 요인입니다. 여성, 고가 티켓, 1등석 승객의 생존율이 높았습니다.
+  snippet: |-
+    numFeatures = numCols
+    catEncoder = bestPipe.named_steps["preprocessor"].named_transformers_["cat"].named_steps["encoder"]
+    catFeatures = catEncoder.get_feature_names_out(catCols).tolist()
+    allFeatures = numFeatures + catFeatures
+    allFeatures
+  exercise:
+    prompt: 12단계. 특성 중요도 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      numFeatures = numCols
+      catEncoder = bestPipe.named_steps["preprocessor"].named_transformers_["cat"].named_steps["encoder"]
+      catFeatures = catEncoder.get_feature_names_out(catCols).tolist()
+      allFeatures = numFeatures + catFeatures
+      allFeatures
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 12단계. 특성 중요도에서 \`numFeatures\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 12단계. 특성 중요도 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: ML 파이프라인
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import pandas as pd
+    import numpy as np
+    from sklearn.datasets import load_diabetes
+    from sklearn.model_selection import train_test_split, cross_val_score
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.pipeline import Pipeline
+    from sklearn.linear_model import Ridge
+    from sklearn.metrics import mean_squared_error, r2_score
+    import matplotlib.pyplot as plt
+
+    diabetes = load_diabetes()
+    xDiab = pd.DataFrame(diabetes.data, columns=diabetes.feature_names)
+    yDiab = diabetes.target
+    xTrD, xTeD, yTrD, yTeD = train_test_split(xDiab, yDiab, test_size=0.2, random_state=42)
+
+    regPipe = Pipeline([
+        ("scaler", StandardScaler()),
+        ("regressor", Ridge(alpha=1.0))
+    ])
+    regPipe.fit(xTrD, yTrD)
+    predD = regPipe.predict(xTeD)
+    r2D = r2_score(yTeD, predD)
+    print(f"R2 Score: {r2D:.4f}")
+
+    cvR2 = cross_val_score(regPipe, xTrD, yTrD, cv=5, scoring="r2")
+    print(f"CV R2: {cvR2.mean():.4f} (+/- {cvR2.std() * 2:.4f})")
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      import numpy as np
+      from sklearn.datasets import load_diabetes
+      from sklearn.model_selection import train_test_split, cross_val_score
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.pipeline import Pipeline
+      from sklearn.linear_model import Ridge
+      from sklearn.metrics import mean_squared_error, r2_score
+      import matplotlib.pyplot as plt
+
+      diabetes = load_diabetes()
+      xDiab = pd.DataFrame(diabetes.data, columns=diabetes.feature_names)
+      yDiab = diabetes.target
+      xTrD, xTeD, yTrD, yTeD = train_test_split(xDiab, yDiab, test_size=0.2, random_state=42)
+
+      regPipe = Pipeline([
+          ("scaler", StandardScaler()),
+          ("regressor", Ridge(alpha=1.0))
+      ])
+      regPipe.fit(xTrD, yTrD)
+      predD = regPipe.predict(xTeD)
+      r2D = r2_score(yTeD, predD)
+      print(f"R2 Score: {r2D:.4f}")
+
+      cvR2 = cross_val_score(regPipe, xTrD, yTrD, cv=5, scoring="r2")
+      print(f"CV R2: {cvR2.mean():.4f} (+/- {cvR2.std() * 2:.4f})")
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 예측 모델 품질 게이트
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고,
+    정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from sklearn.datasets import make_classification
+    from sklearn.model_selection import train_test_split
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import accuracy_score, f1_score
+
+    features, target = make_classification(
+        n_samples=240,
+        n_features=6,
+        n_informative=4,
+        n_redundant=0,
+        class_sep=1.4,
+        random_state=42,
+    )
+    xTrain, xTest, yTrain, yTest = train_test_split(
+        features, target, test_size=0.25, random_state=42, stratify=target
+    )
+
+    riskPipeline = Pipeline([
+        ("scaler", StandardScaler()),
+        ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
+    ])
+
+    def fitRiskModel(pipeline, featureMatrix, labels):
+        pipeline.fit(featureMatrix, labels)
+        return pipeline
+
+    riskModel = fitRiskModel(riskPipeline, xTrain, yTrain)
+    riskPred = riskModel.predict(xTest)
+    riskAccuracy = accuracy_score(yTest, riskPred)
+    riskF1 = f1_score(yTest, riskPred)
+    xTrain.shape, xTest.shape
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      conservativePipeline = Pipeline([
+          ("scaler", StandardScaler()),
+          ("classifier", LogisticRegression(C=0.3, max_iter=1000, random_state=42)),
+      ])
+      conservativeModel = fitRiskModel(conservativePipeline, xTrain, yTrain)
+      conservativePred = conservativeModel.predict(xTest)
+      conservativeAccuracy = accuracy_score(yTest, conservativePred)
+      conservativeF1 = f1_score(yTest, conservativePred)
+
+      assert conservativeAccuracy >= 0.75
+      {
+          "baselineAccuracy": round(riskAccuracy, 3),
+          "baselineF1": round(riskF1, 3),
+          "conservativeAccuracy": round(conservativeAccuracy, 3),
+          "conservativeF1": round(conservativeF1, 3),
+          "accuracyDelta": round(conservativeAccuracy - riskAccuracy, 3),
+      }
+    solution: |-
+      from sklearn.datasets import make_classification
+      from sklearn.model_selection import train_test_split
+      from sklearn.pipeline import Pipeline
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score, f1_score
+
+      features, target = make_classification(
+          n_samples=240,
+          n_features=6,
+          n_informative=4,
+          n_redundant=0,
+          class_sep=1.4,
+          random_state=42,
+      )
+      xTrain, xTest, yTrain, yTest = train_test_split(
+          features, target, test_size=0.25, random_state=42, stratify=target
+      )
+
+      riskPipeline = Pipeline([
+          ("scaler", StandardScaler()),
+          ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
+      ])
+      xTrain.shape, xTest.shape
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증에서 \`conservativePipeline\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sklearn_10-pipeline-manifest-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_data
+    - workflow_validation
+    title: 종합 ML pipeline manifest 검증하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: split·preprocess·model·threshold·metrics의 순서와 hash를 확인한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - preprocess는 split 뒤 train fold 안에서 fit되어야 합니다.
+    - threshold와 metric configuration도 artifact hash에 포함하세요.
+    exercise:
+      prompt: audit_pipeline_manifest(stages)를 완성하세요.
+      starterCode: |-
+        def audit_pipeline_manifest(stages):
+            raise NotImplementedError
+      solution: |
+        def audit_pipeline_manifest(stages):
+            required=["split","preprocess","model","threshold","metrics"]
+            names=[stage.get("name") for stage in stages]; missing=[name for name in required if name not in names]
+            order_valid=all(name in names for name in required) and [names.index(name) for name in required]==sorted(names.index(name) for name in required)
+            unhashed=[stage.get("name") for stage in stages if not stage.get("hash")]
+            return {"valid":not missing and order_valid and not unhashed,"missing":missing,"orderValid":order_valid,"unhashed":unhashed,"stageCount":len(stages)}
+      hints: *id001
+    check:
+      id: python.sklearn.sklearn_10.pipeline-manifest.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_10.pipeline-manifest.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_pipeline_manifest
+        cases:
+        - id: accepts-complete-manifest
+          arguments:
+          - value:
+            - name: split
+              hash: split-hash
+            - name: preprocess
+              hash: preprocess-hash
+            - name: model
+              hash: model-hash
+            - name: threshold
+              hash: threshold-hash
+            - name: metrics
+              hash: metrics-hash
+          expectedReturn:
+            valid: true
+            missing: []
+            orderValid: true
+            unhashed: []
+            stageCount: 5
+        - id: reports-order-and-hash
+          arguments:
+          - value:
+            - name: model
+              hash: m
+            - name: split
+              hash: s
+            - name: preprocess
+              hash: ''
+            - name: metrics
+              hash: x
+          expectedReturn:
+            valid: false
+            missing:
+            - threshold
+            orderValid: false
+            unhashed:
+            - preprocess
+            stageCount: 4
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sklearn_10-model-release-card-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_10-pipeline-manifest-mastery
+    title: 새 모델 release에 evidence card 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: baseline·heldout·subgroup·drift·claim review를 모두 검사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 모델 파일 존재를 release readiness로 부르지 마세요.
+    - claim review와 drift 계획도 blocking evidence입니다.
+    exercise:
+      prompt: audit_model_release(evidence)를 완성하세요.
+      starterCode: |-
+        def audit_model_release(evidence):
+            raise NotImplementedError
+      solution: |
+        def audit_model_release(evidence):
+            required=["baseline","heldout","subgroup","drift","claimReview"]
+            missing=[name for name in required if name not in evidence]
+            failed=[name for name in required if name in evidence and evidence[name].get("status")!="approved"]
+            return {"releaseReady":not missing and not failed,"missing":missing,"failed":failed,"evidenceRefs":[evidence[name].get("ref") for name in required if name in evidence]}
+      hints: *id002
+    check:
+      id: python.sklearn.sklearn_10.model-release-card.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_10.model-release-card.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_model_release
+        cases:
+        - id: accepts-approved-card
+          arguments:
+          - value:
+              baseline:
+                status: approved
+                ref: baseline.json
+              heldout:
+                status: approved
+                ref: heldout.json
+              subgroup:
+                status: approved
+                ref: subgroup.json
+              drift:
+                status: approved
+                ref: drift.json
+              claimReview:
+                status: approved
+                ref: claimReview.json
+          expectedReturn:
+            releaseReady: true
+            missing: []
+            failed: []
+            evidenceRefs:
+            - baseline.json
+            - heldout.json
+            - subgroup.json
+            - drift.json
+            - claimReview.json
+        - id: reports-missing-and-failed
+          arguments:
+          - value:
+              baseline:
+                status: approved
+                ref: b
+              heldout:
+                status: failed
+                ref: h
+          expectedReturn:
+            releaseReady: false
+            missing:
+            - subgroup
+            - drift
+            - claimReview
+            failed:
+            - heldout
+            evidenceRefs:
+            - b
+            - h
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sklearn_10-ml-pipeline-release-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_10-model-release-card-transfer
+    title: 종합 ML pipeline 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 재현성·성능·운영 claim을 분리한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 학습 데이터와 평가 데이터의 경계를 먼저 확인하세요.
+    - 한 metric이나 예측을 실제 진단·인과 결론으로 확대하지 마세요.
+    exercise:
+      prompt: choose_pipeline_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_pipeline_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_pipeline_evidence(situation):
+            table = {'reproducible-build': {'method': 'hashed pipeline manifest', 'evidence': 'data split code model hashes', 'risk': 'mutable dependency'}, 'model-quality': {'method': 'held-out and subgroup metrics', 'evidence': 'baseline error analysis', 'risk': 'single score'}, 'production-use': {'method': 'claim and drift review', 'evidence': 'owner thresholds rollback', 'risk': 'offline-only success'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sklearn.sklearn_10.ml-pipeline-release.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_10.ml-pipeline-release.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_pipeline_evidence
+        cases:
+        - id: recalls-reproducible-build
+          arguments:
+          - value: reproducible-build
+          expectedReturn:
+            method: hashed pipeline manifest
+            evidence: data split code model hashes
+            risk: mutable dependency
+        - id: recalls-model-quality
+          arguments:
+          - value: model-quality
+          expectedReturn:
+            method: held-out and subgroup metrics
+            evidence: baseline error analysis
+            risk: single score
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

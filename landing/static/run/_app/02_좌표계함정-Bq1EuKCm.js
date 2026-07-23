@@ -1,0 +1,561 @@
+var e=`meta:
+  id: visionBasics_02
+  title: 좌표계 함정
+  order: 2
+  category: visionBasics
+  difficulty: ⭐
+  badge: 입문
+  packages:
+  - matplotlib
+  - numpy
+  tags:
+  - numpy
+  - 좌표계
+  - 인덱싱
+  - 행렬
+  - 이미지구조
+  seo:
+    title: 이미지 비전 기초 - 좌표계 함정
+    description: numpy 배열의 (y, x) 인덱싱과 화면 좌표 (x, y)의 차이를 정리합니다.
+    keywords:
+    - numpy
+    - 좌표계
+    - 인덱싱
+    - 이미지
+intro:
+  emoji: 🧭
+  goal: numpy 이미지의 (y, x) 인덱싱이 일반 좌표계와 어떻게 다른지 손으로 그려 보며 정리합니다.
+  description: |-
+    좌표계는 이미지 비전 입문자가 가장 자주 헤매는 부분입니다. 수학에서 점은 (x, y)이고 y는 위로 갈수록 커지지만, 컴퓨터 이미지에서 픽셀은 \`img[y, x]\`로 접근하고 y는 아래로 갈수록 커집니다. 이 강의는 점, 사각형, 십자, 대각선을 직접 그리며 두 좌표계의 차이를 몸으로 익힙니다.
+  direction: 같은 위치를 (y, x)와 (x, y)로 번갈아 적어 보며 원점·축 방향·인덱스 순서의 차이를 직접 확인합니다.
+  benefits:
+  - 픽셀 접근 시 행과 열의 순서를 헷갈리지 않습니다.
+  - 사각형, 십자, 대각선을 한 번에 numpy 슬라이싱으로 그릴 수 있습니다.
+  - OpenCV/Pillow 함수가 (x, y) 인자를 받는 이유와 변환 방법을 이해합니다.
+  diagram:
+    steps:
+    - label: 1단계. 점 하나 찍기
+      detail: 같은 위치를 (y, x)와 (x, y)로 적어 비교합니다.
+    - label: 2단계. 원점이 어디인가
+      detail: 좌상단이 (0, 0)인 이미지 좌표계를 확인합니다.
+    - label: 3단계. 사각형 그리기
+      detail: 슬라이싱으로 사각형 영역을 채워 봅니다.
+    - label: 4단계. 십자와 대각선
+      detail: 단일 행, 단일 열, 인덱스 배열로 도형을 그립니다.
+    runtime:
+    - label: numpy 환경
+      detail: numpy + matplotlib로 좌표 감각을 만듭니다.
+    - label: 검증 흐름
+      detail: assert와 시각 비교로 학습 결과가 기대값과 같은지 확인합니다.
+sections:
+- id: one_pixel
+  title: 1단계. 점 하나 찍어 보기
+  structuredPrimary: true
+  subtitle: 같은 위치를 두 방식으로 적기
+  goal: 같은 픽셀을 numpy 인덱스 (y, x)와 화면 좌표 (x, y)로 동시에 적어 차이를 인식합니다.
+  why: 좌표 순서를 헷갈리면 처음 만든 함수가 항상 90도 회전된 결과를 내놓습니다.
+  explanation: |-
+    numpy 이미지에서 \`img[10, 20]\`은 10번 행, 20번 열의 픽셀입니다. 이 픽셀의 화면 위치는 가로 20, 세로 10이므로 (x, y) 표기로는 (20, 10)입니다. 같은 점을 부르는 두 가지 방식입니다.
+
+    헷갈림을 줄이려면 \`img[y, x]\` 처럼 변수명을 y, x 순으로 쓰는 습관을 들입니다. OpenCV의 \`cv2.circle(img, center=(x, y), ...)\` 같은 함수는 인자가 (x, y)이므로 둘을 섞어 쓸 줄 알아야 합니다.
+  tips:
+  - numpy 인덱스는 \`[행, 열]\` 즉 \`[y, x]\` 입니다. 함수 시그니처가 \`(x, y)\`로 보이면 의도된 변환임을 인지하세요.
+  snippet: |-
+    import numpy as np
+
+    img = np.zeros((50, 80, 3), dtype=np.uint8)
+    img[10, 60] = [255, 255, 255]
+    pixel = img[10, 60]
+    pixel
+  exercise:
+    prompt: 화면 좌표 (x=5, y=40) 위치에 청록색([0, 200, 200]) 픽셀을 찍고 numpy 인덱스로 그 값을 다시 읽으세요.
+    starterCode: |-
+      img2 = np.zeros((50, 80, 3), dtype=np.uint8)
+      img2[___, ___] = [0, 200, 200]
+      img2[___, ___]
+    hints:
+    - "(x=5, y=40)에서 x=5는 열 번호, y=40은 행 번호입니다."
+    - numpy 인덱스는 [행, 열] 순서로 적습니다.
+  check:
+    noError: 인덱스 접근과 대입이 IndexError 없이 끝나야 합니다.
+    resultCheck: 읽어낸 픽셀이 [0, 200, 200]이어야 합니다.
+- id: origin
+  title: 2단계. 원점은 좌상단
+  structuredPrimary: true
+  subtitle: y축은 아래로 증가
+  goal: 이미지 좌표계의 원점이 좌상단이며 y가 아래로 갈수록 커진다는 사실을 시각적으로 확인합니다.
+  why: 수학 그래프와 이미지의 y축 방향이 반대라는 사실을 모르면 위아래 뒤집힌 결과를 디버깅하느라 한참을 헤맵니다.
+  explanation: |-
+    \`[0, 0]\`은 항상 이미지의 좌상단 픽셀입니다. 행 인덱스가 커질수록 아래로, 열 인덱스가 커질수록 오른쪽으로 이동합니다. matplotlib의 \`imshow\`는 기본적으로 이 방향을 그대로 표시합니다.
+
+    \`plt.imshow(img, origin='lower')\` 옵션을 주면 y축이 위로 가는 수학 좌표계처럼 그려집니다. 하지만 이미지 비전 도구는 거의 모두 좌상단 원점을 기준으로 동작하므로 기본 방향을 그대로 쓰는 것이 표준입니다.
+  tips:
+  - imshow에서 점이 의도한 위치에 안 보이면, 행과 열을 바꿔 쓴 것이 아닌지 가장 먼저 확인하세요.
+  snippet: |-
+    import matplotlib.pyplot as plt
+
+    grid = np.zeros((100, 100, 3), dtype=np.uint8)
+    grid[0, 0] = [255, 0, 0]
+    grid[0, 99] = [0, 255, 0]
+    grid[99, 0] = [0, 0, 255]
+    grid[99, 99] = [255, 255, 0]
+
+    fig = plt.figure(figsize=(4, 4))
+    plt.imshow(grid)
+    plt.title('TL=red, TR=green, BL=blue, BR=yellow')
+    plt.axis('on')
+    fig
+  exercise:
+    prompt: "grid의 정중앙 픽셀(50, 50)에 흰색을 찍고 다시 imshow로 확인하세요."
+    starterCode: |-
+      grid[___, ___] = [255, 255, 255]
+      fig2 = plt.figure(figsize=(4, 4))
+      plt.imshow(grid)
+      plt.axis('off')
+      fig2
+    hints:
+    - 정중앙은 행 50, 열 50입니다.
+    - 한 셀 안에서는 같은 변수를 수정해도 됩니다.
+  check:
+    noError: 픽셀 대입과 figure 평가가 오류 없이 끝나야 합니다.
+    resultCheck: grid[50, 50]이 [255, 255, 255]여야 합니다.
+- id: rectangle
+  title: 3단계. 사각형 영역 채우기
+  structuredPrimary: true
+  subtitle: 슬라이싱으로 사각형 그리기
+  goal: 두 슬라이스 범위를 곱한 사각형 영역에 색을 채웁니다.
+  why: 사각형 그리기는 객체 박스, 워터마크, 마스크 만들기 등 거의 모든 처리에 등장합니다.
+  explanation: |-
+    \`img[y0:y1, x0:x1]\` 는 행 y0 이상 y1 미만, 열 x0 이상 x1 미만의 사각형 슬라이스를 가리킵니다. 이 슬라이스에 색을 대입하면 사각형이 채워집니다.
+
+    경계가 헷갈릴 때는 "끝은 포함하지 않는다"를 기억합니다. \`img[0:5, :]\` 는 0, 1, 2, 3, 4 행을 의미하며 5번째 행은 포함되지 않습니다.
+  tips:
+  - 사각형 좌표를 함수에 전달할 때는 (x, y, w, h)나 (x1, y1, x2, y2) 같은 다양한 규약이 있으니 어떤 도구의 규약인지 확인하세요.
+  snippet: |-
+    board = np.zeros((200, 200, 3), dtype=np.uint8)
+    board[40:80, 30:170] = [200, 80, 50]
+    board[100:160, 60:140] = [60, 180, 90]
+    fig = plt.figure(figsize=(4, 4))
+    plt.imshow(board)
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: board의 우상단 (행 0~30, 열 160~200) 영역에 노란색([255, 220, 0])을 채우세요.
+    starterCode: |-
+      board[___:___, ___:___] = [255, 220, 0]
+      fig2 = plt.figure(figsize=(4, 4))
+      plt.imshow(board)
+      plt.axis('off')
+      fig2
+    hints:
+    - 우상단은 행이 작고 열이 큰 영역입니다.
+    - 가로 30 픽셀짜리 사각형이 됩니다.
+  check:
+    noError: 슬라이싱 대입이 ValueError 없이 끝나야 합니다.
+    resultCheck: board[10, 180] 픽셀이 [255, 220, 0]이어야 합니다.
+- id: cross_diagonal
+  title: 4단계. 십자와 대각선
+  structuredPrimary: true
+  subtitle: 단일 축과 인덱스 배열
+  goal: 한 행 전체, 한 열 전체, 대각선을 한 줄로 그립니다.
+  why: 한 줄로 행과 열, 대각선을 그릴 수 있어야 numpy의 진짜 힘을 쓸 수 있습니다.
+  explanation: |-
+    \`img[y, :]\` 는 y번 행 전체를 가리키고 \`img[:, x]\` 는 x번 열 전체를 가리킵니다. 두 슬라이스에 색을 대입하면 가로선과 세로선이 하나씩 그려집니다.
+
+    대각선은 같은 길이의 인덱스 두 개로 표현합니다. \`img[np.arange(n), np.arange(n)]\` 는 좌상단에서 우하단으로 가는 대각선 픽셀들을 한꺼번에 지정합니다. 이것이 fancy indexing이며 마스크 트랙에서 자주 쓰입니다.
+  tips:
+  - fancy indexing은 같은 모양의 인덱스 배열을 두 개 받아 짝지어 위치를 만듭니다. zip과 같은 동작을 한다고 보면 됩니다.
+  snippet: |-
+    plate = np.zeros((150, 150, 3), dtype=np.uint8)
+    plate[75, :] = [255, 255, 255]
+    plate[:, 75] = [255, 255, 255]
+    side = np.arange(150)
+    plate[side, side] = [255, 60, 60]
+    fig = plt.figure(figsize=(4, 4))
+    plt.imshow(plate)
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: plate의 반대 방향 대각선(우상단에서 좌하단으로)을 청록색([0, 200, 200])으로 그리세요.
+    starterCode: |-
+      reverseSide = np.arange(150)
+      plate[reverseSide, ___] = [0, 200, 200]
+      fig2 = plt.figure(figsize=(4, 4))
+      plt.imshow(plate)
+      plt.axis('off')
+      fig2
+    hints:
+    - 반대 대각선의 열 인덱스는 149에서 0으로 줄어듭니다.
+    - "149 - reverseSide 로 계산할 수 있습니다."
+  check:
+    noError: fancy indexing 대입이 IndexError 없이 끝나야 합니다.
+    resultCheck: plate[0, 149]가 [0, 200, 200]이어야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 좌표 감각으로 도형 그리기
+  goal: 좌표계를 직접 다뤄야 풀리는 두 가지 그림을 완성합니다.
+  why: 좌표는 글로 외우면 잊습니다. 한 장의 그림을 직접 그려 봐야 손에 남습니다.
+  explanation: |-
+    아래 두 미션은 좌표계 감각으로만 풀립니다. 각 미션은 import문부터 시작하지만, 위 예제를 실행했다면 import는 생략해도 됩니다.
+  tips:
+  - 사각형 4개로 모서리 표시를 만들 때 같은 (h, w) 패치를 여러 위치에 붙여 보면 좌표 계산이 단순해집니다.
+  snippet: |-
+    corners = np.zeros((120, 200, 3), dtype=np.uint8)
+    patch = np.zeros((20, 20, 3), dtype=np.uint8)
+    patch[:] = [255, 100, 100]
+    corners[0:20, 0:20] = patch
+    corners[0:20, 180:200] = patch
+    corners[100:120, 0:20] = patch
+    corners[100:120, 180:200] = patch
+    fig = plt.figure(figsize=(5, 3))
+    plt.imshow(corners)
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: "미션1: bullseye(200x200x3)에 가운데를 중심으로 한 사각 테두리 세 겹(빨강·녹색·파랑)을 그리세요(바깥부터 가운데 순서). 미션2: 화살표 모양 arrow(100x200x3)를 가로 줄과 두 개의 사선으로 그리세요(우측 끝에서 좌측으로 향하는 화살표)."
+    starterCode: |-
+      bullseye = np.zeros((200, 200, 3), dtype=np.uint8)
+      bullseye[0:200, 0:200] = [255, 0, 0]
+      bullseye[20:180, 20:180] = [0, 0, 0]
+      bullseye[40:160, 40:160] = [___, ___, ___]
+      bullseye[60:140, 60:140] = [0, 0, 0]
+      bullseye[80:120, 80:120] = [0, 0, 255]
+      eyeFig = plt.figure(figsize=(4, 4))
+      plt.imshow(bullseye)
+      plt.axis('off')
+      eyeFig
+    hints:
+    - 가장 바깥부터 안쪽으로 사각형을 겹쳐 색을 덮어쓰는 방식이 가장 간단합니다.
+    - 화살표는 가운데 가로 줄 1개 + 우측 끝에서 좌상/좌하로 향하는 두 대각선으로 만들 수 있습니다.
+  check:
+    noError: 슬라이싱 대입과 figure 평가가 오류 없이 끝나야 합니다.
+    resultCheck: bullseye[100, 100]이 [0, 0, 255]여야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: visionBasics_02-image_coordinates-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - one_pixel
+    - practice
+    title: 이미지 좌표계 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: width·height와 x·y 범위를 혼동하지 않도록 좌표 계약을 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_image_coordinates_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_image_coordinates_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_image_coordinates_contract(value):
+            required = ['width', 'height', 'x', 'y', 'origin']
+            rules = [{'id': 'width', 'field': 'width', 'kind': 'range', 'min': 1, 'max': 4096}, {'id': 'height', 'field': 'height', 'kind': 'range', 'min': 1, 'max': 4096}, {'id': 'x', 'field': 'x', 'kind': 'range', 'min': 0, 'max': 4095}, {'id': 'y', 'field': 'y', 'kind': 'range', 'min': 0, 'max': 4095}, {'id': 'origin', 'field': 'origin', 'kind': 'enum', 'values': ['top-left']}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'image_coordinates', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.vision-basics.visionBasics_02.image_coordinates-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_02.image_coordinates-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_image_coordinates_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              width: 640
+              height: 480
+              x: 120
+              y: 80
+              origin: top-left
+          expectedReturn:
+            accepted: true
+            topic: image_coordinates
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              height: 480
+              x: 120
+              y: 80
+              origin: top-left
+          expectedReturn:
+            accepted: false
+            topic: image_coordinates
+            missing:
+            - width
+            violations:
+            - width
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              width: 0
+              height: 5000
+              x: -1
+              y: 6000
+              origin: bottom-left
+          expectedReturn:
+            accepted: false
+            topic: image_coordinates
+            missing: []
+            violations:
+            - height
+            - origin
+            - width
+            - x
+            - y
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: visionBasics_02-image_coordinates-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionBasics_02-image_coordinates-contract-audit-mastery
+    title: 이미지 좌표계 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_image_coordinates_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_image_coordinates_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_image_coordinates_result(expected, observed):
+            identity = ['sourceHash', 'origin']
+            metrics = {'sampleValue': 0}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'image_coordinates', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.vision-basics.visionBasics_02.image_coordinates-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_02.image_coordinates-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_image_coordinates_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              sourceHash: c1
+              origin: top-left
+              sampleValue: 127
+          - value:
+              sourceHash: c1
+              origin: top-left
+              sampleValue: 127
+          expectedReturn:
+            passed: true
+            topic: image_coordinates
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              sourceHash: c1
+              origin: top-left
+              sampleValue: 127
+          - value:
+              sourceHash: c2
+              origin: bottom-left
+              sampleValue: 120
+          expectedReturn:
+            passed: false
+            topic: image_coordinates
+            missing: []
+            identityMismatch:
+            - origin
+            - sourceHash
+            metricDrift:
+            - sampleValue
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              sourceHash: c1
+              origin: top-left
+              sampleValue: 127
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: image_coordinates
+            missing:
+            - origin
+            - sampleValue
+            - sourceHash
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: visionBasics_02-image_coordinates-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionBasics_02-image_coordinates-result-reconciliation-transfer
+    title: 이미지 좌표계 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_image_coordinates_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_image_coordinates_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_image_coordinates_evidence(stage):
+            stages = {'input': {'action': 'validate coordinate input contract', 'evidence': 'width height origin', 'risk': 'misinterpreted pixels'}, 'process': {'action': 'apply bounded coordinate operation', 'evidence': 'x-y access trace', 'risk': 'silent shape or range drift'}, 'result': {'action': 'reconcile coordinate result', 'evidence': 'sample value at coordinate', 'risk': 'plausible but wrong image'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.vision-basics.visionBasics_02.image_coordinates-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_02.image_coordinates-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_image_coordinates_evidence
+        cases:
+        - id: recalls-input
+          arguments:
+          - value: input
+          expectedReturn:
+            action: validate coordinate input contract
+            evidence: width height origin
+            risk: misinterpreted pixels
+        - id: recalls-process
+          arguments:
+          - value: process
+          expectedReturn:
+            action: apply bounded coordinate operation
+            evidence: x-y access trace
+            risk: silent shape or range drift
+        - id: recalls-result
+          arguments:
+          - value: result
+          expectedReturn:
+            action: reconcile coordinate result
+            evidence: sample value at coordinate
+            risk: plausible but wrong image
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

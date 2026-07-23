@@ -1,0 +1,866 @@
+var e=`meta:
+  packages:
+  - scikit-learn
+  id: sklearn_00
+  title: sklearn소개
+  order: 0
+  category: sklearn
+  badge: 소개
+  source: eddmpython
+  sourceUrl: https://eddmpython.com
+  tags:
+  - scikit-learn
+  - 머신러닝
+  - 분류
+  - 회귀
+  - 클러스터링
+  seo:
+    title: scikit-learn 입문 - Python 머신러닝의 표준
+    description: scikit-learn으로 분류, 회귀, 클러스터링을 시작하세요. 통일된 API로 다양한 ML 알고리즘을 쉽게 사용할 수 있습니다.
+    keywords:
+    - scikit-learn
+    - 머신러닝
+    - 분류
+    - 회귀
+    - 클러스터링
+    - 예측
+intro:
+  direction: sklearn소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 첫 실행 셀은 assert로 핵심 결과를 고정해 실습 코드가 깨지지 않았는지 확인합니다.
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - sklearn소개 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 업무 흐름 검증 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 핵심 처리 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 출력과 상태 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: sklearn소개 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: numpy, scikit-learn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: sklearn소개 실행
+      detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
+    - label: sklearn소개 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+sections:
+- id: intro
+  blocks:
+  - type: mainHeader
+    emoji: 🤖
+    title: scikit-learn이란?
+    subtitle: Python 머신러닝의 대표 외부 패키지
+  - type: hero
+    emoji: 🎯
+    title: 예측을 위한 라이브러리
+    subtitle: 데이터에서 패턴을 학습하고 미래를 예측
+    points:
+    - emoji: 📊
+      title: 분류/회귀
+    - emoji: 🔮
+      title: 예측 모델링
+    - emoji: 🎨
+      title: 클러스터링
+    - emoji: ⚙️
+      title: 통일된 API
+  goal: scikit-learn이란?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: what_is_sklearn
+  blocks:
+  - type: sectionHeader
+    title: 🤔 scikit-learn이 뭔가요?
+    subtitle: 머신러닝을 쉽게 만드는 도구
+  - type: note
+    style: info
+    title: 머신러닝이란?
+    content: 머신러닝은 데이터에서 패턴을 학습하여 새로운 데이터를 예측하는 기술입니다. "이 이메일이 스팸인가?", "이 환자가 당뇨병일 확률은?", "이 집의 가격은 얼마일까?"
+      같은 질문에 답합니다. scikit-learn은 이런 머신러닝 알고리즘을 쉽게 사용할 수 있게 만든 Python 라이브러리입니다. fit/predict/transform이라는
+      일관된 인터페이스로 수십 개의 알고리즘을 동일한 방식으로 사용할 수 있습니다.
+  - type: featureCards
+    cards:
+    - emoji: 🏷️
+      title: 분류 (Classification)
+      description: 카테고리 예측 - 스팸/정상, 양성/악성
+    - emoji: 📈
+      title: 회귀 (Regression)
+      description: 연속 값 예측 - 가격, 수량, 점수
+    - emoji: 🎨
+      title: 클러스터링 (Clustering)
+      description: 비슷한 데이터 그룹화 - 고객 세분화
+    - emoji: 📉
+      title: 차원 축소 (Dimensionality)
+      description: 특성 압축 - PCA, 시각화
+  goal: 🤔 scikit-learn이 뭔가요?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: why_sklearn
+  blocks:
+  - type: sectionHeader
+    title: 🌟 왜 scikit-learn인가요?
+    subtitle: 머신러닝 라이브러리 선택 이유
+  - type: note
+    style: info
+    title: 산업 표준
+    content: scikit-learn은 가장 많이 사용되는 Python ML 라이브러리입니다. 수천 개의 기업과 연구기관에서 사용합니다. 문서화가 잘 되어 있고, 커뮤니티가
+      활발합니다. 취업 시장에서도 sklearn 경험은 필수입니다. TensorFlow, PyTorch 같은 딥러닝 프레임워크를 배우기 전에 sklearn으로 ML 기초를 다지는
+      것이 좋습니다.
+  - type: featureCards
+    cards:
+    - emoji: 🔄
+      title: 통일된 API
+      description: fit(), predict(), transform() 일관된 인터페이스
+    - emoji: 📚
+      title: 풍부한 문서
+      description: 예제, 튜토리얼, API 레퍼런스
+    - emoji: 🧩
+      title: 파이프라인
+      description: 전처리 → 학습 → 평가 자동화
+    - emoji: ⚡
+      title: 최적화된 성능
+      description: NumPy, Cython 기반 고속 연산
+    - emoji: 🛠️
+      title: 다양한 도구
+      description: 교차검증, 그리드서치, 특성선택
+    - emoji: 🌐
+      title: Codaro 로컬 Python 지원
+      description: 로컬 Python에서 바로 실행 가능
+  goal: 🌟 왜 scikit-learn인가요?에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: statsmodels_vs_sklearn
+  blocks:
+  - type: sectionHeader
+    title: 🆚 statsmodels vs scikit-learn
+    subtitle: 통계 분석과 머신러닝의 차이
+  - type: compare
+    left:
+      title: statsmodels
+      subtitle: 통계적 추론
+      icon: 📊
+      color: green
+      items:
+      - 왜 이런 결과인지 이해
+      - p-value, 신뢰구간, 계수 해석
+      - 가설 검정, 통계적 유의성
+      - 단순하고 해석 가능한 모델
+      - 논문, 리포트 작성
+      infoBox: 선수 과목 - 통계적 기반 이해
+    right:
+      title: scikit-learn
+      subtitle: 예측 정확도
+      icon: 🤖
+      color: blue
+      items:
+      - 얼마나 정확하게 예측하는지
+      - 정확도, F1, MSE, ROC-AUC
+      - 교차검증, 과적합 방지
+      - 복잡한 앙상블 모델
+      - 프로덕션 시스템 배포
+      infoBox: 본 과목 - 예측 모델 구축
+  - type: note
+    style: tip
+    title: 학습 순서가 중요합니다
+    content: statsmodels를 먼저 배운 이유가 있습니다. "왜 이 변수가 중요한지" 통계적으로 이해한 뒤에 "어떻게 예측을 최적화할지" 배우는 것이 올바른 순서입니다.
+      통계적 기반 없이 ML을 시작하면 모델이 블랙박스가 됩니다. statsmodels에서 배운 회귀 개념, R², p-value 해석 능력이 sklearn에서도 활용됩니다.
+  goal: 🆚 statsmodels vs scikit-learn에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: sklearn_workflow
+  blocks:
+  - type: sectionHeader
+    title: 🔄 scikit-learn 워크플로우
+    subtitle: 데이터에서 예측까지
+  - type: note
+    style: info
+    title: 일관된 5단계 프로세스
+    content: '모든 sklearn 모델은 동일한 패턴을 따릅니다. 1) 데이터 분할: train_test_split으로 학습/테스트 분리. 2) 전처리: StandardScaler,
+      LabelEncoder로 데이터 변환. 3) 모델 학습: model.fit(X_train, y_train). 4) 예측: model.predict(X_test). 5) 평가:
+      accuracy_score, MSE 등으로 성능 측정. 이 패턴을 익히면 어떤 알고리즘이든 동일하게 적용할 수 있습니다.'
+  - type: featureCards
+    cards:
+    - emoji: ✂️
+      title: 1. 데이터 분할
+      description: train_test_split으로 학습/테스트 분리
+    - emoji: 🔧
+      title: 2. 전처리
+      description: 스케일링, 인코딩, 결측치 처리
+    - emoji: 📚
+      title: 3. 모델 학습
+      description: model.fit(X_train, y_train)
+    - emoji: 🔮
+      title: 4. 예측
+      description: model.predict(X_test)
+    - emoji: 📊
+      title: 5. 평가
+      description: accuracy, MSE, F1, ROC-AUC
+    - emoji: 🔄
+      title: 6. 개선
+      description: 하이퍼파라미터 튜닝, 교차검증
+  goal: 🔄 scikit-learn 워크플로우에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: algorithms
+  blocks:
+  - type: sectionHeader
+    title: 🧠 주요 알고리즘
+    subtitle: scikit-learn이 제공하는 모델들
+  - type: table
+    headers:
+    - 유형
+    - 알고리즘
+    - 용도
+    rows:
+    - - 분류
+      - LogisticRegression
+      - 이진/다중 분류 기본
+    - - 분류
+      - RandomForestClassifier
+      - 앙상블, 특성 중요도
+    - - 분류
+      - GradientBoostingClassifier
+      - 고성능 앙상블
+    - - 분류
+      - SVC
+      - 서포트 벡터 머신
+    - - 회귀
+      - LinearRegression
+      - 선형 회귀 기본
+    - - 회귀
+      - Ridge, Lasso
+      - 정규화 회귀
+    - - 회귀
+      - RandomForestRegressor
+      - 앙상블 회귀
+    - - 클러스터링
+      - KMeans
+      - K개 군집으로 분리
+    - - 클러스터링
+      - DBSCAN
+      - 밀도 기반 군집화
+    - - 차원축소
+      - PCA
+      - 주성분 분석
+    - - 전처리
+      - StandardScaler
+      - 표준화
+    - - 전처리
+      - MinMaxScaler
+      - 정규화 (0~1)
+  - type: note
+    style: tip
+    title: 알고리즘 선택 가이드
+    content: 분류 문제라면 LogisticRegression으로 시작하세요. 성능이 부족하면 RandomForest, GradientBoosting 순으로 시도합니다. 회귀
+      문제는 LinearRegression 기본, 과적합 방지에는 Ridge/Lasso를 사용합니다. 클러스터링은 KMeans가 가장 직관적입니다. 어떤 알고리즘이든 fit/predict
+      패턴은 동일합니다.
+  goal: 🧠 주요 알고리즘에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: key_concepts
+  blocks:
+  - type: sectionHeader
+    title: 🧩 핵심 개념
+    subtitle: ML을 이해하기 위한 필수 용어
+  - type: featureCards
+    cards:
+    - emoji: ✂️
+      title: Train/Test Split
+      description: 학습 데이터와 평가 데이터 분리
+    - emoji: 📉
+      title: 과적합 (Overfitting)
+      description: 학습 데이터에만 너무 맞춰진 상태
+    - emoji: 🔄
+      title: 교차검증 (Cross-Validation)
+      description: 데이터를 K개로 나눠 반복 검증
+    - emoji: ⚙️
+      title: 하이퍼파라미터
+      description: 모델 외부에서 설정하는 값
+    - emoji: 📊
+      title: 특성 (Feature)
+      description: 예측에 사용하는 입력 변수
+    - emoji: 🎯
+      title: 타겟 (Target)
+      description: 예측하려는 출력 변수
+  goal: 🧩 핵심 개념에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: metrics
+  blocks:
+  - type: sectionHeader
+    title: 📋 평가 지표
+    subtitle: 모델 성능을 측정하는 방법
+  - type: table
+    headers:
+    - 지표
+    - 유형
+    - 의미
+    - 해석
+    rows:
+    - - Accuracy
+      - 분류
+      - 정확도
+      - 전체 중 맞춘 비율
+    - - Precision
+      - 분류
+      - 정밀도
+      - 양성 예측 중 실제 양성
+    - - Recall
+      - 분류
+      - 재현율
+      - 실제 양성 중 맞춘 비율
+    - - F1 Score
+      - 분류
+      - 조화평균
+      - 정밀도와 재현율의 균형
+    - - ROC-AUC
+      - 분류
+      - 곡선 아래 면적
+      - 1에 가까울수록 좋음
+    - - MSE
+      - 회귀
+      - 평균제곱오차
+      - 낮을수록 좋음
+    - - RMSE
+      - 회귀
+      - MSE의 제곱근
+      - 원래 단위로 해석
+    - - R²
+      - 회귀
+      - 결정계수
+      - 1에 가까울수록 좋음
+  - type: note
+    style: info
+    title: 지표 선택 가이드
+    content: 분류에서 클래스 불균형이 있다면 Accuracy보다 F1 Score를 사용하세요. 암 진단처럼 놓치면 안 되는 경우 Recall을 중시하고, 스팸 필터처럼 오탐이
+      문제면 Precision을 중시합니다. 회귀에서는 MSE가 기본이고, 해석 편의를 위해 RMSE를 사용합니다. R²는 모델 설명력을 보여줍니다.
+  goal: 📋 평가 지표에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: preprocessing
+  blocks:
+  - type: sectionHeader
+    title: 🔧 전처리의 중요성
+    subtitle: 좋은 예측은 좋은 데이터에서
+  - type: note
+    style: info
+    title: 왜 전처리가 필요한가?
+    content: 대부분의 ML 알고리즘은 숫자만 처리할 수 있습니다. 범주형 데이터(성별, 지역)는 숫자로 변환해야 합니다. 또한 특성 간 스케일이 다르면 일부 알고리즘이 제대로
+      작동하지 않습니다. 예를 들어 나이(0~100)와 수입(0~10000000)을 함께 사용하면 수입이 모델을 지배합니다. StandardScaler로 모든 특성을 같은 스케일로
+      맞추면 이 문제를 해결합니다.
+  - type: featureCards
+    cards:
+    - emoji: 📏
+      title: StandardScaler
+      description: 평균 0, 표준편차 1로 변환
+    - emoji: 📐
+      title: MinMaxScaler
+      description: 0~1 범위로 정규화
+    - emoji: 🏷️
+      title: LabelEncoder
+      description: 범주를 숫자로 변환
+    - emoji: 📊
+      title: OneHotEncoder
+      description: 범주를 이진 벡터로 변환
+  goal: 🔧 전처리의 중요성에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: local_runtime_note
+  blocks:
+  - type: sectionHeader
+    title: ⚠️ Codaro 로컬 Python 환경 참고사항
+    subtitle: 로컬 실행 시 확인할 점
+  - type: note
+    style: warning
+    title: 제한사항
+    content: 이 강의는 Codaro 로컬 Python 환경에서 실행됩니다. scikit-learn의 병렬 처리, 모델 평가, 파이프라인 기능을 로컬 CPU와 메모리 기준으로
+      실습할 수 있습니다. 대용량 데이터셋은 실행 시간을 고려해 샘플링하면서 다룹니다.
+  - type: featureCards
+    cards:
+    - emoji: ✅
+      title: 정상 작동
+      description: LinearRegression, LogisticRegression, RandomForest, KMeans, PCA, StandardScaler
+    - emoji: ⚠️
+      title: 주의 필요
+      description: n_jobs=-1 → n_jobs=1로 변경 필요
+    - emoji: 📦
+      title: 준비 방법
+      description: 라이브러리 패널이 meta.packages 기준으로 현재 실행 환경을 준비
+  goal: ⚠️ Codaro 로컬 Python 환경 참고사항에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: projects_preview
+  blocks:
+  - type: sectionHeader
+    title: 🗺️ 앞으로 배울 내용
+    subtitle: 10개 프로젝트로 마스터하기
+  - type: table
+    headers:
+    - 단계
+    - 프로젝트
+    - 배울 내용
+    - 비즈니스 가치
+    rows:
+    - - 입문
+      - 와인 품질 분류
+      - train_test_split, 다중분류, 스케일링
+      - 품질 자동 분류
+    - - 입문
+      - 유방암 진단
+      - 이진분류, 정밀도/재현율, F1
+      - 의료 진단 자동화
+    - - 기초
+      - 당뇨병 진행도 예측
+      - LinearRegression, MSE, R²
+      - 건강 위험도 예측
+    - - 기초
+      - 주택 가격 예측
+      - 다중특성 회귀, 교차검증
+      - 부동산 가격 책정
+    - - 기초
+      - 손글씨 숫자 인식
+      - 이미지 분류, PCA 시각화
+      - OCR 기초
+    - - 중급
+      - 고객 세분화
+      - KMeans, 엘보우, 실루엣
+      - 마케팅 세분화
+    - - 중급
+      - 소나 신호 분류
+      - RandomForest, 특성 중요도
+      - 신호 탐지 자동화
+    - - 중급
+      - 심장병 예측
+      - GradientBoosting, ROC-AUC
+      - 건강 관리 시스템
+    - - 심화
+      - 신호 탐지 최적화
+      - GridSearchCV, 하이퍼파라미터
+      - 레이더 시스템
+    - - 심화
+      - 종합 ML 파이프라인
+      - Pipeline, 모든 개념 종합
+      - 실전 ML 시스템
+  - type: note
+    style: info
+    title: 프로젝트 기반 학습
+    content: 각 프로젝트는 실제 데이터로 실제 문제를 해결합니다. 와인 품종 분류, 암 진단, 주택 가격 예측 등 현실적인 문제를 다룹니다. 프로젝트를 진행하면서 이전에 배운
+      개념을 반복 사용하고, 새로운 개념을 추가로 학습합니다. 10개 프로젝트를 완료하면 데이터에서 예측 모델을 구축하는 전체 워크플로우를 마스터하게 됩니다.
+  goal: 🗺️ 앞으로 배울 내용에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: prerequisites
+  blocks:
+  - type: sectionHeader
+    title: 📋 선수 지식
+    subtitle: 시작하기 전에 알아야 할 것
+  - type: note
+    style: tip
+    title: 권장 선수 과목
+    content: pandas 기초 (데이터 로딩, 필터링, 그룹화), NumPy 기초 (배열 연산), statsmodels 기초 (회귀 개념, R² 해석)를 미리 학습하는 것을
+      권장합니다. 특히 statsmodels에서 배운 회귀 개념은 sklearn에서도 그대로 활용됩니다. Python 기본 문법(함수, 리스트, 딕셔너리)도 알아야 합니다.
+  - type: featureCards
+    cards:
+    - emoji: 🐼
+      title: pandas
+      description: DataFrame, 필터링, 그룹화
+    - emoji: 🔢
+      title: NumPy
+      description: 배열 연산, 인덱싱
+    - emoji: 📊
+      title: statsmodels
+      description: 회귀 개념, R², p-value
+    - emoji: 🐍
+      title: Python 기초
+      description: 함수, 리스트, 딕셔너리
+  goal: 📋 선수 지식에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: resources
+  blocks:
+  - type: sectionHeader
+    title: 📚 참고 자료
+    subtitle: 더 깊이 공부하고 싶다면
+  - type: links
+    items:
+    - text: scikit-learn 공식 문서
+      url: https://scikit-learn.org/
+      icon: 🔗
+    - text: scikit-learn User Guide
+      url: https://scikit-learn.org/stable/user_guide.html
+      icon: 🔗
+    - text: scikit-learn API Reference
+      url: https://scikit-learn.org/stable/modules/classes.html
+      icon: 🔗
+    - text: scikit-learn Tutorials
+      url: https://scikit-learn.org/stable/tutorial/index.html
+      icon: 🔗
+  goal: 📚 참고 자료에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: next
+  blocks:
+  - type: hero
+    emoji: 👉
+    title: '다음: 와인 품질 분류'
+    subtitle: 첫 번째 머신러닝 모델을 만들어봅니다
+  goal: '다음: 와인 품질 분류에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.'
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 예측 모델 품질 게이트
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고,
+    정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from sklearn.datasets import make_classification
+    from sklearn.model_selection import train_test_split
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import accuracy_score, f1_score
+
+    features, target = make_classification(
+        n_samples=240,
+        n_features=6,
+        n_informative=4,
+        n_redundant=0,
+        class_sep=1.4,
+        random_state=42,
+    )
+    xTrain, xTest, yTrain, yTest = train_test_split(
+        features, target, test_size=0.25, random_state=42, stratify=target
+    )
+
+    riskPipeline = Pipeline([
+        ("scaler", StandardScaler()),
+        ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
+    ])
+
+    def fitRiskModel(pipeline, featureMatrix, labels):
+        pipeline.fit(featureMatrix, labels)
+        return pipeline
+
+    riskModel = fitRiskModel(riskPipeline, xTrain, yTrain)
+    riskPred = riskModel.predict(xTest)
+    riskAccuracy = accuracy_score(yTest, riskPred)
+    riskF1 = f1_score(yTest, riskPred)
+    xTrain.shape, xTest.shape
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      conservativePipeline = Pipeline([
+          ("scaler", StandardScaler()),
+          ("classifier", LogisticRegression(C=0.3, max_iter=1000, random_state=42)),
+      ])
+      conservativeModel = fitRiskModel(conservativePipeline, xTrain, yTrain)
+      conservativePred = conservativeModel.predict(xTest)
+      conservativeAccuracy = accuracy_score(yTest, conservativePred)
+      conservativeF1 = f1_score(yTest, conservativePred)
+
+      assert conservativeAccuracy >= 0.75
+      {
+          "baselineAccuracy": round(riskAccuracy, 3),
+          "baselineF1": round(riskF1, 3),
+          "conservativeAccuracy": round(conservativeAccuracy, 3),
+          "conservativeF1": round(conservativeF1, 3),
+          "accuracyDelta": round(conservativeAccuracy - riskAccuracy, 3),
+      }
+    solution: |-
+      from sklearn.datasets import make_classification
+      from sklearn.model_selection import train_test_split
+      from sklearn.pipeline import Pipeline
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score, f1_score
+
+      features, target = make_classification(
+          n_samples=240,
+          n_features=6,
+          n_informative=4,
+          n_redundant=0,
+          class_sep=1.4,
+          random_state=42,
+      )
+      xTrain, xTest, yTrain, yTest = train_test_split(
+          features, target, test_size=0.25, random_state=42, stratify=target
+      )
+
+      riskPipeline = Pipeline([
+          ("scaler", StandardScaler()),
+          ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
+      ])
+      xTrain.shape, xTest.shape
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증에서 \`conservativePipeline\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sklearn_00-ml-task-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - workflow_validation
+    title: ML 문제의 target·split·metric 계약 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: task type과 target 누수, 평가 metric을 점검한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 모델보다 먼저 target, split, baseline, metric을 고정하세요.
+    - target 또는 미래 정보가 feature에 섞이면 성능은 무효입니다.
+    exercise:
+      prompt: audit_ml_task(task)를 완성하세요.
+      starterCode: |-
+        def audit_ml_task(task):
+            raise NotImplementedError
+      solution: |
+        def audit_ml_task(task):
+            failures = []
+            if task.get("target") in task.get("features", []): failures.append("target-leakage")
+            if task.get("split") not in {"random-stratified", "group", "time"}: failures.append("split-policy")
+            if not task.get("metrics"): failures.append("metrics")
+            if not task.get("baseline"): failures.append("baseline")
+            return {"valid": not failures, "failures": failures, "featureCount": len(task.get("features", [])), "evidence": ["split manifest", "baseline", "held-out metrics", "error analysis"]}
+      hints: *id001
+    check:
+      id: python.sklearn.sklearn_00.ml-task-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_00.ml-task-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_ml_task
+        cases:
+        - id: accepts-classification-contract
+          arguments:
+          - value:
+              target: label
+              features:
+              - x1
+              - x2
+              split: random-stratified
+              metrics:
+              - f1
+              - recall
+              baseline: majority
+          expectedReturn:
+            valid: true
+            failures: []
+            featureCount: 2
+            evidence:
+            - split manifest
+            - baseline
+            - held-out metrics
+            - error analysis
+        - id: reports-leakage-and-gaps
+          arguments:
+          - value:
+              target: label
+              features:
+              - x
+              - label
+              split: random
+              metrics: []
+              baseline: ''
+          expectedReturn:
+            valid: false
+            failures:
+            - target-leakage
+            - split-policy
+            - metrics
+            - baseline
+            featureCount: 2
+            evidence:
+            - split manifest
+            - baseline
+            - held-out metrics
+            - error analysis
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sklearn_00-train-test-identity-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_00-ml-task-contract-mastery
+    title: 새 dataset에 split identity 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 동일 entity가 train과 test에 겹치는지 검사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - row가 아니라 실제 entity 단위로 겹침을 검사하세요.
+    - 한 사람의 여러 관측을 양쪽 split에 나누지 마세요.
+    exercise:
+      prompt: audit_entity_split(train_rows, test_rows, entity_field)를 완성하세요.
+      starterCode: |-
+        def audit_entity_split(train_rows, test_rows, entity_field):
+            raise NotImplementedError
+      solution: |
+        def audit_entity_split(train_rows, test_rows, entity_field):
+            train_ids = {row[entity_field] for row in train_rows}; test_ids = {row[entity_field] for row in test_rows}
+            overlap = sorted(train_ids & test_ids)
+            return {"valid": not overlap and bool(train_rows) and bool(test_rows), "overlap": overlap, "trainEntities": len(train_ids), "testEntities": len(test_ids)}
+      hints: *id002
+    check:
+      id: python.sklearn.sklearn_00.train-test-identity.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_00.train-test-identity.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_entity_split
+        cases:
+        - id: accepts-disjoint-entities
+          arguments:
+          - value:
+            - patient: 1
+            - patient: 2
+          - value:
+            - patient: 3
+          - value: patient
+          expectedReturn:
+            valid: true
+            overlap: []
+            trainEntities: 2
+            testEntities: 1
+        - id: rejects-overlap
+          arguments:
+          - value:
+            - user: a
+          - value:
+            - user: a
+            - user: b
+          - value: user
+          expectedReturn:
+            valid: false
+            overlap:
+            - a
+            trainEntities: 1
+            testEntities: 2
+        - id: rejects-empty-test
+          arguments:
+          - value:
+            - id: 1
+          - value: []
+          - value: id
+          expectedReturn:
+            valid: false
+            overlap: []
+            trainEntities: 1
+            testEntities: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sklearn_00-ml-workflow-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_00-train-test-identity-transfer
+    title: ML workflow 경계 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: split·preprocess·evaluation 책임을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 학습 데이터와 평가 데이터의 경계를 먼저 확인하세요.
+    - 한 metric이나 예측을 실제 진단·인과 결론으로 확대하지 마세요.
+    exercise:
+      prompt: choose_ml_workflow(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_ml_workflow(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_ml_workflow(situation):
+            table = {'independent-rows': {'method': 'stratified split', 'evidence': 'class counts', 'risk': 'entity duplicates'}, 'repeated-entities': {'method': 'group split', 'evidence': 'entity overlap zero', 'risk': 'row leakage'}, 'future-prediction': {'method': 'time split', 'evidence': 'temporal boundary', 'risk': 'lookahead'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sklearn.sklearn_00.ml-workflow-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_00.ml-workflow-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_ml_workflow
+        cases:
+        - id: recalls-independent-rows
+          arguments:
+          - value: independent-rows
+          expectedReturn:
+            method: stratified split
+            evidence: class counts
+            risk: entity duplicates
+        - id: recalls-repeated-entities
+          arguments:
+          - value: repeated-entities
+          expectedReturn:
+            method: group split
+            evidence: entity overlap zero
+            risk: row leakage
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

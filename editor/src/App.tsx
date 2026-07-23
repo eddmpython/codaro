@@ -238,7 +238,7 @@ function App() {
   const { resolvedTheme, themeMode, toggleThemeMode } = useThemeMode();
   const { accentColor, selectAccentColor } = useAccentColor();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [assistantCollapsed, setAssistantCollapsed] = useState(false);
+  const [assistantCollapsed, setAssistantCollapsed] = useState(true);
   const {
     auditCount,
     automationSection,

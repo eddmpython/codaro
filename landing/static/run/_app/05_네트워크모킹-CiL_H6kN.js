@@ -1,0 +1,690 @@
+var e=`meta:
+  id: playwright_05
+  title: 네트워크 모킹
+  order: 5
+  category: playwright
+  difficulty: medium
+  audience: Python 기본 문법을 익힌 자동화 입문자
+  packages:
+    - playwright
+  outcomes: ["automation.browser.testFlow"]
+  prerequisites: ["automation.browser.formInput"]
+  estimatedMinutes: 50
+  tags:
+    - playwright
+    - network
+    - route
+    - mock
+intro:
+  direction: page.route로 API 응답을 통제하고 성공, 빈 데이터, 실패 상태를 반복 검증한다.
+  benefits:
+    - 외부 서버 없이 API 응답을 브라우저 자동화 안에서 재현할 수 있다.
+    - 성공과 실패 화면을 같은 HTML에서 반복 검증할 수 있다.
+    - 네트워크 의존이 있는 업무 화면을 안정적인 학습 코드로 바꿀 수 있다.
+  diagram:
+    steps:
+      - label: API 응답 계약 작성
+        detail: 주문 목록, 빈 목록, 오류 응답처럼 화면이 기대하는 응답 모양을 먼저 만듭니다.
+      - label: route로 요청 가로채기
+        detail: page.route 패턴을 등록해 브라우저 요청에 mock 응답을 돌려줍니다.
+      - label: 화면 결과 기다리기
+        detail: fetch가 끝난 뒤 화면에 그려지는 문구를 expect로 검증합니다.
+      - label: 실패 상태까지 재사용
+        detail: 같은 UI에서 정상과 오류 mock을 바꾸며 자동화가 보는 결과를 비교합니다.
+    runtime:
+      - label: route API 실행
+        detail: Playwright page.route와 route.fulfill이 로컬 브라우저에서 동작해야 합니다.
+      - label: fetch 포함 HTML 실행
+        detail: mock HTML이 /api 요청을 보내고 응답을 화면에 반영합니다.
+      - label: 상태별 assert 마무리
+        detail: 성공, 빈 데이터, 오류 문구를 각각 명시적 assert로 확인합니다.
+sections:
+  - id: fulfill-json
+    title: JSON 응답 가로채기
+    structuredPrimary: true
+    subtitle: route.fulfill
+    goal: 브라우저가 요청한 API URL에 JSON mock 응답을 돌려주고 화면 결과를 확인한다.
+    why: 외부 서버에 의존하지 않아야 학습 코드와 테스트가 같은 결과를 반복해서 낸다.
+    explanation: page.route는 지정한 URL 패턴에 맞는 요청을 가로채고 원하는 응답을 반환합니다. route.fulfill에 status, content_type, body를 넘기면 브라우저는 실제 서버 응답처럼 처리합니다. 이 섹션은 주문 수를 mock JSON에서 읽어 화면에 표시합니다.
+    tips:
+      - route는 page.goto나 fetch가 일어나기 전에 등록해야 합니다.
+      - JSON 문자열은 json.dumps로 만들면 따옴표 실수를 줄일 수 있습니다.
+    snippet: |-
+      import json
+      from playwright.sync_api import sync_playwright, expect
+
+      appHtml = """
+      <main><h1>주문 API</h1><p data-testid="count">loading</p></main>
+      <script>
+      fetch('/api/orders').then(r => r.json()).then(data => {
+        document.querySelector('[data-testid=count]').textContent = String(data.orders.length)
+      })
+      <\/script>
+      """
+
+      with sync_playwright() as p:
+          browser = p.chromium.launch(headless=True)
+          page = browser.new_page()
+          page.route("**/app", lambda route: route.fulfill(status=200, content_type="text/html; charset=utf-8", body=appHtml))
+          page.route("**/api/orders", lambda route: route.fulfill(status=200, content_type="application/json", body=json.dumps({"orders": [1, 2, 3]})))
+          page.goto("https://codaro.local/app")
+          expect(page.get_by_test_id("count")).to_have_text("3")
+          count = page.get_by_test_id("count").inner_text()
+          browser.close()
+
+      assert count == "3"
+      count
+    exercise:
+      prompt: mock 주문을 4개로 바꾸고 화면 count 검증을 통과시키세요.
+      starterCode: |-
+        import json
+        from playwright.sync_api import sync_playwright, expect
+
+        appHtml = """
+        <main><h1>주문 API</h1><p data-testid="count">loading</p></main>
+        <script>
+        fetch('/api/orders').then(r => r.json()).then(data => {
+          document.querySelector('[data-testid=count]').textContent = String(data.orders.length)
+        })
+        <\/script>
+        """
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.route("**/app", lambda route: route.fulfill(status=200, content_type="text/html; charset=utf-8", body=appHtml))
+            page.route("**/api/orders", lambda route: route.fulfill(status=200, content_type="application/json", body=json.dumps({"orders": [1, 2, 3, ___]})))
+            page.goto("https://codaro.local/app")
+            expect(page.get_by_test_id("count")).to_have_text("4")
+            count = page.get_by_test_id("count").inner_text()
+            browser.close()
+
+        assert count == "4"
+        count
+      solution: |-
+        import json
+        from playwright.sync_api import sync_playwright, expect
+
+        appHtml = """
+        <main><h1>주문 API</h1><p data-testid="count">loading</p></main>
+        <script>
+        fetch('/api/orders').then(r => r.json()).then(data => {
+          document.querySelector('[data-testid=count]').textContent = String(data.orders.length)
+        })
+        <\/script>
+        """
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.route("**/app", lambda route: route.fulfill(status=200, content_type="text/html; charset=utf-8", body=appHtml))
+            page.route("**/api/orders", lambda route: route.fulfill(status=200, content_type="application/json", body=json.dumps({"orders": [1, 2, 3, 4]})))
+            page.goto("https://codaro.local/app")
+            expect(page.get_by_test_id("count")).to_have_text("4")
+            count = page.get_by_test_id("count").inner_text()
+            browser.close()
+
+        assert count == "4"
+        count
+      hints:
+        - orders 리스트 항목 수와 expect 문자열을 같게 맞추세요.
+        - route 등록은 page.goto보다 앞에 있어야 합니다.
+    check:
+      noError: app HTML과 API JSON route가 등록된 뒤 page.goto가 완료되어야 합니다.
+      resultCheck: 화면 count가 mock orders 리스트 길이와 같아야 합니다.
+  - id: request-log
+    title: 요청 로그 남기기
+    structuredPrimary: true
+    subtitle: page.on request
+    goal: 브라우저가 호출한 URL 목록을 기록해 자동화가 실제 요청을 보냈는지 확인한다.
+    why: 화면 결과가 틀렸을 때 요청 자체가 나갔는지, mock 응답이 잘못됐는지 구분해야 한다.
+    explanation: page.on("request", handler)를 사용하면 브라우저가 보내는 요청을 관찰할 수 있습니다. mock을 쓰더라도 request 이벤트는 발생하므로 어떤 endpoint가 호출됐는지 확인할 수 있습니다. 요청 로그는 네트워크 자동화의 진단 증거가 됩니다.
+    tips:
+      - URL 전체를 저장한 뒤 필요한 endpoint가 포함됐는지만 검사합니다.
+      - request 로그는 route 등록 문제와 화면 렌더링 문제를 나누는 데 유용합니다.
+    snippet: |-
+      import json
+      from playwright.sync_api import sync_playwright, expect
+
+      appHtml = "<script>fetch('/api/health').then(r => r.json()).then(data => document.body.textContent = data.status)<\/script>"
+      requests = []
+
+      with sync_playwright() as p:
+          browser = p.chromium.launch(headless=True)
+          page = browser.new_page()
+          page.on("request", lambda request: requests.append(request.url))
+          page.route("**/app", lambda route: route.fulfill(status=200, content_type="text/html; charset=utf-8", body=appHtml))
+          page.route("**/api/health", lambda route: route.fulfill(status=200, content_type="application/json", body=json.dumps({"status": "ok"})))
+          page.goto("https://codaro.local/app")
+          expect(page.get_by_text("ok")).to_be_visible()
+          browser.close()
+
+      assert any(url.endswith("/api/health") for url in requests)
+      requests
+    exercise:
+      prompt: API 경로를 "/api/status"로 바꾸고 요청 로그 검증을 맞추세요.
+      starterCode: |-
+        import json
+        from playwright.sync_api import sync_playwright, expect
+
+        appHtml = "<script>fetch('/api/status').then(r => r.json()).then(data => document.body.textContent = data.status)<\/script>"
+        requests = []
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.on("request", lambda request: requests.append(request.url))
+            page.route("**/app", lambda route: route.fulfill(status=200, content_type="text/html; charset=utf-8", body=appHtml))
+            page.route("**___", lambda route: route.fulfill(status=200, content_type="application/json", body=json.dumps({"status": "ok"})))
+            page.goto("https://codaro.local/app")
+            expect(page.get_by_text("ok")).to_be_visible()
+            browser.close()
+
+        assert any(url.endswith("/api/status") for url in requests)
+        requests
+      solution: |-
+        import json
+        from playwright.sync_api import sync_playwright, expect
+
+        appHtml = "<script>fetch('/api/status').then(r => r.json()).then(data => document.body.textContent = data.status)<\/script>"
+        requests = []
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.on("request", lambda request: requests.append(request.url))
+            page.route("**/app", lambda route: route.fulfill(status=200, content_type="text/html; charset=utf-8", body=appHtml))
+            page.route("**/api/status", lambda route: route.fulfill(status=200, content_type="application/json", body=json.dumps({"status": "ok"})))
+            page.goto("https://codaro.local/app")
+            expect(page.get_by_text("ok")).to_be_visible()
+            browser.close()
+
+        assert any(url.endswith("/api/status") for url in requests)
+        requests
+      hints:
+        - fetch 경로와 route 패턴 끝부분을 같은 endpoint로 맞추세요.
+        - 요청 로그에는 app 문서와 API 요청이 모두 들어갈 수 있습니다.
+    check:
+      noError: request 이벤트 수집과 mock 응답 처리가 요청 URL과 응답 JSON을 모두 남겨야 합니다.
+      resultCheck: requests 목록에 바꾼 API endpoint가 포함되어야 합니다.
+  - id: empty-state
+    title: 빈 데이터 상태 검증
+    structuredPrimary: true
+    subtitle: orders가 없을 때
+    goal: mock API가 빈 목록을 반환할 때 화면이 빈 상태 문구를 보여주는지 확인한다.
+    why: 자동화는 성공 데이터뿐 아니라 데이터가 없는 정상 상태도 업무 기준으로 검증해야 한다.
+    explanation: 데이터가 없다는 것은 항상 오류가 아닙니다. 빈 목록이 들어왔을 때 화면이 "처리할 주문 없음" 같은 명확한 상태를 보여주는지 확인해야 합니다. 이 섹션은 같은 API 구조에서 orders만 빈 리스트로 바꿔 화면 분기를 검증합니다.
+    tips:
+      - 빈 상태 문구는 사용자에게 다음 행동을 알려주는 표현이어야 합니다.
+      - mock 데이터 하나만 바꾸고 UI 분기가 달라지는지 확인하세요.
+    snippet: |-
+      import json
+      from playwright.sync_api import sync_playwright, expect
+
+      appHtml = """
+      <p data-testid="message">loading</p>
+      <script>
+      fetch('/api/orders').then(r => r.json()).then(data => {
+        document.querySelector('[data-testid=message]').textContent = data.orders.length ? '주문 있음' : '처리할 주문 없음'
+      })
+      <\/script>
+      """
+
+      with sync_playwright() as p:
+          browser = p.chromium.launch(headless=True)
+          page = browser.new_page()
+          page.route("**/app", lambda route: route.fulfill(status=200, content_type="text/html; charset=utf-8", body=appHtml))
+          page.route("**/api/orders", lambda route: route.fulfill(status=200, content_type="application/json", body=json.dumps({"orders": []})))
+          page.goto("https://codaro.local/app")
+          expect(page.get_by_test_id("message")).to_have_text("처리할 주문 없음")
+          message = page.get_by_test_id("message").inner_text()
+          browser.close()
+
+      assert message == "처리할 주문 없음"
+      message
+    exercise:
+      prompt: 빈 상태 문구를 "대기열 비어 있음"으로 바꾸고 검증하세요.
+      starterCode: |-
+        import json
+        from playwright.sync_api import sync_playwright, expect
+
+        appHtml = """
+        <p data-testid="message">loading</p>
+        <script>
+        fetch('/api/orders').then(r => r.json()).then(data => {
+          document.querySelector('[data-testid=message]').textContent = data.orders.length ? '주문 있음' : '대기열 비어 있음'
+        })
+        <\/script>
+        """
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.route("**/app", lambda route: route.fulfill(status=200, content_type="text/html; charset=utf-8", body=appHtml))
+            page.route("**/api/orders", lambda route: route.fulfill(status=200, content_type="application/json", body=json.dumps({"orders": []})))
+            page.goto("https://codaro.local/app")
+            expect(page.get_by_test_id("message")).to_have_text("___")
+            message = page.get_by_test_id("message").inner_text()
+            browser.close()
+
+        assert message == "대기열 비어 있음"
+        message
+      solution: |-
+        import json
+        from playwright.sync_api import sync_playwright, expect
+
+        appHtml = """
+        <p data-testid="message">loading</p>
+        <script>
+        fetch('/api/orders').then(r => r.json()).then(data => {
+          document.querySelector('[data-testid=message]').textContent = data.orders.length ? '주문 있음' : '대기열 비어 있음'
+        })
+        <\/script>
+        """
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.route("**/app", lambda route: route.fulfill(status=200, content_type="text/html; charset=utf-8", body=appHtml))
+            page.route("**/api/orders", lambda route: route.fulfill(status=200, content_type="application/json", body=json.dumps({"orders": []})))
+            page.goto("https://codaro.local/app")
+            expect(page.get_by_test_id("message")).to_have_text("대기열 비어 있음")
+            message = page.get_by_test_id("message").inner_text()
+            browser.close()
+
+        assert message == "대기열 비어 있음"
+        message
+      hints:
+        - 화면 분기 문자열과 expect 문자열을 같게 맞추세요.
+        - orders가 빈 리스트라서 else 쪽 문구가 표시됩니다.
+    check:
+      noError: 빈 orders mock과 화면 분기 실행이 오류 없이 완료되어야 합니다.
+      resultCheck: message 값이 빈 상태 문구와 일치해야 합니다.
+  - id: failure-completion
+    title: 실패 응답 완료 점검
+    structuredPrimary: true
+    subtitle: 500 mock과 fallback
+    goal: API 실패 응답을 mock하고 화면 fallback 문구와 완료 리포트를 검증한다.
+    why: 웹 자동화는 정상 경로만 보지 않고 서버 실패 때 사용자가 이해할 수 있는 안내가 나오는지도 확인해야 한다.
+    explanation: route.fulfill로 500 응답을 돌려주면 실제 서버 장애 없이 실패 화면을 재현할 수 있습니다. fetch 코드가 response.ok를 확인하고 fallback 문구를 표시하는지 검증합니다. 마지막에는 status와 passed를 딕셔너리로 묶어 실패 상태도 학습 증거로 남깁니다.
+    tips:
+      - 실패 mock도 의도된 결과라면 passed=True로 둘 수 있습니다.
+      - response.ok 분기는 실제 운영 화면 점검에서 자주 보는 기준입니다.
+    snippet: |-
+      from playwright.sync_api import sync_playwright, expect
+
+      appHtml = """
+      <p data-testid="status">loading</p>
+      <script>
+      fetch('/api/orders').then(response => {
+        document.querySelector('[data-testid=status]').textContent = response.ok ? '정상' : '서버 오류 안내'
+      })
+      <\/script>
+      """
+
+      with sync_playwright() as p:
+          browser = p.chromium.launch(headless=True)
+          page = browser.new_page()
+          page.route("**/app", lambda route: route.fulfill(status=200, content_type="text/html; charset=utf-8", body=appHtml))
+          page.route("**/api/orders", lambda route: route.fulfill(status=500, body="broken"))
+          page.goto("https://codaro.local/app")
+          expect(page.get_by_test_id("status")).to_have_text("서버 오류 안내")
+          report = {"status": page.get_by_test_id("status").inner_text(), "failureHandled": True}
+          browser.close()
+
+      assert report == {"status": "서버 오류 안내", "failureHandled": True}
+      report
+    exercise:
+      prompt: 실패 안내 문구를 "재시도 필요"로 바꾸고 report 검증을 통과시키세요.
+      starterCode: |-
+        from playwright.sync_api import sync_playwright, expect
+
+        appHtml = """
+        <p data-testid="status">loading</p>
+        <script>
+        fetch('/api/orders').then(response => {
+          document.querySelector('[data-testid=status]').textContent = response.ok ? '정상' : '재시도 필요'
+        })
+        <\/script>
+        """
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.route("**/app", lambda route: route.fulfill(status=200, content_type="text/html; charset=utf-8", body=appHtml))
+            page.route("**/api/orders", lambda route: route.fulfill(status=500, body="broken"))
+            page.goto("https://codaro.local/app")
+            expect(page.get_by_test_id("status")).to_have_text("___")
+            report = {"status": page.get_by_test_id("status").inner_text(), "failureHandled": True}
+            browser.close()
+
+        assert report == {"status": "재시도 필요", "failureHandled": True}
+        report
+      solution: |-
+        from playwright.sync_api import sync_playwright, expect
+
+        appHtml = """
+        <p data-testid="status">loading</p>
+        <script>
+        fetch('/api/orders').then(response => {
+          document.querySelector('[data-testid=status]').textContent = response.ok ? '정상' : '재시도 필요'
+        })
+        <\/script>
+        """
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.route("**/app", lambda route: route.fulfill(status=200, content_type="text/html; charset=utf-8", body=appHtml))
+            page.route("**/api/orders", lambda route: route.fulfill(status=500, body="broken"))
+            page.goto("https://codaro.local/app")
+            expect(page.get_by_test_id("status")).to_have_text("재시도 필요")
+            report = {"status": page.get_by_test_id("status").inner_text(), "failureHandled": True}
+            browser.close()
+
+        assert report == {"status": "재시도 필요", "failureHandled": True}
+        report
+      hints:
+        - 실패 분기 문자열, expect, report assert를 같은 문구로 맞추세요.
+        - status=500은 의도적으로 실패 화면을 보기 위한 mock입니다.
+    check:
+      noError: 500 mock 응답과 fallback 문구 검증이 오류 없이 끝나야 합니다.
+      resultCheck: report가 실패 응답을 사용자 안내 문구로 처리했음을 보여야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: playwright_05-network-route-resolution-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - fulfill-json
+    - failure-completion
+    title: 요청을 가장 구체적인 mock route에 연결하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: method·URL prefix·우선순위로 rule을 선택하고 unmatched 요청을 드러낸다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - broad wildcard보다 method와 resource가 구체적인 route를 우선하세요.
+    - 매치되지 않은 요청을 실제 네트워크로 조용히 보내지 마세요.
+    exercise:
+      prompt: resolve_mock_route(request, rules)를 완성하세요.
+      starterCode: |-
+        def resolve_mock_route(request, rules):
+            raise NotImplementedError
+      solution: |
+        def resolve_mock_route(request, rules):
+            matches = []
+            for rule in rules:
+                if rule["method"] == request["method"] and request["url"].startswith(rule["urlPrefix"]):
+                    matches.append(rule)
+            if not matches:
+                return {"matched": False, "rule": None, "response": None}
+            selected = sorted(matches, key=lambda rule: (-len(rule["urlPrefix"]), -rule.get("priority", 0), rule["id"]))[0]
+            return {"matched": True, "rule": selected["id"], "response": selected["response"]}
+      hints: *id001
+    check:
+      id: python.playwright.playwright_05.network-route-resolution.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.playwright.playwright_05.network-route-resolution.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: resolve_mock_route
+        cases:
+        - id: chooses-most-specific-prefix
+          arguments:
+          - value:
+              method: GET
+              url: https://api.test/orders/42
+          - value:
+            - id: all
+              method: GET
+              urlPrefix: https://api.test/
+              response:
+                status: 200
+            - id: order
+              method: GET
+              urlPrefix: https://api.test/orders/
+              response:
+                status: 404
+          expectedReturn:
+            matched: true
+            rule: order
+            response:
+              status: 404
+        - id: uses-priority-for-equal-prefix
+          arguments:
+          - value:
+              method: POST
+              url: https://api.test/jobs
+          - value:
+            - id: low
+              method: POST
+              urlPrefix: https://api.test/jobs
+              priority: 1
+              response:
+                status: 202
+            - id: high
+              method: POST
+              urlPrefix: https://api.test/jobs
+              priority: 5
+              response:
+                status: 409
+          expectedReturn:
+            matched: true
+            rule: high
+            response:
+              status: 409
+        - id: reports-unmatched-method
+          arguments:
+          - value:
+              method: DELETE
+              url: https://api.test/jobs
+          - value:
+            - id: post
+              method: POST
+              urlPrefix: https://api.test/jobs
+              response:
+                status: 202
+          expectedReturn:
+            matched: false
+            rule: null
+            response: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: playwright_05-network-log-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - playwright_05-network-route-resolution-mastery
+    title: 새 시나리오의 외부 요청·실패 응답 감사하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 허용 origin 밖 요청과 HTTP 실패를 request identity로 보고한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - mock 성공만 보지 말고 실제 발생한 모든 request의 origin을 감사하세요.
+    - HTTP 오류와 transport 오류를 같은 request identity에 연결하세요.
+    exercise:
+      prompt: audit_network_log(entries, allowed_origins)를 완성하세요.
+      starterCode: |-
+        def audit_network_log(entries, allowed_origins):
+            raise NotImplementedError
+      solution: |
+        def audit_network_log(entries, allowed_origins):
+            from urllib.parse import urlsplit
+            external = []
+            failed = []
+            for entry in entries:
+                parts = urlsplit(entry["url"])
+                origin = f"{parts.scheme}://{parts.netloc}"
+                identity = f"{entry['method']} {entry['url']}"
+                if origin not in allowed_origins:
+                    external.append(identity)
+                if entry.get("status", 0) >= 400 or entry.get("error"):
+                    failed.append(identity)
+            return {"clean": not external and not failed, "external": external, "failed": failed}
+      hints: *id002
+    check:
+      id: python.playwright.playwright_05.network-log-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.playwright.playwright_05.network-log-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_network_log
+        cases:
+        - id: accepts-allowed-successes
+          arguments:
+          - value:
+            - method: GET
+              url: https://app.test/api
+              status: 200
+          - value:
+            - https://app.test
+          expectedReturn:
+            clean: true
+            external: []
+            failed: []
+        - id: reports-external-failure
+          arguments:
+          - value:
+            - method: POST
+              url: https://metrics.test/collect
+              status: 500
+          - value:
+            - https://app.test
+          expectedReturn:
+            clean: false
+            external:
+            - POST https://metrics.test/collect
+            failed:
+            - POST https://metrics.test/collect
+        - id: reports-transport-error
+          arguments:
+          - value:
+            - method: GET
+              url: https://app.test/api
+              error: timeout
+          - value:
+            - https://app.test
+          expectedReturn:
+            clean: false
+            external: []
+            failed:
+            - GET https://app.test/api
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: playwright_05-network-mocking-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - playwright_05-network-log-audit-transfer
+    title: 네트워크 mocking 경계 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 정상·오류·예상 밖 요청에 맞는 격리 전략을 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 브라우저 동작 성공과 사용자 목표 달성을 같은 것으로 취급하지 마세요.
+    - 선택한 action과 함께 판정 가능한 evidence와 남는 risk를 기록하세요.
+    exercise:
+      prompt: choose_network_mocking(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_network_mocking(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_network_mocking(situation):
+            table = {'known-success': {'action': 'fulfill exact method and resource', 'evidence': 'request body and rendered outcome', 'risk': 'fixture drift'}, 'known-failure': {'action': 'fulfill explicit error response', 'evidence': 'status and recovery UI', 'risk': 'happy-path only'}, 'unexpected-request': {'action': 'abort and fail scenario', 'evidence': 'method URL initiator', 'risk': 'silent internet access'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.playwright.playwright_05.network-mocking-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.playwright.playwright_05.network-mocking-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_network_mocking
+        cases:
+        - id: recalls-known-success
+          arguments:
+          - value: known-success
+          expectedReturn:
+            action: fulfill exact method and resource
+            evidence: request body and rendered outcome
+            risk: fixture drift
+        - id: recalls-known-failure
+          arguments:
+          - value: known-failure
+          expectedReturn:
+            action: fulfill explicit error response
+            evidence: status and recovery UI
+            risk: happy-path only
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

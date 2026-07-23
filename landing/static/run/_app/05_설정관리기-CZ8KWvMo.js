@@ -1,0 +1,960 @@
+var e=`meta:
+  packages:
+  - pydantic
+  - pydantic-settings
+  id: pydantic_05
+  title: 설정관리기
+  order: 5
+  category: pydantic
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - pydantic
+  - settings
+  - 환경변수
+  - config
+  - dotenv
+  seo:
+    title: Pydantic Settings - 환경변수와 설정 관리
+    description: pydantic-settings로 애플리케이션 설정을 관리합니다. 환경변수, 중첩 설정, SecretStr을 배웁니다.
+    keywords:
+    - pydantic
+    - settings
+    - 환경변수
+    - config
+    - dotenv
+intro:
+  emoji: ⚙️
+  goal: pydantic-settings로 마이크로서비스 설정 시스템을 구축합니다.
+  description: 실제 서비스에서 설정은 환경(개발/스테이징/운영)에 따라 달라집니다. 데이터베이스 주소, API 키, 포트 번호 등을 코드에 하드코딩하면 배포할 때마다 수정해야
+    합니다. pydantic-settings는 환경변수에서 설정을 읽고, 타입 검증까지 해주어 안전하고 유연한 설정 관리를 가능하게 합니다.
+  direction: 설정관리기에서 입력 스키마를 정의하고 검증된 데이터만 처리 흐름에 넘김합니다.
+  benefits:
+  - 외부 입력 확인 후 스키마 검증에 맞는 코드 입력을 고릅니다.
+  - 설정관리기 결과를 성공 모델과 오류 메시지 기준으로 즉시 점검합니다.
+  - 완료한 코드를 API/자동화 입력 계약에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 라이브러리 로드 입력 확인
+      detail: 입력 기준(외부 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 기본 설정 클래스 처리 실행
+      detail: 스키마 검증 코드를 실행해 중간 결과를 확인합니다.
+    - label: 환경변수 연동 결과 검증
+      detail: 성공 모델과 오류 메시지 기준으로 실행 결과를 비교합니다.
+    - label: 설정관리기 재사용
+      detail: 완성 코드를 API/자동화 입력 계약에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 데이터 계약 환경
+      detail: pydantic, pydanticsettings 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 설정관리기 실행
+      detail: 셀을 실행해 성공 모델과 오류 메시지와 예외 상태를 확인합니다.
+    - label: 설정관리기 완료
+      detail: 검증된 코드를 API/자동화 입력 계약로 남깁니다.
+sections:
+- id: load
+  title: 라이브러리 로드
+  structuredPrimary: true
+  subtitle: pydantic-settings 준비 확인
+  goal: 라이브러리 로드에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: pydantic-settings는 Pydantic V2에서 별도 패키지로 분리되었습니다. BaseSettings를 상속하면 환경변수에서 자동으로 값을 읽어오고,
+    타입 힌트에 맞게 변환합니다. 환경변수 → .env 파일 → 기본값 순서로 값을 찾아 유연하게 설정을 관리할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from pydantic import BaseModel, Field, SecretStr, field_validator
+    from pydantic_settings import BaseSettings, SettingsConfigDict
+  exercise:
+    prompt: 라이브러리 로드 예제에서 import한 이름이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: |-
+      from pydantic import BaseModel, Field, SecretStr, field_validator
+      from pydantic_settings import BaseSettings, SettingsConfigDict
+    hints:
+    - 바꿀 지점은 외부 입력을 만드는 첫 줄과 스키마 검증 줄에서 찾으세요.
+    - 실행 뒤 성공 모델과 오류 메시지 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 라이브러리 로드의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 라이브러리 로드 실행 결과가 성공 모델과 오류 메시지 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: basic
+  title: 기본 설정 클래스
+  structuredPrimary: true
+  subtitle: BaseSettings 상속
+  goal: 기본 설정 클래스에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    BaseSettings를 상속한 클래스는 필드명과 같은 이름의 환경변수에서 자동으로 값을 읽습니다. 필드에 기본값을 지정하면 환경변수가 없을 때 사용됩니다. 타입 힌트에 따라 문자열 환경변수가 자동으로 int, bool 등으로 변환됩니다.
+
+    BaseSettings는 대소문자를 구분하지 않습니다. appName 필드는 APPNAME, AppName, appname 등 어떤 형태의 환경변수도 읽습니다.
+  snippet: |-
+    class AppSettings(BaseSettings):
+        appName: str = "MyApp"
+        debug: bool = False
+        port: int = 8000
+
+    settings = AppSettings()
+    settings
+  exercise:
+    prompt: 기본 설정 클래스 예제에서 \`settings\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      class AppSettings(BaseSettings):
+          appName: str = "MyApp"
+          debug: bool = False
+          port: int = 8000
+
+      settings = AppSettings()
+      settings
+    hints:
+    - 바꿀 지점은 \`settings = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`settings\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 기본 설정 클래스에서 \`settings\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 기본 설정 클래스 실행 뒤 \`settings\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: environ
+  title: 환경변수 연동
+  structuredPrimary: true
+  subtitle: os.environ 시뮬레이션
+  goal: 환경변수 연동에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 실제 서버에서는 환경변수로 설정을 주입합니다. os.environ으로 환경변수를 설정하면 BaseSettings가 자동으로 읽어옵니다. 이 패턴으로 Docker,
+    Kubernetes 등에서 설정을 주입할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import os
+
+    os.environ["APPNAME"] = "ProductionApp"
+    os.environ["DEBUG"] = "true"
+    os.environ["PORT"] = "9000"
+
+    prodSettings = AppSettings()
+    prodSettings
+  exercise:
+    prompt: 환경변수 연동 예제에서 환경변수 이름이나 값을 바꾸고 Settings 모델에 반영되는지 확인하세요.
+    starterCode: |-
+      import os
+
+      os.environ["APPNAME"] = "ProductionApp"
+      os.environ["DEBUG"] = "true"
+      os.environ["PORT"] = "9000"
+
+      prodSettings = AppSettings()
+      prodSettings
+    hints:
+    - 바꿀 지점은 환경변수 이름, 값, Settings 필드 선언입니다.
+    - 실행 뒤 Settings 모델 필드와 출력값이 바꾼 환경값을 반영하는지 보세요.
+  check:
+    noError: 환경변수 연동에서 \`prodSettings\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 환경변수 연동 실행 뒤 \`prodSettings\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: prefix
+  title: 환경변수 접두사
+  structuredPrimary: true
+  subtitle: env_prefix 설정
+  goal: model_config의 env_prefix='DB_'를 설정해 환경변수 DB_HOST/DB_PORT가 각각 host/port 필드로 자동 매핑되는지 확인합니다.
+  why: 같은 환경에서 여러 서비스가 돌 때 환경변수 이름이 충돌합니다. prefix를 두면 서비스마다 네임스페이스가 명확해져 운영 사고가 줄어듭니다.
+  explanation: 여러 서비스가 같은 환경에서 실행될 때 환경변수 이름 충돌을 방지하려면 접두사를 사용합니다. model_config의 env_prefix로 모든 환경변수에
+    공통 접두사를 적용합니다. DB_HOST, DB_PORT처럼 의미있는 네이밍이 가능해집니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class DbSettings(BaseSettings):
+        model_config = {"env_prefix": "DB_"}
+
+        host: str = "localhost"
+        port: int = 5432
+        name: str = "mydb"
+        user: str = "admin"
+
+    os.environ["DB_HOST"] = "production-db.example.com"
+    os.environ["DB_PORT"] = "5433"
+    os.environ["DB_NAME"] = "production_db"
+
+    dbSettings = DbSettings()
+    dbSettings
+  exercise:
+    prompt: 환경변수 접두사 예제에서 접두사와 환경변수 값을 바꾸고 DB 설정 필드가 달라지는지 확인하세요.
+    starterCode: |-
+      class DbSettings(BaseSettings):
+          model_config = {"env_prefix": "DB_"}
+
+          host: str = "localhost"
+          port: int = 5432
+          name: str = "mydb"
+          user: str = "admin"
+
+      os.environ["DB_HOST"] = "production-db.example.com"
+      os.environ["DB_PORT"] = "5433"
+      os.environ["DB_NAME"] = "production_db"
+
+      dbSettings = DbSettings()
+      dbSettings
+    hints:
+    - 바꿀 지점은 DB 접두사 환경변수와 Settings 필드 선언입니다.
+    - 실행 뒤 Settings 인스턴스의 필드와 model_dump 결과가 바꾼 환경값을 반영하는지 보세요.
+  check:
+    noError: 환경변수 접두사의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 환경변수 접두사의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: nested
+  title: 중첩 설정
+  structuredPrimary: true
+  subtitle: 설정 그룹화
+  goal: DatabaseSettings/CacheSettings/LoggingSettings 세 모델을 분리해 메인 Settings에 중첩 필드로 묶고, JSON 환경변수로 그룹 단위 설정을 주입합니다.
+  why: 모든 설정을 한 평면 모델에 두면 100개 넘는 필드가 한 클래스에 쌓여 가독성이 무너집니다. 도메인별 모델로 쪼개면 변경 영향이 한 모델로 제한됩니다.
+  explanation: 복잡한 애플리케이션은 설정을 논리적으로 그룹화해야 합니다. 데이터베이스 설정, 캐시 설정, 로깅 설정 등을 별도 모델로 분리하고 메인 설정에서 조합합니다.
+    중첩된 BaseModel은 JSON 환경변수로 설정할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class DatabaseConfig(BaseModel):
+        host: str = "localhost"
+        port: int = 5432
+        name: str = "app_db"
+        poolSize: int = 5
+
+    class CacheConfig(BaseModel):
+        enabled: bool = True
+        ttl: int = 3600
+        maxSize: int = 1000
+
+    class FullSettings(BaseSettings):
+        appName: str = "MyApp"
+        database: DatabaseConfig = DatabaseConfig()
+        cache: CacheConfig = CacheConfig()
+
+    fullSettings = FullSettings()
+    fullSettings
+  exercise:
+    prompt: 중첩 설정 예제에서 database나 cache 하위 설정 값을 바꾸고 중첩 모델 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      class DatabaseConfig(BaseModel):
+          host: str = "localhost"
+          port: int = 5432
+          name: str = "app_db"
+          poolSize: int = 5
+
+      class CacheConfig(BaseModel):
+          enabled: bool = True
+          ttl: int = 3600
+          maxSize: int = 1000
+
+      class FullSettings(BaseSettings):
+          appName: str = "MyApp"
+          database: DatabaseConfig = DatabaseConfig()
+          cache: CacheConfig = CacheConfig()
+
+      fullSettings = FullSettings()
+      fullSettings
+    hints:
+    - 바꿀 지점은 \`DatabaseConfig\`, \`CacheConfig\`, \`FullSettings\`의 필드와 기본값입니다.
+    - 실행 뒤 중첩된 Settings 필드와 model_dump 결과가 바꾼 입력을 반영하는지 보세요.
+  check:
+    noError: 중첩 설정의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 중첩 설정의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: validation
+  title: 설정 검증
+  structuredPrimary: true
+  subtitle: Field 제약조건
+  goal: 설정 검증에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: BaseSettings도 일반 Pydantic 모델처럼 Field와 validator를 사용한 검증을 지원합니다. 포트 번호 범위, 타임아웃 최소값, 워커
+    수 제한 등 비즈니스 규칙을 설정 단계에서 강제할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from pydantic import field_validator
+
+    class ServerSettings(BaseSettings):
+        host: str = Field(default="0.0.0.0", min_length=1)
+        port: int = Field(default=8000, ge=1, le=65535)
+        workers: int = Field(default=4, ge=1, le=32)
+        timeout: int = Field(default=30, ge=1)
+
+        @field_validator('host')
+        @classmethod
+        def validateHost(cls, v):
+            if v == "":
+                raise ValueError("호스트는 비어있을 수 없습니다")
+            return v
+
+    serverSettings = ServerSettings()
+    serverSettings
+  exercise:
+    prompt: 설정 검증 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      from pydantic import field_validator
+
+      class ServerSettings(BaseSettings):
+          host: str = Field(default="0.0.0.0", min_length=1)
+          port: int = Field(default=8000, ge=1, le=65535)
+          workers: int = Field(default=4, ge=1, le=32)
+          timeout: int = Field(default=30, ge=1)
+
+          @field_validator('host')
+          @classmethod
+          def validateHost(cls, v):
+              if v == "":
+                  raise ValueError("호스트는 비어있을 수 없습니다")
+              return v
+
+      serverSettings = ServerSettings()
+      serverSettings
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: 설정 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 설정 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: secret
+  title: 비밀 값 관리
+  structuredPrimary: true
+  subtitle: SecretStr
+  goal: SecretStr 필드를 가진 설정 모델을 만들고, repr/print에서 마스킹되며 get_secret_value()로만 원본을 꺼낼 수 있는지 확인합니다.
+  why: 비밀번호와 API 키가 stdout/로그에 평문으로 새는 사고는 흔합니다. SecretStr은 출력 경로 전체에 자동 마스킹을 강제해 사람의 실수를 막아 줍니다.
+  explanation: |-
+    비밀번호, API 키 같은 민감한 정보는 로그에 노출되면 안 됩니다. SecretStr 타입을 사용하면 출력 시 자동으로 마스킹되고, get_secret_value()로만 실제 값에 접근할 수 있습니다. 디버깅 로그에서 비밀이 노출되는 것을 방지합니다.
+
+    SecretStr은 repr에서 '**********'로 표시됩니다. 실제 값은 .get_secret_value() 메서드로 접근합니다.
+  snippet: |-
+    class AuthSettings(BaseSettings):
+        model_config = {"env_prefix": "AUTH_"}
+
+        apiKey: SecretStr
+        dbPassword: SecretStr
+        jwtSecret: SecretStr = SecretStr("default-secret")
+
+    os.environ["AUTH_APIKEY"] = "super-secret-api-key-12345"
+    os.environ["AUTH_DBPASSWORD"] = "db-password-xyz"
+
+    authSettings = AuthSettings()
+    authSettings
+  exercise:
+    prompt: 비밀 값 관리 예제에서 API 키나 토큰 값을 바꾸고 SecretStr 출력과 실제 값 접근이 어떻게 다른지 확인하세요.
+    starterCode: |-
+      class AuthSettings(BaseSettings):
+          model_config = {"env_prefix": "AUTH_"}
+
+          apiKey: SecretStr
+          dbPassword: SecretStr
+          jwtSecret: SecretStr = SecretStr("default-secret")
+
+      os.environ["AUTH_APIKEY"] = "super-secret-api-key-12345"
+      os.environ["AUTH_DBPASSWORD"] = "db-password-xyz"
+
+      authSettings = AuthSettings()
+      authSettings
+    hints:
+    - 바꿀 지점은 SecretStr 필드, 환경변수 값, 출력 확인 방식입니다.
+    - 실행 뒤 화면 표시용 값과 \`get_secret_value()\` 결과가 각각 어떻게 달라지는지 보세요.
+  check:
+    noError: 비밀 값 관리의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 비밀 값 관리의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: json
+  title: JSON 환경변수
+  structuredPrimary: true
+  subtitle: 복잡한 값
+  goal: JSON 환경변수에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 리스트나 딕셔너리 같은 복잡한 값도 JSON 문자열로 환경변수에 넣을 수 있습니다. BaseSettings가 자동으로 파싱하여 Python 객체로 변환합니다.
+    CORS 허용 도메인 목록, 기능 플래그 등에 유용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class JsonSettings(BaseSettings):
+        allowedHosts: list[str] = []
+        features: dict[str, bool] = {}
+        ports: list[int] = [8000]
+
+    os.environ["ALLOWEDHOSTS"] = '["localhost", "example.com", "api.example.com"]'
+    os.environ["FEATURES"] = '{"darkMode": true, "beta": false, "analytics": true}'
+    os.environ["PORTS"] = '[8000, 8001, 8002]'
+
+    jsonSettings = JsonSettings()
+    jsonSettings
+  exercise:
+    prompt: JSON 환경변수 예제에서 JSON 문자열 안의 옵션 값을 바꾸고 Settings 모델이 파싱한 결과를 확인하세요.
+    starterCode: |-
+      class JsonSettings(BaseSettings):
+          allowedHosts: list[str] = []
+          features: dict[str, bool] = {}
+          ports: list[int] = [8000]
+
+      os.environ["ALLOWEDHOSTS"] = '["localhost", "example.com", "api.example.com"]'
+      os.environ["FEATURES"] = '{"darkMode": true, "beta": false, "analytics": true}'
+      os.environ["PORTS"] = '[8000, 8001, 8002]'
+
+      jsonSettings = JsonSettings()
+      jsonSettings
+    hints:
+    - 바꿀 지점은 JSON 환경변수 문자열과 Settings 필드 타입입니다.
+    - 실행 뒤 파싱된 리스트/딕셔너리 필드가 바꾼 JSON 값을 반영하는지 보세요.
+  check:
+    noError: JSON 환경변수에서 \`jsonSettings\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: JSON 환경변수 실행 뒤 \`jsonSettings\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: singleton
+  title: 싱글톤 패턴
+  structuredPrimary: true
+  subtitle: lru_cache 활용
+  goal: functools.lru_cache로 감싼 getSettings 함수가 여러 호출에서 같은 인스턴스를 돌려주는지 is 비교로 확인합니다.
+  why: 설정 로드는 환경변수/파일 읽기를 동반해 매 호출이 비쌉니다. lru_cache 싱글톤 패턴은 첫 호출 결과를 재사용해 앱 전체에서 일관된 설정 객체를 보장합니다.
+  explanation: |-
+    설정을 매번 새로 로드하면 성능이 낭비됩니다. functools.lru_cache를 사용하면 설정 객체를 캐싱하여 애플리케이션 전체에서 동일한 인스턴스를 재사용합니다. FastAPI 등 프레임워크에서 권장하는 패턴입니다.
+
+    lru_cache는 동일한 인자에 대해 같은 결과를 반환합니다. 설정을 변경하려면 getSettings.cache_clear()로 캐시를 비워야 합니다.
+  snippet: |-
+    from functools import lru_cache
+
+    class AppConfig(BaseSettings):
+        appName: str = "MyApp"
+        version: str = "1.0.0"
+        debug: bool = False
+
+    @lru_cache
+    def getSettings() -> AppConfig:
+        return AppConfig()
+
+    config1 = getSettings()
+    config2 = getSettings()
+    config1 is config2
+  exercise:
+    prompt: 싱글톤 패턴 예제에서 캐시 함수 입력이나 설정 값을 바꾸고 같은 객체가 재사용되는지 확인하세요.
+    starterCode: |-
+      from functools import lru_cache
+
+      class AppConfig(BaseSettings):
+          appName: str = "MyApp"
+          version: str = "1.0.0"
+          debug: bool = False
+
+      @lru_cache
+      def getSettings() -> AppConfig:
+          return AppConfig()
+
+      config1 = getSettings()
+      config2 = getSettings()
+      config1 is config2
+    hints:
+    - 바꿀 지점은 \`getSettings()\`의 캐시 대상과 Settings 생성 흐름입니다.
+    - 실행 뒤 객체 identity와 설정 필드가 캐시 정책을 어떻게 반영하는지 보세요.
+  check:
+    noError: 싱글톤 패턴의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 싱글톤 패턴 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: result
+  title: 마이크로서비스 설정
+  structuredPrimary: true
+  subtitle: 종합 설정 시스템
+  goal: 환경별 분리(dev/prod), 중첩 모델, SecretStr, lru_cache, 검증을 결합한 마이크로서비스 설정 시스템 한 개를 종합 구성합니다.
+  why: 운영 마이크로서비스의 설정 시스템은 강의 단편을 합쳐 만들어진 형태입니다. 한 번 완성된 베이스 모델이 새 서비스의 출발점이 됩니다.
+  explanation: 지금까지 배운 모든 기법을 종합하여 실제 마이크로서비스에서 사용할 수 있는 설정 시스템을 완성합니다. 중첩 설정, 환경별 분리, 비밀 관리, 검증까지 모두
+    포함한 완전한 설정 관리 시스템입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from typing import Literal
+
+    class DbConfig(BaseModel):
+        host: str = "localhost"
+        port: int = Field(default=5432, ge=1, le=65535)
+        name: str = "app_db"
+        poolMin: int = Field(default=2, ge=1)
+        poolMax: int = Field(default=10, ge=1)
+
+    class RedisConfig(BaseModel):
+        host: str = "localhost"
+        port: int = 6379
+        db: int = 0
+
+    class ServiceSettings(BaseSettings):
+        model_config = {"env_prefix": "SVC_"}
+
+        serviceName: str
+        environment: Literal["dev", "staging", "prod"] = "dev"
+        logLevel: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
+        database: DbConfig = DbConfig()
+        redis: RedisConfig = RedisConfig()
+        apiKey: SecretStr | None = None
+        allowedOrigins: list[str] = ["http://localhost:3000"]
+
+    os.environ["SVC_SERVICENAME"] = "user-service"
+    os.environ["SVC_ENVIRONMENT"] = "prod"
+    os.environ["SVC_LOGLEVEL"] = "WARNING"
+    os.environ["SVC_APIKEY"] = "prod-api-key-secret"
+    os.environ["SVC_ALLOWEDORIGINS"] = '["https://example.com", "https://api.example.com"]'
+
+    svcSettings = ServiceSettings()
+    svcSettings
+  exercise:
+    prompt: 마이크로서비스 설정 예제에서 서비스 이름, 포트, 환경 값을 바꾸고 검증된 설정 모델을 확인하세요.
+    starterCode: |-
+      from typing import Literal
+
+      class DbConfig(BaseModel):
+          host: str = "localhost"
+          port: int = Field(default=5432, ge=1, le=65535)
+          name: str = "app_db"
+          poolMin: int = Field(default=2, ge=1)
+          poolMax: int = Field(default=10, ge=1)
+
+      class RedisConfig(BaseModel):
+          host: str = "localhost"
+          port: int = 6379
+          db: int = 0
+
+      class ServiceSettings(BaseSettings):
+          model_config = {"env_prefix": "SVC_"}
+
+          serviceName: str
+          environment: Literal["dev", "staging", "prod"] = "dev"
+          logLevel: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
+          database: DbConfig = DbConfig()
+          redis: RedisConfig = RedisConfig()
+          apiKey: SecretStr | None = None
+          allowedOrigins: list[str] = ["http://localhost:3000"]
+
+      os.environ["SVC_SERVICENAME"] = "user-service"
+      os.environ["SVC_ENVIRONMENT"] = "prod"
+      os.environ["SVC_LOGLEVEL"] = "WARNING"
+      os.environ["SVC_APIKEY"] = "prod-api-key-secret"
+      os.environ["SVC_ALLOWEDORIGINS"] = '["https://example.com", "https://api.example.com"]'
+
+      svcSettings = ServiceSettings()
+      svcSettings
+    hints:
+    - 바꿀 지점은 서비스 설정 필드, Literal 환경값, 포트 범위입니다.
+    - 실행 뒤 Settings 모델의 필드와 검증 오류 여부가 바꾼 입력을 반영하는지 보세요.
+  check:
+    noError: 마이크로서비스 설정의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 마이크로서비스 설정의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 설정 관리 프로젝트
+  goal: BaseSettings, env_prefix, 중첩, SecretStr, JSON 환경변수를 실제 애플리케이션 설정 모델 한 개로 결합해 직접 실습합니다.
+  why: 강의 본문은 한 기법씩 분리해 익혔습니다. 실습에서는 그 기법들을 한 모델로 합쳐 봐야 운영 시나리오에서 어떻게 결합되는지 손에 익습니다.
+  explanation: |-
+    지금까지 배운 BaseSettings, 접두사, 중첩 설정, SecretStr, JSON 환경변수를 활용하여 실제 애플리케이션 설정 시스템을 구축합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    from pydantic_settings import BaseSettings
+    from pydantic import BaseModel, Field, SecretStr
+    from functools import lru_cache
+    import os
+
+    class ServerConfig(BaseModel):
+        host: str = "0.0.0.0"
+        port: int = Field(default=8000, ge=1, le=65535)
+        workers: int = Field(default=4, ge=1)
+        debug: bool = False
+
+    class DatabaseConfig(BaseModel):
+        host: str = "localhost"
+        port: int = 5432
+        name: str = "app_db"
+        poolSize: int = Field(default=5, ge=1, le=20)
+
+    class WebAppSettings(BaseSettings):
+        model_config = {"env_prefix": "WEBAPP_"}
+
+        appName: str = "WebApp"
+        version: str = "1.0.0"
+        server: ServerConfig = ServerConfig()
+        database: DatabaseConfig = DatabaseConfig()
+
+    @lru_cache
+    def getWebAppSettings() -> WebAppSettings:
+        return WebAppSettings()
+
+    webSettings = getWebAppSettings()
+    webSettings
+  exercise:
+    prompt: 실습 예제에서 웹 서비스 설정 값을 바꾸고 BaseSettings가 환경/기본값을 어떻게 조합하는지 확인하세요.
+    starterCode: |-
+      from pydantic_settings import BaseSettings
+      from pydantic import BaseModel, Field, SecretStr
+      from functools import lru_cache
+      import os
+
+      class ServerConfig(BaseModel):
+          host: str = "0.0.0.0"
+          port: int = Field(default=8000, ge=1, le=65535)
+          workers: int = Field(default=4, ge=1)
+          debug: bool = False
+
+      class DatabaseConfig(BaseModel):
+          host: str = "localhost"
+          port: int = 5432
+          name: str = "app_db"
+          poolSize: int = Field(default=5, ge=1, le=20)
+
+      class WebAppSettings(BaseSettings):
+          model_config = {"env_prefix": "WEBAPP_"}
+
+          appName: str = "WebApp"
+          version: str = "1.0.0"
+          server: ServerConfig = ServerConfig()
+          database: DatabaseConfig = DatabaseConfig()
+
+      @lru_cache
+      def getWebAppSettings() -> WebAppSettings:
+          return WebAppSettings()
+
+      webSettings = getWebAppSettings()
+      webSettings
+    hints:
+    - 바꿀 지점은 웹 서비스 Settings 필드, 기본값, 환경변수 입력입니다.
+    - 실행 뒤 생성된 설정 모델과 model_dump 결과가 바꾼 입력을 반영하는지 보세요.
+  check:
+    noError: 실습의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 실습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 주문 입력 계약과 배치 검증'
+  structuredPrimary: true
+  subtitle: 예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주
+  goal: '현업 흐름 검증: 주문 입력 계약과 배치 검증에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고,
+    잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from typing import Literal
+    from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+    class OrderInput(BaseModel):
+        orderId: str
+        customer: str
+        amount: int = Field(gt=0)
+        status: Literal['paid', 'pending', 'cancelled']
+
+        @field_validator('orderId', 'customer')
+        @classmethod
+        def stripRequiredText(cls, value):
+            cleaned = value.strip()
+            if not cleaned:
+                raise ValueError('text field must not be empty')
+            return cleaned
+
+        @computed_field
+        @property
+        def isRevenue(self) -> bool:
+            return self.status == 'paid'
+
+    validOrder = OrderInput.model_validate({
+        'orderId': ' A-100 ',
+        'customer': ' kim ',
+        'amount': '120000',
+        'status': 'paid',
+    })
+
+    assert validOrder.orderId == 'A-100'
+    assert validOrder.amount == 120000
+    assert validOrder.isRevenue is True
+    validOrder.model_dump()
+  exercise:
+    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
+    starterCode: |-
+      from typing import Literal
+      from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+      class OrderInput(BaseModel):
+          orderId: str
+          customer: str
+          amount: int = Field(gt=0)
+          status: Literal['paid', 'pending', 'cancelled']
+
+          @field_validator('orderId', 'customer')
+          @classmethod
+          def stripRequiredText(cls, value):
+              cleaned = value.strip()
+              if not cleaned:
+                  raise ValueError('text field must not be empty')
+              return cleaned
+
+          @computed_field
+          @property
+          def isRevenue(self) -> bool:
+              return self.status == 'paid'
+
+      validOrder = OrderInput.model_validate({
+          'orderId': ' A-100 ',
+          'customer': ' kim ',
+          'amount': '120000',
+          'status': 'paid',
+      })
+
+      assert validOrder.orderId == 'A-100'
+      assert validOrder.amount == 120000
+      assert validOrder.isRevenue is True
+      validOrder.model_dump()
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pydantic_05-settings-precedence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load
+    - workflow_validation
+    title: 설정 source 우선순위와 secret redaction 적용하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: defaults < environment < explicit overrides 순서로 병합하고 비밀값은 출력에서 가린다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 병합 순서를 코드 순서로 명확히 드러내세요.
+    - 실제 resolved 값과 화면·로그용 public 값을 분리하세요.
+    exercise:
+      prompt: resolve_settings(defaults, environment, overrides, secret_keys)를 완성하세요.
+      starterCode: |-
+        def resolve_settings(defaults, environment, overrides, secret_keys):
+            raise NotImplementedError
+      solution: |
+        def resolve_settings(defaults, environment, overrides, secret_keys):
+            resolved = {**defaults, **environment, **overrides}
+            public = {key: ("***" if key in secret_keys and value else value) for key, value in resolved.items()}
+            sources = {}
+            for key in resolved:
+                sources[key] = "override" if key in overrides else "environment" if key in environment else "default"
+            return {"resolved": resolved, "public": public, "sources": sources}
+      hints: *id001
+    check:
+      id: python.pydantic.pydantic_05.settings-precedence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_05.settings-precedence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: resolve_settings
+        cases:
+        - id: applies-precedence-and-redaction
+          arguments:
+          - value:
+              mode: dev
+              timeout: 10
+          - value:
+              timeout: 20
+              apiKey: secret
+          - value:
+              mode: prod
+          - value:
+            - apiKey
+          expectedReturn:
+            resolved:
+              mode: prod
+              timeout: 20
+              apiKey: secret
+            public:
+              mode: prod
+              timeout: 20
+              apiKey: '***'
+            sources:
+              mode: override
+              timeout: environment
+              apiKey: environment
+        - id: keeps-empty-settings
+          arguments:
+          - value: {}
+          - value: {}
+          - value: {}
+          - value: []
+          expectedReturn:
+            resolved: {}
+            public: {}
+            sources: {}
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pydantic_05-profile-settings-selection-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pydantic_05-settings-precedence-mastery
+    title: 새 실행 profile별 설정 조합하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: source 우선순위를 base·profile·runtime override 계층으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - profile이 존재하는지 먼저 확인하세요.
+    - runtime override key 목록을 결과에 남겨 재현성을 높이세요.
+    exercise:
+      prompt: select_profile_settings(base, profiles, profile_name, runtime_override)를 완성하세요.
+      starterCode: |-
+        def select_profile_settings(base, profiles, profile_name, runtime_override):
+            raise NotImplementedError
+      solution: |
+        def select_profile_settings(base, profiles, profile_name, runtime_override):
+            if profile_name not in profiles:
+                raise ValueError("unknown profile")
+            resolved = {**base, **profiles[profile_name], **runtime_override}
+            return {"profile": profile_name, "resolved": resolved, "overrideKeys": sorted(runtime_override)}
+      hints: *id002
+    check:
+      id: python.pydantic.pydantic_05.profile-settings-selection.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_05.profile-settings-selection.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: select_profile_settings
+        cases:
+        - id: selects-profile-and-runtime-override
+          arguments:
+          - value:
+              logLevel: INFO
+              workers: 1
+          - value:
+              dev:
+                logLevel: DEBUG
+              prod:
+                workers: 4
+          - value: prod
+          - value:
+              workers: 8
+          expectedReturn:
+            profile: prod
+            resolved:
+              logLevel: INFO
+              workers: 8
+            overrideKeys:
+            - workers
+        - id: uses-profile-without-overrides
+          arguments:
+          - value:
+              x: 1
+          - value:
+              test:
+                x: 2
+          - value: test
+          - value: {}
+          expectedReturn:
+            profile: test
+            resolved:
+              x: 2
+            overrideKeys: []
+        - id: rejects-unknown-profile
+          arguments:
+          - value: {}
+          - value: {}
+          - value: missing
+          - value: {}
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pydantic_05-settings-source-policy-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pydantic_05-profile-settings-selection-transfer
+    title: 설정 source별 책임과 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: default, environment, runtime override의 사용 목적과 금지 행동을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 비밀값의 존재 여부와 실제 값을 구분해 기록하세요.
+    - 일회성 override를 기본 설정 파일에 몰래 저장하지 마세요.
+    exercise:
+      prompt: choose_settings_policy(situation)를 완성해 purpose, evidence, forbidden을 반환하세요.
+      starterCode: |-
+        def choose_settings_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_settings_policy(situation):
+            table = {'default': {'purpose': 'safe local baseline', 'evidence': 'checked-in non-secret value', 'forbidden': 'embed credential'}, 'environment': {'purpose': 'deployment-specific value', 'evidence': 'presence without value', 'forbidden': 'print secret'}, 'runtime-override': {'purpose': 'explicit one-run change', 'evidence': 'override key list', 'forbidden': 'silently persist'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.pydantic.pydantic_05.settings-source-policy.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_05.settings-source-policy.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_settings_policy
+        cases:
+        - id: recalls-default
+          arguments:
+          - value: default
+          expectedReturn:
+            purpose: safe local baseline
+            evidence: checked-in non-secret value
+            forbidden: embed credential
+        - id: recalls-environment
+          arguments:
+          - value: environment
+          expectedReturn:
+            purpose: deployment-specific value
+            evidence: presence without value
+            forbidden: print secret
+        - id: rejects-unknown-situation
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

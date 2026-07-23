@@ -1,0 +1,581 @@
+var e=`meta:
+  id: deepVision_03
+  title: 임베딩 벡터 추출
+  order: 3
+  category: deepVision
+  difficulty: ⭐⭐⭐
+  badge: 기초
+  packages:
+  - matplotlib
+  - numpy
+  - pillow
+  - scikit-learn
+  - torch
+  - torchvision
+  tags:
+  - torchvision
+  - ResNet
+  - 임베딩
+  - feature
+  - 특징벡터
+  seo:
+    title: 딥러닝 비전 - 임베딩 벡터 추출
+    description: ResNet의 마지막 분류층을 제거하고 사진을 512차원 특징 벡터로 인코딩합니다.
+    keywords:
+    - 임베딩
+    - feature
+    - ResNet
+    - 특징벡터
+    - torchvision
+intro:
+  emoji: 🔢
+  goal: 사전학습 ResNet을 특징 추출기로 변형해 사진을 512차원 벡터로 만듭니다.
+  description: |-
+    분류 결과는 1000개 클래스에 대한 확률이지만, 그 직전 단계의 512차원 벡터는 "사진의 의미를 압축한 표현"입니다. 이 벡터는 유사도 검색·클러스터링·다른 작업에 그대로 활용됩니다. 이 강의는 분류층을 제거해 특징 벡터를 직접 꺼내는 패턴을 익힙니다.
+  direction: 분류층을 제거한 ResNet으로 사진을 벡터로 변환하고, 벡터의 모양과 의미를 확인합니다.
+  benefits:
+  - nn.Sequential과 children을 이용해 모델 일부를 떼어낼 수 있습니다.
+  - 512차원 임베딩의 정규화와 거리 비교를 직접 다룹니다.
+  - 같은 사진과 다른 사진의 임베딩이 어떻게 다른지 거리로 확인합니다.
+  diagram:
+    steps:
+    - label: 1단계. ResNet 구조 살펴보기
+      detail: children() 으로 레이어를 열거합니다.
+    - label: 2단계. 마지막 fc 제거
+      detail: nn.Sequential로 새 모델 만들기.
+    - label: 3단계. 임베딩 추출
+      detail: (1, 512) 형태로 벡터를 얻습니다.
+    - label: 4단계. 정규화
+      detail: L2 정규화로 코사인 비교 준비.
+    - label: 5단계. 거리 비교
+      detail: 같은/다른 사진 거리 비교.
+    runtime:
+    - label: PyTorch 환경
+      detail: torchvision, torch, sklearn, matplotlib.
+    - label: 검증 흐름
+      detail: assert와 시각 비교로 학습 결과가 기대값과 같은지 확인합니다.
+sections:
+- id: inspect_layers
+  title: 1단계. ResNet 구조 살펴보기
+  structuredPrimary: true
+  subtitle: children() 으로 레이어 열거
+  goal: ResNet18 모델의 자식 모듈을 순서대로 출력해 구조를 파악합니다.
+  why: 어디를 잘라야 임베딩이 나오는지 알려면 모델 구조를 직접 봐야 합니다.
+  explanation: |-
+    \`list(model.children())\` 는 ResNet의 최상위 레이어들을 리스트로 반환합니다. 마지막 두 개는 \`AdaptiveAvgPool2d\` 와 \`Linear(in_features=512, out_features=1000)\` 입니다.
+
+    Linear가 분류층이므로 이 직전까지 살리면 512차원 풀링 결과가 됩니다.
+  tips:
+  - ResNet18의 임베딩 차원은 512입니다. ResNet50은 2048입니다.
+  snippet: |-
+    import torch
+    import torchvision
+    from torchvision.models import resnet18, ResNet18_Weights
+    import torch.nn as nn
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    weights = ResNet18_Weights.DEFAULT
+    model = resnet18(weights=weights)
+    model.eval()
+    layers = list(model.children())
+    [type(layer).__name__ for layer in layers]
+  exercise:
+    prompt: 마지막 두 레이어의 타입을 정확히 출력하세요.
+    starterCode: |-
+      lastTwo = [type(layer).__name__ for layer in layers[___:]]
+      lastTwo
+    hints:
+    - "-2 가 마지막 두 개 슬라이스 시작입니다."
+    - 결과는 AdaptiveAvgPool2d와 Linear입니다.
+  check:
+    noError: children 추출이 오류 없이 끝나야 합니다.
+    resultCheck: layers의 길이가 10 정도여야 합니다.
+- id: drop_fc
+  title: 2단계. 마지막 fc 제거
+  structuredPrimary: true
+  subtitle: nn.Sequential로 새 모델
+  goal: 분류층을 빼고 임베딩 추출기 모델을 만듭니다.
+  why: 임베딩을 얻으려면 fc 직전까지의 결과를 사용해야 합니다.
+  explanation: |-
+    \`nn.Sequential(*layers[:-1])\` 는 마지막 fc만 빠진 새 모듈입니다. 출력은 (1, 512, 1, 1) 모양으로, 마지막 두 축은 풀링으로 1이 되어 있습니다.
+
+    flatten 또는 squeeze로 (1, 512) 모양으로 만들면 임베딩이 됩니다.
+  tips:
+  - layers[:-1] 는 마지막 한 개를 제외한 리스트입니다. 분류층(Linear)만 빠지고 풀링은 남습니다.
+  snippet: |-
+    encoder = nn.Sequential(*layers[:-1])
+    encoder.eval()
+    type(encoder).__name__, sum(1 for _ in encoder.children())
+  exercise:
+    prompt: 새 encoder의 마지막 자식 레이어 타입을 확인하세요.
+    starterCode: |-
+      lastChild = list(encoder.children())[___]
+      type(lastChild).__name__
+    hints:
+    - 마지막은 -1입니다.
+    - 결과는 AdaptiveAvgPool2d 입니다.
+  check:
+    noError: Sequential 생성이 오류 없이 끝나야 합니다.
+    resultCheck: type(encoder).__name__이 'Sequential' 이어야 합니다.
+- id: extract_embedding
+  title: 3단계. 임베딩 추출
+  structuredPrimary: true
+  subtitle: (1, 512) 형태
+  goal: 단일 이미지를 encoder에 통과시켜 (1, 512) 임베딩을 얻습니다.
+  why: 임베딩이 한 줄 호출로 얻어진다는 점을 직접 확인해야 합니다.
+  explanation: |-
+    같은 전처리 (weights.transforms) 로 입력을 만든 뒤 encoder를 호출합니다. 결과는 (1, 512, 1, 1) 이므로 \`.flatten(1)\` 으로 (1, 512) 로 펴면 됩니다.
+
+    \`weights.transforms()\` 전처리는 PIL Image나 torch Tensor만 받으므로, \`load_sample_image\` 가 준 numpy ndarray는 \`Image.fromarray(...)\` 로 감싸 전달합니다.
+
+    numpy로 변환하면 \`.detach().numpy()\` 를 거칩니다.
+  tips:
+  - flatten(1) 은 인덱스 1 차원 이후를 모두 한 차원으로 합칩니다. squeeze 보다 안전합니다.
+  - weights.transforms() 전처리는 ndarray를 거부합니다. Image.fromarray로 PIL Image로 바꿔 넣으세요.
+  snippet: |-
+    from PIL import Image
+
+    preprocess = weights.transforms()
+    china = load_sample_image('china.jpg')
+    batch = preprocess(Image.fromarray(china)).unsqueeze(0)
+    with torch.inference_mode():
+        feat = encoder(batch).flatten(1)
+    feat.shape, feat.dtype
+  exercise:
+    prompt: flower 이미지의 임베딩 featFlower 를 같은 방식으로 얻으세요.
+    starterCode: |-
+      flower = load_sample_image('flower.jpg')
+      batchFlower = preprocess(Image.fromarray(flower)).unsqueeze(0)
+      with torch.inference_mode():
+          featFlower = encoder(batchFlower).flatten(___)
+      featFlower.shape
+    hints:
+    - 빈칸은 정수 1입니다.
+    - 결과 shape은 (1, 512) 입니다.
+  check:
+    noError: 임베딩 추출이 오류 없이 끝나야 합니다.
+    resultCheck: feat.shape이 torch.Size([1, 512]) 이어야 합니다.
+- id: l2_normalize
+  title: 4단계. L2 정규화
+  structuredPrimary: true
+  subtitle: 코사인 비교 준비
+  goal: 임베딩을 단위 벡터로 만들어 코사인 거리 비교를 준비합니다.
+  why: 정규화한 두 벡터의 내적이 곧 코사인 유사도이므로 비교가 단순해집니다.
+  explanation: |-
+    \`torch.nn.functional.normalize(feat, dim=1)\` 가 L2 정규화의 표준 호출입니다. 결과 벡터의 norm은 정확히 1이 됩니다.
+
+    이렇게 정규화한 벡터는 코사인 유사도 = 내적이라는 단순한 관계를 가집니다.
+  tips:
+  - L2 정규화는 큰 활성과 작은 활성의 절대 크기 차이를 없애 비교를 일관되게 만듭니다.
+  snippet: |-
+    import torch.nn.functional as F
+
+    featNorm = F.normalize(feat, dim=1)
+    float(featNorm.norm())
+  exercise:
+    prompt: flower 임베딩을 정규화한 featFlowerNorm을 만들고 norm을 확인하세요.
+    starterCode: |-
+      featFlowerNorm = F.normalize(featFlower, dim=___)
+      float(featFlowerNorm.norm())
+    hints:
+    - dim=1로 임베딩 축을 따라 정규화합니다.
+    - 정규화 후 norm은 1.0 입니다.
+  check:
+    noError: 정규화 호출이 오류 없이 끝나야 합니다.
+    resultCheck: featNorm의 norm이 0.99 < norm < 1.01 사이여야 합니다.
+- id: distance_compare
+  title: 5단계. 거리 비교
+  structuredPrimary: true
+  subtitle: 같은/다른 사진 거리
+  goal: china와 flower 임베딩의 코사인 유사도와, 자기 자신과의 유사도를 비교합니다.
+  why: 같은 사진은 1에 가까운 유사도, 다른 사진은 더 낮은 값이 되어야 합니다.
+  explanation: |-
+    정규화된 두 벡터의 내적은 코사인 유사도입니다. 같은 벡터는 1, 완전히 직교하면 0이 됩니다.
+
+    같은 사진이라도 약간의 노이즈(전처리, 회전 등)가 있으면 1보다 살짝 작아질 수 있습니다.
+  tips:
+  - 코사인 유사도가 모든 사진 쌍에서 0.99 이상이면 모델이 사진을 충분히 구분하지 못한다는 신호일 수 있습니다.
+  snippet: |-
+    flower = load_sample_image('flower.jpg')
+    batchFlower = preprocess(Image.fromarray(flower)).unsqueeze(0)
+    with torch.inference_mode():
+        featFlower = encoder(batchFlower).flatten(1)
+    featFlowerNorm = F.normalize(featFlower, dim=1)
+
+    sameSim = float((featNorm * featNorm).sum())
+    diffSim = float((featNorm * featFlowerNorm).sum())
+    sameSim, diffSim
+  exercise:
+    prompt: china와 china를 좌우 반전한 사진의 임베딩을 만들고 코사인 유사도를 비교하세요.
+    starterCode: |-
+      mirrored = china[:, ::-1, :].copy()
+      batchMirror = preprocess(Image.fromarray(mirrored)).unsqueeze(0)
+      with torch.inference_mode():
+          featMirror = encoder(batchMirror).flatten(1)
+      featMirrorNorm = F.normalize(featMirror, dim=1)
+      mirrorSim = float((featNorm * featMirrorNorm).sum())
+      mirrorSim, ___
+    hints:
+    - 빈칸은 sameSim 같은 비교 변수입니다.
+    - mirrored는 ndarray이므로 Image.fromarray로 감싸 전처리에 넣습니다.
+    - 좌우 반전 사진은 유사도가 1보다 살짝 작아야 정상입니다.
+  check:
+    noError: 코사인 계산이 오류 없이 끝나야 합니다.
+    resultCheck: sameSim이 0.99 이상이어야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 임베딩 통계 분석
+  goal: 임베딩의 분포를 히스토그램으로 그리고 두 사진의 차이를 막대로 비교합니다.
+  why: 임베딩의 어떤 차원이 두 사진을 구분하는지 시각적으로 봐야 직관이 생깁니다.
+  explanation: |-
+    각 미션은 import문부터 시작하지만, 위 예제를 실행했다면 import는 생략해도 됩니다.
+  tips:
+  - 임베딩 차원의 값들 자체에는 직접적인 의미가 없지만, 분포의 모양과 차이는 분석에 의미가 있습니다.
+  snippet: |-
+    chinaArr = featNorm.detach().numpy().ravel()
+    flowerArr = featFlowerNorm.detach().numpy().ravel()
+    diff = np.abs(chinaArr - flowerArr)
+    diff.shape, diff.max(), diff.mean()
+  exercise:
+    prompt: "미션1: china와 flower 임베딩의 히스토그램을 1x2 그리드로 그리세요. 미션2: 두 임베딩의 차이가 큰 상위 10개 차원의 인덱스를 출력하세요."
+    starterCode: |-
+      fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+      axes[0].hist(chinaArr, bins=40, color='steelblue')
+      axes[0].set_title('china embedding')
+      axes[1].hist(flowerArr, bins=40, color='orange')
+      axes[1].set_title('flower embedding')
+      fig
+    hints:
+    - "차이 상위 10개 인덱스는 np.argsort(diff)[-10:] 한 줄입니다."
+    - 히스토그램은 두 분포가 비슷할 수도 있고 다를 수도 있습니다.
+  check:
+    noError: 임베딩 분석이 오류 없이 끝나야 합니다.
+    resultCheck: chinaArr와 flowerArr의 길이가 512여야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: deepVision_03-embedding_vector-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inspect_layers
+    - practice
+    title: 임베딩 벡터 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: dimension·normalization·dtype·model identity를 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_embedding_vector_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_embedding_vector_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_embedding_vector_contract(value):
+            required = ['dimension', 'normalization', 'dtype', 'modelHash']
+            rules = [{'id': 'dimension', 'field': 'dimension', 'kind': 'range', 'min': 1, 'max': 100000}, {'id': 'normalization', 'field': 'normalization', 'kind': 'enum', 'values': ['l2', 'none']}, {'id': 'dtype', 'field': 'dtype', 'kind': 'enum', 'values': ['float32', 'float16']}, {'id': 'model', 'field': 'modelHash', 'kind': 'nonempty'}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'embedding_vector', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.deep-vision.deepVision_03.embedding_vector-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.deep-vision.deepVision_03.embedding_vector-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_embedding_vector_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              dimension: 2048
+              normalization: l2
+              dtype: float32
+              modelHash: embed-a
+          expectedReturn:
+            accepted: true
+            topic: embedding_vector
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              normalization: l2
+              dtype: float32
+              modelHash: embed-a
+          expectedReturn:
+            accepted: false
+            topic: embedding_vector
+            missing:
+            - dimension
+            violations:
+            - dimension
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              dimension: 0
+              normalization: magic
+              dtype: int64
+              modelHash: ''
+          expectedReturn:
+            accepted: false
+            topic: embedding_vector
+            missing: []
+            violations:
+            - dimension
+            - dtype
+            - model
+            - normalization
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: deepVision_03-embedding_vector-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - deepVision_03-embedding_vector-contract-audit-mastery
+    title: 임베딩 벡터 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_embedding_vector_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_embedding_vector_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_embedding_vector_result(expected, observed):
+            identity = ['sourceHash', 'modelHash']
+            metrics = {'vectorNorm': 0.001}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'embedding_vector', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.deep-vision.deepVision_03.embedding_vector-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.deep-vision.deepVision_03.embedding_vector-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_embedding_vector_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              sourceHash: im1
+              modelHash: embed-a
+              vectorNorm: 1.0
+          - value:
+              sourceHash: im1
+              modelHash: embed-a
+              vectorNorm: 1.0005
+          expectedReturn:
+            passed: true
+            topic: embedding_vector
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              sourceHash: im1
+              modelHash: embed-a
+              vectorNorm: 1.0
+          - value:
+              sourceHash: im2
+              modelHash: embed-b
+              vectorNorm: 3.0
+          expectedReturn:
+            passed: false
+            topic: embedding_vector
+            missing: []
+            identityMismatch:
+            - modelHash
+            - sourceHash
+            metricDrift:
+            - vectorNorm
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              sourceHash: im1
+              modelHash: embed-a
+              vectorNorm: 1.0
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: embedding_vector
+            missing:
+            - modelHash
+            - sourceHash
+            - vectorNorm
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: deepVision_03-embedding_vector-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - deepVision_03-embedding_vector-result-reconciliation-transfer
+    title: 임베딩 벡터 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_embedding_vector_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_embedding_vector_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_embedding_vector_evidence(stage):
+            stages = {'source': {'action': 'validate embedding source and model', 'evidence': 'source model transform identity', 'risk': 'model-input mismatch'}, 'inference': {'action': 'run bounded embedding inference', 'evidence': 'inference and normalization trace', 'risk': 'nondeterministic or unsafe inference'}, 'result': {'action': 'reconcile embedding output', 'evidence': 'dimension norm finite-value audit', 'risk': 'confident wrong prediction'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.deep-vision.deepVision_03.embedding_vector-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.deep-vision.deepVision_03.embedding_vector-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_embedding_vector_evidence
+        cases:
+        - id: recalls-source
+          arguments:
+          - value: source
+          expectedReturn:
+            action: validate embedding source and model
+            evidence: source model transform identity
+            risk: model-input mismatch
+        - id: recalls-inference
+          arguments:
+          - value: inference
+          expectedReturn:
+            action: run bounded embedding inference
+            evidence: inference and normalization trace
+            risk: nondeterministic or unsafe inference
+        - id: recalls-result
+          arguments:
+          - value: result
+          expectedReturn:
+            action: reconcile embedding output
+            evidence: dimension norm finite-value audit
+            risk: confident wrong prediction
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

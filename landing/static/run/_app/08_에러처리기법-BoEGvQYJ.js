@@ -1,0 +1,1043 @@
+var e=`meta:
+  packages:
+  - pydantic
+  id: pydantic_08
+  title: 에러처리기법
+  order: 8
+  category: pydantic
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  tags:
+  - pydantic
+  - ValidationError
+  - 에러처리
+  - 커스텀에러
+  - 로깅
+  seo:
+    title: Pydantic 에러 처리 - ValidationError 다루기
+    description: Pydantic의 ValidationError를 효과적으로 처리합니다. 에러 분석, 커스텀 메시지, 로깅을 배웁니다.
+    keywords:
+    - pydantic
+    - ValidationError
+    - 에러처리
+    - 검증
+intro:
+  emoji: 🚨
+  goal: ValidationError를 활용한 REST API 에러 응답 시스템을 구축합니다.
+  description: API 서버에서 잘못된 데이터가 들어오면 클라이언트에게 정확하고 친절한 에러 메시지를 반환해야 합니다. Pydantic의 ValidationError는 어떤
+    필드에서 어떤 문제가 발생했는지 상세한 정보를 제공합니다. 이 프로젝트에서는 이 정보를 분석하고, 사용자 친화적인 응답을 생성하며, 로깅과 모니터링에 활용합니다.
+  direction: 에러처리기법에서 입력 스키마를 정의하고 검증된 데이터만 처리 흐름에 넘김합니다.
+  benefits:
+  - 외부 입력 확인 후 스키마 검증에 맞는 코드 입력을 고릅니다.
+  - 에러처리기법 결과를 성공 모델과 오류 메시지 기준으로 즉시 점검합니다.
+  - 완료한 코드를 API/자동화 입력 계약에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 라이브러리 로드 입력 확인
+      detail: 입력 기준(외부 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 기본 에러 구조 처리 실행
+      detail: 스키마 검증 코드를 실행해 중간 결과를 확인합니다.
+    - label: 에러 상세 분석 결과 검증
+      detail: 성공 모델과 오류 메시지 기준으로 실행 결과를 비교합니다.
+    - label: 에러처리기법 재사용
+      detail: 완성 코드를 API/자동화 입력 계약에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 데이터 계약 환경
+      detail: pydantic 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 에러처리기법 실행
+      detail: 셀을 실행해 성공 모델과 오류 메시지와 예외 상태를 확인합니다.
+    - label: 에러처리기법 완료
+      detail: 검증된 코드를 API/자동화 입력 계약로 남깁니다.
+sections:
+- id: load
+  title: 라이브러리 로드
+  structuredPrimary: true
+  subtitle: Pydantic import 확인
+  goal: 라이브러리 로드에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: ValidationError는 검증 실패 시 발생하는 예외입니다. errors() 메서드로 각 에러의 상세 정보를, error_count()로 에러 개수를,
+    json()으로 JSON 형식의 에러 정보를 얻을 수 있습니다. 이 정보들을 조합하여 API 응답이나 로그를 구성합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import pydantic
+    from pydantic import BaseModel, Field, ValidationError, field_validator
+  exercise:
+    prompt: 라이브러리 로드 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: |-
+      import pydantic
+      from pydantic import BaseModel, Field, ValidationError, field_validator
+    hints:
+    - 바꿀 지점은 외부 입력을 만드는 첫 줄과 스키마 검증 줄에서 찾으세요.
+    - 실행 뒤 성공 모델과 오류 메시지 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 라이브러리 로드의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 라이브러리 로드 실행 결과가 성공 모델과 오류 메시지 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: basic
+  title: 기본 에러 구조
+  structuredPrimary: true
+  subtitle: ValidationError 분석
+  goal: 기본 에러 구조에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    ValidationError가 발생하면 errors() 메서드로 각 에러의 상세 정보를 리스트로 얻습니다. 각 항목은 loc(위치), msg(메시지), type(에러 타입), input(입력값)을 포함합니다. error_count()는 발생한 에러의 총 개수를 반환합니다.
+
+    에러 개수는 error_count()로, 에러 목록은 errors()로, 모델 이름은 title 속성으로 확인합니다.
+  snippet: |-
+    class User(BaseModel):
+        name: str = Field(min_length=2)
+        age: int = Field(ge=0, le=150)
+        email: str
+
+    try:
+        invalidUser = User(name="A", age=-5, email="invalid")
+    except ValidationError as e:
+        validationErr = e
+        validationErr
+  exercise:
+    prompt: 기본 에러 구조 예제에서 \`invalidUser\`, \`validationErr\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      class User(BaseModel):
+          name: str = Field(min_length=2)
+          age: int = Field(ge=0, le=150)
+          email: str
+
+      try:
+          invalidUser = User(name="A", age=-5, email="invalid")
+      except ValidationError as e:
+          validationErr = e
+          validationErr
+    hints:
+    - 바꿀 지점은 \`invalidUser = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`invalidUser\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 기본 에러 구조에서 \`invalidUser\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 기본 에러 구조 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: structure
+  title: 에러 상세 분석
+  structuredPrimary: true
+  subtitle: errors() 메서드
+  goal: 에러 상세 분석에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: errors() 리스트의 각 항목을 분석하면 에러 위치, 메시지, 타입, 입력값을 알 수 있습니다. loc은 튜플로 필드 위치를 나타내고, 중첩 모델이나 리스트에서는
+    경로 전체가 포함됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    errorList = validationErr.errors()
+    errorList
+  exercise:
+    prompt: 에러 상세 분석 예제에서 \`errorList\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      errorList = validationErr.errors()
+      errorList
+    hints:
+    - 바꿀 지점은 \`errorList = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`errorList\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 에러 상세 분석에서 \`errorList\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 에러 상세 분석 실행 뒤 \`errorList\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: nested
+  title: 중첩 모델 에러
+  structuredPrimary: true
+  subtitle: 깊은 위치 추적
+  goal: 중첩 모델 에러에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: 중첩 모델에서 에러가 발생하면 loc이 경로 전체를 포함합니다. 예를 들어 ('address', 'zipCode')는 address 필드 내의 zipCode에서
+    에러가 발생했음을 의미합니다. 리스트의 경우 ('items', 1, 'price')처럼 인덱스도 포함됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class Address(BaseModel):
+        city: str = Field(min_length=2)
+        zipCode: str = Field(pattern=r'^\\d{5}$')
+
+    class Person(BaseModel):
+        name: str
+        address: Address
+
+    try:
+        badPerson = Person(name="Alice", address={"city": "S", "zipCode": "abc"})
+    except ValidationError as e:
+        nestedErr = e.errors()
+        nestedErr
+  exercise:
+    prompt: 중첩 모델 에러 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      class Address(BaseModel):
+          city: str = Field(min_length=2)
+          zipCode: str = Field(pattern=r'^\\d{5}$')
+
+      class Person(BaseModel):
+          name: str
+          address: Address
+
+      try:
+          badPerson = Person(name="Alice", address={"city": "S", "zipCode": "abc"})
+      except ValidationError as e:
+          nestedErr = e.errors()
+          nestedErr
+    hints:
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 중첩 모델 에러의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 중첩 모델 에러의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: json
+  title: JSON 에러 응답
+  structuredPrimary: true
+  subtitle: API 응답 생성
+  goal: JSON 에러 응답에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    json() 메서드는 에러 정보를 JSON 문자열로 반환합니다. 하지만 직접 API 응답 형식을 정의하면 더 유연하게 에러를 표현할 수 있습니다. 필드명을 점 표기법으로 변환하거나, 에러 메시지를 한글화하는 등의 가공이 가능합니다.
+
+    loc은 튜플이므로 '.'.join()으로 'address.zipCode' 같은 점 표기법 경로로 변환합니다.
+  snippet: |-
+    errorJson = validationErr.json()
+    errorJson
+  exercise:
+    prompt: JSON 에러 응답 예제에서 \`errorJson\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      errorJson = validationErr.json()
+      errorJson
+    hints:
+    - 바꿀 지점은 \`errorJson = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`errorJson\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: JSON 에러 응답에서 \`errorJson\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: JSON 에러 응답 실행 뒤 \`errorJson\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: custom
+  title: 커스텀 에러 메시지
+  structuredPrimary: true
+  subtitle: field_validator 활용
+  goal: 커스텀 에러 메시지에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: field_validator에서 ValueError를 발생시키면 커스텀 에러 메시지를 정의할 수 있습니다. 비즈니스 규칙에 맞는 친절한 한글 메시지를 제공하면
+    클라이언트가 문제를 쉽게 이해하고 수정할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class Registration(BaseModel):
+        username: str
+        password: str
+        age: int
+
+        @field_validator('username')
+        @classmethod
+        def validateUsername(cls, v):
+            if len(v) < 4:
+                raise ValueError("사용자명은 4자 이상이어야 합니다")
+            if not v.isalnum():
+                raise ValueError("사용자명은 영문과 숫자만 허용됩니다")
+            return v
+
+        @field_validator('password')
+        @classmethod
+        def validatePassword(cls, v):
+            if len(v) < 8:
+                raise ValueError("비밀번호는 8자 이상이어야 합니다")
+            if not any(c.isdigit() for c in v):
+                raise ValueError("비밀번호에 숫자가 포함되어야 합니다")
+            return v
+
+    try:
+        badReg = Registration(username="ab@", password="short", age=25)
+    except ValidationError as e:
+        customErr = e.errors()
+        customErr
+  exercise:
+    prompt: 커스텀 에러 메시지 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      class Registration(BaseModel):
+          username: str
+          password: str
+          age: int
+
+          @field_validator('username')
+          @classmethod
+          def validateUsername(cls, v):
+              if len(v) < 4:
+                  raise ValueError("사용자명은 4자 이상이어야 합니다")
+              if not v.isalnum():
+                  raise ValueError("사용자명은 영문과 숫자만 허용됩니다")
+              return v
+
+          @field_validator('password')
+          @classmethod
+          def validatePassword(cls, v):
+              if len(v) < 8:
+                  raise ValueError("비밀번호는 8자 이상이어야 합니다")
+              if not any(c.isdigit() for c in v):
+                  raise ValueError("비밀번호에 숫자가 포함되어야 합니다")
+              return v
+
+      try:
+          badReg = Registration(username="ab@", password="short", age=25)
+      except ValidationError as e:
+          customErr = e.errors()
+          customErr
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 커스텀 에러 메시지의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 커스텀 에러 메시지 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: safe
+  title: 안전한 검증
+  structuredPrimary: true
+  subtitle: 예외 없는 검증
+  goal: 안전한 검증에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: try-except를 매번 쓰는 대신 결과 객체를 반환하는 래퍼 함수를 만들면 코드가 깔끔해집니다. 성공 시 데이터를, 실패 시 에러 목록을 포함하는 결과
+    객체로 일관된 처리가 가능합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from typing import TypeVar, Generic
+
+    T = TypeVar('T', bound=BaseModel)
+
+    class ValidationResult(Generic[T]):
+        def __init__(self, success: bool, data: T | None = None, errors: list = None):
+            self.success = success
+            self.data = data
+            self.errors = errors or []
+
+    def safeValidate(modelClass, data: dict) -> ValidationResult:
+        try:
+            instance = modelClass.model_validate(data)
+            return ValidationResult(success=True, data=instance)
+        except ValidationError as e:
+            return ValidationResult(success=False, errors=e.errors())
+
+    result1 = safeValidate(User, {"name": "Alice", "age": 25, "email": "a@b.com"})
+    result2 = safeValidate(User, {"name": "A", "age": -5, "email": "bad"})
+    result1.success, result2.success
+  exercise:
+    prompt: 안전한 검증 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      from typing import TypeVar, Generic
+
+      T = TypeVar('T', bound=BaseModel)
+
+      class ValidationResult(Generic[T]):
+          def __init__(self, success: bool, data: T | None = None, errors: list = None):
+              self.success = success
+              self.data = data
+              self.errors = errors or []
+
+      def safeValidate(modelClass, data: dict) -> ValidationResult:
+          try:
+              instance = modelClass.model_validate(data)
+              return ValidationResult(success=True, data=instance)
+          except ValidationError as e:
+              return ValidationResult(success=False, errors=e.errors())
+
+      result1 = safeValidate(User, {"name": "Alice", "age": 25, "email": "a@b.com"})
+      result2 = safeValidate(User, {"name": "A", "age": -5, "email": "bad"})
+      result1.success, result2.success
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 안전한 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 안전한 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: batch
+  title: 배치 검증
+  structuredPrimary: true
+  subtitle: 여러 데이터 검증
+  goal: 배치 검증에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: CSV나 API 배치 요청처럼 여러 레코드를 한번에 검증해야 할 때가 있습니다. 각 레코드의 성공/실패를 추적하고, 실패한 레코드에 대한 상세 정보를 수집하면
+    배치 작업의 품질 보고서를 생성할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class Product(BaseModel):
+        productId: str
+        name: str = Field(min_length=2)
+        price: float = Field(gt=0)
+
+    dataList = [
+        {"productId": "P1", "name": "Laptop", "price": 1000},
+        {"productId": "P2", "name": "A", "price": 50},
+        {"productId": "P3", "name": "Mouse", "price": -10},
+        {"productId": "P4", "name": "Keyboard", "price": 100}
+    ]
+
+    def batchValidate(modelClass, dataItems):
+        results = {"valid": [], "invalid": []}
+        for idx, item in enumerate(dataItems):
+            try:
+                validated = modelClass.model_validate(item)
+                results["valid"].append({"index": idx, "data": validated.model_dump()})
+            except ValidationError as e:
+                results["invalid"].append({"index": idx, "input": item, "errors": e.errors()})
+        return results
+
+    batchResults = batchValidate(Product, dataList)
+    batchResults
+  exercise:
+    prompt: 배치 검증 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      class Product(BaseModel):
+          productId: str
+          name: str = Field(min_length=2)
+          price: float = Field(gt=0)
+
+      dataList = [
+          {"productId": "P1", "name": "Laptop", "price": 1000},
+          {"productId": "P2", "name": "A", "price": 50},
+          {"productId": "P3", "name": "Mouse", "price": -10},
+          {"productId": "P4", "name": "Keyboard", "price": 100}
+      ]
+
+      def batchValidate(modelClass, dataItems):
+          results = {"valid": [], "invalid": []}
+          for idx, item in enumerate(dataItems):
+              try:
+                  validated = modelClass.model_validate(item)
+                  results["valid"].append({"index": idx, "data": validated.model_dump()})
+              except ValidationError as e:
+                  results["invalid"].append({"index": idx, "input": item, "errors": e.errors()})
+          return results
+
+      batchResults = batchValidate(Product, dataList)
+      batchResults
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 배치 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 배치 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: logging
+  title: 에러 로깅
+  structuredPrimary: true
+  subtitle: 모니터링 통합
+  goal: 에러 로깅에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: 프로덕션 환경에서는 검증 에러를 로깅하여 데이터 품질 문제를 추적해야 합니다. 어떤 필드에서 어떤 에러가 자주 발생하는지 분석하면 API 문서 개선이나 클라이언트
+    버그 발견에 도움이 됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from datetime import datetime
+
+    class ValidationLogger:
+        def __init__(self):
+            self.logs = []
+
+        def logError(self, modelName: str, error: ValidationError, inputData: dict):
+            logEntry = {
+                "timestamp": datetime.now().isoformat(),
+                "model": modelName,
+                "errorCount": error.error_count(),
+                "errors": [
+                    {"field": ".".join(str(l) for l in e["loc"]), "type": e["type"]}
+                    for e in error.errors()
+                ],
+                "inputSample": str(inputData)[:100]
+            }
+            self.logs.append(logEntry)
+            return logEntry
+
+        def getStats(self):
+            if not self.logs:
+                return {"totalErrors": 0}
+            errorTypes = {}
+            for log in self.logs:
+                for err in log["errors"]:
+                    errorTypes[err["type"]] = errorTypes.get(err["type"], 0) + 1
+            return {
+                "totalLogs": len(self.logs),
+                "errorTypeDistribution": errorTypes
+            }
+
+    logger = ValidationLogger()
+
+    testData = {"name": "A", "age": -5, "email": "bad"}
+    try:
+        User.model_validate(testData)
+    except ValidationError as e:
+        logEntry = logger.logError("User", e, testData)
+        logEntry
+  exercise:
+    prompt: 에러 로깅 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      from datetime import datetime
+
+      class ValidationLogger:
+          def __init__(self):
+              self.logs = []
+
+          def logError(self, modelName: str, error: ValidationError, inputData: dict):
+              logEntry = {
+                  "timestamp": datetime.now().isoformat(),
+                  "model": modelName,
+                  "errorCount": error.error_count(),
+                  "errors": [
+                      {"field": ".".join(str(l) for l in e["loc"]), "type": e["type"]}
+                      for e in error.errors()
+                  ],
+                  "inputSample": str(inputData)[:100]
+              }
+              self.logs.append(logEntry)
+              return logEntry
+
+          def getStats(self):
+              if not self.logs:
+                  return {"totalErrors": 0}
+              errorTypes = {}
+              for log in self.logs:
+                  for err in log["errors"]:
+                      errorTypes[err["type"]] = errorTypes.get(err["type"], 0) + 1
+              return {
+                  "totalLogs": len(self.logs),
+                  "errorTypeDistribution": errorTypes
+              }
+
+      logger = ValidationLogger()
+
+      testData = {"name": "A", "age": -5, "email": "bad"}
+      try:
+          User.model_validate(testData)
+      except ValidationError as e:
+          logEntry = logger.logError("User", e, testData)
+          logEntry
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 에러 로깅의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 에러 로깅 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: result
+  title: API 에러 응답 시스템
+  structuredPrimary: true
+  subtitle: 종합 에러 처리
+  goal: API 에러 응답 시스템에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: 지금까지 배운 모든 기법을 종합하여 실제 REST API에서 사용할 수 있는 에러 응답 시스템을 완성합니다. 일관된 형식, 상세한 정보, 친절한 메시지를 제공하는
+    완전한 에러 처리 체계입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class ErrorDetail(BaseModel):
+        field: str
+        message: str
+        code: str
+
+    class ApiErrorResponse(BaseModel):
+        success: bool = False
+        errorCode: str
+        message: str
+        details: list[ErrorDetail] = []
+
+    def createApiError(error: ValidationError, code: str = "VALIDATION_ERROR") -> ApiErrorResponse:
+        details = []
+        for err in error.errors():
+            details.append(ErrorDetail(
+                field=".".join(str(loc) for loc in err["loc"]),
+                message=err["msg"],
+                code=err["type"]
+            ))
+        return ApiErrorResponse(
+            errorCode=code,
+            message=f"{error.error_count()}개의 검증 오류가 발생했습니다",
+            details=details
+        )
+
+    try:
+        badUser = User(name="A", age=-5, email="bad")
+    except ValidationError as e:
+        apiErrorResp = createApiError(e)
+        apiErrorResp.model_dump_json(indent=2)
+  exercise:
+    prompt: API 에러 응답 시스템 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      class ErrorDetail(BaseModel):
+          field: str
+          message: str
+          code: str
+
+      class ApiErrorResponse(BaseModel):
+          success: bool = False
+          errorCode: str
+          message: str
+          details: list[ErrorDetail] = []
+
+      def createApiError(error: ValidationError, code: str = "VALIDATION_ERROR") -> ApiErrorResponse:
+          details = []
+          for err in error.errors():
+              details.append(ErrorDetail(
+                  field=".".join(str(loc) for loc in err["loc"]),
+                  message=err["msg"],
+                  code=err["type"]
+              ))
+          return ApiErrorResponse(
+              errorCode=code,
+              message=f"{error.error_count()}개의 검증 오류가 발생했습니다",
+              details=details
+          )
+
+      try:
+          badUser = User(name="A", age=-5, email="bad")
+      except ValidationError as e:
+          apiErrorResp = createApiError(e)
+          apiErrorResp.model_dump_json(indent=2)
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: API 에러 응답 시스템의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: API 에러 응답 시스템 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 에러 처리 프로젝트
+  goal: 실습에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    지금까지 배운 ValidationError 분석, 커스텀 메시지, 안전한 검증, 배치 처리, 로깅을 활용하여 완전한 에러 처리 시스템을 구축합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    from pydantic import BaseModel, Field, field_validator, ValidationError
+    from typing import Optional
+
+    class FormValidator:
+        errorMessages = {
+            "string_too_short": "최소 {min_length}자 이상 입력해주세요",
+            "string_too_long": "최대 {max_length}자까지 입력 가능합니다",
+            "greater_than": "0보다 큰 값을 입력해주세요",
+            "string_pattern_mismatch": "올바른 형식이 아닙니다"
+        }
+
+        @classmethod
+        def localizeError(cls, error: dict) -> str:
+            errType = error.get("type", "")
+            ctx = error.get("ctx", {})
+            template = cls.errorMessages.get(errType, error.get("msg", "검증 오류"))
+            try:
+                return template.format(**ctx)
+            except KeyError:
+                return template
+
+    class ContactForm(BaseModel):
+        name: str = Field(min_length=2, max_length=50)
+        email: str = Field(pattern=r'^[\\w.-]+@[\\w.-]+\\.\\w+$')
+        phone: str = Field(pattern=r'^\\d{3}-\\d{4}-\\d{4}$')
+        message: str = Field(min_length=10, max_length=1000)
+
+    formData = {"name": "A", "email": "bad", "phone": "123", "message": "short"}
+
+    try:
+        ContactForm.model_validate(formData)
+    except ValidationError as e:
+        localizedErrors = []
+        for err in e.errors():
+            localizedErrors.append({
+                "field": err["loc"][0],
+                "message": FormValidator.localizeError(err)
+            })
+        localizedErrors
+  exercise:
+    prompt: 실습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      from pydantic import BaseModel, Field, field_validator, ValidationError
+      from typing import Optional
+
+      class FormValidator:
+          errorMessages = {
+              "string_too_short": "최소 {min_length}자 이상 입력해주세요",
+              "string_too_long": "최대 {max_length}자까지 입력 가능합니다",
+              "greater_than": "0보다 큰 값을 입력해주세요",
+              "string_pattern_mismatch": "올바른 형식이 아닙니다"
+          }
+
+          @classmethod
+          def localizeError(cls, error: dict) -> str:
+              errType = error.get("type", "")
+              ctx = error.get("ctx", {})
+              template = cls.errorMessages.get(errType, error.get("msg", "검증 오류"))
+              try:
+                  return template.format(**ctx)
+              except KeyError:
+                  return template
+
+      class ContactForm(BaseModel):
+          name: str = Field(min_length=2, max_length=50)
+          email: str = Field(pattern=r'^[\\w.-]+@[\\w.-]+\\.\\w+$')
+          phone: str = Field(pattern=r'^\\d{3}-\\d{4}-\\d{4}$')
+          message: str = Field(min_length=10, max_length=1000)
+
+      formData = {"name": "A", "email": "bad", "phone": "123", "message": "short"}
+
+      try:
+          ContactForm.model_validate(formData)
+      except ValidationError as e:
+          localizedErrors = []
+          for err in e.errors():
+              localizedErrors.append({
+                  "field": err["loc"][0],
+                  "message": FormValidator.localizeError(err)
+              })
+          localizedErrors
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 실습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 주문 입력 계약과 배치 검증'
+  structuredPrimary: true
+  subtitle: 예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주
+  goal: '현업 흐름 검증: 주문 입력 계약과 배치 검증에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고,
+    잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from typing import Literal
+    from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+    class OrderInput(BaseModel):
+        orderId: str
+        customer: str
+        amount: int = Field(gt=0)
+        status: Literal['paid', 'pending', 'cancelled']
+
+        @field_validator('orderId', 'customer')
+        @classmethod
+        def stripRequiredText(cls, value):
+            cleaned = value.strip()
+            if not cleaned:
+                raise ValueError('text field must not be empty')
+            return cleaned
+
+        @computed_field
+        @property
+        def isRevenue(self) -> bool:
+            return self.status == 'paid'
+
+    validOrder = OrderInput.model_validate({
+        'orderId': ' A-100 ',
+        'customer': ' kim ',
+        'amount': '120000',
+        'status': 'paid',
+    })
+
+    assert validOrder.orderId == 'A-100'
+    assert validOrder.amount == 120000
+    assert validOrder.isRevenue is True
+    validOrder.model_dump()
+  exercise:
+    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
+    starterCode: |-
+      from typing import Literal
+      from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+      class OrderInput(BaseModel):
+          orderId: str
+          customer: str
+          amount: int = Field(gt=0)
+          status: Literal['paid', 'pending', 'cancelled']
+
+          @field_validator('orderId', 'customer')
+          @classmethod
+          def stripRequiredText(cls, value):
+              cleaned = value.strip()
+              if not cleaned:
+                  raise ValueError('text field must not be empty')
+              return cleaned
+
+          @computed_field
+          @property
+          def isRevenue(self) -> bool:
+              return self.status == 'paid'
+
+      validOrder = OrderInput.model_validate({
+          'orderId': ' A-100 ',
+          'customer': ' kim ',
+          'amount': '120000',
+          'status': 'paid',
+      })
+
+      assert validOrder.orderId == 'A-100'
+      assert validOrder.amount == 120000
+      assert validOrder.isRevenue is True
+      validOrder.model_dump()
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pydantic_08-flatten-validation-errors-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load
+    - workflow_validation
+    title: 중첩 validation error를 읽기 쉬운 field 목록으로 평탄화하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: loc list를 dotted path로 바꾸고 type·message·input을 보존한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - list index를 문자열로 바꿔 dotted path에 포함하세요.
+    - 오류 message만 복사하지 말고 type과 원래 input도 보존하세요.
+    exercise:
+      prompt: flatten_validation_errors(errors)를 완성해 path, type, message, input 목록을 반환하세요.
+      starterCode: |-
+        def flatten_validation_errors(errors):
+            raise NotImplementedError
+      solution: |
+        def flatten_validation_errors(errors):
+            result = []
+            for error in errors:
+                path = ".".join(str(part) for part in error.get("loc", [])) or "$"
+                result.append({"path": path, "type": error["type"], "message": error["msg"], "input": error.get("input")})
+            return result
+      hints: *id001
+    check:
+      id: python.pydantic.pydantic_08.flatten-validation-errors.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_08.flatten-validation-errors.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: flatten_validation_errors
+        cases:
+        - id: keeps-nested-paths
+          arguments:
+          - value:
+            - loc:
+              - items
+              - 1
+              - quantity
+              type: greater_than
+              msg: must be positive
+              input: 0
+            - loc:
+              - email
+              type: value_error
+              msg: invalid email
+              input: bad
+          expectedReturn:
+          - path: items.1.quantity
+            type: greater_than
+            message: must be positive
+            input: 0
+          - path: email
+            type: value_error
+            message: invalid email
+            input: bad
+        - id: handles-root-error
+          arguments:
+          - value:
+            - loc: []
+              type: model_error
+              msg: mismatch
+          expectedReturn:
+          - path: $
+            type: model_error
+            message: mismatch
+            input: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pydantic_08-group-errors-by-top-field-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pydantic_08-flatten-validation-errors-mastery
+    title: 새 form UI를 위해 오류를 최상위 field별로 묶기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 평탄화한 오류를 field별 count와 상세 path 목록으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - UI grouping key와 정확한 수정 path를 둘 다 남기세요.
+    - 정렬된 key로 반환해 화면과 테스트 결과를 안정화하세요.
+    exercise:
+      prompt: group_errors_by_field(errors)를 완성해 field별 count와 paths를 반환하세요.
+      starterCode: |-
+        def group_errors_by_field(errors):
+            raise NotImplementedError
+      solution: |
+        def group_errors_by_field(errors):
+            grouped = {}
+            for error in errors:
+                path = ".".join(str(part) for part in error.get("loc", [])) or "$"
+                field = str(error.get("loc", ["$"])[0]) if error.get("loc") else "$"
+                bucket = grouped.setdefault(field, {"count": 0, "paths": []})
+                bucket["count"] += 1
+                bucket["paths"].append(path)
+            return {key: grouped[key] for key in sorted(grouped)}
+      hints: *id002
+    check:
+      id: python.pydantic.pydantic_08.group-errors-by-top-field.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_08.group-errors-by-top-field.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: group_errors_by_field
+        cases:
+        - id: groups-nested-item-errors
+          arguments:
+          - value:
+            - loc:
+              - items
+              - 0
+              - sku
+            - loc:
+              - items
+              - 1
+              - quantity
+            - loc:
+              - email
+          expectedReturn:
+            email:
+              count: 1
+              paths:
+              - email
+            items:
+              count: 2
+              paths:
+              - items.0.sku
+              - items.1.quantity
+        - id: handles-empty-errors
+          arguments:
+          - value: []
+          expectedReturn: {}
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pydantic_08-validation-feedback-policy-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pydantic_08-group-errors-by-top-field-transfer
+    title: 검증 실패 피드백의 안전한 수준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: field 오류, secret 오류, model 관계 오류에 맞는 표시와 금지 내용을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 학습 피드백은 수정할 위치와 규칙을 바로 보여줘야 합니다.
+    - 비밀값과 전체 payload는 오류 설명에도 노출하지 마세요.
+    exercise:
+      prompt: choose_validation_feedback(situation)를 완성해 show, action, forbidden을 반환하세요.
+      starterCode: |-
+        def choose_validation_feedback(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_validation_feedback(situation):
+            table = {'field-error': {'show': 'path and constraint', 'action': 'focus field', 'forbidden': 'dump full payload'}, 'secret-error': {'show': 'presence or format only', 'action': 're-enter secret', 'forbidden': 'echo secret'}, 'model-relation-error': {'show': 'related field names', 'action': 'compare values', 'forbidden': 'blame one field only'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.pydantic.pydantic_08.validation-feedback-policy.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_08.validation-feedback-policy.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_validation_feedback
+        cases:
+        - id: recalls-field-error
+          arguments:
+          - value: field-error
+          expectedReturn:
+            show: path and constraint
+            action: focus field
+            forbidden: dump full payload
+        - id: recalls-secret-error
+          arguments:
+          - value: secret-error
+          expectedReturn:
+            show: presence or format only
+            action: re-enter secret
+            forbidden: echo secret
+        - id: rejects-unknown-situation
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,609 @@
+var e=`meta:
+  id: word_03
+  title: 텍스트 스타일링
+  order: 3
+  category: word
+  difficulty: ⭐⭐
+  badge: 기초
+  packages:
+    - python-docx
+  tags:
+    - run
+    - font
+    - East Asian
+  outcomes:
+    - automation.word.runs
+  prerequisites:
+    - automation.word.paragraphs
+  estimatedMinutes: 40
+  seo:
+    title: "Word 텍스트 스타일링 - run, font, East Asian font 패턴"
+    description: "Bold·색상·크기를 run 단위로 적용. 한글 East Asian font 의무 패턴으로 폰트 깨짐 차단."
+    keywords:
+      - python-docx run font
+      - East Asian font
+      - 한글 폰트 docx
+
+intro:
+  direction: "단락을 run 단위로 쪼개 굵기·색·크기를 적용한다. 한글 East Asian font 의무 패턴을 본 강의에서 정착시킨다."
+  benefits:
+    - "Bold·색·크기를 run 단위로 제어 - docx 모든 강조 표현이 가능."
+    - "East Asian font 패턴 한 번 익히면 한글 폰트 깨짐이 트랙 끝까지 없음."
+    - "06강 스타일 정의 함수의 베이스가 되는 함수 형태 정착."
+  diagram:
+    steps:
+      - label: "1. Paragraph.add_run"
+        detail: "단락 안에 run을 추가해 부분별로 다른 스타일."
+      - label: "2. run.font.bold/size/color"
+        detail: "Bold, 크기, 색 적용."
+      - label: "3. East Asian font 의무"
+        detail: "qn('w:eastAsia') 설정으로 한글 폰트 적용."
+    runtime:
+      - label: "python-docx"
+        detail: "docx.oxml.ns.qn 임포트 필요."
+      - label: "검증"
+        detail: "Document 재오픈 후 paragraphs[i].runs[j]의 속성 검증."
+
+sections:
+  - id: step1_runs
+    title: "1단계. add_run으로 부분 스타일"
+    structuredPrimary: true
+    subtitle: "p.add_run(text)"
+    goal: "한 단락 안에 일반 텍스트 + Bold 텍스트가 섞인 구조를 만든다."
+    why: "단락 전체에 단일 스타일을 적용하면 강조가 안 됩니다. run 단위로 쪼개야 부분 굵기·색·크기 적용이 가능합니다."
+    explanation: |-
+      p = doc.add_paragraph()로 빈 단락. p.add_run('일반 텍스트') 후 run = p.add_run(' 강조'); run.bold = True로 일부만 굵게.
+    tips:
+      - "add_paragraph(text)는 첫 run을 자동 추가합니다. 빈 단락에 add_run을 여러 번 호출하는 게 더 유연."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+
+      workdir = TemporaryDirectory()
+      docxPath = Path(workdir.name) / "runs.docx"
+
+      doc = Document()
+      p = doc.add_paragraph()
+      p.add_run("일반 텍스트 ")
+      bold = p.add_run("강조 부분")
+      bold.bold = True
+      doc.save(docxPath)
+
+      reopened = Document(docxPath)
+      runs = reopened.paragraphs[0].runs
+      [(r.text, r.bold) for r in runs]
+    exercise:
+      prompt: "세 번째 run으로 ' 마지막'을 추가하고 모두 색을 빨강(0xFF0000)으로 바꾸세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+        from docx.shared import RGBColor
+
+        workdir = TemporaryDirectory()
+        docxPath = Path(workdir.name) / "r.docx"
+
+        doc = Document()
+        p = doc.add_paragraph()
+        for text in ["일반 ", "강조", ___]:
+            run = p.add_run(text)
+            run.font.color.rgb = RGBColor(0xFF, 0x00, 0x00)
+        doc.save(docxPath)
+
+        len(Document(docxPath).paragraphs[0].runs)
+      hints:
+        - "문자열 ' 마지막'."
+    check:
+      noError: "add_run 인자는 문자열."
+      resultCheck: "출력 3."
+
+  - id: step2_east_asian
+    title: "2단계. East Asian font 의무 패턴"
+    structuredPrimary: true
+    subtitle: "qn('w:eastAsia') 설정"
+    goal: "한글 폰트를 East Asian font 설정까지 포함해 정확히 적용한다."
+    why: "run.font.name만 설정하면 한글 부분이 기본 영문 폰트로 렌더링됩니다. East Asian font 설정이 빠지면 한글이 깨끗하게 안 보입니다."
+    explanation: |-
+      from docx.oxml.ns import qn; run.font.name='맑은 고딕'; run._element.rPr.rFonts.set(qn('w:eastAsia'), '맑은 고딕'). 두 줄이 한 묶음.
+    tips:
+      - "rPr이 없는 run에 .rFonts 접근하면 AttributeError. 한 번 font.name을 설정하면 rPr이 자동 생성됩니다."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+      from docx.oxml.ns import qn
+
+      def applyKoreanFont(run, fontName="맑은 고딕"):
+          run.font.name = fontName
+          run._element.rPr.rFonts.set(qn("w:eastAsia"), fontName)
+
+      workdir = TemporaryDirectory()
+      docxPath = Path(workdir.name) / "ko.docx"
+
+      doc = Document()
+      p = doc.add_paragraph()
+      run = p.add_run("한글 본문이 맑은 고딕으로 보입니다.")
+      applyKoreanFont(run, "맑은 고딕")
+      doc.save(docxPath)
+
+      reopened = Document(docxPath)
+      reopened.paragraphs[0].runs[0].font.name
+    exercise:
+      prompt: "applyKoreanFont의 함수 본체를 직접 작성하세요 - East Asian font까지 정확히 설정해야 한글이 깨지지 않습니다."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+        from docx.oxml.ns import qn
+
+        def applyKoreanFont(run, fontName="맑은 고딕"):
+            run.font.name = fontName
+            ___  # East Asian font 적용: qn('w:eastAsia') 설정
+
+        workdir = TemporaryDirectory()
+        docxPath = Path(workdir.name) / "k.docx"
+
+        doc = Document()
+        p = doc.add_paragraph()
+        run = p.add_run("한글 본문")
+        applyKoreanFont(run, "NanumGothic")
+        doc.save(docxPath)
+
+        run0 = Document(docxPath).paragraphs[0].runs[0]
+        eastAsia = run0._element.rPr.rFonts.get(qn("w:eastAsia"))
+        run0.font.name == "NanumGothic" and eastAsia == "NanumGothic"
+      hints:
+        - "run._element.rPr.rFonts.set(qn('w:eastAsia'), fontName)"
+        - "rPr는 font.name 설정 직후 자동 생성됩니다."
+    check:
+      noError: "qn('w:eastAsia') 키로 rFonts 설정."
+      resultCheck: "True 출력 (이름과 East Asian 둘 다 적용)."
+
+  - id: validation
+    title: "3단계. 검증 - 한글 강조 단락 통합"
+    structuredPrimary: true
+    subtitle: "Bold + 한글 폰트 + 크기"
+    goal: "강조된 한글 단락 함수의 결과를 단위 assert로 검증한다."
+    why: "본 패턴이 06강 스타일 함수의 첫 번째 빌딩 블록입니다."
+    explanation: |-
+      buildEmphasis 함수가 한 단락에 일반/강조/한글 폰트를 한 번에 적용. 재오픈 후 runs.font 속성 검증.
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+      from docx.oxml.ns import qn
+      from docx.shared import Pt, RGBColor
+
+      def applyKoreanFont(run, fontName="맑은 고딕"):
+          run.font.name = fontName
+          run._element.rPr.rFonts.set(qn("w:eastAsia"), fontName)
+
+      def buildEmphasis(path, normalText, boldText):
+          doc = Document()
+          p = doc.add_paragraph()
+          n = p.add_run(normalText)
+          applyKoreanFont(n)
+          b = p.add_run(boldText)
+          b.bold = True
+          b.font.size = Pt(14)
+          b.font.color.rgb = RGBColor(0xC0, 0x39, 0x2B)
+          applyKoreanFont(b)
+          doc.save(path)
+
+      vault = TemporaryDirectory()
+      docxPath = Path(vault.name) / "emp.docx"
+      buildEmphasis(docxPath, "본문은 ", "여기가 강조")
+
+      reopened = Document(docxPath)
+      runs = reopened.paragraphs[0].runs
+      assert len(runs) == 2
+      assert runs[1].bold is True
+      assert runs[1].font.size == Pt(14)
+      [(r.text, r.bold) for r in runs]
+    exercise:
+      prompt: "buildEmphasis 본체를 완성하세요 - boldText는 Bold + Pt(14) 크기 + 빨강(0xC0,0x39,0x2B)을 모두 적용하고, 두 run 모두 한글 폰트가 들어가야 합니다."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+        from docx.oxml.ns import qn
+        from docx.shared import Pt, RGBColor
+
+        def applyKoreanFont(run, fontName="맑은 고딕"):
+            run.font.name = fontName
+            run._element.rPr.rFonts.set(qn("w:eastAsia"), fontName)
+
+        def buildEmphasis(path, normalText, boldText):
+            doc = Document()
+            p = doc.add_paragraph()
+            n = p.add_run(normalText)
+            applyKoreanFont(n)
+            b = p.add_run(boldText)
+            ___  # b에 bold/size Pt(14)/color RGBColor(0xC0,0x39,0x2B) 적용 + applyKoreanFont(b)
+            doc.save(path)
+
+        vault = TemporaryDirectory()
+        docxPath = Path(vault.name) / "e.docx"
+        buildEmphasis(docxPath, "보고서 ", "월간")
+        runs = Document(docxPath).paragraphs[0].runs
+        runs[1].bold, runs[1].font.size, runs[1].font.color.rgb
+      hints:
+        - "b.bold = True; b.font.size = Pt(14); b.font.color.rgb = RGBColor(0xC0,0x39,0x2B); applyKoreanFont(b)"
+        - "네 줄 모두 빠뜨리지 않아야 검증 통과."
+    check:
+      noError: "Bold + size + color + 한글 폰트 동시 적용."
+      resultCheck: "(True, 177800, RGBColor(0xC0, 0x39, 0x2B)) 출력."
+
+  - id: practice
+    title: "실습 - 종합 미션"
+    subtitle: "한글 강조 단락 생성기"
+    goal: "단락 빌더 함수를 직접 작성한다."
+    why: "본 패턴이 트랙 후반의 모든 단락 생성 함수에 재사용됩니다."
+    explanation: |-
+      미션: buildKoreanParagraph(doc, normalText, boldText, color) 함수. 한 단락에 두 run, Bold + 색 적용.
+    snippet: |-
+      from docx import Document
+      from docx.oxml.ns import qn
+      from docx.shared import Pt, RGBColor
+    exercise:
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "함수: buildKoreanParagraph(doc, normalText, boldText, color=(0x33, 0x33, 0x33))"
+    check:
+      noError: "함수 정의."
+      resultCheck: "run 2개와 색 검증."
+    blocks:
+      - type: expansion
+        title: "미션: 한글 강조 단락"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from docx import Document
+              from docx.oxml.ns import qn
+              from docx.shared import Pt, RGBColor
+
+              def applyKoreanFont(run, fontName="맑은 고딕"):
+                  run.font.name = fontName
+                  run._element.rPr.rFonts.set(qn("w:eastAsia"), fontName)
+
+              def buildKoreanParagraph(doc, normalText, boldText, color=(0x33, 0x33, 0x33)):
+                  p = doc.add_paragraph()
+                  n = p.add_run(normalText)
+                  applyKoreanFont(n)
+                  b = p.add_run(boldText)
+                  b.bold = True
+                  b.font.color.rgb = RGBColor(*color)
+                  applyKoreanFont(b)
+                  return p
+
+              missionDir = TemporaryDirectory()
+              docxPath = Path(missionDir.name) / "p.docx"
+              doc = Document()
+              buildKoreanParagraph(doc, "이번 주 ", "매출 1.2억", color=(0xC0, 0x39, 0x2B))
+              doc.save(docxPath)
+
+              reopened = Document(docxPath)
+              runs = reopened.paragraphs[0].runs
+              assert len(runs) == 2
+              assert runs[1].bold is True
+              assert runs[1].font.color.rgb == RGBColor(0xC0, 0x39, 0x2B)
+              [(r.text, r.bold) for r in runs]
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: list
+        style: bullet
+        items:
+          - "굵기·기울임·밑줄·취소선을 한 함수에서 다중 인자"
+          - "한 단락에 여러 색 (긍정 녹색, 부정 빨강)"
+          - "RGBColor를 16진수 문자열로 받는 헬퍼 (예: '#C0392B')"
+          - "기본 폰트를 '나눔고딕'으로 바꿔 본문 분위기 전환"
+          - "06강 스타일 정의 함수에 본 패턴 흡수"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: word_03-run-style-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_runs
+    - extensions
+    title: 텍스트 run의 스타일과 가독성 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 의미 없는 과도한 서식과 읽히지 않는 크기를 찾는다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 강조는 의미를 전달할 때만 한두 축으로 제한하세요.
+    - 본문 run 크기는 렌더 전 최소·최대 범위를 검사하세요.
+    exercise:
+      prompt: audit_runs(runs)를 완성하세요.
+      starterCode: |-
+        def audit_runs(runs):
+            raise NotImplementedError
+      solution: |
+        def audit_runs(runs):
+            failures = []
+            empty = sorted(run["id"] for run in runs if not str(run.get("text", "")).strip())
+            unreadable = sorted(run["id"] for run in runs if float(run.get("sizePt", 0)) < 9 or float(run.get("sizePt", 0)) > 48)
+            noisy = sorted(run["id"] for run in runs if sum(bool(run.get(key)) for key in ["bold", "italic", "underline"]) == 3)
+            if empty:
+                failures.append("empty")
+            if unreadable:
+                failures.append("size")
+            if noisy:
+                failures.append("emphasis")
+            return {"accepted": not failures, "failures": failures, "empty": empty, "unreadable": unreadable, "noisy": noisy}
+      hints: *id001
+    check:
+      id: python.word.word_03.run-style-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_03.run-style-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_runs
+        cases:
+        - id: accepts-bounded-emphasis
+          arguments:
+          - value:
+            - id: r1
+              text: 핵심
+              sizePt: 12
+              bold: true
+          expectedReturn:
+            accepted: true
+            failures: []
+            empty: []
+            unreadable: []
+            noisy: []
+        - id: reports-size-and-noise
+          arguments:
+          - value:
+            - id: r1
+              text: 경고
+              sizePt: 7
+              bold: true
+              italic: true
+              underline: true
+          expectedReturn:
+            accepted: false
+            failures:
+            - size
+            - emphasis
+            empty: []
+            unreadable:
+            - r1
+            noisy:
+            - r1
+        - id: reports-empty-run
+          arguments:
+          - value:
+            - id: r0
+              text: ''
+              sizePt: 11
+          expectedReturn:
+            accepted: false
+            failures:
+            - empty
+            empty:
+            - r0
+            unreadable: []
+            noisy: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: word_03-style-policy-resolution-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - word_03-run-style-audit-mastery
+    title: 브랜드 토큰을 Word run 스타일로 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 직접 서식보다 의미 역할 기반의 결정된 스타일을 만든다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - run마다 시각값을 반복하지 말고 의미 role을 먼저 부여하세요.
+    - 명시적 override가 토큰을 덮는 순서를 고정하세요.
+    exercise:
+      prompt: resolve_run_styles(runs, tokens)를 완성하세요.
+      starterCode: |-
+        def resolve_run_styles(runs, tokens):
+            raise NotImplementedError
+      solution: |
+        def resolve_run_styles(runs, tokens):
+            resolved = []
+            missing_roles = []
+            for run in runs:
+                role = run.get("role", "body")
+                if role not in tokens:
+                    missing_roles.append(role)
+                    continue
+                style = dict(tokens[role])
+                style.update(run.get("override", {}))
+                resolved.append({"id": run["id"], "role": role, "style": style})
+            return {"resolved": resolved, "missingRoles": sorted(set(missing_roles)), "complete": not missing_roles}
+      hints: *id002
+    check:
+      id: python.word.word_03.style-policy-resolution.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_03.style-policy-resolution.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: resolve_run_styles
+        cases:
+        - id: resolves-semantic-token
+          arguments:
+          - value:
+            - id: a
+              role: body
+          - value:
+              body:
+                font: Noto Sans KR
+                sizePt: 11
+          expectedReturn:
+            resolved:
+            - id: a
+              role: body
+              style:
+                font: Noto Sans KR
+                sizePt: 11
+            missingRoles: []
+            complete: true
+        - id: applies-explicit-override
+          arguments:
+          - value:
+            - id: a
+              role: warning
+              override:
+                bold: true
+          - value:
+              warning:
+                color: C62828
+          expectedReturn:
+            resolved:
+            - id: a
+              role: warning
+              style:
+                color: C62828
+                bold: true
+            missingRoles: []
+            complete: true
+        - id: reports-missing-token
+          arguments:
+          - value:
+            - id: a
+              role: legal
+          - value:
+              body:
+                sizePt: 11
+          expectedReturn:
+            resolved: []
+            missingRoles:
+            - legal
+            complete: false
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: word_03-text-style-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - word_03-style-policy-resolution-transfer
+    title: 텍스트 스타일 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 의미·가독성·렌더 검증을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Web에서는 문서 구조와 업무 불변식을 즉시 검증하세요.
+    - Local에서는 저장한 docx를 재개방하고 렌더 결과까지 증거로 남기세요.
+    exercise:
+      prompt: choose_text_style_evidence(stage)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_text_style_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_text_style_evidence(stage):
+            choices = {'semantic': {'action': 'map role to style token', 'evidence': 'role-style manifest', 'risk': 'inconsistent direct formatting'}, 'readability': {'action': 'bound size and emphasis', 'evidence': 'run audit', 'risk': 'unreadable text'}, 'render': {'action': 'inspect exported pages', 'evidence': 'glyph and clipping check', 'risk': 'correct XML but broken display'}}
+            if stage not in choices:
+                raise ValueError('unknown stage')
+            return choices[stage]
+      hints: *id003
+    check:
+      id: python.word.word_03.text-style-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_03.text-style-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_text_style_evidence
+        cases:
+        - id: recalls-semantic
+          arguments:
+          - value: semantic
+          expectedReturn:
+            action: map role to style token
+            evidence: role-style manifest
+            risk: inconsistent direct formatting
+        - id: recalls-readability
+          arguments:
+          - value: readability
+          expectedReturn:
+            action: bound size and emphasis
+            evidence: run audit
+            risk: unreadable text
+        - id: recalls-final-stage
+          arguments:
+          - value: render
+          expectedReturn:
+            action: inspect exported pages
+            evidence: glyph and clipping check
+            risk: correct XML but broken display
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

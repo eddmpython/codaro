@@ -1,0 +1,634 @@
+var e=`meta:
+  id: word_04
+  title: 표 만들기
+  order: 4
+  category: word
+  difficulty: ⭐⭐
+  badge: 기초
+  packages:
+    - python-docx
+  tags:
+    - add_table
+    - cell
+    - merge_cells
+  outcomes:
+    - automation.word.tables
+  prerequisites:
+    - automation.word.paragraphs
+  estimatedMinutes: 45
+  seo:
+    title: "Word 표 만들기 - add_table, cell, merge_cells"
+    description: "보고서에 들어가는 비교표를 코드로 만든다. 셀 병합·헤더 강조 패턴 포함."
+    keywords:
+      - python-docx add_table
+      - merge_cells
+      - 보고서 표 자동화
+
+intro:
+  direction: "보고서·계약서에 들어가는 비교표를 코드로 만든다. 셀 병합과 헤더 강조까지."
+  benefits:
+    - "직원 명단·결재라인·견적 항목 표 자동 생성 - 30분 손작업이 5초."
+    - "table.cell(i, j).text 패턴으로 모든 셀 데이터를 깔끔히 채움."
+    - "10강 회의록의 참석자·결정사항 표 패턴이 본 강의에서 정착."
+  diagram:
+    steps:
+      - label: "1. add_table"
+        detail: "doc.add_table(rows, cols, style)로 빈 표 생성."
+      - label: "2. cell 채우기"
+        detail: "table.cell(i, j).text = value 또는 cell의 paragraphs[0].add_run."
+      - label: "3. merge_cells"
+        detail: "cell1.merge(cell2)로 셀 병합."
+    runtime:
+      - label: "표준 스타일"
+        detail: "'Table Grid' 스타일이 검은 선 적용된 표준 양식."
+      - label: "검증"
+        detail: "재오픈 후 table.rows[i].cells[j].text 단위 assert."
+
+sections:
+  - id: step1_add_table
+    title: "1단계. add_table로 표 만들기"
+    structuredPrimary: true
+    subtitle: "doc.add_table(rows, cols, style='Table Grid')"
+    goal: "3×4 비교표를 만들고 모든 셀에 데이터를 채운다."
+    why: "보고서의 가장 흔한 콘텐츠가 표입니다. add_table 한 줄로 시작."
+    explanation: |-
+      doc.add_table(rows=N, cols=M, style='Table Grid')로 검은 선이 있는 빈 표 생성. table.cell(i, j).text = value로 셀 채우기.
+    tips:
+      - "style 인자 없이 만들면 선이 보이지 않는 빈 표가 됩니다. 'Table Grid' 권장."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+
+      workdir = TemporaryDirectory()
+      docxPath = Path(workdir.name) / "table.docx"
+
+      doc = Document()
+      tbl = doc.add_table(rows=3, cols=4, style="Table Grid")
+
+      headers = ["region", "q1", "q2", "q3"]
+      for colIdx, value in enumerate(headers):
+          tbl.cell(0, colIdx).text = value
+
+      rows = [["Seoul", "120", "135", "150"], ["Busan", "80", "78", "92"]]
+      for rowIdx, rowData in enumerate(rows, start=1):
+          for colIdx, value in enumerate(rowData):
+              tbl.cell(rowIdx, colIdx).text = value
+
+      doc.save(docxPath)
+
+      reopened = Document(docxPath)
+      tbl2 = reopened.tables[0]
+      tbl2.cell(0, 0).text, tbl2.cell(1, 1).text
+    exercise:
+      prompt: "4행 표로 늘려 'Daegu, 60, 65, 70' 행을 추가하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+
+        workdir = TemporaryDirectory()
+        docxPath = Path(workdir.name) / "t.docx"
+
+        doc = Document()
+        tbl = doc.add_table(rows=___, cols=4, style="Table Grid")
+
+        headers = ["region", "q1", "q2", "q3"]
+        for colIdx, value in enumerate(headers):
+            tbl.cell(0, colIdx).text = value
+
+        rows = [["Seoul", "120", "135", "150"], ["Busan", "80", "78", "92"], ["Daegu", "60", "65", "70"]]
+        for rowIdx, rowData in enumerate(rows, start=1):
+            for colIdx, value in enumerate(rowData):
+                tbl.cell(rowIdx, colIdx).text = value
+
+        doc.save(docxPath)
+        Document(docxPath).tables[0].cell(3, 0).text
+      hints:
+        - "정수 4."
+    check:
+      noError: "rows는 정수."
+      resultCheck: "출력 'Daegu'."
+
+  - id: step2_merge
+    title: "2단계. merge_cells로 셀 병합"
+    structuredPrimary: true
+    subtitle: "cell1.merge(cell2)"
+    goal: "헤더 행에 두 컬럼을 병합한 부제목을 만든다."
+    why: "한국 보고서의 결재라인 표는 거의 모두 헤더 병합 구조입니다. merge_cells가 필수입니다."
+    explanation: |-
+      cell1.merge(cell2)는 두 셀과 사이의 모든 셀을 병합. 결과 셀에 text 입력.
+    tips:
+      - "병합된 셀의 .text는 결과 셀에 적용. 병합 전 각 셀의 텍스트는 합쳐집니다."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+
+      workdir = TemporaryDirectory()
+      docxPath = Path(workdir.name) / "merged.docx"
+
+      doc = Document()
+      tbl = doc.add_table(rows=3, cols=4, style="Table Grid")
+
+      # 상위 헤더: 두 셀 병합
+      tbl.cell(0, 0).merge(tbl.cell(0, 1)).text = "지역 정보"
+      tbl.cell(0, 2).merge(tbl.cell(0, 3)).text = "매출"
+
+      # 하위 헤더
+      sub = ["region", "code", "q1", "q2"]
+      for colIdx, value in enumerate(sub):
+          tbl.cell(1, colIdx).text = value
+
+      # 데이터
+      tbl.cell(2, 0).text = "Seoul"
+      tbl.cell(2, 1).text = "S01"
+      tbl.cell(2, 2).text = "120"
+      tbl.cell(2, 3).text = "135"
+
+      doc.save(docxPath)
+
+      reopened = Document(docxPath)
+      reopened.tables[0].cell(0, 0).text
+    exercise:
+      prompt: "tbl.cell(2, 0).merge(tbl.cell(2, 1))로 데이터 행도 병합하고 텍스트를 'Seoul S01'으로."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+
+        workdir = TemporaryDirectory()
+        docxPath = Path(workdir.name) / "m.docx"
+
+        doc = Document()
+        tbl = doc.add_table(rows=3, cols=4, style="Table Grid")
+        tbl.cell(0, 0).merge(tbl.cell(0, 1)).text = "지역 정보"
+        tbl.cell(0, 2).merge(tbl.cell(0, 3)).text = "매출"
+        for colIdx, value in enumerate(["region", "code", "q1", "q2"]):
+            tbl.cell(1, colIdx).text = value
+        tbl.cell(2, 0).merge(tbl.cell(2, 1)).text = ___
+        tbl.cell(2, 2).text = "120"
+        doc.save(docxPath)
+        Document(docxPath).tables[0].cell(2, 0).text
+      hints:
+        - "문자열 'Seoul S01'."
+    check:
+      noError: "merge 후 .text 대입."
+      resultCheck: "출력 'Seoul S01'."
+
+  - id: validation
+    title: "3단계. 검증 - 비교표 빌더"
+    structuredPrimary: true
+    subtitle: "buildComparisonTable + cell 검증"
+    goal: "비교표 빌더 함수의 결과를 셀 단위로 한 번에 검증한다."
+    why: "표는 데이터 정확성이 가장 중요합니다. 셀 단위 assert가 사고 사전 차단."
+    explanation: |-
+      buildComparisonTable(path, headers, rows)이 표를 만들고, 재오픈 후 모든 셀이 입력 데이터와 일치하는지 확인.
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+
+      def buildComparisonTable(path, headers, rows):
+          doc = Document()
+          tbl = doc.add_table(rows=len(rows) + 1, cols=len(headers), style="Table Grid")
+          for colIdx, header in enumerate(headers):
+              tbl.cell(0, colIdx).text = header
+          for rowIdx, rowData in enumerate(rows, start=1):
+              for colIdx, value in enumerate(rowData):
+                  tbl.cell(rowIdx, colIdx).text = str(value)
+          doc.save(path)
+
+      vault = TemporaryDirectory()
+      docxPath = Path(vault.name) / "v.docx"
+      headers = ["region", "amount"]
+      data = [["Seoul", 120000], ["Busan", 80000], ["Daegu", 60000]]
+      buildComparisonTable(docxPath, headers, data)
+
+      reopened = Document(docxPath)
+      tbl = reopened.tables[0]
+      assert tbl.cell(0, 0).text == "region"
+      assert tbl.cell(1, 0).text == "Seoul"
+      assert tbl.cell(3, 1).text == "60000"
+      tbl.cell(0, 0).text, tbl.cell(3, 0).text
+    exercise:
+      prompt: "buildComparisonTable 본체를 직접 작성하세요 - 헤더 행 + 데이터 행을 모두 채우는 add_table 흐름."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+
+        def buildComparisonTable(path, headers, rows):
+            doc = Document()
+            tbl = doc.add_table(rows=len(rows) + 1, cols=len(headers), style="Table Grid")
+            for colIdx, header in enumerate(headers):
+                ___  # tbl.cell(0, colIdx)에 header 텍스트
+            for rowIdx, rowData in enumerate(rows, start=1):
+                for colIdx, value in enumerate(rowData):
+                    ___  # tbl.cell(rowIdx, colIdx)에 str(value)
+            doc.save(path)
+
+        vault = TemporaryDirectory()
+        docxPath = Path(vault.name) / "v.docx"
+        data = [["Seoul", 120000], ["Busan", 80000], ["Daegu", 60000]]
+        buildComparisonTable(docxPath, ["region", "amount"], data)
+        tbl = Document(docxPath).tables[0]
+        tbl.cell(0, 0).text, tbl.cell(3, 1).text
+      hints:
+        - "tbl.cell(0, colIdx).text = header"
+        - "tbl.cell(rowIdx, colIdx).text = str(value)"
+    check:
+      noError: "헤더와 데이터 셀을 모두 채워야 함."
+      resultCheck: "('region', '60000') 출력."
+
+  - id: practice
+    title: "실습 - 종합 미션"
+    subtitle: "한국식 결재라인 표"
+    goal: "담당·검토·승인 결재라인 표 함수를 만든다."
+    why: "결재라인 표는 한국 보고서·기안서·품의서의 99%에 들어가는 표준 구성요소입니다. 담당·검토·승인 3컬럼이 손에 익으면 사내 양식 자동화의 절반이 끝납니다."
+    explanation: |-
+      미션: buildApprovalLine(doc, names) 함수. 'roles → names' 3컬럼 표.
+    snippet: |-
+      from docx import Document
+    exercise:
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "함수: buildApprovalLine(doc, approvers: dict) -> Table"
+    check:
+      noError: "함수 정의."
+      resultCheck: "표의 헤더와 데이터가 정확히 매핑."
+    blocks:
+      - type: expansion
+        title: "미션: 결재라인 표"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from docx import Document
+
+              def buildApprovalLine(doc, approvers):
+                  tbl = doc.add_table(rows=2, cols=len(approvers), style="Table Grid")
+                  for colIdx, (role, name) in enumerate(approvers.items()):
+                      tbl.cell(0, colIdx).text = role
+                      tbl.cell(1, colIdx).text = name
+                  return tbl
+
+              missionDir = TemporaryDirectory()
+              docxPath = Path(missionDir.name) / "a.docx"
+              doc = Document()
+              buildApprovalLine(doc, {"담당": "김대리", "검토": "박과장", "승인": "이팀장"})
+              doc.save(docxPath)
+
+              reopened = Document(docxPath)
+              tbl = reopened.tables[0]
+              assert tbl.cell(0, 0).text == "담당"
+              assert tbl.cell(1, 2).text == "이팀장"
+              [tbl.cell(0, i).text for i in range(3)], [tbl.cell(1, i).text for i in range(3)]
+      - type: expansion
+        title: "미션 2: 직원 명단 → N행 표 자동 생성"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from docx import Document
+
+              def buildEmployeeRoster(path, employees):
+                  doc = Document()
+                  headers = ["이름", "부서", "직급", "내선"]
+                  tbl = doc.add_table(rows=len(employees) + 1, cols=len(headers), style="Table Grid")
+                  for colIdx, header in enumerate(headers):
+                      tbl.cell(0, colIdx).text = header
+                  for rowIdx, emp in enumerate(employees, start=1):
+                      tbl.cell(rowIdx, 0).text = emp["name"]
+                      tbl.cell(rowIdx, 1).text = emp["team"]
+                      tbl.cell(rowIdx, 2).text = emp["role"]
+                      tbl.cell(rowIdx, 3).text = emp["ext"]
+                  doc.save(path)
+                  return tbl
+
+              missionDir = TemporaryDirectory()
+              docxPath = Path(missionDir.name) / "roster.docx"
+              employees = [
+                  {"name": "김대리", "team": "기획", "role": "대리", "ext": "1201"},
+                  {"name": "박과장", "team": "개발", "role": "과장", "ext": "1305"},
+                  {"name": "이팀장", "team": "개발", "role": "팀장", "ext": "1306"},
+              ]
+              buildEmployeeRoster(docxPath, employees)
+
+              reopened = Document(docxPath)
+              tbl = reopened.tables[0]
+              assert len(tbl.rows) == 4
+              assert tbl.cell(0, 2).text == "직급"
+              assert tbl.cell(2, 3).text == "1305"
+              [(tbl.cell(i, 0).text, tbl.cell(i, 3).text) for i in range(len(tbl.rows))]
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: list
+        style: bullet
+        items:
+          - "표 헤더 행에 배경색 (cell._tc XML 조작)"
+          - "셀 안 텍스트를 run 단위로 굵게 (3강 패턴 결합)"
+          - "행 자동 stripe (짝수 행 회색)"
+          - "표 너비를 width 인자로 명시 (Inches(6))"
+          - "직원 명단 dict 리스트 → N행 표 자동"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: word_04-word-table-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_add_table
+    - extensions
+    title: Word 표의 직사각형 구조와 헤더 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 행 길이 불일치·빈 헤더·중복 헤더를 차단한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - Word 표도 먼저 행렬 계약으로 검증한 뒤 렌더하세요.
+    - 헤더는 한 행, 비어 있지 않고 유일하도록 제한하세요.
+    exercise:
+      prompt: audit_word_table(rows, header_rows=1)를 완성하세요.
+      starterCode: |-
+        def audit_word_table(rows, header_rows=1):
+            raise NotImplementedError
+      solution: |
+        def audit_word_table(rows, header_rows=1):
+            failures = []
+            widths = [len(row) for row in rows]
+            rectangular = bool(rows) and len(set(widths)) == 1
+            headers = rows[0] if rows else []
+            empty_headers = [index for index, value in enumerate(headers) if not str(value).strip()]
+            duplicate_headers = sorted({str(value) for value in headers if headers.count(value) > 1})
+            if not rectangular:
+                failures.append("shape")
+            if header_rows != 1:
+                failures.append("header-count")
+            if empty_headers or duplicate_headers:
+                failures.append("headers")
+            return {"accepted": not failures, "failures": failures, "widths": widths, "emptyHeaders": empty_headers, "duplicateHeaders": duplicate_headers}
+      hints: *id001
+    check:
+      id: python.word.word_04.word-table-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_04.word-table-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_word_table
+        cases:
+        - id: accepts-rectangular-table
+          arguments:
+          - value:
+            - - 상품
+              - 금액
+            - - A
+              - 100
+          - value: 1
+          expectedReturn:
+            accepted: true
+            failures: []
+            widths:
+            - 2
+            - 2
+            emptyHeaders: []
+            duplicateHeaders: []
+        - id: reports-ragged-table
+          arguments:
+          - value:
+            - - 상품
+              - 금액
+            - - A
+          - value: 1
+          expectedReturn:
+            accepted: false
+            failures:
+            - shape
+            widths:
+            - 2
+            - 1
+            emptyHeaders: []
+            duplicateHeaders: []
+        - id: reports-header-contract
+          arguments:
+          - value:
+            - - ''
+              - 금액
+              - 금액
+            - - A
+              - 1
+              - 2
+          - value: 2
+          expectedReturn:
+            accepted: false
+            failures:
+            - header-count
+            - headers
+            widths:
+            - 3
+            - 3
+            emptyHeaders:
+            - 0
+            duplicateHeaders:
+            - 금액
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: word_04-table-business-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - word_04-word-table-contract-mastery
+    title: 다른 표의 업무 합계를 재계산해 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 표시 문자열과 원본 수치의 합계를 분리 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표시 형식이 적용되기 전의 numeric value로 합계를 계산하세요.
+    - 허용 오차와 invalid row를 함께 보고하세요.
+    exercise:
+      prompt: reconcile_table_totals(rows, expected_total)를 완성하세요.
+      starterCode: |-
+        def reconcile_table_totals(rows, expected_total):
+            raise NotImplementedError
+      solution: |
+        def reconcile_table_totals(rows, expected_total):
+            invalid = sorted(row.get("id", "") for row in rows if not isinstance(row.get("amount"), (int, float)) or isinstance(row.get("amount"), bool))
+            observed = sum(row["amount"] for row in rows if row.get("id", "") not in invalid)
+            delta = round(observed - expected_total, 2)
+            return {"passed": not invalid and abs(delta) <= 0.01, "invalidRows": invalid, "observedTotal": observed, "expectedTotal": expected_total, "delta": delta}
+      hints: *id002
+    check:
+      id: python.word.word_04.table-business-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_04.table-business-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_table_totals
+        cases:
+        - id: accepts-reconciled-total
+          arguments:
+          - value:
+            - id: a
+              amount: 100
+            - id: b
+              amount: 50
+          - value: 150
+          expectedReturn:
+            passed: true
+            invalidRows: []
+            observedTotal: 150
+            expectedTotal: 150
+            delta: 0
+        - id: reports-total-delta
+          arguments:
+          - value:
+            - id: a
+              amount: 100
+          - value: 120
+          expectedReturn:
+            passed: false
+            invalidRows: []
+            observedTotal: 100
+            expectedTotal: 120
+            delta: -20
+        - id: reports-invalid-value
+          arguments:
+          - value:
+            - id: a
+              amount: '100'
+          - value: 100
+          expectedReturn:
+            passed: false
+            invalidRows:
+            - a
+            observedTotal: 0
+            expectedTotal: 100
+            delta: -100
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: word_04-word-table-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - word_04-table-business-reconciliation-transfer
+    title: Word 표 증거 계층 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: shape·business value·render 검증을 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Web에서는 문서 구조와 업무 불변식을 즉시 검증하세요.
+    - Local에서는 저장한 docx를 재개방하고 렌더 결과까지 증거로 남기세요.
+    exercise:
+      prompt: choose_word_table_evidence(stage)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_word_table_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_word_table_evidence(stage):
+            choices = {'shape': {'action': 'validate rectangular matrix and headers', 'evidence': 'row widths', 'risk': 'shifted cells'}, 'business': {'action': 'recompute source totals', 'evidence': 'reconciliation delta', 'risk': 'plausible wrong values'}, 'render': {'action': 'inspect page geometry', 'evidence': 'visible rows and headers', 'risk': 'clipped table'}}
+            if stage not in choices:
+                raise ValueError('unknown stage')
+            return choices[stage]
+      hints: *id003
+    check:
+      id: python.word.word_04.word-table-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_04.word-table-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_word_table_evidence
+        cases:
+        - id: recalls-shape
+          arguments:
+          - value: shape
+          expectedReturn:
+            action: validate rectangular matrix and headers
+            evidence: row widths
+            risk: shifted cells
+        - id: recalls-business
+          arguments:
+          - value: business
+          expectedReturn:
+            action: recompute source totals
+            evidence: reconciliation delta
+            risk: plausible wrong values
+        - id: recalls-final-stage
+          arguments:
+          - value: render
+          expectedReturn:
+            action: inspect page geometry
+            evidence: visible rows and headers
+            risk: clipped table
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,931 @@
+var e=`meta:
+  packages:
+  - altair
+  - pandas
+  id: altair_07
+  title: 인터랙티브필터
+  order: 7
+  category: altair
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  tags:
+  - selection
+  - when
+  - bind
+  - interactive
+  - mpg
+  seo:
+    title: Altair 인터랙티브 - 선택과 필터링
+    description: Altair로 인터랙티브 차트를 만듭니다. selection, when/then, bind로 동적 필터링을 배웁니다.
+    keywords:
+    - altair interactive
+    - selection
+    - when then
+    - binding
+intro:
+  emoji: 🎮
+  goal: 마우스 클릭과 드래그로 데이터를 동적으로 필터링하는 인터랙티브 차트를 만듭니다.
+  description: selection_interval, selection_point, when().then().otherwise(), bind로 인터랙션을 구현합니다.
+  direction: 인터랙티브필터에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.
+  benefits:
+  - 정리된 테이블 확인 후 채널 인코딩에 맞는 코드 입력을 고릅니다.
+  - 인터랙티브필터 결과를 스케일과 마크 매핑 기준으로 즉시 점검합니다.
+  - 완료한 코드를 선언형 대시보드에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(정리된 테이블)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 기본 차트 처리 실행
+      detail: 채널 인코딩 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 영역 선택 결과 검증
+      detail: 스케일과 마크 매핑 기준으로 실행 결과를 비교합니다.
+    - label: 인터랙티브필터 재사용
+      detail: 완성 코드를 선언형 대시보드에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 선언형 차트 환경
+      detail: altair, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 인터랙티브필터 실행
+      detail: 셀을 실행해 스케일과 마크 매핑와 예외 상태를 확인합니다.
+    - label: 인터랙티브필터 완료
+      detail: 검증된 코드를 선언형 대시보드로 남깁니다.
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  structuredPrimary: true
+  subtitle: seaborn-data
+  goal: 1단계. 데이터 불러오기에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: Codaro 로컬 데이터셋에서 mpg(Miles Per Gallon, 연비) 데이터를 불러옵니다. 1970-1980년대 자동차들의 연비 정보가 담긴 데이터입니다.
+    horsepower는 마력(엔진 힘), mpg는 연비(갤런당 주행거리), origin은 생산국(usa, europe, japan)을 나타냅니다. 이 데이터로 사용자가 클릭하고
+    드래그해서 조작할 수 있는 인터랙티브 차트를 만들어봅니다. 인터랙티브는 "상호작용하는"이라는 뜻으로, 마우스로 차트를 조작하면 차트가 반응하는 것을 의미합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import altair as alt
+    import pandas as pd
+    import warnings
+    warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+    from codaro.curriculum.localData import loadLocalDataset
+
+    mpg = loadLocalDataset("mpg")
+  exercise:
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import altair as alt
+      import pandas as pd
+      import warnings
+      warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+      from codaro.curriculum.localData import loadLocalDataset
+
+      mpg = loadLocalDataset("mpg")
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step2_basic_chart
+  title: 2단계. 기본 차트
+  structuredPrimary: true
+  subtitle: 인터랙션 없는 상태
+  goal: 2단계. 기본 차트에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 먼저 인터랙션이 없는 기본 산점도를 만들어 비교 기준을 마련합니다. 나중에 이 차트에 인터랙션을 추가할 것입니다. 마력(x축)과 연비(y축)의 관계를 점으로
+    표시하고, 생산국(origin)마다 다른 색상을 부여합니다. 일반적으로 마력이 높을수록 연비는 낮아지는 경향을 볼 수 있습니다. properties()로 차트 크기를 지정합니다.
+    width는 가로 길이, height는 세로 길이입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    chartBasic = alt.Chart(mpg).mark_point().encode(
+        x='horsepower:Q',
+        y='mpg:Q',
+        color='origin:N'
+    ).properties(
+        width=500,
+        height=300
+    )
+    chartBasic
+  exercise:
+    prompt: 2단계. 기본 차트 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      chartBasic = alt.Chart(mpg).mark_point().encode(
+          x='horsepower:Q',
+          y='mpg:Q',
+          color='origin:N'
+      ).properties(
+          width=500,
+          height=300
+      )
+      chartBasic
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 2단계. 기본 차트의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 기본 차트의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step3_interval_selection
+  title: 3단계. 영역 선택
+  structuredPrimary: true
+  subtitle: selection_interval
+  goal: 3단계. 영역 선택에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    이제 차트에 인터랙션을 추가합니다. selection_interval()은 "마우스 드래그로 사각형 영역을 선택할 수 있게 하라"는 명령입니다. interval은 "구간"이라는 뜻으로, 차트에서 특정 구간을 드래그해서 선택할 수 있습니다. 이것을 브러싱(brushing, 붓질하듯 영역을 칠한다)이라고 부릅니다. brush 변수에 선택 기능을 저장한 뒤, add_params(brush)로 차트에 추가하면 드래그 기능이 활성화됩니다.
+
+    alt.when().then().otherwise()는 조건문입니다. "만약 ~이면 이렇게 하고, 아니면 저렇게 하라"는 뜻입니다. when(brush)는 "brush로 선택되었으면", then('origin:N')은 "생산국 색상을 표시하고", otherwise(alt.value('lightgray'))는 "아니면 회색으로 표시하라"입니다. 결과적으로 드래그한 영역의 점만 색상이 유지되고, 나머지는 모두 회색으로 바뀌어 선택된 부분이 강조됩니다.
+  tips:
+  - alt.when().then().otherwise()는 조건문입니다. "만약 ~이면 이렇게 하고, 아니면 저렇게 하라"는 뜻입니다. when(brush)는 "brush로 선택되었으면",
+    then('origin:N')은 "생산국 색상을 표시하고", otherwise(alt.value('lightgray'))는 "아니면 회색으로 표시하라"입니다. 결과적으로 드래그한
+    영역의 점만 색상이 유지되고, 나머지는 모두 회색으로 바뀌어 선택된 부분이 강조됩니다.
+  snippet: |-
+    brush = alt.selection_interval()
+
+    chartBrush = alt.Chart(mpg).mark_point().encode(
+        x='horsepower:Q',
+        y='mpg:Q',
+        color=alt.when(brush).then('origin:N').otherwise(alt.value('lightgray'))
+    ).add_params(brush).properties(
+        width=500,
+        height=300,
+        title='드래그로 영역 선택하기'
+    )
+    chartBrush
+  exercise:
+    prompt: 3단계. 영역 선택 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      brush = alt.selection_interval()
+
+      chartBrush = alt.Chart(mpg).mark_point().encode(
+          x='horsepower:Q',
+          y='mpg:Q',
+          color=alt.when(brush).then('origin:N').otherwise(alt.value('lightgray'))
+      ).add_params(brush).properties(
+          width=500,
+          height=300,
+          title='드래그로 영역 선택하기'
+      )
+      chartBrush
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 3단계. 영역 선택의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 영역 선택의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step4_point_selection
+  title: 4단계. 클릭 선택
+  structuredPrimary: true
+  subtitle: selection_point
+  goal: 4단계. 클릭 선택에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    앞에서는 드래그로 영역을 선택했습니다. 이번에는 클릭으로 항목을 선택하는 방법을 배웁니다. selection_point()는 "마우스 클릭으로 개별 항목을 선택하게 하라"는 명령입니다. point는 "점"이라는 뜻입니다. fields=['origin'] 파라미터는 "origin(생산국) 필드 기준으로 선택하라"는 의미입니다. 범례에서 'usa'를 클릭하면 usa 자동차만 선택되고, 'japan'을 클릭하면 일본 자동차만 선택됩니다.
+
+    opacity도 when().then().otherwise()로 조절합니다. 선택된 점은 불투명, 나머지는 반투명으로 표시됩니다.
+  snippet: |-
+    click = alt.selection_point(fields=['origin'], bind='legend')
+
+    chartClick = alt.Chart(mpg).mark_point().encode(
+        x='horsepower:Q',
+        y='mpg:Q',
+        color=alt.when(click).then('origin:N').otherwise(alt.value('lightgray')),
+        opacity=alt.when(click).then(alt.value(1)).otherwise(alt.value(0.2))
+    ).add_params(click).properties(
+        width=500,
+        height=300,
+        title='범례 클릭으로 생산국 선택'
+    )
+    chartClick
+  exercise:
+    prompt: 4단계. 클릭 선택 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      click = alt.selection_point(fields=['origin'], bind='legend')
+
+      chartClick = alt.Chart(mpg).mark_point().encode(
+          x='horsepower:Q',
+          y='mpg:Q',
+          color=alt.when(click).then('origin:N').otherwise(alt.value('lightgray')),
+          opacity=alt.when(click).then(alt.value(1)).otherwise(alt.value(0.2))
+      ).add_params(click).properties(
+          width=500,
+          height=300,
+          title='범례 클릭으로 생산국 선택'
+      )
+      chartClick
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 4단계. 클릭 선택의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 클릭 선택의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step5_conditional
+  title: 5단계. 조건부 스타일링
+  structuredPrimary: true
+  subtitle: 다중 속성 변경
+  goal: 5단계. 조건부 스타일링에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: when().then().otherwise()는 색상뿐만 아니라 크기(size), 투명도(opacity) 등 여러 속성에 동시에 적용할 수 있습니다. opacity는
+    "불투명도"를 의미합니다. 값이 1이면 완전히 불투명(진하게), 0이면 완전히 투명(안 보임), 0.3이면 반투명(흐릿하게) 표시됩니다. 이 코드는 선택된 영역의 점을 크게(size=100),
+    진하게(opacity=1) 만들고, 선택되지 않은 점은 작게(size=30), 흐릿하게(opacity=0.3) 만들어 대비를 극대화합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    brushStyle = alt.selection_interval()
+
+    chartCondition = alt.Chart(mpg).mark_point().encode(
+        x='horsepower:Q',
+        y='mpg:Q',
+        color=alt.when(brushStyle).then('origin:N').otherwise(alt.value('lightgray')),
+        size=alt.when(brushStyle).then(alt.value(100)).otherwise(alt.value(30)),
+        opacity=alt.when(brushStyle).then(alt.value(1)).otherwise(alt.value(0.3))
+    ).add_params(brushStyle).properties(
+        width=500,
+        height=300,
+        title='선택 영역 강조'
+    )
+    chartCondition
+  exercise:
+    prompt: 5단계. 조건부 스타일링 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      brushStyle = alt.selection_interval()
+
+      chartCondition = alt.Chart(mpg).mark_point().encode(
+          x='horsepower:Q',
+          y='mpg:Q',
+          color=alt.when(brushStyle).then('origin:N').otherwise(alt.value('lightgray')),
+          size=alt.when(brushStyle).then(alt.value(100)).otherwise(alt.value(30)),
+          opacity=alt.when(brushStyle).then(alt.value(1)).otherwise(alt.value(0.3))
+      ).add_params(brushStyle).properties(
+          width=500,
+          height=300,
+          title='선택 영역 강조'
+      )
+      chartCondition
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 5단계. 조건부 스타일링의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 조건부 스타일링의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step6_slider
+  title: 6단계. 슬라이더 바인딩
+  structuredPrimary: true
+  subtitle: binding_range
+  goal: 6단계. 슬라이더 바인딩에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    지금까지는 마우스로 직접 차트를 클릭하거나 드래그했습니다. 이번에는 슬라이더라는 UI 위젯을 만들어봅니다. binding_range()는 "범위(range) 슬라이더를 만들어 연결(binding)하라"는 뜻입니다. min은 최솟값, max는 최댓값, step은 한 칸의 간격, name은 슬라이더 옆에 표시될 이름입니다. alt.param()으로 파라미터를 만듭니다. name은 파라미터 이름, value는 초기값(50), bind는 어떤 위젯과 연결할지 지정합니다. alt.datum.horsepower >= selectHp는 "각 데이터의 마력이 슬라이더 값 이상인가?"를 검사합니다.
+
+    alt.datum은 "각각의 데이터"를 의미합니다. alt.datum.horsepower는 "각 데이터 행의 horsepower 값"을 가리킵니다. >= 기호는 "크거나 같다"는 의미입니다. alt.datum.horsepower >= selectHp는 "이 데이터의 마력이 슬라이더 값 이상인가?"를 묻는 조건식입니다. 참이면 opacity=1(진하게), 거짓이면 opacity=0.1(거의 투명)로 표시됩니다.
+  tips:
+  - alt.datum은 "각각의 데이터"를 의미합니다. alt.datum.horsepower는 "각 데이터 행의 horsepower 값"을 가리킵니다. >= 기호는 "크거나 같다"는
+    의미입니다. alt.datum.horsepower >= selectHp는 "이 데이터의 마력이 슬라이더 값 이상인가?"를 묻는 조건식입니다. 참이면 opacity=1(진하게),
+    거짓이면 opacity=0.1(거의 투명)로 표시됩니다.
+  snippet: |-
+    sliderHp = alt.binding_range(min=0, max=200, step=10, name='최소 마력: ')
+    selectHp = alt.param(name='minHorsepower', value=50, bind=sliderHp)
+
+    chartSlider = alt.Chart(mpg).mark_point().encode(
+        x='horsepower:Q',
+        y='mpg:Q',
+        color='origin:N',
+        opacity=alt.when(
+            alt.datum.horsepower >= selectHp
+        ).then(alt.value(1)).otherwise(alt.value(0.1))
+    ).add_params(selectHp).properties(
+        width=500,
+        height=300,
+        title='슬라이더로 마력 필터링'
+    )
+    chartSlider
+  exercise:
+    prompt: 6단계. 슬라이더 바인딩 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      sliderHp = alt.binding_range(min=0, max=200, step=10, name='최소 마력: ')
+      selectHp = alt.param(name='minHorsepower', value=50, bind=sliderHp)
+
+      chartSlider = alt.Chart(mpg).mark_point().encode(
+          x='horsepower:Q',
+          y='mpg:Q',
+          color='origin:N',
+          opacity=alt.when(
+              alt.datum.horsepower >= selectHp
+          ).then(alt.value(1)).otherwise(alt.value(0.1))
+      ).add_params(selectHp).properties(
+          width=500,
+          height=300,
+          title='슬라이더로 마력 필터링'
+      )
+      chartSlider
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 6단계. 슬라이더 바인딩의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 슬라이더 바인딩의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step7_dropdown
+  title: 7단계. 드롭다운 바인딩
+  structuredPrimary: true
+  subtitle: binding_select
+  goal: 7단계. 드롭다운 바인딩에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 슬라이더는 숫자 범위를 조절하는 위젯이었습니다. 이번에는 카테고리를 선택하는 드롭다운 메뉴를 만들어봅니다. binding_select()는 "선택(select)
+    메뉴를 만들어 연결(binding)하라"는 뜻입니다. options는 선택지 목록, labels는 화면에 표시될 이름, name은 드롭다운 이름입니다. [None] + origins는
+    리스트 합치기입니다. None(전체)을 첫 번째 항목으로 추가하고, 그 뒤에 usa, europe, japan을 붙입니다. | 기호는 "또는"이라는 뜻으로, (조건1) | (조건2)는
+    "조건1이거나 조건2이면"을 의미합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    origins = ['usa', 'europe', 'japan']
+    dropdown = alt.binding_select(options=[None] + origins, labels=['전체'] + origins, name='생산국: ')
+    selectOrigin = alt.param(name='selectedOrigin', bind=dropdown)
+
+    chartDropdown = alt.Chart(mpg).mark_point().encode(
+        x='horsepower:Q',
+        y='mpg:Q',
+        color='origin:N',
+        opacity=alt.when(
+            (selectOrigin == None) | (alt.datum.origin == selectOrigin)
+        ).then(alt.value(1)).otherwise(alt.value(0.1))
+    ).add_params(selectOrigin).properties(
+        width=500,
+        height=300,
+        title='드롭다운으로 생산국 필터링'
+    )
+    chartDropdown
+  exercise:
+    prompt: 7단계. 드롭다운 바인딩 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      origins = ['usa', 'europe', 'japan']
+      dropdown = alt.binding_select(options=[None] + origins, labels=['전체'] + origins, name='생산국: ')
+      selectOrigin = alt.param(name='selectedOrigin', bind=dropdown)
+
+      chartDropdown = alt.Chart(mpg).mark_point().encode(
+          x='horsepower:Q',
+          y='mpg:Q',
+          color='origin:N',
+          opacity=alt.when(
+              (selectOrigin == None) | (alt.datum.origin == selectOrigin)
+          ).then(alt.value(1)).otherwise(alt.value(0.1))
+      ).add_params(selectOrigin).properties(
+          width=500,
+          height=300,
+          title='드롭다운으로 생산국 필터링'
+      )
+      chartDropdown
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 7단계. 드롭다운 바인딩의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 드롭다운 바인딩의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step8_combined
+  title: 8단계. 복합 인터랙션
+  structuredPrimary: true
+  subtitle: 여러 컨트롤 조합
+  goal: 8단계. 복합 인터랙션에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 지금까지 배운 슬라이더와 드롭다운을 하나의 차트에 동시에 적용해봅니다. 두 가지 조건을 모두 만족하는 데이터만 강조됩니다. & 기호는 "그리고"라는 뜻입니다.
+    (조건1) & (조건2)는 "조건1이면서 동시에 조건2도 만족해야"를 의미합니다. 앞에서 배운 | (또는)와 반대입니다. 이 코드는 "드롭다운에서 선택한 생산국이면서, 동시에
+    슬라이더 값 이상의 마력을 가진" 자동차만 opacity=0.8로 진하게 표시하고, 나머지는 opacity=0.1로 거의 투명하게 만듭니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    originList = ['usa', 'europe', 'japan']
+    dropdownCombined = alt.binding_select(options=[None] + originList, labels=['전체'] + originList, name='생산국: ')
+    paramOrigin = alt.param(name='originFilter', bind=dropdownCombined)
+
+    sliderCombined = alt.binding_range(min=0, max=200, step=10, name='최소 마력: ')
+    paramHp = alt.param(name='hpFilter', value=0, bind=sliderCombined)
+
+    chartCombined = alt.Chart(mpg).mark_point(size=60).encode(
+        x='horsepower:Q',
+        y='mpg:Q',
+        color='origin:N',
+        opacity=alt.when(
+            ((paramOrigin == None) | (alt.datum.origin == paramOrigin)) &
+            (alt.datum.horsepower >= paramHp)
+        ).then(alt.value(0.8)).otherwise(alt.value(0.1))
+    ).add_params(paramOrigin, paramHp).properties(
+        width=500,
+        height=300,
+        title='복합 필터 대시보드'
+    )
+    chartCombined
+  exercise:
+    prompt: 8단계. 복합 인터랙션 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      originList = ['usa', 'europe', 'japan']
+      dropdownCombined = alt.binding_select(options=[None] + originList, labels=['전체'] + originList, name='생산국: ')
+      paramOrigin = alt.param(name='originFilter', bind=dropdownCombined)
+
+      sliderCombined = alt.binding_range(min=0, max=200, step=10, name='최소 마력: ')
+      paramHp = alt.param(name='hpFilter', value=0, bind=sliderCombined)
+
+      chartCombined = alt.Chart(mpg).mark_point(size=60).encode(
+          x='horsepower:Q',
+          y='mpg:Q',
+          color='origin:N',
+          opacity=alt.when(
+              ((paramOrigin == None) | (alt.datum.origin == paramOrigin)) &
+              (alt.datum.horsepower >= paramHp)
+          ).then(alt.value(0.8)).otherwise(alt.value(0.1))
+      ).add_params(paramOrigin, paramHp).properties(
+          width=500,
+          height=300,
+          title='복합 필터 대시보드'
+      )
+      chartCombined
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 8단계. 복합 인터랙션의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 복합 인터랙션의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step9_final
+  title: 9단계. 최종 결과물
+  structuredPrimary: true
+  subtitle: 인터랙티브 대시보드
+  goal: 9단계. 최종 결과물에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    이제 지금까지 배운 모든 인터랙션 기능을 하나로 합쳐봅니다. 브러싱(드래그), 드롭다운, 슬라이더가 모두 포함된 대시보드입니다. 세 가지 파라미터(brushFinal, paramOriginFinal, paramHpFinal)를 add_params()에 쉼표로 구분해서 모두 추가합니다. 사용자는 드롭다운으로 생산국을 고르고, 슬라이더로 최소 마력을 조절하고, 마우스로 차트를 드래그해서 원하는 데이터를 찾을 수 있습니다. 세 가지 필터가 동시에 작동합니다.
+
+    드롭다운으로 생산국을 선택하고, 슬라이더로 마력 범위를 조절하고, 마우스 드래그로 영역을 선택할 수 있습니다. 세 가지 필터가 동시에 적용되어 데이터를 탐색합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    originsFinal = ['usa', 'europe', 'japan']
+    dropdownFinal = alt.binding_select(options=[None] + originsFinal, labels=['전체'] + originsFinal, name='생산국: ')
+    paramOriginFinal = alt.param(name='originFinal', bind=dropdownFinal)
+
+    sliderFinal = alt.binding_range(min=0, max=200, step=10, name='최소 마력: ')
+    paramHpFinal = alt.param(name='hpFinal', value=0, bind=sliderFinal)
+
+    brushFinal = alt.selection_interval()
+
+    chartFinal = alt.Chart(mpg).mark_circle(size=80).encode(
+        x=alt.X('horsepower:Q', title='마력'),
+        y=alt.Y('mpg:Q', title='연비 (MPG)'),
+        color=alt.when(brushFinal).then('origin:N').otherwise(alt.value('lightgray')),
+        opacity=alt.when(
+            ((paramOriginFinal == None) | (alt.datum.origin == paramOriginFinal)) &
+            (alt.datum.horsepower >= paramHpFinal)
+        ).then(alt.value(0.8)).otherwise(alt.value(0.1)),
+        tooltip=['name', 'origin', 'horsepower', 'mpg', 'cylinders']
+    ).add_params(
+        brushFinal,
+        paramOriginFinal,
+        paramHpFinal
+    ).properties(
+        width=550,
+        height=350,
+        title='자동차 연비 인터랙티브 대시보드'
+    )
+    chartFinal
+  exercise:
+    prompt: 9단계. 최종 결과물 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      originsFinal = ['usa', 'europe', 'japan']
+      dropdownFinal = alt.binding_select(options=[None] + originsFinal, labels=['전체'] + originsFinal, name='생산국: ')
+      paramOriginFinal = alt.param(name='originFinal', bind=dropdownFinal)
+
+      sliderFinal = alt.binding_range(min=0, max=200, step=10, name='최소 마력: ')
+      paramHpFinal = alt.param(name='hpFinal', value=0, bind=sliderFinal)
+
+      brushFinal = alt.selection_interval()
+
+      chartFinal = alt.Chart(mpg).mark_circle(size=80).encode(
+          x=alt.X('horsepower:Q', title='마력'),
+          y=alt.Y('mpg:Q', title='연비 (MPG)'),
+          color=alt.when(brushFinal).then('origin:N').otherwise(alt.value('lightgray')),
+          opacity=alt.when(
+              ((paramOriginFinal == None) | (alt.datum.origin == paramOriginFinal)) &
+              (alt.datum.horsepower >= paramHpFinal)
+          ).then(alt.value(0.8)).otherwise(alt.value(0.1)),
+          tooltip=['name', 'origin', 'horsepower', 'mpg', 'cylinders']
+      ).add_params(
+          brushFinal,
+          paramOriginFinal,
+          paramHpFinal
+      ).properties(
+          width=550,
+          height=350,
+          title='자동차 연비 인터랙티브 대시보드'
+      )
+      chartFinal
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 9단계. 최종 결과물의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 최종 결과물의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step10_workflow
+  title: 10단계. 실무 인터랙션 검증
+  structuredPrimary: true
+  subtitle: 예측 → 파라미터 오류 확인 → 사양 검증 → 기준 실험
+  goal: 10단계. 실무 인터랙션 검증에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: 인터랙티브 차트는 눈으로만 확인하면 놓치는 부분이 많습니다. 슬라이더와 드롭다운이 실제 차트 사양에 연결됐는지, 브러싱 파라미터가 색상 조건에 들어갔는지,
+    툴팁에 필요한 필드가 있는지 코드로 검사해야 합니다. 이번 단계에서는 생산국별 연비를 먼저 예측하고, 파라미터가 빠진 차트를 일부러 실패시킨 뒤, 완성 차트의 인터랙션 사양을
+    검증합니다. 마지막에는 마력 기준을 바꿔 필터 결과가 어떻게 줄어드는지 실험합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    requiredColumns = {"name", "origin", "horsepower", "mpg", "cylinders"}
+    missingColumns = requiredColumns - set(mpg.columns)
+    if missingColumns:
+        raise ValueError(f"mpg 데이터에 필요한 컬럼이 없습니다: {sorted(missingColumns)}")
+
+    mpgFiltered = mpg.dropna(subset=["horsepower", "mpg", "origin"]).copy()
+    mpgByOrigin = (
+        mpgFiltered.groupby("origin")["mpg"]
+        .mean()
+        .round(1)
+        .sort_values(ascending=False)
+    )
+    bestMpgOrigin = mpgByOrigin.index[0]
+
+    highPowerCountByOrigin = {
+        origin: len(mpgFiltered[(mpgFiltered["origin"] == origin) & (mpgFiltered["horsepower"] >= 120)])
+        for origin in sorted(mpgFiltered["origin"].unique())
+    }
+
+    print("생산국별 평균 연비:", mpgByOrigin.to_dict())
+    print("예상: 평균 연비가 가장 높은 생산국은", bestMpgOrigin)
+    print("120마력 이상 차량 수:", highPowerCountByOrigin)
+  exercise:
+    prompt: 10단계. 실무 인터랙션 검증 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      requiredColumns = {"name", "origin", "horsepower", "mpg", "cylinders"}
+      missingColumns = requiredColumns - set(mpg.columns)
+      if missingColumns:
+          raise ValueError(f"mpg 데이터에 필요한 컬럼이 없습니다: {sorted(missingColumns)}")
+
+      mpgFiltered = mpg.dropna(subset=["horsepower", "mpg", "origin"]).copy()
+      mpgByOrigin = (
+          mpgFiltered.groupby("origin")["mpg"]
+          .mean()
+          .round(1)
+          .sort_values(ascending=False)
+      )
+      bestMpgOrigin = mpgByOrigin.index[0]
+
+      highPowerCountByOrigin = {
+          origin: len(mpgFiltered[(mpgFiltered["origin"] == origin) & (mpgFiltered["horsepower"] >= 120)])
+          for origin in sorted(mpgFiltered["origin"].unique())
+      }
+
+      print("생산국별 평균 연비:", mpgByOrigin.to_dict())
+      print("예상: 평균 연비가 가장 높은 생산국은", bestMpgOrigin)
+      print("120마력 이상 차량 수:", highPowerCountByOrigin)
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 10단계. 실무 인터랙션 검증의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 10단계. 실무 인터랙션 검증 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 인터랙티브 차트 프로젝트
+  goal: 실습에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    이 프로젝트에서 배운 내용을 정리하면: selection_interval()로 드래그 선택, selection_point()로 클릭 선택, when().then().otherwise()로 조건부 스타일, binding_range()로 슬라이더, binding_select()로 드롭다운, alt.datum으로 데이터 접근, & (그리고)와 | (또는) 연산자입니다. 이제 배운 개념들을 조합해 새로운 인터랙티브 차트를 만들어봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import altair as alt
+    import pandas as pd
+    from codaro.curriculum.localData import loadLocalDataset
+    car = loadLocalDataset("mpg")
+    kinds = [3, 4, 5, 6, 8]
+    selectCyl = alt.binding_select(options=[None] + kinds, labels=['전체'] + [str(c) for c in kinds], name='실린더: ')
+    filterCyl = alt.param(name='cylFilter', bind=selectCyl)
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import altair as alt
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+      car = loadLocalDataset("mpg")
+      kinds = [3, 4, 5, 6, 8]
+      selectCyl = alt.binding_select(options=[None] + kinds, labels=['전체'] + [str(c) for c in kinds], name='실린더: ')
+      filterCyl = alt.param(name='cylFilter', bind=selectCyl)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 실습의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 실습 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Altair로 인터랙티브 차트를 마스터했습니다!
+  - type: list
+    items:
+    - selection_interval() - 드래그로 영역 선택 (브러싱)
+    - selection_point(fields=[...]) - 클릭으로 항목 선택
+    - add_params() - 선택 파라미터를 차트에 연결
+    - alt.when(selection).then().otherwise() - 조건부 인코딩
+    - binding_range() - 슬라이더 위젯
+    - binding_select() - 드롭다운 위젯
+    - alt.datum.컬럼명 - 데이터 값 접근
+  - type: text
+    content: 다음 프로젝트에서는 여러 차트를 연결하는 다중 뷰 연동을 배웁니다.
+  goal: 정리에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: altair_07-interactive-filter-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - summary
+    title: interactive filter 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: selection parameter와 filter 대상이 눈에 보이는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_interactive_filter(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_interactive_filter(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_interactive_filter(rows):
+            required = ['metricX', 'metricY', 'category']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'category'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['metricX'] for row in usable]
+            y_values = [row['metricY'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.altair.altair_07.interactive-filter-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.altair.altair_07.interactive-filter-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_interactive_filter
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - metricX: 1
+              metricY: 8
+              category: A
+            - metricX: 2
+              metricY: 4
+              category: B
+            - metricX: 3
+              metricY: 6
+              category: A
+          expectedReturn:
+            usableCount: 3
+            excludedCount: 0
+            groupCounts:
+              A: 2
+              B: 1
+            xExtent:
+            - 1
+            - 3
+            yExtent:
+            - 4
+            - 8
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: altair_07-interactive-filter-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - altair_07-interactive-filter-data-evidence-mastery
+    title: interactive filter 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 산점도 brush가 아래 상세 table을 filter하고 선택 수를 표시한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_interactive_filter(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_interactive_filter(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_interactive_filter(candidate):
+            expected = {'mark': 'point', 'x': 'metricX', 'y': 'metricY', 'group': 'category', 'transforms': ['filter-param', 'selection-param'], 'interaction': 'brush'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.altair.altair_07.interactive-filter-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.altair.altair_07.interactive-filter-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_interactive_filter
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: point
+              x: metricX
+              y: metricY
+              group: category
+              transforms:
+              - filter-param
+              - selection-param
+              interaction: brush
+              description: 산점도 brush가 아래 상세 table을 filter하고 선택 수를 표시한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: point
+              x: metricX
+              y: metricY
+              group: category
+              transforms:
+              - filter-param
+              - selection-param
+              interaction: brush
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: metricY
+              y: metricX
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - interaction
+            - description
+            encoding:
+              mark: point
+              x: metricX
+              y: metricY
+              group: category
+              transforms:
+              - filter-param
+              - selection-param
+              interaction: brush
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: altair_07-interactive-filter-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - altair_07-interactive-filter-encoding-transfer-transfer
+    title: interactive filter 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: selection parameter와 filter 대상이 눈에 보이는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_interactive_filter(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_interactive_filter(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_interactive_filter(situation):
+            table = {'continuous-region': {'encoding': 'interval selection', 'evidence': 'selected bounds and count', 'risk': 'invisible state'}, 'category-toggle': {'encoding': 'legend point selection', 'evidence': 'active categories', 'risk': 'empty selection semantics'}, 'reset': {'encoding': 'explicit clear behavior', 'evidence': 'all rows restored', 'risk': 'stuck filter'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.altair.altair_07.interactive-filter-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.altair.altair_07.interactive-filter-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_interactive_filter
+        cases:
+        - id: recalls-continuous-region
+          arguments:
+          - value: continuous-region
+          expectedReturn:
+            encoding: interval selection
+            evidence: selected bounds and count
+            risk: invisible state
+        - id: recalls-category-toggle
+          arguments:
+          - value: category-toggle
+          expectedReturn:
+            encoding: legend point selection
+            evidence: active categories
+            risk: empty selection semantics
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

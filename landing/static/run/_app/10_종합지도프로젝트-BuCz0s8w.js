@@ -1,0 +1,1423 @@
+var e=`meta:
+  packages:
+  - branca
+  - folium
+  id: folium_10
+  title: 종합 지도 프로젝트
+  order: 10
+  category: folium
+  difficulty: ⭐⭐⭐⭐
+  badge: 심화
+  tags:
+  - folium
+  - 종합
+  - 프로젝트
+  - 인터랙티브
+  - 대시보드
+  seo:
+    title: Folium 종합 프로젝트 - 서울 관광 지도
+    description: Folium의 모든 기능을 종합한 인터랙티브 지도를 만듭니다. 마커, 히트맵, 클러스터, GeoJSON을 조합합니다.
+    keywords:
+    - folium
+    - 종합
+    - 프로젝트
+    - 인터랙티브
+    - 관광지도
+intro:
+  emoji: 🏆
+  goal: 모든 기능을 종합한 인터랙티브 지도를 제작합니다.
+  description: 지금까지 배운 모든 내용을 활용합니다. 마커, 클러스터, 히트맵, GeoJSON, 레이어 컨트롤을 조합하여 완성도 높은 지도를 만듭니다. 서울 관광 종합 지도를
+    예제로 구현합니다.
+  direction: 종합 지도 프로젝트에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.
+  benefits:
+  - 위도/경도 데이터 확인 후 지도 레이어 구성에 맞는 코드 입력을 고릅니다.
+  - 종합 지도 프로젝트 결과를 마커와 저장 HTML 기준으로 즉시 점검합니다.
+  - 완료한 코드를 위치 기반 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(위도/경도 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 베이스 맵 설정 처리 실행
+      detail: 지도 레이어 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 주요 랜드마크 결과 검증
+      detail: 마커와 저장 HTML 기준으로 실행 결과를 비교합니다.
+    - label: 종합 지도 프로젝트 재사용
+      detail: 완성 코드를 위치 기반 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 지도 시각화 환경
+      detail: branca, folium 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 종합 지도 프로젝트 실행
+      detail: 셀을 실행해 마커와 저장 HTML와 예외 상태를 확인합니다.
+    - label: 종합 지도 프로젝트 완료
+      detail: 검증된 코드를 위치 기반 리포트로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: 모든 플러그인 import
+  goal: 1단계. 라이브러리 불러오기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: 필요한 모든 라이브러리와 플러그인을 불러옵니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import folium
+    from folium.plugins import HeatMap, MarkerCluster
+    import branca.colormap as cm
+    import random
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: |-
+      import folium
+      from folium.plugins import HeatMap, MarkerCluster
+      import branca.colormap as cm
+      import random
+    hints:
+    - 바꿀 지점은 위도/경도 데이터을 만드는 첫 줄과 지도 레이어 구성 줄에서 찾으세요.
+    - 실행 뒤 마커와 저장 HTML 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 마커와 저장 HTML 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step2_base_map
+  title: 2단계. 베이스 맵 설정
+  structuredPrimary: true
+  subtitle: 기본 지도
+  goal: 2단계. 베이스 맵 설정에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    다중 타일 레이어를 지원하는 베이스 맵을 만듭니다.
+
+    여러 타일을 추가하면 LayerControl에서 전환할 수 있습니다.
+  snippet: |-
+    seoulCenter = [37.5665, 126.9780]
+
+    tourMap = folium.Map(
+        location=seoulCenter,
+        zoom_start=12,
+        tiles=None
+    )
+
+    folium.TileLayer(
+        "CartoDB Positron",
+        name="밝은 지도"
+    ).add_to(tourMap)
+
+    folium.TileLayer(
+        "CartoDB Dark_Matter",
+        name="어두운 지도"
+    ).add_to(tourMap)
+
+    folium.TileLayer(
+        "OpenStreetMap",
+        name="상세 지도"
+    ).add_to(tourMap)
+
+    tourMap
+  exercise:
+    prompt: 2단계. 베이스 맵 설정 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      seoulCenter = [37.5665, 126.9780]
+
+      tourMap = folium.Map(
+          location=seoulCenter,
+          zoom_start=12,
+          tiles=None
+      )
+
+      folium.TileLayer(
+          "CartoDB Positron",
+          name="밝은 지도"
+      ).add_to(tourMap)
+
+      folium.TileLayer(
+          "CartoDB Dark_Matter",
+          name="어두운 지도"
+      ).add_to(tourMap)
+
+      folium.TileLayer(
+          "OpenStreetMap",
+          name="상세 지도"
+      ).add_to(tourMap)
+
+      tourMap
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 2단계. 베이스 맵 설정에서 \`seoulCenter\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. 베이스 맵 설정 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step3_landmark_markers
+  title: 3단계. 주요 랜드마크
+  structuredPrimary: true
+  subtitle: 개별 마커
+  goal: 3단계. 주요 랜드마크에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    주요 랜드마크는 개별 마커로 강조합니다.
+
+    중요한 위치는 개별 마커로 표시하여 클러스터에 묻히지 않게 합니다.
+  snippet: |-
+    landmarks = [
+        {"name": "경복궁", "loc": [37.5796, 126.9770], "desc": "조선 왕궁", "icon": "tower"},
+        {"name": "남산타워", "loc": [37.5512, 126.9882], "desc": "서울 랜드마크", "icon": "signal"},
+        {"name": "광화문", "loc": [37.5760, 126.9769], "desc": "조선 정문", "icon": "flag"},
+        {"name": "동대문DDP", "loc": [37.5673, 127.0095], "desc": "디자인플라자", "icon": "th-large"}
+    ]
+    landmarks
+  exercise:
+    prompt: 3단계. 주요 랜드마크 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      landmarks = [
+          {"name": "경복궁", "loc": [37.5796, 126.9770], "desc": "조선 왕궁", "icon": "tower"},
+          {"name": "남산타워", "loc": [37.5512, 126.9882], "desc": "서울 랜드마크", "icon": "signal"},
+          {"name": "광화문", "loc": [37.5760, 126.9769], "desc": "조선 정문", "icon": "flag"},
+          {"name": "동대문DDP", "loc": [37.5673, 127.0095], "desc": "디자인플라자", "icon": "th-large"}
+      ]
+      landmarks
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 3단계. 주요 랜드마크에서 \`landmarks\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 주요 랜드마크 실행 뒤 \`landmarks\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step4_cafe_cluster
+  title: 4단계. 카페 클러스터
+  structuredPrimary: true
+  subtitle: MarkerCluster
+  goal: 4단계. 카페 클러스터에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    카페 위치를 클러스터로 표시합니다. 대량 데이터를 효율적으로 관리합니다.
+
+    60개 카페가 클러스터로 깔끔하게 표시됩니다.
+  snippet: |-
+    cafeCluster = MarkerCluster(name="카페")
+
+    cafeAreas = [
+        [37.5796, 126.9770],
+        [37.5636, 126.9869],
+        [37.5563, 126.9236],
+        [37.4979, 127.0276]
+    ]
+
+    for area in cafeAreas:
+        for i in range(15):
+            lat = area[0] + random.uniform(-0.008, 0.008)
+            lon = area[1] + random.uniform(-0.008, 0.008)
+            folium.Marker(
+                location=[lat, lon],
+                popup=f"카페 {i+1}",
+                icon=folium.Icon(color="cadetblue", icon="cloud")
+            ).add_to(cafeCluster)
+
+    cafeCluster.add_to(tourMap)
+
+    tourMap
+  exercise:
+    prompt: 4단계. 카페 클러스터 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      cafeCluster = MarkerCluster(name="카페")
+
+      cafeAreas = [
+          [37.5796, 126.9770],
+          [37.5636, 126.9869],
+          [37.5563, 126.9236],
+          [37.4979, 127.0276]
+      ]
+
+      for area in cafeAreas:
+          for i in range(15):
+              lat = area[0] + random.uniform(-0.008, 0.008)
+              lon = area[1] + random.uniform(-0.008, 0.008)
+              folium.Marker(
+                  location=[lat, lon],
+                  popup=f"카페 {i+1}",
+                  icon=folium.Icon(color="cadetblue", icon="cloud")
+              ).add_to(cafeCluster)
+
+      cafeCluster.add_to(tourMap)
+
+      tourMap
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 4단계. 카페 클러스터의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 4단계. 카페 클러스터 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step5_restaurant_cluster
+  title: 5단계. 음식점 클러스터
+  structuredPrimary: true
+  subtitle: 별도 클러스터
+  goal: 5단계. 음식점 클러스터에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    음식점용 별도 클러스터를 만들어 카테고리를 분리합니다.
+
+    show=False로 기본 숨김 상태입니다. LayerControl에서 켤 수 있습니다.
+  snippet: |-
+    restaurantCluster = MarkerCluster(name="음식점", show=False)
+
+    restaurantAreas = [
+        [37.5636, 126.9869],
+        [37.5701, 126.9995],
+        [37.5660, 126.9910]
+    ]
+
+    for area in restaurantAreas:
+        for i in range(20):
+            lat = area[0] + random.uniform(-0.006, 0.006)
+            lon = area[1] + random.uniform(-0.006, 0.006)
+            folium.Marker(
+                location=[lat, lon],
+                popup=f"맛집 {i+1}",
+                icon=folium.Icon(color="orange", icon="cutlery")
+            ).add_to(restaurantCluster)
+
+    restaurantCluster.add_to(tourMap)
+
+    tourMap
+  exercise:
+    prompt: 5단계. 음식점 클러스터 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      restaurantCluster = MarkerCluster(name="음식점", show=False)
+
+      restaurantAreas = [
+          [37.5636, 126.9869],
+          [37.5701, 126.9995],
+          [37.5660, 126.9910]
+      ]
+
+      for area in restaurantAreas:
+          for i in range(20):
+              lat = area[0] + random.uniform(-0.006, 0.006)
+              lon = area[1] + random.uniform(-0.006, 0.006)
+              folium.Marker(
+                  location=[lat, lon],
+                  popup=f"맛집 {i+1}",
+                  icon=folium.Icon(color="orange", icon="cutlery")
+              ).add_to(restaurantCluster)
+
+      restaurantCluster.add_to(tourMap)
+
+      tourMap
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 5단계. 음식점 클러스터의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 5단계. 음식점 클러스터 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step6_heatmap
+  title: 6단계. 관광객 밀도 히트맵
+  structuredPrimary: true
+  subtitle: HeatMap
+  goal: 6단계. 관광객 밀도 히트맵에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    관광객 밀도를 히트맵으로 시각화합니다.
+
+    히트맵도 FeatureGroup에 넣으면 레이어 컨트롤로 제어됩니다.
+  snippet: |-
+    densityGroup = folium.FeatureGroup(name="관광객 밀도", show=False)
+
+    densityData = []
+
+    hotspots = [
+        {"loc": [37.5796, 126.9770], "weight": 1.0},
+        {"loc": [37.5636, 126.9869], "weight": 0.9},
+        {"loc": [37.5512, 126.9882], "weight": 0.8},
+        {"loc": [37.5563, 126.9236], "weight": 0.7}
+    ]
+
+    for hs in hotspots:
+        for _ in range(50):
+            lat = hs["loc"][0] + random.uniform(-0.01, 0.01)
+            lon = hs["loc"][1] + random.uniform(-0.01, 0.01)
+            densityData.append([lat, lon, hs["weight"]])
+
+    HeatMap(
+        densityData,
+        radius=20,
+        blur=15,
+        gradient={0.4: "blue", 0.6: "lime", 0.8: "yellow", 1: "red"}
+    ).add_to(densityGroup)
+
+    densityGroup.add_to(tourMap)
+
+    tourMap
+  exercise:
+    prompt: 6단계. 관광객 밀도 히트맵 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      densityGroup = folium.FeatureGroup(name="관광객 밀도", show=False)
+
+      densityData = []
+
+      hotspots = [
+          {"loc": [37.5796, 126.9770], "weight": 1.0},
+          {"loc": [37.5636, 126.9869], "weight": 0.9},
+          {"loc": [37.5512, 126.9882], "weight": 0.8},
+          {"loc": [37.5563, 126.9236], "weight": 0.7}
+      ]
+
+      for hs in hotspots:
+          for _ in range(50):
+              lat = hs["loc"][0] + random.uniform(-0.01, 0.01)
+              lon = hs["loc"][1] + random.uniform(-0.01, 0.01)
+              densityData.append([lat, lon, hs["weight"]])
+
+      HeatMap(
+          densityData,
+          radius=20,
+          blur=15,
+          gradient={0.4: "blue", 0.6: "lime", 0.8: "yellow", 1: "red"}
+      ).add_to(densityGroup)
+
+      densityGroup.add_to(tourMap)
+
+      tourMap
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 6단계. 관광객 밀도 히트맵의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 6단계. 관광객 밀도 히트맵 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step7_gu_boundaries
+  title: 7단계. 구 경계 GeoJSON
+  structuredPrimary: true
+  subtitle: 행정구역
+  goal: 7단계. 구 경계 GeoJSON에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    서울의 주요 구 경계를 GeoJSON으로 표시합니다.
+
+    컬러맵 범례가 우측 하단에 표시됩니다.
+  snippet: |-
+    guBoundaries = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {"name": "종로구", "visitors": 85000},
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [[
+                        [126.96, 37.57], [127.00, 37.57],
+                        [127.00, 37.60], [126.96, 37.60], [126.96, 37.57]
+                    ]]
+                }
+            },
+            {
+                "type": "Feature",
+                "properties": {"name": "중구", "visitors": 120000},
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [[
+                        [126.96, 37.54], [127.00, 37.54],
+                        [127.00, 37.57], [126.96, 37.57], [126.96, 37.54]
+                    ]]
+                }
+            },
+            {
+                "type": "Feature",
+                "properties": {"name": "용산구", "visitors": 65000},
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [[
+                        [126.96, 37.51], [127.00, 37.51],
+                        [127.00, 37.54], [126.96, 37.54], [126.96, 37.51]
+                    ]]
+                }
+            },
+            {
+                "type": "Feature",
+                "properties": {"name": "마포구", "visitors": 75000},
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [[
+                        [126.90, 37.54], [126.96, 37.54],
+                        [126.96, 37.57], [126.90, 37.57], [126.90, 37.54]
+                    ]]
+                }
+            }
+        ]
+    }
+    guBoundaries
+  exercise:
+    prompt: 7단계. 구 경계 GeoJSON 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      guBoundaries = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "properties": {"name": "종로구", "visitors": 85000},
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.96, 37.57], [127.00, 37.57],
+                          [127.00, 37.60], [126.96, 37.60], [126.96, 37.57]
+                      ]]
+                  }
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"name": "중구", "visitors": 120000},
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.96, 37.54], [127.00, 37.54],
+                          [127.00, 37.57], [126.96, 37.57], [126.96, 37.54]
+                      ]]
+                  }
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"name": "용산구", "visitors": 65000},
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.96, 37.51], [127.00, 37.51],
+                          [127.00, 37.54], [126.96, 37.54], [126.96, 37.51]
+                      ]]
+                  }
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"name": "마포구", "visitors": 75000},
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.90, 37.54], [126.96, 37.54],
+                          [126.96, 37.57], [126.90, 37.57], [126.90, 37.54]
+                      ]]
+                  }
+              }
+          ]
+      }
+      guBoundaries
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 7단계. 구 경계 GeoJSON에서 \`guBoundaries\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. 구 경계 GeoJSON 실행 뒤 \`guBoundaries\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step8_routes
+  title: 8단계. 관광 코스
+  structuredPrimary: true
+  subtitle: PolyLine
+  goal: 8단계. 관광 코스에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    추천 관광 코스를 경로로 표시합니다.
+
+    실선과 점선으로 코스를 구분합니다.
+  snippet: |-
+    routeGroup = folium.FeatureGroup(name="추천 코스", show=False)
+
+    palaceRoute = [
+        [37.5796, 126.9770],
+        [37.5794, 126.9910],
+        [37.5826, 126.9831],
+        [37.5760, 126.9769]
+    ]
+
+    folium.PolyLine(
+        locations=palaceRoute,
+        color="purple",
+        weight=5,
+        opacity=0.8,
+        popup="궁궐 투어 (2시간)"
+    ).add_to(routeGroup)
+
+    shoppingRoute = [
+        [37.5636, 126.9869],
+        [37.5673, 127.0095],
+        [37.5701, 126.9995]
+    ]
+
+    folium.PolyLine(
+        locations=shoppingRoute,
+        color="pink",
+        weight=5,
+        opacity=0.8,
+        dash_array="10",
+        popup="쇼핑 투어 (3시간)"
+    ).add_to(routeGroup)
+
+    routeGroup.add_to(tourMap)
+
+    tourMap
+  exercise:
+    prompt: 8단계. 관광 코스 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      routeGroup = folium.FeatureGroup(name="추천 코스", show=False)
+
+      palaceRoute = [
+          [37.5796, 126.9770],
+          [37.5794, 126.9910],
+          [37.5826, 126.9831],
+          [37.5760, 126.9769]
+      ]
+
+      folium.PolyLine(
+          locations=palaceRoute,
+          color="purple",
+          weight=5,
+          opacity=0.8,
+          popup="궁궐 투어 (2시간)"
+      ).add_to(routeGroup)
+
+      shoppingRoute = [
+          [37.5636, 126.9869],
+          [37.5673, 127.0095],
+          [37.5701, 126.9995]
+      ]
+
+      folium.PolyLine(
+          locations=shoppingRoute,
+          color="pink",
+          weight=5,
+          opacity=0.8,
+          dash_array="10",
+          popup="쇼핑 투어 (3시간)"
+      ).add_to(routeGroup)
+
+      routeGroup.add_to(tourMap)
+
+      tourMap
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 8단계. 관광 코스에서 \`routeGroup\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 8단계. 관광 코스 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step9_layer_control
+  title: 9단계. 레이어 컨트롤
+  structuredPrimary: true
+  subtitle: LayerControl
+  goal: 9단계. 레이어 컨트롤에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+  explanation: |-
+    LayerControl을 추가하여 모든 레이어를 제어합니다.
+
+    collapsed=False로 항상 펼쳐진 상태로 표시됩니다.
+  snippet: |-
+    folium.LayerControl(collapsed=False).add_to(tourMap)
+
+    tourMap
+  exercise:
+    prompt: 9단계. 레이어 컨트롤 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    starterCode: |-
+      folium.LayerControl(collapsed=False).add_to(tourMap)
+
+      tourMap
+    hints:
+    - 바꿀 지점은 위도/경도 데이터을 만드는 첫 줄과 지도 레이어 구성 줄에서 찾으세요.
+    - 실행 뒤 마커와 저장 HTML 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 9단계. 레이어 컨트롤의 수정 코드가 지도 레이어 구성 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 9단계. 레이어 컨트롤 실행 결과가 마커와 저장 HTML 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step10_complete
+  title: 10단계. 완성 코드
+  structuredPrimary: true
+  subtitle: 전체 종합
+  goal: 10단계. 완성 코드에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: 지금까지 작성한 모든 코드를 하나로 합친 완성 버전입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import folium
+    from folium.plugins import HeatMap, MarkerCluster
+    import branca.colormap as cm
+    import random
+    seoulCenter = [37.5665, 126.9780]
+    finalMap = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
+
+    folium.TileLayer("CartoDB Positron", name="밝은 지도").add_to(finalMap)
+    folium.TileLayer("CartoDB Dark_Matter", name="어두운 지도").add_to(finalMap)
+
+    landmarks = [
+        {"name": "경복궁", "loc": [37.5796, 126.9770], "icon": "tower"},
+        {"name": "남산타워", "loc": [37.5512, 126.9882], "icon": "signal"},
+        {"name": "광화문", "loc": [37.5760, 126.9769], "icon": "flag"},
+        {"name": "동대문DDP", "loc": [37.5673, 127.0095], "icon": "th-large"}
+    ]
+
+    lmGroup = folium.FeatureGroup(name="랜드마크")
+    for lm in landmarks:
+        folium.Marker(
+            location=lm["loc"],
+            popup=f"<b>{lm['name']}</b>",
+            tooltip=lm["name"],
+            icon=folium.Icon(color="red", icon=lm["icon"])
+        ).add_to(lmGroup)
+    lmGroup.add_to(finalMap)
+
+    cafeCluster = MarkerCluster(name="카페")
+    cafeAreas = [[37.5796, 126.9770], [37.5636, 126.9869], [37.5563, 126.9236]]
+    for area in cafeAreas:
+        for i in range(10):
+            lat = area[0] + random.uniform(-0.006, 0.006)
+            lon = area[1] + random.uniform(-0.006, 0.006)
+            folium.Marker(
+                [lat, lon],
+                popup=f"카페",
+                icon=folium.Icon(color="cadetblue", icon="cloud")
+            ).add_to(cafeCluster)
+    cafeCluster.add_to(finalMap)
+
+    densityGroup = folium.FeatureGroup(name="관광객 밀도", show=False)
+    densityData = []
+    for area in cafeAreas:
+        for _ in range(30):
+            lat = area[0] + random.uniform(-0.01, 0.01)
+            lon = area[1] + random.uniform(-0.01, 0.01)
+            densityData.append([lat, lon, 0.8])
+    HeatMap(densityData, radius=20, blur=15).add_to(densityGroup)
+    densityGroup.add_to(finalMap)
+
+    guGeo = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {"name": "종로구", "score": 90},
+                "geometry": {"type": "Polygon", "coordinates": [[
+                    [126.96, 37.57], [127.00, 37.57],
+                    [127.00, 37.60], [126.96, 37.60], [126.96, 37.57]
+                ]]}
+            },
+            {
+                "type": "Feature",
+                "properties": {"name": "중구", "score": 85},
+                "geometry": {"type": "Polygon", "coordinates": [[
+                    [126.96, 37.54], [127.00, 37.54],
+                    [127.00, 37.57], [126.96, 37.57], [126.96, 37.54]
+                ]]}
+            }
+        ]
+    }
+
+    guGroup = folium.FeatureGroup(name="구 경계", show=False)
+    scoreColormap = cm.LinearColormap(
+        ["#fee8c8", "#e74c3c"],
+        vmin=70, vmax=100,
+        caption="관광 만족도"
+    )
+    folium.GeoJson(
+        guGeo,
+        style_function=lambda f: {
+            "fillColor": scoreColormap(f["properties"]["score"]),
+            "color": "white", "weight": 2, "fillOpacity": 0.5
+        },
+        tooltip=folium.GeoJsonTooltip(fields=["name", "score"])
+    ).add_to(guGroup)
+    guGroup.add_to(finalMap)
+    scoreColormap.add_to(finalMap)
+
+    routeGroup = folium.FeatureGroup(name="추천 코스", show=False)
+    folium.PolyLine(
+        [[37.5796, 126.9770], [37.5760, 126.9769], [37.5636, 126.9869]],
+        color="purple", weight=4, popup="궁궐-명동 코스"
+    ).add_to(routeGroup)
+    routeGroup.add_to(finalMap)
+
+    folium.LayerControl(collapsed=False).add_to(finalMap)
+
+    finalMap
+  exercise:
+    prompt: 10단계. 완성 코드 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      import folium
+      from folium.plugins import HeatMap, MarkerCluster
+      import branca.colormap as cm
+      import random
+      seoulCenter = [37.5665, 126.9780]
+      finalMap = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
+
+      folium.TileLayer("CartoDB Positron", name="밝은 지도").add_to(finalMap)
+      folium.TileLayer("CartoDB Dark_Matter", name="어두운 지도").add_to(finalMap)
+
+      landmarks = [
+          {"name": "경복궁", "loc": [37.5796, 126.9770], "icon": "tower"},
+          {"name": "남산타워", "loc": [37.5512, 126.9882], "icon": "signal"},
+          {"name": "광화문", "loc": [37.5760, 126.9769], "icon": "flag"},
+          {"name": "동대문DDP", "loc": [37.5673, 127.0095], "icon": "th-large"}
+      ]
+
+      lmGroup = folium.FeatureGroup(name="랜드마크")
+      for lm in landmarks:
+          folium.Marker(
+              location=lm["loc"],
+              popup=f"<b>{lm['name']}</b>",
+              tooltip=lm["name"],
+              icon=folium.Icon(color="red", icon=lm["icon"])
+          ).add_to(lmGroup)
+      lmGroup.add_to(finalMap)
+
+      cafeCluster = MarkerCluster(name="카페")
+      cafeAreas = [[37.5796, 126.9770], [37.5636, 126.9869], [37.5563, 126.9236]]
+      for area in cafeAreas:
+          for i in range(10):
+              lat = area[0] + random.uniform(-0.006, 0.006)
+              lon = area[1] + random.uniform(-0.006, 0.006)
+              folium.Marker(
+                  [lat, lon],
+                  popup=f"카페",
+                  icon=folium.Icon(color="cadetblue", icon="cloud")
+              ).add_to(cafeCluster)
+      cafeCluster.add_to(finalMap)
+
+      densityGroup = folium.FeatureGroup(name="관광객 밀도", show=False)
+      densityData = []
+      for area in cafeAreas:
+          for _ in range(30):
+              lat = area[0] + random.uniform(-0.01, 0.01)
+              lon = area[1] + random.uniform(-0.01, 0.01)
+              densityData.append([lat, lon, 0.8])
+      HeatMap(densityData, radius=20, blur=15).add_to(densityGroup)
+      densityGroup.add_to(finalMap)
+
+      guGeo = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "properties": {"name": "종로구", "score": 90},
+                  "geometry": {"type": "Polygon", "coordinates": [[
+                      [126.96, 37.57], [127.00, 37.57],
+                      [127.00, 37.60], [126.96, 37.60], [126.96, 37.57]
+                  ]]}
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"name": "중구", "score": 85},
+                  "geometry": {"type": "Polygon", "coordinates": [[
+                      [126.96, 37.54], [127.00, 37.54],
+                      [127.00, 37.57], [126.96, 37.57], [126.96, 37.54]
+                  ]]}
+              }
+          ]
+      }
+
+      guGroup = folium.FeatureGroup(name="구 경계", show=False)
+      scoreColormap = cm.LinearColormap(
+          ["#fee8c8", "#e74c3c"],
+          vmin=70, vmax=100,
+          caption="관광 만족도"
+      )
+      folium.GeoJson(
+          guGeo,
+          style_function=lambda f: {
+              "fillColor": scoreColormap(f["properties"]["score"]),
+              "color": "white", "weight": 2, "fillOpacity": 0.5
+          },
+          tooltip=folium.GeoJsonTooltip(fields=["name", "score"])
+      ).add_to(guGroup)
+      guGroup.add_to(finalMap)
+      scoreColormap.add_to(finalMap)
+
+      routeGroup = folium.FeatureGroup(name="추천 코스", show=False)
+      folium.PolyLine(
+          [[37.5796, 126.9770], [37.5760, 126.9769], [37.5636, 126.9869]],
+          color="purple", weight=4, popup="궁궐-명동 코스"
+      ).add_to(routeGroup)
+      routeGroup.add_to(finalMap)
+
+      folium.LayerControl(collapsed=False).add_to(finalMap)
+
+      finalMap
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 10단계. 완성 코드의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 10단계. 완성 코드 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: workflow_validation
+  title: 11단계. 종합 지도 품질 검증
+  structuredPrimary: true
+  subtitle: 데이터 계약과 레이어 렌더 확인
+  goal: 11단계. 종합 지도 품질 검증에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 종합 지도는 위치 데이터, GeoJSON, 레이어 표시 의도를 함께 확인해야 화면 완성 뒤에도 데이터 누락을 줄일 수 있습니다.
+  explanation: |-
+    종합 지도는 기능을 많이 붙이는 과제가 아니라, 데이터 계약과 레이어 의도가 깨지지 않는지 검증하는 프로젝트입니다. 마커, 클러스터, 히트맵, GeoJSON, 경로가 서로 다른 데이터 구조를 쓰므로 먼저 검증 기준을 만들고 마지막에 렌더 결과를 확인합니다.
+
+    종합 프로젝트는 화면 완성도가 아니라 검증 가능한 데이터-지도 파이프라인으로 평가해야 합니다.
+  snippet: |-
+    import folium
+    from folium.plugins import HeatMap, MarkerCluster
+    import branca.colormap as cm
+
+    projectSites = [
+        {"name": "경복궁", "category": "landmark", "loc": [37.5796, 126.9770], "visitors": 90},
+        {"name": "남산타워", "category": "landmark", "loc": [37.5512, 126.9882], "visitors": 85},
+        {"name": "명동 카페", "category": "cafe", "loc": [37.5636, 126.9869], "visitors": 70},
+        {"name": "홍대 카페", "category": "cafe", "loc": [37.5563, 126.9236], "visitors": 75},
+        {"name": "종로 맛집", "category": "restaurant", "loc": [37.5701, 126.9995], "visitors": 65},
+    ]
+
+    projectGeo = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {"name": "중심 관광권", "score": 92},
+                "geometry": {"type": "Polygon", "coordinates": [[
+                    [126.96, 37.56], [127.00, 37.56],
+                    [127.00, 37.60], [126.96, 37.60], [126.96, 37.56]
+                ]]},
+            },
+            {
+                "type": "Feature",
+                "properties": {"name": "동부 관광권", "score": 78},
+                "geometry": {"type": "Polygon", "coordinates": [[
+                    [127.00, 37.54], [127.04, 37.54],
+                    [127.04, 37.58], [127.00, 37.58], [127.00, 37.54]
+                ]]},
+            },
+        ],
+    }
+
+    routePoints = [
+        [37.5796, 126.9770],
+        [37.5760, 126.9769],
+        [37.5636, 126.9869],
+    ]
+
+    categoryConfig = {
+        "landmark": {"label": "랜드마크", "color": "red", "show": True},
+        "cafe": {"label": "카페", "color": "cadetblue", "show": True},
+        "restaurant": {"label": "음식점", "color": "orange", "show": False},
+    }
+
+    len(projectSites), len(projectGeo["features"]), len(routePoints)
+  exercise:
+    prompt: 11단계. 종합 지도 품질 검증 예제에서 관광지, GeoJSON feature, 경로 좌표, 카테고리 표시 설정을 바꾸고 검증 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import folium
+      from folium.plugins import HeatMap, MarkerCluster
+      import branca.colormap as cm
+
+      projectSites = [
+          {"name": "경복궁", "category": "landmark", "loc": [37.5796, 126.9770], "visitors": 90},
+          {"name": "남산타워", "category": "landmark", "loc": [37.5512, 126.9882], "visitors": 85},
+          {"name": "명동 카페", "category": "cafe", "loc": [37.5636, 126.9869], "visitors": 70},
+          {"name": "홍대 카페", "category": "cafe", "loc": [37.5563, 126.9236], "visitors": 75},
+          {"name": "종로 맛집", "category": "restaurant", "loc": [37.5701, 126.9995], "visitors": 65},
+      ]
+
+      projectGeo = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "properties": {"name": "중심 관광권", "score": 92},
+                  "geometry": {"type": "Polygon", "coordinates": [[
+                      [126.96, 37.56], [127.00, 37.56],
+                      [127.00, 37.60], [126.96, 37.60], [126.96, 37.56]
+                  ]]},
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"name": "동부 관광권", "score": 78},
+                  "geometry": {"type": "Polygon", "coordinates": [[
+                      [127.00, 37.54], [127.04, 37.54],
+                      [127.04, 37.58], [127.00, 37.58], [127.00, 37.54]
+                  ]]},
+              },
+          ],
+      }
+
+      routePoints = [
+          [37.5796, 126.9770],
+          [37.5760, 126.9769],
+          [37.5636, 126.9869],
+      ]
+
+      categoryConfig = {
+          "landmark": {"label": "랜드마크", "color": "red", "show": True},
+          "cafe": {"label": "카페", "color": "cadetblue", "show": True},
+          "restaurant": {"label": "음식점", "color": "orange", "show": False},
+      }
+
+      len(projectSites), len(projectGeo["features"]), len(routePoints)
+    hints:
+    - 바꿀 지점은 \`projectSites\`, \`projectGeo\`, \`routePoints\`, \`categoryConfig\`의 좌표와 카테고리 값입니다.
+    - 실행 뒤 개수 검증, 카테고리 설정, 레이어 구성 기준이 바꾼 지도 데이터를 반영하는지 보세요.
+  check:
+    noError: 11단계. 종합 지도 품질 검증의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 11단계. 종합 지도 품질 검증의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 종합 프로젝트
+  goal: 실습에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: 지금까지 배운 내용을 활용하여 나만의 종합 지도를 만들어봅시다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import folium
+    from folium.plugins import HeatMap, MarkerCluster
+    import branca.colormap as cm
+    import random
+    gangnamCenter = [37.4979, 127.0276]
+    realEstateMap = folium.Map(location=gangnamCenter, zoom_start=14, tiles="CartoDB Positron")
+
+    priceGeo = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {"name": "역삼동", "price": 15},
+                "geometry": {"type": "Polygon", "coordinates": [[
+                    [127.02, 37.49], [127.04, 37.49],
+                    [127.04, 37.51], [127.02, 37.51], [127.02, 37.49]
+                ]]}
+            },
+            {
+                "type": "Feature",
+                "properties": {"name": "삼성동", "price": 18},
+                "geometry": {"type": "Polygon", "coordinates": [[
+                    [127.04, 37.49], [127.06, 37.49],
+                    [127.06, 37.51], [127.04, 37.51], [127.04, 37.49]
+                ]]}
+            }
+        ]
+    }
+
+    priceColormap = cm.LinearColormap(
+        ["#fee8c8", "#e74c3c"],
+        vmin=10, vmax=20,
+        caption="평당 가격(억원)"
+    )
+
+    priceGroup = folium.FeatureGroup(name="시세")
+    folium.GeoJson(
+        priceGeo,
+        style_function=lambda f: {
+            "fillColor": priceColormap(f["properties"]["price"]),
+            "color": "white", "weight": 2, "fillOpacity": 0.6
+        },
+        tooltip=folium.GeoJsonTooltip(
+            fields=["name", "price"],
+            aliases=["동:", "평당가:"]
+        )
+    ).add_to(priceGroup)
+    priceGroup.add_to(realEstateMap)
+    priceColormap.add_to(realEstateMap)
+
+    aptCluster = MarkerCluster(name="아파트")
+    for _ in range(30):
+        lat = 37.50 + random.uniform(-0.015, 0.015)
+        lon = 127.03 + random.uniform(-0.02, 0.02)
+        folium.Marker(
+            [lat, lon],
+            icon=folium.Icon(color="blue", icon="home")
+        ).add_to(aptCluster)
+    aptCluster.add_to(realEstateMap)
+
+    infraGroup = folium.FeatureGroup(name="인프라")
+    infras = [
+        {"name": "강남역", "loc": [37.4979, 127.0276]},
+        {"name": "선릉역", "loc": [37.5045, 127.0490]}
+    ]
+    for inf in infras:
+        folium.CircleMarker(
+            location=inf["loc"],
+            radius=10,
+            color="green",
+            fill=True,
+            popup=inf["name"]
+        ).add_to(infraGroup)
+    infraGroup.add_to(realEstateMap)
+
+    folium.LayerControl().add_to(realEstateMap)
+
+    realEstateMap
+  exercise:
+    prompt: 실습 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      import folium
+      from folium.plugins import HeatMap, MarkerCluster
+      import branca.colormap as cm
+      import random
+      gangnamCenter = [37.4979, 127.0276]
+      realEstateMap = folium.Map(location=gangnamCenter, zoom_start=14, tiles="CartoDB Positron")
+
+      priceGeo = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "properties": {"name": "역삼동", "price": 15},
+                  "geometry": {"type": "Polygon", "coordinates": [[
+                      [127.02, 37.49], [127.04, 37.49],
+                      [127.04, 37.51], [127.02, 37.51], [127.02, 37.49]
+                  ]]}
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"name": "삼성동", "price": 18},
+                  "geometry": {"type": "Polygon", "coordinates": [[
+                      [127.04, 37.49], [127.06, 37.49],
+                      [127.06, 37.51], [127.04, 37.51], [127.04, 37.49]
+                  ]]}
+              }
+          ]
+      }
+
+      priceColormap = cm.LinearColormap(
+          ["#fee8c8", "#e74c3c"],
+          vmin=10, vmax=20,
+          caption="평당 가격(억원)"
+      )
+
+      priceGroup = folium.FeatureGroup(name="시세")
+      folium.GeoJson(
+          priceGeo,
+          style_function=lambda f: {
+              "fillColor": priceColormap(f["properties"]["price"]),
+              "color": "white", "weight": 2, "fillOpacity": 0.6
+          },
+          tooltip=folium.GeoJsonTooltip(
+              fields=["name", "price"],
+              aliases=["동:", "평당가:"]
+          )
+      ).add_to(priceGroup)
+      priceGroup.add_to(realEstateMap)
+      priceColormap.add_to(realEstateMap)
+
+      aptCluster = MarkerCluster(name="아파트")
+      for _ in range(30):
+          lat = 37.50 + random.uniform(-0.015, 0.015)
+          lon = 127.03 + random.uniform(-0.02, 0.02)
+          folium.Marker(
+              [lat, lon],
+              icon=folium.Icon(color="blue", icon="home")
+          ).add_to(aptCluster)
+      aptCluster.add_to(realEstateMap)
+
+      infraGroup = folium.FeatureGroup(name="인프라")
+      infras = [
+          {"name": "강남역", "loc": [37.4979, 127.0276]},
+          {"name": "선릉역", "loc": [37.5045, 127.0490]}
+      ]
+      for inf in infras:
+          folium.CircleMarker(
+              location=inf["loc"],
+              radius=10,
+              color="green",
+              fill=True,
+              popup=inf["name"]
+          ).add_to(infraGroup)
+      infraGroup.add_to(realEstateMap)
+
+      folium.LayerControl().add_to(realEstateMap)
+
+      realEstateMap
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 실습의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 실습 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: folium_10-map-project-release-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - practice
+    title: 종합 지도 project 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 위치·레이어·분모·접근성·export가 하나의 지도 계약을 이루는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_map_project_release(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_map_project_release(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_map_project_release(rows):
+            required = ['longitude', 'latitude', 'layer']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'layer'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['longitude'] for row in usable]
+            y_values = [row['latitude'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.folium.folium_10.map-project-release-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.folium.folium_10.map-project-release-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_map_project_release
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - longitude: 127.0
+              latitude: 37.5
+              layer: facilities
+            - longitude: 127.1
+              latitude: 37.6
+              layer: incidents
+            - longitude: null
+              latitude: 37.7
+              layer: invalid
+          expectedReturn:
+            usableCount: 2
+            excludedCount: 1
+            groupCounts:
+              facilities: 1
+              incidents: 1
+            xExtent:
+            - 127.0
+            - 127.1
+            yExtent:
+            - 37.5
+            - 37.6
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: folium_10-map-project-release-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - folium_10-map-project-release-data-evidence-mastery
+    title: 종합 지도 project 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 시설·장애·행정구역 layer를 품질 보고서와 정적 대체물까지 포함해 배포한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_map_project_release(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_map_project_release(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_map_project_release(candidate):
+            expected = {'mark': 'map-dashboard', 'x': 'longitude', 'y': 'latitude', 'group': 'layer', 'transforms': ['export-fallback', 'fit-bounds', 'layer-policy', 'quality-gate'], 'interaction': 'layer-filter'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.folium.folium_10.map-project-release-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.folium.folium_10.map-project-release-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_map_project_release
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: map-dashboard
+              x: longitude
+              y: latitude
+              group: layer
+              transforms:
+              - export-fallback
+              - fit-bounds
+              - layer-policy
+              - quality-gate
+              interaction: layer-filter
+              description: 시설·장애·행정구역 layer를 품질 보고서와 정적 대체물까지 포함해 배포한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: map-dashboard
+              x: longitude
+              y: latitude
+              group: layer
+              transforms:
+              - export-fallback
+              - fit-bounds
+              - layer-policy
+              - quality-gate
+              interaction: layer-filter
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: latitude
+              y: longitude
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - interaction
+            - description
+            encoding:
+              mark: map-dashboard
+              x: longitude
+              y: latitude
+              group: layer
+              transforms:
+              - export-fallback
+              - fit-bounds
+              - layer-policy
+              - quality-gate
+              interaction: layer-filter
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: folium_10-map-project-release-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - folium_10-map-project-release-encoding-transfer-transfer
+    title: 종합 지도 project 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 위치·레이어·분모·접근성·export가 하나의 지도 계약을 이루는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_map_project_release(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_map_project_release(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_map_project_release(situation):
+            table = {'release-map': {'encoding': 'layered interactive map', 'evidence': 'coordinate and join audit', 'risk': 'silent omissions'}, 'accessible-equivalent': {'encoding': 'filterable place table', 'evidence': 'same record count', 'risk': 'map-only access'}, 'offline-evidence': {'encoding': 'static image plus data summary', 'evidence': 'artifact hash', 'risk': 'network tiles'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.folium.folium_10.map-project-release-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.folium.folium_10.map-project-release-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_map_project_release
+        cases:
+        - id: recalls-release-map
+          arguments:
+          - value: release-map
+          expectedReturn:
+            encoding: layered interactive map
+            evidence: coordinate and join audit
+            risk: silent omissions
+        - id: recalls-accessible-equivalent
+          arguments:
+          - value: accessible-equivalent
+          expectedReturn:
+            encoding: filterable place table
+            evidence: same record count
+            risk: map-only access
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

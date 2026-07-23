@@ -1,0 +1,767 @@
+var e=`meta:
+  packages:
+  - pillow
+  - scikit-learn
+  id: pillow_01
+  title: 꽃사진탐색기
+  order: 1
+  category: pillow
+  difficulty: ⭐
+  badge: 입문
+  tags:
+  - Pillow
+  - Image
+  - open
+  - size
+  - mode
+  - thumbnail
+  seo:
+    title: Pillow 입문 - 꽃 사진 탐색기
+    description: Pillow Image 객체로 sklearn 샘플 이미지를 열고 size/mode/format을 손으로 확인합니다.
+    keywords:
+    - Pillow
+    - Image.open
+    - size
+    - mode
+    - thumbnail
+    - 이미지처리
+intro:
+  emoji: 🌸
+  goal: sklearn 샘플을 Pillow Image로 변환해 size/mode/format을 dict로 검증하고, thumbnail vs resize 차이를 손으로 비교합니다.
+  description: Pillow Image는 ndarray와 다른 추상화입니다. size는 (W, H) 순서로 NumPy의 (H, W, C)와 정반대이고, mode는 색공간을 문자열로 표현합니다.
+  direction: load_sample_image → Image.fromarray → size/mode 점검 → thumbnail/resize 비교 → 메타데이터 검증 함수 흐름.
+  benefits:
+  - Pillow size가 (width, height)고 NumPy shape의 (height, width)와 반대임을 확인합니다.
+  - mode 문자열(RGB, L, RGBA)이 색공간을 어떻게 표현하는지 봅니다.
+  - thumbnail은 비율 유지 + in-place, resize는 정확 크기 + 새 객체임을 직접 비교합니다.
+  - validateImageInfo로 입력 안전을 함수 입구에서 강제합니다.
+  diagram:
+    steps:
+    - label: ndarray → Image
+      detail: load_sample_image로 받은 ndarray를 Image.fromarray로 Pillow 객체로 변환합니다.
+    - label: size/mode/format
+      detail: size, mode, format 세 속성으로 객체 식별 정보를 얻습니다.
+    - label: thumbnail
+      detail: 비율 유지 + in-place 동작을 .copy() 사본에 적용해 원본 보존을 확인합니다.
+    - label: resize
+      detail: 정확한 크기 지정 + 새 객체 반환을 thumbnail과 비교합니다.
+    - label: 메타데이터 검증
+      detail: mode와 size 조건을 만족하지 않으면 ValueError로 차단하는 함수를 만듭니다.
+    runtime:
+    - label: pillow 패키지
+      detail: meta.packages의 pillow가 가상환경에 있어야 from PIL import Image가 통과합니다.
+    - label: scikit-learn 샘플
+      detail: load_sample_image는 네트워크 없이 메모리에 RGB ndarray를 로드합니다.
+    - label: 단일 노트북 변수 공유
+      detail: 첫 셀에서 만든 flowerImage가 이후 모든 셀의 공통 입력입니다.
+sections:
+- id: step1_import
+  title: 1단계. ndarray → Pillow Image
+  structuredPrimary: true
+  subtitle: load_sample_image + fromarray
+  goal: sklearn load_sample_image로 받은 ndarray를 Image.fromarray로 Pillow Image 객체로 변환하고 객체 타입을 확인합니다.
+  why: Pillow는 ndarray와 별개의 객체 표현입니다. fromarray로 변환하는 한 줄을 손으로 적어 두면 두 객체 간 변환 흐름이 자연스러워집니다.
+  explanation: |-
+    sklearn load_sample_image('flower.jpg')는 (H, W, 3) RGB ndarray를 돌려줍니다. Image.fromarray(arr)는 같은 데이터를 Pillow Image 객체로 감싸 줍니다. 둘은 메모리를 공유합니다.
+    Image 객체는 .size, .mode 같은 메서드 호출에 적합한 표현이고, ndarray는 픽셀 인덱싱과 NumPy 산술에 적합한 표현입니다. 작업에 따라 둘 사이를 자유롭게 오가는 게 표준입니다.
+    type 확인은 dict 한 키로 단순 검증할 수 있습니다.
+  tips:
+  - Image.open(path)는 파일 경로에서 직접 Image를 만듭니다. sklearn 샘플은 ndarray라 fromarray가 필요합니다.
+  - np.asarray(image)로 Image를 다시 ndarray로 만들 수 있습니다. 메모리는 공유됩니다.
+  snippet: |-
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    flowerArray = load_sample_image('flower.jpg')
+    flowerImage = Image.fromarray(flowerArray)
+
+    {
+        'arrayType': type(flowerArray).__name__,
+        'imageType': type(flowerImage).__name__,
+        'arrayShape': flowerArray.shape,
+    }
+  exercise:
+    prompt: china 샘플로 chinaImage를 만들고 type 이름이 'JpegImageFile'가 아니라 'Image'인지 확인하세요.
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      chinaArray = load_sample_image('china.jpg')
+      chinaImage = Image.___(chinaArray)
+
+      {'type': type(chinaImage).__name__, 'shape': chinaArray.shape}
+    hints:
+    - ndarray로 Image를 만드는 클래스 메서드는 fromarray입니다.
+    - 빈칸에는 fromarray가 들어갑니다.
+    check:
+      noError: load_sample_image와 Image.fromarray가 NameError 없이 끝나야 합니다.
+      resultCheck: shape가 (427, 640, 3)이어야 합니다.
+  check:
+    noError: load_sample_image와 fromarray가 끝나야 합니다.
+    resultCheck: arrayType이 'ndarray', imageType이 'Image' 계열이어야 합니다.
+- id: step2_info
+  title: 2단계. size, mode, format
+  structuredPrimary: true
+  subtitle: 세 속성 한 번에
+  goal: Pillow Image의 size, mode, format 세 속성을 dict로 묶어 NumPy shape (427, 640, 3)이 Pillow에서 (640, 427)으로 표현됨을 확인합니다.
+  why: Pillow size의 (width, height) 순서는 NumPy shape의 (height, width, channels) 순서와 정반대입니다. 이 한 가지가 두 라이브러리를 섞을 때 가장 자주 헷갈리는 함정이라 한 번 명확히 잡고 가야 합니다.
+  explanation: |-
+    Image.size는 항상 (width, height) 2-tuple입니다. ndarray.shape의 첫 두 축과 순서가 뒤집힙니다.
+    Image.mode는 색공간 문자열입니다. 일반 컬러는 'RGB', 그레이스케일은 'L', 알파 포함은 'RGBA', 32-bit float 라벨 마스크는 'I' 등이 있습니다.
+    Image.format은 원본 파일 포맷('JPEG', 'PNG' 등)을 돌려주지만, fromarray로 만든 Image는 파일에서 온 게 아니라 None입니다.
+  tips:
+  - Image.size[0]은 너비(가로 픽셀 수), Image.size[1]은 높이(세로 픽셀 수)입니다.
+  - mode 'L'은 8-bit 그레이스케일, '1'은 1-bit 흑백입니다. 'L'이 일반적입니다.
+  snippet: |-
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    infoImage = Image.fromarray(load_sample_image('flower.jpg'))
+
+    {
+        'size': infoImage.size,
+        'sizeIsWidthHeight': infoImage.size == (640, 427),
+        'mode': infoImage.mode,
+        'format': infoImage.format,
+    }
+  exercise:
+    prompt: 같은 이미지의 size를 height/width 분해해 NumPy shape의 첫 두 축이 거꾸로 나오는지 한 줄에 확인하세요.
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      flipImage = Image.fromarray(load_sample_image('flower.jpg'))
+      flipArr = load_sample_image('flower.jpg')
+
+      width, height = flipImage.size
+      {'width': width, 'height': height, 'matchesArray': (height, width) == flipArr.shape[:___]}
+    hints:
+    - shape의 앞 두 축만 비교하므로 슬라이스 끝은 2입니다.
+    - 빈칸에는 2가 들어갑니다.
+    check:
+      noError: Image.fromarray와 size 분해가 끝나야 합니다.
+      resultCheck: matchesArray가 True여야 합니다.
+  check:
+    noError: Image.fromarray와 속성 호출이 끝나야 합니다.
+    resultCheck: sizeIsWidthHeight가 True, mode가 'RGB', format이 None이어야 합니다.
+- id: step3_thumbnail
+  title: 3단계. thumbnail (비율 유지 + in-place)
+  structuredPrimary: true
+  subtitle: 원본 보존을 위해 .copy() 필수
+  goal: copy로 만든 사본에 thumbnail((150, 150))을 적용해 비율이 유지된 크기로 줄어들고, 원본 size는 변하지 않는지 확인합니다.
+  why: thumbnail은 원본 객체를 직접 수정하는 in-place 메서드입니다. 호출 후 원본을 더 못 쓰게 되므로 사본 패턴을 손으로 한 번 굳히지 않으면 운영에서 의도치 않게 원본이 망가집니다.
+  explanation: |-
+    Image.thumbnail((maxWidth, maxHeight))는 원본 비율을 유지하면서 두 변이 max값 이하가 되도록 축소합니다. 원본 비율 640:427인 이미지에 (150, 150)을 주면 결과는 150:100 정도가 됩니다.
+    이 메서드는 None을 돌려주고 호출 객체를 직접 수정합니다. 원본을 보존하려면 .copy() 사본을 먼저 만들고 그 사본에 thumbnail을 호출해야 합니다.
+    검증은 원본과 사본의 size가 다르고, 사본의 size가 (150, 150) 안에 들어가는지로 합니다.
+  tips:
+  - 같은 비율을 정확한 크기로 만들려면 resize를 쓰는 게 더 안전합니다. thumbnail은 "이하"만 보장합니다.
+  - thumbnail에 Image.Resampling.LANCZOS 같은 리샘플링 옵션을 줄 수 있습니다. 기본은 BICUBIC입니다.
+  snippet: |-
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    thumbnailOriginal = Image.fromarray(load_sample_image('flower.jpg'))
+    thumbnailCopy = thumbnailOriginal.copy()
+    thumbnailCopy.thumbnail((150, 150))
+
+    {
+        'originalSize': thumbnailOriginal.size,
+        'thumbnailSize': thumbnailCopy.size,
+        'originalUnchanged': thumbnailOriginal.size == (640, 427),
+        'thumbnailFitsBox': thumbnailCopy.size[0] <= 150 and thumbnailCopy.size[1] <= 150,
+        'ratioPreserved': abs(thumbnailCopy.size[0] / thumbnailCopy.size[1] - 640 / 427) < 0.05,
+    }
+  exercise:
+    prompt: thumbnail을 사본 없이 원본에 직접 호출하면 원본 size가 바뀌는지 확인하세요. 다음 셀에서 원본을 다시 쓰면 안 됨을 명심합니다.
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      mutateImage = Image.fromarray(load_sample_image('flower.jpg'))
+      beforeSize = mutateImage.size
+      mutateImage.___((100, 100))
+      afterSize = mutateImage.size
+
+      {'beforeSize': beforeSize, 'afterSize': afterSize, 'mutated': beforeSize != afterSize}
+    hints:
+    - thumbnail 메서드 이름은 그대로 thumbnail입니다.
+    - 빈칸에는 thumbnail이 들어갑니다.
+    check:
+      noError: thumbnail 호출이 끝나야 합니다.
+      resultCheck: mutated가 True이고 beforeSize가 (640, 427), afterSize의 두 값이 모두 100 이하여야 합니다.
+  check:
+    noError: copy와 thumbnail 호출이 끝나야 합니다.
+    resultCheck: originalUnchanged, thumbnailFitsBox, ratioPreserved 모두 True여야 합니다.
+- id: step4_resize
+  title: 4단계. resize (정확 크기 + 새 객체)
+  structuredPrimary: true
+  subtitle: 비율 무시 가능
+  goal: resize((200, 200))으로 정확한 정사각형 이미지를 만들고, 원본 size가 그대로인지(thumbnail과 달리)를 확인합니다.
+  why: thumbnail과 resize의 두 가지 차이가 핵심입니다. 비율 유지 여부와 in-place 여부. 이 둘을 한 셀에서 직접 비교해야 어느 상황에 무엇을 쓸지 명확해집니다.
+  explanation: |-
+    Image.resize((width, height))는 비율을 무시하고 지정 크기로 변환합니다. 결과는 새 Image 객체이고 원본은 그대로 유지됩니다.
+    정사각형이 아닌 입력을 정사각형으로 resize하면 가로/세로가 다르게 압축되어 찌그러진 결과가 나옵니다. 비율을 유지하면서 정확한 크기로 만들려면 letterbox(공백 채우기) 기법이 필요합니다.
+    resize도 thumbnail처럼 리샘플링 옵션을 받습니다. 축소에는 LANCZOS, 확대에는 BICUBIC이 일반적입니다.
+  tips:
+  - "Image.Resampling.LANCZOS는 Pillow 9.1+에서 권장됩니다. 이전에는 Image.LANCZOS였습니다."
+  - 정사각 비율로 padding하려면 ImageOps.fit이나 ImageOps.pad가 편합니다.
+  snippet: |-
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    resizeOriginal = Image.fromarray(load_sample_image('flower.jpg'))
+    resizeSquare = resizeOriginal.resize((200, 200))
+
+    {
+        'originalSize': resizeOriginal.size,
+        'squareSize': resizeSquare.size,
+        'originalUnchanged': resizeOriginal.size == (640, 427),
+        'isExactlySquare': resizeSquare.size == (200, 200),
+        'ratioChanged': resizeSquare.size[0] / resizeSquare.size[1] != resizeOriginal.size[0] / resizeOriginal.size[1],
+    }
+  exercise:
+    prompt: 비율을 유지하면서 width=300으로 resize하려면 height를 어떻게 계산해야 하는지 직접 짜 보세요. 결과 height가 200 ~ 202 범위여야 합니다.
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      ratioImage = Image.fromarray(load_sample_image('flower.jpg'))
+      newWidth = 300
+      newHeight = round(newWidth * ratioImage.size[1] / ratioImage.size[___])
+      ratioResized = ratioImage.resize((newWidth, newHeight))
+
+      {'size': ratioResized.size, 'heightInRange': 200 <= newHeight <= 202}
+    hints:
+    - 원본 너비는 size 인덱스 0에 있습니다.
+    - 빈칸에는 0이 들어갑니다.
+    check:
+      noError: resize 호출이 끝나야 합니다.
+      resultCheck: size의 첫 값이 300, heightInRange가 True여야 합니다.
+  check:
+    noError: resize 호출과 dict 구성이 끝나야 합니다.
+    resultCheck: originalUnchanged, isExactlySquare 모두 True여야 합니다.
+- id: step5_display
+  title: 5단계. 세 크기 비교 dict
+  structuredPrimary: true
+  subtitle: 원본 vs thumbnail vs resize
+  goal: 한 셀에서 원본/thumbnail/resize 세 크기를 dict로 묶어 한 번에 비교하고, 비율 유지 여부와 영역 크기 차이를 정량 확인합니다.
+  why: 세 결과의 size를 한 dict에 모아 두면 비율 유지(thumbnail)와 비율 무시(resize)의 차이가 한눈에 보입니다. 자동화 코드에서 어떤 결과가 적합한지 판단하는 표준 출력 형식입니다.
+  explanation: |-
+    같은 원본 이미지를 두 가지 방식으로 줄여 보면 결과 size의 형태가 다릅니다. thumbnail은 비율 유지로 직사각형이 유지되고, resize는 지정한 정사각 크기 그대로입니다.
+    dict 키를 'original'/'thumbnail'/'resize'로 통일하면 다른 입력에 같은 함수를 돌려도 같은 형식의 결과를 얻을 수 있습니다.
+    pixelCount도 함께 비교하면 두 방식의 결과가 픽셀 수에서 얼마나 다른지 정량 확인할 수 있습니다.
+  tips:
+  - dict 형식의 비교 결과는 노트북뿐 아니라 단위 테스트 입력으로도 그대로 활용됩니다.
+  - 픽셀 수 = size[0] * size[1]로 단순 계산합니다. mode가 RGB라면 총 byte는 ×3입니다.
+  snippet: |-
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    compareOriginal = Image.fromarray(load_sample_image('flower.jpg'))
+    compareThumbnail = compareOriginal.copy()
+    compareThumbnail.thumbnail((150, 150))
+    compareResize = compareOriginal.resize((200, 200))
+
+    {
+        'original': {'size': compareOriginal.size, 'pixels': compareOriginal.size[0] * compareOriginal.size[1]},
+        'thumbnail': {'size': compareThumbnail.size, 'pixels': compareThumbnail.size[0] * compareThumbnail.size[1]},
+        'resize': {'size': compareResize.size, 'pixels': compareResize.size[0] * compareResize.size[1]},
+        'thumbnailKeepsRatio': abs(compareThumbnail.size[0] / compareThumbnail.size[1] - compareOriginal.size[0] / compareOriginal.size[1]) < 0.05,
+        'resizeIgnoresRatio': compareResize.size[0] == compareResize.size[1],
+    }
+  exercise:
+    prompt: china 샘플로 같은 비교를 만들어 thumbnailKeepsRatio가 True인지 확인하세요.
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      chinaCompare = Image.fromarray(load_sample_image('___'))
+      chinaThumb = chinaCompare.copy()
+      chinaThumb.thumbnail((100, 100))
+
+      {'originalSize': chinaCompare.size, 'thumbSize': chinaThumb.size, 'keepsRatio': abs(chinaThumb.size[0] / chinaThumb.size[1] - chinaCompare.size[0] / chinaCompare.size[1]) < 0.05}
+    hints:
+    - china 샘플 파일명은 'china.jpg'입니다.
+    - 빈칸에는 china.jpg가 들어갑니다.
+    check:
+      noError: load_sample_image와 thumbnail 호출이 끝나야 합니다.
+      resultCheck: keepsRatio가 True여야 합니다.
+  check:
+    noError: 세 객체 생성과 dict 구성이 끝나야 합니다.
+    resultCheck: thumbnailKeepsRatio가 True이고 resizeIgnoresRatio가 True여야 합니다.
+- id: practice
+  title: 실습 - china 메타데이터 진단
+  structuredPrimary: true
+  subtitle: describeImage 함수
+  goal: describeImage(image) 함수가 size/mode/format/pixelCount 네 키를 가진 진단 dict를 돌려주도록 만들고, flower와 china 두 입력에 같은 형식으로 적용합니다.
+  why: 진단 함수는 새 이미지가 들어왔을 때 "이게 어떤 데이터인지" 한 번에 보고받는 도구입니다. 일관된 dict 형식으로 두면 비교와 단위 테스트가 모두 쉬워집니다.
+  explanation: |-
+    describeImage 함수는 Image 객체를 받아 4개 키 dict를 돌려줍니다. size, mode, format은 속성 그대로, pixelCount는 size 두 값의 곱으로 계산합니다.
+    flower와 china 두 입력에 같은 함수를 돌리면 같은 형식의 결과 dict가 두 개 나옵니다. 이 형식은 자동화 보고서, 단위 테스트, CSV 출력 모두에 그대로 활용됩니다.
+    실무에서는 함수에 더 많은 키(mtime, file_size 등)를 추가할 수 있습니다. 단, 한 번 정의한 키는 일관되게 유지해야 후속 처리가 깨지지 않습니다.
+  tips:
+  - format=None이 의미 있게 표시되도록 그대로 두는 게 좋습니다. fromarray로 만든 객체는 항상 None입니다.
+  - 진단 함수는 read-only로 동작합니다. .copy() 없이도 원본을 건드리지 않습니다.
+  snippet: |-
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+
+    def describeImage(image: Image.Image) -> dict:
+        width, height = image.size
+        return {
+            'size': image.size,
+            'mode': image.mode,
+            'format': image.format,
+            'pixelCount': width * height,
+        }
+
+
+    flowerSample = Image.fromarray(load_sample_image('flower.jpg'))
+    chinaSample = Image.fromarray(load_sample_image('china.jpg'))
+
+    {
+        'flower': describeImage(flowerSample),
+        'china': describeImage(chinaSample),
+    }
+  exercise:
+    prompt: describeImage에 'isRgb' 키를 추가해 mode == 'RGB' 결과를 함께 돌려주고, flower 결과에서 True인지 확인하세요.
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+
+      def describeImageExtended(image):
+          width, height = image.size
+          return {
+              'size': image.size,
+              'mode': image.mode,
+              'pixelCount': width * height,
+              'isRgb': image.mode == '___',
+          }
+
+
+      flowerExt = Image.fromarray(load_sample_image('flower.jpg'))
+      describeImageExtended(flowerExt)
+    hints:
+    - mode 값은 'RGB'입니다.
+    - 빈칸에는 RGB가 들어갑니다.
+    check:
+      noError: describeImageExtended 정의와 호출이 끝나야 합니다.
+      resultCheck: 결과 dict의 isRgb가 True여야 합니다.
+  check:
+    noError: describeImage 정의와 두 호출이 끝나야 합니다.
+    resultCheck: flower와 china 모두 size, mode, format, pixelCount 네 키를 가져야 합니다.
+- id: workflow_validation
+  title: 6단계. 입력 메타데이터 가드 함수
+  structuredPrimary: true
+  subtitle: validateImageInfo + thumbnail 결과 검증
+  goal: validateImageInfo 함수가 mode != 'RGB'나 너무 작은 이미지를 ValueError로 차단하고, 정상 입력에서는 thumbnail 결과가 기대 크기 안에 있는지 회귀 테스트로 확인합니다.
+  why: 자동화 파이프라인에서 입력 이미지의 mode와 size가 가정과 다르면 후속 처리가 조용히 잘못된 결과를 냅니다. 함수 입구에서 명확한 ValueError로 차단하면 운영에서 디버깅 시간이 크게 줄어듭니다.
+  explanation: |-
+    validateImageInfo는 (1) mode == 'RGB', (2) size[0] >= minWidth, (3) size[1] >= minHeight 세 조건을 검사합니다. 하나라도 깨지면 실제 받은 값을 메시지에 포함한 ValueError를 던집니다.
+    Pillow ImageDraw로 만든 합성 입력은 정답 size를 정확히 알 수 있어 검증에 적합합니다. (180, 120) 캔버스에 도형을 그린 결과는 size (180, 120) RGB가 보장됩니다.
+    thumbnail 결과의 size가 (60, 60) 이하인지 검증해 thumbnail이 기대대로 축소했는지 회귀 테스트로 둡니다.
+  tips:
+  - validateImageInfo는 다른 함수의 첫 줄에서 호출해 입력을 한 번에 보호하는 패턴이 표준입니다.
+  - "ValueError 메시지에 실제 받은 값을 포함시키면 호출자가 즉시 원인을 알 수 있습니다."
+  snippet: |-
+    from PIL import Image, ImageDraw
+
+
+    def validateImageInfo(image: Image.Image, minWidth: int = 100, minHeight: int = 80) -> bool:
+        if image.mode != 'RGB':
+            raise ValueError(f"RGB 이미지가 아닙니다: mode={image.mode}")
+        if image.size[0] < minWidth or image.size[1] < minHeight:
+            raise ValueError(f"이미지가 너무 작습니다: size={image.size}, 기대 {(minWidth, minHeight)} 이상")
+        return True
+
+
+    syntheticImage = Image.new('RGB', (180, 120), (235, 245, 255))
+    draw = ImageDraw.Draw(syntheticImage)
+    for box in [(55, 20, 95, 60), (85, 20, 125, 60), (55, 55, 95, 95), (85, 55, 125, 95)]:
+        draw.ellipse(box, fill=(238, 90, 150))
+    draw.ellipse((75, 45, 105, 75), fill=(245, 210, 70))
+
+    okResult = validateImageInfo(syntheticImage)
+
+    grayscaleImage = syntheticImage.convert('L')
+    try:
+        validateImageInfo(grayscaleImage)
+        grayMessage = 'unexpected pass'
+    except ValueError as exc:
+        grayMessage = str(exc)
+
+    tinyImage = syntheticImage.resize((50, 50))
+    try:
+        validateImageInfo(tinyImage)
+        tinyMessage = 'unexpected pass'
+    except ValueError as exc:
+        tinyMessage = str(exc)
+
+    thumbnailed = syntheticImage.copy()
+    thumbnailed.thumbnail((60, 60))
+
+    {
+        'okResult': okResult,
+        'grayMessage': grayMessage,
+        'tinyMessage': tinyMessage,
+        'thumbnailedSize': thumbnailed.size,
+        'thumbnailFitsBox': thumbnailed.size[0] <= 60 and thumbnailed.size[1] <= 60,
+    }
+  exercise:
+    prompt: validateImageInfo에 RGBA 이미지를 넘기면 mode 오류가 나오는지 확인하세요. syntheticImage.convert('RGBA')로 RGBA 사본을 만들 수 있습니다.
+    starterCode: |-
+      from PIL import Image, ImageDraw
+
+
+      def validateImageInfo(image, minWidth=100, minHeight=80):
+          if image.mode != 'RGB':
+              raise ValueError(f"RGB 이미지가 아닙니다: mode={image.mode}")
+          if image.size[0] < minWidth or image.size[1] < minHeight:
+              raise ValueError(f"이미지가 너무 작습니다: size={image.size}")
+          return True
+
+
+      rgbaImage = Image.new('___', (180, 120), (235, 245, 255, 200))
+      try:
+          validateImageInfo(rgbaImage)
+          rgbaMessage = 'unexpected pass'
+      except ValueError as exc:
+          rgbaMessage = str(exc)
+
+      {'rgbaMessage': rgbaMessage, 'hasRgbaHint': 'RGBA' in rgbaMessage}
+    hints:
+    - 4채널 RGBA 모드 문자열은 'RGBA'입니다.
+    - 빈칸에는 RGBA가 들어갑니다.
+    check:
+      noError: validateImageInfo 정의가 끝나야 합니다.
+      resultCheck: hasRgbaHint가 True여야 합니다.
+  check:
+    noError: validateImageInfo 정의와 세 호출이 끝나야 합니다.
+    resultCheck: okResult가 True, grayMessage에 'RGB' 단서, tinyMessage에 'size' 단서, thumbnailFitsBox가 True여야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pillow_01-flower_inspector-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 꽃 사진 탐색기 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 사진 크기·mode·EXIF orientation 해석을 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_flower_inspector_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_flower_inspector_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_flower_inspector_contract(value):
+            required = ['width', 'height', 'mode', 'orientation']
+            rules = [{'id': 'width', 'field': 'width', 'kind': 'positive'}, {'id': 'height', 'field': 'height', 'kind': 'positive'}, {'id': 'mode', 'field': 'mode', 'kind': 'enum', 'values': ['RGB', 'RGBA']}, {'id': 'orientation', 'field': 'orientation', 'kind': 'range', 'min': 1, 'max': 8}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'flower_inspector', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.pillow.pillow_01.flower_inspector-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pillow.pillow_01.flower_inspector-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_flower_inspector_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              width: 1600
+              height: 1200
+              mode: RGB
+              orientation: 6
+          expectedReturn:
+            accepted: true
+            topic: flower_inspector
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              height: 1200
+              mode: RGB
+              orientation: 6
+          expectedReturn:
+            accepted: false
+            topic: flower_inspector
+            missing:
+            - width
+            violations:
+            - width
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              width: 0
+              height: -1
+              mode: CMYK
+              orientation: 9
+          expectedReturn:
+            accepted: false
+            topic: flower_inspector
+            missing: []
+            violations:
+            - height
+            - mode
+            - orientation
+            - width
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pillow_01-flower_inspector-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pillow_01-flower_inspector-contract-audit-mastery
+    title: 꽃 사진 탐색기 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_flower_inspector_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_flower_inspector_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_flower_inspector_result(expected, observed):
+            identity = ['sourceHash', 'orientationApplied']
+            metrics = {'displayWidth': 0}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'flower_inspector', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.pillow.pillow_01.flower_inspector-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pillow.pillow_01.flower_inspector-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_flower_inspector_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              sourceHash: f1
+              orientationApplied: true
+              displayWidth: 1200
+          - value:
+              sourceHash: f1
+              orientationApplied: true
+              displayWidth: 1200
+          expectedReturn:
+            passed: true
+            topic: flower_inspector
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              sourceHash: f1
+              orientationApplied: true
+              displayWidth: 1200
+          - value:
+              sourceHash: f2
+              orientationApplied: false
+              displayWidth: 1600
+          expectedReturn:
+            passed: false
+            topic: flower_inspector
+            missing: []
+            identityMismatch:
+            - orientationApplied
+            - sourceHash
+            metricDrift:
+            - displayWidth
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              sourceHash: f1
+              orientationApplied: true
+              displayWidth: 1200
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: flower_inspector
+            missing:
+            - displayWidth
+            - orientationApplied
+            - sourceHash
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pillow_01-flower_inspector-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pillow_01-flower_inspector-result-reconciliation-transfer
+    title: 꽃 사진 탐색기 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_flower_inspector_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_flower_inspector_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_flower_inspector_evidence(stage):
+            stages = {'source': {'action': 'admit photo inspection source', 'evidence': 'dimensions mode EXIF', 'risk': 'unsafe or misread image'}, 'edit': {'action': 'apply bounded photo inspection edit', 'evidence': 'orientation transpose trace', 'risk': 'quality or geometry loss'}, 'artifact': {'action': 'reopen photo inspection artifact', 'evidence': 'display geometry', 'risk': 'corrupt or visually wrong output'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.pillow.pillow_01.flower_inspector-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pillow.pillow_01.flower_inspector-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_flower_inspector_evidence
+        cases:
+        - id: recalls-source
+          arguments:
+          - value: source
+          expectedReturn:
+            action: admit photo inspection source
+            evidence: dimensions mode EXIF
+            risk: unsafe or misread image
+        - id: recalls-edit
+          arguments:
+          - value: edit
+          expectedReturn:
+            action: apply bounded photo inspection edit
+            evidence: orientation transpose trace
+            risk: quality or geometry loss
+        - id: recalls-artifact
+          arguments:
+          - value: artifact
+          expectedReturn:
+            action: reopen photo inspection artifact
+            evidence: display geometry
+            risk: corrupt or visually wrong output
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

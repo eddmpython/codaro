@@ -1,0 +1,747 @@
+var e=`meta:
+  packages:
+  - pandas
+  id: pandas_05
+  title: 자동차연비분석
+  order: 5
+  category: pandas
+  difficulty: ⭐⭐⭐⭐
+  badge: 기초
+  dataSource: codaro-local:mpg
+  outcomes: ["pandas.aggregate","pandas.report"]
+  prerequisites: ["pandas.aggregate"]
+  estimatedMinutes: 60
+  tags:
+  - mpg
+  - sort
+  - pivot_table
+  - nlargest
+  - 검증
+  - 피벗분석
+  seo:
+    title: pandas 정렬과 피벗테이블 - 자동차 연비 TOP 10 분석
+    description: 자동차 연비 데이터로 정렬(sort_values), TOP N(nlargest), 피벗테이블(pivot_table)을 배웁니다. 연도별 연비 추이 분석.
+    keywords:
+    - pandas sort_values
+    - nlargest
+    - pivot_table
+    - 피벗테이블
+    - mpg 데이터
+intro:
+  emoji: 🚗
+  goal: 자동차 연비 데이터에서 "연비 TOP 10"과 "연도별 연비 추이"를 분석합니다.
+  description: 기초 과정 마무리! 정렬과 피벗테이블을 배웁니다. TOP N을 뽑거나, 행과 열을 기준으로 요약합니다.
+  direction: 자동차연비분석에서 표 데이터를 불러오고 정제, 집계, 검증 결과까지 연결합니다.
+  benefits:
+  - DataFrame 입력 확인 후 정제와 집계에 맞는 코드 입력을 고릅니다.
+  - 자동차연비분석 결과를 행/열 수와 요약값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 데이터 리포트 자동화에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(DataFrame 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 미리보기 처리 실행
+      detail: 정제와 집계 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 제조국별 개수 결과 검증
+      detail: 행/열 수와 요약값 기준으로 실행 결과를 비교합니다.
+    - label: 자동차연비분석 재사용
+      detail: 완성 코드를 데이터 리포트 자동화에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 표 데이터 환경
+      detail: pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 자동차연비분석 실행
+      detail: 셀을 실행해 행/열 수와 요약값와 예외 상태를 확인합니다.
+    - label: 자동차연비분석 완료
+      detail: 검증된 코드를 데이터 리포트 자동화로 남깁니다.
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  structuredPrimary: true
+  subtitle: 자동차 연비 데이터
+  goal: 1단계. 데이터 불러오기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 자동차 연비 데이터셋은 1970년대~1980년대 미국, 일본, 유럽에서 생산된 자동차 144대의 로컬 샘플 연비와 성능 정보를 담고 있습니다. mpg(miles per
+    gallon, 갤런당 마일)는 연비를 나타내며, 숫자가 클수록 연비가 좋습니다. cylinders(실린더 수), displacement(배기량), horsepower(마력),
+    weight(무게), acceleration(가속력), model_year(연식), origin(제조국) 등 9개의 컬럼이 있습니다. 이 데이터로 정렬(sort), TOP N
+    추출(nlargest), 피벗테이블(pivot_table) 등 pandas의 핵심 분석 기법을 배웁니다. 로컬 실행에서는 같은 분석 질문을 계속 풀 수 있도록 작은 자동차 샘플을
+    함께 둡니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import pandas as pd
+    from codaro.curriculum.localData import loadLocalDataset
+
+    mpg = loadLocalDataset("mpg")
+    mpg.shape
+  exercise:
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+
+      mpg = loadLocalDataset("mpg")
+      mpg.shape
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step2_head
+  title: 2단계. 미리보기
+  structuredPrimary: true
+  subtitle: 데이터 구조 파악
+  goal: 2단계. 미리보기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: head()로 데이터의 구조를 파악합니다. 각 행은 하나의 자동차 모델을 나타내며, name 컬럼에는 제조사와 모델명이 포함되어 있습니다. cylinders는
+    엔진의 실린더 개수(4, 6, 8기통 등)로, 일반적으로 숫자가 클수록 출력은 높지만 연비는 낮습니다. horsepower는 엔진 출력을 나타내고, weight는 차량 무게로
+    연비에 큰 영향을 미칩니다. model_year는 70~82로 표시되며 1970~1982년을 의미합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: mpg.head()
+  exercise:
+    prompt: 2단계. 미리보기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: mpg.head()
+    hints:
+    - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
+    - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 미리보기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 미리보기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_value_counts
+  title: 3단계. 제조국별 개수
+  structuredPrimary: true
+  subtitle: value_counts로 확인
+  goal: 3단계. 제조국별 개수에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: usa, japan, europe 3개 제조국이 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: mpg['origin'].value_counts()
+  exercise:
+    prompt: 3단계. 제조국별 개수 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: mpg['origin'].value_counts()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 제조국별 개수의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 3단계. 제조국별 개수 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step4_sort_asc
+  title: 4단계. 오름차순 정렬
+  structuredPrimary: true
+  subtitle: sort_values()
+  goal: 4단계. 오름차순 정렬에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    sort_values() 메서드는 DataFrame을 특정 컬럼 기준으로 정렬합니다. 기본값은 오름차순(ascending order)으로, 작은 값부터 큰 값 순서로 정렬됩니다. 데이터의 순서를 바꾸면 최소값, 최대값, 상위/하위 데이터를 쉽게 찾을 수 있습니다. 정렬은 데이터 분석에서 매우 자주 사용되는 기본 기능입니다.
+
+    sort_values()는 원본을 변경하지 않고 정렬된 새 DataFrame을 반환합니다. 원본을 직접 변경하려면 inplace=True 파라미터를 추가하면 되지만, Codaro 환경에서는 변수 재할당 문제가 발생할 수 있으므로 권장하지 않습니다.
+  tips:
+  - sort_values()는 원본을 변경하지 않고 정렬된 새 DataFrame을 반환합니다. 원본을 직접 변경하려면 inplace=True 파라미터를 추가하면 되지만, Codaro
+    환경에서는 변수 재할당 문제가 발생할 수 있으므로 권장하지 않습니다.
+  snippet: mpg.sort_values('mpg').head()
+  exercise:
+    prompt: 4단계. 오름차순 정렬 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: mpg.sort_values('mpg').head()
+    hints:
+    - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
+    - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 오름차순 정렬의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 4단계. 오름차순 정렬의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step5_sort_desc
+  title: 5단계. 내림차순 정렬
+  structuredPrimary: true
+  subtitle: ascending=False
+  goal: 5단계. 내림차순 정렬에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: ascending=False를 추가하면 내림차순(큰 값부터)입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: mpg.sort_values('mpg', ascending=False).head()
+  exercise:
+    prompt: 5단계. 내림차순 정렬 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: mpg.sort_values('mpg', ascending=False).head()
+    hints:
+    - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
+    - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 내림차순 정렬의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 5단계. 내림차순 정렬의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step6_nlargest
+  title: 6단계. TOP N 뽑기
+  structuredPrimary: true
+  subtitle: nlargest()
+  goal: 6단계. TOP N 뽑기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    nlargest(N, '컬럼') 메서드는 지정한 컬럼 기준으로 가장 큰 값 N개를 바로 뽑아줍니다. sort_values(..., ascending=False).head(N)과 같은 결과지만 훨씬 간결하고 의미가 명확합니다. TOP 10, TOP 100 같은 순위 분석에 매우 유용합니다.
+
+    nlargest()와 반대로 nsmallest()는 가장 작은 값 N개를 뽑습니다. 예를 들어 mpg.nsmallest(10, 'mpg')는 연비가 가장 낮은 10대를 보여줍니다.
+  snippet: mpg.nlargest(10, 'mpg')[['name', 'mpg', 'origin', 'model_year']]
+  exercise:
+    prompt: 6단계. TOP N 뽑기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: mpg.nlargest(10, 'mpg')[['name', 'mpg', 'origin', 'model_year']]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. TOP N 뽑기의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 6단계. TOP N 뽑기 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step7_nsmallest
+  title: 7단계. 하위 N개
+  structuredPrimary: true
+  subtitle: nsmallest()
+  goal: 7단계. 하위 N개에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: nsmallest()는 하위 N개를 뽑습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: mpg.nsmallest(5, 'weight')[['name', 'weight', 'mpg']]
+  exercise:
+    prompt: 7단계. 하위 N개 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: mpg.nsmallest(5, 'weight')[['name', 'weight', 'mpg']]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 하위 N개의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 7단계. 하위 N개 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step7_5_assign_grade
+  title: 7.5단계. 연비 등급 추가
+  structuredPrimary: true
+  subtitle: assign + apply 복습
+  goal: 7.5단계. 연비 등급 추가에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    이전에 배운 assign()과 apply()를 복습합니다. 연비(mpg)를 기준으로 A(30 이상), B(20~30), C(20 미만) 등급을 분류하는 새로운 컬럼을 추가합니다. assign()으로 새 컬럼을 만들고, apply()로 각 값에 함수를 적용합니다. 이렇게 파생 변수를 만들면 데이터를 더 쉽게 분석할 수 있습니다.
+
+    assign()은 새 컬럼을 추가하고, apply()는 각 값에 함수를 적용합니다. lambda x: 조건문은 if-else를 한 줄로 작성하는 방법입니다. 이전 프로젝트(04번)에서 배운 개념을 여기서 다시 활용하고 있습니다.
+  tips:
+  - 'assign()은 새 컬럼을 추가하고, apply()는 각 값에 함수를 적용합니다. lambda x: 조건문은 if-else를 한 줄로 작성하는 방법입니다. 이전 프로젝트(04번)에서
+    배운 개념을 여기서 다시 활용하고 있습니다.'
+  snippet: |-
+    graded = mpg.assign(
+        efficiencyGrade=mpg['mpg'].apply(
+            lambda x: 'A' if x >= 30 else ('B' if x >= 20 else 'C')
+        )
+    )
+    graded[['name', 'mpg', 'efficiencyGrade']].head(10)
+  exercise:
+    prompt: 7.5단계. 연비 등급 추가 예제에서 조건값을 바꾸고 선택되는 분기와 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      graded = mpg.assign(
+          efficiencyGrade=mpg['mpg'].apply(
+              lambda x: 'A' if x >= 30 else ('B' if x >= 20 else 'C')
+          )
+      )
+      graded[['name', 'mpg', 'efficiencyGrade']].head(10)
+    hints:
+    - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
+    - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
+  check:
+    type: noError
+    noError: 7.5단계. 연비 등급 추가의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
+    resultCheck: 7.5단계. 연비 등급 추가 분기 결과가 바꾼 조건값에 맞게 달라져야 합니다.
+- id: step8_groupby_year
+  title: 8단계. 연도별 평균 연비
+  structuredPrimary: true
+  subtitle: 시간에 따른 변화
+  goal: 8단계. 연도별 평균 연비에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 연도(model_year)별로 그룹핑하면 시간에 따른 변화를 볼 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: mpg.groupby('model_year')['mpg'].mean()
+  exercise:
+    prompt: 8단계. 연도별 평균 연비 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: mpg.groupby('model_year')['mpg'].mean()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 연도별 평균 연비의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 8단계. 연도별 평균 연비 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step9_groupby_origin
+  title: 9단계. 제조국별 평균 연비
+  structuredPrimary: true
+  subtitle: 국가 비교
+  goal: 9단계. 제조국별 평균 연비에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 일본차가 평균 30 mpg로 가장 높고, 미국차가 20 mpg로 가장 낮습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: mpg.groupby('origin')['mpg'].mean()
+  exercise:
+    prompt: 9단계. 제조국별 평균 연비 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: mpg.groupby('origin')['mpg'].mean()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 제조국별 평균 연비의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 9단계. 제조국별 평균 연비 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step10_pivot
+  title: 10단계. 피벗테이블 기본
+  structuredPrimary: true
+  subtitle: 행과 열로 요약
+  goal: 10단계. 피벗테이블 기본에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    pivot_table은 엑셀의 피벗테이블과 동일한 기능으로, pandas에서 가장 강력한 데이터 요약 도구 중 하나입니다. groupby가 1차원 그룹핑이라면, pivot_table은 2차원 교차 분석표를 만듭니다. index는 행 기준, columns는 열 기준, values는 계산할 값, aggfunc는 집계 함수를 지정합니다. 예를 들어 "제조국별로(행) 실린더별로(열) 평균 연비를 보고 싶다"는 요구사항을 한 줄로 해결할 수 있습니다. 결과는 제조국 3개 × 실린더 종류 수만큼의 2차원 표가 됩니다. 복잡한 다차원 데이터를 직관적인 크로스탭으로 변환할 때 필수적입니다.
+
+    pivot_table의 4가지 핵심 파라미터: values(계산할 컬럼), index(행 기준), columns(열 기준), aggfunc(집계 함수). index와 columns는 리스트로 여러 개 지정 가능하며, 결과에서 NaN은 해당 조합이 없음을 의미합니다.
+  tips:
+  - 'pivot_table의 4가지 핵심 파라미터: values(계산할 컬럼), index(행 기준), columns(열 기준), aggfunc(집계 함수). index와 columns는
+    리스트로 여러 개 지정 가능하며, 결과에서 NaN은 해당 조합이 없음을 의미합니다.'
+  snippet: mpg.pivot_table(values='mpg', index='origin', columns='cylinders', aggfunc='mean')
+  exercise:
+    prompt: 10단계. 피벗테이블 기본 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: mpg.pivot_table(values='mpg', index='origin', columns='cylinders', aggfunc='mean')
+    hints:
+    - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
+    - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 피벗테이블 기본의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 10단계. 피벗테이블 기본의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step11_pivot_year
+  title: 11단계. 연도 × 제조국
+  structuredPrimary: true
+  subtitle: 시간 + 국가 비교
+  goal: 11단계. 연도 × 제조국에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    pivot_table의 행과 열을 바꾸면 다른 관점의 분석이 가능합니다. 이번에는 연도를 행으로, 제조국을 열로 설정해서 시간의 흐름에 따른 국가별 연비 변화를 추적합니다. 1970년대 오일쇼크 이후 연비 향상 노력이 실제로 데이터에 반영되어 있는지 확인할 수 있습니다. 각 셀의 값은 해당 연도, 해당 국가에서 생산된 차량들의 평균 연비입니다. 이처럼 pivot_table은 시계열 비교에도 매우 유용합니다.
+
+    pivot_table 결과의 NaN 처리: fill_value=0 파라미터를 추가하면 NaN을 0으로 채울 수 있습니다. margins=True를 추가하면 행과 열의 합계(All)가 자동으로 계산됩니다.
+  tips:
+  - 'pivot_table 결과의 NaN 처리: fill_value=0 파라미터를 추가하면 NaN을 0으로 채울 수 있습니다. margins=True를 추가하면 행과 열의 합계(All)가
+    자동으로 계산됩니다.'
+  snippet: mpg.pivot_table(values='mpg', index='model_year', columns='origin', aggfunc='mean')
+  exercise:
+    prompt: 11단계. 연도 × 제조국 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: mpg.pivot_table(values='mpg', index='model_year', columns='origin', aggfunc='mean')
+    hints:
+    - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
+    - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 연도 × 제조국의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 11단계. 연도 × 제조국의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step12_filter_groupby
+  title: 12단계. 80년대 제조국별 연비
+  structuredPrimary: true
+  subtitle: 필터링 + 그룹핑
+  goal: 12단계. 80년대 제조국별 연비에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    필터링과 그룹핑을 조합하면 특정 조건의 데이터만 선택해서 그룹별 통계를 구할 수 있습니다. 80년대(model_year >= 80) 차량만 필터링한 후, 제조국별로 평균 연비를 계산합니다. 이렇게 시대별, 세그먼트별 비교가 가능합니다. 80년대에는 일본차의 연비 우위가 더욱 두드러졌는지, 미국과 유럽은 어떻게 변했는지 확인할 수 있습니다. 메서드 체이닝을 통해 여러 분석 단계를 자연스럽게 연결할 수 있습니다.
+
+    메서드 체이닝 순서 주의: 필터링 → groupby → 집계 순서를 지켜야 합니다. 순서를 바꾸면 에러가 발생하거나 의도한 결과를 얻을 수 없습니다. query()를 사용하면 더 깔끔합니다: mpg.query('model_year >= 80').groupby('origin')['mpg'].mean()
+  tips:
+  - '메서드 체이닝 순서 주의: 필터링 → groupby → 집계 순서를 지켜야 합니다. 순서를 바꾸면 에러가 발생하거나 의도한 결과를 얻을 수 없습니다. query()를 사용하면
+    더 깔끔합니다: mpg.query(''model_year >= 80'').groupby(''origin'')[''mpg''].mean()'
+  snippet: mpg[mpg['model_year'] >= 80].groupby('origin')['mpg'].mean()
+  exercise:
+    prompt: 12단계. 80년대 제조국별 연비 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: mpg[mpg['model_year'] >= 80].groupby('origin')['mpg'].mean()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 12단계. 80년대 제조국별 연비의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 12단계. 80년대 제조국별 연비 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step13_complex
+  title: 13단계. 6기통 이상 연비 TOP 5
+  structuredPrimary: true
+  subtitle: 필터링 + 정렬
+  goal: 13단계. 6기통 이상 연비 TOP 5에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    복잡한 분석 요구사항을 여러 메서드를 조합해서 해결하는 실전 예제입니다. "6기통 이상의 큰 엔진을 가진 차량 중에서도 연비가 좋은 차는 무엇인가?"라는 질문에 답합니다. 먼저 cylinders >= 6으로 필터링해서 6기통, 8기통 차량만 선택하고, nlargest(5, 'mpg')로 그 중 연비 상위 5대를 뽑습니다. 마지막으로 [['name', 'mpg', 'cylinders']]로 필요한 컬럼만 선택합니다. 이처럼 pandas의 여러 기능을 체인으로 연결하면 복잡한 조건도 한 줄로 처리할 수 있습니다.
+
+    복잡한 체이닝은 가독성을 위해 줄바꿈할 수 있습니다. mpg[mpg['cylinders'] >= 6] .nlargest(5, 'mpg') .[ ['name', 'mpg']]처럼 작성하면 각 단계가 명확해집니다. 또는 괄호로 감싸면 됩니다.
+  tips:
+  - 복잡한 체이닝은 가독성을 위해 줄바꿈할 수 있습니다. mpg[mpg['cylinders'] >= 6] .nlargest(5, 'mpg') .[ ['name', 'mpg']]처럼
+    작성하면 각 단계가 명확해집니다. 또는 괄호로 감싸면 됩니다.
+  snippet: mpg[mpg['cylinders'] >= 6].nlargest(5, 'mpg')[['name', 'mpg', 'cylinders']]
+  exercise:
+    prompt: 13단계. 6기통 이상 연비 TOP 5 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: mpg[mpg['cylinders'] >= 6].nlargest(5, 'mpg')[['name', 'mpg', 'cylinders']]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 13단계. 6기통 이상 연비 TOP 5의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 13단계. 6기통 이상 연비 TOP 5 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 연비 리포트와 피벗 점검'
+  structuredPrimary: true
+  subtitle: sort, nlargest, pivot_table, 실패 케이스
+  goal: '현업 흐름 검증: 연비 리포트와 피벗 점검에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    자동차 연비 분석은 정렬 결과와 그룹 평균이 맞는지 같이 봐야 합니다. 상위 차량 목록과 제조국별 피벗이 같은 원본에서 나왔는지 검증하세요.
+
+    변주 실험
+    제조국별 평균 대신 중앙값을 쓰면 순위가 달라지는지 pivot_table의 aggfunc만 바꿔 비교하세요.
+  tips:
+  - 변주 실험 제조국별 평균 대신 중앙값을 쓰면 순위가 달라지는지 pivot_table의 aggfunc만 바꿔 비교하세요.
+  snippet: |-
+    import pandas as pd
+
+    mpg = pd.DataFrame({
+        "name": ["a", "b", "c", "d"],
+        "mpg": [30, 22, 35, 18],
+        "cylinders": [4, 6, 4, 8],
+        "origin": ["japan", "usa", "japan", "usa"],
+    })
+
+    top = mpg.nlargest(2, "mpg")
+    pivot = mpg.pivot_table(index="origin", values="mpg", aggfunc="mean")
+
+    assert top["name"].tolist() == ["c", "a"]
+    assert pivot.loc["japan", "mpg"] == 32.5
+    assert pivot.loc["usa", "mpg"] == 20.0
+  exercise:
+    prompt: '현업 흐름 검증: 연비 리포트와 피벗 점검 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.'
+    starterCode: |-
+      import pandas as pd
+
+      mpg = pd.DataFrame({
+          "name": ["a", "b", "c", "d"],
+          "mpg": [30, 22, 35, 18],
+          "cylinders": [4, 6, 4, 8],
+          "origin": ["japan", "usa", "japan", "usa"],
+      })
+
+      top = mpg.nlargest(2, "mpg")
+      pivot = mpg.pivot_table(index="origin", values="mpg", aggfunc="mean")
+
+      assert top["name"].tolist() == ["c", "a"]
+      assert pivot.loc["japan", "mpg"] == 32.5
+      assert pivot.loc["usa", "mpg"] == 20.0
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 연비 리포트와 피벗 점검의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.'
+    resultCheck: '현업 흐름 검증: 연비 리포트와 피벗 점검의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.'
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 자동차 연비 분석 프로젝트
+  goal: 실습에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    배운 모든 내용을 활용해서 분석해봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import pandas as pd
+    from codaro.curriculum.localData import loadLocalDataset
+
+    data = loadLocalDataset("mpg")
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+
+      data = loadLocalDataset("mpg")
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  subtitle: 기초 과정 완료!
+  blocks:
+  - type: text
+    content: pandas 기초 과정(01~05)을 모두 완료했습니다! 데이터 불러오기부터 필터링, 그룹핑, 결측치 처리, 정렬, 피벗테이블까지 실무에서 가장 많이 사용하는
+      핵심 기능들을 익혔습니다. 이제 여러분은 실제 데이터를 pandas로 분석할 수 있는 기본기를 갖추었습니다.
+  - type: list
+    items:
+    - df.sort_values('컬럼', ascending=False) - 정렬 (오름차순/내림차순)
+    - df.nlargest(N, '컬럼') - 상위 N개 (TOP N)
+    - df.nsmallest(N, '컬럼') - 하위 N개 (BOTTOM N)
+    - df.pivot_table(values, index, columns, aggfunc) - 피벗테이블 (2차원 교차 분석)
+    - df.groupby('컬럼').mean() - 그룹별 집계 (1차원 그룹핑)
+    - 메서드 체이닝 - 필터링.그룹핑.집계를 한 줄로
+  - type: text
+    content: 다음 시간부터는 중급 과정입니다. 시계열 분석, 문자열 처리, 데이터 병합 등 더 고급 기술을 배웁니다.
+  goal: 정리에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pandas_05-mpg-efficiency-filter-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - summary
+    title: 연식과 실린더 조건으로 자동차 연비 비교하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 조건을 만족한 자동차의 평균 연비와 최고 연비 모델을 계산한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 두 필터 조건을 모두 만족한 행만 selected에 넣으세요.
+    - 빈 선택 결과를 평균 0으로 오해하지 않도록 None으로 표시하세요.
+    exercise:
+      prompt: summarize_mpg(rows, minimum_year, maximum_cylinders)를 완성해 count, meanMpg, bestModel을 반환하세요.
+      starterCode: |-
+        def summarize_mpg(rows, minimum_year, maximum_cylinders):
+            raise NotImplementedError
+      solution: |
+        def summarize_mpg(rows, minimum_year, maximum_cylinders):
+            selected = [row for row in rows if row["year"] >= minimum_year and row["cylinders"] <= maximum_cylinders]
+            if not selected:
+                return {"count": 0, "meanMpg": None, "bestModel": None}
+            best = max(selected, key=lambda row: (row["mpg"], row["model"]))
+            return {"count": len(selected), "meanMpg": round(sum(row["mpg"] for row in selected) / len(selected), 2), "bestModel": best["model"]}
+      hints: *id001
+    check:
+      id: python.pandas.pandas_05.mpg-efficiency-filter.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_05.mpg-efficiency-filter.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_mpg
+        cases:
+        - id: filters-and-summarizes
+          arguments:
+          - value:
+            - model: A
+              year: 2020
+              cylinders: 4
+              mpg: 30
+            - model: B
+              year: 2018
+              cylinders: 4
+              mpg: 25
+            - model: C
+              year: 2021
+              cylinders: 6
+              mpg: 20
+          - value: 2019
+          - value: 4
+          expectedReturn:
+            count: 1
+            meanMpg: 30.0
+            bestModel: A
+        - id: reports-empty-selection
+          arguments:
+          - value: []
+          - value: 2020
+          - value: 4
+          expectedReturn:
+            count: 0
+            meanMpg: null
+            bestModel: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pandas_05-fuel-unit-normalization-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_05-mpg-efficiency-filter-mastery
+    title: 새 차량 데이터의 연비 단위를 하나로 정규화하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: mpg와 L/100km가 섞인 레코드를 L/100km로 바꾸고 효율 순위를 만든다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 서로 다른 단위를 그대로 평균 내지 마세요.
+    - L/100km는 값이 작을수록 효율이 좋습니다.
+    exercise:
+      prompt: normalize_fuel_use(rows)를 완성해 model, litersPer100Km을 효율이 좋은 순서로 반환하세요.
+      starterCode: |-
+        def normalize_fuel_use(rows):
+            raise NotImplementedError
+      solution: |
+        def normalize_fuel_use(rows):
+            normalized = []
+            for row in rows:
+                if row["value"] <= 0:
+                    raise ValueError("fuel value must be positive")
+                if row["unit"] == "mpg":
+                    value = 235.215 / row["value"]
+                elif row["unit"] == "l/100km":
+                    value = row["value"]
+                else:
+                    raise ValueError("unknown fuel unit")
+                normalized.append({"model": row["model"], "litersPer100Km": round(value, 2)})
+            return sorted(normalized, key=lambda row: (row["litersPer100Km"], row["model"]))
+      hints: *id002
+    check:
+      id: python.pandas.pandas_05.fuel-unit-normalization.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_05.fuel-unit-normalization.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: normalize_fuel_use
+        cases:
+        - id: normalizes-and-ranks
+          arguments:
+          - value:
+            - model: A
+              value: 47.043
+              unit: mpg
+            - model: B
+              value: 6.0
+              unit: l/100km
+          expectedReturn:
+          - model: A
+            litersPer100Km: 5.0
+          - model: B
+            litersPer100Km: 6.0
+        - id: handles-empty-list
+          arguments:
+          - value: []
+          expectedReturn: []
+        - id: rejects-unknown-unit
+          arguments:
+          - value:
+            - model: X
+              value: 10
+              unit: km/l
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pandas_05-comparison-normalization-rule-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_05-fuel-unit-normalization-transfer
+    title: 비교 전 단위와 조건 정규화 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 비교 질문의 손상 유형에 맞는 준비 단계와 검증 증거를 선택한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 비교 전에 단위, 기간, 필터 결과 수를 확인하세요.
+    - 데이터가 없다는 사실과 평균이 0이라는 값은 다릅니다.
+    exercise:
+      prompt: choose_comparison_fix(issue)를 완성해 action, evidence, failure를 반환하세요.
+      starterCode: |-
+        def choose_comparison_fix(issue):
+            raise NotImplementedError
+      solution: |
+        def choose_comparison_fix(issue):
+            table = {
+                "mixed-units": {"action": "convert-to-one-unit", "evidence": "unit column and conversion formula", "failure": "meaningless aggregate"},
+                "different-time-window": {"action": "filter-common-window", "evidence": "minimum and maximum date", "failure": "seasonal bias"},
+                "empty-filter": {"action": "return-no-result", "evidence": "selected row count", "failure": "fake zero average"},
+            }
+            if issue not in table:
+                raise ValueError("unknown comparison issue")
+            return table[issue]
+      hints: *id003
+    check:
+      id: python.pandas.pandas_05.comparison-normalization-rule.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_05.comparison-normalization-rule.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_comparison_fix
+        cases:
+        - id: recalls-unit-normalization
+          arguments:
+          - value: mixed-units
+          expectedReturn:
+            action: convert-to-one-unit
+            evidence: unit column and conversion formula
+            failure: meaningless aggregate
+        - id: recalls-empty-filter-policy
+          arguments:
+          - value: empty-filter
+          expectedReturn:
+            action: return-no-result
+            evidence: selected row count
+            failure: fake zero average
+        - id: rejects-untracked-issue
+          arguments:
+          - value: ugly-chart
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

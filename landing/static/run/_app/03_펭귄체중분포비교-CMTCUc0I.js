@@ -1,0 +1,859 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - seaborn
+  id: seaborn_03
+  title: 펭귄체중분포비교
+  order: 3
+  category: seaborn
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - seaborn
+  - boxplot
+  - violinplot
+  - penguins
+  - 분포비교
+  seo:
+    title: Seaborn 박스플롯과 바이올린플롯 - 펭귄 체중 분포 비교
+    description: Seaborn boxplot, violinplot으로 펭귄 종별/성별 체중 분포를 비교합니다. hue로 다중 그룹 비교를 배웁니다.
+    keywords:
+    - seaborn
+    - boxplot
+    - violinplot
+    - penguins
+    - 분포
+    - 비교
+intro:
+  emoji: 🐧
+  goal: 펭귄 종별/성별 체중 분포를 박스플롯과 바이올린플롯으로 비교합니다.
+  description: boxplot으로 분포의 요약 통계량을, violinplot으로 분포의 모양을 시각화합니다. hue로 성별을 추가하여 다중 그룹을 비교합니다. 이전에 배운
+    scatterplot, histplot, stripplot 개념을 함께 활용합니다.
+  direction: 펭귄체중분포비교에서 정리된 데이터를 통계 차트로 보고 분포와 관계를 검증합니다.
+  benefits:
+  - 분석용 테이블 확인 후 통계 차트 구성에 맞는 코드 입력을 고릅니다.
+  - 펭귄체중분포비교 결과를 분포, 그룹, 관계 패턴 기준으로 즉시 점검합니다.
+  - 완료한 코드를 탐색 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(분석용 테이블)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 로드 처리 실행
+      detail: 통계 차트 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 기본 박스플롯 결과 검증
+      detail: 분포, 그룹, 관계 패턴 기준으로 실행 결과를 비교합니다.
+    - label: 펭귄체중분포비교 재사용
+      detail: 완성 코드를 탐색 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 통계 시각화 환경
+      detail: matplotlib, seaborn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 펭귄체중분포비교 실행
+      detail: 셀을 실행해 분포, 그룹, 관계 패턴와 예외 상태를 확인합니다.
+    - label: 펭귄체중분포비교 완료
+      detail: 검증된 코드를 탐색 리포트로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: seaborn과 matplotlib을 불러옵니다. penguins 데이터는 남극 팔머 군도에서 수집한 펭귄 데이터입니다. Adelie, Chinstrap,
+    Gentoo 세 종의 부리 크기, 날개 길이, 체중 등이 측정되어 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+    import matplotlib.pyplot as plt
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import matplotlib.pyplot as plt
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 라이브러리 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step2_data
+  title: 2단계. 데이터 로드
+  structuredPrimary: true
+  subtitle: penguins 데이터셋
+  goal: 2단계. 데이터 로드에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: penguins 데이터셋은 120개의 로컬 펭귄 관측 기록입니다. species(종), island(섬), bill_length_mm(부리 길이), bill_depth_mm(부리
+    깊이), flipper_length_mm(날개 길이), body_mass_g(체중), sex(성별) 컬럼이 있습니다. 결측값이 있으므로 dropna()로 제거합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    penguins = loadLocalDataset('penguins').dropna()
+    penguins.head()
+  exercise:
+    prompt: 2단계. 데이터 로드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      penguins = loadLocalDataset('penguins').dropna()
+      penguins.head()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 로드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 로드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_basic_box
+  title: 3단계. 기본 박스플롯
+  structuredPrimary: true
+  subtitle: boxplot()
+  goal: 3단계. 기본 박스플롯에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    boxplot()은 분포의 5가지 요약 통계량을 시각화합니다. 박스의 아래/위는 1사분위수(Q1)와 3사분위수(Q3), 중앙선은 중앙값(median), 수염은 1.5*IQR 범위, 그 밖의 점은 이상치입니다. 종별 체중 분포를 비교해봅니다.
+
+    sns.boxplot(data, x='범주형', y='연속형')으로 범주별 분포를 비교합니다. 박스는 IQR(Q3-Q1)을, 수염은 Q1-1.5*IQR ~ Q3+1.5*IQR 범위를, 점은 이상치를 나타냅니다.
+  tips:
+  - sns.boxplot(data, x='범주형', y='연속형')으로 범주별 분포를 비교합니다. 박스는 IQR(Q3-Q1)을, 수염은 Q1-1.5*IQR ~ Q3+1.5*IQR
+    범위를, 점은 이상치를 나타냅니다.
+  snippet: |-
+    fig, ax = plt.subplots(figsize=(8, 6))
+    sns.boxplot(data=penguins, x='species', y='body_mass_g', ax=ax)
+    ax.set_title('Body Mass by Species')
+    ax.set_ylabel('Body Mass (g)')
+    fig
+  exercise:
+    prompt: 3단계. 기본 박스플롯 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      fig, ax = plt.subplots(figsize=(8, 6))
+      sns.boxplot(data=penguins, x='species', y='body_mass_g', ax=ax)
+      ax.set_title('Body Mass by Species')
+      ax.set_ylabel('Body Mass (g)')
+      fig
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 기본 박스플롯의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 기본 박스플롯 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step4_hue_box
+  title: 4단계. hue로 성별 구분
+  structuredPrimary: true
+  subtitle: 다중 그룹 비교
+  goal: 4단계. hue로 성별 구분에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: hue 파라미터로 두 번째 범주형 변수를 추가할 수 있습니다. 종별로 나누고 성별로 색상을 구분하면 두 가지 요인의 효과를 동시에 비교할 수 있습니다. 같은
+    종에서도 수컷과 암컷의 체중 차이를 확인할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figHue, axHue = plt.subplots(figsize=(10, 6))
+    sns.boxplot(data=penguins, x='species', y='body_mass_g', hue='sex', palette='Set2', ax=axHue)
+    axHue.set_title('Body Mass by Species and Sex')
+    axHue.set_ylabel('Body Mass (g)')
+    axHue.legend(title='Sex')
+    figHue
+  exercise:
+    prompt: 4단계. hue로 성별 구분 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figHue, axHue = plt.subplots(figsize=(10, 6))
+      sns.boxplot(data=penguins, x='species', y='body_mass_g', hue='sex', palette='Set2', ax=axHue)
+      axHue.set_title('Body Mass by Species and Sex')
+      axHue.set_ylabel('Body Mass (g)')
+      axHue.legend(title='Sex')
+      figHue
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. hue로 성별 구분의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 4단계. hue로 성별 구분 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step5_violin
+  title: 5단계. 바이올린플롯
+  structuredPrimary: true
+  subtitle: violinplot()
+  goal: 5단계. 바이올린플롯에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    violinplot()은 박스플롯과 KDE를 결합한 형태입니다. 양쪽으로 대칭인 KDE 곡선으로 분포의 모양을 보여줍니다. 박스플롯보다 분포의 세부적인 형태(다봉분포, 비대칭 등)를 파악하기 좋습니다.
+
+    sns.violinplot()은 분포의 모양(밀도)을 시각화합니다. 폭이 넓은 부분은 데이터가 많은 구간입니다. inner 파라미터로 내부 표시를 조절할 수 있습니다.
+  snippet: |-
+    figViolin, axViolin = plt.subplots(figsize=(8, 6))
+    sns.violinplot(data=penguins, x='species', y='body_mass_g', ax=axViolin)
+    axViolin.set_title('Body Mass by Species (Violin)')
+    axViolin.set_ylabel('Body Mass (g)')
+    figViolin
+  exercise:
+    prompt: 5단계. 바이올린플롯 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figViolin, axViolin = plt.subplots(figsize=(8, 6))
+      sns.violinplot(data=penguins, x='species', y='body_mass_g', ax=axViolin)
+      axViolin.set_title('Body Mass by Species (Violin)')
+      axViolin.set_ylabel('Body Mass (g)')
+      figViolin
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 바이올린플롯의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 바이올린플롯 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step6_violin_hue
+  title: 6단계. 바이올린플롯 hue
+  structuredPrimary: true
+  subtitle: split 옵션
+  goal: 6단계. 바이올린플롯 hue에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    violinplot에 hue를 적용하면 두 그룹의 분포를 나란히 비교할 수 있습니다. split=True를 설정하면 한 바이올린을 반으로 나누어 두 그룹을 좌우에 표시합니다. 공간을 절약하면서 직접 비교가 가능합니다.
+
+    split=True는 두 그룹을 하나의 바이올린 좌우에 표시합니다. hue가 2개 범주일 때만 사용 가능하며, 직접적인 비교에 효과적입니다.
+  snippet: |-
+    figSplit, axSplit = plt.subplots(figsize=(10, 6))
+    sns.violinplot(data=penguins, x='species', y='body_mass_g', hue='sex',
+                  split=True, palette='Set2', ax=axSplit)
+    axSplit.set_title('Body Mass by Species and Sex (Split)')
+    axSplit.set_ylabel('Body Mass (g)')
+    axSplit.legend(title='Sex')
+    figSplit
+  exercise:
+    prompt: 6단계. 바이올린플롯 hue 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figSplit, axSplit = plt.subplots(figsize=(10, 6))
+      sns.violinplot(data=penguins, x='species', y='body_mass_g', hue='sex',
+                    split=True, palette='Set2', ax=axSplit)
+      axSplit.set_title('Body Mass by Species and Sex (Split)')
+      axSplit.set_ylabel('Body Mass (g)')
+      axSplit.legend(title='Sex')
+      figSplit
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 바이올린플롯 hue의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 바이올린플롯 hue의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step7_inner
+  title: 7단계. inner 파라미터
+  structuredPrimary: true
+  subtitle: 내부 표시 옵션
+  goal: 7단계. inner 파라미터에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: inner 파라미터로 바이올린 내부에 표시할 내용을 지정합니다. 'box'는 미니 박스플롯, 'quartile'은 사분위선, 'point'는 개별 점, 'stick'은
+    막대, None은 빈 공간입니다. 목적에 따라 선택합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figInner, (axQuartile, axPoint) = plt.subplots(1, 2, figsize=(14, 5))
+
+    sns.violinplot(data=penguins, x='species', y='body_mass_g', inner='quartile', ax=axQuartile)
+    axQuartile.set_title('inner="quartile"')
+
+    sns.violinplot(data=penguins, x='species', y='body_mass_g', inner='point', ax=axPoint)
+    axPoint.set_title('inner="point"')
+
+    plt.tight_layout()
+    figInner
+  exercise:
+    prompt: 7단계. inner 파라미터 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figInner, (axQuartile, axPoint) = plt.subplots(1, 2, figsize=(14, 5))
+
+      sns.violinplot(data=penguins, x='species', y='body_mass_g', inner='quartile', ax=axQuartile)
+      axQuartile.set_title('inner="quartile"')
+
+      sns.violinplot(data=penguins, x='species', y='body_mass_g', inner='point', ax=axPoint)
+      axPoint.set_title('inner="point"')
+
+      plt.tight_layout()
+      figInner
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. inner 파라미터의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. inner 파라미터 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step8_comparison
+  title: 8단계. 박스 vs 바이올린
+  structuredPrimary: true
+  subtitle: 두 방식 비교
+  goal: 8단계. 박스 vs 바이올린에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 박스플롯과 바이올린플롯을 나란히 비교합니다. 박스플롯은 요약 통계량을 명확히 보여주고, 바이올린플롯은 분포의 세부 형태를 보여줍니다. 두 차트를 함께 보면
+    데이터를 더 완전하게 이해할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figCompare, (axBox, axViol) = plt.subplots(1, 2, figsize=(14, 5))
+
+    sns.boxplot(data=penguins, x='species', y='body_mass_g', hue='sex', palette='Set2', ax=axBox)
+    axBox.set_title('Box Plot')
+    axBox.set_ylabel('Body Mass (g)')
+
+    sns.violinplot(data=penguins, x='species', y='body_mass_g', hue='sex',
+                  split=True, palette='Set2', ax=axViol)
+    axViol.set_title('Violin Plot')
+    axViol.set_ylabel('Body Mass (g)')
+
+    plt.tight_layout()
+    figCompare
+  exercise:
+    prompt: 8단계. 박스 vs 바이올린 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figCompare, (axBox, axViol) = plt.subplots(1, 2, figsize=(14, 5))
+
+      sns.boxplot(data=penguins, x='species', y='body_mass_g', hue='sex', palette='Set2', ax=axBox)
+      axBox.set_title('Box Plot')
+      axBox.set_ylabel('Body Mass (g)')
+
+      sns.violinplot(data=penguins, x='species', y='body_mass_g', hue='sex',
+                    split=True, palette='Set2', ax=axViol)
+      axViol.set_title('Violin Plot')
+      axViol.set_ylabel('Body Mass (g)')
+
+      plt.tight_layout()
+      figCompare
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 박스 vs 바이올린의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 박스 vs 바이올린의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step9_strip_overlay
+  title: 9단계. 점 오버레이
+  structuredPrimary: true
+  subtitle: 박스플롯 + 스트립플롯
+  goal: 9단계. 점 오버레이에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 박스플롯 위에 stripplot을 겹쳐서 개별 데이터 포인트를 함께 표시할 수 있습니다. 요약 통계량과 실제 데이터를 동시에 보여주어 분포의 특성을 더 잘
+    파악할 수 있습니다. dodge 파라미터를 맞춰야 점이 올바른 위치에 표시됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figOverlay, axOverlay = plt.subplots(figsize=(10, 6))
+
+    sns.boxplot(data=penguins, x='species', y='body_mass_g', hue='sex', palette='Set2', ax=axOverlay)
+    sns.stripplot(data=penguins, x='species', y='body_mass_g', hue='sex',
+                 dodge=True, palette='dark:black', alpha=0.5, size=4, ax=axOverlay, legend=False)
+
+    axOverlay.set_title('Body Mass with Individual Points')
+    axOverlay.set_ylabel('Body Mass (g)')
+    axOverlay.legend(title='Sex')
+    figOverlay
+  exercise:
+    prompt: 9단계. 점 오버레이 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figOverlay, axOverlay = plt.subplots(figsize=(10, 6))
+
+      sns.boxplot(data=penguins, x='species', y='body_mass_g', hue='sex', palette='Set2', ax=axOverlay)
+      sns.stripplot(data=penguins, x='species', y='body_mass_g', hue='sex',
+                   dodge=True, palette='dark:black', alpha=0.5, size=4, ax=axOverlay, legend=False)
+
+      axOverlay.set_title('Body Mass with Individual Points')
+      axOverlay.set_ylabel('Body Mass (g)')
+      axOverlay.legend(title='Sex')
+      figOverlay
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 점 오버레이의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 점 오버레이의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step10_flipper
+  title: 10단계. 다른 변수 탐색
+  structuredPrimary: true
+  subtitle: 날개 길이 분포
+  goal: 10단계. 다른 변수 탐색에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 같은 방식으로 날개 길이(flipper_length_mm) 분포도 탐색해봅니다. 이전에 배운 scatterplot으로 체중과 날개 길이의 관계도 함께 확인하면
+    더 풍부한 인사이트를 얻을 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figFlipper, (axFlipBox, axFlipScatter) = plt.subplots(1, 2, figsize=(14, 5))
+
+    sns.boxplot(data=penguins, x='species', y='flipper_length_mm', hue='sex', palette='Set2', ax=axFlipBox)
+    axFlipBox.set_title('Flipper Length by Species')
+    axFlipBox.set_ylabel('Flipper Length (mm)')
+
+    sns.scatterplot(data=penguins, x='flipper_length_mm', y='body_mass_g',
+                   hue='species', palette='Set2', alpha=0.7, ax=axFlipScatter)
+    axFlipScatter.set_title('Flipper vs Body Mass')
+
+    plt.tight_layout()
+    figFlipper
+  exercise:
+    prompt: 10단계. 다른 변수 탐색 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figFlipper, (axFlipBox, axFlipScatter) = plt.subplots(1, 2, figsize=(14, 5))
+
+      sns.boxplot(data=penguins, x='species', y='flipper_length_mm', hue='sex', palette='Set2', ax=axFlipBox)
+      axFlipBox.set_title('Flipper Length by Species')
+      axFlipBox.set_ylabel('Flipper Length (mm)')
+
+      sns.scatterplot(data=penguins, x='flipper_length_mm', y='body_mass_g',
+                     hue='species', palette='Set2', alpha=0.7, ax=axFlipScatter)
+      axFlipScatter.set_title('Flipper vs Body Mass')
+
+      plt.tight_layout()
+      figFlipper
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 다른 변수 탐색의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 다른 변수 탐색의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step11_final
+  title: 11단계. 최종 종합 분석
+  structuredPrimary: true
+  subtitle: 네 가지 관점
+  goal: 11단계. 최종 종합 분석에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 지금까지 배운 모든 차트 유형을 종합하여 펭귄 데이터를 다각도로 분석합니다. 히스토그램으로 전체 분포, 박스플롯으로 요약 통계, 바이올린플롯으로 분포 형태,
+    산점도로 변수 관계를 함께 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figFinal, axesFinal = plt.subplots(2, 2, figsize=(14, 10))
+
+    sns.histplot(data=penguins, x='body_mass_g', hue='species', kde=True, palette='Set2', ax=axesFinal[0, 0])
+    axesFinal[0, 0].set_title('Body Mass Distribution')
+
+    sns.boxplot(data=penguins, x='species', y='body_mass_g', hue='sex', palette='Set2', ax=axesFinal[0, 1])
+    axesFinal[0, 1].set_title('Body Mass by Species and Sex')
+
+    sns.violinplot(data=penguins, x='species', y='flipper_length_mm',
+                  hue='sex', split=True, palette='Set2', ax=axesFinal[1, 0])
+    axesFinal[1, 0].set_title('Flipper Length Distribution')
+
+    sns.scatterplot(data=penguins, x='bill_length_mm', y='bill_depth_mm',
+                   hue='species', style='sex', palette='Set2', ax=axesFinal[1, 1])
+    axesFinal[1, 1].set_title('Bill Dimensions')
+
+    plt.tight_layout()
+    figFinal
+  exercise:
+    prompt: 11단계. 최종 종합 분석 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figFinal, axesFinal = plt.subplots(2, 2, figsize=(14, 10))
+
+      sns.histplot(data=penguins, x='body_mass_g', hue='species', kde=True, palette='Set2', ax=axesFinal[0, 0])
+      axesFinal[0, 0].set_title('Body Mass Distribution')
+
+      sns.boxplot(data=penguins, x='species', y='body_mass_g', hue='sex', palette='Set2', ax=axesFinal[0, 1])
+      axesFinal[0, 1].set_title('Body Mass by Species and Sex')
+
+      sns.violinplot(data=penguins, x='species', y='flipper_length_mm',
+                    hue='sex', split=True, palette='Set2', ax=axesFinal[1, 0])
+      axesFinal[1, 0].set_title('Flipper Length Distribution')
+
+      sns.scatterplot(data=penguins, x='bill_length_mm', y='bill_depth_mm',
+                     hue='species', style='sex', palette='Set2', ax=axesFinal[1, 1])
+      axesFinal[1, 1].set_title('Bill Dimensions')
+
+      plt.tight_layout()
+      figFinal
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 최종 종합 분석의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 11단계. 최종 종합 분석의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 분포 비교 프로젝트
+  goal: 실습에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    지금까지 배운 boxplot, violinplot, hue, split, inner를 활용해서 다양한 분포를 비교해봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+    import matplotlib.pyplot as plt
+
+    data = loadLocalDataset('tips')
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import matplotlib.pyplot as plt
+
+      data = loadLocalDataset('tips')
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Seaborn boxplot과 violinplot으로 펭귄 체중 분포를 비교했습니다.
+  - type: list
+    items:
+    - sns.boxplot() - 5가지 요약 통계량 시각화
+    - sns.violinplot() - 분포 모양(KDE) 시각화
+    - hue로 다중 그룹 비교
+    - split=True - 바이올린을 좌우로 분할
+    - inner='box'/'quartile'/'point' - 내부 표시 옵션
+    - stripplot 오버레이로 개별 점 표시
+  - type: text
+    content: 다음 시간에는 regplot으로 회귀 분석을 시각화합니다.
+  goal: 정리에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+- id: workflow_validation
+  title: 12단계. 펭귄 분포 비교 검증 루프
+  structuredPrimary: true
+  subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
+  goal: 12단계. 펭귄 분포 비교 검증 루프에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    boxplot과 violinplot은 집단 간 차이를 빠르게 비교하지만, 결측값과 범주 수를 먼저 확인하지 않으면 차트 해석이 흔들립니다. Gentoo가 더 무겁다는 예측을 데이터와 차트 양쪽에서 확인합니다.
+
+    분포 비교는 “누가 큰가”에서 멈추지 말고, 다른 지표에서도 같은 결론이 유지되는지 확인해야 실무 보고서가 강해집니다.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    penguinFlow = loadLocalDataset("penguins").dropna()
+    requiredColumns = {"species", "sex", "body_mass_g", "flipper_length_mm"}
+    missingColumns = requiredColumns - set(penguinFlow.columns)
+
+    assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+    assert sorted(penguinFlow["species"].unique()) == ["Adelie", "Chinstrap", "Gentoo"]
+
+    massBySpecies = penguinFlow.groupby("species")["body_mass_g"].mean()
+    assert massBySpecies["Gentoo"] == massBySpecies.max()
+    massBySpecies.round(1)
+  exercise:
+    prompt: 12단계. 펭귄 분포 비교 검증 루프 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      penguinFlow = loadLocalDataset("penguins").dropna()
+      requiredColumns = {"species", "sex", "body_mass_g", "flipper_length_mm"}
+      missingColumns = requiredColumns - set(penguinFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert sorted(penguinFlow["species"].unique()) == ["Adelie", "Chinstrap", "Gentoo"]
+
+      massBySpecies = penguinFlow.groupby("species")["body_mass_g"].mean()
+      assert massBySpecies["Gentoo"] == massBySpecies.max()
+      massBySpecies.round(1)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 12단계. 펭귄 분포 비교 검증 루프의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 12단계. 펭귄 분포 비교 검증 루프의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: seaborn_03-penguin-violin-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 펭귄 체중 분포 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 매끈한 density가 작은 표본을 과장하지 않는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_penguin_violin(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_penguin_violin(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_penguin_violin(rows):
+            required = ['species', 'bodyMass', 'sex']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'sex'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['species'] for row in usable]
+            y_values = [row['bodyMass'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.seaborn.seaborn_03.penguin-violin-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.seaborn.seaborn_03.penguin-violin-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_penguin_violin
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - species: A
+              bodyMass: 3000
+              sex: F
+            - species: A
+              bodyMass: 3200
+              sex: M
+            - species: B
+              bodyMass: 4500
+              sex: M
+          expectedReturn:
+            usableCount: 3
+            excludedCount: 0
+            groupCounts:
+              F: 1
+              M: 2
+            xExtent:
+            - A
+            - B
+            yExtent:
+            - 3000
+            - 4500
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: seaborn_03-penguin-violin-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - seaborn_03-penguin-violin-data-evidence-mastery
+    title: 펭귄 체중 분포 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 기종별 latency 분포를 리전으로 split하되 관측점과 quartile을 함께 보인다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_penguin_violin(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_penguin_violin(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_penguin_violin(candidate):
+            expected = {'mark': 'violin', 'x': 'species', 'y': 'bodyMass', 'group': 'sex', 'transforms': ['density', 'inner-quartile'], 'interaction': 'none'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.seaborn.seaborn_03.penguin-violin-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.seaborn.seaborn_03.penguin-violin-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_penguin_violin
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: violin
+              x: species
+              y: bodyMass
+              group: sex
+              transforms:
+              - density
+              - inner-quartile
+              interaction: none
+              description: 기종별 latency 분포를 리전으로 split하되 관측점과 quartile을 함께 보인다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: violin
+              x: species
+              y: bodyMass
+              group: sex
+              transforms:
+              - density
+              - inner-quartile
+              interaction: none
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: bodyMass
+              y: species
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - description
+            encoding:
+              mark: violin
+              x: species
+              y: bodyMass
+              group: sex
+              transforms:
+              - density
+              - inner-quartile
+              interaction: none
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: seaborn_03-penguin-violin-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - seaborn_03-penguin-violin-encoding-transfer-transfer
+    title: 펭귄 체중 분포 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 매끈한 density가 작은 표본을 과장하지 않는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_penguin_violin(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_penguin_violin(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_penguin_violin(situation):
+            table = {'small-group': {'encoding': 'points plus box', 'evidence': 'raw n', 'risk': 'unstable KDE'}, 'large-distribution': {'encoding': 'violin plus quartile', 'evidence': 'bandwidth and n', 'risk': 'density width as count'}, 'unequal-groups': {'encoding': 'count-scaled or separate n', 'evidence': 'group sizes', 'risk': 'equal area illusion'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.seaborn.seaborn_03.penguin-violin-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.seaborn.seaborn_03.penguin-violin-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_penguin_violin
+        cases:
+        - id: recalls-small-group
+          arguments:
+          - value: small-group
+          expectedReturn:
+            encoding: points plus box
+            evidence: raw n
+            risk: unstable KDE
+        - id: recalls-large-distribution
+          arguments:
+          - value: large-distribution
+          expectedReturn:
+            encoding: violin plus quartile
+            evidence: bandwidth and n
+            risk: density width as count
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

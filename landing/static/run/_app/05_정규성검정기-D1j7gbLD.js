@@ -1,0 +1,744 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - numpy
+  - pandas
+  - scipy
+  id: scipy_05
+  title: 정규성검정기
+  order: 5
+  category: scipy
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - scipy.stats
+  - 정규성검정
+  - shapiro
+  - normaltest
+  - QQ플롯
+  seo:
+    title: scipy.stats 정규성 검정 - 데이터가 정규분포인지 확인하기
+    description: scipy.stats로 데이터의 정규성을 검정합니다. Shapiro-Wilk, D'Agostino, QQ 플롯을 배웁니다.
+    keywords:
+    - scipy
+    - 정규성검정
+    - shapiro
+    - normaltest
+    - 가설검정
+intro:
+  emoji: 🔔
+  goal: 고객 구매액 데이터가 정규분포를 따르는지 검정하고, 적절한 분석 방법을 선택합니다.
+  description: t-검정, ANOVA, 회귀분석 등 많은 통계 기법은 데이터가 정규분포를 따른다고 가정합니다. 가정이 충족되지 않으면 결과의 신뢰성이 떨어집니다. 이 프로젝트에서는
+    고객 구매액 데이터의 정규성을 다양한 방법으로 검정합니다. Shapiro-Wilk 검정, D'Agostino-Pearson 검정, QQ 플롯, 왜도/첨도 분석을 수행하고, 정규성이
+    충족되지 않으면 로그 변환이나 Box-Cox 변환으로 정규화하는 방법을 배웁니다.
+  direction: 정규성검정기에서 수치 데이터를 모델에 넣고 계산 결과와 오차를 검증합니다.
+  benefits:
+  - 수치 입력 확인 후 최적화/적분/신호 처리에 맞는 코드 입력을 고릅니다.
+  - 정규성검정기 결과를 오차와 결과 범위 기준으로 즉시 점검합니다.
+  - 완료한 코드를 과학 계산 루틴에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 라이브러리 및 데이터 로드 입력 확인
+      detail: 입력 기준(수치 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 데이터 탐색 처리 실행
+      detail: 최적화/적분/신호 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: ShapiroWilk 검정 결과 검증
+      detail: 오차와 결과 범위 기준으로 실행 결과를 비교합니다.
+    - label: 정규성검정기 재사용
+      detail: 완성 코드를 과학 계산 루틴에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 과학 계산 환경
+      detail: matplotlib, numpy, pandas, scipy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 정규성검정기 실행
+      detail: 셀을 실행해 오차와 결과 범위와 예외 상태를 확인합니다.
+    - label: 정규성검정기 완료
+      detail: 검증된 코드를 과학 계산 루틴로 남깁니다.
+sections:
+- id: load
+  title: 라이브러리 및 데이터 로드
+  structuredPrimary: true
+  subtitle: scipy.stats
+  goal: 라이브러리 및 데이터 로드에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    정규성 검정은 데이터가 정규분포(종 모양 곡선)를 따르는지 확인하는 통계적 절차입니다. scipy.stats는 여러 정규성 검정 함수를 제공합니다. Shapiro-Wilk는 소표본에 강력하고, D'Agostino-Pearson은 왜도와 첨도를 기반으로 합니다. 실제 비즈니스 데이터는 정규분포를 따르지 않는 경우가 많으므로, 검정과 변환 기법을 모두 익혀야 합니다.
+
+    normalData는 정규분포에서 생성, purchaseData는 로그정규분포에서 생성했습니다. 로그정규분포는 금액, 소득, 도시 인구 등 오른쪽으로 치우친 데이터에서 흔히 나타납니다.
+  snippet: |-
+    import scipy
+
+    import numpy as np
+    from scipy import stats
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    np.random.seed(42)
+    normalData = np.random.normal(loc=50, scale=10, size=100)
+    purchaseData = np.random.lognormal(mean=4, sigma=1, size=150)
+  exercise:
+    prompt: 라이브러리 및 데이터 로드 예제에서 \`normalData\`, \`purchaseData\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      import scipy
+
+      import numpy as np
+      from scipy import stats
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      np.random.seed(42)
+      normalData = np.random.normal(loc=50, scale=10, size=100)
+      purchaseData = np.random.lognormal(mean=4, sigma=1, size=150)
+    hints:
+    - 바꿀 지점은 \`normalData = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`normalData\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 라이브러리 및 데이터 로드에서 \`normalData\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 라이브러리 및 데이터 로드 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: explore
+  title: 데이터 탐색
+  structuredPrimary: true
+  subtitle: 분포 시각화
+  goal: 데이터 탐색에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    정규성 검정 전에 히스토그램과 기술통계량으로 분포 형태를 파악합니다. 정규분포는 종 모양으로 대칭이고, 평균 주위에 데이터가 집중됩니다. 비정규분포는 한쪽으로 치우치거나 여러 개의 봉우리가 있을 수 있습니다. 시각적 탐색은 검정 결과를 해석하는 데 도움이 됩니다.
+
+    정규분포는 평균 ≈ 중앙값, 왜도 ≈ 0, 첨도 ≈ 0입니다. 구매액 데이터는 평균 > 중앙값이고 왜도가 양수로, 오른쪽으로 치우쳐 있습니다.
+  snippet: |-
+    figExplore, (axExplore1, axExplore2) = plt.subplots(1, 2, figsize=(14, 5))
+
+    axExplore1.hist(normalData, bins=20, color='steelblue', edgecolor='white', alpha=0.7)
+    axExplore1.set_xlabel('Value')
+    axExplore1.set_ylabel('Frequency')
+    axExplore1.set_title(f'Normal Data (n={len(normalData)})')
+    axExplore1.grid(True, alpha=0.3)
+
+    axExplore2.hist(purchaseData, bins=30, color='coral', edgecolor='white', alpha=0.7)
+    axExplore2.set_xlabel('Purchase Amount ($)')
+    axExplore2.set_ylabel('Frequency')
+    axExplore2.set_title(f'Purchase Data (n={len(purchaseData)})')
+    axExplore2.grid(True, alpha=0.3)
+    figExplore
+  exercise:
+    prompt: 데이터 탐색 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figExplore, (axExplore1, axExplore2) = plt.subplots(1, 2, figsize=(14, 5))
+
+      axExplore1.hist(normalData, bins=20, color='steelblue', edgecolor='white', alpha=0.7)
+      axExplore1.set_xlabel('Value')
+      axExplore1.set_ylabel('Frequency')
+      axExplore1.set_title(f'Normal Data (n={len(normalData)})')
+      axExplore1.grid(True, alpha=0.3)
+
+      axExplore2.hist(purchaseData, bins=30, color='coral', edgecolor='white', alpha=0.7)
+      axExplore2.set_xlabel('Purchase Amount ($)')
+      axExplore2.set_ylabel('Frequency')
+      axExplore2.set_title(f'Purchase Data (n={len(purchaseData)})')
+      axExplore2.grid(True, alpha=0.3)
+      figExplore
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 데이터 탐색의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 데이터 탐색 실행 결과가 오차와 결과 범위 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: shapiro
+  title: Shapiro-Wilk 검정
+  structuredPrimary: true
+  subtitle: stats.shapiro
+  goal: ShapiroWilk 검정에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    Shapiro-Wilk 검정은 가장 강력한 정규성 검정 중 하나입니다. 5000개 이하의 샘플에 적합하며, W 통계량과 p-value를 반환합니다. 귀무가설은 '데이터가 정규분포를 따른다'입니다. p-value가 0.05보다 크면 귀무가설을 기각하지 않으므로 정규분포를 따른다고 판단합니다.
+
+    W 통계량은 0~1 사이 값으로, 1에 가까울수록 정규분포에 가깝습니다. p > 0.05면 '정규분포를 따르지 않는다'는 증거가 불충분하므로 정규분포로 간주합니다.
+  snippet: |-
+    statNormal, pNormal = stats.shapiro(normalData)
+    statPurchase, pPurchase = stats.shapiro(purchaseData[:50])
+
+    shapiroDf = pd.DataFrame({
+        'Data': ['Normal Data', 'Purchase Data'],
+        'W-statistic': [statNormal, statPurchase],
+        'p-value': [pNormal, pPurchase],
+        'Is Normal (p>0.05)': [pNormal > 0.05, pPurchase > 0.05]
+    })
+    shapiroDf
+  exercise:
+    prompt: ShapiroWilk 검정 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      statNormal, pNormal = stats.shapiro(normalData)
+      statPurchase, pPurchase = stats.shapiro(purchaseData[:50])
+
+      shapiroDf = pd.DataFrame({
+          'Data': ['Normal Data', 'Purchase Data'],
+          'W-statistic': [statNormal, statPurchase],
+          'p-value': [pNormal, pPurchase],
+          'Is Normal (p>0.05)': [pNormal > 0.05, pPurchase > 0.05]
+      })
+      shapiroDf
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: ShapiroWilk 검정의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: ShapiroWilk 검정의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: qqplot
+  title: QQ 플롯 분석
+  structuredPrimary: true
+  subtitle: 시각적 정규성 확인
+  goal: QQ 플롯 분석에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    QQ 플롯(Quantile-Quantile Plot)은 데이터의 분위수와 이론적 정규분포의 분위수를 비교합니다. 점들이 대각선에 가까우면 정규분포입니다. S자 형태는 꼬리가 두껍거나 얇음을 의미하고, 위로 휘면 오른쪽 꼬리가 깁니다. 대규모 데이터에서는 통계 검정보다 QQ 플롯이 더 실용적입니다.
+
+    Normal Data의 점들은 대각선에 가깝게 분포합니다. Purchase Data는 오른쪽 끝에서 위로 휘어 있어 오른쪽 꼬리가 긴 분포(양의 왜도)임을 보여줍니다.
+  snippet: |-
+    def qqPlot(data, ax, title):
+        sortedData = np.sort(data)
+        n = len(data)
+        theoreticalQ = stats.norm.ppf(np.linspace(0.01, 0.99, n))
+
+        ax.scatter(theoreticalQ, sortedData, alpha=0.7, s=30)
+
+        slope = data.std()
+        intercept = data.mean()
+        ax.plot(theoreticalQ, slope * theoreticalQ + intercept, 'r--', linewidth=2)
+
+        ax.set_xlabel('Theoretical Quantiles')
+        ax.set_ylabel('Sample Quantiles')
+        ax.set_title(title)
+        ax.grid(True, alpha=0.3)
+  exercise:
+    prompt: QQ 플롯 분석 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def qqPlot(data, ax, title):
+          sortedData = np.sort(data)
+          n = len(data)
+          theoreticalQ = stats.norm.ppf(np.linspace(0.01, 0.99, n))
+
+          ax.scatter(theoreticalQ, sortedData, alpha=0.7, s=30)
+
+          slope = data.std()
+          intercept = data.mean()
+          ax.plot(theoreticalQ, slope * theoreticalQ + intercept, 'r--', linewidth=2)
+
+          ax.set_xlabel('Theoretical Quantiles')
+          ax.set_ylabel('Sample Quantiles')
+          ax.set_title(title)
+          ax.grid(True, alpha=0.3)
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: QQ 플롯 분석의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: QQ 플롯 분석 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: transform
+  title: 정규성 달성을 위한 변환
+  structuredPrimary: true
+  subtitle: 로그 변환
+  goal: 정규성 달성을 위한 변환에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    오른쪽으로 치우친 데이터는 로그 변환으로 정규분포에 가깝게 만들 수 있습니다. 금액, 소득, 인구 등 양수이면서 범위가 넓은 데이터에 효과적입니다. 변환 후 통계 분석을 수행하고, 결과 해석 시 원래 스케일로 역변환합니다.
+
+    로그 변환은 왜도를 줄이고 Shapiro 검정 p-value를 개선할 수 있지만, 항상 정규성을 보장하지는 않습니다. 변환 후에도 QQ 플롯과 검정 결과를 다시 확인한 뒤 t-검정이나 회귀분석 같은 정규성 가정 분석을 적용해야 합니다.
+  tips:
+  - 로그 변환 후에도 정규성은 자동으로 확보되지 않습니다. 왜도, QQ 플롯, Shapiro p-value를 다시 확인하세요.
+  snippet: |-
+    logPurchase = np.log(purchaseData)
+
+    figTransform, axes = plt.subplots(2, 2, figsize=(12, 8))
+
+    axes[0, 0].hist(purchaseData, bins=30, color='coral', edgecolor='white', alpha=0.7)
+    axes[0, 0].set_title('Original Purchase Data')
+
+    axes[0, 1].hist(logPurchase, bins=25, color='steelblue', edgecolor='white', alpha=0.7)
+    axes[0, 1].set_title('Log-Transformed Data')
+
+    qqPlot(purchaseData, axes[1, 0], 'QQ: Original')
+    qqPlot(logPurchase, axes[1, 1], 'QQ: Log-Transformed')
+
+    plt.tight_layout()
+    figTransform
+  exercise:
+    prompt: 정규성 달성을 위한 변환 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      logPurchase = np.log(purchaseData)
+
+      figTransform, axes = plt.subplots(2, 2, figsize=(12, 8))
+
+      axes[0, 0].hist(purchaseData, bins=30, color='coral', edgecolor='white', alpha=0.7)
+      axes[0, 0].set_title('Original Purchase Data')
+
+      axes[0, 1].hist(logPurchase, bins=25, color='steelblue', edgecolor='white', alpha=0.7)
+      axes[0, 1].set_title('Log-Transformed Data')
+
+      qqPlot(purchaseData, axes[1, 0], 'QQ: Original')
+      qqPlot(logPurchase, axes[1, 1], 'QQ: Log-Transformed')
+
+      plt.tight_layout()
+      figTransform
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 정규성 달성을 위한 변환의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 정규성 달성을 위한 변환의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: boxcox
+  title: Box-Cox 변환
+  structuredPrimary: true
+  subtitle: 최적 변환 자동 탐색
+  goal: BoxCox 변환에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    Box-Cox 변환은 데이터를 정규분포에 가장 가깝게 만드는 최적의 λ(람다) 값을 자동으로 찾습니다. λ=0이면 로그 변환, λ=1이면 변환 없음, λ=0.5면 제곱근 변환과 동일합니다. 양수 데이터에만 적용 가능합니다.
+
+    Box-Cox가 최적 λ를 자동으로 찾아주므로 로그 변환보다 정규성이 더 좋아질 수 있습니다. 단, 해석의 직관성은 로그 변환이 더 좋습니다.
+  snippet: |-
+    boxcoxData, lambdaOpt = stats.boxcox(purchaseData)
+
+    figBoxcox, (axBox1, axBox2) = plt.subplots(1, 2, figsize=(12, 5))
+
+    axBox1.hist(boxcoxData, bins=25, color='seagreen', edgecolor='white', alpha=0.7)
+    axBox1.set_title(f'Box-Cox Transformed (λ = {lambdaOpt:.4f})')
+
+    qqPlot(boxcoxData, axBox2, 'QQ: Box-Cox Transformed')
+    figBoxcox
+  exercise:
+    prompt: BoxCox 변환 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      boxcoxData, lambdaOpt = stats.boxcox(purchaseData)
+
+      figBoxcox, (axBox1, axBox2) = plt.subplots(1, 2, figsize=(12, 5))
+
+      axBox1.hist(boxcoxData, bins=25, color='seagreen', edgecolor='white', alpha=0.7)
+      axBox1.set_title(f'Box-Cox Transformed (λ = {lambdaOpt:.4f})')
+
+      qqPlot(boxcoxData, axBox2, 'QQ: Box-Cox Transformed')
+      figBoxcox
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: BoxCox 변환의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: BoxCox 변환 실행 결과가 오차와 결과 범위 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: result
+  title: 정규성 검정 종합 보고서
+  structuredPrimary: true
+  subtitle: 분석 방법 선택 가이드
+  goal: 정규성 검정 종합 보고서에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 정규성 검정 결과를 종합하여 적절한 분석 방법을 선택합니다. 정규분포를 따르면 모수적 검정(t-test, ANOVA)을, 따르지 않으면 비모수적 검정(Mann-Whitney,
+    Kruskal-Wallis)이나 변환 후 분석을 사용합니다. 표본 크기가 30 이상이면 중심극한정리에 의해 평균의 분포는 정규분포에 가까워집니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    dagK, dagP = stats.normaltest(normalData)
+    dagKp, dagPp = stats.normaltest(purchaseData)
+
+    normalStd = (normalData - normalData.mean()) / normalData.std()
+    purchaseStd = (purchaseData - purchaseData.mean()) / purchaseData.std()
+    ksN, ksPn = stats.kstest(normalStd, 'norm')
+    ksP, ksPp = stats.kstest(purchaseStd, 'norm')
+
+    resultDf = pd.DataFrame({
+        'Test': ['Shapiro-Wilk', "D'Agostino", 'Kolmogorov-Smirnov'],
+        'Normal Data p': [pNormal, dagP, ksPn],
+        'Purchase Data p': [pPurchase, dagPp, ksPp],
+        'Normal Verdict': ['Normal' if pNormal > 0.05 else 'Non-normal', 'Normal' if dagP > 0.05 else 'Non-normal', 'Normal' if ksPn > 0.05 else 'Non-normal'],
+        'Purchase Verdict': ['Normal' if pPurchase > 0.05 else 'Non-normal', 'Normal' if dagPp > 0.05 else 'Non-normal', 'Normal' if ksPp > 0.05 else 'Non-normal']
+    })
+    resultDf
+  exercise:
+    prompt: 정규성 검정 종합 보고서 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      dagK, dagP = stats.normaltest(normalData)
+      dagKp, dagPp = stats.normaltest(purchaseData)
+
+      normalStd = (normalData - normalData.mean()) / normalData.std()
+      purchaseStd = (purchaseData - purchaseData.mean()) / purchaseData.std()
+      ksN, ksPn = stats.kstest(normalStd, 'norm')
+      ksP, ksPp = stats.kstest(purchaseStd, 'norm')
+
+      resultDf = pd.DataFrame({
+          'Test': ['Shapiro-Wilk', "D'Agostino", 'Kolmogorov-Smirnov'],
+          'Normal Data p': [pNormal, dagP, ksPn],
+          'Purchase Data p': [pPurchase, dagPp, ksPp],
+          'Normal Verdict': ['Normal' if pNormal > 0.05 else 'Non-normal', 'Normal' if dagP > 0.05 else 'Non-normal', 'Normal' if ksPn > 0.05 else 'Non-normal'],
+          'Purchase Verdict': ['Normal' if pPurchase > 0.05 else 'Non-normal', 'Normal' if dagPp > 0.05 else 'Non-normal', 'Normal' if ksPp > 0.05 else 'Non-normal']
+      })
+      resultDf
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 정규성 검정 종합 보고서의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
+    resultCheck: 정규성 검정 종합 보고서 분기 결과가 바꾼 조건값에 맞게 달라져야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 정규성 검정 프로젝트
+  goal: 실습에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    지금까지 배운 Shapiro-Wilk 검정, QQ 플롯, 로그/Box-Cox 변환을 활용하여 실제 데이터의 정규성을 평가합니다. 미션1은 직원 급여 데이터 분석, 미션2는 종합 정규성 리포트 작성입니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import numpy as np
+    from scipy import stats
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    np.random.seed(456)
+    salaries = np.random.lognormal(mean=11, sigma=0.5, size=150)
+  exercise:
+    prompt: 실습 예제에서 \`salaries\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import numpy as np
+      from scipy import stats
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      np.random.seed(456)
+      salaries = np.random.lognormal(mean=11, sigma=0.5, size=150)
+    hints:
+    - 바꿀 지점은 \`salaries = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`salaries\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 실습에서 \`salaries\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 \`salaries\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: SLA 지연시간 통계 게이트
+  goal: 업무 흐름 검증에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한
+    신뢰구간과 개선 기준을 함께 제시해야 합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import numpy as np
+    from scipy import optimize, stats
+
+    latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+    def validateLatencySamples(samples):
+        values = np.asarray(samples, dtype=float)
+        if values.size < 5:
+            raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+        if not np.isfinite(values).all():
+            raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+        if (values <= 0).any():
+            raise ValueError("지연시간은 0보다 커야 합니다.")
+        return values
+
+    cleanLatency = validateLatencySamples(latencySamples)
+    cleanLatency.mean(), cleanLatency.std(ddof=1)
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 기대 문자열이나 실제 출력 문구를 바꾸고 assert 비교가 맞는지 확인하세요.
+    starterCode: |-
+      allowedMean = 264
+      capThreshold = optimize.brentq(
+          lambda threshold: np.clip(cleanLatency, None, threshold).mean() - allowedMean,
+          cleanLatency.min(),
+          cleanLatency.max(),
+      )
+      cappedMean = np.clip(cleanLatency, None, capThreshold).mean()
+
+      assert abs(cappedMean - allowedMean) < 1e-6
+      {
+          "allowedMean": allowedMean,
+          "capThreshold": round(float(capThreshold), 2),
+          "cappedMean": round(float(cappedMean), 2),
+      }
+    solution: |-
+      import numpy as np
+      from scipy import optimize, stats
+
+      latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+      def validateLatencySamples(samples):
+          values = np.asarray(samples, dtype=float)
+          if values.size < 5:
+              raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+          if not np.isfinite(values).all():
+              raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+          if (values <= 0).any():
+              raise ValueError("지연시간은 0보다 커야 합니다.")
+          return values
+
+      cleanLatency = validateLatencySamples(latencySamples)
+      cleanLatency.mean(), cleanLatency.std(ddof=1)
+    hints:
+    - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
+    - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증에서 \`allowedMean\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: scipy_05-normality-moments-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load
+    - workflow_validation
+    title: 표본의 skewness와 excess kurtosis 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 표본 크기와 0분산을 검사해 normality diagnostic을 만든다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 정규성 검정 p-value 전에 표본 크기와 moment를 보세요.
+    - 작은 표본의 skew·kurtosis는 불안정합니다.
+    exercise:
+      prompt: normality_moments(values)를 완성하세요.
+      starterCode: |-
+        def normality_moments(values):
+            raise NotImplementedError
+      solution: |
+        def normality_moments(values):
+            if len(values) < 3: raise ValueError("need at least three values")
+            mean = sum(values)/len(values); m2 = sum((x-mean)**2 for x in values)/len(values)
+            if m2 == 0: raise ValueError("zero variance")
+            m3 = sum((x-mean)**3 for x in values)/len(values); m4 = sum((x-mean)**4 for x in values)/len(values)
+            return {"count": len(values), "mean": round(mean,4), "skewness": round(m3/(m2**1.5),4), "excessKurtosis": round(m4/(m2*m2)-3,4)}
+      hints: *id001
+    check:
+      id: python.scipy.scipy_05.normality-moments.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_05.normality-moments.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: normality_moments
+        cases:
+        - id: measures-symmetric-sample
+          arguments:
+          - value:
+            - -1
+            - 0
+            - 1
+          expectedReturn:
+            count: 3
+            mean: 0.0
+            skewness: 0.0
+            excessKurtosis: -1.5
+        - id: measures-skewed-sample
+          arguments:
+          - value:
+            - 0
+            - 0
+            - 1
+            - 3
+          expectedReturn:
+            count: 4
+            mean: 1.0
+            skewness: 0.8165
+            excessKurtosis: -1.0
+        - id: rejects-zero-variance
+          arguments:
+          - value:
+            - 2
+            - 2
+            - 2
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: scipy_05-normality-decision-policy-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_05-normality-moments-mastery
+    title: 새 모델 residual에 정규성 판단 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 표본 크기·skew·outlier 비율로 next action을 결정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 정규성 검정 결과 하나로 데이터를 정규분포라 선언하지 마세요.
+    - residual 정규성과 원자료 정규성을 구분하세요.
+    exercise:
+      prompt: normality_followup(count, skewness, outlier_rate)를 완성하세요.
+      starterCode: |-
+        def normality_followup(count, skewness, outlier_rate):
+            raise NotImplementedError
+      solution: |
+        def normality_followup(count, skewness, outlier_rate):
+            if count <= 0 or not 0 <= outlier_rate <= 1: raise ValueError("invalid diagnostic")
+            if count < 8: action = "collect-more-data"
+            elif abs(skewness) > 1 or outlier_rate > 0.05: action = "inspect-transform-or-robust-model"
+            else: action = "inspect-qq-and-model-residuals"
+            return {"action": action, "smallSample": count < 8, "strongSkew": abs(skewness) > 1, "outlierConcern": outlier_rate > 0.05}
+      hints: *id002
+    check:
+      id: python.scipy.scipy_05.normality-decision-policy.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_05.normality-decision-policy.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: normality_followup
+        cases:
+        - id: requires-more-data
+          arguments:
+          - value: 5
+          - value: 0.1
+          - value: 0
+          expectedReturn:
+            action: collect-more-data
+            smallSample: true
+            strongSkew: false
+            outlierConcern: false
+        - id: flags-skew
+          arguments:
+          - value: 100
+          - value: 1.5
+          - value: 0.01
+          expectedReturn:
+            action: inspect-transform-or-robust-model
+            smallSample: false
+            strongSkew: true
+            outlierConcern: false
+        - id: continues-diagnostics
+          arguments:
+          - value: 30
+          - value: 0.2
+          - value: 0.03
+          expectedReturn:
+            action: inspect-qq-and-model-residuals
+            smallSample: false
+            strongSkew: false
+            outlierConcern: false
+        - id: rejects-rate
+          arguments:
+          - value: 10
+          - value: 0
+          - value: 2
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: scipy_05-normality-check-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_05-normality-decision-policy-transfer
+    title: 정규성 검사 해석 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 표본·residual·검정력 문제를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 수치 방법의 입력 가정과 오차 근거를 함께 남기세요.
+    - p-value나 최적화 성공 flag 하나를 결론으로 사용하지 마세요.
+    exercise:
+      prompt: choose_normality_check(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_normality_check(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_normality_check(situation):
+            table = {'small-sample': {'method': 'QQ plot plus domain knowledge', 'evidence': 'n and outliers', 'risk': 'low power'}, 'large-sample': {'method': 'effect diagnostics', 'evidence': 'skew kurtosis residual impact', 'risk': 'trivial p-value'}, 'regression-assumption': {'method': 'residual diagnostics', 'evidence': 'residual QQ and variance', 'risk': 'testing raw target'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.scipy.scipy_05.normality-check-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_05.normality-check-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_normality_check
+        cases:
+        - id: recalls-small-sample
+          arguments:
+          - value: small-sample
+          expectedReturn:
+            method: QQ plot plus domain knowledge
+            evidence: n and outliers
+            risk: low power
+        - id: recalls-large-sample
+          arguments:
+          - value: large-sample
+          expectedReturn:
+            method: effect diagnostics
+            evidence: skew kurtosis residual impact
+            risk: trivial p-value
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,1123 @@
+var e=`meta:
+  id: visionBasics_07
+  title: 룩업 테이블
+  order: 7
+  category: visionBasics
+  difficulty: ⭐⭐⭐
+  badge: 기초
+  packages:
+  - matplotlib
+  - numpy
+  - scikit-learn
+  tags:
+  - numpy
+  - LUT
+  - 감마보정
+  - 톤매핑
+  - np.take
+  seo:
+    title: 이미지 비전 기초 - 룩업 테이블
+    description: 0~255 → 0~255 매핑을 미리 계산해 두는 LUT으로 감마 보정, 톤 매핑, 반전 등을 한 줄로 적용합니다.
+    keywords:
+    - 룩업테이블
+    - LUT
+    - 감마보정
+    - 톤매핑
+    - np.take
+intro:
+  emoji: 📈
+  goal: 픽셀 값 0~255를 미리 계산된 표로 변환하는 LUT(Lookup Table) 패턴을 익힙니다.
+  description: |-
+    감마 보정처럼 픽셀 한 개당 거듭제곱 한 번씩을 해야 하는 함수는 큰 이미지에서 느립니다. LUT은 0~255 각 값의 결과를 미리 계산해 둔 256칸짜리 표를 만들어 두고, 픽셀 값을 표에서 조회하는 방식입니다. 이 강의는 LUT을 만들고, 감마·반전·톤매핑·이진화 등 다양한 변환을 LUT 한 줄로 적용합니다.
+  direction: 256칸 표를 직접 만들어 픽셀에 적용하고, 동일 변환을 LUT 없이 한 결과와 속도를 비교합니다.
+  benefits:
+  - 픽셀별 비선형 변환을 한 줄 인덱싱으로 가속할 수 있습니다.
+  - 감마 보정, 반전, 포스터화를 표 한 줄로 표현할 수 있습니다.
+  - OpenCV의 cv2.LUT 함수가 무엇을 감추는지 이해합니다.
+  diagram:
+    steps:
+    - label: 1단계. 항등 LUT
+      detail: 입력 그대로 돌려주는 표를 만듭니다.
+    - label: 2단계. 반전 LUT
+      detail: 255 - x 한 줄로 색을 뒤집습니다.
+    - label: 3단계. 감마 보정
+      detail: 거듭제곱 식을 LUT으로 압축합니다.
+    - label: 4단계. 포스터화
+      detail: 값 범위를 묶어 색 단순화를 만듭니다.
+    - label: 5단계. 그레이 채널 LUT 활용
+      detail: 명도 채널만 LUT으로 보정하는 패턴을 실험합니다.
+    runtime:
+    - label: numpy 환경
+      detail: numpy의 fancy indexing이 사실상의 LUT 적용 연산입니다.
+    - label: 검증 흐름
+      detail: assert와 시각 비교로 학습 결과가 기대값과 같은지 확인합니다.
+sections:
+- id: identity_lut
+  title: 1단계. 항등 LUT
+  structuredPrimary: true
+  subtitle: 입력 그대로 돌려주는 표
+  goal: 0~255 입력을 그대로 돌려주는 가장 단순한 LUT을 만들고 적용해 봅니다.
+  why: LUT 적용이 이미지의 모양도 dtype도 바꾸지 않는다는 사실을 먼저 확인하면 다음 단계가 쉽게 따라옵니다.
+  explanation: |-
+    \`identityLut = np.arange(256, dtype=np.uint8)\` 는 인덱스 i가 i를 가리키는 표입니다. 이미지를 인덱스로 사용해 \`identityLut[img]\` 처럼 호출하면 결과는 원본과 똑같습니다.
+
+    이 fancy indexing이 LUT 적용의 본질입니다. OpenCV의 \`cv2.LUT(img, lut)\` 도 같은 일을 합니다.
+  tips:
+  - LUT의 길이는 항상 256이어야 합니다. 0~255 픽셀 값으로 인덱싱하기 때문입니다.
+  snippet: |-
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from sklearn.datasets import load_sample_image
+
+    china = load_sample_image('china.jpg')
+    identityLut = np.arange(256, dtype=np.uint8)
+    sameAsOriginal = identityLut[china]
+    np.array_equal(sameAsOriginal, china)
+  exercise:
+    prompt: identityLut의 5번째 칸 값을 7로 바꾸고 다시 적용한 뒤, 원본 픽셀 값이 5였던 위치가 7로 바뀌었는지 확인하세요(china에 그런 픽셀이 있을 수도 있고 없을 수도 있습니다).
+    starterCode: |-
+      patchedLut = identityLut.copy()
+      patchedLut[5] = ___
+      patched = patchedLut[china]
+      mask = china == 5
+      mask.sum(), patched[mask].max() if mask.any() else None
+    hints:
+    - patchedLut[5]는 0~255 정수만 받을 수 있습니다.
+    - mask가 비어 있으면 결과는 None이 됩니다.
+  check:
+    noError: copy와 인덱싱이 오류 없이 끝나야 합니다.
+    resultCheck: sameAsOriginal 비교에서 True가 반환되어야 합니다.
+- id: invert_lut
+  title: 2단계. 반전 LUT
+  structuredPrimary: true
+  subtitle: 255 - x 한 줄
+  goal: 색을 반전시키는 LUT을 만들고 적용합니다.
+  why: 반전은 가장 단순한 비선형 변환의 예이며 LUT의 표현력을 직관적으로 보여 줍니다.
+  explanation: |-
+    \`invertLut = 255 - np.arange(256, dtype=np.uint8)\` 는 입력 0이 255로, 255가 0으로 가는 표입니다. 이를 이미지에 적용하면 검정과 흰색이 뒤집힌 이미지가 됩니다.
+
+    OpenCV의 \`cv2.bitwise_not(img)\` 가 같은 결과를 냅니다. 함수 호출과 LUT 적용이 같은 일이라는 점을 확인하세요.
+  tips:
+  - 반전은 비트 NOT 연산과 같습니다. 단순하지만 시각적으로 인상적입니다.
+  snippet: |-
+    invertLut = 255 - np.arange(256, dtype=np.uint8)
+    inverted = invertLut[china]
+    fig = plt.figure(figsize=(5, 4))
+    plt.imshow(inverted)
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: 부분 반전 LUT을 만드세요(0~127은 그대로, 128~255만 반전).
+    starterCode: |-
+      partialLut = np.arange(256, dtype=np.uint8)
+      partialLut[128:] = ___ - partialLut[128:]
+      partial = partialLut[china]
+      fig2 = plt.figure(figsize=(5, 4))
+      plt.imshow(partial)
+      plt.axis('off')
+      fig2
+    hints:
+    - 반전은 255에서 값을 빼는 것입니다.
+    - 결과의 어두운 영역은 그대로이고 밝은 영역만 뒤집힙니다.
+  check:
+    noError: LUT 생성과 적용이 오류 없이 끝나야 합니다.
+    resultCheck: invertLut[0] 이 255, invertLut[255] 가 0이어야 합니다.
+- id: gamma
+  title: 3단계. 감마 보정
+  structuredPrimary: true
+  subtitle: x ** gamma를 LUT으로
+  goal: 감마 보정 공식을 LUT으로 한 번에 계산해 둡니다.
+  why: 감마 보정은 어두운 디테일을 살리거나 모니터 출력에 맞추는 표준 보정입니다.
+  explanation: |-
+    감마 보정 공식은 \`out = 255 * (in / 255) ** gamma\` 입니다. gamma가 1보다 작으면 어두운 영역이 밝아지고, 1보다 크면 더 어두워집니다.
+
+    LUT을 만들어 두면 큰 사진에서도 단일 인덱싱 한 번으로 적용됩니다. 한 픽셀씩 거듭제곱하는 코드보다 훨씬 빠릅니다.
+  tips:
+  - 감마 0.5는 어두운 영역을 강조하고, 감마 2.0은 밝은 영역을 강조합니다.
+  snippet: |-
+    def buildGammaLut(gammaValue):
+        norm = np.arange(256, dtype=np.float32) / 255.0
+        return (255.0 * np.power(norm, gammaValue)).clip(0, 255).astype(np.uint8)
+
+    lutGammaHalf = buildGammaLut(0.5)
+    brightDark = lutGammaHalf[china]
+    fig = plt.figure(figsize=(5, 4))
+    plt.imshow(brightDark)
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: 같은 함수로 감마 2.2 LUT을 만들어 적용한 dim22 이미지를 만들고 비교 출력하세요.
+    starterCode: |-
+      lutGammaHigh = buildGammaLut(___)
+      dim22 = lutGammaHigh[china]
+      fig2, axes2 = plt.subplots(1, 2, figsize=(10, 4))
+      axes2[0].imshow(brightDark)
+      axes2[0].set_title('gamma=0.5')
+      axes2[1].imshow(dim22)
+      axes2[1].set_title('gamma=2.2')
+      for axis in axes2:
+          axis.axis('off')
+      fig2
+    hints:
+    - 감마 2.2는 sRGB의 표준 보정값과 같습니다.
+    - 결과가 전체적으로 어두워져야 합니다.
+  check:
+    noError: 함수 정의와 적용이 오류 없이 끝나야 합니다.
+    resultCheck: dim22.mean() 이 brightDark.mean() 보다 작아야 합니다.
+- id: posterize
+  title: 4단계. 포스터화
+  structuredPrimary: true
+  subtitle: 값 범위를 묶어 색 단순화
+  goal: 256가지 값을 8가지로 줄이는 단순화 LUT을 만듭니다.
+  why: 포스터화는 색을 단순화해 일러스트 같은 효과를 만들거나 색 영역을 추출할 때 쓰입니다.
+  explanation: |-
+    \`(input // 32) * 32\` 는 입력을 32단위로 묶습니다. 256 / 32 = 8 단계만 남게 됩니다. LUT으로 미리 계산해 두면 빠릅니다.
+
+    단계 수를 바꿔 보면 분위기가 달라집니다. 단계 수가 적을수록 그림이 추상화됩니다.
+  tips:
+  - 단계 수는 항상 256의 약수로 두는 것이 자연스럽습니다(2, 4, 8, 16, 32, 64).
+  snippet: |-
+    def buildPosterizeLut(levels):
+        step = 256 // levels
+        bucketed = (np.arange(256, dtype=np.int32) // step) * step
+        return bucketed.clip(0, 255).astype(np.uint8)
+
+    lutEight = buildPosterizeLut(8)
+    poster = lutEight[china]
+    fig = plt.figure(figsize=(5, 4))
+    plt.imshow(poster)
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: 레벨을 4와 16으로 각각 적용한 두 결과를 비교 출력하세요.
+    starterCode: |-
+      lutFour = buildPosterizeLut(4)
+      lutSixteen = buildPosterizeLut(___)
+      fig2, axes2 = plt.subplots(1, 2, figsize=(10, 4))
+      axes2[0].imshow(lutFour[china])
+      axes2[0].set_title('4 levels')
+      axes2[1].imshow(lutSixteen[china])
+      axes2[1].set_title('16 levels')
+      for axis in axes2:
+          axis.axis('off')
+      fig2
+    hints:
+    - 레벨 4 는 색 단계가 4개뿐입니다.
+    - 레벨 16은 거의 원본에 가깝게 보입니다.
+  check:
+    noError: LUT 생성과 적용이 오류 없이 끝나야 합니다.
+    resultCheck: poster의 고유 픽셀 값 개수가 china보다 적어야 합니다.
+- id: lut_gray
+  title: 5단계. 그레이 채널에만 LUT 적용
+  structuredPrimary: true
+  subtitle: HSV의 V 채널만 보정
+  goal: 컬러 이미지의 명도만 LUT으로 보정하고 색상은 보존합니다.
+  why: 색을 망치지 않고 밝기만 다듬는 보정은 사진 후처리의 기본기입니다.
+  explanation: |-
+    HSV로 변환해 V 채널만 LUT으로 바꾸고 다시 RGB로 되돌리면 색조와 채도는 유지하면서 밝기만 바뀝니다. matplotlib의 \`hsv_to_rgb\` 가 역변환을 담당합니다.
+
+    이 강의에서 변환은 한 줄이지만, 내부에서는 부동소수 정규화·LUT 적용·역변환의 세 단계가 일어납니다.
+  tips:
+  - V 채널은 0~1 범위 float이므로 LUT 적용 전 *255 후 uint8로, 적용 후 /255로 되돌려야 합니다.
+  snippet: |-
+    from matplotlib.colors import rgb_to_hsv, hsv_to_rgb
+
+    chinaHsv = rgb_to_hsv(china.astype(np.float32) / 255.0)
+    valueChannel = (chinaHsv[:, :, 2] * 255).astype(np.uint8)
+    brightenedValue = lutGammaHalf[valueChannel].astype(np.float32) / 255.0
+    blended = chinaHsv.copy()
+    blended[:, :, 2] = brightenedValue
+    out = (hsv_to_rgb(blended) * 255).clip(0, 255).astype(np.uint8)
+    fig = plt.figure(figsize=(5, 4))
+    plt.imshow(out)
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: 같은 방식으로 감마 1.5 LUT을 V에만 적용한 darkValue 이미지를 만드세요.
+    starterCode: |-
+      lutGamma15 = buildGammaLut(___)
+      darkValueChannel = lutGamma15[valueChannel].astype(np.float32) / 255.0
+      darkBlend = chinaHsv.copy()
+      darkBlend[:, :, 2] = darkValueChannel
+      darkValue = (hsv_to_rgb(darkBlend) * 255).clip(0, 255).astype(np.uint8)
+      fig2 = plt.figure(figsize=(5, 4))
+      plt.imshow(darkValue)
+      plt.axis('off')
+      fig2
+    hints:
+    - 감마 1.5는 어둡게 만드는 값입니다.
+    - 색조는 변하지 않아야 합니다.
+  check:
+    noError: HSV 변환과 역변환이 오류 없이 끝나야 합니다.
+    resultCheck: darkValue.mean() 이 china.mean() 보다 작아야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: LUT 패턴 묶기
+  goal: 다양한 변환 LUT을 하나의 비교 그리드로 묶습니다.
+  why: 여러 LUT을 한 화면에 모아 보면 어떤 변환이 어떤 효과를 내는지 한눈에 정리됩니다.
+  explanation: |-
+    각 미션은 import문부터 시작하지만, 위 예제를 실행했다면 import는 생략해도 됩니다.
+  tips:
+  - LUT은 함수처럼 생각하면 다루기 쉽습니다(입력 → 표를 거쳐 출력).
+  snippet: |-
+    def buildThresholdLut(threshold):
+        table = np.zeros(256, dtype=np.uint8)
+        table[threshold:] = 255
+        return table
+
+    lutBinary = buildThresholdLut(128)
+    binarized = lutBinary[china]
+    binarized.dtype, binarized.shape
+  exercise:
+    prompt: "미션1: 4개 LUT(원본, 감마0.5, 감마2.0, 포스터8단계)를 2x2 그리드로 출력하세요. 미션2: 임곗값 80, 130, 180에 대한 세 개의 이진화 결과를 1x3 그리드로 그리세요."
+    starterCode: |-
+      fig, axes = plt.subplots(2, 2, figsize=(10, 8))
+      axes[0, 0].imshow(china)
+      axes[0, 0].set_title('original')
+      axes[0, 1].imshow(brightDark)
+      axes[0, 1].set_title('gamma=0.5')
+      axes[1, 0].imshow(buildGammaLut(2.0)[china])
+      axes[1, 0].set_title('gamma=2.0')
+      axes[1, 1].imshow(poster)
+      axes[1, 1].set_title('posterize=8')
+      for axis in axes.ravel():
+          axis.axis('off')
+      fig
+    hints:
+    - LUT 함수를 인라인으로 호출해 임시 LUT을 만들어도 됩니다.
+    - 이진화 미션은 buildThresholdLut(N) 으로 표를 세 번 만들어 적용합니다.
+  check:
+    noError: 그리드 출력이 오류 없이 끝나야 합니다.
+    resultCheck: 4개 셀이 모두 다른 이미지로 출력되어야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: visionBasics_07-lookup_table-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - identity_lut
+    - practice
+    title: 룩업 테이블 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 256-entry LUT와 uint8 index 계약을 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_lookup_table_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_lookup_table_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_lookup_table_contract(value):
+            required = ['values', 'inputDtype', 'outputDtype']
+            rules = [{'id': 'lut-length', 'field': 'values', 'kind': 'length', 'value': 256}, {'id': 'input-dtype', 'field': 'inputDtype', 'kind': 'enum', 'values': ['uint8']}, {'id': 'output-dtype', 'field': 'outputDtype', 'kind': 'enum', 'values': ['uint8', 'float32']}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'lookup_table', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.vision-basics.visionBasics_07.lookup_table-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_07.lookup_table-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_lookup_table_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              values:
+              - 0
+              - 1
+              - 2
+              - 3
+              - 4
+              - 5
+              - 6
+              - 7
+              - 8
+              - 9
+              - 10
+              - 11
+              - 12
+              - 13
+              - 14
+              - 15
+              - 16
+              - 17
+              - 18
+              - 19
+              - 20
+              - 21
+              - 22
+              - 23
+              - 24
+              - 25
+              - 26
+              - 27
+              - 28
+              - 29
+              - 30
+              - 31
+              - 32
+              - 33
+              - 34
+              - 35
+              - 36
+              - 37
+              - 38
+              - 39
+              - 40
+              - 41
+              - 42
+              - 43
+              - 44
+              - 45
+              - 46
+              - 47
+              - 48
+              - 49
+              - 50
+              - 51
+              - 52
+              - 53
+              - 54
+              - 55
+              - 56
+              - 57
+              - 58
+              - 59
+              - 60
+              - 61
+              - 62
+              - 63
+              - 64
+              - 65
+              - 66
+              - 67
+              - 68
+              - 69
+              - 70
+              - 71
+              - 72
+              - 73
+              - 74
+              - 75
+              - 76
+              - 77
+              - 78
+              - 79
+              - 80
+              - 81
+              - 82
+              - 83
+              - 84
+              - 85
+              - 86
+              - 87
+              - 88
+              - 89
+              - 90
+              - 91
+              - 92
+              - 93
+              - 94
+              - 95
+              - 96
+              - 97
+              - 98
+              - 99
+              - 100
+              - 101
+              - 102
+              - 103
+              - 104
+              - 105
+              - 106
+              - 107
+              - 108
+              - 109
+              - 110
+              - 111
+              - 112
+              - 113
+              - 114
+              - 115
+              - 116
+              - 117
+              - 118
+              - 119
+              - 120
+              - 121
+              - 122
+              - 123
+              - 124
+              - 125
+              - 126
+              - 127
+              - 128
+              - 129
+              - 130
+              - 131
+              - 132
+              - 133
+              - 134
+              - 135
+              - 136
+              - 137
+              - 138
+              - 139
+              - 140
+              - 141
+              - 142
+              - 143
+              - 144
+              - 145
+              - 146
+              - 147
+              - 148
+              - 149
+              - 150
+              - 151
+              - 152
+              - 153
+              - 154
+              - 155
+              - 156
+              - 157
+              - 158
+              - 159
+              - 160
+              - 161
+              - 162
+              - 163
+              - 164
+              - 165
+              - 166
+              - 167
+              - 168
+              - 169
+              - 170
+              - 171
+              - 172
+              - 173
+              - 174
+              - 175
+              - 176
+              - 177
+              - 178
+              - 179
+              - 180
+              - 181
+              - 182
+              - 183
+              - 184
+              - 185
+              - 186
+              - 187
+              - 188
+              - 189
+              - 190
+              - 191
+              - 192
+              - 193
+              - 194
+              - 195
+              - 196
+              - 197
+              - 198
+              - 199
+              - 200
+              - 201
+              - 202
+              - 203
+              - 204
+              - 205
+              - 206
+              - 207
+              - 208
+              - 209
+              - 210
+              - 211
+              - 212
+              - 213
+              - 214
+              - 215
+              - 216
+              - 217
+              - 218
+              - 219
+              - 220
+              - 221
+              - 222
+              - 223
+              - 224
+              - 225
+              - 226
+              - 227
+              - 228
+              - 229
+              - 230
+              - 231
+              - 232
+              - 233
+              - 234
+              - 235
+              - 236
+              - 237
+              - 238
+              - 239
+              - 240
+              - 241
+              - 242
+              - 243
+              - 244
+              - 245
+              - 246
+              - 247
+              - 248
+              - 249
+              - 250
+              - 251
+              - 252
+              - 253
+              - 254
+              - 255
+              inputDtype: uint8
+              outputDtype: uint8
+          expectedReturn:
+            accepted: true
+            topic: lookup_table
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              inputDtype: uint8
+              outputDtype: uint8
+          expectedReturn:
+            accepted: false
+            topic: lookup_table
+            missing:
+            - values
+            violations:
+            - lut-length
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              values:
+              - 0
+              - 1
+              - 2
+              - 3
+              - 4
+              - 5
+              - 6
+              - 7
+              - 8
+              - 9
+              - 10
+              - 11
+              - 12
+              - 13
+              - 14
+              - 15
+              - 16
+              - 17
+              - 18
+              - 19
+              - 20
+              - 21
+              - 22
+              - 23
+              - 24
+              - 25
+              - 26
+              - 27
+              - 28
+              - 29
+              - 30
+              - 31
+              - 32
+              - 33
+              - 34
+              - 35
+              - 36
+              - 37
+              - 38
+              - 39
+              - 40
+              - 41
+              - 42
+              - 43
+              - 44
+              - 45
+              - 46
+              - 47
+              - 48
+              - 49
+              - 50
+              - 51
+              - 52
+              - 53
+              - 54
+              - 55
+              - 56
+              - 57
+              - 58
+              - 59
+              - 60
+              - 61
+              - 62
+              - 63
+              - 64
+              - 65
+              - 66
+              - 67
+              - 68
+              - 69
+              - 70
+              - 71
+              - 72
+              - 73
+              - 74
+              - 75
+              - 76
+              - 77
+              - 78
+              - 79
+              - 80
+              - 81
+              - 82
+              - 83
+              - 84
+              - 85
+              - 86
+              - 87
+              - 88
+              - 89
+              - 90
+              - 91
+              - 92
+              - 93
+              - 94
+              - 95
+              - 96
+              - 97
+              - 98
+              - 99
+              - 100
+              - 101
+              - 102
+              - 103
+              - 104
+              - 105
+              - 106
+              - 107
+              - 108
+              - 109
+              - 110
+              - 111
+              - 112
+              - 113
+              - 114
+              - 115
+              - 116
+              - 117
+              - 118
+              - 119
+              - 120
+              - 121
+              - 122
+              - 123
+              - 124
+              - 125
+              - 126
+              - 127
+              - 128
+              - 129
+              - 130
+              - 131
+              - 132
+              - 133
+              - 134
+              - 135
+              - 136
+              - 137
+              - 138
+              - 139
+              - 140
+              - 141
+              - 142
+              - 143
+              - 144
+              - 145
+              - 146
+              - 147
+              - 148
+              - 149
+              - 150
+              - 151
+              - 152
+              - 153
+              - 154
+              - 155
+              - 156
+              - 157
+              - 158
+              - 159
+              - 160
+              - 161
+              - 162
+              - 163
+              - 164
+              - 165
+              - 166
+              - 167
+              - 168
+              - 169
+              - 170
+              - 171
+              - 172
+              - 173
+              - 174
+              - 175
+              - 176
+              - 177
+              - 178
+              - 179
+              - 180
+              - 181
+              - 182
+              - 183
+              - 184
+              - 185
+              - 186
+              - 187
+              - 188
+              - 189
+              - 190
+              - 191
+              - 192
+              - 193
+              - 194
+              - 195
+              - 196
+              - 197
+              - 198
+              - 199
+              - 200
+              - 201
+              - 202
+              - 203
+              - 204
+              - 205
+              - 206
+              - 207
+              - 208
+              - 209
+              - 210
+              - 211
+              - 212
+              - 213
+              - 214
+              - 215
+              - 216
+              - 217
+              - 218
+              - 219
+              - 220
+              - 221
+              - 222
+              - 223
+              - 224
+              - 225
+              - 226
+              - 227
+              - 228
+              - 229
+              - 230
+              - 231
+              - 232
+              - 233
+              - 234
+              - 235
+              - 236
+              - 237
+              - 238
+              - 239
+              - 240
+              - 241
+              - 242
+              - 243
+              - 244
+              - 245
+              - 246
+              - 247
+              - 248
+              - 249
+              - 250
+              - 251
+              - 252
+              - 253
+              - 254
+              inputDtype: float32
+              outputDtype: int64
+          expectedReturn:
+            accepted: false
+            topic: lookup_table
+            missing: []
+            violations:
+            - input-dtype
+            - lut-length
+            - output-dtype
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: visionBasics_07-lookup_table-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionBasics_07-lookup_table-contract-audit-mastery
+    title: 룩업 테이블 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_lookup_table_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_lookup_table_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_lookup_table_result(expected, observed):
+            identity = ['sourceHash', 'lutHash']
+            metrics = {'distinctOutputCount': 0}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'lookup_table', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.vision-basics.visionBasics_07.lookup_table-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_07.lookup_table-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_lookup_table_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              sourceHash: l1
+              lutHash: lut-a
+              distinctOutputCount: 200
+          - value:
+              sourceHash: l1
+              lutHash: lut-a
+              distinctOutputCount: 200
+          expectedReturn:
+            passed: true
+            topic: lookup_table
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              sourceHash: l1
+              lutHash: lut-a
+              distinctOutputCount: 200
+          - value:
+              sourceHash: l2
+              lutHash: lut-b
+              distinctOutputCount: 120
+          expectedReturn:
+            passed: false
+            topic: lookup_table
+            missing: []
+            identityMismatch:
+            - lutHash
+            - sourceHash
+            metricDrift:
+            - distinctOutputCount
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              sourceHash: l1
+              lutHash: lut-a
+              distinctOutputCount: 200
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: lookup_table
+            missing:
+            - distinctOutputCount
+            - lutHash
+            - sourceHash
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: visionBasics_07-lookup_table-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionBasics_07-lookup_table-result-reconciliation-transfer
+    title: 룩업 테이블 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_lookup_table_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_lookup_table_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_lookup_table_evidence(stage):
+            stages = {'input': {'action': 'validate lookup-table input contract', 'evidence': '256-value LUT manifest', 'risk': 'misinterpreted pixels'}, 'process': {'action': 'apply bounded lookup-table operation', 'evidence': 'indexed mapping trace', 'risk': 'silent shape or range drift'}, 'result': {'action': 'reconcile lookup-table result', 'evidence': 'distinct output count', 'risk': 'plausible but wrong image'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.vision-basics.visionBasics_07.lookup_table-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_07.lookup_table-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_lookup_table_evidence
+        cases:
+        - id: recalls-input
+          arguments:
+          - value: input
+          expectedReturn:
+            action: validate lookup-table input contract
+            evidence: 256-value LUT manifest
+            risk: misinterpreted pixels
+        - id: recalls-process
+          arguments:
+          - value: process
+          expectedReturn:
+            action: apply bounded lookup-table operation
+            evidence: indexed mapping trace
+            risk: silent shape or range drift
+        - id: recalls-result
+          arguments:
+          - value: result
+          expectedReturn:
+            action: reconcile lookup-table result
+            evidence: distinct output count
+            risk: plausible but wrong image
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

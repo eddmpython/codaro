@@ -1,0 +1,866 @@
+var e=`meta:
+  packages:
+  - altair
+  - pandas
+  id: altair_09
+  title: 고급데이터변환
+  order: 9
+  category: altair
+  difficulty: ⭐⭐⭐
+  badge: 심화
+  tags:
+  - transform_calculate
+  - transform_aggregate
+  - transform_window
+  - transform_fold
+  seo:
+    title: Altair 데이터 변환 - calculate, aggregate, window
+    description: Altair로 데이터를 변환합니다. calculate, aggregate, window, fold로 고급 분석을 배웁니다.
+    keywords:
+    - altair transform
+    - calculate
+    - aggregate
+    - window
+    - fold
+intro:
+  emoji: 🔄
+  goal: 팁 데이터를 다양한 방식으로 변환하고 집계하여 고급 분석 차트를 만듭니다.
+  description: transform_calculate, transform_aggregate, transform_window, transform_fold로 데이터를 가공합니다.
+  direction: 고급데이터변환에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.
+  benefits:
+  - 정리된 테이블 확인 후 채널 인코딩에 맞는 코드 입력을 고릅니다.
+  - 고급데이터변환 결과를 스케일과 마크 매핑 기준으로 즉시 점검합니다.
+  - 완료한 코드를 선언형 대시보드에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(정리된 테이블)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 계산 필드 생성 처리 실행
+      detail: 채널 인코딩 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 조건부 계산 결과 검증
+      detail: 스케일과 마크 매핑 기준으로 실행 결과를 비교합니다.
+    - label: 고급데이터변환 재사용
+      detail: 완성 코드를 선언형 대시보드에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 선언형 차트 환경
+      detail: altair, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 고급데이터변환 실행
+      detail: 셀을 실행해 스케일과 마크 매핑와 예외 상태를 확인합니다.
+    - label: 고급데이터변환 완료
+      detail: 검증된 코드를 선언형 대시보드로 남깁니다.
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  structuredPrimary: true
+  subtitle: seaborn-data
+  goal: 1단계. 데이터 불러오기에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: Codaro 로컬 데이터셋에서 tips(팁) 데이터를 불러옵니다. 레스토랑에서 고객들이 낸 팁을 기록한 데이터입니다. total_bill은 총 계산 금액,
+    tip은 팁 금액, sex는 성별, smoker는 흡연 여부, day는 요일, time은 시간대(Lunch/Dinner), size는 일행 수입니다. 이 프로젝트에서는 데이터를
+    차트에 표시하기 전에 먼저 가공하는 방법을 배웁니다. 새로운 값을 계산하거나, 그룹별로 집계하거나, 순위를 매기는 등의 변환 작업을 수행합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import altair as alt
+    import pandas as pd
+    import warnings
+    warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+    from codaro.curriculum.localData import loadLocalDataset
+
+    tips = loadLocalDataset("tips")
+  exercise:
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import altair as alt
+      import pandas as pd
+      import warnings
+      warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+      from codaro.curriculum.localData import loadLocalDataset
+
+      tips = loadLocalDataset("tips")
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step2_calculate
+  title: 2단계. 계산 필드 생성
+  structuredPrimary: true
+  subtitle: transform_calculate
+  goal: 2단계. 계산 필드 생성에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    데이터에 없는 새로운 값을 계산해서 추가할 수 있습니다. transform_calculate()는 "계산해서 변환하라"는 명령입니다. 팁 비율(tip_pct)을 계산합니다. tip_pct = 'datum.tip / datum.total_bill * 100'은 "팁을 총 금액으로 나누고 100을 곱하라(퍼센트로 만들기)"는 의미입니다. datum.컬럼명으로 각 행의 값에 접근합니다. 계산식은 JavaScript 문법으로 작성하며, 따옴표 안에 넣습니다. 계산된 tip_pct 필드를 마치 원래 있던 컬럼처럼 encode()에서 사용할 수 있습니다.
+
+    transform_calculate()는 메서드 체이닝으로 연결됩니다. alt.Chart().mark_point().encode().transform_calculate() 순서로 이어집니다. 계산식 안에서 사용하는 연산자: / 는 나누기, * 는 곱하기, + 는 더하기, - 는 빼기입니다. JavaScript 문법이지만 일반적인 수학 기호와 같습니다.
+  tips:
+  - 'transform_calculate()는 메서드 체이닝으로 연결됩니다. alt.Chart().mark_point().encode().transform_calculate() 순서로
+    이어집니다. 계산식 안에서 사용하는 연산자: / 는 나누기, * 는 곱하기, + 는 더하기, - 는 빼기입니다. JavaScript 문법이지만 일반적인 수학 기호와 같습니다.'
+  snippet: |-
+    chartCalc = alt.Chart(tips).mark_point().encode(
+        x='total_bill:Q',
+        y='tip_pct:Q',
+        color='day:N'
+    ).transform_calculate(
+        tip_pct='datum.tip / datum.total_bill * 100'
+    ).properties(
+        width=400,
+        height=300,
+        title='금액 대비 팁 비율'
+    )
+    chartCalc
+  exercise:
+    prompt: 2단계. 계산 필드 생성 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      chartCalc = alt.Chart(tips).mark_point().encode(
+          x='total_bill:Q',
+          y='tip_pct:Q',
+          color='day:N'
+      ).transform_calculate(
+          tip_pct='datum.tip / datum.total_bill * 100'
+      ).properties(
+          width=400,
+          height=300,
+          title='금액 대비 팁 비율'
+      )
+      chartCalc
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 2단계. 계산 필드 생성의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 계산 필드 생성의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step3_calculate_condition
+  title: 3단계. 조건부 계산
+  structuredPrimary: true
+  subtitle: 삼항 연산자
+  goal: 3단계. 조건부 계산에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 3단계. 조건부 계산의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    chartCondCalc = alt.Chart(tips).mark_bar().encode(
+        x='tip_category:N',
+        y='count()',
+        color='tip_category:N'
+    ).transform_calculate(
+        tip_pct='datum.tip / datum.total_bill * 100',
+        tip_category='datum.tip / datum.total_bill >= 0.15 ? "관대함" : "보통"'
+    ).properties(
+        title='팁 비율 카테고리별 분포'
+    )
+    chartCondCalc
+  exercise:
+    prompt: 3단계. 조건부 계산 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      chartCondCalc = alt.Chart(tips).mark_bar().encode(
+          x='tip_category:N',
+          y='count()',
+          color='tip_category:N'
+      ).transform_calculate(
+          tip_pct='datum.tip / datum.total_bill * 100',
+          tip_category='datum.tip / datum.total_bill >= 0.15 ? "관대함" : "보통"'
+      ).properties(
+          title='팁 비율 카테고리별 분포'
+      )
+      chartCondCalc
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 3단계. 조건부 계산의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 조건부 계산의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step4_aggregate
+  title: 4단계. 그룹별 집계
+  structuredPrimary: true
+  subtitle: transform_aggregate
+  goal: 4단계. 그룹별 집계에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    이번에는 데이터를 그룹으로 묶어서 요약하는 방법을 배웁니다. transform_aggregate()는 "집계해서 변환하라"는 명령입니다. aggregate는 "모으다, 합치다"라는 뜻입니다. 여러 행을 하나로 모아서 평균, 합계, 개수 등을 계산합니다. avg_tip='mean(tip)'은 "tip 컬럼의 평균(mean)을 계산해서 avg_tip이라는 이름으로 저장하라"는 뜻입니다. groupby=['day']는 "day(요일)별로 그룹을 나눠서 계산하라"는 의미입니다. 월요일 그룹, 화요일 그룹 등 각각의 평균을 구합니다.
+
+    사용 가능한 집계 함수: mean(평균), sum(합계), count(개수), median(중앙값), min(최솟값), max(최댓값), stdev(표준편차) 등이 있습니다. groupby에는 여러 컬럼을 넣을 수 있습니다. groupby=['day', 'time']은 "요일과 시간대 조합별로 그룹을 나눠라"는 뜻입니다. 예: 월요일 점심, 월요일 저녁, 화요일 점심...
+  tips:
+  - '사용 가능한 집계 함수: mean(평균), sum(합계), count(개수), median(중앙값), min(최솟값), max(최댓값), stdev(표준편차) 등이 있습니다.
+    groupby에는 여러 컬럼을 넣을 수 있습니다. groupby=[''day'', ''time'']은 "요일과 시간대 조합별로 그룹을 나눠라"는 뜻입니다. 예: 월요일 점심,
+    월요일 저녁, 화요일 점심...'
+  snippet: |-
+    chartAgg = alt.Chart(tips).mark_bar().encode(
+        x='day:N',
+        y='avg_tip:Q',
+        color='day:N'
+    ).transform_aggregate(
+        avg_tip='mean(tip)',
+        avg_bill='mean(total_bill)',
+        groupby=['day']
+    ).properties(
+        title='요일별 평균 팁'
+    )
+    chartAgg
+  exercise:
+    prompt: 4단계. 그룹별 집계 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      chartAgg = alt.Chart(tips).mark_bar().encode(
+          x='day:N',
+          y='avg_tip:Q',
+          color='day:N'
+      ).transform_aggregate(
+          avg_tip='mean(tip)',
+          avg_bill='mean(total_bill)',
+          groupby=['day']
+      ).properties(
+          title='요일별 평균 팁'
+      )
+      chartAgg
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 4단계. 그룹별 집계의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 그룹별 집계의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step5_multi_aggregate
+  title: 5단계. 다중 그룹 집계
+  structuredPrimary: true
+  subtitle: 여러 기준으로 집계
+  goal: 5단계. 다중 그룹 집계에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 여러 컬럼으로 그룹화할 수 있습니다. 요일과 시간대별 평균 금액을 계산합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    chartMultiAgg = alt.Chart(tips).mark_rect().encode(
+        x='day:O',
+        y='time:N',
+        color='avg_bill:Q'
+    ).transform_aggregate(
+        avg_bill='mean(total_bill)',
+        groupby=['day', 'time']
+    ).properties(
+        width=300,
+        height=150,
+        title='요일-시간대별 평균 금액'
+    )
+    chartMultiAgg
+  exercise:
+    prompt: 5단계. 다중 그룹 집계 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      chartMultiAgg = alt.Chart(tips).mark_rect().encode(
+          x='day:O',
+          y='time:N',
+          color='avg_bill:Q'
+      ).transform_aggregate(
+          avg_bill='mean(total_bill)',
+          groupby=['day', 'time']
+      ).properties(
+          width=300,
+          height=150,
+          title='요일-시간대별 평균 금액'
+      )
+      chartMultiAgg
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 5단계. 다중 그룹 집계의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 다중 그룹 집계의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step6_window
+  title: 6단계. 윈도우 함수
+  structuredPrimary: true
+  subtitle: transform_window
+  goal: 6단계. 윈도우 함수에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    윈도우 함수는 각 행마다 주변 행들을 "창문(window)"처럼 보면서 계산하는 기능입니다. 순위, 누적합, 이동평균 등을 구할 때 사용합니다. transform_window()는 "윈도우 함수로 변환하라"는 명령입니다. rank='rank()'는 "순위를 매겨서 rank라는 필드에 저장하라"는 뜻입니다. sort=[alt.SortField('tip', order='descending')]은 "tip을 내림차순(descending, 큰 것부터)으로 정렬해서 순위를 매기라"는 의미입니다. groupby=['day']는 "각 요일 안에서 따로 순위를 매기라"입니다. transform_filter()로 상위 5개만 남깁니다.
+
+    윈도우 함수 종류: rank()는 순위(동점일 때 다음 순위 건너뜀), row_number()는 행 번호(무조건 1, 2, 3...), dense_rank()는 빽빽한 순위(동점 다음이 바로 이어짐)입니다. transform_filter(alt.datum.rank <= 5)는 "rank 값이 5 이하인 행만 남기라"는 뜻입니다. 각 그룹의 상위 5개씩만 차트에 표시됩니다.
+  tips:
+  - '윈도우 함수 종류: rank()는 순위(동점일 때 다음 순위 건너뜀), row_number()는 행 번호(무조건 1, 2, 3...), dense_rank()는 빽빽한 순위(동점
+    다음이 바로 이어짐)입니다. transform_filter(alt.datum.rank <= 5)는 "rank 값이 5 이하인 행만 남기라"는 뜻입니다. 각 그룹의 상위 5개씩만
+    차트에 표시됩니다.'
+  snippet: |-
+    chartWindow = alt.Chart(tips).mark_point().encode(
+        x='rank:O',
+        y='tip:Q',
+        color='day:N'
+    ).transform_window(
+        rank='rank()',
+        sort=[alt.SortField('tip', order='descending')],
+        groupby=['day']
+    ).transform_filter(
+        alt.datum.rank <= 5
+    ).properties(
+        title='요일별 팁 Top 5'
+    )
+    chartWindow
+  exercise:
+    prompt: 6단계. 윈도우 함수 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      chartWindow = alt.Chart(tips).mark_point().encode(
+          x='rank:O',
+          y='tip:Q',
+          color='day:N'
+      ).transform_window(
+          rank='rank()',
+          sort=[alt.SortField('tip', order='descending')],
+          groupby=['day']
+      ).transform_filter(
+          alt.datum.rank <= 5
+      ).properties(
+          title='요일별 팁 Top 5'
+      )
+      chartWindow
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 6단계. 윈도우 함수의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 윈도우 함수의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step7_cumulative
+  title: 7단계. 누적 계산
+  structuredPrimary: true
+  subtitle: 누적합/누적평균
+  goal: 7단계. 누적 계산에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 윈도우 함수로 누적합이나 이동 평균을 계산할 수 있습니다. 금액순 누적 팁을 계산합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    chartCumulative = alt.Chart(tips).mark_line().encode(
+        x='row_num:Q',
+        y='cumulative_tip:Q'
+    ).transform_window(
+        row_num='row_number()',
+        cumulative_tip='sum(tip)',
+        sort=[alt.SortField('total_bill', order='ascending')]
+    ).properties(
+        width=400,
+        height=250,
+        title='금액순 누적 팁'
+    )
+    chartCumulative
+  exercise:
+    prompt: 7단계. 누적 계산 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      chartCumulative = alt.Chart(tips).mark_line().encode(
+          x='row_num:Q',
+          y='cumulative_tip:Q'
+      ).transform_window(
+          row_num='row_number()',
+          cumulative_tip='sum(tip)',
+          sort=[alt.SortField('total_bill', order='ascending')]
+      ).properties(
+          width=400,
+          height=250,
+          title='금액순 누적 팁'
+      )
+      chartCumulative
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 7단계. 누적 계산의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 누적 계산의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step8_fold
+  title: 8단계. 데이터 피벗
+  structuredPrimary: true
+  subtitle: transform_fold
+  goal: 8단계. 데이터 피벗에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    데이터 구조를 변경하는 방법을 배웁니다. fold는 "접다"라는 뜻으로, 여러 컬럼을 하나의 긴 형태로 변환합니다. transform_fold(['total_bill', 'tip'], as_=['key', 'value'])는 "total_bill과 tip 두 컬럼을 key와 value 두 컬럼으로 변환하라"는 뜻입니다. 원래 데이터가 total_bill=10, tip=2 형태였다면, 변환 후에는 (key='total_bill', value=10), (key='tip', value=2) 두 행으로 나뉩니다. 이렇게 하면 두 컬럼을 하나의 차트에 나란히 비교할 수 있습니다. xOffset='key:N'으로 막대를 옆으로 배치합니다.
+
+    wide(넓은) 형식은 컬럼이 많고 행이 적은 형태입니다. long(긴) 형식은 컬럼이 적고 행이 많은 형태입니다. fold는 wide를 long으로 바꿉니다. as_=['key', 'value']는 "새로 만들 컬럼 이름을 key와 value로 하라"는 뜻입니다. 원하는 이름으로 바꿀 수 있습니다(예: as_=['항목', '값']).
+  tips:
+  - 'wide(넓은) 형식은 컬럼이 많고 행이 적은 형태입니다. long(긴) 형식은 컬럼이 적고 행이 많은 형태입니다. fold는 wide를 long으로 바꿉니다. as_=[''key'',
+    ''value'']는 "새로 만들 컬럼 이름을 key와 value로 하라"는 뜻입니다. 원하는 이름으로 바꿀 수 있습니다(예: as_=[''항목'', ''값'']).'
+  snippet: |-
+    chartFold = alt.Chart(tips).mark_bar().encode(
+        x='day:N',
+        y='mean(value):Q',
+        color='key:N',
+        xOffset='key:N'
+    ).transform_fold(
+        ['total_bill', 'tip'],
+        as_=['key', 'value']
+    ).properties(
+        width=350,
+        height=250,
+        title='요일별 금액 vs 팁 비교'
+    )
+    chartFold
+  exercise:
+    prompt: 8단계. 데이터 피벗 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      chartFold = alt.Chart(tips).mark_bar().encode(
+          x='day:N',
+          y='mean(value):Q',
+          color='key:N',
+          xOffset='key:N'
+      ).transform_fold(
+          ['total_bill', 'tip'],
+          as_=['key', 'value']
+      ).properties(
+          width=350,
+          height=250,
+          title='요일별 금액 vs 팁 비교'
+      )
+      chartFold
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 8단계. 데이터 피벗의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 데이터 피벗의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step9_final
+  title: 9단계. 최종 결과물
+  structuredPrimary: true
+  subtitle: 복합 변환 차트
+  goal: 9단계. 최종 결과물에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    지금까지 배운 변환 기법을 종합해 분석 차트를 완성합니다. 팁 비율을 계산하고, 그룹별로 집계한 뒤 시각화합니다.
+
+    calculate로 팁 비율을 계산하고, aggregate로 요일-시간대별 평균을 집계했습니다. Dinner 시간대의 팁 비율이 Lunch보다 약간 높습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    chartFinal = alt.Chart(tips).mark_bar().encode(
+        x=alt.X('day:O', sort=['Thur', 'Fri', 'Sat', 'Sun'], title='요일'),
+        y=alt.Y('avg_tip_pct:Q', title='평균 팁 비율 (%)'),
+        color=alt.Color('time:N', title='시간대'),
+        xOffset='time:N',
+        tooltip=[
+            alt.Tooltip('day:O', title='요일'),
+            alt.Tooltip('time:N', title='시간대'),
+            alt.Tooltip('avg_tip_pct:Q', title='평균 팁 비율', format='.1f'),
+            alt.Tooltip('count:Q', title='건수')
+        ]
+    ).transform_calculate(
+        tip_pct='datum.tip / datum.total_bill * 100'
+    ).transform_aggregate(
+        avg_tip_pct='mean(tip_pct)',
+        count='count()',
+        groupby=['day', 'time']
+    ).properties(
+        width=400,
+        height=300,
+        title='요일-시간대별 평균 팁 비율'
+    )
+    chartFinal
+  exercise:
+    prompt: 9단계. 최종 결과물 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      chartFinal = alt.Chart(tips).mark_bar().encode(
+          x=alt.X('day:O', sort=['Thur', 'Fri', 'Sat', 'Sun'], title='요일'),
+          y=alt.Y('avg_tip_pct:Q', title='평균 팁 비율 (%)'),
+          color=alt.Color('time:N', title='시간대'),
+          xOffset='time:N',
+          tooltip=[
+              alt.Tooltip('day:O', title='요일'),
+              alt.Tooltip('time:N', title='시간대'),
+              alt.Tooltip('avg_tip_pct:Q', title='평균 팁 비율', format='.1f'),
+              alt.Tooltip('count:Q', title='건수')
+          ]
+      ).transform_calculate(
+          tip_pct='datum.tip / datum.total_bill * 100'
+      ).transform_aggregate(
+          avg_tip_pct='mean(tip_pct)',
+          count='count()',
+          groupby=['day', 'time']
+      ).properties(
+          width=400,
+          height=300,
+          title='요일-시간대별 평균 팁 비율'
+      )
+      chartFinal
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 9단계. 최종 결과물의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 최종 결과물의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 데이터 변환 프로젝트
+  goal: 실습에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    이 프로젝트에서 배운 내용을 정리하면: transform_calculate()로 새 필드 계산, 삼항 연산자(?:)로 조건부 값 지정, transform_aggregate()로 그룹별 집계, groupby로 그룹 기준 지정, transform_window()로 순위와 누적 계산, transform_fold()로 wide를 long으로 변환입니다. 이제 배운 변환 기법들을 조합해 데이터를 다양하게 분석해봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import altair as alt
+    import pandas as pd
+    from codaro.curriculum.localData import loadLocalDataset
+    bill = loadLocalDataset("tips")
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import altair as alt
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+      bill = loadLocalDataset("tips")
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Altair로 고급 데이터 변환을 마스터했습니다!
+  - type: list
+    items:
+    - transform_calculate(필드='표현식') - 새 계산 필드 생성
+    - datum.컬럼명 - 각 행의 값 접근
+    - transform_aggregate(집계필드, groupby) - 그룹별 집계
+    - transform_window(함수, sort, groupby) - 윈도우 함수
+    - rank(), row_number(), sum() - 윈도우 함수 종류
+    - transform_fold([컬럼], as_) - wide to long 변환
+  - type: text
+    content: 다음 프로젝트에서는 모든 기법을 종합한 대시보드를 만듭니다.
+  goal: 정리에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+- id: workflow_validation
+  title: 10단계. 데이터 변환 spec 검증 루프
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  goal: 10단계. 데이터 변환 spec 검증 루프에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    Altair transform은 pandas 전처리와 Vega-Lite 사양의 경계입니다. calculate, aggregate, window가 spec에 정확히 들어갔는지 확인합니다.
+
+    Transform 레슨은 차트가 보이는지보다 transform 사양이 의도대로 남았는지 검증해야 업무 자동화에 쓸 수 있습니다.
+  snippet: |-
+    import altair as alt
+    from codaro.curriculum.localData import loadLocalDataset
+
+    tipsTransform = loadLocalDataset("tips")
+    requiredColumns = {"total_bill", "tip", "time", "day"}
+    missingColumns = requiredColumns - set(tipsTransform.columns)
+
+    assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+    assert tipsTransform["total_bill"].gt(0).all()
+    assert (tipsTransform["tip"] / tipsTransform["total_bill"]).between(0, 1).all()
+  exercise:
+    prompt: 10단계. 데이터 변환 spec 검증 루프 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import altair as alt
+      from codaro.curriculum.localData import loadLocalDataset
+
+      tipsTransform = loadLocalDataset("tips")
+      requiredColumns = {"total_bill", "tip", "time", "day"}
+      missingColumns = requiredColumns - set(tipsTransform.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert tipsTransform["total_bill"].gt(0).all()
+      assert (tipsTransform["tip"] / tipsTransform["total_bill"]).between(0, 1).all()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 10단계. 데이터 변환 spec 검증 루프의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 10단계. 데이터 변환 spec 검증 루프의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: altair_09-advanced-transform-order-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: 고급 data transform 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: calculate·filter·aggregate·window 순서가 결과 grain을 지키는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_advanced_transform_order(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_advanced_transform_order(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_advanced_transform_order(rows):
+            required = ['entity', 'metric', 'segment']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'segment'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['entity'] for row in usable]
+            y_values = [row['metric'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.altair.altair_09.advanced-transform-order-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.altair.altair_09.advanced-transform-order-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_advanced_transform_order
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - entity: A
+              metric: 10
+              segment: X
+            - entity: B
+              metric: 20
+              segment: X
+            - entity: C
+              metric: 15
+              segment: Y
+          expectedReturn:
+            usableCount: 3
+            excludedCount: 0
+            groupCounts:
+              X: 2
+              Y: 1
+            xExtent:
+            - A
+            - C
+            yExtent:
+            - 10
+            - 20
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: altair_09-advanced-transform-order-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - altair_09-advanced-transform-order-data-evidence-mastery
+    title: 고급 data transform 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 계산된 단위 가격을 filter한 뒤 지역 집계와 순위를 만드는 선언형 pipeline을 구성한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_advanced_transform_order(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_advanced_transform_order(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_advanced_transform_order(candidate):
+            expected = {'mark': 'ranked-bar', 'x': 'entity', 'y': 'metric', 'group': 'segment', 'transforms': ['aggregate', 'calculate', 'filter', 'window-rank'], 'interaction': 'none'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.altair.altair_09.advanced-transform-order-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.altair.altair_09.advanced-transform-order-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_advanced_transform_order
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: ranked-bar
+              x: entity
+              y: metric
+              group: segment
+              transforms:
+              - aggregate
+              - calculate
+              - filter
+              - window-rank
+              interaction: none
+              description: 계산된 단위 가격을 filter한 뒤 지역 집계와 순위를 만드는 선언형 pipeline을 구성한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: ranked-bar
+              x: entity
+              y: metric
+              group: segment
+              transforms:
+              - aggregate
+              - calculate
+              - filter
+              - window-rank
+              interaction: none
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: metric
+              y: entity
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - description
+            encoding:
+              mark: ranked-bar
+              x: entity
+              y: metric
+              group: segment
+              transforms:
+              - aggregate
+              - calculate
+              - filter
+              - window-rank
+              interaction: none
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: altair_09-advanced-transform-order-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - altair_09-advanced-transform-order-encoding-transfer-transfer
+    title: 고급 data transform 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: calculate·filter·aggregate·window 순서가 결과 grain을 지키는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_advanced_transform_order(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_advanced_transform_order(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_advanced_transform_order(situation):
+            table = {'derived-row-field': {'encoding': 'calculate before aggregate', 'evidence': 'formula', 'risk': 'aggregate inputs lost'}, 'top-groups': {'encoding': 'aggregate then window rank', 'evidence': 'group grain', 'risk': 'rank raw rows'}, 'post-rank-filter': {'encoding': 'filter rank', 'evidence': 'rank domain', 'risk': 'filter before window'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.altair.altair_09.advanced-transform-order-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.altair.altair_09.advanced-transform-order-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_advanced_transform_order
+        cases:
+        - id: recalls-derived-row-field
+          arguments:
+          - value: derived-row-field
+          expectedReturn:
+            encoding: calculate before aggregate
+            evidence: formula
+            risk: aggregate inputs lost
+        - id: recalls-top-groups
+          arguments:
+          - value: top-groups
+          expectedReturn:
+            encoding: aggregate then window rank
+            evidence: group grain
+            risk: rank raw rows
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

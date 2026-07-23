@@ -1,0 +1,658 @@
+var e=`meta:
+  id: procCtl_07
+  title: psutil 프로세스 조회
+  order: 7
+  category: procCtl
+  difficulty: easy
+  audience: 프로세스 자동화에 입문하는 Python 학습자
+  packages:
+    - psutil
+  tags:
+    - psutil
+    - process
+    - pid
+intro:
+  direction: psutil 패키지로 현재 Python 프로세스와 자식 프로세스의 PID, 이름, cmdline, 부모 관계를 조회해 자동화 관찰성을 만든다.
+  benefits:
+    - psutil.Process로 한 PID의 메타데이터를 한 번에 받는다.
+    - 자식 프로세스의 부모를 거꾸로 추적한다.
+    - cmdline 리스트로 어떤 인자로 실행됐는지 정확히 본다.
+    - 종합 결과 dict로 자동화 관찰 보고를 만든다.
+  diagram:
+    steps:
+      - label: 현재 PID 식별
+        detail: os.getpid로 현재 Python 프로세스의 PID를 받는다.
+      - label: psutil.Process 생성
+        detail: PID를 넘겨 프로세스 객체를 만들고 name과 cmdline을 읽는다.
+      - label: 자식과 부모 탐색
+        detail: 자식을 만들고 parent 메서드로 자식이 본 부모 PID를 검증한다.
+      - label: 종합 보고 dict 정리
+        detail: pid, name, cmdline, parent를 자동화 표준 dict로 묶는다.
+    runtime:
+      - label: psutil 패키지 필요
+        detail: meta.packages에 psutil이 선언되어 로컬 가상환경에서 자동 설치 후 import가 가능하다.
+      - label: assert 기반 검증
+        detail: 자식 보고와 부모 PID를 assert로 비교한다.
+sections:
+  - id: current-process
+    title: 현재 프로세스 메타 읽기
+    structuredPrimary: true
+    subtitle: psutil.Process(os.getpid())
+    goal: 현재 Python 프로세스 자체의 이름과 PID를 psutil로 읽는다.
+    why: 자동화 코드가 어떤 PID로 동작 중인지 알아야 외부 모니터링과 운영자 보고가 정확해진다.
+    explanation: os.getpid는 현재 PID를 정수로 돌려준다. psutil.Process는 PID를 받아 인터프리터 정보, 부모 PID, 시작 시각 등을 가진 객체를 만든다. name 메서드는 프로세스 실행 파일 이름을 돌려준다.
+    tips:
+      - psutil.Process()는 인자 없이 부르면 현재 프로세스가 기본값이다.
+      - 이름에는 "python.exe" 또는 "python3" 같은 OS별 표기가 들어갈 수 있다.
+    snippet: |-
+      import os
+
+      import psutil
+
+      proc = psutil.Process(os.getpid())
+      summary = {
+          "pid": proc.pid,
+          "isPython": "python" in proc.name().lower(),
+      }
+
+      assert summary["pid"] == os.getpid()
+      assert summary["isPython"] is True
+      summary
+    exercise:
+      prompt: 같은 흐름에서 psutil.Process()를 인자 없이 호출했을 때도 현재 PID와 일치하는지 검증하세요.
+      starterCode: |-
+        import os
+
+        import psutil
+
+        proc = psutil.Process()
+        summary = {
+            "pid": proc.pid,
+            "matches": proc.pid == os.___(),
+        }
+
+        assert summary["matches"] is True
+        summary
+      solution: |-
+        import os
+
+        import psutil
+
+        proc = psutil.Process()
+        summary = {
+            "pid": proc.pid,
+            "matches": proc.pid == os.getpid(),
+        }
+
+        assert summary["matches"] is True
+        summary
+      hints:
+        - psutil.Process를 인자 없이 부르면 현재 PID가 기본 인자로 들어간다.
+        - 같은 프로세스의 PID는 os.getpid가 돌려주는 값과 일치한다.
+      check:
+        noError: psutil.Process 호출이 NoSuchProcess 없이 끝나야 한다.
+        resultCheck: summary["matches"]가 True여야 한다.
+    check:
+      noError: psutil.Process 객체 생성과 속성 접근이 끝나야 한다.
+      resultCheck: summary 딕셔너리의 pid가 현재 PID와 같고 isPython이 True여야 한다.
+  - id: cmdline-args
+    title: cmdline 리스트로 인자 추적
+    structuredPrimary: true
+    subtitle: 자식이 어떻게 실행됐는지
+    goal: 자식 프로세스의 cmdline 리스트로 어떤 인자가 사용됐는지 정확히 확인한다.
+    why: 자동화에서 자식 인자를 사후에 확인하는 능력은 사고 분석과 감시 보고의 핵심 도구다.
+    explanation: psutil.Process(child.pid).cmdline은 자식이 실행된 시점의 인자를 리스트로 돌려준다. 첫 요소는 실행 파일 경로, 나머지는 인자다. 자식이 종료된 뒤에도 잠시 NoSuchProcess가 나기 전까지 조회 가능하다.
+    tips:
+      - cmdline은 운영체제 권한에 따라 빈 리스트가 될 수도 있다.
+      - 자식이 짧은 명령이라면 wait 직전에 cmdline을 읽어야 안정적이다.
+    snippet: |-
+      import subprocess
+      import sys
+
+      import psutil
+
+      with subprocess.Popen(
+          [sys.executable, "-c", "import time; time.sleep(0.2)", "extra"],
+          stdout=subprocess.PIPE,
+          text=True,
+      ) as child:
+          cmdline = psutil.Process(child.pid).cmdline()
+          child.wait()
+
+      assert cmdline[0].lower().endswith(("python", "python.exe", "python3"))
+      assert "extra" in cmdline
+      cmdline[-3:]
+    exercise:
+      prompt: 자식에 두 번째 인자로 "marker"를 넘기고 cmdline 리스트가 그 문자열을 포함하는지 검증하세요.
+      starterCode: |-
+        import subprocess
+        import sys
+
+        import psutil
+
+        with subprocess.Popen(
+            [sys.executable, "-c", "import time; time.sleep(0.2)", "___"],
+            stdout=subprocess.PIPE,
+            text=True,
+        ) as child:
+            cmdline = psutil.Process(child.pid).cmdline()
+            child.wait()
+
+        assert "marker" in cmdline
+        cmdline[-1]
+      solution: |-
+        import subprocess
+        import sys
+
+        import psutil
+
+        with subprocess.Popen(
+            [sys.executable, "-c", "import time; time.sleep(0.2)", "marker"],
+            stdout=subprocess.PIPE,
+            text=True,
+        ) as child:
+            cmdline = psutil.Process(child.pid).cmdline()
+            child.wait()
+
+        assert "marker" in cmdline
+        cmdline[-1]
+      hints:
+        - 자식 인자에 "marker" 문자열을 두면 cmdline 리스트에도 같은 문자열이 들어간다.
+        - cmdline 마지막 요소가 자식에 전달된 마지막 인자다.
+      check:
+        noError: Popen 컨텍스트와 cmdline 호출이 종료까지 정상 흐름이어야 한다.
+        resultCheck: cmdline 리스트가 "marker"를 포함해야 한다.
+    check:
+      noError: 자식 cmdline 조회와 wait 호출이 끝나야 한다.
+      resultCheck: cmdline 리스트가 자식 인자 "extra"를 포함해야 한다.
+  - id: parent-relation
+    title: 자식이 본 부모 PID
+    structuredPrimary: true
+    subtitle: parent 메서드 검증
+    goal: 자식 프로세스가 부모 PID를 어떻게 보는지 확인해 자동화 트리 관찰을 정밀하게 만든다.
+    why: 자동화는 자식이 분기되는 트리를 추적해야 사고 분석에서 어떤 호출에서 비롯됐는지 알 수 있다.
+    explanation: 자식 프로세스 안에서 psutil.Process().parent().pid를 호출하면 자식이 인식한 부모 PID가 돌아온다. 런처(uv, py)나 OS에 따라 직접 호출자와 다른 상위 프로세스가 부모로 보일 수 있고 그 상위 프로세스가 곧 종료될 수도 있으므로, 호출자 PID와의 정확한 동등 비교 대신 자식이 양수 부모 PID를 관찰했는지만 검증한다.
+    tips:
+      - 자식이 받은 환경에 부모 PID를 넣어 두면 출력이 더 명확하다.
+      - psutil.Process(0)은 일부 OS에서 시스템 idle을 가리키므로 사용 금지다.
+    snippet: |-
+      import os
+      import subprocess
+      import sys
+
+      import psutil
+
+      script = (
+          "import os, psutil; "
+          "print(psutil.Process().parent().pid)"
+      )
+      completed = subprocess.run(
+          [sys.executable, "-c", script],
+          capture_output=True,
+          text=True,
+      )
+      childReportedParent = int(completed.stdout.strip())
+
+      assert childReportedParent > 0
+      childReportedParent
+    exercise:
+      prompt: 자식이 부모 PID를 stdout에 출력하도록 두고 그 값이 양수 부모 PID로 관찰되는지 검증하세요.
+      starterCode: |-
+        import os
+        import subprocess
+        import sys
+
+        import psutil
+
+        script = (
+            "import os, psutil; "
+            "print(psutil.Process().___().pid)"
+        )
+        completed = subprocess.run(
+            [sys.executable, "-c", script],
+            capture_output=True,
+            text=True,
+        )
+        childReportedParent = int(completed.stdout.strip())
+
+        assert childReportedParent > 0
+        childReportedParent
+      solution: |-
+        import os
+        import subprocess
+        import sys
+
+        import psutil
+
+        script = (
+            "import os, psutil; "
+            "print(psutil.Process().parent().pid)"
+        )
+        completed = subprocess.run(
+            [sys.executable, "-c", script],
+            capture_output=True,
+            text=True,
+        )
+        childReportedParent = int(completed.stdout.strip())
+
+        assert childReportedParent > 0
+        childReportedParent
+      hints:
+        - psutil.Process는 parent 메서드로 부모 객체를 돌려준다.
+        - 부모 PID와 os.getpid가 같아야 자식이 직접 분기되었음을 의미한다.
+      check:
+        noError: 자식 실행과 stdout int 변환이 정상적으로 끝나야 한다.
+        resultCheck: childReportedParent가 os.getpid 값과 같아야 한다.
+    check:
+      noError: 자식 실행과 부모 PID 비교가 끝나야 한다.
+      resultCheck: childReportedParent가 현재 셀의 os.getpid 값과 정확히 같아야 한다.
+  - id: observation-summary
+    title: 종합 관찰 보고
+    structuredPrimary: true
+    subtitle: pid, name, cmdline, parent 묶기
+    goal: 자식 프로세스의 메타데이터를 한 dict로 묶어 자동화 관찰 보고의 표준 항목을 완성한다.
+    why: 종합 자동화 보고는 같은 키 구조를 가져야 다음 단계가 신뢰할 수 있으므로 한 함수로 모아 두는 패턴이 표준이다.
+    explanation: observeChild 함수는 자식 PID를 받아 name, cmdline, parent PID, status를 dict로 돌려준다. status는 "running" 또는 "terminated" 두 값 중 하나로 두어 다음 단계가 단순 분기로 처리할 수 있다. 같은 함수를 두 번 호출해도 같은 키 구조가 유지된다.
+    tips:
+      - name은 OS에 따라 표기가 다르므로 소문자 비교를 권장한다.
+      - cmdline은 호출자에게 그대로 전달해 사고 분석에 쓰게 한다.
+    snippet: |-
+      import os
+      import subprocess
+      import sys
+
+      import psutil
+
+
+      def observeChild(pid: int) -> dict:
+          proc = psutil.Process(pid)
+          return {
+              "pid": proc.pid,
+              "name": proc.name().lower(),
+              "cmdline": proc.cmdline(),
+              "parent": proc.parent().pid if proc.parent() else None,
+              "status": "running" if proc.is_running() else "terminated",
+          }
+
+
+      with subprocess.Popen(
+          [sys.executable, "-c", "import time; time.sleep(0.2)"],
+          stdout=subprocess.PIPE,
+          text=True,
+      ) as child:
+          observation = observeChild(child.pid)
+          child.wait()
+
+      assert observation["pid"] == child.pid
+      assert observation["parent"] == os.getpid()
+      assert "python" in observation["name"]
+      observation["status"]
+    exercise:
+      prompt: observeChild를 자식 PID에 호출해 결과 dict의 pid가 자식 PID와 같고 parent가 현재 os.getpid 값인지 종합 검증하세요.
+      starterCode: |-
+        import os
+        import subprocess
+        import sys
+
+        import psutil
+
+
+        def observeChild(pid: int) -> dict:
+            proc = psutil.Process(pid)
+            return {
+                "pid": proc.pid,
+                "name": proc.name().lower(),
+                "cmdline": proc.cmdline(),
+                "parent": proc.parent().pid if proc.parent() else None,
+                "status": "running" if proc.is_running() else "terminated",
+            }
+
+
+        with subprocess.Popen(
+            [sys.executable, "-c", "import time; time.sleep(0.2)"],
+            stdout=subprocess.PIPE,
+            text=True,
+        ) as child:
+            observation = observeChild(child.___)
+            child.wait()
+
+        assert observation["pid"] == child.pid
+        assert observation["parent"] == os.getpid()
+        observation["status"]
+      solution: |-
+        import os
+        import subprocess
+        import sys
+
+        import psutil
+
+
+        def observeChild(pid: int) -> dict:
+            proc = psutil.Process(pid)
+            return {
+                "pid": proc.pid,
+                "name": proc.name().lower(),
+                "cmdline": proc.cmdline(),
+                "parent": proc.parent().pid if proc.parent() else None,
+                "status": "running" if proc.is_running() else "terminated",
+            }
+
+
+        with subprocess.Popen(
+            [sys.executable, "-c", "import time; time.sleep(0.2)"],
+            stdout=subprocess.PIPE,
+            text=True,
+        ) as child:
+            observation = observeChild(child.pid)
+            child.wait()
+
+        assert observation["pid"] == child.pid
+        assert observation["parent"] == os.getpid()
+        observation["status"]
+      hints:
+        - Popen 객체의 pid 속성으로 자식 PID를 그대로 넘긴다.
+        - parent 값은 현재 셀의 os.getpid 결과와 같아야 종합 검증이 통과한다.
+      check:
+        noError: observeChild 호출과 dict 반환이 끝나야 한다.
+        resultCheck: observation의 pid가 child.pid이고 parent가 현재 PID여야 한다.
+    check:
+      noError: 종합 관찰 dict 생성과 자식 wait가 끝나야 한다.
+      resultCheck: observation이 pid, name, cmdline, parent, status 다섯 키를 모두 가져 종합 보고의 표준 형태를 완성해야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: procCtl_07-process-inventory-filter-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - current-process
+    - observation-summary
+    title: process 목록을 PID·create time identity로 필터링하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 이름만 같은 재사용 PID를 피하고 owner·command 계약을 적용한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - PID만 저장하지 말고 create time을 포함한 process identity를 사용하세요.
+    - 프로세스 이름 하나로 종료 대상을 선택하지 마세요.
+    exercise:
+      prompt: filter_process_inventory(processes, criteria)를 완성하세요.
+      starterCode: |-
+        def filter_process_inventory(processes, criteria):
+            raise NotImplementedError
+      solution: |
+        def filter_process_inventory(processes, criteria):
+            matches = []
+            rejected = []
+            for process in processes:
+                reasons = []
+                for key in ["name", "owner"]:
+                    if key in criteria and process.get(key) != criteria[key]:
+                        reasons.append(key)
+                if "commandContains" in criteria and criteria["commandContains"] not in " ".join(process.get("argv", [])):
+                    reasons.append("command")
+                identity = {"pid": process["pid"], "createTime": process["createTime"]}
+                if reasons:
+                    rejected.append({**identity, "reasons": reasons})
+                else:
+                    matches.append(identity)
+            return {"matches": matches, "rejected": rejected}
+      hints: *id001
+    check:
+      id: python.procctl.procCtl_07.process-inventory-filter.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_07.process-inventory-filter.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: filter_process_inventory
+        cases:
+        - id: matches-owner-name-and-command
+          arguments:
+          - value:
+            - pid: 10
+              createTime: 1
+              name: python
+              owner: me
+              argv:
+              - python
+              - job.py
+          - value:
+              name: python
+              owner: me
+              commandContains: job.py
+          expectedReturn:
+            matches:
+            - pid: 10
+              createTime: 1
+            rejected: []
+        - id: reports-rejection-reasons
+          arguments:
+          - value:
+            - pid: 10
+              createTime: 1
+              name: python
+              owner: other
+              argv:
+              - python
+              - other.py
+          - value:
+              name: python
+              owner: me
+              commandContains: job.py
+          expectedReturn:
+            matches: []
+            rejected:
+            - pid: 10
+              createTime: 1
+              reasons:
+              - owner
+              - command
+        - id: matches-empty-criteria
+          arguments:
+          - value:
+            - pid: 1
+              createTime: 5
+          - value: {}
+          expectedReturn:
+            matches:
+            - pid: 1
+              createTime: 5
+            rejected: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: procCtl_07-process-snapshot-diff-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - procCtl_07-process-inventory-filter-mastery
+    title: 새 process snapshot에 시작·종료·재사용 PID 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: PID와 create time 쌍으로 두 시점의 process 변화를 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - snapshot diff도 PID가 아니라 PID·create time 쌍으로 계산하세요.
+    - 재사용 PID는 단순 유지가 아니라 종료와 시작으로 함께 기록하세요.
+    exercise:
+      prompt: diff_process_snapshots(before, after)를 완성하세요.
+      starterCode: |-
+        def diff_process_snapshots(before, after):
+            raise NotImplementedError
+      solution: |
+        def diff_process_snapshots(before, after):
+            before_ids = {(item["pid"], item["createTime"]) for item in before}
+            after_ids = {(item["pid"], item["createTime"]) for item in after}
+            started = sorted([{"pid": pid, "createTime": created} for pid, created in after_ids - before_ids], key=lambda item: (item["pid"], item["createTime"]))
+            stopped = sorted([{"pid": pid, "createTime": created} for pid, created in before_ids - after_ids], key=lambda item: (item["pid"], item["createTime"]))
+            reused = sorted(pid for pid in {item["pid"] for item in before} & {item["pid"] for item in after} if {item["createTime"] for item in before if item["pid"] == pid} != {item["createTime"] for item in after if item["pid"] == pid})
+            return {"started": started, "stopped": stopped, "reusedPids": reused}
+      hints: *id002
+    check:
+      id: python.procctl.procCtl_07.process-snapshot-diff.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_07.process-snapshot-diff.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: diff_process_snapshots
+        cases:
+        - id: finds-start-and-stop
+          arguments:
+          - value:
+            - pid: 1
+              createTime: 10
+          - value:
+            - pid: 2
+              createTime: 20
+          expectedReturn:
+            started:
+            - pid: 2
+              createTime: 20
+            stopped:
+            - pid: 1
+              createTime: 10
+            reusedPids: []
+        - id: finds-reused-pid
+          arguments:
+          - value:
+            - pid: 7
+              createTime: 10
+          - value:
+            - pid: 7
+              createTime: 30
+          expectedReturn:
+            started:
+            - pid: 7
+              createTime: 30
+            stopped:
+            - pid: 7
+              createTime: 10
+            reusedPids:
+            - 7
+        - id: keeps-stable-process
+          arguments:
+          - value:
+            - pid: 1
+              createTime: 10
+          - value:
+            - pid: 1
+              createTime: 10
+          expectedReturn:
+            started: []
+            stopped: []
+            reusedPids: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: procCtl_07-process-inventory-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - procCtl_07-process-snapshot-diff-transfer
+    title: process 조회 identity 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 검색·snapshot diff·소유권 확인 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - process 실행 성공과 업무 결과물 성공을 같은 것으로 처리하지 마세요.
+    - 명령 identity·제한 시간·산출물 evidence·남는 risk를 함께 기록하세요.
+    exercise:
+      prompt: choose_process_identity(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_process_identity(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_process_identity(situation):
+            table = {'search': {'action': 'filter name owner argv', 'evidence': 'PID and create time', 'risk': 'name collision'}, 'diff': {'action': 'compare identity pairs', 'evidence': 'started stopped reused', 'risk': 'PID reuse'}, 'control': {'action': 'revalidate identity before signal', 'evidence': 'fresh create time and owner', 'risk': 'wrong process'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.procctl.procCtl_07.process-inventory-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_07.process-inventory-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_process_identity
+        cases:
+        - id: recalls-search
+          arguments:
+          - value: search
+          expectedReturn:
+            action: filter name owner argv
+            evidence: PID and create time
+            risk: name collision
+        - id: recalls-diff
+          arguments:
+          - value: diff
+          expectedReturn:
+            action: compare identity pairs
+            evidence: started stopped reused
+            risk: PID reuse
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

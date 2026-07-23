@@ -1,0 +1,809 @@
+var e=`meta:
+  id: requests_12
+  title: 공휴일·영업일 계산 - 마감일을 영업일 기준으로 자동화
+  order: 12
+  category: requests
+  difficulty: ⭐⭐
+  badge: 실전
+  packages:
+    - requests
+  tags:
+    - 영업일
+    - 공휴일
+    - 특일정보
+    - 마감일
+    - 공공데이터포털
+  outcomes:
+    - automation.webApi.businessDays
+  prerequisites:
+    - automation.webApi.get
+  estimatedMinutes: 45
+  seo:
+    title: "공휴일·영업일 계산 자동화 - 공공데이터 특일정보 API로 마감일 순연 처리"
+    description: "공공데이터포털 특일정보 Open API로 그 해 공휴일을 받아 datetime으로 영업일 판정·D+N 영업일·마감일 순연을 계산한다. 세금계산서 발행기한·정산·배송 SLA를 영업일 기준으로 자동화한다."
+    keywords:
+      - 영업일 계산
+      - 공휴일 API
+      - 특일정보
+      - 마감일 순연
+      - data.go.kr
+
+intro:
+  direction: "거래·정산·배송 마감일을 '영업일 기준'으로 정확히 계산한다. 공휴일은 매년 대체·임시공휴일로 바뀌므로, 공공데이터 특일정보 API로 그 해 공휴일을 받아 datetime으로 주말·공휴일을 함께 건너뛴다."
+  benefits:
+    - "세금계산서 발행기한(익월 10일)·급여/정산 마감·'영업일 +3일 배송'을 손으로 달력 세던 일을 코드 한 번으로. 마감을 하루 넘기면 가산세·연체로 실제 돈이 샌다."
+    - "설·추석 대체공휴일과 임시공휴일은 매년 바뀐다 - 공휴일을 코드에 하드코딩하면 내년에 틀린다. 공식 API가 그 해 공휴일을 준다."
+    - "공휴일 집합은 키 없이 샘플로 폴백하고, 영업일 산술은 표준 datetime만으로 네트워크 없이 검증한다."
+  diagram:
+    steps:
+      - label: "1. 공휴일 받기"
+        detail: "특일정보 API 응답에서 isHoliday가 'Y'인 날만 공휴일 date 집합으로 추린다."
+      - label: "2. 영업일 판정"
+        detail: "주말(토·일)과 공휴일을 함께 빼야 영업일이다."
+      - label: "3. N영업일 계산"
+        detail: "'영업일 +N'은 단순 +N일이 아니다 - 주말·공휴일을 건너뛰며 센다."
+      - label: "4. 마감일 순연"
+        detail: "마감일이 휴일이면 다음 영업일로 순연한다."
+    runtime:
+      - label: "로컬 requests + 환경변수 키"
+        detail: "requests.get로 data.go.kr 특일정보 호출, serviceKey는 os.environ에서. 로컬 Python에서 그대로 실행한다."
+      - label: "키 없이 결정론 검증"
+        detail: "공휴일 파싱·영업일 산술·마감 순연은 샘플 공휴일로 assert. 네트워크·키 없이도 회귀를 잡는다."
+
+sections:
+  - id: parse_holidays
+    title: "1단계. 공휴일 받기 - 하드코딩 대신 공식 API"
+    structuredPrimary: true
+    subtitle: "특일정보 응답에서 isHoliday='Y'만 공휴일 집합으로"
+    goal: "특일정보 API 응답 항목에서 실제 공휴일(isHoliday가 'Y')만 골라 date 집합으로 만든다."
+    why: "공휴일은 매년 바뀐다 - 2025년 설 연휴 앞 1월 27일은 정부가 지정한 임시공휴일이었다. 코드에 공휴일을 박아두면 내년엔 틀린다. 그 해 공휴일은 공식 특일정보 API가 준다."
+    explanation: |-
+      공공데이터포털 특일정보(한국천문연구원) API는 연·월별 특일 목록을 준다. 응답 항목은 dateName(명칭), isHoliday('Y'/'N'), locdate(YYYYMMDD 정수) 등을 담는다.
+
+      여기서 핵심은 isHoliday 필터다. 특일정보에는 공휴일이 아닌 국경일(예: 제헌절)도 섞여 들어올 수 있으므로, 쉬는 날 계산에는 isHoliday가 'Y'인 항목만 추려야 한다. locdate는 정수라 문자열로 바꿔 date로 파싱한다.
+    tips:
+      - "isHoliday가 'N'인 항목(제헌절 같은 국경일)은 빨간 날이 아니다 - 영업일 계산에서 빼지 않는다."
+      - "locdate는 20250101 같은 정수다. str()로 바꿔 '%Y%m%d'로 파싱하면 date가 된다."
+    snippet: |-
+      from datetime import date, datetime
+
+      def parseHolidays(items):
+          holidays = set()
+          for item in items:
+              if item["isHoliday"] == "Y":
+                  holidays.add(datetime.strptime(str(item["locdate"]), "%Y%m%d").date())
+          return holidays
+
+      items = [
+          {"dateName": "1월1일", "isHoliday": "Y", "locdate": 20250101},
+          {"dateName": "임시공휴일", "isHoliday": "Y", "locdate": 20250127},
+          {"dateName": "설날", "isHoliday": "Y", "locdate": 20250128},
+          {"dateName": "설날", "isHoliday": "Y", "locdate": 20250129},
+          {"dateName": "설날", "isHoliday": "Y", "locdate": 20250130},
+          {"dateName": "제헌절", "isHoliday": "N", "locdate": 20250717},
+      ]
+      holidays = parseHolidays(items)
+
+      assert date(2025, 1, 27) in holidays
+      assert date(2025, 7, 17) not in holidays
+      assert len(holidays) == 5
+      sorted(holidays)
+    exercise:
+      prompt: "제헌절(7월 17일)은 국경일이지만 공휴일이 아니다. isHoliday를 'N'으로 두면 공휴일 집합에서 빠지는지 확인하세요."
+      starterCode: |-
+        from datetime import date, datetime
+
+        def parseHolidays(items):
+            holidays = set()
+            for item in items:
+                if item["isHoliday"] == "Y":
+                    holidays.add(datetime.strptime(str(item["locdate"]), "%Y%m%d").date())
+            return holidays
+
+        items = [
+            {"dateName": "1월1일", "isHoliday": "Y", "locdate": 20250101},
+            {"dateName": "제헌절", "isHoliday": ___, "locdate": 20250717},
+        ]
+        holidays = parseHolidays(items)
+
+        assert date(2025, 7, 17) not in holidays
+        assert len(holidays) == 1
+        sorted(holidays)
+      hints:
+        - "제헌절은 국경일이지만 쉬는 날이 아니므로 isHoliday는 \\"N\\"."
+        - "isHoliday가 'Y'가 아니면 집합에 추가되지 않는다."
+      check:
+        type: noError
+        noError: "parseHolidays가 예외 없이 끝나야 한다."
+        resultCheck: "제헌절이 빠져 공휴일이 1건(신정)만 남아야 한다."
+    check:
+      noError: "공휴일 파싱이 끝나야 한다."
+      resultCheck: "isHoliday가 'Y'인 5건만 공휴일 집합에 담긴다."
+
+  - id: is_business_day
+    title: "2단계. 영업일 판정 - 주말과 공휴일을 함께 뺀다"
+    structuredPrimary: true
+    subtitle: "weekday < 5 그리고 공휴일이 아님"
+    goal: "어떤 날짜가 영업일인지(평일이면서 공휴일이 아님) 판정하는 함수를 만든다."
+    why: "흔한 버그는 주말만 빼고 공휴일을 깜빡하는 것이다. 1월 27일(월)은 평일이지만 임시공휴일이라 영업일이 아니다 - 둘 다 빼야 맞다."
+    explanation: |-
+      date.weekday()는 월요일 0 … 일요일 6을 돌려준다. 그래서 평일은 weekday가 0~4(5 미만)이다. 토요일(5)·일요일(6)은 주말이다.
+
+      영업일은 '평일' 그리고 '공휴일이 아님'을 동시에 만족해야 한다. 둘 중 하나라도 어기면 영업일이 아니다. 그래서 weekday < 5 and 날짜 not in 공휴일집합 으로 판정한다.
+    tips:
+      - "weekday()는 월0~일6이다. 토·일을 빼려면 weekday < 5인지 본다(요일 영어 약자에 의존하지 않는다)."
+      - "평일이어도 공휴일이면 영업일이 아니다 - 1월 27일(월) 임시공휴일이 그 예다."
+    snippet: |-
+      from datetime import date
+
+      def isBusinessDay(d, holidays):
+          return d.weekday() < 5 and d not in holidays
+
+      holidays = {date(2025, 1, 1), date(2025, 1, 27), date(2025, 1, 28), date(2025, 1, 29), date(2025, 1, 30)}
+
+      assert isBusinessDay(date(2025, 1, 2), holidays) is True
+      assert isBusinessDay(date(2025, 1, 25), holidays) is False
+      assert isBusinessDay(date(2025, 1, 27), holidays) is False
+      isBusinessDay(date(2025, 1, 27), holidays)
+    exercise:
+      prompt: "1월 28일은 설날(화요일이지만 공휴일)이다. 평일이어도 공휴일이면 영업일이 아님을 확인하세요."
+      starterCode: |-
+        from datetime import date
+
+        def isBusinessDay(d, holidays):
+            return d.weekday() < 5 and d not in holidays
+
+        holidays = {date(2025, 1, 1), date(2025, 1, 27), date(2025, 1, 28), date(2025, 1, 29), date(2025, 1, 30)}
+
+        result = isBusinessDay(date(2025, 1, ___), holidays)
+
+        assert result is False
+        result
+      hints:
+        - "설날은 1월 28일."
+        - "28일은 화요일(평일)이지만 공휴일이라 영업일이 아니다."
+      check:
+        type: noError
+        noError: "isBusinessDay가 예외 없이 끝나야 한다."
+        resultCheck: "1월 28일은 공휴일이라 영업일이 아니다(False)."
+    check:
+      noError: "영업일 판정이 끝나야 한다."
+      resultCheck: "주말(1/25)과 공휴일(1/27)이 모두 영업일이 아니다."
+
+  - id: add_business_days
+    title: "3단계. N영업일 후·전 - 주말·공휴일을 건너뛰며 센다"
+    structuredPrimary: true
+    subtitle: "'영업일 +N'은 단순 +N일이 아니다"
+    goal: "시작일에서 N영업일 후(또는 음수면 N영업일 전) 날짜를 구한다."
+    why: "'영업일 +1'을 단순히 +1일로 계산하면 금요일 다음이 토요일이 되어 틀린다. 영업일이 아닌 날은 세지 않고 건너뛰어야 한다."
+    explanation: |-
+      하루씩 이동하면서, 도착한 날이 영업일일 때만 남은 횟수를 줄인다. 남은 횟수가 0이 되면 멈춘다. n이 음수면 거꾸로(영업일 전) 이동한다.
+
+      2025년 1월 24일(금)에서 1영업일 뒤를 보자. 토(25)·일(26)·임시공휴일(27)·설 연휴(28·29·30)를 모두 건너뛰면 1월 31일(금)이 첫 영업일이다. 단순 +1일(=1/25 토요일)과 한참 다르다.
+    tips:
+      - "남은 영업일이 0이 될 때까지 하루씩 옮기되, 영업일일 때만 카운트를 줄인다."
+      - "n이 음수면 step을 -1로 - 같은 로직으로 'N영업일 전'(예: 마감 2영업일 전 알림)이 나온다."
+    snippet: |-
+      from datetime import date, timedelta
+
+      def isBusinessDay(d, holidays):
+          return d.weekday() < 5 and d not in holidays
+
+      def addBusinessDays(start, n, holidays):
+          step = 1 if n >= 0 else -1
+          remaining = abs(n)
+          current = start
+          while remaining > 0:
+              current += timedelta(days=step)
+              if isBusinessDay(current, holidays):
+                  remaining -= 1
+          return current
+
+      holidays = {date(2025, 1, 1), date(2025, 1, 27), date(2025, 1, 28), date(2025, 1, 29), date(2025, 1, 30)}
+
+      assert addBusinessDays(date(2025, 1, 24), 1, holidays) == date(2025, 1, 31)
+      assert addBusinessDays(date(2025, 1, 31), -1, holidays) == date(2025, 1, 24)
+      addBusinessDays(date(2025, 1, 24), 1, holidays)
+    exercise:
+      prompt: "1월 24일(금)에서 2영업일 뒤를 구하세요. 설 연휴를 건너뛰면 2월 3일(월)이 됩니다."
+      starterCode: |-
+        from datetime import date, timedelta
+
+        def isBusinessDay(d, holidays):
+            return d.weekday() < 5 and d not in holidays
+
+        def addBusinessDays(start, n, holidays):
+            step = 1 if n >= 0 else -1
+            remaining = abs(n)
+            current = start
+            while remaining > 0:
+                current += timedelta(days=step)
+                if isBusinessDay(current, holidays):
+                    remaining -= 1
+            return current
+
+        holidays = {date(2025, 1, 1), date(2025, 1, 27), date(2025, 1, 28), date(2025, 1, 29), date(2025, 1, 30)}
+
+        due = addBusinessDays(date(2025, 1, 24), ___, holidays)
+
+        assert due == date(2025, 2, 3)
+        due
+      hints:
+        - "2영업일을 넣는다."
+        - "1/24 다음 영업일은 1/31(금), 그다음 영업일은 2/3(월)이다."
+      check:
+        type: noError
+        noError: "addBusinessDays가 예외 없이 끝나야 한다."
+        resultCheck: "1/24의 2영업일 뒤는 2월 3일이다."
+    check:
+      noError: "N영업일 계산이 끝나야 한다."
+      resultCheck: "1/24의 1영업일 뒤는 설 연휴를 건너뛴 1월 31일이다."
+
+  - id: fetch_and_due
+    title: "4단계. 실전 호출 - 공휴일 받기 + 마감일 순연"
+    structuredPrimary: true
+    subtitle: "requests.get + os.environ + dryRun, 그리고 익영업일 순연"
+    goal: "특일정보 API로 공휴일을 받는 실제 호출 함수를 만들되 키가 없으면 샘플로 폴백하고, 마감일이 휴일이면 다음 영업일로 순연한다."
+    why: "정산·급여 마감일이 그 달 27일인데 27일이 임시공휴일이면, 마감은 다음 영업일로 미뤄진다. serviceKey는 자격증명이라 코드·커밋·로그에 남기지 않고 환경변수로 분리한다."
+    explanation: |-
+      엔드포인트는 GET \`http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo\`이고, 파라미터에 serviceKey와 solYear(연도)를 넣고 _type=json으로 받는다. serviceKey는 os.environ에서 읽는다 - 평문 키를 코드에 넣지 않는다.
+
+      fetchHolidays는 dryRun이 True거나 키가 없으면 네트워크를 타지 않고 sample을 돌려준다. nextBusinessDayOnOrAfter는 주어진 날이 영업일이 될 때까지 하루씩 미뤄, '마감일이 휴일이면 익영업일로 순연' 규칙을 구현한다. 27일이 임시공휴일이고 28~30일이 설 연휴라면 마감은 31일(금)로 순연된다.
+    tips:
+      - "serviceKey를 코드에 박거나 커밋하지 않는다 - 환경변수(DATA_GO_KR_KEY)로만. 공공데이터포털에서 활용신청 후 무료 발급."
+      - "data.go.kr 키는 'URL Encoded'와 '디코딩' 두 형태가 있다. requests의 params=로 넘기면 자동 인코딩되므로 디코딩 키를 쓴다."
+    snippet: |-
+      import os
+      import requests
+      from datetime import date, datetime, timedelta
+
+      def parseHolidays(items):
+          holidays = set()
+          for item in items:
+              if item["isHoliday"] == "Y":
+                  holidays.add(datetime.strptime(str(item["locdate"]), "%Y%m%d").date())
+          return holidays
+
+      def isBusinessDay(d, holidays):
+          return d.weekday() < 5 and d not in holidays
+
+      def nextBusinessDayOnOrAfter(d, holidays):
+          current = d
+          while not isBusinessDay(current, holidays):
+              current += timedelta(days=1)
+          return current
+
+      def fetchHolidays(year, serviceKey=None, dryRun=True, sample=None):
+          if dryRun or not serviceKey:
+              return sample
+          url = "http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo"
+          response = requests.get(
+              url,
+              params={"serviceKey": serviceKey, "solYear": str(year), "numOfRows": 100, "_type": "json"},
+              timeout=10,
+          )
+          response.raise_for_status()
+          return response.json()["response"]["body"]["items"]["item"]
+
+      sample = [
+          {"dateName": "1월1일", "isHoliday": "Y", "locdate": 20250101},
+          {"dateName": "임시공휴일", "isHoliday": "Y", "locdate": 20250127},
+          {"dateName": "설날", "isHoliday": "Y", "locdate": 20250128},
+          {"dateName": "설날", "isHoliday": "Y", "locdate": 20250129},
+          {"dateName": "설날", "isHoliday": "Y", "locdate": 20250130},
+      ]
+      serviceKey = os.environ.get("DATA_GO_KR_KEY")
+      items = fetchHolidays(2025, serviceKey=serviceKey, dryRun=True, sample=sample)
+      holidays = parseHolidays(items)
+
+      settle = nextBusinessDayOnOrAfter(date(2025, 1, 27), holidays)
+      assert settle == date(2025, 1, 31)
+      assert nextBusinessDayOnOrAfter(date(2025, 1, 10), holidays) == date(2025, 1, 10)
+      settle.isoformat()
+    exercise:
+      prompt: "dryRun=True로 호출하면 네트워크 없이 sample이 그대로 반환되어 공휴일 5건이 파싱되는지 확인하세요."
+      starterCode: |-
+        import os
+        import requests
+        from datetime import date, datetime, timedelta
+
+        def parseHolidays(items):
+            holidays = set()
+            for item in items:
+                if item["isHoliday"] == "Y":
+                    holidays.add(datetime.strptime(str(item["locdate"]), "%Y%m%d").date())
+            return holidays
+
+        def fetchHolidays(year, serviceKey=None, dryRun=True, sample=None):
+            if dryRun or not serviceKey:
+                return sample
+            url = "http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo"
+            response = requests.get(
+                url,
+                params={"serviceKey": serviceKey, "solYear": str(year), "numOfRows": 100, "_type": "json"},
+                timeout=10,
+            )
+            response.raise_for_status()
+            return response.json()["response"]["body"]["items"]["item"]
+
+        sample = [
+            {"dateName": "1월1일", "isHoliday": "Y", "locdate": 20250101},
+            {"dateName": "임시공휴일", "isHoliday": "Y", "locdate": 20250127},
+            {"dateName": "설날", "isHoliday": "Y", "locdate": 20250128},
+            {"dateName": "설날", "isHoliday": "Y", "locdate": 20250129},
+            {"dateName": "설날", "isHoliday": "Y", "locdate": 20250130},
+        ]
+        items = fetchHolidays(2025, dryRun=___, sample=sample)
+        holidays = parseHolidays(items)
+
+        assert len(holidays) == 5
+        len(holidays)
+      hints:
+        - "네트워크를 타지 않으려면 dryRun을 True로."
+        - "dryRun이 True면 sample이 그대로 반환되어 공휴일 5건이 파싱된다."
+      check:
+        type: noError
+        noError: "dryRun 경로는 requests를 호출하지 않으므로 키·네트워크 없이 끝나야 한다."
+        resultCheck: "공휴일 5건이 파싱되어야 한다."
+    check:
+      noError: "공휴일 받기·마감 순연이 끝나야 한다."
+      resultCheck: "27일 마감이 임시공휴일·설 연휴를 넘겨 1월 31일로 순연된다."
+
+  - id: practice
+    title: "5단계. 종합 실전 - 주문 CSV → 영업일 기준 마감일 CSV"
+    structuredPrimary: true
+    subtitle: "주문일 + 영업일 SLA = 도착예정일"
+    goal: "주문번호·주문일·SLA(영업일)가 담긴 CSV를 읽어 각 건의 도착예정일(영업일 기준)을 계산하고 CSV로 산출한다."
+    why: "공휴일 파싱(1·4)·영업일 판정(2)·N영업일 계산(3)을 하나로 묶어, 마감 때 그대로 돌리는 자동화로 완성한다. 입력 주문 목록 → 출력 마감일 표가 그날 바로 쓰인다."
+    explanation: |-
+      주문 CSV(주문번호·주문일·SLA 영업일 수)를 csv.DictReader로 읽고, 주문일을 date로 파싱한 뒤 addBusinessDays로 SLA 영업일만큼 더해 도착예정일을 구한다. 결과는 csv.DictWriter로 다시 CSV 문자열로 쓴다.
+
+      설 연휴 때문에 1월 23일(목) +2영업일과 1월 24일(금) +1영업일이 모두 1월 31일(금)로 모인다 - 달력을 손으로 세면 놓치기 쉬운 부분을 코드가 정확히 잡는다.
+    tips:
+      - "주문일 문자열은 datetime.strptime(..., '%Y-%m-%d').date()로 파싱한다."
+      - "산출 CSV는 io.StringIO로 만들어 파일·이메일·시트로 흘려보낼 수 있다(email·openpyxl 트랙과 결합)."
+    snippet: |-
+      import csv
+      import io
+      from datetime import date, datetime, timedelta
+
+      def isBusinessDay(d, holidays):
+          return d.weekday() < 5 and d not in holidays
+
+      def addBusinessDays(start, n, holidays):
+          step = 1 if n >= 0 else -1
+          remaining = abs(n)
+          current = start
+          while remaining > 0:
+              current += timedelta(days=step)
+              if isBusinessDay(current, holidays):
+                  remaining -= 1
+          return current
+
+      holidays = {date(2025, 1, 1), date(2025, 1, 27), date(2025, 1, 28), date(2025, 1, 29), date(2025, 1, 30)}
+
+      orderCsv = "order_no,order_date,sla_days\\nA-1,2025-01-23,2\\nA-2,2025-01-24,1\\n"
+      rows = []
+      for row in csv.DictReader(io.StringIO(orderCsv)):
+          ordered = datetime.strptime(row["order_date"], "%Y-%m-%d").date()
+          due = addBusinessDays(ordered, int(row["sla_days"]), holidays)
+          rows.append({"order_no": row["order_no"], "due_date": due.isoformat()})
+
+      output = io.StringIO()
+      writer = csv.DictWriter(output, fieldnames=["order_no", "due_date"])
+      writer.writeheader()
+      writer.writerows(rows)
+      dueCsv = output.getvalue()
+
+      assert rows[0]["due_date"] == "2025-01-31"
+      assert rows[1]["due_date"] == "2025-01-31"
+      assert "A-1,2025-01-31" in dueCsv
+      len(rows)
+    exercise:
+      prompt: "A-1의 SLA를 3영업일로 바꾸면 도착예정일이 며칠이 되는지 확인하세요. 설 연휴를 건너뛰어 2월 3일(월)이 됩니다."
+      starterCode: |-
+        import csv
+        import io
+        from datetime import date, datetime, timedelta
+
+        def isBusinessDay(d, holidays):
+            return d.weekday() < 5 and d not in holidays
+
+        def addBusinessDays(start, n, holidays):
+            step = 1 if n >= 0 else -1
+            remaining = abs(n)
+            current = start
+            while remaining > 0:
+                current += timedelta(days=step)
+                if isBusinessDay(current, holidays):
+                    remaining -= 1
+            return current
+
+        holidays = {date(2025, 1, 1), date(2025, 1, 27), date(2025, 1, 28), date(2025, 1, 29), date(2025, 1, 30)}
+
+        orderCsv = "order_no,order_date,sla_days\\nA-1,2025-01-23,___\\nA-2,2025-01-24,1\\n"
+        rows = []
+        for row in csv.DictReader(io.StringIO(orderCsv)):
+            ordered = datetime.strptime(row["order_date"], "%Y-%m-%d").date()
+            due = addBusinessDays(ordered, int(row["sla_days"]), holidays)
+            rows.append({"order_no": row["order_no"], "due_date": due.isoformat()})
+
+        assert rows[0]["due_date"] == "2025-02-03"
+        assert len(rows) == 2
+        rows[0]["due_date"]
+      solution: |-
+        import csv
+        import io
+        from datetime import date, datetime, timedelta
+
+        def isBusinessDay(d, holidays):
+            return d.weekday() < 5 and d not in holidays
+
+        def addBusinessDays(start, n, holidays):
+            step = 1 if n >= 0 else -1
+            remaining = abs(n)
+            current = start
+            while remaining > 0:
+                current += timedelta(days=step)
+                if isBusinessDay(current, holidays):
+                    remaining -= 1
+            return current
+
+        holidays = {date(2025, 1, 1), date(2025, 1, 27), date(2025, 1, 28), date(2025, 1, 29), date(2025, 1, 30)}
+
+        orderCsv = "order_no,order_date,sla_days\\nA-1,2025-01-23,3\\nA-2,2025-01-24,1\\n"
+        rows = []
+        for row in csv.DictReader(io.StringIO(orderCsv)):
+            ordered = datetime.strptime(row["order_date"], "%Y-%m-%d").date()
+            due = addBusinessDays(ordered, int(row["sla_days"]), holidays)
+            rows.append({"order_no": row["order_no"], "due_date": due.isoformat()})
+
+        assert rows[0]["due_date"] == "2025-02-03"
+        assert len(rows) == 2
+        rows[0]["due_date"]
+      hints:
+        - "빈칸에 3을 넣는다(영업일 3일)."
+        - "1/23 다음 영업일은 1/24, 그다음은 설 연휴를 건너뛴 1/31, 그다음이 2/3(월)이다."
+      check:
+        type: noError
+        noError: "전체 파이프라인이 예외 없이 끝나야 한다."
+        resultCheck: "A-1의 도착예정일이 2월 3일이어야 한다."
+    check:
+      noError: "주문 CSV → 마감일 CSV 파이프라인이 끝나야 한다."
+      resultCheck: "설 연휴로 1/23 +2영업일과 1/24 +1영업일이 모두 1월 31일로 모인다."
+
+    blocks:
+      - type: tip
+        content: "흔한 오개념: '영업일 +N'을 단순 +N일로 계산해 주말·공휴일을 넘기지 못한다. 또 공휴일을 코드에 하드코딩하면 대체·임시공휴일이 바뀌는 이듬해에 틀린다 - 그 해 공휴일은 특일정보 API로 받는다. 상태조회(번호만)와 달리 특일정보는 GET + solYear/solMonth 파라미터다."
+      - type: list
+        style: bullet
+        items:
+          - "세금계산서 발행기한(공급일 익월 10일, 휴일이면 익영업일 순연)을 nextBusinessDayOnOrAfter로 자동 산출."
+          - "마감 2영업일 전 알림: addBusinessDays(마감일, -2)로 사전 통보일을 계산해 email 트랙으로 발송."
+          - "연도별 공휴일을 한 번 받아 캐시(원자적 쓰기 트랙과 결합)하고, 매년 1월에 갱신."
+          - "여러 해에 걸친 SLA는 fetchHolidays를 연도별로 호출해 공휴일 집합을 합친다(set 합집합)."
+          - "배송·정산·급여 마감을 한 표로 묶어 watchSched로 매일 자동 실행하고 변화분만 통보."
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: requests_12-business-day-calculation-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - parse_holidays
+    - practice
+    title: 주말·공휴일을 제외한 영업일 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 시작·종료 포함 정책을 고정해 실제 영업일과 제외 사유를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 시작일과 종료일 포함 여부를 함수 계약으로 고정하세요.
+    - 주말과 공휴일이 겹쳐도 제외 사유 둘 다 남기세요.
+    exercise:
+      prompt: calculate_business_days(start_day, end_day, weekdays, holidays)를 완성하세요.
+      starterCode: |-
+        def calculate_business_days(start_day, end_day, weekdays, holidays):
+            raise NotImplementedError
+      solution: |
+        def calculate_business_days(start_day, end_day, weekdays, holidays):
+            if end_day < start_day or len(weekdays) <= end_day:
+                raise ValueError("invalid day range")
+            holiday_set = set(holidays)
+            business = []
+            excluded = []
+            for day in range(start_day, end_day + 1):
+                reasons = []
+                if weekdays[day] >= 5:
+                    reasons.append("weekend")
+                if day in holiday_set:
+                    reasons.append("holiday")
+                if reasons:
+                    excluded.append({"day": day, "reasons": reasons})
+                else:
+                    business.append(day)
+            return {"count": len(business), "businessDays": business, "excluded": excluded}
+      hints: *id001
+    check:
+      id: python.requests.requests_12.business-day-calculation.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.requests.requests_12.business-day-calculation.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: calculate_business_days
+        cases:
+        - id: excludes-weekend-and-holiday
+          arguments:
+          - value: 0
+          - value: 6
+          - value:
+            - 0
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+          - value:
+            - 2
+          expectedReturn:
+            count: 4
+            businessDays:
+            - 0
+            - 1
+            - 3
+            - 4
+            excluded:
+            - day: 2
+              reasons:
+              - holiday
+            - day: 5
+              reasons:
+              - weekend
+            - day: 6
+              reasons:
+              - weekend
+        - id: records-overlapping-reasons
+          arguments:
+          - value: 5
+          - value: 6
+          - value:
+            - 0
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+          - value:
+            - 5
+          expectedReturn:
+            count: 0
+            businessDays: []
+            excluded:
+            - day: 5
+              reasons:
+              - weekend
+              - holiday
+            - day: 6
+              reasons:
+              - weekend
+        - id: rejects-invalid-range
+          arguments:
+          - value: 2
+          - value: 1
+          - value:
+            - 0
+            - 1
+            - 2
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: requests_12-holiday-source-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - requests_12-business-day-calculation-mastery
+    title: 새 공휴일 데이터에 출처·연도 완전성 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 요청 연도와 source metadata, 중복 날짜를 검사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 공휴일 이름만 저장하지 말고 provider·조회 시각·대상 연도를 보존하세요.
+    - 다른 연도의 캐시를 정상 응답처럼 사용하지 마세요.
+    exercise:
+      prompt: audit_holiday_source(records, requested_year, source_meta)를 완성하세요.
+      starterCode: |-
+        def audit_holiday_source(records, requested_year, source_meta):
+            raise NotImplementedError
+      solution: |
+        def audit_holiday_source(records, requested_year, source_meta):
+            failures = []
+            if source_meta.get("year") != requested_year:
+                failures.append("year")
+            if not source_meta.get("provider") or not source_meta.get("retrievedAt"):
+                failures.append("provenance")
+            dates = [record["date"] for record in records]
+            duplicates = sorted({date for date in dates if dates.count(date) > 1})
+            if duplicates:
+                failures.append("duplicates")
+            wrong_year = sorted(date for date in dates if not date.startswith(f"{requested_year}-"))
+            if wrong_year:
+                failures.append("record-year")
+            return {"accepted": not failures, "failures": failures, "duplicates": duplicates, "wrongYear": wrong_year}
+      hints: *id002
+    check:
+      id: python.requests.requests_12.holiday-source-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.requests.requests_12.holiday-source-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_holiday_source
+        cases:
+        - id: accepts-provenanced-year
+          arguments:
+          - value:
+            - date: '2026-01-01'
+            - date: '2026-03-01'
+          - value: 2026
+          - value:
+              year: 2026
+              provider: public-api
+              retrievedAt: '2025-12-01'
+          expectedReturn:
+            accepted: true
+            failures: []
+            duplicates: []
+            wrongYear: []
+        - id: reports-stale-source-year
+          arguments:
+          - value:
+            - date: '2026-01-01'
+          - value: 2026
+          - value:
+              year: 2025
+              provider: public-api
+              retrievedAt: '2025-12-01'
+          expectedReturn:
+            accepted: false
+            failures:
+            - year
+            duplicates: []
+            wrongYear: []
+        - id: reports-provenance-duplicate-and-year
+          arguments:
+          - value:
+            - date: '2025-12-31'
+            - date: '2025-12-31'
+          - value: 2026
+          - value:
+              year: 2026
+          expectedReturn:
+            accepted: false
+            failures:
+            - provenance
+            - duplicates
+            - record-year
+            duplicates:
+            - '2025-12-31'
+            wrongYear:
+            - '2025-12-31'
+            - '2025-12-31'
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: requests_12-business-day-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - requests_12-holiday-source-audit-transfer
+    title: 공휴일 영업일 계산 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 달력 계산·출처 검증·장애 fallback을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - HTTP 성공과 업무 데이터의 유효성을 별도 근거로 판정하세요.
+    - 요청 action과 함께 재현 가능한 evidence와 남는 risk를 기록하세요.
+    exercise:
+      prompt: choose_business_day_policy(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_business_day_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_business_day_policy(situation):
+            table = {'calculation': {'action': 'apply explicit inclusive range', 'evidence': 'business days and excluded reasons', 'risk': 'off-by-one'}, 'source': {'action': 'validate year and provenance', 'evidence': 'provider retrievedAt records', 'risk': 'stale calendar'}, 'outage': {'action': 'use approved dated cache', 'evidence': 'cache age and warning', 'risk': 'unknown holiday change'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.requests.requests_12.business-day-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.requests.requests_12.business-day-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_business_day_policy
+        cases:
+        - id: recalls-calculation
+          arguments:
+          - value: calculation
+          expectedReturn:
+            action: apply explicit inclusive range
+            evidence: business days and excluded reasons
+            risk: off-by-one
+        - id: recalls-source
+          arguments:
+          - value: source
+          expectedReturn:
+            action: validate year and provenance
+            evidence: provider retrievedAt records
+            risk: stale calendar
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

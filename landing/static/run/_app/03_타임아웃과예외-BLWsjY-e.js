@@ -1,0 +1,700 @@
+var e=`meta:
+  id: procCtl_03
+  title: 타임아웃과 예외 처리
+  order: 3
+  category: procCtl
+  difficulty: easy
+  audience: 프로세스 자동화에 입문하는 Python 학습자
+  packages: []
+  tags:
+    - subprocess
+    - timeout
+    - exception
+intro:
+  direction: subprocess.run의 timeout 인자와 TimeoutExpired, CalledProcessError를 좁힌 예외 처리로 자동화에서 멈춤 사고와 실패 사고를 안전하게 다룬다.
+  benefits:
+    - timeout 인자로 멈춘 자식 프로세스를 잡는다.
+    - TimeoutExpired 예외에서 남은 자식 프로세스를 안전하게 종료한다.
+    - CalledProcessError와 TimeoutExpired를 분리해 다른 흐름으로 처리한다.
+    - 종합 처리 함수가 성공, 실패, 멈춤 세 결과를 dict로 분류한다.
+  diagram:
+    steps:
+      - label: 짧은 timeout 설정
+        detail: 자식이 1초보다 오래 걸리는 경우 timeout 인자로 자동 종료한다.
+      - label: TimeoutExpired 잡기
+        detail: 좁힌 except로 TimeoutExpired만 처리하고 좀비 프로세스를 정리한다.
+      - label: 실패와 멈춤 분리
+        detail: CalledProcessError는 실패, TimeoutExpired는 멈춤으로 다른 키에 기록한다.
+      - label: 종합 결과 분류
+        detail: 세 결과를 한 함수로 묶어 status 키에 success, failed, timeout 중 하나를 둔다.
+    runtime:
+      - label: 표준 라이브러리만
+        detail: subprocess와 sys만 사용해 외부 패키지가 필요 없다.
+      - label: assert 기반 검증
+        detail: timeout 발생과 returncode를 assert로 비교한다.
+sections:
+  - id: timeout-basic
+    title: 자식이 너무 오래 걸릴 때
+    structuredPrimary: true
+    subtitle: subprocess.run의 timeout
+    goal: 일부러 멈춰 있는 자식을 timeout 인자로 강제 종료한다.
+    why: 자동화 흐름이 외부 명령에서 멈추면 전체 사이클이 진행되지 않으므로 timeout 인자가 안전 핸들이다.
+    explanation: subprocess.run에 timeout 초가 지나면 TimeoutExpired 예외가 발생한다. 예외 객체는 cmd와 timeout 값을 모두 들고 있어 로그에 그대로 기록할 수 있다. 자식 프로세스는 라이브러리가 자동으로 종료 시그널을 보낸다.
+    tips:
+      - timeout은 부동소수도 받으므로 0.5초 같은 짧은 값도 가능하다.
+      - TimeoutExpired는 좁힌 예외이므로 except 절은 정확히 그 이름으로 잡는다.
+    snippet: |-
+      import subprocess
+      import sys
+
+      events = []
+      try:
+          subprocess.run(
+              [sys.executable, "-c", "import time; time.sleep(5)"],
+              timeout=0.3,
+          )
+      except subprocess.TimeoutExpired as exc:
+          events.append({"timeout": round(exc.timeout, 3), "cmd": exc.cmd[-1]})
+
+      assert events == [{"timeout": 0.3, "cmd": "import time; time.sleep(5)"}]
+      events
+    exercise:
+      prompt: 자식이 time.sleep(2)를 호출하도록 두고 timeout을 0.2초로 줘서 TimeoutExpired가 정확히 발생하는지 검증하세요.
+      starterCode: |-
+        import subprocess
+        import sys
+
+        events = []
+        try:
+            subprocess.run(
+                [sys.executable, "-c", "import time; time.sleep(___)"],
+                timeout=___,
+            )
+        except subprocess.TimeoutExpired as exc:
+            events.append({"timeout": round(exc.timeout, 3), "cmd": exc.cmd[-1]})
+
+        assert events == [{"timeout": 0.2, "cmd": "import time; time.sleep(2)"}]
+        events
+      solution: |-
+        import subprocess
+        import sys
+
+        events = []
+        try:
+            subprocess.run(
+                [sys.executable, "-c", "import time; time.sleep(2)"],
+                timeout=0.2,
+            )
+        except subprocess.TimeoutExpired as exc:
+            events.append({"timeout": round(exc.timeout, 3), "cmd": exc.cmd[-1]})
+
+        assert events == [{"timeout": 0.2, "cmd": "import time; time.sleep(2)"}]
+        events
+      hints:
+        - 자식 sleep 인자와 timeout 값은 본문에서 지정한 대로 2와 0.2다.
+        - exc.cmd[-1]은 -c 다음의 코드 문자열을 그대로 돌려준다.
+      check:
+        type: noError
+        noError: TimeoutExpired 좁힌 예외 처리가 정확히 발동해야 한다.
+        resultCheck: events 리스트가 본문 기대값과 정확히 같아야 한다.
+    check:
+      noError: TimeoutExpired 좁힌 예외가 발생하고 잡혀야 한다.
+      resultCheck: events 리스트가 timeout 0.3과 자식 명령 문자열을 정확히 담아야 한다.
+  - id: capture-after-timeout
+    title: 타임아웃 후 출력 복원
+    structuredPrimary: true
+    subtitle: stdout 일부 보존
+    goal: 자식이 타임아웃되더라도 그 시점까지 남긴 stdout 부분을 보존해 로그로 기록한다.
+    why: 자동화 진단에서 멈추기 전에 자식이 어디까지 진행했는지 알 수 있으면 사고 분석이 훨씬 빨라진다.
+    explanation: TimeoutExpired 예외 객체에는 stdout과 stderr 속성이 있다. capture_output=True를 켰을 때 예외 시점까지의 출력이 들어 있다. 자식이 멈추기 전에 남긴 print 결과를 그대로 받을 수 있어 흔히 progress 표시 용도로 쓰인다.
+    tips:
+      - flush=True를 print에 주면 stdout이 즉시 자식 밖으로 빠져 나간다.
+      - TimeoutExpired.stdout은 bytes 또는 text 모드 설정에 따라 형이 다르다.
+      - 부분 출력을 보려면 timeout이 자식의 첫 출력 시점보다 길어야 한다. 너무 짧으면 자식이 인터프리터를 띄우기도 전에 잘려 stdout이 빈다.
+    snippet: |-
+      import subprocess
+      import sys
+
+      script = "import time, sys; print('start', flush=True); time.sleep(30); print('end')"
+      collected = None
+      try:
+          subprocess.run(
+              [sys.executable, "-c", script],
+              timeout=8.0,
+              capture_output=True,
+              text=True,
+          )
+      except subprocess.TimeoutExpired as exc:
+          collected = (exc.stdout or "").strip()
+
+      assert collected == "start"
+      collected
+    exercise:
+      prompt: 자식이 "running"을 출력한 뒤 sleep으로 멈추도록 만들고 TimeoutExpired에서 stdout이 "running"으로 잡히는지 검증하세요.
+      starterCode: |-
+        import subprocess
+        import sys
+
+        script = "import time, sys; print('___', flush=True); time.sleep(30)"
+        collected = None
+        try:
+            subprocess.run(
+                [sys.executable, "-c", script],
+                timeout=8.0,
+                capture_output=___,
+                text=True,
+            )
+        except subprocess.TimeoutExpired as exc:
+            collected = (exc.stdout or "").strip()
+
+        assert collected == "running"
+        collected
+      solution: |-
+        import subprocess
+        import sys
+
+        script = "import time, sys; print('running', flush=True); time.sleep(30)"
+        collected = None
+        try:
+            subprocess.run(
+                [sys.executable, "-c", script],
+                timeout=8.0,
+                capture_output=True,
+                text=True,
+            )
+        except subprocess.TimeoutExpired as exc:
+            collected = (exc.stdout or "").strip()
+
+        assert collected == "running"
+        collected
+      hints:
+        - 자식 print 문자열을 "running"으로 두면 collected와 비교가 통과한다.
+        - capture_output=True를 켜야 TimeoutExpired 객체에 stdout이 들어간다.
+      check:
+        type: noError
+        noError: TimeoutExpired 발생과 예외 객체 stdout 접근이 끝나야 한다.
+        resultCheck: collected가 "running"과 정확히 같아야 한다.
+    check:
+      noError: 부분 출력 보존 흐름이 정상적으로 끝나야 한다.
+      resultCheck: collected가 "start" 문자열을 포함해 타임아웃 직전 출력을 보존해야 한다.
+  - id: differentiate-errors
+    title: 실패와 멈춤 분기
+    structuredPrimary: true
+    subtitle: CalledProcessError vs TimeoutExpired
+    goal: 자식 실행 결과를 success, failed, timeout 세 분기로 처리한다.
+    why: 자동화는 각 분기에 다른 후속 작업이 따라오므로 예외 종류를 정확히 분리하는 것이 큰 차이를 만든다.
+    explanation: try 블록 안에 subprocess.run을 호출하고 except 절을 두 개로 분리한다. TimeoutExpired는 멈춤 분기, CalledProcessError는 실패 분기, try의 정상 경로는 성공 분기다. 결과 dict는 status 키에 셋 중 하나를 두어 다음 단계가 분기를 그대로 사용할 수 있게 한다.
+    tips:
+      - 두 except 절은 좁힌 예외만 받게 두고 그 외 예외는 잡지 않는다.
+      - status 값은 항상 동일한 세 문자열로 두어 후속 코드가 비교하기 쉬워진다.
+    snippet: |-
+      import subprocess
+      import sys
+
+
+      def runOnce(script: str, timeoutSeconds: float) -> dict:
+          try:
+              result = subprocess.run(
+                  [sys.executable, "-c", script],
+                  timeout=timeoutSeconds,
+                  capture_output=True,
+                  text=True,
+                  check=True,
+              )
+              return {"status": "success", "returncode": result.returncode}
+          except subprocess.TimeoutExpired:
+              return {"status": "timeout", "returncode": None}
+          except subprocess.CalledProcessError as exc:
+              return {"status": "failed", "returncode": exc.returncode}
+
+
+      summary = {
+          "ok": runOnce("print('ok')", 10.0),
+          "slow": runOnce("import time; time.sleep(5)", 0.2),
+          "fail": runOnce("import sys; sys.exit(3)", 10.0),
+      }
+
+      assert summary["ok"]["status"] == "success"
+      assert summary["slow"]["status"] == "timeout"
+      assert summary["fail"]["status"] == "failed"
+      summary
+    exercise:
+      prompt: runOnce를 호출해 sys.exit(4)는 failed 분기로 가고 sleep(3)에 timeout 0.2초는 timeout 분기로 가는지 검증하세요.
+      starterCode: |-
+        import subprocess
+        import sys
+
+
+        def runOnce(script: str, timeoutSeconds: float) -> dict:
+            try:
+                result = subprocess.run(
+                    [sys.executable, "-c", script],
+                    timeout=timeoutSeconds,
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                )
+                return {"status": "success", "returncode": result.returncode}
+            except subprocess.___:
+                return {"status": "timeout", "returncode": None}
+            except subprocess.___ as exc:
+                return {"status": "failed", "returncode": exc.returncode}
+
+
+        first = runOnce("import sys; sys.exit(4)", 10.0)
+        second = runOnce("import time; time.sleep(3)", 0.2)
+
+        assert first == {"status": "failed", "returncode": 4}
+        assert second == {"status": "timeout", "returncode": None}
+        {"first": first, "second": second}
+      solution: |-
+        import subprocess
+        import sys
+
+
+        def runOnce(script: str, timeoutSeconds: float) -> dict:
+            try:
+                result = subprocess.run(
+                    [sys.executable, "-c", script],
+                    timeout=timeoutSeconds,
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                )
+                return {"status": "success", "returncode": result.returncode}
+            except subprocess.TimeoutExpired:
+                return {"status": "timeout", "returncode": None}
+            except subprocess.CalledProcessError as exc:
+                return {"status": "failed", "returncode": exc.returncode}
+
+
+        first = runOnce("import sys; sys.exit(4)", 10.0)
+        second = runOnce("import time; time.sleep(3)", 0.2)
+
+        assert first == {"status": "failed", "returncode": 4}
+        assert second == {"status": "timeout", "returncode": None}
+        {"first": first, "second": second}
+      hints:
+        - 첫 번째 except 이름은 subprocess.TimeoutExpired다.
+        - 두 번째 except 이름은 subprocess.CalledProcessError다.
+      check:
+        type: noError
+        noError: 두 분기 호출이 좁힌 예외 처리로 끝나야 한다.
+        resultCheck: first는 status failed, second는 status timeout으로 분류되어야 한다.
+    check:
+      noError: 세 가지 경우 모두 분기 처리가 정상적으로 끝나야 한다.
+      resultCheck: summary의 세 status 값이 success, timeout, failed로 각각 분류되어야 한다.
+  - id: status-summary
+    title: 종합 status 분류 정리
+    structuredPrimary: true
+    subtitle: dict 한 개로 한 사이클 보고
+    goal: 여러 명령을 한 번에 실행한 결과를 status별로 분류해 보고 dict로 정리한다.
+    why: 자동화 배치 작업은 명령 단위 결과보다 전체 사이클의 통계 보고가 다음 의사결정에 직접 사용된다.
+    explanation: 마지막 섹션은 입력 명령 목록을 받아 각 명령을 runOnce로 실행한 뒤 결과를 status별 리스트로 분류한다. successList, failedList, timeoutList 세 키를 가진 종합 보고는 운영자가 한 화면에서 한 사이클을 이해할 수 있게 한다. 동일 입력에 대한 두 번째 실행은 같은 분류를 만들어야 한다.
+    tips:
+      - 종합 보고 dict의 키 이름을 고정하면 운영 화면이 흔들리지 않는다.
+      - 리스트 내부 항목은 명령 식별자만 두어 보고가 길어지지 않게 한다.
+    snippet: |-
+      import subprocess
+      import sys
+
+
+      def runOnce(name: str, script: str, timeoutSeconds: float) -> dict:
+          try:
+              subprocess.run(
+                  [sys.executable, "-c", script],
+                  timeout=timeoutSeconds,
+                  capture_output=True,
+                  text=True,
+                  check=True,
+              )
+              return {"name": name, "status": "success"}
+          except subprocess.TimeoutExpired:
+              return {"name": name, "status": "timeout"}
+          except subprocess.CalledProcessError:
+              return {"name": name, "status": "failed"}
+
+
+      def summarizeBatch(jobs: list[dict]) -> dict:
+          buckets = {"success": [], "failed": [], "timeout": []}
+          for job in jobs:
+              result = runOnce(job["name"], job["script"], job["timeout"])
+              buckets[result["status"]].append(result["name"])
+          return buckets
+
+
+      summary = summarizeBatch([
+          {"name": "ok", "script": "print(1)", "timeout": 10.0},
+          {"name": "slow", "script": "import time; time.sleep(5)", "timeout": 0.2},
+          {"name": "fail", "script": "import sys; sys.exit(2)", "timeout": 10.0},
+      ])
+
+      assert summary == {"success": ["ok"], "failed": ["fail"], "timeout": ["slow"]}
+      summary
+    exercise:
+      prompt: summarizeBatch에 두 개의 ok 작업과 한 개의 fail 작업을 넘기면 success 리스트에 두 이름이 들어가고 failed 리스트에 한 이름이 들어가는지 종합 검증하세요.
+      starterCode: |-
+        import subprocess
+        import sys
+
+
+        def runOnce(name: str, script: str, timeoutSeconds: float) -> dict:
+            try:
+                subprocess.run(
+                    [sys.executable, "-c", script],
+                    timeout=timeoutSeconds,
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                )
+                return {"name": name, "status": "success"}
+            except subprocess.TimeoutExpired:
+                return {"name": name, "status": "timeout"}
+            except subprocess.CalledProcessError:
+                return {"name": name, "status": "failed"}
+
+
+        def summarizeBatch(jobs: list[dict]) -> dict:
+            buckets = {"success": [], "failed": [], "timeout": []}
+            for job in jobs:
+                result = runOnce(job["name"], job["script"], job["timeout"])
+                buckets[result["___"]].append(result["name"])
+            return buckets
+
+
+        summary = summarizeBatch([
+            {"name": "alpha", "script": "print(0)", "timeout": 10.0},
+            {"name": "beta", "script": "print(1)", "timeout": 10.0},
+            {"name": "gamma", "script": "import sys; sys.exit(9)", "timeout": 10.0},
+        ])
+
+        assert summary == {"success": ["alpha", "beta"], "failed": ["gamma"], "timeout": []}
+        summary
+      solution: |-
+        import subprocess
+        import sys
+
+
+        def runOnce(name: str, script: str, timeoutSeconds: float) -> dict:
+            try:
+                subprocess.run(
+                    [sys.executable, "-c", script],
+                    timeout=timeoutSeconds,
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                )
+                return {"name": name, "status": "success"}
+            except subprocess.TimeoutExpired:
+                return {"name": name, "status": "timeout"}
+            except subprocess.CalledProcessError:
+                return {"name": name, "status": "failed"}
+
+
+        def summarizeBatch(jobs: list[dict]) -> dict:
+            buckets = {"success": [], "failed": [], "timeout": []}
+            for job in jobs:
+                result = runOnce(job["name"], job["script"], job["timeout"])
+                buckets[result["status"]].append(result["name"])
+            return buckets
+
+
+        summary = summarizeBatch([
+            {"name": "alpha", "script": "print(0)", "timeout": 10.0},
+            {"name": "beta", "script": "print(1)", "timeout": 10.0},
+            {"name": "gamma", "script": "import sys; sys.exit(9)", "timeout": 10.0},
+        ])
+
+        assert summary == {"success": ["alpha", "beta"], "failed": ["gamma"], "timeout": []}
+        summary
+      hints:
+        - 분류 키 이름은 result 객체의 status 속성을 그대로 사용한다.
+        - 세 명령 중 두 개는 성공, 한 개는 실패이므로 timeout 리스트는 빈 채 남는다.
+      check:
+        type: noError
+        noError: summarizeBatch 호출이 KeyError 없이 끝나야 한다.
+        resultCheck: 종합 결과 dict가 success 두 개와 failed 한 개를 정확히 분류해야 한다.
+    check:
+      noError: 종합 분류 함수와 세 작업 실행이 한 흐름에서 끝나야 한다.
+      resultCheck: summary가 success ok, failed fail, timeout slow 세 키 분류를 정확히 보고해야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: procCtl_03-timeout-outcome-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - timeout-basic
+    - status-summary
+    title: timeout과 partial output 결과 판정하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 시간 초과·종료 확인·부분 산출물 오염을 별도 실패로 기록한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - TimeoutExpired 발생 자체보다 child 종료 확인과 partial artifact 처리가 중요합니다.
+    - 부분 파일은 정상 output과 분리해 quarantine 목록으로 남기세요.
+    exercise:
+      prompt: audit_timeout_outcome(outcome, expected_timeout_ms)를 완성하세요.
+      starterCode: |-
+        def audit_timeout_outcome(outcome, expected_timeout_ms):
+            raise NotImplementedError
+      solution: |
+        def audit_timeout_outcome(outcome, expected_timeout_ms):
+            if expected_timeout_ms <= 0:
+                raise ValueError("timeout must be positive")
+            failures = []
+            if outcome.get("durationMs", 0) > expected_timeout_ms or outcome.get("timedOut", False):
+                failures.append("timeout")
+            if outcome.get("timedOut", False) and not outcome.get("terminated", False):
+                failures.append("not-terminated")
+            if outcome.get("timedOut", False) and outcome.get("partialArtifacts"):
+                failures.append("partial-artifacts")
+            return {"accepted": not failures, "failures": failures, "partialArtifacts": sorted(outcome.get("partialArtifacts", [])), "durationMs": outcome.get("durationMs", 0)}
+      hints: *id001
+    check:
+      id: python.procctl.procCtl_03.timeout-outcome-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_03.timeout-outcome-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_timeout_outcome
+        cases:
+        - id: accepts-bounded-completion
+          arguments:
+          - value:
+              durationMs: 90
+              timedOut: false
+          - value: 100
+          expectedReturn:
+            accepted: true
+            failures: []
+            partialArtifacts: []
+            durationMs: 90
+        - id: reports-unterminated-timeout
+          arguments:
+          - value:
+              durationMs: 150
+              timedOut: true
+              terminated: false
+              partialArtifacts:
+              - output.tmp
+          - value: 100
+          expectedReturn:
+            accepted: false
+            failures:
+            - timeout
+            - not-terminated
+            - partial-artifacts
+            partialArtifacts:
+            - output.tmp
+            durationMs: 150
+        - id: reports-duration-overrun
+          arguments:
+          - value:
+              durationMs: 101
+              timedOut: false
+          - value: 100
+          expectedReturn:
+            accepted: false
+            failures:
+            - timeout
+            partialArtifacts: []
+            durationMs: 101
+        - id: rejects-zero-timeout
+          arguments:
+          - value: {}
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: procCtl_03-retryable-process-failure-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - procCtl_03-timeout-outcome-audit-mastery
+    title: 새 외부 도구 실패에 재시도 정책 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 실패 class와 idempotency로 재시도 가능 여부를 판정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - timeout이라고 무조건 재시도하지 말고 작업의 idempotency를 먼저 확인하세요.
+    - 인자 계약 오류는 backoff로 고쳐지지 않으므로 즉시 중단하세요.
+    exercise:
+      prompt: classify_process_retry(failure, idempotent, attempt, maximum_attempts)를 완성하세요.
+      starterCode: |-
+        def classify_process_retry(failure, idempotent, attempt, maximum_attempts):
+            raise NotImplementedError
+      solution: |
+        def classify_process_retry(failure, idempotent, attempt, maximum_attempts):
+            if attempt <= 0 or maximum_attempts <= 0:
+                raise ValueError("attempts must be positive")
+            retryable_failure = failure in {"timeout", "temporary-unavailable", "resource-busy"}
+            retry = idempotent and retryable_failure and attempt < maximum_attempts
+            return {"retry": retry, "reason": "retryable" if retry else "stop", "remaining": max(0, maximum_attempts - attempt)}
+      hints: *id002
+    check:
+      id: python.procctl.procCtl_03.retryable-process-failure.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_03.retryable-process-failure.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: classify_process_retry
+        cases:
+        - id: retries-idempotent-timeout
+          arguments:
+          - value: timeout
+          - value: true
+          - value: 1
+          - value: 3
+          expectedReturn:
+            retry: true
+            reason: retryable
+            remaining: 2
+        - id: stops-non-idempotent-timeout
+          arguments:
+          - value: timeout
+          - value: false
+          - value: 1
+          - value: 3
+          expectedReturn:
+            retry: false
+            reason: stop
+            remaining: 2
+        - id: stops-contract-error
+          arguments:
+          - value: invalid-argument
+          - value: true
+          - value: 1
+          - value: 3
+          expectedReturn:
+            retry: false
+            reason: stop
+            remaining: 2
+        - id: stops-at-limit
+          arguments:
+          - value: timeout
+          - value: true
+          - value: 3
+          - value: 3
+          expectedReturn:
+            retry: false
+            reason: stop
+            remaining: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: procCtl_03-timeout-recovery-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - procCtl_03-retryable-process-failure-transfer
+    title: process timeout 복구 순서 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 종료·부분 산출물·재시도 판단을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - process 실행 성공과 업무 결과물 성공을 같은 것으로 처리하지 마세요.
+    - 명령 identity·제한 시간·산출물 evidence·남는 risk를 함께 기록하세요.
+    exercise:
+      prompt: choose_timeout_recovery(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_timeout_recovery(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_timeout_recovery(situation):
+            table = {'terminate': {'action': 'stop owned process tree', 'evidence': 'termination confirmation', 'risk': 'orphan child'}, 'cleanup': {'action': 'quarantine partial artifacts', 'evidence': 'partial path list', 'risk': 'stale output reuse'}, 'retry': {'action': 'check idempotency and failure class', 'evidence': 'attempt ledger', 'risk': 'duplicate side effect'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.procctl.procCtl_03.timeout-recovery-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_03.timeout-recovery-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_timeout_recovery
+        cases:
+        - id: recalls-terminate
+          arguments:
+          - value: terminate
+          expectedReturn:
+            action: stop owned process tree
+            evidence: termination confirmation
+            risk: orphan child
+        - id: recalls-cleanup
+          arguments:
+          - value: cleanup
+          expectedReturn:
+            action: quarantine partial artifacts
+            evidence: partial path list
+            risk: stale output reuse
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

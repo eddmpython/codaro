@@ -1,0 +1,761 @@
+var e=`meta:
+  id: xlwings_07
+  title: 영화 박스오피스 표와 동적 합계
+  order: 7
+  category: xlwings
+  badge: 중급
+  difficulty: medium
+  audience: 차트 자동화까지 익혔고, 표 자체를 Excel 객체로 다루고 싶은 학습자
+  packages:
+    - xlwings
+    - pandas
+  tags:
+    - xlwings
+    - tables
+    - ListObject
+    - totals
+    - 동적합계
+  seo:
+    title: 영화 박스오피스 표 자동 - xlwings sheet.tables.add와 합계 행
+    description: 영화 박스오피스 데이터를 Excel 표(ListObject)로 승격하고 totals_row와 SUBTOTAL로 동적 합계를 자동화한다.
+    keywords:
+      - xlwings
+      - tables
+      - ListObject
+      - 박스오피스
+      - SUBTOTAL
+intro:
+  direction: 영화 박스오피스 데이터를 Excel "표"(ListObject)로 승격하고, 영화가 추가될 때마다 합계 행이 자동으로 따라오는 동적 합계 자동화를 만든다.
+  benefits:
+    - "sheet.tables.add()로 일반 범위를 Excel 표로 승격해 정렬·필터·확장 동작을 자동으로 얻는다."
+    - "table.show_totals = True와 XlTotalsCalculation 상수(0=None, 1=Avg, 2=Count, 4=Min, 5=Max, 6=Sum)로 표 크기 변화에 자동 대응하는 합계 행을 만든다."
+    - 표 스타일(table_style_medium 시리즈)을 코드로 지정해 시각 일관성을 확보한다.
+    - 다음 레슨의 다중 워크북 합치기에 쓰일 "표 구조"를 코드로 다루는 감각을 굳힌다.
+  diagram:
+    steps:
+      - label: 1단계. 박스오피스를 Excel 표로 승격
+        detail: 데이터를 시트에 쓰고 sheet.tables.add로 ListObject를 만든다.
+      - label: 2단계. 합계 행 + SUBTOTAL 동적 합계
+        detail: show_totals = True와 TotalsCalculation으로 영화가 추가되어도 자동 갱신되는 합계를 만든다.
+      - label: 3단계. 표 확장과 합계 자동 갱신
+        detail: 표 아래에 신작 영화를 추가해 합계가 자동으로 새 값을 반영하는지 확인한다.
+      - label: 4단계. 실습
+        detail: 분기 박스오피스와 배우별 출연작 표 두 시나리오를 다룬다.
+    runtime:
+      - label: 환경 확인
+        detail: xlwings와 pandas가 모두 import 가능해야 한다.
+      - label: 표 이름 결정
+        detail: 표 이름은 워크북 안에서 unique해야 한다. boxOfficeTable, actorTable 같은 패턴을 쓴다.
+      - label: 시각 검증
+        detail: 표 스타일이 적용된 모양은 visible=True로 직접 확인한다.
+sections:
+  - id: promote-to-table
+    title: 1단계. 박스오피스 데이터를 Excel 표로 승격
+    structuredPrimary: true
+    subtitle: sheet.tables.add(source, name)
+    goal: 영화 박스오피스 DataFrame을 시트에 입력한 영역을 sheet.tables.add로 Excel 표(ListObject)로 승격한다.
+    why: 일반 범위는 정렬과 필터를 사용자가 매번 지정해야 한다. 표로 승격하면 정렬·필터·확장이 자동으로 따라오고, 코드에서도 이름으로 접근할 수 있다.
+    explanation: |-
+      sheet.tables.add(source, name)는 지정한 영역을 Excel 표로 승격합니다. source는 헤더를 포함한 영역, name은 표의 고유 이름입니다.
+      한 번 표가 되면 새 행을 추가할 때 자동으로 표 영역이 확장되고, 헤더에 자동으로 필터가 붙고, 표 스타일이 적용됩니다. 코드에서는 sheet.tables["name"]으로 접근합니다.
+      표 객체는 .range(전체 영역), .data_body_range(헤더 제외), .header_row_range(헤더), .totals_row_range(합계 행) 같은 속성을 가집니다.
+    tips:
+      - 표 이름은 sheet 단위가 아니라 book 단위로 unique해야 합니다. 충돌하면 ValueError가 납니다.
+      - table.table_style로 스타일을 바꿀 수 있습니다. "TableStyleMedium2"가 기본값이고, 1~28번까지 있습니다.
+    snippet: |-
+      import pandas as pd
+      import xlwings as xw
+
+      boxOfficeDf = pd.DataFrame({
+          "title": ["기생충", "범죄도시2", "한산", "헌트", "공조2"],
+          "audience": [10310000, 12692000, 7263000, 4351000, 6982000],
+          "revenue": [85900000000, 130020000000, 76300000000, 41080000000, 71290000000],
+      })
+
+      with xw.App(visible=False) as tApp:
+          tBook = tApp.books.add()
+          tSheet = tBook.sheets.active
+          tSheet.name = "boxOffice"
+          tSheet["A1"].options(index=False).value = boxOfficeDf
+
+          sourceRange = tSheet["A1"].expand("table")
+          boxTable = tSheet.tables.add(source=sourceRange, name="boxOfficeTable")
+
+          tableName = boxTable.name
+          tableHeaders = boxTable.header_row_range.value
+          dataRowCount = boxTable.data_body_range.rows.count
+
+      assert tableName == "boxOfficeTable"
+      assert tableHeaders == ["title", "audience", "revenue"]
+      assert dataRowCount == 5
+      {"name": tableName, "headers": tableHeaders, "rows": dataRowCount}
+    exercise:
+      prompt: boxOfficeDf에 신작 한 편을 추가하고, 표로 승격한 뒤 data_body_range의 행 수가 6이 되는지 확인하세요.
+      starterCode: |-
+        import pandas as pd
+        import xlwings as xw
+
+        boxOfficeDf = pd.DataFrame({
+            "title": ["기생충", "범죄도시2", "한산", "헌트", "공조2", "___"],
+            "audience": [10310000, 12692000, 7263000, 4351000, 6982000, ___],
+            "revenue": [85900000000, 130020000000, 76300000000, 41080000000, 71290000000, ___],
+        })
+
+        with xw.App(visible=False) as tApp:
+            tBook = tApp.books.add()
+            tSheet = tBook.sheets.active
+            tSheet.name = "boxOffice"
+            tSheet["A1"].options(index=False).value = boxOfficeDf
+
+            sourceRange = tSheet["A1"].expand("table")
+            boxTable = tSheet.tables.add(source=sourceRange, name="boxOfficeTable")
+            dataRowCount = boxTable.data_body_range.rows.count
+
+        assert dataRowCount == 6
+        dataRowCount
+      solution: |-
+        import pandas as pd
+        import xlwings as xw
+
+        boxOfficeDf = pd.DataFrame({
+            "title": ["기생충", "범죄도시2", "한산", "헌트", "공조2", "올빼미"],
+            "audience": [10310000, 12692000, 7263000, 4351000, 6982000, 3287000],
+            "revenue": [85900000000, 130020000000, 76300000000, 41080000000, 71290000000, 31200000000],
+        })
+
+        with xw.App(visible=False) as tApp:
+            tBook = tApp.books.add()
+            tSheet = tBook.sheets.active
+            tSheet.name = "boxOffice"
+            tSheet["A1"].options(index=False).value = boxOfficeDf
+
+            sourceRange = tSheet["A1"].expand("table")
+            boxTable = tSheet.tables.add(source=sourceRange, name="boxOfficeTable")
+            dataRowCount = boxTable.data_body_range.rows.count
+
+        assert dataRowCount == 6
+        dataRowCount
+      hints:
+        - DataFrame의 모든 컬럼이 같은 길이여야 합니다.
+        - tables.add의 source는 expand로 잡은 영역을 그대로 받습니다. 행 수가 자동 맞춰집니다.
+    check:
+      noError: tables.add가 ValueError 없이 끝나고 헤더와 데이터 영역에 접근할 수 있어야 합니다.
+      resultCheck: 표 이름, 헤더, 데이터 행 수가 입력 데이터와 정확히 일치해야 합니다.
+
+  - id: totals-row
+    title: 2단계. 합계 행과 SUBTOTAL 함수
+    structuredPrimary: true
+    subtitle: show_totals + TotalsCalculation
+    goal: 표의 show_totals를 True로 켜고 각 컬럼의 합계 함수를 XlTotalsCalculation 상수로 설정해 자동 합계 행을 만든다.
+    why: 일반 SUM 수식은 범위가 고정이지만 표의 SUBTOTAL은 표 구조와 함께 자동 확장된다. 영화가 추가되면 누적 관객·매출이 따라온다.
+    explanation: |-
+      table.show_totals = True를 호출하면 표 맨 아래에 합계 행이 자동으로 추가됩니다. 처음에는 비어 있고, 각 컬럼별로 어떤 합산 함수를 쓸지 지정해야 합니다.
+      table.range.api.ListColumns(컬럼인덱스).TotalsCalculation = 합산코드로 각 컬럼의 함수를 정합니다. 0=None, 1=Average, 2=Count, 3=CountNums, 4=Min, 5=Max, 6=Sum, 7=StdDev, 8=Var, 9=Custom. 이 상수는 Excel의 XlTotalsCalculation 열거값과 같습니다.
+      이 합산은 일반 SUM이 아니라 SUBTOTAL(9, ...) 함수로 들어가서 필터링된 행만 합치는 동작을 자동으로 합니다.
+    tips:
+      - 한국어 Excel에서도 API 코드는 같은 번호를 씁니다. 6=합계가 가장 자주 쓰입니다.
+      - 합계 행의 첫 컬럼(보통 title, name 등)에는 "합계", "Total" 같은 라벨을 직접 넣어야 보입니다.
+    snippet: |-
+      import pandas as pd
+      import xlwings as xw
+
+      boxOfficeDf = pd.DataFrame({
+          "title": ["기생충", "범죄도시2", "한산", "헌트", "공조2"],
+          "audience": [10310000, 12692000, 7263000, 4351000, 6982000],
+          "revenue": [85900000000, 130020000000, 76300000000, 41080000000, 71290000000],
+      })
+
+      with xw.App(visible=False) as totApp:
+          totBook = totApp.books.add()
+          totSheet = totBook.sheets.active
+          totSheet.name = "boxOffice"
+          totSheet["A1"].options(index=False).value = boxOfficeDf
+
+          totTable = totSheet.tables.add(source=totSheet["A1"].expand("table"), name="boxOfficeTable")
+          totTable.show_totals = True
+          totTable.range.api.ListColumns(1).TotalsCalculation = 0
+          totTable.range.api.ListColumns(2).TotalsCalculation = 6
+          totTable.range.api.ListColumns(3).TotalsCalculation = 6
+          totTable.totals_row_range[0, 0].value = "합계"
+
+          totApp.calculate()
+          audienceTotal = int(totTable.totals_row_range[0, 1].value)
+          revenueTotal = int(totTable.totals_row_range[0, 2].value)
+
+      assert audienceTotal == 41598000
+      assert revenueTotal == 404590000000
+      {"audienceTotal": audienceTotal, "revenueTotal": revenueTotal}
+    exercise:
+      prompt: 4번째 컬럼 "perTicketRevenue"를 추가하고, 그 컬럼의 합계 행에는 평균(코드 1)을 적용하세요.
+      starterCode: |-
+        import pandas as pd
+        import xlwings as xw
+
+        boxOfficeDf = pd.DataFrame({
+            "title": ["기생충", "범죄도시2", "한산"],
+            "audience": [10310000, 12692000, 7263000],
+            "revenue": [85900000000, 130020000000, 76300000000],
+            "perTicketRevenue": [8331, 10245, 10505],
+        })
+
+        with xw.App(visible=False) as totApp:
+            totBook = totApp.books.add()
+            totSheet = totBook.sheets.active
+            totSheet.name = "boxOffice"
+            totSheet["A1"].options(index=False).value = boxOfficeDf
+
+            totTable = totSheet.tables.add(source=totSheet["A1"].expand("table"), name="boxOfficeTable")
+            totTable.show_totals = True
+            totTable.range.api.ListColumns(1).TotalsCalculation = 0
+            totTable.range.api.ListColumns(2).TotalsCalculation = 6
+            totTable.range.api.ListColumns(3).TotalsCalculation = 6
+            totTable.range.api.ListColumns(4).TotalsCalculation = ___
+
+            totApp.calculate()
+            unitAvg = totTable.totals_row_range[0, 3].value
+
+        assert 8000 < float(unitAvg) < 11000
+        unitAvg
+      solution: |-
+        import pandas as pd
+        import xlwings as xw
+
+        boxOfficeDf = pd.DataFrame({
+            "title": ["기생충", "범죄도시2", "한산"],
+            "audience": [10310000, 12692000, 7263000],
+            "revenue": [85900000000, 130020000000, 76300000000],
+            "perTicketRevenue": [8331, 10245, 10505],
+        })
+
+        with xw.App(visible=False) as totApp:
+            totBook = totApp.books.add()
+            totSheet = totBook.sheets.active
+            totSheet.name = "boxOffice"
+            totSheet["A1"].options(index=False).value = boxOfficeDf
+
+            totTable = totSheet.tables.add(source=totSheet["A1"].expand("table"), name="boxOfficeTable")
+            totTable.show_totals = True
+            totTable.range.api.ListColumns(1).TotalsCalculation = 0
+            totTable.range.api.ListColumns(2).TotalsCalculation = 6
+            totTable.range.api.ListColumns(3).TotalsCalculation = 6
+            totTable.range.api.ListColumns(4).TotalsCalculation = 1
+
+            totApp.calculate()
+            unitAvg = totTable.totals_row_range[0, 3].value
+
+        assert 8000 < float(unitAvg) < 11000
+        unitAvg
+      hints:
+        - 코드 6=합계, 1=평균입니다. perTicketRevenue 평균은 (8331+10245+10505)/3 ≈ 9694.
+        - SUBTOTAL의 첫 인자가 함수 코드입니다. 9=SUM, 1=AVERAGE 등 Excel SUBTOTAL과 코드 체계가 같습니다.
+    check:
+      noError: show_totals 설정과 TotalsCalculation 코드 지정이 AttributeError 없이 끝나야 합니다.
+      resultCheck: 합계 행에 각 컬럼별 함수가 적용되어 의도한 합산/평균 값이 나와야 합니다.
+
+  - id: dynamic-rows
+    title: 3단계. 표 확장과 합계 자동 갱신
+    structuredPrimary: true
+    subtitle: 신작 영화를 추가하면 합계가 따라온다
+    goal: 박스오피스 표의 마지막 데이터 행 아래에 신작을 추가하면 합계 행이 자동으로 갱신되는 것을 확인한다.
+    why: 일반 SUM 수식은 추가된 행을 포함하지 못한다. SUBTOTAL은 표 영역이 확장되면 자동으로 같이 확장되어 새 합계가 나온다.
+    explanation: |-
+      Excel 표는 영역이 동적입니다. 마지막 데이터 행 바로 아래(합계 행 바로 위)에 값을 쓰면 표가 자동으로 한 행 늘어나고, 합계 행도 한 칸 아래로 밀려나며 새 값을 포함한 합계를 계산합니다.
+      이 동작은 사용자가 손으로 행을 추가했을 때와 동일합니다. 자동화 코드에서도 같은 방식으로 사용합니다.
+      table.data_body_range.last_cell.row로 마지막 데이터 행의 인덱스를 얻고, 그 아래 행에 값을 쓰면 됩니다.
+    tips:
+      - 표가 자동 확장되는 위치는 마지막 데이터 행 바로 아래입니다. 합계 행 자체에 데이터를 쓰면 표가 잘못 잡힐 수 있습니다.
+      - 행 추가 후 app.calculate()를 호출하면 합계가 즉시 갱신됩니다.
+    snippet: |-
+      import pandas as pd
+      import xlwings as xw
+
+      boxOfficeDf = pd.DataFrame({
+          "title": ["기생충", "범죄도시2", "한산"],
+          "audience": [10310000, 12692000, 7263000],
+          "revenue": [85900000000, 130020000000, 76300000000],
+      })
+
+      with xw.App(visible=False) as dApp:
+          dBook = dApp.books.add()
+          dSheet = dBook.sheets.active
+          dSheet.name = "boxOffice"
+          dSheet["A1"].options(index=False).value = boxOfficeDf
+
+          dTable = dSheet.tables.add(source=dSheet["A1"].expand("table"), name="boxOfficeTable")
+          dTable.show_totals = True
+          dTable.range.api.ListColumns(1).TotalsCalculation = 0
+          dTable.range.api.ListColumns(2).TotalsCalculation = 6
+          dTable.range.api.ListColumns(3).TotalsCalculation = 6
+          dApp.calculate()
+          beforeAudience = int(dTable.totals_row_range[0, 1].value)
+
+          newRowIdx = dTable.data_body_range.last_cell.row + 1
+          dSheet[f"A{newRowIdx}:C{newRowIdx}"].value = ["헌트", 4351000, 41080000000]
+          dApp.calculate()
+          afterAudience = int(dTable.totals_row_range[0, 1].value)
+          newRowCount = dTable.data_body_range.rows.count
+
+      assert beforeAudience == 30265000
+      assert afterAudience == 34616000
+      assert newRowCount == 4
+      {"before": beforeAudience, "after": afterAudience, "rows": newRowCount}
+    exercise:
+      prompt: 두 작품을 더 추가해 표를 5개 영화로 만들고, 합계가 5작품 기준으로 갱신되었는지 확인하세요.
+      starterCode: |-
+        import pandas as pd
+        import xlwings as xw
+
+        boxOfficeDf = pd.DataFrame({
+            "title": ["기생충", "범죄도시2", "한산"],
+            "audience": [10310000, 12692000, 7263000],
+            "revenue": [85900000000, 130020000000, 76300000000],
+        })
+
+        with xw.App(visible=False) as dApp:
+            dBook = dApp.books.add()
+            dSheet = dBook.sheets.active
+            dSheet.name = "boxOffice"
+            dSheet["A1"].options(index=False).value = boxOfficeDf
+
+            dTable = dSheet.tables.add(source=dSheet["A1"].expand("table"), name="boxOfficeTable")
+            dTable.show_totals = True
+            dTable.range.api.ListColumns(2).TotalsCalculation = 6
+            dTable.range.api.ListColumns(3).TotalsCalculation = 6
+
+            for newRow in [["헌트", 4351000, 41080000000], ["공조2", 6982000, ___]]:
+                idx = dTable.data_body_range.last_cell.row + 1
+                dSheet[f"A{idx}:C{idx}"].value = newRow
+            dApp.calculate()
+
+            finalRows = dTable.data_body_range.rows.count
+            finalAudience = int(dTable.totals_row_range[0, 1].value)
+
+        assert finalRows == 5
+        assert finalAudience == 41598000
+        {"rows": finalRows, "audience": finalAudience}
+      solution: |-
+        import pandas as pd
+        import xlwings as xw
+
+        boxOfficeDf = pd.DataFrame({
+            "title": ["기생충", "범죄도시2", "한산"],
+            "audience": [10310000, 12692000, 7263000],
+            "revenue": [85900000000, 130020000000, 76300000000],
+        })
+
+        with xw.App(visible=False) as dApp:
+            dBook = dApp.books.add()
+            dSheet = dBook.sheets.active
+            dSheet.name = "boxOffice"
+            dSheet["A1"].options(index=False).value = boxOfficeDf
+
+            dTable = dSheet.tables.add(source=dSheet["A1"].expand("table"), name="boxOfficeTable")
+            dTable.show_totals = True
+            dTable.range.api.ListColumns(2).TotalsCalculation = 6
+            dTable.range.api.ListColumns(3).TotalsCalculation = 6
+
+            for newRow in [["헌트", 4351000, 41080000000], ["공조2", 6982000, 71290000000]]:
+                idx = dTable.data_body_range.last_cell.row + 1
+                dSheet[f"A{idx}:C{idx}"].value = newRow
+            dApp.calculate()
+
+            finalRows = dTable.data_body_range.rows.count
+            finalAudience = int(dTable.totals_row_range[0, 1].value)
+
+        assert finalRows == 5
+        assert finalAudience == 41598000
+        {"rows": finalRows, "audience": finalAudience}
+      hints:
+        - 기존 30265000 + 헌트 4351000 + 공조2 6982000 = 41598000.
+        - last_cell.row를 매 행마다 새로 읽어야 표 확장에 맞춰 다음 위치가 잡힙니다.
+    check:
+      noError: 행 추가와 calculate 호출이 IndexError 없이 끝나야 합니다.
+      resultCheck: 합계 행의 audience 합이 모든 영화의 관객 수 합과 정확히 같아야 합니다.
+
+  - id: practice
+    title: 4단계. 실습
+    subtitle: 동적 합계 표 직접 만들기
+    blocks:
+      - type: text
+        content: |-
+          이번 두 미션은 표 + 동적 합계 패턴을 두 가지 시나리오에 적용합니다.
+      - type: tip
+        content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되어 있으므로 import문은 생략해도 됩니다.
+      - type: expansion
+        title: "미션1: 분기별 박스오피스와 합계"
+        blocks:
+          - type: code
+            title: 표 만들기 + 합계
+            content: |-
+              import pandas as pd
+              import xlwings as xw
+
+              qDf = pd.DataFrame({
+                  "quarter": ["Q1", "Q2", "Q3", "Q4"],
+                  "movieCount": [24, 31, 28, 35],
+                  "totalAudience": [42100000, 58300000, 49700000, 67200000],
+              })
+
+              with xw.App(visible=False) as qApp:
+                  qBook = qApp.books.add()
+                  qSheet = qBook.sheets.active
+                  qSheet.name = "quarter"
+                  qSheet["A1"].options(index=False).value = qDf
+
+                  qTable = qSheet.tables.add(source=qSheet["A1"].expand("table"), name="quarterTable")
+                  qTable.show_totals = True
+                  qTable.range.api.ListColumns(1).TotalsCalculation = 0
+                  qTable.range.api.ListColumns(2).TotalsCalculation = 6
+                  qTable.range.api.ListColumns(3).TotalsCalculation = 6
+                  qApp.calculate()
+
+                  movieCountTotal = int(qTable.totals_row_range[0, 1].value)
+                  audienceTotal = int(qTable.totals_row_range[0, 2].value)
+
+              assert movieCountTotal == 118
+              assert audienceTotal == 217300000
+              {"movies": movieCountTotal, "audience": audienceTotal}
+      - type: expansion
+        title: "미션2: 배우별 출연작 표 + 평균 평점"
+        blocks:
+          - type: code
+            title: 표 + 평균 행
+            content: |-
+              import pandas as pd
+              import xlwings as xw
+
+              actorDf = pd.DataFrame({
+                  "actor": ["송강호", "이병헌", "전도연", "박해일", "전지현"],
+                  "filmCount": [42, 38, 27, 31, 24],
+                  "avgRating": [8.4, 8.1, 8.7, 7.9, 8.2],
+              })
+
+              with xw.App(visible=False) as actorApp:
+                  actorBook = actorApp.books.add()
+                  actorSheet = actorBook.sheets.active
+                  actorSheet.name = "actor"
+                  actorSheet["A1"].options(index=False).value = actorDf
+
+                  actorTable = actorSheet.tables.add(source=actorSheet["A1"].expand("table"), name="actorTable")
+                  actorTable.show_totals = True
+                  actorTable.range.api.ListColumns(1).TotalsCalculation = 2
+                  actorTable.range.api.ListColumns(2).TotalsCalculation = 6
+                  actorTable.range.api.ListColumns(3).TotalsCalculation = 1
+                  actorApp.calculate()
+
+                  actorCount = int(actorTable.totals_row_range[0, 0].value)
+                  filmTotal = int(actorTable.totals_row_range[0, 1].value)
+                  ratingAvg = round(float(actorTable.totals_row_range[0, 2].value), 2)
+
+              assert actorCount == 5
+              assert filmTotal == 162
+              assert abs(ratingAvg - 8.26) < 0.01
+              {"actorCount": actorCount, "filmTotal": filmTotal, "ratingAvg": ratingAvg}
+
+  - id: summary
+    title: 정리
+    subtitle: 동적 표 구조 감각
+    blocks:
+      - type: text
+        content: |-
+          이번 레슨에서 일반 범위를 Excel 표로 승격하고 SUBTOTAL 기반의 동적 합계 행을 자동화했습니다. 영화가 추가되거나 줄어도 합계가 자동으로 따라오는 자동화 패턴이 자리잡았습니다.
+          다음 레슨에서는 여러 워크북을 동시에 열어 데이터를 한 파일로 통합하는 다중 워크북 패턴을 다룹니다.
+    goal: 표 + 동적 합계 자동화를 한 번 완성한 채로 다음 레슨에 진입한다.
+    why: 표 구조는 실무 자동화에서 정렬, 필터, 합계가 살아있는 보고서의 기본 단위다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: xlwings_07-excel-table-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - promote-to-table
+    - summary
+    title: Excel 표와 동적 합계 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 범위·헤더·totals formula 연결을 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 표 이름과 range를 안정적인 identity로 사용하세요.
+    - 동적 합계는 고정 cell range보다 structured reference로 검증하세요.
+    exercise:
+      prompt: audit_excel_table(spec, formulas)를 완성하세요.
+      starterCode: |-
+        def audit_excel_table(spec, formulas):
+            raise NotImplementedError
+      solution: |
+        def audit_excel_table(spec, formulas):
+            failures = []
+            headers = spec.get("headers", [])
+            if not spec.get("name") or not spec.get("range"):
+                failures.append("identity")
+            if not headers or len(headers) != len(set(headers)) or any(not str(value).strip() for value in headers):
+                failures.append("headers")
+            missing_totals = sorted(column for column in spec.get("totalColumns", []) if column not in formulas)
+            stale_refs = sorted(column for column, formula in formulas.items() if spec.get("name") and f"{spec['name']}[" not in formula)
+            if missing_totals or stale_refs:
+                failures.append("totals")
+            return {"accepted": not failures, "failures": failures, "missingTotals": missing_totals, "staleReferences": stale_refs}
+      hints: *id001
+    check:
+      id: python.xlwings.xlwings_07.excel-table-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.xlwings.xlwings_07.excel-table-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_excel_table
+        cases:
+        - id: accepts-structured-total
+          arguments:
+          - value:
+              name: Sales
+              range: A1:B5
+              headers:
+              - 상품
+              - 금액
+              totalColumns:
+              - 금액
+          - value:
+              금액: =SUM(Sales[금액])
+          expectedReturn:
+            accepted: true
+            failures: []
+            missingTotals: []
+            staleReferences: []
+        - id: reports-identity-and-headers
+          arguments:
+          - value:
+              name: ''
+              range: ''
+              headers:
+              - 금액
+              - 금액
+              totalColumns: []
+          - value: {}
+          expectedReturn:
+            accepted: false
+            failures:
+            - identity
+            - headers
+            missingTotals: []
+            staleReferences: []
+        - id: reports-total-contract
+          arguments:
+          - value:
+              name: Sales
+              range: A1:B5
+              headers:
+              - 상품
+              - 금액
+              totalColumns:
+              - 금액
+              - 수량
+          - value:
+              금액: =SUM(B2:B5)
+          expectedReturn:
+            accepted: false
+            failures:
+            - totals
+            missingTotals:
+            - 수량
+            staleReferences:
+            - 금액
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: xlwings_07-table-growth-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - xlwings_07-excel-table-contract-mastery
+    title: 행 추가 후 표 범위와 합계의 동적 확장 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 새 행 수·range row·합계 값을 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 행 추가 후 table range가 실제로 늘었는지 검사하세요.
+    - 합계는 원본 업무 데이터에서 재계산한 expected와 비교하세요.
+    exercise:
+      prompt: reconcile_table_growth(before_rows, added_rows, observed_rows, observed_total, expected_total)를 완성하세요.
+      starterCode: |-
+        def reconcile_table_growth(before_rows, added_rows, observed_rows, observed_total, expected_total):
+            raise NotImplementedError
+      solution: |
+        def reconcile_table_growth(before_rows, added_rows, observed_rows, observed_total, expected_total):
+            expected_rows = before_rows + added_rows
+            failures = []
+            if observed_rows != expected_rows:
+                failures.append("range")
+            if abs(observed_total - expected_total) > 0.01:
+                failures.append("total")
+            return {"passed": not failures, "failures": failures, "expectedRows": expected_rows, "observedRows": observed_rows, "delta": round(observed_total - expected_total, 2)}
+      hints: *id002
+    check:
+      id: python.xlwings.xlwings_07.table-growth-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.xlwings.xlwings_07.table-growth-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_table_growth
+        cases:
+        - id: accepts-dynamic-growth
+          arguments:
+          - value: 3
+          - value: 2
+          - value: 5
+          - value: 150
+          - value: 150
+          expectedReturn:
+            passed: true
+            failures: []
+            expectedRows: 5
+            observedRows: 5
+            delta: 0
+        - id: reports-range
+          arguments:
+          - value: 3
+          - value: 2
+          - value: 4
+          - value: 150
+          - value: 150
+          expectedReturn:
+            passed: false
+            failures:
+            - range
+            expectedRows: 5
+            observedRows: 4
+            delta: 0
+        - id: reports-total
+          arguments:
+          - value: 3
+          - value: 0
+          - value: 3
+          - value: 140
+          - value: 150
+          expectedReturn:
+            passed: false
+            failures:
+            - total
+            expectedRows: 3
+            observedRows: 3
+            delta: -10
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: xlwings_07-excel-table-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - xlwings_07-table-growth-reconciliation-transfer
+    title: Excel 표 자동화 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: identity·structured formula·growth 증거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Web에서는 Excel 자동화 판단을 작은 함수로 즉시 검증하세요.
+    - Local에서는 실제 Excel 프로세스와 workbook artifact 증거를 별도로 남기세요.
+    exercise:
+      prompt: choose_excel_table_evidence(stage)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_excel_table_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_excel_table_evidence(stage):
+            table = {'identity': {'action': 'pin table name range headers', 'evidence': 'table contract', 'risk': 'wrong region'}, 'formula': {'action': 'use structured references', 'evidence': 'formula map', 'risk': 'fixed-range totals'}, 'growth': {'action': 'append and reconcile row count', 'evidence': 'range and total report', 'risk': 'new rows excluded'}}
+            if stage not in table:
+                raise ValueError('unknown stage')
+            return table[stage]
+      hints: *id003
+    check:
+      id: python.xlwings.xlwings_07.excel-table-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.xlwings.xlwings_07.excel-table-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_excel_table_evidence
+        cases:
+        - id: recalls-identity
+          arguments:
+          - value: identity
+          expectedReturn:
+            action: pin table name range headers
+            evidence: table contract
+            risk: wrong region
+        - id: recalls-formula
+          arguments:
+          - value: formula
+          expectedReturn:
+            action: use structured references
+            evidence: formula map
+            risk: fixed-range totals
+        - id: recalls-growth
+          arguments:
+          - value: growth
+          expectedReturn:
+            action: append and reconcile row count
+            evidence: range and total report
+            risk: new rows excluded
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

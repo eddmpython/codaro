@@ -59,30 +59,30 @@ export function CurriculumSectionCard({
   return (
     <section
       aria-label={`${section.title} 학습 섹션`}
-      className="border-y border-border bg-background text-card-foreground"
+      className="border-b border-border bg-background text-card-foreground"
       data-learning-section-card={section.id}
       data-learning-section-mode={readPayloadText(section.contract?.assessmentMode) || "acquisition"}
       data-learning-section-structured={structured ? "true" : "false"}
       id={cellDomId(section.anchorBlockId)}
     >
-      <header className="grid w-full min-w-0 grid-cols-[2.25rem_minmax(0,1fr)] gap-3 border-b border-border px-1 py-5 text-left sm:px-5">
+      <header className="grid w-full min-w-0 grid-cols-[2rem_minmax(0,1fr)] gap-3 border-b border-border px-4 py-4 text-left sm:px-6">
         <span
-          className="flex size-9 shrink-0 items-center justify-center border-r border-border font-mono text-xs font-semibold tabular-nums text-accent-brand"
+          className="flex h-7 w-8 shrink-0 items-center justify-start font-mono text-xs font-bold tabular-nums text-accent-brand"
           data-learning-section-index="true"
         >
           {String(index + 1).padStart(2, "0")}
         </span>
-        <span className="min-w-0 self-center" data-learning-section-heading="true">
+        <div className="min-w-0" data-learning-section-heading="true">
           {readPayloadText(section.contract?.assessmentMode) === "mastery" ? (
-            <span className="mb-1 block text-xs font-semibold text-accent-brand">혼자 완성하기</span>
+            <span className="mb-1 block text-xs font-medium text-accent-brand">혼자 완성하기</span>
           ) : readPayloadText(section.contract?.assessmentMode) === "transfer" ? (
-            <span className="mb-1 block text-xs font-semibold text-accent-brand">새 조건에 적용</span>
+            <span className="mb-1 block text-xs font-medium text-accent-brand">새 조건에 적용</span>
           ) : readPayloadText(section.contract?.assessmentMode) === "retrieval" ? (
-            <span className="mb-1 block text-xs font-semibold text-accent-brand">기억에서 다시 풀기</span>
+            <span className="mb-1 block text-xs font-medium text-accent-brand">기억에서 다시 풀기</span>
           ) : null}
-          <span className="block max-w-3xl text-lg font-semibold text-foreground">{section.title}</span>
-          {section.subtitle ? <span className="mt-1 block max-w-3xl text-sm leading-6 text-muted-foreground">{section.subtitle}</span> : null}
-        </span>
+          <h2 className="max-w-3xl text-lg font-bold text-foreground">{section.title}</h2>
+          {section.subtitle ? <p className="mt-1 max-w-3xl text-sm font-normal leading-6 text-muted-foreground">{section.subtitle}</p> : null}
+        </div>
       </header>
 
       <SectionNarrative contract={section.contract} />
@@ -105,7 +105,7 @@ export function CurriculumSectionCard({
           onSelectBlock={onSelectBlock}
         />
       ) : (
-        <div className="space-y-6 px-1 py-5 sm:px-5">
+        <div className="space-y-6 px-4 py-5 sm:px-6">
           {section.blocks.map((block) => (
             <CurriculumLearningCell
               block={block}
@@ -386,10 +386,10 @@ export function StructuredSectionLearningBody({
   }, [attemptCheck, category, contentId, exercise, exerciseResult]);
 
   return (
-    <div className="space-y-7 px-1 py-5 sm:px-5">
+    <div className="space-y-7 px-4 py-5 sm:px-6">
       {parts.snippet ? (
         <div data-learning-section-part="snippet">
-          <div className="pb-1.5 text-xs font-medium text-muted-foreground" data-learning-snippet-kicker="true">예제</div>
+          <div className="pb-1.5 text-xs font-medium text-muted-foreground" data-learning-snippet-kicker="true">완성 예제</div>
           <CodePayload label="코드" value={parts.snippet.content} />
         </div>
       ) : null}
@@ -422,9 +422,9 @@ export function StructuredSectionLearningBody({
           <div className="flex flex-wrap items-start gap-3">
             <div className="min-w-0 flex-1">
               <div className="text-xs font-medium text-muted-foreground">직접 해보기</div>
-              <h3 className="mt-1 text-[15px] font-semibold leading-6 text-foreground">{blockLabel(exercise)}</h3>
+              <h3 className="mt-1 text-[15px] font-bold leading-6 text-foreground">{blockLabel(exercise)}</h3>
               {exerciseDescription ? (
-                <p className="mt-1 max-w-3xl text-md text-foreground">
+                <p className="mt-1 max-w-3xl text-md font-normal text-foreground">
                   {exerciseDescription}
                 </p>
               ) : null}
@@ -495,11 +495,11 @@ export function StructuredSectionLearningBody({
             <div
               aria-live="polite"
               className={cn(
-                "mt-3 border-l-2 py-0.5 pl-4 text-sm",
+                "mt-3 rounded-r-md border-l-2 px-3 py-2 text-sm",
                 attemptCheck.passed
-                  ? "border-success"
+                  ? "border-success bg-success/10"
                   : attemptCheck.state === "unsupported"
-                    ? "border-border"
+                    ? "border-border bg-muted/40"
                     : "border-destructive",
               )}
               data-learning-check-result={attemptCheck.state}
@@ -507,7 +507,7 @@ export function StructuredSectionLearningBody({
               data-learning-check-executor={attemptCheck.executor}
               role="status"
             >
-              <div className="font-medium text-foreground">
+              <div className="font-bold text-foreground">
                 {attemptCheck.passed
                   ? attemptCheck.evidence === "strong" ? "격리 검증 통과" : "연습 검증 통과"
                   : attemptCheck.state === "unsupported"

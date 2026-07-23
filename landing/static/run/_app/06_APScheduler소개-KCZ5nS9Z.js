@@ -1,0 +1,669 @@
+var e=`meta:
+  id: watchSched_06
+  title: APScheduler 소개
+  order: 6
+  category: watchSched
+  difficulty: easy
+  audience: 폴더 이벤트와 스케줄 자동화에 입문하는 Python 학습자
+  packages:
+  - apscheduler
+  tags:
+    - apscheduler
+    - background
+    - jobs
+intro:
+  direction: APScheduler의 BlockingScheduler를 짧게 가동해 백그라운드 작업 등록과 안전한 종료 흐름을 셀에서 확인한다.
+  benefits:
+    - BackgroundScheduler를 시작과 정지로 안전하게 다룬다.
+    - add_job으로 함수를 등록하고 즉시 트리거한다.
+    - 작업 결과를 외부 리스트에 누적해 검증한다.
+    - 종합 스케줄러 정리로 자동화 표준 흐름을 만든다.
+  diagram:
+    steps:
+      - label: BackgroundScheduler 만들기
+        detail: 인자 없이 BackgroundScheduler를 생성해 셀에서 직접 제어한다.
+      - label: 작업 등록
+        detail: add_job에 함수와 trigger="date"를 주어 즉시 실행되도록 등록한다.
+      - label: start와 shutdown
+        detail: start로 백그라운드 스레드를 띄우고 결과를 받은 뒤 shutdown으로 정리한다.
+      - label: 종합 작업 dict
+        detail: 실행 시각과 결과를 dict로 묶어 자동화 보고에 사용한다.
+    runtime:
+      - label: APScheduler 패키지 필요
+        detail: meta.packages의 APScheduler가 로컬 가상환경에 준비되어야 한다.
+      - label: assert 기반 검증
+        detail: 실행 카운트와 종료 상태를 assert로 비교한다.
+sections:
+  - id: build-scheduler
+    title: BackgroundScheduler 만들기
+    structuredPrimary: true
+    subtitle: 셀에서 안전한 시작
+    goal: BackgroundScheduler를 만들고 start, shutdown 두 메서드를 호출한다.
+    why: 자동화 학습에서는 스케줄러 객체를 만들고 정리하는 흐름을 가장 먼저 확인해 자원 누수를 막아야 한다.
+    explanation: BackgroundScheduler는 별도 스레드에서 동작한다. start로 가동하고 shutdown으로 안전히 종료한다. 인자 없이 만들면 메모리 jobstore와 단일 스레드 executor가 기본이라 학습에 충분하다.
+    tips:
+      - shutdown은 wait=True가 기본이라 진행 중 작업을 끝까지 기다린다.
+      - 같은 셀에서 두 번 start를 호출하면 RuntimeError가 발생한다.
+    snippet: |-
+      from apscheduler.schedulers.background import BackgroundScheduler
+
+      scheduler = BackgroundScheduler()
+      scheduler.start()
+      isRunning = scheduler.running
+      scheduler.shutdown()
+
+      assert isRunning is True
+      assert scheduler.running is False
+      isRunning
+    exercise:
+      prompt: BackgroundScheduler를 start와 shutdown 두 단계로 다루고 시작과 종료 시점의 running 상태가 각각 True와 False인지 검증하세요.
+      starterCode: |-
+        from apscheduler.schedulers.background import BackgroundScheduler
+
+        scheduler = BackgroundScheduler()
+        scheduler.___()
+        isRunning = scheduler.running
+        scheduler.___()
+
+        assert isRunning is True
+        assert scheduler.running is False
+        isRunning
+      solution: |-
+        from apscheduler.schedulers.background import BackgroundScheduler
+
+        scheduler = BackgroundScheduler()
+        scheduler.start()
+        isRunning = scheduler.running
+        scheduler.shutdown()
+
+        assert isRunning is True
+        assert scheduler.running is False
+        isRunning
+      hints:
+        - 시작 메서드 이름은 start이며 인자가 없다.
+        - 종료 메서드 이름은 shutdown이며 진행 작업을 기다린다.
+      check:
+        noError: start와 shutdown 호출이 정상적으로 끝나야 한다.
+        resultCheck: isRunning이 True이고 종료 후 running이 False여야 한다.
+    check:
+      noError: BackgroundScheduler 생명주기 호출이 끝나야 한다.
+      resultCheck: isRunning이 True이고 종료 후 running 속성이 False여야 한다.
+  - id: register-job
+    title: 즉시 실행 작업 등록
+    structuredPrimary: true
+    subtitle: trigger="date" 사용
+    goal: add_job으로 함수를 즉시 실행 트리거로 등록하고 결과 리스트가 채워지는 것을 확인한다.
+    why: 자동화는 한 번만 실행되는 작업도 자주 만나므로 즉시 실행 트리거가 표준 도구다.
+    explanation: trigger="date"는 지정한 시각에 한 번 실행한다. run_date를 주지 않으면 즉시 실행이다. add_job은 Job 객체를 돌려준다. 짧은 sleep 후 결과 리스트를 확인하면 백그라운드 실행이 끝났음을 알 수 있다.
+    tips:
+      - 즉시 실행은 add_job(trigger="date", run_date=None)으로 표현된다.
+      - 학습에서는 시간 sleep을 0.3초 정도로 두면 안정적이다.
+    snippet: |-
+      import time
+
+      from apscheduler.schedulers.background import BackgroundScheduler
+
+      results: list[int] = []
+
+
+      def job() -> None:
+          results.append(1)
+
+
+      scheduler = BackgroundScheduler()
+      scheduler.start()
+      try:
+          scheduler.add_job(job, trigger="date")
+          time.sleep(0.3)
+      finally:
+          scheduler.shutdown()
+
+      assert results == [1]
+      results
+    exercise:
+      prompt: add_job을 두 번 등록해 results 리스트가 [1, 1]로 채워지는지 검증하세요.
+      starterCode: |-
+        import time
+
+        from apscheduler.schedulers.background import BackgroundScheduler
+
+        results: list[int] = []
+
+
+        def job() -> None:
+            results.append(___)
+
+
+        scheduler = BackgroundScheduler()
+        scheduler.start()
+        try:
+            scheduler.add_job(job, trigger="date")
+            scheduler.add_job(job, trigger="date")
+            time.sleep(0.3)
+        finally:
+            scheduler.shutdown()
+
+        assert results == [1, 1]
+        results
+      solution: |-
+        import time
+
+        from apscheduler.schedulers.background import BackgroundScheduler
+
+        results: list[int] = []
+
+
+        def job() -> None:
+            results.append(1)
+
+
+        scheduler = BackgroundScheduler()
+        scheduler.start()
+        try:
+            scheduler.add_job(job, trigger="date")
+            scheduler.add_job(job, trigger="date")
+            time.sleep(0.3)
+        finally:
+            scheduler.shutdown()
+
+        assert results == [1, 1]
+        results
+      hints:
+        - 작업이 results에 추가하는 값은 정수 1이다.
+        - 두 번 등록하면 [1, 1] 두 항목이 모인다.
+      check:
+        noError: 두 번의 add_job 호출과 shutdown이 정상적으로 끝나야 한다.
+        resultCheck: results 리스트가 [1, 1]이어야 한다.
+    check:
+      noError: add_job과 sleep 후 shutdown이 끝나야 한다.
+      resultCheck: results가 [1] 한 항목을 담아야 한다.
+  - id: job-args
+    title: 작업 인자 전달
+    structuredPrimary: true
+    subtitle: args와 kwargs 분리
+    goal: add_job에 args와 kwargs를 분리해 같은 함수가 다른 결과를 만드는 것을 확인한다.
+    why: 자동화는 같은 함수를 다른 인자로 여러 번 등록해야 하는 경우가 흔하므로 인자 전달 방식을 명확히 알아야 한다.
+    explanation: add_job의 args 인자는 위치 인자 튜플, kwargs는 키워드 인자 dict다. 등록 시점에 인자가 캡처되므로 실행 시점의 변수 상태와 무관하다. 같은 함수를 다른 인자로 두 번 등록하면 두 다른 결과가 생긴다.
+    tips:
+      - args는 항상 튜플 또는 리스트로 두어 단일 인자도 인자 모음으로 다룬다.
+      - kwargs는 dict로 두어 명시적인 키 이름을 함수에 전달한다.
+    snippet: |-
+      import time
+
+      from apscheduler.schedulers.background import BackgroundScheduler
+
+      results: list[tuple] = []
+
+
+      def job(name: str, value: int) -> None:
+          results.append((name, value))
+
+
+      scheduler = BackgroundScheduler()
+      scheduler.start()
+      try:
+          scheduler.add_job(job, trigger="date", args=("first", 10))
+          scheduler.add_job(job, trigger="date", kwargs={"name": "second", "value": 20})
+          time.sleep(0.3)
+      finally:
+          scheduler.shutdown()
+      collected = sorted(results)
+
+      assert collected == [("first", 10), ("second", 20)]
+      collected
+    exercise:
+      prompt: '같은 작업을 args=("alpha", 1)과 kwargs={"name": "beta", "value": 2}로 등록해 sorted 결과가 본문 기대값과 같은지 검증하세요.'
+      starterCode: |-
+        import time
+
+        from apscheduler.schedulers.background import BackgroundScheduler
+
+        results: list[tuple] = []
+
+
+        def job(name: str, value: int) -> None:
+            results.append((name, value))
+
+
+        scheduler = BackgroundScheduler()
+        scheduler.start()
+        try:
+            scheduler.add_job(job, trigger="date", args=("alpha", 1))
+            scheduler.add_job(job, trigger="date", kwargs={"name": "beta", "value": ___})
+            time.sleep(0.3)
+        finally:
+            scheduler.shutdown()
+        collected = sorted(results)
+
+        assert collected == [("alpha", 1), ("beta", 2)]
+        collected
+      solution: |-
+        import time
+
+        from apscheduler.schedulers.background import BackgroundScheduler
+
+        results: list[tuple] = []
+
+
+        def job(name: str, value: int) -> None:
+            results.append((name, value))
+
+
+        scheduler = BackgroundScheduler()
+        scheduler.start()
+        try:
+            scheduler.add_job(job, trigger="date", args=("alpha", 1))
+            scheduler.add_job(job, trigger="date", kwargs={"name": "beta", "value": 2})
+            time.sleep(0.3)
+        finally:
+            scheduler.shutdown()
+        collected = sorted(results)
+
+        assert collected == [("alpha", 1), ("beta", 2)]
+        collected
+      hints:
+        - kwargs의 value 키 값은 정수 2다.
+        - sorted는 튜플을 알파벳 순으로 정렬한다.
+      check:
+        noError: 두 add_job 호출과 shutdown이 정상적으로 끝나야 한다.
+        resultCheck: collected가 두 튜플을 본문 기대값과 같은 순서로 담아야 한다.
+    check:
+      noError: 두 인자 패턴 호출과 sort가 끝나야 한다.
+      resultCheck: collected가 두 튜플을 알파벳 순으로 담아야 한다.
+  - id: scheduler-cycle
+    title: 종합 스케줄러 사이클
+    structuredPrimary: true
+    subtitle: 함수로 묶기
+    goal: 스케줄러 시작, 작업 등록, 결과 수집, 종료를 한 함수로 묶어 자동화 표준 흐름을 만든다.
+    why: 종합 사이클을 함수로 두면 호출자가 한 줄로 자동화 작업을 시작하고 같은 dict 결과를 받을 수 있다.
+    explanation: runOnce 함수는 작업 함수와 인자 리스트를 받아 BackgroundScheduler를 짧게 가동해 결과를 모은다. 결과 dict는 jobCount와 results 키를 가진다. 같은 함수는 두 번 호출해도 같은 dict 형태를 유지하므로 자동화 표준에 적합하다.
+    tips:
+      - try/finally로 shutdown을 보장하면 예외가 발생해도 자원이 정리된다.
+      - results 리스트는 정렬하면 자동화에서 일관된 순서를 가진다.
+    snippet: |-
+      import time
+
+      from apscheduler.schedulers.background import BackgroundScheduler
+
+
+      def runOnce(items: list[int]) -> dict:
+          collected: list[int] = []
+
+          def job(value: int) -> None:
+              collected.append(value * 10)
+
+          scheduler = BackgroundScheduler()
+          scheduler.start()
+          try:
+              for value in items:
+                  scheduler.add_job(job, trigger="date", args=(value,))
+              time.sleep(0.3)
+          finally:
+              scheduler.shutdown()
+          return {"jobCount": len(items), "results": sorted(collected)}
+
+
+      report = runOnce([1, 2, 3])
+
+      assert report == {"jobCount": 3, "results": [10, 20, 30]}
+      report
+    exercise:
+      prompt: runOnce에 [4, 5]를 넘기면 jobCount가 2이고 results가 [40, 50] 종합 결과를 보고하는지 검증하세요.
+      starterCode: |-
+        import time
+
+        from apscheduler.schedulers.background import BackgroundScheduler
+
+
+        def runOnce(items: list[int]) -> dict:
+            collected: list[int] = []
+
+            def job(value: int) -> None:
+                collected.append(value * ___)
+
+            scheduler = BackgroundScheduler()
+            scheduler.start()
+            try:
+                for value in items:
+                    scheduler.add_job(job, trigger="date", args=(value,))
+                time.sleep(0.3)
+            finally:
+                scheduler.shutdown()
+            return {"jobCount": len(items), "results": sorted(collected)}
+
+
+        report = runOnce([4, 5])
+
+        assert report == {"jobCount": 2, "results": [40, 50]}
+        report
+      solution: |-
+        import time
+
+        from apscheduler.schedulers.background import BackgroundScheduler
+
+
+        def runOnce(items: list[int]) -> dict:
+            collected: list[int] = []
+
+            def job(value: int) -> None:
+                collected.append(value * 10)
+
+            scheduler = BackgroundScheduler()
+            scheduler.start()
+            try:
+                for value in items:
+                    scheduler.add_job(job, trigger="date", args=(value,))
+                time.sleep(0.3)
+            finally:
+                scheduler.shutdown()
+            return {"jobCount": len(items), "results": sorted(collected)}
+
+
+        report = runOnce([4, 5])
+
+        assert report == {"jobCount": 2, "results": [40, 50]}
+        report
+      hints:
+        - 작업 안 곱셈 인자는 정수 10이다.
+        - '[4, 5]는 각각 40과 50이 되어 results 리스트에 모인다.'
+      check:
+        noError: runOnce 호출이 종합 흐름으로 끝나야 한다.
+        resultCheck: report dict가 jobCount 2와 results [40, 50]을 정확히 담아야 한다.
+    check:
+      noError: 종합 스케줄러 함수가 자원 정리까지 끝나야 한다.
+      resultCheck: report dict가 jobCount 3와 정렬된 results [10, 20, 30]을 담아야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: watchSched_06-scheduler-job-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - build-scheduler
+    - scheduler-cycle
+    title: APScheduler job의 timezone·misfire·coalesce 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 중복 실행과 지연 실행 정책을 명시한 job만 등록한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - timezone과 misfire 처리 방식을 job 등록 시점에 고정하세요.
+    - replaceExisting을 쓰려면 재시작 뒤에도 같은 stable job ID를 사용하세요.
+    exercise:
+      prompt: audit_scheduler_job(job, allowed_timezones)를 완성하세요.
+      starterCode: |-
+        def audit_scheduler_job(job, allowed_timezones):
+            raise NotImplementedError
+      solution: |
+        def audit_scheduler_job(job, allowed_timezones):
+            failures = []
+            if job.get("timezone") not in allowed_timezones:
+                failures.append("timezone")
+            if job.get("misfireGraceSeconds", 0) <= 0:
+                failures.append("misfire-grace")
+            if not isinstance(job.get("coalesce"), bool):
+                failures.append("coalesce")
+            if job.get("maximumInstances", 0) <= 0:
+                failures.append("maximum-instances")
+            if job.get("replaceExisting", False) and not job.get("id"):
+                failures.append("stable-id")
+            return {"ready": not failures, "failures": failures, "jobId": job.get("id")}
+      hints: *id001
+    check:
+      id: python.watchsched.watchSched_06.scheduler-job-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.watchsched.watchSched_06.scheduler-job-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_scheduler_job
+        cases:
+        - id: accepts-bounded-job
+          arguments:
+          - value:
+              id: daily-report
+              timezone: Asia/Seoul
+              misfireGraceSeconds: 60
+              coalesce: true
+              maximumInstances: 1
+              replaceExisting: true
+          - value:
+            - Asia/Seoul
+          expectedReturn:
+            ready: true
+            failures: []
+            jobId: daily-report
+        - id: reports-missing-policies
+          arguments:
+          - value:
+              timezone: UTC
+              misfireGraceSeconds: 0
+              coalesce: 'yes'
+              maximumInstances: 0
+              replaceExisting: true
+          - value:
+            - Asia/Seoul
+          expectedReturn:
+            ready: false
+            failures:
+            - timezone
+            - misfire-grace
+            - coalesce
+            - maximum-instances
+            - stable-id
+            jobId: null
+        - id: accepts-nonreplacing-anonymous-job
+          arguments:
+          - value:
+              timezone: UTC
+              misfireGraceSeconds: 10
+              coalesce: false
+              maximumInstances: 2
+              replaceExisting: false
+          - value:
+            - UTC
+          expectedReturn:
+            ready: true
+            failures: []
+            jobId: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: watchSched_06-misfire-decision-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - watchSched_06-scheduler-job-contract-mastery
+    title: 새 지연 실행에 misfire·coalesce 판정 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 예정 시각 목록과 현재 시각, grace로 실행할 fire를 결정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 지연된 fire를 모두 실행할지 최신 하나로 합칠지 명시하세요.
+    - grace 밖 fire와 미래 fire를 별도 목록으로 남기세요.
+    exercise:
+      prompt: resolve_misfires(scheduled_times, now, grace_seconds, coalesce)를 완성하세요.
+      starterCode: |-
+        def resolve_misfires(scheduled_times, now, grace_seconds, coalesce):
+            raise NotImplementedError
+      solution: |
+        def resolve_misfires(scheduled_times, now, grace_seconds, coalesce):
+            eligible = [value for value in scheduled_times if 0 <= now - value <= grace_seconds]
+            expired = [value for value in scheduled_times if now - value > grace_seconds]
+            future = [value for value in scheduled_times if value > now]
+            execute = [eligible[-1]] if coalesce and eligible else eligible
+            skipped_coalesced = eligible[:-1] if coalesce else []
+            return {"execute": execute, "expired": expired, "future": future, "coalesced": skipped_coalesced}
+      hints: *id002
+    check:
+      id: python.watchsched.watchSched_06.misfire-decision.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.watchsched.watchSched_06.misfire-decision.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: resolve_misfires
+        cases:
+        - id: coalesces-eligible-fires
+          arguments:
+          - value:
+            - 90
+            - 95
+            - 110
+          - value: 100
+          - value: 20
+          - value: true
+          expectedReturn:
+            execute:
+            - 95
+            expired: []
+            future:
+            - 110
+            coalesced:
+            - 90
+        - id: executes-all-without-coalesce
+          arguments:
+          - value:
+            - 80
+            - 90
+            - 95
+          - value: 100
+          - value: 15
+          - value: false
+          expectedReturn:
+            execute:
+            - 90
+            - 95
+            expired:
+            - 80
+            future: []
+            coalesced: []
+        - id: handles-no-eligible-fire
+          arguments:
+          - value:
+            - 10
+            - 200
+          - value: 100
+          - value: 20
+          - value: true
+          expectedReturn:
+            execute: []
+            expired:
+            - 10
+            future:
+            - 200
+            coalesced: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: watchSched_06-apscheduler-policy-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - watchSched_06-misfire-decision-transfer
+    title: APScheduler job 정책 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: timezone·misfire·coalesce·instance 제한을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - event나 시간이 발생했다는 사실보다 처리 identity와 결과 evidence를 검증하세요.
+    - 중복·지연·재시작 상황에서 같은 업무 결과가 보존되는지 확인하세요.
+    exercise:
+      prompt: choose_scheduler_policy(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_scheduler_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_scheduler_policy(situation):
+            table = {'time': {'action': 'bind IANA timezone', 'evidence': 'zone and next fire', 'risk': 'DST shift'}, 'delay': {'action': 'apply misfire grace and coalesce', 'evidence': 'eligible expired skipped fires', 'risk': 'backlog burst'}, 'concurrency': {'action': 'bound maximum instances', 'evidence': 'active job count', 'risk': 'overlapping mutation'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.watchsched.watchSched_06.apscheduler-policy-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.watchsched.watchSched_06.apscheduler-policy-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_scheduler_policy
+        cases:
+        - id: recalls-time
+          arguments:
+          - value: time
+          expectedReturn:
+            action: bind IANA timezone
+            evidence: zone and next fire
+            risk: DST shift
+        - id: recalls-delay
+          arguments:
+          - value: delay
+          expectedReturn:
+            action: apply misfire grace and coalesce
+            evidence: eligible expired skipped fires
+            risk: backlog burst
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,468 @@
+var e=`meta:
+  id: excel_02
+  title: Excel 데이터 읽기와 정제
+  order: 2
+  category: excel
+  badge: 실무
+  packages:
+  - openpyxl
+  - pandas
+  tags:
+  - excel
+  - pandas
+  - openpyxl
+  - 데이터정제
+  - xlsx
+  seo:
+    title: Excel 데이터 읽기와 정제 - 로컬 Python 엑셀 자동화
+    description: openpyxl과 pandas로 로컬 Excel 파일을 만들고 검증하는 실무형 커리큘럼입니다.
+    keywords:
+    - excel
+    - pandas
+    - openpyxl
+    - 데이터정제
+    - xlsx
+intro:
+  direction: Excel 데이터 읽기와 정제에서 엑셀 파일과 셀 범위를 읽고 쓰며 결과 파일을 검증합니다.
+  benefits:
+  - 워크북과 시트 확인 후 셀/범위 조작에 맞는 코드 입력을 고릅니다.
+  - Excel 데이터 읽기와 정제 결과를 저장 파일과 셀 값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 파일 자동화에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 업무 파일을 Data 입력 확인
+      detail: 입력 기준(워크북과 시트)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 파생 컬럼과 요약 처리 실행
+      detail: 셀/범위 조작 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 정제 파이프라인 검증 결과 검증
+      detail: 저장 파일과 셀 값 기준으로 실행 결과를 비교합니다.
+    - label: Excel 데이터 읽기와 정제 재사용
+      detail: 완성 코드를 업무 파일 자동화에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 엑셀 자동화 환경
+      detail: openpyxl, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: Excel 데이터 읽기와 정제 실행
+      detail: 셀을 실행해 저장 파일과 셀 값와 예외 상태를 확인합니다.
+    - label: Excel 데이터 읽기와 정제 완료
+      detail: 검증된 코드를 업무 파일 자동화로 남깁니다.
+sections:
+- id: intro
+  title: 1단계. 업무 파일을 DataFrame으로 읽기
+  structuredPrimary: true
+  subtitle: read_excel과 계약 확인
+  goal: 1단계. 업무 파일을 DataFrame으로 읽기에서 셀/범위 조작 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 실무 엑셀 파일은 사람이 만들기 때문에 헤더 누락, 음수 값, 불필요한 시트가 자주 생깁니다. pandas로 읽은 뒤 컬럼 계약을 먼저 확인하는 습관을 만듭니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    from openpyxl import Workbook
+    import pandas as pd
+
+    excelTemp = TemporaryDirectory()
+    excelRoot = Path(excelTemp.name)
+    ordersPath = excelRoot / "orders.xlsx"
+
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = "orders"
+    sheet.append(["order_id", "region", "quantity", "unit_price"])
+    sheet.append(["A001", "Seoul", 3, 120000])
+    sheet.append(["A002", "Busan", 2, 80000])
+    sheet.append(["A003", "Seoul", 5, 45000])
+    workbook.save(ordersPath)
+
+    orders = pd.read_excel(ordersPath, sheet_name="orders")
+    assert list(orders.columns) == ["order_id", "region", "quantity", "unit_price"]
+    orders
+  exercise:
+    prompt: 1단계. 업무 파일을 DataFrame으로 읽기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from openpyxl import Workbook
+      import pandas as pd
+
+      excelTemp = TemporaryDirectory()
+      excelRoot = Path(excelTemp.name)
+      ordersPath = excelRoot / "orders.xlsx"
+
+      workbook = Workbook()
+      sheet = workbook.active
+      sheet.title = "orders"
+      sheet.append(["order_id", "region", "quantity", "unit_price"])
+      sheet.append(["A001", "Seoul", 3, 120000])
+      sheet.append(["A002", "Busan", 2, 80000])
+      sheet.append(["A003", "Seoul", 5, 45000])
+      workbook.save(ordersPath)
+
+      orders = pd.read_excel(ordersPath, sheet_name="orders")
+      assert list(orders.columns) == ["order_id", "region", "quantity", "unit_price"]
+      orders
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 업무 파일을 DataFrame으로 읽기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 업무 파일을 DataFrame으로 읽기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: cleaning_flow
+  title: 2단계. 파생 컬럼과 요약
+  structuredPrimary: true
+  subtitle: amount 계산
+  goal: 2단계. 파생 컬럼과 요약에서 셀/범위 조작 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 2단계. 파생 컬럼과 요약의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    orders = orders.assign(amount=orders["quantity"] * orders["unit_price"])
+    regionSummary = orders.groupby("region", as_index=False)["amount"].sum().sort_values("amount", ascending=False)
+
+    assert orders["amount"].sum() == 745000
+    assert regionSummary.iloc[0]["region"] == "Seoul"
+    regionSummary
+  exercise:
+    prompt: 2단계. 파생 컬럼과 요약 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      orders = orders.assign(amount=orders["quantity"] * orders["unit_price"])
+      regionSummary = orders.groupby("region", as_index=False)["amount"].sum().sort_values("amount", ascending=False)
+
+      assert orders["amount"].sum() == 745000
+      assert regionSummary.iloc[0]["region"] == "Seoul"
+      regionSummary
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 파생 컬럼과 요약에서 \`orders\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. 파생 컬럼과 요약에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+- id: workflow_validation
+  title: 3단계. 정제 파이프라인 검증 루프
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  goal: 3단계. 정제 파이프라인 검증 루프에서 셀/범위 조작 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 엑셀 정제 파이프라인은 읽기, 계산, 저장이 모두 맞아야 합니다. 입력 컬럼을 검증하고, 잘못된 수량을 잡고, 집계 기준을 바꿔 결과가 어떻게 달라지는지 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def validateOrders(frame):
+        requiredColumns = {"order_id", "region", "quantity", "unit_price"}
+        missingColumns = requiredColumns - set(frame.columns)
+        if missingColumns:
+            raise ValueError(f"주문 파일 필수 컬럼 누락: {sorted(missingColumns)}")
+        assert frame["quantity"].gt(0).all()
+        assert frame["unit_price"].gt(0).all()
+        return True
+
+    assert validateOrders(orders)
+  exercise:
+    prompt: 3단계. 정제 파이프라인 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def validateOrders(frame):
+          requiredColumns = {"order_id", "region", "quantity", "unit_price"}
+          missingColumns = requiredColumns - set(frame.columns)
+          if missingColumns:
+              raise ValueError(f"주문 파일 필수 컬럼 누락: {sorted(missingColumns)}")
+          assert frame["quantity"].gt(0).all()
+          assert frame["unit_price"].gt(0).all()
+          return True
+
+      assert validateOrders(orders)
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 정제 파이프라인 검증 루프의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 3단계. 정제 파이프라인 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: summary
+  title: 정리
+  subtitle: 읽기-정제-저장 완주
+  blocks:
+  - type: text
+    content: 이번 레슨에서는 xlsx 입력을 DataFrame으로 읽고, 파생 컬럼을 만들고, 정제 결과와 요약을 여러 시트로 저장했습니다.
+  goal: 정리에서 워크북과 시트을 바꿨을 때 저장 파일과 셀 값가 어떻게 달라지는지 확인한다.
+  why: 엑셀 자동화는 반복 보고서와 정산 파일을 코드로 재현하는 실무 흐름입니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: excel_02-xlwings-environment-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - summary
+    title: xlwings 실행 환경의 재현 가능성 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: Python·패키지·Excel·운영체제 요구를 한 계약으로 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 설치 명령 성공보다 실제 runtime capability를 검사하세요.
+    - Python과 xlwings 버전은 환경 manifest에 고정하세요.
+    exercise:
+      prompt: audit_xlwings_environment(required, observed)를 완성하세요.
+      starterCode: |-
+        def audit_xlwings_environment(required, observed):
+            raise NotImplementedError
+      solution: |
+        def audit_xlwings_environment(required, observed):
+            missing = sorted(key for key, value in required.items() if value is True and not observed.get(key, False))
+            mismatched = sorted(key for key, value in required.items() if not isinstance(value, bool) and observed.get(key) != value)
+            return {"ready": not missing and not mismatched, "missing": missing, "mismatched": mismatched, "observed": {key: observed.get(key) for key in sorted(required)}}
+      hints: *id001
+    check:
+      id: python.excel.excel_02.xlwings-environment-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.excel.excel_02.xlwings-environment-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_xlwings_environment
+        cases:
+        - id: accepts-pinned-environment
+          arguments:
+          - value:
+              python: '3.12'
+              xlwings: '0.31'
+              desktopExcel: true
+          - value:
+              python: '3.12'
+              xlwings: '0.31'
+              desktopExcel: true
+          expectedReturn:
+            ready: true
+            missing: []
+            mismatched: []
+            observed:
+              desktopExcel: true
+              python: '3.12'
+              xlwings: '0.31'
+        - id: reports-package-version
+          arguments:
+          - value:
+              python: '3.12'
+              xlwings: '0.31'
+          - value:
+              python: '3.12'
+              xlwings: '0.30'
+          expectedReturn:
+            ready: false
+            missing: []
+            mismatched:
+            - xlwings
+            observed:
+              python: '3.12'
+              xlwings: '0.30'
+        - id: reports-missing-excel
+          arguments:
+          - value:
+              desktopExcel: true
+          - value:
+              desktopExcel: false
+          expectedReturn:
+            ready: false
+            missing:
+            - desktopExcel
+            mismatched: []
+            observed:
+              desktopExcel: false
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: excel_02-environment-remediation-plan-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - excel_02-xlwings-environment-contract-mastery
+    title: 환경 차이에서 최소 복구 계획 만들기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 누락 capability와 버전 불일치에 정확한 다음 행동을 연결한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 광범위한 재설치보다 실패한 capability만 복구하세요.
+    - 복구 뒤 동일 audit를 다시 실행하도록 표시하세요.
+    exercise:
+      prompt: plan_environment_remediation(audit)를 완성하세요.
+      starterCode: |-
+        def plan_environment_remediation(audit):
+            raise NotImplementedError
+      solution: |
+        def plan_environment_remediation(audit):
+            actions = []
+            for item in sorted(audit.get("missing", [])):
+                actions.append({"target": item, "action": "provision-capability"})
+            for item in sorted(audit.get("mismatched", [])):
+                actions.append({"target": item, "action": "sync-pinned-version"})
+            return {"actions": actions, "retryAudit": bool(actions), "ready": not actions}
+      hints: *id002
+    check:
+      id: python.excel.excel_02.environment-remediation-plan.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.excel.excel_02.environment-remediation-plan.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_environment_remediation
+        cases:
+        - id: keeps-ready-environment
+          arguments:
+          - value:
+              missing: []
+              mismatched: []
+          expectedReturn:
+            actions: []
+            retryAudit: false
+            ready: true
+        - id: plans-capability
+          arguments:
+          - value:
+              missing:
+              - desktopExcel
+              mismatched: []
+          expectedReturn:
+            actions:
+            - target: desktopExcel
+              action: provision-capability
+            retryAudit: true
+            ready: false
+        - id: plans-version-sync
+          arguments:
+          - value:
+              missing:
+              - macroExecution
+              mismatched:
+              - python
+              - xlwings
+          expectedReturn:
+            actions:
+            - target: macroExecution
+              action: provision-capability
+            - target: python
+              action: sync-pinned-version
+            - target: xlwings
+              action: sync-pinned-version
+            retryAudit: true
+            ready: false
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: excel_02-environment-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - excel_02-environment-remediation-plan-transfer
+    title: xlwings 환경 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 버전·capability·smoke test를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 버전 기록과 실제 capability probe를 분리하세요.
+    - smoke test는 사용자의 기존 workbook이 아닌 disposable artifact로 실행하세요.
+    exercise:
+      prompt: choose_environment_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_environment_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_environment_evidence(stage):
+            table = {"versions": {"action": "record pinned runtime versions", "evidence": "environment manifest", "risk": "works only on author machine"}, "capability": {"action": "probe Excel and xlwings availability", "evidence": "capability audit", "risk": "package installed but Excel absent"}, "smoke": {"action": "open save close disposable workbook", "evidence": "lifecycle log", "risk": "broken integration"}}
+            if stage not in table:
+                raise ValueError("unknown stage")
+            return table[stage]
+      hints: *id003
+    check:
+      id: python.excel.excel_02.environment-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.excel.excel_02.environment-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_environment_evidence
+        cases:
+        - id: recalls-versions
+          arguments:
+          - value: versions
+          expectedReturn:
+            action: record pinned runtime versions
+            evidence: environment manifest
+            risk: works only on author machine
+        - id: recalls-capability
+          arguments:
+          - value: capability
+          expectedReturn:
+            action: probe Excel and xlwings availability
+            evidence: capability audit
+            risk: package installed but Excel absent
+        - id: recalls-smoke
+          arguments:
+          - value: smoke
+          expectedReturn:
+            action: open save close disposable workbook
+            evidence: lifecycle log
+            risk: broken integration
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

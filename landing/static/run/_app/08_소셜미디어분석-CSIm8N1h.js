@@ -1,0 +1,982 @@
+var e=`meta:
+  packages:
+  - polars
+  id: polars_08
+  title: 소셜미디어분석
+  order: 8
+  category: polars
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  tags:
+  - 소셜미디어
+  - unpivot
+  - 체이닝
+  - over
+  - rolling
+  - 시간대분석
+  seo:
+    title: Polars 소셜미디어 분석 - unpivot과 복합 체이닝
+    description: 소셜미디어 데이터로 시간대별 게시물 패턴을 분석합니다. unpivot, over 윈도우, rolling, 복합 표현식 체이닝을 배웁니다.
+    keywords:
+    - Polars unpivot
+    - 표현식 체이닝
+    - 윈도우 함수
+    - 소셜미디어 분석
+intro:
+  emoji: 📱
+  goal: 소셜미디어 데이터에서 "시간대별 게시물 패턴"을 분석하는 대시보드를 만듭니다.
+  description: 게시물 데이터를 탐색하고 시간대별 패턴을 찾습니다. unpivot으로 데이터를 변환하고, over 윈도우 함수로 그룹별 계산을 수행하며, rolling으로
+    이동평균을 구하고, 복합 표현식 체이닝으로 효율적인 분석을 수행합니다. Polars의 강력한 표현식 시스템을 활용하여 pandas보다 간결하고 빠른 코드를 작성합니다.
+  direction: 소셜미디어분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - Polars DataFrame 확인 후 컬럼 선택/필터/집계에 맞는 코드 입력을 고릅니다.
+  - 소셜미디어분석 결과를 행 수, 컬럼 값, 집계 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 대용량 데이터 분석 파이프라인에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 생성 입력 확인
+      detail: 입력 기준(Polars DataFrame)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 탐색 처리 실행
+      detail: 컬럼 선택/필터/집계 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 날짜/시간 처리 결과 검증
+      detail: 행 수, 컬럼 값, 집계 결과 기준으로 실행 결과를 비교합니다.
+    - label: 소셜미디어분석 재사용
+      detail: 완성 코드를 대용량 데이터 분석 파이프라인에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 컬럼형 표 분석 환경
+      detail: polars 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 소셜미디어분석 실행
+      detail: 셀을 실행해 행 수, 컬럼 값, 집계 결과와 예외 상태를 확인합니다.
+    - label: 소셜미디어분석 완료
+      detail: 검증된 코드를 대용량 데이터 분석 파이프라인로 남깁니다.
+sections:
+- id: step1_data
+  title: 1단계. 데이터 생성
+  structuredPrimary: true
+  subtitle: 소셜미디어 게시물 데이터
+  goal: 1단계. 데이터 생성에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    소셜미디어 게시물 데이터를 생성합니다. 실무에서는 Twitter API, Instagram API 등에서 수집한 데이터를 사용하지만, 여기서는 실습용으로 1000개의 샘플 게시물을 생성합니다. 게시 시간(postTime), 플랫폼(platform), 좋아요(likes), 댓글(comments), 공유(shares), 해시태그(hashtag) 등 실제 소셜미디어 분석에 필요한 정보를 포함합니다. 시간대별, 플랫폼별 패턴을 분석하여 최적의 게시 전략을 수립할 수 있습니다.
+
+    random.seed(42)를 사용하면 매번 동일한 랜덤 데이터가 생성되어 재현 가능한 분석이 됩니다. 실무에서는 재현성이 중요하므로 시드를 고정하는 습관을 들이는 것이 좋습니다.
+  snippet: |-
+    import polars as pl
+    from datetime import datetime, timedelta
+    import random
+
+    random.seed(42)
+    baseDate = datetime(2024, 1, 1)
+    hashtags = ["#python", "#data", "#ai", "#ml", "#tech", "#coding", "#dev", "#learn"]
+    platforms = ["twitter", "instagram", "facebook"]
+
+    posts = []
+    for i in range(1000):
+        posts.append({
+            "postId": i + 1,
+            "postTime": baseDate + timedelta(hours=random.randint(0, 24 * 180)),
+            "platform": random.choice(platforms),
+            "likes": random.randint(0, 1000),
+            "comments": random.randint(0, 200),
+            "shares": random.randint(0, 100),
+            "hashtag": random.choice(hashtags),
+        })
+
+    df = pl.DataFrame(posts)
+    df.head(5)
+  exercise:
+    prompt: 1단계. 데이터 생성 예제에서 platforms나 hashtags 리스트 항목을 바꾸고 생성된 df의 분포가 달라지는지 확인하세요.
+    starterCode: |-
+      import polars as pl
+      from datetime import datetime, timedelta
+      import random
+
+      random.seed(42)
+      baseDate = datetime(2024, 1, 1)
+      hashtags = ["#python", "#data", "#ai", "#ml", "#tech", "#coding", "#dev", "#learn"]
+      platforms = ["twitter", "instagram", "facebook"]
+
+      posts = []
+      for i in range(1000):
+          posts.append({
+              "postId": i + 1,
+              "postTime": baseDate + timedelta(hours=random.randint(0, 24 * 180)),
+              "platform": random.choice(platforms),
+              "likes": random.randint(0, 1000),
+              "comments": random.randint(0, 200),
+              "shares": random.randint(0, 100),
+              "hashtag": random.choice(hashtags),
+          })
+
+      df = pl.DataFrame(posts)
+      df.head(5)
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 데이터 생성의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 생성의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step2_explore
+  title: 2단계. 데이터 탐색
+  structuredPrimary: true
+  subtitle: 기본 정보 확인
+  goal: 2단계. 데이터 탐색에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    생성된 데이터의 구조와 기본 통계를 확인합니다. describe() 메서드는 수치형 컬럼의 count, null_count, mean, std, min, 25%, 50%, 75%, max를 한 번에 보여줍니다. 이를 통해 데이터 분포, 이상치, null 여부를 빠르게 파악할 수 있습니다. 좋아요 수의 평균과 표준편차, 최솟값과 최댓값을 확인하면 데이터 품질을 검증할 수 있습니다.
+
+    describe()는 pandas의 describe()와 동일하지만, Polars는 더 빠르고 메모리 효율적입니다. select(pl.all().describe())로 모든 통계를 한눈에 볼 수도 있습니다.
+  tips:
+  - describe()는 pandas의 describe()와 동일하지만, Polars는 더 빠르고 메모리 효율적입니다. select(pl.all().describe())로 모든 통계를
+    한눈에 볼 수도 있습니다.
+  snippet: df.describe()
+  exercise:
+    prompt: 2단계. 데이터 탐색 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: df.describe()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 2단계. 데이터 탐색의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 탐색의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_datetime
+  title: 3단계. 날짜/시간 처리
+  structuredPrimary: true
+  subtitle: dt 네임스페이스 활용
+  goal: 3단계. 날짜/시간 처리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    postTime 컬럼에서 연(year), 월(month), 일(day), 시간(hour), 요일(weekday)을 추출합니다. Polars의 dt 네임스페이스는 날짜/시간 데이터를 처리하는 전용 메서드를 제공합니다. dt.year(), dt.month(), dt.hour(), dt.weekday()로 각 구성 요소를 쉽게 추출할 수 있으며, 시간대별, 요일별 패턴 분석에 필수적입니다. weekday는 0=월요일, 6=일요일을 의미합니다.
+
+    dt 네임스페이스에는 dt.date(), dt.time(), dt.timestamp(), dt.strftime() 등 다양한 메서드가 있습니다. pandas의 dt와 유사하지만, Polars는 타입 안정성이 더 높고 성능도 우수합니다.
+  tips:
+  - dt 네임스페이스에는 dt.date(), dt.time(), dt.timestamp(), dt.strftime() 등 다양한 메서드가 있습니다. pandas의 dt와 유사하지만,
+    Polars는 타입 안정성이 더 높고 성능도 우수합니다.
+  snippet: |-
+    df = df.with_columns([
+        pl.col("postTime").dt.year().alias("year"),
+        pl.col("postTime").dt.month().alias("month"),
+        pl.col("postTime").dt.day().alias("day"),
+        pl.col("postTime").dt.hour().alias("hour"),
+        pl.col("postTime").dt.weekday().alias("weekday")
+    ])
+    df.head(5)
+  exercise:
+    prompt: 3단계. 날짜/시간 처리 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      df = df.with_columns([
+          pl.col("postTime").dt.year().alias("year"),
+          pl.col("postTime").dt.month().alias("month"),
+          pl.col("postTime").dt.day().alias("day"),
+          pl.col("postTime").dt.hour().alias("hour"),
+          pl.col("postTime").dt.weekday().alias("weekday")
+      ])
+      df.head(5)
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 3단계. 날짜/시간 처리의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 3단계. 날짜/시간 처리의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step4_string
+  title: 4단계. 문자열 처리
+  structuredPrimary: true
+  subtitle: str 네임스페이스 활용
+  goal: 4단계. 문자열 처리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    해시태그에서
+
+    str 네임스페이스에는 str.slice(), str.contains(), str.starts_with(), str.split() 등 다양한 메서드가 있습니다. 정규표현식도 지원하여 복잡한 텍스트 처리가 가능합니다.
+  tips:
+  - str 네임스페이스에는 str.slice(), str.contains(), str.starts_with(), str.split() 등 다양한 메서드가 있습니다. 정규표현식도 지원하여
+    복잡한 텍스트 처리가 가능합니다.
+  snippet: |-
+    df = df.with_columns(
+        pl.col("hashtag").str.replace("#", "").str.to_uppercase().alias("tag")
+    )
+    df.select(["hashtag", "tag"]).head(5)
+  exercise:
+    prompt: 4단계. 문자열 처리 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      df = df.with_columns(
+          pl.col("hashtag").str.replace("#", "").str.to_uppercase().alias("tag")
+      )
+      df.select(["hashtag", "tag"]).head(5)
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 4단계. 문자열 처리의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 4단계. 문자열 처리의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step5_groupby
+  title: 5단계. 그룹별 집계
+  structuredPrimary: true
+  subtitle: 플랫폼별 통계
+  goal: 5단계. 그룹별 집계에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    플랫폼별로 게시물 수, 평균 좋아요, 평균 댓글, 평균 공유를 계산합니다. 이를 통해 어떤 플랫폼이 인게이지먼트가 높은지 비교할 수 있습니다. 일반적으로 Instagram은 좋아요 수가 높고, Twitter는 공유(리트윗)가 활발하며, Facebook은 댓글이 많은 경향이 있습니다. round(1)로 소수점 첫째 자리까지만 표시하여 가독성을 높입니다.
+
+    pl.len()은 그룹 내 행 개수를 세는 집계 함수입니다. 최신 Polars에서는 그룹 행 수 집계에 pl.len()을 사용합니다.
+  snippet: |-
+    df.group_by("platform").agg([
+        pl.len().alias("postCount"),
+        pl.col("likes").mean().round(1).alias("avgLikes"),
+        pl.col("comments").mean().round(1).alias("avgComments"),
+        pl.col("shares").mean().round(1).alias("avgShares")
+    ])
+  exercise:
+    prompt: 5단계. 그룹별 집계 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      df.group_by("platform").agg([
+          pl.len().alias("postCount"),
+          pl.col("likes").mean().round(1).alias("avgLikes"),
+          pl.col("comments").mean().round(1).alias("avgComments"),
+          pl.col("shares").mean().round(1).alias("avgShares")
+      ])
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 5단계. 그룹별 집계의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 5단계. 그룹별 집계 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step6_multi_group
+  title: 6단계. 다중 그룹 집계
+  structuredPrimary: true
+  subtitle: 플랫폼 + 시간대별
+  goal: 6단계. 다중 그룹 집계에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    플랫폼과 시간대(오전/오후)별로 집계합니다. when-then-otherwise로 hour를 오전(0-11)과 오후(12-23)로 분류한 후, 플랫폼과 시간대 두 개의 컬럼으로 그룹화합니다. 이렇게 다중 그룹 집계를 하면 "Instagram은 오후에 좋아요가 많다" 같은 세밀한 인사이트를 발견할 수 있습니다. sort()로 플랫폼과 시간대 순으로 정렬하여 비교하기 쉽게 만듭니다.
+
+    group_by([컬럼1, 컬럼2])로 여러 컬럼을 동시에 그룹화할 수 있습니다. 결과는 모든 조합에 대한 집계가 생성됩니다. SQL의 GROUP BY col1, col2와 동일합니다.
+  snippet: |-
+    df = df.with_columns(
+        pl.when(pl.col("hour") < 12)
+        .then(pl.lit("morning"))
+        .otherwise(pl.lit("afternoon"))
+        .alias("timeSlot")
+    )
+
+    df.group_by(["platform", "timeSlot"]).agg([
+        pl.len().alias("postCount"),
+        pl.col("likes").mean().round(1).alias("avgLikes")
+    ]).sort(["platform", "timeSlot"])
+  exercise:
+    prompt: 6단계. 다중 그룹 집계 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      df = df.with_columns(
+          pl.when(pl.col("hour") < 12)
+          .then(pl.lit("morning"))
+          .otherwise(pl.lit("afternoon"))
+          .alias("timeSlot")
+      )
+
+      df.group_by(["platform", "timeSlot"]).agg([
+          pl.len().alias("postCount"),
+          pl.col("likes").mean().round(1).alias("avgLikes")
+      ]).sort(["platform", "timeSlot"])
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 6단계. 다중 그룹 집계의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 6단계. 다중 그룹 집계의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step7_over
+  title: 7단계. over 윈도우 함수
+  structuredPrimary: true
+  subtitle: 그룹별 계산 유지
+  goal: 7단계. over 윈도우 함수에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    over()를 사용하면 그룹별 계산 결과를 원본 행에 붙일 수 있습니다. group_by()와의 차이점은 행 개수가 유지된다는 것입니다. group_by()는 그룹당 하나의 행으로 축소되지만, over()는 각 행에 그룹 통계를 추가합니다. 예를 들어 각 게시물이 해당 플랫폼 평균 대비 얼마나 좋아요를 받았는지 비교할 수 있습니다. 이는 SQL의 윈도우 함수(OVER PARTITION BY)와 동일한 개념입니다.
+
+    over('platform')은 각 행이 속한 플랫폼의 집계 결과를 반환합니다. GROUP BY와 달리 행 수가 유지되므로, 원본 데이터와 그룹 통계를 함께 볼 수 있습니다. over([컬럼1, 컬럼2])로 여러 컬럼으로 그룹화도 가능합니다.
+  tips:
+  - over('platform')은 각 행이 속한 플랫폼의 집계 결과를 반환합니다. GROUP BY와 달리 행 수가 유지되므로, 원본 데이터와 그룹 통계를 함께 볼 수 있습니다.
+    over([컬럼1, 컬럼2])로 여러 컬럼으로 그룹화도 가능합니다.
+  snippet: |-
+    df = df.with_columns([
+        pl.col("likes").mean().over("platform").round(1).alias("platformAvgLikes"),
+        (pl.col("likes") - pl.col("likes").mean().over("platform")).round(1).alias("diffFromAvg")
+    ])
+    df.select(["platform", "likes", "platformAvgLikes", "diffFromAvg"]).head(10)
+  exercise:
+    prompt: 7단계. over 윈도우 함수 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      df = df.with_columns([
+          pl.col("likes").mean().over("platform").round(1).alias("platformAvgLikes"),
+          (pl.col("likes") - pl.col("likes").mean().over("platform")).round(1).alias("diffFromAvg")
+      ])
+      df.select(["platform", "likes", "platformAvgLikes", "diffFromAvg"]).head(10)
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 7단계. over 윈도우 함수의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 7단계. over 윈도우 함수의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step8_rolling
+  title: 8단계. rolling 이동평균
+  structuredPrimary: true
+  subtitle: 시계열 분석
+  goal: 8단계. rolling 이동평균에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    날짜별 좋아요 합계의 7일 이동평균을 계산합니다. 이동평균(moving average)은 시계열 데이터의 트렌드를 파악하는 핵심 기법으로, 단기 변동을 제거하고 장기 추세를 드러냅니다. rolling_mean(window_size=7)은 현재 행을 포함한 최근 7개 값의 평균을 계산합니다. 일별 집계 후 날짜 순으로 정렬한 뒤 이동평균을 적용하면 소셜미디어 인기도의 추세를 시각화할 수 있습니다.
+
+    rolling_mean(window_size=7)은 현재 행 포함 최근 7개 값의 평균입니다. window_size를 조정하여 단기/장기 추세를 파악할 수 있습니다. rolling_sum(), rolling_max(), rolling_std() 등 다양한 rolling 함수를 지원합니다.
+  tips:
+  - rolling_mean(window_size=7)은 현재 행 포함 최근 7개 값의 평균입니다. window_size를 조정하여 단기/장기 추세를 파악할 수 있습니다. rolling_sum(),
+    rolling_max(), rolling_std() 등 다양한 rolling 함수를 지원합니다.
+  snippet: |-
+    dailyStats = df.group_by(pl.col("postTime").dt.date().alias("date")).agg([
+        pl.len().alias("postCount"),
+        pl.col("likes").sum().alias("totalLikes")
+    ]).sort("date")
+
+    dailyStats = dailyStats.with_columns(
+        pl.col("totalLikes").rolling_mean(window_size=7).round(1).alias("ma7Likes")
+    )
+    dailyStats.head(15)
+  exercise:
+    prompt: 8단계. rolling 이동평균 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      dailyStats = df.group_by(pl.col("postTime").dt.date().alias("date")).agg([
+          pl.len().alias("postCount"),
+          pl.col("likes").sum().alias("totalLikes")
+      ]).sort("date")
+
+      dailyStats = dailyStats.with_columns(
+          pl.col("totalLikes").rolling_mean(window_size=7).round(1).alias("ma7Likes")
+      )
+      dailyStats.head(15)
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 8단계. rolling 이동평균의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 8단계. rolling 이동평균의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step9_unpivot
+  title: 9단계. unpivot 변환
+  structuredPrimary: true
+  subtitle: 넓은 형태를 긴 형태로
+  goal: 9단계. unpivot 변환에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    likes, comments, shares 컬럼을 하나의 metric 컬럼으로 변환합니다. unpivot(언피벗)은 여러 컬럼에 분산된 값을 variable-value 형태로 모으는 작업으로, pandas의 melt()와 동일합니다. 넓은 형태(wide format)를 긴 형태(long format)로 변환하면 메트릭별 비교 분석이 쉬워집니다. 예를 들어 "어떤 메트릭이 플랫폼별로 차이가 큰가?"를 한 번에 분석할 수 있습니다.
+
+    unpivot(on=[열1, 열2], index=고정열)은 on에 지정한 열들을 variable/value 쌍으로 변환합니다. index는 고정되어 유지되는 컬럼입니다. pandas의 melt(id_vars, value_vars)와 같은 기능이지만 파라미터 이름이 다릅니다.
+  tips:
+  - unpivot(on=[열1, 열2], index=고정열)은 on에 지정한 열들을 variable/value 쌍으로 변환합니다. index는 고정되어 유지되는 컬럼입니다. pandas의
+    melt(id_vars, value_vars)와 같은 기능이지만 파라미터 이름이 다릅니다.
+  snippet: |-
+    melted = df.select(["postId", "platform", "likes", "comments", "shares"]).unpivot(
+        on=["likes", "comments", "shares"],
+        index=["postId", "platform"],
+        variable_name="metric",
+        value_name="value"
+    )
+    melted.head(15)
+  exercise:
+    prompt: 9단계. unpivot 변환 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      melted = df.select(["postId", "platform", "likes", "comments", "shares"]).unpivot(
+          on=["likes", "comments", "shares"],
+          index=["postId", "platform"],
+          variable_name="metric",
+          value_name="value"
+      )
+      melted.head(15)
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 9단계. unpivot 변환의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 9단계. unpivot 변환의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step10_unpivot_agg
+  title: 10단계. unpivot 후 집계
+  structuredPrimary: true
+  subtitle: 메트릭별 통계
+  goal: 10단계. unpivot 후 집계에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: unpivot된 데이터에서 플랫폼별, 메트릭별 평균을 계산합니다. 이렇게 하면 "Instagram은 likes가 높고, Twitter는 shares가 높다"처럼
+    메트릭별로 플랫폼 특성을 비교할 수 있습니다. group_by([플랫폼, 메트릭])으로 두 축을 동시에 그룹화하고, sort()로 정렬하여 패턴을 명확히 드러냅니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    melted.group_by(["platform", "metric"]).agg(
+        pl.col("value").mean().round(1).alias("avgValue")
+    ).sort(["metric", "platform"])
+  exercise:
+    prompt: 10단계. unpivot 후 집계 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      melted.group_by(["platform", "metric"]).agg(
+          pl.col("value").mean().round(1).alias("avgValue")
+      ).sort(["metric", "platform"])
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 10단계. unpivot 후 집계의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 10단계. unpivot 후 집계 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step11_chaining
+  title: 11단계. 복합 체이닝
+  structuredPrimary: true
+  subtitle: 여러 변환을 한 번에
+  goal: 11단계. 복합 체이닝에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    filter, with_columns, group_by, agg, sort를 체이닝하여 한 번에 복잡한 분석을 수행합니다. Polars의 강력한 표현식 체이닝을 활용하면 중간 변수 없이 읽기 쉬운 파이프라인을 만들 수 있습니다. 여기서는 "Instagram 오후 게시물의 해시태그별 인게이지먼트"를 분석합니다. filter로 조건 필터링, with_columns로 파생 변수 생성, group_by로 집계, sort로 정렬을 한 줄로 연결합니다. 이는 pandas보다 간결하고 빠른 Polars의 장점입니다.
+
+    복합 체이닝은 filter(...).with_columns(...).group_by(...).agg(...).sort(...) 형태로 여러 변환을 연결합니다. 각 단계는 새로운 DataFrame을 반환하므로 불변성(immutability)이 유지됩니다. 괄호로 감싸면 여러 줄로 나눠 쓸 수 있어 가독성이 좋습니다.
+  tips:
+  - 복합 체이닝은 filter(...).with_columns(...).group_by(...).agg(...).sort(...) 형태로 여러 변환을 연결합니다. 각 단계는 새로운
+    DataFrame을 반환하므로 불변성(immutability)이 유지됩니다. 괄호로 감싸면 여러 줄로 나눠 쓸 수 있어 가독성이 좋습니다.
+  snippet: |-
+    filtered = df.filter((pl.col("platform") == "instagram") & (pl.col("hour") >= 12))
+    withEngagement = filtered.with_columns(
+        (pl.col("likes") + pl.col("comments") + pl.col("shares")).alias("engagement")
+    )
+    withEngagement.head()
+  exercise:
+    prompt: 11단계. 복합 체이닝 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      filtered = df.filter((pl.col("platform") == "instagram") & (pl.col("hour") >= 12))
+      withEngagement = filtered.with_columns(
+          (pl.col("likes") + pl.col("comments") + pl.col("shares")).alias("engagement")
+      )
+      withEngagement.head()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 11단계. 복합 체이닝의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 11단계. 복합 체이닝의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step12_dashboard
+  title: 12단계. 대시보드 데이터
+  structuredPrimary: true
+  subtitle: 시간대별 분석 완성
+  goal: 12단계. 대시보드 데이터에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    최종 대시보드에 필요한 시간대별 통계를 생성합니다. 0-23시 각 시간대의 게시물 수, 평균 좋아요, 댓글, 공유, 총 인게이지먼트를 계산하고, 전체 게시물 대비 비율도 추가합니다. over(pl.lit(1))은 전체 데이터를 하나의 그룹으로 보고 총합을 계산하는 트릭입니다. 이렇게 만든 시간대별 통계로 "언제 게시하는 것이 가장 효과적인가?"를 답할 수 있습니다.
+
+    over(pl.lit(1))은 전체 데이터를 하나의 윈도우로 보는 트릭입니다. pl.lit(1)은 모든 행이 같은 값(1)을 가지므로, 전체가 하나의 그룹이 됩니다. 이를 이용해 전체 총합, 전체 평균 등을 계산할 수 있습니다.
+  tips:
+  - over(pl.lit(1))은 전체 데이터를 하나의 윈도우로 보는 트릭입니다. pl.lit(1)은 모든 행이 같은 값(1)을 가지므로, 전체가 하나의 그룹이 됩니다. 이를 이용해
+    전체 총합, 전체 평균 등을 계산할 수 있습니다.
+  snippet: |-
+    hourlyDashboard = df.group_by("hour").agg([
+        pl.len().alias("postCount"),
+        pl.col("likes").mean().round(1).alias("avgLikes"),
+        pl.col("comments").mean().round(1).alias("avgComments"),
+        pl.col("shares").mean().round(1).alias("avgShares"),
+        (pl.col("likes") + pl.col("comments") + pl.col("shares")).mean().round(1).alias("avgEngagement")
+    ]).with_columns(
+        (pl.col("postCount") / pl.col("postCount").sum().over(pl.lit(1)) * 100).round(1).alias("pctOfTotal")
+    ).sort("hour")
+    hourlyDashboard.head()
+  exercise:
+    prompt: 12단계. 대시보드 데이터 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      hourlyDashboard = df.group_by("hour").agg([
+          pl.len().alias("postCount"),
+          pl.col("likes").mean().round(1).alias("avgLikes"),
+          pl.col("comments").mean().round(1).alias("avgComments"),
+          pl.col("shares").mean().round(1).alias("avgShares"),
+          (pl.col("likes") + pl.col("comments") + pl.col("shares")).mean().round(1).alias("avgEngagement")
+      ]).with_columns(
+          (pl.col("postCount") / pl.col("postCount").sum().over(pl.lit(1)) * 100).round(1).alias("pctOfTotal")
+      ).sort("hour")
+      hourlyDashboard.head()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 12단계. 대시보드 데이터의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 12단계. 대시보드 데이터의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step13_peak
+  title: 13단계. 피크 시간대 분석
+  structuredPrimary: true
+  subtitle: 최적 게시 시간
+  goal: 13단계. 피크 시간대 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 평균 인게이지먼트가 전체 평균보다 높은 시간대를 필터링하여 최적의 게시 시간을 찾습니다. 이렇게 찾은 피크 시간대에 게시하면 더 많은 사용자 반응을 얻을 수
+    있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    (
+        hourlyDashboard
+        .filter(pl.col("avgEngagement") > pl.col("avgEngagement").mean())
+        .select(["hour", "postCount", "avgEngagement", "pctOfTotal"])
+        .sort("avgEngagement", descending=True)
+    )
+  exercise:
+    prompt: 13단계. 피크 시간대 분석 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      (
+          hourlyDashboard
+          .filter(pl.col("avgEngagement") > pl.col("avgEngagement").mean())
+          .select(["hour", "postCount", "avgEngagement", "pctOfTotal"])
+          .sort("avgEngagement", descending=True)
+      )
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 13단계. 피크 시간대 분석의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 13단계. 피크 시간대 분석 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step14_weekday
+  title: 14단계. 요일별 분석
+  structuredPrimary: true
+  subtitle: 복합 체이닝으로 요일 패턴
+  goal: 14단계. 요일별 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 요일별 게시물 수와 평균 인게이지먼트를 계산하고, 전체 평균과의 차이를 구합니다. 이를 통해 "주말에 인게이지먼트가 높다" 같은 요일별 패턴을 발견할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    weekdayStats = df.group_by("weekday").agg([
+        pl.len().alias("postCount"),
+        (pl.col("likes") + pl.col("comments") + pl.col("shares")).mean().round(1).alias("avgEngagement")
+    ])
+    weekdayStats
+  exercise:
+    prompt: 14단계. 요일별 분석 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      weekdayStats = df.group_by("weekday").agg([
+          pl.len().alias("postCount"),
+          (pl.col("likes") + pl.col("comments") + pl.col("shares")).mean().round(1).alias("avgEngagement")
+      ])
+      weekdayStats
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 14단계. 요일별 분석의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 14단계. 요일별 분석의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 소셜미디어 분석 프로젝트
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    소셜미디어 분석가가 되어 배운 모든 개념을 심층적으로 활용해봅시다. unpivot으로 메트릭 변환, over로 그룹별 비교, rolling으로 트렌드 분석, 복합 체이닝으로 다단계 분석을 모두 사용합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import polars as pl
+    from datetime import datetime, timedelta
+    import random
+
+    random.seed(42)
+    baseDate = datetime(2024, 1, 1)
+    hashtags = ["#python", "#data", "#ai", "#ml", "#tech"]
+    platforms = ["twitter", "instagram", "facebook"]
+    posts = []
+    for i in range(500):
+        postDate = baseDate + timedelta(days=random.randint(0, 89), hours=random.randint(0, 23))
+        platform = random.choice(platforms)
+        likes = random.randint(0, 500) if platform != "instagram" else random.randint(50, 1000)
+        posts.append({"postId": i + 1, "platform": platform, "postTime": postDate,
+            "likes": likes, "comments": random.randint(0, int(likes * 0.3)),
+            "shares": random.randint(0, int(likes * 0.2))})
+    socialRaw = pl.DataFrame(posts)
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import polars as pl
+      from datetime import datetime, timedelta
+      import random
+
+      random.seed(42)
+      baseDate = datetime(2024, 1, 1)
+      hashtags = ["#python", "#data", "#ai", "#ml", "#tech"]
+      platforms = ["twitter", "instagram", "facebook"]
+      posts = []
+      for i in range(500):
+          postDate = baseDate + timedelta(days=random.randint(0, 89), hours=random.randint(0, 23))
+          platform = random.choice(platforms)
+          likes = random.randint(0, 500) if platform != "instagram" else random.randint(50, 1000)
+          posts.append({"postId": i + 1, "platform": platform, "postTime": postDate,
+              "likes": likes, "comments": random.randint(0, int(likes * 0.3)),
+              "shares": random.randint(0, int(likes * 0.2))})
+      socialRaw = pl.DataFrame(posts)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 실습 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 소셜미디어 분석을 통해 Polars의 고급 기능을 마스터했습니다. over, rolling, unpivot, 복합 체이닝은 실무 데이터 분석의 핵심 기법입니다.
+  - type: list
+    items:
+    - dt.hour(), dt.weekday() - 날짜/시간 구성 요소 추출, 시간대/요일별 분석
+    - str.replace(), str.to_uppercase() - 문자열 정제 및 변환
+    - over('col') - 그룹별 윈도우 계산, 행 수 유지하며 그룹 통계 추가
+    - rolling_mean(window_size=N) - N개 값의 이동평균, 시계열 트렌드 분석
+    - unpivot(on=[], index=[]) - 넓은 형태를 긴 형태로, 메트릭별 비교 분석
+    - filter().with_columns().group_by().agg() - 복합 체이닝, 중간 변수 없이 파이프라인 구축
+    - over(pl.lit(1)) - 전체 데이터를 하나의 윈도우로, 전체 통계 계산
+  - type: text
+    content: 다음 시간에는 대용량 로그 데이터로 Lazy Evaluation과 쿼리 최적화를 배웁니다. explain()으로 쿼리 실행 계획을 확인하고 Predicate Pushdown을
+      경험합니다.
+  goal: 정리에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 주문 매출 파이프라인
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: Polars는 빠른 집계만 배우면 부족합니다. 업무에서는 입력 스키마를 먼저 확인하고, 잘못된 수량이나 단가를 명확한 오류로 막고, 예측한 상위 채널이 실제
+    집계와 맞는지 검증해야 합니다. 마지막에는 기준값을 바꾸는 변주로 결론이 얼마나 안정적인지 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import polars as pl
+
+    orderFrame = pl.DataFrame({
+        "orderId": [1001, 1002, 1003, 1004, 1005, 1006],
+        "channel": ["web", "store", "web", "partner", "store", "web"],
+        "quantity": [3, 2, 5, 1, 4, 2],
+        "unitPrice": [12000, 18000, 9000, 40000, 15000, 22000],
+        "refund": [0, 0, 1, 0, 0, 0],
+    })
+
+    def validateOrderFrame(frame: pl.DataFrame) -> bool:
+        requiredColumns = {"orderId", "channel", "quantity", "unitPrice", "refund"}
+        missingColumns = requiredColumns - set(frame.columns)
+        if missingColumns:
+            raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+        if frame.select((pl.col("quantity") <= 0).any()).item():
+            raise ValueError("quantity는 0보다 커야 합니다.")
+        if frame.select((pl.col("unitPrice") <= 0).any()).item():
+            raise ValueError("unitPrice는 0보다 커야 합니다.")
+        return True
+
+    validateOrderFrame(orderFrame)
+    orderFrame
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      revenueByChannel = (
+          orderFrame.filter(pl.col("refund") == 0)
+          .with_columns((pl.col("quantity") * pl.col("unitPrice")).alias("netRevenue"))
+          .group_by("channel")
+          .agg(pl.col("netRevenue").sum())
+      )
+
+      thresholdFrame = pl.DataFrame({"threshold": [20000, 50000, 80000]}).with_columns(
+          pl.col("threshold").map_elements(
+              lambda threshold: revenueByChannel.filter(pl.col("netRevenue") >= threshold).height,
+              return_dtype=pl.Int64,
+          ).alias("qualifiedChannels")
+      )
+
+      assert thresholdFrame.select((pl.col("qualifiedChannels").diff().fill_null(0) <= 0).all()).item()
+      thresholdFrame
+    solution: |-
+      import polars as pl
+
+      orderFrame = pl.DataFrame({
+          "orderId": [1001, 1002, 1003, 1004, 1005, 1006],
+          "channel": ["web", "store", "web", "partner", "store", "web"],
+          "quantity": [3, 2, 5, 1, 4, 2],
+          "unitPrice": [12000, 18000, 9000, 40000, 15000, 22000],
+          "refund": [0, 0, 1, 0, 0, 0],
+      })
+
+      def validateOrderFrame(frame: pl.DataFrame) -> bool:
+          requiredColumns = {"orderId", "channel", "quantity", "unitPrice", "refund"}
+          missingColumns = requiredColumns - set(frame.columns)
+          if missingColumns:
+              raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+          if frame.select((pl.col("quantity") <= 0).any()).item():
+              raise ValueError("quantity는 0보다 커야 합니다.")
+          if frame.select((pl.col("unitPrice") <= 0).any()).item():
+              raise ValueError("unitPrice는 0보다 커야 합니다.")
+          return True
+
+      validateOrderFrame(orderFrame)
+      orderFrame
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 업무 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: polars_08-social-engagement-rate-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_data
+    - workflow_validation
+    title: 게시물별 engagement rate와 creator 요약 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: likes·comments·shares를 impressions로 정규화하고 creator별 평균과 count를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 반응 건수 합을 impressions로 나눠 게시물 크기를 보정하세요.
+    - creator 평균 옆에 postCount를 함께 남기세요.
+    exercise:
+      prompt: social_engagement_summary(posts)를 완성해 postRates와 creators를 반환하세요.
+      starterCode: |-
+        def social_engagement_summary(posts):
+            raise NotImplementedError
+      solution: |
+        def social_engagement_summary(posts):
+            rates = []
+            grouped = {}
+            for post in posts:
+                if post["impressions"] <= 0:
+                    raise ValueError("impressions must be positive")
+                rate = (post["likes"] + post["comments"] + post["shares"]) / post["impressions"]
+                rates.append({"id": post["id"], "rate": round(rate, 4)})
+                grouped.setdefault(post["creator"], []).append(rate)
+            creators = {name: {"meanRate": round(sum(values) / len(values), 4), "postCount": len(values)} for name, values in sorted(grouped.items())}
+            return {"postRates": rates, "creators": creators}
+      hints: *id001
+    check:
+      id: python.polars.polars_08.social-engagement-rate.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_08.social-engagement-rate.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: social_engagement_summary
+        cases:
+        - id: normalizes-before-creator-mean
+          arguments:
+          - value:
+            - id: p1
+              creator: A
+              likes: 10
+              comments: 2
+              shares: 0
+              impressions: 100
+            - id: p2
+              creator: A
+              likes: 5
+              comments: 0
+              shares: 0
+              impressions: 50
+          expectedReturn:
+            postRates:
+            - id: p1
+              rate: 0.12
+            - id: p2
+              rate: 0.1
+            creators:
+              A:
+                meanRate: 0.11
+                postCount: 2
+        - id: handles-empty-feed
+          arguments:
+          - value: []
+          expectedReturn:
+            postRates: []
+            creators: {}
+        - id: rejects-zero-impressions
+          arguments:
+          - value:
+            - id: x
+              creator: A
+              likes: 1
+              comments: 0
+              shares: 0
+              impressions: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: polars_08-hashtag-explode-count-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_08-social-engagement-rate-mastery
+    title: 새 게시물의 hashtag list를 explode해 빈도 집계하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 게시물 grain을 hashtag row로 펼치고 unique post count와 total mention을 구분한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - explode 전에 hashtag를 소문자·# 제거로 정규화하세요.
+    - 같은 게시물의 중복 tag는 mentions에는 세되 postCount에는 한 번만 셉니다.
+    exercise:
+      prompt: hashtag_usage(posts)를 완성해 hashtag별 mentions와 postCount를 반환하세요.
+      starterCode: |-
+        def hashtag_usage(posts):
+            raise NotImplementedError
+      solution: |
+        def hashtag_usage(posts):
+            grouped = {}
+            for post in posts:
+                for tag in post.get("hashtags", []):
+                    normalized = tag.strip().lower().lstrip("#")
+                    if not normalized:
+                        continue
+                    bucket = grouped.setdefault(normalized, {"mentions": 0, "posts": set()})
+                    bucket["mentions"] += 1
+                    bucket["posts"].add(post["id"])
+            return {tag: {"mentions": value["mentions"], "postCount": len(value["posts"])} for tag, value in sorted(grouped.items())}
+      hints: *id002
+    check:
+      id: python.polars.polars_08.hashtag-explode-count.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_08.hashtag-explode-count.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: hashtag_usage
+        cases:
+        - id: distinguishes-mentions-and-posts
+          arguments:
+          - value:
+            - id: p1
+              hashtags:
+              - '#Python'
+              - python
+              - web
+            - id: p2
+              hashtags:
+              - Python
+          expectedReturn:
+            python:
+              mentions: 3
+              postCount: 2
+            web:
+              mentions: 1
+              postCount: 1
+        - id: handles-posts-without-tags
+          arguments:
+          - value:
+            - id: p1
+          expectedReturn: {}
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: polars_08-social-metric-denominator-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_08-hashtag-explode-count-transfer
+    title: 소셜 metric의 올바른 분모 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: engagement rate, click-through rate, creator share에 맞는 분모와 위험을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 비율 이름이 비슷해도 분자와 분모가 다릅니다.
+    - 모든 비교에 같은 관측 기간을 사용하세요.
+    exercise:
+      prompt: choose_social_denominator(situation)를 완성해 numerator, denominator, risk를 반환하세요.
+      starterCode: |-
+        def choose_social_denominator(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_social_denominator(situation):
+            table = {'engagement-rate': {'numerator': 'likes+comments+shares', 'denominator': 'impressions', 'risk': 'compare raw reactions'}, 'click-through-rate': {'numerator': 'clicks', 'denominator': 'impressions', 'risk': 'use followers'}, 'creator-post-share': {'numerator': 'creator posts', 'denominator': 'all posts in window', 'risk': 'mixed time window'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.polars.polars_08.social-metric-denominator.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_08.social-metric-denominator.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_social_denominator
+        cases:
+        - id: recalls-engagement-rate
+          arguments:
+          - value: engagement-rate
+          expectedReturn:
+            numerator: likes+comments+shares
+            denominator: impressions
+            risk: compare raw reactions
+        - id: recalls-click-through-rate
+          arguments:
+          - value: click-through-rate
+          expectedReturn:
+            numerator: clicks
+            denominator: impressions
+            risk: use followers
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

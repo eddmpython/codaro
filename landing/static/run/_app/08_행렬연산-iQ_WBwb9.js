@@ -1,0 +1,658 @@
+var e=`meta:
+  packages:
+  - sympy
+  id: sympy_08
+  title: 행렬연산
+  order: 8
+  category: sympy
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  tags:
+  - sympy
+  - Matrix
+  - 행렬
+  - 역행렬
+  - 고유값
+  - 선형대수
+  seo:
+    title: SymPy 행렬 연산 - Matrix와 선형대수
+    description: SymPy로 행렬을 생성하고 연산합니다. 역행렬, 행렬식, 고유값과 고유벡터, 연립방정식 풀이를 배웁니다.
+    keywords:
+    - sympy
+    - Matrix
+    - 행렬
+    - 역행렬
+    - 고유값
+    - 선형대수
+intro:
+  emoji: 🔢
+  goal: Matrix()로 행렬을 다루고 선형대수 계산을 수행합니다.
+  description: 행렬은 선형대수의 핵심으로, 데이터 과학, 머신러닝, 컴퓨터 그래픽스의 기초입니다. 2×2 행렬 [[a,b],[c,d]]는 2차원 공간의 선형 변환을 표현하고,
+    3×3 행렬은 3D 회전과 스케일링에 사용됩니다. 역행렬 A⁻¹은 변환의 취소, 행렬식 det(A)는 변환의 스케일 팩터를 의미합니다. 고유값과 고유벡터는 주성분 분석(PCA)의
+    기초가 됩니다. 이 프로젝트를 완료하면 행렬 연산, 연립방정식 풀이, 고유값 분석까지 다룰 수 있게 됩니다.
+  direction: 행렬연산에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 수식과 기호 확인 후 기호 계산에 맞는 코드 입력을 고릅니다.
+  - 행렬연산 결과를 간소화식, 해, 미분/적분 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 수학 계산 검증 루틴에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(수식과 기호)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 행렬 생성 처리 실행
+      detail: 기호 계산 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 특수 행렬 결과 검증
+      detail: 간소화식, 해, 미분/적분 결과 기준으로 실행 결과를 비교합니다.
+    - label: 행렬연산 재사용
+      detail: 완성 코드를 수학 계산 검증 루틴에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기호 계산 환경
+      detail: sympy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 행렬연산 실행
+      detail: 셀을 실행해 간소화식, 해, 미분/적분 결과와 예외 상태를 확인합니다.
+    - label: 행렬연산 완료
+      detail: 검증된 코드를 수학 계산 검증 루틴로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 행렬 작업에 필요한 함수들을 불러옵니다. Matrix()는 행렬을 생성하는 핵심 클래스입니다. eye(n)은 n×n 단위행렬, zeros(m,n)은 m×n
+    영행렬, ones(m,n)은 모든 원소가 1인 행렬입니다. diag()는 대각행렬을 생성합니다. 이 함수들은 NumPy와 유사하지만 기호 연산이 가능합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from sympy import Matrix, eye, zeros, ones, diag
+    from sympy import symbols, solve, Eq, sqrt, Rational
+    from sympy import init_printing
+    init_printing()
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from sympy import Matrix, eye, zeros, ones, diag
+      from sympy import symbols, solve, Eq, sqrt, Rational
+      from sympy import init_printing
+      init_printing()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 1단계. 라이브러리 불러오기의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step2_create
+  title: 2단계. 행렬 생성
+  structuredPrimary: true
+  subtitle: Matrix()
+  goal: 2단계. 행렬 생성에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    Matrix()는 중첩 리스트로 행렬을 생성합니다. Matrix([[1,2],[3,4]])는 2×2 행렬로, 첫 번째 리스트 [1,2]가 첫 번째 행, [3,4]가 두 번째 행입니다. Matrix([1,2,3])처럼 1차원 리스트를 전달하면 3×1 열벡터가 됩니다. 행렬의 크기는 .shape으로, 개별 원소는 [i,j] 인덱싱으로 접근합니다.
+
+    Matrix([[a, b], [c, d]])는 2×2 행렬입니다. Matrix([a, b, c])는 3×1 열벡터입니다.
+  snippet: |-
+    mat1 = Matrix([[1, 2], [3, 4]])
+    mat1
+  exercise:
+    prompt: 2단계. 행렬 생성 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      mat1 = Matrix([[1, 2], [3, 4]])
+      mat1
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 2단계. 행렬 생성의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 행렬 생성 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step3_special
+  title: 3단계. 특수 행렬
+  structuredPrimary: true
+  subtitle: eye, zeros, ones
+  goal: 3단계. 특수 행렬에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 특수 행렬은 선형대수에서 중요한 역할을 합니다. 단위행렬 I = eye(n)은 곱해도 원래 행렬이 변하지 않는 항등원입니다. AI = IA = A입니다. zeros(m,n)은
+    영행렬로 덧셈의 항등원입니다. diag(1,2,3)은 대각선에만 값이 있는 대각행렬로, 스케일링 변환을 표현합니다. 대각행렬의 행렬식은 대각 원소의 곱입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    identity = eye(3)
+    identity
+  exercise:
+    prompt: 3단계. 특수 행렬 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      identity = eye(3)
+      identity
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 3단계. 특수 행렬의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 특수 행렬 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step4_operations
+  title: 4단계. 기본 연산
+  structuredPrimary: true
+  subtitle: 덧셈, 곱셈
+  goal: 4단계. 기본 연산에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    행렬 연산은 원소별이 아닌 선형대수 규칙을 따릅니다. 덧셈 A+B는 같은 크기의 행렬끼리만 가능하고 원소별로 더합니다. 스칼라곱 2A는 모든 원소에 2를 곱합니다. 행렬곱 AB는 A의 열 수와 B의 행 수가 같아야 합니다. 중요한 것은 AB ≠ BA로 교환법칙이 성립하지 않습니다. 이 비교환성이 행렬만의 특성입니다.
+
+    행렬 곱 AB ≠ BA입니다. 행렬 곱은 교환법칙이 성립하지 않습니다. 곱셈 순서에 주의하세요.
+  snippet: |-
+    matA = Matrix([[1, 2], [3, 4]])
+    matB = Matrix([[5, 6], [7, 8]])
+    matA, matB
+  exercise:
+    prompt: 4단계. 기본 연산 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      matA = Matrix([[1, 2], [3, 4]])
+      matB = Matrix([[5, 6], [7, 8]])
+      matA, matB
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 4단계. 기본 연산의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 기본 연산 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step5_transpose
+  title: 5단계. 전치와 거듭제곱
+  structuredPrimary: true
+  subtitle: T, **n
+  goal: 5단계. 전치와 거듭제곱에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 전치행렬 Aᵀ는 행과 열을 바꾼 행렬입니다. 2×3 행렬의 전치는 3×2가 됩니다. .T 속성으로 접근합니다. (AB)ᵀ = BᵀAᵀ 규칙이 중요합니다. 거듭제곱
+    A²는 A*A, A³는 A*A*A입니다. 정사각행렬만 거듭제곱이 가능합니다. A⁻¹은 역행렬로 A*A⁻¹ = I입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    mat3 = Matrix([[1, 2, 3], [4, 5, 6]])
+    transposed = mat3.T
+    transposed
+  exercise:
+    prompt: 5단계. 전치와 거듭제곱 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      mat3 = Matrix([[1, 2, 3], [4, 5, 6]])
+      transposed = mat3.T
+      transposed
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 5단계. 전치와 거듭제곱의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 전치와 거듭제곱 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step6_det_inv
+  title: 6단계. 행렬식과 역행렬
+  structuredPrimary: true
+  subtitle: det(), inv()
+  goal: 6단계. 행렬식과 역행렬에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    행렬식 det(A)는 행렬이 나타내는 선형 변환의 스케일 팩터입니다. 2×2 행렬 [[a,b],[c,d]]의 행렬식은 ad-bc입니다. det(A)≠0이면 역행렬이 존재하고, det(A)=0이면 특이행렬로 역행렬이 없습니다. 역행렬 A⁻¹은 A*A⁻¹ = A⁻¹*A = I를 만족합니다. 연립방정식 Ax=b의 해는 x=A⁻¹b로 구할 수 있습니다.
+
+    행렬식이 0이면 역행렬이 존재하지 않습니다(특이행렬). det()가 0이 아니면 inv()로 역행렬을 구할 수 있습니다.
+  snippet: |-
+    detA = matA.det()
+    detA
+  exercise:
+    prompt: 6단계. 행렬식과 역행렬 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      detA = matA.det()
+      detA
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 6단계. 행렬식과 역행렬의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 행렬식과 역행렬 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step7_eigenvalue
+  title: 7단계. 고유값과 고유벡터
+  structuredPrimary: true
+  subtitle: eigenvals(), eigenvects()
+  goal: 7단계. 고유값과 고유벡터에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    고유값 λ와 고유벡터 v는 Av = λv를 만족합니다. 이는 행렬 A가 벡터 v를 λ배로 스케일링만 한다는 의미입니다. 고유값은 특성방정식 det(A-λI)=0을 풀어 구합니다. eigenvals()는 고유값과 중복도를, eigenvects()는 고유벡터까지 반환합니다. diagonalize()는 P⁻¹AP=D 형태로 대각화하여 거듭제곱 계산을 간단하게 합니다. 이 개념은 PCA, 진동 분석에 핵심입니다.
+
+    eigenvals()는 {고유값: 중복도} 딕셔너리를 반환합니다. eigenvects()는 (고유값, 중복도, [고유벡터들]) 튜플 리스트입니다.
+  snippet: |-
+    emat = Matrix([[4, 1], [2, 3]])
+    evals = emat.eigenvals()
+    evals
+  exercise:
+    prompt: 7단계. 고유값과 고유벡터 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      emat = Matrix([[4, 1], [2, 3]])
+      evals = emat.eigenvals()
+      evals
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 7단계. 고유값과 고유벡터의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 고유값과 고유벡터 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step8_solve
+  title: 8단계. 연립방정식 풀이
+  structuredPrimary: true
+  subtitle: Ax = b
+  goal: 8단계. 연립방정식 풀이에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    연립일차방정식은 행렬로 체계적으로 풀 수 있습니다. 2x+y=5, x+3y=8을 행렬로 표현하면 [[2,1],[1,3]][x,y]ᵀ = [5,8]ᵀ입니다. 해는 x = A⁻¹b로 구합니다. 변수가 많아져도 같은 방법으로 풀 수 있습니다. 역행렬이 존재하면(det≠0) 유일한 해가 있고, 존재하지 않으면 무한히 많거나 해가 없습니다.
+
+    변수가 많은 연립방정식은 행렬로 표현하면 체계적으로 풀 수 있습니다. 계수행렬과 상수벡터로 분리합니다.
+  snippet: |-
+    coeff = Matrix([[2, 1], [1, 3]])
+    const = Matrix([5, 8])
+    coeff, const
+  exercise:
+    prompt: 8단계. 연립방정식 풀이 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      coeff = Matrix([[2, 1], [1, 3]])
+      const = Matrix([5, 8])
+      coeff, const
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 8단계. 연립방정식 풀이의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 연립방정식 풀이 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step9_symbolic
+  title: 9단계. 기호 행렬
+  structuredPrimary: true
+  subtitle: 변수 포함 행렬
+  goal: 9단계. 기호 행렬에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: SymPy의 장점은 숫자 대신 기호를 사용할 수 있다는 것입니다. 2×2 기호 행렬 [[a,b],[c,d]]의 행렬식은 ad-bc, 역행렬은 (1/(ad-bc))[[d,-b],[-c,a]]입니다.
+    이런 일반 공식은 수치 계산으로는 얻을 수 없습니다. 기호 행렬로 패턴을 파악하고, 실제 값을 대입하여 검증할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    a, b, c, d = symbols('a b c d')
+    smat = Matrix([[a, b], [c, d]])
+    smat
+  exercise:
+    prompt: 9단계. 기호 행렬 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      a, b, c, d = symbols('a b c d')
+      smat = Matrix([[a, b], [c, d]])
+      smat
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 9단계. 기호 행렬의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 기호 행렬 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step10_rank
+  title: 10단계. 계수와 영공간
+  structuredPrimary: true
+  subtitle: rank(), nullspace()
+  goal: 10단계. 계수와 영공간에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 행렬의 계수(rank)는 선형 독립인 행(또는 열)의 최대 개수입니다. 3×3 행렬의 rank가 2라면 한 행이 다른 행들의 조합으로 표현됩니다. nullspace()는
+    Ax=0의 해집합으로, 영벡터가 아닌 해가 있으면 행렬은 특이(singular)합니다. rref()는 기약행사다리꼴로 변환하여 rank와 영공간을 직접 확인할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    mat4 = Matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    rk = mat4.rank()
+    rk
+  exercise:
+    prompt: 10단계. 계수와 영공간 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      mat4 = Matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+      rk = mat4.rank()
+      rk
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 10단계. 계수와 영공간의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 계수와 영공간 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 행렬 연습
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    이제 행렬의 기본 연산과 고급 기능을 종합적으로 연습합니다. 미션1에서는 두 행렬 P, Q의 곱 PQ와 QP가 다름을 확인하고, 행렬식과 역행렬을 계산합니다. 미션2에서는 대칭행렬의 고유값을 구하고, 3×3 연립방정식을 행렬로 풉니다. 이 연습들은 데이터 분석, 머신러닝 알고리즘 이해에 직접 활용됩니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    from sympy import Matrix, eye
+
+    matP = Matrix([[2, 1], [1, 3]])
+    matQ = Matrix([[1, 2], [0, 1]])
+
+    prodPQ = matP * matQ
+    prodQP = matQ * matP
+    prodPQ, prodQP
+  exercise:
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from sympy import Matrix, eye
+
+      matP = Matrix([[2, 1], [1, 3]])
+      matQ = Matrix([[1, 2], [0, 1]])
+
+      prodPQ = matP * matQ
+      prodQP = matQ * matP
+      prodPQ, prodQP
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 실습의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 실습 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기'
+  structuredPrimary: true
+  subtitle: 예측 → 수식 구성 → 오류 수정 → 결과 검증 → 실무 변주
+  goal: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: SymPy는 계산기를 대신하는 도구가 아니라, 업무 규칙을 수식으로 고정하고 전제 조건을 검증하는 도구입니다. 여기서는 고정비와 단위 이익으로 손익분기점을
+    구하고, 잘못된 계수를 먼저 실패시킨 뒤, 기준 변경 실험을 수행합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import sympy as sp
+
+    x = sp.symbols('x', nonnegative=True)
+    fixedCost = 120000
+    unitPrice = 5000
+    unitCost = 2000
+
+    revenueExpr = unitPrice * x
+    costExpr = fixedCost + unitCost * x
+    profitExpr = sp.simplify(revenueExpr - costExpr)
+    breakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]
+
+    assert profitExpr == 3000 * x - 120000
+    assert breakEvenQuantity == 40
+    profitExpr, breakEvenQuantity
+  exercise:
+    prompt: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    starterCode: |-
+      import sympy as sp
+
+      x = sp.symbols('x', nonnegative=True)
+      fixedCost = 120000
+      unitPrice = 5000
+      unitCost = 2000
+
+      revenueExpr = unitPrice * x
+      costExpr = fixedCost + unitCost * x
+      profitExpr = sp.simplify(revenueExpr - costExpr)
+      breakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]
+
+      assert profitExpr == 3000 * x - 120000
+      assert breakEvenQuantity == 40
+      profitExpr, breakEvenQuantity
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.'
+    resultCheck: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sympy_08-matrix-multiply-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 행렬 곱 shape와 값을 검증하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: inner dimension을 검사하고 matrix product를 계산한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 곱셈 가능 조건은 left columns=right rows입니다.
+    - elementwise 곱과 matrix 곱을 구분하세요.
+    exercise:
+      prompt: matrix_multiply(left, right)를 완성하세요.
+      starterCode: |-
+        def matrix_multiply(left, right):
+            raise NotImplementedError
+      solution: |
+        def matrix_multiply(left, right):
+            if not left or not right or not left[0] or not right[0]: raise ValueError("empty matrix")
+            if any(len(row) != len(left[0]) for row in left) or any(len(row) != len(right[0]) for row in right): raise ValueError("ragged matrix")
+            if len(left[0]) != len(right): raise ValueError("shape mismatch")
+            return [[sum(left[i][k]*right[k][j] for k in range(len(right))) for j in range(len(right[0]))] for i in range(len(left))]
+      hints: *id001
+    check:
+      id: python.sympy.sympy_08.matrix-multiply.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_08.matrix-multiply.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: matrix_multiply
+        cases:
+        - id: multiplies-compatible-shapes
+          arguments:
+          - value:
+            - - 1
+              - 2
+            - - 3
+              - 4
+          - value:
+            - - 2
+            - - 1
+          expectedReturn:
+          - - 4
+          - - 10
+        - id: multiplies-row-by-matrix
+          arguments:
+          - value:
+            - - 1
+              - 0
+          - value:
+            - - 5
+              - 6
+            - - 7
+              - 8
+          expectedReturn:
+          - - 5
+            - 6
+        - id: rejects-shape-mismatch
+          arguments:
+          - value:
+            - - 1
+              - 2
+          - value:
+            - - 1
+              - 2
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sympy_08-solve-two-by-two-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sympy_08-matrix-multiply-mastery
+    title: 새 연립방정식에 행렬 해법 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 2x2 determinant로 unique와 singular를 구분한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - determinant 0이면 역행렬을 만들지 마세요.
+    - singular에서 해 없음과 무한개는 추가 rank 검사가 필요합니다.
+    exercise:
+      prompt: solve_2x2(matrix, values)를 완성하세요.
+      starterCode: |-
+        def solve_2x2(matrix, values):
+            raise NotImplementedError
+      solution: |
+        def solve_2x2(matrix, values):
+            if len(matrix) != 2 or any(len(row) != 2 for row in matrix) or len(values) != 2: raise ValueError("expected 2x2 system")
+            a,b = matrix[0]; c,d = matrix[1]; determinant = a*d-b*c
+            if determinant == 0: return {"kind": "singular", "solution": None, "determinant": 0}
+            x = (values[0]*d-b*values[1])/determinant; y = (a*values[1]-values[0]*c)/determinant
+            return {"kind": "unique", "solution": [x,y], "determinant": determinant}
+      hints: *id002
+    check:
+      id: python.sympy.sympy_08.solve-two-by-two.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_08.solve-two-by-two.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: solve_2x2
+        cases:
+        - id: solves-unique-system
+          arguments:
+          - value:
+            - - 2
+              - 1
+            - - 1
+              - -1
+          - value:
+            - 5
+            - 1
+          expectedReturn:
+            kind: unique
+            solution:
+            - 2.0
+            - 1.0
+            determinant: -3
+        - id: detects-singular
+          arguments:
+          - value:
+            - - 1
+              - 2
+            - - 2
+              - 4
+          - value:
+            - 3
+            - 6
+          expectedReturn:
+            kind: singular
+            solution: null
+            determinant: 0
+        - id: rejects-wrong-shape
+          arguments:
+          - value:
+            - - 1
+          - value:
+            - 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sympy_08-matrix-operation-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sympy_08-solve-two-by-two-transfer
+    title: 행렬 연산 선택 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 곱·해·역행렬의 조건을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 기호 계산의 가정과 정의역을 결과와 함께 남기세요.
+    - 소수 근삿값과 exact 결과를 구분하세요.
+    exercise:
+      prompt: choose_matrix_method(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_matrix_method(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_matrix_method(situation):
+            table = {'compose-linear-maps': {'method': 'matrix multiplication', 'evidence': 'shape contract', 'risk': 'order reversal'}, 'solve-system': {'method': 'linear solve', 'evidence': 'rank and residual', 'risk': 'explicit inverse'}, 'singularity': {'method': 'determinant or rank', 'evidence': 'zero determinant', 'risk': 'floating tolerance'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sympy.sympy_08.matrix-operation.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_08.matrix-operation.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_matrix_method
+        cases:
+        - id: recalls-compose-linear-maps
+          arguments:
+          - value: compose-linear-maps
+          expectedReturn:
+            method: matrix multiplication
+            evidence: shape contract
+            risk: order reversal
+        - id: recalls-solve-system
+          arguments:
+          - value: solve-system
+          expectedReturn:
+            method: linear solve
+            evidence: rank and residual
+            risk: explicit inverse
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

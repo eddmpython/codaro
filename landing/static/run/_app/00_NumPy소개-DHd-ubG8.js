@@ -1,0 +1,693 @@
+var e=`meta:
+  packages:
+  - numpy
+  id: numpy_00
+  title: NumPy소개
+  order: 0
+  category: numpy
+  badge: 소개
+  source: eddmpython
+  sourceUrl: https://eddmpython.com
+  tags:
+  - NumPy
+  - 수치연산
+  - 배열
+  - 벡터화
+  - 브로드캐스팅
+  - 선형대수
+  - 검증
+  - 로컬실행
+  seo:
+    title: NumPy 입문 - 파이썬 수치 연산의 핵심
+    description: NumPy로 빠르고 효율적인 수치 연산을 수행해보세요. 벡터화와 브로드캐스팅으로 반복문 없이 대용량 데이터를 처리합니다.
+    keywords:
+    - NumPy
+    - 수치연산
+    - 배열
+    - ndarray
+    - 벡터화
+    - 브로드캐스팅
+intro:
+  direction: NumPy소개에서 배열 입력을 만들고 벡터 연산 결과를 수치로 검증합니다.
+  benefits:
+  - 첫 실행 셀은 assert로 핵심 결과를 고정해 실습 코드가 깨지지 않았는지 확인합니다.
+  - 배열 입력 확인 후 벡터화 계산에 맞는 코드 입력을 고릅니다.
+  - NumPy소개 결과를 shape와 수치 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 계산 파이프라인에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 매출 배열을 벡터화로 점검하기 입력 확인
+      detail: 입력 기준(배열 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 벡터화 계산 처리 실행
+      detail: 벡터화 계산 코드를 실행해 중간 결과를 확인합니다.
+    - label: shape와 수치 결과 결과 검증
+      detail: shape와 수치 결과 기준으로 실행 결과를 비교합니다.
+    - label: NumPy소개 재사용
+      detail: 완성 코드를 계산 파이프라인에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 배열 계산 환경
+      detail: numpy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: NumPy소개 실행
+      detail: 셀을 실행해 shape와 수치 결과와 예외 상태를 확인합니다.
+    - label: NumPy소개 완료
+      detail: 검증된 코드를 계산 파이프라인로 남깁니다.
+sections:
+- id: intro
+  blocks:
+  - type: mainHeader
+    emoji: 🔢
+    title: NumPy
+    subtitle: 파이썬 수치 연산의 핵심
+  - type: hero
+    emoji: ⚡
+    title: 빠르고 강력한 배열 연산
+    subtitle: 반복문 없이 대용량 데이터 처리
+    points:
+    - emoji: 🚀
+      title: C 기반 고속 연산
+    - emoji: 📊
+      title: 다차원 배열 지원
+    - emoji: 🔗
+      title: 데이터 과학의 기반
+    - emoji: ⚙️
+      title: 벡터화 연산
+  goal: NumPy에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+- id: numpy_history
+  blocks:
+  - type: sectionHeader
+    title: 🏛️ NumPy의 탄생
+    subtitle: 파이썬 과학 계산의 시작
+  - type: text
+    content: NumPy(Numerical Python)는 2005년 Travis Oliphant가 개발했습니다. 기존에 있던 Numeric과 Numarray를 통합하여 만들어졌으며,
+      현재 파이썬 데이터 과학 생태계의 기반이 되는 핵심 라이브러리입니다. Pandas, Scikit-learn, TensorFlow, PyTorch 등 거의 모든 데이터 과학
+      라이브러리가 NumPy를 기반으로 구축되어 있습니다.
+  - type: featureCards
+    cards:
+    - emoji: 🎯
+      title: 핵심 자료구조
+      description: ndarray(N-dimensional array)라는 다차원 배열 자료구조를 제공합니다
+    - emoji: ⚡
+      title: 고성능
+      description: C로 구현되어 파이썬 리스트보다 수십 배 빠른 연산 속도를 제공합니다
+    - emoji: 🔧
+      title: 범용성
+      description: 과학 계산, 데이터 분석, 머신러닝 등 모든 수치 연산의 기초입니다
+  goal: 🏛️ NumPy의 탄생에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+- id: why_numpy
+  blocks:
+  - type: sectionHeader
+    title: 🚀 왜 NumPy인가?
+    subtitle: 파이썬 리스트의 한계를 넘어서
+  - type: text
+    content: 파이썬 리스트로 100만 개의 숫자를 더하려면 반복문이 필요하고 느립니다. NumPy 배열은 같은 연산을 반복문 없이 한 줄로 작성하고, 수십 배 빠르게 실행합니다.
+  - type: note
+    title: 벡터화(Vectorization)
+    content: NumPy의 핵심 개념입니다. 반복문 없이 배열 전체에 연산을 적용하는 것을 벡터화라고 합니다. arr * 2라고 쓰면 배열의 모든 요소에 2가 곱해집니다. 이는
+      코드를 간결하게 만들고, 내부적으로 최적화된 C 코드가 실행되어 매우 빠릅니다.
+  goal: 🚀 왜 NumPy인가?에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+- id: ndarray
+  blocks:
+  - type: sectionHeader
+    title: 📦 ndarray 자료구조
+    subtitle: NumPy의 핵심
+  - type: text
+    content: NumPy의 핵심 자료구조는 ndarray(N-dimensional array)입니다. 다차원 배열을 의미하며, 파이썬 리스트와 달리 모든 요소가 동일한 데이터
+      타입을 가집니다. 이 제약 덕분에 메모리를 효율적으로 사용하고 빠른 연산이 가능합니다.
+  - type: note
+    title: 파이썬 리스트 vs NumPy 배열
+    content: 파이썬 리스트는 서로 다른 타입의 요소를 담을 수 있고 크기가 동적으로 변합니다. NumPy 배열은 동일 타입만 저장하고 크기가 고정됩니다. 이런 제약이 오히려
+      장점이 되어, 연속된 메모리에 데이터를 저장하고 CPU 캐시를 효율적으로 활용할 수 있습니다.
+  goal: 📦 ndarray 자료구조에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+- id: features
+  blocks:
+  - type: sectionHeader
+    title: 🛠️ NumPy의 주요 기능
+    subtitle: 수치 연산의 모든 것
+  - type: text
+    content: NumPy가 제공하는 주요 기능을 살펴봅시다. 단순히 배열을 만드는 것을 넘어 다양한 수학적, 통계적 연산을 지원합니다.
+  - type: table
+    headers:
+    - 기능
+    - 설명
+    - 예시
+    rows:
+    - - 배열 생성
+      - 다양한 방법으로 배열 생성
+      - array(), zeros(), ones(), arange(), linspace()
+    - - 인덱싱/슬라이싱
+      - 배열 요소 접근 및 부분 선택
+      - arr[0], arr[1:5], arr[arr > 0]
+    - - 수학 연산
+      - 산술, 삼각함수, 지수/로그
+      - +, -, *, /, np.sin(), np.exp()
+    - - 통계 함수
+      - 평균, 표준편차, 최대/최소
+      - mean(), std(), max(), min()
+    - - 배열 변형
+      - 형태 변경, 결합, 분할
+      - reshape(), concatenate(), split()
+    - - 선형대수
+      - 행렬 연산, 역행렬, 고유값
+      - dot(), linalg.inv(), linalg.eig()
+    - - 브로드캐스팅
+      - 크기가 다른 배열 간 연산
+      - 자동으로 크기 맞춤
+  goal: 🛠️ NumPy의 주요 기능에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+- id: broadcasting
+  blocks:
+  - type: sectionHeader
+    title: 📡 브로드캐스팅
+    subtitle: 크기가 다른 배열 간 연산
+  - type: text
+    content: 브로드캐스팅은 NumPy의 강력한 기능 중 하나입니다. 크기가 다른 배열 간에도 연산이 가능하도록 자동으로 배열을 확장합니다. 예를 들어 (3, 3) 행렬에 스칼라
+      값을 더하거나, (3, 1) 배열과 (1, 3) 배열을 더하면 자동으로 (3, 3) 결과가 나옵니다.
+  - type: note
+    title: 브로드캐스팅 규칙
+    content: 두 배열의 차원을 오른쪽부터 비교합니다. 각 차원이 같거나, 둘 중 하나가 1이면 브로드캐스팅이 가능합니다. 예를 들어 (5, 3)과 (3,)은 호환되고, (5,
+      3)과 (1, 3)도 호환됩니다. 하지만 (5, 3)과 (4,)는 호환되지 않습니다.
+  goal: 📡 브로드캐스팅에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+- id: datatype
+  blocks:
+  - type: sectionHeader
+    title: 🏷️ 데이터 타입
+    subtitle: dtype으로 메모리와 정밀도 제어
+  - type: text
+    content: NumPy 배열은 명시적인 데이터 타입(dtype)을 가집니다. 정수, 실수, 복소수, 불리언 등 다양한 타입을 지원하며, 메모리 크기를 직접 지정할 수도 있습니다.
+  - type: table
+    headers:
+    - 타입
+    - 설명
+    - 범위/정밀도
+    rows:
+    - - int32
+      - 32비트 정수
+      - -2^31 ~ 2^31-1
+    - - int64
+      - 64비트 정수
+      - -2^63 ~ 2^63-1
+    - - float32
+      - 32비트 실수
+      - 약 7자리 정밀도
+    - - float64
+      - 64비트 실수 (기본값)
+      - 약 15자리 정밀도
+    - - bool
+      - 불리언
+      - True/False
+    - - complex128
+      - 복소수
+      - 실수부+허수부 각 64비트
+  goal: 🏷️ 데이터 타입에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+- id: comparison
+  blocks:
+  - type: sectionHeader
+    title: ⚖️ NumPy vs Pandas vs 리스트
+    subtitle: 상황에 맞는 도구 선택
+  - type: text
+    content: NumPy는 다른 데이터 처리 도구들과 어떻게 다를까요? 각 도구의 특성을 이해하면 상황에 맞는 도구를 선택할 수 있습니다.
+  - type: table
+    headers:
+    - 특성
+    - NumPy
+    - Pandas
+    - 파이썬 리스트
+    rows:
+    - - 주요 용도
+      - 수치 연산
+      - 테이블 데이터 분석
+      - 범용 자료구조
+    - - 데이터 타입
+      - 동일 타입만
+      - 컬럼별 다른 타입
+      - 혼합 가능
+    - - 인덱싱
+      - 정수/불리언
+      - 정수/라벨/불리언
+      - 정수만
+    - - 속도
+      - 매우 빠름
+      - 빠름 (NumPy 기반)
+      - 느림
+    - - 메모리
+      - 효율적
+      - 보통
+      - 비효율적
+  goal: ⚖️ NumPy vs Pandas vs 리스트에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+- id: ecosystem
+  blocks:
+  - type: sectionHeader
+    title: 🌐 NumPy 생태계
+    subtitle: 데이터 과학의 기반
+  - type: text
+    content: NumPy는 파이썬 데이터 과학 생태계의 기반입니다. NumPy를 잘 이해하면 다른 라이브러리들도 쉽게 배울 수 있습니다.
+  - type: table
+    headers:
+    - 라이브러리
+    - NumPy 활용
+    rows:
+    - - Pandas
+      - DataFrame 내부가 NumPy 배열, .values로 접근
+    - - Matplotlib
+      - 플롯 데이터로 NumPy 배열 사용
+    - - Scikit-learn
+      - 모든 입출력이 NumPy 배열
+    - - SciPy
+      - NumPy 확장, 과학 계산 함수
+    - - TensorFlow/PyTorch
+      - 텐서와 NumPy 배열 상호 변환
+  goal: 🌐 NumPy 생태계에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+- id: usecases
+  blocks:
+  - type: sectionHeader
+    title: 💡 활용 분야
+    subtitle: NumPy가 사용되는 곳
+  - type: text
+    content: NumPy는 다양한 분야에서 활용됩니다. 데이터 전처리부터 과학 시뮬레이션까지 수치 계산이 필요한 거의 모든 곳에서 NumPy를 만날 수 있습니다.
+  - type: table
+    headers:
+    - 분야
+    - 활용 예시
+    rows:
+    - - 데이터 분석
+      - 통계 계산, 데이터 정규화, 특성 엔지니어링
+    - - 머신러닝
+      - 특성 행렬 구성, 가중치 연산, 손실 함수 계산
+    - - 이미지 처리
+      - 픽셀 데이터 조작, 필터 적용, 변환
+    - - 신호 처리
+      - FFT, 필터링, 스펙트럼 분석
+    - - 과학 시뮬레이션
+      - 물리 시뮬레이션, 수치 해석, 미분방정식
+    - - 금융
+      - 포트폴리오 분석, 리스크 계산, 시계열 분석
+  goal: 💡 활용 분야에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+- id: pandas_notice
+  blocks:
+  - type: sectionHeader
+    title: 📋 pandas 사용 안내
+    subtitle: 데이터 로딩용으로만 사용
+  - type: note
+    title: pandas는 나중에 배워요
+    content: 이 커리큘럼에서 pandas(pd)가 등장하지만, 데이터 로딩용으로만 사용합니다. pd.read_csv()로 CSV 파일을 불러온 뒤 .values로 NumPy
+      배열을 추출합니다. pandas의 기능은 Pandas 코스에서 자세히 배우니, 지금은 '데이터 불러오는 도구'로만 이해하세요.
+  goal: 📋 pandas 사용 안내에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+- id: curriculum
+  blocks:
+  - type: sectionHeader
+    title: 📚 커리큘럼
+    subtitle: 10개 프로젝트로 마스터
+  - type: text
+    content: 이 커리큘럼에서는 실제 데이터셋을 활용한 10개의 프로젝트를 통해 NumPy를 배웁니다.
+  - type: table
+    headers:
+    - 프로젝트
+    - 데이터셋
+    - 핵심 개념
+    rows:
+    - - 01. 포켓몬 스탯 분석
+      - Pokemon
+      - 배열 생성, 기본 통계
+    - - 02. 기온 데이터 탐색
+      - Global Temperature
+      - 인덱싱, 슬라이싱
+    - - 03. 지진 발생 패턴
+      - Earthquakes
+      - 불리언 인덱싱, 조건 선택
+    - - 04. 음악 특성 분석
+      - Spotify Songs
+      - 정규화, 상관관계
+    - - 05. BMI 계산기
+      - Weight-Height
+      - 브로드캐스팅, 벡터 연산
+    - - 06. 심장병 위험 분석
+      - Heart Disease
+      - 정렬, 누적 연산
+    - - 07. 대기질 시계열
+      - Air Quality
+      - 결측값 처리
+    - - 08. 행복지수 국가 비교
+      - World Happiness
+      - 순위, 선형대수 기초
+    - - 09. 전복 나이 예측
+      - Abalone
+      - 선형대수, 회귀
+    - - 10. 당뇨병 종합 분석
+      - Pima Diabetes
+      - 전체 개념 종합
+  goal: 📚 커리큘럼에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+- id: start
+  blocks:
+  - type: sectionHeader
+    title: 🎯 시작하기
+    subtitle: 첫 번째 프로젝트로
+  - type: text
+    content: NumPy를 배우면 파이썬으로 수치 계산을 효율적으로 수행할 수 있습니다. 반복문 없이 간결한 코드로 빠른 연산이 가능해지고, 데이터 과학과 머신러닝의 기초를
+      탄탄하게 다질 수 있습니다. 첫 번째 프로젝트에서 포켓몬 스탯 데이터를 분석하며 NumPy 배열의 기본을 익혀봅시다.
+  goal: 🎯 시작하기에서 배열 입력을 바꿨을 때 shape와 수치 결과가 어떻게 달라지는지 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 매출 배열을 벡터화로 점검하기'
+  structuredPrimary: true
+  subtitle: 배열 생성, 브로드캐스팅, 실패 케이스, 변주 실험
+  goal: '현업 흐름 검증: 매출 배열을 벡터화로 점검하기에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    NumPy 입문은 배열 문법 암기가 아니라 같은 업무 계산을 반복문 없이 안전하게 처리하는 감각에서 시작합니다. 매출과 할인율 배열의 shape을 예측하고, 브로드캐스팅 결과를 assert로 검증하세요.
+
+    변주 실험
+    월별 할인율 \`(3,)\`과 지점별 할인율 \`(2, 1)\`을 각각 적용해보고, 결과 shape과 합계가 어떻게 달라지는지 비교하세요.
+  tips:
+  - 변주 실험 월별 할인율 \`(3,)\`과 지점별 할인율 \`(2, 1)\`을 각각 적용해보고, 결과 shape과 합계가 어떻게 달라지는지 비교하세요.
+  snippet: |-
+    import numpy as np
+
+    sales = np.array([
+        [120_000, 135_000, 128_000],
+        [90_000, 98_000, 102_000],
+    ])
+    discountRates = np.array([[0.1], [0.05]])
+
+    discounted = sales * (1 - discountRates)
+    branchTotals = discounted.sum(axis=1)
+
+    assert discounted.shape == (2, 3)
+    assert np.allclose(branchTotals, [344_700, 275_500])
+    assert sales.dtype.kind in {"i", "u"}
+  exercise:
+    prompt: '현업 흐름 검증: 매출 배열을 벡터화로 점검하기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    starterCode: |-
+      import numpy as np
+
+      sales = np.array([
+          [120_000, 135_000, 128_000],
+          [90_000, 98_000, 102_000],
+      ])
+      discountRates = np.array([[0.1], [0.05]])
+
+      discounted = sales * (1 - discountRates)
+      branchTotals = discounted.sum(axis=1)
+
+      assert discounted.shape == (2, 3)
+      assert np.allclose(branchTotals, [344_700, 275_500])
+      assert sales.dtype.kind in {"i", "u"}
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 매출 배열을 벡터화로 점검하기에서 \`sales\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
+    resultCheck: '현업 흐름 검증: 매출 배열을 벡터화로 점검하기에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: numpy_00-numeric-matrix-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - workflow_validation
+    title: 숫자 matrix의 shape·dtype·범위 읽기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 중첩 list가 직사각형인지 검증하고 행·열·숫자 종류·최솟값·최댓값을 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - shape는 [행 수, 열 수] 순서입니다.
+    - float 값이 하나라도 있으면 공통 dtype을 float로 봅니다.
+    exercise:
+      prompt: inspect_numeric_matrix(matrix)를 완성해 shape, dtype, minimum, maximum을 반환하세요.
+      starterCode: |-
+        def inspect_numeric_matrix(matrix):
+            raise NotImplementedError
+      solution: |
+        def inspect_numeric_matrix(matrix):
+            if not isinstance(matrix, list) or not matrix:
+                raise ValueError("non-empty matrix required")
+            width = len(matrix[0])
+            if width == 0 or any(not isinstance(row, list) or len(row) != width for row in matrix):
+                raise ValueError("ragged matrix")
+            values = [value for row in matrix for value in row]
+            if any(not isinstance(value, (int, float)) or isinstance(value, bool) for value in values):
+                raise TypeError("numeric values required")
+            dtype = "float" if any(isinstance(value, float) for value in values) else "int"
+            return {"shape": [len(matrix), width], "dtype": dtype, "minimum": min(values), "maximum": max(values)}
+      hints: *id001
+    check:
+      id: python.numpy.numpy_00.numeric-matrix-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_00.numeric-matrix-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: inspect_numeric_matrix
+        cases:
+        - id: reads-shape-and-promoted-dtype
+          arguments:
+          - value:
+            - - 1
+              - 2
+            - - 3.5
+              - 4
+          expectedReturn:
+            shape:
+            - 2
+            - 2
+            dtype: float
+            minimum: 1
+            maximum: 4
+        - id: keeps-integer-dtype
+          arguments:
+          - value:
+            - - 2
+              - -1
+              - 5
+          expectedReturn:
+            shape:
+            - 1
+            - 3
+            dtype: int
+            minimum: -1
+            maximum: 5
+        - id: rejects-ragged-matrix
+          arguments:
+          - value:
+            - - 1
+              - 2
+            - - 3
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: numpy_00-reshape-and-transpose-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_00-numeric-matrix-contract-mastery
+    title: 새 sensor vector를 matrix로 reshape하고 transpose하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: shape 개념을 flat values의 row-major 재배치와 축 교환으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - reshape는 값 순서를 바꾸지 않고 row-major로 배치합니다.
+    - transpose의 각 행은 원 matrix의 한 열입니다.
+    exercise:
+      prompt: reshape_and_transpose(values, rows)를 완성해 matrix, transpose, shape를 반환하세요.
+      starterCode: |-
+        def reshape_and_transpose(values, rows):
+            raise NotImplementedError
+      solution: |
+        def reshape_and_transpose(values, rows):
+            if not isinstance(rows, int) or isinstance(rows, bool) or rows < 1 or len(values) % rows:
+                raise ValueError("incompatible shape")
+            columns = len(values) // rows
+            matrix = [list(values[index * columns:(index + 1) * columns]) for index in range(rows)]
+            transposed = [[matrix[row][column] for row in range(rows)] for column in range(columns)]
+            return {"matrix": matrix, "transpose": transposed, "shape": [rows, columns]}
+      hints: *id002
+    check:
+      id: python.numpy.numpy_00.reshape-and-transpose.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_00.reshape-and-transpose.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reshape_and_transpose
+        cases:
+        - id: reshapes-row-major-and-transposes
+          arguments:
+          - value:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+          - value: 2
+          expectedReturn:
+            matrix:
+            - - 1
+              - 2
+              - 3
+            - - 4
+              - 5
+              - 6
+            transpose:
+            - - 1
+              - 4
+            - - 2
+              - 5
+            - - 3
+              - 6
+            shape:
+            - 2
+            - 3
+        - id: handles-single-row
+          arguments:
+          - value:
+            - 7
+            - 8
+          - value: 1
+          expectedReturn:
+            matrix:
+            - - 7
+              - 8
+            transpose:
+            - - 7
+            - - 8
+            shape:
+            - 1
+            - 2
+        - id: rejects-incompatible-size
+          arguments:
+          - value:
+            - 1
+            - 2
+            - 3
+          - value: 2
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: numpy_00-array-axis-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_00-reshape-and-transpose-transfer
+    title: 배열 질문에 맞는 axis 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 행별·열별·전체 집계에서 줄어드는 축과 결과 shape를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - axis 번호는 남는 축이 아니라 줄어드는 축을 가리킵니다.
+    - 작은 2x3 예시로 결과 shape를 먼저 적어보세요.
+    exercise:
+      prompt: choose_array_axis(situation)를 완성해 axis, resultShape, meaning을 반환하세요.
+      starterCode: |-
+        def choose_array_axis(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_array_axis(situation):
+            table = {'sum-each-row': {'axis': 1, 'resultShape': 'rows', 'meaning': 'collapse columns'}, 'mean-each-column': {'axis': 0, 'resultShape': 'columns', 'meaning': 'collapse rows'}, 'global-maximum': {'axis': None, 'resultShape': 'scalar', 'meaning': 'collapse all dimensions'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.numpy.numpy_00.array-axis-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_00.array-axis-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_array_axis
+        cases:
+        - id: recalls-sum-each-row
+          arguments:
+          - value: sum-each-row
+          expectedReturn:
+            axis: 1
+            resultShape: rows
+            meaning: collapse columns
+        - id: recalls-mean-each-column
+          arguments:
+          - value: mean-each-column
+          expectedReturn:
+            axis: 0
+            resultShape: columns
+            meaning: collapse rows
+        - id: rejects-unknown-situation
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

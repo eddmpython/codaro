@@ -1,0 +1,852 @@
+var e=`meta:
+  packages:
+  - numpy
+  - pandas
+  id: numpy_07
+  title: 대기질시계열
+  order: 7
+  category: numpy
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  tags:
+  - numpy
+  - nan
+  - isnan
+  - nanmean
+  - nanstd
+  - zeros
+  - flatten
+  - 검증
+  - 결측시계열
+  seo:
+    title: NumPy 결측값 처리 - 대기질 시계열 분석
+    description: NumPy의 결측값 처리와 시계열 분석을 배우며 대기질 데이터의 추세를 파악합니다.
+    keywords:
+    - numpy
+    - 결측값
+    - nan
+    - nanmean
+    - 대기질
+    - 시계열
+intro:
+  emoji: 🌫️
+  goal: 대기질 데이터로 결측값 처리와 시계열 분석을 익힙니다.
+  description: 뉴욕시의 대기질 데이터를 분석합니다. 실제 데이터에는 결측값(NaN)이 많으며, 이를 적절히 처리하면서 시계열 추세를 분석합니다.
+  direction: 대기질시계열에서 배열 입력을 만들고 벡터 연산 결과를 수치로 검증합니다.
+  benefits:
+  - 배열 입력 확인 후 벡터화 계산에 맞는 코드 입력을 고릅니다.
+  - 대기질시계열 결과를 shape와 수치 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 계산 파이프라인에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(배열 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 로드 처리 실행
+      detail: 벡터화 계산 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 배열 추출 결과 검증
+      detail: shape와 수치 결과 기준으로 실행 결과를 비교합니다.
+    - label: 대기질시계열 재사용
+      detail: 완성 코드를 계산 파이프라인에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 배열 계산 환경
+      detail: numpy, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 대기질시계열 실행
+      detail: 셀을 실행해 shape와 수치 결과와 예외 상태를 확인합니다.
+    - label: 대기질시계열 완료
+      detail: 검증된 코드를 계산 파이프라인로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: NumPy와 pandas를 불러옵니다. pandas는 CSV 로딩용으로만 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import numpy as np
+    import pandas as pd
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: |-
+      import numpy as np
+      import pandas as pd
+    hints:
+    - 바꿀 지점은 배열 입력을 만드는 첫 줄과 벡터화 계산 줄에서 찾으세요.
+    - 실행 뒤 shape와 수치 결과 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 shape와 수치 결과 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step2_data
+  title: 2단계. 데이터 로드
+  structuredPrimary: true
+  subtitle: 대기질 데이터셋
+  goal: 2단계. 데이터 로드에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: R 프로그래밍 언어에서 유명한 airquality 데이터셋입니다. 1973년 5~9월 뉴욕시의 일일 대기질 측정값으로, Ozone(오존 농도, ppb), Solar.R(태양
+    복사량), Wind(풍속), Temp(기온, 화씨) 등이 기록되어 있습니다. 실제 측정 데이터라 결측값(측정 실패)이 포함되어 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    df = loadLocalDataset("airquality")
+    df.head(10)
+  exercise:
+    prompt: 2단계. 데이터 로드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      df = loadLocalDataset("airquality")
+      df.head(10)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 로드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 로드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_extract
+  title: 3단계. 배열 추출
+  structuredPrimary: true
+  subtitle: Ozone
+  goal: 3단계. 배열 추출에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 오존 농도 데이터를 NumPy 배열로 추출합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    ozone = df['Ozone'].values
+    ozone[:20]
+  exercise:
+    prompt: 3단계. 배열 추출 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      ozone = df['Ozone'].values
+      ozone[:20]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 배열 추출에서 \`ozone\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 배열 추출 실행 뒤 \`ozone\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step4_isnan
+  title: 4단계. 결측값 확인
+  structuredPrimary: true
+  subtitle: np.isnan()
+  goal: 4단계. 결측값 확인에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    NaN(Not a Number)은 '숫자가 아님'이라는 뜻으로, 결측값을 나타냅니다. 측정 장비 고장, 데이터 입력 누락 등으로 발생합니다. np.isnan()은 각 값이 NaN인지 확인해서 True/False 배열을 반환합니다. 실제 데이터 분석에서는 결측값 처리가 매우 중요합니다.
+
+    np.isnan()은 NaN(Not a Number) 여부를 불리언 배열로 반환합니다. NaN은 결측값을 나타내는 특수한 부동소수점 값입니다.
+  snippet: |-
+    mask = np.isnan(ozone)
+    mask[:20]
+  exercise:
+    prompt: 4단계. 결측값 확인 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      mask = np.isnan(ozone)
+      mask[:20]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 결측값 확인에서 \`mask\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 4단계. 결측값 확인 실행 뒤 \`mask\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step5_nan_count
+  title: 5단계. 결측값 개수
+  structuredPrimary: true
+  subtitle: 비율 계산
+  goal: 5단계. 결측값 개수에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 결측값의 개수와 비율을 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    n = np.sum(mask)
+    ratio = n / len(ozone) * 100
+    f"결측값: {n}개 ({ratio:.1f}%)"
+  exercise:
+    prompt: 5단계. 결측값 개수 예제에서 \`n\`, \`ratio\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      n = np.sum(mask)
+      ratio = n / len(ozone) * 100
+      f"결측값: {n}개 ({ratio:.1f}%)"
+    hints:
+    - 바꿀 지점은 \`n = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`n\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 결측값 개수에서 \`n\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 결측값 개수 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step6_mean_nan
+  title: 6단계. 일반 mean의 문제
+  structuredPrimary: true
+  subtitle: NaN 전파
+  goal: 6단계. 일반 mean의 문제에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: NaN은 '전파(propagation)'되는 특성이 있습니다. 어떤 숫자와 NaN을 연산하면 결과도 NaN이 됩니다. 1 + NaN = NaN, NaN ×
+    5 = NaN 입니다. 따라서 배열에 NaN이 하나라도 있으면 np.mean()의 결과도 NaN이 되어버립니다. 이 문제를 해결하려면 NaN을 무시하는 특별한 함수가 필요합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    avg = np.mean(ozone)
+    f"일반 mean: {avg}"
+  exercise:
+    prompt: 6단계. 일반 mean의 문제 예제에서 \`avg\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      avg = np.mean(ozone)
+      f"일반 mean: {avg}"
+    hints:
+    - 바꿀 지점은 \`avg = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`avg\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 일반 mean의 문제에서 \`avg\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 일반 mean의 문제 실행 뒤 \`avg\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step7_nanmean
+  title: 7단계. nanmean
+  structuredPrimary: true
+  subtitle: NaN 무시 평균
+  goal: 7단계. nanmean에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    np.nanmean()은 NaN 값을 건너뛰고 유효한 값들만으로 평균을 계산합니다. nan이 붙은 함수들(nansum, nanstd, nanmax, nanmin 등)은 모두 NaN을 무시합니다. 결측값이 있는 실제 데이터를 다룰 때 필수적인 함수들입니다.
+
+    np.nanmean(), np.nansum(), np.nanstd(), np.nanmax(), np.nanmin() 등은 NaN을 무시하고 계산합니다. 결측값이 있는 데이터에서 필수적입니다.
+  tips:
+  - np.nanmean(), np.nansum(), np.nanstd(), np.nanmax(), np.nanmin() 등은 NaN을 무시하고 계산합니다. 결측값이 있는 데이터에서
+    필수적입니다.
+  snippet: |-
+    clean = np.nanmean(ozone)
+    f"nanmean: {clean:.2f}"
+  exercise:
+    prompt: 7단계. nanmean 예제에서 \`clean\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      clean = np.nanmean(ozone)
+      f"nanmean: {clean:.2f}"
+    hints:
+    - 바꿀 지점은 \`clean = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`clean\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. nanmean에서 \`clean\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. nanmean 실행 뒤 \`clean\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step8_nan_funcs
+  title: 8단계. NaN-safe 함수들
+  structuredPrimary: true
+  subtitle: 비교
+  goal: 8단계. NaNsafe 함수들에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 다른 nan 통계 함수들도 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    pd.DataFrame({
+        'Statistic': ['Sum', 'Mean', 'Std', 'Max', 'Min'],
+        'Normal': [np.sum(ozone), np.mean(ozone), np.std(ozone), np.max(ozone), np.min(ozone)],
+        'NaN-safe': [np.nansum(ozone), np.nanmean(ozone), np.nanstd(ozone), np.nanmax(ozone), np.nanmin(ozone)]
+    }).round(2)
+  exercise:
+    prompt: 8단계. NaNsafe 함수들 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      pd.DataFrame({
+          'Statistic': ['Sum', 'Mean', 'Std', 'Max', 'Min'],
+          'Normal': [np.sum(ozone), np.mean(ozone), np.std(ozone), np.max(ozone), np.min(ozone)],
+          'NaN-safe': [np.nansum(ozone), np.nanmean(ozone), np.nanstd(ozone), np.nanmax(ozone), np.nanmin(ozone)]
+      }).round(2)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. NaNsafe 함수들의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 8단계. NaNsafe 함수들 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step9_where_fill
+  title: 9단계. 결측값 대체
+  structuredPrimary: true
+  subtitle: np.where()
+  goal: 9단계. 결측값 대체에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    결측값을 다른 값으로 대체하는 것을 '대체(imputation)'라고 합니다. 가장 간단한 방법은 0으로 대체하는 것입니다. np.where(조건, 참일때 값, 거짓일때 값)을 사용해서 NaN이면 0을, 아니면 원래 값을 선택합니다. 단, 0으로 대체하면 평균이 왜곡될 수 있어서 주의가 필요합니다.
+
+    np.where(condition, x, y)로 조건에 따라 값을 선택할 수 있습니다. 여기서는 NaN을 0으로 대체했습니다.
+  snippet: |-
+    filled = np.where(np.isnan(ozone), 0, ozone)
+    filled[:20]
+  exercise:
+    prompt: 9단계. 결측값 대체 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      filled = np.where(np.isnan(ozone), 0, ozone)
+      filled[:20]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 결측값 대체에서 \`filled\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 9단계. 결측값 대체 실행 뒤 \`filled\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step10_mean_fill
+  title: 10단계. 평균값 대체
+  structuredPrimary: true
+  subtitle: 결측값 보간
+  goal: 10단계. 평균값 대체에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 더 나은 대체 방법은 평균값으로 대체하는 것입니다. 먼저 nanmean으로 NaN을 제외한 평균을 구한 뒤, 그 값으로 NaN을 대체합니다. 이렇게 하면 전체
+    평균이 크게 왜곡되지 않습니다. 단, 이 방법은 데이터의 변동성(표준편차)을 줄이는 부작용이 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    mu = np.nanmean(ozone)
+    imputed = np.where(np.isnan(ozone), mu, ozone)
+    f"원본 평균: {np.nanmean(ozone):.2f}, 대체 후 평균: {np.mean(imputed):.2f}"
+  exercise:
+    prompt: 10단계. 평균값 대체 예제에서 \`mu\`, \`imputed\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      mu = np.nanmean(ozone)
+      imputed = np.where(np.isnan(ozone), mu, ozone)
+      f"원본 평균: {np.nanmean(ozone):.2f}, 대체 후 평균: {np.mean(imputed):.2f}"
+    hints:
+    - 바꿀 지점은 \`mu = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`mu\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 평균값 대체에서 \`mu\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 10단계. 평균값 대체 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step11_zeros
+  title: 11단계. zeros로 배열 생성
+  structuredPrimary: true
+  subtitle: 유효 데이터만
+  goal: 11단계. zeros로 배열 생성에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    np.zeros(크기)는 지정한 크기만큼 0으로 채워진 배열을 생성합니다. 대체 대신 NaN을 제거하고 유효한 데이터만 남기는 방법도 있습니다. ~mask는 mask의 반대(NaN이 아닌 위치)이므로, ozone[~mask]로 유효한 값들만 추출할 수 있습니다.
+
+    np.zeros(shape)는 0으로 채워진 배열을 생성합니다. ~(틸다)는 불리언 배열을 반전시켜 NaN이 아닌 위치를 선택합니다.
+  snippet: |-
+    count = np.sum(~mask)
+    valid = np.zeros(count)
+    valid[:] = ozone[~mask]
+    valid[:10]
+  exercise:
+    prompt: 11단계. zeros로 배열 생성 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      count = np.sum(~mask)
+      valid = np.zeros(count)
+      valid[:] = ozone[~mask]
+      valid[:10]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. zeros로 배열 생성에서 \`count\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 11단계. zeros로 배열 생성 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step12_isinf
+  title: 12단계. 무한대 검사
+  structuredPrimary: true
+  subtitle: np.isinf(), np.isfinite()
+  goal: 12단계. 무한대 검사에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    NaN 외에 무한대(infinity)도 특수한 값입니다. 0으로 나누기 등의 연산에서 발생할 수 있습니다. np.isinf()는 무한대(inf, -inf) 여부를 확인하고, np.isfinite()는 값이 '유한한 숫자'인지(NaN도 아니고 무한대도 아닌) 확인합니다. 데이터 품질 검증에 유용합니다.
+
+    np.isinf()는 무한대(inf, -inf) 여부를, np.isfinite()는 유한한 숫자인지(NaN과 inf가 아닌)를 검사합니다.
+  snippet: |-
+    solar = df['Solar.R'].values
+    inf = np.any(np.isinf(solar[~np.isnan(solar)]))
+    finite = np.isfinite(solar)
+    f"무한대 존재: {inf}, 유한값 개수: {np.sum(finite)}"
+  exercise:
+    prompt: 12단계. 무한대 검사 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      solar = df['Solar.R'].values
+      inf = np.any(np.isinf(solar[~np.isnan(solar)]))
+      finite = np.isfinite(solar)
+      f"무한대 존재: {inf}, 유한값 개수: {np.sum(finite)}"
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 12단계. 무한대 검사에서 \`solar\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 12단계. 무한대 검사 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step13_monthly
+  title: 13단계. 월별 평균
+  structuredPrimary: true
+  subtitle: flatten
+  goal: 13단계. 월별 평균에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    월별 오존 평균을 계산합니다.
+
+    flatten()은 다차원 배열을 1차원으로 평탄화합니다. 복잡한 구조의 결과를 단순하게 만들 때 유용합니다.
+  snippet: |-
+    month = df['Month'].values
+    months = np.unique(month)
+    avgs = []
+    for m in months:
+        sub = month == m
+        vals = ozone[sub]
+        avgs.append(np.nanmean(vals))
+    arr = np.array(avgs)
+    arr
+  exercise:
+    prompt: 13단계. 월별 평균 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      month = df['Month'].values
+      months = np.unique(month)
+      avgs = []
+      for m in months:
+          sub = month == m
+          vals = ozone[sub]
+          avgs.append(np.nanmean(vals))
+      arr = np.array(avgs)
+      arr
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 13단계. 월별 평균의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 13단계. 월별 평균 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step14_cumsum
+  title: 14단계. 누적 추세
+  structuredPrimary: true
+  subtitle: 시계열 분석
+  goal: 14단계. 누적 추세에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 일별 오존 누적합으로 추세를 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    zero = np.where(np.isnan(ozone), 0, ozone)
+    cumsum = np.cumsum(zero)
+    cumsum[-10:]
+  exercise:
+    prompt: 14단계. 누적 추세 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      zero = np.where(np.isnan(ozone), 0, ozone)
+      cumsum = np.cumsum(zero)
+      cumsum[-10:]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 14단계. 누적 추세에서 \`zero\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 14단계. 누적 추세 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step15_correlation
+  title: 15단계. 상관관계
+  structuredPrimary: true
+  subtitle: 기온과 오존
+  goal: 15단계. 상관관계에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 15단계. 상관관계의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    temp = df['Temp'].values
+    both = ~np.isnan(ozone) & ~np.isnan(temp)
+    o = ozone[both]
+    t = temp[both]
+    r = np.corrcoef(o, t)[0, 1]
+    f"오존-기온 상관계수: {r:.3f}"
+  exercise:
+    prompt: 15단계. 상관관계 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      temp = df['Temp'].values
+      both = ~np.isnan(ozone) & ~np.isnan(temp)
+      o = ozone[both]
+      t = temp[both]
+      r = np.corrcoef(o, t)[0, 1]
+      f"오존-기온 상관계수: {r:.3f}"
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 15단계. 상관관계에서 \`temp\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 15단계. 상관관계 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 대기질 결측값과 경보일 계산'
+  structuredPrimary: true
+  subtitle: isnan, nanmean, where, corrcoef, 실패 케이스
+  goal: '현업 흐름 검증: 대기질 결측값과 경보일 계산에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    환경 데이터는 결측값을 어떻게 처리했는지가 분석 결과를 좌우합니다. NaN을 유지한 평균, 대체한 누적합, 유효한 날짜만 쓰는 상관관계를 구분해 검증하세요.
+
+    변주 실험
+    결측을 평균으로 채우는 대신 직전 유효값으로 채우면 누적 오존 추세가 어떻게 달라지는지 비교하세요.
+  tips:
+  - 변주 실험 결측을 평균으로 채우는 대신 직전 유효값으로 채우면 누적 오존 추세가 어떻게 달라지는지 비교하세요.
+  snippet: |-
+    import numpy as np
+
+    ozone = np.array([41.0, np.nan, 80.0, 120.0, 55.0])
+    temp = np.array([67.0, 72.0, 79.0, 85.0, 70.0])
+
+    valid = ~np.isnan(ozone)
+    filled = np.where(valid, ozone, np.nanmean(ozone))
+    alertDays = ozone >= 80
+    corr = np.corrcoef(ozone[valid], temp[valid])[0, 1]
+
+    assert round(float(np.nanmean(ozone)), 2) == 74.0
+    assert filled[1] == 74.0
+    assert alertDays.tolist() == [False, False, True, True, False]
+    assert corr > 0.9
+  exercise:
+    prompt: '현업 흐름 검증: 대기질 결측값과 경보일 계산 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    starterCode: |-
+      import numpy as np
+
+      ozone = np.array([41.0, np.nan, 80.0, 120.0, 55.0])
+      temp = np.array([67.0, 72.0, 79.0, 85.0, 70.0])
+
+      valid = ~np.isnan(ozone)
+      filled = np.where(valid, ozone, np.nanmean(ozone))
+      alertDays = ozone >= 80
+      corr = np.corrcoef(ozone[valid], temp[valid])[0, 1]
+
+      assert round(float(np.nanmean(ozone)), 2) == 74.0
+      assert filled[1] == 74.0
+      assert alertDays.tolist() == [False, False, True, True, False]
+      assert corr > 0.9
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 대기질 결측값과 경보일 계산에서 \`ozone\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
+    resultCheck: '현업 흐름 검증: 대기질 결측값과 경보일 계산에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.'
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 대기질 데이터 분석
+  goal: 실습에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import numpy as np
+    import pandas as pd
+
+    data = pd.DataFrame({
+        'Ozone': [41, 36, 12, np.nan, 18, 28, np.nan, 23, 45, 60, 32, 29],
+        'Solar.R': [190, 118, 149, 313, np.nan, 299, 99, 19, 256, 290, 274, 65],
+        'Wind': [7.4, 8.0, 12.6, 11.5, 14.3, 8.6, 13.8, 20.1, 9.7, 6.9, 10.9, 13.2],
+        'Temp': [67, 72, 74, 62, 65, 79, 68, 61, 81, 86, 82, 58],
+        'Month': [5, 5, 5, 5, 5, 6, 6, 6, 7, 7, 8, 9],
+        'Day': [1, 2, 3, 4, 5, 1, 2, 3, 1, 2, 1, 1],
+    })
+    ozone = data['Ozone'].values
+    solar = data['Solar.R'].values
+    month = data['Month'].values
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import numpy as np
+      import pandas as pd
+
+      data = pd.DataFrame({
+          'Ozone': [41, 36, 12, np.nan, 18, 28, np.nan, 23, 45, 60, 32, 29],
+          'Solar.R': [190, 118, 149, 313, np.nan, 299, 99, 19, 256, 290, 274, 65],
+          'Wind': [7.4, 8.0, 12.6, 11.5, 14.3, 8.6, 13.8, 20.1, 9.7, 6.9, 10.9, 13.2],
+          'Temp': [67, 72, 74, 62, 65, 79, 68, 61, 81, 86, 82, 58],
+          'Month': [5, 5, 5, 5, 5, 6, 6, 6, 7, 7, 8, 9],
+          'Day': [1, 2, 3, 4, 5, 1, 2, 3, 1, 2, 1, 1],
+      })
+      ozone = data['Ozone'].values
+      solar = data['Solar.R'].values
+      month = data['Month'].values
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: numpy_07-air-quality-rolling-mean-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - practice
+    title: 대기질 시계열의 이동 평균과 초과 시점 찾기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 시간순 측정값에 완성 window만 적용하고 평균이 기준 이상인 time을 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 입력 순서를 믿지 말고 time으로 정렬하세요.
+    - window가 완성되기 전 시점은 rolling 결과에 넣지 마세요.
+    exercise:
+      prompt: air_quality_rolling(points, window, threshold)를 완성하세요.
+      starterCode: |-
+        def air_quality_rolling(points, window, threshold):
+            raise NotImplementedError
+      solution: |
+        def air_quality_rolling(points, window, threshold):
+            if not isinstance(window, int) or isinstance(window, bool) or window < 1:
+                raise ValueError("positive integer window required")
+            ordered = sorted(points, key=lambda point: point["time"])
+            rolling = []
+            for index in range(window - 1, len(ordered)):
+                values = [point["pm25"] for point in ordered[index - window + 1:index + 1]]
+                rolling.append({"time": ordered[index]["time"], "mean": round(sum(values) / window, 2)})
+            return {"rolling": rolling, "exceedTimes": [point["time"] for point in rolling if point["mean"] >= threshold]}
+      hints: *id001
+    check:
+      id: python.numpy.numpy_07.air-quality-rolling-mean.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_07.air-quality-rolling-mean.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: air_quality_rolling
+        cases:
+        - id: sorts-and-computes-complete-windows
+          arguments:
+          - value:
+            - time: 3
+              pm25: 50
+            - time: 1
+              pm25: 10
+            - time: 2
+              pm25: 30
+            - time: 4
+              pm25: 70
+          - value: 3
+          - value: 50
+          expectedReturn:
+            rolling:
+            - time: 3
+              mean: 30.0
+            - time: 4
+              mean: 50.0
+            exceedTimes:
+            - 4
+        - id: returns-no-partial-window
+          arguments:
+          - value:
+            - time: 1
+              pm25: 10
+          - value: 2
+          - value: 5
+          expectedReturn:
+            rolling: []
+            exceedTimes: []
+        - id: rejects-zero-window
+          arguments:
+          - value: []
+          - value: 0
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: numpy_07-pollution-episode-detection-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_07-air-quality-rolling-mean-mastery
+    title: 새 측정 series에서 연속 초과 episode 찾기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 단일 threshold 초과를 연속된 시간 구간의 start·end·peak로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - threshold 이상인 연속 구간을 하나의 episode로 묶으세요.
+    - series 끝에서도 열린 episode를 닫아야 합니다.
+    exercise:
+      prompt: detect_pollution_episodes(values, threshold)를 완성해 episodes를 반환하세요.
+      starterCode: |-
+        def detect_pollution_episodes(values, threshold):
+            raise NotImplementedError
+      solution: |
+        def detect_pollution_episodes(values, threshold):
+            episodes = []
+            start = None
+            peak = None
+            for index, value in enumerate(values + [float("-inf")]):
+                if value >= threshold:
+                    if start is None:
+                        start = index
+                        peak = value
+                    else:
+                        peak = max(peak, value)
+                elif start is not None:
+                    episodes.append({"start": start, "end": index - 1, "peak": peak})
+                    start = None
+                    peak = None
+            return episodes
+      hints: *id002
+    check:
+      id: python.numpy.numpy_07.pollution-episode-detection.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_07.pollution-episode-detection.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: detect_pollution_episodes
+        cases:
+        - id: finds-two-episodes
+          arguments:
+          - value:
+            - 10
+            - 40
+            - 60
+            - 20
+            - 50
+            - 55
+            - 10
+          - value: 40
+          expectedReturn:
+          - start: 1
+            end: 2
+            peak: 60
+          - start: 4
+            end: 5
+            peak: 55
+        - id: closes-episode-at-series-end
+          arguments:
+          - value:
+            - 10
+            - 40
+            - 50
+          - value: 40
+          expectedReturn:
+          - start: 1
+            end: 2
+            peak: 50
+        - id: handles-no-episode
+          arguments:
+          - value:
+            - 1
+            - 2
+          - value: 10
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: numpy_07-time-window-policy-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_07-pollution-episode-detection-transfer
+    title: 시계열 window 설정 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 이동 평균, episode, 결측 간격 상황에 맞는 정책과 증거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - window 길이는 결과를 바꾸는 모델 선택값입니다.
+    - 연속성 판단 전에 timestamp 간격을 확인하세요.
+    exercise:
+      prompt: choose_time_window_policy(situation)를 완성해 policy, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_time_window_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_time_window_policy(situation):
+            table = {'smooth-noise': {'policy': 'rolling mean', 'evidence': 'window length', 'risk': 'hide peaks'}, 'detect-sustained-event': {'policy': 'consecutive threshold', 'evidence': 'start end peak', 'risk': 'ignore sampling gaps'}, 'missing-timestamp': {'policy': 'reindex and mark missing', 'evidence': 'expected interval', 'risk': 'fake continuity'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.numpy.numpy_07.time-window-policy.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_07.time-window-policy.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_time_window_policy
+        cases:
+        - id: recalls-smooth-noise
+          arguments:
+          - value: smooth-noise
+          expectedReturn:
+            policy: rolling mean
+            evidence: window length
+            risk: hide peaks
+        - id: recalls-detect-sustained-event
+          arguments:
+          - value: detect-sustained-event
+          expectedReturn:
+            policy: consecutive threshold
+            evidence: start end peak
+            risk: ignore sampling gaps
+        - id: rejects-unknown-situation
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

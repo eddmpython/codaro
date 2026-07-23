@@ -1,0 +1,651 @@
+var e=`meta:
+  packages:
+  - pandas
+  - plotly
+  id: plotly_00
+  title: Plotly소개
+  order: 0
+  category: plotly
+  badge: 소개
+  source: eddmpython
+  sourceUrl: https://eddmpython.com
+  tags:
+  - Plotly
+  - Plotly Express
+  - 시각화
+  - 대화형 차트
+  - 인터랙티브
+  seo:
+    title: Plotly Express 입문 - 대화형 데이터 시각화
+    description: Plotly Express로 대화형 차트를 만들어보세요. 마우스 호버, 줌, 필터링이 가능한 인터랙티브 시각화를 경험합니다.
+    keywords:
+    - Plotly
+    - Plotly Express
+    - 대화형 차트
+    - 인터랙티브
+    - 데이터 시각화
+intro:
+  direction: Plotly소개에서 데이터를 상호작용 차트로 구성하고 필터와 표시 상태를 검증합니다.
+  benefits:
+  - 첫 실행 셀은 assert로 핵심 결과를 고정해 실습 코드가 깨지지 않았는지 확인합니다.
+  - 대시보드 데이터 확인 후 인터랙티브 시각화에 맞는 코드 입력을 고릅니다.
+  - Plotly소개 결과를 툴팁과 선택 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 공유 대시보드에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 10단계. Plotly 학습 입력 확인
+      detail: 입력 기준(대시보드 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 인터랙티브 시각화 처리 실행
+      detail: 인터랙티브 시각화 코드를 실행해 중간 결과를 확인합니다.
+    - label: 툴팁과 선택 상태 결과 검증
+      detail: 툴팁과 선택 상태 기준으로 실행 결과를 비교합니다.
+    - label: Plotly소개 재사용
+      detail: 완성 코드를 공유 대시보드에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 인터랙티브 차트 환경
+      detail: pandas, plotly 기준으로 로컬 Python 실행을 준비합니다.
+    - label: Plotly소개 실행
+      detail: 셀을 실행해 툴팁과 선택 상태와 예외 상태를 확인합니다.
+    - label: Plotly소개 완료
+      detail: 검증된 코드를 공유 대시보드로 남깁니다.
+sections:
+- id: intro
+  blocks:
+  - type: mainHeader
+    emoji: 📊
+    title: Plotly Express??
+    subtitle: matplotlib 말고 뭐가 더 있어?
+  - type: hero
+    emoji: ✨
+    title: 대화형 차트의 세계
+    subtitle: 마우스로 탐색하는 시각화
+    points:
+    - emoji: 🖱️
+      title: 마우스 호버로 상세 정보
+    - emoji: 🔍
+      title: 줌인/줌아웃 자유자재
+    - emoji: 📸
+      title: 이미지로 바로 저장
+    - emoji: 🎬
+      title: 애니메이션 차트
+  - type: image
+    src: https://images.plot.ly/plotly-documentation/thumbnail/plotly-express.png
+  goal: Plotly Express??에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+- id: why_plotly
+  blocks:
+  - type: sectionHeader
+    title: 🤔 matplotlib으로 충분하지 않나요?
+    subtitle: 정적 차트 vs 대화형 차트
+  - type: compare
+    left:
+      title: matplotlib
+      subtitle: 전통적인 방식
+      icon: 📄
+      color: gray
+      items:
+      - 이미지로 저장
+      - 보는 것만 가능
+      - 확대하면 깨짐
+      - 세부 정보 확인 어려움
+      - 코드가 길어짐
+      infoBox: 논문, 보고서에 적합
+    right:
+      title: Plotly Express
+      subtitle: 현대적인 방식
+      icon: ✨
+      color: green
+      items:
+      - 웹에서 바로 상호작용
+      - 마우스 호버로 정보 확인
+      - 확대/축소 자유자재
+      - 클릭으로 필터링
+      - 한 줄로 완성
+      infoBox: 웹, 대시보드에 적합
+  goal: 🤔 matplotlib으로 충분하지 않나요?에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+- id: plotly_express
+  blocks:
+  - type: sectionHeader
+    title: 🚀 Plotly Express란?
+    subtitle: Plotly를 쉽게 쓰는 방법
+  - type: note
+    style: info
+    title: Plotly vs Plotly Express
+    content: Plotly는 저수준 라이브러리이고, Plotly Express는 고수준 래퍼입니다. seaborn이 matplotlib을 쉽게 만들어준 것처럼, Plotly
+      Express가 Plotly를 쉽게 만들어줍니다.
+  - type: featureCards
+    cards:
+    - emoji: 🎯
+      title: 한 줄 코드
+      description: px.scatter(df, x='col1', y='col2')처럼 한 줄로 차트 완성
+    - emoji: 📊
+      title: 30+ 차트 종류
+      description: 산점도, 막대, 선, 히트맵, 지도, 3D까지 모두 지원
+    - emoji: 🎨
+      title: 자동 스타일링
+      description: 색상, 범례, 축 라벨을 자동으로 설정
+    - emoji: 🔗
+      title: DataFrame 친화적
+      description: pandas DataFrame을 바로 넣으면 됨
+  goal: 🚀 Plotly Express란?에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+- id: builtin_data
+  blocks:
+  - type: sectionHeader
+    title: 📦 px.data 내장 데이터
+    subtitle: uv 준비 후 바로 사용하는 연습용 데이터
+  - type: table
+    headers:
+    - 데이터
+    - 설명
+    - 행 수
+    - 주요 컬럼
+    rows:
+    - - gapminder()
+      - 세계 발전 지표
+      - 1,704
+      - country, year, lifeExp, pop, gdpPercap
+    - - iris()
+      - 붓꽃 품종
+      - '150'
+      - sepal_length, petal_width, species
+    - - tips()
+      - 레스토랑 팁
+      - '244'
+      - total_bill, tip, day, time, size
+    - - stocks()
+      - 주식 시세
+      - '505'
+      - date, GOOG, AAPL, AMZN, FB, NFLX, MSFT
+    - - carshare()
+      - 카쉐어링
+      - '249'
+      - centroid_lat, centroid_lon, peak_hour
+    - - wind()
+      - 풍향/풍속
+      - '128'
+      - direction, strength, frequency
+    - - election()
+      - 선거 결과
+      - '58'
+      - district, winner, result
+    - - medals_long()
+      - 올림픽 메달
+      - '9'
+      - nation, medal, count
+  - type: note
+    style: tip
+    title: 인터넷 연결 필요 없음
+    content: px.data 데이터는 라이브러리에 내장되어 있어서 인터넷 연결 없이도 사용할 수 있습니다. 학습용으로 완벽합니다.
+  goal: 📦 px.data 내장 데이터에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+- id: projects_preview
+  blocks:
+  - type: sectionHeader
+    title: 🗺️ 10개 프로젝트 미리보기
+    subtitle: 이 순서대로 배웁니다
+  - type: table
+    headers:
+    - 단계
+    - 프로젝트
+    - 배울 내용
+    rows:
+    - - 입문
+      - 01 기본차트입문
+      - scatter, line, bar, histogram 기초
+    - - 초급
+      - 02 팁데이터분석
+      - box, violin, facet으로 분포 비교
+    - - 초급
+      - 03 세계인구분석
+      - color, size, hover로 다차원 표현
+    - - 중급
+      - 04 애니메이션차트
+      - animation_frame으로 시간 변화
+    - - 중급
+      - 05 붓꽃상관분석
+      - trendline, 산점도 매트릭스
+    - - 중급
+      - 06 설문조사분석
+      - pie, 누적 bar, 비율 시각화
+    - - 고급
+      - 07 센서데이터분석
+      - line, area, 시계열 패턴
+    - - 고급
+      - 08 마케팅퍼널분석
+      - funnel, treemap, sunburst
+    - - 고급
+      - 09 주가차트분석
+      - candlestick, OHLC, 금융 차트
+    - - 종합
+      - 10 대시보드프로젝트
+      - subplots로 종합 대시보드
+  - type: note
+    style: info
+    title: 프로젝트 기반 학습
+    content: 각 프로젝트는 완성된 결과물을 만듭니다. 개념만 배우는 게 아니라 실제 분석을 수행합니다.
+  goal: 🗺️ 10개 프로젝트 미리보기에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+- id: interactive_features
+  blocks:
+  - type: sectionHeader
+    title: 🖱️ 대화형 차트의 기능
+    subtitle: Plotly 차트에서 할 수 있는 것들
+  - type: featureCards
+    cards:
+    - emoji: 🔍
+      title: 줌
+      description: 드래그해서 특정 영역 확대. 더블클릭하면 원래대로
+    - emoji: 🖱️
+      title: 호버
+      description: 마우스를 올리면 데이터 포인트 상세 정보 표시
+    - emoji: 📷
+      title: 다운로드
+      description: 차트 우측 상단 카메라 아이콘으로 PNG 저장
+    - emoji: 🔲
+      title: 범례 필터
+      description: 범례 클릭으로 특정 카테고리 숨기기/표시
+    - emoji: ✋
+      title: 팬
+      description: 확대 상태에서 드래그로 이동
+    - emoji: 📦
+      title: 선택
+      description: 박스/올가미로 데이터 포인트 선택
+  goal: 🖱️ 대화형 차트의 기능에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+- id: comparison_chart
+  blocks:
+  - type: sectionHeader
+    title: 📊 Python 시각화 라이브러리 비교
+    subtitle: 어떤 상황에 어떤 도구?
+  - type: table
+    headers:
+    - 라이브러리
+    - 특징
+    - 추천 상황
+    rows:
+    - - matplotlib
+      - 가장 기본, 세밀한 커스텀
+      - 논문, 출판물, 완전한 제어
+    - - seaborn
+      - 통계 시각화, 예쁜 기본값
+      - EDA, 통계 분석
+    - - Plotly Express
+      - 대화형, 웹 친화적
+      - 대시보드, 웹앱, 탐색적 분석
+    - - Altair
+      - 선언적 문법, 간결함
+      - 빠른 프로토타이핑
+    - - Bokeh
+      - 대용량 대화형
+      - 실시간 스트리밍
+  - type: note
+    style: tip
+    title: 정답은 없습니다
+    content: 상황에 맞는 도구를 선택하세요. 이 과정에서는 Plotly Express로 대화형 시각화의 매력을 경험합니다.
+  goal: 📊 Python 시각화 라이브러리 비교에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+- id: resources
+  blocks:
+  - type: sectionHeader
+    title: 📚 참고 자료
+    subtitle: 더 깊이 공부하고 싶다면
+  - type: links
+    items:
+    - text: Plotly Express 공식 문서
+      url: https://plotly.com/python/plotly-express/
+      icon: 🔗
+    - text: px.data 내장 데이터셋
+      url: https://plotly.com/python-api-reference/generated/plotly.express.data.html
+      icon: 🔗
+    - text: Plotly Express Cheat Sheet
+      url: https://www.datacamp.com/cheat-sheet/plotly-express-cheat-sheet
+      icon: 🔗
+  goal: 📚 참고 자료에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+- id: workflow_validation
+  title: 10단계. Plotly 학습 흐름 검증
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  goal: 10단계. Plotly 학습 흐름 검증에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    Plotly 입문은 인터랙티브라는 특징을 말로 아는 데서 끝나지 않습니다. 로컬 데이터로 Figure를 만들고, trace와 layout이 분석 질문을 제대로 담는지 확인해야 합니다.
+
+    Plotly도 Figure 객체를 검증하면 “보이는 차트”를 넘어 재사용 가능한 분석 산출물이 됩니다.
+  snippet: |-
+    import plotly.express as px
+    from codaro.curriculum.localData import loadLocalDataset
+
+    plotlyTips = loadLocalDataset("tips")
+    requiredColumns = {"total_bill", "tip", "time", "day"}
+    missingColumns = requiredColumns - set(plotlyTips.columns)
+
+    assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+    assert plotlyTips["total_bill"].gt(plotlyTips["tip"]).all()
+
+    billTipCorrelation = plotlyTips[["total_bill", "tip"]].corr().loc["total_bill", "tip"]
+    assert billTipCorrelation > 0.6
+    round(float(billTipCorrelation), 3)
+  exercise:
+    prompt: 10단계. Plotly 학습 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import plotly.express as px
+      from codaro.curriculum.localData import loadLocalDataset
+
+      plotlyTips = loadLocalDataset("tips")
+      requiredColumns = {"total_bill", "tip", "time", "day"}
+      missingColumns = requiredColumns - set(plotlyTips.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert plotlyTips["total_bill"].gt(plotlyTips["tip"]).all()
+
+      billTipCorrelation = plotlyTips[["total_bill", "tip"]].corr().loc["total_bill", "tip"]
+      assert billTipCorrelation > 0.6
+      round(float(billTipCorrelation), 3)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. Plotly 학습 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 10단계. Plotly 학습 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: next
+  blocks:
+  - type: hero
+    emoji: 👉
+    title: '다음: 기본 차트 입문'
+    subtitle: 산점도, 선 그래프, 막대 그래프, 히스토그램을 한 번에 배웁니다
+  goal: '다음: 기본 차트 입문에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.'
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: plotly_00-plotly-interaction-contract-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - next
+    title: Plotly interactive chart 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: interaction이 질문에 필요한 세부 정보만 제공하는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_plotly_interaction_contract(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_plotly_interaction_contract(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_plotly_interaction_contract(rows):
+            required = ['x', 'y', 'series']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'series'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['x'] for row in usable]
+            y_values = [row['y'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.plotly.plotly_00.plotly-interaction-contract-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.plotly.plotly_00.plotly-interaction-contract-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_plotly_interaction_contract
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - x: 1
+              y: 3
+              series: A
+            - x: 2
+              y: 5
+              series: A
+            - x: 1
+              y: 4
+              series: B
+          expectedReturn:
+            usableCount: 3
+            excludedCount: 0
+            groupCounts:
+              A: 2
+              B: 1
+            xExtent:
+            - 1
+            - 2
+            yExtent:
+            - 3
+            - 5
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: plotly_00-plotly-interaction-contract-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - plotly_00-plotly-interaction-contract-data-evidence-mastery
+    title: Plotly interactive chart 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 두 실험 series의 값을 hover 세부 정보와 함께 비교한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_plotly_interaction_contract(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_plotly_interaction_contract(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_plotly_interaction_contract(candidate):
+            expected = {'mark': 'interactive-scatter', 'x': 'x', 'y': 'y', 'group': 'series', 'transforms': ['hover-fields'], 'interaction': 'hover'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.plotly.plotly_00.plotly-interaction-contract-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.plotly.plotly_00.plotly-interaction-contract-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_plotly_interaction_contract
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: interactive-scatter
+              x: x
+              y: y
+              group: series
+              transforms:
+              - hover-fields
+              interaction: hover
+              description: 두 실험 series의 값을 hover 세부 정보와 함께 비교한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: interactive-scatter
+              x: x
+              y: y
+              group: series
+              transforms:
+              - hover-fields
+              interaction: hover
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: y
+              y: x
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - interaction
+            - description
+            encoding:
+              mark: interactive-scatter
+              x: x
+              y: y
+              group: series
+              transforms:
+              - hover-fields
+              interaction: hover
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: plotly_00-plotly-interaction-contract-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - plotly_00-plotly-interaction-contract-encoding-transfer-transfer
+    title: Plotly interactive chart 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: interaction이 질문에 필요한 세부 정보만 제공하는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_plotly_interaction_contract(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_plotly_interaction_contract(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_plotly_interaction_contract(situation):
+            table = {'inspect-one-point': {'encoding': 'hover', 'evidence': 'keyboard-accessible equivalent', 'risk': 'hover-only meaning'}, 'select-subset': {'encoding': 'brush selection', 'evidence': 'visible selected count', 'risk': 'hidden scope'}, 'static-report': {'encoding': 'annotated export', 'evidence': 'all essential labels visible', 'risk': 'interaction lost'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.plotly.plotly_00.plotly-interaction-contract-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.plotly.plotly_00.plotly-interaction-contract-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_plotly_interaction_contract
+        cases:
+        - id: recalls-inspect-one-point
+          arguments:
+          - value: inspect-one-point
+          expectedReturn:
+            encoding: hover
+            evidence: keyboard-accessible equivalent
+            risk: hover-only meaning
+        - id: recalls-select-subset
+          arguments:
+          - value: select-subset
+          expectedReturn:
+            encoding: brush selection
+            evidence: visible selected count
+            risk: hidden scope
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

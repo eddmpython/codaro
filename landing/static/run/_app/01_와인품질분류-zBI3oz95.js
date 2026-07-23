@@ -1,0 +1,887 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - pandas
+  - scikit-learn
+  - seaborn
+  id: sklearn_01
+  title: 와인품질분류
+  order: 1
+  category: sklearn
+  difficulty: ⭐
+  badge: 입문
+  tags:
+  - 분류
+  - train_test_split
+  - LogisticRegression
+  - 다중분류
+  - 와인
+  seo:
+    title: scikit-learn 분류 입문 - 와인 품종 분류하기
+    description: 첫 ML 모델을 만들어봅니다. train_test_split으로 데이터를 나누고 LogisticRegression으로 와인 품종을 분류합니다.
+    keywords:
+    - scikit-learn
+    - 분류
+    - LogisticRegression
+    - 와인
+    - 머신러닝
+intro:
+  emoji: 🍷
+  goal: 첫 머신러닝 모델을 만들어 와인 품종을 분류합니다.
+  description: scikit-learn의 기본 워크플로우를 배웁니다. train_test_split으로 데이터를 분할하고, StandardScaler로 전처리하고, LogisticRegression으로
+    분류 모델을 학습합니다. 정확도와 혼동행렬로 모델 성능을 평가합니다.
+  direction: 와인품질분류에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 와인품질분류 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. scikit-learn import 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 불러오기 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 데이터 탐색 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 와인품질분류 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: matplotlib, pandas, scikit-learn, seaborn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 와인품질분류 실행
+      detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
+    - label: 와인품질분류 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+sections:
+- id: step1_package_ready
+  title: 1단계. scikit-learn import 확인
+  structuredPrimary: true
+  subtitle: sklearn 모듈
+  goal: 1단계. scikit-learn import 확인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: |-
+    scikit-learn은 Python 머신러닝용 외부 패키지입니다. Codaro 로컬 환경에서는 YAML의 meta.packages와 라이브러리 패널을 기준으로 필요한 패키지를 uv로 준비합니다.
+
+    이 셀은 설치 명령을 실행하는 단계가 아니라 현재 Python 환경에서 sklearn 모듈을 import할 수 있는지 확인하는 단계입니다.
+  tips:
+  - import sklearn은 설치 명령이 아니라 준비된 패키지를 코드에서 불러오는 확인 단계입니다.
+  snippet: import sklearn
+  exercise:
+    prompt: 1단계. scikit-learn import 확인 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: import sklearn
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. scikit-learn import 확인의 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. scikit-learn import 확인 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
+- id: step2_load
+  title: 2단계. 데이터 불러오기
+  structuredPrimary: true
+  subtitle: load_wine()
+  goal: 2단계. 데이터 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    sklearn.datasets에는 다양한 내장 데이터셋이 있습니다. load_wine()은 이탈리아 한 지역에서 재배한 세 가지 품종의 와인 178개 샘플을 제공합니다. 13가지 화학 성분(알코올, 산도, 마그네슘 등) 측정값이 특성입니다.
+
+    load_wine()은 Bunch 객체를 반환합니다. data는 특성(X), target은 레이블(y), feature_names는 컬럼명, target_names는 클래스명입니다.
+  snippet: |-
+    from sklearn.datasets import load_wine
+    import pandas as pd
+
+    wine = load_wine()
+    X = pd.DataFrame(wine.data, columns=wine.feature_names)
+    y = wine.target
+    X.shape
+  exercise:
+    prompt: 2단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from sklearn.datasets import load_wine
+      import pandas as pd
+
+      wine = load_wine()
+      X = pd.DataFrame(wine.data, columns=wine.feature_names)
+      y = wine.target
+      X.shape
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_explore
+  title: 3단계. 데이터 탐색
+  structuredPrimary: true
+  subtitle: 특성 확인
+  goal: 3단계. 데이터 탐색에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.
+  explanation: 데이터의 구조와 분포를 확인합니다. 13개의 특성과 3개의 클래스(0, 1, 2)가 있습니다. 각 특성의 스케일이 다르므로 전처리가 필요합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: X.head()
+  exercise:
+    prompt: 3단계. 데이터 탐색 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    starterCode: X.head()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 데이터 탐색의 수정 코드가 핵심 처리 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 3단계. 데이터 탐색 실행 결과가 출력과 상태 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step4_split
+  title: 4단계. 데이터 분할
+  structuredPrimary: true
+  subtitle: train_test_split
+  goal: 4단계. 데이터 분할에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    머신러닝의 핵심 원칙은 "학습에 사용하지 않은 데이터로 평가"입니다. train_test_split으로 데이터를 학습용(train)과 테스트용(test)으로 나눕니다. 보통 80:20 또는 70:30 비율로 분할합니다.
+
+    test_size=0.2는 20%를 테스트용으로 분리합니다. random_state는 재현성을 위한 시드값으로, 같은 값이면 항상 같은 분할 결과가 나옵니다. 시드를 고정하지 않으면 실행할 때마다 다른 결과가 나옵니다.
+  tips:
+  - test_size=0.2는 20%를 테스트용으로 분리합니다. random_state는 재현성을 위한 시드값으로, 같은 값이면 항상 같은 분할 결과가 나옵니다. 시드를 고정하지
+    않으면 실행할 때마다 다른 결과가 나옵니다.
+  snippet: |-
+    from sklearn.model_selection import train_test_split
+
+    xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
+    xTrain.shape, xTest.shape
+  exercise:
+    prompt: 4단계. 데이터 분할 예제에서 \`xTrain\`, \`xTest\`, \`yTrain\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      from sklearn.model_selection import train_test_split
+
+      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
+      xTrain.shape, xTest.shape
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 데이터 분할에서 \`xTrain\`, \`xTest\`, \`yTrain\` 할당 개수와 값 순서가 맞아야 합니다.
+    resultCheck: 4단계. 데이터 분할 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step5_scale
+  title: 5단계. 스케일링
+  structuredPrimary: true
+  subtitle: StandardScaler
+  goal: 5단계. 스케일링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    특성들의 스케일이 다르면 일부 알고리즘이 제대로 작동하지 않습니다. 예를 들어 알코올 도수(11~14)와 프롤린 함량(278~1680)을 함께 사용하면 프롤린이 모델을 지배합니다. StandardScaler는 각 특성을 평균 0, 표준편차 1로 변환합니다.
+
+    fit_transform()은 학습 데이터로 평균/표준편차를 계산(fit)하고 변환(transform)합니다. 테스트 데이터는 transform()만 사용합니다. 테스트 데이터로 fit하면 데이터 누수(data leakage)가 발생합니다.
+  tips:
+  - fit_transform()은 학습 데이터로 평균/표준편차를 계산(fit)하고 변환(transform)합니다. 테스트 데이터는 transform()만 사용합니다. 테스트 데이터로
+    fit하면 데이터 누수(data leakage)가 발생합니다.
+  snippet: |-
+    from sklearn.preprocessing import StandardScaler
+
+    scaler = StandardScaler()
+    xTrainSc = scaler.fit_transform(xTrain)
+    xTestSc = scaler.transform(xTest)
+    xTrainSc[:3]
+  exercise:
+    prompt: 5단계. 스케일링 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from sklearn.preprocessing import StandardScaler
+
+      scaler = StandardScaler()
+      xTrainSc = scaler.fit_transform(xTrain)
+      xTestSc = scaler.transform(xTest)
+      xTrainSc[:3]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 스케일링에서 \`scaler\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 스케일링 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step6_model
+  title: 6단계. 모델 학습
+  structuredPrimary: true
+  subtitle: LogisticRegression
+  goal: 6단계. 모델 학습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    LogisticRegression은 분류 문제의 기본 알고리즘입니다. 이름에 "회귀"가 있지만 실제로는 분류에 사용합니다. 각 클래스에 속할 확률을 계산하고, 가장 높은 확률의 클래스를 예측합니다.
+
+    fit(X, y)으로 모델을 학습합니다. max_iter=1000은 최대 반복 횟수입니다. 수렴하지 않으면 경고가 나타나므로 값을 늘려주세요. sklearn의 모든 모델은 fit() 메서드로 학습합니다.
+  tips:
+  - fit(X, y)으로 모델을 학습합니다. max_iter=1000은 최대 반복 횟수입니다. 수렴하지 않으면 경고가 나타나므로 값을 늘려주세요. sklearn의 모든 모델은 fit()
+    메서드로 학습합니다.
+  snippet: |-
+    from sklearn.linear_model import LogisticRegression
+
+    model = LogisticRegression(max_iter=1000)
+    model.fit(xTrainSc, yTrain)
+  exercise:
+    prompt: 6단계. 모델 학습 예제에서 \`model\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from sklearn.linear_model import LogisticRegression
+
+      model = LogisticRegression(max_iter=1000)
+      model.fit(xTrainSc, yTrain)
+    hints:
+    - 바꿀 지점은 \`model = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`model\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 모델 학습에서 \`model\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 모델 학습 실행 뒤 \`model\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step7_predict
+  title: 7단계. 예측
+  structuredPrimary: true
+  subtitle: predict()
+  goal: 7단계. 예측에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    학습된 모델로 테스트 데이터의 품종을 예측합니다. predict()는 클래스 레이블을, predict_proba()는 각 클래스의 확률을 반환합니다.
+
+    predict_proba()는 각 클래스에 속할 확률을 반환합니다. 3개 클래스이므로 각 샘플마다 3개의 확률값이 나오고, 합은 1입니다. 가장 높은 확률의 클래스가 예측 결과입니다.
+  snippet: |-
+    yPred = model.predict(xTestSc)
+    yPred
+  exercise:
+    prompt: 7단계. 예측 예제에서 \`yPred\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      yPred = model.predict(xTestSc)
+      yPred
+    hints:
+    - 바꿀 지점은 \`yPred = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`yPred\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 예측에서 \`yPred\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. 예측 실행 뒤 \`yPred\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step8_accuracy
+  title: 8단계. 정확도 평가
+  structuredPrimary: true
+  subtitle: accuracy_score
+  goal: 8단계. 정확도 평가에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    정확도(accuracy)는 전체 샘플 중 올바르게 예측한 비율입니다. 가장 직관적인 평가 지표이지만, 클래스 불균형이 있으면 오해를 줄 수 있습니다.
+
+    accuracy_score(실제값, 예측값) 순서입니다. 0.97은 97%를 의미합니다. 모델이 테스트 데이터의 97%를 올바르게 분류했습니다.
+  snippet: |-
+    from sklearn.metrics import accuracy_score
+
+    acc = accuracy_score(yTest, yPred)
+    f"정확도: {acc:.2%}"
+  exercise:
+    prompt: 8단계. 정확도 평가 예제에서 \`acc\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from sklearn.metrics import accuracy_score
+
+      acc = accuracy_score(yTest, yPred)
+      f"정확도: {acc:.2%}"
+    hints:
+    - 바꿀 지점은 \`acc = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`acc\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 정확도 평가에서 \`acc\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 8단계. 정확도 평가 실행 뒤 \`acc\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step9_confusion
+  title: 9단계. 혼동행렬
+  structuredPrimary: true
+  subtitle: confusion_matrix
+  goal: 9단계. 혼동행렬에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    혼동행렬(confusion matrix)은 실제 클래스와 예측 클래스의 교차표입니다. 대각선은 올바른 예측, 비대각선은 오분류를 나타냅니다. 어떤 클래스에서 오류가 많은지 파악할 수 있습니다.
+
+    혼동행렬의 행은 실제 클래스, 열은 예측 클래스입니다. 대각선 값이 높을수록 좋습니다. 예를 들어 class_0 행에서 class_1 열에 값이 있다면, 실제 class_0을 class_1로 잘못 예측한 것입니다.
+  tips:
+  - 혼동행렬의 행은 실제 클래스, 열은 예측 클래스입니다. 대각선 값이 높을수록 좋습니다. 예를 들어 class_0 행에서 class_1 열에 값이 있다면, 실제 class_0을
+    class_1로 잘못 예측한 것입니다.
+  snippet: |-
+    from sklearn.metrics import confusion_matrix
+
+    cm = confusion_matrix(yTest, yPred)
+    pd.DataFrame(cm, index=wine.target_names, columns=wine.target_names)
+  exercise:
+    prompt: 9단계. 혼동행렬 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from sklearn.metrics import confusion_matrix
+
+      cm = confusion_matrix(yTest, yPred)
+      pd.DataFrame(cm, index=wine.target_names, columns=wine.target_names)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 혼동행렬의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 9단계. 혼동행렬의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step10_report
+  title: 10단계. 상세 평가
+  structuredPrimary: true
+  subtitle: classification_report
+  goal: 10단계. 상세 평가에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    classification_report는 클래스별 정밀도(precision), 재현율(recall), F1 점수를 제공합니다. 정밀도는 "양성 예측 중 실제 양성 비율", 재현율은 "실제 양성 중 맞춘 비율"입니다.
+
+    precision(정밀도)은 예측이 얼마나 정확한지, recall(재현율)은 실제 양성을 얼마나 찾아냈는지를 나타냅니다. F1-score는 둘의 조화평균입니다. support는 각 클래스의 샘플 수입니다.
+  tips:
+  - precision(정밀도)은 예측이 얼마나 정확한지, recall(재현율)은 실제 양성을 얼마나 찾아냈는지를 나타냅니다. F1-score는 둘의 조화평균입니다. support는
+    각 클래스의 샘플 수입니다.
+  snippet: |-
+    from sklearn.metrics import classification_report
+
+    report = classification_report(yTest, yPred, target_names=wine.target_names)
+    report
+  exercise:
+    prompt: 10단계. 상세 평가 예제에서 \`report\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from sklearn.metrics import classification_report
+
+      report = classification_report(yTest, yPred, target_names=wine.target_names)
+      report
+    hints:
+    - 바꿀 지점은 \`report = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`report\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 상세 평가에서 \`report\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 10단계. 상세 평가 실행 뒤 \`report\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step11_visualize
+  title: 11단계. 시각화
+  structuredPrimary: true
+  subtitle: 혼동행렬 히트맵
+  goal: 11단계. 시각화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 혼동행렬을 히트맵으로 시각화하면 오분류 패턴을 더 직관적으로 파악할 수 있습니다. seaborn의 heatmap을 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=wine.target_names, yticklabels=wine.target_names, ax=ax)
+    ax.set_xlabel('Predicted')
+    ax.set_ylabel('Actual')
+    ax.set_title('Confusion Matrix')
+    fig
+  exercise:
+    prompt: 11단계. 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+
+      fig, ax = plt.subplots(figsize=(8, 6))
+      sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=wine.target_names, yticklabels=wine.target_names, ax=ax)
+      ax.set_xlabel('Predicted')
+      ax.set_ylabel('Actual')
+      ax.set_title('Confusion Matrix')
+      fig
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 시각화의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 11단계. 시각화 실행 결과가 출력과 상태 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step12_summary
+  title: 12단계. 전체 워크플로우
+  structuredPrimary: true
+  subtitle: 정리
+  goal: 12단계. 전체 워크플로우에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: sklearn의 기본 워크플로우를 정리합니다. 데이터 분할 → 전처리 → 모델 학습 → 예측 → 평가 순서입니다. 이 패턴은 모든 sklearn 모델에 동일하게
+    적용됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    resultDf = pd.DataFrame({
+        'Step': ['Data Split', 'Scaling', 'Model', 'Accuracy'],
+        'Value': [f'{len(xTrain)} train, {len(xTest)} test', 'StandardScaler', 'LogisticRegression', f'{acc:.2%}']
+    })
+    resultDf
+  exercise:
+    prompt: 12단계. 전체 워크플로우 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      resultDf = pd.DataFrame({
+          'Step': ['Data Split', 'Scaling', 'Model', 'Accuracy'],
+          'Value': [f'{len(xTrain)} train, {len(xTest)} test', 'StandardScaler', 'LogisticRegression', f'{acc:.2%}']
+      })
+      resultDf
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 12단계. 전체 워크플로우의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 12단계. 전체 워크플로우의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 와인 분류 프로젝트
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    품질 관리 담당자가 되어 와인 품종 분류 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 평가까지 전 과정을 독립적으로 수행합니다. train_test_split, StandardScaler, LogisticRegression, accuracy_score, confusion_matrix를 모두 활용합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    from sklearn.datasets import load_wine
+    from sklearn.model_selection import train_test_split
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import accuracy_score
+    import pandas as pd
+
+    wineData = load_wine()
+    xData = pd.DataFrame(wineData.data, columns=wineData.feature_names)
+    yData = wineData.target
+
+    xTr, xTe, yTr, yTe = train_test_split(xData, yData, test_size=0.2, random_state=42)
+
+    modelRaw = LogisticRegression(max_iter=1000)
+    modelRaw.fit(xTr, yTr)
+    accRaw = accuracy_score(yTe, modelRaw.predict(xTe))
+
+    sc = StandardScaler()
+    xTrSc = sc.fit_transform(xTr)
+    xTeSc = sc.transform(xTe)
+
+    modelSc = LogisticRegression(max_iter=1000)
+    modelSc.fit(xTrSc, yTr)
+    accSc = accuracy_score(yTe, modelSc.predict(xTeSc))
+
+    pd.DataFrame({'Model': ['Raw', 'Scaled'], 'Accuracy': [accRaw, accSc]})
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from sklearn.datasets import load_wine
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score
+      import pandas as pd
+
+      wineData = load_wine()
+      xData = pd.DataFrame(wineData.data, columns=wineData.feature_names)
+      yData = wineData.target
+
+      xTr, xTe, yTr, yTe = train_test_split(xData, yData, test_size=0.2, random_state=42)
+
+      modelRaw = LogisticRegression(max_iter=1000)
+      modelRaw.fit(xTr, yTr)
+      accRaw = accuracy_score(yTe, modelRaw.predict(xTe))
+
+      sc = StandardScaler()
+      xTrSc = sc.fit_transform(xTr)
+      xTeSc = sc.transform(xTe)
+
+      modelSc = LogisticRegression(max_iter=1000)
+      modelSc.fit(xTrSc, yTr)
+      accSc = accuracy_score(yTe, modelSc.predict(xTeSc))
+
+      pd.DataFrame({'Model': ['Raw', 'Scaled'], 'Accuracy': [accRaw, accSc]})
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 예측 모델 품질 게이트
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고,
+    정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from sklearn.datasets import make_classification
+    from sklearn.model_selection import train_test_split
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import accuracy_score, f1_score
+
+    features, target = make_classification(
+        n_samples=240,
+        n_features=6,
+        n_informative=4,
+        n_redundant=0,
+        class_sep=1.4,
+        random_state=42,
+    )
+    xTrain, xTest, yTrain, yTest = train_test_split(
+        features, target, test_size=0.25, random_state=42, stratify=target
+    )
+
+    riskPipeline = Pipeline([
+        ("scaler", StandardScaler()),
+        ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
+    ])
+
+    def fitRiskModel(pipeline, featureMatrix, labels):
+        pipeline.fit(featureMatrix, labels)
+        return pipeline
+
+    riskModel = fitRiskModel(riskPipeline, xTrain, yTrain)
+    riskPred = riskModel.predict(xTest)
+    riskAccuracy = accuracy_score(yTest, riskPred)
+    riskF1 = f1_score(yTest, riskPred)
+    xTrain.shape, xTest.shape
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      conservativePipeline = Pipeline([
+          ("scaler", StandardScaler()),
+          ("classifier", LogisticRegression(C=0.3, max_iter=1000, random_state=42)),
+      ])
+      conservativeModel = fitRiskModel(conservativePipeline, xTrain, yTrain)
+      conservativePred = conservativeModel.predict(xTest)
+      conservativeAccuracy = accuracy_score(yTest, conservativePred)
+      conservativeF1 = f1_score(yTest, conservativePred)
+
+      assert conservativeAccuracy >= 0.75
+      {
+          "baselineAccuracy": round(riskAccuracy, 3),
+          "baselineF1": round(riskF1, 3),
+          "conservativeAccuracy": round(conservativeAccuracy, 3),
+          "conservativeF1": round(conservativeF1, 3),
+          "accuracyDelta": round(conservativeAccuracy - riskAccuracy, 3),
+      }
+    solution: |-
+      from sklearn.datasets import make_classification
+      from sklearn.model_selection import train_test_split
+      from sklearn.pipeline import Pipeline
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score, f1_score
+
+      features, target = make_classification(
+          n_samples=240,
+          n_features=6,
+          n_informative=4,
+          n_redundant=0,
+          class_sep=1.4,
+          random_state=42,
+      )
+      xTrain, xTest, yTrain, yTest = train_test_split(
+          features, target, test_size=0.25, random_state=42, stratify=target
+      )
+
+      riskPipeline = Pipeline([
+          ("scaler", StandardScaler()),
+          ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
+      ])
+      xTrain.shape, xTest.shape
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증에서 \`conservativePipeline\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sklearn_01-multiclass-confusion-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_package_ready
+    - workflow_validation
+    title: 와인 다중분류 confusion matrix와 macro recall 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: label 순서를 고정하고 class별 recall과 macro 평균을 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - accuracy 대신 각 class의 recall을 분리하세요.
+    - test에 없는 class는 recall 0이 아니라 None입니다.
+    exercise:
+      prompt: multiclass_recall(actual, predicted, labels)를 완성하세요.
+      starterCode: |-
+        def multiclass_recall(actual, predicted, labels):
+            raise NotImplementedError
+      solution: |
+        def multiclass_recall(actual, predicted, labels):
+            if len(actual) != len(predicted) or not labels: raise ValueError("invalid labels")
+            matrix = {label:{other:0 for other in labels} for label in labels}
+            for truth,guess in zip(actual,predicted):
+                if truth not in matrix or guess not in matrix: raise ValueError("unknown class")
+                matrix[truth][guess] += 1
+            recalls = {}
+            for label in labels:
+                total = sum(matrix[label].values()); recalls[str(label)] = None if total == 0 else round(matrix[label][label]/total,4)
+            present = [value for value in recalls.values() if value is not None]
+            serialized = {str(label):{str(other):matrix[label][other] for other in labels} for label in labels}
+            return {"matrix":serialized,"recalls":recalls,"macroRecall":None if not present else round(sum(present)/len(present),4)}
+      hints: *id001
+    check:
+      id: python.sklearn.sklearn_01.multiclass-confusion.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_01.multiclass-confusion.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: multiclass_recall
+        cases:
+        - id: computes-class-recall
+          arguments:
+          - value:
+            - 0
+            - 0
+            - 1
+            - 2
+          - value:
+            - 0
+            - 1
+            - 1
+            - 1
+          - value:
+            - 0
+            - 1
+            - 2
+          expectedReturn:
+            matrix:
+              '0':
+                '0': 1
+                '1': 1
+                '2': 0
+              '1':
+                '0': 0
+                '1': 1
+                '2': 0
+              '2':
+                '0': 0
+                '1': 1
+                '2': 0
+            recalls:
+              '0': 0.5
+              '1': 1.0
+              '2': 0.0
+            macroRecall: 0.5
+        - id: keeps-absent-class
+          arguments:
+          - value:
+            - 0
+          - value:
+            - 0
+          - value:
+            - 0
+            - 1
+          expectedReturn:
+            matrix:
+              '0':
+                '0': 1
+                '1': 0
+              '1':
+                '0': 0
+                '1': 0
+            recalls:
+              '0': 1.0
+              '1': null
+            macroRecall: 1.0
+        - id: rejects-unknown
+          arguments:
+          - value:
+            - 0
+          - value:
+            - 2
+          - value:
+            - 0
+            - 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sklearn_01-standardization-fit-boundary-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_01-multiclass-confusion-mastery
+    title: 새 feature scaling에 train-only fit 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: train mean/std로 train과 test를 변환한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - test 값으로 mean·std를 다시 맞추지 마세요.
+    - scaler parameter도 모델 artifact의 일부입니다.
+    exercise:
+      prompt: standardize_split(train, test)를 완성하세요.
+      starterCode: |-
+        def standardize_split(train, test):
+            raise NotImplementedError
+      solution: |
+        def standardize_split(train, test):
+            if not train: raise ValueError("empty train")
+            mean = sum(train)/len(train); variance = sum((value-mean)**2 for value in train)/len(train); std = variance**0.5
+            if std == 0: raise ValueError("zero train variance")
+            scale = lambda values:[round((value-mean)/std,4) for value in values]
+            return {"mean":round(mean,4),"std":round(std,4),"train":scale(train),"test":scale(test)}
+      hints: *id002
+    check:
+      id: python.sklearn.sklearn_01.standardization-fit-boundary.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_01.standardization-fit-boundary.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: standardize_split
+        cases:
+        - id: fits-on-train-only
+          arguments:
+          - value:
+            - 0
+            - 2
+          - value:
+            - 100
+          expectedReturn:
+            mean: 1.0
+            std: 1.0
+            train:
+            - -1.0
+            - 1.0
+            test:
+            - 99.0
+        - id: scales-empty-test
+          arguments:
+          - value:
+            - 1
+            - 3
+          - value: []
+          expectedReturn:
+            mean: 2.0
+            std: 1.0
+            train:
+            - -1.0
+            - 1.0
+            test: []
+        - id: rejects-zero-variance
+          arguments:
+          - value:
+            - 2
+            - 2
+          - value:
+            - 3
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sklearn_01-wine-classification-evidence-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_01-standardization-fit-boundary-transfer
+    title: 다중분류 평가 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: class 불균형과 전처리 경계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 학습 데이터와 평가 데이터의 경계를 먼저 확인하세요.
+    - 한 metric이나 예측을 실제 진단·인과 결론으로 확대하지 마세요.
+    exercise:
+      prompt: choose_multiclass_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_multiclass_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_multiclass_evidence(situation):
+            table = {'balanced-classes': {'method': 'confusion and macro metrics', 'evidence': 'per-class counts', 'risk': 'accuracy only'}, 'scaled-features': {'method': 'pipeline scaler', 'evidence': 'train-fitted parameters', 'risk': 'test fit'}, 'probability-output': {'method': 'calibration audit', 'evidence': 'reliability by class', 'risk': 'score as probability'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sklearn.sklearn_01.wine-classification-evidence.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_01.wine-classification-evidence.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_multiclass_evidence
+        cases:
+        - id: recalls-balanced-classes
+          arguments:
+          - value: balanced-classes
+          expectedReturn:
+            method: confusion and macro metrics
+            evidence: per-class counts
+            risk: accuracy only
+        - id: recalls-scaled-features
+          arguments:
+          - value: scaled-features
+          expectedReturn:
+            method: pipeline scaler
+            evidence: train-fitted parameters
+            risk: test fit
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

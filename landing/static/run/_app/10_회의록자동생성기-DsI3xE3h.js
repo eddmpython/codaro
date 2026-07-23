@@ -1,0 +1,773 @@
+var e=`meta:
+  id: word_10
+  title: 회의록 자동 생성기
+  order: 10
+  category: word
+  difficulty: ⭐⭐⭐⭐⭐
+  badge: 심화
+  packages:
+    - python-docx
+    - docxtpl
+  tags:
+    - 종합프로젝트
+    - 회의록
+    - JSON 기반
+  outcomes:
+    - automation.word.report
+  prerequisites:
+    - automation.word.tables
+    - automation.word.media
+    - automation.word.styles
+    - automation.word.template
+  estimatedMinutes: 90
+  seo:
+    title: "회의록 자동 생성기 - 회의 메모 JSON → 양식 회의록 docx"
+    description: "Word 트랙 모든 패턴을 한 함수에 결합. 회의 메모 JSON에서 표·머리말·서명란 회의록 docx 자동 생성."
+    keywords:
+      - 회의록 자동
+      - 한국 회의록 양식
+      - JSON to docx
+
+intro:
+  direction: "01-09강 모든 패턴을 한 사이클에 묶는다. 회의 메모(JSON)에서 한국 컨설팅 회의록 양식 docx를 한 함수 호출로 생성."
+  benefits:
+    - "컨설팅 이대표의 매주 회의록 40분이 8초로 줄어든다."
+    - "Heading + 표(참석자) + 본문(결정사항) + 머리말(회사) + 서명란이 모두 한 함수에."
+    - "Email 트랙 03강과 결합 시 회의록이 즉시 참석자에게 자동 발송."
+  diagram:
+    steps:
+      - label: "1. 데이터 모델"
+        detail: "회의록 JSON: 일시·장소·참석자·안건·결정사항·액션."
+      - label: "2. 양식 함수"
+        detail: "Codaro 양식 스타일 + 표 + 본문 + 머리말 결합."
+      - label: "3. 일괄 생성"
+        detail: "여러 회의록 메모 → 폴더에 N개 docx."
+      - label: "4. PDF 변환 안내"
+        detail: "LibreOffice headless 명령 한 줄 안내 (트랙 범위 밖)."
+    runtime:
+      - label: "전 강의 패턴 통합"
+        detail: "03강 East Asian font, 04강 표, 05강 머리말, 06강 스타일, 09강 docxtpl 옵션."
+      - label: "검증"
+        detail: "결과 docx의 단락·표·머리말 단위 assert."
+
+sections:
+  - id: step1_model
+    title: "1단계. 회의록 데이터 모델"
+    structuredPrimary: true
+    subtitle: "JSON 구조"
+    goal: "회의록 메모 데이터 dict 구조를 정의한다."
+    why: "자동화의 시작은 데이터 모양을 고정하는 것입니다. 한 회의록 = 한 dict."
+    snippet: |-
+      meetingNote = {
+          "title": "Codaro 주간 동기화",
+          "date": "2026-05-28",
+          "location": "회의실 A",
+          "attendees": [
+              {"name": "김대리", "role": "기획"},
+              {"name": "박과장", "role": "개발"},
+              {"name": "이팀장", "role": "리드"},
+          ],
+          "agenda": [
+              "1Q 매출 리뷰",
+              "신기능 출시 일정",
+              "다음 분기 계획",
+          ],
+          "decisions": [
+              "신기능은 5월 31일 출시",
+              "마케팅 캠페인 6월 1일 시작",
+          ],
+          "actions": [
+              {"who": "김대리", "what": "PRD 작성", "due": "2026-05-30"},
+              {"who": "박과장", "what": "QA 진행", "due": "2026-05-31"},
+          ],
+      }
+      meetingNote["title"], len(meetingNote["attendees"])
+    exercise:
+      prompt: "attendees에 한 명 더 추가하고 길이가 4인지 확인하세요."
+      starterCode: |-
+        meetingNote = {
+            "title": "주간",
+            "attendees": [
+                {"name": "김대리", "role": "기획"},
+                {"name": "박과장", "role": "개발"},
+                {"name": "이팀장", "role": "리드"},
+                ___,
+            ],
+        }
+        len(meetingNote["attendees"])
+      hints:
+        - "dict 한 개. 예: {'name': '윤주임', 'role': '디자인'}."
+    check:
+      noError: "리스트 원소는 dict."
+      resultCheck: "출력 4."
+
+  - id: step2_builder
+    title: "2단계. 회의록 docx 빌더"
+    structuredPrimary: true
+    subtitle: "양식 스타일 + 표 + 본문 결합"
+    goal: "회의록 dict → docx 함수를 만든다."
+    why: "본 강의의 핵심 함수. 컨설팅 이대표가 그대로 가져갈 수 있는 도구."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+      from docx.enum.style import WD_STYLE_TYPE
+      from docx.oxml.ns import qn
+      from docx.shared import Inches, Pt
+
+      def applyCodaroStyles(doc):
+          for name, size, bold in [("CodaroBody", 11, False), ("CodaroHeading", 14, True)]:
+              if name in doc.styles:
+                  continue
+              style = doc.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
+              style.font.name = "맑은 고딕"
+              style.font.size = Pt(size)
+              style.font.bold = bold
+              style.element.rPr.rFonts.set(qn("w:eastAsia"), "맑은 고딕")
+          for side in ("top_margin", "bottom_margin", "left_margin", "right_margin"):
+              setattr(doc.sections[0], side, Inches(0.8))
+          return doc
+
+      def buildMinutes(path, note):
+          doc = Document()
+          applyCodaroStyles(doc)
+          doc.sections[0].header.paragraphs[0].text = "주식회사 Codaro"
+
+          doc.add_heading(note["title"], level=0)
+          doc.add_paragraph(f"일시: {note['date']}, 장소: {note['location']}", style="CodaroBody")
+
+          doc.add_heading("참석자", level=1)
+          attendeesTable = doc.add_table(rows=len(note["attendees"]) + 1, cols=2, style="Table Grid")
+          attendeesTable.cell(0, 0).text = "성명"
+          attendeesTable.cell(0, 1).text = "역할"
+          for idx, attendee in enumerate(note["attendees"], start=1):
+              attendeesTable.cell(idx, 0).text = attendee["name"]
+              attendeesTable.cell(idx, 1).text = attendee["role"]
+
+          doc.add_heading("안건", level=1)
+          for item in note["agenda"]:
+              doc.add_paragraph(item, style="List Number")
+
+          doc.add_heading("결정 사항", level=1)
+          for decision in note["decisions"]:
+              doc.add_paragraph(decision, style="List Bullet")
+
+          doc.add_heading("액션 아이템", level=1)
+          actionTable = doc.add_table(rows=len(note["actions"]) + 1, cols=3, style="Table Grid")
+          for colIdx, header in enumerate(["담당", "내용", "마감"]):
+              actionTable.cell(0, colIdx).text = header
+          for idx, action in enumerate(note["actions"], start=1):
+              actionTable.cell(idx, 0).text = action["who"]
+              actionTable.cell(idx, 1).text = action["what"]
+              actionTable.cell(idx, 2).text = action["due"]
+
+          doc.add_heading("서명", level=1)
+          doc.add_paragraph("작성자: ____________  검토자: ____________", style="CodaroBody")
+
+          doc.save(path)
+          return path
+
+      workdir = TemporaryDirectory()
+      docxPath = Path(workdir.name) / "minutes.docx"
+      buildMinutes(docxPath, {
+          "title": "주간 동기화",
+          "date": "2026-05-28",
+          "location": "회의실 A",
+          "attendees": [{"name": "김대리", "role": "기획"}, {"name": "박과장", "role": "개발"}],
+          "agenda": ["1. 매출", "2. 일정"],
+          "decisions": ["5월 31일 출시"],
+          "actions": [{"who": "김대리", "what": "PRD", "due": "2026-05-30"}],
+      })
+      reopened = Document(docxPath)
+      reopened.paragraphs[0].text, len(reopened.tables)
+    exercise:
+      prompt: "buildMinutes에 한 액션 더 추가하고 actions 표 행 수가 3인지 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+        from docx.enum.style import WD_STYLE_TYPE
+        from docx.oxml.ns import qn
+        from docx.shared import Inches, Pt
+
+        def applyCodaroStyles(doc):
+            for name, size, bold in [("CodaroBody", 11, False), ("CodaroHeading", 14, True)]:
+                if name in doc.styles:
+                    continue
+                style = doc.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
+                style.font.name = "맑은 고딕"
+                style.font.size = Pt(size)
+                style.font.bold = bold
+                style.element.rPr.rFonts.set(qn("w:eastAsia"), "맑은 고딕")
+            return doc
+
+        def buildMinutes(path, note):
+            doc = Document()
+            applyCodaroStyles(doc)
+            doc.add_heading(note["title"], level=0)
+            actionTable = doc.add_table(rows=len(note["actions"]) + 1, cols=3, style="Table Grid")
+            for colIdx, header in enumerate(["담당", "내용", "마감"]):
+                actionTable.cell(0, colIdx).text = header
+            for idx, action in enumerate(note["actions"], start=1):
+                actionTable.cell(idx, 0).text = action["who"]
+                actionTable.cell(idx, 1).text = action["what"]
+                actionTable.cell(idx, 2).text = action["due"]
+            doc.save(path)
+
+        workdir = TemporaryDirectory()
+        docxPath = Path(workdir.name) / "m.docx"
+        buildMinutes(docxPath, {
+            "title": "주간",
+            "actions": [
+                {"who": "김대리", "what": "PRD", "due": "2026-05-30"},
+                ___,
+            ],
+        })
+        len(Document(docxPath).tables[0].rows)
+      hints:
+        - "dict {'who': '박과장', 'what': 'QA', 'due': '2026-05-31'}."
+    check:
+      noError: "리스트 원소는 dict."
+      resultCheck: "출력 3."
+
+  - id: validation
+    title: "3단계. 검증 - 회의록 통합 검증"
+    structuredPrimary: true
+    subtitle: "단락 + 표 + 머리말 일괄 assert"
+    goal: "buildMinutes 결과의 모든 요소를 한 셀에서 검증."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+      from docx.enum.style import WD_STYLE_TYPE
+      from docx.oxml.ns import qn
+      from docx.shared import Inches, Pt
+
+      def applyCodaroStyles(doc):
+          for name, size, bold in [("CodaroBody", 11, False), ("CodaroHeading", 14, True)]:
+              if name in doc.styles:
+                  continue
+              style = doc.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
+              style.font.name = "맑은 고딕"
+              style.font.size = Pt(size)
+              style.font.bold = bold
+              style.element.rPr.rFonts.set(qn("w:eastAsia"), "맑은 고딕")
+          for side in ("top_margin", "bottom_margin", "left_margin", "right_margin"):
+              setattr(doc.sections[0], side, Inches(0.8))
+          return doc
+
+      def buildMinutes(path, note):
+          doc = Document()
+          applyCodaroStyles(doc)
+          doc.sections[0].header.paragraphs[0].text = note.get("company", "Codaro")
+          doc.add_heading(note["title"], level=0)
+          doc.add_paragraph(f"일시: {note['date']}, 장소: {note['location']}", style="CodaroBody")
+          doc.add_heading("참석자", level=1)
+          tbl = doc.add_table(rows=len(note["attendees"]) + 1, cols=2, style="Table Grid")
+          tbl.cell(0, 0).text = "성명"
+          tbl.cell(0, 1).text = "역할"
+          for idx, attendee in enumerate(note["attendees"], start=1):
+              tbl.cell(idx, 0).text = attendee["name"]
+              tbl.cell(idx, 1).text = attendee["role"]
+          doc.add_heading("결정 사항", level=1)
+          for decision in note["decisions"]:
+              doc.add_paragraph(decision, style="List Bullet")
+          doc.save(path)
+          return path
+
+      vault = TemporaryDirectory()
+      docxPath = Path(vault.name) / "v.docx"
+      buildMinutes(docxPath, {
+          "company": "주식회사 Codaro",
+          "title": "주간 동기화",
+          "date": "2026-05-28",
+          "location": "회의실 A",
+          "attendees": [{"name": "김대리", "role": "기획"}, {"name": "박과장", "role": "개발"}],
+          "decisions": ["신기능 5월 31일 출시", "마케팅 6월 1일"],
+      })
+
+      reopened = Document(docxPath)
+      assert reopened.sections[0].header.paragraphs[0].text == "주식회사 Codaro"
+      assert reopened.paragraphs[0].text == "주간 동기화"
+      attendeesTable = reopened.tables[0]
+      assert attendeesTable.cell(1, 0).text == "김대리"
+      decisions = [p.text for p in reopened.paragraphs if p.style.name == "List Bullet"]
+      assert len(decisions) == 2
+      reopened.paragraphs[0].text, attendeesTable.cell(2, 0).text
+    exercise:
+      prompt: "buildMinutes에 액션 아이템 표(3컬럼: 담당/내용/마감)를 추가하는 로직을 작성하세요. 헤더 행 + actions 각 dict를 행으로 채워야 합니다."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+        from docx.enum.style import WD_STYLE_TYPE
+        from docx.oxml.ns import qn
+        from docx.shared import Pt
+
+        def applyCodaroStyles(doc):
+            for name, size, bold in [("CodaroBody", 11, False), ("CodaroHeading", 14, True)]:
+                if name in doc.styles:
+                    continue
+                style = doc.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
+                style.font.name = "맑은 고딕"
+                style.font.size = Pt(size)
+                style.font.bold = bold
+                style.element.rPr.rFonts.set(qn("w:eastAsia"), "맑은 고딕")
+            return doc
+
+        def buildMinutes(path, note):
+            doc = Document()
+            applyCodaroStyles(doc)
+            doc.add_heading(note["title"], level=0)
+            doc.add_heading("액션 아이템", level=1)
+            actions = note["actions"]
+            actionTable = doc.add_table(rows=len(actions) + 1, cols=3, style="Table Grid")
+            for colIdx, header in enumerate(["담당", "내용", "마감"]):
+                actionTable.cell(0, colIdx).text = header
+            for idx, action in enumerate(actions, start=1):
+                ___  # action['who']/['what']/['due']를 각 셀에 채우기 (3줄)
+            doc.save(path)
+
+        vault = TemporaryDirectory()
+        docxPath = Path(vault.name) / "v.docx"
+        buildMinutes(docxPath, {
+            "title": "주간",
+            "actions": [
+                {"who": "김대리", "what": "PRD 작성", "due": "2026-05-30"},
+                {"who": "박과장", "what": "QA 진행", "due": "2026-05-31"},
+            ],
+        })
+        tbl = Document(docxPath).tables[0]
+        tbl.cell(1, 0).text, tbl.cell(2, 1).text, tbl.cell(2, 2).text
+      hints:
+        - "actionTable.cell(idx, 0).text = action['who']"
+        - "actionTable.cell(idx, 1).text = action['what']"
+        - "actionTable.cell(idx, 2).text = action['due']"
+    check:
+      noError: "세 셀을 모두 채우는 3줄 로직."
+      resultCheck: "('김대리', 'QA 진행', '2026-05-31') 출력."
+
+  - id: practice
+    title: "실습 - 종합 미션"
+    subtitle: "다수 회의록 일괄 생성기"
+    goal: "여러 회의 메모를 받아 폴더에 N개 회의록 docx를 만든다."
+    explanation: |-
+      미션: bulkBuildMinutes(notes, outFolder) -> list[Path]. 회의록 파일명은 'YYYY-MM-DD_제목.docx'.
+    snippet: |-
+      from docx import Document
+    exercise:
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "함수: bulkBuildMinutes(notes, outFolder) -> list[Path]"
+    check:
+      noError: "함수 정의 + 폴더 생성."
+      resultCheck: "각 메모마다 docx 1개."
+    blocks:
+      - type: tip
+        content: "본 강의가 Word 트랙의 마지막입니다. 본인 팀의 실제 회의 메모로 함수를 시도해 보세요."
+      - type: expansion
+        title: "미션: 다수 회의록"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from docx import Document
+              from docx.enum.style import WD_STYLE_TYPE
+              from docx.oxml.ns import qn
+              from docx.shared import Pt
+
+              def applyCodaroStyles(doc):
+                  for name, size, bold in [("CodaroBody", 11, False), ("CodaroHeading", 14, True)]:
+                      if name in doc.styles:
+                          continue
+                      style = doc.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
+                      style.font.name = "맑은 고딕"
+                      style.font.size = Pt(size)
+                      style.font.bold = bold
+                      style.element.rPr.rFonts.set(qn("w:eastAsia"), "맑은 고딕")
+                  return doc
+
+              def buildMinutes(path, note):
+                  doc = Document()
+                  applyCodaroStyles(doc)
+                  doc.add_heading(note["title"], level=0)
+                  doc.add_paragraph(f"일시: {note['date']}", style="CodaroBody")
+                  for decision in note.get("decisions", []):
+                      doc.add_paragraph(decision, style="List Bullet")
+                  doc.save(path)
+                  return path
+
+              def bulkBuildMinutes(notes, outFolder):
+                  Path(outFolder).mkdir(exist_ok=True)
+                  outputs = []
+                  for note in notes:
+                      safeTitle = note["title"].replace(" ", "_")
+                      outPath = Path(outFolder) / f"{note['date']}_{safeTitle}.docx"
+                      buildMinutes(outPath, note)
+                      outputs.append(outPath)
+                  return outputs
+
+              missionDir = TemporaryDirectory()
+              base = Path(missionDir.name)
+              notes = [
+                  {"title": "주간 동기화", "date": "2026-05-28", "decisions": ["a", "b"]},
+                  {"title": "킥오프", "date": "2026-05-29", "decisions": ["c"]},
+                  {"title": "회고", "date": "2026-05-30", "decisions": ["d", "e"]},
+              ]
+              outputs = bulkBuildMinutes(notes, base / "minutes")
+              assert len(outputs) == 3
+              for path in outputs:
+                  doc = Document(path)
+                  assert len(doc.paragraphs) > 0
+              [p.name for p in outputs]
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: text
+        content: |-
+          본 트랙의 마무리 강의 응용 아이디어입니다. 한 가지를 골라 본인 업무에 적용해 보세요.
+      - type: list
+        style: bullet
+        items:
+          - "Email 트랙 03강과 결합 - 회의록 docx를 참석자에게 자동 발송"
+          - "PDF 변환 (\`soffice --headless --convert-to pdf minutes.docx\`)"
+          - "회의록 → 캘린더 ics (다음 회의 일정 자동)"
+          - "회의록에서 액션 아이템만 추출해 별도 docx (todo 목록)"
+          - "회의 녹음 → llmBasics로 자동 메모 → 본 함수에 dict 주입"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: word_10-meeting-action-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_model
+    - extensions
+    title: 회의록 action item의 책임·기한 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 담당자·기한·결정 근거가 없는 실행 항목을 차단한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - action item은 참석자 identity, ISO due date, decision ref를 함께 가져야 합니다.
+    - 회의일 이전 기한과 파싱 불가능한 기한을 모두 실패로 보고하세요.
+    exercise:
+      prompt: audit_meeting_actions(actions, attendee_ids, meeting_date)를 완성하세요.
+      starterCode: |-
+        def audit_meeting_actions(actions, attendee_ids, meeting_date):
+            raise NotImplementedError
+      solution: |
+        def audit_meeting_actions(actions, attendee_ids, meeting_date):
+            from datetime import date
+            meeting = date.fromisoformat(meeting_date)
+            failures = []
+            unknown_owner = sorted(item["id"] for item in actions if item.get("ownerId") not in attendee_ids)
+            missing_decision = sorted(item["id"] for item in actions if not str(item.get("decisionRef", "")).strip())
+            invalid_due = []
+            for item in actions:
+                try:
+                    due = date.fromisoformat(item.get("dueDate", ""))
+                    if due < meeting:
+                        invalid_due.append(item["id"])
+                except ValueError:
+                    invalid_due.append(item["id"])
+            invalid_due.sort()
+            if unknown_owner:
+                failures.append("owner")
+            if invalid_due:
+                failures.append("due-date")
+            if missing_decision:
+                failures.append("decision-ref")
+            return {"accepted": not failures, "failures": failures, "unknownOwner": unknown_owner, "invalidDue": invalid_due, "missingDecision": missing_decision}
+      hints: *id001
+    check:
+      id: python.word.word_10.meeting-action-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_10.meeting-action-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_meeting_actions
+        cases:
+        - id: accepts-owned-action
+          arguments:
+          - value:
+            - id: a1
+              ownerId: u1
+              dueDate: '2026-07-25'
+              decisionRef: d1
+          - value:
+            - u1
+          - value: '2026-07-22'
+          expectedReturn:
+            accepted: true
+            failures: []
+            unknownOwner: []
+            invalidDue: []
+            missingDecision: []
+        - id: reports-owner-and-due
+          arguments:
+          - value:
+            - id: a1
+              ownerId: u2
+              dueDate: '2026-07-20'
+              decisionRef: d1
+          - value:
+            - u1
+          - value: '2026-07-22'
+          expectedReturn:
+            accepted: false
+            failures:
+            - owner
+            - due-date
+            unknownOwner:
+            - a1
+            invalidDue:
+            - a1
+            missingDecision: []
+        - id: reports-date-and-decision
+          arguments:
+          - value:
+            - id: a2
+              ownerId: u1
+              dueDate: soon
+              decisionRef: ''
+          - value:
+            - u1
+          - value: '2026-07-22'
+          expectedReturn:
+            accepted: false
+            failures:
+            - due-date
+            - decision-ref
+            unknownOwner: []
+            invalidDue:
+            - a2
+            missingDecision:
+            - a2
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: word_10-meeting-minutes-release-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - word_10-meeting-action-audit-mastery
+    title: 회의록 생성기의 릴리스 원장 검증하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 입력 회의와 docx artifact·action 수·렌더 상태를 대조한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - source meetingId와 hash를 artifact manifest에 묶으세요.
+    - 재개방과 페이지 렌더가 둘 다 통과해야 릴리스하세요.
+    exercise:
+      prompt: audit_minutes_release(source, artifact)를 완성하세요.
+      starterCode: |-
+        def audit_minutes_release(source, artifact):
+            raise NotImplementedError
+      solution: |
+        def audit_minutes_release(source, artifact):
+            failures = []
+            if artifact.get("meetingId") != source.get("meetingId") or artifact.get("sourceHash") != source.get("sourceHash"):
+                failures.append("source-identity")
+            if artifact.get("actionCount") != len(source.get("actions", [])):
+                failures.append("action-count")
+            if not artifact.get("reopened"):
+                failures.append("reopen")
+            if not artifact.get("rendered") or artifact.get("pageCount", 0) < 1:
+                failures.append("render")
+            return {"released": not failures, "failures": failures, "meetingId": artifact.get("meetingId"), "expectedActions": len(source.get("actions", [])), "observedActions": artifact.get("actionCount")}
+      hints: *id002
+    check:
+      id: python.word.word_10.meeting-minutes-release.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_10.meeting-minutes-release.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_minutes_release
+        cases:
+        - id: accepts-verified-minutes
+          arguments:
+          - value:
+              meetingId: m1
+              sourceHash: h
+              actions:
+              - id: a
+          - value:
+              meetingId: m1
+              sourceHash: h
+              actionCount: 1
+              reopened: true
+              rendered: true
+              pageCount: 2
+          expectedReturn:
+            released: true
+            failures: []
+            meetingId: m1
+            expectedActions: 1
+            observedActions: 1
+        - id: reports-identity-and-count
+          arguments:
+          - value:
+              meetingId: m1
+              sourceHash: h
+              actions: []
+          - value:
+              meetingId: m2
+              sourceHash: old
+              actionCount: 1
+              reopened: true
+              rendered: true
+              pageCount: 1
+          expectedReturn:
+            released: false
+            failures:
+            - source-identity
+            - action-count
+            meetingId: m2
+            expectedActions: 0
+            observedActions: 1
+        - id: reports-artifact-evidence
+          arguments:
+          - value:
+              meetingId: m1
+              sourceHash: h
+              actions: []
+          - value:
+              meetingId: m1
+              sourceHash: h
+              actionCount: 0
+              reopened: false
+              rendered: false
+              pageCount: 0
+          expectedReturn:
+            released: false
+            failures:
+            - reopen
+            - render
+            meetingId: m1
+            expectedActions: 0
+            observedActions: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: word_10-meeting-minutes-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - word_10-meeting-minutes-release-transfer
+    title: 회의록 자동화 릴리스 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 의사결정·실행 항목·artifact 증거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Web에서는 문서 구조와 업무 불변식을 즉시 검증하세요.
+    - Local에서는 저장한 docx를 재개방하고 렌더 결과까지 증거로 남기세요.
+    exercise:
+      prompt: choose_minutes_evidence(stage)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_minutes_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_minutes_evidence(stage):
+            choices = {'decision': {'action': 'record stable decision ids', 'evidence': 'decision ledger', 'risk': 'context-free actions'}, 'action': {'action': 'bind owner due date and decision', 'evidence': 'action contract audit', 'risk': 'unowned work'}, 'release': {'action': 'reopen and render source-bound docx', 'evidence': 'minutes release manifest', 'risk': 'wrong or unreadable minutes'}}
+            if stage not in choices:
+                raise ValueError('unknown stage')
+            return choices[stage]
+      hints: *id003
+    check:
+      id: python.word.word_10.meeting-minutes-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_10.meeting-minutes-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_minutes_evidence
+        cases:
+        - id: recalls-decision
+          arguments:
+          - value: decision
+          expectedReturn:
+            action: record stable decision ids
+            evidence: decision ledger
+            risk: context-free actions
+        - id: recalls-action
+          arguments:
+          - value: action
+          expectedReturn:
+            action: bind owner due date and decision
+            evidence: action contract audit
+            risk: unowned work
+        - id: recalls-final-stage
+          arguments:
+          - value: release
+          expectedReturn:
+            action: reopen and render source-bound docx
+            evidence: minutes release manifest
+            risk: wrong or unreadable minutes
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

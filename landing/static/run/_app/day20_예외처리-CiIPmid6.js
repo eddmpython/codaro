@@ -1,0 +1,566 @@
+var e=`meta:
+  id: day20
+  title: 예외처리
+  day: 20
+  category: 30days
+  outcomes: ["python.errorHandling"]
+  prerequisites: ["python.functions"]
+  estimatedMinutes: 40
+  tags:
+  - 예외처리
+  - try
+  - except
+  - finally
+  - raise
+  - validation
+  seo:
+    title: 파이썬 예외 처리 - try, except, finally
+    description: try, except, finally, raise로 에러를 처리하는 방법을 배웁니다.
+    keywords:
+    - 예외
+    - try
+    - except
+    - finally
+    - raise
+intro:
+  emoji: 🛡️
+  points:
+  - try-except로 에러 처리
+  - finally로 정리 작업
+  - raise로 예외 발생
+  - 안정적인 프로그램
+  direction: 예외처리에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 예외처리 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: tryexcept 기본 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 특정 예외 처리 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: 여러 예외 처리 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 예외처리 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 예외처리 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 예외처리 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: try_except_basic
+  title: try-except 기본
+  structuredPrimary: true
+  subtitle: 에러 처리하기
+  goal: tryexcept 기본에서 \`result\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    try-except 문으로 에러를 처리합니다. try 블록에서 에러가 발생하면 except 블록이 실행됩니다. 프로그램이 중단되지 않고 계속 실행됩니다.
+
+    try-except는 예상되는 에러를 처리할 때 사용합니다.
+  snippet: |-
+    try:
+        result = 10 / 0
+    except ZeroDivisionError:
+        result = 'Error occurred'
+
+    result
+  exercise:
+    prompt: tryexcept 기본 예제에서 \`result\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      try:
+          result = 10 / 0
+      except ZeroDivisionError:
+          result = 'Error occurred'
+
+      result
+    hints:
+    - 바꿀 지점은 \`result = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`result\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: tryexcept 기본에서 \`result\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: tryexcept 기본 실행 뒤 \`result\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: specific_exception
+  title: 특정 예외 처리
+  structuredPrimary: true
+  subtitle: 예외 타입 지정
+  goal: 특정 예외 처리에서 \`num\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    except 뒤에 예외 타입을 지정할 수 있습니다. 특정 에러만 처리하고 다른 에러는 그대로 발생시킵니다. 더 정확한 에러 처리가 가능합니다.
+
+    예외 타입을 지정하면 의도하지 않은 에러를 놓치지 않습니다.
+  snippet: |-
+    try:
+        num = 10 / 0
+    except ZeroDivisionError:
+        num = 'Cannot divide by zero'
+
+    num
+  exercise:
+    prompt: 특정 예외 처리 예제에서 \`num\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      try:
+          num = 10 / 0
+      except ZeroDivisionError:
+          num = 'Cannot divide by zero'
+
+      num
+    hints:
+    - 바꿀 지점은 \`num = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`num\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 특정 예외 처리에서 \`num\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 특정 예외 처리 실행 뒤 \`num\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: multiple_except
+  title: 여러 예외 처리
+  structuredPrimary: true
+  subtitle: 다양한 에러 대응
+  goal: 여러 예외 처리에서 \`val\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    여러 except 블록으로 다양한 예외를 처리할 수 있습니다. 위에서부터 순서대로 검사하며, 처음 일치하는 except가 실행됩니다.
+
+    구체적인 예외를 먼저, 일반적인 예외를 나중에 배치하세요.
+  snippet: |-
+    try:
+        val = int('10')
+        ans = val / 2
+    except ValueError:
+        ans = 'Invalid number'
+    except ZeroDivisionError:
+        ans = 'Cannot divide'
+
+    ans
+  exercise:
+    prompt: 여러 예외 처리 예제에서 \`val\`, \`ans\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      try:
+          val = int('10')
+          ans = val / 2
+      except ValueError:
+          ans = 'Invalid number'
+      except ZeroDivisionError:
+          ans = 'Cannot divide'
+
+      ans
+    hints:
+    - 바꿀 지점은 \`val = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`val\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 여러 예외 처리에서 \`val\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 여러 예외 처리 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: finally_clause
+  title: finally 절
+  structuredPrimary: true
+  subtitle: 항상 실행되는 코드
+  goal: finally 절에서 \`calc\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    finally 블록은 예외 발생 여부와 관계없이 항상 실행됩니다. 파일 닫기, 리소스 해제 등 정리 작업에 사용합니다.
+
+    with 문을 사용하면 finally 없이도 자동으로 정리됩니다.
+  snippet: |-
+    try:
+        calc = 10 / 2
+    except ZeroDivisionError:
+        calc = 0
+    finally:
+        status = 'Completed'
+
+    calc, status
+  exercise:
+    prompt: finally 절 예제에서 \`calc\`, \`status\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      try:
+          calc = 10 / 2
+      except ZeroDivisionError:
+          calc = 0
+      finally:
+          status = 'Completed'
+
+      calc, status
+    hints:
+    - 바꿀 지점은 \`calc = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`calc\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: finally 절에서 \`calc\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: finally 절 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: raise_exception
+  title: raise로 예외 발생
+  structuredPrimary: true
+  subtitle: 의도적으로 에러 발생
+  goal: raise로 예외 발생에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    raise 키워드로 예외를 발생시킬 수 있습니다. 조건이 맞지 않을 때 강제로 에러를 내어 프로그램을 중단하거나 예외를 전달합니다.
+
+    raise는 함수의 입력값 검증에 유용합니다.
+  snippet: |-
+    def checkAge(age):
+        if age < 0:
+            raise ValueError('Age cannot be negative')
+        return age
+
+    try:
+        valid = checkAge(-5)
+    except ValueError:
+        valid = 'Invalid age'
+
+    valid
+  exercise:
+    prompt: raise로 예외 발생 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def checkAge(age):
+          if age < 0:
+              raise ValueError('Age cannot be negative')
+          return age
+
+      try:
+          valid = checkAge(-5)
+      except ValueError:
+          valid = 'Invalid age'
+
+      valid
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: raise로 예외 발생의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: raise로 예외 발생 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: exception_info
+  title: 예외 정보
+  structuredPrimary: true
+  subtitle: 에러 메시지 받기
+  goal: 예외 정보에서 \`bad\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    except 예외타입 as 변수: 형식으로 예외 객체를 받을 수 있습니다. 예외 객체는 에러 메시지와 정보를 담고 있습니다.
+
+    예외 메시지를 확인하면 문제를 파악하기 쉽습니다.
+  snippet: |-
+    try:
+        bad = 10 / 0
+    except ZeroDivisionError as err:
+        bad = str(err)
+
+    bad
+  exercise:
+    prompt: 예외 정보 예제에서 \`bad\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      try:
+          bad = 10 / 0
+      except ZeroDivisionError as err:
+          bad = str(err)
+
+      bad
+    hints:
+    - 바꿀 지점은 \`bad = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`bad\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 예외 정보에서 \`bad\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 예외 정보 실행 뒤 \`bad\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: workflow_validation
+  title: '검증 루프: 실패를 설명하는 예외 처리'
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증
+  goal: '검증 루프: 실패를 설명하는 예외 처리에서 예상값과 실제 실행 결과를 비교하는 검증 흐름을 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 좋은 예외 처리는 프로그램을 조용히 살리는 것이 아니라, 어떤 입력이 왜 실패했는지 설명하고 필요한 곳에서만 복구하는 것입니다. 이 루프에서는 숫자 변환,
+    필수 필드 검증, 파일 읽기를 좁힌 예외로 처리합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def parseQuantity(text):
+        try:
+            quantity = int(text)
+        except ValueError as exc:
+            raise ValueError(f'quantity must be integer: {text!r}') from exc
+
+        if quantity <= 0:
+            raise ValueError('quantity must be positive')
+        return quantity
+
+    assert parseQuantity('3') == 3
+
+    try:
+        parseQuantity('3개')
+    except ValueError as exc:
+        quantityProblem = str(exc)
+
+    assert 'integer' in quantityProblem
+    quantityProblem
+  exercise:
+    prompt: '검증 루프: 실패를 설명하는 예외 처리 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
+    starterCode: |-
+      def parseQuantity(text):
+          try:
+              quantity = int(text)
+          except ValueError as exc:
+              raise ValueError(f'quantity must be integer: {text!r}') from exc
+
+          if quantity <= 0:
+              raise ValueError('quantity must be positive')
+          return quantity
+
+      assert parseQuantity('3') == 3
+
+      try:
+          parseQuantity('3개')
+      except ValueError as exc:
+          quantityProblem = str(exc)
+
+      assert 'integer' in quantityProblem
+      quantityProblem
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '검증 루프: 실패를 설명하는 예외 처리의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '검증 루프: 실패를 설명하는 예외 처리 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+- id: practice
+  title: Day 20 종합 복습
+  structuredPrimary: true
+  subtitle: 예외 처리 마스터하기
+  goal: Day 20 종합 복습에서 \`divResult\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: Day 20에서 배운 예외 처리를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤
+    순서로 해도 괜찮습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    try:
+        divResult = 10 / 0
+    except ZeroDivisionError:
+        divResult = 'Error'
+
+    divResult
+  exercise:
+    prompt: Day 20 종합 복습 예제에서 \`divResult\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      try:
+          divResult = 10 / 0
+      except ZeroDivisionError:
+          divResult = 'Error'
+
+      divResult
+    hints:
+    - 바꿀 지점은 \`divResult = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`divResult\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: Day 20 종합 복습에서 \`divResult\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: Day 20 종합 복습 실행 뒤 \`divResult\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: day20-positive-int-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - try_except_basic
+    - practice
+    title: 양의 정수 입력 계약 지키기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 정상 반환과 ValueError 조건을 함께 구현한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: parse_positive_int(text)가 양의 정수를 반환하고 0 이하 또는 숫자가 아니면 ValueError를 내도록 완성하세요.
+      starterCode: |-
+        def parse_positive_int(text):
+            raise NotImplementedError
+      solution: |-
+        def parse_positive_int(text):
+            value = int(text)
+            if value <= 0:
+                raise ValueError('positive integer required')
+            return value
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day20.positive-int.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day20.positive-int.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: parse_positive_int
+        cases:
+        - id: valid
+          arguments:
+          - value: '12'
+          expectedReturn: 12
+        - id: zero
+          arguments:
+          - value: '0'
+          expectedException: ValueError
+        - id: invalid
+          arguments:
+          - value: abc
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day20-safe-divide-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day20-positive-int-mastery
+    title: 나눗셈 실패를 값으로 처리하기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 예외 처리를 새로운 계산 API 계약에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: safe_divide(a, b)가 정상 몫을 반환하고 0으로 나누면 None을 반환하도록 완성하세요.
+      starterCode: |-
+        def safe_divide(a, b):
+            raise NotImplementedError
+      solution: |-
+        def safe_divide(a, b):
+            try:
+                return a / b
+            except ZeroDivisionError:
+                return None
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day20.safe-divide.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day20.safe-divide.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: safe_divide
+        cases:
+        - id: normal
+          arguments:
+          - value: 10
+          - value: 4
+          expectedReturn: 2.5
+        - id: zero
+          arguments:
+          - value: 10
+          - value: 0
+          expectedReturn: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day20-required-value-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day20-safe-divide-transfer
+    title: 필수 key 누락 예외 다시 만들기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 명시적 KeyError 계약을 기억에서 복원한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: required_value(mapping, key)가 값을 반환하고 key가 없으면 KeyError를 내도록 완성하세요.
+      starterCode: |-
+        def required_value(mapping, key):
+            raise NotImplementedError
+      solution: |-
+        def required_value(mapping, key):
+            if key not in mapping:
+                raise KeyError(key)
+            return mapping[key]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day20.required-value.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day20.required-value.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: required_value
+        cases:
+        - id: present
+          arguments:
+          - value:
+              token: ready
+          - value: token
+          expectedReturn: ready
+        - id: missing
+          arguments:
+          - value: {}
+          - value: token
+          expectedException: KeyError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,773 @@
+var e=`meta:
+  id: regex_08
+  title: 텍스트정제토큰화
+  order: 8
+  category: regex
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  tags:
+  - 텍스트 정제
+  - 토큰화
+  - split
+  - LLM
+  - 전처리
+  seo:
+    title: 정규표현식 중급 - 텍스트 정제와 토큰화
+    description: 정규표현식으로 텍스트를 정제하고 토큰화합니다. re.split, 노이즈 제거, LLM 전처리를 배웁니다.
+    keywords:
+    - 정규표현식
+    - regex
+    - 텍스트 정제
+    - 토큰화
+    - LLM 전처리
+intro:
+  emoji: 🧹
+  goal: 로컬 노이즈 텍스트를 정제하고 토큰화하여 LLM 입력을 준비합니다.
+  description: LLM 전처리의 핵심 단계입니다. 노이즈 제거, 정규화, 토큰화를 통해 토큰 수를 최소화하고 품질을 높입니다.
+  direction: 텍스트정제토큰화에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 샘플 문자열 확인 후 패턴 매칭과 치환에 맞는 코드 입력을 고릅니다.
+  - 텍스트정제토큰화 결과를 매치 그룹, 추출 목록, 치환 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 로그/문서 정제 자동화에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(샘플 문자열)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 텍스트 데이터 로드 처리 실행
+      detail: 패턴 매칭과 치환 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 특수문자 제거 결과 검증
+      detail: 매치 그룹, 추출 목록, 치환 결과 기준으로 실행 결과를 비교합니다.
+    - label: 텍스트정제토큰화 재사용
+      detail: 완성 코드를 로그/문서 정제 자동화에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 텍스트 정제 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 텍스트정제토큰화 실행
+      detail: 셀을 실행해 매치 그룹, 추출 목록, 치환 결과와 예외 상태를 확인합니다.
+    - label: 텍스트정제토큰화 완료
+      detail: 검증된 코드를 로그/문서 정제 자동화로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: 1단계. 라이브러리 불러오기의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: import re
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: import re
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
+- id: step2_load_text
+  title: 2단계. 텍스트 데이터 로드
+  structuredPrimary: true
+  subtitle: 로컬 노이즈 텍스트
+  goal: 2단계. 텍스트 데이터 로드에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    실제 고객 피드백, 지원 티켓, 검색 로그처럼 노이즈가 섞인 로컬 문단을 준비합니다. 특수문자, 반복 단어, 줄바꿈, 대소문자 혼재가 들어 있어 텍스트 정제와 토큰화 흐름을 네트워크 없이 안정적으로 연습할 수 있습니다.
+
+    특수문자, 불필요한 공백, 대소문자 혼재 등 노이즈가 많습니다. 이런 노이즈는 LLM API 호출 시 토큰 수를 증가시키고, 분석 품질을 저하시킵니다. 정제 과정을 통해 불필요한 토큰을 줄이면 API 비용을 절감하고 응답 품질을 높일 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    textData = [
+        "Customer feedback!!!  Delivery was fast, but packaging   had extra spaces.",
+        "Support tickets mention login-errors, slow pages, and repeated repeated words.",
+        "LLM preprocessing should remove noise; normalize whitespace; keep useful terms.",
+        "Product reviews include UPPERCASE words, punctuation??? and line\\nbreaks.",
+        "Search logs contain query fragments, duplicate tokens, and messy separators.",
+    ]
+
+    rawText = " ".join(textData)
+    rawText[:300]
+  exercise:
+    prompt: 2단계. 텍스트 데이터 로드 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      textData = [
+          "Customer feedback!!!  Delivery was fast, but packaging   had extra spaces.",
+          "Support tickets mention login-errors, slow pages, and repeated repeated words.",
+          "LLM preprocessing should remove noise; normalize whitespace; keep useful terms.",
+          "Product reviews include UPPERCASE words, punctuation??? and line\\nbreaks.",
+          "Search logs contain query fragments, duplicate tokens, and messy separators.",
+      ]
+
+      rawText = " ".join(textData)
+      rawText[:300]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 텍스트 데이터 로드의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 텍스트 데이터 로드의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: step3_remove_special_chars
+  title: 3단계. 특수문자 제거
+  structuredPrimary: true
+  subtitle: 알파벳과 공백만 남기기
+  goal: 3단계. 특수문자 제거에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    LLM 입력에 불필요한 특수문자를 제거합니다. 쉼표, 마침표, 느낌표 등의 구두점과 특수 기호는 대부분의 분석에서 불필요합니다. 부정 문자 클래스 [^...]를 사용하면 유지할 문자만 지정하고 나머지는 모두 제거할 수 있습니다.
+
+    [^...] 부정 문자 클래스
+    - \`[a-zA-Z\\s]\` : 알파벳과 공백만 - \`[^a-zA-Z\\s]\` : 알파벳과 공백이 **아닌** 모든 것 - \`^\` 가 [ ] 안에 있으면 부정의 의미!
+  tips:
+  - '[^...] 부정 문자 클래스 - \`[a-zA-Z\\s]\` : 알파벳과 공백만 - \`[^a-zA-Z\\s]\` : 알파벳과 공백이 **아닌** 모든 것 - \`^\` 가 [ ] 안에
+    있으면 부정의 의미!'
+  snippet: |-
+    cleanedText = re.sub(r"[^a-zA-Z\\s]", "", rawText)
+    cleanedText[:200]
+  exercise:
+    prompt: 3단계. 특수문자 제거 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      cleanedText = re.sub(r"[^a-zA-Z\\s]", "", rawText)
+      cleanedText[:200]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 특수문자 제거의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 특수문자 제거의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: step4_normalize_whitespace
+  title: 4단계. 공백 정규화
+  structuredPrimary: true
+  subtitle: 연속 공백을 하나로
+  goal: 4단계. 공백 정규화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    연속된 공백을 하나로 통일하여 토큰 낭비를 줄입니다. 웹에서 수집한 텍스트에는 종종 탭, 줄바꿈, 연속 공백 등이 포함됩니다. \\\\s+ 패턴으로 모든 종류의 공백 문자를 하나의 공백으로 정규화하면 깔끔한 텍스트를 얻을 수 있습니다.
+
+    **토큰 절약 효과:** - "word word" (4개 공백) : 약 5 토큰 - "word word" (1개 공백) : 약 2 토큰 - **60% 절약!**
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    normalizedText = re.sub(r"\\s+", " ", cleanedText)
+    normalizedText = normalizedText.strip()
+    normalizedText[:200]
+  exercise:
+    prompt: 4단계. 공백 정규화 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      normalizedText = re.sub(r"\\s+", " ", cleanedText)
+      normalizedText = normalizedText.strip()
+      normalizedText[:200]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 공백 정규화의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 공백 정규화의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: step5_lowercase
+  title: 5단계. 소문자 변환
+  structuredPrimary: true
+  subtitle: 대소문자 통일
+  goal: 5단계. 소문자 변환에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    대소문자를 통일하여 일관성을 높이고 토큰 수를 줄입니다. LLM의 토크나이저는 대소문자를 구분하여 Hello와 hello를 다른 토큰으로 처리합니다. 소문자로 통일하면 어휘 크기가 줄어 효율성이 높아지고, 검색이나 비교도 쉬워집니다.
+
+    대소문자와 토큰
+    LLM 토크나이저는 대소문자를 다른 토큰으로 인식: - "Bacon" : 1 토큰 - "bacon" : 1 토큰 - "BACON" : 1 토큰 소문자로 통일하면 어휘 크기 감소!
+  tips:
+  - '대소문자와 토큰 LLM 토크나이저는 대소문자를 다른 토큰으로 인식: - "Bacon" : 1 토큰 - "bacon" : 1 토큰 - "BACON" : 1 토큰 소문자로 통일하면
+    어휘 크기 감소!'
+  snippet: |-
+    lowercaseText = normalizedText.lower()
+    lowercaseText[:200]
+  exercise:
+    prompt: 5단계. 소문자 변환 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      lowercaseText = normalizedText.lower()
+      lowercaseText[:200]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 소문자 변환의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 소문자 변환의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: step6_tokenization
+  title: 6단계. 토큰화
+  structuredPrimary: true
+  subtitle: re.split()으로 단어 분리
+  goal: 6단계. 토큰화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    텍스트를 단어 단위로 분리합니다.
+
+    re.split(패턴, 텍스트)
+    **re.split()**: - 패턴을 구분자로 텍스트 분리 - str.split()보다 유연함 - 여러 구분자 동시 사용 가능 예: \`re.split(r"[,;\\s]+", text)\` → 쉼표, 세미콜론, 공백으로 분리
+  tips:
+  - 're.split(패턴, 텍스트) **re.split()**: - 패턴을 구분자로 텍스트 분리 - str.split()보다 유연함 - 여러 구분자 동시 사용 가능 예: \`re.split(r"[,;\\s]+",
+    text)\` → 쉼표, 세미콜론, 공백으로 분리'
+  snippet: |-
+    tokens = lowercaseText.split()
+    tokens[:20]
+  exercise:
+    prompt: 6단계. 토큰화 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      tokens = lowercaseText.split()
+      tokens[:20]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 토큰화의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 토큰화의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: step7_advanced_tokenization
+  title: 7단계. 고급 토큰화
+  structuredPrimary: true
+  subtitle: 여러 구분자 동시 처리
+  goal: 7단계. 고급 토큰화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    실제 텍스트는 공백 외에도 쉼표, 마침표 등으로 구분됩니다.
+
+    결과: ['Hello', 'world', 'How', 'are', 'you', 'Fine', 'thanks']
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    testText = "Hello, world! How are you? Fine, thanks."
+
+    tokens = re.split(r"[\\s,!?.;]+", testText)
+    tokens = [t for t in tokens if t]
+    tokens
+  exercise:
+    prompt: 7단계. 고급 토큰화 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      testText = "Hello, world! How are you? Fine, thanks."
+
+      tokens = re.split(r"[\\s,!?.;]+", testText)
+      tokens = [t for t in tokens if t]
+      tokens
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 고급 토큰화의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 7단계. 고급 토큰화 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step8_ngrams
+  title: 8단계. N-gram 추출
+  structuredPrimary: true
+  subtitle: 연속된 단어 조합
+  goal: 8단계. Ngram 추출에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    문맥 분석을 위해 연속된 2~3개 단어를 추출합니다.
+
+    N-gram의 활용
+    N-gram은 문맥을 유지하면서 텍스트를 분석할 때 사용: - Bigram (2-gram): 연속된 2개 단어 - Trigram (3-gram): 연속된 3개 단어 검색, 추천, 자동 완성 등에 활용
+  tips:
+  - 'N-gram의 활용 N-gram은 문맥을 유지하면서 텍스트를 분석할 때 사용: - Bigram (2-gram): 연속된 2개 단어 - Trigram (3-gram): 연속된
+    3개 단어 검색, 추천, 자동 완성 등에 활용'
+  snippet: |-
+    words = lowercaseText.split()[:50]
+
+    bigrams = [f"{words[i]} {words[i+1]}" for i in range(len(words)-1)]
+    bigrams[:10]
+  exercise:
+    prompt: 8단계. Ngram 추출 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      words = lowercaseText.split()[:50]
+
+      bigrams = [f"{words[i]} {words[i+1]}" for i in range(len(words)-1)]
+      bigrams[:10]
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. Ngram 추출의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 8단계. Ngram 추출 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step9_complete_pipeline
+  title: 9단계. 완성된 전처리 파이프라인
+  structuredPrimary: true
+  subtitle: 모든 단계 통합
+  goal: 9단계. 완성된 전처리 파이프라인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: 배운 모든 기법을 합쳐 완성된 파이프라인을 만듭니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def preprocessText(text):
+        text = re.sub(r"[^a-zA-Z\\s]", "", text)
+
+        text = re.sub(r"\\s+", " ", text)
+        text = text.strip()
+
+        text = text.lower()
+
+        tokens = re.split(r"\\s+", text)
+
+        return {
+            "clean_text": text,
+            "tokens": tokens,
+            "token_count": len(tokens)
+        }
+
+    result = preprocessText(rawText)
+    f"토큰 수: {result['token_count']}\\n처음 10개 토큰: {result['tokens'][:10]}"
+  exercise:
+    prompt: 9단계. 완성된 전처리 파이프라인 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def preprocessText(text):
+          text = re.sub(r"[^a-zA-Z\\s]", "", text)
+
+          text = re.sub(r"\\s+", " ", text)
+          text = text.strip()
+
+          text = text.lower()
+
+          tokens = re.split(r"\\s+", text)
+
+          return {
+              "clean_text": text,
+              "tokens": tokens,
+              "token_count": len(tokens)
+          }
+
+      result = preprocessText(rawText)
+      f"토큰 수: {result['token_count']}\\n처음 10개 토큰: {result['tokens'][:10]}"
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 완성된 전처리 파이프라인의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 완성된 전처리 파이프라인 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: step10_comparison
+  title: 10단계. 전처리 전후 비교
+  structuredPrimary: true
+  subtitle: 토큰 절약 효과
+  goal: 10단계. 전처리 전후 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    전처리 전후의 토큰 수를 비교합니다.
+
+    LLM API 비용 절감
+    평균 20~40% 토큰 절약: - 특수문자 제거: 10% - 공백 정규화: 5% - 소문자 변환: 5~10% - 불필요한 반복 제거: 10% **실제 효과**: 10,000 토큰 → 6,000 토큰 = API 비용 40% 절감!
+  tips:
+  - 'LLM API 비용 절감 평균 20~40% 토큰 절약: - 특수문자 제거: 10% - 공백 정규화: 5% - 소문자 변환: 5~10% - 불필요한 반복 제거: 10% **실제
+    효과**: 10,000 토큰 → 6,000 토큰 = API 비용 40% 절감!'
+  snippet: |-
+    original = preprocessText(rawText)
+    originalLen = len(rawText)
+    cleanedLen = len(original['clean_text'])
+    saved = ((originalLen - cleanedLen) / originalLen) * 100
+
+    f"원본 길이: {originalLen}자\\n정제 후: {cleanedLen}자\\n절약: {saved:.1f}%\\n\\n원본 토큰 수 (추정): {originalLen // 4}\\n정제 후 토큰: {original['token_count']}"
+  exercise:
+    prompt: 10단계. 전처리 전후 비교 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      original = preprocessText(rawText)
+      originalLen = len(rawText)
+      cleanedLen = len(original['clean_text'])
+      saved = ((originalLen - cleanedLen) / originalLen) * 100
+
+      f"원본 길이: {originalLen}자\\n정제 후: {cleanedLen}자\\n절약: {saved:.1f}%\\n\\n원본 토큰 수 (추정): {originalLen // 4}\\n정제 후 토큰: {original['token_count']}"
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 전처리 전후 비교의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 전처리 전후 비교의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 텍스트 정제 프로젝트
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    데이터 엔지니어가 되어 텍스트를 정제하고 분석합니다. 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import re
+
+    text = """
+    Contact us: support@company.com, sales@company.com
+    Partners: partner@service.org, info@service.org
+    Admin: admin@shop.io
+    """
+
+    emails = re.findall(r"[\\w.]+@[\\w.]+\\.\\w+", text)
+    emails
+  exercise:
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import re
+
+      text = """
+      Contact us: support@company.com, sales@company.com
+      Partners: partner@service.org, info@service.org
+      Admin: admin@shop.io
+      """
+
+      emails = re.findall(r"[\\w.]+@[\\w.]+\\.\\w+", text)
+      emails
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 실습의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: summary
+  title: 정리
+  subtitle: 여덟 번째 프로젝트 완료!
+  blocks:
+  - type: text
+    content: 이번 프로젝트에서는 텍스트 정제와 토큰화를 배웠습니다. LLM 전처리의 핵심 단계입니다.
+  - type: list
+    items:
+    - '[^...] - 부정 문자 클래스'
+    - re.split() - 패턴으로 분리
+    - \\s+ - 공백 정규화
+    - 토큰화 - 단어 단위 분리
+  - type: text
+    content: 다음은 심화 단계입니다! lookahead와 lookbehind를 배웁니다.
+  goal: 정리에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인'
+  structuredPrimary: true
+  subtitle: 예측 → 패턴 실행 → 오류 수정 → 검증 → 실무 변주
+  goal: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를
+    추출하고, 잘못된 패턴과 빈 입력을 안전하게 처리합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import re
+
+    contactText = '''
+    김개발 <kim@example.com> 010-1234-5678
+    lee@company.co.kr / 02-987-6543
+    잘못된 주소: hello@ / 번호: 12345
+    '''
+
+    emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}')
+    phonePattern = re.compile(r'(?:010-\\d{4}-\\d{4}|02-\\d{3}-\\d{4})')
+
+    emails = emailPattern.findall(contactText)
+    phones = phonePattern.findall(contactText)
+
+    assert emails == ['kim@example.com', 'lee@company.co.kr']
+    assert phones == ['010-1234-5678', '02-987-6543']
+    emails, phones
+  exercise:
+    prompt: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    starterCode: |-
+      import re
+
+      contactText = '''
+      김개발 <kim@example.com> 010-1234-5678
+      lee@company.co.kr / 02-987-6543
+      잘못된 주소: hello@ / 번호: 12345
+      '''
+
+      emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}')
+      phonePattern = re.compile(r'(?:010-\\d{4}-\\d{4}|02-\\d{3}-\\d{4})')
+
+      emails = emailPattern.findall(contactText)
+      phones = phonePattern.findall(contactText)
+
+      assert emails == ['kim@example.com', 'lee@company.co.kr']
+      assert phones == ['010-1234-5678', '02-987-6543']
+      emails, phones
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인의 정규식 패턴이 컴파일되고 입력 텍스트가 매치 단계까지 도달해야 합니다.'
+    resultCheck: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인 결과의 추출 개수와 매치 문자열이 본문 기대값과 같아야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: regex_08-text-normalize-tokenize-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: Unicode·공백을 정규화하고 token provenance 남기기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: NFKC와 casefold를 적용한 뒤 token별 원래 순서를 보존한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - lower만 적용하지 말고 Unicode width와 호환 문자를 정규화하세요.
+    - token 값뿐 아니라 normalized text의 span과 index를 남기세요.
+    exercise:
+      prompt: normalize_and_tokenize(text)를 완성하세요.
+      starterCode: |-
+        def normalize_and_tokenize(text):
+            raise NotImplementedError
+      solution: |
+        def normalize_and_tokenize(text):
+            import re
+            import unicodedata
+            normalized = " ".join(unicodedata.normalize("NFKC", text).casefold().split())
+            tokens = []
+            for index, match in enumerate(re.finditer(r"[\\w]+", normalized, flags=re.UNICODE)):
+                tokens.append({"index": index, "value": match.group(0), "start": match.start(), "end": match.end()})
+            return {"normalized": normalized, "tokens": tokens, "count": len(tokens)}
+      hints: *id001
+    check:
+      id: python.regex.regex_08.text-normalize-tokenize.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_08.text-normalize-tokenize.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: normalize_and_tokenize
+        cases:
+        - id: normalizes-width-case-and-space
+          arguments:
+          - value: '  Ｐｙｔｈｏｎ   TEST  '
+          expectedReturn:
+            normalized: python test
+            tokens:
+            - index: 0
+              value: python
+              start: 0
+              end: 6
+            - index: 1
+              value: test
+              start: 7
+              end: 11
+            count: 2
+        - id: keeps-korean-token
+          arguments:
+          - value: 데이터  분석
+          expectedReturn:
+            normalized: 데이터 분석
+            tokens:
+            - index: 0
+              value: 데이터
+              start: 0
+              end: 3
+            - index: 1
+              value: 분석
+              start: 4
+              end: 6
+            count: 2
+        - id: handles-punctuation-only
+          arguments:
+          - value: '... !!!'
+          expectedReturn:
+            normalized: '... !!!'
+            tokens: []
+            count: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: regex_08-token-corpus-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_08-text-normalize-tokenize-mastery
+    title: 새 corpus의 token 품질 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 문서별 빈 token, vocabulary, 희귀 token을 분모와 함께 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 전체 token 수와 vocabulary 수를 같은 크기 지표로 혼동하지 마세요.
+    - token이 0개인 문서를 preprocessing 성공으로 숨기지 마세요.
+    exercise:
+      prompt: audit_token_corpus(documents, minimum_frequency)를 완성하세요.
+      starterCode: |-
+        def audit_token_corpus(documents, minimum_frequency):
+            raise NotImplementedError
+      solution: |
+        def audit_token_corpus(documents, minimum_frequency):
+            if minimum_frequency <= 0:
+                raise ValueError("minimum frequency must be positive")
+            frequencies = {}
+            empty_documents = []
+            total = 0
+            for document in documents:
+                tokens = document["tokens"]
+                if not tokens:
+                    empty_documents.append(document["id"])
+                for token in tokens:
+                    frequencies[token] = frequencies.get(token, 0) + 1
+                    total += 1
+            rare = sorted(token for token, count in frequencies.items() if count < minimum_frequency)
+            return {"documentCount": len(documents), "tokenCount": total, "vocabularySize": len(frequencies), "emptyDocuments": sorted(empty_documents), "rareTokens": rare}
+      hints: *id002
+    check:
+      id: python.regex.regex_08.token-corpus-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_08.token-corpus-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_token_corpus
+        cases:
+        - id: counts-corpus-and-rare-tokens
+          arguments:
+          - value:
+            - id: a
+              tokens:
+              - python
+              - data
+            - id: b
+              tokens:
+              - python
+          - value: 2
+          expectedReturn:
+            documentCount: 2
+            tokenCount: 3
+            vocabularySize: 2
+            emptyDocuments: []
+            rareTokens:
+            - data
+        - id: reports-empty-document
+          arguments:
+          - value:
+            - id: empty
+              tokens: []
+          - value: 1
+          expectedReturn:
+            documentCount: 1
+            tokenCount: 0
+            vocabularySize: 0
+            emptyDocuments:
+            - empty
+            rareTokens: []
+        - id: rejects-invalid-frequency
+          arguments:
+          - value: []
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: regex_08-text-cleaning-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_08-token-corpus-audit-transfer
+    title: 텍스트 정제·tokenization 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: Unicode 정규화·span·corpus 품질 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - match 수만 보지 말고 정규화 뒤 보존된 의미와 거부된 입력을 함께 확인하세요.
+    - regex가 아닌 전용 parser가 필요한 구조에서는 경계를 명시하세요.
+    exercise:
+      prompt: choose_text_cleaning_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_text_cleaning_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_text_cleaning_evidence(situation):
+            table = {'normalize': {'action': 'NFKC casefold whitespace', 'evidence': 'normalized string', 'risk': 'semantic compatibility change'}, 'tokenize': {'action': 'record ordered token spans', 'evidence': 'index start end', 'risk': 'lost provenance'}, 'corpus': {'action': 'audit empty and rare tokens', 'evidence': 'document and token denominators', 'risk': 'silent empty input'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.regex.regex_08.text-cleaning-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_08.text-cleaning-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_text_cleaning_evidence
+        cases:
+        - id: recalls-normalize
+          arguments:
+          - value: normalize
+          expectedReturn:
+            action: NFKC casefold whitespace
+            evidence: normalized string
+            risk: semantic compatibility change
+        - id: recalls-tokenize
+          arguments:
+          - value: tokenize
+          expectedReturn:
+            action: record ordered token spans
+            evidence: index start end
+            risk: lost provenance
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

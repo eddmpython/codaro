@@ -1,0 +1,610 @@
+var e=`meta:
+  packages:
+  - sympy
+  id: sympy_00
+  title: SymPy소개
+  order: 0
+  category: sympy
+  badge: 소개
+  tags:
+  - sympy
+  - 기호수학
+  - symbolic
+  - 대수학
+  - 미적분
+  seo:
+    title: SymPy 소개 - 파이썬 기호 수학 라이브러리
+    description: SymPy로 수식을 기호로 다루고 미분, 적분, 방정식 풀이를 배웁니다. 수학 문제를 파이썬으로 해결하는 방법을 소개합니다.
+    keywords:
+    - sympy
+    - 기호수학
+    - symbolic math
+    - 미분
+    - 적분
+    - 방정식
+intro:
+  direction: SymPy소개에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 첫 실행 셀은 assert로 핵심 결과를 고정해 실습 코드가 깨지지 않았는지 확인합니다.
+  - 수식과 기호 확인 후 기호 계산에 맞는 코드 입력을 고릅니다.
+  - SymPy소개 결과를 간소화식, 해, 미분/적분 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 수학 계산 검증 루틴에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 손익분기 수식을 기호로 검증하 입력 확인
+      detail: 입력 기준(수식과 기호)과 필요한 조건을 먼저 고정합니다.
+    - label: 기호 계산 처리 실행
+      detail: 기호 계산 코드를 실행해 중간 결과를 확인합니다.
+    - label: 간소화식, 해, 미분/적분 결 결과 검증
+      detail: 간소화식, 해, 미분/적분 결과 기준으로 실행 결과를 비교합니다.
+    - label: SymPy소개 재사용
+      detail: 완성 코드를 수학 계산 검증 루틴에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기호 계산 환경
+      detail: sympy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: SymPy소개 실행
+      detail: 셀을 실행해 간소화식, 해, 미분/적분 결과와 예외 상태를 확인합니다.
+    - label: SymPy소개 완료
+      detail: 검증된 코드를 수학 계산 검증 루틴로 남깁니다.
+sections:
+- id: intro
+  blocks:
+  - type: mainHeader
+    emoji: 🔢
+    title: SymPy
+    subtitle: 파이썬 기호 수학 라이브러리
+  - type: hero
+    emoji: ∫
+    title: 수식을 기호로 다루는 수학
+    subtitle: 정확한 수학적 계산과 수식 조작
+    points:
+    - emoji: 📐
+      title: 미분과 적분
+    - emoji: 🎯
+      title: 방정식 풀이
+    - emoji: 📊
+      title: 행렬 연산
+    - emoji: ∞
+      title: 극한과 급수
+  goal: SymPy에서 기호식 입력과 계산 결과가 어떻게 달라지는지 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+- id: sympy_history
+  blocks:
+  - type: sectionHeader
+    title: 🏛️ SymPy란?
+    subtitle: 기호 수학의 세계
+  - type: text
+    content: SymPy(Symbolic Python)는 2006년 Ondřej Čertík가 개발한 파이썬 기호 수학 라이브러리입니다. 일반 계산기가 3+5=8처럼 숫자 결과를
+      주는 것과 달리, SymPy는 x+y 같은 수식 자체를 다룹니다. (x+1)²을 전개하면 x²+2x+1이 되고, 이를 다시 인수분해할 수 있습니다.
+  - type: featureCards
+    cards:
+    - emoji: 🔣
+      title: 기호 계산
+      description: x, y 같은 변수를 값 없이 수식으로 조작합니다
+    - emoji: ✨
+      title: 정확한 결과
+      description: √2를 1.414...가 아닌 정확한 기호로 유지합니다
+    - emoji: 🐍
+      title: 순수 파이썬
+      description: 외부 의존성 없이 어디서나 실행됩니다
+  goal: 🏛️ SymPy란?에서 기호식 입력과 계산 결과가 어떻게 달라지는지 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+- id: numeric_vs_symbolic
+  blocks:
+  - type: sectionHeader
+    title: ⚖️ 숫자 vs 기호
+    subtitle: 근본적인 차이
+  - type: text
+    content: 숫자 계산(Numeric)은 구체적인 값으로 결과를 얻습니다. sqrt(2)를 계산하면 1.4142...라는 근삿값이 나옵니다. 반면 기호 계산(Symbolic)은
+      √2 그 자체를 유지하며, 정확한 값을 보존합니다.
+  - type: table
+    headers:
+    - 구분
+    - 숫자 계산
+    - 기호 계산
+    rows:
+    - - √2
+      - 1.41421356...
+      - √2
+    - - π
+      - 3.14159265...
+      - π
+    - - (x+1)²
+      - x 값 필요
+      - x² + 2x + 1
+    - - 미분
+      - 수치 근사
+      - 정확한 도함수
+  - type: note
+    title: 왜 기호 계산이 필요한가?
+    content: 수치 계산은 반올림 오차가 누적됩니다. 기호 계산은 정확한 수식을 유지하므로 오차가 없습니다. 미분, 적분 같은 수학적 조작은 기호로 해야 정확한 결과를 얻습니다.
+  goal: ⚖️ 숫자 vs 기호에서 기호식 입력과 계산 결과가 어떻게 달라지는지 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+- id: features
+  blocks:
+  - type: sectionHeader
+    title: 🛠️ SymPy 주요 기능
+    subtitle: 대학 수학의 모든 것
+  - type: text
+    content: SymPy는 대학 수학 과정의 거의 모든 내용을 다룰 수 있습니다. 기초 대수부터 고급 미적분, 선형대수, 미분방정식까지 폭넓게 지원합니다.
+  - type: table
+    headers:
+    - 분야
+    - 기능
+    - 예시
+    rows:
+    - - 대수학
+      - 전개, 인수분해, 방정식
+      - factor(x²-1) → (x+1)(x-1)
+    - - 미적분
+      - 미분, 적분, 극한
+      - diff(x³) → 3x²
+    - - 급수
+      - 테일러 급수, 합
+      - series(sin(x)) → x - x³/6 + ...
+    - - 선형대수
+      - 행렬, 역행렬, 고유값
+      - Matrix([[1,2],[3,4]]).det()
+    - - 삼각함수
+      - 항등식, 변환
+      - trigsimp(sin²+cos²) → 1
+  goal: 🛠️ SymPy 주요 기능에서 기호식 입력과 계산 결과가 어떻게 달라지는지 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+- id: comparison
+  blocks:
+  - type: sectionHeader
+    title: 🔄 SymPy vs 다른 도구
+    subtitle: 적재적소에 맞는 선택
+  - type: table
+    headers:
+    - 도구
+    - 특징
+    - 적합한 용도
+    rows:
+    - - SymPy
+      - 무료, 파이썬 통합, 기호 계산
+      - 수학 학습, 공식 유도
+    - - NumPy/SciPy
+      - 빠른 수치 계산
+      - 대용량 데이터 연산
+    - - Mathematica
+      - 상용, 강력한 기호 계산
+      - 전문 연구
+    - - WolframAlpha
+      - 웹 서비스, 편리
+      - 빠른 검색
+  goal: 🔄 SymPy vs 다른 도구에서 기호식 입력과 계산 결과가 어떻게 달라지는지 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+- id: use_cases
+  blocks:
+  - type: sectionHeader
+    title: 💡 활용 분야
+    subtitle: SymPy가 사용되는 곳
+  - type: text
+    content: SymPy는 수학 학습, 과학 연구, 공학 계산 등 다양한 분야에서 활용됩니다.
+  - type: table
+    headers:
+    - 분야
+    - 활용 예시
+    rows:
+    - - 수학 학습
+      - 미적분 풀이 검증, 복잡한 계산 확인
+    - - 물리학
+      - 운동 방정식 풀이, 라그랑지안 계산
+    - - 공학
+      - 제어 시스템, 신호 처리, 회로 해석
+    - - 교육
+      - 문제 자동 생성, 단계별 풀이 제공
+  goal: 💡 활용 분야에서 기호식 입력과 계산 결과가 어떻게 달라지는지 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+- id: core_concepts
+  blocks:
+  - type: sectionHeader
+    title: 📌 핵심 개념
+    subtitle: 알아야 할 것들
+  - type: featureCards
+    cards:
+    - emoji: 🔤
+      title: 기호 (Symbol)
+      description: x, y, z 같은 수학 변수를 정의합니다
+    - emoji: 📝
+      title: 표현식 (Expression)
+      description: x² + 2x + 1 같은 수식입니다
+    - emoji: ⚖️
+      title: 방정식 (Equation)
+      description: Eq(x², 4)처럼 등호를 포함한 수식입니다
+    - emoji: 📈
+      title: 함수 (Function)
+      description: sin, cos, exp, log 같은 수학 함수입니다
+  goal: 📌 핵심 개념에서 기호식 입력과 계산 결과가 어떻게 달라지는지 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+- id: workflow
+  blocks:
+  - type: sectionHeader
+    title: 🔄 작업 흐름
+    subtitle: SymPy 사용 순서
+  - type: table
+    headers:
+    - 단계
+    - 설명
+    - 예시
+    rows:
+    - - 1. 기호 정의
+      - 변수 생성
+      - x, y = symbols('x y')
+    - - 2. 수식 생성
+      - 표현식 작성
+      - expr = x**2 + 2*x + 1
+    - - 3. 수식 조작
+      - 전개, 인수분해
+      - factor(expr)
+    - - 4. 계산 수행
+      - 미분, 적분, 풀이
+      - diff(expr, x)
+    - - 5. 결과 확인
+      - 값 대입, 수치화
+      - expr.subs(x, 2).evalf()
+  goal: 🔄 작업 흐름에서 기호식 입력과 계산 결과가 어떻게 달라지는지 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+- id: curriculum
+  blocks:
+  - type: sectionHeader
+    title: 📚 커리큘럼
+    subtitle: 10개 프로젝트로 마스터
+  - type: text
+    content: 이 카테고리에서는 10개의 프로젝트를 통해 SymPy의 핵심 기능을 배웁니다.
+  - type: table
+    headers:
+    - 프로젝트
+    - 주제
+    - 핵심 개념
+    rows:
+    - - 01. 기초 수식 계산
+      - 대수학 입문
+      - 기호, 전개, 인수분해
+    - - 02. 대입과 계산
+      - 수식 평가
+      - subs, evalf, simplify
+    - - 03. 방정식 풀이
+      - 대수 방정식
+      - solve, Eq, 연립방정식
+    - - 04. 미분 기초
+      - 미분법
+      - diff, 고차미분, 편미분
+    - - 05. 적분 기초
+      - 적분법
+      - integrate, 정적분
+    - - 06. 극한과 급수
+      - 해석학
+      - limit, series, summation
+    - - 07. 삼각함수 활용
+      - 삼각법
+      - trigsimp, 항등식
+    - - 08. 행렬 연산
+      - 선형대수
+      - Matrix, 역행렬, 고유값
+    - - 09. 수식 시각화
+      - 그래프
+      - plot, matplotlib 연동
+    - - 10. 종합 수학 문제
+      - 응용
+      - 최적화, 미분방정식
+  goal: 📚 커리큘럼에서 기호식 입력과 계산 결과가 어떻게 달라지는지 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+- id: start
+  blocks:
+  - type: sectionHeader
+    title: 🎯 시작하기
+    subtitle: 첫 번째 프로젝트로
+  - type: text
+    content: SymPy를 배우면 파이썬으로 수학 문제를 정확하게 풀 수 있습니다. 손으로 푸는 것과 병행하며 검증하고, 복잡한 계산은 SymPy에게 맡기세요. 첫 번째 프로젝트에서
+      기호를 정의하고 수식을 전개하는 것부터 시작합니다.
+  goal: 🎯 시작하기에서 기호식 입력과 계산 결과가 어떻게 달라지는지 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기'
+  structuredPrimary: true
+  subtitle: 예측 → 수식 구성 → 오류 수정 → 결과 검증 → 실무 변주
+  goal: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: SymPy는 계산기를 대신하는 도구가 아니라, 업무 규칙을 수식으로 고정하고 전제 조건을 검증하는 도구입니다. 여기서는 고정비와 단위 이익으로 손익분기점을
+    구하고, 잘못된 계수를 먼저 실패시킨 뒤, 기준 변경 실험을 수행합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import sympy as sp
+
+    x = sp.symbols('x', nonnegative=True)
+    fixedCost = 120000
+    unitPrice = 5000
+    unitCost = 2000
+
+    revenueExpr = unitPrice * x
+    costExpr = fixedCost + unitCost * x
+    profitExpr = sp.simplify(revenueExpr - costExpr)
+    breakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]
+
+    assert profitExpr == 3000 * x - 120000
+    assert breakEvenQuantity == 40
+    profitExpr, breakEvenQuantity
+  exercise:
+    prompt: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    starterCode: |-
+      import sympy as sp
+
+      x = sp.symbols('x', nonnegative=True)
+      fixedCost = 120000
+      unitPrice = 5000
+      unitCost = 2000
+
+      revenueExpr = unitPrice * x
+      costExpr = fixedCost + unitCost * x
+      profitExpr = sp.simplify(revenueExpr - costExpr)
+      breakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]
+
+      assert profitExpr == 3000 * x - 120000
+      assert breakEvenQuantity == 40
+      profitExpr, breakEvenQuantity
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.'
+    resultCheck: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sympy_00-symbolic-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - workflow_validation
+    title: 기호식의 변수·정의역 계약 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 식이 참조하는 기호와 허용 정의역을 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 같은 이름의 symbol을 여러 객체로 만들지 마세요.
+    - 양수·실수 같은 assumption은 식 변형 결과를 바꿀 수 있습니다.
+    exercise:
+      prompt: audit_expression(symbols, assumptions, required)를 완성하세요.
+      starterCode: |-
+        def audit_expression(symbols, assumptions, required):
+            raise NotImplementedError
+      solution: |
+        def audit_expression(symbols, assumptions, required):
+            duplicates = sorted({name for name in symbols if symbols.count(name) > 1})
+            missing = sorted(set(required) - set(symbols))
+            unknown = sorted(set(assumptions) - set(symbols))
+            return {"valid": not duplicates and not missing and not unknown, "symbols": sorted(set(symbols)), "duplicates": duplicates, "missing": missing, "unknownAssumptions": unknown}
+      hints: *id001
+    check:
+      id: python.sympy.sympy_00.symbolic-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_00.symbolic-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_expression
+        cases:
+        - id: accepts-explicit-contract
+          arguments:
+          - value:
+            - x
+            - y
+          - value:
+              x: real
+          - value:
+            - x
+          expectedReturn:
+            valid: true
+            symbols:
+            - x
+            - y
+            duplicates: []
+            missing: []
+            unknownAssumptions: []
+        - id: reports-contract-errors
+          arguments:
+          - value:
+            - x
+            - x
+          - value:
+              z: positive
+          - value:
+            - x
+            - y
+          expectedReturn:
+            valid: false
+            symbols:
+            - x
+            duplicates:
+            - x
+            missing:
+            - y
+            unknownAssumptions:
+            - z
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sympy_00-exact-number-policy-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sympy_00-symbolic-contract-mastery
+    title: 새 계산에 exact number 정책 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 정수·유리수·소수 입력에서 exact와 approximate 경계를 고른다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - Python float를 exact 유리수로 가장하지 마세요.
+    - 근사는 최종 표시 경계에서 수행하세요.
+    exercise:
+      prompt: classify_numbers(values)를 완성하세요.
+      starterCode: |-
+        def classify_numbers(values):
+            raise NotImplementedError
+      solution: |
+        def classify_numbers(values):
+            exact = []; approximate = []
+            for value in values:
+                if isinstance(value, bool): raise ValueError("boolean is not a numeric contract")
+                if isinstance(value, int) or isinstance(value, str) and "/" in value: exact.append(value)
+                elif isinstance(value, float): approximate.append(value)
+                else: raise ValueError("unsupported number")
+            return {"exact": exact, "approximate": approximate, "mixed": bool(exact and approximate)}
+      hints: *id002
+    check:
+      id: python.sympy.sympy_00.exact-number-policy.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_00.exact-number-policy.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: classify_numbers
+        cases:
+        - id: separates-exact-and-float
+          arguments:
+          - value:
+            - 1
+            - 1/3
+            - 0.5
+          expectedReturn:
+            exact:
+            - 1
+            - 1/3
+            approximate:
+            - 0.5
+            mixed: true
+        - id: keeps-exact-only
+          arguments:
+          - value:
+            - 2
+            - 3/7
+          expectedReturn:
+            exact:
+            - 2
+            - 3/7
+            approximate: []
+            mixed: false
+        - id: rejects-bool
+          arguments:
+          - value:
+            - true
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sympy_00-symbolic-engine-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sympy_00-exact-number-policy-transfer
+    title: 기호 계산 사용 경계 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: exact algebra와 numeric approximation을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 기호 계산의 가정과 정의역을 결과와 함께 남기세요.
+    - 소수 근삿값과 exact 결과를 구분하세요.
+    exercise:
+      prompt: choose_symbolic_boundary(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_symbolic_boundary(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_symbolic_boundary(situation):
+            table = {'algebraic-proof': {'method': 'symbolic exact', 'evidence': 'simplified difference is zero', 'risk': 'missing assumptions'}, 'large-numeric-array': {'method': 'numeric library', 'evidence': 'tolerance', 'risk': 'symbolic explosion'}, 'final-decimal': {'method': 'evalf at boundary', 'evidence': 'precision', 'risk': 'early rounding'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sympy.sympy_00.symbolic-engine-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_00.symbolic-engine-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_symbolic_boundary
+        cases:
+        - id: recalls-algebraic-proof
+          arguments:
+          - value: algebraic-proof
+          expectedReturn:
+            method: symbolic exact
+            evidence: simplified difference is zero
+            risk: missing assumptions
+        - id: recalls-large-numeric-array
+          arguments:
+          - value: large-numeric-array
+          expectedReturn:
+            method: numeric library
+            evidence: tolerance
+            risk: symbolic explosion
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

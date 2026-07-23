@@ -1,0 +1,819 @@
+var e=`meta:
+  packages:
+  - numpy
+  - pillow
+  - scikit-learn
+  id: pillow_06
+  title: RGB채널분석기
+  order: 6
+  category: pillow
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  tags:
+  - Pillow
+  - split
+  - merge
+  - histogram
+  - RGB
+  - 채널
+  seo:
+    title: Pillow 중급 - RGB 채널 분석기
+    description: Pillow split/merge/histogram으로 RGB 채널을 분리하고 색 분포를 정량 분석합니다.
+    keywords:
+    - Pillow
+    - split
+    - merge
+    - histogram
+    - RGB채널
+    - 색상분석
+intro:
+  emoji: 🎨
+  goal: split으로 RGB 채널을 분리해 채널별 평균/histogram을 측정하고 merge로 채널 교환 효과를 만든 뒤, validateRgbMode 가드까지 짭니다.
+  description: RGB 분석은 자동화에서 색 기반 분류와 필터링의 기본입니다. split/merge/histogram 세 메서드 흐름을 정량 검증합니다.
+  direction: split → 채널별 평균/histogram → merge로 채널 교환 → 가드 함수.
+  benefits:
+  - split 결과가 3개의 'L' 모드 단채널 Image라는 점을 확인합니다.
+  - histogram 길이가 RGB는 768 (256×3), L은 256임을 검증합니다.
+  - merge로 채널 순서 교환 (R↔B)이 색을 어떻게 뒤집는지 봅니다.
+  - validateRgbMode로 비 RGB 입력 차단.
+  diagram:
+    steps:
+    - label: RGB 입력
+      detail: china 샘플을 Image.fromarray로 RGB Image로 만듭니다.
+    - label: split
+      detail: 세 채널을 분리해 각 채널이 'L' 모드인지 확인.
+    - label: histogram
+      detail: RGB histogram 길이 768, 채널별 길이 256 검증.
+    - label: 평균 분석
+      detail: 채널별 평균으로 이미지 색조 파악.
+    - label: merge 채널 교환
+      detail: R↔B 교환으로 색이 뒤집히는 효과 확인.
+    runtime:
+    - label: pillow + numpy
+      detail: 채널 통계는 NumPy로 빠르게 계산.
+    - label: 단일 RGB 입력
+      detail: 첫 셀의 source 객체가 이후 모든 셀의 공통 입력.
+    - label: split은 새 객체
+      detail: 각 채널 결과는 독립 Image 객체로 원본과 공유 없음.
+sections:
+- id: step1_load
+  title: 1단계. RGB 분석 입력
+  structuredPrimary: true
+  subtitle: china 컬러 사진
+  goal: china 샘플을 RGB Image로 만들고 mode/size를 확인합니다.
+  why: RGB 채널 분석은 입력이 정확히 'RGB' mode일 때만 의미가 있습니다. 첫 셀에서 mode를 점검해 두면 다음 셀들의 가정이 분명해집니다.
+  explanation: |-
+    sklearn china 풍경 사진은 (640, 427) 크기에 RGB 채널이 균형 있게 분포해 채널 분석에 적합합니다.
+    Image.fromarray로 변환한 결과의 mode는 'RGB'입니다. 이후 split 호출이 3개 채널을 돌려줘야 합니다.
+  tips:
+  - Pillow의 일반 컬러 사진은 거의 항상 'RGB' mode입니다. 'RGBA'는 알파 채널 포함.
+  - mode가 'P'인 인덱스 컬러 이미지는 split이 다르게 동작합니다. convert('RGB')로 먼저 바꾸세요.
+  snippet: |-
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    source = Image.fromarray(load_sample_image('china.jpg'))
+
+    {
+        'mode': source.mode,
+        'size': source.size,
+        'pixelCount': source.size[0] * source.size[1],
+    }
+  exercise:
+    prompt: flower 입력의 mode와 size를 확인하세요.
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      flowerSource = Image.fromarray(load_sample_image('___'))
+      {'mode': flowerSource.mode, 'size': flowerSource.size}
+    hints:
+    - flower 파일명.
+    - 빈칸에는 flower.jpg가 들어갑니다.
+    check:
+      noError: load_sample_image와 Image.fromarray가 끝나야 합니다.
+      resultCheck: mode가 'RGB'여야 합니다.
+  check:
+    noError: load_sample_image와 Image.fromarray가 끝나야 합니다.
+    resultCheck: mode가 'RGB', size가 (640, 427), pixelCount가 273280이어야 합니다.
+- id: step2_split
+  title: 2단계. split으로 채널 분리
+  structuredPrimary: true
+  subtitle: 3개의 'L' 모드 Image
+  goal: source.split()로 R/G/B 세 채널을 분리하고 각 결과가 'L' 모드, 원본과 같은 size인지 확인합니다.
+  why: split은 RGB 채널을 독립적으로 다루는 표준 도구입니다. 각 채널의 mode가 'L'이라는 점을 확인하면 후속 처리에 어떤 함수가 적합한지(예 ImageFilter 단채널 입력) 즉시 알 수 있습니다.
+  explanation: |-
+    Image.split()은 채널 수만큼의 Image 튜플을 돌려줍니다. RGB는 3개 (R, G, B), RGBA는 4개 (R, G, B, A).
+    각 채널은 'L' mode(단채널 그레이스케일) Image입니다. 픽셀 값은 해당 채널의 밝기로, R 채널이 밝으면 그 위치에 빨강이 강합니다.
+    각 채널 Image의 size는 원본과 동일합니다.
+  tips:
+  - "split은 비용이 적습니다(메모리 복사). 자주 써도 안전합니다."
+  - 채널만 빠르게 접근하려면 np.asarray(image)[..., 0]으로 NumPy 인덱싱이 더 빠릅니다.
+  snippet: |-
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    splitSource = Image.fromarray(load_sample_image('china.jpg'))
+    redChannel, greenChannel, blueChannel = splitSource.split()
+
+    {
+        'channelCount': 3,
+        'redMode': redChannel.mode,
+        'greenMode': greenChannel.mode,
+        'blueMode': blueChannel.mode,
+        'redSizeMatchesOriginal': redChannel.size == splitSource.size,
+    }
+  exercise:
+    prompt: split 결과의 len이 3인지 확인하세요. tuple unpacking 대신 변수 한 개로 받아 len()을 측정합니다.
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      channelTuple = Image.fromarray(load_sample_image('china.jpg')).___()
+      {'count': len(channelTuple), 'isThree': len(channelTuple) == 3}
+    hints:
+    - 분리 메서드는 split입니다.
+    - 빈칸에는 split이 들어갑니다.
+    check:
+      noError: split 호출이 끝나야 합니다.
+      resultCheck: isThree가 True여야 합니다.
+  check:
+    noError: split 호출과 dict 구성이 끝나야 합니다.
+    resultCheck: redMode/greenMode/blueMode 모두 'L', redSizeMatchesOriginal이 True여야 합니다.
+- id: step3_visualize
+  title: 3단계. 채널 시각화
+  structuredPrimary: true
+  subtitle: 한 채널만 살린 RGB
+  goal: 빈 단채널 Image와 red 채널을 merge해 "R만 살린 RGB" 이미지를 만들고 결과 채널별 평균이 R만 양수인지 확인합니다.
+  why: 채널을 색으로 시각화하려면 다른 채널을 0으로 채우고 merge합니다. 결과 이미지는 빨강만 살아있는 사진이 되어 R 채널의 분포를 색으로 직관적으로 볼 수 있습니다.
+  explanation: |-
+    Image.new('L', size, 0)으로 모든 픽셀이 0인 단채널 Image를 만듭니다. 이게 G와 B 채널의 자리 채움.
+    Image.merge('RGB', (red, zero, zero))로 R만 원본 값, G와 B는 0인 RGB Image를 만듭니다. 결과는 빨강 만 살아있는 사진입니다.
+    검증은 결과 ndarray의 G와 B 채널 평균이 0인지로 합니다.
+  tips:
+  - 같은 패턴을 G와 B에 적용해 세 채널 시각화 세트를 만들 수 있습니다.
+  - 시각화 결과는 plt.imshow로 바로 그릴 수 있습니다.
+  snippet: |-
+    import numpy as np
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    visSource = Image.fromarray(load_sample_image('china.jpg'))
+    red, green, blue = visSource.split()
+    blackChannel = Image.new('L', visSource.size, 0)
+
+    redOnly = Image.merge('RGB', (red, blackChannel, blackChannel))
+    redOnlyArr = np.asarray(redOnly)
+
+    {
+        'mode': redOnly.mode,
+        'size': redOnly.size,
+        'rMean': round(float(redOnlyArr[..., 0].mean()), 2),
+        'gMean': round(float(redOnlyArr[..., 1].mean()), 2),
+        'bMean': round(float(redOnlyArr[..., 2].mean()), 2),
+        'onlyRedSurvived': float(redOnlyArr[..., 1].mean()) == 0 and float(redOnlyArr[..., 2].mean()) == 0,
+    }
+  exercise:
+    prompt: 같은 패턴으로 G만 살린 RGB 이미지를 만들어 R/B 평균이 0인지 확인하세요.
+    starterCode: |-
+      import numpy as np
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      greenSource = Image.fromarray(load_sample_image('china.jpg'))
+      _, green, _ = greenSource.split()
+      blackG = Image.new('L', greenSource.size, 0)
+      greenOnly = Image.merge('RGB', (blackG, green, ___))
+      greenArr = np.asarray(greenOnly)
+      {'rMean': round(float(greenArr[..., 0].mean()), 2), 'bMean': round(float(greenArr[..., 2].mean()), 2)}
+    hints:
+    - 마지막 자리에 검정 채널을 넣습니다.
+    - 빈칸에는 blackG가 들어갑니다.
+    check:
+      noError: merge 호출이 끝나야 합니다.
+      resultCheck: rMean이 0이고 bMean이 0이어야 합니다.
+  check:
+    noError: split/merge가 끝나야 합니다.
+    resultCheck: onlyRedSurvived가 True여야 합니다.
+- id: step4_histogram
+  title: 4단계. histogram 길이와 분포
+  structuredPrimary: true
+  subtitle: RGB 768 vs L 256
+  goal: source.histogram() 길이가 768(256×3), source.convert('L').histogram() 길이가 256인지 확인하고, 채널별 histogram의 합이 전체 픽셀 수와 같은지 검증합니다.
+  why: histogram은 색 분포 분석의 1차 도구입니다. 길이와 합 관계를 손으로 한 번 확인해 두면 후속 분석(평균, 중앙값, 모드)에서 헷갈리지 않습니다.
+  explanation: |-
+    Image.histogram()은 모든 채널을 한 리스트에 연결한 결과를 돌려줍니다. RGB는 768 길이, L은 256, RGBA는 1024.
+    리스트를 256씩 슬라이스해 채널별로 분리할 수 있습니다. histR = hist[0:256], histG = hist[256:512], histB = hist[512:768].
+    각 채널 histogram의 합은 전체 픽셀 수와 같습니다. 이 관계가 깨지면 mask가 적용됐거나 일부 영역만 측정했다는 신호입니다.
+  tips:
+  - histogram은 mask 인자를 받지 않습니다. 일부 영역 분석에는 crop 후 histogram 호출이 표준입니다.
+  - numpy bincount나 calcHist가 더 빠르지만 Pillow 단독으로는 histogram이 표준 도구입니다.
+  snippet: |-
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    histSource = Image.fromarray(load_sample_image('china.jpg'))
+    rgbHist = histSource.histogram()
+    grayHist = histSource.convert('L').histogram()
+
+    histR = rgbHist[0:256]
+    histG = rgbHist[256:512]
+    histB = rgbHist[512:768]
+    totalPixels = histSource.size[0] * histSource.size[1]
+
+    {
+        'rgbHistLength': len(rgbHist),
+        'grayHistLength': len(grayHist),
+        'isRgb768': len(rgbHist) == 768,
+        'isGray256': len(grayHist) == 256,
+        'rChannelSum': sum(histR),
+        'sumEqualsPixels': sum(histR) == totalPixels,
+    }
+  exercise:
+    prompt: G 채널 histogram의 합도 전체 픽셀 수와 같은지 확인하세요.
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      gSource = Image.fromarray(load_sample_image('china.jpg'))
+      gHist = gSource.histogram()[___:512]
+      gTotal = gSource.size[0] * gSource.size[1]
+      {'gSum': sum(gHist), 'gMatch': sum(gHist) == gTotal}
+    hints:
+    - G 채널은 hist 인덱스 256부터 시작합니다.
+    - 빈칸에는 256이 들어갑니다.
+    check:
+      noError: histogram 호출이 끝나야 합니다.
+      resultCheck: gMatch가 True여야 합니다.
+  check:
+    noError: histogram 두 호출이 끝나야 합니다.
+    resultCheck: isRgb768과 isGray256과 sumEqualsPixels 모두 True여야 합니다.
+- id: step5_analysis
+  title: 5단계. 채널별 평균과 색조
+  structuredPrimary: true
+  subtitle: histogram → mean
+  goal: histogram으로 R/G/B 채널별 평균을 계산하고 어느 채널이 가장 강한지 분류해 이미지의 전체 색조를 파악합니다.
+  why: 채널별 평균은 이미지의 색조를 한 수로 표현하는 표준 지표입니다. R>G>B면 따뜻한 사진, B>G>R면 차가운 사진. 자동화 분류의 기본 신호입니다.
+  explanation: |-
+    histogram에서 평균 = sum(i * histogram[i]) / totalPixels. 256개 항목에 가중치를 곱한 합을 픽셀 수로 나눕니다.
+    더 빠른 방법은 NumPy로 변환 후 .mean(axis=(0, 1))을 호출하는 것입니다. 결과는 (R, G, B) 평균.
+    풍경 사진은 보통 G가 가장 큰 경향, 일몰은 R, 바다는 B가 큰 경향이 있습니다. 이 분류는 단순한 색조 인덱스 역할을 합니다.
+  tips:
+  - histogram 기반 평균은 모든 픽셀을 한 번씩만 처리해 빠릅니다.
+  - "더 정확한 색조 분석은 HSV의 H 채널 히스토그램이 더 적합합니다."
+  snippet: |-
+    import numpy as np
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    analyzeSource = Image.fromarray(load_sample_image('china.jpg'))
+    analyzeArr = np.asarray(analyzeSource)
+
+    rMean = float(analyzeArr[..., 0].mean())
+    gMean = float(analyzeArr[..., 1].mean())
+    bMean = float(analyzeArr[..., 2].mean())
+
+    dominantChannel = max(('R', rMean), ('G', gMean), ('B', bMean), key=lambda pair: pair[1])
+
+    {
+        'channelMeans': [round(rMean, 2), round(gMean, 2), round(bMean, 2)],
+        'dominantChannel': dominantChannel[0],
+        'isLandscapeGreen': dominantChannel[0] == 'G' or gMean > 100,
+    }
+  exercise:
+    prompt: flower 입력의 채널별 평균을 측정해 가장 강한 채널을 확인하세요.
+    starterCode: |-
+      import numpy as np
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      flowerArr = np.asarray(Image.fromarray(load_sample_image('___')))
+      rM = float(flowerArr[..., 0].mean())
+      gM = float(flowerArr[..., 1].mean())
+      bM = float(flowerArr[..., 2].mean())
+      {'channels': [round(rM, 2), round(gM, 2), round(bM, 2)]}
+    hints:
+    - flower 파일명을 넣습니다.
+    - 빈칸에는 flower.jpg가 들어갑니다.
+    check:
+      noError: mean 계산이 끝나야 합니다.
+      resultCheck: channels 길이가 3이어야 합니다.
+  check:
+    noError: 통계 계산이 끝나야 합니다.
+    resultCheck: dominantChannel이 R/G/B 중 하나이고 isLandscapeGreen이 True여야 합니다.
+- id: step6_swap
+  title: 6단계. merge로 채널 교환
+  structuredPrimary: true
+  subtitle: R↔B 뒤집기
+  goal: merge('RGB', (blue, green, red))로 R과 B 채널을 교환한 결과의 채널 평균이 원본의 R/B 평균과 정확히 반대로 매핑되는지 확인합니다.
+  why: 채널 교환은 색을 의도적으로 뒤집는 효과를 만듭니다. cv2 BGR/RGB 변환과 비슷한 원리지만 임의 순서가 가능합니다. 자동화에서 색 보정 실험의 기본 도구입니다.
+  explanation: |-
+    Image.merge('RGB', (newR, newG, newB))는 세 단채널을 새 RGB Image로 합칩니다. 순서가 그대로 R, G, B 자리가 됩니다.
+    원래 R/G/B를 받아 (B, G, R) 순서로 merge하면 결과의 R = 원본 B, B = 원본 R이 됩니다.
+    검증은 결과 ndarray의 R 평균이 원본 B 평균과 같고, B 평균이 원본 R 평균과 같은지로 합니다.
+  tips:
+  - cv2.cvtColor(img, cv2.COLOR_BGR2RGB)와 동일한 효과를 Pillow merge로 만들 수 있습니다.
+  - 채널 순서를 (G, B, R)로 바꾸면 더 독특한 색 효과를 얻을 수 있습니다.
+  snippet: |-
+    import numpy as np
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    swapSource = Image.fromarray(load_sample_image('china.jpg'))
+    red, green, blue = swapSource.split()
+    swapped = Image.merge('RGB', (blue, green, red))
+
+    sourceArr = np.asarray(swapSource)
+    swappedArr = np.asarray(swapped)
+
+    {
+        'originalRMean': round(float(sourceArr[..., 0].mean()), 2),
+        'originalBMean': round(float(sourceArr[..., 2].mean()), 2),
+        'swappedRMean': round(float(swappedArr[..., 0].mean()), 2),
+        'swappedBMean': round(float(swappedArr[..., 2].mean()), 2),
+        'rIsNowOriginalB': abs(float(swappedArr[..., 0].mean()) - float(sourceArr[..., 2].mean())) < 0.5,
+        'bIsNowOriginalR': abs(float(swappedArr[..., 2].mean()) - float(sourceArr[..., 0].mean())) < 0.5,
+    }
+  exercise:
+    prompt: (G, B, R) 순서로 merge해서 결과의 R 평균이 원본 G 평균과 같은지 확인하세요.
+    starterCode: |-
+      import numpy as np
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      gbrSource = Image.fromarray(load_sample_image('china.jpg'))
+      red, green, blue = gbrSource.split()
+      gbr = Image.merge('RGB', (green, blue, ___))
+      sourceArr = np.asarray(gbrSource)
+      gbrArr = np.asarray(gbr)
+      {'gbrRMean': round(float(gbrArr[..., 0].mean()), 2), 'sourceGMean': round(float(sourceArr[..., 1].mean()), 2), 'matches': abs(float(gbrArr[..., 0].mean()) - float(sourceArr[..., 1].mean())) < 0.5}
+    hints:
+    - 마지막 자리에 red 채널.
+    - 빈칸에는 red가 들어갑니다.
+    check:
+      noError: merge 호출이 끝나야 합니다.
+      resultCheck: matches가 True여야 합니다.
+  check:
+    noError: split/merge가 끝나야 합니다.
+    resultCheck: rIsNowOriginalB와 bIsNowOriginalR 모두 True여야 합니다.
+- id: practice
+  title: 실습 - analyzeChannels 함수
+  structuredPrimary: true
+  subtitle: 통합 채널 진단
+  goal: analyzeChannels(image) 함수가 split→평균→dominant 채널까지 한 dict로 묶어 보고하고, flower와 china 두 입력에 같은 형식으로 적용합니다.
+  why: 채널 분석은 자주 반복되는 작업이라 함수로 묶어 두면 자동화가 쉽습니다. 같은 dict 형식이 일관되게 돌아오면 단위 테스트와 비교 분석에 활용 가능합니다.
+  explanation: |-
+    analyzeChannels는 RGB Image를 받아 channelMeans와 dominantChannel을 dict로 돌려줍니다.
+    NumPy로 변환 후 channel별 평균을 한 번에 계산하는 것이 효율적입니다. histogram 기반 계산은 더 느립니다.
+    flower와 china 두 입력에 적용해 비교하면 두 사진의 색조 차이가 즉시 보입니다.
+  tips:
+  - 함수 안에서 image.mode를 먼저 확인해 RGB만 처리하도록 가드를 두는 게 안전합니다(7단계 참고).
+  - 채널별 평균은 자동화 보고서의 표준 출력 형식입니다.
+  snippet: |-
+    import numpy as np
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+
+    def analyzeChannels(image: Image.Image) -> dict:
+        arr = np.asarray(image)
+        means = [round(float(arr[..., c].mean()), 2) for c in range(3)]
+        labels = ['R', 'G', 'B']
+        dominantIdx = means.index(max(means))
+        return {
+            'channelMeans': means,
+            'dominantChannel': labels[dominantIdx],
+            'dominantValue': means[dominantIdx],
+        }
+
+
+    flowerPic = Image.fromarray(load_sample_image('flower.jpg'))
+    chinaPic = Image.fromarray(load_sample_image('china.jpg'))
+
+    [analyzeChannels(flowerPic), analyzeChannels(chinaPic)]
+  exercise:
+    prompt: analyzeChannels에 'isWarm' 키를 추가해 R 평균이 B 평균보다 크면 True를 돌려주는 분류 함수로 확장하세요.
+    starterCode: |-
+      import numpy as np
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+
+      def analyzeChannelsExtended(image):
+          arr = np.asarray(image)
+          rMean = float(arr[..., 0].mean())
+          bMean = float(arr[..., 2].mean())
+          return {'rMean': round(rMean, 2), 'bMean': round(bMean, 2), 'isWarm': rMean > ___}
+
+
+      analyzeChannelsExtended(Image.fromarray(load_sample_image('flower.jpg')))
+    hints:
+    - R이 B보다 크면 warm.
+    - 빈칸에는 bMean이 들어갑니다.
+    check:
+      noError: analyzeChannelsExtended 정의와 호출이 끝나야 합니다.
+      resultCheck: 결과 dict에 isWarm 키가 있어야 합니다.
+  check:
+    noError: analyzeChannels 정의와 두 호출이 끝나야 합니다.
+    resultCheck: 두 결과 모두 channelMeans 3원소와 dominantChannel을 가져야 합니다.
+- id: workflow_validation
+  title: 7단계. RGB 가드 + 채널 합 검증
+  structuredPrimary: true
+  subtitle: validateRgbMode + histogram 검증
+  goal: validateRgbMode가 비 RGB 입력을 차단하고, RGB histogram의 길이/합이 정해진 형식인지 회귀 테스트로 확인합니다.
+  why: 채널 분석은 RGB 입력 가정에 의존합니다. RGBA, L, P 모드 입력은 다른 채널 수를 줘서 후속 처리가 깨집니다. 함수 입구 가드가 그 사고를 차단합니다.
+  explanation: |-
+    validateRgbMode는 image.mode != 'RGB'면 ValueError를 던집니다. 메시지에 실제 mode를 포함시켜 호출자가 즉시 원인을 알 수 있습니다.
+    회귀 테스트는 (1) histogram 길이가 768, (2) 각 채널 합이 totalPixels라는 두 조건입니다. 알고리즘 변경 후 즉시 돌릴 수 있는 1줄 검증입니다.
+    Pillow 합성 입력으로 정답 픽셀 수를 정확히 알 수 있어 검증에 적합합니다.
+  tips:
+  - "validateRgbMode는 다른 채널 분석 함수의 첫 줄에서 호출하면 입력 안전을 한 번에 보호할 수 있습니다."
+  - "Pillow Image.new('RGB', size)는 (0, 0, 0) 기본 검정으로 채웁니다. 다른 색이 필요하면 fill 인자를 줍니다."
+  snippet: |-
+    from PIL import Image
+
+
+    def validateRgbMode(image: Image.Image) -> bool:
+        if image.mode != 'RGB':
+            raise ValueError(f"RGB 이미지가 필요합니다: mode={image.mode}")
+        return True
+
+
+    channelImage = Image.new('RGB', (120, 90))
+    for x in range(120):
+        for y in range(90):
+            if x < 40:
+                channelImage.putpixel((x, y), (220, 40, 40))
+            elif x < 80:
+                channelImage.putpixel((x, y), (40, 220, 40))
+            else:
+                channelImage.putpixel((x, y), (40, 40, 220))
+
+    okResult = validateRgbMode(channelImage)
+    okHist = channelImage.histogram()
+    totalPixels = channelImage.size[0] * channelImage.size[1]
+
+    grayImage = channelImage.convert('L')
+    try:
+        validateRgbMode(grayImage)
+        grayMessage = 'unexpected pass'
+    except ValueError as exc:
+        grayMessage = str(exc)
+
+    {
+        'okResult': okResult,
+        'histLength': len(okHist),
+        'totalPixels': totalPixels,
+        'rChannelSum': sum(okHist[0:256]),
+        'rSumMatches': sum(okHist[0:256]) == totalPixels,
+        'grayMessage': grayMessage,
+    }
+  exercise:
+    prompt: RGBA 입력에 validateRgbMode를 호출해 메시지에 'RGBA' 단서가 포함되는지 확인하세요.
+    starterCode: |-
+      from PIL import Image
+
+
+      def validateRgbMode(image):
+          if image.mode != 'RGB':
+              raise ValueError(f"RGB 이미지가 필요합니다: mode={image.mode}")
+          return True
+
+
+      rgbaImage = Image.new('___', (50, 50), (100, 150, 200, 255))
+      try:
+          validateRgbMode(rgbaImage)
+          rgbaMessage = 'unexpected pass'
+      except ValueError as exc:
+          rgbaMessage = str(exc)
+
+      {'hasRgba': 'RGBA' in rgbaMessage}
+    hints:
+    - 4채널 mode는 'RGBA'.
+    - 빈칸에는 RGBA가 들어갑니다.
+    check:
+      noError: validateRgbMode 정의가 끝나야 합니다.
+      resultCheck: hasRgba가 True여야 합니다.
+  check:
+    noError: validateRgbMode와 histogram 호출이 끝나야 합니다.
+    resultCheck: okResult가 True, histLength가 768, rSumMatches가 True여야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pillow_06-rgb_channel_analysis-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: RGB 채널 분석기 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 채널 순서·histogram bin·sampling 계약을 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_rgb_channel_analysis_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_rgb_channel_analysis_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_rgb_channel_analysis_contract(value):
+            required = ['colorOrder', 'bins', 'sampleStride']
+            rules = [{'id': 'color-order', 'field': 'colorOrder', 'kind': 'enum', 'values': ['RGB']}, {'id': 'bins', 'field': 'bins', 'kind': 'divisible', 'value': 16}, {'id': 'sample-stride', 'field': 'sampleStride', 'kind': 'range', 'min': 1, 'max': 64}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'rgb_channel_analysis', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.pillow.pillow_06.rgb_channel_analysis-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pillow.pillow_06.rgb_channel_analysis-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_rgb_channel_analysis_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              colorOrder: RGB
+              bins: 256
+              sampleStride: 1
+          expectedReturn:
+            accepted: true
+            topic: rgb_channel_analysis
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              bins: 256
+              sampleStride: 1
+          expectedReturn:
+            accepted: false
+            topic: rgb_channel_analysis
+            missing:
+            - colorOrder
+            violations:
+            - color-order
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              colorOrder: BGR
+              bins: 250
+              sampleStride: 100
+          expectedReturn:
+            accepted: false
+            topic: rgb_channel_analysis
+            missing: []
+            violations:
+            - bins
+            - color-order
+            - sample-stride
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pillow_06-rgb_channel_analysis-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pillow_06-rgb_channel_analysis-contract-audit-mastery
+    title: RGB 채널 분석기 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_rgb_channel_analysis_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_rgb_channel_analysis_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_rgb_channel_analysis_result(expected, observed):
+            identity = ['sourceHash', 'colorOrder']
+            metrics = {'histogramCount': 0}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'rgb_channel_analysis', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.pillow.pillow_06.rgb_channel_analysis-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pillow.pillow_06.rgb_channel_analysis-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_rgb_channel_analysis_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              sourceHash: rgb1
+              colorOrder: RGB
+              histogramCount: 921600
+          - value:
+              sourceHash: rgb1
+              colorOrder: RGB
+              histogramCount: 921600
+          expectedReturn:
+            passed: true
+            topic: rgb_channel_analysis
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              sourceHash: rgb1
+              colorOrder: RGB
+              histogramCount: 921600
+          - value:
+              sourceHash: rgb2
+              colorOrder: BGR
+              histogramCount: 900000
+          expectedReturn:
+            passed: false
+            topic: rgb_channel_analysis
+            missing: []
+            identityMismatch:
+            - colorOrder
+            - sourceHash
+            metricDrift:
+            - histogramCount
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              sourceHash: rgb1
+              colorOrder: RGB
+              histogramCount: 921600
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: rgb_channel_analysis
+            missing:
+            - colorOrder
+            - histogramCount
+            - sourceHash
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pillow_06-rgb_channel_analysis-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pillow_06-rgb_channel_analysis-result-reconciliation-transfer
+    title: RGB 채널 분석기 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_rgb_channel_analysis_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_rgb_channel_analysis_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_rgb_channel_analysis_evidence(stage):
+            stages = {'source': {'action': 'admit RGB analysis source', 'evidence': 'channel order bin sampling', 'risk': 'unsafe or misread image'}, 'edit': {'action': 'apply bounded RGB analysis edit', 'evidence': 'histogram accumulation', 'risk': 'quality or geometry loss'}, 'artifact': {'action': 'reopen RGB analysis artifact', 'evidence': 'bin total reconciliation', 'risk': 'corrupt or visually wrong output'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.pillow.pillow_06.rgb_channel_analysis-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pillow.pillow_06.rgb_channel_analysis-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_rgb_channel_analysis_evidence
+        cases:
+        - id: recalls-source
+          arguments:
+          - value: source
+          expectedReturn:
+            action: admit RGB analysis source
+            evidence: channel order bin sampling
+            risk: unsafe or misread image
+        - id: recalls-edit
+          arguments:
+          - value: edit
+          expectedReturn:
+            action: apply bounded RGB analysis edit
+            evidence: histogram accumulation
+            risk: quality or geometry loss
+        - id: recalls-artifact
+          arguments:
+          - value: artifact
+          expectedReturn:
+            action: reopen RGB analysis artifact
+            evidence: bin total reconciliation
+            risk: corrupt or visually wrong output
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

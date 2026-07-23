@@ -1,0 +1,900 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - seaborn
+  id: seaborn_00
+  title: Seaborn소개
+  order: 0
+  category: seaborn
+  badge: 소개
+  source: eddmpython
+  sourceUrl: https://eddmpython.com
+  outcomes: ["viz.statistical"]
+  prerequisites: ["matplotlib.basics"]
+  estimatedMinutes: 35
+  tags:
+  - Seaborn
+  - 시각화
+  - 통계
+  - EDA
+  - Matplotlib
+  - hue
+  seo:
+    title: Seaborn 입문 - 통계 시각화의 강력한 도구
+    description: Seaborn으로 아름다운 통계 차트를 만들어보세요. Matplotlib 위에 구축된 고수준 인터페이스로 탐색적 데이터 분석을 빠르게 수행합니다.
+    keywords:
+    - Seaborn
+    - 통계 시각화
+    - EDA
+    - hue
+    - palette
+    - Matplotlib
+intro:
+  direction: Seaborn소개에서 정리된 데이터를 통계 차트로 보고 분포와 관계를 검증합니다.
+  benefits:
+  - 첫 실행 셀은 assert로 핵심 결과를 고정해 실습 코드가 깨지지 않았는지 확인합니다.
+  - 분석용 테이블 확인 후 통계 차트 구성에 맞는 코드 입력을 고릅니다.
+  - Seaborn소개 결과를 분포, 그룹, 관계 패턴 기준으로 즉시 점검합니다.
+  - 완료한 코드를 탐색 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 17단계. Seaborn 학습 입력 확인
+      detail: 입력 기준(분석용 테이블)과 필요한 조건을 먼저 고정합니다.
+    - label: 통계 차트 구성 처리 실행
+      detail: 통계 차트 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 분포, 그룹, 관계 패턴 결과 검증
+      detail: 분포, 그룹, 관계 패턴 기준으로 실행 결과를 비교합니다.
+    - label: Seaborn소개 재사용
+      detail: 완성 코드를 탐색 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 통계 시각화 환경
+      detail: matplotlib, seaborn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: Seaborn소개 실행
+      detail: 셀을 실행해 분포, 그룹, 관계 패턴와 예외 상태를 확인합니다.
+    - label: Seaborn소개 완료
+      detail: 검증된 코드를 탐색 리포트로 남깁니다.
+sections:
+- id: intro
+  blocks:
+  - type: mainHeader
+    emoji: 🎨
+    title: Seaborn
+    subtitle: 통계 시각화의 강력한 도구
+  - type: hero
+    emoji: 📊
+    title: 아름다운 통계 차트
+    subtitle: 한 줄 코드로 복잡한 분석 시각화
+    points:
+    - emoji: 🎯
+      title: 통계 시각화에 최적화
+    - emoji: 🖌️
+      title: 아름다운 기본 스타일
+    - emoji: 🔗
+      title: Matplotlib 완벽 호환
+    - emoji: ⚡
+      title: 빠른 탐색적 분석
+  goal: Seaborn에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+- id: seaborn_history
+  blocks:
+  - type: sectionHeader
+    title: 🏛️ Seaborn의 탄생
+    subtitle: Matplotlib의 아름다운 확장
+  - type: text
+    content: |-
+      Seaborn은 2012년 Michael Waskom이 만들었습니다. 당시 그는 뉴욕대학교에서 신경과학을 연구하던 대학원생이었습니다. 실험 데이터를 분석하면서 Matplotlib의 복잡한 코드에 불편함을 느꼈고, 더 쉽고 아름다운 시각화 도구를 만들고 싶었습니다.
+
+      Seaborn은 Matplotlib 위에 구축되어 있어서 모든 Matplotlib 기능을 그대로 사용할 수 있습니다. 하지만 통계적 시각화에 특화된 고수준 인터페이스를 제공하여, 복잡한 차트를 한 줄로 그릴 수 있게 해줍니다.
+  - type: featureCards
+    cards:
+    - emoji: 🔬
+      title: 연구자가 만든 도구
+      description: 실제 데이터 분석 경험에서 탄생한 실용적인 라이브러리
+    - emoji: 📈
+      title: 통계 시각화 전문
+      description: 분포, 관계, 범주형 비교 등 통계 분석에 최적화
+    - emoji: 🎨
+      title: 과학적 색상 팔레트
+      description: 색맹 친화적이고 인쇄에도 적합한 색상 체계
+    - emoji: 📚
+      title: 활발한 커뮤니티
+      description: 지속적인 업데이트와 풍부한 문서
+  goal: 🏛️ Seaborn의 탄생에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+- id: why_seaborn
+  blocks:
+  - type: sectionHeader
+    title: 🤔 왜 Seaborn인가?
+    subtitle: Matplotlib과의 차이점
+  - type: text
+    content: |-
+      Matplotlib은 모든 것을 할 수 있지만, 그만큼 코드가 길어집니다. Seaborn은 자주 사용하는 통계 시각화 패턴을 함수로 제공하여 코드를 획기적으로 줄여줍니다.
+
+      예를 들어 그룹별 박스플롯을 그리려면 Matplotlib에서는 데이터를 수동으로 분리하고 반복문을 돌려야 하지만, Seaborn에서는 hue 파라미터 하나로 해결됩니다.
+  - type: compare
+    left:
+      title: Matplotlib
+      subtitle: 저수준 제어
+      icon: 🔧
+      color: blue
+      items:
+      - 모든 요소 직접 제어
+      - 코드가 길어질 수 있음
+      - 데이터 전처리 필요
+      - 범례 수동 설정
+      - 색상 직접 지정
+      infoBox: 세밀한 커스터마이징에 적합
+    right:
+      title: Seaborn
+      subtitle: 고수준 인터페이스
+      icon: 🎨
+      color: green
+      items:
+      - 통계 시각화 한 줄 완성
+      - 아름다운 기본 스타일
+      - DataFrame 직접 사용
+      - 범례 자동 생성
+      - 팔레트 자동 적용
+      infoBox: 빠른 탐색적 분석에 적합
+  goal: 🤔 왜 Seaborn인가?에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+- id: semantic_mapping
+  blocks:
+  - type: sectionHeader
+    title: 🎯 시맨틱 매핑
+    subtitle: Seaborn의 핵심 철학
+  - type: text
+    content: |-
+      Seaborn의 가장 강력한 기능은 시맨틱 매핑(Semantic Mapping)입니다. 데이터의 변수를 시각적 속성에 자동으로 연결해줍니다.
+
+      hue는 색상, style은 선/마커 스타일, size는 크기, col과 row는 패널 분할을 담당합니다. 이 파라미터들을 조합하면 한 차트에서 5개 이상의 변수를 동시에 표현할 수 있습니다.
+  - type: featureCards
+    cards:
+    - emoji: 🎨
+      title: hue (색상)
+      description: 범주형 변수를 색상으로 구분. 가장 많이 사용되는 파라미터
+    - emoji: ✏️
+      title: style (스타일)
+      description: 선 스타일이나 마커 모양으로 추가 변수 표현
+    - emoji: 📏
+      title: size (크기)
+      description: 점이나 선의 크기로 연속형 변수 표현
+    - emoji: 📊
+      title: col, row (패널)
+      description: 데이터를 분할하여 여러 패널로 비교
+  - type: note
+    style: tip
+    title: 다차원 데이터 시각화
+    content: x, y, hue, style, size, col, row를 조합하면 최대 7개 변수를 하나의 그림에 표현할 수 있습니다. Matplotlib으로 같은 결과를
+      얻으려면 수십 줄의 코드가 필요합니다.
+  goal: 🎯 시맨틱 매핑에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+- id: chart_categories
+  blocks:
+  - type: sectionHeader
+    title: 📊 차트 유형별 분류
+    subtitle: 목적에 맞는 함수 선택
+  - type: text
+    content: |-
+      Seaborn은 차트를 목적에 따라 5가지 범주로 분류합니다. 각 범주에는 Figure-level 함수(다중 패널 지원)와 Axes-level 함수(단일 차트)가 있습니다.
+
+      Figure-level 함수는 relplot, displot, catplot처럼 plot으로 끝나고, 자체 Figure를 생성합니다. Axes-level 함수는 기존 Matplotlib Axes에 그릴 수 있어 더 유연합니다.
+  - type: table
+    headers:
+    - 범주
+    - Figure-level
+    - Axes-level 함수들
+    rows:
+    - - 관계형
+      - relplot()
+      - scatterplot(), lineplot()
+    - - 분포형
+      - displot()
+      - histplot(), kdeplot(), rugplot()
+    - - 범주형
+      - catplot()
+      - stripplot(), swarmplot(), boxplot(), violinplot(), barplot(), countplot(), pointplot()
+    - - 회귀형
+      - lmplot()
+      - regplot(), residplot()
+    - - 행렬형
+      - '-'
+      - heatmap(), clustermap()
+  - type: note
+    style: info
+    title: Figure-level vs Axes-level
+    content: Figure-level 함수는 col, row 파라미터로 다중 패널을 쉽게 만들 수 있습니다. Axes-level 함수는 ax 파라미터로 기존 서브플롯에 그릴
+      수 있어 Matplotlib과 조합하기 좋습니다.
+  goal: 📊 차트 유형별 분류에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+- id: relational
+  blocks:
+  - type: sectionHeader
+    title: 🔗 관계형 차트
+    subtitle: 두 연속 변수의 관계
+  - type: text
+    content: |-
+      관계형 차트는 두 연속 변수 사이의 관계를 보여줍니다. scatterplot은 산점도로 개별 데이터 포인트를 표시하고, lineplot은 선 그래프로 추세를 보여줍니다.
+
+      relplot은 Figure-level 함수로, kind 파라미터로 scatter와 line 중 선택할 수 있고, col과 row로 다중 패널을 만들 수 있습니다.
+  - type: featureCards
+    cards:
+    - emoji: ⚫
+      title: scatterplot()
+      description: 산점도. 두 연속 변수의 관계를 점으로 표시
+    - emoji: 📈
+      title: lineplot()
+      description: 선 그래프. 시계열이나 연속적 관계 표현
+    - emoji: 🔲
+      title: relplot()
+      description: Figure-level. col/row로 다중 패널 지원
+  goal: 🔗 관계형 차트에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+- id: distribution
+  blocks:
+  - type: sectionHeader
+    title: 📊 분포형 차트
+    subtitle: 데이터 분포 탐색
+  - type: text
+    content: |-
+      분포형 차트는 단일 변수 또는 두 변수의 분포를 보여줍니다. histplot은 히스토그램, kdeplot은 커널 밀도 추정으로 부드러운 분포 곡선을 그립니다.
+
+      displot은 Figure-level 함수로, kind 파라미터로 hist, kde, ecdf 중 선택할 수 있습니다. multiple 파라미터로 여러 그룹의 분포를 겹쳐서(layer), 쌓아서(stack), 채워서(fill) 표현할 수 있습니다.
+  - type: featureCards
+    cards:
+    - emoji: 📊
+      title: histplot()
+      description: 히스토그램. 구간별 빈도를 막대로 표시
+    - emoji: 〰️
+      title: kdeplot()
+      description: 커널 밀도. 부드러운 분포 곡선
+    - emoji: 📈
+      title: displot()
+      description: Figure-level. 다중 패널 분포 비교
+  goal: 📊 분포형 차트에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+- id: categorical
+  blocks:
+  - type: sectionHeader
+    title: 📋 범주형 차트
+    subtitle: 그룹별 비교 분석
+  - type: text
+    content: |-
+      범주형 차트는 카테고리별로 데이터를 비교합니다. stripplot과 swarmplot은 개별 데이터 포인트를 보여주고, boxplot과 violinplot은 분포를 요약합니다. barplot은 평균값과 신뢰구간을, countplot은 빈도를 표시합니다.
+
+      catplot은 Figure-level 함수로, kind 파라미터로 모든 범주형 차트를 선택할 수 있습니다.
+  - type: table
+    headers:
+    - 함수
+    - 용도
+    - 특징
+    rows:
+    - - stripplot()
+      - 개별 점 표시
+      - 점이 겹칠 수 있음
+    - - swarmplot()
+      - 개별 점 표시
+      - 점이 겹치지 않게 배치
+    - - boxplot()
+      - 분포 요약
+      - 중앙값, 사분위수, 이상치
+    - - violinplot()
+      - 분포 모양
+      - KDE + 박스플롯 결합
+    - - barplot()
+      - 평균값 비교
+      - 신뢰구간 자동 표시
+    - - countplot()
+      - 빈도 비교
+      - 카테고리별 개수
+    - - pointplot()
+      - 평균 추세
+      - 점과 선으로 연결
+  goal: 📋 범주형 차트에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+- id: regression
+  blocks:
+  - type: sectionHeader
+    title: 📐 회귀형 차트
+    subtitle: 관계의 추세선
+  - type: text
+    content: |-
+      회귀형 차트는 두 변수 사이의 선형 관계를 시각화합니다. regplot은 산점도와 회귀선을 함께 그리고, 신뢰구간도 표시합니다.
+
+      lmplot은 Figure-level 함수로, hue와 col로 그룹별 회귀선을 비교할 수 있습니다. order 파라미터로 다항 회귀도 가능합니다.
+  - type: featureCards
+    cards:
+    - emoji: 📈
+      title: regplot()
+      description: 산점도 + 회귀선. 신뢰구간 자동 표시
+    - emoji: 🔲
+      title: lmplot()
+      description: Figure-level. 그룹별 회귀선 비교
+    - emoji: 📊
+      title: residplot()
+      description: 잔차 플롯. 회귀 모델 진단
+  goal: 📐 회귀형 차트에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+- id: matrix
+  blocks:
+  - type: sectionHeader
+    title: 🔥 행렬형 차트
+    subtitle: 2D 데이터의 시각화
+  - type: text
+    content: |-
+      행렬형 차트는 2차원 배열 데이터를 색상으로 표현합니다. heatmap은 상관관계 행렬이나 피벗 테이블을 시각화하는 데 자주 사용됩니다.
+
+      annot 파라미터로 각 셀에 값을 표시하고, cmap으로 색상 체계를 변경할 수 있습니다. clustermap은 계층적 군집화를 적용한 히트맵입니다.
+  - type: featureCards
+    cards:
+    - emoji: 🔥
+      title: heatmap()
+      description: 색상으로 값의 크기 표현. 상관관계 분석에 필수
+    - emoji: 🌳
+      title: clustermap()
+      description: 계층적 군집화 + 히트맵. 패턴 발견에 유용
+  goal: 🔥 행렬형 차트에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+- id: multiplot
+  blocks:
+  - type: sectionHeader
+    title: 🔲 다변량 차트
+    subtitle: 여러 변수를 한눈에
+  - type: text
+    content: |-
+      다변량 차트는 여러 변수의 관계를 한 그림에 표현합니다. pairplot은 모든 변수 쌍의 산점도를 격자로 보여주고, jointplot은 두 변수의 결합 분포와 주변 분포를 함께 표시합니다.
+
+      FacetGrid는 조건부로 데이터를 분할하여 여러 패널에 같은 유형의 차트를 그립니다. 직접 map 메서드를 사용하여 커스텀 시각화를 만들 수 있습니다.
+  - type: featureCards
+    cards:
+    - emoji: 🔲
+      title: pairplot()
+      description: 모든 변수 쌍 비교. EDA 시작점으로 최적
+    - emoji: 🎯
+      title: jointplot()
+      description: 두 변수의 결합 분포 + 주변 분포
+    - emoji: 📊
+      title: FacetGrid
+      description: 조건부 다중 패널. 커스텀 시각화 구성
+  goal: 🔲 다변량 차트에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+- id: styling
+  blocks:
+  - type: sectionHeader
+    title: 🎨 스타일링 시스템
+    subtitle: 아름다운 차트 만들기
+  - type: text
+    content: |-
+      Seaborn은 강력한 스타일링 시스템을 제공합니다. set_theme()으로 전체 테마를, set_style()로 배경 스타일을, set_palette()로 색상 팔레트를 설정합니다.
+
+      context 파라미터는 출력 목적에 따라 폰트와 선 크기를 조절합니다. paper, notebook, talk, poster 순으로 크기가 커집니다.
+  - type: table
+    headers:
+    - 함수
+    - 설정 대상
+    - 옵션 예시
+    rows:
+    - - set_theme()
+      - 전체 테마
+      - style, palette, context 한번에
+    - - set_style()
+      - 배경 스타일
+      - white, dark, whitegrid, darkgrid, ticks
+    - - set_palette()
+      - 색상 팔레트
+      - deep, muted, bright, pastel, dark, colorblind
+    - - set_context()
+      - 출력 크기
+      - paper, notebook, talk, poster
+  - type: note
+    style: tip
+    title: 색맹 친화적 팔레트
+    content: colorblind 팔레트는 색각 이상이 있는 사람도 구분할 수 있는 색상으로 구성되어 있습니다. 발표나 출판물에서는 이 팔레트를 권장합니다.
+  goal: 🎨 스타일링 시스템에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+- id: projects_preview
+  blocks:
+  - type: sectionHeader
+    title: 🗺️ 10개 프로젝트 미리보기
+    subtitle: 이 순서대로 배웁니다
+  - type: table
+    headers:
+    - 단계
+    - 프로젝트
+    - 배울 내용
+    rows:
+    - - 입문
+      - 01 붓꽃품종산점도
+      - scatterplot, hue, palette
+    - - 입문
+      - 02 팁데이터분포탐색
+      - histplot, stripplot, multiple
+    - - 기초
+      - 03 펭귄체중분포비교
+      - boxplot, violinplot, hue
+    - - 기초
+      - 04 광고비판매액회귀
+      - regplot, ci, scatter
+    - - 기초
+      - 05 타이타닉생존분석
+      - barplot, countplot, catplot, col
+    - - 중급
+      - 06 항공편승객시계열
+      - heatmap, lineplot, annot
+    - - 중급
+      - 07 세계기대수명분석
+      - relplot, size, col
+    - - 중급
+      - 08 다이아몬드가격분석
+      - displot, kdeplot, multiple
+    - - 심화
+      - 09 자동차연비종합분석
+      - pairplot, jointplot, lmplot
+    - - 심화
+      - 10 종합EDA리포트
+      - 모든 개념 종합, FacetGrid, set_theme
+  - type: note
+    style: info
+    title: 프로젝트 기반 학습
+    content: 각 프로젝트는 완성된 분석 결과물을 만듭니다. 개념을 배우면서 실제 데이터로 EDA를 수행합니다.
+  goal: 🗺️ 10개 프로젝트 미리보기에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+- id: datasets
+  blocks:
+  - type: sectionHeader
+    title: 📦 내장 데이터셋
+    subtitle: 학습에 최적화된 데이터
+  - type: text
+    content: |-
+      Codaro는 학습과 예제를 위한 로컬 데이터셋을 제공합니다. loadLocalDataset() 함수로 간편하게 불러오며, 인터넷 연결 없이 같은 예제를 재현할 수 있습니다.
+
+      이 과정에서는 iris(붓꽃), tips(팁), penguins(펭귄), titanic(타이타닉), flights(항공편), diamonds(다이아몬드), mpg(자동차 연비) 데이터를 사용합니다.
+  - type: table
+    headers:
+    - 데이터셋
+    - 행 수
+    - 주요 변수
+    - 분석 주제
+    rows:
+    - - iris
+      - '150'
+      - 꽃잎/꽃받침 길이, 품종
+      - 분류, 산점도
+    - - tips
+      - '120'
+      - 결제금액, 팁, 요일, 시간
+      - 회귀, 범주 비교
+    - - penguins
+      - '120'
+      - 종, 섬, 부리, 체중
+      - 분포 비교, 다변량
+    - - titanic
+      - '180'
+      - 생존, 클래스, 성별, 나이
+      - 생존 분석, 범주
+    - - flights
+      - '144'
+      - 연도, 월, 승객 수
+      - 시계열, 히트맵
+    - - diamonds
+      - '5400'
+      - 캐럿, 컷, 색상, 가격
+      - 대용량, 분포
+    - - mpg
+      - '144'
+      - 연비, 실린더, 마력, 원산지
+      - 회귀, 다변량
+  goal: 📦 내장 데이터셋에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+- id: when_to_use
+  blocks:
+  - type: sectionHeader
+    title: ⚖️ 언제 Seaborn을 선택할까?
+    subtitle: 상황별 가이드
+  - type: table
+    headers:
+    - 상황
+    - 적합도
+    - 이유
+    rows:
+    - - 탐색적 데이터 분석(EDA)
+      - O
+      - 빠른 시각화, 자동 통계
+    - - 그룹별 분포 비교
+      - O
+      - hue 파라미터로 한 줄 해결
+    - - 상관관계 분석
+      - O
+      - heatmap, pairplot
+    - - 회귀 분석 시각화
+      - O
+      - regplot, lmplot
+    - - 세밀한 커스터마이징
+      - △
+      - Matplotlib 결합 필요
+    - - 비표준 차트
+      - X
+      - Matplotlib 직접 사용
+    - - 인터랙티브 차트
+      - X
+      - Plotly 등 사용
+  - type: note
+    style: tip
+    title: Matplotlib과 함께 사용하기
+    content: Seaborn으로 빠르게 기본 차트를 만들고, Matplotlib으로 세부 조정하는 워크플로우가 효과적입니다. ax 파라미터로 기존 Axes에 Seaborn 차트를
+      추가할 수 있습니다.
+  goal: ⚖️ 언제 Seaborn을 선택할까?에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+- id: resources
+  blocks:
+  - type: sectionHeader
+    title: 📚 참고 자료
+    subtitle: 더 깊이 공부하고 싶다면
+  - type: links
+    items:
+    - text: Seaborn 공식 문서
+      url: https://seaborn.pydata.org/
+      icon: 🔗
+    - text: Seaborn 갤러리
+      url: https://seaborn.pydata.org/examples/index.html
+      icon: 🔗
+    - text: Seaborn 튜토리얼
+      url: https://seaborn.pydata.org/tutorial.html
+      icon: 🔗
+    - text: Seaborn GitHub
+      url: https://github.com/mwaskom/seaborn
+      icon: 🔗
+  goal: 📚 참고 자료에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+- id: next
+  blocks:
+  - type: hero
+    emoji: 👉
+    title: '다음: 붓꽃 품종 산점도'
+    subtitle: scatterplot으로 품종별 꽃잎 특성을 시각화합니다
+  goal: '다음: 붓꽃 품종 산점도에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.'
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+- id: workflow_validation
+  title: 17단계. Seaborn 학습 흐름 검증
+  structuredPrimary: true
+  subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
+  goal: 17단계. Seaborn 학습 흐름 검증에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    Seaborn 입문은 함수 이름을 외우는 과정이 아닙니다. 어떤 질문에 어떤 차트를 고르고, 데이터 구조가 그 차트에 맞는지 확인한 뒤, 완성된 Axes가 보고서에 들어갈 수준인지 점검해야 합니다.
+
+    입문 레슨도 로컬 데이터, 예측, 검증, 변주를 한 번 통과해야 뒤 레슨의 차트 선택 기준이 생깁니다.
+  snippet: |-
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+
+    seabornTips = loadLocalDataset("tips")
+    requiredColumns = {"total_bill", "tip", "sex", "smoker", "day", "time", "size"}
+    missingColumns = requiredColumns - set(seabornTips.columns)
+
+    assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+    assert len(seabornTips) >= 100
+    assert seabornTips["total_bill"].gt(seabornTips["tip"]).all()
+
+    prediction = "계산 금액이 클수록 팁도 대체로 커질 것이다"
+    correlation = seabornTips[["total_bill", "tip"]].corr().loc["total_bill", "tip"]
+    assert correlation > 0.6
+
+    print(prediction, round(correlation, 3))
+  exercise:
+    prompt: 17단계. Seaborn 학습 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+
+      seabornTips = loadLocalDataset("tips")
+      requiredColumns = {"total_bill", "tip", "sex", "smoker", "day", "time", "size"}
+      missingColumns = requiredColumns - set(seabornTips.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert len(seabornTips) >= 100
+      assert seabornTips["total_bill"].gt(seabornTips["tip"]).all()
+
+      prediction = "계산 금액이 클수록 팁도 대체로 커질 것이다"
+      correlation = seabornTips[["total_bill", "tip"]].corr().loc["total_bill", "tip"]
+      assert correlation > 0.6
+
+      print(prediction, round(correlation, 3))
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 17단계. Seaborn 학습 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 17단계. Seaborn 학습 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: seaborn_00-seaborn-semantic-contract-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - workflow_validation
+    title: Seaborn 통계 시각화 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 통계 집계와 semantic mapping이 질문에 맞는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_seaborn_semantic_contract(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_seaborn_semantic_contract(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_seaborn_semantic_contract(rows):
+            required = ['x', 'y', 'hue']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'hue'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['x'] for row in usable]
+            y_values = [row['y'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.seaborn.seaborn_00.seaborn-semantic-contract-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.seaborn.seaborn_00.seaborn-semantic-contract-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_seaborn_semantic_contract
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - x: 1
+              y: 4
+              hue: A
+            - x: 2
+              y: 6
+              hue: A
+            - x: 1
+              y: 3
+              hue: B
+          expectedReturn:
+            usableCount: 3
+            excludedCount: 0
+            groupCounts:
+              A: 2
+              B: 1
+            xExtent:
+            - 1
+            - 2
+            yExtent:
+            - 3
+            - 6
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: seaborn_00-seaborn-semantic-contract-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - seaborn_00-seaborn-semantic-contract-data-evidence-mastery
+    title: Seaborn 통계 시각화 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 실험 조건별 두 수치 변수 관계를 hue와 marker로 비교한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_seaborn_semantic_contract(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_seaborn_semantic_contract(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_seaborn_semantic_contract(candidate):
+            expected = {'mark': 'relational', 'x': 'x', 'y': 'y', 'group': 'hue', 'transforms': ['semantic-map'], 'interaction': 'none'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.seaborn.seaborn_00.seaborn-semantic-contract-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.seaborn.seaborn_00.seaborn-semantic-contract-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_seaborn_semantic_contract
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: relational
+              x: x
+              y: y
+              group: hue
+              transforms:
+              - semantic-map
+              interaction: none
+              description: 실험 조건별 두 수치 변수 관계를 hue와 marker로 비교한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: relational
+              x: x
+              y: y
+              group: hue
+              transforms:
+              - semantic-map
+              interaction: none
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: y
+              y: x
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - description
+            encoding:
+              mark: relational
+              x: x
+              y: y
+              group: hue
+              transforms:
+              - semantic-map
+              interaction: none
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: seaborn_00-seaborn-semantic-contract-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - seaborn_00-seaborn-semantic-contract-encoding-transfer-transfer
+    title: Seaborn 통계 시각화 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 통계 집계와 semantic mapping이 질문에 맞는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_seaborn_semantic_contract(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_seaborn_semantic_contract(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_seaborn_semantic_contract(situation):
+            table = {'raw-observations': {'encoding': 'scatter', 'evidence': 'point count', 'risk': 'overplotting'}, 'estimated-mean': {'encoding': 'point plus interval', 'evidence': 'estimator and uncertainty', 'risk': 'default estimator'}, 'category-semantic': {'encoding': 'hue plus style', 'evidence': 'group counts', 'risk': 'color-only distinction'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.seaborn.seaborn_00.seaborn-semantic-contract-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.seaborn.seaborn_00.seaborn-semantic-contract-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_seaborn_semantic_contract
+        cases:
+        - id: recalls-raw-observations
+          arguments:
+          - value: raw-observations
+          expectedReturn:
+            encoding: scatter
+            evidence: point count
+            risk: overplotting
+        - id: recalls-estimated-mean
+          arguments:
+          - value: estimated-mean
+          expectedReturn:
+            encoding: point plus interval
+            evidence: estimator and uncertainty
+            risk: default estimator
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

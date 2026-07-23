@@ -30,6 +30,10 @@ def require(condition: bool, message: str, failures: list[str]) -> None:
         failures.append(message)
 
 
+def sourceHasAssetId(source: str, assetId: str) -> bool:
+    return f'assetId="{assetId}"' in source or f'assetId: "{assetId}"' in source
+
+
 def packageVersion(package: dict[str, object], name: str) -> str | None:
     for section in ("dependencies", "devDependencies"):
         values = package.get(section)
@@ -84,6 +88,31 @@ def verifyGeneratedArtifacts(tokens: dict[str, object], fontManifest: dict[str, 
                 require(sha256(target.read_bytes()) == font["sha256"], f"{app} font hash drift: {font['file']}", failures)
 
 
+def verifySemanticCssReferences(tokens: dict[str, object], failures: list[str]) -> None:
+    definitions: set[str] = set()
+    references: set[str] = set()
+    for app in APPS:
+        for path in (ROOT / app / "src").rglob("*.css"):
+            source = path.read_text(encoding="utf-8")
+            definitions.update(re.findall(r"(?m)(--[a-z0-9-]+)\s*:", source))
+            references.update(re.findall(r"var\((--[a-z0-9-]+)", source))
+    undefinedColors = sorted(
+        token for token in references - definitions if token.startswith("--color-")
+    )
+    require(
+        not undefinedColors,
+        f"undefined semantic color tokens: {', '.join(undefinedColors)}",
+        failures,
+    )
+    semanticValues = set(tokens["semanticRoles"].values())
+    tokenNames = set(tokens["astryxTokens"])
+    require(
+        semanticValues <= tokenNames,
+        "semantic roles must all resolve to source tokens",
+        failures,
+    )
+
+
 def verifyEntryPoints(failures: list[str]) -> None:
     for app, entryName in (("landing", "src/main.jsx"), ("editor", "src/main.tsx")):
         layerText = (ROOT / app / "src" / "styles" / "layers.css").read_text(encoding="utf-8").strip()
@@ -116,6 +145,31 @@ def verifyEntryPoints(failures: list[str]) -> None:
                 "editor must not load unused Astryx component CSS",
                 failures,
             )
+        html = (ROOT / app / "index.html").read_text(encoding="utf-8")
+        for fragment in (
+            'name="theme-color" content="#f5f6f8"',
+            'window.localStorage.getItem("codaro-theme")',
+            'root.dataset.theme = resolved',
+            'root.dataset.resolvedTheme = resolved',
+            'root.style.colorScheme = resolved',
+            'root.style.backgroundColor = canvas',
+            'resolved === "dark" ? "#151619" : "#f5f6f8"',
+        ):
+            require(fragment in html, f"{app} first-paint theme bootstrap missing {fragment}", failures)
+        for legacyColor in ("#fbf8f4", "#17121b", "#0a0a0a"):
+            require(legacyColor not in html.lower(), f"{app} first paint retains legacy color {legacyColor}", failures)
+        manifestPath = (
+            ROOT / "landing/static/manifest.webmanifest"
+            if app == "landing"
+            else ROOT / "editor/public/manifest.json"
+        )
+        manifest = json.loads(manifestPath.read_text(encoding="utf-8"))
+        require(
+            manifest.get("background_color") == "#f5f6f8"
+            and manifest.get("theme_color") == "#f5f6f8",
+            f"{app} install surface must start on the shared light canvas",
+            failures,
+        )
 
 
 def verifyRepresentativeSurfaces(failures: list[str]) -> None:
@@ -124,7 +178,45 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
     for label, source in (("landing", landingProvider), ("editor", editorProvider)):
         require('const themeStorageKey = "codaro-theme"' in source, f"{label} theme storage key is not shared", failures)
         require("prefers-reduced-motion: reduce" in source, f"{label} provider misses reduced motion", failures)
-        require('data-astryx-theme="codaro"' in source, f"{label} provider misses the Astryx scope boundary", failures)
+        require(
+            "<Theme" in source and "theme={codaroTheme}" in source,
+            f"{label} provider misses the Astryx scope boundary",
+            failures,
+        )
+        require(
+            'data-astryx-theme="codaro"' not in source,
+            f"{label} provider must not nest a second Astryx scope boundary",
+            failures,
+        )
+        require("themeCanvasColors" in source, f"{label} provider must use generated canvas colors", failures)
+        require("root.dataset.theme = resolvedTheme" in source, f"{label} provider misses resolved data-theme", failures)
+        require('meta[name="theme-color"]' in source, f"{label} provider must update browser chrome color", failures)
+        require("useLayoutEffect" in source, f"{label} provider must settle theme before browser paint", failures)
+
+    require(
+        "useState(readStoredTheme)" in landingProvider,
+        "landing must initialize from stored theme before the first React paint",
+        failures,
+    )
+
+    authoredCss = "\n".join(
+        path.read_text(encoding="utf-8")
+        for app in APPS
+        for path in (ROOT / app / "src").rglob("*.css")
+        if "generated" not in path.parts
+    )
+    unsupportedWeights = sorted(
+        {
+            int(value)
+            for value in re.findall(r"font-weight:\s*([0-9]+)", authoredCss)
+            if int(value) not in {400, 600, 700}
+        }
+    )
+    require(
+        not unsupportedWeights,
+        f"authored CSS requests unavailable font weights: {unsupportedWeights}",
+        failures,
+    )
 
     home = (ROOT / "landing/src/pages/home.jsx").read_text(encoding="utf-8")
     learn = (ROOT / "landing/src/pages/learn.jsx").read_text(encoding="utf-8")
@@ -141,11 +233,16 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
     topBar = (ROOT / "editor/src/components/app/topBar.tsx").read_text(encoding="utf-8")
     editorCss = (ROOT / "editor/src/index.css").read_text(encoding="utf-8")
     require(
-        'assetId="webRunDesktop"' in home
-        and 'assetId="runLearningDetail"' in home
-        and 'assetId="runLearningMobile"' in home
-        and 'assetId="localNotebookDesktop"' in home
-        and 'assetId="localAutomationDesktop"' in home,
+        all(
+            sourceHasAssetId(home, assetId)
+            for assetId in (
+                "webRunDesktop",
+                "runLearningDetail",
+                "runLearningMobile",
+                "localNotebookDesktop",
+                "localAutomationDesktop",
+            )
+        ),
         "home must show manifest-backed Web, learning, and Local product captures",
         failures,
     )
@@ -239,6 +336,7 @@ def main() -> int:
     for app in APPS:
         verifyPackagePins(app, compatibility, failures)
     verifyGeneratedArtifacts(tokens, fontManifest, failures)
+    verifySemanticCssReferences(tokens, failures)
     verifyEntryPoints(failures)
     verifyRepresentativeSurfaces(failures)
 

@@ -1,0 +1,701 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - numpy
+  - pandas
+  - scipy
+  id: scipy_03
+  title: 데이터보간기
+  order: 3
+  category: scipy
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - scipy.interpolate
+  - 보간법
+  - interp1d
+  - 스플라인
+  - 결측값
+  seo:
+    title: scipy.interpolate 보간법 - 데이터 사이 값 추정하기
+    description: scipy.interpolate로 데이터 사이 값을 추정합니다. 선형보간, 스플라인, 다차원 보간을 배웁니다.
+    keywords:
+    - scipy
+    - interpolate
+    - 보간
+    - 스플라인
+    - interp1d
+intro:
+  emoji: 📈
+  goal: 센서 데이터의 결측값을 보간하고 해상도를 높여 부드러운 온도 변화 곡선을 만듭니다.
+  description: IoT 온도 센서가 2시간마다 데이터를 수집합니다. 하지만 1시간 간격으로 더 세밀한 온도 변화를 알고 싶습니다. 또한 센서 오류로 일부 데이터가 누락되었습니다.
+    scipy.interpolate의 보간 기법으로 측정되지 않은 시점의 값을 추정합니다. 선형보간, 3차 스플라인, PCHIP 등 다양한 방법을 비교하고, 각 상황에 맞는 최적의
+    방법을 선택합니다.
+  direction: 데이터보간기에서 수치 데이터를 모델에 넣고 계산 결과와 오차를 검증합니다.
+  benefits:
+  - 수치 입력 확인 후 최적화/적분/신호 처리에 맞는 코드 입력을 고릅니다.
+  - 데이터보간기 결과를 오차와 결과 범위 기준으로 즉시 점검합니다.
+  - 완료한 코드를 과학 계산 루틴에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 라이브러리 및 데이터 로드 입력 확인
+      detail: 입력 기준(수치 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 데이터 탐색 처리 실행
+      detail: 최적화/적분/신호 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 선형 보간 결과 검증
+      detail: 오차와 결과 범위 기준으로 실행 결과를 비교합니다.
+    - label: 데이터보간기 재사용
+      detail: 완성 코드를 과학 계산 루틴에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 과학 계산 환경
+      detail: matplotlib, numpy, pandas, scipy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 데이터보간기 실행
+      detail: 셀을 실행해 오차와 결과 범위와 예외 상태를 확인합니다.
+    - label: 데이터보간기 완료
+      detail: 검증된 코드를 과학 계산 루틴로 남깁니다.
+sections:
+- id: load
+  title: 라이브러리 및 데이터 로드
+  structuredPrimary: true
+  subtitle: scipy.interpolate
+  goal: 라이브러리 및 데이터 로드에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    보간(Interpolation)은 알려진 데이터 점들 사이의 값을 추정하는 기법입니다. 센서 데이터 결측 처리, 해상도 증가, 부드러운 곡선 생성에 광범위하게 활용됩니다. scipy.interpolate 모듈은 1차원부터 다차원까지 다양한 보간 함수를 제공합니다. 이 프로젝트에서는 하루 동안 2시간 간격으로 측정된 온도 데이터를 사용합니다.
+
+    이 데이터는 전형적인 일일 온도 패턴입니다. 새벽에 가장 낮고, 오후 2시경에 가장 높습니다. 13개 측정점을 25개 이상으로 늘려 더 부드러운 곡선을 만들겠습니다.
+  snippet: |-
+    import scipy
+
+    import numpy as np
+    from scipy import interpolate
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    hours = np.array([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24])
+    temps = np.array([15, 14, 13, 14, 17, 21, 24, 26, 25, 22, 19, 17, 15])
+  exercise:
+    prompt: 라이브러리 및 데이터 로드 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import scipy
+
+      import numpy as np
+      from scipy import interpolate
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      hours = np.array([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24])
+      temps = np.array([15, 14, 13, 14, 17, 21, 24, 26, 25, 22, 19, 17, 15])
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 라이브러리 및 데이터 로드에서 \`hours\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 라이브러리 및 데이터 로드 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: explore
+  title: 데이터 탐색
+  structuredPrimary: true
+  subtitle: 측정 지점 시각화
+  goal: 데이터 탐색에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 보간 전에 원본 데이터를 시각화합니다. 측정 지점을 점으로, 연결선을 점선으로 표시하면 현재 데이터의 해상도를 직관적으로 파악할 수 있습니다. 2시간 간격의
+    직선 연결은 실제 온도 변화의 부드러운 곡선을 제대로 표현하지 못합니다. 보간을 통해 이 문제를 해결합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figOrig, axOrig = plt.subplots(figsize=(12, 6))
+    axOrig.scatter(hours, temps, s=100, c='red', zorder=5, label='Measured Points')
+    axOrig.plot(hours, temps, 'r--', alpha=0.5, label='Linear Connection')
+    axOrig.set_xlabel('Hour')
+    axOrig.set_ylabel('Temperature (°C)')
+    axOrig.set_title('Original Temperature Measurements (2-hour intervals)')
+    axOrig.set_xticks(range(0, 25, 2))
+    axOrig.legend()
+    axOrig.grid(True, alpha=0.3)
+    figOrig
+  exercise:
+    prompt: 데이터 탐색 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figOrig, axOrig = plt.subplots(figsize=(12, 6))
+      axOrig.scatter(hours, temps, s=100, c='red', zorder=5, label='Measured Points')
+      axOrig.plot(hours, temps, 'r--', alpha=0.5, label='Linear Connection')
+      axOrig.set_xlabel('Hour')
+      axOrig.set_ylabel('Temperature (°C)')
+      axOrig.set_title('Original Temperature Measurements (2-hour intervals)')
+      axOrig.set_xticks(range(0, 25, 2))
+      axOrig.legend()
+      axOrig.grid(True, alpha=0.3)
+      figOrig
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 데이터 탐색의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 데이터 탐색 실행 결과가 오차와 결과 범위 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: linear
+  title: 선형 보간
+  structuredPrimary: true
+  subtitle: interp1d(kind='linear')
+  goal: 선형 보간에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    선형 보간은 두 측정점을 직선으로 연결하여 중간값을 추정합니다. 가장 단순하고 계산이 빠르지만, 꺾이는 점에서 부자연스러운 각이 생깁니다. interp1d 함수는 보간 함수 객체를 반환하며, 이 함수에 새로운 x값을 입력하면 보간된 y값을 얻습니다. kind 파라미터로 보간 방식을 지정합니다.
+
+    interp1d는 함수를 반환합니다. linearFunc(5)처럼 호출하면 5시의 보간된 온도를 얻습니다. 배열을 입력하면 여러 값을 한 번에 계산합니다.
+  snippet: |-
+    linearFunc = interpolate.interp1d(hours, temps, kind='linear')
+
+    hoursNew = np.arange(0, 24.1, 1)
+    tempsLinear = linearFunc(hoursNew)
+    tempsLinear
+  exercise:
+    prompt: 선형 보간 예제에서 \`linearFunc\`, \`hoursNew\`, \`tempsLinear\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      linearFunc = interpolate.interp1d(hours, temps, kind='linear')
+
+      hoursNew = np.arange(0, 24.1, 1)
+      tempsLinear = linearFunc(hoursNew)
+      tempsLinear
+    hints:
+    - 바꿀 지점은 \`linearFunc = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`linearFunc\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 선형 보간에서 \`linearFunc\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 선형 보간 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: cubic
+  title: 3차 스플라인 보간
+  structuredPrimary: true
+  subtitle: kind='cubic'
+  goal: 3차 스플라인 보간에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    3차 스플라인(cubic spline)은 각 구간을 3차 다항식으로 맞추고, 연결점에서 1차 및 2차 도함수가 연속이 되도록 합니다. 결과적으로 매우 부드러운 곡선이 생성됩니다. 자연 현상의 연속적인 변화를 표현할 때 선호되는 방법입니다. 단점은 극값 근처에서 약간의 오버슈팅이 발생할 수 있습니다.
+
+    cubic 스플라인은 연속적인 자연 현상(온도, 고도, 속도 등)을 표현할 때 가장 많이 사용됩니다. 부드러운 곡선이 필요한 경우 기본 선택입니다.
+  snippet: |-
+    cubicFunc = interpolate.interp1d(hours, temps, kind='cubic')
+    tempsCubic = cubicFunc(hoursNew)
+
+    figCubic, axCubic = plt.subplots(figsize=(12, 6))
+    axCubic.scatter(hours, temps, s=100, c='red', zorder=5, label='Measured')
+    axCubic.plot(hoursNew, tempsCubic, 'g-', linewidth=2, label='Cubic Spline')
+    axCubic.set_xlabel('Hour')
+    axCubic.set_ylabel('Temperature (°C)')
+    axCubic.set_title('Cubic Spline Interpolation')
+    axCubic.set_xticks(range(0, 25, 2))
+    axCubic.legend()
+    axCubic.grid(True, alpha=0.3)
+    figCubic
+  exercise:
+    prompt: 3차 스플라인 보간 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      cubicFunc = interpolate.interp1d(hours, temps, kind='cubic')
+      tempsCubic = cubicFunc(hoursNew)
+
+      figCubic, axCubic = plt.subplots(figsize=(12, 6))
+      axCubic.scatter(hours, temps, s=100, c='red', zorder=5, label='Measured')
+      axCubic.plot(hoursNew, tempsCubic, 'g-', linewidth=2, label='Cubic Spline')
+      axCubic.set_xlabel('Hour')
+      axCubic.set_ylabel('Temperature (°C)')
+      axCubic.set_title('Cubic Spline Interpolation')
+      axCubic.set_xticks(range(0, 25, 2))
+      axCubic.legend()
+      axCubic.grid(True, alpha=0.3)
+      figCubic
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 3차 스플라인 보간의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 3차 스플라인 보간의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: compare
+  title: 보간 방법 비교
+  structuredPrimary: true
+  subtitle: linear vs cubic vs PCHIP
+  goal: 보간 방법 비교에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    다양한 보간 방법을 비교합니다. PCHIP(Piecewise Cubic Hermite Interpolating Polynomial)은 데이터의 단조성을 보존하여 오버슈팅 없이 안정적인 보간을 제공합니다. 각 방법의 특성을 이해하고 데이터에 맞는 방법을 선택하는 것이 중요합니다.
+
+    PCHIP은 오버슈팅이 없어 안전한 선택입니다. 최고/최저점이 측정값을 초과하지 않습니다. 금융 데이터나 단조 변화가 예상되는 경우에 적합합니다.
+  snippet: |-
+    pchipFunc = interpolate.PchipInterpolator(hours, temps)
+    tempsPchip = pchipFunc(hoursNew)
+    tempsPchip[:5]
+  exercise:
+    prompt: 보간 방법 비교 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      pchipFunc = interpolate.PchipInterpolator(hours, temps)
+      tempsPchip = pchipFunc(hoursNew)
+      tempsPchip[:5]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 보간 방법 비교에서 \`pchipFunc\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 보간 방법 비교 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: missing
+  title: 결측값 처리
+  structuredPrimary: true
+  subtitle: NaN 보간
+  goal: 결측값 처리에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 보간의 가장 실용적인 활용 중 하나는 결측값 처리입니다. 센서 오류, 통신 장애, 데이터 손실 등으로 일부 값이 누락된 경우 주변 데이터로부터 추정할 수 있습니다.
+    먼저 유효한 데이터만 추출하고, 이를 바탕으로 보간 함수를 만든 후 결측 위치의 값을 채웁니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    sensorData = np.array([20, 21, np.nan, 23, np.nan, np.nan, 26, 25, 24, np.nan, 22])
+    timePoints = np.arange(len(sensorData))
+
+    sensorDf = pd.DataFrame({'Time': timePoints, 'Value': sensorData})
+    sensorDf
+  exercise:
+    prompt: 결측값 처리 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      sensorData = np.array([20, 21, np.nan, 23, np.nan, np.nan, 26, 25, 24, np.nan, 22])
+      timePoints = np.arange(len(sensorData))
+
+      sensorDf = pd.DataFrame({'Time': timePoints, 'Value': sensorData})
+      sensorDf
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 결측값 처리의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 결측값 처리의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: result
+  title: 최종 온도 분석 보고서
+  structuredPrimary: true
+  subtitle: 고해상도 온도 곡선
+  goal: 최종 온도 분석 보고서에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 2시간 간격 데이터를 1시간 간격으로 보간하여 더 세밀한 온도 변화를 분석합니다. 최고/최저 온도 시간, 변화율이 가장 큰 시간대 등을 정밀하게 파악할 수
+    있습니다. 실무에서는 이런 고해상도 데이터가 에너지 관리, 농업, 기상 예보 등에 활용됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    hoursHigh = np.arange(0, 24.1, 0.5)
+    tempsHigh = pchipFunc(hoursHigh)
+
+    maxIdx = np.argmax(tempsHigh)
+    minIdx = np.argmin(tempsHigh)
+
+    analysisDf = pd.DataFrame({
+        'Metric': ['Max Temperature', 'Max Time', 'Min Temperature', 'Min Time', 'Daily Range'],
+        'Value': [f'{tempsHigh[maxIdx]:.1f}°C', f'{hoursHigh[maxIdx]:.1f}h', f'{tempsHigh[minIdx]:.1f}°C', f'{hoursHigh[minIdx]:.1f}h', f'{tempsHigh[maxIdx] - tempsHigh[minIdx]:.1f}°C']
+    })
+    analysisDf
+  exercise:
+    prompt: 최종 온도 분석 보고서 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      hoursHigh = np.arange(0, 24.1, 0.5)
+      tempsHigh = pchipFunc(hoursHigh)
+
+      maxIdx = np.argmax(tempsHigh)
+      minIdx = np.argmin(tempsHigh)
+
+      analysisDf = pd.DataFrame({
+          'Metric': ['Max Temperature', 'Max Time', 'Min Temperature', 'Min Time', 'Daily Range'],
+          'Value': [f'{tempsHigh[maxIdx]:.1f}°C', f'{hoursHigh[maxIdx]:.1f}h', f'{tempsHigh[minIdx]:.1f}°C', f'{hoursHigh[minIdx]:.1f}h', f'{tempsHigh[maxIdx] - tempsHigh[minIdx]:.1f}°C']
+      })
+      analysisDf
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 최종 온도 분석 보고서의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 최종 온도 분석 보고서의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 보간 활용 프로젝트
+  goal: 실습에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    지금까지 배운 선형보간, 스플라인, PCHIP, 결측값 처리를 활용하여 실제 데이터 문제를 해결합니다. 미션1은 주가 데이터의 결측값 처리입니다. 미션2는 저해상도 신호를 업샘플링하여 부드러운 곡선을 만듭니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import numpy as np
+    from scipy import interpolate
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    np.random.seed(123)
+    days = np.arange(1, 31)
+    basePrices = 100 + np.cumsum(np.random.randn(30) * 2)
+
+    missingIdx = [4, 5, 10, 15, 16, 17, 22]
+    pricesWithNan = basePrices.copy()
+    pricesWithNan[missingIdx] = np.nan
+  exercise:
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import numpy as np
+      from scipy import interpolate
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      np.random.seed(123)
+      days = np.arange(1, 31)
+      basePrices = 100 + np.cumsum(np.random.randn(30) * 2)
+
+      missingIdx = [4, 5, 10, 15, 16, 17, 22]
+      pricesWithNan = basePrices.copy()
+      pricesWithNan[missingIdx] = np.nan
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 실습에서 \`days\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: SLA 지연시간 통계 게이트
+  goal: 업무 흐름 검증에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한
+    신뢰구간과 개선 기준을 함께 제시해야 합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import numpy as np
+    from scipy import optimize, stats
+
+    latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+    def validateLatencySamples(samples):
+        values = np.asarray(samples, dtype=float)
+        if values.size < 5:
+            raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+        if not np.isfinite(values).all():
+            raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+        if (values <= 0).any():
+            raise ValueError("지연시간은 0보다 커야 합니다.")
+        return values
+
+    cleanLatency = validateLatencySamples(latencySamples)
+    cleanLatency.mean(), cleanLatency.std(ddof=1)
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 기대 문자열이나 실제 출력 문구를 바꾸고 assert 비교가 맞는지 확인하세요.
+    starterCode: |-
+      allowedMean = 264
+      capThreshold = optimize.brentq(
+          lambda threshold: np.clip(cleanLatency, None, threshold).mean() - allowedMean,
+          cleanLatency.min(),
+          cleanLatency.max(),
+      )
+      cappedMean = np.clip(cleanLatency, None, capThreshold).mean()
+
+      assert abs(cappedMean - allowedMean) < 1e-6
+      {
+          "allowedMean": allowedMean,
+          "capThreshold": round(float(capThreshold), 2),
+          "cappedMean": round(float(cappedMean), 2),
+      }
+    solution: |-
+      import numpy as np
+      from scipy import optimize, stats
+
+      latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+      def validateLatencySamples(samples):
+          values = np.asarray(samples, dtype=float)
+          if values.size < 5:
+              raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+          if not np.isfinite(values).all():
+              raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+          if (values <= 0).any():
+              raise ValueError("지연시간은 0보다 커야 합니다.")
+          return values
+
+      cleanLatency = validateLatencySamples(latencySamples)
+      cleanLatency.mean(), cleanLatency.std(ddof=1)
+    hints:
+    - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
+    - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증에서 \`allowedMean\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: scipy_03-linear-interpolation-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load
+    - workflow_validation
+    title: 정렬된 관측점 사이를 선형 보간하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 범위 밖 외삽을 거부하고 양쪽 anchor와 비율을 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 보간과 외삽을 구분해 범위 밖 값을 조용히 만들지 마세요.
+    - 사용한 양쪽 anchor를 결과에 남기세요.
+    exercise:
+      prompt: interpolate_linear(points, query)를 완성하세요.
+      starterCode: |-
+        def interpolate_linear(points, query):
+            raise NotImplementedError
+      solution: |
+        def interpolate_linear(points, query):
+            ordered = sorted(points)
+            if len(ordered) < 2 or len({x for x,_ in ordered}) != len(ordered): raise ValueError("invalid interpolation points")
+            if query < ordered[0][0] or query > ordered[-1][0]: raise ValueError("extrapolation disabled")
+            for x,y in ordered:
+                if query == x: return {"value": y, "left": x, "right": x, "ratio": 0.0}
+            for (x0,y0),(x1,y1) in zip(ordered, ordered[1:]):
+                if x0 < query < x1:
+                    ratio = (query-x0)/(x1-x0)
+                    return {"value": y0+ratio*(y1-y0), "left": x0, "right": x1, "ratio": round(ratio,4)}
+      hints: *id001
+    check:
+      id: python.scipy.scipy_03.linear-interpolation.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_03.linear-interpolation.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: interpolate_linear
+        cases:
+        - id: interpolates-between-anchors
+          arguments:
+          - value:
+            - - 0
+              - 0
+            - - 10
+              - 20
+          - value: 2.5
+          expectedReturn:
+            value: 5.0
+            left: 0
+            right: 10
+            ratio: 0.25
+        - id: returns-exact-anchor
+          arguments:
+          - value:
+            - - 0
+              - 1
+            - - 2
+              - 5
+          - value: 2
+          expectedReturn:
+            value: 5
+            left: 2
+            right: 2
+            ratio: 0.0
+        - id: rejects-extrapolation
+          arguments:
+          - value:
+            - - 0
+              - 0
+            - - 1
+              - 1
+          - value: 2
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: scipy_03-gap-interpolation-policy-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_03-linear-interpolation-mastery
+    title: 새 시계열 결측에 보간 정책 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 결측 run 길이가 허용 gap 이하일 때만 선형 채움 계획을 만든다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 양쪽 anchor가 없는 leading·trailing 결측은 보간하지 마세요.
+    - 긴 결측 구간은 관측처럼 꾸미지 말고 blocked로 남기세요.
+    exercise:
+      prompt: plan_missing_gaps(values, maximum_gap)를 완성하세요.
+      starterCode: |-
+        def plan_missing_gaps(values, maximum_gap):
+            raise NotImplementedError
+      solution: |
+        def plan_missing_gaps(values, maximum_gap):
+            if maximum_gap < 0: raise ValueError("negative gap")
+            fills = []; blocked = []; index = 0
+            while index < len(values):
+                if values[index] is not None: index += 1; continue
+                start = index
+                while index < len(values) and values[index] is None: index += 1
+                end = index-1; length = end-start+1
+                bounded = start > 0 and index < len(values)
+                target = fills if bounded and length <= maximum_gap else blocked
+                target.extend(range(start,end+1))
+            return {"fillIndices": fills, "blockedIndices": blocked}
+      hints: *id002
+    check:
+      id: python.scipy.scipy_03.gap-interpolation-policy.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_03.gap-interpolation-policy.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_missing_gaps
+        cases:
+        - id: fills-short-bounded-gap
+          arguments:
+          - value:
+            - 1
+            - null
+            - null
+            - 4
+          - value: 2
+          expectedReturn:
+            fillIndices:
+            - 1
+            - 2
+            blockedIndices: []
+        - id: blocks-edge-and-long-gaps
+          arguments:
+          - value:
+            - null
+            - 1
+            - null
+            - null
+            - 4
+            - null
+          - value: 1
+          expectedReturn:
+            fillIndices: []
+            blockedIndices:
+            - 0
+            - 2
+            - 3
+            - 5
+        - id: rejects-negative-gap
+          arguments:
+          - value:
+            - 1
+          - value: -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: scipy_03-interpolation-method-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_03-gap-interpolation-policy-transfer
+    title: 보간 방법 선택 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 선형·고차·외삽 경계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 수치 방법의 입력 가정과 오차 근거를 함께 남기세요.
+    - p-value나 최적화 성공 flag 하나를 결론으로 사용하지 마세요.
+    exercise:
+      prompt: choose_interpolation(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_interpolation(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_interpolation(situation):
+            table = {'sparse-smooth-series': {'method': 'linear interpolation', 'evidence': 'anchor gaps', 'risk': 'hidden regime change'}, 'smooth-curvature': {'method': 'spline with validation', 'evidence': 'held-out error', 'risk': 'overshoot'}, 'outside-domain': {'method': 'explicit extrapolation model', 'evidence': 'domain distance', 'risk': 'unsupported trend'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.scipy.scipy_03.interpolation-method.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_03.interpolation-method.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_interpolation
+        cases:
+        - id: recalls-sparse-smooth-series
+          arguments:
+          - value: sparse-smooth-series
+          expectedReturn:
+            method: linear interpolation
+            evidence: anchor gaps
+            risk: hidden regime change
+        - id: recalls-smooth-curvature
+          arguments:
+          - value: smooth-curvature
+          expectedReturn:
+            method: spline with validation
+            evidence: held-out error
+            risk: overshoot
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

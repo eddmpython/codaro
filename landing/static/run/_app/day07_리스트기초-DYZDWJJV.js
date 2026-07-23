@@ -1,0 +1,637 @@
+var e=`meta:
+  id: day07
+  title: 리스트기초
+  day: 7
+  category: 30days
+  outcomes: ["python.lists"]
+  prerequisites: ["python.variables"]
+  estimatedMinutes: 40
+  tags:
+  - 리스트
+  - 인덱싱
+  - 슬라이싱
+  - 재고관리
+  - 정합성
+  - 검증
+  seo:
+    title: 파이썬 리스트 기초 - 리스트 생성과 활용
+    description: 리스트의 기본 개념, 생성, 인덱싱, 슬라이싱, 수정 방법을 배웁니다.
+    keywords:
+    - 리스트
+    - list
+    - 인덱싱
+    - 슬라이싱
+    - indexing
+intro:
+  emoji: 📦
+  points:
+  - 리스트로 여러 값을 한 번에 관리
+  - 인덱스로 원하는 요소에 접근
+  - 슬라이싱으로 부분 리스트 추출
+  - 리스트 수정과 연산
+  direction: 리스트기초에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 리스트기초 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 리스트란? 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 다양한 리스트 생성 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: 리스트 인덱싱 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 리스트기초 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 리스트기초 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 리스트기초 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: list_intro
+  title: 리스트란?
+  structuredPrimary: true
+  subtitle: 여러 값을 담는 상자
+  goal: 리스트란?에서 \`items\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    리스트(List)는 여러 개의 값을 순서대로 담을 수 있는 자료구조입니다. 대괄호 []로 만들고, 쉼표로 값을 구분합니다. 숫자, 문자열, 불린 등 어떤 타입의 값도 담을 수 있습니다. 리스트는 순서가 있어서 첫 번째, 두 번째 같은 위치로 값에 접근할 수 있습니다.
+
+    리스트는 프로그래밍에서 가장 많이 사용하는 자료구조 중 하나입니다.
+  snippet: |-
+    items = [1, 2, 3, 4, 5]
+    items
+  exercise:
+    prompt: 리스트란? 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      items = [1, 2, 3, 4, 5]
+      items
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 리스트란?에서 \`items\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 리스트란? 실행 뒤 \`items\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: list_create
+  title: 다양한 리스트 생성
+  structuredPrimary: true
+  subtitle: 타입 제한 없이 자유롭게
+  goal: 다양한 리스트 생성에서 \`nums\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    리스트는 숫자만, 문자열만 담을 수도 있고, 여러 타입을 섞어서 담을 수도 있습니다. 빈 리스트도 만들 수 있습니다. 리스트 안에 리스트를 넣어 중첩 리스트도 만들 수 있습니다.
+
+    빈 리스트는 나중에 값을 추가할 때 유용합니다.
+  snippet: |-
+    nums = [10, 20, 30]
+    nums
+  exercise:
+    prompt: 다양한 리스트 생성 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      nums = [10, 20, 30]
+      nums
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 다양한 리스트 생성에서 \`nums\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 다양한 리스트 생성 실행 뒤 \`nums\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: list_indexing
+  title: 리스트 인덱싱
+  structuredPrimary: true
+  subtitle: 위치로 값 가져오기
+  goal: 리스트 인덱싱에서 \`basket\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    리스트의 각 요소는 인덱스(위치 번호)로 접근할 수 있습니다. 인덱스는 0부터 시작합니다. 첫 번째 요소는 [0], 두 번째는 [1], 세 번째는 [2]입니다. 리스트 이름 뒤에 대괄호를 쓰고 인덱스를 넣으면 그 위치의 값을 가져옵니다.
+
+    리스트 길이보다 큰 인덱스를 사용하면 에러가 발생합니다.
+  snippet: |-
+    basket = ['사과', '바나나', '오렌지', '포도']
+    basket[0]
+  exercise:
+    prompt: 리스트 인덱싱 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      basket = ['사과', '바나나', '오렌지', '포도']
+      basket[0]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 리스트 인덱싱에서 \`basket\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 리스트 인덱싱 실행 뒤 \`basket\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: list_negative
+  title: 음수 인덱싱
+  structuredPrimary: true
+  subtitle: 뒤에서부터 접근하기
+  goal: 음수 인덱싱에서 \`values\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    음수 인덱스를 사용하면 리스트의 뒤에서부터 접근할 수 있습니다. -1은 마지막 요소, -2는 뒤에서 두 번째 요소, -3은 뒤에서 세 번째 요소입니다. 리스트가 길 때 마지막 요소에 접근하는 간편한 방법입니다.
+
+    리스트 길이를 몰라도 [-1]로 마지막 요소에 접근할 수 있습니다.
+  snippet: |-
+    values = [10, 20, 30, 40, 50]
+    values[-1]
+  exercise:
+    prompt: 음수 인덱싱 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      values = [10, 20, 30, 40, 50]
+      values[-1]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 음수 인덱싱에서 \`values\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 음수 인덱싱 실행 뒤 \`values\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: list_slicing
+  title: 리스트 슬라이싱
+  structuredPrimary: true
+  subtitle: 범위로 잘라내기
+  goal: 리스트 슬라이싱에서 \`rainbow\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    슬라이싱은 리스트의 일부분을 잘라내어 새 리스트를 만듭니다. [시작:끝] 형식으로 사용하며, 시작 인덱스부터 끝 인덱스 직전까지 가져옵니다. 시작을 생략하면 처음부터, 끝을 생략하면 끝까지 가져옵니다.
+
+    슬라이싱은 원본 리스트를 변경하지 않고 새 리스트를 만듭니다.
+  snippet: |-
+    rainbow = ['빨강', '주황', '노랑', '초록', '파랑', '남색', '보라']
+    rainbow[:3]
+  exercise:
+    prompt: 리스트 슬라이싱 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      rainbow = ['빨강', '주황', '노랑', '초록', '파랑', '남색', '보라']
+      rainbow[:3]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 리스트 슬라이싱에서 \`rainbow\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 리스트 슬라이싱 실행 뒤 \`rainbow\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: list_step
+  title: 슬라이싱 step
+  structuredPrimary: true
+  subtitle: 간격을 두고 가져오기
+  goal: 슬라이싱 step에서 \`sequence\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    슬라이싱에 step을 추가하면 지정한 간격으로 요소를 가져올 수 있습니다. [시작:끝:step] 형식으로 사용합니다. step이 2면 하나 건너 하나씩, 3이면 두 개 건너 하나씩 가져옵니다. 음수 step을 사용하면 역순으로 가져옵니다.
+
+    [::-1]은 리스트를 뒤집는 간편한 방법입니다.
+  snippet: |-
+    sequence = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    sequence[::2]
+  exercise:
+    prompt: 슬라이싱 step 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      sequence = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+      sequence[::2]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 슬라이싱 step에서 \`sequence\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 슬라이싱 step 실행 뒤 \`sequence\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: list_modify
+  title: 리스트 수정
+  structuredPrimary: true
+  subtitle: 인덱스로 값 변경하기
+  goal: 리스트 수정에서 print() 입력값이 출력 영역에 어떻게 표시되는지 확인한다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  explanation: 리스트는 수정 가능한(mutable) 자료구조입니다. 인덱스를 사용하여 특정 위치의 값을 다른 값으로 변경할 수 있습니다. list[0] = 'new value'
+    형식으로 할당하면 그 위치의 값이 바뀝니다. 문자열과 달리 리스트는 생성 후에도 내용을 변경할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    before = ['사과', '바나나', '오렌지']
+    print('before:', before)
+  exercise:
+    prompt: 리스트 수정 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
+    starterCode: |-
+      before = ['사과', '바나나', '오렌지']
+      print('before:', before)
+    hints:
+    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
+    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+  check:
+    type: noError
+    noError: 리스트 수정의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
+    resultCheck: 리스트 수정 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+- id: list_length
+  title: 리스트 길이
+  structuredPrimary: true
+  subtitle: len() 함수 사용
+  goal: 리스트 길이에서 \`goods\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    len() 함수는 리스트에 담긴 요소의 개수를 반환합니다. 리스트가 몇 개의 항목을 가지고 있는지 알아야 할 때 사용합니다. 빈 리스트의 길이는 0입니다. 리스트의 마지막 인덱스는 len(list) - 1입니다.
+
+    len() 함수는 문자열의 길이도 확인할 수 있습니다.
+  snippet: |-
+    goods = ['사과', '바나나', '오렌지', '포도', '딸기']
+    len(goods)
+  exercise:
+    prompt: 리스트 길이 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      goods = ['사과', '바나나', '오렌지', '포도', '딸기']
+      len(goods)
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 리스트 길이에서 \`goods\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 리스트 길이 실행 뒤 \`goods\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: list_concat
+  title: 리스트 연결
+  structuredPrimary: true
+  subtitle: + 연산자로 합치기
+  goal: 리스트 연결에서 \`front\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    두 개 이상의 리스트를 + 연산자로 연결하여 하나의 긴 리스트를 만들 수 있습니다. 원본 리스트는 변경되지 않고 새로운 리스트가 생성됩니다. 여러 리스트를 순서대로 합칠 때 유용합니다.
+
+    리스트 + 리스트만 가능합니다. 리스트 + 숫자는 에러가 발생합니다.
+  snippet: |-
+    front = [1, 2, 3]
+    back = [4, 5, 6]
+    front + back
+  exercise:
+    prompt: 리스트 연결 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      front = [1, 2, 3]
+      back = [4, 5, 6]
+      front + back
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 리스트 연결에서 \`front\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 리스트 연결 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: list_repeat
+  title: 리스트 반복
+  structuredPrimary: true
+  subtitle: '* 연산자로 복제하기'
+  goal: 리스트 반복에서 \`base\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    리스트에 * 연산자를 사용하면 리스트를 여러 번 반복한 새 리스트를 만들 수 있습니다. list * 3은 리스트를 3번 반복합니다. 같은 값을 여러 개 가진 리스트를 만들 때 편리합니다.
+
+    [0] * 10으로 0이 10개인 리스트를 쉽게 만들 수 있습니다.
+  snippet: |-
+    base = [1, 2, 3]
+    base * 3
+  exercise:
+    prompt: 리스트 반복 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      base = [1, 2, 3]
+      base * 3
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 리스트 반복에서 \`base\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 리스트 반복 실행 뒤 \`base\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: list_membership
+  title: in/not in 연산자
+  structuredPrimary: true
+  subtitle: 요소 포함 여부 확인
+  goal: in/not in 연산자에서 \`bucket\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    in 연산자는 특정 값이 리스트에 있는지 확인합니다. not in은 그 반대입니다. 결과는 True 또는 False입니다. 리스트에서 값을 찾을 때 인덱스를 모두 확인할 필요 없이 간편하게 검사할 수 있습니다.
+
+    in 연산자는 문자열에서 부분 문자열 검색에도 사용됩니다.
+  snippet: |-
+    bucket = ['사과', '바나나', '오렌지']
+    '바나나' in bucket
+  exercise:
+    prompt: in/not in 연산자 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      bucket = ['사과', '바나나', '오렌지']
+      '바나나' in bucket
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: in/not in 연산자에서 \`bucket\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: in/not in 연산자 실행 뒤 \`bucket\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: workflow_validation
+  title: '검증 루프: 재고 목록 정합성 확인'
+  structuredPrimary: true
+  subtitle: 여러 리스트를 같은 순서로 맞춰 업무 데이터로 쓰기
+  goal: '검증 루프: 재고 목록 정합성 확인에서 예상값과 실제 실행 결과를 비교하는 검증 흐름을 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 리스트는 값 여러 개를 담는 상자에서 끝나지 않습니다. 제품명 리스트와 재고 수량 리스트처럼 서로 같은 순서를 공유하는 데이터를 다룰 때는 길이, 인덱스,
+    수정 결과를 계속 검증해야 합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    productNames = ['노트북', '마우스', '키보드', '모니터']
+    stockCounts = [5, 20, 0, 8]
+
+    assert len(productNames) == len(stockCounts)
+
+    firstProduct = productNames[0]
+    firstStock = stockCounts[0]
+    lastProduct = productNames[-1]
+    lastStock = stockCounts[-1]
+
+    assert firstProduct == '노트북'
+    assert firstStock == 5
+    assert lastProduct == '모니터'
+    assert lastStock == 8
+  exercise:
+    prompt: '검증 루프: 재고 목록 정합성 확인 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    starterCode: |-
+      dailyTasks = ['메일 확인', '견적서 작성', '고객 연락', '보고서 정리']
+      urgentTasks = dailyTasks[:2]
+      laterTasks = dailyTasks[2:]
+      orderedTasks = urgentTasks + laterTasks
+
+      assert urgentTasks == ['메일 확인', '견적서 작성']
+      assert laterTasks == ['고객 연락', '보고서 정리']
+      assert orderedTasks == dailyTasks
+      orderedTasks
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '검증 루프: 재고 목록 정합성 확인에서 \`dailyTasks\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
+    resultCheck: '검증 루프: 재고 목록 정합성 확인에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.'
+- id: practice
+  title: Day 7 종합 복습
+  structuredPrimary: true
+  subtitle: 리스트 기초 마스터하기
+  goal: Day 7 종합 복습에서 \`nums\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: Day 7에서 배운 리스트 기초를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤
+    순서로 해도 괜찮습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    students = ['김철수', '이영희', '박민수', '정지은', '최동욱']
+    print('students:', students)
+  exercise:
+    prompt: Day 7 종합 복습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      nums = [10, 20, 30, 40, 50]
+      nums
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: Day 7 종합 복습에서 \`nums\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: Day 7 종합 복습 실행 뒤 \`nums\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: reflection
+  title: Day 7 회고 - 리스트 첫 감각 굳히기
+  structuredPrimary: true
+  subtitle: 기억 굳히기
+  goal: Day 7에서 다룬 리스트 생성, 인덱싱, 슬라이싱의 핵심을 자기 말로 정리한다.
+  why: 같은 개념을 출력 코드와 자기 문장으로 두 번 표현하면 헷갈리기 쉬운 인덱스/슬라이싱 규칙이 굳어집니다.
+  explanation: 오늘 다룬 리스트 생성, append/insert, 인덱싱과 슬라이싱 표기 중에서 가장 익숙해진 점과 아직 헷갈리는 지점을 한 단락으로 적어보세요.
+  reflection:
+    prompt: 리스트 인덱싱과 슬라이싱 중 아직 헷갈리는 한 가지를 예시 코드와 함께 적어주세요.
+    expectedKeywords:
+    - list
+    - 인덱싱
+    - 슬라이싱
+    aiFollowup: 학습자가 적은 헷갈림 지점에 대해 다음 day08(리스트 메서드) 또는 day26(컴프리헨션)에서 어떻게 다시 다루는지 안내한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: day07-score-summary-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - list_intro
+    - reflection
+    title: 점수 목록의 핵심 값 요약하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 리스트에서 최솟값, 최댓값, 합계를 순서대로 만든다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: score_summary(scores)가 [최솟값, 최댓값, 합계]를 반환하도록 완성하세요.
+      starterCode: |-
+        def score_summary(scores):
+            raise NotImplementedError
+      solution: |-
+        def score_summary(scores):
+            return [min(scores), max(scores), sum(scores)]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day07.score-summary.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day07.score-summary.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: score_summary
+        cases:
+        - id: mixed
+          arguments:
+          - value:
+            - 30
+            - 10
+            - 20
+          expectedReturn:
+          - 10
+          - 30
+          - 60
+        - id: single
+          arguments:
+          - value:
+            - 7
+          expectedReturn:
+          - 7
+          - 7
+          - 7
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day07-rotate-left-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day07-score-summary-mastery
+    title: 목록을 원하는 칸만큼 회전하기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 슬라이싱을 변경 가능한 항목 목록에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: rotate_left(items, steps)가 목록을 왼쪽으로 steps칸 회전한 새 목록을 반환하도록 완성하세요.
+      starterCode: |-
+        def rotate_left(items, steps):
+            raise NotImplementedError
+      solution: |-
+        def rotate_left(items, steps):
+            steps %= len(items)
+            return items[steps:] + items[:steps]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day07.rotate-left.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day07.rotate-left.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: rotate_left
+        cases:
+        - id: one
+          arguments:
+          - value:
+            - 1
+            - 2
+            - 3
+            - 4
+          - value: 1
+          expectedReturn:
+          - 2
+          - 3
+          - 4
+          - 1
+        - id: wrapped
+          arguments:
+          - value:
+            - a
+            - b
+            - c
+          - value: 4
+          expectedReturn:
+          - b
+          - c
+          - a
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day07-second-last-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day07-rotate-left-transfer
+    title: 두 위치의 목록 값 다시 고르기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 양수와 음수 인덱스를 리스트에서 다시 사용한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: second_and_last(items)가 두 번째 값과 마지막 값을 새 목록으로 반환하도록 완성하세요.
+      starterCode: |-
+        def second_and_last(items):
+            raise NotImplementedError
+      solution: |-
+        def second_and_last(items):
+            return [items[1], items[-1]]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day07.second-last.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day07.second-last.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: second_and_last
+        cases:
+        - id: numbers
+          arguments:
+          - value:
+            - 5
+            - 6
+            - 7
+            - 8
+          expectedReturn:
+          - 6
+          - 8
+        - id: words
+          arguments:
+          - value:
+            - first
+            - middle
+            - last
+          expectedReturn:
+          - middle
+          - last
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

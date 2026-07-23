@@ -1,0 +1,875 @@
+var e=`meta:
+  packages:
+  - pandas
+  - plotly
+  id: plotly_05
+  title: 세계인구지도
+  order: 5
+  category: plotly
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - choropleth
+  - 지도
+  - 인구
+  - color_continuous_scale
+  - gapminder
+  seo:
+    title: Plotly 코로플레스 지도 - 세계 인구 시각화
+    description: px.choropleth로 국가별 인구 단계구분도를 만듭니다. color_continuous_scale로 색상 스케일을 조절하고 update_layout으로
+      레이아웃을 꾸밉니다.
+    keywords:
+    - choropleth
+    - 단계구분도
+    - 세계지도
+    - 인구 시각화
+    - Plotly
+intro:
+  emoji: 🗺️
+  goal: 국가별 인구를 색상으로 표현한 세계 지도(코로플레스)를 완성합니다.
+  description: px.choropleth는 지도 위에 데이터를 색상으로 표현합니다. 인구가 많을수록 진한 색, 적을수록 연한 색으로 한눈에 파악할 수 있습니다.
+  direction: 세계인구지도에서 데이터를 상호작용 차트로 구성하고 필터와 표시 상태를 검증합니다.
+  benefits:
+  - 대시보드 데이터 확인 후 인터랙티브 시각화에 맞는 코드 입력을 고릅니다.
+  - 세계인구지도 결과를 툴팁과 선택 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 공유 대시보드에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 준비 입력 확인
+      detail: 입력 기준(대시보드 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 최신 연도 필터링 처리 실행
+      detail: 인터랙티브 시각화 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 국가 코드 확인 결과 검증
+      detail: 툴팁과 선택 상태 기준으로 실행 결과를 비교합니다.
+    - label: 세계인구지도 재사용
+      detail: 완성 코드를 공유 대시보드에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 인터랙티브 차트 환경
+      detail: pandas, plotly 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 세계인구지도 실행
+      detail: 셀을 실행해 툴팁과 선택 상태와 예외 상태를 확인합니다.
+    - label: 세계인구지도 완료
+      detail: 검증된 코드를 공유 대시보드로 남깁니다.
+sections:
+- id: step1_load
+  title: 1단계. 데이터 준비
+  structuredPrimary: true
+  subtitle: gapminder 데이터
+  goal: 1단계. 데이터 준비에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: gapminder 데이터셋에는 국가별 인구(pop), 기대수명(lifeExp), GDP(gdpPercap) 등의 주요 지표가 포함되어 있어 세계 발전 현황을
+    분석하기에 이상적입니다. 코로플레스 지도를 그리려면 각 국가를 지리적으로 식별할 수 있는 표준 국가 코드가 필요한데, gapminder는 ISO 3166-1 alpha-3 형식의
+    iso_alpha 컬럼(KOR, USA, CHN 등)을 제공합니다. 이 3자리 코드는 국제 표준이므로 Plotly의 내장 지도 데이터와 자동으로 매칭되어 별도의 지리 정보 파일
+    없이도 세계 지도를 그릴 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import plotly.express as px
+    import pandas as pd
+    df = px.data.gapminder()
+    df.head()
+  exercise:
+    prompt: 1단계. 데이터 준비 예제에서 \`df\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import plotly.express as px
+      import pandas as pd
+      df = px.data.gapminder()
+      df.head()
+    hints:
+    - 바꿀 지점은 \`df = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`df\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 데이터 준비에서 \`df\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 1단계. 데이터 준비 실행 뒤 \`df\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step2_filter
+  title: 2단계. 최신 연도 필터링
+  structuredPrimary: true
+  subtitle: 2007년 데이터만
+  goal: 2단계. 최신 연도 필터링에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: gapminder 데이터는 1952년부터 2007년까지 5년 단위로 수집된 시계열 데이터입니다. 시간에 따른 변화를 보려면 모든 연도를 사용하지만, 특정 시점의
+    스냅샷을 보려면 한 연도만 필터링해야 합니다. 여기서는 가장 최신 데이터인 2007년만 추출하여 현대의 세계 인구 분포를 시각화합니다. query() 메서드는 SQL과 유사한
+    문법으로 데이터를 필터링하는 pandas의 편리한 기능으로, df[df['year'] == 2007]과 동일한 결과를 더 읽기 쉬운 형태로 제공합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    df2007 = df.query('year == 2007')
+    df2007.shape
+  exercise:
+    prompt: 2단계. 최신 연도 필터링 예제에서 \`df2007\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      df2007 = df.query('year == 2007')
+      df2007.shape
+    hints:
+    - 바꿀 지점은 \`df2007 = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`df2007\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 최신 연도 필터링에서 \`df2007\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. 최신 연도 필터링 실행 뒤 \`df2007\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step3_iso_alpha
+  title: 3단계. 국가 코드 확인
+  structuredPrimary: true
+  subtitle: iso_alpha 컬럼
+  goal: 3단계. 국가 코드 확인에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+  explanation: 코로플레스 지도는 국가명(문자열)이 아닌 표준 국가 코드로 지리적 위치를 매칭합니다. iso_alpha 컬럼에는 ISO 3166-1 alpha-3 형식의 3자리
+    코드가 저장되어 있으며, KOR은 한국, USA는 미국, CHN은 중국을 의미합니다. 이 표준 코드 체계는 국제적으로 통용되며, 언어나 국가명 표기 방식과 무관하게 일관되게 작동합니다.
+    예를 들어 한국을 Korea, South Korea, 대한민국 등 여러 이름으로 부를 수 있지만, ISO 코드는 항상 KOR로 고정되어 있어 데이터 매칭 오류를 방지합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: df2007[['country', 'iso_alpha', 'pop']].head(10)
+  exercise:
+    prompt: 3단계. 국가 코드 확인 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: df2007[['country', 'iso_alpha', 'pop']].head(10)
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 국가 코드 확인의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 3단계. 국가 코드 확인 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step4_basic_choropleth
+  title: 4단계. 기본 코로플레스
+  structuredPrimary: true
+  subtitle: px.choropleth 첫 등장
+  goal: 4단계. 기본 코로플레스에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    코로플레스 맵(choropleth map)은 지도 위에 데이터를 색상으로 표현하는 단계구분도입니다. 각 국가나 지역의 경계선 안을 데이터 값에 따라 다른 색상으로 채워서, 지리적 패턴을 한눈에 파악할 수 있게 해줍니다. 인구가 많은 국가는 진한 색, 적은 국가는 연한 색으로 표시되어 세계 인구 분포를 직관적으로 이해할 수 있습니다. 코로플레스는 선거 결과, 질병 확산, 경제 지표, 기후 데이터 등 지역적 차이가 중요한 모든 데이터에 활용됩니다. 뉴스와 연구 논문에서 가장 많이 사용되는 지도 시각화 방식입니다.
+
+    px.choropleth(데이터, locations='국가코드컬럼', color='색상값컬럼')이 기본 형태입니다. locations는 ISO 3166-1 alpha-3 국가 코드(KOR, USA, CHN 등)를 담은 컬럼명을 지정합니다. locationmode 파라미터로 'ISO-3'(기본값), 'USA-states', 'country names' 등을 선택할 수 있습니다. color에 지정한 컬럼의 값에 따라 각 국가가 색상으로 채워집니다. 값이 클수록 진한 색, 작을수록 연한 색이 기본 동작입니다. Plotly는 Natural Earth 데이터를 기반으로 전 세계 국가 경계를 내장하고 있어 별도의 지리 데이터 파일(shapefile, GeoJSON)이 필요 없습니다.
+  tips:
+  - px.choropleth(데이터, locations='국가코드컬럼', color='색상값컬럼')이 기본 형태입니다. locations는 ISO 3166-1 alpha-3 국가
+    코드(KOR, USA, CHN 등)를 담은 컬럼명을 지정합니다. locationmode 파라미터로 'ISO-3'(기본값), 'USA-states', 'country names'
+    등을 선택할 수 있습니다. color에 지정한 컬럼의 값에 따라 각 국가가 색상으로 채워집니다. 값이 클수록 진한 색, 작을수록 연한 색이 기본 동작입니다. Plotly는 Natural
+    Earth 데이터를 기반으로 전 세계 국가 경계를 내장하고 있어 별도의 지리 데이터 파일(shapefile, GeoJSON)이 필요 없습니다.
+  snippet: |-
+    figChoropleth = px.choropleth(
+        df2007,
+        locations='iso_alpha',
+        color='pop'
+    )
+    figChoropleth
+  exercise:
+    prompt: 4단계. 기본 코로플레스 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figChoropleth = px.choropleth(
+          df2007,
+          locations='iso_alpha',
+          color='pop'
+      )
+      figChoropleth
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 기본 코로플레스의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 기본 코로플레스의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step5_color_scale
+  title: 5단계. 색상 스케일 변경
+  structuredPrimary: true
+  subtitle: color_continuous_scale 첫 등장
+  goal: 5단계. 색상 스케일 변경에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    color_continuous_scale이란?
+    연속적인 숫자 데이터의 색상 팔레트를 지정합니다. 'Viridis', 'Plasma', 'Blues', 'Reds', 'YlOrRd' 등이 있습니다. 인구처럼 값의 범위가 큰 데이터에 유용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    px.choropleth(
+        df2007,
+        locations='iso_alpha',
+        color='pop',
+        color_continuous_scale='YlOrRd'
+    )
+  exercise:
+    prompt: 5단계. 색상 스케일 변경 예제에서 \`locations\`, \`color\`, \`color_continuous_scale\` 값 중 하나를 바꾸고 마지막 표시 결과가
+      맞는지 확인하세요.
+    starterCode: |-
+      px.choropleth(
+          df2007,
+          locations='iso_alpha',
+          color='pop',
+          color_continuous_scale='YlOrRd'
+      )
+    hints:
+    - 바꿀 지점은 \`locations = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`locations\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 색상 스케일 변경에서 \`locations\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 색상 스케일 변경 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step6_hover
+  title: 6단계. 호버 정보 추가
+  structuredPrimary: true
+  subtitle: hover_name으로 국가명 표시
+  goal: 6단계. 호버 정보 추가에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 지도에서 각 국가에 마우스를 올렸을 때 국가 이름이 호버 툴팁에 표시되도록 hover_name 파라미터를 추가합니다. 코로플레스 지도는 색상으로 정보를 전달하지만
+    정확히 어느 국가인지 알기 어려울 때가 많으므로, 호버 기능은 필수적입니다. 특히 작은 국가나 비슷한 색상의 인접 국가들을 구분할 때 매우 유용하며, 사용자가 직접 탐색하며 궁금한
+    국가의 정보를 즉시 확인할 수 있게 해줍니다. 이는 정적인 지도와 차별화되는 인터랙티브 시각화의 핵심 장점입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    px.choropleth(
+        df2007,
+        locations='iso_alpha',
+        color='pop',
+        hover_name='country',
+        color_continuous_scale='YlOrRd'
+    )
+  exercise:
+    prompt: 6단계. 호버 정보 추가 예제에서 \`locations\`, \`color\`, \`hover_name\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      px.choropleth(
+          df2007,
+          locations='iso_alpha',
+          color='pop',
+          hover_name='country',
+          color_continuous_scale='YlOrRd'
+      )
+    hints:
+    - 바꿀 지점은 \`locations = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`locations\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 호버 정보 추가에서 \`locations\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 호버 정보 추가 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step7_title_labels
+  title: 7단계. 제목과 라벨
+  structuredPrimary: true
+  subtitle: title, labels 복습
+  goal: 7단계. 제목과 라벨에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 이전 프로젝트에서 배운 title과 labels 파라미터를 복습하며 지도에 제목과 한글 라벨을 추가합니다. title은 차트 상단에 표시되어 무엇을 보여주는
+    시각화인지 명확히 전달하고, labels는 컬럼명을 사용자 친화적인 이름으로 변환하여 가독성을 높입니다. 특히 코로플레스 지도의 색상 막대(colorbar)에도 labels가
+    적용되어 'pop'이 '인구'로 표시되므로, 영문에 익숙하지 않은 청중도 쉽게 이해할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    px.choropleth(
+        df2007,
+        locations='iso_alpha',
+        color='pop',
+        hover_name='country',
+        color_continuous_scale='YlOrRd',
+        title='2007년 세계 인구 분포',
+        labels={'pop': '인구'}
+    )
+  exercise:
+    prompt: 7단계. 제목과 라벨 예제에서 \`locations\`, \`color\`, \`hover_name\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      px.choropleth(
+          df2007,
+          locations='iso_alpha',
+          color='pop',
+          hover_name='country',
+          color_continuous_scale='YlOrRd',
+          title='2007년 세계 인구 분포',
+          labels={'pop': '인구'}
+      )
+    hints:
+    - 바꿀 지점은 \`locations = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`locations\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 제목과 라벨에서 \`locations\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. 제목과 라벨 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step8_update_layout
+  title: 8단계. 레이아웃 수정
+  structuredPrimary: true
+  subtitle: update_layout 복습
+  goal: 8단계. 레이아웃 수정에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: update_layout() 메서드를 사용하여 지도의 시각적 스타일을 세밀하게 조정합니다. geo=dict()를 통해 지도 전용 설정을 제어하며, showframe은
+    지도 테두리 표시 여부, showcoastlines는 해안선 표시 여부, projection_type은 지도 투영법을 지정합니다. margin=dict()로 차트 여백을 조절하여
+    지도가 화면을 최대한 활용하도록 만들 수 있습니다. 이런 레이아웃 최적화는 특히 발표나 보고서에서 제한된 공간을 효율적으로 사용하는 데 중요합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figLayout = px.choropleth(
+        df2007,
+        locations='iso_alpha',
+        color='pop',
+        hover_name='country',
+        color_continuous_scale='YlOrRd',
+        title='2007년 세계 인구 분포',
+        labels={'pop': '인구'}
+    )
+    figLayout.update_layout(
+        geo=dict(
+            showframe=False,
+            showcoastlines=True,
+            projection_type='natural earth'
+        ),
+        margin=dict(l=0, r=0, t=50, b=0)
+    )
+    figLayout
+  exercise:
+    prompt: 8단계. 레이아웃 수정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figLayout = px.choropleth(
+          df2007,
+          locations='iso_alpha',
+          color='pop',
+          hover_name='country',
+          color_continuous_scale='YlOrRd',
+          title='2007년 세계 인구 분포',
+          labels={'pop': '인구'}
+      )
+      figLayout.update_layout(
+          geo=dict(
+              showframe=False,
+              showcoastlines=True,
+              projection_type='natural earth'
+          ),
+          margin=dict(l=0, r=0, t=50, b=0)
+      )
+      figLayout
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 레이아웃 수정의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 레이아웃 수정의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step9_projection
+  title: 9단계. 다양한 투영법
+  structuredPrimary: true
+  subtitle: projection_type 옵션
+  goal: 9단계. 다양한 투영법에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 지도 투영법(projection)을 변경하면 같은 데이터도 완전히 다른 느낌으로 보여줄 수 있습니다. 'equirectangular'는 직사각형 형태로 전통적인
+    세계지도 느낌을 주고, 'orthographic'는 지구본처럼 둥근 모양으로 3D 느낌을 강조하며, 'natural earth'는 곡선이 자연스러운 타협안입니다. 각 투영법은
+    면적, 거리, 각도 중 일부를 왜곡하는 대신 다른 요소를 정확히 보존하므로, 전달하려는 메시지에 따라 적절한 투영법을 선택하는 것이 중요합니다. 예를 들어 극지방을 강조하려면
+    'orthographic'가, 대륙 간 비교에는 'natural earth'가 적합합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figGlobe = px.choropleth(
+        df2007,
+        locations='iso_alpha',
+        color='pop',
+        hover_name='country',
+        color_continuous_scale='Plasma',
+        title='지구본 스타일 세계 인구'
+    )
+    figGlobe.update_layout(
+        geo=dict(
+            showframe=False,
+            projection_type='orthographic'
+        )
+    )
+    figGlobe
+  exercise:
+    prompt: 9단계. 다양한 투영법 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figGlobe = px.choropleth(
+          df2007,
+          locations='iso_alpha',
+          color='pop',
+          hover_name='country',
+          color_continuous_scale='Plasma',
+          title='지구본 스타일 세계 인구'
+      )
+      figGlobe.update_layout(
+          geo=dict(
+              showframe=False,
+              projection_type='orthographic'
+          )
+      )
+      figGlobe
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 다양한 투영법의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 다양한 투영법의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step10_final
+  title: 10단계. 최종 결과물
+  structuredPrimary: true
+  subtitle: 완성된 세계 인구 지도
+  goal: 10단계. 최종 결과물에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: '지금까지 단계별로 배운 모든 요소(iso_alpha 매칭, color_continuous_scale, hover_name, hover_data, labels,
+    geo 설정, colorbar 포맷)를 종합하여 전문적인 수준의 코로플레스 맵을 완성합니다. hover_data에 대륙, 기대수명, GDP까지 추가하여 마우스 오버만으로 국가의
+    종합적인 정보를 파악할 수 있게 하고, coloraxis_colorbar의 tickformat으로 인구를 ''.2s'' 형식(예: 1.2B)으로 간결하게 표시합니다. 이렇게 세심하게
+    스타일링된 지도는 보고서나 프레젠테이션에서 높은 완성도를 보여줍니다.'
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figFinal = px.choropleth(
+        df2007,
+        locations='iso_alpha',
+        color='pop',
+        hover_name='country',
+        hover_data=['continent', 'lifeExp', 'gdpPercap'],
+        color_continuous_scale='YlOrRd',
+        title='2007년 세계 인구 분포',
+        labels={
+            'pop': '인구',
+            'continent': '대륙',
+            'lifeExp': '기대수명',
+            'gdpPercap': '1인당 GDP'
+        }
+    )
+    figFinal.update_layout(
+        geo=dict(
+            showframe=False,
+            showcoastlines=True,
+            coastlinecolor='Gray',
+            projection_type='natural earth'
+        ),
+        margin=dict(l=0, r=0, t=50, b=0),
+        coloraxis_colorbar=dict(
+            title='인구',
+            tickformat='.2s'
+        )
+    )
+    figFinal
+  exercise:
+    prompt: 10단계. 최종 결과물 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figFinal = px.choropleth(
+          df2007,
+          locations='iso_alpha',
+          color='pop',
+          hover_name='country',
+          hover_data=['continent', 'lifeExp', 'gdpPercap'],
+          color_continuous_scale='YlOrRd',
+          title='2007년 세계 인구 분포',
+          labels={
+              'pop': '인구',
+              'continent': '대륙',
+              'lifeExp': '기대수명',
+              'gdpPercap': '1인당 GDP'
+          }
+      )
+      figFinal.update_layout(
+          geo=dict(
+              showframe=False,
+              showcoastlines=True,
+              coastlinecolor='Gray',
+              projection_type='natural earth'
+          ),
+          margin=dict(l=0, r=0, t=50, b=0),
+          coloraxis_colorbar=dict(
+              title='인구',
+              tickformat='.2s'
+          )
+      )
+      figFinal
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 최종 결과물의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 최종 결과물의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: workflow_validation
+  title: 11단계. 실무 지도 검증 루프
+  structuredPrimary: true
+  subtitle: 예측 → 지리 코드 검증 → 오류 수정 → 인구 기준 실험
+  goal: 11단계. 실무 지도 검증 루프에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    코로플레스 지도는 색이 칠해진 것처럼 보여도 국가 코드 매칭이 틀리면 일부 국가가 누락됩니다. 따라서 ISO 코드, 국가 수, 색상 값, 지도 투영법, colorbar 표시까지 함께 확인해야 합니다. 이 단계에서는 2007년 인구 1위 국가가 중국이고, 대륙별 총인구도 아시아가 가장 클 것이라고 먼저 예측합니다.
+
+    지도 시각화는 국가 코드가 빠지면 조용히 일부 지역이 사라질 수 있습니다. ISO 코드, locations 개수, 투영법, colorbar까지 검증하면 보고서 지도 품질을 안정적으로 유지할 수 있습니다.
+  tips:
+  - 지도 시각화는 국가 코드가 빠지면 조용히 일부 지역이 사라질 수 있습니다. ISO 코드, locations 개수, 투영법, colorbar까지 검증하면 보고서 지도 품질을 안정적으로
+    유지할 수 있습니다.
+  snippet: |-
+    requiredColumns = {"country", "continent", "year", "lifeExp", "pop", "gdpPercap", "iso_alpha"}
+    missingColumns = requiredColumns - set(df.columns)
+
+    assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+    assert df2007.shape[0] == 142
+    assert df2007["iso_alpha"].str.len().eq(3).all()
+    assert df2007["iso_alpha"].isna().sum() == 0
+
+    populationByContinent = df2007.groupby("continent")["pop"].sum().sort_values(ascending=False)
+    mostPopulatedCountry = df2007.loc[df2007["pop"].idxmax(), "country"]
+
+    assert mostPopulatedCountry == "China"
+    assert populationByContinent.index[0] == "Asia"
+
+    {
+        "mostPopulatedCountry": mostPopulatedCountry,
+        "topContinent": populationByContinent.index[0],
+        "countryCount": len(df2007),
+    }
+  exercise:
+    prompt: 11단계. 실무 지도 검증 루프 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      requiredColumns = {"country", "continent", "year", "lifeExp", "pop", "gdpPercap", "iso_alpha"}
+      missingColumns = requiredColumns - set(df.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert df2007.shape[0] == 142
+      assert df2007["iso_alpha"].str.len().eq(3).all()
+      assert df2007["iso_alpha"].isna().sum() == 0
+
+      populationByContinent = df2007.groupby("continent")["pop"].sum().sort_values(ascending=False)
+      mostPopulatedCountry = df2007.loc[df2007["pop"].idxmax(), "country"]
+
+      assert mostPopulatedCountry == "China"
+      assert populationByContinent.index[0] == "Asia"
+
+      {
+          "mostPopulatedCountry": mostPopulatedCountry,
+          "topContinent": populationByContinent.index[0],
+          "countryCount": len(df2007),
+      }
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 실무 지도 검증 루프에서 \`requiredColumns\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 11단계. 실무 지도 검증 루프에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 세계 지도 프로젝트
+  goal: 실습에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    지금까지 배운 코로플레스 기법을 활용하여 다양한 주제의 세계 지도를 만들어봅시다. 대륙별 색상 분류, 기대수명 분포, GDP 로그 스케일, 특정 지역 확대 등 각 미션은 서로 다른 데이터 변환과 시각화 옵션을 조합하여 실무에서 자주 마주치는 다양한 분석 상황을 연습할 수 있도록 설계되었습니다. 각 지도는 다른 인사이트를 전달하며, 어떤 변수를 어떻게 시각화하느냐에 따라 메시지가 완전히 달라진다는 것을 체험할 수 있습니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import plotly.express as px
+    import pandas as pd
+
+    world = px.data.gapminder()
+    world2007 = world.query('year == 2007')
+  exercise:
+    prompt: 실습 예제에서 \`world\`, \`world2007\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      import plotly.express as px
+      import pandas as pd
+
+      world = px.data.gapminder()
+      world2007 = world.query('year == 2007')
+    hints:
+    - 바꿀 지점은 \`world = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`world\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 실습에서 \`world\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 코로플레스 지도를 배웠습니다.
+  - type: list
+    items:
+    - px.choropleth() - 국가별 색상 지도
+    - locations='iso_alpha' - 3자리 국가 코드로 식별
+    - color_continuous_scale - 연속 색상 팔레트
+    - update_layout(geo=dict(...)) - 지도 투영법, 해안선 설정
+    - projection_type - 'natural earth', 'orthographic' 등
+  - type: text
+    content: 다음 시간에는 애니메이션으로 시간에 따른 세계 변화를 표현합니다.
+  goal: 정리에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: plotly_05-world-population-map-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - summary
+    title: 세계 인구 지도 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 위치 code와 color 분모가 지도 geometry에 정확히 결합되는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_world_population_map(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_world_population_map(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_world_population_map(rows):
+            required = ['locationCode', 'population', 'continent']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'continent'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['locationCode'] for row in usable]
+            y_values = [row['population'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.plotly.plotly_05.world-population-map-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.plotly.plotly_05.world-population-map-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_world_population_map
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - locationCode: KOR
+              population: 52
+              continent: Asia
+            - locationCode: FRA
+              population: 68
+              continent: Europe
+            - locationCode: null
+              population: 10
+              continent: Other
+          expectedReturn:
+            usableCount: 2
+            excludedCount: 1
+            groupCounts:
+              Asia: 1
+              Europe: 1
+            xExtent:
+            - FRA
+            - KOR
+            yExtent:
+            - 52
+            - 68
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: plotly_05-world-population-map-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - plotly_05-world-population-map-data-evidence-mastery
+    title: 세계 인구 지도 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 국가별 고객 수를 ISO code 검증과 log color scale이 있는 지도에 표시한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_world_population_map(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_world_population_map(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_world_population_map(candidate):
+            expected = {'mark': 'choropleth', 'x': 'locationCode', 'y': 'population', 'group': 'continent', 'transforms': ['log-color', 'validate-location'], 'interaction': 'hover'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.plotly.plotly_05.world-population-map-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.plotly.plotly_05.world-population-map-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_world_population_map
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: choropleth
+              x: locationCode
+              y: population
+              group: continent
+              transforms:
+              - log-color
+              - validate-location
+              interaction: hover
+              description: 국가별 고객 수를 ISO code 검증과 log color scale이 있는 지도에 표시한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: choropleth
+              x: locationCode
+              y: population
+              group: continent
+              transforms:
+              - log-color
+              - validate-location
+              interaction: hover
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: population
+              y: locationCode
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - interaction
+            - description
+            encoding:
+              mark: choropleth
+              x: locationCode
+              y: population
+              group: continent
+              transforms:
+              - log-color
+              - validate-location
+              interaction: hover
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: plotly_05-world-population-map-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - plotly_05-world-population-map-encoding-transfer-transfer
+    title: 세계 인구 지도 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 위치 code와 color 분모가 지도 geometry에 정확히 결합되는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_world_population_map(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_world_population_map(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_world_population_map(situation):
+            table = {'country-total': {'encoding': 'choropleth', 'evidence': 'join coverage', 'risk': 'area dominance'}, 'city-points': {'encoding': 'symbol map', 'evidence': 'lat lon validity', 'risk': 'overlap'}, 'rate-comparison': {'encoding': 'normalized color', 'evidence': 'denominator', 'risk': 'raw count map'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.plotly.plotly_05.world-population-map-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.plotly.plotly_05.world-population-map-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_world_population_map
+        cases:
+        - id: recalls-country-total
+          arguments:
+          - value: country-total
+          expectedReturn:
+            encoding: choropleth
+            evidence: join coverage
+            risk: area dominance
+        - id: recalls-city-points
+          arguments:
+          - value: city-points
+          expectedReturn:
+            encoding: symbol map
+            evidence: lat lon validity
+            risk: overlap
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

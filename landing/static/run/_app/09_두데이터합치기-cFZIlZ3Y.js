@@ -1,0 +1,799 @@
+var e=`meta:
+  packages:
+  - pandas
+  id: pandas_09
+  title: 두데이터합치기
+  order: 9
+  category: pandas
+  difficulty: ⭐⭐⭐⭐⭐
+  badge: 심화
+  outcomes: ["pandas.merge"]
+  prerequisites: ["pandas.loadFrame"]
+  estimatedMinutes: 45
+  tags:
+  - merge
+  - concat
+  - join
+  - 병합
+  - 실무
+  - 검증
+  - 데이터결합
+  seo:
+    title: pandas merge, concat 완전정복 - 데이터 합치기
+    description: 여러 데이터프레임을 합치는 방법을 배웁니다. concat으로 세로/가로 연결, merge로 키 기준 병합, left/right/outer join을 실습합니다.
+    keywords:
+    - pandas merge
+    - concat
+    - join
+    - 데이터 병합
+    - left join
+intro:
+  emoji: 🔗
+  goal: 여러 개의 데이터프레임을 하나로 합치는 방법을 배웁니다.
+  description: 실무에서는 데이터가 여러 파일에 나눠져 있습니다. 고객 정보, 주문 정보, 상품 정보를 합쳐야 분석이 가능합니다.
+  direction: 두데이터합치기에서 표 데이터를 불러오고 정제, 집계, 검증 결과까지 연결합니다.
+  benefits:
+  - DataFrame 입력 확인 후 정제와 집계에 맞는 코드 입력을 고릅니다.
+  - 두데이터합치기 결과를 행/열 수와 요약값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 데이터 리포트 자동화에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 고객 데이터 생성 입력 확인
+      detail: 입력 기준(DataFrame 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 주문 데이터 생성 처리 실행
+      detail: 정제와 집계 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 상품 데이터 생성 결과 검증
+      detail: 행/열 수와 요약값 기준으로 실행 결과를 비교합니다.
+    - label: 두데이터합치기 재사용
+      detail: 완성 코드를 데이터 리포트 자동화에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 표 데이터 환경
+      detail: pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 두데이터합치기 실행
+      detail: 셀을 실행해 행/열 수와 요약값와 예외 상태를 확인합니다.
+    - label: 두데이터합치기 완료
+      detail: 검증된 코드를 데이터 리포트 자동화로 남깁니다.
+sections:
+- id: step1_customers
+  title: 1단계. 고객 데이터 생성
+  structuredPrimary: true
+  subtitle: 학습용 데이터 준비
+  goal: 1단계. 고객 데이터 생성에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 온라인 쇼핑몰 데이터를 예로 들어봅시다. 먼저 고객 정보를 만듭니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import pandas as pd
+
+    customers = pd.DataFrame({
+        'customerId': [1, 2, 3, 4],
+        'name': ['김철수', '이영희', '박민수', '최지은'],
+        'grade': ['VIP', '일반', 'VIP', '일반']
+    })
+    customers
+  exercise:
+    prompt: 1단계. 고객 데이터 생성 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+
+      customers = pd.DataFrame({
+          'customerId': [1, 2, 3, 4],
+          'name': ['김철수', '이영희', '박민수', '최지은'],
+          'grade': ['VIP', '일반', 'VIP', '일반']
+      })
+      customers
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 고객 데이터 생성의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 고객 데이터 생성의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step2_orders
+  title: 2단계. 주문 데이터 생성
+  structuredPrimary: true
+  subtitle: 주문 정보 만들기
+  goal: 2단계. 주문 데이터 생성에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 주문 데이터를 만듭니다. 각 주문에는 주문번호, 고객번호, 상품번호, 수량이 포함됩니다. 여기서 중요한 점은 customerId=5가 고객 테이블에 없는 값이라는
+    것입니다. 이런 불일치 데이터는 실무에서 자주 발생하며, 병합 방식(inner, left, outer)에 따라 처리가 달라집니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    orders = pd.DataFrame({
+        'orderId': [101, 102, 103, 104, 105],
+        'customerId': [1, 2, 1, 3, 5],
+        'productId': ['A', 'B', 'A', 'C', 'B'],
+        'quantity': [2, 1, 3, 1, 2]
+    })
+    orders
+  exercise:
+    prompt: 2단계. 주문 데이터 생성 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      orders = pd.DataFrame({
+          'orderId': [101, 102, 103, 104, 105],
+          'customerId': [1, 2, 1, 3, 5],
+          'productId': ['A', 'B', 'A', 'C', 'B'],
+          'quantity': [2, 1, 3, 1, 2]
+      })
+      orders
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 주문 데이터 생성의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 주문 데이터 생성의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_products
+  title: 3단계. 상품 데이터 생성
+  structuredPrimary: true
+  subtitle: 상품 정보 만들기
+  goal: 3단계. 상품 데이터 생성에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 상품 정보를 만듭니다. productId가 주문 테이블의 productId와 연결되는 키 역할을 합니다. 이렇게 여러 테이블이 공통 키로 연결되는 구조를 관계형
+    데이터베이스 모델이라고 합니다. 고객-주문-상품 세 테이블을 합치면 "누가 무엇을 얼마나 샀는지" 전체 그림을 볼 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    products = pd.DataFrame({
+        'productId': ['A', 'B', 'C'],
+        'productName': ['노트북', '마우스', '키보드'],
+        'price': [1500000, 50000, 100000]
+    })
+    products
+  exercise:
+    prompt: 3단계. 상품 데이터 생성 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      products = pd.DataFrame({
+          'productId': ['A', 'B', 'C'],
+          'productName': ['노트북', '마우스', '키보드'],
+          'price': [1500000, 50000, 100000]
+      })
+      products
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 상품 데이터 생성의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 3단계. 상품 데이터 생성의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step4_concat
+  title: 4단계. concat 기본
+  structuredPrimary: true
+  subtitle: 세로로 단순 연결
+  goal: 4단계. concat 기본에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    concat은 같은 구조의 데이터를 단순히 붙입니다. 1월 주문 + 2월 주문 합치기처럼 같은 형태의 데이터를 이어붙일 때 사용합니다. ignore_index=True로 인덱스를 새로 부여합니다.
+
+    pd.concat()은 여러 DataFrame을 연결합니다. 리스트로 DataFrame들을 넘기면 세로로 이어붙입니다(axis=0, 기본값). ignore_index=True로 인덱스를 0부터 다시 부여합니다. axis=1로 설정하면 가로로 붙입니다.
+  tips:
+  - pd.concat()은 여러 DataFrame을 연결합니다. 리스트로 DataFrame들을 넘기면 세로로 이어붙입니다(axis=0, 기본값). ignore_index=True로
+    인덱스를 0부터 다시 부여합니다. axis=1로 설정하면 가로로 붙입니다.
+  snippet: |-
+    jan = pd.DataFrame({'orderId': [1, 2], 'amount': [10000, 20000]})
+    feb = pd.DataFrame({'orderId': [3, 4], 'amount': [15000, 25000]})
+
+    pd.concat([jan, feb], ignore_index=True)
+  exercise:
+    prompt: 4단계. concat 기본 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      jan = pd.DataFrame({'orderId': [1, 2], 'amount': [10000, 20000]})
+      feb = pd.DataFrame({'orderId': [3, 4], 'amount': [15000, 25000]})
+
+      pd.concat([jan, feb], ignore_index=True)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. concat 기본의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 4단계. concat 기본의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step5_merge_inner
+  title: 5단계. merge 기본 (inner)
+  structuredPrimary: true
+  subtitle: 키 기준 병합
+  goal: 5단계. merge 기본 (inner)에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    merge는 공통 키를 기준으로 합칩니다. SQL의 JOIN과 같은 개념입니다. 기본은 inner join으로 양쪽 모두에 있는 키만 결과에 포함됩니다. customerId=5는 고객 테이블에 없으므로 제외됩니다.
+
+    pd.merge()는 공통 키 컬럼을 기준으로 두 DataFrame을 병합합니다. on 파라미터로 키 컬럼을 지정합니다. 기본은 how='inner'로 양쪽 모두에 존재하는 키만 남깁니다. concat은 단순 연결, merge는 키 기준 병합입니다.
+  tips:
+  - pd.merge()는 공통 키 컬럼을 기준으로 두 DataFrame을 병합합니다. on 파라미터로 키 컬럼을 지정합니다. 기본은 how='inner'로 양쪽 모두에 존재하는 키만
+    남깁니다. concat은 단순 연결, merge는 키 기준 병합입니다.
+  snippet: pd.merge(orders, customers, on='customerId')
+  exercise:
+    prompt: 5단계. merge 기본 (inner) 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: pd.merge(orders, customers, on='customerId')
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. merge 기본 (inner)의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 5단계. merge 기본 (inner) 실행 결과가 행/열 수와 요약값 기준으로 바꾼 열 이름이나 행 값을 반영해야 합니다.
+- id: step6_merge_product
+  title: 6단계. 상품 정보 병합
+  structuredPrimary: true
+  subtitle: 여러 테이블 합치기
+  goal: 6단계. 상품 정보 병합에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 여러 테이블을 연속으로 합칠 수 있습니다. 먼저 주문과 고객을 합치고, 그 결과에 상품을 합칩니다. 실무에서 여러 테이블을 조인하는 패턴입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    merged = pd.merge(orders, customers, on='customerId')
+    full = pd.merge(merged, products, on='productId')
+    full
+  exercise:
+    prompt: 6단계. 상품 정보 병합 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      merged = pd.merge(orders, customers, on='customerId')
+      full = pd.merge(merged, products, on='productId')
+      full
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 상품 정보 병합의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 6단계. 상품 정보 병합의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step7_calculate
+  title: 7단계. 금액 계산
+  structuredPrimary: true
+  subtitle: 병합 후 계산
+  goal: 7단계. 금액 계산에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 합쳐진 데이터로 주문 금액을 계산합니다. merge를 통해 필요한 정보를 모았으므로 이제 계산이 가능합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    priced = full.copy()
+    priced['totalPrice'] = priced['quantity'] * priced['price']
+    priced[['orderId', 'name', 'productName', 'quantity', 'totalPrice']]
+  exercise:
+    prompt: 7단계. 금액 계산 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      priced = full.copy()
+      priced['totalPrice'] = priced['quantity'] * priced['price']
+      priced[['orderId', 'name', 'productName', 'quantity', 'totalPrice']]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 금액 계산의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 7단계. 금액 계산의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step8_left_join
+  title: 8단계. left join
+  structuredPrimary: true
+  subtitle: 왼쪽 데이터 모두 유지
+  goal: 8단계. left join에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    how='left'는 왼쪽 데이터를 모두 유지하고, 오른쪽에 없으면 NaN을 채웁니다. 모든 주문을 유지하면서 고객 정보를 붙이고 싶을 때 사용합니다. customerId=5는 고객이 없지만 주문은 남아있습니다.
+
+    how='left'는 왼쪽 DataFrame의 모든 행을 유지합니다. 오른쪽에 매칭되는 키가 없으면 NaN으로 채웁니다. how='right'는 반대로 오른쪽을 유지, how='outer'는 양쪽 모두 유지, how='inner'(기본값)는 양쪽 모두 존재하는 것만 유지합니다.
+  tips:
+  - how='left'는 왼쪽 DataFrame의 모든 행을 유지합니다. 오른쪽에 매칭되는 키가 없으면 NaN으로 채웁니다. how='right'는 반대로 오른쪽을 유지, how='outer'는
+    양쪽 모두 유지, how='inner'(기본값)는 양쪽 모두 존재하는 것만 유지합니다.
+  snippet: pd.merge(orders, customers, on='customerId', how='left')
+  exercise:
+    prompt: 8단계. left join 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: pd.merge(orders, customers, on='customerId', how='left')
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. left join의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 8단계. left join 실행 결과가 행/열 수와 요약값 기준으로 바꾼 열 이름이나 행 값을 반영해야 합니다.
+- id: step9_right_join
+  title: 9단계. right join
+  structuredPrimary: true
+  subtitle: 오른쪽 데이터 모두 유지
+  goal: 9단계. right join에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: how='right'는 오른쪽 DataFrame의 모든 행을 유지합니다. 왼쪽에 매칭되는 키가 없으면 NaN으로 채웁니다. 이 경우 모든 고객을 유지하면서
+    주문 정보를 붙이므로, 주문이 없는 고객도 결과에 포함됩니다. left join의 반대 개념입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: pd.merge(orders, customers, on='customerId', how='right')
+  exercise:
+    prompt: 9단계. right join 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: pd.merge(orders, customers, on='customerId', how='right')
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. right join의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 9단계. right join 실행 결과가 행/열 수와 요약값 기준으로 바꾼 열 이름이나 행 값을 반영해야 합니다.
+- id: step10_outer_join
+  title: 10단계. outer join
+  structuredPrimary: true
+  subtitle: 양쪽 모두 유지
+  goal: 10단계. outer join에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: how='outer'는 양쪽 DataFrame의 모든 행을 유지합니다. 주문이 있지만 고객 정보가 없는 경우(customerId=5), 고객 정보는 있지만
+    주문이 없는 경우(customerId=4) 모두 결과에 포함됩니다. 데이터 검증이나 불일치 찾기에 유용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: pd.merge(orders, customers, on='customerId', how='outer')
+  exercise:
+    prompt: 10단계. outer join 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: pd.merge(orders, customers, on='customerId', how='outer')
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. outer join의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 10단계. outer join 실행 결과가 행/열 수와 요약값 기준으로 바꾼 열 이름이나 행 값을 반영해야 합니다.
+- id: step11_diff_keys
+  title: 11단계. 다른 키 이름
+  structuredPrimary: true
+  subtitle: left_on, right_on
+  goal: 11단계. 다른 키 이름에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 실무에서는 두 테이블의 키 컬럼 이름이 다른 경우가 많습니다. 예를 들어 한 테이블은 customerId, 다른 테이블은 custId를 사용할 수 있습니다.
+    이때 left_on과 right_on으로 각각의 키 컬럼을 지정합니다. 병합 후 두 컬럼이 모두 남으므로 필요시 drop()으로 정리합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    diffCust = customers.rename(columns={'customerId': 'custId'})
+    pd.merge(orders, diffCust, left_on='customerId', right_on='custId')
+  exercise:
+    prompt: 11단계. 다른 키 이름 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      diffCust = customers.rename(columns={'customerId': 'custId'})
+      pd.merge(orders, diffCust, left_on='customerId', right_on='custId')
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 다른 키 이름의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 11단계. 다른 키 이름의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step12_multi_keys
+  title: 12단계. 여러 키로 병합
+  structuredPrimary: true
+  subtitle: 복수 컬럼 매칭
+  goal: 12단계. 여러 키로 병합에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 하나의 컬럼만으로 고유하게 식별할 수 없을 때 여러 컬럼을 키로 사용합니다. 예를 들어 연도와 월의 조합으로 월별 실적과 목표를 매칭합니다. on 파라미터에
+    리스트로 여러 컬럼을 전달하면 모든 컬럼이 일치하는 경우에만 병합됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    sales = pd.DataFrame({'year': [2023, 2023, 2024], 'month': [1, 2, 1], 'sales': [100, 150, 120]})
+    targets = pd.DataFrame({'year': [2023, 2023, 2024], 'month': [1, 2, 1], 'target': [90, 140, 130]})
+
+    pd.merge(sales, targets, on=['year', 'month'])
+  exercise:
+    prompt: 12단계. 여러 키로 병합 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      sales = pd.DataFrame({'year': [2023, 2023, 2024], 'month': [1, 2, 1], 'sales': [100, 150, 120]})
+      targets = pd.DataFrame({'year': [2023, 2023, 2024], 'month': [1, 2, 1], 'target': [90, 140, 130]})
+
+      pd.merge(sales, targets, on=['year', 'month'])
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 12단계. 여러 키로 병합의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 12단계. 여러 키로 병합의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 주문과 고객 테이블 안전하게 병합하기'
+  structuredPrimary: true
+  subtitle: merge, validate, indicator, 실패 케이스
+  goal: '현업 흐름 검증: 주문과 고객 테이블 안전하게 병합하기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    데이터 병합은 행 수가 늘거나 줄어도 겉으로는 성공처럼 보입니다. 키 중복, 미매칭 행, 병합 후 합계 보존을 반드시 검증하세요.
+
+    변주 실험
+    left join에서 \`_merge == left_only\`가 있는 주문을 별도 오류 리포트로 분리하고, 누락 고객 수를 assert로 고정하세요.
+  tips:
+  - 변주 실험 left join에서 \`_merge == left_only\`가 있는 주문을 별도 오류 리포트로 분리하고, 누락 고객 수를 assert로 고정하세요.
+  snippet: |-
+    import pandas as pd
+
+    orders = pd.DataFrame({
+        "orderId": ["O-1", "O-2"],
+        "customerId": [1, 2],
+        "amount": [12000, 8000],
+    })
+    customers = pd.DataFrame({
+        "customerId": [1, 2],
+        "segment": ["vip", "standard"],
+    })
+
+    merged = orders.merge(customers, on="customerId", how="left", validate="many_to_one", indicator=True)
+    if not merged["_merge"].eq("both").all():
+        raise ValueError("all orders must match a customer")
+
+    assert len(merged) == len(orders)
+    assert merged["_merge"].eq("both").all()
+    assert merged["amount"].sum() == orders["amount"].sum()
+    assert merged.loc[merged["orderId"] == "O-1", "segment"].iloc[0] == "vip"
+  exercise:
+    prompt: '현업 흐름 검증: 주문과 고객 테이블 안전하게 병합하기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.'
+    starterCode: |-
+      import pandas as pd
+
+      orders = pd.DataFrame({
+          "orderId": ["O-1", "O-2"],
+          "customerId": [1, 2],
+          "amount": [12000, 8000],
+      })
+      customers = pd.DataFrame({
+          "customerId": [1, 2],
+          "segment": ["vip", "standard"],
+      })
+
+      merged = orders.merge(customers, on="customerId", how="left", validate="many_to_one", indicator=True)
+      if not merged["_merge"].eq("both").all():
+          raise ValueError("all orders must match a customer")
+
+      assert len(merged) == len(orders)
+      assert merged["_merge"].eq("both").all()
+      assert merged["amount"].sum() == orders["amount"].sum()
+      assert merged.loc[merged["orderId"] == "O-1", "segment"].iloc[0] == "vip"
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 주문과 고객 테이블 안전하게 병합하기의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문과 고객 테이블 안전하게 병합하기 분기 결과가 바꾼 조건값에 맞게 달라져야 합니다.'
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 데이터 병합 프로젝트
+  goal: 실습에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    배운 내용으로 데이터를 병합해봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import pandas as pd
+    data = pd.DataFrame({
+        'customerId': [1, 2, 3, 4],
+        'name': ['김철수', '이영희', '박민수', '최지은'],
+        'grade': ['VIP', '일반', 'VIP', '일반']
+    })
+    dataOrders = pd.DataFrame({
+        'orderId': [101, 102, 103, 104, 105],
+        'customerId': [1, 2, 1, 3, 5],
+        'productId': ['A', 'B', 'A', 'C', 'B'],
+        'quantity': [2, 1, 3, 1, 2]
+    })
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      data = pd.DataFrame({
+          'customerId': [1, 2, 3, 4],
+          'name': ['김철수', '이영희', '박민수', '최지은'],
+          'grade': ['VIP', '일반', 'VIP', '일반']
+      })
+      dataOrders = pd.DataFrame({
+          'orderId': [101, 102, 103, 104, 105],
+          'customerId': [1, 2, 1, 3, 5],
+          'productId': ['A', 'B', 'A', 'C', 'B'],
+          'quantity': [2, 1, 3, 1, 2]
+      })
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 데이터 병합을 배웠습니다.
+  - type: list
+    items:
+    - concat() - 같은 구조의 데이터를 단순 연결
+    - merge() - 키 기준으로 데이터 병합
+    - how='left' - 왼쪽 데이터 모두 유지
+    - how='outer' - 양쪽 데이터 모두 유지
+    - on, left_on, right_on - 병합 키 지정
+  - type: text
+    content: 다음 시간에는 지금까지 배운 모든 것을 활용하는 실전 프로젝트입니다.
+  goal: 정리에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pandas_09-left-join-records-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_customers
+    - summary
+    title: 두 레코드 표를 key로 left join하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 왼쪽 행을 모두 보존하고 오른쪽 열을 결합하며 중복 key를 명시적으로 거절한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - left join은 왼쪽 행 수를 기본적으로 보존합니다.
+    - many-to-one 계약이면 오른쪽 중복 key를 결합 전에 검사하세요.
+    exercise:
+      prompt: left_join_records(left, right, key, right_fields)를 완성하세요.
+      starterCode: |-
+        def left_join_records(left, right, key, right_fields):
+            raise NotImplementedError
+      solution: |
+        def left_join_records(left, right, key, right_fields):
+            index = {}
+            for row in right:
+                value = row[key]
+                if value in index:
+                    raise ValueError("duplicate right key")
+                index[value] = row
+            result = []
+            for row in left:
+                merged = dict(row)
+                match = index.get(row[key], {})
+                for field in right_fields:
+                    merged[field] = match.get(field)
+                result.append(merged)
+            return result
+      hints: *id001
+    check:
+      id: python.pandas.pandas_09.left-join-records.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_09.left-join-records.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: left_join_records
+        cases:
+        - id: preserves-unmatched-left-row
+          arguments:
+          - value:
+            - id: 1
+              amount: 10
+            - id: 2
+              amount: 20
+          - value:
+            - id: 1
+              owner: Mina
+          - value: id
+          - value:
+            - owner
+          expectedReturn:
+          - id: 1
+            amount: 10
+            owner: Mina
+          - id: 2
+            amount: 20
+            owner: null
+        - id: handles-empty-right
+          arguments:
+          - value:
+            - id: 1
+          - value: []
+          - value: id
+          - value:
+            - label
+          expectedReturn:
+          - id: 1
+            label: null
+        - id: rejects-duplicate-right-key
+          arguments:
+          - value:
+            - id: 1
+          - value:
+            - id: 1
+            - id: 1
+          - value: id
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pandas_09-join-key-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_09-left-join-records-mastery
+    title: 새 고객·주문 표의 join 전 key 품질 감사하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 결합 전에 양쪽 중복 key와 매칭되지 않는 key를 계산해 위험을 드러낸다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - join 결과를 보기 전에 각 표의 key 빈도를 세세요.
+    - unmatchedLeft와 unmatchedRight는 서로 다른 데이터 품질 문제입니다.
+    exercise:
+      prompt: audit_join_keys(left, right, key)를 완성해 duplicateLeft, duplicateRight, unmatchedLeft, unmatchedRight를 반환하세요.
+      starterCode: |-
+        def audit_join_keys(left, right, key):
+            raise NotImplementedError
+      solution: |
+        def audit_join_keys(left, right, key):
+            def counts(rows):
+                result = {}
+                for row in rows:
+                    result[row[key]] = result.get(row[key], 0) + 1
+                return result
+            left_counts = counts(left)
+            right_counts = counts(right)
+            left_keys = set(left_counts)
+            right_keys = set(right_counts)
+            return {
+                "duplicateLeft": sorted(value for value, count in left_counts.items() if count > 1),
+                "duplicateRight": sorted(value for value, count in right_counts.items() if count > 1),
+                "unmatchedLeft": sorted(left_keys - right_keys),
+                "unmatchedRight": sorted(right_keys - left_keys),
+            }
+      hints: *id002
+    check:
+      id: python.pandas.pandas_09.join-key-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_09.join-key-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_join_keys
+        cases:
+        - id: finds-duplicates-and-unmatched
+          arguments:
+          - value:
+            - id: 1
+            - id: 1
+            - id: 2
+          - value:
+            - id: 1
+            - id: 3
+            - id: 3
+          - value: id
+          expectedReturn:
+            duplicateLeft:
+            - 1
+            duplicateRight:
+            - 3
+            unmatchedLeft:
+            - 2
+            unmatchedRight:
+            - 3
+        - id: reports-clean-keys
+          arguments:
+          - value:
+            - id: A
+          - value:
+            - id: A
+          - value: id
+          expectedReturn:
+            duplicateLeft: []
+            duplicateRight: []
+            unmatchedLeft: []
+            unmatchedRight: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pandas_09-join-type-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_09-join-key-audit-transfer
+    title: 보존해야 할 행에 맞는 join 종류 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 분석 질문별 join type, 보존 집합, 확인할 위험을 선택한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 어느 표의 행을 반드시 보존해야 하는지 먼저 문장으로 쓰세요.
+    - join 뒤 행 수 증가는 중복 key의 신호일 수 있습니다.
+    exercise:
+      prompt: choose_join_type(goal)를 완성해 join, preserves, audit를 반환하세요.
+      starterCode: |-
+        def choose_join_type(goal):
+            raise NotImplementedError
+      solution: |
+        def choose_join_type(goal):
+            table = {
+                "only-matched-orders": {"join": "inner", "preserves": "matched keys", "audit": "dropped unmatched rows"},
+                "all-customers-even-without-orders": {"join": "left", "preserves": "all customer rows", "audit": "null order fields"},
+                "all-keys-from-both-sides": {"join": "outer", "preserves": "union of keys", "audit": "left-only and right-only rows"},
+            }
+            if goal not in table:
+                raise ValueError("unknown join goal")
+            return table[goal]
+      hints: *id003
+    check:
+      id: python.pandas.pandas_09.join-type-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_09.join-type-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_join_type
+        cases:
+        - id: recalls-left-join
+          arguments:
+          - value: all-customers-even-without-orders
+          expectedReturn:
+            join: left
+            preserves: all customer rows
+            audit: null order fields
+        - id: recalls-outer-audit
+          arguments:
+          - value: all-keys-from-both-sides
+          expectedReturn:
+            join: outer
+            preserves: union of keys
+            audit: left-only and right-only rows
+        - id: rejects-unclear-goal
+          arguments:
+          - value: merge-everything
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

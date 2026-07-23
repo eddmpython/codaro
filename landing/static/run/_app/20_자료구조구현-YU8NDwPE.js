@@ -1,0 +1,1146 @@
+var e=`meta:
+  id: '20'
+  title: 자료구조 구현
+  day: 20
+  category: advancedPython
+  tags:
+  - stack
+  - queue
+  - linkedlist
+  - tree
+  - heap
+  - hashtable
+  - 검증
+  - 자료구조선택
+  seo:
+    title: 파이썬 자료구조 구현 - 스택, 큐, 연결 리스트, 트리, 힙
+    description: 핵심 자료구조를 직접 구현하여 내부 동작을 이해합니다. 스택, 큐, 연결 리스트, 이진 트리, 힙, 해시 테이블을 직접 만들어봅니다.
+    keywords:
+    - 자료구조
+    - 스택
+    - 큐
+    - 연결 리스트
+    - 이진 트리
+    - 힙
+    - 해시 테이블
+intro:
+  emoji: 🏗️
+  points:
+  - '스택과 큐 구현: LIFO/FIFO 구조'
+  - '연결 리스트: 단일/이중 연결'
+  - 이진 트리와 BST 구현
+  - 힙과 해시 테이블 구현
+  direction: 자료구조 구현에서 재사용 가능한 함수형/객체형 설계 조각을 만들고 동작을 검증합니다.
+  benefits:
+  - 작은 함수와 상태 확인 후 추상화 패턴에 맞는 코드 입력을 고릅니다.
+  - 자료구조 구현 결과를 호출 결과와 예외 경계 기준으로 즉시 점검합니다.
+  - 완료한 코드를 라이브러리성 유틸리티에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 스택 구현 입력 확인
+      detail: 입력 기준(작은 함수와 상태)과 필요한 조건을 먼저 고정합니다.
+    - label: 큐 구현 처리 실행
+      detail: 추상화 패턴 코드를 실행해 중간 결과를 확인합니다.
+    - label: 연결 리스트 결과 검증
+      detail: 호출 결과와 예외 경계 기준으로 실행 결과를 비교합니다.
+    - label: 자료구조 구현 재사용
+      detail: 완성 코드를 라이브러리성 유틸리티에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 고급 설계 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 자료구조 구현 실행
+      detail: 셀을 실행해 호출 결과와 예외 경계와 예외 상태를 확인합니다.
+    - label: 자료구조 구현 완료
+      detail: 검증된 코드를 라이브러리성 유틸리티로 남깁니다.
+sections:
+- id: stack
+  title: 스택 구현
+  structuredPrimary: true
+  subtitle: LIFO 구조
+  goal: 스택 구현에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    스택은 후입선출(LIFO) 구조입니다. push로 삽입하고 pop으로 제거합니다. 함수 호출 스택, 괄호 검사, Undo 기능 등에 사용됩니다. O(1) 시간에 삽입/삭제가 가능합니다.
+
+    MinStack은 보조 스택을 사용해 최소값을 추적합니다.
+  snippet: |-
+    class Stack:
+        def __init__(self):
+            self.items = []
+
+        def push(self, item):
+            self.items.append(item)
+
+        def pop(self):
+            if not self.isEmpty():
+                return self.items.pop()
+            return None
+
+        def peek(self):
+            if not self.isEmpty():
+                return self.items[-1]
+            return None
+
+        def isEmpty(self):
+            return len(self.items) == 0
+
+        def size(self):
+            return len(self.items)
+
+    stk = Stack()
+    stk.push(10)
+    stk.push(20)
+    stk.push(30)
+    stkPeek = stk.peek()
+    stkPop = stk.pop()
+    stkSize = stk.size()
+    (stkPeek, stkPop, stkSize)
+  exercise:
+    prompt: 스택 구현 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      class Stack:
+          def __init__(self):
+              self.items = []
+
+          def push(self, item):
+              self.items.append(item)
+
+          def pop(self):
+              if not self.isEmpty():
+                  return self.items.pop()
+              return None
+
+          def peek(self):
+              if not self.isEmpty():
+                  return self.items[-1]
+              return None
+
+          def isEmpty(self):
+              return len(self.items) == 0
+
+          def size(self):
+              return len(self.items)
+
+      stk = Stack()
+      stk.push(10)
+      stk.push(20)
+      stk.push(30)
+      stkPeek = stk.peek()
+      stkPop = stk.pop()
+      stkSize = stk.size()
+      (stkPeek, stkPop, stkSize)
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 스택 구현의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 스택 구현 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: queue
+  title: 큐 구현
+  structuredPrimary: true
+  subtitle: FIFO 구조
+  goal: 큐 구현에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    큐는 선입선출(FIFO) 구조입니다. enqueue로 삽입하고 dequeue로 제거합니다. BFS, 작업 스케줄링, 버퍼 등에 사용됩니다. 덱(Deque)은 양쪽 끝에서 삽입/삭제가 가능합니다.
+
+    collections.deque는 O(1) 양방향 연산을 제공합니다.
+  snippet: |-
+    class Queue:
+        def __init__(self):
+            self.items = []
+
+        def enqueue(self, item):
+            self.items.append(item)
+
+        def dequeue(self):
+            if not self.isEmpty():
+                return self.items.pop(0)
+            return None
+
+        def front(self):
+            if not self.isEmpty():
+                return self.items[0]
+            return None
+
+        def isEmpty(self):
+            return len(self.items) == 0
+
+        def size(self):
+            return len(self.items)
+
+    que = Queue()
+    que.enqueue('A')
+    que.enqueue('B')
+    que.enqueue('C')
+    queFront = que.front()
+    queDeq = que.dequeue()
+    queSize = que.size()
+    (queFront, queDeq, queSize)
+  exercise:
+    prompt: 큐 구현 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      class Queue:
+          def __init__(self):
+              self.items = []
+
+          def enqueue(self, item):
+              self.items.append(item)
+
+          def dequeue(self):
+              if not self.isEmpty():
+                  return self.items.pop(0)
+              return None
+
+          def front(self):
+              if not self.isEmpty():
+                  return self.items[0]
+              return None
+
+          def isEmpty(self):
+              return len(self.items) == 0
+
+          def size(self):
+              return len(self.items)
+
+      que = Queue()
+      que.enqueue('A')
+      que.enqueue('B')
+      que.enqueue('C')
+      queFront = que.front()
+      queDeq = que.dequeue()
+      queSize = que.size()
+      (queFront, queDeq, queSize)
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 큐 구현의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 큐 구현 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: linkedlist
+  title: 연결 리스트
+  structuredPrimary: true
+  subtitle: 노드 기반 구조
+  goal: 연결 리스트에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    연결 리스트는 노드들이 포인터로 연결된 구조입니다. 삽입/삭제가 O(1)이지만 탐색은 O(n)입니다. 단일 연결 리스트는 다음 노드만, 이중 연결 리스트는 이전/다음 노드를 모두 참조합니다.
+
+    이중 연결 리스트는 LRU 캐시 구현에 자주 사용됩니다.
+  snippet: |-
+    class ListNode:
+        def __init__(self, val):
+            self.val = val
+            self.next = None
+
+    class LinkedList:
+        def __init__(self):
+            self.head = None
+
+        def append(self, val):
+            newNode = ListNode(val)
+            if not self.head:
+                self.head = newNode
+                return
+            curr = self.head
+            while curr.next:
+                curr = curr.next
+            curr.next = newNode
+
+        def prepend(self, val):
+            newNode = ListNode(val)
+            newNode.next = self.head
+            self.head = newNode
+
+        def delete(self, val):
+            if not self.head:
+                return
+            if self.head.val == val:
+                self.head = self.head.next
+                return
+            curr = self.head
+            while curr.next and curr.next.val != val:
+                curr = curr.next
+            if curr.next:
+                curr.next = curr.next.next
+
+        def toList(self):
+            result = []
+            curr = self.head
+            while curr:
+                result.append(curr.val)
+                curr = curr.next
+            return result
+
+    llist = LinkedList()
+    llist.append(1)
+    llist.append(2)
+    llist.append(3)
+    llist.prepend(0)
+    llist.delete(2)
+    llistResult = llist.toList()
+    llistResult
+  exercise:
+    prompt: 연결 리스트 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      class ListNode:
+          def __init__(self, val):
+              self.val = val
+              self.next = None
+
+      class LinkedList:
+          def __init__(self):
+              self.head = None
+
+          def append(self, val):
+              newNode = ListNode(val)
+              if not self.head:
+                  self.head = newNode
+                  return
+              curr = self.head
+              while curr.next:
+                  curr = curr.next
+              curr.next = newNode
+
+          def prepend(self, val):
+              newNode = ListNode(val)
+              newNode.next = self.head
+              self.head = newNode
+
+          def delete(self, val):
+              if not self.head:
+                  return
+              if self.head.val == val:
+                  self.head = self.head.next
+                  return
+              curr = self.head
+              while curr.next and curr.next.val != val:
+                  curr = curr.next
+              if curr.next:
+                  curr.next = curr.next.next
+
+          def toList(self):
+              result = []
+              curr = self.head
+              while curr:
+                  result.append(curr.val)
+                  curr = curr.next
+              return result
+
+      llist = LinkedList()
+      llist.append(1)
+      llist.append(2)
+      llist.append(3)
+      llist.prepend(0)
+      llist.delete(2)
+      llistResult = llist.toList()
+      llistResult
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 연결 리스트의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 연결 리스트 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: binarytree
+  title: 이진 트리
+  structuredPrimary: true
+  subtitle: 트리 구조의 기본
+  goal: 이진 트리에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    이진 트리는 각 노드가 최대 2개의 자식을 가지는 구조입니다. 전위/중위/후위 순회로 트리를 탐색합니다. 이진 탐색 트리(BST)는 왼쪽 < 부모 < 오른쪽 규칙을 따릅니다. BST에서 탐색/삽입은 평균 O(log n)입니다.
+
+    BST의 중위 순회는 정렬된 순서로 값을 반환합니다.
+  snippet: |-
+    class TreeNode:
+        def __init__(self, val):
+            self.val = val
+            self.left = None
+            self.right = None
+
+    class BinaryTree:
+        def __init__(self):
+            self.root = None
+
+        def inorder(self, node, result):
+            if node:
+                self.inorder(node.left, result)
+                result.append(node.val)
+                self.inorder(node.right, result)
+            return result
+
+        def preorder(self, node, result):
+            if node:
+                result.append(node.val)
+                self.preorder(node.left, result)
+                self.preorder(node.right, result)
+            return result
+
+        def postorder(self, node, result):
+            if node:
+                self.postorder(node.left, result)
+                self.postorder(node.right, result)
+                result.append(node.val)
+            return result
+
+    btree = BinaryTree()
+    btree.root = TreeNode(1)
+    btree.root.left = TreeNode(2)
+    btree.root.right = TreeNode(3)
+    btree.root.left.left = TreeNode(4)
+    btree.root.left.right = TreeNode(5)
+    btInorder = btree.inorder(btree.root, [])
+    btPreorder = btree.preorder(btree.root, [])
+    btPostorder = btree.postorder(btree.root, [])
+    (btInorder, btPreorder, btPostorder)
+  exercise:
+    prompt: 이진 트리 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      class TreeNode:
+          def __init__(self, val):
+              self.val = val
+              self.left = None
+              self.right = None
+
+      class BinaryTree:
+          def __init__(self):
+              self.root = None
+
+          def inorder(self, node, result):
+              if node:
+                  self.inorder(node.left, result)
+                  result.append(node.val)
+                  self.inorder(node.right, result)
+              return result
+
+          def preorder(self, node, result):
+              if node:
+                  result.append(node.val)
+                  self.preorder(node.left, result)
+                  self.preorder(node.right, result)
+              return result
+
+          def postorder(self, node, result):
+              if node:
+                  self.postorder(node.left, result)
+                  self.postorder(node.right, result)
+                  result.append(node.val)
+              return result
+
+      btree = BinaryTree()
+      btree.root = TreeNode(1)
+      btree.root.left = TreeNode(2)
+      btree.root.right = TreeNode(3)
+      btree.root.left.left = TreeNode(4)
+      btree.root.left.right = TreeNode(5)
+      btInorder = btree.inorder(btree.root, [])
+      btPreorder = btree.preorder(btree.root, [])
+      btPostorder = btree.postorder(btree.root, [])
+      (btInorder, btPreorder, btPostorder)
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 이진 트리의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 이진 트리 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: heap
+  title: 힙 구현
+  structuredPrimary: true
+  subtitle: 우선순위 기반 구조
+  goal: 힙 구현에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    힙은 완전 이진 트리 기반의 우선순위 구조입니다. 최소 힙은 부모가 자식보다 작고, 최대 힙은 부모가 자식보다 큽니다. 삽입과 삭제는 O(log n), 최솟값/최댓값 조회는 O(1)입니다. 우선순위 큐, 힙 정렬에 사용됩니다.
+
+    파이썬 heapq 모듈은 최소 힙을 제공합니다. 최대 힙은 값을 음수로 변환하여 사용합니다.
+  snippet: |-
+    class MinHeap:
+        def __init__(self):
+            self.heap = []
+
+        def parent(self, i):
+            return (i - 1) // 2
+
+        def leftChild(self, i):
+            return 2 * i + 1
+
+        def rightChild(self, i):
+            return 2 * i + 2
+
+        def swap(self, i, j):
+            self.heap[i], self.heap[j] = self.heap[j], self.heap[i]
+
+        def insert(self, val):
+            self.heap.append(val)
+            self._heapifyUp(len(self.heap) - 1)
+
+        def _heapifyUp(self, i):
+            while i > 0 and self.heap[self.parent(i)] > self.heap[i]:
+                self.swap(i, self.parent(i))
+                i = self.parent(i)
+
+        def extractMin(self):
+            if not self.heap:
+                return None
+            if len(self.heap) == 1:
+                return self.heap.pop()
+            minVal = self.heap[0]
+            self.heap[0] = self.heap.pop()
+            self._heapifyDown(0)
+            return minVal
+
+        def _heapifyDown(self, i):
+            smallest = i
+            left = self.leftChild(i)
+            right = self.rightChild(i)
+            if left < len(self.heap) and self.heap[left] < self.heap[smallest]:
+                smallest = left
+            if right < len(self.heap) and self.heap[right] < self.heap[smallest]:
+                smallest = right
+            if smallest != i:
+                self.swap(i, smallest)
+                self._heapifyDown(smallest)
+
+        def peek(self):
+            return self.heap[0] if self.heap else None
+
+    minHeap = MinHeap()
+    for val in [5, 3, 8, 1, 2, 9]:
+        minHeap.insert(val)
+    heapMin = minHeap.peek()
+    heapExtract = minHeap.extractMin()
+    heapMinAfter = minHeap.peek()
+    (heapMin, heapExtract, heapMinAfter)
+  exercise:
+    prompt: 힙 구현 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      class MinHeap:
+          def __init__(self):
+              self.heap = []
+
+          def parent(self, i):
+              return (i - 1) // 2
+
+          def leftChild(self, i):
+              return 2 * i + 1
+
+          def rightChild(self, i):
+              return 2 * i + 2
+
+          def swap(self, i, j):
+              self.heap[i], self.heap[j] = self.heap[j], self.heap[i]
+
+          def insert(self, val):
+              self.heap.append(val)
+              self._heapifyUp(len(self.heap) - 1)
+
+          def _heapifyUp(self, i):
+              while i > 0 and self.heap[self.parent(i)] > self.heap[i]:
+                  self.swap(i, self.parent(i))
+                  i = self.parent(i)
+
+          def extractMin(self):
+              if not self.heap:
+                  return None
+              if len(self.heap) == 1:
+                  return self.heap.pop()
+              minVal = self.heap[0]
+              self.heap[0] = self.heap.pop()
+              self._heapifyDown(0)
+              return minVal
+
+          def _heapifyDown(self, i):
+              smallest = i
+              left = self.leftChild(i)
+              right = self.rightChild(i)
+              if left < len(self.heap) and self.heap[left] < self.heap[smallest]:
+                  smallest = left
+              if right < len(self.heap) and self.heap[right] < self.heap[smallest]:
+                  smallest = right
+              if smallest != i:
+                  self.swap(i, smallest)
+                  self._heapifyDown(smallest)
+
+          def peek(self):
+              return self.heap[0] if self.heap else None
+
+      minHeap = MinHeap()
+      for val in [5, 3, 8, 1, 2, 9]:
+          minHeap.insert(val)
+      heapMin = minHeap.peek()
+      heapExtract = minHeap.extractMin()
+      heapMinAfter = minHeap.peek()
+      (heapMin, heapExtract, heapMinAfter)
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 힙 구현의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 힙 구현 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: hashtable
+  title: 해시 테이블
+  structuredPrimary: true
+  subtitle: 키-값 저장소
+  goal: 해시 테이블에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    해시 테이블은 키를 해시 함수로 변환하여 값을 저장합니다. 평균 O(1) 시간에 조회/삽입/삭제가 가능합니다. 충돌은 체이닝 또는 개방 주소법으로 해결합니다. LRU 캐시는 해시 테이블과 연결 리스트를 조합합니다.
+
+    functools.lru_cache 데코레이터로 함수 결과를 캐싱할 수 있습니다.
+  snippet: |-
+    class HashTable:
+        def __init__(self, size=10):
+            self.size = size
+            self.buckets = [[] for _ in range(size)]
+
+        def _hash(self, key):
+            return hash(key) % self.size
+
+        def put(self, key, value):
+            idx = self._hash(key)
+            for i, (k, v) in enumerate(self.buckets[idx]):
+                if k == key:
+                    self.buckets[idx][i] = (key, value)
+                    return
+            self.buckets[idx].append((key, value))
+
+        def get(self, key):
+            idx = self._hash(key)
+            for k, v in self.buckets[idx]:
+                if k == key:
+                    return v
+            return None
+
+        def remove(self, key):
+            idx = self._hash(key)
+            for i, (k, v) in enumerate(self.buckets[idx]):
+                if k == key:
+                    del self.buckets[idx][i]
+                    return True
+            return False
+
+    htable = HashTable()
+    htable.put("name", "Alice")
+    htable.put("age", 30)
+    htable.put("city", "Seoul")
+    htGet1 = htable.get("name")
+    htGet2 = htable.get("age")
+    htable.remove("age")
+    htGet3 = htable.get("age")
+    (htGet1, htGet2, htGet3)
+  exercise:
+    prompt: 해시 테이블 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      class HashTable:
+          def __init__(self, size=10):
+              self.size = size
+              self.buckets = [[] for _ in range(size)]
+
+          def _hash(self, key):
+              return hash(key) % self.size
+
+          def put(self, key, value):
+              idx = self._hash(key)
+              for i, (k, v) in enumerate(self.buckets[idx]):
+                  if k == key:
+                      self.buckets[idx][i] = (key, value)
+                      return
+              self.buckets[idx].append((key, value))
+
+          def get(self, key):
+              idx = self._hash(key)
+              for k, v in self.buckets[idx]:
+                  if k == key:
+                      return v
+              return None
+
+          def remove(self, key):
+              idx = self._hash(key)
+              for i, (k, v) in enumerate(self.buckets[idx]):
+                  if k == key:
+                      del self.buckets[idx][i]
+                      return True
+              return False
+
+      htable = HashTable()
+      htable.put("name", "Alice")
+      htable.put("age", 30)
+      htable.put("city", "Seoul")
+      htGet1 = htable.get("name")
+      htGet2 = htable.get("age")
+      htable.remove("age")
+      htGet3 = htable.get("age")
+      (htGet1, htGet2, htGet3)
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 해시 테이블의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 해시 테이블 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: workflow_validation
+  title: 실무 자료구조 선택 루프
+  structuredPrimary: true
+  subtitle: 예측 → 구현 → 오류 확인 → 검증
+  goal: 실무 자료구조 선택 루프에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    자료구조는 구현 시험 문제가 아니라 업무 흐름의 병목을 줄이는 선택입니다. 티켓 처리처럼 순서, 우선순위, 되돌리기가 섞인 문제에서는 큐, 힙, 스택을 각각 어디에 써야 하는지 먼저 예측하고, 작은 데이터로 검증한 뒤 수정 실험을 해야 합니다.
+
+    자료구조 선택은 코드 모양보다 처리 순서와 실패 조건을 검증하는 문제입니다. 작은 입력으로 예측과 검증을 통과한 뒤 데이터 크기를 키우세요.
+  snippet: |-
+    class TicketQueue:
+        def __init__(self):
+            self.items = []
+
+        def enqueue(self, ticket):
+            self.items.append(ticket)
+
+        def dequeue(self):
+            if not self.items:
+                raise IndexError("empty ticket queue")
+            return self.items.pop(0)
+
+        def size(self):
+            return len(self.items)
+
+    tickets = [
+        {"id": "T-101", "priority": 3, "title": "결제 실패"},
+        {"id": "T-102", "priority": 1, "title": "비밀번호 초기화"},
+        {"id": "T-103", "priority": 2, "title": "리포트 지연"},
+    ]
+
+    ticketQueue = TicketQueue()
+    for ticket in tickets:
+        ticketQueue.enqueue(ticket)
+
+    firstTicket = ticketQueue.dequeue()
+    secondTicket = ticketQueue.dequeue()
+    assert (firstTicket["id"], secondTicket["id"], ticketQueue.size()) == ("T-101", "T-102", 1)
+  exercise:
+    prompt: 실무 자료구조 선택 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      class TicketQueue:
+          def __init__(self):
+              self.items = []
+
+          def enqueue(self, ticket):
+              self.items.append(ticket)
+
+          def dequeue(self):
+              if not self.items:
+                  raise IndexError("empty ticket queue")
+              return self.items.pop(0)
+
+          def size(self):
+              return len(self.items)
+
+      tickets = [
+          {"id": "T-101", "priority": 3, "title": "결제 실패"},
+          {"id": "T-102", "priority": 1, "title": "비밀번호 초기화"},
+          {"id": "T-103", "priority": 2, "title": "리포트 지연"},
+      ]
+
+      ticketQueue = TicketQueue()
+      for ticket in tickets:
+          ticketQueue.enqueue(ticket)
+
+      firstTicket = ticketQueue.dequeue()
+      secondTicket = ticketQueue.dequeue()
+      assert (firstTicket["id"], secondTicket["id"], ticketQueue.size()) == ("T-101", "T-102", 1)
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 실무 자료구조 선택 루프의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 실무 자료구조 선택 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: practice
+  title: 종합 복습
+  structuredPrimary: true
+  subtitle: 자료구조 마스터하기
+  goal: 종합 복습에서 추상화 패턴 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: Day 20에서 배운 자료구조를 난이도별로 복습합니다. 자료구조는 데이터를 효율적으로 저장하고 접근하기 위한 구조로, 알고리즘 성능의 핵심 요소입니다. 스택(LIFO),
+    큐(FIFO), 힙(우선순위), 트리(계층), 그래프(관계)는 각각 다른 문제 유형에 최적화되어 있습니다. 🟢 기본 문제로 스택과 큐를 구현하고 괄호 검사, BFS 등에 적용해보세요.
+    🟡 응용 문제로 힙 정렬, 이진 탐색 트리를 연습하세요. 🔴 심화 문제에서는 트라이, 그래프 알고리즘 등 고급 자료구조를 다룹니다. 적절한 자료구조 선택이 알고리즘 효율성을 결정하므로
+    각 자료구조의 시간복잡도를 숙지하세요.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class ParenStack:
+        def __init__(self):
+            self.items = []
+
+        def push(self, item):
+            self.items.append(item)
+
+        def pop(self):
+            return self.items.pop() if self.items else None
+
+        def isEmpty(self):
+            return len(self.items) == 0
+
+    def isValidParens(s):
+        pstack = ParenStack()
+        pairs = {')': '(', '}': '{', ']': '['}
+        for ch in s:
+            if ch in '({[':
+                pstack.push(ch)
+            elif ch in ')}]':
+                if pstack.pop() != pairs[ch]:
+                    return False
+        return pstack.isEmpty()
+
+    ex1Result = isValidParens("({[]})")
+    ex1Result
+  exercise:
+    prompt: 종합 복습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      class ParenStack:
+          def __init__(self):
+              self.items = []
+
+          def push(self, item):
+              self.items.append(item)
+
+          def pop(self):
+              return self.items.pop() if self.items else None
+
+          def isEmpty(self):
+              return len(self.items) == 0
+
+      def isValidParens(s):
+          pstack = ParenStack()
+          pairs = {')': '(', '}': '{', ']': '['}
+          for ch in s:
+              if ch in '({[':
+                  pstack.push(ch)
+              elif ch in ')}]':
+                  if pstack.pop() != pairs[ch]:
+                      return False
+          return pstack.isEmpty()
+
+      ex1Result = isValidParens("({[]})")
+      ex1Result
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 20_data_structures-stack-events-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - stack
+    - queue
+    - hashtable
+    - workflow_validation
+    title: 스택 이벤트 로그 처리하기
+    subtitle: stack operation log
+    goal: process_stack_events(events)를 완성해 push, pop, peek 이벤트를 처리하고 출력 목록과 남은 스택을 반환한다.
+    why: 자료구조 구현은 class 모양을 외우는 일이 아니라, 어떤 연산이 어떤 순서를 보장하는지 입력 로그로 검증할 수 있어야 합니다.
+    explanation: push는 value를 쌓고, pop은 마지막 값을 꺼내 outputs에 넣습니다. peek는 꺼내지 않고 마지막 값을 outputs에 넣으며, 빈 스택 pop과 peek는 None을 출력합니다.
+    tips:
+    - 스택은 마지막에 들어온 값이 먼저 나가는 LIFO 구조입니다.
+    - 알 수 없는 action은 ValueError로 거부해야 로그 오류가 묻히지 않습니다.
+    exercise:
+      prompt: process_stack_events(events)를 완성해 remaining, outputs, size를 반환하세요.
+      starterCode: |-
+        def process_stack_events(events):
+            raise NotImplementedError
+      solution: |-
+        def process_stack_events(events):
+            stack = []
+            outputs = []
+            for event in events:
+                action = event["action"]
+                if action == "push":
+                    stack.append(event["value"])
+                elif action == "pop":
+                    outputs.append(stack.pop() if stack else None)
+                elif action == "peek":
+                    outputs.append(stack[-1] if stack else None)
+                else:
+                    raise ValueError("unknown stack action")
+            return {"remaining": stack, "outputs": outputs, "size": len(stack)}
+      hints:
+      - list.append와 list.pop은 스택 구현의 가장 단순한 기본 도구입니다.
+      - peek는 값을 확인만 하고 stack을 변경하지 않아야 합니다.
+    check:
+      id: python.advanced.data-structures.stack-events.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.data-structures.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: process_stack_events
+        cases:
+        - id: processes-push-peek-and-pop-in-lifo-order
+          arguments:
+          - value:
+            - action: push
+              value: A
+            - action: push
+              value: B
+            - action: peek
+            - action: pop
+            - action: pop
+            - action: pop
+          expectedReturn:
+            remaining: []
+            outputs:
+            - B
+            - B
+            - A
+            - null
+            size: 0
+        - id: rejects-unknown-stack-action
+          arguments:
+          - value:
+            - action: rotate
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 20_data_structures-round-robin-queue-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - queue
+    - linkedlist
+    - heap
+    title: 라운드로빈 작업 큐 실행하기
+    subtitle: queue scheduling transfer
+    goal: run_round_robin_queue(tasks, quantum)를 완성해 각 작업을 큐 순서로 조금씩 실행하고 완료 순서를 반환한다.
+    why: 큐는 단순히 append와 pop을 쓰는 문제가 아니라, 공정한 순서 처리와 재삽입 규칙을 코드로 설명할 때 학습 가치가 생깁니다.
+    explanation: 각 task는 id와 remaining을 가집니다. 매번 맨 앞 작업을 최대 quantum만큼 실행하고, 남은 시간이 있으면 뒤로 다시 넣으세요.
+    tips:
+    - queue의 앞에서 꺼내고 뒤에 넣는 순서를 유지해야 round robin이 됩니다.
+    - quantum이 0 이하이면 무한 루프가 될 수 있으므로 ValueError로 거부하세요.
+    exercise:
+      prompt: run_round_robin_queue(tasks, quantum)를 완성해 order, totalTicks, finished를 반환하세요.
+      starterCode: |-
+        def run_round_robin_queue(tasks, quantum):
+            raise NotImplementedError
+      solution: |-
+        def run_round_robin_queue(tasks, quantum):
+            if quantum <= 0:
+                raise ValueError("quantum must be positive")
+
+            queue = [{"id": task["id"], "remaining": task["remaining"]} for task in tasks]
+            order = []
+            finished = []
+            total_ticks = 0
+            while queue:
+                task = queue.pop(0)
+                run = min(quantum, task["remaining"])
+                task["remaining"] -= run
+                total_ticks += run
+                order.append({"id": task["id"], "run": run})
+                if task["remaining"] > 0:
+                    queue.append(task)
+                else:
+                    finished.append(task["id"])
+            return {
+                "order": [item["id"] for item in order],
+                "totalTicks": total_ticks,
+                "finished": finished,
+            }
+      hints:
+      - pop(0)은 큐의 맨 앞을 꺼내는 동작을 표현합니다.
+      - 남은 시간이 있는 작업만 다시 queue 뒤에 넣어야 합니다.
+    check:
+      id: python.advanced.data-structures.round-robin.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.data-structures.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: run_round_robin_queue
+        cases:
+        - id: rotates-unfinished-tasks-to-the-back
+          arguments:
+          - value:
+            - id: A
+              remaining: 5
+            - id: B
+              remaining: 2
+            - id: C
+              remaining: 3
+          - value: 2
+          expectedReturn:
+            order:
+            - A
+            - B
+            - C
+            - A
+            - C
+            - A
+            totalTicks: 10
+            finished:
+            - B
+            - C
+            - A
+        - id: rejects-zero-quantum
+          arguments:
+          - value: []
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 20_data_structures-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 20_data_structures-round-robin-queue-transfer
+    title: 자료구조 선택 기준 회상하기
+    subtitle: data structure recall
+    goal: choose_data_structure(need)를 완성해 요구사항별 자료구조와 대표 연산을 반환한다.
+    why: 자료구조 학습의 최고 가치는 구현 암기가 아니라, 작업 성격을 보고 순서, 우선순위, 계층, 조회 비용을 맞추는 선택 능력입니다.
+    explanation: undo-history, print-jobs, unique-lookup, top-k, hierarchy, frequent-middle-insert 목적별 자료구조를 반환하세요.
+    tips:
+    - LIFO와 FIFO는 사용자 경험에서 전혀 다른 순서를 만듭니다.
+    - 해시 테이블은 정확한 키 조회, 힙은 우선순위 조회에 강합니다.
+    exercise:
+      prompt: choose_data_structure(need)를 완성해 structure, operation, useWhen을 반환하세요.
+      starterCode: |-
+        def choose_data_structure(need):
+            raise NotImplementedError
+      solution: |-
+        def choose_data_structure(need):
+            table = {
+                "undo-history": {
+                    "structure": "stack",
+                    "operation": "push-pop",
+                    "useWhen": "the most recent action must be reversed first",
+                },
+                "print-jobs": {
+                    "structure": "queue",
+                    "operation": "enqueue-dequeue",
+                    "useWhen": "jobs should run in arrival order",
+                },
+                "unique-lookup": {
+                    "structure": "hash-table",
+                    "operation": "key-get-set",
+                    "useWhen": "records are retrieved repeatedly by id",
+                },
+                "top-k": {
+                    "structure": "heap",
+                    "operation": "push-pop-priority",
+                    "useWhen": "the next smallest or largest item is needed often",
+                },
+                "hierarchy": {
+                    "structure": "tree",
+                    "operation": "traverse-children",
+                    "useWhen": "items have parent child relationships",
+                },
+                "frequent-middle-insert": {
+                    "structure": "linked-list",
+                    "operation": "relink-nodes",
+                    "useWhen": "known node positions change without shifting arrays",
+                },
+            }
+            if need not in table:
+                raise ValueError("unknown data structure need")
+            return table[need]
+      hints:
+      - 자료구조 선택은 연산 비용과 보장해야 하는 순서에서 출발합니다.
+      - tree와 linked list는 Python 기본 list보다 구조 표현 자체가 목적일 때 쓰입니다.
+    check:
+      id: python.advanced.data-structures.choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.data-structures.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_data_structure
+        cases:
+        - id: recalls-stack-for-undo
+          arguments:
+          - value: undo-history
+          expectedReturn:
+            structure: stack
+            operation: push-pop
+            useWhen: the most recent action must be reversed first
+        - id: recalls-hash-table-for-id-lookup
+          arguments:
+          - value: unique-lookup
+          expectedReturn:
+            structure: hash-table
+            operation: key-get-set
+            useWhen: records are retrieved repeatedly by id
+        - id: rejects-unknown-need
+          arguments:
+          - value: magic-container
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending
+`;export{e as default};

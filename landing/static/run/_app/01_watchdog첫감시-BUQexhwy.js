@@ -1,0 +1,812 @@
+var e=`meta:
+  id: watchSched_01
+  title: watchdog 첫 감시
+  order: 1
+  category: watchSched
+  difficulty: easy
+  audience: 폴더 이벤트와 스케줄 자동화에 입문하는 Python 학습자
+  packages:
+    - watchdog
+  tags:
+    - watchdog
+    - observer
+    - filesystem
+intro:
+  direction: watchdog의 Observer와 FileSystemEventHandler로 임시 폴더에서 발생한 파일 생성 이벤트를 짧은 시간 안에 감지하고 즉시 멈춘다.
+  benefits:
+    - Observer로 백그라운드 감시 스레드를 만든다.
+    - FileSystemEventHandler 서브클래스에서 on_created를 구현한다.
+    - Observer.start와 stop, join을 안전한 순서로 호출한다.
+    - 감지된 이벤트를 list로 모아 자동화 다음 단계에 넘긴다.
+  diagram:
+    steps:
+      - label: 임시 폴더 준비
+        detail: tempfile.TemporaryDirectory로 자동 정리되는 감시 대상 폴더를 만든다.
+      - label: 이벤트 핸들러 정의
+        detail: FileSystemEventHandler를 상속해 on_created에서 이벤트 src_path를 모은다.
+      - label: Observer 시작
+        detail: Observer를 만들고 schedule, start로 백그라운드 감시를 시작한다.
+      - label: 파일 생성 후 정지
+        detail: 새 파일을 만든 뒤 짧게 sleep하고 Observer.stop과 join으로 정리한다.
+    runtime:
+      - label: watchdog 패키지 필요
+        detail: meta.packages의 watchdog이 로컬 가상환경에 준비되어야 한다.
+      - label: assert 기반 검증
+        detail: 모인 이벤트 경로와 기대값을 assert로 비교한다.
+sections:
+  - id: handler-skeleton
+    title: 이벤트 핸들러 골격 만들기
+    structuredPrimary: true
+    subtitle: FileSystemEventHandler 상속
+    goal: 파일 생성 이벤트를 받아 리스트에 모으는 단순 핸들러를 작성한다.
+    why: 핸들러 골격이 단순할수록 다음 섹션에서 다양한 이벤트 타입으로 확장하기 쉬워진다.
+    explanation: FileSystemEventHandler를 상속하면 on_created, on_modified, on_deleted, on_moved 메서드를 오버라이드할 수 있다. 인자는 FileSystemEvent 객체이며 src_path 속성에 경로 문자열이 들어 있다. 자동화에서는 리스트 같은 외부 상태를 핸들러에 주입해 결과를 모은다.
+    tips:
+      - 핸들러는 별도 스레드에서 호출되므로 공유 리스트는 미리 만들어 두면 안전하다.
+      - on_created 메서드는 새 파일과 새 폴더 모두에서 호출된다.
+    snippet: |-
+      from watchdog.events import FileSystemEventHandler
+
+
+      class CreatedCollector(FileSystemEventHandler):
+          def __init__(self, sink: list) -> None:
+              super().__init__()
+              self.sink = sink
+
+          def on_created(self, event) -> None:
+              self.sink.append(event.src_path)
+
+
+      sink = []
+      handler = CreatedCollector(sink)
+      handler.on_created(type("Event", (), {"src_path": "fake.txt"})())
+
+      assert sink == ["fake.txt"]
+      sink
+    exercise:
+      prompt: CreatedCollector를 두 번 호출해 같은 이벤트 src_path가 sink 리스트에 두 번 누적되는지 검증하세요.
+      starterCode: |-
+        from watchdog.events import FileSystemEventHandler
+
+
+        class CreatedCollector(FileSystemEventHandler):
+            def __init__(self, sink: list) -> None:
+                super().__init__()
+                self.sink = sink
+
+            def on_created(self, event) -> None:
+                self.sink.append(event.___)
+
+
+        sink = []
+        handler = CreatedCollector(sink)
+        handler.on_created(type("Event", (), {"src_path": "first.txt"})())
+        handler.on_created(type("Event", (), {"src_path": "second.txt"})())
+
+        assert sink == ["first.txt", "second.txt"]
+        sink
+      solution: |-
+        from watchdog.events import FileSystemEventHandler
+
+
+        class CreatedCollector(FileSystemEventHandler):
+            def __init__(self, sink: list) -> None:
+                super().__init__()
+                self.sink = sink
+
+            def on_created(self, event) -> None:
+                self.sink.append(event.src_path)
+
+
+        sink = []
+        handler = CreatedCollector(sink)
+        handler.on_created(type("Event", (), {"src_path": "first.txt"})())
+        handler.on_created(type("Event", (), {"src_path": "second.txt"})())
+
+        assert sink == ["first.txt", "second.txt"]
+        sink
+      hints:
+        - FileSystemEvent의 경로 속성은 src_path다.
+        - 두 번 호출하면 sink에 두 항목이 본문 순서대로 들어간다.
+      check:
+        noError: 핸들러 정의와 두 번 호출이 정상적으로 끝나야 한다.
+        resultCheck: sink 리스트가 두 src_path를 본문 순서대로 담아야 한다.
+    check:
+      noError: CreatedCollector 정의와 호출이 끝나야 한다.
+      resultCheck: sink 리스트가 src_path 한 줄을 정확히 담아야 한다.
+  - id: observer-lifecycle
+    title: Observer 시작과 정지
+    structuredPrimary: true
+    subtitle: schedule, start, stop, join
+    goal: Observer를 만들어 한 폴더를 감시하고 안전한 순서로 정리한다.
+    why: Observer는 스레드를 시작하므로 사용 후 stop과 join을 명확히 호출해야 자원 누수가 없다.
+    explanation: Observer 객체에 핸들러와 폴더 경로를 schedule로 등록한 뒤 start를 호출하면 백그라운드 스레드가 동작한다. stop은 종료 신호, join은 스레드 종료 대기다. 자동화에서는 항상 try/finally 또는 with 컨텍스트로 정리한다.
+    tips:
+      - schedule의 첫 인자는 핸들러, 두 번째는 폴더 경로, recursive는 하위 폴더 포함 여부다.
+      - start와 stop은 즉시 반환되므로 join을 기다려야 안전하게 종료된다.
+    snippet: |-
+      import tempfile
+      import time
+      from pathlib import Path
+
+      from watchdog.events import FileSystemEventHandler
+      from watchdog.observers import Observer
+
+
+      class CreatedCollector(FileSystemEventHandler):
+          def __init__(self, sink: list) -> None:
+              super().__init__()
+              self.sink = sink
+
+          def on_created(self, event) -> None:
+              if not event.is_directory:
+                  self.sink.append(Path(event.src_path).name)
+
+
+      sink = []
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td)
+          observer = Observer()
+          observer.schedule(CreatedCollector(sink), str(base), recursive=False)
+          observer.start()
+          try:
+              (base / "first.txt").write_text("ok", encoding="utf-8")
+              time.sleep(0.5)
+          finally:
+              observer.stop()
+              observer.join()
+
+      assert "first.txt" in sink
+      sink
+    exercise:
+      prompt: 같은 흐름으로 second.txt 파일을 만들고 sink 리스트가 "second.txt" 한 줄을 포함하는지 검증하세요.
+      starterCode: |-
+        import tempfile
+        import time
+        from pathlib import Path
+
+        from watchdog.events import FileSystemEventHandler
+        from watchdog.observers import Observer
+
+
+        class CreatedCollector(FileSystemEventHandler):
+            def __init__(self, sink: list) -> None:
+                super().__init__()
+                self.sink = sink
+
+            def on_created(self, event) -> None:
+                if not event.is_directory:
+                    self.sink.append(Path(event.src_path).name)
+
+
+        sink = []
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            observer = Observer()
+            observer.schedule(CreatedCollector(sink), str(base), recursive=___)
+            observer.start()
+            try:
+                (base / "second.txt").write_text("ok", encoding="utf-8")
+                time.sleep(0.5)
+            finally:
+                observer.stop()
+                observer.join()
+
+        assert "second.txt" in sink
+        sink
+      solution: |-
+        import tempfile
+        import time
+        from pathlib import Path
+
+        from watchdog.events import FileSystemEventHandler
+        from watchdog.observers import Observer
+
+
+        class CreatedCollector(FileSystemEventHandler):
+            def __init__(self, sink: list) -> None:
+                super().__init__()
+                self.sink = sink
+
+            def on_created(self, event) -> None:
+                if not event.is_directory:
+                    self.sink.append(Path(event.src_path).name)
+
+
+        sink = []
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            observer = Observer()
+            observer.schedule(CreatedCollector(sink), str(base), recursive=False)
+            observer.start()
+            try:
+                (base / "second.txt").write_text("ok", encoding="utf-8")
+                time.sleep(0.5)
+            finally:
+                observer.stop()
+                observer.join()
+
+        assert "second.txt" in sink
+        sink
+      hints:
+        - recursive 인자를 False로 두면 한 폴더만 감시한다.
+        - try/finally로 stop과 join을 보장해야 자원 누수가 없다.
+      check:
+        noError: Observer 시작과 정리가 IOError 없이 끝나야 한다.
+        resultCheck: sink 리스트에 "second.txt"가 포함되어야 한다.
+    check:
+      noError: Observer 생애주기 호출이 try/finally 안에서 끝나야 한다.
+      resultCheck: sink 리스트가 "first.txt"를 포함해 첫 감시 결과를 보고해야 한다.
+  - id: multi-file
+    title: 여러 파일 감지
+    structuredPrimary: true
+    subtitle: 같은 폴더의 다중 이벤트
+    goal: 한 번에 여러 파일이 만들어졌을 때 모든 이벤트가 수집되는지 확인한다.
+    why: 자동화 감시는 한 사이클에 여러 파일을 다뤄야 하는 경우가 많아 다중 이벤트 처리가 표준이다.
+    explanation: 같은 핸들러는 여러 파일에 대해 차례로 on_created가 호출된다. 동시 파일 생성에서도 watchdog은 OS 이벤트 큐를 통해 모든 이벤트를 전달한다. 정렬은 보장되지 않으므로 sorted로 비교하는 편이 안전하다.
+    tips:
+      - 동시에 만들어진 두 파일은 OS에 따라 도착 순서가 다를 수 있다.
+      - sorted를 통해 결과를 비교하면 순서 무관 검증이 된다.
+    snippet: |-
+      import tempfile
+      import time
+      from pathlib import Path
+
+      from watchdog.events import FileSystemEventHandler
+      from watchdog.observers import Observer
+
+
+      class CreatedCollector(FileSystemEventHandler):
+          def __init__(self, sink: list) -> None:
+              super().__init__()
+              self.sink = sink
+
+          def on_created(self, event) -> None:
+              if not event.is_directory:
+                  self.sink.append(Path(event.src_path).name)
+
+
+      sink = []
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td)
+          observer = Observer()
+          observer.schedule(CreatedCollector(sink), str(base), recursive=False)
+          observer.start()
+          try:
+              (base / "alpha.txt").write_text("", encoding="utf-8")
+              (base / "beta.txt").write_text("", encoding="utf-8")
+              time.sleep(0.5)
+          finally:
+              observer.stop()
+              observer.join()
+      collected = sorted(sink)
+
+      assert collected == ["alpha.txt", "beta.txt"]
+      collected
+    exercise:
+      prompt: gamma.txt와 delta.txt를 만들어 sorted 결과가 정확히 두 이름을 알파벳 순으로 담는지 검증하세요.
+      starterCode: |-
+        import tempfile
+        import time
+        from pathlib import Path
+
+        from watchdog.events import FileSystemEventHandler
+        from watchdog.observers import Observer
+
+
+        class CreatedCollector(FileSystemEventHandler):
+            def __init__(self, sink: list) -> None:
+                super().__init__()
+                self.sink = sink
+
+            def on_created(self, event) -> None:
+                if not event.is_directory:
+                    self.sink.append(Path(event.src_path).name)
+
+
+        sink = []
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            observer = Observer()
+            observer.schedule(CreatedCollector(sink), str(base), recursive=False)
+            observer.start()
+            try:
+                (base / "___").write_text("", encoding="utf-8")
+                (base / "___").write_text("", encoding="utf-8")
+                time.sleep(0.5)
+            finally:
+                observer.stop()
+                observer.join()
+        collected = sorted(sink)
+
+        assert collected == ["delta.txt", "gamma.txt"]
+        collected
+      solution: |-
+        import tempfile
+        import time
+        from pathlib import Path
+
+        from watchdog.events import FileSystemEventHandler
+        from watchdog.observers import Observer
+
+
+        class CreatedCollector(FileSystemEventHandler):
+            def __init__(self, sink: list) -> None:
+                super().__init__()
+                self.sink = sink
+
+            def on_created(self, event) -> None:
+                if not event.is_directory:
+                    self.sink.append(Path(event.src_path).name)
+
+
+        sink = []
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            observer = Observer()
+            observer.schedule(CreatedCollector(sink), str(base), recursive=False)
+            observer.start()
+            try:
+                (base / "gamma.txt").write_text("", encoding="utf-8")
+                (base / "delta.txt").write_text("", encoding="utf-8")
+                time.sleep(0.5)
+            finally:
+                observer.stop()
+                observer.join()
+        collected = sorted(sink)
+
+        assert collected == ["delta.txt", "gamma.txt"]
+        collected
+      hints:
+        - 두 파일 이름은 gamma.txt와 delta.txt다.
+        - sorted 결과는 알파벳 순으로 delta가 먼저 온다.
+      check:
+        noError: Observer 흐름과 다중 파일 작성이 끝나야 한다.
+        resultCheck: collected가 두 파일 이름을 알파벳 순으로 담아야 한다.
+    check:
+      noError: 여러 이벤트 수집이 한 사이클에서 끝나야 한다.
+      resultCheck: collected가 ["alpha.txt", "beta.txt"]로 알파벳 순으로 정렬되어야 한다.
+  - id: summary-cycle
+    title: 종합 첫 감시 사이클
+    structuredPrimary: true
+    subtitle: 함수로 묶기
+    goal: 임시 폴더에서 한 사이클의 감시 결과를 dict로 묶어 자동화 표준 보고 형태를 만든다.
+    why: 자동화 다음 단계는 같은 dict 구조를 기대하므로 첫 감시 사이클부터 일관된 보고 형태를 유지한다.
+    explanation: observeCreations 함수는 sleep 시간을 인자로 받고 같은 폴더에서 만들어진 파일 이름 리스트를 돌려준다. 함수가 dict로 결과를 묶으면 다음 레슨의 이벤트 타입 구분에서 키만 추가하면 된다. 같은 사이클을 두 번 호출해도 같은 dict 구조가 유지된다.
+    tips:
+      - sleep 시간은 0.3에서 0.5초 사이가 일반적으로 안정적이다.
+      - 결과 dict 키 이름은 created, modified, deleted 같은 표준 단어를 사용한다.
+    snippet: |-
+      import tempfile
+      import time
+      from pathlib import Path
+
+      from watchdog.events import FileSystemEventHandler
+      from watchdog.observers import Observer
+
+
+      def observeCreations(filenames: list, sleepSeconds: float = 0.5) -> dict:
+          sink = []
+
+          class Collector(FileSystemEventHandler):
+              def on_created(self, event) -> None:
+                  if not event.is_directory:
+                      sink.append(Path(event.src_path).name)
+
+          with tempfile.TemporaryDirectory() as td:
+              base = Path(td)
+              observer = Observer()
+              observer.schedule(Collector(), str(base), recursive=False)
+              observer.start()
+              try:
+                  for name in filenames:
+                      (base / name).write_text("", encoding="utf-8")
+                  time.sleep(sleepSeconds)
+              finally:
+                  observer.stop()
+                  observer.join()
+          return {"created": sorted(sink)}
+
+
+      report = observeCreations(["alpha.txt", "beta.txt"])
+
+      assert report == {"created": ["alpha.txt", "beta.txt"]}
+      report
+    exercise:
+      prompt: observeCreations에 ["foo.log", "bar.log"]를 넘기면 created 리스트가 알파벳 순으로 두 파일 이름을 담아 종합 결과가 만들어지는지 검증하세요.
+      starterCode: |-
+        import tempfile
+        import time
+        from pathlib import Path
+
+        from watchdog.events import FileSystemEventHandler
+        from watchdog.observers import Observer
+
+
+        def observeCreations(filenames: list, sleepSeconds: float = 0.5) -> dict:
+            sink = []
+
+            class Collector(FileSystemEventHandler):
+                def on_created(self, event) -> None:
+                    if not event.is_directory:
+                        sink.append(Path(event.src_path).name)
+
+            with tempfile.TemporaryDirectory() as td:
+                base = Path(td)
+                observer = Observer()
+                observer.schedule(Collector(), str(base), recursive=False)
+                observer.start()
+                try:
+                    for name in filenames:
+                        (base / name).write_text("", encoding="utf-8")
+                    time.sleep(sleepSeconds)
+                finally:
+                    observer.stop()
+                    observer.join()
+            return {"created": ___(sink)}
+
+
+        report = observeCreations(["foo.log", "bar.log"])
+
+        assert report == {"created": ["bar.log", "foo.log"]}
+        report
+      solution: |-
+        import tempfile
+        import time
+        from pathlib import Path
+
+        from watchdog.events import FileSystemEventHandler
+        from watchdog.observers import Observer
+
+
+        def observeCreations(filenames: list, sleepSeconds: float = 0.5) -> dict:
+            sink = []
+
+            class Collector(FileSystemEventHandler):
+                def on_created(self, event) -> None:
+                    if not event.is_directory:
+                        sink.append(Path(event.src_path).name)
+
+            with tempfile.TemporaryDirectory() as td:
+                base = Path(td)
+                observer = Observer()
+                observer.schedule(Collector(), str(base), recursive=False)
+                observer.start()
+                try:
+                    for name in filenames:
+                        (base / name).write_text("", encoding="utf-8")
+                    time.sleep(sleepSeconds)
+                finally:
+                    observer.stop()
+                    observer.join()
+            return {"created": sorted(sink)}
+
+
+        report = observeCreations(["foo.log", "bar.log"])
+
+        assert report == {"created": ["bar.log", "foo.log"]}
+        report
+      hints:
+        - 정렬 함수 이름은 sorted다.
+        - 알파벳 순으로 bar.log가 foo.log 앞에 온다.
+      check:
+        noError: observeCreations 함수 호출이 종합 정리 흐름으로 끝나야 한다.
+        resultCheck: report dict의 created 리스트가 두 파일을 정렬된 상태로 담아야 한다.
+    check:
+      noError: 종합 감시 함수가 격리 공간에서 끝나야 한다.
+      resultCheck: report dict의 created 리스트가 두 파일 이름을 정렬된 상태로 담아야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: watchSched_01-watch-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - handler-skeleton
+    - summary-cycle
+    title: 폴더 감시 root·event·filter 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 허용 root와 event 종류, include/exclude가 빠진 감시 계획을 차단한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 감시 시작 전에 root와 event 종류를 allowlist로 고정하세요.
+    - 재귀 감시는 output·cache 같은 제외 디렉터리를 필수로 두세요.
+    exercise:
+      prompt: audit_watch_contract(contract, allowed_roots)를 완성하세요.
+      starterCode: |-
+        def audit_watch_contract(contract, allowed_roots):
+            raise NotImplementedError
+      solution: |
+        def audit_watch_contract(contract, allowed_roots):
+            failures = []
+            if contract.get("root") not in allowed_roots:
+                failures.append("root")
+            event_kinds = set(contract.get("eventKinds", []))
+            unknown = sorted(event_kinds - {"created", "modified", "moved", "deleted"})
+            if not event_kinds or unknown:
+                failures.append("events")
+            if not contract.get("include"):
+                failures.append("include")
+            if contract.get("recursive", False) and not contract.get("excludeDirectories"):
+                failures.append("recursive-excludes")
+            return {"ready": not failures, "failures": failures, "unknownEvents": unknown}
+      hints: *id001
+    check:
+      id: python.watchsched.watchSched_01.watch-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.watchsched.watchSched_01.watch-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_watch_contract
+        cases:
+        - id: accepts-bounded-nonrecursive-watch
+          arguments:
+          - value:
+              root: /inbox
+              eventKinds:
+              - created
+              - moved
+              include:
+              - '*.csv'
+              recursive: false
+          - value:
+            - /inbox
+          expectedReturn:
+            ready: true
+            failures: []
+            unknownEvents: []
+        - id: reports-root-event-and-filter
+          arguments:
+          - value:
+              root: /other
+              eventKinds:
+              - opened
+              include: []
+              recursive: false
+          - value:
+            - /inbox
+          expectedReturn:
+            ready: false
+            failures:
+            - root
+            - events
+            - include
+            unknownEvents:
+            - opened
+        - id: requires-recursive-excludes
+          arguments:
+          - value:
+              root: /inbox
+              eventKinds:
+              - created
+              include:
+              - '*.txt'
+              recursive: true
+          - value:
+            - /inbox
+          expectedReturn:
+            ready: false
+            failures:
+            - recursive-excludes
+            unknownEvents: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: watchSched_01-watch-event-admission-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - watchSched_01-watch-contract-audit-mastery
+    title: 새 filesystem event에 감시 계약 적용 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: path root·suffix·event kind·directory 여부로 처리 대상만 선별한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - event callback 안에서 바로 처리하지 말고 admission 계약을 먼저 적용하세요.
+    - 거부 event는 원문 대신 ID와 사유만 ledger에 남기세요.
+    exercise:
+      prompt: admit_watch_events(events, contract)를 완성하세요.
+      starterCode: |-
+        def admit_watch_events(events, contract):
+            raise NotImplementedError
+      solution: |
+        def admit_watch_events(events, contract):
+            accepted = []
+            rejected = []
+            for event in events:
+                reasons = []
+                if not event["path"].startswith(contract["root"].rstrip("/") + "/"):
+                    reasons.append("root")
+                if event["kind"] not in contract["eventKinds"]:
+                    reasons.append("kind")
+                if event.get("isDirectory", False):
+                    reasons.append("directory")
+                if contract.get("suffixes") and not any(event["path"].endswith(suffix) for suffix in contract["suffixes"]):
+                    reasons.append("suffix")
+                if reasons:
+                    rejected.append({"id": event["id"], "reasons": reasons})
+                else:
+                    accepted.append(event["id"])
+            return {"accepted": accepted, "rejected": rejected}
+      hints: *id002
+    check:
+      id: python.watchsched.watchSched_01.watch-event-admission.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.watchsched.watchSched_01.watch-event-admission.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: admit_watch_events
+        cases:
+        - id: accepts-matching-file
+          arguments:
+          - value:
+            - id: a
+              path: /inbox/a.csv
+              kind: created
+              isDirectory: false
+          - value:
+              root: /inbox
+              eventKinds:
+              - created
+              suffixes:
+              - .csv
+          expectedReturn:
+            accepted:
+            - a
+            rejected: []
+        - id: reports-multiple-reasons
+          arguments:
+          - value:
+            - id: x
+              path: /other/a.txt
+              kind: deleted
+              isDirectory: false
+          - value:
+              root: /inbox
+              eventKinds:
+              - created
+              suffixes:
+              - .csv
+          expectedReturn:
+            accepted: []
+            rejected:
+            - id: x
+              reasons:
+              - root
+              - kind
+              - suffix
+        - id: rejects-directory-event
+          arguments:
+          - value:
+            - id: d
+              path: /inbox/folder
+              kind: created
+              isDirectory: true
+          - value:
+              root: /inbox
+              eventKinds:
+              - created
+              suffixes: []
+          expectedReturn:
+            accepted: []
+            rejected:
+            - id: d
+              reasons:
+              - directory
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: watchSched_01-watch-foundation-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - watchSched_01-watch-event-admission-transfer
+    title: 파일 감시 시작 계약 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: root·event·filter·output loop 경계를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - event나 시간이 발생했다는 사실보다 처리 identity와 결과 evidence를 검증하세요.
+    - 중복·지연·재시작 상황에서 같은 업무 결과가 보존되는지 확인하세요.
+    exercise:
+      prompt: choose_watch_boundary(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_watch_boundary(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_watch_boundary(situation):
+            table = {'root': {'action': 'resolve allowed watch root', 'evidence': 'canonical root identity', 'risk': 'scope escape'}, 'event': {'action': 'allowlist event kinds and files', 'evidence': 'admission decision', 'risk': 'noise'}, 'output': {'action': 'exclude generated directories', 'evidence': 'exclude manifest', 'risk': 'self-trigger loop'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.watchsched.watchSched_01.watch-foundation-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.watchsched.watchSched_01.watch-foundation-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_watch_boundary
+        cases:
+        - id: recalls-root
+          arguments:
+          - value: root
+          expectedReturn:
+            action: resolve allowed watch root
+            evidence: canonical root identity
+            risk: scope escape
+        - id: recalls-event
+          arguments:
+          - value: event
+          expectedReturn:
+            action: allowlist event kinds and files
+            evidence: admission decision
+            risk: noise
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

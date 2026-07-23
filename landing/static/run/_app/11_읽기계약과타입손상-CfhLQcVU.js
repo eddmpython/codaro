@@ -1,0 +1,569 @@
+var e=`meta:
+  id: pandas_11
+  title: 읽기 계약과 타입 손상
+  order: 11
+  category: pandas
+  difficulty: ⭐⭐
+  badge: 심화
+  packages:
+    - pandas
+  tags:
+    - read_csv
+    - dtype
+    - 식별자
+    - 데이터품질
+    - 읽기계약
+intro:
+  emoji: 🪪
+  goal: CSV를 읽는 순간 식별자(우편번호·사번)의 선행 0이 사라지는 손상을 보고, dtype 계약으로 막는 법을 익힌다.
+  description: read_csv는 컬럼 타입을 자동 추론한다. 숫자처럼 보이는 식별자는 정수로 추론돼 00123이 123이 되고, 조인 키가 깨진다. dtype를 지정하는 "읽기 계약"으로 막는다.
+  direction: 데이터를 읽는 첫 순간의 타입 추론을 점검하고, 식별자를 문자열로 지켜 조인까지 안전하게 연결한다.
+  benefits:
+    - 읽는 순간의 dtype 추론이 데이터 정합성을 좌우함을 안다.
+    - dtype={"열": str}로 식별자의 선행 0을 보존한다.
+    - 타입이 어긋난 키가 조인을 깨뜨리는 실무 사고를 예방한다.
+  diagram:
+    steps:
+      - label: 추론 손상 확인
+        detail: dtype 없이 읽으면 00123이 int 123이 되는 걸 본다.
+      - label: 읽기 계약 적용
+        detail: 'dtype={"id": str}로 선행 0을 보존한다.'
+      - label: 조인 안전
+        detail: 문자열 키가 보존돼 마스터 테이블과 정상 조인됨을 확인한다.
+    runtime:
+      - label: pandas + 인라인 CSV
+        detail: io.StringIO로 작은 CSV를 만들어 로컬에서 바로 실행한다.
+      - label: assert로 직접 확인
+        detail: dtype와 값, 조인 매칭 수를 assert로 눈에 보이게 검증한다.
+sections:
+  - id: inference-corruption
+    title: 읽는 순간의 타입 손상
+    structuredPrimary: true
+    subtitle: 00123이 123이 된다
+    goal: dtype 없이 read_csv하면 식별자 컬럼이 int로 추론돼 선행 0이 사라지는 것을 확인한다.
+    why: 우편번호·사번·전화번호처럼 숫자로 보이지만 문자열인 식별자는, 읽는 순간 정수로 추론되면 조용히 망가진다.
+    explanation: |-
+      read_csv는 각 컬럼의 타입을 자동으로 추론한다. "00123" 같은 값이 든 컬럼은 전부 숫자로 보이므로 int64로 추론되고, 그 순간 선행 0이 사라져 123이 된다.
+
+      문제는 에러가 안 난다는 것이다. 데이터는 멀쩡히 읽히고 숫자도 그럴듯하다. 하지만 "00123"이라는 원래 식별자는 이미 사라졌다.
+    tips:
+      - 식별자는 숫자처럼 보여도 "이름"이다 - 계산하지 않으면 문자열로 다뤄야 한다.
+      - df["열"].dtype로 읽은 직후 타입을 확인하는 습관이 손상을 일찍 잡는다.
+    snippet: |-
+      import io
+      import pandas as pd
+
+      csv = "id,amount\\n00123,10\\n00045,20\\n00123,30\\n"
+      df = pd.read_csv(io.StringIO(csv))
+
+      idDtypeName = str(df["id"].dtype)
+      firstId = df["id"].iloc[0]
+
+      assert idDtypeName == "int64"
+      assert firstId == 123
+      idDtypeName
+    exercise:
+      prompt: 같은 CSV에서 첫 행 id의 값이 문자열 "00123"이 아니라 정수 123으로 읽히는지 확인하세요.
+      starterCode: |-
+        import io
+        import pandas as pd
+
+        csv = "id,amount\\n00123,10\\n00045,20\\n00123,30\\n"
+        df = pd.read_csv(io.StringIO(csv))
+
+        firstId = df["id"].iloc[___]
+
+        assert firstId == 123
+        firstId
+      solution: |-
+        import io
+        import pandas as pd
+
+        csv = "id,amount\\n00123,10\\n00045,20\\n00123,30\\n"
+        df = pd.read_csv(io.StringIO(csv))
+
+        firstId = df["id"].iloc[0]
+
+        assert firstId == 123
+        firstId
+      hints:
+        - 첫 행은 인덱스 0이다.
+        - dtype 없이 읽었으므로 "00123"이 아니라 123이 나온다.
+      check:
+        type: noError
+        noError: read_csv가 예외 없이 끝나야 한다.
+        resultCheck: firstId가 정수 123이어야 한다(선행 0 손실).
+    check:
+      noError: read_csv가 끝나야 한다.
+      resultCheck: idDtypeName이 "int64"여야 한다.
+  - id: read-contract
+    title: 읽기 계약으로 보존
+    structuredPrimary: true
+    subtitle: 'dtype={"id": str}'
+    goal: read_csv에 dtype를 지정해 식별자를 문자열로 읽으면 선행 0이 보존되는 것을 확인한다.
+    why: 읽기 계약(dtype 지정)은 "이 컬럼은 문자열이다"를 명시해, 추론에 맡기지 않고 식별자를 있는 그대로 지킨다.
+    explanation: |-
+      read_csv의 dtype 인자에 {"id": str}를 넘기면 id 컬럼을 추론 없이 문자열로 읽는다. 그러면 "00123"이 그대로 보존된다.
+
+      식별자 컬럼은 거의 항상 이 계약이 필요하다. 한 줄 추가로 "읽는 순간의 손상"을 원천 차단한다.
+    tips:
+      - dtype에는 여러 열을 dict로 한 번에 지정할 수 있다.
+      - 계산이 필요한 수치 컬럼(amount 등)은 그대로 두고 식별자만 str로 지정하면 된다.
+    snippet: |-
+      import io
+      import pandas as pd
+
+      csv = "id,amount\\n00123,10\\n00045,20\\n00123,30\\n"
+      df = pd.read_csv(io.StringIO(csv), dtype={"id": str})
+
+      firstId = df["id"].iloc[0]
+      firstIdLen = len(firstId)
+
+      assert firstId == "00123"
+      assert firstIdLen == 5
+      firstIdLen
+    exercise:
+      prompt: dtype 계약으로 읽었을 때 두 번째 행 id가 "00045"로 보존되는지 확인하세요.
+      starterCode: |-
+        import io
+        import pandas as pd
+
+        csv = "id,amount\\n00123,10\\n00045,20\\n00123,30\\n"
+        df = pd.read_csv(io.StringIO(csv), dtype={"id": ___})
+
+        secondId = df["id"].iloc[1]
+
+        assert secondId == "00045"
+        secondId
+      solution: |-
+        import io
+        import pandas as pd
+
+        csv = "id,amount\\n00123,10\\n00045,20\\n00123,30\\n"
+        df = pd.read_csv(io.StringIO(csv), dtype={"id": str})
+
+        secondId = df["id"].iloc[1]
+
+        assert secondId == "00045"
+        secondId
+      hints:
+        - 문자열로 읽으려면 dtype 값으로 str을 넘긴다.
+        - 계약을 지키면 "00045"의 선행 0이 보존된다.
+      check:
+        type: noError
+        noError: dtype를 지정한 read_csv가 예외 없이 끝나야 한다.
+        resultCheck: secondId가 문자열 "00045"여야 한다.
+    check:
+      noError: dtype 지정 read_csv가 끝나야 한다.
+      resultCheck: firstIdLen이 5여야 한다(선행 0 보존).
+  - id: join-safety
+    title: 조인까지 안전하게
+    structuredPrimary: true
+    subtitle: 키 타입이 맞아야 합쳐진다
+    goal: 읽기 계약으로 보존한 문자열 키가 마스터 테이블과 정상 조인되고, 손상된 키는 문자열로 안 맞는 것을 확인한다.
+    why: 사번 0042가 42로 손상되면 문자열 키 마스터와 한 건도 안 맞아, 매출이 통째로 누락되는 사고가 난다.
+    explanation: |-
+      마스터 테이블의 id가 문자열("00123")일 때, 읽기 계약을 지킨 거래 데이터는 문자열 키가 보존돼 정상 조인된다.
+
+      반대로 계약 없이 읽어 id가 정수 45가 되면, 마스터의 "00045"와 문자열로 비교했을 때 "45" != "00045"라 매칭되지 않는다. 타입이 어긋난 키는 조용히 조인을 깨뜨린다.
+    tips:
+      - 조인 전에 양쪽 키의 dtype가 같은지 확인하면 "0건 매칭" 사고를 예방한다.
+      - 식별자는 양쪽 모두 문자열로 통일하는 게 가장 안전하다.
+    snippet: |-
+      import io
+      import pandas as pd
+
+      csv = "id,amount\\n00123,10\\n00045,20\\n00123,30\\n"
+      master = pd.DataFrame({"id": ["00123", "00045"], "name": ["Alice", "Bob"]})
+
+      right = pd.read_csv(io.StringIO(csv), dtype={"id": str})
+      rightMerged = right.merge(master, on="id", how="inner")
+      matchedRows = len(rightMerged)
+
+      wrong = pd.read_csv(io.StringIO(csv))
+      wrongKeyAsText = str(wrong["id"].iloc[1])
+
+      assert matchedRows == 3
+      assert wrongKeyAsText == "45"
+      assert wrongKeyAsText != "00045"
+      matchedRows
+    exercise:
+      prompt: 마스터에 "00045"만 있을 때, 계약을 지킨 데이터의 조인 결과가 몇 행인지 확인하세요(00045 한 종류만 매칭).
+      starterCode: |-
+        import io
+        import pandas as pd
+
+        csv = "id,amount\\n00123,10\\n00045,20\\n00123,30\\n"
+        master = pd.DataFrame({"id": [___], "name": ["Bob"]})
+
+        right = pd.read_csv(io.StringIO(csv), dtype={"id": str})
+        rightMerged = right.merge(master, on="id", how="inner")
+        matchedRows = len(rightMerged)
+
+        assert matchedRows == 1
+        matchedRows
+      solution: |-
+        import io
+        import pandas as pd
+
+        csv = "id,amount\\n00123,10\\n00045,20\\n00123,30\\n"
+        master = pd.DataFrame({"id": ["00045"], "name": ["Bob"]})
+
+        right = pd.read_csv(io.StringIO(csv), dtype={"id": str})
+        rightMerged = right.merge(master, on="id", how="inner")
+        matchedRows = len(rightMerged)
+
+        assert matchedRows == 1
+        matchedRows
+      hints:
+        - 마스터 id 리스트에 "00045" 한 개만 넣는다.
+        - CSV에 00045는 한 행뿐이라 매칭은 1행이다.
+      check:
+        type: noError
+        noError: 조인이 예외 없이 끝나야 한다.
+        resultCheck: matchedRows가 1이어야 한다.
+    check:
+      noError: 조인이 끝나야 한다.
+      resultCheck: matchedRows가 3이고 손상된 키는 문자열로 안 맞아야 한다.
+  - id: practice-read-join-pipeline
+    title: '종합 실습: 읽기 계약을 지킨 집계'
+    structuredPrimary: true
+    subtitle: 안전한 읽기 → 조인 → 집계
+    goal: 읽기 계약으로 식별자를 보존해 읽고, 마스터와 조인한 뒤 이름별 금액을 집계하는 파이프라인을 종합 점검한다.
+    why: dtype 계약·조인·집계를 한 흐름으로 묶어, 손상 없이 읽은 데이터가 어떻게 올바른 리포트로 이어지는지 확인한다.
+    explanation: |-
+      거래 CSV를 dtype={"id": str}로 읽어 선행 0을 보존하고, 이름이 든 마스터와 id로 조인한 뒤 이름별 amount 합계를 구한다. 00123은 Alice(10+30=40), 00045는 Bob(20)이다.
+
+      읽는 순간 식별자를 지켰기 때문에 조인이 정상 매칭되고 집계가 올바르게 나온다. 한 곳에서 계약을 어기면 이 전체 파이프라인이 조용히 틀어진다.
+    tips:
+      - 식별자를 문자열로 읽는 한 줄이 조인·집계 전체의 정확성을 떠받친다.
+      - 집계 결과를 dict로 만들면 기대값과 바로 비교해 검증할 수 있다.
+    snippet: |-
+      import io
+      import pandas as pd
+
+      csv = "id,amount\\n00123,10\\n00045,20\\n00123,30\\n"
+      master = pd.DataFrame({"id": ["00123", "00045"], "name": ["Alice", "Bob"]})
+
+      df = pd.read_csv(io.StringIO(csv), dtype={"id": str})
+      merged = df.merge(master, on="id", how="inner")
+      totalByName = {name: int(value) for name, value in merged.groupby("name")["amount"].sum().items()}
+
+      assert totalByName == {"Alice": 40, "Bob": 20}
+      totalByName
+    exercise:
+      prompt: CSV에 "00045,5" 행을 한 줄 더 넣으면 Bob의 합계가 얼마가 되는지 확인하세요.
+      starterCode: |-
+        import io
+        import pandas as pd
+
+        csv = "id,amount\\n00123,10\\n00045,20\\n00123,30\\n00045,___\\n"
+        master = pd.DataFrame({"id": ["00123", "00045"], "name": ["Alice", "Bob"]})
+
+        df = pd.read_csv(io.StringIO(csv), dtype={"id": str})
+        merged = df.merge(master, on="id", how="inner")
+        totalByName = {name: int(value) for name, value in merged.groupby("name")["amount"].sum().items()}
+
+        assert totalByName == {"Alice": 40, "Bob": 25}
+        totalByName
+      solution: |-
+        import io
+        import pandas as pd
+
+        csv = "id,amount\\n00123,10\\n00045,20\\n00123,30\\n00045,5\\n"
+        master = pd.DataFrame({"id": ["00123", "00045"], "name": ["Alice", "Bob"]})
+
+        df = pd.read_csv(io.StringIO(csv), dtype={"id": str})
+        merged = df.merge(master, on="id", how="inner")
+        totalByName = {name: int(value) for name, value in merged.groupby("name")["amount"].sum().items()}
+
+        assert totalByName == {"Alice": 40, "Bob": 25}
+        totalByName
+      hints:
+        - 추가할 금액은 정수 5다.
+        - Bob은 20 + 5 = 25가 된다.
+      check:
+        type: noError
+        noError: 읽기·조인·집계가 예외 없이 끝나야 한다.
+        resultCheck: Bob의 합계가 25여야 한다.
+    check:
+      noError: 읽기·조인·집계 파이프라인이 끝나야 한다.
+      resultCheck: 이름별 합계가 Alice 40, Bob 20이어야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pandas_11-validate-read-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inference-corruption
+    - practice-read-join-pipeline
+    title: 파일 읽기 직후 열 타입 계약 검증하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 문자열로 손상될 수 있는 숫자 열을 명시적으로 변환하고 거절 행을 분리한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - read 성공을 타입 계약 통과로 간주하지 마세요.
+    - 변환 실패와 음수 값의 원래 행 index를 거절 증거로 남기세요.
+    exercise:
+      prompt: validate_read_contract(rows)를 완성해 accepted와 rejected를 반환하세요.
+      starterCode: |-
+        def validate_read_contract(rows):
+            raise NotImplementedError
+      solution: |
+        def validate_read_contract(rows):
+            accepted = []
+            rejected = []
+            for index, row in enumerate(rows):
+                try:
+                    record_id = str(row["id"]).strip()
+                    amount = int(row["amount"])
+                    if not record_id or amount < 0 or isinstance(row["amount"], bool):
+                        raise ValueError
+                    accepted.append({"id": record_id, "amount": amount})
+                except (KeyError, TypeError, ValueError):
+                    rejected.append(index)
+            return {"accepted": accepted, "rejected": rejected}
+      hints: *id001
+    check:
+      id: python.pandas.pandas_11.validate-read-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_11.validate-read-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: validate_read_contract
+        cases:
+        - id: coerces-only-contract-safe-values
+          arguments:
+          - value:
+            - id: ' A '
+              amount: '12'
+            - id: B
+              amount: bad
+            - amount: 3
+            - id: C
+              amount: -1
+          expectedReturn:
+            accepted:
+            - id: A
+              amount: 12
+            rejected:
+            - 1
+            - 2
+            - 3
+        - id: handles-empty-source
+          arguments:
+          - value: []
+          expectedReturn:
+            accepted: []
+            rejected: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pandas_11-detect-type-damage-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_11-validate-read-contract-mastery
+    title: 새 데이터 소스의 관측 타입 손상 탐지하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 기대 schema와 실제 행을 비교해 열별 손상 행 index를 반환한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - bool은 Python에서 int의 하위 타입이므로 숫자 검사에서 따로 제외하세요.
+    - 열이 없는 경우도 타입 손상으로 기록하세요.
+    exercise:
+      prompt: detect_type_damage(rows, schema)를 완성해 damagedByColumn과 cleanRowCount를 반환하세요.
+      starterCode: |-
+        def detect_type_damage(rows, schema):
+            raise NotImplementedError
+      solution: |
+        def detect_type_damage(rows, schema):
+            checks = {
+                "int": lambda value: isinstance(value, int) and not isinstance(value, bool),
+                "number": lambda value: isinstance(value, (int, float)) and not isinstance(value, bool),
+                "str": lambda value: isinstance(value, str),
+                "bool": lambda value: isinstance(value, bool),
+            }
+            if any(kind not in checks for kind in schema.values()):
+                raise ValueError("unknown schema type")
+            damaged = {column: [] for column in schema}
+            clean = 0
+            for index, row in enumerate(rows):
+                row_clean = True
+                for column, kind in schema.items():
+                    if column not in row or not checks[kind](row[column]):
+                        damaged[column].append(index)
+                        row_clean = False
+                clean += row_clean
+            return {"damagedByColumn": damaged, "cleanRowCount": clean}
+      hints: *id002
+    check:
+      id: python.pandas.pandas_11.detect-type-damage.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_11.detect-type-damage.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: detect_type_damage
+        cases:
+        - id: locates-damaged-columns
+          arguments:
+          - value:
+            - id: 1
+              amount: 2.5
+              active: true
+            - id: '2'
+              amount: '3'
+              active: 1
+            - id: 3
+              active: false
+          - value:
+              id: int
+              amount: number
+              active: bool
+          expectedReturn:
+            damagedByColumn:
+              id:
+              - 1
+              amount:
+              - 1
+              - 2
+              active:
+              - 1
+            cleanRowCount: 1
+        - id: handles-empty-source
+          arguments:
+          - value: []
+          - value:
+              id: int
+          expectedReturn:
+            damagedByColumn:
+              id: []
+            cleanRowCount: 0
+        - id: rejects-unknown-schema-kind
+          arguments:
+          - value: []
+          - value:
+              id: uuid
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pandas_11-read-boundary-policy-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_11-detect-type-damage-transfer
+    title: 데이터 읽기 경계의 손상 대응 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 열 누락, 타입 혼합, 날짜 파싱 실패 상황에 맞는 조치와 증거를 선택한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 파일이 열렸다는 사실과 데이터 계약이 유효하다는 사실을 분리하세요.
+    - 손상 값을 추측해 고치지 말고 실패 위치와 정책을 함께 남기세요.
+    exercise:
+      prompt: choose_read_boundary_policy(issue)를 완성해 action, evidence, forbidden을 반환하세요.
+      starterCode: |-
+        def choose_read_boundary_policy(issue):
+            raise NotImplementedError
+      solution: |
+        def choose_read_boundary_policy(issue):
+            table = {
+                "missing-required-column": {"action": "stop-load", "evidence": "expected and actual columns", "forbidden": "invent empty column"},
+                "mixed-numeric-text": {"action": "coerce-with-rejection-log", "evidence": "failed row indexes", "forbidden": "silently keep object type"},
+                "invalid-date": {"action": "parse-with-explicit-format", "evidence": "invalid values and timezone", "forbidden": "guess locale"},
+            }
+            if issue not in table:
+                raise ValueError("unknown read issue")
+            return table[issue]
+      hints: *id003
+    check:
+      id: python.pandas.pandas_11.read-boundary-policy.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_11.read-boundary-policy.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_read_boundary_policy
+        cases:
+        - id: recalls-mixed-type-policy
+          arguments:
+          - value: mixed-numeric-text
+          expectedReturn:
+            action: coerce-with-rejection-log
+            evidence: failed row indexes
+            forbidden: silently keep object type
+        - id: recalls-missing-column-stop
+          arguments:
+          - value: missing-required-column
+          expectedReturn:
+            action: stop-load
+            evidence: expected and actual columns
+            forbidden: invent empty column
+        - id: rejects-unknown-read-issue
+          arguments:
+          - value: slow-file
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,698 @@
+var e=`meta:
+  id: email_02
+  title: HTML 메일과 첨부
+  order: 2
+  category: email
+  difficulty: ⭐
+  badge: 입문
+  packages:
+    - reportlab
+  tags:
+    - EmailMessage
+    - add_alternative
+    - add_attachment
+  outcomes:
+    - automation.email.attachments
+  prerequisites:
+    - automation.email.send
+  estimatedMinutes: 45
+  seo:
+    title: "HTML 메일과 PDF 첨부 - EmailMessage add_attachment"
+    description: "EmailMessage.add_alternative로 HTML 본문을, add_attachment로 PDF/이미지 첨부를 자동화한다. 한글 파일명 깨짐도 해결."
+    keywords:
+      - EmailMessage HTML
+      - add_attachment
+      - 한글 파일명
+      - 멀티파트 메일
+
+intro:
+  direction: "HTML 본문과 PDF 첨부가 들어간 메일을 EmailMessage 한 객체로 만든다. 한글 파일명 깨짐 함정도 같이 해결한다."
+  benefits:
+    - "마케팅 정주임의 HTML 안내 메일 + 보고서 PDF 첨부 작업이 한 함수 호출로 끝난다."
+    - "EmailMessage가 자동으로 multipart/alternative + multipart/mixed 구조를 만들어 별도 MIME 클래스를 직접 다루지 않아도 된다."
+    - "한글 파일명이 깨지는 가장 흔한 첨부 사고를 사전 차단."
+  diagram:
+    steps:
+      - label: "1. set_content 본문"
+        detail: "텍스트 폴백 본문을 먼저."
+      - label: "2. add_alternative HTML"
+        detail: "subtype='html'로 HTML 본문 추가."
+      - label: "3. add_attachment"
+        detail: "PDF/PNG 등 파일 첨부. filename 인자로 한글 파일명 처리."
+      - label: "4. 검증"
+        detail: "iter_attachments로 첨부 목록과 filename, content_type 확인."
+    runtime:
+      - label: "샘플 첨부"
+        detail: "reportlab으로 즉석 PDF를 만들거나 임시 PNG를 생성."
+      - label: "검증"
+        detail: "EmailMessage 객체의 multipart 구조와 첨부 메타 단위 assert."
+
+sections:
+  - id: step1_html_body
+    title: "1단계. HTML 본문 추가"
+    structuredPrimary: true
+    subtitle: "set_content + add_alternative(subtype='html')"
+    goal: "텍스트 본문 + HTML 본문을 가진 multipart/alternative 메일을 만든다."
+    why: "마케팅 메일은 HTML이 표준입니다. 텍스트 폴백을 같이 두면 텍스트 전용 클라이언트에서도 깨지지 않습니다."
+    explanation: |-
+      EmailMessage의 set_content가 텍스트 본문을 세팅하고, add_alternative(html_body, subtype='html')가 HTML 본문을 같은 메시지에 추가합니다. 두 본문이 모두 들어가면 자동으로 multipart/alternative 구조가 됩니다.
+    tips:
+      - "이메일 클라이언트가 HTML을 보여줄 수 있으면 HTML, 아니면 텍스트로 자동 선택합니다."
+    snippet: |-
+      from email.message import EmailMessage
+
+      msg = EmailMessage()
+      msg["From"] = "me@example.com"
+      msg["To"] = "you@example.com"
+      msg["Subject"] = "HTML 안내"
+      msg.set_content("HTML을 지원하지 않는 클라이언트용 본문입니다.", charset="utf-8")
+      msg.add_alternative(
+          "<h1>Codaro</h1><p>HTML 본문입니다.</p>",
+          subtype="html",
+      )
+      msg.get_content_type(), [p.get_content_type() for p in msg.iter_parts()]
+    exercise:
+      prompt: "HTML 본문에 <p>월간 보고서 도착</p>가 들어가도록 바꾸세요."
+      starterCode: |-
+        from email.message import EmailMessage
+
+        msg = EmailMessage()
+        msg["From"] = "me@example.com"
+        msg["To"] = "you@example.com"
+        msg["Subject"] = "HTML 안내"
+        msg.set_content("text fallback", charset="utf-8")
+        msg.add_alternative(___, subtype="html")
+        any("월간 보고서" in p.get_content() for p in msg.iter_parts() if p.get_content_type() == "text/html")
+      hints:
+        - "문자열 '<h1>Codaro</h1><p>월간 보고서 도착</p>'."
+    check:
+      noError: "add_alternative의 subtype은 문자열."
+      resultCheck: "True 출력."
+
+  - id: step2_attach
+    title: "2단계. 파일 첨부"
+    structuredPrimary: true
+    subtitle: "add_attachment(data, maintype, subtype, filename)"
+    goal: "임시 PDF를 만들어 메일에 첨부한다."
+    why: "보고서·견적서 첨부는 사무 메일의 핵심입니다. add_attachment 한 줄로 처리됩니다."
+    explanation: |-
+      파일을 바이트로 읽어 add_attachment(data, maintype='application', subtype='pdf', filename='report.pdf')로 첨부합니다. filename이 수신자가 보는 파일명이 됩니다.
+    tips:
+      - "maintype/subtype은 MIME 타입에 맞춰 지정. PDF는 application/pdf, PNG는 image/png."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from email.message import EmailMessage
+      from reportlab.pdfgen.canvas import Canvas
+
+      workdir = TemporaryDirectory()
+      pdfPath = Path(workdir.name) / "report.pdf"
+      canvas = Canvas(str(pdfPath))
+      canvas.drawString(72, 720, "monthly report")
+      canvas.showPage()
+      canvas.save()
+
+      msg = EmailMessage()
+      msg["From"] = "me@example.com"
+      msg["To"] = "partner@example.com"
+      msg["Subject"] = "월간 보고서"
+      msg.set_content("첨부 확인 부탁드립니다.", charset="utf-8")
+      msg.add_attachment(
+          pdfPath.read_bytes(),
+          maintype="application",
+          subtype="pdf",
+          filename="report.pdf",
+      )
+
+      [(part.get_filename(), part.get_content_type()) for part in msg.iter_attachments()]
+    exercise:
+      prompt: "첨부 파일명을 'monthly_report_2026_05.pdf'로 바꾸세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from email.message import EmailMessage
+        from reportlab.pdfgen.canvas import Canvas
+
+        workdir = TemporaryDirectory()
+        pdfPath = Path(workdir.name) / "r.pdf"
+        canvas = Canvas(str(pdfPath))
+        canvas.drawString(72, 720, "x")
+        canvas.showPage()
+        canvas.save()
+
+        msg = EmailMessage()
+        msg["From"] = "me@example.com"
+        msg["To"] = "partner@example.com"
+        msg["Subject"] = "월간 보고서"
+        msg.set_content("body", charset="utf-8")
+        msg.add_attachment(pdfPath.read_bytes(), maintype="application", subtype="pdf", filename=___)
+        [p.get_filename() for p in msg.iter_attachments()]
+      hints:
+        - "문자열 'monthly_report_2026_05.pdf'."
+    check:
+      noError: "filename은 문자열."
+      resultCheck: "출력 ['monthly_report_2026_05.pdf']."
+
+  - id: step3_korean_filename
+    title: "3단계. 한글 파일명 깨짐 해결"
+    structuredPrimary: true
+    subtitle: "add_attachment의 filename 한글 자동 처리"
+    goal: "한글 파일명으로 첨부하고 iter_attachments에서 한글 그대로 복원되는지 확인한다."
+    why: "한글 파일명이 깨지는 사고는 첨부에서 가장 흔합니다. Python의 EmailMessage는 RFC2231 인코딩을 자동 처리하므로 사용자 코드는 그대로 한글 문자열만 넘기면 됩니다."
+    explanation: |-
+      filename='월간보고서.pdf'를 그대로 넘기면 EmailMessage가 자동으로 RFC2231 형식으로 인코딩합니다. 수신자 클라이언트(Gmail/Outlook 등)는 인코딩을 풀어 한글로 보여줍니다.
+    tips:
+      - "iter_attachments().get_filename()은 자동으로 디코딩된 한글을 돌려줍니다. 발송 시에는 인코딩된 형태로 헤더에 들어갑니다."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from email.message import EmailMessage
+      from reportlab.pdfgen.canvas import Canvas
+
+      workdir = TemporaryDirectory()
+      pdfPath = Path(workdir.name) / "report.pdf"
+      canvas = Canvas(str(pdfPath))
+      canvas.drawString(72, 720, "report body")
+      canvas.showPage()
+      canvas.save()
+
+      msg = EmailMessage()
+      msg["From"] = "me@example.com"
+      msg["To"] = "you@example.com"
+      msg["Subject"] = "보고서"
+      msg.set_content("첨부 확인", charset="utf-8")
+      msg.add_attachment(
+          pdfPath.read_bytes(),
+          maintype="application",
+          subtype="pdf",
+          filename="월간보고서_2026년5월.pdf",
+      )
+
+      [part.get_filename() for part in msg.iter_attachments()]
+    exercise:
+      prompt: "파일명을 '회계_청구서_홍길동.pdf'로 바꾸고 한글이 그대로 복원되는지 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from email.message import EmailMessage
+        from reportlab.pdfgen.canvas import Canvas
+
+        workdir = TemporaryDirectory()
+        pdfPath = Path(workdir.name) / "r.pdf"
+        canvas = Canvas(str(pdfPath))
+        canvas.drawString(72, 720, "x")
+        canvas.showPage()
+        canvas.save()
+
+        msg = EmailMessage()
+        msg["From"] = "me@example.com"
+        msg["To"] = "you@example.com"
+        msg["Subject"] = "청구"
+        msg.set_content("body", charset="utf-8")
+        msg.add_attachment(pdfPath.read_bytes(), maintype="application", subtype="pdf", filename=___)
+        [p.get_filename() for p in msg.iter_attachments()]
+      hints:
+        - "한글 문자열 '회계_청구서_홍길동.pdf'."
+    check:
+      noError: "filename 인자는 키워드."
+      resultCheck: "출력 ['회계_청구서_홍길동.pdf']."
+
+  - id: validation
+    title: "4단계. 검증 루프 - HTML + 첨부 통합 assert"
+    structuredPrimary: true
+    subtitle: "메시지 구조 + 첨부 메타 일괄"
+    goal: "buildEmailWithAttachment 함수가 만든 메시지의 콘텐츠 타입과 첨부 파일명을 한 셀에서 검증한다."
+    why: "HTML + 첨부 흐름은 회귀가 잦은 영역입니다. 한 묶음 assert로 회귀 사전 차단."
+    explanation: |-
+      buildEmailWithAttachment(to, subject, htmlBody, pdfPath, filename)이 한 함수에 패턴을 묶고, 결과의 multipart 구조와 첨부 파일명을 같이 확인합니다.
+    tips:
+      - "multipart 구조는 msg.is_multipart()로도 확인 가능."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from email.message import EmailMessage
+      from reportlab.pdfgen.canvas import Canvas
+
+      def buildEmailWithAttachment(toAddr, subject, htmlBody, pdfPath, filename):
+          msg = EmailMessage()
+          msg["From"] = "me@example.com"
+          msg["To"] = toAddr
+          msg["Subject"] = subject
+          msg.set_content("HTML 미지원 클라이언트용 본문", charset="utf-8")
+          msg.add_alternative(htmlBody, subtype="html")
+          msg.add_attachment(Path(pdfPath).read_bytes(), maintype="application", subtype="pdf", filename=filename)
+          return msg
+
+      vault = TemporaryDirectory()
+      pdfPath = Path(vault.name) / "report.pdf"
+      canvas = Canvas(str(pdfPath))
+      canvas.drawString(72, 720, "report")
+      canvas.showPage()
+      canvas.save()
+
+      msg = buildEmailWithAttachment(
+          "partner@example.com",
+          "월간 보고서",
+          "<h1>월간 보고서</h1>",
+          pdfPath,
+          "보고서.pdf",
+      )
+
+      assert msg.is_multipart()
+      attachments = list(msg.iter_attachments())
+      assert len(attachments) == 1
+      assert attachments[0].get_filename() == "보고서.pdf"
+      assert attachments[0].get_content_type() == "application/pdf"
+      msg["Subject"], attachments[0].get_filename()
+    exercise:
+      prompt: "함수에 csv 인자가 들어왔을 때만 두 번째 첨부를 추가하는 분기를 직접 작성하세요. 빈 자리에 if 가드와 add_attachment 호출(maintype='text', subtype='csv', filename=csvFilename)을 채워 첨부 수가 정확히 2가 되도록 합니다."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from email.message import EmailMessage
+        from reportlab.pdfgen.canvas import Canvas
+
+        def buildEmailWithAttachment(toAddr, subject, htmlBody, pdfPath, filename, csvPath=None, csvFilename=None):
+            msg = EmailMessage()
+            msg["From"] = "me@example.com"
+            msg["To"] = toAddr
+            msg["Subject"] = subject
+            msg.set_content("text", charset="utf-8")
+            msg.add_alternative(htmlBody, subtype="html")
+            msg.add_attachment(Path(pdfPath).read_bytes(), maintype="application", subtype="pdf", filename=filename)
+            ___
+            return msg
+
+        vault = TemporaryDirectory()
+        base = Path(vault.name)
+        pdfPath = base / "r.pdf"
+        canvas = Canvas(str(pdfPath))
+        canvas.drawString(72, 720, "x")
+        canvas.showPage()
+        canvas.save()
+        csvPath = base / "d.csv"
+        csvPath.write_text("a,b\\n1,2\\n", encoding="utf-8")
+
+        msg = buildEmailWithAttachment("p@x.com", "s", "<p>h</p>", pdfPath, "r.pdf", csvPath, "data.csv")
+        len(list(msg.iter_attachments()))
+      hints:
+        - "빈 자리: if csvPath: msg.add_attachment(Path(csvPath).read_bytes(), maintype='text', subtype='csv', filename=csvFilename)."
+    check:
+      noError: "함수 인자가 모두 채워져야 합니다."
+      resultCheck: "출력 2."
+
+  - id: practice
+    title: "실습 - 종합 미션"
+    subtitle: "마케팅 안내 메일 빌더"
+    goal: "HTML 본문 + 한글 첨부 PDF가 들어간 안내 메일 빌더를 직접 작성한다."
+    why: "마케팅 정주임의 실무 메일 패턴 그대로입니다. 함수 하나로 모든 안내 메일을 일관되게 만듭니다."
+    explanation: |-
+      미션은 마케팅 안내 메일 빌더 함수입니다. 한글 제목, HTML 본문, 한글 파일명 첨부가 모두 정상 처리되는지 검증합니다.
+    tips:
+      - "한글 처리는 EmailMessage가 거의 자동입니다. 사용자 코드는 깨끗하게 한글 그대로."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from email.message import EmailMessage
+      from reportlab.pdfgen.canvas import Canvas
+    exercise:
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "함수 시그니처: buildCampaignEmail(toAddr, subject, htmlBody, pdfPath, filename) -> EmailMessage"
+    check:
+      noError: "함수 정의 + 검증."
+      resultCheck: "한글 제목/파일명이 모두 복원되어야 합니다."
+    blocks:
+      - type: expansion
+        title: "미션: 한글 안내 메일 빌더"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from email.message import EmailMessage
+              from reportlab.pdfgen.canvas import Canvas
+
+              def buildCampaignEmail(toAddr, subject, htmlBody, pdfPath, filename):
+                  msg = EmailMessage()
+                  msg["From"] = "marketing@codaro.dev"
+                  msg["To"] = toAddr
+                  msg["Subject"] = subject
+                  msg.set_content("HTML 미지원 클라이언트용 본문입니다.", charset="utf-8")
+                  msg.add_alternative(htmlBody, subtype="html")
+                  msg.add_attachment(
+                      Path(pdfPath).read_bytes(),
+                      maintype="application",
+                      subtype="pdf",
+                      filename=filename,
+                  )
+                  return msg
+
+              missionDir = TemporaryDirectory()
+              missionPdf = Path(missionDir.name) / "guide.pdf"
+              canvas = Canvas(str(missionPdf))
+              canvas.drawString(72, 720, "guide")
+              canvas.showPage()
+              canvas.save()
+
+              msg = buildCampaignEmail(
+                  "customer@example.com",
+                  "Codaro 5월 안내 - 신기능 출시",
+                  "<h1>Codaro 5월</h1><p>새 기능을 확인하세요</p>",
+                  missionPdf,
+                  "Codaro_5월_안내.pdf",
+              )
+              assert msg["Subject"] == "Codaro 5월 안내 - 신기능 출시"
+              attachments = list(msg.iter_attachments())
+              assert attachments[0].get_filename() == "Codaro_5월_안내.pdf"
+              msg["Subject"], attachments[0].get_filename()
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: list
+        style: bullet
+        items:
+          - "첨부 여러 개 (CSV + PDF + 이미지) 동시 발송"
+          - "HTML 본문에 회사 로고를 인라인 이미지(Content-ID)로 삽입 (04강 미리보기)"
+          - "수신자별로 다른 첨부 (개인화 청구서) - 03강 결합"
+          - "첨부 크기 제한 (Gmail 25MB) 체크 함수"
+          - "첨부 파일명을 회사명+날짜 패턴으로 자동 생성"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: email_02-html-attachment-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_html_body
+    - extensions
+    title: HTML 본문과 첨부파일의 안전 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: plain-text 대체본문, unsafe tag, attachment size/hash를 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - HTML 메일에는 반드시 plain-text 대체본문을 제공하세요.
+    - 첨부는 이름이 아니라 byte length·content hash·MIME type으로 검증하세요.
+    exercise:
+      prompt: audit_html_attachments(message, maximum_attachment_bytes)를 완성하세요.
+      starterCode: |-
+        def audit_html_attachments(message, maximum_attachment_bytes):
+            raise NotImplementedError
+      solution: |
+        def audit_html_attachments(message, maximum_attachment_bytes):
+            import re
+            failures = []
+            if not str(message.get("plainText", "")).strip():
+                failures.append("plain-text")
+            html = message.get("html", "")
+            unsafe_tags = sorted(set(match.group(1).lower() for match in re.finditer(r"<\\s*(script|iframe|object)\\b", html, flags=re.I)))
+            if unsafe_tags:
+                failures.append("unsafe-html")
+            attachment_failures = []
+            for item in message.get("attachments", []):
+                reasons = []
+                if item.get("byteLength", 0) > maximum_attachment_bytes:
+                    reasons.append("size")
+                if not item.get("contentHash"):
+                    reasons.append("hash")
+                if not item.get("contentType"):
+                    reasons.append("content-type")
+                if reasons:
+                    attachment_failures.append({"name": item["name"], "reasons": reasons})
+            if attachment_failures:
+                failures.append("attachments")
+            return {"accepted": not failures, "failures": failures, "unsafeTags": unsafe_tags, "attachmentFailures": attachment_failures}
+      hints: *id001
+    check:
+      id: python.email.email_02.html-attachment-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_02.html-attachment-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_html_attachments
+        cases:
+        - id: accepts-safe-alternative-and-attachment
+          arguments:
+          - value:
+              plainText: Report attached
+              html: <p>Report attached</p>
+              attachments:
+              - name: report.pdf
+                byteLength: 100
+                contentHash: abc
+                contentType: application/pdf
+          - value: 1000
+          expectedReturn:
+            accepted: true
+            failures: []
+            unsafeTags: []
+            attachmentFailures: []
+        - id: reports-plain-text-and-unsafe-html
+          arguments:
+          - value:
+              plainText: ''
+              html: <script>alert(1)<\/script>
+              attachments: []
+          - value: 1000
+          expectedReturn:
+            accepted: false
+            failures:
+            - plain-text
+            - unsafe-html
+            unsafeTags:
+            - script
+            attachmentFailures: []
+        - id: reports-attachment-contract
+          arguments:
+          - value:
+              plainText: x
+              html: <p>x</p>
+              attachments:
+              - name: big.bin
+                byteLength: 2000
+                contentHash: ''
+                contentType: ''
+          - value: 1000
+          expectedReturn:
+            accepted: false
+            failures:
+            - attachments
+            unsafeTags: []
+            attachmentFailures:
+            - name: big.bin
+              reasons:
+              - size
+              - hash
+              - content-type
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: email_02-attachment-delivery-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - email_02-html-attachment-contract-mastery
+    title: 새 메일 첨부의 MIME·hash reconciliation 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 계획한 attachment와 생성된 MIME part를 content identity로 대조한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - MIME part를 filename만이 아니라 type과 content hash로 대조하세요.
+    - inline image에는 HTML이 참조할 content ID를 필수로 두세요.
+    exercise:
+      prompt: reconcile_attachment_parts(planned, observed_parts)를 완성하세요.
+      starterCode: |-
+        def reconcile_attachment_parts(planned, observed_parts):
+            raise NotImplementedError
+      solution: |
+        def reconcile_attachment_parts(planned, observed_parts):
+            def identity(item):
+                return (item["name"], item["contentType"], item["contentHash"])
+            planned_ids = {identity(item) for item in planned}
+            observed_ids = {identity(item) for item in observed_parts if item.get("disposition") == "attachment"}
+            missing = sorted([list(item) for item in planned_ids - observed_ids])
+            unexpected = sorted([list(item) for item in observed_ids - planned_ids])
+            inline_without_id = sorted(item["name"] for item in observed_parts if item.get("disposition") == "inline" and not item.get("contentId"))
+            return {"passed": not missing and not unexpected and not inline_without_id, "missing": missing, "unexpected": unexpected, "inlineWithoutContentId": inline_without_id}
+      hints: *id002
+    check:
+      id: python.email.email_02.attachment-delivery-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_02.attachment-delivery-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_attachment_parts
+        cases:
+        - id: accepts-exact-attachment-part
+          arguments:
+          - value:
+            - name: r.pdf
+              contentType: application/pdf
+              contentHash: x
+          - value:
+            - name: r.pdf
+              contentType: application/pdf
+              contentHash: x
+              disposition: attachment
+          expectedReturn:
+            passed: true
+            missing: []
+            unexpected: []
+            inlineWithoutContentId: []
+        - id: reports-missing-and-unexpected-part
+          arguments:
+          - value:
+            - name: r.pdf
+              contentType: application/pdf
+              contentHash: x
+          - value:
+            - name: other.txt
+              contentType: text/plain
+              contentHash: y
+              disposition: attachment
+          expectedReturn:
+            passed: false
+            missing:
+            - - r.pdf
+              - application/pdf
+              - x
+            unexpected:
+            - - other.txt
+              - text/plain
+              - y
+            inlineWithoutContentId: []
+        - id: reports-inline-without-content-id
+          arguments:
+          - value: []
+          - value:
+            - name: chart.png
+              contentType: image/png
+              contentHash: z
+              disposition: inline
+          expectedReturn:
+            passed: false
+            missing: []
+            unexpected: []
+            inlineWithoutContentId:
+            - chart.png
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: email_02-html-attachment-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - email_02-attachment-delivery-reconciliation-transfer
+    title: HTML 메일·첨부 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 대체본문·HTML 안전·MIME identity 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 메일 API 성공과 올바른 수신자·내용·첨부 전달을 분리해 검증하세요.
+    - 실제 발송 전 dry run과 idempotency identity, 비밀정보 redaction을 적용하세요.
+    exercise:
+      prompt: choose_html_mail_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_html_mail_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_html_mail_evidence(situation):
+            table = {'body': {'action': 'provide plain text and safe HTML', 'evidence': 'two body variants', 'risk': 'inaccessible or unsafe mail'}, 'attachment': {'action': 'bind name type size and hash', 'evidence': 'attachment descriptor', 'risk': 'wrong file'}, 'mime': {'action': 'reparse and reconcile parts', 'evidence': 'MIME part identities', 'risk': 'missing or extra attachment'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.email.email_02.html-attachment-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_02.html-attachment-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_html_mail_evidence
+        cases:
+        - id: recalls-body
+          arguments:
+          - value: body
+          expectedReturn:
+            action: provide plain text and safe HTML
+            evidence: two body variants
+            risk: inaccessible or unsafe mail
+        - id: recalls-attachment
+          arguments:
+          - value: attachment
+          expectedReturn:
+            action: bind name type size and hash
+            evidence: attachment descriptor
+            risk: wrong file
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

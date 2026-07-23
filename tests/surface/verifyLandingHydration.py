@@ -200,25 +200,39 @@ def auditCase(browser: Any, case: dict[str, Any], port: int) -> tuple[dict[str, 
         hydratedSnapshot = pageSnapshot(page)
         cls = float(page.evaluate("window.__codaroCls || 0"))
         observerError = page.evaluate("window.__codaroClsObserverError || null")
+        lessonRef = case.get("lessonRef")
 
-        if ssrSnapshot["rootHtmlHash"] != hydratedSnapshot["rootHtmlHash"]:
-            failures.append(f"{case['name']}: hydrated root differs from server markup")
-        if ssrSnapshot["rootText"] != hydratedSnapshot["rootText"]:
-            failures.append(f"{case['name']}: hydrated visible text differs from server text")
+        if lessonRef:
+            if ssrSnapshot["lessonCount"] != 1 or ssrSnapshot["lessonRef"] != lessonRef:
+                failures.append(f"{case['name']}: SSR lesson identity is incomplete")
+            if hydratedSnapshot["editorLessonCount"] != 1:
+                failures.append(
+                    f"{case['name']}: expected one interactive lesson workspace, "
+                    f"found {hydratedSnapshot['editorLessonCount']}"
+                )
+            if hydratedSnapshot["editorLessonRef"] != lessonRef:
+                failures.append(f"{case['name']}: interactive lesson identity changed")
+        else:
+            if ssrSnapshot["rootHtmlHash"] != hydratedSnapshot["rootHtmlHash"]:
+                failures.append(f"{case['name']}: hydrated root differs from server markup")
+            if ssrSnapshot["rootText"] != hydratedSnapshot["rootText"]:
+                failures.append(f"{case['name']}: hydrated visible text differs from server text")
         if ssrSnapshot["metadata"] != hydratedSnapshot["metadata"]:
             failures.append(f"{case['name']}: hydrated metadata differs from SSR metadata")
         if ssrSnapshot["structuredData"] != hydratedSnapshot["structuredData"]:
             failures.append(f"{case['name']}: hydrated structured data differs from SSR structured data")
-        if hydratedSnapshot["rootCount"] != 1 or hydratedSnapshot["appFrameCount"] != 1:
+        expectedAppFrameCount = 0 if lessonRef else 1
+        if (
+            hydratedSnapshot["rootCount"] != 1
+            or hydratedSnapshot["appFrameCount"] != expectedAppFrameCount
+        ):
             failures.append(f"{case['name']}: hydration duplicated the application root")
-        expectedLessonCount = 1 if case.get("lessonRef") else 0
+        expectedLessonCount = 0
         if hydratedSnapshot["lessonCount"] != expectedLessonCount:
             failures.append(
                 f"{case['name']}: expected {expectedLessonCount} public lesson document, "
                 f"found {hydratedSnapshot['lessonCount']}"
             )
-        if case.get("lessonRef") and hydratedSnapshot["lessonRef"] != case["lessonRef"]:
-            failures.append(f"{case['name']}: hydrated lesson identity changed")
         if observerError:
             failures.append(f"{case['name']}: layout shift observer failed: {observerError}")
         if cls > MAX_CLS:
@@ -233,15 +247,22 @@ def auditCase(browser: Any, case: dict[str, Any], port: int) -> tuple[dict[str, 
         result = {
             "name": case["name"],
             "route": route,
-            "lessonRef": case.get("lessonRef"),
+            "lessonRef": lessonRef,
             "rootHtmlStable": ssrSnapshot["rootHtmlHash"] == hydratedSnapshot["rootHtmlHash"],
             "rootTextStable": ssrSnapshot["rootText"] == hydratedSnapshot["rootText"],
+            "rootTransitionedToEditor": bool(
+                lessonRef
+                and ssrSnapshot["rootHtmlHash"] != hydratedSnapshot["rootHtmlHash"]
+                and hydratedSnapshot["editorLessonRef"] == lessonRef
+            ),
             "metadataStable": ssrSnapshot["metadata"] == hydratedSnapshot["metadata"],
             "metadataChanges": changedValues(ssrSnapshot["metadata"], hydratedSnapshot["metadata"]),
             "structuredDataStable": ssrSnapshot["structuredData"] == hydratedSnapshot["structuredData"],
             "rootCount": hydratedSnapshot["rootCount"],
             "appFrameCount": hydratedSnapshot["appFrameCount"],
             "lessonCount": hydratedSnapshot["lessonCount"],
+            "editorLessonCount": hydratedSnapshot["editorLessonCount"],
+            "editorLessonRef": hydratedSnapshot["editorLessonRef"],
             "cls": round(cls, 4),
             "consoleMessages": consoleMessages[:10],
             "passed": not failures,
@@ -285,6 +306,8 @@ def pageSnapshot(page: Any) -> dict[str, Any]:
     )
     lessonLocator = page.locator("[data-public-lesson]")
     lessonCount = lessonLocator.count()
+    editorLessonLocator = page.locator("[data-learning-lesson-ref]")
+    editorLessonCount = editorLessonLocator.count()
     return {
         "rootHtmlHash": hashlib.sha256(rootHtml.encode("utf-8")).hexdigest(),
         "rootText": rootText,
@@ -294,6 +317,12 @@ def pageSnapshot(page: Any) -> dict[str, Any]:
         "appFrameCount": page.locator("#root .appFrame").count(),
         "lessonCount": lessonCount,
         "lessonRef": lessonLocator.first.get_attribute("data-public-lesson") if lessonCount else None,
+        "editorLessonCount": editorLessonCount,
+        "editorLessonRef": (
+            editorLessonLocator.first.get_attribute("data-learning-lesson-ref")
+            if editorLessonCount
+            else None
+        ),
     }
 
 

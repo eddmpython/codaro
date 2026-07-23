@@ -1,0 +1,977 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - numpy
+  - pandas
+  - scipy
+  id: scipy_10
+  title: 종합과학프로젝트
+  order: 10
+  category: scipy
+  difficulty: ⭐⭐⭐⭐
+  badge: 심화
+  tags:
+  - scipy
+  - 종합프로젝트
+  - 데이터분석
+  - 과학계산
+  - 실전
+  seo:
+    title: SciPy 종합 프로젝트 - 모든 모듈 통합 활용
+    description: SciPy의 모든 모듈을 통합하여 실전 과학 계산 문제를 해결합니다. 센서 데이터 분석 파이프라인을 구축합니다.
+    keywords:
+    - scipy
+    - 종합프로젝트
+    - 데이터분석
+    - 과학계산
+intro:
+  emoji: 🔬
+  goal: SciPy의 모든 모듈을 통합하여 실전 데이터 분석 파이프라인을 구축합니다.
+  description: 센서 데이터를 필터링하고, 주파수 분석하고, 통계 검정하고, 모델을 피팅하는 전체 워크플로우를 경험합니다. 이 과정에서 scipy.signal, scipy.fft,
+    scipy.stats, scipy.optimize, scipy.integrate를 모두 활용합니다.
+  direction: 종합과학프로젝트에서 수치 데이터를 모델에 넣고 계산 결과와 오차를 검증합니다.
+  benefits:
+  - 수치 입력 확인 후 최적화/적분/신호 처리에 맞는 코드 입력을 고릅니다.
+  - 종합과학프로젝트 결과를 오차와 결과 범위 기준으로 즉시 점검합니다.
+  - 완료한 코드를 과학 계산 루틴에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 데이터 로드 입력 확인
+      detail: 입력 기준(수치 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 신호 필터링 처리 실행
+      detail: 최적화/적분/신호 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 주파수 분석 결과 검증
+      detail: 오차와 결과 범위 기준으로 실행 결과를 비교합니다.
+    - label: 종합과학프로젝트 재사용
+      detail: 완성 코드를 과학 계산 루틴에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 과학 계산 환경
+      detail: matplotlib, numpy, pandas, scipy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 종합과학프로젝트 실행
+      detail: 셀을 실행해 오차와 결과 범위와 예외 상태를 확인합니다.
+    - label: 종합과학프로젝트 완료
+      detail: 검증된 코드를 과학 계산 루틴로 남깁니다.
+sections:
+- id: load
+  title: 데이터 로드
+  structuredPrimary: true
+  subtitle: 진동 센서 시뮬레이션
+  goal: 데이터 로드에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 산업용 기계에서 수집한 진동 센서 데이터를 분석합니다. 정상 진동(50Hz 회전 주파수), 베어링 결함 신호(120Hz), 전력선 간섭(60Hz), 랜덤 노이즈가
+    합성된 현실적인 센서 데이터를 생성합니다. 이런 데이터에서 결함을 감지하고 상태를 진단하는 것이 산업 현장의 핵심 과제입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import scipy
+
+    import numpy as np
+    from scipy import signal, fft, stats, optimize, integrate
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    np.random.seed(42)
+    fs = 1000
+    duration = 10
+    t = np.linspace(0, duration, fs * duration, endpoint=False)
+    n = len(t)
+
+    rotationFreq = 50
+    normalVib = 1.0 * np.sin(2 * np.pi * rotationFreq * t)
+    normalVib += 0.3 * np.sin(2 * np.pi * 2 * rotationFreq * t)
+
+    defectFreq = 120
+    defectVib = 0.4 * np.sin(2 * np.pi * defectFreq * t)
+
+    powerNoise = 0.2 * np.sin(2 * np.pi * 60 * t)
+    randomNoise = 0.3 * np.random.randn(n)
+
+    rawSignal = normalVib + defectVib + powerNoise + randomNoise
+  exercise:
+    prompt: 데이터 로드 예제에서 \`fs\`, \`duration\`, \`t\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      import scipy
+
+      import numpy as np
+      from scipy import signal, fft, stats, optimize, integrate
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      np.random.seed(42)
+      fs = 1000
+      duration = 10
+      t = np.linspace(0, duration, fs * duration, endpoint=False)
+      n = len(t)
+
+      rotationFreq = 50
+      normalVib = 1.0 * np.sin(2 * np.pi * rotationFreq * t)
+      normalVib += 0.3 * np.sin(2 * np.pi * 2 * rotationFreq * t)
+
+      defectFreq = 120
+      defectVib = 0.4 * np.sin(2 * np.pi * defectFreq * t)
+
+      powerNoise = 0.2 * np.sin(2 * np.pi * 60 * t)
+      randomNoise = 0.3 * np.random.randn(n)
+
+      rawSignal = normalVib + defectVib + powerNoise + randomNoise
+    hints:
+    - 바꿀 지점은 \`fs = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`fs\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 데이터 로드에서 \`fs\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 데이터 로드 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: filter
+  title: 신호 필터링
+  structuredPrimary: true
+  subtitle: scipy.signal
+  goal: 신호 필터링에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 전력선 간섭(60Hz)을 노치 필터로 제거하고, 관심 대역 외의 고주파 노이즈를 저역통과 필터로 줄입니다. 필터 순서가 중요합니다. 먼저 노치로 특정 간섭을
+    제거한 후, 저역통과로 전체 대역을 정리합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    bNotch, aNotch = signal.iirnotch(60 / (fs/2), 30)
+    afterNotch = signal.filtfilt(bNotch, aNotch, rawSignal)
+
+    sosLow = signal.butter(4, 200 / (fs/2), btype='low', output='sos')
+    filteredSignal = signal.sosfiltfilt(sosLow, afterNotch)
+  exercise:
+    prompt: 신호 필터링 예제에서 \`bNotch\`, \`aNotch\`, \`afterNotch\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      bNotch, aNotch = signal.iirnotch(60 / (fs/2), 30)
+      afterNotch = signal.filtfilt(bNotch, aNotch, rawSignal)
+
+      sosLow = signal.butter(4, 200 / (fs/2), btype='low', output='sos')
+      filteredSignal = signal.sosfiltfilt(sosLow, afterNotch)
+    hints:
+    - 바꿀 지점은 \`afterNotch = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`afterNotch\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 신호 필터링에서 \`afterNotch\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 신호 필터링 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: spectrum
+  title: 주파수 분석
+  structuredPrimary: true
+  subtitle: scipy.fft
+  goal: 주파수 분석에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: FFT로 신호의 주파수 성분을 분석하여 회전 주파수(50Hz)와 결함 주파수(120Hz)를 검출합니다. 정상 기계는 회전 주파수와 그 고조파만 나타나야 합니다.
+    결함이 있으면 베어링 결함 주파수 등 비정상적인 피크가 나타납니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    fftResult = fft.fft(filteredSignal)
+    freqs = fft.fftfreq(n, 1/fs)
+    posFreqs = freqs[:n//2]
+    magnitude = 2 * np.abs(fftResult[:n//2]) / n
+
+    figFft, axFft = plt.subplots(figsize=(12, 5))
+    axFft.plot(posFreqs, magnitude, 'b-', linewidth=1)
+    axFft.axvline(50, color='green', linestyle='--', alpha=0.7, label='Rotation (50Hz)')
+    axFft.axvline(100, color='green', linestyle=':', alpha=0.5, label='2x Rotation (100Hz)')
+    axFft.axvline(120, color='red', linestyle='--', alpha=0.7, label='Defect (120Hz)')
+    axFft.set_xlim(0, 200)
+    axFft.set_xlabel('Frequency (Hz)')
+    axFft.set_ylabel('Magnitude')
+    axFft.set_title('Frequency Spectrum of Filtered Signal')
+    axFft.legend()
+    axFft.grid(True, alpha=0.3)
+    figFft
+  exercise:
+    prompt: 주파수 분석 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      fftResult = fft.fft(filteredSignal)
+      freqs = fft.fftfreq(n, 1/fs)
+      posFreqs = freqs[:n//2]
+      magnitude = 2 * np.abs(fftResult[:n//2]) / n
+
+      figFft, axFft = plt.subplots(figsize=(12, 5))
+      axFft.plot(posFreqs, magnitude, 'b-', linewidth=1)
+      axFft.axvline(50, color='green', linestyle='--', alpha=0.7, label='Rotation (50Hz)')
+      axFft.axvline(100, color='green', linestyle=':', alpha=0.5, label='2x Rotation (100Hz)')
+      axFft.axvline(120, color='red', linestyle='--', alpha=0.7, label='Defect (120Hz)')
+      axFft.set_xlim(0, 200)
+      axFft.set_xlabel('Frequency (Hz)')
+      axFft.set_ylabel('Magnitude')
+      axFft.set_title('Frequency Spectrum of Filtered Signal')
+      axFft.legend()
+      axFft.grid(True, alpha=0.3)
+      figFft
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 주파수 분석의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 주파수 분석의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: statistics
+  title: 통계 분석
+  structuredPrimary: true
+  subtitle: scipy.stats
+  goal: 통계 분석에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    진동 신호의 통계적 특성을 분석합니다. RMS(Root Mean Square)는 에너지 수준, 왜도(skewness)는 비대칭성, 첨도(kurtosis)는 충격성을 나타냅니다. 결함이 있으면 첨도가 높아지고 RMS가 증가하는 경향이 있습니다.
+
+    정상 기계의 진동은 보통 정규분포에 가깝습니다. 결함이 발생하면 충격 성분이 추가되어 분포가 뾰족해지고(높은 첨도) 정규성이 감소합니다.
+  snippet: |-
+    rmsValue = np.sqrt(np.mean(filteredSignal**2))
+    skewValue = stats.skew(filteredSignal)
+    kurtValue = stats.kurtosis(filteredSignal)
+    peakValue = np.max(np.abs(filteredSignal))
+    crestFactor = peakValue / rmsValue
+
+    statsDf = pd.DataFrame({
+        'Metric': ['RMS', 'Peak', 'Crest Factor', 'Skewness', 'Kurtosis'],
+        'Value': [f'{rmsValue:.4f}', f'{peakValue:.4f}', f'{crestFactor:.4f}', f'{skewValue:.4f}', f'{kurtValue:.4f}']
+    })
+    statsDf
+  exercise:
+    prompt: 통계 분석 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      rmsValue = np.sqrt(np.mean(filteredSignal**2))
+      skewValue = stats.skew(filteredSignal)
+      kurtValue = stats.kurtosis(filteredSignal)
+      peakValue = np.max(np.abs(filteredSignal))
+      crestFactor = peakValue / rmsValue
+
+      statsDf = pd.DataFrame({
+          'Metric': ['RMS', 'Peak', 'Crest Factor', 'Skewness', 'Kurtosis'],
+          'Value': [f'{rmsValue:.4f}', f'{peakValue:.4f}', f'{crestFactor:.4f}', f'{skewValue:.4f}', f'{kurtValue:.4f}']
+      })
+      statsDf
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 통계 분석의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 통계 분석의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: trend
+  title: 시간 추이 분석
+  structuredPrimary: true
+  subtitle: 상태 변화 모니터링
+  goal: 시간 추이 분석에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: 신호를 세그먼트로 나누어 시간에 따른 특성 변화를 분석합니다. 결함이 진행되면 RMS와 첨도가 점진적으로 증가하는 경향을 보입니다. 이 추이를 모니터링하면
+    고장을 예측할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    segmentLen = 1000
+    nSegments = n // segmentLen
+    segmentRms = []
+    segmentKurt = []
+
+    for i in range(nSegments):
+        seg = filteredSignal[i*segmentLen:(i+1)*segmentLen]
+        segmentRms.append(np.sqrt(np.mean(seg**2)))
+        segmentKurt.append(stats.kurtosis(seg))
+
+    segmentTime = np.arange(nSegments) * (segmentLen / fs)
+  exercise:
+    prompt: 시간 추이 분석 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      segmentLen = 1000
+      nSegments = n // segmentLen
+      segmentRms = []
+      segmentKurt = []
+
+      for i in range(nSegments):
+          seg = filteredSignal[i*segmentLen:(i+1)*segmentLen]
+          segmentRms.append(np.sqrt(np.mean(seg**2)))
+          segmentKurt.append(stats.kurtosis(seg))
+
+      segmentTime = np.arange(nSegments) * (segmentLen / fs)
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 시간 추이 분석의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 시간 추이 분석 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: fitting
+  title: 진폭 피팅
+  structuredPrimary: true
+  subtitle: scipy.optimize
+  goal: 진폭 피팅에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: RMS 값의 시간 변화에 지수함수를 피팅하여 결함 진행 속도를 추정합니다. 지수적 성장 모델은 베어링 결함의 전형적인 진행 패턴입니다. 피팅된 파라미터로 남은
+    수명을 예측할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def expGrowth(tVal, a, b, c):
+        return a * np.exp(b * tVal) + c
+
+    try:
+        fitParams, fitCov = optimize.curve_fit(
+            expGrowth, segmentTime, segmentRms,
+            p0=[0.01, 0.1, np.mean(segmentRms)],
+            maxfev=5000
+        )
+        aFit, bFit, cFit = fitParams
+        rmsFit = expGrowth(segmentTime, aFit, bFit, cFit)
+        fitSuccess = True
+    except (RuntimeError, ValueError):
+        fitSuccess = False
+        rmsFit = np.ones_like(segmentTime) * np.mean(segmentRms)
+
+    figFit, axFit = plt.subplots(figsize=(10, 5))
+    axFit.scatter(segmentTime, segmentRms, s=50, c='blue', label='Measured RMS')
+    axFit.plot(segmentTime, rmsFit, 'r-', linewidth=2, label='Fitted Trend')
+    axFit.set_xlabel('Time (s)')
+    axFit.set_ylabel('RMS')
+    axFit.set_title('RMS Trend with Exponential Fit')
+    axFit.legend()
+    axFit.grid(True, alpha=0.3)
+    figFit
+  exercise:
+    prompt: 진폭 피팅 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      def expGrowth(tVal, a, b, c):
+          return a * np.exp(b * tVal) + c
+
+      try:
+          fitParams, fitCov = optimize.curve_fit(
+              expGrowth, segmentTime, segmentRms,
+              p0=[0.01, 0.1, np.mean(segmentRms)],
+              maxfev=5000
+          )
+          aFit, bFit, cFit = fitParams
+          rmsFit = expGrowth(segmentTime, aFit, bFit, cFit)
+          fitSuccess = True
+      except (RuntimeError, ValueError):
+          fitSuccess = False
+          rmsFit = np.ones_like(segmentTime) * np.mean(segmentRms)
+
+      figFit, axFit = plt.subplots(figsize=(10, 5))
+      axFit.scatter(segmentTime, segmentRms, s=50, c='blue', label='Measured RMS')
+      axFit.plot(segmentTime, rmsFit, 'r-', linewidth=2, label='Fitted Trend')
+      axFit.set_xlabel('Time (s)')
+      axFit.set_ylabel('RMS')
+      axFit.set_title('RMS Trend with Exponential Fit')
+      axFit.legend()
+      axFit.grid(True, alpha=0.3)
+      figFit
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 진폭 피팅의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 진폭 피팅 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: energy
+  title: 에너지 계산
+  structuredPrimary: true
+  subtitle: scipy.integrate
+  goal: 에너지 계산에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 진동 에너지(신호 제곱의 적분)는 피로 손상과 관련됩니다. 누적 에너지를 계산하면 기계가 받은 총 스트레스를 추정할 수 있습니다. 이 값이 임계치를 넘으면
+    부품 교체가 필요합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    signalSquared = filteredSignal ** 2
+    cumulativeEnergy = integrate.cumulative_trapezoid(signalSquared, t, initial=0)
+    totalEnergy = cumulativeEnergy[-1]
+
+    figEnergy, (axEnergyS, axEnergyC) = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
+
+    axEnergyS.plot(t, signalSquared, 'b-', linewidth=0.3, alpha=0.5)
+    axEnergyS.set_ylabel('Signal²')
+    axEnergyS.set_title('Squared Vibration Signal')
+    axEnergyS.grid(True, alpha=0.3)
+
+    axEnergyC.plot(t, cumulativeEnergy, 'r-', linewidth=2)
+    axEnergyC.set_xlabel('Time (s)')
+    axEnergyC.set_ylabel('Cumulative Energy')
+    axEnergyC.set_title(f'Cumulative Vibration Energy (Total: {totalEnergy:.2f})')
+    axEnergyC.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    figEnergy
+  exercise:
+    prompt: 에너지 계산 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      signalSquared = filteredSignal ** 2
+      cumulativeEnergy = integrate.cumulative_trapezoid(signalSquared, t, initial=0)
+      totalEnergy = cumulativeEnergy[-1]
+
+      figEnergy, (axEnergyS, axEnergyC) = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
+
+      axEnergyS.plot(t, signalSquared, 'b-', linewidth=0.3, alpha=0.5)
+      axEnergyS.set_ylabel('Signal²')
+      axEnergyS.set_title('Squared Vibration Signal')
+      axEnergyS.grid(True, alpha=0.3)
+
+      axEnergyC.plot(t, cumulativeEnergy, 'r-', linewidth=2)
+      axEnergyC.set_xlabel('Time (s)')
+      axEnergyC.set_ylabel('Cumulative Energy')
+      axEnergyC.set_title(f'Cumulative Vibration Energy (Total: {totalEnergy:.2f})')
+      axEnergyC.grid(True, alpha=0.3)
+
+      plt.tight_layout()
+      figEnergy
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 에너지 계산의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 에너지 계산의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: comparison
+  title: 정상 vs 결함 비교
+  structuredPrimary: true
+  subtitle: 통계 검정
+  goal: 정상 vs 결함 비교에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 정상 상태(결함 없음)와 결함 상태의 진동 특성을 비교합니다. t-검정으로 두 상태의 RMS 값에 유의미한 차이가 있는지 확인합니다. 이런 통계 검정은 자동
+    이상 탐지 알고리즘의 기반이 됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    np.random.seed(123)
+    tComp = np.linspace(0, 5, 5000)
+
+    normalSig = np.sin(2 * np.pi * 50 * tComp) + 0.2 * np.random.randn(5000)
+    defectSig = np.sin(2 * np.pi * 50 * tComp) + 0.5 * np.sin(2 * np.pi * 120 * tComp) + 0.3 * np.random.randn(5000)
+
+    segRmsNormal = [np.sqrt(np.mean(normalSig[i*500:(i+1)*500]**2)) for i in range(10)]
+    segRmsDefect = [np.sqrt(np.mean(defectSig[i*500:(i+1)*500]**2)) for i in range(10)]
+
+    tStat, pValue = stats.ttest_ind(segRmsNormal, segRmsDefect)
+
+    testDf = pd.DataFrame({
+        'Condition': ['Normal', 'Defect'],
+        'Mean RMS': [f'{np.mean(segRmsNormal):.4f}', f'{np.mean(segRmsDefect):.4f}'],
+        'Std RMS': [f'{np.std(segRmsNormal):.4f}', f'{np.std(segRmsDefect):.4f}'],
+        't-statistic': [f'{tStat:.4f}', ''],
+        'p-value': [f'{pValue:.6f}', '']
+    })
+    testDf
+  exercise:
+    prompt: 정상 vs 결함 비교 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      np.random.seed(123)
+      tComp = np.linspace(0, 5, 5000)
+
+      normalSig = np.sin(2 * np.pi * 50 * tComp) + 0.2 * np.random.randn(5000)
+      defectSig = np.sin(2 * np.pi * 50 * tComp) + 0.5 * np.sin(2 * np.pi * 120 * tComp) + 0.3 * np.random.randn(5000)
+
+      segRmsNormal = [np.sqrt(np.mean(normalSig[i*500:(i+1)*500]**2)) for i in range(10)]
+      segRmsDefect = [np.sqrt(np.mean(defectSig[i*500:(i+1)*500]**2)) for i in range(10)]
+
+      tStat, pValue = stats.ttest_ind(segRmsNormal, segRmsDefect)
+
+      testDf = pd.DataFrame({
+          'Condition': ['Normal', 'Defect'],
+          'Mean RMS': [f'{np.mean(segRmsNormal):.4f}', f'{np.mean(segRmsDefect):.4f}'],
+          'Std RMS': [f'{np.std(segRmsNormal):.4f}', f'{np.std(segRmsDefect):.4f}'],
+          't-statistic': [f'{tStat:.4f}', ''],
+          'p-value': [f'{pValue:.6f}', '']
+      })
+      testDf
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 정상 vs 결함 비교의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 정상 vs 결함 비교 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: result
+  title: 분석 대시보드
+  structuredPrimary: true
+  subtitle: 종합 시각화
+  goal: 분석 대시보드에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 모든 분석 결과를 하나의 대시보드로 시각화합니다. 필터링된 신호, 주파수 스펙트럼, RMS 추이, 누적 에너지를 한눈에 볼 수 있습니다. 이런 대시보드는 기계
+    상태 모니터링 시스템의 핵심입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figDash, axesDash = plt.subplots(2, 2, figsize=(14, 10))
+
+    axesDash[0, 0].plot(t[:1000], filteredSignal[:1000], 'b-', linewidth=0.5)
+    axesDash[0, 0].set_xlabel('Time (s)')
+    axesDash[0, 0].set_ylabel('Amplitude')
+    axesDash[0, 0].set_title('Filtered Vibration Signal')
+    axesDash[0, 0].grid(True, alpha=0.3)
+
+    axesDash[0, 1].plot(posFreqs, magnitude, 'b-', linewidth=1)
+    axesDash[0, 1].axvline(50, color='green', linestyle='--', alpha=0.7, label='50Hz')
+    axesDash[0, 1].axvline(120, color='red', linestyle='--', alpha=0.7, label='120Hz (Defect)')
+    axesDash[0, 1].set_xlim(0, 200)
+    axesDash[0, 1].set_xlabel('Frequency (Hz)')
+    axesDash[0, 1].set_ylabel('Magnitude')
+    axesDash[0, 1].set_title('Frequency Spectrum')
+    axesDash[0, 1].legend()
+    axesDash[0, 1].grid(True, alpha=0.3)
+
+    axesDash[1, 0].scatter(segmentTime, segmentRms, s=50, c='blue', label='RMS')
+    axesDash[1, 0].plot(segmentTime, rmsFit, 'r-', linewidth=2, label='Trend')
+    axesDash[1, 0].set_xlabel('Time (s)')
+    axesDash[1, 0].set_ylabel('RMS')
+    axesDash[1, 0].set_title('RMS Trend')
+    axesDash[1, 0].legend()
+    axesDash[1, 0].grid(True, alpha=0.3)
+
+    axesDash[1, 1].plot(t, cumulativeEnergy, 'purple', linewidth=2)
+    axesDash[1, 1].set_xlabel('Time (s)')
+    axesDash[1, 1].set_ylabel('Cumulative Energy')
+    axesDash[1, 1].set_title(f'Cumulative Energy (Total: {totalEnergy:.1f})')
+    axesDash[1, 1].grid(True, alpha=0.3)
+
+    plt.suptitle('Vibration Analysis Dashboard', fontsize=14, fontweight='bold')
+    plt.tight_layout()
+    figDash
+  exercise:
+    prompt: 분석 대시보드 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figDash, axesDash = plt.subplots(2, 2, figsize=(14, 10))
+
+      axesDash[0, 0].plot(t[:1000], filteredSignal[:1000], 'b-', linewidth=0.5)
+      axesDash[0, 0].set_xlabel('Time (s)')
+      axesDash[0, 0].set_ylabel('Amplitude')
+      axesDash[0, 0].set_title('Filtered Vibration Signal')
+      axesDash[0, 0].grid(True, alpha=0.3)
+
+      axesDash[0, 1].plot(posFreqs, magnitude, 'b-', linewidth=1)
+      axesDash[0, 1].axvline(50, color='green', linestyle='--', alpha=0.7, label='50Hz')
+      axesDash[0, 1].axvline(120, color='red', linestyle='--', alpha=0.7, label='120Hz (Defect)')
+      axesDash[0, 1].set_xlim(0, 200)
+      axesDash[0, 1].set_xlabel('Frequency (Hz)')
+      axesDash[0, 1].set_ylabel('Magnitude')
+      axesDash[0, 1].set_title('Frequency Spectrum')
+      axesDash[0, 1].legend()
+      axesDash[0, 1].grid(True, alpha=0.3)
+
+      axesDash[1, 0].scatter(segmentTime, segmentRms, s=50, c='blue', label='RMS')
+      axesDash[1, 0].plot(segmentTime, rmsFit, 'r-', linewidth=2, label='Trend')
+      axesDash[1, 0].set_xlabel('Time (s)')
+      axesDash[1, 0].set_ylabel('RMS')
+      axesDash[1, 0].set_title('RMS Trend')
+      axesDash[1, 0].legend()
+      axesDash[1, 0].grid(True, alpha=0.3)
+
+      axesDash[1, 1].plot(t, cumulativeEnergy, 'purple', linewidth=2)
+      axesDash[1, 1].set_xlabel('Time (s)')
+      axesDash[1, 1].set_ylabel('Cumulative Energy')
+      axesDash[1, 1].set_title(f'Cumulative Energy (Total: {totalEnergy:.1f})')
+      axesDash[1, 1].grid(True, alpha=0.3)
+
+      plt.suptitle('Vibration Analysis Dashboard', fontsize=14, fontweight='bold')
+      plt.tight_layout()
+      figDash
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 분석 대시보드의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 분석 대시보드 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 종합 프로젝트
+  goal: 실습에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: 데이터 과학자가 되어 전체 분석 파이프라인을 직접 구축해보세요. 심전도(ECG) 분석이나 기상 데이터 분석처럼 다른 도메인의 데이터에 같은 기법을 적용해보세요.
+  snippet: |-
+    np.random.seed(456)
+    fsEcg = 360
+    durEcg = 10
+    tEcg = np.linspace(0, durEcg, fsEcg * durEcg, endpoint=False)
+
+    def ecgWave(tVal, hr):
+        period = 60 / hr
+        phase = (tVal % period) / period
+        p = 0.1 * np.exp(-((phase - 0.1) ** 2) / 0.001)
+        qrs = np.exp(-((phase - 0.2) ** 2) / 0.0003) - 0.2 * np.exp(-((phase - 0.18) ** 2) / 0.0001)
+        tW = 0.3 * np.exp(-((phase - 0.35) ** 2) / 0.002)
+        return p + qrs + tW
+
+    ecgClean = ecgWave(tEcg, 72)
+    ecgNoisy = ecgClean + 0.1 * np.random.randn(len(tEcg)) + 0.05 * np.sin(2 * np.pi * 60 * tEcg)
+
+    bNotchEcg, aNotchEcg = signal.iirnotch(60 / (fsEcg/2), 30)
+    ecgFiltered = signal.filtfilt(bNotchEcg, aNotchEcg, ecgNoisy)
+
+    sosEcg = signal.butter(4, [0.5 / (fsEcg/2), 40 / (fsEcg/2)], btype='band', output='sos')
+    ecgFinal = signal.sosfiltfilt(sosEcg, ecgFiltered)
+  exercise:
+    prompt: 실습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      np.random.seed(456)
+      fsEcg = 360
+      durEcg = 10
+      tEcg = np.linspace(0, durEcg, fsEcg * durEcg, endpoint=False)
+
+      def ecgWave(tVal, hr):
+          period = 60 / hr
+          phase = (tVal % period) / period
+          p = 0.1 * np.exp(-((phase - 0.1) ** 2) / 0.001)
+          qrs = np.exp(-((phase - 0.2) ** 2) / 0.0003) - 0.2 * np.exp(-((phase - 0.18) ** 2) / 0.0001)
+          tW = 0.3 * np.exp(-((phase - 0.35) ** 2) / 0.002)
+          return p + qrs + tW
+
+      ecgClean = ecgWave(tEcg, 72)
+      ecgNoisy = ecgClean + 0.1 * np.random.randn(len(tEcg)) + 0.05 * np.sin(2 * np.pi * 60 * tEcg)
+
+      bNotchEcg, aNotchEcg = signal.iirnotch(60 / (fsEcg/2), 30)
+      ecgFiltered = signal.filtfilt(bNotchEcg, aNotchEcg, ecgNoisy)
+
+      sosEcg = signal.butter(4, [0.5 / (fsEcg/2), 40 / (fsEcg/2)], btype='band', output='sos')
+      ecgFinal = signal.sosfiltfilt(sosEcg, ecgFiltered)
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 실습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: SLA 지연시간 통계 게이트
+  goal: 업무 흐름 검증에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한
+    신뢰구간과 개선 기준을 함께 제시해야 합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import numpy as np
+    from scipy import optimize, stats
+
+    latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+    def validateLatencySamples(samples):
+        values = np.asarray(samples, dtype=float)
+        if values.size < 5:
+            raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+        if not np.isfinite(values).all():
+            raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+        if (values <= 0).any():
+            raise ValueError("지연시간은 0보다 커야 합니다.")
+        return values
+
+    cleanLatency = validateLatencySamples(latencySamples)
+    cleanLatency.mean(), cleanLatency.std(ddof=1)
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 기대 문자열이나 실제 출력 문구를 바꾸고 assert 비교가 맞는지 확인하세요.
+    starterCode: |-
+      allowedMean = 264
+      capThreshold = optimize.brentq(
+          lambda threshold: np.clip(cleanLatency, None, threshold).mean() - allowedMean,
+          cleanLatency.min(),
+          cleanLatency.max(),
+      )
+      cappedMean = np.clip(cleanLatency, None, capThreshold).mean()
+
+      assert abs(cappedMean - allowedMean) < 1e-6
+      {
+          "allowedMean": allowedMean,
+          "capThreshold": round(float(capThreshold), 2),
+          "cappedMean": round(float(cappedMean), 2),
+      }
+    solution: |-
+      import numpy as np
+      from scipy import optimize, stats
+
+      latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+      def validateLatencySamples(samples):
+          values = np.asarray(samples, dtype=float)
+          if values.size < 5:
+              raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+          if not np.isfinite(values).all():
+              raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+          if (values <= 0).any():
+              raise ValueError("지연시간은 0보다 커야 합니다.")
+          return values
+
+      cleanLatency = validateLatencySamples(latencySamples)
+      cleanLatency.mean(), cleanLatency.std(ddof=1)
+    hints:
+    - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
+    - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증에서 \`allowedMean\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: scipy_10-scientific-pipeline-report-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load
+    - workflow_validation
+    title: 종합 과학 계산의 단계별 증거 보고서 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 입력 품질, method, estimate, uncertainty, residual을 하나의 release 판정으로 묶는다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - estimate만 있는 report를 완료로 보지 마세요.
+    - 각 stage의 evidenceRef를 순서대로 보존하세요.
+    exercise:
+      prompt: scientific_report(stages)를 완성하세요.
+      starterCode: |-
+        def scientific_report(stages):
+            raise NotImplementedError
+      solution: |
+        def scientific_report(stages):
+            required = ["input", "method", "estimate", "uncertainty", "residual"]
+            by_name = {stage["name"]: stage for stage in stages}
+            missing = [name for name in required if name not in by_name]
+            failed = [name for name in required if name in by_name and not by_name[name].get("passed",False)]
+            return {"releaseReady": not missing and not failed, "missingStages": missing, "failedStages": failed, "evidenceRefs": [by_name[name].get("evidenceRef") for name in required if name in by_name]}
+      hints: *id001
+    check:
+      id: python.scipy.scipy_10.scientific-pipeline-report.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_10.scientific-pipeline-report.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: scientific_report
+        cases:
+        - id: accepts-complete-report
+          arguments:
+          - value:
+            - name: input
+              passed: true
+              evidenceRef: input.json
+            - name: method
+              passed: true
+              evidenceRef: method.json
+            - name: estimate
+              passed: true
+              evidenceRef: estimate.json
+            - name: uncertainty
+              passed: true
+              evidenceRef: uncertainty.json
+            - name: residual
+              passed: true
+              evidenceRef: residual.json
+          expectedReturn:
+            releaseReady: true
+            missingStages: []
+            failedStages: []
+            evidenceRefs:
+            - input.json
+            - method.json
+            - estimate.json
+            - uncertainty.json
+            - residual.json
+        - id: reports-missing-and-failed
+          arguments:
+          - value:
+            - name: input
+              passed: true
+              evidenceRef: i
+            - name: method
+              passed: false
+              evidenceRef: m
+          expectedReturn:
+            releaseReady: false
+            missingStages:
+            - estimate
+            - uncertainty
+            - residual
+            failedStages:
+            - method
+            evidenceRefs:
+            - i
+            - m
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: scipy_10-uncertainty-propagation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_10-scientific-pipeline-report-mastery
+    title: 새 계산 pipeline에 불확실성 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 독립 입력의 선형 결합에서 variance와 standard uncertainty를 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 독립 입력이라는 가정을 명시하세요.
+    - 각 입력의 variance contribution을 함께 반환하세요.
+    exercise:
+      prompt: propagate_linear_uncertainty(coefficients, uncertainties)를 완성하세요.
+      starterCode: |-
+        def propagate_linear_uncertainty(coefficients, uncertainties):
+            raise NotImplementedError
+      solution: |
+        def propagate_linear_uncertainty(coefficients, uncertainties):
+            if len(coefficients) != len(uncertainties) or any(value < 0 for value in uncertainties): raise ValueError("invalid uncertainty inputs")
+            contributions = [(coefficient*uncertainty)**2 for coefficient,uncertainty in zip(coefficients,uncertainties)]
+            variance = sum(contributions)
+            return {"variance": round(variance,8), "standardUncertainty": round(variance**0.5,8), "contributions": [round(value,8) for value in contributions]}
+      hints: *id002
+    check:
+      id: python.scipy.scipy_10.uncertainty-propagation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_10.uncertainty-propagation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: propagate_linear_uncertainty
+        cases:
+        - id: combines-independent-uncertainty
+          arguments:
+          - value:
+            - 2
+            - -1
+          - value:
+            - 0.1
+            - 0.2
+          expectedReturn:
+            variance: 0.08
+            standardUncertainty: 0.28284271
+            contributions:
+            - 0.04
+            - 0.04
+        - id: handles-exact-inputs
+          arguments:
+          - value:
+            - 1
+            - 3
+          - value:
+            - 0
+            - 0
+          expectedReturn:
+            variance: 0
+            standardUncertainty: 0.0
+            contributions:
+            - 0
+            - 0
+        - id: rejects-negative-uncertainty
+          arguments:
+          - value:
+            - 1
+          - value:
+            - -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: scipy_10-scientific-project-evidence-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_10-uncertainty-propagation-transfer
+    title: 종합 과학 project 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 계산 성공과 과학적 결론을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 수치 방법의 입력 가정과 오차 근거를 함께 남기세요.
+    - p-value나 최적화 성공 flag 하나를 결론으로 사용하지 마세요.
+    exercise:
+      prompt: choose_scientific_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_scientific_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_scientific_evidence(situation):
+            table = {'numerical-result': {'method': 'estimate plus residual and convergence', 'evidence': 'tolerance audit', 'risk': 'false convergence'}, 'uncertain-inputs': {'method': 'uncertainty propagation', 'evidence': 'assumptions contributions', 'risk': 'ignored covariance'}, 'release-claim': {'method': 'reproducible pipeline report', 'evidence': 'input and artifact hashes', 'risk': 'machine pass as scientific truth'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.scipy.scipy_10.scientific-project-evidence.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_10.scientific-project-evidence.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_scientific_evidence
+        cases:
+        - id: recalls-numerical-result
+          arguments:
+          - value: numerical-result
+          expectedReturn:
+            method: estimate plus residual and convergence
+            evidence: tolerance audit
+            risk: false convergence
+        - id: recalls-uncertain-inputs
+          arguments:
+          - value: uncertain-inputs
+          expectedReturn:
+            method: uncertainty propagation
+            evidence: assumptions contributions
+            risk: ignored covariance
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

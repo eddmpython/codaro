@@ -1,0 +1,814 @@
+var e=`meta:
+  id: regex_09
+  title: 고급패턴매칭
+  order: 9
+  category: regex
+  difficulty: ⭐⭐⭐⭐
+  badge: 심화
+  tags:
+  - lookahead
+  - lookbehind
+  - 전방탐색
+  - 후방탐색
+  - 고급 패턴
+  seo:
+    title: 정규표현식 심화 - Lookahead & Lookbehind
+    description: 정규표현식의 고급 기능인 lookahead, lookbehind를 마스터합니다. 복잡한 조건 매칭을 배웁니다.
+    keywords:
+    - 정규표현식
+    - regex
+    - lookahead
+    - lookbehind
+    - 전방탐색
+    - 후방탐색
+intro:
+  emoji: 🔬
+  goal: Lookahead와 Lookbehind로 복잡한 조건 매칭을 마스터합니다.
+  description: 정규표현식의 최고 난이도 기능입니다. "앞/뒤를 보되 포함하지 않는" 제로폭 단언(zero-width assertion)을 배웁니다.
+  direction: 고급패턴매칭에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 샘플 문자열 확인 후 패턴 매칭과 치환에 맞는 코드 입력을 고릅니다.
+  - 고급패턴매칭 결과를 매치 그룹, 추출 목록, 치환 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 로그/문서 정제 자동화에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(샘플 문자열)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 문제 상황 처리 실행
+      detail: 패턴 매칭과 치환 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 긍정 후방탐색 (?< 결과 검증
+      detail: 매치 그룹, 추출 목록, 치환 결과 기준으로 실행 결과를 비교합니다.
+    - label: 고급패턴매칭 재사용
+      detail: 완성 코드를 로그/문서 정제 자동화에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 텍스트 정제 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 고급패턴매칭 실행
+      detail: 셀을 실행해 매치 그룹, 추출 목록, 치환 결과와 예외 상태를 확인합니다.
+    - label: 고급패턴매칭 완료
+      detail: 검증된 코드를 로그/문서 정제 자동화로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: 1단계. 라이브러리 불러오기의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: import re
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: import re
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
+- id: step2_problem
+  title: 2단계. 문제 상황
+  structuredPrimary: true
+  subtitle: 일반 패턴의 한계
+  goal: 2단계. 문제 상황에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    가격에서 숫자만 추출하고 싶은 상황을 생각해봅시다. $100, $200처럼 달러 기호 뒤의 숫자를 찾고 싶지만, $ 기호 자체는 결과에 포함하고 싶지 않습니다. 일반 패턴으로는 이런 조건부 매칭이 어렵습니다.
+
+    결과: ['$100', '$200', '$300'] - $ 기호가 포함되었습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    text = "가격: $100, $200, $300"
+
+    pattern = r"\\$\\d+"
+    re.findall(pattern, text)
+  exercise:
+    prompt: 2단계. 문제 상황 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      text = "가격: $100, $200, $300"
+
+      pattern = r"\\$\\d+"
+      re.findall(pattern, text)
+    hints:
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 문제 상황의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 문제 상황의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+- id: step3_positive_lookbehind
+  title: 3단계. 긍정 후방탐색 (?<=...)
+  structuredPrimary: true
+  subtitle: 뒤를 보되 포함하지 않기
+  goal: 3단계. 긍정 후방탐색 (?<=...)에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    긍정 후방탐색 (?<=패턴)은 앞에 특정 패턴이 있는 위치를 찾되, 그 패턴 자체는 결과에 포함하지 않습니다. 제로폭 단언(zero-width assertion)이라고도 하며, 위치만 확인하고 문자를 소비하지 않는 특수한 기능입니다.
+
+    결과: ['100', '200', '300'] - 완벽합니다!
+  tips:
+  - '긍정 후방탐색: (?<=...) **(?<=패턴)매칭**: - "앞에 패턴이 있는" 매칭을 찾음 - 하지만 패턴 자체는 결과에 포함하지 않음 - **제로폭 단언**: 위치만
+    확인, 문자 소비 안 함 예: \`(?<=@)\\w+\` → @ 뒤의 단어 (@ 제외)'
+  snippet: |-
+    pattern = r"(?<=\\$)\\d+"
+
+    prices = re.findall(pattern, text)
+    prices
+  exercise:
+    prompt: 3단계. 긍정 후방탐색 (?<=...) 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      pattern = r"(?<=\\$)\\d+"
+
+      prices = re.findall(pattern, text)
+      prices
+    hints:
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 긍정 후방탐색 (?<=...)의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 긍정 후방탐색 (?<=...)의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+- id: step4_positive_lookahead
+  title: 4단계. 긍정 전방탐색 (?=...)
+  structuredPrimary: true
+  subtitle: 앞을 보되 포함하지 않기
+  goal: 4단계. 긍정 전방탐색 (?=...)에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    긍정 전방탐색 (?=패턴)은 뒤에 특정 패턴이 있는 위치를 찾되, 그 패턴은 결과에 포함하지 않습니다. 후방탐색과 반대 방향으로 작동합니다. 예를 들어 퍼센트 기호 앞의 숫자만 추출할 때 유용합니다.
+
+    결과: ['10', '20', '30'] - % 기호는 제외!
+  tips:
+  - '긍정 전방탐색: (?=...) **매칭(?=패턴)**: - "뒤에 패턴이 있는" 매칭을 찾음 - 패턴은 결과에 포함하지 않음 예: \`\\w+(?=@)\` → @ 앞의 단어 (@
+    제외)'
+  snippet: |-
+    text = "할인율: 10%, 20%, 30%"
+
+    pattern = r"\\d+(?=%)"
+
+    discounts = re.findall(pattern, text)
+    discounts
+  exercise:
+    prompt: 4단계. 긍정 전방탐색 (?=...) 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      text = "할인율: 10%, 20%, 30%"
+
+      pattern = r"\\d+(?=%)"
+
+      discounts = re.findall(pattern, text)
+      discounts
+    hints:
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 긍정 전방탐색 (?=...)의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 긍정 전방탐색 (?=...)의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+- id: step5_negative_lookbehind
+  title: 5단계. 부정 후방탐색 (?<!...)
+  structuredPrimary: true
+  subtitle: 뒤에 패턴이 없을 때
+  goal: 5단계. 부정 후방탐색 (?<!...)에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    부정 후방탐색 (?<!패턴)은 앞에 특정 패턴이 없을 때만 매칭합니다. 긍정 후방탐색의 반대 개념으로, 특정 접두사가 없는 패턴을 찾을 때 사용합니다. 예를 들어 달러 기호가 없는 숫자만 찾을 수 있습니다.
+
+    결과: ['200'] - $ 없는 숫자만 찾았습니다!
+  tips:
+  - '부정 후방탐색: (?<!...) **(?<!패턴)매칭**: - "앞에 패턴이 없는" 매칭만 찾음 - 특정 문맥을 제외할 때 유용 예: \`(?<!un)\\w+\` → un으로 시작하지
+    않는 단어'
+  snippet: |-
+    text = "금액: $100 또는 200 또는 $300"
+
+    pattern = r"(?<!\\$)\\b\\d+"
+
+    numbers = re.findall(pattern, text)
+    numbers
+  exercise:
+    prompt: 5단계. 부정 후방탐색 (?<!...) 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      text = "금액: $100 또는 200 또는 $300"
+
+      pattern = r"(?<!\\$)\\b\\d+"
+
+      numbers = re.findall(pattern, text)
+      numbers
+    hints:
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 부정 후방탐색 (?<!...)의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 부정 후방탐색 (?<!...)의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+- id: step6_negative_lookahead
+  title: 6단계. 부정 전방탐색 (?!...)
+  structuredPrimary: true
+  subtitle: 앞에 패턴이 없을 때
+  goal: 6단계. 부정 전방탐색 (?!...)에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    (?!패턴) : "뒤에 패턴이 없으면" 매칭합니다.
+
+    .com이 아닌 이메일만 추출되었습니다!
+  tips:
+  - '부정 전방탐색: (?!...) **매칭(?!패턴)**: - "뒤에 패턴이 없는" 매칭만 찾음 - 특정 경우를 제외할 때 사용 예: \`\\d+(?!%)\` → % 로 끝나지 않는
+    숫자'
+  snippet: |-
+    text = "이메일: user@site.com, admin@service.org, info@shop.net"
+
+    pattern = r"\\S+@\\S+\\.(?!com)\\w+"
+
+    nonComEmails = re.findall(pattern, text)
+    nonComEmails
+  exercise:
+    prompt: 6단계. 부정 전방탐색 (?!...) 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      text = "이메일: user@site.com, admin@service.org, info@shop.net"
+
+      pattern = r"\\S+@\\S+\\.(?!com)\\w+"
+
+      nonComEmails = re.findall(pattern, text)
+      nonComEmails
+    hints:
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 부정 전방탐색 (?!...)의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 부정 전방탐색 (?!...)의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+- id: step7_combination
+  title: 7단계. 조합 사용
+  structuredPrimary: true
+  subtitle: Lookaround 여러 개
+  goal: 7단계. 조합 사용에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    Lookahead와 Lookbehind를 동시에 사용하여 복잡한 조건을 만듭니다.
+
+    결과: ['100'] - $ 뒤에 있고 % 앞에 있는 숫자만!
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    text = "예산: $100%, 매출: $200, 목표: 300%"
+
+    pattern = r"(?<=\\$)\\d+(?=%)"
+
+    result = re.findall(pattern, text)
+    result
+  exercise:
+    prompt: 7단계. 조합 사용 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      text = "예산: $100%, 매출: $200, 목표: 300%"
+
+      pattern = r"(?<=\\$)\\d+(?=%)"
+
+      result = re.findall(pattern, text)
+      result
+    hints:
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 조합 사용의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 조합 사용의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+- id: step8_password_validation
+  title: 8단계. 비밀번호 검증
+  structuredPrimary: true
+  subtitle: 실전 활용
+  goal: 8단계. 비밀번호 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    Lookahead로 "8자 이상, 대문자 포함, 숫자 포함" 조건을 동시에 검증합니다.
+
+    복수 조건 검증
+    \`^(?=.*[A-Z])(?=.*\\d).{8,}$\`: - \`(?=.*[A-Z])\` : 대문자가 있는지 확인 - \`(?=.*\\d)\` : 숫자가 있는지 확인 - \`.{8,}\` : 8자 이상 각 조건이 독립적으로 검증됩니다!
+  tips:
+  - '복수 조건 검증 \`^(?=.*[A-Z])(?=.*\\d).{8,}$\`: - \`(?=.*[A-Z])\` : 대문자가 있는지 확인 - \`(?=.*\\d)\` : 숫자가 있는지 확인 -
+    \`.{8,}\` : 8자 이상 각 조건이 독립적으로 검증됩니다!'
+  snippet: |-
+    def validatePassword(password):
+        pattern = r"^(?=.*[A-Z])(?=.*\\d).{8,}$"
+        return re.match(pattern, password) is not None
+
+    passwords = ["weak", "Weak123", "STRONG456", "Good1Pass"]
+
+    results = {pwd: validatePassword(pwd) for pwd in passwords}
+    results
+  exercise:
+    prompt: 8단계. 비밀번호 검증 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def validatePassword(password):
+          pattern = r"^(?=.*[A-Z])(?=.*\\d).{8,}$"
+          return re.match(pattern, password) is not None
+
+      passwords = ["weak", "Weak123", "STRONG456", "Good1Pass"]
+
+      results = {pwd: validatePassword(pwd) for pwd in passwords}
+      results
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 비밀번호 검증의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 비밀번호 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: step9_extract_between
+  title: 9단계. 특정 구간 추출
+  structuredPrimary: true
+  subtitle: 태그 사이의 내용만
+  goal: 9단계. 특정 구간 추출에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    HTML 태그 사이의 내용만 추출합니다.
+
+    결과: ['첫 단락', '둘째 단락'] - 태그는 제외하고 내용만!
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    html = "<p>첫 단락</p> 외부 <p>둘째 단락</p> 더 외부"
+
+    pattern = r"(?<=<p>).*?(?=</p>)"
+
+    contents = re.findall(pattern, html)
+    contents
+  exercise:
+    prompt: 9단계. 특정 구간 추출 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      html = "<p>첫 단락</p> 외부 <p>둘째 단락</p> 더 외부"
+
+      pattern = r"(?<=<p>).*?(?=</p>)"
+
+      contents = re.findall(pattern, html)
+      contents
+    hints:
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 특정 구간 추출의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 특정 구간 추출의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+- id: step10_summary
+  title: 10단계. Lookaround 정리
+  structuredPrimary: true
+  subtitle: 4가지 패턴 비교
+  goal: 10단계. Lookaround 정리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    Lookaround 패턴을 한눈에 정리합니다.
+
+    Lookaround 4종 정리
+    | 이름 | 문법 | 의미 | |------|------|------| | 긍정 후방탐색 | (?<=X)Y | X 뒤의 Y | | 부정 후방탐색 | (?<!X)Y | X가 아닌 것 뒤의 Y | | 긍정 전방탐색 | Y(?=X) | X 앞의 Y | | 부정 전방탐색 | Y(?!X) | X가 아닌 것 앞의 Y |
+  tips:
+  - Lookaround 4종 정리 | 이름 | 문법 | 의미 | |------|------|------| | 긍정 후방탐색 | (?<=X)Y | X 뒤의 Y | | 부정 후방탐색
+    | (?<!X)Y | X가 아닌 것 뒤의 Y | | 긍정 전방탐색 | Y(?=X) | X 앞의 Y | | 부정 전방탐색 | Y(?!X) | X가 아닌 것 앞의 Y |
+  snippet: |-
+    text = "test123abc"
+
+    patterns = {
+        "긍정 후방 (?<=test)": r"(?<=test)\\d+",
+        "부정 후방 (?<!test)": r"(?<!test)\\d+",
+        "긍정 전방 (?=abc)": r"\\d+(?=abc)",
+        "부정 전방 (?!abc)": r"\\d+(?!abc)"
+    }
+
+    {name: re.findall(pattern, text) for name, pattern in patterns.items()}
+  exercise:
+    prompt: 10단계. Lookaround 정리 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      text = "test123abc"
+
+      patterns = {
+          "긍정 후방 (?<=test)": r"(?<=test)\\d+",
+          "부정 후방 (?<!test)": r"(?<!test)\\d+",
+          "긍정 전방 (?=abc)": r"\\d+(?=abc)",
+          "부정 전방 (?!abc)": r"\\d+(?!abc)"
+      }
+
+      {name: re.findall(pattern, text) for name, pattern in patterns.items()}
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. Lookaround 정리의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 10단계. Lookaround 정리 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 고급 패턴 매칭 프로젝트
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    정규표현식 전문가가 되어 복잡한 조건 매칭을 수행합니다. 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import re
+
+    text = "가격: 1000원, 2000원, 만원, 3000원"
+
+    pat = r"(?<!만)\\b\\d+(?=원)"
+    prices = re.findall(pat, text)
+    prices
+  exercise:
+    prompt: 실습 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import re
+
+      text = "가격: 1000원, 2000원, 만원, 3000원"
+
+      pat = r"(?<!만)\\b\\d+(?=원)"
+      prices = re.findall(pat, text)
+      prices
+    hints:
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 실습의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.
+- id: summary
+  title: 정리
+  subtitle: 아홉 번째 프로젝트 완료!
+  blocks:
+  - type: text
+    content: 이번 프로젝트에서는 Lookahead와 Lookbehind를 마스터했습니다. 정규표현식의 최고 난이도 기능입니다.
+  - type: list
+    items:
+    - (?<=X) - 긍정 후방탐색 (X 뒤의)
+    - (?<!X) - 부정 후방탐색 (X 아닌 것 뒤의)
+    - (?=X) - 긍정 전방탐색 (X 앞의)
+    - (?!X) - 부정 전방탐색 (X 아닌 것 앞의)
+  - type: text
+    content: 마지막 프로젝트에서 실전 LLM 전처리 파이프라인을 구축합니다!
+  goal: 정리에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인'
+  structuredPrimary: true
+  subtitle: 예측 → 패턴 실행 → 오류 수정 → 검증 → 실무 변주
+  goal: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를
+    추출하고, 잘못된 패턴과 빈 입력을 안전하게 처리합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import re
+
+    contactText = '''
+    김개발 <kim@example.com> 010-1234-5678
+    lee@company.co.kr / 02-987-6543
+    잘못된 주소: hello@ / 번호: 12345
+    '''
+
+    emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}')
+    phonePattern = re.compile(r'(?:010-\\d{4}-\\d{4}|02-\\d{3}-\\d{4})')
+
+    emails = emailPattern.findall(contactText)
+    phones = phonePattern.findall(contactText)
+
+    assert emails == ['kim@example.com', 'lee@company.co.kr']
+    assert phones == ['010-1234-5678', '02-987-6543']
+    emails, phones
+  exercise:
+    prompt: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    starterCode: |-
+      import re
+
+      contactText = '''
+      김개발 <kim@example.com> 010-1234-5678
+      lee@company.co.kr / 02-987-6543
+      잘못된 주소: hello@ / 번호: 12345
+      '''
+
+      emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}')
+      phonePattern = re.compile(r'(?:010-\\d{4}-\\d{4}|02-\\d{3}-\\d{4})')
+
+      emails = emailPattern.findall(contactText)
+      phones = phonePattern.findall(contactText)
+
+      assert emails == ['kim@example.com', 'lee@company.co.kr']
+      assert phones == ['010-1234-5678', '02-987-6543']
+      emails, phones
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인의 정규식 패턴이 컴파일되고 입력 텍스트가 매치 단계까지 도달해야 합니다.'
+    resultCheck: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인 결과의 추출 개수와 매치 문자열이 본문 기대값과 같아야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: regex_09-named-pattern-extraction-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 여러 named pattern의 겹치는 match 조정하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 우선순위와 span 길이로 겹침을 해소하고 선택·거부 근거를 남긴다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 여러 pattern을 순서대로 치환하지 말고 원본 span에서 충돌을 조정하세요.
+    - 겹침 해소 우선순위와 거부된 match를 report에 남기세요.
+    exercise:
+      prompt: resolve_pattern_matches(matches)를 완성하세요.
+      starterCode: |-
+        def resolve_pattern_matches(matches):
+            raise NotImplementedError
+      solution: |
+        def resolve_pattern_matches(matches):
+            ordered = sorted(matches, key=lambda item: (item["start"], -item.get("priority", 0), -(item["end"] - item["start"]), item["name"]))
+            selected = []
+            rejected = []
+            for match in ordered:
+                overlap = any(match["start"] < item["end"] and item["start"] < match["end"] for item in selected)
+                compact = {key: match[key] for key in ["name", "start", "end"]}
+                if overlap:
+                    rejected.append({**compact, "reason": "overlap"})
+                else:
+                    selected.append(compact)
+            return {"selected": selected, "rejected": rejected}
+      hints: *id001
+    check:
+      id: python.regex.regex_09.named-pattern-extraction.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_09.named-pattern-extraction.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: resolve_pattern_matches
+        cases:
+        - id: prefers-higher-priority-overlap
+          arguments:
+          - value:
+            - name: date
+              start: 0
+              end: 10
+              priority: 2
+            - name: year
+              start: 0
+              end: 4
+              priority: 1
+          expectedReturn:
+            selected:
+            - name: date
+              start: 0
+              end: 10
+            rejected:
+            - name: year
+              start: 0
+              end: 4
+              reason: overlap
+        - id: keeps-non-overlapping-matches
+          arguments:
+          - value:
+            - name: a
+              start: 0
+              end: 2
+            - name: b
+              start: 3
+              end: 5
+          expectedReturn:
+            selected:
+            - name: a
+              start: 0
+              end: 2
+            - name: b
+              start: 3
+              end: 5
+            rejected: []
+        - id: prefers-longer-equal-priority
+          arguments:
+          - value:
+            - name: short
+              start: 0
+              end: 2
+              priority: 1
+            - name: long
+              start: 0
+              end: 5
+              priority: 1
+          expectedReturn:
+            selected:
+            - name: long
+              start: 0
+              end: 5
+            rejected:
+            - name: short
+              start: 0
+              end: 2
+              reason: overlap
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: regex_09-pattern-coverage-matrix-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_09-named-pattern-extraction-mastery
+    title: 새 고급 pattern에 fixture coverage 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: pattern별 positive·negative·boundary fixture 존재 여부를 행렬로 검사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - happy path fixture 수가 아니라 pattern별 세 종류 coverage를 비교하세요.
+    - 등록되지 않은 pattern 이름의 fixture도 drift로 실패시키세요.
+    exercise:
+      prompt: audit_pattern_coverage(pattern_names, fixtures)를 완성하세요.
+      starterCode: |-
+        def audit_pattern_coverage(pattern_names, fixtures):
+            raise NotImplementedError
+      solution: |
+        def audit_pattern_coverage(pattern_names, fixtures):
+            required = {"positive", "negative", "boundary"}
+            matrix = {}
+            missing = {}
+            for name in pattern_names:
+                kinds = {fixture["kind"] for fixture in fixtures if fixture["pattern"] == name}
+                matrix[name] = sorted(kinds)
+                absent = sorted(required - kinds)
+                if absent:
+                    missing[name] = absent
+            unknown = sorted({fixture["pattern"] for fixture in fixtures} - set(pattern_names))
+            return {"complete": not missing and not unknown, "matrix": matrix, "missing": missing, "unknownPatterns": unknown}
+      hints: *id002
+    check:
+      id: python.regex.regex_09.pattern-coverage-matrix.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_09.pattern-coverage-matrix.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_pattern_coverage
+        cases:
+        - id: accepts-full-matrix
+          arguments:
+          - value:
+            - email
+          - value:
+            - pattern: email
+              kind: positive
+            - pattern: email
+              kind: negative
+            - pattern: email
+              kind: boundary
+          expectedReturn:
+            complete: true
+            matrix:
+              email:
+              - boundary
+              - negative
+              - positive
+            missing: {}
+            unknownPatterns: []
+        - id: reports-missing-kinds
+          arguments:
+          - value:
+            - date
+          - value:
+            - pattern: date
+              kind: positive
+          expectedReturn:
+            complete: false
+            matrix:
+              date:
+              - positive
+            missing:
+              date:
+              - boundary
+              - negative
+            unknownPatterns: []
+        - id: reports-unknown-pattern
+          arguments:
+          - value: []
+          - value:
+            - pattern: extra
+              kind: positive
+          expectedReturn:
+            complete: false
+            matrix: {}
+            missing: {}
+            unknownPatterns:
+            - extra
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: regex_09-advanced-pattern-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_09-pattern-coverage-matrix-transfer
+    title: 고급 pattern matching 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: named group·overlap·fixture matrix 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - match 수만 보지 말고 정규화 뒤 보존된 의미와 거부된 입력을 함께 확인하세요.
+    - regex가 아닌 전용 parser가 필요한 구조에서는 경계를 명시하세요.
+    exercise:
+      prompt: choose_advanced_pattern_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_advanced_pattern_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_advanced_pattern_evidence(situation):
+            table = {'capture': {'action': 'use named groups', 'evidence': 'semantic group dictionary', 'risk': 'numeric group drift'}, 'overlap': {'action': 'resolve spans by explicit priority', 'evidence': 'selected and rejected matches', 'risk': 'double counting'}, 'coverage': {'action': 'require positive negative boundary', 'evidence': 'per-pattern matrix', 'risk': 'happy-path bias'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.regex.regex_09.advanced-pattern-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_09.advanced-pattern-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_advanced_pattern_evidence
+        cases:
+        - id: recalls-capture
+          arguments:
+          - value: capture
+          expectedReturn:
+            action: use named groups
+            evidence: semantic group dictionary
+            risk: numeric group drift
+        - id: recalls-overlap
+          arguments:
+          - value: overlap
+          expectedReturn:
+            action: resolve spans by explicit priority
+            evidence: selected and rejected matches
+            risk: double counting
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

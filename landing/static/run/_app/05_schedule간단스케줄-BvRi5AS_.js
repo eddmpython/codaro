@@ -1,0 +1,713 @@
+var e=`meta:
+  id: watchSched_05
+  title: schedule 라이브러리 기본
+  order: 5
+  category: watchSched
+  difficulty: easy
+  audience: 폴더 이벤트와 스케줄 자동화에 입문하는 Python 학습자
+  packages:
+    - schedule
+  outcomes: ["automation.scheduling"]
+  prerequisites: ["python.functions"]
+  estimatedMinutes: 35
+  tags:
+    - schedule
+    - jobs
+    - interval
+intro:
+  direction: schedule 라이브러리로 인터벌과 시간 기반 작업을 정의하고 run_pending으로 셀에서 직접 실행 흐름을 확인한다.
+  benefits:
+    - schedule.every로 인터벌 작업을 등록한다.
+    - run_pending과 run_all로 셀에서 즉시 실행한다.
+    - 작업 단위 함수에서 결과 리스트를 누적한다.
+    - 종합 결과 dict로 실행 횟수와 마지막 실행 시각을 보고한다.
+  diagram:
+    steps:
+      - label: 작업 함수 정의
+        detail: 결과 리스트에 값을 추가하는 작은 작업을 정의한다.
+      - label: 인터벌 등록
+        detail: schedule.every().seconds.do(job)으로 등록한다.
+      - label: run_pending과 run_all
+        detail: 셀에서 직접 작업을 실행해 누적 결과를 확인한다.
+      - label: 종합 결과 정리
+        detail: 누적 횟수와 결과 리스트를 dict로 묶어 자동화 보고에 사용한다.
+    runtime:
+      - label: schedule 패키지 필요
+        detail: Web 강검증은 저장소에 고정한 schedule 1.2.2 wheel의 SHA-256을 확인하고, Local은 meta.packages를 uv 환경에 준비한다.
+      - label: 자동 행동 검증
+        detail: Run 뒤 별도 확인 없이 함수 반환값과 scheduler 정리 상태를 fresh Worker에서 검사한다.
+sections:
+  - id: job-skeleton
+    title: 작업 함수 정의
+    structuredPrimary: true
+    subtitle: 결과 리스트에 누적
+    goal: 호출될 때마다 결과 리스트에 카운터를 추가하는 단순 작업 함수를 만든다.
+    why: 스케줄러 학습은 작업 함수가 단순할 때 실행 흐름을 가장 명확히 보여 준다.
+    explanation: '작업 함수는 인자 없이 호출되며 외부 상태(예: results 리스트)에 부수효과를 남기는 단순 형태다. 함수 자체는 import schedule과 무관하게 정의되고, 등록은 별도 단계에서 한다. 함수가 결과 리스트에 append만 하므로 동작 검증이 쉽다.'
+    tips:
+      - 외부 리스트는 함수 호출 사이에 상태를 유지한다.
+      - 작업 결과는 가능한 한 dict로 두어 다음 단계에서 의미를 가진다.
+    snippet: |-
+      def build_job_results(call_count: int) -> list[int]:
+          results: list[int] = []
+
+          def run_job() -> None:
+              results.append(len(results) + 1)
+
+          for _ in range(call_count):
+              run_job()
+          return results
+    exercise:
+      prompt: call_count만큼 작업 함수를 호출해 1부터 시작하는 누적 결과를 반환하는 build_job_results 함수를 완성하세요. 검증기는 서로 다른 호출 횟수로 자동 실행합니다.
+      starterCode: |-
+        def build_job_results(call_count: int) -> list[int]:
+            results: list[int] = []
+
+            def run_job() -> None:
+                results.append(len(results) + ___)
+
+            for _ in range(call_count):
+                run_job()
+            return results
+      solution: |-
+        def build_job_results(call_count: int) -> list[int]:
+            results: list[int] = []
+
+            def run_job() -> None:
+                results.append(len(results) + 1)
+
+            for _ in range(call_count):
+                run_job()
+            return results
+      hints:
+        - 카운터는 현재 리스트 길이에 1을 더한 값으로 계산된다.
+        - 세 번 호출은 [1, 2, 3]을 만든다.
+    check:
+      id: python.schedule.build-job-results.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.schedule.build-job-results.fixture.v1
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      payload:
+        entry: build_job_results
+        cases:
+          - id: one-call
+            arguments:
+              - value: 1
+            expectedReturn:
+              - 1
+          - id: three-calls
+            arguments:
+              - value: 3
+            expectedReturn:
+              - 1
+              - 2
+              - 3
+        expectedPaths: []
+  - id: schedule-register
+    title: schedule.every 등록
+    structuredPrimary: true
+    subtitle: 인터벌 작업 만들기
+    goal: schedule.every().seconds.do로 작업을 등록하고 schedule.jobs 리스트가 한 개의 Job을 가진다는 것을 확인한다.
+    why: 자동화는 작업 등록과 실행을 분리해야 같은 함수를 다른 주기로 등록하기 쉬워진다.
+    explanation: schedule.every()는 Job 객체를 만들고 seconds, minutes, hours 같은 속성과 do(callable)로 등록을 마친다. schedule.jobs는 등록된 모든 Job 리스트다. clear()로 등록을 모두 비우면 다음 셀에 영향을 주지 않는다.
+    tips:
+      - schedule.clear는 모든 등록을 비우므로 셀 시작 시 호출하면 안전하다.
+      - Job 객체의 interval 속성은 인자로 받은 정수를 그대로 보여 준다.
+    snippet: |-
+      import schedule
+
+      def registered_intervals(intervals: list[int]) -> list[int]:
+          schedule.clear()
+          for interval in intervals:
+              schedule.every(interval).seconds.do(lambda: None)
+          registered = [job.interval for job in schedule.jobs]
+          schedule.clear()
+          return registered
+    exercise:
+      prompt: 전달받은 각 interval을 seconds Job으로 등록하고 실제 Job.interval 목록을 반환한 뒤 scheduler를 비우는 registered_intervals 함수를 완성하세요.
+      starterCode: |-
+        import schedule
+
+        def registered_intervals(intervals: list[int]) -> list[int]:
+            schedule.clear()
+            for interval in intervals:
+                schedule.every(___).seconds.do(lambda: None)
+            registered = [job.interval for job in schedule.jobs]
+            schedule.clear()
+            return registered
+      solution: |-
+        import schedule
+
+        def registered_intervals(intervals: list[int]) -> list[int]:
+            schedule.clear()
+            for interval in intervals:
+                schedule.every(interval).seconds.do(lambda: None)
+            registered = [job.interval for job in schedule.jobs]
+            schedule.clear()
+            return registered
+      hints:
+        - schedule.every에 5를 두 번 넘기면 두 Job이 만들어진다.
+        - schedule.clear는 다음 검사를 위해 마지막에 호출해 셀 상태를 정리한다.
+    check:
+      id: python.schedule.registered-intervals.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.schedule.registered-intervals.fixture.v1
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      packageAssets:
+        - name: schedule
+          version: 1.2.2
+          url: check-packages/schedule-1.2.2-py3-none-any.whl
+          integrity: sha256-W+9KKgGDq/RARq4NFkytysIbHbARvdgQLkoMHpHgan0=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      payload:
+        entry: registered_intervals
+        cases:
+          - id: two-different-intervals
+            arguments:
+              - value:
+                  - 2
+                  - 5
+            expectedReturn:
+              - 2
+              - 5
+          - id: one-transfer-interval
+            arguments:
+              - value:
+                  - 3
+            expectedReturn:
+              - 3
+        expectedPaths: []
+  - id: run-now
+    title: 셀에서 즉시 실행
+    structuredPrimary: true
+    subtitle: schedule.run_all
+    goal: 등록된 모든 작업을 셀에서 즉시 실행해 누적 결과를 확인한다.
+    why: 자동화 학습 환경은 보통 백그라운드 루프를 돌리지 않으므로 run_all로 동작을 즉시 검증한다.
+    explanation: schedule.run_all은 등록된 모든 Job을 즉시 호출한다. 인자로 delay_seconds를 주면 작업 사이에 대기를 두지만 학습에서는 0이 기본이다. 동일 작업을 여러 번 등록하면 같은 횟수만큼 호출된다.
+    tips:
+      - run_all은 즉시 모든 등록 작업을 실행하므로 학습 검증에 편리하다.
+      - 실제 운영에서는 schedule.run_pending을 루프 안에서 호출한다.
+    snippet: |-
+      import schedule
+
+      def run_registered_jobs(count: int) -> list[int]:
+          schedule.clear()
+          results: list[int] = []
+
+          def run_job() -> None:
+              results.append(len(results) + 1)
+
+          for _ in range(count):
+              schedule.every(1).seconds.do(run_job)
+          schedule.run_all()
+          schedule.clear()
+          return results
+    exercise:
+      prompt: count만큼 같은 작업을 등록하고 run_all로 즉시 실행한 뒤 누적 결과를 반환하고 scheduler를 비우는 run_registered_jobs 함수를 완성하세요.
+      starterCode: |-
+        import schedule
+
+        def run_registered_jobs(count: int) -> list[int]:
+            schedule.clear()
+            results: list[int] = []
+
+            def run_job() -> None:
+                results.append(len(results) + 1)
+
+            for _ in range(count):
+                schedule.every(1).seconds.do(run_job)
+            schedule.___()
+            schedule.clear()
+            return results
+      solution: |-
+        import schedule
+
+        def run_registered_jobs(count: int) -> list[int]:
+            schedule.clear()
+            results: list[int] = []
+
+            def run_job() -> None:
+                results.append(len(results) + 1)
+
+            for _ in range(count):
+                schedule.every(1).seconds.do(run_job)
+            schedule.run_all()
+            schedule.clear()
+            return results
+      hints:
+        - 모든 작업을 즉시 실행하는 함수 이름은 run_all이다.
+        - 등록 세 번이면 카운터가 1부터 3까지 차례로 늘어난다.
+    check:
+      id: python.schedule.run-registered-jobs.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.schedule.run-registered-jobs.fixture.v1
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      packageAssets:
+        - name: schedule
+          version: 1.2.2
+          url: check-packages/schedule-1.2.2-py3-none-any.whl
+          integrity: sha256-W+9KKgGDq/RARq4NFkytysIbHbARvdgQLkoMHpHgan0=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      payload:
+        entry: run_registered_jobs
+        cases:
+          - id: one-job
+            arguments:
+              - value: 1
+            expectedReturn:
+              - 1
+          - id: three-jobs
+            arguments:
+              - value: 3
+            expectedReturn:
+              - 1
+              - 2
+              - 3
+        expectedPaths: []
+  - id: tick-summary
+    title: 종합 실행 결과 정리
+    structuredPrimary: true
+    subtitle: 횟수와 마지막 값 보고
+    goal: 셀에서 일정 횟수만큼 작업을 호출한 뒤 종합 결과 dict로 통계를 정리한다.
+    why: 종합 보고는 다음 자동화 단계가 같은 dict 구조를 신뢰할 수 있도록 표준 형태로 둔다.
+    explanation: 마지막 섹션은 작업 함수와 등록을 함수에 묶어 호출 횟수와 결과 리스트를 dict로 돌려준다. 같은 함수는 두 번 호출해도 같은 dict 형태를 유지한다. 자동화에서는 이 dict가 대시보드 입력이 된다.
+    tips:
+      - dict 키 이름은 count와 lastValue처럼 짧게 두어 자동화 코드가 단순해진다.
+      - schedule.clear는 함수 시작 시 호출해 외부 상태가 새 사이클에 영향을 주지 않게 한다.
+    snippet: |-
+      import schedule
+
+      def run_cycle(count: int) -> dict:
+          schedule.clear()
+          results: list[int] = []
+
+          def job() -> None:
+              results.append(len(results) + 1)
+
+          for _ in range(count):
+              schedule.every(1).seconds.do(job)
+          schedule.run_all()
+          schedule.clear()
+          return {
+              "count": count,
+              "lastValue": results[-1] if results else None,
+              "all": results,
+              "remainingJobs": len(schedule.jobs),
+          }
+    exercise:
+      prompt: count만큼 작업을 등록·실행하고 count, lastValue, all, remainingJobs를 반환하는 run_cycle 함수를 완성하세요. count가 0인 경우도 자동 검증됩니다.
+      starterCode: |-
+        import schedule
+
+        def run_cycle(count: int) -> dict:
+            schedule.clear()
+            results: list[int] = []
+
+            def job() -> None:
+                results.append(len(results) + 1)
+
+            for _ in range(count):
+                schedule.every(1).seconds.do(job)
+            schedule.run_all()
+            schedule.clear()
+            return {
+                "count": count,
+                "lastValue": results[-___] if results else None,
+                "all": results,
+                "remainingJobs": len(schedule.jobs),
+            }
+      solution: |-
+        import schedule
+
+        def run_cycle(count: int) -> dict:
+            schedule.clear()
+            results: list[int] = []
+
+            def job() -> None:
+                results.append(len(results) + 1)
+
+            for _ in range(count):
+                schedule.every(1).seconds.do(job)
+            schedule.run_all()
+            schedule.clear()
+            return {
+                "count": count,
+                "lastValue": results[-1] if results else None,
+                "all": results,
+                "remainingJobs": len(schedule.jobs),
+            }
+      hints:
+        - 마지막 항목은 results 리스트의 -1 인덱스다.
+        - 카운트 5이면 all 리스트가 1부터 5까지 다섯 정수를 담는다.
+    check:
+      id: python.schedule.run-cycle.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.schedule.run-cycle.fixture.v1
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      packageAssets:
+        - name: schedule
+          version: 1.2.2
+          url: check-packages/schedule-1.2.2-py3-none-any.whl
+          integrity: sha256-W+9KKgGDq/RARq4NFkytysIbHbARvdgQLkoMHpHgan0=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      payload:
+        entry: run_cycle
+        cases:
+          - id: empty-cycle
+            arguments:
+              - value: 0
+            expectedReturn:
+              count: 0
+              lastValue: null
+              all: []
+              remainingJobs: 0
+          - id: five-job-cycle
+            arguments:
+              - value: 5
+            expectedReturn:
+              count: 5
+              lastValue: 5
+              all:
+                - 1
+                - 2
+                - 3
+                - 4
+                - 5
+              remainingJobs: 0
+        expectedPaths: []
+assessment:
+  masteryVariants:
+  - id: schedule-tagged-jobs-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - schedule-register
+    - tick-summary
+    title: 주기와 tag가 있는 작업 등록하기
+    subtitle: 예시 없이 등록 상태와 정리까지 완성
+    goal: 서로 다른 초 간격 작업에 공통 tag를 붙이고 실제 Job 정보를 보고한 뒤 scheduler를 비운다.
+    why: 운영 자동화는 작업을 등록하는 것만큼 어떤 묶음인지 식별하고 다음 실행에 상태를 남기지 않는 것이 중요하다.
+    explanation: interval과 tag를 바꾼 두 case가 같은 함수를 호출하고 반환값과 남은 Job 수를 함께 검사한다.
+    tips:
+    - do 뒤에 tag(tag_name)를 이어 호출할 수 있습니다.
+    - 보고에 필요한 값을 읽은 뒤 clear하고 remaining 값을 계산하세요.
+    exercise:
+      prompt: register_tagged_jobs(intervals, tag_name)이 각 seconds Job을 등록하고 interval·tags 보고와 remaining 0을 반환하도록 완성하세요.
+      starterCode: |-
+        import schedule
+
+        def register_tagged_jobs(intervals, tag_name):
+            raise NotImplementedError
+      solution: |-
+        import schedule
+
+        def register_tagged_jobs(intervals, tag_name):
+            schedule.clear()
+            for interval in intervals:
+                schedule.every(interval).seconds.do(lambda: None).tag(tag_name)
+            jobs = [
+                {"interval": job.interval, "tags": sorted(job.tags)}
+                for job in schedule.jobs
+            ]
+            schedule.clear()
+            return {"jobs": jobs, "remaining": len(schedule.jobs)}
+      hints:
+      - 등록된 Job 객체마다 interval과 tags를 읽어 dict로 만드세요.
+      - 반환 전에 schedule.clear()를 호출하고 남은 길이를 다시 확인하세요.
+    check:
+      id: python.schedule.register-tagged-jobs.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.schedule.register-tagged-jobs.mastery.fixture.v1
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets:
+      - name: schedule
+        version: 1.2.2
+        url: check-packages/schedule-1.2.2-py3-none-any.whl
+        integrity: sha256-W+9KKgGDq/RARq4NFkytysIbHbARvdgQLkoMHpHgan0=
+      payload:
+        entry: register_tagged_jobs
+        cases:
+        - id: report-jobs
+          arguments:
+          - value:
+            - 2
+            - 5
+          - value: report
+          expectedReturn:
+            jobs:
+            - interval: 2
+              tags:
+              - report
+            - interval: 5
+              tags:
+              - report
+            remaining: 0
+        - id: cleanup-job
+          arguments:
+          - value:
+            - 1
+          - value: cleanup
+          expectedReturn:
+            jobs:
+            - interval: 1
+              tags:
+              - cleanup
+            remaining: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: schedule-named-batch-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - schedule-tagged-jobs-mastery
+    - run-now
+    title: 낯선 작업 이름 묶음을 즉시 실행하기
+    subtitle: 등록과 실행을 업무 batch에 적용
+    goal: 입력받은 작업 이름을 각각 등록하고 run_all로 순서대로 실행한 뒤 상태를 정리한다.
+    why: 간격 숫자 예제를 외우는 대신 실제 작업 식별자를 scheduler callback 인자로 넘겨야 재사용 가능한 batch가 된다.
+    explanation: 길이와 이름이 다른 두 batch를 fresh 실행해 입력 순서, 실행 수, cleanup을 함께 검사한다.
+    tips:
+    - do(record, name)처럼 callback 인자를 등록 시점에 넘기세요.
+    - run_all 뒤 clear를 호출하고 executed 목록과 remainingJobs를 반환하세요.
+    exercise:
+      prompt: run_named_batch(names)가 각 이름을 Job으로 등록·즉시 실행하고 executed, count, remainingJobs를 반환하도록 완성하세요.
+      starterCode: |-
+        import schedule
+
+        def run_named_batch(names):
+            raise NotImplementedError
+      solution: |-
+        import schedule
+
+        def run_named_batch(names):
+            schedule.clear()
+            executed = []
+
+            def record(name):
+                executed.append(name)
+
+            for name in names:
+                schedule.every(1).seconds.do(record, name)
+            schedule.run_all()
+            schedule.clear()
+            return {
+                "executed": executed,
+                "count": len(executed),
+                "remainingJobs": len(schedule.jobs),
+            }
+      hints:
+      - callback 함수가 name을 받아 executed에 append하도록 만드세요.
+      - 모든 Job 등록 뒤 run_all을 한 번만 호출하세요.
+    check:
+      id: python.schedule.run-named-batch.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.schedule.run-named-batch.transfer.fixture.v1
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets:
+      - name: schedule
+        version: 1.2.2
+        url: check-packages/schedule-1.2.2-py3-none-any.whl
+        integrity: sha256-W+9KKgGDq/RARq4NFkytysIbHbARvdgQLkoMHpHgan0=
+      payload:
+        entry: run_named_batch
+        cases:
+        - id: two-report-tasks
+          arguments:
+          - value:
+            - load-orders
+            - publish-report
+          expectedReturn:
+            executed:
+            - load-orders
+            - publish-report
+            count: 2
+            remainingJobs: 0
+        - id: one-cleanup-task
+          arguments:
+          - value:
+            - cleanup-cache
+          expectedReturn:
+            executed:
+            - cleanup-cache
+            count: 1
+            remainingJobs: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: schedule-resilient-cycle-retrieval
+    mode: retrieval
+    unseen: true
+    minimumDelayHours: 168
+    sourceSectionIds:
+    - schedule-named-batch-transfer
+    title: 하루 뒤 실패를 격리하는 실행 cycle 만들기
+    subtitle: callback 상태와 cleanup을 기억에서 복원
+    goal: 일부 작업이 실패해도 각 결과를 기록하고 scheduler를 항상 비운다.
+    why: 시간이 지난 뒤에도 실행과 정리 순서를 재구성해야 한 작업의 오류가 다음 자동화 cycle에 남지 않는다.
+    explanation: 전체 성공 batch와 중간 실패 batch를 각각 실행해 순서별 status와 remainingJobs 0을 검사한다.
+    tips:
+    - callback 안에서 실패 조건을 status로 바꾸고 다음 Job이 계속 실행되게 하세요.
+    - run_all이 끝난 뒤 clear하고 전체 records를 반환하세요.
+    exercise:
+      prompt: run_resilient_cycle(values, fail_value)이 각 값을 실행해 ok 또는 failed status를 기록하고 scheduler를 비운 결과를 반환하도록 완성하세요.
+      starterCode: |-
+        import schedule
+
+        def run_resilient_cycle(values, fail_value):
+            raise NotImplementedError
+      solution: |-
+        import schedule
+
+        def run_resilient_cycle(values, fail_value):
+            schedule.clear()
+            records = []
+
+            def run_one(value):
+                status = "failed" if value == fail_value else "ok"
+                records.append({"value": value, "status": status})
+
+            for value in values:
+                schedule.every(1).seconds.do(run_one, value)
+            schedule.run_all()
+            schedule.clear()
+            return {"records": records, "remainingJobs": len(schedule.jobs)}
+      hints:
+      - 실패 값을 예외로 밖에 던지지 말고 callback 결과 status로 격리하세요.
+      - 모든 callback 실행 뒤 clear하고 remainingJobs를 확인하세요.
+    check:
+      id: python.schedule.run-resilient-cycle.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.schedule.run-resilient-cycle.retrieval.fixture.v1
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets:
+      - name: schedule
+        version: 1.2.2
+        url: check-packages/schedule-1.2.2-py3-none-any.whl
+        integrity: sha256-W+9KKgGDq/RARq4NFkytysIbHbARvdgQLkoMHpHgan0=
+      payload:
+        entry: run_resilient_cycle
+        cases:
+        - id: all-success
+          arguments:
+          - value:
+            - 1
+            - 2
+          - value: 99
+          expectedReturn:
+            records:
+            - value: 1
+              status: ok
+            - value: 2
+              status: ok
+            remainingJobs: 0
+        - id: middle-failure
+          arguments:
+          - value:
+            - 1
+            - 2
+            - 3
+          - value: 2
+          expectedReturn:
+            records:
+            - value: 1
+              status: ok
+            - value: 2
+              status: failed
+            - value: 3
+              status: ok
+            remainingJobs: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending
+`;export{e as default};

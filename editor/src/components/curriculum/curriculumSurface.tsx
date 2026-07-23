@@ -96,7 +96,7 @@ export function CurriculumView({
   return (
     <ScrollArea className="h-full min-h-0 min-w-0">
       <div className="min-w-0 p-4">
-        <div className="mx-auto min-w-0 max-w-5xl space-y-4">
+        <div className="mx-auto min-w-0 max-w-5xl">
           <LearningOverviewHeader
             apiOnline={apiOnline}
             contents={contents}
@@ -122,7 +122,7 @@ export function CurriculumView({
             onImportArchive={onImportLearningArchive}
           />
 
-          <div className="space-y-4">
+          <div>
             {curriculumSections.sections.map((section, index) => (
               <CurriculumSectionCard
                 canRun={canRun}

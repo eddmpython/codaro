@@ -9,7 +9,7 @@ import {
 } from "@codemirror/autocomplete";
 import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import { python } from "@codemirror/lang-python";
-import { bracketMatching, defaultHighlightStyle, syntaxHighlighting } from "@codemirror/language";
+import { bracketMatching, HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import { EditorState, Prec, RangeSet, StateEffect, StateField } from "@codemirror/state";
 import {
   Decoration,
@@ -22,7 +22,9 @@ import {
   lineNumbers,
   placeholder,
 } from "@codemirror/view";
+import { tags } from "@lezer/highlight";
 import { combineErrorSources } from "@/lib/tracebackParser";
+import "@/components/notebook/notebookPanel.css";
 import {
   Loader2,
   MessageSquare,
@@ -40,8 +42,8 @@ import {
 } from "@/components/app/appPrimitives";
 import { RuntimeCapabilityRail } from "@/components/app/runtimeCapabilityRail";
 import { CellAiActions } from "@/components/app/cellAiActions";
+import { NotebookCommandBar } from "@/components/notebook/notebookCommandBar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { fetchCodeCompletions, type CompletionContextProvider } from "@/lib/codeCompletion";
@@ -64,47 +66,70 @@ import type { BlockConfig, CodaroDocument, ExecutionResult, ReactiveDiagnostics 
 
 type ResultMap = Record<string, ExecutionResult>;
 
+const SCRATCH_STARTER_CODE = `prices = [12000, 18500, 7600]
+total = sum(prices)
+count = len(prices)
+average = total / count
+
+print("항목 수:", count)
+print("합계:", total)
+print("평균:", round(average))`;
+
+const codaroSyntaxHighlightStyle = HighlightStyle.define([
+  { tag: tags.keyword, color: "var(--color-syntax-keyword)" },
+  { tag: tags.string, color: "var(--color-syntax-string)" },
+  { tag: tags.comment, color: "var(--color-syntax-comment)", fontStyle: "italic" },
+  { tag: tags.number, color: "var(--color-syntax-number)" },
+  { tag: tags.function(tags.variableName), color: "var(--color-syntax-function)" },
+  { tag: tags.typeName, color: "var(--color-syntax-type)" },
+  { tag: tags.variableName, color: "var(--color-syntax-variable)" },
+  { tag: tags.operator, color: "var(--color-syntax-operator)" },
+  { tag: [tags.bool, tags.null], color: "var(--color-syntax-constant)" },
+  { tag: tags.propertyName, color: "var(--color-syntax-property)" },
+  { tag: tags.punctuation, color: "var(--color-syntax-punctuation)" },
+]);
+
 const codeCellEditorTheme = EditorView.theme({
   "&": {
-    backgroundColor: "var(--code)",
-    color: "var(--code-foreground)",
-    fontSize: "13px",
+    backgroundColor: "var(--color-syntax-background, var(--code))",
+    color: "var(--color-syntax-variable, var(--code-foreground))",
+    fontSize: "14px",
   },
   "&.cm-focused": {
     outline: "none",
   },
   ".cm-scroller": {
-    fontFamily:
-      'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-    lineHeight: "1.55",
+    fontFamily: "var(--font-family-code)",
+    lineHeight: "1.65",
     overflow: "auto",
   },
   ".cm-content": {
-    padding: "0.375rem 0",
+    minHeight: "6.5rem",
+    padding: "0.75rem 0",
   },
   ".cm-line": {
-    padding: "0 0.625rem",
+    padding: "0 0.875rem",
   },
   ".cm-gutters": {
-    backgroundColor: "var(--muted)",
-    borderRight: "1px solid var(--border)",
-    color: "var(--muted-foreground)",
+    backgroundColor: "var(--color-background-muted, var(--muted))",
+    borderRight: "1px solid var(--color-border, var(--border))",
+    color: "var(--color-text-secondary, var(--muted-foreground))",
   },
   ".cm-lineNumbers .cm-gutterElement": {
     padding: "0 0.5rem",
   },
   ".cm-activeLine": {
-    backgroundColor: "color-mix(in oklch, var(--accent) 55%, transparent)",
+    backgroundColor: "color-mix(in oklab, var(--color-accent-muted) 66%, transparent)",
   },
   ".cm-activeLineGutter": {
-    backgroundColor: "var(--accent)",
-    color: "var(--accent-foreground)",
+    backgroundColor: "var(--color-accent-muted, var(--accent))",
+    color: "var(--color-text-accent, var(--accent-foreground))",
   },
   ".cm-cursor": {
-    borderLeftColor: "var(--foreground)",
+    borderLeftColor: "var(--color-accent, var(--foreground))",
   },
   ".cm-selectionBackground": {
-    backgroundColor: "color-mix(in oklch, var(--ring) 35%, transparent) !important",
+    backgroundColor: "color-mix(in oklab, var(--color-accent) 26%, transparent) !important",
   },
   ".cm-codaroErrorLine": {
     backgroundColor: "color-mix(in oklch, var(--destructive) 18%, transparent)",
@@ -172,30 +197,54 @@ export function NotebookPanel({
 }) {
   const staleSet = new Set(staleBlockIds);
   const cyclePaths = formatCyclePaths(diagnostics.cycles);
+  const scratchSeededRef = useRef(false);
+  const selectedBlockIndex = document.blocks.findIndex((block) => block.id === selectedBlockId);
+  const activeCellLabel = selectedBlockIndex >= 0
+    ? `셀 ${selectedBlockIndex + 1} / ${document.blocks.length}`
+    : `${document.blocks.length}개 셀`;
+
+  useEffect(() => {
+    if (scratchSeededRef.current) return;
+    const starterBlock = document.blocks[0];
+    const starterDraft = starterBlock ? drafts[starterBlock.id] ?? starterBlock.content : "";
+    const untouchedScratch = (
+      document.id === "new-notebook"
+      && document.title === "새노트북.py"
+      && document.blocks.length === 1
+      && starterBlock?.type === "code"
+      && !starterDraft.trim()
+    );
+    if (!untouchedScratch || !starterBlock) return;
+
+    scratchSeededRef.current = true;
+    onDraftChange(starterBlock.id, SCRATCH_STARTER_CODE);
+    onRenameDocument("scratch.py");
+    onSelectBlock(starterBlock.id);
+  }, [document, drafts, onDraftChange, onRenameDocument, onSelectBlock]);
+
   return (
-    <section className="grid h-full min-h-0 grid-rows-[auto_auto_auto_minmax(0,1fr)] p-2 sm:p-3">
-      <div className="mb-2 flex min-h-8 items-center gap-2 pl-9">
-        <Input
-          aria-label="노트북 파일명"
-          className="h-7 w-48 max-w-[18rem] border-0 bg-transparent px-1 font-mono text-sm shadow-none focus-visible:ring-1"
-          value={document.title}
-          onBlur={(event) => onRenameDocument(normalizeNotebookFilename(event.target.value))}
-          onChange={(event) => onRenameDocument(event.target.value)}
-        />
-        <Button
-          aria-label="모두 실행"
-          className="ml-auto size-7 shrink-0 [&_svg]:size-3.5"
-          disabled={!canRun || notebookRunning || runningBlockId !== null}
-          size="icon"
-          title="모두 실행"
-          variant="default"
-          onClick={onRunNotebook}
-        >
-          {notebookRunning || runningBlockId !== null ? <Loader2 className="animate-spin" /> : <Play />}
-        </Button>
+    <section
+      className="notebookStudio"
+      data-notebook-studio="true"
+      data-notebook-storage="session"
+    >
+      <NotebookCommandBar
+        activeCellLabel={activeCellLabel}
+        apiOnline={apiOnline}
+        canRun={canRun}
+        notebookRunning={notebookRunning}
+        runningBlockId={runningBlockId}
+        title={document.title}
+        onAddCodeCell={() => onAddCell("code", selectedBlockId || undefined, "after")}
+        onAddMarkdownCell={() => onAddCell("markdown", selectedBlockId || undefined, "after")}
+        onCommitTitle={onRenameDocument}
+        onRunNotebook={onRunNotebook}
+        onTitleChange={onRenameDocument}
+      />
+      <div className="notebookRuntimeRail">
+        <RuntimeCapabilityRail apiOnline={apiOnline} surface="notebook" />
       </div>
-      <RuntimeCapabilityRail apiOnline={apiOnline} surface="notebook" />
-      <div className="mb-1">
+      <div className="notebookPendingArea">
         <PendingNotebookBar
           pendingBlocks={pendingBlocks}
           onAccept={onAcceptPendingBlocks}
@@ -208,10 +257,11 @@ export function NotebookPanel({
         ) : null}
       </div>
 
-      <ScrollArea className="h-full min-h-0">
-        <div className="space-y-0.5 pr-2">
+      <ScrollArea className="notebookViewport">
+        <div className="notebookDocument">
           {document.blocks.length ? document.blocks.map((block, blockIndex) => (
             <DocumentBlock
+              autoFocus={blockIndex === 0 && block.id === selectedBlockId}
               block={block}
               canRun={canRun && (!isExecutableBlock(block) || Boolean((drafts[block.id] ?? block.content).trim()))}
               draft={drafts[block.id] ?? block.content}
@@ -467,7 +517,7 @@ export function CodeCellEditor({
         bracketMatching(),
         closeBrackets(),
         python(),
-        syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+        syntaxHighlighting(codaroSyntaxHighlightStyle, { fallback: true }),
         highlightActiveLine(),
         placeholder(placeholderText),
         EditorView.lineWrapping,
@@ -573,6 +623,7 @@ export function CodeCellEditor({
 }
 
 function DocumentBlock({
+  autoFocus = false,
   block,
   canRun,
   draft,
@@ -591,6 +642,7 @@ function DocumentBlock({
   onSelect,
   onCellAsk,
 }: {
+  autoFocus?: boolean;
   block: BlockConfig;
   canRun: boolean;
   draft: string;
@@ -640,7 +692,12 @@ function DocumentBlock({
     // 미선택 + 렌더 결과가 있으면 미리보기, 선택하면 편집(클릭으로 전환).
     const showPreview = !isSelected && Boolean(markdownHtml);
     return (
-      <section className="group relative py-0.5 pl-6" data-notebook-cell="markdown">
+      <section
+        className="notebookCell group"
+        data-notebook-cell="markdown"
+        data-notebook-cell-selected={isSelected ? "true" : "false"}
+        data-notebook-cell-status={resultStatus}
+      >
         <CellMetaBar
           status={resultStatus}
           title={cellTitle}
@@ -651,14 +708,14 @@ function DocumentBlock({
           onCellAsk={onCellAsk}
           onDelete={onDelete}
         />
-        <div className="relative min-h-14 min-w-0">
+        <div className="notebookCellBody">
           {showInsertBefore ? (
-            <InsertCellButton placement="before" onInsertCell={onInsertCell} className="absolute -left-6 top-0 z-10 opacity-60 transition-opacity group-hover:opacity-100" />
+            <InsertCellButton placement="before" onInsertCell={onInsertCell} className="notebookInsertBefore" />
           ) : null}
-          <InsertCellButton placement="after" onInsertCell={onInsertCell} className="absolute -left-6 bottom-0 z-10 opacity-60 transition-opacity group-hover:opacity-100" />
+          <InsertCellButton placement="after" onInsertCell={onInsertCell} className="notebookInsertAfter" />
           {showPreview ? (
             <div
-              className="prose prose-sm min-h-14 max-w-none cursor-text rounded-md border border-transparent px-2 py-1.5 hover:border-border"
+              className="notebookMarkdownPreview prose prose-sm"
               data-notebook-markdown-preview="true"
               onClick={onSelect}
               dangerouslySetInnerHTML={{ __html: markdownHtml }}
@@ -666,8 +723,8 @@ function DocumentBlock({
           ) : (
             <Textarea
               className={cn(
-                "min-h-24 resize-y rounded-md bg-background font-sans text-sm leading-6 shadow-sm transition-colors",
-                isSelected ? "border-ring ring-2 ring-ring/20" : "border-border hover:border-ring/50",
+                "notebookMarkdownEditor",
+                isSelected && "notebookMarkdownEditorSelected",
               )}
               placeholder="Markdown을 입력하세요. {변수}로 값 보간."
               value={draft}
@@ -682,9 +739,11 @@ function DocumentBlock({
 
   return (
     <section
-      className="group relative py-0.5 pl-6"
+      className="notebookCell group"
       data-automation-session-cell={persistentAutomation ? "true" : undefined}
       data-notebook-cell="code"
+      data-notebook-cell-selected={isSelected ? "true" : "false"}
+      data-notebook-cell-status={resultStatus}
     >
       <CellMetaBar
         canRun={canRun}
@@ -699,19 +758,21 @@ function DocumentBlock({
         onDelete={onDelete}
         onRun={runCurrentDraft}
       />
-      <div className="relative min-h-14 min-w-0">
+      <div className="notebookCellBody">
         {showInsertBefore ? (
-          <InsertCellButton placement="before" onInsertCell={onInsertCell} className="absolute -left-6 top-0 z-10 opacity-60 transition-opacity group-hover:opacity-100" />
+          <InsertCellButton placement="before" onInsertCell={onInsertCell} className="notebookInsertBefore" />
         ) : null}
-        <InsertCellButton placement="after" onInsertCell={onInsertCell} className="absolute -left-6 bottom-0 z-10 opacity-60 transition-opacity group-hover:opacity-100" />
+        <InsertCellButton placement="after" onInsertCell={onInsertCell} className="notebookInsertAfter" />
         <div
           className={cn(
-            "min-h-14 overflow-hidden rounded-md border bg-code shadow-sm transition-colors",
-            isSelected ? "border-ring ring-2 ring-ring/20" : "border-border hover:border-ring/50",
+            "notebookCodeFrame",
+            isSelected && "notebookCodeFrameSelected",
           )}
           data-notebook-input="code"
         >
           <CodeCellEditor
+            autoFocus={autoFocus}
+            placeholderText="Python 코드를 입력하세요"
             value={draft}
             onChange={updateDraft}
             onFocus={onSelect}
@@ -726,12 +787,12 @@ function DocumentBlock({
         </div>
       </div>
       {result ? (
-        <div className="mt-1.5">
+        <div className="notebookCellOutput">
           <ExecutionOutput result={result} />
         </div>
       ) : null}
       {isRunning && !result ? (
-        <div className="mt-1.5">
+        <div className="notebookCellOutput">
           <LoadingInline label="셀 실행 중" />
         </div>
       ) : null}
@@ -767,21 +828,21 @@ function CellMetaBar({
   const Icon = type === "code" ? TerminalSquare : MessageSquare;
 
   return (
-    <div className="mb-0.5 flex min-h-7 w-full min-w-0 items-center gap-2">
+    <div className="notebookCellMeta">
       <div
         className={cn(
-          "inline-flex min-w-0 items-center gap-1.5 px-0.5 text-left text-[11px] text-muted-foreground",
-          selected && "text-foreground",
+          "notebookCellKind",
+          selected && "notebookCellKindSelected",
         )}
       >
         <Icon className="size-3.5 shrink-0" />
         <span className="truncate">{title}</span>
       </div>
-      <div className="ml-auto flex shrink-0 items-center gap-1">
+      <div className="notebookCellActions">
         {diagnosticChips.map((chip) => (
           <span
             key={chip.kind}
-            className="h-6 rounded-md border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[11px] font-medium leading-5 text-amber-700 dark:text-amber-400"
+            className="notebookCellDiagnostic"
             title="정합성 경고 — 실행은 진행되며, 마지막 정의가 적용됩니다."
           >
             {chip.label}
@@ -790,12 +851,12 @@ function CellMetaBar({
         {status !== "idle" ? (
           <span
             className={cn(
-              "h-6 rounded-md px-1.5 py-0.5 text-[11px] font-medium leading-5",
+              "notebookCellStatus",
               status === "error" || status === "conflict"
-                ? "bg-destructive text-destructive-foreground"
+                ? "notebookCellStatusError"
                 : status === "stale"
-                  ? "border border-dashed bg-background text-muted-foreground"
-                  : "border bg-background text-muted-foreground",
+                  ? "notebookCellStatusStale"
+                  : "notebookCellStatusDefault",
             )}
           >
             {statusLabel(status)}
@@ -804,8 +865,8 @@ function CellMetaBar({
         {type === "code" ? (
           <IconButton
             className={cn(
-              "size-6 rounded-md [&_svg]:size-3",
-              selected && "bg-accent-surface text-accent-surface-foreground",
+              "notebookCellRunButton size-11 sm:size-8 [&_svg]:size-4",
+              selected && "notebookCellRunButtonSelected",
             )}
             disabled={!canRun}
             label="셀 실행"
@@ -820,7 +881,7 @@ function CellMetaBar({
         ) : null}
         <CellAiActions compact helpState={cellHelp} selected={selected} onAsk={onCellAsk} />
         <IconButton
-          className="size-6 rounded-md text-muted-foreground hover:text-destructive [&_svg]:size-3"
+          className="notebookCellDeleteButton size-9 sm:size-8 [&_svg]:size-4"
           label="셀 삭제"
           variant="ghost"
           onClick={(event) => {
@@ -847,26 +908,26 @@ function InsertCellButton({
   const placementLabel = placement === "before" ? "위에" : "아래에";
 
   return (
-    <div className={cn("group/insert", className)}>
+    <div className={cn("notebookInsertControl group/insert", className)}>
       <button
         aria-label={`${placementLabel} Python 셀 추가`}
-        className="flex size-6 items-center justify-center rounded-full border bg-background shadow-sm hover:border-ring hover:text-foreground"
+        className="notebookInsertPrimary"
         title={`${placementLabel} Python 셀 추가`}
         type="button"
         onClick={() => onInsertCell("code", placement)}
       >
         <Plus className="size-3.5" />
       </button>
-      <div className="absolute left-6 top-1/2 z-20 hidden -translate-y-1/2 items-center gap-1 rounded-md border bg-popover p-1 shadow-md group-focus-within/insert:flex group-hover/insert:flex">
+      <div className="notebookInsertMenu">
         <button
-          className="h-5 rounded px-1.5 font-mono text-[10px] text-popover-foreground hover:bg-accent-surface hover:text-accent-surface-foreground"
+          className="notebookInsertOption notebookInsertOptionCode"
           type="button"
           onClick={() => onInsertCell("code", placement)}
         >
           Py
         </button>
         <button
-          className="h-5 rounded px-1.5 text-[10px] text-popover-foreground hover:bg-accent-surface hover:text-accent-surface-foreground"
+          className="notebookInsertOption"
           type="button"
           onClick={() => onInsertCell("markdown", placement)}
         >
@@ -883,21 +944,15 @@ function EmptyNotebookActions({
   onAddCell: (type: "code" | "markdown") => void;
 }) {
   return (
-    <div className="flex min-h-32 items-center justify-center gap-2 rounded-md border border-dashed bg-muted/20">
-      <Button className="h-7 gap-1.5 px-2 text-xs" type="button" variant="outline" onClick={() => onAddCell("code")}>
+    <div className="notebookEmptyActions">
+      <Button className="notebookEmptyAction" type="button" variant="outline" onClick={() => onAddCell("code")}>
         <TerminalSquare className="size-3.5" />
         Python 셀
       </Button>
-      <Button className="h-7 gap-1.5 px-2 text-xs" type="button" variant="outline" onClick={() => onAddCell("markdown")}>
+      <Button className="notebookEmptyAction" type="button" variant="outline" onClick={() => onAddCell("markdown")}>
         <MessageSquare className="size-3.5" />
         Markdown 셀
       </Button>
     </div>
   );
-}
-
-function normalizeNotebookFilename(value: string) {
-  const trimmed = value.trim() || "notebook.py";
-  if (trimmed.toLowerCase().endsWith(".py")) return trimmed;
-  return `${trimmed.replace(/\.[^/.]+$/, "")}.py`;
 }

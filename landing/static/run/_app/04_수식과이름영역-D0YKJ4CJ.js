@@ -1,0 +1,907 @@
+var e=`meta:
+  id: openpyxl_04
+  title: 수식과 이름 영역
+  order: 4
+  category: openpyxl
+  difficulty: ⭐⭐
+  badge: 기초
+  packages:
+  - openpyxl
+  outcomes: ["automation.excel.formulas"]
+  prerequisites: ["automation.excel.workbook"]
+  estimatedMinutes: 55
+  tags:
+  - openpyxl
+  - 수식
+  - SUM
+  - IF
+  - DefinedName
+  - data_only
+  seo:
+    title: openpyxl 수식과 이름 영역 - SUM/IF/VLOOKUP·DefinedName·data_only 차이
+    description: 셀에 수식 문자열을 쓰는 방법, 캐시된 계산 결과를 data_only로 읽는 차이, DefinedName으로 가독성을 높이는 패턴까지 정리합니다.
+    keywords:
+    - openpyxl 수식
+    - SUM IF VLOOKUP
+    - DefinedName
+    - data_only
+intro:
+  direction: 셀에 수식 문자열을 직접 쓰고, 저장된 파일을 data_only로 다시 열어 캐시된 결과값을 읽습니다. DefinedName으로 수식을 사람이 읽기 좋게 만듭니다.
+  benefits:
+  - 합계, 평균, 조건 분기, 룩업 수식을 코드로 정확히 넣습니다.
+  - 수식 문자열과 캐시된 결과값을 구분해 다루며, Excel에서 한 번 열어야 결과가 채워지는 한계를 이해합니다.
+  - DefinedName으로 "tax_rate" 같은 이름 영역을 만들어 수식의 가독성을 높입니다.
+  diagram:
+    steps:
+    - label: 수식 입력
+      detail: 셀.value에 "=" 시작 문자열을 대입.
+    - label: data_only
+      detail: load_workbook(path, data_only=True)로 캐시 결과를 읽는다.
+    - label: DefinedName
+      detail: 이름 영역으로 수식을 사람이 읽기 좋게 묶는다.
+    - label: 수식 문자열 검증
+      detail: 수식 문자열은 openpyxl로 즉시 assert. 캐시된 결과값은 Excel을 거쳐야 채워진다는 한계도 확인한다.
+    runtime:
+    - label: openpyxl 패키지 준비
+      detail: 수식 자체는 openpyxl만으로 충분. uv run python에서 SUM/IF/VLOOKUP 문자열을 셀에 그대로 쓴다.
+    - label: data_only 캐시 재오픈
+      detail: load_workbook(path, data_only=True)로 다시 열어 캐시값이 None인지 직접 확인한다.
+sections:
+- id: step1_basic_formula
+  title: 1단계. 셀에 수식 쓰기
+  structuredPrimary: true
+  subtitle: cell.value에 "=" 시작 문자열
+  goal: 합계 수식을 코드로 넣고, 셀의 .value가 그대로 수식 문자열로 보존되는 것을 확인한다.
+  why: openpyxl은 수식을 "문자열"로 다루고 직접 계산은 하지 않습니다. 이 사실을 모르면 "셀 값이 왜 숫자가 아니라 = 로 시작하는 문자열이지?"에서 막힙니다.
+  explanation: |-
+    \`ws['B4'] = "=SUM(B2:B3)"\`처럼 등호로 시작하는 문자열을 셀에 넣으면 openpyxl은 그것을 수식으로 저장합니다. 저장 직후 같은 워크북에서 \`cell.value\`로 읽으면 수식 문자열 그대로 돌아옵니다. 결과값(예: 200000)은 아직 어디에도 없습니다. Excel이 파일을 열어 재계산해야 비로소 캐시에 결과가 채워집니다.
+  tips:
+  - 수식 문자열은 영어 함수명(SUM, AVERAGE, IF, ...)만 인식합니다. Excel UI가 한국어라도 코드에서는 영어 이름을 쓰세요.
+  snippet: |-
+    from openpyxl import Workbook
+
+    book = Workbook()
+    sheet = book.active
+    sheet.append(["region", "amount"])
+    sheet.append(["Seoul", 120000])
+    sheet.append(["Busan", 80000])
+    sheet["A4"] = "total"
+    sheet["B4"] = "=SUM(B2:B3)"
+    sheet["B4"].value
+  exercise:
+    prompt: 평균을 구하는 수식을 C4에 추가하고 같은 방법으로 .value가 수식 문자열인지 확인하세요.
+    starterCode: |-
+      from openpyxl import Workbook
+
+      book = Workbook()
+      sheet = book.active
+      sheet.append(["region", "amount", "average"])
+      sheet.append(["Seoul", 120000, None])
+      sheet.append(["Busan", 80000, None])
+      sheet["A4"] = "total"
+      sheet["B4"] = "=SUM(B2:B3)"
+      sheet["C4"] = ___
+      sheet["B4"].value, sheet["C4"].value
+    hints:
+    - "AVERAGE(B2:B3) 같은 함수를 = 로 시작하는 문자열로 넣으면 됩니다."
+  check:
+    noError: 수식 문자열이 등호(=)로 시작해야 openpyxl이 수식으로 인식합니다.
+    resultCheck: 두 셀의 .value가 모두 수식 문자열(예 "=SUM..", "=AVERAGE..")이어야 합니다.
+- id: step2_data_only
+  title: 2단계. data_only로 캐시 결과 읽기
+  structuredPrimary: true
+  subtitle: load_workbook(path, data_only=True)
+  goal: openpyxl이 직접 계산하지 못한다는 사실과, 캐시가 비어 있을 때의 동작을 코드로 확인한다.
+  why: 수식을 넣은 파일을 다른 시스템에서 "계산된 결과 값"으로 쓰려면 캐시 갱신 단계가 필요합니다. 이 한계를 알아야 자동화 파이프라인을 잘 설계할 수 있습니다.
+  explanation: |-
+    저장 직후의 .xlsx에는 수식 문자열만 들어 있고 캐시된 결과값(cachedValue)은 비어 있습니다. \`load_workbook(path, data_only=True)\`로 다시 열면 cell.value는 캐시 값을 돌려주지만, 그 값은 None입니다. 캐시가 채워지려면 Excel/LibreOffice가 한 번 파일을 열어 저장해야 합니다.
+  tips:
+  - "이 한계 때문에 openpyxl 자동화는 '수식 자체가 결과'인 경우(인보이스 양식, 동적 계산 보고서)에 강합니다. '수식 결과를 다시 계산해 다른 시스템에 넘기는' 흐름이면 LibreOffice headless 호출이나 pandas로 직접 계산하는 편이 안전합니다."
+  snippet: |-
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    from openpyxl import Workbook, load_workbook
+
+    workdir = TemporaryDirectory()
+    target = Path(workdir.name) / "formula.xlsx"
+
+    book = Workbook()
+    sheet = book.active
+    sheet.append(["region", "amount"])
+    sheet.append(["Seoul", 120000])
+    sheet.append(["Busan", 80000])
+    sheet["A4"] = "total"
+    sheet["B4"] = "=SUM(B2:B3)"
+    book.save(target)
+
+    formulaView = load_workbook(target)
+    dataView = load_workbook(target, data_only=True)
+    formulaView["Sheet"]["B4"].value, dataView["Sheet"]["B4"].value
+  exercise:
+    prompt: dataView["Sheet"]["B4"].value가 None인지 직접 assert로 확인하세요.
+    starterCode: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from openpyxl import Workbook, load_workbook
+
+      workdir = TemporaryDirectory()
+      target = Path(workdir.name) / "formula.xlsx"
+
+      book = Workbook()
+      sheet = book.active
+      sheet.append(["region", "amount"])
+      sheet.append(["Seoul", 120000])
+      sheet.append(["Busan", 80000])
+      sheet["A4"] = "total"
+      sheet["B4"] = "=SUM(B2:B3)"
+      book.save(target)
+
+      dataView = load_workbook(target, data_only=True)
+      assert dataView["Sheet"]["B4"].value is ___
+      dataView["Sheet"]["B4"].value
+    hints:
+    - 캐시가 없으면 None이 옵니다. is None 비교가 정확합니다.
+  check:
+    noError: 두 load_workbook 호출이 모두 같은 경로를 써야 FileNotFoundError가 안 납니다.
+    resultCheck: data_only로 연 B4의 value가 None이어야 합니다.
+- id: step3_if_and_countif
+  title: 3단계. IF와 COUNTIF
+  structuredPrimary: true
+  subtitle: 조건 수식 두 가지
+  goal: 조건 분기 수식을 셀에 넣고, 셀 좌표 참조와 비교 연산자 사용을 익힌다.
+  why: 매출 분석에서 "기준 이상/미만" 분류와 카운트는 가장 자주 쓰이는 수식입니다. 코드로 정확한 셀 좌표를 넣을 수 있어야 합니다.
+  explanation: |-
+    \`=IF(B2>=100000,"high","low")\`는 B2 값에 따라 "high"나 "low"를 돌려줍니다. \`=COUNTIF(B2:B4,">=100000")\`은 영역에서 조건을 만족하는 셀 수를 셉니다. 비교 연산자는 큰따옴표로 감싼 문자열 안에 넣어야 합니다.
+  tips:
+  - "f-string으로 조건을 동적으로 만들 때는 인용부호 충돌에 주의하세요. f'=COUNTIF(B2:B4,\\">={threshold}\\")' 같은 패턴이 편합니다."
+  snippet: |-
+    from openpyxl import Workbook
+
+    book = Workbook()
+    sheet = book.active
+    sheet.append(["region", "amount", "tier"])
+    sheet.append(["Seoul", 120000, "=IF(B2>=100000,\\"high\\",\\"low\\")"])
+    sheet.append(["Busan", 80000, "=IF(B3>=100000,\\"high\\",\\"low\\")"])
+    sheet.append(["Daegu", 30000, "=IF(B4>=100000,\\"high\\",\\"low\\")"])
+    sheet["A5"] = "high count"
+    sheet["B5"] = "=COUNTIF(B2:B4,\\">=100000\\")"
+    [sheet.cell(row=row, column=3).value for row in range(2, 5)] + [sheet["B5"].value]
+  exercise:
+    prompt: 기준을 100000에서 60000으로 바꾸려면 IF 수식 세 개와 COUNTIF 한 개의 어디를 고쳐야 할까요?
+    starterCode: |-
+      from openpyxl import Workbook
+
+      book = Workbook()
+      sheet = book.active
+      threshold = ___
+      sheet.append(["region", "amount", "tier"])
+      for rowIndex, (region, amount) in enumerate(
+          [("Seoul", 120000), ("Busan", 80000), ("Daegu", 30000)], start=2
+      ):
+          sheet.cell(row=rowIndex, column=1, value=region)
+          sheet.cell(row=rowIndex, column=2, value=amount)
+          sheet.cell(
+              row=rowIndex,
+              column=3,
+              value=f'=IF(B{rowIndex}>={threshold},"high","low")',
+          )
+      sheet["A5"] = "high count"
+      sheet["B5"] = f'=COUNTIF(B2:B4,">={threshold}")'
+      [sheet.cell(row=row, column=3).value for row in range(2, 5)] + [sheet["B5"].value]
+    hints:
+    - threshold 변수 하나만 바꿔도 수식 네 개가 일관되게 바뀝니다.
+  check:
+    noError: f-string의 인용부호가 짝을 맞춰야 SyntaxError가 안 납니다.
+    resultCheck: 결과 리스트의 각 수식 문자열에 같은 threshold 값이 포함되어야 합니다.
+- id: step4_defined_name
+  title: 4단계. DefinedName으로 이름 영역 만들기
+  structuredPrimary: true
+  subtitle: openpyxl.workbook.defined_name.DefinedName
+  goal: 셀 영역에 사람이 읽는 이름을 붙여 수식의 가독성을 높인다.
+  why: 셀 주소가 직접 들어간 수식보다 tax_rate 같은 이름이 들어간 수식이 훨씬 의도가 분명합니다. 이름 영역은 자동 보고서의 유지보수성을 결정합니다.
+  explanation: |-
+    \`from openpyxl.workbook.defined_name import DefinedName\` 후, \`book.defined_names["tax_rate"] = DefinedName(name="tax_rate", attr_text="Settings!$B$2")\`로 이름을 등록합니다. 수식에서는 좌표 대신 \`tax_rate\`를 쓰면 됩니다.
+  tips:
+  - attr_text는 절대 참조($)로 적는 것이 안전합니다. 상대 참조를 쓰면 수식이 복사될 때 의도와 다르게 움직입니다.
+  snippet: |-
+    from openpyxl import Workbook
+    from openpyxl.workbook.defined_name import DefinedName
+
+    book = Workbook()
+    settings = book.active
+    settings.title = "Settings"
+    settings["A1"] = "tax_rate"
+    settings["B1"] = 0.1
+
+    book.defined_names["tax_rate"] = DefinedName(
+        name="tax_rate",
+        attr_text="Settings!$B$1",
+    )
+
+    invoice = book.create_sheet("Invoice")
+    invoice.append(["item", "amount"])
+    invoice.append(["pen", 1000])
+    invoice.append(["book", 12000])
+    invoice["A4"] = "subtotal"
+    invoice["B4"] = "=SUM(B2:B3)"
+    invoice["A5"] = "tax"
+    invoice["B5"] = "=B4*tax_rate"
+    invoice["A6"] = "total"
+    invoice["B6"] = "=B4+B5"
+    [invoice.cell(row=row, column=2).value for row in range(4, 7)]
+  exercise:
+    prompt: discount_rate를 0.05로 추가해 invoice에 "discount" 행을 만들고 total 수식을 (subtotal - discount + tax) 형태로 바꾸세요.
+    starterCode: |-
+      from openpyxl import Workbook
+      from openpyxl.workbook.defined_name import DefinedName
+
+      book = Workbook()
+      settings = book.active
+      settings.title = "Settings"
+      settings["A1"] = "tax_rate"
+      settings["B1"] = 0.1
+      settings["A2"] = "discount_rate"
+      settings["B2"] = 0.05
+
+      book.defined_names["tax_rate"] = DefinedName(
+          name="tax_rate", attr_text="Settings!$B$1"
+      )
+      book.defined_names["discount_rate"] = DefinedName(
+          name="discount_rate", attr_text=___
+      )
+
+      invoice = book.create_sheet("Invoice")
+      invoice.append(["item", "amount"])
+      invoice.append(["pen", 1000])
+      invoice.append(["book", 12000])
+      invoice["A4"] = "subtotal"
+      invoice["B4"] = "=SUM(B2:B3)"
+      invoice["A5"] = "discount"
+      invoice["B5"] = "=B4*discount_rate"
+      invoice["A6"] = "tax"
+      invoice["B6"] = "=(B4-B5)*tax_rate"
+      invoice["A7"] = "total"
+      invoice["B7"] = "=B4-B5+B6"
+      [invoice.cell(row=row, column=2).value for row in range(4, 8)]
+    hints:
+    - attr_text는 절대 참조 좌표 문자열입니다. Settings 시트의 B2가 discount_rate니까 "Settings!$B$2"입니다.
+  check:
+    noError: DefinedName 등록에서 시트 이름과 셀 좌표가 실제 시트/셀과 맞아야 합니다.
+    resultCheck: invoice의 B5, B6, B7이 모두 수식 문자열이며 정의된 이름을 포함해야 합니다.
+- id: step5_vlookup
+  title: 5단계. VLOOKUP으로 매핑
+  structuredPrimary: true
+  subtitle: 코드 → 이름 변환
+  goal: 룩업 테이블을 별도 시트에 두고 메인 시트의 코드를 이름으로 자동 변환한다.
+  why: 매핑 테이블을 코드에 박지 않고 시트로 빼두면, 사용자가 직접 매핑을 수정할 수 있는 "유지보수 가능한 자동화"가 됩니다.
+  explanation: |-
+    Codes 시트에 코드(A)와 이름(B) 매핑을 두고, Main 시트에서 \`=VLOOKUP(A2,Codes!$A$2:$B$5,2,FALSE)\`로 코드를 이름으로 변환합니다. 룩업 영역은 절대 참조($)로 잠가야 수식을 복사해도 안전합니다.
+  tips:
+  - 네 번째 인자 FALSE(또는 0)는 정확히 일치하는 값만 찾으라는 뜻입니다. TRUE는 근사 매칭이라 정렬되지 않은 키에는 위험합니다. 자동화에서는 항상 FALSE를 권장합니다.
+  snippet: |-
+    from openpyxl import Workbook
+
+    book = Workbook()
+    codes = book.active
+    codes.title = "Codes"
+    codes.append(["code", "label"])
+    codes.append(["SE", "Seoul"])
+    codes.append(["BS", "Busan"])
+    codes.append(["DG", "Daegu"])
+
+    main = book.create_sheet("Main")
+    main.append(["code", "region"])
+    main.append(["SE", "=VLOOKUP(A2,Codes!$A$2:$B$4,2,FALSE)"])
+    main.append(["BS", "=VLOOKUP(A3,Codes!$A$2:$B$4,2,FALSE)"])
+    main.append(["DG", "=VLOOKUP(A4,Codes!$A$2:$B$4,2,FALSE)"])
+    [main.cell(row=row, column=2).value for row in range(2, 5)]
+  exercise:
+    prompt: Codes에 ("IC", "Incheon")을 추가하고 Main에 IC 행을 더해 같은 VLOOKUP 수식이 동작하도록 영역을 확장하세요.
+    starterCode: |-
+      from openpyxl import Workbook
+
+      book = Workbook()
+      codes = book.active
+      codes.title = "Codes"
+      codes.append(["code", "label"])
+      codes.append(["SE", "Seoul"])
+      codes.append(["BS", "Busan"])
+      codes.append(["DG", "Daegu"])
+      codes.append(___)
+
+      main = book.create_sheet("Main")
+      main.append(["code", "region"])
+      for rowIndex, code in enumerate(["SE", "BS", "DG", "IC"], start=2):
+          main.cell(row=rowIndex, column=1, value=code)
+          main.cell(
+              row=rowIndex,
+              column=2,
+              value=f"=VLOOKUP(A{rowIndex},Codes!$A$2:$B$___,2,FALSE)",
+          )
+      [main.cell(row=row, column=2).value for row in range(2, 6)]
+    hints:
+    - "Codes의 마지막 행 번호로 영역 끝을 바꾸세요. 5행까지 4개 코드면 $B$5입니다."
+  check:
+    noError: VLOOKUP 영역 좌표가 실제 Codes 시트의 데이터 범위를 포함해야 합니다.
+    resultCheck: 4개 VLOOKUP 수식 문자열이 모두 같은 영역과 같은 컬럼 인덱스 2를 사용해야 합니다.
+- id: validation
+  title: 6단계. 검증 루프 - 수식 문자열 계약
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 검증
+  goal: 수식 자체가 의도한 함수와 영역을 포함하는지 코드로 검증한다.
+  why: 수식 결과값은 Excel을 거쳐야 채워지지만, 수식 문자열 자체는 openpyxl로 즉시 검증할 수 있습니다. 이것이 자동화 신뢰의 1차 방어선입니다.
+  explanation: |-
+    \`buildInvoice\`는 인보이스를 만드는 함수입니다. 저장 후 다시 열어 핵심 셀이 (1) 수식 문자열인지, (2) 의도한 함수와 영역을 참조하는지 assert로 확인합니다.
+  tips:
+  - 수식 문자열에 포함되어야 할 키워드(예 "SUM", "tax_rate")를 in 연산자로 확인하면 가벼우면서도 의미 있는 계약이 됩니다.
+  snippet: |-
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    from openpyxl import Workbook, load_workbook
+    from openpyxl.workbook.defined_name import DefinedName
+
+    def buildInvoice(path, items, taxRate):
+        book = Workbook()
+        settings = book.active
+        settings.title = "Settings"
+        settings["A1"] = "tax_rate"
+        settings["B1"] = taxRate
+        book.defined_names["tax_rate"] = DefinedName(
+            name="tax_rate", attr_text="Settings!$B$1"
+        )
+        invoice = book.create_sheet("Invoice")
+        invoice.append(["item", "amount"])
+        for item, amount in items:
+            invoice.append([item, amount])
+        subtotalRow = len(items) + 2
+        invoice.cell(row=subtotalRow, column=1, value="subtotal")
+        invoice.cell(row=subtotalRow, column=2, value=f"=SUM(B2:B{subtotalRow - 1})")
+        invoice.cell(row=subtotalRow + 1, column=1, value="tax")
+        invoice.cell(row=subtotalRow + 1, column=2, value=f"=B{subtotalRow}*tax_rate")
+        invoice.cell(row=subtotalRow + 2, column=1, value="total")
+        invoice.cell(
+            row=subtotalRow + 2,
+            column=2,
+            value=f"=B{subtotalRow}+B{subtotalRow + 1}",
+        )
+        book.save(path)
+        return path
+
+    workdir = TemporaryDirectory()
+    invoicePath = buildInvoice(
+        Path(workdir.name) / "invoice.xlsx",
+        [("pen", 1000), ("book", 12000), ("notebook", 5000)],
+        0.1,
+    )
+
+    reopened = load_workbook(invoicePath)
+    invoiceSheet = reopened["Invoice"]
+    subtotalValue = invoiceSheet["B5"].value
+    taxValue = invoiceSheet["B6"].value
+    totalValue = invoiceSheet["B7"].value
+    assert isinstance(subtotalValue, str) and subtotalValue.startswith("=SUM")
+    assert "tax_rate" in taxValue
+    assert "B5" in totalValue and "B6" in totalValue
+    subtotalValue, taxValue, totalValue
+  exercise:
+    prompt: items에 한 줄을 더 추가했을 때, subtotal 수식의 영역(B2:B?)이 자동으로 한 칸 늘어나는지 확인하세요.
+    starterCode: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from openpyxl import Workbook, load_workbook
+      from openpyxl.workbook.defined_name import DefinedName
+
+      def buildInvoice(path, items, taxRate):
+          book = Workbook()
+          settings = book.active
+          settings.title = "Settings"
+          settings["A1"] = "tax_rate"
+          settings["B1"] = taxRate
+          book.defined_names["tax_rate"] = DefinedName(
+              name="tax_rate", attr_text="Settings!$B$1"
+          )
+          invoice = book.create_sheet("Invoice")
+          invoice.append(["item", "amount"])
+          for item, amount in items:
+              invoice.append([item, amount])
+          subtotalRow = len(items) + 2
+          invoice.cell(row=subtotalRow, column=1, value="subtotal")
+          invoice.cell(row=subtotalRow, column=2, value=f"=SUM(B2:B{subtotalRow - 1})")
+          book.save(path)
+          return path
+
+      workdir = TemporaryDirectory()
+      invoicePath = buildInvoice(
+          Path(workdir.name) / "invoice.xlsx",
+          [("pen", 1000), ("book", 12000), ("notebook", 5000), ___],
+          0.1,
+      )
+      reopened = load_workbook(invoicePath)
+      subtotalValue = reopened["Invoice"].cell(row=___, column=2).value
+      subtotalValue
+    hints:
+    - "아이템 4개면 subtotal 행은 6, 영역은 B2:B5가 됩니다."
+  check:
+    noError: buildInvoice가 items 길이에 맞게 subtotal 행을 정확히 계산해야 합니다.
+    resultCheck: subtotal 수식 문자열의 영역이 추가된 행 수에 맞게 확장되어야 합니다.
+- id: practice
+  title: 실습 - 종합 미션 2개
+  structuredPrimary: true
+  subtitle: import부터 검증까지 독립 실행
+  goal: 수식 입력·DefinedName·VLOOKUP을 두 가지 양식(견적서·수강신청서)에 적용한다.
+  why: 수식 자동화는 양식 단위로 직접 만들어 봐야 수식 문자열 패턴이 익숙해집니다.
+  explanation: |-
+    미션1은 견적서(소계/세금/총액 수식)를 만들고 수식 문자열을 assert로 검증합니다. 미션2는 강의 코드 매핑표 + 수강신청서를 만들어 VLOOKUP 수식이 매핑 영역을 정확히 가리키는지 확인합니다.
+  tips:
+  - 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  - 변수 prefix는 \`quote*\`(미션1), \`enroll*\`(미션2)로 격리됩니다.
+  snippet: |-
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    from openpyxl import Workbook, load_workbook
+    from openpyxl.workbook.defined_name import DefinedName
+  exercise:
+    prompt: 두 미션을 직접 작성한 뒤 expansion 정답과 비교하세요.
+    starterCode: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from openpyxl import Workbook, load_workbook
+      from openpyxl.workbook.defined_name import DefinedName
+
+      workdir = TemporaryDirectory()
+      target = Path(workdir.name) / "mission.xlsx"
+      ___
+    hints:
+    - 미션1은 항목 N개 + 소계 SUM 수식 + tax_rate 이름 영역 + 총액.
+    - 미션2는 Codes 시트 + 신청서 시트, VLOOKUP은 절대 참조($)로 잠가야 안전.
+  check:
+    noError: 수식 문자열이 등호로 시작하고 영역 좌표가 유효해야 합니다.
+    resultCheck: 미션1 총액 수식과 미션2 VLOOKUP 수식이 모두 의도한 영역을 참조해야 합니다.
+  blocks:
+  - type: tip
+    content: 두 미션은 서로 다른 prefix로 변수를 분리합니다.
+  - type: expansion
+    title: "미션1: 견적서 - 소계/세금/총액 수식 + DefinedName"
+    blocks:
+    - type: code
+      title: 견적서 생성
+      content: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from openpyxl import Workbook, load_workbook
+        from openpyxl.workbook.defined_name import DefinedName
+
+        quoteDir = TemporaryDirectory()
+        quotePath = Path(quoteDir.name) / "quote.xlsx"
+
+        quoteBook = Workbook()
+        quoteSettings = quoteBook.active
+        quoteSettings.title = "Settings"
+        quoteSettings["A1"] = "tax_rate"
+        quoteSettings["B1"] = 0.1
+        quoteBook.defined_names["tax_rate"] = DefinedName(
+            name="tax_rate", attr_text="Settings!$B$1"
+        )
+
+        quoteSheet = quoteBook.create_sheet("Quote")
+        quoteSheet.append(["item", "quantity", "unit_price", "amount"])
+        quoteItems = [("Notebook", 2, 1200000), ("Mouse", 5, 25000), ("Cable", 10, 8000)]
+        for index, (item, qty, price) in enumerate(quoteItems, start=2):
+            quoteSheet.cell(row=index, column=1, value=item)
+            quoteSheet.cell(row=index, column=2, value=qty)
+            quoteSheet.cell(row=index, column=3, value=price)
+            quoteSheet.cell(row=index, column=4, value=f"=B{index}*C{index}")
+        subtotalRow = len(quoteItems) + 2
+        quoteSheet.cell(row=subtotalRow, column=1, value="subtotal")
+        quoteSheet.cell(row=subtotalRow, column=4, value=f"=SUM(D2:D{subtotalRow - 1})")
+        quoteSheet.cell(row=subtotalRow + 1, column=1, value="tax")
+        quoteSheet.cell(row=subtotalRow + 1, column=4, value=f"=D{subtotalRow}*tax_rate")
+        quoteSheet.cell(row=subtotalRow + 2, column=1, value="total")
+        quoteSheet.cell(row=subtotalRow + 2, column=4, value=f"=D{subtotalRow}+D{subtotalRow + 1}")
+        quoteBook.save(quotePath)
+        subtotalRow
+    - type: code
+      title: 수식 문자열 검증
+      content: |-
+        quoteReopen = load_workbook(quotePath)
+        quoteBack = quoteReopen["Quote"]
+        subtotalFormula = quoteBack.cell(row=5, column=4).value
+        taxFormula = quoteBack.cell(row=6, column=4).value
+        totalFormula = quoteBack.cell(row=7, column=4).value
+        assert subtotalFormula.startswith("=SUM")
+        assert "tax_rate" in taxFormula
+        assert "D5" in totalFormula and "D6" in totalFormula
+        subtotalFormula, taxFormula, totalFormula
+  - type: expansion
+    title: "미션2: 강의 코드 매핑 + VLOOKUP 수강 신청서"
+    blocks:
+    - type: code
+      title: Codes 시트와 Enrollment 시트
+      content: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from openpyxl import Workbook, load_workbook
+
+        enrollDir = TemporaryDirectory()
+        enrollPath = Path(enrollDir.name) / "enrollment.xlsx"
+
+        enrollBook = Workbook()
+        enrollCodes = enrollBook.active
+        enrollCodes.title = "Codes"
+        enrollCodes.append(["code", "course"])
+        codePairs = [("CS101", "프로그래밍 입문"), ("CS201", "자료구조"), ("CS301", "운영체제")]
+        for pair in codePairs:
+            enrollCodes.append(list(pair))
+
+        enrollMain = enrollBook.create_sheet("Enrollment")
+        enrollMain.append(["student", "code", "course"])
+        enrollStudents = [("Alice", "CS101"), ("Bob", "CS201"), ("Carol", "CS301")]
+        for index, (student, code) in enumerate(enrollStudents, start=2):
+            enrollMain.cell(row=index, column=1, value=student)
+            enrollMain.cell(row=index, column=2, value=code)
+            enrollMain.cell(
+                row=index,
+                column=3,
+                value=f"=VLOOKUP(B{index},Codes!$A$2:$B$4,2,FALSE)",
+            )
+        enrollBook.save(enrollPath)
+        enrollMain.max_row
+    - type: code
+      title: VLOOKUP 수식 영역 검증
+      content: |-
+        enrollReopen = load_workbook(enrollPath)
+        enrollBack = enrollReopen["Enrollment"]
+        for row in range(2, 5):
+            formula = enrollBack.cell(row=row, column=3).value
+            assert formula.startswith("=VLOOKUP")
+            assert "$A$2:$B$4" in formula
+            assert "FALSE" in formula
+        [enrollBack.cell(row=row, column=3).value for row in range(2, 5)]
+- id: summary
+  title: 정리
+  subtitle: 수식은 문자열이다
+  blocks:
+  - type: text
+    content: |-
+      openpyxl이 수식을 "문자열로 저장하고 사람이 열어 계산"하는 방식이라는 사실을 받아들이면, 그 위에서 만들 수 있는 자동화가 분명해집니다. 인보이스, 견적서, 정산 양식은 openpyxl의 수식이 가장 빛나는 영역입니다.
+  - type: list
+    style: bullet
+    items:
+    - 수식은 항상 "=" 시작 문자열로 cell.value에 대입
+    - data_only=True로 다시 열면 캐시 결과를 읽지만 비어 있으면 None
+    - DefinedName으로 이름 영역을 만들면 수식 가독성이 즉시 좋아진다
+    - VLOOKUP 영역은 절대 참조($)로 잠그고, 4번째 인자는 항상 FALSE
+    - 수식 결과값이 아닌 "수식 문자열 자체"를 assert로 검증해 자동화의 1차 방어선을 만든다
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: openpyxl_04-formula-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_basic_formula
+    - summary
+    title: 수식과 named range의 참조 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 수식 prefix·참조 sheet·named range 정의 누락을 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 수식 문자열이 \`=\`로 시작하는지와 참조 대상 존재를 분리해 검사하세요.
+    - named range는 workbook 정의 목록과 대조하세요.
+    exercise:
+      prompt: audit_formula_contract(formulas, sheet_names, named_ranges)를 완성하세요.
+      starterCode: |-
+        def audit_formula_contract(formulas, sheet_names, named_ranges):
+            raise NotImplementedError
+      solution: |
+        def audit_formula_contract(formulas, sheet_names, named_ranges):
+            failures = []
+            invalid = []
+            missing_sheets = []
+            missing_names = []
+            sheet_set = set(sheet_names)
+            name_set = set(named_ranges)
+            for item in formulas:
+                if not str(item.get("formula", "")).startswith("="):
+                    invalid.append(item["cell"])
+                for sheet in item.get("referencedSheets", []):
+                    if sheet not in sheet_set:
+                        missing_sheets.append(f"{item['cell']}:{sheet}")
+                for name in item.get("referencedNames", []):
+                    if name not in name_set:
+                        missing_names.append(f"{item['cell']}:{name}")
+            if invalid:
+                failures.append("formula")
+            if missing_sheets:
+                failures.append("sheets")
+            if missing_names:
+                failures.append("names")
+            return {"accepted": not failures, "failures": failures, "invalidCells": sorted(invalid), "missingSheets": sorted(missing_sheets), "missingNames": sorted(missing_names)}
+      hints: *id001
+    check:
+      id: python.openpyxl.openpyxl_04.formula-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_04.formula-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_formula_contract
+        cases:
+        - id: accepts-known-references
+          arguments:
+          - value:
+            - cell: Summary!B2
+              formula: =SUM(Raw!B2:B10)
+              referencedSheets:
+              - Raw
+              referencedNames: []
+          - value:
+            - Raw
+            - Summary
+          - value: []
+          expectedReturn:
+            accepted: true
+            failures: []
+            invalidCells: []
+            missingSheets: []
+            missingNames: []
+        - id: reports-invalid-and-missing-references
+          arguments:
+          - value:
+            - cell: B2
+              formula: SUM(x)
+              referencedSheets:
+              - Missing
+              referencedNames:
+              - TaxRate
+          - value:
+            - Sheet
+          - value: []
+          expectedReturn:
+            accepted: false
+            failures:
+            - formula
+            - sheets
+            - names
+            invalidCells:
+            - B2
+            missingSheets:
+            - B2:Missing
+            missingNames:
+            - B2:TaxRate
+        - id: accepts-defined-name
+          arguments:
+          - value:
+            - cell: B2
+              formula: =A2*TaxRate
+              referencedSheets: []
+              referencedNames:
+              - TaxRate
+          - value:
+            - Sheet
+          - value:
+            - TaxRate
+          expectedReturn:
+            accepted: true
+            failures: []
+            invalidCells: []
+            missingSheets: []
+            missingNames: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: openpyxl_04-formula-result-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - openpyxl_04-formula-contract-audit-mastery
+    title: 새 workbook 수식에 저장식·cached 값 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: formula text와 계산 결과, source 기대값을 함께 비교한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 수식 text 보존과 cached/계산 값 검증을 둘 다 수행하세요.
+    - openpyxl이 계산 엔진이 아님을 명시하고 계산된 artifact 검증 tier를 기록하세요.
+    exercise:
+      prompt: audit_formula_results(expected, observed_formula, observed_values)를 완성하세요.
+      starterCode: |-
+        def audit_formula_results(expected, observed_formula, observed_values):
+            raise NotImplementedError
+      solution: |
+        def audit_formula_results(expected, observed_formula, observed_values):
+            failures = []
+            mismatches = []
+            for cell, contract in sorted(expected.items()):
+                reasons = []
+                if observed_formula.get(cell) != contract["formula"]:
+                    reasons.append("formula")
+                if observed_values.get(cell) != contract["value"]:
+                    reasons.append("value")
+                if reasons:
+                    mismatches.append({"cell": cell, "reasons": reasons})
+            if mismatches:
+                failures.append("formula-results")
+            missing = sorted(set(expected) - set(observed_formula))
+            if missing:
+                failures.append("missing")
+            return {"passed": not failures, "failures": failures, "mismatches": mismatches, "missing": missing}
+      hints: *id002
+    check:
+      id: python.openpyxl.openpyxl_04.formula-result-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_04.formula-result-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_formula_results
+        cases:
+        - id: accepts-formula-and-value
+          arguments:
+          - value:
+              B2:
+                formula: =SUM(A1:A2)
+                value: 3
+          - value:
+              B2: =SUM(A1:A2)
+          - value:
+              B2: 3
+          expectedReturn:
+            passed: true
+            failures: []
+            mismatches: []
+            missing: []
+        - id: reports-formula-and-value-mismatch
+          arguments:
+          - value:
+              B2:
+                formula: =SUM(A1:A2)
+                value: 3
+          - value:
+              B2: =A1+A3
+          - value:
+              B2: 4
+          expectedReturn:
+            passed: false
+            failures:
+            - formula-results
+            mismatches:
+            - cell: B2
+              reasons:
+              - formula
+              - value
+            missing: []
+        - id: reports-missing-formula
+          arguments:
+          - value:
+              B2:
+                formula: =1+1
+                value: 2
+          - value: {}
+          - value: {}
+          expectedReturn:
+            passed: false
+            failures:
+            - formula-results
+            - missing
+            mismatches:
+            - cell: B2
+              reasons:
+              - formula
+              - value
+            missing:
+            - B2
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: openpyxl_04-formula-name-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - openpyxl_04-formula-result-audit-transfer
+    title: 수식·named range 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 참조·저장식·계산값 evidence를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Workbook 저장 성공과 업무 값·수식·표시의 정확성을 분리해 검증하세요.
+    - Web에서는 문서 계약을 검증하고 Local에서는 재개방한 artifact evidence를 남기세요.
+    exercise:
+      prompt: choose_formula_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_formula_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_formula_evidence(situation):
+            table = {'reference': {'action': 'validate sheets and defined names', 'evidence': 'reference inventory', 'risk': 'broken reference'}, 'formula': {'action': 'reopen with formulas preserved', 'evidence': 'formula text by cell', 'risk': 'literal replacement'}, 'value': {'action': 'verify calculated output separately', 'evidence': 'business expected value', 'risk': 'stale cached result'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.openpyxl.openpyxl_04.formula-name-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_04.formula-name-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_formula_evidence
+        cases:
+        - id: recalls-reference
+          arguments:
+          - value: reference
+          expectedReturn:
+            action: validate sheets and defined names
+            evidence: reference inventory
+            risk: broken reference
+        - id: recalls-formula
+          arguments:
+          - value: formula
+          expectedReturn:
+            action: reopen with formulas preserved
+            evidence: formula text by cell
+            risk: literal replacement
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

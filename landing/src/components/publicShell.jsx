@@ -44,8 +44,8 @@ const externalLinks = [
 
 const primaryNavigation = [
   { href: "/learn", label: "학습", match: "/learn" },
-  { href: "/docs", label: "문서", match: "/docs" },
-  { href: "/docs/blog", label: "소식", match: "/docs/blog" },
+  { href: brand.appPath("/run/?surface=editor#editor"), label: "노트북", external: true },
+  { href: brand.appPath("/run/?surface=automation#automation"), label: "자동화", external: true },
 ];
 
 export function Header({ currentPath, onNavigate, themeMode, resolvedTheme, onToggleTheme }) {
@@ -71,17 +71,17 @@ export function Header({ currentPath, onNavigate, themeMode, resolvedTheme, onTo
       <nav className="publicPrimaryNav" aria-label="주요 탐색">
         {primaryNavigation.map((item) => (
           <a
-            aria-current={isActivePath(currentPath, item.match) ? "page" : undefined}
-            href={appPath(item.href)}
+            aria-current={item.match && isActivePath(currentPath, item.match) ? "page" : undefined}
+            href={item.external ? item.href : appPath(item.href)}
             key={item.href}
-            onClick={(event) => navigate(event, item.href)}
+            onClick={item.external ? undefined : (event) => navigate(event, item.href)}
           >
             {item.label}
           </a>
         ))}
       </nav>
       <div className="publicCommands">
-        <a className="publicRunCommand" href={brand.appPath("/run/")}>Run 열기</a>
+        <a className="publicRunCommand" href={brand.appPath("/run/?surface=editor#editor")}>새 노트북</a>
         <a
           className="publicIconCommand"
           href={appPath("/search")}
@@ -94,6 +94,8 @@ export function Header({ currentPath, onNavigate, themeMode, resolvedTheme, onTo
         <details className="publicResourceMenu">
           <summary>리소스 <ChevronDown size={14} aria-hidden="true" /></summary>
           <div>
+            <a href={appPath("/docs")} onClick={(event) => navigate(event, "/docs")}>문서</a>
+            <a href={appPath("/docs/blog")} onClick={(event) => navigate(event, "/docs/blog")}>소식</a>
             <a href={appPath("/packs")} onClick={(event) => navigate(event, "/packs")}>팩</a>
             <a href={appPath("/tools")} onClick={(event) => navigate(event, "/tools")}>도구</a>
           </div>
@@ -131,16 +133,17 @@ export function Header({ currentPath, onNavigate, themeMode, resolvedTheme, onTo
           <a className="publicMobileStart" href={appPath("/learn")} onClick={(event) => navigate(event, "/learn")}>웹에서 시작</a>
           {primaryNavigation.map((item) => (
             <a
-              aria-current={isActivePath(currentPath, item.match) ? "page" : undefined}
-              href={appPath(item.href)}
+              aria-current={item.match && isActivePath(currentPath, item.match) ? "page" : undefined}
+              href={item.external ? item.href : appPath(item.href)}
               key={item.href}
-              onClick={(event) => navigate(event, item.href)}
+              onClick={item.external ? undefined : (event) => navigate(event, item.href)}
             >
               {item.label}
             </a>
           ))}
-          <a href={brand.appPath("/run/")}>Run 열기</a>
           <a href={appPath("/search")} onClick={(event) => navigate(event, "/search")}>검색</a>
+          <a href={appPath("/docs")} onClick={(event) => navigate(event, "/docs")}>문서</a>
+          <a href={appPath("/docs/blog")} onClick={(event) => navigate(event, "/docs/blog")}>소식</a>
           <a href={appPath("/packs")} onClick={(event) => navigate(event, "/packs")}>팩</a>
           <a href={appPath("/tools")} onClick={(event) => navigate(event, "/tools")}>도구</a>
         </nav>

@@ -1,0 +1,584 @@
+var e=`meta:
+  id: visionFeatures_04
+  title: 호모그래피로 이미지 정렬
+  order: 4
+  category: visionFeatures
+  difficulty: ⭐⭐⭐⭐
+  badge: 중급
+  packages:
+  - matplotlib
+  - numpy
+  - opencv-python
+  - scikit-learn
+  tags:
+  - opencv
+  - 호모그래피
+  - findHomography
+  - warpPerspective
+  - 정렬
+  seo:
+    title: 비전 특징점 - 호모그래피로 이미지 정렬
+    description: 매칭 점들로 호모그래피를 추정하고 warpPerspective로 두 사진을 같은 좌표계에 맞춥니다.
+    keywords:
+    - 호모그래피
+    - findHomography
+    - warpPerspective
+    - 이미지정렬
+    - opencv
+intro:
+  emoji: 🧮
+  goal: 매칭된 점들로 한 사진을 다른 사진의 좌표계로 옮기는 호모그래피 변환을 익힙니다.
+  description: |-
+    "두 사진의 같은 영역을 정확히 겹쳐 놓고 싶다" - 이것이 호모그래피의 출발입니다. 매칭으로 얻은 점들에서 RANSAC으로 변환 행렬을 추정하고, warpPerspective로 한 사진을 다른 좌표계로 옮깁니다. 다음 강의 파노라마 스티칭의 직전 단계입니다.
+  direction: 매칭 점들에서 호모그래피를 추정하고 warpPerspective로 정렬해 두 사진을 한 좌표계에 겹칩니다.
+  benefits:
+  - findHomography의 RANSAC inlier 마스크를 이해합니다.
+  - 호모그래피 행렬 H를 직접 다루고 의미를 해석합니다.
+  - warpPerspective로 한 사진을 변환해 정렬 결과를 시각화합니다.
+  diagram:
+    steps:
+    - label: 1단계. 매칭 점 좌표 추출
+      detail: DMatch 객체에서 (x, y) 쌍을 뽑습니다.
+    - label: 2단계. findHomography로 H 추정
+      detail: RANSAC으로 잘못된 매칭을 자동으로 거릅니다.
+    - label: 3단계. inlier 매칭 시각화
+      detail: 좋은 매칭만 골라 그립니다.
+    - label: 4단계. warpPerspective 적용
+      detail: 한 사진을 다른 사진 좌표계로 옮깁니다.
+    - label: 5단계. 두 사진 겹치기
+      detail: 정렬 후 평균 합성으로 겹쳐 봅니다.
+    runtime:
+    - label: 비전 환경
+      detail: opencv-python의 findHomography, warpPerspective를 사용합니다.
+    - label: 검증 흐름
+      detail: assert와 시각 비교로 학습 결과가 기대값과 같은지 확인합니다.
+sections:
+- id: extract_points
+  title: 1단계. 매칭 점 좌표 추출
+  structuredPrimary: true
+  subtitle: DMatch에서 (x, y) 쌍
+  goal: knnMatch 결과에서 두 이미지의 매칭 좌표 쌍을 numpy 배열로 만듭니다.
+  why: 호모그래피 함수는 좌표 배열을 입력으로 받으므로 DMatch에서 좌표만 추출해야 합니다.
+  explanation: |-
+    각 DMatch는 \`.queryIdx\` (첫 이미지 키포인트 인덱스)와 \`.trainIdx\` (두 번째 이미지 키포인트 인덱스)를 가집니다. 키포인트 리스트와 인덱스를 결합해 좌표를 얻습니다.
+
+    findHomography가 기대하는 형식은 \`(N, 1, 2)\` float32 배열입니다. 다음 코드는 그 형식으로 만듭니다.
+  tips:
+  - reshape(-1, 1, 2) 가 OpenCV 함수가 원하는 표준 형식입니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from sklearn.datasets import load_sample_image
+
+    china = load_sample_image('china.jpg')
+    h, w = china.shape[:2]
+    rotMat = cv2.getRotationMatrix2D((w / 2, h / 2), angle=18, scale=1.0)
+    rotMat[:, 2] += [25, 12]
+    warped = cv2.warpAffine(china, rotMat, (w, h))
+
+    orb = cv2.ORB_create(nfeatures=1000)
+    grayA = cv2.cvtColor(china, cv2.COLOR_RGB2GRAY)
+    grayB = cv2.cvtColor(warped, cv2.COLOR_RGB2GRAY)
+    kpA, descA = orb.detectAndCompute(grayA, mask=None)
+    kpB, descB = orb.detectAndCompute(grayB, mask=None)
+    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
+    knn = bf.knnMatch(descA, descB, k=2)
+    good = [m1 for m1, m2 in knn if m1.distance < 0.75 * m2.distance]
+    srcPts = np.array([kpA[m.queryIdx].pt for m in good], dtype=np.float32).reshape(-1, 1, 2)
+    dstPts = np.array([kpB[m.trainIdx].pt for m in good], dtype=np.float32).reshape(-1, 1, 2)
+    srcPts.shape, dstPts.shape
+  exercise:
+    prompt: 매칭 점 첫 5개의 (x, y) 좌표를 깔끔하게 출력하세요.
+    starterCode: |-
+      [(srcPts[i, 0].tolist(), dstPts[i, 0].tolist()) for i in range(___)]
+    hints:
+    - 빈칸은 정수입니다.
+    - 결과는 (src, dst) 좌표 쌍 다섯 개입니다.
+  check:
+    noError: 좌표 추출이 오류 없이 끝나야 합니다.
+    resultCheck: srcPts.shape의 마지막 차원이 2여야 합니다.
+- id: find_homography
+  title: 2단계. findHomography로 H 추정
+  structuredPrimary: true
+  subtitle: RANSAC 한 줄
+  goal: cv2.findHomography로 두 점 집합에서 3x3 변환 행렬과 inlier 마스크를 얻습니다.
+  why: 매칭에 잘못된 짝이 섞여 있어도 RANSAC이 자동으로 거르고 유효한 변환만 남깁니다.
+  explanation: |-
+    \`cv2.findHomography(srcPts, dstPts, cv2.RANSAC, ransacReprojThreshold=4.0)\` 는 3x3 변환 행렬 H와 inlier mask를 돌려줍니다. 마스크는 (N, 1) 모양의 uint8 배열로 1이 inlier, 0이 outlier입니다.
+
+    임곗값 4.0은 변환 후 거리 오차 4픽셀까지를 inlier로 인정한다는 의미입니다.
+  tips:
+  - findHomography 결과가 None이면 매칭이 너무 적거나 변환이 잡히지 않는다는 뜻입니다. 최소 4쌍이 필요합니다.
+  snippet: |-
+    H, inlierMask = cv2.findHomography(srcPts, dstPts, cv2.RANSAC, 4.0)
+    H.shape, int(inlierMask.sum()), len(good)
+  exercise:
+    prompt: 임곗값을 1.0(엄격)과 10.0(느슨)으로 각각 적용해 inlier 개수가 어떻게 바뀌는지 비교하세요.
+    starterCode: |-
+      _, strictMask = cv2.findHomography(srcPts, dstPts, cv2.RANSAC, ___)
+      _, looseMask = cv2.findHomography(srcPts, dstPts, cv2.RANSAC, ___)
+      int(strictMask.sum()), int(looseMask.sum())
+    hints:
+    - 1.0이 엄격, 10.0이 느슨입니다.
+    - 엄격할수록 inlier가 줄어듭니다.
+  check:
+    noError: findHomography가 오류 없이 끝나야 합니다.
+    resultCheck: H.shape이 (3, 3)이어야 합니다.
+- id: draw_inliers
+  title: 3단계. inlier 매칭 시각화
+  structuredPrimary: true
+  subtitle: 좋은 매칭만 그리기
+  goal: inlier로 표시된 매칭만 골라 drawMatches로 시각화합니다.
+  why: RANSAC이 어떤 매칭을 좋다고 골랐는지 시각적으로 확인하는 것이 표준 디버깅입니다.
+  explanation: |-
+    inlierMask의 1번 위치만 골라 \`good\` 매칭에서 추출합니다. drawMatches에 inlier 리스트만 전달하면 좋은 짝만 선으로 이어집니다.
+
+    좋은 결과는 inlier 비율이 60%~90%입니다. 50% 미만이면 매칭이 빈약하거나 변환이 호모그래피로 표현되지 않습니다.
+  tips:
+  - inlier 비율은 매칭 품질의 핵심 지표입니다. 비율이 낮으면 변환 모델을 의심해야 합니다.
+  snippet: |-
+    inliers = [match for match, flag in zip(good, inlierMask.ravel()) if flag == 1]
+    drawn = cv2.drawMatches(china, kpA, warped, kpB, inliers, None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+    fig = plt.figure(figsize=(12, 5))
+    plt.imshow(drawn)
+    plt.title(f'inliers {len(inliers)} / {len(good)}')
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: outlier만 골라 따로 시각화하세요.
+    starterCode: |-
+      outliers = [match for match, flag in zip(good, inlierMask.ravel()) if flag == ___]
+      drawnOut = cv2.drawMatches(china, kpA, warped, kpB, outliers, None, flags=cv2.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+      fig2 = plt.figure(figsize=(12, 5))
+      plt.imshow(drawnOut)
+      plt.title(f'outliers {len(outliers)}')
+      plt.axis('off')
+      fig2
+    hints:
+    - outlier는 flag == 0 입니다.
+    - 결과의 선들이 무작위 방향이어야 정상입니다.
+  check:
+    noError: 시각화가 오류 없이 끝나야 합니다.
+    resultCheck: len(inliers) 가 0보다 커야 합니다.
+- id: warp_perspective
+  title: 4단계. warpPerspective 적용
+  structuredPrimary: true
+  subtitle: 한 사진을 다른 좌표계로
+  goal: 호모그래피 H로 첫 이미지를 두 번째 이미지 좌표계로 옮깁니다.
+  why: 정렬 결과를 직접 보면 H의 의미가 분명해집니다.
+  explanation: |-
+    \`cv2.warpPerspective(china, H, (w, h))\` 는 china를 H로 변환해 (w, h) 크기 캔버스에 그립니다. 결과는 warped와 같은 좌표계가 되어 같은 객체가 같은 위치에 있어야 합니다.
+
+    가장자리의 검은 영역은 변환 후 데이터가 없는 부분입니다.
+  tips:
+  - warpPerspective의 출력 크기는 결과 캔버스 크기입니다. 입력 이미지 크기와 다를 수도 있습니다.
+  snippet: |-
+    aligned = cv2.warpPerspective(china, H, (w, h))
+    fig = plt.figure(figsize=(8, 5))
+    plt.imshow(aligned)
+    plt.title('china warped to match warped')
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: 역변환을 적용해 warped를 china 좌표계로 옮긴 inverseAligned 이미지를 만드세요.
+    starterCode: |-
+      H_inv = np.linalg.inv(H)
+      inverseAligned = cv2.warpPerspective(warped, ___, (w, h))
+      fig2 = plt.figure(figsize=(8, 5))
+      plt.imshow(inverseAligned)
+      plt.axis('off')
+      fig2
+    hints:
+    - 빈칸은 역행렬 변수입니다.
+    - 결과가 원본 china와 비슷한 모양이어야 합니다.
+  check:
+    noError: 변환과 시각화가 오류 없이 끝나야 합니다.
+    resultCheck: aligned.shape 이 warped.shape 와 같아야 합니다.
+- id: overlay
+  title: 5단계. 두 사진 겹치기
+  structuredPrimary: true
+  subtitle: 정렬 후 평균 합성
+  goal: 정렬된 china와 warped를 평균 합성해 정렬 품질을 시각적으로 확인합니다.
+  why: 평균 합성이 흐릿하지 않게 보이면 정렬이 잘 된 것입니다. 흐려 보이면 정렬에 오차가 있습니다.
+  explanation: |-
+    \`((aligned.astype(float) + warped.astype(float)) / 2).clip(0, 255).astype(np.uint8)\` 한 줄로 평균 합성을 만듭니다. 두 사진이 정확히 정렬되어 있으면 평균이 원본과 거의 같게 보입니다.
+  tips:
+  - 정렬 평가는 평균 합성 + 시각 비교가 가장 빠릅니다. 숫자 평가도 가능하지만 시간 대비 효과는 시각화가 큽니다.
+  snippet: |-
+    overlay = ((aligned.astype(np.float32) + warped.astype(np.float32)) / 2.0).clip(0, 255).astype(np.uint8)
+    fig = plt.figure(figsize=(8, 5))
+    plt.imshow(overlay)
+    plt.title('aligned + warped average')
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: 정렬을 적용하지 않은 china + warped 평균 badOverlay 이미지를 만들어 비교 출력하세요.
+    starterCode: |-
+      badOverlay = ((china.astype(np.float32) + warped.astype(np.float32)) / ___).clip(0, 255).astype(np.uint8)
+      fig2, axes2 = plt.subplots(1, 2, figsize=(12, 5))
+      axes2[0].imshow(overlay)
+      axes2[0].set_title('aligned')
+      axes2[1].imshow(badOverlay)
+      axes2[1].set_title('not aligned')
+      for axis in axes2:
+          axis.axis('off')
+      fig2
+    hints:
+    - 빈칸은 2 입니다.
+    - badOverlay는 더 흐려 보여야 합니다.
+  check:
+    noError: 평균 합성과 시각화가 오류 없이 끝나야 합니다.
+    resultCheck: overlay.shape 이 china.shape 와 같아야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 호모그래피 분해 분석
+  goal: 호모그래피 행렬 H를 직접 분해해 회전·이동 성분을 들여다봅니다.
+  why: 행렬 안에 들어 있는 변환 의미를 알면 디버깅이 빨라집니다.
+  explanation: |-
+    각 미션은 import문부터 시작하지만, 위 예제를 실행했다면 import는 생략해도 됩니다.
+  tips:
+  - H의 첫 두 행 첫 두 열이 회전·스케일을 담고, 마지막 열이 평행 이동을 담습니다.
+  snippet: |-
+    print_H = {"H": H.tolist()}
+    print_H
+  exercise:
+    prompt: "미션1: china의 네 모서리 (0,0), (w,0), (w,h), (0,h) 를 H로 변환해 corners_after를 얻고, warped 좌표계에서 어디로 갔는지 점으로 그리세요. 미션2: warped 위에 변환된 네 모서리를 선으로 이어 사각형을 그리세요(cv2.polylines)."
+    starterCode: |-
+      corners = np.array([[0, 0], [w, 0], [w, h], [0, h]], dtype=np.float32).reshape(-1, 1, 2)
+      corners_after = cv2.perspectiveTransform(corners, H).reshape(-1, 2)
+      fig = plt.figure(figsize=(8, 5))
+      plt.imshow(warped)
+      plt.scatter(corners_after[:, 0], corners_after[:, 1], s=80, c='red', edgecolors='black')
+      plt.axis('off')
+      fig
+    hints:
+    - cv2.perspectiveTransform 이 점 좌표 변환의 표준 함수입니다.
+    - polylines는 cv2.polylines(img, [pts], isClosed=True, color, thickness) 형식입니다.
+  check:
+    noError: 모서리 변환과 시각화가 오류 없이 끝나야 합니다.
+    resultCheck: corners_after.shape 이 (4, 2) 여야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: visionFeatures_04-homography-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - extract_points
+    - practice
+    title: 호모그래피 정렬 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 대응점 수·RANSAC threshold·iteration budget를 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_homography_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_homography_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_homography_contract(value):
+            required = ['correspondenceCount', 'ransacThreshold', 'maxIterations', 'confidence']
+            rules = [{'id': 'correspondences', 'field': 'correspondenceCount', 'kind': 'range', 'min': 4, 'max': 100000}, {'id': 'ransac', 'field': 'ransacThreshold', 'kind': 'positive'}, {'id': 'iterations', 'field': 'maxIterations', 'kind': 'range', 'min': 1, 'max': 100000}, {'id': 'confidence', 'field': 'confidence', 'kind': 'unit-interval'}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'homography', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.vision-features.visionFeatures_04.homography-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-features.visionFeatures_04.homography-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_homography_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              correspondenceCount: 120
+              ransacThreshold: 3.0
+              maxIterations: 2000
+              confidence: 0.995
+          expectedReturn:
+            accepted: true
+            topic: homography
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              ransacThreshold: 3.0
+              maxIterations: 2000
+              confidence: 0.995
+          expectedReturn:
+            accepted: false
+            topic: homography
+            missing:
+            - correspondenceCount
+            violations:
+            - correspondences
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              correspondenceCount: 3
+              ransacThreshold: 0
+              maxIterations: 0
+              confidence: 2
+          expectedReturn:
+            accepted: false
+            topic: homography
+            missing: []
+            violations:
+            - confidence
+            - correspondences
+            - iterations
+            - ransac
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: visionFeatures_04-homography-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionFeatures_04-homography-contract-audit-mastery
+    title: 호모그래피 정렬 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_homography_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_homography_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_homography_result(expected, observed):
+            identity = ['queryHash', 'referenceHash']
+            metrics = {'reprojectionError': 0.1}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'homography', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.vision-features.visionFeatures_04.homography-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-features.visionFeatures_04.homography-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_homography_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              queryHash: hq
+              referenceHash: hr
+              reprojectionError: 1.5
+          - value:
+              queryHash: hq
+              referenceHash: hr
+              reprojectionError: 1.55
+          expectedReturn:
+            passed: true
+            topic: homography
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              queryHash: hq
+              referenceHash: hr
+              reprojectionError: 1.5
+          - value:
+              queryHash: other
+              referenceHash: hr
+              reprojectionError: 9.0
+          expectedReturn:
+            passed: false
+            topic: homography
+            missing: []
+            identityMismatch:
+            - queryHash
+            metricDrift:
+            - reprojectionError
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              queryHash: hq
+              referenceHash: hr
+              reprojectionError: 1.5
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: homography
+            missing:
+            - queryHash
+            - referenceHash
+            - reprojectionError
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: visionFeatures_04-homography-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionFeatures_04-homography-result-reconciliation-transfer
+    title: 호모그래피 정렬 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_homography_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_homography_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_homography_evidence(stage):
+            stages = {'source': {'action': 'validate homography frames', 'evidence': 'point correspondence manifest', 'risk': 'wrong frame identity'}, 'estimate': {'action': 'estimate bounded homography', 'evidence': 'RANSAC inlier trace', 'risk': 'unstable geometry'}, 'verify': {'action': 'verify homography result', 'evidence': 'reprojection error and warp overlay', 'risk': 'confident but wrong tracking'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.vision-features.visionFeatures_04.homography-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-features.visionFeatures_04.homography-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_homography_evidence
+        cases:
+        - id: recalls-source
+          arguments:
+          - value: source
+          expectedReturn:
+            action: validate homography frames
+            evidence: point correspondence manifest
+            risk: wrong frame identity
+        - id: recalls-estimate
+          arguments:
+          - value: estimate
+          expectedReturn:
+            action: estimate bounded homography
+            evidence: RANSAC inlier trace
+            risk: unstable geometry
+        - id: recalls-verify
+          arguments:
+          - value: verify
+          expectedReturn:
+            action: verify homography result
+            evidence: reprojection error and warp overlay
+            risk: confident but wrong tracking
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

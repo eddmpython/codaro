@@ -1,0 +1,955 @@
+var e=`meta:
+  packages:
+  - pydantic
+  id: pydantic_06
+  title: JSON스키마생성
+  order: 6
+  category: pydantic
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - pydantic
+  - json-schema
+  - OpenAPI
+  - 문서화
+  - API
+  seo:
+    title: Pydantic JSON Schema - API 문서화와 OpenAPI
+    description: Pydantic 모델에서 JSON Schema를 생성합니다. OpenAPI 문서화, 스키마 커스터마이즈를 배웁니다.
+    keywords:
+    - pydantic
+    - json-schema
+    - OpenAPI
+    - 문서화
+intro:
+  emoji: 📋
+  goal: Pydantic 모델에서 REST API 문서화용 JSON Schema를 자동 생성합니다.
+  description: API를 개발할 때 문서화는 필수입니다. 하지만 코드와 문서를 따로 관리하면 불일치가 생깁니다. Pydantic은 모델 정의에서 자동으로 JSON Schema를
+    생성하여 코드와 문서가 항상 동기화됩니다. FastAPI는 이 기능을 활용해 Swagger UI를 자동 생성합니다.
+  direction: JSON스키마생성에서 입력 스키마를 정의하고 검증된 데이터만 처리 흐름에 넘김합니다.
+  benefits:
+  - 외부 입력 확인 후 스키마 검증에 맞는 코드 입력을 고릅니다.
+  - JSON스키마생성 결과를 성공 모델과 오류 메시지 기준으로 즉시 점검합니다.
+  - 완료한 코드를 API/자동화 입력 계약에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 라이브러리 로드 입력 확인
+      detail: 입력 기준(외부 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 기본 스키마 생성 처리 실행
+      detail: 스키마 검증 코드를 실행해 중간 결과를 확인합니다.
+    - label: 필드 설명 추가 결과 검증
+      detail: 성공 모델과 오류 메시지 기준으로 실행 결과를 비교합니다.
+    - label: JSON스키마생성 재사용
+      detail: 완성 코드를 API/자동화 입력 계약에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 데이터 계약 환경
+      detail: pydantic 기준으로 로컬 Python 실행을 준비합니다.
+    - label: JSON스키마생성 실행
+      detail: 셀을 실행해 성공 모델과 오류 메시지와 예외 상태를 확인합니다.
+    - label: JSON스키마생성 완료
+      detail: 검증된 코드를 API/자동화 입력 계약로 남깁니다.
+sections:
+- id: load
+  title: 라이브러리 로드
+  structuredPrimary: true
+  subtitle: Pydantic import 확인
+  goal: 라이브러리 로드에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: JSON Schema는 JSON 데이터의 구조를 정의하는 표준입니다. Pydantic의 model_json_schema() 메서드는 모델 정의를 분석하여 자동으로
+    JSON Schema를 생성합니다. 이 스키마는 API 문서화, 폼 자동 생성, 클라이언트 코드 생성 등에 활용됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import json
+    import pydantic
+    from enum import Enum
+    from typing import Optional, List, Dict
+    from pydantic import BaseModel, Field, ConfigDict
+  exercise:
+    prompt: 라이브러리 로드 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: |-
+      import json
+      import pydantic
+      from enum import Enum
+      from typing import Optional, List, Dict
+      from pydantic import BaseModel, Field, ConfigDict
+    hints:
+    - 바꿀 지점은 외부 입력을 만드는 첫 줄과 스키마 검증 줄에서 찾으세요.
+    - 실행 뒤 성공 모델과 오류 메시지 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 라이브러리 로드의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 라이브러리 로드 실행 결과가 성공 모델과 오류 메시지 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: basic
+  title: 기본 스키마 생성
+  structuredPrimary: true
+  subtitle: model_json_schema
+  goal: 기본 스키마 생성에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    model_json_schema() 클래스 메서드를 호출하면 JSON Schema 딕셔너리가 반환됩니다. 기본 타입(str, int, float, bool)은 해당 JSON Schema 타입으로 매핑되고, 필수 필드와 선택 필드가 자동으로 구분됩니다.
+
+    스키마의 'properties'에 필드 정보가, 'required'에 필수 필드 목록이 포함됩니다.
+  snippet: |-
+    class User(BaseModel):
+        name: str
+        age: int
+        email: str
+
+    userSchema = User.model_json_schema()
+    userSchema
+  exercise:
+    prompt: 기본 스키마 생성 예제에서 \`userSchema\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      class User(BaseModel):
+          name: str
+          age: int
+          email: str
+
+      userSchema = User.model_json_schema()
+      userSchema
+    hints:
+    - 바꿀 지점은 \`userSchema = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`userSchema\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 기본 스키마 생성에서 \`userSchema\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 기본 스키마 생성 실행 뒤 \`userSchema\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: description
+  title: 필드 설명 추가
+  structuredPrimary: true
+  subtitle: Field description
+  goal: 필드 설명 추가에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: Field의 description 파라미터로 필드에 설명을 추가하면 JSON Schema에 포함됩니다. API 문서를 보는 개발자가 각 필드의 의미와 용도를
+    이해할 수 있습니다. 제약조건(gt, le, min_length 등)도 스키마에 반영됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class Product(BaseModel):
+        productId: str = Field(description="고유 상품 식별자")
+        name: str = Field(description="상품명", min_length=1, max_length=100)
+        price: float = Field(description="상품 가격 (원)", gt=0)
+        stock: int = Field(default=0, description="재고 수량", ge=0)
+
+    productSchema = Product.model_json_schema()
+    json.dumps(productSchema, indent=2, ensure_ascii=False)
+  exercise:
+    prompt: 필드 설명 추가 예제에서 \`productSchema\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      class Product(BaseModel):
+          productId: str = Field(description="고유 상품 식별자")
+          name: str = Field(description="상품명", min_length=1, max_length=100)
+          price: float = Field(description="상품 가격 (원)", gt=0)
+          stock: int = Field(default=0, description="재고 수량", ge=0)
+
+      productSchema = Product.model_json_schema()
+      json.dumps(productSchema, indent=2, ensure_ascii=False)
+    hints:
+    - 바꿀 지점은 \`productSchema = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`productSchema\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 필드 설명 추가에서 \`productSchema\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 필드 설명 추가 실행 뒤 \`productSchema\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: examples
+  title: 예시 값 추가
+  structuredPrimary: true
+  subtitle: examples 파라미터
+  goal: 예시 값 추가에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: Field의 examples 파라미터로 예시 값을 추가하면 API 문서에서 사용자가 필드 형식을 이해하기 쉬워집니다. json_schema_extra로 모델
+    전체에 예시 데이터를 추가할 수도 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class Contact(BaseModel):
+        name: str = Field(description="이름", examples=["홍길동", "김철수"])
+        phone: str = Field(description="전화번호", examples=["010-1234-5678"])
+        email: str = Field(description="이메일", examples=["user@example.com"])
+
+    contactSchema = Contact.model_json_schema()
+    contactSchema["properties"]["name"]
+  exercise:
+    prompt: 예시 값 추가 예제에서 Field 예시나 입력값을 바꾸고 생성된 JSON Schema 속성이 달라지는지 확인하세요.
+    starterCode: |-
+      class Contact(BaseModel):
+          name: str = Field(description="이름", examples=["홍길동", "김철수"])
+          phone: str = Field(description="전화번호", examples=["010-1234-5678"])
+          email: str = Field(description="이메일", examples=["user@example.com"])
+
+      contactSchema = Contact.model_json_schema()
+      contactSchema["properties"]["name"]
+    hints:
+    - 바꿀 지점은 Field 예시, 모델 필드 선언, schema 조회 키입니다.
+    - 실행 뒤 JSON Schema의 properties와 examples가 바꾼 정의를 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 예시 값 추가에서 \`contactSchema\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 예시 값 추가 실행 뒤 \`contactSchema\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: nested
+  title: 중첩 모델 스키마
+  structuredPrimary: true
+  subtitle: $defs와 $ref
+  goal: 중첩 모델 스키마에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 중첩된 모델은 JSON Schema의 $defs 섹션에 정의되고 $ref로 참조됩니다. 이 방식으로 복잡한 모델도 깔끔하게 표현되고, 같은 모델을 여러 곳에서
+    재사용할 때 중복을 피할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class Author(BaseModel):
+        authorId: str = Field(description="작성자 ID")
+        name: str = Field(description="작성자 이름")
+
+    class Article(BaseModel):
+        title: str = Field(description="기사 제목")
+        content: str = Field(description="기사 내용")
+        author: Author
+
+    articleSchema = Article.model_json_schema()
+    json.dumps(articleSchema, indent=2, ensure_ascii=False)
+  exercise:
+    prompt: 중첩 모델 스키마 예제에서 \`articleSchema\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      class Author(BaseModel):
+          authorId: str = Field(description="작성자 ID")
+          name: str = Field(description="작성자 이름")
+
+      class Article(BaseModel):
+          title: str = Field(description="기사 제목")
+          content: str = Field(description="기사 내용")
+          author: Author
+
+      articleSchema = Article.model_json_schema()
+      json.dumps(articleSchema, indent=2, ensure_ascii=False)
+    hints:
+    - 바꿀 지점은 \`articleSchema = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`articleSchema\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 중첩 모델 스키마에서 \`articleSchema\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 중첩 모델 스키마 실행 뒤 \`articleSchema\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: optional
+  title: Optional과 Union 스키마
+  structuredPrimary: true
+  subtitle: anyOf 표현
+  goal: Optional과 Union 스키마에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: Optional 타입은 해당 타입 또는 null을 허용하는 anyOf로 표현됩니다. Union 타입도 마찬가지로 여러 타입 중 하나를 허용하는 구조로 변환됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class Profile(BaseModel):
+        username: str
+        bio: Optional[str] = None
+        website: Optional[str] = None
+
+    profileSchema = Profile.model_json_schema()
+    profileSchema["properties"]["bio"]
+  exercise:
+    prompt: Optional과 Union 스키마 예제에서 선택 필드 타입이나 입력값을 바꾸고 schema의 anyOf/null 허용이 어떻게 표현되는지 확인하세요.
+    starterCode: |-
+      class Profile(BaseModel):
+          username: str
+          bio: Optional[str] = None
+          website: Optional[str] = None
+
+      profileSchema = Profile.model_json_schema()
+      profileSchema["properties"]["bio"]
+    hints:
+    - 바꿀 지점은 Optional/Union 타입 선언과 입력 예시입니다.
+    - 실행 뒤 JSON Schema의 anyOf, nullable 표현, properties가 바꾼 타입을 반영하는지 보세요.
+  check:
+    noError: Optional과 Union 스키마에서 \`profileSchema\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: Optional과 Union 스키마 실행 뒤 \`profileSchema\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: enum
+  title: Enum과 Literal 스키마
+  structuredPrimary: true
+  subtitle: 허용값 목록
+  goal: Enum과 Literal 스키마에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: Enum과 Literal 타입은 허용되는 값 목록으로 스키마가 생성됩니다. API 문서에서 클라이언트 개발자가 어떤 값을 사용할 수 있는지 명확하게 알 수
+    있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class Status(str, Enum):
+        PENDING = "pending"
+        ACTIVE = "active"
+        COMPLETED = "completed"
+
+    class Task(BaseModel):
+        taskId: str
+        status: Status = Field(description="작업 상태")
+
+    taskSchema = Task.model_json_schema()
+    taskSchema["$defs"]["Status"]
+  exercise:
+    prompt: Enum과 Literal 스키마 예제에서 허용값을 바꾸고 schema의 enum/const 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      class Status(str, Enum):
+          PENDING = "pending"
+          ACTIVE = "active"
+          COMPLETED = "completed"
+
+      class Task(BaseModel):
+          taskId: str
+          status: Status = Field(description="작업 상태")
+
+      taskSchema = Task.model_json_schema()
+      taskSchema["$defs"]["Status"]
+    hints:
+    - 바꿀 지점은 Enum 멤버, Literal 허용값, schema 조회 키입니다.
+    - 실행 뒤 JSON Schema의 enum/const 값이 바꾼 정의를 반영하는지 보세요.
+  check:
+    noError: Enum과 Literal 스키마에서 \`PENDING\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: Enum과 Literal 스키마 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: list
+  title: 리스트와 딕셔너리
+  structuredPrimary: true
+  subtitle: array와 object
+  goal: 리스트와 딕셔너리에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: list 타입은 JSON Schema의 array로, dict 타입은 object로 변환됩니다. 리스트와 딕셔너리의 요소 타입도 정확하게 스키마에 반영됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class TaggedItem(BaseModel):
+        itemId: str
+        tags: list[str] = Field(description="태그 목록")
+        scores: list[int] = Field(default=[], description="점수 목록")
+
+    taggedSchema = TaggedItem.model_json_schema()
+    taggedSchema["properties"]["tags"]
+  exercise:
+    prompt: 리스트와 딕셔너리 예제에서 컬렉션 필드 타입이나 기본값을 바꾸고 schema의 배열/객체 표현을 확인하세요.
+    starterCode: |-
+      class TaggedItem(BaseModel):
+          itemId: str
+          tags: list[str] = Field(description="태그 목록")
+          scores: list[int] = Field(default=[], description="점수 목록")
+
+      taggedSchema = TaggedItem.model_json_schema()
+      taggedSchema["properties"]["tags"]
+    hints:
+    - 바꿀 지점은 list/dict 필드 선언, 기본값, schema 조회 키입니다.
+    - 실행 뒤 JSON Schema의 array/object 타입과 item 정의가 바꾼 모델을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 리스트와 딕셔너리에서 \`taggedSchema\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 리스트와 딕셔너리 실행 뒤 \`taggedSchema\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: mode
+  title: 스키마 생성 모드
+  structuredPrimary: true
+  subtitle: validation vs serialization
+  goal: 스키마 생성 모드에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    model_json_schema()의 mode 파라미터로 용도에 맞는 스키마를 생성합니다. 'validation'은 입력 검증용(computed_field 미포함), 'serialization'은 출력용(computed_field 포함) 스키마입니다.
+
+    validation 모드는 클라이언트가 보낼 데이터 형식을, serialization 모드는 서버가 응답할 데이터 형식을 정의합니다.
+  snippet: |-
+    class Item(BaseModel):
+        name: str
+        price: float
+
+        @computed_field
+        @property
+        def formattedPrice(self) -> str:
+            return f"₩{self.price:,.0f}"
+
+    validationSchema = Item.model_json_schema(mode='validation')
+    "formattedPrice" in validationSchema.get("properties", {})
+  exercise:
+    prompt: 스키마 생성 모드 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      class Item(BaseModel):
+          name: str
+          price: float
+
+          @computed_field
+          @property
+          def formattedPrice(self) -> str:
+              return f"₩{self.price:,.0f}"
+
+      validationSchema = Item.model_json_schema(mode='validation')
+      "formattedPrice" in validationSchema.get("properties", {})
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: 스키마 생성 모드의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 스키마 생성 모드 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: custom
+  title: 커스텀 스키마 수정
+  structuredPrimary: true
+  subtitle: json_schema_extra
+  goal: json_schema_extra로 OpenAPI 확장 필드(x-version, tags 등)를 모델 스키마에 삽입하고, model_json_schema 출력에 그 키가 포함되는지 확인합니다.
+  why: 표준 JSON Schema에 없는 메타데이터(버전, 태그, 내부 식별자)를 API 문서에 노출하려면 확장 키가 필요합니다. json_schema_extra가 그 통로입니다.
+  explanation: json_schema_extra로 생성된 스키마에 추가 정보를 삽입할 수 있습니다. OpenAPI 확장 필드(x-), 버전 정보, 태그 등 표준 스키마에 없는
+    메타데이터를 추가할 때 유용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class CustomModel(BaseModel):
+        model_config = {
+            "json_schema_extra": {
+                "x-api-version": "v1",
+                "x-deprecated": False,
+                "x-tags": ["users", "auth"]
+            }
+        }
+        userId: str
+        role: str
+
+    customSchema = CustomModel.model_json_schema()
+    customSchema.get("x-api-version"), customSchema.get("x-tags")
+  exercise:
+    prompt: 커스텀 스키마 수정 예제에서 json_schema_extra 값을 바꾸고 schema에 추가 메타데이터가 반영되는지 확인하세요.
+    starterCode: |-
+      class CustomModel(BaseModel):
+          model_config = {
+              "json_schema_extra": {
+                  "x-api-version": "v1",
+                  "x-deprecated": False,
+                  "x-tags": ["users", "auth"]
+              }
+          }
+          userId: str
+          role: str
+
+      customSchema = CustomModel.model_json_schema()
+      customSchema.get("x-api-version"), customSchema.get("x-tags")
+    hints:
+    - 바꿀 지점은 \`json_schema_extra\`, 모델 필드, schema 조회 키입니다.
+    - 실행 뒤 JSON Schema의 확장 메타데이터가 바꾼 정의를 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 커스텀 스키마 수정의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 커스텀 스키마 수정의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: result
+  title: REST API 스키마 시스템
+  structuredPrimary: true
+  subtitle: 요청/응답 스키마 완성
+  goal: 요청/응답 두 모델과 에러 모델까지 묶어 REST API 한 엔드포인트의 전체 스키마를 종합 생성하고, FastAPI/Swagger가 바로 받을 수 있는 형식인지 확인합니다.
+  why: 운영 API는 한 엔드포인트가 보통 요청/응답/에러 세 모델을 동시에 가집니다. 한 강의 안에서 세 모델을 묶어 만들어 봐야 운영 코드 구조가 손에 익습니다.
+  explanation: 지금까지 배운 모든 기법을 종합하여 실제 REST API의 요청/응답 스키마를 생성합니다. FastAPI와 같은 프레임워크에서 이 스키마를 활용하여 자동으로
+    Swagger 문서를 생성합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class CreateUserRequest(BaseModel):
+        model_config = {
+            "json_schema_extra": {
+                "examples": [{
+                    "username": "alice",
+                    "email": "alice@example.com",
+                    "password": "secure123"
+                }]
+            }
+        }
+        username: str = Field(min_length=3, max_length=50, description="사용자명")
+        email: str = Field(description="이메일 주소")
+        password: str = Field(min_length=8, description="비밀번호")
+
+    requestSchema = CreateUserRequest.model_json_schema()
+    json.dumps(requestSchema, indent=2, ensure_ascii=False)
+  exercise:
+    prompt: REST API 스키마 시스템 예제에서 요청 필드나 응답 필드를 바꾸고 생성된 API schema 구조가 달라지는지 확인하세요.
+    starterCode: |-
+      class CreateUserRequest(BaseModel):
+          model_config = {
+              "json_schema_extra": {
+                  "examples": [{
+                      "username": "alice",
+                      "email": "alice@example.com",
+                      "password": "secure123"
+                  }]
+              }
+          }
+          username: str = Field(min_length=3, max_length=50, description="사용자명")
+          email: str = Field(description="이메일 주소")
+          password: str = Field(min_length=8, description="비밀번호")
+
+      requestSchema = CreateUserRequest.model_json_schema()
+      json.dumps(requestSchema, indent=2, ensure_ascii=False)
+    hints:
+    - 바꿀 지점은 요청/응답 모델 필드와 schema 조회 키입니다.
+    - 실행 뒤 JSON Schema의 properties와 required 목록이 바꾼 모델을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: REST API 스키마 시스템의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: REST API 스키마 시스템의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: API 스키마 프로젝트
+  goal: model_json_schema, Field, examples, Enum, 중첩 모델을 결합해 사용자 등록/조회 API의 완전한 스키마 한 세트를 직접 만들어 봅니다.
+  why: 강의 본문이 가르친 기법은 한 API 스키마 세트에 결합해야 운영 시나리오에서의 결합 방식이 손에 익습니다.
+  explanation: |-
+    지금까지 배운 model_json_schema, Field, examples, Enum, 중첩 모델을 활용하여 완전한 API 스키마를 생성합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    from pydantic import BaseModel, Field
+    from typing import Optional
+    from enum import Enum
+    import json
+
+    class PostStatus(str, Enum):
+        DRAFT = "draft"
+        PUBLISHED = "published"
+        ARCHIVED = "archived"
+
+    class AuthorInfo(BaseModel):
+        authorId: str = Field(description="작성자 고유 ID")
+        name: str = Field(description="작성자 이름")
+
+    class BlogPostRequest(BaseModel):
+        model_config = {
+            "json_schema_extra": {
+                "examples": [{
+                    "title": "Pydantic 시작하기",
+                    "content": "Pydantic은 데이터 검증 라이브러리입니다...",
+                    "tags": ["python", "pydantic"]
+                }]
+            }
+        }
+        title: str = Field(min_length=1, max_length=200, description="포스트 제목")
+        content: str = Field(min_length=10, description="포스트 본문")
+        tags: list[str] = Field(default=[], description="태그 목록")
+        status: PostStatus = Field(default=PostStatus.DRAFT, description="게시 상태")
+
+    class BlogPostResponse(BaseModel):
+        postId: str = Field(description="포스트 고유 ID")
+        title: str = Field(description="포스트 제목")
+        content: str = Field(description="포스트 본문")
+        author: AuthorInfo
+        tags: list[str] = Field(description="태그 목록")
+        status: PostStatus = Field(description="게시 상태")
+        createdAt: str = Field(description="생성 시각")
+        updatedAt: Optional[str] = Field(default=None, description="수정 시각")
+
+    blogReqSchema = BlogPostRequest.model_json_schema()
+    blogReqSchema
+  exercise:
+    prompt: 실습 예제에서 블로그 요청 모델의 필드, 예시, 제약을 바꾸고 schema 출력이 달라지는지 확인하세요.
+    starterCode: |-
+      from pydantic import BaseModel, Field
+      from typing import Optional
+      from enum import Enum
+      import json
+
+      class PostStatus(str, Enum):
+          DRAFT = "draft"
+          PUBLISHED = "published"
+          ARCHIVED = "archived"
+
+      class AuthorInfo(BaseModel):
+          authorId: str = Field(description="작성자 고유 ID")
+          name: str = Field(description="작성자 이름")
+
+      class BlogPostRequest(BaseModel):
+          model_config = {
+              "json_schema_extra": {
+                  "examples": [{
+                      "title": "Pydantic 시작하기",
+                      "content": "Pydantic은 데이터 검증 라이브러리입니다...",
+                      "tags": ["python", "pydantic"]
+                  }]
+              }
+          }
+          title: str = Field(min_length=1, max_length=200, description="포스트 제목")
+          content: str = Field(min_length=10, description="포스트 본문")
+          tags: list[str] = Field(default=[], description="태그 목록")
+          status: PostStatus = Field(default=PostStatus.DRAFT, description="게시 상태")
+
+      class BlogPostResponse(BaseModel):
+          postId: str = Field(description="포스트 고유 ID")
+          title: str = Field(description="포스트 제목")
+          content: str = Field(description="포스트 본문")
+          author: AuthorInfo
+          tags: list[str] = Field(description="태그 목록")
+          status: PostStatus = Field(description="게시 상태")
+          createdAt: str = Field(description="생성 시각")
+          updatedAt: Optional[str] = Field(default=None, description="수정 시각")
+
+      blogReqSchema = BlogPostRequest.model_json_schema()
+      blogReqSchema
+    hints:
+    - 바꿀 지점은 블로그 요청 모델의 필드, 제약, 예시 값입니다.
+    - 실행 뒤 JSON Schema의 properties, required, examples가 바꾼 모델 정의를 반영하는지 보세요.
+  check:
+    noError: 실습의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 실습의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 주문 입력 계약과 배치 검증'
+  structuredPrimary: true
+  subtitle: 예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주
+  goal: '현업 흐름 검증: 주문 입력 계약과 배치 검증에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고,
+    잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from typing import Literal
+    from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+    class OrderInput(BaseModel):
+        orderId: str
+        customer: str
+        amount: int = Field(gt=0)
+        status: Literal['paid', 'pending', 'cancelled']
+
+        @field_validator('orderId', 'customer')
+        @classmethod
+        def stripRequiredText(cls, value):
+            cleaned = value.strip()
+            if not cleaned:
+                raise ValueError('text field must not be empty')
+            return cleaned
+
+        @computed_field
+        @property
+        def isRevenue(self) -> bool:
+            return self.status == 'paid'
+
+    validOrder = OrderInput.model_validate({
+        'orderId': ' A-100 ',
+        'customer': ' kim ',
+        'amount': '120000',
+        'status': 'paid',
+    })
+
+    assert validOrder.orderId == 'A-100'
+    assert validOrder.amount == 120000
+    assert validOrder.isRevenue is True
+    validOrder.model_dump()
+  exercise:
+    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
+    starterCode: |-
+      from typing import Literal
+      from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+      class OrderInput(BaseModel):
+          orderId: str
+          customer: str
+          amount: int = Field(gt=0)
+          status: Literal['paid', 'pending', 'cancelled']
+
+          @field_validator('orderId', 'customer')
+          @classmethod
+          def stripRequiredText(cls, value):
+              cleaned = value.strip()
+              if not cleaned:
+                  raise ValueError('text field must not be empty')
+              return cleaned
+
+          @computed_field
+          @property
+          def isRevenue(self) -> bool:
+              return self.status == 'paid'
+
+      validOrder = OrderInput.model_validate({
+          'orderId': ' A-100 ',
+          'customer': ' kim ',
+          'amount': '120000',
+          'status': 'paid',
+      })
+
+      assert validOrder.orderId == 'A-100'
+      assert validOrder.amount == 120000
+      assert validOrder.isRevenue is True
+      validOrder.model_dump()
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pydantic_06-json-schema-subset-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load
+    - workflow_validation
+    title: field 정의에서 JSON Schema 핵심 구조 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: field type·required·description을 object schema의 properties와 required로 변환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - Python type 이름과 JSON Schema type 이름을 명시적으로 매핑하세요.
+    - optional field는 properties에는 남지만 required에서는 제외됩니다.
+    exercise:
+      prompt: build_json_schema(fields, title)를 완성해 JSON Schema dict를 반환하세요.
+      starterCode: |-
+        def build_json_schema(fields, title):
+            raise NotImplementedError
+      solution: |
+        def build_json_schema(fields, title):
+            type_map = {"str": "string", "int": "integer", "float": "number", "bool": "boolean"}
+            properties = {}
+            required = []
+            for field in fields:
+                if field["type"] not in type_map:
+                    raise ValueError("unsupported field type")
+                properties[field["name"]] = {
+                    "type": type_map[field["type"]],
+                    "description": field.get("description", ""),
+                }
+                if field.get("required", False):
+                    required.append(field["name"])
+            return {"title": title, "type": "object", "properties": properties, "required": required}
+      hints: *id001
+    check:
+      id: python.pydantic.pydantic_06.json-schema-subset.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_06.json-schema-subset.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_json_schema
+        cases:
+        - id: builds-properties-and-required
+          arguments:
+          - value:
+            - name: id
+              type: int
+              required: true
+              description: user id
+            - name: nickname
+              type: str
+              required: false
+          - value: User
+          expectedReturn:
+            title: User
+            type: object
+            properties:
+              id:
+                type: integer
+                description: user id
+              nickname:
+                type: string
+                description: ''
+            required:
+            - id
+        - id: builds-empty-object-schema
+          arguments:
+          - value: []
+          - value: Empty
+          expectedReturn:
+            title: Empty
+            type: object
+            properties: {}
+            required: []
+        - id: rejects-unknown-type
+          arguments:
+          - value:
+            - name: x
+              type: date
+          - value: Bad
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pydantic_06-schema-compatibility-diff-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pydantic_06-json-schema-subset-mastery
+    title: 새·이전 schema의 호환성 변화 분석하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: schema 생성을 field 추가·삭제·required 변화 비교로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - field 추가도 required이면 기존 client를 깨뜨릴 수 있습니다.
+    - type 변경과 field 삭제를 별도 목록으로 남기세요.
+    exercise:
+      prompt: compare_schema_fields(old_fields, new_fields)를 완성해 added, removed, newlyRequired, breaking을 반환하세요.
+      starterCode: |-
+        def compare_schema_fields(old_fields, new_fields):
+            raise NotImplementedError
+      solution: |
+        def compare_schema_fields(old_fields, new_fields):
+            old = {field["name"]: field for field in old_fields}
+            new = {field["name"]: field for field in new_fields}
+            added = sorted(set(new) - set(old))
+            removed = sorted(set(old) - set(new))
+            newly_required = sorted(
+                name for name in new
+                if new[name].get("required", False) and (name not in old or not old[name].get("required", False))
+            )
+            changed_types = sorted(name for name in set(old) & set(new) if old[name].get("type") != new[name].get("type"))
+            return {"added": added, "removed": removed, "newlyRequired": newly_required, "changedTypes": changed_types, "breaking": bool(removed or newly_required or changed_types)}
+      hints: *id002
+    check:
+      id: python.pydantic.pydantic_06.schema-compatibility-diff.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_06.schema-compatibility-diff.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: compare_schema_fields
+        cases:
+        - id: finds-breaking-changes
+          arguments:
+          - value:
+            - name: id
+              type: int
+              required: true
+            - name: name
+              type: str
+          - value:
+            - name: id
+              type: str
+              required: true
+            - name: email
+              type: str
+              required: true
+          expectedReturn:
+            added:
+            - email
+            removed:
+            - name
+            newlyRequired:
+            - email
+            changedTypes:
+            - id
+            breaking: true
+        - id: accepts-optional-addition
+          arguments:
+          - value:
+            - name: id
+              type: int
+          - value:
+            - name: id
+              type: int
+            - name: note
+              type: str
+          expectedReturn:
+            added:
+            - note
+            removed: []
+            newlyRequired: []
+            changedTypes: []
+            breaking: false
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pydantic_06-json-schema-keyword-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pydantic_06-schema-compatibility-diff-transfer
+    title: JSON Schema keyword 역할 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: required, type, format, additionalProperties의 책임과 위험을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - required는 값이 null인지와 다른 조건입니다.
+    - format은 입력 구조 단서이지 외부 주소의 실제 존재 증명은 아닙니다.
+    exercise:
+      prompt: choose_schema_keyword(situation)를 완성해 keyword, meaning, risk를 반환하세요.
+      starterCode: |-
+        def choose_schema_keyword(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_schema_keyword(situation):
+            table = {'field-must-exist': {'keyword': 'required', 'meaning': 'property name must be present', 'risk': 'confuse with non-null'}, 'email-shape': {'keyword': 'format', 'meaning': 'string follows email format', 'risk': 'treat format as transport security'}, 'reject-extra-fields': {'keyword': 'additionalProperties', 'meaning': 'false blocks unknown keys', 'risk': 'break forward compatibility'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.pydantic.pydantic_06.json-schema-keyword.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_06.json-schema-keyword.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_schema_keyword
+        cases:
+        - id: recalls-field-must-exist
+          arguments:
+          - value: field-must-exist
+          expectedReturn:
+            keyword: required
+            meaning: property name must be present
+            risk: confuse with non-null
+        - id: recalls-email-shape
+          arguments:
+          - value: email-shape
+          expectedReturn:
+            keyword: format
+            meaning: string follows email format
+            risk: treat format as transport security
+        - id: rejects-unknown-situation
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,622 @@
+var e=`meta:
+  id: word_05
+  title: 이미지와 머리말
+  order: 5
+  category: word
+  difficulty: ⭐⭐
+  badge: 기초
+  packages:
+    - python-docx
+    - pillow
+  tags:
+    - add_picture
+    - sections
+    - header
+    - footer
+  outcomes:
+    - automation.word.media
+  prerequisites:
+    - automation.word.paragraphs
+  estimatedMinutes: 45
+  seo:
+    title: "Word 이미지와 머리말 - add_picture, sections.header/footer"
+    description: "회사 로고와 페이지 머리말·꼬리말을 코드로 적용. 한국 공문서 양식의 핵심."
+    keywords:
+      - python-docx add_picture
+      - sections header
+      - 머리말 페이지번호
+
+intro:
+  direction: "회사 로고를 본문 또는 머리말에 삽입하고, 모든 페이지에 머리말·꼬리말을 적용한다."
+  benefits:
+    - "사내 표준 양식 - 모든 보고서에 일관된 로고·머리말·페이지번호 자동 적용."
+    - "add_picture(path, width=Inches(N))로 비율 유지 삽입."
+    - "sections.header/footer 패턴으로 모든 페이지에 자동 반복."
+  diagram:
+    steps:
+      - label: "1. add_picture"
+        detail: "doc.add_picture(path, width=Inches(2))로 이미지 삽입."
+      - label: "2. sections.header"
+        detail: "doc.sections[0].header.paragraphs[0].text = '...'."
+      - label: "3. footer 페이지번호"
+        detail: "단순 텍스트 또는 XML 필드 (동적 번호는 한계)."
+    runtime:
+      - label: "이미지 자산"
+        detail: "강의에서는 즉석 단색 PNG 생성."
+      - label: "검증"
+        detail: "재오픈 후 inline_shapes / sections.header.text assert."
+
+sections:
+  - id: step1_picture
+    title: "1단계. add_picture로 로고 삽입"
+    structuredPrimary: true
+    subtitle: "doc.add_picture(path, width)"
+    goal: "단색 PNG를 본문에 삽입한다."
+    why: "보고서 상단 로고는 사내 표준의 표지이자 외부 발송 시 첫인상입니다. 코드 한 줄로 모든 문서에 일관된 로고가 박히면 디자인팀 의존 없이 양식 통일이 가능합니다."
+    explanation: |-
+      doc.add_picture(path, width=Inches(2))로 폭 2인치 이미지 삽입. height 미지정 시 비율 유지.
+    tips:
+      - "PNG가 가장 호환성 좋습니다. SVG는 일부 Word 버전에서 미지원."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+      from docx.shared import Inches
+      from PIL import Image as PILImage
+
+      workdir = TemporaryDirectory()
+      base = Path(workdir.name)
+      imgPath = base / "logo.png"
+      PILImage.new("RGB", (120, 40), color=(48, 84, 150)).save(imgPath)
+
+      docxPath = base / "with_logo.docx"
+      doc = Document()
+      doc.add_picture(str(imgPath), width=Inches(2))
+      doc.add_paragraph("로고 아래 본문")
+      doc.save(docxPath)
+
+      reopened = Document(docxPath)
+      len(reopened.inline_shapes)
+    exercise:
+      prompt: "이미지 width를 Inches(1.5)로 줄이세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+        from docx.shared import Inches
+        from PIL import Image as PILImage
+
+        workdir = TemporaryDirectory()
+        base = Path(workdir.name)
+        imgPath = base / "logo.png"
+        PILImage.new("RGB", (120, 40), color=(48, 84, 150)).save(imgPath)
+        docxPath = base / "logo.docx"
+        doc = Document()
+        doc.add_picture(str(imgPath), width=Inches(___))
+        doc.save(docxPath)
+        len(Document(docxPath).inline_shapes)
+      hints:
+        - "숫자 1.5."
+    check:
+      noError: "Inches 인자는 숫자."
+      resultCheck: "출력 1."
+
+  - id: step2_header
+    title: "2단계. sections.header에 회사명"
+    structuredPrimary: true
+    subtitle: "doc.sections[0].header"
+    goal: "모든 페이지 상단에 '주식회사 Codaro' 머리말이 들어가게 한다."
+    why: "공문서·보고서의 상단 식별자는 표준입니다. 한 번 설정하면 모든 페이지에 자동 적용."
+    explanation: |-
+      doc.sections[0].header는 Header 객체. paragraphs[0].text에 내용 설정.
+    tips:
+      - "section이 여러 개면 각 section의 header를 따로 설정해야 합니다."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+
+      workdir = TemporaryDirectory()
+      docxPath = Path(workdir.name) / "hdr.docx"
+
+      doc = Document()
+      header = doc.sections[0].header
+      header.paragraphs[0].text = "주식회사 Codaro"
+      doc.add_paragraph("본문")
+      doc.save(docxPath)
+
+      reopened = Document(docxPath)
+      reopened.sections[0].header.paragraphs[0].text
+    exercise:
+      prompt: "header를 'Codaro 사내 문서'로 바꾸세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+
+        workdir = TemporaryDirectory()
+        docxPath = Path(workdir.name) / "h.docx"
+
+        doc = Document()
+        doc.sections[0].header.paragraphs[0].text = ___
+        doc.save(docxPath)
+        Document(docxPath).sections[0].header.paragraphs[0].text
+      hints:
+        - "문자열 'Codaro 사내 문서'."
+    check:
+      noError: "header text는 문자열."
+      resultCheck: "출력 'Codaro 사내 문서'."
+
+  - id: validation
+    title: "3단계. 검증 - 로고 + 머리말 통합"
+    structuredPrimary: true
+    subtitle: "buildBrandedDoc + inline_shapes/header.text"
+    goal: "로고와 머리말이 모두 포함된 함수의 결과를 검증한다."
+    why: "사내 양식 함수가 본 트랙의 모든 보고서 베이스가 됩니다."
+    explanation: |-
+      buildBrandedDoc(path, company, logoPath, body)이 머리말 + 로고 + 본문을 한 흐름에. 결과의 inline_shapes 수와 header 텍스트 단위 assert.
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+      from docx.shared import Inches
+      from PIL import Image as PILImage
+
+      def buildBrandedDoc(path, company, logoPath, body):
+          doc = Document()
+          doc.sections[0].header.paragraphs[0].text = company
+          doc.add_picture(str(logoPath), width=Inches(2))
+          doc.add_paragraph(body)
+          doc.save(path)
+
+      vault = TemporaryDirectory()
+      base = Path(vault.name)
+      imgPath = base / "logo.png"
+      PILImage.new("RGB", (120, 40), color=(48, 84, 150)).save(imgPath)
+      docxPath = base / "branded.docx"
+      buildBrandedDoc(docxPath, "주식회사 Codaro", imgPath, "월간 보고서 본문")
+
+      reopened = Document(docxPath)
+      assert reopened.sections[0].header.paragraphs[0].text == "주식회사 Codaro"
+      assert len(reopened.inline_shapes) == 1
+      len(reopened.inline_shapes)
+    exercise:
+      prompt: "buildBrandedDoc 본체를 직접 작성하세요 - 머리말 회사명 + 로고(width Inches(2)) + 본문 단락이 모두 들어가야 합니다."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+        from docx.shared import Inches
+        from PIL import Image as PILImage
+
+        def buildBrandedDoc(path, company, logoPath, body):
+            doc = Document()
+            ___  # 1) 머리말 첫 단락 text를 company로
+            ___  # 2) logoPath를 width=Inches(2)로 add_picture
+            ___  # 3) body를 단락으로 추가
+            doc.save(path)
+
+        vault = TemporaryDirectory()
+        base = Path(vault.name)
+        imgPath = base / "logo.png"
+        PILImage.new("RGB", (120, 40), color=(48, 84, 150)).save(imgPath)
+        docxPath = base / "b.docx"
+        buildBrandedDoc(docxPath, "Codaro Lab", imgPath, "월간 보고서")
+
+        reopened = Document(docxPath)
+        reopened.sections[0].header.paragraphs[0].text, len(reopened.inline_shapes)
+      hints:
+        - "doc.sections[0].header.paragraphs[0].text = company"
+        - "doc.add_picture(str(logoPath), width=Inches(2))"
+        - "doc.add_paragraph(body)"
+    check:
+      noError: "세 줄을 모두 채워야 검증 통과."
+      resultCheck: "('Codaro Lab', 1) 출력."
+
+  - id: practice
+    title: "실습 - 종합 미션"
+    subtitle: "회사 양식 보고서 베이스"
+    goal: "로고 + 머리말 + 꼬리말 페이지번호가 들어간 보고서 베이스 함수를 만든다."
+    why: "06강 스타일 함수와 결합돼 사내 표준 양식이 완성됩니다."
+    explanation: |-
+      미션: brandedReportTemplate(path, company, logoPath) 함수. 머리말·로고·꼬리말(페이지 번호 자리)까지.
+    snippet: |-
+      from docx import Document
+    exercise:
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "꼬리말 텍스트는 단순 'Page N' 형태 (동적 번호는 본 트랙 한계)."
+    check:
+      noError: "함수 정의."
+      resultCheck: "header + image + footer 모두 검증."
+    blocks:
+      - type: expansion
+        title: "미션: 양식 베이스"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from docx import Document
+              from docx.shared import Inches
+              from PIL import Image as PILImage
+
+              def brandedReportTemplate(path, company, logoPath, footerText="문서 식별번호: -"):
+                  doc = Document()
+                  doc.sections[0].header.paragraphs[0].text = company
+                  doc.sections[0].footer.paragraphs[0].text = footerText
+                  doc.add_picture(str(logoPath), width=Inches(2))
+                  doc.add_paragraph("월간 보고서")
+                  doc.save(path)
+                  return path
+
+              missionDir = TemporaryDirectory()
+              base = Path(missionDir.name)
+              imgPath = base / "logo.png"
+              PILImage.new("RGB", (120, 40), color=(48, 84, 150)).save(imgPath)
+              docxPath = base / "tmpl.docx"
+              brandedReportTemplate(docxPath, "주식회사 Codaro", imgPath, "사내전용 - 외부 유출 금지")
+
+              reopened = Document(docxPath)
+              assert reopened.sections[0].header.paragraphs[0].text == "주식회사 Codaro"
+              assert "사내전용" in reopened.sections[0].footer.paragraphs[0].text
+              assert len(reopened.inline_shapes) == 1
+              reopened.sections[0].footer.paragraphs[0].text
+      - type: expansion
+        title: "미션 2: 머리말에 로고 직접 삽입 (텍스트 옆 로고)"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from docx import Document
+              from docx.shared import Inches
+              from PIL import Image as PILImage
+
+              def buildHeaderLogoDoc(path, company, logoPath, body):
+                  doc = Document()
+                  headerPara = doc.sections[0].header.paragraphs[0]
+                  logoRun = headerPara.add_run()
+                  logoRun.add_picture(str(logoPath), width=Inches(0.8))
+                  textRun = headerPara.add_run(f"  {company}")
+                  textRun.bold = True
+                  doc.add_paragraph(body)
+                  doc.save(path)
+                  return path
+
+              missionDir = TemporaryDirectory()
+              base = Path(missionDir.name)
+              imgPath = base / "logo.png"
+              PILImage.new("RGB", (80, 30), color=(48, 84, 150)).save(imgPath)
+              docxPath = base / "header_logo.docx"
+              buildHeaderLogoDoc(docxPath, "주식회사 Codaro", imgPath, "본문")
+
+              reopened = Document(docxPath)
+              header = reopened.sections[0].header
+              assert "주식회사 Codaro" in header.paragraphs[0].text
+              headerRuns = header.paragraphs[0].runs
+              assert len(headerRuns) >= 2
+              header.paragraphs[0].text
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: list
+        style: bullet
+        items:
+          - "다른 첫 페이지 머리말 (sections[0].different_first_page_header_footer)"
+          - "홀수/짝수 페이지 머리말 다르게"
+          - "꼬리말에 자동 페이지번호 (XML field 'PAGE')"
+          - "로고를 머리말 안에 삽입 (header.paragraphs[0].add_run().add_picture)"
+          - "여러 section으로 분리해 부서별 다른 머리말"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: word_05-document-media-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_picture
+    - extensions
+    title: 이미지·머리말·꼬리말 접근성 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 누락된 대체 설명과 과도한 이미지 폭을 찾는다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지의 alt는 장식 설명이 아니라 전달하는 정보를 적으세요.
+    - 이미지 폭을 page width가 아니라 margin을 뺀 usable width와 비교하세요.
+    exercise:
+      prompt: audit_document_media(page_width, margins, images, header, footer)를 완성하세요.
+      starterCode: |-
+        def audit_document_media(page_width, margins, images, header, footer):
+            raise NotImplementedError
+      solution: |
+        def audit_document_media(page_width, margins, images, header, footer):
+            usable = page_width - margins[0] - margins[1]
+            missing_alt = sorted(image["id"] for image in images if not str(image.get("alt", "")).strip())
+            too_wide = sorted(image["id"] for image in images if image.get("width", 0) > usable)
+            failures = []
+            if usable <= 0:
+                failures.append("page-width")
+            if missing_alt:
+                failures.append("alt-text")
+            if too_wide:
+                failures.append("image-width")
+            if not str(header).strip() or "{page}" not in str(footer):
+                failures.append("navigation")
+            return {"accepted": not failures, "failures": failures, "usableWidth": usable, "missingAlt": missing_alt, "tooWide": too_wide}
+      hints: *id001
+    check:
+      id: python.word.word_05.document-media-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_05.document-media-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_document_media
+        cases:
+        - id: accepts-accessible-media
+          arguments:
+          - value: 600
+          - value:
+            - 60
+            - 60
+          - value:
+            - id: chart
+              width: 480
+              alt: 월별 매출 막대차트
+          - value: 월간 보고
+          - value: '{page} / {pages}'
+          expectedReturn:
+            accepted: true
+            failures: []
+            usableWidth: 480
+            missingAlt: []
+            tooWide: []
+        - id: reports-alt-width-navigation
+          arguments:
+          - value: 500
+          - value:
+            - 50
+            - 50
+          - value:
+            - id: hero
+              width: 450
+              alt: ''
+          - value: ''
+          - value: confidential
+          expectedReturn:
+            accepted: false
+            failures:
+            - alt-text
+            - image-width
+            - navigation
+            usableWidth: 400
+            missingAlt:
+            - hero
+            tooWide:
+            - hero
+        - id: reports-invalid-page
+          arguments:
+          - value: 100
+          - value:
+            - 60
+            - 60
+          - value: []
+          - value: 제목
+          - value: '{page}'
+          expectedReturn:
+            accepted: false
+            failures:
+            - page-width
+            usableWidth: -20
+            missingAlt: []
+            tooWide: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: word_05-media-placement-plan-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - word_05-document-media-audit-mastery
+    title: 새 문서의 이미지 배치 계획 만들기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: aspect ratio를 지키며 본문 폭 안의 렌더 크기를 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 원본 비율을 유지한 render width와 height를 함께 계산하세요.
+    - 잘못된 치수는 조용히 건너뛰지 말고 ID를 보고하세요.
+    exercise:
+      prompt: plan_media_placement(images, usable_width)를 완성하세요.
+      starterCode: |-
+        def plan_media_placement(images, usable_width):
+            raise NotImplementedError
+      solution: |
+        def plan_media_placement(images, usable_width):
+            placed = []
+            invalid = []
+            for image in images:
+                width = image.get("width", 0)
+                height = image.get("height", 0)
+                if width <= 0 or height <= 0:
+                    invalid.append(image["id"])
+                    continue
+                render_width = min(width, usable_width)
+                render_height = round(height * render_width / width, 2)
+                placed.append({"id": image["id"], "width": render_width, "height": render_height, "scaled": render_width != width})
+            return {"placements": placed, "invalid": sorted(invalid), "complete": not invalid}
+      hints: *id002
+    check:
+      id: python.word.word_05.media-placement-plan.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_05.media-placement-plan.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_media_placement
+        cases:
+        - id: keeps-small-image
+          arguments:
+          - value:
+            - id: a
+              width: 200
+              height: 100
+          - value: 400
+          expectedReturn:
+            placements:
+            - id: a
+              width: 200
+              height: 100.0
+              scaled: false
+            invalid: []
+            complete: true
+        - id: scales-large-image
+          arguments:
+          - value:
+            - id: a
+              width: 800
+              height: 400
+          - value: 500
+          expectedReturn:
+            placements:
+            - id: a
+              width: 500
+              height: 250.0
+              scaled: true
+            invalid: []
+            complete: true
+        - id: reports-invalid-image
+          arguments:
+          - value:
+            - id: bad
+              width: 0
+              height: 10
+          - value: 500
+          expectedReturn:
+            placements: []
+            invalid:
+            - bad
+            complete: false
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: word_05-media-accessibility-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - word_05-media-placement-plan-transfer
+    title: Word 이미지·머리말 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 접근성·기하·페이지 탐색 증거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Web에서는 문서 구조와 업무 불변식을 즉시 검증하세요.
+    - Local에서는 저장한 docx를 재개방하고 렌더 결과까지 증거로 남기세요.
+    exercise:
+      prompt: choose_media_evidence(stage)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_media_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_media_evidence(stage):
+            choices = {'accessibility': {'action': 'write informational alt text', 'evidence': 'image-alt manifest', 'risk': 'meaning lost to nonvisual reader'}, 'geometry': {'action': 'fit within usable page width', 'evidence': 'render dimensions', 'risk': 'cropped image'}, 'navigation': {'action': 'add stable header and page fields', 'evidence': 'rendered page sequence', 'risk': 'unidentified pages'}}
+            if stage not in choices:
+                raise ValueError('unknown stage')
+            return choices[stage]
+      hints: *id003
+    check:
+      id: python.word.word_05.media-accessibility-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_05.media-accessibility-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_media_evidence
+        cases:
+        - id: recalls-accessibility
+          arguments:
+          - value: accessibility
+          expectedReturn:
+            action: write informational alt text
+            evidence: image-alt manifest
+            risk: meaning lost to nonvisual reader
+        - id: recalls-geometry
+          arguments:
+          - value: geometry
+          expectedReturn:
+            action: fit within usable page width
+            evidence: render dimensions
+            risk: cropped image
+        - id: recalls-final-stage
+          arguments:
+          - value: navigation
+          expectedReturn:
+            action: add stable header and page fields
+            evidence: rendered page sequence
+            risk: unidentified pages
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

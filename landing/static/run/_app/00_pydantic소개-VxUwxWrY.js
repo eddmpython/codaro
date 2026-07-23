@@ -1,0 +1,733 @@
+var e=`meta:
+  packages:
+  - pydantic
+  id: pydantic_00
+  title: pydantic소개
+  order: 0
+  category: pydantic
+  badge: 소개
+  source: eddmpython
+  sourceUrl: https://eddmpython.com
+  tags:
+  - pydantic
+  - 데이터검증
+  - 타입힌트
+  - 모델
+  - 직렬화
+  seo:
+    title: Pydantic 입문 - Python 데이터 검증의 표준
+    description: Pydantic으로 데이터 검증과 설정 관리를 시작하세요. 타입 힌트 기반의 강력한 데이터 모델링 라이브러리입니다.
+    keywords:
+    - pydantic
+    - 데이터검증
+    - 타입힌트
+    - BaseModel
+    - 직렬화
+intro:
+  direction: pydantic소개에서 입력 스키마를 정의하고 검증된 데이터만 처리 흐름에 넘김합니다.
+  benefits:
+  - 첫 실행 셀은 assert로 핵심 결과를 고정해 실습 코드가 깨지지 않았는지 확인합니다.
+  - 외부 입력 확인 후 스키마 검증에 맞는 코드 입력을 고릅니다.
+  - pydantic소개 결과를 성공 모델과 오류 메시지 기준으로 즉시 점검합니다.
+  - 완료한 코드를 API/자동화 입력 계약에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 주문 입력 계약과 배치 검증 입력 확인
+      detail: 입력 기준(외부 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 스키마 검증 처리 실행
+      detail: 스키마 검증 코드를 실행해 중간 결과를 확인합니다.
+    - label: 성공 모델과 오류 메시지 결과 검증
+      detail: 성공 모델과 오류 메시지 기준으로 실행 결과를 비교합니다.
+    - label: pydantic소개 재사용
+      detail: 완성 코드를 API/자동화 입력 계약에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 데이터 계약 환경
+      detail: pydantic 기준으로 로컬 Python 실행을 준비합니다.
+    - label: pydantic소개 실행
+      detail: 셀을 실행해 성공 모델과 오류 메시지와 예외 상태를 확인합니다.
+    - label: pydantic소개 완료
+      detail: 검증된 코드를 API/자동화 입력 계약로 남깁니다.
+sections:
+- id: intro
+  blocks:
+  - type: mainHeader
+    emoji: ✅
+    title: Pydantic??
+    subtitle: Python 데이터 검증의 대표 외부 패키지
+  - type: hero
+    emoji: 🛡️
+    title: 타입 힌트 기반 데이터 검증
+    subtitle: 런타임에서 데이터를 안전하게 검증하고 변환
+    points:
+    - emoji: ✅
+      title: 자동 검증
+    - emoji: 🔄
+      title: 타입 변환
+    - emoji: 📦
+      title: 직렬화
+    - emoji: ⚙️
+      title: 설정 관리
+  goal: Pydantic??에서 외부 입력을 바꿨을 때 성공 모델과 오류 메시지가 어떻게 달라지는지 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+- id: what_is_pydantic
+  blocks:
+  - type: sectionHeader
+    title: 🤔 Pydantic이 뭔가요?
+    subtitle: 데이터 검증과 파싱의 혁명
+  - type: note
+    style: info
+    title: 왜 데이터 검증이 필요한가?
+    content: 외부에서 들어오는 데이터는 신뢰할 수 없습니다. API 요청, JSON 파일, 사용자 입력 등은 예상과 다른 형태일 수 있습니다. 직접 검증 코드를 작성하면 반복적이고
+      오류가 발생하기 쉽습니다. Pydantic은 Python 타입 힌트를 사용하여 데이터 구조를 정의하고, 런타임에 자동으로 검증합니다. 잘못된 데이터가 들어오면 명확한 에러
+      메시지를 제공합니다.
+  - type: featureCards
+    cards:
+    - emoji: 📝
+      title: 선언적 모델 정의
+      description: 타입 힌트로 데이터 구조 선언
+    - emoji: ✅
+      title: 자동 검증
+      description: 타입, 범위, 형식 자동 검사
+    - emoji: 🔄
+      title: 타입 강제 변환
+      description: 문자열 → 숫자 자동 변환
+    - emoji: 📤
+      title: 직렬화/역직렬화
+      description: JSON, dict 변환 지원
+  goal: 🤔 Pydantic이 뭔가요?에서 외부 입력을 바꿨을 때 성공 모델과 오류 메시지가 어떻게 달라지는지 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+- id: why_pydantic
+  blocks:
+  - type: sectionHeader
+    title: 🌟 왜 Pydantic이 필요한가요?
+    subtitle: 수동 검증 vs Pydantic
+  - type: note
+    style: info
+    title: 수동 검증의 문제점
+    content: 수동으로 데이터를 검증하면 코드가 장황해집니다. if문, isinstance, try-except가 반복됩니다. 검증 로직이 비즈니스 로직과 섞여 가독성이 떨어집니다.
+      새 필드가 추가되면 검증 코드도 수정해야 합니다. Pydantic은 이 모든 것을 자동화합니다. 모델을 정의하면 검증, 변환, 에러 메시지가 모두 처리됩니다.
+  - type: featureCards
+    cards:
+    - emoji: ⚡
+      title: 개발 속도 향상
+      description: 검증 코드 자동 생성
+    - emoji: 🐛
+      title: 버그 감소
+      description: 타입 오류 조기 발견
+    - emoji: 📖
+      title: 문서화 효과
+      description: 모델이 곧 API 명세
+    - emoji: 🔧
+      title: IDE 지원
+      description: 자동완성, 타입 체크
+  goal: 🌟 왜 Pydantic이 필요한가요?에서 외부 입력을 바꿨을 때 성공 모델과 오류 메시지가 어떻게 달라지는지 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+- id: pydantic_vs_others
+  blocks:
+  - type: sectionHeader
+    title: 🆚 Pydantic vs 다른 도구
+    subtitle: 언제 무엇을 쓸까?
+  - type: compare
+    left:
+      title: dataclasses
+      subtitle: 표준 라이브러리
+      icon: 📦
+      color: blue
+      items:
+      - 데이터 클래스 정의
+      - 기본값, frozen 지원
+      - 검증 기능 없음
+      - 직렬화 제한적
+      infoBox: 단순 데이터 컨테이너용
+    right:
+      title: Pydantic
+      subtitle: 검증 + 직렬화
+      icon: ✅
+      color: green
+      items:
+      - 데이터 클래스 + 검증
+      - 타입 강제 변환
+      - 상세한 에러 메시지
+      - JSON/dict 직렬화
+      infoBox: 외부 데이터 처리용
+  - type: compare
+    left:
+      title: attrs
+      subtitle: 고급 클래스 도구
+      icon: 🔧
+      color: purple
+      items:
+      - 유연한 클래스 정의
+      - 검증자 수동 정의
+      - 성능 최적화
+      - 학습 곡선 있음
+      infoBox: 고도로 커스텀된 클래스용
+    right:
+      title: Pydantic
+      subtitle: 간편한 검증
+      icon: ✅
+      color: green
+      items:
+      - 타입 힌트 기반 자동 검증
+      - FastAPI 네이티브 지원
+      - JSON Schema 생성
+      - 배우기 쉬움
+      infoBox: API 개발, 설정 관리용
+  - type: note
+    style: tip
+    title: 선택 가이드
+    content: 단순 데이터 컨테이너만 필요하면 dataclasses를 사용하세요. 외부 데이터(API 요청, JSON, 설정 파일)를 다루면 Pydantic이 적합합니다. FastAPI를
+      사용한다면 Pydantic은 필수입니다. 복잡한 클래스 계층이 필요하면 attrs도 고려하세요.
+  goal: 🆚 Pydantic vs 다른 도구에서 외부 입력을 바꿨을 때 성공 모델과 오류 메시지가 어떻게 달라지는지 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+- id: core_concepts
+  blocks:
+  - type: sectionHeader
+    title: 🧩 핵심 개념
+    subtitle: Pydantic으로 무엇을 할 수 있나요?
+  - type: featureCards
+    cards:
+    - emoji: 1️⃣
+      title: BaseModel
+      description: 데이터 모델 정의의 기본 클래스
+    - emoji: 2️⃣
+      title: Field
+      description: 필드별 제약조건, 기본값 설정
+    - emoji: 3️⃣
+      title: Validator
+      description: 커스텀 검증 로직 추가
+    - emoji: 4️⃣
+      title: 중첩 모델
+      description: 복잡한 데이터 구조 표현
+    - emoji: 5️⃣
+      title: 직렬화
+      description: model_dump(), model_dump_json()
+    - emoji: 6️⃣
+      title: 설정 관리
+      description: 환경변수 기반 설정
+  goal: 🧩 핵심 개념에서 외부 입력을 바꿨을 때 성공 모델과 오류 메시지가 어떻게 달라지는지 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+- id: basic_example
+  blocks:
+  - type: sectionHeader
+    title: 💡 간단한 예시
+    subtitle: Pydantic 맛보기
+  - type: note
+    style: info
+    title: 사용자 모델 정의
+    content: Pydantic 모델은 BaseModel을 상속하고 타입 힌트로 필드를 정의합니다. 인스턴스 생성 시 자동으로 타입을 검증하고 변환합니다. 잘못된 데이터가 들어오면
+      ValidationError가 발생합니다.
+  - type: note
+    style: tip
+    title: 코드 예시
+    content: 'class User(BaseModel): name: str, age: int, email: str 형태로 정의하면, User(name="Alice", age="25",
+      email="a@b.com") 호출 시 age가 문자열 "25"여도 자동으로 정수 25로 변환됩니다. age에 "invalid"를 넣으면 ValidationError가 발생합니다.'
+  goal: 💡 간단한 예시에서 외부 입력을 바꿨을 때 성공 모델과 오류 메시지가 어떻게 달라지는지 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+- id: use_cases
+  blocks:
+  - type: sectionHeader
+    title: 💼 실전 활용 사례
+    subtitle: Pydantic으로 해결하는 문제들
+  - type: featureCards
+    cards:
+    - emoji: 🌐
+      title: API 요청/응답
+      description: FastAPI와 함께 API 스키마 정의
+    - emoji: 📄
+      title: JSON 파싱
+      description: 외부 JSON 데이터 검증 및 변환
+    - emoji: ⚙️
+      title: 설정 관리
+      description: 환경변수, 설정 파일 로딩
+    - emoji: 🗄️
+      title: ORM 통합
+      description: SQLAlchemy 모델과 연동
+    - emoji: 📊
+      title: 데이터 파이프라인
+      description: ETL 과정의 데이터 검증
+    - emoji: 🧪
+      title: 테스트 데이터
+      description: 일관된 테스트 픽스처 생성
+  goal: 💼 실전 활용 사례에서 외부 입력을 바꿨을 때 성공 모델과 오류 메시지가 어떻게 달라지는지 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+- id: projects_preview
+  blocks:
+  - type: sectionHeader
+    title: 🗺️ 앞으로 배울 내용
+    subtitle: 10개 프로젝트로 마스터하기
+  - type: table
+    headers:
+    - 단계
+    - 프로젝트
+    - 배울 내용
+    - 실용 가치
+    rows:
+    - - 입문
+      - 사용자 모델 만들기
+      - BaseModel, 타입 힌트, 검증
+      - 기본 데이터 구조
+    - - 입문
+      - 필드 제약조건
+      - Field, 범위, 정규표현식
+      - 상세 검증 규칙
+    - - 기초
+      - 중첩 모델
+      - List, Dict, 모델 중첩
+      - 복잡한 데이터
+    - - 기초
+      - 커스텀 검증
+      - validator, field_validator
+      - 비즈니스 로직
+    - - 기초
+      - 직렬화 마스터
+      - model_dump, alias, exclude
+      - API 응답
+    - - 중급
+      - 설정 관리
+      - BaseSettings, 환경변수
+      - 앱 설정
+    - - 중급
+      - JSON Schema
+      - 스키마 생성, 문서화
+      - API 문서
+    - - 중급
+      - 상속과 Generic
+      - 모델 상속, 재사용
+      - DRY 원칙
+    - - 심화
+      - 고급 타입
+      - Union, Literal, Annotated
+      - 정밀한 타입
+    - - 심화
+      - 종합 프로젝트
+      - 전체 API 모델 설계
+      - 실전 활용
+  - type: note
+    style: info
+    title: 프로젝트 기반 학습
+    content: 각 프로젝트는 실제 시나리오를 다룹니다. 사용자 등록 폼 검증, API 응답 모델링, 설정 파일 관리 등 현실적인 문제를 해결합니다. 10개 프로젝트를 완료하면
+      Pydantic을 활용한 견고한 데이터 모델을 설계할 수 있습니다.
+  goal: 🗺️ 앞으로 배울 내용에서 외부 입력을 바꿨을 때 성공 모델과 오류 메시지가 어떻게 달라지는지 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+- id: local_runtime_note
+  blocks:
+  - type: sectionHeader
+    title: ⚠️ Codaro 로컬 Python 환경 참고사항
+    subtitle: 로컬 실행 시 확인할 점
+  - type: note
+    style: warning
+    title: 제한사항
+    content: Pydantic V2는 Codaro 로컬 Python에서 실행됩니다. 모델 검증, 설정 파일, 환경변수 실습을 로컬 파일 시스템 기준으로 다룰 수 있습니다.
+  - type: featureCards
+    cards:
+    - emoji: ✅
+      title: 정상 작동
+      description: BaseModel, Field, validator, 직렬화
+    - emoji: ⚠️
+      title: 제한 가능
+      description: 파일 시스템 기반 설정 로딩
+    - emoji: 📦
+      title: 로컬 준비
+      description: 라이브러리 패널에서 현재 실행 환경 준비
+  goal: ⚠️ Codaro 로컬 Python 환경 참고사항에서 외부 입력을 바꿨을 때 성공 모델과 오류 메시지가 어떻게 달라지는지 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+- id: package_ready
+  blocks:
+  - type: sectionHeader
+    title: 📦 준비 확인과 시작
+    subtitle: Codaro 로컬 Python 환경에서 바로 사용
+  - type: note
+    style: info
+    title: 로컬에서 바로 실행
+    content: 이 강의는 Codaro 로컬 Python 환경에서 실행됩니다. 필요한 패키지는 상단 라이브러리 패널이 현재 실행 환경에 준비하고, 레슨 안에서는 import와 작은 객체 생성으로 동작을 확인합니다.
+  - type: featureCards
+    cards:
+    - emoji: 🌐
+      title: Codaro 로컬 Python 환경
+      description: 로컬 Python 실행
+    - emoji: 📦
+      title: 패키지 준비
+      description: 라이브러리 패널 기준
+    - emoji: 🚀
+      title: 바로 시작
+      description: from pydantic import BaseModel
+  goal: 📦 준비 확인과 시작에서 외부 입력을 바꿨을 때 성공 모델과 오류 메시지가 어떻게 달라지는지 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+- id: resources
+  blocks:
+  - type: sectionHeader
+    title: 📚 참고 자료
+    subtitle: 더 깊이 공부하고 싶다면
+  - type: links
+    items:
+    - text: Pydantic 공식 문서
+      url: https://docs.pydantic.dev/
+      icon: 🔗
+    - text: Pydantic V2 Migration Guide
+      url: https://docs.pydantic.dev/latest/migration/
+      icon: 🔗
+    - text: Pydantic GitHub
+      url: https://github.com/pydantic/pydantic
+      icon: 🔗
+  goal: 📚 참고 자료에서 외부 입력을 바꿨을 때 성공 모델과 오류 메시지가 어떻게 달라지는지 확인한다.
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+- id: next
+  blocks:
+  - type: hero
+    emoji: 👉
+    title: '다음: 사용자 모델 만들기'
+    subtitle: BaseModel로 첫 번째 데이터 모델을 정의합니다
+  goal: '다음: 사용자 모델 만들기에서 외부 입력을 바꿨을 때 성공 모델과 오류 메시지가 어떻게 달라지는지 확인한다.'
+  why: 데이터 계약은 외부 입력을 안전하게 처리하고 오류를 빠르게 드러내는 실무 기준입니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 주문 입력 계약과 배치 검증'
+  structuredPrimary: true
+  subtitle: 예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주
+  goal: '현업 흐름 검증: 주문 입력 계약과 배치 검증에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고,
+    잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from typing import Literal
+    from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+    class OrderInput(BaseModel):
+        orderId: str
+        customer: str
+        amount: int = Field(gt=0)
+        status: Literal['paid', 'pending', 'cancelled']
+
+        @field_validator('orderId', 'customer')
+        @classmethod
+        def stripRequiredText(cls, value):
+            cleaned = value.strip()
+            if not cleaned:
+                raise ValueError('text field must not be empty')
+            return cleaned
+
+        @computed_field
+        @property
+        def isRevenue(self) -> bool:
+            return self.status == 'paid'
+
+    validOrder = OrderInput.model_validate({
+        'orderId': ' A-100 ',
+        'customer': ' kim ',
+        'amount': '120000',
+        'status': 'paid',
+    })
+
+    assert validOrder.orderId == 'A-100'
+    assert validOrder.amount == 120000
+    assert validOrder.isRevenue is True
+    validOrder.model_dump()
+  exercise:
+    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
+    starterCode: |-
+      from typing import Literal
+      from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+      class OrderInput(BaseModel):
+          orderId: str
+          customer: str
+          amount: int = Field(gt=0)
+          status: Literal['paid', 'pending', 'cancelled']
+
+          @field_validator('orderId', 'customer')
+          @classmethod
+          def stripRequiredText(cls, value):
+              cleaned = value.strip()
+              if not cleaned:
+                  raise ValueError('text field must not be empty')
+              return cleaned
+
+          @computed_field
+          @property
+          def isRevenue(self) -> bool:
+              return self.status == 'paid'
+
+      validOrder = OrderInput.model_validate({
+          'orderId': ' A-100 ',
+          'customer': ' kim ',
+          'amount': '120000',
+          'status': 'paid',
+      })
+
+      assert validOrder.orderId == 'A-100'
+      assert validOrder.amount == 120000
+      assert validOrder.isRevenue is True
+      validOrder.model_dump()
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pydantic_00-record-contract-boundary-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - workflow_validation
+    title: 레코드 목록을 명시적 타입 계약으로 검증하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 필수 id·name·active 타입을 확인해 통과 행과 오류 경로를 분리한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - bool은 int와 구분해 검사하세요.
+    - 오류 메시지만 남기지 말고 행 index와 field path를 보존하세요.
+    exercise:
+      prompt: validate_record_contract(rows)를 완성해 accepted와 errors를 반환하세요.
+      starterCode: |-
+        def validate_record_contract(rows):
+            raise NotImplementedError
+      solution: |
+        def validate_record_contract(rows):
+            accepted = []
+            errors = []
+            for index, row in enumerate(rows):
+                row_errors = []
+                if not isinstance(row.get("id"), int) or isinstance(row.get("id"), bool):
+                    row_errors.append({"path": f"{index}.id", "type": "int"})
+                if not isinstance(row.get("name"), str) or not row.get("name", "").strip():
+                    row_errors.append({"path": f"{index}.name", "type": "nonempty-str"})
+                if not isinstance(row.get("active"), bool):
+                    row_errors.append({"path": f"{index}.active", "type": "bool"})
+                if row_errors:
+                    errors.extend(row_errors)
+                else:
+                    accepted.append({"id": row["id"], "name": row["name"].strip(), "active": row["active"]})
+            return {"accepted": accepted, "errors": errors}
+      hints: *id001
+    check:
+      id: python.pydantic.pydantic_00.record-contract-boundary.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_00.record-contract-boundary.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: validate_record_contract
+        cases:
+        - id: keeps-field-error-paths
+          arguments:
+          - value:
+            - id: 1
+              name: ' Mina '
+              active: true
+            - id: '2'
+              name: ''
+              active: 1
+          expectedReturn:
+            accepted:
+            - id: 1
+              name: Mina
+              active: true
+            errors:
+            - path: 1.id
+              type: int
+            - path: 1.name
+              type: nonempty-str
+            - path: 1.active
+              type: bool
+        - id: handles-empty-batch
+          arguments:
+          - value: []
+          expectedReturn:
+            accepted: []
+            errors: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pydantic_00-api-payload-contract-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pydantic_00-record-contract-boundary-mastery
+    title: 새 API payload의 필수 열과 추가 열 정책 적용하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 레코드 검증 개념을 단일 요청 payload와 forbid-extra 계약으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - missing과 extra를 따로 계산하세요.
+    - 실패 payload를 억지로 normalized 결과로 만들지 마세요.
+    exercise:
+      prompt: validate_api_payload(payload, required, allowed)를 완성해 normalized와 extra를 반환하세요.
+      starterCode: |-
+        def validate_api_payload(payload, required, allowed):
+            raise NotImplementedError
+      solution: |
+        def validate_api_payload(payload, required, allowed):
+            missing = sorted(key for key in required if key not in payload)
+            extra = sorted(key for key in payload if key not in allowed)
+            if missing or extra:
+                return {"valid": False, "missing": missing, "extra": extra, "normalized": None}
+            normalized = {key: payload[key] for key in allowed if key in payload}
+            return {"valid": True, "missing": [], "extra": [], "normalized": normalized}
+      hints: *id002
+    check:
+      id: python.pydantic.pydantic_00.api-payload-contract.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_00.api-payload-contract.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: validate_api_payload
+        cases:
+        - id: accepts-exact-contract
+          arguments:
+          - value:
+              id: 1
+              name: Mina
+          - value:
+            - id
+            - name
+          - value:
+            - id
+            - name
+          expectedReturn:
+            valid: true
+            missing: []
+            extra: []
+            normalized:
+              id: 1
+              name: Mina
+        - id: reports-missing-and-extra
+          arguments:
+          - value:
+              id: 1
+              debug: true
+          - value:
+            - id
+            - name
+          - value:
+            - id
+            - name
+          expectedReturn:
+            valid: false
+            missing:
+            - name
+            extra:
+            - debug
+            normalized: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pydantic_00-validation-layer-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pydantic_00-api-payload-contract-transfer
+    title: 검증이 필요한 경계와 책임 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 외부 입력, 내부 계산, 저장 전 단계에 맞는 검증 책임과 증거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 모든 검증을 한 model에 몰아넣지 말고 경계별 책임을 나누세요.
+    - 실패 위치를 재현할 수 있는 field path나 invariant를 남기세요.
+    exercise:
+      prompt: choose_validation_layer(situation)를 완성해 owner, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_validation_layer(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_validation_layer(situation):
+            table = {'external-input': {'owner': 'input model', 'evidence': 'field error paths', 'risk': 'invalid state enters system'}, 'internal-calculation': {'owner': 'domain function', 'evidence': 'invariant assertion', 'risk': 'model hides logic bug'}, 'before-storage': {'owner': 'persistence boundary', 'evidence': 'serialized schema', 'risk': 'unreadable record'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.pydantic.pydantic_00.validation-layer-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_00.validation-layer-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_validation_layer
+        cases:
+        - id: recalls-external-input
+          arguments:
+          - value: external-input
+          expectedReturn:
+            owner: input model
+            evidence: field error paths
+            risk: invalid state enters system
+        - id: recalls-internal-calculation
+          arguments:
+          - value: internal-calculation
+          expectedReturn:
+            owner: domain function
+            evidence: invariant assertion
+            risk: model hides logic bug
+        - id: rejects-unknown-situation
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

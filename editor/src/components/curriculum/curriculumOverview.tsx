@@ -164,7 +164,7 @@ export function LearningEvidenceBar({
   return (
     <>
       <aside
-        className="flex min-h-10 flex-wrap items-center gap-x-3 gap-y-2 border-y border-border px-1 py-2"
+        className="flex min-h-10 flex-wrap items-center gap-x-3 gap-y-2 border-b border-border px-4 py-2 sm:px-6"
         data-learning-evidence-conflicts={summary.conflicts}
         data-learning-evidence-events={summary.events}
         data-learning-evidence-runtime={localRuntime ? "local" : "web"}
@@ -271,11 +271,11 @@ export function LearningOverviewHeader({
   onOpenTerminalCommand: (command: string) => void;
 }) {
   const overview = curriculumOverview(document, introBlock);
-  // intro.points가 있으면 그대로, 없으면 sections 제목 파생 목차(≤6행 + "외 N개").
-  const learnItems = overview.points.length
-    ? overview.points.slice(0, 6).map((point) => ({ label: point, anchorBlockId: "" }))
-    : sections.slice(0, 6).map((section) => ({ label: section.title, anchorBlockId: section.anchorBlockId }));
-  const overflowCount = overview.points.length ? 0 : Math.max(0, sections.length - 6);
+  const declaredLearnItems = overview.points.length
+    ? overview.points.map((point) => ({ label: point, anchorBlockId: "" }))
+    : sections.map((section) => ({ label: section.title, anchorBlockId: section.anchorBlockId }));
+  const learnItems = declaredLearnItems.slice(0, 4);
+  const overflowCount = Math.max(0, declaredLearnItems.length - learnItems.length);
   const categoryLabel = selectedCategoryLabel || selectedCategory;
   const contentLabel = selectedContentLabel || selectedContentId;
 
@@ -285,7 +285,7 @@ export function LearningOverviewHeader({
       data-learning-overview="true"
       id={introBlock ? cellDomId(introBlock.id) : undefined}
     >
-      <div className="px-6 py-6">
+      <div className="px-4 py-5 sm:px-6">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-muted-foreground">
           <span>{categoryLabel}</span>
           {contentLabel ? <span aria-hidden="true">·</span> : null}
@@ -299,44 +299,46 @@ export function LearningOverviewHeader({
             {referenceLoading ? <LoadingInline label="레슨 불러오는 중" /> : null}
           </span>
         </div>
-        <h1 className="mt-3 text-2xl font-semibold tracking-tight text-foreground" data-learning-overview-part="title">{overview.title}</h1>
+        <h1 className="mt-2 text-2xl font-bold tracking-normal text-foreground" data-learning-overview-part="title">{overview.title}</h1>
         {overview.direction ? (
-          <p className="mt-2 max-w-3xl text-md text-foreground" data-learning-overview-part="direction">{overview.direction}</p>
+          <p className="mt-1.5 max-w-3xl text-md font-normal text-foreground" data-learning-overview-part="direction">{overview.direction}</p>
         ) : null}
 
-        <LearningDomainVisual
-          category={selectedCategory}
-          className="mt-6"
-          variant="lesson"
-        />
-
-        {learnItems.length ? (
-          <div className="mt-5" data-learning-overview-part="learn-list">
-            <div className="text-xs font-medium text-muted-foreground">오늘 배우는 것</div>
-            <ul className="mt-2 max-w-3xl space-y-1.5">
-              {learnItems.map((item, index) => (
-                <li className="flex gap-2.5 text-md text-foreground" key={`${item.label}-${index}`}>
-                  <span className="mt-[0.65em] size-1 shrink-0 rounded-full bg-foreground/40" />
-                  {item.anchorBlockId ? (
-                    <button
-                      className="text-left hover:underline hover:underline-offset-4"
-                      type="button"
-                      onClick={() => scrollToCell(item.anchorBlockId)}
-                    >
-                      {item.label}
-                    </button>
-                  ) : (
-                    <span>{item.label}</span>
-                  )}
-                </li>
-              ))}
-              {overflowCount > 0 ? (
-                <li className="pl-3.5 text-sm text-muted-foreground">외 {overflowCount}개 섹션</li>
-              ) : null}
-            </ul>
-          </div>
-        ) : null}
-
+        <div className="mt-5 border-y border-border py-4">
+          <LearningDomainVisual
+            category={selectedCategory}
+            variant="lesson"
+          >
+            {learnItems.length ? (
+              <div className="mt-4 border-t border-border pt-4" data-learning-overview-part="learn-list">
+                <div className="text-xs font-medium text-muted-foreground">오늘 배우는 것</div>
+                <ol className="mt-2 space-y-1.5">
+                  {learnItems.map((item, index) => (
+                    <li className="flex min-w-0 gap-2.5 text-sm font-normal leading-6 text-foreground" key={`${item.label}-${index}`}>
+                      <span className="w-5 shrink-0 font-mono text-xs tabular-nums text-accent-brand">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      {item.anchorBlockId ? (
+                        <button
+                          className="min-w-0 text-left hover:underline hover:underline-offset-4"
+                          type="button"
+                          onClick={() => scrollToCell(item.anchorBlockId)}
+                        >
+                          {item.label}
+                        </button>
+                      ) : (
+                        <span>{item.label}</span>
+                      )}
+                    </li>
+                  ))}
+                  {overflowCount > 0 ? (
+                    <li className="pl-7 text-xs font-normal text-muted-foreground">이어서 {overflowCount}개 섹션</li>
+                  ) : null}
+                </ol>
+              </div>
+            ) : null}
+          </LearningDomainVisual>
+        </div>
       </div>
 
       <div className="border-t px-6 py-3 empty:hidden">
@@ -384,19 +386,19 @@ export function SectionNarrative({ contract }: { contract?: CurriculumSectionCon
   const explanationParagraphs = explanation.split(/\n{2,}/).map((part) => part.trim()).filter(Boolean);
 
   return (
-    <div className="space-y-6 px-1 pt-6 sm:px-5" data-learning-section-part="overview">
+    <div className="space-y-5 px-4 pt-5 sm:px-6" data-learning-section-part="overview">
       {goal || why ? (
         <div className="min-w-0 max-w-[68ch] border-l-2 border-accent-brand pl-4">
-          <div className="text-xs font-semibold text-accent-brand">이번 섹션의 목표</div>
-          {goal ? <p className="mt-1.5 text-md font-semibold text-foreground">{goal}</p> : null}
-          {why ? <p className={cn("text-sm leading-6 text-muted-foreground", goal && "mt-1.5")}>{why}</p> : null}
+          <div className="text-xs font-medium text-accent-brand">이번 섹션의 목표</div>
+          {goal ? <p className="mt-1.5 text-md font-normal text-foreground">{goal}</p> : null}
+          {why ? <p className={cn("text-sm font-normal leading-6 text-muted-foreground", goal && "mt-1.5")}>{why}</p> : null}
         </div>
       ) : null}
       {explanationParagraphs.length ? (
         <div className="min-w-0 max-w-[68ch] space-y-3">
-          <div className="text-xs font-semibold text-muted-foreground">핵심 개념</div>
+          <div className="text-xs font-medium text-muted-foreground">핵심 개념</div>
           {explanationParagraphs.map((paragraph, index) => (
-            <p className="text-md text-foreground" key={`${paragraph.slice(0, 16)}-${index}`}>{paragraph}</p>
+            <p className="text-md font-normal text-foreground" key={`${paragraph.slice(0, 16)}-${index}`}>{paragraph}</p>
           ))}
         </div>
       ) : null}

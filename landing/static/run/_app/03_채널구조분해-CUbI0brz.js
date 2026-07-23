@@ -1,0 +1,587 @@
+var e=`meta:
+  id: visionBasics_03
+  title: 채널 구조 분해
+  order: 3
+  category: visionBasics
+  difficulty: ⭐⭐
+  badge: 입문
+  packages:
+  - matplotlib
+  - numpy
+  - scikit-learn
+  tags:
+  - numpy
+  - 채널
+  - RGB
+  - alpha
+  - 이미지구조
+  seo:
+    title: 이미지 비전 기초 - 채널 구조 분해
+    description: RGB 이미지를 채널별로 분해하고 다시 합쳐 봅니다. 알파 채널과 흑백 변환의 원리를 익힙니다.
+    keywords:
+    - numpy
+    - 채널
+    - RGB
+    - 흑백변환
+    - 이미지처리
+intro:
+  emoji: 🎚
+  goal: 컬러 이미지가 사실은 세 장의 흑백 이미지를 겹친 것임을 직접 분해하며 익힙니다.
+  description: |-
+    한 장의 컬러 이미지는 빨강·녹색·파랑 세 개의 흑백 이미지를 겹쳐 만든 것입니다. 이 강의는 sklearn의 flower 사진을 채널별로 떼어 보고, 한 채널만 살린 이미지를 만들고, 흑백으로 환산하고, 다시 합치는 과정을 통해 채널의 정체를 파악합니다.
+  direction: 컬러 이미지를 R/G/B 세 장으로 분해하고 다시 합치며 채널이 독립된 흑백 이미지임을 확인합니다.
+  benefits:
+  - 컬러 이미지에서 특정 채널만 떼어내 분석할 수 있습니다.
+  - 각 채널의 밝기 분포를 보고 사진의 색감을 진단할 수 있습니다.
+  - 흑백 변환이 단순 평균이 아니라 가중 평균이라는 점을 이해합니다.
+  diagram:
+    steps:
+    - label: 1단계. 실제 사진 불러오기
+      detail: sklearn flower 이미지를 numpy 배열로 가져옵니다.
+    - label: 2단계. 채널 분해
+      detail: 마지막 차원 인덱싱으로 R, G, B를 분리합니다.
+    - label: 3단계. 채널 단독 보기
+      detail: 한 채널만 살린 컬러 이미지를 만듭니다.
+    - label: 4단계. 가중 평균 흑백
+      detail: 사람 시각에 맞춘 luminance 계수로 흑백을 만듭니다.
+    - label: 5단계. 알파 채널 합성
+      detail: 네 번째 채널로 투명도를 다룹니다.
+    runtime:
+    - label: numpy 환경
+      detail: numpy, matplotlib, sklearn 만으로 동작합니다.
+    - label: 검증 흐름
+      detail: assert와 시각 비교로 학습 결과가 기대값과 같은지 확인합니다.
+sections:
+- id: load_flower
+  title: 1단계. 실제 사진 불러오기
+  structuredPrimary: true
+  subtitle: sklearn flower 이미지
+  goal: sklearn에 내장된 컬러 사진을 numpy 배열로 가져와 모양을 확인합니다.
+  why: 합성 이미지가 아닌 실제 사진을 다뤄야 채널 분리가 의미 있게 보입니다.
+  explanation: |-
+    \`sklearn.datasets.load_sample_image('flower.jpg')\` 는 RGB 순서의 ndarray를 반환합니다. shape는 \`(427, 640, 3)\` 이고 dtype은 \`uint8\` 입니다.
+
+    네트워크 없이 항상 동작하므로 비전 입문 학습용으로 적합합니다. OpenCV 트랙에서는 같은 데이터를 BGR로 변환하지만, 여기서는 RGB 그대로 다룹니다.
+  tips:
+  - load_sample_image는 sklearn이 설치된 환경이면 인터넷 없이 동작합니다.
+  snippet: |-
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from sklearn.datasets import load_sample_image
+
+    flower = load_sample_image('flower.jpg')
+    flower.shape, flower.dtype
+  exercise:
+    prompt: flower 이미지를 imshow로 출력하고 좌상단 픽셀의 RGB 값을 확인하세요.
+    starterCode: |-
+      fig = plt.figure(figsize=(6, 4))
+      plt.imshow(flower)
+      plt.axis('off')
+      fig
+    hints:
+    - flower[0, 0] 으로 픽셀에 접근할 수 있습니다.
+    - 한 셀에서 figure 객체를 마지막에 두면 자동 출력됩니다.
+  check:
+    noError: 이미지 로드와 imshow가 오류 없이 끝나야 합니다.
+    resultCheck: flower의 shape이 (높이, 너비, 3) 형태이고 dtype이 uint8이어야 합니다.
+- id: split_channels
+  title: 2단계. 채널 분해
+  structuredPrimary: true
+  subtitle: R, G, B를 한 장씩 떼어내기
+  goal: 마지막 차원 인덱싱으로 RGB 채널을 각각 분리합니다.
+  why: 각 채널을 따로 보면 사진의 어느 색이 강한지, 어느 영역이 어둡고 밝은지를 객관적으로 진단할 수 있습니다.
+  explanation: |-
+    \`flower[:, :, 0]\` 은 빨강 채널만 뽑은 2차원 배열입니다. shape이 \`(427, 640)\` 이 됩니다. 채널 하나만 떼어내면 자연스럽게 흑백 이미지가 됩니다.
+
+    matplotlib에서 2차원 배열을 imshow하면 viridis 등 색상맵으로 그려집니다. 진짜 흑백으로 보려면 \`cmap='gray'\` 를 지정해야 합니다.
+  tips:
+  - 인덱스 0, 1, 2는 각각 R, G, B입니다. OpenCV의 BGR에서는 같은 인덱스가 B, G, R을 가리키니 라이브러리별 순서를 확인하세요.
+  snippet: |-
+    redChannel = flower[:, :, 0]
+    greenChannel = flower[:, :, 1]
+    blueChannel = flower[:, :, 2]
+    redChannel.shape, greenChannel.shape, blueChannel.shape
+  exercise:
+    prompt: 세 채널을 1행 3열 서브플롯으로 나란히 그리되 모두 cmap='gray'로 표시하세요.
+    starterCode: |-
+      fig, axes = plt.subplots(1, 3, figsize=(12, 4))
+      axes[0].imshow(redChannel, cmap='gray')
+      axes[0].set_title('Red')
+      axes[1].imshow(greenChannel, cmap=___)
+      axes[1].set_title('Green')
+      axes[2].imshow(blueChannel, cmap='gray')
+      axes[2].set_title('Blue')
+      for axis in axes:
+          axis.axis('off')
+      fig
+    hints:
+    - cmap='gray'로 통일해야 같은 기준으로 비교가 됩니다.
+    - 채널별로 밝기 패턴이 다른지 눈으로 확인하세요.
+  check:
+    noError: 세 채널 슬라이싱이 오류 없이 끝나야 합니다.
+    resultCheck: 각 채널의 shape이 2차원이어야 합니다.
+- id: single_channel_color
+  title: 3단계. 한 채널만 살린 컬러 이미지
+  structuredPrimary: true
+  subtitle: 나머지 채널을 0으로
+  goal: 다른 채널 값을 모두 0으로 만들어 한 색깔만 강조한 이미지를 만듭니다.
+  why: 어느 부분에 어떤 색이 들어 있는지 직관적으로 확인하는 가장 빠른 방법입니다.
+  explanation: |-
+    원본 컬러 이미지를 복사한 뒤 두 채널을 0으로 채우면 한 채널만 살아 있는 이미지가 됩니다. 결과는 빨강·녹색·파랑 중 한 가지 톤으로만 보입니다.
+
+    \`.copy()\` 를 빼먹으면 원본 flower 배열이 손상됩니다. numpy 슬라이싱은 기본적으로 뷰(view)를 반환하므로 의도치 않게 원본을 바꿀 수 있습니다.
+  tips:
+  - 새 변수에 사진을 담아 수정할 때는 항상 .copy() 를 먼저 호출하세요.
+  snippet: |-
+    redOnly = flower.copy()
+    redOnly[:, :, 1] = 0
+    redOnly[:, :, 2] = 0
+    fig = plt.figure(figsize=(5, 4))
+    plt.imshow(redOnly)
+    plt.title('Red channel only')
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: 같은 방식으로 녹색만 남긴 greenOnly 이미지를 만들고 출력하세요.
+    starterCode: |-
+      greenOnly = flower.copy()
+      greenOnly[:, :, ___] = 0
+      greenOnly[:, :, ___] = 0
+      fig2 = plt.figure(figsize=(5, 4))
+      plt.imshow(greenOnly)
+      plt.title('Green channel only')
+      plt.axis('off')
+      fig2
+    hints:
+    - 녹색은 인덱스 1입니다. 0과 2를 0으로 만들면 됩니다.
+    - 복사를 잊지 마세요.
+  check:
+    noError: copy와 채널 대입이 오류 없이 끝나야 합니다.
+    resultCheck: greenOnly[0, 0, 0]과 greenOnly[0, 0, 2]가 0이어야 합니다.
+- id: luminance
+  title: 4단계. 가중 평균으로 흑백 만들기
+  structuredPrimary: true
+  subtitle: 단순 평균이 아닌 luminance
+  goal: 사람 눈이 인식하는 밝기에 가깝게 흑백 이미지를 계산합니다.
+  why: 세 채널을 그냥 평균하면 녹색이 강조된 사진은 너무 밝게, 파란 사진은 너무 어둡게 나옵니다.
+  explanation: |-
+    사람의 망막은 녹색에 가장 민감하고 파랑에 둔감합니다. 따라서 흑백 변환에는 가중 평균을 씁니다. ITU-R BT.601 표준은 \`0.299 * R + 0.587 * G + 0.114 * B\` 를 권장합니다.
+
+    OpenCV의 \`cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)\` 가 내부적으로 이 식을 씁니다. 직접 구현해 보면 함수가 무엇을 감추고 있는지 알게 됩니다.
+  tips:
+  - 결과를 uint8로 다시 만들 때 .astype(np.uint8) 를 잊지 마세요. 그렇지 않으면 float 배열이 됩니다.
+  snippet: |-
+    weights = np.array([0.299, 0.587, 0.114], dtype=np.float32)
+    luma = (flower.astype(np.float32) * weights).sum(axis=2)
+    luma = luma.clip(0, 255).astype(np.uint8)
+    luma.dtype, luma.shape
+  exercise:
+    prompt: luma를 imshow로 출력하고, 같은 사진을 단순 평균(mean)으로도 만들어 비교하세요.
+    starterCode: |-
+      simpleGray = flower.mean(axis=___).clip(0, 255).astype(np.uint8)
+      fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+      axes[0].imshow(luma, cmap='gray')
+      axes[0].set_title('luminance')
+      axes[1].imshow(simpleGray, cmap='gray')
+      axes[1].set_title('simple mean')
+      for axis in axes:
+          axis.axis('off')
+      fig
+    hints:
+    - axis=2로 마지막 차원(채널)을 따라 평균을 냅니다.
+    - 두 결과의 차이가 미세해도 분명히 존재합니다.
+  check:
+    noError: 가중합 계산이 오류 없이 끝나야 합니다.
+    resultCheck: luma의 dtype이 uint8, shape이 2차원이어야 합니다.
+- id: alpha_compose
+  title: 5단계. 알파 채널 합성
+  structuredPrimary: true
+  subtitle: 네 번째 채널로 투명도
+  goal: RGBA 이미지를 만들고 알파 채널로 두 이미지를 부드럽게 섞습니다.
+  why: 워터마크, 합성, 오버레이는 모두 알파 채널로 시작합니다.
+  explanation: |-
+    알파 채널은 0(완전 투명)부터 255(불투명) 사이의 한 채널 배열입니다. RGBA 이미지는 \`(H, W, 4)\` 모양이고 OpenCV는 BGRA로 다룹니다.
+
+    두 이미지를 알파로 섞을 때는 \`result = front * alpha + back * (1 - alpha)\` 공식을 씁니다. 알파를 float으로 정규화하면(\`alpha / 255.0\`) 계산이 간단합니다.
+  tips:
+  - 합성 결과는 항상 float으로 잠시 변환했다가 uint8로 되돌리세요. 정수 곱셈은 오버플로우를 일으킵니다.
+  snippet: |-
+    front = np.zeros((100, 100, 3), dtype=np.uint8)
+    front[:] = [240, 80, 80]
+    back = np.zeros((100, 100, 3), dtype=np.uint8)
+    back[:] = [40, 40, 200]
+    alpha = np.full((100, 100, 1), 100, dtype=np.uint8)
+    weight = alpha.astype(np.float32) / 255.0
+    blended = (front * weight + back * (1.0 - weight)).clip(0, 255).astype(np.uint8)
+    blended[50, 50]
+  exercise:
+    prompt: alpha를 가로 방향으로 0에서 255까지 점진적으로 증가하도록 만들어 좌측은 back, 우측은 front가 보이는 그라데이션 합성을 만드세요.
+    starterCode: |-
+      gradAlpha = np.tile(np.linspace(0, 255, 100, dtype=np.uint8), (100, 1)).reshape(100, 100, 1)
+      gradWeight = gradAlpha.astype(np.float32) / ___
+      gradient = (front * gradWeight + back * (1.0 - gradWeight)).clip(0, 255).astype(np.uint8)
+      fig = plt.figure(figsize=(5, 4))
+      plt.imshow(gradient)
+      plt.axis('off')
+      fig
+    hints:
+    - np.linspace(0, 255, 100)은 0부터 255까지 100개 값을 만듭니다.
+    - 알파 분모는 255.0이어야 0~1 범위가 됩니다.
+  check:
+    noError: 알파 합성 계산이 오류 없이 끝나야 합니다.
+    resultCheck: gradient의 좌측 픽셀과 우측 픽셀 색이 서로 달라야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 채널 진단 보고서
+  goal: 분해와 합성을 종합해 사진 한 장의 색감을 진단합니다.
+  why: 채널별 통계를 한 화면에 모으면 어느 색이 부족하거나 과한지 한눈에 보입니다.
+  explanation: |-
+    sklearn의 china 이미지를 가져와 채널별 평균과 최댓값을 표로 만들고, 각 채널을 단독으로 출력합니다. 각 미션은 import문부터 시작하지만, 위 예제를 실행했다면 import는 생략해도 됩니다.
+  tips:
+  - 채널별 평균은 그 사진의 전체 색온도를 가늠하는 지표입니다.
+  snippet: |-
+    china = load_sample_image('china.jpg')
+    report = {
+        f"channel_{idx}": {
+            "mean": float(china[:, :, idx].mean()),
+            "max": int(china[:, :, idx].max()),
+        }
+        for idx in range(3)
+    }
+    report
+  exercise:
+    prompt: "미션1: china의 세 채널을 1행 3열로 cmap='gray'로 그리고 각 타이틀에 평균값을 표시하세요. 미션2: china의 채널 순서를 (B, G, R)로 뒤집은 swapped 이미지를 만들고 원본과 비교 출력하세요."
+    starterCode: |-
+      fig, axes = plt.subplots(1, 3, figsize=(12, 4))
+      for idx, axis in enumerate(axes):
+          axis.imshow(china[:, :, idx], cmap='gray')
+          axis.set_title(f"ch{idx} mean={china[:, :, idx].mean():.1f}")
+          axis.axis('off')
+      fig
+    hints:
+    - 채널 순서 뒤집기는 china[:, :, ::-1] 한 줄입니다.
+    - 두 이미지를 비교하려면 subplots(1, 2)로 만들면 됩니다.
+  check:
+    noError: china 로딩과 그래프 그리기가 오류 없이 끝나야 합니다.
+    resultCheck: report 내 세 채널의 mean과 max 값이 0 이상 255 이하여야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: visionBasics_03-channel_structure-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load_flower
+    - practice
+    title: 채널 구조 분해 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: channel count·color order·alpha 의미를 명시한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_channel_structure_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_channel_structure_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_channel_structure_contract(value):
+            required = ['channelCount', 'colorOrder', 'alphaMode']
+            rules = [{'id': 'channel-count', 'field': 'channelCount', 'kind': 'enum', 'values': [1, 3, 4]}, {'id': 'color-order', 'field': 'colorOrder', 'kind': 'enum', 'values': ['GRAY', 'RGB', 'BGR', 'RGBA', 'BGRA']}, {'id': 'alpha-mode', 'field': 'alphaMode', 'kind': 'enum', 'values': ['none', 'straight', 'premultiplied']}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'channel_structure', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.vision-basics.visionBasics_03.channel_structure-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_03.channel_structure-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_channel_structure_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              channelCount: 4
+              colorOrder: RGBA
+              alphaMode: straight
+          expectedReturn:
+            accepted: true
+            topic: channel_structure
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              colorOrder: RGBA
+              alphaMode: straight
+          expectedReturn:
+            accepted: false
+            topic: channel_structure
+            missing:
+            - channelCount
+            violations:
+            - channel-count
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              channelCount: 2
+              colorOrder: CMYK
+              alphaMode: unknown
+          expectedReturn:
+            accepted: false
+            topic: channel_structure
+            missing: []
+            violations:
+            - alpha-mode
+            - channel-count
+            - color-order
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: visionBasics_03-channel_structure-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionBasics_03-channel_structure-contract-audit-mastery
+    title: 채널 구조 분해 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_channel_structure_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_channel_structure_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_channel_structure_result(expected, observed):
+            identity = ['sourceHash', 'colorOrder']
+            metrics = {'channelMean': 0.5}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'channel_structure', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.vision-basics.visionBasics_03.channel_structure-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_03.channel_structure-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_channel_structure_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              sourceHash: ch1
+              colorOrder: RGBA
+              channelMean: 128.0
+          - value:
+              sourceHash: ch1
+              colorOrder: RGBA
+              channelMean: 128.2
+          expectedReturn:
+            passed: true
+            topic: channel_structure
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              sourceHash: ch1
+              colorOrder: RGBA
+              channelMean: 128.0
+          - value:
+              sourceHash: ch2
+              colorOrder: BGRA
+              channelMean: 140.0
+          expectedReturn:
+            passed: false
+            topic: channel_structure
+            missing: []
+            identityMismatch:
+            - colorOrder
+            - sourceHash
+            metricDrift:
+            - channelMean
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              sourceHash: ch1
+              colorOrder: RGBA
+              channelMean: 128.0
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: channel_structure
+            missing:
+            - channelMean
+            - colorOrder
+            - sourceHash
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: visionBasics_03-channel_structure-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionBasics_03-channel_structure-result-reconciliation-transfer
+    title: 채널 구조 분해 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_channel_structure_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_channel_structure_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_channel_structure_evidence(stage):
+            stages = {'input': {'action': 'validate channel input contract', 'evidence': 'channel order and alpha manifest', 'risk': 'misinterpreted pixels'}, 'process': {'action': 'apply bounded channel operation', 'evidence': 'split-merge trace', 'risk': 'silent shape or range drift'}, 'result': {'action': 'reconcile channel result', 'evidence': 'per-channel statistics', 'risk': 'plausible but wrong image'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.vision-basics.visionBasics_03.channel_structure-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_03.channel_structure-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_channel_structure_evidence
+        cases:
+        - id: recalls-input
+          arguments:
+          - value: input
+          expectedReturn:
+            action: validate channel input contract
+            evidence: channel order and alpha manifest
+            risk: misinterpreted pixels
+        - id: recalls-process
+          arguments:
+          - value: process
+          expectedReturn:
+            action: apply bounded channel operation
+            evidence: split-merge trace
+            risk: silent shape or range drift
+        - id: recalls-result
+          arguments:
+          - value: result
+          expectedReturn:
+            action: reconcile channel result
+            evidence: per-channel statistics
+            risk: plausible but wrong image
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

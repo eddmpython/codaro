@@ -1,0 +1,945 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - numpy
+  - pandas
+  - seaborn
+  id: matplotlib_08
+  title: 다중패널대시보드
+  order: 8
+  category: matplotlib
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  tags:
+  - matplotlib
+  - GridSpec
+  - style
+  - tight_layout
+  - dashboard
+  - pie
+  seo:
+    title: Matplotlib 대시보드 - GridSpec으로 다중 패널 레이아웃
+    description: Matplotlib으로 4개 이상의 차트를 조합한 대시보드를 만듭니다. GridSpec, style, tight_layout, pie 사용법을 배웁니다.
+    keywords:
+    - matplotlib
+    - GridSpec
+    - 대시보드
+    - pie
+    - 스타일
+    - 레이아웃
+intro:
+  emoji: 📋
+  goal: 4개 차트로 구성된 팁 데이터 분석 대시보드를 만듭니다.
+  description: GridSpec으로 복잡한 레이아웃을 구성하고, 여러 차트 유형을 조합합니다. 이전에 배운 plot, hist, scatter, bar, boxplot, pie,
+    subplots 개념을 모두 활용합니다.
+  direction: 다중패널대시보드에서 분석 데이터를 차트로 만들고 축, 범례, 저장 결과를 검증합니다.
+  benefits:
+  - 시각화할 데이터 확인 후 차트 구성에 맞는 코드 입력을 고릅니다.
+  - 다중패널대시보드 결과를 축/범례/파일 출력 기준으로 즉시 점검합니다.
+  - 완료한 코드를 보고서 차트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(시각화할 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 11단계. 한글 폰트 설정 처리 실행
+      detail: 차트 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 2단계. 데이터 로드 결과 검증
+      detail: 축/범례/파일 출력 기준으로 실행 결과를 비교합니다.
+    - label: 다중패널대시보드 재사용
+      detail: 완성 코드를 보고서 차트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 시각 리포트 환경
+      detail: matplotlib, numpy, pandas, seaborn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 다중패널대시보드 실행
+      detail: 셀을 실행해 축/범례/파일 출력와 예외 상태를 확인합니다.
+    - label: 다중패널대시보드 완료
+      detail: 검증된 코드를 보고서 차트로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: |-
+    tips 데이터를 사용하여 레스토랑 팁 분석 대시보드를 만듭니다. GridSpec은 서브플롯보다 더 유연한 레이아웃을 구성할 수 있습니다. 스타일 시트를 적용하면 기본 디자인이 크게 개선됩니다.
+
+    import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. GridSpec은 복잡한 레이아웃을 구성할 때 사용합니다.
+  tips:
+  - import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. GridSpec은 복잡한 레이아웃을
+    구성할 때 사용합니다.
+  snippet: |-
+    import matplotlib.pyplot as plt
+    from matplotlib.gridspec import GridSpec
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+    import numpy as np
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import matplotlib.pyplot as plt
+      from matplotlib.gridspec import GridSpec
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import numpy as np
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 라이브러리 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 축/범례/파일 출력 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step1_font
+  title: 1-1단계. 한글 폰트 설정
+  structuredPrimary: true
+  subtitle: Codaro 로컬 Python 환경 폰트
+  goal: 11단계. 한글 폰트 설정에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    Codaro 로컬 Python에서는 실행 환경에 따라 기본 폰트에 한글 글리프가 없을 수 있습니다. CDN 또는 로컬 폰트 파일을 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
+
+    font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
+  tips:
+  - font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스
+    기호가 깨지는 것을 방지합니다.
+  snippet: |-
+    from matplotlib import font_manager
+
+    fontCandidates = ["Malgun Gothic", "AppleGothic", "NanumGothic", "DejaVu Sans"]
+    availableFonts = {font.name for font in font_manager.fontManager.ttflist}
+    for fontName in fontCandidates:
+        if fontName in availableFonts:
+            plt.rcParams["font.family"] = fontName
+            break
+    plt.rcParams["axes.unicode_minus"] = False
+  exercise:
+    prompt: 11단계. 한글 폰트 설정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      from matplotlib import font_manager
+
+      fontCandidates = ["Malgun Gothic", "AppleGothic", "NanumGothic", "DejaVu Sans"]
+      availableFonts = {font.name for font in font_manager.fontManager.ttflist}
+      for fontName in fontCandidates:
+          if fontName in availableFonts:
+              plt.rcParams["font.family"] = fontName
+              break
+      plt.rcParams["axes.unicode_minus"] = False
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 한글 폰트 설정의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 11단계. 한글 폰트 설정 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step2_data
+  title: 2단계. 데이터 로드
+  structuredPrimary: true
+  subtitle: tips 데이터
+  goal: 2단계. 데이터 로드에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: tips 데이터를 불러오고 기본 통계를 확인합니다. 대시보드에는 총 결제금액, 팁, 요일, 시간대, 인원수 등 다양한 변수를 활용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    tips = loadLocalDataset('tips')
+    tips.head()
+  exercise:
+    prompt: 2단계. 데이터 로드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      tips = loadLocalDataset('tips')
+      tips.head()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 로드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 로드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_style
+  title: 3단계. 스타일 시트 적용
+  structuredPrimary: true
+  subtitle: plt.style.use()
+  goal: 3단계. 스타일 시트 적용에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    Matplotlib은 다양한 내장 스타일 시트를 제공합니다. 스타일을 적용하면 배경색, 그리드, 폰트 등이 일괄 변경됩니다. 'seaborn-v0_8-whitegrid'는 깔끔한 비즈니스 차트에 적합합니다.
+
+    plt.style.use('스타일명')으로 스타일을 적용합니다. 주요 스타일: 'seaborn-v0_8-whitegrid'(깔끔한 격자), 'ggplot'(R 스타일), 'dark_background'(어두운 배경), 'fivethirtyeight'(뉴스 사이트 스타일). plt.style.available로 전체 목록을 볼 수 있습니다.
+  tips:
+  - 'plt.style.use(''스타일명'')으로 스타일을 적용합니다. 주요 스타일: ''seaborn-v0_8-whitegrid''(깔끔한 격자), ''ggplot''(R 스타일),
+    ''dark_background''(어두운 배경), ''fivethirtyeight''(뉴스 사이트 스타일). plt.style.available로 전체 목록을 볼 수 있습니다.'
+  snippet: plt.style.available[:10]
+  exercise:
+    prompt: 3단계. 스타일 시트 적용 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: plt.style.available[:10]
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 스타일 시트 적용의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 3단계. 스타일 시트 적용 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step4_gridspec
+  title: 4단계. GridSpec 기본
+  structuredPrimary: true
+  subtitle: 그리드 레이아웃
+  goal: 4단계. GridSpec 기본에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    GridSpec은 Figure를 그리드로 분할하고, 각 셀에 차트를 배치합니다. 2x2 그리드를 만들고 각 위치에 다른 차트를 배치해봅니다. subplots보다 더 유연한 레이아웃이 가능합니다.
+
+    GridSpec(rows, cols, figure=fig)로 그리드를 정의합니다. fig.add_subplot(gs[row, col])로 특정 위치에 Axes를 추가합니다. gs[0:2, 0]처럼 슬라이싱으로 여러 셀을 합칠 수 있습니다.
+  tips:
+  - GridSpec(rows, cols, figure=fig)로 그리드를 정의합니다. fig.add_subplot(gs[row, col])로 특정 위치에 Axes를 추가합니다. gs[0:2,
+    0]처럼 슬라이싱으로 여러 셀을 합칠 수 있습니다.
+  snippet: |-
+    figGrid = plt.figure(figsize=(12, 10))
+    gs = GridSpec(2, 2, figure=figGrid)
+
+    ax1 = figGrid.add_subplot(gs[0, 0])
+    ax2 = figGrid.add_subplot(gs[0, 1])
+    ax3 = figGrid.add_subplot(gs[1, 0])
+    ax4 = figGrid.add_subplot(gs[1, 1])
+
+    ax1.set_title('위치 [0, 0]')
+    ax2.set_title('위치 [0, 1]')
+    ax3.set_title('위치 [1, 0]')
+    ax4.set_title('위치 [1, 1]')
+
+    plt.tight_layout()
+    figGrid
+  exercise:
+    prompt: 4단계. GridSpec 기본 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figGrid = plt.figure(figsize=(12, 10))
+      gs = GridSpec(2, 2, figure=figGrid)
+
+      ax1 = figGrid.add_subplot(gs[0, 0])
+      ax2 = figGrid.add_subplot(gs[0, 1])
+      ax3 = figGrid.add_subplot(gs[1, 0])
+      ax4 = figGrid.add_subplot(gs[1, 1])
+
+      ax1.set_title('위치 [0, 0]')
+      ax2.set_title('위치 [0, 1]')
+      ax3.set_title('위치 [1, 0]')
+      ax4.set_title('위치 [1, 1]')
+
+      plt.tight_layout()
+      figGrid
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. GridSpec 기본의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 4단계. GridSpec 기본의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step5_hist_box
+  title: 5단계. 히스토그램과 박스플롯
+  structuredPrimary: true
+  subtitle: 분포 시각화
+  goal: 5단계. 히스토그램과 박스플롯에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 첫 번째 행에 팁 금액의 분포를 히스토그램과 박스플롯으로 표시합니다. 이전에 배운 기법들을 적용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figDist = plt.figure(figsize=(14, 5))
+    gs = GridSpec(1, 2, figure=figDist)
+
+    axHist = figDist.add_subplot(gs[0, 0])
+    axHist.hist(tips['tip'], bins=20, color='#3498DB', edgecolor='white', alpha=0.8)
+    axHist.set_title('팁 금액 분포', fontsize=12)
+    axHist.set_xlabel('팁 ($)')
+    axHist.set_ylabel('빈도')
+    figDist
+  exercise:
+    prompt: 5단계. 히스토그램과 박스플롯 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figDist = plt.figure(figsize=(14, 5))
+      gs = GridSpec(1, 2, figure=figDist)
+
+      axHist = figDist.add_subplot(gs[0, 0])
+      axHist.hist(tips['tip'], bins=20, color='#3498DB', edgecolor='white', alpha=0.8)
+      axHist.set_title('팁 금액 분포', fontsize=12)
+      axHist.set_xlabel('팁 ($)')
+      axHist.set_ylabel('빈도')
+      figDist
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 히스토그램과 박스플롯의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 히스토그램과 박스플롯의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step6_scatter_bar
+  title: 6단계. 산점도와 막대 그래프
+  structuredPrimary: true
+  subtitle: 관계와 비교
+  goal: 6단계. 산점도와 막대 그래프에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 두 번째 행에 결제금액-팁 관계 산점도와 시간대별 평균 팁 막대 그래프를 배치합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figRelation = plt.figure(figsize=(14, 5))
+    gs = GridSpec(1, 2, figure=figRelation)
+
+    axScatter = figRelation.add_subplot(gs[0, 0])
+    colors = {'Lunch': '#3498DB', 'Dinner': '#E74C3C'}
+    for time in ['Lunch', 'Dinner']:
+        subset = tips[tips['time'] == time]
+        axScatter.scatter(subset['total_bill'], subset['tip'],
+                         c=colors[time], label=time, alpha=0.6, s=50)
+    axScatter.set_title('결제금액 vs 팁', fontsize=12)
+    axScatter.set_xlabel('결제금액 ($)')
+    axScatter.set_ylabel('팁 ($)')
+    axScatter.legend()
+    figRelation
+  exercise:
+    prompt: 6단계. 산점도와 막대 그래프 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figRelation = plt.figure(figsize=(14, 5))
+      gs = GridSpec(1, 2, figure=figRelation)
+
+      axScatter = figRelation.add_subplot(gs[0, 0])
+      colors = {'Lunch': '#3498DB', 'Dinner': '#E74C3C'}
+      for time in ['Lunch', 'Dinner']:
+          subset = tips[tips['time'] == time]
+          axScatter.scatter(subset['total_bill'], subset['tip'],
+                           c=colors[time], label=time, alpha=0.6, s=50)
+      axScatter.set_title('결제금액 vs 팁', fontsize=12)
+      axScatter.set_xlabel('결제금액 ($)')
+      axScatter.set_ylabel('팁 ($)')
+      axScatter.legend()
+      figRelation
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 산점도와 막대 그래프의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 6단계. 산점도와 막대 그래프 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step7_pie
+  title: 7단계. 파이 차트
+  structuredPrimary: true
+  subtitle: 비율 시각화
+  goal: 7단계. 파이 차트에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    파이 차트는 전체 대비 각 부분의 비율을 보여줍니다. 요일별 주문 비율을 파이 차트로 시각화합니다. autopct로 퍼센트를 표시하고, explode로 특정 조각을 강조할 수 있습니다.
+
+    ax.pie(값, labels=라벨, autopct='%1.1f%%')로 파이 차트를 그립니다. explode로 조각을 떼어내어 강조하고, shadow=True로 그림자 효과를 줍니다. startangle로 시작 각도를 조절합니다.
+  tips:
+  - ax.pie(값, labels=라벨, autopct='%1.1f%%')로 파이 차트를 그립니다. explode로 조각을 떼어내어 강조하고, shadow=True로 그림자 효과를
+    줍니다. startangle로 시작 각도를 조절합니다.
+  snippet: |-
+    figPie, axPie = plt.subplots(figsize=(8, 8))
+
+    dayCount = tips['day'].value_counts()
+    colors = ['#E74C3C', '#27AE60', '#9B59B6', '#F39C12']
+    explode = (0, 0, 0.05, 0)
+
+    axPie.pie(dayCount, labels=dayCount.index, autopct='%1.1f%%',
+             colors=colors, explode=explode, shadow=True, startangle=90)
+    axPie.set_title('요일별 주문 비율', fontsize=14, fontweight='bold')
+
+    figPie
+  exercise:
+    prompt: 7단계. 파이 차트 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figPie, axPie = plt.subplots(figsize=(8, 8))
+
+      dayCount = tips['day'].value_counts()
+      colors = ['#E74C3C', '#27AE60', '#9B59B6', '#F39C12']
+      explode = (0, 0, 0.05, 0)
+
+      axPie.pie(dayCount, labels=dayCount.index, autopct='%1.1f%%',
+               colors=colors, explode=explode, shadow=True, startangle=90)
+      axPie.set_title('요일별 주문 비율', fontsize=14, fontweight='bold')
+
+      figPie
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 파이 차트의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 파이 차트의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step8_dashboard
+  title: 8단계. 4패널 대시보드
+  structuredPrimary: true
+  subtitle: 모든 차트 조합
+  goal: 8단계. 4패널 대시보드에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 지금까지 만든 4가지 차트를 하나의 대시보드로 조합합니다. 2x2 GridSpec으로 레이아웃을 구성하고, 각 위치에 적절한 차트를 배치합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figDash = plt.figure(figsize=(14, 12))
+    gs = GridSpec(2, 2, figure=figDash, hspace=0.3, wspace=0.3)
+
+    ax1Dash = figDash.add_subplot(gs[0, 0])
+    ax1Dash.hist(tips['tip'], bins=20, color='#3498DB', edgecolor='white', alpha=0.8)
+    ax1Dash.set_title('팁 금액 분포', fontsize=12, fontweight='bold')
+    ax1Dash.set_xlabel('팁 ($)')
+    ax1Dash.set_ylabel('빈도')
+    ax1Dash.spines['top'].set_visible(False)
+    ax1Dash.spines['right'].set_visible(False)
+    figDash
+  exercise:
+    prompt: 8단계. 4패널 대시보드 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figDash = plt.figure(figsize=(14, 12))
+      gs = GridSpec(2, 2, figure=figDash, hspace=0.3, wspace=0.3)
+
+      ax1Dash = figDash.add_subplot(gs[0, 0])
+      ax1Dash.hist(tips['tip'], bins=20, color='#3498DB', edgecolor='white', alpha=0.8)
+      ax1Dash.set_title('팁 금액 분포', fontsize=12, fontweight='bold')
+      ax1Dash.set_xlabel('팁 ($)')
+      ax1Dash.set_ylabel('빈도')
+      ax1Dash.spines['top'].set_visible(False)
+      ax1Dash.spines['right'].set_visible(False)
+      figDash
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 4패널 대시보드의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 4패널 대시보드의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step9_advanced
+  title: 9단계. 고급 레이아웃
+  structuredPrimary: true
+  subtitle: 불균등 그리드
+  goal: 9단계. 고급 레이아웃에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: GridSpec으로 불균등한 크기의 셀을 만들 수 있습니다. 위쪽에 큰 차트, 아래쪽에 작은 차트 3개를 배치하는 등 다양한 레이아웃이 가능합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figAdvanced = plt.figure(figsize=(14, 10))
+    gs = GridSpec(2, 3, figure=figAdvanced, height_ratios=[2, 1], hspace=0.3, wspace=0.3)
+
+    axMain = figAdvanced.add_subplot(gs[0, :])
+    for time in ['Lunch', 'Dinner']:
+        subset = tips[tips['time'] == time]
+        axMain.scatter(subset['total_bill'], subset['tip'],
+                      c='#3498DB' if time == 'Lunch' else '#E74C3C',
+                      label=time, alpha=0.6, s=60)
+    axMain.set_title('결제금액과 팁의 관계', fontsize=14, fontweight='bold')
+    axMain.set_xlabel('결제금액 ($)', fontsize=12)
+    axMain.set_ylabel('팁 ($)', fontsize=12)
+    axMain.legend(fontsize=11)
+    axMain.grid(True, alpha=0.3)
+    figAdvanced
+  exercise:
+    prompt: 9단계. 고급 레이아웃 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figAdvanced = plt.figure(figsize=(14, 10))
+      gs = GridSpec(2, 3, figure=figAdvanced, height_ratios=[2, 1], hspace=0.3, wspace=0.3)
+
+      axMain = figAdvanced.add_subplot(gs[0, :])
+      for time in ['Lunch', 'Dinner']:
+          subset = tips[tips['time'] == time]
+          axMain.scatter(subset['total_bill'], subset['tip'],
+                        c='#3498DB' if time == 'Lunch' else '#E74C3C',
+                        label=time, alpha=0.6, s=60)
+      axMain.set_title('결제금액과 팁의 관계', fontsize=14, fontweight='bold')
+      axMain.set_xlabel('결제금액 ($)', fontsize=12)
+      axMain.set_ylabel('팁 ($)', fontsize=12)
+      axMain.legend(fontsize=11)
+      axMain.grid(True, alpha=0.3)
+      figAdvanced
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 고급 레이아웃의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 9단계. 고급 레이아웃 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step10_final
+  title: 10단계. 최종 대시보드
+  structuredPrimary: true
+  subtitle: 완성된 분석 리포트
+  goal: 10단계. 최종 대시보드에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 지금까지 배운 모든 요소를 종합하여 완성도 높은 분석 대시보드를 만듭니다. 일관된 스타일, 명확한 제목, 적절한 여백으로 전문적인 리포트를 완성합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figFinal = plt.figure(figsize=(16, 12))
+    gs = GridSpec(2, 3, figure=figFinal, height_ratios=[1.2, 1], hspace=0.35, wspace=0.3)
+    colorsPie = ['#E74C3C', '#27AE60', '#9B59B6', '#F39C12']
+
+    axFinal1 = figFinal.add_subplot(gs[0, 0:2])
+    for time in ['Lunch', 'Dinner']:
+        subset = tips[tips['time'] == time]
+        axFinal1.scatter(subset['total_bill'], subset['tip'],
+                        c='#3498DB' if time == 'Lunch' else '#E74C3C',
+                        label=time, alpha=0.6, s=70, edgecolors='white')
+    axFinal1.set_title('결제금액과 팁의 관계', fontsize=13, fontweight='bold')
+    axFinal1.set_xlabel('결제금액 ($)', fontsize=11)
+    axFinal1.set_ylabel('팁 ($)', fontsize=11)
+    axFinal1.legend(fontsize=10)
+    axFinal1.grid(True, alpha=0.3)
+    axFinal1.spines['top'].set_visible(False)
+    axFinal1.spines['right'].set_visible(False)
+    figFinal
+  exercise:
+    prompt: 10단계. 최종 대시보드 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figFinal = plt.figure(figsize=(16, 12))
+      gs = GridSpec(2, 3, figure=figFinal, height_ratios=[1.2, 1], hspace=0.35, wspace=0.3)
+      colorsPie = ['#E74C3C', '#27AE60', '#9B59B6', '#F39C12']
+
+      axFinal1 = figFinal.add_subplot(gs[0, 0:2])
+      for time in ['Lunch', 'Dinner']:
+          subset = tips[tips['time'] == time]
+          axFinal1.scatter(subset['total_bill'], subset['tip'],
+                          c='#3498DB' if time == 'Lunch' else '#E74C3C',
+                          label=time, alpha=0.6, s=70, edgecolors='white')
+      axFinal1.set_title('결제금액과 팁의 관계', fontsize=13, fontweight='bold')
+      axFinal1.set_xlabel('결제금액 ($)', fontsize=11)
+      axFinal1.set_ylabel('팁 ($)', fontsize=11)
+      axFinal1.legend(fontsize=10)
+      axFinal1.grid(True, alpha=0.3)
+      axFinal1.spines['top'].set_visible(False)
+      axFinal1.spines['right'].set_visible(False)
+      figFinal
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 최종 대시보드의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 10단계. 최종 대시보드 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 대시보드 프로젝트
+  goal: 실습에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    지금까지 배운 내용을 활용해서 다양한 데이터로 대시보드를 만들어봅시다. GridSpec, pie, style, tight_layout 등 모든 개념을 종합적으로 활용합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import matplotlib.pyplot as plt
+    from matplotlib.gridspec import GridSpec
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+
+    data = loadLocalDataset('penguins').dropna()
+
+    chart = plt.figure(figsize=(14, 10))
+    grid = GridSpec(2, 2, figure=chart, hspace=0.35, wspace=0.3)
+
+    kinds = data['species'].unique()
+    palette = ['#E74C3C', '#27AE60', '#3498DB']
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import matplotlib.pyplot as plt
+      from matplotlib.gridspec import GridSpec
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+
+      data = loadLocalDataset('penguins').dropna()
+
+      chart = plt.figure(figsize=(14, 10))
+      grid = GridSpec(2, 2, figure=chart, hspace=0.35, wspace=0.3)
+
+      kinds = data['species'].unique()
+      palette = ['#E74C3C', '#27AE60', '#3498DB']
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: GridSpec으로 다중 패널 대시보드를 만들었습니다.
+  - type: list
+    items:
+    - GridSpec(rows, cols) - 유연한 그리드 레이아웃 정의
+    - fig.add_subplot(gs[row, col]) - 그리드 위치에 Axes 추가
+    - gs[0:2, 0] - 슬라이싱으로 여러 셀 합치기
+    - height_ratios, width_ratios - 불균등 크기 설정
+    - ax.pie(values, autopct) - 파이 차트
+    - plt.style.use() - 스타일 시트 적용
+    - plt.tight_layout() - 자동 여백 조정
+  - type: text
+    content: 다음 시간에는 annotate와 LaTeX로 고급 주석 차트를 만듭니다.
+  goal: 정리에서 시각화할 데이터을 바꿨을 때 축/범례/파일 출력가 어떻게 달라지는지 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 보고서 차트 품질 게이트
+  goal: 업무 흐름 검증에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고,
+    제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import pandas as pd
+    import matplotlib.pyplot as plt
+
+    reportData = pd.DataFrame({
+        "month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+        "revenue": [82, 91, 105, 112, 121, 130],
+        "cost": [55, 58, 62, 64, 68, 72],
+        "target": [100, 100, 100, 100, 100, 100],
+    })
+
+    def validateChartFrame(frame: pd.DataFrame) -> bool:
+        requiredColumns = {"month", "revenue", "cost", "target"}
+        missingColumns = requiredColumns - set(frame.columns)
+        if missingColumns:
+            raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+        if frame[["revenue", "cost", "target"]].lt(0).any().any():
+            raise ValueError("금액 컬럼은 음수가 될 수 없습니다.")
+        return True
+
+    validateChartFrame(reportData)
+    reportData
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      targetScenario = pd.DataFrame({"target": [95, 100, 115]}).assign(
+          monthsPassed=lambda frame: frame["target"].map(lambda target: int((reportData["revenue"] >= target).sum()))
+      )
+
+      assert targetScenario["monthsPassed"].is_monotonic_decreasing
+      targetScenario
+    solution: |-
+      import pandas as pd
+      import matplotlib.pyplot as plt
+
+      reportData = pd.DataFrame({
+          "month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+          "revenue": [82, 91, 105, 112, 121, 130],
+          "cost": [55, 58, 62, 64, 68, 72],
+          "target": [100, 100, 100, 100, 100, 100],
+      })
+
+      def validateChartFrame(frame: pd.DataFrame) -> bool:
+          requiredColumns = {"month", "revenue", "cost", "target"}
+          missingColumns = requiredColumns - set(frame.columns)
+          if missingColumns:
+              raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+          if frame[["revenue", "cost", "target"]].lt(0).any().any():
+              raise ValueError("금액 컬럼은 음수가 될 수 없습니다.")
+          return True
+
+      validateChartFrame(reportData)
+      reportData
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 업무 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: matplotlib_08-multipanel-dashboard-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 다중 패널 dashboard 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 패널마다 다른 grain을 공통 필터와 연결했는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_multipanel_dashboard(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_multipanel_dashboard(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_multipanel_dashboard(rows):
+            required = ['period', 'metricValue', 'panel']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'panel'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['period'] for row in usable]
+            y_values = [row['metricValue'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.matplotlib.matplotlib_08.multipanel-dashboard-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.matplotlib.matplotlib_08.multipanel-dashboard-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_multipanel_dashboard
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - period: 1
+              metricValue: 10
+              panel: sales
+            - period: 1
+              metricValue: 2
+              panel: returns
+            - period: 2
+              metricValue: 12
+              panel: sales
+          expectedReturn:
+            usableCount: 3
+            excludedCount: 0
+            groupCounts:
+              returns: 1
+              sales: 2
+            xExtent:
+            - 1
+            - 2
+            yExtent:
+            - 2
+            - 12
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: matplotlib_08-multipanel-dashboard-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - matplotlib_08-multipanel-dashboard-data-evidence-mastery
+    title: 다중 패널 dashboard 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 운영 dashboard의 트래픽·지연·오류 패널을 동일 기간 필터로 연결한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_multipanel_dashboard(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_multipanel_dashboard(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_multipanel_dashboard(candidate):
+            expected = {'mark': 'small-multiples', 'x': 'period', 'y': 'metricValue', 'group': 'panel', 'transforms': ['shared-filter', 'shared-x'], 'interaction': 'linked-filter'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.matplotlib.matplotlib_08.multipanel-dashboard-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.matplotlib.matplotlib_08.multipanel-dashboard-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_multipanel_dashboard
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: small-multiples
+              x: period
+              y: metricValue
+              group: panel
+              transforms:
+              - shared-filter
+              - shared-x
+              interaction: linked-filter
+              description: 운영 dashboard의 트래픽·지연·오류 패널을 동일 기간 필터로 연결한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: small-multiples
+              x: period
+              y: metricValue
+              group: panel
+              transforms:
+              - shared-filter
+              - shared-x
+              interaction: linked-filter
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: metricValue
+              y: period
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - interaction
+            - description
+            encoding:
+              mark: small-multiples
+              x: period
+              y: metricValue
+              group: panel
+              transforms:
+              - shared-filter
+              - shared-x
+              interaction: linked-filter
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: matplotlib_08-multipanel-dashboard-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - matplotlib_08-multipanel-dashboard-encoding-transfer-transfer
+    title: 다중 패널 dashboard 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 패널마다 다른 grain을 공통 필터와 연결했는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_multipanel_dashboard(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_multipanel_dashboard(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_multipanel_dashboard(situation):
+            table = {'different-metrics': {'encoding': 'aligned small multiples', 'evidence': 'shared time domain', 'risk': 'misaligned periods'}, 'same-metric-groups': {'encoding': 'facets', 'evidence': 'shared scale', 'risk': 'free-scale comparison'}, 'dashboard-filter': {'encoding': 'linked filter', 'evidence': 'visible active scope', 'risk': 'hidden filter state'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.matplotlib.matplotlib_08.multipanel-dashboard-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.matplotlib.matplotlib_08.multipanel-dashboard-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_multipanel_dashboard
+        cases:
+        - id: recalls-different-metrics
+          arguments:
+          - value: different-metrics
+          expectedReturn:
+            encoding: aligned small multiples
+            evidence: shared time domain
+            risk: misaligned periods
+        - id: recalls-same-metric-groups
+          arguments:
+          - value: same-metric-groups
+          expectedReturn:
+            encoding: facets
+            evidence: shared scale
+            risk: free-scale comparison
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

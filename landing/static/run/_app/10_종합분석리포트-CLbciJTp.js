@@ -1,0 +1,958 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - numpy
+  - pandas
+  - seaborn
+  id: matplotlib_10
+  title: 종합분석리포트
+  order: 10
+  category: matplotlib
+  difficulty: ⭐⭐⭐⭐⭐
+  badge: 심화
+  tags:
+  - matplotlib
+  - savefig
+  - inset_axes
+  - Normalize
+  - comprehensive
+  - report
+  seo:
+    title: Matplotlib 종합 분석 리포트 - 모든 개념 총정리
+    description: Matplotlib의 모든 개념을 종합하여 6패널 분석 리포트를 만듭니다. savefig, inset_axes, Normalize 등 고급 기법을 마스터합니다.
+    keywords:
+    - matplotlib
+    - savefig
+    - inset_axes
+    - Normalize
+    - 분석리포트
+    - 대시보드
+intro:
+  emoji: 📊
+  goal: 6개 패널로 구성된 종합 분석 리포트를 만듭니다.
+  description: 지금까지 배운 모든 개념(plot, scatter, bar, hist, boxplot, violin, pie, imshow, errorbar, fill_between,
+    twinx, GridSpec, annotate, LaTeX, bbox, colormap 등)을 종합합니다. inset_axes로 인셋 차트를 추가하고, savefig로 고품질
+    이미지로 저장하는 방법도 배웁니다.
+  direction: 종합분석리포트에서 분석 데이터를 차트로 만들고 축, 범례, 저장 결과를 검증합니다.
+  benefits:
+  - 시각화할 데이터 확인 후 차트 구성에 맞는 코드 입력을 고릅니다.
+  - 종합분석리포트 결과를 축/범례/파일 출력 기준으로 즉시 점검합니다.
+  - 완료한 코드를 보고서 차트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(시각화할 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 11단계. 한글 폰트 설정 처리 실행
+      detail: 차트 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 2단계. 데이터 로드 결과 검증
+      detail: 축/범례/파일 출력 기준으로 실행 결과를 비교합니다.
+    - label: 종합분석리포트 재사용
+      detail: 완성 코드를 보고서 차트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 시각 리포트 환경
+      detail: matplotlib, numpy, pandas, seaborn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 종합분석리포트 실행
+      detail: 셀을 실행해 축/범례/파일 출력와 예외 상태를 확인합니다.
+    - label: 종합분석리포트 완료
+      detail: 검증된 코드를 보고서 차트로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: |-
+    모든 개념을 활용한 종합 분석 리포트를 만듭니다. gapminder와 tips 데이터를 사용하여 다양한 관점에서 데이터를 분석합니다. inset_axes와 Normalize 등 새로운 개념도 배웁니다.
+
+    종합 분석에는 다양한 matplotlib 서브모듈이 필요합니다. GridSpec은 레이아웃, inset_axes는 인셋 차트, Normalize와 cm은 컬러맵 설정에 사용됩니다.
+  snippet: |-
+    import matplotlib.pyplot as plt
+    from matplotlib.gridspec import GridSpec
+    from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+    from matplotlib.colors import Normalize
+    import matplotlib.cm as cm
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+    import numpy as np
+    import pandas as pd
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import matplotlib.pyplot as plt
+      from matplotlib.gridspec import GridSpec
+      from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+      from matplotlib.colors import Normalize
+      import matplotlib.cm as cm
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import numpy as np
+      import pandas as pd
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 라이브러리 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 축/범례/파일 출력 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step1_font
+  title: 1-1단계. 한글 폰트 설정
+  structuredPrimary: true
+  subtitle: Codaro 로컬 Python 환경 폰트
+  goal: 11단계. 한글 폰트 설정에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    Codaro 로컬 Python에서는 실행 환경에 따라 기본 폰트에 한글 글리프가 없을 수 있습니다. CDN 또는 로컬 폰트 파일을 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
+
+    font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
+  tips:
+  - font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스
+    기호가 깨지는 것을 방지합니다.
+  snippet: |-
+    from matplotlib import font_manager
+
+    fontCandidates = ["Malgun Gothic", "AppleGothic", "NanumGothic", "DejaVu Sans"]
+    availableFonts = {font.name for font in font_manager.fontManager.ttflist}
+    for fontName in fontCandidates:
+        if fontName in availableFonts:
+            plt.rcParams["font.family"] = fontName
+            break
+    plt.rcParams["axes.unicode_minus"] = False
+  exercise:
+    prompt: 11단계. 한글 폰트 설정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      from matplotlib import font_manager
+
+      fontCandidates = ["Malgun Gothic", "AppleGothic", "NanumGothic", "DejaVu Sans"]
+      availableFonts = {font.name for font in font_manager.fontManager.ttflist}
+      for fontName in fontCandidates:
+          if fontName in availableFonts:
+              plt.rcParams["font.family"] = fontName
+              break
+      plt.rcParams["axes.unicode_minus"] = False
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 한글 폰트 설정의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 11단계. 한글 폰트 설정 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step2_data
+  title: 2단계. 데이터 로드
+  structuredPrimary: true
+  subtitle: gapminder + tips
+  goal: 2단계. 데이터 로드에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: gapminder 데이터로 국가별 경제/인구 분석을, tips 데이터로 서비스업 분석을 수행합니다. 두 데이터셋을 조합하여 다양한 인사이트를 도출합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    gapminder = loadLocalDataset("gapminder")
+    tips = loadLocalDataset("tips")
+
+    gapminder2007 = gapminder[gapminder['year'] == 2007].copy()
+
+    gapminder2007.head()
+  exercise:
+    prompt: 2단계. 데이터 로드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      gapminder = loadLocalDataset("gapminder")
+      tips = loadLocalDataset("tips")
+
+      gapminder2007 = gapminder[gapminder['year'] == 2007].copy()
+
+      gapminder2007.head()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 로드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 로드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_inset_axes
+  title: 3단계. 인셋 차트
+  structuredPrimary: true
+  subtitle: inset_axes
+  goal: 3단계. 인셋 차트에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    inset_axes는 기존 Axes 안에 작은 차트를 삽입합니다. 메인 차트의 특정 부분을 확대하거나, 보조 정보를 표시할 때 유용합니다. 위치와 크기를 자유롭게 조절할 수 있습니다.
+
+    inset_axes(ax, width, height, loc)로 인셋 차트를 만듭니다. width/height는 퍼센트('30%') 또는 고정값(1.5)으로 지정합니다. loc은 'upper left', 'lower right' 등 위치입니다. borderpad로 부모 Axes와의 간격을 조절합니다.
+  tips:
+  - inset_axes(ax, width, height, loc)로 인셋 차트를 만듭니다. width/height는 퍼센트('30%') 또는 고정값(1.5)으로 지정합니다. loc은
+    'upper left', 'lower right' 등 위치입니다. borderpad로 부모 Axes와의 간격을 조절합니다.
+  snippet: |-
+    figInset, axInset = plt.subplots(figsize=(12, 7))
+
+    continentColors = {'Asia': '#E74C3C', 'Europe': '#3498DB', 'Africa': '#27AE60',
+                      'Americas': '#9B59B6', 'Oceania': '#F39C12'}
+
+    for continent in continentColors:
+        subset = gapminder2007[gapminder2007['continent'] == continent]
+        axInset.scatter(subset['gdpPercap'], subset['lifeExp'],
+                       s=subset['pop']/1e6, c=continentColors[continent],
+                       alpha=0.6, label=continent, edgecolors='white')
+
+    axInset.set_xlabel('1인당 GDP ($)', fontsize=11)
+    axInset.set_ylabel('기대수명 (세)', fontsize=11)
+    axInset.set_title('국가별 경제수준과 기대수명 (2007)', fontsize=14, fontweight='bold')
+    axInset.legend(loc='lower right')
+    axInset.set_xlim(0, 50000)
+    figInset
+  exercise:
+    prompt: 3단계. 인셋 차트 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figInset, axInset = plt.subplots(figsize=(12, 7))
+
+      continentColors = {'Asia': '#E74C3C', 'Europe': '#3498DB', 'Africa': '#27AE60',
+                        'Americas': '#9B59B6', 'Oceania': '#F39C12'}
+
+      for continent in continentColors:
+          subset = gapminder2007[gapminder2007['continent'] == continent]
+          axInset.scatter(subset['gdpPercap'], subset['lifeExp'],
+                         s=subset['pop']/1e6, c=continentColors[continent],
+                         alpha=0.6, label=continent, edgecolors='white')
+
+      axInset.set_xlabel('1인당 GDP ($)', fontsize=11)
+      axInset.set_ylabel('기대수명 (세)', fontsize=11)
+      axInset.set_title('국가별 경제수준과 기대수명 (2007)', fontsize=14, fontweight='bold')
+      axInset.legend(loc='lower right')
+      axInset.set_xlim(0, 50000)
+      figInset
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 인셋 차트의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 3단계. 인셋 차트 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step4_normalize
+  title: 4단계. 색상 정규화
+  structuredPrimary: true
+  subtitle: Normalize
+  goal: 4단계. 색상 정규화에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    Normalize는 데이터 값을 0~1 범위로 변환하여 컬러맵에 매핑합니다. 연속적인 값에 따라 색상이 변하는 차트를 만들 때 사용합니다. 로그 스케일에는 LogNorm을 사용합니다.
+
+    Normalize(vmin, vmax)로 데이터 범위를 0~1로 매핑합니다. scatter의 c 파라미터에 연속값을 전달하고, cmap과 norm을 함께 사용합니다. LogNorm은 로그 스케일 데이터에 적합합니다. BoundaryNorm은 구간별 색상 매핑에 사용합니다.
+  tips:
+  - Normalize(vmin, vmax)로 데이터 범위를 0~1로 매핑합니다. scatter의 c 파라미터에 연속값을 전달하고, cmap과 norm을 함께 사용합니다. LogNorm은
+    로그 스케일 데이터에 적합합니다. BoundaryNorm은 구간별 색상 매핑에 사용합니다.
+  snippet: |-
+    figNorm, axNorm = plt.subplots(figsize=(12, 7))
+
+    norm = Normalize(vmin=gapminder2007['lifeExp'].min(),
+                    vmax=gapminder2007['lifeExp'].max())
+    cmap = cm.RdYlGn
+
+    scatter = axNorm.scatter(gapminder2007['gdpPercap'], gapminder2007['pop']/1e6,
+                            s=100, c=gapminder2007['lifeExp'],
+                            cmap=cmap, norm=norm, alpha=0.7, edgecolors='white')
+
+    cbar = plt.colorbar(scatter, ax=axNorm)
+    cbar.set_label('기대수명 (세)', fontsize=11)
+
+    axNorm.set_xlabel('1인당 GDP ($)', fontsize=11)
+    axNorm.set_ylabel('인구 (백만 명)', fontsize=11)
+    axNorm.set_title('GDP, 인구, 기대수명의 관계', fontsize=14, fontweight='bold')
+    axNorm.set_xscale('log')
+    axNorm.set_yscale('log')
+
+    figNorm
+  exercise:
+    prompt: 4단계. 색상 정규화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figNorm, axNorm = plt.subplots(figsize=(12, 7))
+
+      norm = Normalize(vmin=gapminder2007['lifeExp'].min(),
+                      vmax=gapminder2007['lifeExp'].max())
+      cmap = cm.RdYlGn
+
+      scatter = axNorm.scatter(gapminder2007['gdpPercap'], gapminder2007['pop']/1e6,
+                              s=100, c=gapminder2007['lifeExp'],
+                              cmap=cmap, norm=norm, alpha=0.7, edgecolors='white')
+
+      cbar = plt.colorbar(scatter, ax=axNorm)
+      cbar.set_label('기대수명 (세)', fontsize=11)
+
+      axNorm.set_xlabel('1인당 GDP ($)', fontsize=11)
+      axNorm.set_ylabel('인구 (백만 명)', fontsize=11)
+      axNorm.set_title('GDP, 인구, 기대수명의 관계', fontsize=14, fontweight='bold')
+      axNorm.set_xscale('log')
+      axNorm.set_yscale('log')
+
+      figNorm
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 색상 정규화의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 색상 정규화의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step5_multi_panel
+  title: 5단계. 6패널 레이아웃
+  structuredPrimary: true
+  subtitle: GridSpec 복잡 레이아웃
+  goal: 5단계. 6패널 레이아웃에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: GridSpec으로 6개 패널을 배치합니다. 상단에 큰 메인 차트, 하단에 작은 보조 차트들을 배치하는 비대칭 레이아웃을 구성합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figLayout = plt.figure(figsize=(18, 12))
+    gs = GridSpec(3, 4, figure=figLayout, height_ratios=[1.5, 1, 1],
+                 hspace=0.35, wspace=0.3)
+
+    axMain = figLayout.add_subplot(gs[0, :3])
+    axSide = figLayout.add_subplot(gs[0, 3])
+    axBot1 = figLayout.add_subplot(gs[1, 0:2])
+    axBot2 = figLayout.add_subplot(gs[1, 2:4])
+    axBot3 = figLayout.add_subplot(gs[2, 0:2])
+    axBot4 = figLayout.add_subplot(gs[2, 2:4])
+
+    for ax, title in zip([axMain, axSide, axBot1, axBot2, axBot3, axBot4],
+                         ['메인', '사이드', '하단1', '하단2', '하단3', '하단4']):
+        ax.set_title(title, fontsize=12)
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+
+    figLayout.suptitle('6패널 분석 리포트 레이아웃', fontsize=16, fontweight='bold')
+    figLayout
+  exercise:
+    prompt: 5단계. 6패널 레이아웃 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figLayout = plt.figure(figsize=(18, 12))
+      gs = GridSpec(3, 4, figure=figLayout, height_ratios=[1.5, 1, 1],
+                   hspace=0.35, wspace=0.3)
+
+      axMain = figLayout.add_subplot(gs[0, :3])
+      axSide = figLayout.add_subplot(gs[0, 3])
+      axBot1 = figLayout.add_subplot(gs[1, 0:2])
+      axBot2 = figLayout.add_subplot(gs[1, 2:4])
+      axBot3 = figLayout.add_subplot(gs[2, 0:2])
+      axBot4 = figLayout.add_subplot(gs[2, 2:4])
+
+      for ax, title in zip([axMain, axSide, axBot1, axBot2, axBot3, axBot4],
+                           ['메인', '사이드', '하단1', '하단2', '하단3', '하단4']):
+          ax.set_title(title, fontsize=12)
+          ax.spines['top'].set_visible(False)
+          ax.spines['right'].set_visible(False)
+
+      figLayout.suptitle('6패널 분석 리포트 레이아웃', fontsize=16, fontweight='bold')
+      figLayout
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 6패널 레이아웃의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 5단계. 6패널 레이아웃 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step6_main_chart
+  title: 6단계. 메인 차트
+  structuredPrimary: true
+  subtitle: 시계열 + 이벤트
+  goal: 6단계. 메인 차트에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 메인 차트에 시계열 데이터와 중요 이벤트를 표시합니다. fill_between으로 영역을 강조하고, annotate로 주요 포인트를 설명합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    years = gapminder[gapminder['country'] == 'Korea, Rep.']['year'].values
+    koreaGdp = gapminder[gapminder['country'] == 'Korea, Rep.']['gdpPercap'].values
+    koreaLife = gapminder[gapminder['country'] == 'Korea, Rep.']['lifeExp'].values
+
+    figMain, axMain = plt.subplots(figsize=(14, 6))
+    axMain.fill_between(years, koreaGdp, alpha=0.3, color='#3498DB')
+    axMain.plot(years, koreaGdp, 'o-', color='#2C3E50', linewidth=2, markersize=8, label='1인당 GDP')
+    axMain.set_ylabel('1인당 GDP ($)', fontsize=11, color='#3498DB')
+    axMain.tick_params(axis='y', labelcolor='#3498DB')
+    figMain
+  exercise:
+    prompt: 6단계. 메인 차트 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      years = gapminder[gapminder['country'] == 'Korea, Rep.']['year'].values
+      koreaGdp = gapminder[gapminder['country'] == 'Korea, Rep.']['gdpPercap'].values
+      koreaLife = gapminder[gapminder['country'] == 'Korea, Rep.']['lifeExp'].values
+
+      figMain, axMain = plt.subplots(figsize=(14, 6))
+      axMain.fill_between(years, koreaGdp, alpha=0.3, color='#3498DB')
+      axMain.plot(years, koreaGdp, 'o-', color='#2C3E50', linewidth=2, markersize=8, label='1인당 GDP')
+      axMain.set_ylabel('1인당 GDP ($)', fontsize=11, color='#3498DB')
+      axMain.tick_params(axis='y', labelcolor='#3498DB')
+      figMain
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 메인 차트의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 메인 차트의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step7_side_chart
+  title: 7단계. 사이드 차트
+  structuredPrimary: true
+  subtitle: 파이 + 통계
+  goal: 7단계. 사이드 차트에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 사이드 패널에 비율을 보여주는 파이 차트와 LaTeX로 표현된 통계 정보를 추가합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figSide, (axPie, axStats) = plt.subplots(2, 1, figsize=(6, 10))
+
+    continentPop = gapminder2007.groupby('continent')['pop'].sum()
+    colors = ['#E74C3C', '#3498DB', '#27AE60', '#9B59B6', '#F39C12']
+    explode = (0, 0, 0.05, 0, 0)
+
+    axPie.pie(continentPop, labels=continentPop.index, autopct='%1.1f%%',
+             colors=colors, explode=explode, shadow=True, startangle=90)
+    axPie.set_title('대륙별 인구 비율 (2007)', fontsize=12, fontweight='bold')
+    figSide
+  exercise:
+    prompt: 7단계. 사이드 차트 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figSide, (axPie, axStats) = plt.subplots(2, 1, figsize=(6, 10))
+
+      continentPop = gapminder2007.groupby('continent')['pop'].sum()
+      colors = ['#E74C3C', '#3498DB', '#27AE60', '#9B59B6', '#F39C12']
+      explode = (0, 0, 0.05, 0, 0)
+
+      axPie.pie(continentPop, labels=continentPop.index, autopct='%1.1f%%',
+               colors=colors, explode=explode, shadow=True, startangle=90)
+      axPie.set_title('대륙별 인구 비율 (2007)', fontsize=12, fontweight='bold')
+      figSide
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 사이드 차트의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 사이드 차트의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step8_bottom_charts
+  title: 8단계. 하단 차트들
+  structuredPrimary: true
+  subtitle: 히스토그램, 박스플롯, 히트맵
+  goal: 8단계. 하단 차트들에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 하단 패널에 다양한 차트 유형을 배치합니다. 히스토그램으로 분포를, 박스플롯으로 그룹별 비교를, 히트맵으로 상관관계를 시각화합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figBottom, axes = plt.subplots(2, 2, figsize=(14, 10))
+    axHist, axBox, axHeat, axError = axes.flatten()
+  exercise:
+    prompt: 8단계. 하단 차트들 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figBottom, axes = plt.subplots(2, 2, figsize=(14, 10))
+      axHist, axBox, axHeat, axError = axes.flatten()
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 하단 차트들의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 하단 차트들 실행 결과가 축/범례/파일 출력 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step9_savefig
+  title: 9단계. 이미지 저장
+  structuredPrimary: true
+  subtitle: savefig
+  goal: 9단계. 이미지 저장에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    savefig로 차트를 이미지 파일로 저장합니다. dpi로 해상도를, bbox_inches로 여백을, transparent로 배경 투명도를 설정합니다. 논문이나 보고서용 고품질 이미지를 생성할 수 있습니다.
+
+    fig.savefig('파일명.png', dpi=300, bbox_inches='tight')로 저장합니다. dpi는 해상도(논문용 300, 웹용 72-150). bbox_inches='tight'는 여백을 자동 조절합니다. format='pdf', 'svg', 'eps' 등 다양한 형식을 지원합니다. facecolor와 transparent로 배경을 설정합니다.
+  tips:
+  - fig.savefig('파일명.png', dpi=300, bbox_inches='tight')로 저장합니다. dpi는 해상도(논문용 300, 웹용 72-150). bbox_inches='tight'는
+    여백을 자동 조절합니다. format='pdf', 'svg', 'eps' 등 다양한 형식을 지원합니다. facecolor와 transparent로 배경을 설정합니다.
+  snippet: |-
+    figSave, axSave = plt.subplots(figsize=(10, 6))
+
+    axSave.bar(['A', 'B', 'C', 'D'], [25, 40, 30, 55],
+              color=['#E74C3C', '#3498DB', '#27AE60', '#9B59B6'])
+    axSave.set_title('저장 테스트 차트', fontsize=14, fontweight='bold')
+    axSave.spines['top'].set_visible(False)
+    axSave.spines['right'].set_visible(False)
+
+    figSave
+  exercise:
+    prompt: 9단계. 이미지 저장 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figSave, axSave = plt.subplots(figsize=(10, 6))
+
+      axSave.bar(['A', 'B', 'C', 'D'], [25, 40, 30, 55],
+                color=['#E74C3C', '#3498DB', '#27AE60', '#9B59B6'])
+      axSave.set_title('저장 테스트 차트', fontsize=14, fontweight='bold')
+      axSave.spines['top'].set_visible(False)
+      axSave.spines['right'].set_visible(False)
+
+      figSave
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 이미지 저장의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 이미지 저장의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step10_final
+  title: 10단계. 최종 리포트
+  structuredPrimary: true
+  subtitle: 모든 개념 종합
+  goal: 10단계. 최종 리포트에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 지금까지 배운 모든 개념을 종합하여 완성도 높은 6패널 분석 리포트를 만듭니다. 각 패널은 서로 다른 인사이트를 제공하며, 전체적으로 일관된 스타일을 유지합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figReport = plt.figure(figsize=(20, 14))
+    gs = GridSpec(3, 4, figure=figReport, height_ratios=[1.3, 1, 1],
+                 hspace=0.4, wspace=0.35)
+  exercise:
+    prompt: 10단계. 최종 리포트 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figReport = plt.figure(figsize=(20, 14))
+      gs = GridSpec(3, 4, figure=figReport, height_ratios=[1.3, 1, 1],
+                   hspace=0.4, wspace=0.35)
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 최종 리포트의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 최종 리포트의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 종합 프로젝트
+  goal: 실습에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    지금까지 배운 모든 개념을 활용해서 나만의 종합 분석 리포트를 만들어봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import matplotlib.pyplot as plt
+    from matplotlib.gridspec import GridSpec
+    from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+    import numpy as np
+
+    data = loadLocalDataset('penguins').dropna()
+
+    chart = plt.figure(figsize=(16, 12))
+    grid = GridSpec(2, 3, figure=chart, hspace=0.35, wspace=0.3)
+
+    palette = {'Adelie': '#E74C3C', 'Chinstrap': '#27AE60', 'Gentoo': '#3498DB'}
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import matplotlib.pyplot as plt
+      from matplotlib.gridspec import GridSpec
+      from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import numpy as np
+
+      data = loadLocalDataset('penguins').dropna()
+
+      chart = plt.figure(figsize=(16, 12))
+      grid = GridSpec(2, 3, figure=chart, hspace=0.35, wspace=0.3)
+
+      palette = {'Adelie': '#E74C3C', 'Chinstrap': '#27AE60', 'Gentoo': '#3498DB'}
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Matplotlib의 모든 개념을 종합하여 6패널 분석 리포트를 만들었습니다.
+  - type: list
+    items:
+    - inset_axes(ax, width, height, loc) - 인셋 차트 추가
+    - Normalize(vmin, vmax) - 연속값을 0~1로 정규화
+    - GridSpec으로 복잡한 비대칭 레이아웃 구성
+    - 여러 차트 유형 조합 (scatter, bar, hist, box, violin, pie, heatmap)
+    - annotate, LaTeX, bbox로 전문적인 주석 추가
+    - errorbar로 불확실성 표현
+    - fill_between으로 영역 강조
+    - twinx로 이중 축 차트 생성
+    - fig.savefig(path, dpi, bbox_inches) - 고품질 이미지 저장
+  - type: text
+    content: Matplotlib 커리큘럼을 완료했습니다. 이제 논문, 보고서, 프레젠테이션에 사용할 수 있는 전문적인 시각화를 만들 수 있습니다.
+  goal: 정리에서 시각화할 데이터을 바꿨을 때 축/범례/파일 출력가 어떻게 달라지는지 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 보고서 차트 품질 게이트
+  goal: 업무 흐름 검증에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고,
+    제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import pandas as pd
+    import matplotlib.pyplot as plt
+
+    reportData = pd.DataFrame({
+        "month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+        "revenue": [82, 91, 105, 112, 121, 130],
+        "cost": [55, 58, 62, 64, 68, 72],
+        "target": [100, 100, 100, 100, 100, 100],
+    })
+
+    def validateChartFrame(frame: pd.DataFrame) -> bool:
+        requiredColumns = {"month", "revenue", "cost", "target"}
+        missingColumns = requiredColumns - set(frame.columns)
+        if missingColumns:
+            raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+        if frame[["revenue", "cost", "target"]].lt(0).any().any():
+            raise ValueError("금액 컬럼은 음수가 될 수 없습니다.")
+        return True
+
+    validateChartFrame(reportData)
+    reportData
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      targetScenario = pd.DataFrame({"target": [95, 100, 115]}).assign(
+          monthsPassed=lambda frame: frame["target"].map(lambda target: int((reportData["revenue"] >= target).sum()))
+      )
+
+      assert targetScenario["monthsPassed"].is_monotonic_decreasing
+      targetScenario
+    solution: |-
+      import pandas as pd
+      import matplotlib.pyplot as plt
+
+      reportData = pd.DataFrame({
+          "month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+          "revenue": [82, 91, 105, 112, 121, 130],
+          "cost": [55, 58, 62, 64, 68, 72],
+          "target": [100, 100, 100, 100, 100, 100],
+      })
+
+      def validateChartFrame(frame: pd.DataFrame) -> bool:
+          requiredColumns = {"month", "revenue", "cost", "target"}
+          missingColumns = requiredColumns - set(frame.columns)
+          if missingColumns:
+              raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+          if frame[["revenue", "cost", "target"]].lt(0).any().any():
+              raise ValueError("금액 컬럼은 음수가 될 수 없습니다.")
+          return True
+
+      validateChartFrame(reportData)
+      reportData
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 업무 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: matplotlib_10-analysis-report-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 종합 분석 report 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 질문·분모·차트·결론이 같은 증거 사슬을 이루는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_analysis_report(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_analysis_report(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_analysis_report(rows):
+            required = ['segment', 'metric', 'evidenceType']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'evidenceType'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['segment'] for row in usable]
+            y_values = [row['metric'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.matplotlib.matplotlib_10.analysis-report-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.matplotlib.matplotlib_10.analysis-report-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_analysis_report
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - segment: A
+              metric: 10
+              evidenceType: observed
+            - segment: B
+              metric: 15
+              evidenceType: observed
+            - segment: C
+              metric: null
+              evidenceType: missing
+          expectedReturn:
+            usableCount: 2
+            excludedCount: 1
+            groupCounts:
+              observed: 2
+            xExtent:
+            - A
+            - B
+            yExtent:
+            - 10
+            - 15
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: matplotlib_10-analysis-report-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - matplotlib_10-analysis-report-data-evidence-mastery
+    title: 종합 분석 report 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 분기 성과 report에 데이터 품질, 비교 차트, 한계 문장을 함께 배치한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_analysis_report(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_analysis_report(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_analysis_report(candidate):
+            expected = {'mark': 'report-panels', 'x': 'segment', 'y': 'metric', 'group': 'evidenceType', 'transforms': ['aggregate', 'annotate', 'quality-gate'], 'interaction': 'none'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.matplotlib.matplotlib_10.analysis-report-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.matplotlib.matplotlib_10.analysis-report-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_analysis_report
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: report-panels
+              x: segment
+              y: metric
+              group: evidenceType
+              transforms:
+              - aggregate
+              - annotate
+              - quality-gate
+              interaction: none
+              description: 분기 성과 report에 데이터 품질, 비교 차트, 한계 문장을 함께 배치한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: report-panels
+              x: segment
+              y: metric
+              group: evidenceType
+              transforms:
+              - aggregate
+              - annotate
+              - quality-gate
+              interaction: none
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: metric
+              y: segment
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - description
+            encoding:
+              mark: report-panels
+              x: segment
+              y: metric
+              group: evidenceType
+              transforms:
+              - aggregate
+              - annotate
+              - quality-gate
+              interaction: none
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: matplotlib_10-analysis-report-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - matplotlib_10-analysis-report-encoding-transfer-transfer
+    title: 종합 분석 report 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 질문·분모·차트·결론이 같은 증거 사슬을 이루는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_analysis_report(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_analysis_report(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_analysis_report(situation):
+            table = {'executive-comparison': {'encoding': 'ranked bars plus context', 'evidence': 'metric contract', 'risk': 'missing denominator'}, 'trend-explanation': {'encoding': 'line plus sourced annotations', 'evidence': 'time range and events', 'risk': 'causal overclaim'}, 'release-report': {'encoding': 'reproducible panels', 'evidence': 'input hash and exclusions', 'risk': 'manual drift'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.matplotlib.matplotlib_10.analysis-report-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.matplotlib.matplotlib_10.analysis-report-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_analysis_report
+        cases:
+        - id: recalls-executive-comparison
+          arguments:
+          - value: executive-comparison
+          expectedReturn:
+            encoding: ranked bars plus context
+            evidence: metric contract
+            risk: missing denominator
+        - id: recalls-trend-explanation
+          arguments:
+          - value: trend-explanation
+          expectedReturn:
+            encoding: line plus sourced annotations
+            evidence: time range and events
+            risk: causal overclaim
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

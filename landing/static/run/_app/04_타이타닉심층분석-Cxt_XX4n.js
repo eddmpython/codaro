@@ -1,0 +1,940 @@
+var e=`meta:
+  packages:
+  - duckdb
+  - pandas
+  id: duckdb_04
+  title: 타이타닉심층분석
+  order: 4
+  category: duckdb
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - titanic
+  - HAVING
+  - 'NULL'
+  - GROUP BY
+  - 집계
+  seo:
+    title: DuckDB HAVING과 NULL 처리 - 타이타닉 심층 분석
+    description: 타이타닉 데이터로 복합 조건 집계와 필터링을 학습합니다. HAVING, IS NULL, IS NOT NULL 사용법을 배웁니다.
+    keywords:
+    - DuckDB
+    - HAVING
+    - IS NULL
+    - GROUP BY
+    - 타이타닉
+    - SQL 집계
+intro:
+  emoji: 🚢
+  goal: 타이타닉 승객 데이터로 복합 조건 집계와 NULL 처리를 마스터합니다.
+  description: GROUP BY로 그룹화한 결과를 HAVING으로 필터링하고, NULL 값을 올바르게 처리하는 방법을 배웁니다.
+  direction: 타이타닉심층분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 테이블과 SQL 쿼리 확인 후 SELECT/WHERE/GROUP BY/CTE에 맞는 코드 입력을 고릅니다.
+  - 타이타닉심층분석 결과를 쿼리 결과 행, 컬럼, 집계값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 로컬 분석 SQL 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(테이블과 SQL 쿼리)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. NULL 값 확인 처리 실행
+      detail: SELECT/WHERE/GROUP BY/CTE 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. IS NULL로 필터 결과 검증
+      detail: 쿼리 결과 행, 컬럼, 집계값 기준으로 실행 결과를 비교합니다.
+    - label: 타이타닉심층분석 재사용
+      detail: 완성 코드를 로컬 분석 SQL 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: SQL 분석 환경
+      detail: duckdb, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 타이타닉심층분석 실행
+      detail: 셀을 실행해 쿼리 결과 행, 컬럼, 집계값와 예외 상태를 확인합니다.
+    - label: 타이타닉심층분석 완료
+      detail: 검증된 코드를 로컬 분석 SQL 리포트로 남깁니다.
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  structuredPrimary: true
+  subtitle: 타이타닉 데이터 준비
+  goal: 1단계. 데이터 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: 180명의 로컬 타이타닉 승객 샘플을 불러옵니다. 이번 프로젝트에서는 HAVING과 NULL 처리라는 두 가지 핵심 개념을 배웁니다. HAVING은 GROUP
+    BY 결과를 필터링할 때 사용하고, NULL 처리는 실무 데이터에서 필수적인 결측값 처리 기법입니다. survived, pclass, sex, age, fare 등의 컬럼을 활용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import pandas as pd
+    from codaro.curriculum.localData import loadLocalDataset
+    import duckdb
+
+    df = loadLocalDataset("titanic")
+    titanic = duckdb.from_df(df)
+  exercise:
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+      import duckdb
+
+      df = loadLocalDataset("titanic")
+      titanic = duckdb.from_df(df)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 1단계. 데이터 불러오기의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 1단계. 데이터 불러오기 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step2_null_check
+  title: 2단계. NULL 값 확인
+  structuredPrimary: true
+  subtitle: 결측값 탐색
+  goal: 2단계. NULL 값 확인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: age 컬럼에 NULL 값이 있는지 확인합니다. 실제 데이터에서 결측값(NULL)은 매우 흔하며, 데이터 품질을 평가하는 첫 번째 단계입니다. COUNT(*)는
+    모든 행을 세고, COUNT(age)는 NULL을 제외한 행만 셉니다. 로컬 titanic 샘플에서는 age가 모두 채워져 있어 두 값이 같습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            COUNT(*) AS totalCount,
+            COUNT(age) AS ageNotNull,
+            COUNT(*) - COUNT(age) AS ageNull
+        FROM titanic
+    """).show()
+  exercise:
+    prompt: 2단계. NULL 값 확인 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              COUNT(*) AS totalCount,
+              COUNT(age) AS ageNotNull,
+              COUNT(*) - COUNT(age) AS ageNull
+          FROM titanic
+      """).show()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 2단계. NULL 값 확인의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 2단계. NULL 값 확인 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step3_is_null
+  title: 3단계. IS NULL로 필터링
+  structuredPrimary: true
+  subtitle: NULL 값만 선택
+  goal: 3단계. IS NULL로 필터링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: |-
+    IS NULL로 age가 없는 승객만 조회합니다. 로컬 titanic 샘플에서는 age 결측이 없어 결과가 비어 있을 수 있습니다. =로는 NULL을 비교할 수 없습니다. NULL은 '알 수 없는 값'이므로 age = NULL은 항상 FALSE를 반환합니다. 반드시 IS NULL 구문을 사용해야 합니다.
+
+    NULL은 '알 수 없음'을 의미합니다. age = NULL은 동작하지 않습니다. 반드시 IS NULL 또는 IS NOT NULL을 사용하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT pclass, sex, fare, embarked
+        FROM titanic
+        WHERE age IS NULL
+        LIMIT 10
+    """).show()
+  exercise:
+    prompt: 3단계. IS NULL로 필터링 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT pclass, sex, fare, embarked
+          FROM titanic
+          WHERE age IS NULL
+          LIMIT 10
+      """).show()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 3단계. IS NULL로 필터링의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 3단계. IS NULL로 필터링 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step4_is_not_null
+  title: 4단계. IS NOT NULL로 필터링
+  structuredPrimary: true
+  subtitle: NULL 제외
+  goal: 4단계. IS NOT NULL로 필터링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: IS NOT NULL로 age가 있는 승객만 조회합니다. 분석에서 결측값을 제외할 때 사용합니다. 평균, 최댓값 같은 통계 분석에서는 NULL을 제거하지 않으면
+    왜곡된 결과가 나올 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT pclass, sex, age, fare
+        FROM titanic
+        WHERE age IS NOT NULL
+        ORDER BY age
+        LIMIT 10
+    """).show()
+  exercise:
+    prompt: 4단계. IS NOT NULL로 필터링 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT pclass, sex, age, fare
+          FROM titanic
+          WHERE age IS NOT NULL
+          ORDER BY age
+          LIMIT 10
+      """).show()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 4단계. IS NOT NULL로 필터링의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 4단계. IS NOT NULL로 필터링 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step5_group_avg
+  title: 5단계. 그룹별 평균 계산
+  structuredPrimary: true
+  subtitle: GROUP BY와 AVG
+  goal: 5단계. 그룹별 평균 계산에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: 객실 등급(pclass)별 평균 나이와 평균 요금을 계산합니다. GROUP BY pclass로 등급별로 묶은 후 AVG 함수로 평균을 구합니다. WHERE
+    age IS NOT NULL로 나이 정보가 있는 승객만 포함시켜 정확한 통계를 얻습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            pclass,
+            COUNT(*) AS passengerCount,
+            ROUND(AVG(age), 1) AS avgAge,
+            ROUND(AVG(fare), 2) AS avgFare
+        FROM titanic
+        WHERE age IS NOT NULL
+        GROUP BY pclass
+        ORDER BY pclass
+    """).show()
+  exercise:
+    prompt: 5단계. 그룹별 평균 계산 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              pclass,
+              COUNT(*) AS passengerCount,
+              ROUND(AVG(age), 1) AS avgAge,
+              ROUND(AVG(fare), 2) AS avgFare
+          FROM titanic
+          WHERE age IS NOT NULL
+          GROUP BY pclass
+          ORDER BY pclass
+      """).show()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 5단계. 그룹별 평균 계산의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 5단계. 그룹별 평균 계산 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step6_having_intro
+  title: 6단계. HAVING 소개
+  structuredPrimary: true
+  subtitle: 그룹 필터링
+  goal: 6단계. HAVING 소개에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: |-
+    HAVING은 GROUP BY 결과를 필터링합니다. WHERE가 개별 행을 필터링한다면, HAVING은 그룹을 필터링합니다.
+
+    HAVING은 GROUP BY 이후에 실행됩니다. WHERE는 그룹화 전, HAVING은 그룹화 후 필터링입니다. 집계 함수 결과로 필터링할 때는 HAVING을 사용하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            pclass,
+            sex,
+            COUNT(*) AS passengerCount,
+            ROUND(AVG(fare), 2) AS avgFare
+        FROM titanic
+        GROUP BY pclass, sex
+        HAVING COUNT(*) >= 50
+        ORDER BY avgFare DESC
+    """).show()
+  exercise:
+    prompt: 6단계. HAVING 소개 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              pclass,
+              sex,
+              COUNT(*) AS passengerCount,
+              ROUND(AVG(fare), 2) AS avgFare
+          FROM titanic
+          GROUP BY pclass, sex
+          HAVING COUNT(*) >= 50
+          ORDER BY avgFare DESC
+      """).show()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 6단계. HAVING 소개의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 6단계. HAVING 소개 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step7_having_avg
+  title: 7단계. 평균값으로 필터링
+  structuredPrimary: true
+  subtitle: HAVING과 AVG
+  goal: 7단계. 평균값으로 필터링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: 평균 요금이 30달러 이상인 그룹만 조회합니다. HAVING은 GROUP BY 이후 집계 결과로 필터링할 때 사용합니다. WHERE는 행 단위 필터이고, HAVING은
+    그룹 단위 필터입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            pclass,
+            embarked,
+            COUNT(*) AS passengerCount,
+            ROUND(AVG(fare), 2) AS avgFare
+        FROM titanic
+        WHERE embarked IS NOT NULL
+        GROUP BY pclass, embarked
+        HAVING AVG(fare) >= 30
+        ORDER BY avgFare DESC
+    """).show()
+  exercise:
+    prompt: 7단계. 평균값으로 필터링 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              pclass,
+              embarked,
+              COUNT(*) AS passengerCount,
+              ROUND(AVG(fare), 2) AS avgFare
+          FROM titanic
+          WHERE embarked IS NOT NULL
+          GROUP BY pclass, embarked
+          HAVING AVG(fare) >= 30
+          ORDER BY avgFare DESC
+      """).show()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 7단계. 평균값으로 필터링의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 7단계. 평균값으로 필터링 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step8_survival_analysis
+  title: 8단계. 생존율 분석
+  structuredPrimary: true
+  subtitle: CASE WHEN과 AVG
+  goal: 8단계. 생존율 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: survived는 1(생존) 또는 0(사망)입니다. AVG(survived)로 생존율을 계산합니다. 0과 1의 평균은 1의 비율과 같으므로, AVG(survived)에
+    100을 곱하면 퍼센트 생존율이 됩니다. 이 트릭은 이진 데이터의 비율 계산에 자주 사용됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            pclass,
+            sex,
+            COUNT(*) AS totalCount,
+            SUM(survived) AS survivedCount,
+            ROUND(AVG(survived) * 100, 1) AS survivalRate
+        FROM titanic
+        GROUP BY pclass, sex
+        ORDER BY survivalRate DESC
+    """).show()
+  exercise:
+    prompt: 8단계. 생존율 분석 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              pclass,
+              sex,
+              COUNT(*) AS totalCount,
+              SUM(survived) AS survivedCount,
+              ROUND(AVG(survived) * 100, 1) AS survivalRate
+          FROM titanic
+          GROUP BY pclass, sex
+          ORDER BY survivalRate DESC
+      """).show()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 8단계. 생존율 분석의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 8단계. 생존율 분석 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step9_in_filter
+  title: 9단계. IN으로 다중 조건
+  structuredPrimary: true
+  subtitle: 특정 값들 선택
+  goal: 9단계. IN으로 다중 조건에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: IN을 사용해 특정 탑승지(embarked)만 분석합니다. S(Southampton), C(Cherbourg)에서 탑승한 승객만 조회합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            embarked,
+            pclass,
+            COUNT(*) AS passengerCount,
+            ROUND(AVG(fare), 2) AS avgFare,
+            ROUND(AVG(survived) * 100, 1) AS survivalRate
+        FROM titanic
+        WHERE embarked IN ('S', 'C')
+        GROUP BY embarked, pclass
+        ORDER BY embarked, pclass
+    """).show()
+  exercise:
+    prompt: 9단계. IN으로 다중 조건 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              embarked,
+              pclass,
+              COUNT(*) AS passengerCount,
+              ROUND(AVG(fare), 2) AS avgFare,
+              ROUND(AVG(survived) * 100, 1) AS survivalRate
+          FROM titanic
+          WHERE embarked IN ('S', 'C')
+          GROUP BY embarked, pclass
+          ORDER BY embarked, pclass
+      """).show()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 9단계. IN으로 다중 조건의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 9단계. IN으로 다중 조건 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step10_complex_having
+  title: 10단계. 복합 HAVING 조건
+  structuredPrimary: true
+  subtitle: AND로 다중 조건
+  goal: 10단계. 복합 HAVING 조건에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: HAVING에 AND를 사용해 여러 조건을 동시에 적용합니다. 승객 수 30명 이상이면서 생존율 50% 이상인 그룹을 찾습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            pclass,
+            sex,
+            embarked,
+            COUNT(*) AS passengerCount,
+            ROUND(AVG(survived) * 100, 1) AS survivalRate
+        FROM titanic
+        WHERE age IS NOT NULL AND embarked IS NOT NULL
+        GROUP BY pclass, sex, embarked
+        HAVING COUNT(*) >= 30 AND AVG(survived) >= 0.5
+        ORDER BY survivalRate DESC
+    """).show()
+  exercise:
+    prompt: 10단계. 복합 HAVING 조건 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              pclass,
+              sex,
+              embarked,
+              COUNT(*) AS passengerCount,
+              ROUND(AVG(survived) * 100, 1) AS survivalRate
+          FROM titanic
+          WHERE age IS NOT NULL AND embarked IS NOT NULL
+          GROUP BY pclass, sex, embarked
+          HAVING COUNT(*) >= 30 AND AVG(survived) >= 0.5
+          ORDER BY survivalRate DESC
+      """).show()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 10단계. 복합 HAVING 조건의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 10단계. 복합 HAVING 조건 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step11_case_category
+  title: 11단계. CASE로 카테고리 생성
+  structuredPrimary: true
+  subtitle: 나이 그룹 분류
+  goal: 11단계. CASE로 카테고리 생성에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: CASE WHEN으로 나이를 그룹화하고, 그룹별 생존율을 분석합니다. 연속형 변수인 나이를 범주형으로 변환하면 패턴을 파악하기 쉬워집니다. 미성년자, 성인,
+    노인 그룹의 생존율 차이를 명확히 비교할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            CASE
+                WHEN age < 18 THEN '미성년자'
+                WHEN age < 60 THEN '성인'
+                ELSE '노인'
+            END AS ageGroup,
+            COUNT(*) AS passengerCount,
+            SUM(survived) AS survivedCount,
+            ROUND(AVG(survived) * 100, 1) AS survivalRate
+        FROM titanic
+        WHERE age IS NOT NULL
+        GROUP BY ageGroup
+        ORDER BY survivalRate DESC
+    """).show()
+  exercise:
+    prompt: 11단계. CASE로 카테고리 생성 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              CASE
+                  WHEN age < 18 THEN '미성년자'
+                  WHEN age < 60 THEN '성인'
+                  ELSE '노인'
+              END AS ageGroup,
+              COUNT(*) AS passengerCount,
+              SUM(survived) AS survivedCount,
+              ROUND(AVG(survived) * 100, 1) AS survivalRate
+          FROM titanic
+          WHERE age IS NOT NULL
+          GROUP BY ageGroup
+          ORDER BY survivalRate DESC
+      """).show()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 11단계. CASE로 카테고리 생성의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 11단계. CASE로 카테고리 생성 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step12_final
+  title: 12단계. 종합 분석
+  structuredPrimary: true
+  subtitle: 모든 개념 활용
+  goal: 12단계. 종합 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: 지금까지 배운 IS NOT NULL, GROUP BY, HAVING, CASE WHEN, IN을 모두 활용한 종합 분석입니다. 객실 등급, 연령대, 성별 세
+    가지 기준으로 다중 그룹화하고, 결측치를 제외하며, 충분한 표본(10명 이상)이 있는 그룹만 필터링합니다. 이런 복합 조건 분석을 통해 타이타닉 생존의 핵심 패턴을 도출할 수
+    있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            pclass,
+            CASE
+                WHEN age < 18 THEN '미성년자'
+                WHEN age < 60 THEN '성인'
+                ELSE '노인'
+            END AS ageGroup,
+            sex,
+            COUNT(*) AS passengerCount,
+            ROUND(AVG(fare), 2) AS avgFare,
+            ROUND(AVG(survived) * 100, 1) AS survivalRate
+        FROM titanic
+        WHERE age IS NOT NULL AND embarked IN ('S', 'C', 'Q')
+        GROUP BY pclass, ageGroup, sex
+        HAVING COUNT(*) >= 10
+        ORDER BY survivalRate DESC, passengerCount DESC
+    """).show()
+  exercise:
+    prompt: 12단계. 종합 분석 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              pclass,
+              CASE
+                  WHEN age < 18 THEN '미성년자'
+                  WHEN age < 60 THEN '성인'
+                  ELSE '노인'
+              END AS ageGroup,
+              sex,
+              COUNT(*) AS passengerCount,
+              ROUND(AVG(fare), 2) AS avgFare,
+              ROUND(AVG(survived) * 100, 1) AS survivalRate
+          FROM titanic
+          WHERE age IS NOT NULL AND embarked IN ('S', 'C', 'Q')
+          GROUP BY pclass, ageGroup, sex
+          HAVING COUNT(*) >= 10
+          ORDER BY survivalRate DESC, passengerCount DESC
+      """).show()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 12단계. 종합 분석의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 12단계. 종합 분석 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 타이타닉 심층 분석 프로젝트
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: |-
+    HAVING과 NULL 처리, CASE WHEN, IN 연산자를 활용해 타이타닉 데이터를 분석합니다. 실무에서는 결측치 처리와 그룹 필터링이 필수적이며, 이 미션을 통해 이러한 패턴을 연습합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import pandas as pd
+    import duckdb
+    data = pd.DataFrame({
+        "survived": [0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1],
+        "pclass": [3, 1, 2, 2, 1, 3, 1, 2, 1, 1, 2, 1],
+        "sex": ["male", "female", "female", "male", "female", "male", "female", "male", "male", "male", "male", "female"],
+        "age": [22, 38, 18, None, 29, 41, 45, 54, 49, 36, 42, 31],
+        "fare": [7.25, 71.28, 13.00, 21.08, 76.29, 8.05, 83.47, 26.00, 35.50, 30.50, 13.00, 79.65],
+        "embarked": ["S", "C", "S", None, "C", "Q", "C", "S", "S", "C", "S", "C"],
+        "class": ["Third", "First", "Second", "Second", "First", "Third", "First", "Second", "First", "First", "Second", "First"],
+        "who": ["man", "woman", "woman", "child", "woman", "man", "woman", "man", "man", "man", "man", "woman"],
+        "name": ["Smith, Mr. John", "Smith, Mrs. Anna", "Smith, Miss. Clara", "Brown, Master. Tim", "Wilson, Mrs. Rose", "Brown, Mr. George", "Doe, Dr. Helen", "Miller, Rev. James", "Stone, Col. Arthur", "Major, Major. Alan", "Taylor, Capt. Mark", "Brown, Miss. Ella"],
+    })
+    tbl1 = duckdb.from_df(data)
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      import duckdb
+      data = pd.DataFrame({
+          "survived": [0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1],
+          "pclass": [3, 1, 2, 2, 1, 3, 1, 2, 1, 1, 2, 1],
+          "sex": ["male", "female", "female", "male", "female", "male", "female", "male", "male", "male", "male", "female"],
+          "age": [22, 38, 18, None, 29, 41, 45, 54, 49, 36, 42, 31],
+          "fare": [7.25, 71.28, 13.00, 21.08, 76.29, 8.05, 83.47, 26.00, 35.50, 30.50, 13.00, 79.65],
+          "embarked": ["S", "C", "S", None, "C", "Q", "C", "S", "S", "C", "S", "C"],
+          "class": ["Third", "First", "Second", "Second", "First", "Third", "First", "Second", "First", "First", "Second", "First"],
+          "who": ["man", "woman", "woman", "child", "woman", "man", "woman", "man", "man", "man", "man", "woman"],
+          "name": ["Smith, Mr. John", "Smith, Mrs. Anna", "Smith, Miss. Clara", "Brown, Master. Tim", "Wilson, Mrs. Rose", "Brown, Mr. George", "Doe, Dr. Helen", "Miller, Rev. James", "Stone, Col. Arthur", "Major, Major. Alan", "Taylor, Capt. Mark", "Brown, Miss. Ella"],
+      })
+      tbl1 = duckdb.from_df(data)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 실습의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 실습 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 복합 조건 집계와 NULL 처리를 마스터했습니다.
+  - type: list
+    items:
+    - IS NULL - NULL 값인 행 선택
+    - IS NOT NULL - NULL이 아닌 행 선택
+    - HAVING - GROUP BY 결과 필터링
+    - HAVING COUNT(*) >= n - 행 수 조건
+    - HAVING AVG(col) >= n - 평균값 조건
+    - WHERE vs HAVING - 행 필터 vs 그룹 필터
+  - type: text
+    content: 다음 시간에는 서브쿼리를 활용한 고급 필터링을 배웁니다.
+  goal: 정리에서 SQL 조건과 집계 결과가 어떻게 연결되는지 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트'
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → SQL 오류 수정 → 결과 검증 → 실무 변주
+  goal: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: DuckDB 학습은 쿼리 결과를 눈으로 보는 데서 끝나면 실무로 이어지기 어렵습니다. 작은 로컬 테이블을 만들고, 잘못된 컬럼명을 먼저 실패시킨 뒤, 집계
+    결과와 기준 변경 실험을 assert로 고정합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import duckdb
+
+    workflowCon = duckdb.connect()
+    workflowCon.sql("""
+        CREATE OR REPLACE TABLE lessonOrders AS
+        SELECT * FROM (VALUES
+            ('A-100', 'paid', 50000, 'web'),
+            ('A-101', 'pending', 20000, 'app'),
+            ('A-102', 'paid', 120000, 'web'),
+            ('A-103', 'cancelled', 15000, 'store'),
+            ('A-104', 'paid', 62000, 'app')
+        ) AS t(orderId, status, amount, channel)
+    """)
+
+    expectedPaidRevenue = 232000
+    expectedPaidCount = 3
+    rowCount = workflowCon.sql("SELECT COUNT(*) FROM lessonOrders").fetchone()[0]
+
+    assert rowCount == 5
+    rowCount
+  exercise:
+    prompt: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    starterCode: |-
+      import duckdb
+
+      workflowCon = duckdb.connect()
+      workflowCon.sql("""
+          CREATE OR REPLACE TABLE lessonOrders AS
+          SELECT * FROM (VALUES
+              ('A-100', 'paid', 50000, 'web'),
+              ('A-101', 'pending', 20000, 'app'),
+              ('A-102', 'paid', 120000, 'web'),
+              ('A-103', 'cancelled', 15000, 'store'),
+              ('A-104', 'paid', 62000, 'app')
+          ) AS t(orderId, status, amount, channel)
+      """)
+
+      expectedPaidRevenue = 232000
+      expectedPaidCount = 3
+      rowCount = workflowCon.sql("SELECT COUNT(*) FROM lessonOrders").fetchone()[0]
+
+      assert rowCount == 5
+      rowCount
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.'
+    resultCheck: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: duckdb_04-having-null-groups-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: NULL을 분리한 뒤 HAVING으로 표본 필터링하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 연령 결측 수를 보존하고 객실 등급별 known age 평균을 최소 표본 수로 필터한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - known age count로 HAVING 조건을 판단하세요.
+    - NULL 행을 버리기 전에 missing count를 보존하세요.
+    exercise:
+      prompt: age_groups(rows, minimum_known)를 완성하세요.
+      starterCode: |-
+        def age_groups(rows, minimum_known):
+            raise NotImplementedError
+      solution: |
+        def age_groups(rows, minimum_known):
+            grouped = {}
+            for row in rows:
+                bucket = grouped.setdefault(str(row["pclass"]), {"values": [], "missing": 0})
+                if row.get("age") is None:
+                    bucket["missing"] += 1
+                else:
+                    bucket["values"].append(row["age"])
+            result = []
+            for pclass, bucket in sorted(grouped.items()):
+                if len(bucket["values"]) >= minimum_known:
+                    result.append({"pclass": int(pclass), "known": len(bucket["values"]), "missing": bucket["missing"], "meanAge": round(sum(bucket["values"]) / len(bucket["values"]), 2)})
+            return result
+      hints: *id001
+    check:
+      id: python.duckdb.duckdb_04.having-null-groups.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_04.having-null-groups.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: age_groups
+        cases:
+        - id: filters-after-aggregation
+          arguments:
+          - value:
+            - pclass: 1
+              age: 20
+            - pclass: 1
+              age: 40
+            - pclass: 1
+              age: null
+            - pclass: 2
+              age: 30
+          - value: 2
+          expectedReturn:
+          - pclass: 1
+            known: 2
+            missing: 1
+            meanAge: 30.0
+        - id: allows-one-known
+          arguments:
+          - value:
+            - pclass: 3
+              age: 18
+          - value: 1
+          expectedReturn:
+          - pclass: 3
+            known: 1
+            missing: 0
+            meanAge: 18.0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: duckdb_04-sensor-missingness-gate-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - duckdb_04-having-null-groups-mastery
+    title: 새 센서 데이터에 결측 품질 게이트 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 장비별 결측률을 계산하고 허용률을 넘은 장비를 분리한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 결측률 분모는 센서별 전체 관측 수입니다.
+    - 임계값과 같은 경우의 정책을 명시하세요.
+    exercise:
+      prompt: sensor_quality(rows, maximum_missing_rate)를 완성하세요.
+      starterCode: |-
+        def sensor_quality(rows, maximum_missing_rate):
+            raise NotImplementedError
+      solution: |
+        def sensor_quality(rows, maximum_missing_rate):
+            grouped = {}
+            for row in rows:
+                bucket = grouped.setdefault(row["sensor"], [0, 0])
+                bucket[1] += 1
+                bucket[0] += int(row.get("value") is None)
+            result = []
+            for sensor, (missing, total) in sorted(grouped.items()):
+                rate = round(missing / total, 3)
+                result.append({"sensor": sensor, "missing": missing, "total": total, "rate": rate, "accepted": rate <= maximum_missing_rate})
+            return result
+      hints: *id002
+    check:
+      id: python.duckdb.duckdb_04.sensor-missingness-gate.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_04.sensor-missingness-gate.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: sensor_quality
+        cases:
+        - id: marks-unhealthy-sensor
+          arguments:
+          - value:
+            - sensor: a
+              value: null
+            - sensor: a
+              value: 1
+            - sensor: b
+              value: 2
+          - value: 0.25
+          expectedReturn:
+          - sensor: a
+            missing: 1
+            total: 2
+            rate: 0.5
+            accepted: false
+          - sensor: b
+            missing: 0
+            total: 1
+            rate: 0.0
+            accepted: true
+        - id: accepts-threshold-equality
+          arguments:
+          - value:
+            - sensor: c
+              value: null
+            - sensor: c
+              value: 4
+          - value: 0.5
+          expectedReturn:
+          - sensor: c
+            missing: 1
+            total: 2
+            rate: 0.5
+            accepted: true
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: duckdb_04-where-having-null-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - duckdb_04-sensor-missingness-gate-transfer
+    title: WHERE·HAVING·NULL 판단 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: row filter와 aggregate filter, NULL 비교 방식을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - NULL은 \`= NULL\`이 아니라 IS NULL로 검사하세요.
+    - HAVING은 그룹을 만든 뒤 적용됩니다.
+    exercise:
+      prompt: choose_filter_stage(situation)를 완성하세요.
+      starterCode: |-
+        def choose_filter_stage(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_filter_stage(situation):
+            table = {'age-is-missing': {'stage': 'WHERE age IS NULL', 'evidence': 'missing row count', 'risk': 'equals NULL'}, 'groups-over-ten': {'stage': 'HAVING COUNT(*) > 10', 'evidence': 'group count', 'risk': 'aggregate in WHERE'}, 'positive-fares': {'stage': 'WHERE fare > 0', 'evidence': 'row predicate', 'risk': 'late filter'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.duckdb.duckdb_04.where-having-null.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_04.where-having-null.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_filter_stage
+        cases:
+        - id: recalls-age-is-missing
+          arguments:
+          - value: age-is-missing
+          expectedReturn:
+            stage: WHERE age IS NULL
+            evidence: missing row count
+            risk: equals NULL
+        - id: recalls-groups-over-ten
+          arguments:
+          - value: groups-over-ten
+          expectedReturn:
+            stage: HAVING COUNT(*) > 10
+            evidence: group count
+            risk: aggregate in WHERE
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

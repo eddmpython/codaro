@@ -105,12 +105,58 @@ def validateTokenDocument(document: dict[str, Any]) -> None:
         elif not isinstance(tokenValue, str):
             raise DesignSystemError(f"token value must be a string or mode pair: {tokenName}")
 
+    expectedSemanticRoles = {
+        "canvas": "--color-background-body",
+        "surface": "--color-background-surface",
+        "elevated": "--color-background-card",
+        "popover": "--color-background-popover",
+        "mutedSurface": "--color-background-muted",
+        "accentSurface": "--color-background-accent-subtle",
+        "inverseSurface": "--color-background-inverse",
+        "textPrimary": "--color-text-primary",
+        "textSecondary": "--color-text-secondary",
+        "textTertiary": "--color-text-tertiary",
+        "textInverse": "--color-text-inverse",
+        "textOnAccent": "--color-text-on-accent",
+        "border": "--color-border",
+        "borderSubtle": "--color-border-subtle",
+        "borderStrong": "--color-border-emphasized",
+        "borderAccent": "--color-border-accent",
+        "focus": "--color-accent",
+        "brand": "--color-accent",
+        "success": "--color-success",
+        "warning": "--color-warning",
+        "danger": "--color-error",
+        "info": "--color-text-blue",
+        "code": "--color-background-muted",
+    }
+    if document["semanticRoles"] != expectedSemanticRoles:
+        raise DesignSystemError("semanticRoles must match the shared product contract")
     for role, tokenName in document["semanticRoles"].items():
-        if tokenName not in tokens and tokenName not in {
-            "--color-text-blue",
-            "--color-background-muted",
-        }:
+        if tokenName not in tokens:
             raise DesignSystemError(f"semantic role {role} references an unknown token")
+
+    modeAwareTokens = (
+        "--color-background-body",
+        "--color-background-surface",
+        "--color-text-primary",
+        "--color-accent",
+        "--color-success",
+    )
+    for tokenName in modeAwareTokens:
+        value = tokens.get(tokenName)
+        if not isinstance(value, list) or len(value) != 2:
+            raise DesignSystemError(f"{tokenName} must define matching light and dark values")
+
+    expectedFontWeights = {
+        "--font-weight-normal": "400",
+        "--font-weight-medium": "600",
+        "--font-weight-semibold": "600",
+        "--font-weight-bold": "700",
+    }
+    for tokenName, expectedValue in expectedFontWeights.items():
+        if tokens.get(tokenName) != expectedValue:
+            raise DesignSystemError(f"{tokenName} must resolve to {expectedValue}")
 
     radiusTokens = [
         "--radius-none",
@@ -133,6 +179,12 @@ def validateFontManifest(document: dict[str, Any]) -> None:
     fonts = document.get("fonts")
     if document.get("version") != 1 or not isinstance(fonts, list) or len(fonts) != 6:
         raise DesignSystemError("font manifest must define the six approved font files")
+    expectedNames = {font["file"] for font in fonts}
+    actualNames = {path.name for path in FONT_SOURCE_ROOT.glob("*.woff2")}
+    if actualNames != expectedNames:
+        raise DesignSystemError("font source directory must exactly match the manifest")
+    if {font["weight"] for font in fonts} != {400, 600, 700}:
+        raise DesignSystemError("font manifest may use only the actual 400, 600, and 700 weights")
     for font in fonts:
         sourcePath = FONT_SOURCE_ROOT / font["file"]
         if not sourcePath.is_file():
@@ -208,6 +260,12 @@ def renderRuntimeCss(document: dict[str, Any]) -> str:
     lines = [
         "",
         "@layer astryx-theme {",
+        '  html[data-theme="light"] #root > [data-astryx-theme="codaro"] {',
+        "    color-scheme: light;",
+        "  }",
+        '  html[data-theme="dark"] #root > [data-astryx-theme="codaro"] {',
+        "    color-scheme: dark;",
+        "  }",
         '  @scope ([data-astryx-theme="codaro"]) to ([data-astryx-theme]) {',
     ]
     for densityName, overrides in document["density"].items():
@@ -258,9 +316,6 @@ def renderAppBridge(appName: str) -> str:
             "--code-fg": "var(--color-text-primary)",
             "--good": "var(--color-success)",
             "--warning": "var(--color-warning)",
-            "--plum": "var(--color-text-purple)",
-            "--plum-deep": "var(--color-accent)",
-            "--amber": "var(--color-text-orange)",
             "--radius-sm": "var(--radius-inner)",
             "--radius-lg": "var(--radius-container)",
             "--radius": "var(--radius-element)",
@@ -324,11 +379,30 @@ def renderRuntimeTypes(sourceHash: str, document: dict[str, Any]) -> str:
         for name, values in document["accents"].items()
     }
     accentSwatchesJson = json.dumps(accentSwatches, ensure_ascii=True, separators=(",", ":"))
+    tokens = document["astryxTokens"]
+    themeCanvasColorsJson = json.dumps(
+        dict(zip(("light", "dark"), tokens["--color-background-body"], strict=True)),
+        ensure_ascii=True,
+        separators=(",", ":"),
+    )
+    themeSurfaceColorsJson = json.dumps(
+        dict(zip(("light", "dark"), tokens["--color-background-surface"], strict=True)),
+        ensure_ascii=True,
+        separators=(",", ":"),
+    )
+    themeInkColorsJson = json.dumps(
+        dict(zip(("light", "dark"), tokens["--color-text-primary"], strict=True)),
+        ensure_ascii=True,
+        separators=(",", ":"),
+    )
     return f'''// @generated by buildDesignSystem.py. Do not edit.
 export {{codaroTheme}} from "./codaro.js";
 
 export const designSystemSourceHash = "{sourceHash}" as const;
 export const accentSwatches = {accentSwatchesJson} as const;
+export const themeCanvasColors = {themeCanvasColorsJson} as const;
+export const themeSurfaceColors = {themeSurfaceColorsJson} as const;
+export const themeInkColors = {themeInkColorsJson} as const;
 export type CodaroThemeMode = "system" | "light" | "dark";
 export type ResolvedThemeMode = "light" | "dark";
 export type DensityMode = "public" | "learningComfortable" | "studioDense";
@@ -467,6 +541,17 @@ def applyOutputs(
                     drift.append(str(targetPath.relative_to(PROJECT_ROOT)))
             else:
                 writeAtomically(targetPath, content)
+        expectedFontNames = {font["file"] for font in manifest["fonts"]}
+        staleFontPaths = [
+            path
+            for path in FONT_TARGETS[appName].glob("*.woff2")
+            if path.name not in expectedFontNames
+        ]
+        if checkOnly:
+            drift.extend(str(path.relative_to(PROJECT_ROOT)) for path in staleFontPaths)
+        else:
+            for path in staleFontPaths:
+                path.unlink()
         for font in manifest["fonts"]:
             sourcePath = FONT_SOURCE_ROOT / font["file"]
             targetPath = FONT_TARGETS[appName] / font["file"]

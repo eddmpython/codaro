@@ -1,0 +1,847 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - numpy
+  - seaborn
+  id: seaborn_05
+  title: 타이타닉생존분석
+  order: 5
+  category: seaborn
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - seaborn
+  - barplot
+  - countplot
+  - catplot
+  - titanic
+  - 생존분석
+  seo:
+    title: Seaborn 범주형 차트 - 타이타닉 생존율 분석
+    description: Seaborn barplot, countplot, catplot으로 타이타닉 생존율을 분석합니다. estimator와 col 파라미터 활용법을 배웁니다.
+    keywords:
+    - seaborn
+    - barplot
+    - countplot
+    - catplot
+    - titanic
+    - 생존분석
+intro:
+  emoji: 🚢
+  goal: 타이타닉 승객의 클래스/성별 생존율을 범주형 차트로 분석합니다.
+  description: barplot으로 평균값과 신뢰구간을, countplot으로 빈도를 시각화합니다. catplot으로 다중 패널을 만들고, estimator로 통계량을 조절합니다.
+    이전에 배운 scatterplot, histplot, boxplot, regplot 개념을 함께 활용합니다.
+  direction: 타이타닉생존분석에서 정리된 데이터를 통계 차트로 보고 분포와 관계를 검증합니다.
+  benefits:
+  - 분석용 테이블 확인 후 통계 차트 구성에 맞는 코드 입력을 고릅니다.
+  - 타이타닉생존분석 결과를 분포, 그룹, 관계 패턴 기준으로 즉시 점검합니다.
+  - 완료한 코드를 탐색 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(분석용 테이블)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 로드 처리 실행
+      detail: 통계 차트 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 카운트 플롯 결과 검증
+      detail: 분포, 그룹, 관계 패턴 기준으로 실행 결과를 비교합니다.
+    - label: 타이타닉생존분석 재사용
+      detail: 완성 코드를 탐색 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 통계 시각화 환경
+      detail: matplotlib, numpy, seaborn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 타이타닉생존분석 실행
+      detail: 셀을 실행해 분포, 그룹, 관계 패턴와 예외 상태를 확인합니다.
+    - label: 타이타닉생존분석 완료
+      detail: 검증된 코드를 탐색 리포트로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: seaborn과 matplotlib을 불러옵니다. titanic 데이터는 1912년 타이타닉호 침몰 사고의 승객 정보입니다. 생존 여부, 객실 등급, 성별,
+    나이 등이 기록되어 있어 생존율 분석에 적합합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+    import matplotlib.pyplot as plt
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import matplotlib.pyplot as plt
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 라이브러리 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step2_data
+  title: 2단계. 데이터 로드
+  structuredPrimary: true
+  subtitle: titanic 데이터셋
+  goal: 2단계. 데이터 로드에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: titanic 데이터셋은 180명의 로컬 승객 샘플입니다. survived(생존:1, 사망:0), pclass(객실등급:1,2,3), sex(성별), age(나이),
+    sibsp(형제/배우자 수), parch(부모/자녀 수), fare(요금), embarked(탑승항) 등의 컬럼이 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    titanic = loadLocalDataset('titanic')
+    titanic.head()
+  exercise:
+    prompt: 2단계. 데이터 로드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      titanic = loadLocalDataset('titanic')
+      titanic.head()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 로드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 로드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_countplot
+  title: 3단계. 카운트 플롯
+  structuredPrimary: true
+  subtitle: countplot()
+  goal: 3단계. 카운트 플롯에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    countplot()은 범주형 변수의 빈도를 막대 그래프로 표시합니다. 각 카테고리에 몇 개의 데이터가 있는지 한눈에 파악할 수 있습니다. 객실 등급별 승객 수를 확인해봅니다.
+
+    sns.countplot(data, x='범주형')은 각 카테고리의 개수를 세어 막대로 표시합니다. histplot(discrete=True)와 비슷하지만 범주형 데이터에 더 적합합니다.
+  tips:
+  - sns.countplot(data, x='범주형')은 각 카테고리의 개수를 세어 막대로 표시합니다. histplot(discrete=True)와 비슷하지만 범주형 데이터에 더
+    적합합니다.
+  snippet: |-
+    fig, ax = plt.subplots(figsize=(8, 6))
+    sns.countplot(data=titanic, x='pclass', ax=ax)
+    ax.set_title('Passengers by Class')
+    ax.set_xlabel('Class')
+    ax.set_ylabel('Count')
+    fig
+  exercise:
+    prompt: 3단계. 카운트 플롯 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      fig, ax = plt.subplots(figsize=(8, 6))
+      sns.countplot(data=titanic, x='pclass', ax=ax)
+      ax.set_title('Passengers by Class')
+      ax.set_xlabel('Class')
+      ax.set_ylabel('Count')
+      fig
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 카운트 플롯의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 카운트 플롯 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step4_countplot_hue
+  title: 4단계. countplot + hue
+  structuredPrimary: true
+  subtitle: 생존 여부 구분
+  goal: 4단계. countplot + hue에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: hue 파라미터로 생존 여부를 색상으로 구분합니다. 각 등급에서 생존자와 사망자의 비율을 시각적으로 비교할 수 있습니다. 1등급 승객이 3등급보다 생존율이
+    높은 것을 볼 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figHue, axHue = plt.subplots(figsize=(8, 6))
+    sns.countplot(data=titanic, x='pclass', hue='survived', palette='Set2', ax=axHue)
+    axHue.set_title('Survival by Class')
+    axHue.set_xlabel('Class')
+    axHue.set_ylabel('Count')
+    axHue.legend(title='Survived', labels=['No', 'Yes'])
+    figHue
+  exercise:
+    prompt: 4단계. countplot + hue 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figHue, axHue = plt.subplots(figsize=(8, 6))
+      sns.countplot(data=titanic, x='pclass', hue='survived', palette='Set2', ax=axHue)
+      axHue.set_title('Survival by Class')
+      axHue.set_xlabel('Class')
+      axHue.set_ylabel('Count')
+      axHue.legend(title='Survived', labels=['No', 'Yes'])
+      figHue
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. countplot + hue의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 4단계. countplot + hue 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step5_barplot
+  title: 5단계. 막대 그래프
+  structuredPrimary: true
+  subtitle: barplot()
+  goal: 5단계. 막대 그래프에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    barplot()은 범주별 평균값과 신뢰구간을 표시합니다. countplot이 개수를 세는 것과 달리, barplot은 연속형 변수의 통계량을 계산합니다. 등급별 평균 생존율을 확인해봅니다. survived는 0과 1이므로 평균이 곧 생존율입니다.
+
+    sns.barplot(data, x='범주형', y='연속형')은 범주별 y의 평균과 95% 신뢰구간을 표시합니다. 기본적으로 estimator=np.mean이 적용됩니다. 에러바는 부트스트랩으로 계산됩니다.
+  tips:
+  - sns.barplot(data, x='범주형', y='연속형')은 범주별 y의 평균과 95% 신뢰구간을 표시합니다. 기본적으로 estimator=np.mean이 적용됩니다. 에러바는
+    부트스트랩으로 계산됩니다.
+  snippet: |-
+    figBar, axBar = plt.subplots(figsize=(8, 6))
+    sns.barplot(data=titanic, x='pclass', y='survived', ax=axBar)
+    axBar.set_title('Survival Rate by Class')
+    axBar.set_xlabel('Class')
+    axBar.set_ylabel('Survival Rate')
+    figBar
+  exercise:
+    prompt: 5단계. 막대 그래프 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figBar, axBar = plt.subplots(figsize=(8, 6))
+      sns.barplot(data=titanic, x='pclass', y='survived', ax=axBar)
+      axBar.set_title('Survival Rate by Class')
+      axBar.set_xlabel('Class')
+      axBar.set_ylabel('Survival Rate')
+      figBar
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 막대 그래프의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 막대 그래프 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step6_barplot_hue
+  title: 6단계. barplot + hue
+  structuredPrimary: true
+  subtitle: 성별 추가
+  goal: 6단계. barplot + hue에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: hue로 성별을 추가하면 등급과 성별의 교차 효과를 확인할 수 있습니다. 로컬 샘플에서는 모든 등급에서 여성의 생존율이 남성보다 높게 설계되어 있습니다. "여성과 어린이
+    먼저" 원칙이 적용된 것으로 해석됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figSex, axSex = plt.subplots(figsize=(10, 6))
+    sns.barplot(data=titanic, x='pclass', y='survived', hue='sex', palette='Set1', ax=axSex)
+    axSex.set_title('Survival Rate by Class and Sex')
+    axSex.set_xlabel('Class')
+    axSex.set_ylabel('Survival Rate')
+    axSex.legend(title='Sex')
+    figSex
+  exercise:
+    prompt: 6단계. barplot + hue 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figSex, axSex = plt.subplots(figsize=(10, 6))
+      sns.barplot(data=titanic, x='pclass', y='survived', hue='sex', palette='Set1', ax=axSex)
+      axSex.set_title('Survival Rate by Class and Sex')
+      axSex.set_xlabel('Class')
+      axSex.set_ylabel('Survival Rate')
+      axSex.legend(title='Sex')
+      figSex
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. barplot + hue의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. barplot + hue 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step7_estimator
+  title: 7단계. estimator 변경
+  structuredPrimary: true
+  subtitle: 통계량 커스터마이징
+  goal: 7단계. estimator 변경에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    estimator 파라미터로 평균 대신 다른 통계량을 사용할 수 있습니다. sum, median, count 등을 지정할 수 있습니다. errorbar 파라미터로 신뢰구간 대신 표준편차(sd)나 표준오차(se)를 표시할 수 있습니다.
+
+    estimator='mean'(기본), 'sum', 'median', 'count' 또는 함수를 지정합니다. errorbar=('ci', 95), 'sd'(표준편차), 'se'(표준오차), None 중 선택합니다.
+  tips:
+  - estimator='mean'(기본), 'sum', 'median', 'count' 또는 함수를 지정합니다. errorbar=('ci', 95), 'sd'(표준편차), 'se'(표준오차),
+    None 중 선택합니다.
+  snippet: |-
+    import numpy as np
+
+    figEst, (axMean, axMedian) = plt.subplots(1, 2, figsize=(14, 5))
+
+    sns.barplot(data=titanic, x='pclass', y='survived', estimator='mean', ax=axMean)
+    axMean.set_title('Mean (default)')
+    axMean.set_ylabel('Survival Rate')
+
+    sns.barplot(data=titanic, x='pclass', y='fare', estimator='median', errorbar='sd', ax=axMedian)
+    axMedian.set_title('Median Fare (SD)')
+    axMedian.set_ylabel('Fare ($)')
+
+    plt.tight_layout()
+    figEst
+  exercise:
+    prompt: 7단계. estimator 변경 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      import numpy as np
+
+      figEst, (axMean, axMedian) = plt.subplots(1, 2, figsize=(14, 5))
+
+      sns.barplot(data=titanic, x='pclass', y='survived', estimator='mean', ax=axMean)
+      axMean.set_title('Mean (default)')
+      axMean.set_ylabel('Survival Rate')
+
+      sns.barplot(data=titanic, x='pclass', y='fare', estimator='median', errorbar='sd', ax=axMedian)
+      axMedian.set_title('Median Fare (SD)')
+      axMedian.set_ylabel('Fare ($)')
+
+      plt.tight_layout()
+      figEst
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. estimator 변경의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. estimator 변경 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step8_pointplot
+  title: 8단계. 포인트 플롯
+  structuredPrimary: true
+  subtitle: pointplot()
+  goal: 8단계. 포인트 플롯에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    pointplot()은 barplot과 같은 통계량을 점과 선으로 표시합니다. 여러 그룹의 추세를 비교하기 좋습니다. 선으로 연결되어 있어 패턴을 파악하기 쉽습니다.
+
+    pointplot()은 barplot과 같은 통계를 점으로 표시합니다. hue를 사용하면 선으로 연결되어 그룹 간 추세 비교에 효과적입니다. markers와 linestyles로 스타일을 변경할 수 있습니다.
+  tips:
+  - pointplot()은 barplot과 같은 통계를 점으로 표시합니다. hue를 사용하면 선으로 연결되어 그룹 간 추세 비교에 효과적입니다. markers와 linestyles로
+    스타일을 변경할 수 있습니다.
+  snippet: |-
+    figPoint, axPoint = plt.subplots(figsize=(10, 6))
+    sns.pointplot(data=titanic, x='pclass', y='survived', hue='sex', palette='Set1', ax=axPoint)
+    axPoint.set_title('Survival Rate Trend')
+    axPoint.set_xlabel('Class')
+    axPoint.set_ylabel('Survival Rate')
+    figPoint
+  exercise:
+    prompt: 8단계. 포인트 플롯 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figPoint, axPoint = plt.subplots(figsize=(10, 6))
+      sns.pointplot(data=titanic, x='pclass', y='survived', hue='sex', palette='Set1', ax=axPoint)
+      axPoint.set_title('Survival Rate Trend')
+      axPoint.set_xlabel('Class')
+      axPoint.set_ylabel('Survival Rate')
+      figPoint
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 포인트 플롯의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 포인트 플롯 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step9_catplot
+  title: 9단계. catplot 다중 패널
+  structuredPrimary: true
+  subtitle: Figure-level 함수
+  goal: 9단계. catplot 다중 패널에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    catplot()은 Figure-level 함수로, col과 row 파라미터로 다중 패널을 쉽게 만들 수 있습니다. kind 파라미터로 strip, swarm, box, violin, bar, count, point 중 선택합니다. 탑승항별로 패널을 분할해봅니다.
+
+    sns.catplot()은 Figure-level 함수입니다. kind='bar'/'count'/'box'/'violin'/'strip'/'swarm'/'point' 중 선택합니다. col='변수'로 패널을 분할합니다. height와 aspect로 크기를 조절합니다.
+  tips:
+  - sns.catplot()은 Figure-level 함수입니다. kind='bar'/'count'/'box'/'violin'/'strip'/'swarm'/'point' 중 선택합니다.
+    col='변수'로 패널을 분할합니다. height와 aspect로 크기를 조절합니다.
+  snippet: |-
+    catEmbarked = sns.catplot(data=titanic, x='pclass', y='survived', hue='sex',
+                    col='embarked', kind='bar', palette='Set1', height=4, aspect=1)
+    catEmbarked.set_axis_labels('Class', 'Survival Rate')
+    catEmbarked.set_titles('Embarked: {col_name}')
+    catEmbarked.figure
+  exercise:
+    prompt: 9단계. catplot 다중 패널 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      catEmbarked = sns.catplot(data=titanic, x='pclass', y='survived', hue='sex',
+                      col='embarked', kind='bar', palette='Set1', height=4, aspect=1)
+      catEmbarked.set_axis_labels('Class', 'Survival Rate')
+      catEmbarked.set_titles('Embarked: {col_name}')
+      catEmbarked.figure
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. catplot 다중 패널의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. catplot 다중 패널의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step10_catplot_count
+  title: 10단계. catplot count
+  structuredPrimary: true
+  subtitle: 빈도 다중 패널
+  goal: 10단계. catplot count에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: catplot에서 kind='count'를 사용하면 countplot의 다중 패널 버전을 만들 수 있습니다. 성별로 패널을 분할하여 남녀 승객의 등급별 분포를
+    비교합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    catSex = sns.catplot(data=titanic, x='pclass', hue='survived',
+                    col='sex', kind='count', palette='Set2', height=4, aspect=1.2)
+    catSex.set_axis_labels('Class', 'Count')
+    catSex.set_titles('{col_name}')
+    catSex.figure
+  exercise:
+    prompt: 10단계. catplot count 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      catSex = sns.catplot(data=titanic, x='pclass', hue='survived',
+                      col='sex', kind='count', palette='Set2', height=4, aspect=1.2)
+      catSex.set_axis_labels('Class', 'Count')
+      catSex.set_titles('{col_name}')
+      catSex.figure
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. catplot count의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 10단계. catplot count의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step11_final
+  title: 11단계. 최종 분석 대시보드
+  structuredPrimary: true
+  subtitle: 종합 시각화
+  goal: 11단계. 최종 분석 대시보드에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 지금까지 배운 모든 요소를 종합하여 타이타닉 생존 분석 대시보드를 완성합니다. countplot, barplot, pointplot, boxplot을 조합하여
+    다양한 관점에서 데이터를 분석합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figFinal, axesFinal = plt.subplots(2, 2, figsize=(14, 10))
+
+    sns.countplot(data=titanic, x='pclass', hue='survived', palette='Set2', ax=axesFinal[0, 0])
+    axesFinal[0, 0].set_title('Survival Count by Class')
+    axesFinal[0, 0].legend(title='Survived', labels=['No', 'Yes'])
+
+    sns.barplot(data=titanic, x='pclass', y='survived', hue='sex', palette='Set1', ax=axesFinal[0, 1])
+    axesFinal[0, 1].set_title('Survival Rate by Class and Sex')
+
+    sns.pointplot(data=titanic, x='pclass', y='survived', hue='sex', palette='Set1', ax=axesFinal[1, 0])
+    axesFinal[1, 0].set_title('Survival Rate Trend')
+
+    sns.boxplot(data=titanic, x='pclass', y='age', hue='survived', palette='Set2', ax=axesFinal[1, 1])
+    axesFinal[1, 1].set_title('Age Distribution by Class and Survival')
+
+    plt.tight_layout()
+    figFinal
+  exercise:
+    prompt: 11단계. 최종 분석 대시보드 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figFinal, axesFinal = plt.subplots(2, 2, figsize=(14, 10))
+
+      sns.countplot(data=titanic, x='pclass', hue='survived', palette='Set2', ax=axesFinal[0, 0])
+      axesFinal[0, 0].set_title('Survival Count by Class')
+      axesFinal[0, 0].legend(title='Survived', labels=['No', 'Yes'])
+
+      sns.barplot(data=titanic, x='pclass', y='survived', hue='sex', palette='Set1', ax=axesFinal[0, 1])
+      axesFinal[0, 1].set_title('Survival Rate by Class and Sex')
+
+      sns.pointplot(data=titanic, x='pclass', y='survived', hue='sex', palette='Set1', ax=axesFinal[1, 0])
+      axesFinal[1, 0].set_title('Survival Rate Trend')
+
+      sns.boxplot(data=titanic, x='pclass', y='age', hue='survived', palette='Set2', ax=axesFinal[1, 1])
+      axesFinal[1, 1].set_title('Age Distribution by Class and Survival')
+
+      plt.tight_layout()
+      figFinal
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 최종 분석 대시보드의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 11단계. 최종 분석 대시보드 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 범주형 분석 프로젝트
+  goal: 실습에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    지금까지 배운 barplot, countplot, pointplot, catplot을 활용해서 다양한 범주형 분석을 해봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+    import matplotlib.pyplot as plt
+
+    data = loadLocalDataset('tips')
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import matplotlib.pyplot as plt
+
+      data = loadLocalDataset('tips')
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Seaborn barplot, countplot, catplot으로 타이타닉 생존율을 분석했습니다.
+  - type: list
+    items:
+    - sns.countplot() - 범주별 빈도 막대 그래프
+    - sns.barplot() - 범주별 평균값 + 신뢰구간
+    - sns.pointplot() - 평균값을 점과 선으로 표시
+    - hue로 다중 그룹 비교
+    - estimator로 통계량 변경 (mean, sum, median)
+    - sns.catplot() - Figure-level, col/row로 다중 패널
+  - type: text
+    content: 다음 시간에는 heatmap과 lineplot으로 항공편 시계열을 분석합니다.
+  goal: 정리에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+- id: workflow_validation
+  title: 12단계. 생존율 비교 검증 루프
+  structuredPrimary: true
+  subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
+  goal: 12단계. 생존율 비교 검증 루프에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    범주형 차트는 집단별 비율을 빠르게 보여 줍니다. 하지만 생존 여부가 0/1인지, 집단 표본이 충분한지 확인한 뒤에야 barplot 해석이 안전합니다.
+
+    범주형 시각화는 비율, 표본 수, 기준 집단을 함께 봐야 의사결정에 쓸 수 있습니다.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    titanicFlow = loadLocalDataset("titanic")
+    requiredColumns = {"survived", "pclass", "sex", "age", "fare"}
+    missingColumns = requiredColumns - set(titanicFlow.columns)
+
+    assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+    assert set(titanicFlow["survived"].unique()).issubset({0, 1})
+
+    survivalBySex = titanicFlow.groupby("sex")["survived"].mean()
+    assert survivalBySex["female"] > survivalBySex["male"]
+    survivalBySex.round(2)
+  exercise:
+    prompt: 12단계. 생존율 비교 검증 루프 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      titanicFlow = loadLocalDataset("titanic")
+      requiredColumns = {"survived", "pclass", "sex", "age", "fare"}
+      missingColumns = requiredColumns - set(titanicFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert set(titanicFlow["survived"].unique()).issubset({0, 1})
+
+      survivalBySex = titanicFlow.groupby("sex")["survived"].mean()
+      assert survivalBySex["female"] > survivalBySex["male"]
+      survivalBySex.round(2)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 12단계. 생존율 비교 검증 루프의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 12단계. 생존율 비교 검증 루프의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: seaborn_05-titanic-survival-estimate-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 타이타닉 생존 추정 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 범주별 생존율의 유효 분모와 불확실성을 보여주는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_titanic_survival_estimate(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_titanic_survival_estimate(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_titanic_survival_estimate(rows):
+            required = ['pclass', 'survivalRate', 'sex']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'sex'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['pclass'] for row in usable]
+            y_values = [row['survivalRate'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.seaborn.seaborn_05.titanic-survival-estimate-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.seaborn.seaborn_05.titanic-survival-estimate-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_titanic_survival_estimate
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - pclass: 1
+              survivalRate: 0.9
+              sex: F
+            - pclass: 1
+              survivalRate: 0.4
+              sex: M
+            - pclass: 3
+              survivalRate: 0.5
+              sex: F
+          expectedReturn:
+            usableCount: 3
+            excludedCount: 0
+            groupCounts:
+              F: 2
+              M: 1
+            xExtent:
+            - 1
+            - 3
+            yExtent:
+            - 0.4
+            - 0.9
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: seaborn_05-titanic-survival-estimate-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - seaborn_05-titanic-survival-estimate-data-evidence-mastery
+    title: 타이타닉 생존 추정 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 요금제와 채널별 전환율을 유효 사용자 수와 interval로 비교한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_titanic_survival_estimate(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_titanic_survival_estimate(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_titanic_survival_estimate(candidate):
+            expected = {'mark': 'point-interval', 'x': 'pclass', 'y': 'survivalRate', 'group': 'sex', 'transforms': ['confidence-interval', 'mean-binary'], 'interaction': 'none'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.seaborn.seaborn_05.titanic-survival-estimate-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.seaborn.seaborn_05.titanic-survival-estimate-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_titanic_survival_estimate
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: point-interval
+              x: pclass
+              y: survivalRate
+              group: sex
+              transforms:
+              - confidence-interval
+              - mean-binary
+              interaction: none
+              description: 요금제와 채널별 전환율을 유효 사용자 수와 interval로 비교한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: point-interval
+              x: pclass
+              y: survivalRate
+              group: sex
+              transforms:
+              - confidence-interval
+              - mean-binary
+              interaction: none
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: survivalRate
+              y: pclass
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - description
+            encoding:
+              mark: point-interval
+              x: pclass
+              y: survivalRate
+              group: sex
+              transforms:
+              - confidence-interval
+              - mean-binary
+              interaction: none
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: seaborn_05-titanic-survival-estimate-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - seaborn_05-titanic-survival-estimate-encoding-transfer-transfer
+    title: 타이타닉 생존 추정 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 범주별 생존율의 유효 분모와 불확실성을 보여주는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_titanic_survival_estimate(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_titanic_survival_estimate(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_titanic_survival_estimate(situation):
+            table = {'binary-outcome-rate': {'encoding': 'point plus interval', 'evidence': 'known denominator', 'risk': 'unknown as failure'}, 'raw-binary-points': {'encoding': 'strip with jitter', 'evidence': 'point n', 'risk': 'overlap'}, 'many-subgroups': {'encoding': 'faceted estimates', 'evidence': 'subgroup n', 'risk': 'multiple comparisons'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.seaborn.seaborn_05.titanic-survival-estimate-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.seaborn.seaborn_05.titanic-survival-estimate-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_titanic_survival_estimate
+        cases:
+        - id: recalls-binary-outcome-rate
+          arguments:
+          - value: binary-outcome-rate
+          expectedReturn:
+            encoding: point plus interval
+            evidence: known denominator
+            risk: unknown as failure
+        - id: recalls-raw-binary-points
+          arguments:
+          - value: raw-binary-points
+          expectedReturn:
+            encoding: strip with jitter
+            evidence: point n
+            risk: overlap
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

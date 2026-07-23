@@ -1,0 +1,676 @@
+var e=`meta:
+  id: resilience_01
+  title: 멱등성과 처리 원장
+  order: 1
+  category: resilience
+  difficulty: easy
+  audience: 자동화 스크립트를 새벽 배치·스케줄러로 돌리려는 Python 학습자
+  packages: []
+  tags:
+    - idempotency
+    - 멱등성
+    - ledger
+    - 재실행
+    - json
+intro:
+  direction: 같은 입력을 두 번 실행해도 결과가 한 번 실행한 것과 같도록, 처리한 작업 키를 디스크 원장(ledger)에 남겨 재실행을 안전하게 만든다.
+  benefits:
+    - 멱등성이 "함수 속성"이 아니라 "외부 상태에 대한 효과"임을 안다.
+    - 처리 키를 JSON 파일로 영속해 프로세스가 죽었다 떠도 이어 쓴다.
+    - 재시도·중복 트리거가 중복 발송·이중 입력을 일으키지 않게 막는다.
+  diagram:
+    steps:
+      - label: 처리 원장 만들기
+        detail: 처리한 작업 키를 set으로 모으고 JSON 파일에 저장한다.
+      - label: 한 번만 처리
+        detail: 이미 원장에 있는 키는 건너뛰고 처음 보는 키만 처리한다.
+      - label: 재실행 안전
+        detail: 저장된 원장을 다시 로드해 두 번째 실행에서 중복을 흡수한다.
+    runtime:
+      - label: 로컬 표준 라이브러리 실행
+        detail: json, pathlib, tempfile만으로 로컬 Python에서 그대로 실행한다.
+      - label: assert로 직접 확인
+        detail: 두 번째 실행이 신규 건만 처리하는지 assert로 눈에 보이게 검증한다.
+sections:
+  - id: persistent-ledger
+    title: 영속 처리 원장
+    structuredPrimary: true
+    subtitle: 처리한 키를 디스크에 남긴다
+    goal: 처리한 작업 키 집합을 JSON 파일에 저장했다가 다시 읽어도 같은 집합이 복원되는지 확인한다.
+    why: 멱등성은 메모리 변수로는 못 만든다. 프로세스가 죽으면 메모리는 사라지므로, 처리 여부는 디스크에 남은 키로 판정해야 한다.
+    explanation: |-
+      멱등성(idempotency)은 "같은 작업을 여러 번 해도 결과가 한 번 한 것과 같다"는 성질이다. 자동화에서 이게 중요한 이유는 스케줄러·재시도가 같은 스크립트를 두 번 부를 수 있기 때문이다.
+
+      핵심은 "무엇을 이미 처리했는가"를 기억하는 것이다. 메모리 변수(set)는 프로세스가 죽으면 날아가므로, 처리한 키를 JSON 파일 같은 디스크 원장(ledger)에 남겨야 다음 실행이 이어서 판단할 수 있다.
+    tips:
+      - set은 JSON에 직접 못 담으므로 sorted(list)로 바꿔 저장하고, 읽을 때 다시 set으로 만든다.
+      - tempfile.TemporaryDirectory를 쓰면 실습 파일이 작업 폴더를 더럽히지 않는다.
+    snippet: |-
+      import json
+      import tempfile
+      from pathlib import Path
+
+      ledger = {"order-1", "order-2"}
+
+      with tempfile.TemporaryDirectory() as tmp:
+          ledgerPath = Path(tmp) / "ledger.json"
+          ledgerPath.write_text(json.dumps(sorted(ledger)), encoding="utf-8")
+          loaded = set(json.loads(ledgerPath.read_text(encoding="utf-8")))
+
+      assert loaded == ledger
+      loaded
+    exercise:
+      prompt: ledger에 "order-3"을 추가한 뒤 저장→로드해도 세 키가 모두 남는지 확인하세요.
+      starterCode: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+        ledger = {"order-1", "order-2"}
+        ledger.add(___)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            ledgerPath = Path(tmp) / "ledger.json"
+            ledgerPath.write_text(json.dumps(sorted(ledger)), encoding="utf-8")
+            loaded = set(json.loads(ledgerPath.read_text(encoding="utf-8")))
+
+        assert loaded == {"order-1", "order-2", "order-3"}
+        loaded
+      solution: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+        ledger = {"order-1", "order-2"}
+        ledger.add("order-3")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            ledgerPath = Path(tmp) / "ledger.json"
+            ledgerPath.write_text(json.dumps(sorted(ledger)), encoding="utf-8")
+            loaded = set(json.loads(ledgerPath.read_text(encoding="utf-8")))
+
+        assert loaded == {"order-1", "order-2", "order-3"}
+        loaded
+      hints:
+        - 추가할 키는 문자열 "order-3"이다.
+        - add 뒤 ledger는 세 개의 키를 가진다.
+      check:
+        type: noError
+        noError: 저장·로드 round-trip이 예외 없이 끝나야 한다.
+        resultCheck: loaded가 세 키 모두를 담아 assert가 통과해야 한다.
+    check:
+      noError: JSON 저장·로드가 끝나야 한다.
+      resultCheck: loaded가 저장 전 ledger와 같아야 한다.
+  - id: send-once
+    title: 한 번만 처리하기
+    structuredPrimary: true
+    subtitle: 이미 처리한 키는 건너뛴다
+    goal: 같은 작업 키를 두 번 넘겨도 실제 발송은 한 번만 일어나는 멱등 함수를 만든다.
+    why: 부수효과(메일 발송·행 추가)는 비가역이다. 같은 키가 다시 와도 한 번만 실행되게 막는 게 멱등성의 핵심이다.
+    explanation: |-
+      sendOnce 함수는 처리 원장(ledger)과 결과 모음(sink), 그리고 작업 키를 받는다. 키가 이미 원장에 있으면 아무것도 하지 않고 False를 돌려준다. 처음 보는 키만 sink에 추가하고 원장에 기록한 뒤 True를 돌려준다.
+
+      이렇게 하면 같은 키를 두 번 호출해도 sink에는 한 번만 들어간다. "두 번 호출 = 한 번 효과"가 바로 멱등이다.
+    tips:
+      - 멱등성은 함수가 "무엇을 이미 했는지"를 기억할 때만 생긴다 - 기억이 곧 원장이다.
+      - return False/True로 "건너뜀/처리함"을 구분하면 호출하는 쪽이 집계할 수 있다.
+    snippet: |-
+      def sendOnce(ledger, sink, key):
+          if key in ledger:
+              return False
+          sink.append(key)
+          ledger.add(key)
+          return True
+
+      ledger = set()
+      sent = []
+
+      sendOnce(ledger, sent, "order-1")
+      sendOnce(ledger, sent, "order-1")
+      sentCount = len(sent)
+
+      assert sentCount == 1
+      sentCount
+    exercise:
+      prompt: "order-1, order-2, order-1을 차례로 처리하면 실제 발송이 몇 건인지 확인하세요(중복 order-1은 한 번만)."
+      starterCode: |-
+        def sendOnce(ledger, sink, key):
+            if key in ledger:
+                return False
+            sink.append(key)
+            ledger.add(key)
+            return True
+
+        ledger = set()
+        sent = []
+
+        for key in ["order-1", "order-2", "order-1"]:
+            sendOnce(ledger, sent, ___)
+        sentCount = len(sent)
+
+        assert sentCount == 2
+        sentCount
+      solution: |-
+        def sendOnce(ledger, sink, key):
+            if key in ledger:
+                return False
+            sink.append(key)
+            ledger.add(key)
+            return True
+
+        ledger = set()
+        sent = []
+
+        for key in ["order-1", "order-2", "order-1"]:
+            sendOnce(ledger, sent, key)
+        sentCount = len(sent)
+
+        assert sentCount == 2
+        sentCount
+      hints:
+        - 반복 변수 key를 그대로 sendOnce에 넘긴다.
+        - 중복된 order-1은 두 번째 호출에서 건너뛰므로 발송은 2건이다.
+      check:
+        type: noError
+        noError: 반복 처리가 예외 없이 끝나야 한다.
+        resultCheck: sentCount가 2여야 한다(중복 1건 제외).
+    check:
+      noError: sendOnce 반복 호출이 끝나야 한다.
+      resultCheck: sentCount가 1이어야 한다.
+  - id: rerun-safe
+    title: 재실행해도 안전하게
+    structuredPrimary: true
+    subtitle: 두 번째 실행은 신규 건만
+    goal: 저장된 원장을 로드해 처리하는 배치가, 겹치는 입력으로 다시 돌아도 신규 건만 처리하는지 확인한다.
+    why: 새벽 배치가 재시도·중복 트리거로 두 번 돌아도, 이미 보낸 주문은 원장에 있어 건너뛴다 - 고객에게 같은 메일이 두 번 가지 않는다.
+    explanation: |-
+      runBatch는 원장 파일을 로드(없으면 빈 set)한 뒤 주문 목록을 돈다. 이미 원장에 있는 키는 skipped로 세고, 처음 보는 키만 sent로 세며 원장에 기록한다. 마지막에 원장을 다시 저장한다.
+
+      1차 실행은 두 건을 모두 발송한다. 2차 실행에 같은 두 건과 신규 한 건을 넘기면, 앞의 두 건은 원장에 있어 건너뛰고 신규 한 건만 발송된다. 같은 코드를 두 번 돌려도 중복 발송이 없다.
+    tips:
+      - 파일이 없을 때 빈 set으로 시작하면 "첫 실행"과 "재실행"을 같은 코드로 다룰 수 있다.
+      - sent/skipped 집계를 dict로 돌려주면 운영자가 한 줄로 결과를 본다.
+    snippet: |-
+      import json
+      import tempfile
+      from pathlib import Path
+
+      def runBatch(orders, ledgerPath):
+          if ledgerPath.exists():
+              ledger = set(json.loads(ledgerPath.read_text(encoding="utf-8")))
+          else:
+              ledger = set()
+          sent = 0
+          skipped = 0
+          for key in orders:
+              if key in ledger:
+                  skipped += 1
+                  continue
+              sent += 1
+              ledger.add(key)
+          ledgerPath.write_text(json.dumps(sorted(ledger)), encoding="utf-8")
+          return {"sent": sent, "skipped": skipped}
+
+      with tempfile.TemporaryDirectory() as tmp:
+          path = Path(tmp) / "ledger.json"
+          first = runBatch(["order-1", "order-2"], path)
+          summary = runBatch(["order-1", "order-2", "order-3"], path)
+
+      assert first == {"sent": 2, "skipped": 0}
+      assert summary == {"sent": 1, "skipped": 2}
+      summary
+    exercise:
+      prompt: 2차 실행 입력을 ["order-2", "order-4"]로 바꾸면 sent와 skipped가 각각 몇 건인지 확인하세요.
+      starterCode: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+        def runBatch(orders, ledgerPath):
+            if ledgerPath.exists():
+                ledger = set(json.loads(ledgerPath.read_text(encoding="utf-8")))
+            else:
+                ledger = set()
+            sent = 0
+            skipped = 0
+            for key in orders:
+                if key in ledger:
+                    skipped += 1
+                    continue
+                sent += 1
+                ledger.add(key)
+            ledgerPath.write_text(json.dumps(sorted(ledger)), encoding="utf-8")
+            return {"sent": sent, "skipped": skipped}
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ledger.json"
+            first = runBatch(["order-1", "order-2"], path)
+            summary = runBatch([___, ___], path)
+
+        assert summary == {"sent": 1, "skipped": 1}
+        summary
+      solution: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+        def runBatch(orders, ledgerPath):
+            if ledgerPath.exists():
+                ledger = set(json.loads(ledgerPath.read_text(encoding="utf-8")))
+            else:
+                ledger = set()
+            sent = 0
+            skipped = 0
+            for key in orders:
+                if key in ledger:
+                    skipped += 1
+                    continue
+                sent += 1
+                ledger.add(key)
+            ledgerPath.write_text(json.dumps(sorted(ledger)), encoding="utf-8")
+            return {"sent": sent, "skipped": skipped}
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ledger.json"
+            first = runBatch(["order-1", "order-2"], path)
+            summary = runBatch(["order-2", "order-4"], path)
+
+        assert summary == {"sent": 1, "skipped": 1}
+        summary
+      hints:
+        - order-2는 1차에서 이미 발송돼 원장에 있으므로 skip된다.
+        - order-4만 신규라 발송 1건, 건너뜀 1건이다.
+      check:
+        type: noError
+        noError: 두 번의 runBatch 호출이 예외 없이 끝나야 한다.
+        resultCheck: summary가 sent 1, skipped 1이어야 한다.
+    check:
+      noError: runBatch 두 번 호출이 끝나야 한다.
+      resultCheck: summary가 sent 1, skipped 2여야 한다.
+  - id: practice-daily-batch
+    title: '종합 실습: 하루 두 번 도는 배치'
+    structuredPrimary: true
+    subtitle: 원장 + 멱등 처리를 한 흐름으로
+    goal: 같은 원장 파일로 아침·저녁 두 번 도는 배치가 고유 주문만 발송하고 중복은 흡수하는지 종합 점검한다.
+    why: 영속 원장·멱등 처리·재실행 안전을 한 번에 묶어 실제 업무 배치가 어떻게 안전해지는지 확인한다.
+    explanation: |-
+      dailyRun은 원장을 로드(없으면 빈 set)해 이미 처리한 주문은 건너뛰고 신규만 발송한 뒤 원장을 저장한다. 아침에 A·B·C 세 건이 들어오면 3건 발송, 저녁에 B·C·D·E가 들어오면 B·C는 원장에 있어 건너뛰고 D·E만 발송한다.
+
+      두 번의 실행을 합쳐도 발송은 고유 주문 5건뿐이다. 멱등성·원장·재실행 안전이 함께 작동한 결과다.
+    tips:
+      - 매 실행이 원장을 로드→처리→저장하므로 몇 번을 돌려도 누적 효과가 같다.
+      - 발송 건수 합이 고유 주문 수와 같으면 중복이 없다는 신호다.
+    snippet: |-
+      import json
+      import tempfile
+      from pathlib import Path
+
+      def dailyRun(orders, ledgerPath):
+          ledger = set(json.loads(ledgerPath.read_text(encoding="utf-8"))) if ledgerPath.exists() else set()
+          sent = 0
+          for key in orders:
+              if key in ledger:
+                  continue
+              sent += 1
+              ledger.add(key)
+          ledgerPath.write_text(json.dumps(sorted(ledger)), encoding="utf-8")
+          return sent
+
+      with tempfile.TemporaryDirectory() as tmp:
+          path = Path(tmp) / "ledger.json"
+          morning = dailyRun(["A", "B", "C"], path)
+          evening = dailyRun(["B", "C", "D", "E"], path)
+          totalSent = morning + evening
+
+      assert morning == 3
+      assert evening == 2
+      assert totalSent == 5
+      totalSent
+    exercise:
+      prompt: 저녁 입력을 ["C", "D"]로 바꾸면 저녁 발송과 총 발송이 각각 몇 건인지 확인하세요.
+      starterCode: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+        def dailyRun(orders, ledgerPath):
+            ledger = set(json.loads(ledgerPath.read_text(encoding="utf-8"))) if ledgerPath.exists() else set()
+            sent = 0
+            for key in orders:
+                if key in ledger:
+                    continue
+                sent += 1
+                ledger.add(key)
+            ledgerPath.write_text(json.dumps(sorted(ledger)), encoding="utf-8")
+            return sent
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ledger.json"
+            morning = dailyRun(["A", "B", "C"], path)
+            evening = dailyRun([___, ___], path)
+            totalSent = morning + evening
+
+        assert evening == 1
+        assert totalSent == 4
+        totalSent
+      solution: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+        def dailyRun(orders, ledgerPath):
+            ledger = set(json.loads(ledgerPath.read_text(encoding="utf-8"))) if ledgerPath.exists() else set()
+            sent = 0
+            for key in orders:
+                if key in ledger:
+                    continue
+                sent += 1
+                ledger.add(key)
+            ledgerPath.write_text(json.dumps(sorted(ledger)), encoding="utf-8")
+            return sent
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ledger.json"
+            morning = dailyRun(["A", "B", "C"], path)
+            evening = dailyRun(["C", "D"], path)
+            totalSent = morning + evening
+
+        assert evening == 1
+        assert totalSent == 4
+        totalSent
+      hints:
+        - C는 아침에 이미 발송돼 원장에 있으므로 건너뛴다.
+        - D만 신규라 저녁 발송 1건, 총 4건이다.
+      check:
+        type: noError
+        noError: 두 번의 dailyRun이 예외 없이 끝나야 한다.
+        resultCheck: 저녁 발송 1건, 총 발송 4건이어야 한다.
+    check:
+      noError: 아침·저녁 dailyRun이 끝나야 한다.
+      resultCheck: 총 발송이 고유 주문 5건과 같아야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: resilience_01-idempotency-ledger-transition-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - persistent-ledger
+    - practice-daily-batch
+    title: 멱등 처리 원장의 claim·commit 상태 전이 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 중복 실행과 실패 후 재시도를 상태로 구분한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 키 존재만 보지 말고 claimed·committed·failed 상태를 구분하세요.
+    - in-flight claim에는 lease 만료 규칙이 있어야 합니다.
+    exercise:
+      prompt: decide_ledger_action(entry, now, lease_seconds)를 완성하세요.
+      starterCode: |-
+        def decide_ledger_action(entry, now, lease_seconds):
+            raise NotImplementedError
+      solution: |
+        def decide_ledger_action(entry, now, lease_seconds):
+            if entry is None:
+                return {"action": "claim", "reason": "new-key"}
+            status = entry.get("status")
+            if status == "committed":
+                return {"action": "skip", "reason": "already-committed"}
+            if status == "claimed" and now - entry.get("claimedAt", now) < lease_seconds:
+                return {"action": "wait", "reason": "active-lease"}
+            if status in {"claimed", "failed"}:
+                return {"action": "reclaim", "reason": "retryable"}
+            return {"action": "reject", "reason": "invalid-state"}
+      hints: *id001
+    check:
+      id: python.resilience.resilience_01.idempotency-ledger-transition.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.resilience.resilience_01.idempotency-ledger-transition.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: decide_ledger_action
+        cases:
+        - id: claims-new-key
+          arguments:
+          - value: null
+          - value: 100
+          - value: 30
+          expectedReturn:
+            action: claim
+            reason: new-key
+        - id: skips-committed-key
+          arguments:
+          - value:
+              status: committed
+          - value: 100
+          - value: 30
+          expectedReturn:
+            action: skip
+            reason: already-committed
+        - id: waits-or-reclaims-lease
+          arguments:
+          - value:
+              status: claimed
+              claimedAt: 90
+          - value: 100
+          - value: 30
+          expectedReturn:
+            action: wait
+            reason: active-lease
+        - id: reclaims-expired-lease
+          arguments:
+          - value:
+              status: claimed
+              claimedAt: 50
+          - value: 100
+          - value: 30
+          expectedReturn:
+            action: reclaim
+            reason: retryable
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: resilience_01-idempotency-key-contract-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - resilience_01-idempotency-ledger-transition-mastery
+    title: 다른 업무 이벤트의 멱등 키 계약 만들기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 업무 identity와 payload hash를 묶어 충돌을 검출한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표시 이름이 아니라 변하지 않는 업무 identity를 키 재료로 사용하세요.
+    - 정렬된 직렬화와 hash로 입력 순서와 무관한 키를 만드세요.
+    exercise:
+      prompt: build_idempotency_key(event, required_fields)를 완성하세요.
+      starterCode: |-
+        def build_idempotency_key(event, required_fields):
+            raise NotImplementedError
+      solution: |
+        def build_idempotency_key(event, required_fields):
+            import hashlib
+            import json
+            missing = sorted(field for field in required_fields if not str(event.get(field, "")).strip())
+            if missing:
+                return {"ready": False, "missing": missing, "key": None}
+            identity = {field: event[field] for field in sorted(required_fields)}
+            payload = json.dumps(identity, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+            digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
+            return {"ready": True, "missing": [], "key": f"{event.get('type', 'event')}:{digest}"}
+      hints: *id002
+    check:
+      id: python.resilience.resilience_01.idempotency-key-contract.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.resilience.resilience_01.idempotency-key-contract.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_idempotency_key
+        cases:
+        - id: builds-stable-key
+          arguments:
+          - value:
+              type: invoice
+              invoiceId: i1
+              version: 2
+          - value:
+            - invoiceId
+            - version
+          expectedReturn:
+            ready: true
+            missing: []
+            key: invoice:bd28997bdc25cde1
+        - id: ignores-input-order
+          arguments:
+          - value:
+              version: 2
+              invoiceId: i1
+              type: invoice
+          - value:
+            - version
+            - invoiceId
+          expectedReturn:
+            ready: true
+            missing: []
+            key: invoice:bd28997bdc25cde1
+        - id: reports-missing-identity
+          arguments:
+          - value:
+              type: invoice
+              invoiceId: ''
+          - value:
+            - invoiceId
+            - version
+          expectedReturn:
+            ready: false
+            missing:
+            - invoiceId
+            - version
+            key: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: resilience_01-idempotency-ledger-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - resilience_01-idempotency-key-contract-transfer
+    title: 멱등 원장 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: claim·effect·commit 순서와 recovery를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Web에서 상태 전이와 불변식을 즉시 검증하세요.
+    - Local에서는 실제 crash·restart 뒤 원장과 artifact를 다시 읽어 확인하세요.
+    exercise:
+      prompt: choose_ledger_evidence(stage)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_ledger_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_ledger_evidence(stage):
+            table = {'claim': {'action': 'atomically claim stable key', 'evidence': 'lease-bearing ledger entry', 'risk': 'concurrent duplicate'}, 'effect': {'action': 'perform bounded external effect', 'evidence': 'effect identity', 'risk': 'unknown outcome'}, 'commit': {'action': 'record committed result', 'evidence': 'result hash and timestamp', 'risk': 'repeat after success'}, 'recover': {'action': 'reclaim expired or failed work', 'evidence': 'retry transition', 'risk': 'permanent stuck claim'}}
+            if stage not in table:
+                raise ValueError('unknown stage')
+            return table[stage]
+      hints: *id003
+    check:
+      id: python.resilience.resilience_01.idempotency-ledger-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.resilience.resilience_01.idempotency-ledger-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_ledger_evidence
+        cases:
+        - id: recalls-claim
+          arguments:
+          - value: claim
+          expectedReturn:
+            action: atomically claim stable key
+            evidence: lease-bearing ledger entry
+            risk: concurrent duplicate
+        - id: recalls-effect
+          arguments:
+          - value: effect
+          expectedReturn:
+            action: perform bounded external effect
+            evidence: effect identity
+            risk: unknown outcome
+        - id: recalls-commit
+          arguments:
+          - value: commit
+          expectedReturn:
+            action: record committed result
+            evidence: result hash and timestamp
+            risk: repeat after success
+        - id: recalls-recover
+          arguments:
+          - value: recover
+          expectedReturn:
+            action: reclaim expired or failed work
+            evidence: retry transition
+            risk: permanent stuck claim
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

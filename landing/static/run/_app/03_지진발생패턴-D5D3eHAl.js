@@ -1,0 +1,802 @@
+var e=`meta:
+  packages:
+  - numpy
+  - pandas
+  id: numpy_03
+  title: 지진발생패턴
+  order: 3
+  category: numpy
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - numpy
+  - boolean indexing
+  - where
+  - unique
+  - percentile
+  - argsort
+  - 검증
+  - 조건선택
+  seo:
+    title: NumPy 불리언 인덱싱 - 지진 데이터 분석
+    description: NumPy의 불리언 인덱싱과 조건 선택을 배우며 전 세계 지진 발생 데이터를 분석합니다.
+    keywords:
+    - numpy
+    - boolean indexing
+    - where
+    - unique
+    - 지진데이터
+intro:
+  emoji: 🌍
+  goal: 지진 데이터로 불리언 인덱싱과 조건 선택을 익힙니다.
+  description: 160건의 로컬 지진 샘플을 분석합니다. 불리언 인덱싱으로 조건에 맞는 데이터를 필터링하고, where와 unique 함수로 데이터를 탐색합니다.
+  direction: 지진발생패턴에서 배열 입력을 만들고 벡터 연산 결과를 수치로 검증합니다.
+  benefits:
+  - 배열 입력 확인 후 벡터화 계산에 맞는 코드 입력을 고릅니다.
+  - 지진발생패턴 결과를 shape와 수치 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 계산 파이프라인에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(배열 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 로드 처리 실행
+      detail: 벡터화 계산 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 배열 추출 결과 검증
+      detail: shape와 수치 결과 기준으로 실행 결과를 비교합니다.
+    - label: 지진발생패턴 재사용
+      detail: 완성 코드를 계산 파이프라인에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 배열 계산 환경
+      detail: numpy, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 지진발생패턴 실행
+      detail: 셀을 실행해 shape와 수치 결과와 예외 상태를 확인합니다.
+    - label: 지진발생패턴 완료
+      detail: 검증된 코드를 계산 파이프라인로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: NumPy와 pandas를 불러옵니다. pandas는 CSV 로딩용으로만 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import numpy as np
+    import pandas as pd
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: |-
+      import numpy as np
+      import pandas as pd
+    hints:
+    - 바꿀 지점은 배열 입력을 만드는 첫 줄과 벡터화 계산 줄에서 찾으세요.
+    - 실행 뒤 shape와 수치 결과 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 shape와 수치 결과 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step2_data
+  title: 2단계. 데이터 로드
+  structuredPrimary: true
+  subtitle: 지진 데이터셋
+  goal: 2단계. 데이터 로드에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 160건의 로컬 지진 샘플을 로드합니다. Magnitude(규모), Latitude(위도), Longitude(경도) 등의 정보가 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    df = loadLocalDataset("earthquakes")
+    df.head()
+  exercise:
+    prompt: 2단계. 데이터 로드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      df = loadLocalDataset("earthquakes")
+      df.head()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 로드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 로드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_extract
+  title: 3단계. 배열 추출
+  structuredPrimary: true
+  subtitle: Magnitude
+  goal: 3단계. 배열 추출에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: Magnitude는 지진의 '규모'를 나타내는 수치입니다. 리히터 규모라고도 불리며, 숫자가 1 증가할 때마다 에너지는 약 32배 커집니다. 예를 들어 규모
+    6.0 지진은 규모 5.0 지진보다 32배나 강합니다. df['Magnitude']로 해당 열을 선택하고 .values로 NumPy 배열로 변환합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    mag = df['Magnitude'].values
+    mag.shape
+  exercise:
+    prompt: 3단계. 배열 추출 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      mag = df['Magnitude'].values
+      mag.shape
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 배열 추출에서 \`mag\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 배열 추출 실행 뒤 \`mag\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step4_stats
+  title: 4단계. 기본 통계
+  structuredPrimary: true
+  subtitle: 규모 분포
+  goal: 4단계. 기본 통계에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  explanation: 기본 통계로 지진 규모 분포를 파악합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: 'f"평균: {np.mean(mag):.2f}, 최소: {np.min(mag):.1f}, 최대: {np.max(mag):.1f}"'
+  exercise:
+    prompt: 4단계. 기본 통계 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    starterCode: 'f"평균: {np.mean(mag):.2f}, 최소: {np.min(mag):.1f}, 최대: {np.max(mag):.1f}"'
+    hints:
+    - 바꿀 지점은 배열 입력을 만드는 첫 줄과 벡터화 계산 줄에서 찾으세요.
+    - 실행 뒤 shape와 수치 결과 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 기본 통계의 수정 코드가 벡터화 계산 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 4단계. 기본 통계 실행 결과가 shape와 수치 결과 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step5_boolean
+  title: 5단계. 불리언 배열 생성
+  structuredPrimary: true
+  subtitle: 비교 연산
+  goal: 5단계. 불리언 배열 생성에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    불리언(Boolean)은 '참(True) 또는 거짓(False)' 두 가지 값만 가지는 데이터 타입입니다. mag >= 6.0이라고 쓰면 NumPy는 160개 모든 지진 샘플에 대해 '규모가 6.0 이상인가?'를 확인하고, 각각 True 또는 False로 답한 배열을 만들어 줍니다. 이렇게 만든 True/False 배열을 불리언 배열이라 하며, 이것으로 원하는 데이터만 골라낼 수 있습니다.
+
+    NumPy 배열에 비교 연산을 적용하면 각 요소에 대한 True/False 불리언 배열이 반환됩니다. 이 배열을 인덱싱에 사용할 수 있습니다.
+  snippet: |-
+    strong = mag >= 6.0
+    strong[:10]
+  exercise:
+    prompt: 5단계. 불리언 배열 생성 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      strong = mag >= 6.0
+      strong[:10]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 불리언 배열 생성에서 \`strong\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 불리언 배열 생성 실행 뒤 \`strong\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step6_boolean_index
+  title: 6단계. 불리언 인덱싱
+  structuredPrimary: true
+  subtitle: 조건 필터링
+  goal: 6단계. 불리언 인덱싱에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    불리언 인덱싱은 True/False 배열을 '체크리스트'처럼 사용해서 True인 항목만 골라내는 기법입니다. mag[strong]이라고 쓰면 strong 배열이 True인 위치의 규모 값만 추출됩니다. 160개 샘플 중 규모 6.0 이상인 지진만 깔끔하게 걸러낼 수 있습니다. 엑셀의 필터 기능을 코드 한 줄로 구현하는 것입니다.
+
+    불리언 배열을 인덱스로 사용하면 True인 위치의 요소만 선택됩니다. mag[mag >= 6.0]처럼 한 줄로 쓸 수도 있습니다.
+  snippet: |-
+    filtered = mag[strong]
+    filtered.shape
+  exercise:
+    prompt: 6단계. 불리언 인덱싱 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      filtered = mag[strong]
+      filtered.shape
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 불리언 인덱싱에서 \`filtered\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 불리언 인덱싱 실행 뒤 \`filtered\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step7_ratio
+  title: 7단계. 비율 계산
+  structuredPrimary: true
+  subtitle: sum으로 개수 세기
+  goal: 7단계. 비율 계산에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    불리언 배열에 sum()을 적용하면 True의 개수가 계산됩니다. 강진 비율을 구해봅시다.
+
+    불리언 배열에 sum()을 적용하면 True의 개수가 계산됩니다. True는 1, False는 0으로 취급되기 때문입니다.
+  snippet: |-
+    ratio = np.sum(strong) / len(mag) * 100
+    f"규모 6.0 이상 비율: {ratio:.2f}%"
+  exercise:
+    prompt: 7단계. 비율 계산 예제에서 \`ratio\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      ratio = np.sum(strong) / len(mag) * 100
+      f"규모 6.0 이상 비율: {ratio:.2f}%"
+    hints:
+    - 바꿀 지점은 \`ratio = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`ratio\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 비율 계산에서 \`ratio\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. 비율 계산 실행 뒤 \`ratio\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step8_multiple
+  title: 8단계. 여러 조건 결합
+  structuredPrimary: true
+  subtitle: '& (and), | (or)'
+  goal: 8단계. 여러 조건 결합에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    두 개 이상의 조건을 동시에 적용할 수 있습니다. &는 '그리고(AND)'로 두 조건을 모두 만족해야 하고, |는 '또는(OR)'로 둘 중 하나만 만족해도 됩니다. (mag >= 5.0) & (mag < 6.0)은 '5.0 이상이면서 동시에 6.0 미만'인 중규모 지진을 찾습니다. 각 조건을 괄호로 감싸는 것이 중요합니다.
+
+    NumPy에서 여러 조건을 결합할 때는 & (and), | (or), ~ (not)을 사용합니다. 각 조건은 반드시 괄호로 감싸야 합니다.
+  snippet: |-
+    medium = (mag >= 5.0) & (mag < 6.0)
+    count = np.sum(medium)
+    f"규모 5.0~6.0 지진 수: {count}"
+  exercise:
+    prompt: 8단계. 여러 조건 결합 예제에서 \`medium\`, \`count\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      medium = (mag >= 5.0) & (mag < 6.0)
+      count = np.sum(medium)
+      f"규모 5.0~6.0 지진 수: {count}"
+    hints:
+    - 바꿀 지점은 \`medium = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`medium\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 여러 조건 결합에서 \`medium\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 8단계. 여러 조건 결합 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step9_percentile
+  title: 9단계. 백분위수
+  structuredPrimary: true
+  subtitle: np.percentile()
+  goal: 9단계. 백분위수에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    백분위수(percentile)는 '전체 중 몇 %가 이 값보다 작은가'를 나타냅니다. 예를 들어 75번째 백분위수가 5.5라면, 전체 지진의 75%가 규모 5.5 미만이라는 뜻입니다. 25%, 50%, 75% 백분위수를 보면 데이터가 어떻게 분포되어 있는지 한눈에 파악할 수 있습니다. 50번째 백분위수는 중앙값(median)과 같습니다.
+
+    np.percentile(arr, q)는 q번째 백분위수를 반환합니다. 50번째 백분위수는 중앙값과 같습니다.
+  snippet: |-
+    q1 = np.percentile(mag, 25)
+    q2 = np.percentile(mag, 50)
+    q3 = np.percentile(mag, 75)
+    f"25%: {q1:.2f}, 50%(중앙값): {q2:.2f}, 75%: {q3:.2f}"
+  exercise:
+    prompt: 9단계. 백분위수 예제에서 \`q1\`, \`q2\`, \`q3\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      q1 = np.percentile(mag, 25)
+      q2 = np.percentile(mag, 50)
+      q3 = np.percentile(mag, 75)
+      f"25%: {q1:.2f}, 50%(중앙값): {q2:.2f}, 75%: {q3:.2f}"
+    hints:
+    - 바꿀 지점은 \`q1 = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`q1\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 백분위수에서 \`q1\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 9단계. 백분위수 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step10_where
+  title: 10단계. where로 조건 선택
+  structuredPrimary: true
+  subtitle: np.where()
+  goal: 10단계. where로 조건 선택에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    np.where()는 조건에 따라 다른 값을 지정하는 함수입니다. np.where(조건, 참일때 값, 거짓일때 값) 형태로 씁니다. 엑셀의 IF 함수와 똑같이 작동합니다. mag >= 6.0 조건이 True면 'Strong', False면 'Normal'을 할당해서 160개 지진 샘플 전체를 한 번에 분류할 수 있습니다.
+
+    np.where(condition, x, y)는 조건이 True인 곳은 x, False인 곳은 y를 반환합니다. 엑셀의 IF 함수와 비슷합니다.
+  snippet: |-
+    category = np.where(mag >= 6.0, 'Strong', 'Normal')
+    category[:10]
+  exercise:
+    prompt: 10단계. where로 조건 선택 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      category = np.where(mag >= 6.0, 'Strong', 'Normal')
+      category[:10]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. where로 조건 선택에서 \`category\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 10단계. where로 조건 선택 실행 뒤 \`category\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step11_nested_where
+  title: 11단계. 중첩 where
+  structuredPrimary: true
+  subtitle: 여러 카테고리
+  goal: 11단계. 중첩 where에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: where 안에 또 다른 where를 넣어 3개 이상의 카테고리로 분류할 수 있습니다. 엑셀에서 IF 안에 IF를 넣는 중첩 IF와 같습니다. 규모 7.0
+    이상은 Major, 6.0 이상은 Strong, 5.0 이상은 Moderate, 나머지는 Light로 4단계 분류가 가능합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    level = np.where(mag >= 7.0, 'Major',
+            np.where(mag >= 6.0, 'Strong',
+            np.where(mag >= 5.0, 'Moderate', 'Light')))
+    level[:20]
+  exercise:
+    prompt: 11단계. 중첩 where 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      level = np.where(mag >= 7.0, 'Major',
+              np.where(mag >= 6.0, 'Strong',
+              np.where(mag >= 5.0, 'Moderate', 'Light')))
+      level[:20]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 중첩 where에서 \`level\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 11단계. 중첩 where 실행 뒤 \`level\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step12_unique
+  title: 12단계. 고유값과 빈도
+  structuredPrimary: true
+  subtitle: np.unique()
+  goal: 12단계. 고유값과 빈도에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    np.unique()는 배열에서 '중복을 제거한 고유한 값들'을 찾아줍니다. 예를 들어 ['A', 'B', 'A', 'C', 'B']에서 unique를 적용하면 ['A', 'B', 'C']가 됩니다. return_counts=True를 추가하면 각 값이 몇 번 나타났는지도 함께 알려줍니다. 분류 결과별 지진 수를 세는 데 유용합니다.
+
+    np.unique()는 배열의 고유한 값들을 반환합니다. return_counts=True를 추가하면 각 값의 빈도도 함께 반환됩니다.
+  snippet: |-
+    labels, counts = np.unique(level, return_counts=True)
+    pd.DataFrame({'Category': labels, 'Count': counts})
+  exercise:
+    prompt: 12단계. 고유값과 빈도 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      labels, counts = np.unique(level, return_counts=True)
+      pd.DataFrame({'Category': labels, 'Count': counts})
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 12단계. 고유값과 빈도의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 12단계. 고유값과 빈도 실행 결과가 shape와 수치 결과 기준으로 바꾼 열 이름이나 행 값을 반영해야 합니다.
+- id: step13_location
+  title: 13단계. 위치 데이터 추출
+  structuredPrimary: true
+  subtitle: 위도/경도
+  goal: 13단계. 위치 데이터 추출에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 위도(Latitude)는 적도를 기준으로 남북 위치를, 경도(Longitude)는 영국 그리니치를 기준으로 동서 위치를 나타냅니다. 서울은 약 위도 37°,
+    경도 127°입니다. argmax로 최대 규모 지진의 인덱스를 찾고, 그 인덱스로 위도와 경도 배열에서 해당 위치를 꺼내면 가장 강한 지진이 어디서 발생했는지 알 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    lat = df['Latitude'].values
+    lon = df['Longitude'].values
+    idx = np.argmax(mag)
+    peak = mag[idx]
+    y = lat[idx]
+    x = lon[idx]
+    f"최대 규모: {peak}, 위치: ({y:.2f}, {x:.2f})"
+  exercise:
+    prompt: 13단계. 위치 데이터 추출 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      lat = df['Latitude'].values
+      lon = df['Longitude'].values
+      idx = np.argmax(mag)
+      peak = mag[idx]
+      y = lat[idx]
+      x = lon[idx]
+      f"최대 규모: {peak}, 위치: ({y:.2f}, {x:.2f})"
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 13단계. 위치 데이터 추출에서 \`lat\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 13단계. 위치 데이터 추출 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step14_region
+  title: 14단계. 지역 필터링
+  structuredPrimary: true
+  subtitle: 태평양 불의 고리
+  goal: 14단계. 지역 필터링에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 태평양 불의 고리(Ring of Fire)는 태평양을 둘러싼 지역으로, 전 세계 지진과 화산의 약 75%가 이곳에서 발생합니다. 한국, 일본, 인도네시아,
+    칠레, 미국 서부 등이 포함됩니다. 경도가 120° 이상이거나 -60° 이하이고(|로 연결), 위도가 60° 이내인 조건을 &로 결합해 이 지역의 지진을 필터링합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    pacific = ((lon >= 120) | (lon <= -60)) & (np.abs(lat) <= 60)
+    n = np.sum(pacific)
+    f"태평양 불의 고리 지진 수: {n} ({n/len(mag)*100:.1f}%)"
+  exercise:
+    prompt: 14단계. 지역 필터링 예제에서 \`pacific\`, \`n\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      pacific = ((lon >= 120) | (lon <= -60)) & (np.abs(lat) <= 60)
+      n = np.sum(pacific)
+      f"태평양 불의 고리 지진 수: {n} ({n/len(mag)*100:.1f}%)"
+    hints:
+    - 바꿀 지점은 \`pacific = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`pacific\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 14단계. 지역 필터링에서 \`pacific\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 14단계. 지역 필터링 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step15_argsort
+  title: 15단계. 정렬 인덱스
+  structuredPrimary: true
+  subtitle: np.argsort()
+  goal: 15단계. 정렬 인덱스에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    argsort()는 '정렬하면 각 값이 몇 번째에 위치할지'를 알려주는 인덱스 배열을 반환합니다. 예를 들어 [3, 1, 2]를 argsort하면 [1, 2, 0]이 나오는데, 이는 '1번 위치 값(1)이 가장 작고, 다음은 2번 위치(2), 그 다음은 0번 위치(3)'라는 뜻입니다. [::-1]로 역순으로 만들면 내림차순 정렬 인덱스가 되어 상위 10개 강진을 쉽게 찾을 수 있습니다.
+
+    np.argsort()는 정렬된 인덱스를 반환합니다. [::-1]로 역순으로 만들어 내림차순 정렬 인덱스를 얻습니다.
+  snippet: |-
+    order = np.argsort(mag)[::-1]
+    top = mag[order[:10]]
+    top
+  exercise:
+    prompt: 15단계. 정렬 인덱스 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      order = np.argsort(mag)[::-1]
+      top = mag[order[:10]]
+      top
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 15단계. 정렬 인덱스에서 \`order\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 15단계. 정렬 인덱스 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 지진 위험 이벤트 필터링'
+  structuredPrimary: true
+  subtitle: 불리언 인덱싱, percentile, argsort, 실패 케이스
+  goal: '현업 흐름 검증: 지진 위험 이벤트 필터링에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    조건 선택은 눈으로 맞아 보이는 결과보다 마스크의 의미가 중요합니다. 규모와 깊이 조건을 분리해서 예측하고, 상위 위험 이벤트가 올바른 순서로 뽑히는지 검증하세요.
+
+    변주 실험
+    깊이가 얕은 지진보다 대도시 근접 지진을 더 위험하게 보는 정책으로 바꾸고, 정렬 기준 배열을 새로 만들어 비교하세요.
+  tips:
+  - 변주 실험 깊이가 얕은 지진보다 대도시 근접 지진을 더 위험하게 보는 정책으로 바꾸고, 정렬 기준 배열을 새로 만들어 비교하세요.
+  snippet: |-
+    import numpy as np
+
+    magnitude = np.array([4.8, 5.1, 6.3, 4.2, 7.0])
+    depth = np.array([10, 70, 25, 12, 40])
+    eventIds = np.array(["E-1", "E-2", "E-3", "E-4", "E-5"])
+
+    shallowStrong = (magnitude >= 5.0) & (depth <= 50)
+    threshold = np.percentile(magnitude, 80)
+    topOrder = np.argsort(magnitude)[::-1]
+
+    assert eventIds[shallowStrong].tolist() == ["E-3", "E-5"]
+    assert round(float(threshold), 2) == 6.44
+    assert eventIds[topOrder[:2]].tolist() == ["E-5", "E-3"]
+  exercise:
+    prompt: '현업 흐름 검증: 지진 위험 이벤트 필터링 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    starterCode: |-
+      import numpy as np
+
+      magnitude = np.array([4.8, 5.1, 6.3, 4.2, 7.0])
+      depth = np.array([10, 70, 25, 12, 40])
+      eventIds = np.array(["E-1", "E-2", "E-3", "E-4", "E-5"])
+
+      shallowStrong = (magnitude >= 5.0) & (depth <= 50)
+      threshold = np.percentile(magnitude, 80)
+      topOrder = np.argsort(magnitude)[::-1]
+
+      assert eventIds[shallowStrong].tolist() == ["E-3", "E-5"]
+      assert round(float(threshold), 2) == 6.44
+      assert eventIds[topOrder[:2]].tolist() == ["E-5", "E-3"]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 지진 위험 이벤트 필터링에서 \`magnitude\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
+    resultCheck: '현업 흐름 검증: 지진 위험 이벤트 필터링에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.'
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 지진 데이터 분석
+  goal: 실습에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import numpy as np
+    import pandas as pd
+
+    data = pd.DataFrame({
+        'Date': ['2026-01-01', '2026-01-03', '2026-01-05', '2026-01-07',
+                 '2026-01-09', '2026-01-11', '2026-01-13', '2026-01-15'],
+        'Latitude': [35.2, -6.1, 38.4, -12.7, 52.1, 19.4, -3.2, 41.7],
+        'Longitude': [139.1, 106.8, -122.3, -77.0, -168.4, -155.2, 142.1, 29.0],
+        'Magnitude': [4.8, 5.6, 3.2, 6.1, 7.0, 4.2, 5.9, 6.5],
+        'Depth': [35, 12, 8, 70, 25, 18, 45, 10],
+    })
+    mag = data['Magnitude'].values
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import numpy as np
+      import pandas as pd
+
+      data = pd.DataFrame({
+          'Date': ['2026-01-01', '2026-01-03', '2026-01-05', '2026-01-07',
+                   '2026-01-09', '2026-01-11', '2026-01-13', '2026-01-15'],
+          'Latitude': [35.2, -6.1, 38.4, -12.7, 52.1, 19.4, -3.2, 41.7],
+          'Longitude': [139.1, 106.8, -122.3, -77.0, -168.4, -155.2, 142.1, 29.0],
+          'Magnitude': [4.8, 5.6, 3.2, 6.1, 7.0, 4.2, 5.9, 6.5],
+          'Depth': [35, 12, 8, 70, 25, 18, 45, 10],
+      })
+      mag = data['Magnitude'].values
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: numpy_03-earthquake-magnitude-bands-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - practice
+    title: 지진 magnitude를 구간화하고 최고 사건 찾기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: magnitude 기준으로 minor·moderate·strong count와 strongest event를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 구간 경계 4와 6이 어느 band에 속하는지 명시적으로 구현하세요.
+    - count와 strongest event는 다른 축의 결과입니다.
+    exercise:
+      prompt: summarize_earthquakes(events)를 완성해 bands와 strongestId를 반환하세요.
+      starterCode: |-
+        def summarize_earthquakes(events):
+            raise NotImplementedError
+      solution: |
+        def summarize_earthquakes(events):
+            bands = {"minor": 0, "moderate": 0, "strong": 0}
+            for event in events:
+                magnitude = event["magnitude"]
+                if magnitude < 0:
+                    raise ValueError("negative magnitude")
+                band = "minor" if magnitude < 4 else "moderate" if magnitude < 6 else "strong"
+                bands[band] += 1
+            strongest = max(events, key=lambda event: (event["magnitude"], event["id"])) if events else None
+            return {"bands": bands, "strongestId": strongest["id"] if strongest else None}
+      hints: *id001
+    check:
+      id: python.numpy.numpy_03.earthquake-magnitude-bands.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_03.earthquake-magnitude-bands.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_earthquakes
+        cases:
+        - id: counts-magnitude-bands
+          arguments:
+          - value:
+            - id: E1
+              magnitude: 3.2
+            - id: E2
+              magnitude: 5.5
+            - id: E3
+              magnitude: 6.0
+          expectedReturn:
+            bands:
+              minor: 1
+              moderate: 1
+              strong: 1
+            strongestId: E3
+        - id: handles-empty-events
+          arguments:
+          - value: []
+          expectedReturn:
+            bands:
+              minor: 0
+              moderate: 0
+              strong: 0
+            strongestId: null
+        - id: rejects-negative-magnitude
+          arguments:
+          - value:
+            - id: X
+              magnitude: -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: numpy_03-spatial-grid-counts-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_03-earthquake-magnitude-bands-mastery
+    title: 새 위치 event를 고정 grid cell로 집계하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: magnitude vector 분석을 latitude·longitude 공간 binning으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 음수 좌표에서 int 절삭과 floor가 다름을 주의하세요.
+    - cell key 형식을 고정해 결과를 안정적으로 비교하세요.
+    exercise:
+      prompt: count_spatial_cells(events, cell_size)를 완성해 cells와 densestCell을 반환하세요.
+      starterCode: |-
+        def count_spatial_cells(events, cell_size):
+            raise NotImplementedError
+      solution: |
+        def count_spatial_cells(events, cell_size):
+            import math
+            if cell_size <= 0:
+                raise ValueError("cell size must be positive")
+            cells = {}
+            for event in events:
+                key = f"{math.floor(event['lat'] / cell_size)}:{math.floor(event['lon'] / cell_size)}"
+                cells[key] = cells.get(key, 0) + 1
+            ordered = {key: cells[key] for key in sorted(cells)}
+            densest = max(cells, key=lambda key: (cells[key], key)) if cells else None
+            return {"cells": ordered, "densestCell": densest}
+      hints: *id002
+    check:
+      id: python.numpy.numpy_03.spatial-grid-counts.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_03.spatial-grid-counts.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: count_spatial_cells
+        cases:
+        - id: bins-events-by-floor
+          arguments:
+          - value:
+            - lat: 1.2
+              lon: 2.8
+            - lat: 1.9
+              lon: 2.1
+            - lat: -0.1
+              lon: 2.0
+          - value: 1
+          expectedReturn:
+            cells:
+              '-1:2': 1
+              '1:2': 2
+            densestCell: '1:2'
+        - id: handles-empty-space
+          arguments:
+          - value: []
+          - value: 5
+          expectedReturn:
+            cells: {}
+            densestCell: null
+        - id: rejects-zero-cell
+          arguments:
+          - value: []
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: numpy_03-earthquake-analysis-caution-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_03-spatial-grid-counts-transfer
+    title: 지진 수치 해석의 핵심 주의점 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: magnitude, count, 위치 density 질문의 scale과 증거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - magnitude는 단순 선형 크기가 아닙니다.
+    - 지역 count 비교에는 관측 기간과 영역 크기가 필요합니다.
+    exercise:
+      prompt: choose_earthquake_caution(situation)를 완성해 caution, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_earthquake_caution(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_earthquake_caution(situation):
+            table = {'compare-magnitude': {'caution': 'logarithmic scale', 'evidence': 'raw magnitude', 'risk': 'treat one unit as linear'}, 'compare-region-count': {'caution': 'observation window', 'evidence': 'time and area bounds', 'risk': 'unequal exposure'}, 'map-density': {'caution': 'cell size', 'evidence': 'bin definition', 'risk': 'arbitrary hotspot'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.numpy.numpy_03.earthquake-analysis-caution.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_03.earthquake-analysis-caution.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_earthquake_caution
+        cases:
+        - id: recalls-compare-magnitude
+          arguments:
+          - value: compare-magnitude
+          expectedReturn:
+            caution: logarithmic scale
+            evidence: raw magnitude
+            risk: treat one unit as linear
+        - id: recalls-compare-region-count
+          arguments:
+          - value: compare-region-count
+          expectedReturn:
+            caution: observation window
+            evidence: time and area bounds
+            risk: unequal exposure
+        - id: rejects-unknown-situation
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

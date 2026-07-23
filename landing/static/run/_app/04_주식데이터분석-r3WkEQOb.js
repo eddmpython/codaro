@@ -1,0 +1,801 @@
+var e=`meta:
+  packages:
+  - polars
+  id: polars_04
+  title: 주식데이터분석
+  order: 4
+  category: polars
+  difficulty: ⭐⭐
+  badge: 기초
+  dataSource: codaro-local:apple_stock
+  tags:
+  - 주식
+  - 이동평균
+  - 수익률
+  - rolling
+  - shift
+  - cum_sum
+  seo:
+    title: Polars 주식 데이터 분석 - 일일 수익률과 이동평균 계산
+    description: 기술주 시세 데이터로 일일 수익률과 이동평균을 계산합니다. cast, shift, rolling_mean, cum_sum 등 윈도우 함수를 배웁니다.
+    keywords:
+    - Polars
+    - 주식 분석
+    - 이동평균
+    - 수익률
+    - rolling_mean
+    - shift
+    - cum_sum
+intro:
+  emoji: 📈
+  goal: 주식 시세 데이터에서 일일 수익률과 20일 이동평균을 계산합니다.
+  description: 기술주 데이터로 금융 분석의 기초를 배웁니다. shift로 전일 종가를 참조하고, rolling_mean으로 이동평균을 계산하며, cum_sum으로 누적 수익률을
+    구합니다.
+  direction: 주식데이터분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - Polars DataFrame 확인 후 컬럼 선택/필터/집계에 맞는 코드 입력을 고릅니다.
+  - 주식데이터분석 결과를 행 수, 컬럼 값, 집계 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 대용량 데이터 분석 파이프라인에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(Polars DataFrame)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 미리보기 처리 실행
+      detail: 컬럼 선택/필터/집계 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 필요한 컬럼 선택 결과 검증
+      detail: 행 수, 컬럼 값, 집계 결과 기준으로 실행 결과를 비교합니다.
+    - label: 주식데이터분석 재사용
+      detail: 완성 코드를 대용량 데이터 분석 파이프라인에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 컬럼형 표 분석 환경
+      detail: polars 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 주식데이터분석 실행
+      detail: 셀을 실행해 행 수, 컬럼 값, 집계 결과와 예외 상태를 확인합니다.
+    - label: 주식데이터분석 완료
+      detail: 검증된 코드를 대용량 데이터 분석 파이프라인로 남깁니다.
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  structuredPrimary: true
+  subtitle: Apple 주식 시세 데이터
+  goal: 1단계. 데이터 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    Apple 주식의 일별 시세 데이터를 분석합니다. 주식 데이터는 시계열(time series) 데이터의 대표적인 예로, 날짜 순서가 중요합니다. 이번 프로젝트에서는 윈도우 함수(window function)를 배웁니다. 윈도우 함수는 이전 행이나 다음 행을 참조하여 계산하는 강력한 기능으로, shift(이전 값 참조), rolling_mean(이동평균), cum_sum(누적합계) 등이 있습니다. 주식 분석의 핵심 지표들을 직접 계산해봅니다.
+
+    주식 데이터는 시계열 분석의 대표적인 예입니다. Polars는 시계열 데이터 처리에 특화되어 있어 이동평균, 수익률 계산 등이 매우 빠릅니다. pandas보다 10배 이상 빠른 성능을 보입니다.
+  tips:
+  - 주식 데이터는 시계열 분석의 대표적인 예입니다. Polars는 시계열 데이터 처리에 특화되어 있어 이동평균, 수익률 계산 등이 매우 빠릅니다. pandas보다 10배 이상 빠른
+    성능을 보입니다.
+  snippet: |-
+    import polars as pl
+    from io import StringIO
+    from codaro.curriculum.localData import loadLocalDataset
+
+    stockCsv = loadLocalDataset("apple_stock").to_csv(index=False)
+    df = pl.read_csv(StringIO(stockCsv))
+    df.shape
+  exercise:
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import polars as pl
+      from io import StringIO
+      from codaro.curriculum.localData import loadLocalDataset
+
+      stockCsv = loadLocalDataset("apple_stock").to_csv(index=False)
+      df = pl.read_csv(StringIO(stockCsv))
+      df.shape
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step2_head
+  title: 2단계. 데이터 미리보기
+  structuredPrimary: true
+  subtitle: 구조 파악
+  goal: 2단계. 데이터 미리보기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: Date, AAPL.Open, AAPL.High, AAPL.Low, AAPL.Close, AAPL.Volume 등의 컬럼이 있습니다. AAPL은 Apple의
+    주식 티커(코드)이며, Open(시가), High(고가), Low(저가), Close(종가), Volume(거래량)은 주식 데이터의 기본 구성 요소입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: df.head()
+  exercise:
+    prompt: 2단계. 데이터 미리보기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: df.head()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 미리보기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 미리보기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_select
+  title: 3단계. 필요한 컬럼 선택
+  structuredPrimary: true
+  subtitle: 날짜와 종가만
+  goal: 3단계. 필요한 컬럼 선택에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 분석에 필요한 날짜(Date)와 종가(AAPL.Close)만 선택합니다. 종가는 하루 중 마지막 거래 가격으로, 주식 분석에서 가장 많이 사용되는 지표입니다.
+    alias()로 컬럼명을 간단하게 바꾸면 이후 코드가 깔끔해집니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    base = df.select([
+        pl.col("Date").alias("date"),
+        pl.col("AAPL.Close").alias("close")
+    ])
+    base.head()
+  exercise:
+    prompt: 3단계. 필요한 컬럼 선택 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      base = df.select([
+          pl.col("Date").alias("date"),
+          pl.col("AAPL.Close").alias("close")
+      ])
+      base.head()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 필요한 컬럼 선택의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 3단계. 필요한 컬럼 선택의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step4_datetime
+  title: 4단계. 날짜 타입 변환
+  structuredPrimary: true
+  subtitle: 문자열을 날짜로
+  goal: 4단계. 날짜 타입 변환에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: date 컬럼이 문자열이면 날짜 함수를 사용할 수 없습니다. str.to_date()로 Date 타입으로 변환해야 dt.year(), dt.month() 같은
+    날짜 함수를 사용할 수 있습니다. "%Y-%m-%d"는 연도-월-일 형식을 의미합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    dated = base.with_columns(
+        pl.col("date").str.to_date("%Y-%m-%d")
+    )
+    dated.head()
+  exercise:
+    prompt: 4단계. 날짜 타입 변환 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      dated = base.with_columns(
+          pl.col("date").str.to_date("%Y-%m-%d")
+      )
+      dated.head()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 날짜 타입 변환의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 4단계. 날짜 타입 변환의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step5_dt
+  title: 5단계. 날짜 정보 추출
+  structuredPrimary: true
+  subtitle: 연도, 월 추출
+  goal: 5단계. 날짜 정보 추출에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: dt.year(), dt.month()로 날짜에서 연도와 월을 추출합니다. 연도와 월 컬럼을 추가하면 월별/연도별 그룹 분석이 가능해집니다. 이전 프로젝트에서
+    배운 dt accessor를 다시 한번 복습합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    withYearMonth = dated.with_columns([
+        pl.col("date").dt.year().alias("year"),
+        pl.col("date").dt.month().alias("month")
+    ])
+    withYearMonth.head()
+  exercise:
+    prompt: 5단계. 날짜 정보 추출 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      withYearMonth = dated.with_columns([
+          pl.col("date").dt.year().alias("year"),
+          pl.col("date").dt.month().alias("month")
+      ])
+      withYearMonth.head()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 날짜 정보 추출의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 5단계. 날짜 정보 추출의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step6_cast
+  title: 6단계. 타입 변환
+  structuredPrimary: true
+  subtitle: cast()로 형변환
+  goal: 6단계. 타입 변환에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    close 컬럼이 Float64인지 확인합니다. 계산을 위해 명시적으로 Float64로 변환하면 타입 불일치로 인한 오류를 예방할 수 있습니다. cast()는 데이터 타입을 변환하는 함수입니다.
+
+    cast() 핵심
+    cast(pl.Float64)는 컬럼 타입을 Float64로 변환합니다. 수치 계산 전에 타입을 맞춰두면 오류를 방지할 수 있습니다.
+  tips:
+  - cast() 핵심 cast(pl.Float64)는 컬럼 타입을 Float64로 변환합니다. 수치 계산 전에 타입을 맞춰두면 오류를 방지할 수 있습니다.
+  snippet: |-
+    casted = withYearMonth.with_columns(
+        pl.col("close").cast(pl.Float64)
+    )
+    casted.schema
+  exercise:
+    prompt: 6단계. 타입 변환 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      casted = withYearMonth.with_columns(
+          pl.col("close").cast(pl.Float64)
+      )
+      casted.schema
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 타입 변환의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 6단계. 타입 변환의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step7_shift
+  title: 7단계. 전일 종가 계산
+  structuredPrimary: true
+  subtitle: shift()로 이전 값 참조
+  goal: 7단계. 전일 종가 계산에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    주식 수익률을 계산하려면 "오늘 가격"과 "어제 가격"을 비교해야 합니다. 하지만 한 행에는 오늘 가격만 있고 어제 가격은 없습니다. shift() 함수는 이 문제를 해결합니다. shift(1)은 전체 컬럼을 한 행 아래로 밀어서, 각 행에서 이전 행의 값을 참조할 수 있게 만듭니다. 첫 번째 행은 이전 값이 없으므로 null이 됩니다. 이것은 시계열 분석의 핵심 기법입니다.
+
+    shift(1)은 모든 값을 한 행 아래로 이동시킵니다. shift(2)는 2행 아래로, shift(-1)은 한 행 위로(다음 값 참조) 이동합니다. 시계열 데이터에서 전일/전월/전년 값을 참조할 때 필수적인 함수입니다. pandas의 shift()와 동일하지만 Polars가 훨씬 빠릅니다.
+  tips:
+  - shift(1)은 모든 값을 한 행 아래로 이동시킵니다. shift(2)는 2행 아래로, shift(-1)은 한 행 위로(다음 값 참조) 이동합니다. 시계열 데이터에서 전일/전월/전년
+    값을 참조할 때 필수적인 함수입니다. pandas의 shift()와 동일하지만 Polars가 훨씬 빠릅니다.
+  snippet: |-
+    withPrev = casted.with_columns(
+        pl.col("close").shift(1).alias("prevClose")
+    )
+    withPrev.head(10)
+  exercise:
+    prompt: 7단계. 전일 종가 계산 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      withPrev = casted.with_columns(
+          pl.col("close").shift(1).alias("prevClose")
+      )
+      withPrev.head(10)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 전일 종가 계산의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 7단계. 전일 종가 계산의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step8_return
+  title: 8단계. 일일 수익률 계산
+  structuredPrimary: true
+  subtitle: (오늘 - 어제) / 어제
+  goal: 8단계. 일일 수익률 계산에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 일일 수익률 = (당일 종가 - 전일 종가) / 전일 종가로 계산합니다. 100을 곱해 백분율로 표시하면 "2.5%"처럼 직관적으로 이해할 수 있습니다. 이
+    공식은 주식 분석의 가장 기본적인 지표입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    withReturn = withPrev.with_columns(
+        ((pl.col("close") - pl.col("prevClose")) / pl.col("prevClose") * 100).alias("dailyReturn")
+    )
+    withReturn.head(10)
+  exercise:
+    prompt: 8단계. 일일 수익률 계산 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      withReturn = withPrev.with_columns(
+          ((pl.col("close") - pl.col("prevClose")) / pl.col("prevClose") * 100).alias("dailyReturn")
+      )
+      withReturn.head(10)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 일일 수익률 계산의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 8단계. 일일 수익률 계산의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step9_rolling
+  title: 9단계. 20일 이동평균
+  structuredPrimary: true
+  subtitle: rolling_mean()
+  goal: 9단계. 20일 이동평균에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    주식 가격은 매일 오르내리며 변동이 심합니다. 전체적인 추세를 보려면 단기 변동을 완화해야 하는데, 이때 사용하는 것이 이동평균(moving average)입니다. rolling_mean(window_size=20)은 현재 행을 포함한 최근 20개 값의 평균을 계산합니다. 예를 들어 5번째 행의 이동평균은 1~5번째 행의 평균이고, 30번째 행의 이동평균은 11~30번째 행의 평균입니다. 주식에서는 20일(약 1개월) 이동평균이 대표적이며, 골든크로스/데드크로스 등의 매매 신호로 활용됩니다.
+
+    rolling_mean(window_size=N)은 현재 포함 최근 N개 값의 평균입니다. 주식 분석에서는 5일(단기), 20일(중기), 60일(장기), 120일(초장기) 이동평균을 주로 사용합니다. window_size를 바꿔서 다양한 기간의 이동평균을 계산할 수 있습니다.
+  tips:
+  - rolling_mean(window_size=N)은 현재 포함 최근 N개 값의 평균입니다. 주식 분석에서는 5일(단기), 20일(중기), 60일(장기), 120일(초장기) 이동평균을
+    주로 사용합니다. window_size를 바꿔서 다양한 기간의 이동평균을 계산할 수 있습니다.
+  snippet: |-
+    withMa = withReturn.with_columns(
+        pl.col("close").rolling_mean(window_size=20).alias("ma20")
+    )
+    withMa.tail(10)
+  exercise:
+    prompt: 9단계. 20일 이동평균 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      withMa = withReturn.with_columns(
+          pl.col("close").rolling_mean(window_size=20).alias("ma20")
+      )
+      withMa.tail(10)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 20일 이동평균의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 9단계. 20일 이동평균의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step10_cumsum
+  title: 10단계. 누적 수익률
+  structuredPrimary: true
+  subtitle: cum_sum()
+  goal: 10단계. 누적 수익률에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    일일 수익률은 하루하루의 변화율이지만, 전체 기간 동안 얼마나 수익이 났는지 보려면 누적 수익률이 필요합니다. cum_sum()은 cumulative sum(누적 합계)의 약자로, 처음부터 현재까지의 값을 모두 더합니다. 예를 들어 1일차 +2%, 2일차 +1%, 3일차 -0.5%라면 누적 수익률은 2%, 3%, 2.5%가 됩니다. 이를 그래프로 그리면 투자 수익 추이를 한눈에 볼 수 있습니다.
+
+    cum_sum()은 누적 합계를 계산합니다. 첫 행부터 현재 행까지 모든 값을 더한 결과를 반환합니다. cum_max()(누적 최대), cum_min()(누적 최소), cum_prod()(누적 곱) 등 다양한 누적 함수가 있습니다. 시계열 분석의 필수 함수입니다.
+  tips:
+  - cum_sum()은 누적 합계를 계산합니다. 첫 행부터 현재 행까지 모든 값을 더한 결과를 반환합니다. cum_max()(누적 최대), cum_min()(누적 최소), cum_prod()(누적
+    곱) 등 다양한 누적 함수가 있습니다. 시계열 분석의 필수 함수입니다.
+  snippet: |-
+    final = withMa.with_columns(
+        pl.col("dailyReturn").cum_sum().alias("cumReturn")
+    )
+    final.tail(10)
+  exercise:
+    prompt: 10단계. 누적 수익률 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      final = withMa.with_columns(
+          pl.col("dailyReturn").cum_sum().alias("cumReturn")
+      )
+      final.tail(10)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 누적 수익률의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 10단계. 누적 수익률의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step11_result
+  title: 11단계. 결과물 - 최종 데이터
+  structuredPrimary: true
+  subtitle: 종가 + 이동평균 + 수익률
+  goal: 11단계. 결과물 최종 데이터에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 모든 분석 결과를 포함한 최종 데이터프레임입니다. drop_nulls()로 null 값이 있는 행(첫 번째 행 등)을 제거하고, select로 핵심 컬럼만
+    선택하여 깔끔한 결과를 만듭니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: final.drop_nulls().select(["date", "close", "ma20", "dailyReturn", "cumReturn"])
+  exercise:
+    prompt: 11단계. 결과물 최종 데이터 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: final.drop_nulls().select(["date", "close", "ma20", "dailyReturn", "cumReturn"])
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 결과물 최종 데이터의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 11단계. 결과물 최종 데이터 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 주식 분석 프로젝트
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    배운 내용으로 주식 분석을 해봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import polars as pl
+    from io import StringIO
+    from codaro.curriculum.localData import loadLocalDataset
+
+    aaplBase = pl.read_csv(StringIO(loadLocalDataset("apple_stock").to_csv(index=False))).select([
+        pl.col("Date").str.to_date("%Y-%m-%d").alias("date"),
+        pl.col("AAPL.Close").alias("close")
+    ])
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import polars as pl
+      from io import StringIO
+      from codaro.curriculum.localData import loadLocalDataset
+
+      aaplBase = pl.read_csv(StringIO(loadLocalDataset("apple_stock").to_csv(index=False))).select([
+          pl.col("Date").str.to_date("%Y-%m-%d").alias("date"),
+          pl.col("AAPL.Close").alias("close")
+      ])
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Polars로 주식 데이터 분석 기초를 배웠습니다.
+  - type: list
+    items:
+    - read_csv() - 데이터 로드
+    - with_columns() - 새 컬럼 추가
+    - cast() - 타입 변환
+    - dt.year(), dt.month() - 날짜 정보 추출
+    - shift(1) - 이전 값 참조
+    - rolling_mean() - 이동평균 계산
+    - cum_sum() - 누적 합계
+  - type: text
+    content: 다음 시간에는 음악 스트리밍 데이터로 문자열 처리와 순위 계산을 배웁니다.
+  goal: 정리에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 주문 매출 파이프라인
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: Polars는 빠른 집계만 배우면 부족합니다. 업무에서는 입력 스키마를 먼저 확인하고, 잘못된 수량이나 단가를 명확한 오류로 막고, 예측한 상위 채널이 실제
+    집계와 맞는지 검증해야 합니다. 마지막에는 기준값을 바꾸는 변주로 결론이 얼마나 안정적인지 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import polars as pl
+
+    orderFrame = pl.DataFrame({
+        "orderId": [1001, 1002, 1003, 1004, 1005, 1006],
+        "channel": ["web", "store", "web", "partner", "store", "web"],
+        "quantity": [3, 2, 5, 1, 4, 2],
+        "unitPrice": [12000, 18000, 9000, 40000, 15000, 22000],
+        "refund": [0, 0, 1, 0, 0, 0],
+    })
+
+    def validateOrderFrame(frame: pl.DataFrame) -> bool:
+        requiredColumns = {"orderId", "channel", "quantity", "unitPrice", "refund"}
+        missingColumns = requiredColumns - set(frame.columns)
+        if missingColumns:
+            raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+        if frame.select((pl.col("quantity") <= 0).any()).item():
+            raise ValueError("quantity는 0보다 커야 합니다.")
+        if frame.select((pl.col("unitPrice") <= 0).any()).item():
+            raise ValueError("unitPrice는 0보다 커야 합니다.")
+        return True
+
+    validateOrderFrame(orderFrame)
+    orderFrame
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      revenueByChannel = (
+          orderFrame.filter(pl.col("refund") == 0)
+          .with_columns((pl.col("quantity") * pl.col("unitPrice")).alias("netRevenue"))
+          .group_by("channel")
+          .agg(pl.col("netRevenue").sum())
+      )
+
+      thresholdFrame = pl.DataFrame({"threshold": [20000, 50000, 80000]}).with_columns(
+          pl.col("threshold").map_elements(
+              lambda threshold: revenueByChannel.filter(pl.col("netRevenue") >= threshold).height,
+              return_dtype=pl.Int64,
+          ).alias("qualifiedChannels")
+      )
+
+      assert thresholdFrame.select((pl.col("qualifiedChannels").diff().fill_null(0) <= 0).all()).item()
+      thresholdFrame
+    solution: |-
+      import polars as pl
+
+      orderFrame = pl.DataFrame({
+          "orderId": [1001, 1002, 1003, 1004, 1005, 1006],
+          "channel": ["web", "store", "web", "partner", "store", "web"],
+          "quantity": [3, 2, 5, 1, 4, 2],
+          "unitPrice": [12000, 18000, 9000, 40000, 15000, 22000],
+          "refund": [0, 0, 1, 0, 0, 0],
+      })
+
+      def validateOrderFrame(frame: pl.DataFrame) -> bool:
+          requiredColumns = {"orderId", "channel", "quantity", "unitPrice", "refund"}
+          missingColumns = requiredColumns - set(frame.columns)
+          if missingColumns:
+              raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+          if frame.select((pl.col("quantity") <= 0).any()).item():
+              raise ValueError("quantity는 0보다 커야 합니다.")
+          if frame.select((pl.col("unitPrice") <= 0).any()).item():
+              raise ValueError("unitPrice는 0보다 커야 합니다.")
+          return True
+
+      validateOrderFrame(orderFrame)
+      orderFrame
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 업무 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: polars_04-stock-return-window-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: 종목별 시간순 수익률과 누적 수익 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: symbol별로 date를 정렬해 이전 close 대비 return과 cumulative return을 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - shift 기준은 symbol group 안에서 date 순서입니다.
+    - 단순 return 합이 아니라 (1+r)을 곱해 cumulative를 계산하세요.
+    exercise:
+      prompt: stock_returns(rows)를 완성해 symbol, date, return, cumulative 목록을 반환하세요.
+      starterCode: |-
+        def stock_returns(rows):
+            raise NotImplementedError
+      solution: |
+        def stock_returns(rows):
+            grouped = {}
+            for row in rows:
+                grouped.setdefault(row["symbol"], []).append(row)
+            result = []
+            for symbol, group in sorted(grouped.items()):
+                previous = None
+                cumulative = 1.0
+                for row in sorted(group, key=lambda item: item["date"]):
+                    change = None if previous is None else row["close"] / previous - 1
+                    if change is not None:
+                        cumulative *= 1 + change
+                    result.append({"symbol": symbol, "date": row["date"], "return": None if change is None else round(change, 3), "cumulative": round(cumulative - 1, 3)})
+                    previous = row["close"]
+            return result
+      hints: *id001
+    check:
+      id: python.polars.polars_04.stock-return-window.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_04.stock-return-window.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: stock_returns
+        cases:
+        - id: computes-window-per-symbol
+          arguments:
+          - value:
+            - symbol: A
+              date: 2
+              close: 110
+            - symbol: A
+              date: 1
+              close: 100
+            - symbol: A
+              date: 3
+              close: 99
+            - symbol: B
+              date: 1
+              close: 50
+          expectedReturn:
+          - symbol: A
+            date: 1
+            return: null
+            cumulative: 0.0
+          - symbol: A
+            date: 2
+            return: 0.1
+            cumulative: 0.1
+          - symbol: A
+            date: 3
+            return: -0.1
+            cumulative: -0.01
+          - symbol: B
+            date: 1
+            return: null
+            cumulative: 0.0
+        - id: handles-empty-prices
+          arguments:
+          - value: []
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: polars_04-rolling-volatility-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_04-stock-return-window-mastery
+    title: 새 return series의 종목별 rolling 변동성 계산하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: window return을 표본 표준편차와 완성 window 시점으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표본 표준편차는 window-1로 나눕니다.
+    - 각 symbol group에서 window를 독립적으로 시작하세요.
+    exercise:
+      prompt: rolling_volatility(rows, window)를 완성해 symbol, date, volatility 목록을 반환하세요.
+      starterCode: |-
+        def rolling_volatility(rows, window):
+            raise NotImplementedError
+      solution: |
+        def rolling_volatility(rows, window):
+            import math
+            if window < 2:
+                raise ValueError("window must be at least two")
+            grouped = {}
+            for row in rows:
+                grouped.setdefault(row["symbol"], []).append(row)
+            result = []
+            for symbol, group in sorted(grouped.items()):
+                ordered = sorted(group, key=lambda item: item["date"])
+                for index in range(window - 1, len(ordered)):
+                    values = [item["return"] for item in ordered[index - window + 1:index + 1]]
+                    mean = sum(values) / window
+                    variance = sum((value - mean) ** 2 for value in values) / (window - 1)
+                    result.append({"symbol": symbol, "date": ordered[index]["date"], "volatility": round(math.sqrt(variance), 4)})
+            return result
+      hints: *id002
+    check:
+      id: python.polars.polars_04.rolling-volatility.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_04.rolling-volatility.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: rolling_volatility
+        cases:
+        - id: computes-sample-window-volatility
+          arguments:
+          - value:
+            - symbol: A
+              date: 1
+              return: 0.1
+            - symbol: A
+              date: 2
+              return: -0.1
+            - symbol: A
+              date: 3
+              return: 0.0
+          - value: 2
+          expectedReturn:
+          - symbol: A
+            date: 2
+            volatility: 0.1414
+          - symbol: A
+            date: 3
+            volatility: 0.0707
+        - id: returns-no-partial-window
+          arguments:
+          - value:
+            - symbol: A
+              date: 1
+              return: 0.1
+          - value: 2
+          expectedReturn: []
+        - id: rejects-one-point-window
+          arguments:
+          - value: []
+          - value: 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: polars_04-window-expression-rule-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_04-rolling-volatility-transfer
+    title: window expression의 partition·order 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 종목별 lag, 전체 rank, 이동 평균에 필요한 partition와 order를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - window 결과를 정의하려면 partition와 order를 둘 다 적으세요.
+    - 전체 row shift를 종목별 이전 값으로 착각하지 마세요.
+    exercise:
+      prompt: choose_window_expression(situation)를 완성해 partitionBy, orderBy, operation을 반환하세요.
+      starterCode: |-
+        def choose_window_expression(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_window_expression(situation):
+            table = {'previous-close-per-symbol': {'partitionBy': 'symbol', 'orderBy': 'date', 'operation': 'shift'}, 'daily-rank-across-symbols': {'partitionBy': 'date', 'orderBy': 'return desc', 'operation': 'rank'}, 'rolling-mean-per-symbol': {'partitionBy': 'symbol', 'orderBy': 'date', 'operation': 'rolling_mean'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.polars.polars_04.window-expression-rule.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_04.window-expression-rule.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_window_expression
+        cases:
+        - id: recalls-previous-close-per-symbol
+          arguments:
+          - value: previous-close-per-symbol
+          expectedReturn:
+            partitionBy: symbol
+            orderBy: date
+            operation: shift
+        - id: recalls-daily-rank-across-symbols
+          arguments:
+          - value: daily-rank-across-symbols
+          expectedReturn:
+            partitionBy: date
+            orderBy: return desc
+            operation: rank
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

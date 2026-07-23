@@ -1,0 +1,628 @@
+var e=`meta:
+  id: visionFeatures_05
+  title: 파노라마 스티칭
+  order: 5
+  category: visionFeatures
+  difficulty: ⭐⭐⭐⭐
+  badge: 중급
+  packages:
+  - matplotlib
+  - numpy
+  - opencv-python
+  - scikit-learn
+  tags:
+  - opencv
+  - 스티칭
+  - panorama
+  - Stitcher
+  - 호모그래피
+  seo:
+    title: 비전 특징점 - 파노라마 스티칭
+    description: 여러 장의 부분 사진을 호모그래피로 정렬해 파노라마 한 장을 만듭니다.
+    keywords:
+    - 파노라마
+    - stitcher
+    - panorama
+    - 호모그래피
+    - opencv
+intro:
+  emoji: 🖼
+  goal: 같은 장면을 부분 부분 찍은 사진들을 호모그래피로 정렬해 한 장의 파노라마로 만듭니다.
+  description: |-
+    파노라마는 매칭과 호모그래피를 실제 응용으로 연결하는 가장 직관적인 예제입니다. 이 강의는 OpenCV가 제공하는 고수준 cv2.Stitcher와, 직접 만든 두 장 합성 함수 두 가지 방식을 동시에 비교하며 스티칭의 내부 동작을 이해합니다.
+  direction: 합성된 두 장(원본의 왼쪽 절반과 회전·이동한 오른쪽 절반)으로 파노라마 한 장을 만듭니다.
+  benefits:
+  - cv2.Stitcher로 한 줄 파노라마를 만들 수 있습니다.
+  - 직접 만든 함수로 호모그래피 정렬 + 단순 합성을 구현할 수 있습니다.
+  - 결과의 봉합선(seam)이 보이는 이유와 개선 방향을 이해합니다.
+  diagram:
+    steps:
+    - label: 1단계. 부분 이미지 두 장 만들기
+      detail: china의 좌측과 우측을 살짝 다르게 자릅니다.
+    - label: 2단계. cv2.Stitcher 한 줄
+      detail: 고수준 API로 즉시 결과 얻기.
+    - label: 3단계. 직접 정렬 함수
+      detail: 매칭 → H → warpPerspective.
+    - label: 4단계. 캔버스에 합치기
+      detail: 두 장을 같은 캔버스에 놓고 평균합니다.
+    - label: 5단계. Stitcher와 비교
+      detail: 두 결과의 차이를 시각으로 확인합니다.
+    runtime:
+    - label: 비전 환경
+      detail: opencv-python의 Stitcher와 warpPerspective를 사용합니다.
+    - label: 검증 흐름
+      detail: assert와 시각 비교로 학습 결과가 기대값과 같은지 확인합니다.
+sections:
+- id: make_pair
+  title: 1단계. 부분 이미지 두 장 만들기
+  structuredPrimary: true
+  subtitle: 좌측 60%와 우측 60%
+  goal: 한 사진에서 좌측 60%와 우측 60%를 잘라 중앙에서 겹치는 두 장을 만듭니다.
+  why: 같은 장면의 두 부분 사진을 자체적으로 만들어 외부 데이터 의존을 없앱니다.
+  explanation: |-
+    \`left = china[:, : int(w * 0.6)]\` 는 좌측 60%, \`right = china[:, int(w * 0.4):]\` 는 우측 60% 입니다. 중앙 20% 가 겹쳐서 매칭 가능 영역이 됩니다.
+
+    여기에 우측 부분을 살짝 회전하면 실제 카메라가 약간 다른 각도로 찍은 효과와 비슷한 학습용 쌍이 만들어집니다.
+  tips:
+  - 겹치는 영역이 너무 좁으면 매칭이 빈약해 스티칭이 실패합니다. 20% 이상 겹쳐 두는 것이 안전합니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from sklearn.datasets import load_sample_image
+
+    china = load_sample_image('china.jpg')
+    h, w = china.shape[:2]
+    leftHalf = china[:, : int(w * 0.6)].copy()
+    rightCut = china[:, int(w * 0.4):].copy()
+    rotMat = cv2.getRotationMatrix2D((rightCut.shape[1] / 2, h / 2), angle=5, scale=1.0)
+    rightHalf = cv2.warpAffine(rightCut, rotMat, (rightCut.shape[1], h))
+    leftHalf.shape, rightHalf.shape
+  exercise:
+    prompt: 두 부분 이미지를 1x2 그리드로 출력하세요.
+    starterCode: |-
+      fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+      axes[0].imshow(leftHalf)
+      axes[0].set_title('left')
+      axes[1].imshow(rightHalf)
+      axes[1].set_title('right (rotated 5°)')
+      for axis in axes:
+          axis.axis('off')
+      fig
+    hints:
+    - imshow와 axis off 두 줄만 반복합니다.
+    - 오른쪽 사진이 약간 기울어진 모습이 보여야 합니다.
+  check:
+    noError: 잘라내기와 회전이 오류 없이 끝나야 합니다.
+    resultCheck: leftHalf.shape의 너비가 rightHalf.shape의 너비와 같은 정도여야 합니다.
+- id: high_level_stitcher
+  title: 2단계. cv2.Stitcher 한 줄
+  structuredPrimary: true
+  subtitle: 고수준 API
+  goal: cv2.Stitcher.create로 즉시 파노라마를 만듭니다.
+  why: OpenCV가 제공하는 가장 간단한 방법을 먼저 시도하는 것이 표준입니다.
+  explanation: |-
+    \`stitcher = cv2.Stitcher.create(cv2.Stitcher_PANORAMA)\` 후 \`status, panorama = stitcher.stitch([left, right])\` 가 끝입니다. 성공하면 status == cv2.Stitcher_OK 이고 panorama 가 결과입니다.
+
+    내부에서는 특징점 검출, 매칭, 호모그래피 추정, 블렌딩이 모두 일어납니다. 실패 사례 진단을 위해 status 코드를 확인하는 습관이 좋습니다.
+  tips:
+  - Stitcher는 단순한 매칭으로는 실패할 수 있는 어려운 케이스(겹침 부족 등)에서 자동으로 거부합니다.
+  snippet: |-
+    stitcher = cv2.Stitcher.create(cv2.Stitcher_PANORAMA)
+    status, panorama = stitcher.stitch([leftHalf, rightHalf])
+    status, None if panorama is None else panorama.shape
+  exercise:
+    prompt: 결과가 성공이면 시각화하고, 실패면 상태 코드를 그대로 출력하세요.
+    starterCode: |-
+      if status == cv2.Stitcher_OK:
+          fig = plt.figure(figsize=(10, 5))
+          plt.imshow(cv2.cvtColor(panorama, ___))
+          plt.axis('off')
+          fig
+      else:
+          status
+    hints:
+    - Stitcher는 BGR로 반환하므로 표시 전에 BGR2RGB가 필요합니다.
+    - 상태 코드의 의미는 OpenCV 문서를 참조합니다.
+  check:
+    noError: Stitcher 호출이 오류 없이 끝나야 합니다.
+    resultCheck: status가 정수여야 합니다.
+- id: align_direct
+  title: 3단계. 직접 정렬 함수
+  structuredPrimary: true
+  subtitle: ORB + 호모그래피
+  goal: 4강에서 배운 흐름으로 두 사진의 호모그래피를 직접 추정합니다.
+  why: 직접 만들면 봉합·블렌딩 단계가 분명히 보이고 디버깅이 쉬워집니다.
+  explanation: |-
+    함수 한 개에 ORB 추출, BFMatcher, knnMatch + Lowe ratio, findHomography를 담습니다. 그 결과 두 사진의 호모그래피 H를 얻습니다.
+
+    Stitcher가 내부에서 하는 일과 같은 단계입니다. 잘 동작하면 둘의 결과가 비슷해야 합니다.
+  tips:
+  - 함수로 묶어 두면 다른 이미지에도 같은 정렬을 적용할 수 있습니다.
+  snippet: |-
+    def estimateHomography(imgA, imgB):
+        orb = cv2.ORB_create(nfeatures=1500)
+        ga = cv2.cvtColor(imgA, cv2.COLOR_RGB2GRAY)
+        gb = cv2.cvtColor(imgB, cv2.COLOR_RGB2GRAY)
+        kpA, descA = orb.detectAndCompute(ga, mask=None)
+        kpB, descB = orb.detectAndCompute(gb, mask=None)
+        bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
+        knn = bf.knnMatch(descA, descB, k=2)
+        good = [m1 for m1, m2 in knn if m1.distance < 0.75 * m2.distance]
+        if len(good) < 8:
+            return None, len(good)
+        src = np.array([kpA[m.queryIdx].pt for m in good], dtype=np.float32).reshape(-1, 1, 2)
+        dst = np.array([kpB[m.trainIdx].pt for m in good], dtype=np.float32).reshape(-1, 1, 2)
+        H, _ = cv2.findHomography(src, dst, cv2.RANSAC, 4.0)
+        return H, len(good)
+
+    H, goodCount = estimateHomography(rightHalf, leftHalf)
+    H.shape, goodCount
+  exercise:
+    prompt: estimateHomography의 nfeatures를 500으로 줄였을 때 goodCount가 어떻게 변하는지 확인하세요(임시로 함수 변형이 부담스러우면 nfeatures를 직접 호출에서 바꾸세요).
+    starterCode: |-
+      orb500 = cv2.ORB_create(nfeatures=___)
+      ga = cv2.cvtColor(rightHalf, cv2.COLOR_RGB2GRAY)
+      gb = cv2.cvtColor(leftHalf, cv2.COLOR_RGB2GRAY)
+      kpA, descA = orb500.detectAndCompute(ga, mask=None)
+      kpB, descB = orb500.detectAndCompute(gb, mask=None)
+      bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
+      knn = bf.knnMatch(descA, descB, k=2)
+      good500 = [m1 for m1, m2 in knn if m1.distance < 0.75 * m2.distance]
+      len(good500)
+    hints:
+    - 키포인트가 적으면 매칭 후보도 적습니다.
+    - 빈칸은 500입니다.
+  check:
+    noError: 함수 호출이 오류 없이 끝나야 합니다.
+    resultCheck: H가 (3, 3) 모양의 ndarray여야 합니다.
+- id: blend_canvas
+  title: 4단계. 큰 캔버스에 두 사진 합치기
+  structuredPrimary: true
+  subtitle: warpPerspective + 평균
+  goal: 두 사진을 정렬해 가로로 긴 캔버스에 합치고 평균 합성으로 봉합합니다.
+  why: 단순 합성은 봉합선이 보이지만 어떻게 동작하는지 가장 직관적으로 보여 줍니다.
+  explanation: |-
+    먼저 right 이미지가 들어갈 만한 크기의 캔버스를 만들고, left를 그대로 붙이고, right를 H로 변환해 같은 캔버스에 그립니다. 두 이미지의 픽셀이 있는 영역은 평균을 취합니다.
+
+    Stitcher가 사용하는 multi-band blending에 비하면 거칠지만, 학습용으로는 충분합니다.
+  tips:
+  - 캔버스 너비는 두 이미지 너비의 합 정도로 두면 보통 안전합니다.
+  snippet: |-
+    canvasW = leftHalf.shape[1] + rightHalf.shape[1]
+    canvas = np.zeros((h, canvasW, 3), dtype=np.uint8)
+    canvas[:, :leftHalf.shape[1]] = leftHalf
+    warpedRight = cv2.warpPerspective(rightHalf, H, (canvasW, h))
+    maskRight = (warpedRight.sum(axis=2) > 0)
+    maskLeft = (canvas.sum(axis=2) > 0)
+    bothMask = maskRight & maskLeft
+    blended = canvas.astype(np.float32)
+    blended[maskRight & ~bothMask] = warpedRight[maskRight & ~bothMask]
+    blended[bothMask] = (blended[bothMask] + warpedRight[bothMask].astype(np.float32)) / 2.0
+    blended = blended.clip(0, 255).astype(np.uint8)
+    fig = plt.figure(figsize=(12, 5))
+    plt.imshow(blended)
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: 평균 합성 대신 right 사진만 우선되는(maskRight 영역은 무조건 warpedRight) 합성을 만드세요.
+    starterCode: |-
+      naive = canvas.copy()
+      naive[maskRight] = warpedRight[___]
+      fig2 = plt.figure(figsize=(12, 5))
+      plt.imshow(naive)
+      plt.axis('off')
+      fig2
+    hints:
+    - 빈칸은 maskRight 입니다.
+    - 결과는 right 영역이 left 영역을 가립니다.
+  check:
+    noError: 캔버스 합성이 오류 없이 끝나야 합니다.
+    resultCheck: blended.shape이 (h, canvasW, 3)이어야 합니다.
+- id: compare_two
+  title: 5단계. Stitcher와 직접 합성 비교
+  structuredPrimary: true
+  subtitle: 결과 두 장 나란히
+  goal: Stitcher 결과와 직접 만든 결과를 나란히 비교합니다.
+  why: 단순 평균 합성의 한계와 Stitcher의 블렌딩이 어떤 차이를 만드는지 직접 봐야 합니다.
+  explanation: |-
+    Stitcher는 봉합선을 자연스럽게 가리도록 multi-band blending을 적용합니다. 직접 만든 평균 합성은 같은 영역에서 빛 차이가 분명히 보일 수 있습니다.
+
+    어떤 추가 작업이 필요할지(노출 보정, 멀티밴드 블렌딩)는 두 결과의 차이를 보고 정합니다.
+  tips:
+  - Stitcher가 실패하면 비교를 생략하고 직접 결과만 출력하면 됩니다.
+  snippet: |-
+    fig, axes = plt.subplots(2, 1, figsize=(12, 8))
+    axes[0].imshow(blended)
+    axes[0].set_title('manual average blend')
+    if status == cv2.Stitcher_OK:
+        axes[1].imshow(cv2.cvtColor(panorama, cv2.COLOR_BGR2RGB))
+        axes[1].set_title('cv2.Stitcher')
+    else:
+        axes[1].imshow(np.zeros_like(blended))
+        axes[1].set_title(f'Stitcher failed status={status}')
+    for axis in axes:
+        axis.axis('off')
+    fig
+  exercise:
+    prompt: blended에서 봉합선(left와 right가 겹치는 중앙 영역)을 가장자리 박스로 표시하세요.
+    starterCode: |-
+      seamMask = bothMask
+      seamRows = np.where(seamMask.any(axis=1))[0]
+      seamCols = np.where(seamMask.any(axis=0))[0]
+      y1, y2 = seamRows.min(), seamRows.max()
+      x1, x2 = seamCols.min(), seamCols.max()
+      marked = blended.copy()
+      cv2.rectangle(marked, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), thickness=___)
+      fig2 = plt.figure(figsize=(12, 5))
+      plt.imshow(marked)
+      plt.axis('off')
+      fig2
+    hints:
+    - 빈칸은 정수 두께입니다.
+    - 봉합 영역의 색이 분명히 달라 보입니다.
+  check:
+    noError: 비교 시각화가 오류 없이 끝나야 합니다.
+    resultCheck: figure가 마지막 줄에 평가되어야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 더 어려운 케이스로 도전
+  goal: 더 큰 회전·이동으로 두 장을 만들어 정렬과 합성을 시도합니다.
+  why: 변환이 강해지면 매칭과 정렬이 어려워지는 한계를 직접 확인해야 알고리즘 선택 감각이 생깁니다.
+  explanation: |-
+    각 미션은 import문부터 시작하지만, 위 예제를 실행했다면 import는 생략해도 됩니다.
+  tips:
+  - 어려운 케이스는 inlier 비율이 50% 미만으로 떨어지기 쉽습니다.
+  snippet: |-
+    hardRotMat = cv2.getRotationMatrix2D((rightCut.shape[1] / 2, h / 2), angle=15, scale=1.0)
+    hardRight = cv2.warpAffine(rightCut, hardRotMat, (rightCut.shape[1], h))
+    hardH, hardGood = estimateHomography(hardRight, leftHalf)
+    None if hardH is None else hardH.shape, hardGood
+  exercise:
+    prompt: "미션1: hardRight를 leftHalf와 합성하는 hardBlended 이미지를 만들고 표시하세요. 미션2: 위 strict (각도 15도)와 easy (각도 5도) 결과를 1x2 그리드로 비교하세요."
+    starterCode: |-
+      hardCanvas = np.zeros((h, canvasW, 3), dtype=np.uint8)
+      hardCanvas[:, :leftHalf.shape[1]] = leftHalf
+      hardWarpedRight = cv2.warpPerspective(hardRight, hardH, (canvasW, h))
+      hardMaskRight = (hardWarpedRight.sum(axis=2) > 0)
+      hardMaskLeft = (hardCanvas.sum(axis=2) > 0)
+      hardBoth = hardMaskRight & hardMaskLeft
+      hardBlended = hardCanvas.astype(np.float32)
+      hardBlended[hardMaskRight & ~hardBoth] = hardWarpedRight[hardMaskRight & ~hardBoth]
+      hardBlended[hardBoth] = (hardBlended[hardBoth] + hardWarpedRight[hardBoth].astype(np.float32)) / 2.0
+      hardBlended = hardBlended.clip(0, 255).astype(np.uint8)
+      fig = plt.figure(figsize=(12, 5))
+      plt.imshow(hardBlended)
+      plt.axis('off')
+      fig
+    hints:
+    - 변환이 강해지면 봉합 영역이 더 두드러집니다.
+    - estimateHomography가 None을 반환하면 매칭 부족이 원인입니다.
+  check:
+    noError: 합성이 오류 없이 끝나야 합니다.
+    resultCheck: hardBlended.shape이 (h, canvasW, 3)이어야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: visionFeatures_05-panorama-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - make_pair
+    - practice
+    title: 파노라마 스티칭 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: image count·overlap·projection·blend 계약을 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_panorama_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_panorama_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_panorama_contract(value):
+            required = ['imageCount', 'minimumOverlap', 'projection', 'blend']
+            rules = [{'id': 'image-count', 'field': 'imageCount', 'kind': 'range', 'min': 2, 'max': 100}, {'id': 'overlap', 'field': 'minimumOverlap', 'kind': 'unit-interval'}, {'id': 'projection', 'field': 'projection', 'kind': 'enum', 'values': ['planar', 'cylindrical', 'spherical']}, {'id': 'blend', 'field': 'blend', 'kind': 'enum', 'values': ['feather', 'multiband']}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'panorama', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.vision-features.visionFeatures_05.panorama-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-features.visionFeatures_05.panorama-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_panorama_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              imageCount: 4
+              minimumOverlap: 0.25
+              projection: cylindrical
+              blend: multiband
+          expectedReturn:
+            accepted: true
+            topic: panorama
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              minimumOverlap: 0.25
+              projection: cylindrical
+              blend: multiband
+          expectedReturn:
+            accepted: false
+            topic: panorama
+            missing:
+            - imageCount
+            violations:
+            - image-count
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              imageCount: 1
+              minimumOverlap: 1.2
+              projection: flat-magic
+              blend: none
+          expectedReturn:
+            accepted: false
+            topic: panorama
+            missing: []
+            violations:
+            - blend
+            - image-count
+            - overlap
+            - projection
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: visionFeatures_05-panorama-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionFeatures_05-panorama-contract-audit-mastery
+    title: 파노라마 스티칭 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_panorama_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_panorama_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_panorama_result(expected, observed):
+            identity = ['sourceSetHash', 'stitchOrderHash']
+            metrics = {'coverageRatio': 0.01}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'panorama', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.vision-features.visionFeatures_05.panorama-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-features.visionFeatures_05.panorama-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_panorama_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              sourceSetHash: ps1
+              stitchOrderHash: 1-2-3-4
+              coverageRatio: 0.92
+          - value:
+              sourceSetHash: ps1
+              stitchOrderHash: 1-2-3-4
+              coverageRatio: 0.925
+          expectedReturn:
+            passed: true
+            topic: panorama
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              sourceSetHash: ps1
+              stitchOrderHash: 1-2-3-4
+              coverageRatio: 0.92
+          - value:
+              sourceSetHash: ps2
+              stitchOrderHash: 4-1
+              coverageRatio: 0.4
+          expectedReturn:
+            passed: false
+            topic: panorama
+            missing: []
+            identityMismatch:
+            - sourceSetHash
+            - stitchOrderHash
+            metricDrift:
+            - coverageRatio
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              sourceSetHash: ps1
+              stitchOrderHash: 1-2-3-4
+              coverageRatio: 0.92
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: panorama
+            missing:
+            - coverageRatio
+            - sourceSetHash
+            - stitchOrderHash
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: visionFeatures_05-panorama-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionFeatures_05-panorama-result-reconciliation-transfer
+    title: 파노라마 스티칭 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_panorama_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_panorama_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_panorama_evidence(stage):
+            stages = {'source': {'action': 'validate panorama frames', 'evidence': 'ordered image set and overlap', 'risk': 'wrong frame identity'}, 'estimate': {'action': 'estimate bounded panorama', 'evidence': 'pairwise homography ledger', 'risk': 'unstable geometry'}, 'verify': {'action': 'verify panorama result', 'evidence': 'coverage and seam inspection', 'risk': 'confident but wrong tracking'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.vision-features.visionFeatures_05.panorama-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-features.visionFeatures_05.panorama-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_panorama_evidence
+        cases:
+        - id: recalls-source
+          arguments:
+          - value: source
+          expectedReturn:
+            action: validate panorama frames
+            evidence: ordered image set and overlap
+            risk: wrong frame identity
+        - id: recalls-estimate
+          arguments:
+          - value: estimate
+          expectedReturn:
+            action: estimate bounded panorama
+            evidence: pairwise homography ledger
+            risk: unstable geometry
+        - id: recalls-verify
+          arguments:
+          - value: verify
+          expectedReturn:
+            action: verify panorama result
+            evidence: coverage and seam inspection
+            risk: confident but wrong tracking
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

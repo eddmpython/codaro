@@ -4,9 +4,31 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="format-detection" content="telephone=no" />
-    <meta name="color-scheme" content="dark light" />
-    <meta name="theme-color" content="#17121b" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#fbf8f4" media="(prefers-color-scheme: light)" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f5f6f8" />
+    <script>
+      (function () {
+        var root = document.documentElement;
+        var mode = "system";
+        try {
+          var storedMode = window.localStorage.getItem("codaro-theme");
+          if (storedMode === "light" || storedMode === "dark") mode = storedMode;
+        } catch (storageError) {
+          mode = "system";
+        }
+        var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        var resolved = mode === "system" ? (prefersDark ? "dark" : "light") : mode;
+        var canvas = resolved === "dark" ? "#151619" : "#f5f6f8";
+        root.classList.toggle("dark", resolved === "dark");
+        root.dataset.theme = resolved;
+        root.dataset.resolvedTheme = resolved;
+        root.dataset.accent = "plum";
+        root.dataset.density = "public";
+        root.style.colorScheme = resolved;
+        root.style.backgroundColor = canvas;
+        document.querySelector('meta[name="theme-color"]').setAttribute("content", canvas);
+      })();
+    </script>
 
     <title>Codaro - Web Python 학습과 Local 자동화 스튜디오</title>
     <meta

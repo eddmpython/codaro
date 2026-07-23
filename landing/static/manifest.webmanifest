@@ -9,8 +9,8 @@
   "id": "/codaro/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#09090b",
-  "theme_color": "#18181b",
+  "background_color": "#f5f6f8",
+  "theme_color": "#f5f6f8",
   "categories": ["education", "productivity", "developer"],
   "icons": [
     {

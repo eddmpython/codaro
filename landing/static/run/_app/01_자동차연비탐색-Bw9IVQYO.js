@@ -1,0 +1,654 @@
+var e=`meta:
+  packages:
+  - altair
+  - pandas
+  id: altair_01
+  title: 자동차연비탐색
+  order: 1
+  category: altair
+  difficulty: ⭐
+  badge: 입문
+  tags:
+  - mpg
+  - scatter
+  - point
+  - 기초
+  seo:
+    title: Altair 산점도 - 마력과 연비 관계 분석
+    description: mpg 데이터로 마력과 연비의 관계를 산점도로 시각화합니다. mark_point, encode, 데이터 타입 지정법을 배웁니다.
+    keywords:
+    - altair
+    - mark_point
+    - 산점도
+    - mpg
+    - 연비분석
+intro:
+  emoji: 🚗
+  goal: 마력과 연비의 관계를 산점도로 시각화합니다.
+  description: Altair로 첫 번째 시각화를 만듭니다. 데이터 로드, 마크 선택, 인코딩의 기본 흐름을 익힙니다.
+  direction: 자동차연비탐색에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.
+  benefits:
+  - 정리된 테이블 확인 후 채널 인코딩에 맞는 코드 입력을 고릅니다.
+  - 자동차연비탐색 결과를 스케일과 마크 매핑 기준으로 즉시 점검합니다.
+  - 완료한 코드를 선언형 대시보드에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(정리된 테이블)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 확인 처리 실행
+      detail: 채널 인코딩 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 첫 번째 산점도 결과 검증
+      detail: 스케일과 마크 매핑 기준으로 실행 결과를 비교합니다.
+    - label: 자동차연비탐색 재사용
+      detail: 완성 코드를 선언형 대시보드에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 선언형 차트 환경
+      detail: altair, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 자동차연비탐색 실행
+      detail: 셀을 실행해 스케일과 마크 매핑와 예외 상태를 확인합니다.
+    - label: 자동차연비탐색 완료
+      detail: 검증된 코드를 선언형 대시보드로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 데이터 불러오기
+  structuredPrimary: true
+  subtitle: seaborn-data
+  goal: 1단계. 데이터 불러오기에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    Codaro 로컬 데이터셋에서 mpg 데이터를 불러옵니다. mpg는 자동차의 연비(mpg), 마력(horsepower), 생산국(origin) 등 정보가 담긴 데이터입니다. pandas는 데이터 분석을 위한 도구이고, DataFrame은 표 데이터를 담는 구조입니다. 이번 레슨에서는 Codaro 로컬 데이터셋을 불러와 인터넷 연결 없이 같은 결과를 재현합니다. Altair는 시각화 라이브러리로, 데이터를 차트로 만들어줍니다.
+
+    import는 "가져오다"라는 뜻으로, 다른 사람이 만든 도구를 가져와서 사용하겠다는 의미입니다. as alt는 "altair를 alt라는 짧은 이름으로 부르겠다"는 뜻입니다. warnings.filterwarnings()는 불필요한 경고 메시지를 숨기는 코드입니다. 차트 기능에는 영향이 없으니 신경 쓰지 않아도 됩니다.
+  tips:
+  - import는 "가져오다"라는 뜻으로, 다른 사람이 만든 도구를 가져와서 사용하겠다는 의미입니다. as alt는 "altair를 alt라는 짧은 이름으로 부르겠다"는 뜻입니다.
+    warnings.filterwarnings()는 불필요한 경고 메시지를 숨기는 코드입니다. 차트 기능에는 영향이 없으니 신경 쓰지 않아도 됩니다.
+  snippet: |-
+    import altair as alt
+    import pandas as pd
+    import warnings
+    warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+    from codaro.curriculum.localData import loadLocalDataset
+
+    mpg = loadLocalDataset("mpg")
+  exercise:
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import altair as alt
+      import pandas as pd
+      import warnings
+      warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+      from codaro.curriculum.localData import loadLocalDataset
+
+      mpg = loadLocalDataset("mpg")
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step2_explore
+  title: 2단계. 데이터 확인
+  structuredPrimary: true
+  subtitle: 컬럼 구조 파악
+  goal: 2단계. 데이터 확인에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+  explanation: 어떤 컬럼(열, 항목)이 있는지 확인합니다. 컬럼은 데이터의 종류를 나타냅니다. name(차량명), mpg(연비), horsepower(마력), origin(생산국)
+    등이 있습니다. head()는 데이터의 처음 5줄을 보여주는 함수로, 점(.)으로 연결하여 사용합니다. 마력과 연비의 관계를 분석해보겠습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: mpg.head()
+  exercise:
+    prompt: 2단계. 데이터 확인 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    starterCode: mpg.head()
+    hints:
+    - 바꿀 지점은 정리된 테이블을 만드는 첫 줄과 채널 인코딩 줄에서 찾으세요.
+    - 실행 뒤 스케일과 마크 매핑 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 2단계. 데이터 확인의 수정 코드가 채널 인코딩 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 2단계. 데이터 확인 실행 결과가 스케일과 마크 매핑 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step3_first_scatter
+  title: 3단계. 첫 번째 산점도
+  structuredPrimary: true
+  subtitle: mark_point, encode
+  goal: 3단계. 첫 번째 산점도에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    Altair의 기본 구조는 Chart(데이터).mark_종류().encode(인코딩)입니다. 이 문장을 세 부분으로 나누어 이해해봅시다. 첫째, Chart(데이터)는 차트 객체를 만듭니다. 괄호 안에 시각화할 데이터를 넣습니다. 둘째, mark_point()는 "점으로 그리겠다"는 의미입니다. 점 대신 선, 막대 등 다른 모양도 가능합니다. 셋째, encode()는 "인코딩한다", 즉 "어떤 데이터를 어디에 표시할지 지정한다"는 뜻입니다. x축과 y축에 어떤 컬럼을 매핑할지 지정합니다.
+
+    점(.)으로 여러 함수를 연결하는 것을 "메서드 체이닝"이라고 합니다. Chart()로 차트를 만들고, mark_point()로 점으로 그리겠다고 하고, encode()로 어떤 데이터를 x, y축에 넣을지 지정하는 과정이 연결된 것입니다. encode() 괄호 안에서 x='horsepower'는 "x축에 horsepower 컬럼을 사용하겠다"는 뜻입니다. 등호(=)는 "할당한다"는 의미입니다.
+  tips:
+  - 점(.)으로 여러 함수를 연결하는 것을 "메서드 체이닝"이라고 합니다. Chart()로 차트를 만들고, mark_point()로 점으로 그리겠다고 하고, encode()로 어떤
+    데이터를 x, y축에 넣을지 지정하는 과정이 연결된 것입니다. encode() 괄호 안에서 x='horsepower'는 "x축에 horsepower 컬럼을 사용하겠다"는 뜻입니다.
+    등호(=)는 "할당한다"는 의미입니다.
+  snippet: |-
+    alt.Chart(mpg).mark_point().encode(
+        x='horsepower',
+        y='mpg'
+    )
+  exercise:
+    prompt: 3단계. 첫 번째 산점도 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      alt.Chart(mpg).mark_point().encode(
+          x='horsepower',
+          y='mpg'
+      )
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 3단계. 첫 번째 산점도의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 첫 번째 산점도의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step4_datatype
+  title: 4단계. 데이터 타입 지정
+  structuredPrimary: true
+  subtitle: :Q, :N
+  goal: 4단계. 데이터 타입 지정에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    Altair는 컬럼명 뒤에 콜론(:)과 타입 약어를 붙여 데이터 타입을 명시합니다. 'horsepower:Q'처럼 작은따옴표 안에 컬럼명과 타입을 함께 씁니다. :Q는 Quantitative(수량형)의 약자로, 숫자를 의미합니다. 마력, 연비 같은 연속적인 숫자 데이터에 사용합니다. :N은 Nominal(명목형)의 약자로, 카테고리를 의미합니다. 생산국, 색상 같은 그룹 이름에 사용합니다. 타입을 명시하면 Altair가 적절한 축 스케일과 범례를 자동으로 설정해줍니다.
+
+    :Q(수량형)는 연속적인 숫자, :N(명목형)는 카테고리, :O(순서형)는 순서가 있는 카테고리, :T(시계열)는 날짜/시간을 의미합니다.
+  snippet: |-
+    alt.Chart(mpg).mark_point().encode(
+        x='horsepower:Q',
+        y='mpg:Q'
+    )
+  exercise:
+    prompt: 4단계. 데이터 타입 지정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      alt.Chart(mpg).mark_point().encode(
+          x='horsepower:Q',
+          y='mpg:Q'
+      )
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 4단계. 데이터 타입 지정의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 데이터 타입 지정의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step5_color
+  title: 5단계. 색상 인코딩
+  structuredPrimary: true
+  subtitle: color로 그룹 구분
+  goal: 5단계. 색상 인코딩에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    color에 origin(생산국)을 지정하면 usa, europe, japan 자동차를 색상으로 구분할 수 있습니다. origin은 숫자가 아니라 그룹 이름(카테고리)이므로 :N(명목형)을 붙입니다. encode() 괄호 안에 x, y 외에 color도 추가할 수 있습니다. 쉼표(,)로 구분하여 여러 인코딩을 나열합니다.
+
+    figColor = 이라는 부분은 변수에 값을 저장하는 것입니다. 등호(=) 왼쪽이 변수명, 오른쪽이 저장할 값입니다. 마지막 줄의 figColor는 저장한 차트를 화면에 표시하라는 의미입니다. 변수명만 쓰면 그 변수에 담긴 내용이 출력됩니다.
+  tips:
+  - figColor = 이라는 부분은 변수에 값을 저장하는 것입니다. 등호(=) 왼쪽이 변수명, 오른쪽이 저장할 값입니다. 마지막 줄의 figColor는 저장한 차트를 화면에 표시하라는
+    의미입니다. 변수명만 쓰면 그 변수에 담긴 내용이 출력됩니다.
+  snippet: |-
+    figColor = alt.Chart(mpg).mark_point().encode(
+        x='horsepower:Q',
+        y='mpg:Q',
+        color='origin:N'
+    )
+    figColor
+  exercise:
+    prompt: 5단계. 색상 인코딩 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figColor = alt.Chart(mpg).mark_point().encode(
+          x='horsepower:Q',
+          y='mpg:Q',
+          color='origin:N'
+      )
+      figColor
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 5단계. 색상 인코딩의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 색상 인코딩의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step6_tooltip
+  title: 6단계. 툴팁 추가
+  structuredPrimary: true
+  subtitle: tooltip으로 상세정보
+  goal: 6단계. 툴팁 추가에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    점 위에 마우스를 올리면 상세 정보를 보여주는 툴팁을 추가합니다. tooltip에 보여줄 컬럼들을 리스트로 지정합니다. 리스트는 대괄호 [ ] 안에 여러 항목을 쉼표로 구분하여 나열한 것입니다. tooltip=['name', 'horsepower']처럼 작은따옴표로 감싼 컬럼명을 나열하면, 해당 컬럼들의 값이 툴팁에 표시됩니다.
+
+    Codaro 환경에서는 다른 셀에서 같은 변수명을 재사용할 수 없습니다. 따라서 각 셀마다 다른 변수명(figColor, figTooltip, figScatter 등)을 사용해야 합니다. 같은 셀 안에서는 fig = ... 후 fig.update() 같은 방식으로 같은 변수를 계속 사용할 수 있지만, 다른 셀에서는 새로운 변수명이 필요합니다.
+  tips:
+  - Codaro 환경에서는 다른 셀에서 같은 변수명을 재사용할 수 없습니다. 따라서 각 셀마다 다른 변수명(figColor, figTooltip, figScatter 등)을 사용해야
+    합니다. 같은 셀 안에서는 fig = ... 후 fig.update() 같은 방식으로 같은 변수를 계속 사용할 수 있지만, 다른 셀에서는 새로운 변수명이 필요합니다.
+  snippet: |-
+    figTooltip = alt.Chart(mpg).mark_point().encode(
+        x='horsepower:Q',
+        y='mpg:Q',
+        color='origin:N',
+        tooltip=['name', 'horsepower', 'mpg', 'origin']
+    )
+    figTooltip
+  exercise:
+    prompt: 6단계. 툴팁 추가 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figTooltip = alt.Chart(mpg).mark_point().encode(
+          x='horsepower:Q',
+          y='mpg:Q',
+          color='origin:N',
+          tooltip=['name', 'horsepower', 'mpg', 'origin']
+      )
+      figTooltip
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 6단계. 툴팁 추가의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 툴팁 추가의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step7_final
+  title: 7단계. 최종 결과물
+  structuredPrimary: true
+  subtitle: 완성된 산점도
+  goal: 7단계. 최종 결과물에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 지금까지 배운 내용을 종합하여 마력-연비 산점도를 완성합니다. Chart()로 차트 객체를 만들고, mark_point()로 점을 그리고, encode()로
+    x축(마력), y축(연비), 색상(생산국), 툴팁을 모두 지정했습니다. 이 차트로 미국, 유럽, 일본 자동차의 마력과 연비 관계를 한눈에 비교할 수 있습니다. 마력이 높을수록
+    연비가 낮아지는 경향이 보입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figScatter = alt.Chart(mpg).mark_point().encode(
+        x='horsepower:Q',
+        y='mpg:Q',
+        color='origin:N',
+        tooltip=['name', 'horsepower', 'mpg', 'origin']
+    )
+    figScatter
+  exercise:
+    prompt: 7단계. 최종 결과물 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figScatter = alt.Chart(mpg).mark_point().encode(
+          x='horsepower:Q',
+          y='mpg:Q',
+          color='origin:N',
+          tooltip=['name', 'horsepower', 'mpg', 'origin']
+      )
+      figScatter
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 7단계. 최종 결과물의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 최종 결과물의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step8_workflow
+  title: 8단계. 실무 산점도 검증
+  structuredPrimary: true
+  subtitle: 예측 → 오류 확인 → 차트 사양 검증 → 기준 실험
+  goal: 8단계. 실무 산점도 검증에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 조건 분기는 입력값에 따라 실행 경로가 바뀌므로 결과를 바로 확인해야 합니다.
+  explanation: |-
+    업무 차트는 화면에 점이 보이는 것만으로 충분하지 않습니다. 어떤 질문을 답하려는지 먼저 예측하고, 필요한 컬럼이 있는지 확인하고, Altair 차트 사양에 x축·y축·색상·툴팁이 의도대로 들어갔는지 검증해야 합니다.
+
+    Altair 입문에서도 차트 사양 검증을 함께 배워야 합니다. 축, 색상, 툴팁, 데이터 행 수를 확인하면 예쁜 차트가 아니라 업무 질문에 답하는 차트를 만들 수 있습니다.
+  snippet: |-
+    requiredColumns = {"name", "mpg", "horsepower", "origin", "weight"}
+    missingColumns = sorted(requiredColumns - set(mpg.columns))
+    if missingColumns:
+        raise ValueError(f"필수 컬럼 누락: {missingColumns}")
+
+    originMpgSummary = mpg.groupby("origin")["mpg"].mean().round(1).sort_values(ascending=False)
+    bestMpgOrigin = originMpgSummary.index[0]
+    highPowerLowEfficiency = mpg[(mpg["horsepower"] >= 160) & (mpg["mpg"] <= 22)]
+
+    bestMpgOrigin, originMpgSummary.to_dict(), len(highPowerLowEfficiency)
+  exercise:
+    prompt: 8단계. 실무 산점도 검증 예제에서 조건값을 바꾸고 선택되는 분기와 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      requiredColumns = {"name", "mpg", "horsepower", "origin", "weight"}
+      missingColumns = sorted(requiredColumns - set(mpg.columns))
+      if missingColumns:
+          raise ValueError(f"필수 컬럼 누락: {missingColumns}")
+
+      originMpgSummary = mpg.groupby("origin")["mpg"].mean().round(1).sort_values(ascending=False)
+      bestMpgOrigin = originMpgSummary.index[0]
+      highPowerLowEfficiency = mpg[(mpg["horsepower"] >= 160) & (mpg["mpg"] <= 22)]
+
+      bestMpgOrigin, originMpgSummary.to_dict(), len(highPowerLowEfficiency)
+    hints:
+    - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
+    - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
+  check:
+    noError: 8단계. 실무 산점도 검증의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
+    resultCheck: 8단계. 실무 산점도 검증 분기 결과가 바꾼 조건값에 맞게 달라져야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: mpg 데이터 시각화 프로젝트
+  goal: 실습에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    mpg 데이터로 다양한 산점도를 만들어봅시다. 이 섹션에서 배운 내용을 정리하면 다음과 같습니다. Chart()로 차트를 만들고, mark_point()로 점을 그리고, encode()로 축과 색상을 지정하는 기본 흐름을 배웠습니다. :Q는 숫자 데이터, :N은 카테고리 데이터에 사용합니다. color로 그룹을 색상으로 구분하고, tooltip으로 마우스 호버 시 상세 정보를 표시할 수 있습니다. 각 미션에서 이 개념들을 모두 활용해봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import altair as alt
+    import pandas as pd
+    from codaro.curriculum.localData import loadLocalDataset
+    car = loadLocalDataset("mpg")
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import altair as alt
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+      car = loadLocalDataset("mpg")
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Altair로 첫 산점도를 완성했습니다.
+  - type: list
+    items:
+    - alt.Chart(data) - 차트 객체 생성
+    - mark_point() - 점(산점도) 마크 선택
+    - encode(x, y) - 축에 컬럼 매핑
+    - :Q - 수량형(Quantitative) 데이터 타입
+    - :N - 명목형(Nominal) 데이터 타입
+    - color='컬럼:N' - 색상으로 그룹 구분
+    - tooltip=[...] - 호버 시 상세정보 표시
+  - type: text
+    content: 다음 시간에는 붓꽃 데이터로 circle 마크와 size, shape 인코딩을 배웁니다.
+  goal: 정리에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: altair_01-car-efficiency-encoding-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - summary
+    title: 자동차 연비 탐색 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 마력·연비 관계에서 origin과 model year 역할이 분리되는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_car_efficiency_encoding(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_car_efficiency_encoding(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_car_efficiency_encoding(rows):
+            required = ['horsepower', 'mpg', 'origin']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'origin'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['horsepower'] for row in usable]
+            y_values = [row['mpg'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.altair.altair_01.car-efficiency-encoding-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.altair.altair_01.car-efficiency-encoding-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_car_efficiency_encoding
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - horsepower: 80
+              mpg: 35
+              origin: EU
+            - horsepower: 120
+              mpg: 25
+              origin: US
+            - horsepower: null
+              mpg: 30
+              origin: JP
+          expectedReturn:
+            usableCount: 2
+            excludedCount: 1
+            groupCounts:
+              EU: 1
+              US: 1
+            xExtent:
+            - 80
+            - 120
+            yExtent:
+            - 25
+            - 35
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: altair_01-car-efficiency-encoding-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - altair_01-car-efficiency-encoding-data-evidence-mastery
+    title: 자동차 연비 탐색 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 장비 출력과 효율 관계를 제조 지역 색과 hover 모델 정보로 탐색한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_car_efficiency_encoding(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_car_efficiency_encoding(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_car_efficiency_encoding(candidate):
+            expected = {'mark': 'point', 'x': 'horsepower', 'y': 'mpg', 'group': 'origin', 'transforms': ['filter-valid', 'type-declarations'], 'interaction': 'hover'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.altair.altair_01.car-efficiency-encoding-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.altair.altair_01.car-efficiency-encoding-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_car_efficiency_encoding
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: point
+              x: horsepower
+              y: mpg
+              group: origin
+              transforms:
+              - filter-valid
+              - type-declarations
+              interaction: hover
+              description: 장비 출력과 효율 관계를 제조 지역 색과 hover 모델 정보로 탐색한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: point
+              x: horsepower
+              y: mpg
+              group: origin
+              transforms:
+              - filter-valid
+              - type-declarations
+              interaction: hover
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: mpg
+              y: horsepower
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - interaction
+            - description
+            encoding:
+              mark: point
+              x: horsepower
+              y: mpg
+              group: origin
+              transforms:
+              - filter-valid
+              - type-declarations
+              interaction: hover
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: altair_01-car-efficiency-encoding-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - altair_01-car-efficiency-encoding-encoding-transfer-transfer
+    title: 자동차 연비 탐색 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 마력·연비 관계에서 origin과 model year 역할이 분리되는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_car_efficiency_encoding(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_car_efficiency_encoding(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_car_efficiency_encoding(situation):
+            table = {'numeric-relation': {'encoding': 'point QxQ', 'evidence': 'valid rows and domains', 'risk': 'null coercion'}, 'origin-group': {'encoding': 'color nominal', 'evidence': 'group n', 'risk': 'too many colors'}, 'model-year': {'encoding': 'facet or temporal filter', 'evidence': 'year range', 'risk': 'ordinal treated continuous'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.altair.altair_01.car-efficiency-encoding-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.altair.altair_01.car-efficiency-encoding-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_car_efficiency_encoding
+        cases:
+        - id: recalls-numeric-relation
+          arguments:
+          - value: numeric-relation
+          expectedReturn:
+            encoding: point QxQ
+            evidence: valid rows and domains
+            risk: null coercion
+        - id: recalls-origin-group
+          arguments:
+          - value: origin-group
+          expectedReturn:
+            encoding: color nominal
+            evidence: group n
+            risk: too many colors
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

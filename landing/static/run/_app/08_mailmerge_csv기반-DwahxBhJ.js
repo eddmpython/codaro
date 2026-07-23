@@ -1,0 +1,746 @@
+var e=`meta:
+  id: word_08
+  title: CSV 기반 mail merge
+  order: 8
+  category: word
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  packages:
+    - python-docx
+  tags:
+    - mail merge
+    - CSV
+    - 양식 일괄
+  outcomes:
+    - automation.word.mailMerge
+  prerequisites:
+    - automation.word.edit
+  estimatedMinutes: 55
+  seo:
+    title: "Word CSV mail merge - 200명 가정통신문 자동 생성"
+    description: "CSV 명단에서 가정통신문 200장을 한 번에 자동 생성. 학교 행정 10시간이 30초로."
+    keywords:
+      - mail merge python
+      - 가정통신문 자동
+      - CSV docx 양식
+
+intro:
+  direction: "CSV 명단의 각 행으로 양식 docx를 채워 N장을 자동 생성. 학교 행정의 가정통신문 200장이 10시간에서 30초로."
+  benefits:
+    - "학교 행정 김선생님의 가정통신문 200장 10시간을 30초로 줄인다."
+    - "07강 fillTemplate 함수를 그대로 호출해 한 함수 추가로 mail merge 완성."
+    - "파일명 패턴(학년_반_번호_이름)으로 결과 정리도 자동."
+  diagram:
+    steps:
+      - label: "1. CSV → dict 리스트"
+        detail: "csv.DictReader로 명단 로드."
+      - label: "2. 양식 + 자리표시자"
+        detail: "07강의 fillTemplate 함수 재사용."
+      - label: "3. 일괄 생성"
+        detail: "각 dict로 fillTemplate 호출, 파일명 자동 생성."
+      - label: "4. 결과 폴더"
+        detail: "outFolder에 N개 docx, 파일명은 데이터 기반."
+    runtime:
+      - label: "07강 함수 재사용"
+        detail: "본 강의는 07강 fillTemplate 함수를 import만 함."
+      - label: "검증"
+        detail: "결과 폴더의 파일 수와 각 docx의 자리표시자 잔여 단위 assert."
+
+sections:
+  - id: step1_csv_load
+    title: "1단계. CSV 명단 로드"
+    structuredPrimary: true
+    subtitle: "csv.DictReader"
+    goal: "학생 명단 CSV를 dict 리스트로 읽는다."
+    why: "발송 대상이 표 형태로 입력되는 게 일반적입니다. CSV 한 곳이 출처."
+    snippet: |-
+      import csv
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+
+      workdir = TemporaryDirectory()
+      csvPath = Path(workdir.name) / "students.csv"
+      csvPath.write_text(
+          "name,grade,classroom,number,parent\\n"
+          "김민수,3,1,12,김부모\\n"
+          "박지영,3,1,13,박부모\\n"
+          "이수진,3,2,5,이부모\\n",
+          encoding="utf-8",
+      )
+      with open(csvPath, "r", encoding="utf-8") as f:
+          students = list(csv.DictReader(f))
+      len(students), students[0]
+    exercise:
+      prompt: "한 명 추가하고 학생 수가 4인지 확인하세요."
+      starterCode: |-
+        import csv
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+
+        workdir = TemporaryDirectory()
+        csvPath = Path(workdir.name) / "students.csv"
+        csvPath.write_text(
+            "name,grade,classroom,number,parent\\n"
+            "김민수,3,1,12,김부모\\n"
+            "박지영,3,1,13,박부모\\n"
+            "이수진,3,2,5,이부모\\n"
+            ___,
+            encoding="utf-8",
+        )
+        with open(csvPath, "r", encoding="utf-8") as f:
+            students = list(csv.DictReader(f))
+        len(students)
+      hints:
+        - "한 줄 추가. 예: '윤하늘,3,2,7,윤부모\\\\n'."
+    check:
+      noError: "CSV 마지막 줄바꿈."
+      resultCheck: "출력 4."
+
+  - id: step2_merge
+    title: "2단계. 일괄 생성"
+    structuredPrimary: true
+    subtitle: "각 학생으로 fillTemplate 호출"
+    goal: "학생 명단 전체에 대해 양식 docx를 만들고 폴더에 저장한다."
+    why: "200장 자동 생성이 본 강의의 ROI 핵심입니다."
+    snippet: |-
+      import csv
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+
+      def replaceInRuns(paragraph, replacements):
+          for run in paragraph.runs:
+              for key, value in replacements.items():
+                  placeholder = f"{{{{{key}}}}}"
+                  if placeholder in run.text:
+                      run.text = run.text.replace(placeholder, value)
+
+      def fillTemplate(templatePath, replacements, outPath):
+          doc = Document(templatePath)
+          for p in doc.paragraphs:
+              replaceInRuns(p, replacements)
+          doc.save(outPath)
+
+      def mailMerge(templatePath, csvPath, outFolder):
+          Path(outFolder).mkdir(exist_ok=True)
+          with open(csvPath, "r", encoding="utf-8") as f:
+              students = list(csv.DictReader(f))
+          outputs = []
+          for student in students:
+              safeName = f"{student['grade']}_{student['classroom']}_{student['number']}_{student['name']}"
+              outPath = Path(outFolder) / f"{safeName}.docx"
+              fillTemplate(templatePath, student, outPath)
+              outputs.append(outPath)
+          return outputs
+
+      workdir = TemporaryDirectory()
+      base = Path(workdir.name)
+      tplPath = base / "tpl.docx"
+      seed = Document()
+      seed.add_paragraph("학년: {{grade}}, 반: {{classroom}}, 번호: {{number}}")
+      seed.add_paragraph("학생: {{name}}, 학부모: {{parent}}")
+      seed.add_paragraph("가정통신문 본문입니다.")
+      seed.save(tplPath)
+
+      csvPath = base / "students.csv"
+      csvPath.write_text(
+          "name,grade,classroom,number,parent\\n"
+          "김민수,3,1,12,김부모\\n"
+          "박지영,3,1,13,박부모\\n",
+          encoding="utf-8",
+      )
+
+      outputs = mailMerge(tplPath, csvPath, base / "letters")
+      [p.name for p in outputs]
+    exercise:
+      prompt: "CSV에 한 명 더 추가하고 결과 docx 수가 3인지 확인하세요."
+      starterCode: |-
+        import csv
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+
+        def replaceInRuns(paragraph, replacements):
+            for run in paragraph.runs:
+                for key, value in replacements.items():
+                    placeholder = f"{{{{{key}}}}}"
+                    if placeholder in run.text:
+                        run.text = run.text.replace(placeholder, value)
+
+        def fillTemplate(templatePath, replacements, outPath):
+            doc = Document(templatePath)
+            for p in doc.paragraphs:
+                replaceInRuns(p, replacements)
+            doc.save(outPath)
+
+        def mailMerge(templatePath, csvPath, outFolder):
+            Path(outFolder).mkdir(exist_ok=True)
+            with open(csvPath, "r", encoding="utf-8") as f:
+                students = list(csv.DictReader(f))
+            outputs = []
+            for student in students:
+                safeName = f"{student['grade']}_{student['classroom']}_{student['number']}_{student['name']}"
+                outPath = Path(outFolder) / f"{safeName}.docx"
+                fillTemplate(templatePath, student, outPath)
+                outputs.append(outPath)
+            return outputs
+
+        workdir = TemporaryDirectory()
+        base = Path(workdir.name)
+        tplPath = base / "t.docx"
+        seed = Document()
+        seed.add_paragraph("학생: {{name}}")
+        seed.save(tplPath)
+
+        csvPath = base / "s.csv"
+        csvPath.write_text(
+            "name,grade,classroom,number,parent\\n"
+            "김민수,3,1,12,김부모\\n"
+            "박지영,3,1,13,박부모\\n"
+            ___,
+            encoding="utf-8",
+        )
+        len(mailMerge(tplPath, csvPath, base / "out"))
+      hints:
+        - "한 줄 추가."
+    check:
+      noError: "CSV 마지막 줄바꿈."
+      resultCheck: "출력 3."
+
+  - id: validation
+    title: "3단계. 검증 - 각 docx 자리표시자 잔여 확인"
+    structuredPrimary: true
+    subtitle: "모든 결과의 자리표시자 잔여 검사"
+    goal: "생성된 모든 docx에 자리표시자가 한 개도 남지 않는지 검증한다."
+    snippet: |-
+      import csv
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from docx import Document
+
+      def replaceInRuns(paragraph, replacements):
+          for run in paragraph.runs:
+              for key, value in replacements.items():
+                  placeholder = f"{{{{{key}}}}}"
+                  if placeholder in run.text:
+                      run.text = run.text.replace(placeholder, value)
+
+      def fillTemplate(templatePath, replacements, outPath):
+          doc = Document(templatePath)
+          for p in doc.paragraphs:
+              replaceInRuns(p, replacements)
+          doc.save(outPath)
+
+      def mailMerge(templatePath, csvPath, outFolder):
+          Path(outFolder).mkdir(exist_ok=True)
+          with open(csvPath, "r", encoding="utf-8") as f:
+              students = list(csv.DictReader(f))
+          outputs = []
+          for student in students:
+              safeName = f"{student['grade']}_{student['classroom']}_{student['number']}_{student['name']}"
+              outPath = Path(outFolder) / f"{safeName}.docx"
+              fillTemplate(templatePath, student, outPath)
+              outputs.append(outPath)
+          return outputs
+
+      vault = TemporaryDirectory()
+      base = Path(vault.name)
+      tplPath = base / "tpl.docx"
+      seed = Document()
+      seed.add_paragraph("학생: {{name}}, 부모: {{parent}}")
+      seed.save(tplPath)
+      csvPath = base / "s.csv"
+      csvPath.write_text(
+          "name,grade,classroom,number,parent\\n"
+          "김민수,3,1,12,김부모\\n"
+          "박지영,3,1,13,박부모\\n"
+          "이수진,3,2,5,이부모\\n",
+          encoding="utf-8",
+      )
+
+      outputs = mailMerge(tplPath, csvPath, base / "out")
+      assert len(outputs) == 3
+      for path in outputs:
+          combined = "\\n".join(p.text for p in Document(path).paragraphs)
+          assert "{{" not in combined
+      [p.name for p in outputs]
+    exercise:
+      prompt: "verifyAllFilled 함수를 작성하세요 - outputs 리스트의 모든 docx에서 자리표시자 잔여 여부를 검사해 (잔여 없는 파일 수, 잔여 있는 파일 수)를 튜플로 반환."
+      starterCode: |-
+        import csv
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from docx import Document
+
+        def replaceInRuns(paragraph, replacements):
+            for run in paragraph.runs:
+                for key, value in replacements.items():
+                    placeholder = f"{{{{{key}}}}}"
+                    if placeholder in run.text:
+                        run.text = run.text.replace(placeholder, value)
+
+        def fillTemplate(templatePath, replacements, outPath):
+            doc = Document(templatePath)
+            for p in doc.paragraphs:
+                replaceInRuns(p, replacements)
+            doc.save(outPath)
+
+        def mailMerge(templatePath, csvPath, outFolder):
+            Path(outFolder).mkdir(exist_ok=True)
+            with open(csvPath, "r", encoding="utf-8") as f:
+                rows = list(csv.DictReader(f))
+            outputs = []
+            for row in rows:
+                outPath = Path(outFolder) / f"{row['name']}.docx"
+                fillTemplate(templatePath, row, outPath)
+                outputs.append(outPath)
+            return outputs
+
+        def verifyAllFilled(outputs):
+            clean, dirty = 0, 0
+            for path in outputs:
+                combined = "\\n".join(p.text for p in Document(path).paragraphs)
+                ___  # '{{' in combined 면 dirty += 1, 아니면 clean += 1
+            return clean, dirty
+
+        vault = TemporaryDirectory()
+        base = Path(vault.name)
+        tplPath = base / "t.docx"
+        seed = Document()
+        seed.add_paragraph("학생: {{name}}, 부모: {{parent}}")
+        seed.save(tplPath)
+        csvPath = base / "s.csv"
+        csvPath.write_text(
+            "name,parent\\n김민수,김부모\\n박지영,\\n이수진,이부모\\n",
+            encoding="utf-8",
+        )
+        outputs = mailMerge(tplPath, csvPath, base / "o")
+        verifyAllFilled(outputs)
+      hints:
+        - "if '{{' in combined: dirty += 1\\\\nelse: clean += 1"
+        - "빈 문자열은 치환되지만 키 자체가 빠지면 잔여 발생."
+    check:
+      noError: "조건 분기로 clean/dirty 카운트."
+      resultCheck: "(3, 0) 출력 (빈 값이라도 키만 있으면 모두 치환됨)."
+
+  - id: practice
+    title: "실습 - 종합 미션"
+    subtitle: "가정통신문 일괄 생성기"
+    goal: "표 안 자리표시자도 처리하는 mailMerge로 확장."
+    why: "07강 패턴을 그대로 가져와 mail merge 전 흐름을 완성."
+    explanation: |-
+      미션: 표 셀 안 자리표시자도 처리하는 mailMergeFull(templatePath, csvPath, outFolder).
+    snippet: |-
+      from docx import Document
+    exercise:
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "07강 fillTemplate(표 셀 순회 포함)을 그대로 호출."
+    check:
+      noError: "함수 정의."
+      resultCheck: "표 안 자리표시자 모두 치환."
+    blocks:
+      - type: expansion
+        title: "미션: 표 포함 mail merge"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              import csv
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from docx import Document
+
+              def replaceInRuns(paragraph, replacements):
+                  for run in paragraph.runs:
+                      for key, value in replacements.items():
+                          placeholder = f"{{{{{key}}}}}"
+                          if placeholder in run.text:
+                              run.text = run.text.replace(placeholder, value)
+
+              def fillTemplate(templatePath, replacements, outPath):
+                  doc = Document(templatePath)
+                  for p in doc.paragraphs:
+                      replaceInRuns(p, replacements)
+                  for tbl in doc.tables:
+                      for row in tbl.rows:
+                          for cell in row.cells:
+                              for p in cell.paragraphs:
+                                  replaceInRuns(p, replacements)
+                  doc.save(outPath)
+
+              def mailMergeFull(templatePath, csvPath, outFolder):
+                  Path(outFolder).mkdir(exist_ok=True)
+                  with open(csvPath, "r", encoding="utf-8") as f:
+                      rows = list(csv.DictReader(f))
+                  outputs = []
+                  for row in rows:
+                      outPath = Path(outFolder) / f"{row['name']}.docx"
+                      fillTemplate(templatePath, row, outPath)
+                      outputs.append(outPath)
+                  return outputs
+
+              missionDir = TemporaryDirectory()
+              base = Path(missionDir.name)
+              tplPath = base / "tpl.docx"
+              seed = Document()
+              seed.add_heading("가정통신문", level=0)
+              seed.add_paragraph("학부모: {{parent}}님께")
+              tbl = seed.add_table(rows=2, cols=2, style="Table Grid")
+              tbl.cell(0, 0).text = "학생"
+              tbl.cell(0, 1).text = "{{name}}"
+              tbl.cell(1, 0).text = "반"
+              tbl.cell(1, 1).text = "{{classroom}}반 {{number}}번"
+              seed.save(tplPath)
+
+              csvPath = base / "students.csv"
+              csvPath.write_text(
+                  "name,classroom,number,parent\\n"
+                  "김민수,1,12,김부모\\n"
+                  "박지영,1,13,박부모\\n",
+                  encoding="utf-8",
+              )
+
+              outputs = mailMergeFull(tplPath, csvPath, base / "letters")
+              assert len(outputs) == 2
+              for path in outputs:
+                  doc = Document(path)
+                  combined = "\\n".join(p.text for p in doc.paragraphs)
+                  combined += "\\n" + "\\n".join(c.text for tbl in doc.tables for row in tbl.rows for c in row.cells)
+                  assert "{{" not in combined
+              [p.name for p in outputs]
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: list
+        style: bullet
+        items:
+          - "Email 트랙 03강과 결합 - 생성된 docx를 학부모에게 자동 발송"
+          - "PDF 변환 (LibreOffice headless) 후 발송"
+          - "발송 결과 로그를 CSV에 추가"
+          - "헤더 매핑 dict로 한국식 컬럼명(이름→name) 자동 변환"
+          - "조건부 추가 단락 (특정 학년에만 보이는 안내)"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: word_08-mail-merge-recipient-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_csv_load
+    - extensions
+    title: CSV 메일머지 수신자 데이터 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 중복 identity·누락 필드·허용 없는 민감정보를 차단한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이름이 아니라 안정적인 recipientId로 중복과 consent를 검사하세요.
+    - 병합 전에 필수 placeholder 입력이 모두 채워졌는지 확인하세요.
+    exercise:
+      prompt: audit_merge_rows(rows, required_fields, consented_ids)를 완성하세요.
+      starterCode: |-
+        def audit_merge_rows(rows, required_fields, consented_ids):
+            raise NotImplementedError
+      solution: |
+        def audit_merge_rows(rows, required_fields, consented_ids):
+            ids = [row.get("recipientId") for row in rows]
+            duplicates = sorted({value for value in ids if value and ids.count(value) > 1})
+            missing = sorted(row.get("recipientId", "") for row in rows if any(not str(row.get(field, "")).strip() for field in required_fields))
+            unconsented = sorted(row.get("recipientId", "") for row in rows if row.get("sensitive") and row.get("recipientId") not in consented_ids)
+            failures = []
+            if duplicates or any(not value for value in ids):
+                failures.append("identity")
+            if missing:
+                failures.append("required-fields")
+            if unconsented:
+                failures.append("consent")
+            return {"accepted": not failures, "failures": failures, "duplicates": duplicates, "missing": missing, "unconsented": unconsented}
+      hints: *id001
+    check:
+      id: python.word.word_08.mail-merge-recipient-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_08.mail-merge-recipient-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_merge_rows
+        cases:
+        - id: accepts-consented-rows
+          arguments:
+          - value:
+            - recipientId: u1
+              name: 민수
+              sensitive: true
+          - value:
+            - name
+          - value:
+            - u1
+          expectedReturn:
+            accepted: true
+            failures: []
+            duplicates: []
+            missing: []
+            unconsented: []
+        - id: reports-duplicate-and-missing
+          arguments:
+          - value:
+            - recipientId: u1
+              name: ''
+            - recipientId: u1
+              name: 영희
+          - value:
+            - name
+          - value: []
+          expectedReturn:
+            accepted: false
+            failures:
+            - identity
+            - required-fields
+            duplicates:
+            - u1
+            missing:
+            - u1
+            unconsented: []
+        - id: reports-consent
+          arguments:
+          - value:
+            - recipientId: u2
+              name: A
+              sensitive: true
+          - value:
+            - name
+          - value: []
+          expectedReturn:
+            accepted: false
+            failures:
+            - consent
+            duplicates: []
+            missing: []
+            unconsented:
+            - u2
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: word_08-mail-merge-manifest-reconcile-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - word_08-mail-merge-recipient-audit-mastery
+    title: 생성된 개인화 문서를 수신자 원장과 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 누락·중복·잘못된 source hash를 검출한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 수신자마다 정확히 하나의 artifact가 생성됐는지 원장으로 검증하세요.
+    - 개인정보 원문 대신 recipientId와 source hash만 증거에 남기세요.
+    exercise:
+      prompt: reconcile_merge_manifest(recipients, artifacts, source_hash)를 완성하세요.
+      starterCode: |-
+        def reconcile_merge_manifest(recipients, artifacts, source_hash):
+            raise NotImplementedError
+      solution: |
+        def reconcile_merge_manifest(recipients, artifacts, source_hash):
+            expected = set(recipients)
+            observed_ids = [item.get("recipientId") for item in artifacts]
+            observed = set(observed_ids)
+            missing = sorted(expected - observed)
+            extra = sorted(observed - expected)
+            duplicates = sorted({value for value in observed_ids if value and observed_ids.count(value) > 1})
+            stale = sorted(item.get("recipientId", "") for item in artifacts if item.get("sourceHash") != source_hash)
+            failures = []
+            if missing or extra or duplicates:
+                failures.append("cardinality")
+            if stale:
+                failures.append("source")
+            return {"passed": not failures, "failures": failures, "missing": missing, "extra": extra, "duplicates": duplicates, "stale": stale}
+      hints: *id002
+    check:
+      id: python.word.word_08.mail-merge-manifest-reconcile.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_08.mail-merge-manifest-reconcile.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_merge_manifest
+        cases:
+        - id: accepts-one-per-recipient
+          arguments:
+          - value:
+            - u1
+            - u2
+          - value:
+            - recipientId: u1
+              sourceHash: h
+            - recipientId: u2
+              sourceHash: h
+          - value: h
+          expectedReturn:
+            passed: true
+            failures: []
+            missing: []
+            extra: []
+            duplicates: []
+            stale: []
+        - id: reports-missing-and-duplicate
+          arguments:
+          - value:
+            - u1
+            - u2
+          - value:
+            - recipientId: u1
+              sourceHash: h
+            - recipientId: u1
+              sourceHash: h
+          - value: h
+          expectedReturn:
+            passed: false
+            failures:
+            - cardinality
+            missing:
+            - u2
+            extra: []
+            duplicates:
+            - u1
+            stale: []
+        - id: reports-extra-and-stale
+          arguments:
+          - value:
+            - u1
+          - value:
+            - recipientId: u1
+              sourceHash: old
+            - recipientId: u3
+              sourceHash: h
+          - value: h
+          expectedReturn:
+            passed: false
+            failures:
+            - cardinality
+            - source
+            missing: []
+            extra:
+            - u3
+            duplicates: []
+            stale:
+            - u1
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: word_08-mail-merge-safety-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - word_08-mail-merge-manifest-reconcile-transfer
+    title: 메일머지 안전 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력 승인·개인화·산출물 원장을 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Web에서는 문서 구조와 업무 불변식을 즉시 검증하세요.
+    - Local에서는 저장한 docx를 재개방하고 렌더 결과까지 증거로 남기세요.
+    exercise:
+      prompt: choose_merge_evidence(stage)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_merge_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_merge_evidence(stage):
+            choices = {'admission': {'action': 'validate identity fields and consent', 'evidence': 'redacted recipient audit', 'risk': 'unauthorized personalization'}, 'render': {'action': 'resolve placeholders per recipient', 'evidence': 'placeholder completeness', 'risk': 'cross-recipient leakage'}, 'release': {'action': 'reconcile one artifact per identity', 'evidence': 'hashed output manifest', 'risk': 'missing or duplicate letters'}}
+            if stage not in choices:
+                raise ValueError('unknown stage')
+            return choices[stage]
+      hints: *id003
+    check:
+      id: python.word.word_08.mail-merge-safety-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_08.mail-merge-safety-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_merge_evidence
+        cases:
+        - id: recalls-admission
+          arguments:
+          - value: admission
+          expectedReturn:
+            action: validate identity fields and consent
+            evidence: redacted recipient audit
+            risk: unauthorized personalization
+        - id: recalls-render
+          arguments:
+          - value: render
+          expectedReturn:
+            action: resolve placeholders per recipient
+            evidence: placeholder completeness
+            risk: cross-recipient leakage
+        - id: recalls-final-stage
+          arguments:
+          - value: release
+          expectedReturn:
+            action: reconcile one artifact per identity
+            evidence: hashed output manifest
+            risk: missing or duplicate letters
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

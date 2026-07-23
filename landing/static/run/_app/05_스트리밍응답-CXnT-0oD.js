@@ -1,0 +1,595 @@
+var e=`meta:
+  packages:
+  - anthropic
+  id: llmBasics_05
+  title: 스트리밍응답
+  order: 5
+  category: llmBasics
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - anthropic
+  - streaming
+  - 실시간
+  - 청크
+  seo:
+    title: Claude 스트리밍 응답 - messages.stream으로 실시간 출력
+    description: client.messages.stream 컨텍스트로 텍스트 청크를 실시간으로 받아 누적하고 최종 응답을 만드는 패턴을 익힙니다.
+    keywords:
+    - Claude streaming
+    - messages.stream
+    - 실시간 응답
+    - text chunk
+intro:
+  emoji: 🌊
+  goal: client.messages.stream으로 응답을 청크 단위로 받아 점진적으로 출력한다.
+  description: 긴 응답은 streaming으로 받으면 사용자 경험이 좋아집니다. 표준 스트리밍 패턴과 누적 처리, 종료 후 final 메시지 추출을 익힙니다.
+  direction: 동기 호출 baseline → text 청크 누적 → 진행 표시 → final 메시지로 ChatSession 확장 순서로 발전시킨다.
+  benefits:
+  - messages.stream 컨텍스트 매니저의 사용법을 분명히 익힌다.
+  - text_stream 이터레이터에서 청크를 받아 누적하는 패턴을 손에 익힌다.
+  - 진행 상태를 화면에 보여주는 출력 패턴을 정한다.
+  - get_final_message로 usage와 stop_reason까지 회수하는 패턴을 정리한다.
+  diagram:
+    steps:
+    - label: 1단계. 동기 호출 baseline
+      detail: 같은 질문을 동기로 한번 보내 응답과 시간 감을 잡는다.
+    - label: 2단계. text_stream 청크 누적
+      detail: stream의 text 이터레이터로 텍스트 조각을 받아 합친다.
+    - label: 3단계. 진행 표시
+      detail: 청크가 도착할 때마다 진행 표시(누적 길이)를 갱신한다.
+    - label: 4단계. get_final_message
+      detail: 스트림 종료 후 final 메시지로 usage와 content를 회수한다.
+    runtime:
+    - label: LLM 호출 환경
+      detail: anthropic 패키지와 ANTHROPIC_API_KEY가 준비된 로컬 Python에서 실행한다.
+    - label: 스트리밍응답 실행
+      detail: stream 컨텍스트가 정상적으로 닫히는지 확인하며 텍스트를 누적한다.
+    - label: 스트리밍응답 완료
+      detail: 다음 강의의 JSON 구조화 출력에서 부분 응답을 누적하는 패턴이 이어진다.
+sections:
+- id: sync_baseline
+  title: 1단계. 동기 호출로 baseline 잡기
+  structuredPrimary: true
+  subtitle: 비교용 응답을 먼저 본다
+  goal: 같은 질문을 동기 호출로 한 번 보내 응답과 시간 감을 baseline으로 잡는다.
+  why: 스트리밍 효과를 비교하려면 동기 호출의 모양을 먼저 알고 있어야 합니다. 응답이 모두 모이고 나서야 사용자에게 보인다는 점을 기억합니다.
+  explanation: 동기 호출은 응답 전체가 만들어진 뒤 한 번에 돌아옵니다. 응답이 길수록 대기 시간이 그대로 보입니다. 이후 스트리밍과 비교하면 첫 글자가 보이는 시점 차이가
+    체감됩니다.
+  tips:
+  - time.time()으로 호출 전후 시각을 찍어 두면 비교가 분명해집니다.
+  snippet: |-
+    import time
+    import anthropic
+
+    client = anthropic.Anthropic()
+    syncStart = time.time()
+    syncResponse = client.messages.create(
+        model="claude-haiku-4-5",
+        max_tokens=300,
+        messages=[{"role": "user", "content": "Python 데코레이터를 처음 배우는 사람에게 자세히 설명해 줘."}],
+    )
+    syncElapsed = round(time.time() - syncStart, 2)
+    syncAnswer = "".join(block.text for block in syncResponse.content if block.type == "text")
+    (syncElapsed, len(syncAnswer))
+  exercise:
+    prompt: max_tokens를 600으로 늘려 syncElapsed가 어떻게 변하는지 비교하세요.
+    starterCode: |-
+      import time
+      import anthropic
+
+      client = anthropic.Anthropic()
+      syncStart = time.time()
+      syncResponse = client.messages.create(
+          model="claude-haiku-4-5",
+          max_tokens=300,
+          messages=[{"role": "user", "content": "Python 데코레이터를 처음 배우는 사람에게 자세히 설명해 줘."}],
+      )
+      syncElapsed = round(time.time() - syncStart, 2)
+      syncAnswer = "".join(block.text for block in syncResponse.content if block.type == "text")
+      (syncElapsed, len(syncAnswer))
+    hints:
+    - 응답이 길어지면 elapsed가 거의 그대로 길어집니다.
+    - 사용자에게 보이는 시간은 첫 글자가 보일 때부터 마지막 글자가 보일 때까지의 합입니다.
+  check:
+    noError: 동기 호출이 예외 없이 끝까지 완료되어야 합니다.
+    resultCheck: syncElapsed가 양수이고 syncAnswer가 비어있지 않아야 합니다.
+- id: text_stream
+  title: 2단계. text_stream으로 청크 누적
+  structuredPrimary: true
+  subtitle: with client.messages.stream(...)
+  goal: stream 컨텍스트 안에서 text_stream을 반복해 청크를 누적해 같은 응답을 만든다.
+  why: 스트리밍은 첫 글자가 가장 빨리 보입니다. 같은 응답을 만들어 동기와 비교하면 streaming의 가치를 체감할 수 있습니다.
+  explanation: client.messages.stream(...)은 컨텍스트 매니저를 돌려줍니다. with 블록 안에서 stream.text_stream을 반복하면 텍스트 청크가 들어오는
+    대로 받습니다. 청크는 보통 짧은 토큰 묶음이며 join으로 합치면 동기 응답과 같은 텍스트가 됩니다.
+  tips:
+  - text_stream 이터레이터는 한 번만 소비됩니다. 두 번 돌리려면 청크를 미리 리스트에 모아둡니다.
+  snippet: |-
+    import anthropic
+
+    client = anthropic.Anthropic()
+    chunks: list[str] = []
+    with client.messages.stream(
+        model="claude-haiku-4-5",
+        max_tokens=300,
+        messages=[{"role": "user", "content": "Python 데코레이터를 처음 배우는 사람에게 자세히 설명해 줘."}],
+    ) as stream:
+        for chunk in stream.text_stream:
+            chunks.append(chunk)
+
+    streamAnswer = "".join(chunks)
+    (len(chunks), len(streamAnswer))
+  exercise:
+    prompt: chunks 리스트의 처음 3개 요소를 출력해 청크 단위가 얼마나 작은지 직접 확인하세요.
+    starterCode: |-
+      import anthropic
+
+      client = anthropic.Anthropic()
+      chunks: list[str] = []
+      with client.messages.stream(
+          model="claude-haiku-4-5",
+          max_tokens=300,
+          messages=[{"role": "user", "content": "Python 데코레이터를 처음 배우는 사람에게 자세히 설명해 줘."}],
+      ) as stream:
+          for chunk in stream.text_stream:
+              chunks.append(chunk)
+
+      streamAnswer = "".join(chunks)
+      (len(chunks), len(streamAnswer))
+    hints:
+    - chunks 슬라이싱(chunks 슬라이스 인덱스 0 3)을 결과 튜플에 함께 넣어 출력할 수 있습니다.
+    - 한국어 응답은 한글 1자가 여러 바이트라서 청크가 토큰 단위로 끊깁니다.
+  check:
+    noError: stream 컨텍스트가 정상적으로 닫혀야 합니다.
+    resultCheck: streamAnswer가 비어있지 않아야 합니다.
+- id: progressive_display
+  title: 3단계. 누적 길이로 진행 표시
+  structuredPrimary: true
+  subtitle: 청크 도착마다 상태 갱신
+  goal: 청크 도착마다 누적 문자열 길이를 기록해 진행 표시 데이터를 만든다.
+  why: 자동화 UI에서 "응답 중" 상태를 보여주려면 청크 단위 진행 데이터가 필요합니다. 길이/시간 두 축을 함께 잡으면 진행률 표시 위젯의 기반이 됩니다.
+  explanation: 청크가 들어올 때마다 time.time()과 누적 길이를 한 줄로 기록합니다. 결과 리스트는 (timestamp, length) 튜플 시퀀스가 됩니다. 자동화에서는
+    이 시퀀스를 그래프나 진행률 위젯으로 그대로 변환할 수 있습니다.
+  tips:
+  - 진행 표시 데이터는 cumulative 패턴이라 monotonic 증가가 보장됩니다. 단조 증가 여부를 assertion으로 확인하면 견고합니다.
+  snippet: |-
+    import time
+    import anthropic
+
+    client = anthropic.Anthropic()
+    timeline: list[tuple[float, int]] = []
+    accumulated = ""
+    startTs = time.time()
+    with client.messages.stream(
+        model="claude-haiku-4-5",
+        max_tokens=200,
+        messages=[{"role": "user", "content": "Python의 list와 tuple 차이를 3문장으로 설명해 줘."}],
+    ) as stream:
+        for piece in stream.text_stream:
+            accumulated += piece
+            timeline.append((round(time.time() - startTs, 3), len(accumulated)))
+
+    (timeline[:3], timeline[-1])
+  exercise:
+    prompt: timeline의 길이 컬럼이 단조 증가하는지 코드로 확인하세요.
+    starterCode: |-
+      import time
+      import anthropic
+
+      client = anthropic.Anthropic()
+      timeline: list[tuple[float, int]] = []
+      accumulated = ""
+      startTs = time.time()
+      with client.messages.stream(
+          model="claude-haiku-4-5",
+          max_tokens=200,
+          messages=[{"role": "user", "content": "Python의 list와 tuple 차이를 3문장으로 설명해 줘."}],
+      ) as stream:
+          for piece in stream.text_stream:
+              accumulated += piece
+              timeline.append((round(time.time() - startTs, 3), len(accumulated)))
+
+      (timeline[:3], timeline[-1])
+    hints:
+    - lengths = [item[1] for item in timeline]을 만들어 lengths == sorted(lengths)로 확인합니다.
+    - timeline이 최소 한 개 이상이어야 한다는 점도 함께 확인합니다.
+  check:
+    noError: 스트림 처리가 정상 완료되어야 합니다.
+    resultCheck: timeline이 비어있지 않고 마지막 길이가 첫 길이보다 커야 합니다.
+- id: final_message
+  title: 4단계. get_final_message로 마무리
+  structuredPrimary: true
+  subtitle: usage와 stop_reason도 회수
+  goal: 스트림 종료 후 stream.get_final_message()로 usage와 stop_reason까지 받는다.
+  why: 비용 추적과 마무리 검증을 위해 final 메시지가 필요합니다. 스트리밍에서도 동기 호출과 같은 정보를 모두 얻을 수 있도록 마무리 패턴을 익힙니다.
+  explanation: stream 컨텍스트가 닫히면 stream.get_final_message()로 Message 객체를 얻을 수 있습니다. 이 객체는 동기 호출의 response와 동일한
+    인터페이스를 노출합니다. usage, stop_reason, content가 그대로 접근됩니다.
+  tips:
+  - get_final_message는 with 블록 안에서 호출해도 동작합니다. 다만 안에서 호출하려면 청크 소비가 끝난 뒤여야 합니다.
+  snippet: |-
+    import anthropic
+
+    client = anthropic.Anthropic()
+    chunks: list[str] = []
+    with client.messages.stream(
+        model="claude-haiku-4-5",
+        max_tokens=200,
+        messages=[{"role": "user", "content": "오늘 학습할 만한 짧은 Python 팁 하나만 알려줘."}],
+    ) as stream:
+        for piece in stream.text_stream:
+            chunks.append(piece)
+        finalMessage = stream.get_final_message()
+
+    finalText = "".join(chunks)
+    (finalMessage.stop_reason, finalMessage.usage.input_tokens, finalMessage.usage.output_tokens, len(finalText))
+  exercise:
+    prompt: finalMessage.content 리스트의 길이와 첫 블록의 type을 함께 출력하세요.
+    starterCode: |-
+      import anthropic
+
+      client = anthropic.Anthropic()
+      chunks: list[str] = []
+      with client.messages.stream(
+          model="claude-haiku-4-5",
+          max_tokens=200,
+          messages=[{"role": "user", "content": "오늘 학습할 만한 짧은 Python 팁 하나만 알려줘."}],
+      ) as stream:
+          for piece in stream.text_stream:
+              chunks.append(piece)
+          finalMessage = stream.get_final_message()
+
+      finalText = "".join(chunks)
+      (finalMessage.stop_reason, finalMessage.usage.input_tokens, finalMessage.usage.output_tokens, len(finalText))
+    hints:
+    - len(finalMessage.content)와 finalMessage.content[0].type을 출력합니다.
+    - 일반 텍스트 응답이면 type은 "text"입니다.
+  check:
+    noError: 스트림과 final 메시지 접근이 예외 없이 끝까지 완료되어야 합니다.
+    resultCheck: stop_reason이 "end_turn" 또는 "max_tokens"이고 토큰 값이 양수여야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 스트리밍 ChatSession 종합 결과'
+  structuredPrimary: true
+  subtitle: 스트리밍을 ChatSession에 합성
+  goal: 3강의 ChatSession을 확장해 sendStreaming(question) 메서드로 텍스트와 final usage를 함께 돌려준다.
+  why: 자동화 UI는 보통 스트리밍으로 응답을 그리고 마지막에 비용을 기록합니다. 한 메서드로 둘 다 처리하면 호출 코드가 단순해집니다.
+  explanation: sendStreaming은 history에 user를 추가한 뒤 stream 컨텍스트로 청크를 누적합니다. 컨텍스트가 닫히기 직전에 get_final_message로
+    usage를 얻고, history에 assistant 응답을 저장합니다. 반환값은 (텍스트, usage) 튜플로 동기 send와 동일한 인터페이스를 유지합니다.
+  tips:
+  - 스트리밍 동안 콜백을 받고 싶다면 onChunk 함수를 인자로 추가하면 됩니다.
+  snippet: |-
+    import anthropic
+
+    class StreamingChatSession:
+        def __init__(self, model: str = "claude-haiku-4-5", system: str | None = None) -> None:
+            self.client = anthropic.Anthropic()
+            self.model = model
+            self.system = system
+            self.history: list[dict] = []
+            self.lastUsage = None
+
+        def sendStreaming(self, question: str, maxTokens: int = 300) -> tuple[str, object]:
+            self.history.append({"role": "user", "content": question})
+            chunks: list[str] = []
+            kwargs = {
+                "model": self.model,
+                "max_tokens": maxTokens,
+                "messages": self.history,
+            }
+            if self.system:
+                kwargs["system"] = self.system
+            with self.client.messages.stream(**kwargs) as stream:
+                for piece in stream.text_stream:
+                    chunks.append(piece)
+                finalMessage = stream.get_final_message()
+            text = "".join(chunks)
+            self.history.append({"role": "assistant", "content": text})
+            self.lastUsage = finalMessage.usage
+            return text, finalMessage.usage
+
+    session = StreamingChatSession(system="너는 한 문장으로 답하는 친근한 멘토야.")
+    answer, usage = session.sendStreaming("for문과 while문의 핵심 차이를 한 문장으로 말해줘.")
+    assert isinstance(answer, str) and len(answer) > 0
+    assert usage.input_tokens > 0 and usage.output_tokens > 0
+    assert len(session.history) == 2
+    (answer, usage.input_tokens, usage.output_tokens)
+  exercise:
+    prompt: sendStreaming에 onChunk 콜백 인자를 추가해 청크 도착마다 콜백을 호출하도록 만드세요.
+    starterCode: |-
+      import anthropic
+      from typing import Callable
+
+      class StreamingChatSession:
+          def __init__(self, model: str = "claude-haiku-4-5", system: str | None = None) -> None:
+              self.client = anthropic.Anthropic()
+              self.model = model
+              self.system = system
+              self.history: list[dict] = []
+              self.lastUsage = None
+
+          def sendStreaming(self, question: str, maxTokens: int = 300) -> tuple[str, object]:
+              self.history.append({"role": "user", "content": question})
+              chunks: list[str] = []
+              kwargs = {
+                  "model": self.model,
+                  "max_tokens": maxTokens,
+                  "messages": self.history,
+              }
+              if self.system:
+                  kwargs["system"] = self.system
+              with self.client.messages.stream(**kwargs) as stream:
+                  for piece in stream.text_stream:
+                      chunks.append(piece)
+                  finalMessage = stream.get_final_message()
+              text = "".join(chunks)
+              self.history.append({"role": "assistant", "content": text})
+              self.lastUsage = finalMessage.usage
+              return text, finalMessage.usage
+
+      session = StreamingChatSession(system="너는 한 문장으로 답하는 친근한 멘토야.")
+      answer, usage = session.sendStreaming("for문과 while문의 핵심 차이를 한 문장으로 말해줘.")
+      assert isinstance(answer, str) and len(answer) > 0
+      assert usage.input_tokens > 0 and usage.output_tokens > 0
+      assert len(session.history) == 2
+      (answer, usage.input_tokens, usage.output_tokens)
+    hints:
+    - 메서드 시그니처에 onChunk 인자를 추가하고 청크 루프에서 onChunk가 None이 아니면 호출합니다.
+    - 콜백은 텍스트 청크를 누적 출력하거나 길이 카운트를 갱신할 때 쓸 수 있습니다.
+  check:
+    noError: 스트리밍 메서드 호출이 예외 없이 끝까지 완료되어야 합니다.
+    resultCheck: answer가 비어 있지 않고 두 토큰 값이 모두 양수여야 합니다.
+assessment:
+  masteryVariants:
+  - id: 05_streaming-assemble-chunks-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - text_stream
+    title: 스트리밍 청크를 최종 텍스트로 조립하기
+    subtitle: chunk accumulator
+    goal: assemble_stream_chunks(chunks)를 완성해 빈 청크를 제외하고 텍스트, 청크 수, 길이 목록을 반환한다.
+    why: 스트리밍은 청크를 받는 순간보다 누적 상태를 정확히 유지하는 코드가 중요합니다.
+    explanation: chunks는 도착 순서대로 들어온 문자열 목록입니다. 빈 문자열은 화면에 의미 있는 변화가 없으므로 제외하고, 남은 청크를 이어 붙여 최종 텍스트를 만듭니다.
+    tips:
+    - text_stream은 이미 순서를 보장하므로 정렬하지 않습니다.
+    - 길이 목록을 함께 반환하면 진행 표시와 디버깅에 바로 쓸 수 있습니다.
+    exercise:
+      prompt: assemble_stream_chunks(chunks)를 완성해 text, chunkCount, lengths를 반환하세요.
+      starterCode: |-
+        def assemble_stream_chunks(chunks):
+            raise NotImplementedError
+      solution: |-
+        def assemble_stream_chunks(chunks):
+            parts = [str(chunk) for chunk in chunks if chunk != ""]
+            return {
+                "text": "".join(parts),
+                "chunkCount": len(parts),
+                "lengths": [len(part) for part in parts],
+            }
+      hints:
+      - 빈 문자열은 제외하고 None이 아닌 값은 문자열로 바꿉니다.
+      - 최종 텍스트는 리스트를 join해서 만듭니다.
+    check:
+      id: python.llm.streaming.assemble-chunks.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.streaming.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: assemble_stream_chunks
+        cases:
+        - id: joins-korean-stream-chunks
+          arguments:
+          - value:
+            - 안녕
+            - 하세요
+            - '!'
+          expectedReturn:
+            text: 안녕하세요!
+            chunkCount: 3
+            lengths:
+            - 2
+            - 3
+            - 1
+        - id: skips-empty-chunks
+          arguments:
+          - value:
+            - Cod
+            - ''
+            - aro
+          expectedReturn:
+            text: Codaro
+            chunkCount: 2
+            lengths:
+            - 3
+            - 3
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 05_streaming-progress-snapshots-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - progressive_display
+    - final_message
+    title: 청크 도착에 맞춰 진행 스냅샷 만들기
+    subtitle: progress snapshots
+    goal: build_stream_snapshots(chunks, every)를 완성해 누적 텍스트 스냅샷과 최종 텍스트를 반환한다.
+    why: 웹 학습 화면은 학생이 기다리는 동안 진행 상태를 자동으로 보여줘야 하므로 청크별 상태를 계산할 수 있어야 합니다.
+    explanation: every는 몇 개 청크마다 스냅샷을 남길지 정합니다. 마지막 청크에서는 간격과 상관없이 최종 스냅샷을 남겨야 화면과 저장 상태가 일치합니다.
+    tips:
+    - every가 1보다 작으면 진행 간격으로 쓸 수 없으므로 ValueError를 발생시킵니다.
+    - index는 사용자에게 보여줄 수 있도록 1부터 셉니다.
+    exercise:
+      prompt: build_stream_snapshots(chunks, every)를 완성해 snapshots, finalText, chunkCount를 반환하세요.
+      starterCode: |-
+        def build_stream_snapshots(chunks, every):
+            raise NotImplementedError
+      solution: |-
+        def build_stream_snapshots(chunks, every):
+            if every < 1:
+                raise ValueError("every must be at least 1")
+            snapshots = []
+            text = ""
+            for index, chunk in enumerate(chunks, 1):
+                text += chunk
+                if index % every == 0 or index == len(chunks):
+                    snapshots.append({"index": index, "text": text, "length": len(text)})
+            return {"snapshots": snapshots, "finalText": text, "chunkCount": len(chunks)}
+      hints:
+      - 마지막 청크에서는 무조건 스냅샷을 남깁니다.
+      - 누적 텍스트와 길이를 같은 시점에 기록합니다.
+    check:
+      id: python.llm.streaming.progress-snapshots.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.streaming.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_stream_snapshots
+        cases:
+        - id: records-interval-and-final-snapshots
+          arguments:
+          - value:
+            - A
+            - B
+            - C
+          - value: 2
+          expectedReturn:
+            snapshots:
+            - index: 2
+              text: AB
+              length: 2
+            - index: 3
+              text: ABC
+              length: 3
+            finalText: ABC
+            chunkCount: 3
+        - id: rejects-invalid-interval
+          arguments:
+          - value:
+            - A
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 05_streaming-rule-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 05_streaming-progress-snapshots-transfer
+    title: 스트리밍 구현 규칙 회상하기
+    subtitle: streaming rule recall
+    goal: choose_streaming_rule(goal)를 완성해 스트리밍 상황별 규칙과 실패 위험을 반환한다.
+    why: 스트리밍은 체감 속도, 누적 표시, 최종 메시지 저장이 분리되어야 안정적으로 동작합니다.
+    explanation: sync-baseline, chunk-accumulate, progress-display, final-message, callback 상황별로 적용할 규칙을 선택하세요.
+    tips:
+    - final 메시지를 버리면 usage와 stop_reason을 잃습니다.
+    - 콜백은 표시 책임을 분리할 때 유용합니다.
+    exercise:
+      prompt: choose_streaming_rule(goal)를 완성해 rule, useWhen, risk를 반환하세요.
+      starterCode: |-
+        def choose_streaming_rule(goal):
+            raise NotImplementedError
+      solution: |-
+        def choose_streaming_rule(goal):
+            table = {
+                "sync-baseline": {"rule": "measure non-stream response first", "useWhen": "comparing user wait time", "risk": "no baseline"},
+                "chunk-accumulate": {"rule": "append chunks in arrival order", "useWhen": "text_stream yields text", "risk": "broken final text"},
+                "progress-display": {"rule": "publish accumulated length as chunks arrive", "useWhen": "answer is long", "risk": "silent waiting"},
+                "final-message": {"rule": "read get_final_message after stream closes", "useWhen": "usage or stop reason matters", "risk": "lost telemetry"},
+                "callback": {"rule": "send each chunk to a display callback", "useWhen": "UI and model code are separated", "risk": "mixed concerns"},
+            }
+            if goal not in table:
+                raise ValueError("unknown streaming goal")
+            return table[goal]
+      hints:
+      - 체감 속도는 첫 청크 시점과 관련이 있습니다.
+      - 저장과 과금 확인에는 final 메시지가 필요합니다.
+    check:
+      id: python.llm.streaming.rule-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.streaming.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_streaming_rule
+        cases:
+        - id: recalls-chunk-accumulate
+          arguments:
+          - value: chunk-accumulate
+          expectedReturn:
+            rule: append chunks in arrival order
+            useWhen: text_stream yields text
+            risk: broken final text
+        - id: recalls-final-message
+          arguments:
+          - value: final-message
+          expectedReturn:
+            rule: read get_final_message after stream closes
+            useWhen: usage or stop reason matters
+            risk: lost telemetry
+        - id: rejects-unknown-goal
+          arguments:
+          - value: wait-longer
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending
+`;export{e as default};

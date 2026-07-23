@@ -3,9 +3,9 @@
   top: 0;
   z-index: 50;
   width: 100%;
-  border-bottom: 1px solid var(--border);
-  background: color-mix(in srgb, var(--background) 94%, transparent);
-  color: var(--foreground);
+  border-bottom: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-background-surface) 96%, transparent);
+  color: var(--color-text-primary);
   backdrop-filter: blur(14px);
 }
 
@@ -25,11 +25,11 @@
   left: 8px;
   z-index: 80;
   transform: translateY(-160%);
-  border: 1px solid var(--border-strong);
-  border-radius: 4px;
+  border: 1px solid var(--color-border-emphasized);
+  border-radius: var(--radius-element);
   padding: 9px 12px;
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-background-surface);
+  color: var(--color-text-primary);
   font-size: 13px;
   font-weight: 700;
 }
@@ -43,10 +43,10 @@
   min-width: 0;
   align-items: center;
   gap: 9px;
-  color: var(--foreground);
-  font-family: var(--font-display);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-heading);
   font-size: 16px;
-  font-weight: 750;
+  font-weight: 700;
   text-decoration: none;
 }
 
@@ -71,9 +71,9 @@
 .publicResourceMenu summary {
   min-height: 40px;
   padding: 0 11px;
-  color: var(--muted-foreground);
+  color: var(--color-text-secondary);
   font-size: 13px;
-  font-weight: 650;
+  font-weight: 700;
   line-height: 40px;
   text-decoration: none;
 }
@@ -90,7 +90,7 @@
   height: 2px;
   transform: scaleX(0);
   transform-origin: left;
-  background: var(--accent-brand, var(--foreground));
+  background: var(--color-accent);
   content: "";
 }
 
@@ -98,7 +98,7 @@
 .publicPrimaryNav a[aria-current="page"],
 .publicRunCommand:hover,
 .publicResourceMenu summary:hover {
-  color: var(--foreground);
+  color: var(--color-text-primary);
 }
 
 .publicPrimaryNav a[aria-current="page"]::after {
@@ -111,10 +111,10 @@
 }
 
 .publicRunCommand {
-  border-left: 1px solid var(--border);
+  border-left: 1px solid var(--color-border);
   margin-left: 4px;
   padding-left: 16px;
-  color: var(--foreground);
+  color: var(--color-text-primary);
 }
 
 .publicIconCommand {
@@ -123,16 +123,16 @@
   height: 40px;
   place-items: center;
   border: 0;
-  border-radius: 4px;
+  border-radius: var(--radius-element);
   background: transparent;
-  color: var(--muted-foreground);
+  color: var(--color-text-secondary);
   cursor: pointer;
 }
 
 .publicIconCommand:hover,
 .publicIconCommand:focus-visible {
-  background: var(--muted);
-  color: var(--foreground);
+  background: var(--color-background-muted);
+  color: var(--color-text-primary);
 }
 
 .publicResourceMenu {
@@ -162,26 +162,26 @@
   display: grid;
   width: 150px;
   overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--card);
-  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-element);
+  background: var(--color-background-card);
+  box-shadow: var(--shadow-med);
 }
 
 .publicResourceMenu > div a {
   min-height: 42px;
   padding: 11px 13px;
-  color: var(--card-foreground);
+  color: var(--color-text-primary);
   font-size: 13px;
   text-decoration: none;
 }
 
 .publicResourceMenu > div a + a {
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--color-border);
 }
 
 .publicResourceMenu > div a:hover {
-  background: var(--muted);
+  background: var(--color-background-muted);
 }
 
 .publicMenuToggle {
@@ -222,27 +222,27 @@
     max-height: calc(100svh - 68px);
     margin-inline: auto;
     overflow-y: auto;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--color-border);
     padding-block: 10px 16px;
   }
 
   .publicMobileMenu a {
     min-height: 46px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--color-border);
     padding: 13px 4px;
-    color: var(--muted-foreground);
+    color: var(--color-text-secondary);
     font-size: 14px;
-    font-weight: 650;
+    font-weight: 700;
     text-decoration: none;
   }
 
   .publicMobileMenu a[aria-current="page"] {
-    color: var(--foreground);
+    color: var(--color-text-primary);
   }
 
   .publicMobileMenu .publicMobileStart {
-    border-bottom-color: var(--border-strong);
-    color: var(--foreground);
+    border-bottom-color: var(--color-border-emphasized);
+    color: var(--color-text-primary);
     font-size: 15px;
   }
 }

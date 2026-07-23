@@ -1,0 +1,720 @@
+var e=`meta:
+  id: email_03
+  title: 다수 수신자와 개인화
+  order: 3
+  category: email
+  difficulty: ⭐⭐
+  badge: 기초
+  packages: []
+  tags:
+    - To
+    - CC
+    - BCC
+    - Template
+    - mail merge
+  outcomes:
+    - automation.email.bulk
+  prerequisites:
+    - automation.email.send
+  estimatedMinutes: 50
+  seo:
+    title: "다수 수신자와 개인화 - CSV → 100명 안내 메일"
+    description: "string.Template로 본문을 치환해 CSV 명단에서 100명에게 개인화 메일을 일괄 발송. dryRun으로 안전 검증."
+    keywords:
+      - 메일 mail merge
+      - string.Template
+      - 다수 발송
+
+intro:
+  direction: "CSV 명단을 받아 string.Template로 본문을 치환하고, 100명에게 개인화된 메일을 안전하게 발송한다. 60분 손작업이 5초가 된다."
+  benefits:
+    - "마케팅 정주임의 100명 개인화 발송 60분을 5초로 줄인다."
+    - "string.Template는 표준 라이브러리. Jinja2 같은 외부 의존이 필요 없다."
+    - "dryRun으로 100건 본문을 모두 미리 검증한 뒤 실 발송 결정."
+  diagram:
+    steps:
+      - label: "1. CSV 명단 로드"
+        detail: "csv.DictReader로 (name, email, role) 같은 dict 리스트로 변환."
+      - label: "2. Template 본문"
+        detail: "string.Template로 $name, $role 자리표시자 치환."
+      - label: "3. 개인화 발송"
+        detail: "각 수신자별 buildMessage → sendMessage."
+      - label: "4. dryRun 검증"
+        detail: "전 명단 메시지 객체를 먼저 생성·검증, 실 발송은 마지막."
+    runtime:
+      - label: "표준 라이브러리만"
+        detail: "csv, string, email, smtplib - 모두 표준."
+      - label: "검증"
+        detail: "각 메시지의 To와 본문 치환 결과를 assert."
+
+sections:
+  - id: step1_csv_load
+    title: "1단계. CSV 명단 로드"
+    structuredPrimary: true
+    subtitle: "csv.DictReader → dict 리스트"
+    goal: "name, email, role 컬럼이 있는 CSV를 dict 리스트로 읽는다."
+    why: "발송 대상 명단은 CSV·엑셀이 표준입니다. DictReader로 한 줄에 한 명씩 깨끗한 dict로 받아오는 패턴이 시작점입니다."
+    explanation: |-
+      csv.DictReader는 첫 행을 헤더로 사용해 각 행을 dict로 돌려줍니다. with open(..., encoding='utf-8') 컨텍스트에서 list comprehension으로 dict 리스트로 변환합니다.
+    tips:
+      - "CSV 인코딩이 EUC-KR이면 UnicodeDecodeError. 명시적으로 encoding='utf-8' 또는 'euc-kr' 지정 필수."
+    snippet: |-
+      import csv
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+
+      workdir = TemporaryDirectory()
+      csvPath = Path(workdir.name) / "list.csv"
+      csvPath.write_text(
+          "name,email,role\\n"
+          "김대리,kim@example.com,대리\\n"
+          "박과장,park@example.com,과장\\n"
+          "이주임,lee@example.com,주임\\n",
+          encoding="utf-8",
+      )
+
+      with open(csvPath, "r", encoding="utf-8") as f:
+          recipients = list(csv.DictReader(f))
+      len(recipients), recipients[0]
+    exercise:
+      prompt: "CSV에 한 명 추가(윤대리, yoon@example.com, 대리)하고 길이가 4인지 확인하세요."
+      starterCode: |-
+        import csv
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+
+        workdir = TemporaryDirectory()
+        csvPath = Path(workdir.name) / "list.csv"
+        csvPath.write_text(
+            "name,email,role\\n"
+            "김대리,kim@example.com,대리\\n"
+            "박과장,park@example.com,과장\\n"
+            "이주임,lee@example.com,주임\\n"
+            ___,
+            encoding="utf-8",
+        )
+        with open(csvPath, "r", encoding="utf-8") as f:
+            recipients = list(csv.DictReader(f))
+        len(recipients)
+      hints:
+        - "CSV 한 줄. 예: '윤대리,yoon@example.com,대리\\\\n'."
+    check:
+      noError: "CSV 마지막에 줄바꿈."
+      resultCheck: "출력 4."
+
+  - id: step2_template
+    title: "2단계. string.Template로 본문 개인화"
+    structuredPrimary: true
+    subtitle: "$name, $role 자리표시자 치환"
+    goal: "$name 님 안녕하세요 패턴의 본문을 한 수신자 데이터로 치환한다."
+    why: "f-string은 미리 데이터가 있어야 동작합니다. Template은 본문 템플릿을 한 번 정의하고 데이터를 나중에 주입하는 mail merge 패턴에 적합합니다."
+    explanation: |-
+      string.Template('$name 님, $role 안내드립니다.').substitute(name='김', role='월간')처럼 호출하면 자리표시자가 치환된 문자열이 나옵니다. substitute는 missing key가 있으면 KeyError, safe_substitute는 그대로 둡니다.
+    tips:
+      - "f-string과 달리 $자리표시자는 본문 안에 있어도 그 자리에서 평가되지 않아 안전합니다."
+    snippet: |-
+      from string import Template
+
+      bodyTemplate = Template(
+          "$name 님 안녕하세요.\\n\\n"
+          "$role 자리에 보고드릴 $topic 자료를 첨부합니다.\\n\\n"
+          "감사합니다."
+      )
+
+      body = bodyTemplate.substitute(name="김대리", role="대리", topic="월간 보고서")
+      body
+    exercise:
+      prompt: "renderBody(recipient) 함수를 직접 작성하세요. dict 하나를 받아 위 Template을 safe_substitute로 채워 문자열을 반환해야 합니다. (safe_substitute는 키가 없으면 자리표시자를 그대로 두므로 부분 데이터에도 안전합니다.) 박과장 데이터로 호출해 첫 줄이 '박과장 님 안녕하세요.'인지 검증합니다."
+      starterCode: |-
+        from string import Template
+
+        bodyTemplate = Template(
+            "$name 님 안녕하세요.\\n\\n"
+            "$role 자리에 보고드릴 $topic 자료를 첨부합니다."
+        )
+
+        def renderBody(recipient):
+            ___
+
+        body = renderBody({"name": "박과장", "role": "과장", "topic": "주간 보고서"})
+        body.splitlines()[0]
+      hints:
+        - "return bodyTemplate.safe_substitute(**recipient)."
+    check:
+      noError: "substitute 인자는 키워드."
+      resultCheck: "출력 '박과장 님 안녕하세요.'."
+
+  - id: step3_bulk_build
+    title: "3단계. 명단 전체에 개인화 메시지 생성"
+    structuredPrimary: true
+    subtitle: "CSV + Template + buildMessage 결합"
+    goal: "CSV의 모든 수신자에 대해 개인화된 EmailMessage 리스트를 만든다."
+    why: "100명 발송의 진짜 가치는 일괄 생성에 있습니다. 한 함수 호출로 100개 메시지가 메모리에 만들어집니다."
+    explanation: |-
+      buildPersonalizedMessages(recipients, subject, bodyTemplate)이 dict 리스트 + Template을 받아 EmailMessage 리스트를 돌려줍니다. dryRun으로 결과를 먼저 검증한 뒤 실 발송.
+    tips:
+      - "1000건 이상은 메모리 부담이 있습니다. 그 경우 generator로 yield하는 패턴으로 변경."
+    snippet: |-
+      import csv
+      from pathlib import Path
+      from string import Template
+      from tempfile import TemporaryDirectory
+      from email.message import EmailMessage
+
+      def buildPersonalizedMessages(recipients, subject, bodyTemplate, fromAddr="me@example.com"):
+          messages = []
+          for recipient in recipients:
+              msg = EmailMessage()
+              msg["From"] = fromAddr
+              msg["To"] = recipient["email"]
+              msg["Subject"] = subject
+              msg.set_content(bodyTemplate.substitute(**recipient), charset="utf-8")
+              messages.append(msg)
+          return messages
+
+      workdir = TemporaryDirectory()
+      csvPath = Path(workdir.name) / "list.csv"
+      csvPath.write_text(
+          "name,email,role\\n"
+          "김대리,kim@example.com,대리\\n"
+          "박과장,park@example.com,과장\\n",
+          encoding="utf-8",
+      )
+      with open(csvPath, "r", encoding="utf-8") as f:
+          recipients = list(csv.DictReader(f))
+
+      template = Template("$name 님 ($role), 보고드립니다.")
+      messages = buildPersonalizedMessages(recipients, "월간 보고", template)
+
+      [(m["To"], m.get_content().strip()) for m in messages]
+    exercise:
+      prompt: "CSV에 한 명(이주임) 추가하고 messages 길이가 3인지 확인하세요."
+      starterCode: |-
+        import csv
+        from pathlib import Path
+        from string import Template
+        from tempfile import TemporaryDirectory
+        from email.message import EmailMessage
+
+        def buildPersonalizedMessages(recipients, subject, bodyTemplate, fromAddr="me@example.com"):
+            messages = []
+            for recipient in recipients:
+                msg = EmailMessage()
+                msg["From"] = fromAddr
+                msg["To"] = recipient["email"]
+                msg["Subject"] = subject
+                msg.set_content(bodyTemplate.substitute(**recipient), charset="utf-8")
+                messages.append(msg)
+            return messages
+
+        workdir = TemporaryDirectory()
+        csvPath = Path(workdir.name) / "list.csv"
+        csvPath.write_text(
+            "name,email,role\\n"
+            "김대리,kim@example.com,대리\\n"
+            "박과장,park@example.com,과장\\n"
+            ___,
+            encoding="utf-8",
+        )
+        with open(csvPath, "r", encoding="utf-8") as f:
+            recipients = list(csv.DictReader(f))
+        template = Template("$name 님 ($role) 안내")
+        len(buildPersonalizedMessages(recipients, "s", template))
+      hints:
+        - "한 줄 추가. '이주임,lee@example.com,주임\\\\n'."
+    check:
+      noError: "CSV 마지막 줄바꿈."
+      resultCheck: "출력 3."
+
+  - id: validation
+    title: "4단계. 검증 루프 - 100건 본문 자동 검증"
+    structuredPrimary: true
+    subtitle: "모든 메시지 To + 본문 키워드 일괄 assert"
+    goal: "buildPersonalizedMessages 결과의 각 메시지가 의도한 수신자와 개인화 본문을 가지는지 한 셀에서 검증한다."
+    why: "100건 발송 전 dryRun 검증이 본 트랙의 안전 원칙입니다. 본문 치환이 의도대로 됐는지 코드가 확인."
+    explanation: |-
+      각 메시지의 To 헤더가 recipient['email']과 같고, 본문에 recipient['name']이 포함됨을 한 묶음 assert로 확인합니다.
+    tips:
+      - "수신자 이름에 자리표시자에 없는 단어가 들어가도 같은 패턴으로 검증 가능."
+    snippet: |-
+      import csv
+      from pathlib import Path
+      from string import Template
+      from tempfile import TemporaryDirectory
+      from email.message import EmailMessage
+
+      def buildPersonalizedMessages(recipients, subject, bodyTemplate, fromAddr="me@example.com"):
+          messages = []
+          for recipient in recipients:
+              msg = EmailMessage()
+              msg["From"] = fromAddr
+              msg["To"] = recipient["email"]
+              msg["Subject"] = subject
+              msg.set_content(bodyTemplate.substitute(**recipient), charset="utf-8")
+              messages.append(msg)
+          return messages
+
+      vault = TemporaryDirectory()
+      csvPath = Path(vault.name) / "list.csv"
+      csvPath.write_text(
+          "name,email,role\\n"
+          "김대리,kim@example.com,대리\\n"
+          "박과장,park@example.com,과장\\n"
+          "이주임,lee@example.com,주임\\n",
+          encoding="utf-8",
+      )
+      with open(csvPath, "r", encoding="utf-8") as f:
+          recipients = list(csv.DictReader(f))
+
+      template = Template("$name 님 ($role), 월간 보고드립니다.")
+      messages = buildPersonalizedMessages(recipients, "월간 보고", template)
+
+      for message, recipient in zip(messages, recipients):
+          assert message["To"] == recipient["email"]
+          assert recipient["name"] in message.get_content()
+      len(messages)
+    exercise:
+      prompt: "CSV에 두 명 추가해 검증을 통과시키세요."
+      starterCode: |-
+        import csv
+        from pathlib import Path
+        from string import Template
+        from tempfile import TemporaryDirectory
+        from email.message import EmailMessage
+
+        def buildPersonalizedMessages(recipients, subject, bodyTemplate, fromAddr="me@example.com"):
+            messages = []
+            for recipient in recipients:
+                msg = EmailMessage()
+                msg["From"] = fromAddr
+                msg["To"] = recipient["email"]
+                msg["Subject"] = subject
+                msg.set_content(bodyTemplate.substitute(**recipient), charset="utf-8")
+                messages.append(msg)
+            return messages
+
+        vault = TemporaryDirectory()
+        csvPath = Path(vault.name) / "list.csv"
+        csvPath.write_text(
+            "name,email,role\\n"
+            "김대리,kim@example.com,대리\\n"
+            "박과장,park@example.com,과장\\n"
+            ___,
+            encoding="utf-8",
+        )
+        with open(csvPath, "r", encoding="utf-8") as f:
+            recipients = list(csv.DictReader(f))
+        template = Template("$name 님 안내")
+        messages = buildPersonalizedMessages(recipients, "s", template)
+        for m, r in zip(messages, recipients):
+            assert m["To"] == r["email"]
+            assert r["name"] in m.get_content()
+        len(messages)
+      hints:
+        - "두 줄 추가. 예: '이주임,lee@x.com,주임\\\\n윤대리,yoon@x.com,대리\\\\n'."
+    check:
+      noError: "마지막 줄바꿈 잊지 말 것."
+      resultCheck: "출력 4."
+
+  - id: practice
+    title: "실습 - 종합 미션"
+    subtitle: "안내 메일 일괄 발송기"
+    goal: "CSV + Template + dryRun 패턴을 함수로 묶어 일괄 발송기 완성."
+    why: "마케팅 정주임이 그대로 가져갈 수 있는 도구가 본 강의의 도착점입니다."
+    explanation: |-
+      미션: bulkSend(csvPath, subject, bodyTemplate, dryRun=True) -> list[EmailMessage] 함수. dryRun=True에서 메시지 리스트만 돌려주고, dryRun=False에서 실제 발송.
+    tips:
+      - "기본 dryRun=True 유지. 실 발송은 학습 후 본인 명단에서."
+    snippet: |-
+      import csv
+      from pathlib import Path
+      from string import Template
+      from tempfile import TemporaryDirectory
+      from email.message import EmailMessage
+    exercise:
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "함수 시그니처: bulkSend(csvPath, subject, bodyTemplate, dryRun=True) -> list"
+    check:
+      noError: "함수 정의 + dryRun 검증."
+      resultCheck: "결과 메시지 수 = CSV 행 수."
+    blocks:
+      - type: expansion
+        title: "미션: 일괄 발송기"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              import csv
+              import os
+              import smtplib
+              import ssl
+              from pathlib import Path
+              from string import Template
+              from tempfile import TemporaryDirectory
+              from email.message import EmailMessage
+
+              def bulkSend(csvPath, subject, bodyTemplate, dryRun=True, fromAddr="me@example.com"):
+                  with open(csvPath, "r", encoding="utf-8") as f:
+                      recipients = list(csv.DictReader(f))
+                  messages = []
+                  for recipient in recipients:
+                      msg = EmailMessage()
+                      msg["From"] = fromAddr
+                      msg["To"] = recipient["email"]
+                      msg["Subject"] = subject
+                      msg.set_content(bodyTemplate.substitute(**recipient), charset="utf-8")
+                      messages.append(msg)
+                  if dryRun:
+                      return messages
+                  ctx = ssl.create_default_context()
+                  with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ctx) as smtp:
+                      smtp.login(os.environ["SMTP_USER"], os.environ["SMTP_APP_PASS"])
+                      for msg in messages:
+                          smtp.send_message(msg)
+                  return messages
+
+              missionDir = TemporaryDirectory()
+              csvPath = Path(missionDir.name) / "list.csv"
+              csvPath.write_text(
+                  "name,email,role\\n"
+                  "김대리,kim@example.com,대리\\n"
+                  "박과장,park@example.com,과장\\n",
+                  encoding="utf-8",
+              )
+              template = Template("$name 님 ($role), 안내드립니다.")
+              messages = bulkSend(csvPath, "월간 안내", template, dryRun=True)
+              assert len(messages) == 2
+              assert messages[0]["To"] == "kim@example.com"
+              assert "김대리" in messages[0].get_content()
+              [m["To"] for m in messages]
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: list
+        style: bullet
+        items:
+          - "Template 본문에 $today, $deadline 같은 동적 필드 추가"
+          - "발송 결과 (성공/실패) 로그를 CSV로 저장"
+          - "수신자별로 다른 첨부 파일 (개인 청구서 PDF) 결합 - PDF 10강과 연결"
+          - "CC/BCC 컬럼을 CSV에 추가해 한 번에 처리"
+          - "한국식 직급 매핑: role='대리'면 '대리님', '과장'이면 '과장님'으로 자동 변환"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: email_03-personalized-recipient-plan-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_csv_load
+    - extensions
+    title: 다수 수신자 개인화 메일을 1인 1envelope로 계획하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: template field 누락과 중복 recipient를 차단하고 개별 message를 만든다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 개인화 메일은 여러 주소를 To/CC에 묶지 말고 1인 1envelope로 만드세요.
+    - template field 누락을 빈 문자열로 발송하지 마세요.
+    exercise:
+      prompt: plan_personalized_messages(recipients, required_fields)를 완성하세요.
+      starterCode: |-
+        def plan_personalized_messages(recipients, required_fields):
+            raise NotImplementedError
+      solution: |
+        def plan_personalized_messages(recipients, required_fields):
+            seen = set()
+            messages = []
+            rejected = []
+            for recipient in recipients:
+                email = recipient.get("email", "").lower()
+                reasons = []
+                if email in seen:
+                    reasons.append("duplicate")
+                missing = sorted(field for field in required_fields if recipient.get(field) in {None, ""})
+                if missing:
+                    reasons.append("fields")
+                if reasons:
+                    rejected.append({"email": email, "reasons": reasons, "missingFields": missing})
+                else:
+                    messages.append({"to": [email], "personalization": {field: recipient[field] for field in required_fields}})
+                    seen.add(email)
+            return {"ready": not rejected, "messages": messages, "rejected": rejected, "oneRecipientPerEnvelope": True}
+      hints: *id001
+    check:
+      id: python.email.email_03.personalized-recipient-plan.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_03.personalized-recipient-plan.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_personalized_messages
+        cases:
+        - id: plans-two-isolated-envelopes
+          arguments:
+          - value:
+            - email: A@example.test
+              name: A
+            - email: b@example.test
+              name: B
+          - value:
+            - name
+          expectedReturn:
+            ready: true
+            messages:
+            - to:
+              - a@example.test
+              personalization:
+                name: A
+            - to:
+              - b@example.test
+              personalization:
+                name: B
+            rejected: []
+            oneRecipientPerEnvelope: true
+        - id: reports-duplicate-recipient
+          arguments:
+          - value:
+            - email: a@example.test
+              name: A
+            - email: A@example.test
+              name: Again
+          - value:
+            - name
+          expectedReturn:
+            ready: false
+            messages:
+            - to:
+              - a@example.test
+              personalization:
+                name: A
+            rejected:
+            - email: a@example.test
+              reasons:
+              - duplicate
+              missingFields: []
+            oneRecipientPerEnvelope: true
+        - id: reports-missing-template-field
+          arguments:
+          - value:
+            - email: a@example.test
+              name: ''
+          - value:
+            - name
+          expectedReturn:
+            ready: false
+            messages: []
+            rejected:
+            - email: a@example.test
+              reasons:
+              - fields
+              missingFields:
+              - name
+            oneRecipientPerEnvelope: true
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: email_03-personalization-preview-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - email_03-personalized-recipient-plan-mastery
+    title: 새 개인화 preview에 recipient 간 정보 누출 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 각 message 본문에 자신의 token만 있고 다른 recipient token은 없는지 검사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 발송 전 recipient별 rendered preview를 별도로 검사하세요.
+    - 다른 recipient의 private token이 본문에 섞이지 않았는지 교차 검사하세요.
+    exercise:
+      prompt: audit_personalization_previews(previews)를 완성하세요.
+      starterCode: |-
+        def audit_personalization_previews(previews):
+            raise NotImplementedError
+      solution: |
+        def audit_personalization_previews(previews):
+            tokens = {preview["recipient"]: preview["privateToken"] for preview in previews}
+            failures = []
+            for preview in previews:
+                reasons = []
+                body = preview["body"]
+                if preview["privateToken"] not in body:
+                    reasons.append("missing-own-token")
+                leaked = sorted(recipient for recipient, token in tokens.items() if recipient != preview["recipient"] and token and token in body)
+                if leaked:
+                    reasons.append("cross-recipient-leak")
+                if reasons:
+                    failures.append({"recipient": preview["recipient"], "reasons": reasons, "leakedRecipients": leaked})
+            return {"accepted": not failures, "failures": failures, "previewCount": len(previews)}
+      hints: *id002
+    check:
+      id: python.email.email_03.personalization-preview-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_03.personalization-preview-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_personalization_previews
+        cases:
+        - id: accepts-isolated-previews
+          arguments:
+          - value:
+            - recipient: a
+              privateToken: A-1
+              body: Hello A-1
+            - recipient: b
+              privateToken: B-2
+              body: Hello B-2
+          expectedReturn:
+            accepted: true
+            failures: []
+            previewCount: 2
+        - id: reports-cross-recipient-leak
+          arguments:
+          - value:
+            - recipient: a
+              privateToken: A-1
+              body: A-1 and B-2
+            - recipient: b
+              privateToken: B-2
+              body: B-2
+          expectedReturn:
+            accepted: false
+            failures:
+            - recipient: a
+              reasons:
+              - cross-recipient-leak
+              leakedRecipients:
+              - b
+            previewCount: 2
+        - id: reports-missing-own-token
+          arguments:
+          - value:
+            - recipient: a
+              privateToken: A-1
+              body: Hello
+          expectedReturn:
+            accepted: false
+            failures:
+            - recipient: a
+              reasons:
+              - missing-own-token
+              leakedRecipients: []
+            previewCount: 1
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: email_03-personalized-mail-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - email_03-personalization-preview-audit-transfer
+    title: 다수 수신자 개인화 안전 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: envelope 격리·field completeness·교차 누출 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 메일 API 성공과 올바른 수신자·내용·첨부 전달을 분리해 검증하세요.
+    - 실제 발송 전 dry run과 idempotency identity, 비밀정보 redaction을 적용하세요.
+    exercise:
+      prompt: choose_personalization_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_personalization_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_personalization_evidence(situation):
+            table = {'envelope': {'action': 'one recipient per message', 'evidence': 'recipient message mapping', 'risk': 'address disclosure'}, 'template': {'action': 'validate required fields', 'evidence': 'missing field report', 'risk': 'broken personalization'}, 'preview': {'action': 'scan cross-recipient tokens', 'evidence': 'isolated rendered body', 'risk': 'private data leak'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.email.email_03.personalized-mail-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_03.personalized-mail-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_personalization_evidence
+        cases:
+        - id: recalls-envelope
+          arguments:
+          - value: envelope
+          expectedReturn:
+            action: one recipient per message
+            evidence: recipient message mapping
+            risk: address disclosure
+        - id: recalls-template
+          arguments:
+          - value: template
+          expectedReturn:
+            action: validate required fields
+            evidence: missing field report
+            risk: broken personalization
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

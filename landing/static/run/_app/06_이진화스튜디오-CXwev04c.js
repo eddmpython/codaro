@@ -1,0 +1,850 @@
+var e=`meta:
+  packages:
+  - numpy
+  - opencv-python
+  - scikit-learn
+  id: opencv_06
+  title: 이진화스튜디오
+  order: 6
+  category: opencv
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  tags:
+  - OpenCV
+  - threshold
+  - adaptiveThreshold
+  - OTSU
+  - 이진화
+  seo:
+    title: OpenCV 중급 - 이진화 스튜디오
+    description: OpenCV threshold/adaptiveThreshold/OTSU로 이미지를 흑백 이진으로 변환하고 객체/배경 분리를 정량 평가합니다.
+    keywords:
+    - OpenCV
+    - threshold
+    - adaptiveThreshold
+    - OTSU
+    - 이진화
+intro:
+  emoji: ⬛
+  goal: 전역/적응형/OTSU 세 이진화 방식을 같은 입력에 적용해 객체 픽셀 비율로 정량 비교하고, 조명이 고르지 않은 입력에서 적응형이 유리한 이유를 직접 확인합니다.
+  description: 이진화는 임계값 기준으로 픽셀을 255/0 두 값으로 분류합니다. 임계값을 사람이 정하느냐, 통계로 찾느냐, 픽셀마다 다르게 두느냐가 세 방식의 핵심 차이입니다.
+  direction: 합성 입력에서 객체 픽셀 수를 미리 계산해 두고 각 방식의 결과를 검증한 뒤, 그래디언트 조명이 있는 입력에서 적응형의 강점을 확인합니다.
+  benefits:
+  - cv2.threshold의 THRESH_BINARY와 THRESH_BINARY_INV의 결과가 정확히 반전 관계인지 확인합니다.
+  - cv2.THRESH_OTSU가 히스토그램에서 자동으로 찾는 임계값과 정답의 차이를 측정합니다.
+  - cv2.adaptiveThreshold의 blockSize/C가 결과에 어떻게 작용하는지 비교합니다.
+  - 임계값 안전 가드 함수로 잘못된 입력을 차단합니다.
+  diagram:
+    steps:
+    - label: 합성 입력 만들기
+      detail: 배경 70 + 직사각형 190 + 원 230으로 픽셀 수가 정해진 입력을 만듭니다.
+    - label: 전역 임계값
+      detail: 임계값 120으로 직사각형과 원을 함께 분리합니다.
+    - label: BINARY vs BINARY_INV
+      detail: 두 결과의 합이 전체 픽셀 수와 같음을 검증합니다.
+    - label: OTSU 자동
+      detail: cv2.THRESH_OTSU로 자동 임계값을 찾고 정답과 얼마나 가까운지 확인합니다.
+    - label: Adaptive 강점
+      detail: 그래디언트 조명 입력에서 전역 임계값이 실패하고 적응형이 성공하는 경우를 봅니다.
+    runtime:
+    - label: opencv-python 패키지
+      detail: meta.packages의 opencv-python이 가상환경에 있어야 cv2.threshold/adaptiveThreshold가 import됩니다.
+    - label: 합성 입력 활용
+      detail: 정답이 정확한 합성 입력에서 알고리즘 동작을 검증한 뒤 실제 사진으로 일반화합니다.
+    - label: 단채널 입력
+      detail: 이진화는 그레이스케일에서 합니다. 컬러는 채널별로 따로 처리합니다.
+sections:
+- id: step1_load
+  title: 1단계. 합성 이진화 입력
+  structuredPrimary: true
+  subtitle: 배경/객체 픽셀 수 미리 계산
+  goal: 균일 배경 위에 직사각형과 원이 그려진 합성 흑백 입력을 만들고, "객체로 분류되어야 할 픽셀 수"를 미리 셉니다.
+  why: 이진화의 성공 여부는 "객체와 배경이 정확히 분리되었는가"입니다. 합성 입력은 정답을 정확히 알 수 있어 알고리즘 검증의 출발점으로 좋습니다.
+  explanation: |-
+    100×140 캔버스를 균일한 배경(70)으로 채운 뒤, 한가운데 직사각형(190)과 원(230)을 그립니다. 두 객체의 밝기가 모두 배경보다 명확히 크므로 임계값 120 정도면 정확히 분리됩니다.
+    객체 픽셀 수는 (image > 120).sum()으로 미리 셀 수 있습니다. 이 정답값을 알면 이후 각 이진화 방식이 정확히 잡았는지 비교할 수 있습니다.
+    실무에서 이런 합성 입력은 알고리즘 회귀 테스트에 자주 쓰입니다. 사진은 정답이 없어 시각 검증에 의존하지만, 합성은 숫자로 검증할 수 있습니다.
+  tips:
+  - cv2.rectangle, cv2.circle의 thickness=-1은 채우기입니다. 둘레만 그리려면 양수를 줍니다.
+  - 객체 픽셀 수는 (image > threshold).sum()으로 한 줄에 측정합니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+
+    thresholdCanvas = np.full((100, 140), 70, dtype=np.uint8)
+    cv2.rectangle(thresholdCanvas, (35, 25), (105, 75), 190, -1)
+    cv2.circle(thresholdCanvas, (70, 50), 18, 230, -1)
+
+    {
+        'shape': thresholdCanvas.shape,
+        'dtype': str(thresholdCanvas.dtype),
+        'backgroundPixels': int((thresholdCanvas == 70).sum()),
+        'objectPixels': int((thresholdCanvas > 120).sum()),
+        'totalPixels': int(thresholdCanvas.size),
+    }
+  exercise:
+    prompt: 같은 캔버스에 작은 원(thickness=-1, 색상 230)을 좌상단 (15, 15) 위치에 반지름 8로 추가하고, 객체 픽셀 수가 원래보다 늘어났는지 확인하세요.
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+      addCanvas = np.full((100, 140), 70, dtype=np.uint8)
+      cv2.rectangle(addCanvas, (35, 25), (105, 75), 190, -1)
+      cv2.circle(addCanvas, (70, 50), 18, 230, -1)
+      cv2.circle(addCanvas, (15, 15), ___, 230, -1)
+
+      addCount = int((addCanvas > 120).sum())
+      {'addCount': addCount, 'increasedFromBase': addCount > 4000}
+    hints:
+    - 반지름 인자 자리에 8을 넣습니다.
+    - 빈칸에는 8이 들어갑니다.
+    check:
+      noError: cv2.circle 추가 호출이 끝나야 합니다.
+      resultCheck: addCount가 양수이고 increasedFromBase가 True여야 합니다.
+  check:
+    noError: 합성 입력 생성과 통계 계산이 끝나야 합니다.
+    resultCheck: shape가 (100, 140), totalPixels가 14000, objectPixels가 양수여야 합니다.
+- id: step2_global
+  title: 2단계. 전역 임계값
+  structuredPrimary: true
+  subtitle: cv2.threshold + THRESH_BINARY
+  goal: 합성 입력에 임계값 120 전역 threshold를 적용해 객체로 분류된 픽셀 수가 step1에서 미리 계산한 정답과 일치하는지 확인합니다.
+  why: 전역 임계값은 가장 단순한 이진화입니다. 합성 입력에서 정답이 정해진 만큼, 결과가 정확히 그 값과 같은지 검증해야 다음 단계로 넘어갈 신뢰가 생깁니다.
+  explanation: |-
+    cv2.threshold(src, thresh, maxval, type)는 (ret, dst) 튜플을 돌려줍니다. ret은 실제 적용된 임계값(THRESH_OTSU 같은 자동 모드가 아니면 thresh와 같음), dst는 이진 이미지입니다.
+    THRESH_BINARY는 임계값보다 큰 픽셀을 maxval(보통 255), 작거나 같은 픽셀을 0으로 만듭니다. 결과 dtype은 입력과 같은 uint8입니다.
+    객체 픽셀 수는 (binary == 255).sum()으로 셉니다. 정답과 정확히 같아야 알고리즘이 의도대로 동작했다고 말할 수 있습니다.
+  tips:
+  - threshold 반환의 ret 값은 자동 모드(OTSU/TRIANGLE)에서만 의미 있습니다. 일반 모드에서는 입력한 thresh와 동일합니다.
+  - "ret을 무시하려면 _, dst = cv2.threshold(...)로 받습니다."
+  snippet: |-
+    import cv2
+    import numpy as np
+
+    globalCanvas = np.full((100, 140), 70, dtype=np.uint8)
+    cv2.rectangle(globalCanvas, (35, 25), (105, 75), 190, -1)
+    cv2.circle(globalCanvas, (70, 50), 18, 230, -1)
+
+    expectedObjectPixels = int((globalCanvas > 120).sum())
+    ret, globalBinary = cv2.threshold(globalCanvas, 120, 255, cv2.THRESH_BINARY)
+    actualObjectPixels = int((globalBinary == 255).sum())
+
+    {
+        'returnedThreshold': float(ret),
+        'expectedObjectPixels': expectedObjectPixels,
+        'actualObjectPixels': actualObjectPixels,
+        'matchesExpected': actualObjectPixels == expectedObjectPixels,
+    }
+  exercise:
+    prompt: 같은 입력에 임계값을 200으로 올려 적용하면 원만 잡히고 직사각형은 빠지는지 확인하세요. 객체 픽셀 수가 step2 결과보다 명백히 작아야 합니다.
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+      tightCanvas = np.full((100, 140), 70, dtype=np.uint8)
+      cv2.rectangle(tightCanvas, (35, 25), (105, 75), 190, -1)
+      cv2.circle(tightCanvas, (70, 50), 18, 230, -1)
+
+      _, tightBinary = cv2.threshold(tightCanvas, ___, 255, cv2.THRESH_BINARY)
+      tightCount = int((tightBinary == 255).sum())
+      {'tightCount': tightCount, 'isMuchSmaller': tightCount < 1000}
+    hints:
+    - 임계값 200은 직사각형(190)을 제외하고 원(230)만 통과시킵니다.
+    - 빈칸에는 200이 들어갑니다.
+    check:
+      noError: threshold 호출이 끝나야 합니다.
+      resultCheck: tightCount가 원 면적 부근(약 1000 미만)이고 isMuchSmaller가 True여야 합니다.
+  check:
+    noError: threshold와 dict 구성이 끝나야 합니다.
+    resultCheck: matchesExpected가 True이고 actualObjectPixels와 expectedObjectPixels가 정확히 같아야 합니다.
+- id: step3_types
+  title: 3단계. BINARY와 BINARY_INV의 보완 관계
+  structuredPrimary: true
+  subtitle: 두 결과의 합 = 전체 픽셀
+  goal: 같은 임계값으로 THRESH_BINARY와 THRESH_BINARY_INV를 적용해 두 이진화 결과가 정확한 보완(complement) 관계인지 검증합니다.
+  why: 두 형태는 같은 임계값 기준으로 정반대 분류를 만듭니다. (binary == 255).sum() + (binaryInv == 255).sum()이 정확히 전체 픽셀 수와 같아야 한다는 관계가 알고리즘 정확성의 즉시 가능한 회귀 테스트입니다.
+  explanation: |-
+    THRESH_BINARY는 thresh보다 큰 픽셀을 255로, THRESH_BINARY_INV는 작거나 같은 픽셀을 255로 만듭니다. 두 결과를 합치면 모든 픽셀이 한 번씩 255가 되어야 합니다(임계값이 정확히 같은 픽셀은 INV가 잡습니다).
+    이 관계가 깨지면 임계값/플래그 조합에 버그가 있다는 신호입니다. 알고리즘 변경 후 회귀 테스트로 즉시 쓸 수 있는 1줄 검증입니다.
+    실무에서는 "이 객체를 흰색으로 잡고 싶다 vs 이 배경을 흰색으로 잡고 싶다"에 따라 두 모드를 골라 씁니다.
+  tips:
+  - 두 결과를 합치는 또 다른 방법은 cv2.bitwise_or(binary, binaryInv)로 모든 픽셀이 255가 됨을 확인하는 것입니다.
+  - 실무에서 흔히 cv2.findContours 같은 후속 함수가 "흰색이 객체"를 가정합니다. BINARY_INV는 어두운 객체를 흰색으로 바꿔야 할 때 유용합니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+
+    invCanvas = np.full((100, 140), 70, dtype=np.uint8)
+    cv2.rectangle(invCanvas, (35, 25), (105, 75), 190, -1)
+    cv2.circle(invCanvas, (70, 50), 18, 230, -1)
+
+    _, binaryNorm = cv2.threshold(invCanvas, 120, 255, cv2.THRESH_BINARY)
+    _, binaryInv = cv2.threshold(invCanvas, 120, 255, cv2.THRESH_BINARY_INV)
+
+    normCount = int((binaryNorm == 255).sum())
+    invCount = int((binaryInv == 255).sum())
+    totalPixels = int(invCanvas.size)
+
+    {
+        'normCount': normCount,
+        'invCount': invCount,
+        'totalPixels': totalPixels,
+        'sumEqualsTotal': normCount + invCount == totalPixels,
+    }
+  exercise:
+    prompt: 같은 입력에 THRESH_TRUNC를 적용했을 때 결과 dtype은 그대로지만 결과 값들이 임계값을 넘는 부분이 임계값으로 잘리는지 확인하세요. 최댓값이 120인지 검사합니다.
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+      truncCanvas = np.full((100, 140), 70, dtype=np.uint8)
+      cv2.rectangle(truncCanvas, (35, 25), (105, 75), 190, -1)
+      cv2.circle(truncCanvas, (70, 50), 18, 230, -1)
+
+      _, truncBinary = cv2.threshold(truncCanvas, 120, 255, cv2.THRESH____)
+      truncMax = int(truncBinary.max())
+      {'truncMax': truncMax, 'isAt120': truncMax == 120}
+    hints:
+    - THRESH_TRUNC는 임계값 초과 값을 임계값으로 자르고, 임계값 이하는 그대로 둡니다.
+    - 빈칸에는 TRUNC가 들어갑니다.
+    check:
+      noError: threshold 호출이 끝나야 합니다.
+      resultCheck: truncMax가 120이고 isAt120이 True여야 합니다.
+  check:
+    noError: 두 threshold 호출이 끝나야 합니다.
+    resultCheck: sumEqualsTotal이 True이고 normCount + invCount가 totalPixels(14000)와 같아야 합니다.
+- id: step4_otsu
+  title: 4단계. OTSU 자동 임계값
+  structuredPrimary: true
+  subtitle: 히스토그램에서 자동 분리
+  goal: cv2.THRESH_OTSU 플래그로 OTSU에게 임계값을 맡기고, 자동으로 찾은 ret 값이 정답 임계값(120)과 비슷한지, 분류 결과가 정답과 거의 일치하는지 확인합니다.
+  why: 정답 임계값을 사람이 매번 손으로 정할 수는 없습니다. OTSU는 히스토그램에서 두 봉우리를 잘 가르는 값을 자동으로 찾아 줘 자동화에서 표준입니다. 합성 입력에서는 정답과 OTSU 결과를 직접 비교할 수 있습니다.
+  explanation: |-
+    cv2.threshold에 cv2.THRESH_BINARY + cv2.THRESH_OTSU를 주면 thresh 인자는 무시되고 OTSU가 히스토그램을 분석해 자동으로 임계값을 결정합니다. ret 값으로 그 결정 결과가 돌아옵니다.
+    OTSU는 클래스 간 분산(between-class variance)을 최대화하는 임계값을 찾습니다. 히스토그램이 두 봉우리(bimodal)일 때 가장 정확합니다.
+    합성 입력은 70(배경)과 190/230(객체) 두 봉우리가 명확해 OTSU가 둘 사이 어딘가 정답에 매우 가까운 값을 찾아야 합니다. 실제로는 약 100~130 범위에서 ret이 나옵니다.
+  tips:
+  - OTSU 임계값은 입력의 히스토그램에 따라 달라집니다. 같은 알고리즘이라도 사진마다 결과가 다릅니다.
+  - cv2.THRESH_TRIANGLE은 OTSU와 다른 자동 임계값 방식입니다. 단봉(unimodal) 히스토그램에 적합합니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+
+    otsuCanvas = np.full((100, 140), 70, dtype=np.uint8)
+    cv2.rectangle(otsuCanvas, (35, 25), (105, 75), 190, -1)
+    cv2.circle(otsuCanvas, (70, 50), 18, 230, -1)
+
+    manualCount = int((otsuCanvas > 120).sum())
+    otsuRet, otsuBinary = cv2.threshold(otsuCanvas, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    otsuCount = int((otsuBinary == 255).sum())
+
+    {
+        'otsuThreshold': round(float(otsuRet), 1),
+        'manualCount': manualCount,
+        'otsuCount': otsuCount,
+        'isClose': abs(otsuCount - manualCount) <= manualCount * 0.05,
+    }
+  exercise:
+    prompt: 같은 합성 입력의 객체 밝기를 100에서 50씩 차이가 작게 바꾸면(180/200) OTSU가 찾은 임계값이 50~150 범위 안에 들어가는지 확인하세요.
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+      shiftCanvas = np.full((100, 140), 70, dtype=np.uint8)
+      cv2.rectangle(shiftCanvas, (35, 25), (105, 75), 180, -1)
+      cv2.circle(shiftCanvas, (70, 50), 18, 200, -1)
+
+      shiftRet, _ = cv2.threshold(shiftCanvas, 0, 255, cv2.THRESH_BINARY + cv2.THRESH____)
+      shiftThreshold = round(float(shiftRet), 1)
+      {'shiftThreshold': shiftThreshold, 'isInRange': 50 < shiftThreshold < 180}
+    hints:
+    - OTSU 플래그 이름은 그대로 OTSU입니다.
+    - 빈칸에는 OTSU가 들어갑니다.
+    check:
+      noError: threshold OTSU 호출이 끝나야 합니다.
+      resultCheck: isInRange가 True이고 shiftThreshold가 50~180 범위 안에 있어야 합니다.
+  check:
+    noError: threshold OTSU 호출이 끝나야 합니다.
+    resultCheck: otsuThreshold가 50~200 범위 안에 있고 isClose가 True여야 합니다.
+- id: step5_adaptive
+  title: 5단계. 적응형 임계값과 조명 변화
+  structuredPrimary: true
+  subtitle: cv2.adaptiveThreshold
+  goal: 가로 방향 그래디언트 조명이 있는 입력에 전역 임계값과 adaptiveThreshold를 각각 적용해, 전역이 한쪽을 망치고 적응형이 양쪽을 모두 살리는 차이를 직접 봅니다.
+  why: 운영 사진은 거의 항상 조명이 고르지 않습니다. 그림자가 있는 문서, 야외에서 찍은 표지판 등은 전역 임계값으로는 한쪽이 잘립니다. 적응형이 강한 영역이 바로 이런 사진들입니다.
+  explanation: |-
+    adaptiveThreshold(src, maxValue, adaptiveMethod, thresholdType, blockSize, C)는 각 픽셀마다 그 주변 blockSize 영역의 평균(MEAN_C) 또는 가우시안 가중 평균(GAUSSIAN_C)에서 C를 뺀 값을 임계값으로 씁니다.
+    예제 입력은 좌→우로 밝기가 50→200까지 증가하는 그래디언트 배경에 가로로 긴 글자 같은 막대 두 개를 그립니다. 왼쪽 막대는 30, 오른쪽 막대는 130이라 전역 임계값 100을 적용하면 왼쪽은 잡히지만 오른쪽은 배경보다 어두워도 사라집니다.
+    adaptiveThreshold는 각 픽셀이 그 주변과 비교되어, 오른쪽 막대도 그 주변 배경(밝음)보다 어두우면 객체로 분류됩니다. 결과적으로 두 막대가 모두 잡힙니다.
+  tips:
+  - blockSize는 홀수여야 합니다. 11, 15, 21이 일반적입니다.
+  - C 값을 키우면 더 엄격해집니다(객체로 분류되려면 주변 평균보다 더 많이 어두워야 함).
+  snippet: |-
+    import cv2
+    import numpy as np
+
+    gradientBg = np.tile(np.linspace(50, 200, 200, dtype=np.uint8), (60, 1))
+    cv2.rectangle(gradientBg, (10, 20), (40, 40), 30, -1)
+    cv2.rectangle(gradientBg, (150, 20), (180, 40), 130, -1)
+
+    _, globalBinary = cv2.threshold(gradientBg, 100, 255, cv2.THRESH_BINARY_INV)
+    adaptiveBinary = cv2.adaptiveThreshold(
+        gradientBg, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 21, 5
+    )
+
+    leftBarGlobal = int((globalBinary[20:40, 10:40] == 255).sum())
+    rightBarGlobal = int((globalBinary[20:40, 150:180] == 255).sum())
+    leftBarAdaptive = int((adaptiveBinary[20:40, 10:40] == 255).sum())
+    rightBarAdaptive = int((adaptiveBinary[20:40, 150:180] == 255).sum())
+
+    {
+        'globalLeftBar': leftBarGlobal,
+        'globalRightBar': rightBarGlobal,
+        'adaptiveLeftBar': leftBarAdaptive,
+        'adaptiveRightBar': rightBarAdaptive,
+        'globalLosesRight': rightBarGlobal < leftBarGlobal * 0.5,
+        'adaptiveCatchesRight': rightBarAdaptive > rightBarGlobal,
+    }
+  exercise:
+    prompt: GAUSSIAN_C로 adaptiveMethod를 바꿔서 결과의 오른쪽 막대 픽셀 수가 0보다 큰지 확인하세요. blockSize와 C는 그대로 둡니다.
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+      gaussGradient = np.tile(np.linspace(50, 200, 200, dtype=np.uint8), (60, 1))
+      cv2.rectangle(gaussGradient, (10, 20), (40, 40), 30, -1)
+      cv2.rectangle(gaussGradient, (150, 20), (180, 40), 130, -1)
+
+      gaussAdaptive = cv2.adaptiveThreshold(
+          gaussGradient, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, ___, 5
+      )
+      gaussRight = int((gaussAdaptive[20:40, 150:180] == 255).sum())
+      {'gaussRight': gaussRight, 'caughtRight': gaussRight > 0}
+    hints:
+    - blockSize는 홀수여야 합니다.
+    - 빈칸에는 21이 들어갑니다.
+    check:
+      noError: adaptiveThreshold 호출이 끝나야 합니다.
+      resultCheck: gaussRight가 양의 정수이고 caughtRight가 True여야 합니다.
+  check:
+    noError: 전역 threshold와 adaptiveThreshold 호출이 끝나야 합니다.
+    resultCheck: globalLosesRight가 True이고 adaptiveCatchesRight가 True여야 합니다.
+- id: step6_block
+  title: 6단계. blockSize와 C의 효과
+  structuredPrimary: true
+  subtitle: 5 vs 21 vs 51
+  goal: 같은 그래디언트 입력에 blockSize를 5/21/51 세 값으로 바꿔 가며 객체 픽셀 수가 어떻게 변하는지 비교합니다.
+  why: blockSize는 "주변을 얼마나 멀리까지 보고 임계값을 정하는가"입니다. 너무 작으면 노이즈에 휘둘리고, 너무 크면 전역 임계값처럼 동작합니다. 직접 비교해 봐야 적정 값에 대한 감각이 생깁니다.
+  explanation: |-
+    blockSize=5는 5×5 영역 평균을 씁니다. 매우 좁은 영역이라 노이즈 잔여가 많고 결과가 거칠어집니다.
+    blockSize=21은 21×21 영역 평균을 씁니다. 일반적인 출발점이고 글자 크기 정도의 객체에 잘 맞습니다.
+    blockSize=51은 51×51 영역 평균을 씁니다. 너무 넓어서 거의 전역 임계값에 가까워집니다.
+    이 셀은 세 값을 동시에 비교해 객체 픽셀 수를 dict로 보여 줘 효과를 직접 측정합니다.
+  tips:
+  - blockSize는 처리하려는 객체 크기의 1.5~2배가 시작점입니다. 너무 크면 적응형의 장점이 사라집니다.
+  - C 값은 보통 2~10 사이에서 시작합니다. 작은 노이즈를 끄려면 C를 키웁니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+
+    blockGradient = np.tile(np.linspace(50, 200, 200, dtype=np.uint8), (60, 1))
+    cv2.rectangle(blockGradient, (10, 20), (40, 40), 30, -1)
+    cv2.rectangle(blockGradient, (150, 20), (180, 40), 130, -1)
+
+    block5 = cv2.adaptiveThreshold(blockGradient, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 5, 5)
+    block21 = cv2.adaptiveThreshold(blockGradient, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 21, 5)
+    block51 = cv2.adaptiveThreshold(blockGradient, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 51, 5)
+
+    {
+        'count5': int((block5 == 255).sum()),
+        'count21': int((block21 == 255).sum()),
+        'count51': int((block51 == 255).sum()),
+    }
+  exercise:
+    prompt: blockSize는 21로 고정하고 C 값을 0과 15로 바꿔 적용해 픽셀 수 차이를 확인하세요. C가 작으면 더 많은 픽셀이 객체로 분류됩니다.
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+      cGradient = np.tile(np.linspace(50, 200, 200, dtype=np.uint8), (60, 1))
+      cv2.rectangle(cGradient, (10, 20), (40, 40), 30, -1)
+      cv2.rectangle(cGradient, (150, 20), (180, 40), 130, -1)
+
+      cLow = cv2.adaptiveThreshold(cGradient, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 21, 0)
+      cHigh = cv2.adaptiveThreshold(cGradient, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 21, ___)
+
+      lowCount = int((cLow == 255).sum())
+      highCount = int((cHigh == 255).sum())
+      {'lowCount': lowCount, 'highCount': highCount, 'cLowKeepsMore': lowCount > highCount}
+    hints:
+    - C 인자에 15를 넣으면 엄격해져 객체 픽셀 수가 줄어듭니다.
+    - 빈칸에는 15가 들어갑니다.
+    check:
+      noError: adaptiveThreshold 두 호출이 끝나야 합니다.
+      resultCheck: cLowKeepsMore가 True이고 lowCount > highCount여야 합니다.
+  check:
+    noError: 세 adaptiveThreshold 호출이 끝나야 합니다.
+    resultCheck: count5, count21, count51 모두 양의 정수여야 합니다.
+- id: practice
+  title: 실습 - flower에서 OTSU
+  structuredPrimary: true
+  subtitle: 실제 사진 일반화
+  goal: flower 컬러 사진을 그레이스케일로 변환해 OTSU 자동 임계값을 적용하고, 객체 픽셀 비율을 dict로 정리합니다.
+  why: 합성 입력에서 검증한 알고리즘은 실제 사진에 일반화될 때 결과가 달라집니다. OTSU 임계값이 자동으로 어떤 값을 골랐는지, 객체 비율이 합리적인 범위에 있는지를 보면 알고리즘이 정상 동작하는지 확인할 수 있습니다.
+  explanation: |-
+    flower 사진은 꽃이 중앙에 있고 배경이 어두운 단순 구조입니다. OTSU는 두 봉우리(꽃 vs 배경)를 잘 가르는 값을 찾아야 합니다.
+    객체 픽셀 비율(객체 픽셀 / 전체 픽셀)을 같이 보면 결과의 합리성을 빠르게 판단할 수 있습니다. 꽃이 사진의 30~60% 정도 차지하는 게 일반적이라 그 범위에 들어와야 OTSU가 의도대로 동작한 것입니다.
+    실무에서는 이 비율을 "객체 검출의 sanity check"로 자주 씁니다. 너무 크거나(99%) 너무 작으면(1%) 임계값이 잘못 잡혔다는 신호입니다.
+  tips:
+  - OTSU가 잘 동작하지 않는 경우(낮은 대비, 균일한 배경) GaussianBlur로 노이즈를 먼저 줄이면 도움이 됩니다.
+  - 객체 픽셀 비율은 .mean() / 255로 한 줄에 계산할 수도 있습니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+    from sklearn.datasets import load_sample_image
+
+    flowerBgr = cv2.cvtColor(load_sample_image('flower.jpg'), cv2.COLOR_RGB2BGR)
+    flowerGray = cv2.cvtColor(flowerBgr, cv2.COLOR_BGR2GRAY)
+    otsuRet, flowerOtsu = cv2.threshold(flowerGray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    {
+        'otsuThreshold': round(float(otsuRet), 1),
+        'objectRatio': round(float((flowerOtsu == 255).sum()) / flowerGray.size, 3),
+        'objectPixelCount': int((flowerOtsu == 255).sum()),
+        'totalPixelCount': int(flowerGray.size),
+    }
+  exercise:
+    prompt: flower 입력에 GaussianBlur (5, 5)를 먼저 적용한 뒤 OTSU를 호출했을 때 임계값이 원래와 비슷한 범위에 들어오는지 확인하세요.
+    starterCode: |-
+      import cv2
+      import numpy as np
+      from sklearn.datasets import load_sample_image
+
+      blurFlowerBgr = cv2.cvtColor(load_sample_image('flower.jpg'), cv2.COLOR_RGB2BGR)
+      blurFlowerGray = cv2.cvtColor(blurFlowerBgr, cv2.COLOR_BGR2GRAY)
+      blurFlowerSmooth = cv2.GaussianBlur(blurFlowerGray, (___, 5), 0)
+
+      blurRet, _ = cv2.threshold(blurFlowerSmooth, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+      {'blurOtsuThreshold': round(float(blurRet), 1), 'isReasonable': 50 < blurRet < 200}
+    hints:
+    - 정사각 커널이라 두 인자 모두 5입니다.
+    - 빈칸에는 5가 들어갑니다.
+    check:
+      noError: GaussianBlur와 threshold OTSU가 끝나야 합니다.
+      resultCheck: isReasonable이 True이고 blurOtsuThreshold가 50~200 범위 안에 있어야 합니다.
+  check:
+    noError: cvtColor와 OTSU threshold가 끝나야 합니다.
+    resultCheck: otsuThreshold가 50~200 범위 안에 있고 objectRatio가 0~1 사이여야 합니다.
+- id: workflow_validation
+  title: 7단계. 임계값 가드와 마스크 비율 검증
+  structuredPrimary: true
+  subtitle: 0~255 범위 + 비정상 비율 차단
+  goal: validateThresholdValue 함수가 0~255 범위 밖의 임계값을 거부하고, 마스크 비율이 0%나 100%처럼 비정상이면 경고를 돌려주는 패턴을 만듭니다.
+  why: 잘못된 임계값(예 300)은 cv2.threshold 자체는 통과하지만 결과가 의도와 다릅니다. 입력 검증과 결과 sanity check를 같은 셀에 두면 자동화에서 sanity 잃은 결과를 즉시 감지할 수 있습니다.
+  explanation: |-
+    validateThresholdValue는 정수 0~255 범위만 허용합니다. 범위 밖이면 ValueError로 즉시 차단합니다.
+    검증 함수는 input 단계, sanity check는 output 단계입니다. 객체 비율이 5% 미만이거나 95% 초과면 임계값이 의도대로 잡지 못한 신호이므로 "warning"으로 표시합니다.
+    이 두 단계를 결합한 함수가 운영 파이프라인 한 셀에 들어가면, 잘못된 호출과 잘못된 결과 모두 자동으로 잡힙니다.
+  tips:
+  - sanity check는 ValueError 대신 dict의 warning 필드로 표시하는 게 후속 처리에 부드럽습니다. raise는 호출 흐름을 끊기 때문입니다.
+  - 비율 임계값(5%, 95%)은 도메인에 따라 다릅니다. 문서 OCR이라면 5% 미만이 정상일 수 있어 조정이 필요합니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+
+
+    def validateThresholdValue(value: int) -> bool:
+        if not (0 <= value <= 255):
+            raise ValueError(f"임계값은 0~255 범위여야 합니다: {value}")
+        return True
+
+
+    def binarizeWithSanity(image: np.ndarray, threshold: int) -> dict:
+        validateThresholdValue(threshold)
+        _, binary = cv2.threshold(image, threshold, 255, cv2.THRESH_BINARY)
+        ratio = float((binary == 255).sum()) / binary.size
+        warning = ''
+        if ratio < 0.05:
+            warning = 'too few object pixels (< 5%)'
+        elif ratio > 0.95:
+            warning = 'too many object pixels (> 95%)'
+        return {'threshold': threshold, 'objectRatio': round(ratio, 3), 'warning': warning}
+
+
+    sanityCanvas = np.full((100, 140), 70, dtype=np.uint8)
+    cv2.rectangle(sanityCanvas, (35, 25), (105, 75), 190, -1)
+
+    goodResult = binarizeWithSanity(sanityCanvas, 120)
+
+    try:
+        binarizeWithSanity(sanityCanvas, 300)
+        outOfRangeMessage = 'unexpected pass'
+    except ValueError as exc:
+        outOfRangeMessage = str(exc)
+
+    tooFewResult = binarizeWithSanity(sanityCanvas, 240)
+
+    {
+        'goodResult': goodResult,
+        'outOfRangeMessage': outOfRangeMessage,
+        'tooFewWarning': tooFewResult['warning'],
+    }
+  exercise:
+    prompt: binarizeWithSanity에 임계값 0을 넘기면 객체 비율이 매우 높아 'too many' 경고가 돌아오는지 확인하세요.
+    starterCode: |-
+      import cv2
+      import numpy as np
+
+
+      def validateThresholdValue(value: int) -> bool:
+          if not (0 <= value <= 255):
+              raise ValueError(f"임계값은 0~255 범위여야 합니다: {value}")
+          return True
+
+
+      def binarizeWithSanity(image: np.ndarray, threshold: int) -> dict:
+          validateThresholdValue(threshold)
+          _, binary = cv2.threshold(image, threshold, 255, cv2.THRESH_BINARY)
+          ratio = float((binary == 255).sum()) / binary.size
+          warning = ''
+          if ratio < 0.05:
+              warning = 'too few object pixels (< 5%)'
+          elif ratio > 0.95:
+              warning = 'too many object pixels (> 95%)'
+          return {'threshold': threshold, 'objectRatio': round(ratio, 3), 'warning': warning}
+
+
+      lowCanvas = np.full((100, 140), 70, dtype=np.uint8)
+      cv2.rectangle(lowCanvas, (35, 25), (105, 75), 190, -1)
+
+      tooManyResult = binarizeWithSanity(lowCanvas, ___)
+      {'warning': tooManyResult['warning'], 'isTooMany': 'too many' in tooManyResult['warning']}
+    hints:
+    - 임계값 0은 거의 모든 픽셀(>0)을 객체로 만듭니다.
+    - 빈칸에는 0이 들어갑니다.
+    check:
+      noError: 함수 정의와 호출이 끝나야 합니다.
+      resultCheck: warning에 'too many' 단서가 있고 isTooMany가 True여야 합니다.
+  check:
+    noError: 두 함수 정의와 세 호출이 끝나야 합니다.
+    resultCheck: goodResult의 objectRatio가 0~1 사이이고 outOfRangeMessage에 '300'이 포함되며 tooFewWarning에 'too few' 단서가 있어야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: opencv_06-binary_threshold-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: 이진화 스튜디오 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: threshold 종류·max value·block size 계약을 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_binary_threshold_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_binary_threshold_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_binary_threshold_contract(value):
+            required = ['method', 'maxValue', 'blockSize']
+            rules = [{'id': 'method', 'field': 'method', 'kind': 'enum', 'values': ['global', 'otsu', 'adaptive-mean', 'adaptive-gaussian']}, {'id': 'max-value', 'field': 'maxValue', 'kind': 'range', 'min': 1, 'max': 255}, {'id': 'block-size', 'field': 'blockSize', 'kind': 'odd'}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'binary_threshold', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.opencv.opencv_06.binary_threshold-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.opencv.opencv_06.binary_threshold-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_binary_threshold_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              method: adaptive-gaussian
+              maxValue: 255
+              blockSize: 11
+          expectedReturn:
+            accepted: true
+            topic: binary_threshold
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              maxValue: 255
+              blockSize: 11
+          expectedReturn:
+            accepted: false
+            topic: binary_threshold
+            missing:
+            - method
+            violations:
+            - method
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              method: unknown
+              maxValue: 0
+              blockSize: 10
+          expectedReturn:
+            accepted: false
+            topic: binary_threshold
+            missing: []
+            violations:
+            - block-size
+            - max-value
+            - method
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: opencv_06-binary_threshold-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - opencv_06-binary_threshold-contract-audit-mastery
+    title: 이진화 스튜디오 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_binary_threshold_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_binary_threshold_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_binary_threshold_result(expected, observed):
+            identity = ['sourceHash', 'thresholdConfig']
+            metrics = {'foregroundRatio': 0.01}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'binary_threshold', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.opencv.opencv_06.binary_threshold-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.opencv.opencv_06.binary_threshold-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_binary_threshold_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              sourceHash: bt1
+              thresholdConfig: adaptive-11
+              foregroundRatio: 0.35
+          - value:
+              sourceHash: bt1
+              thresholdConfig: adaptive-11
+              foregroundRatio: 0.355
+          expectedReturn:
+            passed: true
+            topic: binary_threshold
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              sourceHash: bt1
+              thresholdConfig: adaptive-11
+              foregroundRatio: 0.35
+          - value:
+              sourceHash: bt2
+              thresholdConfig: global
+              foregroundRatio: 0.8
+          expectedReturn:
+            passed: false
+            topic: binary_threshold
+            missing: []
+            identityMismatch:
+            - sourceHash
+            - thresholdConfig
+            metricDrift:
+            - foregroundRatio
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              sourceHash: bt1
+              thresholdConfig: adaptive-11
+              foregroundRatio: 0.35
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: binary_threshold
+            missing:
+            - foregroundRatio
+            - sourceHash
+            - thresholdConfig
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: opencv_06-binary_threshold-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - opencv_06-binary_threshold-result-reconciliation-transfer
+    title: 이진화 스튜디오 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_binary_threshold_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_binary_threshold_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_binary_threshold_evidence(stage):
+            stages = {'source': {'action': 'validate threshold source', 'evidence': 'method max block contract', 'risk': 'invalid image contract'}, 'operation': {'action': 'run bounded threshold operation', 'evidence': 'threshold selection trace', 'risk': 'unstable parameters'}, 'result': {'action': 'reconcile threshold result', 'evidence': 'binary values and foreground ratio', 'risk': 'wrong visual inference'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.opencv.opencv_06.binary_threshold-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.opencv.opencv_06.binary_threshold-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_binary_threshold_evidence
+        cases:
+        - id: recalls-source
+          arguments:
+          - value: source
+          expectedReturn:
+            action: validate threshold source
+            evidence: method max block contract
+            risk: invalid image contract
+        - id: recalls-operation
+          arguments:
+          - value: operation
+          expectedReturn:
+            action: run bounded threshold operation
+            evidence: threshold selection trace
+            risk: unstable parameters
+        - id: recalls-result
+          arguments:
+          - value: result
+          expectedReturn:
+            action: reconcile threshold result
+            evidence: binary values and foreground ratio
+            risk: wrong visual inference
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

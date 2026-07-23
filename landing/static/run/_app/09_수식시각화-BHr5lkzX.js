@@ -1,0 +1,699 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - numpy
+  - sympy
+  id: sympy_09
+  title: 수식시각화
+  order: 9
+  category: sympy
+  difficulty: ⭐⭐⭐⭐
+  badge: 심화
+  tags:
+  - sympy
+  - plot
+  - 시각화
+  - 그래프
+  - matplotlib
+  seo:
+    title: SymPy 시각화 - plot과 matplotlib 연동
+    description: SymPy로 함수 그래프를 그리고 matplotlib과 연동합니다. 2D, 3D 시각화와 미적분 결과를 시각화합니다.
+    keywords:
+    - sympy
+    - plot
+    - 시각화
+    - matplotlib
+    - 그래프
+intro:
+  emoji: 📊
+  goal: SymPy의 plot()으로 함수 그래프를 그리고 matplotlib과 연동합니다.
+  description: 수학 수식을 시각화하면 추상적인 개념이 직관적으로 다가옵니다. 2차 함수 x²은 포물선, sin(x)는 파동, e^x는 폭발적 성장 곡선입니다. SymPy의
+    plot()은 기호 함수를 바로 그래프로 변환합니다. 도함수를 함께 그리면 기울기 변화를 볼 수 있고, 적분 영역을 색칠하면 넓이의 의미를 이해합니다. 접선을 그리면 미분의 기하적
+    의미가 보입니다. 이 프로젝트를 완료하면 함수 그래프, 미적분 시각화, 3D 곡면까지 다룰 수 있게 됩니다.
+  direction: 수식시각화에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 수식과 기호 확인 후 기호 계산에 맞는 코드 입력을 고릅니다.
+  - 수식시각화 결과를 간소화식, 해, 미분/적분 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 수학 계산 검증 루틴에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(수식과 기호)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 기본 플롯 처리 실행
+      detail: 기호 계산 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 여러 함수 결과 검증
+      detail: 간소화식, 해, 미분/적분 결과 기준으로 실행 결과를 비교합니다.
+    - label: 수식시각화 재사용
+      detail: 완성 코드를 수학 계산 검증 루틴에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기호 계산 환경
+      detail: matplotlib, numpy, sympy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 수식시각화 실행
+      detail: 셀을 실행해 간소화식, 해, 미분/적분 결과와 예외 상태를 확인합니다.
+    - label: 수식시각화 완료
+      detail: 검증된 코드를 수학 계산 검증 루틴로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 시각화에 필요한 함수들을 불러옵니다. sympy.plotting의 plot()은 2D 함수 그래프, plot_parametric()은 매개변수 곡선, plot3d()는
+    3D 곡면을 그립니다. matplotlib.pyplot은 더 세밀한 커스터마이징에 사용합니다. SymPy 플롯은 기호 함수를 직접 받아들이므로 변환 없이 바로 그릴 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from sympy import symbols, sin, cos, exp, log, sqrt, pi
+    from sympy import diff, integrate, solve
+    from sympy.plotting import plot, plot_parametric, plot3d
+    import matplotlib.pyplot as plt
+    from sympy import init_printing
+    init_printing()
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from sympy import symbols, sin, cos, exp, log, sqrt, pi
+      from sympy import diff, integrate, solve
+      from sympy.plotting import plot, plot_parametric, plot3d
+      import matplotlib.pyplot as plt
+      from sympy import init_printing
+      init_printing()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 1단계. 라이브러리 불러오기의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step2_basic_plot
+  title: 2단계. 기본 플롯
+  structuredPrimary: true
+  subtitle: plot()
+  goal: 2단계. 기본 플롯에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    plot(f, (x, a, b))는 x가 a에서 b까지 변할 때 f(x)의 그래프를 그립니다. title, xlabel, ylabel로 제목과 축 라벨을 지정합니다. show=False로 설정하면 즉시 표시하지 않고 설정을 추가한 후 show()로 표시할 수 있습니다. 2차 함수 x²은 원점을 꼭지점으로 하는 아래로 볼록한 포물선입니다.
+
+    show=False로 즉시 표시를 막고, 설정 후 show()로 표시합니다. 또는 그냥 plot()만 호출하면 바로 표시됩니다.
+  snippet: x = symbols('x')
+  exercise:
+    prompt: 2단계. 기본 플롯 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: x = symbols('x')
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 2단계. 기본 플롯의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 기본 플롯 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step3_multiple
+  title: 3단계. 여러 함수
+  structuredPrimary: true
+  subtitle: 동시 그리기
+  goal: 3단계. 여러 함수에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 여러 함수를 한 그래프에 비교하면 관계가 명확해집니다. plot(f1, f2, f3, (x, a, b))로 여러 함수를 동시에 그립니다. legend=True로
+    범례를 표시하고, p[0].label로 각 함수에 이름을 붙입니다. sin(x)와 cos(x)를 비교하면 π/2의 위상차를 볼 수 있고, x, x², x³을 비교하면 거듭제곱에
+    따른 성장 속도 차이를 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    p2 = plot(sin(x), cos(x), (x, -2*pi, 2*pi), legend=True, show=False)
+    p2[0].label = 'sin(x)'
+    p2[1].label = 'cos(x)'
+    p2.show()
+    p2
+  exercise:
+    prompt: 3단계. 여러 함수 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      p2 = plot(sin(x), cos(x), (x, -2*pi, 2*pi), legend=True, show=False)
+      p2[0].label = 'sin(x)'
+      p2[1].label = 'cos(x)'
+      p2.show()
+      p2
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 3단계. 여러 함수의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 여러 함수 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step4_style
+  title: 4단계. 스타일 지정
+  structuredPrimary: true
+  subtitle: 색상과 선
+  goal: 4단계. 스타일 지정에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 그래프의 시각적 스타일을 지정하면 구분이 쉬워집니다. line_color='red'로 색상을 지정합니다. 여러 함수를 그릴 때는 p[0].line_color
+    = 'blue', p[1].line_color = 'orange'처럼 각각 다른 색을 지정합니다. 색상은 이름('red'), hex('#FF0000'), RGB 튜플로 지정할
+    수 있습니다. 발표 자료나 논문에 사용할 때는 구분이 명확한 색상을 선택합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    p4 = plot(sin(x), (x, 0, 2*pi), line_color='red', show=False)
+    p4.show()
+    p4
+  exercise:
+    prompt: 4단계. 스타일 지정 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      p4 = plot(sin(x), (x, 0, 2*pi), line_color='red', show=False)
+      p4.show()
+      p4
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 4단계. 스타일 지정의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 스타일 지정 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step5_matplotlib
+  title: 5단계. Matplotlib 연동
+  structuredPrimary: true
+  subtitle: 더 세밀한 제어
+  goal: 5단계. Matplotlib 연동에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    SymPy 플롯의 기능이 부족할 때는 matplotlib과 직접 연동합니다. lambdify로 SymPy 수식을 numpy 함수로 바꾸면 matplotlib의 Figure와 Axes를 완전히 제어할 수 있습니다. ax.grid(True)로 격자를 추가하고, ax.annotate()로 주석을 달고, ax.axhline()으로 보조선을 그립니다. matplotlib의 모든 기능을 활용하여 출판 품질의 그래프를 만들 수 있습니다.
+
+    lambdify(x, expr, 'numpy')는 기호 수식을 numpy 배열을 받는 함수로 변환합니다. SymPy 내부 백엔드에 의존하지 않아 버전 변화에도 안정적입니다.
+  tips:
+  - lambdify로 numpy 함수를 만든 뒤 plt.subplots()로 직접 그리면 축/주석/보조선을 자유롭게 추가할 수 있습니다.
+  snippet: |-
+    import numpy as np
+    from sympy import lambdify
+
+    f = lambdify(x, x**2, 'numpy')
+    xs = np.linspace(-3, 3, 200)
+
+    fig, ax = plt.subplots()
+    ax.plot(xs, f(xs))
+    ax.set_title('Parabola with Matplotlib')
+    ax.grid(True)
+    fig
+  exercise:
+    prompt: 5단계. Matplotlib 연동 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      import numpy as np
+      from sympy import lambdify
+
+      f = lambdify(x, x**2, 'numpy')
+      xs = np.linspace(-3, 3, 200)
+
+      fig, ax = plt.subplots()
+      ax.plot(xs, f(xs))
+      ax.set_title('Parabola with Matplotlib')
+      ax.grid(True)
+      fig
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 5단계. Matplotlib 연동의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 5단계. Matplotlib 연동 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step6_parametric
+  title: 6단계. 매개변수 플롯
+  structuredPrimary: true
+  subtitle: plot_parametric()
+  goal: 6단계. 매개변수 플롯에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    매개변수 곡선은 x(t), y(t)로 정의됩니다. plot_parametric(x(t), y(t), (t, a, b))로 그립니다. 원 x=cos(t), y=sin(t)는 가장 기본적인 예입니다. 리사주 곡선 x=sin(3t), y=sin(2t)은 진동수 비율에 따라 아름다운 패턴을 만듭니다. 매개변수 곡선은 물리학의 운동 궤적, 컴퓨터 그래픽스의 곡선 표현에 널리 사용됩니다.
+
+    매개변수 플롯은 시간에 따른 운동 궤적, 복잡한 곡선 등을 표현할 때 유용합니다.
+  snippet: |-
+    t = symbols('t')
+    pcircle = plot_parametric(cos(t), sin(t), (t, 0, 2*pi), title='Circle', show=False)
+    pcircle.show()
+    pcircle
+  exercise:
+    prompt: 6단계. 매개변수 플롯 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      t = symbols('t')
+      pcircle = plot_parametric(cos(t), sin(t), (t, 0, 2*pi), title='Circle', show=False)
+      pcircle.show()
+      pcircle
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 6단계. 매개변수 플롯의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 매개변수 플롯 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step7_derivative_plot
+  title: 7단계. 도함수 시각화
+  structuredPrimary: true
+  subtitle: 미분 결과
+  goal: 7단계. 도함수 시각화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    함수와 도함수를 함께 그리면 미분의 의미가 시각적으로 드러납니다. f(x) = x³-3x의 도함수 f'(x) = 3x²-3입니다. 도함수가 0인 x = ±1에서 원래 함수는 극값을 가집니다. 도함수가 양수인 구간에서 원래 함수는 증가하고, 음수인 구간에서 감소합니다. 그래프에서 이 관계를 직접 확인할 수 있습니다.
+
+    도함수가 0인 점에서 원래 함수는 극값을 가집니다. 그래프에서 교차점을 확인해보세요.
+  snippet: |-
+    func = x**3 - 3*x
+    dfunc = diff(func, x)
+    func, dfunc
+  exercise:
+    prompt: 7단계. 도함수 시각화 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      func = x**3 - 3*x
+      dfunc = diff(func, x)
+      func, dfunc
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 7단계. 도함수 시각화의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 도함수 시각화 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step8_integral_plot
+  title: 8단계. 적분 영역
+  structuredPrimary: true
+  subtitle: 넓이 시각화
+  goal: 8단계. 적분 영역에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 정적분 ∫[a,b] f(x)dx는 곡선 y=f(x)와 x축 사이의 넓이입니다. matplotlib의 fill_between()으로 이 영역을 색칠하면 적분의
+    기하적 의미가 명확해집니다. ∫[0,2] x²dx = 8/3은 포물선 아래 넓이입니다. 시각화와 수치 계산을 비교하면 적분의 개념이 직관적으로 이해됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import numpy as np
+
+    xarr = np.linspace(0, 2, 100)
+    yarr = xarr**2
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.plot(xarr, yarr, 'b-', linewidth=2, label='y = x^2')
+    ax.fill_between(xarr, yarr, alpha=0.3, color='blue')
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_title('Area under y = x^2 from 0 to 2')
+    ax.legend()
+    fig
+  exercise:
+    prompt: 8단계. 적분 영역 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      import numpy as np
+
+      xarr = np.linspace(0, 2, 100)
+      yarr = xarr**2
+
+      fig, ax = plt.subplots(figsize=(8, 5))
+      ax.plot(xarr, yarr, 'b-', linewidth=2, label='y = x^2')
+      ax.fill_between(xarr, yarr, alpha=0.3, color='blue')
+      ax.set_xlabel('x')
+      ax.set_ylabel('y')
+      ax.set_title('Area under y = x^2 from 0 to 2')
+      ax.legend()
+      fig
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 8단계. 적분 영역의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 적분 영역 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step9_tangent_plot
+  title: 9단계. 접선 시각화
+  structuredPrimary: true
+  subtitle: 미분의 기하적 의미
+  goal: 9단계. 접선 시각화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 미분값 f'(a)는 점 (a, f(a))에서 접선의 기울기입니다. 접선 방정식은 y - f(a) = f'(a)(x - a)입니다. x=1에서 y=x²의 접선은
+    기울기 2로, y = 2(x-1) + 1 = 2x - 1입니다. 곡선과 접선을 함께 그리면 접선이 곡선에 '접하는' 모습을 볼 수 있습니다. 이것이 미분의 기하적 의미입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    curve = x**2
+    dcurve = diff(curve, x)
+    pt = 1
+    yval = curve.subs(x, pt)
+    slope = dcurve.subs(x, pt)
+    tangent = slope * (x - pt) + yval
+    curve, tangent
+  exercise:
+    prompt: 9단계. 접선 시각화 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      curve = x**2
+      dcurve = diff(curve, x)
+      pt = 1
+      yval = curve.subs(x, pt)
+      slope = dcurve.subs(x, pt)
+      tangent = slope * (x - pt) + yval
+      curve, tangent
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 9단계. 접선 시각화의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 접선 시각화 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step10_3d
+  title: 10단계. 3D 플롯
+  structuredPrimary: true
+  subtitle: plot3d()
+  goal: 10단계. 3D 플롯에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 두 변수 함수 z = f(x, y)는 3D 곡면으로 표현됩니다. plot3d(f, (x, a, b), (y, c, d))로 그립니다. z = x² + y²은
+    원뿔 모양의 포물면으로 최솟값이 원점에 있습니다. z = x² - y²은 안장면(saddle surface)으로 한 방향에서 극소, 다른 방향에서 극대입니다. 다변수 함수의 극값
+    분석에서 3D 시각화는 필수적입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: y = symbols('y')
+  exercise:
+    prompt: 10단계. 3D 플롯 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: y = symbols('y')
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 10단계. 3D 플롯의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 3D 플롯 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 시각화 연습
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    이제 다양한 함수의 시각화를 종합적으로 연습합니다. 미션1에서는 지수함수 e^u와 로그함수 ln(u)를 비교합니다. 두 함수는 역함수 관계로 y=x에 대해 대칭입니다. 미션2에서는 sin(v)와 그 도함수들 cos(v), -sin(v)를 함께 그려 미분의 순환 패턴을 확인합니다. 시각화는 수학적 관계를 직관적으로 이해하는 강력한 도구입니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    from sympy import symbols, exp, log, pi
+    from sympy.plotting import plot
+
+    u = symbols('u')
+
+    pExpLog = plot(exp(u), log(u), (u, 0.1, 3), legend=True, show=False)
+    pExpLog[0].label = 'e^u'
+    pExpLog[1].label = 'ln(u)'
+    pExpLog.show()
+    pExpLog
+  exercise:
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from sympy import symbols, exp, log, pi
+      from sympy.plotting import plot
+
+      u = symbols('u')
+
+      pExpLog = plot(exp(u), log(u), (u, 0.1, 3), legend=True, show=False)
+      pExpLog[0].label = 'e^u'
+      pExpLog[1].label = 'ln(u)'
+      pExpLog.show()
+      pExpLog
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 실습의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 실습 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기'
+  structuredPrimary: true
+  subtitle: 예측 → 수식 구성 → 오류 수정 → 결과 검증 → 실무 변주
+  goal: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: SymPy는 계산기를 대신하는 도구가 아니라, 업무 규칙을 수식으로 고정하고 전제 조건을 검증하는 도구입니다. 여기서는 고정비와 단위 이익으로 손익분기점을
+    구하고, 잘못된 계수를 먼저 실패시킨 뒤, 기준 변경 실험을 수행합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import sympy as sp
+
+    x = sp.symbols('x', nonnegative=True)
+    fixedCost = 120000
+    unitPrice = 5000
+    unitCost = 2000
+
+    revenueExpr = unitPrice * x
+    costExpr = fixedCost + unitCost * x
+    profitExpr = sp.simplify(revenueExpr - costExpr)
+    breakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]
+
+    assert profitExpr == 3000 * x - 120000
+    assert breakEvenQuantity == 40
+    profitExpr, breakEvenQuantity
+  exercise:
+    prompt: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    starterCode: |-
+      import sympy as sp
+
+      x = sp.symbols('x', nonnegative=True)
+      fixedCost = 120000
+      unitPrice = 5000
+      unitCost = 2000
+
+      revenueExpr = unitPrice * x
+      costExpr = fixedCost + unitCost * x
+      profitExpr = sp.simplify(revenueExpr - costExpr)
+      breakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]
+
+      assert profitExpr == 3000 * x - 120000
+      assert breakEvenQuantity == 40
+      profitExpr, breakEvenQuantity
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.'
+    resultCheck: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sympy_09-plot-domain-samples-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 수식 시각화의 정의역 표본 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 구간·표본 수를 검증하고 endpoint를 포함한 x grid를 만든다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - count는 interval 수가 아니라 sample 수입니다.
+    - endpoint 포함 여부를 명시하세요.
+    exercise:
+      prompt: sample_domain(lower, upper, count)를 완성하세요.
+      starterCode: |-
+        def sample_domain(lower, upper, count):
+            raise NotImplementedError
+      solution: |
+        def sample_domain(lower, upper, count):
+            if lower >= upper or count < 2: raise ValueError("invalid plot domain")
+            step = (upper-lower)/(count-1)
+            return [round(lower+index*step, 10) for index in range(count)]
+      hints: *id001
+    check:
+      id: python.sympy.sympy_09.plot-domain-samples.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_09.plot-domain-samples.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: sample_domain
+        cases:
+        - id: includes-both-endpoints
+          arguments:
+          - value: 0
+          - value: 1
+          - value: 3
+          expectedReturn:
+          - 0.0
+          - 0.5
+          - 1.0
+        - id: samples-negative-domain
+          arguments:
+          - value: -1
+          - value: 1
+          - value: 5
+          expectedReturn:
+          - -1.0
+          - -0.5
+          - 0.0
+          - 0.5
+          - 1.0
+        - id: rejects-one-sample
+          arguments:
+          - value: 0
+          - value: 1
+          - value: 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sympy_09-discontinuity-segments-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sympy_09-plot-domain-samples-mastery
+    title: 새 유리함수 plot에 불연속 처리 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 금지 x 주변에서 line을 연결하지 않도록 segment를 분리한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 불연속점을 건너 line으로 연결하지 마세요.
+    - 제외 tolerance와 정의역 단위를 함께 기록하세요.
+    exercise:
+      prompt: split_domain(values, excluded, tolerance)를 완성하세요.
+      starterCode: |-
+        def split_domain(values, excluded, tolerance):
+            raise NotImplementedError
+      solution: |
+        def split_domain(values, excluded, tolerance):
+            segments = []; current = []
+            for value in values:
+                if any(abs(value-point) <= tolerance for point in excluded):
+                    if current: segments.append(current); current = []
+                else: current.append(value)
+            if current: segments.append(current)
+            return segments
+      hints: *id002
+    check:
+      id: python.sympy.sympy_09.discontinuity-segments.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_09.discontinuity-segments.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: split_domain
+        cases:
+        - id: splits-at-discontinuity
+          arguments:
+          - value:
+            - -2
+            - -1
+            - 0
+            - 1
+            - 2
+          - value:
+            - 0
+          - value: 0
+          expectedReturn:
+          - - -2
+            - -1
+          - - 1
+            - 2
+        - id: uses-tolerance
+          arguments:
+          - value:
+            - 0.0
+            - 0.99
+            - 1.01
+            - 2.0
+          - value:
+            - 1.0
+          - value: 0.02
+          expectedReturn:
+          - - 0.0
+          - - 2.0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sympy_09-symbolic-plot-evidence-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sympy_09-discontinuity-segments-transfer
+    title: 수식 plot 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 정의역·불연속·정확값을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 기호 계산의 가정과 정의역을 결과와 함께 남기세요.
+    - 소수 근삿값과 exact 결과를 구분하세요.
+    exercise:
+      prompt: choose_plot_contract(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_plot_contract(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_plot_contract(situation):
+            table = {'smooth-function': {'method': 'sampled line', 'evidence': 'domain and resolution', 'risk': 'missed oscillation'}, 'discontinuity': {'method': 'split segments', 'evidence': 'excluded points', 'risk': 'false connecting line'}, 'exact-root': {'method': 'symbolic solve plus marker', 'evidence': 'substitution residual', 'risk': 'visual estimate'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sympy.sympy_09.symbolic-plot-evidence.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_09.symbolic-plot-evidence.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_plot_contract
+        cases:
+        - id: recalls-smooth-function
+          arguments:
+          - value: smooth-function
+          expectedReturn:
+            method: sampled line
+            evidence: domain and resolution
+            risk: missed oscillation
+        - id: recalls-discontinuity
+          arguments:
+          - value: discontinuity
+          expectedReturn:
+            method: split segments
+            evidence: excluded points
+            risk: false connecting line
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

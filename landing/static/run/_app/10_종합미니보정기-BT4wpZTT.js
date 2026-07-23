@@ -1,0 +1,622 @@
+var e=`meta:
+  id: visionBasics_10
+  title: 종합 미니 보정기
+  order: 10
+  category: visionBasics
+  difficulty: ⭐⭐⭐⭐
+  badge: 심화
+  packages:
+  - matplotlib
+  - numpy
+  - scikit-learn
+  tags:
+  - numpy
+  - 보정
+  - 자동화이트밸런스
+  - 종합
+  - 비전기초
+  seo:
+    title: 이미지 비전 기초 - 종합 미니 보정기
+    description: 평균, percentile, LUT, 채널 분해를 한데 모아 자동 화이트밸런스와 노출 보정을 구현합니다.
+    keywords:
+    - 보정
+    - 화이트밸런스
+    - 자동
+    - LUT
+    - 종합프로젝트
+intro:
+  emoji: 🛠
+  goal: 1~9강에서 배운 통계·LUT·마스크·채널 사고를 모아 자동 보정기 한 모듈을 만듭니다.
+  description: |-
+    이 강의는 시리즈의 마무리로, 픽셀 산술·LUT·percentile·채널 분해를 모두 사용해 동작하는 보정 함수 세 개를 만듭니다. 자동 노출 보정, 자동 화이트밸런스, 자동 콘트라스트 늘이기. 마지막에는 셋을 한 함수로 묶어 한 줄 호출로 사진을 다듬는 미니 보정기를 완성합니다.
+  direction: 이전 강의에서 익힌 도구를 조합해 자동 노출·화이트밸런스·콘트라스트 함수를 만들고 종합 보정기로 묶습니다.
+  benefits:
+  - 통계 기반 자동 보정 함수 세 개를 직접 구현할 수 있습니다.
+  - 함수 합성으로 보정 파이프라인을 표현할 수 있습니다.
+  - Pillow/OpenCV 같은 라이브러리가 제공하는 기능의 내부 구조를 이해합니다.
+  diagram:
+    steps:
+    - label: 1단계. 자동 노출
+      detail: 평균을 목표값으로 옮깁니다.
+    - label: 2단계. 자동 화이트밸런스
+      detail: 채널 평균을 같게 맞춥니다(Gray World 가정).
+    - label: 3단계. 자동 콘트라스트
+      detail: percentile 5~95를 0~255로 늘립니다.
+    - label: 4단계. 보정 파이프라인
+      detail: 세 함수를 순서대로 적용합니다.
+    - label: 5단계. 전후 비교
+      detail: 원본과 보정 결과를 시각화로 비교합니다.
+    runtime:
+    - label: numpy 환경
+      detail: numpy + matplotlib + sklearn 만으로 동작합니다.
+    - label: 검증 흐름
+      detail: assert와 시각 비교로 학습 결과가 기대값과 같은지 확인합니다.
+sections:
+- id: auto_exposure
+  title: 1단계. 자동 노출 보정
+  structuredPrimary: true
+  subtitle: 평균을 목표값으로
+  goal: "사진의 평균 밝기를 목표값(예: 128)으로 옮기는 함수를 만듭니다."
+  why: 평균을 옮기는 단순한 보정만으로도 노출이 한참 어긋난 사진을 빠르게 살릴 수 있습니다.
+  explanation: |-
+    \`delta = target - img.mean()\` 만큼 모든 픽셀을 더하면 평균이 target이 됩니다. 음수가 나오거나 255를 넘어가는 픽셀이 생기므로 clip이 필수입니다.
+
+    delta를 그대로 곱해 사용하면 평균은 정확히 target으로 맞춰지지만, 매우 어두운 사진에서는 한 번에 너무 큰 보정이 들어가 디테일이 깨질 수 있습니다.
+  tips:
+  - 보정 함수는 한 줄로 정의해 두면 다음 단계의 파이프라인에 깔끔하게 들어갑니다.
+  snippet: |-
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from sklearn.datasets import load_sample_image
+
+    china = load_sample_image('china.jpg')
+
+    def autoExposure(img, target=128.0):
+        base = img.astype(np.float32)
+        delta = target - base.mean()
+        return (base + delta).clip(0, 255).astype(np.uint8)
+
+    exposed = autoExposure(china)
+    exposed.mean()
+  exercise:
+    prompt: 일부러 어둡게 한 dim 이미지를 만들어 autoExposure로 되돌리고, 보정 전후 평균을 비교하세요.
+    starterCode: |-
+      dim = (china.astype(np.float32) - 60).clip(0, 255).astype(np.uint8)
+      recovered = autoExposure(dim, target=___)
+      dim.mean(), recovered.mean()
+    hints:
+    - target=128 정도로 보정하면 평균이 128 근처로 옵니다.
+    - dim과 recovered의 평균이 분명히 달라야 합니다.
+  check:
+    noError: 함수 정의와 호출이 오류 없이 끝나야 합니다.
+    resultCheck: recovered.mean() 이 dim.mean() 보다 커야 합니다.
+- id: auto_wb
+  title: 2단계. 자동 화이트밸런스
+  structuredPrimary: true
+  subtitle: Gray World 가정
+  goal: 세 채널의 평균을 같게 맞춰 색 편향을 제거하는 함수를 만듭니다.
+  why: 화이트밸런스 보정은 "전체적으로 누른" 사진이나 "푸르스름한" 사진을 즉시 자연스럽게 만듭니다.
+  explanation: |-
+    Gray World 가정은 "평균적으로 사진의 색은 회색이어야 한다"는 단순한 전제입니다. 채널 평균을 모두 같은 목표값으로 맞추면 전체 색 편향이 사라집니다.
+
+    각 채널 픽셀에 \`목표 / 채널 평균\` 을 곱하면 됩니다. 컬러풀한 단일 색 사진(예: 노을)에는 잘 안 맞지만 일반 사진에는 효과적입니다.
+  tips:
+  - 화이트밸런스 보정은 노출 보정 뒤에 적용하는 것이 일반적입니다. 채널별 평균이 비슷한 스케일에서 출발해야 색 보정의 의미가 명확합니다.
+  snippet: |-
+    def autoWhiteBalance(img):
+        base = img.astype(np.float32)
+        channelMean = base.mean(axis=(0, 1))
+        target = channelMean.mean()
+        scale = target / np.maximum(channelMean, 1.0)
+        balanced = base * scale
+        return balanced.clip(0, 255).astype(np.uint8)
+
+    balanced = autoWhiteBalance(china)
+    balanced.mean(axis=(0, 1))
+  exercise:
+    prompt: china의 빨강 채널만 1.3배 곱해 누른 누런 사진을 만들고, autoWhiteBalance로 되돌려 채널 평균을 비교하세요.
+    starterCode: |-
+      tinted = china.astype(np.float32).copy()
+      tinted[:, :, 0] *= ___
+      tinted = tinted.clip(0, 255).astype(np.uint8)
+      tintedMean = tinted.mean(axis=(0, 1))
+      fixedMean = autoWhiteBalance(tinted).mean(axis=(0, 1))
+      tintedMean, fixedMean
+    hints:
+    - 1.3을 빈칸에 넣으세요.
+    - 보정 후 세 채널 평균이 비슷해져야 합니다.
+  check:
+    noError: 곱셈과 보정이 오류 없이 끝나야 합니다.
+    resultCheck: fixedMean 세 값의 편차가 tintedMean보다 작아야 합니다.
+- id: auto_contrast
+  title: 3단계. 자동 콘트라스트
+  structuredPrimary: true
+  subtitle: percentile 5~95 늘이기
+  goal: percentile 5~95 사이를 0~255로 늘리는 자동 콘트라스트 함수를 만듭니다.
+  why: 보정 없이 촬영된 사진은 보통 90~180 좁은 범위에 분포해 있습니다. 양 끝을 늘려야 또렷해집니다.
+  explanation: |-
+    9강의 stretch 패턴을 컬러 이미지로 확장합니다. 각 채널을 독립적으로 늘리면 화이트밸런스가 무너질 수 있으므로 명도 채널(예: 평균)의 percentile을 한 번 구해 모든 채널에 동일하게 적용합니다.
+
+    퍼센타일 양 끝을 0과 100이 아닌 5와 95로 두는 이유는 이상치(노이즈) 픽셀에 늘이기가 좌우되지 않게 하기 위함입니다.
+  tips:
+  - 콘트라스트 늘이기는 평균은 살짝만 바꾸지만 표준편차를 크게 늘립니다.
+  snippet: |-
+    def autoContrast(img, low=5, high=95):
+        base = img.astype(np.float32)
+        gray = base.mean(axis=2) if base.ndim == 3 else base
+        lo = np.percentile(gray, low)
+        hi = np.percentile(gray, high)
+        spread = max(hi - lo, 1.0)
+        stretched = (base - lo) / spread * 255.0
+        return stretched.clip(0, 255).astype(np.uint8)
+
+    contrasted = autoContrast(china)
+    contrasted.std()
+  exercise:
+    prompt: 대비가 부족한 flat 이미지를 만들어(95~150 범위로 압축) 자동 콘트라스트로 살려 보세요.
+    starterCode: |-
+      flat = (china.astype(np.float32) * 0.3 + 100).clip(0, 255).astype(np.uint8)
+      fixed = autoContrast(flat)
+      flat.std(), fixed.std()
+    hints:
+    - flat은 0.3배 축소된 좁은 분포의 사진입니다.
+    - 보정 후 표준편차가 크게 늘어야 합니다.
+  check:
+    noError: 함수 정의와 호출이 오류 없이 끝나야 합니다.
+    resultCheck: fixed.std() 가 flat.std() 보다 분명히 커야 합니다.
+- id: pipeline
+  title: 4단계. 보정 파이프라인
+  structuredPrimary: true
+  subtitle: 세 함수를 한 호출로 묶기
+  goal: 노출 → 화이트밸런스 → 콘트라스트의 순서로 적용하는 종합 보정기를 만듭니다.
+  why: 단일 함수로 묶어 두면 일관된 보정 경로를 적용할 수 있고 차후에 단계 추가도 쉽습니다.
+  explanation: |-
+    함수 합성은 순서가 중요합니다. 노출을 먼저 맞춰 평균을 정상화한 뒤 색 균형, 마지막에 콘트라스트로 디테일을 살리는 순서가 안전합니다. 콘트라스트를 먼저 늘이면 보정 단계에서 양 끝이 잘려 정보가 사라집니다.
+
+    파이프라인을 함수로 두면 매개변수(target, percentile)를 한 군데서 조정할 수 있습니다.
+  tips:
+  - 함수 파이프라인은 비전 라이브러리에서 transform chain이라 부르며, 거의 모든 사진 보정 라이브러리에 같은 패턴이 있습니다.
+  snippet: |-
+    def autoFix(img, target=128.0, low=5, high=95):
+        step1 = autoExposure(img, target=target)
+        step2 = autoWhiteBalance(step1)
+        step3 = autoContrast(step2, low=low, high=high)
+        return step3
+
+    fixed = autoFix(china)
+    fixed.mean(), fixed.std()
+  exercise:
+    prompt: 일부러 누렇고 어둡고 콘트라스트가 부족한 broken 사진을 만들어 autoFix로 살리고 결과 통계를 비교하세요.
+    starterCode: |-
+      broken = china.astype(np.float32).copy()
+      broken[:, :, 0] *= 1.2
+      broken = (broken * 0.35 + 90).clip(0, 255).astype(np.uint8)
+      fixedSample = autoFix(broken)
+      brokenStats = {"mean": float(broken.mean()), "std": float(broken.std())}
+      fixedStats = {"mean": float(fixedSample.mean()), "std": float(fixedSample.std())}
+      brokenStats, fixedStats
+    hints:
+    - 빨강 채널만 1.2배 → 누런 색 편향.
+    - 보정 후 mean은 128 근처로, std는 broken보다 크게 나와야 합니다.
+  check:
+    noError: 파이프라인 호출이 오류 없이 끝나야 합니다.
+    resultCheck: fixedStats의 std가 brokenStats의 std보다 커야 합니다.
+- id: visualize
+  title: 5단계. 전후 비교 시각화
+  structuredPrimary: true
+  subtitle: 보정 효과를 한 화면에
+  goal: 원본과 단계별 보정 결과를 한 화면에 모아 효과를 직관적으로 비교합니다.
+  why: 보정의 효과는 숫자보다 사진으로 보는 편이 빠릅니다.
+  explanation: |-
+    원본 + 노출 보정 + 화이트밸런스 + 자동 콘트라스트의 4단계를 2x2 그리드로 그립니다. 같은 axis 옵션과 같은 figure 크기로 둬야 비교가 정확합니다.
+
+    이 그리드를 보면 어느 단계가 어떤 변화를 만드는지 시각적으로 명확합니다. 디버깅에도 같은 패턴이 유용합니다.
+  tips:
+  - 비교 그리드는 사진 보정 도구의 표준 UX 패턴이기도 합니다. 후속 트랙에서 더 정교한 비교 도구를 만들 것입니다.
+  snippet: |-
+    panels = {
+        "original": china,
+        "exposure": autoExposure(china),
+        "white balance": autoWhiteBalance(autoExposure(china)),
+        "auto fix": autoFix(china),
+    }
+    fig, axes = plt.subplots(2, 2, figsize=(10, 8))
+    for axis, (label, panel) in zip(axes.ravel(), panels.items()):
+        axis.imshow(panel)
+        axis.set_title(label)
+        axis.axis('off')
+    fig
+  exercise:
+    prompt: 같은 4단계 그리드를 flower 사진으로도 그리세요.
+    starterCode: |-
+      flower = load_sample_image('flower.jpg')
+      flowerPanels = {
+          "original": flower,
+          "exposure": autoExposure(flower),
+          "white balance": autoWhiteBalance(autoExposure(flower)),
+          "auto fix": autoFix(flower),
+      }
+      fig2, axes2 = plt.subplots(2, 2, figsize=(10, 8))
+      for axis, (label, panel) in zip(axes2.ravel(), flowerPanels.items()):
+          axis.imshow(panel)
+          axis.set_title(label)
+          axis.axis('off')
+      fig2
+    hints:
+    - 같은 함수들을 새 이미지에 그대로 호출하면 됩니다.
+    - 사진마다 각 단계의 효과가 다르게 보입니다.
+  check:
+    noError: 그리드 출력이 오류 없이 끝나야 합니다.
+    resultCheck: 4개의 패널이 모두 다른 이미지로 출력되어야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 보정기 확장
+  goal: 학습한 보정기를 한 단계 확장해 LUT 한 단계를 추가합니다.
+  why: 자기 손으로 추가 단계를 더해 봐야 파이프라인이라는 추상이 정말 동작한다는 사실을 체감합니다.
+  explanation: |-
+    각 미션은 import문부터 시작하지만, 위 예제를 실행했다면 import는 생략해도 됩니다.
+  tips:
+  - LUT 적용은 7강에서 본 한 줄 패턴이면 충분합니다. 자동 콘트라스트와 다른 점은 곡선 모양의 변환을 자유롭게 만들 수 있다는 것입니다.
+  snippet: |-
+    def buildGammaLut(gammaValue):
+        norm = np.arange(256, dtype=np.float32) / 255.0
+        return (255.0 * np.power(norm, gammaValue)).clip(0, 255).astype(np.uint8)
+
+    softLut = buildGammaLut(0.85)
+    softFix = softLut[autoFix(china)]
+    softFix.mean()
+  exercise:
+    prompt: "미션1: autoFix 뒤에 gamma 0.7 LUT을 적용하는 autoFixSoft 함수를 만들어 china와 flower에 적용한 결과를 1x2 그리드로 그리세요. 미션2: autoFix를 호출하기 전후 통계(mean, std, 채널별 mean)를 비교하는 진단 함수 fixReport(img) 를 만들어 china에 적용한 결과를 출력하세요."
+    starterCode: |-
+      def autoFixSoft(img):
+          base = autoFix(img)
+          return buildGammaLut(___)[base]
+
+      softChina = autoFixSoft(china)
+      softFlower = autoFixSoft(load_sample_image('flower.jpg'))
+      fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+      axes[0].imshow(softChina)
+      axes[0].set_title('china soft fix')
+      axes[1].imshow(softFlower)
+      axes[1].set_title('flower soft fix')
+      for axis in axes:
+          axis.axis('off')
+      fig
+    hints:
+    - gamma 0.7 LUT은 어두운 영역을 살짝 밝게 합니다.
+    - fixReport는 dict를 반환하면 비교가 편합니다.
+  check:
+    noError: 함수 정의와 호출이 오류 없이 끝나야 합니다.
+    resultCheck: softChina.dtype 이 uint8여야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: visionBasics_10-mini_correction-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - auto_exposure
+    - practice
+    title: 미니 보정기 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: gamma·contrast·white-balance 순서와 범위를 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_mini_correction_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_mini_correction_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_mini_correction_contract(value):
+            required = ['gamma', 'contrast', 'whiteBalance', 'operationOrder']
+            rules = [{'id': 'gamma', 'field': 'gamma', 'kind': 'range', 'min': 0.1, 'max': 5}, {'id': 'contrast', 'field': 'contrast', 'kind': 'range', 'min': 0, 'max': 3}, {'id': 'white-balance', 'field': 'whiteBalance', 'kind': 'enum', 'values': ['none', 'gray-world']}, {'id': 'operation-order', 'field': 'operationOrder', 'kind': 'length', 'value': 3}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'mini_correction', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.vision-basics.visionBasics_10.mini_correction-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_10.mini_correction-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_mini_correction_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              gamma: 1.1
+              contrast: 1.2
+              whiteBalance: gray-world
+              operationOrder:
+              - whiteBalance
+              - gamma
+              - contrast
+          expectedReturn:
+            accepted: true
+            topic: mini_correction
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              contrast: 1.2
+              whiteBalance: gray-world
+              operationOrder:
+              - whiteBalance
+              - gamma
+              - contrast
+          expectedReturn:
+            accepted: false
+            topic: mini_correction
+            missing:
+            - gamma
+            violations:
+            - gamma
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              gamma: 0
+              contrast: 5
+              whiteBalance: auto-magic
+              operationOrder:
+              - gamma
+          expectedReturn:
+            accepted: false
+            topic: mini_correction
+            missing: []
+            violations:
+            - contrast
+            - gamma
+            - operation-order
+            - white-balance
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: visionBasics_10-mini_correction-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionBasics_10-mini_correction-contract-audit-mastery
+    title: 미니 보정기 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_mini_correction_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_mini_correction_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_mini_correction_result(expected, observed):
+            identity = ['sourceHash', 'recipeHash']
+            metrics = {'meanLuma': 0.5}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'mini_correction', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.vision-basics.visionBasics_10.mini_correction-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_10.mini_correction-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_mini_correction_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              sourceHash: b1
+              recipeHash: rec-a
+              meanLuma: 130.0
+          - value:
+              sourceHash: b1
+              recipeHash: rec-a
+              meanLuma: 130.4
+          expectedReturn:
+            passed: true
+            topic: mini_correction
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              sourceHash: b1
+              recipeHash: rec-a
+              meanLuma: 130.0
+          - value:
+              sourceHash: b2
+              recipeHash: rec-b
+              meanLuma: 150.0
+          expectedReturn:
+            passed: false
+            topic: mini_correction
+            missing: []
+            identityMismatch:
+            - recipeHash
+            - sourceHash
+            metricDrift:
+            - meanLuma
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              sourceHash: b1
+              recipeHash: rec-a
+              meanLuma: 130.0
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: mini_correction
+            missing:
+            - meanLuma
+            - recipeHash
+            - sourceHash
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: visionBasics_10-mini_correction-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionBasics_10-mini_correction-result-reconciliation-transfer
+    title: 미니 보정기 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_mini_correction_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_mini_correction_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_mini_correction_evidence(stage):
+            stages = {'input': {'action': 'validate correction input contract', 'evidence': 'ordered correction recipe', 'risk': 'misinterpreted pixels'}, 'process': {'action': 'apply bounded correction operation', 'evidence': 'per-step range trace', 'risk': 'silent shape or range drift'}, 'result': {'action': 'reconcile correction result', 'evidence': 'before-after luma and recipe hash', 'risk': 'plausible but wrong image'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.vision-basics.visionBasics_10.mini_correction-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_10.mini_correction-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_mini_correction_evidence
+        cases:
+        - id: recalls-input
+          arguments:
+          - value: input
+          expectedReturn:
+            action: validate correction input contract
+            evidence: ordered correction recipe
+            risk: misinterpreted pixels
+        - id: recalls-process
+          arguments:
+          - value: process
+          expectedReturn:
+            action: apply bounded correction operation
+            evidence: per-step range trace
+            risk: silent shape or range drift
+        - id: recalls-result
+          arguments:
+          - value: result
+          expectedReturn:
+            action: reconcile correction result
+            evidence: before-after luma and recipe hash
+            risk: plausible but wrong image
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,539 @@
+var e=`meta:
+  id: inputCtl_07
+  title: 클립보드 자동화
+  order: 7
+  category: inputCtl
+  difficulty: easy
+  audience: GUI 자동화에 입문하는 Python 학습자
+  packages:
+    - pyperclip
+  tags:
+    - pyperclip
+    - clipboard
+    - automation
+intro:
+  direction: pyperclip으로 시스템 클립보드에 텍스트를 직접 복사하고 다시 받아 클립보드 자동화의 실제 왕복을 학습한다.
+  benefits:
+    - pyperclip.copy로 시스템 클립보드에 텍스트를 올린다.
+    - pyperclip.paste로 클립보드 내용을 읽는다.
+    - 한글 문자열을 그대로 왕복해도 깨지지 않는지 검증한다.
+    - 종합 클립보드 함수가 백업/복원 안전 패턴을 만든다.
+  diagram:
+    steps:
+      - label: copy 호출
+        detail: pyperclip.copy(text)로 시스템 클립보드에 텍스트를 올린다.
+      - label: paste 호출
+        detail: pyperclip.paste()로 클립보드 내용을 문자열로 받는다.
+      - label: 한글 왕복
+        detail: 한국어 문자열도 같은 흐름으로 안전하게 왕복된다.
+      - label: 백업/복원 함수
+        detail: 자동화가 클립보드를 임시로 바꿔 쓰고 작업 후 원래 내용을 복원한다.
+    runtime:
+      - label: pyperclip 패키지 필요
+        detail: meta.packages의 pyperclip이 로컬 가상환경에 준비돼야 한다.
+      - label: 시스템 클립보드 사용
+        detail: 실 호출이 시스템 클립보드를 잠시 덮으므로 다른 작업과 겹치지 않게 한다.
+sections:
+  - id: copy-text
+    title: 클립보드에 복사
+    structuredPrimary: true
+    subtitle: pyperclip.copy()
+    goal: pyperclip.copy(text)로 시스템 클립보드에 문자열을 올리고 paste로 그대로 받아 본다.
+    why: 자동화의 모든 클립보드 사용은 copy/paste 왕복이 정상 동작하는지 확인하는 데서 시작한다.
+    explanation: pyperclip.copy(text)는 인자 문자열을 시스템 클립보드에 올린다. pyperclip.paste()는 현재 클립보드 내용을 문자열로 돌려준다. 두 함수의 짝이 한 번에 동작하면 클립보드 자동화가 가능한 환경이다.
+    tips:
+      - copy 호출 직후 paste를 부르면 같은 문자열이 돌아온다.
+      - 시스템 클립보드는 다른 앱과 공유되므로 자동화는 작업 후 원래 내용으로 복원하는 패턴이 안전하다.
+    snippet: |-
+      import pyperclip
+
+      pyperclip.copy("codaro automation")
+      restored = pyperclip.paste()
+
+      assert restored == "codaro automation"
+      restored
+    exercise:
+      prompt: pyperclip.copy로 'hello'를 클립보드에 올린 뒤 paste 결과가 같은 문자열인지 검증하세요.
+      starterCode: |-
+        import pyperclip
+
+        pyperclip.___("hello")
+        restored = pyperclip.paste()
+
+        assert restored == "hello"
+        restored
+      solution: |-
+        import pyperclip
+
+        pyperclip.copy("hello")
+        restored = pyperclip.paste()
+
+        assert restored == "hello"
+        restored
+      hints:
+        - 함수 이름은 copy다.
+        - paste는 인자 없이 호출한다.
+      check:
+        noError: copy와 paste 호출이 끝나야 한다.
+        resultCheck: restored 문자열이 'hello'와 같아야 한다.
+    check:
+      noError: copy와 paste 호출이 끝나야 한다.
+      resultCheck: restored가 'codaro automation'과 같아야 한다.
+  - id: korean-roundtrip
+    title: 한글 왕복
+    structuredPrimary: true
+    subtitle: 다국어 문자 안전
+    goal: 한국어 문자열을 copy/paste로 왕복해 인코딩 깨짐 없이 그대로 돌아오는지 확인한다.
+    why: 운영 환경의 클립보드는 한국어, 이모지, 다국어를 자주 다루므로 비ASCII 문자가 안전한지 사전 검증이 필요하다.
+    explanation: pyperclip은 내부적으로 OS의 유니코드 클립보드 API를 사용해 한글, 일본어, 이모지 등을 안전하게 왕복한다. paste 결과는 str 타입이라 추가 디코딩이 필요 없다. 같은 흐름이 자동화 운영 환경에서도 그대로 동작한다.
+    tips:
+      - 한국어 클립보드는 IME 입력 자동화의 출력 검증에 자주 쓰인다.
+      - paste 결과는 항상 str이라 다음 함수에 그대로 넘길 수 있다.
+    snippet: |-
+      import pyperclip
+
+      pyperclip.copy("주문 번호 1234")
+      restored = pyperclip.paste()
+
+      assert restored == "주문 번호 1234"
+      restored
+    exercise:
+      prompt: '"검토 사이클" 한국어 문자열을 클립보드에 복사하고 paste 결과가 같은 문자열인지 검증하세요.'
+      starterCode: |-
+        import pyperclip
+
+        pyperclip.copy("___")
+        restored = pyperclip.paste()
+
+        assert restored == "검토 사이클"
+        restored
+      solution: |-
+        import pyperclip
+
+        pyperclip.copy("검토 사이클")
+        restored = pyperclip.paste()
+
+        assert restored == "검토 사이클"
+        restored
+      hints:
+        - 복사할 문자열은 '검토 사이클'이다.
+        - paste 결과는 그대로 str 타입이다.
+      check:
+        noError: 한국어 copy와 paste 호출이 끝나야 한다.
+        resultCheck: restored가 '검토 사이클'과 같아야 한다.
+    check:
+      noError: 한국어 copy/paste 호출이 끝나야 한다.
+      resultCheck: restored 문자열이 본문 한국어 문자열과 같아야 한다.
+  - id: backup-restore
+    title: 백업/복원 패턴
+    structuredPrimary: true
+    subtitle: 사용자 클립보드 보호
+    goal: 자동화가 클립보드를 임시로 덮어 쓴 뒤 원래 내용을 복원하는 안전 패턴을 만든다.
+    why: 사용자 클립보드는 다른 앱과 공유되므로 자동화가 작업 후 원래 내용을 복원하지 않으면 사용자 데이터가 사라진다.
+    explanation: borrowClipboard 함수는 새 텍스트를 잠시 올리고 작업 후 보관한 이전 값을 다시 copy해 복원한다. 컨텍스트 매니저 형태로 만들면 자동화 사고가 발생해도 finally에서 복원된다. 같은 패턴이 운영 환경의 표준이다.
+    tips:
+      - 백업/복원은 자동화가 사용자 환경에 미치는 영향을 최소화한다.
+      - 사고 대비 finally 블록으로 복원을 보장하면 사용자 신뢰가 높아진다.
+    snippet: |-
+      import pyperclip
+
+      pyperclip.copy("user-original")
+      backup = pyperclip.paste()
+      try:
+          pyperclip.copy("automation-temp")
+          temp = pyperclip.paste()
+      finally:
+          pyperclip.copy(backup)
+      restored = pyperclip.paste()
+
+      assert temp == "automation-temp"
+      assert restored == "user-original"
+      (temp, restored)
+    exercise:
+      prompt: 같은 백업/복원 흐름으로 사용자 원본을 'keep me'로 둔 뒤 'temp'를 잠시 올렸다가 복원해 최종 paste가 'keep me'인지 검증하세요.
+      starterCode: |-
+        import pyperclip
+
+        pyperclip.copy("keep me")
+        backup = pyperclip.paste()
+        try:
+            pyperclip.copy("temp")
+            temp = pyperclip.paste()
+        finally:
+            pyperclip.___(backup)
+        restored = pyperclip.paste()
+
+        assert temp == "temp"
+        assert restored == "keep me"
+        (temp, restored)
+      solution: |-
+        import pyperclip
+
+        pyperclip.copy("keep me")
+        backup = pyperclip.paste()
+        try:
+            pyperclip.copy("temp")
+            temp = pyperclip.paste()
+        finally:
+            pyperclip.copy(backup)
+        restored = pyperclip.paste()
+
+        assert temp == "temp"
+        assert restored == "keep me"
+        (temp, restored)
+      hints:
+        - 복원에 사용하는 함수 이름은 copy다.
+        - finally 블록은 사고 발생 시에도 복원을 보장한다.
+      check:
+        noError: copy/paste 흐름이 finally 블록까지 끝나야 한다.
+        resultCheck: restored 문자열이 'keep me'와 같아야 한다.
+    check:
+      noError: 백업/복원 흐름이 끝나야 한다.
+      resultCheck: 임시 텍스트와 복원 텍스트가 본문 기대값과 같아야 한다.
+  - id: clip-cycle
+    title: 종합 클립보드 사이클
+    structuredPrimary: true
+    subtitle: 함수 한 개로 표준화
+    goal: 백업, 임시 사용, 복원을 한 함수로 묶어 종합 결과 dict를 돌려준다.
+    why: 종합 함수는 자동화 코드 전반에서 안전한 클립보드 사용 패턴을 한 줄 호출로 제공해 운영 신뢰도를 높인다.
+    explanation: useTempClipboard 함수는 임시 텍스트를 받아 백업, 복사, paste, 복원을 수행하고 borrowed와 restored 두 문자열을 dict로 돌려준다. borrowed는 자동화가 실제로 사용한 텍스트, restored는 복원된 사용자 원본이다. 같은 dict는 자동화 보고서의 한 행으로 들어간다.
+    tips:
+      - 종합 함수는 호출자에게 백업/복원을 신경 쓰지 않게 만든다.
+      - 결과 dict는 자동화 사이클이 사용자 환경에 미친 영향을 한 줄로 보여 준다.
+    snippet: |-
+      import pyperclip
+
+
+      def useTempClipboard(tempText: str) -> dict:
+          backup = pyperclip.paste()
+          try:
+              pyperclip.copy(tempText)
+              borrowed = pyperclip.paste()
+          finally:
+              pyperclip.copy(backup)
+          return {"borrowed": borrowed, "restored": pyperclip.paste()}
+
+
+      pyperclip.copy("origin")
+      result = useTempClipboard("loan")
+
+      assert result["borrowed"] == "loan"
+      assert result["restored"] == "origin"
+      result
+    exercise:
+      prompt: useTempClipboard에 'sample'을 넘기면 borrowed가 'sample'이고 restored가 원본 'baseline'으로 돌아오는지 종합 검증하세요.
+      starterCode: |-
+        import pyperclip
+
+
+        def useTempClipboard(tempText: str) -> dict:
+            backup = pyperclip.paste()
+            try:
+                pyperclip.copy(tempText)
+                borrowed = pyperclip.paste()
+            finally:
+                pyperclip.copy(backup)
+            return {"borrowed": borrowed, "restored": pyperclip.___()}
+
+
+        pyperclip.copy("baseline")
+        result = useTempClipboard("sample")
+
+        assert result["borrowed"] == "sample"
+        assert result["restored"] == "baseline"
+        result
+      solution: |-
+        import pyperclip
+
+
+        def useTempClipboard(tempText: str) -> dict:
+            backup = pyperclip.paste()
+            try:
+                pyperclip.copy(tempText)
+                borrowed = pyperclip.paste()
+            finally:
+                pyperclip.copy(backup)
+            return {"borrowed": borrowed, "restored": pyperclip.paste()}
+
+
+        pyperclip.copy("baseline")
+        result = useTempClipboard("sample")
+
+        assert result["borrowed"] == "sample"
+        assert result["restored"] == "baseline"
+        result
+      hints:
+        - 읽기 함수 이름은 paste다.
+        - 복원 후 paste 결과는 원본 'baseline'이다.
+      check:
+        noError: useTempClipboard 호출이 종합 결과를 돌려줘야 한다.
+        resultCheck: borrowed가 'sample', restored가 'baseline'이어야 한다.
+    check:
+      noError: useTempClipboard 호출이 끝나야 한다.
+      resultCheck: borrowed가 'loan', restored가 'origin'이어야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: inputCtl_07-clipboard-transaction-plan-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - copy-text
+    - clip-cycle
+    title: clipboard 사용을 capture·replace·verify·restore transaction으로 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 민감도와 원본 복원 조건을 포함한 단계별 계획을 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - clipboard write만 하지 말고 원본 capture와 restore 검증을 포함하세요.
+    - secret을 썼다면 evidence를 redact하고 restore 전 명시적으로 clear하세요.
+    exercise:
+      prompt: plan_clipboard_transaction(original_type, new_type, contains_secret)를 완성하세요.
+      starterCode: |-
+        def plan_clipboard_transaction(original_type, new_type, contains_secret):
+            raise NotImplementedError
+      solution: |
+        def plan_clipboard_transaction(original_type, new_type, contains_secret):
+            allowed = {"text", "empty"}
+            if original_type not in allowed or new_type not in allowed:
+                raise ValueError("unsupported clipboard type")
+            steps = ["capture-original", "write-new", "verify-write", "perform-paste", "restore-original", "verify-restore"]
+            return {"steps": steps, "redactEvidence": contains_secret, "clearBeforeRestore": contains_secret, "restorable": True}
+      hints: *id001
+    check:
+      id: python.inputctl.inputCtl_07.clipboard-transaction-plan.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_07.clipboard-transaction-plan.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_clipboard_transaction
+        cases:
+        - id: plans-safe-text-transaction
+          arguments:
+          - value: text
+          - value: text
+          - value: false
+          expectedReturn:
+            steps:
+            - capture-original
+            - write-new
+            - verify-write
+            - perform-paste
+            - restore-original
+            - verify-restore
+            redactEvidence: false
+            clearBeforeRestore: false
+            restorable: true
+        - id: plans-secret-clear-and-redaction
+          arguments:
+          - value: empty
+          - value: text
+          - value: true
+          expectedReturn:
+            steps:
+            - capture-original
+            - write-new
+            - verify-write
+            - perform-paste
+            - restore-original
+            - verify-restore
+            redactEvidence: true
+            clearBeforeRestore: true
+            restorable: true
+        - id: rejects-binary-clipboard
+          arguments:
+          - value: image
+          - value: text
+          - value: false
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: inputCtl_07-clipboard-result-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inputCtl_07-clipboard-transaction-plan-mastery
+    title: 새 clipboard transaction에 복원·secret 잔존 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 원본 hash 복원과 현재 secret fingerprint 잔존 여부를 판정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - clipboard 원문 대신 hash·fingerprint로 restore와 잔존을 확인하세요.
+    - paste action과 대상 앱에서 관찰된 outcome을 분리해 기록하세요.
+    exercise:
+      prompt: audit_clipboard_result(result)를 완성하세요.
+      starterCode: |-
+        def audit_clipboard_result(result):
+            raise NotImplementedError
+      solution: |
+        def audit_clipboard_result(result):
+            failures = []
+            if result.get("originalHash") != result.get("restoredHash"):
+                failures.append("restore")
+            if result.get("secretFingerprint") and result.get("currentFingerprint") == result.get("secretFingerprint"):
+                failures.append("secret-residual")
+            if not result.get("pasteObserved", False):
+                failures.append("paste-outcome")
+            return {"passed": not failures, "failures": failures, "restored": result.get("originalHash") == result.get("restoredHash")}
+      hints: *id002
+    check:
+      id: python.inputctl.inputCtl_07.clipboard-result-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_07.clipboard-result-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_clipboard_result
+        cases:
+        - id: accepts-restored-observed-paste
+          arguments:
+          - value:
+              originalHash: a
+              restoredHash: a
+              pasteObserved: true
+          expectedReturn:
+            passed: true
+            failures: []
+            restored: true
+        - id: reports-restore-and-paste-failure
+          arguments:
+          - value:
+              originalHash: a
+              restoredHash: b
+              pasteObserved: false
+          expectedReturn:
+            passed: false
+            failures:
+            - restore
+            - paste-outcome
+            restored: false
+        - id: reports-secret-residual
+          arguments:
+          - value:
+              originalHash: a
+              restoredHash: a
+              secretFingerprint: secret
+              currentFingerprint: secret
+              pasteObserved: true
+          expectedReturn:
+            passed: false
+            failures:
+            - secret-residual
+            restored: true
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: inputCtl_07-clipboard-safety-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inputCtl_07-clipboard-result-audit-transfer
+    title: clipboard 자동화 안전 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: capture·secret·restore 증거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 입력 자동화 action 전에 대상·경계·중단 방법을 검증하세요.
+    - 화면 변화와 E-Stop evidence를 남기고 성공을 클릭 발생으로 판단하지 마세요.
+    exercise:
+      prompt: choose_clipboard_policy(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_clipboard_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_clipboard_policy(situation):
+            table = {'capture': {'action': 'hash and store supported original', 'evidence': 'type and hash', 'risk': 'unsupported binary data'}, 'secret': {'action': 'redact and clear after paste', 'evidence': 'secret fingerprint absence', 'risk': 'clipboard leakage'}, 'restore': {'action': 'restore then verify hash', 'evidence': 'original and restored hashes', 'risk': 'user data loss'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.inputctl.inputCtl_07.clipboard-safety-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_07.clipboard-safety-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_clipboard_policy
+        cases:
+        - id: recalls-capture
+          arguments:
+          - value: capture
+          expectedReturn:
+            action: hash and store supported original
+            evidence: type and hash
+            risk: unsupported binary data
+        - id: recalls-secret
+          arguments:
+          - value: secret
+          expectedReturn:
+            action: redact and clear after paste
+            evidence: secret fingerprint absence
+            risk: clipboard leakage
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

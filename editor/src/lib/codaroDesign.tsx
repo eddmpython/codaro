@@ -1,11 +1,12 @@
 import { Theme } from "@astryxdesign/core/theme";
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 
 import { codaroTheme } from "@/styles/generated/codaro.js";
 import {
   normalizeAccentId,
   resolveDensity,
+  themeCanvasColors,
   type AccentId,
   type CodaroThemeMode,
   type DesignRuntimeState,
@@ -26,8 +27,29 @@ type CodaroDesignContextValue = DesignRuntimeState & {
 const CodaroDesignContext = createContext<CodaroDesignContextValue | null>(null);
 
 function readThemeMode(): CodaroThemeMode {
-  const stored = window.localStorage.getItem(themeStorageKey);
-  return themeModes.includes(stored as CodaroThemeMode) ? (stored as CodaroThemeMode) : "system";
+  try {
+    const stored = window.localStorage.getItem(themeStorageKey);
+    return themeModes.includes(stored as CodaroThemeMode) ? (stored as CodaroThemeMode) : "system";
+  } catch {
+    return "system";
+  }
+}
+
+function readAccentId(): AccentId {
+  try {
+    return normalizeAccentId(window.localStorage.getItem(accentStorageKey));
+  } catch {
+    return "plum";
+  }
+}
+
+function storeDesignPreference(key: string, value: string | null): void {
+  try {
+    if (value === null) window.localStorage.removeItem(key);
+    else window.localStorage.setItem(key, value);
+  } catch {
+    // The preference remains active for this session when storage is unavailable.
+  }
 }
 
 function readMediaQuery(query: string): boolean {
@@ -49,9 +71,7 @@ function useMediaQuery(query: string): boolean {
 
 export function CodaroThemeProvider({ children }: { children: ReactNode }) {
   const [themeMode, setThemeModeState] = useState<CodaroThemeMode>(readThemeMode);
-  const [accentId, setAccentId] = useState<AccentId>(() =>
-    normalizeAccentId(window.localStorage.getItem(accentStorageKey)),
-  );
+  const [accentId, setAccentId] = useState<AccentId>(readAccentId);
   const [designSurface, setDesignSurface] = useState<DesignSurface>("chat");
   const prefersDark = useMediaQuery("(prefers-color-scheme: dark)");
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
@@ -60,8 +80,7 @@ export function CodaroThemeProvider({ children }: { children: ReactNode }) {
 
   const setThemeMode = useCallback((mode: CodaroThemeMode) => {
     setThemeModeState(mode);
-    if (mode === "system") window.localStorage.removeItem(themeStorageKey);
-    else window.localStorage.setItem(themeStorageKey, mode);
+    storeDesignPreference(themeStorageKey, mode === "system" ? null : mode);
   }, []);
 
   const cycleThemeMode = useCallback(() => {
@@ -72,15 +91,20 @@ export function CodaroThemeProvider({ children }: { children: ReactNode }) {
   const selectAccentId = useCallback((nextAccent: AccentId) => {
     const normalized = normalizeAccentId(nextAccent);
     setAccentId(normalized);
-    window.localStorage.setItem(accentStorageKey, normalized);
+    storeDesignPreference(accentStorageKey, normalized);
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const root = document.documentElement;
+    const canvasColor = themeCanvasColors[resolvedTheme];
     root.dataset.accent = accentId;
     root.dataset.density = densityMode;
+    root.dataset.theme = resolvedTheme;
     root.dataset.resolvedTheme = resolvedTheme;
     root.classList.toggle("dark", resolvedTheme === "dark");
+    root.style.colorScheme = resolvedTheme;
+    root.style.backgroundColor = canvasColor;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", canvasColor);
   }, [accentId, densityMode, resolvedTheme]);
 
   const value = useMemo<CodaroDesignContextValue>(
@@ -103,7 +127,6 @@ export function CodaroThemeProvider({ children }: { children: ReactNode }) {
       <Theme mode={themeMode} theme={codaroTheme}>
         <div
           data-accent={accentId}
-          data-astryx-theme="codaro"
           data-density={densityMode}
           style={{ display: "contents" }}
         >

@@ -1,0 +1,912 @@
+var e=`meta:
+  packages:
+  - duckdb
+  - pandas
+  id: duckdb_05
+  title: 팁서브쿼리분석
+  order: 5
+  category: duckdb
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - tips
+  - 서브쿼리
+  - 스칼라
+  - WHERE IN
+  - FROM
+  - 평균비교
+  seo:
+    title: DuckDB 서브쿼리 기초 - 팁 서브쿼리 분석
+    description: 레스토랑 팁 데이터로 서브쿼리 패턴을 배웁니다. 스칼라 서브쿼리, WHERE 서브쿼리, FROM 서브쿼리를 실습합니다.
+    keywords:
+    - DuckDB
+    - 서브쿼리
+    - 스칼라 서브쿼리
+    - WHERE IN
+    - SQL 중첩 쿼리
+intro:
+  emoji: 🔍
+  goal: 팁 데이터에서 서브쿼리로 전체 평균과 비교하고 고급 필터링을 수행합니다.
+  description: 서브쿼리는 쿼리 안에 또 다른 쿼리를 넣는 기법입니다. 동적인 조건 필터링, 집계 결과 활용, 복잡한 비교 분석에 필수적입니다.
+  direction: 팁서브쿼리분석에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 테이블과 SQL 쿼리 확인 후 SELECT/WHERE/GROUP BY/CTE에 맞는 코드 입력을 고릅니다.
+  - 팁서브쿼리분석 결과를 쿼리 결과 행, 컬럼, 집계값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 로컬 분석 SQL 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 준비 입력 확인
+      detail: 입력 기준(테이블과 SQL 쿼리)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 서브쿼리란? 처리 실행
+      detail: SELECT/WHERE/GROUP BY/CTE 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 스칼라 서브쿼리 결과 검증
+      detail: 쿼리 결과 행, 컬럼, 집계값 기준으로 실행 결과를 비교합니다.
+    - label: 팁서브쿼리분석 재사용
+      detail: 완성 코드를 로컬 분석 SQL 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: SQL 분석 환경
+      detail: duckdb, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 팁서브쿼리분석 실행
+      detail: 셀을 실행해 쿼리 결과 행, 컬럼, 집계값와 예외 상태를 확인합니다.
+    - label: 팁서브쿼리분석 완료
+      detail: 검증된 코드를 로컬 분석 SQL 리포트로 남깁니다.
+sections:
+- id: step1_load
+  title: 1단계. 데이터 준비
+  structuredPrimary: true
+  subtitle: tips 데이터 로드
+  goal: 1단계. 데이터 준비에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: 레스토랑 팁 데이터를 불러옵니다. 서브쿼리를 활용해 평균과 비교하고 고급 필터링을 수행합니다. 서브쿼리는 쿼리 안에 쿼리를 중첩하는 강력한 기법으로, 동적
+    조건 필터링과 복잡한 집계 분석을 가능하게 합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import pandas as pd
+    from codaro.curriculum.localData import loadLocalDataset
+    import duckdb
+
+    df = loadLocalDataset("tips")
+    tips = duckdb.from_df(df)
+  exercise:
+    prompt: 1단계. 데이터 준비 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+      import duckdb
+
+      df = loadLocalDataset("tips")
+      tips = duckdb.from_df(df)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 1단계. 데이터 준비의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 1단계. 데이터 준비 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step2_subquery_intro
+  title: 2단계. 서브쿼리란?
+  structuredPrimary: true
+  subtitle: 쿼리 안의 쿼리
+  goal: 2단계. 서브쿼리란?에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: 서브쿼리는 SELECT 문 안에 또 다른 SELECT 문을 넣는 것입니다. 크게 3가지 패턴이 있습니다. 1) 스칼라 서브쿼리 (SELECT 절에 사용),
+    2) WHERE 서브쿼리 (조건 필터링에 사용), 3) FROM 서브쿼리 (집계 결과를 테이블처럼 사용).
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT AVG(tip) AS avgTip
+        FROM tips
+    """).show()
+  exercise:
+    prompt: 2단계. 서브쿼리란? 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT AVG(tip) AS avgTip
+          FROM tips
+      """).show()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 2단계. 서브쿼리란?의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 2단계. 서브쿼리란? 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step3_scalar_subquery
+  title: 3단계. 스칼라 서브쿼리
+  structuredPrimary: true
+  subtitle: SELECT 절 안에 서브쿼리
+  goal: 3단계. 스칼라 서브쿼리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: |-
+    스칼라 서브쿼리는 SELECT 절에 서브쿼리를 넣어 단일 값(1행 1열)을 가져옵니다. 각 행마다 전체 평균과 비교할 때 매우 유용합니다. 예를 들어 "이 고객의 팁이 전체 평균보다 높은가?"라는 질문에 답할 수 있습니다. 서브쿼리는 메인 쿼리가 실행될 때마다 평가되어 동적인 비교가 가능합니다.
+
+    스칼라 서브쿼리는 반드시 단일 값(1행 1열)을 반환해야 합니다. (SELECT AVG(...) FROM ...)처럼 집계 함수를 사용하면 안전합니다.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            total_bill,
+            tip,
+            (SELECT AVG(tip) FROM tips) AS avgTip,
+            tip - (SELECT AVG(tip) FROM tips) AS diffFromAvg
+        FROM tips
+        ORDER BY tip DESC
+        LIMIT 10
+    """).show()
+  exercise:
+    prompt: 3단계. 스칼라 서브쿼리 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              total_bill,
+              tip,
+              (SELECT AVG(tip) FROM tips) AS avgTip,
+              tip - (SELECT AVG(tip) FROM tips) AS diffFromAvg
+          FROM tips
+          ORDER BY tip DESC
+          LIMIT 10
+      """).show()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 3단계. 스칼라 서브쿼리의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 3단계. 스칼라 서브쿼리 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step4_scalar_tip_rate
+  title: 4단계. 팁 비율 비교
+  structuredPrimary: true
+  subtitle: 스칼라 서브쿼리 활용
+  goal: 4단계. 팁 비율 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: 각 고객의 팁 비율을 전체 평균 팁 비율과 비교합니다. 평균보다 후하게 팁을 준 고객을 찾을 수 있습니다. 스칼라 서브쿼리는 매 행마다 평균값을 참조하여 개별
+    데이터와 전체 통계를 동시에 볼 수 있게 해줍니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            day,
+            total_bill,
+            tip,
+            ROUND(tip / total_bill * 100, 1) AS tipPct,
+            ROUND((SELECT AVG(tip / total_bill) * 100 FROM tips), 1) AS avgTipPct
+        FROM tips
+        ORDER BY tipPct DESC
+        LIMIT 10
+    """).show()
+  exercise:
+    prompt: 4단계. 팁 비율 비교 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              day,
+              total_bill,
+              tip,
+              ROUND(tip / total_bill * 100, 1) AS tipPct,
+              ROUND((SELECT AVG(tip / total_bill) * 100 FROM tips), 1) AS avgTipPct
+          FROM tips
+          ORDER BY tipPct DESC
+          LIMIT 10
+      """).show()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 4단계. 팁 비율 비교의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 4단계. 팁 비율 비교 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step5_where_subquery
+  title: 5단계. WHERE 서브쿼리
+  structuredPrimary: true
+  subtitle: 동적 조건 필터링
+  goal: 5단계. WHERE 서브쿼리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: |-
+    WHERE 절에 서브쿼리를 사용하면 하드코딩 없이 동적으로 조건을 설정할 수 있습니다. 평균 이상인 데이터만 필터링해봅니다.
+
+    WHERE 서브쿼리는 데이터 기반 필터링을 가능하게 합니다. WHERE tip > 3 대신 WHERE tip > (SELECT AVG(...))로 평균이 바뀌어도 자동 적용됩니다.
+  snippet: |-
+    duckdb.sql("""
+        SELECT *
+        FROM tips
+        WHERE tip > (SELECT AVG(tip) FROM tips)
+        ORDER BY tip DESC
+        LIMIT 10
+    """).show()
+  exercise:
+    prompt: 5단계. WHERE 서브쿼리 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT *
+          FROM tips
+          WHERE tip > (SELECT AVG(tip) FROM tips)
+          ORDER BY tip DESC
+          LIMIT 10
+      """).show()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 5단계. WHERE 서브쿼리의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 5단계. WHERE 서브쿼리 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step6_where_in
+  title: 6단계. WHERE IN 서브쿼리
+  structuredPrimary: true
+  subtitle: 목록 필터링
+  goal: 6단계. WHERE IN 서브쿼리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: |-
+    WHERE IN 서브쿼리로 특정 조건을 만족하는 그룹의 데이터만 선택할 수 있습니다. 평균 팁이 3달러 이상인 요일의 데이터만 조회합니다.
+
+    WHERE col IN (서브쿼리)는 서브쿼리 결과 목록에 포함된 값만 선택합니다. 서브쿼리는 단일 컬럼을 반환해야 합니다.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            day,
+            COUNT(*) AS cnt,
+            ROUND(AVG(tip), 2) AS avgTip
+        FROM tips
+        WHERE day IN (
+            SELECT day
+            FROM tips
+            GROUP BY day
+            HAVING AVG(tip) > 3
+        )
+        GROUP BY day
+        ORDER BY avgTip DESC
+    """).show()
+  exercise:
+    prompt: 6단계. WHERE IN 서브쿼리 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              day,
+              COUNT(*) AS cnt,
+              ROUND(AVG(tip), 2) AS avgTip
+          FROM tips
+          WHERE day IN (
+              SELECT day
+              FROM tips
+              GROUP BY day
+              HAVING AVG(tip) > 3
+          )
+          GROUP BY day
+          ORDER BY avgTip DESC
+      """).show()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 6단계. WHERE IN 서브쿼리의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 6단계. WHERE IN 서브쿼리 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step7_from_subquery
+  title: 7단계. FROM 서브쿼리
+  structuredPrimary: true
+  subtitle: 집계 결과를 테이블처럼 사용
+  goal: 7단계. FROM 서브쿼리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: |-
+    FROM 절에 서브쿼리를 넣으면 집계 결과를 마치 테이블처럼 사용할 수 있습니다. 복잡한 집계를 단계적으로 수행할 때 유용합니다.
+
+    FROM 서브쿼리는 반드시 AS로 별칭을 지정해야 합니다. 별칭 없이는 컬럼을 참조할 수 없습니다.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            sub.day,
+            sub.avgTip,
+            sub.maxTip,
+            sub.cnt
+        FROM (
+            SELECT
+                day,
+                ROUND(AVG(tip), 2) AS avgTip,
+                MAX(tip) AS maxTip,
+                COUNT(*) AS cnt
+            FROM tips
+            GROUP BY day
+        ) AS sub
+        ORDER BY sub.avgTip DESC
+    """).show()
+  exercise:
+    prompt: 7단계. FROM 서브쿼리 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              sub.day,
+              sub.avgTip,
+              sub.maxTip,
+              sub.cnt
+          FROM (
+              SELECT
+                  day,
+                  ROUND(AVG(tip), 2) AS avgTip,
+                  MAX(tip) AS maxTip,
+                  COUNT(*) AS cnt
+              FROM tips
+              GROUP BY day
+          ) AS sub
+          ORDER BY sub.avgTip DESC
+      """).show()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 7단계. FROM 서브쿼리의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 7단계. FROM 서브쿼리 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step8_from_rank
+  title: 8단계. FROM 서브쿼리 + 윈도우 함수
+  structuredPrimary: true
+  subtitle: 순위 매긴 후 조회
+  goal: 8단계. FROM 서브쿼리 + 윈도우 함수에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: FROM 서브쿼리와 윈도우 함수를 조합하면 순위를 매긴 후 특정 순위만 추출할 수 있습니다. 윈도우 함수는 WHERE 절에 직접 사용할 수 없으므로, FROM
+    서브쿼리로 한 번 감싸서 결과를 필터링합니다. 이 패턴은 'TOP N' 쿼리에서 자주 사용됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            sub.day,
+            sub.avgTip,
+            sub.tipRank
+        FROM (
+            SELECT
+                day,
+                ROUND(AVG(tip), 2) AS avgTip,
+                RANK() OVER(ORDER BY AVG(tip) DESC) AS tipRank
+            FROM tips
+            GROUP BY day
+        ) AS sub
+        ORDER BY sub.tipRank
+    """).show()
+  exercise:
+    prompt: 8단계. FROM 서브쿼리 + 윈도우 함수 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              sub.day,
+              sub.avgTip,
+              sub.tipRank
+          FROM (
+              SELECT
+                  day,
+                  ROUND(AVG(tip), 2) AS avgTip,
+                  RANK() OVER(ORDER BY AVG(tip) DESC) AS tipRank
+              FROM tips
+              GROUP BY day
+          ) AS sub
+          ORDER BY sub.tipRank
+      """).show()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 8단계. FROM 서브쿼리 + 윈도우 함수의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 8단계. FROM 서브쿼리 + 윈도우 함수 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step9_complex_subquery
+  title: 9단계. 복합 서브쿼리
+  structuredPrimary: true
+  subtitle: 그룹 평균과 비교
+  goal: 9단계. 복합 서브쿼리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: 서브쿼리를 JOIN과 결합하면 각 그룹의 평균과 개별 값을 비교할 수 있습니다. 요일별 평균보다 높은 팁만 추출합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            t.day,
+            t.total_bill,
+            t.tip,
+            dayAvg.avgTip AS dayAvgTip,
+            ROUND(t.tip - dayAvg.avgTip, 2) AS diffFromDayAvg
+        FROM tips t
+        JOIN (
+            SELECT day, AVG(tip) AS avgTip
+            FROM tips
+            GROUP BY day
+        ) AS dayAvg ON t.day = dayAvg.day
+        WHERE t.tip > dayAvg.avgTip
+        ORDER BY diffFromDayAvg DESC
+        LIMIT 10
+    """).show()
+  exercise:
+    prompt: 9단계. 복합 서브쿼리 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              t.day,
+              t.total_bill,
+              t.tip,
+              dayAvg.avgTip AS dayAvgTip,
+              ROUND(t.tip - dayAvg.avgTip, 2) AS diffFromDayAvg
+          FROM tips t
+          JOIN (
+              SELECT day, AVG(tip) AS avgTip
+              FROM tips
+              GROUP BY day
+          ) AS dayAvg ON t.day = dayAvg.day
+          WHERE t.tip > dayAvg.avgTip
+          ORDER BY diffFromDayAvg DESC
+          LIMIT 10
+      """).show()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 9단계. 복합 서브쿼리의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 9단계. 복합 서브쿼리 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step10_time_analysis
+  title: 10단계. 시간대별 복합 분석
+  structuredPrimary: true
+  subtitle: 다중 서브쿼리
+  goal: 10단계. 시간대별 복합 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: 전체 평균과 시간대별 평균을 동시에 비교하여 팁 성향을 분석합니다. 스칼라 서브쿼리와 FROM 서브쿼리를 함께 사용하면 여러 층위의 통계를 한 번에 비교할
+    수 있습니다. 개별 데이터가 그룹 평균 및 전체 평균과 어떻게 다른지 한눈에 파악할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            t.time,
+            t.day,
+            t.tip,
+            (SELECT AVG(tip) FROM tips) AS totalAvg,
+            timeAvg.avgTip AS timeAvgTip,
+            CASE
+                WHEN t.tip > timeAvg.avgTip THEN '평균 이상'
+                ELSE '평균 이하'
+            END AS category
+        FROM tips t
+        JOIN (
+            SELECT time, AVG(tip) AS avgTip
+            FROM tips
+            GROUP BY time
+        ) AS timeAvg ON t.time = timeAvg.time
+        ORDER BY t.tip DESC
+        LIMIT 12
+    """).show()
+  exercise:
+    prompt: 10단계. 시간대별 복합 분석 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              t.time,
+              t.day,
+              t.tip,
+              (SELECT AVG(tip) FROM tips) AS totalAvg,
+              timeAvg.avgTip AS timeAvgTip,
+              CASE
+                  WHEN t.tip > timeAvg.avgTip THEN '평균 이상'
+                  ELSE '평균 이하'
+              END AS category
+          FROM tips t
+          JOIN (
+              SELECT time, AVG(tip) AS avgTip
+              FROM tips
+              GROUP BY time
+          ) AS timeAvg ON t.time = timeAvg.time
+          ORDER BY t.tip DESC
+          LIMIT 12
+      """).show()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 10단계. 시간대별 복합 분석의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 10단계. 시간대별 복합 분석 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: step11_final
+  title: 11단계. 최종 결과물
+  structuredPrimary: true
+  subtitle: 서브쿼리 패턴 정리
+  goal: 11단계. 최종 결과물에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: 지금까지 배운 3가지 서브쿼리 패턴을 정리합니다. 스칼라 서브쿼리는 단일 값 반환, WHERE 서브쿼리는 조건 필터링, FROM 서브쿼리는 집계 결과를 테이블처럼
+    사용합니다. 각 패턴의 특성을 이해하면 상황에 맞는 최적의 쿼리를 작성할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    duckdb.sql("""
+        SELECT
+            '스칼라' AS pattern,
+            'SELECT (SELECT ...) FROM ...' AS syntax,
+            '단일 값 반환' AS description
+        UNION ALL
+        SELECT
+            'WHERE',
+            'WHERE col IN/>/< (SELECT ...)',
+            '조건 필터링'
+        UNION ALL
+        SELECT
+            'FROM',
+            'FROM (SELECT ...) AS sub',
+            '집계 결과 테이블화'
+    """).show()
+  exercise:
+    prompt: 11단계. 최종 결과물 예제에서 SQL 컬럼, WHERE 조건, 집계 기준 중 하나를 바꾸고 쿼리 결과를 확인하세요.
+    starterCode: |-
+      duckdb.sql("""
+          SELECT
+              '스칼라' AS pattern,
+              'SELECT (SELECT ...) FROM ...' AS syntax,
+              '단일 값 반환' AS description
+          UNION ALL
+          SELECT
+              'WHERE',
+              'WHERE col IN/>/< (SELECT ...)',
+              '조건 필터링'
+          UNION ALL
+          SELECT
+              'FROM',
+              'FROM (SELECT ...) AS sub',
+              '집계 결과 테이블화'
+      """).show()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 11단계. 최종 결과물의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 11단계. 최종 결과물의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: workflow_validation
+  title: 12단계. 실무 서브쿼리 검증
+  structuredPrimary: true
+  subtitle: 예측 → 스칼라 오류 확인 → 결과 검증 → 기준 실험
+  goal: 12단계. 실무 서브쿼리 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: |-
+    서브쿼리는 결과가 나왔다고 끝이 아닙니다. 실무에서는 스칼라 서브쿼리가 정말 1행 1열인지, 동적 기준이 예상한 그룹을 고르는지, 최종 결과가 전체 평균과 그룹 평균을 모두 넘는지 검증해야 합니다.
+
+    서브쿼리 학습은 문법 암기가 아니라 기준을 코드로 고정하는 연습입니다. 오류가 나는 서브쿼리와 통과해야 하는 결과를 함께 검증하면 SQL을 업무 리포트에 사용할 수 있습니다.
+  snippet: |-
+    dayTipSummary = duckdb.sql("""
+        SELECT
+            day,
+            ROUND(AVG(tip), 2) AS avgTip,
+            COUNT(*) AS orderCount
+        FROM tips
+        GROUP BY day
+        ORDER BY avgTip DESC
+    """).df()
+
+    aboveTotalAvgCount = duckdb.sql("""
+        SELECT COUNT(*) AS cnt
+        FROM tips
+        WHERE tip > (SELECT AVG(tip) FROM tips)
+    """).fetchone()[0]
+
+    bestTipDay = dayTipSummary.iloc[0]["day"]
+    bestTipDay, aboveTotalAvgCount, dayTipSummary.to_dict("records")
+  exercise:
+    prompt: 12단계. 실무 서브쿼리 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      dayTipSummary = duckdb.sql("""
+          SELECT
+              day,
+              ROUND(AVG(tip), 2) AS avgTip,
+              COUNT(*) AS orderCount
+          FROM tips
+          GROUP BY day
+          ORDER BY avgTip DESC
+      """).df()
+
+      aboveTotalAvgCount = duckdb.sql("""
+          SELECT COUNT(*) AS cnt
+          FROM tips
+          WHERE tip > (SELECT AVG(tip) FROM tips)
+      """).fetchone()[0]
+
+      bestTipDay = dayTipSummary.iloc[0]["day"]
+      bestTipDay, aboveTotalAvgCount, dayTipSummary.to_dict("records")
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 12단계. 실무 서브쿼리 검증의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 12단계. 실무 서브쿼리 검증 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 서브쿼리 프로젝트
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+  explanation: |-
+    배운 서브쿼리 패턴을 활용해 팁 데이터를 분석합니다. 스칼라 서브쿼리로 전체 평균을 계산하고, WHERE 서브쿼리로 조건 비교를 수행합니다. 서브쿼리는 복잡한 비교 분석의 핵심 도구입니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import pandas as pd
+    import duckdb
+    data = pd.DataFrame({
+        "total_bill": [16.99, 24.59, 32.40, 10.34, 40.17, 21.01, 18.78, 29.85],
+        "tip": [1.01, 3.61, 5.15, 1.66, 6.50, 3.50, 2.00, 4.20],
+        "sex": ["Female", "Male", "Male", "Female", "Male", "Female", "Female", "Male"],
+        "smoker": ["No", "No", "Yes", "No", "Yes", "No", "Yes", "No"],
+        "day": ["Sun", "Sat", "Sat", "Thur", "Sun", "Fri", "Thur", "Sat"],
+        "time": ["Dinner", "Dinner", "Dinner", "Lunch", "Dinner", "Lunch", "Lunch", "Dinner"],
+        "size": [2, 4, 3, 2, 5, 2, 2, 3],
+    })
+    tbl1 = duckdb.from_df(data)
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      import duckdb
+      data = pd.DataFrame({
+          "total_bill": [16.99, 24.59, 32.40, 10.34, 40.17, 21.01, 18.78, 29.85],
+          "tip": [1.01, 3.61, 5.15, 1.66, 6.50, 3.50, 2.00, 4.20],
+          "sex": ["Female", "Male", "Male", "Female", "Male", "Female", "Female", "Male"],
+          "smoker": ["No", "No", "Yes", "No", "Yes", "No", "Yes", "No"],
+          "day": ["Sun", "Sat", "Sat", "Thur", "Sun", "Fri", "Thur", "Sat"],
+          "time": ["Dinner", "Dinner", "Dinner", "Lunch", "Dinner", "Lunch", "Lunch", "Dinner"],
+          "size": [2, 4, 3, 2, 5, 2, 2, 3],
+      })
+      tbl1 = duckdb.from_df(data)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 실습의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.
+    resultCheck: 실습 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 서브쿼리 3가지 패턴을 마스터했습니다.
+  - type: list
+    items:
+    - '스칼라 서브쿼리 - SELECT (SELECT ...) : 단일 값 반환'
+    - 'WHERE 서브쿼리 - WHERE col > (SELECT ...) : 동적 필터링'
+    - 'WHERE IN 서브쿼리 - WHERE col IN (SELECT ...) : 목록 필터링'
+    - 'FROM 서브쿼리 - FROM (SELECT ...) AS sub : 집계 결과 재사용'
+    - 서브쿼리 + JOIN - 그룹별 평균과 비교 분석
+  - type: text
+    content: 다음 시간에는 CTE(WITH 절)로 더 가독성 높은 쿼리를 작성하는 방법을 배웁니다.
+  goal: 정리에서 SQL 조건과 집계 결과가 어떻게 연결되는지 확인한다.
+  why: 쿼리 조건과 결과를 같이 확인해야 리포트나 집계 자동화에서 잘못된 행을 줄일 수 있습니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: duckdb_05-above-dynamic-average-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - summary
+    title: 스칼라 서브쿼리의 동적 기준 구현하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 전체 평균보다 tip rate가 높은 행을 고정 숫자 없이 계산한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 기준 평균과 각 행의 비율을 같은 정의로 계산하세요.
+    - 평균과 같은 행은 \`>\` 조건에서 제외됩니다.
+    exercise:
+      prompt: above_average_tip_rate(rows)를 완성하세요.
+      starterCode: |-
+        def above_average_tip_rate(rows):
+            raise NotImplementedError
+      solution: |
+        def above_average_tip_rate(rows):
+            rates = []
+            for row in rows:
+                if row["total"] <= 0:
+                    raise ValueError("non-positive total")
+                rates.append((row["id"], row["tip"] / row["total"]))
+            if not rates:
+                return {"average": None, "ids": []}
+            average = sum(rate for _, rate in rates) / len(rates)
+            return {"average": round(average, 3), "ids": sorted(row_id for row_id, rate in rates if rate > average)}
+      hints: *id001
+    check:
+      id: python.duckdb.duckdb_05.above-dynamic-average.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_05.above-dynamic-average.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: above_average_tip_rate
+        cases:
+        - id: uses-computed-average
+          arguments:
+          - value:
+            - id: 1
+              total: 10
+              tip: 1
+            - id: 2
+              total: 10
+              tip: 3
+          expectedReturn:
+            average: 0.2
+            ids:
+            - 2
+        - id: handles-empty-input
+          arguments:
+          - value: []
+          expectedReturn:
+            average: null
+            ids: []
+        - id: rejects-zero-total
+          arguments:
+          - value:
+            - id: 1
+              total: 0
+              tip: 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: duckdb_05-correlated-peer-benchmark-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - duckdb_05-above-dynamic-average-mastery
+    title: 새 급여 데이터에 상관 서브쿼리 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 각 직원 급여를 자기 부서의 동료 평균과 비교한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 상관 기준은 현재 행의 department로 제한하세요.
+    - 자기 자신도 부서 평균 분모에 포함되는 정의입니다.
+    exercise:
+      prompt: above_department_average(rows)를 완성하세요.
+      starterCode: |-
+        def above_department_average(rows):
+            raise NotImplementedError
+      solution: |
+        def above_department_average(rows):
+            grouped = {}
+            for row in rows:
+                grouped.setdefault(row["department"], []).append(row["salary"])
+            averages = {name: sum(values) / len(values) for name, values in grouped.items()}
+            result = []
+            for row in rows:
+                benchmark = averages[row["department"]]
+                if row["salary"] > benchmark:
+                    result.append({"id": row["id"], "department": row["department"], "benchmark": round(benchmark, 2)})
+            return sorted(result, key=lambda row: row["id"])
+      hints: *id002
+    check:
+      id: python.duckdb.duckdb_05.correlated-peer-benchmark.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_05.correlated-peer-benchmark.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: above_department_average
+        cases:
+        - id: compares-with-own-department
+          arguments:
+          - value:
+            - id: 1
+              department: A
+              salary: 100
+            - id: 2
+              department: A
+              salary: 200
+            - id: 3
+              department: B
+              salary: 1000
+          expectedReturn:
+          - id: 2
+            department: A
+            benchmark: 150.0
+        - id: returns-none-for-singletons
+          arguments:
+          - value:
+            - id: 4
+              department: C
+              salary: 50
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: duckdb_05-subquery-shape-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - duckdb_05-correlated-peer-benchmark-transfer
+    title: 서브쿼리 결과 shape 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: scalar, set, correlated 기준의 사용 위치를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 비교 연산자는 서브쿼리의 반환 행 수와 맞아야 합니다.
+    - 상관 서브쿼리는 join이나 window로 바꿀 수 있는지 검토하세요.
+    exercise:
+      prompt: choose_subquery_shape(situation)를 완성하세요.
+      starterCode: |-
+        def choose_subquery_shape(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_subquery_shape(situation):
+            table = {'compare-overall-average': {'shape': 'scalar', 'operator': '>', 'risk': 'multiple rows'}, 'allowed-customer-ids': {'shape': 'set', 'operator': 'IN', 'risk': 'NULL membership'}, 'compare-with-own-group': {'shape': 'correlated scalar', 'operator': '>', 'risk': 'repeated work'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.duckdb.duckdb_05.subquery-shape.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_05.subquery-shape.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_subquery_shape
+        cases:
+        - id: recalls-compare-overall-average
+          arguments:
+          - value: compare-overall-average
+          expectedReturn:
+            shape: scalar
+            operator: '>'
+            risk: multiple rows
+        - id: recalls-allowed-customer-ids
+          arguments:
+          - value: allowed-customer-ids
+          expectedReturn:
+            shape: set
+            operator: IN
+            risk: NULL membership
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,872 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - numpy
+  - pandas
+  - scipy
+  id: scipy_07
+  title: 신호필터링
+  order: 7
+  category: scipy
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  tags:
+  - scipy.signal
+  - 필터
+  - butter
+  - filtfilt
+  - 노이즈제거
+  seo:
+    title: scipy.signal 필터링 - 노이즈 제거와 신호 처리
+    description: scipy.signal로 신호에서 노이즈를 제거합니다. 버터워스 필터, 저역통과, 고역통과 필터를 배웁니다.
+    keywords:
+    - scipy
+    - signal
+    - filter
+    - butter
+    - 노이즈제거
+intro:
+  emoji: 🔊
+  goal: scipy.signal로 신호에서 노이즈를 제거하고 원하는 주파수 성분을 추출합니다.
+  description: 센서 데이터, 오디오 신호, 생체신호에서 노이즈를 제거하는 디지털 필터를 설계하고 적용합니다. 버터워스 필터를 중심으로 저역통과, 고역통과, 대역통과 필터를
+    배웁니다.
+  direction: 신호필터링에서 수치 데이터를 모델에 넣고 계산 결과와 오차를 검증합니다.
+  benefits:
+  - 수치 입력 확인 후 최적화/적분/신호 처리에 맞는 코드 입력을 고릅니다.
+  - 신호필터링 결과를 오차와 결과 범위 기준으로 즉시 점검합니다.
+  - 완료한 코드를 과학 계산 루틴에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 데이터 로드 입력 확인
+      detail: 입력 기준(수치 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 버터워스 필터 설계 처리 실행
+      detail: 최적화/적분/신호 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 주파수 응답 결과 검증
+      detail: 오차와 결과 범위 기준으로 실행 결과를 비교합니다.
+    - label: 신호필터링 재사용
+      detail: 완성 코드를 과학 계산 루틴에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 과학 계산 환경
+      detail: matplotlib, numpy, pandas, scipy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 신호필터링 실행
+      detail: 셀을 실행해 오차와 결과 범위와 예외 상태를 확인합니다.
+    - label: 신호필터링 완료
+      detail: 검증된 코드를 과학 계산 루틴로 남깁니다.
+sections:
+- id: load
+  title: 데이터 로드
+  structuredPrimary: true
+  subtitle: 노이즈가 섞인 신호
+  goal: 데이터 로드에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 디지털 신호 처리(DSP)에서 필터는 특정 주파수 대역을 통과시키거나 제거합니다. 이 프로젝트에서는 5Hz 사인파에 고주파 노이즈가 섞인 신호를 생성하고,
+    필터링으로 원래 신호를 복원합니다. 실제 센서 데이터나 생체신호 분석에서 필수적인 기술입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import scipy
+
+    import numpy as np
+    from scipy import signal
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    fs = 500
+    t = np.linspace(0, 1, fs)
+
+    cleanSig = np.sin(2 * np.pi * 5 * t)
+    noise = 0.5 * np.sin(2 * np.pi * 50 * t) + 0.3 * np.random.randn(len(t))
+    noisySig = cleanSig + noise
+  exercise:
+    prompt: 데이터 로드 예제에서 \`fs\`, \`t\`, \`cleanSig\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      import scipy
+
+      import numpy as np
+      from scipy import signal
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      fs = 500
+      t = np.linspace(0, 1, fs)
+
+      cleanSig = np.sin(2 * np.pi * 5 * t)
+      noise = 0.5 * np.sin(2 * np.pi * 50 * t) + 0.3 * np.random.randn(len(t))
+      noisySig = cleanSig + noise
+    hints:
+    - 바꿀 지점은 \`fs = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`fs\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 데이터 로드에서 \`fs\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 데이터 로드 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: butter
+  title: 버터워스 필터 설계
+  structuredPrimary: true
+  subtitle: signal.butter
+  goal: 버터워스 필터 설계에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    버터워스 필터는 통과대역에서 가장 평탄한 주파수 응답을 가집니다. butter 함수로 필터 계수(b, a)를 설계합니다. 차단 주파수는 나이퀴스트 주파수(샘플링 주파수의 절반)로 정규화해야 합니다.
+
+    btype='low'는 저역통과(저주파만 통과), 'high'는 고역통과, 'band'는 대역통과입니다. order가 높을수록 전이대역이 급격하지만 위상왜곡이 커집니다.
+  snippet: |-
+    cutoff = 10
+    nyquist = fs / 2
+    normalCutoff = cutoff / nyquist
+    order = 4
+
+    b, a = signal.butter(order, normalCutoff, btype='low')
+
+    filterDf = pd.DataFrame({
+        'Parameter': ['Cutoff Frequency', 'Nyquist Frequency', 'Normalized Cutoff', 'Filter Order'],
+        'Value': [f'{cutoff} Hz', f'{nyquist} Hz', f'{normalCutoff:.3f}', order]
+    })
+    filterDf
+  exercise:
+    prompt: 버터워스 필터 설계 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      cutoff = 10
+      nyquist = fs / 2
+      normalCutoff = cutoff / nyquist
+      order = 4
+
+      b, a = signal.butter(order, normalCutoff, btype='low')
+
+      filterDf = pd.DataFrame({
+          'Parameter': ['Cutoff Frequency', 'Nyquist Frequency', 'Normalized Cutoff', 'Filter Order'],
+          'Value': [f'{cutoff} Hz', f'{nyquist} Hz', f'{normalCutoff:.3f}', order]
+      })
+      filterDf
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 버터워스 필터 설계의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 버터워스 필터 설계의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: freqresp
+  title: 주파수 응답
+  structuredPrimary: true
+  subtitle: 필터 특성 확인
+  goal: 주파수 응답에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 설계된 필터가 각 주파수를 얼마나 통과시키는지 주파수 응답으로 확인합니다. -3dB 지점이 차단 주파수이며, 이 지점에서 신호 전력이 절반으로 감소합니다.
+    차단 주파수 이상의 고주파는 급격히 감쇄됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    w, h = signal.freqz(b, a, worN=2000)
+    freqs = w * fs / (2 * np.pi)
+
+    figFreq, (axFreqM, axFreqP) = plt.subplots(2, 1, figsize=(10, 6), sharex=True)
+
+    axFreqM.plot(freqs, 20 * np.log10(abs(h)), 'b-', linewidth=2)
+    axFreqM.axvline(cutoff, color='r', linestyle='--', label=f'Cutoff: {cutoff} Hz')
+    axFreqM.axhline(-3, color='gray', linestyle=':', label='-3 dB')
+    axFreqM.set_ylabel('Magnitude (dB)')
+    axFreqM.set_title('Butterworth Lowpass Filter Frequency Response')
+    axFreqM.set_ylim(-60, 5)
+    axFreqM.legend()
+    axFreqM.grid(True, alpha=0.3)
+
+    axFreqP.plot(freqs, np.angle(h, deg=True), 'g-', linewidth=2)
+    axFreqP.set_xlabel('Frequency (Hz)')
+    axFreqP.set_ylabel('Phase (degrees)')
+    axFreqP.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    figFreq
+  exercise:
+    prompt: 주파수 응답 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      w, h = signal.freqz(b, a, worN=2000)
+      freqs = w * fs / (2 * np.pi)
+
+      figFreq, (axFreqM, axFreqP) = plt.subplots(2, 1, figsize=(10, 6), sharex=True)
+
+      axFreqM.plot(freqs, 20 * np.log10(abs(h)), 'b-', linewidth=2)
+      axFreqM.axvline(cutoff, color='r', linestyle='--', label=f'Cutoff: {cutoff} Hz')
+      axFreqM.axhline(-3, color='gray', linestyle=':', label='-3 dB')
+      axFreqM.set_ylabel('Magnitude (dB)')
+      axFreqM.set_title('Butterworth Lowpass Filter Frequency Response')
+      axFreqM.set_ylim(-60, 5)
+      axFreqM.legend()
+      axFreqM.grid(True, alpha=0.3)
+
+      axFreqP.plot(freqs, np.angle(h, deg=True), 'g-', linewidth=2)
+      axFreqP.set_xlabel('Frequency (Hz)')
+      axFreqP.set_ylabel('Phase (degrees)')
+      axFreqP.grid(True, alpha=0.3)
+
+      plt.tight_layout()
+      figFreq
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 주파수 응답의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 주파수 응답의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: filtfilt
+  title: 제로위상 필터링
+  structuredPrimary: true
+  subtitle: signal.filtfilt
+  goal: 제로위상 필터링에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: filtfilt은 신호를 정방향과 역방향으로 두 번 필터링하여 위상 왜곡을 제거합니다. 시간 지연 없이 깨끗한 필터링 결과를 얻습니다. 오프라인 분석에서는
+    항상 filtfilt을 사용하는 것이 좋습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    filteredSig = signal.filtfilt(b, a, noisySig)
+
+    figFilt, axFilt = plt.subplots(figsize=(12, 5))
+
+    axFilt.plot(t, noisySig, 'r-', alpha=0.5, linewidth=0.8, label='Noisy')
+    axFilt.plot(t, filteredSig, 'b-', linewidth=2, label='Filtered')
+    axFilt.plot(t, cleanSig, 'g--', linewidth=1.5, label='Original Clean')
+
+    axFilt.set_xlabel('Time (s)')
+    axFilt.set_ylabel('Amplitude')
+    axFilt.set_title('Noise Removal with Butterworth Lowpass Filter')
+    axFilt.legend()
+    axFilt.grid(True, alpha=0.3)
+    figFilt
+  exercise:
+    prompt: 제로위상 필터링 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      filteredSig = signal.filtfilt(b, a, noisySig)
+
+      figFilt, axFilt = plt.subplots(figsize=(12, 5))
+
+      axFilt.plot(t, noisySig, 'r-', alpha=0.5, linewidth=0.8, label='Noisy')
+      axFilt.plot(t, filteredSig, 'b-', linewidth=2, label='Filtered')
+      axFilt.plot(t, cleanSig, 'g--', linewidth=1.5, label='Original Clean')
+
+      axFilt.set_xlabel('Time (s)')
+      axFilt.set_ylabel('Amplitude')
+      axFilt.set_title('Noise Removal with Butterworth Lowpass Filter')
+      axFilt.legend()
+      axFilt.grid(True, alpha=0.3)
+      figFilt
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 제로위상 필터링의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 제로위상 필터링의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: lfilter
+  title: lfilter vs filtfilt
+  structuredPrimary: true
+  subtitle: 위상 지연 비교
+  goal: lfilter vs filtfilt에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    lfilter는 실시간 필터링에 사용하지만 위상 지연이 발생합니다. 실시간 처리가 필요한 경우(예: 라이브 센서)에만 lfilter를 사용하고, 오프라인 분석에서는 filtfilt을 사용하세요.
+
+    lfilter의 위상 지연은 필터 차수와 차단 주파수에 따라 달라집니다. filtfilt은 두 번 필터링하므로 감쇄가 2배가 되어 더 급격한 롤오프를 보입니다.
+  snippet: |-
+    lfilterResult = signal.lfilter(b, a, noisySig)
+
+    figLfilt, axLfilt = plt.subplots(figsize=(12, 5))
+
+    axLfilt.plot(t, cleanSig, 'g--', linewidth=2, label='Original')
+    axLfilt.plot(t, lfilterResult, 'r-', linewidth=1.5, alpha=0.7, label='lfilter (has delay)')
+    axLfilt.plot(t, filteredSig, 'b-', linewidth=1.5, label='filtfilt (zero-phase)')
+
+    axLfilt.set_xlim(0, 0.3)
+    axLfilt.set_xlabel('Time (s)')
+    axLfilt.set_ylabel('Amplitude')
+    axLfilt.set_title('lfilter vs filtfilt - Phase Delay Comparison')
+    axLfilt.legend()
+    axLfilt.grid(True, alpha=0.3)
+    figLfilt
+  exercise:
+    prompt: lfilter vs filtfilt 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      lfilterResult = signal.lfilter(b, a, noisySig)
+
+      figLfilt, axLfilt = plt.subplots(figsize=(12, 5))
+
+      axLfilt.plot(t, cleanSig, 'g--', linewidth=2, label='Original')
+      axLfilt.plot(t, lfilterResult, 'r-', linewidth=1.5, alpha=0.7, label='lfilter (has delay)')
+      axLfilt.plot(t, filteredSig, 'b-', linewidth=1.5, label='filtfilt (zero-phase)')
+
+      axLfilt.set_xlim(0, 0.3)
+      axLfilt.set_xlabel('Time (s)')
+      axLfilt.set_ylabel('Amplitude')
+      axLfilt.set_title('lfilter vs filtfilt - Phase Delay Comparison')
+      axLfilt.legend()
+      axLfilt.grid(True, alpha=0.3)
+      figLfilt
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: lfilter vs filtfilt의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: lfilter vs filtfilt의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: highpass
+  title: 고역통과 필터
+  structuredPrimary: true
+  subtitle: 저주파 제거
+  goal: 고역통과 필터에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 고역통과 필터는 저주파 성분(드리프트, DC 오프셋)을 제거합니다. 심전도(ECG) 신호에서 기저선 변동을 제거하거나, 가속도계에서 중력 성분을 제거할 때
+    사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    drift = 0.5 * np.sin(2 * np.pi * 0.5 * t)
+    driftSig = cleanSig + drift
+  exercise:
+    prompt: 고역통과 필터 예제에서 \`drift\`, \`driftSig\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      drift = 0.5 * np.sin(2 * np.pi * 0.5 * t)
+      driftSig = cleanSig + drift
+    hints:
+    - 바꿀 지점은 \`drift = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`drift\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 고역통과 필터에서 \`drift\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 고역통과 필터 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: bandpass
+  title: 대역통과 필터
+  structuredPrimary: true
+  subtitle: 특정 주파수 대역 추출
+  goal: 대역통과 필터에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 대역통과 필터는 두 차단 주파수 사이의 성분만 통과시킵니다. 특정 주파수 대역의 신호를 추출할 때 사용합니다. 예를 들어 심박수 분석에서 0.5-4Hz 대역만
+    추출하거나, 특정 진동 주파수를 분석할 때 유용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    comp1 = np.sin(2 * np.pi * 5 * t)
+    comp2 = 0.5 * np.sin(2 * np.pi * 20 * t)
+    comp3 = 0.3 * np.sin(2 * np.pi * 60 * t)
+    complexSig = comp1 + comp2 + comp3
+  exercise:
+    prompt: 대역통과 필터 예제에서 \`comp1\`, \`comp2\`, \`comp3\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      comp1 = np.sin(2 * np.pi * 5 * t)
+      comp2 = 0.5 * np.sin(2 * np.pi * 20 * t)
+      comp3 = 0.3 * np.sin(2 * np.pi * 60 * t)
+      complexSig = comp1 + comp2 + comp3
+    hints:
+    - 바꿀 지점은 \`comp1 = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`comp1\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 대역통과 필터에서 \`comp1\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 대역통과 필터 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: notch
+  title: 노치 필터
+  structuredPrimary: true
+  subtitle: 특정 주파수 제거
+  goal: 노치 필터에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 노치(대역저지) 필터는 특정 주파수만 제거합니다. 전력선 간섭(50Hz 또는 60Hz)을 제거할 때 주로 사용합니다. 생체신호(ECG, EEG) 분석에서 필수적인
+    전처리 단계입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    notchFreq = 50
+    quality = 30
+    bNotch, aNotch = signal.iirnotch(notchFreq / nyquist, quality)
+
+    powerNoise = 0.8 * np.sin(2 * np.pi * 50 * t)
+    contaminated = cleanSig + powerNoise
+    notchFiltered = signal.filtfilt(bNotch, aNotch, contaminated)
+
+    figNotch, axNotch = plt.subplots(figsize=(12, 5))
+    axNotch.plot(t, contaminated, 'r-', alpha=0.5, linewidth=0.8, label='With 50Hz Noise')
+    axNotch.plot(t, notchFiltered, 'b-', linewidth=1.5, label='Notch Filtered')
+    axNotch.plot(t, cleanSig, 'g--', alpha=0.7, label='Original')
+    axNotch.set_xlim(0, 0.5)
+    axNotch.set_xlabel('Time (s)')
+    axNotch.set_ylabel('Amplitude')
+    axNotch.set_title('50Hz Power Line Noise Removal')
+    axNotch.legend()
+    axNotch.grid(True, alpha=0.3)
+    figNotch
+  exercise:
+    prompt: 노치 필터 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      notchFreq = 50
+      quality = 30
+      bNotch, aNotch = signal.iirnotch(notchFreq / nyquist, quality)
+
+      powerNoise = 0.8 * np.sin(2 * np.pi * 50 * t)
+      contaminated = cleanSig + powerNoise
+      notchFiltered = signal.filtfilt(bNotch, aNotch, contaminated)
+
+      figNotch, axNotch = plt.subplots(figsize=(12, 5))
+      axNotch.plot(t, contaminated, 'r-', alpha=0.5, linewidth=0.8, label='With 50Hz Noise')
+      axNotch.plot(t, notchFiltered, 'b-', linewidth=1.5, label='Notch Filtered')
+      axNotch.plot(t, cleanSig, 'g--', alpha=0.7, label='Original')
+      axNotch.set_xlim(0, 0.5)
+      axNotch.set_xlabel('Time (s)')
+      axNotch.set_ylabel('Amplitude')
+      axNotch.set_title('50Hz Power Line Noise Removal')
+      axNotch.legend()
+      axNotch.grid(True, alpha=0.3)
+      figNotch
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 노치 필터의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 노치 필터의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: sos
+  title: SOS 형식 필터
+  structuredPrimary: true
+  subtitle: 수치 안정성
+  goal: SOS 형식 필터에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    높은 차수의 필터는 b/a 형식으로 불안정할 수 있습니다. SOS(Second-Order Sections) 형식이 더 안정적입니다. 고차 필터(order > 4)에서는 SOS를 권장합니다.
+
+    output='sos'로 SOS 형식 계수를 얻고, sosfiltfilt로 필터링합니다. 수치적으로 훨씬 안정적이며, 특히 협대역 필터에서 중요합니다.
+  snippet: |-
+    sos = signal.butter(8, normalCutoff, btype='low', output='sos')
+    sosFiltered = signal.sosfiltfilt(sos, noisySig)
+
+    figSos, axSos = plt.subplots(figsize=(12, 5))
+    axSos.plot(t, noisySig, 'r-', alpha=0.4, linewidth=0.8, label='Noisy')
+    axSos.plot(t, sosFiltered, 'b-', linewidth=2, label='SOS Filtered (order 8)')
+    axSos.plot(t, cleanSig, 'g--', linewidth=1.5, label='Original')
+    axSos.set_xlabel('Time (s)')
+    axSos.set_ylabel('Amplitude')
+    axSos.set_title('Filtering with SOS Format (Higher Order)')
+    axSos.legend()
+    axSos.grid(True, alpha=0.3)
+    figSos
+  exercise:
+    prompt: SOS 형식 필터 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      sos = signal.butter(8, normalCutoff, btype='low', output='sos')
+      sosFiltered = signal.sosfiltfilt(sos, noisySig)
+
+      figSos, axSos = plt.subplots(figsize=(12, 5))
+      axSos.plot(t, noisySig, 'r-', alpha=0.4, linewidth=0.8, label='Noisy')
+      axSos.plot(t, sosFiltered, 'b-', linewidth=2, label='SOS Filtered (order 8)')
+      axSos.plot(t, cleanSig, 'g--', linewidth=1.5, label='Original')
+      axSos.set_xlabel('Time (s)')
+      axSos.set_ylabel('Amplitude')
+      axSos.set_title('Filtering with SOS Format (Higher Order)')
+      axSos.legend()
+      axSos.grid(True, alpha=0.3)
+      figSos
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: SOS 형식 필터의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: SOS 형식 필터의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: result
+  title: 필터 선택 가이드
+  structuredPrimary: true
+  subtitle: 상황별 권장
+  goal: 필터 선택 가이드에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 필터 유형은 제거하려는 노이즈의 주파수 특성에 따라 선택합니다. 고주파 노이즈는 저역통과, 저주파 드리프트는 고역통과, 특정 간섭은 노치 필터를 사용합니다.
+    필터 차수는 4-6차가 일반적이며, 높은 차수는 SOS 형식을 사용하세요.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    guideDf = pd.DataFrame({
+        'Filter Type': ['Lowpass', 'Highpass', 'Bandpass', 'Notch'],
+        'Purpose': ['고주파 노이즈 제거', '저주파 드리프트 제거', '특정 대역 추출', '특정 주파수 제거'],
+        'Example Use': ['센서 스무딩', 'ECG 기저선 보정', '특정 진동 추출', '전력선 간섭 제거'],
+        'btype': ['low', 'high', 'band', 'iirnotch']
+    })
+    guideDf
+  exercise:
+    prompt: 필터 선택 가이드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      guideDf = pd.DataFrame({
+          'Filter Type': ['Lowpass', 'Highpass', 'Bandpass', 'Notch'],
+          'Purpose': ['고주파 노이즈 제거', '저주파 드리프트 제거', '특정 대역 추출', '특정 주파수 제거'],
+          'Example Use': ['센서 스무딩', 'ECG 기저선 보정', '특정 진동 추출', '전력선 간섭 제거'],
+          'btype': ['low', 'high', 'band', 'iirnotch']
+      })
+      guideDf
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 필터 선택 가이드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 필터 선택 가이드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 신호처리 프로젝트
+  goal: 실습에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 신호처리 엔지니어가 되어 다양한 노이즈를 제거해보세요. ECG 신호에서 기저선 변동과 전력선 간섭을 동시에 제거하거나, 가속도계 데이터에서 고주파 진동을 필터링하세요.
+  snippet: |-
+    fsEcg = 360
+    tEcg = np.linspace(0, 2, fsEcg * 2)
+    nyqEcg = fsEcg / 2
+
+    ecgClean = np.sin(2 * np.pi * 1.2 * tEcg) * np.exp(-((tEcg % 0.8 - 0.1) ** 2) / 0.01)
+    ecgClean += 0.3 * np.sin(2 * np.pi * 1.2 * tEcg)
+
+    baseline = 0.5 * np.sin(2 * np.pi * 0.3 * tEcg)
+    powerline = 0.2 * np.sin(2 * np.pi * 60 * tEcg)
+    muscle = 0.1 * np.random.randn(len(tEcg))
+    ecgNoisy = ecgClean + baseline + powerline + muscle
+  exercise:
+    prompt: 실습 예제에서 \`fsEcg\`, \`tEcg\`, \`nyqEcg\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      fsEcg = 360
+      tEcg = np.linspace(0, 2, fsEcg * 2)
+      nyqEcg = fsEcg / 2
+
+      ecgClean = np.sin(2 * np.pi * 1.2 * tEcg) * np.exp(-((tEcg % 0.8 - 0.1) ** 2) / 0.01)
+      ecgClean += 0.3 * np.sin(2 * np.pi * 1.2 * tEcg)
+
+      baseline = 0.5 * np.sin(2 * np.pi * 0.3 * tEcg)
+      powerline = 0.2 * np.sin(2 * np.pi * 60 * tEcg)
+      muscle = 0.1 * np.random.randn(len(tEcg))
+      ecgNoisy = ecgClean + baseline + powerline + muscle
+    hints:
+    - 바꿀 지점은 \`fsEcg = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`fsEcg\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 실습에서 \`fsEcg\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: SLA 지연시간 통계 게이트
+  goal: 업무 흐름 검증에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한
+    신뢰구간과 개선 기준을 함께 제시해야 합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import numpy as np
+    from scipy import optimize, stats
+
+    latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+    def validateLatencySamples(samples):
+        values = np.asarray(samples, dtype=float)
+        if values.size < 5:
+            raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+        if not np.isfinite(values).all():
+            raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+        if (values <= 0).any():
+            raise ValueError("지연시간은 0보다 커야 합니다.")
+        return values
+
+    cleanLatency = validateLatencySamples(latencySamples)
+    cleanLatency.mean(), cleanLatency.std(ddof=1)
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 기대 문자열이나 실제 출력 문구를 바꾸고 assert 비교가 맞는지 확인하세요.
+    starterCode: |-
+      allowedMean = 264
+      capThreshold = optimize.brentq(
+          lambda threshold: np.clip(cleanLatency, None, threshold).mean() - allowedMean,
+          cleanLatency.min(),
+          cleanLatency.max(),
+      )
+      cappedMean = np.clip(cleanLatency, None, capThreshold).mean()
+
+      assert abs(cappedMean - allowedMean) < 1e-6
+      {
+          "allowedMean": allowedMean,
+          "capThreshold": round(float(capThreshold), 2),
+          "cappedMean": round(float(cappedMean), 2),
+      }
+    solution: |-
+      import numpy as np
+      from scipy import optimize, stats
+
+      latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+      def validateLatencySamples(samples):
+          values = np.asarray(samples, dtype=float)
+          if values.size < 5:
+              raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+          if not np.isfinite(values).all():
+              raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+          if (values <= 0).any():
+              raise ValueError("지연시간은 0보다 커야 합니다.")
+          return values
+
+      cleanLatency = validateLatencySamples(latencySamples)
+      cleanLatency.mean(), cleanLatency.std(ddof=1)
+    hints:
+    - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
+    - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증에서 \`allowedMean\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: scipy_07-moving-average-filter-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load
+    - workflow_validation
+    title: 신호 이동평균과 edge 정책 구현하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: centered window가 완전히 들어오는 지점만 filtered value를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - edge padding을 조용히 발명하지 말고 None으로 표시하세요.
+    - window 크기가 signal detail을 얼마나 지우는지 기록하세요.
+    exercise:
+      prompt: moving_average(values, window)를 완성하세요.
+      starterCode: |-
+        def moving_average(values, window):
+            raise NotImplementedError
+      solution: |
+        def moving_average(values, window):
+            if window <= 0 or window % 2 == 0: raise ValueError("window must be positive odd")
+            radius = window//2; result = []
+            for index in range(len(values)):
+                if index < radius or index >= len(values)-radius: result.append(None)
+                else: result.append(round(sum(values[index-radius:index+radius+1])/window,6))
+            return result
+      hints: *id001
+    check:
+      id: python.scipy.scipy_07.moving-average-filter.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_07.moving-average-filter.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: moving_average
+        cases:
+        - id: filters-interior
+          arguments:
+          - value:
+            - 1
+            - 2
+            - 9
+            - 2
+            - 1
+          - value: 3
+          expectedReturn:
+          - null
+          - 4.0
+          - 4.333333
+          - 4.0
+          - null
+        - id: window-one-keeps-values
+          arguments:
+          - value:
+            - 1
+            - 3
+          - value: 1
+          expectedReturn:
+          - 1.0
+          - 3.0
+        - id: rejects-even-window
+          arguments:
+          - value:
+            - 1
+            - 2
+          - value: 2
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: scipy_07-filter-effect-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_07-moving-average-filter-mastery
+    title: 새 센서 signal에 filter 영향 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 원 신호와 filtered 신호의 peak·평균 절대 변화와 유효 표본 수를 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - filtered output만 보지 말고 원 신호 대비 변화량을 측정하세요.
+    - peak 감소가 항상 noise 제거를 뜻하지는 않습니다.
+    exercise:
+      prompt: audit_filter_effect(original, filtered)를 완성하세요.
+      starterCode: |-
+        def audit_filter_effect(original, filtered):
+            raise NotImplementedError
+      solution: |
+        def audit_filter_effect(original, filtered):
+            if len(original) != len(filtered): raise ValueError("length mismatch")
+            pairs = [(a,b) for a,b in zip(original,filtered) if b is not None]
+            if not pairs: return {"validCount": 0, "meanAbsoluteChange": None, "originalPeak": None, "filteredPeak": None}
+            return {"validCount": len(pairs), "meanAbsoluteChange": round(sum(abs(a-b) for a,b in pairs)/len(pairs),6), "originalPeak": max(abs(a) for a,_ in pairs), "filteredPeak": max(abs(b) for _,b in pairs)}
+      hints: *id002
+    check:
+      id: python.scipy.scipy_07.filter-effect-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_07.filter-effect-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_filter_effect
+        cases:
+        - id: measures-filter-change
+          arguments:
+          - value:
+            - 1
+            - 5
+            - 1
+          - value:
+            - null
+            - 3
+            - null
+          expectedReturn:
+            validCount: 1
+            meanAbsoluteChange: 2.0
+            originalPeak: 5
+            filteredPeak: 3
+        - id: reports-no-valid-output
+          arguments:
+          - value:
+            - 1
+            - 2
+          - value:
+            - null
+            - null
+          expectedReturn:
+            validCount: 0
+            meanAbsoluteChange: null
+            originalPeak: null
+            filteredPeak: null
+        - id: rejects-length-mismatch
+          arguments:
+          - value:
+            - 1
+          - value:
+            - 1
+            - 2
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: scipy_07-signal-filter-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_07-filter-effect-audit-transfer
+    title: signal filter 선택 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: smooth·주파수·edge 문제를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 수치 방법의 입력 가정과 오차 근거를 함께 남기세요.
+    - p-value나 최적화 성공 flag 하나를 결론으로 사용하지 마세요.
+    exercise:
+      prompt: choose_signal_filter(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_signal_filter(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_signal_filter(situation):
+            table = {'slow-trend': {'method': 'moving average or low-pass', 'evidence': 'window cutoff', 'risk': 'phase delay'}, 'known-frequency-noise': {'method': 'frequency-aware filter', 'evidence': 'spectrum before after', 'risk': 'ringing'}, 'short-signal': {'method': 'explicit edge policy', 'evidence': 'valid output count', 'risk': 'padding artifacts'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.scipy.scipy_07.signal-filter-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_07.signal-filter-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_signal_filter
+        cases:
+        - id: recalls-slow-trend
+          arguments:
+          - value: slow-trend
+          expectedReturn:
+            method: moving average or low-pass
+            evidence: window cutoff
+            risk: phase delay
+        - id: recalls-known-frequency-noise
+          arguments:
+          - value: known-frequency-noise
+          expectedReturn:
+            method: frequency-aware filter
+            evidence: spectrum before after
+            risk: ringing
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

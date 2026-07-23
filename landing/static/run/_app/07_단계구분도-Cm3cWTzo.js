@@ -1,0 +1,1484 @@
+var e=`meta:
+  packages:
+  - branca
+  - folium
+  id: folium_07
+  title: 단계구분도
+  order: 7
+  category: folium
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  tags:
+  - folium
+  - Choropleth
+  - 단계구분도
+  - 컬러맵
+  - 범례
+  seo:
+    title: Folium Choropleth - 단계구분도 만들기
+    description: Folium으로 Choropleth 지도를 만듭니다. 지역별 데이터를 색상으로 시각화합니다.
+    keywords:
+    - folium
+    - Choropleth
+    - 단계구분도
+    - 지역통계
+    - 시각화
+intro:
+  emoji: 🌈
+  goal: Choropleth 지도로 지역별 데이터를 시각화합니다.
+  description: 단계구분도(Choropleth)는 지역별 수치를 색상 단계로 표현합니다. 인구, 소득, 투표율 등 통계 데이터를 지도에 시각화합니다. GeoJSON과 데이터를
+    연결하여 자동으로 색상을 매핑합니다.
+  direction: 단계구분도에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.
+  benefits:
+  - 위도/경도 데이터 확인 후 지도 레이어 구성에 맞는 코드 입력을 고릅니다.
+  - 단계구분도 결과를 마커와 저장 HTML 기준으로 즉시 점검합니다.
+  - 완료한 코드를 위치 기반 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(위도/경도 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. Choropleth 처리 실행
+      detail: 지도 레이어 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 간단한 Choropl 결과 검증
+      detail: 마커와 저장 HTML 기준으로 실행 결과를 비교합니다.
+    - label: 단계구분도 재사용
+      detail: 완성 코드를 위치 기반 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 지도 시각화 환경
+      detail: branca, folium 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 단계구분도 실행
+      detail: 셀을 실행해 마커와 저장 HTML와 예외 상태를 확인합니다.
+    - label: 단계구분도 완료
+      detail: 검증된 코드를 위치 기반 리포트로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: folium과 Codaro를 불러옵니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: import folium
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: import folium
+    hints:
+    - 바꿀 지점은 위도/경도 데이터을 만드는 첫 줄과 지도 레이어 구성 줄에서 찾으세요.
+    - 실행 뒤 마커와 저장 HTML 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 마커와 저장 HTML 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step2_choropleth_basics
+  title: 2단계. Choropleth 기본
+  structuredPrimary: true
+  subtitle: Choropleth()
+  goal: 2단계. Choropleth 기본에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    Choropleth()는 GeoJSON과 데이터를 연결하여 색상을 자동 매핑합니다. key_on으로 GeoJSON 속성을, columns로 데이터 컬럼을 지정합니다.
+
+    GeoJSON의 properties에 있는 id와 데이터의 키를 매칭시킵니다.
+  snippet: |-
+    seoulCenter = [37.5665, 126.9780]
+
+    guGeo = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {"id": "jongno", "name": "종로구"},
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [[
+                        [126.96, 37.57], [127.00, 37.57],
+                        [127.00, 37.60], [126.96, 37.60], [126.96, 37.57]
+                    ]]
+                }
+            },
+            {
+                "type": "Feature",
+                "properties": {"id": "jung", "name": "중구"},
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [[
+                        [126.96, 37.54], [127.00, 37.54],
+                        [127.00, 37.57], [126.96, 37.57], [126.96, 37.54]
+                    ]]
+                }
+            },
+            {
+                "type": "Feature",
+                "properties": {"id": "yongsan", "name": "용산구"},
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [[
+                        [126.96, 37.51], [127.00, 37.51],
+                        [127.00, 37.54], [126.96, 37.54], [126.96, 37.51]
+                    ]]
+                }
+            }
+        ]
+    }
+
+    guData = {
+        "jongno": 150000,
+        "jung": 130000,
+        "yongsan": 230000
+    }
+    guData
+  exercise:
+    prompt: 2단계. Choropleth 기본 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      seoulCenter = [37.5665, 126.9780]
+
+      guGeo = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "properties": {"id": "jongno", "name": "종로구"},
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.96, 37.57], [127.00, 37.57],
+                          [127.00, 37.60], [126.96, 37.60], [126.96, 37.57]
+                      ]]
+                  }
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"id": "jung", "name": "중구"},
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.96, 37.54], [127.00, 37.54],
+                          [127.00, 37.57], [126.96, 37.57], [126.96, 37.54]
+                      ]]
+                  }
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"id": "yongsan", "name": "용산구"},
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.96, 37.51], [127.00, 37.51],
+                          [127.00, 37.54], [126.96, 37.54], [126.96, 37.51]
+                      ]]
+                  }
+              }
+          ]
+      }
+
+      guData = {
+          "jongno": 150000,
+          "jung": 130000,
+          "yongsan": 230000
+      }
+      guData
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 2단계. Choropleth 기본에서 \`seoulCenter\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. Choropleth 기본 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step3_simple_choropleth
+  title: 3단계. 간단한 Choropleth
+  structuredPrimary: true
+  subtitle: GeoJson + style_function
+  goal: 3단계. 간단한 Choropleth에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    Choropleth 클래스 대신 GeoJson에 style_function을 사용하면 더 유연하게 구현할 수 있습니다.
+
+    getColor 함수에서 값에 따라 색상을 반환합니다. 임계값을 조절하여 구간을 설정합니다.
+  snippet: |-
+    m1 = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+    def getColor(value):
+        if value >= 200000:
+            return "#e74c3c"
+        elif value >= 150000:
+            return "#f39c12"
+        else:
+            return "#27ae60"
+
+    def choroplethStyle(feature):
+        guId = feature["properties"]["id"]
+        value = guData.get(guId, 0)
+        return {
+            "fillColor": getColor(value),
+            "color": "white",
+            "weight": 2,
+            "fillOpacity": 0.7
+        }
+
+    folium.GeoJson(
+        guGeo,
+        style_function=choroplethStyle,
+        tooltip=folium.GeoJsonTooltip(fields=["name"])
+    ).add_to(m1)
+
+    m1
+  exercise:
+    prompt: 3단계. 간단한 Choropleth 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      m1 = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+      def getColor(value):
+          if value >= 200000:
+              return "#e74c3c"
+          elif value >= 150000:
+              return "#f39c12"
+          else:
+              return "#27ae60"
+
+      def choroplethStyle(feature):
+          guId = feature["properties"]["id"]
+          value = guData.get(guId, 0)
+          return {
+              "fillColor": getColor(value),
+              "color": "white",
+              "weight": 2,
+              "fillOpacity": 0.7
+          }
+
+      folium.GeoJson(
+          guGeo,
+          style_function=choroplethStyle,
+          tooltip=folium.GeoJsonTooltip(fields=["name"])
+      ).add_to(m1)
+
+      m1
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: 3단계. 간단한 Choropleth의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 3단계. 간단한 Choropleth 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: step4_color_scale
+  title: 4단계. 컬러 스케일
+  structuredPrimary: true
+  subtitle: 연속적 색상
+  goal: 4단계. 컬러 스케일에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    branca 라이브러리로 연속적인 컬러 스케일을 만들 수 있습니다. Folium에 포함되어 있습니다.
+
+    LinearColormap은 값에 따라 색상을 선형으로 보간합니다. 최소~최대 범위를 자동으로 매핑합니다.
+  snippet: |-
+    import branca.colormap as cm
+
+    m2 = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+    values = list(guData.values())
+    minVal = min(values)
+    maxVal = max(values)
+
+    colormap = cm.LinearColormap(
+        colors=["green", "yellow", "red"],
+        vmin=minVal,
+        vmax=maxVal
+    )
+
+    def scaleStyle(feature):
+        guId = feature["properties"]["id"]
+        value = guData.get(guId, minVal)
+        return {
+            "fillColor": colormap(value),
+            "color": "black",
+            "weight": 1,
+            "fillOpacity": 0.7
+        }
+
+    folium.GeoJson(
+        guGeo,
+        style_function=scaleStyle,
+        tooltip=folium.GeoJsonTooltip(fields=["name"])
+    ).add_to(m2)
+
+    m2
+  exercise:
+    prompt: 4단계. 컬러 스케일 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      import branca.colormap as cm
+
+      m2 = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+      values = list(guData.values())
+      minVal = min(values)
+      maxVal = max(values)
+
+      colormap = cm.LinearColormap(
+          colors=["green", "yellow", "red"],
+          vmin=minVal,
+          vmax=maxVal
+      )
+
+      def scaleStyle(feature):
+          guId = feature["properties"]["id"]
+          value = guData.get(guId, minVal)
+          return {
+              "fillColor": colormap(value),
+              "color": "black",
+              "weight": 1,
+              "fillOpacity": 0.7
+          }
+
+      folium.GeoJson(
+          guGeo,
+          style_function=scaleStyle,
+          tooltip=folium.GeoJsonTooltip(fields=["name"])
+      ).add_to(m2)
+
+      m2
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: 4단계. 컬러 스케일의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 4단계. 컬러 스케일 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: step5_add_legend
+  title: 5단계. 범례 추가
+  structuredPrimary: true
+  subtitle: ColorMap 범례
+  goal: 5단계. 범례 추가에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    ColorMap에 caption을 추가하고 지도에 add_to()하면 범례가 표시됩니다.
+
+    caption은 범례 제목입니다. 범례는 지도 우측 하단에 표시됩니다.
+  snippet: |-
+    m3 = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+    legendColormap = cm.LinearColormap(
+        colors=["#2ecc71", "#f1c40f", "#e74c3c"],
+        vmin=100000,
+        vmax=250000,
+        caption="인구수"
+    )
+
+    def legendStyle(feature):
+        guId = feature["properties"]["id"]
+        value = guData.get(guId, 100000)
+        return {
+            "fillColor": legendColormap(value),
+            "color": "white",
+            "weight": 2,
+            "fillOpacity": 0.7
+        }
+
+    folium.GeoJson(
+        guGeo,
+        style_function=legendStyle,
+        tooltip=folium.GeoJsonTooltip(fields=["name"])
+    ).add_to(m3)
+
+    legendColormap.add_to(m3)
+
+    m3
+  exercise:
+    prompt: 5단계. 범례 추가 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      m3 = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+      legendColormap = cm.LinearColormap(
+          colors=["#2ecc71", "#f1c40f", "#e74c3c"],
+          vmin=100000,
+          vmax=250000,
+          caption="인구수"
+      )
+
+      def legendStyle(feature):
+          guId = feature["properties"]["id"]
+          value = guData.get(guId, 100000)
+          return {
+              "fillColor": legendColormap(value),
+              "color": "white",
+              "weight": 2,
+              "fillOpacity": 0.7
+          }
+
+      folium.GeoJson(
+          guGeo,
+          style_function=legendStyle,
+          tooltip=folium.GeoJsonTooltip(fields=["name"])
+      ).add_to(m3)
+
+      legendColormap.add_to(m3)
+
+      m3
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: 5단계. 범례 추가의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 5단계. 범례 추가 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: step6_step_colormap
+  title: 6단계. 단계별 컬러맵
+  structuredPrimary: true
+  subtitle: StepColormap
+  goal: 6단계. 단계별 컬러맵에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    StepColormap은 구간별로 색상을 나눕니다. 연속이 아닌 이산적인 범주에 적합합니다.
+
+    index는 구간 경계값 리스트입니다. 4개 색상이면 3개 경계가 필요합니다.
+  snippet: |-
+    m4 = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+    stepColormap = cm.StepColormap(
+        colors=["green", "yellow", "orange", "red"],
+        index=[100000, 150000, 200000, 250000],
+        vmin=100000,
+        vmax=250000,
+        caption="인구 구간"
+    )
+
+    def stepStyle(feature):
+        guId = feature["properties"]["id"]
+        value = guData.get(guId, 100000)
+        return {
+            "fillColor": stepColormap(value),
+            "color": "black",
+            "weight": 1,
+            "fillOpacity": 0.7
+        }
+
+    folium.GeoJson(
+        guGeo,
+        style_function=stepStyle,
+        tooltip=folium.GeoJsonTooltip(fields=["name"])
+    ).add_to(m4)
+
+    stepColormap.add_to(m4)
+
+    m4
+  exercise:
+    prompt: 6단계. 단계별 컬러맵 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      m4 = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+      stepColormap = cm.StepColormap(
+          colors=["green", "yellow", "orange", "red"],
+          index=[100000, 150000, 200000, 250000],
+          vmin=100000,
+          vmax=250000,
+          caption="인구 구간"
+      )
+
+      def stepStyle(feature):
+          guId = feature["properties"]["id"]
+          value = guData.get(guId, 100000)
+          return {
+              "fillColor": stepColormap(value),
+              "color": "black",
+              "weight": 1,
+              "fillOpacity": 0.7
+          }
+
+      folium.GeoJson(
+          guGeo,
+          style_function=stepStyle,
+          tooltip=folium.GeoJsonTooltip(fields=["name"])
+      ).add_to(m4)
+
+      stepColormap.add_to(m4)
+
+      m4
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: 6단계. 단계별 컬러맵의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 6단계. 단계별 컬러맵 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: step7_tooltip_with_value
+  title: 7단계. 값 표시 툴팁
+  structuredPrimary: true
+  subtitle: 데이터 포함
+  goal: 7단계. 값 표시 툴팁에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    툴팁에 지역명과 데이터 값을 함께 표시합니다.
+
+    GeoJSON properties에 직접 데이터를 넣으면 tooltip에서 바로 사용할 수 있습니다.
+  snippet: |-
+    m5 = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+    guGeoWithData = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {"id": "jongno", "name": "종로구", "population": 150000},
+                "geometry": guGeo["features"][0]["geometry"]
+            },
+            {
+                "type": "Feature",
+                "properties": {"id": "jung", "name": "중구", "population": 130000},
+                "geometry": guGeo["features"][1]["geometry"]
+            },
+            {
+                "type": "Feature",
+                "properties": {"id": "yongsan", "name": "용산구", "population": 230000},
+                "geometry": guGeo["features"][2]["geometry"]
+            }
+        ]
+    }
+
+    valueColormap = cm.LinearColormap(
+        colors=["lightblue", "blue", "darkblue"],
+        vmin=100000,
+        vmax=250000,
+        caption="인구"
+    )
+
+    def valueStyle(feature):
+        pop = feature["properties"]["population"]
+        return {
+            "fillColor": valueColormap(pop),
+            "color": "white",
+            "weight": 2,
+            "fillOpacity": 0.7
+        }
+
+    folium.GeoJson(
+        guGeoWithData,
+        style_function=valueStyle,
+        tooltip=folium.GeoJsonTooltip(
+            fields=["name", "population"],
+            aliases=["구:", "인구:"]
+        )
+    ).add_to(m5)
+
+    valueColormap.add_to(m5)
+
+    m5
+  exercise:
+    prompt: 7단계. 값 표시 툴팁 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      m5 = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+      guGeoWithData = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "properties": {"id": "jongno", "name": "종로구", "population": 150000},
+                  "geometry": guGeo["features"][0]["geometry"]
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"id": "jung", "name": "중구", "population": 130000},
+                  "geometry": guGeo["features"][1]["geometry"]
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"id": "yongsan", "name": "용산구", "population": 230000},
+                  "geometry": guGeo["features"][2]["geometry"]
+              }
+          ]
+      }
+
+      valueColormap = cm.LinearColormap(
+          colors=["lightblue", "blue", "darkblue"],
+          vmin=100000,
+          vmax=250000,
+          caption="인구"
+      )
+
+      def valueStyle(feature):
+          pop = feature["properties"]["population"]
+          return {
+              "fillColor": valueColormap(pop),
+              "color": "white",
+              "weight": 2,
+              "fillOpacity": 0.7
+          }
+
+      folium.GeoJson(
+          guGeoWithData,
+          style_function=valueStyle,
+          tooltip=folium.GeoJsonTooltip(
+              fields=["name", "population"],
+              aliases=["구:", "인구:"]
+          )
+      ).add_to(m5)
+
+      valueColormap.add_to(m5)
+
+      m5
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: 7단계. 값 표시 툴팁의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 7단계. 값 표시 툴팁 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: step8_highlight
+  title: 8단계. 하이라이트 효과
+  structuredPrimary: true
+  subtitle: 인터랙션 추가
+  goal: 8단계. 하이라이트 효과에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    highlight_function으로 마우스 호버 시 강조 효과를 추가합니다.
+
+    하이라이트로 사용자가 어느 지역을 보고 있는지 명확하게 알 수 있습니다.
+  snippet: |-
+    m6 = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+    hoverColormap = cm.LinearColormap(
+        colors=["#ecf0f1", "#3498db", "#2c3e50"],
+        vmin=100000,
+        vmax=250000,
+        caption="인구"
+    )
+
+    def hoverNormalStyle(feature):
+        pop = feature["properties"]["population"]
+        return {
+            "fillColor": hoverColormap(pop),
+            "color": "white",
+            "weight": 1,
+            "fillOpacity": 0.7
+        }
+
+    def hoverHighlightStyle(feature):
+        return {
+            "fillColor": "#f1c40f",
+            "color": "black",
+            "weight": 3,
+            "fillOpacity": 0.9
+        }
+
+    folium.GeoJson(
+        guGeoWithData,
+        style_function=hoverNormalStyle,
+        highlight_function=hoverHighlightStyle,
+        tooltip=folium.GeoJsonTooltip(
+            fields=["name", "population"],
+            aliases=["구:", "인구:"],
+            style="font-size: 14px; font-weight: bold;"
+        )
+    ).add_to(m6)
+
+    hoverColormap.add_to(m6)
+
+    m6
+  exercise:
+    prompt: 8단계. 하이라이트 효과 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      m6 = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+      hoverColormap = cm.LinearColormap(
+          colors=["#ecf0f1", "#3498db", "#2c3e50"],
+          vmin=100000,
+          vmax=250000,
+          caption="인구"
+      )
+
+      def hoverNormalStyle(feature):
+          pop = feature["properties"]["population"]
+          return {
+              "fillColor": hoverColormap(pop),
+              "color": "white",
+              "weight": 1,
+              "fillOpacity": 0.7
+          }
+
+      def hoverHighlightStyle(feature):
+          return {
+              "fillColor": "#f1c40f",
+              "color": "black",
+              "weight": 3,
+              "fillOpacity": 0.9
+          }
+
+      folium.GeoJson(
+          guGeoWithData,
+          style_function=hoverNormalStyle,
+          highlight_function=hoverHighlightStyle,
+          tooltip=folium.GeoJsonTooltip(
+              fields=["name", "population"],
+              aliases=["구:", "인구:"],
+              style="font-size: 14px; font-weight: bold;"
+          )
+      ).add_to(m6)
+
+      hoverColormap.add_to(m6)
+
+      m6
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: 8단계. 하이라이트 효과의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 8단계. 하이라이트 효과 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: step9_multi_data
+  title: 9단계. 다중 데이터 시각화
+  structuredPrimary: true
+  subtitle: 레이어 전환
+  goal: 9단계. 다중 데이터 시각화에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    여러 종류의 데이터를 레이어로 구분하고 전환할 수 있게 합니다.
+
+    LayerControl로 인구/면적 레이어를 전환할 수 있습니다.
+  snippet: |-
+    m7 = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+    multiGeo = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {"name": "종로구", "population": 150000, "area": 23.9},
+                "geometry": guGeo["features"][0]["geometry"]
+            },
+            {
+                "type": "Feature",
+                "properties": {"name": "중구", "population": 130000, "area": 9.96},
+                "geometry": guGeo["features"][1]["geometry"]
+            },
+            {
+                "type": "Feature",
+                "properties": {"name": "용산구", "population": 230000, "area": 21.87},
+                "geometry": guGeo["features"][2]["geometry"]
+            }
+        ]
+    }
+
+    popColormap = cm.LinearColormap(
+        colors=["lightgreen", "darkgreen"],
+        vmin=100000,
+        vmax=250000
+    )
+
+    areaColormap = cm.LinearColormap(
+        colors=["lightyellow", "darkorange"],
+        vmin=5,
+        vmax=30
+    )
+
+    popGroup = folium.FeatureGroup(name="인구")
+    areaGroup = folium.FeatureGroup(name="면적", show=False)
+
+    folium.GeoJson(
+        multiGeo,
+        style_function=lambda f: {
+            "fillColor": popColormap(f["properties"]["population"]),
+            "color": "white", "weight": 2, "fillOpacity": 0.7
+        },
+        tooltip=folium.GeoJsonTooltip(fields=["name", "population"])
+    ).add_to(popGroup)
+
+    folium.GeoJson(
+        multiGeo,
+        style_function=lambda f: {
+            "fillColor": areaColormap(f["properties"]["area"]),
+            "color": "white", "weight": 2, "fillOpacity": 0.7
+        },
+        tooltip=folium.GeoJsonTooltip(fields=["name", "area"])
+    ).add_to(areaGroup)
+
+    popGroup.add_to(m7)
+    areaGroup.add_to(m7)
+
+    folium.LayerControl().add_to(m7)
+
+    m7
+  exercise:
+    prompt: 9단계. 다중 데이터 시각화 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      m7 = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+      multiGeo = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "properties": {"name": "종로구", "population": 150000, "area": 23.9},
+                  "geometry": guGeo["features"][0]["geometry"]
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"name": "중구", "population": 130000, "area": 9.96},
+                  "geometry": guGeo["features"][1]["geometry"]
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"name": "용산구", "population": 230000, "area": 21.87},
+                  "geometry": guGeo["features"][2]["geometry"]
+              }
+          ]
+      }
+
+      popColormap = cm.LinearColormap(
+          colors=["lightgreen", "darkgreen"],
+          vmin=100000,
+          vmax=250000
+      )
+
+      areaColormap = cm.LinearColormap(
+          colors=["lightyellow", "darkorange"],
+          vmin=5,
+          vmax=30
+      )
+
+      popGroup = folium.FeatureGroup(name="인구")
+      areaGroup = folium.FeatureGroup(name="면적", show=False)
+
+      folium.GeoJson(
+          multiGeo,
+          style_function=lambda f: {
+              "fillColor": popColormap(f["properties"]["population"]),
+              "color": "white", "weight": 2, "fillOpacity": 0.7
+          },
+          tooltip=folium.GeoJsonTooltip(fields=["name", "population"])
+      ).add_to(popGroup)
+
+      folium.GeoJson(
+          multiGeo,
+          style_function=lambda f: {
+              "fillColor": areaColormap(f["properties"]["area"]),
+              "color": "white", "weight": 2, "fillOpacity": 0.7
+          },
+          tooltip=folium.GeoJsonTooltip(fields=["name", "area"])
+      ).add_to(areaGroup)
+
+      popGroup.add_to(m7)
+      areaGroup.add_to(m7)
+
+      folium.LayerControl().add_to(m7)
+
+      m7
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 9단계. 다중 데이터 시각화에서 \`m7\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 9단계. 다중 데이터 시각화 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step10_complete
+  title: 10단계. 완성 예제
+  structuredPrimary: true
+  subtitle: 지역 통계 지도
+  goal: 10단계. 완성 예제에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: 완성된 단계구분도를 만듭니다. 컬러맵, 범례, 툴팁, 하이라이트를 모두 포함합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    statMap = folium.Map(
+        location=[37.555, 126.98],
+        zoom_start=12,
+        tiles="CartoDB Positron"
+    )
+
+    statsGeo = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {"name": "종로구", "value": 85, "category": "상"},
+                "geometry": guGeo["features"][0]["geometry"]
+            },
+            {
+                "type": "Feature",
+                "properties": {"name": "중구", "value": 72, "category": "중"},
+                "geometry": guGeo["features"][1]["geometry"]
+            },
+            {
+                "type": "Feature",
+                "properties": {"name": "용산구", "value": 91, "category": "상"},
+                "geometry": guGeo["features"][2]["geometry"]
+            }
+        ]
+    }
+
+    finalColormap = cm.StepColormap(
+        colors=["#fee8c8", "#fdbb84", "#e34a33"],
+        index=[60, 75, 90, 100],
+        vmin=60,
+        vmax=100,
+        caption="만족도 점수"
+    )
+
+    def finalStyle(feature):
+        val = feature["properties"]["value"]
+        return {
+            "fillColor": finalColormap(val),
+            "color": "#333",
+            "weight": 2,
+            "fillOpacity": 0.8
+        }
+
+    def finalHighlight(feature):
+        return {
+            "fillColor": "#2ecc71",
+            "color": "black",
+            "weight": 3,
+            "fillOpacity": 0.9
+        }
+
+    folium.GeoJson(
+        statsGeo,
+        style_function=finalStyle,
+        highlight_function=finalHighlight,
+        tooltip=folium.GeoJsonTooltip(
+            fields=["name", "value", "category"],
+            aliases=["구:", "점수:", "등급:"],
+            style="background-color: white; padding: 5px;"
+        ),
+        popup=folium.GeoJsonPopup(
+            fields=["name", "value"],
+            aliases=["지역:", "만족도:"]
+        )
+    ).add_to(statMap)
+
+    finalColormap.add_to(statMap)
+
+    statMap
+  exercise:
+    prompt: 10단계. 완성 예제 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      statMap = folium.Map(
+          location=[37.555, 126.98],
+          zoom_start=12,
+          tiles="CartoDB Positron"
+      )
+
+      statsGeo = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "properties": {"name": "종로구", "value": 85, "category": "상"},
+                  "geometry": guGeo["features"][0]["geometry"]
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"name": "중구", "value": 72, "category": "중"},
+                  "geometry": guGeo["features"][1]["geometry"]
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"name": "용산구", "value": 91, "category": "상"},
+                  "geometry": guGeo["features"][2]["geometry"]
+              }
+          ]
+      }
+
+      finalColormap = cm.StepColormap(
+          colors=["#fee8c8", "#fdbb84", "#e34a33"],
+          index=[60, 75, 90, 100],
+          vmin=60,
+          vmax=100,
+          caption="만족도 점수"
+      )
+
+      def finalStyle(feature):
+          val = feature["properties"]["value"]
+          return {
+              "fillColor": finalColormap(val),
+              "color": "#333",
+              "weight": 2,
+              "fillOpacity": 0.8
+          }
+
+      def finalHighlight(feature):
+          return {
+              "fillColor": "#2ecc71",
+              "color": "black",
+              "weight": 3,
+              "fillOpacity": 0.9
+          }
+
+      folium.GeoJson(
+          statsGeo,
+          style_function=finalStyle,
+          highlight_function=finalHighlight,
+          tooltip=folium.GeoJsonTooltip(
+              fields=["name", "value", "category"],
+              aliases=["구:", "점수:", "등급:"],
+              style="background-color: white; padding: 5px;"
+          ),
+          popup=folium.GeoJsonPopup(
+              fields=["name", "value"],
+              aliases=["지역:", "만족도:"]
+          )
+      ).add_to(statMap)
+
+      finalColormap.add_to(statMap)
+
+      statMap
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: 10단계. 완성 예제의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 10단계. 완성 예제 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: step11_workflow
+  title: 11단계. 단계구분도 검증 루프
+  structuredPrimary: true
+  subtitle: 지역 키 매칭과 구간 해석
+  goal: 11단계. 단계구분도 검증 루프에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    단계구분도는 색이 칠해진다고 끝이 아닙니다. GeoJSON의 지역 키와 데이터 키가 정확히 맞는지, 임계값을 바꾸면 어떤 지역의 등급이 달라지는지 예측하고 검증해야 실무 리포트로 쓸 수 있습니다.
+
+    단계구분도는 색상보다 키 매칭과 기준선 검증이 먼저입니다. 데이터-경계 불일치를 잡고 임계값 실험을 거쳐야 의사결정용 지도가 됩니다.
+  snippet: |-
+    serviceGeo = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {"id": "north", "name": "북구"},
+                "geometry": {"type": "Polygon", "coordinates": [[[126.94, 37.58], [126.99, 37.58], [126.99, 37.62], [126.94, 37.62], [126.94, 37.58]]]},
+            },
+            {
+                "type": "Feature",
+                "properties": {"id": "central", "name": "중앙구"},
+                "geometry": {"type": "Polygon", "coordinates": [[[126.94, 37.54], [126.99, 37.54], [126.99, 37.58], [126.94, 37.58], [126.94, 37.54]]]},
+            },
+            {
+                "type": "Feature",
+                "properties": {"id": "south", "name": "남구"},
+                "geometry": {"type": "Polygon", "coordinates": [[[126.94, 37.50], [126.99, 37.50], [126.99, 37.54], [126.94, 37.54], [126.94, 37.50]]]},
+            },
+        ],
+    }
+
+    serviceData = {
+        "north": {"complaints": 180, "population": 120000},
+        "central": {"complaints": 260, "population": 90000},
+        "south": {"complaints": 130, "population": 110000},
+    }
+
+    complaintDensity = {
+        regionId: round(values["complaints"] / values["population"] * 10000, 1)
+        for regionId, values in serviceData.items()
+    }
+    complaintDensity
+  exercise:
+    prompt: 11단계. 단계구분도 검증 루프 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      serviceGeo = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "properties": {"id": "north", "name": "북구"},
+                  "geometry": {"type": "Polygon", "coordinates": [[[126.94, 37.58], [126.99, 37.58], [126.99, 37.62], [126.94, 37.62], [126.94, 37.58]]]},
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"id": "central", "name": "중앙구"},
+                  "geometry": {"type": "Polygon", "coordinates": [[[126.94, 37.54], [126.99, 37.54], [126.99, 37.58], [126.94, 37.58], [126.94, 37.54]]]},
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"id": "south", "name": "남구"},
+                  "geometry": {"type": "Polygon", "coordinates": [[[126.94, 37.50], [126.99, 37.50], [126.99, 37.54], [126.94, 37.54], [126.94, 37.50]]]},
+              },
+          ],
+      }
+
+      serviceData = {
+          "north": {"complaints": 180, "population": 120000},
+          "central": {"complaints": 260, "population": 90000},
+          "south": {"complaints": 130, "population": 110000},
+      }
+
+      complaintDensity = {
+          regionId: round(values["complaints"] / values["population"] * 10000, 1)
+          for regionId, values in serviceData.items()
+      }
+      complaintDensity
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 11단계. 단계구분도 검증 루프의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 11단계. 단계구분도 검증 루프 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 단계구분도
+  goal: 실습에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import folium
+    import branca.colormap as cm
+    salesGeo = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {"region": "북부", "sales": 1200},
+                "geometry": {"type": "Polygon", "coordinates": [[
+                    [126.96, 37.57], [127.00, 37.57],
+                    [127.00, 37.60], [126.96, 37.60], [126.96, 37.57]
+                ]]}
+            },
+            {
+                "type": "Feature",
+                "properties": {"region": "중부", "sales": 800},
+                "geometry": {"type": "Polygon", "coordinates": [[
+                    [126.96, 37.54], [127.00, 37.54],
+                    [127.00, 37.57], [126.96, 37.57], [126.96, 37.54]
+                ]]}
+            },
+            {
+                "type": "Feature",
+                "properties": {"region": "남부", "sales": 1500},
+                "geometry": {"type": "Polygon", "coordinates": [[
+                    [126.96, 37.51], [127.00, 37.51],
+                    [127.00, 37.54], [126.96, 37.54], [126.96, 37.51]
+                ]]}
+            }
+        ]
+    }
+    salesGeo
+  exercise:
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import folium
+      import branca.colormap as cm
+      salesGeo = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "properties": {"region": "북부", "sales": 1200},
+                  "geometry": {"type": "Polygon", "coordinates": [[
+                      [126.96, 37.57], [127.00, 37.57],
+                      [127.00, 37.60], [126.96, 37.60], [126.96, 37.57]
+                  ]]}
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"region": "중부", "sales": 800},
+                  "geometry": {"type": "Polygon", "coordinates": [[
+                      [126.96, 37.54], [127.00, 37.54],
+                      [127.00, 37.57], [126.96, 37.57], [126.96, 37.54]
+                  ]]}
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"region": "남부", "sales": 1500},
+                  "geometry": {"type": "Polygon", "coordinates": [[
+                      [126.96, 37.51], [127.00, 37.51],
+                      [127.00, 37.54], [126.96, 37.54], [126.96, 37.51]
+                  ]]}
+              }
+          ]
+      }
+      salesGeo
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 실습에서 \`salesGeo\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 \`salesGeo\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: folium_07-choropleth-rate-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - practice
+    title: 단계구분도 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 지역 면적이 아니라 정규화된 rate를 color로 비교하는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_choropleth_rate(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_choropleth_rate(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_choropleth_rate(rows):
+            required = ['regionId', 'rate', 'classification']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'classification'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['regionId'] for row in usable]
+            y_values = [row['rate'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.folium.folium_07.choropleth-rate-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.folium.folium_07.choropleth-rate-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_choropleth_rate
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - regionId: A
+              rate: 0.1
+              classification: low
+            - regionId: B
+              rate: 0.5
+              classification: high
+            - regionId: C
+              rate: null
+              classification: missing
+          expectedReturn:
+            usableCount: 2
+            excludedCount: 1
+            groupCounts:
+              high: 1
+              low: 1
+            xExtent:
+            - A
+            - B
+            yExtent:
+            - 0.1
+            - 0.5
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: folium_07-choropleth-rate-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - folium_07-choropleth-rate-data-evidence-mastery
+    title: 단계구분도 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 지역별 장애 건수를 요청 수로 정규화한 rate 단계구분도를 만든다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_choropleth_rate(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_choropleth_rate(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_choropleth_rate(candidate):
+            expected = {'mark': 'choropleth', 'x': 'regionId', 'y': 'rate', 'group': 'classification', 'transforms': ['classify', 'join-coverage', 'normalize'], 'interaction': 'tooltip'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.folium.folium_07.choropleth-rate-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.folium.folium_07.choropleth-rate-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_choropleth_rate
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: choropleth
+              x: regionId
+              y: rate
+              group: classification
+              transforms:
+              - classify
+              - join-coverage
+              - normalize
+              interaction: tooltip
+              description: 지역별 장애 건수를 요청 수로 정규화한 rate 단계구분도를 만든다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: choropleth
+              x: regionId
+              y: rate
+              group: classification
+              transforms:
+              - classify
+              - join-coverage
+              - normalize
+              interaction: tooltip
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: rate
+              y: regionId
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - interaction
+            - description
+            encoding:
+              mark: choropleth
+              x: regionId
+              y: rate
+              group: classification
+              transforms:
+              - classify
+              - join-coverage
+              - normalize
+              interaction: tooltip
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: folium_07-choropleth-rate-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - folium_07-choropleth-rate-encoding-transfer-transfer
+    title: 단계구분도 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 지역 면적이 아니라 정규화된 rate를 color로 비교하는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_choropleth_rate(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_choropleth_rate(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_choropleth_rate(situation):
+            table = {'regional-rate': {'encoding': 'choropleth', 'evidence': 'denominator and join coverage', 'risk': 'raw count'}, 'skewed-rate': {'encoding': 'documented class breaks', 'evidence': 'break values', 'risk': 'arbitrary bins'}, 'missing-region': {'encoding': 'separate missing color', 'evidence': 'missing count', 'risk': 'zero color'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.folium.folium_07.choropleth-rate-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.folium.folium_07.choropleth-rate-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_choropleth_rate
+        cases:
+        - id: recalls-regional-rate
+          arguments:
+          - value: regional-rate
+          expectedReturn:
+            encoding: choropleth
+            evidence: denominator and join coverage
+            risk: raw count
+        - id: recalls-skewed-rate
+          arguments:
+          - value: skewed-rate
+          expectedReturn:
+            encoding: documented class breaks
+            evidence: break values
+            risk: arbitrary bins
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,874 @@
+var e=`meta:
+  packages:
+  - numpy
+  - pandas
+  id: numpy_04
+  title: 음악특성분석
+  order: 4
+  category: numpy
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - numpy
+  - reshape
+  - normalization
+  - corrcoef
+  - broadcasting
+  - nan
+  - 검증
+  - 특성분석
+  seo:
+    title: NumPy 정규화와 상관관계 - Spotify 음악 분석
+    description: NumPy의 배열 변형과 정규화를 배우며 Spotify 음악 특성 데이터의 상관관계를 분석합니다.
+    keywords:
+    - numpy
+    - 정규화
+    - 상관계수
+    - corrcoef
+    - spotify
+    - 음악분석
+intro:
+  emoji: 🎵
+  goal: Spotify 음악 특성 데이터로 정규화와 상관관계를 익힙니다.
+  description: 144곡의 로컬 음악 특성 데이터를 분석합니다. reshape으로 배열 형태를 변경하고, 브로드캐스팅으로 정규화를 수행하며, 상관계수를 계산합니다.
+  direction: 음악특성분석에서 배열 입력을 만들고 벡터 연산 결과를 수치로 검증합니다.
+  benefits:
+  - 배열 입력 확인 후 벡터화 계산에 맞는 코드 입력을 고릅니다.
+  - 음악특성분석 결과를 shape와 수치 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 계산 파이프라인에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(배열 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 로드 처리 실행
+      detail: 벡터화 계산 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 특성 배열 추출 결과 검증
+      detail: shape와 수치 결과 기준으로 실행 결과를 비교합니다.
+    - label: 음악특성분석 재사용
+      detail: 완성 코드를 계산 파이프라인에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 배열 계산 환경
+      detail: numpy, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 음악특성분석 실행
+      detail: 셀을 실행해 shape와 수치 결과와 예외 상태를 확인합니다.
+    - label: 음악특성분석 완료
+      detail: 검증된 코드를 계산 파이프라인로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: NumPy와 pandas를 불러옵니다. pandas는 CSV 로딩용으로만 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import numpy as np
+    import pandas as pd
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: |-
+      import numpy as np
+      import pandas as pd
+    hints:
+    - 바꿀 지점은 배열 입력을 만드는 첫 줄과 벡터화 계산 줄에서 찾으세요.
+    - 실행 뒤 shape와 수치 결과 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 shape와 수치 결과 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step2_data
+  title: 2단계. 데이터 로드
+  structuredPrimary: true
+  subtitle: Spotify 데이터셋
+  goal: 2단계. 데이터 로드에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 로컬 Spotify 샘플에는 144곡의 음악 특성이 담겨 있습니다. danceability(춤추기
+    좋은 정도), energy(에너지), valence(밝고 긍정적인 정도) 등 Spotify가 자체 알고리즘으로 분석한 0~1 사이의 수치들입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    df = loadLocalDataset("spotify_songs")
+    df.head()
+  exercise:
+    prompt: 2단계. 데이터 로드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      df = loadLocalDataset("spotify_songs")
+      df.head()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 로드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 로드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_extract
+  title: 3단계. 특성 배열 추출
+  structuredPrimary: true
+  subtitle: 다중 컬럼
+  goal: 3단계. 특성 배열 추출에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 여러 개의 열(컬럼)을 동시에 선택할 수 있습니다. df[['A', 'B', 'C']]처럼 열 이름 리스트를 전달하면 해당 열들만 추출됩니다. 9개 음악 특성을
+    선택하면 144행 × 9열 크기의 2차원 배열이 만들어집니다. 각 행은 하나의 곡, 각 열은 하나의 특성입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    cols = ['danceability', 'energy', 'loudness', 'speechiness',
+            'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo']
+    features = df[cols].values
+    features.shape
+  exercise:
+    prompt: 3단계. 특성 배열 추출 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      cols = ['danceability', 'energy', 'loudness', 'speechiness',
+              'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo']
+      features = df[cols].values
+      features.shape
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 특성 배열 추출에서 \`cols\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 특성 배열 추출 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step4_stats
+  title: 4단계. 기본 통계
+  structuredPrimary: true
+  subtitle: axis=0
+  goal: 4단계. 기본 통계에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 각 특성의 평균과 표준편차를 계산합니다. axis=0으로 열 방향 연산을 수행합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    avg = np.mean(features, axis=0)
+    std = np.std(features, axis=0)
+    pd.DataFrame({'Feature': cols, 'Mean': np.round(avg, 2), 'Std': np.round(std, 2)})
+  exercise:
+    prompt: 4단계. 기본 통계 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      avg = np.mean(features, axis=0)
+      std = np.std(features, axis=0)
+      pd.DataFrame({'Feature': cols, 'Mean': np.round(avg, 2), 'Std': np.round(std, 2)})
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 기본 통계의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 4단계. 기본 통계의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step5_nan_check
+  title: 5단계. 결측값 확인
+  structuredPrimary: true
+  subtitle: np.isnan()
+  goal: 5단계. 결측값 확인에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  explanation: |-
+    NaN(Not a Number)은 '값이 없음'을 나타내는 특수한 표시입니다. 엑셀의 빈 셀과 비슷합니다. 실제 데이터에서는 측정 실패, 입력 누락 등으로 결측값이 자주 발생합니다. np.isnan()은 각 값이 NaN인지 확인해서 True/False 배열을 반환합니다. sum()으로 전체 NaN 개수를 셀 수 있습니다.
+
+    np.isnan()은 NaN(결측값) 여부를 불리언 배열로 반환합니다. sum()으로 전체 NaN 개수를 확인할 수 있습니다.
+  snippet: np.sum(np.isnan(features))
+  exercise:
+    prompt: 5단계. 결측값 확인 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    starterCode: np.sum(np.isnan(features))
+    hints:
+    - 바꿀 지점은 배열 입력을 만드는 첫 줄과 벡터화 계산 줄에서 찾으세요.
+    - 실행 뒤 shape와 수치 결과 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 결측값 확인의 수정 코드가 벡터화 계산 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 5단계. 결측값 확인 실행 결과가 shape와 수치 결과 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step6_nan_remove
+  title: 6단계. 결측값 제거
+  structuredPrimary: true
+  subtitle: np.any()
+  goal: 6단계. 결측값 제거에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    any()는 '하나라도 있으면 True'를 반환합니다. np.any(np.isnan(features), axis=1)은 각 행(axis=1)에서 NaN이 하나라도 있으면 True입니다. 이 True/False 배열 앞에 ~(틸다)를 붙이면 반전되어, NaN이 없는 행만 True가 됩니다. 결과적으로 NaN이 없는 깨끗한 행들만 남습니다.
+
+    np.any(arr, axis=1)은 각 행에서 하나라도 True가 있으면 True를 반환합니다. ~(틸다)는 불리언 배열을 반전시킵니다.
+  snippet: |-
+    mask = np.any(np.isnan(features), axis=1)
+    clean = features[~mask]
+    clean.shape
+  exercise:
+    prompt: 6단계. 결측값 제거 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      mask = np.any(np.isnan(features), axis=1)
+      clean = features[~mask]
+      clean.shape
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 결측값 제거에서 \`mask\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 결측값 제거 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step7_minmax
+  title: 7단계. Min-Max 정규화
+  structuredPrimary: true
+  subtitle: 0~1 범위
+  goal: 7단계. MinMax 정규화에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    정규화(Normalization)는 서로 다른 단위의 데이터를 같은 범위로 맞추는 작업입니다. tempo(템포)는 50~200 범위이고 danceability는 0~1 범위라서 직접 비교하기 어렵습니다. Min-Max 정규화는 (값 - 최소) / (최대 - 최소)로 모든 값을 0~1 범위로 변환합니다. 브로드캐스팅 덕분에 for문 없이 한 줄로 전체 배열에 적용됩니다.
+
+    Min-Max 정규화는 (값 - 최소) / (최대 - 최소)로 계산합니다. 브로드캐스팅 덕분에 반복문 없이 전체 배열에 연산이 적용됩니다.
+  snippet: |-
+    lo = np.min(clean, axis=0)
+    hi = np.max(clean, axis=0)
+    norm = (clean - lo) / (hi - lo)
+    norm[:5]
+  exercise:
+    prompt: 7단계. MinMax 정규화 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      lo = np.min(clean, axis=0)
+      hi = np.max(clean, axis=0)
+      norm = (clean - lo) / (hi - lo)
+      norm[:5]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. MinMax 정규화에서 \`lo\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. MinMax 정규화 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step8_norm_verify
+  title: 8단계. 정규화 확인
+  structuredPrimary: true
+  subtitle: 범위 검증
+  goal: 8단계. 정규화 확인에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 정규화 후 모든 특성이 0~1 범위에 있는지 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    avg = np.mean(norm, axis=0)
+    mins = np.min(norm, axis=0)
+    maxs = np.max(norm, axis=0)
+    pd.DataFrame({
+        'Feature': cols,
+        'Min': np.round(mins, 2),
+        'Max': np.round(maxs, 2),
+        'Mean': np.round(avg, 2)
+    })
+  exercise:
+    prompt: 8단계. 정규화 확인 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      avg = np.mean(norm, axis=0)
+      mins = np.min(norm, axis=0)
+      maxs = np.max(norm, axis=0)
+      pd.DataFrame({
+          'Feature': cols,
+          'Min': np.round(mins, 2),
+          'Max': np.round(maxs, 2),
+          'Mean': np.round(avg, 2)
+      })
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 정규화 확인의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 8단계. 정규화 확인의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step9_zscore
+  title: 9단계. Z-score 표준화
+  structuredPrimary: true
+  subtitle: 평균 0, 표준편차 1
+  goal: 9단계. Zscore 표준화에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    Z-score 표준화는 (값 - 평균) / 표준편차로 계산합니다. 결과 값은 '평균에서 표준편차 몇 개 만큼 떨어져 있는가'를 의미합니다. Z=2면 평균보다 표준편차 2개만큼 큰 값이고, Z=-1이면 평균보다 표준편차 1개만큼 작은 값입니다. 표준화 후에는 평균이 0, 표준편차가 1이 됩니다.
+
+    Z-score 표준화는 (값 - 평균) / 표준편차로 계산합니다. 결과의 평균은 0, 표준편차는 1이 됩니다.
+  snippet: |-
+    mu = np.mean(clean, axis=0)
+    sigma = np.std(clean, axis=0)
+    z = (clean - mu) / sigma
+    z[:5]
+  exercise:
+    prompt: 9단계. Zscore 표준화 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      mu = np.mean(clean, axis=0)
+      sigma = np.std(clean, axis=0)
+      z = (clean - mu) / sigma
+      z[:5]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. Zscore 표준화에서 \`mu\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 9단계. Zscore 표준화 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step10_zscore_verify
+  title: 10단계. 표준화 확인
+  structuredPrimary: true
+  subtitle: 결과 검증
+  goal: 10단계. 표준화 확인에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  explanation: 표준화 후 평균이 0, 표준편차가 1에 가까운지 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: 'f"평균: {np.mean(z, axis=0).round(5)}, 표준편차: {np.std(z, axis=0).round(2)}"'
+  exercise:
+    prompt: 10단계. 표준화 확인 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    starterCode: 'f"평균: {np.mean(z, axis=0).round(5)}, 표준편차: {np.std(z, axis=0).round(2)}"'
+    hints:
+    - 바꿀 지점은 배열 입력을 만드는 첫 줄과 벡터화 계산 줄에서 찾으세요.
+    - 실행 뒤 shape와 수치 결과 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 표준화 확인의 수정 코드가 벡터화 계산 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 10단계. 표준화 확인 실행 결과가 shape와 수치 결과 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step11_corr_two
+  title: 11단계. 두 변수 상관계수
+  structuredPrimary: true
+  subtitle: np.corrcoef()
+  goal: 11단계. 두 변수 상관계수에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    상관계수는 두 변수가 함께 변하는 정도를 -1에서 1 사이 숫자로 나타냅니다. 1에 가까우면 양의 상관(하나가 커지면 다른 것도 커짐), -1에 가까우면 음의 상관(하나가 커지면 다른 것은 작아짐), 0에 가까우면 관계가 없습니다. np.corrcoef()는 상관계수 행렬을 반환하는데, 2x2 행렬의 비대각선 값이 실제 상관계수입니다.
+
+    np.corrcoef(x, y)는 피어슨 상관계수 행렬을 반환합니다. 대각선은 항상 1(자기 자신과의 상관), 비대각선이 두 변수 간 상관계수입니다.
+  snippet: |-
+    dance = clean[:, 0]
+    energy = clean[:, 1]
+    corr = np.corrcoef(dance, energy)
+    corr
+  exercise:
+    prompt: 11단계. 두 변수 상관계수 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      dance = clean[:, 0]
+      energy = clean[:, 1]
+      corr = np.corrcoef(dance, energy)
+      corr
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 두 변수 상관계수에서 \`dance\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 11단계. 두 변수 상관계수 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step12_corr_value
+  title: 12단계. 상관계수 추출
+  structuredPrimary: true
+  subtitle: 행렬 인덱싱
+  goal: 12단계. 상관계수 추출에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 상관계수 행렬에서 두 변수 간 상관계수만 추출합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    r = corr[0, 1]
+    f"danceability-energy 상관계수: {r:.3f}"
+  exercise:
+    prompt: 12단계. 상관계수 추출 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      r = corr[0, 1]
+      f"danceability-energy 상관계수: {r:.3f}"
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 12단계. 상관계수 추출에서 \`r\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 12단계. 상관계수 추출 실행 뒤 \`r\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step13_corr_all
+  title: 13단계. 전체 상관계수 행렬
+  structuredPrimary: true
+  subtitle: 전치 활용
+  goal: 13단계. 전체 상관계수 행렬에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    9개 특성 간의 모든 상관계수를 한 번에 계산합니다. corrcoef()는 행을 변수로 취급하는데, 현재 데이터는 열이 특성입니다. .T(전치)로 행과 열을 바꿔주면 됩니다. 전치란 행과 열을 서로 뒤집는 것으로, (144, 9) 배열이 (9, 144)으로 바뀝니다. 결과는 9x9 상관계수 행렬입니다.
+
+    corrcoef는 행을 변수로 취급합니다. 특성이 열에 있으므로 .T로 전치하여 행과 열을 바꿔줍니다.
+  snippet: |-
+    matrix = np.corrcoef(clean.T)
+    matrix.shape
+  exercise:
+    prompt: 13단계. 전체 상관계수 행렬 예제에서 \`matrix\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      matrix = np.corrcoef(clean.T)
+      matrix.shape
+    hints:
+    - 바꿀 지점은 \`matrix = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`matrix\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 13단계. 전체 상관계수 행렬에서 \`matrix\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 13단계. 전체 상관계수 행렬 실행 뒤 \`matrix\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step14_corr_display
+  title: 14단계. 상관계수 시각화
+  structuredPrimary: true
+  subtitle: DataFrame 변환
+  goal: 14단계. 상관계수 시각화에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 상관계수 행렬을 DataFrame으로 보기 좋게 표시합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    result = pd.DataFrame(np.round(matrix, 2), columns=cols, index=cols)
+    result
+  exercise:
+    prompt: 14단계. 상관계수 시각화 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      result = pd.DataFrame(np.round(matrix, 2), columns=cols, index=cols)
+      result
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 14단계. 상관계수 시각화의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 14단계. 상관계수 시각화의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step15_corr_extreme
+  title: 15단계. 강한 상관관계 찾기
+  structuredPrimary: true
+  subtitle: np.triu(), unravel_index
+  goal: 15단계. 강한 상관관계 찾기에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    상관계수 행렬에서 가장 강한 관계를 찾습니다. 대각선은 자기 자신과의 상관(항상 1)이므로 제외해야 합니다. np.triu(matrix, k=1)은 상삼각 부분만 남깁니다(대각선 위쪽). unravel_index는 1차원 인덱스를 2차원 위치(행, 열)로 변환합니다. 가장 높은 양의 상관과 음의 상관을 가진 특성 쌍을 찾을 수 있습니다.
+
+    np.triu(arr, k=1)은 상삼각 행렬을 반환합니다. 대각선(k=0)을 제외하면 자기 자신과의 상관(1.0)이 제거됩니다.
+  snippet: |-
+    upper = np.triu(matrix, k=1)
+    idx1 = np.unravel_index(np.argmax(upper), upper.shape)
+    temp = matrix.copy()
+    np.fill_diagonal(temp, 0)
+    idx2 = np.unravel_index(np.argmin(temp), temp.shape)
+    f"가장 강한 양의 상관: {cols[idx1[0]]} - {cols[idx1[1]]} ({matrix[idx1]:.3f})"
+  exercise:
+    prompt: 15단계. 강한 상관관계 찾기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      upper = np.triu(matrix, k=1)
+      idx1 = np.unravel_index(np.argmax(upper), upper.shape)
+      temp = matrix.copy()
+      np.fill_diagonal(temp, 0)
+      idx2 = np.unravel_index(np.argmin(temp), temp.shape)
+      f"가장 강한 양의 상관: {cols[idx1[0]]} - {cols[idx1[1]]} ({matrix[idx1]:.3f})"
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 15단계. 강한 상관관계 찾기에서 \`upper\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 15단계. 강한 상관관계 찾기 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 음악 특성 정규화와 결측 처리'
+  structuredPrimary: true
+  subtitle: nanmean, min-max scaling, corrcoef, 실패 케이스
+  goal: '현업 흐름 검증: 음악 특성 정규화와 결측 처리에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    음악 특성처럼 단위가 섞인 배열은 먼저 정규화하고 결측값을 처리해야 합니다. 결측을 무시한 평균과 정규화 범위를 검증한 뒤 상관관계를 해석하세요.
+
+    변주 실험
+    템포 컬럼만 표준화(z-score)하고 나머지는 min-max로 유지하면 상관계수 해석이 달라지는지 비교하세요.
+  tips:
+  - 변주 실험 템포 컬럼만 표준화(z-score)하고 나머지는 min-max로 유지하면 상관계수 해석이 달라지는지 비교하세요.
+  snippet: |-
+    import numpy as np
+
+    features = np.array([
+        [0.8, 120.0, 0.6],
+        [0.5, np.nan, 0.7],
+        [0.9, 140.0, 0.4],
+    ])
+
+    columnMeans = np.nanmean(features, axis=0)
+    filled = np.where(np.isnan(features), columnMeans, features)
+    minimum = filled.min(axis=0)
+    maximum = filled.max(axis=0)
+    scaled = (filled - minimum) / (maximum - minimum)
+    corr = np.corrcoef(scaled, rowvar=False)
+
+    assert not np.isnan(filled).any()
+    assert np.allclose(scaled.min(axis=0), [0.0, 0.0, 0.0])
+    assert np.allclose(scaled.max(axis=0), [1.0, 1.0, 1.0])
+    assert corr.shape == (3, 3)
+  exercise:
+    prompt: '현업 흐름 검증: 음악 특성 정규화와 결측 처리 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    starterCode: |-
+      import numpy as np
+
+      features = np.array([
+          [0.8, 120.0, 0.6],
+          [0.5, np.nan, 0.7],
+          [0.9, 140.0, 0.4],
+      ])
+
+      columnMeans = np.nanmean(features, axis=0)
+      filled = np.where(np.isnan(features), columnMeans, features)
+      minimum = filled.min(axis=0)
+      maximum = filled.max(axis=0)
+      scaled = (filled - minimum) / (maximum - minimum)
+      corr = np.corrcoef(scaled, rowvar=False)
+
+      assert not np.isnan(filled).any()
+      assert np.allclose(scaled.min(axis=0), [0.0, 0.0, 0.0])
+      assert np.allclose(scaled.max(axis=0), [1.0, 1.0, 1.0])
+      assert corr.shape == (3, 3)
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 음악 특성 정규화와 결측 처리에서 \`features\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
+    resultCheck: '현업 흐름 검증: 음악 특성 정규화와 결측 처리에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.'
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: Spotify 음악 분석
+  goal: 실습에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import numpy as np
+    import pandas as pd
+
+    data = pd.DataFrame({
+        'track_name': ['Local Groove', 'Quiet Pulse', 'Bright Run', 'Deep Focus',
+                       'Night Drive', 'Warm Echo', 'Fast Steps', 'Soft Rain'],
+        'playlist_genre': ['pop', 'acoustic', 'pop', 'ambient',
+                           'rock', 'acoustic', 'edm', 'ambient'],
+        'track_popularity': [72, 44, 81, 35, 67, 58, 89, 39],
+        'danceability': [0.72, 0.42, 0.81, 0.33, 0.64, 0.58, 0.89, 0.37],
+        'energy': [0.80, 0.35, 0.76, 0.28, 0.70, 0.45, 0.91, 0.30],
+        'loudness': [-5.1, -12.4, -6.3, -15.0, -7.8, -10.2, -4.5, -14.1],
+        'speechiness': [0.05, 0.03, 0.08, 0.04, 0.06, 0.05, 0.10, 0.03],
+        'acousticness': [0.12, 0.72, 0.18, 0.86, 0.22, 0.55, 0.08, 0.90],
+        'instrumentalness': [0.01, 0.35, 0.02, 0.60, 0.12, 0.28, 0.00, 0.50],
+        'liveness': [0.10, 0.12, 0.18, 0.09, 0.16, 0.11, 0.22, 0.08],
+        'valence': [0.74, 0.30, 0.82, 0.24, 0.66, 0.48, 0.88, 0.27],
+        'tempo': [118, 86, 128, 72, 104, 94, 140, 68],
+    })
+    cols = ['danceability', 'energy', 'valence', 'tempo']
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import numpy as np
+      import pandas as pd
+
+      data = pd.DataFrame({
+          'track_name': ['Local Groove', 'Quiet Pulse', 'Bright Run', 'Deep Focus',
+                         'Night Drive', 'Warm Echo', 'Fast Steps', 'Soft Rain'],
+          'playlist_genre': ['pop', 'acoustic', 'pop', 'ambient',
+                             'rock', 'acoustic', 'edm', 'ambient'],
+          'track_popularity': [72, 44, 81, 35, 67, 58, 89, 39],
+          'danceability': [0.72, 0.42, 0.81, 0.33, 0.64, 0.58, 0.89, 0.37],
+          'energy': [0.80, 0.35, 0.76, 0.28, 0.70, 0.45, 0.91, 0.30],
+          'loudness': [-5.1, -12.4, -6.3, -15.0, -7.8, -10.2, -4.5, -14.1],
+          'speechiness': [0.05, 0.03, 0.08, 0.04, 0.06, 0.05, 0.10, 0.03],
+          'acousticness': [0.12, 0.72, 0.18, 0.86, 0.22, 0.55, 0.08, 0.90],
+          'instrumentalness': [0.01, 0.35, 0.02, 0.60, 0.12, 0.28, 0.00, 0.50],
+          'liveness': [0.10, 0.12, 0.18, 0.09, 0.16, 0.11, 0.22, 0.08],
+          'valence': [0.74, 0.30, 0.82, 0.24, 0.66, 0.48, 0.88, 0.27],
+          'tempo': [118, 86, 128, 72, 104, 94, 140, 68],
+      })
+      cols = ['danceability', 'energy', 'valence', 'tempo']
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: numpy_04-minmax-music-features-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - practice
+    title: 음악 feature별 min-max 정규화하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 열별 최소·최대를 사용해 서로 다른 단위의 feature를 0~1 범위로 맞춘다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 정규화 범위는 row가 아니라 각 column에서 계산하세요.
+    - 최대와 최소가 같은 열은 0으로 고정해 0 나눗셈을 피하세요.
+    exercise:
+      prompt: minmax_features(matrix)를 완성해 normalized와 ranges를 반환하세요.
+      starterCode: |-
+        def minmax_features(matrix):
+            raise NotImplementedError
+      solution: |
+        def minmax_features(matrix):
+            if not matrix or not matrix[0] or any(len(row) != len(matrix[0]) for row in matrix):
+                raise ValueError("rectangular matrix required")
+            columns = list(zip(*matrix))
+            ranges = [[min(column), max(column)] for column in columns]
+            normalized = []
+            for row in matrix:
+                normalized.append([
+                    0.0 if high == low else round((value - low) / (high - low), 3)
+                    for value, (low, high) in zip(row, ranges)
+                ])
+            return {"normalized": normalized, "ranges": ranges}
+      hints: *id001
+    check:
+      id: python.numpy.numpy_04.minmax-music-features.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_04.minmax-music-features.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: minmax_features
+        cases:
+        - id: normalizes-by-column
+          arguments:
+          - value:
+            - - 10
+              - 100
+            - - 20
+              - 150
+            - - 30
+              - 200
+          expectedReturn:
+            normalized:
+            - - 0.0
+              - 0.0
+            - - 0.5
+              - 0.5
+            - - 1.0
+              - 1.0
+            ranges:
+            - - 10
+              - 30
+            - - 100
+              - 200
+        - id: handles-constant-column
+          arguments:
+          - value:
+            - - 5
+              - 1
+            - - 5
+              - 3
+          expectedReturn:
+            normalized:
+            - - 0.0
+              - 0.0
+            - - 0.0
+              - 1.0
+            ranges:
+            - - 5
+              - 5
+            - - 1
+              - 3
+        - id: rejects-empty-matrix
+          arguments:
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: numpy_04-cosine-track-similarity-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_04-minmax-music-features-mastery
+    title: 새 트랙 vector의 cosine similarity 계산하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: feature 정규화를 방향 기반 유사도와 가장 가까운 track 선택으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - cosine similarity는 vector 크기가 아니라 방향을 비교합니다.
+    - 0 vector는 방향이 없으므로 명시적으로 거절하세요.
+    exercise:
+      prompt: rank_cosine_similarity(query, tracks)를 완성해 similarities와 nearest를 반환하세요.
+      starterCode: |-
+        def rank_cosine_similarity(query, tracks):
+            raise NotImplementedError
+      solution: |
+        def rank_cosine_similarity(query, tracks):
+            import math
+            query_norm = math.sqrt(sum(value * value for value in query))
+            if query_norm == 0:
+                raise ValueError("zero query vector")
+            similarities = {}
+            for name, vector in tracks.items():
+                if len(vector) != len(query):
+                    raise ValueError("shape mismatch")
+                norm = math.sqrt(sum(value * value for value in vector))
+                if norm == 0:
+                    raise ValueError("zero track vector")
+                similarities[name] = round(sum(a * b for a, b in zip(query, vector)) / (query_norm * norm), 4)
+            nearest = max(similarities, key=lambda name: (similarities[name], name)) if similarities else None
+            return {"similarities": {key: similarities[key] for key in sorted(similarities)}, "nearest": nearest}
+      hints: *id002
+    check:
+      id: python.numpy.numpy_04.cosine-track-similarity.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_04.cosine-track-similarity.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: rank_cosine_similarity
+        cases:
+        - id: ranks-by-direction
+          arguments:
+          - value:
+            - 1
+            - 0
+          - value:
+              same:
+              - 2
+              - 0
+              diagonal:
+              - 1
+              - 1
+              opposite:
+              - -1
+              - 0
+          expectedReturn:
+            similarities:
+              diagonal: 0.7071
+              opposite: -1.0
+              same: 1.0
+            nearest: same
+        - id: handles-no-tracks
+          arguments:
+          - value:
+            - 1
+          - value: {}
+          expectedReturn:
+            similarities: {}
+            nearest: null
+        - id: rejects-zero-query
+          arguments:
+          - value:
+            - 0
+            - 0
+          - value:
+              x:
+              - 1
+              - 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: numpy_04-feature-scaling-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_04-cosine-track-similarity-transfer
+    title: feature scale 방법 선택 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: bounded 값, outlier가 있는 값, 방향 비교에 맞는 변환을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 모든 feature에 같은 scaling을 기계적으로 적용하지 마세요.
+    - validation/test 데이터로 scaling 기준을 다시 계산하면 leakage입니다.
+    exercise:
+      prompt: choose_feature_scaling(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_feature_scaling(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_feature_scaling(situation):
+            table = {'known-bounds': {'method': 'min-max', 'evidence': 'training min and max', 'risk': 'future values outside range'}, 'outlier-heavy': {'method': 'robust scaling', 'evidence': 'median and IQR', 'risk': 'mean distorted'}, 'compare-direction': {'method': 'unit norm', 'evidence': 'vector norm', 'risk': 'zero vector'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.numpy.numpy_04.feature-scaling-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_04.feature-scaling-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_feature_scaling
+        cases:
+        - id: recalls-known-bounds
+          arguments:
+          - value: known-bounds
+          expectedReturn:
+            method: min-max
+            evidence: training min and max
+            risk: future values outside range
+        - id: recalls-outlier-heavy
+          arguments:
+          - value: outlier-heavy
+          expectedReturn:
+            method: robust scaling
+            evidence: median and IQR
+            risk: mean distorted
+        - id: rejects-unknown-situation
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

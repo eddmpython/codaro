@@ -1,0 +1,1160 @@
+var e=`meta:
+  id: pdf_10
+  title: 월간 청구서 자동 생성기
+  order: 10
+  category: pdf
+  difficulty: ⭐⭐⭐⭐⭐
+  badge: 심화
+  packages:
+    - pypdf
+    - reportlab
+    - pandas
+  tags:
+    - 종합프로젝트
+    - 청구서
+    - 한글PDF
+    - 자동생성
+  outcomes:
+    - automation.pdf.report
+  prerequisites:
+    - automation.pdf.layout
+    - automation.pdf.security
+  estimatedMinutes: 90
+  seo:
+    title: "월간 청구서 자동 생성기 - CSV → 고객별 한글 PDF 묶음"
+    description: "01-09강에서 익힌 모든 패턴을 한 사이클에 결합한다. CSV 거래 데이터를 받아 고객별 한글 청구서 PDF를 일괄 생성하는 회계팀 실무 도구."
+    keywords:
+      - PDF 청구서 자동 생성
+      - 한국 청구서 양식
+      - reportlab 청구서
+      - 월간 보고서 자동화
+
+intro:
+  direction: "01-09강의 모든 패턴을 한 사이클에 묶는다. CSV 거래 데이터에서 고객별 한글 청구서 PDF 묶음을 만드는 회계팀 실무 도구를 완성한다."
+  benefits:
+    - "회계팀 김대리의 매월 200건 청구서 작성 6.7시간을 30초로 줄인다."
+    - "한국 사업자 청구서 표준 양식(상호·사업자번호·공급가액·세액·합계)을 그대로 재현한다."
+    - "trackPRD에 정의된 ROI 목표(월 15시간 절감)를 본 강의 한 함수가 달성한다."
+  diagram:
+    steps:
+      - label: "1. 데이터 모델 정의"
+        detail: "CSV → 고객 dict 리스트로 변환. 한 고객 = 한 청구서."
+      - label: "2. 청구서 빌더"
+        detail: "한 고객의 데이터로 표지 + 표 + 합계 + 직인 자리가 들어간 한글 PDF를 만드는 함수."
+      - label: "3. 일괄 생성"
+        detail: "200건 데이터를 순회하며 파일명을 자동 생성, 폴더에 저장."
+      - label: "4. 검증과 메타"
+        detail: "각 PDF의 합계가 데이터와 일치하는지 자동 검증 + 메타데이터 자동 입력."
+    runtime:
+      - label: "전 강의 패턴 통합"
+        detail: "06강 한글 폰트, 07강 Platypus, 09강 메타데이터, 02강 일괄 패턴이 모두 호출됨."
+      - label: "검증"
+        detail: "200건 모두에 대해 합계·페이지 수·필수 키워드를 한 셀에서 assert."
+
+sections:
+  - id: step1_data
+    title: "1단계. 데이터 모델과 CSV 입력"
+    structuredPrimary: true
+    subtitle: "CSV → 고객 dict 리스트"
+    goal: "거래 CSV를 읽어 고객별로 그룹핑된 청구 항목 리스트를 만든다."
+    why: "자동화의 시작은 데이터 모양을 고정하는 것입니다. CSV에서 청구서 dict로 바꾸는 변환이 본 파이프라인의 첫 단계입니다."
+    explanation: |-
+      CSV에 customer, item, qty, unit_price 컬럼이 있다고 가정합니다. pandas로 읽어 customer별로 group_by하고, 한 고객의 청구서 dict로 변환합니다.
+    tips:
+      - "실무 CSV는 컬럼명·인코딩이 회사마다 다릅니다. 함수 표면에서 변환 규칙을 명시하면 회사별 차이를 흡수할 수 있습니다."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      import pandas as pd
+
+      workdir = TemporaryDirectory()
+      base = Path(workdir.name)
+      csvPath = base / "deals.csv"
+      csvPath.write_text(
+          "customer,item,qty,unit_price\\n"
+          "Codaro Lab,Subscription,2,50000\\n"
+          "Codaro Lab,Onboarding,1,200000\\n"
+          "Acme Corp,Subscription,5,50000\\n"
+          "Acme Corp,Support,3,30000\\n",
+          encoding="utf-8",
+      )
+
+      def loadInvoices(csvPath):
+          df = pd.read_csv(csvPath)
+          df["amount"] = df["qty"] * df["unit_price"]
+          invoices = []
+          for customer, group in df.groupby("customer"):
+              items = group[["item", "qty", "unit_price", "amount"]].to_dict("records")
+              invoices.append({
+                  "customer": customer,
+                  "items": items,
+                  "subtotal": int(group["amount"].sum()),
+              })
+          return invoices
+
+      invoices = loadInvoices(csvPath)
+      [(inv["customer"], inv["subtotal"]) for inv in invoices]
+    exercise:
+      prompt: "CSV에 'Beta Inc' 고객의 항목 두 개(Subscription qty 3, Support qty 1)를 추가하고 invoices 길이를 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        import pandas as pd
+
+        workdir = TemporaryDirectory()
+        base = Path(workdir.name)
+        csvPath = base / "deals.csv"
+        csvPath.write_text(
+            "customer,item,qty,unit_price\\n"
+            "Codaro Lab,Subscription,2,50000\\n"
+            "Acme Corp,Subscription,5,50000\\n"
+            ___,
+            encoding="utf-8",
+        )
+
+        def loadInvoices(csvPath):
+            df = pd.read_csv(csvPath)
+            df["amount"] = df["qty"] * df["unit_price"]
+            invoices = []
+            for customer, group in df.groupby("customer"):
+                items = group[["item", "qty", "unit_price", "amount"]].to_dict("records")
+                invoices.append({
+                    "customer": customer,
+                    "items": items,
+                    "subtotal": int(group["amount"].sum()),
+                })
+            return invoices
+
+        invoices = loadInvoices(csvPath)
+        len(invoices)
+      hints:
+        - "CSV 행 두 개. 예: 'Beta Inc,Subscription,3,50000\\\\nBeta Inc,Support,1,30000\\\\n'"
+    check:
+      noError: "CSV 문자열은 줄바꿈 포함, 마지막 줄에도 줄바꿈."
+      resultCheck: "출력 3."
+
+  - id: step2_builder
+    title: "2단계. 청구서 PDF 빌더"
+    structuredPrimary: true
+    subtitle: "한글 폰트 + Platypus 표 + 합계"
+    goal: "한 고객의 청구서 dict로 한글 PDF를 생성하는 buildInvoice 함수를 만든다."
+    why: "한국 회계팀의 월간 청구서는 공급가액·부가세·합계 세 줄과 품목 명세표가 한국 사업자 청구서 표준 양식의 핵심입니다. buildInvoice 한 함수가 06강 한글 폰트 헬퍼와 07강 Platypus Table을 한 자리에서 결합해 회계팀이 그대로 쓸 수 있는 청구서를 만듭니다. 3단계의 일괄 생성과 4단계의 합계 검증이 모두 이 함수 위에서 돌아가므로, 여기서 만든 모양이 트랙 전체의 산출물을 결정합니다."
+    explanation: |-
+      buildInvoice(path, invoice)는 등록한 한글 폰트로 표지(고객명, 청구일), 항목 표, 합계 행을 한 페이지 PDF로 그립니다. 부가세 10% 별도 처리도 포함합니다.
+    tips:
+      - "한국 청구서는 공급가액·세액·합계 세 줄로 합계를 표시하는 게 표준입니다. 표 하단 행으로 추가하세요."
+    snippet: |-
+      import sys
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader
+      from reportlab.lib import colors
+      from reportlab.lib.pagesizes import A4
+      from reportlab.lib.styles import getSampleStyleSheet
+      from reportlab.pdfbase import pdfmetrics
+      from reportlab.pdfbase.ttfonts import TTFont
+      from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+      def registerKoreanFont():
+          paths = {
+              "win32": [r"C:\\Windows\\Fonts\\malgun.ttf"],
+              "darwin": ["/System/Library/Fonts/AppleSDGothicNeo.ttc"],
+              "linux": ["/usr/share/fonts/truetype/nanum/NanumGothic.ttf"],
+          }
+          for path in paths.get(sys.platform, []):
+              if Path(path).exists():
+                  pdfmetrics.registerFont(TTFont("Korean", path))
+                  return "Korean"
+          return "Helvetica"
+
+      def buildInvoice(path, invoice):
+          fontName = registerKoreanFont()
+          styles = getSampleStyleSheet()
+          for style in styles.byName.values():
+              style.fontName = fontName
+
+          subtotal = invoice["subtotal"]
+          vat = int(subtotal * 0.1)
+          total = subtotal + vat
+
+          rows = [["품목", "수량", "단가", "금액"]]
+          for item in invoice["items"]:
+              rows.append([item["item"], str(item["qty"]), f"{item['unit_price']:,}", f"{item['amount']:,}"])
+          rows.append(["공급가액", "", "", f"{subtotal:,}"])
+          rows.append(["부가세", "", "", f"{vat:,}"])
+          rows.append(["합계", "", "", f"{total:,}"])
+
+          doc = SimpleDocTemplate(str(path), pagesize=A4, title=f"청구서 {invoice['customer']}")
+          flow = [
+              Paragraph("청구서", styles["Title"]),
+              Spacer(1, 12),
+              Paragraph(f"고객: {invoice['customer']}", styles["Heading2"]),
+              Spacer(1, 12),
+              Table(rows, colWidths=[180, 60, 100, 100], style=TableStyle([
+                  ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+                  ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+                  ("ALIGN", (1, 0), (-1, -1), "RIGHT"),
+                  ("FONTNAME", (0, -3), (-1, -1), fontName),
+              ])),
+          ]
+          doc.build(flow)
+
+      workdir = TemporaryDirectory()
+      pdfPath = Path(workdir.name) / "inv.pdf"
+      sample = {
+          "customer": "Codaro Lab",
+          "items": [
+              {"item": "Subscription", "qty": 2, "unit_price": 50000, "amount": 100000},
+              {"item": "Onboarding", "qty": 1, "unit_price": 200000, "amount": 200000},
+          ],
+          "subtotal": 300000,
+      }
+      buildInvoice(pdfPath, sample)
+      body = PdfReader(pdfPath).pages[0].extract_text() or ""
+      "Codaro Lab" in body and "300,000" in body and "30,000" in body
+    exercise:
+      prompt: "buildInvoice 함수 안에서 한국 청구서 표준 3행(공급가액·부가세·합계)을 만드는 로직을 직접 작성하세요. subtotal에 10% VAT를 더한 합계를 계산하고 rows에 천 단위 구분자 포맷으로 누적해야 합니다."
+      starterCode: |-
+        import sys
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.pdfbase import pdfmetrics
+        from reportlab.pdfbase.ttfonts import TTFont
+        from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+        def registerKoreanFont():
+            paths = {
+                "win32": [r"C:\\Windows\\Fonts\\malgun.ttf"],
+                "darwin": ["/System/Library/Fonts/AppleSDGothicNeo.ttc"],
+                "linux": ["/usr/share/fonts/truetype/nanum/NanumGothic.ttf"],
+            }
+            for path in paths.get(sys.platform, []):
+                if Path(path).exists():
+                    pdfmetrics.registerFont(TTFont("Korean", path))
+                    return "Korean"
+            return "Helvetica"
+
+        def buildInvoice(path, invoice):
+            fontName = registerKoreanFont()
+            styles = getSampleStyleSheet()
+            for style in styles.byName.values():
+                style.fontName = fontName
+            subtotal = invoice["subtotal"]
+            rows = [["품목", "수량", "단가", "금액"]]
+            for item in invoice["items"]:
+                rows.append([item["item"], str(item["qty"]), f"{item['unit_price']:,}", f"{item['amount']:,}"])
+            ___  # VAT 계산 + 공급가액/부가세/합계 3행을 rows에 추가
+            doc = SimpleDocTemplate(str(path), pagesize=A4)
+            doc.build([
+                Paragraph("청구서", styles["Title"]),
+                Table(rows, colWidths=[180, 60, 100, 100], style=TableStyle([("GRID", (0,0), (-1,-1), 0.5, colors.black)])),
+            ])
+
+        workdir = TemporaryDirectory()
+        pdfPath = Path(workdir.name) / "inv.pdf"
+        sample = {
+            "customer": "Acme",
+            "items": [{"item": "Sub", "qty": 1, "unit_price": 500000, "amount": 500000}],
+            "subtotal": 500000,
+        }
+        buildInvoice(pdfPath, sample)
+        body = PdfReader(pdfPath).pages[0].extract_text() or ""
+        assert "500,000" in body  # 공급가액
+        assert "50,000" in body   # 부가세
+        assert "550,000" in body  # 합계
+        "550,000" in body
+      hints:
+        - "vat = int(subtotal * 0.1); total = subtotal + vat"
+        - "rows.append(['공급가액', '', '', f'{subtotal:,}']); rows.append(['부가세', '', '', f'{vat:,}']); rows.append(['합계', '', '', f'{total:,}'])"
+    check:
+      noError: "dict 값이 정수여야 합니다."
+      resultCheck: "True 출력."
+
+  - id: step3_bulk
+    title: "3단계. 일괄 청구서 생성"
+    structuredPrimary: true
+    subtitle: "loadInvoices → buildInvoice 반복"
+    goal: "CSV에서 읽은 모든 고객의 청구서를 한 함수 호출로 폴더에 만든다."
+    why: "200건 일괄 생성이 본 트랙의 ROI 목표(월 15시간 절감)를 달성하는 핵심 단계입니다."
+    explanation: |-
+      generateMonthlyInvoices(csvPath, outFolder)가 loadInvoices + buildInvoice를 묶어 N개 PDF를 만듭니다. 파일명은 customer 이름으로 자동 생성합니다.
+    tips:
+      - "customer 이름에 한글·공백·특수문자가 있을 수 있습니다. 안전화 함수로 파일명 처리."
+    snippet: |-
+      import re
+      import sys
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      import pandas as pd
+      from pypdf import PdfReader
+      from reportlab.lib import colors
+      from reportlab.lib.pagesizes import A4
+      from reportlab.lib.styles import getSampleStyleSheet
+      from reportlab.pdfbase import pdfmetrics
+      from reportlab.pdfbase.ttfonts import TTFont
+      from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+      def registerKoreanFont():
+          paths = {
+              "win32": [r"C:\\Windows\\Fonts\\malgun.ttf"],
+              "darwin": ["/System/Library/Fonts/AppleSDGothicNeo.ttc"],
+              "linux": ["/usr/share/fonts/truetype/nanum/NanumGothic.ttf"],
+          }
+          for path in paths.get(sys.platform, []):
+              if Path(path).exists():
+                  pdfmetrics.registerFont(TTFont("Korean", path))
+                  return "Korean"
+          return "Helvetica"
+
+      def loadInvoices(csvPath):
+          df = pd.read_csv(csvPath)
+          df["amount"] = df["qty"] * df["unit_price"]
+          invoices = []
+          for customer, group in df.groupby("customer"):
+              items = group[["item", "qty", "unit_price", "amount"]].to_dict("records")
+              invoices.append({
+                  "customer": customer,
+                  "items": items,
+                  "subtotal": int(group["amount"].sum()),
+              })
+          return invoices
+
+      def safeFileName(name):
+          return re.sub(r"[^\\w가-힣]+", "_", name).strip("_")
+
+      def buildInvoice(path, invoice):
+          fontName = registerKoreanFont()
+          styles = getSampleStyleSheet()
+          for style in styles.byName.values():
+              style.fontName = fontName
+          subtotal = invoice["subtotal"]
+          vat = int(subtotal * 0.1)
+          total = subtotal + vat
+          rows = [["품목", "수량", "단가", "금액"]]
+          for item in invoice["items"]:
+              rows.append([item["item"], str(item["qty"]), f"{item['unit_price']:,}", f"{item['amount']:,}"])
+          rows.append(["공급가액", "", "", f"{subtotal:,}"])
+          rows.append(["부가세", "", "", f"{vat:,}"])
+          rows.append(["합계", "", "", f"{total:,}"])
+          doc = SimpleDocTemplate(str(path), pagesize=A4, title=f"청구서 {invoice['customer']}")
+          doc.build([
+              Paragraph("청구서", styles["Title"]),
+              Spacer(1, 12),
+              Paragraph(f"고객: {invoice['customer']}", styles["Heading2"]),
+              Spacer(1, 12),
+              Table(rows, colWidths=[180, 60, 100, 100], style=TableStyle([
+                  ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+                  ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+                  ("ALIGN", (1, 0), (-1, -1), "RIGHT"),
+              ])),
+          ])
+
+      def generateMonthlyInvoices(csvPath, outFolder):
+          Path(outFolder).mkdir(exist_ok=True)
+          outputs = []
+          for invoice in loadInvoices(csvPath):
+              outPath = Path(outFolder) / f"{safeFileName(invoice['customer'])}.pdf"
+              buildInvoice(outPath, invoice)
+              outputs.append(outPath)
+          return outputs
+
+      workdir = TemporaryDirectory()
+      base = Path(workdir.name)
+      csvPath = base / "deals.csv"
+      csvPath.write_text(
+          "customer,item,qty,unit_price\\n"
+          "Codaro Lab,Subscription,2,50000\\n"
+          "Codaro Lab,Onboarding,1,200000\\n"
+          "Acme Corp,Subscription,5,50000\\n"
+          "Acme Corp,Support,3,30000\\n",
+          encoding="utf-8",
+      )
+      paths = generateMonthlyInvoices(csvPath, base / "invoices")
+      [p.name for p in paths]
+    exercise:
+      prompt: "CSV에 'Beta Inc' 고객의 항목 2개를 추가하고 결과 PDF 수가 3인지 확인하세요."
+      starterCode: |-
+        import re
+        import sys
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        import pandas as pd
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.pdfbase import pdfmetrics
+        from reportlab.pdfbase.ttfonts import TTFont
+        from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+        def registerKoreanFont():
+            paths = {
+                "win32": [r"C:\\Windows\\Fonts\\malgun.ttf"],
+                "darwin": ["/System/Library/Fonts/AppleSDGothicNeo.ttc"],
+                "linux": ["/usr/share/fonts/truetype/nanum/NanumGothic.ttf"],
+            }
+            for path in paths.get(sys.platform, []):
+                if Path(path).exists():
+                    pdfmetrics.registerFont(TTFont("Korean", path))
+                    return "Korean"
+            return "Helvetica"
+
+        def loadInvoices(csvPath):
+            df = pd.read_csv(csvPath)
+            df["amount"] = df["qty"] * df["unit_price"]
+            invoices = []
+            for customer, group in df.groupby("customer"):
+                items = group[["item", "qty", "unit_price", "amount"]].to_dict("records")
+                invoices.append({"customer": customer, "items": items, "subtotal": int(group["amount"].sum())})
+            return invoices
+
+        def safeFileName(name):
+            return re.sub(r"[^\\w가-힣]+", "_", name).strip("_")
+
+        def buildInvoice(path, invoice):
+            fontName = registerKoreanFont()
+            styles = getSampleStyleSheet()
+            for style in styles.byName.values():
+                style.fontName = fontName
+            subtotal = invoice["subtotal"]
+            vat = int(subtotal * 0.1)
+            total = subtotal + vat
+            rows = [["품목", "수량", "단가", "금액"]]
+            for item in invoice["items"]:
+                rows.append([item["item"], str(item["qty"]), f"{item['unit_price']:,}", f"{item['amount']:,}"])
+            rows.append(["합계", "", "", f"{total:,}"])
+            doc = SimpleDocTemplate(str(path), pagesize=A4)
+            doc.build([
+                Paragraph("청구서", styles["Title"]),
+                Table(rows, colWidths=[180, 60, 100, 100], style=TableStyle([("GRID", (0,0), (-1,-1), 0.5, colors.black)])),
+            ])
+
+        def generateMonthlyInvoices(csvPath, outFolder):
+            Path(outFolder).mkdir(exist_ok=True)
+            outputs = []
+            for invoice in loadInvoices(csvPath):
+                outPath = Path(outFolder) / f"{safeFileName(invoice['customer'])}.pdf"
+                buildInvoice(outPath, invoice)
+                outputs.append(outPath)
+            return outputs
+
+        workdir = TemporaryDirectory()
+        base = Path(workdir.name)
+        csvPath = base / "deals.csv"
+        csvPath.write_text(
+            "customer,item,qty,unit_price\\n"
+            "Codaro Lab,Subscription,2,50000\\n"
+            "Acme Corp,Subscription,5,50000\\n"
+            ___,
+            encoding="utf-8",
+        )
+        paths = generateMonthlyInvoices(csvPath, base / "out")
+        len(paths)
+      hints:
+        - "Beta Inc 두 줄 추가. 예: 'Beta Inc,A,1,10000\\\\nBeta Inc,B,2,20000\\\\n'."
+    check:
+      noError: "CSV는 마지막에도 줄바꿈."
+      resultCheck: "출력 3."
+
+  - id: validation
+    title: "4단계. 검증 루프 - 일괄 결과 합계 자동 검증"
+    structuredPrimary: true
+    subtitle: "각 PDF 본문 + 데이터 합계 일치"
+    goal: "생성된 모든 청구서의 합계가 CSV 데이터의 부가세 포함 합계와 일치하는지 한 셀에서 검증한다."
+    why: "200건 청구서 자동 생성에서 합계가 어긋나면 회계 사고로 직결됩니다. assert 한 묶음이 사전에 잡습니다."
+    explanation: |-
+      각 PDF의 본문에 customer 이름과 부가세 포함 합계 문자열이 모두 포함되는지 확인합니다.
+    tips:
+      - "한국식 천 단위 구분자(,)는 f-string 포맷 {:,}로 자동 적용됩니다."
+    snippet: |-
+      import re
+      import sys
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      import pandas as pd
+      from pypdf import PdfReader
+      from reportlab.lib import colors
+      from reportlab.lib.pagesizes import A4
+      from reportlab.lib.styles import getSampleStyleSheet
+      from reportlab.pdfbase import pdfmetrics
+      from reportlab.pdfbase.ttfonts import TTFont
+      from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+      def registerKoreanFont():
+          paths = {
+              "win32": [r"C:\\Windows\\Fonts\\malgun.ttf"],
+              "darwin": ["/System/Library/Fonts/AppleSDGothicNeo.ttc"],
+              "linux": ["/usr/share/fonts/truetype/nanum/NanumGothic.ttf"],
+          }
+          for path in paths.get(sys.platform, []):
+              if Path(path).exists():
+                  pdfmetrics.registerFont(TTFont("Korean", path))
+                  return "Korean"
+          return "Helvetica"
+
+      def loadInvoices(csvPath):
+          df = pd.read_csv(csvPath)
+          df["amount"] = df["qty"] * df["unit_price"]
+          invoices = []
+          for customer, group in df.groupby("customer"):
+              items = group[["item", "qty", "unit_price", "amount"]].to_dict("records")
+              invoices.append({"customer": customer, "items": items, "subtotal": int(group["amount"].sum())})
+          return invoices
+
+      def safeFileName(name):
+          return re.sub(r"[^\\w가-힣]+", "_", name).strip("_")
+
+      def buildInvoice(path, invoice):
+          fontName = registerKoreanFont()
+          styles = getSampleStyleSheet()
+          for style in styles.byName.values():
+              style.fontName = fontName
+          subtotal = invoice["subtotal"]
+          vat = int(subtotal * 0.1)
+          total = subtotal + vat
+          rows = [["품목", "수량", "단가", "금액"]]
+          for item in invoice["items"]:
+              rows.append([item["item"], str(item["qty"]), f"{item['unit_price']:,}", f"{item['amount']:,}"])
+          rows.append(["합계", "", "", f"{total:,}"])
+          doc = SimpleDocTemplate(str(path), pagesize=A4, title=f"청구서 {invoice['customer']}")
+          doc.build([
+              Paragraph("청구서", styles["Title"]),
+              Spacer(1, 12),
+              Paragraph(f"고객: {invoice['customer']}", styles["Heading2"]),
+              Table(rows, colWidths=[180, 60, 100, 100], style=TableStyle([
+                  ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+                  ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+              ])),
+          ])
+
+      def generateMonthlyInvoices(csvPath, outFolder):
+          Path(outFolder).mkdir(exist_ok=True)
+          outputs = []
+          for invoice in loadInvoices(csvPath):
+              outPath = Path(outFolder) / f"{safeFileName(invoice['customer'])}.pdf"
+              buildInvoice(outPath, invoice)
+              outputs.append(outPath)
+          return outputs
+
+      vault = TemporaryDirectory()
+      base = Path(vault.name)
+      csvPath = base / "deals.csv"
+      csvPath.write_text(
+          "customer,item,qty,unit_price\\n"
+          "Codaro Lab,Subscription,2,50000\\n"
+          "Codaro Lab,Onboarding,1,200000\\n"
+          "Acme Corp,Subscription,5,50000\\n",
+          encoding="utf-8",
+      )
+      paths = generateMonthlyInvoices(csvPath, base / "invoices")
+      invoices = loadInvoices(csvPath)
+
+      for invoicePath, invoice in zip(paths, invoices):
+          body = PdfReader(invoicePath).pages[0].extract_text() or ""
+          assert invoice["customer"] in body
+          total = invoice["subtotal"] + int(invoice["subtotal"] * 0.1)
+          assert f"{total:,}" in body, f"{invoicePath.name} 합계 mismatch"
+      len(paths)
+    exercise:
+      prompt: "CSV에 'Beta Inc' 두 줄을 추가하고 검증을 통과시키세요."
+      starterCode: |-
+        import re
+        import sys
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        import pandas as pd
+        from pypdf import PdfReader
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.pdfbase import pdfmetrics
+        from reportlab.pdfbase.ttfonts import TTFont
+        from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+        def registerKoreanFont():
+            paths = {
+                "win32": [r"C:\\Windows\\Fonts\\malgun.ttf"],
+                "darwin": ["/System/Library/Fonts/AppleSDGothicNeo.ttc"],
+                "linux": ["/usr/share/fonts/truetype/nanum/NanumGothic.ttf"],
+            }
+            for path in paths.get(sys.platform, []):
+                if Path(path).exists():
+                    pdfmetrics.registerFont(TTFont("Korean", path))
+                    return "Korean"
+            return "Helvetica"
+
+        def loadInvoices(csvPath):
+            df = pd.read_csv(csvPath)
+            df["amount"] = df["qty"] * df["unit_price"]
+            invoices = []
+            for customer, group in df.groupby("customer"):
+                items = group[["item", "qty", "unit_price", "amount"]].to_dict("records")
+                invoices.append({"customer": customer, "items": items, "subtotal": int(group["amount"].sum())})
+            return invoices
+
+        def safeFileName(name):
+            return re.sub(r"[^\\w가-힣]+", "_", name).strip("_")
+
+        def buildInvoice(path, invoice):
+            fontName = registerKoreanFont()
+            styles = getSampleStyleSheet()
+            for style in styles.byName.values():
+                style.fontName = fontName
+            subtotal = invoice["subtotal"]
+            total = subtotal + int(subtotal * 0.1)
+            rows = [["품목", "수량", "단가", "금액"]]
+            for item in invoice["items"]:
+                rows.append([item["item"], str(item["qty"]), f"{item['unit_price']:,}", f"{item['amount']:,}"])
+            rows.append(["합계", "", "", f"{total:,}"])
+            doc = SimpleDocTemplate(str(path), pagesize=A4)
+            doc.build([
+                Paragraph("청구서", styles["Title"]),
+                Paragraph(f"고객: {invoice['customer']}", styles["Heading2"]),
+                Table(rows, colWidths=[180, 60, 100, 100], style=TableStyle([("GRID", (0,0), (-1,-1), 0.5, colors.black)])),
+            ])
+
+        def generateMonthlyInvoices(csvPath, outFolder):
+            Path(outFolder).mkdir(exist_ok=True)
+            outputs = []
+            for invoice in loadInvoices(csvPath):
+                outPath = Path(outFolder) / f"{safeFileName(invoice['customer'])}.pdf"
+                buildInvoice(outPath, invoice)
+                outputs.append(outPath)
+            return outputs
+
+        vault = TemporaryDirectory()
+        base = Path(vault.name)
+        csvPath = base / "deals.csv"
+        csvPath.write_text(
+            "customer,item,qty,unit_price\\n"
+            "Codaro Lab,Subscription,2,50000\\n"
+            "Acme Corp,Subscription,5,50000\\n"
+            ___,
+            encoding="utf-8",
+        )
+        paths = generateMonthlyInvoices(csvPath, base / "out")
+        invoices = loadInvoices(csvPath)
+        for invoicePath, invoice in zip(paths, invoices):
+            body = PdfReader(invoicePath).pages[0].extract_text() or ""
+            assert invoice["customer"] in body
+            total = invoice["subtotal"] + int(invoice["subtotal"] * 0.1)
+            assert f"{total:,}" in body
+        len(paths)
+      hints:
+        - "Beta Inc 두 줄 추가. 예: 'Beta Inc,A,1,10000\\\\nBeta Inc,B,2,20000\\\\n'."
+    check:
+      noError: "마지막 줄 줄바꿈."
+      resultCheck: "출력 3."
+
+  - id: misconception
+    title: "5단계. 흔한 오개념 차단"
+    subtitle: "통합 강의에서 가장 흔한 함정"
+    goal: "데이터·폰트·검증 3축에서 가장 흔한 함정을 한 자리에서 차단한다."
+    why: "통합 강의는 한 군데서 막히면 전체가 멈춥니다. 함정을 사전에 알면 디버깅 시간이 0이 됩니다."
+    explanation: |-
+      함정1 (데이터): CSV 인코딩이 EUC-KR이면 한글이 깨집니다. 항상 UTF-8 명시. 함정2 (폰트): 한글 폰트가 시스템에 없으면 폴백 폰트로 한글이 □가 됩니다. 06강 헬퍼가 명확한 에러 메시지로 안내. 함정3 (검증): f-string {:,} 포맷은 정수만 동작합니다. float이면 소수점이 따라옵니다.
+    tips:
+      - "회계 데이터는 항상 정수(원 단위)로 다루세요. 소수점은 표시 단계에서만 처리."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      import pandas as pd
+
+      workdir = TemporaryDirectory()
+      csvPath = Path(workdir.name) / "ko.csv"
+      csvPath.write_text("name,amount\\nCodaro Lab,300000\\nAcme Corp,150000\\n", encoding="utf-8")
+
+      df = pd.read_csv(csvPath, encoding="utf-8")
+      assert df["amount"].dtype.kind in ("i", "u")
+      [f"{value:,}" for value in df["amount"]]
+    exercise:
+      prompt: "amount를 [300000, 150000, 75000]으로 3행 만든 뒤 천 단위 구분자 문자열 리스트를 만드세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        import pandas as pd
+
+        workdir = TemporaryDirectory()
+        csvPath = Path(workdir.name) / "ko.csv"
+        csvPath.write_text("name,amount\\nA,300000\\nB,150000\\nC,___\\n", encoding="utf-8")
+        df = pd.read_csv(csvPath, encoding="utf-8")
+        [f"{value:,}" for value in df["amount"]]
+      hints:
+        - "정수 75000."
+    check:
+      noError: "정수만 {:,} 포맷."
+      resultCheck: "리스트에 '75,000' 포함."
+
+  - id: practice
+    title: "실습 - 종합 미션"
+    subtitle: "회사 양식에 맞는 청구서 생성기"
+    goal: "본인 회사 양식에 맞춘 청구서 생성기로 확장한다."
+    why: "본 강의의 출력물은 학습용 청구서입니다. 실무 이전에 본인 양식으로 한 번 확장해보는 게 자동화 적용의 첫 단추입니다."
+    explanation: |-
+      미션은 본 강의 buildInvoice를 가져와 사업자등록번호, 청구일, 결제 계좌, 회사 직인 자리를 추가한 회사 청구서 생성 함수를 만드는 것입니다.
+    tips:
+      - "직인은 이미지 파일이 있으면 Image flowable로, 없으면 직인 자리를 빈 박스로 그려둡니다."
+    snippet: |-
+      import sys
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader
+      from reportlab.lib import colors
+      from reportlab.lib.pagesizes import A4
+      from reportlab.lib.styles import getSampleStyleSheet
+      from reportlab.pdfbase import pdfmetrics
+      from reportlab.pdfbase.ttfonts import TTFont
+      from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+    exercise:
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "함수 시그니처: buildCompanyInvoice(path, invoice, company) -> Path"
+        - "company dict: {name, biz_no, address, account, issue_date}"
+    check:
+      noError: "함수 정의 + 호출 + PdfReader 검증."
+      resultCheck: "본문에 회사명, 사업자번호, 청구일, 합계가 모두 포함."
+    blocks:
+      - type: tip
+        content: "회사 정보는 함수마다 전달하는 대신 환경변수 또는 설정 파일에서 한 번 읽도록 분리하면 더 깔끔합니다."
+      - type: expansion
+        title: "미션: 회사 양식 청구서 생성기"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              import sys
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from pypdf import PdfReader
+              from reportlab.lib import colors
+              from reportlab.lib.pagesizes import A4
+              from reportlab.lib.styles import getSampleStyleSheet
+              from reportlab.pdfbase import pdfmetrics
+              from reportlab.pdfbase.ttfonts import TTFont
+              from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+              def registerCompanyFont():
+                  paths = {
+                      "win32": [r"C:\\Windows\\Fonts\\malgun.ttf"],
+                      "darwin": ["/System/Library/Fonts/AppleSDGothicNeo.ttc"],
+                      "linux": ["/usr/share/fonts/truetype/nanum/NanumGothic.ttf"],
+                  }
+                  for path in paths.get(sys.platform, []):
+                      if Path(path).exists():
+                          pdfmetrics.registerFont(TTFont("Korean", path))
+                          return "Korean"
+                  return "Helvetica"
+
+              def buildCompanyInvoice(path, invoice, company):
+                  fontName = registerCompanyFont()
+                  styles = getSampleStyleSheet()
+                  for style in styles.byName.values():
+                      style.fontName = fontName
+                  subtotal = invoice["subtotal"]
+                  vat = int(subtotal * 0.1)
+                  total = subtotal + vat
+
+                  headerRows = [
+                      ["공급자", company["name"], "사업자번호", company["biz_no"]],
+                      ["주소", company["address"], "청구일", company["issue_date"]],
+                      ["계좌", company["account"], "고객", invoice["customer"]],
+                  ]
+                  itemRows = [["품목", "수량", "단가", "금액"]]
+                  for item in invoice["items"]:
+                      itemRows.append([item["item"], str(item["qty"]), f"{item['unit_price']:,}", f"{item['amount']:,}"])
+                  itemRows.append(["공급가액", "", "", f"{subtotal:,}"])
+                  itemRows.append(["부가세", "", "", f"{vat:,}"])
+                  itemRows.append(["합계", "", "", f"{total:,}"])
+
+                  doc = SimpleDocTemplate(str(path), pagesize=A4, title=f"청구서 {invoice['customer']}")
+                  doc.build([
+                      Paragraph("청구서", styles["Title"]),
+                      Spacer(1, 12),
+                      Table(headerRows, colWidths=[80, 180, 80, 100], style=TableStyle([
+                          ("BACKGROUND", (0, 0), (0, -1), colors.lightgrey),
+                          ("BACKGROUND", (2, 0), (2, -1), colors.lightgrey),
+                          ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+                      ])),
+                      Spacer(1, 18),
+                      Table(itemRows, colWidths=[180, 60, 100, 100], style=TableStyle([
+                          ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+                          ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+                          ("ALIGN", (1, 0), (-1, -1), "RIGHT"),
+                      ])),
+                  ])
+                  return Path(path)
+
+              missionDir = TemporaryDirectory()
+              outPath = Path(missionDir.name) / "company_invoice.pdf"
+              company = {
+                  "name": "Codaro Inc.",
+                  "biz_no": "123-45-67890",
+                  "address": "Seoul Gangnam-gu",
+                  "account": "Bank 1234-5678",
+                  "issue_date": "2026-05-28",
+              }
+              invoice = {
+                  "customer": "Acme Corp",
+                  "items": [
+                      {"item": "Subscription", "qty": 5, "unit_price": 50000, "amount": 250000},
+                      {"item": "Support", "qty": 3, "unit_price": 30000, "amount": 90000},
+                  ],
+                  "subtotal": 340000,
+              }
+              buildCompanyInvoice(outPath, invoice, company)
+              body = PdfReader(outPath).pages[0].extract_text() or ""
+              for token in ["Codaro Inc.", "123-45-67890", "2026-05-28", "Acme Corp", "374,000"]:
+                  assert token in body, f"missing {token}"
+              body.strip().splitlines()[:5]
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: text
+        content: |-
+          본 트랙의 마무리 강의 응용 아이디어입니다. 한 가지를 골라 본인 업무에 적용해보세요.
+      - type: list
+        style: bullet
+        items:
+          - "Email 트랙 10강과 결합 - 생성된 청구서 PDF를 고객별 메일로 자동 발송"
+          - "08강 패턴 추가 - 청구서마다 'INTERNAL' 워터마크 + 비밀번호 (사외 공유용)"
+          - "월별 디렉터리 자동 생성 (out/2026-05/, out/2026-06/)"
+          - "결제 상태 dashboard 한 페이지 추가 (송장 발행 / 입금 완료 / 미수)"
+          - "openpyxl 트랙과 결합 - 청구서 발행 로그를 xlsx 대시보드로 자동 정리"
+          - "llmBasics 트랙과 결합 - 청구 내역 LLM 요약 코멘트를 청구서 상단에 자동 삽입"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pdf_10-invoice-reconciliation-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_data
+    - extensions
+    title: 월간 청구서의 line item·세금·총액 reconciliation 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 수량·단가 합과 세율, 표시 총액, invoice identity를 판정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 금액 계산은 Decimal과 명시한 반올림 정책을 사용하세요.
+    - invoice/customer identity와 subtotal·tax·total을 모두 검증하세요.
+    exercise:
+      prompt: audit_invoice(invoice)를 완성하세요.
+      starterCode: |-
+        def audit_invoice(invoice):
+            raise NotImplementedError
+      solution: |
+        def audit_invoice(invoice):
+            from decimal import Decimal, ROUND_HALF_UP
+            failures = []
+            if not invoice.get("invoiceId") or not invoice.get("customerId"):
+                failures.append("identity")
+            subtotal = sum(Decimal(str(item["quantity"])) * Decimal(str(item["unitPrice"])) for item in invoice.get("items", []))
+            tax = (subtotal * Decimal(str(invoice["taxRate"]))).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            total = subtotal + tax
+            if Decimal(str(invoice.get("displayedSubtotal", 0))) != subtotal:
+                failures.append("subtotal")
+            if Decimal(str(invoice.get("displayedTax", 0))) != tax:
+                failures.append("tax")
+            if Decimal(str(invoice.get("displayedTotal", 0))) != total:
+                failures.append("total")
+            return {"passed": not failures, "failures": failures, "computedSubtotal": format(subtotal, ".2f"), "computedTax": format(tax, ".2f"), "computedTotal": format(total, ".2f")}
+      hints: *id001
+    check:
+      id: python.pdf.pdf_10.invoice-reconciliation.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_10.invoice-reconciliation.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_invoice
+        cases:
+        - id: accepts-reconciled-invoice
+          arguments:
+          - value:
+              invoiceId: I1
+              customerId: C1
+              items:
+              - quantity: 2
+                unitPrice: '10.00'
+              - quantity: 1
+                unitPrice: '5.50'
+              taxRate: '0.1'
+              displayedSubtotal: '25.50'
+              displayedTax: '2.55'
+              displayedTotal: '28.05'
+          expectedReturn:
+            passed: true
+            failures: []
+            computedSubtotal: '25.50'
+            computedTax: '2.55'
+            computedTotal: '28.05'
+        - id: reports-identity-and-amount-mismatches
+          arguments:
+          - value:
+              invoiceId: ''
+              customerId: ''
+              items:
+              - quantity: 1
+                unitPrice: 10
+              taxRate: '0.1'
+              displayedSubtotal: 9
+              displayedTax: 0
+              displayedTotal: 9
+          expectedReturn:
+            passed: false
+            failures:
+            - identity
+            - subtotal
+            - tax
+            - total
+            computedSubtotal: '10.00'
+            computedTax: '1.00'
+            computedTotal: '11.00'
+        - id: rounds-tax-half-up
+          arguments:
+          - value:
+              invoiceId: I
+              customerId: C
+              items:
+              - quantity: 1
+                unitPrice: '0.05'
+              taxRate: '0.1'
+              displayedSubtotal: '0.05'
+              displayedTax: '0.01'
+              displayedTotal: '0.06'
+          expectedReturn:
+            passed: true
+            failures: []
+            computedSubtotal: '0.05'
+            computedTax: '0.01'
+            computedTotal: '0.06'
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pdf_10-invoice-pdf-release-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_10-invoice-reconciliation-mastery
+    title: 새 청구서 PDF의 text·render·security·중복 release gate 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: invoice identity별 현재 source artifact가 한 개이고 모든 검증을 통과했는지 판정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - invoice identity마다 현재 source artifact가 정확히 하나인지 검사하세요.
+    - text·render·security 검증을 모두 통과해야 release하세요.
+    exercise:
+      prompt: decide_invoice_release(artifacts, current_source_hash)를 완성하세요.
+      starterCode: |-
+        def decide_invoice_release(artifacts, current_source_hash):
+            raise NotImplementedError
+      solution: |
+        def decide_invoice_release(artifacts, current_source_hash):
+            current = [item for item in artifacts if item["sourceHash"] == current_source_hash]
+            stale = sorted(item["id"] for item in artifacts if item["sourceHash"] != current_source_hash)
+            counts = {}
+            failures = []
+            invalid = []
+            for item in current:
+                counts[item["invoiceId"]] = counts.get(item["invoiceId"], 0) + 1
+                if not item.get("textPassed") or not item.get("renderPassed") or not item.get("securityPassed"):
+                    invalid.append(item["id"])
+            duplicates = sorted(invoice_id for invoice_id, count in counts.items() if count > 1)
+            if duplicates:
+                failures.append("duplicates")
+            if invalid:
+                failures.append("verification")
+            if not current:
+                failures.append("current-artifacts")
+            return {"releaseReady": not failures and not stale, "failures": failures, "staleArtifacts": stale, "duplicateInvoices": duplicates, "invalidArtifacts": sorted(invalid)}
+      hints: *id002
+    check:
+      id: python.pdf.pdf_10.invoice-pdf-release.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_10.invoice-pdf-release.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: decide_invoice_release
+        cases:
+        - id: accepts-one-verified-current-invoice
+          arguments:
+          - value:
+            - id: a
+              invoiceId: I1
+              sourceHash: s
+              textPassed: true
+              renderPassed: true
+              securityPassed: true
+          - value: s
+          expectedReturn:
+            releaseReady: true
+            failures: []
+            staleArtifacts: []
+            duplicateInvoices: []
+            invalidArtifacts: []
+        - id: reports-duplicate-and-invalid-invoice
+          arguments:
+          - value:
+            - id: a
+              invoiceId: I1
+              sourceHash: s
+              textPassed: true
+              renderPassed: false
+              securityPassed: true
+            - id: b
+              invoiceId: I1
+              sourceHash: s
+              textPassed: true
+              renderPassed: true
+              securityPassed: true
+          - value: s
+          expectedReturn:
+            releaseReady: false
+            failures:
+            - duplicates
+            - verification
+            staleArtifacts: []
+            duplicateInvoices:
+            - I1
+            invalidArtifacts:
+            - a
+        - id: reports-stale-and-no-current-artifact
+          arguments:
+          - value:
+            - id: old
+              invoiceId: I1
+              sourceHash: old
+              textPassed: true
+              renderPassed: true
+              securityPassed: true
+          - value: s
+          expectedReturn:
+            releaseReady: false
+            failures:
+            - current-artifacts
+            staleArtifacts:
+            - old
+            duplicateInvoices: []
+            invalidArtifacts: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pdf_10-invoice-pdf-capstone-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_10-invoice-pdf-release-transfer
+    title: 월간 청구서 PDF 종료 조건 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 금액·identity·text·render·security·중복 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - PDF 저장 성공과 페이지 내용·geometry·업무 값의 정확성을 분리해 검증하세요.
+    - Web에서는 문서 판단을 연습하고 Local에서는 재개방·render artifact evidence를 남기세요.
+    exercise:
+      prompt: choose_invoice_pdf_gate(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_invoice_pdf_gate(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_invoice_pdf_gate(situation):
+            table = {'amount': {'action': 'recompute line subtotal tax total', 'evidence': 'Decimal reconciliation', 'risk': 'wrong invoice amount'}, 'artifact': {'action': 'reopen text and render pages', 'evidence': 'required text and visible blocks', 'risk': 'blank or clipped invoice'}, 'release': {'action': 'require one secured artifact per invoice', 'evidence': 'source-bound invoice manifest', 'risk': 'duplicate or stale bill'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.pdf.pdf_10.invoice-pdf-capstone-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_10.invoice-pdf-capstone-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_invoice_pdf_gate
+        cases:
+        - id: recalls-amount
+          arguments:
+          - value: amount
+          expectedReturn:
+            action: recompute line subtotal tax total
+            evidence: Decimal reconciliation
+            risk: wrong invoice amount
+        - id: recalls-artifact
+          arguments:
+          - value: artifact
+          expectedReturn:
+            action: reopen text and render pages
+            evidence: required text and visible blocks
+            risk: blank or clipped invoice
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

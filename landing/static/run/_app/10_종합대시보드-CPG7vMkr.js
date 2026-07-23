@@ -1,0 +1,1232 @@
+var e=`meta:
+  packages:
+  - pandas
+  - plotly
+  id: plotly_10
+  title: 종합대시보드
+  order: 10
+  category: plotly
+  difficulty: ⭐⭐⭐⭐
+  badge: 심화
+  tags:
+  - gapminder
+  - 대시보드
+  - make_subplots
+  - 애니메이션
+  - 종합
+  seo:
+    title: Plotly 종합 대시보드 - gapminder 완전 분석
+    description: gapminder 데이터로 모든 Plotly 개념을 종합한 대시보드를 만듭니다. 기본 차트부터 애니메이션까지 총정리합니다.
+    keywords:
+    - plotly 대시보드
+    - gapminder
+    - make_subplots
+    - 종합 분석
+    - 데이터 시각화
+intro:
+  emoji: 🌍
+  goal: gapminder 데이터로 "세계 발전 종합 대시보드"를 완성합니다.
+  description: 막대/선/산점도 기본 차트, 버블/히트맵 고급 차트, 트리맵/선버스트 계층 차트, 애니메이션까지 모든 개념을 종합합니다.
+  direction: 종합대시보드에서 데이터를 상호작용 차트로 구성하고 필터와 표시 상태를 검증합니다.
+  benefits:
+  - 대시보드 데이터 확인 후 인터랙티브 시각화에 맞는 코드 입력을 고릅니다.
+  - 종합대시보드 결과를 툴팁과 선택 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 공유 대시보드에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(대시보드 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 대륙별 평균 기대수명 처리 실행
+      detail: 인터랙티브 시각화 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 대륙별 기대수명 변화 결과 검증
+      detail: 툴팁과 선택 상태 기준으로 실행 결과를 비교합니다.
+    - label: 종합대시보드 재사용
+      detail: 완성 코드를 공유 대시보드에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 인터랙티브 차트 환경
+      detail: pandas, plotly, statsmodels 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 종합대시보드 실행
+      detail: 셀을 실행해 툴팁과 선택 상태와 예외 상태를 확인합니다.
+    - label: 종합대시보드 완료
+      detail: 검증된 코드를 공유 대시보드로 남깁니다.
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  structuredPrimary: true
+  subtitle: px.data.gapminder()
+  goal: 1단계. 데이터 불러오기에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: gapminder는 1952~2007년 142개국의 인구, GDP, 기대수명 데이터로, Plotly의 모든 개념을 종합 실습하기에 이상적입니다. 총 1704행(142개국
+    × 12개 시점)의 데이터는 대륙(continent), 국가(country), 연도(year), 인구(pop), 기대수명(lifeExp), 1인당 GDP(gdpPercap) 컬럼을
+    포함하며, 범주형·수치형·시계열 데이터가 모두 있어 막대, 선, 산점도, 히스토그램, 박스, 파이, 버블, 히트맵, 트리맵, 선버스트, 지도, 애니메이션 등 모든 차트 타입을
+    연습할 수 있습니다. df2007 = gapminder[gapminder['year'] == 2007]로 2007년 최신 데이터만 추출하여 현재 시점 분석에 사용하며, 실무에서는
+    이처럼 전체 데이터와 필터링된 서브셋을 함께 활용하여 다각도 분석을 수행합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import plotly.express as px
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
+    import pandas as pd
+
+    gapminder = px.data.gapminder()
+    df2007 = gapminder[gapminder['year'] == 2007]
+    gapminder
+  exercise:
+    prompt: 1단계. 데이터 불러오기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import plotly.express as px
+      import plotly.graph_objects as go
+      from plotly.subplots import make_subplots
+      import pandas as pd
+
+      gapminder = px.data.gapminder()
+      df2007 = gapminder[gapminder['year'] == 2007]
+      gapminder
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 데이터 불러오기에서 \`gapminder\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 1단계. 데이터 불러오기 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step2_bar
+  title: 2단계. 대륙별 평균 기대수명
+  structuredPrimary: true
+  subtitle: px.bar (A3 반복)
+  goal: 2단계. 대륙별 평균 기대수명에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 막대 그래프로 2007년 대륙별 평균 기대수명을 비교합니다. groupby('continent')로 대륙별로 그룹화하고 lifeExp의 평균을 계산하여 142개
+    국가 데이터를 5개 대륙 요약으로 압축하며, as_index=False로 continent를 일반 컬럼으로 유지하여 px.bar에서 사용하기 쉽게 만듭니다. color='continent'는
+    각 대륙에 고유 색상을 할당하여 시각적 구분을 명확히 하고, showlegend=False는 x축에 이미 대륙명이 있어 범례가 중복되므로 제거합니다. 막대 그래프는 범주 간 수치를
+    비교할 때 가장 직관적이며, 실무에서는 부서별 매출, 제품별 판매량, 지역별 고객 수 등을 비교하는 기본 차트로 활용됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    lifeByContinent = df2007.groupby('continent', as_index=False)['lifeExp'].mean()
+    figBar = px.bar(
+        lifeByContinent,
+        x='continent',
+        y='lifeExp',
+        color='continent',
+        title='2007년 대륙별 평균 기대수명'
+    )
+    figBar.update_layout(showlegend=False)
+    figBar
+  exercise:
+    prompt: 2단계. 대륙별 평균 기대수명 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      lifeByContinent = df2007.groupby('continent', as_index=False)['lifeExp'].mean()
+      figBar = px.bar(
+          lifeByContinent,
+          x='continent',
+          y='lifeExp',
+          color='continent',
+          title='2007년 대륙별 평균 기대수명'
+      )
+      figBar.update_layout(showlegend=False)
+      figBar
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 대륙별 평균 기대수명의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 대륙별 평균 기대수명의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step3_line
+  title: 3단계. 대륙별 기대수명 변화
+  structuredPrimary: true
+  subtitle: px.line (A2 반복)
+  goal: 3단계. 대륙별 기대수명 변화에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 선 그래프로 1952~2007년 대륙별 기대수명 변화 추이를 시각화합니다. groupby(['year', 'continent'])는 연도와 대륙 두 차원으로
+    그룹화하여 각 연도·대륙 조합의 평균을 계산하며, 이를 통해 55년간의 장기 추세를 파악할 수 있습니다. color='continent'는 각 대륙을 다른 색상의 선으로 구분하여
+    5개 대륙의 변화를 한 차트에서 비교하며, 선 그래프는 시계열 데이터의 추세, 계절성, 전환점을 발견하는 데 최적입니다. 이 차트를 통해 전 세계 기대수명이 지속적으로 증가했는지,
+    어느 대륙이 가장 빠르게 개선되었는지, 정체 구간은 없었는지 등을 분석할 수 있으며, 실무에서는 매출 추이, 사용자 증가율, KPI 변화 등 모든 시계열 분석의 기본으로 사용됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    lifeByYear = gapminder.groupby(['year', 'continent'], as_index=False)['lifeExp'].mean()
+    figLine = px.line(
+        lifeByYear,
+        x='year',
+        y='lifeExp',
+        color='continent',
+        title='대륙별 기대수명 변화 (1952-2007)'
+    )
+    figLine
+  exercise:
+    prompt: 3단계. 대륙별 기대수명 변화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      lifeByYear = gapminder.groupby(['year', 'continent'], as_index=False)['lifeExp'].mean()
+      figLine = px.line(
+          lifeByYear,
+          x='year',
+          y='lifeExp',
+          color='continent',
+          title='대륙별 기대수명 변화 (1952-2007)'
+      )
+      figLine
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 대륙별 기대수명 변화의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 대륙별 기대수명 변화의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step4_scatter
+  title: 4단계. GDP와 기대수명 산점도
+  structuredPrimary: true
+  subtitle: px.scatter (A1 반복)
+  goal: 4단계. GDP와 기대수명 산점도에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 산점도로 GDP와 기대수명의 관계를 확인하고, 추세선으로 상관관계를 정량화합니다. log_x=True는 GDP가 넓은 범위(수백~수만 달러)에 분포하므로 로그
+    스케일로 변환하여 저소득 국가들의 차이도 명확히 보이도록 하며, trendline='ols'는 최소자승법(Ordinary Least Squares) 회귀선을 자동으로 그려 GDP와
+    기대수명 간 선형 관계를 보여줍니다. color='continent'는 대륙별로 색상을 구분하여 지역별 패턴 차이를 파악할 수 있게 합니다. 이 차트를 통해 "부유한 국가일수록
+    기대수명이 높다"는 일반적 경향을 확인할 수 있지만, 같은 GDP 수준에서도 대륙별로 기대수명 차이가 있는지, 이상치(outlier)는 어디인지도 발견할 수 있으며, 실무에서는
+    두 변수 간 관계를 탐색하고 가설을 검증하는 데 산점도와 추세선을 필수적으로 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figScatter = px.scatter(
+        df2007,
+        x='gdpPercap',
+        y='lifeExp',
+        color='continent',
+        trendline='ols',
+        log_x=True,
+        title='GDP와 기대수명 관계'
+    )
+    figScatter
+  exercise:
+    prompt: 4단계. GDP와 기대수명 산점도 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figScatter = px.scatter(
+          df2007,
+          x='gdpPercap',
+          y='lifeExp',
+          color='continent',
+          trendline='ols',
+          log_x=True,
+          title='GDP와 기대수명 관계'
+      )
+      figScatter
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. GDP와 기대수명 산점도의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 4단계. GDP와 기대수명 산점도의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step5_histogram
+  title: 5단계. 기대수명 분포
+  structuredPrimary: true
+  subtitle: px.histogram (A4 반복)
+  goal: 5단계. 기대수명 분포에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 히스토그램으로 전 세계 기대수명의 분포를 확인하여 중심 경향과 분산을 파악합니다. nbins=20은 x축을 20개 구간(bin)으로 나누어 각 구간에 속하는
+    국가 수를 막대 높이로 표현하며, 구간이 너무 적으면(5개 이하) 분포의 디테일이 사라지고 너무 많으면(50개 이상) 노이즈가 생기므로 10~30개가 적당합니다. color='continent'는
+    각 막대를 대륙별로 색상 구분하여 쌓기(stack) 형태로 표현하며, 이를 통해 "기대수명 60~70세 구간에 아프리카 국가가 많다" 같은 세부 인사이트를 발견할 수 있습니다.
+    히스토그램은 평균·중앙값만으로는 알 수 없는 분포의 형태(정규분포인지, 왜도가 있는지, 봉우리가 여러 개인지)를 보여주며, 실무에서는 고객 연령 분포, 주문 금액 분포, 응답
+    시간 분포 등을 분석할 때 필수적으로 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figHist = px.histogram(
+        df2007,
+        x='lifeExp',
+        color='continent',
+        nbins=20,
+        title='2007년 기대수명 분포'
+    )
+    figHist
+  exercise:
+    prompt: 5단계. 기대수명 분포 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figHist = px.histogram(
+          df2007,
+          x='lifeExp',
+          color='continent',
+          nbins=20,
+          title='2007년 기대수명 분포'
+      )
+      figHist
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 기대수명 분포의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 기대수명 분포의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step6_box_violin
+  title: 6단계. 분포 비교
+  structuredPrimary: true
+  subtitle: px.box, px.violin (A5, A6 반복)
+  goal: 6단계. 분포 비교에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 박스 플롯과 바이올린 플롯으로 대륙별 기대수명 분포를 비교하여 그룹 간 차이를 정밀 분석합니다. 박스 플롯은 중앙값(상자 내 선), 사분위수(상자 경계),
+    이상치(점)를 명확히 보여주어 통계적 비교에 강하고, 바이올린 플롯은 박스 플롯에 분포의 형태(밀도)를 추가하여 데이터가 어디에 밀집되어 있는지까지 시각화합니다. box=True는
+    바이올린 내부에 박스 플롯을 함께 표시하고, points='all'은 모든 원본 데이터 포인트를 점으로 추가하여 극단값과 분포를 동시에 확인할 수 있게 합니다. 이를 통해 "아시아는
+    기대수명 편차가 크다", "유럽은 중앙값이 높고 일정하다" 같은 대륙별 특성을 발견할 수 있으며, 실무에서는 A/B 테스트 결과 비교, 제품별 만족도 분석, 팀별 성과 비교 등에
+    박스·바이올린 플롯을 활용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figBox = px.box(
+        df2007,
+        x='continent',
+        y='lifeExp',
+        color='continent',
+        title='대륙별 기대수명 분포'
+    )
+    figBox
+  exercise:
+    prompt: 6단계. 분포 비교 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figBox = px.box(
+          df2007,
+          x='continent',
+          y='lifeExp',
+          color='continent',
+          title='대륙별 기대수명 분포'
+      )
+      figBox
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 분포 비교의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 분포 비교의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step7_pie
+  title: 7단계. 인구 비율
+  structuredPrimary: true
+  subtitle: px.pie (A7 반복)
+  goal: 7단계. 인구 비율에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 파이 차트로 대륙별 인구 비율을 확인하여 전체에서 각 대륙이 차지하는 비중을 직관적으로 파악합니다. groupby('continent')['pop'].sum()으로
+    각 대륙의 총 인구를 계산하고, values='pop'에 인구, names='continent'에 대륙명을 지정하면 Plotly가 자동으로 각 조각의 각도를 비율에 맞춰 계산하여
+    원형 차트를 그려줍니다. 파이 차트는 "아시아가 전 세계 인구의 60%를 차지한다" 같은 비율 정보를 한눈에 전달하는 데 탁월하지만, 항목 수가 5~7개 이하일 때 가장 효과적이며,
+    너무 많으면 조각이 작아져 구분이 어렵습니다. 실무에서는 시장 점유율, 예산 배분, 트래픽 소스 비율 등을 표현할 때 파이 차트를 사용하며, 절대값이 아닌 비율 비교가 핵심일
+    때 선택합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    popByContinent = df2007.groupby('continent', as_index=False)['pop'].sum()
+    figPie = px.pie(
+        popByContinent,
+        values='pop',
+        names='continent',
+        title='2007년 대륙별 인구 비율'
+    )
+    figPie
+  exercise:
+    prompt: 7단계. 인구 비율 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      popByContinent = df2007.groupby('continent', as_index=False)['pop'].sum()
+      figPie = px.pie(
+          popByContinent,
+          values='pop',
+          names='continent',
+          title='2007년 대륙별 인구 비율'
+      )
+      figPie
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 인구 비율의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 인구 비율의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step8_bubble
+  title: 8단계. 버블차트
+  structuredPrimary: true
+  subtitle: size로 인구 표현 (B1 반복)
+  goal: 8단계. 버블차트에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 버블차트로 GDP, 기대수명, 인구 세 가지 변수를 한 차트에 표현하여 다차원 분석을 수행합니다. x축은 GDP, y축은 기대수명, 버블 크기(size='pop')는
+    인구, 색상(color='continent')은 대륙을 나타내어 4차원 정보를 동시에 시각화하며, hover_name='country'는 마우스 오버 시 국가명을 표시합니다.
+    log_x=True로 GDP를 로그 스케일로 변환하고, size_max=60으로 최대 버블 크기를 제한하여 거대 인구 국가(중국, 인도)가 화면을 지배하지 않도록 조정합니다.
+    이 차트를 통해 "인구가 많고 GDP가 높지만 기대수명은 중간인 국가"처럼 복잡한 패턴을 발견할 수 있으며, 실무에서는 3개 이상의 지표를 동시에 비교할 때 버블차트를 활용하여
+    숨겨진 인사이트를 찾아냅니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figBubble = px.scatter(
+        df2007,
+        x='gdpPercap',
+        y='lifeExp',
+        size='pop',
+        color='continent',
+        hover_name='country',
+        log_x=True,
+        size_max=60,
+        title='2007년 세계 발전 현황'
+    )
+    figBubble
+  exercise:
+    prompt: 8단계. 버블차트 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figBubble = px.scatter(
+          df2007,
+          x='gdpPercap',
+          y='lifeExp',
+          size='pop',
+          color='continent',
+          hover_name='country',
+          log_x=True,
+          size_max=60,
+          title='2007년 세계 발전 현황'
+      )
+      figBubble
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 버블차트의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 버블차트의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step9_heatmap
+  title: 9단계. 밀도 히트맵
+  structuredPrimary: true
+  subtitle: px.density_heatmap (B2 반복)
+  goal: 9단계. 밀도 히트맵에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 밀도 히트맵으로 GDP와 기대수명의 밀집 구간을 확인하여 데이터가 어디에 집중되어 있는지 파악합니다. px.density_heatmap은 x, y 축을 격자로
+    나누고 각 셀에 속하는 데이터 개수를 색상 진하기로 표현하며, 산점도처럼 점이 많을 때 겹침(overplotting) 문제를 해결합니다. nbinsx=20, nbinsy=20은
+    각 축을 20개 구간으로 나누어 총 400개 셀을 생성하고, color_continuous_scale='Viridis'는 색맹 친화적인 보라-노랑 팔레트를 적용합니다. 색이 진한
+    영역이 데이터가 밀집된 곳이며, 이를 통해 "대부분의 국가가 GDP 1000~10000달러, 기대수명 60~75세 구간에 몰려있다" 같은 분포 패턴을 발견할 수 있습니다. 실무에서는
+    수만 건 이상의 대용량 데이터를 시각화할 때 산점도 대신 밀도 히트맵을 사용하여 성능과 가독성을 동시에 확보합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figHeatmap = px.density_heatmap(
+        df2007,
+        x='gdpPercap',
+        y='lifeExp',
+        nbinsx=20,
+        nbinsy=20,
+        color_continuous_scale='Viridis',
+        title='GDP-기대수명 밀도 분포'
+    )
+    figHeatmap
+  exercise:
+    prompt: 9단계. 밀도 히트맵 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figHeatmap = px.density_heatmap(
+          df2007,
+          x='gdpPercap',
+          y='lifeExp',
+          nbinsx=20,
+          nbinsy=20,
+          color_continuous_scale='Viridis',
+          title='GDP-기대수명 밀도 분포'
+      )
+      figHeatmap
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 밀도 히트맵의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 밀도 히트맵의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step10_treemap
+  title: 10단계. 트리맵
+  structuredPrimary: true
+  subtitle: px.treemap (B3 반복)
+  goal: 10단계. 트리맵에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 트리맵으로 대륙 > 국가 계층 구조를 인구 크기로 표현하여 전체와 부분의 관계를 직관적으로 파악합니다. path=['continent', 'country']는
+    2단계 계층을 정의하고, values='pop'은 각 사각형의 크기를 인구에 비례하여 결정하며, color='lifeExp'는 기대수명을 RdYlGn 색상 팔레트로 표현합니다.
+    트리맵은 공간을 재귀적으로 분할하여 모든 항목을 빈틈없이 배치하므로 파이 차트보다 공간 효율이 높고, 대륙을 클릭하면 하위 국가들이 확대되는 드릴다운 기능으로 세부 탐색이 가능합니다.
+    이를 통해 "아시아 인구가 압도적으로 많지만, 그중 인도와 중국이 대부분을 차지한다"처럼 계층 내 구성을 명확히 이해할 수 있으며, 실무에서는 조직도, 예산 배분, 제품 카테고리
+    매출, 디스크 사용량 등 계층 데이터를 시각화할 때 필수적으로 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figTreemap = px.treemap(
+        df2007,
+        path=['continent', 'country'],
+        values='pop',
+        color='lifeExp',
+        color_continuous_scale='RdYlGn',
+        title='세계 인구 트리맵 (색상: 기대수명)'
+    )
+    figTreemap
+  exercise:
+    prompt: 10단계. 트리맵 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figTreemap = px.treemap(
+          df2007,
+          path=['continent', 'country'],
+          values='pop',
+          color='lifeExp',
+          color_continuous_scale='RdYlGn',
+          title='세계 인구 트리맵 (색상: 기대수명)'
+      )
+      figTreemap
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 트리맵의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 트리맵의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step11_sunburst
+  title: 11단계. 선버스트
+  structuredPrimary: true
+  subtitle: px.sunburst (B4 반복)
+  goal: 11단계. 선버스트에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 선버스트로 같은 계층 구조를 원형으로 표현하여 트리맵과 다른 시각적 경험을 제공합니다. 선버스트는 중앙에서 바깥으로 펼쳐지는 동심원 형태로, 안쪽이 상위 계층(대륙),
+    바깥쪽이 하위 계층(국가)을 나타내며, 각 조각의 각도는 값(인구)에 비례합니다. 트리맵과 동일하게 path, values, color를 지정하지만, 원형 구조가 시각적으로 더
+    균형잡혀 보이고 프레젠테이션 효과가 뛰어나 경영진 보고나 인포그래픽에서 선호됩니다. 조각을 클릭하면 해당 계층이 확대되어 세부 정보를 탐색할 수 있으며, 계층 깊이에 제한이 없어
+    3단계 이상의 복잡한 구조도 표현 가능합니다. 실무에서는 트리맵은 분석 작업에, 선버스트는 시각적 임팩트가 중요한 발표 자료에 사용하는 경향이 있으며, 데이터 성격과 청중에 따라
+    선택합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figSunburst = px.sunburst(
+        df2007,
+        path=['continent', 'country'],
+        values='pop',
+        color='lifeExp',
+        color_continuous_scale='RdYlGn',
+        title='세계 인구 선버스트 (색상: 기대수명)'
+    )
+    figSunburst
+  exercise:
+    prompt: 11단계. 선버스트 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figSunburst = px.sunburst(
+          df2007,
+          path=['continent', 'country'],
+          values='pop',
+          color='lifeExp',
+          color_continuous_scale='RdYlGn',
+          title='세계 인구 선버스트 (색상: 기대수명)'
+      )
+      figSunburst
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 선버스트의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 11단계. 선버스트의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step12_choropleth
+  title: 12단계. 세계지도
+  structuredPrimary: true
+  subtitle: px.choropleth (B6 반복)
+  goal: 12단계. 세계지도에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: '단계구분도(choropleth)로 국가별 기대수명을 세계지도에 표현하여 지리적 패턴을 시각화합니다. locations=''iso_alpha''는 국가를 식별하는
+    ISO 3166-1 alpha-3 코드(예: KOR, USA, JPN)를 지정하고, color=''lifeExp''는 각 국가의 색상을 기대수명에 따라 결정하며, color_continuous_scale=''RdYlGn''은
+    낮으면 빨강, 높으면 초록으로 표현합니다. hover_name=''country''는 마우스 오버 시 국가명을 표시하고, update_layout(geo=dict(showframe=False))로
+    지도 외곽 프레임을 제거하여 깔끔하게 만듭니다. 지도 시각화는 지역별 클러스터링(아프리카는 전반적으로 낮음, 유럽·북미는 높음)과 인접 국가 간 차이를 직관적으로 파악할 수 있게
+    하며, 실무에서는 지역별 매출, 고객 분포, 물류 거점, 질병 확산 등 공간 데이터를 분석할 때 필수적으로 사용합니다.'
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figMap = px.choropleth(
+        df2007,
+        locations='iso_alpha',
+        color='lifeExp',
+        hover_name='country',
+        color_continuous_scale='RdYlGn',
+        title='2007년 세계 기대수명 지도'
+    )
+    figMap.update_layout(geo=dict(showframe=False))
+    figMap
+  exercise:
+    prompt: 12단계. 세계지도 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figMap = px.choropleth(
+          df2007,
+          locations='iso_alpha',
+          color='lifeExp',
+          hover_name='country',
+          color_continuous_scale='RdYlGn',
+          title='2007년 세계 기대수명 지도'
+      )
+      figMap.update_layout(geo=dict(showframe=False))
+      figMap
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 12단계. 세계지도의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 12단계. 세계지도의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step13_animation
+  title: 13단계. 애니메이션
+  structuredPrimary: true
+  subtitle: animation_frame (B9 반복)
+  goal: 13단계. 애니메이션에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: animation_frame으로 1952~2007년 세계 발전 변화를 애니메이션으로 표현하여 시간에 따른 동적 변화를 시각화합니다. animation_frame='year'는
+    연도별로 프레임을 생성하여 재생 버튼을 누르면 1952년부터 2007년까지 자동으로 넘어가며, animation_group='country'는 각 국가가 시간에 따라 이동하는
+    경로를 추적하여 버블이 부드럽게 움직입니다. range_x=[100, 100000], range_y=[25, 90]으로 축 범위를 고정하면 프레임 전환 시 축이 자동 조정되지
+    않아 국가 간 상대적 위치 변화를 명확히 볼 수 있습니다. 이 유명한 "Gapminder 애니메이션"은 한스 로슬링이 TED 강연에서 사용하여 세계적으로 유명해졌으며, "시간에
+    따라 전 세계가 더 부유하고 건강해졌다"는 인사이트를 극적으로 전달합니다. 실무에서는 시계열 변화를 프레젠테이션할 때 애니메이션을 활용하여 청중의 주목을 끌고 스토리텔링 효과를
+    극대화합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figAnim = px.scatter(
+        gapminder,
+        x='gdpPercap',
+        y='lifeExp',
+        size='pop',
+        color='continent',
+        hover_name='country',
+        animation_frame='year',
+        animation_group='country',
+        log_x=True,
+        size_max=60,
+        range_x=[100, 100000],
+        range_y=[25, 90],
+        title='세계 발전 변화 (1952-2007)'
+    )
+    figAnim
+  exercise:
+    prompt: 13단계. 애니메이션 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figAnim = px.scatter(
+          gapminder,
+          x='gdpPercap',
+          y='lifeExp',
+          size='pop',
+          color='continent',
+          hover_name='country',
+          animation_frame='year',
+          animation_group='country',
+          log_x=True,
+          size_max=60,
+          range_x=[100, 100000],
+          range_y=[25, 90],
+          title='세계 발전 변화 (1952-2007)'
+      )
+      figAnim
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 13단계. 애니메이션의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 13단계. 애니메이션의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step14_facet
+  title: 14단계. 패싯 차트
+  structuredPrimary: true
+  subtitle: facet_col (C6 반복)
+  goal: 14단계. 패싯 차트에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: facet_col로 대륙별 GDP-기대수명 관계를 분리하여 그룹별 패턴 차이를 비교합니다. facet_col='continent'는 각 대륙을 별도의 패널로
+    나누어 가로로 배치하고, 각 패널 내에서 해당 대륙 국가들만의 산점도를 그리며, trendline='ols'로 대륙별 추세선을 추가하여 상관관계 강도를 비교할 수 있습니다. showlegend=False는
+    각 패널 제목에 대륙명이 있어 범례가 중복되므로 제거합니다. 이를 통해 "아프리카는 GDP와 기대수명 상관관계가 약하지만, 유럽은 강하다" 같은 그룹별 차이를 발견할 수 있으며,
+    하나의 차트에 모든 데이터를 표시하면 겹쳐서 보기 어려운 패턴을 패싯으로 분리하여 명확히 파악할 수 있습니다. 실무에서는 제품별, 지역별, 세그먼트별로 동일한 분석을 반복할 때
+    패싯을 활용하여 효율적으로 비교 분석을 수행합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figFacet = px.scatter(
+        df2007,
+        x='gdpPercap',
+        y='lifeExp',
+        color='continent',
+        facet_col='continent',
+        log_x=True,
+        trendline='ols',
+        title='대륙별 GDP-기대수명 관계'
+    )
+    figFacet.update_layout(showlegend=False)
+    figFacet
+  exercise:
+    prompt: 14단계. 패싯 차트 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figFacet = px.scatter(
+          df2007,
+          x='gdpPercap',
+          y='lifeExp',
+          color='continent',
+          facet_col='continent',
+          log_x=True,
+          trendline='ols',
+          title='대륙별 GDP-기대수명 관계'
+      )
+      figFacet.update_layout(showlegend=False)
+      figFacet
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 14단계. 패싯 차트의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 14단계. 패싯 차트의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step15_dashboard
+  title: 15단계. 종합 대시보드
+  structuredPrimary: true
+  subtitle: make_subplots + 스타일링 (C8, C11, C12 반복)
+  goal: 15단계. 종합 대시보드에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: '지금까지 배운 모든 개념을 하나로 합쳐 완성도 높은 종합 대시보드를 만듭니다. make_subplots로 3행 2열 격자를 만들고, 6가지 차트를 배치합니다.
+    specs 파라미터로 각 셀의 타입을 지정하며, 파이 차트는 {''type'': ''pie''}로 명시합니다. go.Bar, go.Pie, go.Scatter, go.Box,
+    go.Histogram2d를 사용하여 막대, 파이, 선, 산점도, 박스, 히트맵을 한 화면에 배치합니다. update_xaxes(type=''log'')로 특정 축만 로그 스케일로
+    변경하고, update_layout으로 제목, 배경색, 폰트, 여백을 전문적으로 설정합니다. plot_bgcolor=''white''는 차트 영역, paper_bgcolor=''#f8f9fa''는
+    전체 배경을 의미합니다. showgrid=True로 격자선을 추가하면 값 읽기가 쉬워집니다. 이 대시보드는 막대(대륙별 평균), 파이(인구 비율), 선(추이), 산점도(관계),
+    박스(분포), 히트맵(밀도) 6가지 관점에서 gapminder 데이터를 분석하며, 실무에서는 경영진에게 A4 한 장 분량의 executive summary로 제공하여 핵심 인사이트를
+    효과적으로 전달합니다.'
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    finalDashboard = make_subplots(
+        rows=3, cols=2,
+        subplot_titles=[
+            '대륙별 평균 기대수명',
+            '대륙별 인구 비율',
+            '기대수명 변화 추이',
+            'GDP vs 기대수명',
+            '대륙별 기대수명 분포',
+            'GDP-기대수명 밀도'
+        ],
+        specs=[
+            [{'type': 'xy'}, {'type': 'pie'}],
+            [{'type': 'xy'}, {'type': 'xy'}],
+            [{'type': 'xy'}, {'type': 'xy'}]
+        ]
+    )
+
+    dashLifeByContinent = df2007.groupby('continent', as_index=False)['lifeExp'].mean()
+    finalDashboard.add_trace(
+        go.Bar(x=dashLifeByContinent['continent'], y=dashLifeByContinent['lifeExp'], marker_color='steelblue'),
+        row=1, col=1
+    )
+
+    dashPopByContinent = df2007.groupby('continent', as_index=False)['pop'].sum()
+    finalDashboard.add_trace(
+        go.Pie(labels=dashPopByContinent['continent'], values=dashPopByContinent['pop']),
+        row=1, col=2
+    )
+
+    dashLifeByYear = gapminder.groupby(['year', 'continent'], as_index=False)['lifeExp'].mean()
+    for continent in dashLifeByYear['continent'].unique():
+        continentData = dashLifeByYear[dashLifeByYear['continent'] == continent]
+        finalDashboard.add_trace(
+            go.Scatter(x=continentData['year'], y=continentData['lifeExp'], mode='lines', name=continent),
+            row=2, col=1
+        )
+
+    for continent in df2007['continent'].unique():
+        continentData = df2007[df2007['continent'] == continent]
+        finalDashboard.add_trace(
+            go.Scatter(x=continentData['gdpPercap'], y=continentData['lifeExp'], mode='markers', name=continent, showlegend=False),
+            row=2, col=2
+        )
+
+    for continent in df2007['continent'].unique():
+        continentData = df2007[df2007['continent'] == continent]['lifeExp']
+        finalDashboard.add_trace(
+            go.Box(y=continentData, name=continent, showlegend=False),
+            row=3, col=1
+        )
+
+    finalDashboard.add_trace(
+        go.Histogram2d(x=df2007['gdpPercap'], y=df2007['lifeExp'], nbinsx=15, nbinsy=15, colorscale='Viridis', showscale=False),
+        row=3, col=2
+    )
+
+    finalDashboard.update_xaxes(type='log', row=2, col=2)
+    finalDashboard.update_xaxes(showgrid=True, gridcolor='lightgray')
+    finalDashboard.update_yaxes(showgrid=True, gridcolor='lightgray')
+    finalDashboard.update_layout(
+        height=900,
+        title={
+            'text': 'Gapminder 세계 발전 종합 대시보드',
+            'x': 0.5,
+            'font': {'size': 22}
+        },
+        plot_bgcolor='white',
+        paper_bgcolor='#f8f9fa',
+        font={'family': 'Arial', 'size': 11},
+        margin={'t': 120, 'b': 50, 'l': 50, 'r': 50},
+        showlegend=True,
+        legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1)
+    )
+    finalDashboard
+  exercise:
+    prompt: 15단계. 종합 대시보드 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      finalDashboard = make_subplots(
+          rows=3, cols=2,
+          subplot_titles=[
+              '대륙별 평균 기대수명',
+              '대륙별 인구 비율',
+              '기대수명 변화 추이',
+              'GDP vs 기대수명',
+              '대륙별 기대수명 분포',
+              'GDP-기대수명 밀도'
+          ],
+          specs=[
+              [{'type': 'xy'}, {'type': 'pie'}],
+              [{'type': 'xy'}, {'type': 'xy'}],
+              [{'type': 'xy'}, {'type': 'xy'}]
+          ]
+      )
+
+      dashLifeByContinent = df2007.groupby('continent', as_index=False)['lifeExp'].mean()
+      finalDashboard.add_trace(
+          go.Bar(x=dashLifeByContinent['continent'], y=dashLifeByContinent['lifeExp'], marker_color='steelblue'),
+          row=1, col=1
+      )
+
+      dashPopByContinent = df2007.groupby('continent', as_index=False)['pop'].sum()
+      finalDashboard.add_trace(
+          go.Pie(labels=dashPopByContinent['continent'], values=dashPopByContinent['pop']),
+          row=1, col=2
+      )
+
+      dashLifeByYear = gapminder.groupby(['year', 'continent'], as_index=False)['lifeExp'].mean()
+      for continent in dashLifeByYear['continent'].unique():
+          continentData = dashLifeByYear[dashLifeByYear['continent'] == continent]
+          finalDashboard.add_trace(
+              go.Scatter(x=continentData['year'], y=continentData['lifeExp'], mode='lines', name=continent),
+              row=2, col=1
+          )
+
+      for continent in df2007['continent'].unique():
+          continentData = df2007[df2007['continent'] == continent]
+          finalDashboard.add_trace(
+              go.Scatter(x=continentData['gdpPercap'], y=continentData['lifeExp'], mode='markers', name=continent, showlegend=False),
+              row=2, col=2
+          )
+
+      for continent in df2007['continent'].unique():
+          continentData = df2007[df2007['continent'] == continent]['lifeExp']
+          finalDashboard.add_trace(
+              go.Box(y=continentData, name=continent, showlegend=False),
+              row=3, col=1
+          )
+
+      finalDashboard.add_trace(
+          go.Histogram2d(x=df2007['gdpPercap'], y=df2007['lifeExp'], nbinsx=15, nbinsy=15, colorscale='Viridis', showscale=False),
+          row=3, col=2
+      )
+
+      finalDashboard.update_xaxes(type='log', row=2, col=2)
+      finalDashboard.update_xaxes(showgrid=True, gridcolor='lightgray')
+      finalDashboard.update_yaxes(showgrid=True, gridcolor='lightgray')
+      finalDashboard.update_layout(
+          height=900,
+          title={
+              'text': 'Gapminder 세계 발전 종합 대시보드',
+              'x': 0.5,
+              'font': {'size': 22}
+          },
+          plot_bgcolor='white',
+          paper_bgcolor='#f8f9fa',
+          font={'family': 'Arial', 'size': 11},
+          margin={'t': 120, 'b': 50, 'l': 50, 'r': 50},
+          showlegend=True,
+          legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1)
+      )
+      finalDashboard
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 15단계. 종합 대시보드의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 15단계. 종합 대시보드 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 고급 확장 과제
+  goal: 실습에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    모든 개념을 종합하여 추가 분석 대시보드를 만들어봅시다. 각 미션은 필터링, 서브플롯 구성, 다차원 분석, 시계열 비교, 계층 구조 시각화 등 실전 데이터 분석 시나리오를 반영하며, 완성하면 어떤 데이터든 효과적으로 시각화하고 인사이트를 도출할 수 있는 종합 역량을 갖추게 됩니다. Plotly의 모든 차트 타입, 스타일링 기법, 대시보드 구성 능력을 실전 수준으로 마스터하는 최종 단계입니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import plotly.express as px
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
+    import pandas as pd
+
+    asiaGap = px.data.gapminder()
+    asiaOnly = asiaGap[(asiaGap['year'] == 2007) & (asiaGap['continent'] == 'Asia')]
+    asiaTop10 = asiaOnly.nlargest(10, 'pop')
+  exercise:
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import plotly.express as px
+      import plotly.graph_objects as go
+      from plotly.subplots import make_subplots
+      import pandas as pd
+
+      asiaGap = px.data.gapminder()
+      asiaOnly = asiaGap[(asiaGap['year'] == 2007) & (asiaGap['continent'] == 'Asia')]
+      asiaTop10 = asiaOnly.nlargest(10, 'pop')
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 실습에서 \`asiaGap\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: gapminder 데이터로 Plotly의 모든 개념을 종합한 대시보드를 완성했습니다!
+  - type: list
+    items:
+    - 'A. 기본 차트: bar, line, scatter, histogram, box, violin, pie'
+    - 'B. 고급 차트: bubble, heatmap, treemap, sunburst, choropleth, animation'
+    - 'C. 스타일링: color, size, hover, title, log_scale, facet, trendline'
+    - 'C. 레이아웃: update_layout, update_traces, template, make_subplots'
+  - type: text
+    content: 10개 프로젝트를 완료하며 Plotly Express의 핵심 개념을 모두 마스터했습니다. 이제 어떤 데이터든 효과적으로 시각화할 수 있습니다!
+  goal: 정리에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+- id: workflow_validation
+  title: 16단계. 종합 대시보드 검증 루프
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  goal: 16단계. 종합 대시보드 검증 루프에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    종합 대시보드는 차트를 많이 모으는 작업이 아니라 KPI, 비교, 관계, 분포가 같은 데이터 계약 위에서 움직이도록 만드는 작업입니다.
+
+    대시보드 레슨은 차트 완성보다 입력 검증과 KPI 변주까지 포함해야 실제 업무 템플릿이 됩니다.
+  snippet: |-
+    import plotly.express as px
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
+
+    dashboardGap = px.data.gapminder()
+    dashboard2007 = dashboardGap.query("year == 2007")
+    requiredColumns = {"continent", "country", "lifeExp", "pop", "gdpPercap"}
+    missingColumns = requiredColumns - set(dashboard2007.columns)
+
+    assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+    assert dashboard2007[["lifeExp", "pop", "gdpPercap"]].gt(0).all().all()
+    assert dashboard2007["continent"].nunique() == 5
+  exercise:
+    prompt: 16단계. 종합 대시보드 검증 루프 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import plotly.express as px
+      import plotly.graph_objects as go
+      from plotly.subplots import make_subplots
+
+      dashboardGap = px.data.gapminder()
+      dashboard2007 = dashboardGap.query("year == 2007")
+      requiredColumns = {"continent", "country", "lifeExp", "pop", "gdpPercap"}
+      missingColumns = requiredColumns - set(dashboard2007.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert dashboard2007[["lifeExp", "pop", "gdpPercap"]].gt(0).all().all()
+      assert dashboard2007["continent"].nunique() == 5
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 16단계. 종합 대시보드 검증 루프에서 \`dashboardGap\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 16단계. 종합 대시보드 검증 루프에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: plotly_10-plotly-dashboard-release-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: Plotly 종합 dashboard 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: interaction 없이도 핵심 결론과 현재 scope를 읽을 수 있는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_plotly_dashboard_release(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_plotly_dashboard_release(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_plotly_dashboard_release(rows):
+            required = ['period', 'metric', 'panel']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'panel'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['period'] for row in usable]
+            y_values = [row['metric'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.plotly.plotly_10.plotly-dashboard-release-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.plotly.plotly_10.plotly-dashboard-release-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_plotly_dashboard_release
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - period: 1
+              metric: 10
+              panel: trend
+            - period: 2
+              metric: 15
+              panel: trend
+            - period: 1
+              metric: 4
+              panel: breakdown
+          expectedReturn:
+            usableCount: 3
+            excludedCount: 0
+            groupCounts:
+              breakdown: 1
+              trend: 2
+            xExtent:
+            - 1
+            - 2
+            yExtent:
+            - 4
+            - 15
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: plotly_10-plotly-dashboard-release-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - plotly_10-plotly-dashboard-release-data-evidence-mastery
+    title: Plotly 종합 dashboard 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 운영 dashboard의 filter state와 핵심 설명이 정적 export에도 남도록 구성한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_plotly_dashboard_release(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_plotly_dashboard_release(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_plotly_dashboard_release(candidate):
+            expected = {'mark': 'linked-dashboard', 'x': 'period', 'y': 'metric', 'group': 'panel', 'transforms': ['export-state', 'quality-gate', 'shared-filter'], 'interaction': 'linked-filter'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.plotly.plotly_10.plotly-dashboard-release-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.plotly.plotly_10.plotly-dashboard-release-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_plotly_dashboard_release
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: linked-dashboard
+              x: period
+              y: metric
+              group: panel
+              transforms:
+              - export-state
+              - quality-gate
+              - shared-filter
+              interaction: linked-filter
+              description: 운영 dashboard의 filter state와 핵심 설명이 정적 export에도 남도록 구성한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: linked-dashboard
+              x: period
+              y: metric
+              group: panel
+              transforms:
+              - export-state
+              - quality-gate
+              - shared-filter
+              interaction: linked-filter
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: metric
+              y: period
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - interaction
+            - description
+            encoding:
+              mark: linked-dashboard
+              x: period
+              y: metric
+              group: panel
+              transforms:
+              - export-state
+              - quality-gate
+              - shared-filter
+              interaction: linked-filter
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: plotly_10-plotly-dashboard-release-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - plotly_10-plotly-dashboard-release-encoding-transfer-transfer
+    title: Plotly 종합 dashboard 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: interaction 없이도 핵심 결론과 현재 scope를 읽을 수 있는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_plotly_dashboard_release(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_plotly_dashboard_release(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_plotly_dashboard_release(situation):
+            table = {'interactive-release': {'encoding': 'linked views', 'evidence': 'state contract', 'risk': 'hidden filters'}, 'static-export': {'encoding': 'visible annotations', 'evidence': 'export regression', 'risk': 'lost hover'}, 'performance-budget': {'encoding': 'aggregated layers', 'evidence': 'point count and render time', 'risk': 'browser freeze'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.plotly.plotly_10.plotly-dashboard-release-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.plotly.plotly_10.plotly-dashboard-release-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_plotly_dashboard_release
+        cases:
+        - id: recalls-interactive-release
+          arguments:
+          - value: interactive-release
+          expectedReturn:
+            encoding: linked views
+            evidence: state contract
+            risk: hidden filters
+        - id: recalls-static-export
+          arguments:
+          - value: static-export
+          expectedReturn:
+            encoding: visible annotations
+            evidence: export regression
+            risk: lost hover
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,627 @@
+var e=`meta:
+  id: deepVision_04
+  title: 이미지 유사도 검색
+  order: 4
+  category: deepVision
+  difficulty: ⭐⭐⭐
+  badge: 기초
+  packages:
+  - matplotlib
+  - numpy
+  - pillow
+  - scikit-learn
+  - torch
+  - torchvision
+  tags:
+  - torchvision
+  - 임베딩
+  - 코사인유사도
+  - 검색
+  - top-N
+  seo:
+    title: 딥러닝 비전 - 이미지 유사도 검색
+    description: 임베딩 + 코사인 유사도로 작은 이미지 라이브러리 검색을 구현합니다.
+    keywords:
+    - 임베딩
+    - 유사도검색
+    - 코사인유사도
+    - 이미지검색
+    - torchvision
+intro:
+  emoji: 🔎
+  goal: 임베딩 벡터로 작은 이미지 라이브러리에서 가장 비슷한 사진 N장을 찾는 검색 기능을 만듭니다.
+  description: |-
+    임베딩의 가장 직관적인 응용은 검색입니다. 작은 라이브러리의 모든 사진을 임베딩으로 변환해 두고, 질의 사진의 임베딩과 코사인 유사도로 비교하면 비슷한 사진을 즉시 찾을 수 있습니다. 이 강의는 그 흐름을 합성 라이브러리로 직접 구현합니다.
+  direction: 다양한 변형이 가해진 사진 라이브러리를 만들고, 질의 사진과 비슷한 N장을 코사인 유사도로 검색합니다.
+  benefits:
+  - 라이브러리 사진 N장의 임베딩을 한 번에 계산해 행렬로 보관합니다.
+  - 코사인 유사도를 행렬 곱 한 번으로 계산합니다.
+  - 결과를 query 사진과 함께 시각화하는 표준 검색 결과 화면을 만듭니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 만들기
+      detail: 변형된 사진 N장을 합성합니다.
+    - label: 2단계. 임베딩 일괄 계산
+      detail: 배치 추론으로 (N, 512) 행렬을 얻습니다.
+    - label: 3단계. 질의 임베딩
+      detail: 검색할 사진의 벡터를 만듭니다.
+    - label: 4단계. 코사인 유사도와 top-N
+      detail: 한 번의 곱셈으로 결과를 얻습니다.
+    - label: 5단계. 결과 시각화
+      detail: query + 상위 N장.
+    runtime:
+    - label: PyTorch 환경
+      detail: torchvision encoder + numpy 행렬 연산.
+    - label: 검증 흐름
+      detail: assert와 시각 비교로 학습 결과가 기대값과 같은지 확인합니다.
+sections:
+- id: build_library
+  title: 1단계. 라이브러리 만들기
+  structuredPrimary: true
+  subtitle: 변형 사진 6장
+  goal: china와 flower에 다양한 변형을 적용해 6장짜리 작은 라이브러리를 만듭니다.
+  why: 합성 라이브러리는 실제 데이터 없이도 검색 흐름을 검증할 수 있게 해 줍니다.
+  explanation: |-
+    원본 두 장 + 회전 두 장 + 노이즈 두 장으로 6장을 만듭니다. 각 사진에 짧은 이름을 붙여 결과 시각화에서 라벨로 씁니다.
+
+    노이즈는 가우시안 노이즈(평균 0, 표준편차 15)를 더한 뒤 클립해 만듭니다.
+  tips:
+  - 검색 라이브러리의 변형을 다양하게 두면 알고리즘이 어떤 차이에 강한지 확인할 수 있습니다.
+  snippet: |-
+    import torch
+    import torchvision
+    import torch.nn as nn
+    import torch.nn.functional as F
+    from torchvision.models import resnet18, ResNet18_Weights
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    china = load_sample_image('china.jpg')
+    flower = load_sample_image('flower.jpg')
+
+    def addNoise(img, sigma):
+        noise = np.random.RandomState(42).normal(0, sigma, img.shape)
+        return (img.astype(np.float32) + noise).clip(0, 255).astype(np.uint8)
+
+    library = [
+        ('china', china),
+        ('china_rot', np.rot90(china, k=1).copy()),
+        ('china_noisy', addNoise(china, 15)),
+        ('flower', flower),
+        ('flower_rot', np.rot90(flower, k=1).copy()),
+        ('flower_noisy', addNoise(flower, 15)),
+    ]
+    len(library), library[0][0]
+  exercise:
+    prompt: 라이브러리의 모든 사진을 2x3 그리드로 시각화하세요.
+    starterCode: |-
+      fig, axes = plt.subplots(2, 3, figsize=(12, 6))
+      for axis, (name, img) in zip(axes.ravel(), library):
+          axis.imshow(img)
+          axis.set_title(name)
+          axis.axis('off')
+      fig
+    hints:
+    - axes.ravel은 2x3 그리드를 1차원으로 펴 줍니다.
+    - 6장이 모두 화면에 출력되어야 합니다.
+  check:
+    noError: 라이브러리 생성과 시각화가 오류 없이 끝나야 합니다.
+    resultCheck: library의 길이가 6이어야 합니다.
+- id: batch_embedding
+  title: 2단계. 임베딩 일괄 계산
+  structuredPrimary: true
+  subtitle: 배치 추론
+  goal: 라이브러리의 모든 사진을 한 번에 인코더에 통과시켜 (N, 512) 행렬을 얻습니다.
+  why: 배치 추론이 한 장씩 호출하는 것보다 빠르고 코드도 단순합니다.
+  explanation: |-
+    각 사진을 preprocess로 변환한 뒤 \`torch.stack(...)\` 으로 배치 텐서를 만듭니다. 인코더에 통과시키고 flatten하면 (N, 512) 행렬이 됩니다.
+
+    \`weights.transforms()\` 전처리는 PIL Image나 torch Tensor만 받습니다. 라이브러리 사진은 numpy ndarray이므로 \`Image.fromarray(...)\` 로 감싸 전달합니다.
+
+    L2 정규화한 행렬을 보관하면 이후 검색이 단순해집니다.
+  tips:
+  - 라이브러리가 큰 경우 메모리 사용량이 커집니다. 적절한 배치 크기로 나누어 처리하는 것이 표준입니다.
+  - weights.transforms() 전처리는 ndarray를 거부합니다. Image.fromarray로 PIL Image로 바꿔 넣으세요.
+  snippet: |-
+    from PIL import Image
+
+    weights = ResNet18_Weights.DEFAULT
+    model = resnet18(weights=weights)
+    encoder = nn.Sequential(*list(model.children())[:-1])
+    encoder.eval()
+    preprocess = weights.transforms()
+
+    batch = torch.stack([preprocess(Image.fromarray(item[1])) for item in library])
+    with torch.inference_mode():
+        libFeat = encoder(batch).flatten(1)
+    libFeatNorm = F.normalize(libFeat, dim=1)
+    libFeatNorm.shape
+  exercise:
+    prompt: 라이브러리의 첫 두 사진 임베딩 사이의 코사인 유사도를 계산하세요.
+    starterCode: |-
+      simFirstTwo = float((libFeatNorm[___] * libFeatNorm[1]).sum())
+      simFirstTwo
+    hints:
+    - 첫 사진의 인덱스는 0입니다.
+    - 같은 china의 두 변형이라 유사도가 높아야 합니다.
+  check:
+    noError: 배치 추론이 오류 없이 끝나야 합니다.
+    resultCheck: libFeatNorm.shape이 torch.Size([6, 512]) 이어야 합니다.
+- id: query
+  title: 3단계. 질의 임베딩
+  structuredPrimary: true
+  subtitle: 검색할 사진 한 장
+  goal: 질의 사진의 임베딩을 만들고 정규화합니다.
+  why: 검색은 항상 질의 임베딩 한 개와 라이브러리 N개의 비교입니다.
+  explanation: |-
+    질의는 라이브러리에 없는 새 사진이어야 의미 있는 검증이 됩니다. 여기서는 china에 색 보정을 살짝 가한 사진을 질의로 씁니다.
+
+    질의 사진도 numpy ndarray이므로 \`weights.transforms()\` 전처리에 넣기 전 \`Image.fromarray(...)\` 로 PIL Image로 감쌉니다.
+  tips:
+  - 질의 사진은 라이브러리에 들어가지 않아야 검색 평가가 공정합니다.
+  - weights.transforms() 전처리는 ndarray를 거부합니다. Image.fromarray로 PIL Image로 바꿔 넣으세요.
+  snippet: |-
+    queryImg = (china.astype(np.float32) * 1.1 + 5).clip(0, 255).astype(np.uint8)
+    queryBatch = preprocess(Image.fromarray(queryImg)).unsqueeze(0)
+    with torch.inference_mode():
+        queryFeat = encoder(queryBatch).flatten(1)
+    queryFeatNorm = F.normalize(queryFeat, dim=1)
+    queryFeatNorm.shape
+  exercise:
+    prompt: flower 기반의 질의 queryFlower를 만들고 임베딩을 얻으세요.
+    starterCode: |-
+      queryFlower = (flower.astype(np.float32) * 0.9 + 10).clip(0, 255).astype(np.uint8)
+      queryFlowerBatch = preprocess(Image.fromarray(queryFlower)).unsqueeze(0)
+      with torch.inference_mode():
+          queryFlowerFeat = encoder(queryFlowerBatch).flatten(___)
+      queryFlowerNorm = F.normalize(queryFlowerFeat, dim=1)
+      queryFlowerNorm.shape
+    hints:
+    - 빈칸은 정수 1입니다.
+    - 질의 임베딩도 (1, 512) 모양입니다.
+  check:
+    noError: 질의 임베딩 추출이 오류 없이 끝나야 합니다.
+    resultCheck: queryFeatNorm.shape이 torch.Size([1, 512]) 이어야 합니다.
+- id: top_n
+  title: 4단계. 코사인 유사도와 top-N
+  structuredPrimary: true
+  subtitle: 행렬 곱 한 번
+  goal: 질의 벡터와 라이브러리 행렬을 곱해 모든 유사도를 한 번에 얻고 상위 N개를 추출합니다.
+  why: 임베딩이 정규화되어 있으면 검색이 행렬 곱 한 줄입니다.
+  explanation: |-
+    \`sims = queryFeatNorm @ libFeatNorm.T\` 는 (1, N) 결과를 만듭니다. \`squeeze(0)\` 후 \`topk(k)\` 로 상위 k개의 인덱스와 점수를 얻습니다.
+
+    검색 결과의 일부는 질의 자신과 비슷한 변형, 일부는 다른 카테고리 사진일 수 있습니다.
+  tips:
+  - 큰 라이브러리는 FAISS 같은 인덱싱 라이브러리를 쓰지만, 학습용에서는 numpy 행렬 곱으로 충분합니다.
+  snippet: |-
+    sims = (queryFeatNorm @ libFeatNorm.T).squeeze(0)
+    topVals, topIdx = sims.topk(3)
+    [(library[int(i)][0], float(v)) for i, v in zip(topIdx, topVals)]
+  exercise:
+    prompt: queryFlower에 대해서도 top-3 결과를 얻으세요.
+    starterCode: |-
+      simsFlower = (queryFlowerNorm @ libFeatNorm.T).squeeze(___)
+      topF, topIF = simsFlower.topk(3)
+      [(library[int(i)][0], float(v)) for i, v in zip(topIF, topF)]
+    hints:
+    - 빈칸은 0입니다.
+    - flower 계열 사진이 상위에 나와야 정상입니다.
+  check:
+    noError: 행렬 곱과 topk가 오류 없이 끝나야 합니다.
+    resultCheck: topVals의 길이가 3이어야 합니다.
+- id: visualize
+  title: 5단계. 결과 시각화
+  structuredPrimary: true
+  subtitle: query + top-3
+  goal: 질의 사진과 상위 3장을 한 화면에 시각화합니다.
+  why: 검색 결과 화면은 정확성을 사람이 즉시 평가할 수 있는 표준 UX입니다.
+  explanation: |-
+    1x4 subplots를 만들어 좌측에 질의, 우측 세 칸에 상위 결과를 그립니다. 각 결과 타이틀에 사진 이름과 유사도 점수를 표시합니다.
+  tips:
+  - 검색 결과 화면은 학습용 코드에서도 표준 패턴을 따르면 다른 응용에 그대로 활용할 수 있습니다.
+  snippet: |-
+    queryFlower = (flower.astype(np.float32) * 0.9 + 10).clip(0, 255).astype(np.uint8)
+    queryFlowerBatch = preprocess(Image.fromarray(queryFlower)).unsqueeze(0)
+    with torch.inference_mode():
+        queryFlowerFeat = encoder(queryFlowerBatch).flatten(1)
+    queryFlowerNorm = F.normalize(queryFlowerFeat, dim=1)
+    simsFlower = (queryFlowerNorm @ libFeatNorm.T).squeeze(0)
+    topF, topIF = simsFlower.topk(3)
+
+    fig, axes = plt.subplots(1, 4, figsize=(14, 4))
+    axes[0].imshow(queryImg)
+    axes[0].set_title('query')
+    axes[0].axis('off')
+    for axis, (idx, score) in zip(axes[1:], zip(topIdx.tolist(), topVals.tolist())):
+        name, img = library[int(idx)]
+        axis.imshow(img)
+        axis.set_title(f'{name}\\n{score:.3f}')
+        axis.axis('off')
+    fig
+  exercise:
+    prompt: queryFlower의 결과도 같은 패턴으로 시각화하세요.
+    starterCode: |-
+      fig2, axes2 = plt.subplots(1, 4, figsize=(14, 4))
+      axes2[0].imshow(queryFlower)
+      axes2[0].set_title('query: flower')
+      axes2[0].axis('off')
+      for axis, (idx, score) in zip(axes2[1:], zip(topIF.tolist(), topF.tolist())):
+          name, img = library[int(idx)]
+          axis.imshow(img)
+          axis.set_title(f'{name}\\n{score:.3f}')
+          axis.axis('off')
+      fig2
+    hints:
+    - 같은 패턴을 그대로 적용하면 됩니다.
+    - flower 계열이 상위에 나와야 합니다.
+  check:
+    noError: 시각화가 오류 없이 끝나야 합니다.
+    resultCheck: 두 시각화 모두 4장의 사진이 출력되어야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 검색 평가
+  goal: 라이브러리의 사진들을 질의로 사용해 검색 정확도를 평가합니다.
+  why: 자기 자신을 질의로 사용하는 leave-one-out 평가는 검색 성능의 표준 지표입니다.
+  explanation: |-
+    각 미션은 import문부터 시작하지만, 위 예제를 실행했다면 import는 생략해도 됩니다.
+  tips:
+  - 같은 카테고리 사진들이 상위에 나오면 임베딩이 의미를 잘 잡고 있다는 신호입니다.
+  snippet: |-
+    selfSims = libFeatNorm @ libFeatNorm.T
+    np.fill_diagonal(selfSims.numpy(), -1.0)
+    bestIdx = selfSims.argmax(dim=1)
+    for srcIdx, hitIdx in enumerate(bestIdx.tolist()):
+        print(library[srcIdx][0], '→', library[hitIdx][0])
+    selfSims.shape
+  exercise:
+    prompt: "미션1: 위 결과에서 같은 카테고리(접두사 china/flower)가 매칭된 비율을 출력하세요. 미션2: 라이브러리 안의 모든 쌍의 유사도 행렬을 imshow로 시각화하세요."
+    starterCode: |-
+      sameCategoryHits = 0
+      for srcIdx, hitIdx in enumerate(bestIdx.tolist()):
+          prefSrc = library[srcIdx][0].split('_')[0]
+          prefHit = library[hitIdx][0].split('_')[0]
+          if prefSrc == prefHit:
+              sameCategoryHits += 1
+      accuracy = sameCategoryHits / ___
+      accuracy
+    hints:
+    - 분모는 라이브러리 크기입니다.
+    - accuracy는 0~1 사이여야 합니다.
+  check:
+    noError: 검색 평가가 오류 없이 끝나야 합니다.
+    resultCheck: selfSims.shape이 (6, 6)이어야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: deepVision_04-similarity_search-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - build_library
+    - practice
+    title: 유사도 검색 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: metric·top-k·minimum score·index version 계약을 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_similarity_search_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_similarity_search_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_similarity_search_contract(value):
+            required = ['metric', 'topK', 'minimumScore', 'indexVersion']
+            rules = [{'id': 'metric', 'field': 'metric', 'kind': 'enum', 'values': ['cosine', 'l2', 'dot']}, {'id': 'top-k', 'field': 'topK', 'kind': 'range', 'min': 1, 'max': 1000}, {'id': 'score', 'field': 'minimumScore', 'kind': 'unit-interval'}, {'id': 'index', 'field': 'indexVersion', 'kind': 'nonempty'}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'similarity_search', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.deep-vision.deepVision_04.similarity_search-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.deep-vision.deepVision_04.similarity_search-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_similarity_search_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              metric: cosine
+              topK: 10
+              minimumScore: 0.75
+              indexVersion: 2026-07
+          expectedReturn:
+            accepted: true
+            topic: similarity_search
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              topK: 10
+              minimumScore: 0.75
+              indexVersion: 2026-07
+          expectedReturn:
+            accepted: false
+            topic: similarity_search
+            missing:
+            - metric
+            violations:
+            - metric
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              metric: pearson
+              topK: 0
+              minimumScore: 2
+              indexVersion: ''
+          expectedReturn:
+            accepted: false
+            topic: similarity_search
+            missing: []
+            violations:
+            - index
+            - metric
+            - score
+            - top-k
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: deepVision_04-similarity_search-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - deepVision_04-similarity_search-contract-audit-mastery
+    title: 유사도 검색 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_similarity_search_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_similarity_search_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_similarity_search_result(expected, observed):
+            identity = ['queryHash', 'indexVersion', 'modelHash']
+            metrics = {'topScore': 0.01}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'similarity_search', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.deep-vision.deepVision_04.similarity_search-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.deep-vision.deepVision_04.similarity_search-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_similarity_search_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              queryHash: q1
+              indexVersion: 2026-07
+              modelHash: embed-a
+              topScore: 0.91
+          - value:
+              queryHash: q1
+              indexVersion: 2026-07
+              modelHash: embed-a
+              topScore: 0.915
+          expectedReturn:
+            passed: true
+            topic: similarity_search
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              queryHash: q1
+              indexVersion: 2026-07
+              modelHash: embed-a
+              topScore: 0.91
+          - value:
+              queryHash: q2
+              indexVersion: old
+              modelHash: embed-b
+              topScore: 0.4
+          expectedReturn:
+            passed: false
+            topic: similarity_search
+            missing: []
+            identityMismatch:
+            - indexVersion
+            - modelHash
+            - queryHash
+            metricDrift:
+            - topScore
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              queryHash: q1
+              indexVersion: 2026-07
+              modelHash: embed-a
+              topScore: 0.91
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: similarity_search
+            missing:
+            - indexVersion
+            - modelHash
+            - queryHash
+            - topScore
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: deepVision_04-similarity_search-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - deepVision_04-similarity_search-result-reconciliation-transfer
+    title: 유사도 검색 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_similarity_search_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_similarity_search_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_similarity_search_evidence(stage):
+            stages = {'source': {'action': 'validate similarity source and model', 'evidence': 'query index model identity', 'risk': 'model-input mismatch'}, 'inference': {'action': 'run bounded similarity inference', 'evidence': 'metric ranking trace', 'risk': 'nondeterministic or unsafe inference'}, 'result': {'action': 'reconcile similarity output', 'evidence': 'rank order and top score', 'risk': 'confident wrong prediction'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.deep-vision.deepVision_04.similarity_search-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.deep-vision.deepVision_04.similarity_search-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_similarity_search_evidence
+        cases:
+        - id: recalls-source
+          arguments:
+          - value: source
+          expectedReturn:
+            action: validate similarity source and model
+            evidence: query index model identity
+            risk: model-input mismatch
+        - id: recalls-inference
+          arguments:
+          - value: inference
+          expectedReturn:
+            action: run bounded similarity inference
+            evidence: metric ranking trace
+            risk: nondeterministic or unsafe inference
+        - id: recalls-result
+          arguments:
+          - value: result
+          expectedReturn:
+            action: reconcile similarity output
+            evidence: rank order and top score
+            risk: confident wrong prediction
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

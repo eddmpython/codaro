@@ -1,0 +1,670 @@
+var e=`meta:
+  id: inputCtl_10
+  title: 종합 화면 점검 매크로
+  order: 10
+  category: inputCtl
+  difficulty: medium
+  audience: GUI 자동화에 입문하는 Python 학습자
+  packages:
+    - pyautogui
+    - pyperclip
+  tags:
+    - capstone
+    - automation
+    - workflow
+intro:
+  direction: 안전 설정, 상태 관측, 영역 캡처, 이미지 매치, 클립보드 보고를 묶어 한 사이클로 동작하는 화면 점검 매크로를 직접 만들어 본다.
+  benefits:
+    - 자동화 진입에서 PAUSE와 FAILSAFE를 설정한다.
+    - pyautogui.size와 position으로 시작 상태를 관측한다.
+    - 화면 일부 영역을 캡처하고 위치를 다시 찾는다.
+    - 종합 보고 dict를 만들고 클립보드에 JSON으로 올린다.
+  diagram:
+    steps:
+      - label: 자동화 진입 설정
+        detail: PAUSE 0.05, FAILSAFE True로 안전 환경을 만든다.
+      - label: 시작 상태 관측
+        detail: 시작 시 해상도와 마우스 좌표를 한 dict로 묶어 기록한다.
+      - label: 영역 캡처와 매치
+        detail: 화면 일부를 캡처하고 needle을 잘라 같은 위치에서 다시 찾는다.
+      - label: 종합 보고 + 클립보드
+        detail: 결과 dict를 JSON 직렬화해 클립보드에 올리고 다시 받아 보고의 라운드트립을 검증한다.
+    runtime:
+      - label: pyautogui와 pyperclip 패키지 필요
+        detail: meta.packages의 두 라이브러리가 로컬에 준비돼야 한다.
+      - label: GUI 세션과 시스템 클립보드
+        detail: 실 호출이 마우스/화면/클립보드를 잠시 사용하므로 다른 작업과 겹치지 않게 한다.
+sections:
+  - id: bootstrap
+    title: 자동화 진입 설정
+    structuredPrimary: true
+    subtitle: PAUSE + FAILSAFE
+    goal: bootstrapAutomation 함수가 pyautogui PAUSE와 FAILSAFE를 설정하고 결과 dict로 보고한다.
+    why: 자동화 매크로의 모든 사이클은 안전 설정에서 시작해야 사고 위험이 일관되게 제한된다.
+    explanation: bootstrapAutomation은 pauseSeconds 인자를 받아 PAUSE에 할당하고 FAILSAFE를 True로 고정한 뒤 두 값을 dict로 돌려준다. 같은 함수가 자동화 사이클의 첫 단계로 호출돼야 후속 함수가 안심하고 동작한다.
+    tips:
+      - PAUSE는 0.05초처럼 짧게 두면 자동화 사이클 시간이 줄어든다.
+      - FAILSAFE는 운영 환경에서 절대 False로 두지 않는다.
+    snippet: |-
+      import pyautogui
+
+
+      def bootstrapAutomation(pauseSeconds: float = 0.05) -> dict:
+          pyautogui.PAUSE = pauseSeconds
+          pyautogui.FAILSAFE = True
+          return {"pause": pyautogui.PAUSE, "failsafe": pyautogui.FAILSAFE}
+
+
+      bootstrap = bootstrapAutomation(0.05)
+
+      assert bootstrap == {"pause": 0.05, "failsafe": True}
+      bootstrap
+    exercise:
+      prompt: bootstrapAutomation에 pauseSeconds=0.1을 넘기면 pause 0.1과 failsafe True가 dict로 돌아오는지 검증하세요.
+      starterCode: |-
+        import pyautogui
+
+
+        def bootstrapAutomation(pauseSeconds: float = 0.05) -> dict:
+            pyautogui.PAUSE = pauseSeconds
+            pyautogui.FAILSAFE = ___
+            return {"pause": pyautogui.PAUSE, "failsafe": pyautogui.FAILSAFE}
+
+
+        bootstrap = bootstrapAutomation(0.1)
+
+        assert bootstrap == {"pause": 0.1, "failsafe": True}
+        bootstrap
+      solution: |-
+        import pyautogui
+
+
+        def bootstrapAutomation(pauseSeconds: float = 0.05) -> dict:
+            pyautogui.PAUSE = pauseSeconds
+            pyautogui.FAILSAFE = True
+            return {"pause": pyautogui.PAUSE, "failsafe": pyautogui.FAILSAFE}
+
+
+        bootstrap = bootstrapAutomation(0.1)
+
+        assert bootstrap == {"pause": 0.1, "failsafe": True}
+        bootstrap
+      hints:
+        - FAILSAFE 값은 항상 True로 둔다.
+        - 결과 dict는 pause와 failsafe 두 키를 가진다.
+      check:
+        noError: bootstrapAutomation 호출이 끝나야 한다.
+        resultCheck: bootstrap이 pause 0.1과 failsafe True를 담아야 한다.
+    check:
+      noError: 안전 설정 함수 호출이 끝나야 한다.
+      resultCheck: bootstrap이 pause 0.05와 failsafe True를 담아야 한다.
+  - id: observe-state
+    title: 시작 상태 관측
+    structuredPrimary: true
+    subtitle: size + position
+    goal: observeStartState 함수가 해상도와 마우스 좌표를 한 dict로 묶어 시작 상태를 보고한다.
+    why: 자동화 사이클은 시작 시점의 환경을 기록해 둬야 사고 발생 시 비교 추적이 쉽다.
+    explanation: observeStartState는 pyautogui.size와 position을 호출해 screen, cursor 두 키를 가진 dict를 돌려준다. 결과는 정수 좌표만 담아 JSON 직렬화에 안전하다. 같은 함수를 사이클 끝에서 다시 호출해 변동량을 비교할 수 있다.
+    tips:
+      - 시작 상태는 자동화 로그의 첫 줄로 기록하면 추적이 쉽다.
+      - 같은 함수를 사이클 끝에서도 호출하면 마우스 이동량을 알 수 있다.
+    snippet: |-
+      import pyautogui
+
+
+      def observeStartState() -> dict:
+          screen = pyautogui.size()
+          cursor = pyautogui.position()
+          return {
+              "screen": {"width": screen.width, "height": screen.height},
+              "cursor": {"x": cursor.x, "y": cursor.y},
+          }
+
+
+      startState = observeStartState()
+
+      assert startState["screen"]["width"] > 0
+      assert isinstance(startState["cursor"]["x"], int)
+      startState["screen"]
+    exercise:
+      prompt: observeStartState를 호출해 screen.height가 양수이고 cursor.y가 정수인지 검증하세요.
+      starterCode: |-
+        import pyautogui
+
+
+        def observeStartState() -> dict:
+            screen = pyautogui.size()
+            cursor = pyautogui.___()
+            return {
+                "screen": {"width": screen.width, "height": screen.height},
+                "cursor": {"x": cursor.x, "y": cursor.y},
+            }
+
+
+        startState = observeStartState()
+
+        assert startState["screen"]["height"] > 0
+        assert isinstance(startState["cursor"]["y"], int)
+        startState["screen"]
+      solution: |-
+        import pyautogui
+
+
+        def observeStartState() -> dict:
+            screen = pyautogui.size()
+            cursor = pyautogui.position()
+            return {
+                "screen": {"width": screen.width, "height": screen.height},
+                "cursor": {"x": cursor.x, "y": cursor.y},
+            }
+
+
+        startState = observeStartState()
+
+        assert startState["screen"]["height"] > 0
+        assert isinstance(startState["cursor"]["y"], int)
+        startState["screen"]
+      hints:
+        - 좌표 함수 이름은 position이다.
+        - cursor.y는 정수형이다.
+      check:
+        noError: observeStartState 호출이 끝나야 한다.
+        resultCheck: screen.height가 양수이고 cursor.y가 정수여야 한다.
+    check:
+      noError: observeStartState 호출이 끝나야 한다.
+      resultCheck: startState에 screen과 cursor가 있어야 한다.
+  - id: capture-and-locate
+    title: 영역 캡처와 매치
+    structuredPrimary: true
+    subtitle: screenshot + locate
+    goal: captureAndLocate 함수가 영역 캡처에서 needle을 잘라 같은 영역에서 다시 찾는 사이클을 수행한다.
+    why: 캡처와 매치는 화면 안 요소를 좌표로 잡는 자동화의 핵심 사이클이므로 한 함수로 표준화해 둔다.
+    explanation: captureAndLocate는 영역 tuple을 받아 pyautogui.screenshot으로 캡처하고 결과 이미지의 중앙 사각형을 needle로 잘라 pyautogui.locate로 다시 찾는다. 결과 dict는 captureSize, needleSize, found, needleAt 네 키를 담아 사이클 결과를 한 행으로 보고한다.
+    tips:
+      - needle을 캡처 중앙에서 자르면 매치가 항상 보장돼 학습 결정성이 유지된다.
+      - 매치 결과 Box의 좌표는 캡처 안 상대 좌표다.
+    snippet: |-
+      import pyautogui
+
+
+      def captureAndLocate(region: tuple) -> dict:
+          capture = pyautogui.screenshot(region=region)
+          width, height = capture.size
+          needle = capture.crop((width // 4, height // 4, 3 * width // 4, 3 * height // 4))
+          box = pyautogui.locate(needle, capture)
+          return {
+              "captureSize": capture.size,
+              "needleSize": needle.size,
+              "found": box is not None,
+              "needleAt": (box.left, box.top) if box else None,
+          }
+
+
+      result = captureAndLocate((0, 0, 80, 60))
+
+      assert result["captureSize"] == (80, 60)
+      assert result["found"] is True
+      assert result["needleAt"] == (20, 15)
+      result
+    exercise:
+      prompt: captureAndLocate에 (0, 0, 60, 40) 영역을 넘기면 captureSize가 (60, 40)이고 found가 True인지 종합 검증하세요.
+      starterCode: |-
+        import pyautogui
+
+
+        def captureAndLocate(region: tuple) -> dict:
+            capture = pyautogui.screenshot(region=region)
+            width, height = capture.size
+            needle = capture.crop((width // 4, height // 4, 3 * width // 4, 3 * height // 4))
+            box = pyautogui.___(needle, capture)
+            return {
+                "captureSize": capture.size,
+                "needleSize": needle.size,
+                "found": box is not None,
+                "needleAt": (box.left, box.top) if box else None,
+            }
+
+
+        result = captureAndLocate((0, 0, 60, 40))
+
+        assert result["captureSize"] == (60, 40)
+        assert result["found"] is True
+        result
+      solution: |-
+        import pyautogui
+
+
+        def captureAndLocate(region: tuple) -> dict:
+            capture = pyautogui.screenshot(region=region)
+            width, height = capture.size
+            needle = capture.crop((width // 4, height // 4, 3 * width // 4, 3 * height // 4))
+            box = pyautogui.locate(needle, capture)
+            return {
+                "captureSize": capture.size,
+                "needleSize": needle.size,
+                "found": box is not None,
+                "needleAt": (box.left, box.top) if box else None,
+            }
+
+
+        result = captureAndLocate((0, 0, 60, 40))
+
+        assert result["captureSize"] == (60, 40)
+        assert result["found"] is True
+        result
+      hints:
+        - 매치 함수 이름은 locate다.
+        - needle은 캡처 중앙에서 잘라내 매치가 항상 성공한다.
+      check:
+        noError: captureAndLocate 호출이 종합 결과를 돌려줘야 한다.
+        resultCheck: captureSize가 (60, 40)이고 found가 True여야 한다.
+    check:
+      noError: captureAndLocate 호출이 끝나야 한다.
+      resultCheck: captureSize가 (80, 60)이고 found가 True여야 한다.
+  - id: report-to-clipboard
+    title: 종합 보고 + 클립보드
+    structuredPrimary: true
+    subtitle: JSON 라운드트립
+    goal: 사이클 결과 dict를 JSON으로 직렬화해 클립보드에 올리고 paste로 다시 받아 같은 dict로 복원되는지 검증한다.
+    why: 자동화 사이클이 보고를 클립보드로 전달하는 패턴은 운영자가 사이클 결과를 다른 도구에 즉시 붙여넣을 수 있어 매우 실용적이다.
+    explanation: cycleReport 함수는 bootstrap, startState, locator 세 dict를 받아 종합 보고 dict를 만들고 json.dumps로 직렬화해 클립보드에 올린다. 그리고 paste 결과를 json.loads로 복원해 원본과 같은 dict인지 확인한다. 같은 라운드트립이 자동화 사이클의 결과 보존을 보장한다.
+    tips:
+      - JSON 라운드트립은 자동화 보고의 무결성을 한 번에 검증한다.
+      - 클립보드 보고는 운영자가 다른 메모 앱에 즉시 붙여넣을 수 있어 편리하다.
+    snippet: |-
+      import json
+
+      import pyperclip
+
+
+      def cycleReport(bootstrap: dict, startState: dict, locator: dict) -> dict:
+          report = {"bootstrap": bootstrap, "startState": startState, "locator": locator}
+          pyperclip.copy(json.dumps(report, ensure_ascii=False))
+          restored = json.loads(pyperclip.paste())
+          return {"report": report, "restored": restored, "matches": report == restored}
+
+
+      result = cycleReport(
+          {"pause": 0.05, "failsafe": True},
+          {"screen": {"width": 1920, "height": 1080}, "cursor": {"x": 100, "y": 200}},
+          {"captureSize": [60, 40], "found": True, "needleAt": [15, 10]},
+      )
+
+      assert result["matches"] is True
+      assert result["report"] == result["restored"]
+      result["matches"]
+    exercise:
+      prompt: cycleReport에 임의 dict 세 개를 넘기면 matches가 True이고 report와 restored가 같은지 종합 검증하세요.
+      starterCode: |-
+        import json
+
+        import pyperclip
+
+
+        def cycleReport(bootstrap: dict, startState: dict, locator: dict) -> dict:
+            report = {"bootstrap": bootstrap, "startState": startState, "locator": locator}
+            pyperclip.copy(json.dumps(report, ensure_ascii=False))
+            restored = json.loads(pyperclip.___())
+            return {"report": report, "restored": restored, "matches": report == restored}
+
+
+        result = cycleReport(
+            {"pause": 0.1, "failsafe": True},
+            {"screen": {"width": 800, "height": 600}, "cursor": {"x": 50, "y": 60}},
+            {"captureSize": [40, 30], "found": False, "needleAt": None},
+        )
+
+        assert result["matches"] is True
+        assert result["report"] == result["restored"]
+        result["matches"]
+      solution: |-
+        import json
+
+        import pyperclip
+
+
+        def cycleReport(bootstrap: dict, startState: dict, locator: dict) -> dict:
+            report = {"bootstrap": bootstrap, "startState": startState, "locator": locator}
+            pyperclip.copy(json.dumps(report, ensure_ascii=False))
+            restored = json.loads(pyperclip.paste())
+            return {"report": report, "restored": restored, "matches": report == restored}
+
+
+        result = cycleReport(
+            {"pause": 0.1, "failsafe": True},
+            {"screen": {"width": 800, "height": 600}, "cursor": {"x": 50, "y": 60}},
+            {"captureSize": [40, 30], "found": False, "needleAt": None},
+        )
+
+        assert result["matches"] is True
+        assert result["report"] == result["restored"]
+        result["matches"]
+      hints:
+        - 클립보드 읽기 함수 이름은 paste다.
+        - JSON 라운드트립 후 두 dict는 같아야 한다.
+      check:
+        noError: cycleReport 호출이 종합 결과를 돌려줘야 한다.
+        resultCheck: matches가 True이고 report와 restored가 동일해야 한다.
+    check:
+      noError: 종합 사이클 보고 함수 호출이 끝나야 한다.
+      resultCheck: matches가 True이고 report와 restored가 같아야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: inputCtl_10-screen-audit-capstone-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - bootstrap
+    - report-to-clipboard
+    title: 종합 화면 점검의 상태·안전·증거 completeness 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 필수 state와 E-Stop, before/after, redaction evidence를 release 전에 판정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 정상 완료 화면만이 아니라 오류·중단 state도 필수 목록에 포함하세요.
+    - E-Stop은 설정값이 아니라 실제 중단 event로 시험하세요.
+    exercise:
+      prompt: audit_screen_run(run, required_states)를 완성하세요.
+      starterCode: |-
+        def audit_screen_run(run, required_states):
+            raise NotImplementedError
+      solution: |
+        def audit_screen_run(run, required_states):
+            observed = {item["state"] for item in run.get("observations", [])}
+            missing = sorted(set(required_states) - observed)
+            failures = []
+            if missing:
+                failures.append("states")
+            if not run.get("emergencyStopTested", False):
+                failures.append("emergency-stop")
+            if not run.get("beforeAfterBound", False):
+                failures.append("before-after")
+            if run.get("secretResiduals", 0) != 0:
+                failures.append("secrets")
+            return {"releaseReady": not failures, "failures": failures, "missingStates": missing, "observationCount": len(run.get("observations", []))}
+      hints: *id001
+    check:
+      id: python.inputctl.inputCtl_10.screen-audit-capstone.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_10.screen-audit-capstone.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_screen_run
+        cases:
+        - id: accepts-complete-safe-run
+          arguments:
+          - value:
+              observations:
+              - state: ready
+              - state: saved
+              emergencyStopTested: true
+              beforeAfterBound: true
+              secretResiduals: 0
+          - value:
+            - ready
+            - saved
+          expectedReturn:
+            releaseReady: true
+            failures: []
+            missingStates: []
+            observationCount: 2
+        - id: reports-state-and-safety-gaps
+          arguments:
+          - value:
+              observations:
+              - state: ready
+              emergencyStopTested: false
+              beforeAfterBound: false
+              secretResiduals: 1
+          - value:
+            - ready
+            - error
+          expectedReturn:
+            releaseReady: false
+            failures:
+            - states
+            - emergency-stop
+            - before-after
+            - secrets
+            missingStates:
+            - error
+            observationCount: 1
+        - id: reports-no-observations
+          arguments:
+          - value:
+              emergencyStopTested: true
+              beforeAfterBound: true
+              secretResiduals: 0
+          - value:
+            - ready
+          expectedReturn:
+            releaseReady: false
+            failures:
+            - states
+            missingStates:
+            - ready
+            observationCount: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: inputCtl_10-screen-run-release-streak-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inputCtl_10-screen-audit-capstone-mastery
+    title: 새 화면 자동화의 연속 무개입 통과 판정하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 같은 plan hash의 pass와 intervention 0 조건으로 연속 streak를 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 사람이 중간에 고친 pass는 무개입 자동화 streak로 세지 마세요.
+    - 현재 plan hash와 다른 실행 증거를 release 판정에 합치지 마세요.
+    exercise:
+      prompt: decide_screen_release(runs, current_plan_hash, required_streak)를 완성하세요.
+      starterCode: |-
+        def decide_screen_release(runs, current_plan_hash, required_streak):
+            raise NotImplementedError
+      solution: |
+        def decide_screen_release(runs, current_plan_hash, required_streak):
+            if required_streak <= 0:
+                raise ValueError("required streak must be positive")
+            streak = 0
+            stale = []
+            interventions = []
+            for run in sorted(runs, key=lambda item: item["sequence"]):
+                if run["planHash"] != current_plan_hash:
+                    stale.append(run["sequence"])
+                    continue
+                if run.get("interventions", 0) > 0:
+                    interventions.append(run["sequence"])
+                streak = streak + 1 if run["passed"] and run.get("interventions", 0) == 0 else 0
+            return {"releaseReady": streak >= required_streak and not stale, "streak": streak, "stale": stale, "interventions": interventions}
+      hints: *id002
+    check:
+      id: python.inputctl.inputCtl_10.screen-run-release-streak.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_10.screen-run-release-streak.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: decide_screen_release
+        cases:
+        - id: accepts-two-unassisted-passes
+          arguments:
+          - value:
+            - sequence: 1
+              planHash: a
+              passed: true
+              interventions: 0
+            - sequence: 2
+              planHash: a
+              passed: true
+              interventions: 0
+          - value: a
+          - value: 2
+          expectedReturn:
+            releaseReady: true
+            streak: 2
+            stale: []
+            interventions: []
+        - id: resets-on-user-intervention
+          arguments:
+          - value:
+            - sequence: 1
+              planHash: a
+              passed: true
+              interventions: 1
+            - sequence: 2
+              planHash: a
+              passed: true
+              interventions: 0
+          - value: a
+          - value: 2
+          expectedReturn:
+            releaseReady: false
+            streak: 1
+            stale: []
+            interventions:
+            - 1
+        - id: rejects-stale-plan-run
+          arguments:
+          - value:
+            - sequence: 1
+              planHash: old
+              passed: true
+              interventions: 0
+            - sequence: 2
+              planHash: a
+              passed: true
+              interventions: 0
+          - value: a
+          - value: 1
+          expectedReturn:
+            releaseReady: false
+            streak: 1
+            stale:
+            - 1
+            interventions: []
+        - id: rejects-zero-streak
+          arguments:
+          - value: []
+          - value: a
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: inputCtl_10-screen-audit-capstone-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inputCtl_10-screen-run-release-streak-transfer
+    title: 종합 화면 자동화 종료 조건 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 안전·state·증거·연속 통과 기준을 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 입력 자동화 action 전에 대상·경계·중단 방법을 검증하세요.
+    - 화면 변화와 E-Stop evidence를 남기고 성공을 클릭 발생으로 판단하지 마세요.
+    exercise:
+      prompt: choose_screen_audit_gate(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_screen_audit_gate(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_screen_audit_gate(situation):
+            table = {'safety': {'action': 'test fail-safe and E-Stop', 'evidence': 'real stop event', 'risk': 'runaway input'}, 'outcome': {'action': 'bind before after state', 'evidence': 'state and screenshot hashes', 'risk': 'click-only success'}, 'release': {'action': 'require current unassisted streak', 'evidence': 'plan-bound runs', 'risk': 'manual rescue or stale pass'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.inputctl.inputCtl_10.screen-audit-capstone-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_10.screen-audit-capstone-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_screen_audit_gate
+        cases:
+        - id: recalls-safety
+          arguments:
+          - value: safety
+          expectedReturn:
+            action: test fail-safe and E-Stop
+            evidence: real stop event
+            risk: runaway input
+        - id: recalls-outcome
+          arguments:
+          - value: outcome
+          expectedReturn:
+            action: bind before after state
+            evidence: state and screenshot hashes
+            risk: click-only success
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

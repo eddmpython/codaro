@@ -1,0 +1,591 @@
+var e=`meta:
+  id: visionBasics_06
+  title: 픽셀 산술
+  order: 6
+  category: visionBasics
+  difficulty: ⭐⭐⭐
+  badge: 기초
+  packages:
+  - matplotlib
+  - numpy
+  - scikit-learn
+  tags:
+  - numpy
+  - 밝기
+  - 대비
+  - clip
+  - 산술연산
+  seo:
+    title: 이미지 비전 기초 - 픽셀 산술
+    description: 밝기, 대비, 평균을 numpy 산술 한 줄로 표현하고 clip으로 오버플로우를 막습니다.
+    keywords:
+    - numpy
+    - 밝기조정
+    - 대비조정
+    - clip
+    - 이미지처리
+intro:
+  emoji: 🔢
+  goal: 밝기·대비 보정이 단순한 numpy 산술이라는 점을 직접 식으로 풀어 봅니다.
+  description: |-
+    "밝기를 +30 올린다", "대비를 1.2배 늘린다" 같은 보정은 모두 픽셀 값에 사칙연산을 적용한 결과입니다. 이 강의는 이 식을 직접 적고, uint8 자료형에서 생기는 오버플로우를 clip으로 막는 패턴을 익힙니다.
+  direction: 밝기·대비·평균 합성을 모두 산술식으로 표현하고 clip으로 0~255 범위에 가둡니다.
+  benefits:
+  - 밝기와 대비를 한 줄 산술로 조정할 수 있습니다.
+  - uint8 오버플로우의 원인을 알고 float 캐스팅으로 회피할 수 있습니다.
+  - 두 이미지의 평균과 차이를 한 줄로 만들 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. uint8 오버플로우
+      detail: 그냥 더하면 어떤 일이 일어나는지 확인합니다.
+    - label: 2단계. float 캐스팅 + clip
+      detail: 안전하게 더하는 표준 패턴을 익힙니다.
+    - label: 3단계. 대비 조정
+      detail: 평균값을 기준으로 픽셀을 확대·축소합니다.
+    - label: 4단계. 두 이미지 평균
+      detail: 두 사진을 균등하게 섞습니다.
+    - label: 5단계. 가중 평균
+      detail: 알파 한 줄로 부드러운 합성을 만듭니다.
+    runtime:
+    - label: numpy 환경
+      detail: numpy 산술과 clip만으로 학습합니다.
+    - label: 검증 흐름
+      detail: assert와 시각 비교로 학습 결과가 기대값과 같은지 확인합니다.
+sections:
+- id: overflow
+  title: 1단계. uint8 오버플로우 체험
+  structuredPrimary: true
+  subtitle: 255 + 50 = 49?
+  goal: uint8 자료형으로 직접 덧셈을 해서 오버플로우 결과를 눈으로 확인합니다.
+  why: 한번 직접 부딪혀 봐야 왜 float 캐스팅이 필요한지 잊지 않게 됩니다.
+  explanation: |-
+    uint8은 0~255의 8비트 부호 없는 정수입니다. 250 + 30 처럼 결과가 255를 넘어가면 numpy는 wrap-around를 수행해 24 같은 작은 값을 돌려줍니다. 사진에서 이것이 일어나면 밝아야 할 영역이 갑자기 어두워집니다.
+
+    이 함정은 입문자 코드의 단골 버그입니다. 직접 한 줄로 만든 뒤 다음 섹션에서 해결합니다.
+  tips:
+  - numpy의 산술 결과 dtype은 입력에 따라 결정됩니다. uint8 + uint8 = uint8 입니다.
+  snippet: |-
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from sklearn.datasets import load_sample_image
+
+    china = load_sample_image('china.jpg')
+
+    bright = np.array([240, 250, 255], dtype=np.uint8)
+    overflow = bright + np.uint8(30)
+    overflow
+  exercise:
+    prompt: china 이미지에 그대로 +50을 더한 결과 wrong을 만들고 imshow로 어떤 모습이 되는지 확인하세요.
+    starterCode: |-
+      china = load_sample_image('china.jpg')
+      wrong = china + np.uint8(___)
+      fig = plt.figure(figsize=(5, 4))
+      plt.imshow(wrong)
+      plt.axis('off')
+      fig
+    hints:
+    - 결과는 의도와 다르게 어둡거나 색이 깨져 보입니다.
+    - 그래도 이미지 모양은 유지됩니다.
+  check:
+    noError: 덧셈과 imshow가 오류 없이 끝나야 합니다.
+    resultCheck: wrong과 china의 일부 픽셀 값이 의도와 다르게 작아진 것을 확인할 수 있어야 합니다.
+- id: safe_add
+  title: 2단계. 안전한 더하기
+  structuredPrimary: true
+  subtitle: float 캐스팅 + clip + uint8
+  goal: 오버플로우를 막는 표준 패턴 (float 변환 → 연산 → clip → uint8) 을 익힙니다.
+  why: 이 세 줄 패턴은 비전 코드에서 거의 모든 산술의 표준입니다.
+  explanation: |-
+    \`(img.astype(np.float32) + 50).clip(0, 255).astype(np.uint8)\` 가 정석입니다. float으로 잠시 옮겨서 더하면 더 큰 값도 손실 없이 표현되고, clip으로 255 위는 잘라낸 뒤 다시 uint8로 돌립니다.
+
+    이 패턴을 알면 어떤 산술 보정도 같은 틀로 풀 수 있습니다.
+  tips:
+  - clip의 두 번째 인자는 최댓값입니다. 음수가 나올 수 있는 경우 clip(0, 255) 가 음수도 0으로 잘라 줍니다.
+  snippet: |-
+    safe = (china.astype(np.float32) + 50).clip(0, 255).astype(np.uint8)
+    fig = plt.figure(figsize=(5, 4))
+    plt.imshow(safe)
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: 밝기를 -60 만큼 어둡게 하는 dim 이미지를 같은 패턴으로 만드세요.
+    starterCode: |-
+      dim = (china.astype(np.float32) ___).clip(0, 255).astype(np.uint8)
+      fig2 = plt.figure(figsize=(5, 4))
+      plt.imshow(dim)
+      plt.axis('off')
+      fig2
+    hints:
+    - 어둡게 만들려면 음수를 더하거나 양수를 뺍니다.
+    - clip의 하한 0이 음수 결과를 잘라줍니다.
+  check:
+    noError: 캐스팅과 clip이 오류 없이 끝나야 합니다.
+    resultCheck: dim.mean() 이 china.mean() 보다 작아야 합니다.
+- id: contrast
+  title: 3단계. 대비 조정
+  structuredPrimary: true
+  subtitle: 평균을 기준으로 확대·축소
+  goal: 픽셀 값을 평균으로부터 멀리 밀어내거나 모아 대비를 조정합니다.
+  why: 사진의 디테일이 흐릿할 때 가장 먼저 시도하는 보정이 대비입니다.
+  explanation: |-
+    대비 조정 공식은 \`(pixel - mean) * alpha + mean\` 입니다. alpha가 1보다 크면 대비가 강해지고, 1보다 작으면 부드러워집니다. mean은 보통 128(중간 회색) 또는 이미지 전체 평균을 씁니다.
+
+    OpenCV의 \`cv2.convertScaleAbs(img, alpha=1.2, beta=0)\` 가 비슷한 일을 합니다. 손으로 한 번 식을 적어 보면 함수가 무엇을 감추는지 알게 됩니다.
+  tips:
+  - 대비를 너무 강하게(alpha > 2) 주면 클립으로 흰색/검정 픽셀이 많아져 디테일이 사라집니다.
+  snippet: |-
+    base = china.astype(np.float32)
+    alpha = 1.4
+    midGray = 128.0
+    boosted = ((base - midGray) * alpha + midGray).clip(0, 255).astype(np.uint8)
+    fig = plt.figure(figsize=(5, 4))
+    plt.imshow(boosted)
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: alpha=0.6 으로 대비를 부드럽게 만든 softened를 만들고 원본과 비교 출력하세요.
+    starterCode: |-
+      softened = ((base - midGray) * ___ + midGray).clip(0, 255).astype(np.uint8)
+      fig2, axes2 = plt.subplots(1, 2, figsize=(10, 4))
+      axes2[0].imshow(china)
+      axes2[0].set_title('original')
+      axes2[1].imshow(softened)
+      axes2[1].set_title('alpha=0.6')
+      for axis in axes2:
+          axis.axis('off')
+      fig2
+    hints:
+    - alpha < 1 은 대비를 줄입니다.
+    - 결과는 안개 낀 듯한 느낌이 됩니다.
+  check:
+    noError: 대비 계산과 두 그래프 그리기가 오류 없이 끝나야 합니다.
+    resultCheck: softened.std() 가 china.std() 보다 작아야 합니다.
+- id: average_two
+  title: 4단계. 두 이미지의 평균
+  structuredPrimary: true
+  subtitle: 합성의 가장 단순한 형태
+  goal: 같은 크기 두 이미지를 균등하게 섞습니다.
+  why: 평균 합성은 노출 다른 두 사진을 합치는 HDR의 기본 아이디어와 같습니다.
+  explanation: |-
+    같은 크기의 두 이미지를 평균하려면 \`((a.astype(float) + b.astype(float)) * 0.5).clip(0, 255).astype(np.uint8)\` 입니다. 두 이미지의 크기가 다르면 미리 잘라 맞추거나 다음 트랙의 resize를 써야 합니다.
+  tips:
+  - 평균 합성의 결과는 두 사진의 디테일이 동시에 흐려진 듯한 이미지가 됩니다.
+  snippet: |-
+    flower = load_sample_image('flower.jpg')
+    h = min(china.shape[0], flower.shape[0])
+    w = min(china.shape[1], flower.shape[1])
+    aCut = china[:h, :w].astype(np.float32)
+    bCut = flower[:h, :w].astype(np.float32)
+    averaged = ((aCut + bCut) * 0.5).clip(0, 255).astype(np.uint8)
+    fig = plt.figure(figsize=(6, 4))
+    plt.imshow(averaged)
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: 두 이미지에 각각 다른 가중치(0.8, 0.2)를 곱해 chinaHeavy 이미지를 만드세요.
+    starterCode: |-
+      chinaHeavy = (aCut * ___ + bCut * ___).clip(0, 255).astype(np.uint8)
+      fig2 = plt.figure(figsize=(6, 4))
+      plt.imshow(chinaHeavy)
+      plt.axis('off')
+      fig2
+    hints:
+    - 두 가중치의 합이 1이어야 평균에 가깝게 보입니다.
+    - "0.8과 0.2를 빈칸에 넣어 보세요."
+  check:
+    noError: 가중치 합성이 오류 없이 끝나야 합니다.
+    resultCheck: 'chinaHeavy의 픽셀 분포가 china에 더 가까워야 합니다(예: chinaHeavy의 평균이 china의 평균에 더 가깝다).'
+- id: weighted_blend
+  title: 5단계. 픽셀별 가중치 합성
+  structuredPrimary: true
+  subtitle: 알파 한 줄로 부드러운 페이드
+  goal: 가중치가 픽셀별로 달라지는 합성을 한 줄로 표현합니다.
+  why: 한쪽 끝에서 다른 사진으로 부드럽게 전환되는 페이드 효과는 비전 데모와 광고에 자주 등장합니다.
+  explanation: |-
+    \`alpha\` 가 같은 크기의 float 배열이면 픽셀별 가중치 합성이 됩니다. 좌측은 0, 우측은 1이 되도록 만들면 좌→우로 페이드되는 합성이 만들어집니다.
+
+    실제로는 알파를 3채널로 broadcast해야 RGB와 곱이 됩니다. \`alpha[:, :, None]\` 트릭으로 마지막 축을 추가합니다.
+  tips:
+  - "alpha[:, :, None] 은 (H, W) 배열을 (H, W, 1)로 만들어 RGB 곱에 자연스럽게 들어갑니다."
+  snippet: |-
+    weight = np.linspace(0, 1, w, dtype=np.float32)
+    weight = np.broadcast_to(weight, (h, w))
+    fade = (aCut * (1 - weight[:, :, None]) + bCut * weight[:, :, None]).clip(0, 255).astype(np.uint8)
+    fig = plt.figure(figsize=(6, 4))
+    plt.imshow(fade)
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: 위에서 아래로 가는 세로 페이드 verticalFade를 만드세요(상단은 china, 하단은 flower).
+    starterCode: |-
+      vWeight = np.linspace(0, 1, h, dtype=np.float32)
+      vWeight = np.broadcast_to(vWeight[:, None], (h, w))
+      verticalFade = (aCut * (1 - vWeight[:, :, None]) + bCut * vWeight[:, :, None]).clip(0, 255).astype(np.uint8)
+      fig2 = plt.figure(figsize=(6, 4))
+      plt.imshow(verticalFade)
+      plt.axis('off')
+      fig2
+    hints:
+    - 세로 방향 가중치는 처음 None 인덱스를 행 축에 추가해 만듭니다.
+    - 상단이 0이면 china가 강하고 하단이 1이면 flower가 강해집니다.
+  check:
+    noError: broadcast와 가중치 합성이 오류 없이 끝나야 합니다.
+    resultCheck: verticalFade의 상단 평균과 하단 평균이 서로 달라야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 산술로 보정 도구 만들기
+  goal: 보정 공식을 함수로 묶고 비교 그리드를 만듭니다.
+  why: 보정 함수를 만들면 같은 패턴을 매개변수만 바꿔 반복할 수 있습니다.
+  explanation: |-
+    각 미션은 import문부터 시작하지만, 위 예제를 실행했다면 import는 생략해도 됩니다.
+  tips:
+  - 함수 매개변수에 기본값을 두면 호출이 짧아집니다.
+  snippet: |-
+    def adjust(img, brightness=0.0, contrast=1.0, mid=128.0):
+        base = img.astype(np.float32)
+        out = (base - mid) * contrast + mid + brightness
+        return out.clip(0, 255).astype(np.uint8)
+
+    sample = adjust(china, brightness=20, contrast=1.2)
+    sample.dtype, sample.shape
+  exercise:
+    prompt: "미션1: 위 adjust 함수를 그대로 사용해 (brightness, contrast) 조합 4개를 2x2 그리드로 시각화하세요. 미션2: 두 이미지를 가로 페이드한 fadeImage와 그 결과에 adjust(contrast=1.3) 을 적용한 enhanced를 만들어 비교 출력하세요."
+    starterCode: |-
+      fig, axes = plt.subplots(2, 2, figsize=(10, 8))
+      configs = [(0, 1.0), (40, 1.0), (0, 1.5), (40, 1.5)]
+      for axis, (bVal, cVal) in zip(axes.ravel(), configs):
+          axis.imshow(adjust(china, brightness=bVal, contrast=cVal))
+          axis.set_title(f"b={bVal}, c={cVal}")
+          axis.axis('off')
+      fig
+    hints:
+    - 함수 호출은 키워드 인자로 두면 가독성이 좋습니다.
+    - 두 이미지를 합치는 페이드는 5단계와 같은 패턴을 씁니다.
+  check:
+    noError: 함수 정의와 그리드 출력이 오류 없이 끝나야 합니다.
+    resultCheck: 4개 셀의 이미지가 서로 다른 밝기/대비로 출력되어야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: visionBasics_06-pixel_arithmetic-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - overflow
+    - practice
+    title: 픽셀 산술 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: scale·bias·clip 정책을 명시해 overflow를 막는다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_pixel_arithmetic_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_pixel_arithmetic_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_pixel_arithmetic_contract(value):
+            required = ['scale', 'bias', 'clipMode', 'workingDtype']
+            rules = [{'id': 'scale', 'field': 'scale', 'kind': 'range', 'min': 0, 'max': 4}, {'id': 'bias', 'field': 'bias', 'kind': 'range', 'min': -255, 'max': 255}, {'id': 'clip', 'field': 'clipMode', 'kind': 'enum', 'values': ['saturate', 'normalize']}, {'id': 'dtype', 'field': 'workingDtype', 'kind': 'enum', 'values': ['float32', 'int16']}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'pixel_arithmetic', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.vision-basics.visionBasics_06.pixel_arithmetic-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_06.pixel_arithmetic-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_pixel_arithmetic_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              scale: 1.2
+              bias: 10
+              clipMode: saturate
+              workingDtype: float32
+          expectedReturn:
+            accepted: true
+            topic: pixel_arithmetic
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              bias: 10
+              clipMode: saturate
+              workingDtype: float32
+          expectedReturn:
+            accepted: false
+            topic: pixel_arithmetic
+            missing:
+            - scale
+            violations:
+            - scale
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              scale: 5
+              bias: 300
+              clipMode: wrap
+              workingDtype: uint8
+          expectedReturn:
+            accepted: false
+            topic: pixel_arithmetic
+            missing: []
+            violations:
+            - bias
+            - clip
+            - dtype
+            - scale
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: visionBasics_06-pixel_arithmetic-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionBasics_06-pixel_arithmetic-contract-audit-mastery
+    title: 픽셀 산술 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_pixel_arithmetic_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_pixel_arithmetic_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_pixel_arithmetic_result(expected, observed):
+            identity = ['sourceHash', 'clipMode']
+            metrics = {'clippedRatio': 0.01}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'pixel_arithmetic', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.vision-basics.visionBasics_06.pixel_arithmetic-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_06.pixel_arithmetic-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_pixel_arithmetic_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              sourceHash: p1
+              clipMode: saturate
+              clippedRatio: 0.05
+          - value:
+              sourceHash: p1
+              clipMode: saturate
+              clippedRatio: 0.055
+          expectedReturn:
+            passed: true
+            topic: pixel_arithmetic
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              sourceHash: p1
+              clipMode: saturate
+              clippedRatio: 0.05
+          - value:
+              sourceHash: p2
+              clipMode: normalize
+              clippedRatio: 0.2
+          expectedReturn:
+            passed: false
+            topic: pixel_arithmetic
+            missing: []
+            identityMismatch:
+            - clipMode
+            - sourceHash
+            metricDrift:
+            - clippedRatio
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              sourceHash: p1
+              clipMode: saturate
+              clippedRatio: 0.05
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: pixel_arithmetic
+            missing:
+            - clipMode
+            - clippedRatio
+            - sourceHash
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: visionBasics_06-pixel_arithmetic-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionBasics_06-pixel_arithmetic-result-reconciliation-transfer
+    title: 픽셀 산술 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_pixel_arithmetic_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_pixel_arithmetic_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_pixel_arithmetic_evidence(stage):
+            stages = {'input': {'action': 'validate pixel arithmetic input contract', 'evidence': 'scale bias dtype contract', 'risk': 'misinterpreted pixels'}, 'process': {'action': 'apply bounded pixel arithmetic operation', 'evidence': 'pre-cast range trace', 'risk': 'silent shape or range drift'}, 'result': {'action': 'reconcile pixel arithmetic result', 'evidence': 'clipped pixel ratio', 'risk': 'plausible but wrong image'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.vision-basics.visionBasics_06.pixel_arithmetic-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_06.pixel_arithmetic-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_pixel_arithmetic_evidence
+        cases:
+        - id: recalls-input
+          arguments:
+          - value: input
+          expectedReturn:
+            action: validate pixel arithmetic input contract
+            evidence: scale bias dtype contract
+            risk: misinterpreted pixels
+        - id: recalls-process
+          arguments:
+          - value: process
+          expectedReturn:
+            action: apply bounded pixel arithmetic operation
+            evidence: pre-cast range trace
+            risk: silent shape or range drift
+        - id: recalls-result
+          arguments:
+          - value: result
+          expectedReturn:
+            action: reconcile pixel arithmetic result
+            evidence: clipped pixel ratio
+            risk: plausible but wrong image
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

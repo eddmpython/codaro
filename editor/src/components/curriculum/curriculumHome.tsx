@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpen, CheckCircle2, GraduationCap, RotateCcw, Sparkles, Target } from "lucide-react";
+import { ArrowRight, BookOpen, CheckCircle2, GraduationCap, RotateCcw, Target } from "lucide-react";
 import { useMemo } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -73,46 +73,33 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
     ? categories.find((category) => category.key === resume.category)?.name ?? resume.category
     : "";
   const firstCategory = categories[0];
+  const lessonCount = categories.reduce((total, category) => total + category.count, 0);
 
   return (
     <ScrollArea className="h-full min-h-0 min-w-0" data-curriculum-home="true">
-      <div className="min-w-0 p-4">
-        <div className="mx-auto min-w-0 max-w-5xl space-y-8">
-          <section
-            className="grid gap-6 border-b pb-8 xl:grid-cols-[minmax(0,1fr)_minmax(260px,0.42fr)] xl:items-end"
-            data-curriculum-home-hero="true"
+      <div className="min-w-0 p-4 sm:p-5">
+        <div className="mx-auto min-w-0 max-w-6xl">
+          <header
+            className="grid gap-5 border-b border-border pb-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end"
+            data-curriculum-home-intro="true"
           >
             <div className="min-w-0">
-              <div className="flex items-center gap-2 text-primary">
-                <GraduationCap className="size-5" />
-                <span className="text-sm font-medium">Codaro Learn</span>
+              <div className="flex items-center gap-2 text-accent-brand">
+                <GraduationCap className="size-4" />
+                <span className="text-xs font-medium">학습 스튜디오</span>
               </div>
-              <h1 className="mt-3 max-w-2xl break-keep text-2xl font-semibold tracking-normal sm:text-3xl">
-                만들 결과를 고르고, 코드로 증명하세요.
+              <h1 className="mt-2 max-w-2xl break-keep text-xl font-bold tracking-normal sm:text-2xl">
+                오늘 완성할 결과를 선택하세요.
               </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-                필요한 설명을 읽고 코드를 직접 바꿔 실행하면 검증과 다음 학습 상태가 같은 흐름에서 자동으로 이어집니다.
+              <p className="mt-2 max-w-3xl text-sm font-normal leading-6 text-muted-foreground">
+                설명을 읽고 코드를 직접 바꾸면 실행 결과, 자동 검증, 다음 학습이 한 화면에서 이어집니다.
               </p>
-              {creditedOutcomes > 0 ? (
-                <div
-                  className="mt-4 flex items-center gap-1.5 text-xs text-success"
-                  data-curriculum-home-mastery="true"
-                  data-curriculum-home-credited-outcomes={creditedOutcomes}
-                  data-curriculum-home-independent-outcomes={independentOutcomes}
-                  data-curriculum-home-mastered-outcomes={masteredOutcomes}
-                >
-                  <CheckCircle2 className="size-3.5" />
-                  <span>
-                    강한 검증 {creditedOutcomes}개 · 독립 적용 {independentOutcomes}개 · 숙달 {masteredOutcomes}개
-                  </span>
-                </div>
-              ) : null}
             </div>
 
-            <div className="flex flex-wrap gap-2 xl:justify-end">
+            <div className="flex min-w-0 flex-wrap gap-2 lg:justify-end">
               {resume ? (
                 <Button
-                  className="gap-2"
+                  className="max-w-full gap-2"
                   data-curriculum-home-resume="true"
                   data-learning-control-intent="navigation"
                   onClick={() => onSelectLesson(resume.category, resume.contentId)}
@@ -123,36 +110,64 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
                 </Button>
               ) : firstCategory ? (
                 <Button
-                  className="gap-2"
+                  className="max-w-full gap-2"
                   data-curriculum-home-start="true"
                   data-learning-control-intent="navigation"
                   onClick={() => onSelectCategory(firstCategory.key)}
                 >
-                  <Sparkles className="size-4" />
+                  <BookOpen className="size-4" />
                   {firstCategory.name}부터 시작
                   <ArrowRight className="size-4" />
                 </Button>
               ) : null}
             </div>
-          </section>
+          </header>
+
+          {creditedOutcomes > 0 ? (
+            <dl
+              className="grid grid-cols-3 divide-x divide-border border-b border-border py-4"
+              data-curriculum-home-mastery="true"
+              data-curriculum-home-credited-outcomes={creditedOutcomes}
+              data-curriculum-home-independent-outcomes={independentOutcomes}
+              data-curriculum-home-mastered-outcomes={masteredOutcomes}
+            >
+              {[
+                ["강한 검증", creditedOutcomes],
+                ["독립 적용", independentOutcomes],
+                ["숙달", masteredOutcomes],
+              ].map(([label, value]) => (
+                <div className="min-w-0 px-3 first:pl-0 sm:px-5" key={label}>
+                  <dt className="truncate text-xs font-normal text-muted-foreground">{label}</dt>
+                  <dd className="mt-1 flex items-center gap-1.5 text-lg font-bold tabular-nums text-foreground">
+                    <CheckCircle2 className="size-3.5 text-success" />
+                    {value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          ) : null}
 
           {totalDue > 0 ? (
             <section
-              className="border-b pb-5"
+              className="border-b border-border py-5"
               data-curriculum-home-reviews="true"
             >
-              <div className="flex items-center gap-2 text-warning">
-                <RotateCcw className="size-4" />
-                <h2 className="text-sm font-semibold">다시 풀 문제 · {totalDue}개</h2>
+              <div className="flex flex-wrap items-end justify-between gap-2">
+                <div>
+                  <div className="flex items-center gap-2 text-warning">
+                    <RotateCcw className="size-4" />
+                    <h2 className="text-sm font-bold">다시 풀 문제 · {totalDue}개</h2>
+                  </div>
+                  <p className="mt-1 text-xs font-normal leading-5 text-muted-foreground">
+                    코드를 다시 작성해 기억과 적용력을 실행 결과로 확인합니다.
+                  </p>
+                </div>
               </div>
-              <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                기억 여부를 누르지 말고 코드를 다시 작성해 실행 결과로 확인하세요.
-              </p>
-              <div className="mt-3 space-y-2">
+              <div className="mt-3 divide-y divide-border border-y border-border">
                 {dueReviews.slice(0, 5).map((review) => (
                   <button
                     key={review.lessonKey}
-                    className="flex w-full items-center gap-2 border-b px-1 py-3 text-left transition-colors last:border-b-0 hover:bg-muted/40 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="flex min-h-12 w-full items-center gap-3 px-2 py-2.5 text-left transition-colors hover:bg-muted/40 focus-visible:bg-muted/40 disabled:cursor-not-allowed disabled:opacity-60"
                     data-curriculum-home-review={review.lessonKey}
                     data-curriculum-home-review-open="true"
                     data-learning-control-intent="navigation"
@@ -175,26 +190,36 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
             </section>
           ) : null}
 
-          <section data-curriculum-home-goals="true">
-            <div className="mb-5 flex items-start gap-3">
-              <Target className="mt-0.5 size-5 shrink-0 text-primary" />
-              <div>
-                <h2 className="text-base font-semibold">목표별 학습</h2>
-                <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                  익힐 문법이 아니라 완성할 결과에 가까운 영역을 선택하세요.
-                </p>
+          <section className="pt-6" data-curriculum-home-goals="true">
+            <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <Target className="mt-0.5 size-5 shrink-0 text-accent-brand" />
+                <div>
+                  <h2 className="text-base font-bold">목표별 학습</h2>
+                  <p className="mt-1 text-sm font-normal leading-6 text-muted-foreground">
+                    문법 이름보다 만들고 싶은 결과에 가까운 영역에서 시작하세요.
+                  </p>
+                </div>
               </div>
+              <p className="text-xs font-normal tabular-nums text-muted-foreground">
+                {groups.length}개 영역 · {lessonCount}개 레슨
+              </p>
             </div>
-            <div className="border-y">
+            <div className="border-y border-border">
               {groups.map((group) => (
                 <section
-                  className="grid min-w-0 gap-5 border-b py-6 last:border-b-0 md:grid-cols-[240px_minmax(0,1fr)] md:gap-7"
+                  className="grid min-w-0 gap-5 border-b border-border py-7 last:border-b-0 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-8"
                   key={group.track}
                   data-curriculum-home-domain={group.domainId}
                   data-curriculum-home-goal-group={group.track}
                 >
                   <div className="min-w-0">
-                    <h3 className="px-1 text-sm font-semibold text-foreground">{group.track}</h3>
+                    <div className="flex items-baseline justify-between gap-3 px-1">
+                      <h3 className="text-sm font-bold text-foreground">{group.track}</h3>
+                      <span className="text-xs font-normal tabular-nums text-muted-foreground">
+                        {group.categories.reduce((total, category) => total + category.count, 0)}개
+                      </span>
+                    </div>
                     {group.domainId ? (
                       <LearningDomainVisual
                         className="mt-3"
@@ -203,26 +228,29 @@ export function CurriculumHome({ categories, onSelectCategory, onSelectLesson }:
                       />
                     ) : null}
                   </div>
-                  <div className="min-w-0 divide-y">
+                  <div className="min-w-0 divide-y divide-border border-y border-border lg:border-y-0">
                     {group.categories.map((category) => (
                       <button
-                        className="group flex w-full min-w-0 items-center gap-3 px-1 py-3 text-left transition-colors hover:bg-muted/40"
+                        className="group flex min-h-16 w-full min-w-0 items-center gap-3 px-2 py-3 text-left transition-colors hover:bg-muted/40 focus-visible:bg-muted/40"
                         data-curriculum-home-category={category.key}
                         data-learning-control-intent="navigation"
                         key={category.key}
                         onClick={() => onSelectCategory(category.key)}
                         type="button"
                       >
-                        <BookOpen className="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-primary" />
+                        <BookOpen className="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-accent-brand" />
                         <span className="min-w-0 flex-1">
-                          <span className="block text-sm font-semibold text-foreground">{category.name}</span>
+                          <span className="block text-sm font-bold text-foreground">{category.name}</span>
                           {category.description ? (
-                            <span className="mt-0.5 block text-xs leading-5 text-foreground/80">
+                            <span className="mt-0.5 block text-xs font-normal leading-5 text-muted-foreground">
                               {category.description}
                             </span>
                           ) : null}
                         </span>
-                        <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+                        <span className="hidden shrink-0 text-xs font-normal tabular-nums text-muted-foreground sm:block">
+                          {category.count}개 레슨
+                        </span>
+                        <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-accent-brand" />
                       </button>
                     ))}
                   </div>

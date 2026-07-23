@@ -1,0 +1,535 @@
+var e=`meta:
+  packages:
+  - folium
+  id: folium_00
+  title: Folium 소개
+  order: 0
+  category: folium
+  difficulty: ⭐
+  badge: 소개
+  tags:
+  - folium
+  - 지도
+  - Leaflet
+  - 시각화
+  - 소개
+  seo:
+    title: Folium 소개 - 파이썬 인터랙티브 지도
+    description: Folium으로 인터랙티브 지도를 만듭니다. Leaflet.js 기반의 파이썬 지도 시각화 라이브러리를 소개합니다.
+    keywords:
+    - folium
+    - 지도
+    - Leaflet
+    - 파이썬
+    - 인터랙티브
+intro:
+  direction: Folium 소개에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.
+  benefits:
+  - 첫 실행 셀은 assert로 핵심 결과를 고정해 실습 코드가 깨지지 않았는지 확인합니다.
+  - 위도/경도 데이터 확인 후 지도 레이어 구성에 맞는 코드 입력을 고릅니다.
+  - Folium 소개 결과를 마커와 저장 HTML 기준으로 즉시 점검합니다.
+  - 완료한 코드를 위치 기반 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: Folium이란? 입력 확인
+      detail: 입력 기준(위도/경도 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 왜 Folium인가? 처리 실행
+      detail: 지도 레이어 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 무엇을 만들 수 있나? 결과 검증
+      detail: 마커와 저장 HTML 기준으로 실행 결과를 비교합니다.
+    - label: Folium 소개 재사용
+      detail: 완성 코드를 위치 기반 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 지도 시각화 환경
+      detail: folium 기준으로 로컬 Python 실행을 준비합니다.
+    - label: Folium 소개 실행
+      detail: 셀을 실행해 마커와 저장 HTML와 예외 상태를 확인합니다.
+    - label: Folium 소개 완료
+      detail: 검증된 코드를 위치 기반 리포트로 남깁니다.
+sections:
+- id: what_is_folium
+  title: Folium이란?
+  subtitle: 파이썬 지도 라이브러리
+  blocks:
+  - type: text
+    content: Folium은 파이썬에서 인터랙티브 지도를 만드는 라이브러리입니다. JavaScript 라이브러리인 Leaflet.js를 파이썬에서 쉽게 사용할 수 있게 해줍니다.
+      2013년에 시작되어 현재 가장 인기 있는 파이썬 지도 라이브러리입니다.
+  - type: text
+    content: 지도에 마커를 찍고, 경로를 그리고, 영역을 색칠하고, 히트맵을 만들 수 있습니다. 모든 지도는 줌, 패닝, 클릭 등 인터랙션이 가능합니다.
+  - type: tip
+    content: Leaflet.js는 OpenStreetMap 기반의 오픈소스 지도 라이브러리입니다. 구글맵 API와 달리 무료이고 API 키가 필요 없습니다.
+  goal: Folium이란?에서 위도/경도 데이터을 바꿨을 때 마커와 저장 HTML가 어떻게 달라지는지 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+- id: why_folium
+  title: 왜 Folium인가?
+  subtitle: matplotlib으로 지도 안 되나요?
+  blocks:
+  - type: text
+    content: '**matplotlib으로 지도를 그리면**: 정적 이미지입니다. 확대/축소가 안 되고, 마커 클릭도 안 됩니다. 지도 타일을 직접 관리해야 합니다.'
+  - type: text
+    content: '**Folium으로 지도를 그리면**: 줌인/줌아웃이 자유롭습니다. 마커를 클릭하면 팝업이 뜹니다. 드래그로 지도를 이동할 수 있습니다. 전 세계 어디든 탐색
+      가능합니다.'
+  - type: text
+    content: '**핵심 차이**: Folium은 HTML/JavaScript를 생성합니다. 브라우저에서 실제 지도처럼 동작합니다.'
+  - type: tip
+    content: Folium은 순수 파이썬으로 작성되어 Codaro 로컬 Python에서도 바로 실행할 수 있습니다. 결과는 HTML 지도 객체로 렌더링됩니다.
+  goal: 왜 Folium인가?에서 위도/경도 데이터을 바꿨을 때 마커와 저장 HTML가 어떻게 달라지는지 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+- id: what_can_do
+  title: 무엇을 만들 수 있나?
+  subtitle: Folium의 기능
+  blocks:
+  - type: text
+    content: '**마커와 아이콘**: 위치를 점으로 표시합니다. 클릭하면 정보가 팝업됩니다. 아이콘 색상과 모양을 커스터마이징합니다.'
+  - type: text
+    content: '**도형 그리기**: 원, 사각형, 다각형으로 영역을 표시합니다. 폴리라인으로 경로나 노선을 그립니다.'
+  - type: text
+    content: '**히트맵**: 데이터 밀도를 색상으로 시각화합니다. 인구 밀집도, 매장 분포 등을 표현합니다.'
+  - type: text
+    content: '**단계구분도(Choropleth)**: 지역별로 다른 색상을 칠합니다. 통계 데이터를 지도에 시각화합니다.'
+  - type: text
+    content: '**마커 클러스터**: 수천 개의 마커를 효율적으로 표시합니다. 줌 레벨에 따라 자동으로 그룹화됩니다.'
+  goal: 무엇을 만들 수 있나?에서 위도/경도 데이터을 바꿨을 때 마커와 저장 HTML가 어떻게 달라지는지 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+- id: real_world_examples
+  title: 실제 활용 예시
+  subtitle: 어디서 사용할까?
+  blocks:
+  - type: text
+    content: '**매장/지점 위치 지도**: 프랜차이즈 매장, 은행 지점, 편의점 위치를 지도에 표시합니다.'
+  - type: text
+    content: '**배달/물류 경로**: 배달 경로, 택배 동선, 버스 노선을 지도에 그립니다.'
+  - type: text
+    content: '**부동산/상권 분석**: 지역별 집값, 상권 분포, 유동인구를 시각화합니다.'
+  - type: text
+    content: '**여행/관광 지도**: 관광지, 맛집, 숙소를 카테고리별로 표시합니다.'
+  - type: text
+    content: '**재난/안전 지도**: 대피소 위치, 위험 지역, 사고 발생 현황을 표시합니다.'
+  goal: 실제 활용 예시에서 위도/경도 데이터을 바꿨을 때 마커와 저장 HTML가 어떻게 달라지는지 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+- id: basic_concept
+  title: 기본 개념
+  subtitle: 지도의 구성 요소
+  blocks:
+  - type: text
+    content: '**Map (지도)**: 기본 캔버스입니다. 중심 좌표와 줌 레벨을 설정합니다.'
+  - type: text
+    content: '**Tile Layer (타일 레이어)**: 지도 배경입니다. OpenStreetMap, CartoDB 등 다양한 스타일이 있습니다.'
+  - type: text
+    content: '**Marker (마커)**: 특정 위치를 표시하는 점입니다. 팝업과 툴팁을 추가할 수 있습니다.'
+  - type: text
+    content: '**Layer (레이어)**: 지도 위에 겹쳐지는 요소들입니다. 마커, 도형, 히트맵 등이 각각 레이어입니다.'
+  - type: text
+    content: '**GeoJSON**: 지리 데이터의 표준 형식입니다. 지역 경계, 도로, 건물 등을 표현합니다.'
+  - type: tip
+    content: 위도(latitude)는 남북 위치(-90~90), 경도(longitude)는 동서 위치(-180~180)입니다. 서울은 약 [37.5, 127.0]입니다.
+  goal: 기본 개념에서 위도/경도 데이터을 바꿨을 때 마커와 저장 HTML가 어떻게 달라지는지 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+- id: coordinates
+  title: 좌표 이해하기
+  subtitle: 위도와 경도
+  blocks:
+  - type: text
+    content: '**위도(Latitude)**: 적도 기준 남북 위치입니다. 북쪽이 양수, 남쪽이 음수입니다. 서울은 약 37.5도입니다.'
+  - type: text
+    content: '**경도(Longitude)**: 본초자오선 기준 동서 위치입니다. 동쪽이 양수, 서쪽이 음수입니다. 서울은 약 127도입니다.'
+  - type: text
+    content: '**좌표 형식**: Folium에서는 [위도, 경도] 순서로 입력합니다. 서울시청은 [37.5665, 126.9780]입니다.'
+  - type: text
+    content: '**좌표 찾기**: 구글맵에서 원하는 위치를 클릭하면 좌표가 표시됩니다. 또는 주소를 좌표로 변환하는 지오코딩 서비스를 사용합니다.'
+  - type: tip
+    content: 좌표 순서 주의! Folium은 [lat, lon], 구글맵 URL은 lat,lon, GeoJSON은 [lon, lat]입니다. 혼동하기 쉬우니 주의하세요.
+  goal: 좌표 이해하기에서 위도/경도 데이터을 바꿨을 때 마커와 저장 HTML가 어떻게 달라지는지 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+- id: local_output
+  title: Codaro에서 출력
+  subtitle: object output 사용
+  blocks:
+  - type: text
+    content: Folium은 HTML과 JavaScript를 생성합니다. Codaro에서 지도를 표시하려면 object output을 사용해야 합니다.
+  - type: text
+    content: '**기본 패턴**: \`m\`입니다. m은 지도 객체이고, _repr_html_()이 HTML을 생성합니다.'
+  - type: text
+    content: '**주의**: HTML output은 JavaScript를 실행하지 않습니다. 반드시 object output을 사용하세요.'
+  - type: tip
+    content: 모든 코드 블록 마지막에 m를 넣어야 지도가 표시됩니다.
+  goal: Codaro에서 출력에서 위도/경도 데이터을 바꿨을 때 마커와 저장 HTML가 어떻게 달라지는지 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+- id: learning_path
+  title: 학습 순서
+  subtitle: 10개 프로젝트 로드맵
+  blocks:
+  - type: text
+    content: '**입문 (01-02)**: 기본 지도 생성, 마커 추가, 아이콘 커스터마이징을 배웁니다.'
+  - type: text
+    content: '**기초 (03-05)**: 도형 그리기, 타일 스타일 변경, 레이어 관리를 배웁니다.'
+  - type: text
+    content: '**중급 (06-08)**: GeoJSON, 단계구분도, 히트맵으로 데이터를 시각화합니다.'
+  - type: text
+    content: '**심화 (09-10)**: 마커 클러스터, 종합 프로젝트로 실전 지도를 만듭니다.'
+  - type: tip
+    content: 각 프로젝트는 독립적으로 실행 가능합니다. 순서대로 진행하면 개념이 점진적으로 쌓입니다.
+  goal: 학습 순서에서 위도/경도 데이터을 바꿨을 때 마커와 저장 HTML가 어떻게 달라지는지 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+- id: no_api_key
+  title: API 키 불필요
+  subtitle: 무료로 시작
+  blocks:
+  - type: text
+    content: Folium은 OpenStreetMap 기반이라 API 키가 필요 없습니다. 설치 후 바로 사용할 수 있습니다.
+  - type: text
+    content: '**무료 타일 제공자**: OpenStreetMap, CartoDB, attribution을 명시한 OpenTopoMap 같은 무료 타일을 사용할 수 있습니다.'
+  - type: text
+    content: '**제한 없음**: 구글맵 API처럼 일일 요청 제한이 없습니다. 학습과 프로토타이핑에 적합합니다.'
+  - type: tip
+    content: 상업적 용도나 대량 트래픽의 경우 타일 제공자의 이용약관을 확인하세요.
+  goal: API 키 불필요에서 위도/경도 데이터을 바꿨을 때 마커와 저장 HTML가 어떻게 달라지는지 확인한다.
+  why: 지도 시각화는 위치가 중요한 데이터를 실제 공간 맥락으로 검토하게 해줍니다.
+- id: workflow_validation
+  title: 로컬 지도 검증 루프
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  goal: 로컬 지도 검증 루프에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    Folium 입문은 지도 객체를 만드는 데서 끝나지 않습니다. 업무에서는 좌표가 맞는지, 이름이 렌더 결과에 들어갔는지, 새 지점을 추가해도 검증 기준이 유지되는지 코드로 확인해야 합니다.
+
+    Folium 결과가 지도로 보인다는 사실과 별개로, 업무 품질은 데이터 계약과 렌더 검증에서 결정됩니다.
+  snippet: |-
+    import folium
+
+    officeSites = [
+        {"name": "서울 운영센터", "loc": [37.5665, 126.9780], "priority": "core"},
+        {"name": "강남 상담센터", "loc": [37.4979, 127.0276], "priority": "high"},
+        {"name": "홍대 체험존", "loc": [37.5563, 126.9236], "priority": "medium"},
+    ]
+
+    def validateSite(site):
+        lat, lon = site["loc"]
+        if not (33 <= lat <= 39 and 124 <= lon <= 132):
+            raise ValueError(f"한국 좌표 범위 밖: {site['name']}")
+        if site["priority"] not in {"core", "high", "medium"}:
+            raise ValueError(f"알 수 없는 우선순위: {site['priority']}")
+        return True
+
+    validationResult = [validateSite(site) for site in officeSites]
+    validationResult
+  exercise:
+    prompt: 로컬 지도 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      import folium
+
+      officeSites = [
+          {"name": "서울 운영센터", "loc": [37.5665, 126.9780], "priority": "core"},
+          {"name": "강남 상담센터", "loc": [37.4979, 127.0276], "priority": "high"},
+          {"name": "홍대 체험존", "loc": [37.5563, 126.9236], "priority": "medium"},
+      ]
+
+      def validateSite(site):
+          lat, lon = site["loc"]
+          if not (33 <= lat <= 39 and 124 <= lon <= 132):
+              raise ValueError(f"한국 좌표 범위 밖: {site['name']}")
+          if site["priority"] not in {"core", "high", "medium"}:
+              raise ValueError(f"알 수 없는 우선순위: {site['priority']}")
+          return True
+
+      validationResult = [validateSite(site) for site in officeSites]
+      validationResult
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: 로컬 지도 검증 루프의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 로컬 지도 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: folium_00-folium-map-contract-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - what_is_folium
+    - workflow_validation
+    title: Folium 지도 contract 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 좌표·zoom·tile 출처가 지도 목적에 맞는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_folium_map_contract(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_folium_map_contract(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_folium_map_contract(rows):
+            required = ['longitude', 'latitude', 'layer']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'layer'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['longitude'] for row in usable]
+            y_values = [row['latitude'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.folium.folium_00.folium-map-contract-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.folium.folium_00.folium-map-contract-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_folium_map_contract
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - longitude: 126.98
+              latitude: 37.57
+              layer: places
+            - longitude: 129.07
+              latitude: 35.18
+              layer: places
+            - longitude: null
+              latitude: 0
+              layer: invalid
+          expectedReturn:
+            usableCount: 2
+            excludedCount: 1
+            groupCounts:
+              places: 2
+            xExtent:
+            - 126.98
+            - 129.07
+            yExtent:
+            - 35.18
+            - 37.57
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: folium_00-folium-map-contract-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - folium_00-folium-map-contract-data-evidence-mastery
+    title: Folium 지도 contract 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 두 물류 거점의 좌표를 검증하고 bounds에 맞춰 초기 지도를 설정한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_folium_map_contract(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_folium_map_contract(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_folium_map_contract(candidate):
+            expected = {'mark': 'web-map', 'x': 'longitude', 'y': 'latitude', 'group': 'layer', 'transforms': ['fit-bounds', 'validate-coordinates'], 'interaction': 'pan-zoom'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.folium.folium_00.folium-map-contract-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.folium.folium_00.folium-map-contract-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_folium_map_contract
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: web-map
+              x: longitude
+              y: latitude
+              group: layer
+              transforms:
+              - fit-bounds
+              - validate-coordinates
+              interaction: pan-zoom
+              description: 두 물류 거점의 좌표를 검증하고 bounds에 맞춰 초기 지도를 설정한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: web-map
+              x: longitude
+              y: latitude
+              group: layer
+              transforms:
+              - fit-bounds
+              - validate-coordinates
+              interaction: pan-zoom
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: latitude
+              y: longitude
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - interaction
+            - description
+            encoding:
+              mark: web-map
+              x: longitude
+              y: latitude
+              group: layer
+              transforms:
+              - fit-bounds
+              - validate-coordinates
+              interaction: pan-zoom
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: folium_00-folium-map-contract-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - folium_00-folium-map-contract-encoding-transfer-transfer
+    title: Folium 지도 contract 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 좌표·zoom·tile 출처가 지도 목적에 맞는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_folium_map_contract(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_folium_map_contract(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_folium_map_contract(situation):
+            table = {'known-points': {'encoding': 'fit bounds', 'evidence': 'valid coordinate count', 'risk': 'hard-coded center'}, 'tile-layer': {'encoding': 'attributed tiles', 'evidence': 'provider attribution', 'risk': 'license omission'}, 'offline-report': {'encoding': 'static fallback', 'evidence': 'export screenshot', 'risk': 'network-only tiles'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.folium.folium_00.folium-map-contract-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.folium.folium_00.folium-map-contract-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_folium_map_contract
+        cases:
+        - id: recalls-known-points
+          arguments:
+          - value: known-points
+          expectedReturn:
+            encoding: fit bounds
+            evidence: valid coordinate count
+            risk: hard-coded center
+        - id: recalls-tile-layer
+          arguments:
+          - value: tile-layer
+          expectedReturn:
+            encoding: attributed tiles
+            evidence: provider attribution
+            risk: license omission
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

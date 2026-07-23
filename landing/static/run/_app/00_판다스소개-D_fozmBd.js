@@ -1,0 +1,667 @@
+var e=`meta:
+  packages:
+  - pandas
+  id: pandas_00
+  title: 판다스소개
+  order: 0
+  category: pandas
+  badge: 소개
+  source: eddmpython
+  sourceUrl: https://eddmpython.com
+  outcomes: ["pandas.intro"]
+  prerequisites: ["python.lists","python.functions"]
+  estimatedMinutes: 30
+  tags:
+  - 판다스
+  - 데이터분석
+  - 입문
+  - 검증
+  - 로컬실행
+  seo:
+    title: 판다스(Pandas) 입문 - 파이썬 데이터분석 시작하기
+    description: 파이썬 pandas 라이브러리로 데이터분석을 시작하세요. 실제 데이터(tips, titanic, penguins)로 바로 실습하며 배웁니다.
+    keywords:
+    - pandas
+    - 판다스
+    - 파이썬 데이터분석
+    - DataFrame
+    - 데이터프레임
+intro:
+  direction: 판다스소개에서 표 데이터를 불러오고 정제, 집계, 검증 결과까지 연결합니다.
+  benefits:
+  - 첫 실행 셀은 assert로 핵심 결과를 고정해 실습 코드가 깨지지 않았는지 확인합니다.
+  - DataFrame 입력 확인 후 정제와 집계에 맞는 코드 입력을 고릅니다.
+  - 판다스소개 결과를 행/열 수와 요약값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 데이터 리포트 자동화에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 주문 DataFrame 기본 입력 확인
+      detail: 입력 기준(DataFrame 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 정제와 집계 처리 실행
+      detail: 정제와 집계 코드를 실행해 중간 결과를 확인합니다.
+    - label: 행/열 수와 요약값 결과 검증
+      detail: 행/열 수와 요약값 기준으로 실행 결과를 비교합니다.
+    - label: 판다스소개 재사용
+      detail: 완성 코드를 데이터 리포트 자동화에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 표 데이터 환경
+      detail: pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 판다스소개 실행
+      detail: 셀을 실행해 행/열 수와 요약값와 예외 상태를 확인합니다.
+    - label: 판다스소개 완료
+      detail: 검증된 코드를 데이터 리포트 자동화로 남깁니다.
+sections:
+- id: intro
+  blocks:
+  - type: mainHeader
+    emoji: 🐼
+    title: 판다스?? 파이썬 아니고??
+    subtitle: 분명 파이썬 배우러 왔는데...
+  - type: hero
+    emoji: 🎯
+    title: 실제 데이터로 바로 실습합니다
+    subtitle: 이론 설명 없이, 목표를 정하고 직접 분석해봅니다
+    points:
+    - emoji: 📊
+      title: 실제 데이터 사용
+    - emoji: 🎯
+      title: 목표 중심 학습
+    - emoji: 🚫
+      title: 이론 설명 없음
+    - emoji: ✋
+      title: 직접 해보기
+  goal: 판다스?? 파이썬 아니고??에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+- id: use_cases
+  blocks:
+  - type: sectionHeader
+    title: 🎯 판다스로 뭘 할 수 있나요?
+    subtitle: 실제로 이런 곳에서 씁니다
+  - type: featureCards
+    cards:
+    - emoji: 📊
+      title: 데이터 분석
+      description: 매출 데이터, 설문조사 결과, 실험 데이터 등을 분석하고 인사이트 도출
+    - emoji: 🧹
+      title: 데이터 정제
+      description: 결측치 처리, 이상치 제거, 데이터 형식 변환 등 전처리 작업
+    - emoji: 📈
+      title: 시각화 준비
+      description: matplotlib, seaborn 등과 연동해서 차트/그래프 생성
+    - emoji: 🤖
+      title: 머신러닝 전처리
+      description: scikit-learn, tensorflow 등에 넣기 전 데이터 준비
+    - emoji: 💼
+      title: 업무 자동화
+      description: 엑셀 보고서 자동 생성, 데이터 병합, 정기 리포트
+    - emoji: 🌐
+      title: 웹 데이터 수집
+      description: CSV, JSON, HTML 테이블 등 다양한 소스에서 데이터 로드
+  goal: 🎯 판다스로 뭘 할 수 있나요?에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+- id: python_vs_pandas
+  blocks:
+  - type: sectionHeader
+    title: 🤔 파이썬 문법 다 배우고 판다스?
+    subtitle: 그건 너무 멀고 험한 길입니다...
+  - type: compare
+    left:
+      title: 파이썬 문법 마스터 후 판다스
+      subtitle: 전통적인 방식
+      icon: 😵
+      color: orange
+      items:
+      - 변수 배우고...
+      - 조건문 배우고...
+      - 반복문 배우고...
+      - 함수 배우고...
+      - 클래스 배우고...
+      - 모듈 배우고...
+      - 드디어 판다스??
+      infoBox: 😭 몇 달이 걸릴지 모릅니다
+    right:
+      title: 바로 판다스 시작!
+      subtitle: 실용적인 방식
+      icon: 🚀
+      color: green
+      items:
+      - 변수 = 값 (5분)
+      - 바로 데이터 분석!
+      - 점(.) 찍으면 끝
+      - 결과 바로 확인
+      - 필요한 문법은 그때 학습
+      infoBox: 🎉 오늘 바로 시작합시다!
+  goal: 🤔 파이썬 문법 다 배우고 판다스?에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+- id: excel_connection
+  blocks:
+  - type: hero
+    emoji: 📊
+    title: 엑셀 스프레드시트 = DataFrame
+    subtitle: 판다스는 엑셀 개념과 거의 같습니다
+    points:
+    - emoji: 📋
+      title: 시트 = DataFrame
+    - emoji: 🔤
+      title: 열(A,B,C) = Column
+    - emoji: 🔢
+      title: 행(1,2,3) = Row
+    - emoji: 📦
+      title: 셀 = 값
+  - type: table
+    headers:
+    - 이름
+    - 나이
+    - 점수
+    rows:
+    - - 철수
+      - '25'
+      - '85'
+    - - 영희
+      - '23'
+      - '92'
+    - - 민수
+      - '27'
+      - '78'
+  - type: note
+    title: 위 표가 바로 DataFrame입니다
+    content: pandas에서 데이터는 이런 표 형태로 저장됩니다. 엑셀 시트와 똑같이 생겼죠?
+  goal: 엑셀 스프레드시트 = DataFrame에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+- id: excel_vs_pandas
+  blocks:
+  - type: sectionHeader
+    title: 🆚 엑셀 vs 판다스
+    subtitle: 엑셀도 좋지만, 한계가 있습니다
+  - type: table
+    headers:
+    - 비교 항목
+    - 엑셀
+    - 판다스
+    rows:
+    - - 대용량 처리
+      - ❌ 100만 행 한계
+      - ✅ 수천만 행 가능
+    - - 반복 작업
+      - ❌ 매번 수동 클릭
+      - ✅ 코드 한 번으로 자동화
+    - - 웹 데이터
+      - ❌ 다운로드 → 열기
+      - ✅ URL 한 줄로 바로
+    - - 데이터 탐색
+      - ❌ 스크롤하며 확인
+      - ✅ df.describe() 한 줄
+    - - 가격
+      - 💰 Microsoft 365 구독
+      - 🆓 완전 무료
+    - - 재현성
+      - ❌ 수동 작업 기록 안됨
+      - ✅ 코드로 기록됨
+  - type: note
+    style: info
+    title: 매일 같은 리포트 만드시나요?
+    content: 엑셀로 30분 걸리던 작업, 판다스 코드 한 번 짜면 앞으로 1초면 끝납니다. 그렇게 판다스로 만든 결과를 엑셀로 옮기면 이게 바로 엑셀 자동화입니다.
+  - type: video
+    platform: local
+    url: python/excel/xlwings_sample.webm
+  goal: 🆚 엑셀 vs 판다스에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+- id: alternatives
+  blocks:
+  - type: sectionHeader
+    title: 🤷 Polars? Modin? 그건 뭔가요?
+    subtitle: 판다스 대안들도 있지만...
+  - type: note
+    style: info
+    title: 왜 대안이 나왔을까?
+    content: 판다스는 훌륭하지만, 수천만~수억 행의 대용량 데이터를 다루면 느려집니다. 최근 빅데이터 시대에 맞춰 더 빠른 대안들이 등장하고 있어요.
+  - type: table
+    headers:
+    - 비교
+    - Pandas
+    - Polars
+    - Modin
+    rows:
+    - - 속도
+      - 기준
+      - 약 57배 빠름
+      - 약 4배 빠름
+    - - 학습 난이도
+      - ✅ 쉬움
+      - ⚠️ 새 API 학습
+      - ✅ 판다스와 동일
+    - - ML 호환성
+      - ✅ 완벽
+      - ❌ 제한적
+      - ✅ 완벽
+    - - 커뮤니티
+      - ✅ 가장 큼
+      - ⚠️ 성장중
+      - ⚠️ 작음
+    - - 생태계
+      - ✅ 가장 풍부
+      - ⚠️ 제한적
+      - ✅ 판다스 그대로
+  - type: compare
+    left:
+      title: Polars
+      subtitle: 속도의 왕
+      icon: ⚡
+      color: blue
+      items:
+      - Rust로 만들어서 엄청 빠름
+      - 대용량 데이터에 최적화
+      - 하지만 새로운 API 학습 필요
+      - scikit-learn 등과 호환 안됨
+      infoBox: 속도가 필요할 때 나중에 배우세요
+    right:
+      title: Modin
+      subtitle: 판다스의 분신
+      icon: 👯
+      color: purple
+      items:
+      - 판다스 API 그대로 사용
+      - 내부적으로 병렬 처리
+      - 코드 한 줄도 안 바꿔도 됨
+      - 대용량에서 최대 4배 빠름
+      infoBox: 기존 코드 그대로 쓰고 싶을 때
+  - type: note
+    style: tip
+    title: '결론: 판다스로 시작 → 확장'
+    content: 판다스가 가장 직관적이고, 자료도 가장 많고, 대부분의 라이브러리와 호환됩니다. 판다스로 기본기 익힌 후, 필요하면 Polars나 Modin으로 확장하세요!
+  goal: 🤷 Polars? Modin? 그건 뭔가요?에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+- id: roadmap
+  blocks:
+  - type: sectionHeader
+    title: 🗺️ 판다스 학습 로드맵
+    subtitle: 이 순서대로 배우면 됩니다
+  - type: table
+    headers:
+    - 단계
+    - 배울 내용
+    - 목표
+    rows:
+    - - 1단계
+      - DataFrame 생성/조회
+      - 데이터 불러오고 살펴보기
+    - - 2단계
+      - 데이터 선택/필터링
+      - 원하는 데이터만 뽑아내기
+    - - 3단계
+      - 데이터 정제
+      - 결측치, 중복 처리하기
+    - - 4단계
+      - 데이터 변환
+      - 컬럼 추가, 타입 변환
+    - - 5단계
+      - 그룹화/집계
+      - 통계 내고 요약하기
+    - - 6단계
+      - 데이터 병합
+      - 여러 데이터 합치기
+  - type: note
+    style: info
+    title: 실습은 우측 Codaro에서!
+    content: 필요한 패키지는 uv로 준비한 뒤 바로 실습할 수 있습니다. 코드를 직접 써보면서 배워보세요!
+  goal: 🗺️ 판다스 학습 로드맵에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+- id: cheat_sheet
+  blocks:
+  - type: sectionHeader
+    title: 📋 판다스 치트시트
+    subtitle: 자주 쓰는 함수/메서드 빠른 참조표
+  - type: note
+    style: info
+    title: 치트시트(Cheat Sheet)란?
+    content: 시험 볼 때 몰래 보는 컨닝페이퍼처럼, 자주 쓰는 명령어를 정리한 참조표입니다. 자주 볼 수 있는 곳에 두면 도움됩니다.
+  - type: pdf
+    url: https://pandas.pydata.org/Pandas_Cheat_Sheet.pdf
+    title: Pandas 공식 Cheat Sheet
+    height: 800px
+  goal: 📋 판다스 치트시트에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+- id: official_docs
+  blocks:
+  - type: sectionHeader
+    title: 📚 체계적으로 공부하고 싶다면
+    subtitle: 순서대로 차근차근 배우고 싶은 분들을 위해
+  - type: note
+    style: info
+    title: 이 커리큘럼의 방식
+    content: 아무것도 모르는 상태에서 실제 데이터로 바로 실습합니다. 목표를 정하고 분석하면서 배우는 게 훨씬 효과적이거든요. 그래서 이론 설명은 따로 하지 않습니다. 만약
+      체계적으로 공부하고 싶다면 Pandas공식문서를 우선 공부하면 도움됩니다.
+  - type: links
+    items:
+    - text: pandas 공식 문서
+      url: https://pandas.pydata.org/docs/getting_started/index.html
+      icon: 🔗
+  goal: 📚 체계적으로 공부하고 싶다면에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+- id: next
+  blocks:
+  - type: hero
+    emoji: 👉
+    title: '다음: DataFrame 완전 정복'
+    subtitle: 엑셀 시트처럼 생긴 DataFrame, 직접 만들고 다뤄봅시다!
+  goal: '다음: DataFrame 완전 정복에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.'
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 주문 DataFrame 기본 점검'
+  structuredPrimary: true
+  subtitle: DataFrame 생성, 컬럼 검증, 집계, 실패 케이스
+  goal: '현업 흐름 검증: 주문 DataFrame 기본 점검에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    Pandas는 표를 읽고 바로 업무 질문에 답하는 도구입니다. 처음에는 컬럼이 있는지, 금액이 올바른지, 집계가 원본과 맞는지 확인하는 습관부터 잡아야 합니다.
+
+    변주 실험
+    요일 대신 지점별 매출을 집계하고, 지점 컬럼이 누락됐을 때 어떤 오류 메시지가 더 업무적으로 명확한지 바꿔보세요.
+  tips:
+  - 변주 실험 요일 대신 지점별 매출을 집계하고, 지점 컬럼이 누락됐을 때 어떤 오류 메시지가 더 업무적으로 명확한지 바꿔보세요.
+  snippet: |-
+    import pandas as pd
+
+    orders = pd.DataFrame({
+        "orderId": ["O-1", "O-2", "O-3"],
+        "day": ["Mon", "Mon", "Tue"],
+        "amount": [12000, 8000, 15000],
+    })
+
+    daily = orders.groupby("day", as_index=False)["amount"].sum()
+
+    assert list(orders.columns) == ["orderId", "day", "amount"]
+    assert daily.set_index("day").loc["Mon", "amount"] == 20000
+    assert daily["amount"].sum() == orders["amount"].sum()
+  exercise:
+    prompt: '현업 흐름 검증: 주문 DataFrame 기본 점검 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.'
+    starterCode: |-
+      import pandas as pd
+
+      orders = pd.DataFrame({
+          "orderId": ["O-1", "O-2", "O-3"],
+          "day": ["Mon", "Mon", "Tue"],
+          "amount": [12000, 8000, 15000],
+      })
+
+      daily = orders.groupby("day", as_index=False)["amount"].sum()
+
+      assert list(orders.columns) == ["orderId", "day", "amount"]
+      assert daily.set_index("day").loc["Mon", "amount"] == 20000
+      assert daily["amount"].sum() == orders["amount"].sum()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 주문 DataFrame 기본 점검의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 DataFrame 기본 점검의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pandas_00-inspect-table-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - workflow_validation
+    title: 레코드에서 표의 shape와 결측 계약 읽기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 행 목록을 열 집합, 행 수, 열별 결측 수로 요약한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 열 목록은 첫 행만 보지 말고 모든 행의 key 합집합으로 만드세요.
+    - key가 없거나 값이 None이면 결측으로 셉니다.
+    exercise:
+      prompt: inspect_table(rows)를 완성해 columns, rowCount, nullCounts를 반환하세요.
+      starterCode: |-
+        def inspect_table(rows):
+            raise NotImplementedError
+      solution: |
+        def inspect_table(rows):
+            if not isinstance(rows, list):
+                raise TypeError("rows must be a list")
+            if any(not isinstance(row, dict) for row in rows):
+                raise TypeError("each row must be a dict")
+            columns = sorted({key for row in rows for key in row})
+            return {
+                "columns": columns,
+                "rowCount": len(rows),
+                "nullCounts": {column: sum(row.get(column) is None for row in rows) for column in columns},
+            }
+      hints: *id001
+    check:
+      id: python.pandas.pandas_00.inspect-table-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_00.inspect-table-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: inspect_table
+        cases:
+        - id: finds-union-and-missing-values
+          arguments:
+          - value:
+            - city: Seoul
+              sales: 12
+            - city: Busan
+              sales: null
+            - city: Jeju
+          expectedReturn:
+            columns:
+            - city
+            - sales
+            rowCount: 3
+            nullCounts:
+              city: 0
+              sales: 2
+        - id: handles-empty-table
+          arguments:
+          - value: []
+          expectedReturn:
+            columns: []
+            rowCount: 0
+            nullCounts: {}
+        - id: rejects-non-row-value
+          arguments:
+          - value:
+            - ok: 1
+            - broken
+          expectedException: TypeError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pandas_00-select-complete-rows-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_00-inspect-table-contract-mastery
+    title: 새 주문 표에서 필수 열이 완전한 행만 고르기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 필수 열 계약을 처음 보는 주문 레코드에 적용하고 거절 위치를 함께 남긴다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 필수 열의 존재와 None 여부를 모두 확인하세요.
+    - 거절된 행을 버리기만 하지 말고 원래 index를 증거로 남기세요.
+    exercise:
+      prompt: select_complete_rows(rows, required)를 완성해 accepted와 rejectedIndexes를 반환하세요.
+      starterCode: |-
+        def select_complete_rows(rows, required):
+            raise NotImplementedError
+      solution: |
+        def select_complete_rows(rows, required):
+            if not required or len(set(required)) != len(required):
+                raise ValueError("required columns must be unique and non-empty")
+            accepted = []
+            rejected = []
+            for index, row in enumerate(rows):
+                if all(column in row and row[column] is not None for column in required):
+                    accepted.append(row)
+                else:
+                    rejected.append(index)
+            return {"accepted": accepted, "rejectedIndexes": rejected}
+      hints: *id002
+    check:
+      id: python.pandas.pandas_00.select-complete-rows.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_00.select-complete-rows.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: select_complete_rows
+        cases:
+        - id: separates-valid-orders
+          arguments:
+          - value:
+            - id: A
+              amount: 10
+            - id: B
+            - id: C
+              amount: null
+          - value:
+            - id
+            - amount
+          expectedReturn:
+            accepted:
+            - id: A
+              amount: 10
+            rejectedIndexes:
+            - 1
+            - 2
+        - id: accepts-all-complete-rows
+          arguments:
+          - value:
+            - x: 1
+            - x: 2
+          - value:
+            - x
+          expectedReturn:
+            accepted:
+            - x: 1
+            - x: 2
+            rejectedIndexes: []
+        - id: rejects-empty-contract
+          arguments:
+          - value: []
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pandas_00-choose-table-operation-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_00-select-complete-rows-transfer
+    title: 표 질문에 맞는 연산을 기억에서 선택하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: select, filter, group, join의 역할과 row-count 변화를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 열을 고르는 select와 행을 고르는 filter를 구분하세요.
+    - join은 결합 결과뿐 아니라 매칭되지 않은 행도 확인해야 합니다.
+    exercise:
+      prompt: choose_table_operation(goal)를 완성해 operation, changesRows, evidence를 반환하세요.
+      starterCode: |-
+        def choose_table_operation(goal):
+            raise NotImplementedError
+      solution: |
+        def choose_table_operation(goal):
+            table = {
+                "keep-columns": {"operation": "select", "changesRows": False, "evidence": "column list"},
+                "keep-matching-rows": {"operation": "filter", "changesRows": True, "evidence": "predicate and row count"},
+                "summarize-by-key": {"operation": "group", "changesRows": True, "evidence": "group key and aggregate"},
+                "combine-related-tables": {"operation": "join", "changesRows": True, "evidence": "join key and unmatched rows"},
+            }
+            if goal not in table:
+                raise ValueError("unknown table goal")
+            return table[goal]
+      hints: *id003
+    check:
+      id: python.pandas.pandas_00.choose-table-operation.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_00.choose-table-operation.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_table_operation
+        cases:
+        - id: recalls-filter
+          arguments:
+          - value: keep-matching-rows
+          expectedReturn:
+            operation: filter
+            changesRows: true
+            evidence: predicate and row count
+        - id: recalls-join-evidence
+          arguments:
+          - value: combine-related-tables
+          expectedReturn:
+            operation: join
+            changesRows: true
+            evidence: join key and unmatched rows
+        - id: rejects-vague-goal
+          arguments:
+          - value: make-it-nice
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

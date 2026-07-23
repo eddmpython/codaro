@@ -1,0 +1,938 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - numpy
+  - pandas
+  - scikit-learn
+  id: sklearn_09
+  title: 신호탐지최적화
+  order: 9
+  category: sklearn
+  difficulty: ⭐⭐⭐⭐
+  badge: 고급
+  tags:
+  - sklearn
+  - GridSearchCV
+  - 하이퍼파라미터
+  - 교차검증
+  - 최적화
+  seo:
+    title: Sklearn GridSearchCV - 하이퍼파라미터 최적화
+    description: GridSearchCV로 하이퍼파라미터를 체계적으로 탐색합니다. 교차검증 기반 모델 최적화를 배웁니다.
+    keywords:
+    - sklearn
+    - GridSearchCV
+    - hyperparameter
+    - cross validation
+    - tuning
+intro:
+  emoji: 🎯
+  goal: GridSearchCV로 하이퍼파라미터를 체계적으로 탐색하고 최적의 모델을 찾습니다.
+  description: 하이퍼파라미터는 학습 전에 설정하는 값으로 모델 성능에 큰 영향을 줍니다. GridSearchCV는 지정한 파라미터 조합을 모두 시도하여 최적의 조합을 찾습니다.
+    교차검증으로 과적합을 방지합니다.
+  direction: 신호탐지최적화에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 신호탐지최적화 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 로딩 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 준비 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 기본 모델 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 신호탐지최적화 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: matplotlib, numpy, pandas, scikit-learn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 신호탐지최적화 실행
+      detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
+    - label: 신호탐지최적화 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+sections:
+- id: step1_data
+  title: 1단계. 데이터 로딩
+  structuredPrimary: true
+  subtitle: 와인 데이터
+  goal: 1단계. 데이터 로딩에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    와인 품질 데이터로 하이퍼파라미터 튜닝을 실습합니다. 3개 클래스 분류 문제입니다.
+
+    와인 데이터는 13개 화학 성분으로 3종류 와인을 분류합니다. 하이퍼파라미터 튜닝 실습에 적합한 크기입니다.
+  snippet: |-
+    import pandas as pd
+    import numpy as np
+    from sklearn.datasets import load_wine
+    from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.svm import SVC
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.metrics import accuracy_score, classification_report
+    import matplotlib.pyplot as plt
+
+    wine = load_wine()
+    X = pd.DataFrame(wine.data, columns=wine.feature_names)
+    y = wine.target
+    X.shape, np.unique(y)
+  exercise:
+    prompt: 1단계. 데이터 로딩 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      import numpy as np
+      from sklearn.datasets import load_wine
+      from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.svm import SVC
+      from sklearn.ensemble import RandomForestClassifier
+      from sklearn.metrics import accuracy_score, classification_report
+      import matplotlib.pyplot as plt
+
+      wine = load_wine()
+      X = pd.DataFrame(wine.data, columns=wine.feature_names)
+      y = wine.target
+      X.shape, np.unique(y)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 데이터 로딩의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 로딩의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step2_prep
+  title: 2단계. 데이터 준비
+  structuredPrimary: true
+  subtitle: 분할 및 스케일링
+  goal: 2단계. 데이터 준비에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 학습/테스트 분할 후 스케일링합니다. SVM은 스케일에 민감하므로 반드시 스케일링합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+
+    scaler = StandardScaler()
+    xTrainSc = scaler.fit_transform(xTrain)
+    xTestSc = scaler.transform(xTest)
+    xTrainSc.shape, xTest.shape
+  exercise:
+    prompt: 2단계. 데이터 준비 예제에서 test_size나 random_state 값을 바꾸고 분할·스케일 결과가 맞는지 확인하세요.
+    starterCode: |-
+      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+
+      scaler = StandardScaler()
+      xTrainSc = scaler.fit_transform(xTrain)
+      xTestSc = scaler.transform(xTest)
+      xTrainSc.shape, xTest.shape
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 준비에서 \`xTrain\`, \`xTest\`, \`yTrain\` 할당 개수와 값 순서가 맞아야 합니다.
+    resultCheck: 2단계. 데이터 준비 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step3_baseline
+  title: 3단계. 기본 모델
+  structuredPrimary: true
+  subtitle: 기본 SVM
+  goal: 3단계. 기본 모델에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  explanation: |-
+    기본 파라미터로 SVM을 학습하여 기준선 성능을 확인합니다.
+
+    SVM 기본값은 C=1.0, kernel='rbf', gamma='scale'입니다. 튜닝으로 더 나은 성능을 얻을 수 있습니다.
+  snippet: |-
+    svcBase = SVC(random_state=42)
+    svcBase.fit(xTrainSc, yTrain)
+    yPredBase = svcBase.predict(xTestSc)
+    accBase = accuracy_score(yTest, yPredBase)
+    print(f"Baseline Accuracy: {accBase:.4f}")
+  exercise:
+    prompt: 3단계. 기본 모델 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
+    starterCode: |-
+      svcBase = SVC(random_state=42)
+      svcBase.fit(xTrainSc, yTrain)
+      yPredBase = svcBase.predict(xTestSc)
+      accBase = accuracy_score(yTest, yPredBase)
+      print(f"Baseline Accuracy: {accBase:.4f}")
+    hints:
+    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
+    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+  check:
+    noError: 3단계. 기본 모델의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
+    resultCheck: 3단계. 기본 모델 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+- id: step4_params
+  title: 4단계. 파라미터 그리드
+  structuredPrimary: true
+  subtitle: 탐색 범위
+  goal: 4단계. 파라미터 그리드에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  explanation: |-
+    탐색할 파라미터와 값 범위를 딕셔너리로 정의합니다. C는 규제 강도, gamma는 RBF 커널 폭입니다.
+
+    C가 클수록 오분류 페널티가 커집니다. gamma가 클수록 결정 경계가 복잡해집니다. 둘 다 너무 크면 과적합됩니다.
+  snippet: |-
+    paramGrid = {
+        "C": [0.1, 1, 10, 100],
+        "gamma": [0.001, 0.01, 0.1, 1],
+        "kernel": ["rbf", "linear"]
+    }
+    totalComb = len(paramGrid["C"]) * len(paramGrid["gamma"]) * len(paramGrid["kernel"])
+    print(f"Total combinations: {totalComb}")
+  exercise:
+    prompt: 4단계. 파라미터 그리드 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
+    starterCode: |-
+      paramGrid = {
+          "C": [0.1, 1, 10, 100],
+          "gamma": [0.001, 0.01, 0.1, 1],
+          "kernel": ["rbf", "linear"]
+      }
+      totalComb = len(paramGrid["C"]) * len(paramGrid["gamma"]) * len(paramGrid["kernel"])
+      print(f"Total combinations: {totalComb}")
+    hints:
+    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
+    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+  check:
+    type: noError
+    noError: 4단계. 파라미터 그리드의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
+    resultCheck: 4단계. 파라미터 그리드 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+- id: step5_gridsearch
+  title: 5단계. GridSearchCV 실행
+  structuredPrimary: true
+  subtitle: 체계적 탐색
+  goal: 5단계. GridSearchCV 실행에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    GridSearchCV로 모든 파라미터 조합을 교차검증합니다. cv=5로 5-폴드 교차검증을 수행합니다.
+
+    GridSearchCV는 모든 조합을 시도하므로 파라미터가 많으면 시간이 오래 걸립니다. 범위를 좁히거나 RandomizedSearchCV를 고려하세요.
+  snippet: |-
+    gridSearch = GridSearchCV(SVC(random_state=42), paramGrid, cv=5, scoring="accuracy", return_train_score=True)
+    gridSearch.fit(xTrainSc, yTrain)
+    gridSearch
+  exercise:
+    prompt: 5단계. GridSearchCV 실행 예제에서 \`gridSearch\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      gridSearch = GridSearchCV(SVC(random_state=42), paramGrid, cv=5, scoring="accuracy", return_train_score=True)
+      gridSearch.fit(xTrainSc, yTrain)
+      gridSearch
+    hints:
+    - 바꿀 지점은 \`gridSearch = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`gridSearch\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 5단계. GridSearchCV 실행에서 \`gridSearch\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. GridSearchCV 실행 실행 뒤 \`gridSearch\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step6_results
+  title: 6단계. 결과 분석
+  structuredPrimary: true
+  subtitle: cv_results_
+  goal: 6단계. 결과 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: cv_results_에서 모든 조합의 성능을 확인할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    resultsDf = pd.DataFrame(gridSearch.cv_results_)
+    cols = ["param_C", "param_gamma", "param_kernel", "mean_test_score", "std_test_score", "rank_test_score"]
+    resultsDf[cols].sort_values("rank_test_score").head(10)
+  exercise:
+    prompt: 6단계. 결과 분석 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      resultsDf = pd.DataFrame(gridSearch.cv_results_)
+      cols = ["param_C", "param_gamma", "param_kernel", "mean_test_score", "std_test_score", "rank_test_score"]
+      resultsDf[cols].sort_values("rank_test_score").head(10)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 6단계. 결과 분석의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 6단계. 결과 분석의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step7_best
+  title: 7단계. 최적 모델 평가
+  structuredPrimary: true
+  subtitle: best_estimator_
+  goal: 7단계. 최적 모델 평가에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  explanation: GridSearchCV는 최적 파라미터로 전체 학습 데이터에 다시 학습한 모델을 best_estimator_에 저장합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    bestModel = gridSearch.best_estimator_
+    yPredBest = bestModel.predict(xTestSc)
+    accBest = accuracy_score(yTest, yPredBest)
+    print(f"Baseline Accuracy: {accBase:.4f}")
+    print(f"Tuned Accuracy: {accBest:.4f}")
+    print(f"Improvement: {(accBest - accBase) * 100:.2f}%")
+  exercise:
+    prompt: 7단계. 최적 모델 평가 예제에서 출력 문장 하나를 바꾸고 출력 줄 순서와 바뀐 줄을 확인하세요.
+    starterCode: |-
+      bestModel = gridSearch.best_estimator_
+      yPredBest = bestModel.predict(xTestSc)
+      accBest = accuracy_score(yTest, yPredBest)
+      print(f"Baseline Accuracy: {accBase:.4f}")
+      print(f"Tuned Accuracy: {accBest:.4f}")
+      print(f"Improvement: {(accBest - accBase) * 100:.2f}%")
+    hints:
+    - 바꿀 지점은 각 print()의 따옴표 안 문구나 출력 변수에서 찾으세요.
+    - 실행 뒤 줄 수와 순서가 유지되고, 수정한 줄만 의도대로 바뀌었는지 보세요.
+  check:
+    noError: 7단계. 최적 모델 평가의 각 print() 호출이 따옴표와 괄호 조건을 만족하고 순서대로 출력되어야 합니다.
+    resultCheck: 7단계. 최적 모델 평가 출력 줄 수와 순서가 유지되고, 바꾼 줄의 문구가 출력 영역에 나타나야 합니다.
+- id: step8_heatmap
+  title: 8단계. 파라미터 히트맵
+  structuredPrimary: true
+  subtitle: C vs gamma
+  goal: 8단계. 파라미터 히트맵에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: RBF 커널에서 C와 gamma 조합별 성능을 히트맵으로 시각화합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    rbfResults = resultsDf[resultsDf["param_kernel"] == "rbf"].copy()
+    pivot = rbfResults.pivot_table(values="mean_test_score", index="param_gamma", columns="param_C")
+
+    figHeat, axHeat = plt.subplots(figsize=(8, 6))
+    im = axHeat.imshow(pivot.values, cmap="YlGn", aspect="auto")
+    axHeat.set_xticks(range(len(pivot.columns)))
+    axHeat.set_yticks(range(len(pivot.index)))
+    axHeat.set_xticklabels(pivot.columns)
+    axHeat.set_yticklabels(pivot.index)
+    axHeat.set_xlabel("C")
+    axHeat.set_ylabel("gamma")
+    axHeat.set_title("CV Accuracy: C vs gamma (RBF kernel)")
+    for i in range(len(pivot.index)):
+        for j in range(len(pivot.columns)):
+            axHeat.text(j, i, f"{pivot.values[i, j]:.3f}", ha="center", va="center")
+    plt.colorbar(im, ax=axHeat)
+    figHeat
+  exercise:
+    prompt: 8단계. 파라미터 히트맵 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      rbfResults = resultsDf[resultsDf["param_kernel"] == "rbf"].copy()
+      pivot = rbfResults.pivot_table(values="mean_test_score", index="param_gamma", columns="param_C")
+
+      figHeat, axHeat = plt.subplots(figsize=(8, 6))
+      im = axHeat.imshow(pivot.values, cmap="YlGn", aspect="auto")
+      axHeat.set_xticks(range(len(pivot.columns)))
+      axHeat.set_yticks(range(len(pivot.index)))
+      axHeat.set_xticklabels(pivot.columns)
+      axHeat.set_yticklabels(pivot.index)
+      axHeat.set_xlabel("C")
+      axHeat.set_ylabel("gamma")
+      axHeat.set_title("CV Accuracy: C vs gamma (RBF kernel)")
+      for i in range(len(pivot.index)):
+          for j in range(len(pivot.columns)):
+              axHeat.text(j, i, f"{pivot.values[i, j]:.3f}", ha="center", va="center")
+      plt.colorbar(im, ax=axHeat)
+      figHeat
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 8단계. 파라미터 히트맵의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 8단계. 파라미터 히트맵 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step9_rf
+  title: 9단계. RandomForest 튜닝
+  structuredPrimary: true
+  subtitle: 다른 모델 적용
+  goal: 9단계. RandomForest 튜닝에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  explanation: RandomForest에도 GridSearchCV를 적용합니다. n_estimators, max_depth, min_samples_split을 튜닝합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    rfParamGrid = {
+        "n_estimators": [50, 100, 150],
+        "max_depth": [3, 5, 7, None],
+        "min_samples_split": [2, 5, 10]
+    }
+    rfTotalComb = 3 * 4 * 3
+    print(f"Total combinations: {rfTotalComb}")
+
+    rfGridSearch = GridSearchCV(RandomForestClassifier(random_state=42), rfParamGrid, cv=5, scoring="accuracy")
+    rfGridSearch.fit(xTrainSc, yTrain)
+    print(f"Best RF params: {rfGridSearch.best_params_}")
+  exercise:
+    prompt: 9단계. RandomForest 튜닝 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
+    starterCode: |-
+      rfParamGrid = {
+          "n_estimators": [50, 100, 150],
+          "max_depth": [3, 5, 7, None],
+          "min_samples_split": [2, 5, 10]
+      }
+      rfTotalComb = 3 * 4 * 3
+      print(f"Total combinations: {rfTotalComb}")
+
+      rfGridSearch = GridSearchCV(RandomForestClassifier(random_state=42), rfParamGrid, cv=5, scoring="accuracy")
+      rfGridSearch.fit(xTrainSc, yTrain)
+      print(f"Best RF params: {rfGridSearch.best_params_}")
+    hints:
+    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
+    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+  check:
+    type: noError
+    noError: 9단계. RandomForest 튜닝의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
+    resultCheck: 9단계. RandomForest 튜닝 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+- id: step10_compare
+  title: 10단계. 모델 비교
+  structuredPrimary: true
+  subtitle: SVM vs RF
+  goal: 10단계. 모델 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 튜닝된 SVM과 RandomForest의 성능을 비교합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    rfBest = rfGridSearch.best_estimator_
+    rfPred = rfBest.predict(xTestSc)
+    rfAcc = accuracy_score(yTest, rfPred)
+
+    figComp, axComp = plt.subplots(figsize=(7, 5))
+    models = ["SVM (baseline)", "SVM (tuned)", "RF (tuned)"]
+    accs = [accBase, accBest, rfAcc]
+    colors = ["gray", "steelblue", "coral"]
+    axComp.bar(models, accs, color=colors)
+    axComp.set_ylabel("Accuracy")
+    axComp.set_title("Model Comparison")
+    axComp.set_ylim(0.8, 1.0)
+    for i, v in enumerate(accs):
+        axComp.text(i, v + 0.01, f"{v:.3f}", ha="center")
+    figComp
+  exercise:
+    prompt: 10단계. 모델 비교 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      rfBest = rfGridSearch.best_estimator_
+      rfPred = rfBest.predict(xTestSc)
+      rfAcc = accuracy_score(yTest, rfPred)
+
+      figComp, axComp = plt.subplots(figsize=(7, 5))
+      models = ["SVM (baseline)", "SVM (tuned)", "RF (tuned)"]
+      accs = [accBase, accBest, rfAcc]
+      colors = ["gray", "steelblue", "coral"]
+      axComp.bar(models, accs, color=colors)
+      axComp.set_ylabel("Accuracy")
+      axComp.set_title("Model Comparison")
+      axComp.set_ylim(0.8, 1.0)
+      for i, v in enumerate(accs):
+          axComp.text(i, v + 0.01, f"{v:.3f}", ha="center")
+      figComp
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 10단계. 모델 비교의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 10단계. 모델 비교 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step11_cv
+  title: 11단계. 교차검증 상세
+  structuredPrimary: true
+  subtitle: cv별 점수
+  goal: 11단계. 교차검증 상세에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  explanation: |-
+    최적 모델의 각 폴드별 점수를 확인합니다. 점수 분산이 크면 데이터 의존성이 높습니다.
+
+    교차검증 점수의 표준편차가 작을수록 모델이 안정적입니다. 큰 분산은 특정 데이터 분할에 민감함을 의미합니다.
+  snippet: |-
+    cvScores = cross_val_score(bestModel, xTrainSc, yTrain, cv=5)
+    print(f"CV Scores: {cvScores}")
+    print(f"Mean: {cvScores.mean():.4f} (+/- {cvScores.std() * 2:.4f})")
+  exercise:
+    prompt: 11단계. 교차검증 상세 예제에서 출력 문장 하나를 바꾸고 출력 줄 순서와 바뀐 줄을 확인하세요.
+    starterCode: |-
+      cvScores = cross_val_score(bestModel, xTrainSc, yTrain, cv=5)
+      print(f"CV Scores: {cvScores}")
+      print(f"Mean: {cvScores.mean():.4f} (+/- {cvScores.std() * 2:.4f})")
+    hints:
+    - 바꿀 지점은 각 print()의 따옴표 안 문구나 출력 변수에서 찾으세요.
+    - 실행 뒤 줄 수와 순서가 유지되고, 수정한 줄만 의도대로 바뀌었는지 보세요.
+  check:
+    noError: 11단계. 교차검증 상세의 각 print() 호출이 따옴표와 괄호 조건을 만족하고 순서대로 출력되어야 합니다.
+    resultCheck: 11단계. 교차검증 상세 출력 줄 수와 순서가 유지되고, 바꾼 줄의 문구가 출력 영역에 나타나야 합니다.
+- id: step12_time
+  title: 12단계. 학습 시간
+  structuredPrimary: true
+  subtitle: 시간 비용
+  goal: 12단계. 학습 시간에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  explanation: |-
+    그리드 서치의 총 학습 시간과 조합당 시간을 확인합니다. 파라미터가 많을수록 시간이 기하급수적으로 증가합니다.
+
+    시간 절약 팁: 1) 작은 그리드로 시작, 2) RandomizedSearchCV 사용, 3) 병렬화(Codaro 로컬 Python에서는 불가), 4) 조기 종료(early stopping)
+  tips:
+  - '시간 절약 팁: 1) 작은 그리드로 시작, 2) RandomizedSearchCV 사용, 3) 병렬화(Codaro 로컬 Python에서는 불가), 4) 조기 종료(early
+    stopping)'
+  snippet: |-
+    totalTime = resultsDf["mean_fit_time"].sum()
+    meanTime = resultsDf["mean_fit_time"].mean()
+    print(f"Total combinations: {len(resultsDf)}")
+    print(f"Total fit time: {totalTime:.2f}s")
+    print(f"Mean time per combination: {meanTime:.4f}s")
+  exercise:
+    prompt: 12단계. 학습 시간 예제에서 출력 문장 하나를 바꾸고 출력 줄 순서와 바뀐 줄을 확인하세요.
+    starterCode: |-
+      totalTime = resultsDf["mean_fit_time"].sum()
+      meanTime = resultsDf["mean_fit_time"].mean()
+      print(f"Total combinations: {len(resultsDf)}")
+      print(f"Total fit time: {totalTime:.2f}s")
+      print(f"Mean time per combination: {meanTime:.4f}s")
+    hints:
+    - 바꿀 지점은 각 print()의 따옴표 안 문구나 출력 변수에서 찾으세요.
+    - 실행 뒤 줄 수와 순서가 유지되고, 수정한 줄만 의도대로 바뀌었는지 보세요.
+  check:
+    noError: 12단계. 학습 시간의 각 print() 호출이 따옴표와 괄호 조건을 만족하고 순서대로 출력되어야 합니다.
+    resultCheck: 12단계. 학습 시간 출력 줄 수와 순서가 유지되고, 바꾼 줄의 문구가 출력 영역에 나타나야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 하이퍼파라미터 튜닝
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  explanation: |-
+    지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import pandas as pd
+    import numpy as np
+    from sklearn.datasets import load_breast_cancer
+    from sklearn.model_selection import train_test_split, GridSearchCV
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.svm import SVC
+    from sklearn.metrics import accuracy_score
+    import matplotlib.pyplot as plt
+
+    cancer = load_breast_cancer()
+    xC = cancer.data
+    yC = cancer.target
+    xTrC, xTeC, yTrC, yTeC = train_test_split(xC, yC, test_size=0.2, random_state=42)
+    scalerC = StandardScaler()
+    xTrCsc = scalerC.fit_transform(xTrC)
+    xTeCsc = scalerC.transform(xTeC)
+
+    paramC = {"C": [0.1, 1, 10], "gamma": [0.01, 0.1, 1]}
+    gridC = GridSearchCV(SVC(random_state=42), paramC, cv=5)
+    gridC.fit(xTrCsc, yTrC)
+    print(f"Best Params: {gridC.best_params_}")
+    print(f"Best CV Score: {gridC.best_score_:.4f}")
+
+    predC = gridC.predict(xTeCsc)
+    print(f"Test Accuracy: {accuracy_score(yTeC, predC):.4f}")
+  exercise:
+    prompt: 실습 예제에서 출력 문장 하나를 바꾸고 출력 줄 순서와 바뀐 줄을 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      import numpy as np
+      from sklearn.datasets import load_breast_cancer
+      from sklearn.model_selection import train_test_split, GridSearchCV
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.svm import SVC
+      from sklearn.metrics import accuracy_score
+      import matplotlib.pyplot as plt
+
+      cancer = load_breast_cancer()
+      xC = cancer.data
+      yC = cancer.target
+      xTrC, xTeC, yTrC, yTeC = train_test_split(xC, yC, test_size=0.2, random_state=42)
+      scalerC = StandardScaler()
+      xTrCsc = scalerC.fit_transform(xTrC)
+      xTeCsc = scalerC.transform(xTeC)
+
+      paramC = {"C": [0.1, 1, 10], "gamma": [0.01, 0.1, 1]}
+      gridC = GridSearchCV(SVC(random_state=42), paramC, cv=5)
+      gridC.fit(xTrCsc, yTrC)
+      print(f"Best Params: {gridC.best_params_}")
+      print(f"Best CV Score: {gridC.best_score_:.4f}")
+
+      predC = gridC.predict(xTeCsc)
+      print(f"Test Accuracy: {accuracy_score(yTeC, predC):.4f}")
+    hints:
+    - 바꿀 지점은 각 print()의 따옴표 안 문구나 출력 변수에서 찾으세요.
+    - 실행 뒤 줄 수와 순서가 유지되고, 수정한 줄만 의도대로 바뀌었는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 각 print() 호출이 따옴표와 괄호 조건을 만족하고 순서대로 출력되어야 합니다.
+    resultCheck: 실습 출력 줄 수와 순서가 유지되고, 바꾼 줄의 문구가 출력 영역에 나타나야 합니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 예측 모델 품질 게이트
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고,
+    정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from sklearn.datasets import make_classification
+    from sklearn.model_selection import train_test_split
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import accuracy_score, f1_score
+
+    features, target = make_classification(
+        n_samples=240,
+        n_features=6,
+        n_informative=4,
+        n_redundant=0,
+        class_sep=1.4,
+        random_state=42,
+    )
+    xTrain, xTest, yTrain, yTest = train_test_split(
+        features, target, test_size=0.25, random_state=42, stratify=target
+    )
+
+    riskPipeline = Pipeline([
+        ("scaler", StandardScaler()),
+        ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
+    ])
+
+    def fitRiskModel(pipeline, featureMatrix, labels):
+        pipeline.fit(featureMatrix, labels)
+        return pipeline
+
+    riskModel = fitRiskModel(riskPipeline, xTrain, yTrain)
+    riskPred = riskModel.predict(xTest)
+    riskAccuracy = accuracy_score(yTest, riskPred)
+    riskF1 = f1_score(yTest, riskPred)
+    xTrain.shape, xTest.shape
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      conservativePipeline = Pipeline([
+          ("scaler", StandardScaler()),
+          ("classifier", LogisticRegression(C=0.3, max_iter=1000, random_state=42)),
+      ])
+      conservativeModel = fitRiskModel(conservativePipeline, xTrain, yTrain)
+      conservativePred = conservativeModel.predict(xTest)
+      conservativeAccuracy = accuracy_score(yTest, conservativePred)
+      conservativeF1 = f1_score(yTest, conservativePred)
+
+      assert conservativeAccuracy >= 0.75
+      {
+          "baselineAccuracy": round(riskAccuracy, 3),
+          "baselineF1": round(riskF1, 3),
+          "conservativeAccuracy": round(conservativeAccuracy, 3),
+          "conservativeF1": round(conservativeF1, 3),
+          "accuracyDelta": round(conservativeAccuracy - riskAccuracy, 3),
+      }
+    solution: |-
+      from sklearn.datasets import make_classification
+      from sklearn.model_selection import train_test_split
+      from sklearn.pipeline import Pipeline
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score, f1_score
+
+      features, target = make_classification(
+          n_samples=240,
+          n_features=6,
+          n_informative=4,
+          n_redundant=0,
+          class_sep=1.4,
+          random_state=42,
+      )
+      xTrain, xTest, yTrain, yTest = train_test_split(
+          features, target, test_size=0.25, random_state=42, stratify=target
+      )
+
+      riskPipeline = Pipeline([
+          ("scaler", StandardScaler()),
+          ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
+      ])
+      xTrain.shape, xTest.shape
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증에서 \`conservativePipeline\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sklearn_09-threshold-confusion-curve-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_data
+    - workflow_validation
+    title: 신호 탐지 threshold별 confusion과 비용 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: score cutoff마다 tp·fp·fn·tn과 cost를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - threshold는 모델 재학습 없이 운영 tradeoff를 바꿉니다.
+    - false positive와 false negative의 비용 가정을 공개하세요.
+    exercise:
+      prompt: threshold_costs(scores, outcomes, thresholds, false_positive_cost, false_negative_cost)를 완성하세요.
+      starterCode: |-
+        def threshold_costs(scores, outcomes, thresholds, false_positive_cost, false_negative_cost):
+            raise NotImplementedError
+      solution: |
+        def threshold_costs(scores, outcomes, thresholds, false_positive_cost, false_negative_cost):
+            if len(scores)!=len(outcomes): raise ValueError("length mismatch")
+            result=[]
+            for threshold in thresholds:
+                tp=fp=tn=fn=0
+                for score,truth in zip(scores,outcomes):
+                    guess=int(score>=threshold)
+                    if truth==1 and guess==1: tp+=1
+                    elif truth==1: fn+=1
+                    elif guess==1: fp+=1
+                    else: tn+=1
+                result.append({"threshold":threshold,"tp":tp,"fp":fp,"tn":tn,"fn":fn,"cost":fp*false_positive_cost+fn*false_negative_cost})
+            return result
+      hints: *id001
+    check:
+      id: python.sklearn.sklearn_09.threshold-confusion-curve.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_09.threshold-confusion-curve.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: threshold_costs
+        cases:
+        - id: compares-threshold-costs
+          arguments:
+          - value:
+            - 0.2
+            - 0.6
+            - 0.9
+          - value:
+            - 0
+            - 1
+            - 0
+          - value:
+            - 0.5
+            - 0.8
+          - value: 1
+          - value: 4
+          expectedReturn:
+          - threshold: 0.5
+            tp: 1
+            fp: 1
+            tn: 1
+            fn: 0
+            cost: 1
+          - threshold: 0.8
+            tp: 0
+            fp: 1
+            tn: 1
+            fn: 1
+            cost: 5
+        - id: handles-empty-scores
+          arguments:
+          - value: []
+          - value: []
+          - value:
+            - 0.5
+          - value: 1
+          - value: 1
+          expectedReturn:
+          - threshold: 0.5
+            tp: 0
+            fp: 0
+            tn: 0
+            fn: 0
+            cost: 0
+        - id: rejects-length-mismatch
+          arguments:
+          - value:
+            - 0.1
+          - value:
+            - 0
+            - 1
+          - value:
+            - 0.5
+          - value: 1
+          - value: 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sklearn_09-threshold-selection-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_09-threshold-confusion-curve-mastery
+    title: 새 탐지 정책에 threshold 선택 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 최소 recall 제약 안에서 cost가 가장 낮은 threshold를 고른다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 운영 제약을 먼저 적용한 뒤 cost를 최소화하세요.
+    - test set에서 고른 threshold 성능을 같은 test set의 최종 성능으로 재사용하지 마세요.
+    exercise:
+      prompt: select_threshold(rows, minimum_recall)를 완성하세요.
+      starterCode: |-
+        def select_threshold(rows, minimum_recall):
+            raise NotImplementedError
+      solution: |
+        def select_threshold(rows, minimum_recall):
+            candidates=[]
+            for row in rows:
+                support=row["tp"]+row["fn"]; recall=None if support==0 else row["tp"]/support
+                if recall is not None and recall>=minimum_recall: candidates.append((row["cost"],-row["threshold"],recall,row))
+            if not candidates: return {"selected":None,"reason":"no-feasible-threshold"}
+            _,_,recall,row=min(candidates)
+            return {"selected":row["threshold"],"recall":round(recall,4),"cost":row["cost"]}
+      hints: *id002
+    check:
+      id: python.sklearn.sklearn_09.threshold-selection.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_09.threshold-selection.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: select_threshold
+        cases:
+        - id: selects-lowest-cost-feasible
+          arguments:
+          - value:
+            - threshold: 0.3
+              tp: 9
+              fn: 1
+              cost: 8
+            - threshold: 0.5
+              tp: 8
+              fn: 2
+              cost: 3
+            - threshold: 0.8
+              tp: 5
+              fn: 5
+              cost: 1
+          - value: 0.8
+          expectedReturn:
+            selected: 0.5
+            recall: 0.8
+            cost: 3
+        - id: reports-no-feasible
+          arguments:
+          - value:
+            - threshold: 0.9
+              tp: 1
+              fn: 9
+              cost: 0
+          - value: 0.5
+          expectedReturn:
+            selected: null
+            reason: no-feasible-threshold
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sklearn_09-threshold-optimization-evidence-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_09-threshold-selection-transfer
+    title: threshold 최적화 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: ROC·비용·검증 분리를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 학습 데이터와 평가 데이터의 경계를 먼저 확인하세요.
+    - 한 metric이나 예측을 실제 진단·인과 결론으로 확대하지 마세요.
+    exercise:
+      prompt: choose_threshold_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_threshold_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_threshold_evidence(situation):
+            table = {'ranking-quality': {'method': 'ROC or PR curve', 'evidence': 'all thresholds', 'risk': 'class prevalence'}, 'operating-point': {'method': 'cost constrained threshold', 'evidence': 'cost and recall assumptions', 'risk': 'test tuning'}, 'release-threshold': {'method': 'validation selection then test audit', 'evidence': 'separate splits', 'risk': 'reused test'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sklearn.sklearn_09.threshold-optimization-evidence.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_09.threshold-optimization-evidence.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_threshold_evidence
+        cases:
+        - id: recalls-ranking-quality
+          arguments:
+          - value: ranking-quality
+          expectedReturn:
+            method: ROC or PR curve
+            evidence: all thresholds
+            risk: class prevalence
+        - id: recalls-operating-point
+          arguments:
+          - value: operating-point
+          expectedReturn:
+            method: cost constrained threshold
+            evidence: cost and recall assumptions
+            risk: test tuning
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

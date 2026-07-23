@@ -1,0 +1,962 @@
+var e=`meta:
+  packages:
+  - pandas
+  - plotly
+  id: plotly_06
+  title: 시간에따른세계변화
+  order: 6
+  category: plotly
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  tags:
+  - gapminder
+  - animation
+  - 버블차트
+  - Hans Rosling
+  seo:
+    title: Plotly 애니메이션 버블차트 - 시간에 따른 세계 변화
+    description: gapminder 데이터로 연도별 애니메이션 버블차트를 만듭니다. Hans Rosling 스타일의 인터랙티브 시각화를 배웁니다.
+    keywords:
+    - Plotly
+    - animation_frame
+    - 버블차트
+    - gapminder
+    - Hans Rosling
+intro:
+  emoji: 🌍
+  goal: Hans Rosling 스타일의 연도별 애니메이션 버블차트를 만듭니다.
+  description: gapminder 데이터로 1952년부터 2007년까지 세계 각국의 GDP, 기대수명, 인구가 어떻게 변화했는지 애니메이션으로 시각화합니다.
+  direction: 시간에따른세계변화에서 데이터를 상호작용 차트로 구성하고 필터와 표시 상태를 검증합니다.
+  benefits:
+  - 대시보드 데이터 확인 후 인터랙티브 시각화에 맞는 코드 입력을 고릅니다.
+  - 시간에따른세계변화 결과를 툴팁과 선택 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 공유 대시보드에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리와 데이터 입력 확인
+      detail: 입력 기준(대시보드 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 탐색 처리 실행
+      detail: 인터랙티브 시각화 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 정적 버블차트 결과 검증
+      detail: 툴팁과 선택 상태 기준으로 실행 결과를 비교합니다.
+    - label: 시간에따른세계변화 재사용
+      detail: 완성 코드를 공유 대시보드에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 인터랙티브 차트 환경
+      detail: pandas, plotly 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 시간에따른세계변화 실행
+      detail: 셀을 실행해 툴팁과 선택 상태와 예외 상태를 확인합니다.
+    - label: 시간에따른세계변화 완료
+      detail: 검증된 코드를 공유 대시보드로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리와 데이터 준비
+  structuredPrimary: true
+  subtitle: import와 데이터 로드
+  goal: 1단계. 라이브러리와 데이터 준비에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: plotly.express를 import하고 gapminder 데이터를 로드합니다. gapminder는 세계은행과 WHO가 수집한 1952년부터 2007년까지
+    142개 국가의 경제·보건 데이터로, Hans Rosling이 TED 강연에서 사용하여 전 세계적으로 유명해진 데이터셋입니다. 이 데이터셋을 통해 각 국가의 1인당 GDP(경제
+    수준), 기대수명(보건 수준), 인구(국가 규모)가 55년 동안 어떻게 변화했는지 추적할 수 있습니다. 애니메이션 버블차트는 복잡한 다차원 시계열 데이터를 가장 효과적으로 시각화하는
+    방법 중 하나로, 4개의 변수(시간, GDP, 기대수명, 인구)를 동시에 표현할 수 있습니다. Rosling의 TED 강연에서는 이 차트를 통해 "선진국과 개발도상국의 격차가
+    점차 좁혀진다", "경제 발전과 건강 수준이 강한 상관관계를 가진다"는 인사이트를 직관적으로 전달했습니다. 정적인 표나 단순 그래프로는 절대 볼 수 없는 패턴과 스토리를 발견할
+    수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import plotly.express as px
+    import pandas as pd
+    gap = px.data.gapminder()
+    gap.shape
+  exercise:
+    prompt: 1단계. 라이브러리와 데이터 준비 예제에서 \`gap\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import plotly.express as px
+      import pandas as pd
+      gap = px.data.gapminder()
+      gap.shape
+    hints:
+    - 바꿀 지점은 \`gap = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`gap\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 라이브러리와 데이터 준비에서 \`gap\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 1단계. 라이브러리와 데이터 준비 실행 뒤 \`gap\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step2_explore
+  title: 2단계. 데이터 탐색
+  structuredPrimary: true
+  subtitle: 컬럼과 연도 확인
+  goal: 2단계. 데이터 탐색에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+  explanation: |-
+    애니메이션을 만들기 전에 데이터 구조와 시간 범위를 정확히 파악해야 합니다. 전체 데이터는 1,704행(142개국 × 12개 시점)으로 구성되어 있으며, country(국가명), continent(대륙), year(연도), lifeExp(기대수명), pop(인구), gdpPercap(1인당 GDP) 등 6개 핵심 컬럼을 포함합니다. 데이터는 5년 간격으로 수집되어 1952년부터 2007년까지 총 12개 시점의 스냅샷을 제공합니다. 이 시간 범위를 미리 확인하는 것이 중요한 이유는 애니메이션의 프레임 수와 재생 속도를 결정하기 때문입니다. 12개 프레임이라면 적당한 속도로 재생되지만, 100개 프레임이라면 프레임 간격을 짧게 설정해야 합니다. 또한 연도가 정렬되어 있는지, 빠진 시점은 없는지 확인하여 애니메이션이 자연스럽게 흐르도록 준비합니다.
+
+    unique() 메서드는 컬럼의 고유값들을 반환합니다. year 컬럼에는 1952, 1957, 1962, ..., 2007까지 5년 간격으로 12개 값이 있습니다. 이 값들이 애니메이션의 각 프레임이 되며, 총 12개 프레임이 재생됩니다. 애니메이션 작업 시 시간 컬럼의 고유값 개수가 곧 프레임 수가 되므로 미리 확인하는 것이 좋습니다. 실무에서는 프레임 수가 너무 많으면(100개 이상) 브라우저 성능 문제가 생길 수 있으므로 데이터를 연단위가 아닌 5년 단위나 10년 단위로 집계하여 프레임 수를 줄이는 것이 좋습니다. 또한 sorted(df['year'].unique())를 사용하면 정렬된 순서로 확인할 수 있습니다.
+  tips:
+  - unique() 메서드는 컬럼의 고유값들을 반환합니다. year 컬럼에는 1952, 1957, 1962, ..., 2007까지 5년 간격으로 12개 값이 있습니다. 이 값들이
+    애니메이션의 각 프레임이 되며, 총 12개 프레임이 재생됩니다. 애니메이션 작업 시 시간 컬럼의 고유값 개수가 곧 프레임 수가 되므로 미리 확인하는 것이 좋습니다. 실무에서는
+    프레임 수가 너무 많으면(100개 이상) 브라우저 성능 문제가 생길 수 있으므로 데이터를 연단위가 아닌 5년 단위나 10년 단위로 집계하여 프레임 수를 줄이는 것이 좋습니다.
+    또한 sorted(df['year'].unique())를 사용하면 정렬된 순서로 확인할 수 있습니다.
+  snippet: gap.head()
+  exercise:
+    prompt: 2단계. 데이터 탐색 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    starterCode: gap.head()
+    hints:
+    - 바꿀 지점은 대시보드 데이터을 만드는 첫 줄과 인터랙티브 시각화 줄에서 찾으세요.
+    - 실행 뒤 툴팁과 선택 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 탐색의 수정 코드가 인터랙티브 시각화 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 2단계. 데이터 탐색 실행 결과가 툴팁과 선택 상태 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step3_static_bubble
+  title: 3단계. 정적 버블차트
+  structuredPrimary: true
+  subtitle: 복습 - px.scatter + size
+  goal: 3단계. 정적 버블차트에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 애니메이션을 만들기 전에 먼저 2007년 데이터만으로 정적 버블차트를 완성합니다. 이는 실무에서 복잡한 시각화를 개발할 때의 필수 단계로, 단일 시점으로 레이아웃을
+    검증한 후 시간 축을 추가하는 방식입니다. 이전 프로젝트에서 배운 버블차트(size), 색상 구분(color), 로그 스케일(log_x) 개념을 모두 활용합니다. x축은 1인당
+    GDP를 로그 스케일로 표현하여 값의 범위가 넓은 경제 데이터를 효과적으로 시각화하고, y축은 기대수명을 선형 스케일로 표현합니다. 버블 크기는 인구를 반영하여 국가의 규모를
+    직관적으로 파악할 수 있게 하며, 색상은 대륙으로 구분하여 지리적 패턴을 드러냅니다. 이렇게 4차원 정보(GDP, 기대수명, 인구, 대륙)를 하나의 2차원 평면에 표현할 수 있습니다.
+    hover_name='country'로 국가명을 추가하면 마우스를 올렸을 때 어떤 국가인지 즉시 확인할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    gap2007 = gap[gap['year'] == 2007]
+
+    px.scatter(
+        gap2007,
+        x='gdpPercap',
+        y='lifeExp',
+        size='pop',
+        color='continent',
+        hover_name='country',
+        log_x=True,
+        size_max=60
+    )
+  exercise:
+    prompt: 3단계. 정적 버블차트 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      gap2007 = gap[gap['year'] == 2007]
+
+      px.scatter(
+          gap2007,
+          x='gdpPercap',
+          y='lifeExp',
+          size='pop',
+          color='continent',
+          hover_name='country',
+          log_x=True,
+          size_max=60
+      )
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 정적 버블차트에서 \`gap2007\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 정적 버블차트 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step4_layout
+  title: 4단계. 레이아웃 정리
+  structuredPrimary: true
+  subtitle: 복습 - update_layout
+  goal: 4단계. 레이아웃 정리에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 차트에 제목과 축 라벨을 추가하여 정보 전달력을 높입니다. update_layout() 메서드는 차트 생성 이후 제목, 축 라벨, 크기, 배경색, 여백 등
+    레이아웃 전반을 수정하는 핵심 메서드입니다. 명확한 축 라벨은 데이터 해석에 필수적이며, 특히 로그 스케일을 사용할 때는 반드시 "(로그 스케일)"이라고 명시해야 독자가 값의
+    의미를 정확히 이해할 수 있습니다. 예를 들어 x축에서 1,000에서 10,000으로의 간격과 10,000에서 100,000으로의 간격이 시각적으로 같지만 실제 값 차이는 10배
+    차이가 나므로, 이를 명확히 알려야 오해가 없습니다. 실무에서는 차트를 보는 사람이 단위와 스케일을 정확히 이해할 수 있도록 상세한 라벨을 제공하며, 특히 프레젠테이션이나 보고서에서는
+    "1인당 GDP (USD, 로그 스케일)"처럼 단위까지 명시하는 것이 좋습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figStatic = px.scatter(
+        gap2007,
+        x='gdpPercap',
+        y='lifeExp',
+        size='pop',
+        color='continent',
+        hover_name='country',
+        log_x=True,
+        size_max=60
+    )
+
+    figStatic.update_layout(
+        title='2007년 세계 발전 현황',
+        xaxis_title='1인당 GDP (로그 스케일)',
+        yaxis_title='기대수명'
+    )
+    figStatic
+  exercise:
+    prompt: 4단계. 레이아웃 정리 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figStatic = px.scatter(
+          gap2007,
+          x='gdpPercap',
+          y='lifeExp',
+          size='pop',
+          color='continent',
+          hover_name='country',
+          log_x=True,
+          size_max=60
+      )
+
+      figStatic.update_layout(
+          title='2007년 세계 발전 현황',
+          xaxis_title='1인당 GDP (로그 스케일)',
+          yaxis_title='기대수명'
+      )
+      figStatic
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 레이아웃 정리의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 레이아웃 정리의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step5_animation_intro
+  title: 5단계. 애니메이션 추가
+  structuredPrimary: true
+  subtitle: animation_frame (신규)
+  goal: 5단계. 애니메이션 추가에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    정적 차트에 animation_frame='year' 파라미터 하나만 추가하면 시간에 따른 변화를 보여주는 애니메이션 차트가 완성됩니다. animation_frame은 Plotly의 핵심 기능 중 하나로, 시계열 데이터의 변화를 동적으로 시각화하는 가장 직관적인 방법입니다. 정적 차트에서 애니메이션으로의 전환은 놀라울 정도로 간단합니다. Plotly는 year 컬럼의 각 고유값(1952, 1957, ..., 2007)마다 하나의 프레임을 자동 생성하고, 재생 버튼, 일시정지 버튼, 슬라이더를 UI에 추가하여 사용자가 자유롭게 탐색할 수 있게 합니다. 사용자는 재생 버튼을 눌러 시간의 흐름을 볼 수도 있고, 슬라이더를 드래그하여 특정 시점으로 이동할 수도 있습니다. 이 방식은 여러 시점의 정적 차트를 나열하는 것보다 월등히 효과적이며, 프레젠테이션이나 데이터 스토리텔링에서 청중의 주목을 끌고 인사이트를 전달하는 강력한 도구입니다.
+
+    animation_frame 파라미터는 시간축을 따라 데이터가 변화하는 모습을 애니메이션으로 보여줍니다. year, month, date, timestamp 같은 시간 컬럼을 지정하면 Plotly가 자동으로 재생 컨트롤(재생, 일시정지 버튼)과 슬라이더를 생성합니다. 각 고유값마다 하나의 프레임이 만들어지므로, 여기서는 12개 연도에 대해 12개 프레임이 생성됩니다. 실무 활용: 월별 매출 변화, 주가 일별 추이, 인구 연도별 증가 등 모든 시계열 데이터에 적용 가능합니다. 성능 고려사항: 프레임 수가 너무 많으면(100개 이상) 브라우저 렌더링 성능 문제가 발생할 수 있으므로 데이터를 적절히 샘플링하거나 집계하는 것이 좋습니다. 예를 들어 일별 데이터를 주별이나 월별로 집계하여 프레임 수를 줄일 수 있습니다.
+  tips:
+  - 'animation_frame 파라미터는 시간축을 따라 데이터가 변화하는 모습을 애니메이션으로 보여줍니다. year, month, date, timestamp 같은 시간 컬럼을
+    지정하면 Plotly가 자동으로 재생 컨트롤(재생, 일시정지 버튼)과 슬라이더를 생성합니다. 각 고유값마다 하나의 프레임이 만들어지므로, 여기서는 12개 연도에 대해 12개 프레임이
+    생성됩니다. 실무 활용: 월별 매출 변화, 주가 일별 추이, 인구 연도별 증가 등 모든 시계열 데이터에 적용 가능합니다. 성능 고려사항: 프레임 수가 너무 많으면(100개 이상)
+    브라우저 렌더링 성능 문제가 발생할 수 있으므로 데이터를 적절히 샘플링하거나 집계하는 것이 좋습니다. 예를 들어 일별 데이터를 주별이나 월별로 집계하여 프레임 수를 줄일 수 있습니다.'
+  snippet: |-
+    px.scatter(
+        gap,
+        x='gdpPercap',
+        y='lifeExp',
+        size='pop',
+        color='continent',
+        hover_name='country',
+        animation_frame='year',
+        log_x=True,
+        size_max=60
+    )
+  exercise:
+    prompt: 5단계. 애니메이션 추가 예제에서 \`x\`, \`y\`, \`size\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      px.scatter(
+          gap,
+          x='gdpPercap',
+          y='lifeExp',
+          size='pop',
+          color='continent',
+          hover_name='country',
+          animation_frame='year',
+          log_x=True,
+          size_max=60
+      )
+    hints:
+    - 바꿀 지점은 \`x = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`x\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 애니메이션 추가에서 \`x\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 애니메이션 추가 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step6_animation_group
+  title: 6단계. 애니메이션 그룹 설정
+  structuredPrimary: true
+  subtitle: animation_group (신규)
+  goal: 6단계. 애니메이션 그룹 설정에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    animation_group='country' 파라미터를 추가하면 국가별 이동 궤적이 부드럽게 연결됩니다. animation_group은 프레임 간 전환 시 어떤 데이터 포인트가 동일한 개체(entity)인지 Plotly에게 알려주는 역할을 합니다. 이 파라미터가 없으면 각 프레임의 점들이 독립적으로 갑자기 나타나고 사라지기만 하여 각 국가가 어떻게 변화했는지 추적하기 어렵습니다. 하지만 animation_group을 설정하면 같은 country 값을 가진 점이 이전 프레임의 위치에서 다음 프레임의 위치로 부드럽게(smooth transition) 이동합니다. 예를 들어 한국이 1952년 프레임에서 (GDP=1000, 기대수명=50) 위치에 있었다면, 1957년 프레임에서 (GDP=1500, 기대수명=55)로 점이 움직이는 애니메이션이 재생됩니다. 이는 각 국가의 발전 궤적을 시각적으로 추적할 수 있게 해주어 데이터 스토리텔링에 매우 효과적입니다. 실무에서는 사용자가 특정 개체(고객, 제품, 지역 등)의 시간에 따른 변화를 따라가며 이해할 수 있도록 반드시 설정해야 합니다.
+
+    animation_group은 애니메이션에서 개별 개체를 추적하기 위한 고유 식별자를 지정합니다. country처럼 각 데이터 포인트를 고유하게 구분할 수 있는 컬럼을 사용하며, 이를 통해 프레임 간 전환 시 같은 개체의 위치 변화를 부드럽게 연결하여 궤적을 시각화합니다. 동작 원리: animation_group이 없으면 Plotly는 각 프레임을 독립적으로 렌더링하여 점들이 갑자기 나타났다 사라집니다. 하지만 설정하면 '이전 프레임의 한국'과 '다음 프레임의 한국'이 같은 개체임을 인식하여 위치 간 보간(interpolation)을 수행하고 부드러운 이동 애니메이션을 생성합니다. 실무 활용: 고객 ID별 구매 패턴 변화, 제품 ID별 판매량 추이, 매장별 매출 성장, 직원별 성과 변화 등 개체 단위 추적이 필요한 모든 시계열 분석에 필수적입니다. 이 파라미터 없이는 애니메이션의 핵심 가치인 '연속성'을 표현할 수 없으므로 반드시 설정해야 합니다.
+  tips:
+  - 'animation_group은 애니메이션에서 개별 개체를 추적하기 위한 고유 식별자를 지정합니다. country처럼 각 데이터 포인트를 고유하게 구분할 수 있는 컬럼을 사용하며,
+    이를 통해 프레임 간 전환 시 같은 개체의 위치 변화를 부드럽게 연결하여 궤적을 시각화합니다. 동작 원리: animation_group이 없으면 Plotly는 각 프레임을 독립적으로
+    렌더링하여 점들이 갑자기 나타났다 사라집니다. 하지만 설정하면 ''이전 프레임의 한국''과 ''다음 프레임의 한국''이 같은 개체임을 인식하여 위치 간 보간(interpolation)을
+    수행하고 부드러운 이동 애니메이션을 생성합니다. 실무 활용: 고객 ID별 구매 패턴 변화, 제품 ID별 판매량 추이, 매장별 매출 성장, 직원별 성과 변화 등 개체 단위 추적이
+    필요한 모든 시계열 분석에 필수적입니다. 이 파라미터 없이는 애니메이션의 핵심 가치인 ''연속성''을 표현할 수 없으므로 반드시 설정해야 합니다.'
+  snippet: |-
+    px.scatter(
+        gap,
+        x='gdpPercap',
+        y='lifeExp',
+        size='pop',
+        color='continent',
+        hover_name='country',
+        animation_frame='year',
+        animation_group='country',
+        log_x=True,
+        size_max=60
+    )
+  exercise:
+    prompt: 6단계. 애니메이션 그룹 설정 예제에서 \`x\`, \`y\`, \`size\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      px.scatter(
+          gap,
+          x='gdpPercap',
+          y='lifeExp',
+          size='pop',
+          color='continent',
+          hover_name='country',
+          animation_frame='year',
+          animation_group='country',
+          log_x=True,
+          size_max=60
+      )
+    hints:
+    - 바꿀 지점은 \`x = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`x\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 애니메이션 그룹 설정에서 \`x\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 애니메이션 그룹 설정 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step7_axis_range
+  title: 7단계. 축 범위 고정
+  structuredPrimary: true
+  subtitle: range_x, range_y (신규)
+  goal: 7단계. 축 범위 고정에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    애니메이션에서 축 범위가 프레임마다 변하면 보는 사람이 혼란스럽고 실제 데이터 변화를 파악하기 어렵습니다. 따라서 range_x, range_y로 축 범위를 고정해야 합니다. 기본 설정에서는 Plotly가 각 프레임마다 해당 프레임에 있는 데이터에 맞춰 축 범위를 자동 조정합니다. 예를 들어 1952년 프레임에서는 x축이 [100, 10000]이었다가 2007년 프레임에서는 [500, 50000]으로 변하면, 국가들의 점이 실제로 오른쪽으로 이동한 것인지 축이 변해서 그런 것인지 구분할 수 없게 됩니다. range_x=[100, 100000], range_y=[25, 90]처럼 전체 시간 범위의 모든 데이터를 포함하는 고정 범위를 설정하면 축이 안정적인 기준점 역할을 하여 점들의 실제 이동만 표현됩니다. 실무에서는 전체 데이터의 min/max 값을 확인한 후 약간의 여유(5~10%)를 두고 범위를 설정하는 것이 좋습니다. 예를 들어 최대값이 90이면 95나 100으로 설정하여 극단값이 잘리지 않도록 합니다. 이는 모든 애니메이션 차트 개발의 필수 단계입니다.
+
+    range_x와 range_y는 축의 고정 범위를 설정합니다. 애니메이션에서는 필수적인 파라미터로, 각 프레임마다 축이 자동 조정되는 것을 방지합니다. 리스트 형태로 [최소값, 최대값]을 지정하며, 전체 시점의 데이터를 포함하도록 넉넉하게 설정해야 합니다. GDP는 로그 스케일이므로 100~100000으로 넓게, 기대수명은 25~90세로 설정했습니다. 범위가 좁으면 데이터가 잘리고, 너무 넓으면 변화가 작아 보이므로 적절한 균형이 중요합니다.
+  tips:
+  - range_x와 range_y는 축의 고정 범위를 설정합니다. 애니메이션에서는 필수적인 파라미터로, 각 프레임마다 축이 자동 조정되는 것을 방지합니다. 리스트 형태로 [최소값,
+    최대값]을 지정하며, 전체 시점의 데이터를 포함하도록 넉넉하게 설정해야 합니다. GDP는 로그 스케일이므로 100~100000으로 넓게, 기대수명은 25~90세로 설정했습니다.
+    범위가 좁으면 데이터가 잘리고, 너무 넓으면 변화가 작아 보이므로 적절한 균형이 중요합니다.
+  snippet: |-
+    px.scatter(
+        gap,
+        x='gdpPercap',
+        y='lifeExp',
+        size='pop',
+        color='continent',
+        hover_name='country',
+        animation_frame='year',
+        animation_group='country',
+        log_x=True,
+        size_max=60,
+        range_x=[100, 100000],
+        range_y=[25, 90]
+    )
+  exercise:
+    prompt: 7단계. 축 범위 고정 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      px.scatter(
+          gap,
+          x='gdpPercap',
+          y='lifeExp',
+          size='pop',
+          color='continent',
+          hover_name='country',
+          animation_frame='year',
+          animation_group='country',
+          log_x=True,
+          size_max=60,
+          range_x=[100, 100000],
+          range_y=[25, 90]
+      )
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 축 범위 고정에서 \`x\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. 축 범위 고정 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step8_final
+  title: 8단계. 최종 결과물
+  structuredPrimary: true
+  subtitle: Hans Rosling 스타일 완성
+  goal: 8단계. 최종 결과물에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 모든 설정을 종합하여 Hans Rosling의 유명한 TED 강연 스타일 애니메이션 차트를 완성합니다. labels 파라미터로 컬럼명을 한글로 변환하여 가독성을
+    높이고, hover_data=['pop']로 마우스 오버 시 인구 정보를 추가 표시합니다. title_x=0.5로 제목을 중앙 정렬하고 height=600으로 충분한 공간을 확보합니다.
+    이 최종 차트는 4차원 정보(x=GDP, y=기대수명, size=인구, color=대륙)와 시간 차원을 포함하여 총 5차원 데이터를 하나의 인터랙티브 시각화로 표현합니다. 사용자는
+    재생 버튼을 눌러 1952년부터 2007년까지 55년간 세계 각국이 어떻게 발전했는지 관찰하며, 슬라이더로 특정 시점을 선택하고, 마우스 오버로 국가별 세부 정보를 확인할 수
+    있습니다. 이러한 다층적 인터랙션은 정적 차트로는 절대 불가능한 풍부한 데이터 탐색 경험을 제공합니다. 실무에서는 이런 애니메이션을 프레젠테이션, 웹 대시보드, 데이터 저널리즘
+    등에서 복잡한 시계열 패턴을 전달하는 데 활용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figFinal = px.scatter(
+        gap,
+        x='gdpPercap',
+        y='lifeExp',
+        size='pop',
+        color='continent',
+        hover_name='country',
+        hover_data=['pop'],
+        animation_frame='year',
+        animation_group='country',
+        log_x=True,
+        size_max=60,
+        range_x=[100, 100000],
+        range_y=[25, 90],
+        labels={
+            'gdpPercap': '1인당 GDP (USD)',
+            'lifeExp': '기대수명 (세)',
+            'pop': '인구',
+            'continent': '대륙'
+        }
+    )
+
+    figFinal.update_layout(
+        title='1952-2007 세계 발전 현황',
+        title_x=0.5,
+        height=600
+    )
+    figFinal
+  exercise:
+    prompt: 8단계. 최종 결과물 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figFinal = px.scatter(
+          gap,
+          x='gdpPercap',
+          y='lifeExp',
+          size='pop',
+          color='continent',
+          hover_name='country',
+          hover_data=['pop'],
+          animation_frame='year',
+          animation_group='country',
+          log_x=True,
+          size_max=60,
+          range_x=[100, 100000],
+          range_y=[25, 90],
+          labels={
+              'gdpPercap': '1인당 GDP (USD)',
+              'lifeExp': '기대수명 (세)',
+              'pop': '인구',
+              'continent': '대륙'
+          }
+      )
+
+      figFinal.update_layout(
+          title='1952-2007 세계 발전 현황',
+          title_x=0.5,
+          height=600
+      )
+      figFinal
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 최종 결과물의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 최종 결과물의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step9_speed
+  title: 9단계. 애니메이션 속도 조절
+  structuredPrimary: true
+  subtitle: updatemenus 수정 (신규)
+  goal: 9단계. 애니메이션 속도 조절에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    애니메이션의 재생 속도를 조절하여 데이터 변화를 적절한 템포로 표현합니다. Plotly의 애니메이션 컨트롤은 layout.updatemenus라는 내부 구조로 관리되며, 재생 버튼의 동작을 세밀하게 제어할 수 있습니다. frame.duration은 각 프레임이 화면에 표시되는 시간(밀리초)으로, 값이 클수록 각 시점을 오래 볼 수 있습니다. transition.duration은 프레임 간 전환(점의 이동) 애니메이션에 걸리는 시간입니다. 기본값은 각각 500ms/500ms인데, 더 빠른 애니메이션을 원하면 200ms/100ms로 줄이고, 더 천천히 보고 싶다면 1000ms/500ms로 늘립니다. 실무 가이드: 프레임 수가 많으면(50개 이상) 각 프레임을 짧게(200~300ms), 프레임 수가 적으면(10개 미만) 길게(800~1200ms) 설정하는 것이 좋습니다. 프레젠테이션용은 느리게, 탐색용 대시보드는 빠르게 설정합니다. 최적의 속도는 데이터 특성과 청중에 따라 다르므로 여러 값을 실험하여 결정해야 합니다.
+
+    frame.duration은 각 프레임의 표시 시간(밀리초), transition.duration은 프레임 간 전환 시간입니다. frame.duration이 크면 각 시점을 오래 볼 수 있고, transition.duration이 크면 이동이 더 부드럽습니다. 기본값 500/500ms를 기준으로, 빠른 애니메이션은 200/100ms, 느린 애니메이션은 1000/500ms 정도로 설정합니다. 실무 팁: 프레임 수가 많으면 짧게, 적으면 길게 설정하는 것이 좋으며, 프레젠테이션용은 느리게, 탐색용은 빠르게 설정합니다.
+  tips:
+  - 'frame.duration은 각 프레임의 표시 시간(밀리초), transition.duration은 프레임 간 전환 시간입니다. frame.duration이 크면 각 시점을
+    오래 볼 수 있고, transition.duration이 크면 이동이 더 부드럽습니다. 기본값 500/500ms를 기준으로, 빠른 애니메이션은 200/100ms, 느린 애니메이션은
+    1000/500ms 정도로 설정합니다. 실무 팁: 프레임 수가 많으면 짧게, 적으면 길게 설정하는 것이 좋으며, 프레젠테이션용은 느리게, 탐색용은 빠르게 설정합니다.'
+  snippet: |-
+    figSpeed = px.scatter(
+        gap,
+        x='gdpPercap',
+        y='lifeExp',
+        size='pop',
+        color='continent',
+        hover_name='country',
+        animation_frame='year',
+        animation_group='country',
+        log_x=True,
+        size_max=60,
+        range_x=[100, 100000],
+        range_y=[25, 90]
+    )
+
+    figSpeed.layout.updatemenus[0].buttons[0].args[1]['frame']['duration'] = 500
+    figSpeed.layout.updatemenus[0].buttons[0].args[1]['transition']['duration'] = 300
+    figSpeed
+  exercise:
+    prompt: 9단계. 애니메이션 속도 조절 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figSpeed = px.scatter(
+          gap,
+          x='gdpPercap',
+          y='lifeExp',
+          size='pop',
+          color='continent',
+          hover_name='country',
+          animation_frame='year',
+          animation_group='country',
+          log_x=True,
+          size_max=60,
+          range_x=[100, 100000],
+          range_y=[25, 90]
+      )
+
+      figSpeed.layout.updatemenus[0].buttons[0].args[1]['frame']['duration'] = 500
+      figSpeed.layout.updatemenus[0].buttons[0].args[1]['transition']['duration'] = 300
+      figSpeed
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 애니메이션 속도 조절의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 애니메이션 속도 조절의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step10_continent_filter
+  title: 10단계. 대륙별 필터링
+  structuredPrimary: true
+  subtitle: 특정 대륙만 보기
+  goal: 10단계. 대륙별 필터링에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 전체 세계 데이터에서 특정 지역만 필터링하여 세부 패턴을 깊이 분석합니다. 전 세계 142개국을 한 차트에 표시하면 전체적인 추세는 파악할 수 있지만, 개별
+    국가의 움직임이나 지역 내 비교는 어렵습니다. 대륙이나 지역별로 필터링하면 해당 영역의 국가 간 경쟁, 발전 속도 차이, 이상치(outlier) 국가 등을 명확히 파악할 수 있습니다.
+    아시아를 예로 들면, 한국·일본·싱가포르 등 급속한 경제 발전을 이룬 국가, 중국·인도 등 인구 대국, 아프가니스탄 등 저개발국이 공존하여 매우 역동적인 패턴을 보입니다. color='country'로
+    국가별로 다른 색상을 부여하면 각 국가의 궤적을 추적하기 쉬우며, showlegend=False로 범례를 숨기면 화면이 깔끔해집니다(범례가 너무 길면 오히려 방해가 되므로).
+    실무 데이터 분석에서는 이처럼 전체 개요(overview)를 보여준 후 특정 영역을 확대하는 드릴다운(drill-down) 방식으로 분석을 진행하며, 대시보드에서는 드롭다운 메뉴로
+    대륙을 선택할 수 있게 구현합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    gapAsia = gap[gap['continent'] == 'Asia']
+
+    figAsia = px.scatter(
+        gapAsia,
+        x='gdpPercap',
+        y='lifeExp',
+        size='pop',
+        color='country',
+        hover_name='country',
+        animation_frame='year',
+        animation_group='country',
+        log_x=True,
+        size_max=60,
+        range_x=[100, 100000],
+        range_y=[25, 90]
+    )
+
+    figAsia.update_layout(
+        title='아시아 국가 발전 현황 (1952-2007)',
+        showlegend=False,
+        height=600
+    )
+    figAsia
+  exercise:
+    prompt: 10단계. 대륙별 필터링 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      gapAsia = gap[gap['continent'] == 'Asia']
+
+      figAsia = px.scatter(
+          gapAsia,
+          x='gdpPercap',
+          y='lifeExp',
+          size='pop',
+          color='country',
+          hover_name='country',
+          animation_frame='year',
+          animation_group='country',
+          log_x=True,
+          size_max=60,
+          range_x=[100, 100000],
+          range_y=[25, 90]
+      )
+
+      figAsia.update_layout(
+          title='아시아 국가 발전 현황 (1952-2007)',
+          showlegend=False,
+          height=600
+      )
+      figAsia
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 대륙별 필터링의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 대륙별 필터링의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 애니메이션 버블차트 프로젝트
+  goal: 실습에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    지금까지 배운 모든 개념을 종합하여 다양한 관점의 애니메이션 시각화를 만들어봅니다. 이 실습에서는 animation_frame(시간축 설정), animation_group(개체 추적), range_x/range_y(축 범위 고정), 필터링(조건부 데이터 선택), groupby/agg(데이터 집계), 로그 스케일, 버블 크기 조정 등 이 프로젝트에서 배운 모든 개념을 실전처럼 활용합니다. 각 미션은 실제 데이터 분석 시나리오를 반영하여 구성되었으며, 완성하면 지역별 비교, 인구 상위 국가 분석, 대륙별 집계, 특정 국가 추적 등 다양한 관점에서 세계 발전 양상을 분석할 수 있습니다. 실무에서 애니메이션 차트를 만들 때와 동일한 프로세스를 경험하게 됩니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import plotly.express as px
+    import pandas as pd
+
+    europe = px.data.gapminder()
+    europeData = europe[europe['continent'] == 'Europe']
+  exercise:
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import plotly.express as px
+      import pandas as pd
+
+      europe = px.data.gapminder()
+      europeData = europe[europe['continent'] == 'Europe']
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 실습에서 \`europe\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 애니메이션 버블차트를 만드는 방법을 배웠습니다.
+  - type: list
+    items:
+    - animation_frame - 시간축 애니메이션
+    - animation_group - 추적 대상 지정
+    - range_x, range_y - 축 범위 고정
+    - size - 버블 크기 (복습)
+    - color - 색상 구분 (복습)
+    - log_x - 로그 스케일 (복습)
+    - update_layout - 레이아웃 수정 (복습)
+  - type: text
+    content: 다음 시간에는 레스토랑 매출 분석 대시보드를 만듭니다.
+  goal: 정리에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.
+- id: workflow_validation
+  title: 11단계. 애니메이션 Figure 검증 루프
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  goal: 11단계. 애니메이션 Figure 검증 루프에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    애니메이션 차트는 프레임, 슬라이더, 축 범위가 맞아야 시간 변화가 왜곡되지 않습니다. 연도별 프레임 수와 데이터 조건을 같이 검증합니다.
+
+    애니메이션은 프레임 수가 데이터의 시간 단위와 일치하는지 검증해야 발표용 장식이 아니라 분석 도구가 됩니다.
+  snippet: |-
+    import plotly.express as px
+
+    gapFlow = px.data.gapminder()
+    requiredColumns = {"country", "continent", "year", "lifeExp", "pop", "gdpPercap"}
+    missingColumns = requiredColumns - set(gapFlow.columns)
+
+    assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+    assert gapFlow[["lifeExp", "pop", "gdpPercap"]].gt(0).all().all()
+    assert gapFlow["year"].nunique() >= 10
+  exercise:
+    prompt: 11단계. 애니메이션 Figure 검증 루프 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import plotly.express as px
+
+      gapFlow = px.data.gapminder()
+      requiredColumns = {"country", "continent", "year", "lifeExp", "pop", "gdpPercap"}
+      missingColumns = requiredColumns - set(gapFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert gapFlow[["lifeExp", "pop", "gdpPercap"]].gt(0).all().all()
+      assert gapFlow["year"].nunique() >= 10
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 애니메이션 Figure 검증 루프에서 \`gapFlow\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 11단계. 애니메이션 Figure 검증 루프에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: plotly_06-world-change-animation-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 시간에 따른 세계 변화 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: animation frame마다 국가 집합과 scale이 안정적인가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_world_change_animation(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_world_change_animation(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_world_change_animation(rows):
+            required = ['year', 'metric', 'country']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'country'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['year'] for row in usable]
+            y_values = [row['metric'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.plotly.plotly_06.world-change-animation-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.plotly.plotly_06.world-change-animation-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_world_change_animation
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - year: 2000
+              metric: 10
+              country: A
+            - year: 2010
+              metric: 15
+              country: A
+            - year: 2000
+              metric: 20
+              country: B
+          expectedReturn:
+            usableCount: 3
+            excludedCount: 0
+            groupCounts:
+              A: 2
+              B: 1
+            xExtent:
+            - 2000
+            - 2010
+            yExtent:
+            - 10
+            - 20
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: plotly_06-world-change-animation-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - plotly_06-world-change-animation-data-evidence-mastery
+    title: 시간에 따른 세계 변화 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 지역별 KPI 변화를 고정 scale과 결측 frame 표시가 있는 animation으로 탐색한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_world_change_animation(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_world_change_animation(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_world_change_animation(candidate):
+            expected = {'mark': 'animated-bubble', 'x': 'year', 'y': 'metric', 'group': 'country', 'transforms': ['complete-frames', 'fixed-scale'], 'interaction': 'animation'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.plotly.plotly_06.world-change-animation-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.plotly.plotly_06.world-change-animation-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_world_change_animation
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: animated-bubble
+              x: year
+              y: metric
+              group: country
+              transforms:
+              - complete-frames
+              - fixed-scale
+              interaction: animation
+              description: 지역별 KPI 변화를 고정 scale과 결측 frame 표시가 있는 animation으로 탐색한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: animated-bubble
+              x: year
+              y: metric
+              group: country
+              transforms:
+              - complete-frames
+              - fixed-scale
+              interaction: animation
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: metric
+              y: year
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - interaction
+            - description
+            encoding:
+              mark: animated-bubble
+              x: year
+              y: metric
+              group: country
+              transforms:
+              - complete-frames
+              - fixed-scale
+              interaction: animation
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: plotly_06-world-change-animation-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - plotly_06-world-change-animation-encoding-transfer-transfer
+    title: 시간에 따른 세계 변화 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: animation frame마다 국가 집합과 scale이 안정적인가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_world_change_animation(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_world_change_animation(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_world_change_animation(situation):
+            table = {'change-over-frames': {'encoding': 'animation plus static trail', 'evidence': 'frame completeness', 'risk': 'change blindness'}, 'compare-endpoints': {'encoding': 'slope chart', 'evidence': 'same entities', 'risk': 'missing middle'}, 'precise-trend': {'encoding': 'small-multiple lines', 'evidence': 'full series', 'risk': 'animation memory'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.plotly.plotly_06.world-change-animation-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.plotly.plotly_06.world-change-animation-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_world_change_animation
+        cases:
+        - id: recalls-change-over-frames
+          arguments:
+          - value: change-over-frames
+          expectedReturn:
+            encoding: animation plus static trail
+            evidence: frame completeness
+            risk: change blindness
+        - id: recalls-compare-endpoints
+          arguments:
+          - value: compare-endpoints
+          expectedReturn:
+            encoding: slope chart
+            evidence: same entities
+            risk: missing middle
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

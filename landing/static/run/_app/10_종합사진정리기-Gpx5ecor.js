@@ -1,0 +1,652 @@
+var e=`meta:
+  id: visionApps_10
+  title: 종합 - 사진 자동 정리기
+  order: 10
+  category: visionApps
+  difficulty: ⭐⭐⭐⭐
+  badge: 심화
+  packages:
+  - matplotlib
+  - numpy
+  - opencv-python
+  - pillow
+  - imagehash
+  - scikit-learn
+  tags:
+  - 종합프로젝트
+  - 사진정리
+  - phash
+  - 분류
+  - 응용
+  seo:
+    title: 비전 응용 - 종합 사진 정리기
+    description: phash 중복 검출 + 노출 진단으로 폴더 안 사진을 자동 분류해 폴더 트리로 정리합니다.
+    keywords:
+    - 사진정리
+    - 자동분류
+    - phash
+    - 노출진단
+    - 응용
+intro:
+  emoji: 🗂
+  goal: 폴더 안 사진을 중복 그룹·노출 상태별로 분류해 새 폴더 트리로 정리하는 도구를 만듭니다.
+  description: |-
+    이 강의는 visionApps 트랙의 마지막 응용 종합입니다. visionBasics 9강의 노출 진단, visionApps 7강의 중복 검출을 한데 모아 입력 폴더의 사진을 분류된 출력 폴더 트리로 정리하는 미니 도구를 만듭니다. 결과는 사용자 자신의 사진 라이브러리에 즉시 적용할 수 있는 형태입니다.
+  direction: 임시 입력 폴더의 사진을 노출 진단 + 중복 검출로 분류하고 출력 폴더에 그룹별로 복사합니다.
+  benefits:
+  - 여러 응용 도구를 한 파이프라인에 모으는 패턴을 익힙니다.
+  - 폴더 → 폴더 변환의 응용 함수를 만듭니다.
+  - 결과 폴더 트리를 보고서 형태로 시각화합니다.
+  diagram:
+    steps:
+    - label: 1단계. 입력·출력 폴더
+      detail: OS temp 안에 두 폴더 트리.
+    - label: 2단계. 노출 진단
+      detail: visionBasics 9강 패턴.
+    - label: 3단계. 중복 그룹
+      detail: visionApps 7강 패턴.
+    - label: 4단계. 출력 분류
+      detail: tag 기반 폴더 복사.
+    - label: 5단계. 결과 보고
+      detail: 폴더 트리 + 요약.
+    runtime:
+    - label: 비전 환경
+      detail: opencv-python + Pillow + imagehash.
+    - label: 검증 흐름
+      detail: 분류 결과 폴더 트리와 그룹 통계를 assert와 시각 비교로 기대값과 같은지 확인합니다.
+sections:
+- id: prepare_folders
+  title: 1단계. 입력·출력 폴더 준비
+  structuredPrimary: true
+  subtitle: 두 폴더 트리
+  goal: OS temp에 입력 폴더(다양한 사진) 와 출력 폴더(빈 트리) 를 만듭니다.
+  why: 응용 함수의 입력과 출력은 명확히 분리된 두 폴더여야 합니다.
+  explanation: |-
+    입력 폴더에는 visionApps 7강 패턴으로 만든 변형 사진 7장 + 노출 다른 사진 두 장을 추가로 둡니다. 출력 폴더는 비어 있는 상태로 시작합니다.
+  tips:
+  - 학습용 폴더 트리는 응용 함수가 안정적으로 실행될 수 있는 작은 표본으로 두는 것이 좋습니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import tempfile
+    import shutil
+    from pathlib import Path
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    inputDir = Path(tempfile.gettempdir()) / 'codaro_apps_10_input'
+    outputDir = Path(tempfile.gettempdir()) / 'codaro_apps_10_output'
+    for path in [inputDir, outputDir]:
+        if path.exists():
+            shutil.rmtree(path)
+        path.mkdir()
+    china = load_sample_image('china.jpg')
+    flower = load_sample_image('flower.jpg')
+
+    def write(img, name):
+        Image.fromarray(img).save(inputDir / name)
+
+    write(china, 'china_a.png')
+    write((china.astype(np.float32) * 1.1 + 5).clip(0, 255).astype(np.uint8), 'china_b.png')
+    write(flower, 'flower_a.png')
+    write((flower.astype(np.float32) * 0.92).clip(0, 255).astype(np.uint8), 'flower_b.png')
+    write((china.astype(np.float32) - 80).clip(0, 255).astype(np.uint8), 'china_dark.png')
+    write((flower.astype(np.float32) * 1.3 + 30).clip(0, 255).astype(np.uint8), 'flower_bright.png')
+    sorted(p.name for p in inputDir.iterdir())
+  exercise:
+    prompt: 입력 폴더 파일 개수를 확인하세요.
+    starterCode: |-
+      count = len(list(inputDir.iterdir()))
+      ___ == 6
+    hints:
+    - 빈칸은 count 변수입니다.
+    - 결과는 True여야 합니다.
+  check:
+    noError: 폴더 준비가 오류 없이 끝나야 합니다.
+    resultCheck: inputDir.exists() 와 outputDir.exists() 모두 True여야 합니다.
+- id: exposure
+  title: 2단계. 노출 진단
+  structuredPrimary: true
+  subtitle: visionBasics 9강 패턴
+  goal: 각 사진의 평균 밝기로 노출 태그를 정합니다.
+  why: 분류의 첫 기준은 노출 상태입니다.
+  explanation: |-
+    평균이 90 미만이면 'dark', 200 초과이면 'bright', 그 외는 'normal' 로 분류합니다. 같은 폴더의 모든 사진에 적용해 태그 dict를 만듭니다.
+  tips:
+  - 노출 임곗값은 카메라와 보정 정도에 따라 다릅니다. 학습용 합성에서는 단순 임곗값으로 충분합니다.
+  snippet: |-
+    def exposureTag(img):
+        mean = img.mean()
+        if mean < 90:
+            return 'dark'
+        if mean > 200:
+            return 'bright'
+        return 'normal'
+
+    exposureTags = {}
+    for path in inputDir.iterdir():
+        img = np.array(Image.open(path))
+        exposureTags[path.name] = exposureTag(img)
+    exposureTags
+  exercise:
+    prompt: exposureTags의 dark, bright, normal 개수를 dict로 출력하세요.
+    starterCode: |-
+      from collections import Counter
+
+      tagCounts = Counter(exposureTags.___())
+      tagCounts
+    hints:
+    - 빈칸은 'values' 입니다.
+    - 결과는 각 태그별 카운트 dict입니다.
+  check:
+    noError: 노출 진단이 오류 없이 끝나야 합니다.
+    resultCheck: exposureTags의 키 개수가 inputDir의 파일 개수와 같아야 합니다.
+- id: duplicate_group
+  title: 3단계. 중복 그룹
+  structuredPrimary: true
+  subtitle: visionApps 7강 패턴
+  goal: phash 거리로 중복 사진들을 그룹으로 묶습니다.
+  why: 같은 사진의 변형은 한 그룹으로 묶어 한 번만 보존하는 것이 정리의 핵심입니다.
+  explanation: |-
+    7강에서 만든 findDuplicates 패턴을 그대로 사용합니다. 각 사진의 그룹 ID(그룹 내 대표 이름) 를 dict로 만들면 후속 분류가 편합니다.
+  tips:
+  - 그룹 ID는 정렬된 첫 사진의 이름으로 두는 것이 결정적이고 깔끔합니다.
+  snippet: |-
+    import imagehash
+
+    hashes = {p.name: imagehash.phash(Image.open(p)) for p in inputDir.iterdir()}
+    parent = {name: name for name in hashes}
+    def find(x):
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+    threshold = 10
+    names = list(hashes.keys())
+    for i in range(len(names)):
+        for j in range(i + 1, len(names)):
+            if hashes[names[i]] - hashes[names[j]] <= threshold:
+                parent[find(names[i])] = find(names[j])
+    groupId = {name: find(name) for name in names}
+    sorted(set(groupId.values()))
+  exercise:
+    prompt: 각 그룹 ID에 속한 사진 개수를 출력하세요.
+    starterCode: |-
+      from collections import Counter
+
+      groupSize = Counter(groupId.___())
+      dict(groupSize)
+    hints:
+    - 빈칸은 'values' 입니다.
+    - 결과는 그룹별 사진 수입니다.
+  check:
+    noError: 중복 그룹화가 오류 없이 끝나야 합니다.
+    resultCheck: groupId의 키 개수가 hashes의 키 개수와 같아야 합니다.
+- id: organize
+  title: 4단계. 출력 분류
+  structuredPrimary: true
+  subtitle: tag 기반 폴더 복사
+  goal: 노출 태그와 그룹 ID를 조합한 폴더 트리에 사진을 복사합니다.
+  why: 정리의 결과는 사람이 바로 사용할 수 있는 폴더 트리입니다.
+  explanation: |-
+    출력 폴더 아래 \`<exposureTag>/<groupId>/<filename>\` 형식으로 사진을 복사합니다. 폴더가 존재하지 않으면 자동으로 만듭니다.
+
+    shutil.copy 가 단순하지만 같은 효과의 Image.save 또는 cv2.imwrite도 가능합니다.
+  tips:
+  - 출력 폴더는 항상 비어 있는 상태에서 시작하는 것이 결과 비교에 깔끔합니다.
+  snippet: |-
+    for name in names:
+        tag = exposureTags[name]
+        gid = groupId[name].rsplit('.', 1)[0]
+        destDir = outputDir / tag / gid
+        destDir.mkdir(parents=True, exist_ok=True)
+        shutil.copy(inputDir / name, destDir / name)
+    sorted(str(p.relative_to(outputDir)) for p in outputDir.rglob('*.png'))
+  exercise:
+    prompt: 출력 폴더의 모든 폴더 수와 모든 파일 수를 출력하세요.
+    starterCode: |-
+      dirCount = sum(1 for _ in outputDir.rglob('*') if _.is_dir())
+      fileCount = sum(1 for _ in outputDir.rglob('*') if _.___())
+      dirCount, fileCount
+    hints:
+    - 빈칸은 'is_file' 입니다.
+    - dirCount는 노출 폴더 + 그룹 폴더 수입니다.
+  check:
+    noError: 폴더 복사가 오류 없이 끝나야 합니다.
+    resultCheck: outputDir 안에 png 파일이 존재해야 합니다.
+- id: report
+  title: 5단계. 결과 보고
+  structuredPrimary: true
+  subtitle: 폴더 트리 + 요약
+  goal: 정리 결과를 dict 요약과 함께 시각화합니다.
+  why: 응용의 결과는 결과 폴더 + 요약 보고서 형태가 표준입니다.
+  explanation: |-
+    출력 폴더 트리를 dict로 만들고, 각 노출 카테고리별 첫 사진을 1xN 그리드로 시각화합니다. 요약 dict는 사람이 한 줄에서 결과를 볼 수 있게 합니다.
+  tips:
+  - 결과 보고서는 dict + figure 가 가장 일반적인 형태입니다.
+  snippet: |-
+    summary = {}
+    for tagDir in sorted(outputDir.iterdir()):
+        if not tagDir.is_dir():
+            continue
+        groupDirs = sorted(d for d in tagDir.iterdir() if d.is_dir())
+        summary[tagDir.name] = {gd.name: len(list(gd.glob('*.png'))) for gd in groupDirs}
+    summary
+  exercise:
+    prompt: 각 노출 태그의 첫 사진 한 장을 1xN 그리드로 시각화하세요.
+    starterCode: |-
+      previewImgs = []
+      labels = []
+      for tagDir in sorted(outputDir.iterdir()):
+          if not tagDir.is_dir():
+              continue
+          firstImage = next(tagDir.rglob('*.png'), None)
+          if firstImage is None:
+              continue
+          previewImgs.append(np.array(Image.open(firstImage)))
+          labels.append(tagDir.name)
+      fig, axes = plt.subplots(1, max(len(previewImgs), 1), figsize=(4 * max(len(previewImgs), 1), 4))
+      if len(previewImgs) == 1:
+          axes = [axes]
+      for axis, img, label in zip(axes, previewImgs, labels):
+          axis.imshow(img)
+          axis.set_title(label)
+          axis.axis('___')
+      fig
+    hints:
+    - 빈칸은 'off' 입니다.
+    - 노출 카테고리별 대표 사진이 그려져야 합니다.
+  check:
+    noError: 결과 보고 시각화가 오류 없이 끝나야 합니다.
+    resultCheck: summary가 dict여야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 응용 함수화
+  goal: 입력 폴더 + 출력 폴더 → 정리 dict 한 함수로 묶습니다.
+  why: 응용은 단일 함수 호출로 시작과 끝이 명확해야 합니다.
+  explanation: |-
+    각 미션은 import문부터 시작하지만, 위 예제를 실행했다면 import는 생략해도 됩니다.
+  tips:
+  - 함수는 부수 효과(폴더 생성, 파일 복사) 와 결과 dict 반환을 함께 합니다.
+  snippet: |-
+    def organizePhotos(srcDir, dstDir, threshold=10):
+        srcLocal = Path(srcDir)
+        dstLocal = Path(dstDir)
+        if dstLocal.exists():
+            shutil.rmtree(dstLocal)
+        dstLocal.mkdir(parents=True)
+        hashesLocal = {p.name: imagehash.phash(Image.open(p)) for p in srcLocal.iterdir() if p.is_file()}
+        namesLocal = list(hashesLocal.keys())
+        parentLocal = {name: name for name in namesLocal}
+        def findLocal(x):
+            while parentLocal[x] != x:
+                parentLocal[x] = parentLocal[parentLocal[x]]
+                x = parentLocal[x]
+            return x
+        for i in range(len(namesLocal)):
+            for j in range(i + 1, len(namesLocal)):
+                if hashesLocal[namesLocal[i]] - hashesLocal[namesLocal[j]] <= threshold:
+                    parentLocal[findLocal(namesLocal[i])] = findLocal(namesLocal[j])
+        summaryLocal = {}
+        for name in namesLocal:
+            img = np.array(Image.open(srcLocal / name))
+            tag = exposureTag(img)
+            gid = findLocal(name).rsplit('.', 1)[0]
+            destDirLocal = dstLocal / tag / gid
+            destDirLocal.mkdir(parents=True, exist_ok=True)
+            shutil.copy(srcLocal / name, destDirLocal / name)
+            summaryLocal.setdefault(tag, {}).setdefault(gid, []).append(name)
+        return summaryLocal
+
+    altOutput = Path(tempfile.gettempdir()) / 'codaro_apps_10_alt'
+    altSummary = organizePhotos(inputDir, altOutput, threshold=8)
+    altSummary
+  exercise:
+    prompt: "미션1: threshold를 5, 10, 20에 대해 호출해 그룹 수가 어떻게 변하는지 비교 출력하세요. 미션2: altOutput 디렉터리의 전체 폴더 수와 파일 수를 출력하세요."
+    starterCode: |-
+      compareResult = {}
+      for thr in [5, 10, ___]:
+          tempOut = Path(tempfile.gettempdir()) / f'codaro_apps_10_t{thr}'
+          summaryT = organizePhotos(inputDir, tempOut, threshold=thr)
+          compareResult[thr] = sum(len(groups) for groups in summaryT.values())
+      compareResult
+    hints:
+    - 빈칸은 정수 20 입니다.
+    - 임곗값이 클수록 그룹 수가 줄어듭니다.
+  check:
+    noError: 응용 함수가 오류 없이 끝나야 합니다.
+    resultCheck: altSummary가 dict여야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: visionApps_10-photo_organizer-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - prepare_folders
+    - practice
+    title: 종합 사진 정리기 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: source boundary·date provenance·duplicate threshold·dry-run 정책을 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_photo_organizer_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_photo_organizer_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_photo_organizer_contract(value):
+            required = ['sourceRoots', 'dateSource', 'duplicateThreshold', 'dryRunFirst']
+            rules = [{'id': 'roots', 'field': 'sourceRoots', 'kind': 'nonempty'}, {'id': 'date-source', 'field': 'dateSource', 'kind': 'enum', 'values': ['exif-then-mtime', 'exif-only']}, {'id': 'duplicate', 'field': 'duplicateThreshold', 'kind': 'range', 'min': 0, 'max': 64}, {'id': 'dry-run', 'field': 'dryRunFirst', 'kind': 'enum', 'values': [True]}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'photo_organizer', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.vision-apps.visionApps_10.photo_organizer-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-apps.visionApps_10.photo_organizer-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_photo_organizer_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              sourceRoots:
+              - Photos/Inbox
+              dateSource: exif-then-mtime
+              duplicateThreshold: 6
+              dryRunFirst: true
+          expectedReturn:
+            accepted: true
+            topic: photo_organizer
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              dateSource: exif-then-mtime
+              duplicateThreshold: 6
+              dryRunFirst: true
+          expectedReturn:
+            accepted: false
+            topic: photo_organizer
+            missing:
+            - sourceRoots
+            violations:
+            - roots
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              sourceRoots: []
+              dateSource: filename-guess
+              duplicateThreshold: 100
+              dryRunFirst: false
+          expectedReturn:
+            accepted: false
+            topic: photo_organizer
+            missing: []
+            violations:
+            - date-source
+            - dry-run
+            - duplicate
+            - roots
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: visionApps_10-photo_organizer-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionApps_10-photo_organizer-contract-audit-mastery
+    title: 종합 사진 정리기 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_photo_organizer_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_photo_organizer_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_photo_organizer_result(expected, observed):
+            identity = ['sourceSetHash', 'planHash', 'policyHash']
+            metrics = {'plannedMoves': 0}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'photo_organizer', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.vision-apps.visionApps_10.photo_organizer-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-apps.visionApps_10.photo_organizer-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_photo_organizer_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              sourceSetHash: org1
+              planHash: plan-a
+              policyHash: policy-1
+              plannedMoves: 120
+          - value:
+              sourceSetHash: org1
+              planHash: plan-a
+              policyHash: policy-1
+              plannedMoves: 120
+          expectedReturn:
+            passed: true
+            topic: photo_organizer
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              sourceSetHash: org1
+              planHash: plan-a
+              policyHash: policy-1
+              plannedMoves: 120
+          - value:
+              sourceSetHash: org2
+              planHash: plan-b
+              policyHash: policy-2
+              plannedMoves: 500
+          expectedReturn:
+            passed: false
+            topic: photo_organizer
+            missing: []
+            identityMismatch:
+            - planHash
+            - policyHash
+            - sourceSetHash
+            metricDrift:
+            - plannedMoves
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              sourceSetHash: org1
+              planHash: plan-a
+              policyHash: policy-1
+              plannedMoves: 120
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: photo_organizer
+            missing:
+            - planHash
+            - plannedMoves
+            - policyHash
+            - sourceSetHash
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: visionApps_10-photo_organizer-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionApps_10-photo_organizer-result-reconciliation-transfer
+    title: 종합 사진 정리기 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_photo_organizer_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_photo_organizer_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_photo_organizer_evidence(stage):
+            stages = {'admission': {'action': 'admit photo organization input safely', 'evidence': 'root boundary and source manifest', 'risk': 'privacy or source error'}, 'process': {'action': 'run bounded photo organization workflow', 'evidence': 'dry-run dedupe date plan', 'risk': 'unbounded or wrong transformation'}, 'release': {'action': 'release verified photo organization result', 'evidence': 'move ledger and rollback map', 'risk': 'wrong or sensitive output'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.vision-apps.visionApps_10.photo_organizer-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-apps.visionApps_10.photo_organizer-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_photo_organizer_evidence
+        cases:
+        - id: recalls-admission
+          arguments:
+          - value: admission
+          expectedReturn:
+            action: admit photo organization input safely
+            evidence: root boundary and source manifest
+            risk: privacy or source error
+        - id: recalls-process
+          arguments:
+          - value: process
+          expectedReturn:
+            action: run bounded photo organization workflow
+            evidence: dry-run dedupe date plan
+            risk: unbounded or wrong transformation
+        - id: recalls-release
+          arguments:
+          - value: release
+          expectedReturn:
+            action: release verified photo organization result
+            evidence: move ledger and rollback map
+            risk: wrong or sensitive output
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

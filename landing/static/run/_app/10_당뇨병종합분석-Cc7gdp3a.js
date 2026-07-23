@@ -1,0 +1,934 @@
+var e=`meta:
+  packages:
+  - numpy
+  - pandas
+  id: numpy_10
+  title: 당뇨병종합분석
+  order: 10
+  category: numpy
+  difficulty: ⭐⭐⭐
+  badge: 심화
+  tags:
+  - numpy
+  - 종합
+  - random
+  - bincount
+  - histogram
+  - cov
+  - eig
+  - apply_along_axis
+  - 검증
+  - 종합분석
+  seo:
+    title: NumPy 종합 프로젝트 - 당뇨병 데이터 분석
+    description: NumPy의 모든 핵심 기능을 종합하여 당뇨병 데이터를 심층 분석합니다.
+    keywords:
+    - numpy
+    - 종합분석
+    - 당뇨병
+    - random
+    - histogram
+    - cov
+intro:
+  emoji: 🩺
+  goal: NumPy의 모든 핵심 기능을 종합하여 당뇨병 데이터를 분석합니다.
+  description: Pima 인디언 당뇨병 데이터셋으로 지금까지 배운 모든 NumPy 개념을 종합 활용합니다. 배열 생성, 인덱싱, 통계, 선형대수, 결측값 처리, 상관분석을
+    모두 다룹니다.
+  direction: 당뇨병종합분석에서 배열 입력을 만들고 벡터 연산 결과를 수치로 검증합니다.
+  benefits:
+  - 배열 입력 확인 후 벡터화 계산에 맞는 코드 입력을 고릅니다.
+  - 당뇨병종합분석 결과를 shape와 수치 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 계산 파이프라인에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(배열 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 로드 처리 실행
+      detail: 벡터화 계산 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 배열 추출 결과 검증
+      detail: shape와 수치 결과 기준으로 실행 결과를 비교합니다.
+    - label: 당뇨병종합분석 재사용
+      detail: 완성 코드를 계산 파이프라인에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 배열 계산 환경
+      detail: numpy, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 당뇨병종합분석 실행
+      detail: 셀을 실행해 shape와 수치 결과와 예외 상태를 확인합니다.
+    - label: 당뇨병종합분석 완료
+      detail: 검증된 코드를 계산 파이프라인로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: NumPy와 pandas를 불러옵니다. pandas는 CSV 로딩용으로만 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import numpy as np
+    import pandas as pd
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: |-
+      import numpy as np
+      import pandas as pd
+    hints:
+    - 바꿀 지점은 배열 입력을 만드는 첫 줄과 벡터화 계산 줄에서 찾으세요.
+    - 실행 뒤 shape와 수치 결과 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 shape와 수치 결과 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step2_data
+  title: 2단계. 데이터 로드
+  structuredPrimary: true
+  subtitle: 당뇨병 데이터셋
+  goal: 2단계. 데이터 로드에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 로컬 당뇨병 샘플은 220건의 합성 의료 검사 기록입니다.
+    Glucose(혈당), BloodPressure(혈압), BMI(체질량지수), Insulin(인슐린 수치) 등과 Outcome(당뇨병 유무, 1이면 당뇨)이 기록되어 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    df = loadLocalDataset("diabetes")
+    df.head()
+  exercise:
+    prompt: 2단계. 데이터 로드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      df = loadLocalDataset("diabetes")
+      df.head()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 로드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 로드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_extract
+  title: 3단계. 배열 추출
+  structuredPrimary: true
+  subtitle: 전체 특성
+  goal: 3단계. 배열 추출에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 모든 특성과 타겟을 NumPy 배열로 추출합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    cols = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigree', 'Age']
+    X = df[cols].values
+    y = df['Outcome'].values
+    X.shape, y.shape
+  exercise:
+    prompt: 3단계. 배열 추출 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      cols = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigree', 'Age']
+      X = df[cols].values
+      y = df['Outcome'].values
+      X.shape, y.shape
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 배열 추출에서 \`cols\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 배열 추출 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step4_zero_check
+  title: 4단계. 결측값 확인
+  structuredPrimary: true
+  subtitle: 0값 처리
+  goal: 4단계. 결측값 확인에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 이 데이터셋의 특이점은 결측값이 NaN 대신 0으로 기록되어 있다는 것입니다. 하지만 혈당(Glucose)이나 혈압(BloodPressure)이 0이라는 것은
+    생물학적으로 불가능합니다. 살아있는 사람의 혈당이 0일 수는 없죠. 따라서 이런 0값들은 실제로는 '측정하지 못함'을 의미하는 결측값입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    zeros = np.sum(X == 0, axis=0)
+    ratio = zeros / len(X) * 100
+    pd.DataFrame({'Feature': cols, 'ZeroCount': zeros, 'ZeroRatio': ratio.round(1)})
+  exercise:
+    prompt: 4단계. 결측값 확인 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      zeros = np.sum(X == 0, axis=0)
+      ratio = zeros / len(X) * 100
+      pd.DataFrame({'Feature': cols, 'ZeroCount': zeros, 'ZeroRatio': ratio.round(1)})
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 결측값 확인의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 4단계. 결측값 확인의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step5_replace_nan
+  title: 5단계. 0을 NaN으로
+  structuredPrimary: true
+  subtitle: np.where()
+  goal: 5단계. 0을 NaN으로에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: Glucose, BloodPressure, SkinThickness, Insulin, BMI의 0값은 결측값이므로 NaN으로 변환합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    idx = [1, 2, 3, 4, 5]
+    clean = X.astype(float).copy()
+    for i in idx:
+        clean[:, i] = np.where(clean[:, i] == 0, np.nan, clean[:, i])
+    np.sum(np.isnan(clean), axis=0)
+  exercise:
+    prompt: 5단계. 0을 NaN으로 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      idx = [1, 2, 3, 4, 5]
+      clean = X.astype(float).copy()
+      for i in idx:
+          clean[:, i] = np.where(clean[:, i] == 0, np.nan, clean[:, i])
+      np.sum(np.isnan(clean), axis=0)
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 0을 NaN으로의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 5단계. 0을 NaN으로 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step6_impute
+  title: 6단계. 결측값 대체
+  structuredPrimary: true
+  subtitle: nanmean
+  goal: 6단계. 결측값 대체에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 결측값을 각 컬럼의 평균으로 대체합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    avg = np.nanmean(clean, axis=0)
+    mask = np.isnan(clean)
+    ci = np.where(mask)[1]
+    clean[mask] = avg[ci]
+    np.sum(np.isnan(clean))
+  exercise:
+    prompt: 6단계. 결측값 대체 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      avg = np.nanmean(clean, axis=0)
+      mask = np.isnan(clean)
+      ci = np.where(mask)[1]
+      clean[mask] = avg[ci]
+      np.sum(np.isnan(clean))
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 결측값 대체에서 \`avg\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 결측값 대체 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step7_histogram
+  title: 7단계. 히스토그램
+  structuredPrimary: true
+  subtitle: np.histogram()
+  goal: 7단계. 히스토그램에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    히스토그램은 데이터를 구간(bin)으로 나누어 각 구간에 몇 개의 값이 있는지 세는 것입니다. 예를 들어 혈당 80~100에 몇 명, 100~120에 몇 명 이런 식으로요. np.histogram()은 그래프 없이 숫자만 반환하므로, 분포를 빠르게 파악하거나 추가 계산에 활용할 수 있습니다.
+
+    np.histogram(arr, bins)은 히스토그램 데이터를 반환합니다. 반환값은 (빈도, 구간 경계)입니다. 시각화 없이 분포를 분석할 때 유용합니다.
+  snippet: |-
+    glucose = clean[:, 1]
+    hist, edges = np.histogram(glucose, bins=10)
+    pd.DataFrame({'BinStart': edges[:-1].round(1), 'BinEnd': edges[1:].round(1), 'Count': hist})
+  exercise:
+    prompt: 7단계. 히스토그램 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      glucose = clean[:, 1]
+      hist, edges = np.histogram(glucose, bins=10)
+      pd.DataFrame({'BinStart': edges[:-1].round(1), 'BinEnd': edges[1:].round(1), 'Count': hist})
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 히스토그램의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 7단계. 히스토그램의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step8_bincount
+  title: 8단계. 빈도 계산
+  structuredPrimary: true
+  subtitle: np.bincount()
+  goal: 8단계. 빈도 계산에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    np.bincount()는 정수 배열에서 각 숫자가 몇 번 나오는지 세줍니다. [0,1,1,0,1,0]이 있으면 0이 3번, 1이 3번입니다. 당뇨병 유무(0 또는 1)의 빈도를 세면 데이터에 클래스 불균형(한쪽이 너무 많음)이 있는지 확인할 수 있습니다.
+
+    np.bincount(arr)은 음이 아닌 정수 배열의 각 값 빈도를 계산합니다. 클래스 불균형 확인에 유용합니다.
+  snippet: |-
+    counts = np.bincount(y)
+    f"정상: {counts[0]}명, 당뇨: {counts[1]}명, 비율: {counts[1]/len(y)*100:.1f}%"
+  exercise:
+    prompt: 8단계. 빈도 계산 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      counts = np.bincount(y)
+      f"정상: {counts[0]}명, 당뇨: {counts[1]}명, 비율: {counts[1]/len(y)*100:.1f}%"
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 빈도 계산에서 \`counts\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 8단계. 빈도 계산 실행 뒤 \`counts\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step9_cov
+  title: 9단계. 공분산 행렬
+  structuredPrimary: true
+  subtitle: np.cov()
+  goal: 9단계. 공분산 행렬에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    공분산(covariance)은 두 변수가 함께 변하는 정도를 나타냅니다. 양수면 함께 증가하고, 음수면 하나가 증가할 때 다른 것은 감소합니다. 상관계수와 비슷하지만, 공분산은 원래 단위를 유지합니다. np.cov()는 모든 변수 쌍의 공분산을 행렬로 반환합니다.
+
+    np.cov(arr)은 공분산 행렬을 계산합니다. 행이 변수, 열이 관측치여야 하므로 .T로 전치합니다.
+  snippet: |-
+    cov = np.cov(clean.T)
+    cov.shape
+  exercise:
+    prompt: 9단계. 공분산 행렬 예제에서 \`cov\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      cov = np.cov(clean.T)
+      cov.shape
+    hints:
+    - 바꿀 지점은 \`cov = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`cov\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 공분산 행렬에서 \`cov\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 9단계. 공분산 행렬 실행 뒤 \`cov\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step10_corr_target
+  title: 10단계. 타겟 상관관계
+  structuredPrimary: true
+  subtitle: corrcoef
+  goal: 10단계. 타겟 상관관계에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 각 특성과 당뇨병 유무의 상관계수를 계산합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    corrs = []
+    for i in range(clean.shape[1]):
+        r = np.corrcoef(clean[:, i], y)[0, 1]
+        corrs.append(r)
+    corrs = np.array(corrs)
+    result = pd.DataFrame({'Feature': cols, 'Correlation': corrs.round(3)})
+    result.sort_values('Correlation', ascending=False)
+  exercise:
+    prompt: 10단계. 타겟 상관관계 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      corrs = []
+      for i in range(clean.shape[1]):
+          r = np.corrcoef(clean[:, i], y)[0, 1]
+          corrs.append(r)
+      corrs = np.array(corrs)
+      result = pd.DataFrame({'Feature': cols, 'Correlation': corrs.round(3)})
+      result.sort_values('Correlation', ascending=False)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 타겟 상관관계의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 10단계. 타겟 상관관계 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step11_group_stats
+  title: 11단계. 그룹별 통계
+  structuredPrimary: true
+  subtitle: 당뇨/비당뇨
+  goal: 11단계. 그룹별 통계에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 당뇨병 유무에 따른 각 특성의 평균을 비교합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    sick = y == 1
+    well = y == 0
+    avg1 = np.mean(clean[sick], axis=0)
+    avg2 = np.mean(clean[well], axis=0)
+    diff = (avg1 - avg2) / avg2 * 100
+    pd.DataFrame({
+        'Feature': cols,
+        'Normal': avg2.round(2),
+        'Diabetic': avg1.round(2),
+        'Diff(%)': diff.round(1)
+    })
+  exercise:
+    prompt: 11단계. 그룹별 통계 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      sick = y == 1
+      well = y == 0
+      avg1 = np.mean(clean[sick], axis=0)
+      avg2 = np.mean(clean[well], axis=0)
+      diff = (avg1 - avg2) / avg2 * 100
+      pd.DataFrame({
+          'Feature': cols,
+          'Normal': avg2.round(2),
+          'Diabetic': avg1.round(2),
+          'Diff(%)': diff.round(1)
+      })
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 그룹별 통계의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 11단계. 그룹별 통계의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step12_standardize
+  title: 12단계. 표준화
+  structuredPrimary: true
+  subtitle: Z-score
+  goal: 12단계. 표준화에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 모든 특성을 Z-score로 표준화합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    mu = np.mean(clean, axis=0)
+    sigma = np.std(clean, axis=0)
+    z = (clean - mu) / sigma
+    f"표준화 후 평균: {np.mean(z, axis=0).round(5)}, 표준편차: {np.std(z, axis=0).round(2)}"
+  exercise:
+    prompt: 12단계. 표준화 예제에서 \`mu\`, \`sigma\`, \`z\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      mu = np.mean(clean, axis=0)
+      sigma = np.std(clean, axis=0)
+      z = (clean - mu) / sigma
+      f"표준화 후 평균: {np.mean(z, axis=0).round(5)}, 표준편차: {np.std(z, axis=0).round(2)}"
+    hints:
+    - 바꿀 지점은 \`mu = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`mu\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 12단계. 표준화에서 \`mu\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 12단계. 표준화 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step13_eig
+  title: 13단계. 고유값 분해
+  structuredPrimary: true
+  subtitle: np.linalg.eig()
+  goal: 13단계. 고유값 분해에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    고유값 분해(eigenvalue decomposition)는 행렬을 분석하는 핵심 기법입니다. 공분산 행렬의 고유값은 각 방향으로의 데이터 분산(퍼짐) 정도를 나타냅니다. 가장 큰 고유값의 방향이 데이터가 가장 많이 퍼진 방향입니다. 이것이 PCA(주성분 분석)의 수학적 기초입니다.
+
+    np.linalg.eig(A)는 정방행렬의 고유값과 고유벡터를 반환합니다. 공분산 행렬의 고유값은 각 주성분이 설명하는 분산량입니다.
+  snippet: |-
+    c = np.cov(z.T)
+    eig, vec = np.linalg.eig(c)
+    order = np.argsort(eig)[::-1]
+    eig = eig[order]
+    var = eig / np.sum(eig) * 100
+    pd.DataFrame({'PC': [f'PC{i+1}' for i in range(8)], 'EigenValue': eig.round(3), 'ExplainedVar(%)': var.round(1)})
+  exercise:
+    prompt: 13단계. 고유값 분해 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      c = np.cov(z.T)
+      eig, vec = np.linalg.eig(c)
+      order = np.argsort(eig)[::-1]
+      eig = eig[order]
+      var = eig / np.sum(eig) * 100
+      pd.DataFrame({'PC': [f'PC{i+1}' for i in range(8)], 'EigenValue': eig.round(3), 'ExplainedVar(%)': var.round(1)})
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 13단계. 고유값 분해의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 13단계. 고유값 분해 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step14_apply_along
+  title: 14단계. 축 따라 적용
+  structuredPrimary: true
+  subtitle: np.apply_along_axis()
+  goal: 14단계. 축 따라 적용에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    np.apply_along_axis()는 직접 만든 함수를 배열의 특정 축을 따라 적용합니다. 예를 들어 IQR(사분위수 범위)을 계산하는 함수를 만들어, 모든 열에 한 번에 적용할 수 있습니다. IQR은 75% 백분위수에서 25% 백분위수를 뺀 값으로, 데이터의 퍼짐 정도를 나타냅니다.
+
+    np.apply_along_axis(func, axis, arr)는 배열의 특정 축을 따라 함수를 적용합니다. 커스텀 통계 함수를 적용할 때 유용합니다.
+  snippet: |-
+    def iqr(x):
+        return np.percentile(x, 75) - np.percentile(x, 25)
+
+    vals = np.apply_along_axis(iqr, axis=0, arr=clean)
+    pd.DataFrame({'Feature': cols, 'IQR': vals.round(2)})
+  exercise:
+    prompt: 14단계. 축 따라 적용 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      def iqr(x):
+          return np.percentile(x, 75) - np.percentile(x, 25)
+
+      vals = np.apply_along_axis(iqr, axis=0, arr=clean)
+      pd.DataFrame({'Feature': cols, 'IQR': vals.round(2)})
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 14단계. 축 따라 적용의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 14단계. 축 따라 적용 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: step15_risk_score
+  title: 15단계. 위험 점수 계산
+  structuredPrimary: true
+  subtitle: 종합 분석
+  goal: 15단계. 위험 점수 계산에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 위험 점수(Risk Score)는 여러 특성을 종합하여 하나의 숫자로 나타낸 것입니다. 여기서는 각 특성의 상관계수를 가중치로 사용합니다. 당뇨와 상관관계가
+    높은 특성일수록 가중치가 크고, 그 특성값이 높으면 위험 점수도 올라갑니다. 마치 건강검진 결과를 종합하여 '건강점수'를 매기는 것과 같습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    w = np.abs(corrs) / np.sum(np.abs(corrs))
+    score = np.sum(z * w, axis=1)
+    pct = np.percentile(score, [25, 50, 75, 90])
+    pd.DataFrame({
+        'RiskGroup': ['Low (Q1)', 'Medium (Q2)', 'High (Q3)', 'VeryHigh (90%)', 'Actual'],
+        'Threshold': list(pct.round(2)) + ['-'],
+        'DiabeticRate': [
+            np.mean(y[score < pct[0]]) * 100,
+            np.mean(y[(score >= pct[0]) & (score < pct[1])]) * 100,
+            np.mean(y[(score >= pct[1]) & (score < pct[2])]) * 100,
+            np.mean(y[score >= pct[3]]) * 100,
+            np.mean(y) * 100
+        ]
+    }).round(1)
+  exercise:
+    prompt: 15단계. 위험 점수 계산 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      w = np.abs(corrs) / np.sum(np.abs(corrs))
+      score = np.sum(z * w, axis=1)
+      pct = np.percentile(score, [25, 50, 75, 90])
+      pd.DataFrame({
+          'RiskGroup': ['Low (Q1)', 'Medium (Q2)', 'High (Q3)', 'VeryHigh (90%)', 'Actual'],
+          'Threshold': list(pct.round(2)) + ['-'],
+          'DiabeticRate': [
+              np.mean(y[score < pct[0]]) * 100,
+              np.mean(y[(score >= pct[0]) & (score < pct[1])]) * 100,
+              np.mean(y[(score >= pct[1]) & (score < pct[2])]) * 100,
+              np.mean(y[score >= pct[3]]) * 100,
+              np.mean(y) * 100
+          ]
+      }).round(1)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 15단계. 위험 점수 계산의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 15단계. 위험 점수 계산의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 당뇨 위험 점수 파이프라인'
+  structuredPrimary: true
+  subtitle: 표준화, 공분산, 히스토그램, 위험군 검증
+  goal: '현업 흐름 검증: 당뇨 위험 점수 파이프라인에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    종합 분석은 여러 NumPy 기능을 이어 붙이는 만큼 중간 산출물을 검증해야 합니다. 표준화 평균, 위험 점수 shape, 구간별 환자 수를 단계별로 확인하세요.
+
+    변주 실험
+    가중치를 상관계수 기반으로 바꾼 점수와 수동 가중치 점수를 비교하고, 고위험군에 들어가는 사람이 달라지는지 확인하세요.
+  tips:
+  - 변주 실험 가중치를 상관계수 기반으로 바꾼 점수와 수동 가중치 점수를 비교하고, 고위험군에 들어가는 사람이 달라지는지 확인하세요.
+  snippet: |-
+    import numpy as np
+
+    X = np.array([
+        [120, 70, 28],
+        [160, 85, 35],
+        [140, 80, 31],
+        [180, 95, 40],
+    ], dtype=float)
+    y = np.array([0, 1, 0, 1])
+
+    z = (X - X.mean(axis=0)) / X.std(axis=0)
+    weights = np.array([0.4, 0.3, 0.3])
+    riskScore = z @ weights
+    counts, bins = np.histogram(riskScore, bins=2)
+    covariance = np.cov(X, rowvar=False)
+
+    assert np.allclose(z.mean(axis=0), [0.0, 0.0, 0.0])
+    assert riskScore.shape == (4,)
+    assert counts.sum() == len(y)
+    assert covariance.shape == (3, 3)
+  exercise:
+    prompt: '현업 흐름 검증: 당뇨 위험 점수 파이프라인 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    starterCode: |-
+      import numpy as np
+
+      X = np.array([
+          [120, 70, 28],
+          [160, 85, 35],
+          [140, 80, 31],
+          [180, 95, 40],
+      ], dtype=float)
+      y = np.array([0, 1, 0, 1])
+
+      z = (X - X.mean(axis=0)) / X.std(axis=0)
+      weights = np.array([0.4, 0.3, 0.3])
+      riskScore = z @ weights
+      counts, bins = np.histogram(riskScore, bins=2)
+      covariance = np.cov(X, rowvar=False)
+
+      assert np.allclose(z.mean(axis=0), [0.0, 0.0, 0.0])
+      assert riskScore.shape == (4,)
+      assert counts.sum() == len(y)
+      assert covariance.shape == (3, 3)
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 당뇨 위험 점수 파이프라인의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.'
+    resultCheck: '현업 흐름 검증: 당뇨 위험 점수 파이프라인의 match/search/sub 결과가 바꾼 패턴이나 샘플 문자열 기준과 맞아야 합니다.'
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 당뇨병 종합 분석
+  goal: 실습에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import numpy as np
+    import pandas as pd
+
+    data = pd.DataFrame([
+        [6, 148, 72, 35, 0, 33.6, 0.627, 50, 1],
+        [1, 85, 66, 29, 0, 26.6, 0.351, 31, 0],
+        [8, 183, 64, 0, 0, 23.3, 0.672, 32, 1],
+        [1, 89, 66, 23, 94, 28.1, 0.167, 21, 0],
+        [0, 137, 40, 35, 168, 43.1, 2.288, 33, 1],
+        [5, 116, 74, 0, 0, 25.6, 0.201, 30, 0],
+        [3, 78, 50, 32, 88, 31.0, 0.248, 26, 1],
+        [10, 115, 0, 0, 0, 35.3, 0.134, 29, 0],
+        [2, 197, 70, 45, 543, 30.5, 0.158, 53, 1],
+        [8, 125, 96, 0, 0, 0.0, 0.232, 54, 1],
+        [4, 110, 76, 20, 100, 37.2, 0.450, 61, 0],
+        [7, 160, 82, 42, 210, 39.4, 0.690, 66, 1],
+    ])
+    data.columns = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigree', 'Age', 'Outcome']
+    age = data['Age'].values
+    target = data['Outcome'].values
+    glucose = data['Glucose'].values
+    bmi = data['BMI'].values
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import numpy as np
+      import pandas as pd
+
+      data = pd.DataFrame([
+          [6, 148, 72, 35, 0, 33.6, 0.627, 50, 1],
+          [1, 85, 66, 29, 0, 26.6, 0.351, 31, 0],
+          [8, 183, 64, 0, 0, 23.3, 0.672, 32, 1],
+          [1, 89, 66, 23, 94, 28.1, 0.167, 21, 0],
+          [0, 137, 40, 35, 168, 43.1, 2.288, 33, 1],
+          [5, 116, 74, 0, 0, 25.6, 0.201, 30, 0],
+          [3, 78, 50, 32, 88, 31.0, 0.248, 26, 1],
+          [10, 115, 0, 0, 0, 35.3, 0.134, 29, 0],
+          [2, 197, 70, 45, 543, 30.5, 0.158, 53, 1],
+          [8, 125, 96, 0, 0, 0.0, 0.232, 54, 1],
+          [4, 110, 76, 20, 100, 37.2, 0.450, 61, 0],
+          [7, 160, 82, 42, 210, 39.4, 0.690, 66, 1],
+      ])
+      data.columns = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigree', 'Age', 'Outcome']
+      age = data['Age'].values
+      target = data['Outcome'].values
+      glucose = data['Glucose'].values
+      bmi = data['BMI'].values
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: numpy_10-standardize-diabetes-features-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - practice
+    title: 당뇨 feature를 학습 mean·scale로 표준화하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 각 column에 (value-mean)/scale을 적용하고 0 scale을 거절한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - means와 scales는 학습 데이터에서 고정된 값이어야 합니다.
+    - test 행마다 새 mean을 계산하지 마세요.
+    exercise:
+      prompt: standardize_features(matrix, means, scales)를 완성해 standardized와 shape를 반환하세요.
+      starterCode: |-
+        def standardize_features(matrix, means, scales):
+            raise NotImplementedError
+      solution: |
+        def standardize_features(matrix, means, scales):
+            if len(means) != len(scales) or any(scale <= 0 for scale in scales) or any(len(row) != len(means) for row in matrix):
+                raise ValueError("invalid standardization contract")
+            standardized = [[round((value - mean) / scale, 3) for value, mean, scale in zip(row, means, scales)] for row in matrix]
+            return {"standardized": standardized, "shape": [len(matrix), len(means)]}
+      hints: *id001
+    check:
+      id: python.numpy.numpy_10.standardize-diabetes-features.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_10.standardize-diabetes-features.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: standardize_features
+        cases:
+        - id: applies-training-parameters
+          arguments:
+          - value:
+            - - 10
+              - 100
+            - - 14
+              - 80
+          - value:
+            - 12
+            - 90
+          - value:
+            - 2
+            - 10
+          expectedReturn:
+            standardized:
+            - - -1.0
+              - 1.0
+            - - 1.0
+              - -1.0
+            shape:
+            - 2
+            - 2
+        - id: handles-empty-rows
+          arguments:
+          - value: []
+          - value:
+            - 0
+            - 0
+          - value:
+            - 1
+            - 1
+          expectedReturn:
+            standardized: []
+            shape:
+            - 0
+            - 2
+        - id: rejects-zero-scale
+          arguments:
+          - value:
+            - - 1
+          - value:
+            - 0
+          - value:
+            - 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: numpy_10-score-threshold-classifier-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_10-standardize-diabetes-features-mastery
+    title: 새 표준화 feature에 선형 score와 threshold 적용하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 표준화 결과를 score·probability 없이도 투명한 이진 분류 규칙으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - score와 label을 둘 다 남겨 threshold 영향을 확인하세요.
+    - score == threshold인 경계는 positive에 포함합니다.
+    exercise:
+      prompt: classify_linear_scores(matrix, weights, bias, threshold)를 완성해 scores, labels, positiveIndexes를 반환하세요.
+      starterCode: |-
+        def classify_linear_scores(matrix, weights, bias, threshold):
+            raise NotImplementedError
+      solution: |
+        def classify_linear_scores(matrix, weights, bias, threshold):
+            if any(len(row) != len(weights) for row in matrix):
+                raise ValueError("shape mismatch")
+            scores = [round(bias + sum(value * weight for value, weight in zip(row, weights)), 3) for row in matrix]
+            labels = [1 if score >= threshold else 0 for score in scores]
+            return {"scores": scores, "labels": labels, "positiveIndexes": [index for index, label in enumerate(labels) if label == 1]}
+      hints: *id002
+    check:
+      id: python.numpy.numpy_10.score-threshold-classifier.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_10.score-threshold-classifier.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: classify_linear_scores
+        cases:
+        - id: applies-score-threshold
+          arguments:
+          - value:
+            - - 1
+              - 2
+            - - -1
+              - 0
+            - - 0.5
+              - 0.5
+          - value:
+            - 1
+            - 0.5
+          - value: 0
+          - value: 1
+          expectedReturn:
+            scores:
+            - 2.0
+            - -1.0
+            - 0.75
+            labels:
+            - 1
+            - 0
+            - 0
+            positiveIndexes:
+            - 0
+        - id: includes-threshold-boundary
+          arguments:
+          - value:
+            - - 1
+          - value:
+            - 1
+          - value: 0
+          - value: 1
+          expectedReturn:
+            scores:
+            - 1
+            labels:
+            - 1
+            positiveIndexes:
+            - 0
+        - id: rejects-shape-mismatch
+          arguments:
+          - value:
+            - - 1
+              - 2
+          - value:
+            - 1
+          - value: 0
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: numpy_10-ml-pipeline-leakage-check-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_10-score-threshold-classifier-transfer
+    title: ML pipeline의 leakage 방지 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: scaling, threshold tuning, final test 단계에서 허용 데이터와 증거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 전처리 parameter도 model parameter처럼 training data에서만 학습하세요.
+    - test 결과를 보고 threshold를 바꾸면 더 이상 final test가 아닙니다.
+    exercise:
+      prompt: choose_pipeline_split_policy(situation)를 완성해 fitOn, evaluateOn, forbidden을 반환하세요.
+      starterCode: |-
+        def choose_pipeline_split_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_pipeline_split_policy(situation):
+            table = {'fit-scaler': {'fitOn': 'training rows', 'evaluateOn': 'validation transform', 'forbidden': 'all-data mean'}, 'choose-threshold': {'fitOn': 'validation predictions', 'evaluateOn': 'business metric', 'forbidden': 'test tuning'}, 'final-report': {'fitOn': 'frozen pipeline', 'evaluateOn': 'untouched test rows', 'forbidden': 'repeated peeking'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.numpy.numpy_10.ml-pipeline-leakage-check.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_10.ml-pipeline-leakage-check.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_pipeline_split_policy
+        cases:
+        - id: recalls-fit-scaler
+          arguments:
+          - value: fit-scaler
+          expectedReturn:
+            fitOn: training rows
+            evaluateOn: validation transform
+            forbidden: all-data mean
+        - id: recalls-choose-threshold
+          arguments:
+          - value: choose-threshold
+          expectedReturn:
+            fitOn: validation predictions
+            evaluateOn: business metric
+            forbidden: test tuning
+        - id: rejects-unknown-situation
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

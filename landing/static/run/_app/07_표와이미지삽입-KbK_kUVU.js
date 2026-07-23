@@ -1,0 +1,965 @@
+var e=`meta:
+  id: pdf_07
+  title: 표와 이미지 삽입
+  order: 7
+  category: pdf
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  packages:
+    - reportlab
+    - pypdf
+    - pdfplumber
+  tags:
+    - Platypus
+    - Table
+    - Image
+    - SimpleDocTemplate
+  outcomes:
+    - automation.pdf.layout
+  prerequisites:
+    - automation.pdf.create
+  estimatedMinutes: 60
+  seo:
+    title: "reportlab Platypus - 표와 이미지가 들어간 한글 PDF 보고서"
+    description: "Platypus Table, Image, SimpleDocTemplate로 데이터 표와 로고가 들어간 보고서를 만든다. colWidths 의무화로 페이지 밖으로 나가는 사고를 막는다."
+    keywords:
+      - reportlab Platypus
+      - reportlab Table
+      - reportlab Image
+      - SimpleDocTemplate
+
+intro:
+  direction: "데이터 표와 로고가 들어간 한글 보고서를 Platypus로 만든다. 120분 손작업이 15초로 줄어드는 흐름이다."
+  benefits:
+    - "마케팅 이주임의 표+로고 보고서 양식 작업을 120분에서 15초로 줄인다."
+    - "Platypus Table, Image, SimpleDocTemplate의 세 객체가 한 흐름으로 묶이는 패턴을 익힌다."
+    - "colWidths 의무화로 페이지 밖으로 텍스트가 나가는 가장 흔한 사고를 사전 차단한다."
+  diagram:
+    steps:
+      - label: "1. SimpleDocTemplate"
+        detail: "PDF 컨테이너. 페이지 크기·여백 설정 후 build에 flowable 리스트를 넘긴다."
+      - label: "2. Platypus Table"
+        detail: "list-of-lists 데이터를 Table로 만들고 TableStyle로 선·헤더 색 적용."
+      - label: "3. Image"
+        detail: "로고 PNG/JPG를 Image flowable로 삽입. width·height 단위는 pt."
+      - label: "4. 종합 보고서"
+        detail: "표지 + 표 + 이미지를 한 PDF로 묶어 보고서 양식을 완성."
+    runtime:
+      - label: "이미지 자산"
+        detail: "본 강의는 reportlab으로 즉석 PNG를 만들거나 단색 사각형 이미지를 사용. 외부 의존 없음."
+      - label: "검증"
+        detail: "PdfReader로 페이지 수·본문 키워드, pdfplumber로 표 추출 결과를 함께 검증."
+
+sections:
+  - id: step1_doc_template
+    title: "1단계. SimpleDocTemplate으로 흐름 잡기"
+    structuredPrimary: true
+    subtitle: "SimpleDocTemplate(path, pagesize), build(flowables)"
+    goal: "단락 두 개가 들어간 PDF를 SimpleDocTemplate으로 만든다."
+    why: "월간 매출 보고, 분기 사업계획, 협력사 견적서 - 표와 이미지가 같이 들어가는 보고서를 좌표로 직접 그리면 페이지가 늘어날 때마다 사람이 줄을 다시 맞춰야 합니다. SimpleDocTemplate은 flowable 리스트만 넘기면 자동으로 페이지를 흘려보내므로, 보고서 양식이 데이터 길이에 따라 길어져도 코드는 그대로입니다. 10강 청구서 빌더가 이 패턴을 그대로 씁니다."
+    explanation: |-
+      SimpleDocTemplate(path, pagesize=A4)로 컨테이너를 만들고 build([flow1, flow2, ...])에 flowable 리스트를 넘기면 페이지가 자동으로 흘러갑니다. Paragraph는 가장 흔한 flowable입니다.
+    tips:
+      - "build는 한 번만 호출 가능합니다. 한 번 호출하면 PDF가 닫혀 더 이상 flowable을 추가할 수 없습니다."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader
+      from reportlab.lib.pagesizes import A4
+      from reportlab.lib.styles import getSampleStyleSheet
+      from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
+
+      workdir = TemporaryDirectory()
+      pdfPath = Path(workdir.name) / "doc.pdf"
+      styles = getSampleStyleSheet()
+      doc = SimpleDocTemplate(str(pdfPath), pagesize=A4)
+      doc.build([
+          Paragraph("Report Title", styles["Title"]),
+          Spacer(1, 12),
+          Paragraph("body line one", styles["BodyText"]),
+      ])
+
+      body = PdfReader(pdfPath).pages[0].extract_text() or ""
+      "Report Title" in body and "body line one" in body
+    exercise:
+      prompt: "Spacer 다음에 본문 한 줄을 더 추가하고 추출 결과에 포함되는지 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
+
+        workdir = TemporaryDirectory()
+        pdfPath = Path(workdir.name) / "doc.pdf"
+        styles = getSampleStyleSheet()
+        doc = SimpleDocTemplate(str(pdfPath), pagesize=A4)
+        doc.build([
+            Paragraph("Report Title", styles["Title"]),
+            Spacer(1, 12),
+            Paragraph("body line one", styles["BodyText"]),
+            Paragraph(___, styles["BodyText"]),
+        ])
+        "second line" in (PdfReader(pdfPath).pages[0].extract_text() or "")
+      hints:
+        - "문자열 'second line body'."
+    check:
+      noError: "Paragraph 인자는 (text:str, style:ParagraphStyle)."
+      resultCheck: "True 출력."
+
+  - id: step2_table
+    title: "2단계. Platypus Table"
+    structuredPrimary: true
+    subtitle: "Table(data, colWidths), TableStyle"
+    goal: "list-of-lists 데이터로 Table을 만들고 헤더 색·전체 선을 적용한다."
+    why: "보고서의 핵심 콘텐츠는 표입니다. Table 객체 하나면 헤더 색, 선, 정렬을 한꺼번에 적용할 수 있습니다."
+    explanation: |-
+      Table(data, colWidths=[...])로 표를 만들고 setStyle(TableStyle([...]))로 스타일을 적용합니다. TableStyle 명령은 (command, fromCell, toCell, value) 4-tuple이며 cell 좌표는 (col, row)입니다.
+    tips:
+      - "colWidths를 지정하지 않으면 표가 페이지 폭을 넘어가서 텍스트가 잘릴 수 있습니다. 의무로 지정하세요."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader
+      from reportlab.lib import colors
+      from reportlab.lib.pagesizes import A4
+      from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+
+      data = [
+          ["region", "q1", "q2", "q3"],
+          ["Seoul", "120", "135", "150"],
+          ["Busan", "80", "78", "92"],
+      ]
+
+      workdir = TemporaryDirectory()
+      pdfPath = Path(workdir.name) / "table.pdf"
+      doc = SimpleDocTemplate(str(pdfPath), pagesize=A4)
+      tbl = Table(data, colWidths=[120, 80, 80, 80])
+      tbl.setStyle(TableStyle([
+          ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+          ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+          ("ALIGN", (1, 0), (-1, -1), "RIGHT"),
+      ]))
+      doc.build([tbl])
+
+      body = PdfReader(pdfPath).pages[0].extract_text() or ""
+      all(token in body for token in ["region", "Seoul", "120"])
+    exercise:
+      prompt: "데이터에 'Daegu, 60, 65, 70' 행을 추가하고 표를 다시 만드세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import A4
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+
+        data = [
+            ["region", "q1", "q2", "q3"],
+            ["Seoul", "120", "135", "150"],
+            ["Busan", "80", "78", "92"],
+            [___, ___, ___, ___],
+        ]
+        workdir = TemporaryDirectory()
+        pdfPath = Path(workdir.name) / "table.pdf"
+        doc = SimpleDocTemplate(str(pdfPath), pagesize=A4)
+        tbl = Table(data, colWidths=[120, 80, 80, 80])
+        tbl.setStyle(TableStyle([
+            ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+        ]))
+        doc.build([tbl])
+        "Daegu" in (PdfReader(pdfPath).pages[0].extract_text() or "")
+      hints:
+        - "도시명 'Daegu', 숫자 문자열 3개."
+    check:
+      noError: "리스트 행 길이는 모두 같아야 합니다."
+      resultCheck: "True 출력."
+
+  - id: step3_image
+    title: "3단계. Image flowable"
+    structuredPrimary: true
+    subtitle: "Image(path, width, height)"
+    goal: "단색 PNG를 즉석 만들어 PDF에 로고처럼 삽입한다."
+    why: "보고서에는 회사 로고나 상단 배너가 자주 들어갑니다. Image flowable로 PNG·JPG·SVG를 텍스트와 같은 흐름에 두 수 있습니다."
+    explanation: |-
+      이미지 파일을 reportlab.graphics 또는 Pillow로 즉석 만들고 Image(path, width=120, height=40) flowable로 삽입합니다. width·height 단위는 pt입니다.
+    tips:
+      - "원본 비율을 유지하려면 height만 지정하고 width=None으로 두는 것이 안전합니다. 또는 reportlab.lib.utils.ImageReader로 비율 계산 후 지정."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader
+      from reportlab.lib.pagesizes import A4
+      from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Spacer
+      from reportlab.lib.styles import getSampleStyleSheet
+
+      def buildSampleImage(path):
+          from reportlab.graphics.shapes import Drawing, Rect
+          from reportlab.lib import colors as rlColors
+          from reportlab.graphics import renderPM
+          drawing = Drawing(120, 40)
+          drawing.add(Rect(0, 0, 120, 40, fillColor=rlColors.HexColor("#305496"), strokeColor=None))
+          renderPM.drawToFile(drawing, str(path), fmt="PNG")
+
+      workdir = TemporaryDirectory()
+      base = Path(workdir.name)
+      imgPath = base / "logo.png"
+      pdfPath = base / "with_image.pdf"
+
+      buildSampleImage(imgPath)
+      styles = getSampleStyleSheet()
+      doc = SimpleDocTemplate(str(pdfPath), pagesize=A4)
+      doc.build([
+          Image(str(imgPath), width=120, height=40),
+          Spacer(1, 12),
+          Paragraph("body after image", styles["BodyText"]),
+      ])
+
+      body = PdfReader(pdfPath).pages[0].extract_text() or ""
+      "body after image" in body
+    exercise:
+      prompt: "이미지 width를 200, height를 60으로 키우고 본문이 그대로 추출되는지 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader
+        from reportlab.lib.pagesizes import A4
+        from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Spacer
+        from reportlab.lib.styles import getSampleStyleSheet
+
+        def buildSampleImage(path):
+            from reportlab.graphics.shapes import Drawing, Rect
+            from reportlab.lib import colors as rlColors
+            from reportlab.graphics import renderPM
+            drawing = Drawing(120, 40)
+            drawing.add(Rect(0, 0, 120, 40, fillColor=rlColors.HexColor("#305496"), strokeColor=None))
+            renderPM.drawToFile(drawing, str(path), fmt="PNG")
+
+        workdir = TemporaryDirectory()
+        base = Path(workdir.name)
+        imgPath = base / "logo.png"
+        pdfPath = base / "doc.pdf"
+        buildSampleImage(imgPath)
+
+        styles = getSampleStyleSheet()
+        doc = SimpleDocTemplate(str(pdfPath), pagesize=A4)
+        doc.build([
+            Image(str(imgPath), width=___, height=___),
+            Paragraph("after image", styles["BodyText"]),
+        ])
+        "after image" in (PdfReader(pdfPath).pages[0].extract_text() or "")
+      hints:
+        - "정수 200, 60."
+    check:
+      noError: "Image 인자는 (path:str, width:float, height:float)."
+      resultCheck: "True 출력."
+
+  - id: step4_combined
+    title: "4단계. 표 + 이미지 결합 보고서"
+    structuredPrimary: true
+    subtitle: "이미지(로고) + 제목 + 표 + 본문"
+    goal: "로고 + 제목 + 표 + 본문 네 요소가 들어간 한 페이지 PDF를 만든다."
+    why: "각 요소를 따로 익혔으니 한 흐름에 묶어 진짜 보고서 양식을 완성합니다. 10강 청구서 생성기의 직접 전 단계입니다."
+    explanation: |-
+      flowable 리스트에 Image, Paragraph, Table, Paragraph를 차례로 넣어 build를 한 번 호출합니다. SimpleDocTemplate은 페이지 폭에 맞게 알아서 정렬하므로 좌표를 직접 다룰 필요가 없습니다.
+    tips:
+      - "보고서 양식의 일관성을 위해 ParagraphStyle, TableStyle을 함수로 묶어 재사용하는 것이 좋습니다."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader
+      from reportlab.lib import colors
+      from reportlab.lib.pagesizes import A4
+      from reportlab.lib.styles import getSampleStyleSheet
+      from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+      def buildLogo(path):
+          from reportlab.graphics.shapes import Drawing, Rect
+          from reportlab.lib import colors as rlColors
+          from reportlab.graphics import renderPM
+          drawing = Drawing(120, 40)
+          drawing.add(Rect(0, 0, 120, 40, fillColor=rlColors.HexColor("#305496"), strokeColor=None))
+          renderPM.drawToFile(drawing, str(path), fmt="PNG")
+
+      workdir = TemporaryDirectory()
+      base = Path(workdir.name)
+      imgPath = base / "logo.png"
+      pdfPath = base / "report.pdf"
+      buildLogo(imgPath)
+
+      styles = getSampleStyleSheet()
+      data = [
+          ["region", "amount"],
+          ["Seoul", "120"],
+          ["Busan", "80"],
+      ]
+
+      doc = SimpleDocTemplate(str(pdfPath), pagesize=A4)
+      flow = [
+          Image(str(imgPath), width=120, height=40),
+          Spacer(1, 12),
+          Paragraph("Monthly Sales Report", styles["Heading1"]),
+          Spacer(1, 12),
+          Table(data, colWidths=[200, 100], style=TableStyle([
+              ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+              ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+          ])),
+          Spacer(1, 12),
+          Paragraph("Issued by accounting team on 2026-05-28.", styles["BodyText"]),
+      ]
+      doc.build(flow)
+
+      body = PdfReader(pdfPath).pages[0].extract_text() or ""
+      all(token in body for token in ["Monthly Sales Report", "Seoul", "Issued"])
+    exercise:
+      prompt: "표 colWidths를 [180, 120]으로 바꾸고 본문 키워드 검증을 통과시키세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+        def buildLogo(path):
+            from reportlab.graphics.shapes import Drawing, Rect
+            from reportlab.lib import colors as rlColors
+            from reportlab.graphics import renderPM
+            drawing = Drawing(120, 40)
+            drawing.add(Rect(0, 0, 120, 40, fillColor=rlColors.HexColor("#305496"), strokeColor=None))
+            renderPM.drawToFile(drawing, str(path), fmt="PNG")
+
+        workdir = TemporaryDirectory()
+        base = Path(workdir.name)
+        imgPath = base / "logo.png"
+        pdfPath = base / "report.pdf"
+        buildLogo(imgPath)
+
+        styles = getSampleStyleSheet()
+        data = [["region", "amount"], ["Seoul", "120"], ["Busan", "80"]]
+        doc = SimpleDocTemplate(str(pdfPath), pagesize=A4)
+        doc.build([
+            Image(str(imgPath), width=120, height=40),
+            Paragraph("Monthly Sales", styles["Heading1"]),
+            Table(data, colWidths=[___, ___], style=TableStyle([("GRID", (0,0), (-1,-1), 0.5, colors.black)])),
+        ])
+        "Seoul" in (PdfReader(pdfPath).pages[0].extract_text() or "")
+      hints:
+        - "정수 180, 120."
+    check:
+      noError: "colWidths는 숫자 리스트."
+      resultCheck: "True 출력."
+
+  - id: validation
+    title: "5단계. 검증 루프 - 텍스트 + 표 동시 검증"
+    structuredPrimary: true
+    subtitle: "PdfReader 본문 + pdfplumber 표 비교"
+    goal: "완성된 보고서에서 본문 키워드와 표 추출 결과를 동시에 assert한다."
+    why: "보고서는 텍스트와 표가 둘 다 살아 있어야 가치가 있습니다. 한 검증 셀에서 둘 다 확인하면 회귀가 사전에 잡힙니다."
+    explanation: |-
+      buildReport(path, data)이 표지 + 표를 만들고, 결과를 PdfReader와 pdfplumber로 두 번 열어 본문 키워드와 표 추출 결과를 같이 검증합니다.
+    tips:
+      - "pdfplumber로 표를 추출했을 때 행 수는 데이터 행 + 헤더입니다. 검증에서는 +1을 잊지 마세요."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      import pdfplumber
+      from pypdf import PdfReader
+      from reportlab.lib import colors
+      from reportlab.lib.pagesizes import A4
+      from reportlab.lib.styles import getSampleStyleSheet
+      from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+      def buildReport(path, data):
+          styles = getSampleStyleSheet()
+          doc = SimpleDocTemplate(str(path), pagesize=A4)
+          doc.build([
+              Paragraph("Monthly Report", styles["Heading1"]),
+              Spacer(1, 12),
+              Table(data, colWidths=[160, 100], style=TableStyle([
+                  ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+                  ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+              ])),
+          ])
+
+      vault = TemporaryDirectory()
+      pdfPath = Path(vault.name) / "verify.pdf"
+      data = [["region", "amount"], ["Seoul", "120"], ["Busan", "80"], ["Daegu", "60"]]
+      buildReport(pdfPath, data)
+
+      body = PdfReader(pdfPath).pages[0].extract_text() or ""
+      assert "Monthly Report" in body
+      with pdfplumber.open(pdfPath) as document:
+          tables = document.pages[0].extract_tables()
+      assert len(tables) == 1
+      assert len(tables[0]) == 4
+      tables[0][0], tables[0][1]
+    exercise:
+      prompt: "buildReport 함수의 본문을 직접 작성하세요. 제목 Heading1, 표(colWidths=[160,100], 헤더 회색 배경, 전체 격자)가 순서대로 들어간 한 페이지 PDF를 만들어야 합니다."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        import pdfplumber
+        from pypdf import PdfReader
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.styles import getSampleStyleSheet
+        from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+        def buildReport(path, data):
+            styles = getSampleStyleSheet()
+            doc = SimpleDocTemplate(str(path), pagesize=A4)
+            ___  # Paragraph('Monthly Report', Heading1) + Spacer + Table 을 flowable 리스트로 doc.build
+
+        vault = TemporaryDirectory()
+        pdfPath = Path(vault.name) / "v.pdf"
+        data = [
+            ["region", "amount"],
+            ["Seoul", "120"],
+            ["Busan", "80"],
+            ["Daegu", "60"],
+            ["Incheon", "55"],
+            ["Daejeon", "50"],
+        ]
+        buildReport(pdfPath, data)
+        with pdfplumber.open(pdfPath) as d:
+            tables = d.pages[0].extract_tables()
+        body = PdfReader(pdfPath).pages[0].extract_text() or ""
+        assert "Monthly Report" in body
+        assert len(tables[0]) == 6
+        tables[0][-1]
+      hints:
+        - "doc.build([Paragraph('Monthly Report', styles['Heading1']), Spacer(1, 12), Table(data, colWidths=[160,100], style=TableStyle([...]))])"
+        - "TableStyle 명령 두 줄: ('BACKGROUND', (0,0), (-1,0), colors.lightgrey), ('GRID', (0,0), (-1,-1), 0.5, colors.black)"
+    check:
+      noError: "리스트 길이가 2여야 합니다."
+      resultCheck: "출력 리스트의 마지막 요소가 'Daejeon' 행."
+
+  - id: misconception
+    title: "6단계. 흔한 오개념 차단"
+    subtitle: "colWidths 미지정 → 페이지 밖으로 텍스트"
+    goal: "표 폭을 명시하지 않으면 페이지 밖으로 잘릴 수 있다는 점을 사전에 차단한다."
+    why: "보고서가 시각적으로 잘려 보이는 사고는 자동화의 신뢰를 깎습니다. colWidths 의무화 한 줄이 모든 사고를 사전에 차단합니다."
+    explanation: |-
+      Table(data)만 호출하면 reportlab이 데이터에 기반해 자동으로 폭을 추정하지만, 긴 텍스트가 들어가면 페이지 밖으로 나갈 수 있습니다. colWidths를 명시하면 항상 페이지 폭에 맞춰 균형을 잡을 수 있습니다.
+    tips:
+      - "A4 페이지 사용 가능 폭은 약 460pt(여백 제외)입니다. colWidths 합계를 460 이내로 두세요."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader
+      from reportlab.lib import colors
+      from reportlab.lib.pagesizes import A4
+      from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+
+      def safeBuild(path, data):
+          totalWidth = 460
+          colCount = len(data[0])
+          widths = [totalWidth / colCount] * colCount
+          doc = SimpleDocTemplate(str(path), pagesize=A4)
+          tbl = Table(data, colWidths=widths)
+          tbl.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.5, colors.black)]))
+          doc.build([tbl])
+
+      workdir = TemporaryDirectory()
+      pdfPath = Path(workdir.name) / "safe.pdf"
+      safeBuild(pdfPath, [["a", "b", "c"], ["1", "2", "3"]])
+      len(PdfReader(pdfPath).pages)
+    exercise:
+      prompt: "safeBuild를 그대로 사용해 5컬럼 데이터에 적용하고 페이지 수를 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from pypdf import PdfReader
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import A4
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+
+        def safeBuild(path, data):
+            totalWidth = 460
+            colCount = len(data[0])
+            widths = [totalWidth / colCount] * colCount
+            doc = SimpleDocTemplate(str(path), pagesize=A4)
+            tbl = Table(data, colWidths=widths)
+            tbl.setStyle(TableStyle([("GRID", (0, 0), (-1, -1), 0.5, colors.black)]))
+            doc.build([tbl])
+
+        workdir = TemporaryDirectory()
+        pdfPath = Path(workdir.name) / "safe.pdf"
+        data = [["a", "b", "c", "d", "e"], [___, ___, ___, ___, ___]]
+        safeBuild(pdfPath, data)
+        len(PdfReader(pdfPath).pages)
+      hints:
+        - "어떤 문자열이든 OK. 예: '1', '2', '3', '4', '5'."
+    check:
+      noError: "데이터 행 길이가 헤더와 같아야 합니다."
+      resultCheck: "출력 1."
+
+  - id: practice
+    title: "실습 - 종합 미션 2개"
+    subtitle: "표 + 이미지 보고서 생성기"
+    goal: "Platypus 패턴을 함수로 묶어 실용 보고서 생성기 두 개를 만든다."
+    why: "함수 형태로 묶어두면 본인 업무 데이터로 바로 가져갈 수 있습니다."
+    explanation: |-
+      미션1은 데이터 표만 들어간 보고서, 미션2는 로고 이미지가 상단에 들어간 보고서 생성 함수입니다.
+    tips:
+      - "변수 prefix: tbl*(미션1), logo*(미션2)."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from pypdf import PdfReader
+      from reportlab.lib import colors
+      from reportlab.lib.pagesizes import A4
+      from reportlab.lib.styles import getSampleStyleSheet
+      from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+    exercise:
+      prompt: "두 미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "미션1: makeTableReport(path, title, data) -> Path"
+        - "미션2: makeReportWithLogo(path, logoPath, title, data) -> Path"
+    check:
+      noError: "두 함수가 모두 정의되어야 합니다."
+      resultCheck: "둘 다 PdfReader 본문 검증 통과."
+    blocks:
+      - type: tip
+        content: "함수가 Path를 돌려주면 후속에서 PdfReader로 검증하기 편합니다. 일관된 인터페이스를 유지하세요."
+      - type: expansion
+        title: "미션1: 표 보고서"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from pypdf import PdfReader
+              from reportlab.lib import colors
+              from reportlab.lib.pagesizes import A4
+              from reportlab.lib.styles import getSampleStyleSheet
+              from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+              def makeTableReport(path, title, data):
+                  styles = getSampleStyleSheet()
+                  doc = SimpleDocTemplate(str(path), pagesize=A4)
+                  doc.build([
+                      Paragraph(title, styles["Heading1"]),
+                      Spacer(1, 12),
+                      Table(data, colWidths=[200, 100], style=TableStyle([
+                          ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+                          ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+                      ])),
+                  ])
+                  return Path(path)
+
+              tblDir = TemporaryDirectory()
+              tblPath = Path(tblDir.name) / "table.pdf"
+              makeTableReport(tblPath, "Sales", [
+                  ["region", "amount"],
+                  ["Seoul", "120"],
+                  ["Busan", "80"],
+              ])
+              body = PdfReader(tblPath).pages[0].extract_text() or ""
+              assert "Sales" in body and "Seoul" in body
+              body.strip().splitlines()[:3]
+      - type: expansion
+        title: "미션2: 로고 포함 보고서"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from pypdf import PdfReader
+              from reportlab.lib import colors
+              from reportlab.lib.pagesizes import A4
+              from reportlab.lib.styles import getSampleStyleSheet
+              from reportlab.platypus import Image, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+              def buildLogoPng(path):
+                  from reportlab.graphics.shapes import Drawing, Rect
+                  from reportlab.lib import colors as rlColors
+                  from reportlab.graphics import renderPM
+                  drawing = Drawing(120, 40)
+                  drawing.add(Rect(0, 0, 120, 40, fillColor=rlColors.HexColor("#305496"), strokeColor=None))
+                  renderPM.drawToFile(drawing, str(path), fmt="PNG")
+
+              def makeReportWithLogo(path, logoPath, title, data):
+                  styles = getSampleStyleSheet()
+                  doc = SimpleDocTemplate(str(path), pagesize=A4)
+                  doc.build([
+                      Image(str(logoPath), width=120, height=40),
+                      Spacer(1, 12),
+                      Paragraph(title, styles["Heading1"]),
+                      Spacer(1, 12),
+                      Table(data, colWidths=[200, 100], style=TableStyle([
+                          ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+                          ("GRID", (0, 0), (-1, -1), 0.5, colors.black),
+                      ])),
+                  ])
+                  return Path(path)
+
+              logoDir = TemporaryDirectory()
+              logoPath = Path(logoDir.name) / "logo.png"
+              reportPath = Path(logoDir.name) / "report.pdf"
+              buildLogoPng(logoPath)
+              makeReportWithLogo(reportPath, logoPath, "Monthly", [
+                  ["region", "amount"],
+                  ["Seoul", "120"],
+              ])
+              body = PdfReader(reportPath).pages[0].extract_text() or ""
+              assert "Monthly" in body and "Seoul" in body
+              body.strip().splitlines()[:3]
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: text
+        content: |-
+          표·이미지 결합 패턴의 응용 아이디어입니다.
+      - type: list
+        style: bullet
+        items:
+          - "회사 양식 함수 makeBrandedReport(데이터)로 모든 보고서 통일"
+          - "표 헤더에 행 stripe(회색·흰색 교대)로 가독성 향상"
+          - "이미지 대신 matplotlib png를 삽입해 차트 포함 보고서"
+          - "여러 표를 한 페이지에 두 개 컬럼으로 배치 (Frame 활용)"
+          - "표 셀에 색상 강조(예: 합계 행 노랑)로 한눈에 들어오는 양식"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pdf_07-pdf-table-image-layout-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_doc_template
+    - extensions
+    title: PDF 표·이미지 block의 page box 배치 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: block overlap·overflow와 이미지 caption/alt 누락을 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - block bounding box로 overflow와 overlap을 render 전에 검사하세요.
+    - 이미지는 caption과 alt text를 모두 제공하세요.
+    exercise:
+      prompt: audit_pdf_blocks(blocks, content_box)를 완성하세요.
+      starterCode: |-
+        def audit_pdf_blocks(blocks, content_box):
+            raise NotImplementedError
+      solution: |
+        def audit_pdf_blocks(blocks, content_box):
+            failures = []
+            overflow = []
+            invalid_images = []
+            overlaps = []
+            for block in blocks:
+                if block["x"] < 0 or block["y"] < 0 or block["x"] + block["width"] > content_box["width"] or block["y"] + block["height"] > content_box["height"]:
+                    overflow.append(block["id"])
+                if block["kind"] == "image" and (not block.get("caption") or not block.get("altText")):
+                    invalid_images.append(block["id"])
+            for index, left in enumerate(blocks):
+                for right in blocks[index + 1 :]:
+                    if left["x"] < right["x"] + right["width"] and right["x"] < left["x"] + left["width"] and left["y"] < right["y"] + right["height"] and right["y"] < left["y"] + left["height"]:
+                        overlaps.append([left["id"], right["id"]])
+            if overflow:
+                failures.append("overflow")
+            if invalid_images:
+                failures.append("image-text")
+            if overlaps:
+                failures.append("overlap")
+            return {"accepted": not failures, "failures": failures, "overflow": sorted(overflow), "invalidImages": sorted(invalid_images), "overlaps": overlaps}
+      hints: *id001
+    check:
+      id: python.pdf.pdf_07.pdf-table-image-layout.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_07.pdf-table-image-layout.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_pdf_blocks
+        cases:
+        - id: accepts-separated-table-and-image
+          arguments:
+          - value:
+            - id: table
+              kind: table
+              x: 0
+              y: 0
+              width: 100
+              height: 50
+            - id: chart
+              kind: image
+              x: 0
+              y: 60
+              width: 100
+              height: 50
+              caption: Sales
+              altText: Sales chart
+          - value:
+              width: 200
+              height: 200
+          expectedReturn:
+            accepted: true
+            failures: []
+            overflow: []
+            invalidImages: []
+            overlaps: []
+        - id: reports-overflow-and-missing-image-text
+          arguments:
+          - value:
+            - id: chart
+              kind: image
+              x: 90
+              y: 0
+              width: 20
+              height: 20
+              caption: ''
+              altText: ''
+          - value:
+              width: 100
+              height: 100
+          expectedReturn:
+            accepted: false
+            failures:
+            - overflow
+            - image-text
+            overflow:
+            - chart
+            invalidImages:
+            - chart
+            overlaps: []
+        - id: reports-overlap
+          arguments:
+          - value:
+            - id: a
+              kind: table
+              x: 0
+              y: 0
+              width: 50
+              height: 50
+            - id: b
+              kind: table
+              x: 25
+              y: 25
+              width: 50
+              height: 50
+          - value:
+              width: 100
+              height: 100
+          expectedReturn:
+            accepted: false
+            failures:
+            - overlap
+            overflow: []
+            invalidImages: []
+            overlaps:
+            - - a
+              - b
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pdf_07-rendered-block-evidence-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_07-pdf-table-image-layout-mastery
+    title: 새 PDF render에 block visibility·clipping 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 계획 block마다 rendered pixel bbox와 visible ratio를 대조한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - PDF 구조 존재와 실제 render visibility를 분리해 검증하세요.
+    - block별 visible ratio와 non-white pixel을 evidence로 남기세요.
+    exercise:
+      prompt: audit_rendered_blocks(planned_ids, rendered, minimum_visible_ratio)를 완성하세요.
+      starterCode: |-
+        def audit_rendered_blocks(planned_ids, rendered, minimum_visible_ratio):
+            raise NotImplementedError
+      solution: |
+        def audit_rendered_blocks(planned_ids, rendered, minimum_visible_ratio):
+            rendered_map = {item["id"]: item for item in rendered}
+            missing = sorted(set(planned_ids) - set(rendered_map))
+            clipped = sorted(block_id for block_id in planned_ids if block_id in rendered_map and rendered_map[block_id].get("visibleRatio", 0) < minimum_visible_ratio)
+            blank = sorted(block_id for block_id in planned_ids if block_id in rendered_map and rendered_map[block_id].get("nonWhitePixels", 0) == 0)
+            return {"passed": not missing and not clipped and not blank, "missing": missing, "clipped": clipped, "blank": blank}
+      hints: *id002
+    check:
+      id: python.pdf.pdf_07.rendered-block-evidence.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_07.rendered-block-evidence.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_rendered_blocks
+        cases:
+        - id: accepts-visible-rendered-blocks
+          arguments:
+          - value:
+            - table
+            - chart
+          - value:
+            - id: table
+              visibleRatio: 1.0
+              nonWhitePixels: 100
+            - id: chart
+              visibleRatio: 0.99
+              nonWhitePixels: 200
+          - value: 0.95
+          expectedReturn:
+            passed: true
+            missing: []
+            clipped: []
+            blank: []
+        - id: reports-missing-clipped-and-blank
+          arguments:
+          - value:
+            - missing
+            - clip
+            - blank
+          - value:
+            - id: clip
+              visibleRatio: 0.5
+              nonWhitePixels: 10
+            - id: blank
+              visibleRatio: 1.0
+              nonWhitePixels: 0
+          - value: 0.9
+          expectedReturn:
+            passed: false
+            missing:
+            - missing
+            clipped:
+            - clip
+            blank:
+            - blank
+        - id: accepts-threshold-boundary
+          arguments:
+          - value:
+            - x
+          - value:
+            - id: x
+              visibleRatio: 0.9
+              nonWhitePixels: 1
+          - value: 0.9
+          expectedReturn:
+            passed: true
+            missing: []
+            clipped: []
+            blank: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pdf_07-pdf-table-image-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_07-rendered-block-evidence-transfer
+    title: PDF 표·이미지 배치 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: geometry·설명·render visibility 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - PDF 저장 성공과 페이지 내용·geometry·업무 값의 정확성을 분리해 검증하세요.
+    - Web에서는 문서 판단을 연습하고 Local에서는 재개방·render artifact evidence를 남기세요.
+    exercise:
+      prompt: choose_pdf_block_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_pdf_block_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_pdf_block_evidence(situation):
+            table = {'layout': {'action': 'audit block boxes', 'evidence': 'overflow and overlap pairs', 'risk': 'clipped content'}, 'meaning': {'action': 'add caption and alt text', 'evidence': 'image text alternatives', 'risk': 'image-only information'}, 'render': {'action': 'measure block visible pixels', 'evidence': 'visible ratio and non-white pixels', 'risk': 'blank artifact'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.pdf.pdf_07.pdf-table-image-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_07.pdf-table-image-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_pdf_block_evidence
+        cases:
+        - id: recalls-layout
+          arguments:
+          - value: layout
+          expectedReturn:
+            action: audit block boxes
+            evidence: overflow and overlap pairs
+            risk: clipped content
+        - id: recalls-meaning
+          arguments:
+          - value: meaning
+          expectedReturn:
+            action: add caption and alt text
+            evidence: image text alternatives
+            risk: image-only information
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

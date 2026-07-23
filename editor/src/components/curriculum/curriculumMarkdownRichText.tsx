@@ -117,19 +117,19 @@ export function MarkdownBlock({ content }: { content: string }) {
       return;
     }
     if (line.startsWith("# ")) {
-      rendered.push(<h2 className="text-lg font-semibold text-foreground" key={key}>{line.replace(/^#\s+/, "")}</h2>);
+      rendered.push(<h2 className="text-lg font-bold text-foreground" key={key}>{line.replace(/^#\s+/, "")}</h2>);
       return;
     }
     if (line.startsWith("## ")) {
-      rendered.push(<h3 className="text-[15px] font-semibold leading-6 text-foreground" key={key}>{line.replace(/^##\s+/, "")}</h3>);
+      rendered.push(<h3 className="text-[15px] font-bold leading-6 text-foreground" key={key}>{line.replace(/^##\s+/, "")}</h3>);
       return;
     }
     if (line.startsWith("### ")) {
-      rendered.push(<h4 className="text-sm font-semibold text-foreground" key={key}>{line.replace(/^###\s+/, "")}</h4>);
+      rendered.push(<h4 className="text-sm font-bold text-foreground" key={key}>{line.replace(/^###\s+/, "")}</h4>);
       return;
     }
     if (line.startsWith("#### ")) {
-      rendered.push(<h5 className="text-sm font-medium text-foreground" key={key}>{line.replace(/^####\s+/, "")}</h5>);
+      rendered.push(<h5 className="text-sm font-bold text-foreground" key={key}>{line.replace(/^####\s+/, "")}</h5>);
       return;
     }
     if (line.startsWith("> ")) {

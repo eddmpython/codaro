@@ -1,0 +1,891 @@
+var e=`meta:
+  id: openpyxl_09
+  title: 표와 데이터 검증
+  order: 9
+  category: openpyxl
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  packages:
+  - openpyxl
+  outcomes: ["automation.excel.tables"]
+  prerequisites: ["automation.excel.workbook"]
+  estimatedMinutes: 55
+  tags:
+  - openpyxl
+  - Table
+  - DataValidation
+  - AutoFilter
+  - freeze_panes
+  seo:
+    title: openpyxl 표와 데이터 검증 - Table·DataValidation·freeze_panes·AutoFilter
+    description: 정렬 가능한 표, 드롭다운 데이터 검증, 행 고정, 자동 필터까지 - 입력 양식의 무결성을 코드로 잠그는 패턴을 정리합니다.
+    keywords:
+    - openpyxl Table
+    - TableStyleInfo
+    - DataValidation
+    - freeze_panes
+intro:
+  direction: 입력 양식의 무결성을 표·데이터 검증·고정창·자동 필터로 잠가, 사람이 잘못된 값을 넣을 수 없는 보고서 양식을 만듭니다.
+  benefits:
+  - Table + TableStyleInfo로 정렬·필터·줄무늬가 한 번에 적용되는 표를 만듭니다.
+  - DataValidation으로 셀에 드롭다운, 숫자 범위, 날짜 제약을 부여합니다.
+  - freeze_panes로 헤더가 따라다니는 보고서를 만듭니다.
+  diagram:
+    steps:
+    - label: Table
+      detail: 영역을 정식 Table 객체로 등록.
+    - label: TableStyleInfo
+      detail: 줄무늬·헤더 강조·필터 토글.
+    - label: DataValidation
+      detail: list/decimal/date로 입력 제약.
+    - label: freeze_panes / auto_filter
+      detail: 사용 편의성을 코드로 보장.
+    runtime:
+    - label: openpyxl 패키지 준비
+      detail: openpyxl.worksheet.table의 Table/TableStyleInfo와 openpyxl.worksheet.datavalidation의 DataValidation을 import해 사용한다.
+    - label: 표·검증 재오픈 보존 확인
+      detail: load_workbook으로 다시 열어 ws.tables 키, freeze_panes, data_validations.dataValidation 종류가 보존됐는지 assert로 확인한다.
+sections:
+- id: step1_table
+  title: 1단계. 정식 Table 등록
+  structuredPrimary: true
+  subtitle: openpyxl.worksheet.table.Table
+  goal: 데이터 영역을 정식 Table 객체로 등록해 정렬·필터 가능한 표로 만든다.
+  why: '"단순 셀 영역"과 "표"는 다릅니다. 표는 자동 줄무늬, 헤더 강조, 자동 필터, 정렬이 따라옵니다. 사용자 경험이 즉시 달라집니다.'
+  explanation: |-
+    \`from openpyxl.worksheet.table import Table\`. \`Table(displayName="orders", ref="A1:D10")\`로 만들어 \`ws.add_table(table)\`로 추가합니다. displayName은 워크북 안에서 유일해야 합니다. ref는 헤더를 포함한 전체 영역입니다.
+  tips:
+  - 같은 워크북에 같은 displayName으로 표를 두 개 만들면 ValueError가 납니다. 시트 이름과 결합해 prefix를 두는 식으로 충돌을 피하세요.
+  snippet: |-
+    from openpyxl import Workbook
+    from openpyxl.worksheet.table import Table
+
+    book = Workbook()
+    sheet = book.active
+    sheet.title = "orders"
+    sheet.append(["order_id", "region", "amount", "status"])
+    for row in [
+        ("A001", "Seoul", 120000, "ok"),
+        ("A002", "Busan", 80000, "refund"),
+        ("A003", "Daegu", 30000, "ok"),
+    ]:
+        sheet.append(list(row))
+
+    table = Table(displayName="ordersTable", ref="A1:D4")
+    sheet.add_table(table)
+    sheet.tables["ordersTable"].ref
+  exercise:
+    prompt: 데이터 행을 한 줄 더 추가한 뒤 Table의 ref를 "A1:D5"로 바꾸세요.
+    starterCode: |-
+      from openpyxl import Workbook
+      from openpyxl.worksheet.table import Table
+
+      book = Workbook()
+      sheet = book.active
+      sheet.title = "orders"
+      sheet.append(["order_id", "region", "amount", "status"])
+      for row in [
+          ("A001", "Seoul", 120000, "ok"),
+          ("A002", "Busan", 80000, "refund"),
+          ("A003", "Daegu", 30000, "ok"),
+          ___,
+      ]:
+          sheet.append(list(row))
+
+      table = Table(displayName="ordersTable", ref=___)
+      sheet.add_table(table)
+      sheet.tables["ordersTable"].ref
+    hints:
+    - "4-튜플 (id, region, amount, status). ref는 헤더 포함 'A1:D5'."
+  check:
+    noError: Table의 ref는 헤더 포함 실제 데이터 영역과 정확히 일치해야 합니다.
+    resultCheck: tables 등록 후 ref가 "A1:D5"여야 합니다.
+- id: step2_table_style
+  title: 2단계. TableStyleInfo로 스타일
+  structuredPrimary: true
+  subtitle: 줄무늬·필터 토글
+  goal: TableStyleInfo로 표에 줄무늬와 필터 가시화를 적용한다.
+  why: 표 스타일은 사람이 표를 표로 인식하게 만드는 시각 신호입니다. Excel 기본 스타일 이름을 그대로 쓸 수 있어 한 줄에 끝납니다.
+  explanation: |-
+    \`from openpyxl.worksheet.table import TableStyleInfo\`. \`TableStyleInfo(name="TableStyleMedium9", showFirstColumn=False, showLastColumn=False, showRowStripes=True, showColumnStripes=False)\`. name은 Excel 내장 표 스타일 이름(Light/Medium/Dark1~21).
+  tips:
+  - "TableStyleMedium9 (파란 헤더 + 회색 줄무늬)가 가장 자주 쓰는 무난한 선택입니다. 디자인 시스템을 통일하려면 워크북 전체에서 같은 name을 쓰세요."
+  snippet: |-
+    from openpyxl import Workbook
+    from openpyxl.worksheet.table import Table, TableStyleInfo
+
+    book = Workbook()
+    sheet = book.active
+    sheet.title = "orders"
+    sheet.append(["order_id", "region", "amount", "status"])
+    for row in [("A001", "Seoul", 120000, "ok"), ("A002", "Busan", 80000, "refund")]:
+        sheet.append(list(row))
+
+    table = Table(displayName="ordersTable", ref="A1:D3")
+    table.tableStyleInfo = TableStyleInfo(
+        name="TableStyleMedium9",
+        showRowStripes=True,
+        showColumnStripes=False,
+    )
+    sheet.add_table(table)
+    table.tableStyleInfo.name, table.tableStyleInfo.showRowStripes
+  exercise:
+    prompt: 컬럼 줄무늬도 보이도록 showColumnStripes를 True로 바꾸세요.
+    starterCode: |-
+      from openpyxl import Workbook
+      from openpyxl.worksheet.table import Table, TableStyleInfo
+
+      book = Workbook()
+      sheet = book.active
+      sheet.title = "orders"
+      sheet.append(["order_id", "region", "amount", "status"])
+      for row in [("A001", "Seoul", 120000, "ok"), ("A002", "Busan", 80000, "refund")]:
+          sheet.append(list(row))
+
+      table = Table(displayName="ordersTable", ref="A1:D3")
+      table.tableStyleInfo = TableStyleInfo(
+          name="TableStyleMedium9",
+          showRowStripes=True,
+          showColumnStripes=___,
+      )
+      sheet.add_table(table)
+      table.tableStyleInfo.showColumnStripes
+    hints:
+    - 불리언 True입니다.
+  check:
+    noError: TableStyleInfo의 name이 유효한 내장 스타일 이름이어야 합니다.
+    resultCheck: showColumnStripes가 True여야 합니다.
+- id: step3_dv_list
+  title: 3단계. 드롭다운 DataValidation
+  structuredPrimary: true
+  subtitle: list 타입
+  goal: status 컬럼에 고정된 값들로만 입력되도록 드롭다운을 부여한다.
+  why: 자유 입력은 항상 오타를 만듭니다. "ok"/"refund"/"pending" 같이 정해진 값만 받으면 보고서의 신뢰도가 올라갑니다.
+  explanation: |-
+    \`from openpyxl.worksheet.datavalidation import DataValidation\`. \`DataValidation(type="list", formula1='"ok,refund,pending"', allow_blank=True)\`. formula1의 인용 부호 한 쌍이 Excel 문자열 리스트 문법입니다. 만든 DataValidation을 \`ws.add_data_validation(dv)\` 한 뒤, \`dv.add("D2:D100")\`처럼 적용 영역을 추가합니다.
+  tips:
+  - "값이 많거나 동적이면 같은 워크북의 별도 시트 영역을 가리키게 할 수도 있습니다. formula1='Codes!$A$2:$A$10'."
+  snippet: |-
+    from openpyxl import Workbook
+    from openpyxl.worksheet.datavalidation import DataValidation
+
+    book = Workbook()
+    sheet = book.active
+    sheet.title = "orders"
+    sheet.append(["order_id", "region", "amount", "status"])
+
+    statusDv = DataValidation(
+        type="list",
+        formula1='"ok,refund,pending"',
+        allow_blank=True,
+    )
+    sheet.add_data_validation(statusDv)
+    statusDv.add("D2:D100")
+    sheet.data_validations.dataValidation[0].type, sheet.data_validations.dataValidation[0].sqref
+  exercise:
+    prompt: region 컬럼(B)에도 "Seoul,Busan,Daegu,Incheon" 드롭다운을 한 줄 추가해 같은 시트에 두 개의 DataValidation이 들어가도록 만드세요.
+    starterCode: |-
+      from openpyxl import Workbook
+      from openpyxl.worksheet.datavalidation import DataValidation
+
+      book = Workbook()
+      sheet = book.active
+      sheet.title = "orders"
+      sheet.append(["order_id", "region", "amount", "status"])
+
+      statusDv = DataValidation(type="list", formula1='"ok,refund,pending"', allow_blank=True)
+      sheet.add_data_validation(statusDv)
+      statusDv.add("D2:D100")
+
+      regionDv = DataValidation(type="list", formula1=___, allow_blank=True)
+      sheet.add_data_validation(regionDv)
+      regionDv.add(___)
+
+      len(sheet.data_validations.dataValidation)
+    hints:
+    - "formula1 문자열은 큰따옴표 안에 콤마 구분. region 영역은 'B2:B100'."
+  check:
+    noError: DataValidation type "list"는 formula1에 인용된 값 목록이 필요합니다.
+    resultCheck: 시트의 data_validations.dataValidation 길이가 2여야 합니다.
+- id: step4_dv_decimal
+  title: 4단계. 숫자 범위 DataValidation
+  structuredPrimary: true
+  subtitle: decimal 타입
+  goal: amount 컬럼에 음수와 0 이하 값이 들어가지 못하도록 범위 제약을 부여한다.
+  why: 금액 컬럼에 음수가 들어가면 합계가 엉뚱해집니다. 입력 단계에서 막는 것이 가장 싸고 안전합니다.
+  explanation: |-
+    \`DataValidation(type="decimal", operator="greaterThan", formula1=0, allow_blank=False)\`. operator는 between, greaterThan, lessThanOrEqual 등 Excel 비교 키워드. 사용자가 잘못 입력하면 errorTitle/error 문자열로 안내 메시지를 띄울 수 있습니다.
+  tips:
+  - 에러 메시지는 보고서를 받는 사람이 실수 후 처음 보는 가이드입니다. 무성의한 기본 문구 대신 어떤 값이 허용되는지 명확히 적으세요.
+  snippet: |-
+    from openpyxl import Workbook
+    from openpyxl.worksheet.datavalidation import DataValidation
+
+    book = Workbook()
+    sheet = book.active
+    sheet.title = "orders"
+    sheet.append(["order_id", "region", "amount", "status"])
+
+    amountDv = DataValidation(
+        type="decimal",
+        operator="greaterThan",
+        formula1=0,
+        allow_blank=False,
+        errorTitle="잘못된 금액",
+        error="amount는 0보다 커야 합니다.",
+    )
+    sheet.add_data_validation(amountDv)
+    amountDv.add("C2:C100")
+    amountDv.type, amountDv.operator, amountDv.error
+  exercise:
+    prompt: between 연산자로 0보다 크고 10,000,000 이하만 허용하도록 바꾸세요.
+    starterCode: |-
+      from openpyxl import Workbook
+      from openpyxl.worksheet.datavalidation import DataValidation
+
+      book = Workbook()
+      sheet = book.active
+      sheet.title = "orders"
+      sheet.append(["order_id", "region", "amount", "status"])
+
+      amountDv = DataValidation(
+          type="decimal",
+          operator=___,
+          formula1=0,
+          formula2=___,
+          allow_blank=False,
+          errorTitle="잘못된 금액",
+          error="amount는 0 초과 10,000,000 이하여야 합니다.",
+      )
+      sheet.add_data_validation(amountDv)
+      amountDv.add("C2:C100")
+      amountDv.operator, amountDv.formula1, amountDv.formula2
+    hints:
+    - "between은 formula1=하한, formula2=상한 두 값이 필요합니다."
+  check:
+    noError: between 연산자는 formula1과 formula2 모두 있어야 합니다.
+    resultCheck: 결과 튜플의 operator가 "between"이어야 합니다.
+- id: step5_freeze_filter
+  title: 5단계. freeze_panes와 auto_filter
+  structuredPrimary: true
+  subtitle: 헤더 고정 + 자동 필터 토글
+  goal: 헤더가 스크롤 시 따라다니도록 고정하고, 자동 필터 화살표를 헤더에 켠다.
+  why: 행이 많은 보고서에서 헤더가 사라지면 컬럼이 무슨 의미인지 잊습니다. 자동 필터는 사용자가 직접 정렬/필터하는 비용을 0으로 만듭니다.
+  explanation: |-
+    \`ws.freeze_panes = "A2"\`는 1행을 위에 고정합니다. \`ws.freeze_panes = "B2"\`는 1행+A열을 모두 고정합니다. \`ws.auto_filter.ref = "A1:D100"\`은 헤더에 자동 필터 화살표를 켭니다.
+  tips:
+  - "Table을 등록하면 자동 필터가 표 영역에 자동으로 켜집니다. 표를 안 쓰는 시트에만 auto_filter.ref를 따로 지정하세요."
+  snippet: |-
+    from openpyxl import Workbook
+
+    book = Workbook()
+    sheet = book.active
+    sheet.title = "orders"
+    sheet.append(["order_id", "region", "amount", "status"])
+    sheet.freeze_panes = "A2"
+    sheet.auto_filter.ref = "A1:D100"
+    sheet.freeze_panes, sheet.auto_filter.ref
+  exercise:
+    prompt: freeze_panes를 "B2"로 바꿔 A열도 고정하세요.
+    starterCode: |-
+      from openpyxl import Workbook
+
+      book = Workbook()
+      sheet = book.active
+      sheet.title = "orders"
+      sheet.append(["order_id", "region", "amount", "status"])
+      sheet.freeze_panes = ___
+      sheet.auto_filter.ref = "A1:D100"
+      sheet.freeze_panes
+    hints:
+    - "freeze_panes는 셀 좌표 문자열입니다. 좌상단부터 그 좌표 이전 행/열이 모두 고정됩니다."
+  check:
+    noError: freeze_panes는 유효한 셀 좌표 문자열이어야 합니다.
+    resultCheck: freeze_panes가 "B2"여야 합니다.
+- id: validation
+  title: 6단계. 검증 루프 - 주문 양식 무결성
+  structuredPrimary: true
+  subtitle: 저장 → 재오픈 → 양식 계약
+  goal: 표·드롭다운·금액 범위·헤더 고정을 모두 결합한 주문 입력 양식을 만들고, 재오픈 후 각 제약이 보존됐는지 확인한다.
+  why: 입력 양식의 신뢰는 "코드로 만든 제약이 파일 안에서도 살아 있는가"로 결정됩니다. 재오픈으로 검증하지 않으면 사용자에게 깨진 양식을 전달할 수 있습니다.
+  explanation: |-
+    \`buildOrderForm\`은 표 + 드롭다운 + 금액 검증 + 헤더 고정을 한 시트에 묶어 만듭니다. 재오픈 후 tables, data_validations, freeze_panes를 모두 확인합니다.
+  tips:
+  - "openpyxl이 보존하는 제약과 그렇지 않은 제약(예 일부 사용자 정의 표 스타일)을 알면, 양식을 더 안전하게 설계할 수 있습니다."
+  snippet: |-
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    from openpyxl import Workbook, load_workbook
+    from openpyxl.worksheet.datavalidation import DataValidation
+    from openpyxl.worksheet.table import Table, TableStyleInfo
+
+    def buildOrderForm(path):
+        book = Workbook()
+        sheet = book.active
+        sheet.title = "orders"
+        sheet.append(["order_id", "region", "amount", "status"])
+        sheet.append(["A001", "Seoul", 120000, "ok"])
+        sheet.append(["A002", "Busan", 80000, "refund"])
+
+        table = Table(displayName="ordersTable", ref="A1:D3")
+        table.tableStyleInfo = TableStyleInfo(name="TableStyleMedium9", showRowStripes=True)
+        sheet.add_table(table)
+
+        statusDv = DataValidation(type="list", formula1='"ok,refund,pending"', allow_blank=True)
+        sheet.add_data_validation(statusDv)
+        statusDv.add("D2:D100")
+
+        amountDv = DataValidation(
+            type="decimal",
+            operator="greaterThan",
+            formula1=0,
+            allow_blank=False,
+            errorTitle="잘못된 금액",
+            error="amount는 0보다 커야 합니다.",
+        )
+        sheet.add_data_validation(amountDv)
+        amountDv.add("C2:C100")
+
+        sheet.freeze_panes = "A2"
+        book.save(path)
+        return path
+
+    workdir = TemporaryDirectory()
+    formPath = buildOrderForm(Path(workdir.name) / "order_form.xlsx")
+
+    reopened = load_workbook(formPath)
+    orders = reopened["orders"]
+    assert "ordersTable" in orders.tables
+    assert orders.freeze_panes == "A2"
+    dvTypes = {dv.type for dv in orders.data_validations.dataValidation}
+    assert "list" in dvTypes
+    assert "decimal" in dvTypes
+    list(orders.tables), orders.freeze_panes, sorted(dvTypes)
+  exercise:
+    prompt: priority 컬럼(E)을 추가해 "high,normal,low" 드롭다운을 더하고 ref/freeze/검증 모두 확장하세요.
+    starterCode: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from openpyxl import Workbook, load_workbook
+      from openpyxl.worksheet.datavalidation import DataValidation
+      from openpyxl.worksheet.table import Table, TableStyleInfo
+
+      def buildOrderForm(path):
+          book = Workbook()
+          sheet = book.active
+          sheet.title = "orders"
+          sheet.append(["order_id", "region", "amount", "status", "priority"])
+          sheet.append(["A001", "Seoul", 120000, "ok", "high"])
+          sheet.append(["A002", "Busan", 80000, "refund", "low"])
+
+          table = Table(displayName="ordersTable", ref=___)
+          table.tableStyleInfo = TableStyleInfo(name="TableStyleMedium9", showRowStripes=True)
+          sheet.add_table(table)
+
+          priorityDv = DataValidation(type="list", formula1='"high,normal,low"', allow_blank=True)
+          sheet.add_data_validation(priorityDv)
+          priorityDv.add("E2:E100")
+
+          sheet.freeze_panes = "A2"
+          book.save(path)
+          return path
+
+      workdir = TemporaryDirectory()
+      formPath = buildOrderForm(Path(workdir.name) / "order_form.xlsx")
+      reopened = load_workbook(formPath)
+      assert "ordersTable" in reopened["orders"].tables
+      reopened["orders"].tables["ordersTable"].ref
+    hints:
+    - "헤더 포함 'A1:E3' 영역. priority 추가로 컬럼이 5개."
+  check:
+    noError: Table의 ref가 헤더 포함 데이터 영역과 정확히 일치해야 합니다.
+    resultCheck: ref가 "A1:E3"이어야 합니다.
+- id: practice
+  title: 실습 - 종합 미션 2개
+  structuredPrimary: true
+  subtitle: import부터 검증까지 독립 실행
+  goal: Table·DataValidation·freeze_panes를 두 가지 실무 양식에 결합한다.
+  why: 입력 양식의 무결성은 단계별 예제만으로는 부족합니다. 여러 검증을 한 양식에 결합해 봐야 양식이 양식답게 동작합니다.
+  explanation: |-
+    미션1은 휴가 신청서(부서 드롭다운 + 일수 1~30 범위 + Table + 헤더 고정)입니다. 미션2는 재고 입력 양식(카테고리 드롭다운 + 수량 양수 검증 + Table + A열까지 고정)입니다.
+  tips:
+  - 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  - 변수 prefix는 \`leave*\`(미션1), \`stock*\`(미션2)로 격리됩니다. Table displayName도 미션별로 다르게 두지 않으면 ValueError가 납니다.
+  snippet: |-
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    from openpyxl import Workbook, load_workbook
+    from openpyxl.worksheet.datavalidation import DataValidation
+    from openpyxl.worksheet.table import Table, TableStyleInfo
+  exercise:
+    prompt: 두 미션을 직접 작성한 뒤 expansion 정답과 비교하세요.
+    starterCode: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from openpyxl import Workbook, load_workbook
+      from openpyxl.worksheet.datavalidation import DataValidation
+      from openpyxl.worksheet.table import Table, TableStyleInfo
+
+      workdir = TemporaryDirectory()
+      target = Path(workdir.name) / "mission.xlsx"
+      ___
+    hints:
+    - 미션1 부서 목록은 '"영업,개발,운영"' 형식, 일수는 decimal 1~30.
+    - 미션2 카테고리는 '"가전,주방,사무"', 수량은 decimal greaterThan 0.
+  check:
+    noError: DataValidation의 formula1은 큰따옴표로 감싼 콤마 문자열이어야 합니다.
+    resultCheck: 재오픈 후 tables 개수와 freeze_panes 값이 모두 보존되어야 합니다.
+  blocks:
+  - type: tip
+    content: Table의 displayName은 워크북 전역에서 고유해야 합니다. 두 미션을 한 파일에 합치지 말고 별도 파일로 분리하세요.
+  - type: expansion
+    title: "미션1: 휴가 신청서 양식"
+    blocks:
+    - type: code
+      title: 부서 드롭다운 + 일수 범위 + Table + 헤더 고정
+      content: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from openpyxl import Workbook, load_workbook
+        from openpyxl.worksheet.datavalidation import DataValidation
+        from openpyxl.worksheet.table import Table, TableStyleInfo
+
+        leaveDir = TemporaryDirectory()
+        leavePath = Path(leaveDir.name) / "leave.xlsx"
+
+        leaveBook = Workbook()
+        leaveSheet = leaveBook.active
+        leaveSheet.title = "leaves"
+        leaveSheet.append(["사번", "부서", "사유", "일수", "시작일"])
+        leaveSheet.append(["E001", "영업", "연차", 3, "2026-06-03"])
+        leaveSheet.append(["E002", "개발", "병가", 1, "2026-06-05"])
+
+        deptDv = DataValidation(type="list", formula1='"영업,개발,운영"', allow_blank=False)
+        deptDv.errorTitle = "부서 선택"
+        deptDv.error = "영업/개발/운영 중 하나를 선택하세요."
+        leaveSheet.add_data_validation(deptDv)
+        deptDv.add("B2:B100")
+
+        daysDv = DataValidation(type="decimal", operator="between", formula1=1, formula2=30)
+        daysDv.errorTitle = "일수 범위"
+        daysDv.error = "1~30일 사이로 입력하세요."
+        leaveSheet.add_data_validation(daysDv)
+        daysDv.add("D2:D100")
+
+        leaveTable = Table(displayName="LeaveTable", ref="A1:E3")
+        leaveTable.tableStyleInfo = TableStyleInfo(name="TableStyleMedium2", showRowStripes=True)
+        leaveSheet.add_table(leaveTable)
+        leaveSheet.freeze_panes = "A2"
+        leaveBook.save(leavePath)
+        leaveSheet.freeze_panes
+    - type: code
+      title: 양식 무결성 검증
+      content: |-
+        leaveReopen = load_workbook(leavePath)
+        leaveBack = leaveReopen["leaves"]
+        assert len(leaveBack.tables) == 1
+        assert "LeaveTable" in leaveBack.tables
+        assert leaveBack.freeze_panes == "A2"
+        assert len(leaveBack.data_validations.dataValidation) == 2
+        len(leaveBack.tables), leaveBack.freeze_panes
+  - type: expansion
+    title: "미션2: 재고 입력 양식"
+    blocks:
+    - type: code
+      title: 카테고리 드롭다운 + 수량 양수 + Table + 첫 열 고정
+      content: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from openpyxl import Workbook, load_workbook
+        from openpyxl.worksheet.datavalidation import DataValidation
+        from openpyxl.worksheet.table import Table, TableStyleInfo
+
+        stockDir = TemporaryDirectory()
+        stockPath = Path(stockDir.name) / "stock.xlsx"
+
+        stockBook = Workbook()
+        stockSheet = stockBook.active
+        stockSheet.title = "stocks"
+        stockSheet.append(["품번", "카테고리", "수량", "단가"])
+        stockSheet.append(["SKU-1", "가전", 12, 480000])
+        stockSheet.append(["SKU-2", "주방", 25, 35000])
+
+        categoryDv = DataValidation(type="list", formula1='"가전,주방,사무"', allow_blank=False)
+        categoryDv.errorTitle = "카테고리 선택"
+        categoryDv.error = "가전/주방/사무 중 하나를 선택하세요."
+        stockSheet.add_data_validation(categoryDv)
+        categoryDv.add("B2:B100")
+
+        qtyDv = DataValidation(type="decimal", operator="greaterThan", formula1=0)
+        qtyDv.errorTitle = "수량은 양수"
+        qtyDv.error = "0보다 큰 수량을 입력하세요."
+        stockSheet.add_data_validation(qtyDv)
+        qtyDv.add("C2:C100")
+
+        stockTable = Table(displayName="StockTable", ref="A1:D3")
+        stockTable.tableStyleInfo = TableStyleInfo(name="TableStyleLight9", showRowStripes=True)
+        stockSheet.add_table(stockTable)
+        stockSheet.freeze_panes = "B2"
+        stockBook.save(stockPath)
+        stockSheet.freeze_panes
+    - type: code
+      title: 양식 무결성 검증
+      content: |-
+        stockReopen = load_workbook(stockPath)
+        stockBack = stockReopen["stocks"]
+        assert "StockTable" in stockBack.tables
+        assert stockBack.freeze_panes == "B2"
+        assert len(stockBack.data_validations.dataValidation) == 2
+        len(stockBack.tables), stockBack.freeze_panes
+- id: summary
+  title: 정리
+  subtitle: 양식의 무결성을 코드로
+  blocks:
+  - type: text
+    content: |-
+      입력 양식의 무결성을 표·검증·고정창으로 잠그면, 사용자의 실수는 자연스럽게 줄어듭니다. 다음 강의에서는 모든 강의의 기술을 한 워크북에 통합해 월간 매출 리포트 자동 생성기를 완성합니다.
+  - type: list
+    style: bullet
+    items:
+    - "Table(displayName, ref) + TableStyleInfo로 정렬·필터·줄무늬"
+    - "DataValidation type=list/decimal/date로 입력 제약, add(range)로 영역 적용"
+    - "errorTitle/error 문자열로 사용자에게 친절한 가이드"
+    - "freeze_panes = 'A2'로 헤더 고정, 'B2'면 A열까지 고정"
+    - "Table을 쓰면 auto_filter가 자동으로 켜진다 - 일반 영역에만 auto_filter.ref 따로 지정"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: openpyxl_09-table-validation-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_table
+    - summary
+    title: Excel table header·range와 data validation 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 빈·중복 header, table 이름 충돌, validation source 누락을 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - table header는 비어 있지 않고 table 안에서 유일해야 합니다.
+    - list validation은 source identity와 적용 range를 함께 검증하세요.
+    exercise:
+      prompt: audit_table_validation(tables, validations)를 완성하세요.
+      starterCode: |-
+        def audit_table_validation(tables, validations):
+            raise NotImplementedError
+      solution: |
+        def audit_table_validation(tables, validations):
+            failures = []
+            table_names = [table["name"] for table in tables]
+            duplicate_tables = sorted({name for name in table_names if table_names.count(name) > 1})
+            invalid_tables = []
+            for table in tables:
+                headers = table.get("headers", [])
+                reasons = []
+                if not headers or any(not header for header in headers) or len(headers) != len(set(headers)):
+                    reasons.append("headers")
+                if not table.get("range"):
+                    reasons.append("range")
+                if reasons:
+                    invalid_tables.append({"name": table["name"], "reasons": reasons})
+            invalid_validations = sorted(item["range"] for item in validations if item.get("type") == "list" and not item.get("source"))
+            if duplicate_tables:
+                failures.append("table-names")
+            if invalid_tables:
+                failures.append("tables")
+            if invalid_validations:
+                failures.append("validations")
+            return {"accepted": not failures, "failures": failures, "duplicateTables": duplicate_tables, "invalidTables": invalid_tables, "invalidValidations": invalid_validations}
+      hints: *id001
+    check:
+      id: python.openpyxl.openpyxl_09.table-validation-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_09.table-validation-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_table_validation
+        cases:
+        - id: accepts-table-and-list-validation
+          arguments:
+          - value:
+            - name: Sales
+              range: A1:B3
+              headers:
+              - Month
+              - Amount
+          - value:
+            - range: A2:A3
+              type: list
+              source:
+              - Jan
+              - Feb
+          expectedReturn:
+            accepted: true
+            failures: []
+            duplicateTables: []
+            invalidTables: []
+            invalidValidations: []
+        - id: reports-duplicate-table-and-headers
+          arguments:
+          - value:
+            - name: T
+              range: A1
+              headers:
+              - A
+              - A
+            - name: T
+              range: B1
+              headers:
+              - B
+          - value: []
+          expectedReturn:
+            accepted: false
+            failures:
+            - table-names
+            - tables
+            duplicateTables:
+            - T
+            invalidTables:
+            - name: T
+              reasons:
+              - headers
+            invalidValidations: []
+        - id: reports-missing-validation-source
+          arguments:
+          - value: []
+          - value:
+            - range: B2:B10
+              type: list
+              source: []
+          expectedReturn:
+            accepted: false
+            failures:
+            - validations
+            duplicateTables: []
+            invalidTables: []
+            invalidValidations:
+            - B2:B10
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: openpyxl_09-table-row-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - openpyxl_09-table-validation-contract-mastery
+    title: 새 Excel table에 source row reconciliation 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: primary key와 row hash로 workbook table과 source를 대조한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - row 순서가 아니라 primary key와 row hash로 table을 대조하세요.
+    - source와 workbook 양쪽의 duplicate key를 따로 보고하세요.
+    exercise:
+      prompt: reconcile_table_rows(source_rows, workbook_rows, key_field)를 완성하세요.
+      starterCode: |-
+        def reconcile_table_rows(source_rows, workbook_rows, key_field):
+            raise NotImplementedError
+      solution: |
+        def reconcile_table_rows(source_rows, workbook_rows, key_field):
+            def index(rows):
+                result = {}
+                duplicates = []
+                for row in rows:
+                    key = row[key_field]
+                    if key in result:
+                        duplicates.append(key)
+                    result[key] = row["rowHash"]
+                return result, sorted(set(duplicates))
+            source, source_duplicates = index(source_rows)
+            workbook, workbook_duplicates = index(workbook_rows)
+            missing = sorted(set(source) - set(workbook))
+            unexpected = sorted(set(workbook) - set(source))
+            changed = sorted(key for key in set(source) & set(workbook) if source[key] != workbook[key])
+            return {"passed": not source_duplicates and not workbook_duplicates and not missing and not unexpected and not changed, "sourceDuplicates": source_duplicates, "workbookDuplicates": workbook_duplicates, "missing": missing, "unexpected": unexpected, "changed": changed}
+      hints: *id002
+    check:
+      id: python.openpyxl.openpyxl_09.table-row-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_09.table-row-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_table_rows
+        cases:
+        - id: accepts-reordered-identical-rows
+          arguments:
+          - value:
+            - id: a
+              rowHash: x
+            - id: b
+              rowHash: y
+          - value:
+            - id: b
+              rowHash: y
+            - id: a
+              rowHash: x
+          - value: id
+          expectedReturn:
+            passed: true
+            sourceDuplicates: []
+            workbookDuplicates: []
+            missing: []
+            unexpected: []
+            changed: []
+        - id: reports-missing-unexpected-and-changed
+          arguments:
+          - value:
+            - id: a
+              rowHash: x
+            - id: b
+              rowHash: y
+          - value:
+            - id: a
+              rowHash: z
+            - id: c
+              rowHash: q
+          - value: id
+          expectedReturn:
+            passed: false
+            sourceDuplicates: []
+            workbookDuplicates: []
+            missing:
+            - b
+            unexpected:
+            - c
+            changed:
+            - a
+        - id: reports-duplicate-primary-key
+          arguments:
+          - value:
+            - id: a
+              rowHash: x
+            - id: a
+              rowHash: x
+          - value: []
+          - value: id
+          expectedReturn:
+            passed: false
+            sourceDuplicates:
+            - a
+            workbookDuplicates: []
+            missing:
+            - a
+            unexpected: []
+            changed: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: openpyxl_09-excel-table-validation-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - openpyxl_09-table-row-reconciliation-transfer
+    title: Excel table·data validation 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: header·validation·row reconciliation 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Workbook 저장 성공과 업무 값·수식·표시의 정확성을 분리해 검증하세요.
+    - Web에서는 문서 계약을 검증하고 Local에서는 재개방한 artifact evidence를 남기세요.
+    exercise:
+      prompt: choose_table_validation_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_table_validation_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_table_validation_evidence(situation):
+            table = {'table': {'action': 'validate unique headers and range', 'evidence': 'table manifest', 'risk': 'ambiguous column'}, 'validation': {'action': 'bind type source and range', 'evidence': 'validation contract', 'risk': 'invalid user input'}, 'rows': {'action': 'reconcile primary key and row hash', 'evidence': 'missing unexpected changed', 'risk': 'silent row drift'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.openpyxl.openpyxl_09.excel-table-validation-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_09.excel-table-validation-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_table_validation_evidence
+        cases:
+        - id: recalls-table
+          arguments:
+          - value: table
+          expectedReturn:
+            action: validate unique headers and range
+            evidence: table manifest
+            risk: ambiguous column
+        - id: recalls-validation
+          arguments:
+          - value: validation
+          expectedReturn:
+            action: bind type source and range
+            evidence: validation contract
+            risk: invalid user input
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,985 @@
+var e=`meta:
+  packages:
+  - pydantic
+  id: pydantic_07
+  title: 커스텀타입정의
+  order: 7
+  category: pydantic
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  tags:
+  - pydantic
+  - custom-type
+  - Annotated
+  - AfterValidator
+  - 타입
+  seo:
+    title: Pydantic 커스텀 타입 - 재사용 가능한 검증 타입
+    description: Pydantic으로 커스텀 타입을 정의합니다. Annotated, AfterValidator, 제약 타입을 배웁니다.
+    keywords:
+    - pydantic
+    - custom-type
+    - Annotated
+    - validator
+intro:
+  emoji: 🎨
+  goal: 도메인 특화 커스텀 타입으로 한국형 비즈니스 데이터 검증 라이브러리를 구축합니다.
+  description: 같은 검증 로직을 여러 모델에서 반복하면 유지보수가 어려워집니다. Annotated와 검증기를 조합하여 재사용 가능한 커스텀 타입을 정의하면, 전화번호, 사업자번호,
+    우편번호 등 도메인 특화 타입을 만들어 프로젝트 전체에서 일관되게 사용할 수 있습니다.
+  direction: 커스텀타입정의에서 입력 스키마를 정의하고 검증된 데이터만 처리 흐름에 넘김합니다.
+  benefits:
+  - 외부 입력 확인 후 스키마 검증에 맞는 코드 입력을 고릅니다.
+  - 커스텀타입정의 결과를 성공 모델과 오류 메시지 기준으로 즉시 점검합니다.
+  - 완료한 코드를 API/자동화 입력 계약에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 라이브러리 로드 입력 확인
+      detail: 입력 기준(외부 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: Annotated 기초 처리 실행
+      detail: 스키마 검증 코드를 실행해 중간 결과를 확인합니다.
+    - label: AfterValidator 결과 검증
+      detail: 성공 모델과 오류 메시지 기준으로 실행 결과를 비교합니다.
+    - label: 커스텀타입정의 재사용
+      detail: 완성 코드를 API/자동화 입력 계약에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 데이터 계약 환경
+      detail: pydantic 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 커스텀타입정의 실행
+      detail: 셀을 실행해 성공 모델과 오류 메시지와 예외 상태를 확인합니다.
+    - label: 커스텀타입정의 완료
+      detail: 검증된 코드를 API/자동화 입력 계약로 남깁니다.
+sections:
+- id: load
+  title: 라이브러리 로드
+  structuredPrimary: true
+  subtitle: Pydantic import 확인
+  goal: 라이브러리 로드에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: Annotated는 Python 타입 힌트에 메타데이터를 추가하는 표준 방법입니다. Pydantic은 Annotated에 Field나 검증기를 넣어 타입 자체에
+    검증 규칙을 포함시킵니다. 이렇게 만든 타입 별칭은 어떤 모델에서든 재사용할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import re
+    import pydantic
+    from typing import Annotated, Optional
+    from pydantic import BaseModel, Field, BeforeValidator, AfterValidator, ValidationError
+  exercise:
+    prompt: 라이브러리 로드 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: |-
+      import re
+      import pydantic
+      from typing import Annotated, Optional
+      from pydantic import BaseModel, Field, BeforeValidator, AfterValidator, ValidationError
+    hints:
+    - 바꿀 지점은 외부 입력을 만드는 첫 줄과 스키마 검증 줄에서 찾으세요.
+    - 실행 뒤 성공 모델과 오류 메시지 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 라이브러리 로드의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 라이브러리 로드 실행 결과가 성공 모델과 오류 메시지 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: annotated
+  title: Annotated 기초
+  structuredPrimary: true
+  subtitle: 타입에 메타데이터 추가
+  goal: Annotated 기초에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    Annotated[타입, 메타데이터]로 기존 타입에 검증 규칙을 추가합니다. Field의 제약조건(gt, min_length 등)을 타입 자체에 포함시키면 모든 필드에서 동일한 규칙을 적용할 수 있습니다.
+
+    PositiveInt를 사용하는 모든 필드에 gt=0 제약이 자동 적용됩니다. 규칙 변경 시 타입 정의만 수정하면 됩니다.
+  snippet: |-
+    PositiveInt = Annotated[int, Field(gt=0)]
+    ShortString = Annotated[str, Field(max_length=50)]
+
+    class Product(BaseModel):
+        productId: PositiveInt
+        name: ShortString
+        price: PositiveInt
+
+    product = Product(productId=1, name="Laptop", price=999)
+    product
+  exercise:
+    prompt: Annotated 기초 예제에서 모델 필드나 입력 dict 값을 바꾸고 검증/직렬화 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      PositiveInt = Annotated[int, Field(gt=0)]
+      ShortString = Annotated[str, Field(max_length=50)]
+
+      class Product(BaseModel):
+          productId: PositiveInt
+          name: ShortString
+          price: PositiveInt
+
+      product = Product(productId=1, name="Laptop", price=999)
+      product
+    hints:
+    - 바꿀 지점은 모델 필드 선언, 입력 dict, 생성 인자입니다.
+    - 실행 뒤 model_dump(), 오류 메시지, 반환값이 바꾼 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: Annotated 기초에서 \`PositiveInt\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: Annotated 기초 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: aftervalidator
+  title: AfterValidator
+  structuredPrimary: true
+  subtitle: 값 변환과 검증
+  goal: AfterValidator에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: AfterValidator는 타입 변환 후 추가 검증이나 정규화를 수행합니다. 이메일 소문자 변환, 전화번호 형식 통일, 공백 제거 등에 활용합니다. 함수에서
+    ValueError를 발생시키면 검증 실패로 처리됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def normalizeEmail(v: str) -> str:
+        return v.lower().strip()
+
+    NormalizedEmail = Annotated[str, AfterValidator(normalizeEmail)]
+
+    class User(BaseModel):
+        email: NormalizedEmail
+
+    user = User(email="  ALICE@EXAMPLE.COM  ")
+    user.email
+  exercise:
+    prompt: AfterValidator 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def normalizeEmail(v: str) -> str:
+          return v.lower().strip()
+
+      NormalizedEmail = Annotated[str, AfterValidator(normalizeEmail)]
+
+      class User(BaseModel):
+          email: NormalizedEmail
+
+      user = User(email="  ALICE@EXAMPLE.COM  ")
+      user.email
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: AfterValidator의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: AfterValidator 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: beforevalidator
+  title: BeforeValidator
+  structuredPrimary: true
+  subtitle: 사전 변환
+  goal: BeforeValidator에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: BeforeValidator는 타입 변환 전에 실행됩니다. 다양한 형식의 입력을 통일하거나, 특수한 값을 처리할 때 유용합니다. 날짜 문자열을 여러 형식으로
+    받거나, yes/no를 bool로 변환하는 등에 활용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def parseBoolean(v):
+        if isinstance(v, bool):
+            return v
+        if isinstance(v, str):
+            if v.lower() in ('true', 'yes', '1', 'on', 'y'):
+                return True
+            if v.lower() in ('false', 'no', '0', 'off', 'n'):
+                return False
+        raise ValueError(f"불리언으로 변환 불가: {v}")
+
+    FlexBool = Annotated[bool, BeforeValidator(parseBoolean)]
+
+    class Settings(BaseModel):
+        debug: FlexBool
+        cache: FlexBool
+
+    settings = Settings(debug="yes", cache="off")
+    settings.debug, settings.cache
+  exercise:
+    prompt: BeforeValidator 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def parseBoolean(v):
+          if isinstance(v, bool):
+              return v
+          if isinstance(v, str):
+              if v.lower() in ('true', 'yes', '1', 'on', 'y'):
+                  return True
+              if v.lower() in ('false', 'no', '0', 'off', 'n'):
+                  return False
+          raise ValueError(f"불리언으로 변환 불가: {v}")
+
+      FlexBool = Annotated[bool, BeforeValidator(parseBoolean)]
+
+      class Settings(BaseModel):
+          debug: FlexBool
+          cache: FlexBool
+
+      settings = Settings(debug="yes", cache="off")
+      settings.debug, settings.cache
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: BeforeValidator의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: BeforeValidator 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: combined
+  title: 검증기 조합
+  structuredPrimary: true
+  subtitle: 다중 검증기 체인
+  goal: 검증기 조합에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: 여러 검증기를 조합하여 복잡한 변환 파이프라인을 구성할 수 있습니다. BeforeValidator로 전처리하고, AfterValidator로 후처리하는 식으로
+    단계별 검증을 구현합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def stripWhitespace(v: str) -> str:
+        return v.strip()
+
+    def validateNotEmpty(v: str) -> str:
+        if not v:
+            raise ValueError("빈 문자열 불허")
+        return v
+
+    def capitalizeFirst(v: str) -> str:
+        return v.capitalize()
+
+    CleanName = Annotated[
+        str,
+        BeforeValidator(stripWhitespace),
+        AfterValidator(validateNotEmpty),
+        AfterValidator(capitalizeFirst)
+    ]
+
+    class Person(BaseModel):
+        name: CleanName
+
+    person = Person(name="  alice  ")
+    person.name
+  exercise:
+    prompt: 검증기 조합 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def stripWhitespace(v: str) -> str:
+          return v.strip()
+
+      def validateNotEmpty(v: str) -> str:
+          if not v:
+              raise ValueError("빈 문자열 불허")
+          return v
+
+      def capitalizeFirst(v: str) -> str:
+          return v.capitalize()
+
+      CleanName = Annotated[
+          str,
+          BeforeValidator(stripWhitespace),
+          AfterValidator(validateNotEmpty),
+          AfterValidator(capitalizeFirst)
+      ]
+
+      class Person(BaseModel):
+          name: CleanName
+
+      person = Person(name="  alice  ")
+      person.name
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: 검증기 조합의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 검증기 조합 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: constrained
+  title: 제약 타입
+  structuredPrimary: true
+  subtitle: constr, conint, confloat
+  goal: 제약 타입에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: Pydantic은 자주 사용되는 제약 타입을 제공합니다. constr은 문자열 길이와 패턴을, conint와 confloat는 숫자 범위를 제한합니다. 간단한
+    제약에는 이들을 사용하고, 복잡한 로직은 AfterValidator를 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from pydantic import constr, conint, confloat
+
+    Username = constr(min_length=3, max_length=20, pattern=r'^[a-zA-Z0-9_]+$')
+    Age = conint(ge=0, le=150)
+    Price = confloat(gt=0, le=100000000)
+
+    class Account(BaseModel):
+        username: Username
+        age: Age
+        balance: Price
+
+    account = Account(username="alice_123", age=25, balance=10000.50)
+    account
+  exercise:
+    prompt: 제약 타입 예제에서 모델 필드나 입력 dict 값을 바꾸고 검증/직렬화 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from pydantic import constr, conint, confloat
+
+      Username = constr(min_length=3, max_length=20, pattern=r'^[a-zA-Z0-9_]+$')
+      Age = conint(ge=0, le=150)
+      Price = confloat(gt=0, le=100000000)
+
+      class Account(BaseModel):
+          username: Username
+          age: Age
+          balance: Price
+
+      account = Account(username="alice_123", age=25, balance=10000.50)
+      account
+    hints:
+    - 바꿀 지점은 모델 필드 선언, 입력 dict, 생성 인자입니다.
+    - 실행 뒤 model_dump(), 오류 메시지, 반환값이 바꾼 입력을 반영하는지 보세요.
+  check:
+    noError: 제약 타입의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 제약 타입의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: string
+  title: 문자열 제약
+  structuredPrimary: true
+  subtitle: StringConstraints
+  goal: 문자열 제약에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: StringConstraints는 문자열에 대한 상세한 제약을 정의합니다. 길이, 패턴 외에도 자동 소문자 변환(to_lower), 공백 제거(strip_whitespace)
+    등의 변환도 포함할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from pydantic import StringConstraints
+
+    SlugType = Annotated[str, StringConstraints(
+        min_length=3,
+        max_length=50,
+        pattern=r'^[a-z0-9]+(?:-[a-z0-9]+)*$',
+        to_lower=True,
+        strip_whitespace=True
+    )]
+
+    class Article(BaseModel):
+        slug: SlugType
+
+    article = Article(slug="  my-first-post  ")
+    article.slug
+  exercise:
+    prompt: 문자열 제약 예제에서 모델 필드나 입력 dict 값을 바꾸고 검증/직렬화 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from pydantic import StringConstraints
+
+      SlugType = Annotated[str, StringConstraints(
+          min_length=3,
+          max_length=50,
+          pattern=r'^[a-z0-9]+(?:-[a-z0-9]+)*$',
+          to_lower=True,
+          strip_whitespace=True
+      )]
+
+      class Article(BaseModel):
+          slug: SlugType
+
+      article = Article(slug="  my-first-post  ")
+      article.slug
+    hints:
+    - 바꿀 지점은 모델 필드 선언, 입력 dict, 생성 인자입니다.
+    - 실행 뒤 model_dump(), 오류 메시지, 반환값이 바꾼 입력을 반영하는지 보세요.
+  check:
+    noError: 문자열 제약의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 문자열 제약의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: domain
+  title: 도메인 타입
+  structuredPrimary: true
+  subtitle: 한국형 비즈니스 타입
+  goal: 도메인 타입에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: 실제 비즈니스에서 필요한 한국형 데이터 타입을 정의합니다. 사업자등록번호, 주민등록번호 앞자리, 우편번호 등 한국 시장에 특화된 검증 로직을 타입으로 캡슐화합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def validateBizNumber(v: str) -> str:
+        cleaned = re.sub(r'[^0-9]', '', v)
+        if len(cleaned) != 10:
+            raise ValueError("사업자등록번호는 10자리입니다")
+        return f"{cleaned[:3]}-{cleaned[3:5]}-{cleaned[5:]}"
+
+    BusinessNumber = Annotated[str, AfterValidator(validateBizNumber)]
+
+    class Company(BaseModel):
+        bizNumber: BusinessNumber
+
+    company = Company(bizNumber="123-45-67890")
+    company.bizNumber
+  exercise:
+    prompt: 도메인 타입 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def validateBizNumber(v: str) -> str:
+          cleaned = re.sub(r'[^0-9]', '', v)
+          if len(cleaned) != 10:
+              raise ValueError("사업자등록번호는 10자리입니다")
+          return f"{cleaned[:3]}-{cleaned[3:5]}-{cleaned[5:]}"
+
+      BusinessNumber = Annotated[str, AfterValidator(validateBizNumber)]
+
+      class Company(BaseModel):
+          bizNumber: BusinessNumber
+
+      company = Company(bizNumber="123-45-67890")
+      company.bizNumber
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: 도메인 타입의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 도메인 타입 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: library
+  title: 타입 라이브러리
+  structuredPrimary: true
+  subtitle: 재사용 가능한 타입 모음
+  goal: 타입 라이브러리에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 프로젝트에서 공통으로 사용할 타입들을 모아 라이브러리로 정리합니다. 한 곳에서 정의하고 모든 모델에서 import하여 사용하면 일관성을 유지하고 유지보수가
+    쉬워집니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    PositiveFloat = Annotated[float, Field(gt=0)]
+    NonNegativeInt = Annotated[int, Field(ge=0)]
+    Percentage = Annotated[float, Field(ge=0, le=100)]
+    NonEmptyStr = Annotated[str, Field(min_length=1)]
+    ShortText = Annotated[str, Field(max_length=100)]
+    LongText = Annotated[str, Field(max_length=10000)]
+
+    class OrderLine(BaseModel):
+        productName: NonEmptyStr
+        quantity: NonNegativeInt
+        unitPrice: PositiveFloat
+        discount: Percentage = 0
+
+    orderLine = OrderLine(productName="Laptop", quantity=2, unitPrice=1000000, discount=10)
+    orderLine
+  exercise:
+    prompt: 타입 라이브러리 예제에서 모델 필드나 입력 dict 값을 바꾸고 검증/직렬화 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      PositiveFloat = Annotated[float, Field(gt=0)]
+      NonNegativeInt = Annotated[int, Field(ge=0)]
+      Percentage = Annotated[float, Field(ge=0, le=100)]
+      NonEmptyStr = Annotated[str, Field(min_length=1)]
+      ShortText = Annotated[str, Field(max_length=100)]
+      LongText = Annotated[str, Field(max_length=10000)]
+
+      class OrderLine(BaseModel):
+          productName: NonEmptyStr
+          quantity: NonNegativeInt
+          unitPrice: PositiveFloat
+          discount: Percentage = 0
+
+      orderLine = OrderLine(productName="Laptop", quantity=2, unitPrice=1000000, discount=10)
+      orderLine
+    hints:
+    - 바꿀 지점은 모델 필드 선언, 입력 dict, 생성 인자입니다.
+    - 실행 뒤 model_dump(), 오류 메시지, 반환값이 바꾼 입력을 반영하는지 보세요.
+  check:
+    noError: 타입 라이브러리에서 \`PositiveFloat\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 타입 라이브러리 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: result
+  title: 한국형 비즈니스 타입
+  structuredPrimary: true
+  subtitle: 종합 타입 라이브러리
+  goal: 한국형 비즈니스 타입에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: 지금까지 배운 모든 기법을 종합하여 한국 비즈니스 환경에 맞는 타입 라이브러리를 완성합니다. 휴대폰 번호, 사업자등록번호, 우편번호, 금액 등을 모두 포함합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def validateKorPhone(v: str) -> str:
+        cleaned = re.sub(r'[^0-9]', '', v)
+        if len(cleaned) != 11 or not cleaned.startswith('010'):
+            raise ValueError("유효한 휴대폰 번호가 아닙니다")
+        return f"{cleaned[:3]}-{cleaned[3:7]}-{cleaned[7:]}"
+
+    def validateBizNum(v: str) -> str:
+        cleaned = re.sub(r'[^0-9]', '', v)
+        if len(cleaned) != 10:
+            raise ValueError("사업자등록번호는 10자리입니다")
+        return f"{cleaned[:3]}-{cleaned[3:5]}-{cleaned[5:]}"
+
+    def validatePostal(v: str) -> str:
+        cleaned = re.sub(r'[^0-9]', '', v)
+        if len(cleaned) != 5:
+            raise ValueError("우편번호는 5자리입니다")
+        return cleaned
+
+    KoreanPhone = Annotated[str, AfterValidator(validateKorPhone)]
+    BizNumber = Annotated[str, AfterValidator(validateBizNum)]
+    KorPostal = Annotated[str, AfterValidator(validatePostal)]
+    KRWAmount = Annotated[int, Field(ge=0, description="원화 금액")]
+
+    class BusinessEntity(BaseModel):
+        companyName: NonEmptyStr
+        bizNumber: BizNumber
+        phone: KoreanPhone
+        postalCode: KorPostal
+        capital: KRWAmount
+
+    entity = BusinessEntity(
+        companyName="테크회사",
+        bizNumber="1234567890",
+        phone="010.1234.5678",
+        postalCode="06234",
+        capital=100000000
+    )
+    entity
+  exercise:
+    prompt: 한국형 비즈니스 타입 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def validateKorPhone(v: str) -> str:
+          cleaned = re.sub(r'[^0-9]', '', v)
+          if len(cleaned) != 11 or not cleaned.startswith('010'):
+              raise ValueError("유효한 휴대폰 번호가 아닙니다")
+          return f"{cleaned[:3]}-{cleaned[3:7]}-{cleaned[7:]}"
+
+      def validateBizNum(v: str) -> str:
+          cleaned = re.sub(r'[^0-9]', '', v)
+          if len(cleaned) != 10:
+              raise ValueError("사업자등록번호는 10자리입니다")
+          return f"{cleaned[:3]}-{cleaned[3:5]}-{cleaned[5:]}"
+
+      def validatePostal(v: str) -> str:
+          cleaned = re.sub(r'[^0-9]', '', v)
+          if len(cleaned) != 5:
+              raise ValueError("우편번호는 5자리입니다")
+          return cleaned
+
+      KoreanPhone = Annotated[str, AfterValidator(validateKorPhone)]
+      BizNumber = Annotated[str, AfterValidator(validateBizNum)]
+      KorPostal = Annotated[str, AfterValidator(validatePostal)]
+      KRWAmount = Annotated[int, Field(ge=0, description="원화 금액")]
+
+      class BusinessEntity(BaseModel):
+          companyName: NonEmptyStr
+          bizNumber: BizNumber
+          phone: KoreanPhone
+          postalCode: KorPostal
+          capital: KRWAmount
+
+      entity = BusinessEntity(
+          companyName="테크회사",
+          bizNumber="1234567890",
+          phone="010.1234.5678",
+          postalCode="06234",
+          capital=100000000
+      )
+      entity
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: 한국형 비즈니스 타입의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 한국형 비즈니스 타입 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 커스텀 타입 프로젝트
+  goal: 실습에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    지금까지 배운 Annotated, AfterValidator, BeforeValidator, 제약 타입을 활용하여 도메인 특화 타입을 정의합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    from typing import Annotated
+    from pydantic import BaseModel, Field, AfterValidator, BeforeValidator, ValidationError
+    import re
+
+    def validateCardNumber(v: str) -> str:
+        cleaned = re.sub(r'[^0-9]', '', v)
+        if len(cleaned) != 16:
+            raise ValueError("카드번호는 16자리입니다")
+        return f"{cleaned[:4]}-{cleaned[4:8]}-{cleaned[8:12]}-{cleaned[12:]}"
+
+    def maskCard(v: str) -> str:
+        cleaned = re.sub(r'[^0-9]', '', v)
+        if len(cleaned) < 16:
+            raise ValueError("카드번호는 16자리입니다")
+        return f"{cleaned[:4]}-****-****-{cleaned[12:]}"
+
+    def validateCVV(v: str) -> str:
+        if not v.isdigit() or len(v) not in (3, 4):
+            raise ValueError("CVV는 3-4자리 숫자입니다")
+        return v
+
+    CardNumber = Annotated[str, AfterValidator(validateCardNumber)]
+    MaskedCard = Annotated[str, AfterValidator(maskCard)]
+    CVV = Annotated[str, AfterValidator(validateCVV)]
+    MoneyAmount = Annotated[float, Field(gt=0)]
+
+    class PaymentCard(BaseModel):
+        cardNumber: CardNumber
+        cvv: CVV
+        expiryMonth: int = Field(ge=1, le=12)
+        expiryYear: int = Field(ge=2024, le=2040)
+
+    card = PaymentCard(
+        cardNumber="1234 5678 9012 3456",
+        cvv="123",
+        expiryMonth=12,
+        expiryYear=2025
+    )
+    card
+  exercise:
+    prompt: 실습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      from typing import Annotated
+      from pydantic import BaseModel, Field, AfterValidator, BeforeValidator, ValidationError
+      import re
+
+      def validateCardNumber(v: str) -> str:
+          cleaned = re.sub(r'[^0-9]', '', v)
+          if len(cleaned) != 16:
+              raise ValueError("카드번호는 16자리입니다")
+          return f"{cleaned[:4]}-{cleaned[4:8]}-{cleaned[8:12]}-{cleaned[12:]}"
+
+      def maskCard(v: str) -> str:
+          cleaned = re.sub(r'[^0-9]', '', v)
+          if len(cleaned) < 16:
+              raise ValueError("카드번호는 16자리입니다")
+          return f"{cleaned[:4]}-****-****-{cleaned[12:]}"
+
+      def validateCVV(v: str) -> str:
+          if not v.isdigit() or len(v) not in (3, 4):
+              raise ValueError("CVV는 3-4자리 숫자입니다")
+          return v
+
+      CardNumber = Annotated[str, AfterValidator(validateCardNumber)]
+      MaskedCard = Annotated[str, AfterValidator(maskCard)]
+      CVV = Annotated[str, AfterValidator(validateCVV)]
+      MoneyAmount = Annotated[float, Field(gt=0)]
+
+      class PaymentCard(BaseModel):
+          cardNumber: CardNumber
+          cvv: CVV
+          expiryMonth: int = Field(ge=1, le=12)
+          expiryYear: int = Field(ge=2024, le=2040)
+
+      card = PaymentCard(
+          cardNumber="1234 5678 9012 3456",
+          cvv="123",
+          expiryMonth=12,
+          expiryYear=2025
+      )
+      card
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: 실습의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 실습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 주문 입력 계약과 배치 검증'
+  structuredPrimary: true
+  subtitle: 예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주
+  goal: '현업 흐름 검증: 주문 입력 계약과 배치 검증에서 스키마 검증 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고,
+    잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from typing import Literal
+    from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+    class OrderInput(BaseModel):
+        orderId: str
+        customer: str
+        amount: int = Field(gt=0)
+        status: Literal['paid', 'pending', 'cancelled']
+
+        @field_validator('orderId', 'customer')
+        @classmethod
+        def stripRequiredText(cls, value):
+            cleaned = value.strip()
+            if not cleaned:
+                raise ValueError('text field must not be empty')
+            return cleaned
+
+        @computed_field
+        @property
+        def isRevenue(self) -> bool:
+            return self.status == 'paid'
+
+    validOrder = OrderInput.model_validate({
+        'orderId': ' A-100 ',
+        'customer': ' kim ',
+        'amount': '120000',
+        'status': 'paid',
+    })
+
+    assert validOrder.orderId == 'A-100'
+    assert validOrder.amount == 120000
+    assert validOrder.isRevenue is True
+    validOrder.model_dump()
+  exercise:
+    prompt: '현업 흐름 검증: 주문 입력 계약과 배치 검증 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
+    starterCode: |-
+      from typing import Literal
+      from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+      class OrderInput(BaseModel):
+          orderId: str
+          customer: str
+          amount: int = Field(gt=0)
+          status: Literal['paid', 'pending', 'cancelled']
+
+          @field_validator('orderId', 'customer')
+          @classmethod
+          def stripRequiredText(cls, value):
+              cleaned = value.strip()
+              if not cleaned:
+                  raise ValueError('text field must not be empty')
+              return cleaned
+
+          @computed_field
+          @property
+          def isRevenue(self) -> bool:
+              return self.status == 'paid'
+
+      validOrder = OrderInput.model_validate({
+          'orderId': ' A-100 ',
+          'customer': ' kim ',
+          'amount': '120000',
+          'status': 'paid',
+      })
+
+      assert validOrder.orderId == 'A-100'
+      assert validOrder.amount == 120000
+      assert validOrder.isRevenue is True
+      validOrder.model_dump()
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pydantic_07-custom-order-id-type-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load
+    - workflow_validation
+    title: 업무 식별자를 custom type 계약으로 파싱하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: O-YYYY-NNNN 형식을 검증하고 year·sequence로 분해한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 정규식 통과 뒤에도 sequence 의미 범위를 검사하세요.
+    - 내부 표현은 한 canonical 형식으로 반환하세요.
+    exercise:
+      prompt: parse_order_id(value)를 완성해 canonical, year, sequence를 반환하세요.
+      starterCode: |-
+        def parse_order_id(value):
+            raise NotImplementedError
+      solution: |
+        def parse_order_id(value):
+            import re
+            match = re.fullmatch(r"O-(20\\d{2})-(\\d{4})", str(value).strip().upper())
+            if not match:
+                raise ValueError("invalid order id")
+            year = int(match.group(1))
+            sequence = int(match.group(2))
+            if sequence < 1:
+                raise ValueError("sequence must be positive")
+            return {"canonical": f"O-{year}-{sequence:04d}", "year": year, "sequence": sequence}
+      hints: *id001
+    check:
+      id: python.pydantic.pydantic_07.custom-order-id-type.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_07.custom-order-id-type.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: parse_order_id
+        cases:
+        - id: normalizes-valid-id
+          arguments:
+          - value: ' o-2026-0042 '
+          expectedReturn:
+            canonical: O-2026-0042
+            year: 2026
+            sequence: 42
+        - id: rejects-zero-sequence
+          arguments:
+          - value: O-2026-0000
+          expectedException: ValueError
+        - id: rejects-wrong-shape
+          arguments:
+          - value: 2026-42
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pydantic_07-custom-coordinate-type-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pydantic_07-custom-order-id-type-mastery
+    title: 새 좌표 문자열을 범위가 있는 값 객체로 변환하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: custom id parsing을 위도·경도 문자열과 범위 검증으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 문자열 분리 실패와 숫자 변환 실패를 하나의 명확한 계약 오류로 바꾸세요.
+    - 파싱 뒤 위도·경도 범위를 각각 검사하세요.
+    exercise:
+      prompt: parse_coordinate(value)를 완성해 latitude, longitude, canonical을 반환하세요.
+      starterCode: |-
+        def parse_coordinate(value):
+            raise NotImplementedError
+      solution: |
+        def parse_coordinate(value):
+            try:
+                latitude_text, longitude_text = str(value).split(",", 1)
+                latitude = float(latitude_text.strip())
+                longitude = float(longitude_text.strip())
+            except (TypeError, ValueError) as error:
+                raise ValueError("invalid coordinate") from error
+            if not -90 <= latitude <= 90 or not -180 <= longitude <= 180:
+                raise ValueError("coordinate out of range")
+            return {"latitude": latitude, "longitude": longitude, "canonical": f"{latitude:.4f},{longitude:.4f}"}
+      hints: *id002
+    check:
+      id: python.pydantic.pydantic_07.custom-coordinate-type.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_07.custom-coordinate-type.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: parse_coordinate
+        cases:
+        - id: parses-and-normalizes
+          arguments:
+          - value: 37.5665, 126.9780
+          expectedReturn:
+            latitude: 37.5665
+            longitude: 126.978
+            canonical: 37.5665,126.9780
+        - id: accepts-boundary
+          arguments:
+          - value: -90,180
+          expectedReturn:
+            latitude: -90.0
+            longitude: 180.0
+            canonical: -90.0000,180.0000
+        - id: rejects-out-of-range
+          arguments:
+          - value: 91,0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pydantic_07-custom-type-decision-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pydantic_07-custom-coordinate-type-transfer
+    title: custom type이 필요한 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 반복 형식·범위·canonicalization이 필요한 값과 단순 field validator를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 여러 model에서 반복되는 값 의미는 custom type으로 모으세요.
+    - 한 field의 단순 범위까지 모두 custom class로 만들 필요는 없습니다.
+    exercise:
+      prompt: choose_custom_type(situation)를 완성해 choice, reason, evidence를 반환하세요.
+      starterCode: |-
+        def choose_custom_type(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_custom_type(situation):
+            table = {'reused-business-id': {'choice': 'custom type', 'reason': 'shared parse and canonical rules', 'evidence': 'round-trip examples'}, 'one-model-positive-count': {'choice': 'field constraint', 'reason': 'local numeric range', 'evidence': 'boundary cases'}, 'secret-string': {'choice': 'secret type', 'reason': 'redacted representation', 'evidence': 'no plaintext dump'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.pydantic.pydantic_07.custom-type-decision.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_07.custom-type-decision.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_custom_type
+        cases:
+        - id: recalls-reused-business-id
+          arguments:
+          - value: reused-business-id
+          expectedReturn:
+            choice: custom type
+            reason: shared parse and canonical rules
+            evidence: round-trip examples
+        - id: recalls-one-model-positive-count
+          arguments:
+          - value: one-model-positive-count
+          expectedReturn:
+            choice: field constraint
+            reason: local numeric range
+            evidence: boundary cases
+        - id: rejects-unknown-situation
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

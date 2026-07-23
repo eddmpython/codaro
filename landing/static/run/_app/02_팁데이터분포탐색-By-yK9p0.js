@@ -1,0 +1,838 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - seaborn
+  id: seaborn_02
+  title: 팁데이터분포탐색
+  order: 2
+  category: seaborn
+  difficulty: ⭐
+  badge: 입문
+  tags:
+  - seaborn
+  - histplot
+  - stripplot
+  - swarmplot
+  - multiple
+  - tips
+  seo:
+    title: Seaborn 분포 시각화 - 팁 데이터 히스토그램과 산점 분포
+    description: Seaborn histplot, stripplot, swarmplot으로 팁 데이터의 분포를 탐색합니다. hue와 multiple 파라미터 활용법을 배웁니다.
+    keywords:
+    - seaborn
+    - histplot
+    - stripplot
+    - swarmplot
+    - 분포
+    - tips
+intro:
+  emoji: 💵
+  goal: 팁 데이터의 분포를 히스토그램과 산점 분포로 탐색합니다.
+  description: histplot으로 히스토그램을, stripplot과 swarmplot으로 개별 데이터 포인트를 시각화합니다. hue로 그룹별 분포를 비교하고, multiple
+    파라미터로 분포 표시 방식을 조절합니다. 이전에 배운 scatterplot, palette 개념을 함께 활용합니다.
+  direction: 팁데이터분포탐색에서 정리된 데이터를 통계 차트로 보고 분포와 관계를 검증합니다.
+  benefits:
+  - 분석용 테이블 확인 후 통계 차트 구성에 맞는 코드 입력을 고릅니다.
+  - 팁데이터분포탐색 결과를 분포, 그룹, 관계 패턴 기준으로 즉시 점검합니다.
+  - 완료한 코드를 탐색 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(분석용 테이블)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 로드 처리 실행
+      detail: 통계 차트 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 기본 히스토그램 결과 검증
+      detail: 분포, 그룹, 관계 패턴 기준으로 실행 결과를 비교합니다.
+    - label: 팁데이터분포탐색 재사용
+      detail: 완성 코드를 탐색 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 통계 시각화 환경
+      detail: matplotlib, seaborn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 팁데이터분포탐색 실행
+      detail: 셀을 실행해 분포, 그룹, 관계 패턴와 예외 상태를 확인합니다.
+    - label: 팁데이터분포탐색 완료
+      detail: 검증된 코드를 탐색 리포트로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: seaborn과 matplotlib을 불러옵니다. tips 데이터는 레스토랑에서 수집한 결제 정보와 팁 데이터입니다. 결제금액, 팁, 요일, 시간대, 테이블
+    인원수 등 다양한 변수가 포함되어 있어 분포 분석에 적합합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+    import matplotlib.pyplot as plt
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import matplotlib.pyplot as plt
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 라이브러리 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step2_data
+  title: 2단계. 데이터 로드
+  structuredPrimary: true
+  subtitle: tips 데이터셋
+  goal: 2단계. 데이터 로드에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: tips 데이터셋은 120개의 로컬 식사 기록을 담고 있습니다. total_bill(결제금액), tip(팁), sex(성별), smoker(흡연여부), day(요일),
+    time(시간대), size(인원수) 컬럼이 있습니다. 이 데이터로 팁에 영향을 미치는 요인을 분석할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    tips = loadLocalDataset('tips')
+    tips.head()
+  exercise:
+    prompt: 2단계. 데이터 로드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      tips = loadLocalDataset('tips')
+      tips.head()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 로드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 로드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_basic_hist
+  title: 3단계. 기본 히스토그램
+  structuredPrimary: true
+  subtitle: histplot()
+  goal: 3단계. 기본 히스토그램에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    histplot()은 연속형 변수의 분포를 막대 그래프로 표현합니다. bins 파라미터로 구간 개수를 조절하고, kde=True로 커널 밀도 추정 곡선을 함께 표시할 수 있습니다. 팁 금액의 분포를 확인해봅니다.
+
+    sns.histplot(data, x='컬럼명')으로 히스토그램을 그립니다. bins로 구간 개수를 조절합니다. 구간이 많을수록 세밀하게, 적을수록 전체 추세를 파악하기 좋습니다.
+  snippet: |-
+    fig, ax = plt.subplots(figsize=(8, 6))
+    sns.histplot(data=tips, x='tip', bins=20, ax=ax)
+    ax.set_title('Tip Distribution')
+    fig
+  exercise:
+    prompt: 3단계. 기본 히스토그램 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      fig, ax = plt.subplots(figsize=(8, 6))
+      sns.histplot(data=tips, x='tip', bins=20, ax=ax)
+      ax.set_title('Tip Distribution')
+      fig
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 기본 히스토그램의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 기본 히스토그램 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step4_kde
+  title: 4단계. KDE 곡선 추가
+  structuredPrimary: true
+  subtitle: 커널 밀도 추정
+  goal: 4단계. KDE 곡선 추가에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    kde=True를 설정하면 히스토그램 위에 부드러운 밀도 곡선이 그려집니다. KDE(Kernel Density Estimation)는 데이터의 확률 밀도 함수를 추정하는 방법입니다. 히스토그램의 계단 형태보다 분포의 모양을 더 잘 파악할 수 있습니다.
+
+    kde=True로 커널 밀도 추정 곡선을 추가합니다. 히스토그램의 막대 높이는 빈도(count)이고, KDE 곡선은 확률 밀도로 스케일이 다릅니다. stat='density'로 맞출 수 있습니다.
+  tips:
+  - kde=True로 커널 밀도 추정 곡선을 추가합니다. 히스토그램의 막대 높이는 빈도(count)이고, KDE 곡선은 확률 밀도로 스케일이 다릅니다. stat='density'로
+    맞출 수 있습니다.
+  snippet: |-
+    figKde, axKde = plt.subplots(figsize=(8, 6))
+    sns.histplot(data=tips, x='tip', bins=20, kde=True, ax=axKde)
+    axKde.set_title('Tip Distribution with KDE')
+    figKde
+  exercise:
+    prompt: 4단계. KDE 곡선 추가 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figKde, axKde = plt.subplots(figsize=(8, 6))
+      sns.histplot(data=tips, x='tip', bins=20, kde=True, ax=axKde)
+      axKde.set_title('Tip Distribution with KDE')
+      figKde
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. KDE 곡선 추가의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 4단계. KDE 곡선 추가 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step5_hue_hist
+  title: 5단계. 그룹별 히스토그램
+  structuredPrimary: true
+  subtitle: hue 파라미터
+  goal: 5단계. 그룹별 히스토그램에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: hue 파라미터로 범주형 변수에 따라 분포를 분리할 수 있습니다. 시간대(Lunch/Dinner)별로 팁 분포가 어떻게 다른지 비교해봅니다. 기본적으로 겹쳐서(layer)
+    표시됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figHue, axHue = plt.subplots(figsize=(8, 6))
+    sns.histplot(data=tips, x='tip', hue='time', bins=15, ax=axHue)
+    axHue.set_title('Tip by Time')
+    figHue
+  exercise:
+    prompt: 5단계. 그룹별 히스토그램 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figHue, axHue = plt.subplots(figsize=(8, 6))
+      sns.histplot(data=tips, x='tip', hue='time', bins=15, ax=axHue)
+      axHue.set_title('Tip by Time')
+      figHue
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 그룹별 히스토그램의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 그룹별 히스토그램 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step6_multiple
+  title: 6단계. multiple 파라미터
+  structuredPrimary: true
+  subtitle: 분포 표시 방식
+  goal: 6단계. multiple 파라미터에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    multiple 파라미터로 여러 그룹의 분포를 어떻게 표시할지 결정합니다. 'layer'는 겹쳐서, 'stack'은 쌓아서, 'fill'은 전체를 100%로 채워서 표시합니다. 각 방식은 다른 관점의 비교를 가능하게 합니다.
+
+    multiple 옵션: 'layer'(겹침, 기본값), 'stack'(쌓기), 'fill'(비율 채우기), 'dodge'(나란히). stack은 전체 빈도를, fill은 비율 비교에 적합합니다.
+  tips:
+  - 'multiple 옵션: ''layer''(겹침, 기본값), ''stack''(쌓기), ''fill''(비율 채우기), ''dodge''(나란히). stack은 전체 빈도를,
+    fill은 비율 비교에 적합합니다.'
+  snippet: |-
+    figStack, axStack = plt.subplots(figsize=(8, 6))
+    sns.histplot(data=tips, x='tip', hue='time', bins=15, multiple='stack', ax=axStack)
+    axStack.set_title('Tip by Time (Stacked)')
+    figStack
+  exercise:
+    prompt: 6단계. multiple 파라미터 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figStack, axStack = plt.subplots(figsize=(8, 6))
+      sns.histplot(data=tips, x='tip', hue='time', bins=15, multiple='stack', ax=axStack)
+      axStack.set_title('Tip by Time (Stacked)')
+      figStack
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. multiple 파라미터의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. multiple 파라미터 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step7_fill
+  title: 7단계. fill 모드
+  structuredPrimary: true
+  subtitle: 비율 비교
+  goal: 7단계. fill 모드에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: multiple='fill'은 각 구간에서 그룹별 비율을 100%로 채워 표시합니다. 절대적인 빈도보다 상대적인 비율을 비교할 때 유용합니다. 팁 금액대별로
+    Lunch와 Dinner의 비율이 어떻게 변하는지 확인할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figFill, axFill = plt.subplots(figsize=(8, 6))
+    sns.histplot(data=tips, x='tip', hue='time', bins=15, multiple='fill', ax=axFill)
+    axFill.set_title('Tip by Time (Ratio)')
+    axFill.set_ylabel('Proportion')
+    figFill
+  exercise:
+    prompt: 7단계. fill 모드 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figFill, axFill = plt.subplots(figsize=(8, 6))
+      sns.histplot(data=tips, x='tip', hue='time', bins=15, multiple='fill', ax=axFill)
+      axFill.set_title('Tip by Time (Ratio)')
+      axFill.set_ylabel('Proportion')
+      figFill
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. fill 모드의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 7단계. fill 모드 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step8_stripplot
+  title: 8단계. 스트립 플롯
+  structuredPrimary: true
+  subtitle: stripplot()
+  goal: 8단계. 스트립 플롯에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    stripplot()은 범주형 변수와 연속형 변수의 관계를 개별 점으로 표시합니다. 히스토그램이 분포의 모양을 보여준다면, stripplot은 실제 데이터 포인트의 위치를 보여줍니다. 요일별 팁 분포를 점으로 확인해봅니다.
+
+    sns.stripplot(data, x='범주형', y='연속형')으로 범주별 데이터 포인트를 표시합니다. 점이 겹칠 수 있어 데이터가 많으면 jitter(좌우 흔들림)로 분산시킵니다.
+  snippet: |-
+    figStrip, axStrip = plt.subplots(figsize=(8, 6))
+    sns.stripplot(data=tips, x='day', y='tip', ax=axStrip)
+    axStrip.set_title('Tip by Day')
+    figStrip
+  exercise:
+    prompt: 8단계. 스트립 플롯 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figStrip, axStrip = plt.subplots(figsize=(8, 6))
+      sns.stripplot(data=tips, x='day', y='tip', ax=axStrip)
+      axStrip.set_title('Tip by Day')
+      figStrip
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 스트립 플롯의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 스트립 플롯 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step9_swarmplot
+  title: 9단계. 스웜 플롯
+  structuredPrimary: true
+  subtitle: swarmplot()
+  goal: 9단계. 스웜 플롯에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    swarmplot()은 stripplot과 비슷하지만 점이 겹치지 않도록 자동으로 배치합니다. 데이터의 분포 모양과 밀집 정도를 동시에 파악할 수 있습니다. 단, 데이터가 많으면 계산 시간이 오래 걸릴 수 있습니다.
+
+    swarmplot()은 점이 겹치지 않아 실제 데이터 분포를 정확히 보여줍니다. 단, 데이터가 1000개 이상이면 느려지므로 stripplot을 권장합니다.
+  snippet: |-
+    figSwarm, axSwarm = plt.subplots(figsize=(8, 6))
+    sns.swarmplot(data=tips, x='day', y='tip', ax=axSwarm)
+    axSwarm.set_title('Tip by Day (Swarm)')
+    figSwarm
+  exercise:
+    prompt: 9단계. 스웜 플롯 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figSwarm, axSwarm = plt.subplots(figsize=(8, 6))
+      sns.swarmplot(data=tips, x='day', y='tip', ax=axSwarm)
+      axSwarm.set_title('Tip by Day (Swarm)')
+      figSwarm
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 스웜 플롯의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 스웜 플롯 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step10_hue_strip
+  title: 10단계. hue로 그룹 구분
+  structuredPrimary: true
+  subtitle: 색상으로 추가 변수
+  goal: 10단계. hue로 그룹 구분에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: stripplot과 swarmplot에도 hue를 적용할 수 있습니다. 요일별로 점을 배치하면서 시간대(Lunch/Dinner)를 색상으로 구분하면 두 가지
+    범주를 동시에 비교할 수 있습니다. dodge=True로 그룹을 나란히 배치할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figDodge, axDodge = plt.subplots(figsize=(10, 6))
+    sns.stripplot(data=tips, x='day', y='tip', hue='time', palette='Set2', dodge=True, alpha=0.7, ax=axDodge)
+    axDodge.set_title('Tip by Day and Time')
+    axDodge.legend(title='Time')
+    figDodge
+  exercise:
+    prompt: 10단계. hue로 그룹 구분 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figDodge, axDodge = plt.subplots(figsize=(10, 6))
+      sns.stripplot(data=tips, x='day', y='tip', hue='time', palette='Set2', dodge=True, alpha=0.7, ax=axDodge)
+      axDodge.set_title('Tip by Day and Time')
+      axDodge.legend(title='Time')
+      figDodge
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. hue로 그룹 구분의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 10단계. hue로 그룹 구분 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step11_comparison
+  title: 11단계. 분포 시각화 비교
+  structuredPrimary: true
+  subtitle: 세 가지 방식
+  goal: 11단계. 분포 시각화 비교에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 히스토그램, stripplot, swarmplot을 나란히 비교합니다. 같은 데이터를 다른 방식으로 시각화하면 각각 다른 인사이트를 얻을 수 있습니다. 히스토그램은
+    전체 분포 모양을, stripplot은 개별 데이터와 이상치를, swarmplot은 밀집 정도를 보여줍니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figCompare, (axHist, axStripSub, axSwarmSub) = plt.subplots(1, 3, figsize=(15, 5))
+
+    sns.histplot(data=tips, x='tip', hue='time', multiple='stack', ax=axHist)
+    axHist.set_title('Histogram')
+
+    sns.stripplot(data=tips, x='time', y='tip', hue='time', palette='Set2', ax=axStripSub, legend=False)
+    axStripSub.set_title('Strip Plot')
+
+    sns.swarmplot(data=tips, x='time', y='tip', hue='time', palette='Set2', ax=axSwarmSub, legend=False)
+    axSwarmSub.set_title('Swarm Plot')
+
+    plt.tight_layout()
+    figCompare
+  exercise:
+    prompt: 11단계. 분포 시각화 비교 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figCompare, (axHist, axStripSub, axSwarmSub) = plt.subplots(1, 3, figsize=(15, 5))
+
+      sns.histplot(data=tips, x='tip', hue='time', multiple='stack', ax=axHist)
+      axHist.set_title('Histogram')
+
+      sns.stripplot(data=tips, x='time', y='tip', hue='time', palette='Set2', ax=axStripSub, legend=False)
+      axStripSub.set_title('Strip Plot')
+
+      sns.swarmplot(data=tips, x='time', y='tip', hue='time', palette='Set2', ax=axSwarmSub, legend=False)
+      axSwarmSub.set_title('Swarm Plot')
+
+      plt.tight_layout()
+      figCompare
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 분포 시각화 비교의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 11단계. 분포 시각화 비교 실행 결과가 분포, 그룹, 관계 패턴 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: step12_final
+  title: 12단계. 최종 분석 차트
+  structuredPrimary: true
+  subtitle: 종합 시각화
+  goal: 12단계. 최종 분석 차트에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 지금까지 배운 모든 요소를 종합하여 팁 데이터의 분포를 완성도 높게 시각화합니다. 이전 프로젝트에서 배운 scatterplot도 함께 활용하여 다양한 관점에서
+    데이터를 탐색합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figFinal, axesFinal = plt.subplots(2, 2, figsize=(14, 10))
+
+    sns.histplot(data=tips, x='tip', hue='time', kde=True, palette='Set2', ax=axesFinal[0, 0])
+    axesFinal[0, 0].set_title('Tip Distribution by Time')
+
+    sns.scatterplot(data=tips, x='total_bill', y='tip', hue='time', palette='Set2', alpha=0.7, ax=axesFinal[0, 1])
+    axesFinal[0, 1].set_title('Total Bill vs Tip')
+
+    sns.stripplot(data=tips, x='day', y='tip', hue='time', palette='Set2', dodge=True, alpha=0.7, ax=axesFinal[1, 0])
+    axesFinal[1, 0].set_title('Tip by Day')
+
+    sns.histplot(data=tips, x='total_bill', hue='day', multiple='stack', palette='Set1', ax=axesFinal[1, 1])
+    axesFinal[1, 1].set_title('Bill Distribution by Day')
+
+    plt.tight_layout()
+    figFinal
+  exercise:
+    prompt: 12단계. 최종 분석 차트 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figFinal, axesFinal = plt.subplots(2, 2, figsize=(14, 10))
+
+      sns.histplot(data=tips, x='tip', hue='time', kde=True, palette='Set2', ax=axesFinal[0, 0])
+      axesFinal[0, 0].set_title('Tip Distribution by Time')
+
+      sns.scatterplot(data=tips, x='total_bill', y='tip', hue='time', palette='Set2', alpha=0.7, ax=axesFinal[0, 1])
+      axesFinal[0, 1].set_title('Total Bill vs Tip')
+
+      sns.stripplot(data=tips, x='day', y='tip', hue='time', palette='Set2', dodge=True, alpha=0.7, ax=axesFinal[1, 0])
+      axesFinal[1, 0].set_title('Tip by Day')
+
+      sns.histplot(data=tips, x='total_bill', hue='day', multiple='stack', palette='Set1', ax=axesFinal[1, 1])
+      axesFinal[1, 1].set_title('Bill Distribution by Day')
+
+      plt.tight_layout()
+      figFinal
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 12단계. 최종 분석 차트의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 12단계. 최종 분석 차트 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 분포 탐색 프로젝트
+  goal: 실습에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    지금까지 배운 histplot, stripplot, swarmplot, hue, multiple을 활용해서 다양한 분포를 탐색해봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+    import matplotlib.pyplot as plt
+
+    data = loadLocalDataset('penguins').dropna()
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import matplotlib.pyplot as plt
+
+      data = loadLocalDataset('penguins').dropna()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Seaborn으로 팁 데이터의 분포를 다양한 방식으로 탐색했습니다.
+  - type: list
+    items:
+    - sns.histplot(data, x, bins, kde) - 히스토그램
+    - hue로 그룹별 분포 비교
+    - multiple='layer'/'stack'/'fill' - 분포 표시 방식
+    - sns.stripplot() - 개별 점으로 분포 표시
+    - sns.swarmplot() - 겹치지 않는 점 배치
+    - dodge=True로 그룹 나란히 배치
+  - type: text
+    content: 다음 시간에는 boxplot과 violinplot으로 분포를 비교합니다.
+  goal: 정리에서 분석용 테이블을 바꿨을 때 분포, 그룹, 관계 패턴가 어떻게 달라지는지 확인한다.
+  why: 통계 시각화는 데이터의 분포와 관계를 빠르게 점검하는 탐색 분석 흐름입니다.
+- id: workflow_validation
+  title: 13단계. 팁 분포 분석 검증 루프
+  structuredPrimary: true
+  subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
+  goal: 13단계. 팁 분포 분석 검증 루프에서 통계 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    분포 차트는 평균만 보는 습관을 깨기 위한 도구입니다. 팁 금액이 한쪽으로 치우쳐 있는지 예측하고, 히스토그램이 그 질문을 정확히 보여 주는지 검증합니다.
+
+    분포 분석은 히스토그램을 그린 뒤 끝내지 말고, 어떤 집단의 분포가 왜 다른지 다음 질문을 뽑아야 합니다.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    tipsFlow = loadLocalDataset("tips")
+    requiredColumns = {"total_bill", "tip", "time", "day", "size"}
+    missingColumns = requiredColumns - set(tipsFlow.columns)
+
+    assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+    assert tipsFlow["tip"].between(0, tipsFlow["total_bill"]).all()
+
+    timeTipMean = tipsFlow.groupby("time")["tip"].mean()
+    assert timeTipMean["Dinner"] > timeTipMean["Lunch"]
+    timeTipMean.round(2)
+  exercise:
+    prompt: 13단계. 팁 분포 분석 검증 루프 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      tipsFlow = loadLocalDataset("tips")
+      requiredColumns = {"total_bill", "tip", "time", "day", "size"}
+      missingColumns = requiredColumns - set(tipsFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert tipsFlow["tip"].between(0, tipsFlow["total_bill"]).all()
+
+      timeTipMean = tipsFlow.groupby("time")["tip"].mean()
+      assert timeTipMean["Dinner"] > timeTipMean["Lunch"]
+      timeTipMean.round(2)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 13단계. 팁 분포 분석 검증 루프의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 13단계. 팁 분포 분석 검증 루프의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: seaborn_02-tip-distribution-semantics-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 팁 분포 탐색 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: histogram과 KDE의 가정과 분모를 분리했는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_tip_distribution_semantics(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_tip_distribution_semantics(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_tip_distribution_semantics(rows):
+            required = ['tipRate', 'count', 'meal']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'meal'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['tipRate'] for row in usable]
+            y_values = [row['count'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.seaborn.seaborn_02.tip-distribution-semantics-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.seaborn.seaborn_02.tip-distribution-semantics-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_tip_distribution_semantics
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - tipRate: 0.1
+              count: 4
+              meal: lunch
+            - tipRate: 0.2
+              count: 3
+              meal: dinner
+            - tipRate: 0.3
+              count: 1
+              meal: dinner
+          expectedReturn:
+            usableCount: 3
+            excludedCount: 0
+            groupCounts:
+              dinner: 2
+              lunch: 1
+            xExtent:
+            - 0.1
+            - 0.3
+            yExtent:
+            - 1
+            - 4
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: seaborn_02-tip-distribution-semantics-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - seaborn_02-tip-distribution-semantics-data-evidence-mastery
+    title: 팁 분포 탐색 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 응답 시간 분포를 트래픽 유형별 동일 bin으로 비교한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_tip_distribution_semantics(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_tip_distribution_semantics(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_tip_distribution_semantics(candidate):
+            expected = {'mark': 'histogram', 'x': 'tipRate', 'y': 'count', 'group': 'meal', 'transforms': ['bin', 'count'], 'interaction': 'none'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.seaborn.seaborn_02.tip-distribution-semantics-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.seaborn.seaborn_02.tip-distribution-semantics-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_tip_distribution_semantics
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: histogram
+              x: tipRate
+              y: count
+              group: meal
+              transforms:
+              - bin
+              - count
+              interaction: none
+              description: 응답 시간 분포를 트래픽 유형별 동일 bin으로 비교한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: histogram
+              x: tipRate
+              y: count
+              group: meal
+              transforms:
+              - bin
+              - count
+              interaction: none
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: count
+              y: tipRate
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - description
+            encoding:
+              mark: histogram
+              x: tipRate
+              y: count
+              group: meal
+              transforms:
+              - bin
+              - count
+              interaction: none
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: seaborn_02-tip-distribution-semantics-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - seaborn_02-tip-distribution-semantics-encoding-transfer-transfer
+    title: 팁 분포 탐색 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: histogram과 KDE의 가정과 분모를 분리했는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_tip_distribution_semantics(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_tip_distribution_semantics(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_tip_distribution_semantics(situation):
+            table = {'honest-frequency': {'encoding': 'histogram count', 'evidence': 'bin edges and n', 'risk': 'unequal bins'}, 'shape-estimate': {'encoding': 'KDE plus rug', 'evidence': 'bandwidth', 'risk': 'invented tails'}, 'group-normalization': {'encoding': 'density with explicit common_norm', 'evidence': 'group n', 'risk': 'area comparison'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.seaborn.seaborn_02.tip-distribution-semantics-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.seaborn.seaborn_02.tip-distribution-semantics-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_tip_distribution_semantics
+        cases:
+        - id: recalls-honest-frequency
+          arguments:
+          - value: honest-frequency
+          expectedReturn:
+            encoding: histogram count
+            evidence: bin edges and n
+            risk: unequal bins
+        - id: recalls-shape-estimate
+          arguments:
+          - value: shape-estimate
+          expectedReturn:
+            encoding: KDE plus rug
+            evidence: bandwidth
+            risk: invented tails
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

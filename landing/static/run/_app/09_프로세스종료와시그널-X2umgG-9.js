@@ -1,0 +1,749 @@
+var e=`meta:
+  id: procCtl_09
+  title: 프로세스 종료와 시그널
+  order: 9
+  category: procCtl
+  difficulty: easy
+  audience: 프로세스 자동화에 입문하는 Python 학습자
+  packages: []
+  tags:
+    - subprocess
+    - signal
+    - terminate
+intro:
+  direction: subprocess.Popen으로 만든 자식을 terminate와 kill로 안전하게 종료하고 returncode로 종료 원인을 분류한다.
+  benefits:
+    - terminate와 kill의 동작 차이를 직접 확인한다.
+    - wait의 timeout 인자로 부드러운 종료를 시도하고 실패하면 강제 종료한다.
+    - 종료 원인을 returncode 값으로 분류한다.
+    - 종합 종료 함수가 같은 인터페이스로 모든 경우를 처리한다.
+  diagram:
+    steps:
+      - label: terminate로 부드러운 종료
+        detail: SIGTERM 또는 그에 상응하는 시그널을 자식에 보내 정상 종료를 요청한다.
+      - label: wait 타임아웃 적용
+        detail: wait(timeout=...)로 정해진 시간 안에 종료되지 않으면 다음 단계로 넘어간다.
+      - label: kill로 강제 종료
+        detail: SIGKILL 또는 그에 상응하는 시그널로 자식을 즉시 정리한다.
+      - label: 종합 종료 분류
+        detail: returncode를 보고 정상, 종료 요청, 강제 종료 중 어떤 분기인지 dict에 기록한다.
+    runtime:
+      - label: 표준 라이브러리만
+        detail: subprocess와 sys만 사용해 외부 패키지가 필요 없다.
+      - label: assert 기반 검증
+        detail: returncode와 isAlive 값을 assert로 비교한다.
+sections:
+  - id: terminate-soft
+    title: terminate로 부드러운 종료
+    structuredPrimary: true
+    subtitle: SIGTERM 상응 시그널
+    goal: 자식 프로세스에 terminate를 보내 부드러운 종료 신호를 전달한다.
+    why: 자동화는 가능한 한 자식이 자체 정리 시간을 가질 수 있도록 terminate를 먼저 시도해야 데이터 손상을 막는다.
+    explanation: Popen.terminate는 Linux와 macOS에서 SIGTERM, Windows에서는 그에 상응하는 종료 요청 시그널을 자식에 보낸다. 자식이 시그널을 받지 않거나 처리하지 않으면 종료되지 않을 수 있어 wait timeout으로 확인이 필요하다. terminate 후 returncode는 OS에 따라 음수가 될 수 있다.
+    tips:
+      - Windows에서는 terminate가 사실상 즉시 종료에 가까워 kill과 비슷한 효과다.
+      - SIGTERM은 자식이 직접 처리하지 않으면 기본 동작으로 즉시 종료된다.
+    snippet: |-
+      import subprocess
+      import sys
+
+      with subprocess.Popen(
+          [sys.executable, "-c", "import time; time.sleep(5)"],
+          stdout=subprocess.PIPE,
+          text=True,
+      ) as proc:
+          proc.terminate()
+          returncode = proc.wait(timeout=3)
+
+      assert returncode != 0
+      returncode
+    exercise:
+      prompt: 자식이 sleep(5)로 멈춰 있을 때 terminate를 호출하고 wait이 timeout 안에 returncode를 받아 0이 아닌 값을 돌려주는지 검증하세요.
+      starterCode: |-
+        import subprocess
+        import sys
+
+        with subprocess.Popen(
+            [sys.executable, "-c", "import time; time.sleep(5)"],
+            stdout=subprocess.PIPE,
+            text=True,
+        ) as proc:
+            proc.___()
+            returncode = proc.wait(timeout=3)
+
+        assert returncode != 0
+        returncode
+      solution: |-
+        import subprocess
+        import sys
+
+        with subprocess.Popen(
+            [sys.executable, "-c", "import time; time.sleep(5)"],
+            stdout=subprocess.PIPE,
+            text=True,
+        ) as proc:
+            proc.terminate()
+            returncode = proc.wait(timeout=3)
+
+        assert returncode != 0
+        returncode
+      hints:
+        - terminate 메서드는 인자를 받지 않는다.
+        - 강제 종료된 자식은 returncode가 0이 아니므로 본문 assert가 통과한다.
+      check:
+        noError: terminate 호출과 wait가 정상적으로 끝나야 한다.
+        resultCheck: returncode가 0이 아닌 값이어야 한다.
+    check:
+      noError: 자식 생성, terminate, wait 세 단계가 모두 끝나야 한다.
+      resultCheck: returncode가 0이 아닌 값이어서 자식이 시그널로 종료됐음을 확인해야 한다.
+  - id: wait-timeout
+    title: wait 타임아웃 적용
+    structuredPrimary: true
+    subtitle: 부드러운 종료가 안 될 때
+    goal: terminate 후 일정 시간 기다리지만 종료되지 않으면 kill로 강제 종료한다.
+    why: 자동화는 자식이 무한히 정리하지 않는 경우를 대비해 강제 종료 fallback이 필수다.
+    explanation: wait에 timeout을 주면 그 시간이 지나도 자식이 종료되지 않으면 TimeoutExpired가 발생한다. except 안에서 kill을 호출하고 다시 wait를 부르면 안전하게 마무리할 수 있다. 두 단계 종료 패턴은 자동화 안전성의 표준이다.
+    tips:
+      - kill은 종료를 보장하지만 자식이 자체 정리할 시간을 주지 않는다.
+      - 두 단계 종료 패턴은 데이터를 잃지 않는 가장 단순한 방법이다.
+    snippet: |-
+      import subprocess
+      import sys
+
+      with subprocess.Popen(
+          [
+              sys.executable,
+              "-c",
+              "import signal, time, sys\\n"
+              "signal.signal(signal.SIGTERM, signal.SIG_IGN) if hasattr(signal, 'SIGTERM') else None\\n"
+              "time.sleep(5)",
+          ],
+          stdout=subprocess.PIPE,
+          text=True,
+      ) as proc:
+          proc.terminate()
+          try:
+              returncode = proc.wait(timeout=0.3)
+          except subprocess.TimeoutExpired:
+              proc.kill()
+              returncode = proc.wait(timeout=3)
+
+      assert returncode != 0
+      returncode
+    exercise:
+      prompt: terminate 후 wait timeout 0.2초가 만료되면 kill로 강제 종료하고 returncode가 0이 아닌 값으로 마무리되는지 검증하세요.
+      starterCode: |-
+        import subprocess
+        import sys
+
+        with subprocess.Popen(
+            [
+                sys.executable,
+                "-c",
+                "import signal, time, sys\\n"
+                "signal.signal(signal.SIGTERM, signal.SIG_IGN) if hasattr(signal, 'SIGTERM') else None\\n"
+                "time.sleep(5)",
+            ],
+            stdout=subprocess.PIPE,
+            text=True,
+        ) as proc:
+            proc.terminate()
+            try:
+                returncode = proc.wait(timeout=0.2)
+            except subprocess.___:
+                proc.kill()
+                returncode = proc.wait(timeout=3)
+
+        assert returncode != 0
+        returncode
+      solution: |-
+        import subprocess
+        import sys
+
+        with subprocess.Popen(
+            [
+                sys.executable,
+                "-c",
+                "import signal, time, sys\\n"
+                "signal.signal(signal.SIGTERM, signal.SIG_IGN) if hasattr(signal, 'SIGTERM') else None\\n"
+                "time.sleep(5)",
+            ],
+            stdout=subprocess.PIPE,
+            text=True,
+        ) as proc:
+            proc.terminate()
+            try:
+                returncode = proc.wait(timeout=0.2)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+                returncode = proc.wait(timeout=3)
+
+        assert returncode != 0
+        returncode
+      hints:
+        - except 절은 subprocess.TimeoutExpired를 좁혀 잡는다.
+        - kill 후에는 다시 wait를 호출해야 returncode가 채워진다.
+      check:
+        noError: terminate, wait timeout, kill, 재호출 wait가 모두 정상 흐름이어야 한다.
+        resultCheck: returncode가 0이 아닌 값으로 마무리되어야 한다.
+    check:
+      noError: 두 단계 종료 패턴이 정상적으로 끝나야 한다.
+      resultCheck: returncode가 0이 아닌 값으로 강제 종료가 마무리되어야 한다.
+  - id: returncode-classify
+    title: returncode로 종료 원인 분류
+    structuredPrimary: true
+    subtitle: 정상, 시그널, 강제
+    goal: returncode 값에서 자식이 어떻게 종료됐는지 분류한다.
+    why: 자동화는 종료 원인을 알아야 다음 시도 전략을 결정할 수 있으므로 returncode 분류가 큰 차이를 만든다.
+    explanation: returncode가 0이면 정상 종료, 양의 정수이면 자식이 sys.exit로 종료한 것, 음수이면 시그널로 종료된 것(POSIX 한정)을 의미한다. Windows에서는 음수 표현이 없고 종료 신호도 양의 정수로 매핑된다. 분류 함수는 OS에 관계없이 같은 status 이름을 만들 수 있다.
+    tips:
+      - 분류 함수의 status 이름을 ok, exited, signaled, killed 같은 짧은 명칭으로 두면 호출 측이 단순해진다.
+      - Windows의 강제 종료 returncode는 1 또는 큰 양의 정수가 흔히 나온다.
+    snippet: |-
+      import subprocess
+      import sys
+
+
+      def classifyReturncode(code: int) -> str:
+          if code == 0:
+              return "ok"
+          if code < 0:
+              return "signaled"
+          return "exited"
+
+
+      ok = subprocess.run([sys.executable, "-c", "pass"])
+      failed = subprocess.run([sys.executable, "-c", "import sys; sys.exit(3)"])
+      summary = {
+          "ok": classifyReturncode(ok.returncode),
+          "failed": classifyReturncode(failed.returncode),
+      }
+
+      assert summary["ok"] == "ok"
+      assert summary["failed"] == "exited"
+      summary
+    exercise:
+      prompt: classifyReturncode를 정상 종료와 sys.exit(9) 자식 두 가지 경우에 적용해 분류 결과 dict를 검증하세요.
+      starterCode: |-
+        import subprocess
+        import sys
+
+
+        def classifyReturncode(code: int) -> str:
+            if code == ___:
+                return "ok"
+            if code < 0:
+                return "signaled"
+            return "exited"
+
+
+        ok = subprocess.run([sys.executable, "-c", "pass"])
+        failed = subprocess.run([sys.executable, "-c", "import sys; sys.exit(9)"])
+        summary = {
+            "ok": classifyReturncode(ok.returncode),
+            "failed": classifyReturncode(failed.returncode),
+        }
+
+        assert summary == {"ok": "ok", "failed": "exited"}
+        summary
+      solution: |-
+        import subprocess
+        import sys
+
+
+        def classifyReturncode(code: int) -> str:
+            if code == 0:
+                return "ok"
+            if code < 0:
+                return "signaled"
+            return "exited"
+
+
+        ok = subprocess.run([sys.executable, "-c", "pass"])
+        failed = subprocess.run([sys.executable, "-c", "import sys; sys.exit(9)"])
+        summary = {
+            "ok": classifyReturncode(ok.returncode),
+            "failed": classifyReturncode(failed.returncode),
+        }
+
+        assert summary == {"ok": "ok", "failed": "exited"}
+        summary
+      hints:
+        - 정상 종료를 판정하는 첫 조건은 code == 0이다.
+        - sys.exit(9)는 양의 정수 9를 returncode로 만들므로 exited로 분류된다.
+      check:
+        noError: classifyReturncode 두 호출이 정상적으로 끝나야 한다.
+        resultCheck: summary 딕셔너리가 ok와 exited를 각각 담아야 한다.
+    check:
+      noError: 분류 함수와 두 자식 호출이 끝나야 한다.
+      resultCheck: summary의 ok와 failed가 ok와 exited로 각각 분류되어야 한다.
+  - id: shutdown-pipeline
+    title: 종합 종료 파이프라인
+    structuredPrimary: true
+    subtitle: 한 함수로 모든 경우 처리
+    goal: 자식 종료 전체 흐름을 한 함수로 묶어 자동화 코드가 같은 인터페이스로 모든 경우를 처리한다.
+    why: 종합 종료 파이프라인은 데이터 손상을 막고 한 곳의 변경이 전체 호출에 반영되어 자동화 안전성이 높아진다.
+    explanation: shutdownProcess 함수는 Popen 객체와 graceTime을 받아 terminate, wait timeout, kill, 다시 wait, 마지막으로 classifyReturncode를 호출한다. 결과 dict에는 status 키와 attempts 리스트가 들어가 어떤 단계까지 갔는지 보고한다. 같은 함수는 정상 종료한 자식에도 안전하게 적용된다.
+    tips:
+      - 정상 종료한 자식은 terminate 호출이 무의미해도 안전하다.
+      - attempts 리스트는 운영자에게 종료 절차를 그대로 보여 준다.
+    snippet: |-
+      import subprocess
+      import sys
+
+
+      def classifyReturncode(code: int) -> str:
+          if code == 0:
+              return "ok"
+          if code < 0:
+              return "signaled"
+          return "exited"
+
+
+      def shutdownProcess(proc: subprocess.Popen, graceSeconds: float) -> dict:
+          attempts = []
+          if proc.poll() is None:
+              proc.terminate()
+              attempts.append("terminate")
+              try:
+                  proc.wait(timeout=graceSeconds)
+              except subprocess.TimeoutExpired:
+                  proc.kill()
+                  attempts.append("kill")
+                  proc.wait(timeout=3)
+          else:
+              attempts.append("already-done")
+          return {"status": classifyReturncode(proc.returncode), "attempts": attempts}
+
+
+      with subprocess.Popen(
+          [sys.executable, "-c", "pass"],
+          stdout=subprocess.PIPE,
+          text=True,
+      ) as quick:
+          quick.wait()
+          quickReport = shutdownProcess(quick, 1.0)
+
+      with subprocess.Popen(
+          [sys.executable, "-c", "import time; time.sleep(5)"],
+          stdout=subprocess.PIPE,
+          text=True,
+      ) as slow:
+          slowReport = shutdownProcess(slow, 1.0)
+
+      assert quickReport["status"] == "ok"
+      assert slowReport["status"] in {"exited", "signaled"}
+      {"quick": quickReport, "slow": slowReport}
+    exercise:
+      prompt: shutdownProcess를 즉시 종료된 자식과 5초 sleep 자식 두 경우에 적용해 종합 보고의 status가 ok와 신호 종료로 각각 분류되는지 검증하세요.
+      starterCode: |-
+        import subprocess
+        import sys
+
+
+        def classifyReturncode(code: int) -> str:
+            if code == 0:
+                return "ok"
+            if code < 0:
+                return "signaled"
+            return "exited"
+
+
+        def shutdownProcess(proc: subprocess.Popen, graceSeconds: float) -> dict:
+            attempts = []
+            if proc.poll() is None:
+                proc.terminate()
+                attempts.append("terminate")
+                try:
+                    proc.wait(timeout=graceSeconds)
+                except subprocess.TimeoutExpired:
+                    proc.kill()
+                    attempts.append("kill")
+                    proc.wait(timeout=3)
+            else:
+                attempts.append("already-done")
+            return {"status": classifyReturncode(proc.returncode), "attempts": attempts}
+
+
+        with subprocess.Popen(
+            [sys.executable, "-c", "pass"],
+            stdout=subprocess.PIPE,
+            text=True,
+        ) as quick:
+            quick.wait()
+            quickReport = shutdownProcess(quick, 1.0)
+
+        with subprocess.Popen(
+            [sys.executable, "-c", "import time; time.sleep(5)"],
+            stdout=subprocess.PIPE,
+            text=True,
+        ) as slow:
+            slowReport = shutdownProcess(slow, ___)
+
+        assert quickReport["status"] == "ok"
+        assert slowReport["status"] in {"exited", "signaled"}
+        {"quick": quickReport, "slow": slowReport}
+      solution: |-
+        import subprocess
+        import sys
+
+
+        def classifyReturncode(code: int) -> str:
+            if code == 0:
+                return "ok"
+            if code < 0:
+                return "signaled"
+            return "exited"
+
+
+        def shutdownProcess(proc: subprocess.Popen, graceSeconds: float) -> dict:
+            attempts = []
+            if proc.poll() is None:
+                proc.terminate()
+                attempts.append("terminate")
+                try:
+                    proc.wait(timeout=graceSeconds)
+                except subprocess.TimeoutExpired:
+                    proc.kill()
+                    attempts.append("kill")
+                    proc.wait(timeout=3)
+            else:
+                attempts.append("already-done")
+            return {"status": classifyReturncode(proc.returncode), "attempts": attempts}
+
+
+        with subprocess.Popen(
+            [sys.executable, "-c", "pass"],
+            stdout=subprocess.PIPE,
+            text=True,
+        ) as quick:
+            quick.wait()
+            quickReport = shutdownProcess(quick, 1.0)
+
+        with subprocess.Popen(
+            [sys.executable, "-c", "import time; time.sleep(5)"],
+            stdout=subprocess.PIPE,
+            text=True,
+        ) as slow:
+            slowReport = shutdownProcess(slow, 1.0)
+
+        assert quickReport["status"] == "ok"
+        assert slowReport["status"] in {"exited", "signaled"}
+        {"quick": quickReport, "slow": slowReport}
+      hints:
+        - graceSeconds 인자에 1.0을 넘기면 terminate가 안정적으로 동작한다.
+        - 즉시 종료한 quick 자식은 status가 ok로, 강제 종료된 slow 자식은 exited 또는 signaled로 분류된다.
+      check:
+        noError: shutdownProcess 두 호출이 종합 종료 흐름을 완성해야 한다.
+        resultCheck: quickReport는 ok이고 slowReport는 exited 또는 signaled여야 한다.
+    check:
+      noError: 종합 종료 함수와 두 자식 종료가 모두 끝나야 한다.
+      resultCheck: quickReport의 status는 ok이고 slowReport는 exited 또는 signaled로 분류되어야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: procCtl_09-termination-authorization-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - terminate-soft
+    - shutdown-pipeline
+    title: process 종료 전 identity·owner·allowlist 승인하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 현재 snapshot이 계획과 일치할 때만 signal 단계를 허용한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 종료 직전에 PID·create time·owner를 fresh snapshot으로 다시 확인하세요.
+    - 자동화가 소유하지 않은 process는 이름이 같아도 종료하지 마세요.
+    exercise:
+      prompt: authorize_termination(plan, current_process, allowed_signals)를 완성하세요.
+      starterCode: |-
+        def authorize_termination(plan, current_process, allowed_signals):
+            raise NotImplementedError
+      solution: |
+        def authorize_termination(plan, current_process, allowed_signals):
+            failures = []
+            for key in ["pid", "createTime", "owner"]:
+                if plan.get(key) != current_process.get(key):
+                    failures.append(key)
+            if plan.get("signal") not in allowed_signals:
+                failures.append("signal")
+            if not plan.get("ownedByAutomation", False):
+                failures.append("ownership")
+            return {"authorized": not failures, "failures": failures, "target": {"pid": current_process.get("pid"), "createTime": current_process.get("createTime")}}
+      hints: *id001
+    check:
+      id: python.procctl.procCtl_09.termination-authorization.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_09.termination-authorization.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: authorize_termination
+        cases:
+        - id: authorizes-owned-current-process
+          arguments:
+          - value:
+              pid: 10
+              createTime: 5
+              owner: me
+              signal: TERM
+              ownedByAutomation: true
+          - value:
+              pid: 10
+              createTime: 5
+              owner: me
+          - value:
+            - TERM
+          expectedReturn:
+            authorized: true
+            failures: []
+            target:
+              pid: 10
+              createTime: 5
+        - id: rejects-reused-pid-and-signal
+          arguments:
+          - value:
+              pid: 10
+              createTime: 5
+              owner: me
+              signal: KILL
+              ownedByAutomation: true
+          - value:
+              pid: 10
+              createTime: 8
+              owner: me
+          - value:
+            - TERM
+          expectedReturn:
+            authorized: false
+            failures:
+            - createTime
+            - signal
+            target:
+              pid: 10
+              createTime: 8
+        - id: rejects-unowned-process
+          arguments:
+          - value:
+              pid: 1
+              createTime: 1
+              owner: system
+              signal: TERM
+              ownedByAutomation: false
+          - value:
+              pid: 1
+              createTime: 1
+              owner: system
+          - value:
+            - TERM
+          expectedReturn:
+            authorized: false
+            failures:
+            - ownership
+            target:
+              pid: 1
+              createTime: 1
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: procCtl_09-termination-escalation-plan-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - procCtl_09-termination-authorization-mastery
+    title: 새 종료 작업에 단계적 signal 계획 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: graceful signal과 대기 후 강제 종료를 명시적 budget으로 구성한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 바로 강제 종료하지 말고 graceful signal과 exit 확인 단계를 두세요.
+    - 각 대기 시점과 전체 종료 budget을 고정하세요.
+    exercise:
+      prompt: build_termination_plan(graceful_signal, force_signal, grace_ms, total_budget_ms)를 완성하세요.
+      starterCode: |-
+        def build_termination_plan(graceful_signal, force_signal, grace_ms, total_budget_ms):
+            raise NotImplementedError
+      solution: |
+        def build_termination_plan(graceful_signal, force_signal, grace_ms, total_budget_ms):
+            if grace_ms < 0 or total_budget_ms <= 0 or grace_ms >= total_budget_ms:
+                raise ValueError("invalid termination budget")
+            return {
+                "steps": [
+                    {"action": "signal", "signal": graceful_signal, "atMs": 0},
+                    {"action": "verify-exit", "atMs": grace_ms},
+                    {"action": "signal-if-alive", "signal": force_signal, "atMs": grace_ms},
+                    {"action": "verify-exit", "atMs": total_budget_ms},
+                ],
+                "budgetMs": total_budget_ms,
+            }
+      hints: *id002
+    check:
+      id: python.procctl.procCtl_09.termination-escalation-plan.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_09.termination-escalation-plan.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_termination_plan
+        cases:
+        - id: builds-graceful-then-force-plan
+          arguments:
+          - value: TERM
+          - value: KILL
+          - value: 1000
+          - value: 3000
+          expectedReturn:
+            steps:
+            - action: signal
+              signal: TERM
+              atMs: 0
+            - action: verify-exit
+              atMs: 1000
+            - action: signal-if-alive
+              signal: KILL
+              atMs: 1000
+            - action: verify-exit
+              atMs: 3000
+            budgetMs: 3000
+        - id: allows-zero-grace-with-verification
+          arguments:
+          - value: INT
+          - value: TERM
+          - value: 0
+          - value: 100
+          expectedReturn:
+            steps:
+            - action: signal
+              signal: INT
+              atMs: 0
+            - action: verify-exit
+              atMs: 0
+            - action: signal-if-alive
+              signal: TERM
+              atMs: 0
+            - action: verify-exit
+              atMs: 100
+            budgetMs: 100
+        - id: rejects-grace-equal-budget
+          arguments:
+          - value: TERM
+          - value: KILL
+          - value: 100
+          - value: 100
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: procCtl_09-process-termination-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - procCtl_09-termination-escalation-plan-transfer
+    title: process 종료 안전 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 대상 승인·단계적 signal·종료 증거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - process 실행 성공과 업무 결과물 성공을 같은 것으로 처리하지 마세요.
+    - 명령 identity·제한 시간·산출물 evidence·남는 risk를 함께 기록하세요.
+    exercise:
+      prompt: choose_termination_policy(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_termination_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_termination_policy(situation):
+            table = {'authorize': {'action': 'revalidate PID create time owner', 'evidence': 'fresh identity', 'risk': 'PID reuse'}, 'signal': {'action': 'graceful then force within budget', 'evidence': 'signal timeline', 'risk': 'data corruption'}, 'verify': {'action': 'confirm process tree exited', 'evidence': 'post-signal snapshot', 'risk': 'orphan child'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.procctl.procCtl_09.process-termination-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_09.process-termination-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_termination_policy
+        cases:
+        - id: recalls-authorize
+          arguments:
+          - value: authorize
+          expectedReturn:
+            action: revalidate PID create time owner
+            evidence: fresh identity
+            risk: PID reuse
+        - id: recalls-signal
+          arguments:
+          - value: signal
+          expectedReturn:
+            action: graceful then force within budget
+            evidence: signal timeline
+            risk: data corruption
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

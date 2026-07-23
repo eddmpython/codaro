@@ -11,6 +11,15 @@
 
 @font-face {
   font-family: "Pretendard";
+  src: url("/fonts/Pretendard-600.subset.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF,U+1100-11FF,U+3130-318F,U+AC00-D7AF;
+}
+
+@font-face {
+  font-family: "Pretendard";
   src: url("/fonts/Pretendard-700.subset.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
@@ -40,15 +49,6 @@
   font-family: "JetBrains Mono";
   src: url("/fonts/JetBrainsMono-400.woff2") format("woff2");
   font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-  unicode-range: U+0000-00FF;
-}
-
-@font-face {
-  font-family: "JetBrains Mono";
-  src: url("/fonts/JetBrainsMono-500.woff2") format("woff2");
-  font-weight: 500;
   font-style: normal;
   font-display: swap;
   unicode-range: U+0000-00FF;

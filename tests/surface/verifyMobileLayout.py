@@ -142,14 +142,25 @@ def checkResponsiveCoverage() -> CheckResult:
 def checkNotebookInsertControls() -> CheckResult:
     path = SRC / "components" / "notebook" / "notebookPanel.tsx"
     source = path.read_text(encoding="utf-8")
+    stylePath = SRC / "components" / "notebook" / "notebookPanel.css"
+    styles = stylePath.read_text(encoding="utf-8")
     required = (
         "document.blocks.map((block, blockIndex)",
         "showInsertBefore={blockIndex === 0}",
-        'className="relative min-h-14 min-w-0"',
-        'className="flex size-6 items-center justify-center',
+        'className="notebookCellBody"',
+        '"notebookInsertControl group/insert"',
+        'className="notebookInsertPrimary"',
+        'className="notebookInsertMenu"',
     )
     missing = [fragment for fragment in required if fragment not in source]
-    stableFrames = source.count('className="relative min-h-14 min-w-0"') >= 2
+    styleRequired = (
+        ".notebookCellBody {",
+        ".notebookCodeFrame,",
+        ".notebookInsertControl {",
+        "min-height: 120px;",
+    )
+    missing.extend(fragment for fragment in styleRequired if fragment not in styles)
+    stableFrames = source.count('className="notebookCellBody"') >= 2
     if not stableFrames:
         missing.append("stable code and markdown insert frames")
     return CheckResult(

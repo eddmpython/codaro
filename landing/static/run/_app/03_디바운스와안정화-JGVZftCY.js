@@ -1,0 +1,691 @@
+var e=`meta:
+  id: watchSched_03
+  title: 디바운스와 안정화
+  order: 3
+  category: watchSched
+  difficulty: easy
+  audience: 폴더 이벤트와 스케줄 자동화에 입문하는 Python 학습자
+  packages: []
+  tags:
+    - debounce
+    - throttling
+    - automation
+intro:
+  direction: watchdog이 같은 파일에 짧은 시간 안에 여러 modified 이벤트를 보내는 상황에서 디바운스 함수로 안정된 한 번의 처리만 수행한다.
+  benefits:
+    - 디바운스 함수의 시간 간격 판단을 구현한다.
+    - 같은 키가 짧은 시간에 여러 번 들어와도 한 번만 처리한다.
+    - 다른 키는 독립적으로 자체 시간 창을 가진다.
+    - 종합 사이클에서 디바운스 결과를 표준 dict로 정리한다.
+  diagram:
+    steps:
+      - label: 디바운스 함수 작성
+        detail: 마지막 처리 시각을 dict에 저장해 일정 시간 안의 중복을 거른다.
+      - label: 같은 키 여러 번 호출
+        detail: 50밀리초 간격으로 같은 키를 세 번 호출하면 한 번만 처리되는지 확인한다.
+      - label: 키별 시간 창
+        detail: 두 키가 각자의 시간 창을 가져 서로 영향을 주지 않는다.
+      - label: 종합 결과 정리
+        detail: 처리된 키 목록을 dict로 묶어 자동화 보고에 사용한다.
+    runtime:
+      - label: 표준 라이브러리만
+        detail: time과 기본 dict만 사용해 외부 패키지가 필요 없다.
+      - label: assert 기반 검증
+        detail: 처리된 키 수와 결과를 assert로 비교한다.
+sections:
+  - id: debounce-skeleton
+    title: 디바운스 함수 골격
+    structuredPrimary: true
+    subtitle: 마지막 시각 기억
+    goal: 같은 키가 일정 시간 안에 다시 들어오면 건너뛰는 가장 단순한 디바운스를 만든다.
+    why: 디바운스는 자동화에서 중복 처리를 막는 가장 흔한 패턴이므로 단순한 구현부터 확실히 이해한다.
+    explanation: 디바운스 함수는 마지막 처리 시각을 키별로 저장한다. 새 호출 시각이 마지막 시각 + 임계 시간보다 이전이면 건너뛴다. 그 외의 경우에는 시각을 갱신하고 처리 카운터를 늘린다.
+    tips:
+      - 시간 단위는 부동소수 초를 사용하면 짧은 간격도 표현된다.
+      - 디바운스 dict는 함수 외부에 두어 호출 사이에 상태가 유지되게 한다.
+    snippet: |-
+      import time
+
+      lastSeen: dict[str, float] = {}
+      processed: list[str] = []
+
+
+      def debounce(key: str, windowSeconds: float) -> bool:
+          now = time.monotonic()
+          if key in lastSeen and now - lastSeen[key] < windowSeconds:
+              return False
+          lastSeen[key] = now
+          processed.append(key)
+          return True
+
+
+      first = debounce("note.txt", 0.2)
+      second = debounce("note.txt", 0.2)
+
+      assert first is True
+      assert second is False
+      processed
+    exercise:
+      prompt: 같은 디바운스 함수에 daily.log 키를 두 번 빠르게 호출해 첫 호출만 True, 두 번째는 False가 되는지 검증하세요.
+      starterCode: |-
+        import time
+
+        lastSeen: dict[str, float] = {}
+        processed: list[str] = []
+
+
+        def debounce(key: str, windowSeconds: float) -> bool:
+            now = time.monotonic()
+            if key in lastSeen and now - lastSeen[key] < windowSeconds:
+                return ___
+            lastSeen[key] = now
+            processed.append(key)
+            return True
+
+
+        first = debounce("daily.log", 0.2)
+        second = debounce("daily.log", 0.2)
+
+        assert first is True
+        assert second is False
+        processed
+      solution: |-
+        import time
+
+        lastSeen: dict[str, float] = {}
+        processed: list[str] = []
+
+
+        def debounce(key: str, windowSeconds: float) -> bool:
+            now = time.monotonic()
+            if key in lastSeen and now - lastSeen[key] < windowSeconds:
+                return False
+            lastSeen[key] = now
+            processed.append(key)
+            return True
+
+
+        first = debounce("daily.log", 0.2)
+        second = debounce("daily.log", 0.2)
+
+        assert first is True
+        assert second is False
+        processed
+      hints:
+        - 짧은 간격으로 같은 키가 들어오면 함수는 False를 돌려준다.
+        - 첫 호출은 lastSeen에 키가 없으므로 처리가 진행된다.
+      check:
+        type: noError
+        noError: 디바운스 함수 두 번 호출이 정상적으로 끝나야 한다.
+        resultCheck: first는 True, second는 False여야 한다.
+    check:
+      noError: 디바운스 함수 정의와 호출이 끝나야 한다.
+      resultCheck: processed 리스트가 처음 키만 담아야 한다.
+  - id: time-window
+    title: 같은 키 여러 번 호출
+    structuredPrimary: true
+    subtitle: 시간 창을 넘기면 다시 처리
+    goal: 같은 키를 시간 창보다 짧은 간격으로 여러 번 호출하면 처음만 처리되고, 시간 창이 지나면 다시 처리된다.
+    why: 자동화는 동일 파일이 여러 번 갱신될 때 안정화 시점에서만 처리해야 결과가 깔끔하다.
+    explanation: time.sleep으로 시간 창을 충분히 보낸 뒤 다시 호출하면 디바운스 함수가 True를 돌려준다. 시간 창이 지나기 전 두 번째 호출은 항상 False다. 같은 키의 처리 카운터는 시간 창마다 한 번씩 늘어난다.
+    tips:
+      - sleep 시간을 시간 창보다 약간 크게 두면 안정적이다.
+      - time.monotonic은 단조 증가 시계이므로 시간 비교에 적합하다.
+    snippet: |-
+      import time
+
+      lastSeen: dict[str, float] = {}
+
+
+      def debounce(key: str, windowSeconds: float) -> bool:
+          now = time.monotonic()
+          if key in lastSeen and now - lastSeen[key] < windowSeconds:
+              return False
+          lastSeen[key] = now
+          return True
+
+
+      results = []
+      results.append(debounce("k", 0.15))
+      results.append(debounce("k", 0.15))
+      time.sleep(0.2)
+      results.append(debounce("k", 0.15))
+
+      assert results == [True, False, True]
+      results
+    exercise:
+      prompt: 같은 함수를 키 "ticket"에 세 번 호출하되 첫 두 호출은 빠르게, 세 번째는 sleep 후로 두어 결과 리스트가 [True, False, True]가 되는지 검증하세요.
+      starterCode: |-
+        import time
+
+        lastSeen: dict[str, float] = {}
+
+
+        def debounce(key: str, windowSeconds: float) -> bool:
+            now = time.monotonic()
+            if key in lastSeen and now - lastSeen[key] < windowSeconds:
+                return False
+            lastSeen[key] = now
+            return True
+
+
+        results = []
+        results.append(debounce("ticket", 0.15))
+        results.append(debounce("ticket", 0.15))
+        time.sleep(___)
+        results.append(debounce("ticket", 0.15))
+
+        assert results == [True, False, True]
+        results
+      solution: |-
+        import time
+
+        lastSeen: dict[str, float] = {}
+
+
+        def debounce(key: str, windowSeconds: float) -> bool:
+            now = time.monotonic()
+            if key in lastSeen and now - lastSeen[key] < windowSeconds:
+                return False
+            lastSeen[key] = now
+            return True
+
+
+        results = []
+        results.append(debounce("ticket", 0.15))
+        results.append(debounce("ticket", 0.15))
+        time.sleep(0.2)
+        results.append(debounce("ticket", 0.15))
+
+        assert results == [True, False, True]
+        results
+      hints:
+        - sleep 시간이 시간 창인 0.15초보다 커야 세 번째 호출이 True가 된다.
+        - 0.2초가 안정적인 sleep 값이다.
+      check:
+        type: noError
+        noError: 세 번의 디바운스 호출과 sleep이 끝나야 한다.
+        resultCheck: results가 [True, False, True]여야 한다.
+    check:
+      noError: sleep과 디바운스 호출이 시간 창 전후로 끝나야 한다.
+      resultCheck: results가 [True, False, True]로 시간 창 안 중복이 거른 결과여야 한다.
+  - id: per-key-window
+    title: 키별 독립 시간 창
+    structuredPrimary: true
+    subtitle: 한 키가 다른 키에 영향 없음
+    goal: 두 다른 키는 각자 시간 창을 갖고 서로의 디바운스를 방해하지 않는다.
+    why: 자동화는 보통 여러 파일을 동시에 다루므로 키별 독립이 보장되어야 결과가 의도대로 나온다.
+    explanation: lastSeen dict는 키별로 마지막 시각을 따로 저장한다. 같은 시간 창 안에 두 다른 키를 호출하면 둘 다 True를 돌려준다. 자동화 시스템에서 이 패턴은 파일 단위 처리에 자연스럽다.
+    tips:
+      - 키 이름은 파일 절대 경로처럼 고유한 식별자로 두는 편이 안전하다.
+      - dict.get 으로 기본값을 줄 수도 있지만 in 비교가 명확하다.
+    snippet: |-
+      import time
+
+      lastSeen: dict[str, float] = {}
+
+
+      def debounce(key: str, windowSeconds: float) -> bool:
+          now = time.monotonic()
+          if key in lastSeen and now - lastSeen[key] < windowSeconds:
+              return False
+          lastSeen[key] = now
+          return True
+
+
+      results = [debounce("a.txt", 0.3), debounce("b.txt", 0.3)]
+
+      assert results == [True, True]
+      assert set(lastSeen.keys()) == {"a.txt", "b.txt"}
+      results
+    exercise:
+      prompt: 디바운스에 두 다른 키 alpha.csv와 beta.csv를 한 시간 창 안에 호출해 두 결과 모두 True가 되는지 검증하세요.
+      starterCode: |-
+        import time
+
+        lastSeen: dict[str, float] = {}
+
+
+        def debounce(key: str, windowSeconds: float) -> bool:
+            now = time.monotonic()
+            if ___ in lastSeen and now - lastSeen[key] < windowSeconds:
+                return False
+            lastSeen[key] = now
+            return True
+
+
+        results = [debounce("alpha.csv", 0.3), debounce("beta.csv", 0.3)]
+
+        assert results == [True, True]
+        results
+      solution: |-
+        import time
+
+        lastSeen: dict[str, float] = {}
+
+
+        def debounce(key: str, windowSeconds: float) -> bool:
+            now = time.monotonic()
+            if key in lastSeen and now - lastSeen[key] < windowSeconds:
+                return False
+            lastSeen[key] = now
+            return True
+
+
+        results = [debounce("alpha.csv", 0.3), debounce("beta.csv", 0.3)]
+
+        assert results == [True, True]
+        results
+      hints:
+        - in 비교의 좌변에는 함수 인자 변수 key를 그대로 둔다.
+        - 두 다른 키는 서로의 lastSeen 항목과 무관하다.
+      check:
+        type: noError
+        noError: 두 키 디바운스 호출이 정상적으로 끝나야 한다.
+        resultCheck: results가 [True, True]여야 한다.
+    check:
+      noError: 키별 독립 시간 창 호출이 끝나야 한다.
+      resultCheck: 두 키 모두 True가 나오고 lastSeen에 두 키가 모두 등록되어야 한다.
+  - id: debounce-summary
+    title: 디바운스 사이클 종합 정리
+    structuredPrimary: true
+    subtitle: 처리 결과 dict로 묶기
+    goal: 한 사이클 안의 디바운스 결과를 키별 처리 횟수 dict로 정리해 자동화 보고를 만든다.
+    why: 종합 정리는 다음 단계가 같은 dict를 받아 처리할 수 있게 만들고 운영자에게 처리 통계를 단숨에 보여 준다.
+    explanation: 마지막 섹션은 여러 호출을 한 함수로 묶어 키별 처리 횟수를 돌려준다. dict 키는 입력 키와 같고 값은 처리된 횟수다. 시간 창보다 짧은 호출은 카운트되지 않는다. 같은 함수를 두 번 호출하면 누적된 결과가 늘어난다.
+    tips:
+      - 처리 횟수가 0이면 입력 키가 모두 시간 창 안에 들어왔음을 의미한다.
+      - 종합 결과 dict는 자동화 대시보드의 표준 입력이다.
+    snippet: |-
+      import time
+
+
+      def summarizeDebounce(events: list[tuple[str, float]], windowSeconds: float) -> dict:
+          lastSeen: dict[str, float] = {}
+          counts: dict[str, int] = {}
+          startedAt = time.monotonic()
+          for key, offset in events:
+              now = startedAt + offset
+              if key in lastSeen and now - lastSeen[key] < windowSeconds:
+                  counts.setdefault(key, 0)
+                  continue
+              lastSeen[key] = now
+              counts[key] = counts.get(key, 0) + 1
+          return counts
+
+
+      summary = summarizeDebounce(
+          [("a", 0.0), ("a", 0.05), ("a", 0.4), ("b", 0.1)],
+          windowSeconds=0.2,
+      )
+
+      assert summary == {"a": 2, "b": 1}
+      summary
+    exercise:
+      prompt: 'summarizeDebounce에 "x"가 두 번, "y"가 한 번 들어오되 x의 두 호출이 시간 창 안에 있도록 두어 결과가 {"x": 1, "y": 1}이 되는지 검증하세요.'
+      starterCode: |-
+        import time
+
+
+        def summarizeDebounce(events: list[tuple[str, float]], windowSeconds: float) -> dict:
+            lastSeen: dict[str, float] = {}
+            counts: dict[str, int] = {}
+            startedAt = time.monotonic()
+            for key, offset in events:
+                now = startedAt + offset
+                if key in lastSeen and now - lastSeen[key] < windowSeconds:
+                    counts.setdefault(key, 0)
+                    continue
+                lastSeen[key] = now
+                counts[key] = counts.get(key, 0) + ___
+            return counts
+
+
+        summary = summarizeDebounce(
+            [("x", 0.0), ("x", 0.05), ("y", 0.1)],
+            windowSeconds=0.2,
+        )
+
+        assert summary == {"x": 1, "y": 1}
+        summary
+      solution: |-
+        import time
+
+
+        def summarizeDebounce(events: list[tuple[str, float]], windowSeconds: float) -> dict:
+            lastSeen: dict[str, float] = {}
+            counts: dict[str, int] = {}
+            startedAt = time.monotonic()
+            for key, offset in events:
+                now = startedAt + offset
+                if key in lastSeen and now - lastSeen[key] < windowSeconds:
+                    counts.setdefault(key, 0)
+                    continue
+                lastSeen[key] = now
+                counts[key] = counts.get(key, 0) + 1
+            return counts
+
+
+        summary = summarizeDebounce(
+            [("x", 0.0), ("x", 0.05), ("y", 0.1)],
+            windowSeconds=0.2,
+        )
+
+        assert summary == {"x": 1, "y": 1}
+        summary
+      hints:
+        - 카운터를 1만큼 더하면 처리 횟수가 정확히 늘어난다.
+        - x의 두 번째 호출은 시간 창 안이라 처리되지 않는다.
+      check:
+        type: noError
+        noError: 종합 함수 호출과 dict 반환이 끝나야 한다.
+        resultCheck: 'summary가 {"x": 1, "y": 1}로 본문 기대값과 같아야 한다.'
+    check:
+      noError: 종합 디바운스 함수와 입력 이벤트 처리가 끝나야 한다.
+      resultCheck: summary가 a 2회, b 1회로 종합 정리 결과를 정확히 보고해야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: watchSched_03-debounce-event-groups-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - debounce-skeleton
+    - debounce-summary
+    title: 같은 path의 연속 event를 debounce window로 묶기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 마지막 event 시각 기준으로 group을 나누고 원본 event ID를 보존한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - debounce는 첫 event가 아니라 마지막 event 시각으로 window를 연장하세요.
+    - 합쳐진 group에도 모든 원본 event ID를 보존하세요.
+    exercise:
+      prompt: group_debounced_events(events, window_ms)를 완성하세요.
+      starterCode: |-
+        def group_debounced_events(events, window_ms):
+            raise NotImplementedError
+      solution: |
+        def group_debounced_events(events, window_ms):
+            if window_ms < 0:
+                raise ValueError("negative debounce window")
+            groups = []
+            for event in sorted(events, key=lambda item: (item["path"], item["atMs"], item["id"])):
+                if not groups or groups[-1]["path"] != event["path"] or event["atMs"] - groups[-1]["lastAtMs"] > window_ms:
+                    groups.append({"path": event["path"], "firstAtMs": event["atMs"], "lastAtMs": event["atMs"], "eventIds": [event["id"]]})
+                else:
+                    groups[-1]["lastAtMs"] = event["atMs"]
+                    groups[-1]["eventIds"].append(event["id"])
+            return groups
+      hints: *id001
+    check:
+      id: python.watchsched.watchSched_03.debounce-event-groups.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.watchsched.watchSched_03.debounce-event-groups.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: group_debounced_events
+        cases:
+        - id: groups-nearby-same-path-events
+          arguments:
+          - value:
+            - id: a
+              path: /x
+              atMs: 0
+            - id: b
+              path: /x
+              atMs: 50
+          - value: 100
+          expectedReturn:
+          - path: /x
+            firstAtMs: 0
+            lastAtMs: 50
+            eventIds:
+            - a
+            - b
+        - id: splits-distant-events
+          arguments:
+          - value:
+            - id: a
+              path: /x
+              atMs: 0
+            - id: b
+              path: /x
+              atMs: 101
+          - value: 100
+          expectedReturn:
+          - path: /x
+            firstAtMs: 0
+            lastAtMs: 0
+            eventIds:
+            - a
+          - path: /x
+            firstAtMs: 101
+            lastAtMs: 101
+            eventIds:
+            - b
+        - id: separates-paths
+          arguments:
+          - value:
+            - id: b
+              path: /b
+              atMs: 1
+            - id: a
+              path: /a
+              atMs: 1
+          - value: 100
+          expectedReturn:
+          - path: /a
+            firstAtMs: 1
+            lastAtMs: 1
+            eventIds:
+            - a
+          - path: /b
+            firstAtMs: 1
+            lastAtMs: 1
+            eventIds:
+            - b
+        - id: rejects-negative-window
+          arguments:
+          - value: []
+          - value: -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: watchSched_03-file-stability-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - watchSched_03-debounce-event-groups-mastery
+    title: 새 파일에 크기·수정시각 안정화 판정 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 연속 동일 fingerprint sample 수가 기준에 도달했는지 검사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - debounce 종료와 파일 write 완료를 같은 것으로 보지 마세요.
+    - size와 modified time이 연속으로 같을 때만 처리 단계로 넘기세요.
+    exercise:
+      prompt: audit_file_stability(samples, required_consecutive)를 완성하세요.
+      starterCode: |-
+        def audit_file_stability(samples, required_consecutive):
+            raise NotImplementedError
+      solution: |
+        def audit_file_stability(samples, required_consecutive):
+            if required_consecutive <= 0:
+                raise ValueError("required consecutive must be positive")
+            streak = 0
+            previous = None
+            maximum_streak = 0
+            for sample in samples:
+                fingerprint = (sample["size"], sample["modifiedNs"])
+                streak = streak + 1 if fingerprint == previous else 1
+                previous = fingerprint
+                maximum_streak = max(maximum_streak, streak)
+            return {"stable": maximum_streak >= required_consecutive, "maximumStreak": maximum_streak, "sampleCount": len(samples), "finalFingerprint": list(previous) if previous else None}
+      hints: *id002
+    check:
+      id: python.watchsched.watchSched_03.file-stability-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.watchsched.watchSched_03.file-stability-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_file_stability
+        cases:
+        - id: accepts-three-identical-samples
+          arguments:
+          - value:
+            - size: 10
+              modifiedNs: 1
+            - size: 10
+              modifiedNs: 1
+            - size: 10
+              modifiedNs: 1
+          - value: 3
+          expectedReturn:
+            stable: true
+            maximumStreak: 3
+            sampleCount: 3
+            finalFingerprint:
+            - 10
+            - 1
+        - id: rejects-changing-file
+          arguments:
+          - value:
+            - size: 10
+              modifiedNs: 1
+            - size: 11
+              modifiedNs: 2
+          - value: 2
+          expectedReturn:
+            stable: false
+            maximumStreak: 1
+            sampleCount: 2
+            finalFingerprint:
+            - 11
+            - 2
+        - id: handles-empty-samples
+          arguments:
+          - value: []
+          - value: 1
+          expectedReturn:
+            stable: false
+            maximumStreak: 0
+            sampleCount: 0
+            finalFingerprint: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: watchSched_03-debounce-stability-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - watchSched_03-file-stability-audit-transfer
+    title: debounce와 파일 안정화 차이 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: event group과 content fingerprint 안정 근거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - event나 시간이 발생했다는 사실보다 처리 identity와 결과 evidence를 검증하세요.
+    - 중복·지연·재시작 상황에서 같은 업무 결과가 보존되는지 확인하세요.
+    exercise:
+      prompt: choose_debounce_stability(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_debounce_stability(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_debounce_stability(situation):
+            table = {'debounce': {'action': 'group callbacks by path and time', 'evidence': 'event IDs and window', 'risk': 'callback burst'}, 'stability': {'action': 'sample size and modified time', 'evidence': 'consecutive fingerprints', 'risk': 'partial file'}, 'process': {'action': 'claim ledger identity then handle', 'evidence': 'stable fingerprint and claim', 'risk': 'duplicate worker'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.watchsched.watchSched_03.debounce-stability-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.watchsched.watchSched_03.debounce-stability-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_debounce_stability
+        cases:
+        - id: recalls-debounce
+          arguments:
+          - value: debounce
+          expectedReturn:
+            action: group callbacks by path and time
+            evidence: event IDs and window
+            risk: callback burst
+        - id: recalls-stability
+          arguments:
+          - value: stability
+          expectedReturn:
+            action: sample size and modified time
+            evidence: consecutive fingerprints
+            risk: partial file
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

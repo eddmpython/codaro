@@ -595,11 +595,11 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "name": "landing-public-lesson-desktop",
             "url": (
                 f"http://127.0.0.1:{landingPort}/codaro/learn/lesson/30days/"
-                f"{quote('day01_헬로월드')}?path=pythonFoundation"
+                f"{quote('day01_헬로월드')}/?path=pythonFoundation"
             ),
             "viewport": {"width": 1440, "height": 900},
             "surface": "landing-public-lesson",
-            "waitFor": "[data-public-lesson]",
+            "waitFor": "[data-learning-lesson-ref='30days/day01_헬로월드']",
         },
         {
             "name": "local-learning-home-desktop",
@@ -1661,6 +1661,9 @@ async ({ surface, expectedTier }) => {
     webLearningLinkCount: document.querySelectorAll("a[href*='/learn']").length,
     publicLessonLinkCount: document.querySelectorAll("a[href*='/learn/lesson/']").length,
     publicLessonPageCount: document.querySelectorAll("[data-public-lesson]").length,
+    interactiveLessonCount: document.querySelectorAll("[data-learning-lesson-ref]").length,
+    interactiveLessonRef:
+      document.querySelector("[data-learning-lesson-ref]")?.getAttribute("data-learning-lesson-ref") || null,
     publicLessonRunTargets: Array.from(document.querySelectorAll("a[href*='/run/'][href*='surface=curriculum']"))
       .map((anchor) => {
         const url = new URL(anchor.href, window.location.origin);
@@ -1733,18 +1736,13 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
         if audit["learnLessonRowCount"] < 1 or audit["publicLessonLinkCount"] < 1:
             failures.append(f"{name}: Learn lesson rows must open canonical public lesson documents")
     elif surface == "landing-public-lesson":
-        expected_target = {
-            "category": "30days",
-            "lesson": "day01_헬로월드",
-            "path": "pythonFoundation",
-        }
-        if audit["publicLessonPageCount"] != 1 or audit["visibleImageCount"] < 1:
-            failures.append(f"{name}: canonical public lesson document or product visual is missing")
-        if expected_target not in audit["publicLessonRunTargets"]:
-            failures.append(
-                f"{name}: Run handoff lost canonical category/contentId/path context "
-                f"{audit['publicLessonRunTargets']}"
-            )
+        if (
+            audit["interactiveLessonCount"] != 1
+            or audit["interactiveLessonRef"] != "30days/day01_헬로월드"
+            or audit["lessonSectionCount"] < 1
+            or audit["visibleImageCount"] < 1
+        ):
+            failures.append(f"{name}: canonical interactive lesson workspace is incomplete")
         if audit["forbiddenLearningControls"]:
             failures.append(f"{name}: redundant public learning controls {audit['forbiddenLearningControls']}")
     elif surface == "learning-home":

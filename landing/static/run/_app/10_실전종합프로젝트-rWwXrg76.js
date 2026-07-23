@@ -1,0 +1,1015 @@
+var e=`meta:
+  packages:
+  - polars
+  id: polars_10
+  title: 실전종합프로젝트
+  order: 10
+  category: polars
+  difficulty: ⭐⭐⭐⭐
+  badge: 심화
+  tags:
+  - Polars
+  - 다중소스
+  - 통합분석
+  - Lazy
+  - 종합프로젝트
+  seo:
+    title: Polars 실전 종합 프로젝트 - 다중 데이터 통합 분석
+    description: 여러 데이터셋을 결합하여 종합 분석 파이프라인을 구축합니다. 모든 Polars 개념을 총정리합니다.
+    keywords:
+    - polars
+    - 다중 데이터
+    - 통합 분석
+    - lazy evaluation
+    - 종합 프로젝트
+intro:
+  emoji: 🏆
+  goal: 영화, 배우, 수익 데이터를 통합하여 "영화 산업 종합 분석 대시보드"를 완성합니다.
+  description: 모든 Polars 개념(read_csv, select, filter, with_columns, group_by, join, concat, window, lazy,
+    pivot)을 종합하여 실전 데이터 파이프라인을 구축합니다.
+  direction: 실전종합프로젝트에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - Polars DataFrame 확인 후 컬럼 선택/필터/집계에 맞는 코드 입력을 고릅니다.
+  - 실전종합프로젝트 결과를 행 수, 컬럼 값, 집계 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 대용량 데이터 분석 파이프라인에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 프로젝트 목표 입력 확인
+      detail: 입력 기준(Polars DataFrame)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 생성 및 로드 처리 실행
+      detail: 컬럼 선택/필터/집계 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 전처리 결과 검증
+      detail: 행 수, 컬럼 값, 집계 결과 기준으로 실행 결과를 비교합니다.
+    - label: 실전종합프로젝트 재사용
+      detail: 완성 코드를 대용량 데이터 분석 파이프라인에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 컬럼형 표 분석 환경
+      detail: polars 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 실전종합프로젝트 실행
+      detail: 셀을 실행해 행 수, 컬럼 값, 집계 결과와 예외 상태를 확인합니다.
+    - label: 실전종합프로젝트 완료
+      detail: 검증된 코드를 대용량 데이터 분석 파이프라인로 남깁니다.
+sections:
+- id: step1_goal
+  title: 1단계. 프로젝트 목표
+  structuredPrimary: true
+  subtitle: 다중 소스 통합 분석
+  goal: 1단계. 프로젝트 목표에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 10개의 Polars 프로젝트를 마무리하는 종합 프로젝트입니다. 지금까지 배운 모든 개념을 하나의 데이터 파이프라인에 통합하여 실전 분석 능력을 완성합니다.
+    실무 데이터 분석에서는 단일 테이블이 아닌 여러 소스의 데이터를 결합하여 분석하는 경우가 대부분입니다. 이 프로젝트에서는 영화 정보, 배우 정보, 수익 데이터라는 3개의 독립적인
+    데이터셋을 movieId라는 공통 키로 조인하여 영화 산업 전반을 분석합니다. 데이터 로드부터 전처리, 결합, 변환, 집계, 윈도우 함수, 피벗, Lazy 최적화까지 모든 단계를
+    경험하며, 종합 대시보드를 만드는 완전한 데이터 파이프라인을 구축합니다. 이 프로젝트를 완료하면 Polars로 어떤 분석 업무도 수행할 수 있는 역량을 갖추게 됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import polars as pl
+
+    projectPlan = pl.DataFrame({
+        "단계": ["1.로드", "2.전처리", "3.결합", "4.변환", "5.필터", "6.집계", "7.윈도우", "8.피벗", "9.Lazy", "10.대시보드"],
+        "핵심함수": ["read_csv", "cast/null", "join", "with_columns", "filter", "group_by", "over", "pivot", "lazy/collect", "agg"],
+        "설명": ["3개 DataFrame 생성", "타입변환/결측치", "movieId로 조인", "ROI/등급 파생", "조건 추출", "장르별 통계", "순위/누적", "교차표 생성", "쿼리 최적화", "종합 요약"]
+    })
+    projectPlan
+  exercise:
+    prompt: 1단계. 프로젝트 목표 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import polars as pl
+
+      projectPlan = pl.DataFrame({
+          "단계": ["1.로드", "2.전처리", "3.결합", "4.변환", "5.필터", "6.집계", "7.윈도우", "8.피벗", "9.Lazy", "10.대시보드"],
+          "핵심함수": ["read_csv", "cast/null", "join", "with_columns", "filter", "group_by", "over", "pivot", "lazy/collect", "agg"],
+          "설명": ["3개 DataFrame 생성", "타입변환/결측치", "movieId로 조인", "ROI/등급 파생", "조건 추출", "장르별 통계", "순위/누적", "교차표 생성", "쿼리 최적화", "종합 요약"]
+      })
+      projectPlan
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 프로젝트 목표의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 프로젝트 목표의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step2_load
+  title: 2단계. 데이터 생성 및 로드
+  structuredPrimary: true
+  subtitle: 세 개의 DataFrame (A1, A3 반복)
+  goal: 2단계. 데이터 생성 및 로드에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 실전 분석을 시뮬레이션하기 위해 3개의 독립적인 DataFrame을 생성합니다. 실무 환경에서는 영화 정보는 영화사 데이터베이스에서, 배우 정보는 인사 시스템에서,
+    수익 데이터는 재무 시스템에서 각각 추출하여 pl.read_csv()나 pl.read_database()로 불러옵니다. 이렇게 분산된 데이터 소스를 하나로 통합하는 것이 데이터
+    엔지니어링의 핵심입니다. dfMovies는 영화 제목, 장르, 개봉연도, 평점, 국가 정보를 담고 있고, dfActors는 배우명과 출연료를, dfRevenue는 제작비와 흥행
+    수익을 포함합니다. 세 테이블은 모두 movieId라는 공통 식별자를 가지고 있어 조인이 가능합니다. 스키마를 확인하면 각 테이블의 구조와 데이터 타입을 파악할 수 있으며, 이는
+    조인 전략을 수립하는 첫 단계입니다. 실무에서는 수백만 건의 데이터를 다루지만, 여기서는 학습을 위해 10건의 대표적인 영화를 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import polars as pl
+
+    dfMovies = pl.DataFrame({
+        "movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        "title": ["Avengers", "Titanic", "Avatar", "Joker", "Frozen", "Inception", "Interstellar", "Parasite", "The Batman", "Dune"],
+        "genre": ["Action", "Romance", "Sci-Fi", "Drama", "Animation", "Sci-Fi", "Sci-Fi", "Drama", "Action", "Sci-Fi"],
+        "year": [2012, 1997, 2009, 2019, 2013, 2010, 2014, 2019, 2022, 2021],
+        "rating": [8.0, 7.9, 7.8, 8.4, 7.4, 8.8, 8.6, 8.5, 7.8, 8.0],
+        "country": ["USA", "USA", "USA", "USA", "USA", "USA", "USA", "Korea", "USA", "USA"]
+    })
+
+    dfActors = pl.DataFrame({
+        "movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        "name": ["Robert Downey Jr.", "Leonardo DiCaprio", "Sam Worthington", "Joaquin Phoenix", "Kristen Bell", "Leonardo DiCaprio", "Matthew McConaughey", "Song Kangho", "Robert Pattinson", "Timothee Chalamet"],
+        "fee": [50, 25, 10, 20, 5, 30, 25, 2, 15, 12]
+    })
+
+    dfRevenue = pl.DataFrame({
+        "movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        "budget": [220, 200, 237, 55, 150, 160, 165, 11, 185, 165],
+        "boxOffice": [1518, 2200, 2847, 1074, 1280, 829, 677, 258, 770, 401],
+        "releaseDate": ["2012-05-04", "1997-12-19", "2009-12-18", "2019-10-04", "2013-11-27", "2010-07-16", "2014-11-07", "2019-05-30", "2022-03-04", "2021-10-22"]
+    })
+
+    dfMovies
+  exercise:
+    prompt: 2단계. 데이터 생성 및 로드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import polars as pl
+
+      dfMovies = pl.DataFrame({
+          "movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+          "title": ["Avengers", "Titanic", "Avatar", "Joker", "Frozen", "Inception", "Interstellar", "Parasite", "The Batman", "Dune"],
+          "genre": ["Action", "Romance", "Sci-Fi", "Drama", "Animation", "Sci-Fi", "Sci-Fi", "Drama", "Action", "Sci-Fi"],
+          "year": [2012, 1997, 2009, 2019, 2013, 2010, 2014, 2019, 2022, 2021],
+          "rating": [8.0, 7.9, 7.8, 8.4, 7.4, 8.8, 8.6, 8.5, 7.8, 8.0],
+          "country": ["USA", "USA", "USA", "USA", "USA", "USA", "USA", "Korea", "USA", "USA"]
+      })
+
+      dfActors = pl.DataFrame({
+          "movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+          "name": ["Robert Downey Jr.", "Leonardo DiCaprio", "Sam Worthington", "Joaquin Phoenix", "Kristen Bell", "Leonardo DiCaprio", "Matthew McConaughey", "Song Kangho", "Robert Pattinson", "Timothee Chalamet"],
+          "fee": [50, 25, 10, 20, 5, 30, 25, 2, 15, 12]
+      })
+
+      dfRevenue = pl.DataFrame({
+          "movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+          "budget": [220, 200, 237, 55, 150, 160, 165, 11, 185, 165],
+          "boxOffice": [1518, 2200, 2847, 1074, 1280, 829, 677, 258, 770, 401],
+          "releaseDate": ["2012-05-04", "1997-12-19", "2009-12-18", "2019-10-04", "2013-11-27", "2010-07-16", "2014-11-07", "2019-05-30", "2022-03-04", "2021-10-22"]
+      })
+
+      dfMovies
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 생성 및 로드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 생성 및 로드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_preprocess
+  title: 3단계. 전처리
+  structuredPrimary: true
+  subtitle: null 처리, 타입 변환 (C5, D3, D5 반복)
+  goal: 3단계. 전처리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 원시 데이터(raw data)는 그대로 분석에 사용할 수 없는 경우가 많습니다. 전처리(preprocessing) 단계에서 데이터 타입을 변환하고, 결측치를
+    처리하고, 이상치를 제거하는 등의 작업을 수행합니다. 여기서는 releaseDate가 문자열("2012-05-04")로 저장되어 있어 날짜 연산이 불가능합니다. str.to_date()로
+    Date 타입으로 변환하면 연도, 월, 요일 추출, 날짜 차이 계산 등의 시계열 분석이 가능해집니다. null 값 확인은 데이터 품질 점검의 필수 단계입니다. null이 있으면
+    집계 결과가 왜곡되거나 조인 실패가 발생할 수 있습니다. 실무에서는 전처리 단계에서 데이터 품질 리포트를 생성하고, 문제가 있는 데이터는 소스 시스템에 피드백하거나 규칙에 따라
+    처리합니다. 좋은 분석의 80%는 전처리에서 결정됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    dfRevenue = dfRevenue.with_columns(
+        pl.col("releaseDate").str.to_date("%Y-%m-%d").alias("releaseDate")
+    )
+    dfRevenue
+  exercise:
+    prompt: 3단계. 전처리 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      dfRevenue = dfRevenue.with_columns(
+          pl.col("releaseDate").str.to_date("%Y-%m-%d").alias("releaseDate")
+      )
+      dfRevenue
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 3단계. 전처리의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 3단계. 전처리의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step4_join
+  title: 4단계. 데이터 결합
+  structuredPrimary: true
+  subtitle: join, concat (F1, F4 반복)
+  goal: 4단계. 데이터 결합에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 분산된 데이터를 하나의 분석 테이블로 통합하는 것이 데이터 결합(join)입니다. SQL의 JOIN과 동일한 개념으로, 공통 키(movieId)를 기준으로
+    여러 테이블의 정보를 결합합니다. left join을 사용하면 왼쪽 테이블(dfMovies)의 모든 행을 유지하고, 오른쪽 테이블에서 매칭되는 정보를 가져옵니다. 먼저 영화와
+    배우 데이터를 결합하고(dfMovieActor), 그 결과에 수익 데이터를 추가로 결합합니다(dfFull). 단계별로 조인하면 각 단계의 결과를 확인하며 진행할 수 있습니다.
+    조인 후에는 영화 제목, 배우명, 출연료, 제작비, 흥행 수익 등 모든 정보가 하나의 행에 모이므로 종합적인 분석이 가능해집니다. 실무에서는 수십 개의 테이블을 조인하는 경우도
+    있으며, 조인 키 선택, 조인 방식(inner/left/outer), 중복 처리 등이 중요한 이슈입니다. Polars의 조인은 pandas보다 훨씬 빠른 성능을 제공합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    dfMovieActor = dfMovies.join(
+        dfActors,
+        on="movieId",
+        how="left"
+    )
+    dfFull = dfMovieActor.join(
+        dfRevenue,
+        on="movieId",
+        how="left"
+    )
+    dfFull
+  exercise:
+    prompt: 4단계. 데이터 결합 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      dfMovieActor = dfMovies.join(
+          dfActors,
+          on="movieId",
+          how="left"
+      )
+      dfFull = dfMovieActor.join(
+          dfRevenue,
+          on="movieId",
+          how="left"
+      )
+      dfFull
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 4단계. 데이터 결합의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 4단계. 데이터 결합의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step5_transform
+  title: 5단계. 파생 컬럼 생성
+  structuredPrimary: true
+  subtitle: with_columns, alias, when-then (D1, D2, D6 반복)
+  goal: 5단계. 파생 컬럼 생성에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 원본 데이터에는 없지만 분석에 필요한 파생 변수(derived variable)를 생성합니다. 수익률(ROI)은 "(흥행 수익 - 제작비) / 제작비 * 100"으로
+    계산하며, 투자 대비 수익을 백분율로 표현합니다. ROI가 200%면 투자금의 3배를 벌었다는 의미입니다. 날짜에서 연도(releaseYear)와 월(releaseMonth)을
+    추출하면 시계열 분석과 계절성 분석이 가능합니다. when-then-otherwise 구문으로 수익률을 기준으로 "대박", "성공", "보통", "실패" 등급을 부여하면 영화를
+    범주화할 수 있습니다. 이렇게 연속형 변수를 범주화하면 그룹별 비교가 쉬워집니다. 파생 변수는 원본 데이터에는 없지만 비즈니스 인사이트를 얻는 데 핵심적인 역할을 합니다. 실무에서는
+    도메인 지식을 바탕으로 의미 있는 파생 변수를 설계하는 것이 데이터 분석가의 중요한 역량입니다. with_columns()로 여러 파생 변수를 한 번에 생성할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    dfFull = dfFull.with_columns([
+        ((pl.col("boxOffice") - pl.col("budget")) / pl.col("budget") * 100).alias("roi"),
+        pl.col("releaseDate").dt.year().alias("releaseYear"),
+        pl.col("releaseDate").dt.month().alias("releaseMonth")
+    ])
+    dfFull = dfFull.with_columns(
+        pl.when(pl.col("roi") >= 500).then(pl.lit("대박"))
+        .when(pl.col("roi") >= 200).then(pl.lit("성공"))
+        .when(pl.col("roi") >= 0).then(pl.lit("보통"))
+        .otherwise(pl.lit("실패")).alias("successLevel")
+    )
+    dfFull.select(["title", "budget", "boxOffice", "roi", "releaseYear", "releaseMonth", "successLevel"])
+  exercise:
+    prompt: 5단계. 파생 컬럼 생성 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      dfFull = dfFull.with_columns([
+          ((pl.col("boxOffice") - pl.col("budget")) / pl.col("budget") * 100).alias("roi"),
+          pl.col("releaseDate").dt.year().alias("releaseYear"),
+          pl.col("releaseDate").dt.month().alias("releaseMonth")
+      ])
+      dfFull = dfFull.with_columns(
+          pl.when(pl.col("roi") >= 500).then(pl.lit("대박"))
+          .when(pl.col("roi") >= 200).then(pl.lit("성공"))
+          .when(pl.col("roi") >= 0).then(pl.lit("보통"))
+          .otherwise(pl.lit("실패")).alias("successLevel")
+      )
+      dfFull.select(["title", "budget", "boxOffice", "roi", "releaseYear", "releaseMonth", "successLevel"])
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 5단계. 파생 컬럼 생성의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 5단계. 파생 컬럼 생성의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step6_filter
+  title: 6단계. 필터링
+  structuredPrimary: true
+  subtitle: filter, 비교/논리연산, str.contains (C1, C2, C3, C4 반복)
+  goal: 6단계. 필터링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 전체 데이터에서 분석 목적에 맞는 부분집합을 추출하는 것이 필터링입니다. 평점 8점 이상이면서 수익률 200% 이상인 영화만 추출하면 "흥행과 작품성을 모두
+    갖춘 히트작"을 선별할 수 있습니다. &(and), |(or) 같은 논리 연산자로 복합 조건을 만들 수 있습니다. 문자열 필터에서는 str.contains()로 장르가 "Sci-Fi"를
+    포함하는 영화를 찾을 수 있습니다. 정규표현식도 지원하므로 복잡한 패턴 매칭도 가능합니다. 필터링은 데이터 탐색의 기본이며, 적절한 필터링으로 노이즈를 제거하고 핵심 데이터에
+    집중할 수 있습니다. Lazy 모드에서는 Predicate Pushdown으로 필터가 최우선으로 적용되어 성능이 극대화됩니다. 실무에서는 비즈니스 규칙에 따라 복잡한 필터 조건을
+    설계합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    dfHits = dfFull.filter(
+        (pl.col("rating") >= 8.0) & (pl.col("roi") >= 200)
+    )
+    dfHits.select(["title", "rating", "roi", "successLevel"])
+  exercise:
+    prompt: 6단계. 필터링 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      dfHits = dfFull.filter(
+          (pl.col("rating") >= 8.0) & (pl.col("roi") >= 200)
+      )
+      dfHits.select(["title", "rating", "roi", "successLevel"])
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 6단계. 필터링의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 6단계. 필터링의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step7_select
+  title: 7단계. 열 선택
+  structuredPrimary: true
+  subtitle: select, pl.col, 다중열, exclude (B1, B2, B4, B5 반복)
+  goal: 7단계. 열 선택에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 분석 목적에 맞는 핵심 컬럼만 선택하여 데이터를 간결하게 만듭니다. 전체 테이블에는 수십 개의 컬럼이 있을 수 있지만, 특정 분석에서는 그 중 일부만 필요합니다.
+    select()로 title, genre, rating, boxOffice 등 필요한 컬럼만 선택하면 데이터 크기가 줄어들어 메모리 효율이 높아지고 가독성도 향상됩니다. alias()로
+    컬럼명을 변경하여 더 명확하게 표현할 수 있습니다. 반대로 exclude()를 사용하면 특정 컬럼만 제외하고 나머지를 선택할 수 있습니다. 예를 들어 movieId, actorId
+    같은 내부 식별자는 분석 결과에서 제외하는 것이 좋습니다. Projection Pushdown 최적화에서는 select가 일찍 적용되어 불필요한 컬럼을 읽지 않으므로 I/O 비용이
+    크게 감소합니다. 실무에서는 리포트마다 필요한 컬럼 세트가 다르므로 적절한 선택이 중요합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    dfCore = dfFull.select([
+        pl.col("title"),
+        pl.col("genre"),
+        pl.col("year"),
+        pl.col("rating"),
+        pl.col("name").alias("leadActor"),
+        pl.col("boxOffice"),
+        pl.col("roi")
+    ])
+    dfCore
+  exercise:
+    prompt: 7단계. 열 선택 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      dfCore = dfFull.select([
+          pl.col("title"),
+          pl.col("genre"),
+          pl.col("year"),
+          pl.col("rating"),
+          pl.col("name").alias("leadActor"),
+          pl.col("boxOffice"),
+          pl.col("roi")
+      ])
+      dfCore
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 7단계. 열 선택의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 7단계. 열 선택의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step8_group
+  title: 8단계. 집계 분석
+  structuredPrimary: true
+  subtitle: group_by, agg, 다중그룹 (E1, E2, E3, E4, E5 반복)
+  goal: 8단계. 집계 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 개별 데이터를 그룹별로 요약하여 전체적인 패턴을 파악하는 것이 집계 분석입니다. group_by("genre")로 장르별로 그룹화하고, agg()로 각 그룹의
+    총 수익, 평균 수익, 평균 평점, 영화 수를 계산하면 "어떤 장르가 가장 수익성이 높은지" 한눈에 알 수 있습니다. 다중 그룹 집계에서는 ["genre", "successLevel"]처럼
+    여러 컬럼으로 그룹화하여 교차 분석을 수행합니다. 예를 들어 "Sci-Fi 장르의 대박 영화는 몇 편인지"를 확인할 수 있습니다. sum, mean, count, first,
+    n_unique 등 다양한 집계 함수를 조합하면 풍부한 통계를 산출할 수 있습니다. 집계 결과를 정렬하면 상위/하위 그룹을 빠르게 파악할 수 있습니다. Polars의 group_by는
+    pandas보다 월등히 빠르며, 수백만 건의 데이터도 초 단위로 집계합니다. 실무에서는 집계 데이터를 대시보드나 리포트에 활용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    genreStats = dfFull.group_by("genre").agg([
+        pl.col("boxOffice").sum().alias("totalRevenue"),
+        pl.col("boxOffice").mean().alias("avgRevenue"),
+        pl.col("rating").mean().alias("avgRating"),
+        pl.len().alias("movieCount")
+    ]).sort("totalRevenue", descending=True)
+    genreStats
+  exercise:
+    prompt: 8단계. 집계 분석 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      genreStats = dfFull.group_by("genre").agg([
+          pl.col("boxOffice").sum().alias("totalRevenue"),
+          pl.col("boxOffice").mean().alias("avgRevenue"),
+          pl.col("rating").mean().alias("avgRating"),
+          pl.len().alias("movieCount")
+      ]).sort("totalRevenue", descending=True)
+      genreStats
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 8단계. 집계 분석의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 8단계. 집계 분석의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step9_window
+  title: 9단계. 윈도우 함수
+  structuredPrimary: true
+  subtitle: over, rank, rolling, cum_sum, shift (I1, I2, I3, I4, I5 반복)
+  goal: 9단계. 윈도우 함수에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 윈도우 함수는 집계와 달리 행을 줄이지 않고 각 행에 그룹 내 통계를 추가하는 고급 기법입니다. rank().over("genre")는 각 장르 내에서 흥행
+    순위를 계산합니다. 예를 들어 Sci-Fi 장르 안에서 Avatar가 1위, Dune이 2위처럼 매기는 것입니다. 이렇게 하면 "각 장르의 최고 흥행작"을 쉽게 찾을 수 있습니다.
+    시계열 분석에서는 cum_sum()으로 누적 합계를 계산하여 "시간에 따른 총 수익 증가 추세"를 볼 수 있고, shift()로 이전 값과 비교하여 증가율을 계산할 수 있습니다.
+    rolling()로 이동 평균을 계산하면 단기 트렌드를 파악할 수 있습니다. 윈도우 함수는 SQL의 OVER 절, pandas의 transform()과 유사하지만 Polars가
+    더 빠릅니다. 실무에서는 순위, 비율, 증가율, 이동 평균 등 복잡한 비즈니스 로직을 윈도우 함수로 구현합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    dfRanked = dfFull.with_columns(
+        pl.col("boxOffice").rank(descending=True).over("genre").alias("genreRank")
+    ).select(["title", "genre", "boxOffice", "genreRank"]).sort(["genre", "genreRank"])
+    dfRanked
+  exercise:
+    prompt: 9단계. 윈도우 함수 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      dfRanked = dfFull.with_columns(
+          pl.col("boxOffice").rank(descending=True).over("genre").alias("genreRank")
+      ).select(["title", "genre", "boxOffice", "genreRank"]).sort(["genre", "genreRank"])
+      dfRanked
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 9단계. 윈도우 함수의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 9단계. 윈도우 함수의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step10_sort
+  title: 10단계. 정렬 및 상위 N개
+  structuredPrimary: true
+  subtitle: sort, head/tail (G1, G5 반복)
+  goal: 10단계. 정렬 및 상위 N개에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 데이터를 특정 기준으로 순서대로 배열하는 것이 정렬입니다. sort("roi", descending=True)는 수익률 내림차순 정렬로, 가장 수익성이 높은
+    영화가 맨 위에 옵니다. head(5)와 조합하면 Top 5를 추출할 수 있습니다. 반대로 rating 오름차순 정렬 후 head(3)하면 평점이 낮은 하위 3개 영화를 찾을
+    수 있습니다. 다중 정렬도 가능하여 ["genre", "rating"]으로 정렬하면 "장르별로 그룹화되고, 각 장르 내에서는 평점 순"으로 정렬됩니다. tail()은 하위 N개를
+    추출합니다. 정렬은 데이터 탐색과 리포트 생성에 필수적이며, 상위/하위 항목을 찾는 것은 의사결정에 직접 활용됩니다. 실무에서는 "Top 10 고객", "하위 5% 제품" 같은
+    분석을 자주 수행합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    top5Roi = dfFull.sort("roi", descending=True).head(5).select(["title", "genre", "roi", "successLevel"])
+    top5Roi
+  exercise:
+    prompt: 10단계. 정렬 및 상위 N개 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      top5Roi = dfFull.sort("roi", descending=True).head(5).select(["title", "genre", "roi", "successLevel"])
+      top5Roi
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 10단계. 정렬 및 상위 N개의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 10단계. 정렬 및 상위 N개의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step11_pivot
+  title: 11단계. 피벗
+  structuredPrimary: true
+  subtitle: pivot, unpivot, 체이닝 (J1, J2, J3 반복)
+  goal: 11단계. 피벗에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 피벗은 데이터의 형태를 바꾸어 교차표(cross-tabulation)를 만드는 기법입니다. 행 데이터를 열로 펼치면 가독성이 높은 매트릭스 형태가 됩니다.
+    장르별, 성공등급별 수익을 계산한 후 pivot(on="successLevel", index="genre", values="revenue")하면 장르가 행, 성공등급(대박/성공/보통/실패)이
+    열이 되는 테이블이 생성됩니다. 이렇게 하면 "Sci-Fi 장르의 대박 영화 수익은 얼마인지" 한눈에 볼 수 있습니다. fill_null(0)로 값이 없는 셀을 0으로 채웁니다.
+    Excel의 피벗 테이블, pandas의 pivot_table()과 동일한 기능입니다. unpivot()은 반대로 넓은 형태를 긴 형태로 변환합니다. 메서드 체이닝으로 filter,
+    group_by, pivot, sort를 한 줄로 연결하면 복잡한 분석도 간결하게 표현할 수 있습니다. 실무에서는 피벗 테이블을 리포트나 대시보드의 핵심 뷰로 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    pivotTable = dfFull.group_by(["genre", "successLevel"]).agg(
+        pl.col("boxOffice").sum().alias("revenue")
+    ).pivot(
+        on="successLevel",
+        index="genre",
+        values="revenue"
+    ).fill_null(0)
+    pivotTable
+  exercise:
+    prompt: 11단계. 피벗 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      pivotTable = dfFull.group_by(["genre", "successLevel"]).agg(
+          pl.col("boxOffice").sum().alias("revenue")
+      ).pivot(
+          on="successLevel",
+          index="genre",
+          values="revenue"
+      ).fill_null(0)
+      pivotTable
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 11단계. 피벗의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 11단계. 피벗의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step12_lazy
+  title: 12단계. Lazy 최적화
+  structuredPrimary: true
+  subtitle: lazy, collect, explain (H1, H2, H3 반복)
+  goal: 12단계. Lazy 최적화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 복잡한 데이터 파이프라인을 Lazy 모드로 작성하면 Polars가 자동으로 쿼리를 최적화합니다. lazy()로 시작하여 filter, group_by, agg,
+    sort 등을 체이닝하면 쿼리 계획이 수집됩니다. explain()으로 최적화된 실행 계획을 확인하면 Predicate Pushdown, Projection Pushdown 등이
+    적용된 것을 볼 수 있습니다. 예를 들어 "ROI > 100 필터링"이 맨 앞으로 이동하여 불필요한 데이터 처리를 건너뜁니다. collect()를 호출하면 최적화된 계획이 실제로
+    실행되어 DataFrame을 반환합니다. 실무에서는 대부분의 분석을 Lazy 모드로 작성하여 성능을 극대화합니다. 특히 수백만 건 이상의 대용량 데이터나 복잡한 조인이 포함된
+    쿼리에서 Lazy 모드의 성능 이점이 두드러집니다. 쿼리 개발 시에는 fetch(100)으로 상위 100개만 빠르게 테스트하고, 최종 실행 시 collect()를 사용하는 것이
+    효율적입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    lazyQuery = (
+        dfFull.lazy()
+        .filter(pl.col("roi") > 100)
+        .group_by("genre")
+        .agg([
+            pl.col("boxOffice").sum().alias("totalRevenue"),
+            pl.len().alias("count")
+        ])
+        .sort("totalRevenue", descending=True)
+    )
+    lazyQuery.explain()
+  exercise:
+    prompt: 12단계. Lazy 최적화 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      lazyQuery = (
+          dfFull.lazy()
+          .filter(pl.col("roi") > 100)
+          .group_by("genre")
+          .agg([
+              pl.col("boxOffice").sum().alias("totalRevenue"),
+              pl.len().alias("count")
+          ])
+          .sort("totalRevenue", descending=True)
+      )
+      lazyQuery.explain()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 12단계. Lazy 최적화의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 12단계. Lazy 최적화의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step13_dashboard
+  title: 13단계. 종합 대시보드
+  structuredPrimary: true
+  subtitle: 최종 결과물
+  goal: 13단계. 종합 대시보드에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 데이터 파이프라인의 최종 산출물은 의사결정에 활용할 수 있는 인사이트입니다. 종합 대시보드는 여러 관점의 집계 데이터를 한곳에 모아 전체 상황을 조망할 수
+    있게 합니다. 장르별 요약에서는 영화 수, 총수익, 평균수익, 평균ROI, 평균평점을 계산하여 "어떤 장르가 가장 수익성이 높고 안정적인지" 파악합니다. 연도별 요약은 시계열
+    트렌드를 보여주어 "영화 산업이 성장하는지, 제작비 대비 수익이 개선되는지" 분석할 수 있습니다. 배우별 요약은 "어떤 배우가 출연료 대비 흥행 효율이 높은지" 평가하여 캐스팅
+    의사결정에 활용할 수 있습니다. round()로 소수점을 정리하고 한글 컬럼명을 사용하면 리포트 가독성이 향상됩니다. 실무에서는 이런 집계 데이터를 Tableau, Power
+    BI, Grafana 같은 BI 도구에 연결하거나, CSV로 저장하여 공유합니다. 데이터 분석의 최종 목표는 비즈니스 가치를 창출하는 것입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    dashboardGenre = dfFull.group_by("genre").agg([
+        pl.len().alias("영화수"),
+        pl.col("boxOffice").sum().round(1).alias("총수익"),
+        pl.col("boxOffice").mean().round(1).alias("평균수익"),
+        pl.col("roi").mean().round(1).alias("평균ROI"),
+        pl.col("rating").mean().round(2).alias("평균평점")
+    ]).sort("총수익", descending=True)
+    dashboardGenre
+  exercise:
+    prompt: 13단계. 종합 대시보드 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      dashboardGenre = dfFull.group_by("genre").agg([
+          pl.len().alias("영화수"),
+          pl.col("boxOffice").sum().round(1).alias("총수익"),
+          pl.col("boxOffice").mean().round(1).alias("평균수익"),
+          pl.col("roi").mean().round(1).alias("평균ROI"),
+          pl.col("rating").mean().round(2).alias("평균평점")
+      ]).sort("총수익", descending=True)
+      dashboardGenre
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 13단계. 종합 대시보드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 13단계. 종합 대시보드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 고급 확장 과제
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    10개 프로젝트에서 배운 모든 Polars 개념을 종합하여 실전 수준의 심화 분석을 수행합니다. 복잡한 필터 조건, 다중 조인, 윈도우 함수, 피벗, Lazy 최적화를 모두 활용합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import polars as pl
+
+    movies = pl.DataFrame({
+        "movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        "title": ["Avengers", "Titanic", "Avatar", "Joker", "Frozen", "Inception", "Interstellar", "Parasite", "The Batman", "Dune"],
+        "genre": ["Action", "Romance", "Sci-Fi", "Drama", "Animation", "Sci-Fi", "Sci-Fi", "Drama", "Action", "Sci-Fi"],
+        "year": [2012, 1997, 2009, 2019, 2013, 2010, 2014, 2019, 2022, 2021],
+        "rating": [8.0, 7.9, 7.8, 8.4, 7.4, 8.8, 8.6, 8.5, 7.8, 8.0]
+    })
+    revenue = pl.DataFrame({"movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        "budget": [220.0, 200.0, 237.0, 55.0, 150.0, 160.0, 165.0, 11.4, 185.0, 165.0],
+        "boxOffice": [1518.8, 2187.5, 2847.2, 1074.3, 1280.8, 829.9, 701.7, 258.8, 770.8, 402.0]})
+    movieRevenue = movies.join(revenue, on="movieId", how="left").with_columns(
+        ((pl.col("boxOffice") - pl.col("budget")) / pl.col("budget") * 100).alias("roi"))
+    movieRevenue.head()
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import polars as pl
+
+      movies = pl.DataFrame({
+          "movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+          "title": ["Avengers", "Titanic", "Avatar", "Joker", "Frozen", "Inception", "Interstellar", "Parasite", "The Batman", "Dune"],
+          "genre": ["Action", "Romance", "Sci-Fi", "Drama", "Animation", "Sci-Fi", "Sci-Fi", "Drama", "Action", "Sci-Fi"],
+          "year": [2012, 1997, 2009, 2019, 2013, 2010, 2014, 2019, 2022, 2021],
+          "rating": [8.0, 7.9, 7.8, 8.4, 7.4, 8.8, 8.6, 8.5, 7.8, 8.0]
+      })
+      revenue = pl.DataFrame({"movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+          "budget": [220.0, 200.0, 237.0, 55.0, 150.0, 160.0, 165.0, 11.4, 185.0, 165.0],
+          "boxOffice": [1518.8, 2187.5, 2847.2, 1074.3, 1280.8, 829.9, 701.7, 258.8, 770.8, 402.0]})
+      movieRevenue = movies.join(revenue, on="movieId", how="left").with_columns(
+          ((pl.col("boxOffice") - pl.col("budget")) / pl.col("budget") * 100).alias("roi"))
+      movieRevenue.head()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 10개 프로젝트를 완주하며 Polars의 모든 핵심 개념을 마스터했습니다! 다중 데이터 소스를 통합하고, 전처리하고, 변환하고, 집계하고, 시각화 준비까지 완료하는
+      완전한 데이터 파이프라인을 구축할 수 있는 능력을 갖추었습니다. 이제 실무 환경에서 어떤 데이터 분석 과제가 주어져도 Polars로 효율적으로 처리할 수 있습니다. pandas보다
+      수십 배 빠른 성능, Lazy Evaluation을 통한 자동 최적화, 풍부한 표현식 API는 Polars를 현대 데이터 분석의 필수 도구로 만들어줍니다. 계속해서 실전 프로젝트를
+      경험하며 역량을 키워나가시기 바랍니다!
+  - type: list
+    items:
+    - 'A. 데이터 로드: read_csv, schema 확인'
+    - 'B. 선택: select, pl.col, 다중열, exclude'
+    - 'C. 필터링: filter, 비교/논리연산, str.contains, null 처리'
+    - 'D. 변환: with_columns, alias, cast, str, dt, when-then'
+    - 'E. 집계: group_by, agg, 기본/고급집계, 다중그룹'
+    - 'F. 결합: join, concat'
+    - 'G. 정렬: sort, head/tail'
+    - 'H. Lazy: lazy, collect, explain'
+    - 'I. 윈도우: over, rank, rolling, cum_sum, shift'
+    - 'J. 피벗: pivot, unpivot, 체이닝'
+  - type: text
+    content: 10개 프로젝트를 완료하며 Polars의 모든 핵심 개념을 마스터했습니다! 영화 평점 분석부터 시작하여 날씨 데이터, 게임 판매, 주식 시계열, 음악 스트리밍,
+      부동산 가격, 스포츠 통계, 소셜 미디어, 대용량 로그, 그리고 이 종합 프로젝트까지 다양한 도메인의 데이터를 다루며 실전 감각을 익혔습니다. 이제 pandas를 대체하여
+      월등히 빠른 성능으로 대용량 데이터를 처리할 수 있고, Lazy Evaluation으로 쿼리를 자동 최적화하며, 윈도우 함수와 표현식 API로 복잡한 분석도 간결하게 수행할
+      수 있습니다. 실전 데이터 파이프라인을 자유롭게 구축할 수 있는 역량을 갖추셨습니다. 다음 단계로 DuckDB, Altair 등 다른 도구와 함께 사용하며 데이터 분석 능력을
+      더욱 확장해나가세요!
+  goal: 정리에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 주문 매출 파이프라인
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: Polars는 빠른 집계만 배우면 부족합니다. 업무에서는 입력 스키마를 먼저 확인하고, 잘못된 수량이나 단가를 명확한 오류로 막고, 예측한 상위 채널이 실제
+    집계와 맞는지 검증해야 합니다. 마지막에는 기준값을 바꾸는 변주로 결론이 얼마나 안정적인지 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import polars as pl
+
+    orderFrame = pl.DataFrame({
+        "orderId": [1001, 1002, 1003, 1004, 1005, 1006],
+        "channel": ["web", "store", "web", "partner", "store", "web"],
+        "quantity": [3, 2, 5, 1, 4, 2],
+        "unitPrice": [12000, 18000, 9000, 40000, 15000, 22000],
+        "refund": [0, 0, 1, 0, 0, 0],
+    })
+
+    def validateOrderFrame(frame: pl.DataFrame) -> bool:
+        requiredColumns = {"orderId", "channel", "quantity", "unitPrice", "refund"}
+        missingColumns = requiredColumns - set(frame.columns)
+        if missingColumns:
+            raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+        if frame.select((pl.col("quantity") <= 0).any()).item():
+            raise ValueError("quantity는 0보다 커야 합니다.")
+        if frame.select((pl.col("unitPrice") <= 0).any()).item():
+            raise ValueError("unitPrice는 0보다 커야 합니다.")
+        return True
+
+    validateOrderFrame(orderFrame)
+    orderFrame
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      revenueByChannel = (
+          orderFrame.filter(pl.col("refund") == 0)
+          .with_columns((pl.col("quantity") * pl.col("unitPrice")).alias("netRevenue"))
+          .group_by("channel")
+          .agg(pl.col("netRevenue").sum())
+      )
+
+      thresholdFrame = pl.DataFrame({"threshold": [20000, 50000, 80000]}).with_columns(
+          pl.col("threshold").map_elements(
+              lambda threshold: revenueByChannel.filter(pl.col("netRevenue") >= threshold).height,
+              return_dtype=pl.Int64,
+          ).alias("qualifiedChannels")
+      )
+
+      assert thresholdFrame.select((pl.col("qualifiedChannels").diff().fill_null(0) <= 0).all()).item()
+      thresholdFrame
+    solution: |-
+      import polars as pl
+
+      orderFrame = pl.DataFrame({
+          "orderId": [1001, 1002, 1003, 1004, 1005, 1006],
+          "channel": ["web", "store", "web", "partner", "store", "web"],
+          "quantity": [3, 2, 5, 1, 4, 2],
+          "unitPrice": [12000, 18000, 9000, 40000, 15000, 22000],
+          "refund": [0, 0, 1, 0, 0, 0],
+      })
+
+      def validateOrderFrame(frame: pl.DataFrame) -> bool:
+          requiredColumns = {"orderId", "channel", "quantity", "unitPrice", "refund"}
+          missingColumns = requiredColumns - set(frame.columns)
+          if missingColumns:
+              raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+          if frame.select((pl.col("quantity") <= 0).any()).item():
+              raise ValueError("quantity는 0보다 커야 합니다.")
+          if frame.select((pl.col("unitPrice") <= 0).any()).item():
+              raise ValueError("unitPrice는 0보다 커야 합니다.")
+          return True
+
+      validateOrderFrame(orderFrame)
+      orderFrame
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 업무 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: polars_10-columnar-report-pipeline-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_goal
+    - workflow_validation
+    title: 검증·정제·집계·rank를 잇는 columnar report 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 원시 판매 행에서 schema 오류를 분리하고 region별 total과 rank를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 정제에서 제외한 원래 index를 버리지 마세요.
+    - rank는 집계 total을 계산한 뒤 적용하세요.
+    exercise:
+      prompt: run_columnar_report(rows)를 완성해 rejectedIndexes와 regions를 반환하세요.
+      starterCode: |-
+        def run_columnar_report(rows):
+            raise NotImplementedError
+      solution: |
+        def run_columnar_report(rows):
+            totals = {}
+            rejected = []
+            for index, row in enumerate(rows):
+                amount = row.get("amount")
+                region = str(row.get("region", "")).strip()
+                if not region or not isinstance(amount, (int, float)) or isinstance(amount, bool) or amount < 0:
+                    rejected.append(index)
+                    continue
+                totals[region] = totals.get(region, 0) + amount
+            ordered = sorted(totals.items(), key=lambda item: (-item[1], item[0]))
+            regions = [{"region": region, "total": total, "rank": index} for index, (region, total) in enumerate(ordered, start=1)]
+            return {"rejectedIndexes": rejected, "regions": regions, "acceptedCount": len(rows) - len(rejected)}
+      hints: *id001
+    check:
+      id: python.polars.polars_10.columnar-report-pipeline.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_10.columnar-report-pipeline.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: run_columnar_report
+        cases:
+        - id: keeps-rejection-and-rank-evidence
+          arguments:
+          - value:
+            - region: Seoul
+              amount: 10
+            - region: Busan
+              amount: 20
+            - region: Seoul
+              amount: 15
+            - region: ''
+              amount: 5
+            - region: Busan
+              amount: bad
+          expectedReturn:
+            rejectedIndexes:
+            - 3
+            - 4
+            regions:
+            - region: Seoul
+              total: 25
+              rank: 1
+            - region: Busan
+              total: 20
+              rank: 2
+            acceptedCount: 3
+        - id: handles-empty-report
+          arguments:
+          - value: []
+          expectedReturn:
+            rejectedIndexes: []
+            regions: []
+            acceptedCount: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: polars_10-incremental-batch-merge-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_10-columnar-report-pipeline-mastery
+    title: 새 batch 집계를 기존 snapshot과 idempotent하게 병합하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: columnar report를 processed batch id 원장과 category total 업데이트로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - batch id를 total보다 먼저 확인해 replay를 막으세요.
+    - 입력 snapshot을 직접 mutate하지 말고 새 결과를 반환하세요.
+    exercise:
+      prompt: merge_incremental_batch(snapshot, batch_id, rows)를 완성하세요.
+      starterCode: |-
+        def merge_incremental_batch(snapshot, batch_id, rows):
+            raise NotImplementedError
+      solution: |
+        def merge_incremental_batch(snapshot, batch_id, rows):
+            result = {"processed": list(snapshot.get("processed", [])), "totals": dict(snapshot.get("totals", {}))}
+            if batch_id in result["processed"]:
+                return {**result, "applied": False}
+            for row in rows:
+                result["totals"][row["category"]] = result["totals"].get(row["category"], 0) + row["amount"]
+            result["processed"].append(batch_id)
+            result["processed"].sort()
+            result["totals"] = {key: result["totals"][key] for key in sorted(result["totals"])}
+            return {**result, "applied": True}
+      hints: *id002
+    check:
+      id: python.polars.polars_10.incremental-batch-merge.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_10.incremental-batch-merge.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: merge_incremental_batch
+        cases:
+        - id: applies-new-batch-once
+          arguments:
+          - value:
+              processed:
+              - b1
+              totals:
+                book: 10
+          - value: b2
+          - value:
+            - category: book
+              amount: 5
+            - category: pen
+              amount: 2
+          expectedReturn:
+            processed:
+            - b1
+            - b2
+            totals:
+              book: 15
+              pen: 2
+            applied: true
+        - id: skips-replayed-batch
+          arguments:
+          - value:
+              processed:
+              - b1
+              totals:
+                book: 10
+          - value: b1
+          - value:
+            - category: book
+              amount: 100
+          expectedReturn:
+            processed:
+            - b1
+            totals:
+              book: 10
+            applied: false
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: polars_10-columnar-capstone-evidence-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_10-incremental-batch-merge-transfer
+    title: columnar pipeline 완료 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: source, optimized plan, result, incremental state의 검증 증거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 결과 숫자뿐 아니라 source schema와 실행 plan을 보존하세요.
+    - incremental pipeline은 같은 batch 재실행 결과까지 검증해야 합니다.
+    exercise:
+      prompt: choose_columnar_evidence(situation)를 완성해 evidence, check, risk를 반환하세요.
+      starterCode: |-
+        def choose_columnar_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_columnar_evidence(situation):
+            table = {'source': {'evidence': 'schema hash and row count', 'check': 'required columns', 'risk': 'silent drift'}, 'optimized-plan': {'evidence': 'explain output', 'check': 'pushdown and collect boundary', 'risk': 'eager full scan'}, 'incremental-state': {'evidence': 'processed batch ids', 'check': 'replay returns applied false', 'risk': 'double count'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.polars.polars_10.columnar-capstone-evidence.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_10.columnar-capstone-evidence.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_columnar_evidence
+        cases:
+        - id: recalls-source
+          arguments:
+          - value: source
+          expectedReturn:
+            evidence: schema hash and row count
+            check: required columns
+            risk: silent drift
+        - id: recalls-optimized-plan
+          arguments:
+          - value: optimized-plan
+          expectedReturn:
+            evidence: explain output
+            check: pushdown and collect boundary
+            risk: eager full scan
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/sidebar";
 import type { SidebarCustomCurriculum } from "@/lib/customCurricula";
 import { useLocale } from "@/lib/localeContext";
+import { resolvePublicAsset } from "@/lib/publicAsset";
 import { cn } from "@/lib/utils";
 import { ACCENT_COLORS, type AccentColor, type AutomationSection, type SurfaceMode, type ThemeMode } from "@/lib/surfaceModel";
 import type { CurriculumCategory, CurriculumCategoryTreeNode, CurriculumContentSummary } from "@/types";
@@ -114,7 +115,11 @@ export function ProductSidebar({
           <SidebarMenu className="min-w-0 flex-1">
             <SidebarMenuItem>
               <SidebarMenuButton className="h-10 px-2 text-[13px] group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:p-1!" size="lg" tooltip="Codaro">
-                <img alt="" className="size-8 rounded-md object-contain group-data-[collapsible=icon]:size-8!" src="/brand/avatar-small.png" />
+                <img
+                  alt=""
+                  className="size-8 rounded-md object-contain group-data-[collapsible=icon]:size-8!"
+                  src={resolvePublicAsset("/brand/avatar-small.png")}
+                />
                 <div className="grid flex-1 text-left leading-tight">
                   <span className="truncate font-semibold">Codaro</span>
                 </div>

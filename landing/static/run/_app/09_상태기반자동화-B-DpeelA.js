@@ -1,0 +1,582 @@
+var e=`meta:
+  id: inputCtl_09
+  title: 상태 기반 자동화 분기
+  order: 9
+  category: inputCtl
+  difficulty: medium
+  audience: GUI 자동화에 입문하는 Python 학습자
+  packages:
+    - pyautogui
+  tags:
+    - pyautogui
+    - state
+    - automation
+intro:
+  direction: pyautogui.position과 size로 화면 상태를 직접 읽고 마우스 위치 영역에 따라 자동화 액션을 분기하는 결정 함수를 만든다.
+  benefits:
+    - pyautogui.size로 얻은 해상도를 4분면 경계로 나눈다.
+    - pyautogui.position의 좌표를 사분면 이름으로 분류한다.
+    - FAILSAFE 모서리 근처일 때는 보호 분기로 작업을 멈춘다.
+    - 종합 결정 함수가 상태와 액션, 시퀀스를 dict로 보고한다.
+  diagram:
+    steps:
+      - label: 상태 읽기
+        detail: pyautogui.position과 size를 한 번에 받아 좌표와 해상도를 묶는다.
+      - label: 사분면 분류
+        detail: 좌표를 좌상/우상/좌하/우하 네 사분면 중 하나로 분류한다.
+      - label: FAILSAFE 보호 분기
+        detail: 좌상단 5x5 영역 안이면 자동화가 곧 멈출 수 있으므로 hold 액션을 돌려준다.
+      - label: 종합 결정 보고
+        detail: 상태, 액션, 시퀀스를 한 dict로 묶어 운영자가 검토할 수 있게 만든다.
+    runtime:
+      - label: pyautogui 패키지 필요
+        detail: meta.packages의 pyautogui가 로컬 가상환경에 준비돼야 한다.
+      - label: 실제 화면과 마우스
+        detail: snippet은 실 환경의 해상도와 마우스 위치를 읽으므로 GUI 세션이 필요하다.
+sections:
+  - id: read-state
+    title: 상태 읽기
+    structuredPrimary: true
+    subtitle: position + size
+    goal: pyautogui.position과 size를 한 번에 호출해 좌표와 해상도를 dict로 묶는다.
+    why: 상태 기반 자동화는 결정 함수가 외부 환경을 한 번에 관측한 결과로 분기해야 디버깅이 쉽다.
+    explanation: readState 함수는 pyautogui.position과 size를 호출해 cursor, screen 두 키를 가진 dict를 돌려준다. 두 값은 같은 시점에 읽혀 결정 함수가 일관된 입력을 받는다. 결과 dict는 정수 좌표만 담아 JSON 직렬화에 안전하다.
+    tips:
+      - 상태는 한 번 읽어 결정 함수에 넘기는 편이 분기 추적에 좋다.
+      - 다중 모니터 환경에서는 size가 주 모니터 해상도를 돌려준다.
+    snippet: |-
+      import pyautogui
+
+
+      def readState() -> dict:
+          cursor = pyautogui.position()
+          screen = pyautogui.size()
+          return {
+              "cursor": {"x": cursor.x, "y": cursor.y},
+              "screen": {"width": screen.width, "height": screen.height},
+          }
+
+
+      state = readState()
+
+      assert set(state.keys()) == {"cursor", "screen"}
+      assert state["screen"]["width"] > 0
+      state["screen"]
+    exercise:
+      prompt: readState를 호출해 cursor, screen 두 키와 screen.width가 양수인지 검증하세요.
+      starterCode: |-
+        import pyautogui
+
+
+        def readState() -> dict:
+            cursor = pyautogui.position()
+            screen = pyautogui.___()
+            return {
+                "cursor": {"x": cursor.x, "y": cursor.y},
+                "screen": {"width": screen.width, "height": screen.height},
+            }
+
+
+        state = readState()
+
+        assert set(state.keys()) == {"cursor", "screen"}
+        assert state["screen"]["width"] > 0
+        state["screen"]
+      solution: |-
+        import pyautogui
+
+
+        def readState() -> dict:
+            cursor = pyautogui.position()
+            screen = pyautogui.size()
+            return {
+                "cursor": {"x": cursor.x, "y": cursor.y},
+                "screen": {"width": screen.width, "height": screen.height},
+            }
+
+
+        state = readState()
+
+        assert set(state.keys()) == {"cursor", "screen"}
+        assert state["screen"]["width"] > 0
+        state["screen"]
+      hints:
+        - 해상도 함수 이름은 size다.
+        - 결과 dict는 cursor와 screen 두 키만 가진다.
+      check:
+        noError: readState 호출이 끝나야 한다.
+        resultCheck: state의 키가 cursor와 screen이고 screen.width가 양수여야 한다.
+    check:
+      noError: readState 호출이 끝나야 한다.
+      resultCheck: state에 cursor와 screen 두 키가 있어야 한다.
+  - id: classify-quadrant
+    title: 사분면 분류
+    structuredPrimary: true
+    subtitle: 좌상/우상/좌하/우하
+    goal: 마우스 좌표를 해상도 기준 사분면 이름으로 분류하는 함수를 만든다.
+    why: 자동화 결정 함수는 화면 영역을 의미 있는 이름으로 바꿔야 다음 단계 분기가 가독성을 가진다.
+    explanation: classifyQuadrant 함수는 cursor와 screen dict를 받아 'topLeft', 'topRight', 'bottomLeft', 'bottomRight' 중 하나를 돌려준다. 절반 경계는 너비/높이의 정수 나눗셈으로 정한다. 같은 입력은 같은 결과를 돌려주는 결정적 함수다.
+    tips:
+      - 사분면 이름은 운영자가 결정 결과를 즉시 읽을 수 있게 만든다.
+      - 좌표가 경계에 정확히 걸리면 좌/상이 우선 매치된다.
+    snippet: |-
+      def classifyQuadrant(cursor: dict, screen: dict) -> str:
+          horizontal = "Left" if cursor["x"] < screen["width"] // 2 else "Right"
+          vertical = "top" if cursor["y"] < screen["height"] // 2 else "bottom"
+          return f"{vertical}{horizontal}"
+
+
+      screen = {"width": 1000, "height": 800}
+
+      assert classifyQuadrant({"x": 100, "y": 100}, screen) == "topLeft"
+      assert classifyQuadrant({"x": 900, "y": 700}, screen) == "bottomRight"
+      classifyQuadrant({"x": 100, "y": 100}, screen)
+    exercise:
+      prompt: classifyQuadrant에 cursor (900, 100), screen 1000x800을 넘기면 결과가 'topRight'인지 검증하세요.
+      starterCode: |-
+        def classifyQuadrant(cursor: dict, screen: dict) -> str:
+            horizontal = "Left" if cursor["x"] < screen["width"] // 2 else "Right"
+            vertical = "top" if cursor["y"] < screen["height"] // 2 else "___"
+            return f"{vertical}{horizontal}"
+
+
+        screen = {"width": 1000, "height": 800}
+
+        assert classifyQuadrant({"x": 900, "y": 100}, screen) == "topRight"
+        classifyQuadrant({"x": 900, "y": 100}, screen)
+      solution: |-
+        def classifyQuadrant(cursor: dict, screen: dict) -> str:
+            horizontal = "Left" if cursor["x"] < screen["width"] // 2 else "Right"
+            vertical = "top" if cursor["y"] < screen["height"] // 2 else "bottom"
+            return f"{vertical}{horizontal}"
+
+
+        screen = {"width": 1000, "height": 800}
+
+        assert classifyQuadrant({"x": 900, "y": 100}, screen) == "topRight"
+        classifyQuadrant({"x": 900, "y": 100}, screen)
+      hints:
+        - 화면 아래 절반 키워드는 'bottom'이다.
+        - x=900은 width 1000의 절반을 넘으므로 Right다.
+      check:
+        noError: classifyQuadrant 호출이 끝나야 한다.
+        resultCheck: 결과가 'topRight'여야 한다.
+    check:
+      noError: classifyQuadrant 두 호출이 끝나야 한다.
+      resultCheck: 두 결과가 'topLeft'와 'bottomRight'여야 한다.
+  - id: failsafe-guard
+    title: FAILSAFE 보호 분기
+    structuredPrimary: true
+    subtitle: 좌상단 5x5 영역
+    goal: 좌상단 모서리 5x5 영역 안이면 hold 액션을 돌려주는 보호 분기를 만든다.
+    why: pyautogui FAILSAFE가 좌상단 모서리에서 발동하므로 자동화는 그 영역 근처에서 추가 동작을 멈춰야 안전하다.
+    explanation: protectiveAction 함수는 cursor dict를 받아 (0, 0) 기준 5x5 영역 안이면 'hold', 아니면 'continue'를 돌려준다. 같은 함수가 결정 흐름의 가장 앞에 들어가 위험 영역을 먼저 거른다. 5x5는 pyautogui 기본 FAILSAFE 임계값과 잘 어울리는 안전 마진이다.
+    tips:
+      - 안전 분기는 결정 함수의 가장 앞에 두는 편이 사고 예방에 좋다.
+      - 임계값 5는 작은 모니터에서도 안전한 마진이다.
+    snippet: |-
+      def protectiveAction(cursor: dict) -> str:
+          if cursor["x"] < 5 and cursor["y"] < 5:
+              return "hold"
+          return "continue"
+
+
+      assert protectiveAction({"x": 0, "y": 0}) == "hold"
+      assert protectiveAction({"x": 100, "y": 100}) == "continue"
+      protectiveAction({"x": 2, "y": 2})
+    exercise:
+      prompt: protectiveAction에 cursor (3, 3)을 넘기면 'hold'가, (6, 6)을 넘기면 'continue'가 돌아오는지 검증하세요.
+      starterCode: |-
+        def protectiveAction(cursor: dict) -> str:
+            if cursor["x"] < 5 and cursor["y"] < 5:
+                return "hold"
+            return "___"
+
+
+        assert protectiveAction({"x": 3, "y": 3}) == "hold"
+        assert protectiveAction({"x": 6, "y": 6}) == "continue"
+        protectiveAction({"x": 3, "y": 3})
+      solution: |-
+        def protectiveAction(cursor: dict) -> str:
+            if cursor["x"] < 5 and cursor["y"] < 5:
+                return "hold"
+            return "continue"
+
+
+        assert protectiveAction({"x": 3, "y": 3}) == "hold"
+        assert protectiveAction({"x": 6, "y": 6}) == "continue"
+        protectiveAction({"x": 3, "y": 3})
+      hints:
+        - 안전 영역 밖 액션 이름은 'continue'다.
+        - (3, 3)은 5x5 영역 안이라 hold를 돌려준다.
+      check:
+        noError: protectiveAction 두 호출이 끝나야 한다.
+        resultCheck: 좌상단 영역은 'hold', 그 외는 'continue'여야 한다.
+    check:
+      noError: protectiveAction 호출이 끝나야 한다.
+      resultCheck: (0, 0)은 hold, (100, 100)은 continue여야 한다.
+  - id: decision-report
+    title: 종합 결정 보고
+    structuredPrimary: true
+    subtitle: state, action, sequence
+    goal: 보호 분기와 사분면 분류를 결합한 결정 함수가 state, action, sequence 세 키를 가진 dict를 돌려준다.
+    why: 종합 결정 보고는 자동화 사이클의 의도와 결과를 운영자가 한눈에 검토할 수 있게 만들어 사고를 줄인다.
+    explanation: decideReport 함수는 readState 결과를 받아 보호 분기를 먼저 점검한 뒤 사분면 분류로 액션을 정하고 액션에 맞는 시퀀스를 dict로 묶어 돌려준다. action 이름은 'hold', 'focusTopLeft' 같은 사람이 읽기 좋은 단어다. 같은 입력은 같은 결정 결과를 만드는 결정적 함수다.
+    tips:
+      - 결정 보고 dict는 자동화 로그의 한 행으로 그대로 들어간다.
+      - sequence가 빈 리스트라면 호출 측이 'NOP'으로 안전하게 처리한다.
+    snippet: |-
+      def decideReport(state: dict) -> dict:
+          cursor = state["cursor"]
+          screen = state["screen"]
+          if cursor["x"] < 5 and cursor["y"] < 5:
+              return {"state": "failsafeZone", "action": "hold", "sequence": []}
+          horizontal = "Left" if cursor["x"] < screen["width"] // 2 else "Right"
+          vertical = "top" if cursor["y"] < screen["height"] // 2 else "bottom"
+          quadrant = f"{vertical}{horizontal}"
+          return {
+              "state": quadrant,
+              "action": f"focus{quadrant[:1].upper()}{quadrant[1:]}",
+              "sequence": [{"type": "moveRel", "dx": 0, "dy": 0}],
+          }
+
+
+      sample = {"cursor": {"x": 0, "y": 0}, "screen": {"width": 800, "height": 600}}
+      report = decideReport(sample)
+
+      assert report == {"state": "failsafeZone", "action": "hold", "sequence": []}
+      report
+    exercise:
+      prompt: decideReport에 cursor (700, 100), screen 800x600 상태를 넘기면 state가 'topRight'이고 action이 'focusTopRight'이고 sequence가 한 항목인지 종합 검증하세요.
+      starterCode: |-
+        def decideReport(state: dict) -> dict:
+            cursor = state["cursor"]
+            screen = state["screen"]
+            if cursor["x"] < 5 and cursor["y"] < 5:
+                return {"state": "failsafeZone", "action": "hold", "sequence": []}
+            horizontal = "Left" if cursor["x"] < screen["width"] // 2 else "Right"
+            vertical = "top" if cursor["y"] < screen["height"] // 2 else "bottom"
+            quadrant = f"{vertical}{horizontal}"
+            return {
+                "state": quadrant,
+                "action": f"focus{quadrant[:1].upper()}{quadrant[1:]}",
+                "sequence": [{"type": "moveRel", "dx": 0, "dy": 0}],
+            }
+
+
+        sample = {"cursor": {"x": 700, "y": 100}, "screen": {"width": 800, "height": 600}}
+        report = decideReport(sample)
+
+        assert report["state"] == "topRight"
+        assert report["action"] == "___"
+        assert len(report["sequence"]) == 1
+        report
+      solution: |-
+        def decideReport(state: dict) -> dict:
+            cursor = state["cursor"]
+            screen = state["screen"]
+            if cursor["x"] < 5 and cursor["y"] < 5:
+                return {"state": "failsafeZone", "action": "hold", "sequence": []}
+            horizontal = "Left" if cursor["x"] < screen["width"] // 2 else "Right"
+            vertical = "top" if cursor["y"] < screen["height"] // 2 else "bottom"
+            quadrant = f"{vertical}{horizontal}"
+            return {
+                "state": quadrant,
+                "action": f"focus{quadrant[:1].upper()}{quadrant[1:]}",
+                "sequence": [{"type": "moveRel", "dx": 0, "dy": 0}],
+            }
+
+
+        sample = {"cursor": {"x": 700, "y": 100}, "screen": {"width": 800, "height": 600}}
+        report = decideReport(sample)
+
+        assert report["state"] == "topRight"
+        assert report["action"] == "focusTopRight"
+        assert len(report["sequence"]) == 1
+        report
+      hints:
+        - quadrant가 'topRight'이면 action 이름은 'focusTopRight'다.
+        - 빈칸은 action 문자열이다.
+      check:
+        noError: decideReport 호출이 종합 결과를 돌려줘야 한다.
+        resultCheck: state가 'topRight', action이 'focusTopRight'여야 한다.
+    check:
+      noError: decideReport 호출이 끝나야 한다.
+      resultCheck: report가 state, action, sequence 세 키를 가져야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: inputCtl_09-ui-state-machine-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - read-state
+    - decision-report
+    title: 상태 기반 자동화의 허용 transition 판정하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 현재 state·event 조합이 명시된 경우에만 다음 action과 state를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - action 순서가 아니라 관찰된 state와 event의 transition으로 자동화를 진행하세요.
+    - 예상 밖 화면에서는 추측 클릭 대신 중단과 증거 캡처를 선택하세요.
+    exercise:
+      prompt: advance_ui_state(state, event, transitions)를 완성하세요.
+      starterCode: |-
+        def advance_ui_state(state, event, transitions):
+            raise NotImplementedError
+      solution: |
+        def advance_ui_state(state, event, transitions):
+            key = f"{state}:{event}"
+            if key not in transitions:
+                return {"advanced": False, "state": state, "action": "stop-and-capture", "reason": "unexpected-transition"}
+            transition = transitions[key]
+            return {"advanced": True, "state": transition["next"], "action": transition["action"], "reason": "matched"}
+      hints: *id001
+    check:
+      id: python.inputctl.inputCtl_09.ui-state-machine.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_09.ui-state-machine.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: advance_ui_state
+        cases:
+        - id: advances-known-transition
+          arguments:
+          - value: loading
+          - value: ready
+          - value:
+              loading:ready:
+                next: form
+                action: focus-email
+          expectedReturn:
+            advanced: true
+            state: form
+            action: focus-email
+            reason: matched
+        - id: stops-unknown-event
+          arguments:
+          - value: loading
+          - value: error
+          - value:
+              loading:ready:
+                next: form
+                action: focus-email
+          expectedReturn:
+            advanced: false
+            state: loading
+            action: stop-and-capture
+            reason: unexpected-transition
+        - id: distinguishes-same-event-by-state
+          arguments:
+          - value: saved
+          - value: ready
+          - value:
+              loading:ready:
+                next: form
+                action: focus
+              saved:ready:
+                next: done
+                action: capture
+          expectedReturn:
+            advanced: true
+            state: done
+            action: capture
+            reason: matched
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: inputCtl_09-ui-recovery-plan-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inputCtl_09-ui-state-machine-mastery
+    title: 새 상태 실패에 제한된 recovery 계획 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: failure state·재시도 횟수·idempotency로 복구 action을 결정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 복구 전에 실패 화면을 캡처하고 state를 초기화하세요.
+    - 인증 요구나 비멱등 action은 자동 재시도하지 마세요.
+    exercise:
+      prompt: plan_ui_recovery(failure_state, attempt, maximum_attempts, idempotent)를 완성하세요.
+      starterCode: |-
+        def plan_ui_recovery(failure_state, attempt, maximum_attempts, idempotent):
+            raise NotImplementedError
+      solution: |
+        def plan_ui_recovery(failure_state, attempt, maximum_attempts, idempotent):
+            if attempt <= 0 or maximum_attempts <= 0:
+                raise ValueError("attempts must be positive")
+            retryable = failure_state in {"loading-timeout", "temporary-dialog"}
+            if retryable and idempotent and attempt < maximum_attempts:
+                action = "capture-reset-retry"
+            elif failure_state == "authentication-required":
+                action = "stop-require-user"
+            else:
+                action = "stop-and-report"
+            return {"action": action, "remaining": max(0, maximum_attempts - attempt), "retryable": retryable and idempotent}
+      hints: *id002
+    check:
+      id: python.inputctl.inputCtl_09.ui-recovery-plan.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_09.ui-recovery-plan.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_ui_recovery
+        cases:
+        - id: retries-idempotent-timeout
+          arguments:
+          - value: loading-timeout
+          - value: 1
+          - value: 3
+          - value: true
+          expectedReturn:
+            action: capture-reset-retry
+            remaining: 2
+            retryable: true
+        - id: stops-non-idempotent-timeout
+          arguments:
+          - value: loading-timeout
+          - value: 1
+          - value: 3
+          - value: false
+          expectedReturn:
+            action: stop-and-report
+            remaining: 2
+            retryable: false
+        - id: requires-user-authentication
+          arguments:
+          - value: authentication-required
+          - value: 1
+          - value: 3
+          - value: true
+          expectedReturn:
+            action: stop-require-user
+            remaining: 2
+            retryable: false
+        - id: stops-at-limit
+          arguments:
+          - value: temporary-dialog
+          - value: 3
+          - value: 3
+          - value: true
+          expectedReturn:
+            action: stop-and-report
+            remaining: 0
+            retryable: true
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: inputCtl_09-state-based-automation-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inputCtl_09-ui-recovery-plan-transfer
+    title: 상태 기반 자동화 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 관찰·transition·recovery 증거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 입력 자동화 action 전에 대상·경계·중단 방법을 검증하세요.
+    - 화면 변화와 E-Stop evidence를 남기고 성공을 클릭 발생으로 판단하지 마세요.
+    exercise:
+      prompt: choose_state_automation(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_state_automation(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_state_automation(situation):
+            table = {'observe': {'action': 'classify current UI state', 'evidence': 'semantic or visual state identity', 'risk': 'stale screen'}, 'advance': {'action': 'use explicit state event transition', 'evidence': 'transition ID', 'risk': 'blind sequence'}, 'recover': {'action': 'capture then bounded recovery', 'evidence': 'attempt ledger', 'risk': 'looping mutation'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.inputctl.inputCtl_09.state-based-automation-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_09.state-based-automation-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_state_automation
+        cases:
+        - id: recalls-observe
+          arguments:
+          - value: observe
+          expectedReturn:
+            action: classify current UI state
+            evidence: semantic or visual state identity
+            risk: stale screen
+        - id: recalls-advance
+          arguments:
+          - value: advance
+          expectedReturn:
+            action: use explicit state event transition
+            evidence: transition ID
+            risk: blind sequence
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

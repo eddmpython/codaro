@@ -1,0 +1,664 @@
+var e=`meta:
+  id: fileOps_04
+  title: 복사·이동·이름 변경
+  order: 4
+  category: fileOps
+  difficulty: easy
+  audience: 파일 자동화에 입문하는 Python 학습자
+  packages: []
+  tags:
+    - shutil
+    - pathlib
+    - rename
+intro:
+  direction: shutil과 pathlib을 함께 써서 임시 폴더 안에서 파일을 복제하고 옮기고 이름을 바꾸며 충돌을 처리한다.
+  benefits:
+    - shutil.copy2로 메타데이터까지 보존한 복사를 한다.
+    - shutil.move로 같은 디스크 안에서 파일을 빠르게 이동한다.
+    - Path.rename으로 이름과 경로를 한 번에 바꾼다.
+    - 이름 충돌 시 번호를 붙여 회피하는 패턴을 직접 작성한다.
+  diagram:
+    steps:
+      - label: 원본과 대상 폴더 준비
+        detail: tempfile 안에 source와 archive 폴더를 만들어 실험 공간을 분리한다.
+      - label: 메타 보존 복사
+        detail: shutil.copy2로 원본 mtime이 대상에 그대로 옮겨지는지 확인한다.
+      - label: 폴더 간 이동
+        detail: shutil.move로 source에 있던 파일을 archive로 옮긴다.
+      - label: 이름 충돌 회피
+        detail: 같은 이름이 이미 있으면 _1, _2 같은 접미사를 붙여 새 경로를 만든다.
+    runtime:
+      - label: 표준 라이브러리 조합
+        detail: pathlib, shutil, tempfile 세 모듈만으로 모든 흐름을 구성한다.
+      - label: assert 기반 검증
+        detail: 복사·이동 후 원본과 대상 상태를 assert로 확인한다.
+sections:
+  - id: copy-with-meta
+    title: 메타데이터까지 복사하기
+    structuredPrimary: true
+    subtitle: shutil.copy2의 보존 범위
+    goal: 원본 파일의 내용과 수정 시각을 보존하면서 대상 폴더로 복사한다.
+    why: 자동화 백업이나 보고서 보관에서는 파일이 만들어진 시점을 유지해야 추적이 가능하므로 copy2의 메타데이터 보존이 중요하다.
+    explanation: shutil.copy2는 내용은 물론 stat 정보의 mtime과 access time을 가능한 한 보존한다. shutil.copy는 내용만 복사하고 메타데이터는 새로 설정된다. 대상이 디렉터리이면 같은 이름으로 그 안에 저장되고, 파일 경로이면 그 이름으로 새로 만든다.
+    tips:
+      - copy2의 두 번째 인자는 파일 경로일 수도 폴더 경로일 수도 있다.
+      - 같은 파일에 두 번 copy2를 호출하면 두 번째 호출이 첫 번째 결과를 덮어쓴다.
+    snippet: |-
+      import shutil
+      import tempfile
+      from pathlib import Path
+
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td)
+          source = base / "source" / "summary.txt"
+          archive = base / "archive"
+          source.parent.mkdir()
+          archive.mkdir()
+          source.write_text("주문 12건", encoding="utf-8")
+          copied = Path(shutil.copy2(source, archive / source.name))
+          status = {
+              "exists": copied.exists(),
+              "sameContent": copied.read_text(encoding="utf-8") == "주문 12건",
+              "mtimeMatch": copied.stat().st_mtime == source.stat().st_mtime,
+          }
+
+      assert status == {"exists": True, "sameContent": True, "mtimeMatch": True}
+      status
+    exercise:
+      prompt: report.csv 파일을 source 폴더에 만들고 archive 폴더 안에 같은 이름으로 copy2를 호출해 status dict에 세 가지 결과가 True로 모이게 하세요.
+      starterCode: |-
+        import shutil
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            source = base / "source" / "___"
+            archive = base / "archive"
+            source.parent.mkdir()
+            archive.mkdir()
+            source.write_text("a,b\\n1,2", encoding="utf-8")
+            copied = Path(shutil.___(source, archive / source.name))
+            status = {
+                "exists": copied.exists(),
+                "sameContent": copied.read_text(encoding="utf-8") == "a,b\\n1,2",
+                "mtimeMatch": copied.stat().st_mtime == source.stat().st_mtime,
+            }
+
+        assert status == {"exists": True, "sameContent": True, "mtimeMatch": True}
+        status
+      solution: |-
+        import shutil
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            source = base / "source" / "report.csv"
+            archive = base / "archive"
+            source.parent.mkdir()
+            archive.mkdir()
+            source.write_text("a,b\\n1,2", encoding="utf-8")
+            copied = Path(shutil.copy2(source, archive / source.name))
+            status = {
+                "exists": copied.exists(),
+                "sameContent": copied.read_text(encoding="utf-8") == "a,b\\n1,2",
+                "mtimeMatch": copied.stat().st_mtime == source.stat().st_mtime,
+            }
+
+        assert status == {"exists": True, "sameContent": True, "mtimeMatch": True}
+        status
+      hints:
+        - 파일 이름은 변수로 한 번만 정해서 source와 archive 양쪽에서 같은 이름이 쓰이게 한다.
+        - copy2가 정답이며 copy는 mtime이 새로 갱신되어 비교가 실패한다.
+      check:
+        type: noError
+        noError: copy2 호출과 stat 비교가 PermissionError 없이 끝나야 한다.
+        resultCheck: status 딕셔너리의 세 키가 모두 True여야 한다.
+    check:
+      noError: source 작성과 copy2 호출, copied stat 비교가 차례로 끝나야 한다.
+      resultCheck: status가 exists, sameContent, mtimeMatch 모두 True인 dict여야 한다.
+  - id: move-between-folders
+    title: 폴더 간 파일 이동
+    structuredPrimary: true
+    subtitle: shutil.move로 원본 정리
+    goal: 처리한 파일을 결과 폴더로 옮기고 원본 폴더에는 흔적이 남지 않도록 한다.
+    why: 자동화 파이프라인은 처리 대기 폴더와 처리 완료 폴더를 분리해 같은 파일을 두 번 처리하지 않게 만들어야 한다.
+    explanation: shutil.move는 같은 디스크에서는 rename으로 빠르게 처리하고 다른 디스크에서는 copy2 + 삭제로 동작한다. 원본 파일은 이동 후 사라지므로 처리 완료 표시로 사용할 수 있다. 폴더 자체도 이동할 수 있지만 자동화에서는 파일 단위가 안전하다.
+    tips:
+      - 이동 후 원본 경로는 더 이상 존재하지 않으므로 read_text 같은 추가 호출을 피한다.
+      - 같은 디스크 안의 이동은 매우 빠르며 mtime이 그대로 유지된다.
+    snippet: |-
+      import shutil
+      import tempfile
+      from pathlib import Path
+
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td)
+          inbox = base / "inbox"
+          done = base / "done"
+          inbox.mkdir()
+          done.mkdir()
+          incoming = inbox / "order.json"
+          incoming.write_text("{}", encoding="utf-8")
+          moved = Path(shutil.move(incoming, done / incoming.name))
+          status = {"sourceLeft": incoming.exists(), "movedExists": moved.exists()}
+
+      assert status == {"sourceLeft": False, "movedExists": True}
+      status
+    exercise:
+      prompt: backlog 폴더에 ticket.md를 만들고 archive 폴더로 이동시켜 원본은 사라지고 대상만 남는지 검증하세요.
+      starterCode: |-
+        import shutil
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            backlog = base / "backlog"
+            archive = base / "archive"
+            backlog.mkdir()
+            archive.mkdir()
+            incoming = backlog / "___"
+            incoming.write_text("# todo", encoding="utf-8")
+            moved = Path(shutil.___(incoming, archive / incoming.name))
+            status = {"sourceLeft": incoming.exists(), "movedExists": moved.exists()}
+
+        assert status == {"sourceLeft": False, "movedExists": True}
+        status
+      solution: |-
+        import shutil
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            backlog = base / "backlog"
+            archive = base / "archive"
+            backlog.mkdir()
+            archive.mkdir()
+            incoming = backlog / "ticket.md"
+            incoming.write_text("# todo", encoding="utf-8")
+            moved = Path(shutil.move(incoming, archive / incoming.name))
+            status = {"sourceLeft": incoming.exists(), "movedExists": moved.exists()}
+
+        assert status == {"sourceLeft": False, "movedExists": True}
+        status
+      hints:
+        - 함수 이름은 shutil.move이고 첫 인자가 원본이며 두 번째 인자가 대상이다.
+        - 이동이 끝난 뒤 원본 exists는 False가 되어야 자동화 흐름이 안전하다.
+      check:
+        type: noError
+        noError: shutil.move 호출이 FileExistsError 없이 끝나야 한다.
+        resultCheck: status 딕셔너리에서 sourceLeft는 False, movedExists는 True여야 한다.
+    check:
+      noError: 이동 호출과 양쪽 exists 확인이 격리 공간에서 끝나야 한다.
+      resultCheck: status가 원본은 없고 대상만 있는 상태를 명확히 드러내야 한다.
+  - id: rename-with-suffix
+    title: 이름과 확장자 바꾸기
+    structuredPrimary: true
+    subtitle: Path.rename + with_suffix
+    goal: 한 번의 rename으로 이름과 확장자를 동시에 바꿔 자동화 결과물의 표기를 정리한다.
+    why: 자동화 결과 파일은 단계별로 임시 확장자가 붙는 경우가 많아 마지막에 .yaml이나 .csv로 깔끔하게 바꿔 두면 다음 사용자가 헷갈리지 않는다.
+    explanation: Path.rename은 같은 디렉터리든 다른 디렉터리든 새 경로로 파일을 이동시키며 결과 Path를 돌려준다. 확장자만 바꾸려면 with_suffix와 결합한다. 이미 같은 이름이 있다면 FileExistsError가 발생하므로 exists로 미리 확인하거나 충돌 회피 패턴을 적용한다.
+    tips:
+      - rename은 OS의 rename 시스템 콜을 그대로 부르므로 같은 디스크 안에서 매우 빠르다.
+      - 결과 Path를 반환받지 못하면 이후 코드가 옛 경로를 그대로 참조해 오류가 난다.
+    snippet: |-
+      import tempfile
+      from pathlib import Path
+
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td)
+          draft = base / "report.tmp"
+          draft.write_text("ok", encoding="utf-8")
+          final = draft.rename(draft.with_suffix(".csv"))
+          status = {
+              "draftGone": draft.exists(),
+              "finalExists": final.exists(),
+              "finalName": final.name,
+          }
+
+      assert status == {"draftGone": False, "finalExists": True, "finalName": "report.csv"}
+      status
+    exercise:
+      prompt: capture.tmp 파일을 capture.png로 바꿔 최종 이름과 사라진 원본을 검증하세요.
+      starterCode: |-
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            draft = base / "___"
+            draft.write_text("png bytes", encoding="utf-8")
+            final = draft.rename(draft.with_suffix(".___"))
+            status = {
+                "draftGone": draft.exists(),
+                "finalExists": final.exists(),
+                "finalName": final.name,
+            }
+
+        assert status == {"draftGone": False, "finalExists": True, "finalName": "capture.png"}
+        status
+      solution: |-
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            draft = base / "capture.tmp"
+            draft.write_text("png bytes", encoding="utf-8")
+            final = draft.rename(draft.with_suffix(".png"))
+            status = {
+                "draftGone": draft.exists(),
+                "finalExists": final.exists(),
+                "finalName": final.name,
+            }
+
+        assert status == {"draftGone": False, "finalExists": True, "finalName": "capture.png"}
+        status
+      hints:
+        - 임시 파일 이름과 with_suffix 인자, assert 마지막 이름이 모두 일치해야 한다.
+        - with_suffix는 점을 포함한 문자열을 받으므로 ".png" 형태로 넘긴다.
+      check:
+        type: noError
+        noError: rename과 with_suffix가 OSError 없이 끝나야 한다.
+        resultCheck: status에서 finalName이 capture.png이고 draftGone이 False여야 한다.
+    check:
+      noError: rename 호출과 결과 Path 사용이 정상 흐름으로 끝나야 한다.
+      resultCheck: status가 draftGone False, finalExists True, finalName "report.csv"여야 한다.
+  - id: collision-strategy
+    title: 이름 충돌 회피 종합 정리
+    structuredPrimary: true
+    subtitle: 접미사 번호로 자동 해소
+    goal: 같은 이름이 이미 있을 때 _1, _2 같은 접미사를 자동으로 붙여 새 경로를 만든다.
+    why: 자동화가 같은 폴더에 반복 실행되면 이름 충돌이 자주 일어나므로 사람 개입 없이 안전한 새 이름을 만드는 패턴이 필수다.
+    explanation: 마지막 섹션은 작은 함수로 충돌 회피 패턴을 정리한다. 대상 파일이 이미 있으면 stem에 _1을 붙여 새 경로를 시도하고, 그것도 있으면 _2로 올린다. while 루프와 with_name 메서드를 결합하면 자동화 안에서 재사용 가능한 유틸리티가 된다.
+    tips:
+      - with_name은 디렉터리를 유지한 채 파일명만 바꾼 Path를 만든다.
+      - 함수형 유틸리티로 분리하면 다음 레슨의 백업 흐름에서 그대로 재사용할 수 있다.
+    snippet: |-
+      import shutil
+      import tempfile
+      from pathlib import Path
+
+
+      def uniqueTarget(target: Path) -> Path:
+          if not target.exists():
+              return target
+          counter = 1
+          while True:
+              candidate = target.with_name(f"{target.stem}_{counter}{target.suffix}")
+              if not candidate.exists():
+                  return candidate
+              counter += 1
+
+
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td)
+          archive = base / "archive"
+          archive.mkdir()
+          (archive / "report.txt").write_text("first", encoding="utf-8")
+          source = base / "report.txt"
+          source.write_text("second", encoding="utf-8")
+          finalPath = Path(shutil.copy2(source, uniqueTarget(archive / source.name)))
+          names = sorted(item.name for item in archive.iterdir())
+
+      assert finalPath.name == "report_1.txt"
+      assert names == ["report.txt", "report_1.txt"]
+      {"final": finalPath.name, "names": names}
+    exercise:
+      prompt: archive에 note.md가 이미 있을 때 새 note.md를 복사하면 note_1.md로 저장되고, 같은 단계를 한 번 더 반복하면 note_2.md가 생성되는지 종합 검증하세요.
+      starterCode: |-
+        import shutil
+        import tempfile
+        from pathlib import Path
+
+
+        def uniqueTarget(target: Path) -> Path:
+            if not target.exists():
+                return target
+            counter = 1
+            while True:
+                candidate = target.with_name(f"{target.stem}_{counter}{target.suffix}")
+                if not candidate.exists():
+                    return candidate
+                counter += 1
+
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            archive = base / "archive"
+            archive.mkdir()
+            (archive / "note.md").write_text("first", encoding="utf-8")
+            source = base / "note.md"
+            source.write_text("second", encoding="utf-8")
+            firstFinal = Path(shutil.copy2(source, uniqueTarget(archive / source.name)))
+            secondFinal = Path(shutil.copy2(source, uniqueTarget(archive / source.name)))
+            names = sorted(item.name for item in archive.iterdir())
+
+        assert firstFinal.name == "___"
+        assert secondFinal.name == "___"
+        assert names == ["note.md", "note_1.md", "note_2.md"]
+        {"first": firstFinal.name, "second": secondFinal.name}
+      solution: |-
+        import shutil
+        import tempfile
+        from pathlib import Path
+
+
+        def uniqueTarget(target: Path) -> Path:
+            if not target.exists():
+                return target
+            counter = 1
+            while True:
+                candidate = target.with_name(f"{target.stem}_{counter}{target.suffix}")
+                if not candidate.exists():
+                    return candidate
+                counter += 1
+
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            archive = base / "archive"
+            archive.mkdir()
+            (archive / "note.md").write_text("first", encoding="utf-8")
+            source = base / "note.md"
+            source.write_text("second", encoding="utf-8")
+            firstFinal = Path(shutil.copy2(source, uniqueTarget(archive / source.name)))
+            secondFinal = Path(shutil.copy2(source, uniqueTarget(archive / source.name)))
+            names = sorted(item.name for item in archive.iterdir())
+
+        assert firstFinal.name == "note_1.md"
+        assert secondFinal.name == "note_2.md"
+        assert names == ["note.md", "note_1.md", "note_2.md"]
+        {"first": firstFinal.name, "second": secondFinal.name}
+      hints:
+        - 처음 충돌에서는 _1이 붙고 다음 호출에서는 카운터가 다시 시작해 _2가 붙는다.
+        - 파일이 늘어날수록 정렬된 names 결과에 새 이름이 추가된다.
+      check:
+        type: noError
+        noError: uniqueTarget 함수와 copy2 호출이 두 번 모두 통과해야 한다.
+        resultCheck: 첫 결과는 note_1.md, 두 번째 결과는 note_2.md여야 한다.
+    check:
+      noError: 함수 정의와 copy2 호출이 격리 공간에서 정상적으로 끝나야 한다.
+      resultCheck: 최종 이름이 report_1.txt이고 archive에 두 파일이 모두 존재해야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: fileOps_04-file-transfer-plan-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - copy-with-meta
+    - collision-strategy
+    title: 복사·이동·이름변경의 충돌 정책 계획하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: source identity와 destination 존재 여부, overwrite 정책으로 action을 결정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - destination 충돌을 조용히 overwrite하지 말고 정책으로 판정하세요.
+    - overwrite가 허용돼도 기존 destination backup을 먼저 계획하세요.
+    exercise:
+      prompt: plan_file_transfer(operation, source, destination, destination_exists, overwrite)를 완성하세요.
+      starterCode: |-
+        def plan_file_transfer(operation, source, destination, destination_exists, overwrite):
+            raise NotImplementedError
+      solution: |
+        def plan_file_transfer(operation, source, destination, destination_exists, overwrite):
+            if operation not in {"copy", "move", "rename"}:
+                raise ValueError("unknown operation")
+            if source == destination:
+                return {"ready": False, "action": "skip", "reason": "same-path", "requiresBackup": False}
+            if destination_exists and not overwrite:
+                return {"ready": False, "action": "conflict", "reason": "destination-exists", "requiresBackup": False}
+            return {"ready": True, "action": operation, "reason": "planned", "requiresBackup": destination_exists and overwrite}
+      hints: *id001
+    check:
+      id: python.fileops.fileOps_04.file-transfer-plan.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_04.file-transfer-plan.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_file_transfer
+        cases:
+        - id: plans-copy-to-empty-destination
+          arguments:
+          - value: copy
+          - value: /a
+          - value: /b
+          - value: false
+          - value: false
+          expectedReturn:
+            ready: true
+            action: copy
+            reason: planned
+            requiresBackup: false
+        - id: reports-existing-conflict
+          arguments:
+          - value: move
+          - value: /a
+          - value: /b
+          - value: true
+          - value: false
+          expectedReturn:
+            ready: false
+            action: conflict
+            reason: destination-exists
+            requiresBackup: false
+        - id: requires-backup-before-overwrite
+          arguments:
+          - value: rename
+          - value: /a
+          - value: /b
+          - value: true
+          - value: true
+          expectedReturn:
+            ready: true
+            action: rename
+            reason: planned
+            requiresBackup: true
+        - id: rejects-unknown-operation
+          arguments:
+          - value: merge
+          - value: /a
+          - value: /b
+          - value: false
+          - value: false
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: fileOps_04-file-transfer-result-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - fileOps_04-file-transfer-plan-mastery
+    title: 새 복사·이동 결과에 source/destination hash 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: operation별 source 잔존 조건과 destination content hash를 검사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 복사와 이동의 source 잔존 조건을 구분하세요.
+    - destination path 존재뿐 아니라 content hash와 단일 개수를 검사하세요.
+    exercise:
+      prompt: audit_file_transfer_result(operation, expected_hash, result)를 완성하세요.
+      starterCode: |-
+        def audit_file_transfer_result(operation, expected_hash, result):
+            raise NotImplementedError
+      solution: |
+        def audit_file_transfer_result(operation, expected_hash, result):
+            failures = []
+            if result.get("destinationHash") != expected_hash:
+                failures.append("destination-hash")
+            should_keep_source = operation == "copy"
+            if result.get("sourceExists", False) != should_keep_source:
+                failures.append("source-state")
+            if result.get("destinationCount") != 1:
+                failures.append("destination-count")
+            return {"passed": not failures, "failures": failures, "sourceKept": result.get("sourceExists", False)}
+      hints: *id002
+    check:
+      id: python.fileops.fileOps_04.file-transfer-result.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_04.file-transfer-result.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_file_transfer_result
+        cases:
+        - id: accepts-copy-result
+          arguments:
+          - value: copy
+          - value: abc
+          - value:
+              destinationHash: abc
+              sourceExists: true
+              destinationCount: 1
+          expectedReturn:
+            passed: true
+            failures: []
+            sourceKept: true
+        - id: accepts-move-result
+          arguments:
+          - value: move
+          - value: abc
+          - value:
+              destinationHash: abc
+              sourceExists: false
+              destinationCount: 1
+          expectedReturn:
+            passed: true
+            failures: []
+            sourceKept: false
+        - id: reports-corrupt-duplicate-move
+          arguments:
+          - value: move
+          - value: abc
+          - value:
+              destinationHash: bad
+              sourceExists: true
+              destinationCount: 2
+          expectedReturn:
+            passed: false
+            failures:
+            - destination-hash
+            - source-state
+            - destination-count
+            sourceKept: true
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: fileOps_04-file-transfer-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - fileOps_04-file-transfer-result-transfer
+    title: 복사·이동·이름변경 안전 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 충돌·backup·결과 hash evidence를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 파일 action 전에 root·충돌·dry run 계약을 확인하세요.
+    - 실행 횟수가 아니라 source와 destination artifact identity로 결과를 판정하세요.
+    exercise:
+      prompt: choose_file_transfer_policy(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_file_transfer_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_file_transfer_policy(situation):
+            table = {'conflict': {'action': 'apply explicit overwrite policy', 'evidence': 'source destination identities', 'risk': 'silent replacement'}, 'overwrite': {'action': 'backup existing destination', 'evidence': 'backup descriptor', 'risk': 'irreversible loss'}, 'verify': {'action': 'compare destination hash and source state', 'evidence': 'operation result', 'risk': 'partial move'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.fileops.fileOps_04.file-transfer-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_04.file-transfer-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_file_transfer_policy
+        cases:
+        - id: recalls-conflict
+          arguments:
+          - value: conflict
+          expectedReturn:
+            action: apply explicit overwrite policy
+            evidence: source destination identities
+            risk: silent replacement
+        - id: recalls-overwrite
+          arguments:
+          - value: overwrite
+          expectedReturn:
+            action: backup existing destination
+            evidence: backup descriptor
+            risk: irreversible loss
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

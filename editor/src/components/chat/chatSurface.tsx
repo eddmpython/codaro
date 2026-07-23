@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { defaultChatStartExamples, type ChatStartExample } from "@/lib/chatStartExamples";
 import { useLocale } from "@/lib/localeContext";
 import { providerProfileReady } from "@/lib/providerProfile";
+import { resolvePublicAsset } from "@/lib/publicAsset";
 import type { AssistantMessage } from "@/lib/assistantTypes";
 import type { TeacherScope } from "@/lib/teacherScope";
 import type {
@@ -62,7 +63,11 @@ export function ChatSurface({
     return (
       <div className="grid h-full min-h-0 place-items-center px-4">
         <section className="w-full max-w-3xl">
-          <img alt="" className="mx-auto mb-5 size-52 object-contain sm:size-56" src="/brand/avatar-small.png" />
+          <img
+            alt=""
+            className="mx-auto mb-5 size-52 object-contain sm:size-56"
+            src={resolvePublicAsset("/brand/avatar-small.png")}
+          />
           <div className="mb-5 text-center">
             <div className="text-xl font-semibold tracking-normal">{heroTitle ?? t("chat.empty.title")}</div>
             <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted-foreground">

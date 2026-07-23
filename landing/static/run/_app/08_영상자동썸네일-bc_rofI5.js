@@ -1,0 +1,615 @@
+var e=`meta:
+  id: visionApps_08
+  title: 영상 자동 썸네일
+  order: 8
+  category: visionApps
+  difficulty: ⭐⭐⭐
+  badge: 기초
+  packages:
+  - matplotlib
+  - numpy
+  - opencv-python
+  tags:
+  - opencv
+  - 썸네일
+  - 비디오
+  - scene
+  - 응용
+  seo:
+    title: 비전 응용 - 영상 자동 썸네일
+    description: 프레임 차분으로 영상에서 대표 N장의 썸네일을 자동으로 뽑아냅니다.
+    keywords:
+    - 썸네일
+    - scene
+    - 비디오
+    - 응용
+intro:
+  emoji: 🎬
+  goal: 영상에서 대표 N장의 썸네일을 자동으로 추출하는 응용을 만듭니다.
+  description: |-
+    영상의 모든 프레임이 의미 있지는 않습니다. 장면 전환이 일어난 프레임 또는 일정 간격의 프레임만 추리면 영상을 한 화면에 요약할 수 있습니다. 이 강의는 visionFeatures 6~7강의 비디오 IO와 차분 패턴을 응용해 자동 썸네일 추출기를 만듭니다.
+  direction: 영상을 처음부터 끝까지 읽으며 차분값이 큰 N개 프레임을 골라 썸네일로 저장합니다.
+  benefits:
+  - 프레임 차분의 시계열을 분석해 변화가 큰 시점을 식별합니다.
+  - argsort로 상위 N개 인덱스를 골라 썸네일을 추출합니다.
+  - 결과를 격자로 그리거나 파일로 저장하는 패턴을 익힙니다.
+  diagram:
+    steps:
+    - label: 1단계. 영상 준비
+      detail: codaro_demo.mp4 재사용.
+    - label: 2단계. 차분 시계열
+      detail: 인접 프레임 absdiff 면적.
+    - label: 3단계. 상위 N 인덱스
+      detail: argsort로 큰 변화 시점.
+    - label: 4단계. 썸네일 추출
+      detail: 해당 인덱스의 프레임 저장.
+    - label: 5단계. 격자 시각화
+      detail: N장을 한 화면에.
+    runtime:
+    - label: 비전 환경
+      detail: opencv-python의 VideoCapture와 absdiff.
+    - label: 검증 흐름
+      detail: 프레임 변화도와 추출된 키프레임 수를 assert와 시각 비교로 기대값과 같은지 확인합니다.
+sections:
+- id: prepare
+  title: 1단계. 영상 준비
+  structuredPrimary: true
+  subtitle: codaro_demo.mp4 재사용
+  goal: visionFeatures 6강에서 만든 영상을 사용합니다(없으면 즉석 합성).
+  why: 같은 영상으로 강의를 진행해 결과를 비교 가능하게 만듭니다.
+  explanation: |-
+    합성 영상은 노란 원이 우측으로 이동합니다. 인접 프레임 차분은 원의 이동 영역을 마스크화합니다. 모든 프레임의 차분이 비슷한 면적을 가지므로 단순 변화량 기반 썸네일에서는 균등한 간격으로 N장이 골라집니다.
+  tips:
+  - 실제 영상은 장면 전환이 강한 시점에 차분이 급증합니다. 합성 영상에서는 그 패턴이 약합니다.
+  snippet: |-
+    import cv2
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import tempfile
+    from pathlib import Path
+
+    videoPath = Path(tempfile.gettempdir()) / 'codaro_demo.mp4'
+    if not videoPath.exists():
+        width, height = 320, 240
+        fps = 24
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        writer = cv2.VideoWriter(str(videoPath), fourcc, fps, (width, height))
+        for idx in range(60):
+            frame = np.zeros((height, width, 3), dtype=np.uint8)
+            intensity = int(255 * idx / 59)
+            frame[:] = (intensity, 100, 255 - intensity)
+            cv2.circle(frame, (60 + idx * 4, 120), 20, (0, 255, 255), -1)
+            writer.write(frame)
+        writer.release()
+    videoPath.exists()
+  exercise:
+    prompt: 영상 총 프레임 수를 확인하세요.
+    starterCode: |-
+      cap = cv2.VideoCapture(str(videoPath))
+      total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+      cap.___()
+      total
+    hints:
+    - 빈칸은 release 메서드 이름입니다.
+    - 결과는 60 입니다.
+  check:
+    noError: 영상 준비가 오류 없이 끝나야 합니다.
+    resultCheck: videoPath.exists() 가 True여야 합니다.
+- id: diff_series
+  title: 2단계. 차분 시계열
+  structuredPrimary: true
+  subtitle: 인접 프레임 absdiff 면적
+  goal: 인접 프레임 차분 후 임곗값 마스크의 면적을 시계열로 계산합니다.
+  why: 면적 시계열은 변화 강도를 정량적으로 표현합니다.
+  explanation: |-
+    visionFeatures 7강의 absdiff 패턴을 그대로 응용합니다. 차이가 큰 픽셀 수를 시계열로 모으면 첫 인덱스는 0(이전 프레임 없음) 으로 두는 것이 일반적입니다.
+  tips:
+  - 시계열에 0이 섞이면 시각화나 분석에서 노이즈가 됩니다. 첫 인덱스는 빼고 다루는 것이 안전합니다.
+  snippet: |-
+    cap = cv2.VideoCapture(str(videoPath))
+    prevGray = None
+    diffs = []
+    while True:
+        ok, frame = cap.read()
+        if not ok:
+            break
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        if prevGray is None:
+            diffs.append(0)
+        else:
+            mask = cv2.absdiff(prevGray, gray) > 20
+            diffs.append(int(mask.sum()))
+        prevGray = gray
+    cap.release()
+    len(diffs), diffs[1], diffs[-1]
+  exercise:
+    prompt: 차분 면적의 평균과 최댓값을 출력하세요.
+    starterCode: |-
+      arr = np.array(diffs[___:])
+      arr.mean(), arr.max()
+    hints:
+    - 빈칸은 정수 1입니다(첫 인덱스 제외).
+    - 평균과 최대값이 모두 양수여야 합니다.
+  check:
+    noError: 차분 시계열 계산이 오류 없이 끝나야 합니다.
+    resultCheck: len(diffs) 가 60 정도여야 합니다.
+- id: top_n
+  title: 3단계. 상위 N 인덱스
+  structuredPrimary: true
+  subtitle: argsort로 큰 변화 시점
+  goal: 차분 면적이 큰 N개 프레임 인덱스를 추출합니다.
+  why: 대표 썸네일은 변화가 큰 시점에서 고르는 것이 자연스럽습니다.
+  explanation: |-
+    \`np.argsort(diffs)[-N:]\` 가 상위 N개의 인덱스입니다. 결과는 오름차순이므로 시간순으로 정렬하려면 \`sorted\` 를 한 번 더 적용합니다.
+  tips:
+  - argsort 결과는 작은 값부터 큰 값으로의 순서입니다. 끝에서 N개가 가장 큰 값들의 인덱스입니다.
+  snippet: |-
+    diffArr = np.array(diffs)
+    topN = 4
+    topIdx = sorted(np.argsort(diffArr)[-topN:].tolist())
+    topIdx, [diffArr[i] for i in topIdx]
+  exercise:
+    prompt: N=8로 변경해 더 많은 썸네일 후보를 만드세요.
+    starterCode: |-
+      eightIdx = sorted(np.argsort(diffArr)[___:].tolist())
+      eightIdx
+    hints:
+    - 빈칸은 -8 입니다.
+    - 결과는 8개 인덱스 리스트입니다.
+  check:
+    noError: 인덱스 추출이 오류 없이 끝나야 합니다.
+    resultCheck: len(topIdx) 가 4 여야 합니다.
+- id: extract
+  title: 4단계. 썸네일 추출
+  structuredPrimary: true
+  subtitle: 해당 인덱스의 프레임 저장
+  goal: 인덱스에 해당하는 프레임을 다시 읽어 dict로 모읍니다.
+  why: 인덱스만 있고 실제 프레임이 없으면 시각화도 저장도 못합니다.
+  explanation: |-
+    \`cap.set(cv2.CAP_PROP_POS_FRAMES, idx)\` 로 특정 프레임으로 점프할 수 있지만, 일부 코덱에서는 정확하지 않습니다. 순차 읽기로 원하는 인덱스만 모으는 것이 안정적입니다.
+  tips:
+  - 순차 읽기는 안전하지만 큰 영상에서는 느립니다. 인덱싱이 가능한 영상이면 set 방식이 더 빠릅니다.
+  snippet: |-
+    cap = cv2.VideoCapture(str(videoPath))
+    targetSet = set(topIdx)
+    thumbnails = {}
+    idx = 0
+    while True:
+        ok, frame = cap.read()
+        if not ok:
+            break
+        if idx in targetSet:
+            thumbnails[idx] = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        idx += 1
+    cap.release()
+    sorted(thumbnails.keys()), len(thumbnails)
+  exercise:
+    prompt: eightIdx 인덱스로도 같은 패턴을 적용해 thumbnailsEight를 만드세요.
+    starterCode: |-
+      cap = cv2.VideoCapture(str(videoPath))
+      eightSet = set(eightIdx)
+      thumbnailsEight = {}
+      idx = 0
+      while True:
+          ok, frame = cap.read()
+          if not ok:
+              break
+          if idx in eightSet:
+              thumbnailsEight[idx] = cv2.cvtColor(frame, ___)
+          idx += 1
+      cap.release()
+      len(thumbnailsEight)
+    hints:
+    - 빈칸은 cv2.COLOR_BGR2RGB 입니다.
+    - 결과는 8 입니다.
+  check:
+    noError: 썸네일 추출이 오류 없이 끝나야 합니다.
+    resultCheck: len(thumbnails) 가 len(topIdx) 와 같아야 합니다.
+- id: grid
+  title: 5단계. 격자 시각화
+  structuredPrimary: true
+  subtitle: N장을 한 화면에
+  goal: 추출한 썸네일을 격자로 그려 한눈에 봅니다.
+  why: 영상 한 편의 요약 화면을 만드는 것이 응용의 목표입니다.
+  explanation: |-
+    N장의 썸네일이라면 1xN 또는 2x(N/2) 격자가 자연스럽습니다. 각 칸에 프레임 인덱스를 타이틀로 표시합니다.
+  tips:
+  - 영상 길이가 길어지면 N을 동적으로 조절(예: 길이의 5%) 하는 것이 좋습니다.
+  snippet: |-
+    fig, axes = plt.subplots(1, len(thumbnails), figsize=(4 * len(thumbnails), 4))
+    for axis, key in zip(axes, sorted(thumbnails)):
+        axis.imshow(thumbnails[key])
+        axis.set_title(f'frame {key}')
+        axis.axis('off')
+    fig
+  exercise:
+    prompt: thumbnailsEight를 2x4 격자로 시각화하세요.
+    starterCode: |-
+      fig, axes = plt.subplots(2, 4, figsize=(14, 6))
+      keysSorted = sorted(thumbnailsEight)
+      for axis, key in zip(axes.ravel(), keysSorted):
+          axis.imshow(thumbnailsEight[key])
+          axis.set_title(f'frame {key}')
+          axis.axis('___')
+      fig
+    hints:
+    - 빈칸은 'off' 입니다.
+    - 8장이 모두 출력되어야 합니다.
+  check:
+    noError: 격자 시각화가 오류 없이 끝나야 합니다.
+    resultCheck: figure가 마지막 줄에 평가되어야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 함수화
+  goal: 영상 경로와 N → 썸네일 dict 한 함수에 모읍니다.
+  why: 함수로 묶어 두면 다른 영상에 즉시 적용할 수 있습니다.
+  explanation: |-
+    각 미션은 import문부터 시작하지만, 위 예제를 실행했다면 import는 생략해도 됩니다.
+  tips:
+  - 함수 반환을 dict(인덱스 → ndarray) 로 두면 후속 처리가 편합니다.
+  snippet: |-
+    def extractThumbnails(path, n=4, diffThreshold=20):
+        capLocal = cv2.VideoCapture(str(path))
+        diffsLocal = []
+        prevLocal = None
+        framesLocal = []
+        while True:
+            ok, frame = capLocal.read()
+            if not ok:
+                break
+            grayLocal = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            if prevLocal is None:
+                diffsLocal.append(0)
+            else:
+                maskLocal = cv2.absdiff(prevLocal, grayLocal) > diffThreshold
+                diffsLocal.append(int(maskLocal.sum()))
+            framesLocal.append(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            prevLocal = grayLocal
+        capLocal.release()
+        if not framesLocal:
+            return {}
+        topIdxLocal = sorted(np.argsort(np.array(diffsLocal))[-n:].tolist())
+        return {idx: framesLocal[idx] for idx in topIdxLocal}
+
+    extractThumbnails(videoPath, n=4).keys()
+  exercise:
+    prompt: "미션1: N=2, 4, 6에 대해 추출된 인덱스가 시간순으로 어떻게 변하는지 비교 출력하세요. 미션2: extractThumbnails(videoPath, n=4) 결과를 1x4 격자로 시각화하세요."
+    starterCode: |-
+      compare = {n: list(extractThumbnails(videoPath, n=n).keys()) for n in [___, 4, 6]}
+      compare
+    hints:
+    - 빈칸은 정수 2 입니다.
+    - 결과 dict의 값 길이가 N과 같아야 합니다.
+  check:
+    noError: 함수 호출이 오류 없이 끝나야 합니다.
+    resultCheck: extractThumbnails(videoPath).keys() 의 길이가 4 여야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: visionApps_08-video_thumbnail-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - prepare
+    - practice
+    title: 영상 자동 썸네일 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: duration·sample count·scene threshold·output geometry를 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_video_thumbnail_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_video_thumbnail_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_video_thumbnail_contract(value):
+            required = ['durationSeconds', 'sampleCount', 'sceneThreshold', 'outputSize']
+            rules = [{'id': 'duration', 'field': 'durationSeconds', 'kind': 'positive'}, {'id': 'samples', 'field': 'sampleCount', 'kind': 'range', 'min': 1, 'max': 10000}, {'id': 'scene', 'field': 'sceneThreshold', 'kind': 'unit-interval'}, {'id': 'size', 'field': 'outputSize', 'kind': 'length', 'value': 2}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'video_thumbnail', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.vision-apps.visionApps_08.video_thumbnail-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-apps.visionApps_08.video_thumbnail-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_video_thumbnail_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              durationSeconds: 120
+              sampleCount: 24
+              sceneThreshold: 0.4
+              outputSize:
+              - 1280
+              - 720
+          expectedReturn:
+            accepted: true
+            topic: video_thumbnail
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              sampleCount: 24
+              sceneThreshold: 0.4
+              outputSize:
+              - 1280
+              - 720
+          expectedReturn:
+            accepted: false
+            topic: video_thumbnail
+            missing:
+            - durationSeconds
+            violations:
+            - duration
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              durationSeconds: 0
+              sampleCount: 0
+              sceneThreshold: 2
+              outputSize:
+              - 1280
+          expectedReturn:
+            accepted: false
+            topic: video_thumbnail
+            missing: []
+            violations:
+            - duration
+            - samples
+            - scene
+            - size
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: visionApps_08-video_thumbnail-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionApps_08-video_thumbnail-contract-audit-mastery
+    title: 영상 자동 썸네일 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_video_thumbnail_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_video_thumbnail_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_video_thumbnail_result(expected, observed):
+            identity = ['videoHash', 'samplingPlanHash']
+            metrics = {'selectedTimestamp': 0.5}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'video_thumbnail', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.vision-apps.visionApps_08.video_thumbnail-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-apps.visionApps_08.video_thumbnail-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_video_thumbnail_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              videoHash: vid1
+              samplingPlanHash: uniform-24
+              selectedTimestamp: 48.0
+          - value:
+              videoHash: vid1
+              samplingPlanHash: uniform-24
+              selectedTimestamp: 48.4
+          expectedReturn:
+            passed: true
+            topic: video_thumbnail
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              videoHash: vid1
+              samplingPlanHash: uniform-24
+              selectedTimestamp: 48.0
+          - value:
+              videoHash: vid2
+              samplingPlanHash: random
+              selectedTimestamp: 118.0
+          expectedReturn:
+            passed: false
+            topic: video_thumbnail
+            missing: []
+            identityMismatch:
+            - samplingPlanHash
+            - videoHash
+            metricDrift:
+            - selectedTimestamp
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              videoHash: vid1
+              samplingPlanHash: uniform-24
+              selectedTimestamp: 48.0
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: video_thumbnail
+            missing:
+            - samplingPlanHash
+            - selectedTimestamp
+            - videoHash
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: visionApps_08-video_thumbnail-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionApps_08-video_thumbnail-result-reconciliation-transfer
+    title: 영상 자동 썸네일 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_video_thumbnail_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_video_thumbnail_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_video_thumbnail_evidence(stage):
+            stages = {'admission': {'action': 'admit thumbnail input safely', 'evidence': 'video duration sampling budget', 'risk': 'privacy or source error'}, 'process': {'action': 'run bounded thumbnail workflow', 'evidence': 'scene-quality scoring trace', 'risk': 'unbounded or wrong transformation'}, 'release': {'action': 'release verified thumbnail result', 'evidence': 'selected frame and render', 'risk': 'wrong or sensitive output'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.vision-apps.visionApps_08.video_thumbnail-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-apps.visionApps_08.video_thumbnail-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_video_thumbnail_evidence
+        cases:
+        - id: recalls-admission
+          arguments:
+          - value: admission
+          expectedReturn:
+            action: admit thumbnail input safely
+            evidence: video duration sampling budget
+            risk: privacy or source error
+        - id: recalls-process
+          arguments:
+          - value: process
+          expectedReturn:
+            action: run bounded thumbnail workflow
+            evidence: scene-quality scoring trace
+            risk: unbounded or wrong transformation
+        - id: recalls-release
+          arguments:
+          - value: release
+          expectedReturn:
+            action: release verified thumbnail result
+            evidence: selected frame and render
+            risk: wrong or sensitive output
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -46,6 +46,9 @@ class BuildDesignSystemTest(unittest.TestCase):
         self.assertIn('type AccentId = "plum" | "blue" | "teal"', runtimeTypes)
         self.assertIn('surface === "curriculum" || surface === "lesson"', runtimeTypes)
         self.assertIn('accentSwatches = {"plum":"#6d2857","blue":"#1559aa","teal":"#08786a"}', runtimeTypes)
+        self.assertIn('themeCanvasColors = {"light":"#f5f6f8","dark":"#151619"}', runtimeTypes)
+        self.assertIn('themeSurfaceColors = {"light":"#ffffff","dark":"#222327"}', runtimeTypes)
+        self.assertIn('themeInkColors = {"light":"#18191d","dark":"#f5f6f8"}', runtimeTypes)
 
     def testRuntimeCssIsDeterministicAndReducedMotionAware(self) -> None:
         first = GENERATOR.renderRuntimeCss(self.tokens)
@@ -54,13 +57,23 @@ class BuildDesignSystemTest(unittest.TestCase):
         self.assertIn('@media (prefers-reduced-motion: reduce)', first)
         self.assertIn('[data-density="learningComfortable"]', first)
         self.assertIn('[data-accent="plum"]', first)
+        self.assertIn('html[data-theme="light"] #root > [data-astryx-theme="codaro"]', first)
+        self.assertIn('html[data-theme="dark"] #root > [data-astryx-theme="codaro"]', first)
 
     def testFontCssUsesManifestPolicy(self) -> None:
         css = GENERATOR.renderFontCss(self.fontManifest, "/fonts/")
         self.assertEqual(css.count("@font-face"), 6)
         self.assertEqual(css.count("font-display: swap"), 6)
+        self.assertNotIn("font-weight: 500", css)
+        self.assertEqual({font["weight"] for font in self.fontManifest["fonts"]}, {400, 600, 700})
         self.assertIn('font-family: "Pretendard"', css)
         self.assertIn('font-family: "JetBrains Mono"', css)
+
+    def testSemanticRolesResolveAndFontWeightsArePhysical(self) -> None:
+        tokenNames = set(self.tokens["astryxTokens"])
+        self.assertFalse(set(self.tokens["semanticRoles"].values()) - tokenNames)
+        self.assertEqual(self.tokens["astryxTokens"]["--font-weight-medium"], "600")
+        self.assertEqual(self.tokens["astryxTokens"]["--font-weight-semibold"], "600")
 
 
 if __name__ == "__main__":

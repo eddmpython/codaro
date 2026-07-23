@@ -1,0 +1,722 @@
+var e=`meta:
+  id: day23
+  title: 클래스 고급
+  day: 23
+  category: 30days
+  tags:
+  - 상속
+  - 오버라이딩
+  - super
+  - 다형성
+  - 객체설계
+  - 검증
+  seo:
+    title: 파이썬 클래스 고급 - 상속과 다형성
+    description: 상속, super(), 메서드 오버라이딩, 다중 상속을 배웁니다.
+    keywords:
+    - 상속
+    - inheritance
+    - super
+    - 오버라이딩
+    - 다중상속
+intro:
+  emoji: 🎯
+  points:
+  - 상속으로 클래스 확장
+  - super()로 부모 메서드 호출
+  - 메서드 오버라이딩으로 재정의
+  - 다중 상속으로 여러 부모 활용
+  direction: 클래스 고급에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 클래스 고급 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 상속 기초 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 상속과 init 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: super() 함수 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 클래스 고급 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 클래스 고급 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 클래스 고급 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: inheritance_basic
+  title: 상속 기초
+  structuredPrimary: true
+  subtitle: 부모 클래스로부터 확장
+  goal: 상속 기초에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    상속은 기존 클래스를 확장하여 새로운 클래스를 만드는 기능입니다. class 자식클래스(부모클래스): 형식으로 정의하며, 자식 클래스는 부모 클래스의 모든 속성과 메서드를 물려받습니다. 코드 재사용성이 높아지고 계층 구조를 표현할 수 있습니다.
+
+    상속은 is-a 관계를 나타냅니다. Dog is an Animal, Car is a Vehicle.
+  snippet: |-
+    class Animal:
+        def __init__(self, name):
+            self.name = name
+
+        def speak(self):
+            return 'Some sound'
+
+    class Dog(Animal):
+        pass
+
+    myDog = Dog('Buddy')
+    myDog.name
+  exercise:
+    prompt: 상속 기초 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      class Animal:
+          def __init__(self, name):
+              self.name = name
+
+          def speak(self):
+              return 'Some sound'
+
+      class Dog(Animal):
+          pass
+
+      myDog = Dog('Buddy')
+      myDog.name
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 상속 기초의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 상속 기초 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: inheritance_init
+  title: 상속과 __init__
+  structuredPrimary: true
+  subtitle: 자식 클래스의 초기화
+  goal: 상속과 init에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    자식 클래스에서 __init__을 정의하지 않으면 부모의 __init__을 자동으로 사용합니다. 자식이 __init__을 정의하면 부모의 __init__은 자동으로 호출되지 않으므로 명시적으로 호출해야 합니다.
+
+    자식 __init__에서 부모 __init__을 호출할 때는 self를 명시해야 합니다.
+  snippet: |-
+    class Shape:
+        def __init__(self, color):
+            self.color = color
+
+    class Square(Shape):
+        pass
+
+    sq = Square('red')
+    sq.color
+  exercise:
+    prompt: 상속과 init 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      class Shape:
+          def __init__(self, color):
+              self.color = color
+
+      class Square(Shape):
+          pass
+
+      sq = Square('red')
+      sq.color
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 상속과 init의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 상속과 init 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: super_function
+  title: super() 함수
+  structuredPrimary: true
+  subtitle: 부모 클래스 참조
+  goal: super() 함수에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    super()는 부모 클래스를 참조하는 함수입니다. super().__init__() 형태로 부모의 __init__을 호출할 수 있으며, 부모 클래스명을 직접 쓰는 것보다 유연하고 권장됩니다. 다중 상속 시 특히 유용합니다.
+
+    super()를 사용하면 상속 구조가 바뀌어도 코드 변경이 최소화됩니다.
+  snippet: |-
+    class Employee:
+        def __init__(self, name):
+            self.name = name
+
+    class Manager(Employee):
+        def __init__(self, name, department):
+            super().__init__(name)
+            self.department = department
+
+    mgr = Manager('Bob', 'IT')
+    mgr.name, mgr.department
+  exercise:
+    prompt: super() 함수 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      class Employee:
+          def __init__(self, name):
+              self.name = name
+
+      class Manager(Employee):
+          def __init__(self, name, department):
+              super().__init__(name)
+              self.department = department
+
+      mgr = Manager('Bob', 'IT')
+      mgr.name, mgr.department
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: super() 함수의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: super() 함수 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: method_override
+  title: 메서드 오버라이딩
+  structuredPrimary: true
+  subtitle: 부모 메서드 재정의
+  goal: 메서드 오버라이딩에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    메서드 오버라이딩은 자식 클래스에서 부모 클래스의 메서드를 재정의하는 것입니다. 같은 이름의 메서드를 자식 클래스에 정의하면 부모의 메서드를 덮어씁니다. 필요하면 super()로 부모 메서드를 호출한 후 추가 기능을 구현할 수 있습니다.
+
+    오버라이딩은 같은 인터페이스로 다른 동작을 구현하는 다형성의 핵심입니다.
+  snippet: |-
+    class Bird:
+        def sound(self):
+            return 'chirp'
+
+    class Parrot(Bird):
+        def sound(self):
+            return 'squawk'
+
+    myBird = Parrot()
+    myBird.sound()
+  exercise:
+    prompt: 메서드 오버라이딩 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      class Bird:
+          def sound(self):
+              return 'chirp'
+
+      class Parrot(Bird):
+          def sound(self):
+              return 'squawk'
+
+      myBird = Parrot()
+      myBird.sound()
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 메서드 오버라이딩의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 메서드 오버라이딩 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: multiple_inheritance
+  title: 다중 상속
+  structuredPrimary: true
+  subtitle: 여러 부모 클래스 상속
+  goal: 다중 상속에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    다중 상속은 여러 부모 클래스를 동시에 상속받는 것입니다. class 자식(부모1, 부모2): 형식으로 정의하며, 모든 부모의 속성과 메서드를 상속받습니다. 메서드 이름이 겹치면 MRO 순서에 따라 왼쪽 부모가 우선입니다.
+
+    다중 상속은 강력하지만 복잡할 수 있습니다. 신중하게 사용하세요.
+  snippet: |-
+    class Flyer:
+        def fly(self):
+            return 'flying'
+
+    class Swimmer:
+        def swim(self):
+            return 'swimming'
+
+    class Duck(Flyer, Swimmer):
+        pass
+
+    myDuck = Duck()
+    myDuck.fly(), myDuck.swim()
+  exercise:
+    prompt: 다중 상속 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      class Flyer:
+          def fly(self):
+              return 'flying'
+
+      class Swimmer:
+          def swim(self):
+              return 'swimming'
+
+      class Duck(Flyer, Swimmer):
+          pass
+
+      myDuck = Duck()
+      myDuck.fly(), myDuck.swim()
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 다중 상속의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 다중 상속 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: inheritance_example
+  title: 상속 실전 예제
+  structuredPrimary: true
+  subtitle: 계층 구조 설계
+  goal: 상속 실전 예제에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    상속을 활용하여 실제 문제를 해결하는 예제를 살펴봅니다. 기본 클래스를 정의하고 여러 자식 클래스로 확장하여 코드 재사용성을 높입니다.
+
+    상속은 비슷하지만 약간 다른 클래스들을 효율적으로 관리하는 도구입니다.
+  snippet: |-
+    class Polygon:
+        def __init__(self, sides):
+            self.sides = sides
+
+    class Triangle(Polygon):
+        def __init__(self):
+            super().__init__(3)
+
+    tri = Triangle()
+    tri.sides
+  exercise:
+    prompt: 상속 실전 예제 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      class Polygon:
+          def __init__(self, sides):
+              self.sides = sides
+
+      class Triangle(Polygon):
+          def __init__(self):
+              super().__init__(3)
+
+      tri = Triangle()
+      tri.sides
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 상속 실전 예제의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 상속 실전 예제 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 알림 채널을 다형성으로 처리하기'
+  structuredPrimary: true
+  subtitle: 작게 실행하고 결과를 확인하는 단계
+  goal: '현업 흐름 검증: 알림 채널을 다형성으로 처리하기에서 예상값과 실제 실행 결과를 비교하는 검증 흐름을 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 상속은 공통 규칙을 부모에 두고, 달라지는 부분만 자식 클래스에서 바꿀 때 효과가 있습니다. 아래 예시는 이메일과 문자 알림을 같은 방식으로 처리합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class Notification:
+        def __init__(self, recipient):
+            if not recipient:
+                raise ValueError("recipient is required")
+            self.recipient = recipient
+
+        def send(self, message):
+            if not message.strip():
+                raise ValueError("message is required")
+            return {
+                "channel": "base",
+                "recipient": self.recipient,
+                "message": message,
+            }
+
+    class EmailNotification(Notification):
+        def __init__(self, recipient):
+            if "@" not in recipient:
+                raise ValueError("email recipient must contain @")
+            super().__init__(recipient)
+
+        def send(self, message):
+            payload = super().send(message)
+            payload["channel"] = "email"
+            payload["subject"] = "system notice"
+            return payload
+
+    class SmsNotification(Notification):
+        def __init__(self, recipient):
+            if not recipient.isdigit():
+                raise ValueError("sms recipient must contain digits only")
+            super().__init__(recipient)
+
+        def send(self, message):
+            payload = super().send(message)
+            payload["channel"] = "sms"
+            payload["message"] = message[:40]
+            return payload
+
+    senders = [
+        EmailNotification("team@example.com"),
+        SmsNotification("01012345678"),
+    ]
+
+    results = []
+    for sender in senders:
+        results.append(sender.send("배포가 완료되었습니다"))
+
+    assert [item["channel"] for item in results] == ["email", "sms"]
+    assert results[0]["subject"] == "system notice"
+    assert results[1]["message"] == "배포가 완료되었습니다"
+
+    try:
+        EmailNotification("team.example.com")
+    except ValueError as exc:
+        assert "email" in str(exc)
+
+    print("알림 다형성 흐름 통과")
+  exercise:
+    prompt: '현업 흐름 검증: 알림 채널을 다형성으로 처리하기 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
+    starterCode: |-
+      class Notification:
+          def __init__(self, recipient):
+              if not recipient:
+                  raise ValueError("recipient is required")
+              self.recipient = recipient
+
+          def send(self, message):
+              if not message.strip():
+                  raise ValueError("message is required")
+              return {
+                  "channel": "base",
+                  "recipient": self.recipient,
+                  "message": message,
+              }
+
+      class EmailNotification(Notification):
+          def __init__(self, recipient):
+              if "@" not in recipient:
+                  raise ValueError("email recipient must contain @")
+              super().__init__(recipient)
+
+          def send(self, message):
+              payload = super().send(message)
+              payload["channel"] = "email"
+              payload["subject"] = "system notice"
+              return payload
+
+      class SmsNotification(Notification):
+          def __init__(self, recipient):
+              if not recipient.isdigit():
+                  raise ValueError("sms recipient must contain digits only")
+              super().__init__(recipient)
+
+          def send(self, message):
+              payload = super().send(message)
+              payload["channel"] = "sms"
+              payload["message"] = message[:40]
+              return payload
+
+      senders = [
+          EmailNotification("team@example.com"),
+          SmsNotification("01012345678"),
+      ]
+
+      results = []
+      for sender in senders:
+          results.append(sender.send("배포가 완료되었습니다"))
+
+      assert [item["channel"] for item in results] == ["email", "sms"]
+      assert results[0]["subject"] == "system notice"
+      assert results[1]["message"] == "배포가 완료되었습니다"
+
+      try:
+          EmailNotification("team.example.com")
+      except ValueError as exc:
+          assert "email" in str(exc)
+
+      print("알림 다형성 흐름 통과")
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: '현업 흐름 검증: 알림 채널을 다형성으로 처리하기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 알림 채널을 다형성으로 처리하기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+- id: practice
+  title: Day 23 종합 복습
+  structuredPrimary: true
+  subtitle: 클래스 고급 마스터하기
+  goal: Day 23 종합 복습에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: Day 23에서 배운 클래스 고급 개념을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    class Food:
+        def __init__(self, name):
+            self.name = name
+
+    class Fruit(Food):
+        pass
+
+    apple = Fruit('Apple')
+    apple.name
+  exercise:
+    prompt: Day 23 종합 복습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      class Food:
+          def __init__(self, name):
+              self.name = name
+
+      class Fruit(Food):
+          pass
+
+      apple = Fruit('Apple')
+      apple.name
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: Day 23 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: Day 23 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: day23-employee-inheritance-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inheritance_basic
+    - practice
+    title: 상속으로 직원 설명 확장하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 부모 초기화와 자식 속성을 함께 사용한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: Person, Employee와 employee_label(name, role)를 완성해 'name:role'을 반환하세요.
+      starterCode: |-
+        class Person:
+            pass
+
+        class Employee(Person):
+            pass
+
+        def employee_label(name, role):
+            raise NotImplementedError
+      solution: |-
+        class Person:
+            def __init__(self, name):
+                self.name = name
+
+        class Employee(Person):
+            def __init__(self, name, role):
+                super().__init__(name)
+                self.role = role
+
+        def employee_label(name, role):
+            employee = Employee(name, role)
+            return f"{employee.name}:{employee.role}"
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day23.employee-inheritance.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day23.employee-inheritance.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: employee_label
+        cases:
+        - id: developer
+          arguments:
+          - value: Mina
+          - value: developer
+          expectedReturn: Mina:developer
+        - id: designer
+          arguments:
+          - value: Jun
+          - value: designer
+          expectedReturn: Jun:designer
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day23-polymorphic-sounds-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day23-employee-inheritance-mastery
+    title: 서로 다른 객체에 같은 메서드 호출하기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 다형성을 처음 보는 동물 목록 처리에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: Dog, Cat과 animal_sounds(kinds)를 완성해 각 종류의 sound 결과 목록을 반환하세요.
+      starterCode: |-
+        class Dog:
+            pass
+
+        class Cat:
+            pass
+
+        def animal_sounds(kinds):
+            raise NotImplementedError
+      solution: |-
+        class Dog:
+            def sound(self):
+                return 'woof'
+
+        class Cat:
+            def sound(self):
+                return 'meow'
+
+        def animal_sounds(kinds):
+            classes = {'dog': Dog, 'cat': Cat}
+            return [classes[kind]().sound() for kind in kinds]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day23.polymorphic-sounds.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day23.polymorphic-sounds.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: animal_sounds
+        cases:
+        - id: mixed
+          arguments:
+          - value:
+            - dog
+            - cat
+            - dog
+          expectedReturn:
+          - woof
+          - meow
+          - woof
+        - id: cat
+          arguments:
+          - value:
+            - cat
+          expectedReturn:
+          - meow
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day23-product-classmethod-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day23-polymorphic-sounds-transfer
+    title: 문자열에서 객체를 만드는 classmethod 복원하기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 대체 생성자와 인스턴스 속성을 함께 회상한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: Product.from_text와 product_total(text, quantity)를 완성해 가격 합계를 반환하세요. text 형식은 name,price입니다.
+      starterCode: |-
+        class Product:
+            pass
+
+        def product_total(text, quantity):
+            raise NotImplementedError
+      solution: |-
+        class Product:
+            def __init__(self, name, price):
+                self.name = name
+                self.price = price
+
+            @classmethod
+            def from_text(cls, text):
+                name, price = text.split(',')
+                return cls(name, int(price))
+
+        def product_total(text, quantity):
+            product = Product.from_text(text)
+            return product.price * quantity
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day23.product-classmethod.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day23.product-classmethod.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: product_total
+        cases:
+        - id: pen
+          arguments:
+          - value: pen,1200
+          - value: 3
+          expectedReturn: 3600
+        - id: book
+          arguments:
+          - value: book,8000
+          - value: 2
+          expectedReturn: 16000
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

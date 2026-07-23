@@ -32,7 +32,7 @@ function SectionLead({ title, subtitle }: { title?: string; subtitle?: string })
   if (!title && !subtitle) return null;
   return (
     <div className="min-w-0 max-w-3xl">
-      {title ? <h3 className="text-[15px] font-semibold leading-6 text-foreground">{stripMarkdown(title)}</h3> : null}
+      {title ? <h3 className="text-[15px] font-bold leading-6 text-foreground">{stripMarkdown(title)}</h3> : null}
       {subtitle ? <p className={cn("text-sm leading-6 text-muted-foreground", title && "mt-0.5")}>{stripMarkdown(subtitle)}</p> : null}
     </div>
   );
@@ -53,7 +53,7 @@ export function LocalRunnerHero({ block, payload }: { block: BlockConfig; payloa
       <div className="grid gap-x-8 gap-y-4 sm:grid-cols-3">
         {steps.map(({ title: stepTitle, detail }) => (
           <div className="min-w-0 border-t pt-3" key={stepTitle}>
-            <div className="text-sm font-semibold text-foreground">{stepTitle}</div>
+            <div className="text-sm font-bold text-foreground">{stepTitle}</div>
             <p className="mt-1 text-sm leading-6 text-foreground/75">{detail}</p>
           </div>
         ))}
@@ -102,7 +102,7 @@ export function ChoiceOptionCard({ item }: { item: Record<string, unknown> }) {
 
   return (
     <div className="min-w-0 border-t pt-3">
-      <div className="text-sm font-semibold text-foreground">{stripMarkdown(title)}</div>
+      <div className="text-sm font-bold text-foreground">{stripMarkdown(title)}</div>
       {subtitle ? <div className="mt-0.5 text-xs text-muted-foreground">{stripMarkdown(subtitle)}</div> : null}
       {description ? <p className="mt-1.5 text-sm leading-6 text-foreground/75">{stripMarkdown(description)}</p> : null}
       <DetailList items={advantages} label="장점" />
@@ -142,7 +142,7 @@ export function ResourceCard({ item }: { item: Record<string, unknown> }) {
   return (
     <div className="min-w-0 rounded-lg border p-4">
       <div className="flex min-w-0 items-start justify-between gap-2">
-        <div className="min-w-0 text-sm font-semibold text-foreground">{stripMarkdown(title)}</div>
+        <div className="min-w-0 text-sm font-bold text-foreground">{stripMarkdown(title)}</div>
         {url ? <ExternalLink className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" /> : null}
       </div>
       {description ? <p className="mt-1 text-sm leading-6 text-foreground/75">{stripMarkdown(description)}</p> : null}
@@ -199,7 +199,7 @@ export function StepPracticeCell({ block, payload }: { block: BlockConfig; paylo
     <div className="space-y-3">
       <div className="min-w-0 max-w-3xl">
         <div className="text-xs font-medium text-muted-foreground">{stepNumber ? `STEP ${stepNumber}` : "실습 단계"}</div>
-        <h3 className="mt-1 text-[15px] font-semibold leading-6 text-foreground">{stripMarkdown(title)}</h3>
+        <h3 className="mt-1 text-[15px] font-bold leading-6 text-foreground">{stripMarkdown(title)}</h3>
         {description ? <p className="mt-1 text-md text-foreground">{stripMarkdown(description)}</p> : null}
       </div>
 
@@ -233,7 +233,7 @@ export function PracticePromptCell({ block, payload }: { block: BlockConfig; pay
     <div className="space-y-3">
       <div className="min-w-0 max-w-3xl">
         <div className="text-xs font-medium text-muted-foreground">직접 해보기</div>
-        <h3 className="mt-1 text-[15px] font-semibold leading-6 text-foreground">{stripMarkdown(title)}</h3>
+        <h3 className="mt-1 text-[15px] font-bold leading-6 text-foreground">{stripMarkdown(title)}</h3>
         {content ? <p className="mt-1 text-md text-foreground">{stripMarkdown(content)}</p> : null}
       </div>
       {code ? (
@@ -274,7 +274,7 @@ export function TopRuleItem({ item }: { item: Record<string, unknown> }) {
 
   return (
     <div className="min-w-0 border-t pt-3">
-      <div className="text-sm font-semibold text-foreground">{stripMarkdown(title)}</div>
+      <div className="text-sm font-bold text-foreground">{stripMarkdown(title)}</div>
       {description ? <p className="mt-1 text-sm leading-6 text-foreground/75">{stripMarkdown(description)}</p> : null}
       {points.length ? (
         <ul className="mt-2 space-y-1">
@@ -316,7 +316,7 @@ function ConceptRowCell({ block, payload }: { block: BlockConfig; payload: Recor
             const image = payloadText(row, "image") || payloadText(row, "src");
             return (
               <div className="grid gap-1.5 py-3 first:pt-0 last:pb-0 md:grid-cols-[200px_1fr] md:gap-4" key={`${concept}-${index}`}>
-                <div className="text-sm font-semibold text-foreground">{stripMarkdown(concept)}</div>
+                <div className="text-sm font-bold text-foreground">{stripMarkdown(concept)}</div>
                 <div className="min-w-0 text-md text-foreground">
                   {explain ? <div>{renderInline(explain)}</div> : null}
                   {image ? <div className="mt-2"><VisualAsset src={image} title={concept} /></div> : null}
@@ -384,7 +384,7 @@ function DefinitionCell({ block, payload }: { block: BlockConfig; payload: Recor
             return (
               <div className="grid gap-1.5 py-3 first:pt-0 last:pb-0 md:grid-cols-[200px_1fr] md:gap-4" key={`${term}-${index}`}>
                 <div className="min-w-0">
-                  <div className="text-sm font-semibold text-foreground">{stripMarkdown(term)}</div>
+                  <div className="text-sm font-bold text-foreground">{stripMarkdown(term)}</div>
                   {english ? <div className="mt-0.5 font-mono text-xs text-muted-foreground">{english}</div> : null}
                 </div>
                 <div className="min-w-0 space-y-1">
@@ -453,7 +453,7 @@ function TimelineCell({ block, payload }: { block: BlockConfig; payload: Record<
                 {!last ? <span className="my-1 w-px flex-1 bg-border" /> : null}
               </div>
               <div className={cn("min-w-0 flex-1", last ? "pb-0" : "pb-4")}>
-                <div className="text-sm font-semibold text-foreground">{stripMarkdown(head)}</div>
+                <div className="text-sm font-bold text-foreground">{stripMarkdown(head)}</div>
                 {detail ? <div className="mt-0.5 text-md text-foreground">{renderInline(detail)}</div> : null}
               </div>
             </div>
@@ -481,7 +481,7 @@ function StatCell({ block, payload }: { block: BlockConfig; payload: Record<stri
           const down = trend === "down";
           return (
             <div className="border-l border-border px-5 py-1 first:border-l-0 first:pl-0" key={`${label}-${index}`}>
-              <div className="text-2xl font-semibold tabular-nums text-foreground">{stripMarkdown(value)}</div>
+              <div className="text-2xl font-bold tabular-nums text-foreground">{stripMarkdown(value)}</div>
               <div className="mt-0.5 text-xs font-medium text-muted-foreground">{stripMarkdown(label)}</div>
               {delta ? (
                 <div className={cn("mt-0.5 inline-flex items-center gap-1 text-xs", down ? "text-destructive" : "text-success")}>
@@ -656,7 +656,7 @@ export function ComparisonPanel({ item }: { item: Record<string, unknown> }) {
 
   return (
     <div className="min-w-0 border-t pt-3">
-      <div className="text-sm font-semibold text-foreground">{stripMarkdown(title)}</div>
+      <div className="text-sm font-bold text-foreground">{stripMarkdown(title)}</div>
       {subtitle ? <div className="mt-0.5 text-xs text-muted-foreground">{stripMarkdown(subtitle)}</div> : null}
       {items.length ? (
         <ul className="mt-2 space-y-1">

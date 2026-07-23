@@ -6,8 +6,8 @@
     "themeName": "codaro",
     "themeNeutral": "0.1.6"
   },
-  "fontManifestSha256": "00db89de410deaefb7ed6b46fb9455a99019cf4f884722da2a899de66a33deda",
+  "fontManifestSha256": "68183a5d36a3fa290499a97cf85978b71f22c2d05f2d9269b8c4b1934b899d69",
   "generator": "assets/brand/tools/buildDesignSystem.py",
   "source": "assets/brand/designSystem/tokens.json",
-  "sourceSha256": "bbabec902674da4102719f1371cbd41d5511641f936a3412143853446c891e7f"
+  "sourceSha256": "1426715fa6cfb0cda5a40265c40f67d3f40e76d675060ee6206e68f0b572fffb"
 }

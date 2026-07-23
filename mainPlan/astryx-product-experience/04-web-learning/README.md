@@ -2,11 +2,18 @@
 
 상태: 진행
 
-현재 source는 472개 canonical 공개 lesson route를 prerender하고 sitemap, 검색 index, JSON-LD와 route별 lazy lesson module에 연결한다. public catalog는 browser 310개, Local 162개를 capability 그대로 표시하며 공개 lesson에서 `runtime=web`, `LessonRef`, section을 durable `RunRouteState@1`로 Run에 넘긴다. 정적 Web은 backend API probe나 code-completion POST 없이 source에 저작된 strong CheckSpec 1,413개/467레슨을 fresh pyproc Worker 경계로 평가한다. mastery·transfer·24시간 retrieval variant는 각각 467레슨에 있으며 대표 Chromium evidence는 Day 1·2·11·15·19·20·22·27·30과 pathlib·zip·schedule W0에 한정해 별도로 보존한다. 정확한 결과는 raw source/output을 저장하지 않고 hash와 check/fixture ID를 IndexedDB v3 append-only event로 저장한다. 기존 `codaro-web-progress-v1`은 metadata backup과 non-credit `MigrationImported` event로 cutover transaction 안에서 보존한다. full learning archive v2는 document, drafts, virtual FS와 file·directory·table·image bytes, package bytes, evidence, lineage, disabled·unscheduled automation draft를 content-addressed blob으로 내보내고 Web과 Local에서 같은 bytes로 materialize한다. Local import는 전체 검증과 evidence merge 뒤 immutable object와 `HEAD`를 원자 교체하고 실패하면 이전 `HEAD`를 복원한다. 공식 `web-learning`과 최신 `product-experience-browser` 63/63은 reload/race와 Day 19 artifact transfer flow를 포함해 green이다. source route·SEO·hydration은 검증됐지만 현재 GitHub Pages 배포본은 이전 build라 개별 lesson과 `/run/`이 404다. independent assessment 승인 0/467, Windows AppContainer, 전수 browser·사람 학습성 검수와 실제 배포 smoke가 남아 있으므로 상태는 `진행`이고 `_done`이 아니다.
+## 작업 폴더
+
+- [Learn Explorer](00-learn-explorer/)
+- [Canonical Interactive Lesson](01-canonical-interactive-lesson/)
+
+Learn 목록 개선과 실행 레슨 통합은 별도 완료 단위다. 두 작업이 각각 증거를 남기기 전에는 이 workstream을 `_done`으로 이동하지 않는다.
+
+현재 source는 472개 canonical 공개 lesson route를 semantic 문서와 interactive editor shell로 prerender하고 sitemap, 검색 index, JSON-LD와 route별 lazy lesson module에 연결한다. public explorer는 browser 310개, Local 162개를 capability 그대로 표시하며 이어하기, 검색과 여섯 outcome path에서 canonical lesson으로 한 번에 진입한다. 같은 URL에서 `LessonRef`와 section을 복원하고 코드 수정, 실행, output, check, feedback, 필요한 hint, evidence와 다음 학습을 추가 확인 command 없이 갱신한다. 정적 Web은 backend API probe나 code-completion POST 없이 source에 저작된 strong CheckSpec 1,413개/467레슨을 fresh pyproc Worker 경계로 평가한다. mastery·transfer·24시간 retrieval variant는 각각 467레슨에 있으며 대표 Chromium evidence는 Day 1·2·11·15·19·20·22·27·30과 pathlib·zip·schedule W0에 한정해 별도로 보존한다. 정확한 결과는 raw source/output을 저장하지 않고 hash와 check/fixture ID를 IndexedDB v3 append-only event로 저장한다. 기존 `codaro-web-progress-v1`은 metadata backup과 non-credit `MigrationImported` event로 cutover transaction 안에서 보존한다. full learning archive v2는 document, drafts, virtual FS와 file·directory·table·image bytes, package bytes, evidence, lineage, disabled·unscheduled automation draft를 content-addressed blob으로 내보내고 Web과 Local에서 같은 bytes로 materialize한다. Local import는 전체 검증과 evidence merge 뒤 immutable object와 `HEAD`를 원자 교체하고 실패하면 이전 `HEAD`를 복원한다. 공식 `web-learning`, `learning-method`, Light/Dark 대표 Chromium matrix와 route·SEO·hydration은 green이다. independent assessment 승인 0/467, Windows AppContainer, 전수 browser·사람 학습성 검수와 push된 commit의 실제 배포 smoke가 남아 있으므로 상태는 `진행`이고 `_done`이 아니다.
 
 ## 목표
 
-설치 없이 Learn에서 목표를 선택하고, 개별 레슨을 읽고, Run에서 코드를 수정하고 실행하면 자동 강한 검증과 진행 저장이 이어지며, 다음 방문에 그대로 학습할 수 있게 한다. 현재 472개 카드 나열을 goal-first curriculum product로 바꾼다.
+설치 없이 Learn에서 목표를 선택하고, canonical lesson에서 코드를 수정하고 실행하면 자동 강한 검증과 진행 저장이 이어지며, 다음 방문에 그대로 학습할 수 있게 한다. 472개 카드 나열을 outcome-first curriculum product로 바꾼다.
 
 ## Learn 정보 구조
 
@@ -15,7 +22,7 @@
 - 추천 경로: 예상 시간, web/local compatibility, 완성 결과, prerequisite
 - 전체 탐색: 검색, domain, 난이도, runtime, estimated time filter
 - lesson card: 제목, 한 줄 outcome, 시간, 진행, runtime만 표시한다. emoji와 tag pile을 primary hierarchy로 쓰지 않는다.
-- 개별 lesson URL: `/learn/lesson/<category>/<contentId>?path=<domainId>`의 SSR 제목, description, breadcrumb, preview image, Run navigation
+- 개별 lesson URL: `/learn/lesson/<category>/<contentId>/?path=<domainId>`의 SSR 제목, description, breadcrumb, instructional image와 interactive editor
 
 ### Learn layout blueprint
 
@@ -26,10 +33,10 @@
 
 ### Lesson layout blueprint
 
-- desktop: 12-column 중 2-column breadcrumb/경로, 7-column 문서, 3-column sticky outcome·TOC를 사용한다. Run 진입은 overview의 실제 command이며 body reveal control이 아니다.
+- desktop: product rail과 읽기 폭 안에 overview, instructional image, worked example, editable exercise, output과 verification을 같은 scroll context로 둔다.
 - tablet: 문서 8-column과 접히지 않는 compact TOC 4-column을 사용한다. Lab은 본문 폭을 유지한다.
 - mobile: breadcrumb, overview, 본문, Lab, feedback 순서의 단일 column이다. section selector만 sticky이며 virtual keyboard와 safe area 위에서 본문을 가리지 않는다.
-- 공개 Lesson은 읽기만 해도 핵심 개념과 worked example이 보이고, Run으로 이동한 뒤 같은 section과 focus를 복원한다.
+- 공개 Lesson은 읽기만 해도 핵심 개념과 worked example이 보이고, 같은 URL에서 코드를 수정·실행하며 section과 draft를 복원한다.
 
 ## 대표 공개 경로
 
@@ -46,10 +53,10 @@
 
 각 경로는 `targetOutcomes`의 prerequisite closure를 기존 plan composer로 계산한다. UI용 별도 커리큘럼 목록을 손으로 복제하지 않는다.
 
-## Web Run handoff
+## Canonical interactive lesson
 
-- lesson page는 overview와 첫 worked example을 별도 reveal 없이 보여 준다. 편집·실행 action은 `/run/?surface=curriculum&lesson=<encodedLessonKey>&path=<domainId>`로 이동한다.
-- Run은 `RunRouteState`를 읽어 같은 `LessonRef` document를 선택하고 첫 미완료 required section에 focus한다. `/run/` 단독 진입도 curriculum resume 또는 Learn home으로 시작한다.
+- lesson page는 overview와 첫 worked example을 별도 reveal 없이 보여 주고 같은 pathname에서 `RunRouteState`와 `LessonRef`를 복원해 interactive editor를 연다.
+- `/run/`은 첫 paint에 runnable starter cell이 보이는 자유 Notebook이며 canonical curriculum lesson의 우회 URL로 쓰지 않는다.
 - browser runtime boot는 첫 실행 action에서 lazy하게 시작하며 boot, package, run, check 상태를 분리해 보여 준다.
 - browser Python provider는 기존 `pyproc` 하나만 사용한다. 학습 실행 singleton은 `ObservedRun`을 만들고 strong check는 feasibility를 통과한 fresh pyproc worker 또는 명시적 `localRequired`만 사용한다. 제품 코드에 별도 direct Pyodide boot를 추가하지 않는다.
 - 현재 pyproc wrapper는 same-origin SRI manifest로 배포하지만 Python core는 version-pinned CDN을 기본값으로 쓰며 검증된 offline core cache는 아직 없다. 첫 Web 실행은 network가 필요하고 runtime fetch는 자동으로 진행한다. 설치·다운로드 확인 button은 만들지 않으며 offline 학습을 public claim하지 않는다.

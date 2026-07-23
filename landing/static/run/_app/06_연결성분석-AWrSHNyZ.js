@@ -1,0 +1,750 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - networkx
+  id: networkx_06
+  title: 연결성분석
+  order: 6
+  category: networkx
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  tags:
+  - networkx
+  - 연결성
+  - 컴포넌트
+  - 브릿지
+  - 절단점
+  seo:
+    title: NetworkX 연결성 분석 - 컴포넌트와 취약점
+    description: NetworkX로 네트워크의 연결 구조를 분석합니다. 연결 컴포넌트, 브릿지, 절단점을 찾아 취약점을 파악합니다.
+    keywords:
+    - networkx
+    - 연결성
+    - component
+    - bridge
+    - articulation
+    - 취약점
+intro:
+  emoji: 🔗
+  goal: 네트워크의 연결 구조를 분석하고 취약점을 찾습니다.
+  description: 연결성 분석은 네트워크의 구조적 특성을 파악합니다. 연결 컴포넌트는 서로 도달 가능한 노드 그룹입니다. 브릿지와 절단점은 제거 시 네트워크가 분리되는 취약점입니다.
+    네트워크 안정성 평가에 중요합니다.
+  direction: 연결성분석에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.
+  benefits:
+  - 관계 데이터 확인 후 그래프 알고리즘에 맞는 코드 입력을 고릅니다.
+  - 연결성분석 결과를 노드/엣지와 지표 값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 관계 분석 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(관계 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 연결 그래프 처리 실행
+      detail: 그래프 알고리즘 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 연결 컴포넌트 결과 검증
+      detail: 노드/엣지와 지표 값 기준으로 실행 결과를 비교합니다.
+    - label: 연결성분석 재사용
+      detail: 완성 코드를 관계 분석 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 그래프 분석 환경
+      detail: matplotlib, networkx 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 연결성분석 실행
+      detail: 셀을 실행해 노드/엣지와 지표 값와 예외 상태를 확인합니다.
+    - label: 연결성분석 완료
+      detail: 검증된 코드를 관계 분석 리포트로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: NetworkX와 matplotlib을 불러옵니다. 연결성 분석은 네트워크의 구조적 안정성과 취약점을 파악하는 핵심 기법입니다. 통신망, 전력망, 교통망 등
+    인프라 네트워크에서 어떤 부분이 고장나면 전체 시스템에 영향을 미치는지, 네트워크가 얼마나 견고한지를 분석합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import networkx as nx
+    import matplotlib.pyplot as plt
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+    hints:
+    - 바꿀 지점은 관계 데이터을 만드는 첫 줄과 그래프 알고리즘 줄에서 찾으세요.
+    - 실행 뒤 노드/엣지와 지표 값 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 노드/엣지와 지표 값 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step2_connected
+  title: 2단계. 연결 그래프
+  structuredPrimary: true
+  subtitle: is_connected()
+  goal: 2단계. 연결 그래프에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    연결 그래프(Connected Graph)는 모든 노드 쌍 사이에 경로가 존재하는 그래프입니다. 어떤 두 노드를 선택해도 연결된 엣지를 따라 도달할 수 있습니다. is_connected()로 그래프가 연결되어 있는지 확인할 수 있으며, 연결되지 않은 그래프에서 경로 관련 함수를 호출하면 에러가 발생하므로 사전 확인이 중요합니다.
+
+    연결되지 않은 그래프에서 shortest_path()를 사용하면 에러가 발생합니다. 먼저 is_connected()로 확인하세요.
+  snippet: |-
+    connectedG = nx.Graph()
+    connectedG.add_edges_from([(1, 2), (2, 3), (3, 4), (4, 1)])
+    isConn = nx.is_connected(connectedG)
+    isConn
+  exercise:
+    prompt: 2단계. 연결 그래프 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      connectedG = nx.Graph()
+      connectedG.add_edges_from([(1, 2), (2, 3), (3, 4), (4, 1)])
+      isConn = nx.is_connected(connectedG)
+      isConn
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 2단계. 연결 그래프에서 \`connectedG\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. 연결 그래프 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step3_components
+  title: 3단계. 연결 컴포넌트
+  structuredPrimary: true
+  subtitle: connected_components()
+  goal: 3단계. 연결 컴포넌트에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    connected_components()는 각 연결 컴포넌트(서로 도달 가능한 노드 그룹)를 반환합니다. 연결 컴포넌트는 내부적으로는 모두 연결되어 있지만 다른 컴포넌트와는 분리된 부분그래프입니다. 소셜 네트워크에서 서로 교류가 없는 독립적인 그룹들, 인터넷에서 연결이 끊어진 네트워크 조각들을 식별하는 데 사용됩니다.
+
+    connected_components()는 집합의 제너레이터를 반환합니다. list()로 변환하거나 max()로 가장 큰 것을 찾습니다.
+  snippet: |-
+    multiCompG = nx.Graph()
+    multiCompG.add_edges_from([(1, 2), (2, 3), (3, 1)])
+    multiCompG.add_edges_from([(4, 5)])
+    multiCompG.add_edges_from([(6, 7), (7, 8)])
+
+    components = list(nx.connected_components(multiCompG))
+    components
+  exercise:
+    prompt: 3단계. 연결 컴포넌트 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      multiCompG = nx.Graph()
+      multiCompG.add_edges_from([(1, 2), (2, 3), (3, 1)])
+      multiCompG.add_edges_from([(4, 5)])
+      multiCompG.add_edges_from([(6, 7), (7, 8)])
+
+      components = list(nx.connected_components(multiCompG))
+      components
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 3단계. 연결 컴포넌트에서 \`multiCompG\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 연결 컴포넌트 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step4_visualize_comp
+  title: 4단계. 컴포넌트 시각화
+  structuredPrimary: true
+  subtitle: 그룹별 색상
+  goal: 4단계. 컴포넌트 시각화에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 각 연결 컴포넌트를 다른 색으로 시각화하면 네트워크의 분리된 영역을 쉽게 파악할 수 있습니다. 컴포넌트마다 고유한 색상을 지정하여 그래프를 그리면 어떤 노드들이
+    같은 그룹에 속하는지, 몇 개의 독립된 네트워크가 존재하는지 한눈에 확인할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    compList = list(nx.connected_components(multiCompG))
+    colorList = ['skyblue', 'salmon', 'lightgreen', 'gold']
+
+    nodeColors = []
+    for n in multiCompG.nodes():
+        for i, comp in enumerate(compList):
+            if n in comp:
+                nodeColors.append(colorList[i % len(colorList)])
+                break
+
+    posComp = nx.spring_layout(multiCompG, seed=42)
+    fig1, ax1 = plt.subplots(figsize=(8, 6))
+    nx.draw(multiCompG, pos=posComp, with_labels=True, node_color=nodeColors,
+            node_size=700, font_size=12, ax=ax1)
+    ax1.set_title('Connected Components')
+    fig1
+  exercise:
+    prompt: 4단계. 컴포넌트 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      compList = list(nx.connected_components(multiCompG))
+      colorList = ['skyblue', 'salmon', 'lightgreen', 'gold']
+
+      nodeColors = []
+      for n in multiCompG.nodes():
+          for i, comp in enumerate(compList):
+              if n in comp:
+                  nodeColors.append(colorList[i % len(colorList)])
+                  break
+
+      posComp = nx.spring_layout(multiCompG, seed=42)
+      fig1, ax1 = plt.subplots(figsize=(8, 6))
+      nx.draw(multiCompG, pos=posComp, with_labels=True, node_color=nodeColors,
+              node_size=700, font_size=12, ax=ax1)
+      ax1.set_title('Connected Components')
+      fig1
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 4단계. 컴포넌트 시각화의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 4단계. 컴포넌트 시각화 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step5_bridges
+  title: 5단계. 브릿지
+  structuredPrimary: true
+  subtitle: bridges()
+  goal: 5단계. 브릿지에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    브릿지(Bridge)는 제거하면 그래프가 분리되는 엣지입니다. 두 컴포넌트를 연결하는 유일한 경로이므로, 이 연결이 끊어지면 네트워크가 둘로 쪼개집니다. 통신망에서 브릿지는 단일 장애점(Single Point of Failure)으로, 이 회선이 고장나면 일부 지역이 완전히 단절됩니다. 브릿지를 식별하여 백업 경로를 추가하는 것이 네트워크 안정성 향상의 핵심입니다.
+
+    브릿지는 두 컴포넌트를 연결하는 유일한 경로입니다. 브릿지가 많으면 네트워크가 취약합니다.
+  snippet: |-
+    bridgeG = nx.Graph()
+    bridgeG.add_edges_from([(1, 2), (2, 3), (3, 1)])
+    bridgeG.add_edge(3, 4)
+    bridgeG.add_edges_from([(4, 5), (5, 6), (6, 4)])
+    list(bridgeG.edges())
+  exercise:
+    prompt: 5단계. 브릿지 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      bridgeG = nx.Graph()
+      bridgeG.add_edges_from([(1, 2), (2, 3), (3, 1)])
+      bridgeG.add_edge(3, 4)
+      bridgeG.add_edges_from([(4, 5), (5, 6), (6, 4)])
+      list(bridgeG.edges())
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 5단계. 브릿지에서 \`bridgeG\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 브릿지 실행 뒤 \`bridgeG\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step6_articulation
+  title: 6단계. 절단점
+  structuredPrimary: true
+  subtitle: articulation_points()
+  goal: 6단계. 절단점에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    절단점(Articulation Point)은 제거하면 그래프가 분리되는 노드입니다. 이 노드가 네트워크에서 사라지면 다른 노드들이 서로 도달할 수 없게 됩니다. 조직에서 특정 사람이 없으면 부서 간 소통이 끊기는 경우, 라우터가 고장나면 네트워크가 분리되는 경우가 이에 해당합니다. 절단점을 파악하면 네트워크의 병목과 취약점을 알 수 있습니다.
+
+    절단점은 네트워크의 병목입니다. 이 노드가 실패하면 네트워크가 분리됩니다.
+  snippet: |-
+    artPoints = list(nx.articulation_points(bridgeG))
+    artPoints
+  exercise:
+    prompt: 6단계. 절단점 예제에서 \`artPoints\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      artPoints = list(nx.articulation_points(bridgeG))
+      artPoints
+    hints:
+    - 바꿀 지점은 \`artPoints = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`artPoints\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 6단계. 절단점에서 \`artPoints\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 절단점 실행 뒤 \`artPoints\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step7_robustness
+  title: 7단계. 네트워크 견고성
+  structuredPrimary: true
+  subtitle: 노드 제거 시뮬레이션
+  goal: 7단계. 네트워크 견고성에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    노드를 하나씩 제거하며 네트워크 견고성을 테스트합니다. 절단점을 제거하면 네트워크가 분리되지만, 절단점이 아닌 노드를 제거하면 연결성이 유지됩니다. 이런 시뮬레이션을 통해 어떤 노드가 시스템에 중요한지, 노드 장애 시 어떤 영향이 있는지를 사전에 파악할 수 있습니다.
+
+    절단점이 아닌 노드를 제거해도 연결성이 유지됩니다. 절단점 제거만 네트워크를 분리합니다.
+  snippet: |-
+    robustG = nx.Graph()
+    robustG.add_edges_from([
+        (1, 2), (1, 3), (2, 3), (2, 4), (3, 4),
+        (4, 5), (5, 6), (5, 7), (6, 7)
+    ])
+    nx.is_connected(robustG)
+  exercise:
+    prompt: 7단계. 네트워크 견고성 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      robustG = nx.Graph()
+      robustG.add_edges_from([
+          (1, 2), (1, 3), (2, 3), (2, 4), (3, 4),
+          (4, 5), (5, 6), (5, 7), (6, 7)
+      ])
+      nx.is_connected(robustG)
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 7단계. 네트워크 견고성에서 \`robustG\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. 네트워크 견고성 실행 뒤 \`robustG\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step8_biconnected
+  title: 8단계. 이중연결
+  structuredPrimary: true
+  subtitle: biconnected_components()
+  goal: 8단계. 이중연결에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    이중연결 컴포넌트(Biconnected Component)는 어떤 한 노드를 제거해도 연결이 유지되는 부분그래프입니다. 절단점이 없는 최대 부분그래프로, 내부적으로 최소 두 개의 독립적인 경로가 존재합니다. 이중연결 그래프는 단일 노드 장애에 강건하므로, 고가용성이 필요한 네트워크 설계의 목표가 됩니다.
+
+    이중연결 그래프는 절단점이 없습니다. 어떤 한 노드가 실패해도 나머지가 연결을 유지합니다.
+  snippet: |-
+    biconnComps = list(nx.biconnected_components(bridgeG))
+    biconnComps
+  exercise:
+    prompt: 8단계. 이중연결 예제에서 \`biconnComps\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      biconnComps = list(nx.biconnected_components(bridgeG))
+      biconnComps
+    hints:
+    - 바꿀 지점은 \`biconnComps = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`biconnComps\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 8단계. 이중연결에서 \`biconnComps\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 8단계. 이중연결 실행 뒤 \`biconnComps\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step9_k_connectivity
+  title: 9단계. k-연결성
+  structuredPrimary: true
+  subtitle: node_connectivity()
+  goal: 9단계. k연결성에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    k-연결성(k-connectivity)은 그래프를 분리하려면 최소 몇 개의 노드(또는 엣지)를 제거해야 하는지를 나타냅니다. 노드 연결도가 k이면 k-1개의 노드가 동시에 장애를 일으켜도 네트워크가 연결을 유지합니다. 엣지 연결도도 마찬가지로 해석됩니다. 연결도가 높을수록 네트워크가 더 견고합니다.
+
+    연결도가 높을수록 견고합니다. 완전 그래프의 연결도는 n-1입니다 (모든 노드가 연결됨).
+  snippet: |-
+    nodeConn = nx.node_connectivity(robustG)
+    nodeConn
+  exercise:
+    prompt: 9단계. k연결성 예제에서 \`nodeConn\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      nodeConn = nx.node_connectivity(robustG)
+      nodeConn
+    hints:
+    - 바꿀 지점은 \`nodeConn = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`nodeConn\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 9단계. k연결성에서 \`nodeConn\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 9단계. k연결성 실행 뒤 \`nodeConn\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step10_practical
+  title: 10단계. 실전 분석
+  structuredPrimary: true
+  subtitle: 네트워크 취약점 진단
+  goal: 10단계. 실전 분석에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 실제 네트워크의 취약점을 종합적으로 분석합니다. 기업의 통신 네트워크, 전력망, 교통망 등을 모델링하고 브릿지와 절단점을 식별합니다. 이 분석 결과를 바탕으로
+    백업 연결을 추가하거나, 중요 노드에 이중화를 적용하여 네트워크 안정성을 높일 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    network = nx.Graph()
+    network.add_edges_from([
+        ("HQ", "Branch1"), ("HQ", "Branch2"), ("HQ", "DataCenter"),
+        ("Branch1", "Office1"), ("Branch1", "Office2"),
+        ("Branch2", "Office3"), ("Branch2", "Office4"),
+        ("DataCenter", "Server1"), ("DataCenter", "Server2"),
+        ("Server1", "Server2")
+    ])
+    network.number_of_nodes(), network.number_of_edges()
+  exercise:
+    prompt: 10단계. 실전 분석 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      network = nx.Graph()
+      network.add_edges_from([
+          ("HQ", "Branch1"), ("HQ", "Branch2"), ("HQ", "DataCenter"),
+          ("Branch1", "Office1"), ("Branch1", "Office2"),
+          ("Branch2", "Office3"), ("Branch2", "Office4"),
+          ("DataCenter", "Server1"), ("DataCenter", "Server2"),
+          ("Server1", "Server2")
+      ])
+      network.number_of_nodes(), network.number_of_edges()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 10단계. 실전 분석에서 \`network\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 10단계. 실전 분석 실행 뒤 \`network\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 연결성 분석
+  goal: 실습에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    지금까지 배운 연결성 분석 기법을 활용하여 실전 미션을 수행해봅시다. 전력망의 취약점을 분석하고, 소셜 네트워크에서 브릿지 제거 시 어떻게 분리되는지 시뮬레이션합니다.
+
+    각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  snippet: |-
+    import networkx as nx
+    import matplotlib.pyplot as plt
+
+    power = nx.Graph()
+    power.add_edges_from([
+        ("Plant1", "Substation1"), ("Plant1", "Substation2"),
+        ("Substation1", "District1"), ("Substation1", "District2"),
+        ("Substation2", "District3"), ("Substation2", "District4"),
+        ("District1", "District2")
+    ])
+    power.number_of_nodes(), power.number_of_edges()
+  exercise:
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+
+      power = nx.Graph()
+      power.add_edges_from([
+          ("Plant1", "Substation1"), ("Plant1", "Substation2"),
+          ("Substation1", "District1"), ("Substation1", "District2"),
+          ("Substation2", "District3"), ("Substation2", "District4"),
+          ("District1", "District2")
+      ])
+      power.number_of_nodes(), power.number_of_edges()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 실습에서 \`power\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 \`power\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 인수인계 네트워크
+  goal: 업무 흐름 검증에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 실무 네트워크 분석은 그래프를 그리는 데서 끝나지 않습니다. 먼저 병목 후보를 예측하고, 로컬 Python에서 실행한 뒤, 잘못된 노드나 끊어진 경로를 예외로
+    처리하고, 핵심 지표를 assert로 검증해야 합니다. 아래 흐름은 영업, 지원, 운영, 재무, 엔지니어링 사이의 인수인계 비용을 네트워크로 보고 개선안을 비교합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import networkx as nx
+
+    handoffEdges = [
+        ("sales", "support", 1),
+        ("support", "ops", 2),
+        ("ops", "finance", 1),
+        ("ops", "engineering", 1),
+        ("engineering", "infra", 2),
+        ("support", "customer_success", 2),
+    ]
+
+    workflowGraph = nx.Graph()
+    workflowGraph.add_weighted_edges_from(handoffEdges)
+
+    expectedNodes = {"sales", "support", "ops", "finance", "engineering", "infra", "customer_success"}
+    if set(workflowGraph.nodes()) != expectedNodes:
+        raise ValueError("인수인계 네트워크의 부서 목록이 예상과 다릅니다.")
+    if any(data["weight"] <= 0 for _, _, data in workflowGraph.edges(data=True)):
+        raise ValueError("인수인계 비용은 0보다 커야 합니다.")
+
+    salesToFinanceCost = nx.shortest_path_length(workflowGraph, "sales", "finance", weight="weight")
+    betweenness = nx.betweenness_centrality(workflowGraph, weight="weight")
+
+    workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      experimentGraph = workflowGraph.copy()
+      experimentGraph.add_edge("sales", "finance", weight=2)
+
+      improvedCost = nx.shortest_path_length(experimentGraph, "sales", "finance", weight="weight")
+      improvedBetweenness = nx.betweenness_centrality(experimentGraph, weight="weight")
+      improvement = salesToFinanceCost - improvedCost
+
+      assert improvement > 0
+      {
+          "beforeCost": salesToFinanceCost,
+          "afterCost": improvedCost,
+          "costImprovement": improvement,
+          "opsBetweennessBefore": round(betweenness["ops"], 3),
+          "opsBetweennessAfter": round(improvedBetweenness["ops"], 3),
+      }
+    solution: |-
+      import networkx as nx
+
+      handoffEdges = [
+          ("sales", "support", 1),
+          ("support", "ops", 2),
+          ("ops", "finance", 1),
+          ("ops", "engineering", 1),
+          ("engineering", "infra", 2),
+          ("support", "customer_success", 2),
+      ]
+
+      workflowGraph = nx.Graph()
+      workflowGraph.add_weighted_edges_from(handoffEdges)
+
+      expectedNodes = {"sales", "support", "ops", "finance", "engineering", "infra", "customer_success"}
+      if set(workflowGraph.nodes()) != expectedNodes:
+          raise ValueError("인수인계 네트워크의 부서 목록이 예상과 다릅니다.")
+      if any(data["weight"] <= 0 for _, _, data in workflowGraph.edges(data=True)):
+          raise ValueError("인수인계 비용은 0보다 커야 합니다.")
+
+      workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 업무 흐름 검증에서 \`experimentGraph\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: networkx_06-connected-components-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 연결 component와 isolated node 찾기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: undirected graph의 모든 component를 크기·이름 순으로 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - node 목록에서 isolated node를 잃지 마세요.
+    - component 순서를 안정화해 결과를 재현하세요.
+    exercise:
+      prompt: connected_components(nodes, edges)를 완성하세요.
+      starterCode: |-
+        def connected_components(nodes, edges):
+            raise NotImplementedError
+      solution: |
+        def connected_components(nodes, edges):
+            adjacency = {node: set() for node in nodes}
+            for a, b in edges:
+                adjacency[a].add(b); adjacency[b].add(a)
+            remaining = set(nodes); components = []
+            while remaining:
+                start = min(remaining); seen = {start}; queue = [start]
+                while queue:
+                    for neighbor in adjacency[queue.pop(0)]:
+                        if neighbor not in seen: seen.add(neighbor); queue.append(neighbor)
+                remaining -= seen; components.append(sorted(seen))
+            return sorted(components, key=lambda group: (-len(group), group))
+      hints: *id001
+    check:
+      id: python.networkx.networkx_06.connected-components.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_06.connected-components.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: connected_components
+        cases:
+        - id: finds-components-and-isolate
+          arguments:
+          - value:
+            - a
+            - b
+            - c
+            - d
+          - value:
+            - - a
+              - b
+            - - b
+              - c
+          expectedReturn:
+          - - a
+            - b
+            - c
+          - - d
+        - id: handles-empty
+          arguments:
+          - value: []
+          - value: []
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: networkx_06-bridge-impact-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_06-connected-components-mastery
+    title: 새 인프라 graph에 bridge 영향 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 각 edge 제거 전후 component 수를 비교해 bridge를 찾는다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - edge 하나를 제거하기 전후의 component 수를 비교하세요.
+    - bridge가 곧 실제 장애 원인이라는 주장은 별도 운영 증거가 필요합니다.
+    exercise:
+      prompt: find_bridges(nodes, edges)를 완성하세요.
+      starterCode: |-
+        def find_bridges(nodes, edges):
+            raise NotImplementedError
+      solution: |
+        def find_bridges(nodes, edges):
+            def count_components(kept):
+                adjacency = {node: set() for node in nodes}
+                for a, b in kept: adjacency[a].add(b); adjacency[b].add(a)
+                remaining = set(nodes); count = 0
+                while remaining:
+                    count += 1; queue = [next(iter(remaining))]; seen = set(queue)
+                    while queue:
+                        for neighbor in adjacency[queue.pop()]:
+                            if neighbor not in seen: seen.add(neighbor); queue.append(neighbor)
+                    remaining -= seen
+                return count
+            baseline = count_components(edges)
+            bridges = []
+            for index, edge in enumerate(edges):
+                if count_components(edges[:index] + edges[index + 1:]) > baseline:
+                    bridges.append(sorted(edge))
+            return sorted(bridges)
+      hints: *id002
+    check:
+      id: python.networkx.networkx_06.bridge-impact.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_06.bridge-impact.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: find_bridges
+        cases:
+        - id: finds-tail-bridge
+          arguments:
+          - value:
+            - a
+            - b
+            - c
+            - d
+          - value:
+            - - a
+              - b
+            - - b
+              - c
+            - - c
+              - a
+            - - c
+              - d
+          expectedReturn:
+          - - c
+            - d
+        - id: finds-none-in-cycle
+          arguments:
+          - value:
+            - a
+            - b
+            - c
+          - value:
+            - - a
+              - b
+            - - b
+              - c
+            - - c
+              - a
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: networkx_06-connectivity-question-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_06-bridge-impact-transfer
+    title: 연결성 질문 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: component·bridge·cut 질문을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 그래프 알고리즘의 입력 가정과 반환 의미를 함께 기록하세요.
+    - 시각적 모양만으로 구조적 결론을 내리지 마세요.
+    exercise:
+      prompt: choose_connectivity(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_connectivity(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_connectivity(situation):
+            table = {'disconnected-groups': {'method': 'connected components', 'evidence': 'component sizes', 'risk': 'missing nodes'}, 'single-edge-failure': {'method': 'bridges', 'evidence': 'component increase', 'risk': 'directed semantics'}, 'single-node-failure': {'method': 'articulation points', 'evidence': 'node removal impact', 'risk': 'capacity ignored'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.networkx.networkx_06.connectivity-question.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_06.connectivity-question.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_connectivity
+        cases:
+        - id: recalls-disconnected-groups
+          arguments:
+          - value: disconnected-groups
+          expectedReturn:
+            method: connected components
+            evidence: component sizes
+            risk: missing nodes
+        - id: recalls-single-edge-failure
+          arguments:
+          - value: single-edge-failure
+          expectedReturn:
+            method: bridges
+            evidence: component increase
+            risk: directed semantics
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

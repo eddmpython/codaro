@@ -1,0 +1,856 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - pandas
+  - seaborn
+  id: matplotlib_02
+  title: 팁데이터분포탐색
+  order: 2
+  category: matplotlib
+  difficulty: ⭐
+  badge: 입문
+  outcomes: ["matplotlib.basics","viz.distribution"]
+  prerequisites: ["matplotlib.basics"]
+  estimatedMinutes: 50
+  tags:
+  - matplotlib
+  - hist
+  - boxplot
+  - subplots
+  - tips
+  - 분포
+  seo:
+    title: Matplotlib 히스토그램과 박스플롯 - 팁 데이터 분포 분석
+    description: Matplotlib으로 팁 데이터의 분포를 히스토그램과 박스플롯으로 시각화합니다. hist, boxplot, subplots 사용법을 배웁니다.
+    keywords:
+    - matplotlib
+    - histogram
+    - boxplot
+    - 분포
+    - tips
+    - subplots
+intro:
+  emoji: 💵
+  goal: 레스토랑 팁 데이터의 분포를 히스토그램과 박스플롯으로 분석합니다.
+  description: 데이터 분포를 파악하는 두 가지 핵심 차트를 배웁니다. 히스토그램으로 전체 분포를, 박스플롯으로 요약 통계를 시각화합니다.
+  direction: 팁데이터분포탐색에서 분석 데이터를 차트로 만들고 축, 범례, 저장 결과를 검증합니다.
+  benefits:
+  - 시각화할 데이터 확인 후 차트 구성에 맞는 코드 입력을 고릅니다.
+  - 팁데이터분포탐색 결과를 축/범례/파일 출력 기준으로 즉시 점검합니다.
+  - 완료한 코드를 보고서 차트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(시각화할 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 11단계. 한글 폰트 설정 처리 실행
+      detail: 차트 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 2단계. 데이터 로드 결과 검증
+      detail: 축/범례/파일 출력 기준으로 실행 결과를 비교합니다.
+    - label: 팁데이터분포탐색 재사용
+      detail: 완성 코드를 보고서 차트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 시각 리포트 환경
+      detail: matplotlib, pandas, seaborn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 팁데이터분포탐색 실행
+      detail: 셀을 실행해 축/범례/파일 출력와 예외 상태를 확인합니다.
+    - label: 팁데이터분포탐색 완료
+      detail: 검증된 코드를 보고서 차트로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: |-
+    Codaro 로컬 데이터셋인 tips를 사용합니다. tips 데이터는 레스토랑에서 수집한 팁 정보로, 총 결제금액, 팁, 요일, 시간대, 인원수 등이 포함되어 있습니다. 실제 서비스업 데이터 분석에 자주 사용되는 예제입니다.
+
+    import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. seaborn은 sns로, pandas는 pd로 줄여 쓰는 것이 데이터 과학 커뮤니티의 표준입니다.
+  tips:
+  - import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. seaborn은 sns로, pandas는
+    pd로 줄여 쓰는 것이 데이터 과학 커뮤니티의 표준입니다.
+  snippet: |-
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+    import pandas as pd
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+      import pandas as pd
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 라이브러리 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 축/범례/파일 출력 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step1_font
+  title: 1-1단계. 한글 폰트 설정
+  structuredPrimary: true
+  subtitle: Codaro 로컬 Python 환경 폰트
+  goal: 11단계. 한글 폰트 설정에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    Codaro 로컬 Python에서는 실행 환경에 따라 기본 폰트에 한글 글리프가 없을 수 있습니다. CDN 또는 로컬 폰트 파일을 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
+
+    font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
+  tips:
+  - font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스
+    기호가 깨지는 것을 방지합니다.
+  snippet: |-
+    from matplotlib import font_manager
+
+    fontCandidates = ["Malgun Gothic", "AppleGothic", "NanumGothic", "DejaVu Sans"]
+    availableFonts = {font.name for font in font_manager.fontManager.ttflist}
+    for fontName in fontCandidates:
+        if fontName in availableFonts:
+            plt.rcParams["font.family"] = fontName
+            break
+    plt.rcParams["axes.unicode_minus"] = False
+  exercise:
+    prompt: 11단계. 한글 폰트 설정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      from matplotlib import font_manager
+
+      fontCandidates = ["Malgun Gothic", "AppleGothic", "NanumGothic", "DejaVu Sans"]
+      availableFonts = {font.name for font in font_manager.fontManager.ttflist}
+      for fontName in fontCandidates:
+          if fontName in availableFonts:
+              plt.rcParams["font.family"] = fontName
+              break
+      plt.rcParams["axes.unicode_minus"] = False
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 한글 폰트 설정의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 11단계. 한글 폰트 설정 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step2_data
+  title: 2단계. 데이터 로드
+  structuredPrimary: true
+  subtitle: loadLocalDataset()
+  goal: 2단계. 데이터 로드에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    loadLocalDataset() 함수로 tips 데이터를 불러옵니다. 이 데이터셋은 레스토랑 결제 기록을 담고 있으며, 팁 예측 모델이나 고객 분석에 자주 사용됩니다. 인터넷 연결 없이 같은 실습 흐름을 재현할 수 있습니다.
+
+    loadLocalDataset('tips')처럼 Codaro가 함께 제공하는 로컬 예제 데이터를 불러옵니다. 'tips', 'iris', 'penguins', 'titanic' 등 다양한 데이터셋을 인터넷 연결 없이 바로 재현할 수 있습니다.
+  tips:
+  - loadLocalDataset('tips')처럼 Codaro가 함께 제공하는 로컬 예제 데이터를 불러옵니다. 'tips', 'iris', 'penguins', 'titanic'
+    등 다양한 데이터셋을 인터넷 연결 없이 바로 재현할 수 있습니다.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    tips = loadLocalDataset('tips')
+    tips.head()
+  exercise:
+    prompt: 2단계. 데이터 로드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      tips = loadLocalDataset('tips')
+      tips.head()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 로드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 로드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_explore
+  title: 3단계. 데이터 탐색
+  structuredPrimary: true
+  subtitle: 기본 통계
+  goal: 3단계. 데이터 탐색에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+  explanation: 시각화 전에 데이터의 기본 통계를 확인합니다. describe()로 수치형 컬럼의 평균, 표준편차, 최소/최대값 등을 파악할 수 있습니다. 팁의 평균은 약
+    3달러, 총 결제금액의 평균은 약 20달러입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: tips.describe()
+  exercise:
+    prompt: 3단계. 데이터 탐색 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    starterCode: tips.describe()
+    hints:
+    - 바꿀 지점은 시각화할 데이터을 만드는 첫 줄과 차트 구성 줄에서 찾으세요.
+    - 실행 뒤 축/범례/파일 출력 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 데이터 탐색의 수정 코드가 차트 구성 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 3단계. 데이터 탐색 실행 결과가 축/범례/파일 출력 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step4_hist
+  title: 4단계. 히스토그램 그리기
+  structuredPrimary: true
+  subtitle: ax.hist()
+  goal: 4단계. 히스토그램 그리기에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    히스토그램은 데이터의 분포를 보여주는 차트입니다. 값의 범위를 구간(bin)으로 나누고, 각 구간에 속하는 데이터 개수를 막대로 표시합니다. 팁 금액이 어디에 집중되어 있는지, 이상치가 있는지 파악할 수 있습니다.
+
+    ax.hist(데이터, bins=구간수)로 히스토그램을 그립니다. bins는 구간 개수로, 숫자가 클수록 세밀한 분포를 보여줍니다. 기본값은 10이며, 20~30 정도가 적당합니다. edgecolor로 막대 테두리 색상을 지정하면 구간 구분이 명확해집니다.
+  tips:
+  - ax.hist(데이터, bins=구간수)로 히스토그램을 그립니다. bins는 구간 개수로, 숫자가 클수록 세밀한 분포를 보여줍니다. 기본값은 10이며, 20~30 정도가 적당합니다.
+    edgecolor로 막대 테두리 색상을 지정하면 구간 구분이 명확해집니다.
+  snippet: |-
+    figHist, axHist = plt.subplots(figsize=(10, 6))
+    axHist.hist(tips['tip'], bins=20, color='steelblue', edgecolor='white')
+    axHist.set_title('팁 금액 분포', fontsize=14)
+    axHist.set_xlabel('팁 ($)', fontsize=12)
+    axHist.set_ylabel('빈도', fontsize=12)
+    figHist
+  exercise:
+    prompt: 4단계. 히스토그램 그리기 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figHist, axHist = plt.subplots(figsize=(10, 6))
+      axHist.hist(tips['tip'], bins=20, color='steelblue', edgecolor='white')
+      axHist.set_title('팁 금액 분포', fontsize=14)
+      axHist.set_xlabel('팁 ($)', fontsize=12)
+      axHist.set_ylabel('빈도', fontsize=12)
+      figHist
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 히스토그램 그리기의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 4단계. 히스토그램 그리기 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step5_hist_color
+  title: 5단계. 히스토그램 색상 설정
+  structuredPrimary: true
+  subtitle: color, alpha
+  goal: 5단계. 히스토그램 색상 설정에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 히스토그램의 색상과 투명도를 조정하면 더 보기 좋은 차트를 만들 수 있습니다. alpha로 투명도를 설정하면 여러 히스토그램을 겹쳐서 비교할 때 유용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figHist2, axHist2 = plt.subplots(figsize=(10, 6))
+    axHist2.hist(tips['tip'], bins=25, color='#E74C3C', edgecolor='white', alpha=0.7)
+    axHist2.set_title('팁 금액 분포', fontsize=14)
+    axHist2.set_xlabel('팁 ($)', fontsize=12)
+    axHist2.set_ylabel('빈도', fontsize=12)
+    axHist2.grid(True, alpha=0.3, axis='y')
+    figHist2
+  exercise:
+    prompt: 5단계. 히스토그램 색상 설정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figHist2, axHist2 = plt.subplots(figsize=(10, 6))
+      axHist2.hist(tips['tip'], bins=25, color='#E74C3C', edgecolor='white', alpha=0.7)
+      axHist2.set_title('팁 금액 분포', fontsize=14)
+      axHist2.set_xlabel('팁 ($)', fontsize=12)
+      axHist2.set_ylabel('빈도', fontsize=12)
+      axHist2.grid(True, alpha=0.3, axis='y')
+      figHist2
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 히스토그램 색상 설정의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 5단계. 히스토그램 색상 설정 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step6_boxplot
+  title: 6단계. 박스플롯 그리기
+  structuredPrimary: true
+  subtitle: ax.boxplot()
+  goal: 6단계. 박스플롯 그리기에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    박스플롯(상자 그림)은 데이터의 요약 통계를 시각화합니다. 중앙값, 사분위수, 이상치를 한눈에 파악할 수 있습니다. 상자의 중앙선은 중앙값, 상자의 상하단은 1사분위수(25%)와 3사분위수(75%), 수염은 최소/최대값(이상치 제외), 점은 이상치를 나타냅니다.
+
+    ax.boxplot(데이터)로 박스플롯을 그립니다. vert=True는 수직(기본값), vert=False는 수평입니다. 박스 안의 선은 중앙값, 박스 범위는 IQR(사분위범위), 수염은 1.5*IQR 이내, 그 밖의 점은 이상치입니다.
+  tips:
+  - ax.boxplot(데이터)로 박스플롯을 그립니다. vert=True는 수직(기본값), vert=False는 수평입니다. 박스 안의 선은 중앙값, 박스 범위는 IQR(사분위범위),
+    수염은 1.5*IQR 이내, 그 밖의 점은 이상치입니다.
+  snippet: |-
+    figBox, axBox = plt.subplots(figsize=(8, 6))
+    axBox.boxplot(tips['tip'], vert=True)
+    axBox.set_title('팁 금액 분포 (박스플롯)', fontsize=14)
+    axBox.set_ylabel('팁 ($)', fontsize=12)
+    axBox.grid(True, alpha=0.3, axis='y')
+    figBox
+  exercise:
+    prompt: 6단계. 박스플롯 그리기 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figBox, axBox = plt.subplots(figsize=(8, 6))
+      axBox.boxplot(tips['tip'], vert=True)
+      axBox.set_title('팁 금액 분포 (박스플롯)', fontsize=14)
+      axBox.set_ylabel('팁 ($)', fontsize=12)
+      axBox.grid(True, alpha=0.3, axis='y')
+      figBox
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 박스플롯 그리기의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 6단계. 박스플롯 그리기 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step7_subplots
+  title: 7단계. 서브플롯으로 비교
+  structuredPrimary: true
+  subtitle: plt.subplots(nrows, ncols)
+  goal: 7단계. 서브플롯으로 비교에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    서브플롯을 사용하면 여러 차트를 한 Figure에 배치할 수 있습니다. 히스토그램과 박스플롯을 나란히 배치하여 같은 데이터를 다른 관점에서 비교할 수 있습니다. nrows와 ncols로 행과 열 개수를 지정합니다.
+
+    plt.subplots(행, 열)로 여러 Axes를 생성합니다. 반환값은 (fig, axes)이며, axes는 배열입니다. 1x2면 axes[0], axes[1]로, 2x2면 axes[0,0], axes[0,1] 등으로 접근합니다. 튜플 언패킹으로 (ax1, ax2)처럼 받을 수도 있습니다.
+  tips:
+  - plt.subplots(행, 열)로 여러 Axes를 생성합니다. 반환값은 (fig, axes)이며, axes는 배열입니다. 1x2면 axes[0], axes[1]로, 2x2면
+    axes[0,0], axes[0,1] 등으로 접근합니다. 튜플 언패킹으로 (ax1, ax2)처럼 받을 수도 있습니다.
+  snippet: |-
+    figSub, (axSub1, axSub2) = plt.subplots(1, 2, figsize=(14, 5))
+
+    axSub1.hist(tips['tip'], bins=20, color='steelblue', edgecolor='white')
+    axSub1.set_title('팁 분포 (히스토그램)', fontsize=12)
+    axSub1.set_xlabel('팁 ($)')
+    axSub1.set_ylabel('빈도')
+    figSub
+  exercise:
+    prompt: 7단계. 서브플롯으로 비교 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figSub, (axSub1, axSub2) = plt.subplots(1, 2, figsize=(14, 5))
+
+      axSub1.hist(tips['tip'], bins=20, color='steelblue', edgecolor='white')
+      axSub1.set_title('팁 분포 (히스토그램)', fontsize=12)
+      axSub1.set_xlabel('팁 ($)')
+      axSub1.set_ylabel('빈도')
+      figSub
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 서브플롯으로 비교의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 7단계. 서브플롯으로 비교 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step8_bill_hist
+  title: 8단계. 총 결제금액 분포
+  structuredPrimary: true
+  subtitle: 다른 변수 분석
+  goal: 8단계. 총 결제금액 분포에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 팁뿐만 아니라 총 결제금액(total_bill)의 분포도 분석해봅니다. 결제금액의 분포를 알면 레스토랑의 가격대나 고객 특성을 파악할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figBill, axBill = plt.subplots(figsize=(10, 6))
+    axBill.hist(tips['total_bill'], bins=25, color='#27AE60', edgecolor='white', alpha=0.8)
+    axBill.set_title('총 결제금액 분포', fontsize=14)
+    axBill.set_xlabel('결제금액 ($)', fontsize=12)
+    axBill.set_ylabel('빈도', fontsize=12)
+    axBill.grid(True, alpha=0.3, axis='y')
+    figBill
+  exercise:
+    prompt: 8단계. 총 결제금액 분포 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figBill, axBill = plt.subplots(figsize=(10, 6))
+      axBill.hist(tips['total_bill'], bins=25, color='#27AE60', edgecolor='white', alpha=0.8)
+      axBill.set_title('총 결제금액 분포', fontsize=14)
+      axBill.set_xlabel('결제금액 ($)', fontsize=12)
+      axBill.set_ylabel('빈도', fontsize=12)
+      axBill.grid(True, alpha=0.3, axis='y')
+      figBill
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 총 결제금액 분포의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 8단계. 총 결제금액 분포 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step9_xlim
+  title: 9단계. 축 범위 설정
+  structuredPrimary: true
+  subtitle: set_xlim(), set_ylim()
+  goal: 9단계. 축 범위 설정에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    때로는 특정 범위에 집중하여 분석하고 싶을 때가 있습니다. set_xlim()과 set_ylim()으로 축의 표시 범위를 직접 설정할 수 있습니다. 이상치를 제외하고 주요 분포만 자세히 보고 싶을 때 유용합니다.
+
+    ax.set_xlim(최소, 최대)로 x축 범위를, ax.set_ylim(최소, 최대)로 y축 범위를 설정합니다. 범위 밖의 데이터는 표시되지 않습니다. None을 사용하면 해당 방향은 자동으로 설정됩니다.
+  tips:
+  - ax.set_xlim(최소, 최대)로 x축 범위를, ax.set_ylim(최소, 최대)로 y축 범위를 설정합니다. 범위 밖의 데이터는 표시되지 않습니다. None을 사용하면 해당
+    방향은 자동으로 설정됩니다.
+  snippet: |-
+    figLim, axLim = plt.subplots(figsize=(10, 6))
+    axLim.hist(tips['total_bill'], bins=30, color='#3498DB', edgecolor='white')
+    axLim.set_title('총 결제금액 분포 (0~40$ 범위)', fontsize=14)
+    axLim.set_xlabel('결제금액 ($)', fontsize=12)
+    axLim.set_ylabel('빈도', fontsize=12)
+    axLim.set_xlim(0, 40)
+    axLim.grid(True, alpha=0.3)
+    figLim
+  exercise:
+    prompt: 9단계. 축 범위 설정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figLim, axLim = plt.subplots(figsize=(10, 6))
+      axLim.hist(tips['total_bill'], bins=30, color='#3498DB', edgecolor='white')
+      axLim.set_title('총 결제금액 분포 (0~40$ 범위)', fontsize=14)
+      axLim.set_xlabel('결제금액 ($)', fontsize=12)
+      axLim.set_ylabel('빈도', fontsize=12)
+      axLim.set_xlim(0, 40)
+      axLim.grid(True, alpha=0.3)
+      figLim
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 축 범위 설정의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 9단계. 축 범위 설정 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step10_final
+  title: 10단계. 최종 비교 시각화
+  structuredPrimary: true
+  subtitle: 2x2 서브플롯
+  goal: 10단계. 최종 비교 시각화에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 팁과 결제금액의 히스토그램, 박스플롯을 2x2 격자로 배치하여 종합적인 분포 분석 차트를 만듭니다. 이런 멀티 패널 차트는 데이터 탐색 초기 단계에서 전체적인
+    분포를 파악하는 데 매우 유용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    figFinal, axes = plt.subplots(2, 2, figsize=(12, 10))
+
+    axes[0, 0].hist(tips['tip'], bins=20, color='#E74C3C', edgecolor='white')
+    axes[0, 0].set_title('팁 분포', fontsize=12)
+    axes[0, 0].set_xlabel('팁 ($)')
+    axes[0, 0].set_ylabel('빈도')
+
+    axes[0, 1].boxplot(tips['tip'])
+    axes[0, 1].set_title('팁 박스플롯', fontsize=12)
+    axes[0, 1].set_ylabel('팁 ($)')
+    figFinal
+  exercise:
+    prompt: 10단계. 최종 비교 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      figFinal, axes = plt.subplots(2, 2, figsize=(12, 10))
+
+      axes[0, 0].hist(tips['tip'], bins=20, color='#E74C3C', edgecolor='white')
+      axes[0, 0].set_title('팁 분포', fontsize=12)
+      axes[0, 0].set_xlabel('팁 ($)')
+      axes[0, 0].set_ylabel('빈도')
+
+      axes[0, 1].boxplot(tips['tip'])
+      axes[0, 1].set_title('팁 박스플롯', fontsize=12)
+      axes[0, 1].set_ylabel('팁 ($)')
+      figFinal
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 최종 비교 시각화의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 10단계. 최종 비교 시각화 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 팁 데이터 분포 분석 프로젝트
+  goal: 실습에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    지금까지 배운 내용을 활용해서 팁 데이터를 다양한 관점에서 분석해봅시다. hist, boxplot, subplots, xlim/ylim, color 등 모든 개념을 종합적으로 활용합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    from codaro.curriculum.localData import loadLocalDataset
+
+    tips2 = loadLocalDataset('tips')
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+
+      tips2 = loadLocalDataset('tips')
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 히스토그램과 박스플롯으로 데이터 분포를 분석했습니다.
+  - type: list
+    items:
+    - ax.hist(data, bins) - 히스토그램으로 분포 시각화
+    - ax.boxplot(data) - 박스플롯으로 요약 통계 시각화
+    - plt.subplots(rows, cols) - 여러 차트를 한 Figure에 배치
+    - color, alpha, edgecolor - 색상과 투명도 설정
+    - set_xlim(), set_ylim() - 축 범위 설정
+    - plt.suptitle() - 전체 Figure의 제목
+  - type: text
+    content: 다음 시간에는 붓꽃 데이터로 산점도와 마커 스타일을 배웁니다.
+  goal: 정리에서 시각화할 데이터을 바꿨을 때 축/범례/파일 출력가 어떻게 달라지는지 확인한다.
+  why: 시각화는 데이터 결과를 사람이 검토하고 의사결정에 쓰기 위한 산출물입니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 보고서 차트 품질 게이트
+  goal: 업무 흐름 검증에서 차트 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고,
+    제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import pandas as pd
+    import matplotlib.pyplot as plt
+
+    reportData = pd.DataFrame({
+        "month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+        "revenue": [82, 91, 105, 112, 121, 130],
+        "cost": [55, 58, 62, 64, 68, 72],
+        "target": [100, 100, 100, 100, 100, 100],
+    })
+
+    def validateChartFrame(frame: pd.DataFrame) -> bool:
+        requiredColumns = {"month", "revenue", "cost", "target"}
+        missingColumns = requiredColumns - set(frame.columns)
+        if missingColumns:
+            raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+        if frame[["revenue", "cost", "target"]].lt(0).any().any():
+            raise ValueError("금액 컬럼은 음수가 될 수 없습니다.")
+        return True
+
+    validateChartFrame(reportData)
+    reportData
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      targetScenario = pd.DataFrame({"target": [95, 100, 115]}).assign(
+          monthsPassed=lambda frame: frame["target"].map(lambda target: int((reportData["revenue"] >= target).sum()))
+      )
+
+      assert targetScenario["monthsPassed"].is_monotonic_decreasing
+      targetScenario
+    solution: |-
+      import pandas as pd
+      import matplotlib.pyplot as plt
+
+      reportData = pd.DataFrame({
+          "month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+          "revenue": [82, 91, 105, 112, 121, 130],
+          "cost": [55, 58, 62, 64, 68, 72],
+          "target": [100, 100, 100, 100, 100, 100],
+      })
+
+      def validateChartFrame(frame: pd.DataFrame) -> bool:
+          requiredColumns = {"month", "revenue", "cost", "target"}
+          missingColumns = requiredColumns - set(frame.columns)
+          if missingColumns:
+              raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+          if frame[["revenue", "cost", "target"]].lt(0).any().any():
+              raise ValueError("금액 컬럼은 음수가 될 수 없습니다.")
+          return True
+
+      validateChartFrame(reportData)
+      reportData
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 업무 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: matplotlib_02-tip-distribution-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 팁 분포 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 분포의 bin과 표본 수를 숨기지 않았는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_tip_distribution(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_tip_distribution(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_tip_distribution(rows):
+            required = ['tip', 'count', 'day']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'day'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['tip'] for row in usable]
+            y_values = [row['count'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.matplotlib.matplotlib_02.tip-distribution-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.matplotlib.matplotlib_02.tip-distribution-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_tip_distribution
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - tip: 1
+              count: 2
+              day: Fri
+            - tip: 3
+              count: 1
+              day: Fri
+            - tip: 5
+              count: 4
+              day: Sat
+          expectedReturn:
+            usableCount: 3
+            excludedCount: 0
+            groupCounts:
+              Fri: 2
+              Sat: 1
+            xExtent:
+            - 1
+            - 5
+            yExtent:
+            - 1
+            - 4
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: matplotlib_02-tip-distribution-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - matplotlib_02-tip-distribution-data-evidence-mastery
+    title: 팁 분포 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 배송 시간 분포를 요일별 histogram으로 비교한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_tip_distribution(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_tip_distribution(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_tip_distribution(candidate):
+            expected = {'mark': 'histogram', 'x': 'tip', 'y': 'count', 'group': 'day', 'transforms': ['bin-x', 'count'], 'interaction': 'none'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.matplotlib.matplotlib_02.tip-distribution-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.matplotlib.matplotlib_02.tip-distribution-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_tip_distribution
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: histogram
+              x: tip
+              y: count
+              group: day
+              transforms:
+              - bin-x
+              - count
+              interaction: none
+              description: 배송 시간 분포를 요일별 histogram으로 비교한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: histogram
+              x: tip
+              y: count
+              group: day
+              transforms:
+              - bin-x
+              - count
+              interaction: none
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: count
+              y: tip
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - description
+            encoding:
+              mark: histogram
+              x: tip
+              y: count
+              group: day
+              transforms:
+              - bin-x
+              - count
+              interaction: none
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: matplotlib_02-tip-distribution-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - matplotlib_02-tip-distribution-encoding-transfer-transfer
+    title: 팁 분포 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 분포의 bin과 표본 수를 숨기지 않았는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_tip_distribution(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_tip_distribution(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_tip_distribution(situation):
+            table = {'one-number-distribution': {'encoding': 'histogram', 'evidence': 'bin edges and n', 'risk': 'arbitrary bins'}, 'group-spread': {'encoding': 'boxplot', 'evidence': 'quartiles and outliers', 'risk': 'hidden sample size'}, 'two-numeric-relation': {'encoding': 'scatter', 'evidence': 'point count', 'risk': 'overplotting'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.matplotlib.matplotlib_02.tip-distribution-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.matplotlib.matplotlib_02.tip-distribution-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_tip_distribution
+        cases:
+        - id: recalls-one-number-distribution
+          arguments:
+          - value: one-number-distribution
+          expectedReturn:
+            encoding: histogram
+            evidence: bin edges and n
+            risk: arbitrary bins
+        - id: recalls-group-spread
+          arguments:
+          - value: group-spread
+          expectedReturn:
+            encoding: boxplot
+            evidence: quartiles and outliers
+            risk: hidden sample size
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

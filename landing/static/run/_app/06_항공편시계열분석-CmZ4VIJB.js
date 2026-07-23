@@ -1,0 +1,731 @@
+var e=`meta:
+  packages:
+  - pandas
+  id: pandas_06
+  title: 항공편시계열분석
+  order: 6
+  category: pandas
+  difficulty: ⭐⭐⭐⭐
+  badge: 중급
+  dataSource: codaro-local:flights
+  tags:
+  - flights
+  - 시계열
+  - datetime
+  - rolling
+  - resample
+  - 검증
+  - 시계열
+  seo:
+    title: pandas 시계열 분석 - 항공 승객 데이터로 배우는 datetime
+    description: 항공 승객 데이터로 시계열 분석을 배웁니다. datetime 변환, 월별 패턴, 이동평균(rolling), 연도별 추이 분석을 실습합니다.
+    keywords:
+    - pandas 시계열
+    - datetime
+    - rolling
+    - resample
+    - flights 데이터
+intro:
+  emoji: ✈️
+  goal: 항공 승객 데이터에서 "언제 가장 붐빌까?"를 시계열로 분석합니다.
+  description: 시간 축이 있는 데이터를 다루는 방법을 배웁니다. 월별 패턴, 연도별 추이, 이동평균 등 시계열 분석의 기초를 익힙니다.
+  direction: 항공편시계열분석에서 표 데이터를 불러오고 정제, 집계, 검증 결과까지 연결합니다.
+  benefits:
+  - DataFrame 입력 확인 후 정제와 집계에 맞는 코드 입력을 고릅니다.
+  - 항공편시계열분석 결과를 행/열 수와 요약값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 데이터 리포트 자동화에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 불러오기 입력 확인
+      detail: 입력 기준(DataFrame 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 미리보기 처리 실행
+      detail: 정제와 집계 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 데이터 타입 확인 결과 검증
+      detail: 행/열 수와 요약값 기준으로 실행 결과를 비교합니다.
+    - label: 항공편시계열분석 재사용
+      detail: 완성 코드를 데이터 리포트 자동화에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 표 데이터 환경
+      detail: pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 항공편시계열분석 실행
+      detail: 셀을 실행해 행/열 수와 요약값와 예외 상태를 확인합니다.
+    - label: 항공편시계열분석 완료
+      detail: 검증된 코드를 데이터 리포트 자동화로 남깁니다.
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  structuredPrimary: true
+  subtitle: 1949~1960년 월별 항공 승객 수
+  goal: 1단계. 데이터 불러오기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    항공편 데이터는 1949년부터 1960년까지 12년간의 월별 항공 승객 수를 기록한 시계열 데이터입니다. 총 144개의 행(12년 × 12개월)과 3개의 컬럼(year, month, passengers)으로 구성되어 있습니다. 시계열 데이터는 시간의 흐름에 따라 기록된 데이터로, 추세(장기적 방향), 계절성(주기적 패턴), 순환(불규칙한 반복) 등의 특성을 분석할 수 있습니다. 로컬 실행에서는 네트워크가 없어도 월별, 연도별, 이동평균 흐름이 깨지지 않도록 3개 연도의 월별 샘플을 함께 둡니다.
+
+    시계열 데이터는 시간 순서가 중요한 데이터입니다. 일반 데이터와 달리 행의 순서를 바꾸면 의미가 달라집니다. 주가, 기온, 매출, 트래픽 등 시간에 따라 변하는 모든 데이터가 시계열입니다. pandas는 datetime 인덱스를 활용해 시계열 분석에 특화된 기능들을 제공합니다.
+  tips:
+  - 시계열 데이터는 시간 순서가 중요한 데이터입니다. 일반 데이터와 달리 행의 순서를 바꾸면 의미가 달라집니다. 주가, 기온, 매출, 트래픽 등 시간에 따라 변하는 모든 데이터가
+    시계열입니다. pandas는 datetime 인덱스를 활용해 시계열 분석에 특화된 기능들을 제공합니다.
+  snippet: |-
+    import pandas as pd
+    from codaro.curriculum.localData import loadLocalDataset
+
+    flights = loadLocalDataset("flights")
+    flights.shape
+  exercise:
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+
+      flights = loadLocalDataset("flights")
+      flights.shape
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step2_head
+  title: 2단계. 미리보기
+  structuredPrimary: true
+  subtitle: 데이터 구조 파악
+  goal: 2단계. 미리보기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 데이터의 구조를 먼저 파악해야 합니다. year(연도)는 숫자형, month(월)는 문자형(January, February 등), passengers(승객수)는
+    숫자형입니다. month가 문자열로 저장되어 있어서 시계열 분석을 하려면 datetime 타입으로 변환이 필요합니다. head(10)으로 처음 10개 행을 보면 1949년 1월부터
+    10월까지의 데이터가 시간 순서대로 정렬되어 있음을 확인할 수 있습니다. 데이터가 시간 순서대로 정렬되어 있는 것이 시계열 분석의 첫 번째 조건입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: flights.head(10)
+  exercise:
+    prompt: 2단계. 미리보기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: flights.head(10)
+    hints:
+    - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
+    - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 미리보기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 미리보기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_dtypes
+  title: 3단계. 데이터 타입 확인
+  structuredPrimary: true
+  subtitle: 날짜가 아직 문자열
+  goal: 3단계. 데이터 타입 확인에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    dtypes 속성으로 각 컬럼의 데이터 타입을 확인합니다. year는 int64(정수), month는 object(문자열), passengers는 int64입니다. pandas에서 object 타입은 대부분 문자열을 의미합니다. 시계열 분석을 하려면 year와 month를 합쳐서 datetime64 타입으로 변환해야 합니다. datetime 타입이어야 날짜 계산, 기간 선택, 리샘플링 등 시계열 전용 기능을 사용할 수 있습니다. 지금은 연도와 월이 분리되어 있어서 시간의 연속성을 인식할 수 없는 상태입니다.
+
+    dtypes는 각 컬럼의 데이터 타입을 보여줍니다. int64(정수), float64(실수), object(문자열), datetime64(날짜), bool(참/거짓) 등이 있습니다. 데이터 타입이 올바르지 않으면 연산이 안 되거나 잘못된 결과가 나옵니다. 예를 들어 숫자가 문자열로 저장되면 평균을 구할 수 없습니다.
+  tips:
+  - dtypes는 각 컬럼의 데이터 타입을 보여줍니다. int64(정수), float64(실수), object(문자열), datetime64(날짜), bool(참/거짓) 등이 있습니다.
+    데이터 타입이 올바르지 않으면 연산이 안 되거나 잘못된 결과가 나옵니다. 예를 들어 숫자가 문자열로 저장되면 평균을 구할 수 없습니다.
+  snippet: flights.dtypes
+  exercise:
+    prompt: 3단계. 데이터 타입 확인 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: flights.dtypes
+    hints:
+    - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
+    - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 데이터 타입 확인의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 3단계. 데이터 타입 확인의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step4_datetime
+  title: 4단계. 날짜 컬럼 만들기
+  structuredPrimary: true
+  subtitle: pd.to_datetime()
+  goal: 4단계. 날짜 컬럼 만들기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    year와 month를 합쳐서 하나의 날짜 컬럼을 만듭니다. 먼저 year를 astype(str)로 문자열로 변환하고, +로 month와 연결해서 '1949-Jan' 같은 형태를 만듭니다. 그 다음 pd.to_datetime()으로 이 문자열을 datetime 타입으로 변환합니다. format='%Y-%b' 파라미터는 입력 문자열의 형식을 지정하는데, %Y는 4자리 연도(1949), %b는 월의 축약 이름(Jan)을 의미합니다. 이렇게 만든 date 컬럼은 datetime64 타입이 되어 시계열 분석이 가능해집니다. copy()를 사용하는 이유는 원본 데이터를 보존하고 새로운 DataFrame을 만들기 위함입니다.
+
+    pd.to_datetime()은 다양한 형식의 문자열을 datetime 타입으로 변환합니다. format 파라미터로 입력 형식을 명시하면 변환 속도가 빠르고 정확합니다. 주요 포맷 코드는 %Y(4자리 연도), %m(2자리 월), %d(2자리 일), %B(월 이름), %H(시간), %M(분), %S(초)입니다. '2024-01-15'는 format='%Y-%m-%d', '15/01/2024'는 format='%d/%m/%Y'입니다.
+  tips:
+  - pd.to_datetime()은 다양한 형식의 문자열을 datetime 타입으로 변환합니다. format 파라미터로 입력 형식을 명시하면 변환 속도가 빠르고 정확합니다. 주요
+    포맷 코드는 %Y(4자리 연도), %m(2자리 월), %d(2자리 일), %B(월 이름), %H(시간), %M(분), %S(초)입니다. '2024-01-15'는 format='%Y-%m-%d',
+    '15/01/2024'는 format='%d/%m/%Y'입니다.
+  snippet: |-
+    dated = flights.copy()
+    dated['date'] = pd.to_datetime(dated['year'].astype(str) + '-' + dated['month'], format='%Y-%b')
+    dated.head()
+  exercise:
+    prompt: 4단계. 날짜 컬럼 만들기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      dated = flights.copy()
+      dated['date'] = pd.to_datetime(dated['year'].astype(str) + '-' + dated['month'], format='%Y-%b')
+      dated.head()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 날짜 컬럼 만들기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 4단계. 날짜 컬럼 만들기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step5_set_index
+  title: 5단계. 날짜를 인덱스로 설정
+  structuredPrimary: true
+  subtitle: set_index()
+  goal: 5단계. 날짜를 인덱스로 설정에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    시계열 분석의 핵심은 날짜를 인덱스로 설정하는 것입니다. set_index('date')로 date 컬럼을 인덱스로 만들면 pandas가 이 DataFrame을 시계열 데이터로 인식합니다. 인덱스가 datetime 타입이 되면 '2023-01-01':'2023-12-31' 같은 날짜 범위 선택, rolling() 이동평균, resample() 리샘플링 등 시계열 전용 기능들을 사용할 수 있게 됩니다. 또한 인덱스가 시간 순서대로 정렬되어 있으면 시간 흐름에 따른 패턴 분석이 용이합니다. 기존의 0, 1, 2... 숫자 인덱스 대신 1949-01-01, 1949-02-01 같은 날짜가 인덱스가 되면 데이터의 시간적 맥락을 직관적으로 파악할 수 있습니다.
+
+    set_index()는 특정 컬럼을 DataFrame의 인덱스로 설정합니다. 날짜 컬럼을 인덱스로 설정하면 시계열 데이터의 강력한 기능들을 활용할 수 있습니다. 예를 들어 df['2023']처럼 연도로 필터링, df['2023-01':'2023-03']처럼 기간 슬라이싱, rolling(), resample(), shift() 같은 시계열 메서드 사용이 가능합니다. drop=False 파라미터를 추가하면 원본 컬럼을 유지하면서 인덱스로도 설정할 수 있습니다.
+  tips:
+  - set_index()는 특정 컬럼을 DataFrame의 인덱스로 설정합니다. 날짜 컬럼을 인덱스로 설정하면 시계열 데이터의 강력한 기능들을 활용할 수 있습니다. 예를 들어 df['2023']처럼
+    연도로 필터링, df['2023-01':'2023-03']처럼 기간 슬라이싱, rolling(), resample(), shift() 같은 시계열 메서드 사용이 가능합니다. drop=False
+    파라미터를 추가하면 원본 컬럼을 유지하면서 인덱스로도 설정할 수 있습니다.
+  snippet: |-
+    ts = dated.set_index('date')
+    ts.head()
+  exercise:
+    prompt: 5단계. 날짜를 인덱스로 설정 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      ts = dated.set_index('date')
+      ts.head()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 날짜를 인덱스로 설정의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 5단계. 날짜를 인덱스로 설정의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step6_month_pattern
+  title: 6단계. 월별 평균 승객수
+  structuredPrimary: true
+  subtitle: 계절성 확인
+  goal: 6단계. 월별 평균 승객수에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    시계열 데이터의 중요한 특성 중 하나는 계절성(seasonality)입니다. 계절성이란 특정 시기에 반복적으로 나타나는 패턴을 말합니다. 항공 승객 데이터에서는 여름 휴가철에 승객이 증가하는 패턴이 예상됩니다. month별로 groupby해서 12년간의 평균 승객수를 구하면 어느 달에 가장 붐비는지 알 수 있습니다. sort_values(ascending=False)로 내림차순 정렬하면 승객이 많은 달부터 차례대로 볼 수 있습니다. 결과를 보면 7월과 8월이 가장 높게 나타나는데, 이는 여름 휴가 시즌의 영향입니다. 이런 계절 패턴을 파악하면 항공사는 성수기에 운항 편수를 늘리는 등의 계획을 세울 수 있습니다.
+
+    계절성(seasonality)은 일정 주기로 반복되는 패턴입니다. 월별 패턴(아이스크림 판매는 여름에 증가), 요일별 패턴(주말 교통량 감소), 시간별 패턴(출퇴근 시간 혼잡) 등이 있습니다. 계절성을 파악하면 미래 수요 예측, 재고 관리, 인력 배치 등 실무 의사결정에 활용할 수 있습니다.
+  tips:
+  - 계절성(seasonality)은 일정 주기로 반복되는 패턴입니다. 월별 패턴(아이스크림 판매는 여름에 증가), 요일별 패턴(주말 교통량 감소), 시간별 패턴(출퇴근 시간 혼잡)
+    등이 있습니다. 계절성을 파악하면 미래 수요 예측, 재고 관리, 인력 배치 등 실무 의사결정에 활용할 수 있습니다.
+  snippet: flights.groupby('month')['passengers'].mean().sort_values(ascending=False)
+  exercise:
+    prompt: 6단계. 월별 평균 승객수 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: flights.groupby('month')['passengers'].mean().sort_values(ascending=False)
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 월별 평균 승객수의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 6단계. 월별 평균 승객수 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step7_year_pattern
+  title: 7단계. 연도별 총 승객수
+  structuredPrimary: true
+  subtitle: 추세 확인
+  goal: 7단계. 연도별 총 승객수에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    계절성과 함께 시계열의 또 다른 중요한 특성은 추세(trend)입니다. 추세는 데이터의 장기적인 방향성을 의미합니다. year별로 groupby하고 sum()으로 연간 총 승객수를 구하면 시간이 지날수록 승객이 증가하는지, 감소하는지, 정체되어 있는지 파악할 수 있습니다. 1949년부터 1960년까지 연도별 총계를 보면 지속적으로 증가하는 상승 추세를 확인할 수 있습니다. 이는 1950년대 항공 산업의 성장과 경제 발전을 반영합니다. 추세를 파악하면 장기 계획 수립, 투자 결정, 용량 확대 등의 전략적 의사결정에 활용할 수 있습니다.
+
+    추세(trend)는 데이터의 장기적 방향성입니다. 상승 추세(매출 증가), 하락 추세(인구 감소), 수평 추세(정체) 등이 있습니다. 시계열 분석의 핵심은 추세와 계절성을 분리하는 것입니다. 추세는 장기 전략에, 계절성은 단기 운영에 활용됩니다.
+  tips:
+  - 추세(trend)는 데이터의 장기적 방향성입니다. 상승 추세(매출 증가), 하락 추세(인구 감소), 수평 추세(정체) 등이 있습니다. 시계열 분석의 핵심은 추세와 계절성을 분리하는
+    것입니다. 추세는 장기 전략에, 계절성은 단기 운영에 활용됩니다.
+  snippet: flights.groupby('year')['passengers'].sum()
+  exercise:
+    prompt: 7단계. 연도별 총 승객수 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: flights.groupby('year')['passengers'].sum()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 연도별 총 승객수의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 7단계. 연도별 총 승객수 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step8_pct_change
+  title: 8단계. 연도별 증가율
+  structuredPrimary: true
+  subtitle: pct_change()
+  goal: 8단계. 연도별 증가율에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    절대값의 증가도 중요하지만, 증가율(성장률)을 보면 더 정확한 인사이트를 얻을 수 있습니다. pct_change()는 이전 값 대비 변화율을 계산하는 메서드입니다. (현재값 - 이전값) / 이전값 공식으로 계산되며, 0.15는 15% 증가를 의미합니다. 100을 곱하면 퍼센트 단위로 표시할 수 있습니다. 첫 번째 행(1949년)은 비교할 이전 값이 없어서 NaN으로 나타납니다. 연도별 증가율을 보면 어느 시기에 급성장했는지, 성장세가 둔화되고 있는지 파악할 수 있습니다. 이는 절대값만 볼 때는 놓칠 수 있는 중요한 정보입니다.
+
+    pct_change()는 이전 행 대비 변화율을 자동 계산합니다. (현재값 - 이전값) / 이전값 공식을 사용합니다. periods 파라미터로 비교 간격을 조절할 수 있는데, pct_change(12)는 12행 전과 비교(전년 동월 대비)합니다. 주가 분석에서 전일 대비 등락률, 매출 분석에서 전년 대비 성장률 계산 등에 활용됩니다.
+  tips:
+  - pct_change()는 이전 행 대비 변화율을 자동 계산합니다. (현재값 - 이전값) / 이전값 공식을 사용합니다. periods 파라미터로 비교 간격을 조절할 수 있는데,
+    pct_change(12)는 12행 전과 비교(전년 동월 대비)합니다. 주가 분석에서 전일 대비 등락률, 매출 분석에서 전년 대비 성장률 계산 등에 활용됩니다.
+  snippet: |-
+    yearly = flights.groupby('year')['passengers'].sum()
+    yearly.pct_change() * 100
+  exercise:
+    prompt: 8단계. 연도별 증가율 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      yearly = flights.groupby('year')['passengers'].sum()
+      yearly.pct_change() * 100
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 연도별 증가율의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 8단계. 연도별 증가율의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step9_rolling
+  title: 9단계. 이동평균 계산
+  structuredPrimary: true
+  subtitle: rolling()
+  goal: 9단계. 이동평균 계산에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    시계열 데이터에는 단기 변동(노이즈)과 장기 추세가 섞여 있습니다. 이동평균(moving average)은 단기 변동을 제거하고 전반적인 추세를 부드럽게 보여주는 강력한 도구입니다. rolling(window=12)는 12개월 이동평균을 의미하며, 최근 12개월의 평균을 계산한 뒤 한 달씩 앞으로 이동하면서 반복합니다. 예를 들어 1월~12월 평균, 2월~익년1월 평균, 3월~익년2월 평균... 이런 식입니다. 월별 승객 수는 계절에 따라 급등락하지만, 12개월 이동평균을 보면 계절 변동이 제거되고 완만한 상승 추세만 남습니다. 이는 주가 차트에서 200일 이동평균선을 보는 것과 같은 원리입니다.
+
+    rolling(window=N)은 이동 창(sliding window) 방식으로 N개 행의 평균을 계산합니다. window=12면 최근 12개 행, window=7이면 최근 7개 행입니다. mean() 대신 sum(), std(), max(), min() 등 다양한 집계 함수를 사용할 수 있습니다. 처음 N-1개 행은 창을 채울 데이터가 부족해서 NaN이 됩니다. min_periods 파라미터로 최소 필요 개수를 조절할 수 있습니다.
+  tips:
+  - rolling(window=N)은 이동 창(sliding window) 방식으로 N개 행의 평균을 계산합니다. window=12면 최근 12개 행, window=7이면 최근 7개
+    행입니다. mean() 대신 sum(), std(), max(), min() 등 다양한 집계 함수를 사용할 수 있습니다. 처음 N-1개 행은 창을 채울 데이터가 부족해서 NaN이
+    됩니다. min_periods 파라미터로 최소 필요 개수를 조절할 수 있습니다.
+  snippet: |-
+    rolled = ts.copy()
+    rolled['rolling12'] = rolled['passengers'].rolling(window=12).mean()
+    rolled[['passengers', 'rolling12']].tail(15)
+  exercise:
+    prompt: 9단계. 이동평균 계산 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      rolled = ts.copy()
+      rolled['rolling12'] = rolled['passengers'].rolling(window=12).mean()
+      rolled[['passengers', 'rolling12']].tail(15)
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 이동평균 계산의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 9단계. 이동평균 계산의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step10_pivot
+  title: 10단계. 월×연도 피벗 테이블
+  structuredPrimary: true
+  subtitle: 2차원 요약
+  goal: 10단계. 월×연도 피벗 테이블에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    지금까지는 1차원 분석(월별 또는 연도별)을 했습니다. pivot_table()을 사용하면 2차원 교차표를 만들어서 더 풍부한 인사이트를 얻을 수 있습니다. index='month'로 행을 월로, columns='year'로 열을 연도로 설정하면 12개 월 × 12개 연도 = 144개 셀의 테이블이 만들어집니다. 이 테이블을 보면 각 월이 연도별로 어떻게 변화하는지 한눈에 비교할 수 있습니다. 예를 들어 7월 행을 가로로 보면 1949년부터 1960년까지 7월 승객이 어떻게 증가했는지 추세를 볼 수 있고, 1950년 열을 세로로 보면 그 해의 계절 패턴을 확인할 수 있습니다. 엑셀의 피벗 테이블과 같은 기능으로, 데이터를 다양한 관점에서 요약하는 강력한 도구입니다.
+
+    pivot_table()은 데이터를 2차원 크로스탭(교차표)으로 재구성합니다. index는 행 라벨, columns는 열 라벨, values는 셀에 채울 값, aggfunc는 집계 함수(기본값 mean)를 지정합니다. 여러 컬럼을 리스트로 넘기면 다층 인덱스를 만들 수 있습니다. margins=True로 총계 행/열을 추가할 수 있습니다. 엑셀 피벗보다 훨씬 강력하고 유연합니다.
+  tips:
+  - pivot_table()은 데이터를 2차원 크로스탭(교차표)으로 재구성합니다. index는 행 라벨, columns는 열 라벨, values는 셀에 채울 값, aggfunc는
+    집계 함수(기본값 mean)를 지정합니다. 여러 컬럼을 리스트로 넘기면 다층 인덱스를 만들 수 있습니다. margins=True로 총계 행/열을 추가할 수 있습니다. 엑셀 피벗보다
+    훨씬 강력하고 유연합니다.
+  snippet: flights.pivot_table(index='month', columns='year', values='passengers')
+  exercise:
+    prompt: 10단계. 월×연도 피벗 테이블 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: flights.pivot_table(index='month', columns='year', values='passengers')
+    hints:
+    - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
+    - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 월×연도 피벗 테이블의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 10단계. 월×연도 피벗 테이블의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step11_compare_years
+  title: 11단계. 특정 연도 비교
+  structuredPrimary: true
+  subtitle: 1949년 vs 1960년
+  goal: 11단계. 특정 연도 비교에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 피벗 테이블을 만든 후에는 DataFrame의 컬럼 선택 기능을 그대로 사용할 수 있습니다. 대괄호 안에 리스트로 연도를 넘기면 해당 연도의 데이터만 선택됩니다.
+    첫 해인 1949년과 마지막 해인 1960년을 비교하면 12년간의 성장을 명확하게 볼 수 있습니다. 각 월별로 얼마나 승객이 증가했는지 나란히 비교할 수 있어 매우 직관적입니다.
+    예를 들어 7월을 보면 1949년에는 148명이었지만 1960년에는 465명으로 3배 이상 증가했음을 한눈에 파악할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    pivot = flights.pivot_table(index='month', columns='year', values='passengers')
+    pivot[[1949, 1960]]
+  exercise:
+    prompt: 11단계. 특정 연도 비교 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      pivot = flights.pivot_table(index='month', columns='year', values='passengers')
+      pivot[[1949, 1960]]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 특정 연도 비교의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 11단계. 특정 연도 비교의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step12_monthly_max
+  title: 12단계. 월별 최대 승객수
+  structuredPrimary: true
+  subtitle: 역대 최고 기록
+  goal: 12단계. 월별 최대 승객수에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    pandas의 집계 함수는 axis 파라미터로 방향을 지정할 수 있습니다. axis=0은 열 방향(세로, 컬럼별), axis=1은 행 방향(가로, 행별) 집계입니다. max(axis=1)은 각 행에서 가로로 최대값을 찾습니다. 피벗 테이블에서 각 월(행)의 12개 연도 중 최대 승객수를 구하면, 그 달의 역대 최고 기록을 알 수 있습니다. 대부분 최근 연도(1960년)에 최대값이 나타날 것으로 예상되지만, 특정 달은 다를 수도 있습니다. 이렇게 차원을 따라 집계하는 방식은 pandas의 핵심 개념입니다.
+
+    axis 파라미터는 집계 방향을 지정합니다. axis=0(기본값)은 열 방향 집계(각 컬럼의 합계/평균), axis=1은 행 방향 집계(각 행의 합계/평균)입니다. sum(), mean(), max(), min() 등 모든 집계 함수에서 사용할 수 있습니다. 헷갈리면 '0은 세로, 1은 가로'로 기억하세요.
+  tips:
+  - axis 파라미터는 집계 방향을 지정합니다. axis=0(기본값)은 열 방향 집계(각 컬럼의 합계/평균), axis=1은 행 방향 집계(각 행의 합계/평균)입니다. sum(),
+    mean(), max(), min() 등 모든 집계 함수에서 사용할 수 있습니다. 헷갈리면 '0은 세로, 1은 가로'로 기억하세요.
+  snippet: pivot.max(axis=1)
+  exercise:
+    prompt: 12단계. 월별 최대 승객수 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: pivot.max(axis=1)
+    hints:
+    - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.
+    - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 12단계. 월별 최대 승객수의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 12단계. 월별 최대 승객수의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 월별 승객 시계열 리포트'
+  structuredPrimary: true
+  subtitle: datetime, rolling, pivot_table, 실패 케이스
+  goal: '현업 흐름 검증: 월별 승객 시계열 리포트에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    시계열 리포트는 날짜 타입과 정렬이 틀리면 이동평균과 전년 비교가 모두 틀어집니다. 날짜 변환, 월별 집계, rolling 결과를 작은 표로 검증하세요.
+
+    변주 실험
+    rolling 창을 2개월에서 3개월로 늘리고, 초기 NaN을 그대로 둘지 채울지 리포트 정책을 정하세요.
+  tips:
+  - 변주 실험 rolling 창을 2개월에서 3개월로 늘리고, 초기 NaN을 그대로 둘지 채울지 리포트 정책을 정하세요.
+  snippet: |-
+    import pandas as pd
+
+    flights = pd.DataFrame({
+        "date": ["2026-01-01", "2026-02-01", "2026-03-01"],
+        "passengers": [100, 120, 150],
+    })
+    flights["date"] = pd.to_datetime(flights["date"])
+    flights = flights.set_index("date").sort_index()
+    flights["rolling2"] = flights["passengers"].rolling(2).mean()
+
+    assert pd.api.types.is_datetime64_any_dtype(flights.index)
+    assert flights.loc["2026-03-01", "rolling2"] == 135
+    assert flights["passengers"].pct_change().round(2).iloc[1] == 0.2
+  exercise:
+    prompt: '현업 흐름 검증: 월별 승객 시계열 리포트 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.'
+    starterCode: |-
+      import pandas as pd
+
+      flights = pd.DataFrame({
+          "date": ["2026-01-01", "2026-02-01", "2026-03-01"],
+          "passengers": [100, 120, 150],
+      })
+      flights["date"] = pd.to_datetime(flights["date"])
+      flights = flights.set_index("date").sort_index()
+      flights["rolling2"] = flights["passengers"].rolling(2).mean()
+
+      assert pd.api.types.is_datetime64_any_dtype(flights.index)
+      assert flights.loc["2026-03-01", "rolling2"] == 135
+      assert flights["passengers"].pct_change().round(2).iloc[1] == 0.2
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 월별 승객 시계열 리포트의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.'
+    resultCheck: '현업 흐름 검증: 월별 승객 시계열 리포트의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.'
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 항공 승객 분석 프로젝트
+  goal: 실습에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    항공사 데이터 분석가가 되어 지금까지 배운 모든 시계열 기법을 활용해봅시다. 날짜 변환, 시계열 인덱스 설정, groupby 집계, pct_change 증가율, rolling 이동평균, pivot_table 교차표 등 모든 개념을 종합적으로 사용합니다. 실무에서 시계열 데이터를 분석할 때 이런 단계들을 거쳐 인사이트를 도출합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import pandas as pd
+    from codaro.curriculum.localData import loadLocalDataset
+
+    data = loadLocalDataset("flights")
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+
+      data = loadLocalDataset("flights")
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 시계열 분석 기초를 배웠습니다.
+  - type: list
+    items:
+    - pd.to_datetime() - 문자열을 날짜로 변환
+    - set_index() - 날짜를 인덱스로 설정
+    - rolling() - 이동평균 계산
+    - pct_change() - 증가율 계산
+    - pivot_table() - 2차원 요약표 생성
+  - type: text
+    content: 다음 시간에는 대용량 데이터(5만 행)를 다루는 방법을 배웁니다.
+  goal: 정리에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pandas_06-monthly-delay-trend-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - summary
+    title: 항공편 월별 평균 지연과 이전 달 변화 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 날짜 순서로 월별 평균 지연을 집계하고 직전 관측 월과의 차이를 남긴다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 입력 행 순서가 아니라 month를 정렬한 뒤 변화를 계산하세요.
+    - 첫 관측 월은 비교 대상이 없으므로 changeFromPrevious가 None입니다.
+    exercise:
+      prompt: monthly_delay_trend(rows)를 완성해 month, meanDelay, changeFromPrevious 목록을 반환하세요.
+      starterCode: |-
+        def monthly_delay_trend(rows):
+            raise NotImplementedError
+      solution: |
+        def monthly_delay_trend(rows):
+            grouped = {}
+            for row in rows:
+                grouped.setdefault(row["month"], []).append(row["delay"])
+            result = []
+            previous = None
+            for month in sorted(grouped):
+                mean = round(sum(grouped[month]) / len(grouped[month]), 2)
+                result.append({
+                    "month": month,
+                    "meanDelay": mean,
+                    "changeFromPrevious": None if previous is None else round(mean - previous, 2),
+                })
+                previous = mean
+            return result
+      hints: *id001
+    check:
+      id: python.pandas.pandas_06.monthly-delay-trend.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_06.monthly-delay-trend.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: monthly_delay_trend
+        cases:
+        - id: sorts-before-computing-change
+          arguments:
+          - value:
+            - month: 2026-02
+              delay: 20
+            - month: 2026-01
+              delay: 10
+            - month: 2026-02
+              delay: 10
+            - month: 2026-03
+              delay: 9
+          expectedReturn:
+          - month: 2026-01
+            meanDelay: 10.0
+            changeFromPrevious: null
+          - month: 2026-02
+            meanDelay: 15.0
+            changeFromPrevious: 5.0
+          - month: 2026-03
+            meanDelay: 9.0
+            changeFromPrevious: -6.0
+        - id: handles-empty-series
+          arguments:
+          - value: []
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pandas_06-rolling-window-average-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_06-monthly-delay-trend-mastery
+    title: 새 센서 시계열에서 이동 평균 계산하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 월별 변화 개념을 고정 길이 window 평균으로 옮기고 window가 완성된 시점만 반환한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 계산 전에 time으로 정렬하세요.
+    - 완성되지 않은 앞쪽 window를 임의로 짧게 평균 내지 마세요.
+    exercise:
+      prompt: rolling_average(points, window)를 완성해 time과 average 목록을 반환하세요.
+      starterCode: |-
+        def rolling_average(points, window):
+            raise NotImplementedError
+      solution: |
+        def rolling_average(points, window):
+            if not isinstance(window, int) or isinstance(window, bool) or window < 1:
+                raise ValueError("window must be a positive integer")
+            ordered = sorted(points, key=lambda point: point["time"])
+            result = []
+            for index in range(window - 1, len(ordered)):
+                values = [point["value"] for point in ordered[index - window + 1:index + 1]]
+                result.append({"time": ordered[index]["time"], "average": round(sum(values) / window, 2)})
+            return result
+      hints: *id002
+    check:
+      id: python.pandas.pandas_06.rolling-window-average.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_06.rolling-window-average.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: rolling_average
+        cases:
+        - id: computes-ordered-window
+          arguments:
+          - value:
+            - time: 3
+              value: 9
+            - time: 1
+              value: 3
+            - time: 2
+              value: 6
+            - time: 4
+              value: 12
+          - value: 3
+          expectedReturn:
+          - time: 3
+            average: 6.0
+          - time: 4
+            average: 9.0
+        - id: returns-no-partial-window
+          arguments:
+          - value:
+            - time: 1
+              value: 3
+          - value: 2
+          expectedReturn: []
+        - id: rejects-zero-window
+          arguments:
+          - value: []
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pandas_06-time-series-order-check-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_06-rolling-window-average-transfer
+    title: 시계열 분석 전 순서와 간격 점검 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 정렬, 중복 시점, 누락 구간 문제마다 필요한 조치와 증거를 선택한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - shift나 diff 전에 시간 정렬을 먼저 증명하세요.
+    - 누락 기간을 0으로 채우는 것과 결측으로 표시하는 것은 다른 판단입니다.
+    exercise:
+      prompt: choose_time_series_check(issue)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_time_series_check(issue):
+            raise NotImplementedError
+      solution: |
+        def choose_time_series_check(issue):
+            table = {
+                "unsorted-time": {"action": "sort-by-time", "evidence": "monotonic timestamp check", "risk": "wrong lag"},
+                "duplicate-time": {"action": "define-aggregation", "evidence": "duplicate count", "risk": "double counting"},
+                "missing-period": {"action": "reindex-and-mark-missing", "evidence": "expected versus observed periods", "risk": "fake continuity"},
+            }
+            if issue not in table:
+                raise ValueError("unknown time-series issue")
+            return table[issue]
+      hints: *id003
+    check:
+      id: python.pandas.pandas_06.time-series-order-check.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_06.time-series-order-check.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_time_series_check
+        cases:
+        - id: recalls-sort-before-lag
+          arguments:
+          - value: unsorted-time
+          expectedReturn:
+            action: sort-by-time
+            evidence: monotonic timestamp check
+            risk: wrong lag
+        - id: recalls-gap-policy
+          arguments:
+          - value: missing-period
+          expectedReturn:
+            action: reindex-and-mark-missing
+            evidence: expected versus observed periods
+            risk: fake continuity
+        - id: rejects-unknown-issue
+          arguments:
+          - value: blue-line
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -129,7 +129,7 @@ export function CurriculumLearningCell({
       <div className={cn("min-w-0", !embedded && "p-5")}>
         <div className="flex items-center gap-2">
           <button className="min-w-0 flex-1 text-left" type="button" onClick={onSelect}>
-            <span className="block truncate text-[15px] font-semibold leading-6 text-foreground">{blockLabel(block)}</span>
+            <span className="block truncate text-[15px] font-bold leading-6 text-foreground">{blockLabel(block)}</span>
           </button>
           {showStatus ? (
             <Badge className="h-7 rounded-md px-2 text-xs" variant={resultStatus === "error" ? "destructive" : "outline"}>
@@ -153,7 +153,7 @@ export function CurriculumLearningCell({
         <div className="mt-3 space-y-3">
           {isSnippetCode && block.description ? <SnippetPracticeIntro block={block} /> : null}
           {!isSnippetCode && block.guide?.description ? (
-            <p className="max-w-3xl text-md text-foreground">{stripMarkdown(block.guide.description)}</p>
+            <p className="max-w-3xl text-md font-normal text-foreground">{stripMarkdown(block.guide.description)}</p>
           ) : null}
           <div
             aria-label={`${blockLabel(block)} 코드 편집기`}
@@ -186,7 +186,7 @@ export function SnippetPracticeIntro({ block }: { block: BlockConfig }) {
   return (
     <div className="min-w-0 space-y-2">
       <div className="text-xs font-medium text-muted-foreground">예제</div>
-      {description ? <p className="max-w-3xl text-md text-foreground">{description}</p> : null}
+      {description ? <p className="max-w-3xl text-md font-normal text-foreground">{description}</p> : null}
       <CodePayload value={block.content} />
     </div>
   );
@@ -225,8 +225,8 @@ export function CurriculumSectionTitle({
         type="button"
         onClick={onSelect}
       >
-        <h2 className="text-lg font-semibold text-foreground">{cleanTitle}</h2>
-        {subtitle ? <p className="mt-1 text-sm leading-6 text-muted-foreground">{stripMarkdown(subtitle)}</p> : null}
+        <h2 className="text-lg font-bold text-foreground">{cleanTitle}</h2>
+        {subtitle ? <p className="mt-1 text-sm font-normal leading-6 text-muted-foreground">{stripMarkdown(subtitle)}</p> : null}
       </button>
     </section>
   );

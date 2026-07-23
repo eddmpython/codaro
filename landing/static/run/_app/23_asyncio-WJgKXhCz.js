@@ -1,0 +1,798 @@
+var e=`meta:
+  id: 23_asyncio
+  title: asyncio - 비동기 I/O
+  category: builtins
+  tags:
+  - asyncio
+  - async
+  - await
+  - 비동기
+  - 이벤트루프
+  - coroutine
+  description: async/await 기반 비동기 프로그래밍을 위한 asyncio 모듈
+  keywords:
+  - asyncio
+  - async
+  - await
+  - 비동기
+  - 이벤트루프
+  - coroutine
+intro:
+  emoji: ⚡
+  points:
+  - async/await 문법
+  - 비동기 작업 동시 실행
+  - 이벤트 루프 제어
+  - Codaro 로컬 Python 완벽 지원
+  direction: asyncio 비동기 I/O에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 작은 샘플 입력 확인 후 모듈 함수 호출에 맞는 코드 입력을 고릅니다.
+  - asyncio 비동기 I/O 결과를 반환값, stdout, 객체 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 표준 라이브러리 유틸리티에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 모듈 임포트 입력 확인
+      detail: 입력 기준(작은 샘플 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 기본 비동기 함수 처리 실행
+      detail: 모듈 함수 호출 코드를 실행해 중간 결과를 확인합니다.
+    - label: 동시 실행 결과 검증
+      detail: 반환값, stdout, 객체 상태 기준으로 실행 결과를 비교합니다.
+    - label: asyncio 비동기 I/O 재사용
+      detail: 완성 코드를 표준 라이브러리 유틸리티에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 표준 라이브러리 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: asyncio 비동기 I/O 실행
+      detail: 셀을 실행해 반환값, stdout, 객체 상태와 예외 상태를 확인합니다.
+    - label: asyncio 비동기 I/O 완료
+      detail: 검증된 코드를 표준 라이브러리 유틸리티로 남깁니다.
+sections:
+- id: module_import
+  title: 모듈 임포트
+  structuredPrimary: true
+  subtitle: asyncio 시작하기
+  goal: 모듈 임포트에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    asyncio는 파이썬 표준 라이브러리입니다. async/await 문법을 사용한 비동기 프로그래밍을 지원합니다.
+
+    Codaro 로컬 Python 환경에서 asyncio는 Python 이벤트 루프 기준으로 실행됩니다. 파일, 네트워크, 태스크 자동화처럼 오래 걸리는 작업을 단계적으로 다룰 때 유용합니다.
+  tips:
+  - Codaro 로컬 Python 환경에서 asyncio는 Python 이벤트 루프 기준으로 실행됩니다. 파일, 네트워크, 태스크 자동화처럼 오래 걸리는 작업을 단계적으로 다룰 때
+    유용합니다.
+  snippet: |-
+    import asyncio
+
+    async def greet():
+        return "Hello Async"
+
+    result = asyncio.run(greet())
+    result
+  exercise:
+    prompt: 모듈 임포트 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      import asyncio
+
+      async def greet():
+          return "Hello Async"
+
+      result = asyncio.run(greet())
+      result
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 모듈 임포트의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 모듈 임포트 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: basic_async
+  title: 기본 비동기 함수
+  structuredPrimary: true
+  subtitle: async/await 문법
+  goal: 기본 비동기 함수에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    async def로 비동기 함수를 정의하고 await로 비동기 작업을 대기합니다.
+
+    await는 async 함수 내부에서만 사용하고, 로컬 스크립트에서는 asyncio.run()으로 시작 함수를 실행하면 재현성이 좋습니다.
+  snippet: |-
+    import asyncio
+
+    async def fetchData():
+        await asyncio.sleep(0.1)
+        return "Data loaded"
+
+    output = asyncio.run(fetchData())
+    output
+  exercise:
+    prompt: 기본 비동기 함수 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      import asyncio
+
+      async def fetchData():
+          await asyncio.sleep(0.1)
+          return "Data loaded"
+
+      output = asyncio.run(fetchData())
+      output
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 기본 비동기 함수의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 기본 비동기 함수 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: concurrent_tasks
+  title: 동시 실행
+  structuredPrimary: true
+  subtitle: 여러 작업 병렬 처리
+  goal: 동시 실행에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    asyncio.gather()와 asyncio.create_task()로 여러 비동기 작업을 동시에 실행할 수 있습니다.
+
+    gather()는 모든 작업이 완료될 때까지 기다리고, as_completed()는 완료되는 순서대로 결과를 받을 수 있습니다.
+  snippet: |-
+    import asyncio
+
+    async def taskA():
+        await asyncio.sleep(0.1)
+        return "A done"
+
+    async def taskB():
+        await asyncio.sleep(0.1)
+        return "B done"
+
+    async def taskC():
+        await asyncio.sleep(0.1)
+        return "C done"
+
+    async def runAllTasks():
+        return await asyncio.gather(taskA(), taskB(), taskC())
+
+    results = asyncio.run(runAllTasks())
+    results
+  exercise:
+    prompt: 동시 실행 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      import asyncio
+
+      async def taskA():
+          await asyncio.sleep(0.1)
+          return "A done"
+
+      async def taskB():
+          await asyncio.sleep(0.1)
+          return "B done"
+
+      async def taskC():
+          await asyncio.sleep(0.1)
+          return "C done"
+
+      async def runAllTasks():
+          return await asyncio.gather(taskA(), taskB(), taskC())
+
+      results = asyncio.run(runAllTasks())
+      results
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 동시 실행의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 동시 실행 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: timeout_cancel
+  title: 타임아웃과 취소
+  structuredPrimary: true
+  subtitle: 작업 제어
+  goal: 타임아웃과 취소에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    asyncio.wait_for()로 타임아웃을 설정하고, task.cancel()로 작업을 취소할 수 있습니다.
+
+    타임아웃은 네트워크 요청이나 외부 서비스 호출 시 필수적입니다. 무한 대기를 방지할 수 있습니다.
+  snippet: |-
+    import asyncio
+
+    async def slowOperation():
+        await asyncio.sleep(1)
+        return "Done"
+
+    async def withTimeout():
+        try:
+            result = await asyncio.wait_for(slowOperation(), timeout=0.1)
+            return result
+        except asyncio.TimeoutError:
+            return "Timeout occurred"
+
+    timeoutResult = asyncio.run(withTimeout())
+    timeoutResult
+  exercise:
+    prompt: 타임아웃과 취소 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      import asyncio
+
+      async def slowOperation():
+          await asyncio.sleep(1)
+          return "Done"
+
+      async def withTimeout():
+          try:
+              result = await asyncio.wait_for(slowOperation(), timeout=0.1)
+              return result
+          except asyncio.TimeoutError:
+              return "Timeout occurred"
+
+      timeoutResult = asyncio.run(withTimeout())
+      timeoutResult
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 타임아웃과 취소의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 타임아웃과 취소 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: async_context
+  title: 비동기 컨텍스트
+  structuredPrimary: true
+  subtitle: async with와 async for
+  goal: 비동기 컨텍스트에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    async with로 비동기 컨텍스트 매니저를, async for로 비동기 이터레이터를 사용할 수 있습니다.
+
+    async with와 async for는 파일 I/O, 데이터베이스 연결, 스트리밍 데이터 처리에 유용합니다.
+  snippet: |-
+    import asyncio
+
+    class AsyncResource:
+        async def __aenter__(self):
+            await asyncio.sleep(0.01)
+            return "Resource acquired"
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            await asyncio.sleep(0.01)
+            return False
+
+    async def useResource():
+        async with AsyncResource() as res:
+            return res
+
+    resourceResult = asyncio.run(useResource())
+    resourceResult
+  exercise:
+    prompt: 비동기 컨텍스트 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      import asyncio
+
+      class AsyncResource:
+          async def __aenter__(self):
+              await asyncio.sleep(0.01)
+              return "Resource acquired"
+
+          async def __aexit__(self, exc_type, exc_val, exc_tb):
+              await asyncio.sleep(0.01)
+              return False
+
+      async def useResource():
+          async with AsyncResource() as res:
+              return res
+
+      resourceResult = asyncio.run(useResource())
+      resourceResult
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 비동기 컨텍스트의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 비동기 컨텍스트 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: error_handling
+  title: 예외 처리
+  structuredPrimary: true
+  subtitle: 비동기 에러 핸들링
+  goal: 예외 처리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    비동기 함수에서도 일반적인 try-except 문법을 사용하여 예외를 처리할 수 있습니다.
+
+    return_exceptions=True를 사용하면 예외가 발생해도 다른 작업이 계속 실행되고, 예외는 결과 리스트에 포함됩니다.
+  snippet: |-
+    import asyncio
+
+    async def riskyOperation(shouldFail):
+        await asyncio.sleep(0.01)
+        if shouldFail:
+            raise ValueError("Operation failed")
+        return "Success"
+
+    async def handleError():
+        try:
+            result = await riskyOperation(True)
+            return result
+        except ValueError as e:
+            return f"Error: {e}"
+
+    errorResult = asyncio.run(handleError())
+    errorResult
+  exercise:
+    prompt: 예외 처리 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      import asyncio
+
+      async def riskyOperation(shouldFail):
+          await asyncio.sleep(0.01)
+          if shouldFail:
+              raise ValueError("Operation failed")
+          return "Success"
+
+      async def handleError():
+          try:
+              result = await riskyOperation(True)
+              return result
+          except ValueError as e:
+              return f"Error: {e}"
+
+      errorResult = asyncio.run(handleError())
+      errorResult
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 예외 처리의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 예외 처리 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: practical
+  title: 실전 활용
+  structuredPrimary: true
+  subtitle: 실무 패턴
+  goal: 실전 활용에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    asyncio를 활용한 실전 예제들입니다.
+
+    Semaphore를 사용하면 동시 실행 작업 수를 제한할 수 있어, 리소스 관리와 부하 조절에 유용합니다.
+  snippet: |-
+    import asyncio
+
+    async def fetchApi(apiName, delay):
+        await asyncio.sleep(delay)
+        return {"api": apiName, "data": f"{apiName} response"}
+
+    async def fetchAllApis():
+        apis = [
+            fetchApi("users", 0.1),
+            fetchApi("posts", 0.08),
+            fetchApi("comments", 0.12)
+        ]
+
+        responses = await asyncio.gather(*apis)
+        return responses
+
+    apiResponses = asyncio.run(fetchAllApis())
+    apiResponses
+  exercise:
+    prompt: 실전 활용 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      import asyncio
+
+      async def fetchApi(apiName, delay):
+          await asyncio.sleep(delay)
+          return {"api": apiName, "data": f"{apiName} response"}
+
+      async def fetchAllApis():
+          apis = [
+              fetchApi("users", 0.1),
+              fetchApi("posts", 0.08),
+              fetchApi("comments", 0.12)
+          ]
+
+          responses = await asyncio.gather(*apis)
+          return responses
+
+      apiResponses = asyncio.run(fetchAllApis())
+      apiResponses
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 실전 활용의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 실전 활용 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: workflow_validation
+  title: '검증 루프: 제한된 비동기 작업 큐'
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증
+  goal: '검증 루프: 제한된 비동기 작업 큐에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 비동기 코드는 빠르게 실행하는 것보다 완료, 실패, 타임아웃, 동시성 제한을 예측 가능하게 다루는 것이 중요합니다. 여기서는 작은 작업 큐를 만들고 성공/실패/타임아웃을
+    한 번에 검증합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    async def runLimitedQueue(items, maxConcurrent=2):
+        semaphore = asyncio.Semaphore(maxConcurrent)
+        activeCount = 0
+        maxSeen = 0
+
+        async def process(item):
+            nonlocal activeCount, maxSeen
+            async with semaphore:
+                activeCount += 1
+                maxSeen = max(maxSeen, activeCount)
+                await asyncio.sleep(item['delay'])
+                activeCount -= 1
+                if item.get('fail'):
+                    raise ValueError(f"{item['name']} failed")
+                return {'name': item['name'], 'status': 'ok'}
+
+        results = await asyncio.gather(
+            *(process(item) for item in items),
+            return_exceptions=True
+        )
+        return results, maxSeen
+
+    queueItems = [
+        {'name': 'load-users', 'delay': 0.02},
+        {'name': 'load-lessons', 'delay': 0.01},
+        {'name': 'sync-report', 'delay': 0.02, 'fail': True}
+    ]
+    queueResults, maxConcurrentSeen = asyncio.run(runLimitedQueue(queueItems))
+
+    assert maxConcurrentSeen <= 2
+    assert sum(isinstance(result, dict) for result in queueResults) == 2
+    assert sum(isinstance(result, ValueError) for result in queueResults) == 1
+    queueResults
+  exercise:
+    prompt: '검증 루프: 제한된 비동기 작업 큐 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
+    starterCode: |-
+      async def runLimitedQueue(items, maxConcurrent=2):
+          semaphore = asyncio.Semaphore(maxConcurrent)
+          activeCount = 0
+          maxSeen = 0
+
+          async def process(item):
+              nonlocal activeCount, maxSeen
+              async with semaphore:
+                  activeCount += 1
+                  maxSeen = max(maxSeen, activeCount)
+                  await asyncio.sleep(item['delay'])
+                  activeCount -= 1
+                  if item.get('fail'):
+                      raise ValueError(f"{item['name']} failed")
+                  return {'name': item['name'], 'status': 'ok'}
+
+          results = await asyncio.gather(
+              *(process(item) for item in items),
+              return_exceptions=True
+          )
+          return results, maxSeen
+
+      queueItems = [
+          {'name': 'load-users', 'delay': 0.02},
+          {'name': 'load-lessons', 'delay': 0.01},
+          {'name': 'sync-report', 'delay': 0.02, 'fail': True}
+      ]
+      queueResults, maxConcurrentSeen = asyncio.run(runLimitedQueue(queueItems))
+
+      assert maxConcurrentSeen <= 2
+      assert sum(isinstance(result, dict) for result in queueResults) == 2
+      assert sum(isinstance(result, ValueError) for result in queueResults) == 1
+      queueResults
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '검증 루프: 제한된 비동기 작업 큐의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '검증 루프: 제한된 비동기 작업 큐 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+- id: practice
+  title: 종합 복습
+  structuredPrimary: true
+  subtitle: 작게 실행하고 결과를 확인하는 단계
+  goal: 종합 복습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: 종합 복습의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import asyncio
+
+    async def sayHello():
+        await asyncio.sleep(0.01)
+        return "Hello"
+
+    greeting = asyncio.run(sayHello())
+    greeting
+  exercise:
+    prompt: 종합 복습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      import asyncio
+
+      async def sayHello():
+          await asyncio.sleep(0.01)
+          return "Hello"
+
+      greeting = asyncio.run(sayHello())
+      greeting
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 23_asyncio-limited-queue-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - workflow_validation
+    title: 제한된 비동기 작업 큐를 await 가능한 함수로 검증하기
+    subtitle: Semaphore와 gather
+    goal: 작업 목록을 동시성 제한으로 처리하고 성공 결과, 실패 이름, 최대 동시 실행 수를 반환한다.
+    why: 숙달 검증은 asyncio.run 호출 암기가 아니라, coroutine entry가 실제로 await되어 결과와 실패를 같은 증거로 남기는지 확인합니다.
+    explanation: async run_limited_queue(items, max_concurrent=2)를 완성해 Semaphore로 동시성을 제한하고 gather(return_exceptions=True)
+      결과를 요약하세요.
+    tips:
+    - max_concurrent가 1보다 작으면 ValueError로 막으세요.
+    - 실패한 작업은 예외를 삼키지 말고 errorNames에 이름으로 남기세요.
+    exercise:
+      prompt: async run_limited_queue(items, max_concurrent=2)를 완성해 results, errorNames, maxConcurrentSeen을 반환하세요.
+      starterCode: |-
+        async def run_limited_queue(items, max_concurrent=2):
+            raise NotImplementedError
+      solution: |-
+        import asyncio
+
+        async def run_limited_queue(items, max_concurrent=2):
+            if max_concurrent < 1:
+                raise ValueError("max_concurrent must be positive")
+            semaphore = asyncio.Semaphore(max_concurrent)
+            active = 0
+            max_seen = 0
+
+            async def process(item):
+                nonlocal active, max_seen
+                async with semaphore:
+                    active += 1
+                    max_seen = max(max_seen, active)
+                    await asyncio.sleep(item.get("delay", 0))
+                    active -= 1
+                    if item.get("fail"):
+                        raise ValueError(item["name"])
+                    return {"name": item["name"], "status": "ok"}
+
+            gathered = await asyncio.gather(
+                *(process(item) for item in items),
+                return_exceptions=True,
+            )
+            return {
+                "results": [item for item in gathered if isinstance(item, dict)],
+                "errorNames": [str(item) for item in gathered if isinstance(item, ValueError)],
+                "maxConcurrentSeen": max_seen,
+            }
+      hints:
+      - async 함수 자체를 반환하지 말고 await가 끝난 dict를 반환하세요.
+      - gather의 결과 순서는 입력 coroutine 순서와 같습니다.
+    check:
+      id: python.builtins.asyncio.limited-queue.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.asyncio.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: run_limited_queue
+        cases:
+        - id: limits-concurrency-and-keeps-errors
+          arguments:
+          - value:
+            - name: load-users
+              delay: 0.01
+            - name: load-lessons
+              delay: 0.01
+            - name: sync-report
+              delay: 0.01
+              fail: true
+          - value: 2
+          expectedReturn:
+            results:
+            - name: load-users
+              status: ok
+            - name: load-lessons
+              status: ok
+            errorNames:
+            - sync-report
+            maxConcurrentSeen: 2
+        - id: rejects-zero-concurrency
+          arguments:
+          - value:
+            - name: load-users
+              delay: 0
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 23_asyncio-timeout-summary-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - timeouts
+    - concurrent_tasks
+    title: 비동기 작업별 timeout 결과를 순서대로 요약하기
+    subtitle: wait_for와 gather
+    goal: jobs 목록을 동시에 실행하고 timeout 안에 끝난 작업과 시간 초과 작업을 같은 list로 반환한다.
+    why: 전이 과제에서는 큐 제한에서 timeout 정책으로 옮겨, 성공과 실패를 UI가 바로 표시할 수 있는 구조로 정리합니다.
+    explanation: async summarize_timeouts(jobs, timeout)를 완성해 각 작업의 name, status, result를 입력 순서대로 반환하세요.
+    tips:
+    - asyncio.wait_for는 지정 시간 안에 끝나지 않으면 TimeoutError를 냅니다.
+    - gather는 동시에 실행하되 결과 list는 입력 순서를 유지합니다.
+    exercise:
+      prompt: async summarize_timeouts(jobs, timeout)를 완성해 빠른 작업은 ok, 느린 작업은 timeout으로 반환하세요.
+      starterCode: |-
+        async def summarize_timeouts(jobs, timeout):
+            raise NotImplementedError
+      solution: |-
+        import asyncio
+
+        async def summarize_timeouts(jobs, timeout):
+            async def run_job(job):
+                try:
+                    result = await asyncio.wait_for(
+                        asyncio.sleep(job["delay"], result=job["name"].upper()),
+                        timeout,
+                    )
+                    return {"name": job["name"], "status": "ok", "result": result}
+                except TimeoutError:
+                    return {"name": job["name"], "status": "timeout", "result": ""}
+
+            return await asyncio.gather(*(run_job(job) for job in jobs))
+      hints:
+      - TimeoutError를 밖으로 던지면 전체 gather 결과를 잃습니다.
+      - 각 작업 결과를 같은 dict shape으로 맞추면 UI와 로그가 읽기 쉬워집니다.
+    check:
+      id: python.builtins.asyncio.timeout-summary.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.asyncio.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_timeouts
+        cases:
+        - id: separates-fast-and-slow-jobs
+          arguments:
+          - value:
+            - name: fast
+              delay: 0
+            - name: slow
+              delay: 0.03
+          - value: 0.01
+          expectedReturn:
+          - name: fast
+            status: ok
+            result: FAST
+          - name: slow
+            status: timeout
+            result: ''
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 23_asyncio-gather-order-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 23_asyncio-timeout-summary-transfer
+    title: 완료 순서가 달라도 gather 반환 순서가 유지되는지 회상하기
+    subtitle: create_task와 gather 순서
+    goal: 지연 시간이 다른 작업을 동시에 실행하되 입력 index 순서대로 결과 list를 반환한다.
+    why: 시간이 지나도 남아야 할 asyncio 감각은 빠른 작업이 먼저 끝나도 gather 반환은 입력 순서라는 점입니다.
+    explanation: async collect_ordered_results(names)가 index, name, label을 가진 dict list를 입력 순서대로 반환하게 완성하세요.
+    tips:
+    - delay를 일부러 다르게 줘도 gather 결과는 입력 coroutine 순서입니다.
+    - label에는 index와 name을 함께 넣어 순서를 눈으로 확인하세요.
+    exercise:
+      prompt: async collect_ordered_results(names)를 완성해 서로 다른 delay 뒤에도 입력 순서대로 label을 반환하세요.
+      starterCode: |-
+        async def collect_ordered_results(names):
+            raise NotImplementedError
+      solution: |-
+        import asyncio
+
+        async def collect_ordered_results(names):
+            async def worker(index, name):
+                await asyncio.sleep(0.002 * (len(names) - index))
+                return {"index": index, "name": name, "label": f"{index}:{name}"}
+
+            return await asyncio.gather(
+                *(worker(index, name) for index, name in enumerate(names))
+            )
+      hints:
+      - create_task를 쓰지 않아도 gather가 coroutine들을 schedule합니다.
+      - 완료 순서가 아니라 입력 순서를 기대값으로 잡으세요.
+    check:
+      id: python.builtins.asyncio.gather-order.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.asyncio.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: collect_ordered_results
+        cases:
+        - id: keeps-input-order
+          arguments:
+          - value:
+            - alpha
+            - beta
+            - gamma
+          expectedReturn:
+          - index: 0
+            name: alpha
+            label: 0:alpha
+          - index: 1
+            name: beta
+            label: 1:beta
+          - index: 2
+            name: gamma
+            label: 2:gamma
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending
+`;export{e as default};

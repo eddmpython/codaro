@@ -1,0 +1,745 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - networkx
+  id: networkx_07
+  title: 커뮤니티탐지
+  order: 7
+  category: networkx
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  tags:
+  - networkx
+  - 커뮤니티
+  - 모듈성
+  - 그리디
+  - 레미제라블
+  seo:
+    title: NetworkX 커뮤니티 탐지 - 그룹 발견
+    description: NetworkX로 네트워크에서 커뮤니티(그룹)를 찾습니다. 모듈성 최적화, 그리디 알고리즘, 레미제라블 데이터를 활용합니다.
+    keywords:
+    - networkx
+    - 커뮤니티
+    - community
+    - modularity
+    - 그리디
+    - 레미제라블
+intro:
+  emoji: 👥
+  goal: 그래프에서 커뮤니티(밀접하게 연결된 그룹)를 찾습니다.
+  description: 커뮤니티 탐지는 네트워크에서 밀접하게 연결된 노드 그룹을 찾는 것입니다. 소셜 네트워크의 친구 그룹, 웹의 주제별 페이지 등을 발견합니다. 모듈성(modularity)을
+    최적화하는 그리디 알고리즘으로 커뮤니티를 탐지합니다.
+  direction: 커뮤니티탐지에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.
+  benefits:
+  - 관계 데이터 확인 후 그래프 알고리즘에 맞는 코드 입력을 고릅니다.
+  - 커뮤니티탐지 결과를 노드/엣지와 지표 값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 관계 분석 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(관계 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 모듈성 개념 처리 실행
+      detail: 그래프 알고리즘 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 그리디 모듈성 최적화 결과 검증
+      detail: 노드/엣지와 지표 값 기준으로 실행 결과를 비교합니다.
+    - label: 커뮤니티탐지 재사용
+      detail: 완성 코드를 관계 분석 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 그래프 분석 환경
+      detail: matplotlib, networkx 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 커뮤니티탐지 실행
+      detail: 셀을 실행해 노드/엣지와 지표 값와 예외 상태를 확인합니다.
+    - label: 커뮤니티탐지 완료
+      detail: 검증된 코드를 관계 분석 리포트로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: NetworkX와 커뮤니티 탐지 알고리즘을 불러옵니다. 커뮤니티 탐지(Community Detection)는 네트워크에서 밀접하게 연결된 노드들의 그룹을 자동으로
+    찾는 기법입니다. 소셜 네트워크의 친구 그룹, 생물학 네트워크의 기능적 모듈, 웹 페이지의 주제별 클러스터 등을 발견하는 데 활용됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import networkx as nx
+    from networkx.algorithms import community
+    import matplotlib.pyplot as plt
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: |-
+      import networkx as nx
+      from networkx.algorithms import community
+      import matplotlib.pyplot as plt
+    hints:
+    - 바꿀 지점은 관계 데이터을 만드는 첫 줄과 그래프 알고리즘 줄에서 찾으세요.
+    - 실행 뒤 노드/엣지와 지표 값 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 노드/엣지와 지표 값 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step2_modularity
+  title: 2단계. 모듈성 개념
+  structuredPrimary: true
+  subtitle: modularity
+  goal: 2단계. 모듈성 개념에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    모듈성(Modularity)은 2004년 Newman과 Girvan이 제안한 커뮤니티 분할의 품질 지표입니다. 커뮤니티 내부의 실제 연결 수가 무작위 그래프에서 기대되는 연결 수보다 얼마나 많은지를 측정합니다. -0.5 ~ 1 범위이며, 0.3 이상이면 유의미한 커뮤니티 구조가 있고, 0.7 이상이면 매우 강한 구조입니다. 대부분의 커뮤니티 탐지 알고리즘은 이 모듈성을 최대화하려고 합니다.
+
+    모듈성이 0.3 이상이면 의미 있는 커뮤니티 구조가 있다고 봅니다. 0.7 이상이면 매우 강한 구조입니다.
+  snippet: |-
+    G = nx.Graph()
+    G.add_edges_from([(1, 2), (1, 3), (2, 3), (2, 4), (3, 4)])
+    G.add_edges_from([(5, 6), (5, 7), (6, 7), (6, 8), (7, 8)])
+    G.add_edge(4, 5)
+    G.number_of_nodes(), G.number_of_edges()
+  exercise:
+    prompt: 2단계. 모듈성 개념 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      G = nx.Graph()
+      G.add_edges_from([(1, 2), (1, 3), (2, 3), (2, 4), (3, 4)])
+      G.add_edges_from([(5, 6), (5, 7), (6, 7), (6, 8), (7, 8)])
+      G.add_edge(4, 5)
+      G.number_of_nodes(), G.number_of_edges()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 2단계. 모듈성 개념에서 \`G\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. 모듈성 개념 실행 뒤 \`G\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step3_greedy
+  title: 3단계. 그리디 모듈성 최적화
+  structuredPrimary: true
+  subtitle: greedy_modularity_communities()
+  goal: 3단계. 그리디 모듈성 최적화에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    그리디 모듈성 최적화 알고리즘은 처음에 각 노드를 개별 커뮤니티로 시작하여, 모듈성이 가장 많이 증가하는 방향으로 커뮤니티를 병합해 나갑니다. Clauset, Newman, Moore가 2004년에 제안한 이 방법은 O(n log² n)의 시간 복잡도로 빠르면서도 효과적입니다. 커뮤니티 수를 미리 지정할 필요가 없으며, 알고리즘이 최적의 분할을 자동으로 찾습니다.
+
+    greedy_modularity_communities()는 frozenset의 리스트를 반환합니다. set()으로 변환하면 다루기 쉽습니다.
+  snippet: |-
+    communities = community.greedy_modularity_communities(G)
+    commList = [set(c) for c in communities]
+    commList
+  exercise:
+    prompt: 3단계. 그리디 모듈성 최적화 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      communities = community.greedy_modularity_communities(G)
+      commList = [set(c) for c in communities]
+      commList
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 3단계. 그리디 모듈성 최적화의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 3단계. 그리디 모듈성 최적화 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step4_visualize
+  title: 4단계. 커뮤니티 시각화
+  structuredPrimary: true
+  subtitle: 그룹별 색상
+  goal: 4단계. 커뮤니티 시각화에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 탐지된 커뮤니티를 서로 다른 색으로 시각화하면 네트워크의 그룹 구조를 직관적으로 파악할 수 있습니다. 각 노드가 속한 커뮤니티에 따라 색상을 지정하고, spring_layout으로
+    배치하면 같은 커뮤니티의 노드들이 자연스럽게 가깝게 모이는 것을 볼 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    colorPalette = ['skyblue', 'salmon', 'lightgreen', 'gold', 'plum']
+
+    nodeColors = []
+    for n in G.nodes():
+        for i, comm in enumerate(commList):
+            if n in comm:
+                nodeColors.append(colorPalette[i % len(colorPalette)])
+                break
+
+    posG = nx.spring_layout(G, seed=42)
+    fig1, ax1 = plt.subplots(figsize=(8, 6))
+    nx.draw(G, pos=posG, with_labels=True, node_color=nodeColors,
+            node_size=700, font_size=12, ax=ax1)
+    ax1.set_title('Detected Communities')
+    fig1
+  exercise:
+    prompt: 4단계. 커뮤니티 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      colorPalette = ['skyblue', 'salmon', 'lightgreen', 'gold', 'plum']
+
+      nodeColors = []
+      for n in G.nodes():
+          for i, comm in enumerate(commList):
+              if n in comm:
+                  nodeColors.append(colorPalette[i % len(colorPalette)])
+                  break
+
+      posG = nx.spring_layout(G, seed=42)
+      fig1, ax1 = plt.subplots(figsize=(8, 6))
+      nx.draw(G, pos=posG, with_labels=True, node_color=nodeColors,
+              node_size=700, font_size=12, ax=ax1)
+      ax1.set_title('Detected Communities')
+      fig1
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 4단계. 커뮤니티 시각화의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 4단계. 커뮤니티 시각화 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step5_les_miserables
+  title: 5단계. 레미제라블 네트워크
+  structuredPrimary: true
+  subtitle: les_miserables_graph()
+  goal: 5단계. 레미제라블 네트워크에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    레미제라블(Les Misérables) 네트워크는 Victor Hugo의 소설에 등장하는 인물들 간의 관계를 나타냅니다. 77명의 인물과 254개의 관계로 구성되며, 같은 장면에 함께 등장하면 연결됩니다. 이 데이터셋은 네트워크 분석의 대표적인 벤치마크로, 장발장(Valjean), 코제트(Cosette), 마리우스(Marius) 등 스토리라인별로 자연스러운 커뮤니티가 형성되어 있습니다.
+
+    레미제라블은 Victor Hugo의 소설입니다. 장발장(Valjean), 코제트(Cosette) 등 유명 캐릭터가 등장합니다.
+  snippet: |-
+    lesmis = nx.les_miserables_graph()
+    numNodesLM = lesmis.number_of_nodes()
+    numEdgesLM = lesmis.number_of_edges()
+    numNodesLM, numEdgesLM
+  exercise:
+    prompt: 5단계. 레미제라블 네트워크 예제에서 \`lesmis\`, \`numNodesLM\`, \`numEdgesLM\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      lesmis = nx.les_miserables_graph()
+      numNodesLM = lesmis.number_of_nodes()
+      numEdgesLM = lesmis.number_of_edges()
+      numNodesLM, numEdgesLM
+    hints:
+    - 바꿀 지점은 \`lesmis = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`lesmis\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 5단계. 레미제라블 네트워크에서 \`lesmis\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 레미제라블 네트워크 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step6_lesmis_community
+  title: 6단계. 레미제라블 커뮤니티
+  structuredPrimary: true
+  subtitle: 등장인물 그룹
+  goal: 6단계. 레미제라블 커뮤니티에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: 레미제라블 네트워크에 커뮤니티 탐지를 적용하면 소설의 스토리라인과 일치하는 그룹들이 발견됩니다. 주교와 관련된 초반부 인물들, 팡틴과 코제트 관련 인물들,
+    바리케이드 혁명가들 등이 각각 커뮤니티를 형성합니다. 이는 알고리즘이 네트워크 구조만으로 의미 있는 그룹을 찾아낼 수 있음을 보여줍니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    lmComms = community.greedy_modularity_communities(lesmis)
+    lmCommList = [set(c) for c in lmComms]
+    numComms = len(lmCommList)
+    numComms
+  exercise:
+    prompt: 6단계. 레미제라블 커뮤니티 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      lmComms = community.greedy_modularity_communities(lesmis)
+      lmCommList = [set(c) for c in lmComms]
+      numComms = len(lmCommList)
+      numComms
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 6단계. 레미제라블 커뮤니티의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 6단계. 레미제라블 커뮤니티 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step7_lesmis_viz
+  title: 7단계. 레미제라블 시각화
+  structuredPrimary: true
+  subtitle: 커뮤니티별 색상
+  goal: 7단계. 레미제라블 시각화에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 레미제라블 네트워크를 커뮤니티별로 시각화합니다. 77개의 노드가 있으므로 레이블 대신 색상으로 커뮤니티를 구분합니다. k 파라미터를 조정하여 노드 간 간격을
+    넓히면 구조가 더 잘 보입니다. 시각화를 통해 소설의 스토리 구조와 인물 관계를 한눈에 파악할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    lmColors = []
+    for n in lesmis.nodes():
+        for i, comm in enumerate(lmCommList):
+            if n in comm:
+                lmColors.append(colorPalette[i % len(colorPalette)])
+                break
+
+    posLM = nx.spring_layout(lesmis, seed=42, k=0.5)
+    fig2, ax2 = plt.subplots(figsize=(14, 10))
+    nx.draw(lesmis, pos=posLM, node_color=lmColors, node_size=100,
+            edge_color='lightgray', alpha=0.8, ax=ax2)
+    ax2.set_title(f'Les Miserables Communities ({numComms} groups)')
+    fig2
+  exercise:
+    prompt: 7단계. 레미제라블 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      lmColors = []
+      for n in lesmis.nodes():
+          for i, comm in enumerate(lmCommList):
+              if n in comm:
+                  lmColors.append(colorPalette[i % len(colorPalette)])
+                  break
+
+      posLM = nx.spring_layout(lesmis, seed=42, k=0.5)
+      fig2, ax2 = plt.subplots(figsize=(14, 10))
+      nx.draw(lesmis, pos=posLM, node_color=lmColors, node_size=100,
+              edge_color='lightgray', alpha=0.8, ax=ax2)
+      ax2.set_title(f'Les Miserables Communities ({numComms} groups)')
+      fig2
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 7단계. 레미제라블 시각화의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 7단계. 레미제라블 시각화 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step8_louvain
+  title: 8단계. 루뱅 알고리즘
+  structuredPrimary: true
+  subtitle: louvain_communities()
+  goal: 8단계. 루뱅 알고리즘에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    루뱅(Louvain) 알고리즘은 2008년 벨기에 루뱅 대학에서 개발된 대규모 네트워크용 커뮤니티 탐지 방법입니다. 2단계 과정을 반복합니다. 먼저 각 노드를 이웃 커뮤니티로 이동시켜 로컬 모듈성을 최적화하고, 그 다음 커뮤니티들을 하나의 노드로 축약하여 새 그래프를 만듭니다. 이 과정을 모듈성 증가가 없을 때까지 반복합니다. 수백만 노드의 네트워크도 처리할 수 있으며, 그리디보다 높은 모듈성을 달성하는 경우가 많습니다.
+
+    루뱅 알고리즘은 그리디보다 더 높은 모듈성을 달성하는 경우가 많습니다. 대규모 네트워크에서도 빠릅니다.
+  snippet: |-
+    louvainComms = community.louvain_communities(lesmis, seed=42)
+    louvainList = [set(c) for c in louvainComms]
+    numLouvain = len(louvainList)
+    numLouvain
+  exercise:
+    prompt: 8단계. 루뱅 알고리즘 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      louvainComms = community.louvain_communities(lesmis, seed=42)
+      louvainList = [set(c) for c in louvainComms]
+      numLouvain = len(louvainList)
+      numLouvain
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 8단계. 루뱅 알고리즘의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 8단계. 루뱅 알고리즘 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step9_label_propagation
+  title: 9단계. 레이블 전파
+  structuredPrimary: true
+  subtitle: label_propagation_communities()
+  goal: 9단계. 레이블 전파에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: 레이블 전파(Label Propagation)는 2007년 Raghavan 등이 제안한 간단하면서 빠른 알고리즘입니다. 처음에 각 노드에 고유 레이블을 부여한
+    뒤, 반복적으로 각 노드가 이웃들 중 가장 많이 가진 레이블을 채택하게 합니다. 안정 상태에 도달하면 같은 레이블을 가진 노드들이 커뮤니티를 형성합니다. O(n + m) 시간으로
+    매우 빠르지만, 비결정적이라 실행마다 결과가 달라질 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    lpComms = community.label_propagation_communities(lesmis)
+    lpList = [set(c) for c in lpComms]
+    numLP = len(lpList)
+    numLP
+  exercise:
+    prompt: 9단계. 레이블 전파 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      lpComms = community.label_propagation_communities(lesmis)
+      lpList = [set(c) for c in lpComms]
+      numLP = len(lpList)
+      numLP
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 9단계. 레이블 전파의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 9단계. 레이블 전파 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step10_karate_community
+  title: 10단계. 가라테 클럽 커뮤니티
+  structuredPrimary: true
+  subtitle: 실제 분리와 비교
+  goal: 10단계. 가라테 클럽 커뮤니티에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    가라테 클럽은 실제 분리 결과가 알려진 유일한 벤치마크 데이터입니다. 1977년 Zachary가 관찰한 실제 분열과 알고리즘이 탐지한 커뮤니티를 비교하여 알고리즘의 정확도를 검증할 수 있습니다. 네트워크 구조만으로 실제 사회적 분열을 얼마나 정확하게 예측할 수 있는지 확인해봅니다.
+
+    커뮤니티 탐지 알고리즘이 실제 분리를 상당히 정확하게 예측합니다. 네트워크 구조만으로 그룹을 발견할 수 있습니다.
+  snippet: |-
+    karate = nx.karate_club_graph()
+
+    actualHi = {n for n in karate.nodes() if karate.nodes[n]['club'] == 'Mr. Hi'}
+    actualOfficer = {n for n in karate.nodes() if karate.nodes[n]['club'] == 'Officer'}
+    actualHi, actualOfficer
+  exercise:
+    prompt: 10단계. 가라테 클럽 커뮤니티 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      karate = nx.karate_club_graph()
+
+      actualHi = {n for n in karate.nodes() if karate.nodes[n]['club'] == 'Mr. Hi'}
+      actualOfficer = {n for n in karate.nodes() if karate.nodes[n]['club'] == 'Officer'}
+      actualHi, actualOfficer
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 10단계. 가라테 클럽 커뮤니티의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 10단계. 가라테 클럽 커뮤니티 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 커뮤니티 탐지
+  goal: 실습에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    지금까지 배운 커뮤니티 탐지 알고리즘을 활용하여 실전 미션을 수행해봅시다. 여러 알고리즘의 결과를 비교하고, 피렌체 가문 네트워크에서 역사적 동맹 관계를 탐지해봅니다.
+
+    각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  snippet: |-
+    import networkx as nx
+    from networkx.algorithms import community
+    import matplotlib.pyplot as plt
+
+    data = nx.karate_club_graph()
+    data.number_of_nodes(), data.number_of_edges()
+  exercise:
+    prompt: 실습 예제에서 \`data\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import networkx as nx
+      from networkx.algorithms import community
+      import matplotlib.pyplot as plt
+
+      data = nx.karate_club_graph()
+      data.number_of_nodes(), data.number_of_edges()
+    hints:
+    - 바꿀 지점은 \`data = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`data\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 실습에서 \`data\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 \`data\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 인수인계 네트워크
+  goal: 업무 흐름 검증에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 실무 네트워크 분석은 그래프를 그리는 데서 끝나지 않습니다. 먼저 병목 후보를 예측하고, 로컬 Python에서 실행한 뒤, 잘못된 노드나 끊어진 경로를 예외로
+    처리하고, 핵심 지표를 assert로 검증해야 합니다. 아래 흐름은 영업, 지원, 운영, 재무, 엔지니어링 사이의 인수인계 비용을 네트워크로 보고 개선안을 비교합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import networkx as nx
+
+    handoffEdges = [
+        ("sales", "support", 1),
+        ("support", "ops", 2),
+        ("ops", "finance", 1),
+        ("ops", "engineering", 1),
+        ("engineering", "infra", 2),
+        ("support", "customer_success", 2),
+    ]
+
+    workflowGraph = nx.Graph()
+    workflowGraph.add_weighted_edges_from(handoffEdges)
+
+    expectedNodes = {"sales", "support", "ops", "finance", "engineering", "infra", "customer_success"}
+    if set(workflowGraph.nodes()) != expectedNodes:
+        raise ValueError("인수인계 네트워크의 부서 목록이 예상과 다릅니다.")
+    if any(data["weight"] <= 0 for _, _, data in workflowGraph.edges(data=True)):
+        raise ValueError("인수인계 비용은 0보다 커야 합니다.")
+
+    salesToFinanceCost = nx.shortest_path_length(workflowGraph, "sales", "finance", weight="weight")
+    betweenness = nx.betweenness_centrality(workflowGraph, weight="weight")
+
+    workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      experimentGraph = workflowGraph.copy()
+      experimentGraph.add_edge("sales", "finance", weight=2)
+
+      improvedCost = nx.shortest_path_length(experimentGraph, "sales", "finance", weight="weight")
+      improvedBetweenness = nx.betweenness_centrality(experimentGraph, weight="weight")
+      improvement = salesToFinanceCost - improvedCost
+
+      assert improvement > 0
+      {
+          "beforeCost": salesToFinanceCost,
+          "afterCost": improvedCost,
+          "costImprovement": improvement,
+          "opsBetweennessBefore": round(betweenness["ops"], 3),
+          "opsBetweennessAfter": round(improvedBetweenness["ops"], 3),
+      }
+    solution: |-
+      import networkx as nx
+
+      handoffEdges = [
+          ("sales", "support", 1),
+          ("support", "ops", 2),
+          ("ops", "finance", 1),
+          ("ops", "engineering", 1),
+          ("engineering", "infra", 2),
+          ("support", "customer_success", 2),
+      ]
+
+      workflowGraph = nx.Graph()
+      workflowGraph.add_weighted_edges_from(handoffEdges)
+
+      expectedNodes = {"sales", "support", "ops", "finance", "engineering", "infra", "customer_success"}
+      if set(workflowGraph.nodes()) != expectedNodes:
+          raise ValueError("인수인계 네트워크의 부서 목록이 예상과 다릅니다.")
+      if any(data["weight"] <= 0 for _, _, data in workflowGraph.edges(data=True)):
+          raise ValueError("인수인계 비용은 0보다 커야 합니다.")
+
+      workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 업무 흐름 검증에서 \`experimentGraph\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: networkx_07-community-cut-score-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: community 배정의 내부·외부 edge 점검하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 주어진 label에서 within/cross edge와 비율을 계산한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 모든 edge endpoint에 community label이 있어야 합니다.
+    - within ratio만으로 최적 community를 증명하지 마세요.
+    exercise:
+      prompt: audit_communities(edges, labels)를 완성하세요.
+      starterCode: |-
+        def audit_communities(edges, labels):
+            raise NotImplementedError
+      solution: |
+        def audit_communities(edges, labels):
+            within = 0; cross = 0; missing = []
+            for source, target in edges:
+                if source not in labels or target not in labels:
+                    missing += [node for node in (source, target) if node not in labels]
+                elif labels[source] == labels[target]: within += 1
+                else: cross += 1
+            total = within + cross
+            return {"within": within, "cross": cross, "withinRatio": 0.0 if not total else round(within / total, 3), "missing": sorted(set(missing))}
+      hints: *id001
+    check:
+      id: python.networkx.networkx_07.community-cut-score.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_07.community-cut-score.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_communities
+        cases:
+        - id: measures-community-cut
+          arguments:
+          - value:
+            - - a
+              - b
+            - - b
+              - c
+            - - c
+              - d
+          - value:
+              a: 1
+              b: 1
+              c: 2
+              d: 2
+          expectedReturn:
+            within: 2
+            cross: 1
+            withinRatio: 0.667
+            missing: []
+        - id: reports-missing-label
+          arguments:
+          - value:
+            - - a
+              - b
+          - value:
+              a: 1
+          expectedReturn:
+            within: 0
+            cross: 0
+            withinRatio: 0.0
+            missing:
+            - b
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: networkx_07-label-propagation-step-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_07-community-cut-score-mastery
+    title: 새 graph에 label propagation 한 단계 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 각 node가 이웃 label 빈도와 tie-breaker로 다음 label을 선택한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 동시 update를 위해 원래 label만 읽으세요.
+    - tie-breaker를 고정해 재현 가능하게 만드세요.
+    exercise:
+      prompt: propagate_labels(nodes, edges, labels)를 완성하세요.
+      starterCode: |-
+        def propagate_labels(nodes, edges, labels):
+            raise NotImplementedError
+      solution: |
+        def propagate_labels(nodes, edges, labels):
+            adjacency = {node: set() for node in nodes}
+            for a, b in edges: adjacency[a].add(b); adjacency[b].add(a)
+            result = {}
+            for node in nodes:
+                counts = {}
+                for neighbor in adjacency[node]:
+                    label = labels[neighbor]; counts[label] = counts.get(label, 0) + 1
+                result[node] = labels[node] if not counts else sorted(counts, key=lambda label: (-counts[label], str(label)))[0]
+            return {node: result[node] for node in sorted(result)}
+      hints: *id002
+    check:
+      id: python.networkx.networkx_07.label-propagation-step.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_07.label-propagation-step.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: propagate_labels
+        cases:
+        - id: propagates-majority-label
+          arguments:
+          - value:
+            - a
+            - b
+            - c
+          - value:
+            - - a
+              - b
+            - - a
+              - c
+          - value:
+              a: 1
+              b: 2
+              c: 2
+          expectedReturn:
+            a: 2
+            b: 1
+            c: 1
+        - id: keeps-isolate-label
+          arguments:
+          - value:
+            - x
+          - value: []
+          - value:
+              x: 7
+          expectedReturn:
+            x: 7
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: networkx_07-community-validation-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_07-label-propagation-step-transfer
+    title: community 탐지 검증 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 탐지와 해석의 증거를 분리한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 그래프 알고리즘의 입력 가정과 반환 의미를 함께 기록하세요.
+    - 시각적 모양만으로 구조적 결론을 내리지 마세요.
+    exercise:
+      prompt: choose_community_check(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_community_check(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_community_check(situation):
+            table = {'dense-groups': {'method': 'modularity or cut audit', 'evidence': 'within and cross edges', 'risk': 'resolution limit'}, 'stable-segments': {'method': 'rerun stability', 'evidence': 'agreement across seeds', 'risk': 'one random result'}, 'named-meaning': {'method': 'external attributes', 'evidence': 'post-hoc profile', 'risk': 'stereotyping'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.networkx.networkx_07.community-validation.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_07.community-validation.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_community_check
+        cases:
+        - id: recalls-dense-groups
+          arguments:
+          - value: dense-groups
+          expectedReturn:
+            method: modularity or cut audit
+            evidence: within and cross edges
+            risk: resolution limit
+        - id: recalls-stable-segments
+          arguments:
+          - value: stable-segments
+          expectedReturn:
+            method: rerun stability
+            evidence: agreement across seeds
+            risk: one random result
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

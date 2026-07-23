@@ -1,0 +1,801 @@
+var e=`meta:
+  packages:
+  - numpy
+  - pillow
+  - scikit-learn
+  id: pillow_07
+  title: 워터마크생성기
+  order: 7
+  category: pillow
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  tags:
+  - Pillow
+  - ImageDraw
+  - text
+  - paste
+  - RGBA
+  - alpha
+  - 워터마크
+  seo:
+    title: Pillow 중급 - 워터마크 생성기
+    description: Pillow ImageDraw로 텍스트 그리기, RGBA 알파 채널로 반투명 워터마크를 합성합니다.
+    keywords:
+    - Pillow
+    - 워터마크
+    - ImageDraw
+    - text
+    - 투명도
+    - alpha
+intro:
+  emoji: 💧
+  goal: ImageDraw로 텍스트를 그리고 RGBA mode + paste(mask=alpha)로 반투명 워터마크를 합성하는 흐름을 정량 검증합니다.
+  description: 워터마크는 RGBA 알파 채널로 투명도를 다루는 표준 사례입니다. ImageDraw.text와 paste의 mask 인자 두 도구가 핵심입니다.
+  direction: ImageDraw.text → RGBA 변환 → alpha 마스크로 paste → 위치 정렬 흐름.
+  benefits:
+  - ImageDraw.text의 (x, y)와 fill 인자 동작을 확인합니다.
+  - convert('RGBA')로 알파 채널을 추가하는 흐름을 봅니다.
+  - paste(image, position, mask)의 mask가 픽셀별 합성 강도를 결정함을 검증합니다.
+  - textbbox로 텍스트 크기를 측정해 위치를 자동 정렬합니다.
+  diagram:
+    steps:
+    - label: 베이스 이미지
+      detail: flower 샘플을 RGBA로 변환해 알파 합성에 적합한 형식으로 준비.
+    - label: ImageDraw.text
+      detail: 텍스트를 RGBA Image에 그려 워터마크 레이어 생성.
+    - label: 알파 채널로 합성
+      detail: paste(layer, position, mask=layer)로 반투명 합성.
+    - label: 텍스트 박스 정렬
+      detail: textbbox로 텍스트 크기를 재 우측 하단에 자동 배치.
+    - label: 가드 함수
+      detail: alpha 값이 0~255 범위인지 검증.
+    runtime:
+    - label: pillow + numpy
+      detail: 합성 결과 픽셀을 NumPy로 검증.
+    - label: RGBA 모드 필수
+      detail: 알파 합성은 RGBA에서만 동작. RGB는 convert('RGBA')로 변환.
+sections:
+- id: step1_load
+  title: 1단계. RGBA 베이스 만들기
+  structuredPrimary: true
+  subtitle: convert('RGBA')
+  goal: flower 샘플을 RGB로 받아 convert('RGBA')로 알파 채널 추가 후 mode가 'RGBA', 채널이 4개인지 확인합니다.
+  why: 알파 합성은 RGBA 모드에서만 안전하게 동작합니다. RGB 베이스에 직접 paste(mask=...)를 호출하면 의도와 다른 결과가 나옵니다. 첫 셀에서 변환을 명시적으로 해 둡니다.
+  explanation: |-
+    sklearn flower는 (640, 427, 3) RGB ndarray입니다. Image.fromarray로 RGB Image를 만들고 convert('RGBA')로 알파 채널을 추가합니다.
+    결과 mode는 'RGBA', size는 그대로 (640, 427), 채널이 4개로 늘어납니다. 알파 채널의 초기값은 255 (완전 불투명).
+  tips:
+  - convert('RGBA')는 알파 채널을 255로 채웁니다. RGB 정보는 그대로 유지됩니다.
+  - 알파 합성 후 RGB로 다시 돌리려면 convert('RGB')를 호출합니다.
+  snippet: |-
+    import numpy as np
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    base = Image.fromarray(load_sample_image('flower.jpg')).convert('RGBA')
+    baseArr = np.asarray(base)
+
+    {
+        'mode': base.mode,
+        'size': base.size,
+        'channelCount': baseArr.shape[2],
+        'alphaInitial': int(baseArr[..., 3].mean()),
+    }
+  exercise:
+    prompt: china 입력을 같은 흐름으로 RGBA로 변환해 channelCount가 4인지 확인하세요.
+    starterCode: |-
+      import numpy as np
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      chinaBase = Image.fromarray(load_sample_image('china.jpg')).convert('___')
+      {'mode': chinaBase.mode, 'channelCount': np.asarray(chinaBase).shape[2]}
+    hints:
+    - 알파 포함 mode는 'RGBA'.
+    - 빈칸에는 RGBA가 들어갑니다.
+    check:
+      noError: convert 호출이 끝나야 합니다.
+      resultCheck: channelCount가 4여야 합니다.
+  check:
+    noError: convert와 통계 계산이 끝나야 합니다.
+    resultCheck: mode가 'RGBA', channelCount가 4, alphaInitial이 255여야 합니다.
+- id: step2_simple_text
+  title: 2단계. ImageDraw.text
+  structuredPrimary: true
+  subtitle: 좌표와 fill 색상
+  goal: ImageDraw.Draw(rgba)로 그리기 객체를 만들고 .text((x, y), msg, fill=color)로 텍스트를 그린 뒤 텍스트 영역의 픽셀 변화량을 확인합니다.
+  why: ImageDraw.text는 모든 텍스트 워터마크의 출발점입니다. (x, y) 좌표가 텍스트 왼쪽 위 모서리이고 fill이 색상이라는 두 인자의 동작을 손으로 확인하면 워터마크 위치 정렬이 자연스러워집니다.
+  explanation: |-
+    ImageDraw.Draw(image)는 image에 in-place 그리기를 가능하게 합니다. 결과는 별도 객체 없이 원본이 직접 수정됩니다.
+    .text((x, y), text, fill=(r, g, b, a))로 텍스트를 그립니다. (x, y)는 텍스트 시작 위치(왼쪽 상단), fill은 (R, G, B, A) 튜플.
+    검증은 텍스트가 그려진 영역의 픽셀이 원본과 다른지로 합니다. 기본 폰트는 글리프가 작아 특정 한 픽셀만 찍으면 빗나갈 수 있으므로, 그리기 전후 배열 차이로 확인하는 편이 안정적입니다.
+  tips:
+  - 기본 폰트는 매우 작습니다. ImageFont.truetype으로 폰트와 크기를 명시하는 게 표준입니다.
+  - ImageDraw는 in-place라 .copy()를 먼저 만들어야 원본이 보존됩니다.
+  snippet: |-
+    import numpy as np
+    from PIL import Image, ImageDraw
+    from sklearn.datasets import load_sample_image
+
+    textCanvas = Image.fromarray(load_sample_image('flower.jpg')).convert('RGBA').copy()
+    textDraw = ImageDraw.Draw(textCanvas)
+    textBefore = np.asarray(textCanvas).copy()
+    textDraw.text((10, 10), '워터마크 테스트', fill=(255, 255, 255, 255))
+
+    textAfter = np.asarray(textCanvas)
+    textDiff = np.abs(textAfter.astype(int) - textBefore.astype(int))
+    {
+        'size': textCanvas.size,
+        'changedPixels': int((textDiff.sum(axis=2) > 0).sum()),
+        'isLightFromWhiteText': int(textDiff.sum()) > 0,
+    }
+  exercise:
+    prompt: 빨강 텍스트를 (100, 100)에 그리고 그 픽셀의 R 채널이 200 이상인지 확인하세요.
+    starterCode: |-
+      import numpy as np
+      from PIL import Image, ImageDraw
+      from sklearn.datasets import load_sample_image
+
+      redCanvas = Image.fromarray(load_sample_image('flower.jpg')).convert('RGBA').copy()
+      redDraw = ImageDraw.Draw(redCanvas)
+      before = np.asarray(redCanvas).copy()
+      redDraw.text((100, 100), 'RED', fill=(___, 0, 0, 255))
+
+      after = np.asarray(redCanvas)
+      regionDiff = np.abs(after[95:125, 95:145].astype(int) - before[95:125, 95:145].astype(int))
+      {'changedPixels': int((regionDiff.sum(axis=2) > 0).sum()), 'isRed': int(regionDiff[..., 0].sum()) > 0}
+    hints:
+    - 빨강 채널 값 255를 넣습니다.
+    - 빈칸에는 255가 들어갑니다.
+    check:
+      noError: text 호출이 끝나야 합니다.
+      resultCheck: isRed가 True여야 합니다.
+  check:
+    noError: ImageDraw.text 호출이 끝나야 합니다.
+    resultCheck: isLightFromWhiteText가 True여야 합니다.
+- id: step3_alpha_layer
+  title: 3단계. 알파 레이어와 paste
+  structuredPrimary: true
+  subtitle: paste(layer, position, mask=layer)
+  goal: 투명한 RGBA 레이어에 반투명 텍스트를 그리고 base.paste(layer, (0, 0), mask=layer)로 합성한 뒤 워터마크 영역의 픽셀이 베이스와 텍스트의 블렌딩으로 바뀌었는지 확인합니다.
+  why: paste의 mask 인자가 알파 합성을 결정합니다. layer 자체를 mask로 주면 알파 채널 값에 따라 픽셀별 합성 강도가 정해집니다. 이 패턴이 반투명 워터마크의 표준 구현입니다.
+  explanation: |-
+    Image.new('RGBA', size, (0, 0, 0, 0))으로 완전 투명한 빈 레이어를 만듭니다. 모든 픽셀이 (0, 0, 0, 0).
+    ImageDraw.Draw(layer).text(..., fill=(255, 255, 255, 128))로 반투명 흰 텍스트를 그립니다. 알파=128은 50% 투명.
+    base.paste(layer, (0, 0), mask=layer)는 layer의 알파에 비례한 합성을 base에 적용합니다. base는 in-place 변경됩니다.
+    결과 픽셀이 base와 다른지로 합성이 일어났는지 확인할 수 있습니다.
+  tips:
+  - paste의 mask 인자는 L 모드(단채널) 또는 RGBA(알파 채널만) Image를 받습니다. RGBA를 그대로 주면 알파 채널만 사용됩니다.
+  - paste는 in-place로 동작합니다. base.copy()를 먼저 만들어야 원본이 보존됩니다.
+  snippet: |-
+    import numpy as np
+    from PIL import Image, ImageDraw
+    from sklearn.datasets import load_sample_image
+
+    pasteBase = Image.fromarray(load_sample_image('flower.jpg')).convert('RGBA').copy()
+    pasteLayer = Image.new('RGBA', pasteBase.size, (0, 0, 0, 0))
+    pasteDraw = ImageDraw.Draw(pasteLayer)
+    pasteDraw.text((50, 50), 'WATERMARK', fill=(255, 255, 255, 128))
+
+    baseBefore = np.asarray(pasteBase).copy()
+    pasteBase.paste(pasteLayer, (0, 0), mask=pasteLayer)
+    baseAfter = np.asarray(pasteBase)
+
+    diff = np.abs(baseAfter.astype(int) - baseBefore.astype(int))
+    {
+        'shape': baseAfter.shape,
+        'pixelChanged': int(diff.sum()) > 0,
+        'maxDiff': int(diff.max()),
+    }
+  exercise:
+    prompt: 알파 값을 64(더 투명)로 낮춰 합성하면 변화량 합이 알파=128 케이스보다 작은지 확인하세요.
+    starterCode: |-
+      import numpy as np
+      from PIL import Image, ImageDraw
+      from sklearn.datasets import load_sample_image
+
+      sheerBase = Image.fromarray(load_sample_image('flower.jpg')).convert('RGBA').copy()
+      sheerLayer = Image.new('RGBA', sheerBase.size, (0, 0, 0, 0))
+      ImageDraw.Draw(sheerLayer).text((50, 50), 'SHEER', fill=(255, 255, 255, ___))
+      before = np.asarray(sheerBase).copy()
+      sheerBase.paste(sheerLayer, (0, 0), mask=sheerLayer)
+      diff = int(np.abs(np.asarray(sheerBase).astype(int) - before.astype(int)).sum())
+      {'diffSum': diff}
+    hints:
+    - 알파 64는 더 투명.
+    - 빈칸에는 64가 들어갑니다.
+    check:
+      noError: paste 호출이 끝나야 합니다.
+      resultCheck: diffSum이 0 이상이어야 합니다.
+  check:
+    noError: paste 호출과 비교가 끝나야 합니다.
+    resultCheck: pixelChanged가 True여야 합니다.
+- id: step4_textbbox
+  title: 4단계. textbbox로 자동 정렬
+  structuredPrimary: true
+  subtitle: 우측 하단 배치
+  goal: ImageDraw.textbbox로 텍스트 박스 크기를 측정해 우측 하단에서 padding 만큼 떨어진 위치에 자동 정렬해 그립니다.
+  why: 워터마크는 보통 우측 하단에 배치합니다. 텍스트 크기와 이미지 크기가 다르므로 자동 정렬이 필요합니다. textbbox가 그 계산을 가능하게 합니다.
+  explanation: |-
+    ImageDraw.textbbox((x, y), text, font=font)는 텍스트가 차지할 (left, top, right, bottom) 박스를 돌려줍니다. 박스 크기 = (right-left, bottom-top).
+    이미지 크기와 박스 크기, padding을 사용해 우측 하단 (이미지.W - 박스.W - padding, 이미지.H - 박스.H - padding) 좌표를 계산합니다.
+    이 계산을 함수로 묶어 두면 다양한 텍스트 길이에 자동 적용 가능합니다.
+  tips:
+  - 기본 폰트의 textbbox는 폰트 크기에 따라 다른 결과를 줍니다. truetype 폰트를 쓰면 더 안정적입니다.
+  - getbbox는 deprecated 메서드입니다. textbbox 사용이 표준입니다.
+  snippet: |-
+    from PIL import Image, ImageDraw
+    from sklearn.datasets import load_sample_image
+
+    bboxBase = Image.fromarray(load_sample_image('flower.jpg')).convert('RGBA').copy()
+    bboxDraw = ImageDraw.Draw(bboxBase)
+    bboxText = '@codaro'
+    bboxPadding = 20
+
+    bbox = bboxDraw.textbbox((0, 0), bboxText)
+    textWidth = bbox[2] - bbox[0]
+    textHeight = bbox[3] - bbox[1]
+    posX = bboxBase.size[0] - textWidth - bboxPadding
+    posY = bboxBase.size[1] - textHeight - bboxPadding
+
+    bboxDraw.text((posX, posY), bboxText, fill=(255, 255, 255, 200))
+
+    {
+        'imageSize': bboxBase.size,
+        'textBbox': bbox,
+        'textWidth': textWidth,
+        'textHeight': textHeight,
+        'position': (posX, posY),
+        'isInBottomRight': posX > bboxBase.size[0] // 2 and posY > bboxBase.size[1] // 2,
+    }
+  exercise:
+    prompt: 같은 함수로 좌측 상단 (padding, padding) 위치에 워터마크를 그리세요. 박스 좌표 계산 없이 padding 두 값만 위치로 줍니다.
+    starterCode: |-
+      from PIL import Image, ImageDraw
+      from sklearn.datasets import load_sample_image
+
+      topLeftBase = Image.fromarray(load_sample_image('flower.jpg')).convert('RGBA').copy()
+      topLeftDraw = ImageDraw.Draw(topLeftBase)
+      topLeftDraw.text((___, 20), 'top-left', fill=(255, 255, 255, 200))
+      {'topLeftCorner': (20, 20)}
+    hints:
+    - 좌측 padding 20.
+    - 빈칸에는 20이 들어갑니다.
+    check:
+      noError: text 호출이 끝나야 합니다.
+      resultCheck: topLeftCorner가 (20, 20)이어야 합니다.
+  check:
+    noError: textbbox와 text 호출이 끝나야 합니다.
+    resultCheck: isInBottomRight가 True여야 합니다.
+- id: step5_compose
+  title: 5단계. 합성 함수
+  structuredPrimary: true
+  subtitle: addWatermark
+  goal: addWatermark(image, text, alpha, position) 함수가 입력 RGB Image에 반투명 워터마크를 합성한 RGBA 결과를 돌려주도록 만들고, alpha 값에 따라 합성 강도가 달라지는지 확인합니다.
+  why: 워터마크 합성을 함수로 묶어 두면 어떤 이미지에든 같은 인터페이스로 적용할 수 있습니다. alpha 인자로 투명도를 조절 가능합니다.
+  explanation: |-
+    addWatermark는 RGB 입력을 받아 RGBA로 변환 → 텍스트 레이어 그리기 → paste 합성을 순차적으로 수행합니다. 결과는 RGBA Image.
+    alpha 인자(0~255)로 워터마크의 투명도를 제어합니다. alpha=0은 보이지 않음, alpha=255는 완전 불투명.
+    검증은 같은 입력에 alpha=128과 alpha=64를 적용해 결과 픽셀 변화량이 alpha에 비례하는지로 합니다.
+  tips:
+  - 함수 인터페이스에 fontSize 인자를 추가하면 더 유연합니다. truetype 폰트 경로도 함께.
+  - 결과를 파일로 저장할 때는 convert('RGB')로 알파 채널을 제거합니다(JPG는 알파 불지원).
+  snippet: |-
+    import numpy as np
+    from PIL import Image, ImageDraw
+    from sklearn.datasets import load_sample_image
+
+
+    def addWatermark(image: Image.Image, text: str, alpha: int, position: tuple) -> Image.Image:
+        rgba = image.convert('RGBA').copy()
+        layer = Image.new('RGBA', rgba.size, (0, 0, 0, 0))
+        ImageDraw.Draw(layer).text(position, text, fill=(255, 255, 255, alpha))
+        rgba.paste(layer, (0, 0), mask=layer)
+        return rgba
+
+
+    composeBase = Image.fromarray(load_sample_image('flower.jpg'))
+    weak = addWatermark(composeBase, 'WEAK', alpha=64, position=(50, 50))
+    strong = addWatermark(composeBase, 'STRONG', alpha=200, position=(50, 50))
+
+    baseArr = np.asarray(composeBase.convert('RGBA'))
+    weakDiff = int(np.abs(np.asarray(weak).astype(int) - baseArr.astype(int)).sum())
+    strongDiff = int(np.abs(np.asarray(strong).astype(int) - baseArr.astype(int)).sum())
+
+    {
+        'weakDiff': weakDiff,
+        'strongDiff': strongDiff,
+        'strongerHasMoreDiff': strongDiff > weakDiff,
+        'resultMode': weak.mode,
+    }
+  exercise:
+    prompt: alpha=255 (완전 불투명) 워터마크의 변화량이 alpha=200보다 더 큰지 확인하세요.
+    starterCode: |-
+      import numpy as np
+      from PIL import Image, ImageDraw
+      from sklearn.datasets import load_sample_image
+
+
+      def addWatermark(image, text, alpha, position):
+          rgba = image.convert('RGBA').copy()
+          layer = Image.new('RGBA', rgba.size, (0, 0, 0, 0))
+          ImageDraw.Draw(layer).text(position, text, fill=(255, 255, 255, alpha))
+          rgba.paste(layer, (0, 0), mask=layer)
+          return rgba
+
+
+      maxBase = Image.fromarray(load_sample_image('flower.jpg'))
+      maxResult = addWatermark(maxBase, 'MAX', alpha=___, position=(50, 50))
+      maxDiff = int(np.abs(np.asarray(maxResult).astype(int) - np.asarray(maxBase.convert('RGBA')).astype(int)).sum())
+      {'maxDiff': maxDiff}
+    hints:
+    - 완전 불투명은 255.
+    - 빈칸에는 255가 들어갑니다.
+    check:
+      noError: addWatermark 정의와 호출이 끝나야 합니다.
+      resultCheck: maxDiff가 양의 정수여야 합니다.
+  check:
+    noError: addWatermark 정의와 두 호출이 끝나야 합니다.
+    resultCheck: strongerHasMoreDiff가 True여야 합니다.
+- id: practice
+  title: 실습 - china에 워터마크
+  structuredPrimary: true
+  subtitle: 다른 입력 일반화
+  goal: 같은 addWatermark 함수를 china 사진에 적용해 결과 dict가 같은 형식으로 돌아오는지 확인합니다.
+  why: 함수 재사용은 자동화의 핵심입니다. 같은 함수를 다른 입력에 돌려도 같은 형식 결과가 나오면 후속 처리가 일관됩니다.
+  explanation: |-
+    addWatermark는 입력 size에 무관하게 동작합니다. flower (640, 427)나 china (640, 427) 모두 같은 흐름을 따라 결과가 만들어집니다.
+    실무에서는 함수에 폰트 경로, fontSize, color 인자를 추가해 유연성을 높입니다. 본 예제는 핵심 로직만 다룹니다.
+    함수 결과는 RGBA Image이므로 PNG로 저장하면 알파가 유지됩니다. JPG로 저장하려면 convert('RGB')로 알파를 합쳐야 합니다.
+  tips:
+  - "워터마크 위치는 우측 하단이 표준입니다. 좌측 상단은 사용자 작업 영역을 가리는 경우가 많습니다."
+  - 알파를 너무 작게(예 30 이하) 주면 워터마크가 거의 안 보입니다. 100~180이 적정선.
+  snippet: |-
+    import numpy as np
+    from PIL import Image, ImageDraw
+    from sklearn.datasets import load_sample_image
+
+
+    def addWatermark(image: Image.Image, text: str, alpha: int, position: tuple) -> Image.Image:
+        rgba = image.convert('RGBA').copy()
+        layer = Image.new('RGBA', rgba.size, (0, 0, 0, 0))
+        ImageDraw.Draw(layer).text(position, text, fill=(255, 255, 255, alpha))
+        rgba.paste(layer, (0, 0), mask=layer)
+        return rgba
+
+
+    chinaBase = Image.fromarray(load_sample_image('china.jpg'))
+    chinaResult = addWatermark(chinaBase, '@photo', alpha=150, position=(500, 400))
+
+    {
+        'mode': chinaResult.mode,
+        'size': chinaResult.size,
+        'isRGBA': chinaResult.mode == 'RGBA',
+        'sizeMatches': chinaResult.size == chinaBase.size,
+    }
+  exercise:
+    prompt: addWatermark에 alpha=0을 넘기면 입력과 거의 동일한 결과(변화량 0)가 나오는지 확인하세요.
+    starterCode: |-
+      import numpy as np
+      from PIL import Image, ImageDraw
+      from sklearn.datasets import load_sample_image
+
+
+      def addWatermark(image, text, alpha, position):
+          rgba = image.convert('RGBA').copy()
+          layer = Image.new('RGBA', rgba.size, (0, 0, 0, 0))
+          ImageDraw.Draw(layer).text(position, text, fill=(255, 255, 255, alpha))
+          rgba.paste(layer, (0, 0), mask=layer)
+          return rgba
+
+
+      invisibleBase = Image.fromarray(load_sample_image('flower.jpg'))
+      invisibleResult = addWatermark(invisibleBase, 'INVISIBLE', alpha=___, position=(100, 100))
+      diff = int(np.abs(np.asarray(invisibleResult).astype(int) - np.asarray(invisibleBase.convert('RGBA')).astype(int)).sum())
+      {'diff': diff, 'isInvisible': diff == 0}
+    hints:
+    - 완전 투명은 0.
+    - 빈칸에는 0이 들어갑니다.
+    check:
+      noError: addWatermark 호출이 끝나야 합니다.
+      resultCheck: isInvisible이 True여야 합니다.
+  check:
+    noError: addWatermark 정의와 호출이 끝나야 합니다.
+    resultCheck: isRGBA와 sizeMatches 모두 True여야 합니다.
+- id: workflow_validation
+  title: 6단계. alpha 가드 + 합성 검증
+  structuredPrimary: true
+  subtitle: validateAlpha + 합성 강도 회귀
+  goal: validateAlpha 함수가 0~255 범위 밖 alpha를 ValueError로 차단하고, alpha 변화에 따라 합성 강도가 단조 변화하는지 회귀 테스트로 확인합니다.
+  why: alpha는 정확히 0~255 정수여야 의미가 있습니다. 음수나 256 이상은 paste가 조용히 잘못된 결과를 줍니다. 함수 입구 가드가 그 사고를 차단합니다.
+  explanation: |-
+    validateAlpha는 (1) 0 <= alpha <= 255, (2) 정수형 두 조건을 검사합니다. 둘 중 하나라도 깨지면 ValueError.
+    회귀 테스트는 alpha=50과 alpha=200의 합성 변화량을 비교합니다. 큰 alpha가 더 큰 변화를 줘야 정상.
+  tips:
+  - "alpha=0은 보이지 않는 워터마크입니다. 의미 없지만 차단 대상은 아닙니다."
+  - "ValueError 메시지에 실제 alpha를 포함시키면 호출자가 즉시 원인을 알 수 있습니다."
+  snippet: |-
+    import numpy as np
+    from PIL import Image, ImageDraw
+
+
+    def validateAlpha(alpha: int) -> bool:
+        if not isinstance(alpha, int):
+            raise ValueError(f"alpha는 정수여야 합니다: type={type(alpha).__name__}")
+        if not (0 <= alpha <= 255):
+            raise ValueError(f"alpha는 0~255 범위여야 합니다: {alpha}")
+        return True
+
+
+    validImage = Image.new('RGBA', (100, 80), (255, 255, 255, 255))
+
+    okResult = validateAlpha(128)
+
+    try:
+        validateAlpha(300)
+        outOfRangeMessage = 'unexpected pass'
+    except ValueError as exc:
+        outOfRangeMessage = str(exc)
+
+    try:
+        validateAlpha(1.5)
+        floatMessage = 'unexpected pass'
+    except ValueError as exc:
+        floatMessage = str(exc)
+
+    {
+        'okResult': okResult,
+        'outOfRangeMessage': outOfRangeMessage,
+        'floatMessage': floatMessage,
+    }
+  exercise:
+    prompt: validateAlpha에 -10을 넘기면 ValueError가 잡히는지 확인하세요.
+    starterCode: |-
+      def validateAlpha(alpha):
+          if not isinstance(alpha, int):
+              raise ValueError(f"alpha는 정수여야 합니다: type={type(alpha).__name__}")
+          if not (0 <= alpha <= 255):
+              raise ValueError(f"alpha는 0~255 범위여야 합니다: {alpha}")
+          return True
+
+
+      try:
+          validateAlpha(___)
+          negMessage = 'unexpected pass'
+      except ValueError as exc:
+          negMessage = str(exc)
+
+      {'negMessage': negMessage, 'caught': '범위' in negMessage}
+    hints:
+    - 음수 -10.
+    - 빈칸에는 -10이 들어갑니다.
+    check:
+      noError: validateAlpha 정의가 끝나야 합니다.
+      resultCheck: caught가 True여야 합니다.
+  check:
+    noError: validateAlpha와 세 호출이 끝나야 합니다.
+    resultCheck: okResult가 True이고 outOfRangeMessage에 '300', floatMessage에 'type' 단서가 포함되어야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pillow_07-watermark-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: 워터마크 생성기 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: opacity·anchor·margin·text 계약을 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_watermark_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_watermark_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_watermark_contract(value):
+            required = ['text', 'opacity', 'anchor', 'margin']
+            rules = [{'id': 'text', 'field': 'text', 'kind': 'nonempty'}, {'id': 'opacity', 'field': 'opacity', 'kind': 'unit-interval'}, {'id': 'anchor', 'field': 'anchor', 'kind': 'enum', 'values': ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'center']}, {'id': 'margin', 'field': 'margin', 'kind': 'range', 'min': 0, 'max': 200}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'watermark', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.pillow.pillow_07.watermark-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pillow.pillow_07.watermark-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_watermark_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              text: Codaro
+              opacity: 0.35
+              anchor: bottom-right
+              margin: 24
+          expectedReturn:
+            accepted: true
+            topic: watermark
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              opacity: 0.35
+              anchor: bottom-right
+              margin: 24
+          expectedReturn:
+            accepted: false
+            topic: watermark
+            missing:
+            - text
+            violations:
+            - text
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              text: ''
+              opacity: 1.5
+              anchor: outside
+              margin: -1
+          expectedReturn:
+            accepted: false
+            topic: watermark
+            missing: []
+            violations:
+            - anchor
+            - margin
+            - opacity
+            - text
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pillow_07-watermark-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pillow_07-watermark-contract-audit-mastery
+    title: 워터마크 생성기 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_watermark_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_watermark_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_watermark_result(expected, observed):
+            identity = ['sourceHash', 'watermarkId']
+            metrics = {'changedPixelRatio': 0.01}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'watermark', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.pillow.pillow_07.watermark-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pillow.pillow_07.watermark-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_watermark_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              sourceHash: w1
+              watermarkId: wm-a
+              changedPixelRatio: 0.03
+          - value:
+              sourceHash: w1
+              watermarkId: wm-a
+              changedPixelRatio: 0.035
+          expectedReturn:
+            passed: true
+            topic: watermark
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              sourceHash: w1
+              watermarkId: wm-a
+              changedPixelRatio: 0.03
+          - value:
+              sourceHash: w2
+              watermarkId: wm-b
+              changedPixelRatio: 0.3
+          expectedReturn:
+            passed: false
+            topic: watermark
+            missing: []
+            identityMismatch:
+            - sourceHash
+            - watermarkId
+            metricDrift:
+            - changedPixelRatio
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              sourceHash: w1
+              watermarkId: wm-a
+              changedPixelRatio: 0.03
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: watermark
+            missing:
+            - changedPixelRatio
+            - sourceHash
+            - watermarkId
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pillow_07-watermark-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pillow_07-watermark-result-reconciliation-transfer
+    title: 워터마크 생성기 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_watermark_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_watermark_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_watermark_evidence(stage):
+            stages = {'source': {'action': 'admit watermark source', 'evidence': 'text opacity anchor margin', 'risk': 'unsafe or misread image'}, 'edit': {'action': 'apply bounded watermark edit', 'evidence': 'alpha composite trace', 'risk': 'quality or geometry loss'}, 'artifact': {'action': 'reopen watermark artifact', 'evidence': 'placement and changed pixels', 'risk': 'corrupt or visually wrong output'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.pillow.pillow_07.watermark-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pillow.pillow_07.watermark-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_watermark_evidence
+        cases:
+        - id: recalls-source
+          arguments:
+          - value: source
+          expectedReturn:
+            action: admit watermark source
+            evidence: text opacity anchor margin
+            risk: unsafe or misread image
+        - id: recalls-edit
+          arguments:
+          - value: edit
+          expectedReturn:
+            action: apply bounded watermark edit
+            evidence: alpha composite trace
+            risk: quality or geometry loss
+        - id: recalls-artifact
+          arguments:
+          - value: artifact
+          expectedReturn:
+            action: reopen watermark artifact
+            evidence: placement and changed pixels
+            risk: corrupt or visually wrong output
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,802 @@
+var e=`meta:
+  id: regex_04
+  title: HTML태그제거
+  order: 4
+  category: regex
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - HTML
+  - 비탐욕적
+  - DOTALL
+  - 태그 제거
+  - 텍스트 정제
+  seo:
+    title: 정규표현식 기초 - HTML 태그 제거
+    description: 정규표현식으로 HTML에서 순수 텍스트만 추출합니다. 비탐욕적 매칭, re.DOTALL 플래그를 배웁니다.
+    keywords:
+    - 정규표현식
+    - regex
+    - HTML 파싱
+    - 태그 제거
+    - 비탐욕적 매칭
+intro:
+  emoji: 🏷️
+  goal: HTML 문서에서 모든 태그를 제거하고 순수 텍스트만 추출합니다.
+  description: 웹 크롤링 후 가장 많이 하는 작업입니다. 탐욕적 vs 비탐욕적 매칭의 차이를 배우고, LLM 전처리의 첫 단계를 경험합니다.
+  direction: HTML태그제거에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 샘플 문자열 확인 후 패턴 매칭과 치환에 맞는 코드 입력을 고릅니다.
+  - HTML태그제거 결과를 매치 그룹, 추출 목록, 치환 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 로그/문서 정제 자동화에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(샘플 문자열)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 불러오기 처리 실행
+      detail: 패턴 매칭과 치환 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 잘못된 패턴 (탐욕적 결과 검증
+      detail: 매치 그룹, 추출 목록, 치환 결과 기준으로 실행 결과를 비교합니다.
+    - label: HTML태그제거 재사용
+      detail: 완성 코드를 로그/문서 정제 자동화에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 텍스트 정제 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: HTML태그제거 실행
+      detail: 셀을 실행해 매치 그룹, 추출 목록, 치환 결과와 예외 상태를 확인합니다.
+    - label: HTML태그제거 완료
+      detail: 검증된 코드를 로그/문서 정제 자동화로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: 1단계. 라이브러리 불러오기의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: import re
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: import re
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
+- id: step2_load
+  title: 2단계. 데이터 불러오기
+  structuredPrimary: true
+  subtitle: 로컬 게시글 샘플
+  goal: 2단계. 데이터 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: 로컬 게시글 샘플에 HTML 태그를 추가해 크롤링 결과와 비슷한 입력을 만듭니다. 실제 웹 데이터에는 본문, 제목, 작성자 정보와 함께 태그가 섞여 있으므로
+    LLM 입력이나 분석 전에 태그 제거와 공백 정리가 필요합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    postsData = [
+        {
+            "userId": 1,
+            "id": 1,
+            "title": "HTML cleaning checklist",
+            "body": "Remove tags, normalize whitespace, and keep the meaningful text.",
+        },
+        {
+            "userId": 2,
+            "id": 2,
+            "title": "Script tags are not content",
+            "body": "Tracking scripts and inline styles should not reach the analysis step.",
+        },
+        {
+            "userId": 3,
+            "id": 3,
+            "title": "LLM input preparation",
+            "body": "Clean text reduces token waste and keeps prompts focused.",
+        },
+        {
+            "userId": 4,
+            "id": 4,
+            "title": "Crawler output review",
+            "body": "Raw pages often mix navigation, metadata, and article paragraphs.",
+        },
+        {
+            "userId": 5,
+            "id": 5,
+            "title": "Batch preprocessing note",
+            "body": "A reusable function makes hundreds of pages easier to clean.",
+        },
+    ]
+
+    postsData[0]['body']
+  exercise:
+    prompt: 2단계. 데이터 불러오기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      postsData = [
+          {
+              "userId": 1,
+              "id": 1,
+              "title": "HTML cleaning checklist",
+              "body": "Remove tags, normalize whitespace, and keep the meaningful text.",
+          },
+          {
+              "userId": 2,
+              "id": 2,
+              "title": "Script tags are not content",
+              "body": "Tracking scripts and inline styles should not reach the analysis step.",
+          },
+          {
+              "userId": 3,
+              "id": 3,
+              "title": "LLM input preparation",
+              "body": "Clean text reduces token waste and keeps prompts focused.",
+          },
+          {
+              "userId": 4,
+              "id": 4,
+              "title": "Crawler output review",
+              "body": "Raw pages often mix navigation, metadata, and article paragraphs.",
+          },
+          {
+              "userId": 5,
+              "id": 5,
+              "title": "Batch preprocessing note",
+              "body": "A reusable function makes hundreds of pages easier to clean.",
+          },
+      ]
+
+      postsData[0]['body']
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 불러오기의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 데이터 불러오기의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: step3_wrong_pattern
+  title: 3단계. 잘못된 패턴 (탐욕적 매칭)
+  structuredPrimary: true
+  subtitle: .* 의 함정
+  goal: 3단계. 잘못된 패턴 (탐욕적 매칭)에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    직관적으로 생각하면 < 와 > 사이의 모든 문자를 찾으면 될 것 같습니다. 하지만 정규표현식의 기본 동작은 우리의 예상과 다를 수 있습니다. 이 문제를 통해 탐욕적 매칭이라는 중요한 개념을 배워봅시다.
+
+    결과: ['<div>안녕</div><span>하세요</span>'] - 전체가 하나로 매칭되었습니다!
+  tips:
+  - '탐욕적 매칭의 문제 \`.*\`는 **탐욕적(greedy)**입니다. 가능한 한 많이 매칭하려고 합니다. \`<.*>\` 는: 1. 첫 번째 \`<\` 를 찾고 2. 마지막 \`>\` 까지
+    최대한 많이 매칭 3. 중간의 모든 것을 다 포함 우리가 원하는 건 각 태그를 개별적으로 찾는 것입니다!'
+  snippet: |-
+    wrongPattern = r"<.*>"
+
+    testHtml = "<div>안녕</div><span>하세요</span>"
+    re.findall(wrongPattern, testHtml)
+  exercise:
+    prompt: 3단계. 잘못된 패턴 (탐욕적 매칭) 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      wrongPattern = r"<.*>"
+
+      testHtml = "<div>안녕</div><span>하세요</span>"
+      re.findall(wrongPattern, testHtml)
+    hints:
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 잘못된 패턴 (탐욕적 매칭)의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 잘못된 패턴 (탐욕적 매칭)의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: step4_non_greedy
+  title: 4단계. 올바른 패턴 (비탐욕적 매칭)
+  structuredPrimary: true
+  subtitle: 작게 실행하고 결과를 확인하는 단계
+  goal: 4단계. 올바른 패턴 (비탐욕적 매칭)에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: 4단계. 올바른 패턴 (비탐욕적 매칭)의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    correctPattern = r"<.*?>"
+
+    testHtml = "<div>안녕</div><span>하세요</span>"
+    re.findall(correctPattern, testHtml)
+  exercise:
+    prompt: 4단계. 올바른 패턴 (비탐욕적 매칭) 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      correctPattern = r"<.*?>"
+
+      testHtml = "<div>안녕</div><span>하세요</span>"
+      re.findall(correctPattern, testHtml)
+    hints:
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 올바른 패턴 (비탐욕적 매칭)의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 올바른 패턴 (비탐욕적 매칭)의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: step5_remove_tags
+  title: 5단계. HTML 태그 제거
+  structuredPrimary: true
+  subtitle: re.sub로 치환
+  goal: 5단계. HTML 태그 제거에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    이제 모든 HTML 태그를 빈 문자열로 치환하여 제거합니다.
+
+    태그는 사라졌지만 여러 줄의 공백이 남아있네요. 추가 정제가 필요합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    pattern = r"<.*?>"
+
+    htmlText = (
+        "<article><h1>HTML cleaning checklist</h1>"
+        "<p>Remove tags, normalize <b>whitespace</b>, "
+        "and keep the meaningful <i>text</i>.</p></article>"
+    )
+    cleanText = re.sub(pattern, "", htmlText)
+    cleanText
+  exercise:
+    prompt: 5단계. HTML 태그 제거 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      pattern = r"<.*?>"
+
+      htmlText = (
+          "<article><h1>HTML cleaning checklist</h1>"
+          "<p>Remove tags, normalize <b>whitespace</b>, "
+          "and keep the meaningful <i>text</i>.</p></article>"
+      )
+      cleanText = re.sub(pattern, "", htmlText)
+      cleanText
+    hints:
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. HTML 태그 제거의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 5단계. HTML 태그 제거의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: step6_clean_whitespace
+  title: 6단계. 공백 정리
+  structuredPrimary: true
+  subtitle: 연속된 공백 제거
+  goal: 6단계. 공백 정리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    연속된 공백, 탭, 개행을 하나의 공백으로 통일합니다.
+
+    공백 패턴
+    **패턴: \\\\s+** - \`\\s\` : 공백 문자 (스페이스, 탭, 개행 등) - \`\\s+\` : 공백 문자 1개 이상 - \`.strip()\` : 양 끝 공백 제거 LLM 전처리에서 매우 자주 사용하는 패턴입니다!
+  tips:
+  - '공백 패턴 **패턴: \\\\s+** - \`\\s\` : 공백 문자 (스페이스, 탭, 개행 등) - \`\\s+\` : 공백 문자 1개 이상 - \`.strip()\` : 양 끝 공백 제거
+    LLM 전처리에서 매우 자주 사용하는 패턴입니다!'
+  snippet: |-
+    cleanText = re.sub(r"\\s+", " ", cleanText)
+    cleanText = cleanText.strip()
+    cleanText
+  exercise:
+    prompt: 6단계. 공백 정리 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      cleanText = re.sub(r"\\s+", " ", cleanText)
+      cleanText = cleanText.strip()
+      cleanText
+    hints:
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 공백 정리의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 공백 정리의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: step7_dotall_flag
+  title: 7단계. re.DOTALL 플래그
+  structuredPrimary: true
+  subtitle: . 이 개행 포함하기
+  goal: 7단계. re.DOTALL 플래그에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    기본적으로 . 은 개행(\\n)을 매칭하지 않습니다. 여러 줄에 걸친 태그를 처리하려면 플래그가 필요합니다.
+
+    re.DOTALL (re.S)
+    **re.DOTALL** 또는 **re.S** 플래그: - \`.\` 이 개행 문자도 매칭하게 만듭니다 - 여러 줄에 걸친 패턴을 찾을 때 필수 - \`flags=re.DOTALL\` 또는 \`flags=re.S\` 로 사용
+  tips:
+  - 're.DOTALL (re.S) **re.DOTALL** 또는 **re.S** 플래그: - \`.\` 이 개행 문자도 매칭하게 만듭니다 - 여러 줄에 걸친 패턴을 찾을 때 필수 -
+    \`flags=re.DOTALL\` 또는 \`flags=re.S\` 로 사용'
+  snippet: |-
+    multilineHtml = """
+    <div
+        class="container"
+        id="main">
+    내용
+    </div>
+    """
+  exercise:
+    prompt: 7단계. re.DOTALL 플래그 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      multilineHtml = """
+      <div
+          class="container"
+          id="main">
+      내용
+      </div>
+      """
+    hints:
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. re.DOTALL 플래그의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 7단계. re.DOTALL 플래그의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: step8_complete_function
+  title: 8단계. 완성된 HTML 정제 함수
+  structuredPrimary: true
+  subtitle: 재사용 가능한 함수
+  goal: 8단계. 완성된 HTML 정제 함수에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: 배운 내용을 모두 합쳐 완성된 함수를 만듭니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def stripHtml(html):
+        noTags = re.sub(r"<.*?>", "", html, flags=re.DOTALL)
+        cleaned = re.sub(r"\\s+", " ", noTags)
+        return cleaned.strip()
+  exercise:
+    prompt: 8단계. 완성된 HTML 정제 함수 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def stripHtml(html):
+          noTags = re.sub(r"<.*?>", "", html, flags=re.DOTALL)
+          cleaned = re.sub(r"\\s+", " ", noTags)
+          return cleaned.strip()
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. 완성된 HTML 정제 함수의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 완성된 HTML 정제 함수 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: step9_token_comparison
+  title: 9단계. LLM 토큰 절약 효과
+  structuredPrimary: true
+  subtitle: 전처리 전후 비교
+  goal: 9단계. LLM 토큰 절약 효과에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    HTML 태그 제거가 LLM 토큰에 얼마나 영향을 주는지 확인해봅시다.
+
+    실제 토큰 절약
+    HTML 태그 제거로 평균 30~50% 토큰 절약! - 원본 1000자 → 정제 후 500자 - 토큰 수: ~250 → ~125 - API 비용: 50% 절감 웹 크롤링 후 필수 전처리 단계입니다.
+  tips:
+  - '실제 토큰 절약 HTML 태그 제거로 평균 30~50% 토큰 절약! - 원본 1000자 → 정제 후 500자 - 토큰 수: ~250 → ~125 - API 비용: 50% 절감
+    웹 크롤링 후 필수 전처리 단계입니다.'
+  snippet: |-
+    original = htmlText
+    cleaned = stripHtml(htmlText)
+
+    originalLen = len(original)
+    cleanedLen = len(cleaned)
+    saved = ((originalLen - cleanedLen) / originalLen) * 100
+
+    f"원본: {originalLen}자\\n정제: {cleanedLen}자\\n절약: {saved:.1f}%"
+  exercise:
+    prompt: 9단계. LLM 토큰 절약 효과 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      original = htmlText
+      cleaned = stripHtml(htmlText)
+
+      originalLen = len(original)
+      cleanedLen = len(cleaned)
+      saved = ((originalLen - cleanedLen) / originalLen) * 100
+
+      f"원본: {originalLen}자\\n정제: {cleanedLen}자\\n절약: {saved:.1f}%"
+    hints:
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. LLM 토큰 절약 효과의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 9단계. LLM 토큰 절약 효과의 실행 결과가 본문 기대값과 일치해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: HTML 정제 프로젝트
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+  explanation: |-
+    웹 개발자가 되어 다양한 HTML 문서를 정제합니다. 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import re
+
+    raw = """
+    <html>
+    <head>
+        <style>.red { color: red; }</style>
+        <script>console.log('test');<\/script>
+    </head>
+    <body>
+        <p>실제 내용입니다</p>
+    </body>
+    </html>
+    """
+
+    def strip(html):
+        out = re.sub(r"<script.*?<\/script>", "", html, flags=re.DOTALL)
+        out = re.sub(r"<style.*?</style>", "", out, flags=re.DOTALL)
+        out = re.sub(r"<.*?>", "", out, flags=re.DOTALL)
+        out = re.sub(r"\\s+", " ", out)
+        return out.strip()
+
+    strip(raw)
+  exercise:
+    prompt: 실습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      import re
+
+      raw = """
+      <html>
+      <head>
+          <style>.red { color: red; }</style>
+          <script>console.log('test');<\/script>
+      </head>
+      <body>
+          <p>실제 내용입니다</p>
+      </body>
+      </html>
+      """
+
+      def strip(html):
+          out = re.sub(r"<script.*?<\/script>", "", html, flags=re.DOTALL)
+          out = re.sub(r"<style.*?</style>", "", out, flags=re.DOTALL)
+          out = re.sub(r"<.*?>", "", out, flags=re.DOTALL)
+          out = re.sub(r"\\s+", " ", out)
+          return out.strip()
+
+      strip(raw)
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.
+    resultCheck: 실습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: summary
+  title: 정리
+  subtitle: 네 번째 프로젝트 완료!
+  blocks:
+  - type: text
+    content: 이번 프로젝트에서는 비탐욕적 매칭과 re.DOTALL 플래그를 배웠습니다. HTML 태그를 제거하고 순수 텍스트만 추출할 수 있습니다.
+  - type: list
+    items:
+    - .*? - 비탐욕적 매칭 (최소 매칭)
+    - re.DOTALL - . 이 개행도 매칭
+    - \\s+ - 공백 1개 이상
+    - re.sub() - 패턴 치환
+  - type: text
+    content: 다음 프로젝트에서는 로그 파일을 파싱하는 방법을 배웁니다!
+  goal: 정리에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인'
+  structuredPrimary: true
+  subtitle: 예측 → 패턴 실행 → 오류 수정 → 검증 → 실무 변주
+  goal: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를
+    추출하고, 잘못된 패턴과 빈 입력을 안전하게 처리합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import re
+
+    contactText = '''
+    김개발 <kim@example.com> 010-1234-5678
+    lee@company.co.kr / 02-987-6543
+    잘못된 주소: hello@ / 번호: 12345
+    '''
+
+    emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}')
+    phonePattern = re.compile(r'(?:010-\\d{4}-\\d{4}|02-\\d{3}-\\d{4})')
+
+    emails = emailPattern.findall(contactText)
+    phones = phonePattern.findall(contactText)
+
+    assert emails == ['kim@example.com', 'lee@company.co.kr']
+    assert phones == ['010-1234-5678', '02-987-6543']
+    emails, phones
+  exercise:
+    prompt: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    starterCode: |-
+      import re
+
+      contactText = '''
+      김개발 <kim@example.com> 010-1234-5678
+      lee@company.co.kr / 02-987-6543
+      잘못된 주소: hello@ / 번호: 12345
+      '''
+
+      emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}')
+      phonePattern = re.compile(r'(?:010-\\d{4}-\\d{4}|02-\\d{3}-\\d{4})')
+
+      emails = emailPattern.findall(contactText)
+      phones = phonePattern.findall(contactText)
+
+      assert emails == ['kim@example.com', 'lee@company.co.kr']
+      assert phones == ['010-1234-5678', '02-987-6543']
+      emails, phones
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인의 정규식 패턴이 컴파일되고 입력 텍스트가 매치 단계까지 도달해야 합니다.'
+    resultCheck: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인 결과의 추출 개수와 매치 문자열이 본문 기대값과 같아야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: regex_04-html-visible-text-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: HTML parser로 보이는 텍스트 추출하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: script·style 내용을 제외하고 block 경계의 텍스트를 순서대로 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - HTML 태그 제거를 \`<.*?>\` regex 한 줄로 구현하지 마세요.
+    - script·style의 비가시 텍스트를 학습 자료나 검색 corpus에 섞지 마세요.
+    exercise:
+      prompt: extract_visible_text(html_text)를 완성하세요.
+      starterCode: |-
+        def extract_visible_text(html_text):
+            raise NotImplementedError
+      solution: |
+        def extract_visible_text(html_text):
+            from html.parser import HTMLParser
+            class VisibleTextParser(HTMLParser):
+                def __init__(self):
+                    super().__init__()
+                    self.hidden = 0
+                    self.parts = []
+                def handle_starttag(self, tag, attrs):
+                    if tag in {"script", "style"}:
+                        self.hidden += 1
+                def handle_endtag(self, tag):
+                    if tag in {"script", "style"} and self.hidden:
+                        self.hidden -= 1
+                def handle_data(self, data):
+                    value = " ".join(data.split())
+                    if value and not self.hidden:
+                        self.parts.append(value)
+            parser = VisibleTextParser()
+            parser.feed(html_text)
+            return {"text": " ".join(parser.parts), "parts": parser.parts}
+      hints: *id001
+    check:
+      id: python.regex.regex_04.html-visible-text.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_04.html-visible-text.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: extract_visible_text
+        cases:
+        - id: extracts-visible-text
+          arguments:
+          - value: <main><h1>Hello</h1><p>World</p></main>
+          expectedReturn:
+            text: Hello World
+            parts:
+            - Hello
+            - World
+        - id: excludes-script-and-style
+          arguments:
+          - value: <style>.x{}</style><p>Keep</p><script>alert(1)<\/script>
+          expectedReturn:
+            text: Keep
+            parts:
+            - Keep
+        - id: normalizes-whitespace-and-entities
+          arguments:
+          - value: <p>A&nbsp;  B &amp; C</p>
+          expectedReturn:
+            text: A B & C
+            parts:
+            - A B & C
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: regex_04-html-link-inventory-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_04-html-visible-text-mastery
+    title: 새 HTML 문서에 링크 inventory 추출 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: base URL로 절대화하고 scheme allowlist 밖 링크를 격리한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 상대 URL은 문서의 실제 base URL과 함께 절대화하세요.
+    - '\`javascript:\` 같은 비 HTTP scheme을 자동 요청 목록에 넣지 마세요.'
+    exercise:
+      prompt: inventory_links(html_text, base_url)를 완성하세요.
+      starterCode: |-
+        def inventory_links(html_text, base_url):
+            raise NotImplementedError
+      solution: |
+        def inventory_links(html_text, base_url):
+            from html.parser import HTMLParser
+            from urllib.parse import urljoin, urlsplit
+            class LinkParser(HTMLParser):
+                def __init__(self):
+                    super().__init__()
+                    self.hrefs = []
+                def handle_starttag(self, tag, attrs):
+                    if tag == "a":
+                        values = dict(attrs)
+                        if values.get("href"):
+                            self.hrefs.append(values["href"])
+            parser = LinkParser()
+            parser.feed(html_text)
+            accepted = []
+            rejected = []
+            for href in parser.hrefs:
+                absolute = urljoin(base_url, href)
+                if urlsplit(absolute).scheme in {"http", "https"}:
+                    accepted.append(absolute)
+                else:
+                    rejected.append({"href": href, "reason": "scheme"})
+            return {"accepted": accepted, "rejected": rejected}
+      hints: *id002
+    check:
+      id: python.regex.regex_04.html-link-inventory.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_04.html-link-inventory.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: inventory_links
+        cases:
+        - id: resolves-relative-links
+          arguments:
+          - value: <a href='/docs'>Docs</a><a href='next'>Next</a>
+          - value: https://example.test/base/
+          expectedReturn:
+            accepted:
+            - https://example.test/docs
+            - https://example.test/base/next
+            rejected: []
+        - id: rejects-script-scheme
+          arguments:
+          - value: <a href='javascript:alert(1)'>Bad</a>
+          - value: https://example.test/
+          expectedReturn:
+            accepted: []
+            rejected:
+            - href: javascript:alert(1)
+              reason: scheme
+        - id: ignores-anchor-without-href
+          arguments:
+          - value: <a>Plain</a>
+          - value: https://example.test/
+          expectedReturn:
+            accepted: []
+            rejected: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: regex_04-html-processing-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_04-html-link-inventory-transfer
+    title: HTML 텍스트 처리 경계 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 보이는 텍스트·링크·sanitization 책임을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - match 수만 보지 말고 정규화 뒤 보존된 의미와 거부된 입력을 함께 확인하세요.
+    - regex가 아닌 전용 parser가 필요한 구조에서는 경계를 명시하세요.
+    exercise:
+      prompt: choose_html_processing(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_html_processing(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_html_processing(situation):
+            table = {'visible-text': {'action': 'HTMLParser excluding script style', 'evidence': 'ordered text parts', 'risk': 'hidden content'}, 'links': {'action': 'parse href then urljoin', 'evidence': 'absolute URL and scheme', 'risk': 'unsafe scheme'}, 'render-user-html': {'action': 'use vetted sanitizer', 'evidence': 'allowed tags and attributes', 'risk': 'XSS'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.regex.regex_04.html-processing-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_04.html-processing-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_html_processing
+        cases:
+        - id: recalls-visible-text
+          arguments:
+          - value: visible-text
+          expectedReturn:
+            action: HTMLParser excluding script style
+            evidence: ordered text parts
+            risk: hidden content
+        - id: recalls-links
+          arguments:
+          - value: links
+          expectedReturn:
+            action: parse href then urljoin
+            evidence: absolute URL and scheme
+            risk: unsafe scheme
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

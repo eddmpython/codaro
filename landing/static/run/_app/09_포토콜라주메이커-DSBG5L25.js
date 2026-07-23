@@ -1,0 +1,846 @@
+var e=`meta:
+  packages:
+  - numpy
+  - pillow
+  - scikit-learn
+  id: pillow_09
+  title: 포토콜라주메이커
+  order: 9
+  category: pillow
+  difficulty: ⭐⭐⭐⭐
+  badge: 심화
+  tags:
+  - Pillow
+  - paste
+  - collage
+  - 합성
+  - resize
+  - 레이아웃
+  seo:
+    title: Pillow 심화 - 포토 콜라주 메이커
+    description: Pillow paste/resize로 여러 이미지를 격자 레이아웃에 배치한 콜라주를 만들고 좌표/크기를 정량 검증합니다.
+    keywords:
+    - Pillow
+    - 콜라주
+    - paste
+    - 이미지합성
+    - 레이아웃
+intro:
+  emoji: 🖼️
+  goal: 여러 이미지를 정확한 크기로 resize한 뒤 paste로 격자 위치에 배치해 콜라주를 만들고 각 셀 영역의 픽셀 평균으로 정확한 배치를 검증합니다.
+  description: 콜라주는 여러 사진을 한 캔버스에 배치하는 작업입니다. 셀 크기 계산, 정확한 resize, 좌표 기반 paste가 핵심입니다.
+  direction: 캔버스 생성 → 셀 크기 계산 → 이미지 resize → paste → 영역별 검증.
+  benefits:
+  - 캔버스를 격자로 나누는 셀 크기 계산을 손으로 짭니다.
+  - resize로 모든 셀 이미지를 동일 크기로 통일하는 흐름을 익힙니다.
+  - paste의 (x, y) 좌표가 좌상단 기준임을 확인합니다.
+  - makeCollage 함수로 N×M 격자 콜라주를 한 함수에 묶습니다.
+  diagram:
+    steps:
+    - label: 입력 이미지 준비
+      detail: flower/china 두 샘플을 Image로 변환.
+    - label: 캔버스 만들기
+      detail: Image.new로 콜라주 베이스 캔버스.
+    - label: 셀 크기 계산
+      detail: 캔버스 크기 ÷ 격자 크기 = 셀 크기.
+    - label: resize + paste
+      detail: 각 셀에 맞춰 resize하고 좌표 위치에 paste.
+    - label: 영역 검증
+      detail: 각 셀 위치 픽셀 평균으로 정확한 배치 확인.
+    runtime:
+    - label: pillow + numpy
+      detail: 영역 평균 계산은 NumPy로.
+    - label: paste는 in-place
+      detail: paste 호출은 캔버스를 직접 수정. 원본 보존에는 .copy() 필요.
+sections:
+- id: step1_images
+  title: 1단계. 콜라주 소재 이미지
+  structuredPrimary: true
+  subtitle: 두 sklearn 샘플
+  goal: flower와 china 두 이미지를 Image.fromarray로 변환하고 둘 다 같은 size를 가지는지 확인합니다.
+  why: 콜라주의 입력 이미지들은 보통 크기가 다릅니다. 같은 크기로 통일해야 격자 배치가 자연스럽습니다. 첫 셀에서 입력 size를 점검합니다.
+  explanation: |-
+    sklearn flower와 china는 우연히 같은 (640, 427) RGB 이미지입니다. 두 입력의 size가 같다는 것을 확인하면 이후 resize 단계가 단순해집니다.
+    실무에서는 크기가 다른 사진들이 입력으로 들어옵니다. 함수의 첫 단계에서 size를 정규화하는 게 표준 패턴입니다.
+  tips:
+  - 다양한 비율의 사진은 letterbox(공백 채우기)나 center crop으로 통일하는 게 일반적입니다.
+  - "Image.size는 (width, height) 순서. NumPy shape의 (height, width, channels)와 다름에 주의."
+  snippet: |-
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    flower = Image.fromarray(load_sample_image('flower.jpg'))
+    china = Image.fromarray(load_sample_image('china.jpg'))
+
+    {
+        'flowerSize': flower.size,
+        'chinaSize': china.size,
+        'sameSize': flower.size == china.size,
+    }
+  exercise:
+    prompt: 두 이미지의 mode가 모두 'RGB'인지 확인하세요.
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      flower = Image.fromarray(load_sample_image('flower.jpg'))
+      china = Image.fromarray(load_sample_image('china.jpg'))
+      {'sameMode': flower.mode == china.mode and flower.mode == '___'}
+    hints:
+    - RGB mode.
+    - 빈칸에는 RGB가 들어갑니다.
+    check:
+      noError: load 호출이 끝나야 합니다.
+      resultCheck: sameMode가 True여야 합니다.
+  check:
+    noError: load_sample_image와 fromarray가 끝나야 합니다.
+    resultCheck: sameSize가 True여야 합니다.
+- id: step2_canvas
+  title: 2단계. 콜라주 캔버스
+  structuredPrimary: true
+  subtitle: 격자 크기 결정
+  goal: 800×600 흰 캔버스를 만들고, 2×2 격자라면 각 셀이 400×300이 되는 계산을 명시적으로 짭니다.
+  why: 콜라주 캔버스는 N×M 격자로 나뉩니다. 셀 크기 = 캔버스 크기 ÷ 격자 크기. 이 계산을 정확히 해야 셀이 캔버스를 빈틈없이 채웁니다.
+  explanation: |-
+    Image.new('RGB', (canvasWidth, canvasHeight), color='white')로 흰 캔버스를 만듭니다.
+    셀 크기 = (canvasWidth // gridCols, canvasHeight // gridRows). 격자가 2×2면 셀 크기는 캔버스의 절반.
+    캔버스 크기가 격자로 나누어떨어지지 않으면 일부 픽셀이 남습니다. 정확한 격자를 위해 (gridRows × cellHeight, gridCols × cellWidth)로 캔버스 크기를 역산하는 게 안전합니다.
+  tips:
+  - 셀 사이에 간격(padding)을 두려면 셀 크기를 약간 줄이고 paste 위치를 조정합니다.
+  - 격자 안에서 셀별로 다른 비율이 필요하면 격자 외에 명시적 셀 좌표가 필요합니다.
+  snippet: |-
+    from PIL import Image
+
+    canvasWidth = 800
+    canvasHeight = 600
+    gridRows = 2
+    gridCols = 2
+
+    canvas = Image.new('RGB', (canvasWidth, canvasHeight), color='white')
+    cellWidth = canvasWidth // gridCols
+    cellHeight = canvasHeight // gridRows
+
+    {
+        'canvasSize': canvas.size,
+        'gridShape': (gridRows, gridCols),
+        'cellSize': (cellWidth, cellHeight),
+        'fillsExactly': gridRows * cellHeight == canvasHeight and gridCols * cellWidth == canvasWidth,
+    }
+  exercise:
+    prompt: 3×3 격자로 (900, 600) 캔버스를 만들면 셀 크기가 (300, 200)인지 확인하세요.
+    starterCode: |-
+      from PIL import Image
+
+      threeCanvas = Image.new('RGB', (900, 600), color='white')
+      threeCellWidth = 900 // ___
+      threeCellHeight = 600 // 3
+      {'cellSize': (threeCellWidth, threeCellHeight), 'isCorrect': (threeCellWidth, threeCellHeight) == (300, 200)}
+    hints:
+    - 격자 열 수 3.
+    - 빈칸에는 3이 들어갑니다.
+    check:
+      noError: Image.new 호출이 끝나야 합니다.
+      resultCheck: isCorrect가 True여야 합니다.
+  check:
+    noError: Image.new와 계산이 끝나야 합니다.
+    resultCheck: cellSize가 (400, 300), fillsExactly가 True여야 합니다.
+- id: step3_resize
+  title: 3단계. 셀 크기에 맞춰 resize
+  structuredPrimary: true
+  subtitle: 모든 입력을 같은 크기로
+  goal: flower와 china를 cellWidth×cellHeight로 resize하고 결과가 모두 같은 size인지 확인합니다.
+  why: paste 호출 시 셀 크기보다 큰 이미지는 넘쳐서 다른 셀을 덮습니다. 정확한 셀 크기로 resize해야 격자가 깔끔합니다.
+  explanation: |-
+    Image.resize((width, height))는 정확한 크기로 변환합니다. 비율을 무시하므로 입력 비율이 셀 비율과 다르면 약간 왜곡됩니다.
+    비율 유지 + 정확 크기가 필요하면 ImageOps.fit 같은 헬퍼를 씁니다. 본 예제는 단순화를 위해 직접 resize를 사용합니다.
+    검증은 모든 셀 이미지의 size가 (cellWidth, cellHeight)와 같은지로 합니다.
+  tips:
+  - ImageOps.fit(image, size)는 비율 유지 + 중앙 crop을 자동으로 해 줘 콜라주에 적합합니다.
+  - resize 인자는 (width, height) 순서. cellWidth가 먼저 옵니다.
+  snippet: |-
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    canvasWidth, canvasHeight = 800, 600
+    gridRows, gridCols = 2, 2
+    cellWidth = canvasWidth // gridCols
+    cellHeight = canvasHeight // gridRows
+
+    flower = Image.fromarray(load_sample_image('flower.jpg'))
+    china = Image.fromarray(load_sample_image('china.jpg'))
+
+    flowerCell = flower.resize((cellWidth, cellHeight))
+    chinaCell = china.resize((cellWidth, cellHeight))
+
+    {
+        'cellSize': (cellWidth, cellHeight),
+        'flowerCellSize': flowerCell.size,
+        'chinaCellSize': chinaCell.size,
+        'allMatch': flowerCell.size == (cellWidth, cellHeight) == chinaCell.size,
+    }
+  exercise:
+    prompt: cell 크기를 (200, 150)으로 작게 잡아 resize하고 결과 size가 정확한지 확인하세요.
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      smallFlower = Image.fromarray(load_sample_image('flower.jpg')).resize((200, ___))
+      {'size': smallFlower.size, 'isExact': smallFlower.size == (200, 150)}
+    hints:
+    - cell 높이 150.
+    - 빈칸에는 150이 들어갑니다.
+    check:
+      noError: resize 호출이 끝나야 합니다.
+      resultCheck: isExact가 True여야 합니다.
+  check:
+    noError: resize 두 호출이 끝나야 합니다.
+    resultCheck: allMatch가 True여야 합니다.
+- id: step4_paste
+  title: 4단계. paste로 격자 배치
+  structuredPrimary: true
+  subtitle: 4개 셀에 이미지 붙이기
+  goal: 2×2 격자의 4개 셀에 (flower, china, china, flower) 순서로 이미지를 paste하고 각 셀 영역의 평균이 입력 이미지의 평균에 가까운지 확인합니다.
+  why: paste의 (x, y) 좌표가 좌상단 기준임을 한 번 명확히 해 두면 더 큰 격자에서도 좌표 계산이 자연스럽습니다.
+  explanation: |-
+    canvas.paste(image, (x, y))는 image의 좌상단을 (x, y) 위치에 놓고 붙입니다. image의 size만큼 영역이 덮입니다.
+    2×2 격자에서 좌표는 (0, 0), (cellWidth, 0), (0, cellHeight), (cellWidth, cellHeight) 네 위치입니다.
+    검증은 각 셀 영역 (y:y+cellHeight, x:x+cellWidth)의 평균 픽셀이 원본 이미지의 평균과 비슷한지로 합니다.
+  tips:
+  - paste는 in-place로 동작. canvas.copy()를 먼저 만들면 안전합니다.
+  - paste에 mask 인자를 주면 알파 합성. 본 예제는 단순 덮어쓰기.
+  snippet: |-
+    import numpy as np
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+    canvasWidth, canvasHeight = 800, 600
+    cellWidth = canvasWidth // 2
+    cellHeight = canvasHeight // 2
+
+    flower = Image.fromarray(load_sample_image('flower.jpg'))
+    china = Image.fromarray(load_sample_image('china.jpg'))
+    flowerCell = flower.resize((cellWidth, cellHeight))
+    chinaCell = china.resize((cellWidth, cellHeight))
+
+    canvas = Image.new('RGB', (canvasWidth, canvasHeight), color='white')
+    canvas.paste(flowerCell, (0, 0))
+    canvas.paste(chinaCell, (cellWidth, 0))
+    canvas.paste(chinaCell, (0, cellHeight))
+    canvas.paste(flowerCell, (cellWidth, cellHeight))
+
+    arr = np.asarray(canvas)
+    topLeftMean = float(arr[0:cellHeight, 0:cellWidth].mean())
+    bottomRightMean = float(arr[cellHeight:, cellWidth:].mean())
+    flowerMean = float(np.asarray(flowerCell).mean())
+
+    {
+        'canvasSize': canvas.size,
+        'topLeftMean': round(topLeftMean, 2),
+        'bottomRightMean': round(bottomRightMean, 2),
+        'flowerMean': round(flowerMean, 2),
+        'topLeftMatchesFlower': abs(topLeftMean - flowerMean) < 5,
+    }
+  exercise:
+    prompt: 4개 셀 모두에 flowerCell을 paste해 4개 영역의 평균이 모두 flowerMean과 비슷한지 확인하세요.
+    starterCode: |-
+      import numpy as np
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      canvasWidth, canvasHeight = 800, 600
+      cellWidth = canvasWidth // 2
+      cellHeight = canvasHeight // 2
+
+      flower = Image.fromarray(load_sample_image('flower.jpg')).resize((cellWidth, cellHeight))
+      uniformCanvas = Image.new('RGB', (canvasWidth, canvasHeight), color='white')
+      for x in [0, cellWidth]:
+          for y in [0, ___]:
+              uniformCanvas.paste(flower, (x, y))
+
+      arr = np.asarray(uniformCanvas)
+      flowerMean = float(np.asarray(flower).mean())
+      diff = abs(float(arr.mean()) - flowerMean)
+      {'diff': round(diff, 2), 'isUniform': diff < 2}
+    hints:
+    - 두 번째 y 좌표 cellHeight.
+    - 빈칸에는 cellHeight가 들어갑니다.
+    check:
+      noError: paste 호출이 끝나야 합니다.
+      resultCheck: isUniform이 True여야 합니다.
+  check:
+    noError: paste 네 호출이 끝나야 합니다.
+    resultCheck: topLeftMatchesFlower가 True여야 합니다.
+- id: step5_makecollage
+  title: 5단계. makeCollage 함수
+  structuredPrimary: true
+  subtitle: N×M 격자 일반화
+  goal: makeCollage(images, gridShape, canvasSize) 함수가 임의 격자 크기에 이미지들을 자동 배치하도록 만들고 결과 size가 의도한 캔버스 크기인지 확인합니다.
+  why: 콜라주 함수를 일반화하면 2×2 외에도 3×3, 4×2 같은 다양한 레이아웃을 같은 함수로 다룰 수 있습니다. 자동화의 표준 도구.
+  explanation: |-
+    makeCollage는 images 리스트와 gridShape (rows, cols)을 받아 자동으로 셀 크기를 계산하고 이미지를 차례로 배치합니다.
+    images 길이는 rows × cols여야 합니다. 부족하면 일부 셀이 빈 채로, 많으면 초과분은 무시.
+    셀 인덱스 i에서 row = i // cols, col = i % cols, 좌표는 (col × cellWidth, row × cellHeight).
+  tips:
+  - 함수가 부족한 이미지 입력에 RuntimeError를 던지면 자동화 호출자가 즉시 알 수 있습니다.
+  - 셀 간 padding을 인자로 받으면 더 다양한 레이아웃이 가능합니다.
+  snippet: |-
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+
+    def makeCollage(images: list, gridShape: tuple, canvasSize: tuple) -> Image.Image:
+        rows, cols = gridShape
+        canvasWidth, canvasHeight = canvasSize
+        cellWidth = canvasWidth // cols
+        cellHeight = canvasHeight // rows
+        canvas = Image.new('RGB', canvasSize, color='white')
+        for i, img in enumerate(images):
+            if i >= rows * cols:
+                break
+            r, c = i // cols, i % cols
+            resized = img.resize((cellWidth, cellHeight))
+            canvas.paste(resized, (c * cellWidth, r * cellHeight))
+        return canvas
+
+
+    flower = Image.fromarray(load_sample_image('flower.jpg'))
+    china = Image.fromarray(load_sample_image('china.jpg'))
+
+    collage22 = makeCollage([flower, china, china, flower], (2, 2), (800, 600))
+    collage33 = makeCollage([flower] * 9, (3, 3), (900, 600))
+
+    {
+        'collage22Size': collage22.size,
+        'collage33Size': collage33.size,
+        'isCorrect22': collage22.size == (800, 600),
+        'isCorrect33': collage33.size == (900, 600),
+    }
+  exercise:
+    prompt: makeCollage로 1×3 가로 격자 콜라주를 (900, 300) 캔버스로 만들고 셀 너비가 300인지 확인하세요.
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+
+      def makeCollage(images, gridShape, canvasSize):
+          rows, cols = gridShape
+          canvasWidth, canvasHeight = canvasSize
+          cellWidth = canvasWidth // cols
+          cellHeight = canvasHeight // rows
+          canvas = Image.new('RGB', canvasSize, color='white')
+          for i, img in enumerate(images):
+              if i >= rows * cols:
+                  break
+              r, c = i // cols, i % cols
+              canvas.paste(img.resize((cellWidth, cellHeight)), (c * cellWidth, r * cellHeight))
+          return canvas
+
+
+      flower = Image.fromarray(load_sample_image('flower.jpg'))
+      banner = makeCollage([flower, flower, flower], (1, ___), (900, 300))
+      {'size': banner.size, 'isBanner': banner.size == (900, 300)}
+    hints:
+    - 가로 격자 열 수 3.
+    - 빈칸에는 3이 들어갑니다.
+    check:
+      noError: makeCollage 호출이 끝나야 합니다.
+      resultCheck: isBanner가 True여야 합니다.
+  check:
+    noError: makeCollage 정의와 두 호출이 끝나야 합니다.
+    resultCheck: isCorrect22와 isCorrect33 모두 True여야 합니다.
+- id: practice
+  title: 실습 - 영역 평균 검증
+  structuredPrimary: true
+  subtitle: 셀별 통계 분리
+  goal: 2×2 콜라주의 4개 셀 영역 평균을 NumPy 슬라이싱으로 측정해 각 셀이 의도한 이미지인지 확인하는 검증 함수를 만듭니다.
+  why: 셀 영역 통계는 콜라주가 정확히 배치됐는지의 직관적 검증 도구입니다. 자동화에서 회귀 테스트로 활용 가능합니다.
+  explanation: |-
+    arr[y1:y2, x1:x2].mean()으로 영역 평균을 계산합니다. 2×2 콜라주의 네 영역은 (0:cellH, 0:cellW), (0:cellH, cellW:), (cellH:, 0:cellW), (cellH:, cellW:).
+    각 영역의 평균을 dict로 정리하면 어느 셀에 어떤 이미지가 들어갔는지 확인 가능합니다.
+    같은 이미지를 모든 셀에 paste하면 네 영역 평균이 거의 동일해야 합니다.
+  tips:
+  - "NumPy 슬라이싱은 [y1:y2, x1:x2] 순서. Pillow의 (x, y)와 반대."
+  - 영역 평균은 회귀 테스트로 활용. 콜라주 알고리즘 변경 후 다른 결과가 나오면 회귀.
+  snippet: |-
+    import numpy as np
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+
+    def cellMeans(canvas: Image.Image, gridShape: tuple) -> list:
+        arr = np.asarray(canvas)
+        rows, cols = gridShape
+        canvasWidth, canvasHeight = canvas.size
+        cellWidth = canvasWidth // cols
+        cellHeight = canvasHeight // rows
+        means = []
+        for r in range(rows):
+            for c in range(cols):
+                region = arr[r * cellHeight:(r + 1) * cellHeight, c * cellWidth:(c + 1) * cellWidth]
+                means.append(round(float(region.mean()), 2))
+        return means
+
+
+    flower = Image.fromarray(load_sample_image('flower.jpg'))
+    canvas = Image.new('RGB', (800, 600), color='white')
+    for r in range(2):
+        for c in range(2):
+            canvas.paste(flower.resize((400, 300)), (c * 400, r * 300))
+
+    means = cellMeans(canvas, (2, 2))
+    {
+        'cellCount': len(means),
+        'means': means,
+        'allClose': max(means) - min(means) < 2,
+    }
+  exercise:
+    prompt: 같은 함수를 3×3 격자에 적용해 9개 셀 평균을 측정하세요.
+    starterCode: |-
+      import numpy as np
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+
+      def cellMeans(canvas, gridShape):
+          arr = np.asarray(canvas)
+          rows, cols = gridShape
+          canvasWidth, canvasHeight = canvas.size
+          cellWidth = canvasWidth // cols
+          cellHeight = canvasHeight // rows
+          means = []
+          for r in range(rows):
+              for c in range(cols):
+                  region = arr[r * cellHeight:(r + 1) * cellHeight, c * cellWidth:(c + 1) * cellWidth]
+                  means.append(round(float(region.mean()), 2))
+          return means
+
+
+      flower = Image.fromarray(load_sample_image('flower.jpg'))
+      canvas33 = Image.new('RGB', (900, 600), color='white')
+      cellW33 = 900 // 3
+      cellH33 = 600 // ___
+      for r in range(3):
+          for c in range(3):
+              canvas33.paste(flower.resize((cellW33, cellH33)), (c * cellW33, r * cellH33))
+
+      means33 = cellMeans(canvas33, (3, 3))
+      {'count': len(means33), 'isNine': len(means33) == 9}
+    hints:
+    - 격자 행 수 3.
+    - 빈칸에는 3이 들어갑니다.
+    check:
+      noError: cellMeans와 paste가 끝나야 합니다.
+      resultCheck: isNine이 True여야 합니다.
+  check:
+    noError: cellMeans 정의와 호출이 끝나야 합니다.
+    resultCheck: cellCount가 4이고 allClose가 True여야 합니다.
+- id: workflow_validation
+  title: 6단계. 격자 일관성 가드
+  structuredPrimary: true
+  subtitle: 이미지 수와 격자 일치 검증
+  goal: validateCollageInput 함수가 이미지 수와 격자 크기의 곱이 일치하는지 검증하고, 정상 입력에서 결과 크기가 캔버스와 같은지 확인합니다.
+  why: makeCollage에 부족하거나 많은 이미지를 넘기면 일부 셀이 비거나 무시됩니다. 함수 입구에서 검증하면 자동화 사고를 막을 수 있습니다.
+  explanation: |-
+    validateCollageInput은 (1) gridShape이 길이 2 tuple, (2) len(images) == rows × cols 두 조건을 검사합니다.
+    잘못된 입력이면 ValueError에 실제 이미지 수와 격자 크기를 메시지에 포함시켜 호출자가 즉시 원인을 알 수 있게 합니다.
+  tips:
+  - 정상 입력에 collage size가 캔버스 size와 일치하는지를 회귀 테스트로 둡니다.
+  - 결과 크기는 항상 캔버스 크기와 같습니다. 다르면 makeCollage에 버그.
+  snippet: |-
+    from PIL import Image
+    from sklearn.datasets import load_sample_image
+
+
+    def validateCollageInput(images: list, gridShape: tuple) -> bool:
+        if len(gridShape) != 2:
+            raise ValueError(f"gridShape는 (rows, cols) 2-tuple이어야 합니다: {gridShape}")
+        rows, cols = gridShape
+        if len(images) != rows * cols:
+            raise ValueError(f"이미지 수({len(images)})와 격자 크기({rows*cols}) 불일치")
+        return True
+
+
+    flower = Image.fromarray(load_sample_image('flower.jpg'))
+    china = Image.fromarray(load_sample_image('china.jpg'))
+
+    okResult = validateCollageInput([flower, china, china, flower], (2, 2))
+
+    try:
+        validateCollageInput([flower, china], (2, 2))
+        shortMessage = 'unexpected pass'
+    except ValueError as exc:
+        shortMessage = str(exc)
+
+    try:
+        validateCollageInput([flower] * 4, (2, 2, 1))
+        wrongShapeMessage = 'unexpected pass'
+    except ValueError as exc:
+        wrongShapeMessage = str(exc)
+
+    {
+        'okResult': okResult,
+        'shortMessage': shortMessage,
+        'wrongShapeMessage': wrongShapeMessage,
+    }
+  exercise:
+    prompt: validateCollageInput에 5개 이미지와 (2, 2) 격자를 넘기면 길이 불일치 오류가 잡히는지 확인하세요.
+    starterCode: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+
+      def validateCollageInput(images, gridShape):
+          if len(gridShape) != 2:
+              raise ValueError(f"gridShape는 (rows, cols) 2-tuple이어야 합니다: {gridShape}")
+          rows, cols = gridShape
+          if len(images) != rows * cols:
+              raise ValueError(f"이미지 수({len(images)})와 격자 크기({rows*cols}) 불일치")
+          return True
+
+
+      img = Image.fromarray(load_sample_image('flower.jpg'))
+      try:
+          validateCollageInput([img] * ___, (2, 2))
+          msg = 'unexpected pass'
+      except ValueError as exc:
+          msg = str(exc)
+
+      {'msg': msg, 'hasMismatch': '불일치' in msg}
+    hints:
+    - 5개 이미지를 만듭니다.
+    - 빈칸에는 5가 들어갑니다.
+    check:
+      noError: validateCollageInput 정의가 끝나야 합니다.
+      resultCheck: hasMismatch가 True여야 합니다.
+  check:
+    noError: validateCollageInput과 호출들이 끝나야 합니다.
+    resultCheck: okResult가 True이고 shortMessage에 '불일치', wrongShapeMessage에 '2-tuple' 단서가 포함되어야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pillow_09-photo_collage-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_images
+    - workflow_validation
+    title: 포토 콜라주 메이커 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 입력 수·column·gap·cell size 계약을 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_photo_collage_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_photo_collage_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_photo_collage_contract(value):
+            required = ['imageCount', 'columns', 'gap', 'cellSize']
+            rules = [{'id': 'image-count', 'field': 'imageCount', 'kind': 'range', 'min': 1, 'max': 100}, {'id': 'columns', 'field': 'columns', 'kind': 'range', 'min': 1, 'max': 10}, {'id': 'gap', 'field': 'gap', 'kind': 'range', 'min': 0, 'max': 100}, {'id': 'cell-size', 'field': 'cellSize', 'kind': 'length', 'value': 2}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'photo_collage', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.pillow.pillow_09.photo_collage-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pillow.pillow_09.photo_collage-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_photo_collage_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              imageCount: 6
+              columns: 3
+              gap: 12
+              cellSize:
+              - 320
+              - 240
+          expectedReturn:
+            accepted: true
+            topic: photo_collage
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              columns: 3
+              gap: 12
+              cellSize:
+              - 320
+              - 240
+          expectedReturn:
+            accepted: false
+            topic: photo_collage
+            missing:
+            - imageCount
+            violations:
+            - image-count
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              imageCount: 0
+              columns: 20
+              gap: -1
+              cellSize:
+              - 320
+          expectedReturn:
+            accepted: false
+            topic: photo_collage
+            missing: []
+            violations:
+            - cell-size
+            - columns
+            - gap
+            - image-count
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pillow_09-photo_collage-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pillow_09-photo_collage-contract-audit-mastery
+    title: 포토 콜라주 메이커 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_photo_collage_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_photo_collage_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_photo_collage_result(expected, observed):
+            identity = ['sourceSetHash', 'layoutHash']
+            metrics = {'placedCount': 0}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'photo_collage', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.pillow.pillow_09.photo_collage-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pillow.pillow_09.photo_collage-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_photo_collage_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              sourceSetHash: set1
+              layoutHash: 3x2
+              placedCount: 6
+          - value:
+              sourceSetHash: set1
+              layoutHash: 3x2
+              placedCount: 6
+          expectedReturn:
+            passed: true
+            topic: photo_collage
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              sourceSetHash: set1
+              layoutHash: 3x2
+              placedCount: 6
+          - value:
+              sourceSetHash: set2
+              layoutHash: 2x2
+              placedCount: 4
+          expectedReturn:
+            passed: false
+            topic: photo_collage
+            missing: []
+            identityMismatch:
+            - layoutHash
+            - sourceSetHash
+            metricDrift:
+            - placedCount
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              sourceSetHash: set1
+              layoutHash: 3x2
+              placedCount: 6
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: photo_collage
+            missing:
+            - layoutHash
+            - placedCount
+            - sourceSetHash
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pillow_09-photo_collage-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pillow_09-photo_collage-result-reconciliation-transfer
+    title: 포토 콜라주 메이커 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_photo_collage_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_photo_collage_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_photo_collage_evidence(stage):
+            stages = {'source': {'action': 'admit collage source', 'evidence': 'source set and grid', 'risk': 'unsafe or misread image'}, 'edit': {'action': 'apply bounded collage edit', 'evidence': 'fit-and-place trace', 'risk': 'quality or geometry loss'}, 'artifact': {'action': 'reopen collage artifact', 'evidence': 'placement count and canvas', 'risk': 'corrupt or visually wrong output'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.pillow.pillow_09.photo_collage-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pillow.pillow_09.photo_collage-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_photo_collage_evidence
+        cases:
+        - id: recalls-source
+          arguments:
+          - value: source
+          expectedReturn:
+            action: admit collage source
+            evidence: source set and grid
+            risk: unsafe or misread image
+        - id: recalls-edit
+          arguments:
+          - value: edit
+          expectedReturn:
+            action: apply bounded collage edit
+            evidence: fit-and-place trace
+            risk: quality or geometry loss
+        - id: recalls-artifact
+          arguments:
+          - value: artifact
+          expectedReturn:
+            action: reopen collage artifact
+            evidence: placement count and canvas
+            risk: corrupt or visually wrong output
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

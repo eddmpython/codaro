@@ -1,0 +1,802 @@
+var e=`meta:
+  packages:
+  - numpy
+  - pandas
+  id: numpy_05
+  title: BMI계산기
+  order: 5
+  category: numpy
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - numpy
+  - broadcasting
+  - vectorization
+  - where
+  - digitize
+  - 검증
+  - 벡터화
+  seo:
+    title: NumPy 브로드캐스팅 - BMI 계산기
+    description: NumPy의 브로드캐스팅과 벡터 연산을 배우며 160명의 키/몸무게 데이터로 BMI를 계산합니다.
+    keywords:
+    - numpy
+    - 브로드캐스팅
+    - 벡터화
+    - BMI
+    - broadcasting
+intro:
+  emoji: ⚖️
+  goal: 160명의 키/몸무게 데이터로 BMI를 계산합니다.
+  description: 브로드캐스팅을 활용한 벡터 연산으로 반복문 없이 대량의 데이터를 빠르게 처리하는 방법을 배웁니다.
+  direction: BMI계산기에서 배열 입력을 만들고 벡터 연산 결과를 수치로 검증합니다.
+  benefits:
+  - 배열 입력 확인 후 벡터화 계산에 맞는 코드 입력을 고릅니다.
+  - BMI계산기 결과를 shape와 수치 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 계산 파이프라인에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(배열 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 로드 처리 실행
+      detail: 벡터화 계산 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 데이터 구조 확인 결과 검증
+      detail: shape와 수치 결과 기준으로 실행 결과를 비교합니다.
+    - label: BMI계산기 재사용
+      detail: 완성 코드를 계산 파이프라인에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 배열 계산 환경
+      detail: numpy, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: BMI계산기 실행
+      detail: 셀을 실행해 shape와 수치 결과와 예외 상태를 확인합니다.
+    - label: BMI계산기 완료
+      detail: 검증된 코드를 계산 파이프라인로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: NumPy와 pandas를 불러옵니다. pandas는 CSV 로딩용으로만 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import numpy as np
+    import pandas as pd
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: |-
+      import numpy as np
+      import pandas as pd
+    hints:
+    - 바꿀 지점은 배열 입력을 만드는 첫 줄과 벡터화 계산 줄에서 찾으세요.
+    - 실행 뒤 shape와 수치 결과 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 shape와 수치 결과 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step2_data
+  title: 2단계. 데이터 로드
+  structuredPrimary: true
+  subtitle: 키/몸무게 데이터
+  goal: 2단계. 데이터 로드에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 160명의 키와 몸무게 데이터를 로드합니다. 데이터가 미국 단위로 되어 있어서 키는 인치(inch, 1인치=2.54cm), 몸무게는 파운드(pound,
+    1파운드=0.45kg)입니다. 나중에 우리가 익숙한 미터와 킬로그램으로 변환할 예정입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from codaro.curriculum.localData import loadLocalDataset
+
+    df = loadLocalDataset("weight_height")
+    df.head()
+  exercise:
+    prompt: 2단계. 데이터 로드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      df = loadLocalDataset("weight_height")
+      df.head()
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 로드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 로드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_shape
+  title: 3단계. 데이터 구조 확인
+  structuredPrimary: true
+  subtitle: shape
+  goal: 3단계. 데이터 구조 확인에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  explanation: 데이터의 크기를 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: df.shape
+  exercise:
+    prompt: 3단계. 데이터 구조 확인 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    starterCode: df.shape
+    hints:
+    - 바꿀 지점은 배열 입력을 만드는 첫 줄과 벡터화 계산 줄에서 찾으세요.
+    - 실행 뒤 shape와 수치 결과 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 데이터 구조 확인의 수정 코드가 벡터화 계산 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 3단계. 데이터 구조 확인 실행 결과가 shape와 수치 결과 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step4_extract
+  title: 4단계. 배열 추출
+  structuredPrimary: true
+  subtitle: Height, Weight
+  goal: 4단계. 배열 추출에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 키(인치)와 몸무게(파운드) 데이터를 NumPy 배열로 추출합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    inch = df['Height'].values
+    lbs = df['Weight'].values
+    inch[:10]
+  exercise:
+    prompt: 4단계. 배열 추출 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      inch = df['Height'].values
+      lbs = df['Weight'].values
+      inch[:10]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 배열 추출에서 \`inch\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 4단계. 배열 추출 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step5_convert_height
+  title: 5단계. 키 단위 변환
+  structuredPrimary: true
+  subtitle: 인치 → 미터
+  goal: 5단계. 키 단위 변환에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    브로드캐스팅(Broadcasting)은 NumPy의 핵심 기능입니다. 배열에 하나의 숫자(스칼라)를 곱하면, NumPy가 자동으로 배열의 모든 요소에 그 연산을 적용합니다. inch * 0.0254 한 줄로 160개 값 모두가 인치에서 미터로 변환됩니다. for문을 쓸 필요가 없습니다.
+
+    NumPy 배열에 스칼라 값을 곱하면 모든 요소에 자동으로 연산이 적용됩니다. 이것이 브로드캐스팅의 가장 기본적인 형태입니다.
+  snippet: |-
+    meter = inch * 0.0254
+    meter[:10]
+  exercise:
+    prompt: 5단계. 키 단위 변환 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      meter = inch * 0.0254
+      meter[:10]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 키 단위 변환에서 \`meter\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 키 단위 변환 실행 뒤 \`meter\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step6_convert_weight
+  title: 6단계. 몸무게 단위 변환
+  structuredPrimary: true
+  subtitle: 파운드 → 킬로그램
+  goal: 6단계. 몸무게 단위 변환에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 몸무게를 파운드에서 킬로그램으로 변환합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    kg = lbs * 0.453592
+    kg[:10]
+  exercise:
+    prompt: 6단계. 몸무게 단위 변환 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      kg = lbs * 0.453592
+      kg[:10]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 몸무게 단위 변환에서 \`kg\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 몸무게 단위 변환 실행 뒤 \`kg\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step7_bmi
+  title: 7단계. BMI 계산
+  structuredPrimary: true
+  subtitle: 벡터 연산
+  goal: 7단계. BMI 계산에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    BMI(Body Mass Index, 체질량지수)는 비만도를 측정하는 지표입니다. 공식은 체중(kg) ÷ 키(m)²입니다. NumPy에서는 배열끼리의 연산도 요소별로 자동 적용됩니다. kg 배열과 meter 배열의 같은 위치 값들끼리 계산되어 160명의 BMI가 한 번에 계산됩니다. 이를 벡터 연산(vectorization)이라 합니다.
+
+    배열 간 연산도 요소별로 자동 적용됩니다. kg / meter ** 2는 각 사람의 BMI를 한 번에 계산합니다.
+  snippet: |-
+    bmi = kg / (meter ** 2)
+    bmi[:10]
+  exercise:
+    prompt: 7단계. BMI 계산 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      bmi = kg / (meter ** 2)
+      bmi[:10]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. BMI 계산에서 \`bmi\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. BMI 계산 실행 뒤 \`bmi\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step8_stats
+  title: 8단계. BMI 통계
+  structuredPrimary: true
+  subtitle: 기본 통계량
+  goal: 8단계. BMI 통계에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 배열 계산은 반복문 없이 많은 값을 빠르게 처리하는 분석 코드의 바탕입니다.
+  explanation: BMI의 평균, 최소, 최대, 표준편차를 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: 'f"평균: {np.mean(bmi):.2f}, 최소: {np.min(bmi):.2f}, 최대: {np.max(bmi):.2f}, 표준편차: {np.std(bmi):.2f}"'
+  exercise:
+    prompt: 8단계. BMI 통계 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.
+    starterCode: 'f"평균: {np.mean(bmi):.2f}, 최소: {np.min(bmi):.2f}, 최대: {np.max(bmi):.2f}, 표준편차: {np.std(bmi):.2f}"'
+    hints:
+    - 바꿀 지점은 배열 입력을 만드는 첫 줄과 벡터화 계산 줄에서 찾으세요.
+    - 실행 뒤 shape와 수치 결과 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. BMI 통계의 수정 코드가 벡터화 계산 단계의 마지막 확인 값까지 도달해야 합니다.
+    resultCheck: 8단계. BMI 통계 실행 결과가 shape와 수치 결과 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step9_category
+  title: 9단계. BMI 분류
+  structuredPrimary: true
+  subtitle: 중첩 where
+  goal: 9단계. BMI 분류에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 세계보건기구(WHO) 기준으로 BMI를 분류합니다. 18.5 미만은 저체중(Underweight), 18.5~25는 정상(Normal), 25~30은 과체중(Overweight),
+    30 이상은 비만(Obese)입니다. np.where를 중첩하면 4개 이상의 카테고리로 분류할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    category = np.where(bmi < 18.5, 'Underweight',
+               np.where(bmi < 25, 'Normal',
+               np.where(bmi < 30, 'Overweight', 'Obese')))
+    category[:10]
+  exercise:
+    prompt: 9단계. BMI 분류 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      category = np.where(bmi < 18.5, 'Underweight',
+                 np.where(bmi < 25, 'Normal',
+                 np.where(bmi < 30, 'Overweight', 'Obese')))
+      category[:10]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. BMI 분류에서 \`category\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 9단계. BMI 분류 실행 뒤 \`category\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step10_count
+  title: 10단계. 카테고리별 집계
+  structuredPrimary: true
+  subtitle: np.unique()
+  goal: 10단계. 카테고리별 집계에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 각 카테고리별 인원수와 비율을 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    labels, counts = np.unique(category, return_counts=True)
+    pd.DataFrame({'Category': labels, 'Count': counts, 'Ratio': np.round(counts / len(bmi) * 100, 1)})
+  exercise:
+    prompt: 10단계. 카테고리별 집계 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      labels, counts = np.unique(category, return_counts=True)
+      pd.DataFrame({'Category': labels, 'Count': counts, 'Ratio': np.round(counts / len(bmi) * 100, 1)})
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 카테고리별 집계의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 10단계. 카테고리별 집계 실행 결과가 shape와 수치 결과 기준으로 바꾼 열 이름이나 행 값을 반영해야 합니다.
+- id: step11_gender
+  title: 11단계. 성별 데이터 추출
+  structuredPrimary: true
+  subtitle: Gender
+  goal: 11단계. 성별 데이터 추출에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 성별 데이터를 추출하여 남녀별 분석을 준비합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    sex = df['Gender'].values
+    sex[:10]
+  exercise:
+    prompt: 11단계. 성별 데이터 추출 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      sex = df['Gender'].values
+      sex[:10]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 성별 데이터 추출에서 \`sex\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 11단계. 성별 데이터 추출 실행 뒤 \`sex\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step12_gender_bmi
+  title: 12단계. 성별 BMI 비교
+  structuredPrimary: true
+  subtitle: 불리언 마스크
+  goal: 12단계. 성별 BMI 비교에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 불리언 마스크를 활용해 남녀 데이터를 분리합니다. sex == 'Male'은 남성이면 True, 아니면 False인 배열을 만듭니다. 이 True/False
+    배열로 bmi[male]처럼 인덱싱하면 남성의 BMI만 추출됩니다. 성별에 따른 BMI 차이를 쉽게 비교할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    male = sex == 'Male'
+    female = sex == 'Female'
+    m = bmi[male]
+    f_ = bmi[female]
+    f"남성 평균 BMI: {np.mean(m):.2f}, 여성 평균 BMI: {np.mean(f_):.2f}"
+  exercise:
+    prompt: 12단계. 성별 BMI 비교 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      male = sex == 'Male'
+      female = sex == 'Female'
+      m = bmi[male]
+      f_ = bmi[female]
+      f"남성 평균 BMI: {np.mean(m):.2f}, 여성 평균 BMI: {np.mean(f_):.2f}"
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 12단계. 성별 BMI 비교에서 \`male\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 12단계. 성별 BMI 비교 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step13_gender_stats
+  title: 13단계. 성별 종합 통계
+  structuredPrimary: true
+  subtitle: DataFrame 정리
+  goal: 13단계. 성별 종합 통계에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 성별에 따른 키, 몸무게, BMI 차이를 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    pd.DataFrame({
+        'Gender': ['Male', 'Female'],
+        'Height(cm)': [np.mean(meter[male]) * 100, np.mean(meter[female]) * 100],
+        'Weight(kg)': [np.mean(kg[male]), np.mean(kg[female])],
+        'BMI': [np.mean(m), np.mean(f_)]
+    }).round(2)
+  exercise:
+    prompt: 13단계. 성별 종합 통계 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      pd.DataFrame({
+          'Gender': ['Male', 'Female'],
+          'Height(cm)': [np.mean(meter[male]) * 100, np.mean(meter[female]) * 100],
+          'Weight(kg)': [np.mean(kg[male]), np.mean(kg[female])],
+          'BMI': [np.mean(m), np.mean(f_)]
+      }).round(2)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 13단계. 성별 종합 통계의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 13단계. 성별 종합 통계 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.
+- id: step14_digitize
+  title: 14단계. 키 구간화
+  structuredPrimary: true
+  subtitle: np.digitize()
+  goal: 14단계. 키 구간화에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    np.digitize()는 연속적인 숫자 데이터를 구간(bin)으로 나눕니다. 예를 들어 bins=[150, 155, 160]이면 150 미만은 0, 150~155는 1, 155~160은 2, 160 이상은 3으로 분류됩니다. 키 데이터를 5cm 단위로 그룹화하면 구간별 분석이 가능해집니다.
+
+    np.digitize(arr, bins)는 배열의 각 값이 bins의 어느 구간에 속하는지 인덱스로 반환합니다. 데이터를 구간별로 그룹화할 때 유용합니다.
+  snippet: |-
+    cm = meter * 100
+    bins = np.arange(150, 200, 5)
+    groups = np.digitize(cm, bins)
+    np.unique(groups)
+  exercise:
+    prompt: 14단계. 키 구간화 예제에서 \`cm\`, \`bins\`, \`groups\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      cm = meter * 100
+      bins = np.arange(150, 200, 5)
+      groups = np.digitize(cm, bins)
+      np.unique(groups)
+    hints:
+    - 바꿀 지점은 \`cm = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`cm\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 14단계. 키 구간화에서 \`cm\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 14단계. 키 구간화 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step15_ideal_weight
+  title: 15단계. 이상적 체중 범위
+  structuredPrimary: true
+  subtitle: BMI 18.5~25
+  goal: 15단계. 이상적 체중 범위에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 각 사람의 이상적인 체중 범위를 계산합니다. BMI 18.5~25 기준입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    lo = 18.5 * (meter ** 2)
+    hi = 25 * (meter ** 2)
+    ideal = (kg >= lo) & (kg <= hi)
+    f"정상 체중 비율: {np.mean(ideal) * 100:.1f}%"
+  exercise:
+    prompt: 15단계. 이상적 체중 범위 예제에서 \`lo\`, \`hi\`, \`ideal\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      lo = 18.5 * (meter ** 2)
+      hi = 25 * (meter ** 2)
+      ideal = (kg >= lo) & (kg <= hi)
+      f"정상 체중 비율: {np.mean(ideal) * 100:.1f}%"
+    hints:
+    - 바꿀 지점은 \`lo = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`lo\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 15단계. 이상적 체중 범위에서 \`lo\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 15단계. 이상적 체중 범위 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 건강검진 BMI 벡터화'
+  structuredPrimary: true
+  subtitle: 브로드캐스팅, where, digitize, 실패 케이스
+  goal: '현업 흐름 검증: 건강검진 BMI 벡터화에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    BMI 계산은 한 명씩 반복문으로 처리하기보다 배열 단위로 검증하는 연습에 좋습니다. 키와 몸무게 배열 shape을 맞추고, 분류 기준이 기대대로 적용되는지 확인하세요.
+
+    변주 실험
+    아시아 기준 BMI 구간과 WHO 기준 BMI 구간을 각각 \`bins\`로 만들어 같은 사람들의 분류가 어떻게 달라지는지 비교하세요.
+  tips:
+  - 변주 실험 아시아 기준 BMI 구간과 WHO 기준 BMI 구간을 각각 \`bins\`로 만들어 같은 사람들의 분류가 어떻게 달라지는지 비교하세요.
+  snippet: |-
+    import numpy as np
+
+    weights = np.array([60.0, 82.0, 95.0])
+    heights = np.array([1.70, 1.75, 1.80])
+
+    bmi = weights / (heights ** 2)
+    labels = np.where(bmi >= 25, "review", "normal")
+    groups = np.digitize(bmi, bins=[18.5, 23.0, 25.0, 30.0])
+
+    assert np.allclose(np.round(bmi, 1), [20.8, 26.8, 29.3])
+    assert labels.tolist() == ["normal", "review", "review"]
+    assert groups.tolist() == [1, 3, 3]
+  exercise:
+    prompt: '현업 흐름 검증: 건강검진 BMI 벡터화 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    starterCode: |-
+      import numpy as np
+
+      weights = np.array([60.0, 82.0, 95.0])
+      heights = np.array([1.70, 1.75, 1.80])
+
+      bmi = weights / (heights ** 2)
+      labels = np.where(bmi >= 25, "review", "normal")
+      groups = np.digitize(bmi, bins=[18.5, 23.0, 25.0, 30.0])
+
+      assert np.allclose(np.round(bmi, 1), [20.8, 26.8, 29.3])
+      assert labels.tolist() == ["normal", "review", "review"]
+      assert groups.tolist() == [1, 3, 3]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: '현업 흐름 검증: 건강검진 BMI 벡터화에서 \`weights\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
+    resultCheck: '현업 흐름 검증: 건강검진 BMI 벡터화에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.'
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: BMI 분석
+  goal: 실습에서 벡터화 계산 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    import numpy as np
+    import pandas as pd
+
+    data = pd.DataFrame({
+        'Gender': ['Male', 'Female', 'Male', 'Female', 'Male',
+                   'Female', 'Male', 'Female', 'Male', 'Female'],
+        'Height': [70.0, 64.0, 68.5, 62.0, 72.0, 66.5, 69.0, 63.5, 74.0, 61.5],
+        'Weight': [180.0, 135.0, 165.0, 120.0, 210.0, 150.0, 175.0, 128.0, 230.0, 112.0],
+    })
+    height = data['Height'].values * 0.0254
+    weight = data['Weight'].values * 0.453592
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import numpy as np
+      import pandas as pd
+
+      data = pd.DataFrame({
+          'Gender': ['Male', 'Female', 'Male', 'Female', 'Male',
+                     'Female', 'Male', 'Female', 'Male', 'Female'],
+          'Height': [70.0, 64.0, 68.5, 62.0, 72.0, 66.5, 69.0, 63.5, 74.0, 61.5],
+          'Weight': [180.0, 135.0, 165.0, 120.0, 210.0, 150.0, 175.0, 128.0, 230.0, 112.0],
+      })
+      height = data['Height'].values * 0.0254
+      weight = data['Weight'].values * 0.453592
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: numpy_05-batch-bmi-categories-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - practice
+    title: 키·몸무게 vector에서 BMI와 범주 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 행별 BMI를 계산하고 under·normal·over 범주 count를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - height 단위가 meter인지 계약에서 확인하세요.
+    - 18.5와 25 경계가 어느 범주에 들어가는지 정확히 구현하세요.
+    exercise:
+      prompt: classify_bmi(heights_m, weights_kg)를 완성해 bmi, categories, counts를 반환하세요.
+      starterCode: |-
+        def classify_bmi(heights_m, weights_kg):
+            raise NotImplementedError
+      solution: |
+        def classify_bmi(heights_m, weights_kg):
+            if len(heights_m) != len(weights_kg) or any(height <= 0 or weight <= 0 for height, weight in zip(heights_m, weights_kg)):
+                raise ValueError("aligned positive measurements required")
+            values = [round(weight / (height * height), 1) for height, weight in zip(heights_m, weights_kg)]
+            categories = ["under" if value < 18.5 else "normal" if value < 25 else "over" for value in values]
+            counts = {key: categories.count(key) for key in ("under", "normal", "over")}
+            return {"bmi": values, "categories": categories, "counts": counts}
+      hints: *id001
+    check:
+      id: python.numpy.numpy_05.batch-bmi-categories.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_05.batch-bmi-categories.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: classify_bmi
+        cases:
+        - id: computes-and-bands-batch
+          arguments:
+          - value:
+            - 2.0
+            - 1.6
+            - 1.8
+          - value:
+            - 60
+            - 64
+            - 90
+          expectedReturn:
+            bmi:
+            - 15.0
+            - 25.0
+            - 27.8
+            categories:
+            - under
+            - over
+            - over
+            counts:
+              under: 1
+              normal: 0
+              over: 2
+        - id: handles-empty-batch
+          arguments:
+          - value: []
+          - value: []
+          expectedReturn:
+            bmi: []
+            categories: []
+            counts:
+              under: 0
+              normal: 0
+              over: 0
+        - id: rejects-zero-height
+          arguments:
+          - value:
+            - 0
+          - value:
+            - 50
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: numpy_05-batch-formula-evaluation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_05-batch-bmi-categories-mastery
+    title: 새 가격 vector에 할인·세금 공식을 일괄 적용하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: BMI vector 계산을 같은 shape의 값·할인율에 대한 element-wise 공식으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - prices와 discount_rates는 같은 shape여야 합니다.
+    - 할인 뒤 세금을 적용하는 연산 순서를 지키세요.
+    exercise:
+      prompt: final_prices(prices, discount_rates, tax_rate)를 완성해 discounted, final, total을 반환하세요.
+      starterCode: |-
+        def final_prices(prices, discount_rates, tax_rate):
+            raise NotImplementedError
+      solution: |
+        def final_prices(prices, discount_rates, tax_rate):
+            if len(prices) != len(discount_rates) or not 0 <= tax_rate <= 1:
+                raise ValueError("invalid price contract")
+            if any(price < 0 or not 0 <= discount <= 1 for price, discount in zip(prices, discount_rates)):
+                raise ValueError("value out of range")
+            discounted = [round(price * (1 - discount), 2) for price, discount in zip(prices, discount_rates)]
+            final = [round(value * (1 + tax_rate), 2) for value in discounted]
+            return {"discounted": discounted, "final": final, "total": round(sum(final), 2)}
+      hints: *id002
+    check:
+      id: python.numpy.numpy_05.batch-formula-evaluation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_05.batch-formula-evaluation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: final_prices
+        cases:
+        - id: applies-elementwise-formula
+          arguments:
+          - value:
+            - 100
+            - 200
+          - value:
+            - 0.1
+            - 0.25
+          - value: 0.1
+          expectedReturn:
+            discounted:
+            - 90.0
+            - 150.0
+            final:
+            - 99.0
+            - 165.0
+            total: 264.0
+        - id: handles-empty-cart
+          arguments:
+          - value: []
+          - value: []
+          - value: 0.1
+          expectedReturn:
+            discounted: []
+            final: []
+            total: 0
+        - id: rejects-shape-mismatch
+          arguments:
+          - value:
+            - 100
+          - value: []
+          - value: 0.1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: numpy_05-vectorization-shape-rule-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_05-batch-formula-evaluation-transfer
+    title: element-wise 연산의 shape 규칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 같은 shape, scalar broadcasting, 불일치 vector 상황을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 수식보다 먼저 각 입력의 shape를 적으세요.
+    - broadcasting이 된다는 사실과 업무 의미가 맞는지는 별도 판단입니다.
+    exercise:
+      prompt: choose_vector_shape_rule(situation)를 완성해 allowed, resultShape, risk를 반환하세요.
+      starterCode: |-
+        def choose_vector_shape_rule(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_vector_shape_rule(situation):
+            table = {'same-length-vectors': {'allowed': True, 'resultShape': 'same length', 'risk': 'pair order mismatch'}, 'vector-and-scalar': {'allowed': True, 'resultShape': 'vector length', 'risk': 'wrong unit'}, 'different-length-vectors': {'allowed': False, 'resultShape': None, 'risk': 'unintended broadcasting'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.numpy.numpy_05.vectorization-shape-rule.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_05.vectorization-shape-rule.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_vector_shape_rule
+        cases:
+        - id: recalls-same-length-vectors
+          arguments:
+          - value: same-length-vectors
+          expectedReturn:
+            allowed: true
+            resultShape: same length
+            risk: pair order mismatch
+        - id: recalls-vector-and-scalar
+          arguments:
+          - value: vector-and-scalar
+          expectedReturn:
+            allowed: true
+            resultShape: vector length
+            risk: wrong unit
+        - id: rejects-unknown-situation
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,926 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - numpy
+  - pandas
+  - scipy
+  id: scipy_08
+  title: 수치적분기
+  order: 8
+  category: scipy
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  tags:
+  - scipy.integrate
+  - quad
+  - 적분
+  - 면적계산
+  - 미분방정식
+  seo:
+    title: scipy.integrate 수치적분 - 곡선 아래 면적 계산
+    description: scipy.integrate의 quad로 곡선 아래 면적을 계산합니다. 정적분, 이중적분, 미분방정식 풀이를 배웁니다.
+    keywords:
+    - scipy
+    - integrate
+    - quad
+    - 적분
+    - 면적
+intro:
+  emoji: 📐
+  goal: scipy.integrate로 수치적분을 수행하고 미분방정식을 풉니다.
+  description: 해석적으로 풀 수 없는 적분을 수치적으로 계산합니다. 곡선 아래 면적, 확률 계산, 물리량 누적 등 다양한 응용에 활용합니다.
+  direction: 수치적분기에서 수치 데이터를 모델에 넣고 계산 결과와 오차를 검증합니다.
+  benefits:
+  - 수치 입력 확인 후 최적화/적분/신호 처리에 맞는 코드 입력을 고릅니다.
+  - 수치적분기 결과를 오차와 결과 범위 기준으로 즉시 점검합니다.
+  - 완료한 코드를 과학 계산 루틴에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 데이터 로드 입력 확인
+      detail: 입력 기준(수치 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 기본 정적분 처리 실행
+      detail: 최적화/적분/신호 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 삼각함수 적분 결과 검증
+      detail: 오차와 결과 범위 기준으로 실행 결과를 비교합니다.
+    - label: 수치적분기 재사용
+      detail: 완성 코드를 과학 계산 루틴에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 과학 계산 환경
+      detail: matplotlib, numpy, pandas, scipy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 수치적분기 실행
+      detail: 셀을 실행해 오차와 결과 범위와 예외 상태를 확인합니다.
+    - label: 수치적분기 완료
+      detail: 검증된 코드를 과학 계산 루틴로 남깁니다.
+sections:
+- id: load
+  title: 데이터 로드
+  structuredPrimary: true
+  subtitle: 적분 환경 설정
+  goal: 데이터 로드에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: 수치적분은 함수 곡선 아래의 면적을 근사적으로 계산합니다. 해석적 적분이 불가능하거나 너무 복잡한 경우에 유용합니다. 이 프로젝트에서는 다양한 적분 기법과
+    미분방정식 풀이를 실습합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import scipy
+
+    import numpy as np
+    from scipy import integrate
+    import matplotlib.pyplot as plt
+    import pandas as pd
+  exercise:
+    prompt: 데이터 로드 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: |-
+      import scipy
+
+      import numpy as np
+      from scipy import integrate
+      import matplotlib.pyplot as plt
+      import pandas as pd
+    hints:
+    - 바꿀 지점은 수치 입력을 만드는 첫 줄과 최적화/적분/신호 처리 줄에서 찾으세요.
+    - 실행 뒤 오차와 결과 범위 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 데이터 로드의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 데이터 로드 실행 결과가 오차와 결과 범위 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: quad
+  title: 기본 정적분
+  structuredPrimary: true
+  subtitle: integrate.quad
+  goal: 기본 정적분에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    quad 함수는 1차원 정적분을 계산합니다. 적분할 함수, 하한, 상한을 입력하면 적분값과 추정 오차를 반환합니다. 적응형 구적법을 사용하여 함수가 급격히 변하는 곳에서 더 많은 점을 샘플링합니다.
+
+    quad는 적응형 Gauss-Kronrod 구적법을 사용합니다. 반환되는 error는 추정 오차이며, 대부분의 경우 매우 작습니다.
+  snippet: |-
+    def f1(x):
+        return x ** 2
+
+    result1, error1 = integrate.quad(f1, 0, 1)
+    analyticalResult = 1/3
+
+    quadDf = pd.DataFrame({
+        'Method': ['Numerical (quad)', 'Analytical'],
+        'Result': [result1, analyticalResult],
+        'Error': [abs(result1 - analyticalResult), 0]
+    })
+    quadDf
+  exercise:
+    prompt: 기본 정적분 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      def f1(x):
+          return x ** 2
+
+      result1, error1 = integrate.quad(f1, 0, 1)
+      analyticalResult = 1/3
+
+      quadDf = pd.DataFrame({
+          'Method': ['Numerical (quad)', 'Analytical'],
+          'Result': [result1, analyticalResult],
+          'Error': [abs(result1 - analyticalResult), 0]
+      })
+      quadDf
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 기본 정적분의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 기본 정적분 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: trig
+  title: 삼각함수 적분
+  structuredPrimary: true
+  subtitle: 양수/음수 영역
+  goal: 삼각함수 적분에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 삼각함수의 적분에서는 양수 영역과 음수 영역이 상쇄될 수 있습니다. 한 주기(0~2π)에 대한 sin 적분은 0이 됩니다. 절대값 적분이 필요한 경우 별도로
+    처리해야 합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    sinHalf, _ = integrate.quad(np.sin, 0, np.pi)
+    sinFull, _ = integrate.quad(np.sin, 0, 2 * np.pi)
+
+    sinDf = pd.DataFrame({
+        'Range': ['0 to π', '0 to 2π'],
+        'Integral': [f'{sinHalf:.6f}', f'{sinFull:.6e}'],
+        'Interpretation': ['Positive area only', 'Positive + Negative = 0']
+    })
+    sinDf
+  exercise:
+    prompt: 삼각함수 적분 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      sinHalf, _ = integrate.quad(np.sin, 0, np.pi)
+      sinFull, _ = integrate.quad(np.sin, 0, 2 * np.pi)
+
+      sinDf = pd.DataFrame({
+          'Range': ['0 to π', '0 to 2π'],
+          'Integral': [f'{sinHalf:.6f}', f'{sinFull:.6e}'],
+          'Interpretation': ['Positive area only', 'Positive + Negative = 0']
+      })
+      sinDf
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 삼각함수 적분의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 삼각함수 적분의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: gaussian
+  title: 가우스 적분
+  structuredPrimary: true
+  subtitle: 정규분포 확률
+  goal: 가우스 적분에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 정규분포의 확률밀도함수를 적분하면 확률을 계산할 수 있습니다. 68-95-99.7 법칙은 ±1σ, ±2σ, ±3σ 범위에 각각 약 68%, 95%, 99.7%의
+    데이터가 포함됨을 의미합니다. quad로 이를 직접 확인할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def normalPdf(x, mu=0, sigma=1):
+        return (1 / (sigma * np.sqrt(2 * np.pi))) * np.exp(-0.5 * ((x - mu) / sigma) ** 2)
+
+    prob1Sig, _ = integrate.quad(normalPdf, -1, 1)
+    prob2Sig, _ = integrate.quad(normalPdf, -2, 2)
+    prob3Sig, _ = integrate.quad(normalPdf, -3, 3)
+
+    probDf = pd.DataFrame({
+        'Range': ['±1σ', '±2σ', '±3σ'],
+        'Probability': [f'{prob1Sig:.4%}', f'{prob2Sig:.4%}', f'{prob3Sig:.4%}'],
+        'Expected': ['~68%', '~95%', '~99.7%']
+    })
+    probDf
+  exercise:
+    prompt: 가우스 적분 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      def normalPdf(x, mu=0, sigma=1):
+          return (1 / (sigma * np.sqrt(2 * np.pi))) * np.exp(-0.5 * ((x - mu) / sigma) ** 2)
+
+      prob1Sig, _ = integrate.quad(normalPdf, -1, 1)
+      prob2Sig, _ = integrate.quad(normalPdf, -2, 2)
+      prob3Sig, _ = integrate.quad(normalPdf, -3, 3)
+
+      probDf = pd.DataFrame({
+          'Range': ['±1σ', '±2σ', '±3σ'],
+          'Probability': [f'{prob1Sig:.4%}', f'{prob2Sig:.4%}', f'{prob3Sig:.4%}'],
+          'Expected': ['~68%', '~95%', '~99.7%']
+      })
+      probDf
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 가우스 적분의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 가우스 적분 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: infinite
+  title: 무한 적분
+  structuredPrimary: true
+  subtitle: -∞ to ∞
+  goal: 무한 적분에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: quad는 무한 구간 적분도 지원합니다. np.inf를 사용하여 양의 무한대, -np.inf를 사용하여 음의 무한대를 지정합니다. 정규분포 전체 적분은 정의에
+    의해 1이 됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    totalProb, errProb = integrate.quad(normalPdf, -np.inf, np.inf)
+
+    infDf = pd.DataFrame({
+        'Integration': ['Full Normal PDF', 'Tail P(X > 2)'],
+        'Result': [f'{totalProb:.6f}', ''],
+        'Expected': ['1.0', '']
+    })
+  exercise:
+    prompt: 무한 적분 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      totalProb, errProb = integrate.quad(normalPdf, -np.inf, np.inf)
+
+      infDf = pd.DataFrame({
+          'Integration': ['Full Normal PDF', 'Tail P(X > 2)'],
+          'Result': [f'{totalProb:.6f}', ''],
+          'Expected': ['1.0', '']
+      })
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 무한 적분의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 무한 적분의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: trapz
+  title: 데이터 적분
+  structuredPrimary: true
+  subtitle: 사다리꼴 법칙
+  goal: 데이터 적분에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    함수 대신 이산 데이터가 있을 때는 trapezoid(사다리꼴 법칙)나 simpson(심프슨 법칙)을 사용합니다. 속도-시간 그래프에서 이동 거리를 계산하거나, 전력-시간에서 총 에너지를 계산할 때 유용합니다.
+
+    trapezoid(구 trapz)는 사다리꼴로 근사합니다. simpson은 포물선으로 근사하여 더 정확하지만 짝수 개 구간이 필요합니다.
+  snippet: |-
+    time = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    velocity = np.array([0, 2, 5, 8, 10, 10, 9, 7, 4, 2, 0])
+
+    distance = integrate.trapezoid(velocity, time)
+
+    figVel, axVel = plt.subplots(figsize=(10, 6))
+    axVel.plot(time, velocity, 'b-o', linewidth=2, markersize=8, label='Velocity')
+    axVel.fill_between(time, velocity, alpha=0.3, color='blue', label=f'Distance = {distance:.1f} m')
+    axVel.set_xlabel('Time (s)')
+    axVel.set_ylabel('Velocity (m/s)')
+    axVel.set_title('Distance from Velocity-Time Graph')
+    axVel.legend()
+    axVel.grid(True, alpha=0.3)
+    figVel
+  exercise:
+    prompt: 데이터 적분 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      time = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+      velocity = np.array([0, 2, 5, 8, 10, 10, 9, 7, 4, 2, 0])
+
+      distance = integrate.trapezoid(velocity, time)
+
+      figVel, axVel = plt.subplots(figsize=(10, 6))
+      axVel.plot(time, velocity, 'b-o', linewidth=2, markersize=8, label='Velocity')
+      axVel.fill_between(time, velocity, alpha=0.3, color='blue', label=f'Distance = {distance:.1f} m')
+      axVel.set_xlabel('Time (s)')
+      axVel.set_ylabel('Velocity (m/s)')
+      axVel.set_title('Distance from Velocity-Time Graph')
+      axVel.legend()
+      axVel.grid(True, alpha=0.3)
+      figVel
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 데이터 적분의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 데이터 적분의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: dblquad
+  title: 이중적분
+  structuredPrimary: true
+  subtitle: 2차원 적분
+  goal: 이중적분에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: dblquad는 2차원 영역에서 적분을 수행합니다. 부피 계산, 2차원 확률 밀도 적분, 질량 중심 계산 등에 사용됩니다. 적분 순서는 안쪽(y)부터 계산한
+    후 바깥쪽(x)을 계산합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def f2d(y, x):
+        return x * y
+
+    resultDbl, errDbl = integrate.dblquad(f2d, 0, 1, 0, 1)
+
+    dblDf = pd.DataFrame({
+        'Integral': ['∬xy dA', 'Circle Area (r=1)'],
+        'Result': [f'{resultDbl:.6f}', ''],
+        'Analytical': ['1/4 = 0.25', 'π ≈ 3.1416']
+    })
+    dblDf
+  exercise:
+    prompt: 이중적분 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      def f2d(y, x):
+          return x * y
+
+      resultDbl, errDbl = integrate.dblquad(f2d, 0, 1, 0, 1)
+
+      dblDf = pd.DataFrame({
+          'Integral': ['∬xy dA', 'Circle Area (r=1)'],
+          'Result': [f'{resultDbl:.6f}', ''],
+          'Analytical': ['1/4 = 0.25', 'π ≈ 3.1416']
+      })
+      dblDf
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 이중적분의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 이중적분 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: ode
+  title: 미분방정식 풀이
+  structuredPrimary: true
+  subtitle: odeint
+  goal: 미분방정식 풀이에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 미분방정식은 변화율을 정의합니다. odeint로 초기값 문제를 수치적으로 풉니다. 가장 간단한 예는 지수 감쇠 dy/dt = -ky로, 방사성 붕괴나 RC
+    회로 방전을 모델링합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def decay(y, tVal, k):
+        return -k * y
+
+    y0 = 100
+    kDecay = 0.3
+    tSpan = np.linspace(0, 20, 100)
+
+    solution = integrate.odeint(decay, y0, tSpan, args=(kDecay,))
+    analyticalSol = y0 * np.exp(-kDecay * tSpan)
+
+    figDecay, axDecay = plt.subplots(figsize=(10, 6))
+    axDecay.plot(tSpan, solution, 'b-', linewidth=2, label='Numerical (odeint)')
+    axDecay.plot(tSpan, analyticalSol, 'r--', linewidth=2, label='Analytical')
+    axDecay.set_xlabel('Time')
+    axDecay.set_ylabel('y')
+    axDecay.set_title("Exponential Decay: dy/dt = -0.3y")
+    axDecay.legend()
+    axDecay.grid(True, alpha=0.3)
+    figDecay
+  exercise:
+    prompt: 미분방정식 풀이 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      def decay(y, tVal, k):
+          return -k * y
+
+      y0 = 100
+      kDecay = 0.3
+      tSpan = np.linspace(0, 20, 100)
+
+      solution = integrate.odeint(decay, y0, tSpan, args=(kDecay,))
+      analyticalSol = y0 * np.exp(-kDecay * tSpan)
+
+      figDecay, axDecay = plt.subplots(figsize=(10, 6))
+      axDecay.plot(tSpan, solution, 'b-', linewidth=2, label='Numerical (odeint)')
+      axDecay.plot(tSpan, analyticalSol, 'r--', linewidth=2, label='Analytical')
+      axDecay.set_xlabel('Time')
+      axDecay.set_ylabel('y')
+      axDecay.set_title("Exponential Decay: dy/dt = -0.3y")
+      axDecay.legend()
+      axDecay.grid(True, alpha=0.3)
+      figDecay
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 미분방정식 풀이의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 미분방정식 풀이 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: oscillator
+  title: 조화진동자
+  structuredPrimary: true
+  subtitle: 2차 미분방정식
+  goal: 조화진동자에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: 2차 미분방정식은 1차 연립방정식으로 변환하여 풉니다. 조화진동자(스프링-질량 시스템)는 d²x/dt² = -ω²x로, 위치 x와 속도 v = dx/dt 두
+    변수의 연립방정식으로 변환합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def harmonic(state, tVal, omega):
+        x, v = state
+        dxdt = v
+        dvdt = -omega**2 * x
+        return [dxdt, dvdt]
+
+    omegaH = 2
+    initState = [1, 0]
+    tOsc = np.linspace(0, 10, 500)
+
+    oscSol = integrate.odeint(harmonic, initState, tOsc, args=(omegaH,))
+    xOsc = oscSol[:, 0]
+    vOsc = oscSol[:, 1]
+  exercise:
+    prompt: 조화진동자 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def harmonic(state, tVal, omega):
+          x, v = state
+          dxdt = v
+          dvdt = -omega**2 * x
+          return [dxdt, dvdt]
+
+      omegaH = 2
+      initState = [1, 0]
+      tOsc = np.linspace(0, 10, 500)
+
+      oscSol = integrate.odeint(harmonic, initState, tOsc, args=(omegaH,))
+      xOsc = oscSol[:, 0]
+      vOsc = oscSol[:, 1]
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 조화진동자의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 조화진동자 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: solveivp
+  title: solve_ivp
+  structuredPrimary: true
+  subtitle: 최신 ODE 솔버
+  goal: solveivp에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: solve_ivp는 odeint보다 현대적인 인터페이스를 제공하며 다양한 솔버를 지원합니다. 감쇠 진동자와 같은 복잡한 시스템을 시뮬레이션할 때 더 유연하게
+    사용할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def dampedOsc(tVal, state, omega, gamma):
+        x, v = state
+        dxdt = v
+        dvdt = -omega**2 * x - 2 * gamma * v
+        return [dxdt, dvdt]
+
+    omegaD = 2
+    gammaD = 0.2
+    tSpanIvp = (0, 15)
+    tEvalIvp = np.linspace(0, 15, 300)
+
+    solIvp = integrate.solve_ivp(
+        dampedOsc, tSpanIvp, [1, 0],
+        args=(omegaD, gammaD),
+        t_eval=tEvalIvp,
+        method='RK45'
+    )
+
+    figDamp, axDamp = plt.subplots(figsize=(12, 5))
+    axDamp.plot(solIvp.t, solIvp.y[0], 'b-', linewidth=2, label='Position')
+    axDamp.plot(solIvp.t, np.exp(-gammaD * solIvp.t), 'r--', linewidth=1.5, alpha=0.7, label='Envelope')
+    axDamp.plot(solIvp.t, -np.exp(-gammaD * solIvp.t), 'r--', linewidth=1.5, alpha=0.7)
+    axDamp.set_xlabel('Time')
+    axDamp.set_ylabel('Position')
+    axDamp.set_title('Damped Harmonic Oscillator')
+    axDamp.legend()
+    axDamp.grid(True, alpha=0.3)
+    figDamp
+  exercise:
+    prompt: solveivp 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      def dampedOsc(tVal, state, omega, gamma):
+          x, v = state
+          dxdt = v
+          dvdt = -omega**2 * x - 2 * gamma * v
+          return [dxdt, dvdt]
+
+      omegaD = 2
+      gammaD = 0.2
+      tSpanIvp = (0, 15)
+      tEvalIvp = np.linspace(0, 15, 300)
+
+      solIvp = integrate.solve_ivp(
+          dampedOsc, tSpanIvp, [1, 0],
+          args=(omegaD, gammaD),
+          t_eval=tEvalIvp,
+          method='RK45'
+      )
+
+      figDamp, axDamp = plt.subplots(figsize=(12, 5))
+      axDamp.plot(solIvp.t, solIvp.y[0], 'b-', linewidth=2, label='Position')
+      axDamp.plot(solIvp.t, np.exp(-gammaD * solIvp.t), 'r--', linewidth=1.5, alpha=0.7, label='Envelope')
+      axDamp.plot(solIvp.t, -np.exp(-gammaD * solIvp.t), 'r--', linewidth=1.5, alpha=0.7)
+      axDamp.set_xlabel('Time')
+      axDamp.set_ylabel('Position')
+      axDamp.set_title('Damped Harmonic Oscillator')
+      axDamp.legend()
+      axDamp.grid(True, alpha=0.3)
+      figDamp
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: solveivp의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: solveivp 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: result
+  title: 적분 함수 정리
+  structuredPrimary: true
+  subtitle: 함수 선택 가이드
+  goal: 적분 함수 정리에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: scipy.integrate는 다양한 적분 상황에 맞는 함수를 제공합니다. 1차원 함수는 quad, 2차원은 dblquad, 이산 데이터는 trapezoid나
+    simpson, 미분방정식은 odeint나 solve_ivp를 사용하세요.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    intGuideDf = pd.DataFrame({
+        'Function': ['quad', 'dblquad', 'tplquad', 'trapezoid', 'simpson', 'odeint', 'solve_ivp'],
+        'Purpose': ['1D 정적분', '2D 정적분', '3D 정적분', '데이터 적분 (사다리꼴)', '데이터 적분 (심프슨)', 'ODE 풀이 (구 버전)', 'ODE 풀이 (신 버전)'],
+        'Input': ['함수', '함수', '함수', '배열', '배열', '미분방정식', '미분방정식']
+    })
+    intGuideDf
+  exercise:
+    prompt: 적분 함수 정리 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      intGuideDf = pd.DataFrame({
+          'Function': ['quad', 'dblquad', 'tplquad', 'trapezoid', 'simpson', 'odeint', 'solve_ivp'],
+          'Purpose': ['1D 정적분', '2D 정적분', '3D 정적분', '데이터 적분 (사다리꼴)', '데이터 적분 (심프슨)', 'ODE 풀이 (구 버전)', 'ODE 풀이 (신 버전)'],
+          'Input': ['함수', '함수', '함수', '배열', '배열', '미분방정식', '미분방정식']
+      })
+      intGuideDf
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 적분 함수 정리의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 적분 함수 정리의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 적분 프로젝트
+  goal: 실습에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: 물리/공학 문제를 수치적분으로 해결해보세요. 힘-거리 그래프에서 일(Work)을 계산하거나, 인구 성장을 로지스틱 방정식으로 시뮬레이션해보세요.
+  snippet: |-
+    def force(x):
+        return 10 + 5 * x - 0.5 * x**2
+
+    xForce = np.linspace(0, 10, 100)
+    yForce = force(xForce)
+
+    workDone, _ = integrate.quad(force, 0, 10)
+  exercise:
+    prompt: 실습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def force(x):
+          return 10 + 5 * x - 0.5 * x**2
+
+      xForce = np.linspace(0, 10, 100)
+      yForce = force(xForce)
+
+      workDone, _ = integrate.quad(force, 0, 10)
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 실습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: SLA 지연시간 통계 게이트
+  goal: 업무 흐름 검증에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한
+    신뢰구간과 개선 기준을 함께 제시해야 합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import numpy as np
+    from scipy import optimize, stats
+
+    latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+    def validateLatencySamples(samples):
+        values = np.asarray(samples, dtype=float)
+        if values.size < 5:
+            raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+        if not np.isfinite(values).all():
+            raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+        if (values <= 0).any():
+            raise ValueError("지연시간은 0보다 커야 합니다.")
+        return values
+
+    cleanLatency = validateLatencySamples(latencySamples)
+    cleanLatency.mean(), cleanLatency.std(ddof=1)
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 기대 문자열이나 실제 출력 문구를 바꾸고 assert 비교가 맞는지 확인하세요.
+    starterCode: |-
+      allowedMean = 264
+      capThreshold = optimize.brentq(
+          lambda threshold: np.clip(cleanLatency, None, threshold).mean() - allowedMean,
+          cleanLatency.min(),
+          cleanLatency.max(),
+      )
+      cappedMean = np.clip(cleanLatency, None, capThreshold).mean()
+
+      assert abs(cappedMean - allowedMean) < 1e-6
+      {
+          "allowedMean": allowedMean,
+          "capThreshold": round(float(capThreshold), 2),
+          "cappedMean": round(float(cappedMean), 2),
+      }
+    solution: |-
+      import numpy as np
+      from scipy import optimize, stats
+
+      latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+      def validateLatencySamples(samples):
+          values = np.asarray(samples, dtype=float)
+          if values.size < 5:
+              raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+          if not np.isfinite(values).all():
+              raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+          if (values <= 0).any():
+              raise ValueError("지연시간은 0보다 커야 합니다.")
+          return values
+
+      cleanLatency = validateLatencySamples(latencySamples)
+      cleanLatency.mean(), cleanLatency.std(ddof=1)
+    hints:
+    - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
+    - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증에서 \`allowedMean\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: scipy_08-trapezoid-integral-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load
+    - workflow_validation
+    title: 불균일 x grid의 사다리꼴 적분 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: x 증가와 길이를 검사해 구간별 기여도와 합을 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - x 간격이 균일하다고 가정하지 마세요.
+    - 부호 있는 누적과 절대 면적을 구분하세요.
+    exercise:
+      prompt: trapezoid_integral(x_values, y_values)를 완성하세요.
+      starterCode: |-
+        def trapezoid_integral(x_values, y_values):
+            raise NotImplementedError
+      solution: |
+        def trapezoid_integral(x_values, y_values):
+            if len(x_values) != len(y_values) or len(x_values) < 2 or any(b <= a for a,b in zip(x_values,x_values[1:])): raise ValueError("invalid integration grid")
+            areas = [(x_values[i+1]-x_values[i])*(y_values[i]+y_values[i+1])/2 for i in range(len(x_values)-1)]
+            return {"areas": [round(value,6) for value in areas], "total": round(sum(areas),6), "intervalCount": len(areas)}
+      hints: *id001
+    check:
+      id: python.scipy.scipy_08.trapezoid-integral.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_08.trapezoid-integral.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: trapezoid_integral
+        cases:
+        - id: integrates-nonuniform-grid
+          arguments:
+          - value:
+            - 0
+            - 1
+            - 3
+          - value:
+            - 0
+            - 2
+            - 2
+          expectedReturn:
+            areas:
+            - 1.0
+            - 4.0
+            total: 5.0
+            intervalCount: 2
+        - id: keeps-signed-area
+          arguments:
+          - value:
+            - 0
+            - 1
+            - 2
+          - value:
+            - 1
+            - -1
+            - 1
+          expectedReturn:
+            areas:
+            - 0.0
+            - 0.0
+            total: 0.0
+            intervalCount: 2
+        - id: rejects-unsorted-grid
+          arguments:
+          - value:
+            - 0
+            - 2
+            - 1
+          - value:
+            - 0
+            - 1
+            - 2
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: scipy_08-integration-convergence-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_08-trapezoid-integral-mastery
+    title: 새 수치적분에 grid 수렴 점검 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 연속 refinement 결과 차이를 tolerance로 판정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 한 grid의 값만으로 정확도를 주장하지 마세요.
+    - refinement 간 마지막 차이와 전체 추세를 함께 보세요.
+    exercise:
+      prompt: audit_integration_convergence(estimates, tolerance)를 완성하세요.
+      starterCode: |-
+        def audit_integration_convergence(estimates, tolerance):
+            raise NotImplementedError
+      solution: |
+        def audit_integration_convergence(estimates, tolerance):
+            if len(estimates) < 2 or tolerance <= 0: raise ValueError("need refinement estimates")
+            deltas = [abs(b-a) for a,b in zip(estimates,estimates[1:])]
+            return {"accepted": deltas[-1] <= tolerance, "estimate": estimates[-1], "lastDelta": round(deltas[-1],12), "deltas": [round(value,12) for value in deltas]}
+      hints: *id002
+    check:
+      id: python.scipy.scipy_08.integration-convergence.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_08.integration-convergence.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_integration_convergence
+        cases:
+        - id: accepts-converged-sequence
+          arguments:
+          - value:
+            - 1.5
+            - 1.42
+            - 1.4143
+          - value: 0.01
+          expectedReturn:
+            accepted: true
+            estimate: 1.4143
+            lastDelta: 0.0057
+            deltas:
+            - 0.08
+            - 0.0057
+        - id: rejects-unstable-sequence
+          arguments:
+          - value:
+            - 1
+            - 1.5
+            - 1.2
+          - value: 0.1
+          expectedReturn:
+            accepted: false
+            estimate: 1.2
+            lastDelta: 0.3
+            deltas:
+            - 0.5
+            - 0.3
+        - id: rejects-single-estimate
+          arguments:
+          - value:
+            - 1
+          - value: 0.1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: scipy_08-numerical-integration-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_08-integration-convergence-transfer
+    title: 수치적분 방법 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 표본 grid·함수·특이점을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 수치 방법의 입력 가정과 오차 근거를 함께 남기세요.
+    - p-value나 최적화 성공 flag 하나를 결론으로 사용하지 마세요.
+    exercise:
+      prompt: choose_integration_method(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_integration_method(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_integration_method(situation):
+            table = {'sampled-data': {'method': 'trapezoid', 'evidence': 'x grid and interval contributions', 'risk': 'unsorted x'}, 'smooth-callable': {'method': 'adaptive quadrature', 'evidence': 'error estimate', 'risk': 'hidden singularity'}, 'oscillatory': {'method': 'specialized or refined integration', 'evidence': 'convergence study', 'risk': 'aliasing'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.scipy.scipy_08.numerical-integration-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_08.numerical-integration-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_integration_method
+        cases:
+        - id: recalls-sampled-data
+          arguments:
+          - value: sampled-data
+          expectedReturn:
+            method: trapezoid
+            evidence: x grid and interval contributions
+            risk: unsorted x
+        - id: recalls-smooth-callable
+          arguments:
+          - value: smooth-callable
+          expectedReturn:
+            method: adaptive quadrature
+            evidence: error estimate
+            risk: hidden singularity
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

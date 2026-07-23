@@ -1,0 +1,678 @@
+var e=`meta:
+  id: email_09
+  title: 안전한 자격증명 관리
+  order: 9
+  category: email
+  difficulty: ⭐⭐⭐⭐
+  badge: 심화
+  packages: []
+  tags:
+    - os.environ
+    - dryRun
+    - .env
+    - 보안
+  outcomes:
+    - automation.email.credentials
+  prerequisites:
+    - automation.email.send
+  estimatedMinutes: 45
+  seo:
+    title: "안전한 자격증명 관리 - 환경변수 + dryRun 일관 패턴"
+    description: "발송·수신 모듈에 자격증명을 안전하게 관리. .env 활용, dryRun 일관 패턴, 환경 검증."
+    keywords:
+      - 환경변수 관리
+      - dotenv
+      - dryRun 패턴
+      - SMTP 자격증명
+
+intro:
+  direction: "발송·수신 모듈의 자격증명을 환경변수와 dryRun으로 일관되게 관리한다. 평문 비밀번호 사고와 .env 커밋 사고를 모두 차단."
+  benefits:
+    - "한 모듈로 모든 강의의 자격증명을 통합 관리해 사고 위험을 한 곳에 격리."
+    - ".env 파일 + .gitignore + load_dotenv 패턴이 본 강의로 안착."
+    - "dryRun 정책을 함수 시그니처 수준에서 강제."
+  diagram:
+    steps:
+      - label: "1. 환경변수 로드"
+        detail: ".env 파일에서 os.environ으로 자동 로드 (외부 dotenv 불필요한 표준 구현)."
+      - label: "2. validateCredentials"
+        detail: "필수 변수 누락 시 명확한 에러."
+      - label: "3. dryRun 강제"
+        detail: "함수 표면에서 dryRun=True 기본값 일관 적용."
+      - label: "4. .gitignore 안내"
+        detail: ".env 파일은 절대 커밋하지 않도록."
+    runtime:
+      - label: "표준만"
+        detail: "외부 python-dotenv 대신 표준 라이브러리로 간단 구현."
+      - label: "검증"
+        detail: "환경변수 가드와 dryRun 흐름을 단위 assert."
+
+sections:
+  - id: step1_load_env
+    title: "1단계. .env 파일 로드 (표준만)"
+    structuredPrimary: true
+    subtitle: "임시 .env 작성 + 수동 파싱"
+    goal: "key=value 형태의 .env 파일을 읽어 os.environ에 주입한다."
+    why: "외부 dotenv 의존 없이 표준만으로 .env 로드 가능. 본 트랙의 외부 의존 0 정책 일관."
+    explanation: |-
+      .env 파일은 KEY=VALUE 줄들. 파싱은 strip().split('=', 1)으로 충분. 줄 시작이 #이면 주석.
+    tips:
+      - "값에 따옴표가 있으면 strip하는 정도면 충분. 본격 dotenv는 python-dotenv 추천."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      import os
+
+      def loadEnvFile(path):
+          loaded = {}
+          for raw in Path(path).read_text(encoding="utf-8").splitlines():
+              line = raw.strip()
+              if not line or line.startswith("#"):
+                  continue
+              key, _, value = line.partition("=")
+              loaded[key.strip()] = value.strip().strip('"').strip("'")
+          for key, value in loaded.items():
+              os.environ[key] = value
+          return list(loaded.keys())
+
+      workdir = TemporaryDirectory()
+      envPath = Path(workdir.name) / ".env"
+      envPath.write_text(
+          "# Codaro Email\\n"
+          "SMTP_USER=me@example.com\\n"
+          'SMTP_APP_PASS="app pass 16자"\\n',
+          encoding="utf-8",
+      )
+      keys = loadEnvFile(envPath)
+      keys, os.environ.get("SMTP_USER")
+    exercise:
+      prompt: ".env에 IMAP_USER 한 줄 더 추가하고 loaded keys 길이가 3인지 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        import os
+
+        def loadEnvFile(path):
+            loaded = {}
+            for raw in Path(path).read_text(encoding="utf-8").splitlines():
+                line = raw.strip()
+                if not line or line.startswith("#"):
+                    continue
+                key, _, value = line.partition("=")
+                loaded[key.strip()] = value.strip().strip('"').strip("'")
+            for key, value in loaded.items():
+                os.environ[key] = value
+            return list(loaded.keys())
+
+        workdir = TemporaryDirectory()
+        envPath = Path(workdir.name) / ".env"
+        envPath.write_text(
+            "SMTP_USER=me@example.com\\n"
+            "SMTP_APP_PASS=secret\\n"
+            ___,
+            encoding="utf-8",
+        )
+        len(loadEnvFile(envPath))
+      hints:
+        - "추가 줄. 예: 'IMAP_USER=me@example.com\\\\n'."
+    check:
+      noError: "줄 끝 줄바꿈."
+      resultCheck: "출력 3."
+
+  - id: step2_validate
+    title: "2단계. 자격증명 검증"
+    structuredPrimary: true
+    subtitle: "필수 변수 가드"
+    goal: "필요한 환경변수가 모두 있는지 확인하고 누락 시 명확한 에러를 낸다."
+    why: "환경변수 누락이 디버깅 시간을 가장 많이 잡아먹습니다. 시작 단계에서 한 번 검증하면 끝까지 안전."
+    explanation: |-
+      validateCredentials(required=['SMTP_USER', 'SMTP_APP_PASS'])이 누락된 변수 리스트를 돌려주고, 누락이 있으면 EnvironmentError로 명확히 알림.
+    tips:
+      - "에러 메시지에 누락 변수 이름을 명시적으로 적어주면 사용자가 바로 해결 가능."
+    snippet: |-
+      import os
+
+      def validateCredentials(required):
+          missing = [key for key in required if not os.environ.get(key)]
+          if missing:
+              raise EnvironmentError(f"필수 환경변수 누락: {', '.join(missing)}")
+          return True
+
+      os.environ["SMTP_USER"] = "me@example.com"
+      os.environ["SMTP_APP_PASS"] = "secret"
+      try:
+          validateCredentials(["SMTP_USER", "SMTP_APP_PASS"])
+          state = "valid"
+      except EnvironmentError as exc:
+          state = str(exc)
+      state
+    exercise:
+      prompt: "필수에 'IMAP_USER'를 추가하고, 환경변수가 없으면 에러 메시지에 'IMAP_USER'가 포함되는지 확인하세요."
+      starterCode: |-
+        import os
+
+        def validateCredentials(required):
+            missing = [key for key in required if not os.environ.get(key)]
+            if missing:
+                raise EnvironmentError(f"missing: {', '.join(missing)}")
+            return True
+
+        os.environ.pop("IMAP_USER", None)
+        try:
+            validateCredentials(["SMTP_USER", ___])
+            state = "ok"
+        except EnvironmentError as exc:
+            state = str(exc)
+        "IMAP_USER" in state
+      hints:
+        - "문자열 'IMAP_USER'."
+    check:
+      noError: "리스트 원소는 문자열."
+      resultCheck: "True 출력."
+
+  - id: step3_dryrun_module
+    title: "3단계. 통합 발송 모듈"
+    structuredPrimary: true
+    subtitle: "환경 + dryRun + 발송 패턴 통합"
+    goal: "자격증명 검증 + dryRun + 실 발송이 한 모듈에 들어간다."
+    why: "본 모듈 하나가 본 트랙의 모든 강의 발송 표면입니다. 한 곳에서 보안과 안전 모두 관리."
+    explanation: |-
+      sendEmail(toAddr, subject, body, dryRun=True)이 검증 → 메시지 빌드 → dryRun 분기 → 실 발송 흐름을 한 함수에 묶음.
+    tips:
+      - "dryRun=True를 절대 기본값에서 빼지 마세요. 변경 시 안전 정책이 깨집니다."
+    snippet: |-
+      import os
+      import smtplib
+      import ssl
+      from email.message import EmailMessage
+
+      def sendEmail(toAddr, subject, body, dryRun=True):
+          if not dryRun:
+              required = ["SMTP_USER", "SMTP_APP_PASS"]
+              missing = [key for key in required if not os.environ.get(key)]
+              if missing:
+                  raise EnvironmentError(f"missing: {', '.join(missing)}")
+          msg = EmailMessage()
+          msg["From"] = os.environ.get("SMTP_USER", "me@example.com")
+          msg["To"] = toAddr
+          msg["Subject"] = subject
+          msg.set_content(body, charset="utf-8")
+          if dryRun:
+              return msg
+          ctx = ssl.create_default_context()
+          with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ctx) as smtp:
+              smtp.login(os.environ["SMTP_USER"], os.environ["SMTP_APP_PASS"])
+              smtp.send_message(msg)
+          return msg
+
+      result = sendEmail("partner@example.com", "test", "body", dryRun=True)
+      result["Subject"], result.get_content().strip()
+    exercise:
+      prompt: "sendEmail을 직접 작성하세요. dryRun=False일 때 SMTP_USER/SMTP_APP_PASS 누락이면 EnvironmentError를 raise하고, dryRun=True일 때는 환경변수 누락이어도 EmailMessage만 만들어 반환해야 합니다. 두 경로를 모두 검증합니다."
+      starterCode: |-
+        import os
+        from email.message import EmailMessage
+
+        def sendEmail(toAddr, subject, body, dryRun=True):
+            if not dryRun:
+                missing = ___
+                if missing:
+                    raise EnvironmentError(f"missing: {', '.join(missing)}")
+            msg = EmailMessage()
+            msg["From"] = os.environ.get("SMTP_USER", "me@example.com")
+            msg["To"] = toAddr
+            msg["Subject"] = subject
+            msg.set_content(body, charset="utf-8")
+            if dryRun:
+                return msg
+            raise RuntimeError("실 발송 경로")
+
+        savedUser = os.environ.pop("SMTP_USER", None)
+        savedPass = os.environ.pop("SMTP_APP_PASS", None)
+        try:
+            dry = sendEmail("partner@example.com", "월간 보고서", "body", dryRun=True)
+            assert dry["Subject"] == "월간 보고서"
+            try:
+                sendEmail("partner@example.com", "x", "y", dryRun=False)
+                guarded = False
+            except EnvironmentError:
+                guarded = True
+        finally:
+            if savedUser is not None:
+                os.environ["SMTP_USER"] = savedUser
+            if savedPass is not None:
+                os.environ["SMTP_APP_PASS"] = savedPass
+        (dry["Subject"], guarded)
+      hints:
+        - "missing: [k for k in ('SMTP_USER', 'SMTP_APP_PASS') if not os.environ.get(k)]."
+    check:
+      noError: "Subject는 문자열."
+      resultCheck: "출력 '월간 보고서'."
+
+  - id: practice
+    title: "실습 - 종합 미션"
+    subtitle: "환경 격리 발송 모듈"
+    goal: "loadEnvFile + validate + sendEmail을 한 모듈로 묶어 환경 격리된 안전 발송기 완성."
+    why: "회사 PC에 평문 비밀번호가 박힌 스크립트가 git에 커밋되면 보안 사고와 계정 정지로 직결됩니다. .env 파일 + load → validate → dryRun 흐름을 한 모듈에 모으면 자격증명 관리 정책이 한 곳에서 강제되고, 10강 주간 보고서 발송기는 이 모듈을 그대로 백엔드로 사용해 보안과 안전 모두를 한 줄로 처리합니다."
+    explanation: |-
+      미션: 환경 가드, 검증, dryRun을 모두 갖춘 sendEmailModule(toAddr, subject, body, dryRun=True) 함수 작성.
+    tips:
+      - ".env는 절대 git 커밋 금지. .gitignore에 추가 필수."
+    snippet: |-
+      import os
+    exercise:
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "함수: sendEmailModule(toAddr, subject, body, dryRun=True) -> EmailMessage"
+    check:
+      noError: "환경 가드 + dryRun."
+      resultCheck: "dryRun=True에서 EmailMessage 반환."
+    blocks:
+      - type: expansion
+        title: "미션: 환경 격리 발송 모듈"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              import os
+              import smtplib
+              import ssl
+              from email.message import EmailMessage
+
+              def validateCredentials(required):
+                  missing = [key for key in required if not os.environ.get(key)]
+                  if missing:
+                      raise EnvironmentError(f"필수 환경변수 누락: {', '.join(missing)}")
+                  return True
+
+              def sendEmailModule(toAddr, subject, body, dryRun=True, fromAddr=None):
+                  msg = EmailMessage()
+                  msg["From"] = fromAddr or os.environ.get("SMTP_USER", "me@example.com")
+                  msg["To"] = toAddr
+                  msg["Subject"] = subject
+                  msg.set_content(body, charset="utf-8")
+                  if dryRun:
+                      return msg
+                  validateCredentials(["SMTP_USER", "SMTP_APP_PASS"])
+                  ctx = ssl.create_default_context()
+                  with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ctx) as smtp:
+                      smtp.login(os.environ["SMTP_USER"], os.environ["SMTP_APP_PASS"])
+                      smtp.send_message(msg)
+                  return msg
+
+              result = sendEmailModule(
+                  "partner@example.com",
+                  "월간 보고서 발송",
+                  "검토 부탁드립니다.",
+                  dryRun=True,
+              )
+              assert result["Subject"] == "월간 보고서 발송"
+              assert result["To"] == "partner@example.com"
+              assert "검토" in result.get_content()
+              result["Subject"]
+      - type: expansion
+        title: "미션2: 환경 프로필 스위처"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              import os
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+
+              def loadProfile(envDir, profile):
+                  path = Path(envDir) / f".env.{profile}"
+                  if not path.exists():
+                      raise FileNotFoundError(f"프로필 없음: {path}")
+                  values = {}
+                  for raw in path.read_text(encoding="utf-8").splitlines():
+                      line = raw.strip()
+                      if not line or line.startswith("#"):
+                          continue
+                      key, _, value = line.partition("=")
+                      values[key.strip()] = value.strip().strip('"').strip("'")
+                  return values
+
+              def applyProfile(values, required):
+                  missing = [k for k in required if not values.get(k)]
+                  if missing:
+                      raise EnvironmentError(f"프로필 누락 변수: {', '.join(missing)}")
+                  for key, value in values.items():
+                      os.environ[key] = value
+                  return sorted(values.keys())
+
+              workdir = TemporaryDirectory()
+              base = Path(workdir.name)
+              (base / ".env.dev").write_text(
+                  "SMTP_USER=dev@example.com\\nSMTP_APP_PASS=dev-pass\\n",
+                  encoding="utf-8",
+              )
+              (base / ".env.prod").write_text(
+                  "SMTP_USER=ops@example.com\\nSMTP_APP_PASS=prod-pass\\n",
+                  encoding="utf-8",
+              )
+
+              savedUser = os.environ.pop("SMTP_USER", None)
+              savedPass = os.environ.pop("SMTP_APP_PASS", None)
+              try:
+                  devKeys = applyProfile(loadProfile(base, "dev"), ["SMTP_USER", "SMTP_APP_PASS"])
+                  assert os.environ["SMTP_USER"] == "dev@example.com"
+                  prodKeys = applyProfile(loadProfile(base, "prod"), ["SMTP_USER", "SMTP_APP_PASS"])
+                  assert os.environ["SMTP_USER"] == "ops@example.com"
+                  try:
+                      loadProfile(base, "missing")
+                      missingGuarded = False
+                  except FileNotFoundError:
+                      missingGuarded = True
+              finally:
+                  os.environ.pop("SMTP_USER", None)
+                  os.environ.pop("SMTP_APP_PASS", None)
+                  if savedUser is not None:
+                      os.environ["SMTP_USER"] = savedUser
+                  if savedPass is not None:
+                      os.environ["SMTP_APP_PASS"] = savedPass
+              (devKeys, prodKeys, missingGuarded)
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: list
+        style: bullet
+        items:
+          - "여러 계정 (개인/회사) 환경변수 분리"
+          - "OAuth2 토큰 refresh 자동화 (Outlook M365)"
+          - "비밀번호를 OS 키체인(macOS Keychain, Windows Credential)에 저장"
+          - ".env 검증 CLI 도구 (필수 변수 보고)"
+          - "환경별 .env (.env.dev, .env.prod) 분기"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: email_09-credential-reference-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load_env
+    - extensions
+    title: 메일 자격증명의 secret reference·scope·rotation 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 값 저장 없이 provider reference와 만료·허용 목적을 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - YAML·코드·로그에는 secret 값이 아니라 provider와 key reference만 남기세요.
+    - 자격증명 purpose와 만료일을 실행 전에 검사하세요.
+    exercise:
+      prompt: audit_credential_reference(reference, now_day, allowed_purposes)를 완성하세요.
+      starterCode: |-
+        def audit_credential_reference(reference, now_day, allowed_purposes):
+            raise NotImplementedError
+      solution: |
+        def audit_credential_reference(reference, now_day, allowed_purposes):
+            failures = []
+            if not reference.get("provider") or not reference.get("key"):
+                failures.append("reference")
+            if "value" in reference:
+                failures.append("embedded-value")
+            if reference.get("purpose") not in allowed_purposes:
+                failures.append("purpose")
+            if reference.get("expiresDay", now_day - 1) <= now_day:
+                failures.append("expired")
+            return {"accepted": not failures, "failures": failures, "identity": f"{reference.get('provider')}:{reference.get('key')}"}
+      hints: *id001
+    check:
+      id: python.email.email_09.credential-reference-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_09.credential-reference-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_credential_reference
+        cases:
+        - id: accepts-scoped-future-reference
+          arguments:
+          - value:
+              provider: os-keyring
+              key: smtp-report
+              purpose: weekly-report
+              expiresDay: 100
+          - value: 50
+          - value:
+            - weekly-report
+          expectedReturn:
+            accepted: true
+            failures: []
+            identity: os-keyring:smtp-report
+        - id: reports-embedded-disallowed-expired-secret
+          arguments:
+          - value:
+              provider: env
+              key: SMTP_PASSWORD
+              value: secret
+              purpose: other
+              expiresDay: 10
+          - value: 10
+          - value:
+            - weekly-report
+          expectedReturn:
+            accepted: false
+            failures:
+            - embedded-value
+            - purpose
+            - expired
+            identity: env:SMTP_PASSWORD
+        - id: reports-missing-reference
+          arguments:
+          - value:
+              purpose: weekly-report
+              expiresDay: 100
+          - value: 1
+          - value:
+            - weekly-report
+          expectedReturn:
+            accepted: false
+            failures:
+            - reference
+            identity: None:None
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: email_09-credential-use-ledger-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - email_09-credential-reference-audit-mastery
+    title: 새 자격증명 사용에 최소 scope·redaction 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 요청 scope가 허용 scope 안이고 로그 잔존이 없는지 판정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 발송 계정에 IMAP read 같은 불필요 scope를 함께 부여하지 마세요.
+    - 사용 ledger에는 secret 값이 아닌 audit ID와 scope만 남기세요.
+    exercise:
+      prompt: audit_credential_use(usage, allowed_scopes)를 완성하세요.
+      starterCode: |-
+        def audit_credential_use(usage, allowed_scopes):
+            raise NotImplementedError
+      solution: |
+        def audit_credential_use(usage, allowed_scopes):
+            requested = set(usage.get("requestedScopes", []))
+            excess = sorted(requested - set(allowed_scopes))
+            failures = []
+            if excess:
+                failures.append("scope")
+            if usage.get("secretResidualFindings", 0) != 0:
+                failures.append("redaction")
+            if not usage.get("auditId"):
+                failures.append("audit-id")
+            return {"accepted": not failures, "failures": failures, "excessScopes": excess, "recordedSecretValue": False}
+      hints: *id002
+    check:
+      id: python.email.email_09.credential-use-ledger.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_09.credential-use-ledger.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_credential_use
+        cases:
+        - id: accepts-minimal-redacted-use
+          arguments:
+          - value:
+              requestedScopes:
+              - smtp-send
+              secretResidualFindings: 0
+              auditId: u1
+          - value:
+            - smtp-send
+          expectedReturn:
+            accepted: true
+            failures: []
+            excessScopes: []
+            recordedSecretValue: false
+        - id: reports-scope-redaction-and-audit-gaps
+          arguments:
+          - value:
+              requestedScopes:
+              - smtp-send
+              - imap-read
+              secretResidualFindings: 1
+              auditId: ''
+          - value:
+            - smtp-send
+          expectedReturn:
+            accepted: false
+            failures:
+            - scope
+            - redaction
+            - audit-id
+            excessScopes:
+            - imap-read
+            recordedSecretValue: false
+        - id: accepts-no-scope-use
+          arguments:
+          - value:
+              requestedScopes: []
+              secretResidualFindings: 0
+              auditId: u2
+          - value: []
+          expectedReturn:
+            accepted: true
+            failures: []
+            excessScopes: []
+            recordedSecretValue: false
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: email_09-mail-credential-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - email_09-credential-use-ledger-transfer
+    title: 메일 자격증명 관리 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: reference·scope·rotation·redaction 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 메일 API 성공과 올바른 수신자·내용·첨부 전달을 분리해 검증하세요.
+    - 실제 발송 전 dry run과 idempotency identity, 비밀정보 redaction을 적용하세요.
+    exercise:
+      prompt: choose_mail_credential_policy(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_mail_credential_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_mail_credential_policy(situation):
+            table = {'store': {'action': 'keep provider key reference', 'evidence': 'secret identity', 'risk': 'embedded credential'}, 'use': {'action': 'request minimal scope', 'evidence': 'scope and audit ID', 'risk': 'overprivilege'}, 'rotate': {'action': 'enforce expiry and revoke old', 'evidence': 'rotation event', 'risk': 'stale credential'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.email.email_09.mail-credential-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_09.mail-credential-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_mail_credential_policy
+        cases:
+        - id: recalls-store
+          arguments:
+          - value: store
+          expectedReturn:
+            action: keep provider key reference
+            evidence: secret identity
+            risk: embedded credential
+        - id: recalls-use
+          arguments:
+          - value: use
+          expectedReturn:
+            action: request minimal scope
+            evidence: scope and audit ID
+            risk: overprivilege
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,775 @@
+var e=`meta:
+  packages:
+  - pandas
+  id: pandas_02
+  title: 타이타닉생존분석
+  order: 2
+  category: pandas
+  difficulty: ⭐⭐
+  badge: 입문
+  dataSource: codaro-local:titanic
+  outcomes: ["pandas.filterSelect","pandas.aggregate"]
+  prerequisites: ["pandas.loadFrame"]
+  estimatedMinutes: 60
+  tags:
+  - titanic
+  - 필터링
+  - loc
+  - iloc
+  - value_counts
+  - 검증
+  - 생존분석
+  seo:
+    title: pandas 타이타닉 생존분석 - 조건 필터링, loc, iloc
+    description: 타이타닉 데이터로 조건 필터링을 배웁니다. 생존자/사망자 필터링, value_counts, loc/iloc으로 데이터 선택하는 방법을 실습합니다.
+    keywords:
+    - pandas 필터링
+    - loc iloc
+    - value_counts
+    - 타이타닉 데이터
+    - 조건 선택
+intro:
+  emoji: 🚢
+  goal: 타이타닉 승객 데이터에서 "누가 생존했는가?"를 분석합니다.
+  description: 조건 필터링을 배웁니다. "생존자만", "1등석만"처럼 원하는 데이터만 골라내는 방법을 익힙니다.
+  direction: 타이타닉 180명 로컬 승객 샘플로 Boolean Indexing + value_counts + loc/iloc을 손에 익혀 "필터링 → 집계 → 위치 기반 선택" 흐름을 완성합니다.
+  benefits:
+  - DataFrame에서 단일 컬럼/다중 컬럼 선택 패턴을 명확히 구분합니다.
+  - Boolean Series(== 비교)와 Boolean Indexing(df[조건])의 관계를 코드로 확인합니다.
+  - value_counts로 분포를 빠르게 보고 normalize로 비율로 전환합니다.
+  - loc(레이블 기반)과 iloc(위치 기반) 두 인덱서의 사용 시점을 분명히 합니다.
+  diagram:
+    steps:
+    - label: 1단계. 데이터 로드 + shape
+      detail: loadLocalDataset(titanic)으로 180행 DataFrame을 만든다.
+    - label: 2단계. 컬럼 선택과 조건식
+      detail: 단일/다중 컬럼 + Boolean Series로 필터링 기반을 다진다.
+    - label: 3단계. 필터링 + 통계 조합
+      detail: 1등석 생존율, 여성 생존율을 계산해 가설을 데이터로 확인한다.
+    - label: 4단계. loc/iloc + workflow 검증
+      detail: 두 인덱서 차이를 비교하고 합성 4행으로 assert 4개를 고정한다.
+    runtime:
+    - label: 표 데이터 환경
+      detail: pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 타이타닉생존분석 실행
+      detail: 셀을 실행해 필터링 행 수, 생존율, loc/iloc 결과와 예외 상태를 확인합니다.
+    - label: 타이타닉생존분석 완료
+      detail: 검증된 필터링 코드를 생존 요인 리포트 자동화로 남깁니다.
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  structuredPrimary: true
+  subtitle: 타이타닉 승객 데이터
+  goal: loadLocalDataset로 titanic DataFrame을 불러오고 shape으로 행/열 수를 확인한다.
+  why: 데이터 분석의 첫 단계입니다. 180명이라는 전체 표본 크기를 알아야 이후 1등석/여성 같은 그룹 비율을 해석할 수 있습니다.
+  explanation: 타이타닉 데이터셋은 1912년 4월 15일 침몰한 타이타닉호 승객 구조를 본뜬 180명의 로컬 샘플 정보를 담고 있습니다. 이 데이터는 데이터 분석 교육에서 가장 널리 사용되는 클래식
+    데이터셋으로, 실제 역사적 사건을 바탕으로 생존 요인을 분석할 수 있습니다. 15개의 컬럼에는 승객의 나이, 성별, 객실 등급, 운임, 가족 관계 등 다양한 정보가 포함되어 있습니다.
+    survived 컬럼이 1이면 생존, 0이면 사망을 의미하며, 이번 분석의 핵심 타겟 변수입니다. 로컬 실행에서는 네트워크가 없어도 필터링 흐름을 연습할 수 있도록 핵심 컬럼을
+    가진 샘플 데이터를 함께 사용합니다.
+  tips:
+  - survived 컬럼이 분석의 타겟입니다. 0/1 이진 변수라는 점을 기억해두면 평균이 곧 생존율이라는 트릭을 쓸 수 있습니다.
+  snippet: |-
+    import pandas as pd
+    from codaro.curriculum.localData import loadLocalDataset
+
+    titanic = loadLocalDataset("titanic")
+    titanic.shape
+  exercise:
+    prompt: shape 대신 columns나 dtypes를 호출해 컬럼 이름과 타입을 확인하세요.
+    starterCode: |-
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+
+      titanic = loadLocalDataset("titanic")
+      titanic.shape
+    hints:
+    - dtypes는 각 컬럼의 NumPy 타입을 Series로 반환합니다.
+    - 숫자 컬럼은 int64 또는 float64, 문자열 컬럼은 object입니다.
+  check:
+    type: noError
+    noError: loadLocalDataset과 shape 호출이 정상 실행되어야 합니다.
+    resultCheck: shape 결과가 (891, n) 형태의 튜플이거나 그에 준해야 합니다.
+- id: step2_head
+  title: 2단계. 미리보기
+  structuredPrimary: true
+  subtitle: head()로 구조 파악
+  goal: head()로 앞 몇 행을 보고 컬럼명(pclass/sex/age/fare 등)이 무엇을 뜻하는지 익힌다.
+  why: 필터링 조건을 쓸 때 컬럼 이름과 값의 형식(숫자인지 문자열인지)을 알아야 == 비교를 올바르게 작성할 수 있습니다.
+  explanation: head() 메서드로 데이터의 처음 몇 행을 미리 확인합니다. 이 단계에서 각 컬럼의 데이터 타입과 실제 값들이 어떻게 저장되어 있는지 파악할 수 있습니다.
+    pclass는 객실 등급(1등석, 2등석, 3등석), sex는 성별, age는 나이, sibsp는 함께 탑승한 형제자매/배우자 수, parch는 부모/자녀 수, fare는 운임,
+    embarked는 탑승 항구를 의미합니다. 데이터를 분석하기 전에 전체적인 구조를 이해하는 것이 매우 중요합니다.
+  tips:
+  - sex 컬럼은 문자열 (female/male), pclass는 정수 (1/2/3)임을 미리 확인해두면 필터링 조건의 따옴표 사용을 헷갈리지 않습니다.
+  snippet: titanic.head()
+  exercise:
+    prompt: head()를 head(10)으로 바꾸거나 tail()을 호출해 다른 행을 미리 보세요.
+    starterCode: titanic.head()
+    hints:
+    - head(n)은 처음 n행, tail(n)은 마지막 n행을 반환합니다.
+    - 인자를 주지 않으면 기본 5행입니다.
+  check:
+    type: noError
+    noError: head() 호출이 정상 실행되어야 합니다.
+    resultCheck: 결과 DataFrame이 원본 컬럼을 모두 포함하고 행 수가 5(또는 호출 인자)여야 합니다.
+- id: step3_single
+  title: 3단계. 컬럼 하나 선택
+  structuredPrimary: true
+  subtitle: 대괄호 사용
+  goal: 대괄호 한 겹으로 단일 컬럼을 선택하면 Series가 반환되는 것을 확인한다.
+  why: pandas의 모든 분석은 Series 또는 DataFrame을 다룹니다. 단일 컬럼 선택이 Series를 만든다는 사실은 이후 sum/mean/value_counts 호출의 기본입니다.
+  explanation: |-
+    DataFrame에서 특정 컬럼 하나만 선택하려면 대괄호를 사용합니다. 대괄호 안에 컬럼명을 문자열로 입력하면 해당 컬럼의 모든 값을 Series 형태로 가져올 수 있습니다. 여기서는 생존 여부를 나타내는 survived 컬럼을 선택합니다. 이 컬럼은 이진 변수로, 0과 1 두 가지 값만 가지며 생존자 분석의 핵심 변수입니다.
+
+    DataFrame 대괄호로 단일 컬럼명을 선택하면 Series를 반환합니다. Series는 pandas의 1차원 데이터 구조로, 하나의 열을 나타냅니다. 컬럼명은 반드시 따옴표로 감싸야 하며, 대소문자를 정확히 구분해야 합니다.
+  tips:
+  - titanic.survived처럼 점 표기법도 동작하지만, 컬럼명에 공백이나 예약어가 있으면 깨집니다. 대괄호 표기법이 안전합니다.
+  snippet: titanic['survived']
+  exercise:
+    prompt: survived 대신 sex나 age 컬럼을 선택해 결과 Series의 dtype을 확인하세요.
+    starterCode: titanic['survived']
+    hints:
+    - sex는 object(문자열), age는 float64(결측치 포함 가능)일 것입니다.
+    - 결과에 .dtype을 붙이면 타입을 확인할 수 있습니다.
+  check:
+    type: noError
+    noError: 단일 컬럼 선택이 KeyError 없이 실행되어야 합니다.
+    resultCheck: 결과가 Series이고 길이가 891 또는 그에 준해야 합니다.
+- id: step4_multi
+  title: 4단계. 컬럼 여러 개 선택
+  structuredPrimary: true
+  subtitle: 대괄호 2겹
+  goal: 대괄호 두 겹으로 여러 컬럼을 선택하면 DataFrame이 반환된다는 점을 확인한다.
+  why: 단일 컬럼은 Series, 다중 컬럼은 DataFrame. 이 두 결과를 혼동하면 그 뒤 메서드 호출이 깨집니다. 두 겹 대괄호의 의미를 처음에 분명히 해둡니다.
+  explanation: |-
+    여러 컬럼을 동시에 선택하려면 대괄호를 2겹으로 사용합니다. 바깥 대괄호는 DataFrame 선택을 의미하고, 안쪽 대괄호는 컬럼명 리스트를 의미합니다. 결과는 Series가 아닌 DataFrame으로 반환되며, 선택한 컬럼들만 포함하는 새로운 표를 만듭니다. 분석에 필요한 핵심 컬럼만 추출해서 보기 쉽게 만들 수 있습니다.
+
+    대괄호 1겹과 2겹의 차이가 핵심입니다. titanic 대괄호 single은 Series를 반환하고, titanic 대괄호 double은 DataFrame을 반환합니다. 여러 컬럼을 선택할 때는 반드시 2겹으로 작성해야 합니다.
+  tips:
+  - 한 컬럼만 선택하더라도 titanic 대괄호 double로 쓰면 DataFrame 형태를 유지할 수 있습니다 - 시각화 라이브러리는 보통 DataFrame을 요구합니다.
+  snippet: titanic[['survived', 'pclass', 'sex', 'age']]
+  exercise:
+    prompt: 리스트의 컬럼 수를 2개로 줄이거나 fare를 추가해 결과 컬럼 수가 어떻게 달라지는지 확인하세요.
+    starterCode: titanic[['survived', 'pclass', 'sex', 'age']]
+    hints:
+    - 결과 DataFrame의 .columns 길이가 리스트의 길이와 같아야 합니다.
+    - 존재하지 않는 컬럼명을 넣으면 KeyError가 발생합니다.
+  check:
+    type: noError
+    noError: 다중 컬럼 선택이 KeyError 없이 실행되어야 합니다.
+    resultCheck: 결과가 DataFrame이고 컬럼 수가 리스트 길이와 같아야 합니다.
+- id: step5_condition
+  title: 5단계. 조건 만들기
+  structuredPrimary: true
+  subtitle: == 비교 연산자
+  goal: == 연산자로 Boolean Series(True/False 배열)를 만든다.
+  why: 필터링의 첫 절반은 Boolean Series입니다. 이 단계 없이 6단계의 df 대괄호 조건이 어떻게 동작하는지 이해할 수 없습니다.
+  explanation: |-
+    데이터 필터링의 핵심은 조건식을 만드는 것입니다. ==는 같은지를 확인하는 비교 연산자로, 각 값이 조건을 만족하면 True, 만족하지 않으면 False를 반환합니다. titanic survived ==1은 각 승객이 생존했는지 확인하는 조건식입니다. 결과는 180개의 True/False 값으로 이루어진 Boolean Series가 됩니다. 이 Boolean Series를 다음 단계에서 필터링에 사용합니다.
+
+    비교 연산자는 ==, !=, >, <, >=, <= 등이 있습니다. 할당의 =과 비교의 ==를 구분해야 합니다. x = 5는 값을 대입하고, x == 5는 같은지 비교합니다.
+  tips:
+  - Boolean Series의 sum()은 True의 개수를 줍니다 - (titanic 컬럼 == 값).sum()이 곧 조건을 만족하는 행 수입니다.
+  snippet: titanic['survived'] == 1
+  exercise:
+    prompt: == 1을 != 1이나 == 0으로 바꿔 결과 Boolean Series가 뒤집히는지 확인하세요.
+    starterCode: titanic['survived'] == 1
+    hints:
+    - 부등호 연산자(!=)는 다르다는 뜻이고 ==와 정확히 반대 결과를 줍니다.
+    - sum()을 붙이면 True 개수를 셀 수 있습니다.
+  check:
+    type: noError
+    noError: 비교 연산이 정상 실행되어 Boolean Series를 반환해야 합니다.
+    resultCheck: 결과가 Series이고 dtype이 bool이어야 합니다.
+- id: step6_filter
+  title: 6단계. 생존자 필터링
+  structuredPrimary: true
+  subtitle: 조건이 True인 행만
+  goal: df 대괄호 조건 형태(Boolean Indexing)로 생존자 99명만 추출한다.
+  why: Boolean Series와 Boolean Indexing이 결합되는 핵심 단계입니다. 이 패턴이 모든 pandas 필터링의 기본입니다.
+  explanation: |-
+    이제 조건식을 DataFrame의 대괄호 안에 넣어서 실제 필터링을 수행합니다. df 대괄호 조건식 형태로 작성하면 조건이 True인 행만 선택되고, False인 행은 자동으로 제외됩니다. 이를 Boolean Indexing이라고 부릅니다. len 함수로 개수를 세어보면 180명 중 99명이 생존한 것을 확인할 수 있습니다. 생존율은 55%입니다.
+
+    필터링 결과를 새 변수에 저장하면 추가 분석을 할 수 있습니다. len은 행의 개수를 세는 함수입니다. .shape[0]이나 .count()를 사용해도 같은 결과를 얻을 수 있습니다.
+  tips:
+  - 생존자 수 / 전체 수가 곧 생존율입니다 - 99 / 180 = 0.55.
+  snippet: |-
+    survivors = titanic[titanic['survived'] == 1]
+    len(survivors)
+  exercise:
+    prompt: == 1 대신 == 0으로 바꿔 사망자 수를 구하고 180 - 생존자 수와 같은지 확인하세요.
+    starterCode: |-
+      survivors = titanic[titanic['survived'] == 1]
+      len(survivors)
+    hints:
+    - 생존자 수 + 사망자 수가 전체 행 수와 같아야 합니다.
+    - 결측이 있으면 합이 전체보다 작을 수 있습니다.
+  check:
+    type: noError
+    noError: Boolean Indexing이 KeyError 없이 실행되어야 합니다.
+    resultCheck: len(survivors)가 0보다 큰 정수여야 합니다.
+- id: step7_firstclass
+  title: 7단계. 1등석 필터링
+  structuredPrimary: true
+  subtitle: 다른 조건 적용
+  goal: pclass == 1 조건으로 1등석 승객 216명을 추출해 같은 패턴을 다른 컬럼에 적용한다.
+  why: 한 번 익힌 Boolean Indexing 패턴이 모든 컬럼에 동일하게 적용된다는 점을 손에 익힙니다.
+  explanation: 같은 방식으로 다른 조건을 적용해봅니다. pclass(passenger class)는 객실 등급을 나타내며, 1이 1등석, 2가 2등석, 3이 3등석입니다.
+    타이타닉에서는 객실 등급이 생존에 큰 영향을 미쳤는데, 상류층이 탑승한 1등석은 구명보트 접근이 용이했기 때문입니다. 1등석 승객은 216명이었습니다.
+  tips:
+  - pclass는 정수이므로 == 1로 비교합니다. sex처럼 문자열이면 == "female"로 따옴표가 필요합니다.
+  snippet: |-
+    first = titanic[titanic['pclass'] == 1]
+    len(first)
+  exercise:
+    prompt: pclass == 1을 pclass == 3으로 바꿔 3등석 승객 수를 구하고 1등석보다 훨씬 많다는 점을 확인하세요.
+    starterCode: |-
+      first = titanic[titanic['pclass'] == 1]
+      len(first)
+    hints:
+    - 3등석은 약 491명으로 가장 많습니다.
+    - 1등석 + 2등석 + 3등석이 180이 되어야 합니다.
+  check:
+    type: noError
+    noError: Boolean Indexing이 정상 실행되어야 합니다.
+    resultCheck: len(first)가 0과 891 사이의 정수여야 합니다.
+- id: step8_value_counts
+  title: 8단계. 값별 개수
+  structuredPrimary: true
+  subtitle: value_counts()
+  goal: value_counts로 컬럼의 모든 고유 값마다 등장 횟수를 한 줄에 본다.
+  why: 매번 ==로 필터링하고 len 호출하는 대신, value_counts 한 줄이면 분포 전체가 나옵니다.
+  explanation: |-
+    value_counts 메서드는 범주형 데이터의 각 값이 몇 번 등장하는지 자동으로 세어줍니다. 일일이 필터링해서 개수를 셀 필요 없이 한 줄로 전체 분포를 파악할 수 있어 매우 편리합니다. 기본적으로 개수가 많은 순서대로 정렬되어 출력됩니다. 로컬 타이타닉 샘플에서는 81명이 사망(0), 99명이 생존(1)했습니다. 생존자가 사망자보다 조금 많습니다.
+
+    value_counts는 기본적으로 결측치(NaN)를 제외합니다. 결측치도 포함하려면 dropna=False를 추가하면 됩니다. 또한 sort=False를 추가하면 정렬하지 않고 원래 순서대로 보여줍니다.
+  tips:
+  - value_counts의 결과 인덱스가 고유 값이고 값이 빈도수입니다. 결과에 .index.tolist()를 붙이면 모든 고유 값을 리스트로 받을 수 있습니다.
+  snippet: titanic['survived'].value_counts()
+  exercise:
+    prompt: survived 대신 pclass나 sex 컬럼으로 바꿔 등급별/성별 분포를 확인하세요.
+    starterCode: titanic['survived'].value_counts()
+    hints:
+    - pclass는 3개 고유 값, sex는 2개 고유 값을 가집니다.
+    - 결과의 sum()이 결측치 제외 전체 행 수와 같아야 합니다.
+  check:
+    type: noError
+    noError: value_counts가 정상 실행되어 Series를 반환해야 합니다.
+    resultCheck: 결과 Series의 값이 모두 정수 빈도여야 합니다.
+- id: step8_5_describe
+  title: 8.5단계. 숫자 통계 복습
+  structuredPrimary: true
+  subtitle: describe()로 전체 파악
+  goal: describe()로 숫자 컬럼들의 평균/표준편차/사분위수를 한 번에 본다.
+  why: 필터링으로 부분을 보기 전, 전체의 통계를 알아야 부분 통계가 평균보다 높은지 낮은지를 판단할 수 있습니다.
+  explanation: |-
+    이전 프로젝트(01번)에서 배운 describe()를 복습합니다. 숫자 컬럼들의 평균, 표준편차, 최소/최대값 등을 한눈에 확인할 수 있습니다. 나이(age)는 평균 약 30세, 운임(fare)은 평균 약 $32, 최대 운임은 $512입니다. describe()는 데이터를 처음 볼 때 전체적인 분포를 빠르게 파악하는 데 매우 유용합니다.
+
+    describe()는 01번 프로젝트에서 처음 배운 메서드입니다. count(개수), mean(평균), std(표준편차), min(최소), 25%(1사분위), 50%(중앙값), 75%(3사분위), max(최대)를 자동으로 계산해줍니다.
+  tips:
+  - fare의 max가 $512인데 mean이 $32인 큰 격차는 분포가 한쪽으로 치우쳐 있다는 신호입니다 - 1등석 운임이 극단적으로 비쌌습니다.
+  snippet: titanic.describe()
+  exercise:
+    prompt: include=all 옵션을 추가해 문자열 컬럼(sex 등)의 통계도 함께 보세요.
+    starterCode: titanic.describe()
+    hints:
+    - include=all을 주면 unique/top/freq 같은 범주형 통계도 함께 표시됩니다.
+    - 컬럼이 늘어나면 결과 DataFrame의 shape도 함께 늘어납니다.
+  check:
+    type: noError
+    noError: describe() 호출이 정상 실행되어 통계 DataFrame을 반환해야 합니다.
+    resultCheck: 결과 인덱스에 count, mean, std, min, max가 모두 포함되어야 합니다.
+- id: step9_normalize
+  title: 9단계. 비율로 보기
+  structuredPrimary: true
+  subtitle: normalize=True
+  goal: value_counts에 normalize=True를 주어 빈도가 아닌 비율로 본다.
+  why: 81 vs 99 같은 절대 수치보다 0.45 vs 0.55 같은 비율이 더 직관적입니다. 보고서나 시각화에는 비율이 더 적합합니다.
+  explanation: |-
+    value_counts에 normalize=True 파라미터를 추가하면 개수 대신 비율(백분율)을 보여줍니다. 전체에서 각 값이 차지하는 상대적 비중을 파악할 때 유용합니다. 개수만 보면 절대적 규모를 알 수 있지만, 비율을 보면 전체 대비 어느 정도 비중인지 직관적으로 이해할 수 있습니다. 3등석이 약 55%, 1등석이 약 24%, 2등석이 약 21%를 차지합니다.
+
+    normalize=True의 결과는 0에서 1 사이의 소수로 표시됩니다. 백분율로 보려면 * 100을 곱하면 됩니다.
+  tips:
+  - normalize=True 결과의 sum()은 항상 1.0이 되어야 합니다 - 그렇지 않으면 결측치가 있다는 신호입니다.
+  snippet: titanic['pclass'].value_counts(normalize=True)
+  exercise:
+    prompt: pclass 대신 sex나 survived로 바꿔 성별/생존 비율을 비교하세요.
+    starterCode: titanic['pclass'].value_counts(normalize=True)
+    hints:
+    - sex는 male이 약 65%, female이 약 35%입니다.
+    - survived는 0이 45%, 1이 55%입니다.
+  check:
+    type: noError
+    noError: normalize 옵션 호출이 정상 실행되어야 합니다.
+    resultCheck: 결과 Series의 sum()이 1.0에 가까운 값이어야 합니다.
+- id: step10_survival_rate
+  title: 10단계. 1등석 생존율
+  structuredPrimary: true
+  subtitle: 필터링 + 통계 조합
+  goal: pclass==1 필터링 + survived.mean() 조합으로 1등석 생존율(약 72%)을 한 줄에 계산한다.
+  why: 0/1 이진 변수의 평균이 곧 1의 비율이라는 트릭이 이 강의의 가장 강력한 도구입니다. 같은 패턴이 합격률, 클릭률, 전환율 계산에 그대로 적용됩니다.
+  explanation: |-
+    이제 필터링과 통계를 조합해서 더 깊이 있는 분석을 수행합니다. 1등석 승객만 필터링한 후, survived 컬럼의 평균을 구하면 생존율을 계산할 수 있습니다. survived가 0(사망)과 1(생존)로 이루어져 있기 때문에, 평균값이 곧 생존한 사람의 비율이 됩니다. 로컬 샘플에서 1등석 생존율은 약 72%로, 전체 생존율 55%보다 높습니다. 메서드 체이닝을 통해 여러 작업을 한 줄로 연결할 수 있습니다.
+
+    0과 1로 이루어진 이진 변수의 평균은 1의 비율과 같습니다. 예를 들어 1, 0, 1, 1, 0의 평균은 0.6이며 60%가 1이라는 의미입니다. 이 트릭은 생존율, 합격률, 성공률 계산에 자주 사용됩니다.
+  tips:
+  - 등급별 생존율을 보면 1등석이 약 72%로 가장 높고, 2등석과 3등석은 약 47%입니다. 객실 등급별 차이를 비율로 비교하세요.
+  snippet: titanic[titanic['pclass'] == 1]['survived'].mean()
+  exercise:
+    prompt: pclass == 1을 pclass == 3으로 바꿔 3등석 생존율을 구하고 1등석과 비교하세요.
+    starterCode: titanic[titanic['pclass'] == 1]['survived'].mean()
+    hints:
+    - 3등석 생존율은 약 0.47로 1등석보다 낮습니다.
+    - 두 결과의 차이가 객실 등급의 영향력을 보여줍니다.
+  check:
+    type: noError
+    noError: 필터링 + mean 체인이 정상 실행되어야 합니다.
+    resultCheck: 결과가 0과 1 사이의 float여야 합니다.
+- id: step11_female
+  title: 11단계. 여성 생존율
+  structuredPrimary: true
+  subtitle: 성별로 비교
+  goal: sex == female 필터링으로 여성 생존율(100%)을 계산해 성별 차이가 로컬 샘플에 어떻게 들어 있는지 확인한다.
+  why: 데이터 분석은 가설을 수치로 검증하는 과정입니다. 역사적 서술이 데이터에서 실제로 보이는지 확인하는 것이 분석의 핵심 가치입니다.
+  explanation: 타이타닉 침몰 당시 "여성과 어린이 먼저(Women and children first)" 원칙이 실제로 적용되었는지 데이터로 확인해봅니다. 여성 승객만 필터링한
+    후 생존율을 계산하면 100%가 나옵니다. 이는 전체 생존율 55%, 남성 생존율 25%와 비교하면 압도적으로 높은 수치입니다. 로컬 샘플에서 성별 차이가 크게 설계되었음을
+    데이터가 입증합니다.
+  tips:
+  - 문자열 비교는 따옴표가 필수입니다 - sex == female이 아니라 sex == "female"이어야 합니다(파이썬 변수처럼 인식되어 NameError).
+  snippet: titanic[titanic['sex'] == 'female']['survived'].mean()
+  exercise:
+    prompt: female을 male로 바꿔 남성 생존율을 구하고 여성과 비교하세요.
+    starterCode: titanic[titanic['sex'] == 'female']['survived'].mean()
+    hints:
+    - 남성 생존율은 0.25로 여성보다 낮습니다.
+    - 100% vs 25%의 차이가 로컬 샘플의 성별 생존율 차이를 보여줍니다.
+  check:
+    type: noError
+    noError: 문자열 비교 필터링이 정상 실행되어야 합니다.
+    resultCheck: 결과가 0과 1 사이의 float여야 합니다.
+- id: step12_loc
+  title: 12단계. loc 사용
+  structuredPrimary: true
+  subtitle: 조건 + 컬럼 동시 선택
+  goal: df.loc 행조건 열선택 형태로 행 필터링과 컬럼 선택을 한 번에 한다.
+  why: titanic[조건]['컬럼']은 두 번의 인덱싱이지만 .loc은 한 번입니다. 메모리와 가독성에서 .loc이 권장됩니다.
+  explanation: |-
+    loc은 DataFrame에서 행과 열을 동시에 선택할 수 있는 강력한 인덱서입니다. .loc 행조건 컬럼 형태로 사용하며, 행은 Boolean 조건식으로, 열은 컬럼명이나 리스트로 지정합니다. 지금까지는 titanic[조건][컬럼] 형태로 두 번 선택했지만, loc을 사용하면 한 번에 처리할 수 있어 더 효율적입니다. 생존자의 나이만 뽑아내는 것처럼 특정 조건의 특정 컬럼을 분석할 때 매우 유용합니다.
+
+    loc에서 열을 리스트로 주면 여러 컬럼을 동시에 선택할 수 있습니다. titanic.loc 행조건 컬럼리스트 형태로 사용하면 생존자의 나이, 성별, 등급을 한번에 볼 수 있습니다.
+  tips:
+  - .loc은 SettingWithCopyWarning을 피해갑니다 - 값을 변경하려면 반드시 .loc 표기법을 쓰세요.
+  snippet: titanic.loc[titanic['survived'] == 1, 'age'].head()
+  exercise:
+    prompt: age 대신 fare로 바꾸거나 컬럼을 리스트로 만들어 여러 컬럼을 동시에 선택하세요.
+    starterCode: titanic.loc[titanic['survived'] == 1, 'age'].head()
+    hints:
+    - 단일 컬럼이면 Series, 컬럼 리스트면 DataFrame이 반환됩니다.
+    - 컬럼 리스트의 예는 [age, sex, pclass]입니다.
+  check:
+    type: noError
+    noError: .loc 호출이 정상 실행되어야 합니다.
+    resultCheck: 결과가 Series 또는 DataFrame이고 행 수가 생존자 수와 같아야 합니다.
+- id: step13_iloc
+  title: 13단계. iloc 사용
+  structuredPrimary: true
+  subtitle: 번호로 선택
+  goal: .iloc[정수]로 위치(0부터 시작)로 단일 행을 선택한다.
+  why: loc은 컬럼명, iloc은 행 번호. 검색 기반과 위치 기반의 차이를 명확히 구분해두면 SettingWithCopyWarning 같은 함정을 피할 수 있습니다.
+  explanation: |-
+    loc이 레이블(이름)로 선택한다면, iloc은 정수 위치(integer location)로 선택합니다. iloc은 0부터 시작하는 인덱스 번호로 행과 열을 선택하며, 파이썬의 리스트 인덱싱과 동일하게 작동합니다. iloc[0]은 첫 번째 행, iloc[1]은 두 번째 행을 의미합니다. 컬럼명이나 조건과 무관하게 순수하게 위치만으로 데이터를 선택할 때 사용합니다.
+
+    loc과 iloc의 차이는 loc은 레이블(컬럼명, 인덱스명), iloc은 정수 위치로 선택한다는 점입니다. loc[0]은 인덱스 이름이 0인 행을, iloc[0]은 첫 번째 행을 의미합니다. 조건 기반 필터링에는 loc, 위치 기반 선택에는 iloc을 사용하세요.
+  tips:
+  - iloc은 음수도 받습니다 - iloc[-1]은 마지막 행입니다.
+  snippet: titanic.iloc[0]
+  exercise:
+    prompt: 0을 5나 -1로 바꿔 다섯 번째 행, 마지막 행을 선택해보세요.
+    starterCode: titanic.iloc[0]
+    hints:
+    - iloc[5]는 인덱스 5인 행(여섯 번째)을, iloc[-1]은 마지막 행을 반환합니다.
+    - 결과는 Series이고 인덱스가 컬럼 이름입니다.
+  check:
+    type: noError
+    noError: iloc 호출이 IndexError 없이 실행되어야 합니다.
+    resultCheck: 결과가 Series이고 인덱스가 원본 DataFrame의 컬럼 이름이어야 합니다.
+- id: step14_iloc_range
+  title: 14단계. iloc 범위 선택
+  structuredPrimary: true
+  subtitle: 행과 열 범위 지정
+  goal: iloc에 슬라이스(0:3, 0:4)를 넘겨 직사각형 영역을 한 번에 추출한다.
+  why: 대용량 데이터에서 일부 행과 일부 컬럼만 빠르게 보고 싶을 때 표준 패턴입니다.
+  explanation: |-
+    iloc은 슬라이싱을 지원하여 범위로 선택할 수 있습니다. iloc 행시작:행끝, 열시작:열끝 형태로 사용하며, 파이썬 슬라이싱 규칙을 따릅니다. 시작 인덱스는 포함되고 끝 인덱스는 제외됩니다. 예를 들어 0:3은 0, 1, 2 세 개의 행을 선택합니다. 행과 열을 동시에 범위 지정하면 데이터의 특정 부분만 추출할 수 있습니다. 대용량 데이터에서 일부만 샘플링할 때 유용합니다.
+
+    슬라이싱에서 콜론만 쓰면 전체를 의미합니다. iloc 전체:5는 처음 5행 전체 컬럼, iloc 전체, 전체:3은 전체 행의 처음 3개 컬럼을 선택합니다. iloc 음수 -1은 마지막 행, iloc 음수 -5:는 마지막 5개 행을 선택합니다.
+  tips:
+  - 슬라이스 끝 인덱스는 제외됩니다 - iloc[0:3]은 인덱스 0, 1, 2 세 행만 가져옵니다.
+  snippet: titanic.iloc[0:3, 0:4]
+  exercise:
+    prompt: 슬라이스를 더 넓은 범위로 늘리거나 음수 인덱스를 활용해 결과 shape가 어떻게 달라지는지 확인하세요.
+    starterCode: titanic.iloc[0:3, 0:4]
+    hints:
+    - 결과 shape는 (행 슬라이스 길이, 열 슬라이스 길이)입니다.
+    - 음수 시작 인덱스(예 minus 3 콜론)는 마지막 3행을 의미합니다.
+  check:
+    type: noError
+    noError: iloc 범위 선택이 정상 실행되어야 합니다.
+    resultCheck: 결과 shape가 슬라이스 범위와 일치해야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 생존율 리포트 만들기'
+  structuredPrimary: true
+  subtitle: 필터링, groupby, loc/iloc, 실패 케이스
+  goal: 합성 4행 DataFrame으로 groupby 생존율, loc 어린이 생존율, iloc 위치 선택 네 결과를 assert로 동시에 고정한다.
+  why: 생존율 분석은 행 필터를 잘못 잡아도 숫자는 나옵니다. 합성 데이터 + assert로 기대값을 미리 박아두면 잘못된 필터링을 즉시 잡을 수 있습니다.
+  explanation: |-
+    생존율 분석은 행을 잘못 필터링해도 숫자는 나오기 때문에 검증이 중요합니다. 필수 컬럼을 확인하고, 등급별 생존율과 어린이 생존율을 따로 계산해 기대값을 고정하세요.
+
+    변주 실험: 어린이 기준을 13세에서 16세로 바꾸고, 생존율이 변하는지 같은 코드로 비교하세요.
+  tips:
+  - groupby + mean으로 등급별 생존율을 한 줄에 만들 수 있습니다 - 이건 다음 강의(pandas 03)의 핵심 주제입니다.
+  - .loc[정수]는 인덱스 레이블이 정수인 행을 가져옵니다. RangeIndex DataFrame에서는 iloc과 같은 결과가 나옵니다.
+  snippet: |-
+    import pandas as pd
+
+    titanic = pd.DataFrame({
+        "pclass": [1, 1, 3, 3],
+        "age": [38, 10, 22, 8],
+        "survived": [1, 1, 0, 1],
+    })
+
+    classRate = titanic.groupby("pclass")["survived"].mean()
+    childRate = titanic.loc[titanic["age"] < 13, "survived"].mean()
+
+    assert classRate.loc[1] == 1.0
+    assert round(classRate.loc[3], 2) == 0.5
+    assert childRate == 1.0
+    assert titanic.iloc[0]["pclass"] == 1
+  exercise:
+    prompt: survived 값을 바꿔 classRate assert가 어떻게 깨지는지 확인하고 우변을 새 값으로 갱신하세요.
+    starterCode: |-
+      import pandas as pd
+
+      titanic = pd.DataFrame({
+          "pclass": [1, 1, 3, 3],
+          "age": [38, 10, 22, 8],
+          "survived": [1, 1, 0, 1],
+      })
+
+      classRate = titanic.groupby("pclass")["survived"].mean()
+      childRate = titanic.loc[titanic["age"] < 13, "survived"].mean()
+
+      assert classRate.loc[1] == 1.0
+      assert round(classRate.loc[3], 2) == 0.5
+      assert childRate == 1.0
+      assert titanic.iloc[0]["pclass"] == 1
+    hints:
+    - pclass 1 두 명 모두 survived 1이라 평균은 1.0입니다.
+    - childRate는 age < 13인 2명(10, 8) 모두 survived 1이라 1.0입니다.
+  check:
+    type: noError
+    noError: groupby/loc/iloc 모든 호출이 정상 실행되어야 합니다.
+    resultCheck: 네 assert 모두 통과해야 하며, 데이터를 바꾸면 그에 맞춰 우변도 갱신되어야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 타이타닉 생존 분석 프로젝트
+  goal: 배운 필터링/value_counts/loc 패턴을 직접 조합해 자신만의 생존 요인 분석을 수행한다.
+  why: 가이드된 단계만 따라가는 학습보다 빈 셀에서 시작하는 실습이 손에 익는 정도가 다릅니다.
+  explanation: |-
+    배운 내용으로 타이타닉 생존 요인을 분석해봅시다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  tips:
+  - 가설을 한 문장으로 적은 뒤 그에 필요한 필터링을 작성하고 mean으로 검증하세요.
+  snippet: |-
+    import pandas as pd
+    from codaro.curriculum.localData import loadLocalDataset
+
+    data = loadLocalDataset("titanic")
+  exercise:
+    prompt: data에서 어린이(age < 13)와 성인의 생존율을 각각 구하고 차이를 비교하세요.
+    starterCode: |-
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
+
+      data = loadLocalDataset("titanic")
+    hints:
+    - 어린이 필터링은 data[data['age'] < 13]['survived'].mean() 형태입니다.
+    - 성인은 age >= 13으로 필터링하면 됩니다.
+  check:
+    type: noError
+    noError: loadLocalDataset과 그 뒤 분석 코드가 KeyError 없이 실행되어야 합니다.
+    resultCheck: 결과가 0과 1 사이의 생존율 값들이어야 합니다.
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 조건 필터링의 핵심 개념을 배웠습니다. Boolean Indexing을 통해 원하는 조건의 데이터만 골라내고, loc/iloc을 사용해서 행과 열을 효율적으로
+      선택하는 방법을 익혔습니다. 이 기술들은 실제 데이터 분석에서 가장 많이 사용되는 필수 스킬입니다.
+  - type: list
+    items:
+    - df[['컬럼1', '컬럼2']] - 여러 컬럼 선택 (2겹 대괄호)
+    - df[df['컬럼'] == 값] - 조건 필터링 (Boolean Indexing)
+    - df['컬럼'].value_counts() - 값별 개수 세기
+    - df['컬럼'].value_counts(normalize=True) - 비율로 보기
+    - df.loc[조건, '컬럼'] - 조건 + 컬럼 동시 선택 (레이블)
+    - df.iloc[번호] - 위치로 선택 (정수 인덱스)
+  - type: text
+    content: 다음 시간에는 펭귄 데이터로 groupby를 배웁니다. 그룹별로 통계를 한 번에 구하는 강력한 기능입니다.
+  goal: 이 강의에서 익힌 필터링/value_counts/loc·iloc 6가지 패턴을 머릿속에 정리한다.
+  why: 같은 패턴이 다음 강의(펭귄 groupby)와 후속 모든 데이터 분석 트랙에서 그대로 반복됩니다. 한 번 정리해두면 다음 강의가 빠르게 진입합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pandas_02-survival-rate-by-group-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - summary
+    title: 승객 그룹별 생존율과 표본 수 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 선택한 그룹 열마다 전체 수, 생존 수, 생존율을 함께 집계한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 생존율만 반환하지 말고 분모가 되는 count를 함께 남기세요.
+    - 그룹 key는 JSON 증거에서 안정적으로 비교하도록 문자열로 정규화하세요.
+    exercise:
+      prompt: survival_by_group(rows, group_key)를 완성해 그룹별 count, survived, rate를 반환하세요.
+      starterCode: |-
+        def survival_by_group(rows, group_key):
+            raise NotImplementedError
+      solution: |
+        def survival_by_group(rows, group_key):
+            grouped = {}
+            for row in rows:
+                key = str(row[group_key])
+                bucket = grouped.setdefault(key, {"count": 0, "survived": 0})
+                bucket["count"] += 1
+                bucket["survived"] += 1 if row["survived"] else 0
+            return {
+                key: {**value, "rate": round(value["survived"] / value["count"], 3)}
+                for key, value in sorted(grouped.items())
+            }
+      hints: *id001
+    check:
+      id: python.pandas.pandas_02.survival-rate-by-group.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_02.survival-rate-by-group.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: survival_by_group
+        cases:
+        - id: groups-class-rates
+          arguments:
+          - value:
+            - class: 1
+              survived: 1
+            - class: 1
+              survived: 0
+            - class: 3
+              survived: 0
+          - value: class
+          expectedReturn:
+            '1':
+              count: 2
+              survived: 1
+              rate: 0.5
+            '3':
+              count: 1
+              survived: 0
+              rate: 0.0
+        - id: handles-empty-input
+          arguments:
+          - value: []
+          - value: class
+          expectedReturn: {}
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pandas_02-outcome-rate-comparison-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_02-survival-rate-by-group-mastery
+    title: 새 캠페인 데이터에서 세그먼트별 성공률 비교하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 생존율 집계 구조를 캠페인 세그먼트와 boolean outcome에 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - outcome 값은 bool로 해석하되 그룹별 전체 수를 별도로 누적하세요.
+    - 비율이 높아도 표본 수가 작을 수 있으므로 counts를 버리지 마세요.
+    exercise:
+      prompt: compare_outcome_rates(rows, segment_key, outcome_key)를 완성해 rates와 leader를 반환하세요.
+      starterCode: |-
+        def compare_outcome_rates(rows, segment_key, outcome_key):
+            raise NotImplementedError
+      solution: |
+        def compare_outcome_rates(rows, segment_key, outcome_key):
+            counts = {}
+            for row in rows:
+                key = str(row[segment_key])
+                bucket = counts.setdefault(key, [0, 0])
+                bucket[0] += 1
+                bucket[1] += bool(row[outcome_key])
+            rates = {key: round(success / count, 3) for key, (count, success) in sorted(counts.items())}
+            leader = max(rates, key=lambda key: (rates[key], key)) if rates else None
+            return {"rates": rates, "leader": leader, "counts": {key: value[0] for key, value in sorted(counts.items())}}
+      hints: *id002
+    check:
+      id: python.pandas.pandas_02.outcome-rate-comparison.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_02.outcome-rate-comparison.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: compare_outcome_rates
+        cases:
+        - id: compares-campaigns
+          arguments:
+          - value:
+            - campaign: A
+              clicked: true
+            - campaign: A
+              clicked: false
+            - campaign: B
+              clicked: true
+          - value: campaign
+          - value: clicked
+          expectedReturn:
+            rates:
+              A: 0.5
+              B: 1.0
+            leader: B
+            counts:
+              A: 2
+              B: 1
+        - id: handles-empty-campaign
+          arguments:
+          - value: []
+          - value: campaign
+          - value: clicked
+          expectedReturn:
+            rates: {}
+            leader: null
+            counts: {}
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pandas_02-rate-denominator-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_02-outcome-rate-comparison-transfer
+    title: 비율 질문에서 올바른 분모를 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 전체 비율, 그룹 내 비율, 조건부 비율의 분모를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - ‘그룹 안에서’라는 말이 있으면 분모도 해당 그룹으로 제한됩니다.
+    - 조건부 질문은 조건을 분자에만 적용하지 않도록 주의하세요.
+    exercise:
+      prompt: choose_rate_denominator(question)를 완성해 numerator, denominator, groupBy를 반환하세요.
+      starterCode: |-
+        def choose_rate_denominator(question):
+            raise NotImplementedError
+      solution: |
+        def choose_rate_denominator(question):
+            table = {
+                "overall-survival": {"numerator": "survived rows", "denominator": "all rows", "groupBy": None},
+                "survival-within-class": {"numerator": "survived rows in class", "denominator": "all rows in class", "groupBy": "class"},
+                "female-share-among-survivors": {"numerator": "female survived rows", "denominator": "all survived rows", "groupBy": None},
+            }
+            if question not in table:
+                raise ValueError("unknown rate question")
+            return table[question]
+      hints: *id003
+    check:
+      id: python.pandas.pandas_02.rate-denominator-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_02.rate-denominator-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_rate_denominator
+        cases:
+        - id: recalls-within-group-denominator
+          arguments:
+          - value: survival-within-class
+          expectedReturn:
+            numerator: survived rows in class
+            denominator: all rows in class
+            groupBy: class
+        - id: distinguishes-share-among-survivors
+          arguments:
+          - value: female-share-among-survivors
+          expectedReturn:
+            numerator: female survived rows
+            denominator: all survived rows
+            groupBy: null
+        - id: rejects-undefined-question
+          arguments:
+          - value: survival-vibes
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

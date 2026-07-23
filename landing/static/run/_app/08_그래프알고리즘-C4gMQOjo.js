@@ -1,0 +1,801 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - networkx
+  id: networkx_08
+  title: 그래프알고리즘
+  order: 8
+  category: networkx
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  tags:
+  - networkx
+  - BFS
+  - DFS
+  - 최소신장트리
+  - 위상정렬
+  seo:
+    title: NetworkX 그래프 알고리즘 - BFS, DFS, MST
+    description: NetworkX로 고전 그래프 알고리즘을 배웁니다. BFS, DFS, 최소신장트리, 위상정렬을 실습합니다.
+    keywords:
+    - networkx
+    - BFS
+    - DFS
+    - MST
+    - 위상정렬
+    - 그래프알고리즘
+intro:
+  emoji: 🔍
+  goal: BFS, DFS, 최소신장트리, 위상정렬 등 고전 그래프 알고리즘을 배웁니다.
+  description: 그래프 알고리즘은 컴퓨터 과학의 핵심입니다. 너비우선탐색(BFS)과 깊이우선탐색(DFS)은 그래프 순회의 기본입니다. 최소신장트리(MST)는 모든 노드를 최소
+    비용으로 연결합니다. 위상정렬은 의존성 순서를 결정합니다.
+  direction: 그래프알고리즘에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.
+  benefits:
+  - 관계 데이터 확인 후 그래프 알고리즘에 맞는 코드 입력을 고릅니다.
+  - 그래프알고리즘 결과를 노드/엣지와 지표 값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 관계 분석 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(관계 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 너비우선탐색 처리 실행
+      detail: 그래프 알고리즘 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 깊이우선탐색 결과 검증
+      detail: 노드/엣지와 지표 값 기준으로 실행 결과를 비교합니다.
+    - label: 그래프알고리즘 재사용
+      detail: 완성 코드를 관계 분석 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 그래프 분석 환경
+      detail: matplotlib, networkx 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 그래프알고리즘 실행
+      detail: 셀을 실행해 노드/엣지와 지표 값와 예외 상태를 확인합니다.
+    - label: 그래프알고리즘 완료
+      detail: 검증된 코드를 관계 분석 리포트로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: NetworkX와 matplotlib을 불러옵니다. 그래프 알고리즘은 컴퓨터 과학의 핵심 분야로, 경로 탐색, 네트워크 최적화, 작업 스케줄링 등 다양한 문제를
+    해결합니다. 이 장에서는 그래프 순회(BFS, DFS), 최소신장트리(MST), 위상정렬 등 고전적이면서 중요한 알고리즘들을 배웁니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import networkx as nx
+    import matplotlib.pyplot as plt
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+    hints:
+    - 바꿀 지점은 관계 데이터을 만드는 첫 줄과 그래프 알고리즘 줄에서 찾으세요.
+    - 실행 뒤 노드/엣지와 지표 값 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 노드/엣지와 지표 값 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step2_bfs
+  title: 2단계. 너비우선탐색
+  structuredPrimary: true
+  subtitle: BFS
+  goal: 2단계. 너비우선탐색에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    너비우선탐색(Breadth-First Search, BFS)은 시작 노드에서 가까운 노드부터 차례로 방문합니다. 마치 물결이 퍼지듯이 레벨(거리) 순서로 탐색합니다. 큐(Queue) 자료구조를 사용하며, 가중치가 없는 그래프에서 최단 경로를 찾는 데 사용됩니다. 소셜 네트워크에서 '친구의 친구' 찾기, 웹 크롤링 등에 활용됩니다.
+
+    BFS는 최단 경로 찾기에 사용됩니다. 가중치가 없는 그래프에서 최단 경로를 보장합니다.
+  snippet: |-
+    G = nx.Graph()
+    G.add_edges_from([
+        (1, 2), (1, 3), (2, 4), (2, 5),
+        (3, 6), (3, 7), (4, 8), (5, 8)
+    ])
+
+    bfsEdges = list(nx.bfs_edges(G, source=1))
+    bfsNodes = [1] + [v for _, v in bfsEdges]
+    bfsNodes
+  exercise:
+    prompt: 2단계. 너비우선탐색 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      G = nx.Graph()
+      G.add_edges_from([
+          (1, 2), (1, 3), (2, 4), (2, 5),
+          (3, 6), (3, 7), (4, 8), (5, 8)
+      ])
+
+      bfsEdges = list(nx.bfs_edges(G, source=1))
+      bfsNodes = [1] + [v for _, v in bfsEdges]
+      bfsNodes
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 2단계. 너비우선탐색에서 \`G\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. 너비우선탐색 실행 뒤 \`G\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step3_dfs
+  title: 3단계. 깊이우선탐색
+  structuredPrimary: true
+  subtitle: DFS
+  goal: 3단계. 깊이우선탐색에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    깊이우선탐색(Depth-First Search, DFS)은 한 방향으로 가능한 깊이 들어간 후, 막히면 되돌아와서 다른 경로를 탐색합니다. 스택(Stack) 또는 재귀 호출로 구현됩니다. 미로 찾기, 퍼즐 풀이, 사이클 탐지, 위상정렬 등에 사용됩니다. BFS와 달리 최단 경로를 보장하지 않지만, 메모리 사용량이 적습니다.
+
+    BFS는 레벨 순서(1→2,3→4,5,6,7→8), DFS는 한 가지를 깊이 탐색(1→2→4→8→5→3→6→7)합니다.
+  snippet: |-
+    dfsEdges = list(nx.dfs_edges(G, source=1))
+    dfsEdges
+  exercise:
+    prompt: 3단계. 깊이우선탐색 예제에서 \`dfsEdges\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      dfsEdges = list(nx.dfs_edges(G, source=1))
+      dfsEdges
+    hints:
+    - 바꿀 지점은 \`dfsEdges = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`dfsEdges\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 3단계. 깊이우선탐색에서 \`dfsEdges\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 깊이우선탐색 실행 뒤 \`dfsEdges\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step4_visualize_traversal
+  title: 4단계. 탐색 시각화
+  structuredPrimary: true
+  subtitle: 방문 순서 표시
+  goal: 4단계. 탐색 시각화에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: BFS와 DFS 탐색 과정을 시각화하면 두 알고리즘의 차이를 직관적으로 이해할 수 있습니다. 노드에 방문 순서를 표시하고, 탐색에 사용된 엣지를 강조합니다.
+    BFS는 너비 방향으로 균등하게 퍼져나가고, DFS는 한 가지를 따라 깊이 들어가는 패턴을 확인할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    posG = nx.spring_layout(G, seed=42)
+
+    fig1, ax1 = plt.subplots(figsize=(8, 6))
+    nx.draw(G, pos=posG, with_labels=False, node_color='lightgray',
+            node_size=500, edge_color='lightgray', ax=ax1)
+    nx.draw_networkx_edges(G, pos=posG, edgelist=bfsEdges,
+                            edge_color='blue', width=2, ax=ax1)
+
+    labels = {n: str(i) for i, n in enumerate(bfsNodes)}
+    nx.draw_networkx_labels(G, pos=posG, labels=labels, font_size=12, ax=ax1)
+    ax1.set_title('BFS Traversal Order')
+    fig1
+  exercise:
+    prompt: 4단계. 탐색 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      posG = nx.spring_layout(G, seed=42)
+
+      fig1, ax1 = plt.subplots(figsize=(8, 6))
+      nx.draw(G, pos=posG, with_labels=False, node_color='lightgray',
+              node_size=500, edge_color='lightgray', ax=ax1)
+      nx.draw_networkx_edges(G, pos=posG, edgelist=bfsEdges,
+                              edge_color='blue', width=2, ax=ax1)
+
+      labels = {n: str(i) for i, n in enumerate(bfsNodes)}
+      nx.draw_networkx_labels(G, pos=posG, labels=labels, font_size=12, ax=ax1)
+      ax1.set_title('BFS Traversal Order')
+      fig1
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 4단계. 탐색 시각화의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 4단계. 탐색 시각화 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step5_mst
+  title: 5단계. 최소신장트리
+  structuredPrimary: true
+  subtitle: minimum_spanning_tree()
+  goal: 5단계. 최소신장트리에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    최소신장트리(Minimum Spanning Tree, MST)는 그래프의 모든 노드를 연결하면서 엣지 가중치의 합이 최소인 트리입니다. 도시들을 최소 비용으로 도로로 연결하거나, 컴퓨터들을 최소 케이블로 네트워크에 연결하는 문제에 사용됩니다. 크루스칼(Kruskal) 알고리즘이나 프림(Prim) 알고리즘으로 구할 수 있으며, NetworkX는 기본적으로 크루스칼 알고리즘을 사용합니다.
+
+    MST는 n개 노드를 n-1개 엣지로 연결합니다. 크루스칼이나 프림 알고리즘을 사용합니다.
+  snippet: |-
+    wG = nx.Graph()
+    wG.add_edge("A", "B", weight=4)
+    wG.add_edge("A", "C", weight=2)
+    wG.add_edge("B", "C", weight=1)
+    wG.add_edge("B", "D", weight=5)
+    wG.add_edge("C", "D", weight=8)
+    wG.add_edge("C", "E", weight=10)
+    wG.add_edge("D", "E", weight=2)
+    wG.add_edge("D", "F", weight=6)
+    wG.add_edge("E", "F", weight=3)
+
+    mst = nx.minimum_spanning_tree(wG)
+    mstEdges = list(mst.edges(data=True))
+    mstWeight = sum(d["weight"] for _, _, d in mstEdges)
+    mstWeight
+  exercise:
+    prompt: 5단계. 최소신장트리 예제에서 \`wG\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      wG = nx.Graph()
+      wG.add_edge("A", "B", weight=4)
+      wG.add_edge("A", "C", weight=2)
+      wG.add_edge("B", "C", weight=1)
+      wG.add_edge("B", "D", weight=5)
+      wG.add_edge("C", "D", weight=8)
+      wG.add_edge("C", "E", weight=10)
+      wG.add_edge("D", "E", weight=2)
+      wG.add_edge("D", "F", weight=6)
+      wG.add_edge("E", "F", weight=3)
+
+      mst = nx.minimum_spanning_tree(wG)
+      mstEdges = list(mst.edges(data=True))
+      mstWeight = sum(d["weight"] for _, _, d in mstEdges)
+      mstWeight
+    hints:
+    - 바꿀 지점은 \`wG = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`wG\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 5단계. 최소신장트리에서 \`wG\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 최소신장트리 실행 뒤 \`wG\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step6_mst_viz
+  title: 6단계. MST 시각화
+  structuredPrimary: true
+  subtitle: 신장트리 강조
+  goal: 6단계. MST 시각화에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 원래 그래프와 최소신장트리를 함께 시각화하면 어떤 엣지가 선택되었는지 직관적으로 확인할 수 있습니다. MST에 포함된 엣지를 다른 색으로 강조하고, 각 엣지의
+    가중치를 표시합니다. MST는 항상 n-1개의 엣지만 가지며(n은 노드 수), 사이클이 없는 트리 구조입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    posW = nx.spring_layout(wG, seed=42)
+
+    fig3, ax3 = plt.subplots(figsize=(10, 7))
+    nx.draw(wG, pos=posW, with_labels=True, node_color='lightblue',
+            node_size=700, edge_color='lightgray', width=1, ax=ax3)
+
+    mstEdgeList = [(u, v) for u, v, d in mstEdges]
+    nx.draw_networkx_edges(wG, pos=posW, edgelist=mstEdgeList,
+                            edge_color='green', width=3, ax=ax3)
+
+    edgeLabels = nx.get_edge_attributes(wG, 'weight')
+    nx.draw_networkx_edge_labels(wG, pos=posW, edge_labels=edgeLabels,
+                                  font_size=10, ax=ax3)
+    ax3.set_title(f'Minimum Spanning Tree (Total: {mstWeight})')
+    fig3
+  exercise:
+    prompt: 6단계. MST 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      posW = nx.spring_layout(wG, seed=42)
+
+      fig3, ax3 = plt.subplots(figsize=(10, 7))
+      nx.draw(wG, pos=posW, with_labels=True, node_color='lightblue',
+              node_size=700, edge_color='lightgray', width=1, ax=ax3)
+
+      mstEdgeList = [(u, v) for u, v, d in mstEdges]
+      nx.draw_networkx_edges(wG, pos=posW, edgelist=mstEdgeList,
+                              edge_color='green', width=3, ax=ax3)
+
+      edgeLabels = nx.get_edge_attributes(wG, 'weight')
+      nx.draw_networkx_edge_labels(wG, pos=posW, edge_labels=edgeLabels,
+                                    font_size=10, ax=ax3)
+      ax3.set_title(f'Minimum Spanning Tree (Total: {mstWeight})')
+      fig3
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 6단계. MST 시각화의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 6단계. MST 시각화 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step7_topological
+  title: 7단계. 위상정렬
+  structuredPrimary: true
+  subtitle: topological_sort()
+  goal: 7단계. 위상정렬에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    위상정렬(Topological Sort)은 방향 비순환 그래프(DAG)에서 모든 엣지가 앞에서 뒤로 향하도록 노드를 일렬로 나열하는 것입니다. '선행 작업이 완료된 후에만 수행 가능'한 의존성 관계를 반영합니다. 소프트웨어 패키지 설치 순서, 대학 수강 순서(선수과목), 빌드 시스템의 컴파일 순서 등에 사용됩니다. 사이클이 있으면 위상정렬이 불가능합니다.
+
+    위상정렬은 "선행 작업이 완료된 후에만 수행"하는 순서입니다. DAG에서만 가능합니다.
+  snippet: |-
+    dag = nx.DiGraph()
+    dag.add_edges_from([
+        ("A", "B"), ("A", "C"),
+        ("B", "D"), ("C", "D"),
+        ("D", "E"), ("C", "E")
+    ])
+    dag.edges()
+  exercise:
+    prompt: 7단계. 위상정렬 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      dag = nx.DiGraph()
+      dag.add_edges_from([
+          ("A", "B"), ("A", "C"),
+          ("B", "D"), ("C", "D"),
+          ("D", "E"), ("C", "E")
+      ])
+      dag.edges()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 7단계. 위상정렬에서 \`dag\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. 위상정렬 실행 뒤 \`dag\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step8_dag_viz
+  title: 8단계. DAG 시각화
+  structuredPrimary: true
+  subtitle: 의존성 그래프
+  goal: 8단계. DAG 시각화에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: DAG(Directed Acyclic Graph, 방향 비순환 그래프)를 시각화하면 의존성 구조를 명확히 볼 수 있습니다. 화살표는 의존성 방향을 나타내며,
+    A→B는 'A가 완료되어야 B를 시작할 수 있음'을 의미합니다. 위상정렬 순서 번호를 노드에 표시하면 작업 순서를 한눈에 파악할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    posDAG = nx.spring_layout(dag, seed=42)
+
+    fig4, ax4 = plt.subplots(figsize=(8, 6))
+    nx.draw(dag, pos=posDAG, with_labels=True, node_color='wheat',
+            node_size=800, font_size=12, arrows=True, arrowsize=20, ax=ax4)
+    ax4.set_title('Directed Acyclic Graph (DAG)')
+    fig4
+  exercise:
+    prompt: 8단계. DAG 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      posDAG = nx.spring_layout(dag, seed=42)
+
+      fig4, ax4 = plt.subplots(figsize=(8, 6))
+      nx.draw(dag, pos=posDAG, with_labels=True, node_color='wheat',
+              node_size=800, font_size=12, arrows=True, arrowsize=20, ax=ax4)
+      ax4.set_title('Directed Acyclic Graph (DAG)')
+      fig4
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 8단계. DAG 시각화의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 8단계. DAG 시각화의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step9_ancestors
+  title: 9단계. 조상과 후손
+  structuredPrimary: true
+  subtitle: ancestors(), descendants()
+  goal: 9단계. 조상과 후손에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    방향 그래프에서 ancestors()는 특정 노드에 도달할 수 있는 모든 선행 노드(조상)를, descendants()는 특정 노드에서 출발하여 도달할 수 있는 모든 후행 노드(후손)를 반환합니다. 작업 스케줄링에서 '이 작업을 하려면 어떤 작업들이 먼저 완료되어야 하는가?'(조상), '이 작업이 완료되면 어떤 작업들을 시작할 수 있는가?'(후손)를 분석하는 데 유용합니다.
+
+    DAG에서 조상은 "나보다 먼저 완료되어야 하는 작업", 후손은 "나 이후에 시작할 수 있는 작업"입니다.
+  snippet: |-
+    ancestorsE = nx.ancestors(dag, "E")
+    ancestorsE
+  exercise:
+    prompt: 9단계. 조상과 후손 예제에서 \`ancestorsE\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      ancestorsE = nx.ancestors(dag, "E")
+      ancestorsE
+    hints:
+    - 바꿀 지점은 \`ancestorsE = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`ancestorsE\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 9단계. 조상과 후손에서 \`ancestorsE\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 9단계. 조상과 후손 실행 뒤 \`ancestorsE\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step10_practical
+  title: 10단계. 실전 응용
+  structuredPrimary: true
+  subtitle: 작업 스케줄링
+  goal: 10단계. 실전 응용에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 프로젝트 작업 의존성을 DAG로 모델링하고 실행 순서를 결정하는 실전 예제입니다. 소프트웨어 개발 프로젝트에서 설계 → 프론트엔드/백엔드 개발 → API →
+    통합 → 테스트 → 배포의 의존성을 그래프로 표현합니다. 위상정렬을 통해 작업들의 올바른 실행 순서를 자동으로 도출할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    project = nx.DiGraph()
+    project.add_edge("Design", "Frontend")
+    project.add_edge("Design", "Backend")
+    project.add_edge("Backend", "API")
+    project.add_edge("Frontend", "Integration")
+    project.add_edge("API", "Integration")
+    project.add_edge("Integration", "Testing")
+    project.add_edge("Testing", "Deploy")
+    project.edges()
+  exercise:
+    prompt: 10단계. 실전 응용 예제에서 \`project\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      project = nx.DiGraph()
+      project.add_edge("Design", "Frontend")
+      project.add_edge("Design", "Backend")
+      project.add_edge("Backend", "API")
+      project.add_edge("Frontend", "Integration")
+      project.add_edge("API", "Integration")
+      project.add_edge("Integration", "Testing")
+      project.add_edge("Testing", "Deploy")
+      project.edges()
+    hints:
+    - 바꿀 지점은 \`project = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`project\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 10단계. 실전 응용에서 \`project\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 10단계. 실전 응용 실행 뒤 \`project\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 그래프 알고리즘
+  goal: 실습에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    지금까지 배운 그래프 알고리즘을 활용하여 실전 미션을 수행해봅시다. 네트워크 케이블링 비용을 최소화하는 MST 문제와 소프트웨어 빌드 순서를 결정하는 위상정렬 문제를 해결합니다.
+
+    각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  snippet: |-
+    import networkx as nx
+    import matplotlib.pyplot as plt
+
+    data = nx.Graph()
+    data.add_edge("Server", "Switch1", weight=10)
+    data.add_edge("Server", "Switch2", weight=15)
+    data.add_edge("Switch1", "Switch2", weight=5)
+    data.add_edge("Switch1", "PC1", weight=3)
+    data.add_edge("Switch1", "PC2", weight=4)
+    data.add_edge("Switch2", "PC3", weight=6)
+    data.add_edge("Switch2", "PC4", weight=7)
+    data.add_edge("PC1", "PC2", weight=2)
+    data.edges(data=True)
+  exercise:
+    prompt: 실습 예제에서 \`data\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+
+      data = nx.Graph()
+      data.add_edge("Server", "Switch1", weight=10)
+      data.add_edge("Server", "Switch2", weight=15)
+      data.add_edge("Switch1", "Switch2", weight=5)
+      data.add_edge("Switch1", "PC1", weight=3)
+      data.add_edge("Switch1", "PC2", weight=4)
+      data.add_edge("Switch2", "PC3", weight=6)
+      data.add_edge("Switch2", "PC4", weight=7)
+      data.add_edge("PC1", "PC2", weight=2)
+      data.edges(data=True)
+    hints:
+    - 바꿀 지점은 \`data = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`data\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 실습에서 \`data\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 \`data\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 인수인계 네트워크
+  goal: 업무 흐름 검증에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 실무 네트워크 분석은 그래프를 그리는 데서 끝나지 않습니다. 먼저 병목 후보를 예측하고, 로컬 Python에서 실행한 뒤, 잘못된 노드나 끊어진 경로를 예외로
+    처리하고, 핵심 지표를 assert로 검증해야 합니다. 아래 흐름은 영업, 지원, 운영, 재무, 엔지니어링 사이의 인수인계 비용을 네트워크로 보고 개선안을 비교합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import networkx as nx
+
+    handoffEdges = [
+        ("sales", "support", 1),
+        ("support", "ops", 2),
+        ("ops", "finance", 1),
+        ("ops", "engineering", 1),
+        ("engineering", "infra", 2),
+        ("support", "customer_success", 2),
+    ]
+
+    workflowGraph = nx.Graph()
+    workflowGraph.add_weighted_edges_from(handoffEdges)
+
+    expectedNodes = {"sales", "support", "ops", "finance", "engineering", "infra", "customer_success"}
+    if set(workflowGraph.nodes()) != expectedNodes:
+        raise ValueError("인수인계 네트워크의 부서 목록이 예상과 다릅니다.")
+    if any(data["weight"] <= 0 for _, _, data in workflowGraph.edges(data=True)):
+        raise ValueError("인수인계 비용은 0보다 커야 합니다.")
+
+    salesToFinanceCost = nx.shortest_path_length(workflowGraph, "sales", "finance", weight="weight")
+    betweenness = nx.betweenness_centrality(workflowGraph, weight="weight")
+
+    workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      experimentGraph = workflowGraph.copy()
+      experimentGraph.add_edge("sales", "finance", weight=2)
+
+      improvedCost = nx.shortest_path_length(experimentGraph, "sales", "finance", weight="weight")
+      improvedBetweenness = nx.betweenness_centrality(experimentGraph, weight="weight")
+      improvement = salesToFinanceCost - improvedCost
+
+      assert improvement > 0
+      {
+          "beforeCost": salesToFinanceCost,
+          "afterCost": improvedCost,
+          "costImprovement": improvement,
+          "opsBetweennessBefore": round(betweenness["ops"], 3),
+          "opsBetweennessAfter": round(improvedBetweenness["ops"], 3),
+      }
+    solution: |-
+      import networkx as nx
+
+      handoffEdges = [
+          ("sales", "support", 1),
+          ("support", "ops", 2),
+          ("ops", "finance", 1),
+          ("ops", "engineering", 1),
+          ("engineering", "infra", 2),
+          ("support", "customer_success", 2),
+      ]
+
+      workflowGraph = nx.Graph()
+      workflowGraph.add_weighted_edges_from(handoffEdges)
+
+      expectedNodes = {"sales", "support", "ops", "finance", "engineering", "infra", "customer_success"}
+      if set(workflowGraph.nodes()) != expectedNodes:
+          raise ValueError("인수인계 네트워크의 부서 목록이 예상과 다릅니다.")
+      if any(data["weight"] <= 0 for _, _, data in workflowGraph.edges(data=True)):
+          raise ValueError("인수인계 비용은 0보다 커야 합니다.")
+
+      workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 업무 흐름 검증에서 \`experimentGraph\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: networkx_08-bfs-traversal-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: BFS 탐색 순서와 거리 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 시작 node에서 안정적 BFS order와 hop distance를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - queue에 넣을 때 visited를 표시해 중복 삽입을 막으세요.
+    - 이웃 순서를 정렬해 traversal을 재현하세요.
+    exercise:
+      prompt: bfs_traversal(edges, start)를 완성하세요.
+      starterCode: |-
+        def bfs_traversal(edges, start):
+            raise NotImplementedError
+      solution: |
+        def bfs_traversal(edges, start):
+            adjacency = {}
+            for a, b in edges: adjacency.setdefault(a, set()).add(b); adjacency.setdefault(b, set()).add(a)
+            order = []; distance = {start: 0}; queue = [start]
+            while queue:
+                node = queue.pop(0); order.append(node)
+                for neighbor in sorted(adjacency.get(node, [])):
+                    if neighbor not in distance: distance[neighbor] = distance[node] + 1; queue.append(neighbor)
+            return {"order": order, "distance": {node: distance[node] for node in sorted(distance)}}
+      hints: *id001
+    check:
+      id: python.networkx.networkx_08.bfs-traversal.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_08.bfs-traversal.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: bfs_traversal
+        cases:
+        - id: returns-order-and-distance
+          arguments:
+          - value:
+            - - a
+              - b
+            - - a
+              - c
+            - - b
+              - d
+          - value: a
+          expectedReturn:
+            order:
+            - a
+            - b
+            - c
+            - d
+            distance:
+              a: 0
+              b: 1
+              c: 1
+              d: 2
+        - id: handles-isolated-start
+          arguments:
+          - value: []
+          - value: x
+          expectedReturn:
+            order:
+            - x
+            distance:
+              x: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: networkx_08-topological-order-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_08-bfs-traversal-mastery
+    title: 새 dependency graph에 위상 정렬 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: directed acyclic graph의 실행 순서와 cycle node를 반환한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - indegree 0 node만 ready queue에 넣으세요.
+    - cycle이 있으면 부분 순서를 완료로 보지 마세요.
+    exercise:
+      prompt: topological_order(nodes, edges)를 완성하세요.
+      starterCode: |-
+        def topological_order(nodes, edges):
+            raise NotImplementedError
+      solution: |
+        def topological_order(nodes, edges):
+            outgoing = {node: [] for node in nodes}; indegree = {node: 0 for node in nodes}
+            for source, target in edges: outgoing[source].append(target); indegree[target] += 1
+            ready = sorted(node for node in nodes if indegree[node] == 0); order = []
+            while ready:
+                node = ready.pop(0); order.append(node)
+                for target in sorted(outgoing[node]):
+                    indegree[target] -= 1
+                    if indegree[target] == 0: ready.append(target); ready.sort()
+            cycle = sorted(node for node in nodes if indegree[node] > 0)
+            return {"order": order, "cycleNodes": cycle}
+      hints: *id002
+    check:
+      id: python.networkx.networkx_08.topological-order.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_08.topological-order.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: topological_order
+        cases:
+        - id: orders-dependencies
+          arguments:
+          - value:
+            - build
+            - test
+            - deploy
+          - value:
+            - - build
+              - test
+            - - test
+              - deploy
+          expectedReturn:
+            order:
+            - build
+            - test
+            - deploy
+            cycleNodes: []
+        - id: reports-cycle
+          arguments:
+          - value:
+            - a
+            - b
+          - value:
+            - - a
+              - b
+            - - b
+              - a
+          expectedReturn:
+            order: []
+            cycleNodes:
+            - a
+            - b
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: networkx_08-graph-algorithm-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_08-topological-order-transfer
+    title: graph 알고리즘 선택 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 탐색·순서·경로 질문을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 그래프 알고리즘의 입력 가정과 반환 의미를 함께 기록하세요.
+    - 시각적 모양만으로 구조적 결론을 내리지 마세요.
+    exercise:
+      prompt: choose_graph_algorithm(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_graph_algorithm(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_graph_algorithm(situation):
+            table = {'layers-from-source': {'method': 'BFS', 'evidence': 'hop distance', 'risk': 'weighted edges'}, 'dependency-order': {'method': 'topological sort', 'evidence': 'DAG and indegree', 'risk': 'cycle'}, 'visit-deep-branch': {'method': 'DFS', 'evidence': 'discovery tree', 'risk': 'recursion depth'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.networkx.networkx_08.graph-algorithm-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_08.graph-algorithm-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_graph_algorithm
+        cases:
+        - id: recalls-layers-from-source
+          arguments:
+          - value: layers-from-source
+          expectedReturn:
+            method: BFS
+            evidence: hop distance
+            risk: weighted edges
+        - id: recalls-dependency-order
+          arguments:
+          - value: dependency-order
+          expectedReturn:
+            method: topological sort
+            evidence: DAG and indegree
+            risk: cycle
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

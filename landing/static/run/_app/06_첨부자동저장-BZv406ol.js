@@ -1,0 +1,701 @@
+var e=`meta:
+  id: email_06
+  title: 첨부 자동 저장
+  order: 6
+  category: email
+  difficulty: ⭐⭐⭐
+  badge: 중급
+  packages:
+    - reportlab
+  tags:
+    - email.parser
+    - BytesParser
+    - walk
+    - 첨부 저장
+  outcomes:
+    - automation.email.classify
+  prerequisites:
+    - automation.email.receive
+  estimatedMinutes: 50
+  seo:
+    title: "메일 첨부 자동 저장 - BytesParser + walk + disposition"
+    description: "받은 메일의 첨부 파일을 자동으로 폴더에 분류 저장한다. 사장님의 매주 150분 첨부 정리가 8초로."
+    keywords:
+      - 첨부 자동 저장
+      - email.parser BytesParser
+      - get_content_disposition
+
+intro:
+  direction: "받은 메일의 첨부 파일을 코드로 자동 추출·저장한다. 세금계산서·견적서·계약서 PDF가 매주 30분 × 5일 손정리하던 작업이 8초로."
+  benefits:
+    - "사장님의 첨부 정리 150분/주를 8초로 줄인다."
+    - "BytesParser + walk + get_content_disposition 세 메서드로 모든 첨부를 일관 처리."
+    - "한글 파일명도 자동 디코딩되어 그대로 저장."
+  diagram:
+    steps:
+      - label: "1. 메일을 바이트로 fetch"
+        detail: "IMAP fetch '(RFC822)'로 원본 바이트 받기."
+      - label: "2. BytesParser로 파싱"
+        detail: "email.parser.BytesParser().parsebytes로 EmailMessage 객체 복원."
+      - label: "3. walk + disposition"
+        detail: "msg.walk()로 모든 파트 순회, get_content_disposition() == 'attachment'면 첨부."
+      - label: "4. 폴더 저장"
+        detail: "part.get_filename()으로 한글 파일명 받고 폴더에 쓰기."
+    runtime:
+      - label: "테스트 데이터"
+        detail: "발송된 EmailMessage를 as_bytes로 직렬화해 BytesParser로 복원 - 외부 IMAP 의존 없이 검증."
+      - label: "검증"
+        detail: "추출된 첨부 파일이 폴더에 실제 생성됐는지 + 파일명/크기 assert."
+
+sections:
+  - id: step1_serialize
+    title: "1단계. 메일을 바이트로 직렬화"
+    structuredPrimary: true
+    subtitle: "msg.as_bytes()"
+    goal: "EmailMessage를 바이트로 직렬화하고 BytesParser로 복원한다."
+    why: "IMAP fetch가 돌려주는 바이트와 같은 형태입니다. 외부 IMAP 없이 본 강의 검증이 가능합니다."
+    explanation: |-
+      msg.as_bytes()로 전체 메시지를 바이트로 변환. email.parser.BytesParser().parsebytes(data)가 다시 EmailMessage 객체로 복원합니다. round-trip이 깨끗합니다.
+    tips:
+      - "as_bytes는 헤더·본문·첨부 모두 포함합니다. IMAP fetch 결과와 동일 구조."
+    snippet: |-
+      from email.message import EmailMessage
+      from email.parser import BytesParser
+      from email.policy import default
+
+      original = EmailMessage()
+      original["From"] = "me@example.com"
+      original["To"] = "you@example.com"
+      original["Subject"] = "round trip"
+      original.set_content("body", charset="utf-8")
+
+      serialized = original.as_bytes()
+      restored = BytesParser(policy=default).parsebytes(serialized)
+      restored["Subject"], restored.get_content().strip()
+    exercise:
+      prompt: "원본 Subject를 '복원 테스트'로 바꾸고 round-trip이 같은지 확인하세요."
+      starterCode: |-
+        from email.message import EmailMessage
+        from email.parser import BytesParser
+        from email.policy import default
+
+        original = EmailMessage()
+        original["From"] = "me@example.com"
+        original["To"] = "you@example.com"
+        original["Subject"] = ___
+        original.set_content("body", charset="utf-8")
+
+        restored = BytesParser(policy=default).parsebytes(original.as_bytes())
+        restored["Subject"] == "복원 테스트"
+      hints:
+        - "한글 문자열 '복원 테스트'."
+    check:
+      noError: "policy=default 권장."
+      resultCheck: "True 출력."
+
+  - id: step2_walk_attachments
+    title: "2단계. walk로 첨부 찾기"
+    structuredPrimary: true
+    subtitle: "msg.walk() + get_content_disposition()"
+    goal: "첨부가 들어간 메일을 만들고 walk로 첨부 파트만 골라낸다."
+    why: "메시지 안의 첨부는 multipart 구조 안에 깊이 들어 있습니다. walk가 트리를 평면화해 순회 가능하게 해줍니다."
+    explanation: |-
+      msg.walk()는 모든 파트를 재귀적으로 yield합니다. get_content_disposition() == 'attachment'면 첨부 파트입니다. iter_attachments()도 동일 결과를 더 깔끔히 돌려주는 API.
+    tips:
+      - "policy=default로 파싱한 EmailMessage는 iter_attachments() 사용 가능. policy 없이 파싱하면 walk + 수동 필터."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from email.message import EmailMessage
+      from email.parser import BytesParser
+      from email.policy import default
+      from reportlab.pdfgen.canvas import Canvas
+
+      workdir = TemporaryDirectory()
+      pdfPath = Path(workdir.name) / "r.pdf"
+      canvas = Canvas(str(pdfPath))
+      canvas.drawString(72, 720, "x")
+      canvas.showPage()
+      canvas.save()
+
+      original = EmailMessage()
+      original["From"] = "me@example.com"
+      original["To"] = "you@example.com"
+      original["Subject"] = "with attach"
+      original.set_content("body", charset="utf-8")
+      original.add_attachment(pdfPath.read_bytes(), maintype="application", subtype="pdf", filename="r.pdf")
+
+      restored = BytesParser(policy=default).parsebytes(original.as_bytes())
+      attachments = [p for p in restored.iter_attachments()]
+      [(p.get_filename(), p.get_content_type()) for p in attachments]
+    exercise:
+      prompt: "원본에 두 번째 첨부(data.csv, text/csv)를 추가하고 iter_attachments가 2개를 돌려주는지 확인하세요."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from email.message import EmailMessage
+        from email.parser import BytesParser
+        from email.policy import default
+        from reportlab.pdfgen.canvas import Canvas
+
+        workdir = TemporaryDirectory()
+        pdfPath = Path(workdir.name) / "r.pdf"
+        canvas = Canvas(str(pdfPath))
+        canvas.drawString(72, 720, "x")
+        canvas.showPage()
+        canvas.save()
+        csvPath = Path(workdir.name) / "data.csv"
+        csvPath.write_text("a,b\\n1,2\\n", encoding="utf-8")
+
+        original = EmailMessage()
+        original["From"] = "me@example.com"
+        original["To"] = "you@example.com"
+        original["Subject"] = "with attach"
+        original.set_content("body", charset="utf-8")
+        original.add_attachment(pdfPath.read_bytes(), maintype="application", subtype="pdf", filename="r.pdf")
+        original.add_attachment(csvPath.read_bytes(), maintype="text", subtype="csv", filename=___)
+
+        restored = BytesParser(policy=default).parsebytes(original.as_bytes())
+        len(list(restored.iter_attachments()))
+      hints:
+        - "문자열 'data.csv'."
+    check:
+      noError: "add_attachment 인자 키워드."
+      resultCheck: "출력 2."
+
+  - id: step3_save_to_folder
+    title: "3단계. 첨부를 폴더에 저장"
+    structuredPrimary: true
+    subtitle: "filename으로 파일 쓰기"
+    goal: "복원된 메일의 첨부를 모두 폴더에 저장한다."
+    why: "받은 첨부를 코드로 폴더에 정리하는 게 본 강의의 진짜 가치입니다. 매일 30분 손작업이 8초로 줄어듭니다."
+    explanation: |-
+      saveAttachments(msg, outFolder)가 모든 첨부 파트를 outFolder에 저장. 파일명은 part.get_filename(). 충돌 시 prefix를 두거나 timestamp 추가.
+    tips:
+      - "파일명이 None일 수도 있습니다 (이메일이 부적절하게 구성된 경우). 가드 추가 권장."
+    snippet: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from email.message import EmailMessage
+      from email.parser import BytesParser
+      from email.policy import default
+      from reportlab.pdfgen.canvas import Canvas
+
+      def saveAttachments(msg, outFolder):
+          Path(outFolder).mkdir(exist_ok=True)
+          saved = []
+          for part in msg.iter_attachments():
+              name = part.get_filename()
+              if not name:
+                  continue
+              outPath = Path(outFolder) / name
+              outPath.write_bytes(part.get_payload(decode=True) or b"")
+              saved.append(outPath)
+          return saved
+
+      workdir = TemporaryDirectory()
+      base = Path(workdir.name)
+      pdfPath = base / "r.pdf"
+      canvas = Canvas(str(pdfPath))
+      canvas.drawString(72, 720, "x")
+      canvas.showPage()
+      canvas.save()
+      csvPath = base / "d.csv"
+      csvPath.write_text("a,b\\n1,2\\n", encoding="utf-8")
+
+      original = EmailMessage()
+      original["From"] = "me@example.com"
+      original["To"] = "you@example.com"
+      original["Subject"] = "s"
+      original.set_content("body", charset="utf-8")
+      original.add_attachment(pdfPath.read_bytes(), maintype="application", subtype="pdf", filename="세금계산서.pdf")
+      original.add_attachment(csvPath.read_bytes(), maintype="text", subtype="csv", filename="거래내역.csv")
+
+      restored = BytesParser(policy=default).parsebytes(original.as_bytes())
+      saved = saveAttachments(restored, base / "downloads")
+      [p.name for p in saved]
+    exercise:
+      prompt: "saveAttachments를 빈 함수로 직접 작성하세요. 폴더 생성, iter_attachments 순회, filename이 None인 파트 건너뛰기, payload를 폴더에 쓰고 Path 리스트 반환까지 본인이 채워야 합니다. 한글 파일명 두 개로 검증합니다."
+      starterCode: |-
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        from email.message import EmailMessage
+        from email.parser import BytesParser
+        from email.policy import default
+        from reportlab.pdfgen.canvas import Canvas
+
+        def saveAttachments(msg, outFolder):
+            ___
+
+        workdir = TemporaryDirectory()
+        base = Path(workdir.name)
+        pdfPath1 = base / "a.pdf"
+        Canvas(str(pdfPath1)).showPage();
+        c1 = Canvas(str(pdfPath1)); c1.showPage(); c1.save()
+        pdfPath2 = base / "b.pdf"
+        c2 = Canvas(str(pdfPath2)); c2.showPage(); c2.save()
+
+        original = EmailMessage()
+        original["From"] = "me@example.com"
+        original["To"] = "you@example.com"
+        original["Subject"] = "s"
+        original.set_content("body", charset="utf-8")
+        original.add_attachment(pdfPath1.read_bytes(), maintype="application", subtype="pdf", filename="청구서_5월.pdf")
+        original.add_attachment(pdfPath2.read_bytes(), maintype="application", subtype="pdf", filename="계약서.pdf")
+
+        restored = BytesParser(policy=default).parsebytes(original.as_bytes())
+        saved = saveAttachments(restored, base / "out")
+        len(saved)
+      hints:
+        - "본체 골자: Path(outFolder).mkdir(exist_ok=True) → for part in msg.iter_attachments(): name=part.get_filename(); if not name: continue; (outFolder/name).write_bytes(part.get_payload(decode=True) or b'') → 리스트에 모아 반환."
+    check:
+      noError: "한글 파일명도 문자열."
+      resultCheck: "출력 2."
+
+  - id: practice
+    title: "실습 - 종합 미션"
+    subtitle: "월별 자동 정리 도구"
+    goal: "첨부를 첨부 종류별 (PDF/CSV/이미지) 폴더로 자동 분류 저장한다."
+    why: "1인 사장님이 매월 받는 세금계산서·견적서·계약서 PDF가 100개를 넘으면 손으로 폴더 분류만 한 시간이 사라집니다. Content-Type 기반 분류 + 발신자/월별 분류 두 패턴이 한 함수에 모이면 inbox만 비워도 회계·법무 자료가 자동 정리됩니다. 07강 IMAP 자동 이동과 결합되면 사람이 직접 메일을 열 필요가 사라집니다."
+    explanation: |-
+      미션: sortAttachmentsByType(msg, outFolder) -> dict[type, list[Path]] 함수. PDF는 pdf/, CSV는 csv/, 이미지는 image/ 하위 폴더로 분류.
+    tips:
+      - "Content-Type의 maintype/subtype으로 분류."
+    snippet: |-
+      from email.message import EmailMessage
+      from email.parser import BytesParser
+      from email.policy import default
+    exercise:
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."
+      starterCode: |-
+        ___
+      hints:
+        - "함수: sortAttachmentsByType(msg, outFolder) -> dict"
+    check:
+      noError: "함수 정의 + 분류."
+      resultCheck: "각 타입별 폴더에 파일이 정확히 분류."
+    blocks:
+      - type: expansion
+        title: "미션: 종류별 자동 분류"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from email.message import EmailMessage
+              from email.parser import BytesParser
+              from email.policy import default
+              from reportlab.pdfgen.canvas import Canvas
+
+              def sortAttachmentsByType(msg, outFolder):
+                  buckets = {"pdf": [], "csv": [], "image": [], "other": []}
+                  for part in msg.iter_attachments():
+                      name = part.get_filename()
+                      if not name:
+                          continue
+                      maintype, subtype = part.get_content_type().split("/")
+                      if maintype == "image":
+                          bucket = "image"
+                      elif subtype == "pdf":
+                          bucket = "pdf"
+                      elif subtype == "csv":
+                          bucket = "csv"
+                      else:
+                          bucket = "other"
+                      bucketDir = Path(outFolder) / bucket
+                      bucketDir.mkdir(parents=True, exist_ok=True)
+                      outPath = bucketDir / name
+                      outPath.write_bytes(part.get_payload(decode=True) or b"")
+                      buckets[bucket].append(outPath)
+                  return buckets
+
+              missionDir = TemporaryDirectory()
+              base = Path(missionDir.name)
+              pdfPath = base / "r.pdf"
+              canvas = Canvas(str(pdfPath))
+              canvas.showPage()
+              canvas.save()
+              csvPath = base / "d.csv"
+              csvPath.write_text("a,b\\n", encoding="utf-8")
+
+              original = EmailMessage()
+              original["From"] = "me@example.com"
+              original["To"] = "you@example.com"
+              original["Subject"] = "s"
+              original.set_content("body", charset="utf-8")
+              original.add_attachment(pdfPath.read_bytes(), maintype="application", subtype="pdf", filename="r.pdf")
+              original.add_attachment(csvPath.read_bytes(), maintype="text", subtype="csv", filename="d.csv")
+
+              restored = BytesParser(policy=default).parsebytes(original.as_bytes())
+              result = sortAttachmentsByType(restored, base / "sorted")
+              assert len(result["pdf"]) == 1
+              assert len(result["csv"]) == 1
+              {k: len(v) for k, v in result.items()}
+      - type: expansion
+        title: "미션2: 발신자·월별 폴더 분류"
+        blocks:
+          - type: code
+            title: "함수 정의와 검증"
+            content: |-
+              import re
+              from datetime import datetime
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+              from email.message import EmailMessage
+              from email.parser import BytesParser
+              from email.policy import default
+              from email.utils import parseaddr
+              from reportlab.pdfgen.canvas import Canvas
+
+              def sortAttachmentsBySender(msg, outFolder, receivedAt=None):
+                  receivedAt = receivedAt or datetime.utcnow()
+                  _, address = parseaddr(msg.get("From", ""))
+                  domain = address.split("@", 1)[-1].lower() if "@" in address else "unknown"
+                  bucket = Path(outFolder) / re.sub(r"[^a-z0-9.-]", "_", domain) / receivedAt.strftime("%Y-%m")
+                  bucket.mkdir(parents=True, exist_ok=True)
+                  saved = []
+                  for part in msg.iter_attachments():
+                      name = part.get_filename()
+                      if not name:
+                          continue
+                      target = bucket / name
+                      target.write_bytes(part.get_payload(decode=True) or b"")
+                      saved.append(target)
+                  return saved
+
+              workdir = TemporaryDirectory()
+              base = Path(workdir.name)
+              pdfPath = base / "p.pdf"
+              c = Canvas(str(pdfPath)); c.showPage(); c.save()
+
+              original = EmailMessage()
+              original["From"] = "Vendor Bot <billing@vendor.com>"
+              original["To"] = "me@example.com"
+              original["Subject"] = "월간 청구서"
+              original.set_content("body", charset="utf-8")
+              original.add_attachment(pdfPath.read_bytes(), maintype="application", subtype="pdf", filename="청구서.pdf")
+
+              restored = BytesParser(policy=default).parsebytes(original.as_bytes())
+              saved = sortAttachmentsBySender(restored, base / "by_sender", datetime(2026, 5, 1))
+              assert saved[0].parts[-3] == "vendor.com"
+              assert saved[0].parts[-2] == "2026-05"
+              saved[0].name
+
+  - id: extensions
+    title: "확장 변주"
+    blocks:
+      - type: list
+        style: bullet
+        items:
+          - "발신자별 폴더 추가 분류 (sender/yyyy-mm/filename)"
+          - "중복 파일명 처리 (timestamp suffix)"
+          - "특정 확장자만 저장 (PDF만, 이미지만)"
+          - "07강 결합 - 저장 후 메일을 'Processed' 폴더로 자동 이동"
+          - "PDF 트랙 04강 결합 - 저장된 PDF 표를 자동 추출해 CSV로"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: email_06-attachment-save-plan-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_serialize
+    - extensions
+    title: 수신 첨부파일의 이름·크기·MIME·quarantine 계획하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: path traversal과 확장자/MIME 불일치, byte budget을 차단한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 첨부 filename의 directory 부분을 신뢰하지 말고 path traversal을 거부하세요.
+    - 허용된 첨부도 바로 업무 폴더가 아니라 quarantine에 저장하세요.
+    exercise:
+      prompt: plan_attachment_save(attachments, maximum_bytes, allowed_types)를 완성하세요.
+      starterCode: |-
+        def plan_attachment_save(attachments, maximum_bytes, allowed_types):
+            raise NotImplementedError
+      solution: |
+        def plan_attachment_save(attachments, maximum_bytes, allowed_types):
+            from pathlib import PurePath
+            save = []
+            rejected = []
+            for item in attachments:
+                reasons = []
+                safe_name = PurePath(item["name"]).name
+                if safe_name != item["name"] or safe_name in {"", ".", ".."}:
+                    reasons.append("name")
+                if item.get("byteLength", 0) > maximum_bytes:
+                    reasons.append("size")
+                if item.get("contentType") not in allowed_types:
+                    reasons.append("content-type")
+                if not item.get("contentHash"):
+                    reasons.append("hash")
+                if reasons:
+                    rejected.append({"name": item["name"], "reasons": reasons})
+                else:
+                    save.append({"name": safe_name, "quarantine": f"quarantine/{safe_name}", "hash": item["contentHash"]})
+            return {"ready": not rejected, "save": save, "rejected": rejected}
+      hints: *id001
+    check:
+      id: python.email.email_06.attachment-save-plan.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_06.attachment-save-plan.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_attachment_save
+        cases:
+        - id: plans-quarantined-save
+          arguments:
+          - value:
+            - name: report.pdf
+              byteLength: 100
+              contentType: application/pdf
+              contentHash: x
+          - value: 1000
+          - value:
+            - application/pdf
+          expectedReturn:
+            ready: true
+            save:
+            - name: report.pdf
+              quarantine: quarantine/report.pdf
+              hash: x
+            rejected: []
+        - id: reports-traversal-size-type-and-hash
+          arguments:
+          - value:
+            - name: ../evil.exe
+              byteLength: 2000
+              contentType: application/octet-stream
+              contentHash: ''
+          - value: 1000
+          - value:
+            - application/pdf
+          expectedReturn:
+            ready: false
+            save: []
+            rejected:
+            - name: ../evil.exe
+              reasons:
+              - name
+              - size
+              - content-type
+              - hash
+        - id: handles-empty-attachments
+          arguments:
+          - value: []
+          - value: 1000
+          - value: []
+          expectedReturn:
+            ready: true
+            save: []
+            rejected: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: email_06-attachment-release-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - email_06-attachment-save-plan-mastery
+    title: 새 첨부파일에 quarantine scan·hash release 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 저장 hash와 scan 결과, destination 충돌을 통과한 파일만 release한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 저장된 bytes의 hash를 MIME manifest와 다시 비교하세요.
+    - scan status가 명시적으로 clean일 때만 quarantine 밖으로 이동하세요.
+    exercise:
+      prompt: audit_attachment_release(items)를 완성하세요.
+      starterCode: |-
+        def audit_attachment_release(items):
+            raise NotImplementedError
+      solution: |
+        def audit_attachment_release(items):
+            release = []
+            blocked = []
+            for item in items:
+                reasons = []
+                if item.get("savedHash") != item.get("expectedHash"):
+                    reasons.append("hash")
+                if item.get("scanStatus") != "clean":
+                    reasons.append("scan")
+                if item.get("destinationExists", False):
+                    reasons.append("conflict")
+                if reasons:
+                    blocked.append({"id": item["id"], "reasons": reasons})
+                else:
+                    release.append(item["id"])
+            return {"released": release, "blocked": blocked}
+      hints: *id002
+    check:
+      id: python.email.email_06.attachment-release-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_06.attachment-release-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_attachment_release
+        cases:
+        - id: releases-clean-matching-file
+          arguments:
+          - value:
+            - id: a
+              savedHash: x
+              expectedHash: x
+              scanStatus: clean
+              destinationExists: false
+          expectedReturn:
+            released:
+            - a
+            blocked: []
+        - id: reports-all-release-blockers
+          arguments:
+          - value:
+            - id: a
+              savedHash: bad
+              expectedHash: x
+              scanStatus: unknown
+              destinationExists: true
+          expectedReturn:
+            released: []
+            blocked:
+            - id: a
+              reasons:
+              - hash
+              - scan
+              - conflict
+        - id: separates-clean-and-blocked-files
+          arguments:
+          - value:
+            - id: a
+              savedHash: x
+              expectedHash: x
+              scanStatus: clean
+            - id: b
+              savedHash: y
+              expectedHash: y
+              scanStatus: blocked
+          expectedReturn:
+            released:
+            - a
+            blocked:
+            - id: b
+              reasons:
+              - scan
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: email_06-attachment-save-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - email_06-attachment-release-audit-transfer
+    title: 수신 첨부파일 저장 안전 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: name·quarantine·scan·hash evidence를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 메일 API 성공과 올바른 수신자·내용·첨부 전달을 분리해 검증하세요.
+    - 실제 발송 전 dry run과 idempotency identity, 비밀정보 redaction을 적용하세요.
+    exercise:
+      prompt: choose_attachment_save_gate(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_attachment_save_gate(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_attachment_save_gate(situation):
+            table = {'admit': {'action': 'validate safe name type size and hash', 'evidence': 'attachment descriptor', 'risk': 'path traversal or oversized file'}, 'quarantine': {'action': 'save outside business destination', 'evidence': 'quarantine path and saved hash', 'risk': 'unsafe execution'}, 'release': {'action': 'require clean scan and no conflict', 'evidence': 'release decision', 'risk': 'malware or overwrite'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.email.email_06.attachment-save-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_06.attachment-save-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_attachment_save_gate
+        cases:
+        - id: recalls-admit
+          arguments:
+          - value: admit
+          expectedReturn:
+            action: validate safe name type size and hash
+            evidence: attachment descriptor
+            risk: path traversal or oversized file
+        - id: recalls-quarantine
+          arguments:
+          - value: quarantine
+          expectedReturn:
+            action: save outside business destination
+            evidence: quarantine path and saved hash
+            risk: unsafe execution
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

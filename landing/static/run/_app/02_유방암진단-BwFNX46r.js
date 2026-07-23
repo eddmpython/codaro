@@ -1,0 +1,842 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - pandas
+  - scikit-learn
+  - seaborn
+  id: sklearn_02
+  title: 유방암진단
+  order: 2
+  category: sklearn
+  difficulty: ⭐⭐
+  badge: 입문
+  tags:
+  - 이진분류
+  - precision
+  - recall
+  - F1
+  - 유방암
+  seo:
+    title: scikit-learn 이진 분류 - 유방암 진단 모델
+    description: 이진 분류 모델로 유방암 양성/악성을 판별합니다. 정밀도, 재현율, F1 점수로 모델을 평가합니다.
+    keywords:
+    - scikit-learn
+    - 이진분류
+    - 유방암
+    - precision
+    - recall
+intro:
+  emoji: 🏥
+  goal: 이진 분류 모델로 유방암 양성/악성을 판별합니다.
+  description: 의료 진단에서 중요한 이진 분류를 배웁니다. 정밀도(precision)와 재현율(recall)의 차이를 이해하고, 상황에 맞는 평가 지표를 선택하는 방법을
+    익힙니다. 이전 프로젝트에서 배운 train_test_split, StandardScaler, LogisticRegression을 복습합니다.
+  direction: 유방암진단에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.
+  - 유방암진단 결과를 출력과 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 데이터 불러오기 처리 실행
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 분할과 스케일링 결과 검증
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.
+    - label: 유방암진단 재사용
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 업무 코드 환경
+      detail: matplotlib, pandas, scikit-learn, seaborn 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 유방암진단 실행
+      detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.
+    - label: 유방암진단 완료
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: 유방암 진단 모델을 만들기 위해 필요한 라이브러리를 불러옵니다. sklearn의 breast_cancer 데이터셋은 569개의 세포 샘플과 30개의 특성을
+    제공합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from sklearn.datasets import load_breast_cancer
+    from sklearn.model_selection import train_test_split
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+    from sklearn.metrics import confusion_matrix, classification_report
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: |-
+      from sklearn.datasets import load_breast_cancer
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+      from sklearn.metrics import confusion_matrix, classification_report
+      import pandas as pd
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.
+- id: step2_load
+  title: 2단계. 데이터 불러오기
+  structuredPrimary: true
+  subtitle: load_breast_cancer()
+  goal: 2단계. 데이터 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    유방암 데이터셋을 불러옵니다. 세포핵의 반지름, 질감, 둘레, 면적 등 30개의 특성으로 양성(benign)과 악성(malignant)을 구분합니다. 타겟 0은 악성, 1은 양성입니다.
+
+    target=0은 malignant(악성), target=1은 benign(양성)입니다. 의료에서는 악성을 "양성(positive)"으로 취급합니다. 혼란을 방지하기 위해 0/1 숫자로 작업하는 것이 좋습니다.
+  tips:
+  - target=0은 malignant(악성), target=1은 benign(양성)입니다. 의료에서는 악성을 "양성(positive)"으로 취급합니다. 혼란을 방지하기 위해 0/1
+    숫자로 작업하는 것이 좋습니다.
+  snippet: |-
+    cancer = load_breast_cancer()
+    X = pd.DataFrame(cancer.data, columns=cancer.feature_names)
+    y = cancer.target
+    X.shape
+  exercise:
+    prompt: 2단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      cancer = load_breast_cancer()
+      X = pd.DataFrame(cancer.data, columns=cancer.feature_names)
+      y = cancer.target
+      X.shape
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step3_split_scale
+  title: 3단계. 분할과 스케일링
+  structuredPrimary: true
+  subtitle: 전처리
+  goal: 3단계. 분할과 스케일링에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 이전 프로젝트에서 배운 대로 데이터를 분할하고 스케일링합니다. 30개의 특성이 모두 다른 스케일이므로 StandardScaler가 필수입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    scaler = StandardScaler()
+    xTrainSc = scaler.fit_transform(xTrain)
+    xTestSc = scaler.transform(xTest)
+    xTrainSc.shape
+  exercise:
+    prompt: 3단계. 분할과 스케일링 예제에서 \`xTrain\`, \`xTest\`, \`yTrain\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
+
+      scaler = StandardScaler()
+      xTrainSc = scaler.fit_transform(xTrain)
+      xTestSc = scaler.transform(xTest)
+      xTrainSc.shape
+    hints:
+    - 바꿀 지점은 \`scaler = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`scaler\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 3단계. 분할과 스케일링에서 \`scaler\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 분할과 스케일링 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step4_train
+  title: 4단계. 모델 학습
+  structuredPrimary: true
+  subtitle: LogisticRegression
+  goal: 4단계. 모델 학습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 이진 분류에서도 LogisticRegression을 사용합니다. 출력이 0 또는 1의 두 클래스이므로 이진 분류(binary classification)라고
+    합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    model = LogisticRegression(max_iter=1000)
+    model.fit(xTrainSc, yTrain)
+  exercise:
+    prompt: 4단계. 모델 학습 예제에서 \`model\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      model = LogisticRegression(max_iter=1000)
+      model.fit(xTrainSc, yTrain)
+    hints:
+    - 바꿀 지점은 \`model = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`model\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 4단계. 모델 학습에서 \`model\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 4단계. 모델 학습 실행 뒤 \`model\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step5_predict
+  title: 5단계. 예측
+  structuredPrimary: true
+  subtitle: predict
+  goal: 5단계. 예측에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 테스트 데이터로 예측을 수행합니다. 의료 진단에서는 악성(0)을 놓치지 않는 것이 중요합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    yPred = model.predict(xTestSc)
+    yPred[:10]
+  exercise:
+    prompt: 5단계. 예측 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      yPred = model.predict(xTestSc)
+      yPred[:10]
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 5단계. 예측에서 \`yPred\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 예측 실행 뒤 \`yPred\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step6_accuracy
+  title: 6단계. 정확도
+  structuredPrimary: true
+  subtitle: accuracy_score
+  goal: 6단계. 정확도에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 전체 정확도를 확인합니다. 하지만 의료 진단에서는 정확도만으로는 부족합니다. 악성을 양성으로 잘못 판단하면 치명적이기 때문입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    acc = accuracy_score(yTest, yPred)
+    f"정확도: {acc:.2%}"
+  exercise:
+    prompt: 6단계. 정확도 예제에서 \`acc\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      acc = accuracy_score(yTest, yPred)
+      f"정확도: {acc:.2%}"
+    hints:
+    - 바꿀 지점은 \`acc = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`acc\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 6단계. 정확도에서 \`acc\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 정확도 실행 뒤 \`acc\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step7_precision_recall
+  title: 7단계. 정밀도와 재현율
+  structuredPrimary: true
+  subtitle: precision, recall
+  goal: 7단계. 정밀도와 재현율에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    정밀도(precision)는 "양성 예측 중 실제 양성 비율"입니다. 재현율(recall)은 "실제 양성 중 맞춘 비율"입니다. 이 데이터셋은 악성이 0, 양성이 1이므로 악성 탐지 지표를 보려면 pos_label=0을 명시해야 합니다. 의료에서는 악성(0)을 놓치지 않는 것이 중요하므로 재현율이 더 중요합니다.
+
+    암 진단에서 악성(0)을 놓치면(False Negative) 환자가 치료 시기를 놓칩니다. 따라서 재현율이 높아야 합니다. 반대로 스팸 필터에서는 정상 메일을 스팸으로 오분류(False Positive)하면 안 되므로 정밀도가 더 중요합니다.
+  tips:
+  - sklearn의 precision_score/recall_score는 기본 pos_label=1입니다. 유방암 데이터에서 악성(0)을 기준으로 보려면 pos_label=0을 넣습니다.
+  snippet: |-
+    prec = precision_score(yTest, yPred, pos_label=0)
+    rec = recall_score(yTest, yPred, pos_label=0)
+    f"정밀도: {prec:.2%}, 재현율: {rec:.2%}"
+  exercise:
+    prompt: 7단계. 정밀도와 재현율 예제에서 \`prec\`, \`rec\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      prec = precision_score(yTest, yPred, pos_label=0)
+      rec = recall_score(yTest, yPred, pos_label=0)
+      f"정밀도: {prec:.2%}, 재현율: {rec:.2%}"
+    hints:
+    - 바꿀 지점은 \`prec = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`prec\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 7단계. 정밀도와 재현율에서 \`prec\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. 정밀도와 재현율 실행 뒤 \`prec\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step8_f1
+  title: 8단계. F1 점수
+  structuredPrimary: true
+  subtitle: 조화평균
+  goal: 8단계. F1 점수에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    F1 점수는 정밀도와 재현율의 조화평균입니다. 두 지표 중 하나만 높으면 F1이 낮아집니다. 정밀도와 재현율의 균형을 평가할 때 사용합니다.
+
+    F1 = 2 * (precision * recall) / (precision + recall). 조화평균이므로 두 값이 비슷해야 높은 F1이 나옵니다. 예를 들어 precision=0.9, recall=0.1이면 F1은 0.18에 불과합니다.
+  tips:
+  - F1 = 2 * (precision * recall) / (precision + recall). 조화평균이므로 두 값이 비슷해야 높은 F1이 나옵니다. 예를 들어 precision=0.9,
+    recall=0.1이면 F1은 0.18에 불과합니다.
+  snippet: |-
+    f1 = f1_score(yTest, yPred, pos_label=0)
+    f"F1 점수: {f1:.2%}"
+  exercise:
+    prompt: 8단계. F1 점수 예제에서 \`f1\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      f1 = f1_score(yTest, yPred, pos_label=0)
+      f"F1 점수: {f1:.2%}"
+    hints:
+    - 바꿀 지점은 \`f1 = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`f1\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 8단계. F1 점수에서 \`f1\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 8단계. F1 점수 실행 뒤 \`f1\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step9_confusion
+  title: 9단계. 혼동행렬 분석
+  structuredPrimary: true
+  subtitle: TP, TN, FP, FN
+  goal: 9단계. 혼동행렬 분석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    혼동행렬을 통해 실제 클래스와 예측 클래스가 어떻게 엇갈렸는지 확인합니다. 이 데이터셋은 라벨 0이 악성, 1이 양성이므로 의료 관점에서는 실제 악성을 양성으로 예측한 칸이 가장 위험합니다.
+
+    confusion_matrix(yTest, yPred)는 기본 라벨 순서 [0, 1]을 씁니다. 이 표에서는 좌상=악성을 악성으로 정확히 예측, 우상=악성을 양성으로 놓침, 좌하=양성을 악성으로 오경보, 우하=양성을 양성으로 정확히 예측입니다. TP/TN 명칭은 어떤 클래스를 positive로 둘지에 따라 달라집니다.
+  tips:
+  - 악성을 positive로 볼 때는 라벨 0 기준으로 해석합니다. 우상 칸이 실제 악성을 양성으로 놓친 위험 사례입니다.
+  snippet: |-
+    cm = confusion_matrix(yTest, yPred)
+    cmDf = pd.DataFrame(cm, index=['Actual Malignant', 'Actual Benign'], columns=['Pred Malignant', 'Pred Benign'])
+    cmDf
+  exercise:
+    prompt: 9단계. 혼동행렬 분석 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      cm = confusion_matrix(yTest, yPred)
+      cmDf = pd.DataFrame(cm, index=['Actual Malignant', 'Actual Benign'], columns=['Pred Malignant', 'Pred Benign'])
+      cmDf
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 9단계. 혼동행렬 분석의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 9단계. 혼동행렬 분석의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step10_report
+  title: 10단계. 상세 리포트
+  structuredPrimary: true
+  subtitle: classification_report
+  goal: 10단계. 상세 리포트에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: classification_report로 클래스별 상세 평가를 확인합니다. 악성(0)과 양성(1) 각각의 precision, recall, f1을 비교합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    report = classification_report(yTest, yPred, target_names=['malignant', 'benign'])
+    report
+  exercise:
+    prompt: 10단계. 상세 리포트 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      report = classification_report(yTest, yPred, target_names=['malignant', 'benign'])
+      report
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 10단계. 상세 리포트에서 \`report\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 10단계. 상세 리포트 실행 뒤 \`report\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step11_proba
+  title: 11단계. 확률 예측
+  structuredPrimary: true
+  subtitle: predict_proba
+  goal: 11단계. 확률 예측에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    predict_proba()로 각 클래스의 확률을 얻을 수 있습니다. 의료에서는 확률값을 활용하여 위험도를 세분화하거나, 임계값을 조정할 수 있습니다.
+
+    기본 임계값은 0.5입니다. 악성 확률이 0.5 이상이면 악성으로 예측합니다. 재현율을 높이려면 임계값을 낮춰서 더 많은 케이스를 악성으로 분류할 수 있습니다.
+  snippet: |-
+    proba = model.predict_proba(xTestSc)
+    probaDf = pd.DataFrame(proba, columns=['Malignant Prob', 'Benign Prob'])
+    probaDf.head(10)
+  exercise:
+    prompt: 11단계. 확률 예측 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      proba = model.predict_proba(xTestSc)
+      probaDf = pd.DataFrame(proba, columns=['Malignant Prob', 'Benign Prob'])
+      probaDf.head(10)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 11단계. 확률 예측의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 11단계. 확률 예측의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: step12_summary
+  title: 12단계. 정리
+  structuredPrimary: true
+  subtitle: 이진 분류 완료
+  goal: 12단계. 정리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 이번 프로젝트에서는 유방암 진단 모델을 만들어 이진 분류를 학습했습니다. 정확도뿐 아니라 정밀도, 재현율, F1 점수로 모델을 다각도로 평가하는 방법을 배웠습니다.
+    의료처럼 오분류 비용이 다른 경우 상황에 맞는 지표를 선택해야 합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    summary = pd.DataFrame({
+        'Item': ['Dataset', 'Model', 'Accuracy', 'Malignant Precision', 'Malignant Recall', 'Malignant F1'],
+        'Value': ['Breast Cancer (569 samples)', 'LogisticRegression', f'{acc:.2%}', f'{prec:.2%}', f'{rec:.2%}', f'{f1:.2%}']
+    })
+    summary
+  exercise:
+    prompt: 12단계. 정리 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      summary = pd.DataFrame({
+          'Item': ['Dataset', 'Model', 'Accuracy', 'Malignant Precision', 'Malignant Recall', 'Malignant F1'],
+          'Value': ['Breast Cancer (569 samples)', 'LogisticRegression', f'{acc:.2%}', f'{prec:.2%}', f'{rec:.2%}', f'{f1:.2%}']
+      })
+      summary
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 12단계. 정리의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 12단계. 정리의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 유방암 진단 프로젝트
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: |-
+    의료 AI 개발자가 되어 진단 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 평가까지 전 과정을 독립적으로 수행합니다. 이전 프로젝트의 train_test_split, StandardScaler와 이번 프로젝트의 precision, recall, F1을 모두 활용합니다.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    from sklearn.datasets import load_breast_cancer
+    from sklearn.model_selection import train_test_split
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import accuracy_score, f1_score
+    import pandas as pd
+
+    data = load_breast_cancer()
+    xFull = pd.DataFrame(data.data, columns=data.feature_names)
+    yFull = data.target
+
+    top10 = ['mean radius', 'mean texture', 'mean perimeter', 'mean area', 'mean smoothness', 'mean compactness', 'mean concavity', 'mean concave points', 'mean symmetry', 'mean fractal dimension']
+    xTop10 = xFull[top10]
+
+    xTr1, xTe1, yTr1, yTe1 = train_test_split(xFull, yFull, test_size=0.2, random_state=42)
+    xTr2, xTe2, yTr2, yTe2 = train_test_split(xTop10, yFull, test_size=0.2, random_state=42)
+
+    sc1 = StandardScaler()
+    sc2 = StandardScaler()
+
+    model1 = LogisticRegression(max_iter=1000)
+    model1.fit(sc1.fit_transform(xTr1), yTr1)
+    pred1 = model1.predict(sc1.transform(xTe1))
+
+    model2 = LogisticRegression(max_iter=1000)
+    model2.fit(sc2.fit_transform(xTr2), yTr2)
+    pred2 = model2.predict(sc2.transform(xTe2))
+
+    pd.DataFrame({
+        'Features': ['All 30', 'Top 10'],
+        'Accuracy': [accuracy_score(yTe1, pred1), accuracy_score(yTe2, pred2)],
+        'F1': [f1_score(yTe1, pred1), f1_score(yTe2, pred2)]
+    })
+  exercise:
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from sklearn.datasets import load_breast_cancer
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score, f1_score
+      import pandas as pd
+
+      data = load_breast_cancer()
+      xFull = pd.DataFrame(data.data, columns=data.feature_names)
+      yFull = data.target
+
+      top10 = ['mean radius', 'mean texture', 'mean perimeter', 'mean area', 'mean smoothness', 'mean compactness', 'mean concavity', 'mean concave points', 'mean symmetry', 'mean fractal dimension']
+      xTop10 = xFull[top10]
+
+      xTr1, xTe1, yTr1, yTe1 = train_test_split(xFull, yFull, test_size=0.2, random_state=42)
+      xTr2, xTe2, yTr2, yTe2 = train_test_split(xTop10, yFull, test_size=0.2, random_state=42)
+
+      sc1 = StandardScaler()
+      sc2 = StandardScaler()
+
+      model1 = LogisticRegression(max_iter=1000)
+      model1.fit(sc1.fit_transform(xTr1), yTr1)
+      pred1 = model1.predict(sc1.transform(xTe1))
+
+      model2 = LogisticRegression(max_iter=1000)
+      model2.fit(sc2.fit_transform(xTr2), yTr2)
+      pred2 = model2.predict(sc2.transform(xTe2))
+
+      pd.DataFrame({
+          'Features': ['All 30', 'Top 10'],
+          'Accuracy': [accuracy_score(yTe1, pred1), accuracy_score(yTe2, pred2)],
+          'F1': [f1_score(yTe1, pred1), f1_score(yTe2, pred2)]
+      })
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 예측 모델 품질 게이트
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고,
+    정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from sklearn.datasets import make_classification
+    from sklearn.model_selection import train_test_split
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import accuracy_score, f1_score
+
+    features, target = make_classification(
+        n_samples=240,
+        n_features=6,
+        n_informative=4,
+        n_redundant=0,
+        class_sep=1.4,
+        random_state=42,
+    )
+    xTrain, xTest, yTrain, yTest = train_test_split(
+        features, target, test_size=0.25, random_state=42, stratify=target
+    )
+
+    riskPipeline = Pipeline([
+        ("scaler", StandardScaler()),
+        ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
+    ])
+
+    def fitRiskModel(pipeline, featureMatrix, labels):
+        pipeline.fit(featureMatrix, labels)
+        return pipeline
+
+    riskModel = fitRiskModel(riskPipeline, xTrain, yTrain)
+    riskPred = riskModel.predict(xTest)
+    riskAccuracy = accuracy_score(yTest, riskPred)
+    riskF1 = f1_score(yTest, riskPred)
+    xTrain.shape, xTest.shape
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      conservativePipeline = Pipeline([
+          ("scaler", StandardScaler()),
+          ("classifier", LogisticRegression(C=0.3, max_iter=1000, random_state=42)),
+      ])
+      conservativeModel = fitRiskModel(conservativePipeline, xTrain, yTrain)
+      conservativePred = conservativeModel.predict(xTest)
+      conservativeAccuracy = accuracy_score(yTest, conservativePred)
+      conservativeF1 = f1_score(yTest, conservativePred)
+
+      assert conservativeAccuracy >= 0.75
+      {
+          "baselineAccuracy": round(riskAccuracy, 3),
+          "baselineF1": round(riskF1, 3),
+          "conservativeAccuracy": round(conservativeAccuracy, 3),
+          "conservativeF1": round(conservativeF1, 3),
+          "accuracyDelta": round(conservativeAccuracy - riskAccuracy, 3),
+      }
+    solution: |-
+      from sklearn.datasets import make_classification
+      from sklearn.model_selection import train_test_split
+      from sklearn.pipeline import Pipeline
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score, f1_score
+
+      features, target = make_classification(
+          n_samples=240,
+          n_features=6,
+          n_informative=4,
+          n_redundant=0,
+          class_sep=1.4,
+          random_state=42,
+      )
+      xTrain, xTest, yTrain, yTest = train_test_split(
+          features, target, test_size=0.25, random_state=42, stratify=target
+      )
+
+      riskPipeline = Pipeline([
+          ("scaler", StandardScaler()),
+          ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
+      ])
+      xTrain.shape, xTest.shape
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증에서 \`conservativePipeline\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sklearn_02-diagnostic-confusion-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 의료 분류의 sensitivity·specificity 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: positive label을 명시해 confusion counts와 지표를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - positive class가 무엇인지 결과 계약에 고정하세요.
+    - 의료 모델 metric은 실제 진단을 대신하지 않습니다.
+    exercise:
+      prompt: diagnostic_metrics(actual, predicted, positive)를 완성하세요.
+      starterCode: |-
+        def diagnostic_metrics(actual, predicted, positive):
+            raise NotImplementedError
+      solution: |
+        def diagnostic_metrics(actual, predicted, positive):
+            if len(actual) != len(predicted) or not actual: raise ValueError("invalid diagnostic sample")
+            tp=tn=fp=fn=0
+            for truth,guess in zip(actual,predicted):
+                if truth==positive and guess==positive: tp+=1
+                elif truth==positive: fn+=1
+                elif guess==positive: fp+=1
+                else: tn+=1
+            sensitivity = None if tp+fn==0 else tp/(tp+fn); specificity = None if tn+fp==0 else tn/(tn+fp)
+            return {"tp":tp,"tn":tn,"fp":fp,"fn":fn,"sensitivity":None if sensitivity is None else round(sensitivity,4),"specificity":None if specificity is None else round(specificity,4)}
+      hints: *id001
+    check:
+      id: python.sklearn.sklearn_02.diagnostic-confusion.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_02.diagnostic-confusion.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: diagnostic_metrics
+        cases:
+        - id: computes-diagnostic-metrics
+          arguments:
+          - value:
+            - 1
+            - 1
+            - 0
+            - 0
+          - value:
+            - 1
+            - 0
+            - 1
+            - 0
+          - value: 1
+          expectedReturn:
+            tp: 1
+            tn: 1
+            fp: 1
+            fn: 1
+            sensitivity: 0.5
+            specificity: 0.5
+        - id: handles-no-negatives
+          arguments:
+          - value:
+            - 1
+            - 1
+          - value:
+            - 1
+            - 0
+          - value: 1
+          expectedReturn:
+            tp: 1
+            tn: 0
+            fp: 0
+            fn: 1
+            sensitivity: 0.5
+            specificity: null
+        - id: rejects-empty
+          arguments:
+          - value: []
+          - value: []
+          - value: 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sklearn_02-medical-claim-boundary-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_02-diagnostic-confusion-mastery
+    title: 새 의료 예측 문구에 안전 경계 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 예측 score와 승인된 표현을 구분해 금지 claim을 찾는다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 모델 출력은 확진이 아니라 검토가 필요한 위험 신호입니다.
+    - 외부 검증과 임상 검토가 없으면 release claim을 차단하세요.
+    exercise:
+      prompt: audit_medical_claim(claim, has_clinician_review, has_external_validation)를 완성하세요.
+      starterCode: |-
+        def audit_medical_claim(claim, has_clinician_review, has_external_validation):
+            raise NotImplementedError
+      solution: |
+        def audit_medical_claim(claim, has_clinician_review, has_external_validation):
+            lowered = claim.lower(); forbidden = [term for term in ["확진","치료 보장","disease confirmed","guaranteed treatment"] if term in lowered]
+            failures = []
+            if forbidden: failures.append("diagnostic-overclaim")
+            if not has_clinician_review: failures.append("no-clinician-review")
+            if not has_external_validation: failures.append("no-external-validation")
+            return {"releaseAllowed":not failures,"failures":failures,"forbiddenTerms":forbidden,"allowedScope":"decision-support research only"}
+      hints: *id002
+    check:
+      id: python.sklearn.sklearn_02.medical-claim-boundary.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_02.medical-claim-boundary.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_medical_claim
+        cases:
+        - id: accepts-reviewed-support-claim
+          arguments:
+          - value: 위험도 분류를 돕는 연구용 모델
+          - value: true
+          - value: true
+          expectedReturn:
+            releaseAllowed: true
+            failures: []
+            forbiddenTerms: []
+            allowedScope: decision-support research only
+        - id: blocks-diagnostic-claim
+          arguments:
+          - value: 암 확진 결과
+          - value: false
+          - value: false
+          expectedReturn:
+            releaseAllowed: false
+            failures:
+            - diagnostic-overclaim
+            - no-clinician-review
+            - no-external-validation
+            forbiddenTerms:
+            - 확진
+            allowedScope: decision-support research only
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sklearn_02-medical-model-evidence-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_02-medical-claim-boundary-transfer
+    title: 의료 모델 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 분류 성능과 배포 claim을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 학습 데이터와 평가 데이터의 경계를 먼저 확인하세요.
+    - 한 metric이나 예측을 실제 진단·인과 결론으로 확대하지 마세요.
+    exercise:
+      prompt: choose_medical_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_medical_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_medical_evidence(situation):
+            table = {'screening-model': {'method': 'sensitivity specificity and PPV', 'evidence': 'prevalence and threshold', 'risk': 'dataset shift'}, 'probability-risk': {'method': 'calibration', 'evidence': 'reliability and subgroup audit', 'risk': 'uncalibrated score'}, 'clinical-release': {'method': 'external clinical validation', 'evidence': 'review protocol', 'risk': 'diagnostic overclaim'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sklearn.sklearn_02.medical-model-evidence.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_02.medical-model-evidence.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_medical_evidence
+        cases:
+        - id: recalls-screening-model
+          arguments:
+          - value: screening-model
+          expectedReturn:
+            method: sensitivity specificity and PPV
+            evidence: prevalence and threshold
+            risk: dataset shift
+        - id: recalls-probability-risk
+          arguments:
+          - value: probability-risk
+          expectedReturn:
+            method: calibration
+            evidence: reliability and subgroup audit
+            risk: uncalibrated score
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

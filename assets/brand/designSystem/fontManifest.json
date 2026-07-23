@@ -15,6 +15,17 @@
       "sha256": "01dd73155fdfab7ce9b25224523e85a96927e21aef97f21957d41f1bfa7e3878"
     },
     {
+      "file": "Pretendard-600.subset.woff2",
+      "family": "Pretendard",
+      "weight": 600,
+      "style": "normal",
+      "unicodeRange": "U+0000-00FF,U+1100-11FF,U+3130-318F,U+AC00-D7AF",
+      "preload": true,
+      "license": "OFL-1.1",
+      "licenseSource": "https://github.com/orioncactus/pretendard/blob/main/LICENSE",
+      "sha256": "4247dc5e260b92640c2cbd0e75091154647b71e1d5884116655e2903468c54cc"
+    },
+    {
       "file": "Pretendard-700.subset.woff2",
       "family": "Pretendard",
       "weight": 700,
@@ -57,17 +68,6 @@
       "license": "OFL-1.1",
       "licenseSource": "https://github.com/JetBrains/JetBrainsMono/blob/master/OFL.txt",
       "sha256": "14425ba9c695763c1547f48a206b7aa60350a33ae23de09f0407877f3fcd89eb"
-    },
-    {
-      "file": "JetBrainsMono-500.woff2",
-      "family": "JetBrains Mono",
-      "weight": 500,
-      "style": "normal",
-      "unicodeRange": "U+0000-00FF",
-      "preload": false,
-      "license": "OFL-1.1",
-      "licenseSource": "https://github.com/JetBrains/JetBrainsMono/blob/master/OFL.txt",
-      "sha256": "cb182feeed4d798ff6961d3c79f7026279448fca0676438aaecb21f3fc39553a"
     }
   ]
 }

@@ -1,0 +1,625 @@
+var e=`meta:
+  packages:
+  - sympy
+  id: sympy_03
+  title: 방정식풀이
+  order: 3
+  category: sympy
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - sympy
+  - solve
+  - Eq
+  - solveset
+  - 방정식
+  - 연립방정식
+  seo:
+    title: SymPy 방정식 풀이 - solve, Eq 사용법
+    description: SymPy로 일차방정식, 이차방정식, 연립방정식을 풉니다. solve()와 Eq()로 다양한 방정식을 해결하는 방법을 배웁니다.
+    keywords:
+    - sympy
+    - solve
+    - Eq
+    - solveset
+    - 방정식
+    - 연립방정식
+intro:
+  emoji: 🎯
+  goal: solve()와 Eq()로 다양한 방정식을 풀고 해를 구합니다.
+  description: 방정식 풀이는 SymPy의 가장 강력한 기능 중 하나입니다. 손으로 풀면 실수하기 쉬운 이차방정식, 연립방정식을 solve() 한 줄로 정확하게 해결합니다.
+    x²-5x+6=0의 해가 x=2, x=3임을 즉시 구하고, 두 변수 연립방정식도 딕셔너리 형태로 깔끔하게 반환합니다. 나이 문제, 속도 문제, 도형 문제 등 실생활 문제를 방정식으로
+    모델링하고 SymPy로 풀 수 있습니다. 이 프로젝트를 완료하면 어떤 대수 방정식이든 자신있게 풀 수 있게 됩니다.
+  direction: 방정식풀이에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 수식과 기호 확인 후 기호 계산에 맞는 코드 입력을 고릅니다.
+  - 방정식풀이 결과를 간소화식, 해, 미분/적분 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 수학 계산 검증 루틴에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(수식과 기호)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 기본 방정식 처리 실행
+      detail: 기호 계산 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 일차방정식 결과 검증
+      detail: 간소화식, 해, 미분/적분 결과 기준으로 실행 결과를 비교합니다.
+    - label: 방정식풀이 재사용
+      detail: 완성 코드를 수학 계산 검증 루틴에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기호 계산 환경
+      detail: sympy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 방정식풀이 실행
+      detail: 셀을 실행해 간소화식, 해, 미분/적분 결과와 예외 상태를 확인합니다.
+    - label: 방정식풀이 완료
+      detail: 검증된 코드를 수학 계산 검증 루틴로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 방정식 풀이에 필요한 함수들을 불러옵니다. solve()가 가장 많이 쓰이는 핵심 함수입니다. Eq()는 좌변=우변 형태의 등식을 명시적으로 표현할 때 사용합니다.
+    solveset()은 해를 집합 형태로 반환하여 해가 없거나 무한히 많은 경우를 명확하게 처리합니다. S는 SymPy의 단일 객체(Singleton)로, S.Reals(실수),
+    S.Integers(정수) 같은 수 집합에 접근할 때 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from sympy import symbols, solve, Eq, solveset, S
+    from sympy import sqrt, Rational, simplify, expand
+    from sympy import init_printing
+    init_printing()
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from sympy import symbols, solve, Eq, solveset, S
+      from sympy import sqrt, Rational, simplify, expand
+      from sympy import init_printing
+      init_printing()
+    hints:
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 1단계. 라이브러리 불러오기의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step2_solve_basic
+  title: 2단계. 기본 방정식
+  structuredPrimary: true
+  subtitle: solve()
+  goal: 2단계. 기본 방정식에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    solve()는 방정식의 해를 구하는 핵심 함수입니다. solve(x**2-4, x)는 x²-4=0을 풀어 x=2, x=-2를 반환합니다. 수식을 0과 같다고 가정하고 해를 찾습니다. 결과는 파이썬 리스트로 반환되어 solutions[0], solutions[1]처럼 각 해에 접근할 수 있습니다. 해가 하나면 리스트에 원소가 하나, 해가 없으면 빈 리스트가 반환됩니다.
+
+    solve(수식, 변수)는 수식=0이 되는 변수 값을 찾습니다. 해가 여러 개면 리스트로 반환됩니다.
+  snippet: x = symbols('x')
+  exercise:
+    prompt: 2단계. 기본 방정식 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: x = symbols('x')
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 2단계. 기본 방정식의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 2단계. 기본 방정식 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step3_linear
+  title: 3단계. 일차방정식
+  structuredPrimary: true
+  subtitle: ax + b = 0
+  goal: 3단계. 일차방정식에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 일차방정식 ax+b=0은 해가 정확히 하나입니다. 2x+6=0을 풀면 x=-3이 나옵니다. solve()는 양변을 정리하고 이항하는 과정을 자동으로 수행합니다.
+    분수 계수가 있어도 Rational을 사용하면 정확한 해를 구합니다. 일차방정식은 가장 기본적인 형태이지만, 연립방정식의 구성 요소가 되므로 확실히 익혀두세요.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    linear1 = solve(2*x + 6, x)
+    linear1
+  exercise:
+    prompt: 3단계. 일차방정식 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      linear1 = solve(2*x + 6, x)
+      linear1
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 3단계. 일차방정식의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 3단계. 일차방정식 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step4_eq
+  title: 4단계. 등식 표현
+  structuredPrimary: true
+  subtitle: Eq()
+  goal: 4단계. 등식 표현에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    Eq()는 Equation의 줄임말로, 좌변=우변 형태의 등식을 명시적으로 표현합니다. solve(2*x+3-7, x) 대신 solve(Eq(2*x+3, 7), x)처럼 쓰면 수학적으로 더 자연스럽습니다. 2x+3=7을 그대로 표현할 수 있어 문제를 읽고 바로 코드로 옮기기 좋습니다. Eq 객체는 출력할 때도 2x+3=7 형태로 보여져서 가독성이 높습니다.
+
+    Eq(좌변, 우변)으로 등식을 만듭니다. solve()에 Eq 객체를 전달하면 자동으로 처리합니다.
+  snippet: |-
+    eq1 = Eq(2*x + 3, 7)
+    eq1
+  exercise:
+    prompt: 4단계. 등식 표현 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      eq1 = Eq(2*x + 3, 7)
+      eq1
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 4단계. 등식 표현의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 등식 표현 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step5_quadratic
+  title: 5단계. 이차방정식
+  structuredPrimary: true
+  subtitle: ax² + bx + c = 0
+  goal: 5단계. 이차방정식에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    이차방정식 ax²+bx+c=0은 판별식 b²-4ac에 따라 해의 개수가 달라집니다. 양수면 서로 다른 두 실근, 0이면 중근(같은 해 2개), 음수면 복소수 해입니다. solve()는 근의 공식을 적용하여 정확한 해를 구합니다. x²-2=0의 해는 ±√2처럼 무리수로, x²+1=0의 해는 ±i처럼 허수로 정확하게 표현됩니다. 손으로 풀면 계산 실수가 잦은 이차방정식을 SymPy로 확실하게 검증할 수 있습니다.
+
+    SymPy는 복소수 해도 자동으로 구합니다. I는 허수단위 √(-1)입니다.
+  snippet: |-
+    quad1 = solve(x**2 - 5*x + 6, x)
+    quad1
+  exercise:
+    prompt: 5단계. 이차방정식 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      quad1 = solve(x**2 - 5*x + 6, x)
+      quad1
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 5단계. 이차방정식의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 5단계. 이차방정식 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step6_higher
+  title: 6단계. 고차방정식
+  structuredPrimary: true
+  subtitle: 3차, 4차 방정식
+  goal: 6단계. 고차방정식에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 3차, 4차 방정식도 solve()로 풀 수 있습니다. x³-1=0은 실근 1과 복소근 2개를 모두 반환합니다. 인수분해가 가능한 x³-6x²+11x-6=0은
+    정수 해 1, 2, 3을 정확하게 구합니다. 5차 이상 방정식은 일반적인 근의 공식이 없지만(갈루아 이론), SymPy는 특수한 경우에 해를 구하거나 수치 근사를 제공합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    cubic = solve(x**3 - 1, x)
+    cubic
+  exercise:
+    prompt: 6단계. 고차방정식 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      cubic = solve(x**3 - 1, x)
+      cubic
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 6단계. 고차방정식의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 고차방정식 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step7_system
+  title: 7단계. 연립방정식
+  structuredPrimary: true
+  subtitle: 여러 방정식
+  goal: 7단계. 연립방정식에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    연립방정식은 여러 방정식을 동시에 만족하는 해를 찾는 것입니다. solve([eq1, eq2], [x, y])처럼 방정식 리스트와 변수 리스트를 전달합니다. 해는 {x: 값, y: 값} 딕셔너리로 반환되어 result[x], result[y]로 각 변수의 값에 접근할 수 있습니다. 중학교에서 배운 가감법, 대입법을 SymPy가 자동으로 적용합니다. 3원 연립방정식도 같은 방식으로 풀 수 있습니다.
+
+    solve([방정식들], [변수들])로 연립방정식을 풉니다. 결과는 {x: 값, y: 값} 딕셔너리입니다.
+  snippet: y = symbols('y')
+  exercise:
+    prompt: 7단계. 연립방정식 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: y = symbols('y')
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 7단계. 연립방정식의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 7단계. 연립방정식 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step8_solveset
+  title: 8단계. 해집합
+  structuredPrimary: true
+  subtitle: solveset()
+  goal: 8단계. 해집합에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    solveset()은 solve()의 발전된 버전으로, 해를 수학적 집합으로 반환합니다. 해가 2개면 {-2, 2}, 해가 없으면 공집합 ∅, 해가 무한히 많으면 조건 집합으로 표현합니다. domain=S.Reals를 지정하면 실수 범위에서만 해를 찾아, x²+1=0처럼 실수 해가 없는 경우 공집합을 반환합니다. 해의 존재 여부를 명확하게 판단해야 할 때 solveset()이 더 적합합니다.
+
+    domain=S.Reals로 실수 범위만 지정할 수 있습니다. S.Complexes는 복소수 전체입니다. 기본값은 복소수입니다.
+  snippet: |-
+    ss1 = solveset(x**2 - 4, x)
+    ss1
+  exercise:
+    prompt: 8단계. 해집합 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      ss1 = solveset(x**2 - 4, x)
+      ss1
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 8단계. 해집합의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 8단계. 해집합 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step9_verify
+  title: 9단계. 해 검증
+  structuredPrimary: true
+  subtitle: subs로 확인
+  goal: 9단계. 해 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 구한 해가 정말 맞는지 검증하는 습관은 매우 중요합니다. 해를 원래 방정식에 subs()로 대입하면 0이 나와야 합니다(수식=0 형태이므로). x²-5x+6=0의
+    해 x=2, x=3을 대입하면 4-10+6=0, 9-15+6=0으로 모두 0이 됩니다. 특히 복잡한 방정식을 풀었을 때 검증 단계를 거치면 오류를 방지할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    expr = x**2 - 5*x + 6
+    solutions = solve(expr, x)
+    solutions
+  exercise:
+    prompt: 9단계. 해 검증 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      expr = x**2 - 5*x + 6
+      solutions = solve(expr, x)
+      solutions
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 9단계. 해 검증의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 9단계. 해 검증 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: step10_practical
+  title: 10단계. 실전 문제
+  structuredPrimary: true
+  subtitle: 응용 예제
+  goal: 10단계. 실전 문제에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: 실생활 문제를 방정식으로 모델링하고 푸는 것이 수학의 진정한 활용입니다. 나이 문제(현재 아버지가 아들보다 30살 많고, 5년 후 아버지 나이가 아들의 3배),
+    속도 문제(거리=속력×시간 관계), 도형 문제(둘레와 넓이 조건) 등을 연립방정식으로 표현합니다. 문제를 읽고 변수를 정의하고 조건을 방정식으로 옮기는 연습이 중요합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    father, son = symbols('father son')
+    eq1 = Eq(father, son + 30)
+    eq2 = Eq(father + 5, 3*(son + 5))
+    ages = solve([eq1, eq2], [father, son])
+    ages
+  exercise:
+    prompt: 10단계. 실전 문제 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      father, son = symbols('father son')
+      eq1 = Eq(father, son + 30)
+      eq2 = Eq(father + 5, 3*(son + 5))
+      ages = solve([eq1, eq2], [father, son])
+      ages
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 10단계. 실전 문제의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 10단계. 실전 문제 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 방정식 풀이 연습
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 기호 계산은 입력식과 결과식이 직접 연결되므로 중간 결과를 확인하는 습관이 중요합니다.
+  explanation: |-
+    지금까지 배운 solve, Eq, solveset, subs를 모두 활용하여 실전 문제를 풀어봅시다. 미션1은 1차, 2차, 3차 방정식을 순서대로 풀어보는 기본 연습입니다. 미션2는 3원 연립방정식과 비선형 연립방정식(원과 직선의 교점)을 다룹니다. 각 미션은 독립적으로 실행 가능하므로 원하는 것부터 시작하세요.
+
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  snippet: |-
+    from sympy import symbols, solve, Eq, sqrt
+
+    u = symbols('u')
+
+    linear = solve(3*u - 9, u)
+    linear
+  exercise:
+    prompt: 실습 예제에서 기호, 수식, 대입값 중 하나를 바꾸고 계산 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from sympy import symbols, solve, Eq, sqrt
+
+      u = symbols('u')
+
+      linear = solve(3*u - 9, u)
+      linear
+    hints:
+    - 바꿀 지점은 symbols(), 수식 정의, solve/simplify/diff/integrate 인자입니다.
+    - 실행 뒤 간소화식, 해, 미분/적분 결과가 바꾼 수식과 맞는지 보세요.
+  check:
+    noError: 실습의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.
+    resultCheck: 실습 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기'
+  structuredPrimary: true
+  subtitle: 예측 → 수식 구성 → 오류 수정 → 결과 검증 → 실무 변주
+  goal: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: SymPy는 계산기를 대신하는 도구가 아니라, 업무 규칙을 수식으로 고정하고 전제 조건을 검증하는 도구입니다. 여기서는 고정비와 단위 이익으로 손익분기점을
+    구하고, 잘못된 계수를 먼저 실패시킨 뒤, 기준 변경 실험을 수행합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import sympy as sp
+
+    x = sp.symbols('x', nonnegative=True)
+    fixedCost = 120000
+    unitPrice = 5000
+    unitCost = 2000
+
+    revenueExpr = unitPrice * x
+    costExpr = fixedCost + unitCost * x
+    profitExpr = sp.simplify(revenueExpr - costExpr)
+    breakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]
+
+    assert profitExpr == 3000 * x - 120000
+    assert breakEvenQuantity == 40
+    profitExpr, breakEvenQuantity
+  exercise:
+    prompt: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    starterCode: |-
+      import sympy as sp
+
+      x = sp.symbols('x', nonnegative=True)
+      fixedCost = 120000
+      unitPrice = 5000
+      unitCost = 2000
+
+      revenueExpr = unitPrice * x
+      costExpr = fixedCost + unitCost * x
+      profitExpr = sp.simplify(revenueExpr - costExpr)
+      breakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]
+
+      assert profitExpr == 3000 * x - 120000
+      assert breakEvenQuantity == 40
+      profitExpr, breakEvenQuantity
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.'
+    resultCheck: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sympy_03-linear-equation-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 일차방정식의 해와 특수 경우 구분하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: ax+b=0에서 unique·none·all 해를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 계수가 0인 경우를 나눗셈 전에 처리하세요.
+    - 해가 없음과 모든 값이 해임을 같은 빈 배열로만 표현하지 마세요.
+    exercise:
+      prompt: solve_linear(a, b)를 완성하세요.
+      starterCode: |-
+        def solve_linear(a, b):
+            raise NotImplementedError
+      solution: |
+        def solve_linear(a, b):
+            if a == 0: return {"kind": "all" if b == 0 else "none", "solutions": []}
+            return {"kind": "unique", "solutions": [-b / a]}
+      hints: *id001
+    check:
+      id: python.sympy.sympy_03.linear-equation.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_03.linear-equation.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: solve_linear
+        cases:
+        - id: solves-unique
+          arguments:
+          - value: 2
+          - value: -6
+          expectedReturn:
+            kind: unique
+            solutions:
+            - 3.0
+        - id: detects-no-solution
+          arguments:
+          - value: 0
+          - value: 4
+          expectedReturn:
+            kind: none
+            solutions: []
+        - id: detects-all-values
+          arguments:
+          - value: 0
+          - value: 0
+          expectedReturn:
+            kind: all
+            solutions: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sympy_03-quadratic-real-roots-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sympy_03-linear-equation-mastery
+    title: 새 이차방정식에 해법 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 판별식으로 실근 개수와 정렬된 근을 반환한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 실수 정의역에서는 음의 판별식이 해 없음입니다.
+    - 중근은 같은 해를 두 번 반환하지 마세요.
+    exercise:
+      prompt: solve_quadratic(a, b, c)를 완성하세요.
+      starterCode: |-
+        def solve_quadratic(a, b, c):
+            raise NotImplementedError
+      solution: |
+        def solve_quadratic(a, b, c):
+            if a == 0: raise ValueError("not quadratic")
+            discriminant = b*b - 4*a*c
+            if discriminant < 0: return {"discriminant": discriminant, "roots": []}
+            root = discriminant ** 0.5
+            roots = sorted({(-b-root)/(2*a), (-b+root)/(2*a)})
+            return {"discriminant": discriminant, "roots": roots}
+      hints: *id002
+    check:
+      id: python.sympy.sympy_03.quadratic-real-roots.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_03.quadratic-real-roots.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: solve_quadratic
+        cases:
+        - id: finds-two-roots
+          arguments:
+          - value: 1
+          - value: -3
+          - value: 2
+          expectedReturn:
+            discriminant: 1
+            roots:
+            - 1.0
+            - 2.0
+        - id: deduplicates-double-root
+          arguments:
+          - value: 1
+          - value: 2
+          - value: 1
+          expectedReturn:
+            discriminant: 0
+            roots:
+            - -1.0
+        - id: returns-no-real-roots
+          arguments:
+          - value: 1
+          - value: 0
+          - value: 1
+          expectedReturn:
+            discriminant: -4
+            roots: []
+        - id: rejects-linear
+          arguments:
+          - value: 0
+          - value: 1
+          - value: 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sympy_03-equation-solver-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sympy_03-quadratic-real-roots-transfer
+    title: 방정식 풀이 검증 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 해 집합과 검산을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 기호 계산의 가정과 정의역을 결과와 함께 남기세요.
+    - 소수 근삿값과 exact 결과를 구분하세요.
+    exercise:
+      prompt: choose_equation_method(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_equation_method(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_equation_method(situation):
+            table = {'one-linear': {'method': 'solve coefficient cases', 'evidence': 'substitute solution', 'risk': 'zero coefficient'}, 'polynomial': {'method': 'factor or solve', 'evidence': 'root multiplicity', 'risk': 'domain mismatch'}, 'system': {'method': 'linear solve', 'evidence': 'rank and residual', 'risk': 'singular matrix'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sympy.sympy_03.equation-solver.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_03.equation-solver.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_equation_method
+        cases:
+        - id: recalls-one-linear
+          arguments:
+          - value: one-linear
+          expectedReturn:
+            method: solve coefficient cases
+            evidence: substitute solution
+            risk: zero coefficient
+        - id: recalls-polynomial
+          arguments:
+          - value: polynomial
+          expectedReturn:
+            method: factor or solve
+            evidence: root multiplicity
+            risk: domain mismatch
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,833 @@
+var e=`meta:
+  id: watchSched_10
+  title: 종합 폴더 감시 리포터
+  order: 10
+  category: watchSched
+  difficulty: medium
+  audience: 폴더 이벤트와 스케줄 자동화에 입문하는 Python 학습자
+  packages:
+    - watchdog
+  tags:
+    - watchdog
+    - reporting
+    - project
+intro:
+  direction: watchdog 감시, 디바운스, 스케줄, JSON 영속화를 한데 모아 한 사이클의 폴더 변화를 자동 리포트로 남기는 종합 프로젝트를 만든다.
+  benefits:
+    - 감시 폴더에서 발생한 이벤트를 분류와 디바운스로 안정화한다.
+    - 사이클이 끝나면 JSON 리포트로 영속화한다.
+    - 같은 사이클을 두 번 실행해도 같은 dict 형태를 유지한다.
+    - 운영자가 한 화면에서 사이클 결과를 비교할 수 있는 표준 보고를 만든다.
+  diagram:
+    steps:
+      - label: 감시 폴더 준비
+        detail: tempfile 격리 공간에 source 폴더와 reports 폴더를 만든다.
+      - label: 이벤트 분류 핸들러
+        detail: PatternMatchingEventHandler로 csv 파일만 created 이벤트를 모은다.
+      - label: 디바운스 적용
+        detail: 같은 파일이 짧은 시간 안에 두 번 이벤트가 들어오면 한 번만 기록한다.
+      - label: JSON 리포트 영속화
+        detail: 사이클 결과를 reports/last.json에 저장하고 다시 읽어 검증한다.
+    runtime:
+      - label: watchdog 패키지 필요
+        detail: meta.packages의 watchdog이 로컬 가상환경에 준비되어야 한다.
+      - label: assert 기반 종합 검증
+        detail: 사이클 결과 dict와 저장된 JSON 내용을 assert로 비교한다.
+sections:
+  - id: cycle-builder
+    title: 사이클 빌더 함수
+    structuredPrimary: true
+    subtitle: csv 이벤트 모으기
+    goal: tempfile 격리 폴더에서 csv 파일을 만들 때 발생한 created 이벤트를 dict 리스트로 모은다.
+    why: 종합 사이클의 첫 단계는 신뢰할 수 있는 이벤트 수집이므로 패턴 필터와 함께 안정화한다.
+    explanation: collectCsvEvents 함수는 파일명 리스트를 받아 Observer를 짧게 가동한 뒤 csv 파일에 대한 created 이벤트만 모은다. 결과는 dict 리스트로 timestamp 없이 이름 순서만 보고한다. tempfile 안에서 동작해 사용자 환경에 영향을 주지 않는다.
+    tips:
+      - PatternMatchingEventHandler로 csv만 필터링하면 후속 단계가 단순해진다.
+      - sleep 시간을 0.5초 정도 두면 이벤트 전파가 안정적이다.
+    snippet: |-
+      import tempfile
+      import time
+      from pathlib import Path
+
+      from watchdog.events import PatternMatchingEventHandler
+      from watchdog.observers import Observer
+
+
+      def collectCsvEvents(filenames: list, sleepSeconds: float = 0.5) -> list:
+          collected: list[str] = []
+
+          class Collector(PatternMatchingEventHandler):
+              def on_created(self, event):
+                  collected.append(Path(event.src_path).name)
+
+          with tempfile.TemporaryDirectory() as td:
+              base = Path(td)
+              observer = Observer()
+              observer.schedule(
+                  Collector(patterns=["*.csv"], ignore_directories=True),
+                  str(base),
+                  recursive=False,
+              )
+              observer.start()
+              try:
+                  for name in filenames:
+                      (base / name).write_text("", encoding="utf-8")
+                  time.sleep(sleepSeconds)
+              finally:
+                  observer.stop()
+                  observer.join()
+          return sorted(collected)
+
+
+      events = collectCsvEvents(["a.csv", "b.tmp", "c.csv"])
+
+      assert events == ["a.csv", "c.csv"]
+      events
+    exercise:
+      prompt: collectCsvEvents에 ["first.csv", "second.csv", "scratch.tmp"]를 넘기면 sorted 결과가 두 csv 이름만 담는지 검증하세요.
+      starterCode: |-
+        import tempfile
+        import time
+        from pathlib import Path
+
+        from watchdog.events import PatternMatchingEventHandler
+        from watchdog.observers import Observer
+
+
+        def collectCsvEvents(filenames: list, sleepSeconds: float = 0.5) -> list:
+            collected: list[str] = []
+
+            class Collector(PatternMatchingEventHandler):
+                def on_created(self, event):
+                    collected.append(Path(event.src_path).name)
+
+            with tempfile.TemporaryDirectory() as td:
+                base = Path(td)
+                observer = Observer()
+                observer.schedule(
+                    Collector(patterns=["___"], ignore_directories=True),
+                    str(base),
+                    recursive=False,
+                )
+                observer.start()
+                try:
+                    for name in filenames:
+                        (base / name).write_text("", encoding="utf-8")
+                    time.sleep(sleepSeconds)
+                finally:
+                    observer.stop()
+                    observer.join()
+            return sorted(collected)
+
+
+        events = collectCsvEvents(["first.csv", "second.csv", "scratch.tmp"])
+
+        assert events == ["first.csv", "second.csv"]
+        events
+      solution: |-
+        import tempfile
+        import time
+        from pathlib import Path
+
+        from watchdog.events import PatternMatchingEventHandler
+        from watchdog.observers import Observer
+
+
+        def collectCsvEvents(filenames: list, sleepSeconds: float = 0.5) -> list:
+            collected: list[str] = []
+
+            class Collector(PatternMatchingEventHandler):
+                def on_created(self, event):
+                    collected.append(Path(event.src_path).name)
+
+            with tempfile.TemporaryDirectory() as td:
+                base = Path(td)
+                observer = Observer()
+                observer.schedule(
+                    Collector(patterns=["*.csv"], ignore_directories=True),
+                    str(base),
+                    recursive=False,
+                )
+                observer.start()
+                try:
+                    for name in filenames:
+                        (base / name).write_text("", encoding="utf-8")
+                    time.sleep(sleepSeconds)
+                finally:
+                    observer.stop()
+                    observer.join()
+            return sorted(collected)
+
+
+        events = collectCsvEvents(["first.csv", "second.csv", "scratch.tmp"])
+
+        assert events == ["first.csv", "second.csv"]
+        events
+      hints:
+        - 패턴 필터는 *.csv 한 개 리스트로 둔다.
+        - sorted 결과는 알파벳 순으로 first가 second보다 앞에 온다.
+      check:
+        noError: collectCsvEvents 호출이 IOError 없이 끝나야 한다.
+        resultCheck: events 리스트가 두 csv 파일을 정렬된 형태로 담아야 한다.
+    check:
+      noError: 감시 함수와 자식 파일 작성이 한 사이클에서 끝나야 한다.
+      resultCheck: events가 csv 두 파일을 정렬된 형태로 담아야 한다.
+  - id: debounce-cycle
+    title: 디바운스 적용 사이클
+    structuredPrimary: true
+    subtitle: 중복 이벤트 정리
+    goal: 같은 파일 이름이 짧은 시간 안에 두 번 들어와도 한 번만 결과에 남는 디바운스 사이클을 만든다.
+    why: 자동화 사이클은 watchdog이 같은 파일에 여러 이벤트를 보낼 수 있는 OS 동작을 흡수해 결과가 안정되어야 한다.
+    explanation: dedupeEvents 함수는 이벤트 리스트와 시간 창을 받아 같은 이름이 시간 창 안에 다시 등장하면 무시한다. 결과는 정렬된 고유 이름 리스트다. 같은 입력을 두 번 호출해도 같은 결과가 나오는 멱등성을 갖는다.
+    tips:
+      - 디바운스 dict는 함수 안에서 새로 만들어 호출 사이에 상태가 없도록 한다.
+      - 정렬된 리스트로 결과를 두면 자동화에서 같은 순서를 보장한다.
+    snippet: |-
+      def dedupeEvents(events: list[tuple[str, float]], windowSeconds: float) -> list[str]:
+          lastSeen: dict[str, float] = {}
+          keep: list[str] = []
+          for name, timestamp in events:
+              if name in lastSeen and timestamp - lastSeen[name] < windowSeconds:
+                  continue
+              lastSeen[name] = timestamp
+              keep.append(name)
+          return sorted(set(keep))
+
+
+      raw = [("a.csv", 0.0), ("a.csv", 0.05), ("b.csv", 0.1), ("a.csv", 0.3)]
+      unique = dedupeEvents(raw, windowSeconds=0.2)
+
+      assert unique == ["a.csv", "b.csv"]
+      unique
+    exercise:
+      prompt: dedupeEvents에 [("x.csv", 0.0), ("y.csv", 0.05), ("x.csv", 0.1)]을 넘기고 window=0.2를 두면 결과가 ["x.csv", "y.csv"]가 되는지 검증하세요.
+      starterCode: |-
+        def dedupeEvents(events: list[tuple[str, float]], windowSeconds: float) -> list[str]:
+            lastSeen: dict[str, float] = {}
+            keep: list[str] = []
+            for name, timestamp in events:
+                if name in lastSeen and timestamp - lastSeen[name] < windowSeconds:
+                    continue
+                lastSeen[name] = timestamp
+                keep.append(name)
+            return sorted(___(keep))
+
+
+        raw = [("x.csv", 0.0), ("y.csv", 0.05), ("x.csv", 0.1)]
+        unique = dedupeEvents(raw, windowSeconds=0.2)
+
+        assert unique == ["x.csv", "y.csv"]
+        unique
+      solution: |-
+        def dedupeEvents(events: list[tuple[str, float]], windowSeconds: float) -> list[str]:
+            lastSeen: dict[str, float] = {}
+            keep: list[str] = []
+            for name, timestamp in events:
+                if name in lastSeen and timestamp - lastSeen[name] < windowSeconds:
+                    continue
+                lastSeen[name] = timestamp
+                keep.append(name)
+            return sorted(set(keep))
+
+
+        raw = [("x.csv", 0.0), ("y.csv", 0.05), ("x.csv", 0.1)]
+        unique = dedupeEvents(raw, windowSeconds=0.2)
+
+        assert unique == ["x.csv", "y.csv"]
+        unique
+      hints:
+        - 고유 항목으로 만드는 함수 이름은 set이다.
+        - 알파벳 순으로 x.csv가 y.csv보다 앞에 온다.
+      check:
+        noError: dedupeEvents 호출과 정렬이 끝나야 한다.
+        resultCheck: unique 리스트가 두 csv 이름을 정렬된 형태로 담아야 한다.
+    check:
+      noError: 디바운스 사이클이 끝나야 한다.
+      resultCheck: unique 리스트가 두 csv 파일 이름을 정렬된 형태로 담아야 한다.
+  - id: persist-cycle
+    title: JSON 리포트 영속화
+    structuredPrimary: true
+    subtitle: reports/last.json
+    goal: 사이클 결과를 reports/last.json에 저장하고 다시 읽어 영속성을 확인한다.
+    why: 자동화 사이클은 결과가 디스크에 남아야 어제와 오늘을 비교할 수 있고 운영자가 사고를 빠르게 추적한다.
+    explanation: persistCycle 함수는 unique 이벤트 리스트와 base 폴더를 받아 reports 디렉터리를 만들고 last.json에 저장한다. payload에는 events와 generatedAt이 들어간다. 같은 셀에서 다시 읽으면 원본 events가 그대로 복원된다.
+    tips:
+      - generatedAt은 항상 UTC ISO 형식으로 두어 자동화 표준에 맞춘다.
+      - reports 디렉터리는 사이클마다 다시 만들어 다른 사이클이 영향을 주지 않게 한다.
+    snippet: |-
+      import json
+      import tempfile
+      from datetime import UTC, datetime
+      from pathlib import Path
+
+
+      def persistCycle(events: list[str], base: Path) -> dict:
+          reportsDir = base / "reports"
+          reportsDir.mkdir(parents=True, exist_ok=True)
+          payload = {"events": events, "generatedAt": datetime.now(UTC).isoformat(timespec="seconds")}
+          target = reportsDir / "last.json"
+          target.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+          restored = json.loads(target.read_text(encoding="utf-8"))
+          return {"saved": payload, "restored": restored}
+
+
+      with tempfile.TemporaryDirectory() as td:
+          report = persistCycle(["a.csv", "b.csv"], Path(td))
+
+      assert report["saved"]["events"] == report["restored"]["events"]
+      assert "generatedAt" in report["restored"]
+      report["restored"]["events"]
+    exercise:
+      prompt: persistCycle에 ["one.csv", "two.csv"]를 넘기면 restored events가 원본과 같고 generatedAt 키가 포함되는지 검증하세요.
+      starterCode: |-
+        import json
+        import tempfile
+        from datetime import UTC, datetime
+        from pathlib import Path
+
+
+        def persistCycle(events: list[str], base: Path) -> dict:
+            reportsDir = base / "reports"
+            reportsDir.mkdir(parents=True, exist_ok=True)
+            payload = {"events": events, "generatedAt": datetime.now(UTC).isoformat(timespec="seconds")}
+            target = reportsDir / "last.json"
+            target.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+            restored = json.loads(target.___(encoding="utf-8"))
+            return {"saved": payload, "restored": restored}
+
+
+        with tempfile.TemporaryDirectory() as td:
+            report = persistCycle(["one.csv", "two.csv"], Path(td))
+
+        assert report["restored"]["events"] == ["one.csv", "two.csv"]
+        assert "generatedAt" in report["restored"]
+        report["restored"]["events"]
+      solution: |-
+        import json
+        import tempfile
+        from datetime import UTC, datetime
+        from pathlib import Path
+
+
+        def persistCycle(events: list[str], base: Path) -> dict:
+            reportsDir = base / "reports"
+            reportsDir.mkdir(parents=True, exist_ok=True)
+            payload = {"events": events, "generatedAt": datetime.now(UTC).isoformat(timespec="seconds")}
+            target = reportsDir / "last.json"
+            target.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+            restored = json.loads(target.read_text(encoding="utf-8"))
+            return {"saved": payload, "restored": restored}
+
+
+        with tempfile.TemporaryDirectory() as td:
+            report = persistCycle(["one.csv", "two.csv"], Path(td))
+
+        assert report["restored"]["events"] == ["one.csv", "two.csv"]
+        assert "generatedAt" in report["restored"]
+        report["restored"]["events"]
+      hints:
+        - Path 객체의 텍스트 읽기 메서드는 read_text다.
+        - restored events 리스트는 원본 입력과 정확히 같다.
+      check:
+        noError: persistCycle 호출과 JSON 왕복이 끝나야 한다.
+        resultCheck: report.restored.events가 본문 기대값과 같고 generatedAt 키가 포함되어야 한다.
+    check:
+      noError: 영속 사이클 함수가 격리 공간에서 끝나야 한다.
+      resultCheck: restored.events가 원본 events와 같고 generatedAt 키가 포함되어야 한다.
+  - id: full-cycle
+    title: 종합 사이클 완성
+    structuredPrimary: true
+    subtitle: 감시 + 디바운스 + 영속화
+    goal: 감시, 디바운스, JSON 저장을 한 함수로 묶어 종합 폴더 감시 리포터를 완성한다.
+    why: 종합 자동화 프로젝트는 사이클 한 호출로 시작과 끝이 명확해야 운영자가 신뢰할 수 있다.
+    explanation: runReporter 함수는 입력 파일 리스트와 시간 창을 받아 collectCsvEvents, dedupeEvents, persistCycle을 차례로 호출한다. 결과는 events와 reportPath 두 키를 가진 dict다. 같은 입력으로 두 번 호출해도 같은 dict 구조를 유지한다.
+    tips:
+      - 종합 사이클은 한 함수에서 전 단계를 호출해 호출자가 단순해진다.
+      - reportPath 키는 자동화 보고서의 영속 위치를 직접 가리킨다.
+    snippet: |-
+      import json
+      import tempfile
+      import time
+      from datetime import UTC, datetime
+      from pathlib import Path
+
+      from watchdog.events import PatternMatchingEventHandler
+      from watchdog.observers import Observer
+
+
+      def runReporter(filenames: list, sleepSeconds: float = 0.5) -> dict:
+          collected: list[str] = []
+
+          class Collector(PatternMatchingEventHandler):
+              def on_created(self, event):
+                  collected.append(Path(event.src_path).name)
+
+          with tempfile.TemporaryDirectory() as td:
+              base = Path(td)
+              observer = Observer()
+              observer.schedule(
+                  Collector(patterns=["*.csv"], ignore_directories=True),
+                  str(base),
+                  recursive=False,
+              )
+              observer.start()
+              try:
+                  for name in filenames:
+                      (base / name).write_text("", encoding="utf-8")
+                  time.sleep(sleepSeconds)
+              finally:
+                  observer.stop()
+                  observer.join()
+              unique = sorted(set(collected))
+              reportsDir = base / "reports"
+              reportsDir.mkdir(parents=True, exist_ok=True)
+              payload = {"events": unique, "generatedAt": datetime.now(UTC).isoformat(timespec="seconds")}
+              target = reportsDir / "last.json"
+              target.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+              return {"events": unique, "reportPath": str(target.relative_to(base))}
+
+
+      report = runReporter(["a.csv", "b.csv", "ignore.tmp"])
+
+      assert report["events"] == ["a.csv", "b.csv"]
+      assert report["reportPath"].endswith("last.json")
+      report
+    exercise:
+      prompt: runReporter에 ["alpha.csv", "beta.csv", "garbage.tmp"]를 넘기면 events가 알파벳 순으로 두 csv, reportPath가 last.json으로 끝나는지 종합 검증하세요.
+      starterCode: |-
+        import json
+        import tempfile
+        import time
+        from datetime import UTC, datetime
+        from pathlib import Path
+
+        from watchdog.events import PatternMatchingEventHandler
+        from watchdog.observers import Observer
+
+
+        def runReporter(filenames: list, sleepSeconds: float = 0.5) -> dict:
+            collected: list[str] = []
+
+            class Collector(PatternMatchingEventHandler):
+                def on_created(self, event):
+                    collected.append(Path(event.src_path).name)
+
+            with tempfile.TemporaryDirectory() as td:
+                base = Path(td)
+                observer = Observer()
+                observer.schedule(
+                    Collector(patterns=["*.csv"], ignore_directories=True),
+                    str(base),
+                    recursive=False,
+                )
+                observer.start()
+                try:
+                    for name in filenames:
+                        (base / name).write_text("", encoding="utf-8")
+                    time.sleep(sleepSeconds)
+                finally:
+                    observer.stop()
+                    observer.join()
+                unique = sorted(set(collected))
+                reportsDir = base / "reports"
+                reportsDir.mkdir(parents=True, exist_ok=True)
+                payload = {"events": unique, "generatedAt": datetime.now(UTC).isoformat(timespec="seconds")}
+                target = reportsDir / "last.json"
+                target.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+                return {"events": unique, "reportPath": str(target.relative_to(base))}
+
+
+        report = runReporter(["alpha.csv", "beta.csv", "garbage.tmp"])
+
+        assert report["events"] == ["alpha.csv", "beta.csv"]
+        assert report["reportPath"].endswith("___")
+        report
+      solution: |-
+        import json
+        import tempfile
+        import time
+        from datetime import UTC, datetime
+        from pathlib import Path
+
+        from watchdog.events import PatternMatchingEventHandler
+        from watchdog.observers import Observer
+
+
+        def runReporter(filenames: list, sleepSeconds: float = 0.5) -> dict:
+            collected: list[str] = []
+
+            class Collector(PatternMatchingEventHandler):
+                def on_created(self, event):
+                    collected.append(Path(event.src_path).name)
+
+            with tempfile.TemporaryDirectory() as td:
+                base = Path(td)
+                observer = Observer()
+                observer.schedule(
+                    Collector(patterns=["*.csv"], ignore_directories=True),
+                    str(base),
+                    recursive=False,
+                )
+                observer.start()
+                try:
+                    for name in filenames:
+                        (base / name).write_text("", encoding="utf-8")
+                    time.sleep(sleepSeconds)
+                finally:
+                    observer.stop()
+                    observer.join()
+                unique = sorted(set(collected))
+                reportsDir = base / "reports"
+                reportsDir.mkdir(parents=True, exist_ok=True)
+                payload = {"events": unique, "generatedAt": datetime.now(UTC).isoformat(timespec="seconds")}
+                target = reportsDir / "last.json"
+                target.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+                return {"events": unique, "reportPath": str(target.relative_to(base))}
+
+
+        report = runReporter(["alpha.csv", "beta.csv", "garbage.tmp"])
+
+        assert report["events"] == ["alpha.csv", "beta.csv"]
+        assert report["reportPath"].endswith("last.json")
+        report
+      hints:
+        - reportPath는 reports/last.json 형태로 끝난다.
+        - endswith 인자에 last.json 문자열을 그대로 넣는다.
+      check:
+        noError: runReporter 호출이 종합 사이클로 끝나야 한다.
+        resultCheck: report dict의 events가 두 csv 이름이고 reportPath가 last.json으로 끝나야 한다.
+    check:
+      noError: 종합 사이클이 격리 공간에서 끝나야 한다.
+      resultCheck: report dict가 두 csv 이름과 last.json 경로를 정확히 담아야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: watchSched_10-folder-reporter-capstone-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - cycle-builder
+    - full-cycle
+    title: 폴더 감시 reporter의 event·file·report reconciliation 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: accepted event마다 안정 파일과 report row가 정확히 하나 있는지 판정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - callback 수가 아니라 accepted event와 report row를 identity로 reconcile하세요.
+    - 파일 안정성 증거가 없는 event를 report에 포함하지 마세요.
+    exercise:
+      prompt: audit_folder_report(events, stable_files, report_rows)를 완성하세요.
+      starterCode: |-
+        def audit_folder_report(events, stable_files, report_rows):
+            raise NotImplementedError
+      solution: |
+        def audit_folder_report(events, stable_files, report_rows):
+            event_ids = {event["id"] for event in events if event.get("accepted", False)}
+            stable_ids = {item["eventId"] for item in stable_files}
+            row_counts = {}
+            for row in report_rows:
+                row_counts[row["eventId"]] = row_counts.get(row["eventId"], 0) + 1
+            missing_stable = sorted(event_ids - stable_ids)
+            missing_rows = sorted(event_ids - set(row_counts))
+            duplicate_rows = sorted(event_id for event_id, count in row_counts.items() if count > 1)
+            unexpected_rows = sorted(set(row_counts) - event_ids)
+            failures = []
+            if missing_stable:
+                failures.append("stability")
+            if missing_rows:
+                failures.append("missing-report")
+            if duplicate_rows:
+                failures.append("duplicate-report")
+            if unexpected_rows:
+                failures.append("unexpected-report")
+            return {"passed": not failures, "failures": failures, "missingStable": missing_stable, "missingRows": missing_rows, "duplicateRows": duplicate_rows, "unexpectedRows": unexpected_rows}
+      hints: *id001
+    check:
+      id: python.watchsched.watchSched_10.folder-reporter-capstone.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.watchsched.watchSched_10.folder-reporter-capstone.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_folder_report
+        cases:
+        - id: accepts-one-row-per-stable-event
+          arguments:
+          - value:
+            - id: a
+              accepted: true
+          - value:
+            - eventId: a
+          - value:
+            - eventId: a
+          expectedReturn:
+            passed: true
+            failures: []
+            missingStable: []
+            missingRows: []
+            duplicateRows: []
+            unexpectedRows: []
+        - id: reports-stability-and-missing-row
+          arguments:
+          - value:
+            - id: a
+              accepted: true
+          - value: []
+          - value: []
+          expectedReturn:
+            passed: false
+            failures:
+            - stability
+            - missing-report
+            missingStable:
+            - a
+            missingRows:
+            - a
+            duplicateRows: []
+            unexpectedRows: []
+        - id: reports-duplicate-and-unexpected-row
+          arguments:
+          - value:
+            - id: a
+              accepted: true
+          - value:
+            - eventId: a
+          - value:
+            - eventId: a
+            - eventId: a
+            - eventId: x
+          expectedReturn:
+            passed: false
+            failures:
+            - duplicate-report
+            - unexpected-report
+            missingStable: []
+            missingRows: []
+            duplicateRows:
+            - a
+            unexpectedRows:
+            - x
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: watchSched_10-folder-reporter-release-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - watchSched_10-folder-reporter-capstone-mastery
+    title: 새 폴더 reporter 실행에 재시작·중복·artifact gate 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 같은 source와 watch contract에서 두 번 실행해 report hash가 같은지 판정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 재시작 뒤 같은 input에서 같은 report hash가 나오는지 검증하세요.
+    - 현재 source·watch contract와 다른 run은 release evidence에서 제외하세요.
+    exercise:
+      prompt: decide_reporter_release(runs, current_source_hash, current_contract_hash)를 완성하세요.
+      starterCode: |-
+        def decide_reporter_release(runs, current_source_hash, current_contract_hash):
+            raise NotImplementedError
+      solution: |
+        def decide_reporter_release(runs, current_source_hash, current_contract_hash):
+            current = [run for run in runs if run["sourceHash"] == current_source_hash and run["contractHash"] == current_contract_hash]
+            stale = sorted(run["id"] for run in runs if run not in current)
+            failures = []
+            if len(current) < 2:
+                failures.append("restart-evidence")
+            report_hashes = {run["reportHash"] for run in current if run.get("passed")}
+            if len(report_hashes) != 1 or any(not run.get("passed") for run in current):
+                failures.append("determinism")
+            if any(run.get("duplicateRows", 0) for run in current):
+                failures.append("duplicates")
+            return {"releaseReady": not failures and not stale, "failures": failures, "staleRuns": stale, "currentRunCount": len(current)}
+      hints: *id002
+    check:
+      id: python.watchsched.watchSched_10.folder-reporter-release.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.watchsched.watchSched_10.folder-reporter-release.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: decide_reporter_release
+        cases:
+        - id: accepts-two-deterministic-current-runs
+          arguments:
+          - value:
+            - id: a
+              sourceHash: s
+              contractHash: c
+              reportHash: r
+              passed: true
+              duplicateRows: 0
+            - id: b
+              sourceHash: s
+              contractHash: c
+              reportHash: r
+              passed: true
+              duplicateRows: 0
+          - value: s
+          - value: c
+          expectedReturn:
+            releaseReady: true
+            failures: []
+            staleRuns: []
+            currentRunCount: 2
+        - id: reports-single-run-and-duplicate
+          arguments:
+          - value:
+            - id: a
+              sourceHash: s
+              contractHash: c
+              reportHash: r
+              passed: true
+              duplicateRows: 1
+          - value: s
+          - value: c
+          expectedReturn:
+            releaseReady: false
+            failures:
+            - restart-evidence
+            - duplicates
+            staleRuns: []
+            currentRunCount: 1
+        - id: rejects-stale-run
+          arguments:
+          - value:
+            - id: old
+              sourceHash: old
+              contractHash: c
+              reportHash: r
+              passed: true
+            - id: a
+              sourceHash: s
+              contractHash: c
+              reportHash: r
+              passed: true
+            - id: b
+              sourceHash: s
+              contractHash: c
+              reportHash: r
+              passed: true
+          - value: s
+          - value: c
+          expectedReturn:
+            releaseReady: false
+            failures: []
+            staleRuns:
+            - old
+            currentRunCount: 2
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: watchSched_10-folder-reporter-capstone-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - watchSched_10-folder-reporter-release-transfer
+    title: 폴더 감시 reporter 종료 조건 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: event·stability·ledger·report·restart 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - event나 시간이 발생했다는 사실보다 처리 identity와 결과 evidence를 검증하세요.
+    - 중복·지연·재시작 상황에서 같은 업무 결과가 보존되는지 확인하세요.
+    exercise:
+      prompt: choose_folder_reporter_gate(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_folder_reporter_gate(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_folder_reporter_gate(situation):
+            table = {'input': {'action': 'admit debounce and stabilize event', 'evidence': 'event IDs and file fingerprint', 'risk': 'partial duplicate input'}, 'process': {'action': 'claim idempotency ledger', 'evidence': 'single owner and attempts', 'risk': 'concurrent duplicate'}, 'release': {'action': 'reconcile report and restart run', 'evidence': 'source-bound deterministic artifact', 'risk': 'stale or duplicated row'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.watchsched.watchSched_10.folder-reporter-capstone-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.watchsched.watchSched_10.folder-reporter-capstone-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_folder_reporter_gate
+        cases:
+        - id: recalls-input
+          arguments:
+          - value: input
+          expectedReturn:
+            action: admit debounce and stabilize event
+            evidence: event IDs and file fingerprint
+            risk: partial duplicate input
+        - id: recalls-process
+          arguments:
+          - value: process
+          expectedReturn:
+            action: claim idempotency ledger
+            evidence: single owner and attempts
+            risk: concurrent duplicate
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,719 @@
+var e=`meta:
+  id: 15_pickle
+  title: pickle - 객체 직렬화
+  category: builtins
+  tags:
+  - pickle
+  - 직렬화
+  - 캐싱
+  - 저장
+  seo:
+    title: 파이썬 pickle 모듈 완전 정복
+    description: pickle 모듈로 Python 객체 직렬화, 바이너리 저장, 캐싱을 배웁니다.
+    keywords:
+    - pickle
+    - 직렬화
+    - dump
+    - load
+    - 캐싱
+    - 파이썬pickle
+intro:
+  emoji: 🥒
+  points:
+  - Python 객체 직렬화
+  - 바이너리 파일 저장
+  - 복잡한 객체 저장
+  - 캐싱과 세션 관리
+  direction: pickle 객체 직렬화에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.
+  benefits:
+  - 작은 샘플 입력 확인 후 모듈 함수 호출에 맞는 코드 입력을 고릅니다.
+  - pickle 객체 직렬화 결과를 반환값, stdout, 객체 상태 기준으로 즉시 점검합니다.
+  - 완료한 코드를 표준 라이브러리 유틸리티에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: pickle 모듈 불러오기 입력 확인
+      detail: 입력 기준(작은 샘플 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: 기본 직렬화 처리 실행
+      detail: 모듈 함수 호출 코드를 실행해 중간 결과를 확인합니다.
+    - label: 바이트 직렬화 결과 검증
+      detail: 반환값, stdout, 객체 상태 기준으로 실행 결과를 비교합니다.
+    - label: pickle 객체 직렬화 재사용
+      detail: 완성 코드를 표준 라이브러리 유틸리티에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 표준 라이브러리 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: pickle 객체 직렬화 실행
+      detail: 셀을 실행해 반환값, stdout, 객체 상태와 예외 상태를 확인합니다.
+    - label: pickle 객체 직렬화 완료
+      detail: 검증된 코드를 표준 라이브러리 유틸리티로 남깁니다.
+sections:
+- id: module_import
+  title: pickle 모듈 불러오기
+  structuredPrimary: true
+  subtitle: ⚠️ 가장 먼저 실행하세요
+  goal: pickle 모듈 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    pickle은 파이썬 표준 라이브러리입니다. Python 객체를 바이너리 형태로 직렬화하고 역직렬화하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다.
+
+    이 섹션을 먼저 실행하면 아래 모든 예제에서 pickle 모듈을 사용할 수 있습니다.
+  snippet: |-
+    import pickle
+    import os
+    import tempfile
+    from pathlib import Path
+
+    pickleScratch = Path(tempfile.gettempdir()) / 'codaro_pickle_scratch'
+    pickleScratch.mkdir(parents=True, exist_ok=True)
+
+    'pickle 모듈이 정상적으로 로드되었습니다'
+  exercise:
+    prompt: pickle 모듈 불러오기 예제에서 \`pickleScratch\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import pickle
+      import os
+      import tempfile
+      from pathlib import Path
+
+      pickleScratch = Path(tempfile.gettempdir()) / 'codaro_pickle_scratch'
+      pickleScratch.mkdir(parents=True, exist_ok=True)
+
+      'pickle 모듈이 정상적으로 로드되었습니다'
+    hints:
+    - 바꿀 지점은 \`pickleScratch = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`pickleScratch\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: pickle 모듈 불러오기에서 \`pickleScratch\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: pickle 모듈 불러오기 실행 뒤 \`pickleScratch\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: basic_serialization
+  title: 기본 직렬화
+  structuredPrimary: true
+  subtitle: dump와 load
+  goal: 기본 직렬화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    pickle.dump()는 Python 객체를 바이너리 파일로 저장하고, pickle.load()는 바이너리 파일에서 객체를 복원합니다. 딕셔너리, 리스트, 클래스 인스턴스 등 거의 모든 Python 객체를 저장할 수 있습니다. 머신러닝 모델 저장, 게임 세이브, 데이터 캐싱에 필수적입니다.
+
+    pickle은 바이너리 형식이므로 사람이 읽을 수 없습니다. 디버깅이 필요하면 JSON을 사용하세요.
+  snippet: |-
+    userData = {'name': 'Alice', 'age': 30, 'scores': [95, 88, 92]}
+    with open(pickleScratch / 'user.pkl', 'wb') as f:
+        pickle.dump(userData, f)
+    'user.pkl 저장 완료'
+  exercise:
+    prompt: 기본 직렬화 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      userData = {'name': 'Alice', 'age': 30, 'scores': [95, 88, 92]}
+      with open(pickleScratch / 'user.pkl', 'wb') as f:
+          pickle.dump(userData, f)
+      'user.pkl 저장 완료'
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 기본 직렬화에서 \`userData\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 기본 직렬화 실행 뒤 \`userData\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: bytes_operations
+  title: 바이트 직렬화
+  structuredPrimary: true
+  subtitle: dumps와 loads
+  goal: 바이트 직렬화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    pickle.dumps()는 객체를 바이트 문자열로 변환하고, pickle.loads()는 바이트에서 객체를 복원합니다. 파일이 아닌 메모리나 네트워크로 객체를 전송할 때 유용합니다. 데이터베이스 저장, 메시지 큐, 분산 시스템에 활용됩니다.
+
+    dumps/loads는 파일 I/O 없이 빠르게 직렬화할 수 있어 메모리 캐싱에 적합합니다.
+  snippet: |-
+    dataDict = {'x': 10, 'y': 20, 'z': 30}
+    serializedBytes = pickle.dumps(dataDict)
+    type(serializedBytes).__name__
+  exercise:
+    prompt: 바이트 직렬화 예제에서 \`dataDict\`, \`serializedBytes\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      dataDict = {'x': 10, 'y': 20, 'z': 30}
+      serializedBytes = pickle.dumps(dataDict)
+      type(serializedBytes).__name__
+    hints:
+    - 바꿀 지점은 \`dataDict = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`dataDict\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 바이트 직렬화에서 \`dataDict\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 바이트 직렬화 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: supported_types
+  title: 지원 타입
+  structuredPrimary: true
+  subtitle: 직렬화 가능한 객체들
+  goal: 지원 타입에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    pickle은 많은 Python 객체를 직렬화할 수 있습니다. 기본 타입, 컬렉션, 날짜 객체, 사용자 정의 클래스의 상태 저장에 활용할 수 있습니다. JSON과 달리 set, datetime 같은 Python 전용 타입도 보존할 수 있어 강력하지만, 신뢰한 로컬 데이터에만 사용해야 합니다.
+
+    pickle은 신뢰할 수 없는 소스의 데이터를 로드하면 위험합니다. 악의적인 코드가 실행될 수 있습니다.
+  snippet: |-
+    tagSet = {'python', 'pickle', 'tutorial'}
+    with open(pickleScratch / 'tags.pkl', 'wb') as f:
+        pickle.dump(tagSet, f)
+    with open(pickleScratch / 'tags.pkl', 'rb') as f:
+        loadedTags = pickle.load(f)
+    loadedTags
+  exercise:
+    prompt: 지원 타입 예제에서 \`tagSet\`, \`loadedTags\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      tagSet = {'python', 'pickle', 'tutorial'}
+      with open(pickleScratch / 'tags.pkl', 'wb') as f:
+          pickle.dump(tagSet, f)
+      with open(pickleScratch / 'tags.pkl', 'rb') as f:
+          loadedTags = pickle.load(f)
+      loadedTags
+    hints:
+    - 바꿀 지점은 \`tagSet = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`tagSet\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 지원 타입에서 \`tagSet\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 지원 타입 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: protocol_versions
+  title: 프로토콜 버전
+  structuredPrimary: true
+  subtitle: 호환성과 성능
+  goal: 프로토콜 버전에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    pickle은 여러 프로토콜 버전을 지원합니다. 높은 버전일수록 효율적이지만 하위 Python 버전과 호환되지 않을 수 있습니다. protocol 파라미터로 버전을 지정하며, HIGHEST_PROTOCOL을 사용하면 최신 버전을 자동 선택합니다.
+
+    대용량 데이터는 HIGHEST_PROTOCOL을 사용하면 크기와 속도가 최적화됩니다.
+  snippet: |-
+    simpleData = {'key': 'value'}
+    defaultBytes = pickle.dumps(simpleData)
+    len(defaultBytes)
+  exercise:
+    prompt: 프로토콜 버전 예제에서 \`simpleData\`, \`defaultBytes\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      simpleData = {'key': 'value'}
+      defaultBytes = pickle.dumps(simpleData)
+      len(defaultBytes)
+    hints:
+    - 바꿀 지점은 \`simpleData = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`simpleData\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 프로토콜 버전에서 \`simpleData\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 프로토콜 버전 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: multiple_objects
+  title: 다중 객체 처리
+  structuredPrimary: true
+  subtitle: 여러 객체 저장과 복원
+  goal: 한 파일에 pickle.dump를 여러 번 호출해 여러 객체를 순차 저장하고, load도 같은 순서로 호출해 복원합니다.
+  why: pickle은 한 호출에 한 객체만 다루지만 같은 파일 핸들에 연속 dump가 가능합니다. 이 구조를 알면 스트리밍 직렬화나 체크포인트 저장 패턴을 짤 때 헷갈리지 않습니다.
+  explanation: |-
+    하나의 파일에 여러 객체를 순차적으로 저장하고 복원할 수 있습니다. dump()를 여러 번 호출하여 저장하고, load()를 반복하여 순서대로 불러옵니다. 관련된 여러 데이터를 한 파일에 묶어 관리할 때 유용합니다.
+
+    관련된 여러 객체는 리스트나 딕셔너리로 묶어서 한 번에 저장하는 것이 더 편리합니다.
+  snippet: |-
+    obj1 = {'type': 'config', 'value': 100}
+    obj2 = ['item1', 'item2', 'item3']
+    obj3 = (1, 2, 3)
+    with open(pickleScratch / 'multi.pkl', 'wb') as f:
+        pickle.dump(obj1, f)
+        pickle.dump(obj2, f)
+        pickle.dump(obj3, f)
+    'multi.pkl 저장 완료'
+  exercise:
+    prompt: 다중 객체 처리 예제에서 저장할 객체의 순서나 값을 바꾸고 순차 load 결과가 같은 순서를 따르는지 확인하세요.
+    starterCode: |-
+      obj1 = {'type': 'config', 'value': 100}
+      obj2 = ['item1', 'item2', 'item3']
+      obj3 = (1, 2, 3)
+      with open(pickleScratch / 'multi.pkl', 'wb') as f:
+          pickle.dump(obj1, f)
+          pickle.dump(obj2, f)
+          pickle.dump(obj3, f)
+      'multi.pkl 저장 완료'
+    hints:
+    - 바꿀 지점은 \`obj1\`, \`obj2\`, \`obj3\`의 값과 dump 호출 순서입니다.
+    - 실행 뒤 load를 같은 순서로 호출했을 때 복원된 객체가 저장 순서를 반영하는지 보세요.
+  check:
+    noError: 다중 객체 처리의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 다중 객체 처리의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: practical
+  title: 실전 활용
+  structuredPrimary: true
+  subtitle: 캐싱, 세션, 체크포인트
+  goal: 실전 활용에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 조건 분기는 입력값에 따라 실행 경로가 바뀌므로 결과를 바로 확인해야 합니다.
+  explanation: |-
+    실무에서 자주 사용하는 pickle 활용 패턴을 살펴봅니다. 계산 결과 캐싱, 사용자 세션 저장, 머신러닝 모델 체크포인트, 게임 세이브 등 다양한 시나리오에서 pickle을 효과적으로 사용할 수 있습니다.
+
+    pickle 파일은 Python 버전이 다르면 호환되지 않을 수 있습니다. 장기 저장은 JSON이나 데이터베이스를 고려하세요.
+  snippet: |-
+    cachePath = pickleScratch / 'cache.pkl'
+    if os.path.exists(cachePath):
+        with open(cachePath, 'rb') as f:
+            cachedResult = pickle.load(f)
+    else:
+        cachedResult = sum(range(10000))
+        with open(cachePath, 'wb') as f:
+            pickle.dump(cachedResult, f)
+    cachedResult
+  exercise:
+    prompt: 실전 활용 예제에서 조건값을 바꾸고 선택되는 분기와 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      cachePath = pickleScratch / 'cache.pkl'
+      if os.path.exists(cachePath):
+          with open(cachePath, 'rb') as f:
+              cachedResult = pickle.load(f)
+      else:
+          cachedResult = sum(range(10000))
+          with open(cachePath, 'wb') as f:
+              pickle.dump(cachedResult, f)
+      cachedResult
+    hints:
+    - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
+    - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
+  check:
+    noError: 실전 활용의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
+    resultCheck: 실전 활용 분기 결과가 바꾼 조건값에 맞게 달라져야 합니다.
+- id: workflow_validation
+  title: '검증 루프: 신뢰된 캐시 체크포인트'
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증
+  goal: '검증 루프: 신뢰된 캐시 체크포인트에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    pickle은 로컬에서 신뢰한 Python 객체를 빠르게 저장할 때만 사용합니다. 이 흐름에서는 체크포인트를 저장하고, 경로와 버전, 필수 필드를 검증하며, 깨진 파일을 좁힌 예외로 처리합니다.
+
+    실무 변주: 체크포인트에 schemaVersion과 expiresAt을 추가하고, 오래된 캐시는 재학습 큐로 보내는 검증 함수를 만들어 보세요.
+  snippet: |-
+    pickleWorkflowRoot = Path(tempfile.mkdtemp(prefix='codaro_pickle_workflow_')).resolve()
+    checkpointData = {
+        'version': 1,
+        'model': {'name': 'baseline', 'features': ['amount', 'region']},
+        'metrics': {'accuracy': 0.91, 'loss': 0.18},
+        'createdBy': 'local'
+    }
+
+    def saveCheckpoint(path, data):
+        path = Path(path).resolve()
+        assert pickleWorkflowRoot in path.parents, '허용된 작업 폴더에만 저장합니다'
+        with open(path, 'wb') as f:
+            pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
+        return path
+
+    def loadTrustedCheckpoint(path):
+        path = Path(path).resolve()
+        assert pickleWorkflowRoot in path.parents, '허용된 작업 폴더에서만 읽습니다'
+        with open(path, 'rb') as f:
+            loaded = pickle.load(f)
+        assert loaded.get('version') == 1, '지원하지 않는 체크포인트 버전입니다'
+        assert isinstance(loaded.get('model'), dict), 'model 정보가 필요합니다'
+        assert isinstance(loaded.get('metrics'), dict), 'metrics 정보가 필요합니다'
+        return loaded
+
+    checkpointFile = saveCheckpoint(pickleWorkflowRoot / 'checkpoint.pkl', checkpointData)
+    restoredCheckpoint = loadTrustedCheckpoint(checkpointFile)
+    assert restoredCheckpoint == checkpointData
+    restoredCheckpoint
+  exercise:
+    prompt: '검증 루프: 신뢰된 캐시 체크포인트 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
+    starterCode: |-
+      pickleWorkflowRoot = Path(tempfile.mkdtemp(prefix='codaro_pickle_workflow_')).resolve()
+      checkpointData = {
+          'version': 1,
+          'model': {'name': 'baseline', 'features': ['amount', 'region']},
+          'metrics': {'accuracy': 0.91, 'loss': 0.18},
+          'createdBy': 'local'
+      }
+
+      def saveCheckpoint(path, data):
+          path = Path(path).resolve()
+          assert pickleWorkflowRoot in path.parents, '허용된 작업 폴더에만 저장합니다'
+          with open(path, 'wb') as f:
+              pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
+          return path
+
+      def loadTrustedCheckpoint(path):
+          path = Path(path).resolve()
+          assert pickleWorkflowRoot in path.parents, '허용된 작업 폴더에서만 읽습니다'
+          with open(path, 'rb') as f:
+              loaded = pickle.load(f)
+          assert loaded.get('version') == 1, '지원하지 않는 체크포인트 버전입니다'
+          assert isinstance(loaded.get('model'), dict), 'model 정보가 필요합니다'
+          assert isinstance(loaded.get('metrics'), dict), 'metrics 정보가 필요합니다'
+          return loaded
+
+      checkpointFile = saveCheckpoint(pickleWorkflowRoot / 'checkpoint.pkl', checkpointData)
+      restoredCheckpoint = loadTrustedCheckpoint(checkpointFile)
+      assert restoredCheckpoint == checkpointData
+      restoredCheckpoint
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: '검증 루프: 신뢰된 캐시 체크포인트의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '검증 루프: 신뢰된 캐시 체크포인트 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+- id: practice
+  title: pickle 모듈 종합 복습
+  structuredPrimary: true
+  subtitle: 객체 직렬화 마스터하기
+  goal: pickle 모듈 종합 복습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: pickle 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    saveDict = {'a': 1, 'b': 2}
+    with open(pickleScratch / 'd1.pkl', 'wb') as f:
+        pickle.dump(saveDict, f)
+    'Saved'
+  exercise:
+    prompt: pickle 모듈 종합 복습 예제에서 \`saveDict\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      saveDict = {'a': 1, 'b': 2}
+      with open(pickleScratch / 'd1.pkl', 'wb') as f:
+          pickle.dump(saveDict, f)
+      'Saved'
+    hints:
+    - 바꿀 지점은 \`saveDict = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`saveDict\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: pickle 모듈 종합 복습에서 \`saveDict\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: pickle 모듈 종합 복습 실행 뒤 \`saveDict\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 15_pickle-trusted-checkpoint-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - basic_serialization
+    - supported_types
+    - workflow_validation
+    title: 신뢰한 체크포인트를 저장하고 즉시 검산하기
+    subtitle: dump, load, 필수 필드 검증
+    goal: 체크포인트 dict를 검증한 뒤 pickle 파일로 저장하고 다시 읽어 핵심 필드가 보존됐는지 반환한다.
+    why: pickle은 저장 자체보다 신뢰한 로컬 객체를 저장했는지, 복원 뒤 필요한 필드가 유지됐는지를 확인할 때 실무 가치가 생깁니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않는 target path와 checkpoint dict를 넘겨 저장, 복원, 실패 케이스를 함께 검증합니다.
+    tips:
+    - pickle.load는 신뢰한 로컬 파일에만 사용하세요.
+    - 저장 전에 version, model, metrics를 먼저 검증하세요.
+    exercise:
+      prompt: save_trusted_checkpoint(path, checkpoint)가 pickle 파일을 만들고 path, version, modelName, featureCount, accuracy를
+        담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def save_trusted_checkpoint(path, checkpoint):
+            raise NotImplementedError
+      solution: |-
+        import pickle
+        from pathlib import Path
+
+        def save_trusted_checkpoint(path, checkpoint):
+            if checkpoint.get("version") != 1:
+                raise ValueError("unsupported checkpoint version")
+            model = checkpoint.get("model")
+            metrics = checkpoint.get("metrics")
+            if not isinstance(model, dict) or not isinstance(metrics, dict):
+                raise ValueError("model and metrics are required")
+            target = Path(path)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            with target.open("wb") as file:
+                pickle.dump(checkpoint, file, protocol=pickle.HIGHEST_PROTOCOL)
+            with target.open("rb") as file:
+                restored = pickle.load(file)
+            if restored != checkpoint:
+                raise ValueError("checkpoint round trip failed")
+            return {
+                "path": str(target),
+                "version": restored["version"],
+                "modelName": model.get("name"),
+                "featureCount": len(model.get("features", [])),
+                "accuracy": metrics.get("accuracy"),
+            }
+      hints:
+      - 먼저 dict 구조를 검사한 뒤 파일을 여세요.
+      - 반환 path는 verifier가 fixture root 기준 상대경로로 정규화합니다.
+    check:
+      id: python.builtins.pickle.trusted-checkpoint.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.pickle.checkpoint.behavior.v1.fixture
+      fixtureHash: sha256-KkCthDuytG5auAGuGoeJfFaQYT8Kg9Ce2il+NbRzHhc=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: input/trusted_checkpoint.pkl
+          contentBase64: gASVjgAAAAAAAAB9lCiMB3ZlcnNpb26USwGMBW1vZGVslH2UKIwEbmFtZZSMCGJhc2VsaW5llIwIZmVhdHVyZXOUXZQojAZhbW91bnSUjAZyZWdpb26UZXWMB21ldHJpY3OUfZQojAthY2N1cmFjeVBjdJRLW4wHbG9zc1BjdJRLEnWMCWNyZWF0ZWRCeZSMBWxvY2FslHUu
+        - path: input/missing_metrics.pkl
+          contentBase64: gASVUgAAAAAAAAB9lCiMB3ZlcnNpb26USwGMBW1vZGVslH2UKIwEbmFtZZSMBWRyYWZ0lIwIZmVhdHVyZXOUXZSMAXiUYXWMCWNyZWF0ZWRCeZSMBWxvY2FslHUu
+        - path: input/corrupt_checkpoint.pkl
+          contentBase64: bm90IGEgcGlja2xl
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: save_trusted_checkpoint
+        cases:
+        - id: saves-and-verifies-checkpoint
+          arguments:
+          - fixturePath: output/checkpoint.pkl
+          - value:
+              version: 1
+              model:
+                name: baseline
+                features:
+                - amount
+                - region
+              metrics:
+                accuracy: 0.91
+                loss: 0.18
+              createdBy: local
+          expectedReturn:
+            path: output/checkpoint.pkl
+            version: 1
+            modelName: baseline
+            featureCount: 2
+            accuracy: 0.91
+        - id: rejects-missing-metrics
+          arguments:
+          - fixturePath: output/bad-checkpoint.pkl
+          - value:
+              version: 1
+              model:
+                name: draft
+                features:
+                - x
+              createdBy: local
+          expectedException: ValueError
+        expectedPaths:
+        - path: output/checkpoint.pkl
+          kind: file
+        normalizeReturnPaths:
+        - path
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 15_pickle-sequential-bundle-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - multiple_objects
+    - 15_pickle-trusted-checkpoint-mastery
+    title: 여러 객체를 순차 pickle 번들로 저장하기
+    subtitle: 같은 파일에 dump를 여러 번 호출
+    goal: 여러 record dict를 한 파일에 순차 저장하고 EOF까지 다시 읽어 저장 순서와 항목 수를 검증한다.
+    why: pickle을 캐시나 체크포인트에 쓰다 보면 한 파일에 여러 객체를 쌓는 흐름과 EOFError 종료 조건을 정확히 이해해야 합니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 이번에는 단일 checkpoint가 아니라 여러 record를 같은 파일에 순서대로 저장하세요.
+    tips:
+    - load를 반복하다가 EOFError가 나면 정상 종료로 처리하세요.
+    - 각 record에 kind가 없으면 저장하지 말고 ValueError를 내세요.
+    exercise:
+      prompt: write_pickle_bundle(target_path, records)가 path, count, kinds, totalItems를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def write_pickle_bundle(target_path, records):
+            raise NotImplementedError
+      solution: |-
+        import pickle
+        from pathlib import Path
+
+        def write_pickle_bundle(target_path, records):
+            target = Path(target_path)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            with target.open("wb") as file:
+                for record in records:
+                    if not isinstance(record, dict) or "kind" not in record:
+                        raise ValueError("record kind is required")
+                    pickle.dump(record, file, protocol=pickle.HIGHEST_PROTOCOL)
+            restored = []
+            with target.open("rb") as file:
+                while True:
+                    try:
+                        restored.append(pickle.load(file))
+                    except EOFError:
+                        break
+            return {
+                "path": str(target),
+                "count": len(restored),
+                "kinds": [record["kind"] for record in restored],
+                "totalItems": sum(len(record.get("items", [])) for record in restored),
+            }
+      hints:
+      - dump 호출 순서가 load 결과 순서가 됩니다.
+      - EOFError는 파일이 깨졌다는 뜻이 아니라 순차 load의 정상 종료 신호로 쓸 수 있습니다.
+    check:
+      id: python.builtins.pickle.sequential-bundle.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.pickle.checkpoint.behavior.v1.fixture
+      fixtureHash: sha256-KkCthDuytG5auAGuGoeJfFaQYT8Kg9Ce2il+NbRzHhc=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: input/trusted_checkpoint.pkl
+          contentBase64: gASVjgAAAAAAAAB9lCiMB3ZlcnNpb26USwGMBW1vZGVslH2UKIwEbmFtZZSMCGJhc2VsaW5llIwIZmVhdHVyZXOUXZQojAZhbW91bnSUjAZyZWdpb26UZXWMB21ldHJpY3OUfZQojAthY2N1cmFjeVBjdJRLW4wHbG9zc1BjdJRLEnWMCWNyZWF0ZWRCeZSMBWxvY2FslHUu
+        - path: input/missing_metrics.pkl
+          contentBase64: gASVUgAAAAAAAAB9lCiMB3ZlcnNpb26USwGMBW1vZGVslH2UKIwEbmFtZZSMBWRyYWZ0lIwIZmVhdHVyZXOUXZSMAXiUYXWMCWNyZWF0ZWRCeZSMBWxvY2FslHUu
+        - path: input/corrupt_checkpoint.pkl
+          contentBase64: bm90IGEgcGlja2xl
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: write_pickle_bundle
+        cases:
+        - id: writes-sequential-records
+          arguments:
+          - fixturePath: output/bundle.pkl
+          - value:
+            - kind: config
+              items:
+              - amount
+              - region
+            - kind: result
+              items:
+              - accuracy
+              - loss
+              - count
+          expectedReturn:
+            path: output/bundle.pkl
+            count: 2
+            kinds:
+            - config
+            - result
+            totalItems: 5
+        - id: rejects-record-without-kind
+          arguments:
+          - fixturePath: output/bad-bundle.pkl
+          - value:
+            - items:
+              - missing
+          expectedException: ValueError
+        expectedPaths:
+        - path: output/bundle.pkl
+          kind: file
+        normalizeReturnPaths:
+        - path
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 15_pickle-safe-load-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 15_pickle-sequential-bundle-transfer
+    title: 오래된 pickle 캐시를 안전하게 다시 읽기
+    subtitle: 신뢰된 파일 검증과 깨진 파일 거부
+    goal: pickle 파일을 읽고 version, model, metrics 구조를 검증해 요약 dict를 반환한다.
+    why: 시간이 지나도 꼭 남아야 하는 pickle 지식은 load가 편하다는 사실보다, 신뢰 경계와 구조 검증을 함께 적용하는 습관입니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. valid pickle, 필드 누락 pickle, 깨진 파일을 같은 함수로 판정하세요.
+    tips:
+    - pickle.UnpicklingError와 EOFError는 ValueError로 감싸서 호출자가 같은 실패 경로를 쓰게 하세요.
+    - version이 1이고 model, metrics가 dict인지 확인하세요.
+    exercise:
+      prompt: load_trusted_pickle_summary(path)가 modelName, featureCount, metricNames, createdBy를 담은 dict를 반환하고 깨진 파일은 ValueError로
+        막도록 완성하세요.
+      starterCode: |-
+        def load_trusted_pickle_summary(path):
+            raise NotImplementedError
+      solution: |-
+        import pickle
+
+        def load_trusted_pickle_summary(path):
+            try:
+                with open(path, "rb") as file:
+                    loaded = pickle.load(file)
+            except (pickle.UnpicklingError, EOFError, AttributeError, ValueError, TypeError) as exc:
+                raise ValueError("trusted pickle could not be loaded") from exc
+            if not isinstance(loaded, dict):
+                raise ValueError("checkpoint must be a dict")
+            if loaded.get("version") != 1:
+                raise ValueError("unsupported checkpoint version")
+            model = loaded.get("model")
+            metrics = loaded.get("metrics")
+            if not isinstance(model, dict) or not isinstance(metrics, dict):
+                raise ValueError("model and metrics are required")
+            features = model.get("features")
+            if not isinstance(features, list):
+                raise ValueError("model features must be a list")
+            return {
+                "modelName": model.get("name"),
+                "featureCount": len(features),
+                "metricNames": sorted(metrics),
+                "createdBy": loaded.get("createdBy"),
+            }
+      hints:
+      - 파일을 읽은 뒤 바로 반환하지 말고 구조를 검증하세요.
+      - metricNames는 정렬된 리스트로 반환하세요.
+    check:
+      id: python.builtins.pickle.safe-load.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.pickle.checkpoint.behavior.v1.fixture
+      fixtureHash: sha256-KkCthDuytG5auAGuGoeJfFaQYT8Kg9Ce2il+NbRzHhc=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: input/trusted_checkpoint.pkl
+          contentBase64: gASVjgAAAAAAAAB9lCiMB3ZlcnNpb26USwGMBW1vZGVslH2UKIwEbmFtZZSMCGJhc2VsaW5llIwIZmVhdHVyZXOUXZQojAZhbW91bnSUjAZyZWdpb26UZXWMB21ldHJpY3OUfZQojAthY2N1cmFjeVBjdJRLW4wHbG9zc1BjdJRLEnWMCWNyZWF0ZWRCeZSMBWxvY2FslHUu
+        - path: input/missing_metrics.pkl
+          contentBase64: gASVUgAAAAAAAAB9lCiMB3ZlcnNpb26USwGMBW1vZGVslH2UKIwEbmFtZZSMBWRyYWZ0lIwIZmVhdHVyZXOUXZSMAXiUYXWMCWNyZWF0ZWRCeZSMBWxvY2FslHUu
+        - path: input/corrupt_checkpoint.pkl
+          contentBase64: bm90IGEgcGlja2xl
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: load_trusted_pickle_summary
+        cases:
+        - id: loads-protocol-zero-checkpoint
+          arguments:
+          - fixturePath: input/trusted_checkpoint.pkl
+          expectedReturn:
+            modelName: baseline
+            featureCount: 2
+            metricNames:
+            - accuracyPct
+            - lossPct
+            createdBy: local
+        - id: rejects-missing-metrics
+          arguments:
+          - fixturePath: input/missing_metrics.pkl
+          expectedException: ValueError
+        - id: rejects-corrupt-pickle
+          arguments:
+          - fixturePath: input/corrupt_checkpoint.pkl
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending
+`;export{e as default};

@@ -1,0 +1,854 @@
+var e=`meta:
+  id: fileOps_10
+  title: 종합 다운로드 폴더 정리 프로젝트
+  order: 10
+  category: fileOps
+  difficulty: medium
+  audience: 파일 자동화에 입문하는 Python 학습자
+  packages: []
+  outcomes: ["automation.fileBackup"]
+  prerequisites: ["automation.fileBackup"]
+  estimatedMinutes: 70
+  tags:
+    - project
+    - cleanup
+    - report
+intro:
+  direction: tempfile 안에 가짜 다운로드 폴더를 만들고 분류, 백업, 빈 폴더 정리, JSON 리포트 저장까지 한 사이클을 종합 프로젝트로 묶는다.
+  benefits:
+    - 분류 규칙과 백업 정책을 한 함수에서 함께 적용한다.
+    - dry-run 모드로 실제 변경 전에 결과를 미리 본다.
+    - 종합 리포트를 JSON으로 저장해 다음 사이클이 비교할 수 있게 한다.
+    - 두 번 실행해도 같은 결과가 나오는 멱등 사이클을 완성한다.
+  diagram:
+    steps:
+      - label: 가짜 다운로드 트리 생성
+        detail: csv, png, log, docx 파일을 한 폴더에 만들어 실제 상황을 재현한다.
+      - label: 분류 함수 호출
+        detail: 확장자 규칙을 적용해 파일을 카테고리 폴더로 옮긴다.
+      - label: 백업과 빈 폴더 정리
+        detail: 정리 결과를 archive 폴더로 복제하고 비어 버린 폴더는 제거한다.
+      - label: JSON 리포트 작성
+        detail: moved, backed-up, removed, generated-at 키를 가진 dict를 JSON으로 저장한다.
+      - label: 멱등 사이클 검증
+        detail: 같은 사이클을 다시 실행했을 때 moved와 removed가 빈 리스트가 되는지 확인한다.
+    runtime:
+      - label: 표준 라이브러리만
+        detail: pathlib, shutil, json, tempfile, hashlib만으로 종합 함수를 만든다.
+      - label: assert 기반 검증
+        detail: 첫 사이클과 두 번째 사이클 리포트를 assert로 비교한다.
+sections:
+  - id: build-environment
+    title: 가짜 다운로드 트리 만들기
+    structuredPrimary: true
+    subtitle: 실제 상황 재현
+    goal: csv, png, log, docx 네 종류 파일을 한 폴더에 만들어 자동화 입력을 재현한다.
+    why: 종합 프로젝트는 다양한 확장자가 섞인 실제 입력에서 흐름이 동작해야 의미가 있다.
+    explanation: 시작 단계는 임시 디렉터리에 4개의 파일을 만들어 둔다. 각 파일은 작은 텍스트나 바이트로 채워 mtime과 size가 의미를 갖게 한다. 이렇게 만든 폴더는 종합 사이클의 입력이 되어 다음 섹션에서 그대로 사용된다.
+    tips:
+      - 다양한 확장자가 섞여 있어야 _other 폴더로 가는 경로까지 검증할 수 있다.
+      - 파일 이름은 직관적으로 두어 결과 리포트를 사람이 읽기 쉽게 만든다.
+    snippet: |-
+      import tempfile
+      from pathlib import Path
+
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td)
+          (base / "report.csv").write_text("a,b\\n1,2", encoding="utf-8")
+          (base / "photo.png").write_bytes(b"\\x89PNGfake")
+          (base / "today.log").write_text("ok", encoding="utf-8")
+          (base / "memo.docx").write_text("draft", encoding="utf-8")
+          initial = sorted(p.name for p in base.iterdir())
+
+      assert initial == ["memo.docx", "photo.png", "report.csv", "today.log"]
+      initial
+    exercise:
+      prompt: 같은 폴더에 invoice.json을 한 개 더 추가해 initial 리스트가 다섯 이름을 정렬된 상태로 포함하는지 검증하세요.
+      starterCode: |-
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            (base / "report.csv").write_text("a,b\\n1,2", encoding="utf-8")
+            (base / "photo.png").write_bytes(b"\\x89PNGfake")
+            (base / "today.log").write_text("ok", encoding="utf-8")
+            (base / "memo.docx").write_text("draft", encoding="utf-8")
+            (base / "___").write_text("{}", encoding="utf-8")
+            initial = sorted(p.name for p in base.iterdir())
+
+        assert initial == ["invoice.json", "memo.docx", "photo.png", "report.csv", "today.log"]
+        initial
+      solution: |-
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            (base / "report.csv").write_text("a,b\\n1,2", encoding="utf-8")
+            (base / "photo.png").write_bytes(b"\\x89PNGfake")
+            (base / "today.log").write_text("ok", encoding="utf-8")
+            (base / "memo.docx").write_text("draft", encoding="utf-8")
+            (base / "invoice.json").write_text("{}", encoding="utf-8")
+            initial = sorted(p.name for p in base.iterdir())
+
+        assert initial == ["invoice.json", "memo.docx", "photo.png", "report.csv", "today.log"]
+        initial
+      hints:
+        - 새 파일 이름은 invoice.json으로 두어 자동화 입력의 다양성을 확보한다.
+        - 정렬 결과는 알파벳 순으로 invoice가 가장 먼저 나온다.
+      check:
+        type: noError
+        noError: 다섯 파일을 차례로 만들고 iterdir로 정렬하는 코드가 끝나야 한다.
+        resultCheck: initial 리스트가 다섯 파일 이름을 정렬된 형태로 담아야 한다.
+    check:
+      noError: 네 파일을 만들고 정렬된 이름을 모으는 코드가 끝나야 한다.
+      resultCheck: initial 리스트가 네 파일 이름을 정렬된 상태로 정확히 담아야 한다.
+  - id: organize-cycle
+    title: 분류 함수와 백업 합치기
+    structuredPrimary: true
+    subtitle: organize + archive
+    goal: 분류 결과를 archive 폴더에 복제해 원본 정리와 백업이 한 사이클에서 함께 끝나도록 한다.
+    why: 자동화 정리는 한 번에 정리와 백업을 함께 수행해야 다음 사이클에서 원본이 사라져도 archive에서 복구할 수 있다.
+    explanation: organizeAndBackup 함수는 rules dict로 분류한 뒤 같은 결과를 archive 폴더에 한 번 더 복제한다. archive 폴더는 분류 폴더와 같은 base 안에 두어 동일 디스크의 빠른 복사를 활용한다. 결과 dict는 어떤 파일이 어디로 갔고 어떤 백업이 만들어졌는지 동시에 보여 준다.
+    tips:
+      - archive 안에는 분류 폴더 구조를 그대로 복제해야 검색이 쉽다.
+      - 백업 사이클은 절대로 원본을 다시 만들지 않으므로 원본 일관성이 유지된다.
+    snippet: |-
+      import shutil
+      import tempfile
+      from pathlib import Path
+
+
+      rules = {".csv": "tabular", ".json": "tabular", ".png": "images", ".log": "logs"}
+
+
+      def organizeAndBackup(base: Path, archive: Path) -> dict:
+          report = {"moved": [], "archived": []}
+          archive.mkdir(parents=True, exist_ok=True)
+          for path in sorted(base.iterdir()):
+              if not path.is_file():
+                  continue
+              category = rules.get(path.suffix.lower(), "_other")
+              destination = base / category / path.name
+              destination.parent.mkdir(parents=True, exist_ok=True)
+              shutil.move(path, destination)
+              report["moved"].append(f"{category}/{path.name}")
+              archived = archive / category / path.name
+              archived.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(destination, archived)
+              report["archived"].append(f"{category}/{path.name}")
+          return report
+
+
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td) / "downloads"
+          archive = Path(td) / "archive"
+          base.mkdir()
+          (base / "metric.csv").write_text("a,b", encoding="utf-8")
+          (base / "photo.png").write_bytes(b"\\x89PNGfake")
+          report = organizeAndBackup(base, archive)
+
+      assert report == {
+          "moved": ["tabular/metric.csv", "images/photo.png"],
+          "archived": ["tabular/metric.csv", "images/photo.png"],
+      }
+      report
+    exercise:
+      prompt: 같은 사이클에 stale.log 파일을 추가하면 logs/stale.log가 moved와 archived 양쪽에 모두 들어가는지 검증하세요.
+      starterCode: |-
+        import shutil
+        import tempfile
+        from pathlib import Path
+
+
+        rules = {".csv": "tabular", ".png": "images", "___": "logs"}
+
+
+        def organizeAndBackup(base: Path, archive: Path) -> dict:
+            report = {"moved": [], "archived": []}
+            archive.mkdir(parents=True, exist_ok=True)
+            for path in sorted(base.iterdir()):
+                if not path.is_file():
+                    continue
+                category = rules.get(path.suffix.lower(), "_other")
+                destination = base / category / path.name
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(path, destination)
+                report["moved"].append(f"{category}/{path.name}")
+                archived = archive / category / path.name
+                archived.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(destination, archived)
+                report["archived"].append(f"{category}/{path.name}")
+            return report
+
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td) / "downloads"
+            archive = Path(td) / "archive"
+            base.mkdir()
+            (base / "metric.csv").write_text("a,b", encoding="utf-8")
+            (base / "stale.log").write_text("err", encoding="utf-8")
+            report = organizeAndBackup(base, archive)
+
+        assert report == {
+            "moved": ["tabular/metric.csv", "logs/stale.log"],
+            "archived": ["tabular/metric.csv", "logs/stale.log"],
+        }
+        report
+      solution: |-
+        import shutil
+        import tempfile
+        from pathlib import Path
+
+
+        rules = {".csv": "tabular", ".png": "images", ".log": "logs"}
+
+
+        def organizeAndBackup(base: Path, archive: Path) -> dict:
+            report = {"moved": [], "archived": []}
+            archive.mkdir(parents=True, exist_ok=True)
+            for path in sorted(base.iterdir()):
+                if not path.is_file():
+                    continue
+                category = rules.get(path.suffix.lower(), "_other")
+                destination = base / category / path.name
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(path, destination)
+                report["moved"].append(f"{category}/{path.name}")
+                archived = archive / category / path.name
+                archived.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(destination, archived)
+                report["archived"].append(f"{category}/{path.name}")
+            return report
+
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td) / "downloads"
+            archive = Path(td) / "archive"
+            base.mkdir()
+            (base / "metric.csv").write_text("a,b", encoding="utf-8")
+            (base / "stale.log").write_text("err", encoding="utf-8")
+            report = organizeAndBackup(base, archive)
+
+        assert report == {
+            "moved": ["tabular/metric.csv", "logs/stale.log"],
+            "archived": ["tabular/metric.csv", "logs/stale.log"],
+        }
+        report
+      hints:
+        - rules dict에 ".log" 키를 추가해야 logs 폴더로 분류된다.
+        - 정렬된 iterdir 결과는 csv가 먼저 log가 뒤로 처리된다.
+      check:
+        type: noError
+        noError: organizeAndBackup 함수 호출이 PermissionError 없이 끝나야 한다.
+        resultCheck: report.moved와 report.archived가 같은 두 경로를 본문 순서대로 담아야 한다.
+    check:
+      noError: 분류와 백업이 한 함수 호출에서 끝나야 한다.
+      resultCheck: report dict가 moved와 archived 두 키에 동일한 결과를 담아야 한다.
+  - id: report-save
+    title: JSON 리포트 저장
+    structuredPrimary: true
+    subtitle: generatedAt 포함 dict
+    goal: 분류와 백업 결과를 JSON 리포트로 저장해 다음 사이클이 비교할 수 있게 한다.
+    why: 자동화 리포트가 영속화되어 있어야 운영자가 어제와 오늘의 차이를 볼 수 있고 사고가 났을 때 추적이 가능하다.
+    explanation: 리포트 dict는 generatedAt, moved, archived 세 키를 가진다. datetime.now(UTC).isoformat으로 표준 ISO 시각을 만들고 json.dumps(ensure_ascii=False, indent=2)로 사람이 읽을 수 있게 저장한다. 같은 폴더에 reports/last.json 파일을 두면 다음 사이클이 그것을 읽어 비교할 수 있다.
+    tips:
+      - generatedAt 키는 항상 UTC로 두어 다른 머신과 비교가 쉽다.
+      - JSON 저장 후 같은 셀에서 다시 읽으면 직렬화가 무결한지 즉시 검증할 수 있다.
+    snippet: |-
+      import json
+      import tempfile
+      from datetime import UTC, datetime
+      from pathlib import Path
+
+
+      def saveReport(base: Path, payload: dict) -> Path:
+          reportsDir = base / "reports"
+          reportsDir.mkdir(parents=True, exist_ok=True)
+          payload = dict(payload)
+          payload["generatedAt"] = datetime.now(UTC).isoformat(timespec="seconds")
+          target = reportsDir / "last.json"
+          target.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+          return target
+
+
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td)
+          target = saveReport(base, {"moved": ["a"], "archived": ["a"]})
+          restored = json.loads(target.read_text(encoding="utf-8"))
+
+      assert restored["moved"] == ["a"]
+      assert restored["archived"] == ["a"]
+      assert "generatedAt" in restored
+      restored
+    exercise:
+      prompt: saveReport에 moved에 두 경로, archived에 같은 두 경로를 넘기고 generatedAt이 누락되지 않는지 검증하세요.
+      starterCode: |-
+        import json
+        import tempfile
+        from datetime import UTC, datetime
+        from pathlib import Path
+
+
+        def saveReport(base: Path, payload: dict) -> Path:
+            reportsDir = base / "reports"
+            reportsDir.mkdir(parents=True, exist_ok=True)
+            payload = dict(payload)
+            payload["___"] = datetime.now(UTC).isoformat(timespec="seconds")
+            target = reportsDir / "last.json"
+            target.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+            return target
+
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            target = saveReport(base, {"moved": ["x", "y"], "archived": ["x", "y"]})
+            restored = json.loads(target.read_text(encoding="utf-8"))
+
+        assert restored["moved"] == ["x", "y"]
+        assert restored["archived"] == ["x", "y"]
+        assert "generatedAt" in restored
+        restored
+      solution: |-
+        import json
+        import tempfile
+        from datetime import UTC, datetime
+        from pathlib import Path
+
+
+        def saveReport(base: Path, payload: dict) -> Path:
+            reportsDir = base / "reports"
+            reportsDir.mkdir(parents=True, exist_ok=True)
+            payload = dict(payload)
+            payload["generatedAt"] = datetime.now(UTC).isoformat(timespec="seconds")
+            target = reportsDir / "last.json"
+            target.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+            return target
+
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            target = saveReport(base, {"moved": ["x", "y"], "archived": ["x", "y"]})
+            restored = json.loads(target.read_text(encoding="utf-8"))
+
+        assert restored["moved"] == ["x", "y"]
+        assert restored["archived"] == ["x", "y"]
+        assert "generatedAt" in restored
+        restored
+      hints:
+        - generatedAt 키 이름은 camelCase로 통일한다.
+        - 리포트 dict는 함수 안에서 복사해 둬야 호출자의 payload가 변경되지 않는다.
+      check:
+        type: noError
+        noError: saveReport 호출과 JSON 왕복이 IOError 없이 끝나야 한다.
+        resultCheck: restored 딕셔너리가 두 키와 generatedAt까지 정확히 채워져야 한다.
+    check:
+      noError: JSON 직렬화와 디스크 쓰기, 다시 읽기가 끝나야 한다.
+      resultCheck: restored 딕셔너리가 moved, archived, generatedAt 세 키를 모두 가져야 한다.
+  - id: idempotent-cycle
+    title: 멱등 사이클 종합 완성
+    structuredPrimary: true
+    subtitle: 같은 입력 두 번 실행
+    goal: 분류와 백업, 리포트 저장까지 묶은 종합 함수가 두 번째 실행에서는 moved가 비어 있는 안정 상태로 마무리한다.
+    why: 자동화 정리 사이클은 두 번째 실행이 첫 번째와 같은 결과를 만들어야 하며, 그렇지 않으면 운영자가 안심하고 스케줄에 올릴 수 없다.
+    explanation: cleanupOnce 함수는 폴더에 정리되지 않은 파일이 있을 때만 분류와 백업을 진행한다. 모든 파일이 이미 카테고리 폴더 안에 있으면 moved가 비어 있는 보고가 만들어진다. 두 번째 호출에서 빈 moved가 나오면 사이클이 멱등하게 안정화되었음을 의미한다.
+    tips:
+      - 두 번째 사이클의 moved가 비어 있다면 이전 결과가 그대로 유지된 안정 상태다.
+      - 사이클 종합 리포트는 archived 리스트가 누적되지 않게 매 호출마다 새로 만든다.
+    snippet: |-
+      import json
+      import shutil
+      import tempfile
+      from datetime import UTC, datetime
+      from pathlib import Path
+
+
+      rules = {".csv": "tabular", ".png": "images", ".log": "logs"}
+
+
+      def cleanupOnce(base: Path, archive: Path) -> dict:
+          report = {"moved": [], "archived": []}
+          archive.mkdir(parents=True, exist_ok=True)
+          for path in sorted(base.iterdir()):
+              if not path.is_file():
+                  continue
+              category = rules.get(path.suffix.lower(), "_other")
+              destination = base / category / path.name
+              destination.parent.mkdir(parents=True, exist_ok=True)
+              shutil.move(path, destination)
+              report["moved"].append(f"{category}/{path.name}")
+              archived = archive / category / path.name
+              archived.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(destination, archived)
+              report["archived"].append(f"{category}/{path.name}")
+          report["generatedAt"] = datetime.now(UTC).isoformat(timespec="seconds")
+          return report
+
+
+      with tempfile.TemporaryDirectory() as td:
+          base = Path(td) / "downloads"
+          archive = Path(td) / "archive"
+          base.mkdir()
+          (base / "metric.csv").write_text("", encoding="utf-8")
+          (base / "photo.png").write_bytes(b"x")
+          firstReport = cleanupOnce(base, archive)
+          secondReport = cleanupOnce(base, archive)
+
+      assert firstReport["moved"] == ["tabular/metric.csv", "images/photo.png"]
+      assert secondReport["moved"] == []
+      assert secondReport["archived"] == []
+      {"first": firstReport["moved"], "second": secondReport["moved"]}
+    exercise:
+      prompt: cleanupOnce를 두 번 호출한 뒤 두 번째 보고의 moved와 archived가 모두 빈 리스트가 되어 종합 사이클이 멱등하게 마무리되는지 검증하세요.
+      starterCode: |-
+        import json
+        import shutil
+        import tempfile
+        from datetime import UTC, datetime
+        from pathlib import Path
+
+
+        rules = {".csv": "tabular", ".png": "images", ".log": "logs"}
+
+
+        def cleanupOnce(base: Path, archive: Path) -> dict:
+            report = {"moved": [], "archived": []}
+            archive.mkdir(parents=True, exist_ok=True)
+            for path in sorted(base.iterdir()):
+                if not path.is_file():
+                    continue
+                category = rules.get(path.suffix.lower(), "_other")
+                destination = base / category / path.name
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(path, destination)
+                report["moved"].append(f"{category}/{path.name}")
+                archived = archive / category / path.name
+                archived.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(destination, archived)
+                report["archived"].append(f"{category}/{path.name}")
+            report["generatedAt"] = datetime.now(UTC).isoformat(timespec="seconds")
+            return report
+
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td) / "downloads"
+            archive = Path(td) / "archive"
+            base.mkdir()
+            (base / "metric.csv").write_text("", encoding="utf-8")
+            (base / "stale.log").write_text("", encoding="utf-8")
+            firstReport = cleanupOnce(base, archive)
+            secondReport = cleanupOnce(base, archive)
+
+        assert firstReport["moved"] == ["tabular/metric.csv", "logs/stale.log"]
+        assert secondReport["moved"] == ___
+        assert secondReport["archived"] == []
+        {"first": firstReport["moved"], "second": secondReport["moved"]}
+      solution: |-
+        import json
+        import shutil
+        import tempfile
+        from datetime import UTC, datetime
+        from pathlib import Path
+
+
+        rules = {".csv": "tabular", ".png": "images", ".log": "logs"}
+
+
+        def cleanupOnce(base: Path, archive: Path) -> dict:
+            report = {"moved": [], "archived": []}
+            archive.mkdir(parents=True, exist_ok=True)
+            for path in sorted(base.iterdir()):
+                if not path.is_file():
+                    continue
+                category = rules.get(path.suffix.lower(), "_other")
+                destination = base / category / path.name
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(path, destination)
+                report["moved"].append(f"{category}/{path.name}")
+                archived = archive / category / path.name
+                archived.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(destination, archived)
+                report["archived"].append(f"{category}/{path.name}")
+            report["generatedAt"] = datetime.now(UTC).isoformat(timespec="seconds")
+            return report
+
+
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td) / "downloads"
+            archive = Path(td) / "archive"
+            base.mkdir()
+            (base / "metric.csv").write_text("", encoding="utf-8")
+            (base / "stale.log").write_text("", encoding="utf-8")
+            firstReport = cleanupOnce(base, archive)
+            secondReport = cleanupOnce(base, archive)
+
+        assert firstReport["moved"] == ["tabular/metric.csv", "logs/stale.log"]
+        assert secondReport["moved"] == []
+        assert secondReport["archived"] == []
+        {"first": firstReport["moved"], "second": secondReport["moved"]}
+      hints:
+        - 두 번째 사이클은 base에 정리되지 않은 파일이 없어 moved 리스트가 빈 상태가 된다.
+        - assert에서 빈 리스트는 그냥 []로 비교한다.
+      check:
+        type: noError
+        noError: cleanupOnce 두 번 호출이 격리 공간에서 끝나야 한다.
+        resultCheck: 두 번째 보고의 moved와 archived가 모두 빈 리스트로 종합 사이클의 멱등성을 보여야 한다.
+    check:
+      noError: cleanupOnce 두 번 호출과 dict 비교가 끝나야 한다.
+      resultCheck: firstReport는 두 항목을 담고 secondReport는 빈 리스트를 담아 종합 멱등 사이클이 완성되어야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: fileOps_10-downloads-cleanup-capstone-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - build-environment
+    - idempotent-cycle
+    title: 다운로드 폴더 정리의 plan·conflict·quarantine 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 분류 move와 오래된 파일 quarantine를 분리하고 충돌 시 실행을 막는다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 다운로드 정리는 실행 전 전체 dry-run plan을 검증하고 그 판정을 JSON audit에 남기세요.
+    - JSON table은 dict 하나가 아니라 동일한 열을 가진 record list로 저장하세요.
+    exercise:
+      prompt: audit_download_cleanup(plan, output_path)를 완성해 판정 결과를 반환하고, output_path에는 같은 결과를 한 행짜리 JSON table로 저장하세요.
+      starterCode: |-
+        def audit_download_cleanup(plan, output_path=None):
+            raise NotImplementedError
+      solution: |
+        import json
+        from pathlib import Path
+
+
+        def audit_download_cleanup(plan, output_path=None):
+            failures = []
+            conflicts = sorted(item["path"] for item in plan.get("items", []) if item.get("destinationExists", False))
+            outside = sorted(item["path"] for item in plan.get("items", []) if not item.get("withinDownloads", False))
+            direct_deletes = sorted(item["path"] for item in plan.get("items", []) if item.get("action") == "delete")
+            if conflicts:
+                failures.append("conflicts")
+            if outside:
+                failures.append("scope")
+            if direct_deletes:
+                failures.append("direct-delete")
+            if not plan.get("dryRun", False):
+                failures.append("dry-run")
+            result = {"ready": not failures, "failures": failures, "conflicts": conflicts, "outside": outside, "directDeletes": direct_deletes}
+            default_path = "output/empty-audit.json" if not plan.get("items", []) else "output/ready-audit.json" if result["ready"] else "output/blocked-audit.json"
+            target = Path(output_path or default_path)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(json.dumps([result], ensure_ascii=False, sort_keys=True, indent=2), encoding="utf-8")
+            return result
+      hints: *id001
+    check:
+      id: python.fileops.fileOps_10.downloads-cleanup-capstone.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_10.downloads-cleanup-capstone.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_download_cleanup
+        cases:
+        - id: accepts-dry-run-move-and-quarantine
+          arguments:
+          - value:
+              dryRun: true
+              items:
+              - path: /Downloads/a.pdf
+                action: move
+                withinDownloads: true
+                destinationExists: false
+              - path: /Downloads/old.zip
+                action: quarantine
+                withinDownloads: true
+                destinationExists: false
+          - value: output/ready-audit.json
+          expectedReturn:
+            ready: true
+            failures: []
+            conflicts: []
+            outside: []
+            directDeletes: []
+        - id: reports-all-blockers
+          arguments:
+          - value:
+              dryRun: false
+              items:
+              - path: /other/a
+                action: delete
+                withinDownloads: false
+                destinationExists: true
+          - value: output/blocked-audit.json
+          expectedReturn:
+            ready: false
+            failures:
+            - conflicts
+            - scope
+            - direct-delete
+            - dry-run
+            conflicts:
+            - /other/a
+            outside:
+            - /other/a
+            directDeletes:
+            - /other/a
+        - id: accepts-empty-dry-run
+          arguments:
+          - value:
+              dryRun: true
+              items: []
+          - value: output/empty-audit.json
+          expectedReturn:
+            ready: true
+            failures: []
+            conflicts: []
+            outside: []
+            directDeletes: []
+        expectedPaths:
+        - path: output/ready-audit.json
+          kind: table
+          origin: created
+          format: json
+          columns:
+          - conflicts
+          - directDeletes
+          - failures
+          - outside
+          - ready
+        - path: output/blocked-audit.json
+          kind: table
+          origin: created
+          format: json
+          columns:
+          - conflicts
+          - directDeletes
+          - failures
+          - outside
+          - ready
+        - path: output/empty-audit.json
+          kind: table
+          origin: created
+          format: json
+          columns:
+          - conflicts
+          - directDeletes
+          - failures
+          - outside
+          - ready
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: fileOps_10-downloads-cleanup-release-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - fileOps_10-downloads-cleanup-capstone-mastery
+    title: 새 다운로드 정리에 artifact·idempotency gate 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 같은 input inventory를 두 번 적용했을 때 두 번째 action 0과 artifact 일치를 검사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 두 번째 실행 action 0으로 정리 작업의 idempotency를 검증하세요.
+    - 같은 input inventory hash에서만 두 run을 비교하세요.
+    exercise:
+      prompt: decide_cleanup_release(first_run, second_run, expected_artifacts)를 완성하세요.
+      starterCode: |-
+        def decide_cleanup_release(first_run, second_run, expected_artifacts):
+            raise NotImplementedError
+      solution: |
+        def decide_cleanup_release(first_run, second_run, expected_artifacts):
+            failures = []
+            if not first_run.get("passed", False):
+                failures.append("first-run")
+            if second_run.get("actionCount") != 0:
+                failures.append("idempotency")
+            observed = set(first_run.get("artifacts", []))
+            missing = sorted(set(expected_artifacts) - observed)
+            unexpected = sorted(observed - set(expected_artifacts))
+            if missing or unexpected:
+                failures.append("artifacts")
+            if first_run.get("inputHash") != second_run.get("inputHash"):
+                failures.append("input-identity")
+            return {"releaseReady": not failures, "failures": failures, "missingArtifacts": missing, "unexpectedArtifacts": unexpected}
+      hints: *id002
+    check:
+      id: python.fileops.fileOps_10.downloads-cleanup-release.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_10.downloads-cleanup-release.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: decide_cleanup_release
+        cases:
+        - id: accepts-idempotent-artifact-result
+          arguments:
+          - value:
+              passed: true
+              artifacts:
+              - docs/a.pdf
+              inputHash: x
+          - value:
+              actionCount: 0
+              inputHash: x
+          - value:
+            - docs/a.pdf
+          expectedReturn:
+            releaseReady: true
+            failures: []
+            missingArtifacts: []
+            unexpectedArtifacts: []
+        - id: reports-run-idempotency-and-artifacts
+          arguments:
+          - value:
+              passed: false
+              artifacts:
+              - extra
+              inputHash: x
+          - value:
+              actionCount: 1
+              inputHash: x
+          - value:
+            - expected
+          expectedReturn:
+            releaseReady: false
+            failures:
+            - first-run
+            - idempotency
+            - artifacts
+            missingArtifacts:
+            - expected
+            unexpectedArtifacts:
+            - extra
+        - id: reports-input-identity-change
+          arguments:
+          - value:
+              passed: true
+              artifacts: []
+              inputHash: a
+          - value:
+              actionCount: 0
+              inputHash: b
+          - value: []
+          expectedReturn:
+            releaseReady: false
+            failures:
+            - input-identity
+            missingArtifacts: []
+            unexpectedArtifacts: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: fileOps_10-downloads-cleanup-capstone-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - fileOps_10-downloads-cleanup-release-transfer
+    title: 다운로드 폴더 정리 종료 조건 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: scope·dry run·quarantine·artifact·idempotency 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 파일 action 전에 root·충돌·dry run 계약을 확인하세요.
+    - 실행 횟수가 아니라 source와 destination artifact identity로 결과를 판정하세요.
+    exercise:
+      prompt: choose_cleanup_gate(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_cleanup_gate(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_cleanup_gate(situation):
+            table = {'plan': {'action': 'classify and detect conflicts in dry run', 'evidence': 'source destination plan', 'risk': 'wrong move'}, 'delete': {'action': 'quarantine with retention', 'evidence': 'reversible manifest', 'risk': 'irreversible loss'}, 'release': {'action': 'reconcile artifacts and rerun', 'evidence': 'zero-action second run', 'risk': 'non-idempotent cleanup'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.fileops.fileOps_10.downloads-cleanup-capstone-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_10.downloads-cleanup-capstone-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_cleanup_gate
+        cases:
+        - id: recalls-plan
+          arguments:
+          - value: plan
+          expectedReturn:
+            action: classify and detect conflicts in dry run
+            evidence: source destination plan
+            risk: wrong move
+        - id: recalls-delete
+          arguments:
+          - value: delete
+          expectedReturn:
+            action: quarantine with retention
+            evidence: reversible manifest
+            risk: irreversible loss
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

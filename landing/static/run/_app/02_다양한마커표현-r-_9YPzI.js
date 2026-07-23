@@ -1,0 +1,1036 @@
+var e=`meta:
+  packages:
+  - folium
+  id: folium_02
+  title: 다양한마커표현
+  order: 2
+  category: folium
+  difficulty: ⭐
+  badge: 입문
+  tags:
+  - folium
+  - Marker
+  - Icon
+  - popup
+  - tooltip
+  - HTML
+  seo:
+    title: Folium 마커 커스터마이징 - 아이콘과 팝업
+    description: Folium에서 다양한 마커 스타일을 사용합니다. 커스텀 아이콘, HTML 팝업, 툴팁을 배웁니다.
+    keywords:
+    - folium
+    - Marker
+    - Icon
+    - DivIcon
+    - popup
+    - tooltip
+intro:
+  emoji: 🎨
+  goal: 여러 종류의 마커와 아이콘을 사용하여 지도를 꾸밉니다.
+  description: 마커의 다양한 표현 방법을 배웁니다. Icon()으로 색상과 아이콘을 변경하고, DivIcon()으로 완전한 커스텀 마커를 만듭니다. popup에 HTML을
+    넣어 풍부한 정보를 표시합니다.
+  direction: 다양한마커표현에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.
+  benefits:
+  - 위도/경도 데이터 확인 후 지도 레이어 구성에 맞는 코드 입력을 고릅니다.
+  - 다양한마커표현 결과를 마커와 저장 HTML 기준으로 즉시 점검합니다.
+  - 완료한 코드를 위치 기반 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(위도/경도 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 아이콘 색상 처리 실행
+      detail: 지도 레이어 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 아이콘 종류 결과 검증
+      detail: 마커와 저장 HTML 기준으로 실행 결과를 비교합니다.
+    - label: 다양한마커표현 재사용
+      detail: 완성 코드를 위치 기반 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 지도 시각화 환경
+      detail: folium 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 다양한마커표현 실행
+      detail: 셀을 실행해 마커와 저장 HTML와 예외 상태를 확인합니다.
+    - label: 다양한마커표현 완료
+      detail: 검증된 코드를 위치 기반 리포트로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: folium과 Codaro를 불러옵니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: import folium
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: import folium
+    hints:
+    - 바꿀 지점은 위도/경도 데이터을 만드는 첫 줄과 지도 레이어 구성 줄에서 찾으세요.
+    - 실행 뒤 마커와 저장 HTML 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 마커와 저장 HTML 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step2_icon_colors
+  title: 2단계. 아이콘 색상
+  structuredPrimary: true
+  subtitle: Icon(color=)
+  goal: 2단계. 아이콘 색상에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    Icon()의 color 파라미터로 마커 색상을 지정합니다. 18가지 색상을 사용할 수 있습니다.
+
+    카테고리별로 색상을 다르게 하면 한눈에 구분할 수 있습니다. 음식점은 빨강, 카페는 파랑 등으로 구분하세요.
+  snippet: |-
+    seoulLoc = [37.5665, 126.9780]
+    colorList = ["red", "blue", "green", "purple", "orange",
+                 "darkred", "lightred", "beige", "darkblue", "darkgreen",
+                 "cadetblue", "darkpurple", "white", "pink", "lightblue",
+                 "lightgreen", "gray", "black"]
+
+    m1 = folium.Map(location=seoulLoc, zoom_start=13)
+
+    for i, clr in enumerate(colorList):
+        offset = [seoulLoc[0] + (i // 6) * 0.01, seoulLoc[1] + (i % 6) * 0.01]
+        folium.Marker(
+            location=offset,
+            popup=clr,
+            icon=folium.Icon(color=clr)
+        ).add_to(m1)
+
+    m1
+  exercise:
+    prompt: 2단계. 아이콘 색상 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      seoulLoc = [37.5665, 126.9780]
+      colorList = ["red", "blue", "green", "purple", "orange",
+                   "darkred", "lightred", "beige", "darkblue", "darkgreen",
+                   "cadetblue", "darkpurple", "white", "pink", "lightblue",
+                   "lightgreen", "gray", "black"]
+
+      m1 = folium.Map(location=seoulLoc, zoom_start=13)
+
+      for i, clr in enumerate(colorList):
+          offset = [seoulLoc[0] + (i // 6) * 0.01, seoulLoc[1] + (i % 6) * 0.01]
+          folium.Marker(
+              location=offset,
+              popup=clr,
+              icon=folium.Icon(color=clr)
+          ).add_to(m1)
+
+      m1
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 2단계. 아이콘 색상의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 2단계. 아이콘 색상 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step3_icon_types
+  title: 3단계. 아이콘 종류
+  structuredPrimary: true
+  subtitle: Icon(icon=)
+  goal: 3단계. 아이콘 종류에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    icon 파라미터로 마커 안의 아이콘을 변경합니다. Glyphicon과 Font Awesome 아이콘을 사용할 수 있습니다.
+
+    Font Awesome 아이콘을 사용하려면 prefix='fa'를 추가하세요. 더 다양한 아이콘을 사용할 수 있습니다.
+  snippet: |-
+    glyphicons = ["home", "star", "heart", "cloud", "music",
+                  "camera", "user", "glass", "flag", "gift"]
+
+    m2 = folium.Map(location=seoulLoc, zoom_start=14)
+
+    for i, icn in enumerate(glyphicons):
+        offset = [seoulLoc[0] + (i // 5) * 0.008, seoulLoc[1] + (i % 5) * 0.008]
+        folium.Marker(
+            location=offset,
+            popup=icn,
+            icon=folium.Icon(color="blue", icon=icn)
+        ).add_to(m2)
+
+    m2
+  exercise:
+    prompt: 3단계. 아이콘 종류 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      glyphicons = ["home", "star", "heart", "cloud", "music",
+                    "camera", "user", "glass", "flag", "gift"]
+
+      m2 = folium.Map(location=seoulLoc, zoom_start=14)
+
+      for i, icn in enumerate(glyphicons):
+          offset = [seoulLoc[0] + (i // 5) * 0.008, seoulLoc[1] + (i % 5) * 0.008]
+          folium.Marker(
+              location=offset,
+              popup=icn,
+              icon=folium.Icon(color="blue", icon=icn)
+          ).add_to(m2)
+
+      m2
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 3단계. 아이콘 종류의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 3단계. 아이콘 종류 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step4_html_popup
+  title: 4단계. HTML 팝업
+  structuredPrimary: true
+  subtitle: 풍부한 정보 표시
+  goal: 4단계. HTML 팝업에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    popup에 HTML을 넣어 이미지, 링크, 표 등을 표시할 수 있습니다.
+
+    Popup() 객체를 사용하면 max_width로 팝업 너비를 조절할 수 있습니다.
+  snippet: |-
+    htmlContent = """
+    <div style="font-family: Arial; width: 200px;">
+        <h4 style="color: #2E86AB;">서울시청</h4>
+        <p style="margin: 5px 0;">주소: 서울특별시 중구 태평로1가</p>
+        <p style="margin: 5px 0;">전화: 02-120</p>
+        <hr>
+        <small>클릭하여 상세 정보 확인</small>
+    </div>
+    """
+
+    m4 = folium.Map(location=seoulLoc, zoom_start=15)
+    folium.Marker(
+        location=seoulLoc,
+        popup=folium.Popup(htmlContent, max_width=250),
+        icon=folium.Icon(color="red", icon="info-sign")
+    ).add_to(m4)
+
+    m4
+  exercise:
+    prompt: 4단계. HTML 팝업 예제에서 \`htmlContent\`, \`m4\`, \`location\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      htmlContent = """
+      <div style="font-family: Arial; width: 200px;">
+          <h4 style="color: #2E86AB;">서울시청</h4>
+          <p style="margin: 5px 0;">주소: 서울특별시 중구 태평로1가</p>
+          <p style="margin: 5px 0;">전화: 02-120</p>
+          <hr>
+          <small>클릭하여 상세 정보 확인</small>
+      </div>
+      """
+
+      m4 = folium.Map(location=seoulLoc, zoom_start=15)
+      folium.Marker(
+          location=seoulLoc,
+          popup=folium.Popup(htmlContent, max_width=250),
+          icon=folium.Icon(color="red", icon="info-sign")
+      ).add_to(m4)
+
+      m4
+    hints:
+    - 바꿀 지점은 \`htmlContent = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`htmlContent\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 4단계. HTML 팝업에서 \`htmlContent\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 4단계. HTML 팝업 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step5_tooltip_style
+  title: 5단계. 툴팁 스타일
+  structuredPrimary: true
+  subtitle: Tooltip()
+  goal: 5단계. 툴팁 스타일에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    Tooltip() 객체로 툴팁을 더 세밀하게 제어할 수 있습니다.
+
+    permanent=True로 설정하면 마우스를 올리지 않아도 항상 툴팁이 표시됩니다.
+  snippet: |-
+    m5 = folium.Map(location=seoulLoc, zoom_start=14)
+
+    folium.Marker(
+        location=[37.5665, 126.9780],
+        tooltip=folium.Tooltip("항상 표시", permanent=True),
+        icon=folium.Icon(color="blue")
+    ).add_to(m5)
+
+    folium.Marker(
+        location=[37.5665, 126.9880],
+        tooltip=folium.Tooltip("<b>HTML 툴팁</b><br>여러 줄 가능"),
+        icon=folium.Icon(color="green")
+    ).add_to(m5)
+
+    m5
+  exercise:
+    prompt: 5단계. 툴팁 스타일 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      m5 = folium.Map(location=seoulLoc, zoom_start=14)
+
+      folium.Marker(
+          location=[37.5665, 126.9780],
+          tooltip=folium.Tooltip("항상 표시", permanent=True),
+          icon=folium.Icon(color="blue")
+      ).add_to(m5)
+
+      folium.Marker(
+          location=[37.5665, 126.9880],
+          tooltip=folium.Tooltip("<b>HTML 툴팁</b><br>여러 줄 가능"),
+          icon=folium.Icon(color="green")
+      ).add_to(m5)
+
+      m5
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 5단계. 툴팁 스타일에서 \`m5\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 툴팁 스타일 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step6_divicon
+  title: 6단계. DivIcon
+  structuredPrimary: true
+  subtitle: 완전 커스텀 마커
+  goal: 6단계. DivIcon에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    DivIcon()으로 HTML/CSS를 사용한 완전한 커스텀 마커를 만들 수 있습니다.
+
+    DivIcon은 아무 HTML이나 마커로 사용할 수 있어 자유도가 높습니다. 로고, 이모지, 커스텀 디자인 모두 가능합니다.
+  snippet: |-
+    spots = [
+        {"name": "1번", "loc": [37.5665, 126.9780]},
+        {"name": "2번", "loc": [37.5600, 126.9850]},
+        {"name": "3번", "loc": [37.5700, 126.9900]}
+    ]
+
+    m6 = folium.Map(location=seoulLoc, zoom_start=14)
+
+    for i, spot in enumerate(spots, 1):
+        folium.Marker(
+            location=spot["loc"],
+            popup=spot["name"],
+            icon=folium.DivIcon(
+                html=f"""
+                <div style="
+                    background-color: #E74C3C;
+                    color: white;
+                    width: 25px;
+                    height: 25px;
+                    border-radius: 50%;
+                    text-align: center;
+                    line-height: 25px;
+                    font-weight: bold;
+                    font-size: 14px;
+                    border: 2px solid white;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+                ">{i}</div>
+                """
+            )
+        ).add_to(m6)
+
+    m6
+  exercise:
+    prompt: 6단계. DivIcon 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      spots = [
+          {"name": "1번", "loc": [37.5665, 126.9780]},
+          {"name": "2번", "loc": [37.5600, 126.9850]},
+          {"name": "3번", "loc": [37.5700, 126.9900]}
+      ]
+
+      m6 = folium.Map(location=seoulLoc, zoom_start=14)
+
+      for i, spot in enumerate(spots, 1):
+          folium.Marker(
+              location=spot["loc"],
+              popup=spot["name"],
+              icon=folium.DivIcon(
+                  html=f"""
+                  <div style="
+                      background-color: #E74C3C;
+                      color: white;
+                      width: 25px;
+                      height: 25px;
+                      border-radius: 50%;
+                      text-align: center;
+                      line-height: 25px;
+                      font-weight: bold;
+                      font-size: 14px;
+                      border: 2px solid white;
+                      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+                  ">{i}</div>
+                  """
+              )
+          ).add_to(m6)
+
+      m6
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 6단계. DivIcon의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 6단계. DivIcon 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step7_emoji_marker
+  title: 7단계. 이모지 마커
+  structuredPrimary: true
+  subtitle: DivIcon으로 이모지 사용
+  goal: 7단계. 이모지 마커에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    DivIcon으로 이모지를 마커로 사용할 수 있습니다.
+
+    이모지 마커는 직관적이고 귀엽습니다. 카테고리별로 다른 이모지를 사용하면 구분이 쉽습니다.
+  snippet: |-
+    emojiSpots = [
+        {"name": "카페", "loc": [37.5665, 126.9780], "emoji": "☕"},
+        {"name": "음식점", "loc": [37.5600, 126.9750], "emoji": "🍽️"},
+        {"name": "쇼핑", "loc": [37.5630, 126.9850], "emoji": "🛍️"},
+        {"name": "공원", "loc": [37.5700, 126.9800], "emoji": "🌳"},
+        {"name": "호텔", "loc": [37.5580, 126.9900], "emoji": "🏨"}
+    ]
+
+    m7 = folium.Map(location=seoulLoc, zoom_start=14)
+
+    for spot in emojiSpots:
+        folium.Marker(
+            location=spot["loc"],
+            popup=spot["name"],
+            icon=folium.DivIcon(
+                html=f'<div style="font-size: 24px;">{spot["emoji"]}</div>'
+            )
+        ).add_to(m7)
+
+    m7
+  exercise:
+    prompt: 7단계. 이모지 마커 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      emojiSpots = [
+          {"name": "카페", "loc": [37.5665, 126.9780], "emoji": "☕"},
+          {"name": "음식점", "loc": [37.5600, 126.9750], "emoji": "🍽️"},
+          {"name": "쇼핑", "loc": [37.5630, 126.9850], "emoji": "🛍️"},
+          {"name": "공원", "loc": [37.5700, 126.9800], "emoji": "🌳"},
+          {"name": "호텔", "loc": [37.5580, 126.9900], "emoji": "🏨"}
+      ]
+
+      m7 = folium.Map(location=seoulLoc, zoom_start=14)
+
+      for spot in emojiSpots:
+          folium.Marker(
+              location=spot["loc"],
+              popup=spot["name"],
+              icon=folium.DivIcon(
+                  html=f'<div style="font-size: 24px;">{spot["emoji"]}</div>'
+              )
+          ).add_to(m7)
+
+      m7
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 7단계. 이모지 마커의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 7단계. 이모지 마커 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step8_circle_marker
+  title: 8단계. CircleMarker
+  structuredPrimary: true
+  subtitle: 원형 마커
+  goal: 8단계. CircleMarker에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    CircleMarker()는 크기가 고정된 원형 마커입니다. 줌 레벨에 상관없이 같은 크기로 표시됩니다.
+
+    CircleMarker의 radius는 픽셀 단위입니다. Circle()의 radius는 미터 단위라서 줌에 따라 크기가 변합니다.
+  snippet: |-
+    m8 = folium.Map(location=seoulLoc, zoom_start=14)
+
+    folium.CircleMarker(
+        location=[37.5665, 126.9780],
+        radius=10,
+        color="red",
+        fill=True,
+        fill_color="red",
+        fill_opacity=0.7,
+        popup="작은 원"
+    ).add_to(m8)
+
+    folium.CircleMarker(
+        location=[37.5600, 126.9850],
+        radius=20,
+        color="blue",
+        fill=True,
+        fill_color="blue",
+        fill_opacity=0.5,
+        popup="중간 원"
+    ).add_to(m8)
+
+    folium.CircleMarker(
+        location=[37.5700, 126.9700],
+        radius=30,
+        color="green",
+        fill=True,
+        fill_color="green",
+        fill_opacity=0.3,
+        popup="큰 원"
+    ).add_to(m8)
+
+    m8
+  exercise:
+    prompt: 8단계. CircleMarker 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      m8 = folium.Map(location=seoulLoc, zoom_start=14)
+
+      folium.CircleMarker(
+          location=[37.5665, 126.9780],
+          radius=10,
+          color="red",
+          fill=True,
+          fill_color="red",
+          fill_opacity=0.7,
+          popup="작은 원"
+      ).add_to(m8)
+
+      folium.CircleMarker(
+          location=[37.5600, 126.9850],
+          radius=20,
+          color="blue",
+          fill=True,
+          fill_color="blue",
+          fill_opacity=0.5,
+          popup="중간 원"
+      ).add_to(m8)
+
+      folium.CircleMarker(
+          location=[37.5700, 126.9700],
+          radius=30,
+          color="green",
+          fill=True,
+          fill_color="green",
+          fill_opacity=0.3,
+          popup="큰 원"
+      ).add_to(m8)
+
+      m8
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 8단계. CircleMarker에서 \`m8\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 8단계. CircleMarker 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step9_data_driven
+  title: 9단계. 데이터 기반 마커
+  structuredPrimary: true
+  subtitle: 값에 따른 시각화
+  goal: 9단계. 데이터 기반 마커에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    데이터 값에 따라 마커 크기나 색상을 다르게 표시합니다.
+
+    데이터 값을 시각적 요소(크기, 색상, 투명도)에 매핑하면 패턴을 쉽게 파악할 수 있습니다.
+  snippet: |-
+    stores = [
+        {"name": "강남점", "loc": [37.4979, 127.0276], "sales": 100},
+        {"name": "홍대점", "loc": [37.5563, 126.9236], "sales": 80},
+        {"name": "명동점", "loc": [37.5636, 126.9869], "sales": 150},
+        {"name": "여의도점", "loc": [37.5219, 126.9245], "sales": 60}
+    ]
+
+    m9 = folium.Map(location=seoulLoc, zoom_start=12)
+
+    for store in stores:
+        radius = store["sales"] / 5
+        folium.CircleMarker(
+            location=store["loc"],
+            radius=radius,
+            color="crimson",
+            fill=True,
+            fill_color="crimson",
+            fill_opacity=0.6,
+            popup=f"{store['name']}: {store['sales']}억"
+        ).add_to(m9)
+
+    m9
+  exercise:
+    prompt: 9단계. 데이터 기반 마커 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      stores = [
+          {"name": "강남점", "loc": [37.4979, 127.0276], "sales": 100},
+          {"name": "홍대점", "loc": [37.5563, 126.9236], "sales": 80},
+          {"name": "명동점", "loc": [37.5636, 126.9869], "sales": 150},
+          {"name": "여의도점", "loc": [37.5219, 126.9245], "sales": 60}
+      ]
+
+      m9 = folium.Map(location=seoulLoc, zoom_start=12)
+
+      for store in stores:
+          radius = store["sales"] / 5
+          folium.CircleMarker(
+              location=store["loc"],
+              radius=radius,
+              color="crimson",
+              fill=True,
+              fill_color="crimson",
+              fill_opacity=0.6,
+              popup=f"{store['name']}: {store['sales']}억"
+          ).add_to(m9)
+
+      m9
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 9단계. 데이터 기반 마커의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 9단계. 데이터 기반 마커 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step10_complete
+  title: 10단계. 완성 예제
+  structuredPrimary: true
+  subtitle: 맛집 지도
+  goal: 10단계. 완성 예제에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: 다양한 마커 스타일을 종합하여 맛집 지도를 만듭니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    restaurants = [
+        {"name": "한식당", "loc": [37.5665, 126.9780], "category": "한식", "rating": 4.5},
+        {"name": "이탈리안", "loc": [37.5600, 126.9850], "category": "양식", "rating": 4.2},
+        {"name": "스시집", "loc": [37.5700, 126.9750], "category": "일식", "rating": 4.8},
+        {"name": "중화요리", "loc": [37.5630, 126.9700], "category": "중식", "rating": 4.0}
+    ]
+
+    categoryColors = {"한식": "red", "양식": "blue", "일식": "green", "중식": "orange"}
+    categoryIcons = {"한식": "🍚", "양식": "🍝", "일식": "🍣", "중식": "🥟"}
+
+    foodMap = folium.Map(location=seoulLoc, zoom_start=14)
+
+    for rest in restaurants:
+        cat = rest["category"]
+        htmlPopup = f"""
+        <div style="font-family: Arial; width: 150px;">
+            <h4>{categoryIcons[cat]} {rest['name']}</h4>
+            <p>카테고리: {cat}</p>
+            <p>평점: {'⭐' * int(rest['rating'])} {rest['rating']}</p>
+        </div>
+        """
+
+        folium.Marker(
+            location=rest["loc"],
+            popup=folium.Popup(htmlPopup, max_width=200),
+            tooltip=f"{rest['name']} ({rest['rating']}점)",
+            icon=folium.Icon(color=categoryColors[cat], icon="cutlery", prefix="fa")
+        ).add_to(foodMap)
+
+    foodMap
+  exercise:
+    prompt: 10단계. 완성 예제 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      restaurants = [
+          {"name": "한식당", "loc": [37.5665, 126.9780], "category": "한식", "rating": 4.5},
+          {"name": "이탈리안", "loc": [37.5600, 126.9850], "category": "양식", "rating": 4.2},
+          {"name": "스시집", "loc": [37.5700, 126.9750], "category": "일식", "rating": 4.8},
+          {"name": "중화요리", "loc": [37.5630, 126.9700], "category": "중식", "rating": 4.0}
+      ]
+
+      categoryColors = {"한식": "red", "양식": "blue", "일식": "green", "중식": "orange"}
+      categoryIcons = {"한식": "🍚", "양식": "🍝", "일식": "🍣", "중식": "🥟"}
+
+      foodMap = folium.Map(location=seoulLoc, zoom_start=14)
+
+      for rest in restaurants:
+          cat = rest["category"]
+          htmlPopup = f"""
+          <div style="font-family: Arial; width: 150px;">
+              <h4>{categoryIcons[cat]} {rest['name']}</h4>
+              <p>카테고리: {cat}</p>
+              <p>평점: {'⭐' * int(rest['rating'])} {rest['rating']}</p>
+          </div>
+          """
+
+          folium.Marker(
+              location=rest["loc"],
+              popup=folium.Popup(htmlPopup, max_width=200),
+              tooltip=f"{rest['name']} ({rest['rating']}점)",
+              icon=folium.Icon(color=categoryColors[cat], icon="cutlery", prefix="fa")
+          ).add_to(foodMap)
+
+      foodMap
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 10단계. 완성 예제의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 10단계. 완성 예제 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step11_workflow
+  title: 11단계. 실무 마커 설계 검증
+  structuredPrimary: true
+  subtitle: 예측 → 오류 확인 → 렌더 검증 → 수정 실험
+  goal: 11단계. 실무 마커 설계 검증에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    마커 커스터마이징은 예쁘게 보이는 것으로 끝나지 않습니다. 업무 지도에서는 지점 카테고리, 위험도, 팝업 정보가 빠짐없이 연결되어야 하고, 정의하지 않은 카테고리는 조용히 기본값으로 넘어가지 말고 오류로 확인해야 합니다.
+
+    마커 표현은 디자인 문제가 아니라 데이터 계약 문제입니다. 카테고리 매핑, 좌표 범위, 팝업 핵심 정보, 위험도 기준을 코드로 검증하면 지도 결과물을 업무 리포트로 믿고 사용할 수 있습니다.
+  tips:
+  - 마커 표현은 디자인 문제가 아니라 데이터 계약 문제입니다. 카테고리 매핑, 좌표 범위, 팝업 핵심 정보, 위험도 기준을 코드로 검증하면 지도 결과물을 업무 리포트로 믿고 사용할
+    수 있습니다.
+  snippet: |-
+    operationSites = [
+        {"name": "강남 플래그십", "loc": [37.4979, 127.0276], "category": "store", "riskScore": 82, "owner": "영업"},
+        {"name": "성수 물류허브", "loc": [37.5446, 127.0557], "category": "warehouse", "riskScore": 64, "owner": "물류"},
+        {"name": "마포 고객센터", "loc": [37.5663, 126.9019], "category": "support", "riskScore": 48, "owner": "CS"},
+        {"name": "여의도 팝업존", "loc": [37.5219, 126.9245], "category": "store", "riskScore": 71, "owner": "마케팅"},
+    ]
+
+    markerStyle = {
+        "store": {"color": "red", "icon": "shopping-cart", "prefix": "fa"},
+        "warehouse": {"color": "blue", "icon": "home", "prefix": "glyphicon"},
+        "support": {"color": "green", "icon": "info-sign", "prefix": "glyphicon"},
+    }
+
+    highRiskNames = [site["name"] for site in operationSites if site["riskScore"] >= 70]
+    highRiskNames
+  exercise:
+    prompt: 11단계. 실무 마커 설계 검증 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      operationSites = [
+          {"name": "강남 플래그십", "loc": [37.4979, 127.0276], "category": "store", "riskScore": 82, "owner": "영업"},
+          {"name": "성수 물류허브", "loc": [37.5446, 127.0557], "category": "warehouse", "riskScore": 64, "owner": "물류"},
+          {"name": "마포 고객센터", "loc": [37.5663, 126.9019], "category": "support", "riskScore": 48, "owner": "CS"},
+          {"name": "여의도 팝업존", "loc": [37.5219, 126.9245], "category": "store", "riskScore": 71, "owner": "마케팅"},
+      ]
+
+      markerStyle = {
+          "store": {"color": "red", "icon": "shopping-cart", "prefix": "fa"},
+          "warehouse": {"color": "blue", "icon": "home", "prefix": "glyphicon"},
+          "support": {"color": "green", "icon": "info-sign", "prefix": "glyphicon"},
+      }
+
+      highRiskNames = [site["name"] for site in operationSites if site["riskScore"] >= 70]
+      highRiskNames
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 11단계. 실무 마커 설계 검증의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 11단계. 실무 마커 설계 검증 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 마커 표현
+  goal: 실습에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
+
+    각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  snippet: |-
+    import folium
+    tourCourse = [
+        {"order": 1, "name": "경복궁", "loc": [37.5796, 126.9770]},
+        {"order": 2, "name": "인사동", "loc": [37.5742, 126.9858]},
+        {"order": 3, "name": "명동", "loc": [37.5636, 126.9869]},
+        {"order": 4, "name": "남산타워", "loc": [37.5512, 126.9882]}
+    ]
+    tourCourse
+  exercise:
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import folium
+      tourCourse = [
+          {"order": 1, "name": "경복궁", "loc": [37.5796, 126.9770]},
+          {"order": 2, "name": "인사동", "loc": [37.5742, 126.9858]},
+          {"order": 3, "name": "명동", "loc": [37.5636, 126.9869]},
+          {"order": 4, "name": "남산타워", "loc": [37.5512, 126.9882]}
+      ]
+      tourCourse
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 실습에서 \`tourCourse\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 \`tourCourse\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: folium_02-marker-semantics-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - practice
+    title: marker 표현 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: marker 색·icon·popup이 같은 범주 의미를 일관되게 전달하는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_marker_semantics(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_marker_semantics(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_marker_semantics(rows):
+            required = ['longitude', 'latitude', 'status']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'status'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['longitude'] for row in usable]
+            y_values = [row['latitude'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.folium.folium_02.marker-semantics-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.folium.folium_02.marker-semantics-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_marker_semantics
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - longitude: 127.0
+              latitude: 37.5
+              status: open
+            - longitude: 127.1
+              latitude: 37.6
+              status: closed
+            - longitude: 127.2
+              latitude: 37.7
+              status: open
+          expectedReturn:
+            usableCount: 3
+            excludedCount: 0
+            groupCounts:
+              closed: 1
+              open: 2
+            xExtent:
+            - 127.0
+            - 127.2
+            yExtent:
+            - 37.5
+            - 37.7
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: folium_02-marker-semantics-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - folium_02-marker-semantics-data-evidence-mastery
+    title: marker 표현 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 시설 운영 상태를 color와 icon 중복 encoding, 안전한 popup으로 표시한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_marker_semantics(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_marker_semantics(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_marker_semantics(candidate):
+            expected = {'mark': 'semantic-markers', 'x': 'longitude', 'y': 'latitude', 'group': 'status', 'transforms': ['popup-sanitize', 'status-style'], 'interaction': 'popup'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.folium.folium_02.marker-semantics-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.folium.folium_02.marker-semantics-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_marker_semantics
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: semantic-markers
+              x: longitude
+              y: latitude
+              group: status
+              transforms:
+              - popup-sanitize
+              - status-style
+              interaction: popup
+              description: 시설 운영 상태를 color와 icon 중복 encoding, 안전한 popup으로 표시한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: semantic-markers
+              x: longitude
+              y: latitude
+              group: status
+              transforms:
+              - popup-sanitize
+              - status-style
+              interaction: popup
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: latitude
+              y: longitude
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - interaction
+            - description
+            encoding:
+              mark: semantic-markers
+              x: longitude
+              y: latitude
+              group: status
+              transforms:
+              - popup-sanitize
+              - status-style
+              interaction: popup
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: folium_02-marker-semantics-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - folium_02-marker-semantics-encoding-transfer-transfer
+    title: marker 표현 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: marker 색·icon·popup이 같은 범주 의미를 일관되게 전달하는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_marker_semantics(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_marker_semantics(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_marker_semantics(situation):
+            table = {'status-category': {'encoding': 'color plus icon', 'evidence': 'legend', 'risk': 'color-only'}, 'exact-detail': {'encoding': 'popup plus accessible list', 'evidence': 'sanitized fields', 'risk': 'HTML injection'}, 'many-statuses': {'encoding': 'filter layers', 'evidence': 'visible active state', 'risk': 'legend overload'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.folium.folium_02.marker-semantics-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.folium.folium_02.marker-semantics-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_marker_semantics
+        cases:
+        - id: recalls-status-category
+          arguments:
+          - value: status-category
+          expectedReturn:
+            encoding: color plus icon
+            evidence: legend
+            risk: color-only
+        - id: recalls-exact-detail
+          arguments:
+          - value: exact-detail
+          expectedReturn:
+            encoding: popup plus accessible list
+            evidence: sanitized fields
+            risk: HTML injection
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

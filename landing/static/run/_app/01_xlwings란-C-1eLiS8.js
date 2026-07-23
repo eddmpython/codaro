@@ -1,0 +1,451 @@
+var e=`meta:
+  id: excel_01
+  title: Excel 로컬 자동화 입문
+  order: 1
+  category: excel
+  badge: 입문
+  packages:
+  - openpyxl
+  outcomes: ["automation.excel.intro"]
+  prerequisites: ["python.functions"]
+  estimatedMinutes: 30
+  tags:
+  - excel
+  - openpyxl
+  - 워크북
+  - 로컬Python
+  - 자동화
+  seo:
+    title: Excel 로컬 자동화 입문 - 로컬 Python 엑셀 자동화
+    description: openpyxl과 pandas로 로컬 Excel 파일을 만들고 검증하는 실무형 커리큘럼입니다.
+    keywords:
+    - excel
+    - openpyxl
+    - 워크북
+    - 로컬Python
+    - 자동화
+intro:
+  direction: Excel 로컬 자동화 입문에서 엑셀 파일과 셀 범위를 읽고 쓰며 결과 파일을 검증합니다.
+  benefits:
+  - 워크북과 시트 확인 후 셀/범위 조작에 맞는 코드 입력을 고릅니다.
+  - Excel 로컬 자동화 입문 결과를 저장 파일과 셀 값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 파일 자동화에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 로컬 Excel 자동 입력 확인
+      detail: 입력 기준(워크북과 시트)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 워크북 만들기 처리 실행
+      detail: 셀/범위 조작 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 워크북 검증 루프 결과 검증
+      detail: 저장 파일과 셀 값 기준으로 실행 결과를 비교합니다.
+    - label: Excel 로컬 자동화 입문 재사용
+      detail: 완성 코드를 업무 파일 자동화에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 엑셀 자동화 환경
+      detail: openpyxl 기준으로 로컬 Python 실행을 준비합니다.
+    - label: Excel 로컬 자동화 입문 실행
+      detail: 셀을 실행해 저장 파일과 셀 값와 예외 상태를 확인합니다.
+    - label: Excel 로컬 자동화 입문 완료
+      detail: 검증된 코드를 업무 파일 자동화로 남깁니다.
+sections:
+- id: intro
+  title: 1단계. 로컬 Excel 자동화의 기준
+  subtitle: 앱 제어 대신 파일 기반 자동화
+  blocks:
+  - type: text
+    content: 로컬 Python 커리큘럼에서는 Excel 프로그램을 직접 조종하기보다, xlsx 파일을 코드로 생성하고 검증하는 흐름을 먼저 배웁니다. 이 방식은 CI와 서버에서도
+      재현 가능하고, 사용자가 같은 파일을 업무에 바로 가져갈 수 있습니다.
+  - type: tip
+    content: Excel 앱 제어가 필요한 특수 업무는 나중에 선택지로 다루고, 기본 커리큘럼은 openpyxl/pandas 파일 자동화를 기준으로 잡습니다.
+  goal: 1단계. 로컬 Excel 자동화의 기준에서 워크북과 시트을 바꿨을 때 저장 파일과 셀 값가 어떻게 달라지는지 확인한다.
+  why: 엑셀 자동화는 반복 보고서와 정산 파일을 코드로 재현하는 실무 흐름입니다.
+- id: create_workbook
+  title: 2단계. 워크북 만들기
+  structuredPrimary: true
+  subtitle: Workbook과 Worksheet
+  goal: 2단계. 워크북 만들기에서 셀/범위 조작 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 2단계. 워크북 만들기의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    from openpyxl import Workbook, load_workbook
+
+    excelTemp = TemporaryDirectory()
+    excelRoot = Path(excelTemp.name)
+    salesPath = excelRoot / "sales_report.xlsx"
+
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = "sales"
+    sheet.append(["date", "region", "product", "amount"])
+    sheet.append(["2026-05-01", "Seoul", "Notebook", 1250000])
+    sheet.append(["2026-05-02", "Busan", "Monitor", 420000])
+    sheet.append(["2026-05-03", "Seoul", "Keyboard", 180000])
+    workbook.save(salesPath)
+
+    assert salesPath.exists()
+    salesPath
+  exercise:
+    prompt: 2단계. 워크북 만들기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      from openpyxl import Workbook, load_workbook
+
+      excelTemp = TemporaryDirectory()
+      excelRoot = Path(excelTemp.name)
+      salesPath = excelRoot / "sales_report.xlsx"
+
+      workbook = Workbook()
+      sheet = workbook.active
+      sheet.title = "sales"
+      sheet.append(["date", "region", "product", "amount"])
+      sheet.append(["2026-05-01", "Seoul", "Notebook", 1250000])
+      sheet.append(["2026-05-02", "Busan", "Monitor", 420000])
+      sheet.append(["2026-05-03", "Seoul", "Keyboard", 180000])
+      workbook.save(salesPath)
+
+      assert salesPath.exists()
+      salesPath
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 2단계. 워크북 만들기에서 \`excelTemp\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. 워크북 만들기에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+- id: workflow_validation
+  title: 3단계. 워크북 검증 루프
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  goal: 3단계. 워크북 검증 루프에서 셀/범위 조작 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 엑셀 자동화는 파일이 만들어졌다는 사실보다, 사용자가 열었을 때 믿을 수 있는 구조인지가 중요합니다. 필수 컬럼과 금액 규칙을 검증하고, 잘못된 금액이 들어왔을
+    때 명확하게 실패시키는 흐름을 만듭니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def validateSalesWorksheet(worksheet):
+        headers = [cell.value for cell in worksheet[1]]
+        requiredHeaders = ["date", "region", "product", "amount"]
+        if headers != requiredHeaders:
+            raise ValueError(f"헤더가 다릅니다: {headers}")
+        amounts = [row[3] for row in worksheet.iter_rows(min_row=2, values_only=True)]
+        assert all(amount > 0 for amount in amounts)
+        return {"rowCount": len(amounts), "totalAmount": sum(amounts)}
+
+    loadedSheet = load_workbook(salesPath)["sales"]
+    salesValidation = validateSalesWorksheet(loadedSheet)
+    assert salesValidation["rowCount"] == 3
+    salesValidation
+  exercise:
+    prompt: 3단계. 워크북 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def validateSalesWorksheet(worksheet):
+          headers = [cell.value for cell in worksheet[1]]
+          requiredHeaders = ["date", "region", "product", "amount"]
+          if headers != requiredHeaders:
+              raise ValueError(f"헤더가 다릅니다: {headers}")
+          amounts = [row[3] for row in worksheet.iter_rows(min_row=2, values_only=True)]
+          assert all(amount > 0 for amount in amounts)
+          return {"rowCount": len(amounts), "totalAmount": sum(amounts)}
+
+      loadedSheet = load_workbook(salesPath)["sales"]
+      salesValidation = validateSalesWorksheet(loadedSheet)
+      assert salesValidation["rowCount"] == 3
+      salesValidation
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: 3단계. 워크북 검증 루프의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 3단계. 워크북 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: summary
+  title: 정리
+  subtitle: 파일 자동화의 기본 완주 조건
+  blocks:
+  - type: text
+    content: 이번 레슨에서는 로컬 xlsx 파일을 만들고, 시트 구조와 금액 규칙을 검증하고, 기준을 바꿔 지역별 요약을 만드는 흐름을 완성했습니다.
+  goal: 정리에서 워크북과 시트을 바꿨을 때 저장 파일과 셀 값가 어떻게 달라지는지 확인한다.
+  why: 엑셀 자동화는 반복 보고서와 정산 파일을 코드로 재현하는 실무 흐름입니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: excel_01-excel-tool-selection-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - summary
+    title: Excel 업무에 openpyxl·xlwings를 근거로 선택하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: Desktop Excel 의존성과 artifact 요구에서 도구를 결정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 익숙한 도구가 아니라 작업 capability로 선택하세요.
+    - Web에서 연습할 판단과 Local에서 필요한 Excel 효과를 함께 반환하세요.
+    exercise:
+      prompt: choose_excel_tool(requirements)를 완성하세요.
+      starterCode: |-
+        def choose_excel_tool(requirements):
+            raise NotImplementedError
+      solution: |
+        def choose_excel_tool(requirements):
+            desktop_reasons = []
+            if requirements.get("liveExcel"):
+                desktop_reasons.append("live-excel")
+            if requirements.get("macro"):
+                desktop_reasons.append("macro")
+            if requirements.get("UDF"):
+                desktop_reasons.append("udf")
+            tool = "xlwings" if desktop_reasons else "openpyxl"
+            return {"tool": tool, "desktopReasons": desktop_reasons, "webPractice": ["sheet schema", "formula contract", "business reconciliation"]}
+      hints: *id001
+    check:
+      id: python.excel.excel_01.excel-tool-selection.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.excel.excel_01.excel-tool-selection.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_excel_tool
+        cases:
+        - id: chooses-portable-artifact-tool
+          arguments:
+          - value:
+              createXlsx: true
+          expectedReturn:
+            tool: openpyxl
+            desktopReasons: []
+            webPractice:
+            - sheet schema
+            - formula contract
+            - business reconciliation
+        - id: chooses-live-excel-control
+          arguments:
+          - value:
+              liveExcel: true
+              macro: true
+          expectedReturn:
+            tool: xlwings
+            desktopReasons:
+            - live-excel
+            - macro
+            webPractice:
+            - sheet schema
+            - formula contract
+            - business reconciliation
+        - id: chooses-udf-runtime
+          arguments:
+          - value:
+              UDF: true
+          expectedReturn:
+            tool: xlwings
+            desktopReasons:
+            - udf
+            webPractice:
+            - sheet schema
+            - formula contract
+            - business reconciliation
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: excel_01-excel-tool-tradeoff-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - excel_01-excel-tool-selection-mastery
+    title: 새 업무 제약에 Excel 도구 선택 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 운영체제·병렬성·렌더 요구를 점수화한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 운영 제약마다 선택 근거와 가중치를 드러내세요.
+    - 동점 규칙도 결정론적으로 고정하세요.
+    exercise:
+      prompt: score_excel_tools(constraints)를 완성하세요.
+      starterCode: |-
+        def score_excel_tools(constraints):
+            raise NotImplementedError
+      solution: |
+        def score_excel_tools(constraints):
+            scores = {"openpyxl": 0, "xlwings": 0}
+            reasons = []
+            if constraints.get("crossPlatform"):
+                scores["openpyxl"] += 2
+                reasons.append("cross-platform")
+            if constraints.get("parallelWorkers", 1) > 1:
+                scores["openpyxl"] += 2
+                reasons.append("parallel-workers")
+            if constraints.get("exactExcelRender"):
+                scores["xlwings"] += 3
+                reasons.append("excel-render")
+            if constraints.get("macro"):
+                scores["xlwings"] += 3
+                reasons.append("macro")
+            selected = sorted(scores, key=lambda key: (-scores[key], key))[0]
+            return {"selected": selected, "scores": scores, "reasons": reasons}
+      hints: *id002
+    check:
+      id: python.excel.excel_01.excel-tool-tradeoff.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.excel.excel_01.excel-tool-tradeoff.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: score_excel_tools
+        cases:
+        - id: selects-cross-platform
+          arguments:
+          - value:
+              crossPlatform: true
+              parallelWorkers: 4
+          expectedReturn:
+            selected: openpyxl
+            scores:
+              openpyxl: 4
+              xlwings: 0
+            reasons:
+            - cross-platform
+            - parallel-workers
+        - id: selects-excel-render
+          arguments:
+          - value:
+              exactExcelRender: true
+          expectedReturn:
+            selected: xlwings
+            scores:
+              openpyxl: 0
+              xlwings: 3
+            reasons:
+            - excel-render
+        - id: resolves-tie-deterministically
+          arguments:
+          - value: {}
+          expectedReturn:
+            selected: openpyxl
+            scores:
+              openpyxl: 0
+              xlwings: 0
+            reasons: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: excel_01-excel-tool-rule-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - excel_01-excel-tool-tradeoff-transfer
+    title: Excel 도구 선택 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: artifact와 Desktop automation 경계를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 파일 생성과 Desktop Excel 제어를 같은 capability로 취급하지 마세요.
+    - 각 도구 선택에는 검증 evidence와 남는 risk가 있습니다.
+    exercise:
+      prompt: recall_excel_tool(use_case)를 완성하세요.
+      starterCode: |-
+        def recall_excel_tool(use_case):
+            raise NotImplementedError
+      solution: |
+        def recall_excel_tool(use_case):
+            table = {"xlsx-artifact": {"tool": "openpyxl", "evidence": "reopened workbook", "risk": "render differs from Excel"}, "live-session": {"tool": "xlwings", "evidence": "pid and workbook path", "risk": "wrong Excel instance"}, "macro": {"tool": "xlwings", "evidence": "signed allowlisted call", "risk": "untrusted code"}}
+            if use_case not in table:
+                raise ValueError("unknown use case")
+            return table[use_case]
+      hints: *id003
+    check:
+      id: python.excel.excel_01.excel-tool-rule-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.excel.excel_01.excel-tool-rule-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: recall_excel_tool
+        cases:
+        - id: recalls-artifact
+          arguments:
+          - value: xlsx-artifact
+          expectedReturn:
+            tool: openpyxl
+            evidence: reopened workbook
+            risk: render differs from Excel
+        - id: recalls-live-session
+          arguments:
+          - value: live-session
+          expectedReturn:
+            tool: xlwings
+            evidence: pid and workbook path
+            risk: wrong Excel instance
+        - id: recalls-macro
+          arguments:
+          - value: macro
+          expectedReturn:
+            tool: xlwings
+            evidence: signed allowlisted call
+            risk: untrusted code
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,575 @@
+var e=`meta:
+  id: visionBasics_01
+  title: 픽셀과 ndarray
+  order: 1
+  category: visionBasics
+  difficulty: ⭐
+  badge: 입문
+  packages:
+  - matplotlib
+  - numpy
+  tags:
+  - numpy
+  - ndarray
+  - uint8
+  - 픽셀
+  - 이미지구조
+  seo:
+    title: 이미지 비전 기초 - 픽셀과 ndarray
+    description: 이미지가 numpy 배열로 어떻게 표현되는지 배웁니다. dtype, shape, 채널 수를 직접 만들고 확인합니다.
+    keywords:
+    - numpy
+    - ndarray
+    - 이미지
+    - 픽셀
+    - dtype
+intro:
+  emoji: 🧱
+  goal: 이미지가 numpy의 (H, W, C) 모양 uint8 배열이라는 사실을 직접 만들어 보며 익힙니다.
+  description: |-
+    Pillow나 OpenCV에 들어가기 전에 한 번은 직접 numpy로 이미지를 만들어 봐야 합니다. 이미지는 결국 0부터 255 사이의 숫자가 빽빽하게 채워진 직사각형 표일 뿐이고, 이 표가 \`np.ndarray\` 객체로 메모리에 들어가 있는 것이 전부입니다. 이 강의는 그 표를 직접 만들고 색을 칠하고 모양을 확인합니다.
+  direction: 빈 캔버스를 numpy로 만들고 픽셀을 직접 채워 이미지가 ndarray라는 사실을 손으로 체화합니다.
+  benefits:
+  - 빈 배열에서 색이 있는 이미지를 만들 수 있습니다.
+  - shape, dtype, 채널 수를 보고 이미지의 구조를 즉시 읽을 수 있습니다.
+  - 다음 트랙에서 만나는 Pillow Image와 OpenCV ndarray가 결국 같은 표라는 점을 이해합니다.
+  diagram:
+    steps:
+    - label: 1단계. 빈 캔버스 만들기
+      detail: np.zeros로 (H, W, 3) 모양의 검정 이미지를 만듭니다.
+    - label: 2단계. 픽셀에 색 채우기
+      detail: 전체 또는 일부 영역에 [R, G, B] 값을 대입합니다.
+    - label: 3단계. shape과 dtype 확인
+      detail: 만든 배열의 크기와 자료형이 의도와 같은지 검사합니다.
+    - label: 4단계. matplotlib으로 시각화
+      detail: 숫자 배열을 사람이 볼 수 있는 이미지로 띄웁니다.
+    runtime:
+    - label: numpy 환경
+      detail: numpy와 matplotlib만으로 학습이 진행됩니다. 무거운 비전 라이브러리는 아직 필요 없습니다.
+    - label: 검증 흐름
+      detail: assert와 시각 비교로 학습 결과가 기대값과 같은지 확인합니다.
+sections:
+- id: empty_canvas
+  title: 1단계. 빈 캔버스 만들기
+  structuredPrimary: true
+  subtitle: np.zeros로 만드는 검정 이미지
+  goal: 원하는 크기의 비어 있는 이미지를 numpy로 생성합니다.
+  why: 이미지가 어떤 모양의 배열인지 한 줄로 직접 만들어 봐야 다른 비전 코드가 무엇을 다루는지 보입니다.
+  explanation: |-
+    이미지는 \`(높이, 너비, 채널)\` 모양의 numpy 배열입니다. 채널이 3이면 컬러(빨강·녹색·파랑), 채널이 없으면 흑백입니다. 모든 값이 0인 배열은 완전한 검정 이미지입니다.
+
+    \`np.zeros((200, 300, 3), dtype=np.uint8)\` 은 세로 200, 가로 300, 3채널짜리 검정 이미지를 만듭니다. dtype을 명시하지 않으면 float64로 만들어져 메모리를 8배 더 쓰고 0~255 표현과 어긋나므로 항상 \`np.uint8\`을 지정합니다.
+  tips:
+  - shape의 첫 번째 숫자가 높이(세로 픽셀 수)이고 두 번째가 너비(가로 픽셀 수)입니다. 화면 좌표와 순서가 반대이니 주의합니다.
+  snippet: |-
+    import numpy as np
+
+    canvas = np.zeros((200, 300, 3), dtype=np.uint8)
+    canvas.shape
+  exercise:
+    prompt: canvas의 크기를 세로 100, 가로 400으로 바꾸고 shape이 (100, 400, 3)으로 나오는지 확인하세요.
+    starterCode: |-
+      import numpy as np
+
+      canvas = np.zeros((___, ___, 3), dtype=np.uint8)
+      canvas.shape
+    hints:
+    - 첫 번째 인자가 높이, 두 번째가 너비입니다.
+    - 결과 shape의 마지막 숫자 3은 RGB 채널을 의미합니다.
+  check:
+    noError: canvas가 np.ndarray로 만들어지고 shape 속성에 접근할 수 있어야 합니다.
+    resultCheck: 출력된 shape이 (높이, 너비, 3) 형태의 튜플이어야 합니다.
+- id: paint_pixels
+  title: 2단계. 픽셀에 색 칠하기
+  structuredPrimary: true
+  subtitle: 전체와 일부 영역 색 채우기
+  goal: 빈 캔버스의 전체 또는 일부 영역에 RGB 색을 대입합니다.
+  why: 픽셀이 정말 숫자 세 개로 표현된다는 사실은 직접 색을 칠해 봐야 와닿습니다.
+  explanation: |-
+    \`canvas[:] = [R, G, B]\` 는 모든 픽셀을 같은 색으로 채웁니다. 슬라이싱을 쓰면 사각형 영역만 채울 수 있습니다. matplotlib은 RGB 순서를 사용하므로 빨강은 \`[255, 0, 0]\` 입니다.
+
+    pillow나 OpenCV에서는 같은 일을 메서드로 감추지만, 본질은 "배열의 특정 영역에 숫자 세 개를 대입한다"입니다.
+  tips:
+  - "[255, 0, 0]은 순수 빨강, [0, 255, 0]은 녹색, [0, 0, 255]는 파랑입니다. 세 채널에 같은 값을 주면 회색이 됩니다."
+  snippet: |-
+    plate = np.zeros((120, 360, 3), dtype=np.uint8)
+    plate[:, 0:120] = [255, 0, 0]
+    plate[:, 120:240] = [0, 255, 0]
+    plate[:, 240:360] = [0, 0, 255]
+    plate[0, 0]
+  exercise:
+    prompt: plate의 가운데 녹색 영역을 노란색([255, 255, 0])으로 바꾸고 plate[60, 180] 값으로 확인하세요.
+    starterCode: |-
+      plate = np.zeros((120, 360, 3), dtype=np.uint8)
+      plate[:, 0:120] = [255, 0, 0]
+      plate[:, 120:240] = [___, ___, ___]
+      plate[:, 240:360] = [0, 0, 255]
+      plate[60, 180]
+    hints:
+    - 노란색은 빨강과 녹색이 둘 다 켜진 상태입니다.
+    - plate[60, 180]은 60번째 행, 180번째 열의 픽셀 값입니다.
+  check:
+    noError: 슬라이싱 대입이 ValueError 없이 끝나야 합니다.
+    resultCheck: plate[60, 180]이 [255, 255, 0] 배열로 출력되어야 합니다.
+- id: shape_dtype
+  title: 3단계. shape과 dtype 확인
+  structuredPrimary: true
+  subtitle: 만든 배열의 메타데이터 점검
+  goal: 배열의 shape, dtype, 픽셀 수를 코드로 확인합니다.
+  why: 이미지 처리 버그의 절반은 "내가 다루는 배열의 모양과 자료형이 무엇인지 모름"에서 시작합니다.
+  explanation: |-
+    \`shape\`은 배열의 모양을 튜플로, \`dtype\`은 자료형을 알려줍니다. 픽셀 수는 \`shape\`의 곱 또는 \`size\`로 얻습니다. dtype이 \`uint8\`이 아닌 \`float32\`나 \`int64\`로 잡혀 있으면 imshow가 색을 다르게 해석합니다.
+
+    실무 코드에서는 함수 입력 첫 줄에 \`assert image.dtype == np.uint8\` 같은 점검을 두는 일이 흔합니다. 입력의 모양을 강제하면 깊은 곳에서 발생하는 색깔 깨짐을 조기에 차단합니다.
+  tips:
+  - "shape이 2차원이면 흑백, 3차원이면 컬러입니다. 알파 채널까지 포함하면 마지막 차원이 4가 됩니다."
+  snippet: |-
+    info = {
+        "shape": plate.shape,
+        "dtype": str(plate.dtype),
+        "pixels": plate.size,
+        "channels": plate.shape[-1],
+    }
+    info
+  exercise:
+    prompt: dtype을 np.float32로 바꾼 새 캔버스 floatCanvas를 만들고 정보를 비교하세요.
+    starterCode: |-
+      floatCanvas = np.zeros((50, 50, 3), dtype=___)
+      {"shape": floatCanvas.shape, "dtype": str(floatCanvas.dtype)}
+    hints:
+    - np.float32는 32비트 부동소수입니다.
+    - dtype을 바꾸면 같은 픽셀이라도 메모리 사용량이 달라집니다.
+  check:
+    noError: 사전 만들기와 속성 접근이 오류 없이 끝나야 합니다.
+    resultCheck: 출력된 dict에 shape, dtype, pixels, channels 키가 들어 있어야 합니다.
+- id: visualize
+  title: 4단계. matplotlib으로 시각화
+  structuredPrimary: true
+  subtitle: 숫자 배열을 이미지로 띄우기
+  goal: 만든 배열을 사람이 볼 수 있는 이미지로 출력합니다.
+  why: 코드로 만든 픽셀이 화면에서 의도한 색으로 나오는지 시각화 없이는 확신할 수 없습니다.
+  explanation: |-
+    \`matplotlib.pyplot.imshow\`는 numpy 배열을 그림으로 그립니다. uint8이면 그대로, float이면 0~1 범위라고 가정합니다. \`plt.axis('off')\` 로 축 눈금을 없애야 사진처럼 보입니다.
+
+    노트북 환경에서는 셀의 마지막 라인이 자동으로 출력되므로 \`plt.show()\` 호출이 필수는 아닙니다. 대신 figure 객체를 마지막에 두면 인라인으로 렌더링됩니다.
+  tips:
+  - imshow는 자료형에 따라 값 범위를 다르게 해석합니다. dtype을 항상 의도와 일치시키세요.
+  snippet: |-
+    import matplotlib.pyplot as plt
+
+    fig = plt.figure(figsize=(6, 2))
+    plt.imshow(plate)
+    plt.title(f"plate {plate.shape}")
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: 새 캔버스 stripes를 만들어 가로 줄무늬 세 개(빨강, 흰색, 파랑)를 그리고 imshow로 확인하세요.
+    starterCode: |-
+      stripes = np.zeros((150, 200, 3), dtype=np.uint8)
+      stripes[0:50, :] = [255, 0, 0]
+      stripes[50:100, :] = [___, ___, ___]
+      stripes[100:150, :] = [0, 0, 255]
+      fig2 = plt.figure(figsize=(4, 3))
+      plt.imshow(stripes)
+      plt.axis('off')
+      fig2
+    hints:
+    - 흰색은 세 채널 모두 255입니다.
+    - 행 슬라이싱 [0:50, :] 은 처음 50줄 전체를 의미합니다.
+  check:
+    noError: imshow가 호출되고 figure가 마지막 줄에 평가되어야 합니다.
+    resultCheck: stripes의 행 영역별 색이 의도한 색과 일치해야 합니다.
+- id: bridge
+  title: 5단계. Pillow / OpenCV로의 연결
+  structuredPrimary: true
+  subtitle: 다음 트랙 미리보기
+  goal: 다음 트랙에서 다룰 라이브러리가 결국 같은 ndarray를 다룬다는 사실을 확인합니다.
+  why: 라이브러리 이름이 달라도 메모리 안에서는 numpy 배열이라는 동일한 객체임을 인지하면 학습 속도가 빨라집니다.
+  explanation: |-
+    Pillow의 \`Image\` 객체는 내부에서 픽셀 데이터를 보관하다가 \`np.array(im)\`을 호출하면 ndarray를 반환합니다. OpenCV는 처음부터 ndarray를 직접 다루며 단지 채널 순서가 BGR입니다.
+
+    아래 코드는 numpy 배열에서 Pillow Image로, 다시 ndarray로 왕복하는 흐름입니다. 어느 단계에서도 픽셀 데이터의 정체는 같습니다.
+  tips:
+  - OpenCV의 cv2.cvtColor(plate, cv2.COLOR_RGB2BGR)는 마지막 차원의 순서를 뒤집는 한 줄 연산입니다. 이 트랙에서 직접 슬라이싱으로 같은 일을 해 볼 것입니다.
+  snippet: |-
+    bridged = plate[:, :, ::-1]
+    bridged.shape, bridged[0, 0]
+  exercise:
+    prompt: plate의 모든 픽셀의 채널 순서를 뒤집어 bgrPlate를 만들고 [0, 0] 픽셀 값으로 RGB와 BGR이 어떻게 달라졌는지 확인하세요.
+    starterCode: |-
+      bgrPlate = plate[:, :, ___]
+      bgrPlate[0, 0]
+    hints:
+    - "[::-1]은 마지막 축을 뒤집습니다."
+    - 빨강이 RGB에서 [255, 0, 0]이면 BGR에서는 [0, 0, 255]입니다.
+  check:
+    noError: 슬라이싱이 ValueError 없이 끝나야 합니다.
+    resultCheck: bgrPlate[0, 0]이 [0, 0, 255]로 출력되어야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 직접 픽셀 디자인하기
+  goal: 배운 개념(생성·대입·시각화)으로 작은 디자인 한 장을 만듭니다.
+  why: 새 개념은 직접 한 장면을 처음부터 끝까지 그려 봐야 머리에 박힙니다.
+  explanation: |-
+    아래 두 미션을 통해 픽셀 배열을 자유롭게 다루는 감각을 만듭니다. 미션마다 새 변수명을 사용해 셀 간 충돌을 막습니다.
+
+    각 미션은 import문부터 시작하지만, 위 예제를 실행했다면 이미 라이브러리가 로딩되어 있으므로 import는 생략해도 됩니다.
+  tips:
+  - 한 셀 안에서는 변수 재할당이 가능하지만, 다른 셀에서는 이미 만든 변수에 다시 대입할 수 없습니다.
+  snippet: |-
+    flag = np.zeros((180, 270, 3), dtype=np.uint8)
+    flag[0:60, :] = [0, 0, 0]
+    flag[60:120, :] = [200, 16, 46]
+    flag[120:180, :] = [255, 206, 0]
+    plt.figure(figsize=(5, 3))
+    plt.imshow(flag)
+    plt.axis('off')
+  exercise:
+    prompt: "미션1: 9개 색 격자판 colorGrid(360x360x3)를 만들어 3x3 셀 각각에 다른 색을 칠하세요. 미션2: 좌상단에서 우하단으로 가는 대각 그라데이션 grad(200x200x3)을 만드세요(R 채널 = 행 인덱스, G 채널 = 열 인덱스)."
+    starterCode: |-
+      colorGrid = np.zeros((360, 360, 3), dtype=np.uint8)
+      for rowIdx in range(3):
+          for colIdx in range(3):
+              y0, y1 = rowIdx * 120, (rowIdx + 1) * 120
+              x0, x1 = colIdx * 120, (colIdx + 1) * 120
+              colorGrid[y0:y1, x0:x1] = [
+                  rowIdx * 110,
+                  colIdx * 110,
+                  (rowIdx + colIdx) * 60,
+              ]
+      gridFig = plt.figure(figsize=(4, 4))
+      plt.imshow(colorGrid)
+      plt.axis('off')
+      gridFig
+    hints:
+    - 이중 for문으로 행과 열 위치를 계산합니다.
+    - 그라데이션은 np.indices나 np.mgrid로 좌표 격자를 만들면 더 깔끔하지만, 명시적 슬라이싱으로도 충분합니다.
+  check:
+    noError: 격자 채우기와 figure 평가가 오류 없이 끝나야 합니다.
+    resultCheck: colorGrid의 [60, 60] 픽셀과 [300, 300] 픽셀이 서로 다른 RGB 값이어야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: visionBasics_01-pixel_array-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - empty_canvas
+    - practice
+    title: 픽셀과 ndarray 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 이미지 shape·dtype·channel 불변식을 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_pixel_array_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_pixel_array_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_pixel_array_contract(value):
+            required = ['shape', 'dtype', 'channels']
+            rules = [{'id': 'shape-rank', 'field': 'shape', 'kind': 'length', 'value': 3}, {'id': 'dtype', 'field': 'dtype', 'kind': 'enum', 'values': ['uint8', 'float32']}, {'id': 'channels', 'field': 'channels', 'kind': 'range', 'min': 1, 'max': 4}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'pixel_array', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.vision-basics.visionBasics_01.pixel_array-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_01.pixel_array-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_pixel_array_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              shape:
+              - 480
+              - 640
+              - 3
+              dtype: uint8
+              channels: 3
+          expectedReturn:
+            accepted: true
+            topic: pixel_array
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              dtype: uint8
+              channels: 3
+          expectedReturn:
+            accepted: false
+            topic: pixel_array
+            missing:
+            - shape
+            violations:
+            - shape-rank
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              shape:
+              - 480
+              - 640
+              dtype: float64
+              channels: 5
+          expectedReturn:
+            accepted: false
+            topic: pixel_array
+            missing: []
+            violations:
+            - channels
+            - dtype
+            - shape-rank
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: visionBasics_01-pixel_array-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionBasics_01-pixel_array-contract-audit-mastery
+    title: 픽셀과 ndarray 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_pixel_array_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_pixel_array_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_pixel_array_result(expected, observed):
+            identity = ['sourceHash', 'colorOrder']
+            metrics = {'pixelCount': 0}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'pixel_array', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.vision-basics.visionBasics_01.pixel_array-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_01.pixel_array-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_pixel_array_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              sourceHash: h1
+              colorOrder: RGB
+              pixelCount: 307200
+          - value:
+              sourceHash: h1
+              colorOrder: RGB
+              pixelCount: 307200
+          expectedReturn:
+            passed: true
+            topic: pixel_array
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              sourceHash: h1
+              colorOrder: RGB
+              pixelCount: 307200
+          - value:
+              sourceHash: h2
+              colorOrder: BGR
+              pixelCount: 300000
+          expectedReturn:
+            passed: false
+            topic: pixel_array
+            missing: []
+            identityMismatch:
+            - colorOrder
+            - sourceHash
+            metricDrift:
+            - pixelCount
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              sourceHash: h1
+              colorOrder: RGB
+              pixelCount: 307200
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: pixel_array
+            missing:
+            - colorOrder
+            - pixelCount
+            - sourceHash
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: visionBasics_01-pixel_array-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionBasics_01-pixel_array-result-reconciliation-transfer
+    title: 픽셀과 ndarray 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_pixel_array_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_pixel_array_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_pixel_array_evidence(stage):
+            stages = {'input': {'action': 'validate pixel array input contract', 'evidence': 'shape dtype channel manifest', 'risk': 'misinterpreted pixels'}, 'process': {'action': 'apply bounded pixel array operation', 'evidence': 'bounded index trace', 'risk': 'silent shape or range drift'}, 'result': {'action': 'reconcile pixel array result', 'evidence': 'pixel count and source hash', 'risk': 'plausible but wrong image'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.vision-basics.visionBasics_01.pixel_array-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_01.pixel_array-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_pixel_array_evidence
+        cases:
+        - id: recalls-input
+          arguments:
+          - value: input
+          expectedReturn:
+            action: validate pixel array input contract
+            evidence: shape dtype channel manifest
+            risk: misinterpreted pixels
+        - id: recalls-process
+          arguments:
+          - value: process
+          expectedReturn:
+            action: apply bounded pixel array operation
+            evidence: bounded index trace
+            risk: silent shape or range drift
+        - id: recalls-result
+          arguments:
+          - value: result
+          expectedReturn:
+            action: reconcile pixel array result
+            evidence: pixel count and source hash
+            risk: plausible but wrong image
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

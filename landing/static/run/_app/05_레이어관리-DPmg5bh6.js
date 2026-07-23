@@ -1,0 +1,1186 @@
+var e=`meta:
+  packages:
+  - folium
+  id: folium_05
+  title: 레이어 관리
+  order: 5
+  category: folium
+  difficulty: ⭐⭐
+  badge: 기초
+  tags:
+  - folium
+  - FeatureGroup
+  - LayerControl
+  - 레이어
+  - 그룹
+  seo:
+    title: Folium 레이어 관리 - FeatureGroup과 LayerControl
+    description: Folium으로 레이어를 그룹화하고 토글합니다. FeatureGroup과 LayerControl로 지도 요소를 관리합니다.
+    keywords:
+    - folium
+    - FeatureGroup
+    - LayerControl
+    - 레이어
+    - 그룹화
+intro:
+  emoji: 📚
+  goal: 여러 레이어를 그룹으로 관리하고 토글합니다.
+  description: 지도에 많은 요소가 있으면 관리가 어렵습니다. FeatureGroup으로 요소를 그룹화하고 LayerControl로 켜고 끌 수 있게 합니다. 카테고리별로
+    마커를 분류하고 사용자가 원하는 것만 표시합니다.
+  direction: 레이어 관리에서 위치 데이터를 지도 레이어로 배치하고 마커/영역 표시를 검증합니다.
+  benefits:
+  - 위도/경도 데이터 확인 후 지도 레이어 구성에 맞는 코드 입력을 고릅니다.
+  - 레이어 관리 결과를 마커와 저장 HTML 기준으로 즉시 점검합니다.
+  - 완료한 코드를 위치 기반 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(위도/경도 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. FeatureGrou 처리 실행
+      detail: 지도 레이어 구성 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 여러 그룹 만들기 결과 검증
+      detail: 마커와 저장 HTML 기준으로 실행 결과를 비교합니다.
+    - label: 레이어 관리 재사용
+      detail: 완성 코드를 위치 기반 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 지도 시각화 환경
+      detail: folium 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 레이어 관리 실행
+      detail: 셀을 실행해 마커와 저장 HTML와 예외 상태를 확인합니다.
+    - label: 레이어 관리 완료
+      detail: 검증된 코드를 위치 기반 리포트로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: folium과 Codaro를 불러옵니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: import folium
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: import folium
+    hints:
+    - 바꿀 지점은 위도/경도 데이터을 만드는 첫 줄과 지도 레이어 구성 줄에서 찾으세요.
+    - 실행 뒤 마커와 저장 HTML 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 마커와 저장 HTML 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step2_feature_group
+  title: 2단계. FeatureGroup 생성
+  structuredPrimary: true
+  subtitle: FeatureGroup()
+  goal: 2단계. FeatureGroup 생성에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    FeatureGroup()은 여러 요소를 하나의 그룹으로 묶습니다. 그룹 단위로 표시/숨김을 제어할 수 있습니다.
+
+    마커를 그룹에 추가하고(add_to(group)), 그룹을 지도에 추가합니다(add_to(map)).
+  snippet: |-
+    seoulCenter = [37.5665, 126.9780]
+    m1 = folium.Map(location=seoulCenter, zoom_start=13)
+
+    cafeGroup = folium.FeatureGroup(name="카페")
+
+    cafes = [
+        [37.5665, 126.9780],
+        [37.5700, 126.9750],
+        [37.5630, 126.9820]
+    ]
+
+    for loc in cafes:
+        folium.Marker(
+            location=loc,
+            icon=folium.Icon(color="cadetblue", icon="cloud")
+        ).add_to(cafeGroup)
+
+    cafeGroup.add_to(m1)
+
+    m1
+  exercise:
+    prompt: 2단계. FeatureGroup 생성 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      seoulCenter = [37.5665, 126.9780]
+      m1 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      cafeGroup = folium.FeatureGroup(name="카페")
+
+      cafes = [
+          [37.5665, 126.9780],
+          [37.5700, 126.9750],
+          [37.5630, 126.9820]
+      ]
+
+      for loc in cafes:
+          folium.Marker(
+              location=loc,
+              icon=folium.Icon(color="cadetblue", icon="cloud")
+          ).add_to(cafeGroup)
+
+      cafeGroup.add_to(m1)
+
+      m1
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 2단계. FeatureGroup 생성의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 2단계. FeatureGroup 생성 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step3_multiple_groups
+  title: 3단계. 여러 그룹 만들기
+  structuredPrimary: true
+  subtitle: 카테고리별 분류
+  goal: 3단계. 여러 그룹 만들기에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    여러 FeatureGroup을 만들어 카테고리별로 마커를 분류합니다.
+
+    그룹별로 아이콘 색상을 다르게 하면 구분하기 쉽습니다.
+  snippet: |-
+    m2 = folium.Map(location=seoulCenter, zoom_start=13)
+
+    restaurantGroup = folium.FeatureGroup(name="음식점")
+    cafeGroup2 = folium.FeatureGroup(name="카페")
+
+    restaurants = [
+        {"name": "한식당", "loc": [37.5680, 126.9760]},
+        {"name": "일식당", "loc": [37.5650, 126.9800]},
+        {"name": "양식당", "loc": [37.5620, 126.9750]}
+    ]
+
+    cafes2 = [
+        {"name": "스타벅스", "loc": [37.5670, 126.9820]},
+        {"name": "투썸", "loc": [37.5640, 126.9770]},
+        {"name": "이디야", "loc": [37.5690, 126.9790]}
+    ]
+
+    for r in restaurants:
+        folium.Marker(
+            location=r["loc"],
+            popup=r["name"],
+            icon=folium.Icon(color="red", icon="cutlery")
+        ).add_to(restaurantGroup)
+
+    for c in cafes2:
+        folium.Marker(
+            location=c["loc"],
+            popup=c["name"],
+            icon=folium.Icon(color="blue", icon="cloud")
+        ).add_to(cafeGroup2)
+
+    restaurantGroup.add_to(m2)
+    cafeGroup2.add_to(m2)
+
+    m2
+  exercise:
+    prompt: 3단계. 여러 그룹 만들기 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      m2 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      restaurantGroup = folium.FeatureGroup(name="음식점")
+      cafeGroup2 = folium.FeatureGroup(name="카페")
+
+      restaurants = [
+          {"name": "한식당", "loc": [37.5680, 126.9760]},
+          {"name": "일식당", "loc": [37.5650, 126.9800]},
+          {"name": "양식당", "loc": [37.5620, 126.9750]}
+      ]
+
+      cafes2 = [
+          {"name": "스타벅스", "loc": [37.5670, 126.9820]},
+          {"name": "투썸", "loc": [37.5640, 126.9770]},
+          {"name": "이디야", "loc": [37.5690, 126.9790]}
+      ]
+
+      for r in restaurants:
+          folium.Marker(
+              location=r["loc"],
+              popup=r["name"],
+              icon=folium.Icon(color="red", icon="cutlery")
+          ).add_to(restaurantGroup)
+
+      for c in cafes2:
+          folium.Marker(
+              location=c["loc"],
+              popup=c["name"],
+              icon=folium.Icon(color="blue", icon="cloud")
+          ).add_to(cafeGroup2)
+
+      restaurantGroup.add_to(m2)
+      cafeGroup2.add_to(m2)
+
+      m2
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 3단계. 여러 그룹 만들기의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 3단계. 여러 그룹 만들기 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step4_layer_control
+  title: 4단계. LayerControl 추가
+  structuredPrimary: true
+  subtitle: LayerControl()
+  goal: 4단계. LayerControl 추가에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    LayerControl()을 추가하면 우측 상단에 레이어 토글 버튼이 생깁니다.
+
+    우측 상단 아이콘을 클릭하면 레이어 목록이 나타납니다. 체크박스로 레이어를 켜고 끌 수 있습니다.
+  snippet: |-
+    m3 = folium.Map(location=seoulCenter, zoom_start=13)
+
+    restaurantGroup2 = folium.FeatureGroup(name="음식점")
+    cafeGroup3 = folium.FeatureGroup(name="카페")
+
+    for r in restaurants:
+        folium.Marker(
+            location=r["loc"],
+            popup=r["name"],
+            icon=folium.Icon(color="red", icon="cutlery")
+        ).add_to(restaurantGroup2)
+
+    for c in cafes2:
+        folium.Marker(
+            location=c["loc"],
+            popup=c["name"],
+            icon=folium.Icon(color="blue", icon="cloud")
+        ).add_to(cafeGroup3)
+
+    restaurantGroup2.add_to(m3)
+    cafeGroup3.add_to(m3)
+
+    folium.LayerControl().add_to(m3)
+
+    m3
+  exercise:
+    prompt: 4단계. LayerControl 추가 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      m3 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      restaurantGroup2 = folium.FeatureGroup(name="음식점")
+      cafeGroup3 = folium.FeatureGroup(name="카페")
+
+      for r in restaurants:
+          folium.Marker(
+              location=r["loc"],
+              popup=r["name"],
+              icon=folium.Icon(color="red", icon="cutlery")
+          ).add_to(restaurantGroup2)
+
+      for c in cafes2:
+          folium.Marker(
+              location=c["loc"],
+              popup=c["name"],
+              icon=folium.Icon(color="blue", icon="cloud")
+          ).add_to(cafeGroup3)
+
+      restaurantGroup2.add_to(m3)
+      cafeGroup3.add_to(m3)
+
+      folium.LayerControl().add_to(m3)
+
+      m3
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 4단계. LayerControl 추가의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 4단계. LayerControl 추가 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step5_overlay_vs_base
+  title: 5단계. 오버레이 vs 베이스 레이어
+  structuredPrimary: true
+  subtitle: 레이어 종류
+  goal: 5단계. 오버레이 vs 베이스 레이어에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    베이스 레이어는 라디오 버튼(하나만 선택), 오버레이는 체크박스(다중 선택)입니다. FeatureGroup은 기본적으로 오버레이입니다.
+
+    타일 레이어는 베이스(라디오), FeatureGroup은 오버레이(체크박스)로 표시됩니다.
+  snippet: |-
+    m4 = folium.Map(location=seoulCenter, zoom_start=13, tiles=None)
+
+    folium.TileLayer("OpenStreetMap", name="기본 지도").add_to(m4)
+    folium.TileLayer("CartoDB Positron", name="심플 지도").add_to(m4)
+
+    markerGroup = folium.FeatureGroup(name="마커")
+    folium.Marker(seoulCenter, popup="시청").add_to(markerGroup)
+    markerGroup.add_to(m4)
+
+    circleGroup = folium.FeatureGroup(name="영역")
+    folium.Circle(seoulCenter, radius=500, color="blue").add_to(circleGroup)
+    circleGroup.add_to(m4)
+
+    folium.LayerControl().add_to(m4)
+
+    m4
+  exercise:
+    prompt: 5단계. 오버레이 vs 베이스 레이어 예제에서 \`m4\`, \`markerGroup\`, \`circleGroup\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      m4 = folium.Map(location=seoulCenter, zoom_start=13, tiles=None)
+
+      folium.TileLayer("OpenStreetMap", name="기본 지도").add_to(m4)
+      folium.TileLayer("CartoDB Positron", name="심플 지도").add_to(m4)
+
+      markerGroup = folium.FeatureGroup(name="마커")
+      folium.Marker(seoulCenter, popup="시청").add_to(markerGroup)
+      markerGroup.add_to(m4)
+
+      circleGroup = folium.FeatureGroup(name="영역")
+      folium.Circle(seoulCenter, radius=500, color="blue").add_to(circleGroup)
+      circleGroup.add_to(m4)
+
+      folium.LayerControl().add_to(m4)
+
+      m4
+    hints:
+    - 바꿀 지점은 \`m4 = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`m4\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 5단계. 오버레이 vs 베이스 레이어에서 \`m4\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 오버레이 vs 베이스 레이어 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step6_show_option
+  title: 6단계. 기본 표시 설정
+  structuredPrimary: true
+  subtitle: show 파라미터
+  goal: 6단계. 기본 표시 설정에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    show=False로 설정하면 처음에는 숨겨진 상태로 시작합니다.
+
+    선택적 정보(주차장, 화장실 등)는 show=False로 숨겨두면 지도가 깔끔합니다.
+  snippet: |-
+    m5 = folium.Map(location=seoulCenter, zoom_start=13)
+
+    visibleGroup = folium.FeatureGroup(name="기본 표시", show=True)
+    hiddenGroup = folium.FeatureGroup(name="숨김 시작", show=False)
+
+    folium.Marker(
+        [37.5665, 126.9750],
+        popup="항상 보임",
+        icon=folium.Icon(color="green")
+    ).add_to(visibleGroup)
+
+    folium.Marker(
+        [37.5665, 126.9810],
+        popup="레이어 켜야 보임",
+        icon=folium.Icon(color="gray")
+    ).add_to(hiddenGroup)
+
+    visibleGroup.add_to(m5)
+    hiddenGroup.add_to(m5)
+
+    folium.LayerControl().add_to(m5)
+
+    m5
+  exercise:
+    prompt: 6단계. 기본 표시 설정 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      m5 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      visibleGroup = folium.FeatureGroup(name="기본 표시", show=True)
+      hiddenGroup = folium.FeatureGroup(name="숨김 시작", show=False)
+
+      folium.Marker(
+          [37.5665, 126.9750],
+          popup="항상 보임",
+          icon=folium.Icon(color="green")
+      ).add_to(visibleGroup)
+
+      folium.Marker(
+          [37.5665, 126.9810],
+          popup="레이어 켜야 보임",
+          icon=folium.Icon(color="gray")
+      ).add_to(hiddenGroup)
+
+      visibleGroup.add_to(m5)
+      hiddenGroup.add_to(m5)
+
+      folium.LayerControl().add_to(m5)
+
+      m5
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 6단계. 기본 표시 설정에서 \`m5\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 6단계. 기본 표시 설정 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step7_shapes_grouping
+  title: 7단계. 도형 그룹화
+  structuredPrimary: true
+  subtitle: 도형별 레이어
+  goal: 7단계. 도형 그룹화에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    마커뿐 아니라 원, 폴리곤 등 모든 요소를 그룹에 넣을 수 있습니다.
+
+    마커와 영역을 별도 그룹으로 분리하면 사용자가 원하는 정보만 볼 수 있습니다.
+  snippet: |-
+    m6 = folium.Map(location=seoulCenter, zoom_start=13)
+
+    spotGroup = folium.FeatureGroup(name="관광지")
+    areaGroup = folium.FeatureGroup(name="관광 구역")
+
+    spots = [
+        {"name": "경복궁", "loc": [37.5796, 126.9770]},
+        {"name": "명동", "loc": [37.5636, 126.9869]},
+        {"name": "남산타워", "loc": [37.5512, 126.9882]}
+    ]
+
+    for spot in spots:
+        folium.Marker(
+            location=spot["loc"],
+            popup=spot["name"],
+            icon=folium.Icon(color="red", icon="star")
+        ).add_to(spotGroup)
+
+        folium.Circle(
+            location=spot["loc"],
+            radius=300,
+            color="orange",
+            fill=True,
+            fill_opacity=0.2
+        ).add_to(areaGroup)
+
+    spotGroup.add_to(m6)
+    areaGroup.add_to(m6)
+
+    folium.LayerControl().add_to(m6)
+
+    m6
+  exercise:
+    prompt: 7단계. 도형 그룹화 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      m6 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      spotGroup = folium.FeatureGroup(name="관광지")
+      areaGroup = folium.FeatureGroup(name="관광 구역")
+
+      spots = [
+          {"name": "경복궁", "loc": [37.5796, 126.9770]},
+          {"name": "명동", "loc": [37.5636, 126.9869]},
+          {"name": "남산타워", "loc": [37.5512, 126.9882]}
+      ]
+
+      for spot in spots:
+          folium.Marker(
+              location=spot["loc"],
+              popup=spot["name"],
+              icon=folium.Icon(color="red", icon="star")
+          ).add_to(spotGroup)
+
+          folium.Circle(
+              location=spot["loc"],
+              radius=300,
+              color="orange",
+              fill=True,
+              fill_opacity=0.2
+          ).add_to(areaGroup)
+
+      spotGroup.add_to(m6)
+      areaGroup.add_to(m6)
+
+      folium.LayerControl().add_to(m6)
+
+      m6
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 7단계. 도형 그룹화의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 7단계. 도형 그룹화 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step8_collapsed
+  title: 8단계. 컨트롤 옵션
+  structuredPrimary: true
+  subtitle: collapsed
+  goal: 8단계. 컨트롤 옵션에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    LayerControl의 collapsed 옵션으로 기본 펼침/접힘 상태를 설정합니다.
+
+    collapsed=False면 처음부터 레이어 목록이 펼쳐져 있습니다. 레이어가 중요할 때 사용합니다.
+  snippet: |-
+    m7 = folium.Map(location=seoulCenter, zoom_start=13)
+
+    group1 = folium.FeatureGroup(name="그룹1")
+    group2 = folium.FeatureGroup(name="그룹2")
+
+    folium.Marker([37.5665, 126.9750]).add_to(group1)
+    folium.Marker([37.5665, 126.9810]).add_to(group2)
+
+    group1.add_to(m7)
+    group2.add_to(m7)
+
+    folium.LayerControl(collapsed=False).add_to(m7)
+
+    m7
+  exercise:
+    prompt: 8단계. 컨트롤 옵션 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      m7 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      group1 = folium.FeatureGroup(name="그룹1")
+      group2 = folium.FeatureGroup(name="그룹2")
+
+      folium.Marker([37.5665, 126.9750]).add_to(group1)
+      folium.Marker([37.5665, 126.9810]).add_to(group2)
+
+      group1.add_to(m7)
+      group2.add_to(m7)
+
+      folium.LayerControl(collapsed=False).add_to(m7)
+
+      m7
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 8단계. 컨트롤 옵션에서 \`m7\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 8단계. 컨트롤 옵션 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: step9_complex_example
+  title: 9단계. 복잡한 레이어 구조
+  structuredPrimary: true
+  subtitle: 다중 카테고리
+  goal: 9단계. 복잡한 레이어 구조에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: |-
+    여러 카테고리와 타일을 조합한 복잡한 레이어 구조를 만듭니다.
+
+    베이스 레이어(타일)와 오버레이(마커 그룹)를 조합하면 유연한 지도를 만들 수 있습니다.
+  snippet: |-
+    m8 = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
+
+    folium.TileLayer("CartoDB Positron", name="밝은 지도").add_to(m8)
+    folium.TileLayer("CartoDB Dark_Matter", name="어두운 지도").add_to(m8)
+
+    historyGroup = folium.FeatureGroup(name="역사 유적")
+    shoppingGroup = folium.FeatureGroup(name="쇼핑")
+    foodGroup = folium.FeatureGroup(name="맛집", show=False)
+
+    historySites = [
+        {"name": "경복궁", "loc": [37.5796, 126.9770]},
+        {"name": "창덕궁", "loc": [37.5794, 126.9910]}
+    ]
+
+    shoppingSites = [
+        {"name": "명동", "loc": [37.5636, 126.9869]},
+        {"name": "동대문", "loc": [37.5711, 127.0095]}
+    ]
+
+    foodSites = [
+        {"name": "광장시장", "loc": [37.5701, 126.9995]},
+        {"name": "을지로 골목", "loc": [37.5660, 126.9910]}
+    ]
+
+    for site in historySites:
+        folium.Marker(
+            location=site["loc"],
+            popup=site["name"],
+            icon=folium.Icon(color="purple", icon="tower")
+        ).add_to(historyGroup)
+
+    for site in shoppingSites:
+        folium.Marker(
+            location=site["loc"],
+            popup=site["name"],
+            icon=folium.Icon(color="pink", icon="shopping-cart")
+        ).add_to(shoppingGroup)
+
+    for site in foodSites:
+        folium.Marker(
+            location=site["loc"],
+            popup=site["name"],
+            icon=folium.Icon(color="orange", icon="cutlery")
+        ).add_to(foodGroup)
+
+    historyGroup.add_to(m8)
+    shoppingGroup.add_to(m8)
+    foodGroup.add_to(m8)
+
+    folium.LayerControl().add_to(m8)
+
+    m8
+  exercise:
+    prompt: 9단계. 복잡한 레이어 구조 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      m8 = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
+
+      folium.TileLayer("CartoDB Positron", name="밝은 지도").add_to(m8)
+      folium.TileLayer("CartoDB Dark_Matter", name="어두운 지도").add_to(m8)
+
+      historyGroup = folium.FeatureGroup(name="역사 유적")
+      shoppingGroup = folium.FeatureGroup(name="쇼핑")
+      foodGroup = folium.FeatureGroup(name="맛집", show=False)
+
+      historySites = [
+          {"name": "경복궁", "loc": [37.5796, 126.9770]},
+          {"name": "창덕궁", "loc": [37.5794, 126.9910]}
+      ]
+
+      shoppingSites = [
+          {"name": "명동", "loc": [37.5636, 126.9869]},
+          {"name": "동대문", "loc": [37.5711, 127.0095]}
+      ]
+
+      foodSites = [
+          {"name": "광장시장", "loc": [37.5701, 126.9995]},
+          {"name": "을지로 골목", "loc": [37.5660, 126.9910]}
+      ]
+
+      for site in historySites:
+          folium.Marker(
+              location=site["loc"],
+              popup=site["name"],
+              icon=folium.Icon(color="purple", icon="tower")
+          ).add_to(historyGroup)
+
+      for site in shoppingSites:
+          folium.Marker(
+              location=site["loc"],
+              popup=site["name"],
+              icon=folium.Icon(color="pink", icon="shopping-cart")
+          ).add_to(shoppingGroup)
+
+      for site in foodSites:
+          folium.Marker(
+              location=site["loc"],
+              popup=site["name"],
+              icon=folium.Icon(color="orange", icon="cutlery")
+          ).add_to(foodGroup)
+
+      historyGroup.add_to(m8)
+      shoppingGroup.add_to(m8)
+      foodGroup.add_to(m8)
+
+      folium.LayerControl().add_to(m8)
+
+      m8
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 9단계. 복잡한 레이어 구조의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 9단계. 복잡한 레이어 구조 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step10_complete
+  title: 10단계. 완성 예제
+  structuredPrimary: true
+  subtitle: 관광지 필터 지도
+  goal: 10단계. 완성 예제에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 반복 결과를 확인하면 빠진 항목이나 잘못된 누적을 초기에 잡을 수 있습니다.
+  explanation: 카테고리별 필터 기능이 있는 서울 관광 지도를 완성합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    filterMap = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
+
+    folium.TileLayer("CartoDB Positron", name="기본").add_to(filterMap)
+    folium.TileLayer("OpenStreetMap", name="도로").add_to(filterMap)
+
+    palaceGroup = folium.FeatureGroup(name="궁궐")
+    parkGroup = folium.FeatureGroup(name="공원")
+    stationGroup = folium.FeatureGroup(name="지하철역", show=False)
+
+    palaces = [
+        {"name": "경복궁", "loc": [37.5796, 126.9770]},
+        {"name": "창덕궁", "loc": [37.5794, 126.9910]},
+        {"name": "덕수궁", "loc": [37.5658, 126.9750]}
+    ]
+
+    parks = [
+        {"name": "남산공원", "loc": [37.5512, 126.9882]},
+        {"name": "올림픽공원", "loc": [37.5200, 127.1212]},
+        {"name": "한강공원", "loc": [37.5283, 126.9340]}
+    ]
+
+    stations = [
+        {"name": "서울역", "loc": [37.5547, 126.9707]},
+        {"name": "강남역", "loc": [37.4979, 127.0276]},
+        {"name": "홍대입구역", "loc": [37.5563, 126.9236]}
+    ]
+
+    for p in palaces:
+        folium.Marker(
+            location=p["loc"],
+            popup=f"<b>{p['name']}</b>",
+            tooltip=p["name"],
+            icon=folium.Icon(color="red", icon="star")
+        ).add_to(palaceGroup)
+
+    for p in parks:
+        folium.Marker(
+            location=p["loc"],
+            popup=f"<b>{p['name']}</b>",
+            tooltip=p["name"],
+            icon=folium.Icon(color="green", icon="tree-deciduous")
+        ).add_to(parkGroup)
+
+    for s in stations:
+        folium.CircleMarker(
+            location=s["loc"],
+            radius=8,
+            color="blue",
+            fill=True,
+            popup=s["name"]
+        ).add_to(stationGroup)
+
+    palaceGroup.add_to(filterMap)
+    parkGroup.add_to(filterMap)
+    stationGroup.add_to(filterMap)
+
+    folium.LayerControl(collapsed=False).add_to(filterMap)
+
+    filterMap
+  exercise:
+    prompt: 10단계. 완성 예제 예제에서 반복 대상의 항목이나 범위를 바꾸고 반복 결과가 같이 바뀌는지 확인하세요.
+    starterCode: |-
+      filterMap = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
+
+      folium.TileLayer("CartoDB Positron", name="기본").add_to(filterMap)
+      folium.TileLayer("OpenStreetMap", name="도로").add_to(filterMap)
+
+      palaceGroup = folium.FeatureGroup(name="궁궐")
+      parkGroup = folium.FeatureGroup(name="공원")
+      stationGroup = folium.FeatureGroup(name="지하철역", show=False)
+
+      palaces = [
+          {"name": "경복궁", "loc": [37.5796, 126.9770]},
+          {"name": "창덕궁", "loc": [37.5794, 126.9910]},
+          {"name": "덕수궁", "loc": [37.5658, 126.9750]}
+      ]
+
+      parks = [
+          {"name": "남산공원", "loc": [37.5512, 126.9882]},
+          {"name": "올림픽공원", "loc": [37.5200, 127.1212]},
+          {"name": "한강공원", "loc": [37.5283, 126.9340]}
+      ]
+
+      stations = [
+          {"name": "서울역", "loc": [37.5547, 126.9707]},
+          {"name": "강남역", "loc": [37.4979, 127.0276]},
+          {"name": "홍대입구역", "loc": [37.5563, 126.9236]}
+      ]
+
+      for p in palaces:
+          folium.Marker(
+              location=p["loc"],
+              popup=f"<b>{p['name']}</b>",
+              tooltip=p["name"],
+              icon=folium.Icon(color="red", icon="star")
+          ).add_to(palaceGroup)
+
+      for p in parks:
+          folium.Marker(
+              location=p["loc"],
+              popup=f"<b>{p['name']}</b>",
+              tooltip=p["name"],
+              icon=folium.Icon(color="green", icon="tree-deciduous")
+          ).add_to(parkGroup)
+
+      for s in stations:
+          folium.CircleMarker(
+              location=s["loc"],
+              radius=8,
+              color="blue",
+              fill=True,
+              popup=s["name"]
+          ).add_to(stationGroup)
+
+      palaceGroup.add_to(filterMap)
+      parkGroup.add_to(filterMap)
+      stationGroup.add_to(filterMap)
+
+      folium.LayerControl(collapsed=False).add_to(filterMap)
+
+      filterMap
+    hints:
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 10단계. 완성 예제의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 10단계. 완성 예제 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step11_workflow
+  title: 11단계. 운영 레이어 검증
+  structuredPrimary: true
+  subtitle: 카테고리 누락과 표시 상태 확인
+  goal: 11단계. 운영 레이어 검증에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 지도 레이어는 좌표 데이터와 표시 상태를 함께 확인해야 운영 지도에서 누락이나 과표시를 줄일 수 있습니다.
+  explanation: |-
+    레이어 지도는 정보가 많아질수록 누락과 과표시가 생기기 쉽습니다. 업무용 운영 지도에서는 시설, 리스크, 고객 접점을 분리하고, 어떤 레이어가 기본으로 보일지 예측한 뒤 HTML 렌더 결과로 검증합니다.
+
+    레이어 관리는 지도 꾸미기가 아니라 정보 과밀도를 제어하는 설계입니다. 기본 표시, 숨김 표시, 미분류 오류를 코드로 검증해야 운영 지도가 믿을 만해집니다.
+  snippet: |-
+    operationSites = [
+        {"name": "강남 고객센터", "category": "support", "loc": [37.4979, 127.0276]},
+        {"name": "홍대 체험존", "category": "showroom", "loc": [37.5563, 126.9236]},
+        {"name": "여의도 장애 접수", "category": "risk", "loc": [37.5219, 126.9245]},
+        {"name": "종로 교육장", "category": "training", "loc": [37.5796, 126.9770]},
+    ]
+
+    layerConfig = {
+        "support": {"label": "고객센터", "color": "blue", "show": True},
+        "showroom": {"label": "체험존", "color": "green", "show": True},
+        "training": {"label": "교육장", "color": "purple", "show": True},
+        "risk": {"label": "리스크", "color": "red", "show": False},
+    }
+
+    sorted(layerConfig)
+  exercise:
+    prompt: 11단계. 운영 레이어 검증 예제에서 사이트 카테고리, 좌표, 기본 표시 설정을 바꾸고 레이어 구성이 달라지는지 확인하세요.
+    starterCode: |-
+      operationSites = [
+          {"name": "강남 고객센터", "category": "support", "loc": [37.4979, 127.0276]},
+          {"name": "홍대 체험존", "category": "showroom", "loc": [37.5563, 126.9236]},
+          {"name": "여의도 장애 접수", "category": "risk", "loc": [37.5219, 126.9245]},
+          {"name": "종로 교육장", "category": "training", "loc": [37.5796, 126.9770]},
+      ]
+
+      layerConfig = {
+          "support": {"label": "고객센터", "color": "blue", "show": True},
+          "showroom": {"label": "체험존", "color": "green", "show": True},
+          "training": {"label": "교육장", "color": "purple", "show": True},
+          "risk": {"label": "리스크", "color": "red", "show": False},
+      }
+
+      sorted(layerConfig)
+    hints:
+    - 바꿀 지점은 \`operationSites\`의 category/loc, \`layerConfig\`의 label/color/show 값입니다.
+    - 실행 뒤 분류 누락 여부와 기본 표시 레이어가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 11단계. 운영 레이어 검증의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 11단계. 운영 레이어 검증의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 레이어 관리
+  goal: 실습에서 지도 레이어 구성 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import folium
+    toilets = [
+        {"name": "시청 화장실", "loc": [37.5665, 126.9780]},
+        {"name": "광화문 화장실", "loc": [37.5725, 126.9768]}
+    ]
+    parking = [
+        {"name": "시청 주차장", "loc": [37.5655, 126.9790]},
+        {"name": "세종로 주차장", "loc": [37.5710, 126.9760]}
+    ]
+    data = {"toilets": toilets, "parking": parking}
+    data
+  exercise:
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import folium
+      toilets = [
+          {"name": "시청 화장실", "loc": [37.5665, 126.9780]},
+          {"name": "광화문 화장실", "loc": [37.5725, 126.9768]}
+      ]
+      parking = [
+          {"name": "시청 주차장", "loc": [37.5655, 126.9790]},
+          {"name": "세종로 주차장", "loc": [37.5710, 126.9760]}
+      ]
+      data = {"toilets": toilets, "parking": parking}
+      data
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 실습에서 \`toilets\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: folium_05-layer-visibility-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - practice
+    title: layer 관리 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: overlay 기본 가시성과 control 이름이 데이터 의미를 드러내는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_layer_visibility(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_layer_visibility(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_layer_visibility(rows):
+            required = ['longitude', 'latitude', 'layerName']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'layerName'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['longitude'] for row in usable]
+            y_values = [row['latitude'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.folium.folium_05.layer-visibility-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.folium.folium_05.layer-visibility-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_layer_visibility
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - longitude: 127.0
+              latitude: 37.5
+              layerName: stores
+            - longitude: 127.1
+              latitude: 37.6
+              layerName: incidents
+            - longitude: 127.2
+              latitude: 37.7
+              layerName: stores
+          expectedReturn:
+            usableCount: 3
+            excludedCount: 0
+            groupCounts:
+              incidents: 1
+              stores: 2
+            xExtent:
+            - 127.0
+            - 127.2
+            yExtent:
+            - 37.5
+            - 37.7
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: folium_05-layer-visibility-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - folium_05-layer-visibility-data-evidence-mastery
+    title: layer 관리 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 매장과 장애 overlay를 이름 있는 FeatureGroup과 명시적 초기 상태로 제공한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_layer_visibility(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_layer_visibility(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_layer_visibility(candidate):
+            expected = {'mark': 'layered-map', 'x': 'longitude', 'y': 'latitude', 'group': 'layerName', 'transforms': ['default-visibility', 'named-groups'], 'interaction': 'layer-control'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.folium.folium_05.layer-visibility-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.folium.folium_05.layer-visibility-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_layer_visibility
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: layered-map
+              x: longitude
+              y: latitude
+              group: layerName
+              transforms:
+              - default-visibility
+              - named-groups
+              interaction: layer-control
+              description: 매장과 장애 overlay를 이름 있는 FeatureGroup과 명시적 초기 상태로 제공한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: layered-map
+              x: longitude
+              y: latitude
+              group: layerName
+              transforms:
+              - default-visibility
+              - named-groups
+              interaction: layer-control
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: latitude
+              y: longitude
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - interaction
+            - description
+            encoding:
+              mark: layered-map
+              x: longitude
+              y: latitude
+              group: layerName
+              transforms:
+              - default-visibility
+              - named-groups
+              interaction: layer-control
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: folium_05-layer-visibility-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - folium_05-layer-visibility-encoding-transfer-transfer
+    title: layer 관리 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: overlay 기본 가시성과 control 이름이 데이터 의미를 드러내는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_layer_visibility(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_layer_visibility(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_layer_visibility(situation):
+            table = {'alternative-basemaps': {'encoding': 'base layers', 'evidence': 'one active', 'risk': 'multiple tiles'}, 'independent-overlays': {'encoding': 'overlay groups', 'evidence': 'visible counts', 'risk': 'hidden default'}, 'many-layers': {'encoding': 'grouped control', 'evidence': 'layer taxonomy', 'risk': 'control clutter'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.folium.folium_05.layer-visibility-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.folium.folium_05.layer-visibility-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_layer_visibility
+        cases:
+        - id: recalls-alternative-basemaps
+          arguments:
+          - value: alternative-basemaps
+          expectedReturn:
+            encoding: base layers
+            evidence: one active
+            risk: multiple tiles
+        - id: recalls-independent-overlays
+          arguments:
+          - value: independent-overlays
+          expectedReturn:
+            encoding: overlay groups
+            evidence: visible counts
+            risk: hidden default
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

@@ -1,0 +1,578 @@
+var e=`meta:
+  id: visionApps_01
+  title: 문서 스캐너
+  order: 1
+  category: visionApps
+  difficulty: ⭐⭐⭐
+  badge: 기초
+  packages:
+  - matplotlib
+  - numpy
+  - opencv-python
+  tags:
+  - opencv
+  - 문서스캐너
+  - 호모그래피
+  - 정렬
+  - 응용
+  seo:
+    title: 비전 응용 - 문서 스캐너
+    description: 비스듬히 찍힌 문서 사진을 호모그래피로 정렬해 스캔 결과처럼 만듭니다.
+    keywords:
+    - 문서스캐너
+    - 호모그래피
+    - 정렬
+    - opencv
+intro:
+  emoji: 📄
+  goal: 비스듬히 찍힌 문서 사진을 호모그래피로 정렬해 스캔 결과처럼 만듭니다.
+  description: |-
+    카메라로 찍은 문서는 항상 약간 기울어져 있습니다. 호모그래피 한 번이면 네 모서리를 골라 사각형으로 정렬한 스캔 이미지를 얻을 수 있습니다. 이 강의는 합성 입력으로 그 흐름을 끝까지 실행합니다.
+  direction: 합성된 비스듬한 문서 이미지를 만들고, 네 모서리를 골라 호모그래피로 직사각형 좌표계로 정렬합니다.
+  benefits:
+  - 호모그래피를 응용에 그대로 적용할 수 있습니다.
+  - cv2.getPerspectiveTransform과 warpPerspective 한 줄을 익힙니다.
+  - 결과 이미지를 흑백 + 임곗값 처리로 스캔 결과처럼 만드는 후처리를 배웁니다.
+  diagram:
+    steps:
+    - label: 1단계. 합성 문서 만들기
+      detail: 흰색 사각형 위에 텍스트와 도형을 그립니다.
+    - label: 2단계. 비스듬한 사진 만들기
+      detail: warpPerspective로 기울어진 사진 합성.
+    - label: 3단계. 네 모서리 좌표
+      detail: 합성에 사용한 좌표를 그대로 사용합니다.
+    - label: 4단계. 호모그래피 + 정렬
+      detail: getPerspectiveTransform 한 줄.
+    - label: 5단계. 스캔 후처리
+      detail: 그레이 + 적응 임곗값.
+    runtime:
+    - label: 비전 환경
+      detail: opencv-python, numpy, matplotlib 만으로 동작.
+    - label: 검증 흐름
+      detail: assert와 시각 비교로 학습 결과가 기대값과 같은지 확인합니다.
+sections:
+- id: synth_doc
+  title: 1단계. 합성 문서 만들기
+  structuredPrimary: true
+  subtitle: 흰색 캔버스 + 텍스트
+  goal: 흰색 사각형 위에 텍스트와 도형을 그려 학습용 문서를 만듭니다.
+  why: 외부 데이터 없이 모든 강의 흐름을 즉시 실행할 수 있도록 합성을 사용합니다.
+  explanation: |-
+    \`np.full((H, W, 3), 255, dtype=np.uint8)\` 가 흰 캔버스입니다. cv2.putText로 텍스트, cv2.rectangle로 도형을 그립니다.
+
+    텍스트는 영문만 사용합니다(cv2의 한글 폰트 지원이 까다롭습니다). 한국어 OCR 학습은 4강에서 다룹니다.
+  tips:
+  - cv2.putText의 좌표는 텍스트의 좌하단입니다. 좌상단이 아닌 점에 주의하세요.
+  snippet: |-
+    import cv2
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    document = np.full((400, 300, 3), 255, dtype=np.uint8)
+    cv2.putText(document, "Codaro Doc Scanner", (20, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (10, 10, 10), 2)
+    cv2.putText(document, "Lesson 01 - homography", (20, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (40, 40, 40), 1)
+    cv2.rectangle(document, (20, 180), (280, 380), (40, 40, 40), 1)
+    cv2.putText(document, "BODY TEXT", (40, 240), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (40, 40, 40), 2)
+    document.shape
+  exercise:
+    prompt: document를 시각화하세요.
+    starterCode: |-
+      fig = plt.figure(figsize=(4, 5))
+      plt.imshow(document)
+      plt.axis('___')
+      fig
+    hints:
+    - 빈칸은 'off' 입니다.
+    - 텍스트가 화면에 보여야 합니다.
+  check:
+    noError: 합성 문서 생성이 오류 없이 끝나야 합니다.
+    resultCheck: document.shape이 (400, 300, 3) 이어야 합니다.
+- id: warp_doc
+  title: 2단계. 비스듬한 사진 만들기
+  structuredPrimary: true
+  subtitle: 카메라가 기울어진 효과
+  goal: 합성 문서를 warpPerspective로 기울여 학습 입력 사진을 만듭니다.
+  why: 학습 환경에서 실제 비스듬 사진을 얻기 어려우므로 합성으로 통제 가능한 입력을 만듭니다.
+  explanation: |-
+    원본의 네 모서리 좌표와 그것이 옮겨질 비스듬한 좌표를 정해 호모그래피 행렬을 만듭니다. 그 행렬로 warpPerspective를 호출하면 합성된 비스듬 사진이 나옵니다.
+
+    캔버스를 크게 잡고 가운데에 문서를 두면 시각적으로 자연스럽습니다.
+  tips:
+  - 합성에 사용한 모서리 좌표는 다음 단계에서 그대로 정답으로 사용합니다.
+  snippet: |-
+    canvasH, canvasW = 500, 600
+    photo = np.full((canvasH, canvasW, 3), 200, dtype=np.uint8)
+    sourceCorners = np.array([[0, 0], [300, 0], [300, 400], [0, 400]], dtype=np.float32)
+    targetCorners = np.array([[120, 80], [520, 60], [540, 460], [80, 440]], dtype=np.float32)
+    warpMatrix = cv2.getPerspectiveTransform(sourceCorners, targetCorners)
+    photo = cv2.warpPerspective(document, warpMatrix, (canvasW, canvasH), dst=photo, borderMode=cv2.BORDER_TRANSPARENT)
+    photo.shape
+  exercise:
+    prompt: photo를 시각화하세요.
+    starterCode: |-
+      fig = plt.figure(figsize=(6, 5))
+      plt.imshow(photo)
+      plt.axis('off')
+      fig
+    hints:
+    - 문서가 비스듬하게 보여야 합니다.
+    - 캔버스 색은 기본 200으로 회색 입니다.
+  check:
+    noError: 합성 사진 만들기가 오류 없이 끝나야 합니다.
+    resultCheck: photo.shape이 (500, 600, 3) 이어야 합니다.
+- id: corners
+  title: 3단계. 네 모서리 좌표
+  structuredPrimary: true
+  subtitle: 정답 좌표 사용
+  goal: 합성에 쓴 네 모서리 좌표를 그대로 정답으로 사용합니다.
+  why: 학습 환경에서는 사람이 클릭하지 않고 즉시 학습이 가능해야 합니다.
+  explanation: |-
+    실제 응용에서는 코너 검출(visionFeatures 1강) 이나 GUI 클릭으로 네 점을 얻지만, 학습에서는 합성에 사용한 좌표를 그대로 사용합니다.
+
+    네 점의 순서는 좌상-우상-우하-좌하 시계 방향이 표준입니다.
+  tips:
+  - 모서리 좌표 순서가 어긋나면 결과가 거꾸로 뒤집힌 이미지가 됩니다.
+  snippet: |-
+    detectedCorners = targetCorners.copy()
+    detectedCorners
+  exercise:
+    prompt: detectedCorners를 photo 위에 점으로 표시하세요.
+    starterCode: |-
+      fig = plt.figure(figsize=(6, 5))
+      plt.imshow(photo)
+      plt.scatter(detectedCorners[:, 0], detectedCorners[:, 1], s=80, c='red', edgecolors='___')
+      plt.axis('off')
+      fig
+    hints:
+    - 빈칸은 'black' 입니다.
+    - 네 모서리 점이 문서 네 모서리에 정확히 있어야 합니다.
+  check:
+    noError: 좌표 시각화가 오류 없이 끝나야 합니다.
+    resultCheck: detectedCorners.shape이 (4, 2) 이어야 합니다.
+- id: align
+  title: 4단계. 호모그래피 + 정렬
+  structuredPrimary: true
+  subtitle: getPerspectiveTransform
+  goal: 네 모서리를 직사각형으로 옮기는 호모그래피로 사진을 정렬합니다.
+  why: 정렬된 결과가 스캔 이미지의 기본입니다.
+  explanation: |-
+    원본 사진의 네 모서리 → 목표 직사각형의 네 모서리로 가는 호모그래피를 만들고 warpPerspective로 변환합니다. 결과 캔버스 크기는 (300, 400) 정도가 적당합니다.
+  tips:
+  - 결과 캔버스의 가로:세로 비율이 원본 문서의 비율과 비슷해야 정렬 결과가 자연스럽습니다.
+  snippet: |-
+    outW, outH = 300, 400
+    rect = np.array([[0, 0], [outW, 0], [outW, outH], [0, outH]], dtype=np.float32)
+    alignMatrix = cv2.getPerspectiveTransform(detectedCorners, rect)
+    aligned = cv2.warpPerspective(photo, alignMatrix, (outW, outH))
+    fig = plt.figure(figsize=(4, 5))
+    plt.imshow(aligned)
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: 결과 크기를 (600, 800) 으로 키운 alignedBig을 만드세요.
+    starterCode: |-
+      bigW, bigH = ___, ___
+      bigRect = np.array([[0, 0], [bigW, 0], [bigW, bigH], [0, bigH]], dtype=np.float32)
+      bigMatrix = cv2.getPerspectiveTransform(detectedCorners, bigRect)
+      alignedBig = cv2.warpPerspective(photo, bigMatrix, (bigW, bigH))
+      alignedBig.shape
+    hints:
+    - 두 빈칸은 정수 600, 800 입니다.
+    - 결과는 더 큰 크기의 스캔처럼 보입니다.
+  check:
+    noError: 정렬이 오류 없이 끝나야 합니다.
+    resultCheck: aligned.shape의 첫 두 차원이 (400, 300) 이어야 합니다.
+- id: post_process
+  title: 5단계. 스캔 후처리
+  structuredPrimary: true
+  subtitle: 그레이 + 적응 임곗값
+  goal: 정렬 결과를 흑백 + 임곗값 처리로 스캔 이미지처럼 만듭니다.
+  why: 종이 스캐너가 만드는 결과와 비슷한 가독성 좋은 흑백 이미지를 만듭니다.
+  explanation: |-
+    \`cv2.adaptiveThreshold\` 가 종이 텍스트 분리에 잘 맞습니다. 블록 크기를 너무 작게 두면 텍스트가 끊어지고 너무 크게 두면 배경이 검게 보일 수 있습니다.
+  tips:
+  - 임곗값 후처리 전 cv2.GaussianBlur로 약간 흐리게 만들면 노이즈가 줄어듭니다.
+  snippet: |-
+    gray = cv2.cvtColor(aligned, cv2.COLOR_RGB2GRAY)
+    binary = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 25, 10)
+    fig = plt.figure(figsize=(4, 5))
+    plt.imshow(binary, cmap='gray')
+    plt.axis('off')
+    fig
+  exercise:
+    prompt: 블록 크기를 51, 상수 5로 바꿔 binarySoft을 만드세요.
+    starterCode: |-
+      binarySoft = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, ___, 5)
+      fig2 = plt.figure(figsize=(4, 5))
+      plt.imshow(binarySoft, cmap='gray')
+      plt.axis('off')
+      fig2
+    hints:
+    - 빈칸은 정수 51 입니다.
+    - 결과가 더 부드러워야 합니다.
+  check:
+    noError: 후처리가 오류 없이 끝나야 합니다.
+    resultCheck: binary.dtype이 uint8여야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 함수화
+  goal: 입력 사진 + 네 모서리 → 스캔 결과 한 함수에 모읍니다.
+  why: 함수로 묶어 두면 새 사진에 같은 변환을 즉시 적용할 수 있습니다.
+  explanation: |-
+    각 미션은 import문부터 시작하지만, 위 예제를 실행했다면 import는 생략해도 됩니다.
+  tips:
+  - 함수 시그니처는 (이미지, 좌표) → 정렬 흑백 이미지 가 표준입니다.
+  snippet: |-
+    def scanDocument(img, corners, outW=300, outH=400, block=25, constant=10):
+        rectLocal = np.array([[0, 0], [outW, 0], [outW, outH], [0, outH]], dtype=np.float32)
+        matrix = cv2.getPerspectiveTransform(corners, rectLocal)
+        alignedLocal = cv2.warpPerspective(img, matrix, (outW, outH))
+        grayLocal = cv2.cvtColor(alignedLocal, cv2.COLOR_RGB2GRAY)
+        return cv2.adaptiveThreshold(grayLocal, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, block, constant)
+
+    scanResult = scanDocument(photo, detectedCorners)
+    scanResult.shape
+  exercise:
+    prompt: "미션1: 위 함수에 다른 출력 크기 (200, 280) 을 적용한 thumbnail 결과를 만들고 시각화하세요. 미션2: 정렬 결과(컬러) 와 스캔 후처리 결과를 1x2 그리드로 비교 출력하세요."
+    starterCode: |-
+      thumbnail = scanDocument(photo, detectedCorners, outW=___, outH=___)
+      fig = plt.figure(figsize=(3, 4))
+      plt.imshow(thumbnail, cmap='gray')
+      plt.axis('off')
+      fig
+    hints:
+    - 두 빈칸은 정수 200, 280 입니다.
+    - 결과는 더 작은 흑백 스캔입니다.
+  check:
+    noError: 함수 호출이 오류 없이 끝나야 합니다.
+    resultCheck: scanResult.shape이 (400, 300) 이어야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: visionApps_01-document_scanner-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - synth_doc
+    - practice
+    title: 문서 스캐너 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 4개 corner·output geometry·DPI·contrast 계약을 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_document_scanner_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_document_scanner_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_document_scanner_contract(value):
+            required = ['cornerCount', 'outputSize', 'dpi', 'contrastMethod']
+            rules = [{'id': 'corners', 'field': 'cornerCount', 'kind': 'range', 'min': 4, 'max': 4}, {'id': 'output-size', 'field': 'outputSize', 'kind': 'length', 'value': 2}, {'id': 'dpi', 'field': 'dpi', 'kind': 'range', 'min': 72, 'max': 1200}, {'id': 'contrast', 'field': 'contrastMethod', 'kind': 'enum', 'values': ['none', 'adaptive', 'clahe']}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'document_scanner', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.vision-apps.visionApps_01.document_scanner-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-apps.visionApps_01.document_scanner-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_document_scanner_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              cornerCount: 4
+              outputSize:
+              - 2480
+              - 3508
+              dpi: 300
+              contrastMethod: adaptive
+          expectedReturn:
+            accepted: true
+            topic: document_scanner
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              outputSize:
+              - 2480
+              - 3508
+              dpi: 300
+              contrastMethod: adaptive
+          expectedReturn:
+            accepted: false
+            topic: document_scanner
+            missing:
+            - cornerCount
+            violations:
+            - corners
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              cornerCount: 3
+              outputSize:
+              - 2480
+              dpi: 10
+              contrastMethod: magic
+          expectedReturn:
+            accepted: false
+            topic: document_scanner
+            missing: []
+            violations:
+            - contrast
+            - corners
+            - dpi
+            - output-size
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: visionApps_01-document_scanner-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionApps_01-document_scanner-contract-audit-mastery
+    title: 문서 스캐너 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_document_scanner_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_document_scanner_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_document_scanner_result(expected, observed):
+            identity = ['sourceHash', 'cornerSetHash']
+            metrics = {'pageCoverage': 0.01}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'document_scanner', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.vision-apps.visionApps_01.document_scanner-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-apps.visionApps_01.document_scanner-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_document_scanner_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              sourceHash: doc1
+              cornerSetHash: c4-a
+              pageCoverage: 0.92
+          - value:
+              sourceHash: doc1
+              cornerSetHash: c4-a
+              pageCoverage: 0.925
+          expectedReturn:
+            passed: true
+            topic: document_scanner
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              sourceHash: doc1
+              cornerSetHash: c4-a
+              pageCoverage: 0.92
+          - value:
+              sourceHash: doc2
+              cornerSetHash: c3
+              pageCoverage: 0.5
+          expectedReturn:
+            passed: false
+            topic: document_scanner
+            missing: []
+            identityMismatch:
+            - cornerSetHash
+            - sourceHash
+            metricDrift:
+            - pageCoverage
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              sourceHash: doc1
+              cornerSetHash: c4-a
+              pageCoverage: 0.92
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: document_scanner
+            missing:
+            - cornerSetHash
+            - pageCoverage
+            - sourceHash
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: visionApps_01-document_scanner-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionApps_01-document_scanner-result-reconciliation-transfer
+    title: 문서 스캐너 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_document_scanner_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_document_scanner_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_document_scanner_evidence(stage):
+            stages = {'admission': {'action': 'admit document scan input safely', 'evidence': 'source and corner geometry', 'risk': 'privacy or source error'}, 'process': {'action': 'run bounded document scan workflow', 'evidence': 'perspective and contrast trace', 'risk': 'unbounded or wrong transformation'}, 'release': {'action': 'release verified document scan result', 'evidence': 'page render and OCR sample', 'risk': 'wrong or sensitive output'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.vision-apps.visionApps_01.document_scanner-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-apps.visionApps_01.document_scanner-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_document_scanner_evidence
+        cases:
+        - id: recalls-admission
+          arguments:
+          - value: admission
+          expectedReturn:
+            action: admit document scan input safely
+            evidence: source and corner geometry
+            risk: privacy or source error
+        - id: recalls-process
+          arguments:
+          - value: process
+          expectedReturn:
+            action: run bounded document scan workflow
+            evidence: perspective and contrast trace
+            risk: unbounded or wrong transformation
+        - id: recalls-release
+          arguments:
+          - value: release
+          expectedReturn:
+            action: release verified document scan result
+            evidence: page render and OCR sample
+            risk: wrong or sensitive output
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

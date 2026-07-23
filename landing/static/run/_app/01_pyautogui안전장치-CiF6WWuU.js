@@ -1,0 +1,557 @@
+var e=`meta:
+  id: inputCtl_01
+  title: pyautogui 안전장치
+  order: 1
+  category: inputCtl
+  difficulty: easy
+  audience: GUI 자동화에 입문하는 Python 학습자
+  packages:
+    - pyautogui
+  tags:
+    - pyautogui
+    - failsafe
+    - safety
+intro:
+  direction: pyautogui의 PAUSE와 FAILSAFE 안전장치를 설정해 GUI 자동화 중 통제 불능 사고를 막는 시작 패턴을 만든다.
+  benefits:
+    - pyautogui.PAUSE로 모든 호출 사이에 안전한 대기를 둔다.
+    - pyautogui.FAILSAFE로 마우스를 화면 모서리로 보내면 자동 중단되게 한다.
+    - 안전장치 설정 함수를 자동화 진입점에서 항상 호출한다.
+    - 종합 설정 dict로 자동화 시작 환경을 표준화한다.
+  diagram:
+    steps:
+      - label: PAUSE 설정
+        detail: 호출 간 0.1초처럼 짧은 대기를 두어 사용자 개입 여지를 확보한다.
+      - label: FAILSAFE 활성화
+        detail: True로 두면 마우스 좌상단 이동 시 즉시 예외를 일으킨다.
+      - label: 설정 함수로 묶기
+        detail: 한 함수에서 두 값을 함께 설정해 자동화 진입점이 단순해진다.
+      - label: 종합 설정 검증
+        detail: 호출 후 PAUSE와 FAILSAFE 값이 의도대로 바뀌었는지 dict로 확인한다.
+    runtime:
+      - label: pyautogui 패키지 필요
+        detail: meta.packages의 pyautogui가 로컬 가상환경에 준비되어야 한다.
+      - label: assert 기반 검증
+        detail: 안전장치 설정 값과 상수를 assert로 비교한다.
+sections:
+  - id: pause-setting
+    title: PAUSE 상수 설정
+    structuredPrimary: true
+    subtitle: 호출 사이 대기 시간
+    goal: pyautogui.PAUSE를 0.1초로 설정해 모든 함수 호출 사이에 짧은 대기가 들어가게 한다.
+    why: 자동화가 너무 빨리 동작하면 사용자가 개입할 시간이 없으므로 짧은 대기가 안전 장치 역할을 한다.
+    explanation: pyautogui.PAUSE는 모듈 단위 부동소수 값이다. 매 함수 호출 직후 그 시간만큼 sleep이 자동으로 들어간다. 기본값은 0.1초지만 자동화 환경에 따라 더 길게 두기도 한다.
+    tips:
+      - PAUSE가 너무 짧으면 화면이 따라잡지 못해 자동화가 실패할 수 있다.
+      - 학습에서는 0.05초처럼 짧게 두어 셀 실행 시간을 줄인다.
+    snippet: |-
+      import pyautogui
+
+      pyautogui.PAUSE = 0.05
+      summary = {"pause": pyautogui.PAUSE}
+
+      assert summary == {"pause": 0.05}
+      summary
+    exercise:
+      prompt: pyautogui.PAUSE를 0.2초로 설정해 summary 딕셔너리의 pause 값이 0.2인지 검증하세요.
+      starterCode: |-
+        import pyautogui
+
+        pyautogui.PAUSE = ___
+        summary = {"pause": pyautogui.PAUSE}
+
+        assert summary == {"pause": 0.2}
+        summary
+      solution: |-
+        import pyautogui
+
+        pyautogui.PAUSE = 0.2
+        summary = {"pause": pyautogui.PAUSE}
+
+        assert summary == {"pause": 0.2}
+        summary
+      hints:
+        - 부동소수 0.2를 모듈 상수에 할당한다.
+        - PAUSE는 모듈 단위 변수라 모듈 이름.PAUSE 형태로 접근한다.
+      check:
+        noError: pyautogui.PAUSE 할당이 정상적으로 끝나야 한다.
+        resultCheck: summary의 pause 값이 0.2여야 한다.
+    check:
+      noError: 모듈 상수 할당과 summary 구성이 끝나야 한다.
+      resultCheck: summary의 pause가 정확히 0.05여야 한다.
+  - id: failsafe-toggle
+    title: FAILSAFE 활성화
+    structuredPrimary: true
+    subtitle: 좌상단 모서리 탈출
+    goal: pyautogui.FAILSAFE를 True로 두어 마우스를 화면 좌상단으로 보내면 자동화가 즉시 중단된다.
+    why: 자동화가 통제 불능이 됐을 때 사용자가 마우스를 즉시 모서리로 보내 자동화를 멈출 수 있는 수동 안전장치다.
+    explanation: pyautogui.FAILSAFE는 boolean이다. True일 때 마우스가 화면 좌상단 좌표에 도달하면 FailSafeException이 발생해 자동화가 중단된다. 운영 환경에서는 절대 False로 두지 말아야 한다.
+    tips:
+      - FAILSAFE는 통제 불능 자동화를 멈출 마지막 보호 장치다.
+      - 자동화 디버깅 중에는 일시적으로 False로 둘 수 있으나 운영에서는 항상 True를 유지한다.
+    snippet: |-
+      import pyautogui
+
+      pyautogui.FAILSAFE = True
+      summary = {"failsafe": pyautogui.FAILSAFE}
+
+      assert summary == {"failsafe": True}
+      summary
+    exercise:
+      prompt: FAILSAFE 값을 True로 두어 안전장치가 활성화된 상태인지 검증하세요.
+      starterCode: |-
+        import pyautogui
+
+        pyautogui.FAILSAFE = ___
+        summary = {"failsafe": pyautogui.FAILSAFE}
+
+        assert summary == {"failsafe": True}
+        summary
+      solution: |-
+        import pyautogui
+
+        pyautogui.FAILSAFE = True
+        summary = {"failsafe": pyautogui.FAILSAFE}
+
+        assert summary == {"failsafe": True}
+        summary
+      hints:
+        - FAILSAFE는 boolean이라 True 또는 False만 받는다.
+        - 운영 환경 안전을 위해 True로 두는 것이 표준이다.
+      check:
+        noError: FAILSAFE 할당이 정상적으로 끝나야 한다.
+        resultCheck: summary의 failsafe가 True여야 한다.
+    check:
+      noError: 모듈 상수 할당이 정상적으로 끝나야 한다.
+      resultCheck: summary의 failsafe가 True여야 한다.
+  - id: setup-function
+    title: 설정 함수로 묶기
+    structuredPrimary: true
+    subtitle: 자동화 진입점 표준화
+    goal: PAUSE와 FAILSAFE 설정을 한 함수에서 함께 처리해 자동화 진입점을 표준화한다.
+    why: 자동화는 여러 스크립트에서 같은 안전 설정을 공유해야 운영자가 매번 사고 위험을 의식하지 않아도 된다.
+    explanation: configurePyautogui 함수는 pause 시간을 받아 PAUSE에 할당하고 FAILSAFE는 항상 True로 둔다. 자동화 진입점에서 한 줄 호출로 끝나도록 만들어 사용자 실수를 줄인다. 함수는 변경된 값을 dict로 보고해 호출자가 확인할 수 있다.
+    tips:
+      - 안전 설정 함수는 모듈 import 직후 호출하는 편이 명확하다.
+      - dict 반환은 단위 테스트에서 설정 적용을 검증할 수 있게 만든다.
+    snippet: |-
+      import pyautogui
+
+
+      def configurePyautogui(pauseSeconds: float = 0.1) -> dict:
+          pyautogui.PAUSE = pauseSeconds
+          pyautogui.FAILSAFE = True
+          return {"pause": pyautogui.PAUSE, "failsafe": pyautogui.FAILSAFE}
+
+
+      summary = configurePyautogui(0.05)
+
+      assert summary == {"pause": 0.05, "failsafe": True}
+      summary
+    exercise:
+      prompt: configurePyautogui에 pauseSeconds=0.3을 넘기면 summary가 pause 0.3과 failsafe True를 담는지 검증하세요.
+      starterCode: |-
+        import pyautogui
+
+
+        def configurePyautogui(pauseSeconds: float = 0.1) -> dict:
+            pyautogui.PAUSE = pauseSeconds
+            pyautogui.FAILSAFE = ___
+            return {"pause": pyautogui.PAUSE, "failsafe": pyautogui.FAILSAFE}
+
+
+        summary = configurePyautogui(0.3)
+
+        assert summary == {"pause": 0.3, "failsafe": True}
+        summary
+      solution: |-
+        import pyautogui
+
+
+        def configurePyautogui(pauseSeconds: float = 0.1) -> dict:
+            pyautogui.PAUSE = pauseSeconds
+            pyautogui.FAILSAFE = True
+            return {"pause": pyautogui.PAUSE, "failsafe": pyautogui.FAILSAFE}
+
+
+        summary = configurePyautogui(0.3)
+
+        assert summary == {"pause": 0.3, "failsafe": True}
+        summary
+      hints:
+        - FAILSAFE 값은 항상 True로 두는 것이 표준이다.
+        - 인자가 0.3이면 PAUSE도 같은 값으로 설정된다.
+      check:
+        noError: configurePyautogui 호출이 정상적으로 끝나야 한다.
+        resultCheck: summary가 pause 0.3과 failsafe True를 정확히 담아야 한다.
+    check:
+      noError: 설정 함수 호출이 정상적으로 끝나야 한다.
+      resultCheck: summary가 pause 0.05와 failsafe True를 정확히 담아야 한다.
+  - id: safety-summary
+    title: 종합 안전 보고
+    structuredPrimary: true
+    subtitle: 모든 설정 한 dict로
+    goal: 자동화 시작 시 안전 설정 값을 한 dict로 묶어 운영자가 한눈에 확인할 수 있는 보고를 만든다.
+    why: 종합 보고는 자동화 사고 후 첫 진단 지점이므로 시작 시점의 안전 설정 값을 영구적으로 기록해 두면 추적이 쉬워진다.
+    explanation: snapshotSettings 함수는 PAUSE, FAILSAFE 값을 dict로 돌려준다. 결과는 자동화 보고서의 첫 줄에 들어가는 표준 항목이다. 같은 함수는 두 번 호출해도 같은 dict 형태를 유지한다.
+    tips:
+      - 안전 설정 변경 사고는 종합 보고에 즉시 나타나 운영자가 빨리 알 수 있다.
+      - 시작 시 dict와 종료 시 dict를 비교하면 자동화가 설정을 바꿨는지 확인할 수 있다.
+    snippet: |-
+      import pyautogui
+
+
+      def snapshotSettings() -> dict:
+          return {"pause": pyautogui.PAUSE, "failsafe": pyautogui.FAILSAFE}
+
+
+      pyautogui.PAUSE = 0.05
+      pyautogui.FAILSAFE = True
+      summary = snapshotSettings()
+
+      assert summary == {"pause": 0.05, "failsafe": True}
+      summary
+    exercise:
+      prompt: PAUSE를 0.5초로 두고 FAILSAFE를 True로 둔 뒤 snapshotSettings로 두 키 종합 결과가 같은지 검증하세요.
+      starterCode: |-
+        import pyautogui
+
+
+        def snapshotSettings() -> dict:
+            return {"pause": pyautogui.___, "failsafe": pyautogui.FAILSAFE}
+
+
+        pyautogui.PAUSE = 0.5
+        pyautogui.FAILSAFE = True
+        summary = snapshotSettings()
+
+        assert summary == {"pause": 0.5, "failsafe": True}
+        summary
+      solution: |-
+        import pyautogui
+
+
+        def snapshotSettings() -> dict:
+            return {"pause": pyautogui.PAUSE, "failsafe": pyautogui.FAILSAFE}
+
+
+        pyautogui.PAUSE = 0.5
+        pyautogui.FAILSAFE = True
+        summary = snapshotSettings()
+
+        assert summary == {"pause": 0.5, "failsafe": True}
+        summary
+      hints:
+        - 모듈 상수 이름은 PAUSE 대문자다.
+        - PAUSE 값이 0.5이면 summary의 pause 키도 0.5다.
+      check:
+        noError: snapshotSettings 호출이 정상적으로 끝나야 한다.
+        resultCheck: summary가 pause 0.5와 failsafe True를 종합 결과로 담아야 한다.
+    check:
+      noError: 종합 보고 함수가 정상적으로 끝나야 한다.
+      resultCheck: summary가 pause와 failsafe 두 키를 정확히 담아야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: inputCtl_01-input-safety-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pause-setting
+    - safety-summary
+    title: 입력 자동화의 fail-safe·E-Stop·행동 budget 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 대상 앱과 dry run, 최대 action 수가 빠진 자동화를 실행 전에 차단한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - fail-safe 옵션과 사용자가 누를 E-Stop을 둘 다 계획하세요.
+    - 처음 실행은 반드시 dry run이며 action 수에 상한을 두세요.
+    exercise:
+      prompt: audit_input_safety(plan)를 완성하세요.
+      starterCode: |-
+        def audit_input_safety(plan):
+            raise NotImplementedError
+      solution: |
+        def audit_input_safety(plan):
+            required = {"targetApps", "failSafe", "emergencyStop", "dryRun", "maximumActions"}
+            missing = sorted(required - set(plan))
+            failures = []
+            if not plan.get("targetApps"):
+                failures.append("target-apps")
+            if not plan.get("failSafe", False):
+                failures.append("fail-safe")
+            if not plan.get("emergencyStop"):
+                failures.append("emergency-stop")
+            if not plan.get("dryRun", False):
+                failures.append("dry-run")
+            if plan.get("maximumActions", 0) <= 0:
+                failures.append("action-budget")
+            return {"ready": not missing and not failures, "missing": missing, "failures": failures}
+      hints: *id001
+    check:
+      id: python.inputctl.inputCtl_01.input-safety-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_01.input-safety-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_input_safety
+        cases:
+        - id: accepts-bounded-plan
+          arguments:
+          - value:
+              targetApps:
+              - Editor
+              failSafe: true
+              emergencyStop: ctrl+shift+esc
+              dryRun: true
+              maximumActions: 20
+          expectedReturn:
+            ready: true
+            missing: []
+            failures: []
+        - id: reports-disabled-guards
+          arguments:
+          - value:
+              targetApps: []
+              failSafe: false
+              emergencyStop: ''
+              dryRun: false
+              maximumActions: 0
+          expectedReturn:
+            ready: false
+            missing: []
+            failures:
+            - target-apps
+            - fail-safe
+            - emergency-stop
+            - dry-run
+            - action-budget
+        - id: reports-missing-contract
+          arguments:
+          - value: {}
+          expectedReturn:
+            ready: false
+            missing:
+            - dryRun
+            - emergencyStop
+            - failSafe
+            - maximumActions
+            - targetApps
+            failures:
+            - target-apps
+            - fail-safe
+            - emergency-stop
+            - dry-run
+            - action-budget
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: inputCtl_01-input-batch-authorization-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inputCtl_01-input-safety-contract-mastery
+    title: 새 입력 action batch에 대상 창·budget 승인 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 현재 foreground 앱과 허용 action 종류·개수를 계획과 대조한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - batch 직전에 foreground 앱을 다시 확인하세요.
+    - 허용 action 종류와 최대 개수를 계획에서 가져오세요.
+    exercise:
+      prompt: authorize_input_batch(actions, foreground_app, plan)를 완성하세요.
+      starterCode: |-
+        def authorize_input_batch(actions, foreground_app, plan):
+            raise NotImplementedError
+      solution: |
+        def authorize_input_batch(actions, foreground_app, plan):
+            failures = []
+            if foreground_app not in plan.get("targetApps", []):
+                failures.append("foreground-app")
+            if len(actions) > plan.get("maximumActions", 0):
+                failures.append("action-budget")
+            disallowed = sorted({action["kind"] for action in actions} - set(plan.get("allowedActions", [])))
+            if disallowed:
+                failures.append("action-kind")
+            return {"authorized": not failures, "failures": failures, "actionCount": len(actions), "disallowedKinds": disallowed}
+      hints: *id002
+    check:
+      id: python.inputctl.inputCtl_01.input-batch-authorization.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_01.input-batch-authorization.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: authorize_input_batch
+        cases:
+        - id: authorizes-allowed-batch
+          arguments:
+          - value:
+            - kind: move
+            - kind: click
+          - value: Editor
+          - value:
+              targetApps:
+              - Editor
+              maximumActions: 3
+              allowedActions:
+              - move
+              - click
+          expectedReturn:
+            authorized: true
+            failures: []
+            actionCount: 2
+            disallowedKinds: []
+        - id: rejects-wrong-app-and-budget
+          arguments:
+          - value:
+            - kind: click
+            - kind: click
+          - value: Mail
+          - value:
+              targetApps:
+              - Editor
+              maximumActions: 1
+              allowedActions:
+              - click
+          expectedReturn:
+            authorized: false
+            failures:
+            - foreground-app
+            - action-budget
+            actionCount: 2
+            disallowedKinds: []
+        - id: rejects-disallowed-kind
+          arguments:
+          - value:
+            - kind: hotkey
+          - value: Editor
+          - value:
+              targetApps:
+              - Editor
+              maximumActions: 2
+              allowedActions:
+              - move
+          expectedReturn:
+            authorized: false
+            failures:
+            - action-kind
+            actionCount: 1
+            disallowedKinds:
+            - hotkey
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: inputCtl_01-input-safety-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inputCtl_01-input-batch-authorization-transfer
+    title: GUI 입력 안전장치 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 사전 제한·실시간 중단·사후 증거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 입력 자동화 action 전에 대상·경계·중단 방법을 검증하세요.
+    - 화면 변화와 E-Stop evidence를 남기고 성공을 클릭 발생으로 판단하지 마세요.
+    exercise:
+      prompt: choose_input_safety(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_input_safety(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_input_safety(situation):
+            table = {'before': {'action': 'allowlist app and dry run', 'evidence': 'planned action batch', 'risk': 'wrong target'}, 'during': {'action': 'enable fail-safe and E-Stop', 'evidence': 'stop event', 'risk': 'runaway input'}, 'after': {'action': 'verify observed state', 'evidence': 'before after screenshot and state', 'risk': 'click without outcome'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.inputctl.inputCtl_01.input-safety-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_01.input-safety-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_input_safety
+        cases:
+        - id: recalls-before
+          arguments:
+          - value: before
+          expectedReturn:
+            action: allowlist app and dry run
+            evidence: planned action batch
+            risk: wrong target
+        - id: recalls-during
+          arguments:
+          - value: during
+          expectedReturn:
+            action: enable fail-safe and E-Stop
+            evidence: stop event
+            risk: runaway input
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

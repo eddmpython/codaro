@@ -1,0 +1,796 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - networkx
+  id: networkx_02
+  title: 방향그래프와가중치
+  order: 2
+  category: networkx
+  difficulty: ⭐
+  badge: 입문
+  tags:
+  - networkx
+  - DiGraph
+  - 방향그래프
+  - 가중치
+  - 속성
+  seo:
+    title: NetworkX 방향 그래프와 가중치
+    description: DiGraph로 방향 그래프를 만들고, 엣지에 가중치를 추가합니다. 노드와 엣지 속성을 관리하는 방법을 배웁니다.
+    keywords:
+    - networkx
+    - DiGraph
+    - 방향그래프
+    - 가중치
+    - 속성
+    - weight
+intro:
+  emoji: ➡️
+  goal: 방향 그래프와 가중치 그래프를 만들고 속성을 관리합니다.
+  description: 방향 그래프(DiGraph)는 엣지에 방향이 있습니다. A→B와 B→A는 다른 연결입니다. 가중치 그래프는 엣지에 수치가 있어 거리, 비용 등을 표현합니다.
+    노드와 엣지에 다양한 속성을 추가하는 방법도 배웁니다.
+  direction: 방향그래프와가중치에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.
+  benefits:
+  - 관계 데이터 확인 후 그래프 알고리즘에 맞는 코드 입력을 고릅니다.
+  - 방향그래프와가중치 결과를 노드/엣지와 지표 값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 관계 분석 리포트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 라이브러리 불러오기 입력 확인
+      detail: 입력 기준(관계 데이터)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 방향 그래프 생성 처리 실행
+      detail: 그래프 알고리즘 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 진입/진출 차수 결과 검증
+      detail: 노드/엣지와 지표 값 기준으로 실행 결과를 비교합니다.
+    - label: 방향그래프와가중치 재사용
+      detail: 완성 코드를 관계 분석 리포트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 그래프 분석 환경
+      detail: matplotlib, networkx 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 방향그래프와가중치 실행
+      detail: 셀을 실행해 노드/엣지와 지표 값와 예외 상태를 확인합니다.
+    - label: 방향그래프와가중치 완료
+      detail: 검증된 코드를 관계 분석 리포트로 남깁니다.
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  structuredPrimary: true
+  subtitle: import
+  goal: 1단계. 라이브러리 불러오기에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.
+  explanation: 이전 프로젝트와 마찬가지로 NetworkX와 matplotlib을 불러옵니다. 이번 프로젝트에서는 무방향 그래프(Graph) 외에 방향 그래프(DiGraph)를
+    다룹니다. DiGraph는 Directed Graph의 줄임말로, 엣지에 방향이 있는 그래프입니다. 트위터 팔로우, 웹 링크, 인용 관계 등 비대칭적인 관계를 표현할 때 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import networkx as nx
+    import matplotlib.pyplot as plt
+  exercise:
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.
+    starterCode: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+    hints:
+    - 바꿀 지점은 관계 데이터을 만드는 첫 줄과 그래프 알고리즘 줄에서 찾으세요.
+    - 실행 뒤 노드/엣지와 지표 값 중 하나가 바꾼 값을 반영하는지 보세요.
+  check:
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.
+    resultCheck: 1단계. 라이브러리 불러오기 실행 결과가 노드/엣지와 지표 값 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: step2_digraph
+  title: 2단계. 방향 그래프 생성
+  structuredPrimary: true
+  subtitle: DiGraph()
+  goal: 2단계. 방향 그래프 생성에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    nx.DiGraph()로 방향 그래프를 생성합니다. add_edge(u, v)를 호출하면 u에서 v로 향하는 화살표가 생깁니다. 무방향 그래프와 달리 add_edge('A', 'B')와 add_edge('B', 'A')는 서로 다른 두 개의 엣지입니다. 양방향 연결이 필요하면 두 엣지를 모두 추가해야 합니다. has_edge()로 특정 방향의 엣지가 있는지 확인할 수 있습니다.
+
+    DiGraph에서 (A, B) 엣지와 (B, A) 엣지는 다릅니다. 무방향 그래프와 달리 방향이 중요합니다.
+  snippet: |-
+    dg = nx.DiGraph()
+    dg.add_edge("A", "B")
+    dg.add_edge("B", "C")
+    dg.add_edge("A", "C")
+    list(dg.edges())
+  exercise:
+    prompt: 2단계. 방향 그래프 생성 예제에서 \`dg\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      dg = nx.DiGraph()
+      dg.add_edge("A", "B")
+      dg.add_edge("B", "C")
+      dg.add_edge("A", "C")
+      list(dg.edges())
+    hints:
+    - 바꿀 지점은 \`dg = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`dg\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 2단계. 방향 그래프 생성에서 \`dg\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 2단계. 방향 그래프 생성 실행 뒤 \`dg\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step3_in_out
+  title: 3단계. 진입/진출 차수
+  structuredPrimary: true
+  subtitle: in_degree(), out_degree()
+  goal: 3단계. 진입/진출 차수에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    방향 그래프에서는 차수(degree)가 두 가지로 나뉩니다. 진입 차수(in-degree)는 해당 노드로 들어오는 화살표의 개수입니다. 트위터에서 팔로워 수에 해당합니다. 진출 차수(out-degree)는 해당 노드에서 나가는 화살표의 개수입니다. 트위터에서 팔로잉 수에 해당합니다. 인기 있는 인플루언서는 진입 차수가 높고, 활동적인 사용자는 진출 차수가 높습니다.
+
+    in_degree()는 들어오는 화살표 수, out_degree()는 나가는 화살표 수입니다. 일반 degree()는 둘의 합입니다.
+  snippet: |-
+    dg2 = nx.DiGraph()
+    dg2.add_edges_from([("A", "B"), ("A", "C"), ("B", "C"), ("C", "D"), ("D", "A")])
+    list(dg2.edges())
+  exercise:
+    prompt: 3단계. 진입/진출 차수 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      dg2 = nx.DiGraph()
+      dg2.add_edges_from([("A", "B"), ("A", "C"), ("B", "C"), ("C", "D"), ("D", "A")])
+      list(dg2.edges())
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 3단계. 진입/진출 차수에서 \`dg2\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 3단계. 진입/진출 차수 실행 뒤 \`dg2\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: step4_visualize_directed
+  title: 4단계. 방향 그래프 시각화
+  structuredPrimary: true
+  subtitle: 화살표 표시
+  goal: 4단계. 방향 그래프 시각화에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    방향 그래프를 시각화하면 엣지가 화살표로 표시됩니다. nx.draw() 함수는 DiGraph를 감지하면 자동으로 화살표를 그립니다. arrows=True를 명시적으로 지정해도 됩니다. arrowsize 파라미터로 화살표 크기를 조절할 수 있습니다. 노드가 많거나 엣지가 복잡하면 화살표가 겹쳐 보이기 어려울 수 있으므로, 적절한 레이아웃과 크기 조절이 중요합니다.
+
+    arrowsize로 화살표 크기를 조절합니다. connectionstyle 파라미터로 곡선 화살표도 가능합니다.
+  snippet: |-
+    posDg = nx.spring_layout(dg2, seed=42)
+    fig1, ax1 = plt.subplots(figsize=(7, 5))
+    nx.draw(dg2, pos=posDg, with_labels=True, node_color='lightcoral',
+            node_size=800, font_size=12, arrows=True,
+            arrowsize=20, edge_color='gray', ax=ax1)
+    ax1.set_title('Directed Graph')
+    fig1
+  exercise:
+    prompt: 4단계. 방향 그래프 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      posDg = nx.spring_layout(dg2, seed=42)
+      fig1, ax1 = plt.subplots(figsize=(7, 5))
+      nx.draw(dg2, pos=posDg, with_labels=True, node_color='lightcoral',
+              node_size=800, font_size=12, arrows=True,
+              arrowsize=20, edge_color='gray', ax=ax1)
+      ax1.set_title('Directed Graph')
+      fig1
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 4단계. 방향 그래프 시각화의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 4단계. 방향 그래프 시각화의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step5_weighted
+  title: 5단계. 가중치 그래프
+  structuredPrimary: true
+  subtitle: weight 속성
+  goal: 5단계. 가중치 그래프에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    엣지에 가중치(weight)를 추가하면 연결의 강도나 비용을 표현할 수 있습니다. add_edge(u, v, weight=값)처럼 키워드 인자로 전달합니다. 도시 간 거리, 운송 비용, 친밀도 점수 등이 가중치가 됩니다. 가중치가 있으면 단순히 연결 여부만 보는 것이 아니라, 어떤 경로가 더 짧은지 또는 비용이 적은지 계산할 수 있습니다. edges(data=True)로 엣지와 가중치를 함께 조회합니다.
+
+    edges(data=True)로 엣지와 속성을 함께 조회합니다. G[u][v]로 특정 엣지의 속성 딕셔너리에 접근합니다.
+  snippet: |-
+    wg = nx.Graph()
+    wg.add_edge("Seoul", "Busan", weight=325)
+    wg.add_edge("Seoul", "Daejeon", weight=140)
+    wg.add_edge("Daejeon", "Busan", weight=200)
+    wg.add_edge("Seoul", "Gwangju", weight=270)
+    list(wg.edges(data=True))
+  exercise:
+    prompt: 5단계. 가중치 그래프 예제에서 \`wg\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      wg = nx.Graph()
+      wg.add_edge("Seoul", "Busan", weight=325)
+      wg.add_edge("Seoul", "Daejeon", weight=140)
+      wg.add_edge("Daejeon", "Busan", weight=200)
+      wg.add_edge("Seoul", "Gwangju", weight=270)
+      list(wg.edges(data=True))
+    hints:
+    - 바꿀 지점은 \`wg = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`wg\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 5단계. 가중치 그래프에서 \`wg\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 5단계. 가중치 그래프 실행 뒤 \`wg\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step6_weighted_visual
+  title: 6단계. 가중치 시각화
+  structuredPrimary: true
+  subtitle: 엣지 라벨
+  goal: 6단계. 가중치 시각화에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    가중치 정보를 시각화에 표시하면 네트워크를 더 직관적으로 이해할 수 있습니다. nx.draw_networkx_edge_labels() 함수를 사용하면 엣지 위에 텍스트를 표시할 수 있습니다. get_edge_attributes(G, 'weight')로 모든 엣지의 가중치를 딕셔너리로 추출하고, 이를 edge_labels 파라미터에 전달합니다. 도시 간 거리, 비용, 시간 등을 엣지 위에 표시하면 한눈에 네트워크 특성을 파악할 수 있습니다.
+
+    get_edge_attributes()로 특정 속성만 추출하여 라벨로 표시합니다.
+  snippet: |-
+    posW = nx.spring_layout(wg, seed=42)
+    fig2, ax2 = plt.subplots(figsize=(8, 6))
+    nx.draw(wg, pos=posW, with_labels=True, node_color='lightgreen',
+            node_size=1000, font_size=11, ax=ax2)
+
+    edgeLabels = nx.get_edge_attributes(wg, 'weight')
+    nx.draw_networkx_edge_labels(wg, pos=posW, edge_labels=edgeLabels,
+                                  font_size=10, ax=ax2)
+    ax2.set_title('City Distance Network (km)')
+    fig2
+  exercise:
+    prompt: 6단계. 가중치 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      posW = nx.spring_layout(wg, seed=42)
+      fig2, ax2 = plt.subplots(figsize=(8, 6))
+      nx.draw(wg, pos=posW, with_labels=True, node_color='lightgreen',
+              node_size=1000, font_size=11, ax=ax2)
+
+      edgeLabels = nx.get_edge_attributes(wg, 'weight')
+      nx.draw_networkx_edge_labels(wg, pos=posW, edge_labels=edgeLabels,
+                                    font_size=10, ax=ax2)
+      ax2.set_title('City Distance Network (km)')
+      fig2
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 6단계. 가중치 시각화의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 6단계. 가중치 시각화의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: step7_node_attr
+  title: 7단계. 노드 속성
+  structuredPrimary: true
+  subtitle: 노드에 정보 추가
+  goal: 7단계. 노드 속성에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    노드에도 다양한 속성을 추가할 수 있습니다. add_node(노드, 속성=값)처럼 키워드 인자로 전달합니다. 사람 노드에 나이, 성별, 도시 정보를 저장하거나, 도시 노드에 인구, 면적, 위도/경도를 저장할 수 있습니다. nodes(data=True)로 모든 노드와 속성을 조회하고, G.nodes[노드][속성]으로 특정 노드의 특정 속성에 접근합니다. 속성을 활용하면 특정 조건의 노드만 필터링하는 것도 가능합니다.
+
+    nodes(data=True)는 (노드, 속성딕셔너리) 튜플의 뷰를 반환합니다.
+  snippet: |-
+    social = nx.Graph()
+    social.add_node("Alice", age=25, city="Seoul")
+    social.add_node("Bob", age=30, city="Busan")
+    social.add_node("Carol", age=28, city="Seoul")
+    social.add_edge("Alice", "Bob")
+    social.add_edge("Alice", "Carol")
+    social.nodes(data=True)
+  exercise:
+    prompt: 7단계. 노드 속성 예제에서 \`social\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      social = nx.Graph()
+      social.add_node("Alice", age=25, city="Seoul")
+      social.add_node("Bob", age=30, city="Busan")
+      social.add_node("Carol", age=28, city="Seoul")
+      social.add_edge("Alice", "Bob")
+      social.add_edge("Alice", "Carol")
+      social.nodes(data=True)
+    hints:
+    - 바꿀 지점은 \`social = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`social\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 7단계. 노드 속성에서 \`social\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 7단계. 노드 속성 실행 뒤 \`social\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step8_edge_attr
+  title: 8단계. 엣지 속성
+  structuredPrimary: true
+  subtitle: 다양한 엣지 정보
+  goal: 8단계. 엣지 속성에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    엣지에는 weight 외에도 원하는 만큼 많은 속성을 추가할 수 있습니다. 관계 유형(친구, 동료, 가족), 관계 시작 연도, 상호작용 빈도 등 다양한 정보를 저장합니다. add_edge(u, v, 속성1=값1, 속성2=값2)처럼 여러 속성을 동시에 추가할 수 있습니다. G[u][v]로 엣지 속성 딕셔너리에 접근하고, 값을 읽거나 수정할 수 있습니다. 속성은 나중에 분석이나 시각화에 활용됩니다.
+
+    G[u][v]로 엣지 속성 딕셔너리에 접근하고 수정할 수 있습니다.
+  snippet: |-
+    relations = nx.Graph()
+    relations.add_edge("A", "B", relation="friend", since=2020)
+    relations.add_edge("A", "C", relation="colleague", since=2021)
+    relations.add_edge("B", "C", relation="family", since=2015)
+    relations.edges(data=True)
+  exercise:
+    prompt: 8단계. 엣지 속성 예제에서 \`relations\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      relations = nx.Graph()
+      relations.add_edge("A", "B", relation="friend", since=2020)
+      relations.add_edge("A", "C", relation="colleague", since=2021)
+      relations.add_edge("B", "C", relation="family", since=2015)
+      relations.edges(data=True)
+    hints:
+    - 바꿀 지점은 \`relations = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`relations\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 8단계. 엣지 속성에서 \`relations\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 8단계. 엣지 속성 실행 뒤 \`relations\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: step9_color_by_attr
+  title: 9단계. 속성으로 색상 지정
+  structuredPrimary: true
+  subtitle: 시각화 활용
+  goal: 9단계. 속성으로 색상 지정에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    노드 속성에 따라 색상을 다르게 지정하면 시각화가 더 의미 있어집니다. 예를 들어 서울에 사는 사람은 파란색, 부산에 사는 사람은 빨간색으로 표시할 수 있습니다. 리스트 컴프리헨션을 사용해 각 노드의 속성값에 해당하는 색상 리스트를 만들고, 이를 node_color 파라미터에 전달합니다. 같은 방식으로 노드 크기(node_size)도 속성값에 비례하게 설정할 수 있습니다.
+
+    리스트 컴프리헨션으로 각 노드의 속성에 따른 색상 리스트를 만들어 node_color에 전달합니다.
+  snippet: |-
+    cityColors = {"Seoul": "skyblue", "Busan": "salmon"}
+    nodeColors = [cityColors.get(social.nodes[n].get("city", "Seoul"), "gray")
+                  for n in social.nodes()]
+
+    posSocial = nx.spring_layout(social, seed=42)
+    fig3, ax3 = plt.subplots(figsize=(7, 5))
+    nx.draw(social, pos=posSocial, with_labels=True, node_color=nodeColors,
+            node_size=1000, font_size=11, ax=ax3)
+    ax3.set_title('Social Network by City')
+    fig3
+  exercise:
+    prompt: 9단계. 속성으로 색상 지정 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      cityColors = {"Seoul": "skyblue", "Busan": "salmon"}
+      nodeColors = [cityColors.get(social.nodes[n].get("city", "Seoul"), "gray")
+                    for n in social.nodes()]
+
+      posSocial = nx.spring_layout(social, seed=42)
+      fig3, ax3 = plt.subplots(figsize=(7, 5))
+      nx.draw(social, pos=posSocial, with_labels=True, node_color=nodeColors,
+              node_size=1000, font_size=11, ax=ax3)
+      ax3.set_title('Social Network by City')
+      fig3
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    noError: 9단계. 속성으로 색상 지정의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
+    resultCheck: 9단계. 속성으로 색상 지정 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
+- id: step10_road
+  title: 10단계. 도로 네트워크 예제
+  structuredPrimary: true
+  subtitle: 종합 실습
+  goal: 10단계. 도로 네트워크 예제에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 지금까지 배운 방향 그래프와 가중치를 모두 활용하여 도로 네트워크를 모델링합니다. 실제 도로망에는 일방통행(단방향)과 양방향 도로가 섞여 있습니다. 각 도로에는
+    거리(distance)와 차선 수(lanes) 같은 속성이 있습니다. 양방향 도로는 양쪽 방향으로 엣지를 모두 추가해야 합니다. 완성된 도로 네트워크를 시각화하고, 각 교차로의
+    진입/진출 차수를 분석합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    road = nx.DiGraph()
+    road.add_edge("A", "B", distance=5, lanes=2)
+    road.add_edge("B", "A", distance=5, lanes=2)
+    road.add_edge("B", "C", distance=3, lanes=1)
+    road.add_edge("A", "C", distance=10, lanes=3)
+    road.add_edge("C", "D", distance=4, lanes=2)
+    road.add_edge("D", "B", distance=6, lanes=1)
+    road.edges(data=True)
+  exercise:
+    prompt: 10단계. 도로 네트워크 예제 예제에서 \`road\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      road = nx.DiGraph()
+      road.add_edge("A", "B", distance=5, lanes=2)
+      road.add_edge("B", "A", distance=5, lanes=2)
+      road.add_edge("B", "C", distance=3, lanes=1)
+      road.add_edge("A", "C", distance=10, lanes=3)
+      road.add_edge("C", "D", distance=4, lanes=2)
+      road.add_edge("D", "B", distance=6, lanes=1)
+      road.edges(data=True)
+    hints:
+    - 바꿀 지점은 \`road = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`road\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    noError: 10단계. 도로 네트워크 예제에서 \`road\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 10단계. 도로 네트워크 예제 실행 뒤 \`road\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 방향과 가중치
+  goal: 실습에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    이번 프로젝트에서 배운 방향 그래프(DiGraph), 진입/진출 차수, 가중치, 노드/엣지 속성을 활용하여 미션을 수행합니다. 미션1에서는 소셜 미디어의 팔로우 관계를 방향 그래프로 모델링하고, 미션2에서는 물류 네트워크의 운송 비용을 가중치 그래프로 분석합니다. 각 미션은 독립적으로 실행 가능합니다.
+
+    각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  snippet: |-
+    import networkx as nx
+    import matplotlib.pyplot as plt
+
+    follow = nx.DiGraph()
+    users = ["User1", "User2", "User3", "User4", "User5"]
+    follow.add_nodes_from(users)
+
+    followEdges = [
+        ("User1", "User2"),
+        ("User1", "User3"),
+        ("User2", "User3"),
+        ("User3", "User1"),
+        ("User4", "User1"),
+        ("User4", "User2"),
+        ("User5", "User1"),
+        ("User5", "User2"),
+        ("User5", "User3")
+    ]
+    follow.add_edges_from(followEdges)
+    list(follow.edges())
+  exercise:
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+
+      follow = nx.DiGraph()
+      users = ["User1", "User2", "User3", "User4", "User5"]
+      follow.add_nodes_from(users)
+
+      followEdges = [
+          ("User1", "User2"),
+          ("User1", "User3"),
+          ("User2", "User3"),
+          ("User3", "User1"),
+          ("User4", "User1"),
+          ("User4", "User2"),
+          ("User5", "User1"),
+          ("User5", "User2"),
+          ("User5", "User3")
+      ]
+      follow.add_edges_from(followEdges)
+      list(follow.edges())
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 실습에서 \`follow\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: 인수인계 네트워크
+  goal: 업무 흐름 검증에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 실무 네트워크 분석은 그래프를 그리는 데서 끝나지 않습니다. 먼저 병목 후보를 예측하고, 로컬 Python에서 실행한 뒤, 잘못된 노드나 끊어진 경로를 예외로
+    처리하고, 핵심 지표를 assert로 검증해야 합니다. 아래 흐름은 영업, 지원, 운영, 재무, 엔지니어링 사이의 인수인계 비용을 네트워크로 보고 개선안을 비교합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import networkx as nx
+
+    handoffEdges = [
+        ("sales", "support", 1),
+        ("support", "ops", 2),
+        ("ops", "finance", 1),
+        ("ops", "engineering", 1),
+        ("engineering", "infra", 2),
+        ("support", "customer_success", 2),
+    ]
+
+    workflowGraph = nx.Graph()
+    workflowGraph.add_weighted_edges_from(handoffEdges)
+
+    expectedNodes = {"sales", "support", "ops", "finance", "engineering", "infra", "customer_success"}
+    if set(workflowGraph.nodes()) != expectedNodes:
+        raise ValueError("인수인계 네트워크의 부서 목록이 예상과 다릅니다.")
+    if any(data["weight"] <= 0 for _, _, data in workflowGraph.edges(data=True)):
+        raise ValueError("인수인계 비용은 0보다 커야 합니다.")
+
+    salesToFinanceCost = nx.shortest_path_length(workflowGraph, "sales", "finance", weight="weight")
+    betweenness = nx.betweenness_centrality(workflowGraph, weight="weight")
+
+    workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      experimentGraph = workflowGraph.copy()
+      experimentGraph.add_edge("sales", "finance", weight=2)
+
+      improvedCost = nx.shortest_path_length(experimentGraph, "sales", "finance", weight="weight")
+      improvedBetweenness = nx.betweenness_centrality(experimentGraph, weight="weight")
+      improvement = salesToFinanceCost - improvedCost
+
+      assert improvement > 0
+      {
+          "beforeCost": salesToFinanceCost,
+          "afterCost": improvedCost,
+          "costImprovement": improvement,
+          "opsBetweennessBefore": round(betweenness["ops"], 3),
+          "opsBetweennessAfter": round(improvedBetweenness["ops"], 3),
+      }
+    solution: |-
+      import networkx as nx
+
+      handoffEdges = [
+          ("sales", "support", 1),
+          ("support", "ops", 2),
+          ("ops", "finance", 1),
+          ("ops", "engineering", 1),
+          ("engineering", "infra", 2),
+          ("support", "customer_success", 2),
+      ]
+
+      workflowGraph = nx.Graph()
+      workflowGraph.add_weighted_edges_from(handoffEdges)
+
+      expectedNodes = {"sales", "support", "ops", "finance", "engineering", "infra", "customer_success"}
+      if set(workflowGraph.nodes()) != expectedNodes:
+          raise ValueError("인수인계 네트워크의 부서 목록이 예상과 다릅니다.")
+      if any(data["weight"] <= 0 for _, _, data in workflowGraph.edges(data=True)):
+          raise ValueError("인수인계 비용은 0보다 커야 합니다.")
+
+      workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    noError: 업무 흐름 검증에서 \`experimentGraph\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: networkx_02-directed-weight-balance-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 방향·가중 graph의 유입과 유출 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: node별 in/out degree와 weight 합을 분리한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - degree와 weight 합은 서로 다른 지표입니다.
+    - source와 target 역할을 바꾸지 마세요.
+    exercise:
+      prompt: directed_balance(nodes, edges)를 완성하세요.
+      starterCode: |-
+        def directed_balance(nodes, edges):
+            raise NotImplementedError
+      solution: |
+        def directed_balance(nodes, edges):
+            result = {node: {"inDegree": 0, "outDegree": 0, "inWeight": 0, "outWeight": 0} for node in nodes}
+            for source, target, weight in edges:
+                if source not in result or target not in result or weight < 0:
+                    raise ValueError("invalid weighted edge")
+                result[source]["outDegree"] += 1
+                result[source]["outWeight"] += weight
+                result[target]["inDegree"] += 1
+                result[target]["inWeight"] += weight
+            return {node: result[node] for node in sorted(result)}
+      hints: *id001
+    check:
+      id: python.networkx.networkx_02.directed-weight-balance.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_02.directed-weight-balance.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: directed_balance
+        cases:
+        - id: separates-in-and-out
+          arguments:
+          - value:
+            - a
+            - b
+          - value:
+            - - a
+              - b
+              - 3
+            - - b
+              - a
+              - 1
+          expectedReturn:
+            a:
+              inDegree: 1
+              outDegree: 1
+              inWeight: 1
+              outWeight: 3
+            b:
+              inDegree: 1
+              outDegree: 1
+              inWeight: 3
+              outWeight: 1
+        - id: keeps-zero-node
+          arguments:
+          - value:
+            - x
+          - value: []
+          expectedReturn:
+            x:
+              inDegree: 0
+              outDegree: 0
+              inWeight: 0
+              outWeight: 0
+        - id: rejects-negative-weight
+          arguments:
+          - value:
+            - a
+          - value:
+            - - a
+              - a
+              - -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: networkx_02-flow-anomaly-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_02-directed-weight-balance-mastery
+    title: 새 자금 흐름에 방향 graph 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: node별 순유입과 총량을 계산해 큰 imbalance를 찾는다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - net과 total volume을 함께 보여주세요.
+    - 큰 순유입이 곧 이상 거래라는 인과 주장은 하지 마세요.
+    exercise:
+      prompt: flow_anomalies(nodes, edges, threshold)를 완성하세요.
+      starterCode: |-
+        def flow_anomalies(nodes, edges, threshold):
+            raise NotImplementedError
+      solution: |
+        def flow_anomalies(nodes, edges, threshold):
+            flow = {node: {"in": 0, "out": 0} for node in nodes}
+            for source, target, amount in edges:
+                flow[source]["out"] += amount
+                flow[target]["in"] += amount
+            result = []
+            for node, values in sorted(flow.items()):
+                net = values["in"] - values["out"]
+                if abs(net) >= threshold:
+                    result.append({"node": node, "net": net, "volume": values["in"] + values["out"]})
+            return result
+      hints: *id002
+    check:
+      id: python.networkx.networkx_02.flow-anomaly.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_02.flow-anomaly.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: flow_anomalies
+        cases:
+        - id: finds-imbalances
+          arguments:
+          - value:
+            - a
+            - b
+            - c
+          - value:
+            - - a
+              - b
+              - 10
+            - - b
+              - c
+              - 2
+          - value: 5
+          expectedReturn:
+          - node: a
+            net: -10
+            volume: 10
+          - node: b
+            net: 8
+            volume: 12
+        - id: returns-none-below-threshold
+          arguments:
+          - value:
+            - a
+            - b
+          - value:
+            - - a
+              - b
+              - 1
+          - value: 2
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: networkx_02-directed-weight-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_02-flow-anomaly-transfer
+    title: 방향과 가중치 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 경로 의미에 맞는 edge 속성을 고른다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 그래프 알고리즘의 입력 가정과 반환 의미를 함께 기록하세요.
+    - 시각적 모양만으로 구조적 결론을 내리지 마세요.
+    exercise:
+      prompt: choose_edge_semantics(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_edge_semantics(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_edge_semantics(situation):
+            table = {'follows': {'method': 'directed unweighted', 'evidence': 'source target', 'risk': 'symmetrizing'}, 'distance': {'method': 'weighted', 'evidence': 'unit', 'risk': 'negative value'}, 'event-count': {'method': 'aggregate or multiedge', 'evidence': 'event grain', 'risk': 'lost multiplicity'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.networkx.networkx_02.directed-weight-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_02.directed-weight-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_edge_semantics
+        cases:
+        - id: recalls-follows
+          arguments:
+          - value: follows
+          expectedReturn:
+            method: directed unweighted
+            evidence: source target
+            risk: symmetrizing
+        - id: recalls-distance
+          arguments:
+          - value: distance
+          expectedReturn:
+            method: weighted
+            evidence: unit
+            risk: negative value
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

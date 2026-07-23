@@ -1,0 +1,505 @@
+var e=`meta:
+  id: excel_03
+  title: Excel 리포트 자동 생성
+  order: 3
+  category: excel
+  badge: 리포트
+  packages:
+  - openpyxl
+  - pandas
+  outcomes: ["automation.excel.workbook"]
+  prerequisites: ["automation.excel.intro"]
+  estimatedMinutes: 45
+  tags:
+  - excel
+  - openpyxl
+  - pandas
+  - 리포트
+  - 차트
+  seo:
+    title: Excel 리포트 자동 생성 - 로컬 Python 엑셀 자동화
+    description: openpyxl과 pandas로 로컬 Excel 파일을 만들고 검증하는 실무형 커리큘럼입니다.
+    keywords:
+    - excel
+    - openpyxl
+    - pandas
+    - 리포트
+    - 차트
+intro:
+  direction: Excel 리포트 자동 생성에서 엑셀 파일과 셀 범위를 읽고 쓰며 결과 파일을 검증합니다.
+  benefits:
+  - 워크북과 시트 확인 후 셀/범위 조작에 맞는 코드 입력을 고릅니다.
+  - Excel 리포트 자동 생성 결과를 저장 파일과 셀 값 기준으로 즉시 점검합니다.
+  - 완료한 코드를 업무 파일 자동화에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 1단계. 보고서 파일의 목표 입력 확인
+      detail: 입력 기준(워크북과 시트)과 필요한 조건을 먼저 고정합니다.
+    - label: 2단계. 리포트 파일 만들기 처리 실행
+      detail: 셀/범위 조작 코드를 실행해 중간 결과를 확인합니다.
+    - label: 3단계. 리포트 검증 루프 결과 검증
+      detail: 저장 파일과 셀 값 기준으로 실행 결과를 비교합니다.
+    - label: Excel 리포트 자동 생성 재사용
+      detail: 완성 코드를 업무 파일 자동화에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 엑셀 자동화 환경
+      detail: openpyxl, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: Excel 리포트 자동 생성 실행
+      detail: 셀을 실행해 저장 파일과 셀 값와 예외 상태를 확인합니다.
+    - label: Excel 리포트 자동 생성 완료
+      detail: 검증된 코드를 업무 파일 자동화로 남깁니다.
+sections:
+- id: intro
+  title: 1단계. 보고서 파일의 목표
+  structuredPrimary: true
+  subtitle: 데이터 + 요약 + 차트
+  goal: 1단계. 보고서 파일의 목표에서 셀/범위 조작 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 자동화된 Excel 리포트는 원본 데이터, 요약 표, 차트가 한 파일 안에 일관되게 들어 있어야 합니다. 이번 레슨은 pandas와 openpyxl을 함께
+    사용해 보고서 파일을 생성하고 구조를 검증합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+    import pandas as pd
+    from openpyxl import load_workbook
+    from openpyxl.chart import BarChart, Reference
+    from codaro.curriculum.localData import loadLocalDataset
+
+    excelTemp = TemporaryDirectory()
+    excelRoot = Path(excelTemp.name)
+    reportPath = excelRoot / "tips_report.xlsx"
+
+    tips = loadLocalDataset("tips")
+    tipsReport = tips.assign(tip_rate=tips["tip"] / tips["total_bill"])
+    summary = tipsReport.groupby("time", as_index=False).agg(order_count=("tip", "size"), avg_tip=("tip", "mean"), avg_tip_rate=("tip_rate", "mean"))
+
+    assert set(summary["time"]) == {"Lunch", "Dinner"}
+    summary.round(3)
+  exercise:
+    prompt: 1단계. 보고서 파일의 목표 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+      import pandas as pd
+      from openpyxl import load_workbook
+      from openpyxl.chart import BarChart, Reference
+      from codaro.curriculum.localData import loadLocalDataset
+
+      excelTemp = TemporaryDirectory()
+      excelRoot = Path(excelTemp.name)
+      reportPath = excelRoot / "tips_report.xlsx"
+
+      tips = loadLocalDataset("tips")
+      tipsReport = tips.assign(tip_rate=tips["tip"] / tips["total_bill"])
+      summary = tipsReport.groupby("time", as_index=False).agg(order_count=("tip", "size"), avg_tip=("tip", "mean"), avg_tip_rate=("tip_rate", "mean"))
+
+      assert set(summary["time"]) == {"Lunch", "Dinner"}
+      summary.round(3)
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 1단계. 보고서 파일의 목표의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 1단계. 보고서 파일의 목표의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: build_report
+  title: 2단계. 리포트 파일 만들기
+  structuredPrimary: true
+  subtitle: 시트와 차트
+  goal: 2단계. 리포트 파일 만들기에서 셀/범위 조작 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 2단계. 리포트 파일 만들기의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    with pd.ExcelWriter(reportPath, engine="openpyxl") as writer:
+        tipsReport.to_excel(writer, sheet_name="raw_data", index=False)
+        summary.to_excel(writer, sheet_name="summary", index=False)
+
+    workbook = load_workbook(reportPath)
+    summarySheet = workbook["summary"]
+    chart = BarChart()
+    chart.title = "시간대별 평균 팁"
+    data = Reference(summarySheet, min_col=3, min_row=1, max_row=summarySheet.max_row)
+    categories = Reference(summarySheet, min_col=1, min_row=2, max_row=summarySheet.max_row)
+    chart.add_data(data, titles_from_data=True)
+    chart.set_categories(categories)
+    summarySheet.add_chart(chart, "G2")
+    workbook.save(reportPath)
+
+    assert reportPath.exists()
+    workbook = load_workbook(reportPath)
+    assert workbook.sheetnames == ["raw_data", "summary"]
+  exercise:
+    prompt: 2단계. 리포트 파일 만들기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      with pd.ExcelWriter(reportPath, engine="openpyxl") as writer:
+          tipsReport.to_excel(writer, sheet_name="raw_data", index=False)
+          summary.to_excel(writer, sheet_name="summary", index=False)
+
+      workbook = load_workbook(reportPath)
+      summarySheet = workbook["summary"]
+      chart = BarChart()
+      chart.title = "시간대별 평균 팁"
+      data = Reference(summarySheet, min_col=3, min_row=1, max_row=summarySheet.max_row)
+      categories = Reference(summarySheet, min_col=1, min_row=2, max_row=summarySheet.max_row)
+      chart.add_data(data, titles_from_data=True)
+      chart.set_categories(categories)
+      summarySheet.add_chart(chart, "G2")
+      workbook.save(reportPath)
+
+      assert reportPath.exists()
+      workbook = load_workbook(reportPath)
+      assert workbook.sheetnames == ["raw_data", "summary"]
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 2단계. 리포트 파일 만들기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 2단계. 리포트 파일 만들기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: workflow_validation
+  title: 3단계. 리포트 검증 루프
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  goal: 3단계. 리포트 검증 루프에서 셀/범위 조작 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 리포트 자동화는 파일 생성보다 검증이 중요합니다. 시트 구성, 요약 행 수, 차트 존재를 확인하고, 잘못된 리포트 구조를 명확하게 실패시킵니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def validateExcelReport(path):
+        workbook = load_workbook(path, data_only=True)
+        requiredSheets = {"raw_data", "summary"}
+        missingSheets = requiredSheets - set(workbook.sheetnames)
+        if missingSheets:
+            raise ValueError(f"리포트 필수 시트 누락: {sorted(missingSheets)}")
+        summarySheet = workbook["summary"]
+        headers = [cell.value for cell in summarySheet[1]]
+        assert {"time", "order_count", "avg_tip", "avg_tip_rate"}.issubset(set(headers))
+        assert len(workbook["summary"]._charts) == 1
+        return {"sheetCount": len(workbook.sheetnames), "summaryRows": summarySheet.max_row - 1}
+
+    reportValidation = validateExcelReport(reportPath)
+    assert reportValidation["summaryRows"] == 2
+    reportValidation
+  exercise:
+    prompt: 3단계. 리포트 검증 루프 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def validateExcelReport(path):
+          workbook = load_workbook(path, data_only=True)
+          requiredSheets = {"raw_data", "summary"}
+          missingSheets = requiredSheets - set(workbook.sheetnames)
+          if missingSheets:
+              raise ValueError(f"리포트 필수 시트 누락: {sorted(missingSheets)}")
+          summarySheet = workbook["summary"]
+          headers = [cell.value for cell in summarySheet[1]]
+          assert {"time", "order_count", "avg_tip", "avg_tip_rate"}.issubset(set(headers))
+          assert len(workbook["summary"]._charts) == 1
+          return {"sheetCount": len(workbook.sheetnames), "summaryRows": summarySheet.max_row - 1}
+
+      reportValidation = validateExcelReport(reportPath)
+      assert reportValidation["summaryRows"] == 2
+      reportValidation
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+  check:
+    noError: 3단계. 리포트 검증 루프의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 3단계. 리포트 검증 루프 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: summary
+  title: 정리
+  subtitle: Excel 리포트 자동화 완주
+  blocks:
+  - type: text
+    content: 이번 레슨에서는 로컬 데이터로 Excel 리포트 파일을 만들고, 여러 시트와 차트가 들어 있는지 검증하고, 집계 기준을 바꾸는 변주까지 완성했습니다.
+  goal: 정리에서 워크북과 시트을 바꿨을 때 저장 파일과 셀 값가 어떻게 달라지는지 확인한다.
+  why: 엑셀 자동화는 반복 보고서와 정산 파일을 코드로 재현하는 실무 흐름입니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: excel_03-xlwings-lite-capability-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - summary
+    title: xlwings Lite 지원 범위와 fallback 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 요구 기능을 지원하는지와 Local 전환 사유를 계산한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - Lite 지원 여부를 추측하지 말고 capability set과 요구 set으로 비교하세요.
+    - 지원하지 않는 기능만 명시적 Local 사유로 반환하세요.
+    exercise:
+      prompt: plan_lite_execution(requirements, supported_features)를 완성하세요.
+      starterCode: |-
+        def plan_lite_execution(requirements, supported_features):
+            raise NotImplementedError
+      solution: |
+        def plan_lite_execution(requirements, supported_features):
+            required = sorted(key for key, needed in requirements.items() if needed)
+            unsupported = sorted(set(required) - set(supported_features))
+            return {"tier": "local" if unsupported else "web", "required": required, "unsupported": unsupported, "webRunnable": not unsupported}
+      hints: *id001
+    check:
+      id: python.excel.excel_03.xlwings-lite-capability.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.excel.excel_03.xlwings-lite-capability.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_lite_execution
+        cases:
+        - id: keeps-supported-task-on-web
+          arguments:
+          - value:
+              rangeValues: true
+              formulas: true
+          - value:
+            - rangeValues
+            - formulas
+          expectedReturn:
+            tier: web
+            required:
+            - formulas
+            - rangeValues
+            unsupported: []
+            webRunnable: true
+        - id: routes-macro-local
+          arguments:
+          - value:
+              rangeValues: true
+              macro: true
+          - value:
+            - rangeValues
+          expectedReturn:
+            tier: local
+            required:
+            - macro
+            - rangeValues
+            unsupported:
+            - macro
+            webRunnable: false
+        - id: handles-empty-task
+          arguments:
+          - value: {}
+          - value: []
+          expectedReturn:
+            tier: web
+            required: []
+            unsupported: []
+            webRunnable: true
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: excel_03-lite-fallback-contract-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - excel_03-xlwings-lite-capability-mastery
+    title: Lite에서 Local로 넘기는 handoff 계약 만들기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: Web에서 만든 계획·검증 케이스·source hash를 보존한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - Local 전환은 Web 학습 결과를 버리는 재시작이 아니어야 합니다.
+    - plan ID, source hash, 통과한 check를 handoff에 보존하세요.
+    exercise:
+      prompt: build_lite_handoff(web_result, unsupported_features)를 완성하세요.
+      starterCode: |-
+        def build_lite_handoff(web_result, unsupported_features):
+            raise NotImplementedError
+      solution: |
+        def build_lite_handoff(web_result, unsupported_features):
+            required = {"planId", "sourceHash", "checksPassed"}
+            missing = sorted(required - set(web_result))
+            failures = []
+            if not web_result.get("checksPassed", False):
+                failures.append("web-checks")
+            if not unsupported_features:
+                failures.append("unnecessary-handoff")
+            return {"ready": not missing and not failures, "missing": missing, "failures": failures, "localReasons": sorted(unsupported_features), "preservedEvidence": ["planId", "sourceHash", "checksPassed"]}
+      hints: *id002
+    check:
+      id: python.excel.excel_03.lite-fallback-contract.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.excel.excel_03.lite-fallback-contract.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_lite_handoff
+        cases:
+        - id: accepts-evidenced-handoff
+          arguments:
+          - value:
+              planId: p1
+              sourceHash: h
+              checksPassed: true
+          - value:
+            - macro
+          expectedReturn:
+            ready: true
+            missing: []
+            failures: []
+            localReasons:
+            - macro
+            preservedEvidence:
+            - planId
+            - sourceHash
+            - checksPassed
+        - id: reports-failed-web-checks
+          arguments:
+          - value:
+              planId: p1
+              sourceHash: h
+              checksPassed: false
+          - value:
+            - desktopExcel
+          expectedReturn:
+            ready: false
+            missing: []
+            failures:
+            - web-checks
+            localReasons:
+            - desktopExcel
+            preservedEvidence:
+            - planId
+            - sourceHash
+            - checksPassed
+        - id: reports-missing-and-unnecessary
+          arguments:
+          - value:
+              checksPassed: true
+          - value: []
+          expectedReturn:
+            ready: false
+            missing:
+            - planId
+            - sourceHash
+            failures:
+            - unnecessary-handoff
+            localReasons: []
+            preservedEvidence:
+            - planId
+            - sourceHash
+            - checksPassed
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: excel_03-lite-boundary-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - excel_03-lite-fallback-contract-transfer
+    title: xlwings Lite 경계 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 지원 검사·Web 학습·Local handoff를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Web capability와 Desktop Excel capability를 과장 없이 구분하세요.
+    - 지원되지 않는 효과도 그 전 단계 판단은 Web에서 학습할 수 있습니다.
+    exercise:
+      prompt: choose_lite_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_lite_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_lite_evidence(stage):
+            table = {"support": {"action": "compare requirement and capability sets", "evidence": "unsupported feature list", "risk": "false web parity"}, "learn": {"action": "run portable contract checks", "evidence": "behavior results", "risk": "download-only learning"}, "handoff": {"action": "preserve plan and source identity", "evidence": "local handoff manifest", "risk": "duplicated work"}}
+            if stage not in table:
+                raise ValueError("unknown stage")
+            return table[stage]
+      hints: *id003
+    check:
+      id: python.excel.excel_03.lite-boundary-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.excel.excel_03.lite-boundary-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_lite_evidence
+        cases:
+        - id: recalls-support
+          arguments:
+          - value: support
+          expectedReturn:
+            action: compare requirement and capability sets
+            evidence: unsupported feature list
+            risk: false web parity
+        - id: recalls-learn
+          arguments:
+          - value: learn
+          expectedReturn:
+            action: run portable contract checks
+            evidence: behavior results
+            risk: download-only learning
+        - id: recalls-handoff
+          arguments:
+          - value: handoff
+          expectedReturn:
+            action: preserve plan and source identity
+            evidence: local handoff manifest
+            risk: duplicated work
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

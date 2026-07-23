@@ -1,0 +1,806 @@
+var e=`meta:
+  packages:
+  - matplotlib
+  - numpy
+  - pandas
+  - scipy
+  id: scipy_09
+  title: 스펙트럼분석기
+  order: 9
+  category: scipy
+  difficulty: ⭐⭐⭐⭐
+  badge: 심화
+  tags:
+  - scipy.fft
+  - FFT
+  - 스펙트럼
+  - 주파수분석
+  - 스펙트로그램
+  seo:
+    title: scipy.fft 스펙트럼 분석 - 주파수 성분 분석하기
+    description: scipy.fft로 신호의 주파수 성분을 분석합니다. FFT, 파워 스펙트럼, 스펙트로그램을 배웁니다.
+    keywords:
+    - scipy
+    - fft
+    - 스펙트럼
+    - 주파수분석
+    - 푸리에변환
+intro:
+  emoji: 📊
+  goal: scipy.fft로 신호를 주파수 영역에서 분석합니다.
+  description: 시간 영역 신호를 주파수 영역으로 변환하여 어떤 주파수 성분으로 구성되어 있는지 분석합니다. 오디오, 진동, 심장박동 등 다양한 신호 분석에 활용합니다.
+  direction: 스펙트럼분석기에서 수치 데이터를 모델에 넣고 계산 결과와 오차를 검증합니다.
+  benefits:
+  - 수치 입력 확인 후 최적화/적분/신호 처리에 맞는 코드 입력을 고릅니다.
+  - 스펙트럼분석기 결과를 오차와 결과 범위 기준으로 즉시 점검합니다.
+  - 완료한 코드를 과학 계산 루틴에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 데이터 로드 입력 확인
+      detail: 입력 기준(수치 입력)과 필요한 조건을 먼저 고정합니다.
+    - label: FFT 수행 처리 실행
+      detail: 최적화/적분/신호 처리 코드를 실행해 중간 결과를 확인합니다.
+    - label: 주파수 스펙트럼 결과 검증
+      detail: 오차와 결과 범위 기준으로 실행 결과를 비교합니다.
+    - label: 스펙트럼분석기 재사용
+      detail: 완성 코드를 과학 계산 루틴에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 과학 계산 환경
+      detail: matplotlib, numpy, pandas, scipy 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 스펙트럼분석기 실행
+      detail: 셀을 실행해 오차와 결과 범위와 예외 상태를 확인합니다.
+    - label: 스펙트럼분석기 완료
+      detail: 검증된 코드를 과학 계산 루틴로 남깁니다.
+sections:
+- id: load
+  title: 데이터 로드
+  structuredPrimary: true
+  subtitle: 복합 신호 생성
+  goal: 데이터 로드에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 푸리에 변환(FFT)은 시간 영역 신호를 주파수 영역으로 변환합니다. 복잡한 신호가 어떤 주파수 성분들의 합으로 구성되어 있는지 분해할 수 있습니다. 이 프로젝트에서는
+    여러 주파수가 합성된 신호를 생성하고 FFT로 각 주파수를 검출합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import scipy
+
+    import numpy as np
+    from scipy import fft
+    from scipy import signal
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    fs = 500
+    duration = 2
+    t = np.linspace(0, duration, fs * duration, endpoint=False)
+
+    freq1, amp1 = 5, 1.0
+    freq2, amp2 = 15, 0.5
+    freq3, amp3 = 30, 0.3
+
+    sig1 = amp1 * np.sin(2 * np.pi * freq1 * t)
+    sig2 = amp2 * np.sin(2 * np.pi * freq2 * t)
+    sig3 = amp3 * np.sin(2 * np.pi * freq3 * t)
+
+    compositeSignal = sig1 + sig2 + sig3
+  exercise:
+    prompt: 데이터 로드 예제에서 \`fs\`, \`duration\`, \`t\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      import scipy
+
+      import numpy as np
+      from scipy import fft
+      from scipy import signal
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      fs = 500
+      duration = 2
+      t = np.linspace(0, duration, fs * duration, endpoint=False)
+
+      freq1, amp1 = 5, 1.0
+      freq2, amp2 = 15, 0.5
+      freq3, amp3 = 30, 0.3
+
+      sig1 = amp1 * np.sin(2 * np.pi * freq1 * t)
+      sig2 = amp2 * np.sin(2 * np.pi * freq2 * t)
+      sig3 = amp3 * np.sin(2 * np.pi * freq3 * t)
+
+      compositeSignal = sig1 + sig2 + sig3
+    hints:
+    - 바꿀 지점은 \`fs = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`fs\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 데이터 로드에서 \`fs\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 데이터 로드 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: fftcalc
+  title: FFT 수행
+  structuredPrimary: true
+  subtitle: fft.fft
+  goal: FFT 수행에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    fft.fft는 시간 영역 신호를 주파수 영역으로 변환합니다. 결과는 복소수이며, 크기(절대값)가 각 주파수의 진폭을 나타냅니다. fftfreq로 각 빈에 해당하는 주파수를 계산합니다.
+
+    fftfreq는 각 FFT 빈에 해당하는 주파수를 반환합니다. 결과는 양수와 음수 주파수를 모두 포함하며, 실수 신호에서는 보통 양수 부분만 사용합니다.
+  snippet: |-
+    n = len(compositeSignal)
+    fftResult = fft.fft(compositeSignal)
+    freqs = fft.fftfreq(n, 1/fs)
+
+    magnitude = np.abs(fftResult) / n
+  exercise:
+    prompt: FFT 수행 예제에서 \`n\`, \`fftResult\`, \`freqs\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      n = len(compositeSignal)
+      fftResult = fft.fft(compositeSignal)
+      freqs = fft.fftfreq(n, 1/fs)
+
+      magnitude = np.abs(fftResult) / n
+    hints:
+    - 바꿀 지점은 \`n = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`n\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: FFT 수행에서 \`n\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: FFT 수행 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: spectrum
+  title: 주파수 스펙트럼
+  structuredPrimary: true
+  subtitle: 양수 주파수만
+  goal: 주파수 스펙트럼에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: 실수 신호의 FFT는 대칭이므로 양수 주파수만 사용합니다. DC 성분을 제외한 나머지 진폭을 2배하여 전체 에너지를 표현합니다. 스펙트럼에서 5Hz, 15Hz,
+    30Hz에 피크가 나타나야 합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    positiveFreqs = freqs[:n//2]
+    positiveMag = 2 * magnitude[:n//2]
+    positiveMag[0] = magnitude[0]
+
+    figSpectrum, axSpectrum = plt.subplots(figsize=(12, 6))
+    axSpectrum.plot(positiveFreqs, positiveMag, 'b-', linewidth=1.5)
+    axSpectrum.axvline(freq1, color='r', linestyle='--', alpha=0.7, label=f'{freq1} Hz')
+    axSpectrum.axvline(freq2, color='g', linestyle='--', alpha=0.7, label=f'{freq2} Hz')
+    axSpectrum.axvline(freq3, color='orange', linestyle='--', alpha=0.7, label=f'{freq3} Hz')
+    axSpectrum.set_xlabel('Frequency (Hz)')
+    axSpectrum.set_ylabel('Magnitude')
+    axSpectrum.set_title('Frequency Spectrum (FFT)')
+    axSpectrum.set_xlim(0, 50)
+    axSpectrum.legend()
+    axSpectrum.grid(True, alpha=0.3)
+    figSpectrum
+  exercise:
+    prompt: 주파수 스펙트럼 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      positiveFreqs = freqs[:n//2]
+      positiveMag = 2 * magnitude[:n//2]
+      positiveMag[0] = magnitude[0]
+
+      figSpectrum, axSpectrum = plt.subplots(figsize=(12, 6))
+      axSpectrum.plot(positiveFreqs, positiveMag, 'b-', linewidth=1.5)
+      axSpectrum.axvline(freq1, color='r', linestyle='--', alpha=0.7, label=f'{freq1} Hz')
+      axSpectrum.axvline(freq2, color='g', linestyle='--', alpha=0.7, label=f'{freq2} Hz')
+      axSpectrum.axvline(freq3, color='orange', linestyle='--', alpha=0.7, label=f'{freq3} Hz')
+      axSpectrum.set_xlabel('Frequency (Hz)')
+      axSpectrum.set_ylabel('Magnitude')
+      axSpectrum.set_title('Frequency Spectrum (FFT)')
+      axSpectrum.set_xlim(0, 50)
+      axSpectrum.legend()
+      axSpectrum.grid(True, alpha=0.3)
+      figSpectrum
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 주파수 스펙트럼의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 주파수 스펙트럼의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: peaks
+  title: 피크 검출
+  structuredPrimary: true
+  subtitle: 주요 주파수 찾기
+  goal: 피크 검출에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: signal.find_peaks로 스펙트럼에서 피크를 자동으로 찾아 주요 주파수를 식별합니다. height 파라미터로 최소 진폭 임계값을 설정하여 노이즈로
+    인한 작은 피크를 무시합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    peakIdx, peakProps = signal.find_peaks(positiveMag, height=0.1)
+    peakFreqs = positiveFreqs[peakIdx]
+    peakMags = positiveMag[peakIdx]
+
+    peakDf = pd.DataFrame({
+        'Frequency (Hz)': peakFreqs,
+        'Magnitude': peakMags
+    }).sort_values('Magnitude', ascending=False)
+    peakDf
+  exercise:
+    prompt: 피크 검출 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      peakIdx, peakProps = signal.find_peaks(positiveMag, height=0.1)
+      peakFreqs = positiveFreqs[peakIdx]
+      peakMags = positiveMag[peakIdx]
+
+      peakDf = pd.DataFrame({
+          'Frequency (Hz)': peakFreqs,
+          'Magnitude': peakMags
+      }).sort_values('Magnitude', ascending=False)
+      peakDf
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 피크 검출의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 피크 검출의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: psd
+  title: 파워 스펙트럼 밀도
+  structuredPrimary: true
+  subtitle: Welch 방법
+  goal: 파워 스펙트럼 밀도에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    파워 스펙트럼 밀도(PSD)는 주파수별 에너지 분포를 나타냅니다. signal.welch는 신호를 여러 세그먼트로 나누어 평균함으로써 더 안정적인 추정을 제공합니다. 노이즈가 있는 실제 신호 분석에 적합합니다.
+
+    semilogy는 y축을 로그 스케일로 표시합니다. 파워가 큰 주파수와 작은 주파수를 함께 볼 수 있습니다. nperseg는 각 세그먼트 길이로, 주파수 해상도와 분산 사이의 트레이드오프가 있습니다.
+  tips:
+  - semilogy는 y축을 로그 스케일로 표시합니다. 파워가 큰 주파수와 작은 주파수를 함께 볼 수 있습니다. nperseg는 각 세그먼트 길이로, 주파수 해상도와 분산 사이의
+    트레이드오프가 있습니다.
+  snippet: |-
+    freqsWelch, psdWelch = signal.welch(compositeSignal, fs, nperseg=256)
+
+    figPsd, axPsd = plt.subplots(figsize=(12, 6))
+    axPsd.semilogy(freqsWelch, psdWelch, 'b-', linewidth=2)
+    axPsd.set_xlabel('Frequency (Hz)')
+    axPsd.set_ylabel('Power Spectral Density')
+    axPsd.set_title('Power Spectrum (Welch Method)')
+    axPsd.set_xlim(0, 50)
+    axPsd.grid(True, alpha=0.3)
+    figPsd
+  exercise:
+    prompt: 파워 스펙트럼 밀도 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      freqsWelch, psdWelch = signal.welch(compositeSignal, fs, nperseg=256)
+
+      figPsd, axPsd = plt.subplots(figsize=(12, 6))
+      axPsd.semilogy(freqsWelch, psdWelch, 'b-', linewidth=2)
+      axPsd.set_xlabel('Frequency (Hz)')
+      axPsd.set_ylabel('Power Spectral Density')
+      axPsd.set_title('Power Spectrum (Welch Method)')
+      axPsd.set_xlim(0, 50)
+      axPsd.grid(True, alpha=0.3)
+      figPsd
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 파워 스펙트럼 밀도의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 파워 스펙트럼 밀도 실행 결과가 오차와 결과 범위 기준으로 바꾼 데이터 값이나 축 설정을 반영해야 합니다.
+- id: spectrogram
+  title: 스펙트로그램
+  structuredPrimary: true
+  subtitle: 시간-주파수 분석
+  goal: 스펙트로그램에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 스펙트로그램은 시간에 따라 주파수 성분이 어떻게 변하는지 보여줍니다. 음성, 음악, 비정상 신호 분석에 필수적입니다. STFT(Short-Time Fourier
+    Transform)를 기반으로 합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    tChirp = np.linspace(0, 5, 5000)
+    chirpSignal = signal.chirp(tChirp, f0=5, f1=50, t1=5, method='linear')
+  exercise:
+    prompt: 스펙트로그램 예제에서 \`tChirp\`, \`chirpSignal\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      tChirp = np.linspace(0, 5, 5000)
+      chirpSignal = signal.chirp(tChirp, f0=5, f1=50, t1=5, method='linear')
+    hints:
+    - 바꿀 지점은 \`tChirp = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`tChirp\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 스펙트로그램에서 \`tChirp\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 스펙트로그램 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: fftfilter
+  title: FFT 필터링
+  structuredPrimary: true
+  subtitle: 주파수 영역에서 필터링
+  goal: FFT 필터링에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: FFT 영역에서 특정 주파수를 제거하고 역변환(IFFT)하면 필터링 효과를 얻습니다. 정확한 주파수 제어가 가능하지만, 급격한 차단은 링잉 현상을 일으킬 수
+    있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    fftFiltered = fftResult.copy()
+
+    freqMask = (np.abs(freqs) > 12) & (np.abs(freqs) < 18)
+    fftFiltered[freqMask] = 0
+
+    filteredSignalFft = np.real(fft.ifft(fftFiltered))
+  exercise:
+    prompt: FFT 필터링 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      fftFiltered = fftResult.copy()
+
+      freqMask = (np.abs(freqs) > 12) & (np.abs(freqs) < 18)
+      fftFiltered[freqMask] = 0
+
+      filteredSignalFft = np.real(fft.ifft(fftFiltered))
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+  check:
+    type: noError
+    noError: FFT 필터링에서 \`fftFiltered\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: FFT 필터링 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: window
+  title: 윈도우 함수
+  structuredPrimary: true
+  subtitle: 스펙트럼 누설 방지
+  goal: 윈도우 함수에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.
+  explanation: |-
+    유한 길이 신호의 FFT는 스펙트럼 누설(spectral leakage)이 발생합니다. 신호 끝부분의 불연속성이 원인입니다. Hann, Hamming 등의 윈도우 함수를 적용하면 양끝을 0으로 부드럽게 줄여 누설을 감소시킵니다.
+
+    10.5Hz처럼 FFT 빈 중심에서 벗어난 주파수는 누설이 심합니다. Hann 윈도우를 적용하면 사이드로브가 크게 감소합니다. 메인로브가 약간 넓어지는 트레이드오프가 있습니다.
+  snippet: |-
+    testFreq = 10.5
+    testSig = np.sin(2 * np.pi * testFreq * t)
+
+    hannWindow = signal.windows.hann(len(testSig))
+    testSigWindowed = testSig * hannWindow
+
+    fftRect = fft.fft(testSig)
+    fftHann = fft.fft(testSigWindowed)
+
+    magRect = 20 * np.log10(np.abs(fftRect[:n//2]) / n + 1e-10)
+    magHann = 20 * np.log10(np.abs(fftHann[:n//2]) / n + 1e-10)
+
+    figWindow, axWindow = plt.subplots(figsize=(12, 6))
+    axWindow.plot(positiveFreqs, magRect, 'r-', alpha=0.7, label='Rectangular (no window)')
+    axWindow.plot(positiveFreqs, magHann, 'b-', label='Hann window')
+    axWindow.set_xlim(0, 30)
+    axWindow.set_ylim(-80, 0)
+    axWindow.set_xlabel('Frequency (Hz)')
+    axWindow.set_ylabel('Magnitude (dB)')
+    axWindow.set_title('Effect of Window Function on Spectral Leakage')
+    axWindow.legend()
+    axWindow.grid(True, alpha=0.3)
+    figWindow
+  exercise:
+    prompt: 윈도우 함수 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.
+    starterCode: |-
+      testFreq = 10.5
+      testSig = np.sin(2 * np.pi * testFreq * t)
+
+      hannWindow = signal.windows.hann(len(testSig))
+      testSigWindowed = testSig * hannWindow
+
+      fftRect = fft.fft(testSig)
+      fftHann = fft.fft(testSigWindowed)
+
+      magRect = 20 * np.log10(np.abs(fftRect[:n//2]) / n + 1e-10)
+      magHann = 20 * np.log10(np.abs(fftHann[:n//2]) / n + 1e-10)
+
+      figWindow, axWindow = plt.subplots(figsize=(12, 6))
+      axWindow.plot(positiveFreqs, magRect, 'r-', alpha=0.7, label='Rectangular (no window)')
+      axWindow.plot(positiveFreqs, magHann, 'b-', label='Hann window')
+      axWindow.set_xlim(0, 30)
+      axWindow.set_ylim(-80, 0)
+      axWindow.set_xlabel('Frequency (Hz)')
+      axWindow.set_ylabel('Magnitude (dB)')
+      axWindow.set_title('Effect of Window Function on Spectral Leakage')
+      axWindow.legend()
+      axWindow.grid(True, alpha=0.3)
+      figWindow
+    hints:
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: 윈도우 함수의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.
+    resultCheck: 윈도우 함수의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.
+- id: result
+  title: FFT 분석 가이드
+  structuredPrimary: true
+  subtitle: 실무 팁
+  goal: FFT 분석 가이드에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+  explanation: 주파수 분석 시 샘플링 주파수, 데이터 길이, 윈도우 선택이 결과에 큰 영향을 줍니다. 주파수 해상도는 fs/N으로 결정되며, 나이퀴스트 정리에 따라 fs/2까지만
+    분석 가능합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    fftGuideDf = pd.DataFrame({
+        'Topic': ['주파수 해상도', '주파수 범위', '윈도우', '평균화', '제로 패딩'],
+        'Formula': ['Δf = fs/N', '0 ~ fs/2', 'Hann, Hamming', 'Welch, Bartlett', 'N을 늘림'],
+        'Effect': ['샘플 수 늘리면 해상도 증가', '나이퀴스트 한계', '스펙트럼 누설 감소', '노이즈 감소', '주파수 보간 효과']
+    })
+    fftGuideDf
+  exercise:
+    prompt: FFT 분석 가이드 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      fftGuideDf = pd.DataFrame({
+          'Topic': ['주파수 해상도', '주파수 범위', '윈도우', '평균화', '제로 패딩'],
+          'Formula': ['Δf = fs/N', '0 ~ fs/2', 'Hann, Hamming', 'Welch, Bartlett', 'N을 늘림'],
+          'Effect': ['샘플 수 늘리면 해상도 증가', '나이퀴스트 한계', '스펙트럼 누설 감소', '노이즈 감소', '주파수 보간 효과']
+      })
+      fftGuideDf
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    type: noError
+    noError: FFT 분석 가이드의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: FFT 분석 가이드의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: practice
+  title: 실습
+  structuredPrimary: true
+  subtitle: 주파수 분석 프로젝트
+  goal: 실습에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 신호처리 엔지니어가 되어 다양한 신호의 주파수 특성을 분석해보세요. 심박 신호에서 심박수를 추출하거나, 합성 음성의 스펙트로그램을 시각화해보세요.
+  snippet: |-
+    fsHr = 250
+    durHr = 10
+    tHr = np.linspace(0, durHr, fsHr * durHr, endpoint=False)
+
+    heartRate = 72
+    heartFreq = heartRate / 60
+    hrSignal = np.sin(2 * np.pi * heartFreq * tHr)
+    hrSignal += 0.3 * np.sin(2 * np.pi * 2 * heartFreq * tHr)
+    hrSignal += 0.1 * np.random.randn(len(tHr))
+  exercise:
+    prompt: 실습 예제에서 \`fsHr\`, \`durHr\`, \`tHr\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      fsHr = 250
+      durHr = 10
+      tHr = np.linspace(0, durHr, fsHr * durHr, endpoint=False)
+
+      heartRate = 72
+      heartFreq = heartRate / 60
+      hrSignal = np.sin(2 * np.pi * heartFreq * tHr)
+      hrSignal += 0.3 * np.sin(2 * np.pi * 2 * heartFreq * tHr)
+      hrSignal += 0.1 * np.random.randn(len(tHr))
+    hints:
+    - 바꿀 지점은 \`fsHr = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`fsHr\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+  check:
+    type: noError
+    noError: 실습에서 \`fsHr\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: workflow_validation
+  title: 업무 흐름 검증
+  structuredPrimary: true
+  subtitle: SLA 지연시간 통계 게이트
+  goal: 업무 흐름 검증에서 최적화/적분/신호 처리 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한
+    신뢰구간과 개선 기준을 함께 제시해야 합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    import numpy as np
+    from scipy import optimize, stats
+
+    latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+    def validateLatencySamples(samples):
+        values = np.asarray(samples, dtype=float)
+        if values.size < 5:
+            raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+        if not np.isfinite(values).all():
+            raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+        if (values <= 0).any():
+            raise ValueError("지연시간은 0보다 커야 합니다.")
+        return values
+
+    cleanLatency = validateLatencySamples(latencySamples)
+    cleanLatency.mean(), cleanLatency.std(ddof=1)
+  exercise:
+    prompt: 업무 흐름 검증 예제에서 기대 문자열이나 실제 출력 문구를 바꾸고 assert 비교가 맞는지 확인하세요.
+    starterCode: |-
+      allowedMean = 264
+      capThreshold = optimize.brentq(
+          lambda threshold: np.clip(cleanLatency, None, threshold).mean() - allowedMean,
+          cleanLatency.min(),
+          cleanLatency.max(),
+      )
+      cappedMean = np.clip(cleanLatency, None, capThreshold).mean()
+
+      assert abs(cappedMean - allowedMean) < 1e-6
+      {
+          "allowedMean": allowedMean,
+          "capThreshold": round(float(capThreshold), 2),
+          "cappedMean": round(float(cappedMean), 2),
+      }
+    solution: |-
+      import numpy as np
+      from scipy import optimize, stats
+
+      latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+      def validateLatencySamples(samples):
+          values = np.asarray(samples, dtype=float)
+          if values.size < 5:
+              raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+          if not np.isfinite(values).all():
+              raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+          if (values <= 0).any():
+              raise ValueError("지연시간은 0보다 커야 합니다.")
+          return values
+
+      cleanLatency = validateLatencySamples(latencySamples)
+      cleanLatency.mean(), cleanLatency.std(ddof=1)
+    hints:
+    - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
+    - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
+  check:
+    type: noError
+    noError: 업무 흐름 검증에서 \`allowedMean\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: scipy_09-discrete-spectrum-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load
+    - workflow_validation
+    title: 짧은 signal의 DFT power spectrum 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: sampling rate와 one-sided bin의 frequency·power를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - frequency bin은 sample_rate/n 간격입니다.
+    - window·normalization을 명시하지 않은 power를 물리 단위 PSD로 부르지 마세요.
+    exercise:
+      prompt: power_spectrum(values, sample_rate)를 완성하세요.
+      starterCode: |-
+        def power_spectrum(values, sample_rate):
+            raise NotImplementedError
+      solution: |
+        def power_spectrum(values, sample_rate):
+            import cmath
+            if not values or sample_rate <= 0: raise ValueError("invalid signal")
+            n = len(values); bins = []
+            for k in range(n//2+1):
+                coefficient = sum(value*cmath.exp(-2j*cmath.pi*k*t/n) for t,value in enumerate(values))
+                bins.append({"frequency": round(k*sample_rate/n,6), "power": round((abs(coefficient)/n)**2,6)})
+            return bins
+      hints: *id001
+    check:
+      id: python.scipy.scipy_09.discrete-spectrum.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_09.discrete-spectrum.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: power_spectrum
+        cases:
+        - id: finds-dc-signal
+          arguments:
+          - value:
+            - 2
+            - 2
+            - 2
+            - 2
+          - value: 4
+          expectedReturn:
+          - frequency: 0.0
+            power: 4.0
+          - frequency: 1.0
+            power: 0.0
+          - frequency: 2.0
+            power: 0.0
+        - id: finds-alternating-bin
+          arguments:
+          - value:
+            - 1
+            - -1
+            - 1
+            - -1
+          - value: 4
+          expectedReturn:
+          - frequency: 0.0
+            power: 0.0
+          - frequency: 1.0
+            power: 0.0
+          - frequency: 2.0
+            power: 1.0
+        - id: rejects-empty
+          arguments:
+          - value: []
+          - value: 10
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: scipy_09-spectral-peak-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_09-discrete-spectrum-mastery
+    title: 새 진동 spectrum에 peak 검증 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: DC 제외 dominant bin과 spectral share를 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 평균 offset인 DC bin을 주기 peak와 분리하세요.
+    - peak share와 절대 power를 함께 보세요.
+    exercise:
+      prompt: dominant_frequency(bins)를 완성하세요.
+      starterCode: |-
+        def dominant_frequency(bins):
+            raise NotImplementedError
+      solution: |
+        def dominant_frequency(bins):
+            positive = [row for row in bins if row["frequency"] > 0]
+            if not positive: return {"frequency": None, "power": None, "share": None}
+            dominant = sorted(positive,key=lambda row:(-row["power"],row["frequency"]))[0]
+            total = sum(row["power"] for row in positive)
+            return {"frequency": dominant["frequency"], "power": dominant["power"], "share": 0.0 if total == 0 else round(dominant["power"]/total,4)}
+      hints: *id002
+    check:
+      id: python.scipy.scipy_09.spectral-peak-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_09.spectral-peak-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: dominant_frequency
+        cases:
+        - id: finds-dominant-nondc-bin
+          arguments:
+          - value:
+            - frequency: 0
+              power: 10
+            - frequency: 2
+              power: 3
+            - frequency: 4
+              power: 1
+          expectedReturn:
+            frequency: 2
+            power: 3
+            share: 0.75
+        - id: handles-no-positive-bin
+          arguments:
+          - value:
+            - frequency: 0
+              power: 2
+          expectedReturn:
+            frequency: null
+            power: null
+            share: null
+        - id: handles-zero-power
+          arguments:
+          - value:
+            - frequency: 1
+              power: 0
+          expectedReturn:
+            frequency: 1
+            power: 0
+            share: 0.0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: scipy_09-spectrum-analysis-evidence-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_09-spectral-peak-audit-transfer
+    title: 스펙트럼 분석 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: sampling·window·peak 해석을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 수치 방법의 입력 가정과 오차 근거를 함께 남기세요.
+    - p-value나 최적화 성공 flag 하나를 결론으로 사용하지 마세요.
+    exercise:
+      prompt: choose_spectrum_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_spectrum_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_spectrum_evidence(situation):
+            table = {'periodic-component': {'method': 'FFT power spectrum', 'evidence': 'sample rate bin width window', 'risk': 'aliasing'}, 'nonstationary-frequency': {'method': 'short-time spectrum', 'evidence': 'window length overlap', 'risk': 'time-frequency tradeoff'}, 'dc-offset': {'method': 'demean before peak analysis', 'evidence': 'removed mean', 'risk': 'removing real baseline'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.scipy.scipy_09.spectrum-analysis-evidence.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_09.spectrum-analysis-evidence.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_spectrum_evidence
+        cases:
+        - id: recalls-periodic-component
+          arguments:
+          - value: periodic-component
+          expectedReturn:
+            method: FFT power spectrum
+            evidence: sample rate bin width window
+            risk: aliasing
+        - id: recalls-nonstationary-frequency
+          arguments:
+          - value: nonstationary-frequency
+          expectedReturn:
+            method: short-time spectrum
+            evidence: window length overlap
+            risk: time-frequency tradeoff
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

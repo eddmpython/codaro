@@ -1,0 +1,755 @@
+var e=`meta:
+  id: xlwings_04
+  title: 항공편 DataFrame과 Excel 왕복
+  order: 4
+  category: xlwings
+  badge: 기초
+  difficulty: easy
+  audience: 표 입력과 시트 탐색을 익혔고, 이제 pandas로 분석 가능한 형태로 표를 다루고 싶은 학습자
+  packages:
+    - xlwings
+    - pandas
+  tags:
+    - xlwings
+    - pandas
+    - DataFrame
+    - options
+    - converter
+  seo:
+    title: 항공편 DataFrame ↔ Excel 왕복 - xlwings options 컨버터
+    description: 항공편 데이터(편명, 노선, 출발/도착, 승객 수)를 pandas DataFrame으로 시트에 입력하고 options 컨버터로 다시 읽는 양방향 왕복을 익힌다.
+    keywords:
+      - xlwings
+      - pandas
+      - DataFrame
+      - options
+      - 항공편
+intro:
+  direction: 항공편 운항 데이터(편명·노선·시간·승객 수)를 pandas DataFrame으로 만들고 Excel 시트와 양방향으로 왕복하는 패턴을 익힌다.
+  benefits:
+    - "sheet[\\"A1\\"].value = df 한 줄로 헤더와 인덱스를 함께 쓰는 가장 짧은 패턴을 익힌다."
+    - "options(pd.DataFrame, header=1, index=False)로 Excel 영역을 DataFrame으로 읽는 컨버터를 다룬다."
+    - 항공편 데이터처럼 시계열·관계형이 섞인 표가 list-of-lists ↔ DataFrame 두 형태로 왕복하는 방식을 직접 비교한다.
+    - 다음 레슨의 수식과 서식으로 자연스럽게 이어지는 데이터 분석 기반을 만든다.
+  diagram:
+    steps:
+      - label: 1단계. DataFrame → Excel
+        detail: 항공편 DataFrame을 시트의 Range에 그대로 대입해 헤더와 데이터를 자동 입력한다.
+      - label: 2단계. Excel → DataFrame
+        detail: options(pd.DataFrame, ...)로 영역을 DataFrame으로 읽는 컨버터 패턴을 익힌다.
+      - label: 3단계. 양방향 round-trip 검증
+        detail: 같은 항공편 데이터가 DataFrame → 시트 → 다시 DataFrame을 거쳐도 변하지 않는지 equals로 비교.
+      - label: 4단계. 실습
+        detail: 항공편 분석과 호텔 예약 DataFrame 왕복을 직접 만든다.
+    runtime:
+      - label: 패키지 확인
+        detail: xlwings와 pandas가 둘 다 import 가능해야 한다.
+      - label: 데이터 형태 결정
+        detail: 인덱스를 컬럼으로 둘지 별도 인덱스로 둘지 미리 정한다. 항공편은 index=False가 자연스럽다.
+      - label: round-trip 검증
+        detail: DataFrame.equals로 원본과 왕복 후 결과를 비교한다.
+sections:
+  - id: df-to-excel
+    title: 1단계. 항공편 DataFrame을 Excel에 그대로 쓰기
+    structuredPrimary: true
+    subtitle: sheet["A1"].value = df
+    goal: 항공편 DataFrame을 새 시트에 한 번에 입력하고, 헤더 자동 포함 여부와 인덱스 처리 방식을 확인한다.
+    why: 항공사 운항 분석은 pandas에서 끝낸 뒤 Excel로 내보내는 흐름이 자주 쓰인다. 한 줄 대입이 가장 짧은 경로다.
+    explanation: |-
+      sheet["A1"].value = df로 DataFrame을 그대로 시트에 대입하면, xlwings가 자동으로 컬럼 헤더를 첫 행에, 인덱스를 첫 열에 쓰고 데이터를 채웁니다.
+      인덱스를 안 쓰고 싶으면 sheet["A1"].options(index=False).value = df 형태로 옵션을 줍니다. 항공편처럼 식별자(flightNo)가 이미 있는 데이터는 인덱스를 따로 둘 필요가 없습니다.
+      이번 단계에서는 인덱스 포함과 index=False 두 방식을 시트에 동시에 두어 차이를 직접 비교합니다.
+    tips:
+      - df를 그대로 대입하면 인덱스가 항상 포함됩니다. 보고서에 인덱스가 필요 없다면 index=False 옵션을 명시하세요.
+      - 큰 DataFrame을 쓸 때도 한 번의 대입이 셀별 입력보다 압도적으로 빠릅니다.
+    snippet: |-
+      import pandas as pd
+      import xlwings as xw
+
+      flightDf = pd.DataFrame({
+          "flightNo": ["KE001", "OZ211", "TW901"],
+          "route": ["ICN-LAX", "ICN-NRT", "ICN-CEB"],
+          "passengers": [318, 264, 189],
+      })
+
+      with xw.App(visible=False) as dfApp:
+          dfBook = dfApp.books.add()
+          withIndexSheet = dfBook.sheets.active
+          withIndexSheet.name = "withIndex"
+          withIndexSheet["A1"].value = flightDf
+
+          noIndexSheet = dfBook.sheets.add("noIndex")
+          noIndexSheet["A1"].options(index=False).value = flightDf
+
+          withIndexHeader = withIndexSheet["A1:D1"].value
+          noIndexHeader = noIndexSheet["A1:C1"].value
+
+      assert withIndexHeader[0] is None
+      assert noIndexHeader == ["flightNo", "route", "passengers"]
+      {"withIndex": withIndexHeader, "noIndex": noIndexHeader}
+    exercise:
+      prompt: flightDf에 "departCity" 컬럼을 추가하고, noIndex 시트의 헤더가 새 컬럼까지 포함하는지 확인하세요.
+      starterCode: |-
+        import pandas as pd
+        import xlwings as xw
+
+        flightDf = pd.DataFrame({
+            "flightNo": ["KE001", "OZ211", "TW901"],
+            "route": ["ICN-LAX", "ICN-NRT", "ICN-CEB"],
+            "passengers": [318, 264, 189],
+            "___": ["Seoul", "Seoul", "Seoul"],
+        })
+
+        with xw.App(visible=False) as dfApp:
+            dfBook = dfApp.books.add()
+            noIndexSheet = dfBook.sheets.active
+            noIndexSheet.name = "noIndex"
+            noIndexSheet["A1"].options(index=False).value = flightDf
+            noIndexHeader = noIndexSheet["A1:D1"].value
+
+        assert len(noIndexHeader) == 4
+        assert "___" in noIndexHeader
+        noIndexHeader
+      solution: |-
+        import pandas as pd
+        import xlwings as xw
+
+        flightDf = pd.DataFrame({
+            "flightNo": ["KE001", "OZ211", "TW901"],
+            "route": ["ICN-LAX", "ICN-NRT", "ICN-CEB"],
+            "passengers": [318, 264, 189],
+            "departCity": ["Seoul", "Seoul", "Seoul"],
+        })
+
+        with xw.App(visible=False) as dfApp:
+            dfBook = dfApp.books.add()
+            noIndexSheet = dfBook.sheets.active
+            noIndexSheet.name = "noIndex"
+            noIndexSheet["A1"].options(index=False).value = flightDf
+            noIndexHeader = noIndexSheet["A1:D1"].value
+
+        assert len(noIndexHeader) == 4
+        assert "departCity" in noIndexHeader
+        noIndexHeader
+      hints:
+        - 새 컬럼의 값 리스트 길이는 다른 컬럼과 같아야 합니다(여기서는 3개).
+        - options(index=False)를 빼면 첫 컬럼이 None(인덱스 자리)이 됩니다.
+    check:
+      noError: pandas와 xlwings import, DataFrame 대입이 ValueError 없이 끝나야 합니다.
+      resultCheck: options(index=False) 결과의 헤더가 DataFrame의 컬럼 목록과 같고, 추가한 컬럼이 포함되어야 합니다.
+
+  - id: excel-to-df
+    title: 2단계. Excel 영역을 DataFrame으로 읽기
+    structuredPrimary: true
+    subtitle: options(pd.DataFrame, header=1, index=False)
+    goal: Excel 시트의 항공편 표 영역을 options(pd.DataFrame, ...) 컨버터로 한 번에 DataFrame으로 읽고 pandas 메서드로 바로 분석한다.
+    why: Excel에서 읽은 데이터를 바로 DataFrame으로 받으면, list-of-lists를 분석용 자료구조로 변환하는 중간 단계가 사라진다.
+    explanation: |-
+      Range.options(pd.DataFrame, header=1, index=False).value를 하면 영역의 첫 행을 헤더로, 나머지 행을 데이터로 해석한 DataFrame이 반환됩니다. expand("table")과 결합하면 행 수를 외울 필요 없이 바로 DataFrame을 얻을 수 있습니다.
+      header=1은 헤더가 한 줄, header=2는 두 줄(multi-index)이라는 뜻입니다. index=False는 첫 컬럼을 인덱스로 쓰지 않고 일반 컬럼으로 두라는 뜻입니다.
+      이렇게 읽은 DataFrame은 pandas의 모든 메서드를 그대로 쓸 수 있으므로 sort_values, groupby, mean 등이 바로 가능합니다.
+    tips:
+      - expand로 영역을 잡은 뒤 options를 적용하면 행 수가 가변적인 표도 자동 처리됩니다.
+      - 숫자 컬럼이 float로 읽히는 경우가 있습니다. 정수가 필요하면 .astype(int)를 추가하세요.
+    snippet: |-
+      import pandas as pd
+      import xlwings as xw
+
+      flightDf = pd.DataFrame({
+          "flightNo": ["KE001", "OZ211", "TW901", "KE251"],
+          "route": ["ICN-LAX", "ICN-NRT", "ICN-CEB", "ICN-FRA"],
+          "passengers": [318, 264, 189, 295],
+      })
+
+      with xw.App(visible=False) as readApp:
+          readBook = readApp.books.add()
+          readSheet = readBook.sheets.active
+          readSheet.name = "flights"
+          readSheet["A1"].options(index=False).value = flightDf
+
+          readDf = readSheet["A1"].expand("table").options(pd.DataFrame, header=1, index=False).value
+          readDf["passengers"] = readDf["passengers"].astype(int)
+          totalPassengers = int(readDf["passengers"].sum())
+          busiestFlight = readDf.loc[readDf["passengers"].idxmax(), "flightNo"]
+
+      assert list(readDf.columns) == ["flightNo", "route", "passengers"]
+      assert totalPassengers == 1066
+      assert busiestFlight == "KE001"
+      readDf
+    exercise:
+      prompt: 평균 승객 수를 계산하는 한 줄을 추가하고, 결과가 266 이상인지 확인하세요.
+      starterCode: |-
+        import pandas as pd
+        import xlwings as xw
+
+        flightDf = pd.DataFrame({
+            "flightNo": ["KE001", "OZ211", "TW901", "KE251"],
+            "route": ["ICN-LAX", "ICN-NRT", "ICN-CEB", "ICN-FRA"],
+            "passengers": [318, 264, 189, 295],
+        })
+
+        with xw.App(visible=False) as readApp:
+            readBook = readApp.books.add()
+            readSheet = readBook.sheets.active
+            readSheet.name = "flights"
+            readSheet["A1"].options(index=False).value = flightDf
+
+            readDf = readSheet["A1"].expand("table").options(pd.DataFrame, header=1, index=False).value
+            readDf["passengers"] = readDf["passengers"].astype(int)
+            avgPassengers = readDf["passengers"].___()
+
+        assert avgPassengers >= 266
+        avgPassengers
+      solution: |-
+        import pandas as pd
+        import xlwings as xw
+
+        flightDf = pd.DataFrame({
+            "flightNo": ["KE001", "OZ211", "TW901", "KE251"],
+            "route": ["ICN-LAX", "ICN-NRT", "ICN-CEB", "ICN-FRA"],
+            "passengers": [318, 264, 189, 295],
+        })
+
+        with xw.App(visible=False) as readApp:
+            readBook = readApp.books.add()
+            readSheet = readBook.sheets.active
+            readSheet.name = "flights"
+            readSheet["A1"].options(index=False).value = flightDf
+
+            readDf = readSheet["A1"].expand("table").options(pd.DataFrame, header=1, index=False).value
+            readDf["passengers"] = readDf["passengers"].astype(int)
+            avgPassengers = readDf["passengers"].mean()
+
+        assert avgPassengers >= 266
+        avgPassengers
+      hints:
+        - pandas Series에 .mean()을 호출하면 평균을 얻습니다.
+        - (318 + 264 + 189 + 295) / 4 = 266.5.
+    check:
+      noError: options(pd.DataFrame, ...) 호출과 DataFrame 메서드가 KeyError나 AttributeError 없이 끝나야 합니다.
+      resultCheck: 읽은 DataFrame의 컬럼과 합계, 평균이 원본 flightDf의 값과 일치해야 합니다.
+
+  - id: roundtrip-verify
+    title: 3단계. 양방향 round-trip 검증
+    structuredPrimary: true
+    subtitle: DataFrame.equals로 완전 일치 확인
+    goal: 항공편 DataFrame을 시트에 쓴 뒤 다시 읽어 원본과 동일한지 DataFrame.equals로 검증한다.
+    why: 왕복에서 값이 바뀌면(소수점, 날짜 포맷, 인코딩) 자동화가 조용히 실패한다. equals로 비교하면 한 번에 잡힌다.
+    explanation: |-
+      pandas는 DataFrame 두 개를 비교하는 .equals 메서드를 제공합니다. 컬럼명, 인덱스, dtype, 값까지 모두 같아야 True를 돌려줍니다.
+      Excel을 거치면 날짜는 datetime으로, 정수도 float로 바뀌는 경우가 있습니다. 이번 단계에서는 dtype을 명시적으로 맞춘 뒤 equals로 비교합니다.
+      파일 저장과 재로딩까지 거친 완전한 round-trip이 통과해야 자동화가 신뢰할 수 있습니다.
+    tips:
+      - passengers가 float로 읽히면 astype(int)로 맞춥니다.
+      - load factor 같은 비율(0~1)은 astype(float)으로 통일하면 비교가 안정적입니다.
+    snippet: |-
+      import pandas as pd
+      import xlwings as xw
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+
+      originalDf = pd.DataFrame({
+          "flightNo": ["KE001", "OZ211", "TW901"],
+          "route": ["ICN-LAX", "ICN-NRT", "ICN-CEB"],
+          "passengers": [318, 264, 189],
+      })
+      rtTemp = TemporaryDirectory()
+      rtPath = Path(rtTemp.name) / "flights_roundtrip.xlsx"
+
+      with xw.App(visible=False) as rtWriteApp:
+          rtBook = rtWriteApp.books.add()
+          rtSheet = rtBook.sheets.active
+          rtSheet.name = "flights"
+          rtSheet["A1"].options(index=False).value = originalDf
+          rtBook.save(str(rtPath))
+
+      with xw.App(visible=False) as rtReadApp:
+          rtReadBook = rtReadApp.books.open(str(rtPath))
+          rtReadSheet = rtReadBook.sheets["flights"]
+          loadedDf = rtReadSheet["A1"].expand("table").options(pd.DataFrame, header=1, index=False).value
+          loadedDf["passengers"] = loadedDf["passengers"].astype(int)
+          rtReadBook.close()
+
+      assert loadedDf.equals(originalDf)
+      loadedDf
+    exercise:
+      prompt: originalDf에 새 컬럼 "loadFactor"(소수점 값)를 추가하고, round-trip 후에도 equals가 통과하도록 dtype을 맞추세요.
+      starterCode: |-
+        import pandas as pd
+        import xlwings as xw
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+
+        originalDf = pd.DataFrame({
+            "flightNo": ["KE001", "OZ211", "TW901"],
+            "route": ["ICN-LAX", "ICN-NRT", "ICN-CEB"],
+            "passengers": [318, 264, 189],
+            "loadFactor": [0.85, 0.78, 0.62],
+        })
+        rtTemp = TemporaryDirectory()
+        rtPath = Path(rtTemp.name) / "flights_roundtrip.xlsx"
+
+        with xw.App(visible=False) as rtWriteApp:
+            rtBook = rtWriteApp.books.add()
+            rtSheet = rtBook.sheets.active
+            rtSheet.name = "flights"
+            rtSheet["A1"].options(index=False).value = originalDf
+            rtBook.save(str(rtPath))
+
+        with xw.App(visible=False) as rtReadApp:
+            rtReadBook = rtReadApp.books.open(str(rtPath))
+            rtReadSheet = rtReadBook.sheets["flights"]
+            loadedDf = rtReadSheet["A1"].expand("table").options(pd.DataFrame, header=1, index=False).value
+            loadedDf["passengers"] = loadedDf["passengers"].astype(int)
+            loadedDf["loadFactor"] = loadedDf["loadFactor"].astype(___)
+            rtReadBook.close()
+
+        assert loadedDf.equals(originalDf)
+        loadedDf
+      solution: |-
+        import pandas as pd
+        import xlwings as xw
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+
+        originalDf = pd.DataFrame({
+            "flightNo": ["KE001", "OZ211", "TW901"],
+            "route": ["ICN-LAX", "ICN-NRT", "ICN-CEB"],
+            "passengers": [318, 264, 189],
+            "loadFactor": [0.85, 0.78, 0.62],
+        })
+        rtTemp = TemporaryDirectory()
+        rtPath = Path(rtTemp.name) / "flights_roundtrip.xlsx"
+
+        with xw.App(visible=False) as rtWriteApp:
+            rtBook = rtWriteApp.books.add()
+            rtSheet = rtBook.sheets.active
+            rtSheet.name = "flights"
+            rtSheet["A1"].options(index=False).value = originalDf
+            rtBook.save(str(rtPath))
+
+        with xw.App(visible=False) as rtReadApp:
+            rtReadBook = rtReadApp.books.open(str(rtPath))
+            rtReadSheet = rtReadBook.sheets["flights"]
+            loadedDf = rtReadSheet["A1"].expand("table").options(pd.DataFrame, header=1, index=False).value
+            loadedDf["passengers"] = loadedDf["passengers"].astype(int)
+            loadedDf["loadFactor"] = loadedDf["loadFactor"].astype(float)
+            rtReadBook.close()
+
+        assert loadedDf.equals(originalDf)
+        loadedDf
+      hints:
+        - originalDf의 loadFactor는 이미 float입니다. 읽은 후에도 float로 맞추면 equals 통과합니다.
+        - 정수 컬럼은 int, 소수점 컬럼은 float로 맞추는 것이 round-trip의 핵심입니다.
+    check:
+      noError: 두 with 블록과 astype 변환이 ValueError 없이 끝나야 합니다.
+      resultCheck: DataFrame.equals가 True를 돌려주어 원본과 round-trip 결과가 완전히 일치해야 합니다.
+
+  - id: practice
+    title: 4단계. 실습
+    subtitle: DataFrame 분석 + Excel 출력 자동화
+    blocks:
+      - type: text
+        content: |-
+          이번 두 미션은 항공편 분석 결과와 호텔 예약 데이터를 Excel로 내보내고 다시 읽어 검증하는 패턴을 다룹니다.
+      - type: tip
+        content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되어 있으므로 import문은 생략해도 됩니다.
+      - type: expansion
+        title: "미션1: 노선별 평균 승객 수 분석"
+        blocks:
+          - type: code
+            title: 원본 데이터와 groupby 분석
+            content: |-
+              import pandas as pd
+              import xlwings as xw
+
+              rawDf = pd.DataFrame({
+                  "route": ["ICN-LAX", "ICN-NRT", "ICN-LAX", "ICN-NRT", "ICN-LAX", "ICN-CEB"],
+                  "date": ["2026-05-01", "2026-05-01", "2026-05-02", "2026-05-02", "2026-05-03", "2026-05-03"],
+                  "passengers": [318, 264, 305, 271, 322, 189],
+              })
+              routeAvg = rawDf.groupby("route", as_index=False)["passengers"].mean().sort_values("passengers", ascending=False)
+              routeAvg
+          - type: code
+            title: 두 시트에 raw와 분석 결과 입력
+            content: |-
+              with xw.App(visible=False) as routeApp:
+                  routeBook = routeApp.books.add()
+                  rawSheet = routeBook.sheets.active
+                  rawSheet.name = "raw"
+                  rawSheet["A1"].options(index=False).value = rawDf
+
+                  avgSheet = routeBook.sheets.add("route_avg")
+                  avgSheet["A1"].options(index=False).value = routeAvg
+
+                  readback = avgSheet["A1"].expand("table").options(pd.DataFrame, header=1, index=False).value
+
+              assert readback.iloc[0]["route"] == "ICN-LAX"
+              readback
+      - type: expansion
+        title: "미션2: 호텔 예약 DataFrame round-trip"
+        blocks:
+          - type: code
+            title: 예약 DataFrame 만들기
+            content: |-
+              import pandas as pd
+              import xlwings as xw
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+
+              bookingDf = pd.DataFrame({
+                  "bookingId": ["B001", "B002", "B003", "B004"],
+                  "guest": ["김지원", "이서연", "박민준", "정유진"],
+                  "nights": [3, 5, 2, 7],
+                  "ratePerNight": [125000.0, 98000.0, 145000.0, 88000.0],
+              })
+              bookingTemp = TemporaryDirectory()
+              bookingPath = Path(bookingTemp.name) / "hotel_bookings.xlsx"
+              bookingDf
+          - type: code
+            title: 시트에 저장
+            content: |-
+              with xw.App(visible=False) as bookingWriteApp:
+                  bookingBook = bookingWriteApp.books.add()
+                  bookingSheet = bookingBook.sheets.active
+                  bookingSheet.name = "bookings"
+                  bookingSheet["A1"].options(index=False).value = bookingDf
+                  bookingBook.save(str(bookingPath))
+              bookingPath.exists()
+          - type: code
+            title: 다시 읽어 round-trip equals
+            content: |-
+              with xw.App(visible=False) as bookingReadApp:
+                  bookingReadBook = bookingReadApp.books.open(str(bookingPath))
+                  bookingReadSheet = bookingReadBook.sheets["bookings"]
+                  loadedBookings = bookingReadSheet["A1"].expand("table").options(pd.DataFrame, header=1, index=False).value
+                  loadedBookings["nights"] = loadedBookings["nights"].astype(int)
+                  loadedBookings["ratePerNight"] = loadedBookings["ratePerNight"].astype(float)
+                  bookingReadBook.close()
+
+              assert loadedBookings.equals(bookingDf)
+              loadedBookings
+
+  - id: summary
+    title: 정리
+    subtitle: DataFrame ↔ Excel 양방향 감각
+    blocks:
+      - type: text
+        content: |-
+          이번 레슨에서 항공편 DataFrame을 한 줄 대입으로 Excel에 쓰고, options(pd.DataFrame, ...) 컨버터로 Excel 영역을 DataFrame으로 다시 읽고, equals로 round-trip을 검증하는 양방향 패턴을 완성했습니다.
+          다음 레슨에서는 같은 시트 위에 Excel 수식(=SUM, =AVERAGE 등)을 코드로 쓰고, 셀 서식(통화, 색상)을 자동 지정하는 흐름을 다룹니다.
+    goal: DataFrame 왕복 패턴을 한 번 완성한 채로 다음 레슨에 진입한다.
+    why: 이 패턴은 pandas 분석 결과를 그대로 Excel 보고서로 만드는 자동화의 핵심이다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: xlwings_04-dataframe-roundtrip-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - df-to-excel
+    - summary
+    title: DataFrame 왕복의 schema·index·null 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 중복 column·의도치 않은 index·null drift를 찾는다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - DataFrame의 columns, index 포함 여부, null 정책을 쓰기 전에 고정하세요.
+    - 2D values와 schema의 열 수를 함께 검사하세요.
+    exercise:
+      prompt: audit_dataframe_contract(columns, rows, include_index, null_policy)를 완성하세요.
+      starterCode: |-
+        def audit_dataframe_contract(columns, rows, include_index, null_policy):
+            raise NotImplementedError
+      solution: |
+        def audit_dataframe_contract(columns, rows, include_index, null_policy):
+            duplicates = sorted({name for name in columns if columns.count(name) > 1})
+            ragged = [index for index, row in enumerate(rows) if len(row) != len(columns)]
+            null_cells = [[r, c] for r, row in enumerate(rows) for c, value in enumerate(row) if value is None]
+            failures = []
+            if duplicates:
+                failures.append("columns")
+            if ragged:
+                failures.append("shape")
+            if include_index not in {True, False}:
+                failures.append("index")
+            if null_cells and null_policy == "reject":
+                failures.append("nulls")
+            return {"accepted": not failures, "failures": failures, "duplicates": duplicates, "raggedRows": ragged, "nullCells": null_cells}
+      hints: *id001
+    check:
+      id: python.xlwings.xlwings_04.dataframe-roundtrip-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.xlwings.xlwings_04.dataframe-roundtrip-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_dataframe_contract
+        cases:
+        - id: accepts-explicit-schema
+          arguments:
+          - value:
+            - sku
+            - price
+          - value:
+            - - A
+              - 10
+          - value: false
+          - value: reject
+          expectedReturn:
+            accepted: true
+            failures: []
+            duplicates: []
+            raggedRows: []
+            nullCells: []
+        - id: reports-shape-and-columns
+          arguments:
+          - value:
+            - sku
+            - sku
+          - value:
+            - - A
+          - value: false
+          - value: allow
+          expectedReturn:
+            accepted: false
+            failures:
+            - columns
+            - shape
+            duplicates:
+            - sku
+            raggedRows:
+            - 0
+            nullCells: []
+        - id: reports-null-policy
+          arguments:
+          - value:
+            - sku
+            - price
+          - value:
+            - - A
+              - null
+          - value: false
+          - value: reject
+          expectedReturn:
+            accepted: false
+            failures:
+            - nulls
+            duplicates: []
+            raggedRows: []
+            nullCells:
+            - - 0
+              - 1
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: xlwings_04-dataframe-roundtrip-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - xlwings_04-dataframe-roundtrip-contract-mastery
+    title: Excel 왕복 후 DataFrame 값 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: key 기준으로 행 누락과 type drift를 검출한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 행 순서가 아니라 business key로 왕복 결과를 비교하세요.
+    - Excel이 숫자를 문자열로 바꾼 type drift를 명시적으로 보고하세요.
+    exercise:
+      prompt: reconcile_dataframe_rows(expected, observed, key, types)를 완성하세요.
+      starterCode: |-
+        def reconcile_dataframe_rows(expected, observed, key, types):
+            raise NotImplementedError
+      solution: |
+        def reconcile_dataframe_rows(expected, observed, key, types):
+            exp = {row[key]: row for row in expected}
+            obs = {row[key]: row for row in observed}
+            missing = sorted(set(exp) - set(obs))
+            extra = sorted(set(obs) - set(exp))
+            type_drift = []
+            for row_id in sorted(set(exp) & set(obs)):
+                for field, expected_type in types.items():
+                    value = obs[row_id].get(field)
+                    actual = "number" if isinstance(value, (int, float)) and not isinstance(value, bool) else "string" if isinstance(value, str) else "null" if value is None else type(value).__name__
+                    if actual != expected_type:
+                        type_drift.append(f"{row_id}:{field}")
+            return {"passed": not missing and not extra and not type_drift, "missing": missing, "extra": extra, "typeDrift": type_drift}
+      hints: *id002
+    check:
+      id: python.xlwings.xlwings_04.dataframe-roundtrip-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.xlwings.xlwings_04.dataframe-roundtrip-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_dataframe_rows
+        cases:
+        - id: accepts-roundtrip
+          arguments:
+          - value:
+            - sku: A
+              price: 10
+          - value:
+            - sku: A
+              price: 10.0
+          - value: sku
+          - value:
+              price: number
+          expectedReturn:
+            passed: true
+            missing: []
+            extra: []
+            typeDrift: []
+        - id: reports-membership
+          arguments:
+          - value:
+            - sku: A
+              price: 10
+          - value:
+            - sku: B
+              price: 10
+          - value: sku
+          - value:
+              price: number
+          expectedReturn:
+            passed: false
+            missing:
+            - A
+            extra:
+            - B
+            typeDrift: []
+        - id: reports-type-drift
+          arguments:
+          - value:
+            - sku: A
+              price: 10
+          - value:
+            - sku: A
+              price: '10'
+          - value: sku
+          - value:
+              price: number
+          expectedReturn:
+            passed: false
+            missing: []
+            extra: []
+            typeDrift:
+            - A:price
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: xlwings_04-dataframe-roundtrip-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - xlwings_04-dataframe-roundtrip-reconciliation-transfer
+    title: DataFrame 왕복 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: schema·shape·type 증거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Web에서는 Excel 자동화 판단을 작은 함수로 즉시 검증하세요.
+    - Local에서는 실제 Excel 프로세스와 workbook artifact 증거를 별도로 남기세요.
+    exercise:
+      prompt: choose_dataframe_evidence(stage)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_dataframe_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_dataframe_evidence(stage):
+            table = {'schema': {'action': 'declare columns index null policy', 'evidence': 'dataframe contract', 'risk': 'implicit layout'}, 'write': {'action': 'assign rectangular values', 'evidence': 'range shape', 'risk': 'shifted matrix'}, 'roundtrip': {'action': 'compare keys and types after read', 'evidence': 'membership and type report', 'risk': 'silent coercion'}}
+            if stage not in table:
+                raise ValueError('unknown stage')
+            return table[stage]
+      hints: *id003
+    check:
+      id: python.xlwings.xlwings_04.dataframe-roundtrip-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.xlwings.xlwings_04.dataframe-roundtrip-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_dataframe_evidence
+        cases:
+        - id: recalls-schema
+          arguments:
+          - value: schema
+          expectedReturn:
+            action: declare columns index null policy
+            evidence: dataframe contract
+            risk: implicit layout
+        - id: recalls-write
+          arguments:
+          - value: write
+          expectedReturn:
+            action: assign rectangular values
+            evidence: range shape
+            risk: shifted matrix
+        - id: recalls-roundtrip
+          arguments:
+          - value: roundtrip
+          expectedReturn:
+            action: compare keys and types after read
+            evidence: membership and type report
+            risk: silent coercion
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};

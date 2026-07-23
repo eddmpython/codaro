@@ -1,0 +1,725 @@
+var e=`meta:
+  packages:
+  - altair
+  - pandas
+  id: altair_00
+  title: Altair소개
+  order: 0
+  category: altair
+  badge: 소개
+  source: eddmpython
+  sourceUrl: https://eddmpython.com
+  tags:
+  - Altair
+  - Vega-Lite
+  - 선언적시각화
+  - 통계시각화
+  - 인터랙티브
+  - Codaro
+  seo:
+    title: Altair 입문 - 선언적 통계 시각화 라이브러리
+    description: Altair로 간결하고 우아한 시각화를 시작하세요. Vega-Lite 기반의 선언적 문법으로 복잡한 차트도 쉽게 만들 수 있습니다.
+    keywords:
+    - Altair
+    - Vega-Lite
+    - 시각화
+    - 데이터시각화
+    - Python차트
+    - 선언적시각화
+intro:
+  direction: Altair소개에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.
+  benefits:
+  - 첫 실행 셀은 assert로 핵심 결과를 고정해 실습 코드가 깨지지 않았는지 확인합니다.
+  - 정리된 테이블 확인 후 채널 인코딩에 맞는 코드 입력을 고릅니다.
+  - Altair소개 결과를 스케일과 마크 매핑 기준으로 즉시 점검합니다.
+  - 완료한 코드를 선언형 대시보드에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 10단계. Altair 학습 입력 확인
+      detail: 입력 기준(정리된 테이블)과 필요한 조건을 먼저 고정합니다.
+    - label: 채널 인코딩 처리 실행
+      detail: 채널 인코딩 코드를 실행해 중간 결과를 확인합니다.
+    - label: 스케일과 마크 매핑 결과 검증
+      detail: 스케일과 마크 매핑 기준으로 실행 결과를 비교합니다.
+    - label: Altair소개 재사용
+      detail: 완성 코드를 선언형 대시보드에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 선언형 차트 환경
+      detail: altair, pandas 기준으로 로컬 Python 실행을 준비합니다.
+    - label: Altair소개 실행
+      detail: 셀을 실행해 스케일과 마크 매핑와 예외 상태를 확인합니다.
+    - label: Altair소개 완료
+      detail: 검증된 코드를 선언형 대시보드로 남깁니다.
+sections:
+- id: intro
+  blocks:
+  - type: mainHeader
+    emoji: 📊
+    title: Altair??
+    subtitle: 선언적 시각화가 뭐길래?
+  - type: hero
+    emoji: ✨
+    title: 선언적 통계 시각화 라이브러리
+    subtitle: 무엇을 그릴지만 말하면, 어떻게는 알아서
+    points:
+    - emoji: 💡
+      title: 선언적 문법으로 간결한 코드
+    - emoji: 📈
+      title: 통계 시각화에 최적화
+    - emoji: 🔗
+      title: 인터랙션 내장
+    - emoji: 🎯
+      title: Codaro에서 자동 인터랙티브
+  - type: note
+    style: info
+    title: 로컬 미리보기
+    content: 이 과정의 모든 차트는 Codaro 로컬 데이터셋과 Altair spec으로 재현합니다. 외부 이미지나 원격 데이터 없이도 같은 학습 흐름을 실행할 수 있습니다.
+  goal: Altair??에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+- id: what_is_altair
+  blocks:
+  - type: sectionHeader
+    title: 🤔 Altair가 뭔가요?
+    subtitle: 한마디로 선언적 시각화
+  - type: note
+    style: info
+    title: 선언적(Declarative) 프로그래밍이란?
+    content: 명령형 프로그래밍이 '이렇게 저렇게 해라'고 단계별로 지시한다면, 선언적 프로그래밍은 '이런 결과를 원한다'고 목표만 말합니다. Altair는 '이 데이터를 x축에,
+      저 데이터를 y축에 놓고, 색깔은 이걸로'라고 선언하면 나머지는 알아서 처리합니다.
+  - type: featureCards
+    cards:
+    - emoji: 📝
+      title: 선언적 문법
+      description: 원하는 결과를 기술하면 차트가 생성
+    - emoji: 🎨
+      title: Vega-Lite 기반
+      description: 표준화된 시각화 문법 사용
+    - emoji: 📊
+      title: 통계 특화
+      description: 집계, 변환을 차트 내에서 처리
+    - emoji: 🔌
+      title: pandas 연동
+      description: DataFrame을 바로 시각화
+  goal: 🤔 Altair가 뭔가요?에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+- id: why_altair
+  blocks:
+  - type: sectionHeader
+    title: 🌟 왜 Altair가 좋을까요?
+    subtitle: 데이터 과학자들이 선호하는 이유
+  - type: featureCards
+    cards:
+    - emoji: ✂️
+      title: 코드가 간결함
+      description: Matplotlib 대비 1/3~1/5 코드량
+    - emoji: 🧠
+      title: 일관된 문법
+      description: 모든 차트를 같은 방식으로 생성
+    - emoji: 📊
+      title: 차트 내 집계
+      description: mean(), count() 등을 차트에서 바로
+    - emoji: 🔗
+      title: 인터랙션 내장
+      description: 브러싱, 선택, 링킹 기본 제공
+    - emoji: 🎯
+      title: 타입 추론
+      description: 데이터 타입에 맞게 자동 조정
+    - emoji: 📤
+      title: 다양한 출력
+      description: HTML, PNG, SVG, JSON 모두 가능
+  goal: 🌟 왜 Altair가 좋을까요?에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+- id: altair_vs_others
+  blocks:
+  - type: sectionHeader
+    title: 🆚 Altair vs 다른 라이브러리
+    subtitle: 각각 언제 쓰면 좋을까요?
+  - type: compare
+    left:
+      title: Matplotlib
+      subtitle: 명령형, 저수준
+      icon: 📉
+      color: blue
+      items:
+      - 세밀한 커스터마이징
+      - 논문/출판용 그래프
+      - 정적 이미지 출력
+      - 풍부한 예제와 문서
+      - 학습 곡선 높음
+      infoBox: 세밀한 제어가 필요할 때
+    right:
+      title: Altair
+      subtitle: 선언적, 고수준
+      icon: ✨
+      color: green
+      items:
+      - 간결한 코드
+      - 탐색적 데이터 분석
+      - 인터랙티브 기본 지원
+      - 통계 시각화 특화
+      - 학습 곡선 낮음
+      infoBox: 빠른 탐색과 분석에 최적
+  - type: compare
+    left:
+      title: Plotly
+      subtitle: 인터랙티브 특화
+      icon: 🎨
+      color: purple
+      items:
+      - 화려한 인터랙션
+      - 대시보드 구축
+      - 3D 차트 강력
+      - 지도 시각화 우수
+      - 상대적으로 무거움
+      infoBox: 프로덕션 대시보드에 적합
+    right:
+      title: Altair
+      subtitle: 분석 친화적
+      icon: ✨
+      color: green
+      items:
+      - 분석 워크플로우 최적
+      - 문법이 더 일관적
+      - 통계 변환 내장
+      - 가볍고 빠름
+      - 브러싱/링킹 우수
+      infoBox: 탐색적 분석에 최적
+  - type: note
+    style: tip
+    title: 용도에 맞게 선택하세요
+    content: 논문 그래프는 Matplotlib, 대시보드는 Plotly, 데이터 탐색과 분석은 Altair가 좋습니다. 각 도구의 강점을 알고 상황에 맞게 쓰는 게 핵심입니다.
+  goal: 🆚 Altair vs 다른 라이브러리에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+- id: grammar_intro
+  blocks:
+  - type: sectionHeader
+    title: 📐 선언적 문법의 힘
+    subtitle: 차트 = 데이터 + 인코딩 + 마크
+  - type: note
+    style: info
+    title: 시각화 문법(Grammar of Graphics)
+    content: Altair는 'Grammar of Graphics' 철학을 따릅니다. 차트는 데이터(Data), 인코딩(Encoding), 마크(Mark)의 조합입니다. 데이터의
+      어떤 열을 어떤 시각 요소(위치, 색상, 크기)에 대응시킬지 선언하면 차트가 완성됩니다.
+  - type: featureCards
+    cards:
+    - emoji: 📦
+      title: Data
+      description: 시각화할 데이터 (DataFrame)
+    - emoji: 🎯
+      title: Mark
+      description: 점, 선, 막대 등 시각 요소
+    - emoji: 🔗
+      title: Encoding
+      description: 데이터와 시각 요소의 매핑
+    - emoji: ⚙️
+      title: Transform
+      description: 집계, 필터 등 데이터 변환
+  - type: note
+    style: tip
+    title: 생각의 흐름대로 코딩
+    content: alt.Chart(data).mark_point().encode(x='컬럼A', y='컬럼B', color='컬럼C') - 이게 전부입니다. '이 데이터로, 점을
+      찍어서, x는 A, y는 B, 색깔은 C'라고 생각하는 대로 코드를 작성하면 됩니다.
+  goal: 📐 선언적 문법의 힘에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+- id: local_integration
+  blocks:
+  - type: sectionHeader
+    title: 🚀 Codaro에서 Altair
+    subtitle: 자동 인터랙티브의 마법
+  - type: note
+    style: info
+    title: Altair chart selection
+    content: Codaro는 Altair 차트를 자동으로 인터랙티브하게 만들어줍니다. 별도 설정 없이 Altair chart selection로 감싸기만 하면 브러싱, 선택,
+      줌 등이 자동 활성화됩니다. 선택한 데이터를 다른 셀에서 바로 사용할 수도 있습니다.
+  - type: featureCards
+    cards:
+    - emoji: 🎯
+      title: 자동 인터랙티브
+      description: 추가 코드 없이 인터랙션 활성화
+    - emoji: 🔄
+      title: 리액티브 연동
+      description: 차트 선택이 다른 셀에 반영
+    - emoji: 📊
+      title: 데이터 추출
+      description: 브러싱한 데이터를 DataFrame으로
+    - emoji: ⚡
+      title: 실시간 업데이트
+      description: 데이터 변경시 차트 자동 갱신
+  - type: note
+    style: tip
+    title: 분석과 시각화의 통합
+    content: Codaro + Altair 조합은 탐색적 데이터 분석(EDA)에 최적입니다. 차트에서 관심 영역을 선택하면 해당 데이터만 필터링되어 다음 분석에 바로 사용할
+      수 있습니다. 코드와 시각화가 하나로 연결됩니다.
+  goal: 🚀 Codaro에서 Altair에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+- id: data_types
+  blocks:
+  - type: sectionHeader
+    title: 📋 데이터 타입 (Q, N, O, T)
+    subtitle: Altair가 데이터를 이해하는 방식
+  - type: note
+    style: info
+    title: 왜 타입이 중요한가?
+    content: Altair는 데이터 타입에 따라 축, 색상, 범례를 자동으로 결정합니다. 숫자형(Q)은 연속 색상, 범주형(N)은 개별 색상을 사용합니다. 타입을 명시하면 원하는
+      시각화를 정확히 얻을 수 있습니다.
+  - type: table
+    headers:
+    - 타입
+    - 이름
+    - 예시
+    - 시각화
+    rows:
+    - - Q
+      - Quantitative (정량)
+      - 가격, 나이, 온도
+      - 연속 축, 그라데이션 색상
+    - - N
+      - Nominal (명목)
+      - 국가, 브랜드, 성별
+      - 개별 축, 구분 색상
+    - - O
+      - Ordinal (순서)
+      - 학년, 등급, 만족도
+      - 순서 있는 축, 순차 색상
+    - - T
+      - Temporal (시간)
+      - 날짜, 시간
+      - 시간 축, 시계열 형식
+  - type: note
+    style: tip
+    title: 타입 지정 방법
+    content: x='price:Q', color='country:N'처럼 콜론 뒤에 타입을 붙입니다. Altair가 자동 추론하지만, 명시적으로 지정하면 의도대로 시각화됩니다.
+      숫자인데 범주로 쓰고 싶으면 :N을 붙이면 됩니다.
+  goal: 📋 데이터 타입 (Q, N, O, T)에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+- id: interaction_intro
+  blocks:
+  - type: sectionHeader
+    title: 🖱️ 인터랙션 기능
+    subtitle: 클릭, 드래그, 호버로 데이터 탐색
+  - type: featureCards
+    cards:
+    - emoji: ✋
+      title: 브러싱(Brushing)
+      description: 드래그로 영역 선택, 다른 차트와 연동
+    - emoji: 👆
+      title: 선택(Selection)
+      description: 클릭으로 특정 데이터 포인트 선택
+    - emoji: 🔗
+      title: 링킹(Linking)
+      description: 여러 차트를 연결해 동시 탐색
+    - emoji: 🔍
+      title: 줌/팬
+      description: 확대, 축소, 이동으로 상세 탐색
+    - emoji: 💬
+      title: 툴팁
+      description: 호버시 상세 정보 표시
+    - emoji: 🎚️
+      title: 슬라이더
+      description: 범위 조절로 동적 필터링
+  - type: note
+    style: info
+    title: 코드 몇 줄로 인터랙션 추가
+    content: Matplotlib에서는 수십 줄이 필요한 인터랙션을, Altair는 selection_interval(), selection_point() 한 줄로 추가합니다.
+      Codaro에서는 이마저도 자동입니다. 탐색적 분석에서 이 차이가 생산성을 크게 높입니다.
+  goal: 🖱️ 인터랙션 기능에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+- id: projects_preview
+  blocks:
+  - type: sectionHeader
+    title: 🗺️ 앞으로 배울 내용
+    subtitle: Altair로 이런 것들을 해봅니다
+  - type: table
+    headers:
+    - 단계
+    - 프로젝트
+    - 배울 내용
+    rows:
+    - - 입문
+      - 기본 차트
+      - mark_point, mark_bar, mark_line
+    - - 입문
+      - 인코딩
+      - x, y, color, size, shape
+    - - 기초
+      - 집계 차트
+      - mean(), count(), sum() 변환
+    - - 기초
+      - 조건부 색상
+      - condition, alt.value
+    - - 중급
+      - 인터랙션
+      - selection, 브러싱, 링킹
+    - - 중급
+      - 복합 차트
+      - layer, hconcat, vconcat
+    - - 심화
+      - 고급 변환
+      - fold, pivot, window
+    - - 심화
+      - 대시보드
+      - Codaro 연동 분석
+  - type: note
+    style: info
+    title: 프로젝트 기반 학습
+    content: 각 프로젝트에서 실제 데이터를 시각화합니다. 산점도, 막대 그래프부터 시작해 인터랙티브 대시보드까지, 난이도를 높여가며 Altair를 마스터합니다.
+  goal: 🗺️ 앞으로 배울 내용에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+- id: resources
+  blocks:
+  - type: sectionHeader
+    title: 📚 참고 자료
+    subtitle: 더 깊이 공부하고 싶다면
+  - type: links
+    items:
+    - text: Altair 공식 문서
+      url: https://altair-viz.github.io/
+      icon: 🔗
+    - text: Altair 갤러리
+      url: https://altair-viz.github.io/gallery/
+      icon: 🔗
+    - text: Vega-Lite 문서
+      url: https://vega.github.io/vega-lite/
+      icon: 🔗
+    - text: Codaro Altair 연동
+      url: https://codaro.io/blog/altair
+      icon: 🔗
+  goal: 📚 참고 자료에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+- id: workflow_validation
+  title: 10단계. Altair 학습 흐름 검증
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  goal: 10단계. Altair 학습 흐름 검증에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: |-
+    Altair는 선언적 시각화이므로 차트를 그린 뒤 Vega-Lite 사양을 확인할 수 있습니다. 입문 단계부터 데이터 계약과 spec 검증을 같이 익히면 이후 인터랙션과 대시보드가 훨씬 안전해집니다.
+
+    Altair는 spec을 검사할 수 있다는 점이 강점입니다. 학습자에게 차트 결과와 사양을 같이 보게 해야 합니다.
+  snippet: |-
+    import altair as alt
+    from codaro.curriculum.localData import loadLocalDataset
+
+    altairMpg = loadLocalDataset("mpg")
+    requiredColumns = {"mpg", "horsepower", "weight", "origin"}
+    missingColumns = requiredColumns - set(altairMpg.columns)
+
+    assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+    assert altairMpg[["mpg", "horsepower", "weight"]].gt(0).all().all()
+    assert altairMpg[["weight", "mpg"]].corr().loc["weight", "mpg"] < -0.5
+  exercise:
+    prompt: 10단계. Altair 학습 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.
+    starterCode: |-
+      import altair as alt
+      from codaro.curriculum.localData import loadLocalDataset
+
+      altairMpg = loadLocalDataset("mpg")
+      requiredColumns = {"mpg", "horsepower", "weight", "origin"}
+      missingColumns = requiredColumns - set(altairMpg.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert altairMpg[["mpg", "horsepower", "weight"]].gt(0).all().all()
+      assert altairMpg[["weight", "mpg"]].corr().loc["weight", "mpg"] < -0.5
+    hints:
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.
+  check:
+    noError: 10단계. Altair 학습 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
+    resultCheck: 10단계. Altair 학습 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+- id: next
+  blocks:
+  - type: hero
+    emoji: 👉
+    title: '다음: 기본 차트 만들기'
+    subtitle: 점, 선, 막대로 첫 번째 Altair 차트를 그려봅니다
+  goal: '다음: 기본 차트 만들기에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.'
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: altair_00-altair-grammar-contract-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - next
+    title: Altair 선언형 grammar 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 데이터 field type과 encoding channel이 명시적인가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_altair_grammar_contract(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_altair_grammar_contract(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_altair_grammar_contract(rows):
+            required = ['featureX', 'featureY', 'category']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'category'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['featureX'] for row in usable]
+            y_values = [row['featureY'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.altair.altair_00.altair-grammar-contract-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.altair.altair_00.altair-grammar-contract-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_altair_grammar_contract
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - featureX: 1
+              featureY: 3
+              category: A
+            - featureX: 2
+              featureY: 5
+              category: A
+            - featureX: 1
+              featureY: 4
+              category: B
+          expectedReturn:
+            usableCount: 3
+            excludedCount: 0
+            groupCounts:
+              A: 2
+              B: 1
+            xExtent:
+            - 1
+            - 2
+            yExtent:
+            - 3
+            - 5
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: altair_00-altair-grammar-contract-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - altair_00-altair-grammar-contract-data-evidence-mastery
+    title: Altair 선언형 grammar 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 새 실험 데이터의 quantitative 축과 nominal group을 선언형 spec으로 표현한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_altair_grammar_contract(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_altair_grammar_contract(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_altair_grammar_contract(candidate):
+            expected = {'mark': 'point', 'x': 'featureX', 'y': 'featureY', 'group': 'category', 'transforms': ['type-declarations'], 'interaction': 'none'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.altair.altair_00.altair-grammar-contract-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.altair.altair_00.altair-grammar-contract-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_altair_grammar_contract
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: point
+              x: featureX
+              y: featureY
+              group: category
+              transforms:
+              - type-declarations
+              interaction: none
+              description: 새 실험 데이터의 quantitative 축과 nominal group을 선언형 spec으로 표현한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: point
+              x: featureX
+              y: featureY
+              group: category
+              transforms:
+              - type-declarations
+              interaction: none
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: featureY
+              y: featureX
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - description
+            encoding:
+              mark: point
+              x: featureX
+              y: featureY
+              group: category
+              transforms:
+              - type-declarations
+              interaction: none
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: altair_00-altair-grammar-contract-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - altair_00-altair-grammar-contract-encoding-transfer-transfer
+    title: Altair 선언형 grammar 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 데이터 field type과 encoding channel이 명시적인가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_altair_grammar_contract(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_altair_grammar_contract(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_altair_grammar_contract(situation):
+            table = {'numeric-measure': {'encoding': 'quantitative', 'evidence': 'numeric domain', 'risk': 'ordinal inference'}, 'unordered-label': {'encoding': 'nominal', 'evidence': 'category list', 'risk': 'alphabetic magnitude'}, 'ordered-level': {'encoding': 'ordinal', 'evidence': 'explicit order', 'risk': 'nominal default'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.altair.altair_00.altair-grammar-contract-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.altair.altair_00.altair-grammar-contract-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_altair_grammar_contract
+        cases:
+        - id: recalls-numeric-measure
+          arguments:
+          - value: numeric-measure
+          expectedReturn:
+            encoding: quantitative
+            evidence: numeric domain
+            risk: ordinal inference
+        - id: recalls-unordered-label
+          arguments:
+          - value: unordered-label
+          expectedReturn:
+            encoding: nominal
+            evidence: category list
+            risk: alphabetic magnitude
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+`;export{e as default};
