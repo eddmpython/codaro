@@ -267,6 +267,75 @@ def waitForLearningLessonRoute(page: Any, contentId: str, category: str = "30day
         mobileOverlay.wait_for(state="hidden", timeout=20_000)
 
 
+def readWebLearningEvidenceEventCount(page: Any) -> int:
+    return int(
+        page.evaluate(
+            """
+            async () => {
+              if (typeof indexedDB.databases !== 'function') return -1;
+              const databases = await indexedDB.databases();
+              const descriptor = databases.find(
+                (database) => database.name === 'codaro-learning-evidence-v1'
+              );
+              if (!descriptor || Number(descriptor.version || 0) < 3) return -1;
+              return new Promise((resolve, reject) => {
+                const request = indexedDB.open('codaro-learning-evidence-v1');
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                  const database = request.result;
+                  if (
+                    database.version < 3
+                    || !database.objectStoreNames.contains('events')
+                  ) {
+                    database.close();
+                    resolve(-1);
+                    return;
+                  }
+                  const transaction = database.transaction('events', 'readonly');
+                  const count = transaction.objectStore('events').count();
+                  transaction.onerror = () => {
+                    database.close();
+                    reject(transaction.error);
+                  };
+                  transaction.onabort = () => {
+                    database.close();
+                    reject(transaction.error);
+                  };
+                  transaction.oncomplete = () => {
+                    const result = Number(count.result);
+                    database.close();
+                    resolve(result);
+                  };
+                };
+              });
+            }
+            """
+        )
+    )
+
+
+def waitForWebLearningEvidenceEventCount(
+    page: Any,
+    expected: int,
+    *,
+    timeout: int = 120_000,
+) -> None:
+    deadline = time.monotonic() + timeout / 1_000
+    lastCount = -1
+    while time.monotonic() < deadline:
+        lastCount = readWebLearningEvidenceEventCount(page)
+        if lastCount == expected:
+            return
+        if lastCount > expected:
+            raise AssertionError(
+                f"Web learning evidence exceeded {expected} event(s): {lastCount}"
+            )
+        page.wait_for_timeout(100)
+    raise AssertionError(
+        f"Web learning evidence did not reach {expected} event(s): {lastCount}"
+    )
+
+
 def openLearningDataSettings(page: Any) -> Any:
     learningData = page.locator('[data-product-learning-data-settings="true"]:visible')
     if learningData.count():
@@ -2267,9 +2336,7 @@ def runBrowserMatrix(
                         )
                     if case.get("verifyDraftAutosaveBeforeEvidence"):
                         draft_source = "print('draft before verification')"
-                        summary = page.locator('[data-learning-evidence-summary="true"]')
-                        if summary.get_attribute("data-learning-evidence-events") != "0":
-                            raise AssertionError("fresh Web lesson has evidence before a verified check")
+                        waitForWebLearningEvidenceEventCount(page, 0, timeout=20_000)
                         exercise = page.locator('[data-learning-section-part="exercise"]').first
                         exercise.locator(".cm-content").first.fill(draft_source, timeout=20_000)
                         pushLearningLessonRoute(page, "day02_변수와데이터타입")
@@ -2299,9 +2366,7 @@ def runBrowserMatrix(
                             arg=draft_source,
                             timeout=20_000,
                         )
-                        summary = page.locator('[data-learning-evidence-summary="true"]')
-                        if summary.get_attribute("data-learning-evidence-events") != "0":
-                            raise AssertionError("draft autosave created false learning evidence")
+                        waitForWebLearningEvidenceEventCount(page, 0, timeout=20_000)
                     if case.get("runLearningCell"):
                         page.evaluate("() => localStorage.removeItem('codaro-web-progress-v1')")
                         assessmentMode = str(case.get("targetAssessmentMode", ""))
@@ -2458,13 +2523,7 @@ def runBrowserMatrix(
                             transfer.wait_for(state="visible", timeout=30_000)
                             transfer.locator('.cm-content').fill(case["transferSolutionCode"], timeout=20_000)
                             transfer.get_by_role("button", name="셀 실행").click(timeout=20_000)
-                            page.wait_for_function(
-                                """
-                                () => Number(document.querySelector('[data-learning-evidence-summary]')
-                                  ?.getAttribute('data-learning-evidence-events') || 0) === 2
-                                """,
-                                timeout=120_000,
-                            )
+                            waitForWebLearningEvidenceEventCount(page, 2)
                             page.add_init_script(
                                 """
                                 (() => {
@@ -2500,17 +2559,9 @@ def runBrowserMatrix(
                             )
                             retrieval_run.click(timeout=20_000)
                             try:
-                                page.wait_for_function(
-                                    """
-                                    () => Number(document.querySelector('[data-learning-evidence-summary]')
-                                      ?.getAttribute('data-learning-evidence-events') || 0) === 3
-                                    """,
-                                    timeout=120_000,
-                                )
+                                waitForWebLearningEvidenceEventCount(page, 3)
                             except Exception as error:
-                                evidence_count = page.locator(
-                                    '[data-learning-evidence-summary]'
-                                ).get_attribute('data-learning-evidence-events')
+                                evidence_count = readWebLearningEvidenceEventCount(page)
                                 check_result = retrieval.locator('[data-learning-check-result]').last
                                 check_state = (
                                     check_result.get_attribute('data-learning-check-result')

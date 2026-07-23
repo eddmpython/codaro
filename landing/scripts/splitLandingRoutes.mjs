@@ -21,7 +21,7 @@ function checkSplit() {
     "routes/routePrimitives.jsx",
   ];
   for (const relativePath of required) readFileSync(resolve(landingRoot, `src/${relativePath}`), "utf8");
-  if (app.split("\n").length > 150) throw new Error("App.jsx regained route or public-shell ownership");
+  if (app.trimEnd().split(/\r?\n/).length > 150) throw new Error("App.jsx regained route or public-shell ownership");
   if (!app.includes('from "./routes/resolvePublicRoute.jsx"')) throw new Error("App.jsx is missing route resolver boundary");
   console.log("ok: landing shell and route domains remain split");
 }
