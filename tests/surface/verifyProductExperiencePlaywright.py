@@ -1493,6 +1493,31 @@ async ({ surface, expectedTier }) => {
       && rect.left < window.innerWidth
       && rect.top < window.innerHeight;
   };
+  const visibleRect = (element) => {
+    if (!visible(element)) return null;
+    const rect = element.getBoundingClientRect();
+    let left = Math.max(rect.left, 0);
+    let top = Math.max(rect.top, 0);
+    let right = Math.min(rect.right, window.innerWidth);
+    let bottom = Math.min(rect.bottom, window.innerHeight);
+    const clips = new Set(["auto", "clip", "hidden", "scroll"]);
+    let ancestor = element.parentElement;
+    while (ancestor) {
+      const ancestorStyle = getComputedStyle(ancestor);
+      const ancestorRect = ancestor.getBoundingClientRect();
+      if (clips.has(ancestorStyle.overflowX)) {
+        left = Math.max(left, ancestorRect.left);
+        right = Math.min(right, ancestorRect.right);
+      }
+      if (clips.has(ancestorStyle.overflowY)) {
+        top = Math.max(top, ancestorRect.top);
+        bottom = Math.min(bottom, ancestorRect.bottom);
+      }
+      ancestor = ancestor.parentElement;
+    }
+    if (right - left <= 1 || bottom - top <= 1) return null;
+    return { x: left, y: top, width: right - left, height: bottom - top };
+  };
   const actionName = (element) => (
     element.getAttribute("aria-label")
     || element.getAttribute("title")
@@ -1501,9 +1526,9 @@ async ({ surface, expectedTier }) => {
     || ""
   ).replace(/\\s+/g, " ").trim();
   const actions = [...document.querySelectorAll("button, a[href], input, textarea, select")]
-    .filter(visible)
     .map((element) => {
-      const rect = element.getBoundingClientRect();
+      const rect = visibleRect(element);
+      if (!rect) return null;
       return {
         tag: element.tagName.toLowerCase(),
         name: actionName(element).slice(0, 100),
@@ -1512,7 +1537,8 @@ async ({ surface, expectedTier }) => {
         width: rect.width,
         height: rect.height,
       };
-    });
+    })
+    .filter(Boolean);
   const overlaps = [];
   for (let leftIndex = 0; leftIndex < actions.length; leftIndex += 1) {
     for (let rightIndex = leftIndex + 1; rightIndex < actions.length; rightIndex += 1) {

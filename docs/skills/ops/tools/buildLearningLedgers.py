@@ -103,7 +103,8 @@ def pathLedgers() -> dict[str, tuple[Path, dict[str, Any]]]:
 
 
 def fileSha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    content = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(content).hexdigest()
 
 
 def aggregateHash(entries: list[dict[str, str]]) -> str:

@@ -4,7 +4,7 @@ canonicalRows: 3
 lessons:
   - lessonRef: "devTools/commandLineIntro"
     identityLedgerRef: "identity-ledger/devTools.yml"
-    lessonContentHash: "36f3c32fd5d574463b74f102dff3248aa2a2a2aa127250b61e0a8c5bc5c61b25"
+    lessonContentHash: "39d89b435d2ef6939e5f1ae617e1aa433a793905f460adf1eef91929f4dbe9ad"
     disposition: migrate
     ownerPacket: "07-remaining-domains/03-scripting-automation"
     eligiblePathIds: ["scriptingAutomation"]
@@ -23,7 +23,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "devTools/gitFirstSteps"
     identityLedgerRef: "identity-ledger/devTools.yml"
-    lessonContentHash: "b8921e1f304d78f49f4d259b61399a707010cc0124668847e38bca8fb5230906"
+    lessonContentHash: "716df7196ba4a49e0a0cc4d0fb15bc477d6419d3a300e7eec40e9d537f37cfc4"
     disposition: migrate
     ownerPacket: "07-remaining-domains/03-scripting-automation"
     eligiblePathIds: ["scriptingAutomation"]
@@ -42,7 +42,7 @@ lessons:
     evidenceCommitRequirement: required-before-done
   - lessonRef: "devTools/githubIntro"
     identityLedgerRef: "identity-ledger/devTools.yml"
-    lessonContentHash: "28beeb79563a838db503b8b81f380ce3398fba874dbd16381fdf78debcd3673c"
+    lessonContentHash: "598983e31e8160de01281d4c1fcf52b6b65b1fd1aa92cb723efaa4476bf2ec28"
     disposition: migrate
     ownerPacket: "07-remaining-domains/03-scripting-automation"
     eligiblePathIds: ["scriptingAutomation"]

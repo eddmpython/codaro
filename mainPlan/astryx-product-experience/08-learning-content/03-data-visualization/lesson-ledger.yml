@@ -2,7 +2,7 @@ schemaVersion: 1
 pathId: dataVisualization
 composerSnapshotDate: "2026-07-18"
 composerGraphCount: 469
-composerVersionHash: "75fc453f508da3b8709bd0be8a4d36213ec535c7af7d2cd892e20c2aca3e7c06"
+composerVersionHash: "e4d4d563381b658826a477e2541ce7cbb70db111eafdf9217f15e8f7eadc6ef3"
 taxonomySnapshotHash: "b5e9b0b9db4f6ecd89c7be10a5c795f9b991b3ce700d5b5cf044607fc835def2"
 sourceSetHash: "5f8d7bb62f23c2e10ed89536f72449613b42d55e7c0a659010a18ebf61ce535e"
 ledgerTool: "uv run python -X utf8 docs/skills/ops/tools/buildLearningLedgers.py --check"

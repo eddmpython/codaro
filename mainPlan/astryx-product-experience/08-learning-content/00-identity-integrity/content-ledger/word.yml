@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "word/00_word소개"
     identityLedgerRef: "identity-ledger/word.yml"
-    lessonContentHash: "f95ba38e9ecf6f43d1df872ffa7a8091d13f596ac6a906f8accac4eeb8a142d7"
+    lessonContentHash: "f361176647e2af9bddf8fa9f1c3bbfd3e2844fa31709c0c50564e4be99d40b70"
     disposition: migrate
     ownerPacket: "07-remaining-domains/02-document-automation"
     eligiblePathIds: ["documentAutomation"]

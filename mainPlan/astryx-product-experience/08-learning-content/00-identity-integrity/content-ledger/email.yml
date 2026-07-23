@@ -4,7 +4,7 @@ canonicalRows: 11
 lessons:
   - lessonRef: "email/00_email소개"
     identityLedgerRef: "identity-ledger/email.yml"
-    lessonContentHash: "856d16c725e4d148bd12773529e6114dd88a00dd65150496fc446e9c32e128b8"
+    lessonContentHash: "49b9e04266284d5a8523894efb6f764c63e4aa17d4ba3750f4c46b1a9d3972e4"
     disposition: migrate
     ownerPacket: "07-remaining-domains/01-email-automation"
     eligiblePathIds: ["emailAutomation"]
