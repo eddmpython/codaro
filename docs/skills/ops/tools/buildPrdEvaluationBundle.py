@@ -75,6 +75,10 @@ CONTRACT_BUNDLE_PATHS = {
 }
 BRIEFING_PATH = "evaluation-contract/evaluator-briefing.yml"
 ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
+ZIP_COMPRESSION = zipfile.ZIP_STORED
+ZIP_COMPRESSION_NAME = "stored"
+ZIP_CREATE_SYSTEM = 3
+ZIP_FORMAT_VERSION = 20
 
 
 class BundleError(ValueError):
@@ -100,6 +104,12 @@ class BundleEntry:
         return row
 
 
+@dataclass(frozen=True)
+class GitIndexEntry:
+    objectId: str
+    mode: str
+
+
 def runGit(*args: str) -> bytes:
     try:
         result = subprocess.run(
@@ -116,6 +126,58 @@ def runGit(*args: str) -> bytes:
 
 def decodeGitPaths(payload: bytes) -> list[str]:
     return [part.decode("utf-8", errors="surrogateescape") for part in payload.split(b"\0") if part]
+
+
+def gitIndexEntries() -> dict[str, GitIndexEntry]:
+    entries: dict[str, GitIndexEntry] = {}
+    for row in runGit("ls-files", "--stage", "-z").split(b"\0"):
+        if not row:
+            continue
+        try:
+            metadata, encodedPath = row.split(b"\t", 1)
+            mode, objectId, stage = metadata.decode("ascii", errors="strict").split(" ")
+            path = encodedPath.decode("utf-8", errors="surrogateescape")
+        except (UnicodeDecodeError, ValueError) as exc:
+            raise BundleError("git index row is malformed") from exc
+        if stage != "0":
+            raise BundleError(f"git index contains an unresolved path: {path}")
+        entries[PurePosixPath(path).as_posix()] = GitIndexEntry(objectId=objectId, mode=mode)
+    return entries
+
+
+def readGitBlobs(objectIds: Iterable[str]) -> dict[str, bytes]:
+    requested = sorted(set(objectIds))
+    if not requested:
+        return {}
+    try:
+        result = subprocess.run(
+            ("git", "cat-file", "--batch"),
+            cwd=ROOT,
+            input=("".join(f"{objectId}\n" for objectId in requested)).encode("ascii"),
+            check=True,
+            capture_output=True,
+            timeout=60,
+        )
+    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+        raise BundleError("git command failed: git cat-file --batch") from exc
+    stream = io.BytesIO(result.stdout)
+    blobs: dict[str, bytes] = {}
+    for requestedId in requested:
+        header = stream.readline().rstrip(b"\n")
+        parts = header.split(b" ")
+        if len(parts) != 3 or parts[1] != b"blob":
+            raise BundleError(f"git index object is not a blob: {requestedId}")
+        try:
+            size = int(parts[2])
+        except ValueError as exc:
+            raise BundleError(f"git blob size is invalid: {requestedId}") from exc
+        payload = stream.read(size)
+        if len(payload) != size or stream.read(1) != b"\n":
+            raise BundleError(f"git blob payload is truncated: {requestedId}")
+        blobs[requestedId] = payload
+    if stream.read(1):
+        raise BundleError("git cat-file returned unexpected trailing data")
+    return blobs
 
 
 def sha256Bytes(payload: bytes) -> str:
@@ -171,23 +233,56 @@ def verifyExcludedPriorReports(paths: Iterable[str]) -> None:
         raise BundleError("bundle contains excluded history or generated paths: " + ", ".join(sorted(set(failures))))
 
 
-def collectRepositoryEntries() -> list[BundleEntry]:
-    paths = decodeGitPaths(runGit("ls-files", "-z", "--cached", "--others", "--exclude-standard"))
-    entries: list[BundleEntry] = []
-    for path in sorted(set(paths)):
-        normalized = PurePosixPath(path).as_posix()
-        if not isPathIncluded(normalized):
+def repositoryPaths() -> list[str]:
+    return sorted(set(decodeGitPaths(runGit("ls-files", "-z", "--cached", "--others", "--exclude-standard"))))
+
+
+def repositorySourceBytes(
+    paths: Iterable[str],
+    statuses: Iterable[tuple[str, str]],
+) -> dict[str, bytes]:
+    normalizedPaths = sorted({PurePosixPath(path).as_posix() for path in paths})
+    dirtyPaths = {PurePosixPath(path).as_posix() for _, path in statuses}
+    indexEntries = gitIndexEntries()
+    cleanObjectIds = {
+        indexEntries[path].objectId
+        for path in normalizedPaths
+        if path not in dirtyPaths and path in indexEntries
+    }
+    blobs = readGitBlobs(cleanObjectIds)
+    payloads: dict[str, bytes] = {}
+    for path in normalizedPaths:
+        source = ROOT / Path(path)
+        indexEntry = indexEntries.get(path)
+        if path not in dirtyPaths and indexEntry is not None:
+            if indexEntry.mode == "120000":
+                raise BundleError(f"bundle source must not be a symbolic link: {path}")
+            if indexEntry.mode not in {"100644", "100755"}:
+                raise BundleError(f"bundle source must be a regular Git blob: {path}")
+            payloads[path] = blobs[indexEntry.objectId]
             continue
-        source = ROOT / Path(normalized)
         if source.is_symlink():
-            raise BundleError(f"bundle source must not be a symbolic link: {normalized}")
+            raise BundleError(f"bundle source must not be a symbolic link: {path}")
         if not source.is_file():
             continue
         try:
             source.resolve().relative_to(ROOT.resolve())
         except ValueError as exc:
-            raise BundleError(f"bundle source escapes repository root: {normalized}") from exc
-        entries.append(BundleEntry(normalized, source.read_bytes(), normalized, "repository"))
+            raise BundleError(f"bundle source escapes repository root: {path}") from exc
+        payloads[path] = source.read_bytes()
+    return payloads
+
+
+def collectRepositoryEntries(paths: Iterable[str], sourceBytes: dict[str, bytes]) -> list[BundleEntry]:
+    entries: list[BundleEntry] = []
+    for path in sorted(set(paths)):
+        normalized = PurePosixPath(path).as_posix()
+        if not isPathIncluded(normalized):
+            continue
+        payload = sourceBytes.get(normalized)
+        if payload is None:
+            continue
+        entries.append(BundleEntry(normalized, payload, normalized, "repository"))
     return entries
 
 
@@ -213,10 +308,14 @@ def evaluatorBriefing() -> bytes:
     return yaml.safe_dump(payload, allow_unicode=True, sort_keys=False).encode("utf-8")
 
 
-def collectBundleEntries() -> tuple[BundleEntry, ...]:
-    entries = collectRepositoryEntries()
+def collectBundleEntries(
+    paths: Iterable[str],
+    sourceBytes: dict[str, bytes],
+) -> tuple[BundleEntry, ...]:
+    entries = collectRepositoryEntries(paths, sourceBytes)
     for bundlePath, source in CONTRACT_BUNDLE_PATHS.items():
-        entries.append(BundleEntry(bundlePath, source.read_bytes(), relativePath(source), "frozen-contract"))
+        sourcePath = relativePath(source)
+        entries.append(BundleEntry(bundlePath, sourceBytes[sourcePath], sourcePath, "frozen-contract"))
     entries.append(BundleEntry(BRIEFING_PATH, evaluatorBriefing(), None, "generated-briefing"))
     entries.sort(key=lambda entry: entry.path)
     paths = [entry.path for entry in entries]
@@ -257,21 +356,19 @@ def latestIncludedScopeCommit(gitHead: str) -> str:
     raise BundleError("git history does not contain an evaluation scope commit")
 
 
-def changedScopeStatuses() -> list[tuple[str, str]]:
+def changedRepositoryStatuses() -> list[tuple[str, str]]:
     rows: list[tuple[str, str]] = []
     changed = decodeGitPaths(runGit("diff", "--name-status", "--no-renames", "-z", "HEAD"))
     if len(changed) % 2:
         raise BundleError("git diff name-status output is malformed")
     for index in range(0, len(changed), 2):
         statusCode, path = changed[index], PurePosixPath(changed[index + 1]).as_posix()
-        if not isPathIncluded(path):
-            continue
         rows.append((statusCode, path))
     untracked = decodeGitPaths(runGit("ls-files", "-z", "--others", "--exclude-standard"))
     trackedPaths = {path for _, path in rows}
     for path in untracked:
         normalized = PurePosixPath(path).as_posix()
-        if normalized in trackedPaths or not isPathIncluded(normalized):
+        if normalized in trackedPaths:
             continue
         source = ROOT / Path(normalized)
         if source.is_file():
@@ -279,8 +376,30 @@ def changedScopeStatuses() -> list[tuple[str, str]]:
     return sorted(rows, key=lambda row: (row[1], row[0]))
 
 
+def isBundleSourcePath(path: str) -> bool:
+    normalized = PurePosixPath(path).as_posix()
+    contractSources = {relativePath(source) for source in CONTRACT_BUNDLE_PATHS.values()}
+    return isPathIncluded(normalized) or normalized in contractSources
+
+
+def changedScopeStatuses(
+    statuses: Iterable[tuple[str, str]] | None = None,
+) -> list[tuple[str, str]]:
+    sourceStatuses = changedRepositoryStatuses() if statuses is None else statuses
+    return [
+        (statusCode, PurePosixPath(path).as_posix())
+        for statusCode, path in sourceStatuses
+        if isBundleSourcePath(path)
+    ]
+
+
 def dirtyDiffHash(entries: Iterable[BundleEntry], statuses: Iterable[tuple[str, str]]) -> str:
-    contentHashes = {entry.path: sha256Bytes(entry.data) for entry in entries}
+    contentHashes: dict[str, str] = {}
+    for entry in entries:
+        contentHash = sha256Bytes(entry.data)
+        contentHashes[entry.path] = contentHash
+        if entry.sourcePath is not None:
+            contentHashes[entry.sourcePath] = contentHash
     rows = [
         {"path": path, "status": statusCode, "sha256": contentHashes.get(path)}
         for statusCode, path in statuses
@@ -290,14 +409,18 @@ def dirtyDiffHash(entries: Iterable[BundleEntry], statuses: Iterable[tuple[str, 
 
 def buildZipBytes(entries: Iterable[BundleEntry]) -> bytes:
     output = io.BytesIO()
-    with zipfile.ZipFile(output, mode="w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as archive:
+    with zipfile.ZipFile(output, mode="w", compression=ZIP_COMPRESSION, allowZip64=False) as archive:
         for entry in sorted(entries, key=lambda item: item.path):
             info = zipfile.ZipInfo(entry.path, date_time=ZIP_TIMESTAMP)
-            info.compress_type = zipfile.ZIP_DEFLATED
-            info.create_system = 3
+            info.compress_type = ZIP_COMPRESSION
+            info.create_system = ZIP_CREATE_SYSTEM
+            info.create_version = ZIP_FORMAT_VERSION
+            info.extract_version = ZIP_FORMAT_VERSION
+            info.extra = b""
+            info.comment = b""
+            info.internal_attr = 0
             info.external_attr = (stat.S_IFREG | 0o444) << 16
-            info.flag_bits |= 0x800
-            archive.writestr(info, entry.data, compress_type=zipfile.ZIP_DEFLATED, compresslevel=6)
+            archive.writestr(info, entry.data)
     return output.getvalue()
 
 
@@ -348,12 +471,16 @@ def remediationSealBlockers(inputManifest: dict[str, Any]) -> list[str]:
     return blockers
 
 
-def roundReadiness(inputManifest: dict[str, Any], roster: dict[str, Any]) -> dict[str, Any]:
+def roundReadiness(
+    inputManifest: dict[str, Any],
+    roster: dict[str, Any],
+    rubricBytes: bytes,
+) -> dict[str, Any]:
     sealBlockers = remediationSealBlockers(inputManifest) + verifyEvaluatorRoster(roster)
     rubric = inputManifest.get("rubric")
     if (
         not isinstance(rubric, dict)
-        or rubric.get("sha256") != sha256Bytes(RUBRIC_SOURCE.read_bytes())
+        or rubric.get("sha256") != sha256Bytes(rubricBytes)
         or rubric.get("targetScore") is not None
         or rubric.get("passThreshold") is not None
     ):
@@ -391,15 +518,28 @@ def buildEvaluationScopeManifest(entries: tuple[BundleEntry, ...], *, gitHead: s
 def buildPrdEvaluationBundle() -> tuple[dict[str, Any], bytes]:
     gitHead = currentGitHead()
     scopeCommit = latestIncludedScopeCommit(gitHead)
-    beforeStatuses = changedScopeStatuses()
-    entries = collectBundleEntries()
+    paths = repositoryPaths()
+    repositoryStatuses = changedRepositoryStatuses()
+    beforeStatuses = changedScopeStatuses(repositoryStatuses)
+    sourcePaths = {
+        PurePosixPath(path).as_posix()
+        for path in paths
+        if isPathIncluded(path)
+    }
+    sourcePaths.update(relativePath(source) for source in CONTRACT_BUNDLE_PATHS.values())
+    sourceBytes = repositorySourceBytes(sourcePaths, repositoryStatuses)
+    entries = collectBundleEntries(paths, sourceBytes)
     beforeDiffHash = dirtyDiffHash(entries, beforeStatuses)
     scope = buildEvaluationScopeManifest(entries, gitHead=scopeCommit, diffHash=beforeDiffHash)
     archiveBytes = buildZipBytes(entries)
     if currentGitHead() != gitHead or changedScopeStatuses() != beforeStatuses:
         raise BundleError("evaluation scope changed while the bundle was being built")
     inputManifest = loadMapping(INPUT_PATH)
-    readiness = roundReadiness(inputManifest, loadMapping(ROSTER_PATH))
+    readiness = roundReadiness(
+        inputManifest,
+        loadMapping(ROSTER_PATH),
+        sourceBytes[relativePath(RUBRIC_SOURCE)],
+    )
     inputScope = inputManifest.get("scope")
     sealedScopeMatches = (
         inputManifest.get("sealed") is True
@@ -427,6 +567,9 @@ def buildPrdEvaluationBundle() -> tuple[dict[str, Any], bytes]:
             "path": relativePath(ARCHIVE_PATH),
             "sha256": sha256Bytes(archiveBytes),
             "bytes": len(archiveBytes),
+            "format": "zip",
+            "compression": ZIP_COMPRESSION_NAME,
+            "compressionMethod": ZIP_COMPRESSION,
             "readOnlyEntries": True,
         },
         "roundReadiness": readiness,
@@ -440,7 +583,7 @@ def buildPrdEvaluationBundle() -> tuple[dict[str, Any], bytes]:
             {
                 "bundlePath": bundlePath,
                 "sourcePath": relativePath(source),
-                "sha256": sha256Bytes(source.read_bytes()),
+                "sha256": sha256Bytes(sourceBytes[relativePath(source)]),
             }
             for bundlePath, source in CONTRACT_BUNDLE_PATHS.items()
         ],

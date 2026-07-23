@@ -105,10 +105,11 @@ def testLatestIncludedScopeCommitKeepsIncludedHead(monkeypatch: pytest.MonkeyPat
     assert builder.latestIncludedScopeCommit(sourceCommit) == sourceCommit
 
 
-def testDeterministicZipHasReadOnlyEntries() -> None:
+def testDeterministicZipUsesStoredReadOnlyEntries() -> None:
     builder = loadBuilder()
     entries = (
         builder.BundleEntry("b.txt", b"second", None, "test"),
+        builder.BundleEntry("학습.txt", "검증".encode(), None, "test"),
         builder.BundleEntry("a.txt", b"first", None, "test"),
     )
 
@@ -116,10 +117,95 @@ def testDeterministicZipHasReadOnlyEntries() -> None:
     second = builder.buildZipBytes(tuple(reversed(entries)))
 
     assert first == second
+    assert hashlib.sha256(first).digest() == hashlib.sha256(second).digest()
     with zipfile.ZipFile(io.BytesIO(first)) as archive:
-        assert archive.namelist() == ["a.txt", "b.txt"]
+        assert archive.namelist() == ["a.txt", "b.txt", "학습.txt"]
+        assert {name: archive.read(name) for name in archive.namelist()} == {
+            "a.txt": b"first",
+            "b.txt": b"second",
+            "학습.txt": "검증".encode(),
+        }
         assert all(info.date_time == builder.ZIP_TIMESTAMP for info in archive.infolist())
+        assert all(info.compress_type == zipfile.ZIP_STORED for info in archive.infolist())
+        assert all(info.create_system == builder.ZIP_CREATE_SYSTEM for info in archive.infolist())
+        assert all(info.create_version == builder.ZIP_FORMAT_VERSION for info in archive.infolist())
+        assert all(info.extract_version == builder.ZIP_FORMAT_VERSION for info in archive.infolist())
+        assert all(info.extra == b"" and info.comment == b"" for info in archive.infolist())
         assert all((info.external_attr >> 16) & 0o777 == 0o444 for info in archive.infolist())
+
+
+def testCleanTrackedSourceUsesGitBlobAcrossCheckoutLineEndings(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    builder = loadBuilder()
+    relative = "docs/example.md"
+    source = tmp_path / relative
+    source.parent.mkdir(parents=True)
+    indexBytes = b"first\nsecond\n"
+    objectId = "1" * 40
+    monkeypatch.setattr(builder, "ROOT", tmp_path)
+    monkeypatch.setattr(
+        builder,
+        "gitIndexEntries",
+        lambda: {relative: builder.GitIndexEntry(objectId=objectId, mode="100644")},
+    )
+    monkeypatch.setattr(builder, "readGitBlobs", lambda objectIds: {objectId: indexBytes})
+
+    source.write_bytes(b"first\r\nsecond\r\n")
+    windowsPayload = builder.repositorySourceBytes([relative], [])
+    source.write_bytes(indexBytes)
+    linuxPayload = builder.repositorySourceBytes([relative], [])
+
+    assert windowsPayload == linuxPayload == {relative: indexBytes}
+    windowsEntry = builder.BundleEntry(relative, windowsPayload[relative], relative, "repository")
+    linuxEntry = builder.BundleEntry(relative, linuxPayload[relative], relative, "repository")
+    assert windowsEntry.manifestRow()["sha256"] == linuxEntry.manifestRow()["sha256"]
+    windowsScope = builder.buildEvaluationScopeManifest(
+        (windowsEntry,),
+        gitHead="3" * 40,
+        diffHash="4" * 64,
+    )
+    linuxScope = builder.buildEvaluationScopeManifest(
+        (linuxEntry,),
+        gitHead="3" * 40,
+        diffHash="4" * 64,
+    )
+    assert windowsScope["manifestHash"] == linuxScope["manifestHash"]
+    assert builder.sha256Bytes(builder.buildZipBytes([windowsEntry])) == builder.sha256Bytes(
+        builder.buildZipBytes([linuxEntry])
+    )
+
+
+def testDirtyAndUntrackedSourcesPreserveExactWorktreeBytes(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    builder = loadBuilder()
+    tracked = "docs/dirty.md"
+    untracked = "docs/new.bin"
+    trackedBytes = b"changed\r\nbytes\r\n"
+    untrackedBytes = b"\x00worktree\r\n"
+    (tmp_path / "docs").mkdir()
+    (tmp_path / tracked).write_bytes(trackedBytes)
+    (tmp_path / untracked).write_bytes(untrackedBytes)
+    monkeypatch.setattr(builder, "ROOT", tmp_path)
+    monkeypatch.setattr(
+        builder,
+        "gitIndexEntries",
+        lambda: {tracked: builder.GitIndexEntry(objectId="2" * 40, mode="100644")},
+    )
+    monkeypatch.setattr(builder, "readGitBlobs", lambda objectIds: {})
+
+    payloads = builder.repositorySourceBytes(
+        [tracked, untracked],
+        [("M", tracked), ("??", untracked)],
+    )
+
+    assert payloads == {
+        tracked: trackedBytes,
+        untracked: untrackedBytes,
+    }
 
 
 def testCurrentBundleIsCompleteAndStillBlockedFromSealing() -> None:
@@ -133,6 +219,9 @@ def testCurrentBundleIsCompleteAndStillBlockedFromSealing() -> None:
     assert manifest["state"] == "draft"
     assert manifest["roundReadiness"]["sealEligible"] is False
     assert manifest["archive"]["sha256"] == hashlib.sha256(archiveBytes).hexdigest()
+    assert manifest["archive"]["format"] == "zip"
+    assert manifest["archive"]["compression"] == "stored"
+    assert manifest["archive"]["compressionMethod"] == zipfile.ZIP_STORED
     assert manifest["scope"]["manifestHash"] == hashlib.sha256(
         json.dumps(
             {"schemaVersion": 1, "files": rows},
@@ -146,6 +235,7 @@ def testCurrentBundleIsCompleteAndStillBlockedFromSealing() -> None:
     assert "evaluation-contract/evaluator-briefing.yml" in paths
     with zipfile.ZipFile(io.BytesIO(archiveBytes)) as archive:
         assert archive.namelist() == paths
+        assert all(info.compress_type == zipfile.ZIP_STORED for info in archive.infolist())
 
 
 def testExplicitExcludedPathIsRejected() -> None:
