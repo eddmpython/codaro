@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
+from threading import Lock
 from typing import Any
 
 from fastapi import APIRouter
@@ -13,7 +15,7 @@ from ..document.blockOperations import (
     removeBlock,
     updateBlock,
 )
-from ..document.models import ExportRequest, ExportResponse, LoadRequest, SaveRequest
+from ..document.models import CodaroDocument, ExportRequest, ExportResponse, LoadRequest, SaveRequest
 from ..document.service import createEmptyDocument, exportDocument, loadDocument, saveDocument
 from ..kernel.documentExecution import executeDocumentCodeBlock
 from ..serverLog import formatLogFields, getServerLogger
@@ -23,9 +25,21 @@ from .errors import fail
 from .requestModels import InsertBlockRequest, MoveBlockRequest, RemoveBlockRequest, RunBlockRequest, UpdateBlockRequest
 
 
+WINDOWS_RESERVED_STEMS = {
+    "AUX",
+    "CON",
+    "NUL",
+    "PRN",
+    *(f"COM{index}" for index in range(1, 10)),
+    *(f"LPT{index}" for index in range(1, 10)),
+}
+
+
 def createDocumentRouter(state: ServerState) -> APIRouter:
     router = APIRouter()
     logger = getServerLogger()
+    saveLock = Lock()
+    latestSaveByDocument: dict[tuple[str, str], tuple[int, Path]] = {}
 
     def safeResolvePath(rawPath: str) -> Path:
         try:
@@ -59,16 +73,94 @@ def createDocumentRouter(state: ServerState) -> APIRouter:
         return {"path": str(path.resolve()), "document": document.model_dump(), "exists": True}
 
     @router.post("/api/document/save")
-    def apiSaveDocument(request: SaveRequest) -> dict[str, str]:
-        if not request.path:
-            fail(400, "document_path_required", "Path is required for save.")
-        safeResolvePath(request.path)
-        savedPath = saveDocument(request.path, request.document)
+    def apiSaveDocument(request: SaveRequest) -> dict[str, str | int | bool | None]:
+        generationValues = (
+            request.saveDocumentId,
+            request.saveRevision,
+            request.saveSessionId,
+        )
+        if any(value is not None for value in generationValues) and any(
+            value is None for value in generationValues
+        ):
+            fail(
+                400,
+                "document_save_generation_incomplete",
+                "saveDocumentId, saveRevision, and saveSessionId must be provided together.",
+            )
+
+        with saveLock:
+            generationKey = (
+                (request.saveSessionId, request.saveDocumentId)
+                if request.saveSessionId is not None and request.saveDocumentId is not None
+                else None
+            )
+            latestSave: tuple[int, Path] | None = None
+            if generationKey is not None and request.saveRevision is not None:
+                latestSave = latestSaveByDocument.get(generationKey)
+                if latestSave is not None and request.saveRevision <= latestSave[0]:
+                    return {
+                        "accepted": False,
+                        "path": str(latestSave[1]),
+                        "saveRevision": latestSave[0],
+                    }
+
+            requestedPath = safeResolvePath(request.path) if request.path else None
+            # Jupyter import is intentionally lossy; autosave must never rewrite its source file.
+            isJupyterAutosave = generationKey is not None and (
+                request.document.metadata.sourceFormat == "ipynb"
+                or (requestedPath is not None and requestedPath.suffix.lower() == ".ipynb")
+            )
+            documentToSave = (
+                request.document.model_copy(
+                    update={
+                        "metadata": request.document.metadata.model_copy(
+                            update={"sourceFormat": "percent"}
+                        )
+                    }
+                )
+                if isJupyterAutosave
+                else request.document
+            )
+            if isJupyterAutosave:
+                path = (
+                    latestSave[1]
+                    if latestSave is not None
+                    else allocateCodaroCopyPath(
+                        state.workspaceRoot,
+                        documentToSave,
+                        sourcePath=requestedPath,
+                    )
+                )
+            else:
+                path = (
+                    requestedPath
+                    if requestedPath is not None
+                    else (
+                        latestSave[1]
+                        if generationKey is not None and latestSave is not None
+                        else allocateDocumentPath(state.workspaceRoot, documentToSave)
+                    )
+                )
+            savedPath = saveDocument(str(path), documentToSave)
+            if generationKey is not None and request.saveRevision is not None:
+                latestSaveByDocument[generationKey] = (request.saveRevision, savedPath)
+            if (
+                isJupyterAutosave
+                and requestedPath is not None
+                and state.documentPath is not None
+                and state.documentPath.expanduser().resolve() == requestedPath
+            ):
+                state.documentPath = savedPath
+
         logger.info(
             "document-save %s",
             formatLogFields(path=savedPath, title=request.document.title, blockCount=len(request.document.blocks)),
         )
-        return {"path": str(savedPath)}
+        return {
+            "accepted": True,
+            "path": str(savedPath),
+            "saveRevision": request.saveRevision,
+        }
 
     @router.post("/api/document/export", response_model=ExportResponse)
     def apiExportDocument(request: ExportRequest) -> ExportResponse:
@@ -198,3 +290,46 @@ def createDocumentRouter(state: ServerState) -> APIRouter:
         return {"result": payload.httpPayload(), "blockId": block.id}
 
     return router
+
+
+def allocateDocumentPath(workspaceRoot: Path, document: CodaroDocument) -> Path:
+    suffix = ".ipynb" if document.metadata.sourceFormat == "ipynb" else ".py"
+    stem = safeDocumentStem(document.title, suffix=suffix)
+    resolvedWorkspace = workspaceRoot.resolve()
+    candidate = resolvedWorkspace / f"{stem}{suffix}"
+    sequence = 2
+    while candidate.exists():
+        candidate = resolvedWorkspace / f"{stem}-{sequence}{suffix}"
+        sequence += 1
+    return candidate
+
+
+def allocateCodaroCopyPath(
+    workspaceRoot: Path,
+    document: CodaroDocument,
+    *,
+    sourcePath: Path | None,
+) -> Path:
+    resolvedWorkspace = workspaceRoot.resolve()
+    targetDirectory = sourcePath.parent if sourcePath is not None else resolvedWorkspace
+    rawTitle = sourcePath.stem if sourcePath is not None else document.title
+    stem = safeDocumentStem(rawTitle, suffix=".ipynb")
+    candidate = targetDirectory / f"{stem}.codaro.py"
+    sequence = 2
+    while candidate.exists():
+        candidate = targetDirectory / f"{stem}-{sequence}.codaro.py"
+        sequence += 1
+    return candidate
+
+
+def safeDocumentStem(rawTitle: str, *, suffix: str) -> str:
+    stemSource = str(rawTitle or "notebook").strip()
+    if stemSource.lower().endswith(suffix):
+        stemSource = stemSource[: -len(suffix)]
+    stem = (
+        re.sub(r'[<>:"/\\|?*\x00-\x1f]+', "-", stemSource).strip(" .-")[:80]
+        or "notebook"
+    )
+    if stem.upper() in WINDOWS_RESERVED_STEMS:
+        return f"notebook-{stem.lower()}"
+    return stem

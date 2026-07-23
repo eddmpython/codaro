@@ -1,4 +1,5 @@
 import {
+  CircleAlert,
   FileCode2,
   Globe2,
   HardDrive,
@@ -11,12 +12,14 @@ import {
 
 import { IconButton } from "@/components/app/appPrimitives";
 import { Button } from "@/components/ui/button";
+import type { NotebookPersistenceState } from "@/lib/notebookPersistence";
 
 export function NotebookCommandBar({
   activeCellLabel,
   apiOnline,
   canRun,
   notebookRunning,
+  persistence,
   runningBlockId,
   title,
   onAddCodeCell,
@@ -29,6 +32,7 @@ export function NotebookCommandBar({
   apiOnline: boolean;
   canRun: boolean;
   notebookRunning: boolean;
+  persistence: NotebookPersistenceState;
   runningBlockId: string | null;
   title: string;
   onAddCodeCell: () => void;
@@ -40,6 +44,12 @@ export function NotebookCommandBar({
   const running = notebookRunning || runningBlockId !== null;
   const RuntimeIcon = apiOnline ? HardDrive : Globe2;
   const runtimeLabel = apiOnline ? "Local" : "Web Run";
+  const persistenceView = notebookPersistenceView(persistence);
+  const PersistenceIcon = persistence.phase === "saving"
+    ? Loader2
+    : persistence.phase === "error"
+      ? CircleAlert
+      : Save;
 
   return (
     <header className="notebookCommandBar">
@@ -65,12 +75,17 @@ export function NotebookCommandBar({
           <span>{runtimeLabel}</span>
         </span>
         <span
+          aria-live="polite"
           className="notebookStatusItem notebookPersistenceStatus"
-          data-notebook-persistence="session"
-          title="편집 내용은 현재 세션에 즉시 반영됩니다."
+          data-notebook-persistence={persistence.phase}
+          data-notebook-persistence-mode={persistence.mode}
+          title={persistenceView.detail}
         >
-          <Save aria-hidden="true" />
-          <span>세션 자동 반영</span>
+          <PersistenceIcon
+            aria-hidden="true"
+            className={persistence.phase === "saving" ? "animate-spin" : undefined}
+          />
+          <span>{persistenceView.label}</span>
         </span>
       </div>
 
@@ -105,6 +120,50 @@ export function NotebookCommandBar({
       </div>
     </header>
   );
+}
+
+function notebookPersistenceView(persistence: NotebookPersistenceState): {
+  detail: string;
+  label: string;
+} {
+  if (persistence.phase === "error") {
+    return {
+      detail: persistence.error ?? "저장 위치에 접근하지 못했습니다.",
+      label: "저장 실패",
+    };
+  }
+  if (!persistence.ready) {
+    return {
+      detail: "문서를 불러온 뒤 저장을 시작합니다.",
+      label: "저장 준비 중",
+    };
+  }
+  if (persistence.phase === "saving") {
+    return {
+      detail: persistence.mode === "local"
+        ? "현재 파일에 변경 내용을 저장하고 있습니다."
+        : "이 브라우저에 변경 내용을 저장하고 있습니다.",
+      label: "저장 중",
+    };
+  }
+  if (persistence.phase === "pending") {
+    return {
+      detail: "입력이 멈추면 변경 내용을 자동 저장합니다.",
+      label: "저장 대기",
+    };
+  }
+  if (persistence.phase === "saved") {
+    return {
+      detail: persistence.detail
+        ? `${persistence.detail}에 저장했습니다.`
+        : "변경 내용을 저장했습니다.",
+      label: persistence.mode === "local" ? "파일 저장됨" : "브라우저 저장됨",
+    };
+  }
+  return {
+    detail: "변경 내용이 생기면 자동 저장합니다.",
+    label: "변경 사항 없음",
+  };
 }
 
 function normalizeNotebookFilename(value: string) {

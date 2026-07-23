@@ -1,12 +1,34 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
+import stat
 import uuid
 
 from .codaroFormat import parseCodaroDocument, writeCodaroDocument
 from .jupyterFormat import parseJupyterDocument, writeJupyterDocument
 from .percentFormat import isPercentFormat, parsePercentDocument, writePercentDocument
 from .models import AppConfig, BlockConfig, CodaroDocument, DocumentMetadata, RuntimeConfig
+
+
+def _writeTextAtomically(path: Path, text: str) -> None:
+    temporaryPath = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
+    temporaryCreated = False
+    existingMode = stat.S_IMODE(path.stat().st_mode) if path.exists() else None
+
+    try:
+        with temporaryPath.open("x", encoding="utf-8") as temporaryFile:
+            temporaryCreated = True
+            temporaryFile.write(text)
+            temporaryFile.flush()
+            os.fsync(temporaryFile.fileno())
+        if existingMode is not None:
+            temporaryPath.chmod(existingMode)
+        os.replace(temporaryPath, path)
+        temporaryCreated = False
+    finally:
+        if temporaryCreated:
+            temporaryPath.unlink(missing_ok=True)
 
 
 def createEmptyDocument(title: str = "Untitled") -> CodaroDocument:
@@ -47,9 +69,12 @@ def saveDocument(pathLike: str, document: CodaroDocument) -> Path:
 
     sourceFormat = payload.metadata.sourceFormat
     if sourceFormat == "percent":
-        path.write_text(writePercentDocument(payload), encoding="utf-8")
+        text = writePercentDocument(payload)
+    elif sourceFormat == "ipynb":
+        text = writeJupyterDocument(payload)
     else:
-        path.write_text(writeCodaroDocument(payload), encoding="utf-8")
+        text = writeCodaroDocument(payload)
+    _writeTextAtomically(path, text)
     return path
 
 
@@ -73,5 +98,5 @@ def exportDocument(pathLike: str, formatName: str, outputPathLike: str | None = 
     else:
         raise ValueError(f"Unsupported export format: {formatName}")
 
-    outputPath.write_text(text, encoding="utf-8")
+    _writeTextAtomically(outputPath, text)
     return outputPath

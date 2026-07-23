@@ -14,7 +14,8 @@ import type {
 
 type UseAppBootstrapEffectOptions = {
   applyBootstrapCurriculumState: (bootstrap: AppBootstrapState) => void;
-  applyDocument: (document: CodaroDocument) => void;
+  loadDocument: (document: CodaroDocument) => void;
+  onDocumentPath: (path: string | null) => void;
   onLoadState: (loadState: LoadState) => void;
   onNotice: (notice: AppNotice) => void;
   onProfile: (profile: AiProfile | null) => void;
@@ -25,7 +26,8 @@ type UseAppBootstrapEffectOptions = {
 
 export function useAppBootstrapEffect({
   applyBootstrapCurriculumState,
-  applyDocument,
+  loadDocument,
+  onDocumentPath,
   onLoadState,
   onNotice,
   onProfile,
@@ -43,8 +45,9 @@ export function useAppBootstrapEffect({
       applyBootstrapCurriculumState(bootstrap);
       onToolCatalog(bootstrap.toolCatalog);
       onProfile(bootstrap.profile);
+      onDocumentPath(bootstrap.documentPath);
       if (bootstrap.sessionId) onSessionId(bootstrap.sessionId);
-      if (bootstrap.documentToApply) applyDocument(bootstrap.documentToApply);
+      if (bootstrap.documentToApply) loadDocument(bootstrap.documentToApply);
       if (bootstrap.notice) onNotice(bootstrap.notice);
       if (bootstrap.refreshAutomation) {
         await refreshAutomation();
@@ -67,7 +70,8 @@ export function useAppBootstrapEffect({
     };
   }, [
     applyBootstrapCurriculumState,
-    applyDocument,
+    loadDocument,
+    onDocumentPath,
     onLoadState,
     onNotice,
     onProfile,

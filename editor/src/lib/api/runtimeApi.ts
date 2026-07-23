@@ -6,16 +6,55 @@ export type ReactiveResponse = {
   executionOrder: string[];
 } & Partial<ReactiveDiagnostics>;
 
+export const DOCUMENT_SAVE_KEEPALIVE_MAX_BYTES = 60 * 1024;
+
+export type DocumentSaveOptions = {
+  keepalive?: boolean;
+  saveDocumentId?: string;
+  saveRevision?: number;
+  saveSessionId?: string;
+};
+
+type DocumentSaveRequest = {
+  path: string | null;
+  document: CodaroDocument;
+  saveDocumentId?: string;
+  saveRevision?: number;
+  saveSessionId?: string;
+};
+
+export function documentSaveSupportsKeepalive(
+  path: string | null,
+  document: CodaroDocument,
+  options: DocumentSaveOptions = {},
+): boolean {
+  const request = createDocumentSaveRequest(path, document, options);
+  return new TextEncoder().encode(JSON.stringify(request)).byteLength
+    <= DOCUMENT_SAVE_KEEPALIVE_MAX_BYTES;
+}
+
 export const runtimeApi = {
-loadDocument: (path: string) => postJson<{ path: string; document: CodaroDocument; exists: boolean }>(
+  loadDocument: (path: string) => postJson<{ path: string; document: CodaroDocument; exists: boolean }>(
     "/api/document/load",
     { path },
   ),
-saveDocument: (path: string, document: CodaroDocument) => postJson<{ path: string }>("/api/document/save", {
-    path,
-    document,
-  }),
-createSession: (workingDirectory?: string | null) => postJson<{ sessionId: string; status: string }>(
+  saveDocument: (
+    path: string | null,
+    document: CodaroDocument,
+    options: DocumentSaveOptions = {},
+  ) => {
+    const request = createDocumentSaveRequest(path, document, options);
+    const keepalive = Boolean(
+      options.keepalive
+      && documentSaveSupportsKeepalive(path, document, options),
+    );
+    return postJson<{ accepted: boolean; path: string; saveRevision: number | null }>(
+      "/api/document/save",
+      request,
+      { keepalive },
+    );
+  },
+  createSession: (workingDirectory?: string | null) => postJson<{ sessionId: string; status: string }>(
     "/api/kernel/create",
     { workingDirectory: workingDirectory ?? null },
   ),
@@ -23,11 +62,11 @@ createSession: (workingDirectory?: string | null) => postJson<{ sessionId: strin
     `/api/kernel/${sessionId}`,
     { method: "DELETE", keepalive },
   ),
-executeCode: (sessionId: string, code: string, blockId?: string | null) => postJson<ExecutionResult>(
+  executeCode: (sessionId: string, code: string, blockId?: string | null) => postJson<ExecutionResult>(
     `/api/kernel/${sessionId}/execute`,
     { code, blockId: blockId ?? null },
   ),
-executeReactive: (
+  executeReactive: (
     sessionId: string,
     blockId: string,
     blocks: Array<{ id: string; type: "code" | "markdown"; content: string }>,
@@ -36,7 +75,7 @@ executeReactive: (
     `/api/kernel/${sessionId}/execute-reactive`,
     { blockId, blocks, notebookName: notebookName ?? null },
   ),
-setUiValue: (
+  setUiValue: (
     sessionId: string,
     payload: {
       blockId: string;
@@ -48,13 +87,13 @@ setUiValue: (
     `/api/kernel/${sessionId}/set-ui-value`,
     payload,
   ),
-removeCell: (sessionId: string, blockId: string) => postJson<{ status: string }>(
+  removeCell: (sessionId: string, blockId: string) => postJson<{ status: string }>(
     `/api/kernel/${sessionId}/remove-cell`,
     { code: "", blockId },
   ),
-variables: (sessionId: string) => requestJson<VariableInfo[]>(`/api/kernel/${sessionId}/variables`),
-resetSession: (sessionId: string) => postJson<{ status: string }>(`/api/kernel/${sessionId}/reset`, {}),
-complete: (payload: {
+  variables: (sessionId: string) => requestJson<VariableInfo[]>(`/api/kernel/${sessionId}/variables`),
+  resetSession: (sessionId: string) => postJson<{ status: string }>(`/api/kernel/${sessionId}/reset`, {}),
+  complete: (payload: {
     prefix: string;
     suffix?: string;
     context?: { variables?: Array<{ name: string; type?: string }>; blocks?: Array<{ type: string; content: string }> };
@@ -65,7 +104,7 @@ complete: (payload: {
     context: payload.context ?? null,
     provider: payload.provider ?? null,
   }),
-sendUiEvent: (
+  sendUiEvent: (
     sessionId: string,
     payload: { callbackId: string; eventType?: string; payload?: unknown; blockId?: string | null },
   ) => postJson<{
@@ -85,7 +124,22 @@ sendUiEvent: (
       blockId: payload.blockId ?? null,
     },
   ),
-sessionPackagesList: (sessionId: string) => requestJson<PackageInfo[]>(`/api/kernel/${sessionId}/packages/list`),
-sessionPackageInstall: (sessionId: string, name: string) =>
-    postJson<PackageInstallResult>(`/api/kernel/${sessionId}/packages/install`, { name })
+  sessionPackagesList: (sessionId: string) =>
+    requestJson<PackageInfo[]>(`/api/kernel/${sessionId}/packages/list`),
+  sessionPackageInstall: (sessionId: string, name: string) =>
+    postJson<PackageInstallResult>(`/api/kernel/${sessionId}/packages/install`, { name }),
 };
+
+function createDocumentSaveRequest(
+  path: string | null,
+  document: CodaroDocument,
+  options: DocumentSaveOptions,
+): DocumentSaveRequest {
+  return {
+    path,
+    document,
+    saveDocumentId: options.saveDocumentId,
+    saveRevision: options.saveRevision,
+    saveSessionId: options.saveSessionId,
+  };
+}

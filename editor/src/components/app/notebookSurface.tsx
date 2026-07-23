@@ -9,6 +9,7 @@ import type { AssistantMessage, CellAiHelpState } from "@/lib/assistantTypes";
 import type { CellAiAction } from "@/lib/cellModel";
 import type { TeacherScope } from "@/lib/teacherScope";
 import { cn } from "@/lib/utils";
+import type { NotebookPersistenceState } from "@/lib/notebookPersistence";
 import type {
   AiProfile,
   BlockConfig,
@@ -33,6 +34,7 @@ export type NotebookSurfaceProps = {
   drafts: Record<string, string>;
   messages: AssistantMessage[];
   notebookRunning: boolean;
+  notebookPersistence: NotebookPersistenceState;
   pendingBlocks: BlockConfig[];
   prompt: string;
   results: ResultMap;
@@ -72,6 +74,7 @@ export function NotebookSurface(props: NotebookSurfaceProps) {
         document={props.document}
         drafts={props.drafts}
         notebookRunning={props.notebookRunning}
+        persistence={props.notebookPersistence}
         pendingBlocks={props.pendingBlocks}
         results={props.results}
         runningBlockId={props.runningBlockId}

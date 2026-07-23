@@ -5,6 +5,7 @@ import type { CellAiAction } from "@/lib/cellModel";
 import type { AutomationSection, SurfaceMode } from "@/lib/surfaceModel";
 import type { TeacherScope } from "@/lib/teacherScope";
 import type { LearningArchiveMaterialization } from "@/lib/learningArchive";
+import type { NotebookPersistenceState } from "@/lib/notebookPersistence";
 import type {
   AiProfile,
   BlockConfig,
@@ -51,6 +52,7 @@ type MainSurfaceProps = {
   loadState: LoadState;
   messages: AssistantMessage[];
   notebookRunning: boolean;
+  notebookPersistence: NotebookPersistenceState;
   pendingBlocks: BlockConfig[];
   prompt: string;
   referenceLoading: boolean;
@@ -158,6 +160,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
         drafts={props.drafts}
         messages={props.messages}
         notebookRunning={props.notebookRunning}
+        notebookPersistence={props.notebookPersistence}
         pendingBlocks={props.pendingBlocks}
         prompt={props.prompt}
         results={props.results}

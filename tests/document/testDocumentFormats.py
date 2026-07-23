@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
-from codaro.document import createEmptyDocument, parseCodaroDocument, parseJupyterDocument
+from codaro.document import createEmptyDocument, loadDocument, parseCodaroDocument, parseJupyterDocument, saveDocument
 from codaro.document import writeCodaroDocument, writeJupyterDocument
 from codaro.document import parsePercentDocument, writePercentDocument, isPercentFormat
 
@@ -36,6 +37,28 @@ def testJupyterRoundTrip() -> None:
     assert "sum(items)" in parsed.blocks[0].content
     assert parsed.blocks[1].type == "markdown"
     assert parsed.blocks[1].content == "## Heading"
+
+
+def testSaveDocumentPreservesJupyterFormat(tmp_path: Path) -> None:
+    path = tmp_path / "analysis.ipynb"
+    document = createEmptyDocument("analysis")
+    document.metadata.sourceFormat = "ipynb"
+    document.blocks = [
+        document.blocks[0].model_copy(update={"content": "total = sum([1, 2, 3])"}),
+        document.blocks[0].model_copy(
+            update={"id": "block-markdown", "type": "markdown", "content": "## 결과"},
+        ),
+    ]
+
+    savedPath = saveDocument(str(path), document)
+    payload = json.loads(savedPath.read_text(encoding="utf-8"))
+    loaded = loadDocument(str(savedPath))
+
+    assert payload["nbformat"] == 4
+    assert [cell["cell_type"] for cell in payload["cells"]] == ["code", "markdown"]
+    assert loaded.metadata.sourceFormat == "ipynb"
+    assert loaded.blocks[0].content == "total = sum([1, 2, 3])"
+    assert loaded.blocks[1].content == "## 결과"
 
 
 def testPercentRoundTrip() -> None:

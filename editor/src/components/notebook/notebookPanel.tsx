@@ -53,6 +53,7 @@ import {
   isPersistentAutomationBlock,
   type CellAiAction,
 } from "@/lib/cellModel";
+import type { NotebookPersistenceState } from "@/lib/notebookPersistence";
 import type { CellAiHelpState } from "@/lib/assistantTypes";
 import { statusLabel } from "@/lib/displayFormat";
 import {
@@ -156,6 +157,7 @@ export function NotebookPanel({
   document,
   drafts,
   notebookRunning,
+  persistence,
   pendingBlocks,
   results,
   runningBlockId,
@@ -179,6 +181,7 @@ export function NotebookPanel({
   document: CodaroDocument;
   drafts: Record<string, string>;
   notebookRunning: boolean;
+  persistence: NotebookPersistenceState;
   pendingBlocks: BlockConfig[];
   results: ResultMap;
   runningBlockId: string | null;
@@ -226,13 +229,15 @@ export function NotebookPanel({
     <section
       className="notebookStudio"
       data-notebook-studio="true"
-      data-notebook-storage="session"
+      data-notebook-storage={persistence.mode === "local" ? "local-file" : "browser"}
+      data-notebook-storage-status={persistence.phase}
     >
       <NotebookCommandBar
         activeCellLabel={activeCellLabel}
         apiOnline={apiOnline}
         canRun={canRun}
         notebookRunning={notebookRunning}
+        persistence={persistence}
         runningBlockId={runningBlockId}
         title={document.title}
         onAddCodeCell={() => onAddCell("code", selectedBlockId || undefined, "after")}

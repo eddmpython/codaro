@@ -23,7 +23,12 @@
 
 ## 현재 증거
 
-- `scratch.py` starter cell, Web/Local runtime, 세션 자동 반영, Python/Markdown 셀 추가와 전체 실행 command bar를 구현했다.
+- `scratch.py` starter cell, Web/Local runtime, Python/Markdown 셀 추가와 전체 실행 command bar를 구현했다.
+- Web draft는 브라우저 저장소에 즉시 보존되고 reload 뒤 복원된다. Local draft는 700ms debounce 뒤 실제 workspace 파일에 저장되며 pending, saving, saved, error 상태가 command bar에 자동 표시된다.
+- page hide와 background 전환은 일반 저장을 먼저 시작하고 UTF-8 요청 body 60KiB 이하에서만 보조 keepalive를 보낸다. 더 큰 미저장 문서는 keepalive를 강제 차단하고 일반 저장이 끝날 때까지 native 이탈 경고를 사용한다.
+- Local 경로는 `(documentId, path)`가 함께 소유해 새 문서가 이전 파일을 덮지 않는다. server는 session·document별 revision을 잠가 역순 요청을 거절하고 기존 이름과 겹치면 고유 경로를 할당한다.
+- Local 파일은 같은 디렉터리의 임시 파일을 flush·fsync한 뒤 `os.replace`로 교체한다. write, fsync, replace 실패 시 마지막 정상 파일과 원본 mode를 보존하고 임시 파일을 정리한다.
+- `.ipynb` 자동 저장은 출력, metadata, attachment, execution count, magic이 있는 원본을 byte-for-byte 보존하고 같은 디렉터리의 고유 `*.codaro.py` 사본으로 승격한다. 수동 Jupyter round trip은 별도 범위다.
 - mobile 44px 실행 control과 desktop 전역 도구 예약 영역을 적용했다.
 - `web-learning`, `learning-method`, Light/Dark `astryx-journey`에서 Run과 Notebook 대표 case가 통과했다.
 - Pages `main@3a18dd97`의 `/run/`을 cold load한 뒤 `모든 셀 실행` 한 번으로 `항목 수: 3`, `합계: 38100`, `평균: 12700` 출력과 브라우저 FS 실행 기록이 같은 cell 아래 자동 표시되는 것을 확인했다.
@@ -40,19 +45,27 @@
 - `editor/src/components/notebook/notebookPanel.tsx`: runnable starter cell, code cell, output·error 렌더링
 - `editor/src/components/notebook/notebookPanel.css`: code/output 계층, mobile control, desktop global-tool 예약 영역
 - `editor/src/components/app/notebookSurface.tsx`: Notebook panel과 inspector 조합
+- `editor/src/hooks/useNotebookDocumentState.ts`, `editor/src/lib/notebookPersistence.ts`: Web durable draft와 Local debounce·revision·경로 소유권·bounded keepalive 저장
+- `src/codaro/api/documentRouter.py`: workspace 고유 경로, stale revision 거절, Jupyter 원본 보호 사본
+- `src/codaro/document/service.py`: Python·Percent·Jupyter 공용 원자 저장
 - `editor/src/lib/notebookRuntime.ts`, `editor/src/hooks/useNotebookRuntimeState.ts`: 단일 cell과 reactive notebook 실행 상태
-- `tests/surface/verifyProductExperiencePlaywright.py`, `tests/surface/verifyMobileLayout.py`: Run 대표 여정과 overlap·viewport 계약
+- `tests/surface/verifyNotebookAutosavePlaywright.py`, `tests/surface/verifyProductExperiencePlaywright.py`, `tests/surface/verifyMobileLayout.py`: 저장·reload와 Run 대표 여정, overlap·viewport 계약
 
 ## 영향 함수·심볼
 
 - `NotebookCommandBar`, `NotebookPanel`, `NotebookSurface`
 - `SCRATCH_STARTER_CODE`, `CodeCellEditor`, `DocumentBlock`, `InsertCellButton`
+- `useNotebookAutosave`, `persistNotebookDocument`, `resolveNotebookSaveCompletion`, `documentSaveSupportsKeepalive`
+- `allocateDocumentPath`, `allocateCodaroCopyPath`, `safeDocumentStem`
+- `_writeTextAtomically`
 - `runNotebookBlock`, `runReactiveNotebook`, `ensureRuntimeSession`
 - `NotebookSurfaceProps`, `RuntimeSessionResult`, `RunNotebookResult`
 
 ## 테스트
 
 - `uv run python -X utf8 tests/run.py gate web-learning`: Web lesson과 Run 실행, 출력, 자동 검증 대표 흐름
+- `uv run python -X utf8 tests/surface/verifyNotebookAutosavePlaywright.py`: Web 편집·저장·reload·빈 code cell, 실제 FastAPI Local의 small bounded keepalive·large regular save와 새 문서 경로 분리
+- `uv run python -X utf8 -m pytest tests/surface/testNotebookPersistence.py tests/runtime/testServerApi.py tests/document/testDocumentAtomicSave.py`: 브라우저 저장 fail-closed, keepalive byte 한도, Local unique path·revision·Jupyter 원본 보호·원자 저장 실패 보존
 - `uv run python -X utf8 tests/product/verifyAstryxJourneyAudit.py`: `web-run-mobile`, `web-run-desktop`, `local-run-minimum` 대표 case
 - `uv run python -X utf8 tests/run.py gate mobile-layout`: 44px mobile 실행 control과 responsive layout 계약
 - `uv run python -X utf8 tests/run.py gate product-experience-browser`: Notebook 실행과 출력, overlap, horizontal overflow 감사

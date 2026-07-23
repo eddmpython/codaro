@@ -25,7 +25,7 @@ from codaro.ai.providers import oauthChatgptProvider as oauthProviderModule
 from codaro.ai.secrets import SecretStore
 import codaro.server as serverModule
 import codaro.system.localDiagnostics as localDiagnosticsModule
-from codaro.document import createEmptyDocument
+from codaro.document import createEmptyDocument, loadDocument
 from codaro.kernel.protocol import WsExecuteMessage
 from codaro.runtime import LocalEngine
 from codaro.server import createServerApp, createServerEventLoop
@@ -84,6 +84,252 @@ def testSaveDocument(tmp_path: Path) -> None:
     content = path.read_text(encoding="utf-8")
     assert "codaro:app" in content
     assert "value = 42" in content
+
+
+def testSaveDocumentResolvesRelativePathInsideWorkspace(tmp_path: Path) -> None:
+    client = TestClient(createServerApp(workspaceRoot=tmp_path))
+    document = createEmptyDocument("Scratch")
+    document.blocks[0].content = "value = 42"
+
+    response = client.post(
+        "/api/document/save",
+        json={"path": "scratch.py", "document": document.model_dump()},
+    )
+
+    expectedPath = tmp_path / "scratch.py"
+    assert response.status_code == 200
+    assert response.json()["path"] == str(expectedPath.resolve())
+    assert expectedPath.exists()
+    assert "value = 42" in expectedPath.read_text(encoding="utf-8")
+
+
+def testSaveDocumentApiPreservesLoadedJupyterNotebook(tmp_path: Path) -> None:
+    client = TestClient(createServerApp(workspaceRoot=tmp_path))
+    path = tmp_path / "analysis.ipynb"
+    path.write_text(
+        json.dumps({
+            "nbformat": 4,
+            "nbformat_minor": 5,
+            "metadata": {},
+            "cells": [{
+                "cell_type": "code",
+                "id": "analysis-cell",
+                "metadata": {},
+                "source": "value = 1",
+                "execution_count": None,
+                "outputs": [],
+            }],
+        }),
+        encoding="utf-8",
+    )
+
+    loaded = client.post("/api/document/load", json={"path": str(path)})
+    document = loaded.json()["document"]
+    document["blocks"][0]["content"] = "value = 42"
+    saved = client.post(
+        "/api/document/save",
+        json={"path": str(path), "document": document},
+    )
+    reloaded = client.post("/api/document/load", json={"path": str(path)})
+    payload = json.loads(path.read_text(encoding="utf-8"))
+
+    assert loaded.status_code == 200
+    assert saved.status_code == 200
+    assert reloaded.status_code == 200
+    assert payload["nbformat"] == 4
+    assert payload["cells"][0]["cell_type"] == "code"
+    assert payload["cells"][0]["source"] == "value = 42"
+    assert reloaded.json()["document"]["metadata"]["sourceFormat"] == "ipynb"
+    assert reloaded.json()["document"]["blocks"][0]["content"] == "value = 42"
+
+
+def testAutosaveKeepsRichJupyterOriginalAndUsesUniqueCodaroCopy(tmp_path: Path) -> None:
+    path = tmp_path / "analysis.ipynb"
+    originalPayload = {
+        "nbformat": 4,
+        "nbformat_minor": 5,
+        "metadata": {
+            "kernelspec": {
+                "display_name": "Data Science",
+                "language": "python",
+                "name": "python3",
+            },
+            "custom": {"owner": "student", "keep": True},
+        },
+        "custom_top_level": {"keep": [1, 2, 3]},
+        "cells": [
+            {
+                "cell_type": "code",
+                "id": "analysis-cell",
+                "metadata": {"tags": ["keep-output"], "custom": {"keep": True}},
+                "source": ["%matplotlib inline\n", "value = 1\n", "value"],
+                "execution_count": 7,
+                "outputs": [
+                    {
+                        "name": "stdout",
+                        "output_type": "stream",
+                        "text": ["1\n"],
+                    }
+                ],
+            },
+            {
+                "cell_type": "markdown",
+                "id": "attachment-cell",
+                "metadata": {"slideshow": {"slide_type": "slide"}},
+                "source": ["![plot](attachment:plot.png)"],
+                "attachments": {
+                    "plot.png": {
+                        "image/png": "aGVsbG8=",
+                    }
+                },
+            },
+        ],
+    }
+    originalText = json.dumps(originalPayload, ensure_ascii=False, indent=2) + "\n"
+    path.write_text(originalText, encoding="utf-8")
+    occupiedCopy = tmp_path / "analysis.codaro.py"
+    occupiedCopy.write_text("existing_copy = True\n", encoding="utf-8")
+    client = TestClient(
+        createServerApp(mode="app", documentPath=path, workspaceRoot=tmp_path)
+    )
+
+    loaded = client.post("/api/document/load", json={"path": str(path)})
+    document = loaded.json()["document"]
+    document["blocks"][0]["content"] += "\nvalue = 42"
+    generation = {
+        "saveDocumentId": document["id"],
+        "saveSessionId": "jupyter-autosave-session",
+    }
+    first = client.post(
+        "/api/document/save",
+        json={
+            "path": str(path),
+            "document": document,
+            "saveRevision": 1,
+            **generation,
+        },
+    )
+    copyPath = Path(first.json()["path"])
+
+    document["blocks"][0]["content"] += "\nvalue = 99"
+    second = client.post(
+        "/api/document/save",
+        json={
+            # A concurrent snapshot can still carry the original bootstrap path.
+            "path": str(path),
+            "document": document,
+            "saveRevision": 2,
+            **generation,
+        },
+    )
+    stale = client.post(
+        "/api/document/save",
+        json={
+            "path": str(path),
+            "document": document,
+            "saveRevision": 1,
+            **generation,
+        },
+    )
+
+    assert loaded.status_code == 200
+    assert first.status_code == 200
+    assert first.json()["accepted"] is True
+    assert copyPath == tmp_path / "analysis-2.codaro.py"
+    assert second.status_code == 200
+    assert second.json()["accepted"] is True
+    assert Path(second.json()["path"]) == copyPath
+    assert stale.status_code == 200
+    assert stale.json()["accepted"] is False
+    assert Path(stale.json()["path"]) == copyPath
+    assert client.get("/api/bootstrap").json()["documentPath"] == str(copyPath)
+
+    # Autosave must not rewrite or normalize any part of the source notebook.
+    assert path.read_text(encoding="utf-8") == originalText
+    preserved = json.loads(path.read_text(encoding="utf-8"))
+    assert preserved["metadata"] == originalPayload["metadata"]
+    assert preserved["custom_top_level"] == originalPayload["custom_top_level"]
+    assert preserved["cells"][0]["source"][0] == "%matplotlib inline\n"
+    assert preserved["cells"][0]["execution_count"] == 7
+    assert preserved["cells"][0]["outputs"] == originalPayload["cells"][0]["outputs"]
+    assert preserved["cells"][1]["metadata"] == originalPayload["cells"][1]["metadata"]
+    assert preserved["cells"][1]["attachments"] == originalPayload["cells"][1]["attachments"]
+
+    assert occupiedCopy.read_text(encoding="utf-8") == "existing_copy = True\n"
+    assert "# codaro:app" in copyPath.read_text(encoding="utf-8")
+    copyDocument = loadDocument(str(copyPath))
+    assert copyDocument.metadata.sourceFormat == "percent"
+    assert "value = 99" in copyDocument.blocks[0].content
+
+
+def testSaveDocumentApiAllocatesUniquePathAndRejectsStaleRevision(tmp_path: Path) -> None:
+    client = TestClient(createServerApp(workspaceRoot=tmp_path))
+    existingPath = tmp_path / "scratch.py"
+    existingPath.write_text("original = True\n", encoding="utf-8")
+    document = createEmptyDocument("scratch.py")
+    document.blocks[0].content = "revision = 1"
+    payload = document.model_dump()
+    generation = {
+        "saveDocumentId": document.id,
+        "saveSessionId": "save-session-a",
+    }
+
+    first = client.post(
+        "/api/document/save",
+        json={"path": None, "document": payload, "saveRevision": 1, **generation},
+    )
+    allocatedPath = Path(first.json()["path"])
+    payload["blocks"][0]["content"] = "revision = 2"
+    second = client.post(
+        "/api/document/save",
+        json={"path": None, "document": payload, "saveRevision": 2, **generation},
+    )
+    payload["blocks"][0]["content"] = "revision = 1"
+    stale = client.post(
+        "/api/document/save",
+        json={"path": None, "document": payload, "saveRevision": 1, **generation},
+    )
+
+    assert first.status_code == 200
+    assert first.json()["accepted"] is True
+    assert allocatedPath == tmp_path / "scratch-2.py"
+    assert second.status_code == 200
+    assert second.json()["accepted"] is True
+    assert Path(second.json()["path"]) == allocatedPath
+    assert stale.status_code == 200
+    assert stale.json()["accepted"] is False
+    assert stale.json()["saveRevision"] == 2
+    assert Path(stale.json()["path"]) == allocatedPath
+    assert existingPath.read_text(encoding="utf-8") == "original = True\n"
+    assert "revision = 2" in allocatedPath.read_text(encoding="utf-8")
+    assert sorted(path.name for path in tmp_path.glob("scratch*.py")) == [
+        "scratch-2.py",
+        "scratch.py",
+    ]
+
+    reverseDocument = createEmptyDocument("race.py")
+    reversePayload = reverseDocument.model_dump()
+    reverseGeneration = {
+        "saveDocumentId": reverseDocument.id,
+        "saveSessionId": "save-session-b",
+    }
+    reversePayload["blocks"][0]["content"] = "revision = 2"
+    newestFirst = client.post(
+        "/api/document/save",
+        json={"path": None, "document": reversePayload, "saveRevision": 2, **reverseGeneration},
+    )
+    reversePayload["blocks"][0]["content"] = "revision = 1"
+    olderSecond = client.post(
+        "/api/document/save",
+        json={"path": None, "document": reversePayload, "saveRevision": 1, **reverseGeneration},
+    )
+
+    racePath = Path(newestFirst.json()["path"])
+    assert newestFirst.json()["accepted"] is True
+    assert olderSecond.json()["accepted"] is False
+    assert Path(olderSecond.json()["path"]) == racePath
+    assert "revision = 2" in racePath.read_text(encoding="utf-8")
+    assert len(list(tmp_path.glob("race*.py"))) == 1
 
 
 def testKernelCreateAndExecute() -> None:

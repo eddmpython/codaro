@@ -38,6 +38,7 @@ export type AppBootstrapState = {
   contents: CurriculumContentSummary[];
   curriculumDocument: CodaroDocument | null;
   diagnostics: DiagnosticSummary;
+  documentPath: string | null;
   documentToApply: CodaroDocument | null;
   notice: AppNotice | null;
   profile: AiProfile | null;
@@ -79,6 +80,7 @@ export const initialBootstrapState: AppBootstrapState = {
   contents: initialCurriculum.contents.contents,
   curriculumDocument: initialCurriculum.document,
   diagnostics: emptyDiagnosticSummary,
+  documentPath: null,
   documentToApply: null,
   notice: initialAppNotice,
   profile: fallbackProfile,
@@ -111,7 +113,7 @@ export async function loadAppBootstrapState(): Promise<AppBootstrapState> {
   const sessionId = apiOnline ? await createInitialSession() : null;
   const loadedDocument = bootstrapResult.online && bootstrapResult.data.documentPath
     ? await loadBootstrapDocument(bootstrapResult.data.documentPath)
-    : { document: null, notice: null };
+    : { document: null, notice: null, path: null };
   const diagnosticsNotice = diagnosticNoticeFromSummary(diagnosticsResult.data, diagnosticsResult.error);
 
   return {
@@ -121,6 +123,7 @@ export async function loadAppBootstrapState(): Promise<AppBootstrapState> {
     categoryGroups: categoryResult.data.groups,
     categoryTree: categoryResult.data.tree ?? builtInCategories.tree ?? [],
     diagnostics: diagnosticsResult.data,
+    documentPath: loadedDocument.path,
     documentToApply: loadedDocument.document,
     notice: chooseBootstrapNotice(loadedDocument.notice, diagnosticsNotice),
     profile: profileResult.data,
@@ -216,6 +219,7 @@ async function createInitialSession() {
 async function loadBootstrapDocument(documentPath: string): Promise<{
   document: CodaroDocument | null;
   notice: AppNotice;
+  path: string | null;
 }> {
   try {
     const loaded = await codaroApi.loadDocument(documentPath);
@@ -226,6 +230,7 @@ async function loadBootstrapDocument(documentPath: string): Promise<{
         title: translate("document.loaded"),
         detail: shortPath(loaded.path),
       },
+      path: loaded.path,
     };
   } catch (error) {
     return {
@@ -235,6 +240,7 @@ async function loadBootstrapDocument(documentPath: string): Promise<{
         title: translate("document.openFailed"),
         detail: error instanceof Error ? error.message : String(error),
       },
+      path: null,
     };
   }
 }

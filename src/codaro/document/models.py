@@ -79,6 +79,9 @@ class LoadRequest(BaseModel):
 class SaveRequest(BaseModel):
     path: str | None = None
     document: CodaroDocument
+    saveDocumentId: str | None = Field(default=None, max_length=200)
+    saveRevision: int | None = Field(default=None, ge=0)
+    saveSessionId: str | None = Field(default=None, max_length=200)
 
 
 class ExportRequest(BaseModel):

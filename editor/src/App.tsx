@@ -98,6 +98,7 @@ function App() {
     else setDesignSurface("chat");
   }, [setDesignSurface, surface]);
   const [loadState, setLoadState] = useState<LoadState>("loading");
+  const [notebookDocumentPath, setNotebookDocumentPath] = useState<string | null>(null);
   // apiOnline 은 부트스트랩 1회가 아니라 라이브 연결 스토어가 소유한다(세션 중간 끊김 감지).
   const connection = useConnectionStatus();
   const apiOnline = connection.apiOnline;
@@ -114,12 +115,18 @@ function App() {
     deleteNotebookCell,
     document,
     drafts,
+    loadNotebookDocument,
+    persistence: notebookPersistence,
     renameNotebookDocument,
     replaceDocument,
     selectedBlockId,
     selectBlock,
     updateDraft,
-  } = useNotebookDocumentState();
+  } = useNotebookDocumentState({
+    localDocumentPath: notebookDocumentPath,
+    persistenceEnabled: loadState === "ready",
+    retryKey: apiOnline,
+  });
   const {
     applyBootstrapCurriculumState,
     applyCurriculumSelectionState,
@@ -368,6 +375,12 @@ function App() {
     clearPendingChanges();
   }, [applyNotebookDocument, clearPendingChanges, resetRuntimeState]);
 
+  const loadDocument = useCallback((nextDocument: CodaroDocument) => {
+    loadNotebookDocument(nextDocument);
+    resetRuntimeState();
+    clearPendingChanges();
+  }, [clearPendingChanges, loadNotebookDocument, resetRuntimeState]);
+
   const applyLearningArchive = useCallback(async (archive: LearningArchiveMaterialization) => {
     const selection = await applyImportedLearningArchiveState(archive);
     resetRuntimeState();
@@ -390,7 +403,8 @@ function App() {
 
   useAppBootstrapEffect({
     applyBootstrapCurriculumState,
-    applyDocument,
+    loadDocument,
+    onDocumentPath: setNotebookDocumentPath,
     onLoadState: setLoadState,
     onNotice: applyNotice,
     onProfile: setAiProfile,
@@ -582,6 +596,7 @@ function App() {
               onRenameDocument={renameNotebookDocument}
               onOpenSharePackCurriculum={openSharePackCurriculum}
               notebookRunning={notebookRunning}
+              notebookPersistence={notebookPersistence}
               onRunBlock={runBlock}
               onRunNotebook={runNotebook}
               onRunTask={runTask}
