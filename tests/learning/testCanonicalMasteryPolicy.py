@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import subprocess
 
@@ -16,6 +17,9 @@ from codaro.curriculum.taxonomy import CurriculumTaxonomy, OutcomeDef
 
 ROOT = Path(__file__).resolve().parents[2]
 OUTCOME_ID = "python.variables"
+ESBUILD = ROOT / "editor" / "node_modules" / ".bin" / (
+    "esbuild.cmd" if os.name == "nt" else "esbuild"
+)
 
 
 def envelope(kind: str, sequence: int, occurredAt: str, **payload: object) -> dict[str, object]:
@@ -329,10 +333,9 @@ def testLearningEventTimestampRequiresTimezoneInPythonAndTypeScript(tmp_path: Pa
         sealLearningEvent(core)
 
     bundlePath = tmp_path / "learning-event.mjs"
-    esbuild = ROOT / "editor" / "node_modules" / ".bin" / "esbuild.cmd"
     subprocess.run(
         [
-            str(esbuild),
+            str(ESBUILD),
             str(ROOT / "editor" / "src" / "lib" / "learningEvent.ts"),
             "--bundle",
             "--format=esm",
@@ -394,10 +397,9 @@ def testTypeScriptAssessmentQueueUsesAcceptedCreditAndKeepsRetriesVisible(tmp_pa
             },
         ],
     }), encoding="utf-8")
-    esbuild = ROOT / "editor" / "node_modules" / ".bin" / "esbuild.cmd"
     subprocess.run(
         [
-            str(esbuild),
+            str(ESBUILD),
             str(ROOT / "editor" / "src" / "lib" / "curriculumAssessmentQueue.ts"),
             "--bundle",
             "--format=esm",
@@ -450,12 +452,11 @@ def testTypeScriptStrongEvidenceRejectsResealedCrossLinkChains(tmp_path: Path) -
         "event": ROOT / "editor" / "src" / "lib" / "learningEvent.ts",
         "web": ROOT / "editor" / "src" / "lib" / "webLearningEvidence.ts",
     }
-    esbuild = ROOT / "editor" / "node_modules" / ".bin" / "esbuild.cmd"
     bundlePaths: dict[str, Path] = {}
     for name, source in bundles.items():
         bundlePath = tmp_path / f"{name}.mjs"
         command = [
-            str(esbuild),
+            str(ESBUILD),
             str(source),
             "--bundle",
             "--format=esm",
@@ -546,10 +547,9 @@ def testPythonAndTypeScriptMasteryPolicyConformance(tmp_path: Path) -> None:
         json.dumps({"events": events, "asOf": asOf}, ensure_ascii=False),
         encoding="utf-8",
     )
-    esbuild = ROOT / "editor" / "node_modules" / ".bin" / "esbuild.cmd"
     subprocess.run(
         [
-            str(esbuild),
+            str(ESBUILD),
             str(ROOT / "editor" / "src" / "lib" / "masteryPolicy.ts"),
             "--bundle",
             "--format=esm",
@@ -582,10 +582,9 @@ def testPythonAndTypeScriptMasteryPolicyConformance(tmp_path: Path) -> None:
 
 def testTypeScriptStrongCheckWriterUsesPriorProjectionAndOmitsInvalidCredit(tmp_path: Path) -> None:
     bundlePath = tmp_path / "canonical-evidence-writer.mjs"
-    esbuild = ROOT / "editor" / "node_modules" / ".bin" / "esbuild.cmd"
     subprocess.run(
         [
-            str(esbuild),
+            str(ESBUILD),
             str(ROOT / "editor" / "src" / "lib" / "canonicalLearningEvidence.ts"),
             "--bundle",
             "--format=esm",
@@ -787,10 +786,9 @@ def testTypeScriptCurriculumProjectionRequiresAllCanonicalCreditsAndSchedulesRev
             },
         ],
     }, ensure_ascii=False), encoding="utf-8")
-    esbuild = ROOT / "editor" / "node_modules" / ".bin" / "esbuild.cmd"
     subprocess.run(
         [
-            str(esbuild),
+            str(ESBUILD),
             str(ROOT / "editor" / "src" / "lib" / "curriculumLearningProjection.ts"),
             "--bundle",
             "--format=esm",
