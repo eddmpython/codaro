@@ -8,6 +8,7 @@ meta:
   packages:
   - matplotlib
   - numpy
+  - pillow
   - scikit-learn
   - torch
   - torchvision
@@ -272,3 +273,338 @@ sections:
   check:
     noError: 비교 시각화가 오류 없이 끝나야 합니다.
     resultCheck: chinaTop1과 flowerTop1 모두 (str, float) 튜플이어야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: deepVision_02-resnet_classification-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load_model
+    - practice
+    title: ResNet 분류 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: model·label map·image size·top-k 계약을 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_resnet_classification_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_resnet_classification_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_resnet_classification_contract(value):
+            required = ['modelHash', 'labelMapHash', 'imageSize', 'topK']
+            rules = [{'id': 'model', 'field': 'modelHash', 'kind': 'nonempty'}, {'id': 'labels', 'field': 'labelMapHash', 'kind': 'nonempty'}, {'id': 'image-size', 'field': 'imageSize', 'kind': 'length', 'value': 2}, {'id': 'top-k', 'field': 'topK', 'kind': 'range', 'min': 1, 'max': 1000}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'resnet_classification', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.deep-vision.deepVision_02.resnet_classification-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.deep-vision.deepVision_02.resnet_classification-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_resnet_classification_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              modelHash: resnet50-a
+              labelMapHash: imagenet-1k
+              imageSize:
+              - 224
+              - 224
+              topK: 5
+          expectedReturn:
+            accepted: true
+            topic: resnet_classification
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              labelMapHash: imagenet-1k
+              imageSize:
+              - 224
+              - 224
+              topK: 5
+          expectedReturn:
+            accepted: false
+            topic: resnet_classification
+            missing:
+            - modelHash
+            violations:
+            - model
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              modelHash: ''
+              labelMapHash: ''
+              imageSize:
+              - 224
+              topK: 0
+          expectedReturn:
+            accepted: false
+            topic: resnet_classification
+            missing: []
+            violations:
+            - image-size
+            - labels
+            - model
+            - top-k
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: deepVision_02-resnet_classification-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - deepVision_02-resnet_classification-contract-audit-mastery
+    title: ResNet 분류 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_resnet_classification_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_resnet_classification_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_resnet_classification_result(expected, observed):
+            identity = ['sourceHash', 'modelHash', 'labelMapHash']
+            metrics = {'top1Probability': 0.001}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'resnet_classification', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.deep-vision.deepVision_02.resnet_classification-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.deep-vision.deepVision_02.resnet_classification-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_resnet_classification_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              sourceHash: img1
+              modelHash: resnet50-a
+              labelMapHash: imagenet-1k
+              top1Probability: 0.82
+          - value:
+              sourceHash: img1
+              modelHash: resnet50-a
+              labelMapHash: imagenet-1k
+              top1Probability: 0.8205
+          expectedReturn:
+            passed: true
+            topic: resnet_classification
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              sourceHash: img1
+              modelHash: resnet50-a
+              labelMapHash: imagenet-1k
+              top1Probability: 0.82
+          - value:
+              sourceHash: img2
+              modelHash: resnet18
+              labelMapHash: other
+              top1Probability: 0.3
+          expectedReturn:
+            passed: false
+            topic: resnet_classification
+            missing: []
+            identityMismatch:
+            - labelMapHash
+            - modelHash
+            - sourceHash
+            metricDrift:
+            - top1Probability
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              sourceHash: img1
+              modelHash: resnet50-a
+              labelMapHash: imagenet-1k
+              top1Probability: 0.82
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: resnet_classification
+            missing:
+            - labelMapHash
+            - modelHash
+            - sourceHash
+            - top1Probability
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: deepVision_02-resnet_classification-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - deepVision_02-resnet_classification-result-reconciliation-transfer
+    title: ResNet 분류 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_resnet_classification_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_resnet_classification_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_resnet_classification_evidence(stage):
+            stages = {'source': {'action': 'validate classification source and model', 'evidence': 'image model label preprocess', 'risk': 'model-input mismatch'}, 'inference': {'action': 'run bounded classification inference', 'evidence': 'softmax and top-k trace', 'risk': 'nondeterministic or unsafe inference'}, 'result': {'action': 'reconcile classification output', 'evidence': 'top-k labels and probabilities', 'risk': 'confident wrong prediction'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.deep-vision.deepVision_02.resnet_classification-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.deep-vision.deepVision_02.resnet_classification-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_resnet_classification_evidence
+        cases:
+        - id: recalls-source
+          arguments:
+          - value: source
+          expectedReturn:
+            action: validate classification source and model
+            evidence: image model label preprocess
+            risk: model-input mismatch
+        - id: recalls-inference
+          arguments:
+          - value: inference
+          expectedReturn:
+            action: run bounded classification inference
+            evidence: softmax and top-k trace
+            risk: nondeterministic or unsafe inference
+        - id: recalls-result
+          arguments:
+          - value: result
+          expectedReturn:
+            action: reconcile classification output
+            evidence: top-k labels and probabilities
+            risk: confident wrong prediction
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

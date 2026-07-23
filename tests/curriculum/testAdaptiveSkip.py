@@ -9,7 +9,6 @@ from pathlib import Path
 import pytest
 
 from codaro.curriculum.lessonGraph import buildLessonGraph
-from codaro.curriculum.outcomeCredit import FAST_TRACK_MASTERY_BOOST
 from codaro.curriculum.outcomeMastery import computeMastery
 from codaro.curriculum.planComposer import PlanGoal, composeMasterPlan
 from codaro.curriculum.progress import ProgressTracker
@@ -74,29 +73,26 @@ def testSecondAttemptDoesNotFastTrack(tracker, graph) -> None:
     assert all(not c.fastTrack for c in credits), "두 번째 시도부터 fastTrack 아님"
 
 
-def testFastTrackMasteryBoosted(tracker, graph, taxonomy) -> None:
+def testLegacyFastTrackDoesNotBoostCanonicalMastery(tracker, graph, taxonomy) -> None:
     lesson, sectionId, outcomeId = _pickOutcomeWithLesson(graph)
     tracker.recordSectionResult(lesson.category, lesson.contentId, sectionId, passed=True, hintLevel=0)
     tracker.creditCheckPass(lesson.category, lesson.contentId, sectionId, [outcomeId], hintLevel=0)
     report = computeMastery(graph, taxonomy, tracker)
     entry = next(o for o in report.outcomes if o.outcomeId == outcomeId)
-    assert entry.fastTracked, "fastTracked 플래그 표시"
-    # Single fast-track credit → mastery >= FAST_TRACK_MASTERY_BOOST.
-    assert entry.level >= FAST_TRACK_MASTERY_BOOST, (
-        f"fast-track credit 1 개 → mastery {entry.level} (>= {FAST_TRACK_MASTERY_BOOST})"
-    )
+    assert entry.fastTracked is False
+    assert entry.level == 0.0
+    assert entry.stage == "unproven"
 
 
-def testFastTrackOutcomeSkippedInAdaptivePlan(tracker, graph, taxonomy) -> None:
+def testLegacyFastTrackOutcomeIsNotSkippedInAdaptivePlan(tracker, graph, taxonomy) -> None:
     lesson, sectionId, outcomeId = _pickOutcomeWithLesson(graph)
     tracker.recordSectionResult(lesson.category, lesson.contentId, sectionId, passed=True, hintLevel=0)
     tracker.creditCheckPass(lesson.category, lesson.contentId, sectionId, [outcomeId], hintLevel=0)
     goal = PlanGoal(outcomes=[outcomeId], adaptiveSkip=True)
     plan = composeMasterPlan(goal, graph, taxonomy, tracker)
     skippedIds = {item["outcomeId"] for item in plan.adaptiveSkipped}
-    assert outcomeId in skippedIds, "fast-track outcome 이 adaptiveSkipped 에 포함"
-    # plan.targetOutcomes 에는 더 이상 없음.
-    assert outcomeId not in plan.targetOutcomes
+    assert outcomeId not in skippedIds
+    assert outcomeId in plan.targetOutcomes
 
 
 def testAdaptiveSkipDisabledKeepsOutcome(tracker, graph, taxonomy) -> None:

@@ -78,9 +78,6 @@ sections:
     hints:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: for 리스트 순회의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
@@ -114,9 +111,6 @@ sections:
     hints:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: for 문자열 순회의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
@@ -148,9 +142,6 @@ sections:
     hints:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: for 딕셔너리 순회의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
@@ -172,9 +163,6 @@ sections:
     hints:
     - 바꿀 지점은 문자열, 숫자, 변수 같은 예제 값을 만드는 첫 줄과 기초 문법 줄에서 찾으세요.
     - 실행 뒤 출력 또는 마지막 표현식 결과 중 하나가 바꾼 값을 반영하는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: range() 함수의 수정 코드가 기초 문법 단계의 마지막 확인 값까지 도달해야 합니다.
@@ -204,9 +192,6 @@ sections:
     hints:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: range()와 for의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
@@ -240,9 +225,6 @@ sections:
     hints:
     - 바꿀 지점은 `idx = ...` 오른쪽 값입니다.
     - 실행 뒤 `idx` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: while 기본에서 `idx` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -278,9 +260,6 @@ sections:
     hints:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: break 문의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
@@ -314,9 +293,6 @@ sections:
     hints:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: continue 문의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
@@ -354,9 +330,6 @@ sections:
     hints:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: forelse 절의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
@@ -390,9 +363,6 @@ sections:
     hints:
     - 바꿀 지점은 `counter = ...` 오른쪽 값입니다.
     - 실행 뒤 `counter` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: whileelse 절에서 `counter` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -428,9 +398,6 @@ sections:
     hints:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 중첩 반복문의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
@@ -470,9 +437,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 실무 반복 처리 루프에서 `dailyOrders` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -504,9 +468,6 @@ sections:
     hints:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: Day 14 종합 복습의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
@@ -525,3 +486,240 @@ sections:
     - while
     - break
     aiFollowup: 학습자가 선호한 반복 패턴을 인정하고, 다른 쪽이 더 적합한 사례를 한 가지 제시한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: day14-sum-even-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - for_list
+    - reflection
+    title: 반복해서 짝수만 합하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 반복과 조건을 결합해 누적값을 만든다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: sum_even(numbers)가 짝수만 더한 합계를 반환하도록 완성하세요.
+      starterCode: |-
+        def sum_even(numbers):
+            raise NotImplementedError
+      solution: |-
+        def sum_even(numbers):
+            total = 0
+            for number in numbers:
+                if number % 2 == 0:
+                    total += number
+            return total
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day14.sum-even.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day14.sum-even.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: sum_even
+        cases:
+        - id: mixed
+          arguments:
+          - value:
+            - 1
+            - 2
+            - 3
+            - 4
+          expectedReturn: 6
+        - id: none
+          arguments:
+          - value:
+            - 1
+            - 3
+            - 5
+          expectedReturn: 0
+        - id: negative
+          arguments:
+          - value:
+            - -2
+            - 3
+            - 6
+          expectedReturn: 4
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day14-running-totals-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day14-sum-even-mastery
+    title: 값이 들어올 때마다 누적 합계 남기기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 누적 루프를 시계열 진행값에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: running_totals(numbers)가 각 위치까지의 누적 합계를 목록으로 반환하도록 완성하세요.
+      starterCode: |-
+        def running_totals(numbers):
+            raise NotImplementedError
+      solution: |-
+        def running_totals(numbers):
+            total = 0
+            result = []
+            for number in numbers:
+                total += number
+                result.append(total)
+            return result
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day14.running-totals.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day14.running-totals.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: running_totals
+        cases:
+        - id: positive
+          arguments:
+          - value:
+            - 2
+            - 3
+            - 5
+          expectedReturn:
+          - 2
+          - 5
+          - 10
+        - id: signed
+          arguments:
+          - value:
+            - 4
+            - -1
+            - 2
+          expectedReturn:
+          - 4
+          - 3
+          - 5
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day14-first-match-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day14-running-totals-transfer
+    title: 처음 일치하는 위치 찾기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: break 대신 즉시 return하는 탐색 루프를 회상한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: first_match(items, target)가 처음 일치하는 index를, 없으면 -1을 반환하도록 완성하세요.
+      starterCode: |-
+        def first_match(items, target):
+            raise NotImplementedError
+      solution: |-
+        def first_match(items, target):
+            for index, item in enumerate(items):
+                if item == target:
+                    return index
+            return -1
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day14.first-match.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day14.first-match.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: first_match
+        cases:
+        - id: duplicate
+          arguments:
+          - value:
+            - a
+            - b
+            - a
+          - value: a
+          expectedReturn: 0
+        - id: middle
+          arguments:
+          - value:
+            - 3
+            - 5
+            - 7
+          - value: 5
+          expectedReturn: 1
+        - id: missing
+          arguments:
+          - value:
+            - 1
+            - 2
+          - value: 9
+          expectedReturn: -1
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

@@ -38,6 +38,7 @@ import {
   LoadingInline,
   PendingNotebookBar,
 } from "@/components/app/appPrimitives";
+import { RuntimeCapabilityRail } from "@/components/app/runtimeCapabilityRail";
 import { CellAiActions } from "@/components/app/cellAiActions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -123,6 +124,7 @@ const codeCellEditorTheme = EditorView.theme({
 });
 
 export function NotebookPanel({
+  apiOnline,
   canRun,
   cellHelpByBlockId,
   diagnostics,
@@ -145,6 +147,7 @@ export function NotebookPanel({
   onRunNotebook,
   onSelectBlock,
 }: {
+  apiOnline: boolean;
   canRun: boolean;
   cellHelpByBlockId: Record<string, CellAiHelpState>;
   diagnostics: ReactiveDiagnostics;
@@ -163,14 +166,14 @@ export function NotebookPanel({
   onDraftChange: (blockId: string, value: string) => void;
   onRenameDocument: (title: string) => void;
   onRejectPendingBlocks: () => void;
-  onRunBlock: (block: BlockConfig) => void;
+  onRunBlock: (block: BlockConfig, sourceOverride?: string) => void;
   onRunNotebook: () => void;
   onSelectBlock: (blockId: string) => void;
 }) {
   const staleSet = new Set(staleBlockIds);
   const cyclePaths = formatCyclePaths(diagnostics.cycles);
   return (
-    <section className="grid h-full min-h-0 grid-rows-[auto_auto_minmax(0,1fr)] p-2 sm:p-3">
+    <section className="grid h-full min-h-0 grid-rows-[auto_auto_auto_minmax(0,1fr)] p-2 sm:p-3">
       <div className="mb-2 flex min-h-8 items-center gap-2 pl-9">
         <Input
           aria-label="노트북 파일명"
@@ -191,6 +194,7 @@ export function NotebookPanel({
           {notebookRunning || runningBlockId !== null ? <Loader2 className="animate-spin" /> : <Play />}
         </Button>
       </div>
+      <RuntimeCapabilityRail apiOnline={apiOnline} surface="notebook" />
       <div className="mb-1">
         <PendingNotebookBar
           pendingBlocks={pendingBlocks}
@@ -206,7 +210,7 @@ export function NotebookPanel({
 
       <ScrollArea className="h-full min-h-0">
         <div className="space-y-0.5 pr-2">
-          {document.blocks.length ? document.blocks.map((block) => (
+          {document.blocks.length ? document.blocks.map((block, blockIndex) => (
             <DocumentBlock
               block={block}
               canRun={canRun && (!isExecutableBlock(block) || Boolean((drafts[block.id] ?? block.content).trim()))}
@@ -218,12 +222,13 @@ export function NotebookPanel({
               isRunning={runningBlockId === block.id}
               isStale={staleSet.has(block.id)}
               inCycle={blockInCycle(diagnostics, block.id)}
+              showInsertBefore={blockIndex === 0}
               diagnosticChips={cellDiagnosticChips(diagnostics, block.id)}
               onCellAsk={(action, question) => onCellAsk(action, block, question)}
               onDelete={() => onDeleteCell(block.id)}
               onDraftChange={(value) => onDraftChange(block.id, value)}
               onInsertCell={(type, placement) => onAddCell(type, block.id, placement)}
-              onRun={() => onRunBlock(block)}
+              onRun={(sourceOverride) => onRunBlock(block, sourceOverride)}
               onSelect={() => onSelectBlock(block.id)}
             />
           )) : (
@@ -408,7 +413,7 @@ export function CodeCellEditor({
   value: string;
   onChange: (value: string) => void;
   onFocus: () => void;
-  onRun?: () => void;
+  onRun?: (source: string) => void;
   completionContext?: CompletionContextProvider;
   errorLines?: number[];
   aiComments?: AiLineComment[];
@@ -482,14 +487,14 @@ export function CodeCellEditor({
           {
             key: "Mod-Enter",
             run: () => {
-              onRunRef.current?.();
+              onRunRef.current?.(viewRef.current?.state.doc.toString() ?? "");
               return true;
             },
           },
           {
             key: "Ctrl-Enter",
             run: () => {
-              onRunRef.current?.();
+              onRunRef.current?.(viewRef.current?.state.doc.toString() ?? "");
               return true;
             },
           },
@@ -575,6 +580,7 @@ function DocumentBlock({
   isRunning,
   isStale = false,
   inCycle = false,
+  showInsertBefore = false,
   diagnosticChips = [],
   result,
   cellHelp,
@@ -592,6 +598,7 @@ function DocumentBlock({
   isRunning: boolean;
   isStale?: boolean;
   inCycle?: boolean;
+  showInsertBefore?: boolean;
   diagnosticChips?: CellDiagnosticChip[];
   result?: ExecutionResult;
   cellHelp?: CellAiHelpState;
@@ -599,7 +606,7 @@ function DocumentBlock({
   onDelete: () => void;
   onDraftChange: (value: string) => void;
   onInsertCell: (type: "code" | "markdown", placement: "before" | "after") => void;
-  onRun: () => void;
+  onRun: (sourceOverride?: string) => void;
   onSelect: () => void;
 }) {
   const persistentAutomation = isPersistentAutomationBlock(block);
@@ -612,6 +619,20 @@ function DocumentBlock({
         : "Python";
   // 우선순위: 실행 중 → 순환(conflict, 빨강) → stale(오래됨) → 실행 결과 → 대기.
   const resultStatus = isRunning ? "running" : inCycle ? "conflict" : isStale ? "stale" : result?.status ?? "idle";
+  const draftRef = useRef(draft);
+
+  useEffect(() => {
+    draftRef.current = draft;
+  }, [draft]);
+
+  const updateDraft = (value: string) => {
+    draftRef.current = value;
+    onDraftChange(value);
+  };
+
+  const runCurrentDraft = () => {
+    onRun(draftRef.current);
+  };
 
   if (block.type === "markdown") {
     const markdownData = result?.data as { html?: unknown } | null | undefined;
@@ -630,12 +651,14 @@ function DocumentBlock({
           onCellAsk={onCellAsk}
           onDelete={onDelete}
         />
-        <div className="relative min-w-0">
-          <InsertCellButton placement="before" onInsertCell={onInsertCell} className="absolute -left-6 top-0 z-10 opacity-60 transition-opacity group-hover:opacity-100" />
+        <div className="relative min-h-14 min-w-0">
+          {showInsertBefore ? (
+            <InsertCellButton placement="before" onInsertCell={onInsertCell} className="absolute -left-6 top-0 z-10 opacity-60 transition-opacity group-hover:opacity-100" />
+          ) : null}
           <InsertCellButton placement="after" onInsertCell={onInsertCell} className="absolute -left-6 bottom-0 z-10 opacity-60 transition-opacity group-hover:opacity-100" />
           {showPreview ? (
             <div
-              className="prose prose-sm max-w-none cursor-text rounded-md border border-transparent px-2 py-1.5 hover:border-border"
+              className="prose prose-sm min-h-14 max-w-none cursor-text rounded-md border border-transparent px-2 py-1.5 hover:border-border"
               data-notebook-markdown-preview="true"
               onClick={onSelect}
               dangerouslySetInnerHTML={{ __html: markdownHtml }}
@@ -648,7 +671,7 @@ function DocumentBlock({
               )}
               placeholder="Markdown을 입력하세요. {변수}로 값 보간."
               value={draft}
-              onChange={(event) => onDraftChange(event.target.value)}
+              onChange={(event) => updateDraft(event.target.value)}
               onFocus={onSelect}
             />
           )}
@@ -674,21 +697,23 @@ function DocumentBlock({
         diagnosticChips={diagnosticChips}
         onCellAsk={onCellAsk}
         onDelete={onDelete}
-        onRun={onRun}
+        onRun={runCurrentDraft}
       />
-      <div className="relative min-w-0">
-        <InsertCellButton placement="before" onInsertCell={onInsertCell} className="absolute -left-6 top-0 z-10 opacity-60 transition-opacity group-hover:opacity-100" />
+      <div className="relative min-h-14 min-w-0">
+        {showInsertBefore ? (
+          <InsertCellButton placement="before" onInsertCell={onInsertCell} className="absolute -left-6 top-0 z-10 opacity-60 transition-opacity group-hover:opacity-100" />
+        ) : null}
         <InsertCellButton placement="after" onInsertCell={onInsertCell} className="absolute -left-6 bottom-0 z-10 opacity-60 transition-opacity group-hover:opacity-100" />
         <div
           className={cn(
-            "overflow-hidden rounded-md border bg-code shadow-sm transition-colors",
+            "min-h-14 overflow-hidden rounded-md border bg-code shadow-sm transition-colors",
             isSelected ? "border-ring ring-2 ring-ring/20" : "border-border hover:border-ring/50",
           )}
           data-notebook-input="code"
         >
           <CodeCellEditor
             value={draft}
-            onChange={onDraftChange}
+            onChange={updateDraft}
             onFocus={onSelect}
             onRun={onRun}
             errorLines={combineErrorSources(
@@ -780,7 +805,7 @@ function CellMetaBar({
           <IconButton
             className={cn(
               "size-6 rounded-md [&_svg]:size-3",
-              selected && "bg-accent text-accent-foreground",
+              selected && "bg-accent-surface text-accent-surface-foreground",
             )}
             disabled={!canRun}
             label="셀 실행"
@@ -825,23 +850,23 @@ function InsertCellButton({
     <div className={cn("group/insert", className)}>
       <button
         aria-label={`${placementLabel} Python 셀 추가`}
-        className="flex size-5 items-center justify-center rounded-full border bg-background shadow-sm hover:border-ring hover:text-foreground"
+        className="flex size-6 items-center justify-center rounded-full border bg-background shadow-sm hover:border-ring hover:text-foreground"
         title={`${placementLabel} Python 셀 추가`}
         type="button"
         onClick={() => onInsertCell("code", placement)}
       >
-        <Plus className="size-3" />
+        <Plus className="size-3.5" />
       </button>
       <div className="absolute left-6 top-1/2 z-20 hidden -translate-y-1/2 items-center gap-1 rounded-md border bg-popover p-1 shadow-md group-focus-within/insert:flex group-hover/insert:flex">
         <button
-          className="h-5 rounded px-1.5 font-mono text-[10px] text-popover-foreground hover:bg-accent hover:text-accent-foreground"
+          className="h-5 rounded px-1.5 font-mono text-[10px] text-popover-foreground hover:bg-accent-surface hover:text-accent-surface-foreground"
           type="button"
           onClick={() => onInsertCell("code", placement)}
         >
           Py
         </button>
         <button
-          className="h-5 rounded px-1.5 text-[10px] text-popover-foreground hover:bg-accent hover:text-accent-foreground"
+          className="h-5 rounded px-1.5 text-[10px] text-popover-foreground hover:bg-accent-surface hover:text-accent-surface-foreground"
           type="button"
           onClick={() => onInsertCell("markdown", placement)}
         >

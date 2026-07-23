@@ -31,17 +31,19 @@ def testNotebookPanelDoesNotCallTransportApiDirectly() -> None:
 def testCodeCompletionOwnsCompletionApiBoundary() -> None:
     source = _read("editor/src/lib/codeCompletion.ts")
 
-    assert 'import { codaroApi } from "@/lib/api"' in source
+    assert "codaroApi" in source
+    assert 'from "@/lib/api"' in source
     assert "codaroApi.complete" in source
     assert "CodeCompletionContext" in source
 
 
 def testCurriculumSurfaceDoesNotCallTransportApiDirectly() -> None:
     source = _read("editor/src/components/curriculum/curriculumSurface.tsx")
+    overview = _read("editor/src/components/curriculum/curriculumOverview.tsx")
 
     assert 'from "@/lib/api"' not in source
     assert "codaroApi" not in source
-    assert "CurriculumDependencyPanel" in source
+    assert "CurriculumDependencyPanel" in overview
     assert "listCurriculumPackages" not in source
     assert "installCurriculumPackage" not in source
 
@@ -65,58 +67,31 @@ def testCurriculumDependencyPanelDelegatesPackageApiBoundary() -> None:
     assert "curriculumPackageInstallCommand" in source
 
 
-def testAssignmentRoomPanelDelegatesClassroomApiBoundary() -> None:
-    source = _read("editor/src/components/classroom/assignmentRoomPanel.tsx")
+def testClassroomFrontendStaysRemovedFromCoreLearningProduct() -> None:
+    removed = (
+        "editor/src/components/classroom/assignmentRoomPanel.tsx",
+        "editor/src/hooks/useAssignmentRoomState.ts",
+        "editor/src/lib/classroomSession.ts",
+        "editor/src/lib/classroomOperations.ts",
+        "editor/src/lib/classroomEvents.ts",
+        "editor/src/lib/curriculumCheck.ts",
+        "editor/src/lib/curriculumCompletion.ts",
+    )
+    assert all(not (ROOT / path).exists() for path in removed)
 
-    assert 'from "@/lib/api"' not in source
-    assert "codaroApi" not in source
-    assert "useAssignmentRoomState" in source
-    assert 'data-assignment-room-panel="true"' in source
-    assert 'data-assignment-room-create="true"' in source
-    assert 'data-assignment-room-join="true"' in source
-    assert 'data-assignment-room-dashboard="true"' in source
-
-
-def testAssignmentRoomStateHookDelegatesClassroomApiBoundary() -> None:
-    source = _read("editor/src/hooks/useAssignmentRoomState.ts")
-
-    assert 'from "@/lib/api"' not in source
-    assert "codaroApi" not in source
-    assert "createAssignmentRoomFromDocument" in source
-    assert "loadAssignmentDashboard" in source
-    assert "recordAssignmentLearningEvent" in source
-
-
-def testClassroomOperationsOwnsClassroomApiBoundary() -> None:
-    source = _read("editor/src/lib/classroomOperations.ts")
-
-    assert 'import { codaroApi } from "@/lib/api"' in source
-    assert "codaroApi.classroomStatus" in source
-    assert "codaroApi.createAssignment" in source
-    assert "codaroApi.publishAssignment" in source
-    assert "codaroApi.joinAssignment" in source
-    assert "codaroApi.assignmentMaterial" in source
-    assert "codaroApi.assignmentDashboard" in source
-    assert "codaroApi.recordAssignmentEvent" in source
-
-
-def testClassroomEventsKeepStudentSignalScopedAndOfflineSafe() -> None:
-    source = _read("editor/src/lib/classroomEvents.ts")
-
-    assert 'from "@/lib/api"' not in source
-    assert "codaroApi" not in source
-    assert "ASSIGNMENT_OUTBOX_KEY" in source
-    assert "enqueueAssignmentEvent" in source
-    assert "flushAssignmentEventOutbox" in source
-    assert "SECRET_PATTERNS" in source
-    assert "redactText" in source
-    assert "studentCode" not in source
+    api = _read("editor/src/lib/api.ts")
+    types = _read("editor/src/types.ts")
+    progressEvent = _read("editor/src/lib/curriculumProgressEvent.ts")
+    assert "/api/classroom/" not in api
+    assert "AssignmentRoomPayload" not in types
+    assert 'PROGRESS_UPDATED_EVENT = "codaro:progress-updated"' in progressEvent
 
 
 def testCurriculumPackagePreparationOwnsPackageApiBoundary() -> None:
     source = _read("editor/src/lib/curriculumPackagePreparation.ts")
 
-    assert 'import { codaroApi } from "@/lib/api"' in source
+    assert "codaroApi" in source
+    assert 'from "@/lib/api"' in source
     assert "codaroApi.packagesList" in source
     assert "codaroApi.packageInstall" in source
 
@@ -203,11 +178,13 @@ def testCurriculumProgressHookDoesNotCallTransportApiDirectly() -> None:
     assert "loadCurriculumProgress" in source
 
 
-def testCurriculumProgressOwnsProgressApiBoundary() -> None:
+def testCurriculumProgressOwnsCanonicalEvidenceProjectionBoundary() -> None:
     source = _read("editor/src/lib/curriculumProgress.ts")
 
-    assert 'import { codaroApi } from "@/lib/api"' in source
-    assert "codaroApi.progress" in source
+    assert "loadCanonicalCurriculumLearningState" in source
+    assert "progressSummaryFromCanonicalProjection" in source
+    assert "codaroApi.progress" not in source
+    assert 'from "@/lib/api"' not in source
 
 
 def testAssistantResponsePlanDoesNotPersistCurriculumDirectly() -> None:
@@ -367,6 +344,20 @@ def testLocalRuntimeOwnsOfflineExecutionBoundary() -> None:
     assert "로컬 실행 결과" not in _read("editor/src/lib/localFallback.ts")
 
 
+def testNotebookRuntimeReleasesKernelSessionOnPageHide() -> None:
+    api = _read("editor/src/lib/api/runtimeApi.ts")
+    runtime = _read("editor/src/lib/notebookRuntime.ts")
+    runtimeHook = _read("editor/src/hooks/useNotebookRuntimeState.ts")
+
+    assert "destroySession:" in api
+    assert "requestJson<{ destroyed: boolean }>" in api
+    assert 'method: "DELETE"' in api
+    assert "export async function releaseRuntimeSession" in runtime
+    assert "codaroApi.destroySession(sessionId, options.keepalive ?? false)" in runtime
+    assert 'window.addEventListener("pagehide", release)' in runtimeHook
+    assert "releaseRuntimeSession(sessionId, { keepalive: true })" in runtimeHook
+
+
 def testAutomationBlocksRemainExecutableInNotebookModel() -> None:
     appShell = _read("editor/src/App.tsx")
     cellModel = _read("editor/src/lib/cellModel.ts")
@@ -390,7 +381,7 @@ def testAutomationBlocksRemainExecutableInNotebookModel() -> None:
 
 
 def testPersistentAutomationCellsUseSessionCellBoundary() -> None:
-    api = _read("editor/src/lib/api.ts")
+    api = _read("editor/src/lib/api/automationApi.ts")
     runtime = _read("editor/src/lib/notebookRuntime.ts")
     automationRuntime = _read("editor/src/lib/automationCellRuntime.ts")
     runtimeHook = _read("editor/src/hooks/useNotebookRuntimeState.ts")

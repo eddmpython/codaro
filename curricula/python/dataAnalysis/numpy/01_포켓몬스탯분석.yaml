@@ -519,3 +519,277 @@ sections:
     type: noError
     noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: numpy_01-pokemon-stat-totals-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - practice
+    title: 포켓몬 stat matrix에서 total과 최강 항목 찾기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 각 행의 stat 합계를 계산하고 최소 total 조건을 통과한 이름과 최고 이름을 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - stat 합계는 row axis를 줄이는 연산입니다.
+    - 동률일 때 이름으로 결정해 결과를 재현 가능하게 만드세요.
+    exercise:
+      prompt: summarize_pokemon_stats(names, stats, minimum_total)를 완성하세요.
+      starterCode: |-
+        def summarize_pokemon_stats(names, stats, minimum_total):
+            raise NotImplementedError
+      solution: |
+        def summarize_pokemon_stats(names, stats, minimum_total):
+            if len(names) != len(stats) or any(not row for row in stats):
+                raise ValueError("name and stat rows must align")
+            totals = [sum(row) for row in stats]
+            selected = [name for name, total in zip(names, totals) if total >= minimum_total]
+            best_index = max(range(len(names)), key=lambda index: (totals[index], names[index])) if names else None
+            return {"totals": totals, "selected": selected, "best": names[best_index] if best_index is not None else None}
+      hints: *id001
+    check:
+      id: python.numpy.numpy_01.pokemon-stat-totals.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_01.pokemon-stat-totals.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_pokemon_stats
+        cases:
+        - id: computes-row-totals
+          arguments:
+          - value:
+            - A
+            - B
+            - C
+          - value:
+            - - 10
+              - 20
+              - 30
+            - - 25
+              - 25
+              - 25
+            - - 40
+              - 10
+              - 5
+          - value: 60
+          expectedReturn:
+            totals:
+            - 60
+            - 75
+            - 55
+            selected:
+            - A
+            - B
+            best: B
+        - id: handles-empty-roster
+          arguments:
+          - value: []
+          - value: []
+          - value: 0
+          expectedReturn:
+            totals: []
+            selected: []
+            best: null
+        - id: rejects-misaligned-rows
+          arguments:
+          - value:
+            - A
+          - value: []
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: numpy_01-weighted-candidate-score-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_01-pokemon-stat-totals-mastery
+    title: 새 후보자 feature matrix에 가중 점수 적용하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: stat 합계를 feature별 weight가 다른 dot product와 순위로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 각 row와 weights 길이가 같아야 dot product가 의미 있습니다.
+    - 원래 입력 순서의 scores와 정렬된 ranking을 구분하세요.
+    exercise:
+      prompt: rank_weighted_candidates(names, features, weights)를 완성해 scores와 ranking을 반환하세요.
+      starterCode: |-
+        def rank_weighted_candidates(names, features, weights):
+            raise NotImplementedError
+      solution: |
+        def rank_weighted_candidates(names, features, weights):
+            if len(names) != len(features) or any(len(row) != len(weights) for row in features):
+                raise ValueError("shape mismatch")
+            scores = [round(sum(value * weight for value, weight in zip(row, weights)), 3) for row in features]
+            ranking = [name for _score, name in sorted(zip(scores, names), key=lambda item: (-item[0], item[1]))]
+            return {"scores": scores, "ranking": ranking}
+      hints: *id002
+    check:
+      id: python.numpy.numpy_01.weighted-candidate-score.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_01.weighted-candidate-score.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: rank_weighted_candidates
+        cases:
+        - id: applies-feature-weights
+          arguments:
+          - value:
+            - Mina
+            - Jun
+          - value:
+            - - 80
+              - 90
+              - 70
+            - - 90
+              - 70
+              - 85
+          - value:
+            - 0.5
+            - 0.3
+            - 0.2
+          expectedReturn:
+            scores:
+            - 81.0
+            - 83.0
+            ranking:
+            - Jun
+            - Mina
+        - id: handles-no-candidates
+          arguments:
+          - value: []
+          - value: []
+          - value:
+            - 1
+          expectedReturn:
+            scores: []
+            ranking: []
+        - id: rejects-feature-shape-mismatch
+          arguments:
+          - value:
+            - A
+          - value:
+            - - 1
+              - 2
+          - value:
+            - 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: numpy_01-matrix-selection-rule-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_01-weighted-candidate-score-transfer
+    title: boolean mask와 argmax 역할 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 조건 통과 행 선택, 최고 위치, 정렬 순위에 맞는 연산을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - max 값과 max 위치는 다른 결과입니다.
+    - mask는 선택 대상의 첫 축 길이와 같아야 합니다.
+    exercise:
+      prompt: choose_matrix_selection(situation)를 완성해 operation, returns, risk를 반환하세요.
+      starterCode: |-
+        def choose_matrix_selection(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_matrix_selection(situation):
+            table = {'keep-total-at-least-threshold': {'operation': 'boolean mask', 'returns': 'matching rows', 'risk': 'mask length mismatch'}, 'position-of-largest-total': {'operation': 'argmax', 'returns': 'single index', 'risk': 'flatten wrong axis'}, 'full-descending-order': {'operation': 'argsort', 'returns': 'index array', 'risk': 'sort values without names'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.numpy.numpy_01.matrix-selection-rule.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_01.matrix-selection-rule.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_matrix_selection
+        cases:
+        - id: recalls-keep-total-at-least-threshold
+          arguments:
+          - value: keep-total-at-least-threshold
+          expectedReturn:
+            operation: boolean mask
+            returns: matching rows
+            risk: mask length mismatch
+        - id: recalls-position-of-largest-total
+          arguments:
+          - value: position-of-largest-total
+          expectedReturn:
+            operation: argmax
+            returns: single index
+            risk: flatten wrong axis
+        - id: rejects-unknown-situation
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

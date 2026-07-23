@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "pillow"
+sourceCount: 11
+lessons:
+  - lessonRef: "pillow/00_Pillow소개"
+    sourcePath: "curricula/python/imageVision/pillow/00_Pillow소개.yaml"
+    metaId: "pillow_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pillow/01_꽃사진탐색기"
+    sourcePath: "curricula/python/imageVision/pillow/01_꽃사진탐색기.yaml"
+    metaId: "pillow_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pillow/02_중국풍경편집기"
+    sourcePath: "curricula/python/imageVision/pillow/02_중국풍경편집기.yaml"
+    metaId: "pillow_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pillow/03_흑백사진변환기"
+    sourcePath: "curricula/python/imageVision/pillow/03_흑백사진변환기.yaml"
+    metaId: "pillow_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pillow/04_사진필터스튜디오"
+    sourcePath: "curricula/python/imageVision/pillow/04_사진필터스튜디오.yaml"
+    metaId: "pillow_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pillow/05_밝기대비조절기"
+    sourcePath: "curricula/python/imageVision/pillow/05_밝기대비조절기.yaml"
+    metaId: "pillow_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pillow/06_RGB채널분석기"
+    sourcePath: "curricula/python/imageVision/pillow/06_RGB채널분석기.yaml"
+    metaId: "pillow_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pillow/07_워터마크생성기"
+    sourcePath: "curricula/python/imageVision/pillow/07_워터마크생성기.yaml"
+    metaId: "pillow_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pillow/08_도형아트생성기"
+    sourcePath: "curricula/python/imageVision/pillow/08_도형아트생성기.yaml"
+    metaId: "pillow_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pillow/09_포토콜라주메이커"
+    sourcePath: "curricula/python/imageVision/pillow/09_포토콜라주메이커.yaml"
+    metaId: "pillow_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pillow/10_종합이미지에디터"
+    sourcePath: "curricula/python/imageVision/pillow/10_종합이미지에디터.yaml"
+    metaId: "pillow_10"
+    registryStatus: registered
+    reviewStatus: pending

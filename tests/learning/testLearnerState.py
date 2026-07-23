@@ -1,4 +1,4 @@
-"""Learner State Store 테스트 — Predict-Run-Reconcile-Adapt 루프 3단계."""
+"""Learner State Store tests."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -10,12 +10,6 @@ from codaro.curriculum.learnerState import (
     MASTERY_EMA,
 )
 from codaro.curriculum.masterySignal import MasteryEvidence
-from codaro.curriculum.predictionDiff import (
-    ActualResult,
-    PredictionDiff,
-    comparePrediction,
-)
-from codaro.curriculum.sectionContract import LearningPredictContract
 
 
 @pytest.fixture
@@ -115,33 +109,6 @@ def testRecordEvidenceCountsBySuccessFlag(store: LearnerStateStore) -> None:
         "s.outcome", MasteryEvidence(scoreTarget=0.4, strength=1.0, isSuccess=False)
     )
     assert slip.failureCount == 1 and slip.successCount == 0
-
-
-def testPredictionDiffMatchCountsAsSuccess(store: LearnerStateStore) -> None:
-    predict = LearningPredictContract(expectedValue="42")
-    actual = ActualResult(value="42")
-    diff = comparePrediction(predict, actual)
-    mastery = store.recordPredictionResult("python.variables", diff)
-    assert mastery.successCount == 1
-
-
-def testPredictionDiffMismatchCountsAsFailure(store: LearnerStateStore) -> None:
-    predict = LearningPredictContract(expectedValue="42")
-    actual = ActualResult(value="41")
-    diff = comparePrediction(predict, actual)
-    mastery = store.recordPredictionResult("python.variables", diff)
-    assert mastery.failureCount == 1
-
-
-def testSkippedDiffDoesNotAffectMastery(store: LearnerStateStore) -> None:
-    predict = LearningPredictContract()
-    actual = ActualResult(value="42")
-    diff = comparePrediction(predict, actual)
-    assert diff.overall == "skipped"
-    store.recordPredictionResult("python.variables", diff)
-    mastery = store.getMastery("python.variables")
-    assert mastery.successCount == 0
-    assert mastery.failureCount == 0
 
 
 def testNewMisconceptionReturnsNew(store: LearnerStateStore) -> None:

@@ -655,3 +655,300 @@ sections:
       분리해 보세요.'
   goal: '실무 변주: 날짜 변환 정책 확장에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.'
   why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: regex_06-date-format-normalization-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_variation
+    title: 여러 날짜 형식을 ISO date로 엄격 변환하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 허용 format만 순서대로 시도하고 모호하거나 유효하지 않은 날짜를 거부한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 유연한 parser가 추측하게 두지 말고 허용 format 목록을 고정하세요.
+    - 두 format이 다른 날짜를 만들면 우선순위로 덮지 말고 ambiguous로 거부하세요.
+    exercise:
+      prompt: normalize_date(value, formats)를 완성하세요.
+      starterCode: |-
+        def normalize_date(value, formats):
+            raise NotImplementedError
+      solution: |
+        def normalize_date(value, formats):
+            from datetime import datetime
+            matches = []
+            for date_format in formats:
+                try:
+                    parsed = datetime.strptime(value, date_format).date()
+                    matches.append((date_format, parsed.isoformat()))
+                except ValueError:
+                    pass
+            unique_dates = sorted({item[1] for item in matches})
+            if not matches:
+                raise ValueError("unsupported date")
+            if len(unique_dates) > 1:
+                raise ValueError("ambiguous date")
+            return {"date": unique_dates[0], "matchedFormats": [item[0] for item in matches]}
+      hints: *id001
+    check:
+      id: python.regex.regex_06.date-format-normalization.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_06.date-format-normalization.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: normalize_date
+        cases:
+        - id: parses-iso-date
+          arguments:
+          - value: '2026-07-22'
+          - value:
+            - '%Y-%m-%d'
+            - '%d/%m/%Y'
+          expectedReturn:
+            date: '2026-07-22'
+            matchedFormats:
+            - '%Y-%m-%d'
+        - id: parses-korean-date
+          arguments:
+          - value: 2026. 7. 2
+          - value:
+            - '%Y. %m. %d'
+          expectedReturn:
+            date: '2026-07-02'
+            matchedFormats:
+            - '%Y. %m. %d'
+        - id: rejects-invalid-date
+          arguments:
+          - value: '2026-02-30'
+          - value:
+            - '%Y-%m-%d'
+          expectedException: ValueError
+        - id: rejects-ambiguous-date
+          arguments:
+          - value: 01/02/2026
+          - value:
+            - '%d/%m/%Y'
+            - '%m/%d/%Y'
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: regex_06-dated-record-order-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_06-date-format-normalization-mastery
+    title: 새 날짜 record에 timezone·순서 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: UTC epoch와 source timezone 유무로 역전·중복 시점을 찾는다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표시 문자열이 아니라 공통 UTC epoch로 record 순서를 검사하세요.
+    - 같은 시각의 중복 record를 단순 정렬로 숨기지 마세요.
+    exercise:
+      prompt: audit_dated_records(records, require_timezone)를 완성하세요.
+      starterCode: |-
+        def audit_dated_records(records, require_timezone):
+            raise NotImplementedError
+      solution: |
+        def audit_dated_records(records, require_timezone):
+            failures = []
+            missing_timezone = sorted(record["id"] for record in records if require_timezone and not record.get("timezone"))
+            if missing_timezone:
+                failures.append("timezone")
+            reversals = []
+            duplicates = []
+            previous = None
+            seen = set()
+            for record in records:
+                epoch = record["epoch"]
+                if previous is not None and epoch < previous:
+                    reversals.append(record["id"])
+                if epoch in seen:
+                    duplicates.append(record["id"])
+                seen.add(epoch)
+                previous = epoch
+            if reversals:
+                failures.append("order")
+            if duplicates:
+                failures.append("duplicate-time")
+            return {"accepted": not failures, "failures": failures, "missingTimezone": missing_timezone, "reversals": reversals, "duplicates": duplicates}
+      hints: *id002
+    check:
+      id: python.regex.regex_06.dated-record-order-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_06.dated-record-order-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_dated_records
+        cases:
+        - id: accepts-ordered-zoned-records
+          arguments:
+          - value:
+            - id: a
+              epoch: 1
+              timezone: UTC
+            - id: b
+              epoch: 2
+              timezone: UTC
+          - value: true
+          expectedReturn:
+            accepted: true
+            failures: []
+            missingTimezone: []
+            reversals: []
+            duplicates: []
+        - id: reports-timezone-and-reversal
+          arguments:
+          - value:
+            - id: a
+              epoch: 2
+            - id: b
+              epoch: 1
+              timezone: UTC
+          - value: true
+          expectedReturn:
+            accepted: false
+            failures:
+            - timezone
+            - order
+            missingTimezone:
+            - a
+            reversals:
+            - b
+            duplicates: []
+        - id: reports-duplicate-time
+          arguments:
+          - value:
+            - id: a
+              epoch: 1
+            - id: b
+              epoch: 1
+          - value: false
+          expectedReturn:
+            accepted: false
+            failures:
+            - duplicate-time
+            missingTimezone: []
+            reversals: []
+            duplicates:
+            - b
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: regex_06-date-conversion-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_06-dated-record-order-audit-transfer
+    title: 날짜 변환 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: format 추측·timezone·정렬 evidence를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - match 수만 보지 말고 정규화 뒤 보존된 의미와 거부된 입력을 함께 확인하세요.
+    - regex가 아닌 전용 parser가 필요한 구조에서는 경계를 명시하세요.
+    exercise:
+      prompt: choose_date_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_date_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_date_evidence(situation):
+            table = {'parse': {'action': 'try explicit format allowlist', 'evidence': 'matched format and ISO date', 'risk': 'ambiguous day month'}, 'timestamp': {'action': 'require timezone then UTC', 'evidence': 'source zone and epoch', 'risk': 'naive datetime'}, 'sequence': {'action': 'audit reversals and duplicates', 'evidence': 'record identities', 'risk': 'sorted-away source error'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.regex.regex_06.date-conversion-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_06.date-conversion-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_date_evidence
+        cases:
+        - id: recalls-parse
+          arguments:
+          - value: parse
+          expectedReturn:
+            action: try explicit format allowlist
+            evidence: matched format and ISO date
+            risk: ambiguous day month
+        - id: recalls-timestamp
+          arguments:
+          - value: timestamp
+          expectedReturn:
+            action: require timezone then UTC
+            evidence: source zone and epoch
+            risk: naive datetime
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

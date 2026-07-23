@@ -425,9 +425,8 @@ def jsAssertLearningOverview(viewport: str) -> str:
   if (!(learnList.textContent || '').includes('DataFrame 만들기')) {{
     throw new Error('learn list should surface section titles');
   }}
-  const startButton = overview.querySelector('[data-learning-overview-start="true"]');
-  if (!startButton) throw new Error('start button is missing');
-  if (!(startButton.textContent || '').includes('학습 시작')) throw new Error('start button copy is missing');
+  const redundantStartButton = overview.querySelector('[data-learning-overview-start="true"]');
+  if (redundantStartButton) throw new Error('lesson content must not require a redundant start action');
   if (overview.querySelector('[data-learning-workflow-diagram="true"], [data-learning-workflow-step="true"]')) {{
     throw new Error('workflow diagram should be removed');
   }}
@@ -449,7 +448,7 @@ def jsAssertLearningOverview(viewport: str) -> str:
   if (overviewRect.width < Math.min(320, window.innerWidth - 24)) {{
     throw new Error('overview width is unexpectedly small: ' + overviewRect.width);
   }}
-  const visibleBands = [title, direction, learnList, startButton].filter(Boolean).map((item) => item.getBoundingClientRect());
+  const visibleBands = [title, direction, learnList].filter(Boolean).map((item) => item.getBoundingClientRect());
   visibleBands.forEach((rect, index) => {{
     if (rect.width <= 0 || rect.height <= 0) throw new Error('empty overview band at ' + index);
     if (rect.left < overviewRect.left - 1 || rect.right > overviewRect.right + 1) {{
@@ -461,7 +460,7 @@ def jsAssertLearningOverview(viewport: str) -> str:
     viewport: {json.dumps(viewport)},
     title: (title.textContent || '').trim(),
     learnRows: learnRows.length,
-    startButton: true,
+    redundantStartButton: false,
   }});
 }})()
 """)
@@ -520,12 +519,12 @@ def jsAssertStructuredCardLayout(viewport: str) -> str:
   }}
 
   const bands = [
-    card.querySelector(':scope > button'),
+    card.querySelector(':scope > header'),
     card.querySelector(':scope > [data-learning-section-part="overview"]'),
     card.querySelector('[data-learning-section-part="snippet"]'),
     card.querySelector('[data-learning-section-part="exercise"]'),
   ].filter(Boolean);
-  if (bands.length !== 4) throw new Error('band count ' + bands.length);
+  if (bands.length !== 4) throw new Error('learning flow band count ' + bands.length);
 
   const header = bands[0];
   const sectionIndex = header.querySelector('[data-learning-section-index="true"]');
@@ -701,7 +700,6 @@ def jsAssertLearningVisualIntegrity(viewport: str) -> str:
     '[data-learning-overview-part="title"]',
     '[data-learning-overview-part="direction"]',
     '[data-learning-overview-part="learn-list"]',
-    '[data-learning-overview-start="true"]',
     '[data-learning-section-index="true"]',
     '[data-learning-section-heading="true"]',
     '[data-code-payload-copy="true"]',

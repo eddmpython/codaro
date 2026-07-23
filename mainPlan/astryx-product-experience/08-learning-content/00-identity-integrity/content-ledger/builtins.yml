@@ -1,0 +1,669 @@
+schemaVersion: 1
+category: "builtins"
+canonicalRows: 35
+lessons:
+  - lessonRef: "builtins/01_math"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "08b09de6b6c0b89ccd627d1fb0c4ab6ea8afe691ab23069e412a42f5739f7b46"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["builtins.numericMath"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/01_math:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_01_math:v1","retrieve:builtins_01_math:v2","retrieve:builtins_01_math:v3"]
+    transferVariantIds: ["transfer:builtins_01_math:near-v1","transfer:builtins_01_math:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/02_random"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "365926c5c39c0b9a62e6bab91532c2b272f1872960b9e3cbfff0f2233d6c627d"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["builtins.numericMath"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/02_random:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_02_random:v1","retrieve:builtins_02_random:v2","retrieve:builtins_02_random:v3"]
+    transferVariantIds: ["transfer:builtins_02_random:near-v1","transfer:builtins_02_random:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/03_datetime"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "38a3c1240ecf47542d8d31c2b1025bc95ae0051c03d059393134d718f5221402"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["builtins.datetime"]
+    prerequisites: ["python.oop"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/03_datetime:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_03_datetime:v1","retrieve:builtins_03_datetime:v2","retrieve:builtins_03_datetime:v3"]
+    transferVariantIds: ["transfer:builtins_03_datetime:near-v1","transfer:builtins_03_datetime:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/04_time"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "1c5c9b44fb62a7351c1cee0ba508d179d1553ea18f399b6b5c0e20cf1069da1b"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["builtins.datetime"]
+    prerequisites: ["builtins.datetime"]
+    reinforcesOutcomeIds: ["builtins.datetime"]
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/04_time:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_04_time:v1","retrieve:builtins_04_time:v2","retrieve:builtins_04_time:v3"]
+    transferVariantIds: ["transfer:builtins_04_time:near-v1","transfer:builtins_04_time:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/05_collections"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "2735cc8842a7535753d18909a7ad526b67f800100f57a0151a010ead2b3d8ffd"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["builtins.collections"]
+    prerequisites: ["python.dictsAndSets"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/05_collections:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_05_collections:v1","retrieve:builtins_05_collections:v2","retrieve:builtins_05_collections:v3"]
+    transferVariantIds: ["transfer:builtins_05_collections:near-v1","transfer:builtins_05_collections:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/06_itertools"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "3e993b39de5294abf669c2c241797370e29088a06458256f06a1d7d7a8722496"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["builtins.collections"]
+    prerequisites: ["python.advancedSyntax"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/06_itertools:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_06_itertools:v1","retrieve:builtins_06_itertools:v2","retrieve:builtins_06_itertools:v3"]
+    transferVariantIds: ["transfer:builtins_06_itertools:near-v1","transfer:builtins_06_itertools:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/07_functools"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "b2f6d9e9d7d4352e94f057bdce62d13e6c8808aaec9ead1c63a9b8f18d2353f1"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["python.functools"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/07_functools:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_07_functools:v1","retrieve:builtins_07_functools:v2","retrieve:builtins_07_functools:v3"]
+    transferVariantIds: ["transfer:builtins_07_functools:near-v1","transfer:builtins_07_functools:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/08_os"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "84674d2f0a23bd581e4950cd997b107b13087cf9d674f82947956e22c6a43ccd"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["fileAutomation","standardLibraryMastery"]
+    outcomes: ["builtins.fileSystem"]
+    prerequisites: ["python.modulesAndIo"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/08_os:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_08_os:v1","retrieve:builtins_08_os:v2","retrieve:builtins_08_os:v3"]
+    transferVariantIds: ["transfer:builtins_08_os:near-v1","transfer:builtins_08_os:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/09_pathlib"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "8f228e3424e51a67b12dacb266e13ba63931b0d2490892e296f64067cb6f5f3a"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["fileAutomation","standardLibraryMastery"]
+    outcomes: ["builtins.fileSystem"]
+    prerequisites: ["python.modulesAndIo"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/09_pathlib:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_09_pathlib:v1","retrieve:builtins_09_pathlib:v2","retrieve:builtins_09_pathlib:v3"]
+    transferVariantIds: ["transfer:builtins_09_pathlib:near-v1","transfer:builtins_09_pathlib:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/10_sys"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "f6f8812803a1891999508058ae3a87e453dd3621261d9e04f52c4a42f92eeb56"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["builtins.cli"]
+    prerequisites: ["python.modulesAndIo"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/10_sys:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_10_sys:v1","retrieve:builtins_10_sys:v2","retrieve:builtins_10_sys:v3"]
+    transferVariantIds: ["transfer:builtins_10_sys:near-v1","transfer:builtins_10_sys:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/11_glob"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "86bd4f60ddfaa6d0013f8b3e30ff11f9c511c606eb592ee81f664e1ef1658d62"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["fileAutomation","standardLibraryMastery"]
+    outcomes: ["builtins.fileSystem"]
+    prerequisites: ["builtins.fileSystem"]
+    reinforcesOutcomeIds: ["builtins.fileSystem"]
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/11_glob:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_11_glob:v1","retrieve:builtins_11_glob:v2","retrieve:builtins_11_glob:v3"]
+    transferVariantIds: ["transfer:builtins_11_glob:near-v1","transfer:builtins_11_glob:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/12_shutil"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "cdb75c44d5ec4c2554540fc9697001c57061c16d10f14eaa2e2b86d2acacb761"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["fileAutomation","standardLibraryMastery"]
+    outcomes: ["builtins.fileSystem"]
+    prerequisites: ["builtins.fileSystem"]
+    reinforcesOutcomeIds: ["builtins.fileSystem"]
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/12_shutil:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_12_shutil:v1","retrieve:builtins_12_shutil:v2","retrieve:builtins_12_shutil:v3"]
+    transferVariantIds: ["transfer:builtins_12_shutil:near-v1","transfer:builtins_12_shutil:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/13_json"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "6d8f59788cee30bf5a58684c2e8b3867be8337cf35a938beeb4cd3e931d3b45b"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["builtins.dataFormats"]
+    prerequisites: ["python.dictsAndSets"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/13_json:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_13_json:v1","retrieve:builtins_13_json:v2","retrieve:builtins_13_json:v3"]
+    transferVariantIds: ["transfer:builtins_13_json:near-v1","transfer:builtins_13_json:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/14_csv"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "5234873cb34b3abfaa7c87d8c7efde399c5c40cd131a617a85766b6454b96720"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["builtins.dataFormats"]
+    prerequisites: ["python.modulesAndIo"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/14_csv:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_14_csv:v1","retrieve:builtins_14_csv:v2","retrieve:builtins_14_csv:v3"]
+    transferVariantIds: ["transfer:builtins_14_csv:near-v1","transfer:builtins_14_csv:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/15_pickle"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "073226c7fa44043a62748e07b72699263261e1ca42866aa60841685cd86dada5"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["builtins.dataFormats"]
+    prerequisites: ["python.modulesAndIo"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/15_pickle:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_15_pickle:v1","retrieve:builtins_15_pickle:v2","retrieve:builtins_15_pickle:v3"]
+    transferVariantIds: ["transfer:builtins_15_pickle:near-v1","transfer:builtins_15_pickle:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/16_struct"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "2123aaff282babbcfb666588a04d5615e347031256b1fbe7157bb6a234dd6ab7"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["builtins.dataFormats"]
+    prerequisites: ["python.modulesAndIo"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/16_struct:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_16_struct:v1","retrieve:builtins_16_struct:v2","retrieve:builtins_16_struct:v3"]
+    transferVariantIds: ["transfer:builtins_16_struct:near-v1","transfer:builtins_16_struct:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/17_string"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "26280c2df357a4fc474de0755fde03936b3b953ed42e0726d627210ca3cb9db3"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery","textProcessing"]
+    outcomes: ["builtins.textProcessing"]
+    prerequisites: ["python.strings"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/17_string:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_17_string:v1","retrieve:builtins_17_string:v2","retrieve:builtins_17_string:v3"]
+    transferVariantIds: ["transfer:builtins_17_string:near-v1","transfer:builtins_17_string:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/18_textwrap"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "ccff6b1f5c6fc14aaeb82b117605c6a59760e61493b553546229abaa427de3f2"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery","textProcessing"]
+    outcomes: ["builtins.textProcessing"]
+    prerequisites: ["python.strings"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/18_textwrap:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_18_textwrap:v1","retrieve:builtins_18_textwrap:v2","retrieve:builtins_18_textwrap:v3"]
+    transferVariantIds: ["transfer:builtins_18_textwrap:near-v1","transfer:builtins_18_textwrap:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/19_difflib"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "3f7371abdb60e9efb94167ba97bca01cd7878ddf28a03721bdff6f9cede580fa"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery","textProcessing"]
+    outcomes: ["builtins.textProcessing"]
+    prerequisites: ["python.strings"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/19_difflib:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_19_difflib:v1","retrieve:builtins_19_difflib:v2","retrieve:builtins_19_difflib:v3"]
+    transferVariantIds: ["transfer:builtins_19_difflib:near-v1","transfer:builtins_19_difflib:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/20_base64"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "48bab1f02f091439c8365dd73ac5082a4cd9c421e93b6407cc21bd16e973c4aa"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery","textProcessing"]
+    outcomes: ["builtins.textProcessing"]
+    prerequisites: ["python.strings"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/20_base64:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_20_base64:v1","retrieve:builtins_20_base64:v2","retrieve:builtins_20_base64:v3"]
+    transferVariantIds: ["transfer:builtins_20_base64:near-v1","transfer:builtins_20_base64:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/21_urllib"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "eec480e25280edd3a40a99ebc1a557d013c33df25e2b6de30d85cbc61d1652e8"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["builtins.networking"]
+    prerequisites: ["python.modulesAndIo"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/21_urllib:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_21_urllib:v1","retrieve:builtins_21_urllib:v2","retrieve:builtins_21_urllib:v3"]
+    transferVariantIds: ["transfer:builtins_21_urllib:near-v1","transfer:builtins_21_urllib:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/22_email"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "af8b58bf0d10d1b360e97ed20bd35856b5f0b579df59a56b562ee977bcbe1cf1"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["builtins.networking"]
+    prerequisites: ["python.modulesAndIo"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/22_email:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_22_email:v1","retrieve:builtins_22_email:v2","retrieve:builtins_22_email:v3"]
+    transferVariantIds: ["transfer:builtins_22_email:near-v1","transfer:builtins_22_email:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/23_asyncio"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "fa0970d24e3c72254b9da5ab243d4e88fc1804494a1684305d4e25128b5bc8fc"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["builtins.async"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/23_asyncio:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_23_asyncio:v1","retrieve:builtins_23_asyncio:v2","retrieve:builtins_23_asyncio:v3"]
+    transferVariantIds: ["transfer:builtins_23_asyncio:near-v1","transfer:builtins_23_asyncio:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/24_argparse"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "d98307291ce78d4f3d3f48e9bf9421791dfaf1f280612cd08aac71ef5d4a44e4"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["builtins.cli"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/24_argparse:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_24_argparse:v1","retrieve:builtins_24_argparse:v2","retrieve:builtins_24_argparse:v3"]
+    transferVariantIds: ["transfer:builtins_24_argparse:near-v1","transfer:builtins_24_argparse:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/25_logging"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "e0b8f5ccd1c9062138b2f64f8804ea1ff985d6621f22918f7db2a0fd7b1810b1"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery","systemMonitoring"]
+    outcomes: ["builtins.logging"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/25_logging:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_25_logging:v1","retrieve:builtins_25_logging:v2","retrieve:builtins_25_logging:v3"]
+    transferVariantIds: ["transfer:builtins_25_logging:near-v1","transfer:builtins_25_logging:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/26_unittest"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "544981886683856e1c94a0b5adbfc57b65b712eea8e5e9bcf16d325b68eec4d2"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["builtins.testing"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/26_unittest:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_26_unittest:v1","retrieve:builtins_26_unittest:v2","retrieve:builtins_26_unittest:v3"]
+    transferVariantIds: ["transfer:builtins_26_unittest:near-v1","transfer:builtins_26_unittest:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/27_timeit"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "8cd32e2648be3317e6a6f5d69bb8c03c80893a8f6294c18f1c2e55e77e123a63"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery","systemMonitoring"]
+    outcomes: ["builtins.logging"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/27_timeit:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_27_timeit:v1","retrieve:builtins_27_timeit:v2","retrieve:builtins_27_timeit:v3"]
+    transferVariantIds: ["transfer:builtins_27_timeit:near-v1","transfer:builtins_27_timeit:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/28_copy"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "6ff6877658bcc97fcafff9b0f7ba26571f1a3033eb3a28f3438aa3bc8841b121"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["pythonFoundation","standardLibraryMastery"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.oop"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/28_copy:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_28_copy:v1","retrieve:builtins_28_copy:v2","retrieve:builtins_28_copy:v3"]
+    transferVariantIds: ["transfer:builtins_28_copy:near-v1","transfer:builtins_28_copy:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/29_pprint"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "a5fcd26eb58e4ea7857e9b55dca203d8213f7f8f2b5b58c6307aac5242f77855"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery","systemMonitoring"]
+    outcomes: ["builtins.logging"]
+    prerequisites: ["python.dictsAndSets"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/29_pprint:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_29_pprint:v1","retrieve:builtins_29_pprint:v2","retrieve:builtins_29_pprint:v3"]
+    transferVariantIds: ["transfer:builtins_29_pprint:near-v1","transfer:builtins_29_pprint:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/30_inspect"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "7e48a577c24b92fabe7a58dbf3dbe077fabc86335127bbbde99e887c90efc2c2"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery","systemMonitoring"]
+    outcomes: ["builtins.logging"]
+    prerequisites: ["python.advancedSyntax"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/30_inspect:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_30_inspect:v1","retrieve:builtins_30_inspect:v2","retrieve:builtins_30_inspect:v3"]
+    transferVariantIds: ["transfer:builtins_30_inspect:near-v1","transfer:builtins_30_inspect:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/31_subprocess"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "f534882a57d4fb4b3d8357df133f29c1ffb3f612c955500e5c25cdc29fb8e9b7"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["builtins.subprocess"]
+    prerequisites: ["python.modulesAndIo"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:builtins/31_subprocess:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_31_subprocess:v1","retrieve:builtins_31_subprocess:v2","retrieve:builtins_31_subprocess:v3"]
+    transferVariantIds: ["transfer:builtins_31_subprocess:near-v1","transfer:builtins_31_subprocess:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/32_contextlib"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "d281855f09d778904d3c561590c25f39c8debb1493cc9101314854a0cc4e9ae4"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["builtins.contextManagers"]
+    prerequisites: ["python.advancedSyntax"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/32_contextlib:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_32_contextlib:v1","retrieve:builtins_32_contextlib:v2","retrieve:builtins_32_contextlib:v3"]
+    transferVariantIds: ["transfer:builtins_32_contextlib:near-v1","transfer:builtins_32_contextlib:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/33_tempfile"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "bcaf4c7a33281878807089aeedc920b209f0bb4c40e2500a43d279f381c10e27"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["builtins.tempFiles"]
+    prerequisites: ["builtins.fileSystem","builtins.contextManagers"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/33_tempfile:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_33_tempfile:v1","retrieve:builtins_33_tempfile:v2","retrieve:builtins_33_tempfile:v3"]
+    transferVariantIds: ["transfer:builtins_33_tempfile:near-v1","transfer:builtins_33_tempfile:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/34_hashlib"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "896261dbd8ccbfa1f17999a258cd4048419f612fe304ef2d72d0af73666ca3a3"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["builtins.hashing"]
+    prerequisites: ["python.strings","builtins.fileSystem"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/34_hashlib:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_34_hashlib:v1","retrieve:builtins_34_hashlib:v2","retrieve:builtins_34_hashlib:v3"]
+    transferVariantIds: ["transfer:builtins_34_hashlib:near-v1","transfer:builtins_34_hashlib:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "builtins/35_zipfile"
+    identityLedgerRef: "identity-ledger/builtins.yml"
+    lessonContentHash: "34c92ae35a22286c92298184006926e02c0e5a294fa6bf14d77412fe832be54f"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/23-standard-library-mastery"
+    eligiblePathIds: ["standardLibraryMastery"]
+    outcomes: ["builtins.archives"]
+    prerequisites: ["builtins.fileSystem","builtins.contextManagers"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:builtins/35_zipfile:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:builtins_35_zipfile:v1","retrieve:builtins_35_zipfile:v2","retrieve:builtins_35_zipfile:v3"]
+    transferVariantIds: ["transfer:builtins_35_zipfile:near-v1","transfer:builtins_35_zipfile:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

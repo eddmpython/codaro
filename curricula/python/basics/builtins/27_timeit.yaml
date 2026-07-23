@@ -380,3 +380,303 @@ sections:
     type: noError
     noError: 종합 복습에서 `simple` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 종합 복습 실행 뒤 `simple` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 27_timeit-sample-summary-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - workflow_validation
+    - repeat_timing
+    title: 반복 측정 샘플을 재현 가능한 리포트로 요약하기
+    subtitle: repeat, number, best, spread
+    goal: 측정 샘플 list와 repeat, number를 받아 정렬된 결과, 최솟값, 최댓값, spread, per-loop 시간을 반환한다.
+    why: 숙달 검증은 현재 PC에서 몇 초가 나왔는지가 아니라, timeit 결과를 흔들림을 고려한 리포트로 해석하는 능력을 확인합니다.
+    explanation: summarize_timing_samples(samples, repeat, number)를 완성해 샘플 수와 반복 설정을 검증하고, 최솟값 중심 리포트를 dict로 반환하세요.
+    tips:
+    - repeat와 number가 1보다 작으면 ValueError로 막으세요.
+    - 샘플 수가 repeat와 다르면 측정 조건이 불완전하므로 ValueError로 막으세요.
+    exercise:
+      prompt: summarize_timing_samples(samples, repeat, number)를 완성해 ordered, best, worst, spread, perLoopBestMicroseconds를
+        반환하세요.
+      starterCode: |-
+        def summarize_timing_samples(samples, repeat, number):
+            raise NotImplementedError
+      solution: |-
+        def summarize_timing_samples(samples, repeat, number):
+            if repeat < 1 or number < 1:
+                raise ValueError("repeat and number must be positive")
+            if len(samples) != repeat:
+                raise ValueError("sample count must match repeat")
+            ordered = sorted(samples)
+            best = ordered[0]
+            worst = ordered[-1]
+            return {
+                "repeat": repeat,
+                "number": number,
+                "best": round(best, 6),
+                "worst": round(worst, 6),
+                "spread": round(worst - best, 6),
+                "perLoopBestMicroseconds": round(best / number * 1_000_000, 3),
+                "ordered": [round(value, 6) for value in ordered],
+            }
+      hints:
+      - 평균보다 best를 기준으로 잡으면 일시적인 시스템 노이즈 영향을 줄일 수 있습니다.
+      - per-loop 시간은 best / number에 1_000_000을 곱해 microseconds로 표현하세요.
+    check:
+      id: python.builtins.timeit.sample-summary.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.timeit.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_timing_samples
+        cases:
+        - id: summarizes-repeat-samples
+          arguments:
+          - value:
+            - 0.0152
+            - 0.0148
+            - 0.0161
+          - value: 3
+          - value: 1000
+          expectedReturn:
+            repeat: 3
+            number: 1000
+            best: 0.0148
+            worst: 0.0161
+            spread: 0.0013
+            perLoopBestMicroseconds: 14.8
+            ordered:
+            - 0.0148
+            - 0.0152
+            - 0.0161
+        - id: rejects-sample-count-mismatch
+          arguments:
+          - value:
+            - 0.01
+            - 0.02
+          - value: 3
+          - value: 1000
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 27_timeit-candidate-comparison-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - comparing_code
+    - best_practices
+    title: 여러 구현 후보의 샘플을 비교해 fastest와 speedup 산출하기
+    subtitle: candidate best 비교
+    goal: 후보별 측정 샘플을 받아 최솟값 기준으로 fastest, slowest, speedup, summaries를 반환한다.
+    why: 전이 과제에서는 한 statement 요약에서 여러 구현 비교로 옮겨, 숫자를 판단 가능한 의사결정 리포트로 바꿉니다.
+    explanation: compare_benchmark_samples(candidates)를 완성해 각 후보의 best/worst/sampleCount를 만들고 best 기준으로 정렬하세요.
+    tips:
+    - 후보가 비어 있으면 ValueError로 막으세요.
+    - speedup은 slowest best / fastest best로 계산하고 소수 둘째 자리까지 반올림하세요.
+    exercise:
+      prompt: compare_benchmark_samples(candidates)를 완성해 fastest, slowest, speedup, summaries를 반환하세요.
+      starterCode: |-
+        def compare_benchmark_samples(candidates):
+            raise NotImplementedError
+      solution: |-
+        def compare_benchmark_samples(candidates):
+            if not candidates:
+                raise ValueError("candidates required")
+            summaries = []
+            for item in candidates:
+                samples = sorted(item["samples"])
+                best = samples[0]
+                summaries.append({
+                    "name": item["name"],
+                    "best": round(best, 6),
+                    "worst": round(samples[-1], 6),
+                    "sampleCount": len(samples),
+                })
+            summaries.sort(key=lambda item: item["best"])
+            fastest = summaries[0]
+            slowest = summaries[-1]
+            return {
+                "fastest": fastest["name"],
+                "slowest": slowest["name"],
+                "speedup": round(slowest["best"] / fastest["best"], 2),
+                "summaries": summaries,
+            }
+      hints:
+      - 후보별 샘플은 먼저 정렬해 best와 worst를 뽑으세요.
+      - 반환 summaries도 best가 빠른 순서로 정렬되어야 읽기 쉽습니다.
+    check:
+      id: python.builtins.timeit.candidate-comparison.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.timeit.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: compare_benchmark_samples
+        cases:
+        - id: compares-three-candidates
+          arguments:
+          - value:
+            - name: list-comprehension
+              samples:
+              - 0.011
+              - 0.01
+              - 0.012
+            - name: for-loop
+              samples:
+              - 0.018
+              - 0.017
+              - 0.019
+            - name: map
+              samples:
+              - 0.014
+              - 0.015
+              - 0.013
+          expectedReturn:
+            fastest: list-comprehension
+            slowest: for-loop
+            speedup: 1.7
+            summaries:
+            - name: list-comprehension
+              best: 0.01
+              worst: 0.012
+              sampleCount: 3
+            - name: map
+              best: 0.013
+              worst: 0.015
+              sampleCount: 3
+            - name: for-loop
+              best: 0.017
+              worst: 0.019
+              sampleCount: 3
+        - id: rejects-empty-candidates
+          arguments:
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 27_timeit-command-plan-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 27_timeit-candidate-comparison-transfer
+    title: timeit 실행 계획에서 total execution과 setup 사용 여부 회상하기
+    subtitle: stmt, setup, number, repeat
+    goal: statement와 setup, number, repeat를 받아 공백 정리, setup 사용 여부, 총 실행 횟수를 반환한다.
+    why: 시간이 지나도 남아야 할 timeit 감각은 측정 숫자보다, number와 repeat가 실제 실행 횟수를 어떻게 만드는지 아는 것입니다.
+    explanation: plan_timeit_command(stmt, setup="", number=1000, repeat=5)를 완성해 측정 계획을 dict로 반환하고 잘못된 반복 조건은 ValueError로
+      막으세요.
+    tips:
+    - stmt와 setup은 strip해서 리포트에 남기세요.
+    - totalExecutions는 number * repeat입니다.
+    exercise:
+      prompt: plan_timeit_command(stmt, setup="", number=1000, repeat=5)를 완성해 totalExecutions와 usesSetup을 반환하세요.
+      starterCode: |-
+        def plan_timeit_command(stmt, setup="", number=1000, repeat=5):
+            raise NotImplementedError
+      solution: |-
+        def plan_timeit_command(stmt, setup="", number=1000, repeat=5):
+            if number < 1 or repeat < 1:
+                raise ValueError("number and repeat must be positive")
+            return {
+                "stmt": stmt.strip(),
+                "setup": setup.strip(),
+                "number": number,
+                "repeat": repeat,
+                "usesSetup": bool(setup.strip()),
+                "totalExecutions": number * repeat,
+            }
+      hints:
+      - setup 문자열이 공백뿐이면 usesSetup은 False여야 합니다.
+      - 반복 횟수가 커질수록 실행 시간은 number * repeat만큼 늘어납니다.
+    check:
+      id: python.builtins.timeit.command-plan.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.timeit.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_timeit_command
+        cases:
+        - id: plans-statement-with-setup
+          arguments:
+          - value: ' target() '
+          - value: ' from __main__ import target '
+          - value: 250
+          - value: 4
+          expectedReturn:
+            stmt: target()
+            setup: from __main__ import target
+            number: 250
+            repeat: 4
+            usesSetup: true
+            totalExecutions: 1000
+        - id: rejects-zero-repeat
+          arguments:
+          - value: target()
+          - value: ''
+          - value: 100
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

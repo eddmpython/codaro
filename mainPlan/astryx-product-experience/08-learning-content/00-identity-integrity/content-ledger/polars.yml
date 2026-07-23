@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "polars"
+canonicalRows: 11
+lessons:
+  - lessonRef: "polars/00_Polars소개"
+    identityLedgerRef: "identity-ledger/polars.yml"
+    lessonContentHash: "c352e18c20f6241fc846e488a093906b9f747931a76f86b383dc8cadbbcd09f5"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/19-big-data-pipelines"
+    eligiblePathIds: ["bigDataPipelines"]
+    outcomes: ["polars.intro"]
+    prerequisites: ["pandas.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:polars/00_Polars소개:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:polars_00_Polars__:v1","retrieve:polars_00_Polars__:v2","retrieve:polars_00_Polars__:v3"]
+    transferVariantIds: ["transfer:polars_00_Polars__:near-v1","transfer:polars_00_Polars__:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "polars/01_영화평점분석"
+    identityLedgerRef: "identity-ledger/polars.yml"
+    lessonContentHash: "cf02bc6869274ee98b3e8e8fa8bc7956e456374f05c4af3828ee80642fb9f43c"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/19-big-data-pipelines"
+    eligiblePathIds: ["bigDataPipelines"]
+    outcomes: ["polars.transform"]
+    prerequisites: ["polars.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:polars/01_영화평점분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:polars_01_______:v1","retrieve:polars_01_______:v2","retrieve:polars_01_______:v3"]
+    transferVariantIds: ["transfer:polars_01_______:near-v1","transfer:polars_01_______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "polars/02_날씨데이터분석"
+    identityLedgerRef: "identity-ledger/polars.yml"
+    lessonContentHash: "35228fbce3ef5af99558968b88f084e1245b5d687e3fd0ea8ec790469ff450a2"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/19-big-data-pipelines"
+    eligiblePathIds: ["bigDataPipelines"]
+    outcomes: ["polars.transform"]
+    prerequisites: ["polars.transform"]
+    reinforcesOutcomeIds: ["polars.transform"]
+    runtimeTier: browser
+    checkSpecId: "lesson:polars/02_날씨데이터분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:polars_02________:v1","retrieve:polars_02________:v2","retrieve:polars_02________:v3"]
+    transferVariantIds: ["transfer:polars_02________:near-v1","transfer:polars_02________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "polars/03_게임판매분석"
+    identityLedgerRef: "identity-ledger/polars.yml"
+    lessonContentHash: "2e35e9e49f31c362eec8fed0abe53ce27f374f47299a00c1f3e39fca26b62b60"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/19-big-data-pipelines"
+    eligiblePathIds: ["bigDataPipelines"]
+    outcomes: ["polars.aggregate"]
+    prerequisites: ["polars.transform"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:polars/03_게임판매분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:polars_03_______:v1","retrieve:polars_03_______:v2","retrieve:polars_03_______:v3"]
+    transferVariantIds: ["transfer:polars_03_______:near-v1","transfer:polars_03_______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "polars/04_주식데이터분석"
+    identityLedgerRef: "identity-ledger/polars.yml"
+    lessonContentHash: "60fd43c8fa65ff49ee32d3e496c74825a697c6cd7e6ac13f02de4e18aeb7b895"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/19-big-data-pipelines"
+    eligiblePathIds: ["bigDataPipelines"]
+    outcomes: ["polars.aggregate"]
+    prerequisites: ["polars.aggregate"]
+    reinforcesOutcomeIds: ["polars.aggregate"]
+    runtimeTier: browser
+    checkSpecId: "lesson:polars/04_주식데이터분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:polars_04________:v1","retrieve:polars_04________:v2","retrieve:polars_04________:v3"]
+    transferVariantIds: ["transfer:polars_04________:near-v1","transfer:polars_04________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "polars/05_음악스트리밍분석"
+    identityLedgerRef: "identity-ledger/polars.yml"
+    lessonContentHash: "7f26ad087cb2dd6192f679c1944e1fc947469e0b94e0c2b0ea31b4d841dafcc9"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/19-big-data-pipelines"
+    eligiblePathIds: ["bigDataPipelines"]
+    outcomes: ["polars.aggregate"]
+    prerequisites: ["polars.aggregate"]
+    reinforcesOutcomeIds: ["polars.aggregate"]
+    runtimeTier: browser
+    checkSpecId: "lesson:polars/05_음악스트리밍분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:polars_05_________:v1","retrieve:polars_05_________:v2","retrieve:polars_05_________:v3"]
+    transferVariantIds: ["transfer:polars_05_________:near-v1","transfer:polars_05_________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "polars/06_부동산가격분석"
+    identityLedgerRef: "identity-ledger/polars.yml"
+    lessonContentHash: "74164c7a125cdbe4f40041e34ccebb134293048b586131d16c246b0acb38363b"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/19-big-data-pipelines"
+    eligiblePathIds: ["bigDataPipelines"]
+    outcomes: ["polars.aggregate"]
+    prerequisites: ["polars.aggregate"]
+    reinforcesOutcomeIds: ["polars.aggregate"]
+    runtimeTier: browser
+    checkSpecId: "lesson:polars/06_부동산가격분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:polars_06________:v1","retrieve:polars_06________:v2","retrieve:polars_06________:v3"]
+    transferVariantIds: ["transfer:polars_06________:near-v1","transfer:polars_06________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "polars/07_스포츠통계분석"
+    identityLedgerRef: "identity-ledger/polars.yml"
+    lessonContentHash: "0858c6a3ef89cebf0556d92e2fa22c697919a41dca732429c32d8ed052ff161e"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/19-big-data-pipelines"
+    eligiblePathIds: ["bigDataPipelines"]
+    outcomes: ["polars.aggregate"]
+    prerequisites: ["polars.aggregate"]
+    reinforcesOutcomeIds: ["polars.aggregate"]
+    runtimeTier: browser
+    checkSpecId: "lesson:polars/07_스포츠통계분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:polars_07________:v1","retrieve:polars_07________:v2","retrieve:polars_07________:v3"]
+    transferVariantIds: ["transfer:polars_07________:near-v1","transfer:polars_07________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "polars/08_소셜미디어분석"
+    identityLedgerRef: "identity-ledger/polars.yml"
+    lessonContentHash: "d78b061e08437d9ddb82b68848a9b21bcac98b1b69bfa84e32b9e684df735334"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/19-big-data-pipelines"
+    eligiblePathIds: ["bigDataPipelines"]
+    outcomes: ["polars.aggregate"]
+    prerequisites: ["polars.aggregate"]
+    reinforcesOutcomeIds: ["polars.aggregate"]
+    runtimeTier: browser
+    checkSpecId: "lesson:polars/08_소셜미디어분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:polars_08________:v1","retrieve:polars_08________:v2","retrieve:polars_08________:v3"]
+    transferVariantIds: ["transfer:polars_08________:near-v1","transfer:polars_08________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "polars/09_대용량로그분석"
+    identityLedgerRef: "identity-ledger/polars.yml"
+    lessonContentHash: "602d7bfdceddbe7ddd201c620ad788fafd8118794eaca7d194ebeacd4e98661c"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/19-big-data-pipelines"
+    eligiblePathIds: ["bigDataPipelines"]
+    outcomes: ["polars.bigData"]
+    prerequisites: ["polars.aggregate"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:polars/09_대용량로그분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:polars_09________:v1","retrieve:polars_09________:v2","retrieve:polars_09________:v3"]
+    transferVariantIds: ["transfer:polars_09________:near-v1","transfer:polars_09________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "polars/10_실전종합프로젝트"
+    identityLedgerRef: "identity-ledger/polars.yml"
+    lessonContentHash: "4de06dac487cf3049d7e3e58f3a55a5be71380a924f86d3ea40b47f1aacb901d"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/19-big-data-pipelines"
+    eligiblePathIds: ["bigDataPipelines"]
+    outcomes: ["polars.bigData"]
+    prerequisites: ["polars.bigData"]
+    reinforcesOutcomeIds: ["polars.bigData"]
+    runtimeTier: browser
+    checkSpecId: "lesson:polars/10_실전종합프로젝트:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:polars_10_________:v1","retrieve:polars_10_________:v2","retrieve:polars_10_________:v3"]
+    transferVariantIds: ["transfer:polars_10_________:near-v1","transfer:polars_10_________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

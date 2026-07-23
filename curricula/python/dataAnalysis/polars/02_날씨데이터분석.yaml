@@ -564,3 +564,268 @@ sections:
     type: noError
     noError: 업무 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 업무 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: polars_02-weather-filter-plan-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 날씨 레코드의 schema·조건·projection plan 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 필수 열을 확인하고 기온 범위와 강수 조건을 적용해 필요한 열만 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - filter에 쓰는 열도 scan projection에 포함해야 합니다.
+    - 최종 결과에서는 rain 열을 제외해도 filter 단계에서는 필요합니다.
+    exercise:
+      prompt: filter_weather(rows, minimum_temp, rainy_only)를 완성해 rows와 scannedColumns를 반환하세요.
+      starterCode: |-
+        def filter_weather(rows, minimum_temp, rainy_only):
+            raise NotImplementedError
+      solution: |
+        def filter_weather(rows, minimum_temp, rainy_only):
+            required = {"date", "city", "temperature", "rain"}
+            if any(set(row) < required for row in rows):
+                raise ValueError("weather schema mismatch")
+            selected = [row for row in rows if row["temperature"] >= minimum_temp and (not rainy_only or row["rain"] > 0)]
+            result = [{"date": row["date"], "city": row["city"], "temperature": row["temperature"]} for row in selected]
+            return {"rows": result, "scannedColumns": sorted(required)}
+      hints: *id001
+    check:
+      id: python.polars.polars_02.weather-filter-plan.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_02.weather-filter-plan.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: filter_weather
+        cases:
+        - id: filters-and-projects
+          arguments:
+          - value:
+            - date: 07-01
+              city: Seoul
+              temperature: 30
+              rain: 5
+            - date: 07-02
+              city: Seoul
+              temperature: 25
+              rain: 0
+          - value: 28
+          - value: true
+          expectedReturn:
+            rows:
+            - date: 07-01
+              city: Seoul
+              temperature: 30
+            scannedColumns:
+            - city
+            - date
+            - rain
+            - temperature
+        - id: handles-empty-weather
+          arguments:
+          - value: []
+          - value: 0
+          - value: false
+          expectedReturn:
+            rows: []
+            scannedColumns:
+            - city
+            - date
+            - rain
+            - temperature
+        - id: rejects-schema-gap
+          arguments:
+          - value:
+            - date: x
+          - value: 0
+          - value: false
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: polars_02-daily-weather-aggregation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_02-weather-filter-plan-mastery
+    title: 새 hourly weather를 도시·날짜별 일 요약으로 집계하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: row filter를 group key 두 개와 min·max·rain sum 집계로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - city와 date를 함께 group key로 사용하세요.
+    - temperature는 min/max, rain은 sum으로 서로 다른 집계를 적용하세요.
+    exercise:
+      prompt: daily_weather_summary(rows)를 완성해 city, date, minTemp, maxTemp, rainTotal 목록을 반환하세요.
+      starterCode: |-
+        def daily_weather_summary(rows):
+            raise NotImplementedError
+      solution: |
+        def daily_weather_summary(rows):
+            grouped = {}
+            for row in rows:
+                grouped.setdefault((row["city"], row["date"]), []).append(row)
+            result = []
+            for (city, date), group in sorted(grouped.items()):
+                temperatures = [row["temperature"] for row in group]
+                result.append({"city": city, "date": date, "minTemp": min(temperatures), "maxTemp": max(temperatures), "rainTotal": sum(row["rain"] for row in group)})
+            return result
+      hints: *id002
+    check:
+      id: python.polars.polars_02.daily-weather-aggregation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_02.daily-weather-aggregation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: daily_weather_summary
+        cases:
+        - id: groups-by-two-keys
+          arguments:
+          - value:
+            - city: Seoul
+              date: 07-01
+              temperature: 20
+              rain: 1
+            - city: Seoul
+              date: 07-01
+              temperature: 30
+              rain: 2
+            - city: Busan
+              date: 07-01
+              temperature: 25
+              rain: 0
+          expectedReturn:
+          - city: Busan
+            date: 07-01
+            minTemp: 25
+            maxTemp: 25
+            rainTotal: 0
+          - city: Seoul
+            date: 07-01
+            minTemp: 20
+            maxTemp: 30
+            rainTotal: 3
+        - id: handles-empty-hours
+          arguments:
+          - value: []
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: polars_02-query-optimization-signal-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_02-daily-weather-aggregation-transfer
+    title: lazy query 최적화 신호 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: predicate pushdown, projection pushdown, streaming 가능성의 조건을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - optimizer가 이해할 수 있는 expression을 사용하세요.
+    - Python callback은 pushdown을 막을 수 있습니다.
+    exercise:
+      prompt: choose_query_optimization(situation)를 완성해 optimization, evidence, blocker를 반환하세요.
+      starterCode: |-
+        def choose_query_optimization(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_query_optimization(situation):
+            table = {'filter-near-scan': {'optimization': 'predicate pushdown', 'evidence': 'filter in plan', 'blocker': 'opaque Python callback'}, 'select-needed-columns': {'optimization': 'projection pushdown', 'evidence': 'scan column list', 'blocker': 'select all'}, 'bounded-group-aggregate': {'optimization': 'streaming candidate', 'evidence': 'engine plan', 'blocker': 'global sort'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.polars.polars_02.query-optimization-signal.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_02.query-optimization-signal.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_query_optimization
+        cases:
+        - id: recalls-filter-near-scan
+          arguments:
+          - value: filter-near-scan
+          expectedReturn:
+            optimization: predicate pushdown
+            evidence: filter in plan
+            blocker: opaque Python callback
+        - id: recalls-select-needed-columns
+          arguments:
+          - value: select-needed-columns
+          expectedReturn:
+            optimization: projection pushdown
+            evidence: scan column list
+            blocker: select all
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

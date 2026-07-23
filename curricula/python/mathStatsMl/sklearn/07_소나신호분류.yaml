@@ -641,3 +641,265 @@ sections:
     type: noError
     noError: 업무 흐름 검증에서 `conservativePipeline` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sklearn_07-stratified-count-plan-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_data
+    - workflow_validation
+    title: 소나 이진분류의 stratified split 수 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: class별 test count를 최소 1개 보존해 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 각 class가 train과 test 양쪽에 남아야 합니다.
+    - 작은 class에서 비율 반올림 결과를 검토하세요.
+    exercise:
+      prompt: stratified_test_counts(class_counts, test_ratio)를 완성하세요.
+      starterCode: |-
+        def stratified_test_counts(class_counts, test_ratio):
+            raise NotImplementedError
+      solution: |
+        def stratified_test_counts(class_counts, test_ratio):
+            if not 0 < test_ratio < 1 or any(count < 2 for count in class_counts.values()): raise ValueError("cannot stratify")
+            result={}
+            for label,count in sorted(class_counts.items()):
+                test=max(1,min(count-1,round(count*test_ratio)))
+                result[str(label)]={"train":count-test,"test":test}
+            return result
+      hints: *id001
+    check:
+      id: python.sklearn.sklearn_07.stratified-count-plan.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_07.stratified-count-plan.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: stratified_test_counts
+        cases:
+        - id: preserves-both-classes
+          arguments:
+          - value:
+              rock: 8
+              mine: 2
+          - value: 0.25
+          expectedReturn:
+            mine:
+              train: 1
+              test: 1
+            rock:
+              train: 6
+              test: 2
+        - id: handles-small-ratio
+          arguments:
+          - value:
+              0: 3
+              1: 3
+          - value: 0.1
+          expectedReturn:
+            '0':
+              train: 2
+              test: 1
+            '1':
+              train: 2
+              test: 1
+        - id: rejects-singleton-class
+          arguments:
+          - value:
+              0: 1
+              1: 5
+          - value: 0.2
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sklearn_07-signal-feature-range-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_07-stratified-count-plan-mastery
+    title: 새 신호 feature에 train range 점검 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: test feature가 train min/max 밖에 있는 비율을 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - scaler를 적용하기 전 원 feature range shift를 기록하세요.
+    - 범위 밖 값은 자동 오류가 아니라 외부 검토 신호입니다.
+    exercise:
+      prompt: feature_range_shift(train_rows, test_rows)를 완성하세요.
+      starterCode: |-
+        def feature_range_shift(train_rows, test_rows):
+            raise NotImplementedError
+      solution: |
+        def feature_range_shift(train_rows, test_rows):
+            if not train_rows or not test_rows or any(len(row)!=len(train_rows[0]) for row in train_rows+test_rows): raise ValueError("shape mismatch")
+            ranges=[(min(row[index] for row in train_rows),max(row[index] for row in train_rows)) for index in range(len(train_rows[0]))]
+            outside=[sum(value<ranges[index][0] or value>ranges[index][1] for index,value in enumerate(row)) for row in test_rows]
+            total=len(test_rows)*len(ranges)
+            return {"ranges":[list(pair) for pair in ranges],"outsideCount":sum(outside),"outsideRate":round(sum(outside)/total,4)}
+      hints: *id002
+    check:
+      id: python.sklearn.sklearn_07.signal-feature-range.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_07.signal-feature-range.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: feature_range_shift
+        cases:
+        - id: detects-range-shift
+          arguments:
+          - value:
+            - - 0
+              - 10
+            - - 2
+              - 8
+          - value:
+            - - 1
+              - 9
+            - - 3
+              - 20
+          expectedReturn:
+            ranges:
+            - - 0
+              - 2
+            - - 8
+              - 10
+            outsideCount: 2
+            outsideRate: 0.5
+        - id: accepts-inside-range
+          arguments:
+          - value:
+            - - 0
+            - - 2
+          - value:
+            - - 1
+          expectedReturn:
+            ranges:
+            - - 0
+              - 2
+            outsideCount: 0
+            outsideRate: 0.0
+        - id: rejects-empty
+          arguments:
+          - value: []
+          - value:
+            - - 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sklearn_07-sonar-classification-evidence-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_07-signal-feature-range-transfer
+    title: 신호 분류 검증 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: class split·scale·shift를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 학습 데이터와 평가 데이터의 경계를 먼저 확인하세요.
+    - 한 metric이나 예측을 실제 진단·인과 결론으로 확대하지 마세요.
+    exercise:
+      prompt: choose_signal_classifier_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_signal_classifier_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_signal_classifier_evidence(situation):
+            table = {'imbalanced-labels': {'method': 'stratified split', 'evidence': 'class counts per split', 'risk': 'singleton class'}, 'many-amplitudes': {'method': 'train-fitted scaler', 'evidence': 'feature ranges', 'risk': 'test fit'}, 'new-device': {'method': 'external device holdout', 'evidence': 'range shift and metrics', 'risk': 'sensor shift'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sklearn.sklearn_07.sonar-classification-evidence.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_07.sonar-classification-evidence.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_signal_classifier_evidence
+        cases:
+        - id: recalls-imbalanced-labels
+          arguments:
+          - value: imbalanced-labels
+          expectedReturn:
+            method: stratified split
+            evidence: class counts per split
+            risk: singleton class
+        - id: recalls-many-amplitudes
+          arguments:
+          - value: many-amplitudes
+          expectedReturn:
+            method: train-fitted scaler
+            evidence: feature ranges
+            risk: test fit
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

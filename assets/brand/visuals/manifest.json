@@ -1,0 +1,560 @@
+{
+  "schemaVersion": 1,
+  "assets": [
+    {
+      "id": "runLearningDetail",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run-learning-detail.png",
+      "sourceHash": "sha256-5f004b2afa8f2b997f710c5b64c4ab25a93dce5b8c1680db2016848f5c1bf762",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "local-strong-learning-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 900,
+        "height": 760,
+        "aspectRatio": 1.184211,
+        "focalPoint": { "x": 0.66, "y": 0.45 },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": ["landing-proof", "learn-proof", "documentation"]
+      },
+      "variants": {
+        "formats": ["avif", "webp"],
+        "responsiveWidths": [480, 720, 900],
+        "lightDark": "single",
+        "locales": ["ko-KR"],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "Codaro 로컬 학습 화면에서 헬로월드 설명, 코드 예제, 강한 검증 상태가 한 흐름에 표시된 모습",
+        "caption": "설명, 실행 가능한 코드, 자동 검증이 같은 레슨 화면에서 이어집니다.",
+        "learningQuestion": "학습자는 설명을 읽은 뒤 어느 코드 영역을 바꾸고 실행해야 하는가?",
+        "decisionShown": "레슨 설명과 실행 및 검증 위치의 관계",
+        "lessonRefs": ["30일완성/헬로월드"]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": { "width": 900, "height": 760 },
+        "theme": "dark",
+        "locale": "ko-KR"
+      }
+    },
+    {
+      "id": "runLearningMobile",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run-learning-mobile.png",
+      "sourceHash": "sha256-bc3c80e69c771493171151988e1d095589fa9dce06aa97b531fa7a251f5fbc09",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-lesson-mobile",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 390,
+        "height": 844,
+        "aspectRatio": 0.462085,
+        "focalPoint": { "x": 0.5, "y": 0.42 },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": ["landing-mobile-proof", "learn-mobile-proof"]
+      },
+      "variants": {
+        "formats": ["avif", "webp"],
+        "responsiveWidths": [390],
+        "lightDark": "single",
+        "locales": ["ko-KR"],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "390픽셀 너비의 Codaro 웹 레슨에서 학습 개요와 첫 학습 섹션이 열린 읽기 흐름으로 이어지는 모습",
+        "caption": "모바일에서도 별도 확인 단계 없이 학습 목표 다음에 실습이 이어집니다.",
+        "learningQuestion": "작은 화면에서도 현재 학습 목표와 다음 실습을 동시에 찾을 수 있는가?",
+        "decisionShown": "모바일 레슨의 정보 우선순위",
+        "lessonRefs": ["30일완성/헬로월드"]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": { "width": 390, "height": 844 },
+        "theme": "dark",
+        "locale": "ko-KR"
+      }
+    },
+    {
+      "id": "webRunDesktop",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/web-run-desktop.png",
+      "sourceHash": "sha256-24a3746e0ef831559d1f62b1f579b677d032c7d85708842a424943f9e51cd355",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-run-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1440,
+        "height": 900,
+        "aspectRatio": 1.6,
+        "focalPoint": { "x": 0.52, "y": 0.34 },
+        "safeTextRegion": { "x": 0.2, "y": 0.32, "width": 0.48, "height": 0.48 },
+        "fit": "cover",
+        "background": "surface",
+        "proofUsage": ["landing-hero-background", "web-run-proof"]
+      },
+      "variants": {
+        "formats": ["avif", "webp"],
+        "responsiveWidths": [720, 1080, 1440],
+        "lightDark": "single",
+        "locales": ["ko-KR"],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "설치 없이 브라우저 Python 셀을 실행하는 Codaro Web Run 전체 화면",
+        "caption": "Web Run은 브라우저 파일과 지원 패키지를 사용해 설치 없이 Python 셀을 실행합니다.",
+        "learningQuestion": "웹 실행 환경과 로컬 실행 환경의 권한 차이는 어디에 표시되는가?",
+        "decisionShown": "Web Run의 실행 계층과 지원 범위",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": { "width": 1440, "height": 900 },
+        "theme": "dark",
+        "locale": "ko-KR"
+      }
+    },
+    {
+      "id": "localNotebookDesktop",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/local-notebook-desktop.png",
+      "sourceHash": "sha256-f63d588e284f23c6ca9615344f5d90498a2b61fbf9cf3c43c94504cf001ee3a1",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "local-run-minimum",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 900,
+        "height": 640,
+        "aspectRatio": 1.40625,
+        "focalPoint": { "x": 0.66, "y": 0.3 },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": ["landing-local-proof", "local-empty-state"]
+      },
+      "variants": {
+        "formats": ["avif", "webp"],
+        "responsiveWidths": [600, 900],
+        "lightDark": "single",
+        "locales": ["ko-KR"],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "Codaro Local Studio에서 시스템 Python과 프로젝트 파일 및 터미널이 연결된 빈 노트북 화면",
+        "caption": "Local Studio는 같은 셀 모델에 실제 프로젝트 파일과 시스템 Python을 연결합니다.",
+        "learningQuestion": "웹에서 검증한 코드를 실제 프로젝트 파일로 옮길 때 어떤 실행 계층이 바뀌는가?",
+        "decisionShown": "Local Studio의 런타임 및 파일 권한 확장",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": { "width": 900, "height": 640 },
+        "theme": "dark",
+        "locale": "ko-KR"
+      }
+    },
+    {
+      "id": "localAutomationDesktop",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/local-automation-desktop.png",
+      "sourceHash": "sha256-f64373a73e1cfab14fe888463eff3984241684d23c23570c3c1858068b71c48d",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "local-automation-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1440,
+        "height": 900,
+        "aspectRatio": 1.6,
+        "focalPoint": { "x": 0.62, "y": 0.45 },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": ["landing-automation-proof", "local-automation-operational-state"]
+      },
+      "variants": {
+        "formats": ["avif", "webp"],
+        "responsiveWidths": [720, 1080, 1440],
+        "lightDark": "single",
+        "locales": ["ko-KR"],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "Codaro Local 자동화 화면에서 브라우저 루틴, 파일 정리, 엑셀 반복 작업과 예약 태스크 상태가 보이는 모습",
+        "caption": "검증된 셀과 recipe는 로컬에서 파일 작업과 예약 실행으로 확장됩니다.",
+        "learningQuestion": "반복 실행할 수 있는 코드와 아직 학습 중인 코드를 어떻게 구분하는가?",
+        "decisionShown": "검증된 코드가 자동화 recipe와 task로 승격되는 경계",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": { "width": 1440, "height": 900 },
+        "theme": "dark",
+        "locale": "ko-KR"
+      }
+    },
+    {
+      "id": "pythonFundamentals",
+      "kind": "instructional",
+      "sourceType": "generatedRaster",
+      "sourcePath": "assets/brand/visuals/learning/python-fundamentals-v1.png",
+      "sourceHash": "sha256-209adca76258d3aa9f5ae79b7d9e24916861f49b125ce007db3449da97757fb4",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro visual authoring pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "python-fundamentals-domain-v1",
+        "promptHash": "sha256-45246801d7843b7af2cc0174e818e81a9d9e0d1925a4e7b738222dce3e4e5d38",
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1672,
+        "height": 941,
+        "aspectRatio": 1.776833,
+        "focalPoint": { "x": 0.58, "y": 0.55 },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "light-neutral",
+        "proofUsage": ["learning-domain-basics", "lesson-context"]
+      },
+      "variants": {
+        "formats": ["avif", "webp"],
+        "responsiveWidths": [480, 840, 1200, 1672],
+        "lightDark": "single",
+        "locales": ["ko-KR", "en-US"],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "밝은 작업대에서 변수, 문자열, 리스트, 제어 흐름을 색상 타일과 연결선으로 설명한 파이썬 기초 학습 이미지",
+        "caption": "값의 종류가 컬렉션과 제어 흐름으로 이어지는 파이썬 기초 구조입니다.",
+        "learningQuestion": "하나의 값은 어떤 과정을 거쳐 컬렉션과 반복 흐름으로 확장되는가?",
+        "decisionShown": "변수, 자료형, 컬렉션, 제어 흐름의 선후 관계",
+        "lessonRefs": ["30days/day02_변수와데이터타입", "30days/day07_리스트기초"]
+      }
+    },
+    {
+      "id": "dataAnalysis",
+      "kind": "instructional",
+      "sourceType": "generatedRaster",
+      "sourcePath": "assets/brand/visuals/learning/data-analysis-v1.png",
+      "sourceHash": "sha256-b0ac8b2e66927c41d410f959896410f0a492827eabab47b6306f350f853b0c58",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro visual authoring pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "data-analysis-domain-v1",
+        "promptHash": "sha256-c737f07e956cf2e3c97cdec7ff696187f3585c3d665865623c2873a344bba484",
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1672,
+        "height": 941,
+        "aspectRatio": 1.776833,
+        "focalPoint": { "x": 0.54, "y": 0.48 },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "light-neutral",
+        "proofUsage": ["learning-domain-data-analysis", "lesson-context"]
+      },
+      "variants": {
+        "formats": ["avif", "webp"],
+        "responsiveWidths": [480, 840, 1200, 1672],
+        "lightDark": "single",
+        "locales": ["ko-KR", "en-US"],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "원본 표가 정리, 그룹화, 비교 차트, 보고서로 이어지는 데이터 분석 학습 이미지",
+        "caption": "원본 데이터를 정리하고 묶어 비교 가능한 결과로 바꾸는 분석 흐름입니다.",
+        "learningQuestion": "원본 행은 어떤 변환을 거쳐 비교 가능한 결과가 되는가?",
+        "decisionShown": "정리, 그룹화, 비교, 보고의 분석 순서",
+        "lessonRefs": []
+      }
+    },
+    {
+      "id": "dataVisualization",
+      "kind": "instructional",
+      "sourceType": "generatedRaster",
+      "sourcePath": "assets/brand/visuals/learning/data-visualization-v1.png",
+      "sourceHash": "sha256-5248dc1b6fb113b1ba93c003d507db6bc20fbd7680b9f1d8abc1ac8c803dc509",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro visual authoring pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "data-visualization-domain-v1",
+        "promptHash": "sha256-e850f31ca2c0d2bb88f54fe8d763a0bdeec70ed29732a5d466f8746a04ed35f1",
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1672,
+        "height": 941,
+        "aspectRatio": 1.776833,
+        "focalPoint": { "x": 0.58, "y": 0.5 },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "light-neutral",
+        "proofUsage": ["learning-domain-visualization", "lesson-context"]
+      },
+      "variants": {
+        "formats": ["avif", "webp"],
+        "responsiveWidths": [480, 840, 1200, 1672],
+        "lightDark": "single",
+        "locales": ["ko-KR", "en-US"],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "같은 데이터가 막대, 선, 산점도, 분포 차트로 달리 표현되는 시각화 학습 이미지",
+        "caption": "같은 값도 질문에 따라 적합한 시각적 표현이 달라집니다.",
+        "learningQuestion": "비교, 변화, 관계, 분포에는 각각 어떤 차트가 맞는가?",
+        "decisionShown": "데이터 질문과 시각적 인코딩의 대응",
+        "lessonRefs": []
+      }
+    },
+    {
+      "id": "statisticsMachineLearning",
+      "kind": "instructional",
+      "sourceType": "generatedRaster",
+      "sourcePath": "assets/brand/visuals/learning/statistics-ml-v1.png",
+      "sourceHash": "sha256-d6e581dafc4f7321429f12a8895e28915532d7a5679f649fdc80194f546d64eb",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro visual authoring pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "statistics-machine-learning-domain-v1",
+        "promptHash": "sha256-882f948c62f95971f176cc50ee33b87daead4134ea0bcd2130c9bcba9ac4d0a5",
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1672,
+        "height": 941,
+        "aspectRatio": 1.776833,
+        "focalPoint": { "x": 0.5, "y": 0.48 },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "light-neutral",
+        "proofUsage": ["learning-domain-math-stats-ml", "lesson-context"]
+      },
+      "variants": {
+        "formats": ["avif", "webp"],
+        "responsiveWidths": [480, 840, 1200, 1672],
+        "lightDark": "single",
+        "locales": ["ko-KR", "en-US"],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "표본, 분포, 적합 곡선, 결정 경계, 평가 결과를 단계별로 보여 주는 통계와 머신러닝 학습 이미지",
+        "caption": "표본의 불확실성을 모델에 반영하고 별도 데이터로 판단을 검증합니다.",
+        "learningQuestion": "모델의 적합과 일반화는 어떤 서로 다른 근거로 판단하는가?",
+        "decisionShown": "표본, 적합, 분리, 평가의 모델링 순서",
+        "lessonRefs": []
+      }
+    },
+    {
+      "id": "imageVision",
+      "kind": "instructional",
+      "sourceType": "generatedRaster",
+      "sourcePath": "assets/brand/visuals/learning/image-vision-v1.png",
+      "sourceHash": "sha256-1b1922d95f3dfcf836d24fa8c3e11c7c02c79f8a20f968f2c89d21609fed17b2",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro visual authoring pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "image-vision-domain-v1",
+        "promptHash": "sha256-73fc05ae505bab09936dba44d712c45d882f7bafe4b9634a5b0bdb4055abd3ab",
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1672,
+        "height": 941,
+        "aspectRatio": 1.776833,
+        "focalPoint": { "x": 0.56, "y": 0.48 },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "light-neutral",
+        "proofUsage": ["learning-domain-image-vision", "lesson-context"]
+      },
+      "variants": {
+        "formats": ["avif", "webp"],
+        "responsiveWidths": [480, 840, 1200, 1672],
+        "lightDark": "single",
+        "locales": ["ko-KR", "en-US"],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "과일 사진이 픽셀과 색 채널, 변환, 윤곽, 분할 결과로 이어지는 이미지 처리 학습 이미지",
+        "caption": "하나의 이미지를 픽셀 수준에서 변환하고 경계와 객체로 해석하는 흐름입니다.",
+        "learningQuestion": "원본 픽셀은 어떤 변환을 거쳐 측정 가능한 객체가 되는가?",
+        "decisionShown": "픽셀, 변환, 윤곽, 분할, 측정의 처리 순서",
+        "lessonRefs": []
+      }
+    },
+    {
+      "id": "learningAutomation",
+      "kind": "instructional",
+      "sourceType": "generatedRaster",
+      "sourcePath": "assets/brand/visuals/learning/automation-v1.png",
+      "sourceHash": "sha256-a21d2e9766461642abe4dfc44073c44d58709fd483c51ab73b5682ed9fb2c482",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro visual authoring pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "learning-automation-domain-v1",
+        "promptHash": "sha256-2f378e592935ce87e9eed1ae357053602f5e9a625cf8a656d28f5dbff71165b7",
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1672,
+        "height": 941,
+        "aspectRatio": 1.776833,
+        "focalPoint": { "x": 0.54, "y": 0.5 },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "light-neutral",
+        "proofUsage": ["learning-domain-automation", "lesson-context"]
+      },
+      "variants": {
+        "formats": ["avif", "webp"],
+        "responsiveWidths": [480, 840, 1200, 1672],
+        "lightDark": "single",
+        "locales": ["ko-KR", "en-US"],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "입력 파일, 검증된 recipe, 안전 점검, 예약, 보고서, 감사 기록이 반복 흐름으로 연결된 자동화 학습 이미지",
+        "caption": "검증된 코드는 안전 점검과 기록을 포함한 반복 작업으로 확장됩니다.",
+        "learningQuestion": "반복 실행 전에 어떤 검증과 안전 경계가 필요한가?",
+        "decisionShown": "입력, dry-run, 예약, 산출물, 감사의 자동화 흐름",
+        "lessonRefs": []
+      }
+    },
+    {
+      "id": "developerLiteracy",
+      "kind": "instructional",
+      "sourceType": "generatedRaster",
+      "sourcePath": "assets/brand/visuals/learning/developer-literacy-v1.png",
+      "sourceHash": "sha256-9990255713daf2a6fe88169aaf2fe0f78d79b155d02dc807ddda39e79a1424da",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro visual authoring pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "developer-literacy-domain-v1",
+        "promptHash": "sha256-85e38fd1ca4b81e80c950874eb38b7ad64a9fe79549dc36514be63d4bed709aa",
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1672,
+        "height": 941,
+        "aspectRatio": 1.776833,
+        "focalPoint": { "x": 0.5, "y": 0.5 },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "light-neutral",
+        "proofUsage": ["learning-domain-developer-literacy", "lesson-context"]
+      },
+      "variants": {
+        "formats": ["avif", "webp"],
+        "responsiveWidths": [480, 840, 1200, 1672],
+        "lightDark": "single",
+        "locales": ["ko-KR", "en-US"],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "저장소와 폴더, 소스 파일, 터미널, 버전 이력, 테스트, 패키지, 문서의 관계를 보여 주는 개발 학습 이미지",
+        "caption": "작은 소프트웨어 프로젝트를 구성하는 파일, 실행, 검증, 배포의 관계입니다.",
+        "learningQuestion": "소스 변경은 어떤 검증과 패키징 단계를 거쳐 공유되는가?",
+        "decisionShown": "저장소, 실행, 테스트, 패키지, 문서의 프로젝트 구조",
+        "lessonRefs": []
+      }
+    },
+    {
+      "id": "aiIntegration",
+      "kind": "instructional",
+      "sourceType": "generatedRaster",
+      "sourcePath": "assets/brand/visuals/learning/ai-integration-v1.png",
+      "sourceHash": "sha256-37e84d22dbb900c25cb41555f02f92442bbc4e56c9e4103bf39aa58ba4f76423",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro visual authoring pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "ai-integration-domain-v1",
+        "promptHash": "sha256-51f558f4635cfe113f30a3771b3d16437bd96f712cb726b65347c3f0e32c7479",
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1672,
+        "height": 941,
+        "aspectRatio": 1.776833,
+        "focalPoint": { "x": 0.52, "y": 0.48 },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "light-neutral",
+        "proofUsage": ["learning-domain-ai-integration", "lesson-context"]
+      },
+      "variants": {
+        "formats": ["avif", "webp"],
+        "responsiveWidths": [480, 840, 1200, 1672],
+        "lightDark": "single",
+        "locales": ["ko-KR", "en-US"],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "입력과 문서가 검색, 모델, 도구 호출, 출처가 있는 응답, 평가로 이어지는 AI 통합 학습 이미지",
+        "caption": "출처와 도구 경계를 유지하면서 모델 응답을 실제 작업과 평가로 연결합니다.",
+        "learningQuestion": "모델의 응답을 근거와 도구 실행, 평가에 어떻게 묶는가?",
+        "decisionShown": "입력, 검색, 모델, 도구, 출처, 평가의 통합 경계",
+        "lessonRefs": []
+      }
+    }
+  ]
+}

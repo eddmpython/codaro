@@ -426,3 +426,306 @@ sections:
     check:
       noError: sweepEmpty 호출 후 rglob가 종합 정리 결과를 그대로 반영해야 한다.
       resultCheck: remaining 리스트가 keep 폴더와 note.txt만 남긴 상태여야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: fileOps_08-directory-organization-plan-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - rules-map
+    - empty-folder-sweep
+    title: 확장자 규칙으로 디렉터리 정리 dry-run 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 분류되지 않은 파일과 destination 충돌을 숨기지 않고 move plan을 만든다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 정리 계획은 항상 dry run으로 먼저 보여주고 destination 충돌을 차단하세요.
+    - 분류되지 않은 확장자는 기타 폴더로 추측 이동하지 말고 남겨 두세요.
+    exercise:
+      prompt: plan_directory_organization(files, rules, existing_destinations)를 완성하세요.
+      starterCode: |-
+        def plan_directory_organization(files, rules, existing_destinations):
+            raise NotImplementedError
+      solution: |
+        def plan_directory_organization(files, rules, existing_destinations):
+            existing = set(existing_destinations)
+            moves = []
+            unclassified = []
+            conflicts = []
+            for file in files:
+                suffix = file["suffix"].lower()
+                category = rules.get(suffix)
+                if not category:
+                    unclassified.append(file["path"])
+                    continue
+                name = file["path"].rsplit("/", 1)[-1]
+                destination = f"{category}/{name}"
+                if destination in existing:
+                    conflicts.append({"source": file["path"], "destination": destination})
+                else:
+                    moves.append({"source": file["path"], "destination": destination})
+                    existing.add(destination)
+            return {"ready": not conflicts, "moves": moves, "unclassified": unclassified, "conflicts": conflicts, "dryRun": True}
+      hints: *id001
+    check:
+      id: python.fileops.fileOps_08.directory-organization-plan.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_08.directory-organization-plan.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_directory_organization
+        cases:
+        - id: plans-classified-moves
+          arguments:
+          - value:
+            - path: /in/a.PDF
+              suffix: .PDF
+            - path: /in/b.jpg
+              suffix: .jpg
+          - value:
+              .pdf: docs
+              .jpg: images
+          - value: []
+          expectedReturn:
+            ready: true
+            moves:
+            - source: /in/a.PDF
+              destination: docs/a.PDF
+            - source: /in/b.jpg
+              destination: images/b.jpg
+            unclassified: []
+            conflicts: []
+            dryRun: true
+        - id: reports-unclassified-file
+          arguments:
+          - value:
+            - path: /in/a.bin
+              suffix: .bin
+          - value:
+              .txt: text
+          - value: []
+          expectedReturn:
+            ready: true
+            moves: []
+            unclassified:
+            - /in/a.bin
+            conflicts: []
+            dryRun: true
+        - id: reports-destination-conflict
+          arguments:
+          - value:
+            - path: /in/a.txt
+              suffix: .txt
+          - value:
+              .txt: text
+          - value:
+            - text/a.txt
+          expectedReturn:
+            ready: false
+            moves: []
+            unclassified: []
+            conflicts:
+            - source: /in/a.txt
+              destination: text/a.txt
+            dryRun: true
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: fileOps_08-organization-result-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - fileOps_08-directory-organization-plan-mastery
+    title: 새 디렉터리 정리 결과에 move reconciliation 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 계획된 source·destination 쌍과 실제 artifact를 정확히 대조한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 파일 수만 비교하지 말고 source·destination·hash 쌍을 reconcile하세요.
+    - 계획에 없던 이동도 unexpected artifact로 실패시키세요.
+    exercise:
+      prompt: audit_organization_result(planned, observed)를 완성하세요.
+      starterCode: |-
+        def audit_organization_result(planned, observed):
+            raise NotImplementedError
+      solution: |
+        def audit_organization_result(planned, observed):
+            planned_ids = {(item["source"], item["destination"], item["hash"]) for item in planned}
+            observed_ids = {(item["source"], item["destination"], item["hash"]) for item in observed}
+            missing = sorted([list(item) for item in planned_ids - observed_ids])
+            unexpected = sorted([list(item) for item in observed_ids - planned_ids])
+            return {"passed": not missing and not unexpected, "missing": missing, "unexpected": unexpected, "plannedCount": len(planned_ids), "observedCount": len(observed_ids)}
+      hints: *id002
+    check:
+      id: python.fileops.fileOps_08.organization-result-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_08.organization-result-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_organization_result
+        cases:
+        - id: accepts-exact-observation
+          arguments:
+          - value:
+            - source: a
+              destination: docs/a
+              hash: x
+          - value:
+            - source: a
+              destination: docs/a
+              hash: x
+          expectedReturn:
+            passed: true
+            missing: []
+            unexpected: []
+            plannedCount: 1
+            observedCount: 1
+        - id: reports-missing-and-unexpected
+          arguments:
+          - value:
+            - source: a
+              destination: docs/a
+              hash: x
+          - value:
+            - source: b
+              destination: docs/b
+              hash: y
+          expectedReturn:
+            passed: false
+            missing:
+            - - a
+              - docs/a
+              - x
+            unexpected:
+            - - b
+              - docs/b
+              - y
+            plannedCount: 1
+            observedCount: 1
+        - id: handles-empty-plan
+          arguments:
+          - value: []
+          - value: []
+          expectedReturn:
+            passed: true
+            missing: []
+            unexpected: []
+            plannedCount: 0
+            observedCount: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: fileOps_08-directory-organization-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - fileOps_08-organization-result-audit-transfer
+    title: 디렉터리 정리 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 분류·충돌·dry run·reconciliation 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 파일 action 전에 root·충돌·dry run 계약을 확인하세요.
+    - 실행 횟수가 아니라 source와 destination artifact identity로 결과를 판정하세요.
+    exercise:
+      prompt: choose_organization_gate(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_organization_gate(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_organization_gate(situation):
+            table = {'classify': {'action': 'apply explicit suffix rules', 'evidence': 'classified and unclassified lists', 'risk': 'guessed category'}, 'plan': {'action': 'detect destination conflicts in dry run', 'evidence': 'move plan', 'risk': 'overwrite'}, 'verify': {'action': 'reconcile source destination hash', 'evidence': 'artifact pairs', 'risk': 'partial organization'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.fileops.fileOps_08.directory-organization-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_08.directory-organization-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_organization_gate
+        cases:
+        - id: recalls-classify
+          arguments:
+          - value: classify
+          expectedReturn:
+            action: apply explicit suffix rules
+            evidence: classified and unclassified lists
+            risk: guessed category
+        - id: recalls-plan
+          arguments:
+          - value: plan
+          expectedReturn:
+            action: detect destination conflicts in dry run
+            evidence: move plan
+            risk: overwrite
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

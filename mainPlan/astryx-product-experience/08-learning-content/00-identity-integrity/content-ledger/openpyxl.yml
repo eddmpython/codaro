@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "openpyxl"
+canonicalRows: 11
+lessons:
+  - lessonRef: "openpyxl/00_openpyxl소개"
+    identityLedgerRef: "identity-ledger/openpyxl.yml"
+    lessonContentHash: "19cec5e67559389fe1303d0deda8d7b95f1f7ab418fb37296496eb2e675804b4"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.intro"]
+    prerequisites: ["python.functions","python.modulesAndIo"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:openpyxl/00_openpyxl소개:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:openpyxl_00_openpyxl__:v1","retrieve:openpyxl_00_openpyxl__:v2","retrieve:openpyxl_00_openpyxl__:v3"]
+    transferVariantIds: ["transfer:openpyxl_00_openpyxl__:near-v1","transfer:openpyxl_00_openpyxl__:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "openpyxl/01_워크북과시트만들기"
+    identityLedgerRef: "identity-ledger/openpyxl.yml"
+    lessonContentHash: "f233da520bfde8723ef35b35a6946ebf99724be9529dc2f57aece41f38064467"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.intro","automation.excel.workbook"]
+    prerequisites: ["automation.excel.intro"]
+    reinforcesOutcomeIds: ["automation.excel.intro"]
+    runtimeTier: browser
+    checkSpecId: "lesson:openpyxl/01_워크북과시트만들기:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:openpyxl_01__________:v1","retrieve:openpyxl_01__________:v2","retrieve:openpyxl_01__________:v3"]
+    transferVariantIds: ["transfer:openpyxl_01__________:near-v1","transfer:openpyxl_01__________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "openpyxl/02_셀읽기와쓰기"
+    identityLedgerRef: "identity-ledger/openpyxl.yml"
+    lessonContentHash: "665608cc0321646eabf0a16fac672abe279aee6822b48524bad477bdc214e7d4"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.workbook"]
+    prerequisites: ["automation.excel.workbook"]
+    reinforcesOutcomeIds: ["automation.excel.workbook"]
+    runtimeTier: browser
+    checkSpecId: "lesson:openpyxl/02_셀읽기와쓰기:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:openpyxl_02_______:v1","retrieve:openpyxl_02_______:v2","retrieve:openpyxl_02_______:v3"]
+    transferVariantIds: ["transfer:openpyxl_02_______:near-v1","transfer:openpyxl_02_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "openpyxl/03_범위와다중시트"
+    identityLedgerRef: "identity-ledger/openpyxl.yml"
+    lessonContentHash: "0ee666065b5b0a941e2192899f22a17d7ec7c9777bb2b015dfb78a113bab489d"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.workbook"]
+    prerequisites: ["automation.excel.workbook"]
+    reinforcesOutcomeIds: ["automation.excel.workbook"]
+    runtimeTier: browser
+    checkSpecId: "lesson:openpyxl/03_범위와다중시트:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:openpyxl_03________:v1","retrieve:openpyxl_03________:v2","retrieve:openpyxl_03________:v3"]
+    transferVariantIds: ["transfer:openpyxl_03________:near-v1","transfer:openpyxl_03________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "openpyxl/04_수식과이름영역"
+    identityLedgerRef: "identity-ledger/openpyxl.yml"
+    lessonContentHash: "04bf1a3ba7bf174bfcf4219b3b129054482556985446bb2721511178a4ef1346"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.formulas"]
+    prerequisites: ["automation.excel.workbook"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:openpyxl/04_수식과이름영역:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:openpyxl_04________:v1","retrieve:openpyxl_04________:v2","retrieve:openpyxl_04________:v3"]
+    transferVariantIds: ["transfer:openpyxl_04________:near-v1","transfer:openpyxl_04________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "openpyxl/05_셀서식과숫자포맷"
+    identityLedgerRef: "identity-ledger/openpyxl.yml"
+    lessonContentHash: "992397056d99c1fd4dc78e1e426661f07f14f73d131a935ae81645ab06ac5158"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.styles"]
+    prerequisites: ["automation.excel.workbook"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:openpyxl/05_셀서식과숫자포맷:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:openpyxl_05_________:v1","retrieve:openpyxl_05_________:v2","retrieve:openpyxl_05_________:v3"]
+    transferVariantIds: ["transfer:openpyxl_05_________:near-v1","transfer:openpyxl_05_________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "openpyxl/06_조건부서식"
+    identityLedgerRef: "identity-ledger/openpyxl.yml"
+    lessonContentHash: "8b7be6e352dd5ff937002b57a15976fa1bd056bdac361f61d83974956d63a03c"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.conditional"]
+    prerequisites: ["automation.excel.styles"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:openpyxl/06_조건부서식:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:openpyxl_06______:v1","retrieve:openpyxl_06______:v2","retrieve:openpyxl_06______:v3"]
+    transferVariantIds: ["transfer:openpyxl_06______:near-v1","transfer:openpyxl_06______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "openpyxl/07_차트삽입"
+    identityLedgerRef: "identity-ledger/openpyxl.yml"
+    lessonContentHash: "f27d290a4a0a6e340e8e0051bd9aeae9b46e57b89b853486257fdfaec276e632"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.charts"]
+    prerequisites: ["automation.excel.workbook"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:openpyxl/07_차트삽입:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:openpyxl_07_____:v1","retrieve:openpyxl_07_____:v2","retrieve:openpyxl_07_____:v3"]
+    transferVariantIds: ["transfer:openpyxl_07_____:near-v1","transfer:openpyxl_07_____:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "openpyxl/08_이미지와하이퍼링크"
+    identityLedgerRef: "identity-ledger/openpyxl.yml"
+    lessonContentHash: "825deec80a6ba40f6ef44022cfd9cda2fe75e2f15557ff53332d2f0ac4991aca"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.images"]
+    prerequisites: ["automation.excel.workbook"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:openpyxl/08_이미지와하이퍼링크:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:openpyxl_08__________:v1","retrieve:openpyxl_08__________:v2","retrieve:openpyxl_08__________:v3"]
+    transferVariantIds: ["transfer:openpyxl_08__________:near-v1","transfer:openpyxl_08__________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "openpyxl/09_표와데이터검증"
+    identityLedgerRef: "identity-ledger/openpyxl.yml"
+    lessonContentHash: "7b888bc74f4a28c5ae2e9ffb229cfa45e3d37ece82a831348afa1e1bd2ca9aa2"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.tables"]
+    prerequisites: ["automation.excel.workbook"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:openpyxl/09_표와데이터검증:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:openpyxl_09________:v1","retrieve:openpyxl_09________:v2","retrieve:openpyxl_09________:v3"]
+    transferVariantIds: ["transfer:openpyxl_09________:near-v1","transfer:openpyxl_09________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "openpyxl/10_월간매출리포트생성기"
+    identityLedgerRef: "identity-ledger/openpyxl.yml"
+    lessonContentHash: "759fdc87b4bbeaf9de8706257f68830e78e5f9bcaf81d0b2a708c8706101f94a"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.report"]
+    prerequisites: ["automation.excel.workbook","automation.excel.formulas","automation.excel.styles","automation.excel.conditional","automation.excel.charts","automation.excel.tables"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:openpyxl/10_월간매출리포트생성기:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:openpyxl_10___________:v1","retrieve:openpyxl_10___________:v2","retrieve:openpyxl_10___________:v3"]
+    transferVariantIds: ["transfer:openpyxl_10___________:near-v1","transfer:openpyxl_10___________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

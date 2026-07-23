@@ -13,11 +13,19 @@ SRC = EDITOR / "src"
 INDEX = EDITOR / "index.html"
 USE_MOBILE = SRC / "hooks" / "use-mobile.ts"
 
-CORE_SURFACES = (
-    SRC / "components" / "notebook" / "notebookPanel.tsx",
-    SRC / "components" / "curriculum" / "curriculumSurface.tsx",
-    SRC / "components" / "app" / "mainSurface.tsx",
-    SRC / "components" / "app" / "productSidebar.tsx",
+CORE_SURFACE_GROUPS = (
+    ("notebook", (SRC / "components" / "notebook" / "notebookPanel.tsx",)),
+    (
+        "curriculum",
+        (
+            SRC / "components" / "curriculum" / "curriculumSurface.tsx",
+            SRC / "components" / "curriculum" / "curriculumHome.tsx",
+            SRC / "components" / "curriculum" / "curriculumOverview.tsx",
+            SRC / "components" / "curriculum" / "curriculumSectionRenderer.tsx",
+        ),
+    ),
+    ("main", (SRC / "components" / "app" / "mainSurface.tsx",)),
+    ("sidebar", (SRC / "components" / "app" / "productSidebar.tsx",)),
 )
 
 RESPONSIVE_PREFIXES = ("sm:", "md:", "lg:", "xl:")
@@ -37,6 +45,7 @@ def runChecks() -> list[CheckResult]:
     results.append(checkServiceWorker())
     results.append(checkUseMobileBreakpoint())
     results.append(checkResponsiveCoverage())
+    results.append(checkNotebookInsertControls())
     results.append(checkViewportInsetsHook())
     results.append(checkPrefersDarkHook())
     results.append(checkVitePwaConfig())
@@ -80,7 +89,16 @@ def checkManifest() -> CheckResult:
 
 def checkServiceWorker() -> CheckResult:
     sw = (PUBLIC / "serviceWorker.js").read_text(encoding="utf-8")
-    keywords = ("navigationNetworkFirst", "assetCacheFirst", "networkFirst", "/api/", "/ws/", "SHELL_CACHE", "RUNTIME_CACHE")
+    keywords = (
+        "navigationNetworkFirst",
+        "assetCacheFirst",
+        "networkFirst",
+        'scopedPath("api/")',
+        'scopedPath("ws/")',
+        "SHELL_CACHE",
+        "RUNTIME_CACHE",
+        "SCOPE_PATH",
+    )
     missing = [keyword for keyword in keywords if keyword not in sw]
     return CheckResult(
         name="service-worker-strategies",
@@ -104,19 +122,42 @@ def checkUseMobileBreakpoint() -> CheckResult:
 
 def checkResponsiveCoverage() -> CheckResult:
     findings: list[str] = []
-    for path in CORE_SURFACES:
-        if not path.exists():
-            findings.append(f"{path.name}: missing")
+    for label, paths in CORE_SURFACE_GROUPS:
+        missingPaths = [path for path in paths if not path.exists()]
+        if missingPaths:
+            findings.append(f"{label}: missing {', '.join(path.name for path in missingPaths)}")
             continue
-        source = path.read_text(encoding="utf-8")
+        source = "\n".join(path.read_text(encoding="utf-8") for path in paths)
         responsive = sum(source.count(prefix) for prefix in RESPONSIVE_PREFIXES)
         usesMobileHook = "useIsMobile" in source or "useMobile" in source or "use-mobile" in source
         if responsive == 0 and not usesMobileHook:
-            findings.append(f"{path.name}: no responsive classes or mobile hook")
+            findings.append(f"{label}: no responsive classes or mobile hook in responsibility modules")
     return CheckResult(
         name="surface-responsive",
         ok=not findings,
         detail="all core surfaces responsive" if not findings else "; ".join(findings),
+    )
+
+
+def checkNotebookInsertControls() -> CheckResult:
+    path = SRC / "components" / "notebook" / "notebookPanel.tsx"
+    source = path.read_text(encoding="utf-8")
+    required = (
+        "document.blocks.map((block, blockIndex)",
+        "showInsertBefore={blockIndex === 0}",
+        'className="relative min-h-14 min-w-0"',
+        'className="flex size-6 items-center justify-center',
+    )
+    missing = [fragment for fragment in required if fragment not in source]
+    stableFrames = source.count('className="relative min-h-14 min-w-0"') >= 2
+    if not stableFrames:
+        missing.append("stable code and markdown insert frames")
+    return CheckResult(
+        name="notebook-insert-controls",
+        ok=not missing,
+        detail="single insert control per boundary with stable mobile spacing"
+        if not missing
+        else f"missing: {', '.join(missing)}",
     )
 
 

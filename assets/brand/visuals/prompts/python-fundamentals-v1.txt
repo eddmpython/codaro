@@ -1,0 +1,9 @@
+Use case: scientific-educational
+Asset type: Codaro learning catalog domain visual for Python fundamentals
+Primary request: Create a premium editorial educational illustration that makes Python fundamentals tangible: a clean desktop workspace with a compact code editor showing abstract colored code lines (no readable text), small physical-like tiles representing variables, strings, numbers, lists, and control flow connected in a clear sequence.
+Scene/backdrop: bright neutral studio workspace with white and charcoal surfaces, subtle grid paper, one teal accent, one coral accent, one yellow accent, restrained plum details.
+Style/medium: sophisticated mixed 3D paper-cut and crisp editorial illustration, realistic material texture, high-end education product art, not childish.
+Composition/framing: wide 16:9, main learning objects centered-right with clear negative space at left and generous safe edges; all objects fully visible.
+Lighting/mood: soft daylight, high clarity, focused and optimistic.
+Constraints: no people, no logos, no brand names, no readable UI text, no letters, no watermark, no gradients, no glowing orbs, no bokeh, no dark atmospheric background. The visual must communicate variables, types, collections, and step-by-step control flow at a glance.
+Avoid: generic stock coding image, floating holograms, neon cyberpunk, dominant purple or blue, excessive rounded cards.

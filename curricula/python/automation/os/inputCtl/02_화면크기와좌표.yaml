@@ -256,3 +256,280 @@ sections:
     check:
       noError: 종합 스냅숏 함수 호출이 끝나야 한다.
       resultCheck: snapshot이 screen, cursor, cursorOnScreen 세 키를 담아야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: inputCtl_02-screen-coordinate-normalization-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - read-size
+    - snapshot
+    title: 화면 좌표를 viewport 비율로 정규화하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: screen 경계 안의 point만 0~1 비율과 edge 거리를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 현재 screen 크기 없이 저장한 절대 좌표를 재사용하지 마세요.
+    - 가장 가까운 화면 edge 거리도 safety evidence로 남기세요.
+    exercise:
+      prompt: normalize_screen_point(x, y, width, height)를 완성하세요.
+      starterCode: |-
+        def normalize_screen_point(x, y, width, height):
+            raise NotImplementedError
+      solution: |
+        def normalize_screen_point(x, y, width, height):
+            if width <= 0 or height <= 0 or not 0 <= x < width or not 0 <= y < height:
+                raise ValueError("point outside screen")
+            return {
+                "xRatio": round(x / width, 4),
+                "yRatio": round(y / height, 4),
+                "edgeDistance": min(x, y, width - 1 - x, height - 1 - y),
+            }
+      hints: *id001
+    check:
+      id: python.inputctl.inputCtl_02.screen-coordinate-normalization.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_02.screen-coordinate-normalization.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: normalize_screen_point
+        cases:
+        - id: normalizes-center
+          arguments:
+          - value: 500
+          - value: 250
+          - value: 1000
+          - value: 500
+          expectedReturn:
+            xRatio: 0.5
+            yRatio: 0.5
+            edgeDistance: 249
+        - id: normalizes-top-left
+          arguments:
+          - value: 0
+          - value: 0
+          - value: 100
+          - value: 100
+          expectedReturn:
+            xRatio: 0.0
+            yRatio: 0.0
+            edgeDistance: 0
+        - id: rejects-right-edge-outside
+          arguments:
+          - value: 100
+          - value: 0
+          - value: 100
+          - value: 100
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: inputCtl_02-monitor-point-resolution-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inputCtl_02-screen-coordinate-normalization-mastery
+    title: 새 다중 모니터 배치에 point 소속 판정 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 음수 origin을 포함한 monitor rectangle에서 정확히 하나의 화면을 찾는다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 다중 모니터에서는 가상 desktop origin이 음수일 수 있습니다.
+    - point가 정확히 한 monitor에 속하지 않으면 입력 action을 만들지 마세요.
+    exercise:
+      prompt: resolve_monitor_for_point(point, monitors)를 완성하세요.
+      starterCode: |-
+        def resolve_monitor_for_point(point, monitors):
+            raise NotImplementedError
+      solution: |
+        def resolve_monitor_for_point(point, monitors):
+            matches = []
+            for monitor in monitors:
+                if monitor["x"] <= point[0] < monitor["x"] + monitor["width"] and monitor["y"] <= point[1] < monitor["y"] + monitor["height"]:
+                    matches.append(monitor["id"])
+            if len(matches) != 1:
+                return {"resolved": False, "monitor": None, "matches": sorted(matches)}
+            return {"resolved": True, "monitor": matches[0], "matches": matches}
+      hints: *id002
+    check:
+      id: python.inputctl.inputCtl_02.monitor-point-resolution.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_02.monitor-point-resolution.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: resolve_monitor_for_point
+        cases:
+        - id: resolves-negative-origin-monitor
+          arguments:
+          - value:
+            - -100
+            - 20
+          - value:
+            - id: left
+              x: -1920
+              y: 0
+              width: 1920
+              height: 1080
+            - id: main
+              x: 0
+              y: 0
+              width: 1920
+              height: 1080
+          expectedReturn:
+            resolved: true
+            monitor: left
+            matches:
+            - left
+        - id: resolves-main-monitor
+          arguments:
+          - value:
+            - 0
+            - 0
+          - value:
+            - id: left
+              x: -100
+              y: 0
+              width: 100
+              height: 100
+            - id: main
+              x: 0
+              y: 0
+              width: 100
+              height: 100
+          expectedReturn:
+            resolved: true
+            monitor: main
+            matches:
+            - main
+        - id: reports-outside-point
+          arguments:
+          - value:
+            - 500
+            - 500
+          - value:
+            - id: main
+              x: 0
+              y: 0
+              width: 100
+              height: 100
+          expectedReturn:
+            resolved: false
+            monitor: null
+            matches: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: inputCtl_02-screen-coordinate-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inputCtl_02-monitor-point-resolution-transfer
+    title: 화면 크기와 좌표 계약 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: viewport 비율·monitor origin·edge safety 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 입력 자동화 action 전에 대상·경계·중단 방법을 검증하세요.
+    - 화면 변화와 E-Stop evidence를 남기고 성공을 클릭 발생으로 판단하지 마세요.
+    exercise:
+      prompt: choose_coordinate_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_coordinate_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_coordinate_evidence(situation):
+            table = {'single-screen': {'action': 'validate bounds and normalize', 'evidence': 'screen dimensions and ratios', 'risk': 'resolution drift'}, 'multi-monitor': {'action': 'resolve virtual desktop rectangle', 'evidence': 'monitor identity and origin', 'risk': 'negative coordinate'}, 'edge': {'action': 'enforce safety margin', 'evidence': 'edge distance', 'risk': 'fail-safe corner'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.inputctl.inputCtl_02.screen-coordinate-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_02.screen-coordinate-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_coordinate_evidence
+        cases:
+        - id: recalls-single-screen
+          arguments:
+          - value: single-screen
+          expectedReturn:
+            action: validate bounds and normalize
+            evidence: screen dimensions and ratios
+            risk: resolution drift
+        - id: recalls-multi-monitor
+          arguments:
+          - value: multi-monitor
+          expectedReturn:
+            action: resolve virtual desktop rectangle
+            evidence: monitor identity and origin
+            risk: negative coordinate
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

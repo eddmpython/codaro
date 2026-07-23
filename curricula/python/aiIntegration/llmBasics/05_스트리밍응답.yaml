@@ -337,3 +337,258 @@ sections:
   check:
     noError: 스트리밍 메서드 호출이 예외 없이 끝까지 완료되어야 합니다.
     resultCheck: answer가 비어 있지 않고 두 토큰 값이 모두 양수여야 합니다.
+assessment:
+  masteryVariants:
+  - id: 05_streaming-assemble-chunks-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - text_stream
+    title: 스트리밍 청크를 최종 텍스트로 조립하기
+    subtitle: chunk accumulator
+    goal: assemble_stream_chunks(chunks)를 완성해 빈 청크를 제외하고 텍스트, 청크 수, 길이 목록을 반환한다.
+    why: 스트리밍은 청크를 받는 순간보다 누적 상태를 정확히 유지하는 코드가 중요합니다.
+    explanation: chunks는 도착 순서대로 들어온 문자열 목록입니다. 빈 문자열은 화면에 의미 있는 변화가 없으므로 제외하고, 남은 청크를 이어 붙여 최종 텍스트를 만듭니다.
+    tips:
+    - text_stream은 이미 순서를 보장하므로 정렬하지 않습니다.
+    - 길이 목록을 함께 반환하면 진행 표시와 디버깅에 바로 쓸 수 있습니다.
+    exercise:
+      prompt: assemble_stream_chunks(chunks)를 완성해 text, chunkCount, lengths를 반환하세요.
+      starterCode: |-
+        def assemble_stream_chunks(chunks):
+            raise NotImplementedError
+      solution: |-
+        def assemble_stream_chunks(chunks):
+            parts = [str(chunk) for chunk in chunks if chunk != ""]
+            return {
+                "text": "".join(parts),
+                "chunkCount": len(parts),
+                "lengths": [len(part) for part in parts],
+            }
+      hints:
+      - 빈 문자열은 제외하고 None이 아닌 값은 문자열로 바꿉니다.
+      - 최종 텍스트는 리스트를 join해서 만듭니다.
+    check:
+      id: python.llm.streaming.assemble-chunks.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.streaming.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: assemble_stream_chunks
+        cases:
+        - id: joins-korean-stream-chunks
+          arguments:
+          - value:
+            - 안녕
+            - 하세요
+            - '!'
+          expectedReturn:
+            text: 안녕하세요!
+            chunkCount: 3
+            lengths:
+            - 2
+            - 3
+            - 1
+        - id: skips-empty-chunks
+          arguments:
+          - value:
+            - Cod
+            - ''
+            - aro
+          expectedReturn:
+            text: Codaro
+            chunkCount: 2
+            lengths:
+            - 3
+            - 3
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 05_streaming-progress-snapshots-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - progressive_display
+    - final_message
+    title: 청크 도착에 맞춰 진행 스냅샷 만들기
+    subtitle: progress snapshots
+    goal: build_stream_snapshots(chunks, every)를 완성해 누적 텍스트 스냅샷과 최종 텍스트를 반환한다.
+    why: 웹 학습 화면은 학생이 기다리는 동안 진행 상태를 자동으로 보여줘야 하므로 청크별 상태를 계산할 수 있어야 합니다.
+    explanation: every는 몇 개 청크마다 스냅샷을 남길지 정합니다. 마지막 청크에서는 간격과 상관없이 최종 스냅샷을 남겨야 화면과 저장 상태가 일치합니다.
+    tips:
+    - every가 1보다 작으면 진행 간격으로 쓸 수 없으므로 ValueError를 발생시킵니다.
+    - index는 사용자에게 보여줄 수 있도록 1부터 셉니다.
+    exercise:
+      prompt: build_stream_snapshots(chunks, every)를 완성해 snapshots, finalText, chunkCount를 반환하세요.
+      starterCode: |-
+        def build_stream_snapshots(chunks, every):
+            raise NotImplementedError
+      solution: |-
+        def build_stream_snapshots(chunks, every):
+            if every < 1:
+                raise ValueError("every must be at least 1")
+            snapshots = []
+            text = ""
+            for index, chunk in enumerate(chunks, 1):
+                text += chunk
+                if index % every == 0 or index == len(chunks):
+                    snapshots.append({"index": index, "text": text, "length": len(text)})
+            return {"snapshots": snapshots, "finalText": text, "chunkCount": len(chunks)}
+      hints:
+      - 마지막 청크에서는 무조건 스냅샷을 남깁니다.
+      - 누적 텍스트와 길이를 같은 시점에 기록합니다.
+    check:
+      id: python.llm.streaming.progress-snapshots.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.streaming.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_stream_snapshots
+        cases:
+        - id: records-interval-and-final-snapshots
+          arguments:
+          - value:
+            - A
+            - B
+            - C
+          - value: 2
+          expectedReturn:
+            snapshots:
+            - index: 2
+              text: AB
+              length: 2
+            - index: 3
+              text: ABC
+              length: 3
+            finalText: ABC
+            chunkCount: 3
+        - id: rejects-invalid-interval
+          arguments:
+          - value:
+            - A
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 05_streaming-rule-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 05_streaming-progress-snapshots-transfer
+    title: 스트리밍 구현 규칙 회상하기
+    subtitle: streaming rule recall
+    goal: choose_streaming_rule(goal)를 완성해 스트리밍 상황별 규칙과 실패 위험을 반환한다.
+    why: 스트리밍은 체감 속도, 누적 표시, 최종 메시지 저장이 분리되어야 안정적으로 동작합니다.
+    explanation: sync-baseline, chunk-accumulate, progress-display, final-message, callback 상황별로 적용할 규칙을 선택하세요.
+    tips:
+    - final 메시지를 버리면 usage와 stop_reason을 잃습니다.
+    - 콜백은 표시 책임을 분리할 때 유용합니다.
+    exercise:
+      prompt: choose_streaming_rule(goal)를 완성해 rule, useWhen, risk를 반환하세요.
+      starterCode: |-
+        def choose_streaming_rule(goal):
+            raise NotImplementedError
+      solution: |-
+        def choose_streaming_rule(goal):
+            table = {
+                "sync-baseline": {"rule": "measure non-stream response first", "useWhen": "comparing user wait time", "risk": "no baseline"},
+                "chunk-accumulate": {"rule": "append chunks in arrival order", "useWhen": "text_stream yields text", "risk": "broken final text"},
+                "progress-display": {"rule": "publish accumulated length as chunks arrive", "useWhen": "answer is long", "risk": "silent waiting"},
+                "final-message": {"rule": "read get_final_message after stream closes", "useWhen": "usage or stop reason matters", "risk": "lost telemetry"},
+                "callback": {"rule": "send each chunk to a display callback", "useWhen": "UI and model code are separated", "risk": "mixed concerns"},
+            }
+            if goal not in table:
+                raise ValueError("unknown streaming goal")
+            return table[goal]
+      hints:
+      - 체감 속도는 첫 청크 시점과 관련이 있습니다.
+      - 저장과 과금 확인에는 final 메시지가 필요합니다.
+    check:
+      id: python.llm.streaming.rule-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.streaming.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_streaming_rule
+        cases:
+        - id: recalls-chunk-accumulate
+          arguments:
+          - value: chunk-accumulate
+          expectedReturn:
+            rule: append chunks in arrival order
+            useWhen: text_stream yields text
+            risk: broken final text
+        - id: recalls-final-message
+          arguments:
+          - value: final-message
+          expectedReturn:
+            rule: read get_final_message after stream closes
+            useWhen: usage or stop reason matters
+            risk: lost telemetry
+        - id: rejects-unknown-goal
+          arguments:
+          - value: wait-longer
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

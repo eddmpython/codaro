@@ -692,3 +692,268 @@ sections:
     type: noError
     noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
     resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pydantic_05-settings-precedence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load
+    - workflow_validation
+    title: 설정 source 우선순위와 secret redaction 적용하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: defaults < environment < explicit overrides 순서로 병합하고 비밀값은 출력에서 가린다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 병합 순서를 코드 순서로 명확히 드러내세요.
+    - 실제 resolved 값과 화면·로그용 public 값을 분리하세요.
+    exercise:
+      prompt: resolve_settings(defaults, environment, overrides, secret_keys)를 완성하세요.
+      starterCode: |-
+        def resolve_settings(defaults, environment, overrides, secret_keys):
+            raise NotImplementedError
+      solution: |
+        def resolve_settings(defaults, environment, overrides, secret_keys):
+            resolved = {**defaults, **environment, **overrides}
+            public = {key: ("***" if key in secret_keys and value else value) for key, value in resolved.items()}
+            sources = {}
+            for key in resolved:
+                sources[key] = "override" if key in overrides else "environment" if key in environment else "default"
+            return {"resolved": resolved, "public": public, "sources": sources}
+      hints: *id001
+    check:
+      id: python.pydantic.pydantic_05.settings-precedence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_05.settings-precedence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: resolve_settings
+        cases:
+        - id: applies-precedence-and-redaction
+          arguments:
+          - value:
+              mode: dev
+              timeout: 10
+          - value:
+              timeout: 20
+              apiKey: secret
+          - value:
+              mode: prod
+          - value:
+            - apiKey
+          expectedReturn:
+            resolved:
+              mode: prod
+              timeout: 20
+              apiKey: secret
+            public:
+              mode: prod
+              timeout: 20
+              apiKey: '***'
+            sources:
+              mode: override
+              timeout: environment
+              apiKey: environment
+        - id: keeps-empty-settings
+          arguments:
+          - value: {}
+          - value: {}
+          - value: {}
+          - value: []
+          expectedReturn:
+            resolved: {}
+            public: {}
+            sources: {}
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pydantic_05-profile-settings-selection-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pydantic_05-settings-precedence-mastery
+    title: 새 실행 profile별 설정 조합하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: source 우선순위를 base·profile·runtime override 계층으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - profile이 존재하는지 먼저 확인하세요.
+    - runtime override key 목록을 결과에 남겨 재현성을 높이세요.
+    exercise:
+      prompt: select_profile_settings(base, profiles, profile_name, runtime_override)를 완성하세요.
+      starterCode: |-
+        def select_profile_settings(base, profiles, profile_name, runtime_override):
+            raise NotImplementedError
+      solution: |
+        def select_profile_settings(base, profiles, profile_name, runtime_override):
+            if profile_name not in profiles:
+                raise ValueError("unknown profile")
+            resolved = {**base, **profiles[profile_name], **runtime_override}
+            return {"profile": profile_name, "resolved": resolved, "overrideKeys": sorted(runtime_override)}
+      hints: *id002
+    check:
+      id: python.pydantic.pydantic_05.profile-settings-selection.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_05.profile-settings-selection.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: select_profile_settings
+        cases:
+        - id: selects-profile-and-runtime-override
+          arguments:
+          - value:
+              logLevel: INFO
+              workers: 1
+          - value:
+              dev:
+                logLevel: DEBUG
+              prod:
+                workers: 4
+          - value: prod
+          - value:
+              workers: 8
+          expectedReturn:
+            profile: prod
+            resolved:
+              logLevel: INFO
+              workers: 8
+            overrideKeys:
+            - workers
+        - id: uses-profile-without-overrides
+          arguments:
+          - value:
+              x: 1
+          - value:
+              test:
+                x: 2
+          - value: test
+          - value: {}
+          expectedReturn:
+            profile: test
+            resolved:
+              x: 2
+            overrideKeys: []
+        - id: rejects-unknown-profile
+          arguments:
+          - value: {}
+          - value: {}
+          - value: missing
+          - value: {}
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pydantic_05-settings-source-policy-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pydantic_05-profile-settings-selection-transfer
+    title: 설정 source별 책임과 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: default, environment, runtime override의 사용 목적과 금지 행동을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 비밀값의 존재 여부와 실제 값을 구분해 기록하세요.
+    - 일회성 override를 기본 설정 파일에 몰래 저장하지 마세요.
+    exercise:
+      prompt: choose_settings_policy(situation)를 완성해 purpose, evidence, forbidden을 반환하세요.
+      starterCode: |-
+        def choose_settings_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_settings_policy(situation):
+            table = {'default': {'purpose': 'safe local baseline', 'evidence': 'checked-in non-secret value', 'forbidden': 'embed credential'}, 'environment': {'purpose': 'deployment-specific value', 'evidence': 'presence without value', 'forbidden': 'print secret'}, 'runtime-override': {'purpose': 'explicit one-run change', 'evidence': 'override key list', 'forbidden': 'silently persist'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.pydantic.pydantic_05.settings-source-policy.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_05.settings-source-policy.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_settings_policy
+        cases:
+        - id: recalls-default
+          arguments:
+          - value: default
+          expectedReturn:
+            purpose: safe local baseline
+            evidence: checked-in non-secret value
+            forbidden: embed credential
+        - id: recalls-environment
+          arguments:
+          - value: environment
+          expectedReturn:
+            purpose: deployment-specific value
+            evidence: presence without value
+            forbidden: print secret
+        - id: rejects-unknown-situation
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

@@ -1,0 +1,285 @@
+.learnResumeBand {
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-background-body);
+}
+
+.learnResumeInner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 76px;
+  align-items: center;
+  gap: 24px;
+}
+
+.learnResumeInner > div {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+}
+
+.learnResumeInner span,
+.learnResumeInner small {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.learnResumeInner strong {
+  overflow: hidden;
+  color: var(--color-text-primary);
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.learnResumeInner a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 7px;
+  color: var(--color-text-accent);
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.learnPathRail {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.learnPathStep:nth-child(4) {
+  border-left: 0;
+}
+
+.learnPathStep:nth-child(n + 4) {
+  border-top: 1px solid var(--color-border);
+}
+
+.learnPathCopy small {
+  color: var(--color-text-tertiary);
+  font-size: 11px;
+}
+
+.learnExplorerBand {
+  padding-block: 58px 36px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-background-body);
+}
+
+.learnExplorerInner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(520px, 1.35fr);
+  align-items: end;
+  gap: 28px 48px;
+}
+
+.learnExplorerLead {
+  display: grid;
+  gap: 10px;
+}
+
+.learnExplorerLead h2 {
+  margin: 0;
+}
+
+.learnExplorerControls {
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) auto minmax(160px, 0.7fr);
+  align-items: end;
+  gap: 12px;
+}
+
+.learnSearchField,
+.learnPathSelect,
+.learnRuntimeSegments {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+.learnSearchField > span,
+.learnPathSelect > span,
+.learnRuntimeSegments legend {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.learnSearchField input,
+.learnPathSelect select {
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  padding-inline: 12px;
+  background: var(--color-background-surface);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 13px;
+}
+
+.learnRuntimeSegments {
+  grid-template-columns: repeat(3, auto);
+}
+
+.learnRuntimeSegments legend {
+  grid-column: 1 / -1;
+}
+
+.learnRuntimeSegments button {
+  height: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  padding-inline: 11px;
+  background: var(--color-background-surface);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.learnRuntimeSegments button:first-of-type {
+  border-radius: 5px 0 0 5px;
+}
+
+.learnRuntimeSegments button:last-of-type {
+  border-radius: 0 5px 5px 0;
+}
+
+.learnRuntimeSegments button + button {
+  border-left: 0;
+}
+
+.learnRuntimeSegments button[aria-pressed="true"] {
+  background: var(--color-background-accent-strong);
+  color: var(--color-text-on-accent);
+}
+
+.learnResultCount {
+  grid-column: 1 / -1;
+  margin: -8px 0 0;
+  color: var(--color-text-tertiary);
+  font-size: 12px;
+  text-align: right;
+}
+
+.learnDomainNav {
+  top: 64px;
+}
+
+.learnDomainCount {
+  align-self: end;
+  color: var(--color-text-tertiary);
+  font-family: var(--font-family-code);
+  font-size: 12px;
+}
+
+.learnLessonRow {
+  grid-template-columns: 44px minmax(0, 1fr) 74px 24px;
+}
+
+.learnLessonRuntime {
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-self: end;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-inner);
+  padding-inline: 7px;
+  background: var(--color-background-surface);
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.learnLessonRow[data-runtime-tier="local"] .learnLessonRuntime,
+.learnLessonRow[data-runtime-tier="local"] .learnLessonOpenIcon {
+  color: var(--color-text-warning, var(--color-text-secondary));
+}
+
+.learnEmptyState {
+  min-height: 320px;
+  display: grid;
+  align-content: center;
+  gap: 10px;
+  padding-block: 72px;
+}
+
+.learnEmptyState h2 {
+  margin: 0;
+}
+
+@media (max-width: 1050px) {
+  .learnExplorerInner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .learnResumeInner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+    padding-block: 13px;
+  }
+
+  .learnResumeInner a {
+    justify-self: start;
+  }
+
+  .learnPathRail {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .learnPathStep + .learnPathStep,
+  .learnPathStep:nth-child(4) {
+    border-top: 1px solid var(--color-border);
+    border-left: 0;
+  }
+
+  .learnExplorerBand {
+    padding-block: 42px 28px;
+  }
+
+  .learnExplorerControls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .learnRuntimeSegments {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .learnDomainNav {
+    top: 56px;
+  }
+
+  .learnLessonRow {
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+    gap: 10px;
+  }
+
+  .learnLessonRuntime {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+    margin-top: 2px;
+  }
+
+  .learnLessonOpenIcon {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+  }
+}
+
+@media (max-width: 380px) {
+  .learnRuntimeSegments button {
+    min-width: 0;
+    padding-inline: 5px;
+    font-size: 11px;
+  }
+}

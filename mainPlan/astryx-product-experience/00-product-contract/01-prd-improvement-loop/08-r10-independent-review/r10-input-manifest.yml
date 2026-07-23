@@ -1,0 +1,187 @@
+schemaVersion: 1
+roundId: R10
+roundState: blocked
+sealed: false
+preparedAt: 2026-07-18 04:48:06+00:00
+rubric:
+  path: mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/00-evaluation-contract/rubric.yml
+  version: 1
+  sha256: 0150ee794a4fd567e3462d059d46192e4f22d8fc56c0a452ce4e347c2582f08d
+  targetScore: null
+  passThreshold: null
+scope:
+  sealState: unsealed
+  gitCommit: 527e0e2627e7e85f75a2b760b3bf3e59d5b4b184
+  dirtyDiffHash: null
+  manifestHash: null
+  evaluationBundleHash: null
+  reason: active remediation packets and current worktree are not completion-sealed
+draftBundle:
+  manifestPath: mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/08-r10-independent-review/evaluation-bundle.manifest.yml
+  archivePath: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
+  gitCommit: 527e0e2627e7e85f75a2b760b3bf3e59d5b4b184
+  dirtyDiffHash: 91b85159d87fb5f8170e532cbd51aaaead315131a8aac5e67fedd0818aaa563d
+  manifestHash: dfccbf0402ace180bd660a1a0b466beca1eee762cf8910931c0276a78852bc23
+  evaluationBundleHash: 0b4f7118471561faa1f01a288d2dafa9db5194b8b16654a012601b074dd2bd0f
+  fileCount: 2586
+  bundleIntegrityState: passed
+  sealEligible: false
+excludedEvaluatorInputs:
+- mainPlan/astryx-product-experience/00-product-contract/00-specialist-review/**
+- mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/**
+- prior score summaries and conclusions
+- generated output, build, and cache directories
+remediations:
+- packet: 02-completion-and-gate-bootstrap
+  primaryFindings:
+  - GOV-01
+  - ARCH-02
+  - ARCH-04
+  owner: product architecture
+  state: implementationInProgress
+  factAuditCommand: uv run python -X utf8 tests/product/verifyPlanFactAudit.py --packet 02-completion-and-gate-bootstrap
+  factAuditCommandState: implemented
+  negativeFixture: tests/product/bootstrapAfterUse.fixture.yml
+  negativeFixtureState: present
+  closureEvidence: null
+  eligibleForR10: false
+- packet: 03-learning-vertical-slice
+  primaryFindings:
+  - LEARN-01
+  - LEARN-02
+  - SCOPE-01
+  owner: curriculum and learning QA
+  state: implementationInProgress
+  factAuditCommand: uv run python -X utf8 tests/learning/verifyVerticalSliceAudit.py
+  factAuditCommandState: implemented
+  negativeFixture: tests/learning/fixtures/verticalSlice/weak-no-error-only.yml
+  negativeFixtureState: present
+  closureEvidence:
+    reportPath: output/test-runner/learning-vertical-slice/learning-vertical-slice-report.json
+    strongBehaviorSections: 12
+    localAuthoredSolutions: verified
+    masteryVariants: 3
+    transferVariants: 3
+    retrievalVariants: 3
+    webAssessmentProgressionCases: 3
+    localAssessmentProgressionCases: 3
+    localUiHandoff: verified
+    humanLearningReview: absent
+  eligibleForR10: false
+- packet: 04-evidence-migration
+  primaryFindings:
+  - ARCH-01
+  owner: learning data architecture
+  state: implementationInProgress
+  factAuditCommand: uv run python -X utf8 tests/product/verifyEvidenceMigrationAudit.py
+  factAuditCommandState: implemented
+  negativeFixture: tests/learning/fixtures/evidenceMigration/old-reader-after-cutover.yml
+  negativeFixtureState: present
+  closureEvidence:
+    reportPath: output/test-runner/evidence-migration/evidence-migration-report.json
+    localCutoverHeader: implemented
+    webIndexedDbReaderFloor: 3
+    webChromiumV2Rejection: implemented
+    launcherReaderFloorGuard: implemented
+    legacyProgressImport: verified
+    crashPointMatrix: verified
+    humanIndependentReview: absent
+  eligibleForR10: false
+- packet: 05-check-sandbox-feasibility
+  primaryFindings:
+  - ARCH-03
+  supportingFindings:
+  - LEARN-02
+  owner: runtime security
+  state: implementationInProgress
+  factAuditCommand: uv run python -X utf8 tests/product/verifyCheckSandboxFeasibility.py
+  factAuditCommandState: implemented
+  negativeFixture: tests/curriculum/fixtures/checkSandbox/shared-student-expected-namespace.json
+  negativeFixtureState: present
+  closureEvidence:
+    reportPath: output/test-runner/check-sandbox-feasibility/check-sandbox-feasibility-report.json
+    browserFreshWorker: verified
+    browserExpectedPayloadSeparated: verified
+    localFreshProcess: verified
+    localExpectedPayloadSeparated: verified
+    localForbiddenCapabilityProbes: verified
+    browserOpaqueOriginFrame: absent
+    browserThreeEngineMatrix: absent
+    windowsAppContainerBroker: absent
+    humanRuntimeSecurityReview: absent
+  eligibleForR10: false
+- packet: 06-astryx-journey-evidence
+  primaryFindings:
+  - UX-01
+  - UX-02
+  owner: product design and accessibility QA
+  state: implementationInProgress
+  factAuditCommand: uv run python -X utf8 tests/product/verifyAstryxJourneyAudit.py
+  factAuditCommandState: implemented
+  negativeFixture: tests/product/fixtures/astryxVerticalSlice/reveal-only-control.json
+  negativeFixtureState: present
+  closureEvidence:
+    reportPath: output/test-runner/astryx-journey/astryx-journey-report.json
+    browserCases: 11
+    astryxThemeCases: 11
+    redundantLearningControls: 0
+    landingImageProofCases: 2
+    actualWebView2Matrix: absent
+    manualAccessibilityMatrix: absent
+    facilitatedLearningStudy: absent
+    humanDesignAccessibilityReview: absent
+  eligibleForR10: false
+- packet: 07-release-research-operations
+  primaryFindings:
+  - OPS-01
+  - OPS-02
+  supportingFindings:
+  - SCOPE-01
+  owner: release and research operations
+  state: implementationInProgress
+  factAuditCommand: uv run python -X utf8 tests/product/verifyReleaseResearchOperations.py
+  factAuditCommandState: implemented
+  negativeFixture: tests/product/fixtures/releaseResearch/missing-research-owner.yml
+  negativeFixtureState: present
+  closureEvidence:
+    reportPath: output/test-runner/release-research-operations/release-research-operations-report.json
+    primaryRunBuild: verified
+    appCompatibilityBuild: verified
+    scopedServiceWorkerCaches: verified
+    efficacyStageMachine: verified
+    aggregatePromotionForbidden: verified
+    deployedC0Archive: absent
+    c2TwoReleaseEvidence: absent
+    c3Telemetry: absent
+    researchAndPrivacyOwners: absent
+    participantReports: absent
+    humanOperationsReview: absent
+  eligibleForR10: false
+- packet: 09-learning-quality-revalidation
+  primaryFindings:
+  - LEARN-01
+  - LEARN-02
+  - UX-01
+  owner: curriculum, learning QA, and product experience
+  state: implementationInProgress
+  factAuditCommand: uv run python -X utf8 tests/curriculum/verifyCurriculumTopTierAudit.py
+  factAuditCommandState: implemented
+  negativeFixture: tests/learning/fixtures/verticalSlice/weak-no-error-only.yml
+  negativeFixtureState: present
+  closureEvidence:
+    strongCheckSpecLessons: 467
+    strongCheckSpecs: 1413
+    weakOnlyLessons: 0
+    masteryLessons: 467
+    transferLessons: 467
+    retrievalLessons: 467
+    productExperienceBrowserCases: 54
+  eligibleForR10: false
+blockingReasons:
+- packet 02 has implementation and negative-fixture evidence but no clean A/E/B completion transition; packets 03 through
+  07 and 09 have no independent closure
+- learning ledgers are reproducible and weak-only coverage is 0, but independent assessment approval coverage is 0 of 472
+  lessons
+- author-fact-audit.snapshot.yml is non-independent and cannot decide pass
+- the draft evaluation bundle passes integrity checks, but its scope hashes are not sealed
+- three eligible independent evaluators are not assigned

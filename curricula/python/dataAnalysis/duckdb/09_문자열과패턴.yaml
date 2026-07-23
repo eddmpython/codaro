@@ -876,3 +876,250 @@ sections:
   check:
     noError: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.'
     resultCheck: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: duckdb_09-string-normalization-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: 문자열 정규화와 패턴 추출 계약 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: email의 공백·대소문자를 정규화하고 유효한 domain만 추출한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - TRIM과 LOWER를 패턴 검사 전에 적용하세요.
+    - 제외한 문자열 수를 함께 반환하세요.
+    exercise:
+      prompt: normalize_emails(values)를 완성해 rows와 invalidCount를 반환하세요.
+      starterCode: |-
+        def normalize_emails(values):
+            raise NotImplementedError
+      solution: |
+        def normalize_emails(values):
+            rows = []
+            invalid = 0
+            for value in values:
+                normalized = value.strip().lower()
+                if normalized.count("@") != 1 or not all(normalized.split("@")):
+                    invalid += 1
+                    continue
+                local, domain = normalized.split("@")
+                if "." not in domain:
+                    invalid += 1
+                    continue
+                rows.append({"email": normalized, "local": local, "domain": domain})
+            return {"rows": rows, "invalidCount": invalid}
+      hints: *id001
+    check:
+      id: python.duckdb.duckdb_09.string-normalization.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_09.string-normalization.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: normalize_emails
+        cases:
+        - id: normalizes-and-extracts
+          arguments:
+          - value:
+            - ' Alice@Example.COM '
+            - bad
+            - bob@test.io
+          expectedReturn:
+            rows:
+            - email: alice@example.com
+              local: alice
+              domain: example.com
+            - email: bob@test.io
+              local: bob
+              domain: test.io
+            invalidCount: 1
+        - id: rejects-empty-local
+          arguments:
+          - value:
+            - '@example.com'
+          expectedReturn:
+            rows: []
+            invalidCount: 1
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: duckdb_09-sku-pattern-parser-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - duckdb_09-string-normalization-mastery
+    title: 새 SKU 데이터에 문자열 패턴 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 대문자 category와 숫자 code로 구성된 SKU만 구조화한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - split 결과의 segment 수를 먼저 확인하세요.
+    - 정제된 값과 원본 증거를 혼동하지 마세요.
+    exercise:
+      prompt: parse_skus(values)를 완성하세요.
+      starterCode: |-
+        def parse_skus(values):
+            raise NotImplementedError
+      solution: |
+        def parse_skus(values):
+            parsed = []
+            rejected = []
+            for value in values:
+                parts = value.strip().split("-")
+                if len(parts) != 2 or not parts[0].isalpha() or not parts[1].isdigit():
+                    rejected.append(value)
+                    continue
+                parsed.append({"raw": value, "category": parts[0].upper(), "code": int(parts[1])})
+            return {"parsed": parsed, "rejected": rejected}
+      hints: *id002
+    check:
+      id: python.duckdb.duckdb_09.sku-pattern-parser.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_09.sku-pattern-parser.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: parse_skus
+        cases:
+        - id: parses-valid-skus
+          arguments:
+          - value:
+            - ab-001
+            - ' HOME-42 '
+          expectedReturn:
+            parsed:
+            - raw: ab-001
+              category: AB
+              code: 1
+            - raw: ' HOME-42 '
+              category: HOME
+              code: 42
+            rejected: []
+        - id: keeps-rejected-evidence
+          arguments:
+          - value:
+            - A-x
+            - A-1-2
+          expectedReturn:
+            parsed: []
+            rejected:
+            - A-x
+            - A-1-2
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: duckdb_09-string-function-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - duckdb_09-sku-pattern-parser-transfer
+    title: 문자열 함수 선택 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 부분 일치, 고정 위치, 구조 패턴에 맞는 함수를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 단순 패턴에는 복잡한 정규식을 쓰지 않아도 됩니다.
+    - 정규식은 전체 match인지 일부 match인지 명시하세요.
+    exercise:
+      prompt: choose_string_function(situation)를 완성하세요.
+      starterCode: |-
+        def choose_string_function(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_string_function(situation):
+            table = {'prefix-search': {'function': "LIKE 'ABC%'", 'evidence': 'matched count', 'risk': 'case sensitivity'}, 'fixed-slice': {'function': 'SUBSTR', 'evidence': 'position examples', 'risk': 'one-based index'}, 'structured-token': {'function': 'REGEXP_EXTRACT', 'evidence': 'rejected examples', 'risk': 'partial match'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.duckdb.duckdb_09.string-function-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_09.string-function-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_string_function
+        cases:
+        - id: recalls-prefix-search
+          arguments:
+          - value: prefix-search
+          expectedReturn:
+            function: LIKE 'ABC%'
+            evidence: matched count
+            risk: case sensitivity
+        - id: recalls-fixed-slice
+          arguments:
+          - value: fixed-slice
+          expectedReturn:
+            function: SUBSTR
+            evidence: position examples
+            risk: one-based index
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

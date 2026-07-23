@@ -701,3 +701,331 @@ sections:
           - "다국어 PDF(영문 본문 + 한글 표지) 페이지별로 다른 폰트 적용"
           - "표지 + 목차 + 본문 + 부록을 함수로 분리해 SimpleDocTemplate 다중 빌드"
           - "Paragraph 스타일을 JSON 설정으로 외부화해 디자인 일관성 유지"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pdf_06-font-glyph-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_register
+    - extensions
+    title: 한글 font의 embedding·glyph coverage 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 문서 문자 집합이 font glyph에 포함되고 subset/embed 정책이 있는지 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 폰트 파일 존재가 아니라 실제 문서 character glyph coverage를 검사하세요.
+    - embedding 허용 license와 실제 embedded 상태를 둘 다 확인하세요.
+    exercise:
+      prompt: audit_font_coverage(texts, font)를 완성하세요.
+      starterCode: |-
+        def audit_font_coverage(texts, font):
+            raise NotImplementedError
+      solution: |
+        def audit_font_coverage(texts, font):
+            required = {character for text in texts for character in text if not character.isspace()}
+            available = set(font.get("glyphs", []))
+            missing = sorted(required - available)
+            failures = []
+            if missing:
+                failures.append("glyphs")
+            if not font.get("embedded", False):
+                failures.append("embedding")
+            if not font.get("licenseAllowsEmbedding", False):
+                failures.append("license")
+            return {"accepted": not failures, "failures": failures, "missingGlyphs": missing, "requiredGlyphCount": len(required)}
+      hints: *id001
+    check:
+      id: python.pdf.pdf_06.font-glyph-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_06.font-glyph-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_font_coverage
+        cases:
+        - id: accepts-embedded-korean-glyphs
+          arguments:
+          - value:
+            - 매출 보고
+          - value:
+              glyphs:
+              - 매
+              - 출
+              - 보
+              - 고
+              embedded: true
+              licenseAllowsEmbedding: true
+          expectedReturn:
+            accepted: true
+            failures: []
+            missingGlyphs: []
+            requiredGlyphCount: 4
+        - id: reports-missing-glyph-and-policies
+          arguments:
+          - value:
+            - 한글
+          - value:
+              glyphs:
+              - 한
+              embedded: false
+              licenseAllowsEmbedding: false
+          expectedReturn:
+            accepted: false
+            failures:
+            - glyphs
+            - embedding
+            - license
+            missingGlyphs:
+            - 글
+            requiredGlyphCount: 2
+        - id: ignores-whitespace-glyphs
+          arguments:
+          - value:
+            - '  '
+          - value:
+              glyphs: []
+              embedded: true
+              licenseAllowsEmbedding: true
+          expectedReturn:
+            accepted: true
+            failures: []
+            missingGlyphs: []
+            requiredGlyphCount: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pdf_06-pdf-text-style-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_06-font-glyph-contract-mastery
+    title: 새 PDF의 heading·body style 일관성 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: role별 font·size·leading signature와 최소 body size를 검사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - role별 font·size·leading signature를 재사용하세요.
+    - body text 최소 크기와 문서 전체 style budget을 검사하세요.
+    exercise:
+      prompt: audit_pdf_text_styles(runs, minimum_body_size, maximum_styles)를 완성하세요.
+      starterCode: |-
+        def audit_pdf_text_styles(runs, minimum_body_size, maximum_styles):
+            raise NotImplementedError
+      solution: |
+        def audit_pdf_text_styles(runs, minimum_body_size, maximum_styles):
+            signatures = {}
+            small_body = []
+            for run in runs:
+                signature = (run["font"], run["size"], run["leading"])
+                signatures.setdefault(run["role"], set()).add(signature)
+                if run["role"] == "body" and run["size"] < minimum_body_size:
+                    small_body.append(run["id"])
+            inconsistent = sorted(role for role, values in signatures.items() if len(values) > 1)
+            unique_count = len({value for values in signatures.values() for value in values})
+            failures = []
+            if inconsistent:
+                failures.append("consistency")
+            if small_body:
+                failures.append("body-size")
+            if unique_count > maximum_styles:
+                failures.append("style-budget")
+            return {"accepted": not failures, "failures": failures, "inconsistentRoles": inconsistent, "smallBodyRuns": sorted(small_body), "uniqueStyleCount": unique_count}
+      hints: *id002
+    check:
+      id: python.pdf.pdf_06.pdf-text-style-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_06.pdf-text-style-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_pdf_text_styles
+        cases:
+        - id: accepts-consistent-heading-and-body
+          arguments:
+          - value:
+            - id: h
+              role: heading
+              font: Noto
+              size: 16
+              leading: 20
+            - id: b1
+              role: body
+              font: Noto
+              size: 10
+              leading: 14
+            - id: b2
+              role: body
+              font: Noto
+              size: 10
+              leading: 14
+          - value: 9
+          - value: 3
+          expectedReturn:
+            accepted: true
+            failures: []
+            inconsistentRoles: []
+            smallBodyRuns: []
+            uniqueStyleCount: 2
+        - id: reports-inconsistent-small-body
+          arguments:
+          - value:
+            - id: b1
+              role: body
+              font: A
+              size: 8
+              leading: 10
+            - id: b2
+              role: body
+              font: B
+              size: 10
+              leading: 12
+          - value: 9
+          - value: 3
+          expectedReturn:
+            accepted: false
+            failures:
+            - consistency
+            - body-size
+            inconsistentRoles:
+            - body
+            smallBodyRuns:
+            - b1
+            uniqueStyleCount: 2
+        - id: reports-style-budget
+          arguments:
+          - value:
+            - id: a
+              role: a
+              font: A
+              size: 10
+              leading: 10
+            - id: b
+              role: b
+              font: B
+              size: 11
+              leading: 11
+          - value: 9
+          - value: 1
+          expectedReturn:
+            accepted: false
+            failures:
+            - style-budget
+            inconsistentRoles: []
+            smallBodyRuns: []
+            uniqueStyleCount: 2
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pdf_06-pdf-font-style-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_06-pdf-text-style-audit-transfer
+    title: 한글 font·style 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: glyph·embedding·license·role style 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - PDF 저장 성공과 페이지 내용·geometry·업무 값의 정확성을 분리해 검증하세요.
+    - Web에서는 문서 판단을 연습하고 Local에서는 재개방·render artifact evidence를 남기세요.
+    exercise:
+      prompt: choose_pdf_font_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_pdf_font_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_pdf_font_evidence(situation):
+            table = {'glyph': {'action': 'compare document characters with font cmap', 'evidence': 'missing glyph list', 'risk': 'tofu boxes'}, 'embed': {'action': 'verify embedded subset and license', 'evidence': 'font descriptor', 'risk': 'reader substitution'}, 'style': {'action': 'reuse role signatures', 'evidence': 'font size leading map', 'risk': 'inconsistent unreadable text'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.pdf.pdf_06.pdf-font-style-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_06.pdf-font-style-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_pdf_font_evidence
+        cases:
+        - id: recalls-glyph
+          arguments:
+          - value: glyph
+          expectedReturn:
+            action: compare document characters with font cmap
+            evidence: missing glyph list
+            risk: tofu boxes
+        - id: recalls-embed
+          arguments:
+          - value: embed
+          expectedReturn:
+            action: verify embedded subset and license
+            evidence: font descriptor
+            risk: reader substitution
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

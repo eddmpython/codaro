@@ -1,0 +1,507 @@
+var e=`meta:
+  id: playwright_10
+  title: 종합 브라우저 점검 프로젝트
+  order: 10
+  category: playwright
+  difficulty: medium
+  audience: Python 기본 문법을 익힌 자동화 입문자
+  packages:
+    - playwright
+  tags:
+    - playwright
+    - project
+    - report
+    - browser-audit
+intro:
+  direction: 로그인 폼, 네트워크 mock, 화면 검증, 스크린샷, JSON 리포트를 하나의 브라우저 점검 함수로 묶는다.
+  benefits:
+    - 앞 레슨의 locator, expect, route, storage, screenshot 흐름을 한 프로젝트로 연결한다.
+    - 외부 네트워크 없이 재현 가능한 업무 점검 루틴을 완성한다.
+    - 결과 파일과 completion 딕셔너리로 자동화 완료 기준을 남긴다.
+  diagram:
+    steps:
+      - label: 점검 화면 정의
+        detail: 로그인 폼, 대시보드, 주문 수 API를 포함한 로컬 앱 HTML을 준비합니다.
+      - label: 사용자 흐름 실행
+        detail: 이메일을 입력하고 버튼을 눌러 로그인 상태를 만듭니다.
+      - label: API 응답 mock
+        detail: /api/orders 응답을 route.fulfill로 고정해 주문 수를 검증합니다.
+      - label: 증거 산출물 저장
+        detail: 스크린샷과 JSON 리포트를 scratch 경로에 저장하고 completion을 반환합니다.
+    runtime:
+      - label: Playwright 통합 실행
+        detail: locator, expect, route, screenshot, evaluate가 한 코드 흐름에서 동작해야 합니다.
+      - label: 네트워크 없는 재현성
+        detail: 모든 URL은 codaro.local mock route로 처리되어 외부 사이트에 접속하지 않습니다.
+      - label: 파일 산출물 검증
+        detail: screenshot과 report JSON은 CODARO_PLAYWRIGHT_OUTPUT_DIR 또는 OS temp 아래에만 생성합니다.
+sections:
+  - id: project-html
+    title: 점검 화면 만들기
+    structuredPrimary: true
+    subtitle: 로그인 폼과 상태 영역
+    goal: 프로젝트에서 사용할 로컬 HTML을 만들고 핵심 화면 요소가 포함됐는지 검증한다.
+    why: 종합 자동화는 클릭부터 시작하지 않고, 어떤 화면 계약을 검증할지 먼저 고정해야 한다.
+    explanation: 이 프로젝트의 HTML은 이메일 입력칸, 로그인 버튼, 상태 문구, 주문 수 영역을 포함합니다. 외부 앱을 열지 않고도 실제 업무 화면과 비슷한 흐름을 만들 수 있습니다. 먼저 문자열 안에 자동화할 요소가 모두 있는지 assert로 확인합니다.
+    tips:
+      - label과 button name은 나중에 role/label locator로 찾을 수 있게 의미 있게 씁니다.
+      - data-testid는 상태 값처럼 명확히 검증할 대상에만 붙입니다.
+    snippet: |-
+      appHtml = """
+      <main>
+        <h1>운영 점검</h1>
+        <label>이메일 <input name="email" /></label>
+        <button type="button">로그인</button>
+        <p data-testid="status">로그인 전</p>
+        <p data-testid="orders">주문 0건</p>
+      </main>
+      """
+
+      assert "이메일" in appHtml
+      assert "로그인" in appHtml
+      assert 'data-testid="orders"' in appHtml
+      appHtml
+    exercise:
+      prompt: h1 제목을 "주문 운영 점검"으로 바꾸고 HTML 계약을 검증하세요.
+      starterCode: |-
+        appHtml = """
+        <main>
+          <h1>___</h1>
+          <label>이메일 <input name="email" /></label>
+          <button type="button">로그인</button>
+          <p data-testid="status">로그인 전</p>
+          <p data-testid="orders">주문 0건</p>
+        </main>
+        """
+
+        assert "주문 운영 점검" in appHtml
+        assert "이메일" in appHtml
+        assert 'data-testid="orders"' in appHtml
+        appHtml
+      solution: |-
+        appHtml = """
+        <main>
+          <h1>주문 운영 점검</h1>
+          <label>이메일 <input name="email" /></label>
+          <button type="button">로그인</button>
+          <p data-testid="status">로그인 전</p>
+          <p data-testid="orders">주문 0건</p>
+        </main>
+        """
+
+        assert "주문 운영 점검" in appHtml
+        assert "이메일" in appHtml
+        assert 'data-testid="orders"' in appHtml
+        appHtml
+      hints:
+        - h1 태그 안의 텍스트와 assert 문자열을 같게 맞추세요.
+        - 자동화에 필요한 입력, 버튼, 상태 영역은 그대로 남겨야 합니다.
+    check:
+      noError: appHtml 문자열과 assert가 SyntaxError 없이 실행되어야 합니다.
+      resultCheck: HTML에 제목, 입력 label, orders test id가 모두 포함되어야 합니다.
+  - id: login-flow
+    title: 로그인 흐름 검증
+    structuredPrimary: true
+    subtitle: fill, click, expect
+    goal: 이메일을 입력하고 로그인 버튼을 눌러 화면 상태가 사용자 이름으로 바뀌는지 확인한다.
+    why: 브라우저 자동화의 핵심은 함수 호출보다 사용자가 보는 흐름을 같은 순서로 재현하는 것이다.
+    explanation: Playwright locator는 label과 role을 기준으로 사용자가 인식하는 요소를 찾습니다. 여기서는 이메일을 채우고 버튼을 누르면 JavaScript가 상태 문구를 바꾸도록 HTML에 script를 넣습니다. expect는 클릭 뒤 바뀐 화면을 기다리며 검증합니다.
+    tips:
+      - 버튼 클릭 전에 입력값을 먼저 채워야 상태 문구가 기대값으로 바뀝니다.
+      - locator는 CSS보다 label, role, test id 순으로 의미를 드러내는 기준을 우선합니다.
+    snippet: |-
+      from playwright.sync_api import sync_playwright, expect
+
+      html = """
+      <main>
+        <label>이메일 <input name="email" /></label>
+        <button type="button">로그인</button>
+        <p data-testid="status">로그인 전</p>
+        <script>
+          document.querySelector('button').addEventListener('click', () => {
+            const email = document.querySelector('input[name=email]').value;
+            document.querySelector('[data-testid=status]').textContent = \`\${email} 로그인 완료\`;
+          });
+        <\/script>
+      </main>
+      """
+
+      with sync_playwright() as p:
+          browser = p.chromium.launch(headless=True)
+          page = browser.new_page()
+          page.set_content(html)
+          page.get_by_label("이메일").fill("ops@codaro.local")
+          page.get_by_role("button", name="로그인").click()
+          expect(page.get_by_test_id("status")).to_have_text("ops@codaro.local 로그인 완료")
+          statusText = page.get_by_test_id("status").inner_text()
+          browser.close()
+
+      assert statusText.endswith("로그인 완료")
+      statusText
+    exercise:
+      prompt: 이메일을 audit@codaro.local로 바꾸고 로그인 완료 검증을 맞추세요.
+      starterCode: |-
+        from playwright.sync_api import sync_playwright, expect
+
+        html = """
+        <main>
+          <label>이메일 <input name="email" /></label>
+          <button type="button">로그인</button>
+          <p data-testid="status">로그인 전</p>
+          <script>
+            document.querySelector('button').addEventListener('click', () => {
+              const email = document.querySelector('input[name=email]').value;
+              document.querySelector('[data-testid=status]').textContent = \`\${email} 로그인 완료\`;
+            });
+          <\/script>
+        </main>
+        """
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.set_content(html)
+            page.get_by_label("이메일").fill("___")
+            page.get_by_role("button", name="로그인").click()
+            expect(page.get_by_test_id("status")).to_have_text("audit@codaro.local 로그인 완료")
+            statusText = page.get_by_test_id("status").inner_text()
+            browser.close()
+
+        assert statusText == "audit@codaro.local 로그인 완료"
+        statusText
+      solution: |-
+        from playwright.sync_api import sync_playwright, expect
+
+        html = """
+        <main>
+          <label>이메일 <input name="email" /></label>
+          <button type="button">로그인</button>
+          <p data-testid="status">로그인 전</p>
+          <script>
+            document.querySelector('button').addEventListener('click', () => {
+              const email = document.querySelector('input[name=email]').value;
+              document.querySelector('[data-testid=status]').textContent = \`\${email} 로그인 완료\`;
+            });
+          <\/script>
+        </main>
+        """
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.set_content(html)
+            page.get_by_label("이메일").fill("audit@codaro.local")
+            page.get_by_role("button", name="로그인").click()
+            expect(page.get_by_test_id("status")).to_have_text("audit@codaro.local 로그인 완료")
+            statusText = page.get_by_test_id("status").inner_text()
+            browser.close()
+
+        assert statusText == "audit@codaro.local 로그인 완료"
+        statusText
+      hints:
+        - fill에 넣는 이메일과 expect 문자열의 이메일을 같게 맞추세요.
+        - statusText는 클릭 뒤 화면에 표시된 최종 상태입니다.
+    check:
+      noError: fill, click, expect 흐름이 timeout 없이 완료되어야 합니다.
+      resultCheck: statusText가 audit@codaro.local 로그인 완료와 정확히 같아야 합니다.
+  - id: api-and-evidence
+    title: API mock과 증거 저장
+    structuredPrimary: true
+    subtitle: route, screenshot, report
+    goal: mock API 주문 수를 화면에 반영하고 스크린샷과 JSON 리포트를 scratch에 저장한다.
+    why: 실제 점검 루틴은 화면만 보는 것이 아니라 입력 데이터, API 응답, 증거 파일을 함께 남겨야 한다.
+    explanation: page.route로 앱 HTML과 API JSON을 모두 mock하면 네트워크 없이 같은 결과를 반복할 수 있습니다. 화면 script는 /api/orders를 fetch해 주문 수를 표시합니다. 검증이 끝나면 screenshot과 report JSON을 저장해 자동화 산출물로 남깁니다.
+    tips:
+      - route는 page.goto보다 먼저 등록합니다.
+      - JSON 리포트에는 화면에서 읽은 값과 파일명처럼 재확인 가능한 정보를 넣습니다.
+    snippet: |-
+      from pathlib import Path
+      import json
+      import os
+      import tempfile
+      from playwright.sync_api import sync_playwright, expect
+
+      outputDir = Path(os.environ.get("CODARO_PLAYWRIGHT_OUTPUT_DIR", tempfile.gettempdir())) / "codaro-playwright-project"
+      outputDir.mkdir(parents=True, exist_ok=True)
+      screenshotPath = outputDir / "orders-dashboard.png"
+      reportPath = outputDir / "orders-report.json"
+      appHtml = """
+      <main>
+        <h1>주문 운영 점검</h1>
+        <p data-testid="orders">주문 로딩 중</p>
+        <script>
+          fetch('/api/orders').then(response => response.json()).then(data => {
+            document.querySelector('[data-testid=orders]').textContent = \`주문 \${data.orders.length}건\`;
+          });
+        <\/script>
+      </main>
+      """
+
+      with sync_playwright() as p:
+          browser = p.chromium.launch(headless=True)
+          page = browser.new_page()
+          page.route("**/app", lambda route: route.fulfill(status=200, content_type="text/html; charset=utf-8", body=appHtml))
+          page.route("**/api/orders", lambda route: route.fulfill(status=200, content_type="application/json", body=json.dumps({"orders": [101, 102]})))
+          page.goto("https://codaro.local/app")
+          expect(page.get_by_test_id("orders")).to_have_text("주문 2건")
+          ordersText = page.get_by_test_id("orders").inner_text()
+          page.screenshot(path=screenshotPath)
+          browser.close()
+
+      reportPath.write_text(json.dumps({"ordersText": ordersText, "screenshot": screenshotPath.name}, ensure_ascii=False, indent=2), encoding="utf-8")
+      assert screenshotPath.exists()
+      assert json.loads(reportPath.read_text(encoding="utf-8"))["ordersText"] == "주문 2건"
+      str(reportPath)
+    exercise:
+      prompt: mock 주문을 3개로 바꾸고 화면/리포트 검증을 "주문 3건"에 맞추세요.
+      starterCode: |-
+        from pathlib import Path
+        import json
+        import os
+        import tempfile
+        from playwright.sync_api import sync_playwright, expect
+
+        outputDir = Path(os.environ.get("CODARO_PLAYWRIGHT_OUTPUT_DIR", tempfile.gettempdir())) / "codaro-playwright-project"
+        outputDir.mkdir(parents=True, exist_ok=True)
+        screenshotPath = outputDir / "orders-dashboard.png"
+        reportPath = outputDir / "orders-report.json"
+        appHtml = """
+        <main>
+          <h1>주문 운영 점검</h1>
+          <p data-testid="orders">주문 로딩 중</p>
+          <script>
+            fetch('/api/orders').then(response => response.json()).then(data => {
+              document.querySelector('[data-testid=orders]').textContent = \`주문 \${data.orders.length}건\`;
+            });
+          <\/script>
+        </main>
+        """
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.route("**/app", lambda route: route.fulfill(status=200, content_type="text/html; charset=utf-8", body=appHtml))
+            page.route("**/api/orders", lambda route: route.fulfill(status=200, content_type="application/json", body=json.dumps({"orders": [101, 102, ___]})))
+            page.goto("https://codaro.local/app")
+            expect(page.get_by_test_id("orders")).to_have_text("주문 3건")
+            ordersText = page.get_by_test_id("orders").inner_text()
+            page.screenshot(path=screenshotPath)
+            browser.close()
+
+        reportPath.write_text(json.dumps({"ordersText": ordersText, "screenshot": screenshotPath.name}, ensure_ascii=False, indent=2), encoding="utf-8")
+        assert screenshotPath.exists()
+        assert json.loads(reportPath.read_text(encoding="utf-8"))["ordersText"] == "주문 3건"
+        str(reportPath)
+      solution: |-
+        from pathlib import Path
+        import json
+        import os
+        import tempfile
+        from playwright.sync_api import sync_playwright, expect
+
+        outputDir = Path(os.environ.get("CODARO_PLAYWRIGHT_OUTPUT_DIR", tempfile.gettempdir())) / "codaro-playwright-project"
+        outputDir.mkdir(parents=True, exist_ok=True)
+        screenshotPath = outputDir / "orders-dashboard.png"
+        reportPath = outputDir / "orders-report.json"
+        appHtml = """
+        <main>
+          <h1>주문 운영 점검</h1>
+          <p data-testid="orders">주문 로딩 중</p>
+          <script>
+            fetch('/api/orders').then(response => response.json()).then(data => {
+              document.querySelector('[data-testid=orders]').textContent = \`주문 \${data.orders.length}건\`;
+            });
+          <\/script>
+        </main>
+        """
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.route("**/app", lambda route: route.fulfill(status=200, content_type="text/html; charset=utf-8", body=appHtml))
+            page.route("**/api/orders", lambda route: route.fulfill(status=200, content_type="application/json", body=json.dumps({"orders": [101, 102, 103]})))
+            page.goto("https://codaro.local/app")
+            expect(page.get_by_test_id("orders")).to_have_text("주문 3건")
+            ordersText = page.get_by_test_id("orders").inner_text()
+            page.screenshot(path=screenshotPath)
+            browser.close()
+
+        reportPath.write_text(json.dumps({"ordersText": ordersText, "screenshot": screenshotPath.name}, ensure_ascii=False, indent=2), encoding="utf-8")
+        assert screenshotPath.exists()
+        assert json.loads(reportPath.read_text(encoding="utf-8"))["ordersText"] == "주문 3건"
+        str(reportPath)
+      hints:
+        - orders 배열 항목 수와 expect 문자열의 숫자가 같아야 합니다.
+        - reportPath에 저장한 ordersText도 같은 화면 값을 사용합니다.
+    check:
+      noError: route mock, fetch 반영, screenshot 저장, JSON 리포트 쓰기가 오류 없이 완료되어야 합니다.
+      resultCheck: 화면과 리포트 모두 주문 3건을 가리켜야 합니다.
+  - id: final-browser-audit-completion
+    title: 종합 점검 완료
+    structuredPrimary: true
+    subtitle: 함수형 자동화 리포트
+    goal: 브라우저 점검 전체를 함수로 묶고 completion 딕셔너리로 성공 여부와 산출물을 반환한다.
+    why: 학습의 끝은 셀 조각이 아니라 다시 실행 가능한 작은 자동화 함수와 그 결과 계약이어야 한다.
+    explanation: runBrowserAudit 함수는 브라우저를 열고, 화면/API를 mock하고, 주문 수를 검증하고, 스크린샷과 JSON 리포트를 저장합니다. 반환값은 passed, orders, fileExists를 담아 이후 테스트나 자동화 스케줄러가 판단할 수 있는 형태입니다.
+    tips:
+      - 함수 안에서 만든 browser는 항상 close로 정리합니다.
+      - completion은 사람이 읽기 쉬운 값과 자동 판단 가능한 boolean을 함께 둡니다.
+    snippet: |-
+      from pathlib import Path
+      import json
+      import os
+      import tempfile
+      from playwright.sync_api import sync_playwright, expect
+
+      def runBrowserAudit():
+          outputDir = Path(os.environ.get("CODARO_PLAYWRIGHT_OUTPUT_DIR", tempfile.gettempdir())) / "codaro-playwright-project"
+          outputDir.mkdir(parents=True, exist_ok=True)
+          screenshotPath = outputDir / "final-dashboard.png"
+          reportPath = outputDir / "final-report.json"
+          appHtml = """
+          <main>
+            <h1>주문 운영 점검</h1>
+            <label>이메일 <input name="email" /></label>
+            <button type="button">로그인</button>
+            <p data-testid="status">로그인 전</p>
+            <p data-testid="orders">주문 로딩 중</p>
+            <script>
+              document.querySelector('button').addEventListener('click', () => {
+                document.querySelector('[data-testid=status]').textContent = '점검 로그인 완료';
+              });
+              fetch('/api/orders').then(response => response.json()).then(data => {
+                document.querySelector('[data-testid=orders]').textContent = \`주문 \${data.orders.length}건\`;
+              });
+            <\/script>
+          </main>
+          """
+
+          with sync_playwright() as p:
+              browser = p.chromium.launch(headless=True)
+              page = browser.new_page()
+              page.route("**/app", lambda route: route.fulfill(status=200, content_type="text/html; charset=utf-8", body=appHtml))
+              page.route("**/api/orders", lambda route: route.fulfill(status=200, content_type="application/json", body=json.dumps({"orders": [101, 102]})))
+              page.goto("https://codaro.local/app")
+              page.get_by_label("이메일").fill("ops@codaro.local")
+              page.get_by_role("button", name="로그인").click()
+              expect(page.get_by_test_id("status")).to_have_text("점검 로그인 완료")
+              expect(page.get_by_test_id("orders")).to_have_text("주문 2건")
+              page.screenshot(path=screenshotPath)
+              browser.close()
+
+          report = {"passed": True, "orders": 2, "screenshot": screenshotPath.name}
+          reportPath.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+          return {"passed": report["passed"], "orders": report["orders"], "screenshotExists": screenshotPath.exists(), "reportExists": reportPath.exists()}
+
+      completion = runBrowserAudit()
+      assert completion == {"passed": True, "orders": 2, "screenshotExists": True, "reportExists": True}
+      completion
+    exercise:
+      prompt: 주문 수를 4건으로 바꾸고 completion의 orders 검증을 맞추세요.
+      starterCode: |-
+        from pathlib import Path
+        import json
+        import os
+        import tempfile
+        from playwright.sync_api import sync_playwright, expect
+
+        def runBrowserAudit():
+            outputDir = Path(os.environ.get("CODARO_PLAYWRIGHT_OUTPUT_DIR", tempfile.gettempdir())) / "codaro-playwright-project"
+            outputDir.mkdir(parents=True, exist_ok=True)
+            screenshotPath = outputDir / "final-dashboard.png"
+            reportPath = outputDir / "final-report.json"
+            appHtml = """
+            <main>
+              <h1>주문 운영 점검</h1>
+              <label>이메일 <input name="email" /></label>
+              <button type="button">로그인</button>
+              <p data-testid="status">로그인 전</p>
+              <p data-testid="orders">주문 로딩 중</p>
+              <script>
+                document.querySelector('button').addEventListener('click', () => {
+                  document.querySelector('[data-testid=status]').textContent = '점검 로그인 완료';
+                });
+                fetch('/api/orders').then(response => response.json()).then(data => {
+                  document.querySelector('[data-testid=orders]').textContent = \`주문 \${data.orders.length}건\`;
+                });
+              <\/script>
+            </main>
+            """
+
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=True)
+                page = browser.new_page()
+                page.route("**/app", lambda route: route.fulfill(status=200, content_type="text/html; charset=utf-8", body=appHtml))
+                page.route("**/api/orders", lambda route: route.fulfill(status=200, content_type="application/json", body=json.dumps({"orders": [101, 102, 103, ___]})))
+                page.goto("https://codaro.local/app")
+                page.get_by_label("이메일").fill("ops@codaro.local")
+                page.get_by_role("button", name="로그인").click()
+                expect(page.get_by_test_id("status")).to_have_text("점검 로그인 완료")
+                expect(page.get_by_test_id("orders")).to_have_text("주문 4건")
+                page.screenshot(path=screenshotPath)
+                browser.close()
+
+            report = {"passed": True, "orders": 4, "screenshot": screenshotPath.name}
+            reportPath.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+            return {"passed": report["passed"], "orders": report["orders"], "screenshotExists": screenshotPath.exists(), "reportExists": reportPath.exists()}
+
+        completion = runBrowserAudit()
+        assert completion == {"passed": True, "orders": 4, "screenshotExists": True, "reportExists": True}
+        completion
+      solution: |-
+        from pathlib import Path
+        import json
+        import os
+        import tempfile
+        from playwright.sync_api import sync_playwright, expect
+
+        def runBrowserAudit():
+            outputDir = Path(os.environ.get("CODARO_PLAYWRIGHT_OUTPUT_DIR", tempfile.gettempdir())) / "codaro-playwright-project"
+            outputDir.mkdir(parents=True, exist_ok=True)
+            screenshotPath = outputDir / "final-dashboard.png"
+            reportPath = outputDir / "final-report.json"
+            appHtml = """
+            <main>
+              <h1>주문 운영 점검</h1>
+              <label>이메일 <input name="email" /></label>
+              <button type="button">로그인</button>
+              <p data-testid="status">로그인 전</p>
+              <p data-testid="orders">주문 로딩 중</p>
+              <script>
+                document.querySelector('button').addEventListener('click', () => {
+                  document.querySelector('[data-testid=status]').textContent = '점검 로그인 완료';
+                });
+                fetch('/api/orders').then(response => response.json()).then(data => {
+                  document.querySelector('[data-testid=orders]').textContent = \`주문 \${data.orders.length}건\`;
+                });
+              <\/script>
+            </main>
+            """
+
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=True)
+                page = browser.new_page()
+                page.route("**/app", lambda route: route.fulfill(status=200, content_type="text/html; charset=utf-8", body=appHtml))
+                page.route("**/api/orders", lambda route: route.fulfill(status=200, content_type="application/json", body=json.dumps({"orders": [101, 102, 103, 104]})))
+                page.goto("https://codaro.local/app")
+                page.get_by_label("이메일").fill("ops@codaro.local")
+                page.get_by_role("button", name="로그인").click()
+                expect(page.get_by_test_id("status")).to_have_text("점검 로그인 완료")
+                expect(page.get_by_test_id("orders")).to_have_text("주문 4건")
+                page.screenshot(path=screenshotPath)
+                browser.close()
+
+            report = {"passed": True, "orders": 4, "screenshot": screenshotPath.name}
+            reportPath.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+            return {"passed": report["passed"], "orders": report["orders"], "screenshotExists": screenshotPath.exists(), "reportExists": reportPath.exists()}
+
+        completion = runBrowserAudit()
+        assert completion == {"passed": True, "orders": 4, "screenshotExists": True, "reportExists": True}
+        completion
+      hints:
+        - orders 배열 항목 수, expect 문자열, report의 orders 값을 모두 4로 맞추세요.
+        - completion은 passed, orders, screenshotExists, reportExists 네 키를 유지해야 합니다.
+    check:
+      noError: runBrowserAudit 함수가 브라우저 실행, mock, 파일 저장을 모두 완료해야 합니다.
+      resultCheck: completion이 passed True, orders 4, 파일 존재 True를 모두 보여야 합니다.
+`;export{e as default};

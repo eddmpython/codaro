@@ -1,0 +1,9 @@
+Use case: scientific-educational
+Asset type: Codaro learning catalog domain visual for mathematics, statistics, and machine learning
+Primary request: Create a premium editorial educational illustration that shows samples becoming a distribution, a fitted line, a decision boundary, and an evaluated model. Use physical points, curves, a small balance scale for bias/variance, and train/test partitions with no labels or readable text.
+Scene/backdrop: bright neutral studio tabletop with white and charcoal surfaces, teal, coral, yellow, green, and restrained plum accents.
+Style/medium: sophisticated mixed 3D paper-cut and crisp editorial illustration, accurate mathematical relationships, high-end education product art, not childish.
+Composition/framing: wide 16:9, coherent progression from samples on the left to model evaluation on the right, generous safe edges and no cropped objects.
+Lighting/mood: soft daylight, rigorous and approachable.
+Constraints: no people, logos, brand names, letters, formulas, readable UI text, watermark, gradients, glowing orbs, bokeh, or dark atmospheric background. Make uncertainty, fit, separation, and evaluation visually distinct.
+Avoid: robot imagery, brain icons, neon AI clichés, dominant purple or blue, excessive rounded cards.

@@ -2,39 +2,7 @@
 
 LLM provider 없이도 학습 루프가 "진단 → 안내"까지 닫히는지 결정적으로 검증한다.
 """
-from dataclasses import dataclass
-
-from codaro.curriculum.checkFlow import _variableShapeDtype, recommendNextAction
-
-
-@dataclass
-class _FakeVar:
-    name: str
-    shape: str = ""
-    dtype: str = ""
-
-
-class _FakeSession:
-    def __init__(self, variables):
-        self._variables = variables
-
-    def getVariables(self):
-        return self._variables
-
-
-def testVariableShapeDtypeReadsNamedVariable() -> None:
-    session = _FakeSession([_FakeVar("arr", shape="(3, 5)", dtype="int64"), _FakeVar("x")])
-    assert _variableShapeDtype(session, "arr") == ("(3, 5)", "int64")
-
-
-def testVariableShapeDtypeEmptyWhenNoName() -> None:
-    session = _FakeSession([_FakeVar("arr", shape="(3, 5)", dtype="int64")])
-    assert _variableShapeDtype(session, "") == ("", "")
-
-
-def testVariableShapeDtypeEmptyWhenMissing() -> None:
-    session = _FakeSession([_FakeVar("arr", shape="(3, 5)", dtype="int64")])
-    assert _variableShapeDtype(session, "other") == ("", "")
+from codaro.curriculum.checkFlow import recommendNextAction
 
 
 def testPassAdvances() -> None:
@@ -44,12 +12,11 @@ def testPassAdvances() -> None:
     assert action["kind"] == "advance"
 
 
-def testPassWithMisconceptionReconcilesPrediction() -> None:
-    # 통과했지만 예측이 어긋나 silent 오개념이 발화한 경우 — reflective 안내.
+def testPassWithMisconceptionExplainsUnexpectedResult() -> None:
     action = recommendNextAction(
         passed=True, hasMisconception=True, doneCriterionViolated=False, hintLevel=0, maxHints=3
     )
-    assert action["kind"] == "reconcilePrediction"
+    assert action["kind"] == "explainUnexpectedResult"
     assert action["label"]
 
 

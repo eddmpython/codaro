@@ -155,6 +155,19 @@ def testGraphBuildFromRealRepo() -> None:
     assert len(days) >= 25
 
 
+def testCanonicalLessonGraphCoversAllSources() -> None:
+    loader = StudyLoader(str(CURRICULA_DIR))
+    taxonomy = loadTaxonomy()
+    graph = buildLessonGraph(loader, taxonomy)
+    keys = [lesson.key for lesson in graph.lessons]
+
+    assert len(keys) == 472
+    assert len(keys) == len(set(keys))
+    assert graph.byKey("builtins/33_tempfile").outcomes == ["builtins.tempFiles"]
+    assert graph.byKey("builtins/34_hashlib").outcomes == ["builtins.hashing"]
+    assert graph.byKey("builtins/35_zipfile").outcomes == ["builtins.archives"]
+
+
 # ---------------------------------------------------------------------------
 # Plan composer
 # ---------------------------------------------------------------------------
@@ -592,7 +605,7 @@ def testAutoValidatedRespectsAverageWeight(tmp_path) -> None:
     assert "a.intro" not in tracker.listAutoValidatedOutcomes()
 
 
-def testComputeMasteryIncludesCredits(tmp_path) -> None:
+def testComputeMasteryIgnoresLegacyProgressCredits(tmp_path) -> None:
     from codaro.curriculum.lessonGraph import LessonGraph, LessonNode
     from codaro.curriculum.outcomeMastery import computeMastery
     from codaro.curriculum.progress import ProgressTracker
@@ -609,9 +622,9 @@ def testComputeMasteryIncludesCredits(tmp_path) -> None:
     taxonomy = CurriculumTaxonomy(outcomes=[OutcomeDef(id="a.intro", label="A")])
     report = computeMastery(graph, taxonomy, tracker)
     entry = next(o for o in report.outcomes if o.outcomeId == "a.intro")
-    # credit weight 1.0 → 0.5 contribution
-    assert entry.level >= 0.5
-    assert entry.creditCount == 1
+    assert entry.level == 0.0
+    assert entry.stage == "unproven"
+    assert entry.creditCount == 0
 
 
 def testLessonNodeOutcomesForSection() -> None:

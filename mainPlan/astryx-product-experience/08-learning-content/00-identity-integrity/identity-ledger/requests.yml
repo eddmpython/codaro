@@ -1,0 +1,29 @@
+schemaVersion: 1
+category: "requests"
+sourceCount: 5
+lessons:
+  - lessonRef: "requests/00_requests소개"
+    sourcePath: "curricula/python/automation/webApi/requests/00_requests소개.yaml"
+    metaId: "requests_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "requests/01_첫GET요청"
+    sourcePath: "curricula/python/automation/webApi/requests/01_첫GET요청.yaml"
+    metaId: "requests_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "requests/11_사업자등록상태조회"
+    sourcePath: "curricula/python/automation/webApi/requests/11_사업자등록상태조회.yaml"
+    metaId: "requests_11"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "requests/12_공휴일영업일계산"
+    sourcePath: "curricula/python/automation/webApi/requests/12_공휴일영업일계산.yaml"
+    metaId: "requests_12"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "requests/13_환율조회환산"
+    sourcePath: "curricula/python/automation/webApi/requests/13_환율조회환산.yaml"
+    metaId: "requests_13"
+    registryStatus: registered
+    reviewStatus: pending

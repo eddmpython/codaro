@@ -302,3 +302,321 @@ sections:
     type: noError
     noError: glob 모듈 종합 복습의 마지막 표현식이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: glob 모듈 종합 복습 실행 결과에 직접 바꾼 마지막 표현식 값이 표시되어야 합니다.
+assessment:
+  masteryVariants:
+  - id: 11_glob-basic-names-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - basic_patterns
+    - practical_use
+    - workflow_validation
+    title: 패턴에 맞는 파일명만 고르기
+    subtitle: glob 결과를 basename 목록으로 정리
+    goal: 지정 폴더와 glob pattern에서 파일만 찾아 정렬된 파일명 목록을 반환한다.
+    why: glob 결과를 그대로 보여주면 절대경로와 실행 위치에 묶이므로, 학습자는 먼저 의도한 파일명만 확인할 수 있어야 합니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 fixture 파일을 만든 뒤 보이지 않던 폴더와 pattern으로 다시 호출합니다.
+    tips:
+    - glob.glob(os.path.join(root, pattern))으로 검색하세요.
+    - os.path.isfile(path)로 파일만 남기고 os.path.basename(path)를 반환하세요.
+    exercise:
+      prompt: match_file_names(root, pattern)가 pattern에 맞는 파일명 목록을 정렬해서 반환하도록 완성하세요.
+      starterCode: |-
+        def match_file_names(root, pattern):
+            raise NotImplementedError
+      solution: |-
+        import glob
+        import os
+
+        def match_file_names(root, pattern):
+            matches = glob.glob(os.path.join(root, pattern))
+            return sorted(os.path.basename(path) for path in matches if os.path.isfile(path))
+      hints:
+      - glob 결과에는 경로가 포함되므로 basename으로 정리하세요.
+      - 폴더가 pattern에 걸려도 파일만 남겨야 합니다.
+    check:
+      id: python.builtins.glob.basic-names.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.glob.pattern-report.mastery.behavior.v1.fixture
+      fixtureHash: sha256-wnvGWmI/42+y9uLpGf0R+WwjwkSV0m69vEdaaVi/IOo=
+      fixture:
+        directories:
+        - data/archive
+        - logs/2026
+        - notes
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: data/sales_01.csv
+          content: sales01
+        - path: data/sales_02.csv
+          content: sales02
+        - path: data/customers.csv
+          content: customers
+        - path: data/archive/sales_00.csv
+          content: old
+        - path: logs/2026/app_20260524.log
+          content: log24
+        - path: logs/2026/app_20260525.log
+          content: log25
+        - path: README.md
+          content: readme
+        - path: notes/todo.txt
+          content: todo
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: match_file_names
+        cases:
+        - id: csv-files
+          arguments:
+          - fixturePath: data
+          - value: '*.csv'
+          expectedReturn:
+          - customers.csv
+          - sales_01.csv
+          - sales_02.csv
+        - id: numbered-sales
+          arguments:
+          - fixturePath: data
+          - value: sales_??.csv
+          expectedReturn:
+          - sales_01.csv
+          - sales_02.csv
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 11_glob-recursive-relative-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - 11_glob-basic-names-mastery
+    title: 재귀 검색 결과를 상대경로로 반환하기
+    subtitle: recursive=True와 relpath 조합
+    goal: root 아래에서 recursive pattern에 맞는 파일을 찾아 POSIX 상대경로 목록으로 반환한다.
+    why: 재귀 검색은 범위가 넓어지므로 어떤 하위 폴더가 잡혔는지 상대경로로 확인해야 과다 매칭을 빨리 잡을 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 단일 폴더 검색이 아니라 하위 폴더까지 포함하세요.
+    tips:
+    - glob.glob(full_pattern, recursive=True)를 사용하세요.
+    - os.path.relpath 결과의 구분자는 /로 바꿔 반환하세요.
+    exercise:
+      prompt: recursive_relative_matches(root, pattern)가 recursive glob 결과를 root 기준 POSIX 상대경로 목록으로 반환하도록 완성하세요.
+      starterCode: |-
+        def recursive_relative_matches(root, pattern):
+            raise NotImplementedError
+      solution: |-
+        import glob
+        import os
+
+        def recursive_relative_matches(root, pattern):
+            base = os.path.abspath(root)
+            full_pattern = os.path.join(base, pattern)
+            matches = []
+            for path in glob.glob(full_pattern, recursive=True):
+                if os.path.isfile(path):
+                    matches.append(os.path.relpath(path, base).replace(os.sep, "/"))
+            return sorted(matches)
+      hints:
+      - pattern에 **가 들어가도 recursive=True가 없으면 하위 폴더가 잡히지 않습니다.
+      - 절대경로 대신 root 기준 상대경로를 반환하세요.
+    check:
+      id: python.builtins.glob.recursive-relative.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.glob.pattern-report.mastery.behavior.v1.fixture
+      fixtureHash: sha256-wnvGWmI/42+y9uLpGf0R+WwjwkSV0m69vEdaaVi/IOo=
+      fixture:
+        directories:
+        - data/archive
+        - logs/2026
+        - notes
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: data/sales_01.csv
+          content: sales01
+        - path: data/sales_02.csv
+          content: sales02
+        - path: data/customers.csv
+          content: customers
+        - path: data/archive/sales_00.csv
+          content: old
+        - path: logs/2026/app_20260524.log
+          content: log24
+        - path: logs/2026/app_20260525.log
+          content: log25
+        - path: README.md
+          content: readme
+        - path: notes/todo.txt
+          content: todo
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: recursive_relative_matches
+        cases:
+        - id: recursive-logs
+          arguments:
+          - fixturePath: .
+          - value: '**/*.log'
+          expectedReturn:
+          - logs/2026/app_20260524.log
+          - logs/2026/app_20260525.log
+        - id: recursive-csv
+          arguments:
+          - fixturePath: .
+          - value: data/**/*.csv
+          expectedReturn:
+          - data/archive/sales_00.csv
+          - data/customers.csv
+          - data/sales_01.csv
+          - data/sales_02.csv
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 11_glob-pattern-limit-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 11_glob-recursive-relative-transfer
+    title: 여러 패턴을 제한된 목록으로 수집하기
+    subtitle: iglob 결과를 중복 없이 제한
+    goal: 여러 glob pattern을 순서대로 검색해 중복을 제거하고 limit개까지만 상대경로로 반환한다.
+    why: 시간이 지난 뒤에도 glob 학습의 핵심은 많이 찾는 것이 아니라, 너무 많이 찾지 않도록 범위와 limit을 함께 제어하는 것입니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. iglob, dedup, limit 제어를 예시 없이 다시 조립하세요.
+    tips:
+    - limit이 0 이하이면 ValueError를 일으키세요.
+    - 같은 파일이 여러 pattern에 걸려도 한 번만 반환하세요.
+    exercise:
+      prompt: collect_limited_matches(root, patterns, limit)가 count, matches, truncated를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def collect_limited_matches(root, patterns, limit):
+            raise NotImplementedError
+      solution: |-
+        import glob
+        import os
+
+        def collect_limited_matches(root, patterns, limit):
+            if limit <= 0:
+                raise ValueError("limit must be positive")
+            base = os.path.abspath(root)
+            seen = set()
+            matches = []
+            for pattern in patterns:
+                full_pattern = os.path.join(base, pattern)
+                for path in sorted(glob.iglob(full_pattern, recursive=True)):
+                    if not os.path.isfile(path):
+                        continue
+                    relative = os.path.relpath(path, base).replace(os.sep, "/")
+                    if relative in seen:
+                        continue
+                    seen.add(relative)
+                    matches.append(relative)
+                    if len(matches) >= limit:
+                        return {"count": len(matches), "matches": matches, "truncated": True}
+            return {"count": len(matches), "matches": matches, "truncated": False}
+      hints:
+      - glob.iglob은 이터레이터라 필요한 만큼 소비하는 흐름을 만들 수 있습니다.
+      - truncated는 limit 때문에 중간에 멈췄을 때만 True입니다.
+    check:
+      id: python.builtins.glob.pattern-limit.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.glob.pattern-report.mastery.behavior.v1.fixture
+      fixtureHash: sha256-wnvGWmI/42+y9uLpGf0R+WwjwkSV0m69vEdaaVi/IOo=
+      fixture:
+        directories:
+        - data/archive
+        - logs/2026
+        - notes
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: data/sales_01.csv
+          content: sales01
+        - path: data/sales_02.csv
+          content: sales02
+        - path: data/customers.csv
+          content: customers
+        - path: data/archive/sales_00.csv
+          content: old
+        - path: logs/2026/app_20260524.log
+          content: log24
+        - path: logs/2026/app_20260525.log
+          content: log25
+        - path: README.md
+          content: readme
+        - path: notes/todo.txt
+          content: todo
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: collect_limited_matches
+        cases:
+        - id: truncates-after-four
+          arguments:
+          - fixturePath: .
+          - value:
+            - data/*.csv
+            - logs/**/*.log
+          - value: 4
+          expectedReturn:
+            count: 4
+            matches:
+            - data/customers.csv
+            - data/sales_01.csv
+            - data/sales_02.csv
+            - logs/2026/app_20260524.log
+            truncated: true
+        - id: all-small-patterns
+          arguments:
+          - fixturePath: .
+          - value:
+            - README.*
+            - notes/*.txt
+          - value: 10
+          expectedReturn:
+            count: 2
+            matches:
+            - README.md
+            - notes/todo.txt
+            truncated: false
+        - id: rejects-zero-limit
+          arguments:
+          - fixturePath: .
+          - value:
+            - '*.md'
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

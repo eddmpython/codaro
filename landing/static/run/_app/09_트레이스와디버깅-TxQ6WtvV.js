@@ -1,0 +1,338 @@
+var e=`meta:
+  id: playwright_09
+  title: 트레이스와 디버깅
+  order: 9
+  category: playwright
+  difficulty: medium
+  audience: Python 기본 문법을 익힌 자동화 입문자
+  packages:
+    - playwright
+  tags:
+    - playwright
+    - trace
+    - debugging
+    - evidence
+intro:
+  direction: 콘솔 로그, trace zip, 실패 스크린샷을 모아 브라우저 자동화 실패 원인을 설명 가능한 증거로 바꾼다.
+  benefits:
+    - 화면 실패를 "안 됨"이 아니라 콘솔, trace, screenshot 증거로 분해할 수 있다.
+    - trace 파일과 스크린샷을 scratch 경로에 저장하는 습관을 익힌다.
+    - 실패를 일부러 만들고 잡아내는 디버깅 루틴을 연습한다.
+  diagram:
+    steps:
+      - label: 브라우저 콘솔 수집
+        detail: page.on("console")로 화면 안 JavaScript 로그를 Python 리스트에 모읍니다.
+      - label: trace 기록 시작
+        detail: context.tracing.start로 스냅샷과 스크린샷을 기록합니다.
+      - label: 실패 증거 저장
+        detail: 검증 실패를 잡아낸 뒤 현재 화면을 screenshot으로 남깁니다.
+      - label: 디버깅 리포트 완성
+        detail: 수집한 로그, trace, screenshot 파일 존재 여부를 딕셔너리로 정리합니다.
+    runtime:
+      - label: Playwright trace API 실행
+        detail: context.tracing.start/stop이 Chromium context에서 동작해야 합니다.
+      - label: scratch 산출물 저장
+        detail: trace zip과 screenshot은 CODARO_PLAYWRIGHT_OUTPUT_DIR 또는 OS temp 아래에만 저장합니다.
+      - label: 실패 원인 assert
+        detail: 실패를 잡는 코드도 최종 assert로 증거 생성 여부를 검증합니다.
+sections:
+  - id: console-capture
+    title: 콘솔 로그 수집
+    structuredPrimary: true
+    subtitle: page.on("console")
+    goal: 브라우저 안 JavaScript console.log 메시지를 Python 리스트로 수집한다.
+    why: 화면이 기대대로 바뀌지 않을 때 콘솔 메시지는 프런트 코드가 어떤 상태를 지나갔는지 알려준다.
+    explanation: Playwright는 page.on 이벤트로 브라우저에서 발생하는 콘솔 메시지를 받을 수 있습니다. 테스트 HTML 안에서 console.log를 실행하고 Python 리스트에 text 값을 저장하면, 화면 밖의 내부 신호까지 검증할 수 있습니다.
+    tips:
+      - 이벤트 핸들러는 console.log가 발생하기 전에 등록합니다.
+      - 수집한 로그는 너무 길게 저장하지 말고 실패 분석에 필요한 키워드만 확인합니다.
+    snippet: |-
+      from playwright.sync_api import sync_playwright
+
+      messages = []
+
+      with sync_playwright() as p:
+          browser = p.chromium.launch(headless=True)
+          page = browser.new_page()
+          page.on("console", lambda message: messages.append(message.text))
+          page.set_content("<script>console.log('dashboard ready')<\/script>")
+          browser.close()
+
+      assert messages == ["dashboard ready"]
+      messages
+    exercise:
+      prompt: console.log 메시지를 "orders loaded"로 바꾸고 수집 결과를 검증하세요.
+      starterCode: |-
+        from playwright.sync_api import sync_playwright
+
+        messages = []
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.on("console", lambda message: messages.append(message.text))
+            page.set_content("<script>console.log('___')<\/script>")
+            browser.close()
+
+        assert messages == ["orders loaded"]
+        messages
+      solution: |-
+        from playwright.sync_api import sync_playwright
+
+        messages = []
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.on("console", lambda message: messages.append(message.text))
+            page.set_content("<script>console.log('orders loaded')<\/script>")
+            browser.close()
+
+        assert messages == ["orders loaded"]
+        messages
+      hints:
+        - console.log 문자열과 assert 리스트의 문자열을 같게 맞추세요.
+        - page.on 등록은 set_content보다 앞에 있어야 합니다.
+    check:
+      noError: console 이벤트 등록과 set_content 실행이 오류 없이 끝나야 합니다.
+      resultCheck: messages 리스트에 바꾼 콘솔 메시지가 정확히 하나 들어 있어야 합니다.
+  - id: trace-file
+    title: trace 파일 저장
+    structuredPrimary: true
+    subtitle: context.tracing
+    goal: Playwright trace를 scratch zip 파일로 저장하고 파일 크기를 검증한다.
+    why: trace는 클릭 전후 DOM, 네트워크, 스크린샷을 함께 담아 실패 재현 시간을 줄인다.
+    explanation: trace는 browser context 단위로 시작하고 멈춥니다. snapshots와 screenshots 옵션을 켜면 나중에 trace viewer에서 화면 변화를 따라갈 수 있습니다. 학습에서는 trace 파일이 만들어졌는지만 확인하고, 저장 위치는 temp/scratch 아래로 제한합니다.
+    tips:
+      - trace start는 검증할 동작보다 앞에 둡니다.
+      - trace 파일은 zip이라 저장 후 exists와 size를 함께 확인합니다.
+    snippet: |-
+      from pathlib import Path
+      import os
+      import tempfile
+      from playwright.sync_api import sync_playwright
+
+      outputDir = Path(os.environ.get("CODARO_PLAYWRIGHT_OUTPUT_DIR", tempfile.gettempdir())) / "codaro-playwright-debug"
+      outputDir.mkdir(parents=True, exist_ok=True)
+      tracePath = outputDir / "dashboard-trace.zip"
+
+      with sync_playwright() as p:
+          browser = p.chromium.launch(headless=True)
+          context = browser.new_context()
+          context.tracing.start(screenshots=True, snapshots=True)
+          page = context.new_page()
+          page.set_content("<main><h1>Trace target</h1><button>Save</button></main>")
+          page.get_by_role("button", name="Save").click()
+          context.tracing.stop(path=tracePath)
+          browser.close()
+
+      assert tracePath.exists()
+      assert tracePath.stat().st_size > 0
+      str(tracePath)
+    exercise:
+      prompt: trace 파일명을 orders-trace.zip으로 바꾸고 파일 저장 검증을 통과시키세요.
+      starterCode: |-
+        from pathlib import Path
+        import os
+        import tempfile
+        from playwright.sync_api import sync_playwright
+
+        outputDir = Path(os.environ.get("CODARO_PLAYWRIGHT_OUTPUT_DIR", tempfile.gettempdir())) / "codaro-playwright-debug"
+        outputDir.mkdir(parents=True, exist_ok=True)
+        tracePath = outputDir / "___"
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            context = browser.new_context()
+            context.tracing.start(screenshots=True, snapshots=True)
+            page = context.new_page()
+            page.set_content("<main><h1>Trace target</h1><button>Save</button></main>")
+            page.get_by_role("button", name="Save").click()
+            context.tracing.stop(path=tracePath)
+            browser.close()
+
+        assert tracePath.exists()
+        assert tracePath.name == "orders-trace.zip"
+        str(tracePath)
+      solution: |-
+        from pathlib import Path
+        import os
+        import tempfile
+        from playwright.sync_api import sync_playwright
+
+        outputDir = Path(os.environ.get("CODARO_PLAYWRIGHT_OUTPUT_DIR", tempfile.gettempdir())) / "codaro-playwright-debug"
+        outputDir.mkdir(parents=True, exist_ok=True)
+        tracePath = outputDir / "orders-trace.zip"
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            context = browser.new_context()
+            context.tracing.start(screenshots=True, snapshots=True)
+            page = context.new_page()
+            page.set_content("<main><h1>Trace target</h1><button>Save</button></main>")
+            page.get_by_role("button", name="Save").click()
+            context.tracing.stop(path=tracePath)
+            browser.close()
+
+        assert tracePath.exists()
+        assert tracePath.name == "orders-trace.zip"
+        str(tracePath)
+      hints:
+        - 파일명은 .zip으로 끝나야 trace viewer에서 다루기 쉽습니다.
+        - path=tracePath 인자가 stop 호출에 들어 있어야 파일이 저장됩니다.
+    check:
+      noError: tracing.start와 tracing.stop(path=...)가 오류 없이 완료되어야 합니다.
+      resultCheck: tracePath가 orders-trace.zip 파일을 가리키고 실제로 존재해야 합니다.
+  - id: failure-screenshot
+    title: 실패 스크린샷 남기기
+    structuredPrimary: true
+    subtitle: AssertionError 처리
+    goal: 의도적으로 실패하는 expect를 잡고 현재 화면 screenshot을 저장한다.
+    why: 실패 순간 화면이 남아 있으면 로그만으로 알 수 없는 UI 상태를 빠르게 확인할 수 있다.
+    explanation: 자동화에서 실패를 무조건 숨기면 안 됩니다. 여기서는 학습을 위해 AssertionError를 잡고 스크린샷을 저장한 뒤, 오류 메시지와 파일 존재 여부를 함께 검증합니다. 실제 테스트에서는 스크린샷을 남긴 뒤 예외를 다시 발생시키는 방식도 사용할 수 있습니다.
+    tips:
+      - 실패 증거를 저장한 뒤에는 오류가 있었다는 사실도 별도 값으로 남깁니다.
+      - screenshot 파일은 반복 실행해도 덮어쓸 수 있는 scratch 경로에 둡니다.
+    snippet: |-
+      from pathlib import Path
+      import os
+      import tempfile
+      from playwright.sync_api import sync_playwright, expect
+
+      outputDir = Path(os.environ.get("CODARO_PLAYWRIGHT_OUTPUT_DIR", tempfile.gettempdir())) / "codaro-playwright-debug"
+      outputDir.mkdir(parents=True, exist_ok=True)
+      screenshotPath = outputDir / "failed-status.png"
+      errorText = ""
+
+      with sync_playwright() as p:
+          browser = p.chromium.launch(headless=True)
+          page = browser.new_page()
+          page.set_content("<p data-testid='status'>지연</p>")
+          try:
+              expect(page.get_by_test_id("status")).to_have_text("정상", timeout=200)
+          except AssertionError as exc:
+              errorText = str(exc)
+              page.screenshot(path=screenshotPath)
+          browser.close()
+
+      assert screenshotPath.exists()
+      assert "정상" in errorText
+      {"screenshot": screenshotPath.name, "captured": True}
+    exercise:
+      prompt: 실패 스크린샷 파일명을 failed-order.png로 바꾸고 증거 저장을 확인하세요.
+      starterCode: |-
+        from pathlib import Path
+        import os
+        import tempfile
+        from playwright.sync_api import sync_playwright, expect
+
+        outputDir = Path(os.environ.get("CODARO_PLAYWRIGHT_OUTPUT_DIR", tempfile.gettempdir())) / "codaro-playwright-debug"
+        outputDir.mkdir(parents=True, exist_ok=True)
+        screenshotPath = outputDir / "___"
+        errorText = ""
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.set_content("<p data-testid='status'>지연</p>")
+            try:
+                expect(page.get_by_test_id("status")).to_have_text("정상", timeout=200)
+            except AssertionError as exc:
+                errorText = str(exc)
+                page.screenshot(path=screenshotPath)
+            browser.close()
+
+        assert screenshotPath.exists()
+        assert screenshotPath.name == "failed-order.png"
+        assert "정상" in errorText
+        {"screenshot": screenshotPath.name, "captured": True}
+      solution: |-
+        from pathlib import Path
+        import os
+        import tempfile
+        from playwright.sync_api import sync_playwright, expect
+
+        outputDir = Path(os.environ.get("CODARO_PLAYWRIGHT_OUTPUT_DIR", tempfile.gettempdir())) / "codaro-playwright-debug"
+        outputDir.mkdir(parents=True, exist_ok=True)
+        screenshotPath = outputDir / "failed-order.png"
+        errorText = ""
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.set_content("<p data-testid='status'>지연</p>")
+            try:
+                expect(page.get_by_test_id("status")).to_have_text("정상", timeout=200)
+            except AssertionError as exc:
+                errorText = str(exc)
+                page.screenshot(path=screenshotPath)
+            browser.close()
+
+        assert screenshotPath.exists()
+        assert screenshotPath.name == "failed-order.png"
+        assert "정상" in errorText
+        {"screenshot": screenshotPath.name, "captured": True}
+      hints:
+        - screenshotPath 파일명과 assert의 파일명을 같게 맞추세요.
+        - except 블록이 실행되어야 screenshot 파일이 생깁니다.
+    check:
+      noError: 실패 expect를 잡고 screenshot 저장까지 실패 원인과 증거 경로를 남겨야 합니다.
+      resultCheck: failed-order.png 파일이 존재하고 errorText에 기대 문자열이 포함되어야 합니다.
+  - id: debug-report-completion
+    title: 디버깅 리포트 완료
+    structuredPrimary: true
+    subtitle: 로그와 증거 묶기
+    goal: 콘솔 로그, trace, screenshot 존재 여부를 completion 딕셔너리로 정리한다.
+    why: 디버깅 산출물은 파일만 남기면 끝이 아니라 어떤 증거가 준비됐는지 구조화되어야 재사용된다.
+    explanation: 마지막 섹션은 앞에서 배운 세 가지 증거를 하나의 리포트 형태로 묶습니다. 실제 프로젝트에서는 이 딕셔너리를 JSON으로 저장하거나 CI summary에 붙일 수 있습니다. 여기서는 파일 존재 여부와 로그 키워드를 assert로 고정합니다.
+    tips:
+      - 리포트에는 파일명과 boolean을 함께 넣으면 사람이 읽고 자동화도 판단하기 쉽습니다.
+      - 완료 조건은 trace, screenshot, console 세 축이 모두 True가 되는 것입니다.
+    snippet: |-
+      debugReport = {
+          "consoleMessages": ["dashboard ready"],
+          "traceFile": "dashboard-trace.zip",
+          "screenshotFile": "failed-status.png",
+          "evidenceReady": True,
+      }
+
+      assert "dashboard ready" in debugReport["consoleMessages"]
+      assert debugReport["traceFile"].endswith(".zip")
+      assert debugReport["screenshotFile"].endswith(".png")
+      assert debugReport["evidenceReady"] is True
+      debugReport
+    exercise:
+      prompt: traceFile 값을 orders-trace.zip으로 바꾸고 완료 리포트 검증을 유지하세요.
+      starterCode: |-
+        debugReport = {
+            "consoleMessages": ["orders loaded"],
+            "traceFile": "___",
+            "screenshotFile": "failed-order.png",
+            "evidenceReady": True,
+        }
+
+        assert "orders loaded" in debugReport["consoleMessages"]
+        assert debugReport["traceFile"] == "orders-trace.zip"
+        assert debugReport["screenshotFile"].endswith(".png")
+        assert debugReport["evidenceReady"] is True
+        debugReport
+      solution: |-
+        debugReport = {
+            "consoleMessages": ["orders loaded"],
+            "traceFile": "orders-trace.zip",
+            "screenshotFile": "failed-order.png",
+            "evidenceReady": True,
+        }
+
+        assert "orders loaded" in debugReport["consoleMessages"]
+        assert debugReport["traceFile"] == "orders-trace.zip"
+        assert debugReport["screenshotFile"].endswith(".png")
+        assert debugReport["evidenceReady"] is True
+        debugReport
+      hints:
+        - traceFile은 앞 섹션에서 만든 파일명과 같은 문자열로 맞추세요.
+        - evidenceReady는 모든 증거가 준비됐다는 최종 신호입니다.
+    check:
+      noError: debugReport 딕셔너리와 네 개의 assert가 trace, screenshot, message, status를 모두 확인해야 합니다.
+      resultCheck: completion 리포트가 console, trace, screenshot 증거를 모두 포함해야 합니다.
+`;export{e as default};

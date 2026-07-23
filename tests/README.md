@@ -8,7 +8,7 @@ gate 드라이버를 같은 폴더에 둔다. 구조의 SSOT는
 
 ## 도메인 폴더
 
-`architecture/` `automation/` `classroom/` `curriculum/` `document/` `learning/` `runtime/` `share/`
+`architecture/` `automation/` `curriculum/` `document/` `learning/` `migrations/` `runtime/` `share/`
 `surface/` `teacher/`, 그리고 제품 전반 audit은 `product/`.
 
 각 폴더 안에:

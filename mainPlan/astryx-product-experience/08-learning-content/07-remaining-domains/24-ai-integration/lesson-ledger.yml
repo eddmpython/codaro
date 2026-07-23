@@ -1,0 +1,59 @@
+schemaVersion: 1
+pathId: aiIntegration
+composerSnapshotDate: "2026-07-18"
+composerGraphCount: 469
+composerVersionHash: "75fc453f508da3b8709bd0be8a4d36213ec535c7af7d2cd892e20c2aca3e7c06"
+taxonomySnapshotHash: "b5e9b0b9db4f6ecd89c7be10a5c795f9b991b3ce700d5b5cf044607fc835def2"
+sourceSetHash: "5f8d7bb62f23c2e10ed89536f72449613b42d55e7c0a659010a18ebf61ce535e"
+ledgerTool: "uv run python -X utf8 docs/skills/ops/tools/buildLearningLedgers.py --check"
+targetOutcomes:
+  - "python.functions"
+  - "python.errorHandling"
+  - "python.modulesAndIo"
+  - "llm.intro"
+  - "llm.conversations"
+  - "llm.streaming"
+  - "llm.structuredOutput"
+  - "llm.caching"
+  - "llm.toolUse"
+gaps: []
+lessons:
+  - order: 1
+    lessonRef: "30days/day01_헬로월드"
+    canonicalContentRef: "30days/day01_헬로월드"
+  - order: 2
+    lessonRef: "llmBasics/02_시스템프롬프트역할부여"
+    canonicalContentRef: "llmBasics/02_시스템프롬프트역할부여"
+  - order: 3
+    lessonRef: "30days/day02_변수와데이터타입"
+    canonicalContentRef: "30days/day02_변수와데이터타입"
+  - order: 4
+    lessonRef: "llmBasics/03_멀티턴대화만들기"
+    canonicalContentRef: "llmBasics/03_멀티턴대화만들기"
+  - order: 5
+    lessonRef: "llmBasics/05_스트리밍응답"
+    canonicalContentRef: "llmBasics/05_스트리밍응답"
+  - order: 6
+    lessonRef: "30days/day03_연산자"
+    canonicalContentRef: "30days/day03_연산자"
+  - order: 7
+    lessonRef: "llmBasics/07_프롬프트캐싱"
+    canonicalContentRef: "llmBasics/07_프롬프트캐싱"
+  - order: 8
+    lessonRef: "30days/day13_조건문"
+    canonicalContentRef: "30days/day13_조건문"
+  - order: 9
+    lessonRef: "30days/day15_함수기초"
+    canonicalContentRef: "30days/day15_함수기초"
+  - order: 10
+    lessonRef: "30days/day18_모듈과import"
+    canonicalContentRef: "30days/day18_모듈과import"
+  - order: 11
+    lessonRef: "30days/day20_예외처리"
+    canonicalContentRef: "30days/day20_예외처리"
+  - order: 12
+    lessonRef: "llmBasics/06_JSON구조화출력"
+    canonicalContentRef: "llmBasics/06_JSON구조화출력"
+  - order: 13
+    lessonRef: "llmBasics/08_도구사용기초"
+    canonicalContentRef: "llmBasics/08_도구사용기초"

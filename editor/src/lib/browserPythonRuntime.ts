@@ -1,12 +1,14 @@
 // browserPythonRuntime.ts - pyproc(브라우저 파이썬 런타임) 소비 세임 = 브라우저 커널.
 // 같은 노트북이 로컬 백엔드(apiOnline)와 브라우저(WASM CPython)를 모두 쓴다. 백엔드가 없으면
 // notebookRuntime이 이 커널로 셀을 진짜 실행한다(과거 print 정규식 시뮬레이션 대체).
-// 실행 SSOT는 로컬 Python 불변이고 이 티어는 보조다. 설계 근거: mainPlan/codaro-anywhere/14, 19.
+// Web Run과 Local은 같은 학습 문서와 evidence 계약을 쓴다. 설계 근거:
+// mainPlan/astryx-product-experience/00-product-contract/README.md.
 // pyproc은 첫 실행에서 lazy import(런타임 다운로드 지연 + 코드 스플릿). 단일 boot 경로는
 // SharedArrayBuffer/COOP-COEP가 필요 없어 정적 호스팅에서도 돈다.
 import type { ExecutionResult, VariableInfo } from "@/types";
 
 type PyRuntime = {
+  readonly indexURL: string;
   fs: PyRuntimeFileSystem;
   enableAsgiServer(cfg?: { app?: string }): PyRuntimeAsgiServer;
   run(code: string): unknown;
@@ -106,6 +108,11 @@ async function ensureRuntime(): Promise<PyRuntime> {
 /** 브라우저 커널이 이미 부팅됐는지(부팅 대기 없이 상태 표시용). */
 export function isBrowserKernelBooted(): boolean {
   return runtimePromise !== null;
+}
+
+export async function getBrowserPythonRuntimeInfo(): Promise<{ indexURL: string }> {
+  const runtime = await ensureRuntime();
+  return { indexURL: runtime.indexURL };
 }
 
 // 사용자 전역을 VariableInfo 목록(JSON)으로 뽑는다. 밑줄 프리픽스는 내부용이라 제외.

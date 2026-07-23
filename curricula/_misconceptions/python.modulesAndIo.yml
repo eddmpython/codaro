@@ -2,7 +2,7 @@ meta:
   outcomeId: python.modulesAndIo
   status: draft
   version: 1
-  note: "초안 - Predict-Run-Reconcile-Adapt 루프 1단계 시드. 사람이 정제 필요."
+  note: "초안 - 실제 코드와 에러로 관찰 가능한 오개념 시드. 사람이 정제 필요."
 
 misconceptions:
   - id: python.modulesAndIo.fileNotClosed
@@ -31,10 +31,10 @@ misconceptions:
     label: "f.read()를 두 번 호출하면 같은 내용이 또 나올 거라 예측"
     summary: "같은 파일 객체에서 read()를 두 번째 호출하면 빈 문자열이 나온다."
     triggers:
-      - kind: predictionMismatch
-        appliesTo: prediction
-        expectedField: value
-        description: "두 번째 read 결과를 첫 번째와 같다고 예측."
+      - kind: codePattern
+        appliesTo: code
+        pattern: "([A-Za-z_]\\w*)\\.read\\([^)]*\\)[\\s\\S]{0,200}?\\1\\.read\\("
+        description: "seek 없이 같은 파일 객체의 read를 두 번 호출."
     diagnostic:
       message: "파일 객체는 내부 커서를 가지고 있어 한 번 끝까지 읽으면 다음 read는 빈 문자열입니다. 다시 읽으려면 `f.seek(0)`."
       references: ["python.modulesAndIo"]

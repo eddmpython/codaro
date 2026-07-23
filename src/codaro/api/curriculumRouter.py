@@ -7,7 +7,6 @@ from ..curriculum.catalogFlow import buildCurriculumTaxonomyPayload, buildLearni
 from ..curriculum.checkFlow import (
     CurriculumCheckInput,
     CurriculumCheckInvalid,
-    CurriculumCheckPrediction,
     CurriculumCheckSessionMissing,
     runCurriculumCheckFlow,
 )
@@ -15,6 +14,10 @@ from ..curriculum.contentFlow import (
     CurriculumContentFlow,
     CurriculumContentError,
 )
+from ..curriculum.evidenceArchive import EvidenceArchiveError
+from ..curriculum.learningArchive import LearningArchiveError, readCurrentLearningArchive
+from ..curriculum.learningArchiveFlow import importLearningArchive
+from ..curriculum.localStrongCheck import LocalStrongCheckInvalid, runLocalStrongCheck
 from ..curriculum.planningFlow import (
     CurriculumMasterPlanInput,
     CurriculumPlanningError,
@@ -41,9 +44,14 @@ from ..curriculum.reviewFlow import buildCurriculumReviewsPayload, recordCurricu
 from ..serverLog import formatLogFields, getServerLogger
 from ..system.serverState import ServerState
 from .errors import fail
+from .learningArchiveAutomation import adoptLearningArchiveAutomationDraft
 from .requestModels import (
     CheckExerciseRequest,
+    CurriculumEvidenceArchiveRequest,
+    CurriculumEvidenceEventRequest,
+    CurriculumLearningArchiveRequest,
     CurriculumProgressRequest,
+    LocalStrongCheckRequest,
     MasterPlanRequest,
     OutcomeValidationRequest,
     ReviewResultRequest,
@@ -62,6 +70,7 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
         progressTracker=state.progressTracker,
         learnerStateStore=state.learnerStateStore,
         analyticsTimeline=state.analyticsTimeline,
+        learningEvents=state.learningEvidenceArchiveStore.eventPayloads,
     )
 
     @router.get("/api/curriculum/categories")
@@ -143,6 +152,106 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
         )
         return result.payload
 
+    @router.get("/api/curriculum/evidence/summary")
+    def apiCurriculumEvidenceSummary() -> dict[str, int]:
+        return state.learningEvidenceArchiveStore.summary()
+
+    @router.get("/api/curriculum/evidence/archive")
+    def apiCurriculumEvidenceArchive() -> dict[str, object]:
+        return state.learningEvidenceArchiveStore.buildArchive()
+
+    @router.post("/api/curriculum/evidence/import")
+    def apiImportCurriculumEvidence(request: CurriculumEvidenceArchiveRequest) -> dict[str, object]:
+        try:
+            receipt = state.learningEvidenceArchiveStore.mergeArchive(request.archive)
+        except EvidenceArchiveError as error:
+            fail(400, "curriculum-evidence-archive-invalid", str(error))
+        logger.info(
+            "curriculum %s",
+            formatLogFields(
+                action="evidence-import",
+                inserted=receipt["inserted"],
+                skipped=receipt["skipped"],
+                conflicted=receipt["conflicted"],
+            ),
+        )
+        return receipt
+
+    @router.post("/api/curriculum/evidence/event")
+    def apiAppendCurriculumEvidence(request: CurriculumEvidenceEventRequest) -> dict[str, object]:
+        try:
+            receipt = state.learningEvidenceArchiveStore.appendEvent(request.event)
+        except EvidenceArchiveError as error:
+            fail(400, "curriculum-evidence-event-invalid", str(error))
+        logger.info(
+            "curriculum %s",
+            formatLogFields(
+                action="evidence-append",
+                inserted=receipt["inserted"],
+                skipped=receipt["skipped"],
+                conflicted=receipt["conflicted"],
+            ),
+        )
+        return receipt
+
+    @router.get("/api/curriculum/learning-archive/current")
+    def apiCurrentCurriculumLearningArchive() -> dict[str, object] | None:
+        try:
+            archive = readCurrentLearningArchive(state.learningArchiveRoot, required=False)
+        except LearningArchiveError as error:
+            fail(500, "curriculum-learning-archive-corrupt", str(error))
+        return archive
+
+    @router.post("/api/curriculum/learning-archive/import")
+    def apiImportCurriculumLearningArchive(request: CurriculumLearningArchiveRequest) -> dict[str, object]:
+        try:
+            receipt = importLearningArchive(
+                request.archive,
+                storeRoot=state.learningArchiveRoot,
+                evidenceStore=state.learningEvidenceArchiveStore,
+            )
+        except LearningArchiveError as error:
+            fail(400, "curriculum-learning-archive-invalid", str(error))
+        logger.info(
+            "curriculum %s",
+            formatLogFields(
+                action="learning-archive-import",
+                archiveId=receipt["archiveId"],
+                changed=receipt["changed"],
+                evidenceInserted=receipt["evidence"]["inserted"],
+                automationDrafts=len(receipt["automationDrafts"]),
+            ),
+        )
+        return receipt
+
+    @router.post("/api/curriculum/learning-archive/automation-drafts/{draftId}/adopt")
+    def apiAdoptCurriculumLearningArchiveAutomationDraft(draftId: str) -> dict[str, object]:
+        try:
+            return adoptLearningArchiveAutomationDraft(
+                draftId,
+                storeRoot=state.learningArchiveRoot,
+                workspaceRoot=state.workspaceRoot,
+            )
+        except LearningArchiveError as error:
+            fail(400, "curriculum-learning-archive-automation-invalid", str(error))
+
+    @router.post("/api/curriculum/check/strong/local")
+    def apiLocalStrongCheck(request: LocalStrongCheckRequest) -> dict[str, object]:
+        try:
+            payload = runLocalStrongCheck(request.checkSpec, request.source)
+        except LocalStrongCheckInvalid as error:
+            fail(400, "curriculum-local-strong-check-invalid", str(error))
+        logger.info(
+            "curriculum %s",
+            formatLogFields(
+                action="local-strong-check",
+                checkId=request.checkSpec.get("id"),
+                passed=payload.get("passed"),
+                state=payload.get("state"),
+            ),
+        )
+        return payload
+
     @router.post("/api/curriculum/check")
     async def apiCheckExercise(request: CheckExerciseRequest) -> dict[str, object]:
         try:
@@ -163,12 +272,6 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
                     category=request.category,
                     contentId=request.contentId,
                     sectionId=request.sectionId,
-                    prediction=CurriculumCheckPrediction(
-                        expectedShape=request.prediction.expectedShape,
-                        expectedDtype=request.prediction.expectedDtype,
-                        expectedValue=request.prediction.expectedValue,
-                        expectedError=request.prediction.expectedError,
-                    ) if request.prediction is not None else None,
                 ),
                 sessionManager=state.sessionManager,
             )
@@ -213,6 +316,7 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
                 curriculumOs=state.curriculumOs,
                 progressTracker=state.progressTracker,
                 learnerStateStore=state.learnerStateStore,
+                learningEvents=state.learningEvidenceArchiveStore.eventPayloads(),
                 request=CurriculumMasterPlanInput(
                     domain=request.domain,
                     outcomes=request.outcomes,
@@ -355,7 +459,7 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
 
     @router.get("/api/learner/snapshot")
     def apiLearnerSnapshot() -> dict[str, object]:
-        """학습자 상태 전체 스냅샷 — Predict-Run-Reconcile-Adapt 루프 표면.
+        """학습자 상태 전체 스냅샷.
 
         프론트가 mastery 패널, misconception 표시, dynamic gap UI를 그릴 때 호출한다.
         """
@@ -380,7 +484,7 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
     def apiLearnerOutcome(outcomeId: str) -> dict[str, object]:
         """단일 outcome에 대한 mastery + 관련 misconception hit 목록.
 
-        Predict-Run-Reconcile-Adapt 루프에서 한 outcome에 집중할 때 폴링용.
+        한 outcome에 집중할 때 폴링용.
         """
         try:
             payload = buildLearnerOutcomePayload(

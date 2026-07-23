@@ -2,7 +2,6 @@ import pytest
 
 from codaro.curriculum.authoringProposalFlow import (
     CurriculumAuthoringProposalError,
-    buildPredictPromptProposalPayload,
     buildVariationProposalPayload,
     generateVariationDrafts,
 )
@@ -25,16 +24,9 @@ class StudyLoader:
                     },
                 },
                 {
-                    "id": "filled-predict",
-                    "title": "Already predicted",
-                    "exercise": {
-                        "prompt": "Predict first.",
-                        "starterCode": "print('ok')",
-                        "predict": {
-                            "prompt": "What prints?",
-                            "expectedValue": "ok",
-                        },
-                    },
+                    "id": "practice",
+                    "title": "Additional practice",
+                    "exercise": {"prompt": "Run it.", "starterCode": "print('ok')"},
                 },
             ],
         }
@@ -64,18 +56,6 @@ def testVariationProposalRejectsMissingSection() -> None:
         )
 
     assert excInfo.value.code == "curriculum_section_not_found"
-
-
-def testPredictPromptProposalSkipsFilledPredictContracts() -> None:
-    payload = buildPredictPromptProposalPayload(
-        studyLoader=StudyLoader(),
-        category="python",
-        contentId="variables",
-    )
-
-    assert payload["sectionCount"] == 2
-    assert [draft["sectionId"] for draft in payload["drafts"]] == ["intro"]
-    assert payload["skipped"] == [{"sectionId": "filled-predict", "reason": "predict already filled"}]
 
 
 def testGenerateVariationDraftsFallsBackWhenNoLiteralFound() -> None:

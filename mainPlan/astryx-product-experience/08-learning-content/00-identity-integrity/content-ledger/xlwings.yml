@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "xlwings"
+canonicalRows: 11
+lessons:
+  - lessonRef: "xlwings/00_xlwings소개"
+    identityLedgerRef: "identity-ledger/xlwings.yml"
+    lessonContentHash: "dc2b4cff660d438163937790f6b54d410ca25c932872e05b6d8a25e3aab79d3b"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.intro"]
+    prerequisites: ["python.functions","python.modulesAndIo"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:xlwings/00_xlwings소개:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:xlwings_00_xlwings__:v1","retrieve:xlwings_00_xlwings__:v2","retrieve:xlwings_00_xlwings__:v3"]
+    transferVariantIds: ["transfer:xlwings_00_xlwings__:near-v1","transfer:xlwings_00_xlwings__:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "xlwings/01_첫엑셀연결"
+    identityLedgerRef: "identity-ledger/xlwings.yml"
+    lessonContentHash: "96040a3389c1023a6181760d6a8e4f9df0b8f79ff04d5a3214fffba89a2fb272"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.intro","automation.excel.workbook"]
+    prerequisites: ["automation.excel.intro"]
+    reinforcesOutcomeIds: ["automation.excel.intro"]
+    runtimeTier: local
+    checkSpecId: "lesson:xlwings/01_첫엑셀연결:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:xlwings_01______:v1","retrieve:xlwings_01______:v2","retrieve:xlwings_01______:v3"]
+    transferVariantIds: ["transfer:xlwings_01______:near-v1","transfer:xlwings_01______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "xlwings/02_가격표일괄입력"
+    identityLedgerRef: "identity-ledger/xlwings.yml"
+    lessonContentHash: "bb08d1ea292c72fafe43406ab4e3989a88c3f795bc2effbb12e644e4694228c4"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.workbook"]
+    prerequisites: ["automation.excel.workbook"]
+    reinforcesOutcomeIds: ["automation.excel.workbook"]
+    runtimeTier: local
+    checkSpecId: "lesson:xlwings/02_가격표일괄입력:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:xlwings_02________:v1","retrieve:xlwings_02________:v2","retrieve:xlwings_02________:v3"]
+    transferVariantIds: ["transfer:xlwings_02________:near-v1","transfer:xlwings_02________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "xlwings/03_시트탐색과확장"
+    identityLedgerRef: "identity-ledger/xlwings.yml"
+    lessonContentHash: "21f5532eb86100b673cb8f3817ccd43249835bfeb9151c1b03f7f31616c1ad56"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.workbook"]
+    prerequisites: ["automation.excel.workbook"]
+    reinforcesOutcomeIds: ["automation.excel.workbook"]
+    runtimeTier: local
+    checkSpecId: "lesson:xlwings/03_시트탐색과확장:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:xlwings_03________:v1","retrieve:xlwings_03________:v2","retrieve:xlwings_03________:v3"]
+    transferVariantIds: ["transfer:xlwings_03________:near-v1","transfer:xlwings_03________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "xlwings/04_DataFrame왕복"
+    identityLedgerRef: "identity-ledger/xlwings.yml"
+    lessonContentHash: "984b2afa3b56b39c9107945faa277bbdef17cb20c29b30688dced39189a09981"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.workbook"]
+    prerequisites: ["automation.excel.workbook","pandas.loadFrame"]
+    reinforcesOutcomeIds: ["automation.excel.workbook"]
+    runtimeTier: local
+    checkSpecId: "lesson:xlwings/04_DataFrame왕복:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:xlwings_04_DataFrame__:v1","retrieve:xlwings_04_DataFrame__:v2","retrieve:xlwings_04_DataFrame__:v3"]
+    transferVariantIds: ["transfer:xlwings_04_DataFrame__:near-v1","transfer:xlwings_04_DataFrame__:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "xlwings/05_수식과서식"
+    identityLedgerRef: "identity-ledger/xlwings.yml"
+    lessonContentHash: "2c7eec37fdc4f36948a0a1f295a93aa74a8ae4a3f64ec7e05a284393bb756d8a"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.formulas","automation.excel.styles"]
+    prerequisites: ["automation.excel.workbook"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:xlwings/05_수식과서식:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:xlwings_05______:v1","retrieve:xlwings_05______:v2","retrieve:xlwings_05______:v3"]
+    transferVariantIds: ["transfer:xlwings_05______:near-v1","transfer:xlwings_05______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "xlwings/06_막대차트자동생성"
+    identityLedgerRef: "identity-ledger/xlwings.yml"
+    lessonContentHash: "802642829f8767516c6856e57b5e7a8b7272f1dead72b9ea9039b47ce99c42c4"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.charts"]
+    prerequisites: ["automation.excel.workbook"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:xlwings/06_막대차트자동생성:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:xlwings_06_________:v1","retrieve:xlwings_06_________:v2","retrieve:xlwings_06_________:v3"]
+    transferVariantIds: ["transfer:xlwings_06_________:near-v1","transfer:xlwings_06_________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "xlwings/07_표와동적합계"
+    identityLedgerRef: "identity-ledger/xlwings.yml"
+    lessonContentHash: "9d367cd9af75f687861502375a17b8c562a17b78caf004a07042fe484d48e0bd"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.tables"]
+    prerequisites: ["automation.excel.workbook","automation.excel.formulas"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:xlwings/07_표와동적합계:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:xlwings_07_______:v1","retrieve:xlwings_07_______:v2","retrieve:xlwings_07_______:v3"]
+    transferVariantIds: ["transfer:xlwings_07_______:near-v1","transfer:xlwings_07_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "xlwings/08_월별파일분기합치기"
+    identityLedgerRef: "identity-ledger/xlwings.yml"
+    lessonContentHash: "faf4615485b10f194e0157536a23105ad04fb10179ed863d8345e2cc3f9e31c1"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.report"]
+    prerequisites: ["automation.excel.workbook","automation.excel.tables"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:xlwings/08_월별파일분기합치기:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:xlwings_08__________:v1","retrieve:xlwings_08__________:v2","retrieve:xlwings_08__________:v3"]
+    transferVariantIds: ["transfer:xlwings_08__________:near-v1","transfer:xlwings_08__________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "xlwings/09_VBA매크로호출"
+    identityLedgerRef: "identity-ledger/xlwings.yml"
+    lessonContentHash: "7560c4c290a5b47997206b3f3552a395b1d125258edf7672309521e6a141a35f"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.workbook"]
+    prerequisites: ["automation.excel.workbook"]
+    reinforcesOutcomeIds: ["automation.excel.workbook"]
+    runtimeTier: local
+    checkSpecId: "lesson:xlwings/09_VBA매크로호출:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:xlwings_09_VBA_____:v1","retrieve:xlwings_09_VBA_____:v2","retrieve:xlwings_09_VBA_____:v3"]
+    transferVariantIds: ["transfer:xlwings_09_VBA_____:near-v1","transfer:xlwings_09_VBA_____:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "xlwings/10_UDF가격계산기"
+    identityLedgerRef: "identity-ledger/xlwings.yml"
+    lessonContentHash: "ec7cbb881b16fbf676773f381f5029b386a0e4bfc754d4aa0c5450ff031e1240"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.workbook"]
+    prerequisites: ["automation.excel.workbook"]
+    reinforcesOutcomeIds: ["automation.excel.workbook"]
+    runtimeTier: local
+    checkSpecId: "lesson:xlwings/10_UDF가격계산기:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:xlwings_10_UDF_____:v1","retrieve:xlwings_10_UDF_____:v2","retrieve:xlwings_10_UDF_____:v3"]
+    transferVariantIds: ["transfer:xlwings_10_UDF_____:near-v1","transfer:xlwings_10_UDF_____:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

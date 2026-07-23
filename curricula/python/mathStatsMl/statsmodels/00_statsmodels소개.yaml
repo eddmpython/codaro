@@ -530,3 +530,261 @@ sections:
     type: noError
     noError: 업무 흐름 검증에서 `compactX` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: statsmodels_00-inference-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - workflow_validation
+    title: 통계 모델의 estimand·가정·진단 계약 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 질문, target, predictors, estimand, covariance, diagnostics를 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 무엇을 추정하는지 estimand를 먼저 적으세요.
+    - 표준오차 방식과 residual diagnostic을 명시하세요.
+    exercise:
+      prompt: audit_inference_contract(contract)를 완성하세요.
+      starterCode: |-
+        def audit_inference_contract(contract):
+            raise NotImplementedError
+      solution: |
+        def audit_inference_contract(contract):
+            required={"question","target","predictors","estimand","covariance","diagnostics"}
+            missing=sorted(required-set(contract)); failures=[]
+            if contract.get("target") in contract.get("predictors",[]): failures.append("target-leakage")
+            if not contract.get("diagnostics"): failures.append("diagnostics")
+            if contract.get("covariance") not in {"nonrobust","HC3","HAC","cluster"}: failures.append("covariance")
+            return {"valid":not missing and not failures,"missing":missing,"failures":failures,"evidence":["design matrix","coefficient interval","residual diagnostics","claim scope"]}
+      hints: *id001
+    check:
+      id: python.statsmodels.statsmodels_00.inference-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.statsmodels.statsmodels_00.inference-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_inference_contract
+        cases:
+        - id: accepts-regression-contract
+          arguments:
+          - value:
+              question: association
+              target: sales
+              predictors:
+              - ads
+              estimand: slope
+              covariance: HC3
+              diagnostics:
+              - residuals
+          expectedReturn:
+            valid: true
+            missing: []
+            failures: []
+            evidence:
+            - design matrix
+            - coefficient interval
+            - residual diagnostics
+            - claim scope
+        - id: reports-contract-errors
+          arguments:
+          - value:
+              question: x
+              target: y
+              predictors:
+              - y
+              estimand: effect
+              covariance: default
+              diagnostics: []
+          expectedReturn:
+            valid: false
+            missing: []
+            failures:
+            - target-leakage
+            - diagnostics
+            - covariance
+            evidence:
+            - design matrix
+            - coefficient interval
+            - residual diagnostics
+            - claim scope
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: statsmodels_00-coefficient-interval-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - statsmodels_00-inference-contract-mastery
+    title: 새 계수 결과에 신뢰구간 검산 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: estimate와 standard error로 대칭 구간과 sign stability를 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - estimate와 interval width를 함께 보여주세요.
+    - 0 제외 여부를 효과 크기나 실무 중요성과 혼동하지 마세요.
+    exercise:
+      prompt: coefficient_interval(estimate, standard_error, critical_value)를 완성하세요.
+      starterCode: |-
+        def coefficient_interval(estimate, standard_error, critical_value):
+            raise NotImplementedError
+      solution: |
+        def coefficient_interval(estimate, standard_error, critical_value):
+            if standard_error < 0 or critical_value <= 0: raise ValueError("invalid interval inputs")
+            lower=estimate-critical_value*standard_error; upper=estimate+critical_value*standard_error
+            return {"estimate":estimate,"lower":round(lower,6),"upper":round(upper,6),"excludesZero":lower>0 or upper<0,"width":round(upper-lower,6)}
+      hints: *id002
+    check:
+      id: python.statsmodels.statsmodels_00.coefficient-interval.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.statsmodels.statsmodels_00.coefficient-interval.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: coefficient_interval
+        cases:
+        - id: computes-positive-interval
+          arguments:
+          - value: 2
+          - value: 0.5
+          - value: 1.96
+          expectedReturn:
+            estimate: 2
+            lower: 1.02
+            upper: 2.98
+            excludesZero: true
+            width: 1.96
+        - id: keeps-uncertain-sign
+          arguments:
+          - value: 0.2
+          - value: 0.3
+          - value: 1.96
+          expectedReturn:
+            estimate: 0.2
+            lower: -0.388
+            upper: 0.788
+            excludesZero: false
+            width: 1.176
+        - id: rejects-negative-se
+          arguments:
+          - value: 1
+          - value: -1
+          - value: 2
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: statsmodels_00-inference-model-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - statsmodels_00-coefficient-interval-transfer
+    title: 통계 모델 선택 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: outcome 종류와 dependence에 맞는 모델을 고른다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 계수·불확실성·가정 진단을 한 묶음으로 해석하세요.
+    - 통계적 연관을 인과 효과나 개인 확정 예측으로 확대하지 마세요.
+    exercise:
+      prompt: choose_inference_model(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_inference_model(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_inference_model(situation):
+            table = {'continuous-outcome': {'method': 'OLS with residual diagnostics', 'evidence': 'coefficients intervals residuals', 'risk': 'nonlinearity'}, 'binary-outcome': {'method': 'logistic regression', 'evidence': 'odds ratio calibration', 'risk': 'probability interpretation'}, 'count-outcome': {'method': 'Poisson or negative binomial', 'evidence': 'exposure dispersion', 'risk': 'overdispersion'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.statsmodels.statsmodels_00.inference-model-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.statsmodels.statsmodels_00.inference-model-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_inference_model
+        cases:
+        - id: recalls-continuous-outcome
+          arguments:
+          - value: continuous-outcome
+          expectedReturn:
+            method: OLS with residual diagnostics
+            evidence: coefficients intervals residuals
+            risk: nonlinearity
+        - id: recalls-binary-outcome
+          arguments:
+          - value: binary-outcome
+          expectedReturn:
+            method: logistic regression
+            evidence: odds ratio calibration
+            risk: probability interpretation
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

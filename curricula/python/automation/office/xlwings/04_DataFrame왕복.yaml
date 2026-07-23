@@ -440,3 +440,315 @@ sections:
           다음 레슨에서는 같은 시트 위에 Excel 수식(=SUM, =AVERAGE 등)을 코드로 쓰고, 셀 서식(통화, 색상)을 자동 지정하는 흐름을 다룹니다.
     goal: DataFrame 왕복 패턴을 한 번 완성한 채로 다음 레슨에 진입한다.
     why: 이 패턴은 pandas 분석 결과를 그대로 Excel 보고서로 만드는 자동화의 핵심이다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: xlwings_04-dataframe-roundtrip-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - df-to-excel
+    - summary
+    title: DataFrame 왕복의 schema·index·null 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 중복 column·의도치 않은 index·null drift를 찾는다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - DataFrame의 columns, index 포함 여부, null 정책을 쓰기 전에 고정하세요.
+    - 2D values와 schema의 열 수를 함께 검사하세요.
+    exercise:
+      prompt: audit_dataframe_contract(columns, rows, include_index, null_policy)를 완성하세요.
+      starterCode: |-
+        def audit_dataframe_contract(columns, rows, include_index, null_policy):
+            raise NotImplementedError
+      solution: |
+        def audit_dataframe_contract(columns, rows, include_index, null_policy):
+            duplicates = sorted({name for name in columns if columns.count(name) > 1})
+            ragged = [index for index, row in enumerate(rows) if len(row) != len(columns)]
+            null_cells = [[r, c] for r, row in enumerate(rows) for c, value in enumerate(row) if value is None]
+            failures = []
+            if duplicates:
+                failures.append("columns")
+            if ragged:
+                failures.append("shape")
+            if include_index not in {True, False}:
+                failures.append("index")
+            if null_cells and null_policy == "reject":
+                failures.append("nulls")
+            return {"accepted": not failures, "failures": failures, "duplicates": duplicates, "raggedRows": ragged, "nullCells": null_cells}
+      hints: *id001
+    check:
+      id: python.xlwings.xlwings_04.dataframe-roundtrip-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.xlwings.xlwings_04.dataframe-roundtrip-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_dataframe_contract
+        cases:
+        - id: accepts-explicit-schema
+          arguments:
+          - value:
+            - sku
+            - price
+          - value:
+            - - A
+              - 10
+          - value: false
+          - value: reject
+          expectedReturn:
+            accepted: true
+            failures: []
+            duplicates: []
+            raggedRows: []
+            nullCells: []
+        - id: reports-shape-and-columns
+          arguments:
+          - value:
+            - sku
+            - sku
+          - value:
+            - - A
+          - value: false
+          - value: allow
+          expectedReturn:
+            accepted: false
+            failures:
+            - columns
+            - shape
+            duplicates:
+            - sku
+            raggedRows:
+            - 0
+            nullCells: []
+        - id: reports-null-policy
+          arguments:
+          - value:
+            - sku
+            - price
+          - value:
+            - - A
+              - null
+          - value: false
+          - value: reject
+          expectedReturn:
+            accepted: false
+            failures:
+            - nulls
+            duplicates: []
+            raggedRows: []
+            nullCells:
+            - - 0
+              - 1
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: xlwings_04-dataframe-roundtrip-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - xlwings_04-dataframe-roundtrip-contract-mastery
+    title: Excel 왕복 후 DataFrame 값 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: key 기준으로 행 누락과 type drift를 검출한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 행 순서가 아니라 business key로 왕복 결과를 비교하세요.
+    - Excel이 숫자를 문자열로 바꾼 type drift를 명시적으로 보고하세요.
+    exercise:
+      prompt: reconcile_dataframe_rows(expected, observed, key, types)를 완성하세요.
+      starterCode: |-
+        def reconcile_dataframe_rows(expected, observed, key, types):
+            raise NotImplementedError
+      solution: |
+        def reconcile_dataframe_rows(expected, observed, key, types):
+            exp = {row[key]: row for row in expected}
+            obs = {row[key]: row for row in observed}
+            missing = sorted(set(exp) - set(obs))
+            extra = sorted(set(obs) - set(exp))
+            type_drift = []
+            for row_id in sorted(set(exp) & set(obs)):
+                for field, expected_type in types.items():
+                    value = obs[row_id].get(field)
+                    actual = "number" if isinstance(value, (int, float)) and not isinstance(value, bool) else "string" if isinstance(value, str) else "null" if value is None else type(value).__name__
+                    if actual != expected_type:
+                        type_drift.append(f"{row_id}:{field}")
+            return {"passed": not missing and not extra and not type_drift, "missing": missing, "extra": extra, "typeDrift": type_drift}
+      hints: *id002
+    check:
+      id: python.xlwings.xlwings_04.dataframe-roundtrip-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.xlwings.xlwings_04.dataframe-roundtrip-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_dataframe_rows
+        cases:
+        - id: accepts-roundtrip
+          arguments:
+          - value:
+            - sku: A
+              price: 10
+          - value:
+            - sku: A
+              price: 10.0
+          - value: sku
+          - value:
+              price: number
+          expectedReturn:
+            passed: true
+            missing: []
+            extra: []
+            typeDrift: []
+        - id: reports-membership
+          arguments:
+          - value:
+            - sku: A
+              price: 10
+          - value:
+            - sku: B
+              price: 10
+          - value: sku
+          - value:
+              price: number
+          expectedReturn:
+            passed: false
+            missing:
+            - A
+            extra:
+            - B
+            typeDrift: []
+        - id: reports-type-drift
+          arguments:
+          - value:
+            - sku: A
+              price: 10
+          - value:
+            - sku: A
+              price: '10'
+          - value: sku
+          - value:
+              price: number
+          expectedReturn:
+            passed: false
+            missing: []
+            extra: []
+            typeDrift:
+            - A:price
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: xlwings_04-dataframe-roundtrip-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - xlwings_04-dataframe-roundtrip-reconciliation-transfer
+    title: DataFrame 왕복 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: schema·shape·type 증거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Web에서는 Excel 자동화 판단을 작은 함수로 즉시 검증하세요.
+    - Local에서는 실제 Excel 프로세스와 workbook artifact 증거를 별도로 남기세요.
+    exercise:
+      prompt: choose_dataframe_evidence(stage)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_dataframe_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_dataframe_evidence(stage):
+            table = {'schema': {'action': 'declare columns index null policy', 'evidence': 'dataframe contract', 'risk': 'implicit layout'}, 'write': {'action': 'assign rectangular values', 'evidence': 'range shape', 'risk': 'shifted matrix'}, 'roundtrip': {'action': 'compare keys and types after read', 'evidence': 'membership and type report', 'risk': 'silent coercion'}}
+            if stage not in table:
+                raise ValueError('unknown stage')
+            return table[stage]
+      hints: *id003
+    check:
+      id: python.xlwings.xlwings_04.dataframe-roundtrip-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.xlwings.xlwings_04.dataframe-roundtrip-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_dataframe_evidence
+        cases:
+        - id: recalls-schema
+          arguments:
+          - value: schema
+          expectedReturn:
+            action: declare columns index null policy
+            evidence: dataframe contract
+            risk: implicit layout
+        - id: recalls-write
+          arguments:
+          - value: write
+          expectedReturn:
+            action: assign rectangular values
+            evidence: range shape
+            risk: shifted matrix
+        - id: recalls-roundtrip
+          arguments:
+          - value: roundtrip
+          expectedReturn:
+            action: compare keys and types after read
+            evidence: membership and type report
+            risk: silent coercion
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

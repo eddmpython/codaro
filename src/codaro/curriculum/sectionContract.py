@@ -6,6 +6,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from .taxonomy import LessonOutcomeRecord, mergeLessonRecord
+
 
 STRUCTURED_SECTION_FIELDS = {
     "goal",
@@ -55,27 +57,6 @@ class LessonIntroContract(BaseModel):
     diagram: dict[str, Any] = Field(default_factory=dict)
 
 
-class LearningPredictContract(BaseModel):
-    """Predict-Run-Reconcile-Adapt 루프 1단계 — 실행 전 학습자가 적는 예측.
-
-    각 필드는 선택. 비어 있으면 해당 차원은 비교에서 제외된다.
-    """
-    prompt: str = ""
-    expectedShape: str = ""
-    expectedDtype: str = ""
-    expectedValue: str = ""
-    expectedError: str = ""
-
-    def isEmpty(self) -> bool:
-        return not any([
-            self.prompt,
-            self.expectedShape,
-            self.expectedDtype,
-            self.expectedValue,
-            self.expectedError,
-        ])
-
-
 class LearningExerciseContract(BaseModel):
     prompt: str = ""
     starterCode: str = ""
@@ -83,12 +64,11 @@ class LearningExerciseContract(BaseModel):
     check: dict[str, Any] = Field(default_factory=dict)
     hints: list[str] = Field(default_factory=list)
     difficulty: str = "easy"
-    predict: LearningPredictContract = Field(default_factory=LearningPredictContract)
     variations: list[LearningVariationContract] = Field(default_factory=list)
 
 
 class LearningVariationContract(BaseModel):
-    """같은 outcome 을 검증하는 변주 문제 — 사상 5 (predict→run→fix→verify→variation) 의 마지막.
+    """같은 outcome을 다른 입력과 맥락에서 다시 검증하는 변주 문제.
 
     학습자가 메인 exercise 통과 후 "한 번 더 확인" 으로 호출. parameterization 은 수치/
     타입/순서 변형 메타로, AI 도구 propose-variation 이 채우는 슬롯이다.
@@ -104,7 +84,7 @@ class LearningVariationContract(BaseModel):
 
 
 class LearningReflectionContract(BaseModel):
-    """강의 끝 회고 셀 — Predict-Run-Reconcile-Adapt 루프 후 기억 굳히기 단계.
+    """강의 끝에서 기억을 굳히는 선택적 회고 셀.
 
     학습자가 "방금 배운 것" 을 자기 표현으로 적게 한다. expectedKeywords 가 있으면
     auto-grade 가능 (포함 여부 검사). aiFollowup 는 채워진 답을 (있다면 teacher) 가
@@ -132,6 +112,11 @@ class LearningSectionContract(BaseModel):
     reflection: LearningReflectionContract = Field(default_factory=LearningReflectionContract)
     rawBlocks: list[dict[str, Any]] = Field(default_factory=list)
     contractGaps: list[str] = Field(default_factory=list)
+    assessmentMode: str = ""
+    sourceSectionIds: list[str] = Field(default_factory=list)
+    unseen: bool = False
+    minimumDelayHours: int = 0
+    outcomeIds: list[str] = Field(default_factory=list)
 
 
 class LearningLessonContract(BaseModel):
@@ -140,14 +125,25 @@ class LearningLessonContract(BaseModel):
     sections: list[LearningSectionContract] = Field(default_factory=list)
 
 
-def lessonContractFromYaml(content: dict[str, Any], *, fallbackTitle: str = "") -> LearningLessonContract:
+def lessonContractFromYaml(
+    content: dict[str, Any],
+    *,
+    fallbackTitle: str = "",
+    taxonomyRecord: LessonOutcomeRecord | None = None,
+) -> LearningLessonContract:
     meta = _mapValue(content.get("meta"))
     intro = _mapValue(content.get("intro"))
     runtime = _mapValue(content.get("runtime"))
     seo = _mapValue(meta.get("seo"))
     title = _textValue(meta.get("title") or content.get("title")) or fallbackTitle
+    outcomeRecord = mergeLessonRecord(meta, taxonomyRecord)
     sections = [
-        _sectionContract(section, index)
+        _sectionContract(
+            section,
+            index,
+            lessonOutcomeIds=outcomeRecord.outcomes,
+            sectionOutcomeIds=outcomeRecord.sectionOutcomes,
+        )
         for index, section in enumerate(_arrayOfMaps(content.get("sections")), start=1)
     ]
     return LearningLessonContract(
@@ -188,7 +184,7 @@ def sectionContractGaps(section: LearningSectionContract) -> list[str]:
         gaps.append("explanation")
     if not section.tips:
         gaps.append("tips")
-    if not section.snippet:
+    if not section.snippet and section.assessmentMode not in {"mastery", "transfer", "retrieval"}:
         gaps.append("snippet")
     if not section.exercise.prompt:
         gaps.append("exercise.prompt")
@@ -199,7 +195,13 @@ def sectionContractGaps(section: LearningSectionContract) -> list[str]:
     return gaps
 
 
-def _sectionContract(section: dict[str, Any], index: int) -> LearningSectionContract:
+def _sectionContract(
+    section: dict[str, Any],
+    index: int,
+    *,
+    lessonOutcomeIds: list[str] | None = None,
+    sectionOutcomeIds: dict[str, list[str]] | None = None,
+) -> LearningSectionContract:
     blocks = _arrayOfMaps(section.get("blocks"))
     directExercise = _exerciseContract(section.get("exercise"))
     inferredExercise = _firstExerciseFromBlocks(blocks)
@@ -208,8 +210,11 @@ def _sectionContract(section: dict[str, Any], index: int) -> LearningSectionCont
         exercise = exercise.model_copy(update={"solution": exercise.starterCode})
     check = _checkMap(section.get("check")) or exercise.check
     reflection = _reflectionContract(section.get("reflection"))
+    sectionId = _textValue(section.get("id")) or f"section-{index}"
+    directOutcomeIds = _uniqueTextList(section.get("outcomeIds") or section.get("outcomes"))
+    mappedOutcomeIds = (sectionOutcomeIds or {}).get(sectionId, [])
     contract = LearningSectionContract(
-        id=_textValue(section.get("id")) or f"section-{index}",
+        id=sectionId,
         title=_textValue(section.get("title")) or f"{index}단계",
         subtitle=_textValue(section.get("subtitle")),
         goal=_textValue(section.get("goal") or section.get("study") or section.get("objective")),
@@ -222,6 +227,11 @@ def _sectionContract(section: dict[str, Any], index: int) -> LearningSectionCont
         check=check,
         reflection=reflection,
         rawBlocks=blocks,
+        assessmentMode=_textValue(section.get("assessmentMode") or section.get("mode")),
+        sourceSectionIds=_uniqueTextList(section.get("sourceSectionIds")),
+        unseen=section.get("unseen") is True,
+        minimumDelayHours=_nonNegativeInteger(section.get("minimumDelayHours")),
+        outcomeIds=directOutcomeIds or mappedOutcomeIds or list(lessonOutcomeIds or []),
     )
     if not sectionHasStructuredFields(section):
         return contract
@@ -239,7 +249,6 @@ def _exerciseContract(value: Any) -> LearningExerciseContract:
         check=check,
         hints=_uniqueTextList(value.get("hints") or value.get("tips")),
         difficulty=_textValue(value.get("difficulty")) or "easy",
-        predict=_predictContract(value.get("predict")),
         variations=_variationsContract(value.get("variations")),
     )
 
@@ -268,18 +277,6 @@ def _reflectionContract(value: Any) -> LearningReflectionContract:
         prompt=_textValue(value.get("prompt") or value.get("question")),
         expectedKeywords=_uniqueTextList(value.get("expectedKeywords") or value.get("keywords")),
         aiFollowup=_textValue(value.get("aiFollowup") or value.get("followup")),
-    )
-
-
-def _predictContract(value: Any) -> LearningPredictContract:
-    if not isinstance(value, dict):
-        return LearningPredictContract()
-    return LearningPredictContract(
-        prompt=_textValue(value.get("prompt") or value.get("question")),
-        expectedShape=_textValue(value.get("expectedShape") or value.get("shape")),
-        expectedDtype=_textValue(value.get("expectedDtype") or value.get("dtype") or value.get("type")),
-        expectedValue=_textValue(value.get("expectedValue") or value.get("value") or value.get("result")),
-        expectedError=_textValue(value.get("expectedError") or value.get("error") or value.get("errorClass")),
     )
 
 
@@ -357,6 +354,8 @@ _CHECK_PRESERVE_KEYS = frozenset({
 
 def _checkMap(value: Any) -> dict[str, Any]:
     if isinstance(value, dict):
+        if value.get("version") == 1 and value.get("kind") and value.get("strength"):
+            return {str(key): item for key, item in value.items() if item is not None}
         result: dict[str, Any] = {}
         for key, item in value.items():
             keyStr = str(key)
@@ -461,3 +460,10 @@ def _textValue(value: Any) -> str:
     if isinstance(value, int | float | bool):
         return str(value)
     return ""
+
+
+def _nonNegativeInteger(value: Any) -> int:
+    try:
+        return max(0, int(value or 0))
+    except (TypeError, ValueError):
+        return 0

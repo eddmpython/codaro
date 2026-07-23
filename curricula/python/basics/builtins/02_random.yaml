@@ -327,3 +327,280 @@ sections:
     type: noError
     noError: random 모듈 종합 복습에서 `floatNum` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: random 모듈 종합 복습 실행 뒤 `floatNum` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 02_random-draw-ticket-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - basic_random
+    - seed_control
+    - practice
+    title: 시드로 재현 가능한 번호 뽑기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: random.Random(seed)를 사용해 범위 안 정수를 재현 가능하게 반환한다.
+    why: 테스트 가능한 무작위 코드는 전역 random 상태가 아니라 전용 Random 객체와 seed를 함께 써야 합니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 seed와 범위로 다시 호출합니다.
+    tips:
+    - random.seed 대신 random.Random(seed)로 함수 안 전용 생성기를 만드세요.
+    - randint는 양 끝값을 모두 포함합니다.
+    exercise:
+      prompt: draw_ticket(seed, low, high)가 주어진 seed와 범위에서 재현 가능한 정수 하나를 반환하도록 완성하세요.
+      starterCode: |-
+        import random
+
+        def draw_ticket(seed, low, high):
+            raise NotImplementedError
+      solution: |-
+        import random
+
+        def draw_ticket(seed, low, high):
+            rng = random.Random(seed)
+            return rng.randint(low, high)
+      hints:
+      - 함수 안에서 rng = random.Random(seed)를 먼저 만드세요.
+      - low와 high를 하드코딩하면 다른 case에서 실패합니다.
+    check:
+      id: python.builtins.random.draw-ticket.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.random.draw-ticket.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: draw_ticket
+        cases:
+        - id: small-range
+          arguments:
+          - value: 7
+          - value: 1
+          - value: 10
+          expectedReturn: 6
+        - id: large-range
+          arguments:
+          - value: 2026
+          - value: 100
+          - value: 999
+          expectedReturn: 221
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 02_random-split-groups-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - 02_random-draw-ticket-mastery
+    title: 원본을 보존하며 실험군 나누기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 전용 Random 객체와 shuffle을 조합해 재현 가능한 control, variant 그룹을 만든다.
+    why: 샘플링 자동화는 결과 재현성과 원본 보존을 동시에 만족해야 신뢰할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 예시가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 입력 목록을 그대로 섞지 말고 복사본을 만든 뒤 shuffle 하세요.
+    - 각 그룹은 비교하기 쉽도록 정렬해서 반환하세요.
+    exercise:
+      prompt: split_experiment_groups(user_ids, seed)가 control, variant, originalUnchanged를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        import random
+
+        def split_experiment_groups(user_ids, seed):
+            raise NotImplementedError
+      solution: |-
+        import random
+
+        def split_experiment_groups(user_ids, seed):
+            rng = random.Random(seed)
+            shuffled = list(user_ids)
+            rng.shuffle(shuffled)
+            midpoint = len(shuffled) // 2
+            return {
+                "control": sorted(shuffled[:midpoint]),
+                "variant": sorted(shuffled[midpoint:]),
+                "originalUnchanged": list(user_ids),
+            }
+      hints:
+      - midpoint는 len(shuffled) // 2로 계산하세요.
+      - originalUnchanged는 함수가 받은 순서를 그대로 보여주는 안전장치입니다.
+    check:
+      id: python.builtins.random.split-groups.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.random.split-groups.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: split_experiment_groups
+        cases:
+        - id: four-users
+          arguments:
+          - value:
+            - u1
+            - u2
+            - u3
+            - u4
+          - value: 11
+          expectedReturn:
+            control:
+            - u1
+            - u2
+            variant:
+            - u3
+            - u4
+            originalUnchanged:
+            - u1
+            - u2
+            - u3
+            - u4
+        - id: six-users
+          arguments:
+          - value:
+            - a
+            - b
+            - c
+            - d
+            - e
+            - f
+          - value: 5
+          expectedReturn:
+            control:
+            - a
+            - b
+            - d
+            variant:
+            - c
+            - e
+            - f
+            originalUnchanged:
+            - a
+            - b
+            - c
+            - d
+            - e
+            - f
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 02_random-sample-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 02_random-split-groups-transfer
+    title: 중복 없는 샘플링 조건 다시 구성하기
+    subtitle: 하루 뒤 기억에서 재구성
+    goal: random.sample의 크기 제약을 기억에서 복원하고 불가능한 요청은 ValueError로 거부한다.
+    why: 시간이 지난 뒤에도 표본 수와 모집단 크기 관계를 지켜야 무작위 추출 자동화가 조용히 틀어지지 않습니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - sample은 중복 없이 뽑으므로 count가 전체 개수보다 크면 실패해야 합니다.
+    - 검사 결과를 안정적으로 비교하려면 뽑은 뒤 정렬하세요.
+    exercise:
+      prompt: pick_without_replacement(items, count, seed)가 중복 없는 정렬 샘플을 반환하고 count가 너무 크면 ValueError를 일으키도록 완성하세요.
+      starterCode: |-
+        import random
+
+        def pick_without_replacement(items, count, seed):
+            raise NotImplementedError
+      solution: |-
+        import random
+
+        def pick_without_replacement(items, count, seed):
+            if count > len(items):
+                raise ValueError("count cannot exceed item count")
+            rng = random.Random(seed)
+            return sorted(rng.sample(list(items), count))
+      hints:
+      - random.sample(list(items), count)를 사용하세요.
+      - count 오류를 무시하고 가능한 만큼만 반환하면 검증이 통과하지 않습니다.
+    check:
+      id: python.builtins.random.sample.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.random.sample.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: pick_without_replacement
+        cases:
+        - id: colors
+          arguments:
+          - value:
+            - red
+            - blue
+            - green
+            - yellow
+          - value: 2
+          - value: 3
+          expectedReturn:
+          - blue
+          - green
+        - id: numbers
+          arguments:
+          - value:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+          - value: 3
+          - value: 9
+          expectedReturn:
+          - 2
+          - 3
+          - 4
+        - id: rejects-oversize
+          arguments:
+          - value:
+            - only
+          - value: 2
+          - value: 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

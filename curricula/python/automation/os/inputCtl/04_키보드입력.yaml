@@ -263,3 +263,302 @@ sections:
     check:
       noError: planKeyboardSequence 호출이 끝나야 한다.
       resultCheck: skipped 리스트가 유효하지 않은 키를 담고 sequence가 enter press로 시작해야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: inputCtl_04-keyboard-sequence-plan-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - keyboard-keys
+    - input-plan
+    title: 텍스트 입력과 hotkey를 분리한 keyboard sequence 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: plain text·key press·hotkey를 typed action으로 구성하고 금지 chord를 차단한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 문자열과 special key, hotkey를 같은 `write` 호출로 섞지 마세요.
+    - 앱 종료·시스템 전환 chord는 명시적 blocklist로 차단하세요.
+    exercise:
+      prompt: plan_keyboard_sequence(items, blocked_hotkeys)를 완성하세요.
+      starterCode: |-
+        def plan_keyboard_sequence(items, blocked_hotkeys):
+            raise NotImplementedError
+      solution: |
+        def plan_keyboard_sequence(items, blocked_hotkeys):
+            blocked = {tuple(keys) for keys in blocked_hotkeys}
+            actions = []
+            rejected = []
+            for index, item in enumerate(items):
+                if item["kind"] == "text":
+                    actions.append({"kind": "write", "text": item["value"]})
+                elif item["kind"] == "key":
+                    actions.append({"kind": "press", "key": item["value"]})
+                elif item["kind"] == "hotkey":
+                    keys = tuple(item["keys"])
+                    if keys in blocked:
+                        rejected.append({"index": index, "reason": "blocked-hotkey"})
+                    else:
+                        actions.append({"kind": "hotkey", "keys": list(keys)})
+                else:
+                    rejected.append({"index": index, "reason": "unknown-kind"})
+            return {"ready": not rejected, "actions": actions, "rejected": rejected}
+      hints: *id001
+    check:
+      id: python.inputctl.inputCtl_04.keyboard-sequence-plan.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_04.keyboard-sequence-plan.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_keyboard_sequence
+        cases:
+        - id: plans-text-key-and-hotkey
+          arguments:
+          - value:
+            - kind: text
+              value: hello
+            - kind: key
+              value: enter
+            - kind: hotkey
+              keys:
+              - ctrl
+              - s
+          - value: []
+          expectedReturn:
+            ready: true
+            actions:
+            - kind: write
+              text: hello
+            - kind: press
+              key: enter
+            - kind: hotkey
+              keys:
+              - ctrl
+              - s
+            rejected: []
+        - id: rejects-blocked-hotkey
+          arguments:
+          - value:
+            - kind: hotkey
+              keys:
+              - alt
+              - f4
+          - value:
+            - - alt
+              - f4
+          expectedReturn:
+            ready: false
+            actions: []
+            rejected:
+            - index: 0
+              reason: blocked-hotkey
+        - id: rejects-unknown-kind
+          arguments:
+          - value:
+            - kind: macro
+          - value: []
+          expectedReturn:
+            ready: false
+            actions: []
+            rejected:
+            - index: 0
+              reason: unknown-kind
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: inputCtl_04-keyboard-focus-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inputCtl_04-keyboard-sequence-plan-mastery
+    title: 새 키보드 입력에 focus·value 변화 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: planned field와 실제 focus, 입력 전후 value를 비교한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 입력 직전에 실제 focus field identity를 확인하세요.
+    - 비밀번호는 value 대신 길이와 redacted marker만 evidence에 남기세요.
+    exercise:
+      prompt: audit_keyboard_focus(observation, secret_input)를 완성하세요.
+      starterCode: |-
+        def audit_keyboard_focus(observation, secret_input):
+            raise NotImplementedError
+      solution: |
+        def audit_keyboard_focus(observation, secret_input):
+            failures = []
+            if observation.get("plannedField") != observation.get("focusedField"):
+                failures.append("focus")
+            if observation.get("beforeValue") == observation.get("afterValue"):
+                failures.append("no-value-change")
+            if observation.get("expectedLength") != observation.get("observedLength"):
+                failures.append("length")
+            return {"passed": not failures, "failures": failures, "recordedValue": "[REDACTED]" if secret_input else observation.get("afterValue")}
+      hints: *id002
+    check:
+      id: python.inputctl.inputCtl_04.keyboard-focus-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_04.keyboard-focus-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_keyboard_focus
+        cases:
+        - id: accepts-focused-text-change
+          arguments:
+          - value:
+              plannedField: query
+              focusedField: query
+              beforeValue: ''
+              afterValue: hello
+              expectedLength: 5
+              observedLength: 5
+          - value: false
+          expectedReturn:
+            passed: true
+            failures: []
+            recordedValue: hello
+        - id: reports-wrong-focus-and-length
+          arguments:
+          - value:
+              plannedField: email
+              focusedField: search
+              beforeValue: ''
+              afterValue: abc
+              expectedLength: 5
+              observedLength: 3
+          - value: false
+          expectedReturn:
+            passed: false
+            failures:
+            - focus
+            - length
+            recordedValue: abc
+        - id: redacts-secret-value
+          arguments:
+          - value:
+              plannedField: password
+              focusedField: password
+              beforeValue: ''
+              afterValue: secret
+              expectedLength: 6
+              observedLength: 6
+          - value: true
+          expectedReturn:
+            passed: true
+            failures: []
+            recordedValue: '[REDACTED]'
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: inputCtl_04-keyboard-input-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inputCtl_04-keyboard-focus-audit-transfer
+    title: 키보드 자동화 안전 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: text·special key·secret 입력 증거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 입력 자동화 action 전에 대상·경계·중단 방법을 검증하세요.
+    - 화면 변화와 E-Stop evidence를 남기고 성공을 클릭 발생으로 판단하지 마세요.
+    exercise:
+      prompt: choose_keyboard_input(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_keyboard_input(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_keyboard_input(situation):
+            table = {'text': {'action': 'verify focus then write', 'evidence': 'field and length change', 'risk': 'wrong focus'}, 'hotkey': {'action': 'allowlist chord', 'evidence': 'typed key sequence', 'risk': 'system shortcut'}, 'secret': {'action': 'use approved secret input', 'evidence': 'redacted length only', 'risk': 'clipboard or log leakage'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.inputctl.inputCtl_04.keyboard-input-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_04.keyboard-input-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_keyboard_input
+        cases:
+        - id: recalls-text
+          arguments:
+          - value: text
+          expectedReturn:
+            action: verify focus then write
+            evidence: field and length change
+            risk: wrong focus
+        - id: recalls-hotkey
+          arguments:
+          - value: hotkey
+          expectedReturn:
+            action: allowlist chord
+            evidence: typed key sequence
+            risk: system shortcut
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

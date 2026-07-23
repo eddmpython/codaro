@@ -357,3 +357,275 @@ sections:
     check:
       noError: 종합 정리 함수 호출과 dict 반환이 한 흐름에서 끝나야 한다.
       resultCheck: summary가 progress와 returncode 두 키를 모두 갖고 자동화 표준 형태와 일치해야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: procCtl_04-stream-line-framing-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - popen-context
+    - streaming-summary
+    title: stream chunk를 줄 단위 record로 안전하게 조립하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: chunk 경계에 걸린 UTF-8 text를 buffer에 보존하고 완성 줄만 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - read chunk 하나를 log line 하나로 가정하지 마세요.
+    - 마지막 newline이 없는 remainder를 성공 line처럼 확정하지 마세요.
+    exercise:
+      prompt: frame_stream_lines(chunks)를 완성하세요.
+      starterCode: |-
+        def frame_stream_lines(chunks):
+            raise NotImplementedError
+      solution: |
+        def frame_stream_lines(chunks):
+            buffer = ""
+            lines = []
+            for chunk in chunks:
+                buffer += chunk
+                parts = buffer.split("\n")
+                lines.extend(parts[:-1])
+                buffer = parts[-1]
+            return {"lines": lines, "remainder": buffer, "lineCount": len(lines)}
+      hints: *id001
+    check:
+      id: python.procctl.procCtl_04.stream-line-framing.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_04.stream-line-framing.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: frame_stream_lines
+        cases:
+        - id: joins-split-lines
+          arguments:
+          - value:
+            - hel
+            - 'lo
+
+              wor'
+            - 'ld
+
+              '
+          expectedReturn:
+            lines:
+            - hello
+            - world
+            remainder: ''
+            lineCount: 2
+        - id: keeps-final-remainder
+          arguments:
+          - value:
+            - 'a
+
+              b'
+          expectedReturn:
+            lines:
+            - a
+            remainder: b
+            lineCount: 1
+        - id: handles-empty-chunks
+          arguments:
+          - value: []
+          expectedReturn:
+            lines: []
+            remainder: ''
+            lineCount: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: procCtl_04-stream-backpressure-plan-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - procCtl_04-stream-line-framing-mastery
+    title: 새 process stream에 buffer 제한 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: producer·consumer rate와 최대 buffer로 pause·drop 금지 정책을 판정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - stdout가 빠르다는 이유로 줄을 버리지 말고 producer를 제어하세요.
+    - 현재 buffer와 다음 interval 성장량을 함께 계산하세요.
+    exercise:
+      prompt: plan_stream_backpressure(producer_rate, consumer_rate, current_buffer, maximum_buffer)를 완성하세요.
+      starterCode: |-
+        def plan_stream_backpressure(producer_rate, consumer_rate, current_buffer, maximum_buffer):
+            raise NotImplementedError
+      solution: |
+        def plan_stream_backpressure(producer_rate, consumer_rate, current_buffer, maximum_buffer):
+            if min(producer_rate, consumer_rate, current_buffer, maximum_buffer) < 0 or maximum_buffer == 0:
+                raise ValueError("invalid stream rates")
+            growth = max(0, producer_rate - consumer_rate)
+            projected = current_buffer + growth
+            if projected > maximum_buffer:
+                action = "pause-producer"
+            elif projected > maximum_buffer * 0.8:
+                action = "drain-priority"
+            else:
+                action = "continue"
+            return {"action": action, "projectedBuffer": projected, "growth": growth, "dropAllowed": False}
+      hints: *id002
+    check:
+      id: python.procctl.procCtl_04.stream-backpressure-plan.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_04.stream-backpressure-plan.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_stream_backpressure
+        cases:
+        - id: continues-balanced-stream
+          arguments:
+          - value: 10
+          - value: 10
+          - value: 20
+          - value: 100
+          expectedReturn:
+            action: continue
+            projectedBuffer: 20
+            growth: 0
+            dropAllowed: false
+        - id: prioritizes-near-limit-drain
+          arguments:
+          - value: 20
+          - value: 10
+          - value: 75
+          - value: 100
+          expectedReturn:
+            action: drain-priority
+            projectedBuffer: 85
+            growth: 10
+            dropAllowed: false
+        - id: pauses-over-limit-producer
+          arguments:
+          - value: 50
+          - value: 10
+          - value: 80
+          - value: 100
+          expectedReturn:
+            action: pause-producer
+            projectedBuffer: 120
+            growth: 40
+            dropAllowed: false
+        - id: rejects-zero-buffer
+          arguments:
+          - value: 1
+          - value: 1
+          - value: 0
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: procCtl_04-streaming-process-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - procCtl_04-stream-backpressure-plan-transfer
+    title: process streaming 경계 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: chunk framing·stderr 분리·backpressure 증거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - process 실행 성공과 업무 결과물 성공을 같은 것으로 처리하지 마세요.
+    - 명령 identity·제한 시간·산출물 evidence·남는 risk를 함께 기록하세요.
+    exercise:
+      prompt: choose_streaming_policy(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_streaming_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_streaming_policy(situation):
+            table = {'framing': {'action': 'buffer until newline', 'evidence': 'complete lines and remainder', 'risk': 'split record'}, 'channels': {'action': 'tag stdout and stderr separately', 'evidence': 'channel timestamp sequence', 'risk': 'lost ordering'}, 'pressure': {'action': 'bound buffer and pause producer', 'evidence': 'rates and buffer size', 'risk': 'silent drop'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.procctl.procCtl_04.streaming-process-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_04.streaming-process-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_streaming_policy
+        cases:
+        - id: recalls-framing
+          arguments:
+          - value: framing
+          expectedReturn:
+            action: buffer until newline
+            evidence: complete lines and remainder
+            risk: split record
+        - id: recalls-channels
+          arguments:
+          - value: channels
+          expectedReturn:
+            action: tag stdout and stderr separately
+            evidence: channel timestamp sequence
+            risk: lost ordering
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

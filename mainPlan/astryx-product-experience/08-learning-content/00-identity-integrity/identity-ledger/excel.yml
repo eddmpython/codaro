@@ -1,0 +1,19 @@
+schemaVersion: 1
+category: "excel"
+sourceCount: 3
+lessons:
+  - lessonRef: "excel/01_xlwings란"
+    sourcePath: "curricula/python/automation/office/excel/01_xlwings란.yaml"
+    metaId: "excel_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "excel/02_xlwings설치"
+    sourcePath: "curricula/python/automation/office/excel/02_xlwings설치.yaml"
+    metaId: "excel_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "excel/03_xlwingsLite"
+    sourcePath: "curricula/python/automation/office/excel/03_xlwingsLite.yaml"
+    metaId: "excel_03"
+    registryStatus: registered
+    reviewStatus: pending

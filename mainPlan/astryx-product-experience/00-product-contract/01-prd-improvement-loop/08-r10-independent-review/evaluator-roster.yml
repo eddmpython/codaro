@@ -1,0 +1,37 @@
+schemaVersion: 1
+roundId: R10
+roundState: blocked
+roundEligible: false
+slots:
+  learning:
+    evaluatorId: null
+    expertiseEvidence: null
+    remediationParticipation: unknown
+    priorRoundParticipation: unknown
+    conflictOfInterest: unknown
+    availability: null
+    signedAt: null
+    eligible: false
+  ux:
+    evaluatorId: null
+    expertiseEvidence: null
+    remediationParticipation: unknown
+    priorRoundParticipation: unknown
+    conflictOfInterest: unknown
+    availability: null
+    signedAt: null
+    eligible: false
+  architecture:
+    evaluatorId: null
+    expertiseEvidence: null
+    remediationParticipation: unknown
+    priorRoundParticipation: unknown
+    conflictOfInterest: unknown
+    availability: null
+    signedAt: null
+    eligible: false
+blockingReasons:
+  - learning evaluator is unassigned
+  - ux evaluator is unassigned
+  - architecture evaluator is unassigned
+  - remediation authors and prior-round evaluators are ineligible

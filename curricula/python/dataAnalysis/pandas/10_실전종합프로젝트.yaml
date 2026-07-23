@@ -7,6 +7,9 @@ meta:
   category: pandas
   difficulty: ⭐⭐⭐⭐⭐
   badge: 심화
+  outcomes: ["pandas.report"]
+  prerequisites: ["pandas.aggregate","pandas.merge"]
+  estimatedMinutes: 90
   tags:
   - 실전
   - API
@@ -821,3 +824,322 @@ sections:
       준비가 되었습니다. 공공데이터포털, Kaggle 등에서 데이터를 찾아 분석해보세요!
   goal: 정리에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
   why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pandas_10-analysis-report-pipeline-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_api_concept
+    - summary
+    title: 판매 레코드를 정제·집계해 보고서 계약 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 유효 행과 거절 행을 분리하고 카테고리 합계와 최고 카테고리를 하나의 결과로 만든다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 반환 집계와 별개로 각 sourceIndex의 채택 상태와 거절 이유를 CSV에 보존하세요.
+    - 빈 입력도 header가 있는 empty-report.csv를 남겨 무산출과 0건 결과를 구분하세요.
+    exercise:
+      prompt: build_sales_report(rows, output_path)를 완성해 acceptedCount, rejectedIndexes, totals, leader를 반환하세요. output_path에는
+        sourceIndex, status, category, amount, reason 열로 모든 입력 행의 채택·거절 근거를 CSV로 저장하세요.
+      starterCode: |-
+        def build_sales_report(rows, output_path=None):
+            raise NotImplementedError
+      solution: |
+        import csv
+        from pathlib import Path
+
+
+        def build_sales_report(rows, output_path=None):
+            totals = {}
+            rejected = []
+            accepted = 0
+            artifact_rows = []
+            for index, row in enumerate(rows):
+                if not row.get("category") or not isinstance(row.get("amount"), (int, float)) or isinstance(row.get("amount"), bool) or row["amount"] < 0:
+                    rejected.append(index)
+                    artifact_rows.append({
+                        "sourceIndex": index,
+                        "status": "rejected",
+                        "category": row.get("category"),
+                        "amount": row.get("amount"),
+                        "reason": "category-or-nonnegative-amount",
+                    })
+                    continue
+                accepted += 1
+                totals[row["category"]] = totals.get(row["category"], 0) + row["amount"]
+                artifact_rows.append({
+                    "sourceIndex": index,
+                    "status": "accepted",
+                    "category": row["category"],
+                    "amount": row["amount"],
+                    "reason": "",
+                })
+            ordered = {key: totals[key] for key in sorted(totals)}
+            leader = max(totals, key=lambda key: (totals[key], key)) if totals else None
+            result = {"acceptedCount": accepted, "rejectedIndexes": rejected, "totals": ordered, "leader": leader}
+            output_path = Path(output_path or ("output/sales-report.csv" if ordered else "output/empty-report.csv"))
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            columns = ["sourceIndex", "status", "category", "amount", "reason"]
+            with output_path.open("w", encoding="utf-8", newline="") as stream:
+                writer = csv.DictWriter(stream, fieldnames=columns)
+                writer.writeheader()
+                writer.writerows(artifact_rows)
+            return result
+      hints: *id001
+    check:
+      id: python.pandas.pandas_10.analysis-report-pipeline.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_10.analysis-report-pipeline.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_sales_report
+        cases:
+        - id: builds-auditable-report
+          arguments:
+          - value:
+            - category: book
+              amount: 10
+            - category: music
+              amount: 20
+            - category: book
+              amount: 5
+            - category: ''
+              amount: 8
+            - category: music
+              amount: bad
+          - value: output/sales-report.csv
+          expectedReturn:
+            acceptedCount: 3
+            rejectedIndexes:
+            - 3
+            - 4
+            totals:
+              book: 15
+              music: 20
+            leader: music
+        - id: reports-no-valid-rows
+          arguments:
+          - value: []
+          - value: output/empty-report.csv
+          expectedReturn:
+            acceptedCount: 0
+            rejectedIndexes: []
+            totals: {}
+            leader: null
+        expectedPaths:
+        - path: output/sales-report.csv
+          kind: table
+          origin: created
+          format: csv
+          columns:
+          - sourceIndex
+          - status
+          - category
+          - amount
+          - reason
+        - path: output/empty-report.csv
+          kind: table
+          origin: created
+          format: csv
+          columns:
+          - sourceIndex
+          - status
+          - category
+          - amount
+          - reason
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pandas_10-configurable-group-report-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_10-analysis-report-pipeline-mastery
+    title: 새 비용 데이터에 재사용 가능한 그룹 보고서 적용하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 판매 전용 파이프라인을 그룹 열·값 열·최소값이 다른 보고서로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 업무 열 이름을 함수 안에 하드코딩하지 마세요.
+    - 제외 건수를 별도로 계산해 필터 조건의 영향을 드러내세요.
+    exercise:
+      prompt: group_report(rows, group_key, value_key, minimum)를 완성해 groups, includedCount, excludedCount를 반환하세요.
+      starterCode: |-
+        def group_report(rows, group_key, value_key, minimum):
+            raise NotImplementedError
+      solution: |
+        def group_report(rows, group_key, value_key, minimum):
+            groups = {}
+            included = 0
+            for row in rows:
+                value = row.get(value_key)
+                if not isinstance(value, (int, float)) or isinstance(value, bool) or value < minimum:
+                    continue
+                included += 1
+                groups[str(row[group_key])] = groups.get(str(row[group_key]), 0) + value
+            return {
+                "groups": {key: groups[key] for key in sorted(groups)},
+                "includedCount": included,
+                "excludedCount": len(rows) - included,
+            }
+      hints: *id002
+    check:
+      id: python.pandas.pandas_10.configurable-group-report.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_10.configurable-group-report.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: group_report
+        cases:
+        - id: reuses-report-contract
+          arguments:
+          - value:
+            - team: A
+              cost: 5
+            - team: A
+              cost: 20
+            - team: B
+              cost: 30
+            - team: B
+              cost: null
+          - value: team
+          - value: cost
+          - value: 10
+          expectedReturn:
+            groups:
+              A: 20
+              B: 30
+            includedCount: 2
+            excludedCount: 2
+        - id: handles-empty-report
+          arguments:
+          - value: []
+          - value: team
+          - value: cost
+          - value: 0
+          expectedReturn:
+            groups: {}
+            includedCount: 0
+            excludedCount: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pandas_10-report-evidence-contract-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_10-configurable-group-report-transfer
+    title: 재현 가능한 분석 보고서의 필수 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 단계별로 필요한 입력, 변환, 결과 증거와 누락 위험을 선택한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 보고서는 최종 숫자만이 아니라 입력과 변환 근거를 함께 보존해야 합니다.
+    - 파일을 썼다는 사실보다 다시 읽어 계약을 검증한 증거가 강합니다.
+    exercise:
+      prompt: choose_report_evidence(stage)를 완성해 evidence, check, risk를 반환하세요.
+      starterCode: |-
+        def choose_report_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_report_evidence(stage):
+            table = {
+                "input": {"evidence": "schema and row count", "check": "required columns and types", "risk": "silent source drift"},
+                "transform": {"evidence": "rule and rejected rows", "check": "before and after counts", "risk": "hidden data loss"},
+                "aggregate": {"evidence": "group key and metric", "check": "recomputed totals", "risk": "wrong denominator"},
+                "export": {"evidence": "artifact hash and schema", "check": "read-back validation", "risk": "corrupt report"},
+            }
+            if stage not in table:
+                raise ValueError("unknown report stage")
+            return table[stage]
+      hints: *id003
+    check:
+      id: python.pandas.pandas_10.report-evidence-contract.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_10.report-evidence-contract.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_report_evidence
+        cases:
+        - id: recalls-transform-evidence
+          arguments:
+          - value: transform
+          expectedReturn:
+            evidence: rule and rejected rows
+            check: before and after counts
+            risk: hidden data loss
+        - id: recalls-export-readback
+          arguments:
+          - value: export
+          expectedReturn:
+            evidence: artifact hash and schema
+            check: read-back validation
+            risk: corrupt report
+        - id: rejects-decoration-stage
+          arguments:
+          - value: make-pretty
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

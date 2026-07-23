@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codaro.dev/contracts/learningEvent.schema.json",
+  "title": "Codaro LearningEvent",
+  "oneOf": [
+    { "$ref": "#/$defs/RunObserved" },
+    { "$ref": "#/$defs/CheckEvaluated" },
+    { "$ref": "#/$defs/SupportProvided" },
+    { "$ref": "#/$defs/CreditGranted" },
+    { "$ref": "#/$defs/MigrationImported" },
+    { "$ref": "#/$defs/EvidenceTombstoned" }
+  ],
+  "$defs": {
+    "DecimalCounter": { "type": "string", "pattern": "^(0|[1-9][0-9]*)$" },
+    "Hash": { "type": "string", "pattern": "^sha256-(?:[0-9a-f]{64}|[A-Za-z0-9_-]{43}|[A-Za-z0-9+/]{43}=)$" },
+    "EpochRefs": {
+      "type": "object",
+      "required": ["global"],
+      "properties": {
+        "global": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "lesson": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "Envelope": {
+      "type": "object",
+      "required": [
+        "schemaVersion",
+        "eventId",
+        "kind",
+        "occurredAt",
+        "payloadHash",
+        "learningEpoch",
+        "epochRefByScope",
+        "deviceId",
+        "deviceSequence",
+        "lamport"
+      ],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "eventId": { "type": "string", "minLength": 1 },
+        "kind": { "type": "string" },
+        "occurredAt": { "type": "string", "format": "date-time" },
+        "payloadHash": { "$ref": "#/$defs/Hash" },
+        "learningEpoch": { "type": "string", "minLength": 1 },
+        "epochRefByScope": { "$ref": "#/$defs/EpochRefs" },
+        "deviceId": { "type": "string", "minLength": 1 },
+        "deviceSequence": { "$ref": "#/$defs/DecimalCounter" },
+        "lamport": { "$ref": "#/$defs/DecimalCounter" }
+      }
+    },
+    "RunContext": {
+      "type": "object",
+      "required": [
+        "attemptId",
+        "runId",
+        "lessonRef",
+        "sectionId",
+        "outcomeIds",
+        "taskVariantId",
+        "lessonContentHash",
+        "sourceCodeHash",
+        "checkSpecId",
+        "checkSpecVersion",
+        "checkEngineVersion",
+        "masteryPolicyVersion",
+        "fixtureHash",
+        "tierUsed",
+        "runtimeId",
+        "runtimeVersion",
+        "packageSetHash"
+      ],
+      "properties": {
+        "attemptId": { "type": "string", "minLength": 1 },
+        "runId": { "type": "string", "minLength": 1 },
+        "lessonRef": { "type": "string", "pattern": "^[^/]+/[^/]+$" },
+        "sectionId": { "type": "string", "minLength": 1 },
+        "outcomeIds": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "taskVariantId": { "type": "string", "minLength": 1 },
+        "lessonContentHash": { "$ref": "#/$defs/Hash" },
+        "sourceCodeHash": { "$ref": "#/$defs/Hash" },
+        "checkSpecId": { "type": "string", "minLength": 1 },
+        "checkSpecVersion": { "type": "string", "minLength": 1 },
+        "checkEngineVersion": { "type": "string", "minLength": 1 },
+        "masteryPolicyVersion": { "const": 1 },
+        "fixtureHash": { "$ref": "#/$defs/Hash" },
+        "tierUsed": { "enum": ["browser", "local"] },
+        "runtimeId": { "type": "string", "minLength": 1 },
+        "runtimeVersion": { "type": "string", "minLength": 1 },
+        "packageSetHash": { "$ref": "#/$defs/Hash" }
+      },
+      "additionalProperties": false
+    },
+    "CreditSlice": {
+      "type": "object",
+      "required": ["outcomeId", "creditMode", "preAttemptState"],
+      "properties": {
+        "outcomeId": { "type": "string", "minLength": 1 },
+        "creditMode": { "enum": ["acquisition", "reinforcement", "transfer", "retrieval", "capstone"] },
+        "preAttemptState": { "enum": ["unproven", "practicing", "independent", "transfer", "mastered", "reviewDue"] }
+      },
+      "additionalProperties": false
+    },
+    "RunObserved": {
+      "allOf": [
+        { "$ref": "#/$defs/Envelope" },
+        {
+          "type": "object",
+          "required": ["runContext", "startedAt", "completedAt", "runStatus"],
+          "properties": {
+            "kind": { "const": "RunObserved" },
+            "runContext": { "$ref": "#/$defs/RunContext" },
+            "startedAt": { "type": "string", "format": "date-time" },
+            "completedAt": { "type": "string", "format": "date-time" },
+            "runStatus": { "enum": ["success", "error", "stopped", "timeout"] },
+            "stdout": { "type": "string" },
+            "stderr": { "type": "string" },
+            "exception": { "type": ["object", "null"] },
+            "artifactDescriptors": { "type": "array", "items": { "type": "object" } }
+          }
+        }
+      ]
+    },
+    "CheckEvaluated": {
+      "allOf": [
+        { "$ref": "#/$defs/Envelope" },
+        {
+          "type": "object",
+          "required": ["runEventId", "checkId", "strength", "passed", "assessmentMode", "unseen", "errorClass", "recommendedHintLevel"],
+          "properties": {
+            "kind": { "const": "CheckEvaluated" },
+            "runEventId": { "type": "string", "minLength": 1 },
+            "checkId": { "type": "string", "minLength": 1 },
+            "strength": { "enum": ["weak", "strong"] },
+            "passed": { "type": "boolean" },
+            "assessmentMode": { "enum": ["acquisition", "reinforcement", "transfer", "retrieval", "capstone"] },
+            "unseen": { "type": "boolean" },
+            "errorClass": { "type": "string" },
+            "recommendedHintLevel": { "type": "integer", "minimum": 0 }
+          }
+        }
+      ]
+    },
+    "SupportProvided": {
+      "allOf": [
+        { "$ref": "#/$defs/Envelope" },
+        {
+          "type": "object",
+          "required": ["runEventId", "hintLevel", "answerReveal", "supportId"],
+          "properties": {
+            "kind": { "const": "SupportProvided" },
+            "runEventId": { "type": "string", "minLength": 1 },
+            "hintLevel": { "type": "integer", "minimum": 0 },
+            "answerReveal": { "type": "boolean" },
+            "supportId": { "type": "string", "minLength": 1 }
+          }
+        }
+      ]
+    },
+    "CreditGranted": {
+      "allOf": [
+        { "$ref": "#/$defs/Envelope" },
+        {
+          "type": "object",
+          "required": ["runEventId", "checkEventIds", "supportEventIds", "attemptFingerprint", "creditSlices", "evidenceTime", "appendReceiptAt"],
+          "properties": {
+            "kind": { "const": "CreditGranted" },
+            "runEventId": { "type": "string", "minLength": 1 },
+            "checkEventIds": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1, "uniqueItems": true },
+            "supportEventIds": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+            "attemptFingerprint": { "$ref": "#/$defs/Hash" },
+            "creditSlices": { "type": "array", "items": { "$ref": "#/$defs/CreditSlice" }, "minItems": 1 },
+            "evidenceTime": { "type": "string", "format": "date-time" },
+            "appendReceiptAt": { "type": "string", "format": "date-time" }
+          }
+        }
+      ]
+    },
+    "MigrationImported": {
+      "allOf": [
+        { "$ref": "#/$defs/Envelope" },
+        {
+          "type": "object",
+          "required": ["sourceKind", "sourceRecordHash", "recordCount", "creditEligibility"],
+          "properties": {
+            "kind": { "const": "MigrationImported" },
+            "sourceKind": { "type": "string", "minLength": 1 },
+            "sourceRecordHash": { "$ref": "#/$defs/Hash" },
+            "recordCount": { "type": "integer", "minimum": 0 },
+            "creditEligibility": { "const": "none" }
+          }
+        }
+      ]
+    },
+    "EvidenceTombstoned": {
+      "allOf": [
+        { "$ref": "#/$defs/Envelope" },
+        {
+          "type": "object",
+          "required": ["scope", "parentEpoch", "newEpoch", "frontierByDevice", "revokedCreditEventIds"],
+          "properties": {
+            "kind": { "const": "EvidenceTombstoned" },
+            "scope": { "type": "string", "pattern": "^(global|path:.+|lesson:[^/]+/[^/]+)$" },
+            "parentEpoch": { "type": "string", "minLength": 1 },
+            "newEpoch": { "type": "string", "minLength": 1 },
+            "frontierByDevice": { "type": "object", "additionalProperties": { "$ref": "#/$defs/DecimalCounter" } },
+            "revokedCreditEventIds": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }
+          }
+        }
+      ]
+    }
+  }
+}

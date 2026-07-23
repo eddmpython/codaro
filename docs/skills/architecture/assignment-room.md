@@ -1,149 +1,69 @@
 ---
 id: assignment-room
-title: Assignment Room
-description: Tutor-led homework rooms for distributing curriculum YAML, joining with codes, and tracking learner progress events.
+title: Retired Assignment Room
+description: Removed classroom feature boundary, local archive migration, and one-release HTTP retirement contract.
 category: architecture
 section: learning
 order: 216
-purpose: 튜터가 YAML 숙제를 과제방으로 배포하고 학생 Codaro exe가 로컬 실행 결과를 동기화하는 제품 계약을 고정한다.
-whenToUse: 과제 배포, 학생 참가 코드, 튜터 대시보드, 학습 이벤트 동기화, 원격/relay 학습 기능을 설계하거나 구현할 때.
+purpose: 제거된 과제방 기능이 핵심 학습 흐름으로 재유입되지 않게 하고, 기존 로컬 데이터를 안전하게 보존하거나 삭제하는 이관 계약을 고정한다.
+whenToUse: classroom 참조를 발견했거나 기존 `~/.codaro/classroom` 데이터를 감사, 내보내기, 검증, 삭제해야 할 때.
 ---
 
-# Assignment Room
+# Retired Assignment Room
 
-과제방은 채팅방이 아니라 **튜터가 숙제를 배정하고 학생의 학습 이벤트를 추적하는 공간**이다. YAML 또는 share pack이 숙제 내용이고, 과제방은 그 내용을 누구에게 줬는지, 누가 풀고 있는지, 어디서 막혔는지, 어떤 피드백을 남겼는지를 유지한다.
+상태: active product feature 제거 완료, 로컬 데이터 이관만 유지
 
-Codaro의 로컬-first 원칙은 유지한다. 학생 코드는 학생 PC의 로컬 Python 커널에서 실행하고, 과제방은 실행 이벤트와 진단 신호만 동기화한다. 공동 편집, 원격 커널 조종, 태그만으로 접근하는 공개 관찰은 과제방 MVP 범위가 아니다.
+과제방은 현재 Codaro 제품과 학습 방식의 일부가 아니다. tutor room, join code, participant token, dashboard, event outbox, relay, frontend panel과 active backend 구현은 삭제했다. 새 학습 기능은 이 계약을 import하거나 hidden endpoint로 다시 연결하지 않는다.
 
-## 제품 흐름
+## 남아 있는 경계
+
+- `/api/classroom`과 모든 하위 HTTP 경로는 한 호환 release 동안 `410 Gone`만 반환한다.
+- 응답은 local-owner CLI의 audit, export, verify, purge 명령만 안내한다.
+- HTTP로 archive를 만들거나 내려받지 않는다.
+- `src/codaro/api/classroomRetirementRouter.py`는 호환 안내만 담당한다.
+- `tests/architecture/verifyClassroomRemoved.py`가 active classroom source, symbol, frontend import 재유입을 차단한다.
+
+## 로컬 데이터 이관
+
+기존 데이터는 현재 OS 사용자가 로컬 CLI로만 다룬다.
 
 ```text
-튜터가 현재 학습 YAML 또는 share pack을 연다
-→ 과제 만들기
-→ material snapshot 저장
-→ publish로 joinCode 발급
-→ 학생이 joinCode + studentTag로 참가
-→ 학생 Codaro가 material을 로컬 학습으로 연다
-→ 예측/검증/힌트/완료 이벤트를 append
-→ 튜터 dashboard가 roster, stuck, pass/fail, feedback을 갱신
+codaro classroom audit
+codaro classroom export --output <archive.zip>
+codaro classroom verify <archive.zip>
+codaro classroom purge --archive <archive.zip> --confirm-hash <sha256> --reason user
 ```
 
-## 책임 분리
+90일이 지난 검증된 archive는 `--reason expired`로 삭제할 수 있다. purge는 detached SHA-256, source manifest, schema와 source aggregate를 다시 검증하고 OS handle lock을 획득한 뒤에만 수행한다.
 
-- `share/`는 pack inspect/install/load를 맡는다.
-- `curriculum/`은 학습 카드, check, progress, learner state를 맡는다.
-- `classroom/`은 과제방, participant, event, dashboard, sync queue를 맡는다.
-- `api/classroomRouter.py`는 HTTP payload와 status code만 맡고, 판단은 `classroom/assignmentFlow.py`로 넘긴다.
-- `editor/src/components/classroom/*`는 화면만 맡고, API 호출은 `editor/src/lib/classroomOperations.ts`가 맡는다.
+## 보존과 삭제 안전성
 
-## 데이터 모델
+- archive는 versioned JSON manifest와 assignment/event row를 deterministic ZIP으로 저장한다.
+- access token, provider credential, join code와 직접 식별 필드는 보존하지 않는다.
+- participant와 표시 이름은 archive마다 새로 만든 HMAC key로 가명화하며 key 자체는 archive에 쓰지 않는다.
+- email, 절대 경로와 명백한 secret은 payload에서 redaction한다.
+- symlink, reparse point, 저장소 경계 이탈 경로는 거부한다.
+- purge는 `prepared` ledger, same-volume atomic quarantine rename, manifest exact-file delete, `completed` ledger 순서로 진행한다.
+- crash 뒤에는 prepared ledger와 quarantine 상태를 기준으로 idempotent하게 재개하고, 이후 새로 생성된 classroom root는 삭제하지 않는다.
 
-### AssignmentMaterial
+## SSOT
 
-과제의 학습 내용 snapshot이다. MVP는 현재 학습 document snapshot을 기본으로 저장한다. share pack material은 `packId`, `packVersion`, `contentPath`를 함께 남긴다.
+| 역할 | 경로 |
+| --- | --- |
+| archive audit/export/verify/purge | `src/codaro/migrations/classroomArchive.py` |
+| archive schema | `contracts/classroomArchive.schema.json` |
+| migration ledger schema | `contracts/classroomMigrationLedger.schema.json` |
+| HTTP 410 경계 | `src/codaro/api/classroomRetirementRouter.py` |
+| migration 회귀 | `tests/migrations/testClassroomArchive.py` |
+| 제거 회귀 | `tests/architecture/verifyClassroomRemoved.py` |
 
-필수 필드:
+## 재도입 규칙
 
-- `sourceKind`: `document | sharePack | inlineYaml`
-- `title`
-- `category`
-- `contentId`
-- `document` 또는 pack 위치 정보
-- `packages`
-
-### AssignmentRoom
-
-과제방 자체다.
-
-- `assignmentId`
-- `title`
-- `description`
-- `status`: `draft | published | archived`
-- `joinCode`
-- `tutorToken`
-- `material`
-- `participants`
-- `settings`
-- `createdAt`, `updatedAt`, `dueAt`
-
-`studentTag`는 표시/구분용이지 인증 수단이 아니다. 학생이 이벤트를 보내려면 `participantId + participantToken`이 필요하고, 튜터 dashboard에는 `tutorToken`이 필요하다.
-
-### AssignmentEvent
-
-학습 이벤트는 append-only다. `eventId`는 client가 만들 수 있고 store는 idempotent하게 처리한다.
-
-이벤트 타입:
-
-- `materialOpened`
-- `sectionStarted`
-- `predictionLocked`
-- `checkSubmitted`
-- `checkPassed`
-- `checkFailed`
-- `hintUsed`
-- `missionCompleted`
-- `lessonCompleted`
-- `questionAsked`
-- `feedbackPosted`
-- `feedbackRead`
-
-기본 payload는 progress/diagnostic only다. 학생 코드 본문은 기본 전송하지 않는다. stdout/stderr는 길이 제한과 secret redaction 후 필요한 신호만 보낸다.
-
-## API 계약
-
-| Endpoint | Method | 역할 |
-| --- | --- | --- |
-| `/api/classroom/status` | GET | 과제방 기능 상태 |
-| `/api/classroom/assignments` | GET | 로컬 assignment 목록 |
-| `/api/classroom/assignments` | POST | 과제방 draft 생성 |
-| `/api/classroom/assignments/{assignmentId}/publish` | POST | joinCode 발급 |
-| `/api/classroom/join` | POST | 학생 참가 및 participantToken 발급 |
-| `/api/classroom/assignments/{assignmentId}/material` | GET | 참가자가 받을 material snapshot |
-| `/api/classroom/assignments/{assignmentId}/dashboard` | GET | 튜터 dashboard payload |
-| `/api/classroom/events` | POST | 학생/튜터 이벤트 append |
-| `/api/classroom/events` | GET | cursor 이후 이벤트 조회 |
-| `/api/classroom/comments` | POST | 피드백/질문 이벤트 append |
-
-권한 없는 요청은 403, 존재하지 않는 과제는 404, 잘못된 joinCode는 404로 처리한다.
-
-## 동기화와 relay
-
-MVP는 같은 API 계약으로 local/self-host relay를 검증한다. Hosted relay는 같은 endpoint를 노출하는 별도 서비스로 배포할 수 있다. Codaro exe는 relay URL을 설정하면 같은 `assignmentFlow` payload를 원격으로 주고받는다.
-
-학생 오프라인 상태에서는 이벤트를 outbox에 저장한다. 다음 온라인 시 `eventId` 기준으로 중복 없이 전송한다. relay 장애는 학습 실패가 아니라 dashboard stale 상태다.
-
-## 프론트 표면
-
-과제방은 MVP에서 새 1급 사이드바 표면이 아니다. `현재 학습` 상단의 과제 패널로 시작한다.
-
-튜터:
-
-- 현재 학습 YAML에서 과제 만들기
-- publish 후 joinCode 확인
-- roster와 stuck 상태 보기
-- 학생/섹션 scoped feedback 작성
-
-학생:
-
-- joinCode 입력
-- material 열기
-- 로컬에서 예측/실행/검증
-- 동기화 상태 확인
-
-## 성공 기준
-
-- 튜터가 현재 학습 document로 과제방을 만들 수 있다.
-- publish 후 joinCode가 발급된다.
-- 학생은 joinCode로 참가하고 material snapshot을 열 수 있다.
-- `checkPassed/checkFailed`, `missionCompleted`, `lessonCompleted` 이벤트가 자동 기록된다.
-- dashboard는 participant별 started/stuck/completed 상태를 보여준다.
-- 태그만으로는 dashboard나 이벤트 접근이 되지 않는다.
-- offline event는 outbox에 남고 중복 없이 재전송 가능하다.
+과제방이 다시 필요하면 과거 source를 숨겨 둔 채 되살리지 않는다. 학습 효과, privacy, 인증과 운영 책임을 새 이니셔티브에서 다시 평가하고 별도 제품으로 설계한다.
 
 ## 관련
 
-- [[learning-three-pillars]]
-- [[teacher-tool-loop]]
 - [[curriculum-os]]
-- [[share-pack-distribution]]
+- [[teacher-tool-loop]]
 - [[frontend-product-surface]]
+- [[testing-and-gates]]

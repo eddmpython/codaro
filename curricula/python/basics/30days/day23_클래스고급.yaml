@@ -90,9 +90,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 상속 기초의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -132,9 +129,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 상속과 init의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -178,9 +172,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: super() 함수의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -222,9 +213,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 메서드 오버라이딩의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -272,9 +260,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 다중 상속의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -316,9 +301,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 상속 실전 예제의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -455,9 +437,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 이 코드를 실행하면 어떤 예외가 발생할까요?
-      expectedError: ValueError
   check:
     noError: '현업 흐름 검증: 알림 채널을 다형성으로 처리하기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
     resultCheck: '현업 흐름 검증: 알림 채널을 다형성으로 처리하기 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
@@ -495,10 +474,248 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: Day 23 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: Day 23 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: day23-employee-inheritance-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inheritance_basic
+    - practice
+    title: 상속으로 직원 설명 확장하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 부모 초기화와 자식 속성을 함께 사용한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: Person, Employee와 employee_label(name, role)를 완성해 'name:role'을 반환하세요.
+      starterCode: |-
+        class Person:
+            pass
+
+        class Employee(Person):
+            pass
+
+        def employee_label(name, role):
+            raise NotImplementedError
+      solution: |-
+        class Person:
+            def __init__(self, name):
+                self.name = name
+
+        class Employee(Person):
+            def __init__(self, name, role):
+                super().__init__(name)
+                self.role = role
+
+        def employee_label(name, role):
+            employee = Employee(name, role)
+            return f"{employee.name}:{employee.role}"
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day23.employee-inheritance.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day23.employee-inheritance.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: employee_label
+        cases:
+        - id: developer
+          arguments:
+          - value: Mina
+          - value: developer
+          expectedReturn: Mina:developer
+        - id: designer
+          arguments:
+          - value: Jun
+          - value: designer
+          expectedReturn: Jun:designer
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day23-polymorphic-sounds-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day23-employee-inheritance-mastery
+    title: 서로 다른 객체에 같은 메서드 호출하기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 다형성을 처음 보는 동물 목록 처리에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: Dog, Cat과 animal_sounds(kinds)를 완성해 각 종류의 sound 결과 목록을 반환하세요.
+      starterCode: |-
+        class Dog:
+            pass
+
+        class Cat:
+            pass
+
+        def animal_sounds(kinds):
+            raise NotImplementedError
+      solution: |-
+        class Dog:
+            def sound(self):
+                return 'woof'
+
+        class Cat:
+            def sound(self):
+                return 'meow'
+
+        def animal_sounds(kinds):
+            classes = {'dog': Dog, 'cat': Cat}
+            return [classes[kind]().sound() for kind in kinds]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day23.polymorphic-sounds.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day23.polymorphic-sounds.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: animal_sounds
+        cases:
+        - id: mixed
+          arguments:
+          - value:
+            - dog
+            - cat
+            - dog
+          expectedReturn:
+          - woof
+          - meow
+          - woof
+        - id: cat
+          arguments:
+          - value:
+            - cat
+          expectedReturn:
+          - meow
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day23-product-classmethod-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day23-polymorphic-sounds-transfer
+    title: 문자열에서 객체를 만드는 classmethod 복원하기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 대체 생성자와 인스턴스 속성을 함께 회상한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: Product.from_text와 product_total(text, quantity)를 완성해 가격 합계를 반환하세요. text 형식은 name,price입니다.
+      starterCode: |-
+        class Product:
+            pass
+
+        def product_total(text, quantity):
+            raise NotImplementedError
+      solution: |-
+        class Product:
+            def __init__(self, name, price):
+                self.name = name
+                self.price = price
+
+            @classmethod
+            def from_text(cls, text):
+                name, price = text.split(',')
+                return cls(name, int(price))
+
+        def product_total(text, quantity):
+            product = Product.from_text(text)
+            return product.price * quantity
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day23.product-classmethod.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day23.product-classmethod.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: product_total
+        cases:
+        - id: pen
+          arguments:
+          - value: pen,1200
+          - value: 3
+          expectedReturn: 3600
+        - id: book
+          arguments:
+          - value: book,8000
+          - value: 2
+          expectedReturn: 16000
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

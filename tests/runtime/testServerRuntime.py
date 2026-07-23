@@ -58,12 +58,13 @@ def testRunServerStartsWithExistingEditorBuild(monkeypatch, tmp_path: Path) -> N
         captured["appArgs"] = kwargs
         return "sentinel-app"
 
-    def fakeUvicornRun(app, host: str, port: int, log_level: str) -> None:
+    def fakeUvicornRun(app, host: str, port: int, log_level: str, loop) -> None:
         captured["uvicorn"] = {
             "app": app,
             "host": host,
             "port": port,
             "logLevel": log_level,
+            "loop": loop,
         }
 
     monkeypatch.setattr(serverModule, "WEB_BUILD_ROOT", tmp_path)
@@ -77,6 +78,7 @@ def testRunServerStartsWithExistingEditorBuild(monkeypatch, tmp_path: Path) -> N
     assert captured["uvicorn"]["host"] == "0.0.0.0"
     assert captured["uvicorn"]["port"] == 9011
     assert captured["uvicorn"]["logLevel"] == "warning"
+    assert captured["uvicorn"]["loop"] is serverModule.createServerEventLoop
 
 
 def testResolveWebBuildRootUsesEnvironmentOverride(monkeypatch, tmp_path: Path) -> None:

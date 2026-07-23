@@ -1,0 +1,9 @@
+Use case: scientific-educational
+Asset type: Codaro learning catalog domain visual for AI integration
+Primary request: Create a premium editorial educational illustration that shows a grounded AI application pipeline: structured user input and a small document set enter a model block, retrieval selects relevant source fragments, a tool call performs a bounded action, and the final response carries visible source links and an evaluation check. No readable text.
+Scene/backdrop: bright neutral studio workbench with white and charcoal surfaces, teal, coral, yellow, green, and restrained plum accents.
+Style/medium: sophisticated mixed 3D paper-cut and crisp editorial illustration, tactile document fragments, connector paths, tool block, source pins, and evaluation gauge, high-end education product art.
+Composition/framing: wide 16:9, transparent left-to-right grounded pipeline with sources remaining visible through the final answer, generous margins.
+Lighting/mood: soft daylight, trustworthy, precise, practical.
+Constraints: no people, faces, robots, brains, logos, brand names, letters, readable UI text, watermark, gradients, glowing orbs, bokeh, or dark atmospheric background. Show provenance, tool boundaries, and evaluation rather than magic.
+Avoid: chatbot speech bubbles, humanoid robots, neon AI clichés, dominant purple or blue, excessive rounded cards.

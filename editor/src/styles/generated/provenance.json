@@ -1,0 +1,13 @@
+{
+  "astryx": {
+    "cli": "0.1.6",
+    "core": "0.1.6",
+    "stylex": "0.19.0",
+    "themeName": "codaro",
+    "themeNeutral": "0.1.6"
+  },
+  "fontManifestSha256": "00db89de410deaefb7ed6b46fb9455a99019cf4f884722da2a899de66a33deda",
+  "generator": "assets/brand/tools/buildDesignSystem.py",
+  "source": "assets/brand/designSystem/tokens.json",
+  "sourceSha256": "bbabec902674da4102719f1371cbd41d5511641f936a3412143853446c891e7f"
+}

@@ -1,0 +1,522 @@
+var e=`meta:
+  id: xlwings_05
+  title: 학생 성적표 수식과 서식 자동
+  order: 5
+  category: xlwings
+  badge: 기초
+  difficulty: easy
+  audience: DataFrame 왕복을 익혔고, Excel 수식과 서식까지 코드로 다루고 싶은 학습자
+  packages:
+    - xlwings
+    - pandas
+  tags:
+    - xlwings
+    - formula
+    - number_format
+    - color
+    - autofit
+  seo:
+    title: 학생 성적표 자동 - xlwings 수식, 평균, 서식
+    description: 학생 성적표에 평균과 합계 수식을 자동 입력하고, 점수에 따라 셀 색상을 다르게 지정하는 자동화를 만든다.
+    keywords:
+      - xlwings
+      - formula
+      - 성적표
+      - number_format
+      - autofit
+intro:
+  direction: 학생 4과목 성적표에 평균/합계 수식을 코드로 자동 입력하고, 점수 컬럼은 정수 서식, 헤더와 평균 행은 색상으로 강조한 뒤 열 너비를 자동 맞춤한다.
+  benefits:
+    - "sheet[f\\"E{r}\\"].formula = \\"=AVERAGE(B2:D2)\\" 패턴으로 Excel 수식을 코드로 입력하고 계산된 결과를 즉시 받는다."
+    - "number_format으로 점수/평균/날짜 표기를 자동 지정해 사용자가 다시 손댈 필요 없는 성적표를 만든다."
+    - 폰트 색, 배경색, 굵게 처리로 합계 행과 헤더를 시각적으로 강조하는 자동화 패턴을 익힌다.
+    - "autofit과 app.calculate로 \\"열어 보면 깔끔하게 정렬된 채 결과까지 채워진\\" 성적표를 만든다."
+  diagram:
+    steps:
+      - label: 1단계. 학생 성적 입력과 학생별 평균 수식
+        detail: DataFrame을 시트에 쓰고 각 학생 행에 =AVERAGE 수식을 추가한다.
+      - label: 2단계. number_format으로 점수/평균 표기
+        detail: 점수 컬럼에 "0", 평균 컬럼에 "0.0"을 지정해 표기를 자동 제어한다.
+      - label: 3단계. 헤더와 평균 행 색상 강조 + autofit
+        detail: 헤더는 진한 배경, 평균 행은 강조색, 모든 컬럼 너비 자동 맞춤.
+      - label: 4단계. 실습
+        detail: 반별 종합 성적표와 분기 매출 보고서 두 시나리오를 다룬다.
+    runtime:
+      - label: xlwings + pandas 확인
+        detail: pandas로 DataFrame을 만들고 xlwings로 시트에 입력하므로 둘 다 필요하다.
+      - label: app.calculate 호출
+        detail: 수식을 쓰면 Excel이 자동 계산하지만, 명시적으로 호출하면 타이밍을 제어할 수 있다.
+      - label: 시각 결과 확인
+        detail: visible=True로 실행하면 서식이 실제 적용된 모양을 눈으로 확인할 수 있다.
+sections:
+  - id: formula-write
+    title: 1단계. 학생별 평균 수식 자동 입력
+    structuredPrimary: true
+    subtitle: range.formula = "=AVERAGE(...)"
+    goal: 학생 성적 DataFrame을 시트에 쓴 뒤 각 학생 행의 마지막 컬럼에 =AVERAGE 수식을 코드로 입력하고 계산된 평균을 받는다.
+    why: 수식을 코드로 쓰면 사용자가 파일을 열기 전부터 평균이 계산되어 있다. 학생 수가 늘어나도 같은 코드로 동작한다.
+    explanation: |-
+      range.formula = "=AVERAGE(B2:D2)"처럼 문자열을 .formula에 대입하면 Excel이 그대로 수식으로 인식합니다. .value도 가능하지만 .formula가 의도를 더 명확하게 표현합니다.
+      수식이 쓰여지면 Excel이 즉시 계산하고, 다시 range.value를 읽으면 계산된 결과(숫자)가 돌아옵니다. 한 셀이 두 모습(수식 문자열과 결과 숫자)을 동시에 가지는 셈입니다.
+      이번 단계에서는 학생 한 명당 한 줄씩 평균 수식을 자동으로 채웁니다. expand로 학생 수를 자동 인식한 뒤 for 루프로 각 학생 평균을 계산합니다.
+    tips:
+      - 수식의 범위는 expand로 잡은 영역의 last_cell.row를 이용해 동적으로 만들 수 있습니다.
+      - range.formula는 셀의 수식 문자열을, range.value는 계산된 결과를 돌려줍니다. 차이를 의식하세요.
+    snippet: |-
+      import pandas as pd
+      import xlwings as xw
+
+      gradesDf = pd.DataFrame({
+          "name": ["김민서", "이도윤", "박서아", "정하은", "최우진"],
+          "korean": [88, 92, 75, 95, 81],
+          "math": [91, 85, 88, 79, 93],
+          "english": [86, 89, 72, 90, 84],
+      })
+
+      with xw.App(visible=False) as fApp:
+          fBook = fApp.books.add()
+          fSheet = fBook.sheets.active
+          fSheet.name = "grades"
+          fSheet["A1"].options(index=False).value = gradesDf
+
+          dataRange = fSheet["A1"].expand("table")
+          lastRow = dataRange.last_cell.row
+          fSheet["E1"].value = "average"
+          for r in range(2, lastRow + 1):
+              fSheet[f"E{r}"].formula = f"=AVERAGE(B{r}:D{r})"
+
+          fApp.calculate()
+          averages = [round(fSheet[f"E{r}"].value, 1) for r in range(2, lastRow + 1)]
+          firstFormula = fSheet["E2"].formula
+
+      assert averages == [88.3, 88.7, 78.3, 88.0, 86.0]
+      assert firstFormula.startswith("=AVERAGE")
+      {"averages": averages, "formula": firstFormula}
+    exercise:
+      prompt: F열에 "total" 컬럼을 추가하고 각 학생 행에 =SUM 수식을 코드로 같이 넣으세요.
+      starterCode: |-
+        import pandas as pd
+        import xlwings as xw
+
+        gradesDf = pd.DataFrame({
+            "name": ["김민서", "이도윤", "박서아", "정하은"],
+            "korean": [88, 92, 75, 95],
+            "math": [91, 85, 88, 79],
+            "english": [86, 89, 72, 90],
+        })
+
+        with xw.App(visible=False) as fApp:
+            fBook = fApp.books.add()
+            fSheet = fBook.sheets.active
+            fSheet.name = "grades"
+            fSheet["A1"].options(index=False).value = gradesDf
+
+            dataRange = fSheet["A1"].expand("table")
+            lastRow = dataRange.last_cell.row
+            fSheet["E1"].value = "average"
+            fSheet["F1"].value = "total"
+            for r in range(2, lastRow + 1):
+                fSheet[f"E{r}"].formula = f"=AVERAGE(B{r}:D{r})"
+                fSheet[f"F{r}"].formula = f"=___(B{r}:D{r})"
+
+            fApp.calculate()
+            totals = [int(fSheet[f"F{r}"].value) for r in range(2, lastRow + 1)]
+
+        assert totals == [265, 266, 235, 264]
+        totals
+      solution: |-
+        import pandas as pd
+        import xlwings as xw
+
+        gradesDf = pd.DataFrame({
+            "name": ["김민서", "이도윤", "박서아", "정하은"],
+            "korean": [88, 92, 75, 95],
+            "math": [91, 85, 88, 79],
+            "english": [86, 89, 72, 90],
+        })
+
+        with xw.App(visible=False) as fApp:
+            fBook = fApp.books.add()
+            fSheet = fBook.sheets.active
+            fSheet.name = "grades"
+            fSheet["A1"].options(index=False).value = gradesDf
+
+            dataRange = fSheet["A1"].expand("table")
+            lastRow = dataRange.last_cell.row
+            fSheet["E1"].value = "average"
+            fSheet["F1"].value = "total"
+            for r in range(2, lastRow + 1):
+                fSheet[f"E{r}"].formula = f"=AVERAGE(B{r}:D{r})"
+                fSheet[f"F{r}"].formula = f"=SUM(B{r}:D{r})"
+
+            fApp.calculate()
+            totals = [int(fSheet[f"F{r}"].value) for r in range(2, lastRow + 1)]
+
+        assert totals == [265, 266, 235, 264]
+        totals
+      hints:
+        - SUM 함수는 같은 행의 B부터 D까지 합산합니다.
+        - 88 + 91 + 86 = 265, 92 + 85 + 89 = 266 ...
+    check:
+      noError: formula 대입과 value 읽기가 SyntaxError 없이 끝나야 합니다.
+      resultCheck: 각 학생의 평균과 합계가 점수 계산과 정확히 일치해야 합니다.
+
+  - id: number-format
+    title: 2단계. number_format으로 점수와 평균 표기
+    structuredPrimary: true
+    subtitle: "0 (정수), 0.0 (소수점 1자리)"
+    goal: 점수 컬럼은 정수 표기로, 평균 컬럼은 소수점 1자리로 number_format을 지정한다.
+    why: 사용자가 보는 표기는 값 자체가 아니라 number_format으로 결정된다. 성적표의 신뢰감은 표기 통일에서 나온다.
+    explanation: |-
+      Excel의 셀 표시 방식은 number_format 문자열로 정해집니다. "0"은 정수, "0.0"은 소수점 1자리, "0.00%"는 소수점 2자리 퍼센트, "yyyy-mm-dd"는 ISO 날짜입니다.
+      range.number_format = "..."로 한 영역의 모든 셀에 같은 표기를 지정합니다. expand로 잡은 영역의 특정 컬럼만 지정하려면 컬럼 단위 슬라이스를 사용합니다.
+      값(.value) 자체는 그대로지만 사용자가 보는 표기는 number_format이 바꿉니다. 자동화 보고서에서는 거의 항상 명시해야 합니다.
+    tips:
+      - 자주 쓰는 패턴은 "0"(정수), "0.0"(소수점 1자리), "0.0%"(비율), "#,##0"(천 단위), "yyyy-mm-dd"(날짜)입니다.
+      - 컬럼 전체 지정은 sheet["B:B"].number_format = "..."이지만, 표 안의 일부 영역만 지정하는 편이 보통입니다.
+    snippet: |-
+      import pandas as pd
+      import xlwings as xw
+
+      gradesDf = pd.DataFrame({
+          "name": ["김민서", "이도윤", "박서아"],
+          "korean": [88, 92, 75],
+          "math": [91, 85, 88],
+          "english": [86, 89, 72],
+      })
+
+      with xw.App(visible=False) as nfApp:
+          nfBook = nfApp.books.add()
+          nfSheet = nfBook.sheets.active
+          nfSheet.name = "grades"
+          nfSheet["A1"].options(index=False).value = gradesDf
+
+          dataRange = nfSheet["A1"].expand("table")
+          lastRow = dataRange.last_cell.row
+
+          nfSheet["E1"].value = "average"
+          for r in range(2, lastRow + 1):
+              nfSheet[f"E{r}"].formula = f"=AVERAGE(B{r}:D{r})"
+
+          nfSheet[f"B2:D{lastRow}"].number_format = "0"
+          nfSheet[f"E2:E{lastRow}"].number_format = "0.0"
+          nfApp.calculate()
+
+          koreanFormat = nfSheet[f"B2:D{lastRow}"].number_format
+          avgFormat = nfSheet[f"E2:E{lastRow}"].number_format
+
+      assert koreanFormat == "0"
+      assert avgFormat == "0.0"
+      {"score": koreanFormat, "average": avgFormat}
+    exercise:
+      prompt: 평균 컬럼을 소수점 2자리로 바꾸고(점수는 그대로 정수), 두 서식이 모두 의도대로 들어갔는지 확인하세요.
+      starterCode: |-
+        import pandas as pd
+        import xlwings as xw
+
+        gradesDf = pd.DataFrame({
+            "name": ["김민서", "이도윤", "박서아"],
+            "korean": [88, 92, 75],
+            "math": [91, 85, 88],
+            "english": [86, 89, 72],
+        })
+
+        with xw.App(visible=False) as nfApp:
+            nfBook = nfApp.books.add()
+            nfSheet = nfBook.sheets.active
+            nfSheet.name = "grades"
+            nfSheet["A1"].options(index=False).value = gradesDf
+
+            dataRange = nfSheet["A1"].expand("table")
+            lastRow = dataRange.last_cell.row
+            nfSheet["E1"].value = "average"
+            for r in range(2, lastRow + 1):
+                nfSheet[f"E{r}"].formula = f"=AVERAGE(B{r}:D{r})"
+
+            nfSheet[f"B2:D{lastRow}"].number_format = "0"
+            nfSheet[f"E2:E{lastRow}"].number_format = "___"
+
+            avgFormat = nfSheet["E2"].number_format
+
+        assert avgFormat == "0.00"
+        avgFormat
+      solution: |-
+        import pandas as pd
+        import xlwings as xw
+
+        gradesDf = pd.DataFrame({
+            "name": ["김민서", "이도윤", "박서아"],
+            "korean": [88, 92, 75],
+            "math": [91, 85, 88],
+            "english": [86, 89, 72],
+        })
+
+        with xw.App(visible=False) as nfApp:
+            nfBook = nfApp.books.add()
+            nfSheet = nfBook.sheets.active
+            nfSheet.name = "grades"
+            nfSheet["A1"].options(index=False).value = gradesDf
+
+            dataRange = nfSheet["A1"].expand("table")
+            lastRow = dataRange.last_cell.row
+            nfSheet["E1"].value = "average"
+            for r in range(2, lastRow + 1):
+                nfSheet[f"E{r}"].formula = f"=AVERAGE(B{r}:D{r})"
+
+            nfSheet[f"B2:D{lastRow}"].number_format = "0"
+            nfSheet[f"E2:E{lastRow}"].number_format = "0.00"
+
+            avgFormat = nfSheet["E2"].number_format
+
+        assert avgFormat == "0.00"
+        avgFormat
+      hints:
+        - '"0.00"은 소수점 2자리 강제 표기입니다.'
+        - '자주 쓰는 점수 서식: "0"(정수), "0.0"(1자리), "0.00"(2자리).'
+    check:
+      noError: number_format 대입과 읽기가 ValueError 없이 끝나야 합니다.
+      resultCheck: 각 컬럼의 number_format이 의도한 문자열과 정확히 일치해야 합니다.
+
+  - id: color-and-autofit
+    title: 3단계. 헤더와 평균 행 강조 + autofit
+    structuredPrimary: true
+    subtitle: color, bold, autofit
+    goal: 헤더 행과 평균 컬럼에 배경색과 폰트 굵게를 지정하고, 모든 컬럼 너비를 자동 맞춤한다.
+    why: 자동화 성적표는 사용자가 한 눈에 평균을 보게 만들어야 한다. 색과 굵게, 너비 자동 맞춤이 그 마지막 단계다.
+    explanation: |-
+      range.color = (R, G, B) 튜플로 셀 배경색을 지정합니다. range.font.bold = True로 굵게, range.font.color = (R, G, B)로 폰트 색까지 정합니다.
+      sheet.autofit()은 모든 컬럼의 너비를 셀 안 내용에 맞게 자동 조정합니다. 특정 컬럼만 맞추려면 sheet["A:A"].autofit()을 씁니다.
+      이 세 가지(색, 굵게, autofit)는 자동화 보고서의 마무리 단계로, 매번 같은 방식으로 적용됩니다.
+    tips:
+      - 색은 (255, 235, 156)처럼 RGB 튜플로 줍니다. 자주 쓰는 강조색은 미리 변수에 잡아두세요.
+      - autofit은 시트 단위와 컬럼 단위 모두 가능합니다. 보통 시트 단위로 한 번에 처리합니다.
+    snippet: |-
+      import pandas as pd
+      import xlwings as xw
+
+      gradesDf = pd.DataFrame({
+          "name": ["김민서", "이도윤", "박서아"],
+          "korean": [88, 92, 75],
+          "math": [91, 85, 88],
+          "english": [86, 89, 72],
+      })
+      HEADER_BG = (37, 99, 235)
+      HEADER_FG = (255, 255, 255)
+      AVG_BG = (255, 235, 156)
+
+      with xw.App(visible=False) as styleApp:
+          styleBook = styleApp.books.add()
+          styleSheet = styleBook.sheets.active
+          styleSheet.name = "grades"
+          styleSheet["A1"].options(index=False).value = gradesDf
+
+          dataRange = styleSheet["A1"].expand("table")
+          lastRow = dataRange.last_cell.row
+          styleSheet["E1"].value = "average"
+          for r in range(2, lastRow + 1):
+              styleSheet[f"E{r}"].formula = f"=AVERAGE(B{r}:D{r})"
+
+          headerRange = styleSheet["A1:E1"]
+          headerRange.color = HEADER_BG
+          headerRange.font.color = HEADER_FG
+          headerRange.font.bold = True
+
+          avgColumn = styleSheet[f"E2:E{lastRow}"]
+          avgColumn.color = AVG_BG
+          avgColumn.font.bold = True
+
+          styleSheet[f"B2:D{lastRow}"].number_format = "0"
+          styleSheet[f"E2:E{lastRow}"].number_format = "0.0"
+          styleSheet.autofit()
+          styleApp.calculate()
+
+          headerColor = headerRange.color
+          avgColor = avgColumn.color
+
+      assert headerColor == HEADER_BG
+      assert avgColor == AVG_BG
+      {"header": headerColor, "average": avgColor}
+    exercise:
+      prompt: 평균이 90 이상인 학생 행만 별도 강조색(연한 초록)으로 칠하는 로직을 추가하세요.
+      starterCode: |-
+        import pandas as pd
+        import xlwings as xw
+
+        gradesDf = pd.DataFrame({
+            "name": ["김민서", "이도윤", "박서아", "정하은"],
+            "korean": [88, 92, 75, 95],
+            "math": [91, 85, 88, 93],
+            "english": [86, 89, 72, 91],
+        })
+        HIGH_BG = (___, ___, ___)
+
+        with xw.App(visible=False) as styleApp:
+            styleBook = styleApp.books.add()
+            styleSheet = styleBook.sheets.active
+            styleSheet.name = "grades"
+            styleSheet["A1"].options(index=False).value = gradesDf
+
+            dataRange = styleSheet["A1"].expand("table")
+            lastRow = dataRange.last_cell.row
+            styleSheet["E1"].value = "average"
+            for r in range(2, lastRow + 1):
+                styleSheet[f"E{r}"].formula = f"=AVERAGE(B{r}:D{r})"
+            styleApp.calculate()
+
+            highRows = []
+            for r in range(2, lastRow + 1):
+                if float(styleSheet[f"E{r}"].value) >= 90:
+                    styleSheet[f"A{r}:E{r}"].color = HIGH_BG
+                    highRows.append(r)
+
+        assert len(highRows) >= 1
+        highRows
+      solution: |-
+        import pandas as pd
+        import xlwings as xw
+
+        gradesDf = pd.DataFrame({
+            "name": ["김민서", "이도윤", "박서아", "정하은"],
+            "korean": [88, 92, 75, 95],
+            "math": [91, 85, 88, 93],
+            "english": [86, 89, 72, 91],
+        })
+        HIGH_BG = (187, 247, 208)
+
+        with xw.App(visible=False) as styleApp:
+            styleBook = styleApp.books.add()
+            styleSheet = styleBook.sheets.active
+            styleSheet.name = "grades"
+            styleSheet["A1"].options(index=False).value = gradesDf
+
+            dataRange = styleSheet["A1"].expand("table")
+            lastRow = dataRange.last_cell.row
+            styleSheet["E1"].value = "average"
+            for r in range(2, lastRow + 1):
+                styleSheet[f"E{r}"].formula = f"=AVERAGE(B{r}:D{r})"
+            styleApp.calculate()
+
+            highRows = []
+            for r in range(2, lastRow + 1):
+                if float(styleSheet[f"E{r}"].value) >= 90:
+                    styleSheet[f"A{r}:E{r}"].color = HIGH_BG
+                    highRows.append(r)
+
+        assert len(highRows) >= 1
+        highRows
+      hints:
+        - 연한 초록 RGB는 (187, 247, 208) 정도가 무난합니다.
+        - 정하은이 평균 93으로 90 이상이므로 그 행이 강조됩니다.
+    check:
+      noError: 조건문과 color 지정이 AttributeError 없이 끝나야 합니다.
+      resultCheck: 평균 90 이상인 학생 행이 highRows에 들어 있고 실제 셀 색상이 의도한 RGB와 같아야 합니다.
+
+  - id: practice
+    title: 4단계. 실습
+    subtitle: 수식 + 서식 자동화 보고서 직접 만들기
+    blocks:
+      - type: text
+        content: |-
+          이번 두 미션은 수식 자동 입력과 서식을 결합한 보고서 두 시나리오(반별 성적, 분기 매출)를 다룹니다.
+      - type: tip
+        content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되어 있으므로 import문은 생략해도 됩니다.
+      - type: expansion
+        title: "미션1: 반별 평균 + 학급 평균"
+        blocks:
+          - type: code
+            title: 데이터와 수식 + 서식
+            content: |-
+              import pandas as pd
+              import xlwings as xw
+
+              classDf = pd.DataFrame({
+                  "name": ["김민서", "이도윤", "박서아", "정하은", "최우진"],
+                  "korean": [88, 92, 75, 95, 81],
+                  "math": [91, 85, 88, 79, 93],
+                  "english": [86, 89, 72, 90, 84],
+              })
+
+              with xw.App(visible=False) as cApp:
+                  cBook = cApp.books.add()
+                  cSheet = cBook.sheets.active
+                  cSheet.name = "class3a"
+                  cSheet["A1"].options(index=False).value = classDf
+
+                  rng = cSheet["A1"].expand("table")
+                  lastRow = rng.last_cell.row
+                  cSheet["E1"].value = "average"
+                  for r in range(2, lastRow + 1):
+                      cSheet[f"E{r}"].formula = f"=AVERAGE(B{r}:D{r})"
+
+                  totalRow = lastRow + 1
+                  cSheet[f"A{totalRow}"].value = "학급평균"
+                  for col in ["B", "C", "D", "E"]:
+                      cSheet[f"{col}{totalRow}"].formula = f"=AVERAGE({col}2:{col}{lastRow})"
+
+                  cSheet[f"A1:E1"].font.bold = True
+                  cSheet[f"A1:E1"].color = (37, 99, 235)
+                  cSheet[f"A1:E1"].font.color = (255, 255, 255)
+                  cSheet[f"A{totalRow}:E{totalRow}"].font.bold = True
+                  cSheet[f"A{totalRow}:E{totalRow}"].color = (255, 235, 156)
+                  cSheet[f"B2:D{lastRow}"].number_format = "0"
+                  cSheet[f"E2:E{lastRow}"].number_format = "0.0"
+                  cSheet[f"B{totalRow}:E{totalRow}"].number_format = "0.0"
+                  cSheet.autofit()
+                  cApp.calculate()
+
+                  classKoreanAvg = round(float(cSheet[f"B{totalRow}"].value), 1)
+                  classOverall = round(float(cSheet[f"E{totalRow}"].value), 1)
+
+              assert classKoreanAvg == 86.2
+              {"koreanAvg": classKoreanAvg, "overallAvg": classOverall}
+      - type: expansion
+        title: "미션2: 분기 매출 + 마진율 자동 계산 + 강조"
+        blocks:
+          - type: code
+            title: 데이터와 수식 + 서식 자동 적용
+            content: |-
+              import pandas as pd
+              import xlwings as xw
+
+              salesDf = pd.DataFrame({
+                  "product": ["A", "B", "C", "D"],
+                  "revenue": [12000000, 8500000, 15300000, 9800000],
+                  "cost": [7200000, 6100000, 9100000, 7200000],
+              })
+
+              with xw.App(visible=False) as mApp:
+                  mBook = mApp.books.add()
+                  mSheet = mBook.sheets.active
+                  mSheet.name = "products"
+                  mSheet["A1"].options(index=False).value = salesDf
+
+                  rng = mSheet["A1"].expand("table")
+                  lastRow = rng.last_cell.row
+                  mSheet["D1"].value = "marginRate"
+                  for r in range(2, lastRow + 1):
+                      mSheet[f"D{r}"].formula = f"=(B{r}-C{r})/B{r}"
+
+                  mSheet[f"B2:C{lastRow}"].number_format = "#,##0"
+                  mSheet[f"D2:D{lastRow}"].number_format = "0.0%"
+                  mSheet["A1:D1"].font.bold = True
+                  mSheet["A1:D1"].color = (16, 185, 129)
+                  mSheet["A1:D1"].font.color = (255, 255, 255)
+                  mSheet.autofit()
+                  mApp.calculate()
+
+                  marginValues = [mSheet[f"D{r}"].value for r in range(2, lastRow + 1)]
+
+              assert all(0 < m < 1 for m in marginValues)
+              [round(m, 3) for m in marginValues]
+
+  - id: summary
+    title: 정리
+    subtitle: 수식 + 서식이 살아있는 자동화 보고서
+    blocks:
+      - type: text
+        content: |-
+          이번 레슨에서 학생 평균/합계 수식 자동 입력, number_format 정수/소수점 표기, 헤더 색 강조, 조건부 행 강조, autofit 자동 너비까지 한 번에 완성했습니다.
+          다음 레슨에서는 같은 데이터로 막대 차트를 자동 생성하고, 데이터가 바뀌면 차트가 어떻게 갱신되는지 다룹니다.
+    goal: 수식과 서식을 결합한 자동화 보고서 패턴을 한 번 완성한다.
+    why: 보고서는 "값이 맞다"가 아니라 "사용자가 한눈에 본다"가 완성 기준이다.
+`;export{e as default};

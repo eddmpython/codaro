@@ -1,0 +1,459 @@
+var e=`meta:\r
+  packages:\r
+  - pandas\r
+  id: pandas_07\r
+  title: 다이아몬드가격분석\r
+  order: 7\r
+  category: pandas\r
+  difficulty: ⭐⭐⭐⭐\r
+  badge: 중급\r
+  dataSource: codaro-local:diamonds\r
+  tags:\r
+  - diamonds\r
+  - 대용량\r
+  - category\r
+  - corr\r
+  - 상관분석\r
+  - 검증\r
+  - 가격분석\r
+  seo:\r
+    title: pandas 대용량 데이터 분석 - 5만 행 다이아몬드 데이터\r
+    description: 5만 행 다이아몬드 데이터로 대용량 처리를 배웁니다. 메모리 확인, 범주형 데이터, 상관관계 분석, 조건별 가격 비교를 실습합니다.\r
+    keywords:\r
+    - pandas 대용량\r
+    - category dtype\r
+    - corr\r
+    - 상관분석\r
+    - diamonds 데이터\r
+intro:\r
+  emoji: 💎\r
+  goal: 5만 개 다이아몬드 데이터에서 "가격을 결정하는 요인"을 분석합니다.\r
+  description: 5만 행이 넘는 대용량 데이터를 다룹니다. 메모리 관리, 범주형 데이터 처리, 상관관계 분석을 배웁니다.\r
+  direction: 다이아몬드가격분석에서 표 데이터를 불러오고 정제, 집계, 검증 결과까지 연결합니다.\r
+  benefits:\r
+  - DataFrame 입력 확인 후 정제와 집계에 맞는 코드 입력을 고릅니다.\r
+  - 다이아몬드가격분석 결과를 행/열 수와 요약값 기준으로 즉시 점검합니다.\r
+  - 완료한 코드를 데이터 리포트 자동화에 다시 사용할 수 있습니다.\r
+  diagram:\r
+    steps:\r
+    - label: 1단계. 데이터 불러오기 입력 확인\r
+      detail: 입력 기준(DataFrame 입력)과 필요한 조건을 먼저 고정합니다.\r
+    - label: 2단계. 샘플 확인 처리 실행\r
+      detail: 정제와 집계 코드를 실행해 중간 결과를 확인합니다.\r
+    - label: 3단계. 메모리 사용량 확인 결과 검증\r
+      detail: 행/열 수와 요약값 기준으로 실행 결과를 비교합니다.\r
+    - label: 다이아몬드가격분석 재사용\r
+      detail: 완성 코드를 데이터 리포트 자동화에 붙일 수 있게 정리합니다.\r
+    runtime:\r
+    - label: 표 데이터 환경\r
+      detail: pandas 기준으로 로컬 Python 실행을 준비합니다.\r
+    - label: 다이아몬드가격분석 실행\r
+      detail: 셀을 실행해 행/열 수와 요약값와 예외 상태를 확인합니다.\r
+    - label: 다이아몬드가격분석 완료\r
+      detail: 검증된 코드를 데이터 리포트 자동화로 남깁니다.\r
+sections:\r
+- id: step1_load\r
+  title: 1단계. 데이터 불러오기\r
+  structuredPrimary: true\r
+  subtitle: 53,940개 다이아몬드\r
+  goal: 1단계. 데이터 불러오기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: |-\r
+    이번에는 53,940개의 행을 가진 대용량 데이터를 다룹니다. 지금까지 다룬 데이터는 수백 행 정도였지만, 실무에서는 수만~수백만 행의 데이터를 다루는 경우가 많습니다. 데이터가 커지면 메모리 사용량, 처리 속도, 데이터 타입 최적화 등을 고려해야 합니다. 다이아몬드 데이터는 각 다이아몬드의 가격(price), 캐럿(carat), 컷(cut), 색상(color), 투명도(clarity) 등 10개의 속성 정보를 담고 있습니다. 로컬 실행에서는 네트워크가 없어도 메모리 확인, 범주형 변환, 상관분석 흐름을 실습할 수 있도록 같은 컬럼 구조의 샘플 데이터를 함께 둡니다.\r
+\r
+    대용량 데이터를 다룰 때는 처음부터 전체를 로드하지 말고 nrows 파라미터로 일부만 먼저 확인하는 것이 좋습니다. 외부 CSV를 다룰 때는 pd.read_csv(path, nrows=1000)처럼 처음 1000행만 불러와서 데이터 구조를 파악할 수 있습니다. 또한 usecols로 필요한 컬럼만 선택하면 메모리를 절약할 수 있습니다.\r
+  tips:\r
+  - 대용량 데이터를 다룰 때는 처음부터 전체를 로드하지 말고 nrows 파라미터로 일부만 먼저 확인하는 것이 좋습니다. 외부 CSV를 다룰 때는 pd.read_csv(path, nrows=1000)처럼\r
+    처음 1000행만 불러와서 데이터 구조를 파악할 수 있습니다. 또한 usecols로 필요한 컬럼만 선택하면 메모리를 절약할 수 있습니다.\r
+  snippet: |-\r
+    import pandas as pd\r
+    from codaro.curriculum.localData import loadLocalDataset\r
+\r
+    diamonds = loadLocalDataset("diamonds")\r
+    diamonds.shape\r
+  exercise:\r
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      import pandas as pd\r
+      from codaro.curriculum.localData import loadLocalDataset\r
+\r
+      diamonds = loadLocalDataset("diamonds")\r
+      diamonds.shape\r
+    hints:\r
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.\r
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.\r
+    resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.\r
+- id: step2_sample\r
+  title: 2단계. 샘플 확인\r
+  structuredPrimary: true\r
+  subtitle: sample()로 랜덤 샘플\r
+  goal: 2단계. 샘플 확인에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: |-\r
+    대용량 데이터를 다룰 때 head()의 한계가 드러납니다. head()는 항상 처음 몇 개 행만 보여주기 때문에 데이터가 정렬되어 있거나 특정 패턴으로 저장되어 있으면 전체 특성을 파악하기 어렵습니다. sample() 메서드는 무작위로 n개의 행을 선택하여 데이터 전체에 걸친 샘플을 보여줍니다. 5만 개 데이터에서 5개를 랜덤하게 추출하면 처음, 중간, 끝 구간에서 골고루 데이터를 볼 수 있어 전체 분포를 더 잘 파악할 수 있습니다. 머신러닝에서 학습/테스트 데이터를 나눌 때도 이 원리를 사용합니다.\r
+\r
+    sample(n)은 무작위로 n개 행을 선택합니다. random_state=42처럼 시드를 고정하면 실행할 때마다 같은 샘플이 나와서 재현 가능합니다. frac 파라미터를 사용하면 비율로 샘플링할 수 있는데, sample(frac=0.1)은 전체의 10%를 랜덤 추출합니다. 대용량 데이터에서 빠른 프로토타이핑에 유용합니다.\r
+  tips:\r
+  - sample(n)은 무작위로 n개 행을 선택합니다. random_state=42처럼 시드를 고정하면 실행할 때마다 같은 샘플이 나와서 재현 가능합니다. frac 파라미터를 사용하면\r
+    비율로 샘플링할 수 있는데, sample(frac=0.1)은 전체의 10%를 랜덤 추출합니다. 대용량 데이터에서 빠른 프로토타이핑에 유용합니다.\r
+  snippet: diamonds.sample(5)\r
+  exercise:\r
+    prompt: 2단계. 샘플 확인 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: diamonds.sample(5)\r
+    hints:\r
+    - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.\r
+    - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 2단계. 샘플 확인의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.\r
+    resultCheck: 2단계. 샘플 확인의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.\r
+- id: step3_memory\r
+  title: 3단계. 메모리 사용량 확인\r
+  structuredPrimary: true\r
+  subtitle: memory_usage()\r
+  goal: 3단계. 메모리 사용량 확인에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: |-\r
+    대용량 데이터를 다룰 때는 메모리 관리가 매우 중요합니다. 컴퓨터의 RAM은 제한적이므로 데이터가 얼마나 메모리를 사용하는지 파악해야 합니다. memory_usage() 메서드는 각 컬럼이 차지하는 메모리를 바이트 단위로 보여줍니다. deep=True 파라미터는 특히 중요한데, 이것을 설정하지 않으면 문자열(object) 타입의 실제 메모리 사용량을 정확히 계산하지 못합니다. 문자열은 길이에 따라 메모리가 달라지므로 deep=True로 각 문자열의 실제 크기를 측정해야 합니다. 결과를 보면 어느 컬럼이 메모리를 많이 사용하는지 파악할 수 있어, 최적화가 필요한 부분을 찾을 수 있습니다.\r
+\r
+    memory_usage(deep=True)는 각 컬럼의 실제 메모리 사용량을 바이트 단위로 계산합니다. deep=False(기본값)일 때는 object 타입의 포인터 크기만 측정하지만, deep=True는 실제 데이터 크기를 측정합니다. 메모리가 부족할 때는 불필요한 컬럼 삭제, 데이터 타입 변경(int64 → int32, object → category), 청크 단위 처리 등으로 최적화할 수 있습니다.\r
+  tips:\r
+  - memory_usage(deep=True)는 각 컬럼의 실제 메모리 사용량을 바이트 단위로 계산합니다. deep=False(기본값)일 때는 object 타입의 포인터 크기만 측정하지만,\r
+    deep=True는 실제 데이터 크기를 측정합니다. 메모리가 부족할 때는 불필요한 컬럼 삭제, 데이터 타입 변경(int64 → int32, object → category),\r
+    청크 단위 처리 등으로 최적화할 수 있습니다.\r
+  snippet: diamonds.memory_usage(deep=True)\r
+  exercise:\r
+    prompt: 3단계. 메모리 사용량 확인 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: diamonds.memory_usage(deep=True)\r
+    hints:\r
+    - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.\r
+    - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 3단계. 메모리 사용량 확인의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.\r
+    resultCheck: 3단계. 메모리 사용량 확인의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.\r
+- id: step4_total_memory\r
+  title: 4단계. 총 메모리 계산\r
+  structuredPrimary: true\r
+  subtitle: MB 단위로 변환\r
+  goal: 4단계. 총 메모리 계산에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: |-\r
+    컬럼별 메모리를 sum()으로 합치면 전체 DataFrame의 총 메모리 사용량을 알 수 있습니다. 기본 단위인 바이트(byte)는 너무 크기 때문에 MB나 GB로 변환하면 이해하기 쉽습니다. 1024 바이트 = 1 KB, 1024 KB = 1 MB 이므로, 바이트를 1024로 두 번 나누면 MB 단위가 됩니다. 예를 들어 3,570,304 바이트는 약 3.4 MB입니다. 전체 데이터가 몇 MB인지 파악하면 현재 시스템에서 처리 가능한지, 샘플링이 필요한지, 클라우드로 옮겨야 하는지 판단할 수 있습니다.\r
+\r
+    메모리 단위 변환은 1024 기준입니다. 1024 bytes = 1 KB, 1024 KB = 1 MB, 1024 MB = 1 GB입니다. 1000이 아니라 1024인 이유는 컴퓨터가 2진법(2^10=1024)을 사용하기 때문입니다. / 1024 / 1024 / 1024로 3번 나누면 GB 단위가 됩니다.\r
+  tips:\r
+  - 메모리 단위 변환은 1024 기준입니다. 1024 bytes = 1 KB, 1024 KB = 1 MB, 1024 MB = 1 GB입니다. 1000이 아니라 1024인 이유는 컴퓨터가\r
+    2진법(2^10=1024)을 사용하기 때문입니다. / 1024 / 1024 / 1024로 3번 나누면 GB 단위가 됩니다.\r
+  snippet: diamonds.memory_usage(deep=True).sum() / 1024 / 1024\r
+  exercise:\r
+    prompt: 4단계. 총 메모리 계산 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: diamonds.memory_usage(deep=True).sum() / 1024 / 1024\r
+    hints:\r
+    - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.\r
+    - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 4단계. 총 메모리 계산의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.\r
+    resultCheck: 4단계. 총 메모리 계산의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.\r
+- id: step5_unique\r
+  title: 5단계. 고유값 확인\r
+  structuredPrimary: true\r
+  subtitle: 범주형 데이터 찾기\r
+  goal: 5단계. 고유값 확인에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: |-\r
+    데이터를 분석하기 전에 어떤 컬럼이 범주형인지 파악하는 것이 중요합니다. unique() 메서드는 해당 컬럼에 어떤 고유한 값들이 있는지 보여줍니다. cut 컬럼을 확인해보면 'Fair', 'Good', 'Very Good', 'Premium', 'Ideal' 5가지 값만 존재합니다. 5만 개 행이 있지만 이 5가지 값만 반복되는 것입니다. 이런 데이터를 범주형(categorical) 데이터라고 합니다. 성별(남/여), 등급(상/중/하), 요일(월~일) 같이 제한된 값들이 반복되는 경우가 범주형입니다. 범주형 데이터를 적절히 처리하면 메모리를 크게 절약하고 처리 속도도 빨라집니다.\r
+\r
+    unique()는 중복을 제거한 고유값 목록을 반환합니다. nunique()는 고유값의 개수만 반환합니다. value_counts()는 각 값이 몇 번 나타나는지 빈도를 세어줍니다. 범주형 데이터를 찾을 때는 nunique()가 작은 컬럼(대체로 10~20개 이하)을 확인하면 됩니다.\r
+  tips:\r
+  - unique()는 중복을 제거한 고유값 목록을 반환합니다. nunique()는 고유값의 개수만 반환합니다. value_counts()는 각 값이 몇 번 나타나는지 빈도를 세어줍니다.\r
+    범주형 데이터를 찾을 때는 nunique()가 작은 컬럼(대체로 10~20개 이하)을 확인하면 됩니다.\r
+  snippet: diamonds['cut'].unique()\r
+  exercise:\r
+    prompt: 5단계. 고유값 확인 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: diamonds['cut'].unique()\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 5단계. 고유값 확인의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.\r
+    resultCheck: 5단계. 고유값 확인 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.\r
+- id: step6_category\r
+  title: 6단계. category 타입 변환\r
+  structuredPrimary: true\r
+  subtitle: 메모리 절약\r
+  goal: 6단계. category 타입 변환에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: |-\r
+    범주형 데이터를 object(문자열) 타입으로 저장하면 'Fair', 'Good' 같은 문자열을 5만 번 반복해서 저장합니다. 매우 비효율적입니다. astype('category')로 변환하면 pandas는 똑똑하게 처리합니다. 'Fair'=0, 'Good'=1, 'Very Good'=2, 'Premium'=3, 'Ideal'=4 같은 코드북을 한 번만 만들고, 실제 데이터는 0, 1, 2, 3, 4 같은 정수로 저장합니다. 문자열 5만 개 대신 작은 정수 5만 개 + 코드북 하나만 저장하므로 메모리가 크게 절약됩니다. 데이터가 클수록, 고유값이 적을수록 절약 효과가 큽니다. 실제로 이 데이터에서 cut, color, clarity를 category로 바꾸면 메모리가 50% 이상 줄어듭니다.\r
+\r
+    astype('category')는 object 타입을 category 타입으로 변환합니다. category는 내부적으로 정수 코드 + 카테고리 목록으로 저장되어 메모리 효율이 높습니다. 특히 고유값이 적고 행이 많을수록 효과가 큽니다. 성별(2개), 요일(7개), 월(12개) 같은 컬럼은 반드시 category로 변환해야 합니다. 처리 속도도 빨라지고 groupby 등의 연산도 효율적입니다.\r
+  tips:\r
+  - astype('category')는 object 타입을 category 타입으로 변환합니다. category는 내부적으로 정수 코드 + 카테고리 목록으로 저장되어 메모리 효율이\r
+    높습니다. 특히 고유값이 적고 행이 많을수록 효과가 큽니다. 성별(2개), 요일(7개), 월(12개) 같은 컬럼은 반드시 category로 변환해야 합니다. 처리 속도도 빨라지고\r
+    groupby 등의 연산도 효율적입니다.\r
+  snippet: |-\r
+    catDf = diamonds.copy()\r
+    catDf['cut'] = catDf['cut'].astype('category')\r
+    catDf['cut'].dtype\r
+  exercise:\r
+    prompt: 6단계. category 타입 변환 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      catDf = diamonds.copy()\r
+      catDf['cut'] = catDf['cut'].astype('category')\r
+      catDf['cut'].dtype\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 6단계. category 타입 변환의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.\r
+    resultCheck: 6단계. category 타입 변환의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.\r
+- id: step7_ordered_category\r
+  title: 7단계. 순서 지정\r
+  structuredPrimary: true\r
+  subtitle: pd.Categorical()\r
+  goal: 7단계. 순서 지정에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: |-\r
+    범주에 순서를 지정하면 정렬할 때 그 순서를 따릅니다. Fair < Good < Very Good < Premium < Ideal 순서로 품질이 좋아지므로 이 순서를 지정합니다.\r
+\r
+    pd.Categorical()은 순서가 있는 범주형 데이터를 만듭니다. categories로 순서를 지정하고 ordered=True로 순서형임을 표시합니다. 이렇게 하면 sort_values()나 비교 연산자(>, <)를 사용할 때 지정한 순서를 따릅니다.\r
+  tips:\r
+  - pd.Categorical()은 순서가 있는 범주형 데이터를 만듭니다. categories로 순서를 지정하고 ordered=True로 순서형임을 표시합니다. 이렇게 하면 sort_values()나\r
+    비교 연산자(>, <)를 사용할 때 지정한 순서를 따릅니다.\r
+  snippet: |-\r
+    cutOrder = ['Fair', 'Good', 'Very Good', 'Premium', 'Ideal']\r
+    ordered = diamonds.copy()\r
+    ordered['cut'] = pd.Categorical(ordered['cut'], categories=cutOrder, ordered=True)\r
+    ordered.sort_values('cut').head(10)\r
+  exercise:\r
+    prompt: 7단계. 순서 지정 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      cutOrder = ['Fair', 'Good', 'Very Good', 'Premium', 'Ideal']\r
+      ordered = diamonds.copy()\r
+      ordered['cut'] = pd.Categorical(ordered['cut'], categories=cutOrder, ordered=True)\r
+      ordered.sort_values('cut').head(10)\r
+    hints:\r
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.\r
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 7단계. 순서 지정의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.\r
+    resultCheck: 7단계. 순서 지정의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.\r
+- id: step8_corr\r
+  title: 8단계. 상관관계 행렬\r
+  structuredPrimary: true\r
+  subtitle: corr()\r
+  goal: 8단계. 상관관계 행렬에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: |-\r
+    가격에 영향을 미치는 요인을 찾으려면 변수 간의 관계를 파악해야 합니다. 상관관계(correlation)는 두 변수가 함께 움직이는 정도를 -1에서 1 사이의 숫자로 나타냅니다. 1에 가까우면 강한 양의 상관(한 변수가 증가하면 다른 변수도 증가), -1에 가까우면 강한 음의 상관(한 변수가 증가하면 다른 변수는 감소), 0에 가까우면 상관관계가 없음을 의미합니다. corr() 메서드는 모든 수치형 컬럼 쌍의 상관계수를 행렬 형태로 계산합니다. select_dtypes(include='number')로 숫자형 컬럼만 선택한 이유는 문자열로는 상관계수를 계산할 수 없기 때문입니다. 대각선은 자기 자신과의 상관이므로 항상 1입니다.\r
+\r
+    corr()은 피어슨 상관계수(Pearson correlation)를 계산합니다. -1에서 1 사이 값으로, 절대값이 클수록 관계가 강합니다. 해석 기준: |r| >= 0.7 강한 상관, 0.3 <= |r| < 0.7 중간 상관, |r| < 0.3 약한 상관입니다. method='spearman'으로 비선형 관계도 측정할 수 있습니다. 상관관계는 인과관계가 아님을 주의하세요!\r
+  tips:\r
+  - 'corr()은 피어슨 상관계수(Pearson correlation)를 계산합니다. -1에서 1 사이 값으로, 절대값이 클수록 관계가 강합니다. 해석 기준: |r| >= 0.7\r
+    강한 상관, 0.3 <= |r| < 0.7 중간 상관, |r| < 0.3 약한 상관입니다. method=''spearman''으로 비선형 관계도 측정할 수 있습니다. 상관관계는\r
+    인과관계가 아님을 주의하세요!'\r
+  snippet: diamonds.select_dtypes(include='number').corr()\r
+  exercise:\r
+    prompt: 8단계. 상관관계 행렬 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: diamonds.select_dtypes(include='number').corr()\r
+    hints:\r
+    - 바꿀 지점은 DataFrame 입력을 만드는 첫 줄과 정제와 집계 줄에서 찾으세요.\r
+    - 실행 뒤 행/열 수와 요약값 중 하나가 바꾼 값을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 8단계. 상관관계 행렬의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.\r
+    resultCheck: 8단계. 상관관계 행렬의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.\r
+- id: step9_price_corr\r
+  title: 9단계. 가격 상관관계\r
+  structuredPrimary: true\r
+  subtitle: 가격과 관련된 요인\r
+  goal: 9단계. 가격 상관관계에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: carat(캐럿)이 0.92로 가장 높습니다. 캐럿이 클수록 가격이 높습니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: diamonds.select_dtypes(include='number').corr()['price'].sort_values(ascending=False)\r
+  exercise:\r
+    prompt: 9단계. 가격 상관관계 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: diamonds.select_dtypes(include='number').corr()['price'].sort_values(ascending=False)\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 9단계. 가격 상관관계의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.\r
+    resultCheck: 9단계. 가격 상관관계 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.\r
+- id: step10_cut_price\r
+  title: 10단계. 컷별 평균 가격\r
+  structuredPrimary: true\r
+  subtitle: 심슨의 역설\r
+  goal: 10단계. 컷별 평균 가격에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: 의외로 Fair 컷이 가장 비쌉니다. 하지만 Fair 컷의 캐럿이 더 크기 때문입니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: diamonds.groupby('cut')['price'].mean().sort_values(ascending=False)\r
+  exercise:\r
+    prompt: 10단계. 컷별 평균 가격 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: diamonds.groupby('cut')['price'].mean().sort_values(ascending=False)\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 10단계. 컷별 평균 가격의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.\r
+    resultCheck: 10단계. 컷별 평균 가격 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.\r
+- id: step11_cut_carat\r
+  title: 11단계. 컷별 캐럿 확인\r
+  structuredPrimary: true\r
+  subtitle: 역설의 원인\r
+  goal: 11단계. 컷별 캐럿 확인에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: Fair 컷이 캐럿이 더 큽니다. 캐럿을 통제하고 비교해야 공정합니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: diamonds.groupby('cut')['carat'].mean().sort_values(ascending=False)\r
+  exercise:\r
+    prompt: 11단계. 컷별 캐럿 확인 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: diamonds.groupby('cut')['carat'].mean().sort_values(ascending=False)\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 11단계. 컷별 캐럿 확인의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.\r
+    resultCheck: 11단계. 컷별 캐럿 확인 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.\r
+- id: step12_controlled\r
+  title: 12단계. 통제된 비교\r
+  structuredPrimary: true\r
+  subtitle: 동일 조건에서 비교\r
+  goal: 12단계. 통제된 비교에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: 1캐럿 다이아만 비교하면 Ideal이 가장 비쌉니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    oneCarat = diamonds[(diamonds['carat'] >= 0.95) & (diamonds['carat'] <= 1.05)]\r
+    oneCarat.groupby('cut')['price'].mean().sort_values(ascending=False)\r
+  exercise:\r
+    prompt: 12단계. 통제된 비교 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      oneCarat = diamonds[(diamonds['carat'] >= 0.95) & (diamonds['carat'] <= 1.05)]\r
+      oneCarat.groupby('cut')['price'].mean().sort_values(ascending=False)\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 12단계. 통제된 비교의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.\r
+    resultCheck: 12단계. 통제된 비교의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.\r
+- id: workflow_validation\r
+  title: '현업 흐름 검증: 가격 비교에서 캐럿 통제하기'\r
+  structuredPrimary: true\r
+  subtitle: category, groupby, corr, 필터링, 실패 케이스\r
+  goal: '현업 흐름 검증: 가격 비교에서 캐럿 통제하기에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.'\r
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.\r
+  explanation: |-\r
+    가격 비교는 confounder를 통제하지 않으면 잘못된 결론을 냅니다. 컷별 평균 가격과 1캐럿 근처 가격을 나눠 계산하고, 캐럿과 가격 상관관계도 함께 확인하세요.\r
+\r
+    변주 실험\r
+    1캐럿 범위를 0.9~1.1로 넓히면 컷별 평균 순위가 유지되는지 비교하세요.\r
+  tips:\r
+  - 변주 실험 1캐럿 범위를 0.9~1.1로 넓히면 컷별 평균 순위가 유지되는지 비교하세요.\r
+  snippet: |-\r
+    import pandas as pd\r
+\r
+    diamonds = pd.DataFrame({\r
+        "cut": ["Ideal", "Fair", "Ideal", "Fair"],\r
+        "carat": [1.0, 1.5, 0.9, 1.0],\r
+        "price": [6000, 7200, 5200, 5400],\r
+    })\r
+    diamonds["cut"] = diamonds["cut"].astype("category")\r
+\r
+    overall = diamonds.groupby("cut", observed=True)["price"].mean()\r
+    controlled = diamonds.query("0.95 <= carat <= 1.05").groupby("cut", observed=True)["price"].mean()\r
+    corr = diamonds[["carat", "price"]].corr().loc["carat", "price"]\r
+\r
+    assert overall.loc["Fair"] > overall.loc["Ideal"]\r
+    assert controlled.loc["Ideal"] > controlled.loc["Fair"]\r
+    assert corr > 0.8\r
+  exercise:\r
+    prompt: '현업 흐름 검증: 가격 비교에서 캐럿 통제하기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.'\r
+    starterCode: |-\r
+      import pandas as pd\r
+\r
+      diamonds = pd.DataFrame({\r
+          "cut": ["Ideal", "Fair", "Ideal", "Fair"],\r
+          "carat": [1.0, 1.5, 0.9, 1.0],\r
+          "price": [6000, 7200, 5200, 5400],\r
+      })\r
+      diamonds["cut"] = diamonds["cut"].astype("category")\r
+\r
+      overall = diamonds.groupby("cut", observed=True)["price"].mean()\r
+      controlled = diamonds.query("0.95 <= carat <= 1.05").groupby("cut", observed=True)["price"].mean()\r
+      corr = diamonds[["carat", "price"]].corr().loc["carat", "price"]\r
+\r
+      assert overall.loc["Fair"] > overall.loc["Ideal"]\r
+      assert controlled.loc["Ideal"] > controlled.loc["Fair"]\r
+      assert corr > 0.8\r
+    hints:\r
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.\r
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: '현업 흐름 검증: 가격 비교에서 캐럿 통제하기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.'\r
+    resultCheck: '현업 흐름 검증: 가격 비교에서 캐럿 통제하기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.'\r
+- id: practice\r
+  title: 실습\r
+  structuredPrimary: true\r
+  subtitle: 다이아몬드 가격 분석 프로젝트\r
+  goal: 실습에서 정제와 집계 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: |-\r
+    배운 내용으로 가격 결정 요인을 분석해봅시다.\r
+\r
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.\r
+  snippet: |-\r
+    import pandas as pd\r
+    from codaro.curriculum.localData import loadLocalDataset\r
+\r
+    data = loadLocalDataset("diamonds")\r
+  exercise:\r
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      import pandas as pd\r
+      from codaro.curriculum.localData import loadLocalDataset\r
+\r
+      data = loadLocalDataset("diamonds")\r
+    hints:\r
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.\r
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.\r
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.\r
+- id: summary\r
+  title: 정리\r
+  blocks:\r
+  - type: text\r
+    content: 대용량 데이터 처리와 상관분석을 배웠습니다.\r
+  - type: list\r
+    items:\r
+    - memory_usage() - 메모리 사용량 확인\r
+    - astype('category') - 범주형 타입 변환\r
+    - pd.Categorical() - 순서 있는 범주형\r
+    - corr() - 상관관계 분석\r
+    - 심슨의 역설 - 전체와 부분의 결과가 다를 수 있음\r
+  - type: text\r
+    content: 다음 시간에는 교통사고 데이터로 순위 분석을 배웁니다.\r
+  goal: 정리에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+`;export{e as default};

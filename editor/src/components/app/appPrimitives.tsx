@@ -140,21 +140,21 @@ export function ExecutionOutput({
       )}
       {result.artifacts?.length ? (
         <div
-          className="mt-3 rounded-md border border-border/70 bg-background/70 px-3 py-2 text-xs leading-5"
+          className="mt-3 border-t border-border/70 pt-3 text-xs leading-5"
           data-runtime-artifacts="true"
         >
-          <div className="mb-1 font-medium text-foreground">{t("system.runtimeArtifacts")}</div>
-          <div className="space-y-1">
+          <div className="font-medium text-foreground">{t("system.runtimeArtifacts")}</div>
+          <div className="mt-1 divide-y divide-border/70">
             {result.artifacts.map((artifact) => (
               <div
                 key={`${artifact.kind}:${artifact.path}`}
-                className="min-w-0"
+                className="grid min-w-0 gap-0.5 py-2"
                 data-runtime-artifact-kind={artifact.kind}
               >
-                <span className="text-muted-foreground">{artifact.label}: </span>
-                <span className="break-all font-mono text-[11px]">{artifact.path}</span>
+                <span className="font-medium text-muted-foreground">{artifact.label}</span>
+                <code className="break-all font-mono text-[11px] text-foreground">{artifact.path}</code>
                 {artifact.detail ? (
-                  <span className="ml-1 text-muted-foreground">{artifact.detail}</span>
+                  <span className="text-[11px] text-muted-foreground">{artifact.detail}</span>
                 ) : null}
               </div>
             ))}

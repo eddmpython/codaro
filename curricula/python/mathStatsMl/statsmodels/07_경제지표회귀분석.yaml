@@ -775,3 +775,253 @@ sections:
     type: noError
     noError: 업무 흐름 검증에서 `compactX` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: statsmodels_07-economic-time-alignment-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: 경제지표 시점과 발표 lag 정렬하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 예측 시점 이전에 발표된 값만 feature로 허용한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 관측 기간과 실제 발표 시점을 구분하세요.
+    - 나중에 수정된 경제지표를 과거 예측에 사용하지 마세요.
+    exercise:
+      prompt: audit_release_lags(rows, prediction_time)를 완성하세요.
+      starterCode: |-
+        def audit_release_lags(rows, prediction_time):
+            raise NotImplementedError
+      solution: |
+        def audit_release_lags(rows, prediction_time):
+            usable=[]; leaked=[]
+            for row in rows:
+                target=usable if row["releasedAt"]<=prediction_time else leaked
+                target.append(row["name"])
+            return {"valid":not leaked,"usable":sorted(usable),"leaked":sorted(leaked),"predictionTime":prediction_time}
+      hints: *id001
+    check:
+      id: python.statsmodels.statsmodels_07.economic-time-alignment.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.statsmodels.statsmodels_07.economic-time-alignment.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_release_lags
+        cases:
+        - id: blocks-future-release
+          arguments:
+          - value:
+            - name: cpi
+              releasedAt: 2
+            - name: gdp-revision
+              releasedAt: 5
+          - value: 3
+          expectedReturn:
+            valid: false
+            usable:
+            - cpi
+            leaked:
+            - gdp-revision
+            predictionTime: 3
+        - id: accepts-known-indicators
+          arguments:
+          - value:
+            - name: rate
+              releasedAt: 1
+          - value: 1
+          expectedReturn:
+            valid: true
+            usable:
+            - rate
+            leaked: []
+            predictionTime: 1
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: statsmodels_07-robust-standard-error-choice-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - statsmodels_07-economic-time-alignment-mastery
+    title: 새 경제 회귀에 covariance 선택 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: time dependence와 group dependence에 맞는 covariance 정책을 고른다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - covariance 방식은 data dependence 구조에 맞춰야 합니다.
+    - cluster 수가 너무 적으면 cluster SE도 불안정합니다.
+    exercise:
+      prompt: select_covariance(has_heteroskedasticity, has_time_dependence, cluster_count)를 완성하세요.
+      starterCode: |-
+        def select_covariance(has_heteroskedasticity, has_time_dependence, cluster_count):
+            raise NotImplementedError
+      solution: |
+        def select_covariance(has_heteroskedasticity, has_time_dependence, cluster_count):
+            if cluster_count<0: raise ValueError("negative clusters")
+            if cluster_count>=20: method="cluster"
+            elif has_time_dependence: method="HAC"
+            elif has_heteroskedasticity: method="HC3"
+            else: method="nonrobust"
+            return {"method":method,"requiresLag":method=="HAC","clusterAdequate":cluster_count>=20}
+      hints: *id002
+    check:
+      id: python.statsmodels.statsmodels_07.robust-standard-error-choice.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.statsmodels.statsmodels_07.robust-standard-error-choice.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: select_covariance
+        cases:
+        - id: chooses-hac-for-time
+          arguments:
+          - value: true
+          - value: true
+          - value: 0
+          expectedReturn:
+            method: HAC
+            requiresLag: true
+            clusterAdequate: false
+        - id: chooses-cluster
+          arguments:
+          - value: true
+          - value: true
+          - value: 30
+          expectedReturn:
+            method: cluster
+            requiresLag: false
+            clusterAdequate: true
+        - id: chooses-hc3
+          arguments:
+          - value: true
+          - value: false
+          - value: 0
+          expectedReturn:
+            method: HC3
+            requiresLag: false
+            clusterAdequate: false
+        - id: rejects-negative-clusters
+          arguments:
+          - value: false
+          - value: false
+          - value: -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: statsmodels_07-economic-regression-evidence-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - statsmodels_07-robust-standard-error-choice-transfer
+    title: 경제 회귀 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: release lag·serial dependence·causality를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 계수·불확실성·가정 진단을 한 묶음으로 해석하세요.
+    - 통계적 연관을 인과 효과나 개인 확정 예측으로 확대하지 마세요.
+    exercise:
+      prompt: choose_economic_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_economic_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_economic_evidence(situation):
+            table = {'real-time-forecast': {'method': 'vintage-aware time split', 'evidence': 'release timestamps', 'risk': 'revised data leakage'}, 'serial-errors': {'method': 'HAC covariance', 'evidence': 'lag choice residual ACF', 'risk': 'default SE'}, 'policy-effect': {'method': 'causal design', 'evidence': 'identification assumptions', 'risk': 'OLS association'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.statsmodels.statsmodels_07.economic-regression-evidence.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.statsmodels.statsmodels_07.economic-regression-evidence.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_economic_evidence
+        cases:
+        - id: recalls-real-time-forecast
+          arguments:
+          - value: real-time-forecast
+          expectedReturn:
+            method: vintage-aware time split
+            evidence: release timestamps
+            risk: revised data leakage
+        - id: recalls-serial-errors
+          arguments:
+          - value: serial-errors
+          expectedReturn:
+            method: HAC covariance
+            evidence: lag choice residual ACF
+            risk: default SE
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

@@ -9,6 +9,7 @@ import yaml
 from pydantic import ValidationError
 
 from codaro.curriculum.contentCache import CurriculumContentCache
+from codaro.curriculum.contentFlow import loadCurriculumContentPayload
 from codaro.curriculum.studyLoader import CATEGORY_GROUPS, CATEGORY_TREE, StudyLoader, curriculumCategoryTree
 from codaro.curriculum.converter import yamlToDocument
 from codaro.curriculum.progress import ProgressTracker
@@ -35,6 +36,9 @@ class _CountingStudyLoader:
                 }
             ],
         }
+
+    def resolveContentId(self, category: str, contentId: str) -> str:
+        return contentId
 
     def getPrevNext(self, category: str, contentId: str) -> dict:
         self.prevNextCount += 1
@@ -262,6 +266,46 @@ def testLoadStudy() -> None:
     assert "meta" in content
     assert "sections" in content
     assert content["meta"]["title"] == "헬로월드"
+
+
+def testLegacyMetaIdResolvesToCanonicalContentId() -> None:
+    if not CURRICULA_DIR.exists():
+        return
+    loader = StudyLoader(str(CURRICULA_DIR))
+
+    canonicalId = loader.resolveContentId("30days", "day02")
+    content = loader.loadStudy("30days", "day02")
+
+    assert canonicalId == "day02_변수와데이터타입"
+    assert content["meta"]["id"] == "day02"
+
+
+def testDeletedOrCustomLessonRefRemainsPortableEvidenceIdentity() -> None:
+    if not CURRICULA_DIR.exists():
+        return
+    loader = StudyLoader(str(CURRICULA_DIR))
+
+    assert loader.resolveLessonRef("custom/deleted-lesson") == "custom/deleted-lesson"
+    assert loader.resolveLessonRef("30days/day02") == "30days/day02_변수와데이터타입"
+
+
+def testLegacyMetaIdUsesCanonicalResponseAndProgressKey(tmp_path: Path) -> None:
+    if not CURRICULA_DIR.exists():
+        return
+    loader = StudyLoader(str(CURRICULA_DIR))
+    tracker = ProgressTracker(storagePath=tmp_path / "progress.json")
+
+    result = loadCurriculumContentPayload(
+        studyLoader=loader,
+        contentCache=CurriculumContentCache(),
+        progressTracker=tracker,
+        category="30days",
+        contentId="day02",
+    )
+
+    assert result.payload["contentId"] == "day02_변수와데이터타입"
+    assert result.payload["document"]["metadata"]["tags"] == ["30days", "day02_변수와데이터타입"]
+    assert set(tracker.load().lessons) == {"30days/day02_변수와데이터타입"}
 
 
 def testYamlToDocument() -> None:

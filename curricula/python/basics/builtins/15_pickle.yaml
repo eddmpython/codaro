@@ -377,3 +377,342 @@ sections:
   check:
     noError: pickle 모듈 종합 복습에서 `saveDict` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: pickle 모듈 종합 복습 실행 뒤 `saveDict` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 15_pickle-trusted-checkpoint-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - basic_serialization
+    - supported_types
+    - workflow_validation
+    title: 신뢰한 체크포인트를 저장하고 즉시 검산하기
+    subtitle: dump, load, 필수 필드 검증
+    goal: 체크포인트 dict를 검증한 뒤 pickle 파일로 저장하고 다시 읽어 핵심 필드가 보존됐는지 반환한다.
+    why: pickle은 저장 자체보다 신뢰한 로컬 객체를 저장했는지, 복원 뒤 필요한 필드가 유지됐는지를 확인할 때 실무 가치가 생깁니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않는 target path와 checkpoint dict를 넘겨 저장, 복원, 실패 케이스를 함께 검증합니다.
+    tips:
+    - pickle.load는 신뢰한 로컬 파일에만 사용하세요.
+    - 저장 전에 version, model, metrics를 먼저 검증하세요.
+    exercise:
+      prompt: save_trusted_checkpoint(path, checkpoint)가 pickle 파일을 만들고 path, version, modelName, featureCount, accuracy를
+        담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def save_trusted_checkpoint(path, checkpoint):
+            raise NotImplementedError
+      solution: |-
+        import pickle
+        from pathlib import Path
+
+        def save_trusted_checkpoint(path, checkpoint):
+            if checkpoint.get("version") != 1:
+                raise ValueError("unsupported checkpoint version")
+            model = checkpoint.get("model")
+            metrics = checkpoint.get("metrics")
+            if not isinstance(model, dict) or not isinstance(metrics, dict):
+                raise ValueError("model and metrics are required")
+            target = Path(path)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            with target.open("wb") as file:
+                pickle.dump(checkpoint, file, protocol=pickle.HIGHEST_PROTOCOL)
+            with target.open("rb") as file:
+                restored = pickle.load(file)
+            if restored != checkpoint:
+                raise ValueError("checkpoint round trip failed")
+            return {
+                "path": str(target),
+                "version": restored["version"],
+                "modelName": model.get("name"),
+                "featureCount": len(model.get("features", [])),
+                "accuracy": metrics.get("accuracy"),
+            }
+      hints:
+      - 먼저 dict 구조를 검사한 뒤 파일을 여세요.
+      - 반환 path는 verifier가 fixture root 기준 상대경로로 정규화합니다.
+    check:
+      id: python.builtins.pickle.trusted-checkpoint.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.pickle.checkpoint.behavior.v1.fixture
+      fixtureHash: sha256-KkCthDuytG5auAGuGoeJfFaQYT8Kg9Ce2il+NbRzHhc=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: input/trusted_checkpoint.pkl
+          contentBase64: gASVjgAAAAAAAAB9lCiMB3ZlcnNpb26USwGMBW1vZGVslH2UKIwEbmFtZZSMCGJhc2VsaW5llIwIZmVhdHVyZXOUXZQojAZhbW91bnSUjAZyZWdpb26UZXWMB21ldHJpY3OUfZQojAthY2N1cmFjeVBjdJRLW4wHbG9zc1BjdJRLEnWMCWNyZWF0ZWRCeZSMBWxvY2FslHUu
+        - path: input/missing_metrics.pkl
+          contentBase64: gASVUgAAAAAAAAB9lCiMB3ZlcnNpb26USwGMBW1vZGVslH2UKIwEbmFtZZSMBWRyYWZ0lIwIZmVhdHVyZXOUXZSMAXiUYXWMCWNyZWF0ZWRCeZSMBWxvY2FslHUu
+        - path: input/corrupt_checkpoint.pkl
+          contentBase64: bm90IGEgcGlja2xl
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: save_trusted_checkpoint
+        cases:
+        - id: saves-and-verifies-checkpoint
+          arguments:
+          - fixturePath: output/checkpoint.pkl
+          - value:
+              version: 1
+              model:
+                name: baseline
+                features:
+                - amount
+                - region
+              metrics:
+                accuracy: 0.91
+                loss: 0.18
+              createdBy: local
+          expectedReturn:
+            path: output/checkpoint.pkl
+            version: 1
+            modelName: baseline
+            featureCount: 2
+            accuracy: 0.91
+        - id: rejects-missing-metrics
+          arguments:
+          - fixturePath: output/bad-checkpoint.pkl
+          - value:
+              version: 1
+              model:
+                name: draft
+                features:
+                - x
+              createdBy: local
+          expectedException: ValueError
+        expectedPaths:
+        - path: output/checkpoint.pkl
+          kind: file
+        normalizeReturnPaths:
+        - path
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 15_pickle-sequential-bundle-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - multiple_objects
+    - 15_pickle-trusted-checkpoint-mastery
+    title: 여러 객체를 순차 pickle 번들로 저장하기
+    subtitle: 같은 파일에 dump를 여러 번 호출
+    goal: 여러 record dict를 한 파일에 순차 저장하고 EOF까지 다시 읽어 저장 순서와 항목 수를 검증한다.
+    why: pickle을 캐시나 체크포인트에 쓰다 보면 한 파일에 여러 객체를 쌓는 흐름과 EOFError 종료 조건을 정확히 이해해야 합니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 이번에는 단일 checkpoint가 아니라 여러 record를 같은 파일에 순서대로 저장하세요.
+    tips:
+    - load를 반복하다가 EOFError가 나면 정상 종료로 처리하세요.
+    - 각 record에 kind가 없으면 저장하지 말고 ValueError를 내세요.
+    exercise:
+      prompt: write_pickle_bundle(target_path, records)가 path, count, kinds, totalItems를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def write_pickle_bundle(target_path, records):
+            raise NotImplementedError
+      solution: |-
+        import pickle
+        from pathlib import Path
+
+        def write_pickle_bundle(target_path, records):
+            target = Path(target_path)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            with target.open("wb") as file:
+                for record in records:
+                    if not isinstance(record, dict) or "kind" not in record:
+                        raise ValueError("record kind is required")
+                    pickle.dump(record, file, protocol=pickle.HIGHEST_PROTOCOL)
+            restored = []
+            with target.open("rb") as file:
+                while True:
+                    try:
+                        restored.append(pickle.load(file))
+                    except EOFError:
+                        break
+            return {
+                "path": str(target),
+                "count": len(restored),
+                "kinds": [record["kind"] for record in restored],
+                "totalItems": sum(len(record.get("items", [])) for record in restored),
+            }
+      hints:
+      - dump 호출 순서가 load 결과 순서가 됩니다.
+      - EOFError는 파일이 깨졌다는 뜻이 아니라 순차 load의 정상 종료 신호로 쓸 수 있습니다.
+    check:
+      id: python.builtins.pickle.sequential-bundle.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.pickle.checkpoint.behavior.v1.fixture
+      fixtureHash: sha256-KkCthDuytG5auAGuGoeJfFaQYT8Kg9Ce2il+NbRzHhc=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: input/trusted_checkpoint.pkl
+          contentBase64: gASVjgAAAAAAAAB9lCiMB3ZlcnNpb26USwGMBW1vZGVslH2UKIwEbmFtZZSMCGJhc2VsaW5llIwIZmVhdHVyZXOUXZQojAZhbW91bnSUjAZyZWdpb26UZXWMB21ldHJpY3OUfZQojAthY2N1cmFjeVBjdJRLW4wHbG9zc1BjdJRLEnWMCWNyZWF0ZWRCeZSMBWxvY2FslHUu
+        - path: input/missing_metrics.pkl
+          contentBase64: gASVUgAAAAAAAAB9lCiMB3ZlcnNpb26USwGMBW1vZGVslH2UKIwEbmFtZZSMBWRyYWZ0lIwIZmVhdHVyZXOUXZSMAXiUYXWMCWNyZWF0ZWRCeZSMBWxvY2FslHUu
+        - path: input/corrupt_checkpoint.pkl
+          contentBase64: bm90IGEgcGlja2xl
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: write_pickle_bundle
+        cases:
+        - id: writes-sequential-records
+          arguments:
+          - fixturePath: output/bundle.pkl
+          - value:
+            - kind: config
+              items:
+              - amount
+              - region
+            - kind: result
+              items:
+              - accuracy
+              - loss
+              - count
+          expectedReturn:
+            path: output/bundle.pkl
+            count: 2
+            kinds:
+            - config
+            - result
+            totalItems: 5
+        - id: rejects-record-without-kind
+          arguments:
+          - fixturePath: output/bad-bundle.pkl
+          - value:
+            - items:
+              - missing
+          expectedException: ValueError
+        expectedPaths:
+        - path: output/bundle.pkl
+          kind: file
+        normalizeReturnPaths:
+        - path
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 15_pickle-safe-load-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 15_pickle-sequential-bundle-transfer
+    title: 오래된 pickle 캐시를 안전하게 다시 읽기
+    subtitle: 신뢰된 파일 검증과 깨진 파일 거부
+    goal: pickle 파일을 읽고 version, model, metrics 구조를 검증해 요약 dict를 반환한다.
+    why: 시간이 지나도 꼭 남아야 하는 pickle 지식은 load가 편하다는 사실보다, 신뢰 경계와 구조 검증을 함께 적용하는 습관입니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. valid pickle, 필드 누락 pickle, 깨진 파일을 같은 함수로 판정하세요.
+    tips:
+    - pickle.UnpicklingError와 EOFError는 ValueError로 감싸서 호출자가 같은 실패 경로를 쓰게 하세요.
+    - version이 1이고 model, metrics가 dict인지 확인하세요.
+    exercise:
+      prompt: load_trusted_pickle_summary(path)가 modelName, featureCount, metricNames, createdBy를 담은 dict를 반환하고 깨진 파일은 ValueError로
+        막도록 완성하세요.
+      starterCode: |-
+        def load_trusted_pickle_summary(path):
+            raise NotImplementedError
+      solution: |-
+        import pickle
+
+        def load_trusted_pickle_summary(path):
+            try:
+                with open(path, "rb") as file:
+                    loaded = pickle.load(file)
+            except (pickle.UnpicklingError, EOFError, AttributeError, ValueError, TypeError) as exc:
+                raise ValueError("trusted pickle could not be loaded") from exc
+            if not isinstance(loaded, dict):
+                raise ValueError("checkpoint must be a dict")
+            if loaded.get("version") != 1:
+                raise ValueError("unsupported checkpoint version")
+            model = loaded.get("model")
+            metrics = loaded.get("metrics")
+            if not isinstance(model, dict) or not isinstance(metrics, dict):
+                raise ValueError("model and metrics are required")
+            features = model.get("features")
+            if not isinstance(features, list):
+                raise ValueError("model features must be a list")
+            return {
+                "modelName": model.get("name"),
+                "featureCount": len(features),
+                "metricNames": sorted(metrics),
+                "createdBy": loaded.get("createdBy"),
+            }
+      hints:
+      - 파일을 읽은 뒤 바로 반환하지 말고 구조를 검증하세요.
+      - metricNames는 정렬된 리스트로 반환하세요.
+    check:
+      id: python.builtins.pickle.safe-load.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.pickle.checkpoint.behavior.v1.fixture
+      fixtureHash: sha256-KkCthDuytG5auAGuGoeJfFaQYT8Kg9Ce2il+NbRzHhc=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: input/trusted_checkpoint.pkl
+          contentBase64: gASVjgAAAAAAAAB9lCiMB3ZlcnNpb26USwGMBW1vZGVslH2UKIwEbmFtZZSMCGJhc2VsaW5llIwIZmVhdHVyZXOUXZQojAZhbW91bnSUjAZyZWdpb26UZXWMB21ldHJpY3OUfZQojAthY2N1cmFjeVBjdJRLW4wHbG9zc1BjdJRLEnWMCWNyZWF0ZWRCeZSMBWxvY2FslHUu
+        - path: input/missing_metrics.pkl
+          contentBase64: gASVUgAAAAAAAAB9lCiMB3ZlcnNpb26USwGMBW1vZGVslH2UKIwEbmFtZZSMBWRyYWZ0lIwIZmVhdHVyZXOUXZSMAXiUYXWMCWNyZWF0ZWRCeZSMBWxvY2FslHUu
+        - path: input/corrupt_checkpoint.pkl
+          contentBase64: bm90IGEgcGlja2xl
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: load_trusted_pickle_summary
+        cases:
+        - id: loads-protocol-zero-checkpoint
+          arguments:
+          - fixturePath: input/trusted_checkpoint.pkl
+          expectedReturn:
+            modelName: baseline
+            featureCount: 2
+            metricNames:
+            - accuracyPct
+            - lossPct
+            createdBy: local
+        - id: rejects-missing-metrics
+          arguments:
+          - fixturePath: input/missing_metrics.pkl
+          expectedException: ValueError
+        - id: rejects-corrupt-pickle
+          arguments:
+          - fixturePath: input/corrupt_checkpoint.pkl
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

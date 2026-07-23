@@ -61,23 +61,28 @@ export function TopControls({
       ) : null}
 
       <div className="absolute right-2 top-1.5 z-30 flex items-center gap-0.5">
-        <SocialLinks />
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button asChild className="h-6 gap-1 px-2 text-[11px] [&_svg]:size-3" size="sm" variant="outline">
-              <a aria-label={t("topbar.githubStar")} href={CODARO_LINKS.githubRepo} rel="noreferrer noopener" target="_blank">
-                <Star className="fill-amber-400 text-amber-400" />
-                <span className="hidden sm:inline">{t("topbar.githubStar")}</span>
-              </a>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>{t("topbar.githubStar")}</TooltipContent>
-        </Tooltip>
+        <div className="hidden items-center gap-0.5 xl:flex" data-topbar-external-links="desktop">
+          <SocialLinks />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button asChild className="h-6 gap-1 px-2 text-[11px] [&_svg]:size-3" size="sm" variant="outline">
+                <a aria-label={t("topbar.githubStar")} href={CODARO_LINKS.githubRepo} rel="noreferrer noopener" target="_blank">
+                  <Star className="fill-amber-400 text-amber-400" />
+                  <span className="hidden sm:inline">{t("topbar.githubStar")}</span>
+                </a>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t("topbar.githubStar")}</TooltipContent>
+          </Tooltip>
+        </div>
         {showStatusNotice && onCopyDiagnosticExport ? (
-          <DiagnosticExportButton onCopyDiagnosticExport={onCopyDiagnosticExport} />
+          <div className="hidden xl:block" data-topbar-diagnostic="desktop">
+            <DiagnosticExportButton onCopyDiagnosticExport={onCopyDiagnosticExport} />
+          </div>
         ) : null}
         {showAssistantToggle ? (
           <TopBarIconButton
+            className="hidden xl:inline-flex"
             label={assistantCollapsed ? t("topbar.aiOpen") : t("topbar.aiClose")}
             onClick={onToggleAssistant}
           >

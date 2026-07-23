@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "matplotlib"
+canonicalRows: 11
+lessons:
+  - lessonRef: "matplotlib/00_Matplotlib소개"
+    identityLedgerRef: "identity-ledger/matplotlib.yml"
+    lessonContentHash: "c7061aa54e619dfd926bb84d43d93d48f84dcaeffb06708a05c621db38786ac0"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization","timeSeriesAnalysis","timeSeriesForecasting"]
+    outcomes: ["matplotlib.basics"]
+    prerequisites: ["pandas.loadFrame"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:matplotlib/00_Matplotlib소개:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:matplotlib_00_Matplotlib__:v1","retrieve:matplotlib_00_Matplotlib__:v2","retrieve:matplotlib_00_Matplotlib__:v3"]
+    transferVariantIds: ["transfer:matplotlib_00_Matplotlib__:near-v1","transfer:matplotlib_00_Matplotlib__:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "matplotlib/01_주가추세분석"
+    identityLedgerRef: "identity-ledger/matplotlib.yml"
+    lessonContentHash: "3a005a018b66252b6f6e16d843b2c50e68bd96abb5627da4ca655fdff533b2f1"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization","timeSeriesAnalysis","timeSeriesForecasting"]
+    outcomes: ["matplotlib.basics"]
+    prerequisites: ["matplotlib.basics"]
+    reinforcesOutcomeIds: ["matplotlib.basics"]
+    runtimeTier: browser
+    checkSpecId: "lesson:matplotlib/01_주가추세분석:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:matplotlib_01_______:v1","retrieve:matplotlib_01_______:v2","retrieve:matplotlib_01_______:v3"]
+    transferVariantIds: ["transfer:matplotlib_01_______:near-v1","transfer:matplotlib_01_______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "matplotlib/02_팁데이터분포탐색"
+    identityLedgerRef: "identity-ledger/matplotlib.yml"
+    lessonContentHash: "d8e80091b30e19d574c1dc8f51e80316873d01362680983ceb3eea712ebd857a"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization","timeSeriesAnalysis","timeSeriesForecasting"]
+    outcomes: ["matplotlib.basics","viz.distribution"]
+    prerequisites: ["matplotlib.basics"]
+    reinforcesOutcomeIds: ["matplotlib.basics"]
+    runtimeTier: browser
+    checkSpecId: "lesson:matplotlib/02_팁데이터분포탐색:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:matplotlib_02_________:v1","retrieve:matplotlib_02_________:v2","retrieve:matplotlib_02_________:v3"]
+    transferVariantIds: ["transfer:matplotlib_02_________:near-v1","transfer:matplotlib_02_________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "matplotlib/03_붓꽃품종산점도"
+    identityLedgerRef: "identity-ledger/matplotlib.yml"
+    lessonContentHash: "baf361323f89823edb79ee092dccdd7c377951aaae626f7a33c467ac3c84742f"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization","timeSeriesAnalysis","timeSeriesForecasting"]
+    outcomes: ["matplotlib.basics"]
+    prerequisites: ["matplotlib.basics"]
+    reinforcesOutcomeIds: ["matplotlib.basics"]
+    runtimeTier: browser
+    checkSpecId: "lesson:matplotlib/03_붓꽃품종산점도:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:matplotlib_03________:v1","retrieve:matplotlib_03________:v2","retrieve:matplotlib_03________:v3"]
+    transferVariantIds: ["transfer:matplotlib_03________:near-v1","transfer:matplotlib_03________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "matplotlib/04_대륙별인구비교"
+    identityLedgerRef: "identity-ledger/matplotlib.yml"
+    lessonContentHash: "6dab850925c3dbeaa7564e680b935ea99f3edb05f84a80876f9e0a65f43e13ae"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization","timeSeriesAnalysis","timeSeriesForecasting"]
+    outcomes: ["matplotlib.basics"]
+    prerequisites: ["matplotlib.basics"]
+    reinforcesOutcomeIds: ["matplotlib.basics"]
+    runtimeTier: browser
+    checkSpecId: "lesson:matplotlib/04_대륙별인구비교:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:matplotlib_04________:v1","retrieve:matplotlib_04________:v2","retrieve:matplotlib_04________:v3"]
+    transferVariantIds: ["transfer:matplotlib_04________:near-v1","transfer:matplotlib_04________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "matplotlib/05_펭귄체중분석"
+    identityLedgerRef: "identity-ledger/matplotlib.yml"
+    lessonContentHash: "b1a2576828975654b6758cb08a333b4bd7e1e003526eaac9f6cf9db748980a73"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization"]
+    outcomes: ["viz.distribution"]
+    prerequisites: ["matplotlib.basics"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:matplotlib/05_펭귄체중분석:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:matplotlib_05_______:v1","retrieve:matplotlib_05_______:v2","retrieve:matplotlib_05_______:v3"]
+    transferVariantIds: ["transfer:matplotlib_05_______:near-v1","transfer:matplotlib_05_______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "matplotlib/06_상관관계히트맵"
+    identityLedgerRef: "identity-ledger/matplotlib.yml"
+    lessonContentHash: "541446e470eb801204501da55ee2092606e63bfb0253836cb65bec5c7f95c958"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization"]
+    outcomes: ["viz.heatmap"]
+    prerequisites: ["matplotlib.basics","pandas.aggregate"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:matplotlib/06_상관관계히트맵:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:matplotlib_06________:v1","retrieve:matplotlib_06________:v2","retrieve:matplotlib_06________:v3"]
+    transferVariantIds: ["transfer:matplotlib_06________:near-v1","transfer:matplotlib_06________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "matplotlib/07_시계열다중축차트"
+    identityLedgerRef: "identity-ledger/matplotlib.yml"
+    lessonContentHash: "084550ab0e35cebddd2be86dfcb6979049b422fe2a433206b3a7f98430213df4"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization"]
+    outcomes: ["matplotlib.advanced"]
+    prerequisites: ["matplotlib.basics"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:matplotlib/07_시계열다중축차트:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:matplotlib_07_________:v1","retrieve:matplotlib_07_________:v2","retrieve:matplotlib_07_________:v3"]
+    transferVariantIds: ["transfer:matplotlib_07_________:near-v1","transfer:matplotlib_07_________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "matplotlib/08_다중패널대시보드"
+    identityLedgerRef: "identity-ledger/matplotlib.yml"
+    lessonContentHash: "d49f4ab199b8359415e9ec0ad86c367c085197da61da1c11d282ef3909a360cc"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization"]
+    outcomes: ["matplotlib.advanced"]
+    prerequisites: ["matplotlib.advanced"]
+    reinforcesOutcomeIds: ["matplotlib.advanced"]
+    runtimeTier: browser
+    checkSpecId: "lesson:matplotlib/08_다중패널대시보드:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:matplotlib_08_________:v1","retrieve:matplotlib_08_________:v2","retrieve:matplotlib_08_________:v3"]
+    transferVariantIds: ["transfer:matplotlib_08_________:near-v1","transfer:matplotlib_08_________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "matplotlib/09_고급주석차트"
+    identityLedgerRef: "identity-ledger/matplotlib.yml"
+    lessonContentHash: "eb8523ac41337b9e163978b3c93c2f83c7988a65e00ce9de81fdc171154b33f0"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization"]
+    outcomes: ["matplotlib.advanced"]
+    prerequisites: ["matplotlib.advanced"]
+    reinforcesOutcomeIds: ["matplotlib.advanced"]
+    runtimeTier: browser
+    checkSpecId: "lesson:matplotlib/09_고급주석차트:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:matplotlib_09_______:v1","retrieve:matplotlib_09_______:v2","retrieve:matplotlib_09_______:v3"]
+    transferVariantIds: ["transfer:matplotlib_09_______:near-v1","transfer:matplotlib_09_______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "matplotlib/10_종합분석리포트"
+    identityLedgerRef: "identity-ledger/matplotlib.yml"
+    lessonContentHash: "ba7dd9d81b7958fdcac26f2d33645d55751eaf6f98c93c88e71ce4d05a7a0821"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization"]
+    outcomes: ["matplotlib.advanced"]
+    prerequisites: ["matplotlib.advanced"]
+    reinforcesOutcomeIds: ["matplotlib.advanced"]
+    runtimeTier: browser
+    checkSpecId: "lesson:matplotlib/10_종합분석리포트:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:matplotlib_10________:v1","retrieve:matplotlib_10________:v2","retrieve:matplotlib_10________:v3"]
+    transferVariantIds: ["transfer:matplotlib_10________:near-v1","transfer:matplotlib_10________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

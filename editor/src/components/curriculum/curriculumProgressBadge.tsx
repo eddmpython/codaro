@@ -22,7 +22,7 @@ export function CurriculumProgressBadge({
       className={cn(
         "gap-1 px-2 py-0.5 text-[10px] font-medium",
         tone === "complete" && "border-success/50 text-success",
-        tone === "active" && "border-ring/40 bg-accent/30 text-foreground",
+        tone === "active" && "border-ring/40 bg-accent-surface/30 text-foreground",
         tone === "idle" && "text-muted-foreground",
       )}
       data-progress-badge={tone}

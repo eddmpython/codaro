@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "root": "src/lib/generated",
+  "tracked": false,
+  "outputs": [
+    {
+      "path": "curriculum.js",
+      "producer": "scripts/generateCurriculum.js"
+    },
+    {
+      "path": "curriculumLessons",
+      "producer": "scripts/generateCurriculum.js"
+    },
+    {
+      "path": "docsNav.js",
+      "producer": "scripts/generateContent.js"
+    },
+    {
+      "path": "docsPages",
+      "producer": "scripts/generateContent.js"
+    },
+    {
+      "path": "posts.js",
+      "producer": "scripts/generateContent.js"
+    },
+    {
+      "path": "searchIndex.js",
+      "producer": "scripts/generateContent.js"
+    },
+    {
+      "path": "visualAssetManifest.js",
+      "producer": "scripts/syncVisualAssets.js"
+    }
+  ],
+  "trackedExceptions": [
+    {
+      "path": "src/styles/generated",
+      "producer": "../assets/brand/tools/buildDesignSystem.py",
+      "reason": "Vite and TypeScript import the shared token and font modules before the landing content lifecycle runs."
+    }
+  ]
+}

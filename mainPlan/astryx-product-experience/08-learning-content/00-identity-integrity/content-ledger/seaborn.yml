@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "seaborn"
+canonicalRows: 11
+lessons:
+  - lessonRef: "seaborn/00_Seaborn소개"
+    identityLedgerRef: "identity-ledger/seaborn.yml"
+    lessonContentHash: "5786bff53435a659192b7b948b80c66b84078640d59f946da9b362e3baa6c645"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization"]
+    outcomes: ["viz.statistical"]
+    prerequisites: ["matplotlib.basics"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:seaborn/00_Seaborn소개:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:seaborn_00_Seaborn__:v1","retrieve:seaborn_00_Seaborn__:v2","retrieve:seaborn_00_Seaborn__:v3"]
+    transferVariantIds: ["transfer:seaborn_00_Seaborn__:near-v1","transfer:seaborn_00_Seaborn__:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "seaborn/01_붓꽃품종산점도"
+    identityLedgerRef: "identity-ledger/seaborn.yml"
+    lessonContentHash: "ed6407413b0728837556fb803d64429d0e1b02b7d4d6d08252e58012fcbc33c2"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization"]
+    outcomes: ["viz.statistical"]
+    prerequisites: ["viz.statistical"]
+    reinforcesOutcomeIds: ["viz.statistical"]
+    runtimeTier: browser
+    checkSpecId: "lesson:seaborn/01_붓꽃품종산점도:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:seaborn_01________:v1","retrieve:seaborn_01________:v2","retrieve:seaborn_01________:v3"]
+    transferVariantIds: ["transfer:seaborn_01________:near-v1","transfer:seaborn_01________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "seaborn/02_팁데이터분포탐색"
+    identityLedgerRef: "identity-ledger/seaborn.yml"
+    lessonContentHash: "ed8e52cd4aaf6f8de611ab2f90edb30a01bdbc1e731658382e41241a988ee2ab"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization"]
+    outcomes: ["viz.distribution"]
+    prerequisites: ["viz.statistical"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:seaborn/02_팁데이터분포탐색:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:seaborn_02_________:v1","retrieve:seaborn_02_________:v2","retrieve:seaborn_02_________:v3"]
+    transferVariantIds: ["transfer:seaborn_02_________:near-v1","transfer:seaborn_02_________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "seaborn/03_펭귄체중분포비교"
+    identityLedgerRef: "identity-ledger/seaborn.yml"
+    lessonContentHash: "cfaa70077a789759d7e189cef5f68872f2a470c3cd54e9e5bd2a74a9262cfa11"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization"]
+    outcomes: ["viz.distribution"]
+    prerequisites: ["viz.distribution"]
+    reinforcesOutcomeIds: ["viz.distribution"]
+    runtimeTier: browser
+    checkSpecId: "lesson:seaborn/03_펭귄체중분포비교:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:seaborn_03_________:v1","retrieve:seaborn_03_________:v2","retrieve:seaborn_03_________:v3"]
+    transferVariantIds: ["transfer:seaborn_03_________:near-v1","transfer:seaborn_03_________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "seaborn/04_광고비판매액회귀"
+    identityLedgerRef: "identity-ledger/seaborn.yml"
+    lessonContentHash: "5e0e37ef4c78523fbd85828dbc948193dc07f26fe5a13109a49b63fdebaa9eb1"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization"]
+    outcomes: ["viz.regression"]
+    prerequisites: ["viz.statistical"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:seaborn/04_광고비판매액회귀:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:seaborn_04_________:v1","retrieve:seaborn_04_________:v2","retrieve:seaborn_04_________:v3"]
+    transferVariantIds: ["transfer:seaborn_04_________:near-v1","transfer:seaborn_04_________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "seaborn/05_타이타닉생존분석"
+    identityLedgerRef: "identity-ledger/seaborn.yml"
+    lessonContentHash: "f39f33baf3a50641129e25601c24fc8477dd419757c044039ff3e9e97ae397a7"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization"]
+    outcomes: ["viz.distribution","viz.statistical"]
+    prerequisites: ["viz.statistical"]
+    reinforcesOutcomeIds: ["viz.statistical"]
+    runtimeTier: browser
+    checkSpecId: "lesson:seaborn/05_타이타닉생존분석:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:seaborn_05_________:v1","retrieve:seaborn_05_________:v2","retrieve:seaborn_05_________:v3"]
+    transferVariantIds: ["transfer:seaborn_05_________:near-v1","transfer:seaborn_05_________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "seaborn/06_항공편승객시계열"
+    identityLedgerRef: "identity-ledger/seaborn.yml"
+    lessonContentHash: "23ade73dcbf96a57898f8498c31e7f361c3d7750372014f7caaee8df2ed58c69"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization"]
+    outcomes: ["viz.statistical"]
+    prerequisites: ["viz.statistical","pandas.timeSeries"]
+    reinforcesOutcomeIds: ["viz.statistical"]
+    runtimeTier: browser
+    checkSpecId: "lesson:seaborn/06_항공편승객시계열:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:seaborn_06_________:v1","retrieve:seaborn_06_________:v2","retrieve:seaborn_06_________:v3"]
+    transferVariantIds: ["transfer:seaborn_06_________:near-v1","transfer:seaborn_06_________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "seaborn/07_세계기대수명분석"
+    identityLedgerRef: "identity-ledger/seaborn.yml"
+    lessonContentHash: "9c1a29018d6f023e93e73e9ace8b8f9c4c6502880e5d8d9499cbf17b7d605f14"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization"]
+    outcomes: ["viz.regression"]
+    prerequisites: ["viz.regression"]
+    reinforcesOutcomeIds: ["viz.regression"]
+    runtimeTier: browser
+    checkSpecId: "lesson:seaborn/07_세계기대수명분석:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:seaborn_07_________:v1","retrieve:seaborn_07_________:v2","retrieve:seaborn_07_________:v3"]
+    transferVariantIds: ["transfer:seaborn_07_________:near-v1","transfer:seaborn_07_________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "seaborn/08_다이아몬드가격분석"
+    identityLedgerRef: "identity-ledger/seaborn.yml"
+    lessonContentHash: "8291096893266d00b86739d6a83d1ee5c59cea8dfbea8aeafec86cb5e14396f3"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization"]
+    outcomes: ["viz.heatmap","viz.distribution"]
+    prerequisites: ["viz.distribution"]
+    reinforcesOutcomeIds: ["viz.distribution"]
+    runtimeTier: browser
+    checkSpecId: "lesson:seaborn/08_다이아몬드가격분석:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:seaborn_08__________:v1","retrieve:seaborn_08__________:v2","retrieve:seaborn_08__________:v3"]
+    transferVariantIds: ["transfer:seaborn_08__________:near-v1","transfer:seaborn_08__________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "seaborn/09_자동차연비종합분석"
+    identityLedgerRef: "identity-ledger/seaborn.yml"
+    lessonContentHash: "ca1923715b264d9e63ada78fd616663c83b0c80ed4ad90785b895b7b79db7fd3"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization"]
+    outcomes: ["viz.regression","viz.heatmap"]
+    prerequisites: ["viz.regression"]
+    reinforcesOutcomeIds: ["viz.regression"]
+    runtimeTier: browser
+    checkSpecId: "lesson:seaborn/09_자동차연비종합분석:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:seaborn_09__________:v1","retrieve:seaborn_09__________:v2","retrieve:seaborn_09__________:v3"]
+    transferVariantIds: ["transfer:seaborn_09__________:near-v1","transfer:seaborn_09__________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "seaborn/10_종합EDA리포트"
+    identityLedgerRef: "identity-ledger/seaborn.yml"
+    lessonContentHash: "5a1d95d457e348af71dfb118d6a9a773547a565fa1faa6a97ffca0ceff770920"
+    disposition: migrate
+    ownerPacket: "03-data-visualization"
+    eligiblePathIds: ["dataVisualization"]
+    outcomes: ["viz.edaReport"]
+    prerequisites: ["viz.regression","viz.heatmap","viz.distribution"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:seaborn/10_종합EDA리포트:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:seaborn_10___EDA___:v1","retrieve:seaborn_10___EDA___:v2","retrieve:seaborn_10___EDA___:v3"]
+    transferVariantIds: ["transfer:seaborn_10___EDA___:near-v1","transfer:seaborn_10___EDA___:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

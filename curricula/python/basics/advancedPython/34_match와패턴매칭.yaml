@@ -339,3 +339,297 @@ sections:
     type: noError
     noError: normalize 정의와 match 분기가 NameError, SyntaxError 없이 실행되어야 합니다.
     resultCheck: 결과가 [list-of-3, [item:a, item:b], number:42, text:hello] 처럼 OR/as 패턴이 의도한 대로 매칭되어야 합니다.
+assessment:
+  masteryVariants:
+  - id: 34_pattern_matching-learning-event-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - literal-capture
+    - mapping-pattern
+    - as-binding-or
+    title: 학습 이벤트를 match로 구조 분기하기
+    subtitle: structural event routing
+    goal: route_learning_event(event)를 완성해 dict, list, guard 패턴을 사용해 학습 이벤트를 설명 문자열로 변환한다.
+    why: 패턴 매칭의 가치는 값을 비교하는 데서 끝나지 않고, 입력 구조를 분해하면서 필요한 값만 안전하게 꺼내는 데 있습니다.
+    explanation: run 성공, check 통과, navigate 명령, 숫자 progress, 그 외 입력을 서로 다른 문자열로 반환하세요.
+    tips:
+    - mapping pattern은 필요한 key가 없으면 다음 case로 넘어갑니다.
+    - guard는 구조가 맞은 뒤 추가 조건을 확인할 때 씁니다.
+    exercise:
+      prompt: route_learning_event(event)를 완성해 이벤트 구조별 설명 문자열을 반환하세요.
+      starterCode: |-
+        def route_learning_event(event):
+            raise NotImplementedError
+      solution: |-
+        def route_learning_event(event):
+            match event:
+                case {"type": "run", "lesson": lesson, "ok": True}:
+                    return f"run-ok:{lesson}"
+                case {"type": "check", "result": {"passed": True, "score": score}} if score >= 90:
+                    return f"mastery:{score}"
+                case ["navigate", target]:
+                    return f"go:{target}"
+                case int() | float() as progress:
+                    return f"progress:{progress}"
+                case _:
+                    return "unhandled"
+      hints:
+      - check case는 score guard가 90 이상일 때만 mastery로 처리합니다.
+      - list 명령은 ["navigate", target] 형태만 처리하세요.
+    check:
+      id: python.advanced.pattern-matching.learning-event.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.pattern-matching.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: route_learning_event
+        cases:
+        - id: routes-successful-run-event
+          arguments:
+          - value:
+              type: run
+              lesson: advancedPython-34
+              ok: true
+          expectedReturn: run-ok:advancedPython-34
+        - id: routes-high-score-check-event
+          arguments:
+          - value:
+              type: check
+              result:
+                passed: true
+                score: 95
+          expectedReturn: mastery:95
+        - id: routes-navigation-command-list
+          arguments:
+          - value:
+            - navigate
+            - /learn/python
+          expectedReturn: go:/learn/python
+        - id: leaves-low-score-unhandled
+          arguments:
+          - value:
+              type: check
+              result:
+                passed: true
+                score: 70
+          expectedReturn: unhandled
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 34_pattern_matching-command-normalizer-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - sequence-pattern
+    - class-pattern
+    - as-binding-or
+    title: 여러 명령 형태를 match로 표준화하기
+    subtitle: command normalization transfer
+    goal: normalize_command(command)를 완성해 list, dict, scalar 명령을 같은 dict 계약으로 표준화한다.
+    why: 이벤트 라우팅에서 배운 구조 매칭을 명령 정규화로 옮기면, API 입력이 여러 형태를 가질 때 안전하게 표준 형태로 모으는 감각이 생깁니다.
+    explanation: list move 명령, dict move 명령, stop 문자열을 처리하고 나머지는 ValueError로 거부하세요.
+    tips:
+    - OR 패턴 양쪽에서 같은 변수 이름을 바인딩해야 본문에서 쓸 수 있습니다.
+    - 더 구체적인 case를 위에 두어야 의도한 분기가 먼저 실행됩니다.
+    exercise:
+      prompt: normalize_command(command)를 완성해 type, direction, steps를 가진 dict로 표준화하세요.
+      starterCode: |-
+        def normalize_command(command):
+            raise NotImplementedError
+      solution: |-
+        def normalize_command(command):
+            match command:
+                case ["move", str() as direction, int() as steps] | {"move": {"direction": str() as direction, "steps": int() as steps}}:
+                    return {"type": "move", "direction": direction, "steps": steps}
+                case "stop":
+                    return {"type": "stop", "direction": None, "steps": 0}
+                case _:
+                    raise ValueError("unknown command shape")
+      hints:
+      - list와 dict 형태를 같은 move 결과로 합치세요.
+      - steps가 int가 아니면 매칭되지 않아 ValueError로 떨어져야 합니다.
+    check:
+      id: python.advanced.pattern-matching.command-normalizer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.pattern-matching.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: normalize_command
+        cases:
+        - id: normalizes-list-move-command
+          arguments:
+          - value:
+            - move
+            - up
+            - 3
+          expectedReturn:
+            type: move
+            direction: up
+            steps: 3
+        - id: normalizes-dict-move-command
+          arguments:
+          - value:
+              move:
+                direction: left
+                steps: 2
+          expectedReturn:
+            type: move
+            direction: left
+            steps: 2
+        - id: rejects-unknown-command-shape
+          arguments:
+          - value:
+            - move
+            - up
+            - three
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 34_pattern_matching-feature-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 34_pattern_matching-command-normalizer-transfer
+    title: match 패턴 선택 기준 회상하기
+    subtitle: pattern matching recall
+    goal: choose_match_pattern(need)를 완성해 구조 분기 상황별 패턴과 주의점을 반환한다.
+    why: match는 모든 if문 대체품이 아니라, 입력 구조를 분해하면서 분기해야 할 때 가장 읽기 좋습니다.
+    explanation: fixed-value, unpack-list, json-shape, dataclass-shape, combine-shapes, extra-condition 상황별 패턴을 선택하세요.
+    tips:
+    - mapping pattern은 JSON형 dict 분기에 잘 맞습니다.
+    - guard는 case 뒤 if 조건으로 추가 검증을 붙입니다.
+    exercise:
+      prompt: choose_match_pattern(need)를 완성해 pattern, useWhen, caution을 반환하세요.
+      starterCode: |-
+        def choose_match_pattern(need):
+            raise NotImplementedError
+      solution: |-
+        def choose_match_pattern(need):
+            table = {
+                "fixed-value": {
+                    "pattern": "literal-pattern",
+                    "useWhen": "a command or status value decides the branch",
+                    "caution": "place specific cases before broad captures",
+                },
+                "unpack-list": {
+                    "pattern": "sequence-pattern",
+                    "useWhen": "position in a list or tuple carries meaning",
+                    "caution": "length must match unless using star capture",
+                },
+                "json-shape": {
+                    "pattern": "mapping-pattern",
+                    "useWhen": "dict keys define the input shape",
+                    "caution": "missing keys simply fall through",
+                },
+                "dataclass-shape": {
+                    "pattern": "class-pattern",
+                    "useWhen": "object type and attributes decide behavior",
+                    "caution": "__match_args__ affects positional matching",
+                },
+                "combine-shapes": {
+                    "pattern": "or-pattern-with-as",
+                    "useWhen": "several shapes share one handling body",
+                    "caution": "both sides must bind the same names",
+                },
+                "extra-condition": {
+                    "pattern": "guard",
+                    "useWhen": "shape matches but values need an additional condition",
+                    "caution": "guards should stay small and readable",
+                },
+            }
+            if need not in table:
+                raise ValueError("unknown match need")
+            return table[need]
+      hints:
+      - match가 좋은 문제는 보통 데이터 구조가 분기의 중심입니다.
+      - 너무 복잡한 guard는 별도 함수로 빼는 편이 낫습니다.
+    check:
+      id: python.advanced.pattern-matching.feature-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.pattern-matching.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_match_pattern
+        cases:
+        - id: recalls-mapping-pattern-for-json-shape
+          arguments:
+          - value: json-shape
+          expectedReturn:
+            pattern: mapping-pattern
+            useWhen: dict keys define the input shape
+            caution: missing keys simply fall through
+        - id: recalls-or-as-for-combined-shapes
+          arguments:
+          - value: combine-shapes
+          expectedReturn:
+            pattern: or-pattern-with-as
+            useWhen: several shapes share one handling body
+            caution: both sides must bind the same names
+        - id: rejects-unknown-need
+          arguments:
+          - value: if-but-fancier
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

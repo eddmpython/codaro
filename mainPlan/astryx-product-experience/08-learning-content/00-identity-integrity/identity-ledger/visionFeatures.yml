@@ -1,0 +1,54 @@
+schemaVersion: 1
+category: "visionFeatures"
+sourceCount: 10
+lessons:
+  - lessonRef: "visionFeatures/01_코너검출"
+    sourcePath: "curricula/python/imageVision/visionFeatures/01_코너검출.yaml"
+    metaId: "visionFeatures_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionFeatures/02_ORB특징점"
+    sourcePath: "curricula/python/imageVision/visionFeatures/02_ORB특징점.yaml"
+    metaId: "visionFeatures_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionFeatures/03_특징점매칭"
+    sourcePath: "curricula/python/imageVision/visionFeatures/03_특징점매칭.yaml"
+    metaId: "visionFeatures_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionFeatures/04_호모그래피정렬"
+    sourcePath: "curricula/python/imageVision/visionFeatures/04_호모그래피정렬.yaml"
+    metaId: "visionFeatures_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionFeatures/05_파노라마스티칭"
+    sourcePath: "curricula/python/imageVision/visionFeatures/05_파노라마스티칭.yaml"
+    metaId: "visionFeatures_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionFeatures/06_비디오입출력"
+    sourcePath: "curricula/python/imageVision/visionFeatures/06_비디오입출력.yaml"
+    metaId: "visionFeatures_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionFeatures/07_배경차분"
+    sourcePath: "curricula/python/imageVision/visionFeatures/07_배경차분.yaml"
+    metaId: "visionFeatures_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionFeatures/08_광학흐름"
+    sourcePath: "curricula/python/imageVision/visionFeatures/08_광학흐름.yaml"
+    metaId: "visionFeatures_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionFeatures/09_객체트래커"
+    sourcePath: "curricula/python/imageVision/visionFeatures/09_객체트래커.yaml"
+    metaId: "visionFeatures_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionFeatures/10_종합영상ROI추적기"
+    sourcePath: "curricula/python/imageVision/visionFeatures/10_종합영상ROI추적기.yaml"
+    metaId: "visionFeatures_10"
+    registryStatus: registered
+    reviewStatus: pending

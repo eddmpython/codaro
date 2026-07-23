@@ -428,3 +428,273 @@ sections:
     type: noError
     noError: 업무 흐름 검증에서 `allowedMean` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: scipy_03-linear-interpolation-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load
+    - workflow_validation
+    title: 정렬된 관측점 사이를 선형 보간하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 범위 밖 외삽을 거부하고 양쪽 anchor와 비율을 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 보간과 외삽을 구분해 범위 밖 값을 조용히 만들지 마세요.
+    - 사용한 양쪽 anchor를 결과에 남기세요.
+    exercise:
+      prompt: interpolate_linear(points, query)를 완성하세요.
+      starterCode: |-
+        def interpolate_linear(points, query):
+            raise NotImplementedError
+      solution: |
+        def interpolate_linear(points, query):
+            ordered = sorted(points)
+            if len(ordered) < 2 or len({x for x,_ in ordered}) != len(ordered): raise ValueError("invalid interpolation points")
+            if query < ordered[0][0] or query > ordered[-1][0]: raise ValueError("extrapolation disabled")
+            for x,y in ordered:
+                if query == x: return {"value": y, "left": x, "right": x, "ratio": 0.0}
+            for (x0,y0),(x1,y1) in zip(ordered, ordered[1:]):
+                if x0 < query < x1:
+                    ratio = (query-x0)/(x1-x0)
+                    return {"value": y0+ratio*(y1-y0), "left": x0, "right": x1, "ratio": round(ratio,4)}
+      hints: *id001
+    check:
+      id: python.scipy.scipy_03.linear-interpolation.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_03.linear-interpolation.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: interpolate_linear
+        cases:
+        - id: interpolates-between-anchors
+          arguments:
+          - value:
+            - - 0
+              - 0
+            - - 10
+              - 20
+          - value: 2.5
+          expectedReturn:
+            value: 5.0
+            left: 0
+            right: 10
+            ratio: 0.25
+        - id: returns-exact-anchor
+          arguments:
+          - value:
+            - - 0
+              - 1
+            - - 2
+              - 5
+          - value: 2
+          expectedReturn:
+            value: 5
+            left: 2
+            right: 2
+            ratio: 0.0
+        - id: rejects-extrapolation
+          arguments:
+          - value:
+            - - 0
+              - 0
+            - - 1
+              - 1
+          - value: 2
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: scipy_03-gap-interpolation-policy-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_03-linear-interpolation-mastery
+    title: 새 시계열 결측에 보간 정책 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 결측 run 길이가 허용 gap 이하일 때만 선형 채움 계획을 만든다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 양쪽 anchor가 없는 leading·trailing 결측은 보간하지 마세요.
+    - 긴 결측 구간은 관측처럼 꾸미지 말고 blocked로 남기세요.
+    exercise:
+      prompt: plan_missing_gaps(values, maximum_gap)를 완성하세요.
+      starterCode: |-
+        def plan_missing_gaps(values, maximum_gap):
+            raise NotImplementedError
+      solution: |
+        def plan_missing_gaps(values, maximum_gap):
+            if maximum_gap < 0: raise ValueError("negative gap")
+            fills = []; blocked = []; index = 0
+            while index < len(values):
+                if values[index] is not None: index += 1; continue
+                start = index
+                while index < len(values) and values[index] is None: index += 1
+                end = index-1; length = end-start+1
+                bounded = start > 0 and index < len(values)
+                target = fills if bounded and length <= maximum_gap else blocked
+                target.extend(range(start,end+1))
+            return {"fillIndices": fills, "blockedIndices": blocked}
+      hints: *id002
+    check:
+      id: python.scipy.scipy_03.gap-interpolation-policy.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_03.gap-interpolation-policy.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_missing_gaps
+        cases:
+        - id: fills-short-bounded-gap
+          arguments:
+          - value:
+            - 1
+            - null
+            - null
+            - 4
+          - value: 2
+          expectedReturn:
+            fillIndices:
+            - 1
+            - 2
+            blockedIndices: []
+        - id: blocks-edge-and-long-gaps
+          arguments:
+          - value:
+            - null
+            - 1
+            - null
+            - null
+            - 4
+            - null
+          - value: 1
+          expectedReturn:
+            fillIndices: []
+            blockedIndices:
+            - 0
+            - 2
+            - 3
+            - 5
+        - id: rejects-negative-gap
+          arguments:
+          - value:
+            - 1
+          - value: -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: scipy_03-interpolation-method-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_03-gap-interpolation-policy-transfer
+    title: 보간 방법 선택 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 선형·고차·외삽 경계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 수치 방법의 입력 가정과 오차 근거를 함께 남기세요.
+    - p-value나 최적화 성공 flag 하나를 결론으로 사용하지 마세요.
+    exercise:
+      prompt: choose_interpolation(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_interpolation(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_interpolation(situation):
+            table = {'sparse-smooth-series': {'method': 'linear interpolation', 'evidence': 'anchor gaps', 'risk': 'hidden regime change'}, 'smooth-curvature': {'method': 'spline with validation', 'evidence': 'held-out error', 'risk': 'overshoot'}, 'outside-domain': {'method': 'explicit extrapolation model', 'evidence': 'domain distance', 'risk': 'unsupported trend'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.scipy.scipy_03.interpolation-method.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_03.interpolation-method.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_interpolation
+        cases:
+        - id: recalls-sparse-smooth-series
+          arguments:
+          - value: sparse-smooth-series
+          expectedReturn:
+            method: linear interpolation
+            evidence: anchor gaps
+            risk: hidden regime change
+        - id: recalls-smooth-curvature
+          arguments:
+          - value: smooth-curvature
+          expectedReturn:
+            method: spline with validation
+            evidence: held-out error
+            risk: overshoot
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

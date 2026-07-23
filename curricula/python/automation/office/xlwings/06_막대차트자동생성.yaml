@@ -9,6 +9,9 @@ meta:
   packages:
     - xlwings
     - pandas
+  outcomes: ["automation.excel.charts"]
+  prerequisites: ["automation.excel.workbook"]
+  estimatedMinutes: 55
   tags:
     - xlwings
     - charts
@@ -423,3 +426,324 @@ sections:
           다음 레슨에서는 Excel 표(ListObject)를 코드로 만들고, 표에 합계 행을 추가해 표 영역이 자라면 합계도 자동 따라오는 동적 합계 패턴을 다룹니다.
     goal: 차트 자동화 패턴을 한 번 완성한 채로 다음 레슨에 진입한다.
     why: 자동화 보고서의 시각 마감은 거의 항상 차트로 결정되므로 이 패턴이 자리잡아야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: xlwings_06-chart-spec-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - add-chart
+    - summary
+    title: 막대차트의 데이터 범위와 시각 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 빈 범위·잘못된 축·읽히지 않는 제목을 차단한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - chart source range가 실제 data range와 일치하는지 검사하세요.
+    - 제목과 안정적인 pixel 크기를 artifact 계약에 넣으세요.
+    exercise:
+      prompt: audit_chart_spec(spec, available_ranges)를 완성하세요.
+      starterCode: |-
+        def audit_chart_spec(spec, available_ranges):
+            raise NotImplementedError
+      solution: |
+        def audit_chart_spec(spec, available_ranges):
+            failures = []
+            if spec.get("sourceRange") not in available_ranges:
+                failures.append("source")
+            if spec.get("categoryColumn") == spec.get("valueColumn") or not spec.get("categoryColumn") or not spec.get("valueColumn"):
+                failures.append("axes")
+            if not str(spec.get("title", "")).strip():
+                failures.append("title")
+            width, height = spec.get("size", [0, 0])
+            if width < 320 or height < 200:
+                failures.append("size")
+            return {"accepted": not failures, "failures": failures, "sourceRange": spec.get("sourceRange"), "size": [width, height]}
+      hints: *id001
+    check:
+      id: python.xlwings.xlwings_06.chart-spec-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.xlwings.xlwings_06.chart-spec-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_chart_spec
+        cases:
+        - id: accepts-readable-chart
+          arguments:
+          - value:
+              sourceRange: A1:B5
+              categoryColumn: A
+              valueColumn: B
+              title: 월별 매출
+              size:
+              - 640
+              - 360
+          - value:
+            - A1:B5
+          expectedReturn:
+            accepted: true
+            failures: []
+            sourceRange: A1:B5
+            size:
+            - 640
+            - 360
+        - id: reports-source-and-axes
+          arguments:
+          - value:
+              sourceRange: D1:E5
+              categoryColumn: A
+              valueColumn: A
+              title: 차트
+              size:
+              - 640
+              - 360
+          - value:
+            - A1:B5
+          expectedReturn:
+            accepted: false
+            failures:
+            - source
+            - axes
+            sourceRange: D1:E5
+            size:
+            - 640
+            - 360
+        - id: reports-title-and-size
+          arguments:
+          - value:
+              sourceRange: A1:B5
+              categoryColumn: A
+              valueColumn: B
+              title: ''
+              size:
+              - 200
+              - 100
+          - value:
+            - A1:B5
+          expectedReturn:
+            accepted: false
+            failures:
+            - title
+            - size
+            sourceRange: A1:B5
+            size:
+            - 200
+            - 100
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: xlwings_06-chart-render-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - xlwings_06-chart-spec-audit-mastery
+    title: 생성된 차트의 series와 범례 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 예상 series·category 수와 재개방 결과를 비교한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - chart object 존재만 보지 말고 series 이름과 category 수를 검사하세요.
+    - Local에서는 screenshot 또는 render evidence로 visibility를 확인하세요.
+    exercise:
+      prompt: reconcile_chart_render(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_chart_render(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_chart_render(expected, observed):
+            failures = []
+            missing_series = sorted(set(expected.get("series", [])) - set(observed.get("series", [])))
+            extra_series = sorted(set(observed.get("series", [])) - set(expected.get("series", [])))
+            if missing_series or extra_series:
+                failures.append("series")
+            if expected.get("categoryCount") != observed.get("categoryCount"):
+                failures.append("categories")
+            if not observed.get("visible", False):
+                failures.append("visibility")
+            return {"passed": not failures, "failures": failures, "missingSeries": missing_series, "extraSeries": extra_series, "expectedCategories": expected.get("categoryCount"), "observedCategories": observed.get("categoryCount")}
+      hints: *id002
+    check:
+      id: python.xlwings.xlwings_06.chart-render-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.xlwings.xlwings_06.chart-render-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_chart_render
+        cases:
+        - id: accepts-visible-chart
+          arguments:
+          - value:
+              series:
+              - 매출
+              categoryCount: 4
+          - value:
+              series:
+              - 매출
+              categoryCount: 4
+              visible: true
+          expectedReturn:
+            passed: true
+            failures: []
+            missingSeries: []
+            extraSeries: []
+            expectedCategories: 4
+            observedCategories: 4
+        - id: reports-series
+          arguments:
+          - value:
+              series:
+              - 매출
+              categoryCount: 4
+          - value:
+              series:
+              - 비용
+              categoryCount: 4
+              visible: true
+          expectedReturn:
+            passed: false
+            failures:
+            - series
+            missingSeries:
+            - 매출
+            extraSeries:
+            - 비용
+            expectedCategories: 4
+            observedCategories: 4
+        - id: reports-categories-and-visibility
+          arguments:
+          - value:
+              series: []
+              categoryCount: 4
+          - value:
+              series: []
+              categoryCount: 3
+              visible: false
+          expectedReturn:
+            passed: false
+            failures:
+            - categories
+            - visibility
+            missingSeries: []
+            extraSeries: []
+            expectedCategories: 4
+            observedCategories: 3
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: xlwings_06-chart-automation-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - xlwings_06-chart-render-reconciliation-transfer
+    title: Excel 차트 자동화 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: source·semantic series·render 증거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Web에서는 Excel 자동화 판단을 작은 함수로 즉시 검증하세요.
+    - Local에서는 실제 Excel 프로세스와 workbook artifact 증거를 별도로 남기세요.
+    exercise:
+      prompt: choose_chart_evidence(stage)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_chart_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_chart_evidence(stage):
+            table = {'source': {'action': 'pin source range and columns', 'evidence': 'chart spec', 'risk': 'wrong data'}, 'semantic': {'action': 'verify series and categories', 'evidence': 'reopened chart metadata', 'risk': 'misleading chart'}, 'render': {'action': 'inspect visible chart at stable size', 'evidence': 'render capture', 'risk': 'blank or clipped object'}}
+            if stage not in table:
+                raise ValueError('unknown stage')
+            return table[stage]
+      hints: *id003
+    check:
+      id: python.xlwings.xlwings_06.chart-automation-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.xlwings.xlwings_06.chart-automation-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_chart_evidence
+        cases:
+        - id: recalls-source
+          arguments:
+          - value: source
+          expectedReturn:
+            action: pin source range and columns
+            evidence: chart spec
+            risk: wrong data
+        - id: recalls-semantic
+          arguments:
+          - value: semantic
+          expectedReturn:
+            action: verify series and categories
+            evidence: reopened chart metadata
+            risk: misleading chart
+        - id: recalls-render
+          arguments:
+          - value: render
+          expectedReturn:
+            action: inspect visible chart at stable size
+            evidence: render capture
+            risk: blank or clipped object
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

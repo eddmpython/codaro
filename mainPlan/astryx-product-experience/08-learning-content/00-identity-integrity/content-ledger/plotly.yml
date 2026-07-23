@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "plotly"
+canonicalRows: 11
+lessons:
+  - lessonRef: "plotly/00_Plotly소개"
+    identityLedgerRef: "identity-ledger/plotly.yml"
+    lessonContentHash: "ad39e18428ee05f147ea8768b07a79a5bfc071c653d51e8817b4f6e8ba0c6514"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["interactiveDashboards"]
+    outcomes: ["viz.interactive"]
+    prerequisites: ["matplotlib.basics"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:plotly/00_Plotly소개:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:plotly_00_Plotly__:v1","retrieve:plotly_00_Plotly__:v2","retrieve:plotly_00_Plotly__:v3"]
+    transferVariantIds: ["transfer:plotly_00_Plotly__:near-v1","transfer:plotly_00_Plotly__:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "plotly/01_세계기대수명비교"
+    identityLedgerRef: "identity-ledger/plotly.yml"
+    lessonContentHash: "2cc4786bb9c528f0b6e0e9acc05f4e2450b0263fe4672f8659e7bfc27d85ec5c"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["interactiveDashboards"]
+    outcomes: ["viz.interactive"]
+    prerequisites: ["viz.interactive"]
+    reinforcesOutcomeIds: ["viz.interactive"]
+    runtimeTier: browser
+    checkSpecId: "lesson:plotly/01_세계기대수명비교:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:plotly_01_________:v1","retrieve:plotly_01_________:v2","retrieve:plotly_01_________:v3"]
+    transferVariantIds: ["transfer:plotly_01_________:near-v1","transfer:plotly_01_________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "plotly/02_팁데이터분포분석"
+    identityLedgerRef: "identity-ledger/plotly.yml"
+    lessonContentHash: "1e7c84dbe9487b0b908c7fd25feee654640dd903fcce09212c30f6197f1825bc"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["interactiveDashboards"]
+    outcomes: ["viz.interactive"]
+    prerequisites: ["viz.interactive"]
+    reinforcesOutcomeIds: ["viz.interactive"]
+    runtimeTier: browser
+    checkSpecId: "lesson:plotly/02_팁데이터분포분석:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:plotly_02_________:v1","retrieve:plotly_02_________:v2","retrieve:plotly_02_________:v3"]
+    transferVariantIds: ["transfer:plotly_02_________:near-v1","transfer:plotly_02_________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "plotly/03_붓꽃품종분류"
+    identityLedgerRef: "identity-ledger/plotly.yml"
+    lessonContentHash: "eef0f6c5a36b5200f377943014e827a7f4e3dd02901827c83181b4bc058bc077"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["interactiveDashboards"]
+    outcomes: ["viz.interactive"]
+    prerequisites: ["viz.interactive"]
+    reinforcesOutcomeIds: ["viz.interactive"]
+    runtimeTier: browser
+    checkSpecId: "lesson:plotly/03_붓꽃품종분류:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:plotly_03_______:v1","retrieve:plotly_03_______:v2","retrieve:plotly_03_______:v3"]
+    transferVariantIds: ["transfer:plotly_03_______:near-v1","transfer:plotly_03_______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "plotly/04_GDP기대수명관계"
+    identityLedgerRef: "identity-ledger/plotly.yml"
+    lessonContentHash: "a2256bbf8635cd5ac919cd6074b595cecb0f30e6b5baffae1786990cb49a486b"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["interactiveDashboards"]
+    outcomes: ["viz.interactive"]
+    prerequisites: ["viz.interactive"]
+    reinforcesOutcomeIds: ["viz.interactive"]
+    runtimeTier: browser
+    checkSpecId: "lesson:plotly/04_GDP기대수명관계:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:plotly_04_GDP______:v1","retrieve:plotly_04_GDP______:v2","retrieve:plotly_04_GDP______:v3"]
+    transferVariantIds: ["transfer:plotly_04_GDP______:near-v1","transfer:plotly_04_GDP______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "plotly/05_세계인구지도"
+    identityLedgerRef: "identity-ledger/plotly.yml"
+    lessonContentHash: "dd1840aa81d531a4daef9733d67dc9eec795b94a05c874250997a82b57f136bd"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["geoVisualization","interactiveDashboards"]
+    outcomes: ["viz.geoMaps"]
+    prerequisites: ["viz.interactive"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:plotly/05_세계인구지도:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:plotly_05_______:v1","retrieve:plotly_05_______:v2","retrieve:plotly_05_______:v3"]
+    transferVariantIds: ["transfer:plotly_05_______:near-v1","transfer:plotly_05_______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "plotly/06_시간에따른세계변화"
+    identityLedgerRef: "identity-ledger/plotly.yml"
+    lessonContentHash: "843089ff081f4e89c8c8257bfb7862d44f7e1f071c274b640fa2c74724a9f6ba"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["interactiveDashboards"]
+    outcomes: ["viz.interactive"]
+    prerequisites: ["viz.interactive"]
+    reinforcesOutcomeIds: ["viz.interactive"]
+    runtimeTier: browser
+    checkSpecId: "lesson:plotly/06_시간에따른세계변화:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:plotly_06__________:v1","retrieve:plotly_06__________:v2","retrieve:plotly_06__________:v3"]
+    transferVariantIds: ["transfer:plotly_06__________:near-v1","transfer:plotly_06__________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "plotly/07_레스토랑매출분석"
+    identityLedgerRef: "identity-ledger/plotly.yml"
+    lessonContentHash: "9a1178ee1dbeebd2f8d284f4122ffbc2652a1800d807287f6f2d697362f61ff4"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["interactiveDashboards"]
+    outcomes: ["viz.interactive"]
+    prerequisites: ["viz.interactive"]
+    reinforcesOutcomeIds: ["viz.interactive"]
+    runtimeTier: browser
+    checkSpecId: "lesson:plotly/07_레스토랑매출분석:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:plotly_07_________:v1","retrieve:plotly_07_________:v2","retrieve:plotly_07_________:v3"]
+    transferVariantIds: ["transfer:plotly_07_________:near-v1","transfer:plotly_07_________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "plotly/08_대륙별계층구조"
+    identityLedgerRef: "identity-ledger/plotly.yml"
+    lessonContentHash: "766941678ac2f9f8707f579a99f78081382756ab32b054fcd7cf349738ab269f"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["interactiveDashboards"]
+    outcomes: ["viz.interactive"]
+    prerequisites: ["viz.interactive"]
+    reinforcesOutcomeIds: ["viz.interactive"]
+    runtimeTier: browser
+    checkSpecId: "lesson:plotly/08_대륙별계층구조:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:plotly_08________:v1","retrieve:plotly_08________:v2","retrieve:plotly_08________:v3"]
+    transferVariantIds: ["transfer:plotly_08________:near-v1","transfer:plotly_08________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "plotly/09_주식시계열분석"
+    identityLedgerRef: "identity-ledger/plotly.yml"
+    lessonContentHash: "1202932c3f8778c4945d95c9f729264b8d735096b35ee9638fd1ccf916bf9d9b"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["interactiveDashboards"]
+    outcomes: ["viz.interactive","viz.interactiveAdvanced"]
+    prerequisites: ["viz.interactive"]
+    reinforcesOutcomeIds: ["viz.interactive"]
+    runtimeTier: browser
+    checkSpecId: "lesson:plotly/09_주식시계열분석:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:plotly_09________:v1","retrieve:plotly_09________:v2","retrieve:plotly_09________:v3"]
+    transferVariantIds: ["transfer:plotly_09________:near-v1","transfer:plotly_09________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "plotly/10_종합대시보드"
+    identityLedgerRef: "identity-ledger/plotly.yml"
+    lessonContentHash: "783296bb16c0f12661609c89ff86db25a422a7b264def5f3c13d0869814e33e2"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["interactiveDashboards"]
+    outcomes: ["viz.interactiveAdvanced"]
+    prerequisites: ["viz.interactiveAdvanced"]
+    reinforcesOutcomeIds: ["viz.interactiveAdvanced"]
+    runtimeTier: browser
+    checkSpecId: "lesson:plotly/10_종합대시보드:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:plotly_10_______:v1","retrieve:plotly_10_______:v2","retrieve:plotly_10_______:v3"]
+    transferVariantIds: ["transfer:plotly_10_______:near-v1","transfer:plotly_10_______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

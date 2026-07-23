@@ -49,7 +49,7 @@ export function ProviderReconnectBar({
       </Button>
       <button
         aria-label={t("provider.reconnect.dismiss")}
-        className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+        className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent-surface hover:text-foreground"
         title={t("provider.reconnect.dismiss")}
         type="button"
         onClick={onDismiss}

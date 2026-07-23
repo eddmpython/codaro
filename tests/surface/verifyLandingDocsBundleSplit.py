@@ -18,7 +18,7 @@ def main() -> int:
         verifyDocsPageContentModules(),
         verifyGeneratedDocsFreshness(),
         verifyDocsRouteLoadsContentOnDemand(),
-        verifyLandingHomeDownloadSeo(),
+        verifyLandingHomeProductSeo(),
         verifyPostbuildLoadsDocsContent(),
         verifyBuiltDocsNavChunk(),
         verifyBuiltHomeSeoAndDownload(),
@@ -105,13 +105,13 @@ def generatedDocsPageText() -> str:
 
 
 def verifyDocsRouteLoadsContentOnDemand() -> dict[str, Any]:
-    path = ROOT / "landing" / "src" / "App.jsx"
+    path = ROOT / "landing" / "src" / "routes" / "docsRoutes.jsx"
     return requireNeedles(
         "docs-route-on-demand-content",
         path,
         (
             "import.meta.glob",
-            "./lib/generated/docsPages/*.js",
+            "../lib/generated/docsPages/*.js",
             "contentModule",
             "pageContent",
             "setContent(module.pageContent)",
@@ -119,17 +119,24 @@ def verifyDocsRouteLoadsContentOnDemand() -> dict[str, Any]:
     )
 
 
-def verifyLandingHomeDownloadSeo() -> dict[str, Any]:
+def verifyLandingHomeProductSeo() -> dict[str, Any]:
     checks = (
         (
-            "landing/src/App.jsx",
+            "landing/src/components/publicShell.jsx",
             (
-                "Codaro.exe",
-                "Python 학습과 개인 자동화 스튜디오",
-                "GitHub Releases",
                 "brand.launcherDownloadUrl",
                 "brand.launcherChecksumUrl",
                 "brand.launcherSbomUrl",
+                "brand.releaseUrl",
+            ),
+        ),
+        (
+            "landing/src/pages/home.jsx",
+            (
+                "Windows 로컬 앱 다운로드",
+                "브라우저에서 시작",
+                "brand.launcherDownloadUrl",
+                "releaseLinks",
             ),
         ),
         (
@@ -143,24 +150,38 @@ def verifyLandingHomeDownloadSeo() -> dict[str, Any]:
             ),
         ),
         (
-            "landing/src/lib/seo.js",
+            "landing/index.html",
             (
-                "SoftwareApplication",
-                "downloadUrl: brand.launcherDownloadUrl",
-                "operatingSystem: \"Windows\"",
-                "brand.toSiteUrl",
+                '"@type": "WebApplication"',
+                '"name": "Codaro Web"',
+                '"operatingSystem": "Any"',
+                '"url": "https://eddmpython.github.io/codaro/run/"',
+                '"@type": "SoftwareApplication"',
+                '"name": "Codaro Local"',
+                '"operatingSystem": "Windows 10, Windows 11"',
+                '"downloadUrl": "https://github.com/eddmpython/codaro/releases/latest/download/Codaro.exe"',
             ),
         ),
         (
             "landing/src/styles.css",
             (
-                ".heroSection",
-                ".heroActions",
-                ".releaseLinks",
                 ".pageShell",
                 ".proseArticle",
                 ".siteFooter",
             ),
+        ),
+        (
+            "landing/src/styles/homeAstryx.css",
+            (
+                ".homeShell",
+                ".homeProductHero",
+                ".homeHeroActions",
+                ".homeReleaseLinks",
+            ),
+        ),
+        (
+            "landing/src/main.jsx",
+            ("./styles/homeAstryx.css",),
         ),
         (
             ".github/workflows/launcher-release.yml",
@@ -196,7 +217,7 @@ def verifyLandingHomeDownloadSeo() -> dict[str, Any]:
     )
     if "var(--accent)" in sourceText:
         missing.append("landing source still uses shadcn accent token as the brand emphasis color")
-    return result("landing-home-download-seo", missing)
+    return result("landing-home-product-seo", missing)
 
 
 def verifyPostbuildLoadsDocsContent() -> dict[str, Any]:
@@ -221,6 +242,8 @@ def verifyBuiltHomeSeoAndDownload() -> dict[str, Any]:
         return result("built-home-seo-download", missing)
     text = path.read_text(encoding="utf-8")
     for needle in (
+        '"@type": "WebApplication"',
+        '"url": "https://eddmpython.github.io/codaro/run/"',
         "https://github.com/eddmpython/codaro/releases/latest/download/Codaro.exe",
         "https://github.com/eddmpython/codaro/releases/latest/download/Codaro.exe.sha256",
         "https://github.com/eddmpython/codaro/releases/latest/download/codaro.spdx.json",

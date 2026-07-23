@@ -76,9 +76,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 지역 변수의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -112,9 +109,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 전역 변수의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -152,9 +146,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: global 키워드의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -190,9 +181,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 중첩 함수의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -232,9 +220,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: nonlocal 키워드의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -270,9 +255,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 클로저 기본의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -314,9 +296,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 클로저 활용의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -382,9 +361,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: '검증 루프: 고객별 누적 결제 상태 만들기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
@@ -416,10 +392,230 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: Day 17 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: Day 17 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: day17-counter-values-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - local_scope
+    - practice
+    title: nonlocal 상태를 여러 번 갱신하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 클로저가 바깥 함수의 상태를 기억하는 흐름을 확인한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: counter_values(start, step, count)가 클로저 카운터를 count번 호출한 결과 목록을 반환하도록 완성하세요.
+      starterCode: |-
+        def counter_values(start, step, count):
+            raise NotImplementedError
+      solution: |-
+        def counter_values(start, step, count):
+            current = start
+            def next_value():
+                nonlocal current
+                current += step
+                return current
+            return [next_value() for _ in range(count)]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day17.counter-values.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day17.counter-values.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: counter_values
+        cases:
+        - id: positive
+          arguments:
+          - value: 10
+          - value: 2
+          - value: 3
+          expectedReturn:
+          - 12
+          - 14
+          - 16
+        - id: negative
+          arguments:
+          - value: 5
+          - value: -1
+          - value: 2
+          expectedReturn:
+          - 4
+          - 3
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day17-scaled-values-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day17-counter-values-mastery
+    title: 설정값을 기억하는 변환 함수 만들기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 클로저를 데이터 변환 설정에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: scaled_values(values, factor)가 factor를 기억하는 내부 함수를 사용해 변환 목록을 반환하도록 완성하세요.
+      starterCode: |-
+        def scaled_values(values, factor):
+            raise NotImplementedError
+      solution: |-
+        def scaled_values(values, factor):
+            def scale(value):
+                return value * factor
+            return [scale(value) for value in values]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day17.scaled-values.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day17.scaled-values.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: scaled_values
+        cases:
+        - id: triple
+          arguments:
+          - value:
+            - 1
+            - 2
+            - 3
+          - value: 3
+          expectedReturn:
+          - 3
+          - 6
+          - 9
+        - id: half
+          arguments:
+          - value:
+            - 4
+            - 8
+          - value: 0.5
+          expectedReturn:
+          - 2.0
+          - 4.0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day17-nonlocal-total-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day17-scaled-values-transfer
+    title: 내부 함수로 누적 상태 다시 만들기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: nonlocal 선언과 호출 순서를 기억에서 복원한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: nonlocal_total(values)가 내부 add 함수로 값을 누적한 최종 합계를 반환하도록 완성하세요.
+      starterCode: |-
+        def nonlocal_total(values):
+            raise NotImplementedError
+      solution: |-
+        def nonlocal_total(values):
+            total = 0
+            def add(value):
+                nonlocal total
+                total += value
+            for value in values:
+                add(value)
+            return total
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day17.nonlocal-total.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day17.nonlocal-total.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: nonlocal_total
+        cases:
+        - id: positive
+          arguments:
+          - value:
+            - 3
+            - 4
+            - 5
+          expectedReturn: 12
+        - id: signed
+          arguments:
+          - value:
+            - 10
+            - -3
+          expectedReturn: 7
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

@@ -673,3 +673,267 @@ sections:
   check:
     noError: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.'
     resultCheck: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: duckdb_04-having-null-groups-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: NULL을 분리한 뒤 HAVING으로 표본 필터링하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 연령 결측 수를 보존하고 객실 등급별 known age 평균을 최소 표본 수로 필터한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - known age count로 HAVING 조건을 판단하세요.
+    - NULL 행을 버리기 전에 missing count를 보존하세요.
+    exercise:
+      prompt: age_groups(rows, minimum_known)를 완성하세요.
+      starterCode: |-
+        def age_groups(rows, minimum_known):
+            raise NotImplementedError
+      solution: |
+        def age_groups(rows, minimum_known):
+            grouped = {}
+            for row in rows:
+                bucket = grouped.setdefault(str(row["pclass"]), {"values": [], "missing": 0})
+                if row.get("age") is None:
+                    bucket["missing"] += 1
+                else:
+                    bucket["values"].append(row["age"])
+            result = []
+            for pclass, bucket in sorted(grouped.items()):
+                if len(bucket["values"]) >= minimum_known:
+                    result.append({"pclass": int(pclass), "known": len(bucket["values"]), "missing": bucket["missing"], "meanAge": round(sum(bucket["values"]) / len(bucket["values"]), 2)})
+            return result
+      hints: *id001
+    check:
+      id: python.duckdb.duckdb_04.having-null-groups.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_04.having-null-groups.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: age_groups
+        cases:
+        - id: filters-after-aggregation
+          arguments:
+          - value:
+            - pclass: 1
+              age: 20
+            - pclass: 1
+              age: 40
+            - pclass: 1
+              age: null
+            - pclass: 2
+              age: 30
+          - value: 2
+          expectedReturn:
+          - pclass: 1
+            known: 2
+            missing: 1
+            meanAge: 30.0
+        - id: allows-one-known
+          arguments:
+          - value:
+            - pclass: 3
+              age: 18
+          - value: 1
+          expectedReturn:
+          - pclass: 3
+            known: 1
+            missing: 0
+            meanAge: 18.0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: duckdb_04-sensor-missingness-gate-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - duckdb_04-having-null-groups-mastery
+    title: 새 센서 데이터에 결측 품질 게이트 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 장비별 결측률을 계산하고 허용률을 넘은 장비를 분리한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 결측률 분모는 센서별 전체 관측 수입니다.
+    - 임계값과 같은 경우의 정책을 명시하세요.
+    exercise:
+      prompt: sensor_quality(rows, maximum_missing_rate)를 완성하세요.
+      starterCode: |-
+        def sensor_quality(rows, maximum_missing_rate):
+            raise NotImplementedError
+      solution: |
+        def sensor_quality(rows, maximum_missing_rate):
+            grouped = {}
+            for row in rows:
+                bucket = grouped.setdefault(row["sensor"], [0, 0])
+                bucket[1] += 1
+                bucket[0] += int(row.get("value") is None)
+            result = []
+            for sensor, (missing, total) in sorted(grouped.items()):
+                rate = round(missing / total, 3)
+                result.append({"sensor": sensor, "missing": missing, "total": total, "rate": rate, "accepted": rate <= maximum_missing_rate})
+            return result
+      hints: *id002
+    check:
+      id: python.duckdb.duckdb_04.sensor-missingness-gate.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_04.sensor-missingness-gate.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: sensor_quality
+        cases:
+        - id: marks-unhealthy-sensor
+          arguments:
+          - value:
+            - sensor: a
+              value: null
+            - sensor: a
+              value: 1
+            - sensor: b
+              value: 2
+          - value: 0.25
+          expectedReturn:
+          - sensor: a
+            missing: 1
+            total: 2
+            rate: 0.5
+            accepted: false
+          - sensor: b
+            missing: 0
+            total: 1
+            rate: 0.0
+            accepted: true
+        - id: accepts-threshold-equality
+          arguments:
+          - value:
+            - sensor: c
+              value: null
+            - sensor: c
+              value: 4
+          - value: 0.5
+          expectedReturn:
+          - sensor: c
+            missing: 1
+            total: 2
+            rate: 0.5
+            accepted: true
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: duckdb_04-where-having-null-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - duckdb_04-sensor-missingness-gate-transfer
+    title: WHERE·HAVING·NULL 판단 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: row filter와 aggregate filter, NULL 비교 방식을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - NULL은 `= NULL`이 아니라 IS NULL로 검사하세요.
+    - HAVING은 그룹을 만든 뒤 적용됩니다.
+    exercise:
+      prompt: choose_filter_stage(situation)를 완성하세요.
+      starterCode: |-
+        def choose_filter_stage(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_filter_stage(situation):
+            table = {'age-is-missing': {'stage': 'WHERE age IS NULL', 'evidence': 'missing row count', 'risk': 'equals NULL'}, 'groups-over-ten': {'stage': 'HAVING COUNT(*) > 10', 'evidence': 'group count', 'risk': 'aggregate in WHERE'}, 'positive-fares': {'stage': 'WHERE fare > 0', 'evidence': 'row predicate', 'risk': 'late filter'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.duckdb.duckdb_04.where-having-null.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_04.where-having-null.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_filter_stage
+        cases:
+        - id: recalls-age-is-missing
+          arguments:
+          - value: age-is-missing
+          expectedReturn:
+            stage: WHERE age IS NULL
+            evidence: missing row count
+            risk: equals NULL
+        - id: recalls-groups-over-ten
+          arguments:
+          - value: groups-over-ten
+          expectedReturn:
+            stage: HAVING COUNT(*) > 10
+            evidence: group count
+            risk: aggregate in WHERE
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

@@ -1,0 +1,198 @@
+var e=`meta:\r
+  id: requests_00\r
+  title: requests 자동화 소개\r
+  order: 0\r
+  category: requests\r
+  packages:\r
+    - requests\r
+    - httpx\r
+  tags:\r
+    - requests\r
+    - REST\r
+    - API\r
+    - JSON\r
+    - 자동화\r
+  outcomes:\r
+    - automation.webApi.intro\r
+  prerequisites:\r
+    - python.functions\r
+    - python.modulesAndIo\r
+  estimatedMinutes: 30\r
+  seo:\r
+    title: "requests 자동화 소개 - REST API로 일일 데이터 수집 파이프라인"\r
+    description: "requests 한 패키지로 외부 API 호출·인증·페이지네이션·파일 전송을 다루고 마지막에 httpx async로 병렬을 확장한다. 10개 프로젝트로 주간 8시간 절감 목표."\r
+    keywords:\r
+      - requests\r
+      - REST API\r
+      - JSON\r
+      - 페이지네이션\r
+      - httpx async\r
+\r
+intro:\r
+  direction: "외부 API에서 매일 받아야 하는 데이터를 requests 한 패키지로 자동 수집·결합·통보한다. 마지막 한 강의만 httpx로 비동기·병렬을 다룬다."\r
+  benefits:\r
+    - "주간 8시간 이상 절감 - 미세먼지·환율·외부 검색·Slack 알림·페이지네이션 수집."\r
+    - "10개 프로젝트로 GET·POST·헤더·세션·페이지네이션·스트리밍·비동기까지 한 트랙에서 끝낸다."\r
+    - "안전 정책 4종(환경변수, timeout, sandbox URL, dryRun)이 모든 강의 첫 셀에 의무로 들어가 학습 중 사고를 사전 차단."\r
+  diagram:\r
+    steps:\r
+      - label: "1. GET·params·headers"\r
+        detail: "requests.get으로 공공 API 단발 호출 → params로 쿼리 → headers로 API 키 주입."\r
+      - label: "2. POST와 알림"\r
+        detail: "requests.post + json=으로 Slack 같은 webhook 호출. dryRun 안전 패턴."\r
+      - label: "3. 안전·세션·페이지네이션"\r
+        detail: "timeout + Retry, Session으로 로그인 흐름, generator로 페이지 전체 수집."\r
+      - label: "4. 파일·async 통합"\r
+        detail: "stream으로 대용량 다운로드 → httpx로 100 URL 병렬 → 일일 수집기 한 본."\r
+    runtime:\r
+      - label: "메인 의존성"\r
+        detail: "requests 한 패키지. 09강에서만 httpx, 07·10강에서 pandas 결합."\r
+      - label: "안전 검증"\r
+        detail: "공공 sample 또는 httpbin.org로 동작 확인 후 응답 객체 단위 assert로 검증한다. 부수효과 호출은 dryRun=True 기본."\r
+\r
+sections:\r
+  - id: runtime_check\r
+    title: "라이브러리 실행 확인"\r
+    structuredPrimary: true\r
+    subtitle: "requests와 httpx import 확인"\r
+    goal: "requests와 httpx를 import하고 버전 문자열을 확인해 현재 로컬 Python에서 웹 요청 도구를 바로 쓸 수 있는지 검증한다."\r
+    why: "실제 네트워크 호출 전에 패키지와 객체를 먼저 확인하면 API 오류와 환경 오류를 분리할 수 있습니다."\r
+    explanation: "상단 라이브러리 패널이 requests, httpx 준비 상태를 확인하고, 이 셀은 두 패키지가 코드에서 import되는지와 기본 메타데이터가 읽히는지 검증합니다."\r
+    tips:\r
+      - "첫 셀에서는 외부 사이트 호출보다 import와 버전 확인을 먼저 고정합니다."\r
+      - "버전 문자열을 dict로 묶어두면 이후 진단 로그에도 그대로 재사용할 수 있습니다."\r
+    snippet: |-\r
+      import httpx\r
+      import requests\r
+\r
+      versions = {\r
+          "requests": requests.__version__,\r
+          "httpx": httpx.__version__,\r
+      }\r
+\r
+      assert all(versions.values())\r
+      print(versions)\r
+    exercise:\r
+      prompt: versions dict에 두 패키지의 major 버전을 추가하고, 값이 비어 있지 않은지 assert로 확인하세요.\r
+      starterCode: |-\r
+        import httpx\r
+        import requests\r
+\r
+        versions = {\r
+            "requests": requests.__version__,\r
+            "httpx": httpx.__version__,\r
+        }\r
+        major_versions = {name: value.split(".")[0] for name, value in versions.items()}\r
+\r
+        assert all(major_versions.values())\r
+        print(major_versions)\r
+      solution: |-\r
+        import httpx\r
+        import requests\r
+\r
+        versions = {\r
+            "requests": requests.__version__,\r
+            "httpx": httpx.__version__,\r
+        }\r
+        major_versions = {name: value.split(".")[0] for name, value in versions.items()}\r
+\r
+        assert all(major_versions.values())\r
+        print(major_versions)\r
+      hints:\r
+      - "__version__은 패키지가 제공하는 버전 문자열입니다."\r
+      - "split('.')의 첫 값은 major 버전입니다."\r
+    check:\r
+      type: noError\r
+      noError: "requests와 httpx import, 버전 dict 생성, assert가 오류 없이 끝나야 합니다."\r
+      resultCheck: "출력에 requests와 httpx의 major 버전이 모두 포함되어야 합니다."\r
+  - id: position\r
+    title: "1. 웹 API 자동화가 차지하는 자리"\r
+    blocks:\r
+      - type: text\r
+        content: |-\r
+          한국 직장인의 반복 데이터 작업은 대부분 "매일 어딘가에서 받아 어딘가에 넣는" 흐름입니다. 공공데이터포털에서 미세먼지를 받아 보고서에 붙이고, 환율 사이트에서 숫자를 받아 사내 게시판에 옮기고, 마케팅 결과를 Naver Open API로 점검하는 일이 모두 손작업이라면 주간 8시간 이상이 빠집니다. requests 한 패키지로 이 시간을 거의 0초에 가깝게 만들 수 있습니다.\r
+      - type: text\r
+        content: |-\r
+          이 트랙은 한 패키지 정책을 가집니다. 메인은 requests, 마지막 한 강의(09)만 httpx로 비동기를 다룹니다. 한국 자료와 실무 트러블슈팅 사례가 모두 requests 어휘 기준으로 쌓여 있어 학습 효율이 가장 큽니다. async는 데이터 수집의 천장이 보일 때만 필요하므로 한 번만 노출합니다.\r
+      - type: text\r
+        content: |-\r
+          안전 정책 네 가지가 모든 강의 첫 셀에 의무로 들어갑니다. 환경변수 자격증명, timeout 의무, sandbox/예제 URL 우선, dryRun 일관성입니다. 학습 중 100번 호출로 외부 API에 차단당하거나, 잘못된 webhook에 메시지가 폭주하는 사고를 원천 차단합니다.\r
+\r
+  - id: library_map\r
+    title: "2. 한 패키지의 자리"\r
+    blocks:\r
+      - type: table\r
+        headers: ["모듈/객체", "역할", "사용 강의"]\r
+        rows:\r
+          - ["requests.get / requests.post", "단발 호출", "01·02·03·04"]\r
+          - ["requests.Session", "쿠키·헤더·커넥션 풀 유지", "06·07·10"]\r
+          - ["Response.json() / .text / .content / .iter_content", "응답 파싱", "01-08"]\r
+          - ["requests.exceptions + urllib3 Retry", "에러 처리", "05·10"]\r
+          - ["httpx.AsyncClient + asyncio.gather", "비동기 병렬", "09"]\r
+          - ["os.environ + dryRun 가드", "자격증명·안전 패턴", "03 이후 공통"]\r
+      - type: note\r
+        title: "왜 urllib·aiohttp·requests-html을 쓰지 않나"\r
+        content: "urllib는 표준이지만 JSON·세션·헤더에 보일러플레이트가 폭증해 학습 효율이 떨어집니다. aiohttp는 비동기 전용이라 학습 곡선이 가팔라 단 한 강의(09) 노출에 부적합 - 동일 API 모양의 httpx가 requests 사용자에게 이전 비용이 가장 낮습니다. requests-html은 메인터넌스 정체로 권장하지 않습니다."\r
+\r
+  - id: persona_match\r
+    title: "3. 누가 어느 강의에서 답을 얻나"\r
+    blocks:\r
+      - type: text\r
+        content: |-\r
+          네 페르소나를 기준으로 강의가 설계됐습니다. 본인 업무와 가까운 곳부터 우선 가져갈 수 있습니다.\r
+      - type: table\r
+        headers: ["페르소나", "주간 API 작업", "이 트랙 졸업 시 산출물"]\r
+        rows:\r
+          - ["데이터 분석 김주임", "매일 공공데이터포털에서 미세먼지·기상 조회 → 엑셀 정리 (40분/일)", "01·07·10강 - 페이지네이션 자동 수집 + DataFrame 저장"]\r
+          - ["운영 박대리", "매일 환율 사이트 보고 사내 게시판에 옮김 (15분/일)", "02·05강 - 환율 API + 안전 호출 + 로컬 캐시"]\r
+          - ["마케팅 정주임", "캠페인 결과를 Naver/Kakao Open API로 점검 (회당 30분)", "03·08강 - 헤더 인증 + 이미지 일괄 다운로드"]\r
+          - ["DevOps 박과장", "배치 결과를 Slack에 수동 통보 (장애당 10분)", "04·05강 - POST 호출 + 재시도 가드"]\r
+\r
+  - id: capability_map\r
+    title: "4. 10개 프로젝트로 다루는 능력"\r
+    blocks:\r
+      - type: table\r
+        headers: ["프로젝트", "핵심 능력", "산출물"]\r
+        rows:\r
+          - ["01 첫 GET 요청", "requests.get, status_code, .json()", "공공 API 미세먼지 현황 조회"]\r
+          - ["02 쿼리 파라미터와 환율", "params=, URL 인코딩, 응답 캐시", "매일 환율 표"]\r
+          - ["03 헤더와 API 키", "headers=, os.environ, User-Agent", "Naver 검색 결과 표"]\r
+          - ["04 POST와 JSON 전송", "requests.post, json= vs data=", "Slack 알림 봇"]\r
+          - ["05 에러 처리·재시도", "timeout, raise_for_status, Retry", "안전 호출 헬퍼"]\r
+          - ["06 Session과 로그인", "Session, cookies, 헤더 persist", "인증 후 데이터 수집"]\r
+          - ["07 페이지네이션 수집", "cursor/offset, Link 헤더, generator", "GitHub repo 전체 issue"]\r
+          - ["08 파일 업·다운과 스트리밍", "files=, stream=, iter_content", "이미지 일괄 다운로드"]\r
+          - ["09 httpx 비동기 병렬", "AsyncClient, gather, Semaphore", "100 URL 병렬 조회"]\r
+          - ["10 매일 공공 API 수집기", "전 개념 종합", "3 API → DataFrame → 차트 → 저장·통보"]\r
+\r
+  - id: safety_policy\r
+    title: "5. 트랙 전체에 적용되는 안전 정책"\r
+    blocks:\r
+      - type: text\r
+        content: |-\r
+          웹 API 자동화는 두 가지 사고 비용이 큽니다. 자격증명 노출(코드에 평문 키)과 과도한 호출(rate limit 위반으로 IP/계정 차단). 다음 네 가지가 모든 강의 첫 셀에 의무로 들어갑니다.\r
+      - type: list\r
+        style: check\r
+        items:\r
+          - "자격증명은 환경변수만 - 코드에 평문 API 키 금지. os.environ['NAVER_CLIENT_ID']."\r
+          - "timeout 의무화 - 모든 호출에 timeout=10 이상. 무한 대기로 스크립트가 영구 정지되는 사고 차단."\r
+          - "sandbox/예제 URL 우선 - httpbin.org, 공공 sample, GitHub public API로 동작 확인 후 실 API."\r
+          - "dryRun 일관성 - POST/PUT/DELETE 같은 부수효과 호출은 기본 dryRun=True. 실 호출은 명시적으로 dryRun=False."\r
+      - type: note\r
+        title: "공공데이터포털 인증키 발급 절차"\r
+        content: "data.go.kr 회원가입 → 원하는 API 페이지에서 '활용신청' → 일반 인증키(Encoding) / 일반 인증키(Decoding) 두 종류 발급. URL에 그대로 붙이려면 Encoding, params= 키워드로 넘기려면 Decoding을 권장합니다. 환경변수 DATA_GO_KR_KEY에 저장하고 코드는 os.environ으로 읽습니다."\r
+\r
+  - id: contract\r
+    title: "6. 학습 계약"\r
+    blocks:\r
+      - type: list\r
+        style: bullet\r
+        items:\r
+          - "모든 부수효과 호출(POST/PUT/DELETE)은 dryRun=True 기본값. 실 호출은 dryRun=False 명시 필요."\r
+          - "01-08강은 응답 객체 단위 assert로 검증. 공공 GET은 실제 호출, POST/인증 API는 httpbin.org 또는 mock 응답으로 검증."\r
+          - "09강은 httpbin.org/delay 엔드포인트로 async 효과를 시각화."\r
+          - "10강은 3 API 결합 + 캐시 폴백 패턴 검증."\r
+          - "환경변수 미설정 시 sample 응답으로 폴백해 학습이 끊기지 않게 한다."\r
+      - type: tip\r
+        content: "본 트랙을 시작하기 전에 Naver Open API와 Slack incoming webhook(또는 카카오워크/잔디)을 미리 발급해 환경변수에 저장해 두세요. 03·04강의 실제 호출 검증이 즉시 가능해집니다."\r
+`;export{e as default};

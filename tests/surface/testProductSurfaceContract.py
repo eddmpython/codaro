@@ -24,26 +24,30 @@ def _rel(path: Path) -> str:
     return path.relative_to(ROOT).as_posix()
 
 
-def testProductSurfaceNavKeepsConversationFirstFlow() -> None:
+def testProductSurfaceNavKeepsWebLearningFirstAndLocalHomeFirst() -> None:
     source = _read("editor/src/lib/surfaceModel.ts")
     items = re.findall(
-        r'\{ value: "([^"]+)", labelKey: "([^"]+)", flowRole: "([^"]+)", beta: (true|false), visibleInSidebar: (true|false) \}',
+        r'\{ value: "([^"]+)", labelKey: "([^"]+)", flowRole: "([^"]+)", beta: (true|false), visibleInSidebar: (true|false), runtimeVisibility: "([^"]+)" \}',
         source,
     )
     values = [item[0] for item in items]
     flowRoles = [item[2] for item in items]
     visibility = [item[4] for item in items]
 
-    assert values[:5] == ["chat", "curriculum", "editor", "automation", "share"]
-    assert flowRoles[:5] == ["entry", "learning", "notebook", "secondLoop", "support"]
-    assert visibility[:5] == ["true", "true", "true", "true", "false"]
-    assert 'value: "automation", labelKey: "nav.automation", flowRole: "secondLoop", beta: true, visibleInSidebar: true' in source
-    assert 'value: "share", labelKey: "nav.share", flowRole: "support", beta: true, visibleInSidebar: false' in source
-    assert 'DEFAULT_SURFACE: SurfaceMode = "chat"' in source
+    runtimeVisibility = [item[5] for item in items]
+
+    assert values == ["home", "curriculum", "editor", "automation", "chat", "share"]
+    assert flowRoles == ["entry", "learning", "notebook", "secondLoop", "support", "support"]
+    assert visibility == ["true", "true", "true", "true", "true", "false"]
+    assert runtimeVisibility == ["local", "all", "all", "all", "all", "all"]
+    assert 'value: "automation", labelKey: "nav.automation", flowRole: "secondLoop", beta: true, visibleInSidebar: true, runtimeVisibility: "all"' in source
+    assert 'value: "share", labelKey: "nav.share", flowRole: "support", beta: true, visibleInSidebar: false, runtimeVisibility: "all"' in source
+    assert 'DEFAULT_SURFACE: SurfaceMode = "curriculum"' in source
     assert "SURFACE_MODES: readonly SurfaceMode[] = PRODUCT_SURFACE_NAV.map" in source
     assert "PRODUCT_SIDEBAR_NAV: readonly ProductSurfaceNavItem[] = PRODUCT_SURFACE_NAV" in source
     assert "ProductSidebarFlowItem = ProductSurfaceNavItem &" in source
-    assert "PRODUCT_SIDEBAR_FLOW_ITEMS: readonly ProductSidebarFlowItem[] = PRODUCT_SIDEBAR_NAV.map" in source
+    assert 'PRODUCT_SIDEBAR_FLOW_ITEMS: readonly ProductSidebarFlowItem[] = productSidebarFlowItems("web")' in source
+    assert 'item.runtimeVisibility === "all" || runtimeTier === "local"' in source
     assert "flowStep: index + 1" in source
     assert "SIDEBAR_SURFACES: readonly SurfaceMode[] = PRODUCT_SIDEBAR_NAV.map" in source
     assert "isSurfaceMode(value: string)" in source
@@ -53,13 +57,92 @@ def testProductSurfaceNavKeepsConversationFirstFlow() -> None:
     assert "HIDDEN_SURFACES: readonly SurfaceMode[] = PRODUCT_SURFACE_NAV" in source
 
 
-def testSurfaceRouteUsesSurfaceModelContract() -> None:
+def testSurfaceRouteUsesDurableRunRouteContract() -> None:
     source = _read("editor/src/hooks/useSurfaceRoute.ts")
+    routeState = _read("editor/src/lib/runRouteState.ts")
 
     assert "DEFAULT_SURFACE" in source
-    assert "isSurfaceMode" in source
+    assert "readRunRouteState" in source
+    assert "writeRunRouteState" in source
+    assert 'window.addEventListener("popstate"' in source
+    assert 'navigateRunRoute({ surface: nextSurface }, "push")' in source
+    assert not (EDITOR_SRC / "lib" / "curriculumDeepLink.ts").exists()
     assert 'return "chat"' not in source
     assert 'value === "editor"' not in source
+    assert 'runRouteRuntimeTier() === "local" ? "home" : DEFAULT_SURFACE' in source
+    assert 'runtimeTier === "web" && requestedSurface === "home" ? "curriculum" : requestedSurface' in routeState
+
+
+def testLocalHomeIsAnOperationalRuntimeEntry() -> None:
+    home = _read("editor/src/components/app/localHomeSurface.tsx")
+    mainSurface = _read("editor/src/components/app/mainSurface.tsx")
+    app = _read("editor/src/App.tsx")
+
+    for marker in (
+        'data-local-home-surface="true"',
+        'data-local-home-resume="true"',
+        'data-local-home-operations="true"',
+        'data-local-home-commands="true"',
+        "AutomationOperationStrip",
+        'onNavigate("curriculum")',
+        'onNavigate("editor")',
+        'onNavigate("automation")',
+    ):
+        assert marker in home
+    assert "@/components/ui/card" not in home
+    assert "LocalHomeSurface" in mainSurface
+    assert 'props.surface === "home"' in mainSurface
+    assert "runtimeTier={runRouteState.runtimeTier}" in app
+    assert 'surface === "home"' in app
+
+
+def testLearningVisualsUseOneManifestBackedDomainMapping() -> None:
+    visualAssets = _read("editor/src/lib/visualAssets.ts")
+    learningVisuals = _read("editor/src/lib/learningVisualAssets.ts")
+
+    assert 'from "@/lib/generated/visualAssetManifest"' in visualAssets
+    assert "resolveVisualAsset(domain.assetId, { width })" in learningVisuals
+    assert "LEARNING_VISUAL_DOMAINS" in learningVisuals
+    for assetId in (
+        "pythonFundamentals",
+        "dataAnalysis",
+        "dataVisualization",
+        "statisticsMachineLearning",
+        "imageVision",
+        "learningAutomation",
+        "developerLiteracy",
+        "aiIntegration",
+    ):
+        assert learningVisuals.count(f'assetId: "{assetId}"') == 1
+    for categoryKey in ("30days", "pandas", "matplotlib", "sklearn", "opencv", "playwright", "devTools", "llmBasics"):
+        assert f'"{categoryKey}"' in learningVisuals
+
+
+def testLearningHomeAndLessonRenderInstructionalVisualsWithoutRevealControls() -> None:
+    home = _read("editor/src/components/curriculum/curriculumHome.tsx")
+    overview = _read("editor/src/components/curriculum/curriculumOverview.tsx")
+    visual = _read("editor/src/components/curriculum/learningDomainVisual.tsx")
+    browserGate = _read("tests/surface/verifyProductExperiencePlaywright.py")
+
+    assert "<LearningDomainVisual" in home
+    assert "LEARNING_VISUAL_DOMAINS.map" in home
+    assert "<LearningDomainVisual" in overview
+    assert "category={selectedCategory}" in overview
+    for marker in (
+        'data-learning-domain-visual="true"',
+        'data-learning-visual-kind="instructional"',
+        'data-learning-visual-question="true"',
+        'data-learning-visual-decision="true"',
+        "visual.learning.learningQuestion",
+        "visual.learning.decisionShown",
+    ):
+        assert marker in visual
+    assert "@/components/ui/card" not in visual
+    assert "<button" not in visual
+    assert "text-[11px]" not in home
+    assert '"name": "web-learning-home-desktop"' in browserGate
+    assert '"viewport": {"width": 1440, "height": 900}' in browserGate
+    assert "all 8 instructional learning-domain visuals must render" in browserGate
 
 
 def testAppDelegatesProductSurfaceSelectionPolicy() -> None:
@@ -93,7 +176,7 @@ def testProductSidebarRendersCentralSurfaceNavOnly() -> None:
     assert "CustomCurriculumDeleteDialog" not in source
     assert "surfaceIcons" not in source
     assert "categoryTitle" not in source
-    assert "PRODUCT_SIDEBAR_FLOW_ITEMS" in flowNav
+    assert "productSidebarFlowItems(runtimeTier)" in flowNav
     assert "sidebarSurfaceIcons" in flowNav
     assert "sidebarIconForSurface" in flowNav
     assert "Unsupported sidebar surface" in flowNav
@@ -103,13 +186,13 @@ def testProductSidebarRendersCentralSurfaceNavOnly() -> None:
     assert "PRODUCT_SURFACE_NAV" not in flowNav
     assert "flowStep: index + 1" not in flowNav
     assert 'data-product-nav="flow"' in flowNav
-    assert 'data-product-flow-hierarchy="chat-first"' in flowNav
+    assert 'data-product-flow-hierarchy="runtime-ordered"' in flowNav
     assert 'data-product-nav="utility"' in source
     assert 'data-product-flow-marker="true"' in flowNav
     assert "data-product-flow-role={flowRole}" in flowNav
     assert 'data-product-flow-second-loop={flowRole === "secondLoop" ? "true" : undefined}' in flowNav
     assert "data-product-flow-step={flowStep}" in flowNav
-    assert 'flowRole === "entry" && "font-medium"' in flowNav
+    assert 'flowStep === 1 && "font-medium"' in flowNav
     assert 'flowRole === "secondLoop" && "border-t border-sidebar-border/60 bg-sidebar-accent/20"' in flowNav
     assert source.index("<ProductFlowNav") < source.index('data-product-nav="utility"')
     assert source.index('data-product-nav="utility"') < source.index('tooltip={t("terminal.title")}')
@@ -175,19 +258,17 @@ def testChatStartExamplesCarryDogfoodFlowMetadata() -> None:
 
     assert 'surfaceFlowRole, type ProductSurfaceFlowRole, type SurfaceMode' in startExamples
     assert "CHAT_START_EXAMPLE_DEFINITIONS" in startExamples
-    assert "CURRICULUM_GOAL_EXAMPLE_DEFINITIONS" in startExamples
     assert "translateExampleDefinitions(CHAT_START_EXAMPLE_DEFINITIONS, t)" in startExamples
-    assert "translateExampleDefinitions(CURRICULUM_GOAL_EXAMPLE_DEFINITIONS, t)" in startExamples
     assert 'labelKey: "chat.example.pandas", promptKey: "chat.example.pandas.prompt", surface: "curriculum"' in startExamples
     assert 'labelKey: "chat.example.browser", promptKey: "chat.example.browser.prompt", surface: "curriculum"' in startExamples
     assert 'labelKey: "chat.example.automation", promptKey: "chat.example.automation.prompt", surface: "automation"' in startExamples
-    assert 'labelKey: "curriculum.goal.example.report", promptKey: "curriculum.goal.example.report.prompt", surface: "curriculum"' in startExamples
     assert startExamples.index('"chat.example.pandas"') < startExamples.index('"chat.example.automation"')
     assert "flowRole: surfaceFlowRole(example.surface)" in startExamples
     assert 'flowRole: "secondLoop"' not in startExamples
     assert "CurrentLearningSurface" in mainSurface
-    assert "curriculumGoalExamples(t)" in currentLearningSurface
-    assert "curriculum.goal.example.report" not in mainSurface
+    assert 'data-curriculum-loading="true"' in currentLearningSurface
+    assert "ChatSurface" not in currentLearningSurface
+    assert "curriculumGoalExamples" not in currentLearningSurface
     assert 'data-chat-start-example="true"' in chat
     assert "data-chat-start-flow-role={example.flowRole}" in chat
     assert 'data-chat-start-second-loop={example.flowRole === "secondLoop" ? "true" : undefined}' in chat
@@ -196,13 +277,37 @@ def testChatStartExamplesCarryDogfoodFlowMetadata() -> None:
 
 def testAutomationSurfaceFramesAutomationAsSecondLoop() -> None:
     source = _read("editor/src/components/automation/automationSurface.tsx")
+    operationStrip = _read("editor/src/components/automation/automationOperationStrip.tsx")
+    runInspector = _read("editor/src/components/automation/automationRunInspector.tsx")
 
     assert 'data-automation-loop="second-loop"' in source
     assert 'data-automation-source="validated-cell-recipe"' in source
     assert 'data-automation-artifact="validated-cell-recipe"' in source
+    assert 'data-automation-studio-layout="true"' in source
+    assert "data-automation-task-selector={task.id}" in source
+    assert "data-automation-task-detail={task.id}" in source
+    assert "md:grid-cols-[minmax(220px,280px)_minmax(0,1fr)]" in source
+    assert "xl:grid-cols-[280px_minmax(380px,1fr)_360px]" in source
+    assert '<AutomationOperationStrip' in source
+    assert '<AutomationRunInspector' in source
     assert "automation.codaro.description" in source
     assert "automation.custom.description" in source
     assert "automation.empty.detail" in source
+    assert '@/components/ui/card' not in source
+
+    assert 'data-automation-operation-strip="true"' in operationStrip
+    assert 'data-automation-estop-control="true"' in operationStrip
+    assert "onClick={onToggleEStop}" in operationStrip
+    assert '@/components/ui/card' not in operationStrip
+
+    assert 'data-automation-run-inspector="true"' in runInspector
+    assert 'data-automation-task-enabled="true"' in runInspector
+    assert 'data-automation-run-command="true"' in runInspector
+    assert 'data-automation-run-stream={kind}' in runInspector
+    assert 'kind="stdout"' in runInspector
+    assert 'kind="stderr"' in runInspector
+    assert "POST /api/tasks/{encodeURIComponent(task.id)}/run" in runInspector
+    assert '@/components/ui/card' not in runInspector
 
 
 def testProductSurfaceDocsNameTheSameFlow() -> None:
@@ -215,14 +320,14 @@ def testProductSurfaceDocsNameTheSameFlow() -> None:
     assert "대화, 현재 학습, 노트북, 자동화" in skillsReadme
     assert "기존 커리큘럼 추천·조합" in skillsReadme
     assert "자동화는 검증된 스크립트를 태스크로 예약 실행" in skillsReadme
-    assert "`대화 → 현재 학습 → 노트북 → 자동화`" in frontendDoc
+    assert "`현재 학습 → 노트북 → 자동화 → 대화`" in frontendDoc
     assert "`PRODUCT_SURFACE_NAV`" in frontendDoc
     assert "`entry`/`learning`/`notebook`/`secondLoop`/`support`" in frontendDoc
     assert "`editor/src/lib/teacherScope.ts`" in frontendDoc
     assert "`editor/src/lib/chatStartExamples.ts`" in ssotMap
-    assert "`대화 → 현재 학습 → 노트북 → 자동화`" in dogfoodDoc
-    assert "`대화 → 현재 학습 → 노트북 → 자동화`" in identityDoc
-    assert "`대화 → 현재 학습 → 노트북 → 자동화` 사이드바 순서" in ssotMap
+    assert "`현재 학습 → 노트북 → 자동화 → 대화`" in dogfoodDoc
+    assert "`현재 학습 → 노트북 → 자동화 → 대화`" in identityDoc
+    assert "`현재 학습 → 노트북 → 자동화 → 대화` 사이드바 순서" in ssotMap
     assert "`editor/src/lib/teacherScope.ts`" in ssotMap
 
 
@@ -301,11 +406,13 @@ def testMainAndChatSurfacesDoNotAbsorbRoutingOrTreeInternals() -> None:
         "CurriculumCellToc",
         "CurriculumView",
         "CodeCellEditor",
-        "curriculumGoalExamples",
         "selectedCategoryLabel",
         "selectedContentLabel",
     ):
         assert expected in currentLearningSurface
+
+    assert "curriculumGoalExamples" not in currentLearningSurface
+    assert 'data-curriculum-loading="true"' in currentLearningSurface
 
     for expected in (
         "NotebookPanel",

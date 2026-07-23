@@ -348,3 +348,322 @@ sections:
     check:
       noError: 종합 사이클 보고 함수 호출이 끝나야 한다.
       resultCheck: matches가 True이고 report와 restored가 같아야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: inputCtl_10-screen-audit-capstone-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - bootstrap
+    - report-to-clipboard
+    title: 종합 화면 점검의 상태·안전·증거 completeness 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 필수 state와 E-Stop, before/after, redaction evidence를 release 전에 판정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 정상 완료 화면만이 아니라 오류·중단 state도 필수 목록에 포함하세요.
+    - E-Stop은 설정값이 아니라 실제 중단 event로 시험하세요.
+    exercise:
+      prompt: audit_screen_run(run, required_states)를 완성하세요.
+      starterCode: |-
+        def audit_screen_run(run, required_states):
+            raise NotImplementedError
+      solution: |
+        def audit_screen_run(run, required_states):
+            observed = {item["state"] for item in run.get("observations", [])}
+            missing = sorted(set(required_states) - observed)
+            failures = []
+            if missing:
+                failures.append("states")
+            if not run.get("emergencyStopTested", False):
+                failures.append("emergency-stop")
+            if not run.get("beforeAfterBound", False):
+                failures.append("before-after")
+            if run.get("secretResiduals", 0) != 0:
+                failures.append("secrets")
+            return {"releaseReady": not failures, "failures": failures, "missingStates": missing, "observationCount": len(run.get("observations", []))}
+      hints: *id001
+    check:
+      id: python.inputctl.inputCtl_10.screen-audit-capstone.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_10.screen-audit-capstone.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_screen_run
+        cases:
+        - id: accepts-complete-safe-run
+          arguments:
+          - value:
+              observations:
+              - state: ready
+              - state: saved
+              emergencyStopTested: true
+              beforeAfterBound: true
+              secretResiduals: 0
+          - value:
+            - ready
+            - saved
+          expectedReturn:
+            releaseReady: true
+            failures: []
+            missingStates: []
+            observationCount: 2
+        - id: reports-state-and-safety-gaps
+          arguments:
+          - value:
+              observations:
+              - state: ready
+              emergencyStopTested: false
+              beforeAfterBound: false
+              secretResiduals: 1
+          - value:
+            - ready
+            - error
+          expectedReturn:
+            releaseReady: false
+            failures:
+            - states
+            - emergency-stop
+            - before-after
+            - secrets
+            missingStates:
+            - error
+            observationCount: 1
+        - id: reports-no-observations
+          arguments:
+          - value:
+              emergencyStopTested: true
+              beforeAfterBound: true
+              secretResiduals: 0
+          - value:
+            - ready
+          expectedReturn:
+            releaseReady: false
+            failures:
+            - states
+            missingStates:
+            - ready
+            observationCount: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: inputCtl_10-screen-run-release-streak-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inputCtl_10-screen-audit-capstone-mastery
+    title: 새 화면 자동화의 연속 무개입 통과 판정하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 같은 plan hash의 pass와 intervention 0 조건으로 연속 streak를 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 사람이 중간에 고친 pass는 무개입 자동화 streak로 세지 마세요.
+    - 현재 plan hash와 다른 실행 증거를 release 판정에 합치지 마세요.
+    exercise:
+      prompt: decide_screen_release(runs, current_plan_hash, required_streak)를 완성하세요.
+      starterCode: |-
+        def decide_screen_release(runs, current_plan_hash, required_streak):
+            raise NotImplementedError
+      solution: |
+        def decide_screen_release(runs, current_plan_hash, required_streak):
+            if required_streak <= 0:
+                raise ValueError("required streak must be positive")
+            streak = 0
+            stale = []
+            interventions = []
+            for run in sorted(runs, key=lambda item: item["sequence"]):
+                if run["planHash"] != current_plan_hash:
+                    stale.append(run["sequence"])
+                    continue
+                if run.get("interventions", 0) > 0:
+                    interventions.append(run["sequence"])
+                streak = streak + 1 if run["passed"] and run.get("interventions", 0) == 0 else 0
+            return {"releaseReady": streak >= required_streak and not stale, "streak": streak, "stale": stale, "interventions": interventions}
+      hints: *id002
+    check:
+      id: python.inputctl.inputCtl_10.screen-run-release-streak.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_10.screen-run-release-streak.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: decide_screen_release
+        cases:
+        - id: accepts-two-unassisted-passes
+          arguments:
+          - value:
+            - sequence: 1
+              planHash: a
+              passed: true
+              interventions: 0
+            - sequence: 2
+              planHash: a
+              passed: true
+              interventions: 0
+          - value: a
+          - value: 2
+          expectedReturn:
+            releaseReady: true
+            streak: 2
+            stale: []
+            interventions: []
+        - id: resets-on-user-intervention
+          arguments:
+          - value:
+            - sequence: 1
+              planHash: a
+              passed: true
+              interventions: 1
+            - sequence: 2
+              planHash: a
+              passed: true
+              interventions: 0
+          - value: a
+          - value: 2
+          expectedReturn:
+            releaseReady: false
+            streak: 1
+            stale: []
+            interventions:
+            - 1
+        - id: rejects-stale-plan-run
+          arguments:
+          - value:
+            - sequence: 1
+              planHash: old
+              passed: true
+              interventions: 0
+            - sequence: 2
+              planHash: a
+              passed: true
+              interventions: 0
+          - value: a
+          - value: 1
+          expectedReturn:
+            releaseReady: false
+            streak: 1
+            stale:
+            - 1
+            interventions: []
+        - id: rejects-zero-streak
+          arguments:
+          - value: []
+          - value: a
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: inputCtl_10-screen-audit-capstone-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inputCtl_10-screen-run-release-streak-transfer
+    title: 종합 화면 자동화 종료 조건 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 안전·state·증거·연속 통과 기준을 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 입력 자동화 action 전에 대상·경계·중단 방법을 검증하세요.
+    - 화면 변화와 E-Stop evidence를 남기고 성공을 클릭 발생으로 판단하지 마세요.
+    exercise:
+      prompt: choose_screen_audit_gate(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_screen_audit_gate(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_screen_audit_gate(situation):
+            table = {'safety': {'action': 'test fail-safe and E-Stop', 'evidence': 'real stop event', 'risk': 'runaway input'}, 'outcome': {'action': 'bind before after state', 'evidence': 'state and screenshot hashes', 'risk': 'click-only success'}, 'release': {'action': 'require current unassisted streak', 'evidence': 'plan-bound runs', 'risk': 'manual rescue or stale pass'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.inputctl.inputCtl_10.screen-audit-capstone-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_10.screen-audit-capstone-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_screen_audit_gate
+        cases:
+        - id: recalls-safety
+          arguments:
+          - value: safety
+          expectedReturn:
+            action: test fail-safe and E-Stop
+            evidence: real stop event
+            risk: runaway input
+        - id: recalls-outcome
+          arguments:
+          - value: outcome
+          expectedReturn:
+            action: bind before after state
+            evidence: state and screenshot hashes
+            risk: click-only success
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

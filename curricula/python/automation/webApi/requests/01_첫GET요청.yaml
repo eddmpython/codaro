@@ -319,3 +319,304 @@ sections:
           - "도시 리스트를 CSV에서 읽어 결과를 CSV로 저장"
           - "기온이 임계값을 넘으면 04강의 Slack 알림 패턴으로 통보"
           - "한국환경공단 에어코리아 미세먼지 API(인증키 필요)로 미세먼지 수집 흐름 확장"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: requests_01-get-response-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_first_get
+    - extensions
+    title: 첫 GET 응답의 status·content type·schema 판정하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 200 여부뿐 아니라 JSON content type과 필수 필드를 함께 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - '`response.json()` 호출 전에 status와 content type을 검사하세요.'
+    - JSON 파싱 성공과 업무 schema 충족을 별도 판정으로 남기세요.
+    exercise:
+      prompt: audit_get_response(response, required_fields)를 완성하세요.
+      starterCode: |-
+        def audit_get_response(response, required_fields):
+            raise NotImplementedError
+      solution: |
+        def audit_get_response(response, required_fields):
+            failures = []
+            if response.get("status") != 200:
+                failures.append("status")
+            content_type = response.get("headers", {}).get("content-type", "").split(";", 1)[0].strip().lower()
+            if content_type != "application/json":
+                failures.append("content-type")
+            body = response.get("json")
+            if not isinstance(body, dict):
+                failures.append("json-object")
+                missing = sorted(required_fields)
+            else:
+                missing = sorted(set(required_fields) - set(body))
+                if missing:
+                    failures.append("schema")
+            return {"accepted": not failures, "failures": failures, "missingFields": missing, "contentType": content_type}
+      hints: *id001
+    check:
+      id: python.requests.requests_01.get-response-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.requests.requests_01.get-response-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_get_response
+        cases:
+        - id: accepts-json-schema
+          arguments:
+          - value:
+              status: 200
+              headers:
+                content-type: application/json; charset=utf-8
+              json:
+                id: 1
+                name: A
+          - value:
+            - id
+            - name
+          expectedReturn:
+            accepted: true
+            failures: []
+            missingFields: []
+            contentType: application/json
+        - id: reports-html-error-page
+          arguments:
+          - value:
+              status: 503
+              headers:
+                content-type: text/html
+              text: down
+          - value:
+            - id
+          expectedReturn:
+            accepted: false
+            failures:
+            - status
+            - content-type
+            - json-object
+            missingFields:
+            - id
+            contentType: text/html
+        - id: reports-schema-gap
+          arguments:
+          - value:
+              status: 200
+              headers:
+                content-type: application/json
+              json:
+                id: 1
+          - value:
+            - id
+            - name
+          expectedReturn:
+            accepted: false
+            failures:
+            - schema
+            missingFields:
+            - name
+            contentType: application/json
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: requests_01-retry-schedule-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - requests_01-get-response-audit-mastery
+    title: 새 GET 실패에 제한된 backoff 계획 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: status와 Retry-After를 근거로 재시도 시각을 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 404 같은 계약 오류를 서버 일시 장애처럼 재시도하지 마세요.
+    - Retry-After와 최대 지연을 함께 적용해 무한 대기를 막으세요.
+    exercise:
+      prompt: build_retry_schedule(attempts, base_delay, maximum_delay)를 완성하세요.
+      starterCode: |-
+        def build_retry_schedule(attempts, base_delay, maximum_delay):
+            raise NotImplementedError
+      solution: |
+        def build_retry_schedule(attempts, base_delay, maximum_delay):
+            if base_delay <= 0 or maximum_delay <= 0:
+                raise ValueError("delays must be positive")
+            schedule = []
+            for index, attempt in enumerate(attempts):
+                retryable = attempt["status"] in {408, 425, 429, 500, 502, 503, 504}
+                if not retryable:
+                    schedule.append({"attempt": index + 1, "retry": False, "wait": None})
+                    break
+                header_delay = attempt.get("retryAfter")
+                wait = min(maximum_delay, header_delay if header_delay is not None else base_delay * (2**index))
+                schedule.append({"attempt": index + 1, "retry": True, "wait": wait})
+            return schedule
+      hints: *id002
+    check:
+      id: python.requests.requests_01.retry-schedule.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.requests.requests_01.retry-schedule.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_retry_schedule
+        cases:
+        - id: backs-off-retryable-statuses
+          arguments:
+          - value:
+            - status: 503
+            - status: 500
+          - value: 1
+          - value: 10
+          expectedReturn:
+          - attempt: 1
+            retry: true
+            wait: 1
+          - attempt: 2
+            retry: true
+            wait: 2
+        - id: honors-capped-retry-after
+          arguments:
+          - value:
+            - status: 429
+              retryAfter: 30
+          - value: 1
+          - value: 8
+          expectedReturn:
+          - attempt: 1
+            retry: true
+            wait: 8
+        - id: stops-on-client-error
+          arguments:
+          - value:
+            - status: 404
+            - status: 503
+          - value: 1
+          - value: 10
+          expectedReturn:
+          - attempt: 1
+            retry: false
+            wait: null
+        - id: rejects-invalid-delay
+          arguments:
+          - value: []
+          - value: 0
+          - value: 10
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: requests_01-get-response-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - requests_01-retry-schedule-transfer
+    title: GET 응답 검증 순서 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 전송·형식·업무 schema 오류를 단계별로 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - HTTP 성공과 업무 데이터의 유효성을 별도 근거로 판정하세요.
+    - 요청 action과 함께 재현 가능한 evidence와 남는 risk를 기록하세요.
+    exercise:
+      prompt: choose_response_check(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_response_check(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_response_check(situation):
+            table = {'transport': {'action': 'check timeout and status', 'evidence': 'attempt log', 'risk': 'blind retry'}, 'format': {'action': 'check content type then parse', 'evidence': 'header and parse result', 'risk': 'HTML error as JSON'}, 'schema': {'action': 'validate required fields and types', 'evidence': 'schema failures', 'risk': 'silent API drift'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.requests.requests_01.get-response-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.requests.requests_01.get-response-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_response_check
+        cases:
+        - id: recalls-transport
+          arguments:
+          - value: transport
+          expectedReturn:
+            action: check timeout and status
+            evidence: attempt log
+            risk: blind retry
+        - id: recalls-format
+          arguments:
+          - value: format
+          expectedReturn:
+            action: check content type then parse
+            evidence: header and parse result
+            risk: HTML error as JSON
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

@@ -763,3 +763,278 @@ sections:
   check:
     noError: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.'
     resultCheck: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: duckdb_08-lag-moving-window-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: LAG와 이동 평균을 같은 시간축에 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 센서별 시각 순서에서 이전 값 차이와 현재 포함 3개 이동 평균을 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - LAG 첫 행은 이전 값이 없으므로 None입니다.
+    - ROWS 2 PRECEDING 프레임은 최대 현재 포함 3개입니다.
+    exercise:
+      prompt: sensor_windows(rows)를 완성하세요.
+      starterCode: |-
+        def sensor_windows(rows):
+            raise NotImplementedError
+      solution: |
+        def sensor_windows(rows):
+            grouped = {}
+            for row in rows:
+                grouped.setdefault(row["sensor"], []).append(row)
+            result = []
+            for sensor in sorted(grouped):
+                values = []
+                for row in sorted(grouped[sensor], key=lambda item: item["time"]):
+                    previous = values[-1] if values else None
+                    values.append(row["value"])
+                    frame = values[-3:]
+                    result.append({"sensor": sensor, "time": row["time"], "delta": None if previous is None else row["value"] - previous, "movingMean": round(sum(frame) / len(frame), 2)})
+            return result
+      hints: *id001
+    check:
+      id: python.duckdb.duckdb_08.lag-moving-window.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_08.lag-moving-window.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: sensor_windows
+        cases:
+        - id: computes-lag-and-bounded-frame
+          arguments:
+          - value:
+            - sensor: a
+              time: 1
+              value: 3
+            - sensor: a
+              time: 2
+              value: 6
+            - sensor: a
+              time: 3
+              value: 9
+            - sensor: a
+              time: 4
+              value: 12
+          expectedReturn:
+          - sensor: a
+            time: 1
+            delta: null
+            movingMean: 3.0
+          - sensor: a
+            time: 2
+            delta: 3
+            movingMean: 4.5
+          - sensor: a
+            time: 3
+            delta: 3
+            movingMean: 6.0
+          - sensor: a
+            time: 4
+            delta: 3
+            movingMean: 9.0
+        - id: resets-partition
+          arguments:
+          - value:
+            - sensor: b
+              time: 1
+              value: 7
+          expectedReturn:
+          - sensor: b
+            time: 1
+            delta: null
+            movingMean: 7.0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: duckdb_08-qualify-change-events-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - duckdb_08-lag-moving-window-mastery
+    title: 새 가격 데이터에 QUALIFY 패턴 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 상품별 이전 가격과 비교해 threshold 이상의 변화 행만 남긴다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 먼저 LAG를 계산하고 그 결과를 QUALIFY 조건으로 거르세요.
+    - partition 사이의 이전 값을 섞지 마세요.
+    exercise:
+      prompt: significant_price_changes(rows, threshold)를 완성하세요.
+      starterCode: |-
+        def significant_price_changes(rows, threshold):
+            raise NotImplementedError
+      solution: |
+        def significant_price_changes(rows, threshold):
+            grouped = {}
+            for row in rows:
+                grouped.setdefault(row["product"], []).append(row)
+            result = []
+            for product in sorted(grouped):
+                previous = None
+                for row in sorted(grouped[product], key=lambda item: item["date"]):
+                    if previous is not None:
+                        change = row["price"] - previous
+                        if abs(change) >= threshold:
+                            result.append({"product": product, "date": row["date"], "change": change})
+                    previous = row["price"]
+            return result
+      hints: *id002
+    check:
+      id: python.duckdb.duckdb_08.qualify-change-events.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_08.qualify-change-events.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: significant_price_changes
+        cases:
+        - id: filters-after-lag
+          arguments:
+          - value:
+            - product: A
+              date: 1
+              price: 10
+            - product: A
+              date: 2
+              price: 12
+            - product: A
+              date: 3
+              price: 8
+          - value: 3
+          expectedReturn:
+          - product: A
+            date: 3
+            change: -4
+        - id: does-not-cross-products
+          arguments:
+          - value:
+            - product: A
+              date: 1
+              price: 100
+            - product: B
+              date: 1
+              price: 1
+          - value: 1
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: duckdb_08-advanced-window-frame-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - duckdb_08-qualify-change-events-transfer
+    title: 고급 window frame 선택 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: LAG, rolling ROWS, QUALIFY의 책임을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - ROWS frame은 달력 기간이 아니라 행 개수입니다.
+    - window alias 필터는 QUALIFY 단계에서 수행하세요.
+    exercise:
+      prompt: choose_advanced_window(situation)를 완성하세요.
+      starterCode: |-
+        def choose_advanced_window(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_advanced_window(situation):
+            table = {'previous-event': {'function': 'LAG', 'frame': 'ordered partition', 'risk': 'missing order'}, 'last-seven-rows': {'function': 'AVG', 'frame': 'ROWS 6 PRECEDING', 'risk': 'date gaps'}, 'filter-window-rank': {'function': 'QUALIFY', 'frame': 'after window', 'risk': 'WHERE too early'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.duckdb.duckdb_08.advanced-window-frame.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_08.advanced-window-frame.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_advanced_window
+        cases:
+        - id: recalls-previous-event
+          arguments:
+          - value: previous-event
+          expectedReturn:
+            function: LAG
+            frame: ordered partition
+            risk: missing order
+        - id: recalls-last-seven-rows
+          arguments:
+          - value: last-seven-rows
+          expectedReturn:
+            function: AVG
+            frame: ROWS 6 PRECEDING
+            risk: date gaps
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

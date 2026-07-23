@@ -50,6 +50,7 @@
   - `codaro/curricula` base curriculum content (release 시 repo 루트 `curricula/`에서 wheel 안으로 번들; loader는 패키지 경로 우선, 개발 체크아웃은 repo 루트 폴백)
   - document model
   - runtime contracts
+  - root `contracts/`에서 생성된 `codaro/generatedContracts` wire schema와 source hash
   - LocalEngine and future isolated runtime entrypoints
   - curriculum loader
   - public CLI entrypoint

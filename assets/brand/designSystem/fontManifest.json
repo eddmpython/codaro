@@ -1,0 +1,73 @@
+{
+  "$schema": "https://codaro.dev/contracts/font-manifest.schema.json",
+  "version": 1,
+  "fontDisplay": "swap",
+  "fonts": [
+    {
+      "file": "Pretendard-400.subset.woff2",
+      "family": "Pretendard",
+      "weight": 400,
+      "style": "normal",
+      "unicodeRange": "U+0000-00FF,U+1100-11FF,U+3130-318F,U+AC00-D7AF",
+      "preload": true,
+      "license": "OFL-1.1",
+      "licenseSource": "https://github.com/orioncactus/pretendard/blob/main/LICENSE",
+      "sha256": "01dd73155fdfab7ce9b25224523e85a96927e21aef97f21957d41f1bfa7e3878"
+    },
+    {
+      "file": "Pretendard-700.subset.woff2",
+      "family": "Pretendard",
+      "weight": 700,
+      "style": "normal",
+      "unicodeRange": "U+0000-00FF,U+1100-11FF,U+3130-318F,U+AC00-D7AF",
+      "preload": true,
+      "license": "OFL-1.1",
+      "licenseSource": "https://github.com/orioncactus/pretendard/blob/main/LICENSE",
+      "sha256": "78eb71c33101ee7d4f8d1b777d193a12d00f8a296e712a8c417cf27abe946397"
+    },
+    {
+      "file": "SpaceGrotesk-600.woff2",
+      "family": "Space Grotesk",
+      "weight": 600,
+      "style": "normal",
+      "unicodeRange": "U+0000-00FF",
+      "preload": false,
+      "license": "OFL-1.1",
+      "licenseSource": "https://github.com/floriankarsten/space-grotesk/blob/master/OFL.txt",
+      "sha256": "685bbbf69fa616df1ef81847c85fc76be097ddfb3468ff2257be54511ab3130f"
+    },
+    {
+      "file": "SpaceGrotesk-700.woff2",
+      "family": "Space Grotesk",
+      "weight": 700,
+      "style": "normal",
+      "unicodeRange": "U+0000-00FF",
+      "preload": false,
+      "license": "OFL-1.1",
+      "licenseSource": "https://github.com/floriankarsten/space-grotesk/blob/master/OFL.txt",
+      "sha256": "35f8aec56cfd5cbfdb03cc68733a54a0b05bb3617ffcd5fd332badc0b045ca55"
+    },
+    {
+      "file": "JetBrainsMono-400.woff2",
+      "family": "JetBrains Mono",
+      "weight": 400,
+      "style": "normal",
+      "unicodeRange": "U+0000-00FF",
+      "preload": true,
+      "license": "OFL-1.1",
+      "licenseSource": "https://github.com/JetBrains/JetBrainsMono/blob/master/OFL.txt",
+      "sha256": "14425ba9c695763c1547f48a206b7aa60350a33ae23de09f0407877f3fcd89eb"
+    },
+    {
+      "file": "JetBrainsMono-500.woff2",
+      "family": "JetBrains Mono",
+      "weight": 500,
+      "style": "normal",
+      "unicodeRange": "U+0000-00FF",
+      "preload": false,
+      "license": "OFL-1.1",
+      "licenseSource": "https://github.com/JetBrains/JetBrainsMono/blob/master/OFL.txt",
+      "sha256": "cb182feeed4d798ff6961d3c79f7026279448fca0676438aaecb21f3fc39553a"
+    }
+  ]
+}

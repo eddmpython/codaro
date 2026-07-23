@@ -116,16 +116,6 @@ class ProcessSupervisor:
             self._killProcess(process)
             return
 
-        uptime = time.monotonic() - self._startedAt
-        if uptime > self._limits.maxExecutionSeconds:
-            self._emitEvent("resource-exceeded", {
-                "reason": "timeout",
-                "uptime": round(uptime, 1),
-                "limit": self._limits.maxExecutionSeconds,
-            })
-            self._killProcess(process)
-            return
-
         if snap.memoryMb > self._limits.maxMemoryMb:
             self._emitEvent("resource-exceeded", {
                 "reason": "memory",

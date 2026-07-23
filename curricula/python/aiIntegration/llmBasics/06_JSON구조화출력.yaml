@@ -410,3 +410,274 @@ sections:
   check:
     noError: 함수 정의와 호출, assertion이 모두 정상 실행되어야 합니다.
     resultCheck: order가 amount, customer 정보를 정확히 추출해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 06_json-output-parse-order-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - strict_system
+    - assistant_prefill
+    title: 주문 JSON을 안전하게 파싱하기
+    subtitle: strict JSON parser
+    goal: parse_order_json(text)를 완성해 필수 키를 검증하고 amount를 정수로 정규화한다.
+    why: 구조화 출력은 모델 응답을 그대로 믿는 것이 아니라 코드가 받을 수 있는 사전으로 확정하는 단계까지 포함합니다.
+    explanation: 응답 문자열을 json.loads로 파싱한 뒤 orderId, customer, amount, currency 네 키를 검사합니다. amount는 다음 계산 단계에서 쓸 수 있도록 int로
+      바꿉니다.
+    tips:
+    - json.JSONDecodeError는 그대로 두지 말고 ValueError로 감싸면 호출부의 에러 처리가 단순해집니다.
+    - 필수 키 누락과 타입 오류는 같은 실패 흐름으로 처리해도 충분합니다.
+    exercise:
+      prompt: parse_order_json(text)를 완성해 검증된 주문 사전을 반환하세요.
+      starterCode: |-
+        def parse_order_json(text):
+            raise NotImplementedError
+      solution: |-
+        import json
+
+        def parse_order_json(text):
+            try:
+                parsed = json.loads(text)
+            except json.JSONDecodeError as exc:
+                raise ValueError("invalid JSON") from exc
+            if not isinstance(parsed, dict):
+                raise ValueError("order must be an object")
+            required = ["orderId", "customer", "amount", "currency"]
+            missing = [key for key in required if key not in parsed]
+            if missing:
+                raise ValueError("missing required keys")
+            return {
+                "orderId": str(parsed["orderId"]),
+                "customer": str(parsed["customer"]),
+                "amount": int(parsed["amount"]),
+                "currency": str(parsed["currency"]),
+            }
+      hints:
+      - 필수 키 목록을 먼저 만들고 누락 여부를 검사합니다.
+      - amount는 문자열로 와도 int로 변환되어야 합니다.
+    check:
+      id: python.llm.json-output.parse-order.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.json-output.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: parse_order_json
+        cases:
+        - id: parses-valid-order
+          arguments:
+          - value: '{"orderId":"A-100","customer":"민준","amount":"120000","currency":"KRW"}'
+          expectedReturn:
+            orderId: A-100
+            customer: 민준
+            amount: 120000
+            currency: KRW
+        - id: rejects-invalid-json-text
+          arguments:
+          - value: '```json {"orderId":"A-100"} ```'
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 06_json-output-retry-parser-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - parse_retry
+    - workflow_validation
+    title: 후보 응답을 순서대로 재시도해 파싱하기
+    subtitle: parse retry loop
+    goal: parse_order_with_retry(candidates)를 완성해 첫 유효 JSON 주문과 시도 횟수를 반환한다.
+    why: 구조화 출력은 실패 가능성을 인정하고 다음 후보나 재호출 결과로 복구할 수 있어야 자동화에 쓸 수 있습니다.
+    explanation: candidates는 모델 응답 후보 문자열 목록입니다. 앞 후보가 JSON 파싱이나 필수 키 검증에 실패하면 다음 후보를 시도하고, 끝까지 실패하면 ValueError를 발생시킵니다.
+    tips:
+    - 성공 시 attempt는 1부터 세어 사용자와 로그가 이해하기 쉽게 만듭니다.
+    - 실패를 숨기지 말고 모든 후보가 실패했을 때 명시적으로 예외를 냅니다.
+    exercise:
+      prompt: parse_order_with_retry(candidates)를 완성해 attempts, orderId, amount, currency를 반환하세요.
+      starterCode: |-
+        def parse_order_with_retry(candidates):
+            raise NotImplementedError
+      solution: |-
+        import json
+
+        def normalize_order(parsed):
+            if not isinstance(parsed, dict):
+                raise ValueError("order must be an object")
+            required = ["orderId", "customer", "amount", "currency"]
+            missing = [key for key in required if key not in parsed]
+            if missing:
+                raise ValueError("missing required keys")
+            return {
+                "orderId": str(parsed["orderId"]),
+                "customer": str(parsed["customer"]),
+                "amount": int(parsed["amount"]),
+                "currency": str(parsed["currency"]),
+            }
+
+        def parse_order_with_retry(candidates):
+            if not candidates:
+                raise ValueError("candidates must not be empty")
+            for attempt, text in enumerate(candidates, 1):
+                try:
+                    order = normalize_order(json.loads(text))
+                except (json.JSONDecodeError, TypeError, ValueError) as exc:
+                    last_error = exc
+                    continue
+                return {
+                    "attempts": attempt,
+                    "orderId": order["orderId"],
+                    "amount": order["amount"],
+                    "currency": order["currency"],
+                }
+            raise ValueError("no valid order JSON") from last_error
+      hints:
+      - 첫 후보가 실패해도 반복문을 멈추지 않습니다.
+      - 성공 반환값은 자동화 로그에 필요한 핵심 키만 담습니다.
+    check:
+      id: python.llm.json-output.retry-parser.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.json-output.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: parse_order_with_retry
+        cases:
+        - id: succeeds-on-second-candidate
+          arguments:
+          - value:
+            - 주문 정보입니다.
+            - '{"orderId":"B-200","customer":"지아","amount":45000,"currency":"KRW"}'
+          expectedReturn:
+            attempts: 2
+            orderId: B-200
+            amount: 45000
+            currency: KRW
+        - id: rejects-all-invalid-candidates
+          arguments:
+          - value:
+            - '{}'
+            - not-json
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 06_json-output-rule-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 06_json-output-retry-parser-transfer
+    title: JSON 출력 운영 규칙 회상하기
+    subtitle: JSON rule recall
+    goal: choose_json_output_rule(goal)를 완성해 구조화 출력 상황별 규칙과 실패 위험을 반환한다.
+    why: JSON 출력은 프롬프트, prefill, 파서, 재시도가 한 묶음으로 움직일 때 안정성이 생깁니다.
+    explanation: strict-system, assistant-prefill, parse-json, retry-on-fail, schema-check 상황별로 적용할 규칙을 선택하세요.
+    tips:
+    - JSON만 요구하는 문장과 실제 파싱 검증은 다른 단계입니다.
+    - schema-check는 다음 코드가 기대하는 키를 보장합니다.
+    exercise:
+      prompt: choose_json_output_rule(goal)를 완성해 rule, useWhen, risk를 반환하세요.
+      starterCode: |-
+        def choose_json_output_rule(goal):
+            raise NotImplementedError
+      solution: |-
+        def choose_json_output_rule(goal):
+            table = {
+                "strict-system": {"rule": "forbid text outside valid JSON", "useWhen": "response feeds code", "risk": "markdown wrapper"},
+                "assistant-prefill": {"rule": "start assistant response with opening brace", "useWhen": "shape needs stronger bias", "risk": "format drift"},
+                "parse-json": {"rule": "run json.loads before using fields", "useWhen": "receiving model text", "risk": "string masquerade"},
+                "retry-on-fail": {"rule": "retry when parse or schema check fails", "useWhen": "automation must recover", "risk": "single-shot failure"},
+                "schema-check": {"rule": "validate required keys and types", "useWhen": "next step is deterministic code", "risk": "missing field crash"},
+            }
+            if goal not in table:
+                raise ValueError("unknown JSON output goal")
+            return table[goal]
+      hints:
+      - 자동화에서 문자열과 사전은 분명히 구분해야 합니다.
+      - 키 검증은 파싱 직후에 실행합니다.
+    check:
+      id: python.llm.json-output.rule-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.json-output.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_json_output_rule
+        cases:
+        - id: recalls-strict-system
+          arguments:
+          - value: strict-system
+          expectedReturn:
+            rule: forbid text outside valid JSON
+            useWhen: response feeds code
+            risk: markdown wrapper
+        - id: recalls-schema-check
+          arguments:
+          - value: schema-check
+          expectedReturn:
+            rule: validate required keys and types
+            useWhen: next step is deterministic code
+            risk: missing field crash
+        - id: rejects-unknown-goal
+          arguments:
+          - value: hope-it-parses
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

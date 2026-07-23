@@ -342,3 +342,309 @@ sections:
     type: noError
     noError: 종합 복습에서 `cube` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 종합 복습 실행 뒤 `cube` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 01_advanced_lambda-payment-pipeline-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - map_function
+    - filter_function
+    - reduce_function
+    - workflow_validation
+    title: 결제 이벤트를 filter, map, reduce로 검증 가능한 요약으로 만들기
+    subtitle: higher-order payment pipeline
+    goal: 결제 이벤트에서 paid 상태와 최소 금액 조건을 통과한 항목만 골라 수수료 차감 금액과 합계를 반환한다.
+    why: 람다와 고차 함수는 짧게 쓰는 기술이 아니라, 데이터 정제와 변환, 집계를 한 흐름으로 읽히게 만드는 도구입니다.
+    explanation: summarize_payment_events(events, minimum_amount, fee_rate=0.1)를 완성해 filter로 대상 이벤트를 고르고 map으로 net 금액을 만들며
+      reduce로 합계를 계산하세요.
+    tips:
+    - 원본 events를 수정하지 마세요.
+    - minimum_amount보다 작은 paid 이벤트와 refund 이벤트는 제외해야 합니다.
+    exercise:
+      prompt: summarize_payment_events(events, minimum_amount, fee_rate=0.1)를 완성해 선택된 id, net 금액, 합계를 반환하세요.
+      starterCode: |-
+        def summarize_payment_events(events, minimum_amount, fee_rate=0.1):
+            raise NotImplementedError
+      solution: |-
+        def summarize_payment_events(events, minimum_amount, fee_rate=0.1):
+            from functools import reduce
+
+            if minimum_amount < 0:
+                raise ValueError("minimum_amount must be non-negative")
+
+            selected = list(filter(
+                lambda event: event["status"] == "paid" and event["amount"] >= minimum_amount,
+                events,
+            ))
+            net_amounts = list(map(
+                lambda event: round(event["amount"] * (1 - fee_rate)),
+                selected,
+            ))
+            total_net = reduce(lambda total, amount: total + amount, net_amounts, 0)
+            return {
+                "selectedIds": [event["id"] for event in selected],
+                "netAmounts": net_amounts,
+                "totalNet": total_net,
+                "count": len(selected),
+            }
+      hints:
+      - filter 조건은 status와 amount 조건을 모두 봐야 합니다.
+      - reduce에는 초기값 0을 넣으면 빈 결과도 안전합니다.
+    check:
+      id: python.advanced.lambda.payment-pipeline.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.lambda.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_payment_events
+        cases:
+        - id: summarizes-paid-events-above-threshold
+          arguments:
+          - value:
+            - id: A1
+              status: paid
+              amount: 120000
+            - id: A2
+              status: refund
+              amount: 50000
+            - id: A3
+              status: paid
+              amount: 45000
+            - id: A4
+              status: paid
+              amount: 80000
+          - value: 60000
+          - value: 0.1
+          expectedReturn:
+            selectedIds:
+            - A1
+            - A4
+            netAmounts:
+            - 108000
+            - 72000
+            totalNet: 180000
+            count: 2
+        - id: rejects-negative-threshold
+          arguments:
+          - value: []
+          - value: -1
+          - value: 0.1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 01_advanced_lambda-transform-spec-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - higher_order
+    - practical_patterns
+    title: 이름 있는 변환 규칙을 고차 함수 파이프라인으로 적용하기
+    subtitle: reusable transformation stages
+    goal: stage 이름 목록과 숫자 목록을 받아 각 stage 함수를 순서대로 적용하고 중간 결과를 반환한다.
+    why: 전이 과제에서는 map/filter/reduce를 결제 예시 밖으로 옮겨, 작은 함수를 조립하는 설계 감각을 확인합니다.
+    explanation: apply_named_stages(values, stages)를 완성해 keep-even, square, positive-only, total stage를 조합하세요.
+    tips:
+    - stage 순서가 결과를 바꿉니다.
+    - 모르는 stage는 ValueError로 막으세요.
+    exercise:
+      prompt: apply_named_stages(values, stages)를 완성해 각 stage 적용 뒤의 값을 기록하세요.
+      starterCode: |-
+        def apply_named_stages(values, stages):
+            raise NotImplementedError
+      solution: |-
+        def apply_named_stages(values, stages):
+            from functools import reduce
+
+            handlers = {
+                "keep-even": lambda items: list(filter(lambda value: value % 2 == 0, items)),
+                "square": lambda items: list(map(lambda value: value * value, items)),
+                "positive-only": lambda items: list(filter(lambda value: value > 0, items)),
+                "total": lambda items: [reduce(lambda total, value: total + value, items, 0)],
+            }
+            current = list(values)
+            trace = []
+            for stage in stages:
+                if stage not in handlers:
+                    raise ValueError("unknown stage")
+                current = handlers[stage](current)
+                trace.append({"stage": stage, "values": current})
+            return {
+                "final": current,
+                "trace": trace,
+                "stageCount": len(stages),
+            }
+      hints:
+      - handlers dict의 값은 함수를 담습니다.
+      - 각 stage 뒤 current를 trace에 남기면 디버깅이 쉬워집니다.
+    check:
+      id: python.advanced.lambda.transform-spec.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.lambda.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: apply_named_stages
+        cases:
+        - id: applies-filter-map-reduce-stages-in-order
+          arguments:
+          - value:
+            - -3
+            - 2
+            - 5
+            - 4
+          - value:
+            - positive-only
+            - keep-even
+            - square
+            - total
+          expectedReturn:
+            final:
+            - 20
+            trace:
+            - stage: positive-only
+              values:
+              - 2
+              - 5
+              - 4
+            - stage: keep-even
+              values:
+              - 2
+              - 4
+            - stage: square
+              values:
+              - 4
+              - 16
+            - stage: total
+              values:
+              - 20
+            stageCount: 4
+        - id: rejects-unknown-stage
+          arguments:
+          - value:
+            - 1
+          - value:
+            - cube
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 01_advanced_lambda-tool-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 01_advanced_lambda-transform-spec-transfer
+    title: map, filter, reduce의 역할 회상하기
+    subtitle: transform, select, collapse
+    goal: 목적 이름을 받아 map, filter, reduce 중 맞는 고차 함수와 결과 shape를 반환한다.
+    why: 시간이 지나도 남아야 할 감각은 map은 변환, filter는 선택, reduce는 축약이라는 역할 구분입니다.
+    explanation: choose_higher_order_tool(goal)를 완성해 transform, select, collapse 목적별 tool과 outputShape를 반환하세요.
+    tips:
+    - map과 filter는 iterable을 돌려주고, reduce는 보통 단일 값을 돌려줍니다.
+    - 내장 sum, max가 더 명확하면 reduce보다 그것을 우선할 수 있습니다.
+    exercise:
+      prompt: choose_higher_order_tool(goal)를 완성해 목적별 고차 함수 선택 결과를 반환하세요.
+      starterCode: |-
+        def choose_higher_order_tool(goal):
+            raise NotImplementedError
+      solution: |-
+        def choose_higher_order_tool(goal):
+            table = {
+                "transform": {"tool": "map", "outputShape": "one output per input", "keepsLength": True},
+                "select": {"tool": "filter", "outputShape": "zero or more original items", "keepsLength": False},
+                "collapse": {"tool": "reduce", "outputShape": "single accumulated value", "keepsLength": False},
+            }
+            if goal not in table:
+                raise ValueError("unknown higher-order goal")
+            return table[goal]
+      hints:
+      - 변환은 각 입력마다 결과 하나가 필요합니다.
+      - 축약은 여러 값을 하나로 모읍니다.
+    check:
+      id: python.advanced.lambda.tool-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.lambda.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_higher_order_tool
+        cases:
+        - id: recalls-map-for-transform
+          arguments:
+          - value: transform
+          expectedReturn:
+            tool: map
+            outputShape: one output per input
+            keepsLength: true
+        - id: recalls-reduce-for-collapse
+          arguments:
+          - value: collapse
+          expectedReturn:
+            tool: reduce
+            outputShape: single accumulated value
+            keepsLength: false
+        - id: rejects-unknown-purpose
+          arguments:
+          - value: mutate-in-place
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

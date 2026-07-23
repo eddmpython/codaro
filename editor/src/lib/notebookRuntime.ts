@@ -17,6 +17,10 @@ import type {
   VariableInfo,
 } from "@/types";
 
+export const RUNTIME_SESSION_RELEASE_REQUEST_EVENT = "codaro:release-runtime-session";
+
+const runtimeSessionReleasePromises = new Map<string, Promise<boolean>>();
+
 function extractDiagnostics(payload: ReactiveResponse): ReactiveDiagnostics {
   return {
     cycles: payload.cycles ?? [],
@@ -41,6 +45,24 @@ export async function removeNotebookCellState(sessionId: string | null, blockId:
   } catch (error) {
     console.warn("remove-cell failed", error);
   }
+}
+
+export async function releaseRuntimeSession(
+  sessionId: string | null,
+  options: { keepalive?: boolean } = {},
+): Promise<boolean> {
+  if (!sessionId) return false;
+  const activeRelease = runtimeSessionReleasePromises.get(sessionId);
+  if (activeRelease) return activeRelease;
+  const release = codaroApi.destroySession(sessionId, options.keepalive ?? false)
+    .then((result) => result.destroyed)
+    .catch((error) => {
+      runtimeSessionReleasePromises.delete(sessionId);
+      console.warn("kernel session release failed", error);
+      return false;
+    });
+  runtimeSessionReleasePromises.set(sessionId, release);
+  return release;
 }
 
 export type RuntimeSessionResult = {
@@ -490,4 +512,3 @@ function errorMessage(error: unknown) {
 function firstMessageLine(value: string) {
   return value.split(/\r?\n/).map((line) => line.trim()).find(Boolean) ?? "";
 }
-

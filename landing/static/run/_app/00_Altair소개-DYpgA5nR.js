@@ -1,0 +1,437 @@
+var e=`meta:\r
+  packages:\r
+  - altair\r
+  - pandas\r
+  id: altair_00\r
+  title: Altair소개\r
+  order: 0\r
+  category: altair\r
+  badge: 소개\r
+  source: eddmpython\r
+  sourceUrl: https://eddmpython.com\r
+  tags:\r
+  - Altair\r
+  - Vega-Lite\r
+  - 선언적시각화\r
+  - 통계시각화\r
+  - 인터랙티브\r
+  - Codaro\r
+  seo:\r
+    title: Altair 입문 - 선언적 통계 시각화 라이브러리\r
+    description: Altair로 간결하고 우아한 시각화를 시작하세요. Vega-Lite 기반의 선언적 문법으로 복잡한 차트도 쉽게 만들 수 있습니다.\r
+    keywords:\r
+    - Altair\r
+    - Vega-Lite\r
+    - 시각화\r
+    - 데이터시각화\r
+    - Python차트\r
+    - 선언적시각화\r
+intro:\r
+  direction: Altair소개에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.\r
+  benefits:\r
+  - 첫 실행 셀은 assert로 핵심 결과를 고정해 실습 코드가 깨지지 않았는지 확인합니다.\r
+  - 정리된 테이블 확인 후 채널 인코딩에 맞는 코드 입력을 고릅니다.\r
+  - Altair소개 결과를 스케일과 마크 매핑 기준으로 즉시 점검합니다.\r
+  - 완료한 코드를 선언형 대시보드에 다시 사용할 수 있습니다.\r
+  diagram:\r
+    steps:\r
+    - label: 10단계. Altair 학습 입력 확인\r
+      detail: 입력 기준(정리된 테이블)과 필요한 조건을 먼저 고정합니다.\r
+    - label: 채널 인코딩 처리 실행\r
+      detail: 채널 인코딩 코드를 실행해 중간 결과를 확인합니다.\r
+    - label: 스케일과 마크 매핑 결과 검증\r
+      detail: 스케일과 마크 매핑 기준으로 실행 결과를 비교합니다.\r
+    - label: Altair소개 재사용\r
+      detail: 완성 코드를 선언형 대시보드에 붙일 수 있게 정리합니다.\r
+    runtime:\r
+    - label: 선언형 차트 환경\r
+      detail: altair, pandas 기준으로 로컬 Python 실행을 준비합니다.\r
+    - label: Altair소개 실행\r
+      detail: 셀을 실행해 스케일과 마크 매핑와 예외 상태를 확인합니다.\r
+    - label: Altair소개 완료\r
+      detail: 검증된 코드를 선언형 대시보드로 남깁니다.\r
+sections:\r
+- id: intro\r
+  blocks:\r
+  - type: mainHeader\r
+    emoji: 📊\r
+    title: Altair??\r
+    subtitle: 선언적 시각화가 뭐길래?\r
+  - type: hero\r
+    emoji: ✨\r
+    title: 선언적 통계 시각화 라이브러리\r
+    subtitle: 무엇을 그릴지만 말하면, 어떻게는 알아서\r
+    points:\r
+    - emoji: 💡\r
+      title: 선언적 문법으로 간결한 코드\r
+    - emoji: 📈\r
+      title: 통계 시각화에 최적화\r
+    - emoji: 🔗\r
+      title: 인터랙션 내장\r
+    - emoji: 🎯\r
+      title: Codaro에서 자동 인터랙티브\r
+  - type: note\r
+    style: info\r
+    title: 로컬 미리보기\r
+    content: 이 과정의 모든 차트는 Codaro 로컬 데이터셋과 Altair spec으로 재현합니다. 외부 이미지나 원격 데이터 없이도 같은 학습 흐름을 실행할 수 있습니다.\r
+  goal: Altair??에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.\r
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.\r
+- id: what_is_altair\r
+  blocks:\r
+  - type: sectionHeader\r
+    title: 🤔 Altair가 뭔가요?\r
+    subtitle: 한마디로 선언적 시각화\r
+  - type: note\r
+    style: info\r
+    title: 선언적(Declarative) 프로그래밍이란?\r
+    content: 명령형 프로그래밍이 '이렇게 저렇게 해라'고 단계별로 지시한다면, 선언적 프로그래밍은 '이런 결과를 원한다'고 목표만 말합니다. Altair는 '이 데이터를 x축에,\r
+      저 데이터를 y축에 놓고, 색깔은 이걸로'라고 선언하면 나머지는 알아서 처리합니다.\r
+  - type: featureCards\r
+    cards:\r
+    - emoji: 📝\r
+      title: 선언적 문법\r
+      description: 원하는 결과를 기술하면 차트가 생성\r
+    - emoji: 🎨\r
+      title: Vega-Lite 기반\r
+      description: 표준화된 시각화 문법 사용\r
+    - emoji: 📊\r
+      title: 통계 특화\r
+      description: 집계, 변환을 차트 내에서 처리\r
+    - emoji: 🔌\r
+      title: pandas 연동\r
+      description: DataFrame을 바로 시각화\r
+  goal: 🤔 Altair가 뭔가요?에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.\r
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.\r
+- id: why_altair\r
+  blocks:\r
+  - type: sectionHeader\r
+    title: 🌟 왜 Altair가 좋을까요?\r
+    subtitle: 데이터 과학자들이 선호하는 이유\r
+  - type: featureCards\r
+    cards:\r
+    - emoji: ✂️\r
+      title: 코드가 간결함\r
+      description: Matplotlib 대비 1/3~1/5 코드량\r
+    - emoji: 🧠\r
+      title: 일관된 문법\r
+      description: 모든 차트를 같은 방식으로 생성\r
+    - emoji: 📊\r
+      title: 차트 내 집계\r
+      description: mean(), count() 등을 차트에서 바로\r
+    - emoji: 🔗\r
+      title: 인터랙션 내장\r
+      description: 브러싱, 선택, 링킹 기본 제공\r
+    - emoji: 🎯\r
+      title: 타입 추론\r
+      description: 데이터 타입에 맞게 자동 조정\r
+    - emoji: 📤\r
+      title: 다양한 출력\r
+      description: HTML, PNG, SVG, JSON 모두 가능\r
+  goal: 🌟 왜 Altair가 좋을까요?에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.\r
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.\r
+- id: altair_vs_others\r
+  blocks:\r
+  - type: sectionHeader\r
+    title: 🆚 Altair vs 다른 라이브러리\r
+    subtitle: 각각 언제 쓰면 좋을까요?\r
+  - type: compare\r
+    left:\r
+      title: Matplotlib\r
+      subtitle: 명령형, 저수준\r
+      icon: 📉\r
+      color: blue\r
+      items:\r
+      - 세밀한 커스터마이징\r
+      - 논문/출판용 그래프\r
+      - 정적 이미지 출력\r
+      - 풍부한 예제와 문서\r
+      - 학습 곡선 높음\r
+      infoBox: 세밀한 제어가 필요할 때\r
+    right:\r
+      title: Altair\r
+      subtitle: 선언적, 고수준\r
+      icon: ✨\r
+      color: green\r
+      items:\r
+      - 간결한 코드\r
+      - 탐색적 데이터 분석\r
+      - 인터랙티브 기본 지원\r
+      - 통계 시각화 특화\r
+      - 학습 곡선 낮음\r
+      infoBox: 빠른 탐색과 분석에 최적\r
+  - type: compare\r
+    left:\r
+      title: Plotly\r
+      subtitle: 인터랙티브 특화\r
+      icon: 🎨\r
+      color: purple\r
+      items:\r
+      - 화려한 인터랙션\r
+      - 대시보드 구축\r
+      - 3D 차트 강력\r
+      - 지도 시각화 우수\r
+      - 상대적으로 무거움\r
+      infoBox: 프로덕션 대시보드에 적합\r
+    right:\r
+      title: Altair\r
+      subtitle: 분석 친화적\r
+      icon: ✨\r
+      color: green\r
+      items:\r
+      - 분석 워크플로우 최적\r
+      - 문법이 더 일관적\r
+      - 통계 변환 내장\r
+      - 가볍고 빠름\r
+      - 브러싱/링킹 우수\r
+      infoBox: 탐색적 분석에 최적\r
+  - type: note\r
+    style: tip\r
+    title: 용도에 맞게 선택하세요\r
+    content: 논문 그래프는 Matplotlib, 대시보드는 Plotly, 데이터 탐색과 분석은 Altair가 좋습니다. 각 도구의 강점을 알고 상황에 맞게 쓰는 게 핵심입니다.\r
+  goal: 🆚 Altair vs 다른 라이브러리에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.\r
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.\r
+- id: grammar_intro\r
+  blocks:\r
+  - type: sectionHeader\r
+    title: 📐 선언적 문법의 힘\r
+    subtitle: 차트 = 데이터 + 인코딩 + 마크\r
+  - type: note\r
+    style: info\r
+    title: 시각화 문법(Grammar of Graphics)\r
+    content: Altair는 'Grammar of Graphics' 철학을 따릅니다. 차트는 데이터(Data), 인코딩(Encoding), 마크(Mark)의 조합입니다. 데이터의\r
+      어떤 열을 어떤 시각 요소(위치, 색상, 크기)에 대응시킬지 선언하면 차트가 완성됩니다.\r
+  - type: featureCards\r
+    cards:\r
+    - emoji: 📦\r
+      title: Data\r
+      description: 시각화할 데이터 (DataFrame)\r
+    - emoji: 🎯\r
+      title: Mark\r
+      description: 점, 선, 막대 등 시각 요소\r
+    - emoji: 🔗\r
+      title: Encoding\r
+      description: 데이터와 시각 요소의 매핑\r
+    - emoji: ⚙️\r
+      title: Transform\r
+      description: 집계, 필터 등 데이터 변환\r
+  - type: note\r
+    style: tip\r
+    title: 생각의 흐름대로 코딩\r
+    content: alt.Chart(data).mark_point().encode(x='컬럼A', y='컬럼B', color='컬럼C') - 이게 전부입니다. '이 데이터로, 점을\r
+      찍어서, x는 A, y는 B, 색깔은 C'라고 생각하는 대로 코드를 작성하면 됩니다.\r
+  goal: 📐 선언적 문법의 힘에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.\r
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.\r
+- id: local_integration\r
+  blocks:\r
+  - type: sectionHeader\r
+    title: 🚀 Codaro에서 Altair\r
+    subtitle: 자동 인터랙티브의 마법\r
+  - type: note\r
+    style: info\r
+    title: Altair chart selection\r
+    content: Codaro는 Altair 차트를 자동으로 인터랙티브하게 만들어줍니다. 별도 설정 없이 Altair chart selection로 감싸기만 하면 브러싱, 선택,\r
+      줌 등이 자동 활성화됩니다. 선택한 데이터를 다른 셀에서 바로 사용할 수도 있습니다.\r
+  - type: featureCards\r
+    cards:\r
+    - emoji: 🎯\r
+      title: 자동 인터랙티브\r
+      description: 추가 코드 없이 인터랙션 활성화\r
+    - emoji: 🔄\r
+      title: 리액티브 연동\r
+      description: 차트 선택이 다른 셀에 반영\r
+    - emoji: 📊\r
+      title: 데이터 추출\r
+      description: 브러싱한 데이터를 DataFrame으로\r
+    - emoji: ⚡\r
+      title: 실시간 업데이트\r
+      description: 데이터 변경시 차트 자동 갱신\r
+  - type: note\r
+    style: tip\r
+    title: 분석과 시각화의 통합\r
+    content: Codaro + Altair 조합은 탐색적 데이터 분석(EDA)에 최적입니다. 차트에서 관심 영역을 선택하면 해당 데이터만 필터링되어 다음 분석에 바로 사용할\r
+      수 있습니다. 코드와 시각화가 하나로 연결됩니다.\r
+  goal: 🚀 Codaro에서 Altair에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.\r
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.\r
+- id: data_types\r
+  blocks:\r
+  - type: sectionHeader\r
+    title: 📋 데이터 타입 (Q, N, O, T)\r
+    subtitle: Altair가 데이터를 이해하는 방식\r
+  - type: note\r
+    style: info\r
+    title: 왜 타입이 중요한가?\r
+    content: Altair는 데이터 타입에 따라 축, 색상, 범례를 자동으로 결정합니다. 숫자형(Q)은 연속 색상, 범주형(N)은 개별 색상을 사용합니다. 타입을 명시하면 원하는\r
+      시각화를 정확히 얻을 수 있습니다.\r
+  - type: table\r
+    headers:\r
+    - 타입\r
+    - 이름\r
+    - 예시\r
+    - 시각화\r
+    rows:\r
+    - - Q\r
+      - Quantitative (정량)\r
+      - 가격, 나이, 온도\r
+      - 연속 축, 그라데이션 색상\r
+    - - N\r
+      - Nominal (명목)\r
+      - 국가, 브랜드, 성별\r
+      - 개별 축, 구분 색상\r
+    - - O\r
+      - Ordinal (순서)\r
+      - 학년, 등급, 만족도\r
+      - 순서 있는 축, 순차 색상\r
+    - - T\r
+      - Temporal (시간)\r
+      - 날짜, 시간\r
+      - 시간 축, 시계열 형식\r
+  - type: note\r
+    style: tip\r
+    title: 타입 지정 방법\r
+    content: x='price:Q', color='country:N'처럼 콜론 뒤에 타입을 붙입니다. Altair가 자동 추론하지만, 명시적으로 지정하면 의도대로 시각화됩니다.\r
+      숫자인데 범주로 쓰고 싶으면 :N을 붙이면 됩니다.\r
+  goal: 📋 데이터 타입 (Q, N, O, T)에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.\r
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.\r
+- id: interaction_intro\r
+  blocks:\r
+  - type: sectionHeader\r
+    title: 🖱️ 인터랙션 기능\r
+    subtitle: 클릭, 드래그, 호버로 데이터 탐색\r
+  - type: featureCards\r
+    cards:\r
+    - emoji: ✋\r
+      title: 브러싱(Brushing)\r
+      description: 드래그로 영역 선택, 다른 차트와 연동\r
+    - emoji: 👆\r
+      title: 선택(Selection)\r
+      description: 클릭으로 특정 데이터 포인트 선택\r
+    - emoji: 🔗\r
+      title: 링킹(Linking)\r
+      description: 여러 차트를 연결해 동시 탐색\r
+    - emoji: 🔍\r
+      title: 줌/팬\r
+      description: 확대, 축소, 이동으로 상세 탐색\r
+    - emoji: 💬\r
+      title: 툴팁\r
+      description: 호버시 상세 정보 표시\r
+    - emoji: 🎚️\r
+      title: 슬라이더\r
+      description: 범위 조절로 동적 필터링\r
+  - type: note\r
+    style: info\r
+    title: 코드 몇 줄로 인터랙션 추가\r
+    content: Matplotlib에서는 수십 줄이 필요한 인터랙션을, Altair는 selection_interval(), selection_point() 한 줄로 추가합니다.\r
+      Codaro에서는 이마저도 자동입니다. 탐색적 분석에서 이 차이가 생산성을 크게 높입니다.\r
+  goal: 🖱️ 인터랙션 기능에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.\r
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.\r
+- id: projects_preview\r
+  blocks:\r
+  - type: sectionHeader\r
+    title: 🗺️ 앞으로 배울 내용\r
+    subtitle: Altair로 이런 것들을 해봅니다\r
+  - type: table\r
+    headers:\r
+    - 단계\r
+    - 프로젝트\r
+    - 배울 내용\r
+    rows:\r
+    - - 입문\r
+      - 기본 차트\r
+      - mark_point, mark_bar, mark_line\r
+    - - 입문\r
+      - 인코딩\r
+      - x, y, color, size, shape\r
+    - - 기초\r
+      - 집계 차트\r
+      - mean(), count(), sum() 변환\r
+    - - 기초\r
+      - 조건부 색상\r
+      - condition, alt.value\r
+    - - 중급\r
+      - 인터랙션\r
+      - selection, 브러싱, 링킹\r
+    - - 중급\r
+      - 복합 차트\r
+      - layer, hconcat, vconcat\r
+    - - 심화\r
+      - 고급 변환\r
+      - fold, pivot, window\r
+    - - 심화\r
+      - 대시보드\r
+      - Codaro 연동 분석\r
+  - type: note\r
+    style: info\r
+    title: 프로젝트 기반 학습\r
+    content: 각 프로젝트에서 실제 데이터를 시각화합니다. 산점도, 막대 그래프부터 시작해 인터랙티브 대시보드까지, 난이도를 높여가며 Altair를 마스터합니다.\r
+  goal: 🗺️ 앞으로 배울 내용에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.\r
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.\r
+- id: resources\r
+  blocks:\r
+  - type: sectionHeader\r
+    title: 📚 참고 자료\r
+    subtitle: 더 깊이 공부하고 싶다면\r
+  - type: links\r
+    items:\r
+    - text: Altair 공식 문서\r
+      url: https://altair-viz.github.io/\r
+      icon: 🔗\r
+    - text: Altair 갤러리\r
+      url: https://altair-viz.github.io/gallery/\r
+      icon: 🔗\r
+    - text: Vega-Lite 문서\r
+      url: https://vega.github.io/vega-lite/\r
+      icon: 🔗\r
+    - text: Codaro Altair 연동\r
+      url: https://codaro.io/blog/altair\r
+      icon: 🔗\r
+  goal: 📚 참고 자료에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.\r
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.\r
+- id: workflow_validation\r
+  title: 10단계. Altair 학습 흐름 검증\r
+  structuredPrimary: true\r
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주\r
+  goal: 10단계. Altair 학습 흐름 검증에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.\r
+  explanation: |-\r
+    Altair는 선언적 시각화이므로 차트를 그린 뒤 Vega-Lite 사양을 확인할 수 있습니다. 입문 단계부터 데이터 계약과 spec 검증을 같이 익히면 이후 인터랙션과 대시보드가 훨씬 안전해집니다.\r
+\r
+    Altair는 spec을 검사할 수 있다는 점이 강점입니다. 학습자에게 차트 결과와 사양을 같이 보게 해야 합니다.\r
+  snippet: |-\r
+    import altair as alt\r
+    from codaro.curriculum.localData import loadLocalDataset\r
+\r
+    altairMpg = loadLocalDataset("mpg")\r
+    requiredColumns = {"mpg", "horsepower", "weight", "origin"}\r
+    missingColumns = requiredColumns - set(altairMpg.columns)\r
+\r
+    assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"\r
+    assert altairMpg[["mpg", "horsepower", "weight"]].gt(0).all().all()\r
+    assert altairMpg[["weight", "mpg"]].corr().loc["weight", "mpg"] < -0.5\r
+  exercise:\r
+    prompt: 10단계. Altair 학습 흐름 검증 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      import altair as alt\r
+      from codaro.curriculum.localData import loadLocalDataset\r
+\r
+      altairMpg = loadLocalDataset("mpg")\r
+      requiredColumns = {"mpg", "horsepower", "weight", "origin"}\r
+      missingColumns = requiredColumns - set(altairMpg.columns)\r
+\r
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"\r
+      assert altairMpg[["mpg", "horsepower", "weight"]].gt(0).all().all()\r
+      assert altairMpg[["weight", "mpg"]].corr().loc["weight", "mpg"] < -0.5\r
+    hints:\r
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.\r
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.\r
+  check:\r
+    noError: 10단계. Altair 학습 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.\r
+    resultCheck: 10단계. Altair 학습 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.\r
+- id: next\r
+  blocks:\r
+  - type: hero\r
+    emoji: 👉\r
+    title: '다음: 기본 차트 만들기'\r
+    subtitle: 점, 선, 막대로 첫 번째 Altair 차트를 그려봅니다\r
+  goal: '다음: 기본 차트 만들기에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.'\r
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.\r
+`;export{e as default};

@@ -370,3 +370,271 @@ sections:
     type: noError
     noError: datetime 모듈 종합 복습에서 `myBirthday` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: datetime 모듈 종합 복습 실행 뒤 `myBirthday` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 03_datetime-due-date-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - date_arithmetic
+    - formatting
+    - workflow_validation
+    title: 고정 기준일로 마감 상태 계산하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: ISO 날짜 문자열을 date로 바꾸고 기준일 대비 남은 날짜와 상태를 반환한다.
+    why: 현재 날짜에 의존하지 않고 기준일을 인자로 받아야 일정 계산을 반복 검증할 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 오늘 날짜와 마감일 조합으로 다시 호출합니다.
+    tips:
+    - date.fromisoformat은 YYYY-MM-DD 문자열을 date 객체로 바꿉니다.
+    - 음수, 0~3일, 그 이후를 서로 다른 상태로 나누세요.
+    exercise:
+      prompt: classify_due_date(today_text, due_text)가 due, daysLeft, status를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        from datetime import date
+
+        def classify_due_date(today_text, due_text):
+            raise NotImplementedError
+      solution: |-
+        from datetime import date
+
+        def classify_due_date(today_text, due_text):
+            today = date.fromisoformat(today_text)
+            due = date.fromisoformat(due_text)
+            days_left = (due - today).days
+            if days_left < 0:
+                status = "overdue"
+            elif days_left <= 3:
+                status = "dueSoon"
+            else:
+                status = "scheduled"
+            return {"due": due.isoformat(), "daysLeft": days_left, "status": status}
+      hints:
+      - 두 문자열을 모두 date 객체로 변환한 뒤 빼면 timedelta가 됩니다.
+      - 반환 key 이름과 status 문자열이 검사 계약과 같아야 합니다.
+    check:
+      id: python.builtins.datetime.due-date.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.datetime.due-date.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: classify_due_date
+        cases:
+        - id: due-soon
+          arguments:
+          - value: '2026-05-24'
+          - value: '2026-05-27'
+          expectedReturn:
+            due: '2026-05-27'
+            daysLeft: 3
+            status: dueSoon
+        - id: scheduled
+          arguments:
+          - value: '2026-05-24'
+          - value: '2026-06-02'
+          expectedReturn:
+            due: '2026-06-02'
+            daysLeft: 9
+            status: scheduled
+        - id: overdue
+          arguments:
+          - value: '2026-05-24'
+          - value: '2026-05-20'
+          expectedReturn:
+            due: '2026-05-20'
+            daysLeft: -4
+            status: overdue
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 03_datetime-next-business-day-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - 03_datetime-due-date-mastery
+    title: 다음 영업일 찾기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: timedelta와 weekday를 사용해 주말과 지정 휴일을 건너뛴 다음 영업일을 반환한다.
+    why: 날짜 연산은 하루 더하기에서 끝나지 않고 운영 규칙을 반영해야 실제 일정 자동화가 됩니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 예시가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - weekday가 5 이상이면 토요일이나 일요일입니다.
+    - holidays는 ISO 문자열 목록이므로 current.isoformat()으로 비교하세요.
+    exercise:
+      prompt: next_business_day(start_text, holidays)가 시작일 다음 날부터 주말과 휴일을 건너뛰고 다음 영업일 ISO 문자열을 반환하도록 완성하세요.
+      starterCode: |-
+        from datetime import date, timedelta
+
+        def next_business_day(start_text, holidays):
+            raise NotImplementedError
+      solution: |-
+        from datetime import date, timedelta
+
+        def next_business_day(start_text, holidays):
+            current = date.fromisoformat(start_text) + timedelta(days=1)
+            holiday_set = set(holidays)
+            while current.weekday() >= 5 or current.isoformat() in holiday_set:
+                current += timedelta(days=1)
+            return current.isoformat()
+      hints:
+      - 하루씩 전진하며 조건을 검사하세요.
+      - 휴일 목록과 비교할 때 date 객체가 아니라 ISO 문자열로 맞추세요.
+    check:
+      id: python.builtins.datetime.next-business-day.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.datetime.next-business-day.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: next_business_day
+        cases:
+        - id: weekend-and-holiday
+          arguments:
+          - value: '2026-05-22'
+          - value:
+            - '2026-05-25'
+          expectedReturn: '2026-05-26'
+        - id: normal-weekday
+          arguments:
+          - value: '2026-05-26'
+          - value: []
+          expectedReturn: '2026-05-27'
+        - id: friday-to-monday
+          arguments:
+          - value: '2026-05-29'
+          - value: []
+          expectedReturn: '2026-06-01'
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 03_datetime-date-window-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 03_datetime-next-business-day-transfer
+    title: 날짜 구간 요약 다시 구성하기
+    subtitle: 하루 뒤 기억에서 재구성
+    goal: 시작일과 종료일 사이의 전체 일수, 주말 수, 시작 요일을 계산하고 역전된 구간은 거부한다.
+    why: 시간이 지난 뒤에도 포함 구간과 주말 판정을 정확히 복원해야 리포트 기간 계산을 믿을 수 있습니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 종료일도 포함해야 하므로 while current <= end 조건을 사용하세요.
+    - end가 start보다 빠르면 ValueError를 일으키세요.
+    exercise:
+      prompt: summarize_date_window(start_text, end_text)가 days, weekendDays, startWeekday, end를 담은 dict를 반환하고 역전된 구간은 ValueError를
+        일으키도록 완성하세요.
+      starterCode: |-
+        from datetime import date, timedelta
+
+        def summarize_date_window(start_text, end_text):
+            raise NotImplementedError
+      solution: |-
+        from datetime import date, timedelta
+
+        def summarize_date_window(start_text, end_text):
+            start = date.fromisoformat(start_text)
+            end = date.fromisoformat(end_text)
+            if end < start:
+                raise ValueError("end date must not be before start date")
+            current = start
+            days = 0
+            weekend_days = 0
+            while current <= end:
+                days += 1
+                if current.weekday() >= 5:
+                    weekend_days += 1
+                current += timedelta(days=1)
+            return {
+                "days": days,
+                "weekendDays": weekend_days,
+                "startWeekday": start.isoweekday(),
+                "end": end.isoformat(),
+            }
+      hints:
+      - weekday는 0부터, isoweekday는 1부터 시작합니다.
+      - 종료일을 포함하지 않으면 첫 번째 case의 days가 맞지 않습니다.
+    check:
+      id: python.builtins.datetime.date-window.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.datetime.date-window.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_date_window
+        cases:
+        - id: weekend-window
+          arguments:
+          - value: '2026-05-22'
+          - value: '2026-05-24'
+          expectedReturn:
+            days: 3
+            weekendDays: 2
+            startWeekday: 5
+            end: '2026-05-24'
+        - id: workweek-window
+          arguments:
+          - value: '2026-06-01'
+          - value: '2026-06-05'
+          expectedReturn:
+            days: 5
+            weekendDays: 0
+            startWeekday: 1
+            end: '2026-06-05'
+        - id: rejects-reversed
+          arguments:
+          - value: '2026-06-05'
+          - value: '2026-06-01'
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

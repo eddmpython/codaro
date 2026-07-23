@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "sympy"
+sourceCount: 11
+lessons:
+  - lessonRef: "sympy/00_sympy소개"
+    sourcePath: "curricula/python/mathStatsMl/sympy/00_sympy소개.yaml"
+    metaId: "sympy_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "sympy/01_기초수식계산"
+    sourcePath: "curricula/python/mathStatsMl/sympy/01_기초수식계산.yaml"
+    metaId: "sympy_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "sympy/02_대입과계산"
+    sourcePath: "curricula/python/mathStatsMl/sympy/02_대입과계산.yaml"
+    metaId: "sympy_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "sympy/03_방정식풀이"
+    sourcePath: "curricula/python/mathStatsMl/sympy/03_방정식풀이.yaml"
+    metaId: "sympy_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "sympy/04_미분기초"
+    sourcePath: "curricula/python/mathStatsMl/sympy/04_미분기초.yaml"
+    metaId: "sympy_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "sympy/05_적분기초"
+    sourcePath: "curricula/python/mathStatsMl/sympy/05_적분기초.yaml"
+    metaId: "sympy_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "sympy/06_극한과급수"
+    sourcePath: "curricula/python/mathStatsMl/sympy/06_극한과급수.yaml"
+    metaId: "sympy_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "sympy/07_삼각함수활용"
+    sourcePath: "curricula/python/mathStatsMl/sympy/07_삼각함수활용.yaml"
+    metaId: "sympy_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "sympy/08_행렬연산"
+    sourcePath: "curricula/python/mathStatsMl/sympy/08_행렬연산.yaml"
+    metaId: "sympy_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "sympy/09_수식시각화"
+    sourcePath: "curricula/python/mathStatsMl/sympy/09_수식시각화.yaml"
+    metaId: "sympy_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "sympy/10_종합수학문제"
+    sourcePath: "curricula/python/mathStatsMl/sympy/10_종합수학문제.yaml"
+    metaId: "sympy_10"
+    registryStatus: registered
+    reviewStatus: pending

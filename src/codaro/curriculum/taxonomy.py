@@ -24,6 +24,7 @@ class DomainDef(BaseModel):
     label: str
     description: str = ""
     targetOutcomes: list[str] = Field(default_factory=list)
+    capstoneLessonRef: str | None = None
 
 
 class LessonOutcomeRecord(BaseModel):
@@ -72,6 +73,10 @@ class CurriculumTaxonomy(BaseModel):
                     errors.append(
                         f"domain {domain.id}: unknown outcome '{outcomeId}'"
                     )
+            if domain.capstoneLessonRef and domain.capstoneLessonRef not in self.lessonOutcomes:
+                errors.append(
+                    f"domain {domain.id}: unknown capstone lesson '{domain.capstoneLessonRef}'"
+                )
         for key, record in self.lessonOutcomes.items():
             for outcomeId in record.outcomes:
                 if outcomeId not in knownOutcomes:

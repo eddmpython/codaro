@@ -1,0 +1,232 @@
+schemaVersion: 1
+category: "pandas"
+canonicalRows: 12
+lessons:
+  - lessonRef: "pandas/00_판다스소개"
+    identityLedgerRef: "identity-ledger/pandas.yml"
+    lessonContentHash: "acdf1d772cadd96c47d571a8be470b50154041efad509bc481b0e85622bd2479"
+    disposition: migrate
+    ownerPacket: "02-data-reporting"
+    eligiblePathIds: ["bigDataPipelines","dataReporting"]
+    outcomes: ["pandas.intro"]
+    prerequisites: ["python.lists","python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:pandas/00_판다스소개:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:pandas_00______:v1","retrieve:pandas_00______:v2","retrieve:pandas_00______:v3"]
+    transferVariantIds: ["transfer:pandas_00______:near-v1","transfer:pandas_00______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pandas/01_레스토랑팁분석"
+    identityLedgerRef: "identity-ledger/pandas.yml"
+    lessonContentHash: "2d5fa7ed83147629ca60d4726bbe0ae2e052eeb8beeb6133597a100ef9b22f2e"
+    disposition: migrate
+    ownerPacket: "02-data-reporting"
+    eligiblePathIds: ["dataReporting","dataVisualization","geoVisualization","interactiveDashboards","machineLearning","officeAutomation","statisticalAnalysis","timeSeriesAnalysis"]
+    outcomes: ["pandas.loadFrame","pandas.filterSelect"]
+    prerequisites: ["pandas.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:pandas/01_레스토랑팁분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:pandas_01________:v1","retrieve:pandas_01________:v2","retrieve:pandas_01________:v3"]
+    transferVariantIds: ["transfer:pandas_01________:near-v1","transfer:pandas_01________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pandas/02_타이타닉생존분석"
+    identityLedgerRef: "identity-ledger/pandas.yml"
+    lessonContentHash: "c33b04636f342713db03aa69e9438ffbf917e1606c954cf0a2deefd54be92ea8"
+    disposition: migrate
+    ownerPacket: "02-data-reporting"
+    eligiblePathIds: ["dataReporting","interactiveDashboards","machineLearning","officeAutomation","timeSeriesAnalysis"]
+    outcomes: ["pandas.filterSelect","pandas.aggregate"]
+    prerequisites: ["pandas.loadFrame"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:pandas/02_타이타닉생존분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:pandas_02_________:v1","retrieve:pandas_02_________:v2","retrieve:pandas_02_________:v3"]
+    transferVariantIds: ["transfer:pandas_02_________:near-v1","transfer:pandas_02_________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pandas/03_펭귄종비교분석"
+    identityLedgerRef: "identity-ledger/pandas.yml"
+    lessonContentHash: "7fabdcfb1587f607da73ead6c4ac4391a56d14e0d0068494b42319e24725ca74"
+    disposition: migrate
+    ownerPacket: "02-data-reporting"
+    eligiblePathIds: ["dataReporting","interactiveDashboards","officeAutomation","timeSeriesAnalysis"]
+    outcomes: ["pandas.aggregate"]
+    prerequisites: ["pandas.filterSelect"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:pandas/03_펭귄종비교분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:pandas_03________:v1","retrieve:pandas_03________:v2","retrieve:pandas_03________:v3"]
+    transferVariantIds: ["transfer:pandas_03________:near-v1","transfer:pandas_03________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pandas/04_붓꽃품종분류"
+    identityLedgerRef: "identity-ledger/pandas.yml"
+    lessonContentHash: "40cb12b16d08853d0d49a60222a19b2e355453563c7cb8c70eac3a64d6976084"
+    disposition: migrate
+    ownerPacket: "02-data-reporting"
+    eligiblePathIds: ["dataReporting","interactiveDashboards","officeAutomation","timeSeriesAnalysis"]
+    outcomes: ["pandas.aggregate"]
+    prerequisites: ["pandas.aggregate"]
+    reinforcesOutcomeIds: ["pandas.aggregate"]
+    runtimeTier: browser
+    checkSpecId: "lesson:pandas/04_붓꽃품종분류:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:pandas_04_______:v1","retrieve:pandas_04_______:v2","retrieve:pandas_04_______:v3"]
+    transferVariantIds: ["transfer:pandas_04_______:near-v1","transfer:pandas_04_______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pandas/05_자동차연비분석"
+    identityLedgerRef: "identity-ledger/pandas.yml"
+    lessonContentHash: "95c8f2b1d40c45759185780339e3c75fc21893fa87983bd67b486d377b8323aa"
+    disposition: migrate
+    ownerPacket: "02-data-reporting"
+    eligiblePathIds: ["dataReporting","interactiveDashboards","officeAutomation","timeSeriesAnalysis"]
+    outcomes: ["pandas.aggregate","pandas.report"]
+    prerequisites: ["pandas.aggregate"]
+    reinforcesOutcomeIds: ["pandas.aggregate"]
+    runtimeTier: browser
+    checkSpecId: "lesson:pandas/05_자동차연비분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:pandas_05________:v1","retrieve:pandas_05________:v2","retrieve:pandas_05________:v3"]
+    transferVariantIds: ["transfer:pandas_05________:near-v1","transfer:pandas_05________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pandas/06_항공편시계열분석"
+    identityLedgerRef: "identity-ledger/pandas.yml"
+    lessonContentHash: "e86bb228235dadd2b4ac77301c8672fb2d2911019373e32eca8ba25370112c25"
+    disposition: migrate
+    ownerPacket: "02-data-reporting"
+    eligiblePathIds: ["dataReporting","timeSeriesAnalysis","timeSeriesForecasting"]
+    outcomes: ["pandas.timeSeries"]
+    prerequisites: ["pandas.loadFrame","pandas.aggregate"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:pandas/06_항공편시계열분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:pandas_06_________:v1","retrieve:pandas_06_________:v2","retrieve:pandas_06_________:v3"]
+    transferVariantIds: ["transfer:pandas_06_________:near-v1","transfer:pandas_06_________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pandas/07_다이아몬드가격분석"
+    identityLedgerRef: "identity-ledger/pandas.yml"
+    lessonContentHash: "5b9232eec60446904546adc960ef0c0c226c16664ac3b68ba87ce1d13611d949"
+    disposition: migrate
+    ownerPacket: "02-data-reporting"
+    eligiblePathIds: ["dataReporting","interactiveDashboards","officeAutomation","timeSeriesAnalysis"]
+    outcomes: ["pandas.aggregate"]
+    prerequisites: ["pandas.aggregate"]
+    reinforcesOutcomeIds: ["pandas.aggregate"]
+    runtimeTier: browser
+    checkSpecId: "lesson:pandas/07_다이아몬드가격분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:pandas_07__________:v1","retrieve:pandas_07__________:v2","retrieve:pandas_07__________:v3"]
+    transferVariantIds: ["transfer:pandas_07__________:near-v1","transfer:pandas_07__________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pandas/08_교통사고원인분석"
+    identityLedgerRef: "identity-ledger/pandas.yml"
+    lessonContentHash: "82499a2598eb76b7626f4f29e50975b60bda32606d252d7a34fbde683e0309b3"
+    disposition: migrate
+    ownerPacket: "02-data-reporting"
+    eligiblePathIds: ["dataReporting","interactiveDashboards","officeAutomation","timeSeriesAnalysis"]
+    outcomes: ["pandas.aggregate"]
+    prerequisites: ["pandas.aggregate"]
+    reinforcesOutcomeIds: ["pandas.aggregate"]
+    runtimeTier: browser
+    checkSpecId: "lesson:pandas/08_교통사고원인분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:pandas_08_________:v1","retrieve:pandas_08_________:v2","retrieve:pandas_08_________:v3"]
+    transferVariantIds: ["transfer:pandas_08_________:near-v1","transfer:pandas_08_________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pandas/09_두데이터합치기"
+    identityLedgerRef: "identity-ledger/pandas.yml"
+    lessonContentHash: "d2c8b0bc28e4760060cc1bb664e1ef4d099c87a1ad453afe51696c315afbde18"
+    disposition: migrate
+    ownerPacket: "02-data-reporting"
+    eligiblePathIds: ["dataReporting"]
+    outcomes: ["pandas.merge"]
+    prerequisites: ["pandas.loadFrame"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:pandas/09_두데이터합치기:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:pandas_09________:v1","retrieve:pandas_09________:v2","retrieve:pandas_09________:v3"]
+    transferVariantIds: ["transfer:pandas_09________:near-v1","transfer:pandas_09________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pandas/10_실전종합프로젝트"
+    identityLedgerRef: "identity-ledger/pandas.yml"
+    lessonContentHash: "bbcb3c2801f43415908838842ad7c046d1624ec1da88cbef517840914d541f4b"
+    disposition: migrate
+    ownerPacket: "02-data-reporting"
+    eligiblePathIds: ["dataReporting"]
+    outcomes: ["pandas.report"]
+    prerequisites: ["pandas.aggregate","pandas.merge"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:pandas/10_실전종합프로젝트:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:pandas_10_________:v1","retrieve:pandas_10_________:v2","retrieve:pandas_10_________:v3"]
+    transferVariantIds: ["transfer:pandas_10_________:near-v1","transfer:pandas_10_________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pandas/11_읽기계약과타입손상"
+    identityLedgerRef: "identity-ledger/pandas.yml"
+    lessonContentHash: "caab8aa68e51748ceac1cd65ce60ed279dae4d5e1d47d0c7773e291e52f64e24"
+    disposition: migrate
+    ownerPacket: "02-data-reporting"
+    eligiblePathIds: ["dataReporting"]
+    outcomes: ["pandas.readContract"]
+    prerequisites: ["pandas.loadFrame"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:pandas/11_읽기계약과타입손상:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:pandas_11__________:v1","retrieve:pandas_11__________:v2","retrieve:pandas_11__________:v3"]
+    transferVariantIds: ["transfer:pandas_11__________:near-v1","transfer:pandas_11__________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

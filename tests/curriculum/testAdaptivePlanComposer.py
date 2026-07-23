@@ -1,4 +1,4 @@
-"""Adaptive planComposer 테스트 — Predict-Run-Reconcile-Adapt 루프 5단계.
+"""Adaptive planComposer 테스트 — Run-Evidence-Feedback-Adapt 루프.
 
 learnerState 입력이 주어졌을 때 step에 mastery가 붙고 dynamic gap이 분리되며,
 같은 입력에 대해 결정적 plan이 나오는지 검증한다.
@@ -78,7 +78,29 @@ def testStepsHaveNullMasteryWhenLearnerStoreAbsent() -> None:
     assert plan.dynamicGaps == []
 
 
-def testStepsCarryMasteryWhenLearnerStorePresent(tmp_path: Path) -> None:
+def testDomainCapstoneIsForcedAfterOutcomeLessons() -> None:
+    taxonomy = _smallTaxonomy()
+    taxonomy.domains[0].capstoneLessonRef = "cat/99_capstone"
+    graph = _smallGraph()
+    graph.lessons.append(LessonNode(
+        category="cat",
+        contentId="99_capstone",
+        title="Capstone",
+        sortKey=(50, "99_capstone"),
+        outcomes=[],
+        prerequisites=["c"],
+        estimatedMinutes=30,
+        lessonRole="project",
+    ))
+
+    plan = composeMasterPlan(PlanGoal(domain="goalC"), graph, taxonomy)
+
+    assert plan.capstoneLessonRef == "cat/99_capstone"
+    assert plan.steps[-1].key == "cat/99_capstone"
+    assert plan.steps[-1].lessonRole == "project"
+
+
+def testLegacyLearnerStoreDoesNotPopulateCanonicalMastery(tmp_path: Path) -> None:
     store = LearnerStateStore(tmp_path / "learner.db")
     store.recordOutcomeAttempt("a", success=True)
     store.recordOutcomeAttempt("a", success=True)
@@ -91,13 +113,11 @@ def testStepsCarryMasteryWhenLearnerStorePresent(tmp_path: Path) -> None:
     )
 
     stepA = next(step for step in plan.steps if step.key == "cat/01_a")
-    assert stepA.learnerMastery is not None
-    assert stepA.learnerMastery > 0.0
-    assert stepA.learnerConfidence is not None
+    assert stepA.learnerMastery is None
+    assert stepA.learnerConfidence is None
 
 
-def testDynamicGapTriggeredByLowMastery(tmp_path: Path) -> None:
-    """목표 outcome에 대해 학습자 mastery가 낮으면 dynamic gap으로 분리."""
+def testLegacyLowMasteryDoesNotCreateCanonicalDynamicGap(tmp_path: Path) -> None:
     store = LearnerStateStore(tmp_path / "learner.db")
     # 학습자가 c에 한 번 실패함 — 낮은 mastery
     store.recordOutcomeAttempt("c", success=False)
@@ -110,7 +130,7 @@ def testDynamicGapTriggeredByLowMastery(tmp_path: Path) -> None:
     )
 
     dynamicOutcomes = {gap.outcomeId for gap in plan.dynamicGaps}
-    assert "c" in dynamicOutcomes
+    assert "c" not in dynamicOutcomes
     # 정적 gap은 없어야 한다 (c에 대한 레슨이 존재)
     staticOutcomes = {gap.outcomeId for gap in plan.gaps}
     assert "c" not in staticOutcomes

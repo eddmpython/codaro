@@ -342,3 +342,302 @@ sections:
   check:
     noError: heavyJob과 풀 호출이 NameError나 ImportError 없이 실행되어야 합니다.
     resultCheck: sameResults가 True이고 processAvailable가 True이면 두 풀의 결과가 일치한 것입니다.
+assessment:
+  masteryVariants:
+  - id: 35_concurrency-job-classifier-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - gil-io-vs-cpu
+    - thread-pool
+    - process-pool
+    title: 작업 성격에 맞는 동시성 실행 모델 고르기
+    subtitle: concurrency workload classification
+    goal: classify_concurrency_jobs(jobs)를 완성해 IO, CPU, 공유 상태, async IO 작업별 권장 실행 모델을 반환한다.
+    why: 동시성의 핵심은 더 많이 동시에 돌리는 것이 아니라, 작업 성격에 맞는 모델을 고르고 위험을 설명하는 판단입니다.
+    explanation: kind가 io이면 thread-pool, cpu이면 process-pool, shared-state이면 thread-with-lock, async-io이면 asyncio를 선택하세요.
+    tips:
+    - GIL 때문에 CPU 바운드 작업은 스레드만으로 빨라지기 어렵습니다.
+    - 공유 상태를 바꾸는 스레드는 lock 같은 보호가 필요합니다.
+    exercise:
+      prompt: classify_concurrency_jobs(jobs)를 완성해 plans와 toolCounts를 반환하세요.
+      starterCode: |-
+        def classify_concurrency_jobs(jobs):
+            raise NotImplementedError
+      solution: |-
+        def classify_concurrency_jobs(jobs):
+            tool_by_kind = {
+                "io": "thread-pool",
+                "cpu": "process-pool",
+                "shared-state": "thread-with-lock",
+                "async-io": "asyncio",
+            }
+            plans = []
+            counts = {}
+            for job in jobs:
+                kind = job["kind"]
+                if kind not in tool_by_kind:
+                    raise ValueError("unknown job kind")
+                tool = tool_by_kind[kind]
+                counts[tool] = counts.get(tool, 0) + 1
+                plans.append({"id": job["id"], "tool": tool})
+            return {"plans": plans, "toolCounts": counts}
+      hints:
+      - job kind를 먼저 분류한 뒤 toolCounts를 누적하세요.
+      - 알 수 없는 kind는 임의 fallback 대신 ValueError로 드러내세요.
+    check:
+      id: python.advanced.concurrency.job-classifier.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.concurrency.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: classify_concurrency_jobs
+        cases:
+        - id: chooses-model-by-workload-kind
+          arguments:
+          - value:
+            - id: fetch-api
+              kind: io
+            - id: resize-images
+              kind: cpu
+            - id: update-counter
+              kind: shared-state
+            - id: websocket
+              kind: async-io
+          expectedReturn:
+            plans:
+            - id: fetch-api
+              tool: thread-pool
+            - id: resize-images
+              tool: process-pool
+            - id: update-counter
+              tool: thread-with-lock
+            - id: websocket
+              tool: asyncio
+            toolCounts:
+              thread-pool: 1
+              process-pool: 1
+              thread-with-lock: 1
+              asyncio: 1
+        - id: rejects-unknown-job-kind
+          arguments:
+          - value:
+            - id: mystery
+              kind: magic
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 35_concurrency-critical-section-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - thread-basic
+    - lock-race
+    - thread-pool
+    title: 공유 카운터 갱신을 critical section으로 모델링하기
+    subtitle: lock contract transfer
+    goal: simulate_locked_counter(operations)를 완성해 각 작업의 before와 after를 순서대로 기록하고 최종 값을 반환한다.
+    why: 실제 race condition은 재현이 흔들릴 수 있으므로, 학습 단계에서는 lock이 보장해야 하는 원자적 갱신 계약을 결정적으로 검증합니다.
+    explanation: 각 operation은 worker와 delta를 가집니다. delta는 int여야 하고, counter는 0에서 시작해 순서대로 갱신됩니다.
+    tips:
+    - critical section 안에서는 before를 읽고 after를 기록하는 사이에 다른 갱신이 끼어들면 안 됩니다.
+    - 이 함수는 실제 thread 대신 lock이 보장해야 할 결과 모델을 검사합니다.
+    exercise:
+      prompt: simulate_locked_counter(operations)를 완성해 final과 log를 반환하세요.
+      starterCode: |-
+        def simulate_locked_counter(operations):
+            raise NotImplementedError
+      solution: |-
+        def simulate_locked_counter(operations):
+            counter = 0
+            log = []
+            for operation in operations:
+                delta = operation["delta"]
+                if not isinstance(delta, int):
+                    raise TypeError("delta must be int")
+                before = counter
+                counter = before + delta
+                log.append(f"{operation['worker']}:{before}->{counter}")
+            return {"final": counter, "log": log}
+      hints:
+      - before와 after를 한 묶음으로 기록해야 갱신 순서가 보입니다.
+      - delta가 숫자가 아니면 TypeError로 막으세요.
+    check:
+      id: python.advanced.concurrency.critical-section.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.concurrency.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: simulate_locked_counter
+        cases:
+        - id: records-atomic-counter-updates
+          arguments:
+          - value:
+            - worker: A
+              delta: 2
+            - worker: B
+              delta: 3
+            - worker: A
+              delta: -1
+          expectedReturn:
+            final: 4
+            log:
+            - A:0->2
+            - B:2->5
+            - A:5->4
+        - id: rejects-non-integer-delta
+          arguments:
+          - value:
+            - worker: A
+              delta: '2'
+          expectedException: TypeError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 35_concurrency-tool-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 35_concurrency-critical-section-transfer
+    title: 동시성 도구 선택 기준 회상하기
+    subtitle: concurrency tool recall
+    goal: choose_concurrency_tool(need)를 완성해 작업 성격별 도구와 주의점을 반환한다.
+    why: 동시성은 성능 개선 도구이면서 동시에 버그 증폭기입니다. IO, CPU, 공유 상태, 완료 순서, 직렬화 제약을 구분하는 판단이 학습의 핵심입니다.
+    explanation: io-wait, cpu-bound, shared-counter, many-small-io, completed-order, pickleable-cpu-work 상황별 도구를 선택하세요.
+    tips:
+    - ThreadPoolExecutor는 IO 대기 숨기기에, ProcessPoolExecutor는 CPU 작업 병렬화에 더 적합합니다.
+    - as_completed는 제출 순서가 아니라 완료 순서로 결과를 줍니다.
+    exercise:
+      prompt: choose_concurrency_tool(need)를 완성해 tool, useWhen, caution을 반환하세요.
+      starterCode: |-
+        def choose_concurrency_tool(need):
+            raise NotImplementedError
+      solution: |-
+        def choose_concurrency_tool(need):
+            table = {
+                "io-wait": {
+                    "tool": "threading-or-thread-pool",
+                    "useWhen": "tasks mostly wait for network or disk",
+                    "caution": "shared state still needs protection",
+                },
+                "cpu-bound": {
+                    "tool": "process-pool",
+                    "useWhen": "pure Python CPU work should bypass the GIL",
+                    "caution": "functions and data must be pickleable",
+                },
+                "shared-counter": {
+                    "tool": "Lock",
+                    "useWhen": "multiple threads update one mutable value",
+                    "caution": "keep critical sections small",
+                },
+                "many-small-io": {
+                    "tool": "ThreadPoolExecutor",
+                    "useWhen": "many blocking IO calls share one simple interface",
+                    "caution": "limit max_workers to avoid overload",
+                },
+                "completed-order": {
+                    "tool": "as_completed",
+                    "useWhen": "results should be handled as soon as each future finishes",
+                    "caution": "output order differs from submit order",
+                },
+                "pickleable-cpu-work": {
+                    "tool": "ProcessPoolExecutor",
+                    "useWhen": "top-level CPU functions can run in child processes",
+                    "caution": "startup and IPC cost can dominate small jobs",
+                },
+            }
+            if need not in table:
+                raise ValueError("unknown concurrency need")
+            return table[need]
+      hints:
+      - 먼저 병목이 IO 대기인지 CPU 계산인지 나누세요.
+      - 공유 상태가 있으면 성능보다 정합성 보호가 먼저입니다.
+    check:
+      id: python.advanced.concurrency.tool-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.concurrency.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_concurrency_tool
+        cases:
+        - id: recalls-process-pool-for-cpu-bound-work
+          arguments:
+          - value: cpu-bound
+          expectedReturn:
+            tool: process-pool
+            useWhen: pure Python CPU work should bypass the GIL
+            caution: functions and data must be pickleable
+        - id: recalls-lock-for-shared-counter
+          arguments:
+          - value: shared-counter
+          expectedReturn:
+            tool: Lock
+            useWhen: multiple threads update one mutable value
+            caution: keep critical sections small
+        - id: rejects-unknown-need
+          arguments:
+          - value: parallel-everything
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

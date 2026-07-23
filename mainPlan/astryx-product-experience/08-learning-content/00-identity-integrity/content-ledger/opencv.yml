@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "opencv"
+canonicalRows: 11
+lessons:
+  - lessonRef: "opencv/00_OpenCV소개"
+    identityLedgerRef: "identity-ledger/opencv.yml"
+    lessonContentHash: "f1d2b70f57f3682f72f0141ed862f78316baebcd83b25ebc55fa056b97bfd34f"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/12-computer-vision"
+    eligiblePathIds: ["computerVision","deepLearningVision","visionAdvanced","visionAutomation"]
+    outcomes: ["vision.opencvBasics"]
+    prerequisites: ["numpy.arrayOps"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:opencv/00_OpenCV소개:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:opencv_00_OpenCV__:v1","retrieve:opencv_00_OpenCV__:v2","retrieve:opencv_00_OpenCV__:v3"]
+    transferVariantIds: ["transfer:opencv_00_OpenCV__:near-v1","transfer:opencv_00_OpenCV__:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "opencv/01_이미지구조탐색기"
+    identityLedgerRef: "identity-ledger/opencv.yml"
+    lessonContentHash: "1809a6d0a8485b390e0252056a7108016490e7d88ddd4833b227a3c06fc4c5dd"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/12-computer-vision"
+    eligiblePathIds: ["computerVision","deepLearningVision","visionAdvanced","visionAutomation"]
+    outcomes: ["vision.opencvBasics"]
+    prerequisites: ["vision.opencvBasics"]
+    reinforcesOutcomeIds: ["vision.opencvBasics"]
+    runtimeTier: local
+    checkSpecId: "lesson:opencv/01_이미지구조탐색기:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:opencv_01_________:v1","retrieve:opencv_01_________:v2","retrieve:opencv_01_________:v3"]
+    transferVariantIds: ["transfer:opencv_01_________:near-v1","transfer:opencv_01_________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "opencv/02_색공간변환기"
+    identityLedgerRef: "identity-ledger/opencv.yml"
+    lessonContentHash: "310c488c3dc0c8e44202192f73f72e0be70108965b4d2ac1fea3a1d7c19972d6"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/12-computer-vision"
+    eligiblePathIds: ["computerVision","deepLearningVision","visionAdvanced","visionAutomation"]
+    outcomes: ["vision.opencvBasics"]
+    prerequisites: ["vision.opencvBasics"]
+    reinforcesOutcomeIds: ["vision.opencvBasics"]
+    runtimeTier: local
+    checkSpecId: "lesson:opencv/02_색공간변환기:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:opencv_02_______:v1","retrieve:opencv_02_______:v2","retrieve:opencv_02_______:v3"]
+    transferVariantIds: ["transfer:opencv_02_______:near-v1","transfer:opencv_02_______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "opencv/03_기하학적변환기"
+    identityLedgerRef: "identity-ledger/opencv.yml"
+    lessonContentHash: "aa980cccae7959bb7339838584ef04c64a54ccdf94778bc9e16745ea5063bdd3"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/12-computer-vision"
+    eligiblePathIds: ["computerVision","deepLearningVision","visionAdvanced","visionAutomation"]
+    outcomes: ["vision.opencvBasics"]
+    prerequisites: ["vision.opencvBasics"]
+    reinforcesOutcomeIds: ["vision.opencvBasics"]
+    runtimeTier: local
+    checkSpecId: "lesson:opencv/03_기하학적변환기:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:opencv_03________:v1","retrieve:opencv_03________:v2","retrieve:opencv_03________:v3"]
+    transferVariantIds: ["transfer:opencv_03________:near-v1","transfer:opencv_03________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "opencv/04_이미지필터랩"
+    identityLedgerRef: "identity-ledger/opencv.yml"
+    lessonContentHash: "61c0c4ad18479170fea67d8e20dc49010e2b4cd2e4fa16e1979a5dc641dd26c7"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/12-computer-vision"
+    eligiblePathIds: ["computerVision"]
+    outcomes: ["vision.filters"]
+    prerequisites: ["vision.opencvBasics"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:opencv/04_이미지필터랩:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:opencv_04_______:v1","retrieve:opencv_04_______:v2","retrieve:opencv_04_______:v3"]
+    transferVariantIds: ["transfer:opencv_04_______:near-v1","transfer:opencv_04_______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "opencv/05_에지검출기"
+    identityLedgerRef: "identity-ledger/opencv.yml"
+    lessonContentHash: "56c584db88a651a3bd1842874ad143321728ac135488e54f06eeb6cc0e0161ac"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/12-computer-vision"
+    eligiblePathIds: ["computerVision"]
+    outcomes: ["vision.filters"]
+    prerequisites: ["vision.filters"]
+    reinforcesOutcomeIds: ["vision.filters"]
+    runtimeTier: local
+    checkSpecId: "lesson:opencv/05_에지검출기:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:opencv_05______:v1","retrieve:opencv_05______:v2","retrieve:opencv_05______:v3"]
+    transferVariantIds: ["transfer:opencv_05______:near-v1","transfer:opencv_05______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "opencv/06_이진화스튜디오"
+    identityLedgerRef: "identity-ledger/opencv.yml"
+    lessonContentHash: "7049fe5605746a3c7d31e58be50646ef1d59090ff543b0814ca72382688acedb"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/12-computer-vision"
+    eligiblePathIds: ["computerVision"]
+    outcomes: ["vision.filters"]
+    prerequisites: ["vision.filters"]
+    reinforcesOutcomeIds: ["vision.filters"]
+    runtimeTier: local
+    checkSpecId: "lesson:opencv/06_이진화스튜디오:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:opencv_06________:v1","retrieve:opencv_06________:v2","retrieve:opencv_06________:v3"]
+    transferVariantIds: ["transfer:opencv_06________:near-v1","transfer:opencv_06________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "opencv/07_모폴로지연산기"
+    identityLedgerRef: "identity-ledger/opencv.yml"
+    lessonContentHash: "c6ae1fec2a16b3ba1dc3b0bfd4ee44d405bce5ea55c6624ff6d4b420d725ac8f"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/12-computer-vision"
+    eligiblePathIds: ["computerVision"]
+    outcomes: ["vision.filters"]
+    prerequisites: ["vision.filters"]
+    reinforcesOutcomeIds: ["vision.filters"]
+    runtimeTier: local
+    checkSpecId: "lesson:opencv/07_모폴로지연산기:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:opencv_07________:v1","retrieve:opencv_07________:v2","retrieve:opencv_07________:v3"]
+    transferVariantIds: ["transfer:opencv_07________:near-v1","transfer:opencv_07________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "opencv/08_히스토그램분석기"
+    identityLedgerRef: "identity-ledger/opencv.yml"
+    lessonContentHash: "2d1fd5c40c7ad72b2529be3665c92f2a547abc2316bc0f2b153846ec88d30f2d"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/12-computer-vision"
+    eligiblePathIds: ["computerVision","visionAdvanced","visionAutomation"]
+    outcomes: ["vision.features"]
+    prerequisites: ["vision.opencvBasics"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:opencv/08_히스토그램분석기:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:opencv_08_________:v1","retrieve:opencv_08_________:v2","retrieve:opencv_08_________:v3"]
+    transferVariantIds: ["transfer:opencv_08_________:near-v1","transfer:opencv_08_________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "opencv/09_컨투어탐지기"
+    identityLedgerRef: "identity-ledger/opencv.yml"
+    lessonContentHash: "8b939dcbb4f5b43904f54033915125919ebf653c6ce5ba5876db115d492efd21"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/12-computer-vision"
+    eligiblePathIds: ["computerVision","visionAdvanced","visionAutomation"]
+    outcomes: ["vision.features"]
+    prerequisites: ["vision.filters"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:opencv/09_컨투어탐지기:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:opencv_09_______:v1","retrieve:opencv_09_______:v2","retrieve:opencv_09_______:v3"]
+    transferVariantIds: ["transfer:opencv_09_______:near-v1","transfer:opencv_09_______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "opencv/10_종합비전프로젝트"
+    identityLedgerRef: "identity-ledger/opencv.yml"
+    lessonContentHash: "852836b291c7721865dea43557e677c0c845a2b86db4e99a0b941f9071c3dff3"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/12-computer-vision"
+    eligiblePathIds: ["computerVision"]
+    outcomes: ["vision.filters","vision.features"]
+    prerequisites: ["vision.features","vision.filters"]
+    reinforcesOutcomeIds: ["vision.filters","vision.features"]
+    runtimeTier: local
+    checkSpecId: "lesson:opencv/10_종합비전프로젝트:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:opencv_10_________:v1","retrieve:opencv_10_________:v2","retrieve:opencv_10_________:v3"]
+    transferVariantIds: ["transfer:opencv_10_________:near-v1","transfer:opencv_10_________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

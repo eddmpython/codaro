@@ -4,6 +4,7 @@ mod autostart;
 mod backend;
 mod download;
 mod failure;
+mod generated_contracts;
 mod github;
 mod instance;
 mod ipc;
@@ -24,7 +25,7 @@ use provision::{
     activate_release, load_manifest_from_source, stage_release, stage_release_with_progress,
 };
 use self_update::{apply_self_update, check_launcher_update, download_launcher_update};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use state::{
     ActiveReleaseState, ActiveReleaseStore, CrashState, CrashStateStore, CrashStatus,
     LastKnownGoodReleaseStore, RollbackMarker, RollbackMarkerStore, UpdateConfig,
@@ -507,6 +508,7 @@ fn provision_and_spawn(
         .workspace_root
         .clone()
         .unwrap_or(std::env::current_dir().context("Failed to resolve current directory.")?);
+    ensure_learning_evidence_reader_compatibility(paths, &active)?;
     let config = BackendLaunchConfig::from_active_release(
         paths,
         &active,
@@ -1009,6 +1011,10 @@ fn run_doctor(paths: &LauncherPaths) -> Result<()> {
     let payload = serde_json::json!({
         "appRoot": paths.root(),
         "launcherVersion": LAUNCHER_VERSION,
+        "contractHashes": {
+            "artifactOwnership": generated_contracts::artifact_ownership::ARTIFACT_OWNERSHIP_CONTRACT_SHA256,
+            "artifactOwners": generated_contracts::artifact_ownership::ARTIFACT_OWNERSHIP_OWNERS_SHA256,
+        },
         "runtimeDir": paths.runtime_dir(),
         "sharedPythonExecutableHint": paths.python_executable(),
         "activePythonExecutable": active_python_executable,
@@ -1234,6 +1240,7 @@ fn launch_active_backend(paths: &LauncherPaths, args: LaunchActiveArgs) -> Resul
     {
         return Ok(());
     }
+    ensure_learning_evidence_reader_compatibility(paths, &state)?;
     let config = BackendLaunchConfig::from_active_release(
         paths,
         &state,
@@ -1603,9 +1610,14 @@ fn resolve_rollback_state(
     stores: &LauncherStateStores,
     failed_state: &ActiveReleaseState,
 ) -> Result<Option<ActiveReleaseState>> {
+    let minimum_reader_version = learning_evidence_reader_floor(paths)?;
+    let mut incompatible_release_ids: Vec<String> = Vec::new();
     if let Some(last_known_good) = stores.last_known_good_release.load_optional()? {
         if last_known_good.release_id != failed_state.release_id {
-            return Ok(Some(last_known_good));
+            if last_known_good.learning_evidence_reader_version >= minimum_reader_version {
+                return Ok(Some(last_known_good));
+            }
+            incompatible_release_ids.push(last_known_good.release_id);
         }
     }
 
@@ -1613,6 +1625,12 @@ fn resolve_rollback_state(
         .release_dir(&failed_state.release_id)
         .join("manifest.json");
     if !manifest_path.is_file() {
+        if !incompatible_release_ids.is_empty() {
+            bail!(
+                "Rollback blocked: learning evidence requires reader version {minimum_reader_version}, but release(s) {} are older.",
+                incompatible_release_ids.join(", ")
+            );
+        }
         return Ok(None);
     }
     let manifest = load_manifest_from_source(
@@ -1624,9 +1642,69 @@ fn resolve_rollback_state(
         .rollback_to
         .filter(|release_id| release_id != &failed_state.release_id)
     else {
+        if !incompatible_release_ids.is_empty() {
+            bail!(
+                "Rollback blocked: learning evidence requires reader version {minimum_reader_version}, but release(s) {} are older.",
+                incompatible_release_ids.join(", ")
+            );
+        }
         return Ok(None);
     };
-    load_staged_state(paths, &rollback_release_id).map(Some)
+    let rollback_state = load_staged_state(paths, &rollback_release_id)?;
+    if rollback_state.learning_evidence_reader_version < minimum_reader_version {
+        incompatible_release_ids.push(rollback_state.release_id);
+        bail!(
+            "Rollback blocked: learning evidence requires reader version {minimum_reader_version}, but release(s) {} are older.",
+            incompatible_release_ids.join(", ")
+        );
+    }
+    Ok(Some(rollback_state))
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct LearningEvidenceStoreHeader {
+    schema_version: u32,
+    minimum_reader_version: u32,
+    cutover_marker: LearningEvidenceCutoverMarker,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct LearningEvidenceCutoverMarker {
+    event_id: String,
+}
+
+fn learning_evidence_reader_floor(paths: &LauncherPaths) -> Result<u32> {
+    let header_path = paths.learning_evidence_store_header_path();
+    if !header_path.is_file() {
+        return Ok(0);
+    }
+    let source = std::fs::read_to_string(&header_path).with_context(|| {
+        format!(
+            "Failed to read learning evidence store header `{}`.",
+            header_path.display()
+        )
+    })?;
+    let header: LearningEvidenceStoreHeader = serde_json::from_str(&source).with_context(|| {
+        format!(
+            "Failed to parse learning evidence store header `{}`.",
+            header_path.display()
+        )
+    })?;
+    if header.schema_version != 1
+        || header.minimum_reader_version == 0
+        || !header
+            .cutover_marker
+            .event_id
+            .starts_with("learning-evidence-cutover:")
+    {
+        bail!(
+            "Learning evidence store header `{}` is invalid.",
+            header_path.display()
+        );
+    }
+    Ok(header.minimum_reader_version)
 }
 
 fn ensure_release_is_staged(
@@ -1680,6 +1758,7 @@ fn start_backend_for_state(
     port: u16,
     workspace_root: &std::path::Path,
 ) -> Result<(BackendLaunchConfig, Child)> {
+    ensure_learning_evidence_reader_compatibility(paths, state)?;
     let config = BackendLaunchConfig::from_active_release(
         paths,
         state,
@@ -1699,6 +1778,22 @@ fn start_backend_for_state(
         )));
     }
     Ok((config, child))
+}
+
+fn ensure_learning_evidence_reader_compatibility(
+    paths: &LauncherPaths,
+    state: &ActiveReleaseState,
+) -> Result<()> {
+    let minimum_reader_version = learning_evidence_reader_floor(paths)?;
+    if state.learning_evidence_reader_version < minimum_reader_version {
+        bail!(
+            "Release `{}` cannot open the learning evidence store: reader version {}, required {}.",
+            state.release_id,
+            state.learning_evidence_reader_version,
+            minimum_reader_version
+        );
+    }
+    Ok(())
 }
 
 fn start_backend_for_state_with_retries(
@@ -2114,6 +2209,40 @@ mod tests {
     }
 
     #[test]
+    fn resolve_rollback_state_rejects_reader_below_cutover_floor() {
+        let _guard = test_guard();
+        let temp_dir = tempdir().unwrap();
+        let paths = LauncherPaths::discover(Some(temp_dir.path().join("Codaro"))).unwrap();
+        paths.ensure_layout().unwrap();
+        let stores = LauncherStateStores::new(&paths);
+        let failed_state = sample_state("2026.03.18-2");
+        let mut legacy_state = sample_state("2026.03.10-2");
+        legacy_state.learning_evidence_reader_version = 0;
+        stores.last_known_good_release.save(&legacy_state).unwrap();
+        fs::write(
+            paths.learning_evidence_store_header_path(),
+            serde_json::to_string_pretty(&serde_json::json!({
+                "schemaVersion": 1,
+                "dataEpoch": 1,
+                "minimumReaderVersion": 1,
+                "legacySnapshotHash": "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                "cutoverMarker": {
+                    "eventId": "learning-evidence-cutover:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                    "occurredAt": "2026-07-22T00:00:00Z"
+                }
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+
+        let error = resolve_rollback_state(&paths, &stores, &failed_state).unwrap_err();
+
+        assert!(error.to_string().contains("Rollback blocked"));
+        assert!(error.to_string().contains("reader version 1"));
+        assert!(error.to_string().contains(&legacy_state.release_id));
+    }
+
+    #[test]
     fn update_check_reports_available_release() {
         let _guard = test_guard();
         let temp_dir = tempdir().unwrap();
@@ -2338,6 +2467,7 @@ mod tests {
             backend_entry_module: "fakebackend".into(),
             backend_console_script: "codaro".into(),
             editor_version: "0.3.0".into(),
+            learning_evidence_reader_version: 1,
             runtime_version: "3.12.12".into(),
             installed_at_unix_seconds: 1234,
         }
@@ -2634,6 +2764,7 @@ raise SystemExit(1)
             "releaseId": release_id,
             "launcherVersion": LAUNCHER_VERSION,
             "minLauncherVersion": LAUNCHER_VERSION,
+            "learningEvidenceReaderVersion": 1,
             "pythonRuntime": {
                 "version": "3.12.12",
                 "url": "file:///python-runtime.zip",
@@ -2669,6 +2800,7 @@ raise SystemExit(1)
             "releaseId": release_id,
             "launcherVersion": LAUNCHER_VERSION,
             "minLauncherVersion": LAUNCHER_VERSION,
+            "learningEvidenceReaderVersion": 1,
             "pythonRuntime": {
                 "version": "3.12.12",
                 "url": "file:///python-runtime.zip",

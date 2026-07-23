@@ -486,3 +486,259 @@ sections:
   check:
     noError: 업무 흐름 검증에서 `experimentGraph` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: networkx_07-community-cut-score-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: community 배정의 내부·외부 edge 점검하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 주어진 label에서 within/cross edge와 비율을 계산한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 모든 edge endpoint에 community label이 있어야 합니다.
+    - within ratio만으로 최적 community를 증명하지 마세요.
+    exercise:
+      prompt: audit_communities(edges, labels)를 완성하세요.
+      starterCode: |-
+        def audit_communities(edges, labels):
+            raise NotImplementedError
+      solution: |
+        def audit_communities(edges, labels):
+            within = 0; cross = 0; missing = []
+            for source, target in edges:
+                if source not in labels or target not in labels:
+                    missing += [node for node in (source, target) if node not in labels]
+                elif labels[source] == labels[target]: within += 1
+                else: cross += 1
+            total = within + cross
+            return {"within": within, "cross": cross, "withinRatio": 0.0 if not total else round(within / total, 3), "missing": sorted(set(missing))}
+      hints: *id001
+    check:
+      id: python.networkx.networkx_07.community-cut-score.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_07.community-cut-score.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_communities
+        cases:
+        - id: measures-community-cut
+          arguments:
+          - value:
+            - - a
+              - b
+            - - b
+              - c
+            - - c
+              - d
+          - value:
+              a: 1
+              b: 1
+              c: 2
+              d: 2
+          expectedReturn:
+            within: 2
+            cross: 1
+            withinRatio: 0.667
+            missing: []
+        - id: reports-missing-label
+          arguments:
+          - value:
+            - - a
+              - b
+          - value:
+              a: 1
+          expectedReturn:
+            within: 0
+            cross: 0
+            withinRatio: 0.0
+            missing:
+            - b
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: networkx_07-label-propagation-step-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_07-community-cut-score-mastery
+    title: 새 graph에 label propagation 한 단계 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 각 node가 이웃 label 빈도와 tie-breaker로 다음 label을 선택한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 동시 update를 위해 원래 label만 읽으세요.
+    - tie-breaker를 고정해 재현 가능하게 만드세요.
+    exercise:
+      prompt: propagate_labels(nodes, edges, labels)를 완성하세요.
+      starterCode: |-
+        def propagate_labels(nodes, edges, labels):
+            raise NotImplementedError
+      solution: |
+        def propagate_labels(nodes, edges, labels):
+            adjacency = {node: set() for node in nodes}
+            for a, b in edges: adjacency[a].add(b); adjacency[b].add(a)
+            result = {}
+            for node in nodes:
+                counts = {}
+                for neighbor in adjacency[node]:
+                    label = labels[neighbor]; counts[label] = counts.get(label, 0) + 1
+                result[node] = labels[node] if not counts else sorted(counts, key=lambda label: (-counts[label], str(label)))[0]
+            return {node: result[node] for node in sorted(result)}
+      hints: *id002
+    check:
+      id: python.networkx.networkx_07.label-propagation-step.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_07.label-propagation-step.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: propagate_labels
+        cases:
+        - id: propagates-majority-label
+          arguments:
+          - value:
+            - a
+            - b
+            - c
+          - value:
+            - - a
+              - b
+            - - a
+              - c
+          - value:
+              a: 1
+              b: 2
+              c: 2
+          expectedReturn:
+            a: 2
+            b: 1
+            c: 1
+        - id: keeps-isolate-label
+          arguments:
+          - value:
+            - x
+          - value: []
+          - value:
+              x: 7
+          expectedReturn:
+            x: 7
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: networkx_07-community-validation-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_07-label-propagation-step-transfer
+    title: community 탐지 검증 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 탐지와 해석의 증거를 분리한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 그래프 알고리즘의 입력 가정과 반환 의미를 함께 기록하세요.
+    - 시각적 모양만으로 구조적 결론을 내리지 마세요.
+    exercise:
+      prompt: choose_community_check(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_community_check(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_community_check(situation):
+            table = {'dense-groups': {'method': 'modularity or cut audit', 'evidence': 'within and cross edges', 'risk': 'resolution limit'}, 'stable-segments': {'method': 'rerun stability', 'evidence': 'agreement across seeds', 'risk': 'one random result'}, 'named-meaning': {'method': 'external attributes', 'evidence': 'post-hoc profile', 'risk': 'stereotyping'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.networkx.networkx_07.community-validation.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_07.community-validation.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_community_check
+        cases:
+        - id: recalls-dense-groups
+          arguments:
+          - value: dense-groups
+          expectedReturn:
+            method: modularity or cut audit
+            evidence: within and cross edges
+            risk: resolution limit
+        - id: recalls-stable-segments
+          arguments:
+          - value: stable-segments
+          expectedReturn:
+            method: rerun stability
+            evidence: agreement across seeds
+            risk: one random result
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

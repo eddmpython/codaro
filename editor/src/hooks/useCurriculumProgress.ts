@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { PROGRESS_UPDATED_EVENT } from "@/lib/curriculumCompletion";
+import { PROGRESS_UPDATED_EVENT } from "@/lib/curriculumProgressEvent";
 import { loadCurriculumProgress } from "@/lib/curriculumProgress";
 import type { ProgressSummary } from "@/types";
 

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codaro.local/contracts/classroomMigrationLedger.schema.json",
+  "title": "Codaro classroom migration ledger row",
+  "type": "object",
+  "required": ["schemaVersion", "operation", "transactionId", "state", "archiveHash", "sourceAggregateHash", "requestedAt", "completedAt", "gitHead"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "operation": {"enum": ["archive-export", "classroom-purge"]},
+    "transactionId": {"type": "string", "format": "uuid"},
+    "state": {"enum": ["prepared", "completed"]},
+    "archiveHash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "sourceAggregateHash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "requestedAt": {"type": "string", "format": "date-time"},
+    "completedAt": {"type": "string"},
+    "gitHead": {"type": "string", "minLength": 1}
+  }
+}

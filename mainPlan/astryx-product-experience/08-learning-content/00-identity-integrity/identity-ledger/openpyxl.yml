@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "openpyxl"
+sourceCount: 11
+lessons:
+  - lessonRef: "openpyxl/00_openpyxl소개"
+    sourcePath: "curricula/python/automation/office/openpyxl/00_openpyxl소개.yaml"
+    metaId: "openpyxl_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "openpyxl/01_워크북과시트만들기"
+    sourcePath: "curricula/python/automation/office/openpyxl/01_워크북과시트만들기.yaml"
+    metaId: "openpyxl_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "openpyxl/02_셀읽기와쓰기"
+    sourcePath: "curricula/python/automation/office/openpyxl/02_셀읽기와쓰기.yaml"
+    metaId: "openpyxl_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "openpyxl/03_범위와다중시트"
+    sourcePath: "curricula/python/automation/office/openpyxl/03_범위와다중시트.yaml"
+    metaId: "openpyxl_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "openpyxl/04_수식과이름영역"
+    sourcePath: "curricula/python/automation/office/openpyxl/04_수식과이름영역.yaml"
+    metaId: "openpyxl_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "openpyxl/05_셀서식과숫자포맷"
+    sourcePath: "curricula/python/automation/office/openpyxl/05_셀서식과숫자포맷.yaml"
+    metaId: "openpyxl_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "openpyxl/06_조건부서식"
+    sourcePath: "curricula/python/automation/office/openpyxl/06_조건부서식.yaml"
+    metaId: "openpyxl_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "openpyxl/07_차트삽입"
+    sourcePath: "curricula/python/automation/office/openpyxl/07_차트삽입.yaml"
+    metaId: "openpyxl_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "openpyxl/08_이미지와하이퍼링크"
+    sourcePath: "curricula/python/automation/office/openpyxl/08_이미지와하이퍼링크.yaml"
+    metaId: "openpyxl_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "openpyxl/09_표와데이터검증"
+    sourcePath: "curricula/python/automation/office/openpyxl/09_표와데이터검증.yaml"
+    metaId: "openpyxl_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "openpyxl/10_월간매출리포트생성기"
+    sourcePath: "curricula/python/automation/office/openpyxl/10_월간매출리포트생성기.yaml"
+    metaId: "openpyxl_10"
+    registryStatus: registered
+    reviewStatus: pending

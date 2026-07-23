@@ -3,6 +3,9 @@ meta:
   title: 헬로월드
   day: 1
   category: 30days
+  outcomes: ["python.intro"]
+  prerequisites: []
+  estimatedMinutes: 25
   tags:
   - 헬로월드
   - print
@@ -51,6 +54,8 @@ sections:
 - id: hello_world
   title: Hello World
   structuredPrimary: true
+  assessmentMode: mastery
+  unseen: true
   subtitle: 첫 파이썬 프로그램
   goal: Hello World에서 print() 입력값이 출력 영역에 어떻게 표시되는지 확인한다.
   why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
@@ -60,14 +65,11 @@ sections:
     작은따옴표('')와 큰따옴표("")는 기능상 차이가 없습니다. 편한 것을 사용하세요.
   snippet: print('Hello World')
   exercise:
-    prompt: Hello World 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
-    starterCode: print('Hello World')
+    prompt: 빈칸 문자열을 Codaro로 바꿔 정확히 Hello Codaro를 출력하세요.
+    starterCode: print('Hello ____')
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
     - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역에 무엇이 표시될까요?
-      expectedValue: Hello World
     variations:
     - prompt: 작은따옴표 대신 큰따옴표로 바꿔도 같은 결과가 나오는지 확인하세요.
       starterCode: print("Hello Codaro")
@@ -76,9 +78,25 @@ sections:
       starterCode: print('Hello', 'World')
       parameterization: 인자 개수 변경 - 공백 구분자 검증
   check:
-    type: noError
-    noError: Hello World의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
-    resultCheck: Hello World 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+    id: python.print.hello-codaro.output.v1
+    version: 1
+    kind: output
+    strength: strong
+    executor: browser-worker
+    timeoutMs: 8000
+    fixtureId: python.print.hello-codaro.fixture.v1
+    fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+    fixture:
+      directories: []
+      env:
+        LANG: C.UTF-8
+        TZ: UTC
+      files: []
+      stdin: []
+    payload:
+      comparator: exact
+      expected: Hello Codaro
+      normalization: trim-final-newline
 - id: print_korean
   title: 한글 출력하기
   structuredPrimary: true
@@ -91,18 +109,16 @@ sections:
     이모지도 출력할 수 있습니다: print('🐍 Python')
   snippet: print('안녕하세요, 파이썬!')
   exercise:
-    prompt: 한글 출력하기 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
-    starterCode: print('안녕하세요, 파이썬!')
+    prompt: 빈칸을 Codaro로 바꿔 정확히 안녕하세요, Codaro!를 출력하세요.
+    starterCode: print('안녕하세요, ____!')
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
     - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역에 무엇이 표시될까요?
-      expectedValue: 안녕하세요, 파이썬!
   check:
-    type: noError
-    noError: 한글 출력하기의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
-    resultCheck: 한글 출력하기 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 안녕하세요, Codaro!
+    resultCheck: 출력이 안녕하세요, Codaro!와 정확히 일치해야 합니다.
 - id: print_multiple
   title: 여러 줄 출력하기
   structuredPrimary: true
@@ -117,24 +133,22 @@ sections:
     print('두 번째 줄')
     print('세 번째 줄')
   exercise:
-    prompt: 여러 줄 출력하기 예제에서 출력 문장 하나를 바꾸고 출력 줄 순서와 바뀐 줄을 확인하세요.
+    prompt: 두 번째 줄의 빈칸을 바꿔 세 줄을 정확한 순서로 출력하세요.
     starterCode: |-
       print('첫 번째 줄')
-      print('두 번째 줄')
+      print('____')
       print('세 번째 줄')
     hints:
     - 바꿀 지점은 각 print()의 따옴표 안 문구나 출력 변수에서 찾으세요.
     - 실행 뒤 줄 수와 순서가 유지되고, 수정한 줄만 의도대로 바뀌었는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역에 무엇이 표시될까요?
-      expectedValue: |
-        첫 번째 줄
-        두 번째 줄
-        세 번째 줄
   check:
-    type: noError
-    noError: 여러 줄 출력하기의 각 print() 호출이 따옴표와 괄호 조건을 만족하고 순서대로 출력되어야 합니다.
-    resultCheck: 여러 줄 출력하기 출력 줄 수와 순서가 유지되고, 바꾼 줄의 문구가 출력 영역에 나타나야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: |-
+      첫 번째 줄
+      바꾼 두 번째 줄
+      세 번째 줄
+    resultCheck: 세 줄의 문구와 순서가 정확히 일치해야 합니다.
 - id: print_newline
   title: 줄바꿈 문자
   structuredPrimary: true
@@ -147,18 +161,19 @@ sections:
     \n을 사용하면 print() 한 번으로 여러 줄을 출력할 수 있어 편리합니다.
   snippet: print('첫 번째 줄\n두 번째 줄\n세 번째 줄')
   exercise:
-    prompt: 줄바꿈 문자 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
-    starterCode: print('첫 번째 줄\n두 번째 줄\n세 번째 줄')
+    prompt: 가운데 빈칸을 채워 줄바꿈 문자 하나의 print()로 세 줄을 정확히 출력하세요.
+    starterCode: print('첫 번째 줄\n____\n세 번째 줄')
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
     - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역에 무엇이 표시될까요?
-      expectedValue: 첫 번째 줄\n두 번째 줄\n세 번째 줄
   check:
-    type: noError
-    noError: 줄바꿈 문자의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
-    resultCheck: 줄바꿈 문자 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: |-
+      첫 번째 줄
+      두 번째 줄
+      세 번째 줄
+    resultCheck: 줄바꿈 뒤 세 줄이 정확히 일치해야 합니다.
 - id: comment_single
   title: 한 줄 주석
   structuredPrimary: true
@@ -171,18 +186,18 @@ sections:
     주석은 코드를 이해하기 쉽게 만들지만, 과도한 주석은 오히려 가독성을 해칩니다.
   snippet: print('실행됩니다')
   exercise:
-    prompt: 한 줄 주석 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
-    starterCode: print('실행됩니다')
+    prompt: 첫 줄은 # 주석으로 남기고 빈칸을 바꿔 실행됩니다만 출력하세요.
+    starterCode: |-
+      # 이 줄은 실행 결과에 나오지 않습니다.
+      print('____')
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
     - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역에 무엇이 표시될까요?
-      expectedValue: 실행됩니다
   check:
-    type: noError
-    noError: 한 줄 주석의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
-    resultCheck: 한 줄 주석 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: 실행됩니다
+    resultCheck: 주석 문장은 제외되고 실행됩니다만 출력되어야 합니다.
 - id: comment_multi
   title: 여러 줄 설명 메모
   structuredPrimary: true
@@ -201,24 +216,24 @@ sections:
     '''
     print('주석 후')
   exercise:
-    prompt: 여러 줄 설명 메모 예제에서 출력 문장 하나를 바꾸고 출력 줄 순서와 바뀐 줄을 확인하세요.
+    prompt: 삼중 따옴표 설명은 그대로 두고 마지막 빈칸을 채워 두 줄만 출력하세요.
     starterCode: |-
       print('주석 전')
       '''
       이 부분은 여러 줄 설명 메모처럼 볼 수 있습니다.
       지금은 실행 결과에 보이지 않습니다.
       '''
-      print('주석 후')
+      print('____')
     hints:
     - 바꿀 지점은 각 print()의 따옴표 안 문구나 출력 변수에서 찾으세요.
     - 실행 뒤 줄 수와 순서가 유지되고, 수정한 줄만 의도대로 바뀌었는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
-    type: noError
-    noError: 여러 줄 설명 메모의 각 print() 호출이 따옴표와 괄호 조건을 만족하고 순서대로 출력되어야 합니다.
-    resultCheck: 여러 줄 설명 메모 출력 줄 수와 순서가 유지되고, 바꾼 줄의 문구가 출력 영역에 나타나야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: |-
+      주석 전
+      주석 후
+    resultCheck: 설명 메모는 출력되지 않고 주석 전과 주석 후만 순서대로 나와야 합니다.
 - id: print_numbers
   title: 숫자 출력하기
   structuredPrimary: true
@@ -231,18 +246,16 @@ sections:
     print(123)은 숫자 123을, print('123')은 문자 '123'을 출력합니다.
   snippet: print(123)
   exercise:
-    prompt: 숫자 출력하기 예제에서 출력 숫자를 바꾸고 출력 영역 숫자가 그대로 바뀌는지 확인하세요.
-    starterCode: print(123)
+    prompt: 계산식의 숫자를 바꿔 숫자 456을 출력하세요. 따옴표로 감싸지 마세요.
+    starterCode: print(100 + 23)
     hints:
     - 바꿀 지점은 print() 괄호 안의 숫자 리터럴입니다.
     - 실행 뒤 출력된 숫자가 입력한 숫자와 정확히 같은지 보세요.
-    predict:
-      prompt: 이 print() 호출의 출력 영역에는 어떤 숫자가 표시될까요?
-      expectedValue: 123
   check:
-    type: noError
-    noError: 숫자 출력하기의 숫자 print() 호출이 SyntaxError 없이 출력되어야 합니다.
-    resultCheck: 숫자 출력하기 출력 값이 직접 바꾼 숫자와 정확히 일치해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '456'
+    resultCheck: 계산 결과가 숫자 456으로 정확히 출력되어야 합니다.
 - id: print_calculation
   title: 계산 결과 출력하기
   structuredPrimary: true
@@ -255,18 +268,16 @@ sections:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: print(10 + 20)
   exercise:
-    prompt: 계산 결과 출력하기 예제에서 계산식의 숫자나 연산자를 바꾸고 출력 숫자가 새 계산 결과와 맞는지 확인하세요.
-    starterCode: print(10 + 20)
+    prompt: 계산식의 숫자나 연산자를 바꿔 정확히 42를 출력하세요.
+    starterCode: print((6 * 7) - 1)
     hints:
     - 바꿀 지점은 print() 안의 숫자, 연산자, 괄호 위치에서 찾으세요.
     - 실행 뒤 출력 숫자를 직접 계산한 값과 비교하세요.
-    predict:
-      prompt: 이 계산식의 결과는 어떤 숫자일까요? 직접 계산해 본 뒤 실행과 비교하세요.
-      expectedValue: (계산 결과 숫자를 적어주세요)
   check:
-    type: noError
-    noError: 계산 결과 출력하기의 계산식이 SyntaxError 없이 print()까지 실행되어야 합니다.
-    resultCheck: 계산 결과 출력하기 출력 숫자가 수정한 계산식의 실제 결과와 일치해야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: '42'
+    resultCheck: 계산식의 실행 결과가 42와 정확히 일치해야 합니다.
 - id: notebook_expression
   title: 마지막 줄 값 확인하기
   structuredPrimary: true
@@ -279,18 +290,16 @@ sections:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: '''Hello Notebook'''
   exercise:
-    prompt: 마지막 줄 값 확인하기 예제에서 마지막 표현식 값을 바꾸고 셀 결과가 새 값으로 표시되는지 확인하세요.
-    starterCode: '''Hello Notebook'''
+    prompt: 마지막 표현식의 빈칸을 바꿔 print() 없이 Hello Notebook을 표시하세요.
+    starterCode: '''Hello ____'''
     hints:
     - 바꿀 지점은 셀 마지막 줄의 문자열, 숫자, 계산식입니다.
     - 실행 뒤 출력 영역의 마지막 값이 직접 입력한 표현식 결과와 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 줄의 문자열은 어떻게 표시될까요?
-      expectedValue: '''Hello Notebook'''
   check:
-    type: noError
-    noError: 마지막 줄 값 확인하기의 마지막 표현식이 SyntaxError 없이 평가되어야 합니다.
-    resultCheck: 마지막 줄 값 확인하기 실행 결과에 직접 바꾼 마지막 표현식 값이 표시되어야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: Hello Notebook
+    resultCheck: 마지막 표현식 결과가 Hello Notebook과 정확히 일치해야 합니다.
 - id: practice
   title: Day 1 종합 복습
   structuredPrimary: true
@@ -303,18 +312,19 @@ sections:
   - 작게 실행하고 결과를 바로 확인하세요.
   snippet: print('Hello World')
   exercise:
-    prompt: Day 1 종합 복습 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
-    starterCode: print('Hello World')
+    prompt: 변수의 빈칸을 채우고 주석은 실행하지 않은 채 Hello Codaro를 출력하세요.
+    starterCode: |-
+      # name 변수는 출력할 대상을 기억합니다.
+      name = '____'
+      print('Hello', name)
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
     - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역에 무엇이 표시될까요?
-      expectedValue: Hello World
   check:
-    type: noError
-    noError: Day 1 종합 복습의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
-    resultCheck: Day 1 종합 복습 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+    type: outputExact
+    evidence: practice
+    outputExact: Hello Codaro
+    resultCheck: 변수와 print()를 연결한 출력이 Hello Codaro와 정확히 일치해야 합니다.
 - id: reflection
   title: Day 1 회고 - 오늘 무엇을 배웠나요?
   structuredPrimary: true
@@ -329,3 +339,111 @@ sections:
     - 출력
     - 주석
     aiFollowup: 학습자가 적은 답을 한 줄로 요약하고, 헷갈린 지점에 대해 다음 강의 어디에서 다시 만날지 안내한다.
+assessment:
+  transferVariants:
+  - id: report-status-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - hello_world
+    - print_calculation
+    title: 새 보고 상태 한 줄 만들기
+    subtitle: 예제에 없던 업무 문구로 출력 규칙 옮기기
+    goal: 문자열과 숫자를 조합해 처음 보는 파일 처리 상태를 한 줄로 출력한다.
+    why: 배운 예제 문구를 외우는 대신 새로운 업무 상태에 같은 출력 규칙을 적용해야 실제 전이가 확인된다.
+    explanation: 앞의 정답 문구를 복제하지 않고 주어진 변수와 출력 형식만 보고 완성한다. 실행 결과는 공백과 구두점까지 독립 fixture에서 비교한다.
+    tips:
+    - 첫 실패 뒤에는 콜론 위치와 쉼표가 만드는 공백을 먼저 확인한다.
+    - '출력 영역이 Report ready: 3 files 한 줄과 정확히 같은지 비교한다.'
+    exercise:
+      prompt: 'files 변수는 그대로 두고 정확히 Report ready: 3 files를 한 줄로 출력하세요.'
+      starterCode: |-
+        files = 3
+        print("Report ___:", files, "files")
+      solution: |-
+        files = 3
+        print("Report ready:", files, "files")
+      hints:
+      - 첫 문자열의 빈칸만 ready로 바꾸면 콜론은 그대로 사용할 수 있습니다.
+      - print의 쉼표는 항목 사이에 공백 하나를 자동으로 넣습니다.
+    check:
+      id: python.print.report-status.transfer.output.v1
+      version: 1
+      kind: output
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.print.report-status.transfer.fixture.v1
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      payload:
+        comparator: exact
+        expected: 'Report ready: 3 files'
+        normalization: trim-final-newline
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: hello-codaro-retrieval-24h
+    mode: retrieval
+    unseen: true
+    minimumDelayHours: 168
+    sourceSectionIds:
+    - report-status-transfer
+    title: 하루 뒤 첫 출력 다시 만들기
+    subtitle: 예제 없이 변수와 print를 회상하기
+    goal: 하루 이상 지난 뒤 변수와 print를 다시 구성해 Hello Codaro를 출력한다.
+    why: 바로 본 코드를 따라 쓰는 것과 시간이 지난 뒤 스스로 회상하는 능력은 다르다.
+    explanation: 이 variant는 base lesson에 즉시 표시하지 않고 strong evidence 시각에서 24시간이 지난 review queue에서 사용한다.
+    tips:
+    - 첫 실패 뒤에는 target 변수를 print에 전달했는지 확인한다.
+    - 두 단어 사이 공백이 하나인지 출력 영역에서 확인한다.
+    exercise:
+      prompt: target 변수를 사용해 정확히 Hello Codaro를 출력하는 한 줄을 완성하세요.
+      starterCode: |-
+        target = "Codaro"
+        # 아래 한 줄을 완성하세요.
+      solution: |-
+        target = "Codaro"
+        print("Hello", target)
+      hints:
+      - print에는 문자열 Hello와 target 변수를 함께 전달합니다.
+      - 쉼표로 두 값을 나누면 사이 공백은 print가 만듭니다.
+    check:
+      id: python.print.hello-codaro.retrieval-24h.output.v1
+      version: 1
+      kind: output
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.print.hello-codaro.retrieval-24h.fixture.v1
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      payload:
+        comparator: exact
+        expected: Hello Codaro
+        normalization: trim-final-newline
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

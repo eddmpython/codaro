@@ -195,3 +195,301 @@ sections:
           - "환경변수 미설정 시 sample 응답으로 폴백해 학습이 끊기지 않게 한다."
       - type: tip
         content: "본 트랙을 시작하기 전에 Naver Open API와 Slack incoming webhook(또는 카카오워크/잔디)을 미리 발급해 환경변수에 저장해 두세요. 03·04강의 실제 호출 검증이 즉시 가능해집니다."
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: requests_00-http-request-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - runtime_check
+    - contract
+    title: HTTP 요청의 method·origin·timeout 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 실제 호출 전에 허용 origin, timeout, body 정책이 빠진 요청을 차단한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 호출 함수보다 먼저 method·origin·timeout을 데이터 계약으로 만드세요.
+    - GET query와 JSON body를 혼용하지 말고 API 계약에 맞게 구분하세요.
+    exercise:
+      prompt: audit_request_contract(request, allowed_origins)를 완성하세요.
+      starterCode: |-
+        def audit_request_contract(request, allowed_origins):
+            raise NotImplementedError
+      solution: |
+        def audit_request_contract(request, allowed_origins):
+            from urllib.parse import urlsplit
+            required = {"method", "url", "timeoutSeconds"}
+            missing = sorted(required - set(request))
+            failures = []
+            if request.get("method") not in {"GET", "POST", "PUT", "PATCH", "DELETE"}:
+                failures.append("method")
+            parts = urlsplit(request.get("url", ""))
+            origin = f"{parts.scheme}://{parts.netloc}" if parts.scheme and parts.netloc else ""
+            if origin not in allowed_origins:
+                failures.append("origin")
+            if request.get("timeoutSeconds", 0) <= 0:
+                failures.append("timeout")
+            if request.get("method") in {"GET", "DELETE"} and request.get("json") is not None:
+                failures.append("body-policy")
+            return {"ready": not missing and not failures, "missing": missing, "failures": failures, "origin": origin}
+      hints: *id001
+    check:
+      id: python.requests.requests_00.http-request-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.requests.requests_00.http-request-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_request_contract
+        cases:
+        - id: accepts-bounded-get
+          arguments:
+          - value:
+              method: GET
+              url: https://api.example.test/items
+              timeoutSeconds: 5
+          - value:
+            - https://api.example.test
+          expectedReturn:
+            ready: true
+            missing: []
+            failures: []
+            origin: https://api.example.test
+        - id: reports-origin-timeout-and-body
+          arguments:
+          - value:
+              method: GET
+              url: https://other.test/items
+              timeoutSeconds: 0
+              json:
+                q: 1
+          - value:
+            - https://api.example.test
+          expectedReturn:
+            ready: false
+            missing: []
+            failures:
+            - origin
+            - timeout
+            - body-policy
+            origin: https://other.test
+        - id: reports-missing-contract
+          arguments:
+          - value:
+              url: not-a-url
+          - value: []
+          expectedReturn:
+            ready: false
+            missing:
+            - method
+            - timeoutSeconds
+            failures:
+            - method
+            - origin
+            - timeout
+            origin: ''
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: requests_00-request-safety-plan-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - requests_00-http-request-contract-mastery
+    title: 새 API 작업에 재시도·idempotency 계획 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: method와 idempotency key 유무로 자동 재시도 가능 여부를 판정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 모든 네트워크 오류를 같은 방식으로 재시도하지 마세요.
+    - 상태 변경 요청은 dry run과 request identity를 먼저 확보하세요.
+    exercise:
+      prompt: plan_request_safety(request, maximum_attempts)를 완성하세요.
+      starterCode: |-
+        def plan_request_safety(request, maximum_attempts):
+            raise NotImplementedError
+      solution: |
+        def plan_request_safety(request, maximum_attempts):
+            if maximum_attempts <= 0:
+                raise ValueError("attempt count must be positive")
+            method = request["method"]
+            inherently_safe = method in {"GET", "HEAD", "OPTIONS"}
+            idempotent = inherently_safe or method in {"PUT", "DELETE"} or bool(request.get("idempotencyKey"))
+            attempts = maximum_attempts if idempotent else 1
+            return {
+                "idempotent": idempotent,
+                "attempts": attempts,
+                "requiresDryRun": method in {"POST", "PATCH", "DELETE"},
+                "evidence": ["request identity", "attempt log", "final response"],
+            }
+      hints: *id002
+    check:
+      id: python.requests.requests_00.request-safety-plan.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.requests.requests_00.request-safety-plan.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_request_safety
+        cases:
+        - id: allows-get-retries
+          arguments:
+          - value:
+              method: GET
+          - value: 3
+          expectedReturn:
+            idempotent: true
+            attempts: 3
+            requiresDryRun: false
+            evidence:
+            - request identity
+            - attempt log
+            - final response
+        - id: limits-unkeyed-post
+          arguments:
+          - value:
+              method: POST
+          - value: 4
+          expectedReturn:
+            idempotent: false
+            attempts: 1
+            requiresDryRun: true
+            evidence:
+            - request identity
+            - attempt log
+            - final response
+        - id: allows-keyed-post-retries
+          arguments:
+          - value:
+              method: POST
+              idempotencyKey: job-42
+          - value: 2
+          expectedReturn:
+            idempotent: true
+            attempts: 2
+            requiresDryRun: true
+            evidence:
+            - request identity
+            - attempt log
+            - final response
+        - id: rejects-zero-attempts
+          arguments:
+          - value:
+              method: GET
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: requests_00-requests-foundation-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - requests_00-request-safety-plan-transfer
+    title: requests 기본 안전 계약 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 읽기·생성·삭제 요청의 timeout과 재시도 경계를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - HTTP 성공과 업무 데이터의 유효성을 별도 근거로 판정하세요.
+    - 요청 action과 함께 재현 가능한 evidence와 남는 risk를 기록하세요.
+    exercise:
+      prompt: choose_request_policy(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_request_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_request_policy(situation):
+            table = {'read': {'action': 'bounded GET with retry', 'evidence': 'status headers parsed body', 'risk': 'stale cache'}, 'create': {'action': 'POST with idempotency key', 'evidence': 'request identity and created resource', 'risk': 'duplicate mutation'}, 'delete': {'action': 'dry run then allowlisted DELETE', 'evidence': 'target before and response after', 'risk': 'irreversible loss'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.requests.requests_00.requests-foundation-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.requests.requests_00.requests-foundation-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_request_policy
+        cases:
+        - id: recalls-read
+          arguments:
+          - value: read
+          expectedReturn:
+            action: bounded GET with retry
+            evidence: status headers parsed body
+            risk: stale cache
+        - id: recalls-create
+          arguments:
+          - value: create
+          expectedReturn:
+            action: POST with idempotency key
+            evidence: request identity and created resource
+            risk: duplicate mutation
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

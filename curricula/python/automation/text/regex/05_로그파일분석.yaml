@@ -500,3 +500,300 @@ sections:
     content: 이제 기초 단계를 완료했습니다! 다음부터는 중급 프로젝트가 시작됩니다!
   goal: 정리에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.
   why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: regex_05-structured-log-parse-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - summary
+    title: 로그 줄을 timestamp·level·message로 구조화하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 형식 오류 줄을 누락시키지 않고 rejected 근거로 분리한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 파싱 실패 줄을 버리지 말고 원래 line number와 함께 격리하세요.
+    - level count의 분모가 accepted line인지 전체 line인지 명시하세요.
+    exercise:
+      prompt: parse_log_lines(lines)를 완성하세요.
+      starterCode: |-
+        def parse_log_lines(lines):
+            raise NotImplementedError
+      solution: |
+        def parse_log_lines(lines):
+            import re
+            pattern = re.compile(r"^(?P<timestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z) \[(?P<level>INFO|WARN|ERROR)\] (?P<message>.+)$")
+            records = []
+            rejected = []
+            for index, line in enumerate(lines):
+                match = pattern.fullmatch(line)
+                if not match:
+                    rejected.append({"line": index + 1, "text": line})
+                else:
+                    records.append(match.groupdict())
+            counts = {level: sum(record["level"] == level for record in records) for level in ["INFO", "WARN", "ERROR"]}
+            return {"records": records, "rejected": rejected, "counts": counts}
+      hints: *id001
+    check:
+      id: python.regex.regex_05.structured-log-parse.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_05.structured-log-parse.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: parse_log_lines
+        cases:
+        - id: parses-and-counts-levels
+          arguments:
+          - value:
+            - 2026-07-22T00:00:00Z [INFO] ready
+            - 2026-07-22T00:00:01Z [ERROR] failed
+          expectedReturn:
+            records:
+            - timestamp: '2026-07-22T00:00:00Z'
+              level: INFO
+              message: ready
+            - timestamp: '2026-07-22T00:00:01Z'
+              level: ERROR
+              message: failed
+            rejected: []
+            counts:
+              INFO: 1
+              WARN: 0
+              ERROR: 1
+        - id: reports-malformed-line-number
+          arguments:
+          - value:
+            - bad line
+            - 2026-07-22T00:00:00Z [WARN] slow
+          expectedReturn:
+            records:
+            - timestamp: '2026-07-22T00:00:00Z'
+              level: WARN
+              message: slow
+            rejected:
+            - line: 1
+              text: bad line
+            counts:
+              INFO: 0
+              WARN: 1
+              ERROR: 0
+        - id: rejects-empty-message
+          arguments:
+          - value:
+            - '2026-07-22T00:00:00Z [INFO] '
+          expectedReturn:
+            records: []
+            rejected:
+            - line: 1
+              text: '2026-07-22T00:00:00Z [INFO] '
+            counts:
+              INFO: 0
+              WARN: 0
+              ERROR: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: regex_05-log-incident-window-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_05-structured-log-parse-mastery
+    title: 새 로그 흐름에 오류 incident 묶기 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 시간 간격 threshold 안의 ERROR를 같은 incident로 집계한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - ERROR 줄 수와 실제 incident 수를 같은 지표로 부르지 마세요.
+    - 묶음 threshold를 report에 남겨 재집계 가능하게 하세요.
+    exercise:
+      prompt: group_error_incidents(events, maximum_gap_seconds)를 완성하세요.
+      starterCode: |-
+        def group_error_incidents(events, maximum_gap_seconds):
+            raise NotImplementedError
+      solution: |
+        def group_error_incidents(events, maximum_gap_seconds):
+            if maximum_gap_seconds < 0:
+                raise ValueError("negative gap")
+            errors = sorted((event for event in events if event["level"] == "ERROR"), key=lambda event: event["at"])
+            incidents = []
+            for event in errors:
+                if not incidents or event["at"] - incidents[-1]["end"] > maximum_gap_seconds:
+                    incidents.append({"start": event["at"], "end": event["at"], "messages": [event["message"]]})
+                else:
+                    incidents[-1]["end"] = event["at"]
+                    incidents[-1]["messages"].append(event["message"])
+            return {"incidentCount": len(incidents), "incidents": incidents}
+      hints: *id002
+    check:
+      id: python.regex.regex_05.log-incident-window.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_05.log-incident-window.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: group_error_incidents
+        cases:
+        - id: groups-nearby-errors
+          arguments:
+          - value:
+            - at: 0
+              level: ERROR
+              message: a
+            - at: 5
+              level: WARN
+              message: w
+            - at: 8
+              level: ERROR
+              message: b
+          - value: 10
+          expectedReturn:
+            incidentCount: 1
+            incidents:
+            - start: 0
+              end: 8
+              messages:
+              - a
+              - b
+        - id: splits-distant-errors
+          arguments:
+          - value:
+            - at: 1
+              level: ERROR
+              message: a
+            - at: 20
+              level: ERROR
+              message: b
+          - value: 5
+          expectedReturn:
+            incidentCount: 2
+            incidents:
+            - start: 1
+              end: 1
+              messages:
+              - a
+            - start: 20
+              end: 20
+              messages:
+              - b
+        - id: rejects-negative-gap
+          arguments:
+          - value: []
+          - value: -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: regex_05-log-analysis-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_05-log-incident-window-transfer
+    title: 로그 분석 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 파싱 품질·level 집계·incident 집계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - match 수만 보지 말고 정규화 뒤 보존된 의미와 거부된 입력을 함께 확인하세요.
+    - regex가 아닌 전용 parser가 필요한 구조에서는 경계를 명시하세요.
+    exercise:
+      prompt: choose_log_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_log_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_log_evidence(situation):
+            table = {'parse': {'action': 'fullmatch structured line', 'evidence': 'accepted and rejected counts', 'risk': 'silent drop'}, 'levels': {'action': 'count accepted records', 'evidence': 'level denominator', 'risk': 'malformed bias'}, 'incidents': {'action': 'group errors by explicit gap', 'evidence': 'start end messages', 'risk': 'alert count inflation'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.regex.regex_05.log-analysis-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_05.log-analysis-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_log_evidence
+        cases:
+        - id: recalls-parse
+          arguments:
+          - value: parse
+          expectedReturn:
+            action: fullmatch structured line
+            evidence: accepted and rejected counts
+            risk: silent drop
+        - id: recalls-levels
+          arguments:
+          - value: levels
+          expectedReturn:
+            action: count accepted records
+            evidence: level denominator
+            risk: malformed bias
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

@@ -323,3 +323,324 @@ sections:
     check:
       noError: 종합 관찰 함수 호출과 자식 wait가 끝나야 한다.
       resultCheck: observation의 system cpu가 정상 범위, child rss가 0 초과, status가 ok로 종합 결과가 완성되어야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: procCtl_08-resource-window-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - system-cpu
+    - observation-bundle
+    title: 시스템 자원 임계 초과의 지속시간 판정하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 순간 spike가 아니라 연속 sample 수로 CPU·memory 경보를 결정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 한 번의 높은 sample을 지속 장애로 선언하지 마세요.
+    - threshold와 연속 sample 수를 alert evidence에 함께 남기세요.
+    exercise:
+      prompt: audit_resource_windows(samples, thresholds, minimum_consecutive)를 완성하세요.
+      starterCode: |-
+        def audit_resource_windows(samples, thresholds, minimum_consecutive):
+            raise NotImplementedError
+      solution: |
+        def audit_resource_windows(samples, thresholds, minimum_consecutive):
+            if minimum_consecutive <= 0:
+                raise ValueError("minimum consecutive must be positive")
+            alerts = []
+            for metric, threshold in sorted(thresholds.items()):
+                streak = 0
+                maximum_streak = 0
+                for sample in samples:
+                    streak = streak + 1 if sample.get(metric, 0) > threshold else 0
+                    maximum_streak = max(maximum_streak, streak)
+                if maximum_streak >= minimum_consecutive:
+                    alerts.append({"metric": metric, "maximumStreak": maximum_streak, "threshold": threshold})
+            return {"healthy": not alerts, "alerts": alerts, "sampleCount": len(samples)}
+      hints: *id001
+    check:
+      id: python.procctl.procCtl_08.resource-window-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_08.resource-window-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_resource_windows
+        cases:
+        - id: ignores-single-spike
+          arguments:
+          - value:
+            - cpu: 90
+            - cpu: 10
+          - value:
+              cpu: 80
+          - value: 2
+          expectedReturn:
+            healthy: true
+            alerts: []
+            sampleCount: 2
+        - id: alerts-sustained-cpu
+          arguments:
+          - value:
+            - cpu: 90
+            - cpu: 91
+            - cpu: 20
+          - value:
+              cpu: 80
+          - value: 2
+          expectedReturn:
+            healthy: false
+            alerts:
+            - metric: cpu
+              maximumStreak: 2
+              threshold: 80
+            sampleCount: 3
+        - id: orders-multiple-metric-alerts
+          arguments:
+          - value:
+            - memory: 95
+              cpu: 90
+            - memory: 96
+              cpu: 91
+          - value:
+              memory: 90
+              cpu: 80
+          - value: 2
+          expectedReturn:
+            healthy: false
+            alerts:
+            - metric: cpu
+              maximumStreak: 2
+              threshold: 80
+            - metric: memory
+              maximumStreak: 2
+              threshold: 90
+            sampleCount: 2
+        - id: rejects-zero-window
+          arguments:
+          - value: []
+          - value: {}
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: procCtl_08-resource-baseline-comparison-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - procCtl_08-resource-window-audit-mastery
+    title: 새 실행의 자원 사용량을 baseline과 비교하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 절대 한계와 baseline 대비 증가율을 함께 검사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - baseline 대비 증가만으로 절대 자원 한계를 무시하지 마세요.
+    - baseline 0에서는 무한 증가율을 만들지 말고 growth를 미정으로 두세요.
+    exercise:
+      prompt: compare_resource_baseline(current, baseline, absolute_limits, growth_limits)를 완성하세요.
+      starterCode: |-
+        def compare_resource_baseline(current, baseline, absolute_limits, growth_limits):
+            raise NotImplementedError
+      solution: |
+        def compare_resource_baseline(current, baseline, absolute_limits, growth_limits):
+            failures = []
+            details = []
+            for metric in sorted(current):
+                value = current[metric]
+                base = baseline.get(metric, 0)
+                growth = None if base == 0 else round((value - base) / base, 4)
+                reasons = []
+                if metric in absolute_limits and value > absolute_limits[metric]:
+                    reasons.append("absolute")
+                if growth is not None and metric in growth_limits and growth > growth_limits[metric]:
+                    reasons.append("growth")
+                if reasons:
+                    failures.append(metric)
+                details.append({"metric": metric, "value": value, "baseline": base, "growth": growth, "reasons": reasons})
+            return {"accepted": not failures, "failedMetrics": failures, "details": details}
+      hints: *id002
+    check:
+      id: python.procctl.procCtl_08.resource-baseline-comparison.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_08.resource-baseline-comparison.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: compare_resource_baseline
+        cases:
+        - id: accepts-within-limits
+          arguments:
+          - value:
+              memory: 110
+          - value:
+              memory: 100
+          - value:
+              memory: 200
+          - value:
+              memory: 0.2
+          expectedReturn:
+            accepted: true
+            failedMetrics: []
+            details:
+            - metric: memory
+              value: 110
+              baseline: 100
+              growth: 0.1
+              reasons: []
+        - id: reports-absolute-and-growth
+          arguments:
+          - value:
+              memory: 250
+          - value:
+              memory: 100
+          - value:
+              memory: 200
+          - value:
+              memory: 1.0
+          expectedReturn:
+            accepted: false
+            failedMetrics:
+            - memory
+            details:
+            - metric: memory
+              value: 250
+              baseline: 100
+              growth: 1.5
+              reasons:
+              - absolute
+              - growth
+        - id: handles-zero-baseline
+          arguments:
+          - value:
+              cpu: 10
+          - value:
+              cpu: 0
+          - value:
+              cpu: 50
+          - value:
+              cpu: 0.1
+          expectedReturn:
+            accepted: true
+            failedMetrics: []
+            details:
+            - metric: cpu
+              value: 10
+              baseline: 0
+              growth: null
+              reasons: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: procCtl_08-resource-monitoring-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - procCtl_08-resource-baseline-comparison-transfer
+    title: 시스템 자원 모니터링 근거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 순간값·지속 구간·baseline 회귀를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - process 실행 성공과 업무 결과물 성공을 같은 것으로 처리하지 마세요.
+    - 명령 identity·제한 시간·산출물 evidence·남는 risk를 함께 기록하세요.
+    exercise:
+      prompt: choose_resource_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_resource_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_resource_evidence(situation):
+            table = {'sample': {'action': 'record timestamped metric', 'evidence': 'raw bounded sample', 'risk': 'single spike'}, 'alert': {'action': 'require consecutive threshold breach', 'evidence': 'maximum streak', 'risk': 'alert noise'}, 'regression': {'action': 'compare absolute and baseline limits', 'evidence': 'value growth reasons', 'risk': 'moving baseline'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.procctl.procCtl_08.resource-monitoring-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_08.resource-monitoring-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_resource_evidence
+        cases:
+        - id: recalls-sample
+          arguments:
+          - value: sample
+          expectedReturn:
+            action: record timestamped metric
+            evidence: raw bounded sample
+            risk: single spike
+        - id: recalls-alert
+          arguments:
+          - value: alert
+          expectedReturn:
+            action: require consecutive threshold breach
+            evidence: maximum streak
+            risk: alert noise
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

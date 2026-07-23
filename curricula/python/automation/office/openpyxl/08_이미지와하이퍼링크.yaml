@@ -506,3 +506,302 @@ sections:
     - '내부 링크 "#SheetName!A1" 형식, 공백 있는 이름은 작은따옴표'
     - "Comment(text, author)로 셀에 부가 설명, 받는 사람이 별도 문서 없이 이해"
     - "재오픈 후 _images, hyperlink.target/location, comment.text를 모두 검증"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: openpyxl_08-media-link-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_image_from_pil
+    - summary
+    title: Excel 이미지·하이퍼링크의 alt text·origin 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 이미지 크기·설명과 허용 origin 밖 링크를 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지는 alt text와 pixel budget을 artifact 계약에 포함하세요.
+    - 하이퍼링크는 URL 문자열이 아니라 normalized origin allowlist로 검사하세요.
+    exercise:
+      prompt: audit_media_links(images, links, allowed_origins, maximum_image_pixels)를 완성하세요.
+      starterCode: |-
+        def audit_media_links(images, links, allowed_origins, maximum_image_pixels):
+            raise NotImplementedError
+      solution: |
+        def audit_media_links(images, links, allowed_origins, maximum_image_pixels):
+            from urllib.parse import urlsplit
+            image_failures = []
+            for image in images:
+                reasons = []
+                if not image.get("altText"):
+                    reasons.append("alt-text")
+                if image.get("width", 0) * image.get("height", 0) > maximum_image_pixels:
+                    reasons.append("pixel-budget")
+                if reasons:
+                    image_failures.append({"id": image["id"], "reasons": reasons})
+            link_failures = []
+            for link in links:
+                parts = urlsplit(link["url"])
+                origin = f"{parts.scheme}://{parts.netloc}"
+                if parts.scheme not in {"http", "https"} or origin not in allowed_origins:
+                    link_failures.append({"cell": link["cell"], "origin": origin})
+            return {"accepted": not image_failures and not link_failures, "imageFailures": image_failures, "linkFailures": link_failures}
+      hints: *id001
+    check:
+      id: python.openpyxl.openpyxl_08.media-link-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_08.media-link-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_media_links
+        cases:
+        - id: accepts-described-image-and-link
+          arguments:
+          - value:
+            - id: logo
+              altText: Company logo
+              width: 100
+              height: 50
+          - value:
+            - cell: A1
+              url: https://example.test/report
+          - value:
+            - https://example.test
+          - value: 10000
+          expectedReturn:
+            accepted: true
+            imageFailures: []
+            linkFailures: []
+        - id: reports-image-contract-failures
+          arguments:
+          - value:
+            - id: photo
+              altText: ''
+              width: 1000
+              height: 1000
+          - value: []
+          - value: []
+          - value: 10000
+          expectedReturn:
+            accepted: false
+            imageFailures:
+            - id: photo
+              reasons:
+              - alt-text
+              - pixel-budget
+            linkFailures: []
+        - id: reports-disallowed-link-origin
+          arguments:
+          - value: []
+          - value:
+            - cell: B2
+              url: https://other.test/x
+          - value:
+            - https://example.test
+          - value: 1
+          expectedReturn:
+            accepted: false
+            imageFailures: []
+            linkFailures:
+            - cell: B2
+              origin: https://other.test
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: openpyxl_08-media-artifact-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - openpyxl_08-media-link-contract-mastery
+    title: 새 workbook의 media relationship reconciliation 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 계획한 image·link identity가 재개방 package relationship에 존재하는지 검사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - cell 값만 재개방하지 말고 xlsx package media relationship도 대조하세요.
+    - target 원문 대신 image bytes나 URL의 hash를 identity로 사용하세요.
+    exercise:
+      prompt: reconcile_media_relationships(planned, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_media_relationships(planned, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_media_relationships(planned, observed):
+            planned_ids = {(item["kind"], item["anchor"], item["targetHash"]) for item in planned}
+            observed_ids = {(item["kind"], item["anchor"], item["targetHash"]) for item in observed}
+            missing = sorted([list(item) for item in planned_ids - observed_ids])
+            unexpected = sorted([list(item) for item in observed_ids - planned_ids])
+            return {"passed": not missing and not unexpected, "missing": missing, "unexpected": unexpected}
+      hints: *id002
+    check:
+      id: python.openpyxl.openpyxl_08.media-artifact-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_08.media-artifact-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_media_relationships
+        cases:
+        - id: accepts-image-and-link-relationships
+          arguments:
+          - value:
+            - kind: image
+              anchor: A1
+              targetHash: img
+            - kind: link
+              anchor: B2
+              targetHash: url
+          - value:
+            - kind: link
+              anchor: B2
+              targetHash: url
+            - kind: image
+              anchor: A1
+              targetHash: img
+          expectedReturn:
+            passed: true
+            missing: []
+            unexpected: []
+        - id: reports-missing-media
+          arguments:
+          - value:
+            - kind: image
+              anchor: A1
+              targetHash: img
+          - value: []
+          expectedReturn:
+            passed: false
+            missing:
+            - - image
+              - A1
+              - img
+            unexpected: []
+        - id: reports-unexpected-link
+          arguments:
+          - value: []
+          - value:
+            - kind: link
+              anchor: A1
+              targetHash: x
+          expectedReturn:
+            passed: false
+            missing: []
+            unexpected:
+            - - link
+              - A1
+              - x
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: openpyxl_08-excel-media-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - openpyxl_08-media-artifact-reconciliation-transfer
+    title: Excel 이미지·하이퍼링크 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 설명·origin·relationship evidence를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Workbook 저장 성공과 업무 값·수식·표시의 정확성을 분리해 검증하세요.
+    - Web에서는 문서 계약을 검증하고 Local에서는 재개방한 artifact evidence를 남기세요.
+    exercise:
+      prompt: choose_excel_media_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_excel_media_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_excel_media_evidence(situation):
+            table = {'image': {'action': 'bound pixels and add alt text', 'evidence': 'image descriptor', 'risk': 'bloated inaccessible workbook'}, 'link': {'action': 'allowlist normalized origin', 'evidence': 'cell and URL hash', 'risk': 'unsafe destination'}, 'verify': {'action': 'reconcile package relationships', 'evidence': 'anchor and target hash', 'risk': 'missing media'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.openpyxl.openpyxl_08.excel-media-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_08.excel-media-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_excel_media_evidence
+        cases:
+        - id: recalls-image
+          arguments:
+          - value: image
+          expectedReturn:
+            action: bound pixels and add alt text
+            evidence: image descriptor
+            risk: bloated inaccessible workbook
+        - id: recalls-link
+          arguments:
+          - value: link
+          expectedReturn:
+            action: allowlist normalized origin
+            evidence: cell and URL hash
+            risk: unsafe destination
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

@@ -1,4 +1,4 @@
-"""Learner State Store — Predict-Run-Reconcile-Adapt 루프 3단계.
+"""Learner State Store for mastery, misconceptions, and execution evidence.
 
 학습자의 outcome 별 mastery, misconception hit 기록, 실행 요약을 SQLite로
 영구 저장한다. [[planComposer]]와 [[diagnostics]] tool들이 이 상태를 읽어
@@ -27,9 +27,6 @@ from .masterySignal import (
     isMastered,
     masteryLowerBound,
 )
-from .predictionDiff import PredictionDiff
-
-
 MASTERY_EMA = 0.3
 CONFIDENCE_STEP = 0.1
 REPEAT_THRESHOLD_DAYS = 0  # 같은 day에 두 번 hit 해도 repeat로 본다 (가장 엄격).
@@ -243,20 +240,6 @@ class LearnerStateStore:
         return self.recordEvidence(
             outcomeId,
             MasteryEvidence(scoreTarget=1.0 if success else 0.0, strength=1.0, isSuccess=success),
-        )
-
-    def recordPredictionResult(
-        self,
-        outcomeId: str,
-        diff: PredictionDiff,
-    ) -> OutcomeMastery:
-        """예측 diff를 mastery 신호로 변환. match→success, mismatch→failure, skipped→무영향."""
-        if diff.overall == "skipped":
-            return self.getMastery(outcomeId)
-        match = diff.overall == "match"
-        return self.recordEvidence(
-            outcomeId,
-            MasteryEvidence(scoreTarget=1.0 if match else 0.0, strength=1.0, isSuccess=match),
         )
 
     # ------------------------------------------------------------------

@@ -531,3 +531,303 @@ sections:
     - merge_cells / unmerge_cells - 헤더 시각적 정렬
     - 다중 시트 분리 = defaultdict + create_sheet의 짝
     - "분리 결과의 합 = 원본의 합 - 데이터 손실을 막는 핵심 계약"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: openpyxl_03-range-shape-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_iter_rows_basic
+    - summary
+    title: 2차원 range write의 행·열 shape 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: ragged data와 target 크기 불일치를 write 전에 차단한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - range write 전에 2차원 list가 rectangular인지 검사하세요.
+    - target range의 행·열 크기와 실제 shape를 비교하세요.
+    exercise:
+      prompt: audit_range_shape(values, target_rows, target_columns)를 완성하세요.
+      starterCode: |-
+        def audit_range_shape(values, target_rows, target_columns):
+            raise NotImplementedError
+      solution: |
+        def audit_range_shape(values, target_rows, target_columns):
+            row_lengths = [len(row) for row in values]
+            ragged = len(set(row_lengths)) > 1
+            actual_rows = len(values)
+            actual_columns = row_lengths[0] if row_lengths else 0
+            failures = []
+            if ragged:
+                failures.append("ragged")
+            if actual_rows != target_rows or actual_columns != target_columns:
+                failures.append("target-shape")
+            return {"accepted": not failures, "failures": failures, "actualShape": [actual_rows, actual_columns], "rowLengths": row_lengths}
+      hints: *id001
+    check:
+      id: python.openpyxl.openpyxl_03.range-shape-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_03.range-shape-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_range_shape
+        cases:
+        - id: accepts-rectangular-shape
+          arguments:
+          - value:
+            - - 1
+              - 2
+            - - 3
+              - 4
+          - value: 2
+          - value: 2
+          expectedReturn:
+            accepted: true
+            failures: []
+            actualShape:
+            - 2
+            - 2
+            rowLengths:
+            - 2
+            - 2
+        - id: reports-ragged-target-shape
+          arguments:
+          - value:
+            - - 1
+              - 2
+            - - 3
+          - value: 2
+          - value: 2
+          expectedReturn:
+            accepted: false
+            failures:
+            - ragged
+            actualShape:
+            - 2
+            - 2
+            rowLengths:
+            - 2
+            - 1
+        - id: reports-empty-shape-mismatch
+          arguments:
+          - value: []
+          - value: 1
+          - value: 1
+          expectedReturn:
+            accepted: false
+            failures:
+            - target-shape
+            actualShape:
+            - 0
+            - 0
+            rowLengths: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: openpyxl_03-multi-sheet-range-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - openpyxl_03-range-shape-audit-mastery
+    title: 새 다중 sheet range 결과 reconciliation 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: sheet·range identity와 matrix hash를 계획과 대조한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - sheet 이름과 A1 range를 합친 identity로 matrix를 추적하세요.
+    - 전체 workbook hash만 보지 말고 업무 range별 hash를 비교하세요.
+    exercise:
+      prompt: reconcile_sheet_ranges(planned, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_sheet_ranges(planned, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_sheet_ranges(planned, observed):
+            def identity(item):
+                return f"{item['sheet']}!{item['range']}"
+            planned_map = {identity(item): item["matrixHash"] for item in planned}
+            observed_map = {identity(item): item["matrixHash"] for item in observed}
+            missing = sorted(set(planned_map) - set(observed_map))
+            unexpected = sorted(set(observed_map) - set(planned_map))
+            changed = sorted(key for key in set(planned_map) & set(observed_map) if planned_map[key] != observed_map[key])
+            return {"passed": not missing and not unexpected and not changed, "missing": missing, "unexpected": unexpected, "changed": changed}
+      hints: *id002
+    check:
+      id: python.openpyxl.openpyxl_03.multi-sheet-range-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_03.multi-sheet-range-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_sheet_ranges
+        cases:
+        - id: accepts-multi-sheet-ranges
+          arguments:
+          - value:
+            - sheet: Raw
+              range: A1:B2
+              matrixHash: a
+            - sheet: Summary
+              range: A1:B1
+              matrixHash: b
+          - value:
+            - sheet: Summary
+              range: A1:B1
+              matrixHash: b
+            - sheet: Raw
+              range: A1:B2
+              matrixHash: a
+          expectedReturn:
+            passed: true
+            missing: []
+            unexpected: []
+            changed: []
+        - id: reports-changed-range
+          arguments:
+          - value:
+            - sheet: Raw
+              range: A1:B2
+              matrixHash: a
+          - value:
+            - sheet: Raw
+              range: A1:B2
+              matrixHash: x
+          expectedReturn:
+            passed: false
+            missing: []
+            unexpected: []
+            changed:
+            - Raw!A1:B2
+        - id: reports-missing-and-unexpected-range
+          arguments:
+          - value:
+            - sheet: Raw
+              range: A1:B2
+              matrixHash: a
+          - value:
+            - sheet: Other
+              range: A1
+              matrixHash: b
+          expectedReturn:
+            passed: false
+            missing:
+            - Raw!A1:B2
+            unexpected:
+            - Other!A1
+            changed: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: openpyxl_03-range-multisheet-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - openpyxl_03-multi-sheet-range-reconciliation-transfer
+    title: 범위·다중 sheet 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: shape·range identity·matrix hash 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Workbook 저장 성공과 업무 값·수식·표시의 정확성을 분리해 검증하세요.
+    - Web에서는 문서 계약을 검증하고 Local에서는 재개방한 artifact evidence를 남기세요.
+    exercise:
+      prompt: choose_range_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_range_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_range_evidence(situation):
+            table = {'shape': {'action': 'validate rectangular dimensions', 'evidence': 'row lengths and target shape', 'risk': 'shifted cells'}, 'identity': {'action': 'bind sheet and A1 range', 'evidence': 'sheet range key', 'risk': 'wrong sheet'}, 'verify': {'action': 'hash reopened matrix', 'evidence': 'range matrix hash', 'risk': 'partial write'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.openpyxl.openpyxl_03.range-multisheet-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_03.range-multisheet-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_range_evidence
+        cases:
+        - id: recalls-shape
+          arguments:
+          - value: shape
+          expectedReturn:
+            action: validate rectangular dimensions
+            evidence: row lengths and target shape
+            risk: shifted cells
+        - id: recalls-identity
+          arguments:
+          - value: identity
+          expectedReturn:
+            action: bind sheet and A1 range
+            evidence: sheet range key
+            risk: wrong sheet
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

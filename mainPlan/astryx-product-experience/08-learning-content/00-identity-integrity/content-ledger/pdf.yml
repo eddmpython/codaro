@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "pdf"
+canonicalRows: 11
+lessons:
+  - lessonRef: "pdf/00_pdf소개"
+    identityLedgerRef: "identity-ledger/pdf.yml"
+    lessonContentHash: "d9e5723d34d9825794b3cfff5deed34f3c70e69fcf2f10c9036a20fd7589ee7d"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/00-pdf-automation"
+    eligiblePathIds: ["pdfAutomation"]
+    outcomes: ["automation.pdf.intro"]
+    prerequisites: ["python.functions","python.modulesAndIo"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:pdf/00_pdf소개:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:pdf_00_pdf__:v1","retrieve:pdf_00_pdf__:v2","retrieve:pdf_00_pdf__:v3"]
+    transferVariantIds: ["transfer:pdf_00_pdf__:near-v1","transfer:pdf_00_pdf__:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pdf/01_pdf열고페이지정보"
+    identityLedgerRef: "identity-ledger/pdf.yml"
+    lessonContentHash: "1e536aa2f3823ca7ac06470540c155fd032284ecd78d43cba8c31d50801c41a7"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/00-pdf-automation"
+    eligiblePathIds: ["pdfAutomation"]
+    outcomes: ["automation.pdf.read"]
+    prerequisites: ["automation.pdf.intro","python.functions","python.modulesAndIo"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:pdf/01_pdf열고페이지정보:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:pdf_01_pdf_______:v1","retrieve:pdf_01_pdf_______:v2","retrieve:pdf_01_pdf_______:v3"]
+    transferVariantIds: ["transfer:pdf_01_pdf_______:near-v1","transfer:pdf_01_pdf_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pdf/02_pdf병합과분할"
+    identityLedgerRef: "identity-ledger/pdf.yml"
+    lessonContentHash: "3fd9f571b8b95612c22fd17a9636778da84c7e3ad93de23c03e30d4a6098d689"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/00-pdf-automation"
+    eligiblePathIds: ["pdfAutomation"]
+    outcomes: ["automation.pdf.merge"]
+    prerequisites: ["automation.pdf.read","python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:pdf/02_pdf병합과분할:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:pdf_02_pdf_____:v1","retrieve:pdf_02_pdf_____:v2","retrieve:pdf_02_pdf_____:v3"]
+    transferVariantIds: ["transfer:pdf_02_pdf_____:near-v1","transfer:pdf_02_pdf_____:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pdf/03_텍스트추출"
+    identityLedgerRef: "identity-ledger/pdf.yml"
+    lessonContentHash: "a81370b669ab8eecd58df3f4ced2bff8e3bc2c8b7e347209bd092cee1ee12273"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/00-pdf-automation"
+    eligiblePathIds: ["pdfAutomation"]
+    outcomes: ["automation.pdf.extract"]
+    prerequisites: ["automation.pdf.read","python.strings"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:pdf/03_텍스트추출:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:pdf_03______:v1","retrieve:pdf_03______:v2","retrieve:pdf_03______:v3"]
+    transferVariantIds: ["transfer:pdf_03______:near-v1","transfer:pdf_03______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pdf/04_표추출"
+    identityLedgerRef: "identity-ledger/pdf.yml"
+    lessonContentHash: "8998b84b080109eb97433b27f478c9b917aef91483beb70441e96b19e940f15d"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/00-pdf-automation"
+    eligiblePathIds: ["pdfAutomation"]
+    outcomes: ["automation.pdf.extract"]
+    prerequisites: ["automation.pdf.extract","pandas.intro"]
+    reinforcesOutcomeIds: ["automation.pdf.extract"]
+    runtimeTier: local
+    checkSpecId: "lesson:pdf/04_표추출:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:pdf_04____:v1","retrieve:pdf_04____:v2","retrieve:pdf_04____:v3"]
+    transferVariantIds: ["transfer:pdf_04____:near-v1","transfer:pdf_04____:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pdf/05_첫pdf생성"
+    identityLedgerRef: "identity-ledger/pdf.yml"
+    lessonContentHash: "93083649c775ab87d1be72ddbd8c0094d09e0b0d13f37271d00a2eeb5733b826"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/00-pdf-automation"
+    eligiblePathIds: ["pdfAutomation"]
+    outcomes: ["automation.pdf.create"]
+    prerequisites: ["automation.pdf.read"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:pdf/05_첫pdf생성:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:pdf_05__pdf__:v1","retrieve:pdf_05__pdf__:v2","retrieve:pdf_05__pdf__:v3"]
+    transferVariantIds: ["transfer:pdf_05__pdf__:near-v1","transfer:pdf_05__pdf__:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pdf/06_한글폰트와스타일"
+    identityLedgerRef: "identity-ledger/pdf.yml"
+    lessonContentHash: "dc4e8c1d2426715e1d3bf4d4fcdf8a9e273e17fd199f9391e9f11f1de6d4c266"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/00-pdf-automation"
+    eligiblePathIds: ["pdfAutomation"]
+    outcomes: ["automation.pdf.create"]
+    prerequisites: ["automation.pdf.create"]
+    reinforcesOutcomeIds: ["automation.pdf.create"]
+    runtimeTier: local
+    checkSpecId: "lesson:pdf/06_한글폰트와스타일:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:pdf_06_________:v1","retrieve:pdf_06_________:v2","retrieve:pdf_06_________:v3"]
+    transferVariantIds: ["transfer:pdf_06_________:near-v1","transfer:pdf_06_________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pdf/07_표와이미지삽입"
+    identityLedgerRef: "identity-ledger/pdf.yml"
+    lessonContentHash: "71e032bdc1eed5010eef479f6b1d0a8abc388fdaff075680158520f1db99f744"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/00-pdf-automation"
+    eligiblePathIds: ["pdfAutomation"]
+    outcomes: ["automation.pdf.layout"]
+    prerequisites: ["automation.pdf.create"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:pdf/07_표와이미지삽입:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:pdf_07________:v1","retrieve:pdf_07________:v2","retrieve:pdf_07________:v3"]
+    transferVariantIds: ["transfer:pdf_07________:near-v1","transfer:pdf_07________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pdf/08_워터마크와암호화"
+    identityLedgerRef: "identity-ledger/pdf.yml"
+    lessonContentHash: "03e68df175027de133c944a0b6a0e8e9ddb9f6962b7f7de088a7378902751c2b"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/00-pdf-automation"
+    eligiblePathIds: ["pdfAutomation"]
+    outcomes: ["automation.pdf.security"]
+    prerequisites: ["automation.pdf.merge","automation.pdf.create"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:pdf/08_워터마크와암호화:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:pdf_08_________:v1","retrieve:pdf_08_________:v2","retrieve:pdf_08_________:v3"]
+    transferVariantIds: ["transfer:pdf_08_________:near-v1","transfer:pdf_08_________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pdf/09_양식채우기"
+    identityLedgerRef: "identity-ledger/pdf.yml"
+    lessonContentHash: "2582e64ac7ff24ba0bb6b74f1ac82a0ff63c861238a23049a0648571ee6e6a6e"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/00-pdf-automation"
+    eligiblePathIds: ["pdfAutomation"]
+    outcomes: ["automation.pdf.forms"]
+    prerequisites: ["automation.pdf.read","automation.pdf.create"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:pdf/09_양식채우기:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:pdf_09______:v1","retrieve:pdf_09______:v2","retrieve:pdf_09______:v3"]
+    transferVariantIds: ["transfer:pdf_09______:near-v1","transfer:pdf_09______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pdf/10_월간청구서생성기"
+    identityLedgerRef: "identity-ledger/pdf.yml"
+    lessonContentHash: "b162711a3709b4e07f6b0e4393c4c60a3a7c96a2e9c8b926e2afcfcb328f09a2"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/00-pdf-automation"
+    eligiblePathIds: ["pdfAutomation"]
+    outcomes: ["automation.pdf.report"]
+    prerequisites: ["automation.pdf.layout","automation.pdf.security"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:pdf/10_월간청구서생성기:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:pdf_10_________:v1","retrieve:pdf_10_________:v2","retrieve:pdf_10_________:v3"]
+    transferVariantIds: ["transfer:pdf_10_________:near-v1","transfer:pdf_10_________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

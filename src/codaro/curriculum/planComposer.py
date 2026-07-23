@@ -13,7 +13,7 @@
 """
 from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterable, Mapping
 
 from pydantic import BaseModel, Field
 
@@ -126,6 +126,7 @@ class MasterPlan(BaseModel):
     goalResolution: dict | None = None
     # Phase 6 — adaptive skip 으로 자동 제외된 outcome.
     adaptiveSkipped: list[dict] = Field(default_factory=list)
+    capstoneLessonRef: str | None = None
 
 
 def _categoryRank(category: str) -> int:
@@ -354,7 +355,16 @@ def composeMasterPlan(
     progressTracker: ProgressTracker | None = None,
     learnerStateStore: LearnerStateStore | None = None,
     aiProvider=None,
+    learningEvents: Iterable[Mapping[str, object]] = (),
 ) -> MasterPlan:
+    _ = learnerStateStore
+    canonicalEvents = tuple(learningEvents)
+    masteryReport = computeMastery(
+        graph,
+        taxonomy,
+        progressTracker,
+        learningEvents=canonicalEvents,
+    )
     targetOutcomes = _resolveTargetOutcomes(goal, taxonomy)
     excludeKeys: set[str] = set(goal.excludeKeys or [])
 
@@ -386,28 +396,38 @@ def composeMasterPlan(
     # target 단계뿐 아니라 prerequisite expansion에서도 차단되어야 한다.
     masteredOutcomes: set[str] = set()
     adaptiveSkippedOutcomes: list[dict] = []
-    if (goal.skipMasteredOutcomes or goal.adaptiveSkip) and progressTracker is not None:
-        validated = progressTracker.listValidatedOutcomes()
-        report = computeMastery(graph, taxonomy, progressTracker, validated)
+    if goal.skipMasteredOutcomes or goal.adaptiveSkip:
+        report = masteryReport
         if goal.skipMasteredOutcomes:
             masteredOutcomes = masteredOutcomeIds(report)
         if goal.adaptiveSkip:
-            # Phase 6 — fast-track 으로 mastery >= FAST_TRACK_MASTERY_BOOST 도달한 outcome.
-            from .outcomeCredit import FAST_TRACK_MASTERY_BOOST as _FT_BOOST
-
             for entry in report.outcomes:
-                if entry.fastTracked and entry.level >= _FT_BOOST and entry.outcomeId not in masteredOutcomes:
+                if entry.mastered and entry.outcomeId not in masteredOutcomes:
                     masteredOutcomes.add(entry.outcomeId)
                     adaptiveSkippedOutcomes.append({
                         "outcomeId": entry.outcomeId,
                         "outcomeLabel": entry.label,
-                        "reason": f"빠른 통과 — mastery {entry.level:.2f}",
+                        "reason": f"canonical mastery {entry.level:.2f}",
                     })
         targetOutcomes = [oid for oid in targetOutcomes if oid not in masteredOutcomes]
 
     selected, unresolved = _expandWithPrerequisites(
         targetOutcomes, graph, excludeKeys, masteredOutcomes,
     )
+
+    domain = taxonomy.domainById(goal.domain) if goal.domain else None
+    capstoneLessonRef = domain.capstoneLessonRef if domain else None
+    capstone = graph.byKey(capstoneLessonRef) if capstoneLessonRef else None
+    if capstone is not None and capstone.key not in excludeKeys:
+        selected[capstone.key] = capstone
+        extra, extraUnresolved = _expandWithPrerequisites(
+            capstone.prerequisites,
+            graph,
+            set(excludeKeys) | {capstone.key},
+            masteredOutcomes,
+        )
+        selected.update(extra)
+        unresolved.update(extraUnresolved)
 
     # projectIntent 가 매칭한 project lesson 은 강제 포함 — backward expansion 이
     # 이미 같은 outcome 을 더 입문 lesson 으로 cover 했더라도 deliverable 까지 도달해야 한다.
@@ -434,15 +454,14 @@ def composeMasterPlan(
         completed = _completedKeys(progressTracker)
 
     ordered = _topologicalSort(selected)
+    if capstone is not None and capstone in ordered:
+        ordered = [lesson for lesson in ordered if lesson.key != capstone.key] + [capstone]
 
-    # learnerState 입력 — 결정적: 동일 store 상태 → 동일 결과
-    learnerMasteryByOutcome: dict[str, tuple[float, float]] = {}
-    if learnerStateStore is not None:
-        for mastery in learnerStateStore.listMastery():
-            learnerMasteryByOutcome[mastery.outcomeId] = (
-                mastery.score,
-                mastery.confidence,
-            )
+    learnerMasteryByOutcome: dict[str, tuple[float, float]] = {
+        entry.outcomeId: (entry.level, 1.0)
+        for entry in masteryReport.outcomes
+        if entry.creditCount > 0
+    }
 
     targetSet = set(targetOutcomes)
     steps: list[PlanStep] = []
@@ -500,13 +519,12 @@ def composeMasterPlan(
 
     # deliverableOnly — mastery 가 이미 0.6 이상인 outcome 의 concept lesson 은 droppedSteps 로.
     # project / practice 는 유지.
-    if goal.deliverableOnly and progressTracker is not None:
+    if goal.deliverableOnly:
         if not masteredOutcomes:  # skipMastered 가 off 였더라도 mastery 측정은 필요
-            validated = progressTracker.listValidatedOutcomes()
-            report = computeMastery(graph, taxonomy, progressTracker, validated)
+            report = masteryReport
             highMastery = {
                 entry.outcomeId for entry in report.outcomes
-                if entry.level >= 0.6 or entry.mastered
+                if entry.stage in {"independent", "transfer", "mastered"}
             }
         else:
             highMastery = set(masteredOutcomes)
@@ -584,6 +602,7 @@ def composeMasterPlan(
         projectMatches=matchedKeywords,
         goalResolution=goalResolution,
         adaptiveSkipped=adaptiveSkippedOutcomes,
+        capstoneLessonRef=capstoneLessonRef,
     )
 
 

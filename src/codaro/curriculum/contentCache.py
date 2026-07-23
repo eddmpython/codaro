@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from ..document.models import CodaroDocument
@@ -55,11 +56,18 @@ class CurriculumContentCache:
         self._cache: dict[str, CachedCurriculumContent] = {}
 
     def get(self, studyLoader: StudyLoader, category: str, contentId: str) -> CurriculumContentPayload:
+        contentId = studyLoader.resolveContentId(category, contentId)
         cacheKey = f"{category}/{contentId}"
         cached = self._cache.get(cacheKey)
         if cached is None:
             yamlContent = studyLoader.loadStudy(category, contentId)
-            document, solutions = yamlToDocument(yamlContent, category, contentId)
+            studyDir = getattr(studyLoader, "studyDir", None)
+            document, solutions = yamlToDocument(
+                yamlContent,
+                category,
+                contentId,
+                taxonomyPath=Path(studyDir) / "_taxonomy.yml" if studyDir else None,
+            )
             cached = CachedCurriculumContent(
                 document=document,
                 solutions=dict(solutions),

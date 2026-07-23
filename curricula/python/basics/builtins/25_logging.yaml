@@ -685,3 +685,331 @@ sections:
     type: noError
     noError: configureLogger 정의와 두 번 호출이 NameError 없이 끝나야 합니다.
     resultCheck: 결과 dict의 handlerCount가 1, lineCount가 2여야 합니다.
+assessment:
+  masteryVariants:
+  - id: 25_logging-operation-lines-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - workflow_validation
+    - practice
+    title: 운영 로그를 캡처해 레벨 필터와 handler 중복을 검증하기
+    subtitle: StreamHandler, Formatter, logger level
+    goal: 이벤트 목록을 logging record로 남기고 필터링된 lines, warning 이상 개수, handlerCount, loggerLevel을 반환한다.
+    why: 숙달 검증은 로그 호출 여부가 아니라, 실제 캡처된 로그 줄이 레벨 정책과 handler 중복 방지 규칙을 만족하는지 확인합니다.
+    explanation: capture_operation_logs(events, minimum_level="INFO")를 완성해 DEBUG는 필터링하고, WARNING 이상 record 수와 logger 설정 상태를
+      반환하세요.
+    tips:
+    - logger.handlers.clear()를 호출해 재실행해도 handler가 누적되지 않게 하세요.
+    - logger.log(level, "operation=%s status=%s", ...) 형태로 lazy formatting을 사용하세요.
+    exercise:
+      prompt: capture_operation_logs(events, minimum_level="INFO")를 완성해 logging output lines와 handler 상태를 반환하고 알 수 없는 level은
+        ValueError로 막으세요.
+      starterCode: |-
+        def capture_operation_logs(events, minimum_level="INFO"):
+            raise NotImplementedError
+      solution: |-
+        import io
+        import logging
+
+        def capture_operation_logs(events, minimum_level="INFO"):
+            levels = {
+                "DEBUG": logging.DEBUG,
+                "INFO": logging.INFO,
+                "WARNING": logging.WARNING,
+                "ERROR": logging.ERROR,
+                "CRITICAL": logging.CRITICAL,
+            }
+            if minimum_level not in levels:
+                raise ValueError("unknown minimum level")
+            stream = io.StringIO()
+            handler = logging.StreamHandler(stream)
+            handler.setFormatter(logging.Formatter("%(levelname)s|%(name)s|%(message)s"))
+            logger = logging.getLogger("codaro.assessment.logging.operations")
+            logger.handlers.clear()
+            logger.propagate = False
+            logger.setLevel(levels[minimum_level])
+            logger.addHandler(handler)
+            for event in events:
+                level_name = event.get("level", "INFO")
+                if level_name not in levels:
+                    raise ValueError("unknown event level")
+                logger.log(
+                    levels[level_name],
+                    "operation=%s status=%s",
+                    event["operation"],
+                    event["status"],
+                )
+            lines = stream.getvalue().strip().splitlines()
+            return {
+                "lines": lines,
+                "warningOrHigherCount": sum(
+                    line.startswith(("WARNING", "ERROR", "CRITICAL")) for line in lines
+                ),
+                "handlerCount": len(logger.handlers),
+                "loggerLevel": logging.getLevelName(logger.level),
+            }
+      hints:
+      - minimum_level과 event level을 같은 levels dict로 검증하세요.
+      - DEBUG 입력은 minimum_level이 INFO일 때 lines에 남지 않아야 합니다.
+    check:
+      id: python.builtins.logging.operation-lines.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.logging.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: capture_operation_logs
+        cases:
+        - id: captures-filtered-operation-lines
+          arguments:
+          - value:
+            - level: DEBUG
+              operation: warmup
+              status: skip
+            - level: INFO
+              operation: load-users
+              status: ok
+            - level: WARNING
+              operation: sync-report
+              status: slow
+            - level: ERROR
+              operation: publish
+              status: failed
+          expectedReturn:
+            lines:
+            - INFO|codaro.assessment.logging.operations|operation=load-users status=ok
+            - WARNING|codaro.assessment.logging.operations|operation=sync-report status=slow
+            - ERROR|codaro.assessment.logging.operations|operation=publish status=failed
+            warningOrHigherCount: 2
+            handlerCount: 1
+            loggerLevel: INFO
+        - id: rejects-unknown-level
+          arguments:
+          - value:
+            - level: TRACE
+              operation: load-users
+              status: ok
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 25_logging-json-records-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - workflow_validation
+    - formatters
+    title: JSON 로그 record를 만들고 다시 파싱해 필수 필드 검증하기
+    subtitle: custom Formatter와 extra
+    goal: record 목록을 JSON line 로그로 출력하고 다시 파싱해 requestId 누락 수와 lineCount를 반환한다.
+    why: 전이 과제에서는 사람이 읽는 text line에서 운영 도구가 집계할 수 있는 구조화 로그로 옮깁니다.
+    explanation: format_structured_logs(records)가 custom Formatter를 붙인 logger로 JSON lines를 만들고, json.loads로 파싱한 records와 누락
+      requestId 수를 반환하게 만드세요.
+    tips:
+    - record.getMessage()를 써야 logging lazy formatting이 적용된 최종 메시지를 얻습니다.
+    - extra가 없는 record는 requestId를 "unknown"으로 채우세요.
+    exercise:
+      prompt: format_structured_logs(records)를 완성해 JSON line 로그를 만들고 records, missingRequestIds, lineCount를 반환하세요.
+      starterCode: |-
+        def format_structured_logs(records):
+            raise NotImplementedError
+      solution: |-
+        import io
+        import json
+        import logging
+
+        def format_structured_logs(records):
+            class JsonFormatter(logging.Formatter):
+                def format(self, record):
+                    payload = {
+                        "level": record.levelname,
+                        "logger": record.name,
+                        "message": record.getMessage(),
+                        "requestId": getattr(record, "requestId", "unknown"),
+                    }
+                    return json.dumps(payload, ensure_ascii=False, sort_keys=True)
+
+            stream = io.StringIO()
+            handler = logging.StreamHandler(stream)
+            handler.setFormatter(JsonFormatter())
+            logger = logging.getLogger("codaro.assessment.logging.json")
+            logger.handlers.clear()
+            logger.propagate = False
+            logger.setLevel(logging.INFO)
+            logger.addHandler(handler)
+            for item in records:
+                extra = {"requestId": item["requestId"]} if item.get("requestId") else None
+                logger.log(getattr(logging, item.get("level", "INFO")), item["message"], extra=extra)
+            parsed = [json.loads(line) for line in stream.getvalue().strip().splitlines()]
+            return {
+                "records": parsed,
+                "missingRequestIds": sum(record["requestId"] == "unknown" for record in parsed),
+                "lineCount": len(parsed),
+            }
+      hints:
+      - Formatter 안에서는 record.name, record.levelname, record.getMessage()를 사용할 수 있습니다.
+      - requestId가 없는 입력은 extra를 넘기지 않아야 기본값 "unknown" 경로를 확인할 수 있습니다.
+    check:
+      id: python.builtins.logging.json-records.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.logging.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: format_structured_logs
+        cases:
+        - id: emits-and-parses-json-lines
+          arguments:
+          - value:
+            - level: INFO
+              message: lesson verified
+              requestId: req-101
+            - level: WARNING
+              message: request id missing
+          expectedReturn:
+            records:
+            - level: INFO
+              logger: codaro.assessment.logging.json
+              message: lesson verified
+              requestId: req-101
+            - level: WARNING
+              logger: codaro.assessment.logging.json
+              message: request id missing
+              requestId: unknown
+            missingRequestIds: 1
+            lineCount: 2
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 25_logging-handler-reuse-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 25_logging-json-records-transfer
+    title: 로거 재설정 뒤에도 handler가 중복되지 않는지 회상 검증하기
+    subtitle: handlers.clear와 StreamHandler
+    goal: 같은 로거를 두 번 configure한 뒤 메시지를 남겨 handlerCount와 lineCount가 기대값인지 반환한다.
+    why: 시간이 지나도 남아야 할 logging 감각은 노트북과 테스트 재실행에서 handler 중복으로 로그가 두 배씩 불어나는 문제를 막는 것입니다.
+    explanation: configure_reusable_logger(name, messages)가 같은 logger를 재설정해도 handler 1개만 유지하고, 캡처된 lines를 반환하게 만드세요.
+    tips:
+    - configure 내부 첫 줄에서 logger.handlers.clear()를 호출하세요.
+    - 같은 stream을 재사용하면 재설정 전후 로그가 모두 한 곳에 모입니다.
+    exercise:
+      prompt: configure_reusable_logger(name, messages)를 완성해 두 번 configure한 뒤에도 handlerCount 1과 누적 lines를 반환하세요.
+      starterCode: |-
+        def configure_reusable_logger(name, messages):
+            raise NotImplementedError
+      solution: |-
+        import io
+        import logging
+
+        def configure_reusable_logger(name, messages):
+            stream = io.StringIO()
+
+            def configure():
+                logger = logging.getLogger(name)
+                logger.handlers.clear()
+                logger.propagate = False
+                logger.setLevel(logging.INFO)
+                handler = logging.StreamHandler(stream)
+                handler.setFormatter(logging.Formatter("%(levelname)s|%(message)s"))
+                logger.addHandler(handler)
+                return logger
+
+            logger = configure()
+            logger.info(messages[0])
+            logger = configure()
+            for message in messages[1:]:
+                logger.info(message)
+            lines = stream.getvalue().strip().splitlines()
+            return {
+                "handlerCount": len(logger.handlers),
+                "lineCount": len(lines),
+                "lines": lines,
+            }
+      hints:
+      - 두 번째 configure 뒤에도 첫 번째 로그 line은 stream에 남아야 합니다.
+      - handlerCount가 2가 되면 같은 record가 중복 출력될 위험이 있습니다.
+    check:
+      id: python.builtins.logging.handler-reuse.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.logging.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: configure_reusable_logger
+        cases:
+        - id: keeps-one-handler-across-reconfigure
+          arguments:
+          - value: codaro.assessment.logging.reuse
+          - value:
+            - first call
+            - second call
+            - third call
+          expectedReturn:
+            handlerCount: 1
+            lineCount: 3
+            lines:
+            - INFO|first call
+            - INFO|second call
+            - INFO|third call
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

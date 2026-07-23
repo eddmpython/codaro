@@ -76,6 +76,12 @@ class StaticAppServer:
                     return
 
                 data = target.read_bytes()
+                if apiBaseUrl and target.name == "index.html" and b'codaro-runtime-tier' not in data:
+                    data = data.replace(
+                        b"</head>",
+                        b'<meta name="codaro-runtime-tier" content="local"></head>',
+                        1,
+                    )
                 contentType = mimetypes.guess_type(target.name)[0] or "application/octet-stream"
                 self.send_response(200)
                 self.send_header("Content-Type", contentType)

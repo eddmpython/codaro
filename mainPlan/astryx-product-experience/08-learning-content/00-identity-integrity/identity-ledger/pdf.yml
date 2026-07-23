@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "pdf"
+sourceCount: 11
+lessons:
+  - lessonRef: "pdf/00_pdf소개"
+    sourcePath: "curricula/python/automation/office/pdf/00_pdf소개.yaml"
+    metaId: "pdf_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pdf/01_pdf열고페이지정보"
+    sourcePath: "curricula/python/automation/office/pdf/01_pdf열고페이지정보.yaml"
+    metaId: "pdf_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pdf/02_pdf병합과분할"
+    sourcePath: "curricula/python/automation/office/pdf/02_pdf병합과분할.yaml"
+    metaId: "pdf_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pdf/03_텍스트추출"
+    sourcePath: "curricula/python/automation/office/pdf/03_텍스트추출.yaml"
+    metaId: "pdf_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pdf/04_표추출"
+    sourcePath: "curricula/python/automation/office/pdf/04_표추출.yaml"
+    metaId: "pdf_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pdf/05_첫pdf생성"
+    sourcePath: "curricula/python/automation/office/pdf/05_첫pdf생성.yaml"
+    metaId: "pdf_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pdf/06_한글폰트와스타일"
+    sourcePath: "curricula/python/automation/office/pdf/06_한글폰트와스타일.yaml"
+    metaId: "pdf_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pdf/07_표와이미지삽입"
+    sourcePath: "curricula/python/automation/office/pdf/07_표와이미지삽입.yaml"
+    metaId: "pdf_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pdf/08_워터마크와암호화"
+    sourcePath: "curricula/python/automation/office/pdf/08_워터마크와암호화.yaml"
+    metaId: "pdf_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pdf/09_양식채우기"
+    sourcePath: "curricula/python/automation/office/pdf/09_양식채우기.yaml"
+    metaId: "pdf_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pdf/10_월간청구서생성기"
+    sourcePath: "curricula/python/automation/office/pdf/10_월간청구서생성기.yaml"
+    metaId: "pdf_10"
+    registryStatus: registered
+    reviewStatus: pending

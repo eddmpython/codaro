@@ -5,12 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "tsc -b && vite build && npm run pyproc:assets",
+    "archive-state:check": "node scripts/verifyLearningArchiveState.mjs",
+    "build": "npm run visuals:sync && tsc -b && vite build && npm run pyproc:assets",
     "check": "tsc -b",
     "pyproc:assets": "node scripts/generatePyprocAssets.mjs",
+    "visuals:sync": "node scripts/syncVisualAssets.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@astryxdesign/core": "0.1.6",
+    "@astryxdesign/theme-neutral": "0.1.6",
     "@codemirror/autocomplete": "^6.20.2",
     "@codemirror/commands": "^6.8.1",
     "@codemirror/lang-python": "^6.2.1",
@@ -20,17 +24,18 @@
     "@lezer/highlight": "^1.2.1",
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-tabs": "^1.1.13",
+    "@stylexjs/stylex": "0.19.0",
     "@xterm/addon-fit": "^0.10.0",
     "@xterm/xterm": "^5.5.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "lucide-react": "^0.577.0",
+    "lucide-react": "1.25.0",
     "pyproc": "github:eddmpython/pyproc#a7fc83906cfa7bf24c009c8631043738423fa84a",
     "radix-ui": "^1.4.3",
-    "react": "^19.2.1",
-    "react-dom": "^19.2.1",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
     "tailwind-merge": "^3.4.0",
-    "yaml": "^2.9.0"
+    "yaml": "2.9.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.17",
@@ -39,7 +44,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.2.0",
     "tailwindcss": "^4.1.17",
-    "typescript": "^5.9.3",
+    "typescript": "6.0.3",
     "vite": "^8.0.16"
   },
   "overrides": {

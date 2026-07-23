@@ -3,6 +3,9 @@ meta:
   title: 함수기초
   day: 15
   category: 30days
+  outcomes: ["python.functions"]
+  prerequisites: ["python.controlFlow"]
+  estimatedMinutes: 45
   tags:
   - 함수
   - def
@@ -76,9 +79,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 함수 정의의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -110,9 +110,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: return 문의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -142,9 +139,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 매개변수 1개의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -174,9 +168,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 매개변수 여러 개의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -212,9 +203,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 여러 값 반환의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -244,9 +232,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 매개변수 없는 함수의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -278,9 +263,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: return 없는 함수의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -324,9 +306,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 함수와 조건문의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -362,9 +341,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 함수와 반복문의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -400,9 +376,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 함수 재사용의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -458,9 +431,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 실무 함수 설계 루프의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -490,10 +460,211 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: Day 15 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: Day 15 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: day15-clamp-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - def_basic
+    - practice
+    title: 값을 허용 범위 안으로 제한하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 매개변수와 반환값으로 재사용 가능한 함수를 만든다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: clamp(value, low, high)가 범위 안 값은 그대로, 밖의 값은 가까운 경계를 반환하도록 완성하세요.
+      starterCode: |-
+        def clamp(value, low, high):
+            raise NotImplementedError
+      solution: |-
+        def clamp(value, low, high):
+            return max(low, min(value, high))
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day15.clamp.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day15.clamp.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: clamp
+        cases:
+        - id: inside
+          arguments:
+          - value: 5
+          - value: 1
+          - value: 10
+          expectedReturn: 5
+        - id: below
+          arguments:
+          - value: -2
+          - value: 0
+          - value: 8
+          expectedReturn: 0
+        - id: above
+          arguments:
+          - value: 12
+          - value: 0
+          - value: 8
+          expectedReturn: 8
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day15-receipt-line-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day15-clamp-mastery
+    title: 수량과 단가로 영수증 한 줄 만들기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 함수 입력을 계산과 문자열 결과에 함께 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: receipt_line(item, quantity, price)가 '품목:합계' 문자열을 반환하도록 완성하세요.
+      starterCode: |-
+        def receipt_line(item, quantity, price):
+            raise NotImplementedError
+      solution: |-
+        def receipt_line(item, quantity, price):
+            return f"{item}:{quantity * price}"
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day15.receipt-line.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day15.receipt-line.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: receipt_line
+        cases:
+        - id: pen
+          arguments:
+          - value: pen
+          - value: 3
+          - value: 1000
+          expectedReturn: pen:3000
+        - id: book
+          arguments:
+          - value: book
+          - value: 2
+          - value: 7500
+          expectedReturn: book:15000
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day15-rectangle-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day15-receipt-line-transfer
+    title: 함수로 넓이와 둘레 함께 반환하기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 여러 계산 결과를 하나의 반환 계약으로 다시 구성한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: rectangle(width, height)가 area와 perimeter를 가진 딕셔너리를 반환하도록 완성하세요.
+      starterCode: |-
+        def rectangle(width, height):
+            raise NotImplementedError
+      solution: |-
+        def rectangle(width, height):
+            return {'area': width * height, 'perimeter': 2 * (width + height)}
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day15.rectangle.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day15.rectangle.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: rectangle
+        cases:
+        - id: basic
+          arguments:
+          - value: 3
+          - value: 4
+          expectedReturn:
+            area: 12
+            perimeter: 14
+        - id: square
+          arguments:
+          - value: 5
+          - value: 5
+          expectedReturn:
+            area: 25
+            perimeter: 20
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

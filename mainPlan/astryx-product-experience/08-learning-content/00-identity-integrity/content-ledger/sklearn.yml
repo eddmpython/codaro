@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "sklearn"
+canonicalRows: 11
+lessons:
+  - lessonRef: "sklearn/00_sklearn소개"
+    identityLedgerRef: "identity-ledger/sklearn.yml"
+    lessonContentHash: "ba6efef04c3a0b28a58da122e44cc05a6d756505303df9312c04e1e9eef838ab"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/08-machine-learning"
+    eligiblePathIds: ["machineLearning"]
+    outcomes: ["ml.intro"]
+    prerequisites: ["pandas.loadFrame","numpy.arrayOps"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:sklearn/00_sklearn소개:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:sklearn_00_sklearn__:v1","retrieve:sklearn_00_sklearn__:v2","retrieve:sklearn_00_sklearn__:v3"]
+    transferVariantIds: ["transfer:sklearn_00_sklearn__:near-v1","transfer:sklearn_00_sklearn__:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "sklearn/01_와인품질분류"
+    identityLedgerRef: "identity-ledger/sklearn.yml"
+    lessonContentHash: "537ea1400cc98f5353233e1a2b64af0221c712182ee1a5b38af5481f79bf8058"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/08-machine-learning"
+    eligiblePathIds: ["machineLearning"]
+    outcomes: ["ml.classification"]
+    prerequisites: ["ml.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:sklearn/01_와인품질분류:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:sklearn_01_______:v1","retrieve:sklearn_01_______:v2","retrieve:sklearn_01_______:v3"]
+    transferVariantIds: ["transfer:sklearn_01_______:near-v1","transfer:sklearn_01_______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "sklearn/02_유방암진단"
+    identityLedgerRef: "identity-ledger/sklearn.yml"
+    lessonContentHash: "c6c2791f2ebf22af6bbfa3cc851ac74abc10fce26f406870d56da6a8192d9d87"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/08-machine-learning"
+    eligiblePathIds: ["machineLearning"]
+    outcomes: ["ml.classification"]
+    prerequisites: ["ml.classification"]
+    reinforcesOutcomeIds: ["ml.classification"]
+    runtimeTier: browser
+    checkSpecId: "lesson:sklearn/02_유방암진단:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:sklearn_02______:v1","retrieve:sklearn_02______:v2","retrieve:sklearn_02______:v3"]
+    transferVariantIds: ["transfer:sklearn_02______:near-v1","transfer:sklearn_02______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "sklearn/03_당뇨병진행도예측"
+    identityLedgerRef: "identity-ledger/sklearn.yml"
+    lessonContentHash: "1e96d1b272130d1234ff1f5fbecfa43a0f3f50dd663f4acc401b8eb1d2e71971"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/08-machine-learning"
+    eligiblePathIds: ["machineLearning"]
+    outcomes: ["ml.regression"]
+    prerequisites: ["ml.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:sklearn/03_당뇨병진행도예측:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:sklearn_03_________:v1","retrieve:sklearn_03_________:v2","retrieve:sklearn_03_________:v3"]
+    transferVariantIds: ["transfer:sklearn_03_________:near-v1","transfer:sklearn_03_________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "sklearn/04_주택가격예측"
+    identityLedgerRef: "identity-ledger/sklearn.yml"
+    lessonContentHash: "48f265286bd29e61d188959b67337a0c9e930560593a7f9deb418e06b4a0553c"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/08-machine-learning"
+    eligiblePathIds: ["machineLearning"]
+    outcomes: ["ml.regression"]
+    prerequisites: ["ml.regression"]
+    reinforcesOutcomeIds: ["ml.regression"]
+    runtimeTier: browser
+    checkSpecId: "lesson:sklearn/04_주택가격예측:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:sklearn_04_______:v1","retrieve:sklearn_04_______:v2","retrieve:sklearn_04_______:v3"]
+    transferVariantIds: ["transfer:sklearn_04_______:near-v1","transfer:sklearn_04_______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "sklearn/05_손글씨숫자인식"
+    identityLedgerRef: "identity-ledger/sklearn.yml"
+    lessonContentHash: "24a95c6a81dc776513c3615e9d18a11761d10022515cba982a17ccd4e4bb562d"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/08-machine-learning"
+    eligiblePathIds: ["machineLearning"]
+    outcomes: ["ml.classification"]
+    prerequisites: ["ml.classification"]
+    reinforcesOutcomeIds: ["ml.classification"]
+    runtimeTier: browser
+    checkSpecId: "lesson:sklearn/05_손글씨숫자인식:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:sklearn_05________:v1","retrieve:sklearn_05________:v2","retrieve:sklearn_05________:v3"]
+    transferVariantIds: ["transfer:sklearn_05________:near-v1","transfer:sklearn_05________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "sklearn/06_고객세분화"
+    identityLedgerRef: "identity-ledger/sklearn.yml"
+    lessonContentHash: "748c3bf8a27493dae1b08166686292ca3790df043087d18cb751c0020bbabf5f"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/08-machine-learning"
+    eligiblePathIds: ["machineLearning"]
+    outcomes: ["ml.clustering"]
+    prerequisites: ["ml.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:sklearn/06_고객세분화:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:sklearn_06______:v1","retrieve:sklearn_06______:v2","retrieve:sklearn_06______:v3"]
+    transferVariantIds: ["transfer:sklearn_06______:near-v1","transfer:sklearn_06______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "sklearn/07_소나신호분류"
+    identityLedgerRef: "identity-ledger/sklearn.yml"
+    lessonContentHash: "912851d558a81b094e496138d3e277b41fe7bb95810ffe76c3bd083b6baa0a09"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/08-machine-learning"
+    eligiblePathIds: ["machineLearning"]
+    outcomes: ["ml.classification"]
+    prerequisites: ["ml.classification"]
+    reinforcesOutcomeIds: ["ml.classification"]
+    runtimeTier: browser
+    checkSpecId: "lesson:sklearn/07_소나신호분류:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:sklearn_07_______:v1","retrieve:sklearn_07_______:v2","retrieve:sklearn_07_______:v3"]
+    transferVariantIds: ["transfer:sklearn_07_______:near-v1","transfer:sklearn_07_______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "sklearn/08_심장병예측"
+    identityLedgerRef: "identity-ledger/sklearn.yml"
+    lessonContentHash: "b040c8bcf8ede9c917cd472c28693fbe9de847aa5795b1ab66a1d6297f98a9e3"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/08-machine-learning"
+    eligiblePathIds: ["machineLearning"]
+    outcomes: ["ml.classification"]
+    prerequisites: ["ml.classification"]
+    reinforcesOutcomeIds: ["ml.classification"]
+    runtimeTier: browser
+    checkSpecId: "lesson:sklearn/08_심장병예측:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:sklearn_08______:v1","retrieve:sklearn_08______:v2","retrieve:sklearn_08______:v3"]
+    transferVariantIds: ["transfer:sklearn_08______:near-v1","transfer:sklearn_08______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "sklearn/09_신호탐지최적화"
+    identityLedgerRef: "identity-ledger/sklearn.yml"
+    lessonContentHash: "80abdbb39156ca2c0072db62e2f90107133a9e5a51b16d38c74d3cb5a1592ca2"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/08-machine-learning"
+    eligiblePathIds: ["machineLearning"]
+    outcomes: ["ml.pipeline"]
+    prerequisites: ["ml.classification"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:sklearn/09_신호탐지최적화:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:sklearn_09________:v1","retrieve:sklearn_09________:v2","retrieve:sklearn_09________:v3"]
+    transferVariantIds: ["transfer:sklearn_09________:near-v1","transfer:sklearn_09________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "sklearn/10_종합ML파이프라인"
+    identityLedgerRef: "identity-ledger/sklearn.yml"
+    lessonContentHash: "0d15610f09c99b601a96f38cf98a02b8c1243dfa7877576c1086ed97f4665dfc"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/08-machine-learning"
+    eligiblePathIds: ["machineLearning"]
+    outcomes: ["ml.pipeline"]
+    prerequisites: ["ml.pipeline"]
+    reinforcesOutcomeIds: ["ml.pipeline"]
+    runtimeTier: browser
+    checkSpecId: "lesson:sklearn/10_종합ML파이프라인:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:sklearn_10___ML_____:v1","retrieve:sklearn_10___ML_____:v2","retrieve:sklearn_10___ML_____:v3"]
+    transferVariantIds: ["transfer:sklearn_10___ML_____:near-v1","transfer:sklearn_10___ML_____:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

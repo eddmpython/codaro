@@ -417,3 +417,273 @@ sections:
     type: noError
     noError: longRunner와 main이 NameError, TypeError, RuntimeError 없이 실행되어야 합니다.
     resultCheck: log 리스트가 started, tick(여러 번), cancelled, cleanup, awaited 순서로 채워져 cancel→finally→awaited 흐름이 보여야 합니다.
+assessment:
+  masteryVariants:
+  - id: 33_async_coroutines-gather-plan-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - coroutine-basics
+    - gather-parallel
+    - task-cancel
+    title: async gather로 요청 결과를 입력 순서대로 모으기
+    subtitle: asyncio gather contract
+    goal: run_async_fetch_plan(names)를 완성해 각 이름을 비동기 함수로 처리하고 gather의 입력 순서 보존 결과를 반환한다.
+    why: async 학습의 핵심은 빠른 척하는 예제가 아니라, await 지점과 결과 순서, task 수를 정확히 이해하는 것입니다.
+    explanation: 각 이름은 fetch 코루틴에서 await asyncio.sleep(0)을 거친 뒤 done:name으로 바뀝니다. gather 결과는 완료 순서가 아니라 입력 순서입니다.
+    tips:
+    - asyncio.run은 동기 함수 밖에서 코루틴을 실행하는 작은 진입점입니다.
+    - sleep(0)은 실제 지연 없이 이벤트 루프에 제어를 넘깁니다.
+    exercise:
+      prompt: run_async_fetch_plan(names)를 완성해 results와 taskCount를 반환하세요.
+      starterCode: |-
+        def run_async_fetch_plan(names):
+            raise NotImplementedError
+      solution: |-
+        def run_async_fetch_plan(names):
+            import asyncio
+
+            async def fetch(name):
+                await asyncio.sleep(0)
+                return f"done:{name}"
+
+            async def main():
+                results = await asyncio.gather(*(fetch(name) for name in names))
+                return {"results": list(results), "taskCount": len(results)}
+
+            return asyncio.run(main())
+      hints:
+      - gather는 여러 awaitable을 한 번에 기다립니다.
+      - 반환 리스트가 names 입력 순서와 같은지 확인하세요.
+    check:
+      id: python.advanced.async-coroutines.gather-plan.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.async-coroutines.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: run_async_fetch_plan
+        cases:
+        - id: returns-gather-results-in-input-order
+          arguments:
+          - value:
+            - a
+            - b
+            - c
+          expectedReturn:
+            results:
+            - done:a
+            - done:b
+            - done:c
+            taskCount: 3
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 33_async_coroutines-queue-worker-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - async-with-for
+    - queue-producer-consumer
+    - task-cancel
+    title: asyncio.Queue로 생산자와 소비자 흐름 시뮬레이션하기
+    subtitle: async queue transfer
+    goal: run_async_queue_flow(items)를 완성해 queue에 넣은 항목을 worker가 순서대로 처리한 결과를 반환한다.
+    why: gather에서 배운 await 흐름을 queue 생산자·소비자로 옮기면, 비동기 작업이 단순 병렬 호출뿐 아니라 흐름 제어에도 쓰인다는 점을 확인합니다.
+    explanation: producer는 items를 queue에 넣고 마지막에 None sentinel을 넣습니다. worker는 sentinel 전까지 processed:item을 기록하세요.
+    tips:
+    - sentinel은 종료 신호로 쓰이며 실제 데이터와 구분되어야 합니다.
+    - queue.get은 await해야 하므로 worker는 async 함수여야 합니다.
+    exercise:
+      prompt: run_async_queue_flow(items)를 완성해 processed와 count를 반환하세요.
+      starterCode: |-
+        def run_async_queue_flow(items):
+            raise NotImplementedError
+      solution: |-
+        def run_async_queue_flow(items):
+            import asyncio
+
+            async def main():
+                queue = asyncio.Queue()
+                processed = []
+
+                async def producer():
+                    for item in items:
+                        await queue.put(item)
+                    await queue.put(None)
+
+                async def worker():
+                    while True:
+                        item = await queue.get()
+                        if item is None:
+                            break
+                        processed.append(f"processed:{item}")
+
+                await asyncio.gather(producer(), worker())
+                return {"processed": processed, "count": len(processed)}
+
+            return asyncio.run(main())
+      hints:
+      - producer와 worker를 gather로 같이 실행하세요.
+      - worker는 None을 받으면 break해야 합니다.
+    check:
+      id: python.advanced.async-coroutines.queue-worker.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.async-coroutines.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: run_async_queue_flow
+        cases:
+        - id: processes-queue-items-before-sentinel
+          arguments:
+          - value:
+            - O-1
+            - O-2
+          expectedReturn:
+            processed:
+            - processed:O-1
+            - processed:O-2
+            count: 2
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 33_async_coroutines-tool-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 33_async_coroutines-queue-worker-transfer
+    title: async 도구 선택 기준 회상하기
+    subtitle: async tool recall
+    goal: choose_async_tool(need)를 완성해 비동기 상황별 도구와 주의점을 반환한다.
+    why: async 코드는 잘못 쓰면 더 복잡해집니다. await, gather, async with, Queue, cancel이 해결하는 문제가 서로 다르다는 판단이 핵심입니다.
+    explanation: single-await, fanout-results, async-resource, producer-consumer, stop-background-task 상황별 도구를 선택하세요.
+    tips:
+    - gather는 여러 awaitable을 함께 기다리되 결과 순서는 입력 순서입니다.
+    - cancel 뒤에는 task를 await해 cleanup이 끝났는지 확인해야 합니다.
+    exercise:
+      prompt: choose_async_tool(need)를 완성해 tool, useWhen, caution을 반환하세요.
+      starterCode: |-
+        def choose_async_tool(need):
+            raise NotImplementedError
+      solution: |-
+        def choose_async_tool(need):
+            table = {
+                "single-await": {
+                    "tool": "await",
+                    "useWhen": "one coroutine result is needed before continuing",
+                    "caution": "await only inside async functions",
+                },
+                "fanout-results": {
+                    "tool": "asyncio.gather",
+                    "useWhen": "several independent awaitables should complete together",
+                    "caution": "result order follows input order",
+                },
+                "async-resource": {
+                    "tool": "async with",
+                    "useWhen": "setup or teardown needs await",
+                    "caution": "cleanup must still run on exceptions",
+                },
+                "producer-consumer": {
+                    "tool": "asyncio.Queue",
+                    "useWhen": "producers and workers need flow control",
+                    "caution": "define a clear shutdown signal",
+                },
+                "stop-background-task": {
+                    "tool": "Task.cancel",
+                    "useWhen": "a scheduled task must be stopped safely",
+                    "caution": "await the task after cancelling",
+                },
+            }
+            if need not in table:
+                raise ValueError("unknown async need")
+            return table[need]
+      hints:
+      - 비동기 도구는 실행 순서와 정리 책임을 기준으로 고르세요.
+      - 백그라운드 task는 취소 뒤 확인 await까지가 한 세트입니다.
+    check:
+      id: python.advanced.async-coroutines.tool-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.async-coroutines.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_async_tool
+        cases:
+        - id: recalls-gather-result-order
+          arguments:
+          - value: fanout-results
+          expectedReturn:
+            tool: asyncio.gather
+            useWhen: several independent awaitables should complete together
+            caution: result order follows input order
+        - id: recalls-cancel-await-pair
+          arguments:
+          - value: stop-background-task
+          expectedReturn:
+            tool: Task.cancel
+            useWhen: a scheduled task must be stopped safely
+            caution: await the task after cancelling
+        - id: rejects-unknown-need
+          arguments:
+          - value: async-everything
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

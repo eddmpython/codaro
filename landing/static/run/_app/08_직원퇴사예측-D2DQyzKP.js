@@ -1,0 +1,870 @@
+var e=`meta:\r
+  packages:\r
+  - altair\r
+  - matplotlib\r
+  - numpy\r
+  - pandas\r
+  - plotly\r
+  - scikit-learn\r
+  - scipy\r
+  - seaborn\r
+  - statsmodels\r
+  id: statsmodels_08\r
+  title: 직원퇴사예측\r
+  order: 8\r
+  category: statsmodels\r
+  difficulty: ⭐⭐⭐⭐\r
+  badge: 중급\r
+  dataSource: codaro-local:hr_attrition\r
+  tags:\r
+  - 가설검정\r
+  - t-test\r
+  - ANOVA\r
+  - 직원이탈\r
+  - HR분석\r
+  - 로지스틱회귀\r
+  seo:\r
+    title: statsmodels 가설 검정 - 직원 퇴사 예측과 HR 분석\r
+    description: t-test, ANOVA로 퇴사 요인을 분석합니다. 가설 검정과 로지스틱 회귀로 HR 데이터를 분석합니다.\r
+    keywords:\r
+    - statsmodels\r
+    - 가설검정\r
+    - t-test\r
+    - ANOVA\r
+    - 직원이탈\r
+    - HR분석\r
+    - 퇴사예측\r
+intro:\r
+  emoji: 👔\r
+  goal: 가설 검정으로 퇴사 요인을 분석하고 퇴사 확률을 예측합니다\r
+  description: IBM HR Analytics 데이터로 어떤 요인이 직원 퇴사에 영향을 미치는지 통계적으로 검증합니다. t-test, ANOVA로 그룹 간 차이를 검정하고,\r
+    로지스틱 회귀로 퇴사 확률을 예측합니다.\r
+  direction: 직원퇴사예측에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.\r
+  benefits:\r
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.\r
+  - 직원퇴사예측 결과를 출력과 상태 기준으로 즉시 점검합니다.\r
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.\r
+  diagram:\r
+    steps:\r
+    - label: 1단계. 데이터 불러오기 입력 확인\r
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.\r
+    - label: 2단계. 데이터 탐색 처리 실행\r
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.\r
+    - label: 3단계. 퇴사율 확인 결과 검증\r
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.\r
+    - label: 직원퇴사예측 재사용\r
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.\r
+    runtime:\r
+    - label: 업무 코드 환경\r
+      detail: altair, matplotlib, numpy, pandas 기준으로 로컬 Python 실행을 준비합니다.\r
+    - label: 직원퇴사예측 실행\r
+      detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.\r
+    - label: 직원퇴사예측 완료\r
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.\r
+sections:\r
+- id: step1_load\r
+  title: 1단계. 데이터 불러오기\r
+  structuredPrimary: true\r
+  subtitle: IBM HR Analytics 데이터\r
+  goal: 1단계. 데이터 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: IBM HR Analytics 데이터셋은 1,470명 직원의 35개 특성과 퇴사 여부(Attrition)를 담고 있습니다. 나이, 급여, 근속연수, 만족도,\r
+    출장빈도, 초과근무 여부 등 HR 분석에 필요한 풍부한 변수가 포함됩니다. 이 데이터로 어떤 요인이 퇴사에 영향을 미치는지 분석하면, 기업은 핵심 인재 유지 전략을 수립하고 채용\r
+    비용을 절감할 수 있습니다. 평균 채용 비용이 연봉의 30-50%에 달하므로 퇴사 예방은 큰 비용 절감 효과가 있습니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    import pandas as pd\r
+    import numpy as np\r
+    import statsmodels.api as sm\r
+    from scipy import stats\r
+    import plotly.express as px\r
+    import plotly.graph_objects as go\r
+    from codaro.curriculum.localData import loadLocalDataset\r
+\r
+    hrData = loadLocalDataset("hr_attrition")\r
+    hrData.shape\r
+  exercise:\r
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      import pandas as pd\r
+      import numpy as np\r
+      import statsmodels.api as sm\r
+      from scipy import stats\r
+      import plotly.express as px\r
+      import plotly.graph_objects as go\r
+      from codaro.curriculum.localData import loadLocalDataset\r
+\r
+      hrData = loadLocalDataset("hr_attrition")\r
+      hrData.shape\r
+    hints:\r
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.\r
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.\r
+    resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.\r
+- id: step2_explore\r
+  title: 2단계. 데이터 탐색\r
+  structuredPrimary: true\r
+  subtitle: 컬럼 구조 확인\r
+  goal: 2단계. 데이터 탐색에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.\r
+  explanation: Age(나이), MonthlyIncome(월급), YearsAtCompany(근속연수), JobSatisfaction(직무만족도), Attrition(퇴사여부)\r
+    등 35개 컬럼을 확인합니다. HR 데이터는 수치형(나이, 급여)과 범주형(부서, 직급)이 섞여 있어 각각 다른 분석 방법이 필요합니다. 컬럼명이 영어로 되어 있지만 직관적인\r
+    이름이라 의미를 파악하기 쉽습니다. 데이터 탐색 단계에서 각 변수의 타입과 의미를 정확히 파악하는 것이 분석의 기초입니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: hrData.columns.tolist()\r
+  exercise:\r
+    prompt: 2단계. 데이터 탐색 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.\r
+    starterCode: hrData.columns.tolist()\r
+    hints:\r
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.\r
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 2단계. 데이터 탐색의 수정 코드가 핵심 처리 단계의 마지막 확인 값까지 도달해야 합니다.\r
+    resultCheck: 2단계. 데이터 탐색 실행 결과가 출력과 상태 기준으로 바꾼 입력값을 반영해야 합니다.\r
+- id: step3_attrition_rate\r
+  title: 3단계. 퇴사율 확인\r
+  structuredPrimary: true\r
+  subtitle: 전체 퇴사 비율\r
+  goal: 3단계. 퇴사율 확인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: |-\r
+    전체 직원 중 몇 퍼센트가 퇴사했는지 확인합니다. 퇴사율은 HR의 핵심 지표로, 산업 평균과 비교하여 우리 회사의 인재 관리 수준을 판단할 수 있습니다. 일반적으로 15% 이상이면 높은 편입니다. Attrition이 Yes/No 문자열이므로 통계 분석을 위해 0/1 숫자로 변환합니다. 이런 이진 변환은 로지스틱 회귀와 t-test 수행에 필수적인 전처리 단계입니다.\r
+\r
+    mean()으로 0/1 변수의 평균을 구하면 1의 비율, 즉 퇴사율이 됩니다. 05 프로젝트에서 배운 이탈률 계산과 동일한 원리입니다.\r
+  snippet: |-\r
+    hrData['AttritionBinary'] = (hrData['Attrition'] == 'Yes').astype(int)\r
+    attritionRate = hrData['AttritionBinary'].mean()\r
+    f"퇴사율: {attritionRate:.1%}"\r
+  exercise:\r
+    prompt: 3단계. 퇴사율 확인 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      hrData['AttritionBinary'] = (hrData['Attrition'] == 'Yes').astype(int)\r
+      attritionRate = hrData['AttritionBinary'].mean()\r
+      f"퇴사율: {attritionRate:.1%}"\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 3단계. 퇴사율 확인에서 \`attritionRate\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 3단계. 퇴사율 확인 실행 뒤 \`attritionRate\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.\r
+- id: step4_hypothesis_intro\r
+  title: 4단계. 가설 검정 소개\r
+  structuredPrimary: true\r
+  subtitle: 통계적 유의성 판단\r
+  goal: 4단계. 가설 검정 소개에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: |-\r
+    가설 검정은 두 그룹 간 차이가 우연인지 실제인지 통계적으로 판단하는 방법입니다. 예를 들어 퇴사자 평균 급여가 재직자보다 낮다면, 이 차이가 표본의 우연한 변동인지 실제 모집단에서도 존재하는 차이인지 검정합니다. p-value가 0.05 미만이면 '우연일 확률이 5% 미만'이므로 차이가 유의미하다고 결론짓습니다. 가설 검정은 HR 의사결정에 통계적 근거를 제공합니다.\r
+\r
+    불리언 인덱싱으로 조건에 맞는 행만 선택합니다. hrData[조건]은 조건이 True인 행만 반환합니다. 01-07 프로젝트에서 배운 데이터 필터링 기법입니다.\r
+  snippet: |-\r
+    attritionYes = hrData[hrData['AttritionBinary'] == 1]\r
+    attritionNo = hrData[hrData['AttritionBinary'] == 0]\r
+    f"퇴사자: {len(attritionYes)}명, 재직자: {len(attritionNo)}명"\r
+  exercise:\r
+    prompt: 4단계. 가설 검정 소개 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      attritionYes = hrData[hrData['AttritionBinary'] == 1]\r
+      attritionNo = hrData[hrData['AttritionBinary'] == 0]\r
+      f"퇴사자: {len(attritionYes)}명, 재직자: {len(attritionNo)}명"\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 4단계. 가설 검정 소개에서 \`attritionYes\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 4단계. 가설 검정 소개 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.\r
+- id: step5_ttest_income\r
+  title: 5단계. t-test 급여 비교\r
+  structuredPrimary: true\r
+  subtitle: 퇴사자 vs 재직자 급여\r
+  goal: 5단계. ttest 급여 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: |-\r
+    독립표본 t-test로 퇴사자와 재직자의 평균 급여를 비교합니다. t-test의 귀무가설(H0)은 '두 그룹의 평균이 같다'입니다. 검정 결과 p-value가 0.05 미만이면 귀무가설을 기각하고, '급여 차이가 통계적으로 유의미하다'고 결론짓습니다. 급여가 낮은 직원이 더 많이 퇴사한다면, 급여 인상이나 복지 개선이 퇴사 방지 전략이 될 수 있습니다.\r
+\r
+    stats.ttest_ind()는 독립표본 t-test를 수행합니다. ind는 independent(독립)의 약자입니다. 두 그룹이 서로 독립적일 때 사용합니다. 동일한 사람의 전후 비교는 paired t-test(ttest_rel)를 사용합니다.\r
+  tips:\r
+  - stats.ttest_ind()는 독립표본 t-test를 수행합니다. ind는 independent(독립)의 약자입니다. 두 그룹이 서로 독립적일 때 사용합니다. 동일한 사람의\r
+    전후 비교는 paired t-test(ttest_rel)를 사용합니다.\r
+  snippet: |-\r
+    incomeYes = attritionYes['MonthlyIncome']\r
+    incomeNo = attritionNo['MonthlyIncome']\r
+\r
+    tStatIncome, pValueIncome = stats.ttest_ind(incomeYes, incomeNo)\r
+    f"t-statistic: {tStatIncome:.3f}, p-value: {pValueIncome:.4f}"\r
+  exercise:\r
+    prompt: 5단계. ttest 급여 비교 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      incomeYes = attritionYes['MonthlyIncome']\r
+      incomeNo = attritionNo['MonthlyIncome']\r
+\r
+      tStatIncome, pValueIncome = stats.ttest_ind(incomeYes, incomeNo)\r
+      f"t-statistic: {tStatIncome:.3f}, p-value: {pValueIncome:.4f}"\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 5단계. ttest 급여 비교에서 \`incomeYes\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 5단계. ttest 급여 비교 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.\r
+- id: step6_ttest_interpret\r
+  title: 6단계. t-test 결과 해석\r
+  structuredPrimary: true\r
+  subtitle: 급여 차이 확인\r
+  goal: 6단계. ttest 결과 해석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: |-\r
+    p-value와 함께 실제 평균 차이도 확인해야 합니다. 표본이 크면 작은 차이도 통계적으로 유의미하게 나올 수 있지만, 실제 비즈니스 의미가 없을 수 있습니다. 예를 들어 퇴사자가 재직자보다 월급이 1만원 낮고 p-value가 0.01이어도, 이 차이로 퇴사를 설명하기는 어렵습니다. 통계적 유의성(p-value)과 실질적 유의성(효과 크기)을 함께 고려해야 의미 있는 결론을 얻습니다.\r
+\r
+    퇴사자의 평균 급여가 재직자보다 낮다면, 급여 불만족이 퇴사 요인일 수 있습니다. 하지만 상관관계가 인과관계를 의미하지는 않습니다.\r
+  snippet: |-\r
+    meanIncomeYes = incomeYes.mean()\r
+    meanIncomeNo = incomeNo.mean()\r
+\r
+    incomeDf = pd.DataFrame({\r
+        '그룹': ['퇴사자', '재직자'],\r
+        '평균급여': [meanIncomeYes, meanIncomeNo],\r
+        '인원수': [len(incomeYes), len(incomeNo)]\r
+    })\r
+    incomeDf\r
+  exercise:\r
+    prompt: 6단계. ttest 결과 해석 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      meanIncomeYes = incomeYes.mean()\r
+      meanIncomeNo = incomeNo.mean()\r
+\r
+      incomeDf = pd.DataFrame({\r
+          '그룹': ['퇴사자', '재직자'],\r
+          '평균급여': [meanIncomeYes, meanIncomeNo],\r
+          '인원수': [len(incomeYes), len(incomeNo)]\r
+      })\r
+      incomeDf\r
+    hints:\r
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.\r
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 6단계. ttest 결과 해석의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.\r
+    resultCheck: 6단계. ttest 결과 해석의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.\r
+- id: step7_ttest_age\r
+  title: 7단계. t-test 나이 비교\r
+  structuredPrimary: true\r
+  subtitle: 연령대별 퇴사 패턴\r
+  goal: 7단계. ttest 나이 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: 퇴사자와 재직자의 평균 나이를 비교합니다. 일반적으로 젊은 직원은 경력 개발, 더 좋은 기회 탐색 등의 이유로 이직률이 높습니다. 반면 경력이 쌓인 직원은\r
+    안정성을 선호하여 퇴사율이 낮을 수 있습니다. t-test 결과가 유의미하다면 연령대별 맞춤 인재 관리 전략이 필요합니다. 예를 들어 젊은 직원에게는 성장 기회를, 경력 직원에게는\r
+    안정성을 강조하는 접근이 효과적일 수 있습니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    ageYes = attritionYes['Age']\r
+    ageNo = attritionNo['Age']\r
+\r
+    tStatAge, pValueAge = stats.ttest_ind(ageYes, ageNo)\r
+\r
+    ageDf = pd.DataFrame({\r
+        '그룹': ['퇴사자', '재직자'],\r
+        '평균나이': [ageYes.mean(), ageNo.mean()],\r
+        't-stat': [tStatAge, '-'],\r
+        'p-value': [f"{pValueAge:.4f}", '-']\r
+    })\r
+    ageDf\r
+  exercise:\r
+    prompt: 7단계. ttest 나이 비교 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      ageYes = attritionYes['Age']\r
+      ageNo = attritionNo['Age']\r
+\r
+      tStatAge, pValueAge = stats.ttest_ind(ageYes, ageNo)\r
+\r
+      ageDf = pd.DataFrame({\r
+          '그룹': ['퇴사자', '재직자'],\r
+          '평균나이': [ageYes.mean(), ageNo.mean()],\r
+          't-stat': [tStatAge, '-'],\r
+          'p-value': [f"{pValueAge:.4f}", '-']\r
+      })\r
+      ageDf\r
+    hints:\r
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.\r
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 7단계. ttest 나이 비교의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.\r
+    resultCheck: 7단계. ttest 나이 비교의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.\r
+- id: step8_ttest_years\r
+  title: 8단계. t-test 근속연수 비교\r
+  structuredPrimary: true\r
+  subtitle: 재직 기간 분석\r
+  goal: 8단계. ttest 근속연수 비교에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: 근속연수(YearsAtCompany)가 퇴사에 영향을 미치는지 검정합니다. 신입 직원은 조직 적응 실패, 기대와 현실의 괴리 등으로 퇴사율이 높은 경향이 있습니다.\r
+    반면 장기 근속자는 회사에 대한 충성도가 높고 퇴직금 등의 이유로 퇴사를 꺼릴 수 있습니다. 근속연수와 퇴사의 관계를 파악하면 온보딩 프로그램 강화, 신입 멘토링 제도 등 적절한\r
+    시기에 개입하는 전략을 수립할 수 있습니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    yearsYes = attritionYes['YearsAtCompany']\r
+    yearsNo = attritionNo['YearsAtCompany']\r
+\r
+    tStatYears, pValueYears = stats.ttest_ind(yearsYes, yearsNo)\r
+\r
+    yearsDf = pd.DataFrame({\r
+        '그룹': ['퇴사자', '재직자'],\r
+        '평균근속연수': [yearsYes.mean(), yearsNo.mean()],\r
+        't-stat': [tStatYears, '-'],\r
+        'p-value': [f"{pValueYears:.4f}", '-']\r
+    })\r
+    yearsDf\r
+  exercise:\r
+    prompt: 8단계. ttest 근속연수 비교 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      yearsYes = attritionYes['YearsAtCompany']\r
+      yearsNo = attritionNo['YearsAtCompany']\r
+\r
+      tStatYears, pValueYears = stats.ttest_ind(yearsYes, yearsNo)\r
+\r
+      yearsDf = pd.DataFrame({\r
+          '그룹': ['퇴사자', '재직자'],\r
+          '평균근속연수': [yearsYes.mean(), yearsNo.mean()],\r
+          't-stat': [tStatYears, '-'],\r
+          'p-value': [f"{pValueYears:.4f}", '-']\r
+      })\r
+      yearsDf\r
+    hints:\r
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.\r
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 8단계. ttest 근속연수 비교의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.\r
+    resultCheck: 8단계. ttest 근속연수 비교의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.\r
+- id: step9_multiple_ttest\r
+  title: 9단계. 여러 변수 t-test\r
+  structuredPrimary: true\r
+  subtitle: 종합 비교\r
+  goal: 9단계. 여러 변수 ttest에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: |-\r
+    여러 수치형 변수에 대해 한번에 t-test를 수행하여 퇴사와 가장 관련 있는 요인을 찾습니다. 나이, 급여, 근속연수, 총 경력, 출퇴근 거리, 이전 직장 수, 워라밸 점수 등을 비교합니다. p-value로 정렬하면 퇴사자와 재직자 간 차이가 가장 큰 변수가 무엇인지 한눈에 파악할 수 있습니다. 이는 로지스틱 회귀 모델에 어떤 변수를 넣을지 결정하는 근거가 됩니다.\r
+\r
+    p-value가 낮은 순서로 정렬하면 퇴사와 가장 관련 있는 변수를 찾을 수 있습니다. Significant가 Yes인 변수는 퇴사자와 재직자 간 차이가 통계적으로 유의미합니다.\r
+  snippet: |-\r
+    numericVars = ['Age', 'MonthlyIncome', 'YearsAtCompany', 'TotalWorkingYears',\r
+                   'DistanceFromHome', 'NumCompaniesWorked', 'WorkLifeBalance']\r
+\r
+    ttestResults = []\r
+    for var in numericVars:\r
+        yesVals = attritionYes[var].dropna()\r
+        noVals = attritionNo[var].dropna()\r
+        tStat, pVal = stats.ttest_ind(yesVals, noVals)\r
+        ttestResults.append({\r
+            'Variable': var,\r
+            'Mean_Yes': yesVals.mean(),\r
+            'Mean_No': noVals.mean(),\r
+            'Difference': yesVals.mean() - noVals.mean(),\r
+            'p-value': pVal,\r
+            'Significant': 'Yes' if pVal < 0.05 else 'No'\r
+        })\r
+\r
+    ttestDf = pd.DataFrame(ttestResults).sort_values('p-value')\r
+    ttestDf\r
+  exercise:\r
+    prompt: 9단계. 여러 변수 ttest 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      numericVars = ['Age', 'MonthlyIncome', 'YearsAtCompany', 'TotalWorkingYears',\r
+                     'DistanceFromHome', 'NumCompaniesWorked', 'WorkLifeBalance']\r
+\r
+      ttestResults = []\r
+      for var in numericVars:\r
+          yesVals = attritionYes[var].dropna()\r
+          noVals = attritionNo[var].dropna()\r
+          tStat, pVal = stats.ttest_ind(yesVals, noVals)\r
+          ttestResults.append({\r
+              'Variable': var,\r
+              'Mean_Yes': yesVals.mean(),\r
+              'Mean_No': noVals.mean(),\r
+              'Difference': yesVals.mean() - noVals.mean(),\r
+              'p-value': pVal,\r
+              'Significant': 'Yes' if pVal < 0.05 else 'No'\r
+          })\r
+\r
+      ttestDf = pd.DataFrame(ttestResults).sort_values('p-value')\r
+      ttestDf\r
+    hints:\r
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.\r
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 9단계. 여러 변수 ttest의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.\r
+    resultCheck: 9단계. 여러 변수 ttest 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.\r
+- id: step10_ttest_viz\r
+  title: 10단계. t-test 결과 시각화\r
+  structuredPrimary: true\r
+  subtitle: 변수별 차이 비교\r
+  goal: 10단계. ttest 결과 시각화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.\r
+  explanation: |-\r
+    여러 변수의 t-test 결과를 막대 그래프로 시각화하면 어떤 요인이 퇴사에 가장 큰 영향을 미치는지 직관적으로 파악할 수 있습니다. 유의미한 변수(p < 0.05)와 그렇지 않은 변수를 색상으로 구분합니다.\r
+\r
+    빨간색은 통계적으로 유의미한 차이(p < 0.05), 회색은 유의미하지 않은 차이입니다. 막대가 길수록 퇴사자와 재직자 간 차이가 큽니다.\r
+  snippet: |-\r
+    import altair as alt\r
+\r
+    ttestViz = alt.Chart(ttestDf).mark_bar().encode(\r
+        x=alt.X('Variable:N', sort='-y', title='Variable'),\r
+        y=alt.Y('Difference:Q', title='Mean Difference (Yes - No)'),\r
+        color=alt.Color('Significant:N', scale=alt.Scale(domain=['Yes', 'No'], range=['#e74c3c', '#95a5a6'])),\r
+        tooltip=['Variable', 'Mean_Yes', 'Mean_No', 'Difference', 'p-value']\r
+    ).properties(width=500, height=300, title='Mean Difference by Variable (Attrition Yes vs No)')\r
+    ttestViz\r
+  exercise:\r
+    prompt: 10단계. ttest 결과 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      import altair as alt\r
+\r
+      ttestViz = alt.Chart(ttestDf).mark_bar().encode(\r
+          x=alt.X('Variable:N', sort='-y', title='Variable'),\r
+          y=alt.Y('Difference:Q', title='Mean Difference (Yes - No)'),\r
+          color=alt.Color('Significant:N', scale=alt.Scale(domain=['Yes', 'No'], range=['#e74c3c', '#95a5a6'])),\r
+          tooltip=['Variable', 'Mean_Yes', 'Mean_No', 'Difference', 'p-value']\r
+      ).properties(width=500, height=300, title='Mean Difference by Variable (Attrition Yes vs No)')\r
+      ttestViz\r
+    hints:\r
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.\r
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.\r
+  check:\r
+    noError: 10단계. ttest 결과 시각화의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.\r
+    resultCheck: 10단계. ttest 결과 시각화의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.\r
+- id: step11_anova_intro\r
+  title: 11단계. ANOVA 소개\r
+  structuredPrimary: true\r
+  subtitle: 3개 이상 그룹 비교\r
+  goal: 11단계. ANOVA 소개에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: |-\r
+    t-test는 2개 그룹만 비교할 수 있습니다. 3개 이상 그룹을 비교하려면 ANOVA(Analysis of Variance, 분산분석)를 사용합니다. 직무만족도는 1(매우 낮음)에서 4(매우 높음)까지 4단계로 측정되므로 ANOVA가 적합합니다. ANOVA는 '모든 그룹의 평균이 같다'는 귀무가설을 검정하며, p-value가 0.05 미만이면 최소 한 그룹은 다른 그룹과 유의미하게 다르다고 결론짓습니다.\r
+\r
+    JobSatisfaction은 1(낮음)에서 4(높음)까지 4단계입니다. groupby().agg()로 각 그룹의 통계량을 계산합니다. 02 프로젝트에서 배운 집계 함수 활용입니다.\r
+  snippet: |-\r
+    satisfactionGroups = hrData.groupby('JobSatisfaction')['AttritionBinary'].agg(['mean', 'count'])\r
+    satisfactionGroups.columns = ['퇴사율', '인원수']\r
+    satisfactionGroups\r
+  exercise:\r
+    prompt: 11단계. ANOVA 소개 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      satisfactionGroups = hrData.groupby('JobSatisfaction')['AttritionBinary'].agg(['mean', 'count'])\r
+      satisfactionGroups.columns = ['퇴사율', '인원수']\r
+      satisfactionGroups\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 11단계. ANOVA 소개에서 \`satisfactionGroups\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 11단계. ANOVA 소개 실행 뒤 \`satisfactionGroups\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.\r
+- id: step12_anova_test\r
+  title: 12단계. ANOVA 검정\r
+  structuredPrimary: true\r
+  subtitle: 만족도별 퇴사율 차이\r
+  goal: 12단계. ANOVA 검정에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: |-\r
+    One-way ANOVA로 직무만족도 4개 그룹 간 퇴사율 차이를 검정합니다. F-statistic은 그룹 간 분산을 그룹 내 분산으로 나눈 값으로, 클수록 그룹 간 차이가 뚜렷합니다. 만족도 1인 그룹의 퇴사율이 만족도 4인 그룹보다 높다면, 직무 만족도 개선이 퇴사 방지에 효과적이라는 통계적 근거가 됩니다. ANOVA 결과가 유의미하면 어떤 그룹 간에 차이가 있는지 사후검정으로 추가 분석할 수 있습니다.\r
+\r
+    stats.f_oneway()는 One-way ANOVA를 수행합니다. F-statistic은 그룹 간 분산과 그룹 내 분산의 비율입니다. F값이 클수록 그룹 간 차이가 큽니다.\r
+  snippet: |-\r
+    group1 = hrData[hrData['JobSatisfaction'] == 1]['AttritionBinary']\r
+    group2 = hrData[hrData['JobSatisfaction'] == 2]['AttritionBinary']\r
+    group3 = hrData[hrData['JobSatisfaction'] == 3]['AttritionBinary']\r
+    group4 = hrData[hrData['JobSatisfaction'] == 4]['AttritionBinary']\r
+\r
+    fStat, pValueAnova = stats.f_oneway(group1, group2, group3, group4)\r
+    f"F-statistic: {fStat:.3f}, p-value: {pValueAnova:.4f}"\r
+  exercise:\r
+    prompt: 12단계. ANOVA 검정 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      group1 = hrData[hrData['JobSatisfaction'] == 1]['AttritionBinary']\r
+      group2 = hrData[hrData['JobSatisfaction'] == 2]['AttritionBinary']\r
+      group3 = hrData[hrData['JobSatisfaction'] == 3]['AttritionBinary']\r
+      group4 = hrData[hrData['JobSatisfaction'] == 4]['AttritionBinary']\r
+\r
+      fStat, pValueAnova = stats.f_oneway(group1, group2, group3, group4)\r
+      f"F-statistic: {fStat:.3f}, p-value: {pValueAnova:.4f}"\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 12단계. ANOVA 검정에서 \`group1\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 12단계. ANOVA 검정 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.\r
+- id: step13_anova_boxplot\r
+  title: 13단계. ANOVA Boxplot 시각화\r
+  structuredPrimary: true\r
+  subtitle: 만족도별 급여 분포\r
+  goal: 13단계. ANOVA Boxplot 시각화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.\r
+  explanation: |-\r
+    Boxplot은 ANOVA 분석에 적합한 시각화로, 각 그룹의 중앙값, 사분위수, 이상치를 한눈에 보여줍니다. 직무만족도별 급여 분포를 비교하면 어떤 그룹이 급여가 낮은지 파악할 수 있습니다.\r
+\r
+    녹색은 재직자, 빨간색은 퇴사자입니다. 박스 안의 선은 중앙값, 박스 상하는 25%-75% 범위입니다. 퇴사자의 급여가 전반적으로 낮다면 급여 불만족이 퇴사 원인일 수 있습니다.\r
+  snippet: |-\r
+    import seaborn as sns\r
+    import matplotlib.pyplot as plt\r
+\r
+    boxFig, boxAx = plt.subplots(figsize=(8, 5))\r
+    sns.boxplot(data=hrData, x='JobSatisfaction', y='MonthlyIncome', hue='Attrition', ax=boxAx, palette=['#2ecc71', '#e74c3c'])\r
+    boxAx.set_xlabel('Job Satisfaction (1=Low, 4=High)')\r
+    boxAx.set_ylabel('Monthly Income')\r
+    boxAx.set_title('Monthly Income by Job Satisfaction and Attrition')\r
+    boxFig\r
+  exercise:\r
+    prompt: 13단계. ANOVA Boxplot 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      import seaborn as sns\r
+      import matplotlib.pyplot as plt\r
+\r
+      boxFig, boxAx = plt.subplots(figsize=(8, 5))\r
+      sns.boxplot(data=hrData, x='JobSatisfaction', y='MonthlyIncome', hue='Attrition', ax=boxAx, palette=['#2ecc71', '#e74c3c'])\r
+      boxAx.set_xlabel('Job Satisfaction (1=Low, 4=High)')\r
+      boxAx.set_ylabel('Monthly Income')\r
+      boxAx.set_title('Monthly Income by Job Satisfaction and Attrition')\r
+      boxFig\r
+    hints:\r
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.\r
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 13단계. ANOVA Boxplot 시각화의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.\r
+    resultCheck: 13단계. ANOVA Boxplot 시각화 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.\r
+- id: step14_anova_viz\r
+  title: 14단계. ANOVA 시각화\r
+  structuredPrimary: true\r
+  subtitle: 만족도별 퇴사율 비교\r
+  goal: 14단계. ANOVA 시각화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.\r
+  explanation: 직무만족도별 퇴사율을 막대그래프로 시각화합니다. 시각화는 통계 검정 결과를 직관적으로 이해하게 해주며, 경영진에게 보고할 때 설득력을 높입니다. 막대 높이가\r
+    일정하지 않고 만족도가 낮을수록 퇴사율이 높은 패턴이 보인다면, 직무 만족도 개선의 필요성을 시각적으로 증명할 수 있습니다. 숫자와 그래프를 함께 제시하면 분석 결과의 신뢰성이\r
+    높아집니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    satisfactionDf = hrData.groupby('JobSatisfaction')['AttritionBinary'].mean().reset_index()\r
+    satisfactionDf.columns = ['JobSatisfaction', 'AttritionRate']\r
+\r
+    satisfactionFig = px.bar(satisfactionDf, x='JobSatisfaction', y='AttritionRate',\r
+                             title='Job Satisfaction vs Attrition Rate',\r
+                             labels={'JobSatisfaction': 'Job Satisfaction (1-4)', 'AttritionRate': 'Attrition Rate'},\r
+                             color='AttritionRate',\r
+                             color_continuous_scale='Reds')\r
+    satisfactionFig.show()\r
+  exercise:\r
+    prompt: 14단계. ANOVA 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      satisfactionDf = hrData.groupby('JobSatisfaction')['AttritionBinary'].mean().reset_index()\r
+      satisfactionDf.columns = ['JobSatisfaction', 'AttritionRate']\r
+\r
+      satisfactionFig = px.bar(satisfactionDf, x='JobSatisfaction', y='AttritionRate',\r
+                               title='Job Satisfaction vs Attrition Rate',\r
+                               labels={'JobSatisfaction': 'Job Satisfaction (1-4)', 'AttritionRate': 'Attrition Rate'},\r
+                               color='AttritionRate',\r
+                               color_continuous_scale='Reds')\r
+      satisfactionFig.show()\r
+    hints:\r
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.\r
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 14단계. ANOVA 시각화의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.\r
+    resultCheck: 14단계. ANOVA 시각화의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.\r
+- id: step15_logit_model\r
+  title: 15단계. 로지스틱 회귀\r
+  structuredPrimary: true\r
+  subtitle: 퇴사 확률 예측\r
+  goal: 15단계. 로지스틱 회귀에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: 로지스틱 회귀로 여러 요인을 동시에 고려하여 퇴사 확률을 예측합니다. t-test는 한 번에 하나의 변수만 분석하지만, 로지스틱 회귀는 나이, 급여, 근속연수\r
+    등 여러 변수의 영향을 동시에 분석합니다. 이렇게 하면 '다른 조건이 같을 때' 각 변수가 퇴사에 미치는 순수한 영향력을 파악할 수 있습니다. 예를 들어 급여가 낮아서 퇴사하는지,\r
+    근속연수가 짧아서 퇴사하는지 구분할 수 있습니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    XLogit = hrData[['Age', 'MonthlyIncome', 'YearsAtCompany', 'DistanceFromHome', 'NumCompaniesWorked']].copy()\r
+    XLogit = sm.add_constant(XLogit)\r
+    yLogit = hrData['AttritionBinary']\r
+\r
+    logitModel = sm.Logit(yLogit, XLogit).fit(disp=0)\r
+    logitModel.summary()\r
+  exercise:\r
+    prompt: 15단계. 로지스틱 회귀 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      XLogit = hrData[['Age', 'MonthlyIncome', 'YearsAtCompany', 'DistanceFromHome', 'NumCompaniesWorked']].copy()\r
+      XLogit = sm.add_constant(XLogit)\r
+      yLogit = hrData['AttritionBinary']\r
+\r
+      logitModel = sm.Logit(yLogit, XLogit).fit(disp=0)\r
+      logitModel.summary()\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 15단계. 로지스틱 회귀에서 \`XLogit\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 15단계. 로지스틱 회귀 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.\r
+- id: step16_odds_ratio\r
+  title: 16단계. 승산비 계산\r
+  structuredPrimary: true\r
+  subtitle: 변수별 영향력\r
+  goal: 16단계. 승산비 계산에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: |-\r
+    승산비(Odds Ratio)로 각 변수의 영향력을 해석합니다. 승산비는 로지스틱 회귀 계수를 exp() 함수로 변환한 값으로, 해당 변수가 1 증가할 때 퇴사 '승산'이 몇 배로 바뀌는지 나타냅니다. 승산비가 1.1이면 10% 증가, 0.9이면 10% 감소입니다. 예를 들어 DistanceFromHome의 승산비가 1.05면 출퇴근 거리가 1km 증가할 때마다 퇴사 승산이 5% 증가한다는 의미입니다.\r
+\r
+    Odds Ratio가 1.1이면 해당 변수가 1 증가할 때 퇴사 확률이 10% 증가합니다. 0.9이면 10% 감소합니다. 05 프로젝트의 승산비 해석과 동일합니다.\r
+  snippet: |-\r
+    oddsRatio = np.exp(logitModel.params)\r
+    pvals = logitModel.pvalues\r
+\r
+    orDf = pd.DataFrame({\r
+        'Variable': oddsRatio.index,\r
+        'Odds Ratio': oddsRatio.values,\r
+        'p-value': pvals.values,\r
+        'Significant': ['Yes' if p < 0.05 else 'No' for p in pvals.values]\r
+    })\r
+    orDf\r
+  exercise:\r
+    prompt: 16단계. 승산비 계산 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      oddsRatio = np.exp(logitModel.params)\r
+      pvals = logitModel.pvalues\r
+\r
+      orDf = pd.DataFrame({\r
+          'Variable': oddsRatio.index,\r
+          'Odds Ratio': oddsRatio.values,\r
+          'p-value': pvals.values,\r
+          'Significant': ['Yes' if p < 0.05 else 'No' for p in pvals.values]\r
+      })\r
+      orDf\r
+    hints:\r
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.\r
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 16단계. 승산비 계산의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.\r
+    resultCheck: 16단계. 승산비 계산 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.\r
+- id: step17_prediction\r
+  title: 17단계. 퇴사 확률 예측\r
+  structuredPrimary: true\r
+  subtitle: 개인별 리스크 점수\r
+  goal: 17단계. 퇴사 확률 예측에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: predict()로 각 직원의 퇴사 확률을 계산합니다. 확률이 30% 이상인 직원을 고위험군으로 분류하면, HR 팀이 선제적으로 면담을 진행하거나 맞춤형 복지를\r
+    제공할 수 있습니다. 모든 직원에게 동일한 자원을 투입하는 것보다, 퇴사 위험이 높은 직원에게 집중 관리하는 것이 비용 대비 효과적입니다. 이런 예측 기반 HR 관리를 People\r
+    Analytics라고 합니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    hrData['AttritionProb'] = logitModel.predict(XLogit)\r
+\r
+    highRisk = hrData[hrData['AttritionProb'] > 0.3][['Age', 'MonthlyIncome', 'YearsAtCompany', 'AttritionProb', 'AttritionBinary']]\r
+    f"고위험군 직원 수: {len(highRisk)}명"\r
+    highRisk.head(10)\r
+  exercise:\r
+    prompt: 17단계. 퇴사 확률 예측 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      hrData['AttritionProb'] = logitModel.predict(XLogit)\r
+\r
+      highRisk = hrData[hrData['AttritionProb'] > 0.3][['Age', 'MonthlyIncome', 'YearsAtCompany', 'AttritionProb', 'AttritionBinary']]\r
+      f"고위험군 직원 수: {len(highRisk)}명"\r
+      highRisk.head(10)\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 17단계. 퇴사 확률 예측에서 \`highRisk\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 17단계. 퇴사 확률 예측 실행 뒤 \`highRisk\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.\r
+- id: step18_roc_auc\r
+  title: 18단계. 모델 평가\r
+  structuredPrimary: true\r
+  subtitle: ROC-AUC 계산\r
+  goal: 18단계. 모델 평가에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.\r
+  explanation: ROC-AUC로 모델 성능을 평가합니다. AUC(Area Under Curve)는 모델이 퇴사자와 재직자를 얼마나 잘 구분하는지 나타내며, 0.5는 무작위\r
+    추측, 1.0은 완벽한 분류입니다. 실무에서는 AUC 0.7 이상이면 사용 가능한 수준으로 봅니다. ROC 곡선이 대각선(무작위 기준선)에서 멀리 위쪽으로 휘어질수록 좋은 모델입니다.\r
+    모델 성능이 낮다면 더 많은 변수를 추가하거나 다른 알고리즘을 시도해볼 수 있습니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    from sklearn.metrics import roc_auc_score, roc_curve\r
+\r
+    aucScore = roc_auc_score(yLogit, hrData['AttritionProb'])\r
+    f"AUC: {aucScore:.3f}"\r
+\r
+    fpr, tpr, thresholds = roc_curve(yLogit, hrData['AttritionProb'])\r
+\r
+    rocFig = go.Figure()\r
+    rocFig.add_trace(go.Scatter(x=fpr, y=tpr, mode='lines', name=f'ROC (AUC={aucScore:.3f})'))\r
+    rocFig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode='lines', name='Random', line=dict(dash='dash')))\r
+    rocFig.update_layout(title='ROC Curve - Attrition Prediction',\r
+                         xaxis_title='False Positive Rate',\r
+                         yaxis_title='True Positive Rate')\r
+    rocFig.show()\r
+  exercise:\r
+    prompt: 18단계. 모델 평가 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      from sklearn.metrics import roc_auc_score, roc_curve\r
+\r
+      aucScore = roc_auc_score(yLogit, hrData['AttritionProb'])\r
+      f"AUC: {aucScore:.3f}"\r
+\r
+      fpr, tpr, thresholds = roc_curve(yLogit, hrData['AttritionProb'])\r
+\r
+      rocFig = go.Figure()\r
+      rocFig.add_trace(go.Scatter(x=fpr, y=tpr, mode='lines', name=f'ROC (AUC={aucScore:.3f})'))\r
+      rocFig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode='lines', name='Random', line=dict(dash='dash')))\r
+      rocFig.update_layout(title='ROC Curve - Attrition Prediction',\r
+                           xaxis_title='False Positive Rate',\r
+                           yaxis_title='True Positive Rate')\r
+      rocFig.show()\r
+    hints:\r
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.\r
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 18단계. 모델 평가의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.\r
+    resultCheck: 18단계. 모델 평가의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.\r
+- id: practice\r
+  title: 실습\r
+  structuredPrimary: true\r
+  subtitle: HR 분석 프로젝트\r
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: |-\r
+    HR 분석가가 되어 직원 퇴사 요인을 분석합니다. 실제 HR 분석에서는 여러 가설을 검정하고, 유의미한 변수를 조합하여 예측 모델을 만듭니다. 각 미션은 데이터 로딩부터 가설 검정, 로지스틱 회귀까지 전체 과정을 독립적으로 수행합니다. 본 프로젝트에서 배운 t-test, ANOVA, 승산비 해석을 실습을 통해 체화해봅니다.\r
+\r
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.\r
+  snippet: |-\r
+    import pandas as pd\r
+    import numpy as np\r
+    import statsmodels.api as sm\r
+    from scipy import stats\r
+    from codaro.curriculum.localData import loadLocalDataset\r
+\r
+    wlbData = loadLocalDataset("hr_attrition")\r
+    wlbData['AttritionBinary'] = (wlbData['Attrition'] == 'Yes').astype(int)\r
+    wlbData.shape\r
+  exercise:\r
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      import pandas as pd\r
+      import numpy as np\r
+      import statsmodels.api as sm\r
+      from scipy import stats\r
+      from codaro.curriculum.localData import loadLocalDataset\r
+\r
+      wlbData = loadLocalDataset("hr_attrition")\r
+      wlbData['AttritionBinary'] = (wlbData['Attrition'] == 'Yes').astype(int)\r
+      wlbData.shape\r
+    hints:\r
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.\r
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.\r
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.\r
+- id: summary\r
+  title: 정리\r
+  subtitle: 여덟 번째 프로젝트 완료!\r
+  blocks:\r
+  - type: text\r
+    content: 이번 프로젝트에서는 IBM HR 데이터로 직원 퇴사 요인을 분석했습니다. t-test로 퇴사자와 재직자의 급여, 나이, 근속연수 차이를 검정하고, ANOVA로\r
+      직무만족도별 퇴사율을 비교했습니다. 로지스틱 회귀로 퇴사 확률을 예측하고, 고위험군 직원을 식별했습니다. 이제 HR 분석, 인재 유지 전략, 채용 계획에 통계적 근거를 제공할\r
+      수 있습니다.\r
+  - type: list\r
+    items:\r
+    - t-test - 두 그룹 평균 비교\r
+    - ANOVA - 3개 이상 그룹 비교\r
+    - p-value가 0.05 미만이면 통계적으로 유의미\r
+    - F-statistic - 그룹 간/내 분산 비율\r
+    - Logit + 승산비 - 퇴사 확률과 영향력\r
+    - ROC-AUC - 분류 모델 성능 평가\r
+  - type: text\r
+    content: 다음 프로젝트에서는 자전거 수요 데이터로 ARIMA 시계열 분석을 배웁니다. ACF, PACF로 파라미터를 선택하고 미래 수요를 예측해봅니다.\r
+  goal: 정리에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.\r
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.\r
+- id: workflow_validation\r
+  title: 업무 흐름 검증\r
+  structuredPrimary: true\r
+  subtitle: 회귀 리포트 품질 게이트\r
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.\r
+  explanation: statsmodels 학습의 핵심은 모델을 만들고 summary를 보는 데서 끝나지 않는 것입니다. 먼저 어떤 변수가 유의할지 예측하고, 로컬 데이터의 컬럼과\r
+    결측치를 검증하고, 회귀 결과가 보고서에 들어갈 수준인지 R², F-test, 잔차 진단으로 확인해야 합니다. 마지막에는 변수를 빼는 변주로 모델 선택의 근거를 비교합니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    import pandas as pd\r
+    import statsmodels.api as sm\r
+    from statsmodels.stats.diagnostic import het_breuschpagan\r
+    from codaro.curriculum.localData import loadLocalDataset\r
+\r
+    marketingData = loadLocalDataset("advertising")\r
+    requiredColumns = ["TV", "Radio", "Newspaper", "Sales"]\r
+\r
+    missingColumns = [column for column in requiredColumns if column not in marketingData.columns]\r
+    if missingColumns:\r
+        raise ValueError(f"필수 컬럼이 없습니다: {missingColumns}")\r
+    if marketingData[requiredColumns].isna().any().any():\r
+        raise ValueError("회귀분석 전 결측치를 처리해야 합니다.")\r
+\r
+    reportY = marketingData["Sales"]\r
+    reportX = sm.add_constant(marketingData[["TV", "Radio", "Newspaper"]])\r
+    reportModel = sm.OLS(reportY, reportX).fit()\r
+\r
+    marketingData[requiredColumns].head()\r
+  exercise:\r
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      compactX = sm.add_constant(marketingData[["TV", "Radio"]])\r
+      compactModel = sm.OLS(reportY, compactX).fit()\r
+      r2Drop = reportModel.rsquared - compactModel.rsquared\r
+\r
+      assert compactModel.rsquared >= 0.95\r
+      {\r
+          "fullR2": round(reportModel.rsquared, 3),\r
+          "compactR2": round(compactModel.rsquared, 3),\r
+          "r2Drop": round(r2Drop, 3),\r
+          "fullAIC": round(reportModel.aic, 1),\r
+          "compactAIC": round(compactModel.aic, 1),\r
+      }\r
+    solution: |-\r
+      import pandas as pd\r
+      import statsmodels.api as sm\r
+      from statsmodels.stats.diagnostic import het_breuschpagan\r
+      from codaro.curriculum.localData import loadLocalDataset\r
+\r
+      marketingData = loadLocalDataset("advertising")\r
+      requiredColumns = ["TV", "Radio", "Newspaper", "Sales"]\r
+\r
+      missingColumns = [column for column in requiredColumns if column not in marketingData.columns]\r
+      if missingColumns:\r
+          raise ValueError(f"필수 컬럼이 없습니다: {missingColumns}")\r
+      if marketingData[requiredColumns].isna().any().any():\r
+          raise ValueError("회귀분석 전 결측치를 처리해야 합니다.")\r
+\r
+      marketingData[requiredColumns].head()\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 업무 흐름 검증에서 \`compactX\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.\r
+`;export{e as default};

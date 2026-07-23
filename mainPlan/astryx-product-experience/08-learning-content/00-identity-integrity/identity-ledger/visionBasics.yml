@@ -1,0 +1,54 @@
+schemaVersion: 1
+category: "visionBasics"
+sourceCount: 10
+lessons:
+  - lessonRef: "visionBasics/01_픽셀과ndarray"
+    sourcePath: "curricula/python/imageVision/visionBasics/01_픽셀과ndarray.yaml"
+    metaId: "visionBasics_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionBasics/02_좌표계함정"
+    sourcePath: "curricula/python/imageVision/visionBasics/02_좌표계함정.yaml"
+    metaId: "visionBasics_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionBasics/03_채널구조분해"
+    sourcePath: "curricula/python/imageVision/visionBasics/03_채널구조분해.yaml"
+    metaId: "visionBasics_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionBasics/04_색공간직관"
+    sourcePath: "curricula/python/imageVision/visionBasics/04_색공간직관.yaml"
+    metaId: "visionBasics_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionBasics/05_슬라이싱과ROI"
+    sourcePath: "curricula/python/imageVision/visionBasics/05_슬라이싱과ROI.yaml"
+    metaId: "visionBasics_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionBasics/06_픽셀산술"
+    sourcePath: "curricula/python/imageVision/visionBasics/06_픽셀산술.yaml"
+    metaId: "visionBasics_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionBasics/07_룩업테이블"
+    sourcePath: "curricula/python/imageVision/visionBasics/07_룩업테이블.yaml"
+    metaId: "visionBasics_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionBasics/08_마스크사고"
+    sourcePath: "curricula/python/imageVision/visionBasics/08_마스크사고.yaml"
+    metaId: "visionBasics_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionBasics/09_이미지통계"
+    sourcePath: "curricula/python/imageVision/visionBasics/09_이미지통계.yaml"
+    metaId: "visionBasics_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionBasics/10_종합미니보정기"
+    sourcePath: "curricula/python/imageVision/visionBasics/10_종합미니보정기.yaml"
+    metaId: "visionBasics_10"
+    registryStatus: registered
+    reviewStatus: pending

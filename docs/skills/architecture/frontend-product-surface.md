@@ -22,7 +22,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 
 - `editor/`가 Codaro의 실제 제품 UI 표면이다.
 - 사용자에게 보이는 제품 표면은 **대화**, **현재 학습**, **노트북**, **자동화** 네 가지다.
-- 사이드바 표면 순서는 `대화 → 현재 학습 → 노트북 → 자동화`다. 이 순서는 네 앱을 동급으로 늘어놓는 메뉴가 아니라, 대화에서 시작해 산출물을 관리하고 실행하는 흐름이다.
+- 사이드바 표면 순서는 `현재 학습 → 노트북 → 자동화 → 대화`다. 이 순서는 네 앱을 동급으로 늘어놓는 메뉴가 아니라, 학습에서 검증한 작업을 노트북과 자동화로 확장하고 대화를 지원 도구로 쓰는 흐름이다.
 - `editor/src/lib/surfaceModel.ts`의 `PRODUCT_SURFACE_NAV`가 표면 순서, 표시 이름 key, 제품 흐름 역할(`entry`/`learning`/`notebook`/`secondLoop`/`support`), 사이드바 노출 여부의 기준이다. `PRODUCT_SIDEBAR_NAV`는 보이는 표면만, `PRODUCT_SIDEBAR_FLOW_ITEMS`는 여기서 파생한 사이드바 흐름 단계다. 컴포넌트가 별도 배열로 표면 순서, 숨김 정책, 단계 번호를 복사하면 실패다.
 - `editor/src/components/app/productSidebar.tsx`는 sidebar shell이다. flow nav는 `productFlowNav.tsx`, 학습 tree는 `curriculumSidebarTree.tsx`, 자동화 tree는 `automationSidebarTree.tsx`가 맡는다.
 - 제품 내부 실행/편집 단위는 notebook과 cell로 구분한다. 제품 UI와 프론트 코드의 기본 명칭도 노트북/셀을 기준으로 둔다.
@@ -48,7 +48,8 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 
 | 파일 | 책임 |
 | --- | --- |
-| `editor/src/lib/surfaceModel.ts` | `대화 → 현재 학습 → 노트북 → 자동화` 순서, flow role, visible/hidden, 기본 표면 |
+| `editor/src/lib/surfaceModel.ts` | `현재 학습 → 노트북 → 자동화 → 대화` 순서, flow role, visible/hidden, 기본 표면 |
+| `editor/src/lib/runRouteState.ts` | lesson/path/runtime을 포함한 `/run/` URL, 저장소 resume, push/replace/popstate 복원 |
 | `editor/src/components/app/productFlowNav.tsx` | `PRODUCT_SIDEBAR_FLOW_ITEMS`만 읽어 사이드바 흐름 nav 렌더링 |
 | `editor/src/components/app/productSidebar.tsx` | sidebar shell, terminal utility, 현재 표면의 focused tree 배치 |
 | `editor/src/components/app/mainSurface.tsx` | 표면 선택과 큰 레이아웃 조립. 요청 분류, assistant 산출물 라우팅, pending 적용 로직, 현재 학습/노트북 내부 조립 금지 |
@@ -93,7 +94,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 - 현재 학습: `curricula/` 레슨 트리, YAML에서 전개된 학습 셀, 셀 바로가기 TOC, 접을 수 있는 Codaro 패널
 - 노트북: 빈 노트북, Python/Markdown 셀, 셀 바로 아래 실행 결과, 접을 수 있는 Codaro 패널
 - 자동화: 검증된 셀/recipe를 저장하고 예약하는 두 번째 loop. `Codaro 자동화`, `나만의 자동화`, 태스크 예약과 실행 상태를 보여준다.
-- 과제방: MVP에서는 별도 1급 사이드바 표면이 아니라 현재 학습 상단의 과제 패널이다. 튜터는 현재 YAML로 과제를 만들고 joinCode를 배포하며, 학생은 joinCode로 참가해 로컬 실행 결과 이벤트를 동기화한다. 표면/계약 SSOT는 `docs/skills/architecture/assignment-room.md`다.
+- 과제방의 frontend와 active backend 도메인은 제거했다. 학습 실행·검증·진도 event는 classroom API, session, outbox를 import하지 않는다. 한 호환 release의 HTTP `410 Gone` 안내와 local-owner archive migration만 제품 밖 경계에 남는다.
 - tool call과 컨텍스트는 사용자가 검토해야 할 때 action log/diff/detail로 열 수 있게 한다. 학습 화면의 기본 우측 패널로 고정하지 않는다.
 
 ## 결정

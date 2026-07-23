@@ -1,0 +1,154 @@
+schemaVersion: 1
+category: "30days"
+sourceCount: 30
+lessons:
+  - lessonRef: "30days/day01_헬로월드"
+    sourcePath: "curricula/python/basics/30days/day01_헬로월드.yaml"
+    metaId: "day01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day02_변수와데이터타입"
+    sourcePath: "curricula/python/basics/30days/day02_변수와데이터타입.yaml"
+    metaId: "day02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day03_연산자"
+    sourcePath: "curricula/python/basics/30days/day03_연산자.yaml"
+    metaId: "day03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day04_문자열기초"
+    sourcePath: "curricula/python/basics/30days/day04_문자열기초.yaml"
+    metaId: "day04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day05_문자열인덱싱슬라이싱"
+    sourcePath: "curricula/python/basics/30days/day05_문자열인덱싱슬라이싱.yaml"
+    metaId: "day05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day06_문자열메서드"
+    sourcePath: "curricula/python/basics/30days/day06_문자열메서드.yaml"
+    metaId: "day06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day07_리스트기초"
+    sourcePath: "curricula/python/basics/30days/day07_리스트기초.yaml"
+    metaId: "day07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day08_리스트메서드"
+    sourcePath: "curricula/python/basics/30days/day08_리스트메서드.yaml"
+    metaId: "day08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day09_튜플"
+    sourcePath: "curricula/python/basics/30days/day09_튜플.yaml"
+    metaId: "day09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day10_집합"
+    sourcePath: "curricula/python/basics/30days/day10_집합.yaml"
+    metaId: "day10"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day11_딕셔너리기초"
+    sourcePath: "curricula/python/basics/30days/day11_딕셔너리기초.yaml"
+    metaId: "day11"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day12_딕셔너리메서드"
+    sourcePath: "curricula/python/basics/30days/day12_딕셔너리메서드.yaml"
+    metaId: "day12"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day13_조건문"
+    sourcePath: "curricula/python/basics/30days/day13_조건문.yaml"
+    metaId: "day13"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day14_반복문"
+    sourcePath: "curricula/python/basics/30days/day14_반복문.yaml"
+    metaId: "day14"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day15_함수기초"
+    sourcePath: "curricula/python/basics/30days/day15_함수기초.yaml"
+    metaId: "day15"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day16_함수고급"
+    sourcePath: "curricula/python/basics/30days/day16_함수고급.yaml"
+    metaId: "day16"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day17_스코프와클로저"
+    sourcePath: "curricula/python/basics/30days/day17_스코프와클로저.yaml"
+    metaId: "day17"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day18_모듈과import"
+    sourcePath: "curricula/python/basics/30days/day18_모듈과import.yaml"
+    metaId: "day18"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day19_파일입출력"
+    sourcePath: "curricula/python/basics/30days/day19_파일입출력.yaml"
+    metaId: "day19"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day20_예외처리"
+    sourcePath: "curricula/python/basics/30days/day20_예외처리.yaml"
+    metaId: "day20"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day21_중간종합복습"
+    sourcePath: "curricula/python/basics/30days/day21_중간종합복습.yaml"
+    metaId: "day21"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day22_클래스기초"
+    sourcePath: "curricula/python/basics/30days/day22_클래스기초.yaml"
+    metaId: "day22"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day23_클래스고급"
+    sourcePath: "curricula/python/basics/30days/day23_클래스고급.yaml"
+    metaId: "day23"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day24_특수메서드"
+    sourcePath: "curricula/python/basics/30days/day24_특수메서드.yaml"
+    metaId: "day24"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day25_프로퍼티와데코레이터"
+    sourcePath: "curricula/python/basics/30days/day25_프로퍼티와데코레이터.yaml"
+    metaId: "day25"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day26_컴프리헨션"
+    sourcePath: "curricula/python/basics/30days/day26_컴프리헨션.yaml"
+    metaId: "day26"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day27_제너레이터와이터레이터"
+    sourcePath: "curricula/python/basics/30days/day27_제너레이터와이터레이터.yaml"
+    metaId: "day27"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day28_고급문법종합"
+    sourcePath: "curricula/python/basics/30days/day28_고급문법종합.yaml"
+    metaId: "day28"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day29_알고리즘연습"
+    sourcePath: "curricula/python/basics/30days/day29_알고리즘연습.yaml"
+    metaId: "day29"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "30days/day30_최종프로젝트"
+    sourcePath: "curricula/python/basics/30days/day30_최종프로젝트.yaml"
+    metaId: "day30"
+    registryStatus: registered
+    reviewStatus: pending

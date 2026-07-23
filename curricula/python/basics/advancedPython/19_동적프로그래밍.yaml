@@ -472,3 +472,319 @@ sections:
     type: noError
     noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 19_dynamic_programming-campaign-budget-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - dp_intro
+    - tabulation
+    - classic_problems
+    - workflow_validation
+    title: 제한 예산 안에서 캠페인 조합 고르기
+    subtitle: knapsack campaign budget
+    goal: plan_campaign_budget(campaigns, budget)를 완성해 예산 안에서 가치가 가장 큰 캠페인 조합과 사용 금액을 반환한다.
+    why: DP는 피보나치 암기가 아니라, 선택의 조합이 폭발하는 상황에서 같은 상태를 다시 계산하지 않고 최적 결정을 누적하는 기술입니다.
+    explanation: 각 캠페인은 name, cost, value를 가집니다. 각 캠페인은 한 번만 고를 수 있으며, budget이 음수이면 ValueError로 거부하세요.
+    tips:
+    - 0/1 선택 문제에서는 capacity를 뒤에서 앞으로 순회해야 같은 캠페인을 두 번 쓰지 않습니다.
+    - dp[capacity]에 현재 최선의 value와 선택된 이름 목록을 함께 저장하면 설명 가능한 결과가 됩니다.
+    exercise:
+      prompt: plan_campaign_budget(campaigns, budget)를 완성해 value, selected, spent를 반환하세요.
+      starterCode: |-
+        def plan_campaign_budget(campaigns, budget):
+            raise NotImplementedError
+      solution: |-
+        def plan_campaign_budget(campaigns, budget):
+            if budget < 0:
+                raise ValueError("budget must be non-negative")
+
+            dp = [(0, []) for _ in range(budget + 1)]
+            costs_by_name = {}
+            for campaign in campaigns:
+                name = campaign["name"]
+                cost = campaign["cost"]
+                value = campaign["value"]
+                costs_by_name[name] = cost
+                for capacity in range(budget, cost - 1, -1):
+                    previous_value, previous_names = dp[capacity - cost]
+                    candidate = (previous_value + value, previous_names + [name])
+                    if candidate[0] > dp[capacity][0]:
+                        dp[capacity] = candidate
+
+            best_value, selected = dp[budget]
+            return {
+                "value": best_value,
+                "selected": selected,
+                "spent": sum(costs_by_name[name] for name in selected),
+            }
+      hints:
+      - capacity를 앞에서부터 돌면 같은 항목을 여러 번 고르는 unbounded 문제로 바뀝니다.
+      - selected 목록을 같이 보관하면 숫자만 맞는 답보다 학습 검증이 강해집니다.
+    check:
+      id: python.advanced.dp-campaign.budget.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.dp-campaign.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_campaign_budget
+        cases:
+        - id: chooses-best-value-within-budget
+          arguments:
+          - value:
+            - name: email
+              cost: 1
+              value: 5
+            - name: search
+              cost: 3
+              value: 12
+            - name: retargeting
+              cost: 4
+              value: 14
+            - name: content
+              cost: 2
+              value: 8
+          - value: 5
+          expectedReturn:
+            value: 20
+            selected:
+            - search
+            - content
+            spent: 5
+        - id: rejects-negative-budget
+          arguments:
+          - value: []
+          - value: -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 19_dynamic_programming-grid-cost-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - memoization
+    - tabulation
+    - advanced_dp
+    title: 배송 격자에서 최소 비용 경로 찾기
+    subtitle: grid path dynamic programming
+    goal: min_delivery_cost(grid)를 완성해 오른쪽과 아래 이동만 허용될 때 최소 비용과 이동 경로를 반환한다.
+    why: 예산 조합에서 배운 상태 누적을 격자 문제로 옮기면, DP가 특정 예제의 요령이 아니라 상태 정의의 기술이라는 점이 드러납니다.
+    explanation: grid는 양의 비용 숫자로 이루어진 직사각형 2차원 리스트입니다. 빈 입력이나 들쭉날쭉한 행은 ValueError로 거부하세요.
+    tips:
+    - 각 칸의 최적 비용은 위쪽 또는 왼쪽 칸의 최적 비용 중 작은 값에 현재 비용을 더한 값입니다.
+    - 비용과 함께 이동 경로를 저장하면 선택 과정을 검증할 수 있습니다.
+    exercise:
+      prompt: min_delivery_cost(grid)를 완성해 cost와 moves를 반환하세요.
+      starterCode: |-
+        def min_delivery_cost(grid):
+            raise NotImplementedError
+      solution: |-
+        def min_delivery_cost(grid):
+            if not grid or not grid[0]:
+                raise ValueError("grid must not be empty")
+            width = len(grid[0])
+            if any(len(row) != width for row in grid):
+                raise ValueError("grid must be rectangular")
+
+            dp = []
+            for row_index, row in enumerate(grid):
+                dp_row = []
+                for col_index, cost in enumerate(row):
+                    if row_index == 0 and col_index == 0:
+                        dp_row.append((cost, []))
+                    else:
+                        options = []
+                        if row_index > 0:
+                            prev_cost, prev_moves = dp[row_index - 1][col_index]
+                            options.append((prev_cost + cost, prev_moves + ["down"]))
+                        if col_index > 0:
+                            prev_cost, prev_moves = dp_row[col_index - 1]
+                            options.append((prev_cost + cost, prev_moves + ["right"]))
+                        dp_row.append(min(options, key=lambda item: item[0]))
+                dp.append(dp_row)
+
+            best_cost, moves = dp[-1][-1]
+            return {"cost": best_cost, "moves": moves}
+      hints:
+      - 현재 행의 왼쪽 값은 dp_row에서, 위쪽 값은 이전 dp 행에서 읽습니다.
+      - tie가 중요한 문제라면 비용이 같을 때의 규칙도 명시해야 합니다.
+    check:
+      id: python.advanced.dp-campaign.grid-cost.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.dp-campaign.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: min_delivery_cost
+        cases:
+        - id: finds-lowest-cost-grid-route
+          arguments:
+          - value:
+            - - 1
+              - 4
+              - 1
+            - - 2
+              - 1
+              - 5
+            - - 3
+              - 1
+              - 1
+          expectedReturn:
+            cost: 6
+            moves:
+            - down
+            - right
+            - down
+            - right
+        - id: rejects-ragged-grid
+          arguments:
+          - value:
+            - - 1
+              - 2
+            - - 3
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 19_dynamic_programming-pattern-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 19_dynamic_programming-grid-cost-transfer
+    title: DP 패턴 선택 기준 회상하기
+    subtitle: dynamic programming pattern recall
+    goal: choose_dp_pattern(problem)를 완성해 문제 유형별 상태 저장 방식과 주의점을 반환한다.
+    why: 시간이 지나도 남아야 할 DP 지식은 점화식 표기보다, 중복 상태를 어디에 저장하고 어떤 방향으로 채울지 결정하는 판단입니다.
+    explanation: overlapping-recursion, bounded-choice, grid-path, rolling-state, substring-match 목적별 패턴을 반환하세요.
+    tips:
+    - 메모이제이션은 재귀 구조를 유지하고, 타뷸레이션은 작은 상태부터 채웁니다.
+    - 이전 행이나 이전 값만 필요하면 rolling array로 메모리를 줄일 수 있습니다.
+    exercise:
+      prompt: choose_dp_pattern(problem)를 완성해 pattern, state, warning을 반환하세요.
+      starterCode: |-
+        def choose_dp_pattern(problem):
+            raise NotImplementedError
+      solution: |-
+        def choose_dp_pattern(problem):
+            table = {
+                "overlapping-recursion": {
+                    "pattern": "memoization",
+                    "state": "function arguments",
+                    "warning": "cache every input that changes the result",
+                },
+                "bounded-choice": {
+                    "pattern": "0-1-knapsack",
+                    "state": "item index and capacity",
+                    "warning": "iterate capacity backwards for one-time choices",
+                },
+                "grid-path": {
+                    "pattern": "2d-tabulation",
+                    "state": "row and column",
+                    "warning": "define blocked or missing cells before filling",
+                },
+                "rolling-state": {
+                    "pattern": "rolling-array",
+                    "state": "previous row or previous few values",
+                    "warning": "do not overwrite values still needed later",
+                },
+                "substring-match": {
+                    "pattern": "string-dp",
+                    "state": "prefix lengths",
+                    "warning": "empty prefix base cases decide edge behavior",
+                },
+            }
+            if problem not in table:
+                raise ValueError("unknown dp problem")
+            return table[problem]
+      hints:
+      - DP 문제는 상태와 전이를 먼저 말로 정의한 뒤 코드로 옮기세요.
+      - 저장 방향이 잘못되면 같은 항목을 여러 번 쓰거나 필요한 값을 덮어쓸 수 있습니다.
+    check:
+      id: python.advanced.dp-campaign.pattern-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.dp-campaign.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_dp_pattern
+        cases:
+        - id: recalls-knapsack-state-and-direction
+          arguments:
+          - value: bounded-choice
+          expectedReturn:
+            pattern: 0-1-knapsack
+            state: item index and capacity
+            warning: iterate capacity backwards for one-time choices
+        - id: recalls-rolling-array-risk
+          arguments:
+          - value: rolling-state
+          expectedReturn:
+            pattern: rolling-array
+            state: previous row or previous few values
+            warning: do not overwrite values still needed later
+        - id: rejects-unknown-problem
+          arguments:
+          - value: magic-table
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

@@ -11,6 +11,8 @@ pub struct ReleaseManifest {
     pub release_id: String,
     pub launcher_version: String,
     pub min_launcher_version: String,
+    #[serde(default)]
+    pub learning_evidence_reader_version: u32,
     pub python_runtime: RuntimeArtifact,
     pub editor: EditorArtifact,
     pub backend: BackendArtifact,

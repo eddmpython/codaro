@@ -418,3 +418,293 @@ sections:
     type: noError
     noError: email 모듈 종합 복습에서 `basicMsg` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: email 모듈 종합 복습 실행 뒤 `basicMsg` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 22_email-report-message-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - workflow_validation
+    title: 발송 전 리포트 이메일 구조 검증하기
+    subtitle: EmailMessage와 attachment 검사
+    goal: 수신자, 제목, 본문, CSV 첨부가 들어간 EmailMessage를 만들고 핵심 구조를 dict로 반환한다.
+    why: 숙달 검증은 메일을 보내는 기능이 아니라, 보내기 전 메시지 구조가 안전한지 자동으로 판정하는 능력을 확인합니다.
+    explanation: build_report_email(sender, recipients, subject, body, attachment_text)가 EmailMessage를 만들고 header, body, attachment
+      정보를 반환하게 완성하세요.
+    tips:
+    - 수신자 목록이 비어 있으면 ValueError로 막으세요.
+    - 첨부는 bytes로 넣고 get_filename과 get_content_type으로 검증하세요.
+    exercise:
+      prompt: build_report_email(sender, recipients, subject, body, attachment_text)를 완성해 이메일 구조 요약을 반환하고 빈 수신자 목록은 거부하세요.
+      starterCode: |-
+        def build_report_email(sender, recipients, subject, body, attachment_text):
+            raise NotImplementedError
+      solution: |-
+        from email.message import EmailMessage
+
+        def build_report_email(sender, recipients, subject, body, attachment_text):
+            if not recipients:
+                raise ValueError("at least one recipient required")
+            msg = EmailMessage()
+            msg["From"] = sender
+            msg["To"] = ", ".join(recipients)
+            msg["Subject"] = subject
+            msg.set_content(body)
+            msg.add_attachment(
+                attachment_text.encode("utf-8"),
+                maintype="text",
+                subtype="csv",
+                filename="report.csv",
+            )
+            attachments = list(msg.iter_attachments())
+            return {
+                "from": msg["From"],
+                "to": [address.strip() for address in msg["To"].split(",")],
+                "subject": msg["Subject"],
+                "body": msg.get_body(preferencelist=("plain",)).get_content().strip(),
+                "attachmentCount": len(attachments),
+                "attachmentFilename": attachments[0].get_filename(),
+                "attachmentContentType": attachments[0].get_content_type(),
+            }
+      hints:
+      - EmailMessage는 header를 dict처럼 읽고 쓸 수 있습니다.
+      - '`iter_attachments()` 결과를 list로 바꿔 첨부 개수를 확인하세요.'
+    check:
+      id: python.builtins.email.report-message.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.email.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_report_email
+        cases:
+        - id: builds-report-email
+          arguments:
+          - value: teacher@example.com
+          - value:
+            - learner@example.com
+            - reviewer@example.com
+          - value: Weekly curriculum report
+          - value: All checks passed.
+          - value: |-
+              id,status
+              1,passed
+          expectedReturn:
+            from: teacher@example.com
+            to:
+            - learner@example.com
+            - reviewer@example.com
+            subject: Weekly curriculum report
+            body: All checks passed.
+            attachmentCount: 1
+            attachmentFilename: report.csv
+            attachmentContentType: text/csv
+        - id: rejects-empty-recipients
+          arguments:
+          - value: teacher@example.com
+          - value: []
+          - value: Weekly curriculum report
+          - value: All checks passed.
+          - value: id,status
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 22_email-parse-raw-message-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - message_basics
+    - headers
+    title: 직렬화된 MIME 메시지를 읽어 수신자와 본문 요약하기
+    subtitle: Parser와 getaddresses
+    goal: raw email 문자열을 파싱해 제목, 발신자, 수신자 목록, plain body, multipart 여부를 반환한다.
+    why: 전이 과제에서는 메시지를 만드는 문제에서 이미 만들어진 MIME 메시지를 검사하는 문제로 옮깁니다.
+    explanation: summarize_mime_message(raw_message)가 header와 본문을 표준 parser로 읽고, 수신자 주소를 list로 정리하게 만드세요.
+    tips:
+    - Parser(policy=policy.default).parsestr(...)를 사용하세요.
+    - To 헤더는 getaddresses로 이름과 주소를 분리할 수 있습니다.
+    exercise:
+      prompt: summarize_mime_message(raw_message)를 완성해 raw email 문자열에서 subject, from, recipients, body, isMultipart를 반환하세요.
+      starterCode: |-
+        def summarize_mime_message(raw_message):
+            raise NotImplementedError
+      solution: |-
+        from email import policy
+        from email.parser import Parser
+        from email.utils import getaddresses
+
+        def summarize_mime_message(raw_message):
+            msg = Parser(policy=policy.default).parsestr(raw_message)
+            recipients = [addr for _name, addr in getaddresses(msg.get_all("to", []))]
+            body = msg.get_body(preferencelist=("plain",))
+            return {
+                "subject": msg["Subject"],
+                "from": msg["From"],
+                "recipients": recipients,
+                "body": body.get_content().strip() if body else "",
+                "isMultipart": msg.is_multipart(),
+            }
+      hints:
+      - header 이름은 대소문자를 섞어 써도 표준 메시지 객체가 찾아줍니다.
+      - body가 없을 수 있으므로 None 경로를 처리하세요.
+    check:
+      id: python.builtins.email.raw-message.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.email.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_mime_message
+        cases:
+        - id: parses-plain-review-message
+          arguments:
+          - value: |-
+              From: Teacher <teacher@example.com>
+              To: Learner <learner@example.com>, Reviewer <reviewer@example.com>
+              Subject: Review ready
+              Content-Type: text/plain; charset="utf-8"
+
+              Please review lesson 22.
+          expectedReturn:
+            subject: Review ready
+            from: Teacher <teacher@example.com>
+            recipients:
+            - learner@example.com
+            - reviewer@example.com
+            body: Please review lesson 22.
+            isMultipart: false
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 22_email-header-validation-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 22_email-parse-raw-message-transfer
+    title: 발송 헤더에서 필수 값과 수신자 주소 회상 검증하기
+    subtitle: getaddresses와 누락 거부
+    goal: From, To, Subject를 확인하고 수신자 주소 수와 Reply-To 여부를 반환한다.
+    why: 시간이 지나도 남아야 할 email 감각은 메시지를 보내기 전에 필수 헤더와 주소를 자동으로 막는 검증 습관입니다.
+    explanation: validate_outbound_headers(headers)가 필수 헤더와 수신자 주소를 검사하고, 누락이나 잘못된 주소는 ValueError로 거부하게 만드세요.
+    tips:
+    - getaddresses는 이름이 섞인 To 헤더에서도 실제 주소를 뽑아 줍니다.
+    - Subject는 strip해서 빈 문자열을 막는 조건으로 확장할 수 있습니다.
+    exercise:
+      prompt: validate_outbound_headers(headers)를 완성해 sender, recipientCount, subject, hasReplyTo를 반환하고 필수 헤더 누락은 거부하세요.
+      starterCode: |-
+        def validate_outbound_headers(headers):
+            raise NotImplementedError
+      solution: |-
+        from email.utils import getaddresses
+
+        def validate_outbound_headers(headers):
+            required = ("From", "To", "Subject")
+            missing = [name for name in required if not headers.get(name)]
+            if missing:
+                raise ValueError("missing headers: " + ",".join(missing))
+            recipients = [addr for _name, addr in getaddresses([headers["To"]])]
+            if not recipients or any("@" not in addr for addr in recipients):
+                raise ValueError("invalid recipients")
+            return {
+                "sender": headers["From"],
+                "recipientCount": len(recipients),
+                "subject": headers["Subject"].strip(),
+                "hasReplyTo": bool(headers.get("Reply-To")),
+            }
+      hints:
+      - headers dict에 키가 없을 수 있으므로 get을 먼저 사용하세요.
+      - 주소 검증은 최소한 `@`가 있는지 확인하고 실패를 조용히 넘기지 마세요.
+    check:
+      id: python.builtins.email.header-validation.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.email.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: validate_outbound_headers
+        cases:
+        - id: validates-reply-to-header
+          arguments:
+          - value:
+              From: ops@example.com
+              To: A <a@example.com>, b@example.com
+              Subject: Deploy report
+              Reply-To: support@example.com
+          expectedReturn:
+            sender: ops@example.com
+            recipientCount: 2
+            subject: Deploy report
+            hasReplyTo: true
+        - id: rejects-missing-subject
+          arguments:
+          - value:
+              From: ops@example.com
+              To: a@example.com
+          expectedException: ValueError
+        - id: rejects-invalid-recipient
+          arguments:
+          - value:
+              From: ops@example.com
+              To: not-an-address
+              Subject: Deploy report
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

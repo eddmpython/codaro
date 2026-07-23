@@ -1,0 +1,62 @@
+schemaVersion: 1
+surfaceState: route-backed
+learnerEvidenceClaim: none
+paths:
+  - pathId: pythonFoundation
+    capstoneLessonRef: 30days/day30_최종프로젝트
+    publicUrl: /run/?surface=curriculum&category=30days&lesson=day30_%EC%B5%9C%EC%A2%85%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8#curriculum
+    masteryCheckId: python.30days.day30.sales-report.mastery.behavior.v1
+    evidenceKinds: [strong-check, artifact-descriptor]
+    webArtifactKinds: [file]
+    webArtifactPaths: [report-a.json, report-b.json]
+    localGraduationRequired: false
+    localGraduationState: not-required
+  - pathId: dataReporting
+    capstoneLessonRef: pandas/10_실전종합프로젝트
+    publicUrl: /run/?surface=curriculum&category=pandas&lesson=10_%EC%8B%A4%EC%A0%84%EC%A2%85%ED%95%A9%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8#curriculum
+    masteryCheckId: python.pandas.pandas_10.analysis-report-pipeline.mastery.behavior.v1
+    evidenceKinds: [strong-check, artifact-descriptor]
+    webArtifactKinds: [table]
+    webArtifactPaths: [output/sales-report.csv, output/empty-report.csv]
+    localGraduationRequired: false
+    localGraduationState: not-required
+  - pathId: dataVisualization
+    capstoneLessonRef: seaborn/10_종합EDA리포트
+    publicUrl: /run/?surface=curriculum&category=seaborn&lesson=10_%EC%A2%85%ED%95%A9EDA%EB%A6%AC%ED%8F%AC%ED%8A%B8#curriculum
+    masteryCheckId: python.seaborn.seaborn_10.eda-evidence-report-data-evidence.mastery.behavior.v1
+    evidenceKinds: [strong-check, artifact-descriptor]
+    webArtifactKinds: [table, image]
+    webArtifactPaths:
+      - output/eda-report.csv
+      - output/eda-preview.png
+      - output/empty-eda-report.csv
+      - output/empty-eda-preview.png
+    localGraduationRequired: false
+    localGraduationState: optional
+  - pathId: fileAutomation
+    capstoneLessonRef: fileOps/10_종합다운로드폴더정리
+    publicUrl: /run/?surface=curriculum&category=fileOps&lesson=10_%EC%A2%85%ED%95%A9%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C%ED%8F%B4%EB%8D%94%EC%A0%95%EB%A6%AC#curriculum
+    masteryCheckId: python.fileops.fileOps_10.downloads-cleanup-capstone.mastery.behavior.v1
+    evidenceKinds: [strong-check, artifact-descriptor]
+    webArtifactKinds: [table]
+    webArtifactPaths: [output/ready-audit.json, output/blocked-audit.json, output/empty-audit.json]
+    localGraduationRequired: true
+    localGraduationState: pending-independent-evidence
+  - pathId: officeAutomation
+    capstoneLessonRef: openpyxl/10_월간매출리포트생성기
+    publicUrl: /run/?surface=curriculum&category=openpyxl&lesson=10_%EC%9B%94%EA%B0%84%EB%A7%A4%EC%B6%9C%EB%A6%AC%ED%8F%AC%ED%8A%B8%EC%83%9D%EC%84%B1%EA%B8%B0#curriculum
+    masteryCheckId: python.openpyxl.openpyxl_10.monthly-sales-report.mastery.behavior.v1
+    evidenceKinds: [strong-check, artifact-descriptor]
+    webArtifactKinds: [table]
+    webArtifactPaths: [output/reconciled-report.json, output/gap-report.json, output/unexpected-month-report.json]
+    localGraduationRequired: true
+    localGraduationState: pending-independent-evidence
+  - pathId: webMonitoring
+    capstoneLessonRef: playwright/10_종합브라우저점검프로젝트
+    publicUrl: /run/?surface=curriculum&category=playwright&lesson=10_%EC%A2%85%ED%95%A9%EB%B8%8C%EB%9D%BC%EC%9A%B0%EC%A0%80%EC%A0%90%EA%B2%80%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8#curriculum
+    masteryCheckId: python.playwright.playwright_10.browser-audit-report.mastery.behavior.v1
+    evidenceKinds: [strong-check, artifact-descriptor]
+    webArtifactKinds: [table]
+    webArtifactPaths: [output/ready-browser-audit.json, output/coverage-gap-audit.json, output/a11y-network-audit.json]
+    localGraduationRequired: true
+    localGraduationState: pending-independent-evidence

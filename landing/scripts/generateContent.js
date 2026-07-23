@@ -1,9 +1,10 @@
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, extname, posix, relative, resolve, sep } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { marked } from "marked";
 import { parse as parseYaml } from "yaml";
+import { toLessonSearchEntry } from "./lessonDiscovery.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(__dirname, "..", "..");
@@ -314,13 +315,35 @@ function writeDocsPageModules(pages) {
   }
 }
 
+async function collectLessonSearchEntries() {
+  const curriculumModule = resolve(generatedRoot, "curriculum.js");
+  if (!existsSync(curriculumModule)) {
+    throw new Error("Missing generated curriculum index. Run generateCurriculum.js before generateContent.js.");
+  }
+  const { curriculumLessons, curriculumLessonCount } = await import(pathToFileURL(curriculumModule));
+  const entries = await Promise.all(curriculumLessons.map(async (lesson) => {
+    const modulePath = resolve(generatedRoot, "curriculumLessons", `${lesson.contentModule}.js`);
+    if (!existsSync(modulePath)) throw new Error(`Missing public lesson content module: ${lesson.contentModule}`);
+    const { default: payload } = await import(pathToFileURL(modulePath));
+    return toLessonSearchEntry(payload);
+  }));
+  const uniqueRoutes = new Set(entries.map((entry) => entry.url));
+  const uniqueRefs = new Set(entries.map((entry) => entry.lessonRef));
+  if (entries.length !== curriculumLessonCount || uniqueRoutes.size !== entries.length || uniqueRefs.size !== entries.length) {
+    throw new Error(`[content] public lesson search contract mismatch: entries=${entries.length} routes=${uniqueRoutes.size} refs=${uniqueRefs.size} curriculum=${curriculumLessonCount}`);
+  }
+  return entries;
+}
+
 const posts = collectBlogPosts();
 const docsPages = collectDocsPages();
+const lessonSearchEntries = await collectLessonSearchEntries();
 const docsNavPages = docsPages.map(toDocsNavPage);
 const docsSections = buildDocsSections(docsNavPages);
 const postCategories = [...new Map(posts.map((post) => [post.category, { slug: post.category, label: post.categoryLabel }])).values()];
 const postSeries = [...new Map(posts.map((post) => [post.series, { slug: post.series, label: post.seriesLabel }])).values()];
 const searchEntries = [
+  ...lessonSearchEntries,
   ...posts.map((post) => ({
     kind: "writing",
     title: post.title,
@@ -351,4 +374,4 @@ for (const [fileName, content] of modules) {
   writeFileSync(resolve(generatedRoot, fileName), content, "utf-8");
 }
 
-console.log(`[content] posts=${posts.length} docs=${docsPages.length} search=${searchEntries.length}`);
+console.log(`[content] posts=${posts.length} docs=${docsPages.length} lessons=${lessonSearchEntries.length} search=${searchEntries.length}`);

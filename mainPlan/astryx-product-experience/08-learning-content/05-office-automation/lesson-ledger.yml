@@ -1,0 +1,79 @@
+schemaVersion: 1
+pathId: officeAutomation
+composerSnapshotDate: "2026-07-18"
+composerGraphCount: 469
+composerVersionHash: "75fc453f508da3b8709bd0be8a4d36213ec535c7af7d2cd892e20c2aca3e7c06"
+taxonomySnapshotHash: "b5e9b0b9db4f6ecd89c7be10a5c795f9b991b3ce700d5b5cf044607fc835def2"
+sourceSetHash: "5f8d7bb62f23c2e10ed89536f72449613b42d55e7c0a659010a18ebf61ce535e"
+ledgerTool: "uv run python -X utf8 docs/skills/ops/tools/buildLearningLedgers.py --check"
+targetOutcomes:
+  - "python.variables"
+  - "python.controlFlow"
+  - "python.functions"
+  - "python.modulesAndIo"
+  - "automation.excel.intro"
+  - "automation.excel.workbook"
+  - "automation.excel.formulas"
+  - "automation.excel.styles"
+  - "automation.excel.conditional"
+  - "automation.excel.charts"
+  - "automation.excel.tables"
+  - "automation.excel.report"
+  - "pandas.loadFrame"
+  - "pandas.aggregate"
+gaps: []
+lessons:
+  - order: 1
+    lessonRef: "30days/day01_헬로월드"
+    canonicalContentRef: "30days/day01_헬로월드"
+  - order: 2
+    lessonRef: "30days/day02_변수와데이터타입"
+    canonicalContentRef: "30days/day02_변수와데이터타입"
+  - order: 3
+    lessonRef: "30days/day03_연산자"
+    canonicalContentRef: "30days/day03_연산자"
+  - order: 4
+    lessonRef: "30days/day07_리스트기초"
+    canonicalContentRef: "30days/day07_리스트기초"
+  - order: 5
+    lessonRef: "30days/day13_조건문"
+    canonicalContentRef: "30days/day13_조건문"
+  - order: 6
+    lessonRef: "30days/day15_함수기초"
+    canonicalContentRef: "30days/day15_함수기초"
+  - order: 7
+    lessonRef: "30days/day18_모듈과import"
+    canonicalContentRef: "30days/day18_모듈과import"
+  - order: 8
+    lessonRef: "pandas/00_판다스소개"
+    canonicalContentRef: "pandas/00_판다스소개"
+  - order: 9
+    lessonRef: "excel/01_xlwings란"
+    canonicalContentRef: "excel/01_xlwings란"
+  - order: 10
+    lessonRef: "pandas/01_레스토랑팁분석"
+    canonicalContentRef: "pandas/01_레스토랑팁분석"
+  - order: 11
+    lessonRef: "excel/03_xlwingsLite"
+    canonicalContentRef: "excel/03_xlwingsLite"
+  - order: 12
+    lessonRef: "pandas/02_타이타닉생존분석"
+    canonicalContentRef: "pandas/02_타이타닉생존분석"
+  - order: 13
+    lessonRef: "openpyxl/04_수식과이름영역"
+    canonicalContentRef: "openpyxl/04_수식과이름영역"
+  - order: 14
+    lessonRef: "openpyxl/05_셀서식과숫자포맷"
+    canonicalContentRef: "openpyxl/05_셀서식과숫자포맷"
+  - order: 15
+    lessonRef: "xlwings/06_막대차트자동생성"
+    canonicalContentRef: "xlwings/06_막대차트자동생성"
+  - order: 16
+    lessonRef: "openpyxl/09_표와데이터검증"
+    canonicalContentRef: "openpyxl/09_표와데이터검증"
+  - order: 17
+    lessonRef: "openpyxl/06_조건부서식"
+    canonicalContentRef: "openpyxl/06_조건부서식"
+  - order: 18
+    lessonRef: "xlwings/08_월별파일분기합치기"
+    canonicalContentRef: "xlwings/08_월별파일분기합치기"

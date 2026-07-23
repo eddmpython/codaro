@@ -339,3 +339,316 @@ sections:
     type: noError
     noError: struct 모듈 종합 복습에서 `intVal` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: struct 모듈 종합 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 16_struct-sensor-packet-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - basic_packing
+    - byte_order
+    - workflow_validation
+    title: 센서 레코드를 고정 길이 packet으로 저장하기
+    subtitle: pack, endian, 길이 검증
+    goal: 센서 reading 목록을 빅엔디안 바이너리 packet으로 저장하고 packet 수, byteLength, 첫 sensorId를 반환한다.
+    why: struct 학습은 pack 결과를 눈으로 보는 데서 끝나지 않고, 정해진 포맷 길이와 값 범위를 지키는 파일을 만들 때 실무 가치가 생깁니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않는 target path와 reading 목록을 넘겨 정상 저장과 실패 케이스를 함께 검증합니다.
+    tips:
+    - format은 `>4sBIfH`를 쓰고 magic은 `b"CDRO"`로 고정하세요.
+    - humidity는 0부터 100까지만 허용하세요.
+    exercise:
+      prompt: write_sensor_packets(target_path, readings)가 path, packetCount, byteLength, firstSensorId를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def write_sensor_packets(target_path, readings):
+            raise NotImplementedError
+      solution: |-
+        import struct
+        from pathlib import Path
+
+        PACKET_FORMAT = ">4sBIfH"
+        MAGIC = b"CDRO"
+
+        def write_sensor_packets(target_path, readings):
+            target = Path(target_path)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            packets = []
+            for reading in readings:
+                sensor_id = int(reading["sensorId"])
+                temperature = float(reading["temperature"])
+                humidity = int(reading["humidity"])
+                if not 0 <= humidity <= 100:
+                    raise ValueError("humidity must be between 0 and 100")
+                packets.append(struct.pack(PACKET_FORMAT, MAGIC, 1, sensor_id, temperature, humidity))
+            payload = b"".join(packets)
+            target.write_bytes(payload)
+            first_sensor_id = struct.unpack(PACKET_FORMAT, payload[:struct.calcsize(PACKET_FORMAT)])[2] if packets else None
+            return {
+                "path": str(target),
+                "packetCount": len(packets),
+                "byteLength": len(payload),
+                "firstSensorId": first_sensor_id,
+            }
+      hints:
+      - struct.calcsize(PACKET_FORMAT)로 packet 하나의 길이를 계산할 수 있습니다.
+      - 반환 path는 verifier가 fixture root 기준 상대경로로 정규화합니다.
+    check:
+      id: python.builtins.struct.sensor-packet.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.struct.binary-packet.behavior.v1.fixture
+      fixtureHash: sha256-A0orzacqMjbHW3HLQRlXPKIijw0Haby6TkFZ8lPUjH0=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: input/sensors.bin
+          contentBase64: Q0RSTwEAAAAHQbwAAAAtQ0RSTwEAAAAIQZ4AAAAy
+        - path: input/bad_magic.bin
+          contentBase64: QkFEIQEAAAAHQbwAAAAt
+        - path: input/header.bin
+          contentBase64: EjRWeAAAAAIAABAA
+        - path: input/short_header.bin
+          contentBase64: EjRWeAAAAAI=
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: write_sensor_packets
+        cases:
+        - id: writes-two-sensor-packets
+          arguments:
+          - fixturePath: output/sensors.bin
+          - value:
+            - sensorId: 7
+              temperature: 23.5
+              humidity: 45
+            - sensorId: 8
+              temperature: 19.75
+              humidity: 50
+          expectedReturn:
+            path: output/sensors.bin
+            packetCount: 2
+            byteLength: 30
+            firstSensorId: 7
+        - id: rejects-invalid-humidity
+          arguments:
+          - fixturePath: output/bad-sensors.bin
+          - value:
+            - sensorId: 9
+              temperature: 21.0
+              humidity: 101
+          expectedException: ValueError
+        expectedPaths:
+        - path: output/sensors.bin
+          kind: file
+        normalizeReturnPaths:
+        - path
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 16_struct-read-sensor-file-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - 16_struct-sensor-packet-mastery
+    - basic_unpacking
+    title: 바이너리 센서 파일을 chunk 단위로 요약하기
+    subtitle: calcsize와 unpack 반복
+    goal: 고정 길이 sensor packet 파일을 읽어 sensorId, 온도, 습도 요약을 반환하고 잘못된 magic은 거부한다.
+    why: 바이너리 파일 자동화는 한 packet만 unpack하는 예제보다, 전체 파일을 포맷 길이로 나눠 검증하며 읽는 흐름을 익혀야 실무에 이어집니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 이번에는 직접 만든 파일이 아니라 fixture의 unseen binary 파일을 읽으세요.
+    tips:
+    - 파일 길이가 packet 크기의 배수가 아니면 ValueError를 내세요.
+    - unpack 결과의 magic과 version을 각 packet마다 확인하세요.
+    exercise:
+      prompt: summarize_sensor_file(path)가 packetCount, sensorIds, temperaturesCenti, maxHumidity를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def summarize_sensor_file(path):
+            raise NotImplementedError
+      solution: |-
+        import struct
+        from pathlib import Path
+
+        PACKET_FORMAT = ">4sBIfH"
+        MAGIC = b"CDRO"
+        PACKET_SIZE = struct.calcsize(PACKET_FORMAT)
+
+        def summarize_sensor_file(path):
+            data = Path(path).read_bytes()
+            if len(data) % PACKET_SIZE != 0:
+                raise ValueError("sensor file has a partial packet")
+            records = []
+            for offset in range(0, len(data), PACKET_SIZE):
+                magic, version, sensor_id, temperature, humidity = struct.unpack(PACKET_FORMAT, data[offset:offset + PACKET_SIZE])
+                if magic != MAGIC or version != 1:
+                    raise ValueError("unsupported sensor packet")
+                records.append({
+                    "sensorId": sensor_id,
+                    "temperatureCenti": round(temperature * 100),
+                    "humidity": humidity,
+                })
+            return {
+                "packetCount": len(records),
+                "sensorIds": [record["sensorId"] for record in records],
+                "temperaturesCenti": [record["temperatureCenti"] for record in records],
+                "maxHumidity": max((record["humidity"] for record in records), default=0),
+            }
+      hints:
+      - range(0, len(data), PACKET_SIZE)로 chunk 시작점을 만들 수 있습니다.
+      - float 비교 대신 centi 정수로 바꿔 반환하면 검증이 안정됩니다.
+    check:
+      id: python.builtins.struct.read-sensor-file.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.struct.binary-packet.behavior.v1.fixture
+      fixtureHash: sha256-A0orzacqMjbHW3HLQRlXPKIijw0Haby6TkFZ8lPUjH0=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: input/sensors.bin
+          contentBase64: Q0RSTwEAAAAHQbwAAAAtQ0RSTwEAAAAIQZ4AAAAy
+        - path: input/bad_magic.bin
+          contentBase64: QkFEIQEAAAAHQbwAAAAt
+        - path: input/header.bin
+          contentBase64: EjRWeAAAAAIAABAA
+        - path: input/short_header.bin
+          contentBase64: EjRWeAAAAAI=
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_sensor_file
+        cases:
+        - id: summarizes-sensor-file
+          arguments:
+          - fixturePath: input/sensors.bin
+          expectedReturn:
+            packetCount: 2
+            sensorIds:
+            - 7
+            - 8
+            temperaturesCenti:
+            - 2350
+            - 1975
+            maxHumidity: 50
+        - id: rejects-bad-magic
+          arguments:
+          - fixturePath: input/bad_magic.bin
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 16_struct-header-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 16_struct-read-sensor-file-transfer
+    title: 파일 헤더를 다시 읽어 포맷 경계를 확인하기
+    subtitle: 12바이트 header와 빅엔디안 정수
+    goal: 12바이트 header에서 magic, version, dataSize를 읽고 짧은 header는 ValueError로 거부한다.
+    why: 시간이 지나도 struct에서 남아야 할 감각은 값 하나를 pack하는 법보다, byteLength와 endian을 먼저 고정한 뒤 해석하는 습관입니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. payload 본문이 아니라 header만 보고 파일 형식 경계를 판정하세요.
+    tips:
+    - header format은 `>III`이고 길이는 struct.calcsize로 확인하세요.
+    - magic은 8자리 16진수 문자열로 반환하세요.
+    exercise:
+      prompt: read_codaro_header(path)가 magicHex, version, dataSize, byteLength를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def read_codaro_header(path):
+            raise NotImplementedError
+      solution: |-
+        import struct
+        from pathlib import Path
+
+        HEADER_FORMAT = ">III"
+        HEADER_SIZE = struct.calcsize(HEADER_FORMAT)
+
+        def read_codaro_header(path):
+            data = Path(path).read_bytes()
+            if len(data) != HEADER_SIZE:
+                raise ValueError("header must be exactly 12 bytes")
+            magic, version, data_size = struct.unpack(HEADER_FORMAT, data)
+            if magic != 0x12345678:
+                raise ValueError("unexpected magic")
+            return {
+                "magicHex": f"0x{magic:08x}",
+                "version": version,
+                "dataSize": data_size,
+                "byteLength": len(data),
+            }
+      hints:
+      - len(data)와 struct.calcsize 결과를 먼저 비교하세요.
+      - '`f"0x{magic:08x}"`는 leading zero가 필요한 header에도 안전합니다.'
+    check:
+      id: python.builtins.struct.header.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.struct.binary-packet.behavior.v1.fixture
+      fixtureHash: sha256-A0orzacqMjbHW3HLQRlXPKIijw0Haby6TkFZ8lPUjH0=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: input/sensors.bin
+          contentBase64: Q0RSTwEAAAAHQbwAAAAtQ0RSTwEAAAAIQZ4AAAAy
+        - path: input/bad_magic.bin
+          contentBase64: QkFEIQEAAAAHQbwAAAAt
+        - path: input/header.bin
+          contentBase64: EjRWeAAAAAIAABAA
+        - path: input/short_header.bin
+          contentBase64: EjRWeAAAAAI=
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: read_codaro_header
+        cases:
+        - id: reads-big-endian-header
+          arguments:
+          - fixturePath: input/header.bin
+          expectedReturn:
+            magicHex: '0x12345678'
+            version: 2
+            dataSize: 4096
+            byteLength: 12
+        - id: rejects-short-header
+          arguments:
+          - fixturePath: input/short_header.bin
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

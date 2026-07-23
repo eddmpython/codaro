@@ -85,9 +85,6 @@ sections:
     hints:
     - 바꿀 지점은 `day28Scratch = ...` 오른쪽 값입니다.
     - 실행 뒤 `day28Scratch` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     noError: with 문 기초에서 `day28Scratch` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: with 문 기초 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
@@ -128,9 +125,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 컨텍스트 매니저 프로토콜의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -188,10 +182,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 줄의 문자열은 어떻게 표시될까요?
-      expectedValue: 'completed'
-      expectedDtype: str
   check:
     noError: 리소스 관리의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 리소스 관리 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
@@ -238,9 +228,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 예외 처리의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -276,9 +263,6 @@ sections:
     hints:
     - 바꿀 지점은 `sourceFile = ...` 오른쪽 값입니다.
     - 실행 뒤 `sourceFile` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     noError: 다중 컨텍스트에서 `sourceFile` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 다중 컨텍스트 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
@@ -329,9 +313,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 실전 패턴의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -427,9 +408,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 이 코드를 실행하면 어떤 예외가 발생할까요?
-      expectedError: ValueError
   check:
     type: noError
     noError: '현업 흐름 검증: 리포트 파일을 안전하게 쓰고 복원하기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
@@ -468,9 +446,6 @@ sections:
     hints:
     - 바꿀 지점은 `basicScratch = ...` 오른쪽 값입니다.
     - 실행 뒤 `basicScratch` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     noError: Day 28 종합 복습에서 `basicScratch` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Day 28 종합 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
@@ -488,3 +463,226 @@ sections:
     - 컨텍스트 매니저
     - 예외 처리
     aiFollowup: 학습자가 고른 리소스 관리 패턴과 업무 위치를 짧게 정리하고, 실패했을 때 어떤 상태가 복원되어야 하는지 한 가지를 되묻는다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: day28-head-middle-tail-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - with_basic
+    - reflection
+    title: 확장 언패킹으로 목록 분해하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 첫 값, 중간 목록, 마지막 값을 한 계약으로 반환한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: split_parts(items)가 head, middle, tail을 가진 딕셔너리를 반환하도록 완성하세요.
+      starterCode: |-
+        def split_parts(items):
+            raise NotImplementedError
+      solution: |-
+        def split_parts(items):
+            head, *middle, tail = items
+            return {'head': head, 'middle': middle, 'tail': tail}
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day28.head-middle-tail.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day28.head-middle-tail.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: split_parts
+        cases:
+        - id: many
+          arguments:
+          - value:
+            - 1
+            - 2
+            - 3
+            - 4
+          expectedReturn:
+            head: 1
+            middle:
+            - 2
+            - 3
+            tail: 4
+        - id: two
+          arguments:
+          - value:
+            - a
+            - b
+          expectedReturn:
+            head: a
+            middle: []
+            tail: b
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day28-match-payload-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day28-head-middle-tail-mastery
+    title: 구조 패턴으로 payload 분류하기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: match/case를 처음 보는 이벤트 데이터에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: classify_payload(payload)가 kind와 필드에 따라 'text:value', 'count:value', 또는 'unknown'을 반환하도록 완성하세요.
+      starterCode: |-
+        def classify_payload(payload):
+            raise NotImplementedError
+      solution: |-
+        def classify_payload(payload):
+            match payload:
+                case {'kind': 'text', 'value': str(value)}:
+                    return f"text:{value}"
+                case {'kind': 'count', 'value': int(value)}:
+                    return f"count:{value}"
+                case _:
+                    return 'unknown'
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day28.match-payload.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day28.match-payload.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: classify_payload
+        cases:
+        - id: text
+          arguments:
+          - value:
+              kind: text
+              value: hello
+          expectedReturn: text:hello
+        - id: count
+          arguments:
+          - value:
+              kind: count
+              value: 3
+          expectedReturn: count:3
+        - id: unknown
+          arguments:
+          - value:
+              kind: other
+          expectedReturn: unknown
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day28-walrus-lengths-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day28-match-payload-transfer
+    title: 계산한 길이를 조건과 결과에 재사용하기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 할당 표현식을 기억에서 다시 구성한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: long_lengths(texts, minimum)가 minimum 이상인 문자열 길이만 목록으로 반환하도록 완성하세요.
+      starterCode: |-
+        def long_lengths(texts, minimum):
+            raise NotImplementedError
+      solution: |-
+        def long_lengths(texts, minimum):
+            return [length for text in texts if (length := len(text)) >= minimum]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day28.walrus-lengths.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day28.walrus-lengths.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: long_lengths
+        cases:
+        - id: mixed
+          arguments:
+          - value:
+            - a
+            - python
+            - code
+          - value: 4
+          expectedReturn:
+          - 6
+          - 4
+        - id: none
+          arguments:
+          - value:
+            - a
+            - bb
+          - value: 3
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

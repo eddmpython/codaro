@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "scipy"
+sourceCount: 11
+lessons:
+  - lessonRef: "scipy/00_scipy소개"
+    sourcePath: "curricula/python/mathStatsMl/scipy/00_scipy소개.yaml"
+    metaId: "scipy_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "scipy/01_확률분포탐색기"
+    sourcePath: "curricula/python/mathStatsMl/scipy/01_확률분포탐색기.yaml"
+    metaId: "scipy_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "scipy/02_AB테스트분석"
+    sourcePath: "curricula/python/mathStatsMl/scipy/02_AB테스트분석.yaml"
+    metaId: "scipy_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "scipy/03_데이터보간기"
+    sourcePath: "curricula/python/mathStatsMl/scipy/03_데이터보간기.yaml"
+    metaId: "scipy_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "scipy/04_곡선피팅마스터"
+    sourcePath: "curricula/python/mathStatsMl/scipy/04_곡선피팅마스터.yaml"
+    metaId: "scipy_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "scipy/05_정규성검정기"
+    sourcePath: "curricula/python/mathStatsMl/scipy/05_정규성검정기.yaml"
+    metaId: "scipy_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "scipy/06_포트폴리오최적화"
+    sourcePath: "curricula/python/mathStatsMl/scipy/06_포트폴리오최적화.yaml"
+    metaId: "scipy_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "scipy/07_신호필터링"
+    sourcePath: "curricula/python/mathStatsMl/scipy/07_신호필터링.yaml"
+    metaId: "scipy_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "scipy/08_수치적분기"
+    sourcePath: "curricula/python/mathStatsMl/scipy/08_수치적분기.yaml"
+    metaId: "scipy_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "scipy/09_스펙트럼분석기"
+    sourcePath: "curricula/python/mathStatsMl/scipy/09_스펙트럼분석기.yaml"
+    metaId: "scipy_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "scipy/10_종합과학프로젝트"
+    sourcePath: "curricula/python/mathStatsMl/scipy/10_종합과학프로젝트.yaml"
+    metaId: "scipy_10"
+    registryStatus: registered
+    reviewStatus: pending

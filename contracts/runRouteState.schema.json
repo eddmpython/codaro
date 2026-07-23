@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codaro.dev/contracts/runRouteState.schema.json",
+  "title": "Codaro Run Route State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "surface",
+    "runtimeTier",
+    "lessonKey",
+    "pathId",
+    "sectionId",
+    "documentId",
+    "taskId"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "surface": {
+      "type": "string",
+      "enum": ["home", "chat", "editor", "curriculum", "automation", "share"]
+    },
+    "runtimeTier": {
+      "type": "string",
+      "enum": ["web", "local"]
+    },
+    "lessonKey": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 321,
+          "pattern": "^[^/\\u0000-\\u001f\\u007f]{1,160}/[^/\\u0000-\\u001f\\u007f]{1,160}$"
+        }
+      ]
+    },
+    "pathId": { "$ref": "#/$defs/NullableRouteId" },
+    "sectionId": { "$ref": "#/$defs/NullableRouteId" },
+    "documentId": { "$ref": "#/$defs/NullableRouteId" },
+    "taskId": { "$ref": "#/$defs/NullableRouteId" }
+  },
+  "$defs": {
+    "NullableRouteId": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^[^\\u0000-\\u001f\\u007f]+$"
+        }
+      ]
+    }
+  }
+}

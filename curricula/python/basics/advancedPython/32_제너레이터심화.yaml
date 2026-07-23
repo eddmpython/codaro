@@ -344,3 +344,291 @@ sections:
     type: noError
     noError: groupSums와 itertools 호출이 NameError나 TypeError 없이 실행되어야 합니다.
     resultCheck: sortedGroups가 [(a, 60), (b, 20), (c, 100)]이고 rawGroups는 키별 합이 분산되어 sorted를 앞에 두는 것이 왜 필요한지 보여야 합니다.
+assessment:
+  masteryVariants:
+  - id: 32_advanced_generators-lazy-pipeline-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - yield-from
+    - pipeline
+    - itertools-combine
+    title: lazy 파이프라인으로 홀수 제곱 offset 만들기
+    subtitle: lazy generator pipeline
+    goal: build_lazy_offsets(start, count)를 완성해 홀수만 필터링하고 제곱한 뒤 100을 더한 count개 값을 반환한다.
+    why: 제너레이터의 핵심은 yield 문법이 아니라, 큰 입력을 한꺼번에 만들지 않고 단계별 변환을 필요할 때만 소비하는 흐름입니다.
+    explanation: start부터 증가하는 정수 흐름에서 홀수만 남기고, 제곱한 뒤 100을 더해 count개만 리스트로 반환하세요.
+    tips:
+    - 각 단계는 generator를 반환하고 마지막 take 단계에서만 소비하세요.
+    - count가 음수이면 ValueError로 거부합니다.
+    exercise:
+      prompt: build_lazy_offsets(start, count)를 완성해 count개 offset 값을 반환하세요.
+      starterCode: |-
+        def build_lazy_offsets(start, count):
+            raise NotImplementedError
+      solution: |-
+        def build_lazy_offsets(start, count):
+            if count < 0:
+                raise ValueError("count must be non-negative")
+
+            def numbers():
+                current = start
+                while True:
+                    yield current
+                    current += 1
+
+            def keep_odd(values):
+                for value in values:
+                    if value % 2 == 1:
+                        yield value
+
+            def transform(values):
+                for value in values:
+                    yield value * value + 100
+
+            result = []
+            for value in transform(keep_odd(numbers())):
+                if len(result) == count:
+                    break
+                result.append(value)
+            return result
+      hints:
+      - 무한 numbers generator를 만들 수 있지만 count개만 소비해야 합니다.
+      - 필터와 변환을 분리하면 pipeline 단계가 보입니다.
+    check:
+      id: python.advanced.generators.lazy-pipeline.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.generators.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_lazy_offsets
+        cases:
+        - id: returns-first-five-odd-square-offsets
+          arguments:
+          - value: 1
+          - value: 5
+          expectedReturn:
+          - 101
+          - 109
+          - 125
+          - 149
+          - 181
+        - id: rejects-negative-count
+          arguments:
+          - value: 1
+          - value: -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 32_advanced_generators-batch-stream-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - send-coroutine
+    - throw-close
+    - itertools-combine
+    title: 이벤트 스트림을 고정 크기 batch로 흘려보내기
+    subtitle: generator batching transfer
+    goal: batch_event_stream(events, batch_size)를 완성해 입력 이벤트를 batch_size 단위로 묶은 리스트를 반환한다.
+    why: lazy pipeline을 배치 처리로 옮기면, 파일·로그·API 응답처럼 긴 흐름을 한 번에 메모리에 올리지 않는 설계 감각이 생깁니다.
+    explanation: batch_size는 양수여야 합니다. 마지막 batch는 크기가 작아도 반환하세요.
+    tips:
+    - 내부 generator에서 batch가 가득 찰 때 yield하면 됩니다.
+    - 남은 batch는 반복이 끝난 뒤 한 번 더 yield해야 합니다.
+    exercise:
+      prompt: batch_event_stream(events, batch_size)를 완성해 batch 목록을 반환하세요.
+      starterCode: |-
+        def batch_event_stream(events, batch_size):
+            raise NotImplementedError
+      solution: |-
+        def batch_event_stream(events, batch_size):
+            if batch_size <= 0:
+                raise ValueError("batch_size must be positive")
+
+            def batches():
+                batch = []
+                for event in events:
+                    batch.append(event)
+                    if len(batch) == batch_size:
+                        yield batch
+                        batch = []
+                if batch:
+                    yield batch
+
+            return list(batches())
+      hints:
+      - batch를 yield한 뒤에는 새 리스트로 바꿔야 이전 batch가 변하지 않습니다.
+      - 마지막에 남은 batch를 놓치지 마세요.
+    check:
+      id: python.advanced.generators.batch-stream.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.generators.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: batch_event_stream
+        cases:
+        - id: emits-full-and-final-partial-batches
+          arguments:
+          - value:
+            - O-1
+            - O-2
+            - O-3
+            - O-4
+            - O-5
+          - value: 2
+          expectedReturn:
+          - - O-1
+            - O-2
+          - - O-3
+            - O-4
+          - - O-5
+        - id: rejects-zero-batch-size
+          arguments:
+          - value: []
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 32_advanced_generators-tool-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 32_advanced_generators-batch-stream-transfer
+    title: 제너레이터 도구 선택 기준 회상하기
+    subtitle: generator tool recall
+    goal: choose_generator_tool(need)를 완성해 lazy 처리 상황별 도구와 주의점을 반환한다.
+    why: 제너레이터 고급 기능은 쓰는 순간 멋있어 보이지만, 소비 시점, 외부 제어, 종료 처리, itertools 조합을 구분하지 못하면 버그가 숨어듭니다.
+    explanation: delegate-subgenerator, inject-value, abort-stream, lazy-pipeline, stdlib-lazy-combine 상황별 도구를 선택하세요.
+    tips:
+    - yield from은 하위 generator에 위임할 때 씁니다.
+    - close와 throw는 finally 정리와 함께 생각해야 합니다.
+    exercise:
+      prompt: choose_generator_tool(need)를 완성해 tool, useWhen, caution을 반환하세요.
+      starterCode: |-
+        def choose_generator_tool(need):
+            raise NotImplementedError
+      solution: |-
+        def choose_generator_tool(need):
+            table = {
+                "delegate-subgenerator": {
+                    "tool": "yield-from",
+                    "useWhen": "one generator should expose another generator output",
+                    "caution": "return values and exceptions are delegated too",
+                },
+                "inject-value": {
+                    "tool": "send",
+                    "useWhen": "the consumer should push data back into the generator",
+                    "caution": "prime the generator before first non-None send",
+                },
+                "abort-stream": {
+                    "tool": "throw-or-close",
+                    "useWhen": "the consumer needs to stop or signal failure",
+                    "caution": "cleanup belongs in finally",
+                },
+                "lazy-pipeline": {
+                    "tool": "generator-pipeline",
+                    "useWhen": "large data should move through small transformations",
+                    "caution": "iterators are consumed once",
+                },
+                "stdlib-lazy-combine": {
+                    "tool": "itertools",
+                    "useWhen": "standard lazy grouping, slicing, or accumulation is needed",
+                    "caution": "groupby only groups adjacent keys",
+                },
+            }
+            if need not in table:
+                raise ValueError("unknown generator need")
+            return table[need]
+      hints:
+      - 먼저 데이터가 언제 소비되는지 확인하세요.
+      - itertools는 표준 도구지만 전제 조건을 모르면 결과가 틀릴 수 있습니다.
+    check:
+      id: python.advanced.generators.tool-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.generators.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_generator_tool
+        cases:
+        - id: recalls-pipeline-for-large-data
+          arguments:
+          - value: lazy-pipeline
+          expectedReturn:
+            tool: generator-pipeline
+            useWhen: large data should move through small transformations
+            caution: iterators are consumed once
+        - id: recalls-itertools-groupby-warning
+          arguments:
+          - value: stdlib-lazy-combine
+          expectedReturn:
+            tool: itertools
+            useWhen: standard lazy grouping, slicing, or accumulation is needed
+            caution: groupby only groups adjacent keys
+        - id: rejects-unknown-need
+          arguments:
+          - value: infinite-list
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

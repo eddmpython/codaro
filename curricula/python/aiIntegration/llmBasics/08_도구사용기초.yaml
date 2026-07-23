@@ -508,3 +508,268 @@ sections:
   check:
     noError: runToolLoopWithTrace 호출과 assertion이 모두 정상 실행되어야 합니다.
     resultCheck: outcome["calls"] 길이가 2 이상이고 text에 두 도시 이름이 포함되어야 합니다.
+assessment:
+  masteryVariants:
+  - id: 08_tool-use-extract-request-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - tool_use_response
+    title: 응답에서 tool_use 요청 추출하기
+    subtitle: tool request extractor
+    goal: extract_tool_request(response)를 완성해 첫 tool_use 블록의 id, name, input을 반환한다.
+    why: 도구 루프의 첫 분기점은 일반 텍스트와 tool_use 블록을 정확히 구분하는 것입니다.
+    explanation: response.content를 순회하며 type이 tool_use인 블록을 찾습니다. 도구 호출이 없으면 루프를 계속할 수 없으므로 ValueError를 발생시킵니다.
+    tips:
+    - 테스트에서는 dict 형태를 쓰지만 실제 SDK 객체도 같은 필드를 가집니다.
+    - input은 도구 핸들러로 바로 넘길 수 있도록 dict로 반환합니다.
+    exercise:
+      prompt: extract_tool_request(response)를 완성해 도구 호출 정보를 반환하세요.
+      starterCode: |-
+        def extract_tool_request(response):
+            raise NotImplementedError
+      solution: |-
+        def read_field(value, key, default=None):
+            if isinstance(value, dict):
+                return value.get(key, default)
+            return getattr(value, key, default)
+
+        def extract_tool_request(response):
+            for block in read_field(response, "content", []):
+                if read_field(block, "type") != "tool_use":
+                    continue
+                return {
+                    "id": read_field(block, "id"),
+                    "name": read_field(block, "name"),
+                    "input": dict(read_field(block, "input", {})),
+                }
+            raise ValueError("tool_use block not found")
+      hints:
+      - content 안에는 text 블록과 tool_use 블록이 함께 올 수 있습니다.
+      - 없는 도구 호출을 None으로 넘기지 말고 명시적으로 실패시킵니다.
+    check:
+      id: python.llm.tool-use.extract-request.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.tool-use.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: extract_tool_request
+        cases:
+        - id: extracts-first-tool-use-block
+          arguments:
+          - value:
+              content:
+              - type: text
+                text: 확인 중
+              - type: tool_use
+                id: toolu_01
+                name: get_weather
+                input:
+                  city: 서울
+          expectedReturn:
+            id: toolu_01
+            name: get_weather
+            input:
+              city: 서울
+        - id: rejects-response-without-tool-use
+          arguments:
+          - value:
+              content:
+              - type: text
+                text: 도구가 필요하지 않습니다
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 08_tool-use-result-message-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - tool_result_back
+    - tool_loop
+    title: tool_result 회신 메시지 만들기
+    subtitle: tool result message
+    goal: build_tool_result_message(tool_call, result_text)를 완성해 모델에 되돌릴 user 메시지를 만든다.
+    why: 도구 실행 결과는 아무 문자열이 아니라 정확한 tool_result 블록 형식으로 되돌아가야 다음 모델 호출이 이어집니다.
+    explanation: tool_call의 id를 tool_use_id로 복사하고, result_text를 content에 담은 user 메시지를 반환합니다. id가 없으면 어떤 호출의 결과인지 알 수 없으므로
+      실패해야 합니다.
+    tips:
+    - role은 user이고 content는 리스트입니다.
+    - tool_use_id는 tool_use 블록의 id와 정확히 같아야 합니다.
+    exercise:
+      prompt: build_tool_result_message(tool_call, result_text)를 완성해 tool_result 메시지를 반환하세요.
+      starterCode: |-
+        def build_tool_result_message(tool_call, result_text):
+            raise NotImplementedError
+      solution: |-
+        def build_tool_result_message(tool_call, result_text):
+            tool_id = tool_call.get("id")
+            if not tool_id:
+                raise ValueError("tool_call id is required")
+            return {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "tool_result",
+                        "tool_use_id": tool_id,
+                        "content": str(result_text),
+                    }
+                ],
+            }
+      hints:
+      - tool_call["id"]가 그대로 tool_use_id가 됩니다.
+      - 실행 결과는 문자열로 정규화해도 됩니다.
+    check:
+      id: python.llm.tool-use.result-message.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.tool-use.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_tool_result_message
+        cases:
+        - id: builds-user-tool-result-message
+          arguments:
+          - value:
+              id: toolu_01
+              name: get_weather
+              input:
+                city: 서울
+          - value: 서울은 24도, 맑음
+          expectedReturn:
+            role: user
+            content:
+            - type: tool_result
+              tool_use_id: toolu_01
+              content: 서울은 24도, 맑음
+        - id: rejects-missing-tool-id
+          arguments:
+          - value:
+              name: get_weather
+              input:
+                city: 서울
+          - value: 서울은 맑음
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 08_tool-use-loop-step-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 08_tool-use-result-message-transfer
+    title: 도구 루프 단계 회상하기
+    subtitle: tool loop recall
+    goal: choose_tool_loop_step(goal)를 완성해 도구 사용 단계별 규칙과 실패 위험을 반환한다.
+    why: 도구 사용은 스키마, tool_use 감지, 로컬 실행, tool_result 회신, 라운드 제한이 순서대로 맞아야 안정됩니다.
+    explanation: define-schema, inspect-stop-reason, dispatch-local, return-tool-result, limit-rounds 상황별로 적용할 규칙을 선택하세요.
+    tips:
+    - 도구 호출은 모델이 결정하지만 실행은 로컬 코드가 책임집니다.
+    - 라운드 제한이 없으면 도구 호출 루프가 끝나지 않을 수 있습니다.
+    exercise:
+      prompt: choose_tool_loop_step(goal)를 완성해 rule, useWhen, risk를 반환하세요.
+      starterCode: |-
+        def choose_tool_loop_step(goal):
+            raise NotImplementedError
+      solution: |-
+        def choose_tool_loop_step(goal):
+            table = {
+                "define-schema": {"rule": "describe tool name and input schema", "useWhen": "exposing a callable function", "risk": "bad argument shape"},
+                "inspect-stop-reason": {"rule": "branch when stop_reason is tool_use", "useWhen": "response arrives", "risk": "ignored tool call"},
+                "dispatch-local": {"rule": "execute the named local handler", "useWhen": "tool_use block is present", "risk": "no side effect"},
+                "return-tool-result": {"rule": "send user tool_result block with matching id", "useWhen": "handler returns", "risk": "model cannot continue"},
+                "limit-rounds": {"rule": "cap loop iterations", "useWhen": "tool use can repeat", "risk": "infinite loop"},
+            }
+            if goal not in table:
+                raise ValueError("unknown tool loop goal")
+            return table[goal]
+      hints:
+      - stop_reason은 다음 행동을 결정하는 신호입니다.
+      - tool_result의 id 연결이 끊기면 모델이 결과를 매칭하지 못합니다.
+    check:
+      id: python.llm.tool-use.loop-step.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.tool-use.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_tool_loop_step
+        cases:
+        - id: recalls-dispatch-local
+          arguments:
+          - value: dispatch-local
+          expectedReturn:
+            rule: execute the named local handler
+            useWhen: tool_use block is present
+            risk: no side effect
+        - id: recalls-limit-rounds
+          arguments:
+          - value: limit-rounds
+          expectedReturn:
+            rule: cap loop iterations
+            useWhen: tool use can repeat
+            risk: infinite loop
+        - id: rejects-unknown-goal
+          arguments:
+          - value: click-confirm
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

@@ -1,0 +1,54 @@
+schemaVersion: 1
+category: "visionApps"
+sourceCount: 10
+lessons:
+  - lessonRef: "visionApps/01_문서스캐너"
+    sourcePath: "curricula/python/imageVision/visionApps/01_문서스캐너.yaml"
+    metaId: "visionApps_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionApps/02_QR바코드리더"
+    sourcePath: "curricula/python/imageVision/visionApps/02_QR바코드리더.yaml"
+    metaId: "visionApps_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionApps/03_OCR기초"
+    sourcePath: "curricula/python/imageVision/visionApps/03_OCR기초.yaml"
+    metaId: "visionApps_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionApps/04_한국어OCR"
+    sourcePath: "curricula/python/imageVision/visionApps/04_한국어OCR.yaml"
+    metaId: "visionApps_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionApps/05_얼굴검출모자이크"
+    sourcePath: "curricula/python/imageVision/visionApps/05_얼굴검출모자이크.yaml"
+    metaId: "visionApps_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionApps/06_얼굴임베딩비교"
+    sourcePath: "curricula/python/imageVision/visionApps/06_얼굴임베딩비교.yaml"
+    metaId: "visionApps_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionApps/07_이미지중복검출"
+    sourcePath: "curricula/python/imageVision/visionApps/07_이미지중복검출.yaml"
+    metaId: "visionApps_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionApps/08_영상자동썸네일"
+    sourcePath: "curricula/python/imageVision/visionApps/08_영상자동썸네일.yaml"
+    metaId: "visionApps_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionApps/09_화면캡처분석"
+    sourcePath: "curricula/python/imageVision/visionApps/09_화면캡처분석.yaml"
+    metaId: "visionApps_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "visionApps/10_종합사진정리기"
+    sourcePath: "curricula/python/imageVision/visionApps/10_종합사진정리기.yaml"
+    metaId: "visionApps_10"
+    registryStatus: registered
+    reviewStatus: pending

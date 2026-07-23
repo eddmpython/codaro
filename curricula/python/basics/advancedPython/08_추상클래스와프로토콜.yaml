@@ -645,3 +645,343 @@ sections:
     type: noError
     noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 08_advanced_abc-protocol-export-contract-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - abc_module
+    - protocol_typing
+    - workflow_validation
+    title: ABC 저장소와 Protocol 포매터로 내보내기 계약 검증하기
+    subtitle: explicit sink and structural formatter
+    goal: rows를 받아 ABC로 sink 구현을 강제하고 runtime_checkable Protocol로 formatter 구조를 확인한 뒤 저장 결과를 반환한다.
+    why: ABC와 Protocol의 차이는 시험용 용어가 아니라, 런타임 강제 계약과 기존 객체를 받는 구조적 계약을 어디에 둘지 결정하는 설계 문제입니다.
+    explanation: run_export_contract(rows)를 완성해 추상 sink 인스턴스화 실패, formatter 구조 검사, CSV 저장 결과를 함께 검증하세요.
+    tips:
+    - ReportSink는 write를 구현하지 않으면 인스턴스화할 수 없어야 합니다.
+    - RowFormatter는 상속하지 않아도 render 메서드가 있으면 runtime check를 통과합니다.
+    exercise:
+      prompt: run_export_contract(rows)를 완성해 savedName, content, formatterIsProtocol, abstractRejected를 반환하세요.
+      starterCode: |-
+        def run_export_contract(rows):
+            raise NotImplementedError
+      solution: |-
+        def run_export_contract(rows):
+            from abc import ABC, abstractmethod
+            from typing import Protocol, runtime_checkable
+
+            @runtime_checkable
+            class RowFormatter(Protocol):
+                def render(self, rows: list[dict]) -> str:
+                    ...
+
+            class ReportSink(ABC):
+                @abstractmethod
+                def write(self, name: str, content: str) -> str:
+                    raise NotImplementedError
+
+            class CsvFormatter:
+                def render(self, rows):
+                    header = ",".join(rows[0])
+                    lines = [header]
+                    for row in rows:
+                        lines.append(",".join(str(row[key]) for key in rows[0]))
+                    return "\n".join(lines)
+
+            class MemorySink(ReportSink):
+                def __init__(self):
+                    self.files = {}
+
+                def write(self, name, content):
+                    self.files[name] = content
+                    return name
+
+            try:
+                ReportSink()
+                abstract_rejected = False
+            except TypeError:
+                abstract_rejected = True
+
+            formatter = CsvFormatter()
+            if not isinstance(formatter, RowFormatter):
+                raise TypeError("formatter must implement render")
+            sink = MemorySink()
+            content = formatter.render(rows)
+            saved_name = sink.write("orders.csv", content)
+            return {
+                "savedName": saved_name,
+                "content": sink.files[saved_name],
+                "formatterIsProtocol": isinstance(formatter, RowFormatter),
+                "abstractRejected": abstract_rejected,
+            }
+      hints:
+      - ABC는 상속과 abstractmethod 구현 여부를 런타임에 강제합니다.
+      - Protocol은 구조를 확인하므로 CsvFormatter가 상속하지 않아도 됩니다.
+    check:
+      id: python.advanced.abc-protocol.export-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.abc-protocol.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: run_export_contract
+        cases:
+        - id: exports-rows-through-abc-sink-and-protocol-formatter
+          arguments:
+          - value:
+            - id: A-100
+              amount: 12000
+            - id: A-101
+              amount: 9000
+          expectedReturn:
+            savedName: orders.csv
+            content: |-
+              id,amount
+              A-100,12000
+              A-101,9000
+            formatterIsProtocol: true
+            abstractRejected: true
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 08_advanced_abc-plugin-pipeline-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - practical_abc
+    - interface_design
+    - duck_typing
+    title: ABC 플러그인 파이프라인으로 데이터 검증과 보강 순서 고정하기
+    subtitle: plugin interface pipeline
+    goal: 데이터 dict를 받아 ABC Plugin 구현체들이 순서대로 실행된 결과와 추상 클래스 거부 여부를 반환한다.
+    why: 전이 과제에서는 내보내기 예시 밖에서 ABC를 전략 패턴으로 사용해, 구현 누락을 빨리 실패시키고 실행 순서를 명시합니다.
+    explanation: run_plugin_pipeline(data)를 완성해 ValidatePlugin과 EnrichPlugin을 같은 Plugin 인터페이스로 실행하고 결과 steps를 검증하세요.
+    tips:
+    - Plugin은 name과 execute를 모두 추상 계약으로 가져야 합니다.
+    - ValidatePlugin은 id가 없으면 ValueError로 막아야 합니다.
+    exercise:
+      prompt: run_plugin_pipeline(data)를 완성해 result, pluginNames, abstractRejected를 반환하세요.
+      starterCode: |-
+        def run_plugin_pipeline(data):
+            raise NotImplementedError
+      solution: |-
+        def run_plugin_pipeline(data):
+            from abc import ABC, abstractmethod
+
+            class Plugin(ABC):
+                @property
+                @abstractmethod
+                def name(self) -> str:
+                    raise NotImplementedError
+
+                @abstractmethod
+                def execute(self, payload: dict) -> dict:
+                    raise NotImplementedError
+
+            class ValidatePlugin(Plugin):
+                @property
+                def name(self):
+                    return "validate"
+
+                def execute(self, payload):
+                    if "id" not in payload:
+                        raise ValueError("id is required")
+                    payload = dict(payload)
+                    payload.setdefault("steps", []).append("validate")
+                    return payload
+
+            class EnrichPlugin(Plugin):
+                @property
+                def name(self):
+                    return "enrich"
+
+                def execute(self, payload):
+                    payload = dict(payload)
+                    payload["kind"] = "report-row"
+                    payload.setdefault("steps", []).append("enrich")
+                    return payload
+
+            try:
+                Plugin()
+                abstract_rejected = False
+            except TypeError:
+                abstract_rejected = True
+
+            plugins = [ValidatePlugin(), EnrichPlugin()]
+            result = dict(data)
+            for plugin in plugins:
+                result = plugin.execute(result)
+            return {
+                "result": result,
+                "pluginNames": [plugin.name for plugin in plugins],
+                "abstractRejected": abstract_rejected,
+            }
+      hints:
+      - 각 plugin은 새 dict를 반환하면 입력 부작용을 줄일 수 있습니다.
+      - 추상 클래스 인스턴스화 실패도 계약 검증의 일부입니다.
+    check:
+      id: python.advanced.abc.plugin-pipeline.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.abc-protocol.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: run_plugin_pipeline
+        cases:
+        - id: runs-plugins-in-interface-order
+          arguments:
+          - value:
+              id: A-100
+              amount: 12000
+          expectedReturn:
+            result:
+              id: A-100
+              amount: 12000
+              steps:
+              - validate
+              - enrich
+              kind: report-row
+            pluginNames:
+            - validate
+            - enrich
+            abstractRejected: true
+        - id: rejects-missing-id
+          arguments:
+          - value:
+              amount: 12000
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 08_advanced_abc-protocol-tool-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 08_advanced_abc-plugin-pipeline-transfer
+    title: ABC, Protocol, 덕 타이핑 선택 기준 회상하기
+    subtitle: interface tool recall
+    goal: 목적 이름을 받아 적절한 인터페이스 설계 도구와 런타임 강제 여부를 반환한다.
+    why: 시간이 지나도 남아야 할 지식은 ABC와 Protocol의 이름보다, 명시 상속 강제와 구조적 호환 중 무엇이 필요한지 판단하는 기준입니다.
+    explanation: choose_interface_tool(goal)를 완성해 enforce-subclass-contract, accept-existing-objects, dynamic-behavior 목적별
+      도구를 고르세요.
+    tips:
+    - ABC는 구현 누락을 인스턴스 생성 시점에 막습니다.
+    - Protocol은 기존 클래스가 상속 없이도 타입 계약을 만족하게 합니다.
+    exercise:
+      prompt: choose_interface_tool(goal)를 완성해 목적별 인터페이스 도구 선택 결과를 반환하세요.
+      starterCode: |-
+        def choose_interface_tool(goal):
+            raise NotImplementedError
+      solution: |-
+        def choose_interface_tool(goal):
+            table = {
+                "enforce-subclass-contract": {
+                    "tool": "ABC",
+                    "runtimeEnforced": True,
+                    "requiresInheritance": True,
+                },
+                "accept-existing-objects": {
+                    "tool": "Protocol",
+                    "runtimeEnforced": False,
+                    "requiresInheritance": False,
+                },
+                "dynamic-behavior": {
+                    "tool": "duck typing",
+                    "runtimeEnforced": False,
+                    "requiresInheritance": False,
+                },
+            }
+            if goal not in table:
+                raise ValueError("unknown interface goal")
+            return table[goal]
+      hints:
+      - runtime_checkable Protocol도 시그니처까지 검증하지는 않습니다.
+      - 기존 객체를 느슨하게 받으려면 Protocol이나 덕 타이핑을 고려하세요.
+    check:
+      id: python.advanced.abc-protocol.tool-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.abc-protocol.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_interface_tool
+        cases:
+        - id: recalls-abc-for-runtime-contract
+          arguments:
+          - value: enforce-subclass-contract
+          expectedReturn:
+            tool: ABC
+            runtimeEnforced: true
+            requiresInheritance: true
+        - id: recalls-protocol-for-existing-objects
+          arguments:
+          - value: accept-existing-objects
+          expectedReturn:
+            tool: Protocol
+            runtimeEnforced: false
+            requiresInheritance: false
+        - id: rejects-unknown-goal
+          arguments:
+          - value: monkeypatch-method
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

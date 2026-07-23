@@ -407,3 +407,324 @@ sections:
     type: noError
     noError: 종합 복습에서 `nums` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 종합 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 28_copy-boundary-audit-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - shallow_copy
+    - deep_copy
+    - workflow_validation
+    title: 얕은 복사와 깊은 복사의 원본 오염 경계 증명하기
+    subtitle: shared nested objects
+    goal: 중첩 dict/list를 얕은 복사와 깊은 복사로 각각 수정한 뒤 원본이 어디서 바뀌는지 반환값으로 증명한다.
+    why: copy 학습의 핵심은 함수 이름 암기가 아니라, 실제 데이터 구조에서 어떤 중첩 객체가 공유되는지 검증하는 습관입니다.
+    explanation: audit_copy_boundaries(order)를 완성해 shallow copy는 중첩 items와 metadata를 공유하고, deepcopy는 중첩 구조를 독립 복제한다는 것을 결과
+      dict로 보여주세요.
+    tips:
+    - copy.copy 결과는 최상위 dict만 새 객체이고 내부 list/dict는 같은 객체입니다.
+    - copy.deepcopy 결과를 수정해도 원본의 같은 위치 값은 바뀌지 않아야 합니다.
+    exercise:
+      prompt: audit_copy_boundaries(order)를 완성해 shallow와 deep copy의 공유 여부와 수정 결과를 반환하세요.
+      starterCode: |-
+        def audit_copy_boundaries(order):
+            raise NotImplementedError
+      solution: |-
+        def audit_copy_boundaries(order):
+            import copy
+
+            if not order.get("items"):
+                raise ValueError("items required")
+
+            shallow = copy.copy(order)
+            deep = copy.deepcopy(order)
+
+            shallow["items"][0]["qty"] += 1
+            shallow["metadata"]["rush"] = True
+            deep["items"][1]["qty"] += 10
+
+            return {
+                "originalFirstQty": order["items"][0]["qty"],
+                "originalSecondQty": order["items"][1]["qty"],
+                "deepSecondQty": deep["items"][1]["qty"],
+                "originalRush": order["metadata"]["rush"],
+                "shallowSharesItems": shallow["items"] is order["items"],
+                "deepSharesItems": deep["items"] is order["items"],
+                "deepSharesMetadata": deep["metadata"] is order["metadata"],
+            }
+      hints:
+      - 먼저 shallow를 수정해 원본이 함께 바뀌는 위치를 기록하세요.
+      - deep을 수정한 뒤 원본의 같은 위치가 그대로인지 비교하세요.
+    check:
+      id: python.builtins.copy.boundary-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.copy.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_copy_boundaries
+        cases:
+        - id: reports-shallow-leak-and-deep-isolation
+          arguments:
+          - value:
+              items:
+              - sku: A-100
+                qty: 2
+              - sku: B-200
+                qty: 1
+              metadata:
+                rush: false
+              notes:
+              - gift
+          expectedReturn:
+            originalFirstQty: 3
+            originalSecondQty: 1
+            deepSecondQty: 11
+            originalRush: true
+            shallowSharesItems: true
+            deepSharesItems: false
+            deepSharesMetadata: false
+        - id: rejects-order-without-items
+          arguments:
+          - value:
+              items: []
+              metadata:
+                rush: false
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 28_copy-template-variant-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - practical
+    - custom_objects
+    - workflow_validation
+    title: 교육 과정 템플릿을 deepcopy로 안전하게 파생하기
+    subtitle: safe template variant
+    goal: 기본 템플릿을 깊은 복사한 뒤 학습자 이름, 단계, rubric을 바꿔도 원본 템플릿이 보존되는지 반환한다.
+    why: 실전에서는 기본 설정이나 커리큘럼 템플릿을 여러 변형으로 파생합니다. 여기서 원본을 오염시키면 이후 학습 흐름 전체가 틀어집니다.
+    explanation: build_training_variant(template, learner_name, extra_step)를 완성해 deepcopy로 독립 변형을 만들고 원본과 변형의 steps/rubric
+      공유 여부를 함께 반환하세요.
+    tips:
+    - learner_name과 extra_step은 strip해서 저장하세요.
+    - extra_step이 비어 있으면 의미 없는 변형이므로 ValueError로 막으세요.
+    exercise:
+      prompt: build_training_variant(template, learner_name, extra_step)를 완성해 원본 보존과 변형 결과를 반환하세요.
+      starterCode: |-
+        def build_training_variant(template, learner_name, extra_step):
+            raise NotImplementedError
+      solution: |-
+        def build_training_variant(template, learner_name, extra_step):
+            import copy
+
+            step = extra_step.strip()
+            if not step:
+                raise ValueError("extra_step required")
+
+            variant = copy.deepcopy(template)
+            variant["learner"] = learner_name.strip()
+            variant["steps"].append(step)
+            variant["rubric"]["checks"].append("variant-smoke")
+
+            return {
+                "originalLearner": template["learner"],
+                "variantLearner": variant["learner"],
+                "originalSteps": template["steps"],
+                "variantSteps": variant["steps"],
+                "originalChecks": template["rubric"]["checks"],
+                "variantChecks": variant["rubric"]["checks"],
+                "sharesSteps": variant["steps"] is template["steps"],
+                "sharesRubric": variant["rubric"] is template["rubric"],
+            }
+      hints:
+      - 원본 template에는 append를 직접 호출하지 마세요.
+      - 반환값에 원본과 변형을 모두 넣어 보존 여부가 드러나게 만드세요.
+    check:
+      id: python.builtins.copy.template-variant.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.copy.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_training_variant
+        cases:
+        - id: creates-independent-training-variant
+          arguments:
+          - value:
+              learner: baseline
+              steps:
+              - read
+              - edit
+              - run
+              rubric:
+                checks:
+                - no-error
+          - value: ' Hana '
+          - value: ' explain failure '
+          expectedReturn:
+            originalLearner: baseline
+            variantLearner: Hana
+            originalSteps:
+            - read
+            - edit
+            - run
+            variantSteps:
+            - read
+            - edit
+            - run
+            - explain failure
+            originalChecks:
+            - no-error
+            variantChecks:
+            - no-error
+            - variant-smoke
+            sharesSteps: false
+            sharesRubric: false
+        - id: rejects-empty-extra-step
+          arguments:
+          - value:
+              learner: baseline
+              steps:
+              - read
+              rubric:
+                checks: []
+          - value: Codaro
+          - value: '   '
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 28_copy-shallow-patch-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 28_copy-template-variant-transfer
+    title: 얕은 복사 설정 패치에서 중첩 aliasing 회상하기
+    subtitle: top-level new, nested shared
+    goal: copy.copy로 만든 설정 복사본의 최상위 값과 중첩 retry 값이 각각 어떻게 동작하는지 반환한다.
+    why: 시간이 지나도 남아야 할 copy 감각은 얕은 복사가 최상위 객체만 새로 만들고 내부 가변 객체는 공유한다는 점입니다.
+    explanation: simulate_shallow_patch(config, max_retries)를 완성해 최상위 enabled 변경은 원본에 새지 않지만, 중첩 retry 변경은 원본에 새는 것을 반환하세요.
+    tips:
+    - copy.copy(config)는 config 자체와 다른 객체입니다.
+    - 하지만 config["retry"] 같은 중첩 dict는 같은 객체로 남습니다.
+    exercise:
+      prompt: simulate_shallow_patch(config, max_retries)를 완성해 얕은 복사의 최상위 변경과 중첩 변경 차이를 반환하세요.
+      starterCode: |-
+        def simulate_shallow_patch(config, max_retries):
+            raise NotImplementedError
+      solution: |-
+        def simulate_shallow_patch(config, max_retries):
+            import copy
+
+            if max_retries < 1:
+                raise ValueError("max_retries must be positive")
+
+            cloned = copy.copy(config)
+            cloned["enabled"] = False
+            cloned["retry"]["max"] = max_retries
+
+            return {
+                "sameTopLevelObject": cloned is config,
+                "sharesRetry": cloned["retry"] is config["retry"],
+                "originalEnabled": config["enabled"],
+                "clonedEnabled": cloned["enabled"],
+                "originalRetryMax": config["retry"]["max"],
+                "clonedRetryMax": cloned["retry"]["max"],
+            }
+      hints:
+      - 최상위 enabled는 cloned에서만 바뀌어야 합니다.
+      - retry max는 중첩 dict를 공유하므로 원본에서도 바뀝니다.
+    check:
+      id: python.builtins.copy.shallow-patch.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.copy.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: simulate_shallow_patch
+        cases:
+        - id: distinguishes-top-level-and-nested-mutation
+          arguments:
+          - value:
+              enabled: true
+              retry:
+                max: 2
+                delaySeconds: 30
+          - value: 5
+          expectedReturn:
+            sameTopLevelObject: false
+            sharesRetry: true
+            originalEnabled: true
+            clonedEnabled: false
+            originalRetryMax: 5
+            clonedRetryMax: 5
+        - id: rejects-invalid-retry-count
+          arguments:
+          - value:
+              enabled: true
+              retry:
+                max: 2
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

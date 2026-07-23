@@ -5,6 +5,9 @@ export default defineConfig({
   base: "/codaro/",
   publicDir: "static",
   plugins: [react()],
+  ssr: {
+    noExternal: ["@astryxdesign/theme-neutral"],
+  },
   build: {
     outDir: "build",
     emptyOutDir: true,

@@ -15,8 +15,8 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-surface: var(--accent);
+  --color-accent-surface-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
   --color-input: var(--input);
@@ -52,133 +52,10 @@
   --text-md--line-height: 1.7;
   --text-lg: 16px;
   --text-lg--line-height: 1.35;
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-}
-
-:root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.141 0.005 285.823);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.141 0.005 285.823);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.21 0.006 285.885);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.21 0.006 285.885);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.705 0.015 286.067);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-primary: oklch(0.21 0.006 285.885);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.705 0.015 286.067);
-  --code: oklch(0.967 0.001 286.375);
-  --code-foreground: oklch(0.141 0.005 285.823);
-  --success: oklch(0.596 0.145 163.225);
-  --success-foreground: oklch(0.985 0 0);
-  --warning: oklch(0.666 0.179 58.318);
-  --warning-foreground: oklch(0.141 0.005 285.823);
-  --accent-brand: var(--primary);
-  --accent-brand-foreground: var(--primary-foreground);
-}
-
-.dark {
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.92 0.004 286.32);
-  --primary-foreground: oklch(0.21 0.006 285.885);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(0.274 0.006 286.033);
-  --input: oklch(0.274 0.006 286.033);
-  --ring: oklch(0.552 0.016 285.938);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.274 0.006 286.033);
-  --sidebar-ring: oklch(0.552 0.016 285.938);
-  --code: oklch(0.21 0.006 285.885);
-  --code-foreground: oklch(0.985 0 0);
-  --success: oklch(0.765 0.177 163.223);
-  --success-foreground: oklch(0.141 0.005 285.823);
-  --warning: oklch(0.828 0.189 84.429);
-  --warning-foreground: oklch(0.141 0.005 285.823);
-}
-
-/* 사용자 선택 강조색 팔레트 — html[data-accent]가 --accent-brand만 갈아끼운다.
-   --primary(무채 흑/백)와 shadcn --accent(중립 hover면)는 불변. 기본(zinc)은 속성 없음.
-   다크는 html.dark[data-accent] 특이성(0,2,1)으로 라이트 값을 확실히 이긴다. */
-html[data-accent="blue"] {
-  --accent-brand: oklch(0.546 0.245 262.881);
-  --accent-brand-foreground: oklch(0.985 0 0);
-}
-html[data-accent="indigo"] {
-  --accent-brand: oklch(0.511 0.262 276.966);
-  --accent-brand-foreground: oklch(0.985 0 0);
-}
-html[data-accent="violet"] {
-  --accent-brand: oklch(0.541 0.281 293.009);
-  --accent-brand-foreground: oklch(0.985 0 0);
-}
-/* teal-600은 흰 글자 대비 3.6:1로 AA 미달 — 라이트는 teal-700 값을 쓴다. */
-html[data-accent="teal"] {
-  --accent-brand: oklch(0.511 0.096 186.391);
-  --accent-brand-foreground: oklch(0.985 0 0);
-}
-html.dark[data-accent="blue"] {
-  --accent-brand: oklch(0.707 0.165 254.624);
-  --accent-brand-foreground: oklch(0.141 0.005 285.823);
-}
-html.dark[data-accent="indigo"] {
-  --accent-brand: oklch(0.673 0.182 276.935);
-  --accent-brand-foreground: oklch(0.141 0.005 285.823);
-}
-html.dark[data-accent="violet"] {
-  --accent-brand: oklch(0.702 0.183 293.541);
-  --accent-brand-foreground: oklch(0.141 0.005 285.823);
-}
-html.dark[data-accent="teal"] {
-  --accent-brand: oklch(0.777 0.152 181.912);
-  --accent-brand-foreground: oklch(0.141 0.005 285.823);
-}
-html[data-accent] {
-  --ring: var(--accent-brand);
+  --radius-sm: var(--radius-inner);
+  --radius-md: var(--radius-element);
+  --radius-lg: var(--radius-container);
+  --radius-xl: var(--radius-container);
 }
 
 @layer base {
@@ -187,38 +64,34 @@ html[data-accent] {
     box-sizing: border-box;
   }
 
+  html,
+  #root,
+  #root > [data-astryx-theme] {
+    height: 100%;
+    overflow: hidden;
+  }
+
   body {
     @apply bg-background text-foreground;
+    margin: 0;
+    min-width: 320px;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--color-background-body);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-body);
+    font-size: 13px;
   }
-}
 
-body {
-  margin: 0;
-  min-width: 320px;
-  height: 100vh;
-  overflow: hidden;
-  background: var(--background);
-  color: var(--foreground);
-  font-size: 13px;
-  font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
 
-html,
-#root {
-  height: 100%;
-  overflow: hidden;
-}
-
-button,
-input,
-textarea,
-select {
-  font: inherit;
-}
-
-/* giscus(GitHub Discussions) 댓글 — iframe 기본 너비(300px) 대신 컨테이너를 가득 채운다. */
-[data-lesson-comments] .giscus,
-[data-lesson-comments] .giscus-frame {
-  width: 100%;
+  [data-lesson-comments] .giscus,
+  [data-lesson-comments] .giscus-frame {
+    width: 100%;
+  }
 }

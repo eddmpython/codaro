@@ -436,3 +436,322 @@ sections:
     - "ws.append(iterable)은 max_row+1 위치에 한 줄을 쌓는다"
     - "get_column_letter / column_index_from_string으로 컬럼 좌표를 자유롭게 변환한다"
     - "load_workbook(path)로 저장한 파일을 다시 열어 항상 결과를 검증한다"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: openpyxl_02-cell-update-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_two_coords
+    - summary
+    title: 셀 write의 type·overwrite·blank 정책 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: schema와 기존 값 보호 정책으로 update 계획을 판정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - Excel 표시값이 같아 보여도 Python value type을 schema로 검사하세요.
+    - 기존 nonblank 셀 overwrite는 명시적 정책 없이는 차단하세요.
+    exercise:
+      prompt: audit_cell_updates(updates, schema, existing_values, allow_overwrite)를 완성하세요.
+      starterCode: |-
+        def audit_cell_updates(updates, schema, existing_values, allow_overwrite):
+            raise NotImplementedError
+      solution: |
+        def audit_cell_updates(updates, schema, existing_values, allow_overwrite):
+            failures = []
+            accepted = []
+            rejected = []
+            for update in updates:
+                cell = update["cell"]
+                reasons = []
+                expected_type = schema.get(cell)
+                if expected_type and type(update["value"]).__name__ != expected_type:
+                    reasons.append("type")
+                if cell in existing_values and existing_values[cell] not in {None, ""} and not allow_overwrite:
+                    reasons.append("overwrite")
+                if reasons:
+                    rejected.append({"cell": cell, "reasons": reasons})
+                else:
+                    accepted.append(cell)
+            if rejected:
+                failures.append("updates")
+            return {"ready": not failures, "accepted": accepted, "rejected": rejected}
+      hints: *id001
+    check:
+      id: python.openpyxl.openpyxl_02.cell-update-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_02.cell-update-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_cell_updates
+        cases:
+        - id: accepts-typed-empty-cell-updates
+          arguments:
+          - value:
+            - cell: A1
+              value: Name
+            - cell: B2
+              value: 3
+          - value:
+              A1: str
+              B2: int
+          - value:
+              A1: null
+              B2: ''
+          - value: false
+          expectedReturn:
+            ready: true
+            accepted:
+            - A1
+            - B2
+            rejected: []
+        - id: reports-type-and-overwrite
+          arguments:
+          - value:
+            - cell: A1
+              value: 3
+          - value:
+              A1: str
+          - value:
+              A1: old
+          - value: false
+          expectedReturn:
+            ready: false
+            accepted: []
+            rejected:
+            - cell: A1
+              reasons:
+              - type
+              - overwrite
+        - id: allows-explicit-overwrite
+          arguments:
+          - value:
+            - cell: A1
+              value: new
+          - value:
+              A1: str
+          - value:
+              A1: old
+          - value: true
+          expectedReturn:
+            ready: true
+            accepted:
+            - A1
+            rejected: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: openpyxl_02-cell-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - openpyxl_02-cell-update-audit-mastery
+    title: 새 셀 write 결과에 값·type reconciliation 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 계획값과 재개방된 셀의 값·data type을 대조한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 재개방한 cell의 value와 Excel data type을 함께 비교하세요.
+    - 계획에 없던 변경 셀도 unexpected로 실패시키세요.
+    exercise:
+      prompt: reconcile_cell_results(planned, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_cell_results(planned, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_cell_results(planned, observed):
+            observed_map = {item["cell"]: item for item in observed}
+            missing = []
+            mismatches = []
+            for item in planned:
+                cell = item["cell"]
+                if cell not in observed_map:
+                    missing.append(cell)
+                    continue
+                actual = observed_map[cell]
+                reasons = []
+                if actual.get("value") != item.get("value"):
+                    reasons.append("value")
+                if actual.get("dataType") != item.get("dataType"):
+                    reasons.append("type")
+                if reasons:
+                    mismatches.append({"cell": cell, "reasons": reasons})
+            unexpected = sorted(set(observed_map) - {item["cell"] for item in planned})
+            return {"passed": not missing and not mismatches and not unexpected, "missing": sorted(missing), "mismatches": mismatches, "unexpected": unexpected}
+      hints: *id002
+    check:
+      id: python.openpyxl.openpyxl_02.cell-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_02.cell-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_cell_results
+        cases:
+        - id: accepts-value-and-type-match
+          arguments:
+          - value:
+            - cell: A1
+              value: Name
+              dataType: s
+          - value:
+            - cell: A1
+              value: Name
+              dataType: s
+          expectedReturn:
+            passed: true
+            missing: []
+            mismatches: []
+            unexpected: []
+        - id: reports-value-and-type-mismatch
+          arguments:
+          - value:
+            - cell: B2
+              value: 3
+              dataType: n
+          - value:
+            - cell: B2
+              value: '3'
+              dataType: s
+          expectedReturn:
+            passed: false
+            missing: []
+            mismatches:
+            - cell: B2
+              reasons:
+              - value
+              - type
+            unexpected: []
+        - id: reports-missing-and-unexpected
+          arguments:
+          - value:
+            - cell: A1
+              value: 1
+              dataType: n
+          - value:
+            - cell: C1
+              value: 1
+              dataType: n
+          expectedReturn:
+            passed: false
+            missing:
+            - A1
+            mismatches: []
+            unexpected:
+            - C1
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: openpyxl_02-cell-io-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - openpyxl_02-cell-result-reconciliation-transfer
+    title: 셀 읽기·쓰기 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: value·type·overwrite·재개방 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Workbook 저장 성공과 업무 값·수식·표시의 정확성을 분리해 검증하세요.
+    - Web에서는 문서 계약을 검증하고 Local에서는 재개방한 artifact evidence를 남기세요.
+    exercise:
+      prompt: choose_cell_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_cell_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_cell_evidence(situation):
+            table = {'plan': {'action': 'validate cell schema and overwrite policy', 'evidence': 'accepted and rejected cells', 'risk': 'silent data loss'}, 'write': {'action': 'assign typed Python values', 'evidence': 'planned value and data type', 'risk': 'text-number confusion'}, 'verify': {'action': 'reopen and reconcile cells', 'evidence': 'observed value and type', 'risk': 'save conversion'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.openpyxl.openpyxl_02.cell-io-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_02.cell-io-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_cell_evidence
+        cases:
+        - id: recalls-plan
+          arguments:
+          - value: plan
+          expectedReturn:
+            action: validate cell schema and overwrite policy
+            evidence: accepted and rejected cells
+            risk: silent data loss
+        - id: recalls-write
+          arguments:
+          - value: write
+          expectedReturn:
+            action: assign typed Python values
+            evidence: planned value and data type
+            risk: text-number confusion
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

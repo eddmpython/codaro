@@ -546,3 +546,260 @@ sections:
     type: noError
     noError: 업무 흐름 검증에서 `allowedMean` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: scipy_09-discrete-spectrum-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load
+    - workflow_validation
+    title: 짧은 signal의 DFT power spectrum 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: sampling rate와 one-sided bin의 frequency·power를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - frequency bin은 sample_rate/n 간격입니다.
+    - window·normalization을 명시하지 않은 power를 물리 단위 PSD로 부르지 마세요.
+    exercise:
+      prompt: power_spectrum(values, sample_rate)를 완성하세요.
+      starterCode: |-
+        def power_spectrum(values, sample_rate):
+            raise NotImplementedError
+      solution: |
+        def power_spectrum(values, sample_rate):
+            import cmath
+            if not values or sample_rate <= 0: raise ValueError("invalid signal")
+            n = len(values); bins = []
+            for k in range(n//2+1):
+                coefficient = sum(value*cmath.exp(-2j*cmath.pi*k*t/n) for t,value in enumerate(values))
+                bins.append({"frequency": round(k*sample_rate/n,6), "power": round((abs(coefficient)/n)**2,6)})
+            return bins
+      hints: *id001
+    check:
+      id: python.scipy.scipy_09.discrete-spectrum.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_09.discrete-spectrum.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: power_spectrum
+        cases:
+        - id: finds-dc-signal
+          arguments:
+          - value:
+            - 2
+            - 2
+            - 2
+            - 2
+          - value: 4
+          expectedReturn:
+          - frequency: 0.0
+            power: 4.0
+          - frequency: 1.0
+            power: 0.0
+          - frequency: 2.0
+            power: 0.0
+        - id: finds-alternating-bin
+          arguments:
+          - value:
+            - 1
+            - -1
+            - 1
+            - -1
+          - value: 4
+          expectedReturn:
+          - frequency: 0.0
+            power: 0.0
+          - frequency: 1.0
+            power: 0.0
+          - frequency: 2.0
+            power: 1.0
+        - id: rejects-empty
+          arguments:
+          - value: []
+          - value: 10
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: scipy_09-spectral-peak-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_09-discrete-spectrum-mastery
+    title: 새 진동 spectrum에 peak 검증 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: DC 제외 dominant bin과 spectral share를 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 평균 offset인 DC bin을 주기 peak와 분리하세요.
+    - peak share와 절대 power를 함께 보세요.
+    exercise:
+      prompt: dominant_frequency(bins)를 완성하세요.
+      starterCode: |-
+        def dominant_frequency(bins):
+            raise NotImplementedError
+      solution: |
+        def dominant_frequency(bins):
+            positive = [row for row in bins if row["frequency"] > 0]
+            if not positive: return {"frequency": None, "power": None, "share": None}
+            dominant = sorted(positive,key=lambda row:(-row["power"],row["frequency"]))[0]
+            total = sum(row["power"] for row in positive)
+            return {"frequency": dominant["frequency"], "power": dominant["power"], "share": 0.0 if total == 0 else round(dominant["power"]/total,4)}
+      hints: *id002
+    check:
+      id: python.scipy.scipy_09.spectral-peak-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_09.spectral-peak-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: dominant_frequency
+        cases:
+        - id: finds-dominant-nondc-bin
+          arguments:
+          - value:
+            - frequency: 0
+              power: 10
+            - frequency: 2
+              power: 3
+            - frequency: 4
+              power: 1
+          expectedReturn:
+            frequency: 2
+            power: 3
+            share: 0.75
+        - id: handles-no-positive-bin
+          arguments:
+          - value:
+            - frequency: 0
+              power: 2
+          expectedReturn:
+            frequency: null
+            power: null
+            share: null
+        - id: handles-zero-power
+          arguments:
+          - value:
+            - frequency: 1
+              power: 0
+          expectedReturn:
+            frequency: 1
+            power: 0
+            share: 0.0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: scipy_09-spectrum-analysis-evidence-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_09-spectral-peak-audit-transfer
+    title: 스펙트럼 분석 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: sampling·window·peak 해석을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 수치 방법의 입력 가정과 오차 근거를 함께 남기세요.
+    - p-value나 최적화 성공 flag 하나를 결론으로 사용하지 마세요.
+    exercise:
+      prompt: choose_spectrum_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_spectrum_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_spectrum_evidence(situation):
+            table = {'periodic-component': {'method': 'FFT power spectrum', 'evidence': 'sample rate bin width window', 'risk': 'aliasing'}, 'nonstationary-frequency': {'method': 'short-time spectrum', 'evidence': 'window length overlap', 'risk': 'time-frequency tradeoff'}, 'dc-offset': {'method': 'demean before peak analysis', 'evidence': 'removed mean', 'risk': 'removing real baseline'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.scipy.scipy_09.spectrum-analysis-evidence.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_09.spectrum-analysis-evidence.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_spectrum_evidence
+        cases:
+        - id: recalls-periodic-component
+          arguments:
+          - value: periodic-component
+          expectedReturn:
+            method: FFT power spectrum
+            evidence: sample rate bin width window
+            risk: aliasing
+        - id: recalls-nonstationary-frequency
+          arguments:
+          - value: nonstationary-frequency
+          expectedReturn:
+            method: short-time spectrum
+            evidence: window length overlap
+            risk: time-frequency tradeoff
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

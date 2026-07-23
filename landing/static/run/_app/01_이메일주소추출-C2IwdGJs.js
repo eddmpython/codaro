@@ -1,0 +1,449 @@
+var e=`meta:\r
+  id: regex_01\r
+  title: 이메일주소추출\r
+  order: 1\r
+  category: regex\r
+  difficulty: ⭐\r
+  badge: 입문\r
+  tags:\r
+  - 이메일\r
+  - findall\r
+  - 문자 클래스\r
+  - 기본 패턴\r
+  - 로컬 JSON\r
+  seo:\r
+    title: 정규표현식 입문 - 이메일 주소 추출\r
+    description: 정규표현식으로 텍스트에서 이메일 주소를 추출합니다. 기본 패턴, 문자 클래스, findall 사용법을 배웁니다.\r
+    keywords:\r
+    - 정규표현식\r
+    - regex\r
+    - 이메일 추출\r
+    - re.findall\r
+    - 패턴 매칭\r
+intro:\r
+  emoji: 📧\r
+  goal: 로컬 사용자 JSON 샘플에서 모든 이메일 주소를 추출합니다.\r
+  description: 정규표현식의 첫 프로젝트입니다. 기본 패턴과 문자 클래스로 이메일을 찾아내는 방법을 배웁니다. 웹 데이터 정제의 기초를 다집니다.\r
+  direction: 이메일주소추출에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.\r
+  benefits:\r
+  - 샘플 문자열 확인 후 패턴 매칭과 치환에 맞는 코드 입력을 고릅니다.\r
+  - 이메일주소추출 결과를 매치 그룹, 추출 목록, 치환 결과 기준으로 즉시 점검합니다.\r
+  - 완료한 코드를 로그/문서 정제 자동화에 다시 사용할 수 있습니다.\r
+  diagram:\r
+    steps:\r
+    - label: 1단계. 라이브러리 불러오기 입력 확인\r
+      detail: 입력 기준(샘플 문자열)과 필요한 조건을 먼저 고정합니다.\r
+    - label: 2단계. 데이터 불러오기 처리 실행\r
+      detail: 패턴 매칭과 치환 코드를 실행해 중간 결과를 확인합니다.\r
+    - label: 3단계. 이메일 형식 탐색 결과 검증\r
+      detail: 매치 그룹, 추출 목록, 치환 결과 기준으로 실행 결과를 비교합니다.\r
+    - label: 이메일주소추출 재사용\r
+      detail: 완성 코드를 로그/문서 정제 자동화에 붙일 수 있게 정리합니다.\r
+    runtime:\r
+    - label: 텍스트 정제 환경\r
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.\r
+    - label: 이메일주소추출 실행\r
+      detail: 셀을 실행해 매치 그룹, 추출 목록, 치환 결과와 예외 상태를 확인합니다.\r
+    - label: 이메일주소추출 완료\r
+      detail: 검증된 코드를 로그/문서 정제 자동화로 남깁니다.\r
+sections:\r
+- id: step1_import\r
+  title: 1단계. 라이브러리 불러오기\r
+  structuredPrimary: true\r
+  subtitle: import\r
+  goal: 1단계. 라이브러리 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: import 준비가 정확해야 다음 셀과 자동화 코드에서 같은 이름을 안정적으로 재사용할 수 있습니다.\r
+  explanation: |-\r
+    정규표현식을 사용하려면 Python 내장 모듈인 re를 불러와야 합니다. re는 Python 설치 시 기본으로 포함되어 있어 별도 설치가 필요 없습니다. 정규표현식은 텍스트 패턴 매칭의 표준 도구로, 이메일, 전화번호, URL 등 특정 형식의 문자열을 찾거나 변환할 때 필수적으로 사용됩니다.\r
+\r
+    re 모듈이란?\r
+    re는 regular expression의 약자로, Python의 정규표현식 모듈입니다. 패턴 매칭, 검색, 치환 등의 기능을 제공합니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    import re\r
+    import json\r
+  exercise:\r
+    prompt: 1단계. 라이브러리 불러오기 예제에서 import한 모듈의 별칭이나 바로 이어지는 확인 호출을 바꿔 준비 상태를 확인하세요.\r
+    starterCode: |-\r
+      import re\r
+      import json\r
+    hints:\r
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.\r
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 1단계. 라이브러리 불러오기의 import 대상 모듈과 별칭이 현재 로컬 환경에서 준비되어야 합니다.\r
+    resultCheck: 1단계. 라이브러리 불러오기 다음 셀에서 import한 이름을 사용할 수 있어야 합니다.\r
+- id: step2_load\r
+  title: 2단계. 데이터 불러오기\r
+  structuredPrimary: true\r
+  subtitle: 로컬 JSON 샘플\r
+  goal: 2단계. 데이터 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.\r
+  explanation: |-\r
+    정규표현식 학습에 필요한 사용자 데이터를 로컬 JSON 구조로 준비합니다. 이름, 이메일, 팀 정보가 들어 있는 리스트를 쓰면 네트워크와 무관하게 데이터 탐색, 문자열 변환, 이메일 추출 흐름을 반복 연습할 수 있습니다.\r
+\r
+    로컬 JSON 샘플\r
+    리스트 안에 딕셔너리를 담으면 실제 API 응답과 비슷한 JSON 구조를 만들 수 있습니다. 이 구조를 문자열로 변환하면 정규표현식 추출 연습에 바로 사용할 수 있습니다.\r
+  tips:\r
+  - 로컬 JSON 샘플 리스트 안에 딕셔너리를 담으면 실제 API 응답과 비슷한 JSON 구조를 만들 수 있습니다. 이 구조를 문자열로 변환하면 정규표현식 추출 연습에 바로 사용할\r
+    수 있습니다.\r
+  snippet: |-\r
+    usersData = [\r
+        {"name": "Hana Kim", "email": "hana.kim@codaro.io", "team": "education"},\r
+        {"name": "Min Park", "email": "min.park@dataworks.com", "team": "analytics"},\r
+        {"name": "Jae Lee", "email": "jae_lee@codaro.io", "team": "automation"},\r
+        {"name": "Soo Choi", "email": "soo.choi@insightlab.kr", "team": "research"},\r
+        {"name": "Yuna Jung", "email": "yuna.jung@sample.org", "team": "support"},\r
+        {"name": "Alex Morgan", "email": "alex.morgan@service.net", "team": "platform"},\r
+        {"name": "Rina Han", "email": "rina.han@codaro.io", "team": "education"},\r
+        {"name": "Noah Shin", "email": "noah.shin@opsmail.co", "team": "operations"},\r
+        {"name": "Mina Kwon", "email": "mina.kwon@dataworks.com", "team": "analytics"},\r
+        {"name": "Leo Yu", "email": "leo.yu@sample.org", "team": "support"},\r
+    ]\r
+\r
+    usersData[:2]\r
+  exercise:\r
+    prompt: 2단계. 데이터 불러오기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      usersData = [\r
+          {"name": "Hana Kim", "email": "hana.kim@codaro.io", "team": "education"},\r
+          {"name": "Min Park", "email": "min.park@dataworks.com", "team": "analytics"},\r
+          {"name": "Jae Lee", "email": "jae_lee@codaro.io", "team": "automation"},\r
+          {"name": "Soo Choi", "email": "soo.choi@insightlab.kr", "team": "research"},\r
+          {"name": "Yuna Jung", "email": "yuna.jung@sample.org", "team": "support"},\r
+          {"name": "Alex Morgan", "email": "alex.morgan@service.net", "team": "platform"},\r
+          {"name": "Rina Han", "email": "rina.han@codaro.io", "team": "education"},\r
+          {"name": "Noah Shin", "email": "noah.shin@opsmail.co", "team": "operations"},\r
+          {"name": "Mina Kwon", "email": "mina.kwon@dataworks.com", "team": "analytics"},\r
+          {"name": "Leo Yu", "email": "leo.yu@sample.org", "team": "support"},\r
+      ]\r
+\r
+      usersData[:2]\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 2단계. 데이터 불러오기의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.\r
+    resultCheck: 2단계. 데이터 불러오기의 실행 결과가 본문 기대값과 일치해야 합니다.\r
+- id: step3_explore\r
+  title: 3단계. 이메일 형식 탐색\r
+  structuredPrimary: true\r
+  subtitle: 데이터 구조 파악\r
+  goal: 3단계. 이메일 형식 탐색에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.\r
+  explanation: |-\r
+    정규표현식 패턴을 만들기 전에 어떤 이메일 형식이 있는지 먼저 확인해야 합니다. 패턴을 알아야 패턴을 만들 수 있기 때문입니다. 실무에서도 데이터를 먼저 탐색하고 공통된 규칙을 파악한 후에 정규표현식을 작성하는 것이 일반적인 워크플로우입니다. 이메일의 경우 사용자명@도메인.최상위도메인 형태가 기본이지만, 세부적인 변형이 많습니다.\r
+\r
+    확인된 이메일 형식: - hana.kim@codaro.io - min.park@dataworks.com - jae_lee@codaro.io - soo.choi@insightlab.kr - yuna.jung@sample.org 공통 패턴: **단어@단어.단어** 형식입니다. 단어 부분에는 문자, 숫자, 마침표(.), 언더스코어(_)가 올 수 있습니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    emails = [user['email'] for user in usersData[:5]]\r
+    emails\r
+  exercise:\r
+    prompt: 3단계. 이메일 형식 탐색 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      emails = [user['email'] for user in usersData[:5]]\r
+      emails\r
+    hints:\r
+    - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.\r
+    - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 3단계. 이메일 형식 탐색의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.\r
+    resultCheck: 3단계. 이메일 형식 탐색 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.\r
+- id: step4_pattern_basic\r
+  title: 4단계. 기본 패턴 만들기\r
+  structuredPrimary: true\r
+  subtitle: 간단한 이메일 패턴\r
+  goal: 4단계. 기본 패턴 만들기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.\r
+  explanation: |-\r
+    가장 간단한 이메일 패턴부터 시작합니다. 복잡한 패턴을 처음부터 만들려고 하면 실수하기 쉬우므로, 단순한 패턴에서 시작해서 점진적으로 개선하는 것이 좋습니다. 먼저 단어@단어.단어 형식을 정규표현식으로 표현해봅시다. 여기서 단어란 영문자, 숫자, 언더스코어를 의미합니다.\r
+\r
+    패턴 해석\r
+    **패턴: \\\\w+@\\\\w+\\\\.\\\\w+** - \`\\w+\` : 단어 문자(문자, 숫자, _)가 1개 이상 - \`@\` : @ 기호 그대로 - \`\\w+\` : 단어 문자 1개 이상 - \`\\.\` : 마침표 (\\ 로 이스케이프 필요) - \`\\w+\` : 단어 문자 1개 이상\r
+  tips:\r
+  - '패턴 해석 **패턴: \\\\w+@\\\\w+\\\\.\\\\w+** - \`\\w+\` : 단어 문자(문자, 숫자, _)가 1개 이상 - \`@\` : @ 기호 그대로 - \`\\w+\` : 단어 문자\r
+    1개 이상 - \`\\.\` : 마침표 (\\ 로 이스케이프 필요) - \`\\w+\` : 단어 문자 1개 이상'\r
+  snippet: |-\r
+    testText = "Contact: john@test.com and admin@site.org"\r
+    pattern = r"\\w+@\\w+\\.\\w+"\r
+    re.findall(pattern, testText)\r
+  exercise:\r
+    prompt: 4단계. 기본 패턴 만들기 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      testText = "Contact: john@test.com and admin@site.org"\r
+      pattern = r"\\w+@\\w+\\.\\w+"\r
+      re.findall(pattern, testText)\r
+    hints:\r
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.\r
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 4단계. 기본 패턴 만들기의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.\r
+    resultCheck: 4단계. 기본 패턴 만들기의 실행 결과가 본문 기대값과 일치해야 합니다.\r
+- id: step5_pattern_improved\r
+  title: 5단계. 패턴 개선하기\r
+  structuredPrimary: true\r
+  subtitle: 마침표와 언더스코어 처리\r
+  goal: 5단계. 패턴 개선하기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.\r
+  explanation: |-\r
+    실제 이메일 주소에는 다양한 문자가 포함될 수 있습니다. Julianne.OConner@kory.org처럼 아이디에 마침표가 포함되거나, Lucio_Hettinger@annie.ca처럼 언더스코어가 사용되기도 합니다. 문자 클래스 [...]를 사용하면 여러 문자 중 하나를 매칭할 수 있어, 이런 다양한 형식을 한 번에 처리할 수 있습니다.\r
+\r
+    패턴 해석\r
+    **패턴: [\\\\w.]+@[\\\\w.]+\\\\.\\\\w+** - \`[\\w.]+\` : 단어 문자 또는 마침표가 1개 이상 ([ ] 는 문자 클래스) - \`@\` : @ 기호 - \`[\\w.]+\` : 도메인 부분 (서브도메인 포함 가능) - \`\\.\` : 마침표 - \`\\w+\` : 최상위 도메인 (com, org, net 등)\r
+  tips:\r
+  - '패턴 해석 **패턴: [\\\\w.]+@[\\\\w.]+\\\\.\\\\w+** - \`[\\w.]+\` : 단어 문자 또는 마침표가 1개 이상 ([ ] 는 문자 클래스) - \`@\` : @ 기호\r
+    - \`[\\w.]+\` : 도메인 부분 (서브도메인 포함 가능) - \`\\.\` : 마침표 - \`\\w+\` : 최상위 도메인 (com, org, net 등)'\r
+  snippet: |-\r
+    pattern = r"[\\w.]+@[\\w.]+\\.\\w+"\r
+\r
+    testText = "Contact: Julianne.OConner@kory.org and Lucio_Hettinger@annie.ca"\r
+    re.findall(pattern, testText)\r
+  exercise:\r
+    prompt: 5단계. 패턴 개선하기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      pattern = r"[\\w.]+@[\\w.]+\\.\\w+"\r
+\r
+      testText = "Contact: Julianne.OConner@kory.org and Lucio_Hettinger@annie.ca"\r
+      re.findall(pattern, testText)\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 5단계. 패턴 개선하기의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.\r
+    resultCheck: 5단계. 패턴 개선하기의 실행 결과가 본문 기대값과 일치해야 합니다.\r
+- id: step6_extract_all\r
+  title: 6단계. 모든 이메일 추출\r
+  structuredPrimary: true\r
+  subtitle: re.findall로 전체 추출\r
+  goal: 6단계. 모든 이메일 추출에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.\r
+  explanation: |-\r
+    이제 실제 사용자 데이터에서 모든 이메일을 추출합니다. JSON 데이터를 문자열로 변환하면 모든 필드의 값이 하나의 텍스트에 담기게 됩니다. re.findall() 함수는 이 텍스트에서 패턴과 일치하는 모든 부분을 찾아 리스트로 반환합니다. 이 방식은 데이터 구조를 몰라도 원하는 형식의 문자열을 추출할 수 있어 매우 유용합니다.\r
+\r
+    re.findall() 사용법\r
+    re.findall(패턴, 텍스트)는 패턴과 일치하는 모든 문자열을 리스트로 반환합니다. 가장 많이 사용하는 정규표현식 함수입니다.\r
+  tips:\r
+  - re.findall() 사용법 re.findall(패턴, 텍스트)는 패턴과 일치하는 모든 문자열을 리스트로 반환합니다. 가장 많이 사용하는 정규표현식 함수입니다.\r
+  snippet: |-\r
+    allText = json.dumps(usersData)\r
+    extractedEmails = re.findall(pattern, allText)\r
+    extractedEmails\r
+  exercise:\r
+    prompt: 6단계. 모든 이메일 추출 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      allText = json.dumps(usersData)\r
+      extractedEmails = re.findall(pattern, allText)\r
+      extractedEmails\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 6단계. 모든 이메일 추출의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.\r
+    resultCheck: 6단계. 모든 이메일 추출의 실행 결과가 본문 기대값과 일치해야 합니다.\r
+- id: step7_result\r
+  title: 7단계. 결과 확인\r
+  structuredPrimary: true\r
+  subtitle: 추출된 이메일 분석\r
+  goal: 7단계. 결과 확인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.\r
+  explanation: |-\r
+    추출한 이메일 주소들을 확인하고 간단한 통계를 내봅시다. 이메일에서 @ 뒤의 도메인 부분을 분리하면 어떤 도메인이 많이 사용되는지 분석할 수 있습니다. 이런 도메인별 분류는 마케팅 분석, 사용자 분포 파악, 스팸 필터링 등 다양한 실무에서 활용됩니다.\r
+\r
+    정규표현식으로 비정형 텍스트에서 구조화된 정보를 추출했습니다. JSON 구조를 파싱하지 않고도 패턴만으로 원하는 데이터를 찾아낸 것입니다. 이것이 정규표현식의 첫 번째 강력함입니다. 웹 크롤링, 로그 분석, 데이터 정제 등 다양한 분야에서 이 기법이 활용됩니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: f"총 {len(extractedEmails)}개의 이메일 주소를 찾았습니다"\r
+  exercise:\r
+    prompt: 7단계. 결과 확인 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.\r
+    starterCode: f"총 {len(extractedEmails)}개의 이메일 주소를 찾았습니다"\r
+    hints:\r
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.\r
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 7단계. 결과 확인의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.\r
+    resultCheck: 7단계. 결과 확인의 실행 결과가 본문 기대값과 일치해야 합니다.\r
+- id: step8_workflow\r
+  title: 8단계. 실무 이메일 추출 검증\r
+  structuredPrimary: true\r
+  subtitle: 예측 → 오류 확인 → 검증 → 도메인 기준 실험\r
+  goal: 8단계. 실무 이메일 추출 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.\r
+  explanation: 실무에서는 이메일처럼 보이는 문자열을 많이 찾는 것보다, 잘못 잡은 값과 놓친 값을 줄이는 것이 더 중요합니다. 특히 \`alerts+ops@codaro.io\`처럼\r
+    \`+\`가 들어간 주소는 단순 패턴에서 누락되거나 일부만 잘릴 수 있습니다. 이번 단계에서는 먼저 기대 결과를 정해두고, 단순 패턴이 실패하는 모습을 확인합니다. 그다음 검증 함수를\r
+    만들어 추출 개수·도메인 통계·허용 도메인 필터가 모두 맞는지 확인합니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    workflowText = """\r
+    고객 문의: support@codaro.io\r
+    데이터 팀: min.park@dataworks.com\r
+    운영 알림: alerts+ops@codaro.io\r
+    연구 협업: soo.choi@insightlab.kr\r
+    잘못된 값: broken@codaro, user@@example.com, @missing.local\r
+    """\r
+\r
+    expectedEmails = {\r
+        "support@codaro.io",\r
+        "min.park@dataworks.com",\r
+        "alerts+ops@codaro.io",\r
+        "soo.choi@insightlab.kr",\r
+    }\r
+\r
+    print("예상 추출 개수:", len(expectedEmails))\r
+  exercise:\r
+    prompt: 8단계. 실무 이메일 추출 검증 예제에서 패턴이나 샘플 문자열을 바꾸고 추출/치환 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      workflowText = """\r
+      고객 문의: support@codaro.io\r
+      데이터 팀: min.park@dataworks.com\r
+      운영 알림: alerts+ops@codaro.io\r
+      연구 협업: soo.choi@insightlab.kr\r
+      잘못된 값: broken@codaro, user@@example.com, @missing.local\r
+      """\r
+\r
+      expectedEmails = {\r
+          "support@codaro.io",\r
+          "min.park@dataworks.com",\r
+          "alerts+ops@codaro.io",\r
+          "soo.choi@insightlab.kr",\r
+      }\r
+\r
+      print("예상 추출 개수:", len(expectedEmails))\r
+    hints:\r
+    - 바꿀 지점은 정규식 패턴, 그룹, re.search/findall/sub의 입력 문자열입니다.\r
+    - 실행 뒤 매치 그룹, 추출 목록, 치환 문자열이 바꾼 패턴과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 8단계. 실무 이메일 추출 검증의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.\r
+    resultCheck: 8단계. 실무 이메일 추출 검증의 실행 결과가 본문 기대값과 일치해야 합니다.\r
+- id: practice\r
+  title: 실습\r
+  structuredPrimary: true\r
+  subtitle: 이메일 추출 프로젝트\r
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.\r
+  explanation: |-\r
+    정규표현식 개발자가 되어 이메일 추출 도구를 만들어봅시다. 미션1에서는 회사 연락처에서 특정 도메인(.com)의 이메일만 필터링하고, 미션2에서는 로컬 사용자 JSON 샘플에서 이메일을 추출해 도메인별 통계를 분석합니다. 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.\r
+\r
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.\r
+  snippet: |-\r
+    import re\r
+\r
+    text = """\r
+    회사 연락처:\r
+    대표: ceo@company.com\r
+    고객센터: support@help.net\r
+    영업팀: sales@company.com\r
+    개발팀: dev@tech.io\r
+    마케팅: marketing@company.com\r
+    """\r
+\r
+    emails = re.findall(r"[\\w.]+@[\\w.]+\\.\\w+", text)\r
+    emails\r
+  exercise:\r
+    prompt: 실습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      import re\r
+\r
+      text = """\r
+      회사 연락처:\r
+      대표: ceo@company.com\r
+      고객센터: support@help.net\r
+      영업팀: sales@company.com\r
+      개발팀: dev@tech.io\r
+      마케팅: marketing@company.com\r
+      """\r
+\r
+      emails = re.findall(r"[\\w.]+@[\\w.]+\\.\\w+", text)\r
+      emails\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 실습의 정규식 패턴과 입력 문자열 처리가 컴파일/치환 단계까지 도달해야 합니다.\r
+    resultCheck: 실습의 실행 결과가 본문 기대값과 일치해야 합니다.\r
+- id: summary\r
+  title: 정리\r
+  subtitle: 첫 번째 프로젝트 완료!\r
+  blocks:\r
+  - type: text\r
+    content: 이번 프로젝트에서는 정규표현식의 기본을 배웠습니다. re.findall()로 패턴과 일치하는 모든 문자열을 추출하는 방법을 익혔고, 문자 클래스를 사용해 다양한\r
+      이메일 형식을 처리하는 패턴을 만들었습니다. 이 기법은 이메일뿐 아니라 전화번호, URL, 날짜 등 형식이 있는 모든 데이터 추출에 응용할 수 있습니다.\r
+  - type: list\r
+    items:\r
+    - \\w - 단어 문자 (문자, 숫자, _)\r
+    - + - 1개 이상 반복\r
+    - '[\\w.] - 문자 클래스 (단어 문자 또는 마침표)'\r
+    - \\. - 마침표 리터럴 (이스케이프 필수)\r
+    - re.findall() - 모든 매칭 결과를 리스트로 반환\r
+  - type: text\r
+    content: 다음 프로젝트에서는 전화번호 형식을 통일하는 방법을 배웁니다!\r
+  goal: 정리에서 패턴과 입력 문자열이 추출/치환 결과로 이어지는 흐름을 확인한다.\r
+  why: 패턴 처리는 샘플 문자열 결과를 즉시 확인해야 과도한 매칭이나 누락을 줄일 수 있습니다.\r
+- id: workflow_validation\r
+  title: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인'\r
+  structuredPrimary: true\r
+  subtitle: 예측 → 패턴 실행 → 오류 수정 → 검증 → 실무 변주\r
+  goal: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.'\r
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.\r
+  explanation: 정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를\r
+    추출하고, 잘못된 패턴과 빈 입력을 안전하게 처리합니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    import re\r
+\r
+    contactText = '''\r
+    김개발 <kim@example.com> 010-1234-5678\r
+    lee@company.co.kr / 02-987-6543\r
+    잘못된 주소: hello@ / 번호: 12345\r
+    '''\r
+\r
+    emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}')\r
+    phonePattern = re.compile(r'(?:010-\\d{4}-\\d{4}|02-\\d{3}-\\d{4})')\r
+\r
+    emails = emailPattern.findall(contactText)\r
+    phones = phonePattern.findall(contactText)\r
+\r
+    assert emails == ['kim@example.com', 'lee@company.co.kr']\r
+    assert phones == ['010-1234-5678', '02-987-6543']\r
+    emails, phones\r
+  exercise:\r
+    prompt: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'\r
+    starterCode: |-\r
+      import re\r
+\r
+      contactText = '''\r
+      김개발 <kim@example.com> 010-1234-5678\r
+      lee@company.co.kr / 02-987-6543\r
+      잘못된 주소: hello@ / 번호: 12345\r
+      '''\r
+\r
+      emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}')\r
+      phonePattern = re.compile(r'(?:010-\\d{4}-\\d{4}|02-\\d{3}-\\d{4})')\r
+\r
+      emails = emailPattern.findall(contactText)\r
+      phones = phonePattern.findall(contactText)\r
+\r
+      assert emails == ['kim@example.com', 'lee@company.co.kr']\r
+      assert phones == ['010-1234-5678', '02-987-6543']\r
+      emails, phones\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인의 정규식 패턴이 컴파일되고 입력 텍스트가 매치 단계까지 도달해야 합니다.'\r
+    resultCheck: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인 결과의 추출 개수와 매치 문자열이 본문 기대값과 같아야 합니다.'\r
+`;export{e as default};

@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "altair"
+canonicalRows: 11
+lessons:
+  - lessonRef: "altair/00_Altair소개"
+    identityLedgerRef: "identity-ledger/altair.yml"
+    lessonContentHash: "d829030d669bd301f6ee8764eed6d97825d9896c1ea745009b11761dc736d4d0"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["interactiveDashboards"]
+    outcomes: ["viz.declarative"]
+    prerequisites: ["matplotlib.basics"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:altair/00_Altair소개:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:altair_00_Altair__:v1","retrieve:altair_00_Altair__:v2","retrieve:altair_00_Altair__:v3"]
+    transferVariantIds: ["transfer:altair_00_Altair__:near-v1","transfer:altair_00_Altair__:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "altair/01_자동차연비탐색"
+    identityLedgerRef: "identity-ledger/altair.yml"
+    lessonContentHash: "9db085adf9f66a4802956c6cb0139eebef67ac1c413d20680d91b64ace53f9c8"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["interactiveDashboards"]
+    outcomes: ["viz.declarative"]
+    prerequisites: ["viz.declarative"]
+    reinforcesOutcomeIds: ["viz.declarative"]
+    runtimeTier: browser
+    checkSpecId: "lesson:altair/01_자동차연비탐색:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:altair_01________:v1","retrieve:altair_01________:v2","retrieve:altair_01________:v3"]
+    transferVariantIds: ["transfer:altair_01________:near-v1","transfer:altair_01________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "altair/02_붓꽃품종구분"
+    identityLedgerRef: "identity-ledger/altair.yml"
+    lessonContentHash: "50f2621eb5eefd038087be49845574d0c7d18c81fadb77bdfee2a5c7e79b8503"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["interactiveDashboards"]
+    outcomes: ["viz.declarative"]
+    prerequisites: ["viz.declarative"]
+    reinforcesOutcomeIds: ["viz.declarative"]
+    runtimeTier: browser
+    checkSpecId: "lesson:altair/02_붓꽃품종구분:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:altair_02_______:v1","retrieve:altair_02_______:v2","retrieve:altair_02_______:v3"]
+    transferVariantIds: ["transfer:altair_02_______:near-v1","transfer:altair_02_______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "altair/03_팁데이터분석"
+    identityLedgerRef: "identity-ledger/altair.yml"
+    lessonContentHash: "5fb2de5d3e12e695759251b90b503e9f247843741a9fac2c038f80f611d796ba"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["interactiveDashboards"]
+    outcomes: ["viz.declarative"]
+    prerequisites: ["viz.declarative"]
+    reinforcesOutcomeIds: ["viz.declarative"]
+    runtimeTier: browser
+    checkSpecId: "lesson:altair/03_팁데이터분석:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:altair_03_______:v1","retrieve:altair_03_______:v2","retrieve:altair_03_______:v3"]
+    transferVariantIds: ["transfer:altair_03_______:near-v1","transfer:altair_03_______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "altair/04_펭귄서식지분석"
+    identityLedgerRef: "identity-ledger/altair.yml"
+    lessonContentHash: "c21b889574cc6c32ea1626cce6f401dd2f11ea1b975a66141297b02c55ae4d51"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["interactiveDashboards"]
+    outcomes: ["viz.declarative"]
+    prerequisites: ["viz.declarative"]
+    reinforcesOutcomeIds: ["viz.declarative"]
+    runtimeTier: browser
+    checkSpecId: "lesson:altair/04_펭귄서식지분석:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:altair_04________:v1","retrieve:altair_04________:v2","retrieve:altair_04________:v3"]
+    transferVariantIds: ["transfer:altair_04________:near-v1","transfer:altair_04________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "altair/05_타이타닉생존분석"
+    identityLedgerRef: "identity-ledger/altair.yml"
+    lessonContentHash: "be34cabab0246b71cf48ce93a344f5363a5befe507320b4753440d47b4fed42c"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["interactiveDashboards"]
+    outcomes: ["viz.declarative"]
+    prerequisites: ["viz.declarative"]
+    reinforcesOutcomeIds: ["viz.declarative"]
+    runtimeTier: browser
+    checkSpecId: "lesson:altair/05_타이타닉생존분석:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:altair_05_________:v1","retrieve:altair_05_________:v2","retrieve:altair_05_________:v3"]
+    transferVariantIds: ["transfer:altair_05_________:near-v1","transfer:altair_05_________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "altair/06_항공편분석"
+    identityLedgerRef: "identity-ledger/altair.yml"
+    lessonContentHash: "f5cfea7e249f92e2d21fea571ce8365ec1446e4862301cc618289d29c69d8cc1"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["interactiveDashboards"]
+    outcomes: ["viz.declarative"]
+    prerequisites: ["viz.declarative","pandas.timeSeries"]
+    reinforcesOutcomeIds: ["viz.declarative"]
+    runtimeTier: browser
+    checkSpecId: "lesson:altair/06_항공편분석:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:altair_06______:v1","retrieve:altair_06______:v2","retrieve:altair_06______:v3"]
+    transferVariantIds: ["transfer:altair_06______:near-v1","transfer:altair_06______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "altair/07_인터랙티브필터"
+    identityLedgerRef: "identity-ledger/altair.yml"
+    lessonContentHash: "7fb6e450fdb6a0fa4d680dbbef35e3cc8d046ed10264c30b42f64ab7886b445f"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["interactiveDashboards"]
+    outcomes: ["viz.interactiveAdvanced"]
+    prerequisites: ["viz.declarative"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:altair/07_인터랙티브필터:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:altair_07________:v1","retrieve:altair_07________:v2","retrieve:altair_07________:v3"]
+    transferVariantIds: ["transfer:altair_07________:near-v1","transfer:altair_07________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "altair/08_다중뷰연결"
+    identityLedgerRef: "identity-ledger/altair.yml"
+    lessonContentHash: "dd52859b051389b210558e34f37822c220601ec929acaa8a2efb28e332b1004d"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["interactiveDashboards"]
+    outcomes: ["viz.interactiveAdvanced"]
+    prerequisites: ["viz.interactiveAdvanced"]
+    reinforcesOutcomeIds: ["viz.interactiveAdvanced"]
+    runtimeTier: browser
+    checkSpecId: "lesson:altair/08_다중뷰연결:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:altair_08______:v1","retrieve:altair_08______:v2","retrieve:altair_08______:v3"]
+    transferVariantIds: ["transfer:altair_08______:near-v1","transfer:altair_08______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "altair/09_고급데이터변환"
+    identityLedgerRef: "identity-ledger/altair.yml"
+    lessonContentHash: "cb3a62b3a49fb71dcc7047e99cd6329b480096e9079593ead85553dcd020bfdc"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["interactiveDashboards"]
+    outcomes: ["viz.declarative"]
+    prerequisites: ["viz.declarative"]
+    reinforcesOutcomeIds: ["viz.declarative"]
+    runtimeTier: browser
+    checkSpecId: "lesson:altair/09_고급데이터변환:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:altair_09________:v1","retrieve:altair_09________:v2","retrieve:altair_09________:v3"]
+    transferVariantIds: ["transfer:altair_09________:near-v1","transfer:altair_09________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "altair/10_종합대시보드"
+    identityLedgerRef: "identity-ledger/altair.yml"
+    lessonContentHash: "9f48b9d8087283404528fa1babbf5bc2ceef8911be6c68a9f723a081e60384d7"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/05-interactive-dashboards"
+    eligiblePathIds: ["interactiveDashboards"]
+    outcomes: ["viz.interactiveAdvanced"]
+    prerequisites: ["viz.interactiveAdvanced"]
+    reinforcesOutcomeIds: ["viz.interactiveAdvanced"]
+    runtimeTier: browser
+    checkSpecId: "lesson:altair/10_종합대시보드:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:altair_10_______:v1","retrieve:altair_10_______:v2","retrieve:altair_10_______:v3"]
+    transferVariantIds: ["transfer:altair_10_______:near-v1","transfer:altair_10_______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

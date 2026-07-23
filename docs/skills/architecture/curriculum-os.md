@@ -138,7 +138,7 @@ unknown domain/outcome ID는 400 + `curriculum_unknown_domain` / `curriculum_unk
   - SVG mastery 추세 라인 차트
   - 힌트 분포 바 차트
   - 최근 활동 도메인 chip
-- 체크 통과 시 [`checkResultPanel.tsx`](../../../editor/src/components/curriculum/checkResultPanel.tsx) 가 credit 카드를 그린다 - outcome chip 에 자동 검증된 outcome 은 Trophy 아이콘으로 강조.
+- 학습 셀 실행 뒤 [`curriculumSurface.tsx`](../../../editor/src/components/curriculum/curriculumSurface.tsx)가 결과를 자동 평가하고, 통과·실패 근거와 필요한 다음 수정을 셀 바로 아래에 표시한다. 별도 검증 버튼, hint reveal, prediction diff, 수동 outcome credit 카드는 사용하지 않는다.
 
 ## 무결성 게이트
 

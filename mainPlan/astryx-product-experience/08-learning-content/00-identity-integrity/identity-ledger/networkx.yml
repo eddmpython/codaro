@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "networkx"
+sourceCount: 11
+lessons:
+  - lessonRef: "networkx/00_networkx소개"
+    sourcePath: "curricula/python/mathStatsMl/networkx/00_networkx소개.yaml"
+    metaId: "networkx_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "networkx/01_첫그래프만들기"
+    sourcePath: "curricula/python/mathStatsMl/networkx/01_첫그래프만들기.yaml"
+    metaId: "networkx_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "networkx/02_방향그래프와가중치"
+    sourcePath: "curricula/python/mathStatsMl/networkx/02_방향그래프와가중치.yaml"
+    metaId: "networkx_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "networkx/03_최단경로찾기"
+    sourcePath: "curricula/python/mathStatsMl/networkx/03_최단경로찾기.yaml"
+    metaId: "networkx_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "networkx/04_중심성분석"
+    sourcePath: "curricula/python/mathStatsMl/networkx/04_중심성분석.yaml"
+    metaId: "networkx_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "networkx/05_소셜네트워크분석"
+    sourcePath: "curricula/python/mathStatsMl/networkx/05_소셜네트워크분석.yaml"
+    metaId: "networkx_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "networkx/06_연결성분석"
+    sourcePath: "curricula/python/mathStatsMl/networkx/06_연결성분석.yaml"
+    metaId: "networkx_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "networkx/07_커뮤니티탐지"
+    sourcePath: "curricula/python/mathStatsMl/networkx/07_커뮤니티탐지.yaml"
+    metaId: "networkx_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "networkx/08_그래프알고리즘"
+    sourcePath: "curricula/python/mathStatsMl/networkx/08_그래프알고리즘.yaml"
+    metaId: "networkx_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "networkx/09_랜덤그래프모델"
+    sourcePath: "curricula/python/mathStatsMl/networkx/09_랜덤그래프모델.yaml"
+    metaId: "networkx_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "networkx/10_종합네트워크프로젝트"
+    sourcePath: "curricula/python/mathStatsMl/networkx/10_종합네트워크프로젝트.yaml"
+    metaId: "networkx_10"
+    registryStatus: registered
+    reviewStatus: pending

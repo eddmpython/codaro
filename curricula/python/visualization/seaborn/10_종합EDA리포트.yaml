@@ -9,6 +9,9 @@ meta:
   category: seaborn
   difficulty: ⭐⭐⭐
   badge: 심화
+  outcomes: ["viz.edaReport"]
+  prerequisites: ["viz.regression","viz.heatmap","viz.distribution"]
+  estimatedMinutes: 90
   tags:
   - seaborn
   - EDA
@@ -621,3 +624,447 @@ sections:
     type: noError
     noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: seaborn_10-eda-evidence-report-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - practice
+    title: 종합 EDA report 데이터·preview 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 탐색 결과를 해석하기 전에 모든 입력 행의 포함 상태와 panel별 표본 수를 재현 가능한 표·이미지로 남긴다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - CSV의 status로 NULL 때문에 preview에서 제외된 행을 숨기지 마세요.
+    - 빈 입력도 header-only table과 명시적인 empty-state preview를 모두 남기세요.
+    exercise:
+      prompt: prepare_eda_evidence_report(rows, table_path, image_path)를 완성하세요. table_path에는 feature, metric, panel, status
+        열의 CSV를 저장하고, 제공된 helper로 image_path에 panel별 usable count를 그린 PNG preview를 저장한 뒤 usable·excluded 분모와 축 범위를 반환하세요.
+      starterCode: |
+        import csv
+        import struct
+        import zlib
+        from pathlib import Path
+
+
+        def _write_preview_png(output_path, group_counts):
+            width, height = 320, 180
+            pixels = [bytearray([248, 250, 252] * width) for _ in range(height)]
+
+            def fill_rect(left, top, right, bottom, color):
+                for y in range(max(0, top), min(height, bottom)):
+                    for x in range(max(0, left), min(width, right)):
+                        offset = x * 3
+                        pixels[y][offset:offset + 3] = bytes(color)
+
+            fill_rect(20, 18, 300, 156, (255, 255, 255))
+            fill_rect(39, 28, 41, 146, (51, 65, 85))
+            fill_rect(39, 144, 294, 146, (51, 65, 85))
+            items = sorted(group_counts.items())[:8]
+            if items:
+                maximum = max(count for _, count in items)
+                slot = 240 // len(items)
+                bar_width = min(36, max(8, slot - 10))
+                palette = [(17, 138, 178), (6, 148, 162), (239, 108, 86), (255, 183, 3)]
+                for index, (_, count) in enumerate(items):
+                    bar_height = max(2, round(100 * count / maximum))
+                    left = 47 + index * slot + (slot - bar_width) // 2
+                    fill_rect(left, 145 - bar_height, left + bar_width, 145, palette[index % len(palette)])
+            else:
+                fill_rect(88, 76, 232, 80, (148, 163, 184))
+                fill_rect(158, 48, 162, 108, (148, 163, 184))
+
+            def chunk(kind, data):
+                checksum = zlib.crc32(kind + data) & 0xFFFFFFFF
+                return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", checksum)
+
+            raw = b"".join(b"\x00" + bytes(row) for row in pixels)
+            payload = (
+                b"\x89PNG\r\n\x1a\n"
+                + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0))
+                + chunk(b"IDAT", zlib.compress(raw, 9))
+                + chunk(b"IEND", b"")
+            )
+            target = Path(output_path)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(payload)
+
+
+        def prepare_eda_evidence_report(rows, table_path=None, image_path=None):
+            raise NotImplementedError
+      solution: |
+        import csv
+        import struct
+        import zlib
+        from pathlib import Path
+
+
+        def _write_preview_png(output_path, group_counts):
+            width, height = 320, 180
+            pixels = [bytearray([248, 250, 252] * width) for _ in range(height)]
+
+            def fill_rect(left, top, right, bottom, color):
+                for y in range(max(0, top), min(height, bottom)):
+                    for x in range(max(0, left), min(width, right)):
+                        offset = x * 3
+                        pixels[y][offset:offset + 3] = bytes(color)
+
+            fill_rect(20, 18, 300, 156, (255, 255, 255))
+            fill_rect(39, 28, 41, 146, (51, 65, 85))
+            fill_rect(39, 144, 294, 146, (51, 65, 85))
+            items = sorted(group_counts.items())[:8]
+            if items:
+                maximum = max(count for _, count in items)
+                slot = 240 // len(items)
+                bar_width = min(36, max(8, slot - 10))
+                palette = [(17, 138, 178), (6, 148, 162), (239, 108, 86), (255, 183, 3)]
+                for index, (_, count) in enumerate(items):
+                    bar_height = max(2, round(100 * count / maximum))
+                    left = 47 + index * slot + (slot - bar_width) // 2
+                    fill_rect(left, 145 - bar_height, left + bar_width, 145, palette[index % len(palette)])
+            else:
+                fill_rect(88, 76, 232, 80, (148, 163, 184))
+                fill_rect(158, 48, 162, 108, (148, 163, 184))
+
+            def chunk(kind, data):
+                checksum = zlib.crc32(kind + data) & 0xFFFFFFFF
+                return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", checksum)
+
+            raw = b"".join(b"\x00" + bytes(row) for row in pixels)
+            payload = (
+                b"\x89PNG\r\n\x1a\n"
+                + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0))
+                + chunk(b"IDAT", zlib.compress(raw, 9))
+                + chunk(b"IEND", b"")
+            )
+            target = Path(output_path)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(payload)
+
+
+        def prepare_eda_evidence_report(rows, table_path=None, image_path=None):
+            required = ["feature", "metric", "panel"]
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            for row in usable:
+                key = str(row["panel"])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row["feature"] for row in usable]
+            y_values = [row["metric"] for row in usable]
+            result = {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+            empty = not rows
+            table_path = table_path or ("output/empty-eda-report.csv" if empty else "output/eda-report.csv")
+            image_path = image_path or ("output/empty-eda-preview.png" if empty else "output/eda-preview.png")
+            target = Path(table_path)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            columns = ["feature", "metric", "panel", "status"]
+            with target.open("w", encoding="utf-8", newline="") as stream:
+                writer = csv.DictWriter(stream, fieldnames=columns)
+                writer.writeheader()
+                for row in rows:
+                    writer.writerow({
+                        "feature": row["feature"],
+                        "metric": row["metric"],
+                        "panel": row["panel"],
+                        "status": "usable" if all(row[name] is not None for name in required) else "excluded",
+                    })
+            _write_preview_png(image_path, groups)
+            return result
+      hints: *id001
+    check:
+      id: python.seaborn.seaborn_10.eda-evidence-report-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.seaborn.seaborn_10.eda-evidence-report-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_eda_evidence_report
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - feature: age
+              metric: 0.1
+              panel: missing
+            - feature: fare
+              metric: 0.7
+              panel: correlation
+            - feature: score
+              metric: null
+              panel: distribution
+          - value: output/eda-report.csv
+          - value: output/eda-preview.png
+          expectedReturn:
+            usableCount: 2
+            excludedCount: 1
+            groupCounts:
+              correlation: 1
+              missing: 1
+            xExtent:
+            - age
+            - fare
+            yExtent:
+            - 0.1
+            - 0.7
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          - value: output/empty-eda-report.csv
+          - value: output/empty-eda-preview.png
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths:
+        - path: output/eda-report.csv
+          kind: table
+          origin: created
+          format: csv
+          columns:
+          - feature
+          - metric
+          - panel
+          - status
+        - path: output/eda-preview.png
+          kind: image
+          origin: created
+          mediaType: image/png
+          width: 320
+          height: 180
+        - path: output/empty-eda-report.csv
+          kind: table
+          origin: created
+          format: csv
+          columns:
+          - feature
+          - metric
+          - panel
+          - status
+        - path: output/empty-eda-preview.png
+          kind: image
+          origin: created
+          mediaType: image/png
+          width: 320
+          height: 180
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: seaborn_10-eda-evidence-report-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - seaborn_10-eda-evidence-report-data-evidence-mastery
+    title: 종합 EDA report 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 고객 이탈 데이터 EDA를 품질, 단변량, 관계, 한계 panel로 재현한다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_eda_evidence_report(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_eda_evidence_report(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_eda_evidence_report(candidate):
+            expected = {'mark': 'eda-panels', 'x': 'feature', 'y': 'metric', 'group': 'panel', 'transforms': ['distribution', 'quality-summary', 'relationship'], 'interaction': 'none'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.seaborn.seaborn_10.eda-evidence-report-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.seaborn.seaborn_10.eda-evidence-report-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_eda_evidence_report
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: eda-panels
+              x: feature
+              y: metric
+              group: panel
+              transforms:
+              - distribution
+              - quality-summary
+              - relationship
+              interaction: none
+              description: 고객 이탈 데이터 EDA를 품질, 단변량, 관계, 한계 panel로 재현한다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: eda-panels
+              x: feature
+              y: metric
+              group: panel
+              transforms:
+              - distribution
+              - quality-summary
+              - relationship
+              interaction: none
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: metric
+              y: feature
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - description
+            encoding:
+              mark: eda-panels
+              x: feature
+              y: metric
+              group: panel
+              transforms:
+              - distribution
+              - quality-summary
+              - relationship
+              interaction: none
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: seaborn_10-eda-evidence-report-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - seaborn_10-eda-evidence-report-encoding-transfer-transfer
+    title: 종합 EDA report 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 탐색 결과가 품질·분포·관계·한계 순서로 재현되는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_eda_evidence_report(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_eda_evidence_report(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_eda_evidence_report(situation):
+            table = {'quality-first': {'encoding': 'missingness table', 'evidence': 'row and field denominators', 'risk': 'silent drop'}, 'distribution-next': {'encoding': 'type-appropriate plots', 'evidence': 'n and domain', 'risk': 'default bins'}, 'relationship-last': {'encoding': 'hypothesis-linked plots', 'evidence': 'claim scope', 'risk': 'causal overreach'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.seaborn.seaborn_10.eda-evidence-report-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.seaborn.seaborn_10.eda-evidence-report-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_eda_evidence_report
+        cases:
+        - id: recalls-quality-first
+          arguments:
+          - value: quality-first
+          expectedReturn:
+            encoding: missingness table
+            evidence: row and field denominators
+            risk: silent drop
+        - id: recalls-distribution-next
+          arguments:
+          - value: distribution-next
+          expectedReturn:
+            encoding: type-appropriate plots
+            evidence: n and domain
+            risk: default bins
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

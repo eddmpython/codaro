@@ -1,0 +1,194 @@
+schemaVersion: 1
+category: "visionFeatures"
+canonicalRows: 10
+lessons:
+  - lessonRef: "visionFeatures/01_코너검출"
+    identityLedgerRef: "identity-ledger/visionFeatures.yml"
+    lessonContentHash: "059a8171bcafa1b9a0148ec54996ee5c08fd4d2207e11f023eed1424e5f252bb"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/13-vision-advanced"
+    eligiblePathIds: ["visionAdvanced"]
+    outcomes: ["vision.featureMatching"]
+    prerequisites: ["vision.opencvBasics","vision.features"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:visionFeatures/01_코너검출:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionFeatures_01_____:v1","retrieve:visionFeatures_01_____:v2","retrieve:visionFeatures_01_____:v3"]
+    transferVariantIds: ["transfer:visionFeatures_01_____:near-v1","transfer:visionFeatures_01_____:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionFeatures/02_ORB특징점"
+    identityLedgerRef: "identity-ledger/visionFeatures.yml"
+    lessonContentHash: "e5165ff15b62c35c1fe5907d0639b9a98bad0b9867f21bb17c3989cd3cbb7df4"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/13-vision-advanced"
+    eligiblePathIds: ["visionAdvanced"]
+    outcomes: ["vision.featureMatching"]
+    prerequisites: ["vision.featureMatching"]
+    reinforcesOutcomeIds: ["vision.featureMatching"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionFeatures/02_ORB특징점:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionFeatures_02_ORB___:v1","retrieve:visionFeatures_02_ORB___:v2","retrieve:visionFeatures_02_ORB___:v3"]
+    transferVariantIds: ["transfer:visionFeatures_02_ORB___:near-v1","transfer:visionFeatures_02_ORB___:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionFeatures/03_특징점매칭"
+    identityLedgerRef: "identity-ledger/visionFeatures.yml"
+    lessonContentHash: "47781259356f7600e5bb801152bef5e40bd43ae017db9123199ca0b84c4ab894"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/13-vision-advanced"
+    eligiblePathIds: ["visionAdvanced"]
+    outcomes: ["vision.featureMatching"]
+    prerequisites: ["vision.featureMatching"]
+    reinforcesOutcomeIds: ["vision.featureMatching"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionFeatures/03_특징점매칭:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionFeatures_03______:v1","retrieve:visionFeatures_03______:v2","retrieve:visionFeatures_03______:v3"]
+    transferVariantIds: ["transfer:visionFeatures_03______:near-v1","transfer:visionFeatures_03______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionFeatures/04_호모그래피정렬"
+    identityLedgerRef: "identity-ledger/visionFeatures.yml"
+    lessonContentHash: "b3d8f178f81aa0d6b8264b65115b15398bc1091137a121e902c87ec2cbb7b7c2"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/13-vision-advanced"
+    eligiblePathIds: ["visionAdvanced"]
+    outcomes: ["vision.featureMatching"]
+    prerequisites: ["vision.featureMatching"]
+    reinforcesOutcomeIds: ["vision.featureMatching"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionFeatures/04_호모그래피정렬:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionFeatures_04________:v1","retrieve:visionFeatures_04________:v2","retrieve:visionFeatures_04________:v3"]
+    transferVariantIds: ["transfer:visionFeatures_04________:near-v1","transfer:visionFeatures_04________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionFeatures/05_파노라마스티칭"
+    identityLedgerRef: "identity-ledger/visionFeatures.yml"
+    lessonContentHash: "ead014b61a26ade1b01f21e25a00e7940c8e0be944b274cb50cebd06b341038c"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/13-vision-advanced"
+    eligiblePathIds: ["visionAdvanced"]
+    outcomes: ["vision.featureMatching"]
+    prerequisites: ["vision.featureMatching"]
+    reinforcesOutcomeIds: ["vision.featureMatching"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionFeatures/05_파노라마스티칭:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionFeatures_05________:v1","retrieve:visionFeatures_05________:v2","retrieve:visionFeatures_05________:v3"]
+    transferVariantIds: ["transfer:visionFeatures_05________:near-v1","transfer:visionFeatures_05________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionFeatures/06_비디오입출력"
+    identityLedgerRef: "identity-ledger/visionFeatures.yml"
+    lessonContentHash: "a0a27d5ab829cf449e151338087f65a08c119e2e283147d27085a20a511cb6c5"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/13-vision-advanced"
+    eligiblePathIds: ["visionAdvanced"]
+    outcomes: ["vision.video"]
+    prerequisites: ["vision.opencvBasics"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:visionFeatures/06_비디오입출력:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionFeatures_06_______:v1","retrieve:visionFeatures_06_______:v2","retrieve:visionFeatures_06_______:v3"]
+    transferVariantIds: ["transfer:visionFeatures_06_______:near-v1","transfer:visionFeatures_06_______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionFeatures/07_배경차분"
+    identityLedgerRef: "identity-ledger/visionFeatures.yml"
+    lessonContentHash: "65bf889c24d06ba8e16a3ee321a4a19ebd83d0e73571996d34a2aa5c499bfb54"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/13-vision-advanced"
+    eligiblePathIds: ["visionAdvanced"]
+    outcomes: ["vision.video"]
+    prerequisites: ["vision.video"]
+    reinforcesOutcomeIds: ["vision.video"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionFeatures/07_배경차분:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionFeatures_07_____:v1","retrieve:visionFeatures_07_____:v2","retrieve:visionFeatures_07_____:v3"]
+    transferVariantIds: ["transfer:visionFeatures_07_____:near-v1","transfer:visionFeatures_07_____:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionFeatures/08_광학흐름"
+    identityLedgerRef: "identity-ledger/visionFeatures.yml"
+    lessonContentHash: "7ebb3a4930c9955f018c7f61e56d62d3315bfc5805281d6592380250bfeea433"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/13-vision-advanced"
+    eligiblePathIds: ["visionAdvanced"]
+    outcomes: ["vision.video"]
+    prerequisites: ["vision.video"]
+    reinforcesOutcomeIds: ["vision.video"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionFeatures/08_광학흐름:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionFeatures_08_____:v1","retrieve:visionFeatures_08_____:v2","retrieve:visionFeatures_08_____:v3"]
+    transferVariantIds: ["transfer:visionFeatures_08_____:near-v1","transfer:visionFeatures_08_____:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionFeatures/09_객체트래커"
+    identityLedgerRef: "identity-ledger/visionFeatures.yml"
+    lessonContentHash: "06e89dc863fabc2982e9d0dffc6a2b512d56677855b415576a76c3e9f3a5dd3a"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/13-vision-advanced"
+    eligiblePathIds: ["visionAdvanced"]
+    outcomes: ["vision.video"]
+    prerequisites: ["vision.video"]
+    reinforcesOutcomeIds: ["vision.video"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionFeatures/09_객체트래커:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionFeatures_09______:v1","retrieve:visionFeatures_09______:v2","retrieve:visionFeatures_09______:v3"]
+    transferVariantIds: ["transfer:visionFeatures_09______:near-v1","transfer:visionFeatures_09______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionFeatures/10_종합영상ROI추적기"
+    identityLedgerRef: "identity-ledger/visionFeatures.yml"
+    lessonContentHash: "872f134d640b2b5e075c9c3854a925d172616a9858813cb43e5d38f2f2a04b67"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/13-vision-advanced"
+    eligiblePathIds: ["visionAdvanced"]
+    outcomes: ["vision.featureMatching","vision.video"]
+    prerequisites: ["vision.video","vision.featureMatching"]
+    reinforcesOutcomeIds: ["vision.featureMatching","vision.video"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionFeatures/10_종합영상ROI추적기:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionFeatures_10_____ROI___:v1","retrieve:visionFeatures_10_____ROI___:v2","retrieve:visionFeatures_10_____ROI___:v3"]
+    transferVariantIds: ["transfer:visionFeatures_10_____ROI___:near-v1","transfer:visionFeatures_10_____ROI___:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

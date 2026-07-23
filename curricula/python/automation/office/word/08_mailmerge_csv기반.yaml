@@ -423,3 +423,323 @@ sections:
           - "발송 결과 로그를 CSV에 추가"
           - "헤더 매핑 dict로 한국식 컬럼명(이름→name) 자동 변환"
           - "조건부 추가 단락 (특정 학년에만 보이는 안내)"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: word_08-mail-merge-recipient-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_csv_load
+    - extensions
+    title: CSV 메일머지 수신자 데이터 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 중복 identity·누락 필드·허용 없는 민감정보를 차단한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이름이 아니라 안정적인 recipientId로 중복과 consent를 검사하세요.
+    - 병합 전에 필수 placeholder 입력이 모두 채워졌는지 확인하세요.
+    exercise:
+      prompt: audit_merge_rows(rows, required_fields, consented_ids)를 완성하세요.
+      starterCode: |-
+        def audit_merge_rows(rows, required_fields, consented_ids):
+            raise NotImplementedError
+      solution: |
+        def audit_merge_rows(rows, required_fields, consented_ids):
+            ids = [row.get("recipientId") for row in rows]
+            duplicates = sorted({value for value in ids if value and ids.count(value) > 1})
+            missing = sorted(row.get("recipientId", "") for row in rows if any(not str(row.get(field, "")).strip() for field in required_fields))
+            unconsented = sorted(row.get("recipientId", "") for row in rows if row.get("sensitive") and row.get("recipientId") not in consented_ids)
+            failures = []
+            if duplicates or any(not value for value in ids):
+                failures.append("identity")
+            if missing:
+                failures.append("required-fields")
+            if unconsented:
+                failures.append("consent")
+            return {"accepted": not failures, "failures": failures, "duplicates": duplicates, "missing": missing, "unconsented": unconsented}
+      hints: *id001
+    check:
+      id: python.word.word_08.mail-merge-recipient-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_08.mail-merge-recipient-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_merge_rows
+        cases:
+        - id: accepts-consented-rows
+          arguments:
+          - value:
+            - recipientId: u1
+              name: 민수
+              sensitive: true
+          - value:
+            - name
+          - value:
+            - u1
+          expectedReturn:
+            accepted: true
+            failures: []
+            duplicates: []
+            missing: []
+            unconsented: []
+        - id: reports-duplicate-and-missing
+          arguments:
+          - value:
+            - recipientId: u1
+              name: ''
+            - recipientId: u1
+              name: 영희
+          - value:
+            - name
+          - value: []
+          expectedReturn:
+            accepted: false
+            failures:
+            - identity
+            - required-fields
+            duplicates:
+            - u1
+            missing:
+            - u1
+            unconsented: []
+        - id: reports-consent
+          arguments:
+          - value:
+            - recipientId: u2
+              name: A
+              sensitive: true
+          - value:
+            - name
+          - value: []
+          expectedReturn:
+            accepted: false
+            failures:
+            - consent
+            duplicates: []
+            missing: []
+            unconsented:
+            - u2
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: word_08-mail-merge-manifest-reconcile-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - word_08-mail-merge-recipient-audit-mastery
+    title: 생성된 개인화 문서를 수신자 원장과 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 누락·중복·잘못된 source hash를 검출한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 수신자마다 정확히 하나의 artifact가 생성됐는지 원장으로 검증하세요.
+    - 개인정보 원문 대신 recipientId와 source hash만 증거에 남기세요.
+    exercise:
+      prompt: reconcile_merge_manifest(recipients, artifacts, source_hash)를 완성하세요.
+      starterCode: |-
+        def reconcile_merge_manifest(recipients, artifacts, source_hash):
+            raise NotImplementedError
+      solution: |
+        def reconcile_merge_manifest(recipients, artifacts, source_hash):
+            expected = set(recipients)
+            observed_ids = [item.get("recipientId") for item in artifacts]
+            observed = set(observed_ids)
+            missing = sorted(expected - observed)
+            extra = sorted(observed - expected)
+            duplicates = sorted({value for value in observed_ids if value and observed_ids.count(value) > 1})
+            stale = sorted(item.get("recipientId", "") for item in artifacts if item.get("sourceHash") != source_hash)
+            failures = []
+            if missing or extra or duplicates:
+                failures.append("cardinality")
+            if stale:
+                failures.append("source")
+            return {"passed": not failures, "failures": failures, "missing": missing, "extra": extra, "duplicates": duplicates, "stale": stale}
+      hints: *id002
+    check:
+      id: python.word.word_08.mail-merge-manifest-reconcile.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_08.mail-merge-manifest-reconcile.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_merge_manifest
+        cases:
+        - id: accepts-one-per-recipient
+          arguments:
+          - value:
+            - u1
+            - u2
+          - value:
+            - recipientId: u1
+              sourceHash: h
+            - recipientId: u2
+              sourceHash: h
+          - value: h
+          expectedReturn:
+            passed: true
+            failures: []
+            missing: []
+            extra: []
+            duplicates: []
+            stale: []
+        - id: reports-missing-and-duplicate
+          arguments:
+          - value:
+            - u1
+            - u2
+          - value:
+            - recipientId: u1
+              sourceHash: h
+            - recipientId: u1
+              sourceHash: h
+          - value: h
+          expectedReturn:
+            passed: false
+            failures:
+            - cardinality
+            missing:
+            - u2
+            extra: []
+            duplicates:
+            - u1
+            stale: []
+        - id: reports-extra-and-stale
+          arguments:
+          - value:
+            - u1
+          - value:
+            - recipientId: u1
+              sourceHash: old
+            - recipientId: u3
+              sourceHash: h
+          - value: h
+          expectedReturn:
+            passed: false
+            failures:
+            - cardinality
+            - source
+            missing: []
+            extra:
+            - u3
+            duplicates: []
+            stale:
+            - u1
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: word_08-mail-merge-safety-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - word_08-mail-merge-manifest-reconcile-transfer
+    title: 메일머지 안전 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력 승인·개인화·산출물 원장을 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Web에서는 문서 구조와 업무 불변식을 즉시 검증하세요.
+    - Local에서는 저장한 docx를 재개방하고 렌더 결과까지 증거로 남기세요.
+    exercise:
+      prompt: choose_merge_evidence(stage)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_merge_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_merge_evidence(stage):
+            choices = {'admission': {'action': 'validate identity fields and consent', 'evidence': 'redacted recipient audit', 'risk': 'unauthorized personalization'}, 'render': {'action': 'resolve placeholders per recipient', 'evidence': 'placeholder completeness', 'risk': 'cross-recipient leakage'}, 'release': {'action': 'reconcile one artifact per identity', 'evidence': 'hashed output manifest', 'risk': 'missing or duplicate letters'}}
+            if stage not in choices:
+                raise ValueError('unknown stage')
+            return choices[stage]
+      hints: *id003
+    check:
+      id: python.word.word_08.mail-merge-safety-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_08.mail-merge-safety-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_merge_evidence
+        cases:
+        - id: recalls-admission
+          arguments:
+          - value: admission
+          expectedReturn:
+            action: validate identity fields and consent
+            evidence: redacted recipient audit
+            risk: unauthorized personalization
+        - id: recalls-render
+          arguments:
+          - value: render
+          expectedReturn:
+            action: resolve placeholders per recipient
+            evidence: placeholder completeness
+            risk: cross-recipient leakage
+        - id: recalls-final-stage
+          arguments:
+          - value: release
+          expectedReturn:
+            action: reconcile one artifact per identity
+            evidence: hashed output manifest
+            risk: missing or duplicate letters
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

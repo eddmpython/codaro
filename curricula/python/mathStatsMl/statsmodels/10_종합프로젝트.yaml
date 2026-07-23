@@ -857,3 +857,291 @@ sections:
     type: noError
     noError: 업무 흐름 검증에서 `compactX` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: statsmodels_10-statistical-model-report-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: 종합 통계 모델 report의 필수 증거 검사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: estimand·design·coefficient·diagnostics·validation·claim을 모두 blocking stage로 둔다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - coefficient table만으로 report를 완료하지 마세요.
+    - claim scope와 validation을 blocking section으로 유지하세요.
+    exercise:
+      prompt: audit_statistical_report(sections)를 완성하세요.
+      starterCode: |-
+        def audit_statistical_report(sections):
+            raise NotImplementedError
+      solution: |
+        def audit_statistical_report(sections):
+            required=["estimand","design","coefficients","diagnostics","validation","claimScope"]
+            by_name={section["name"]:section for section in sections}; missing=[name for name in required if name not in by_name]
+            failed=[name for name in required if name in by_name and by_name[name].get("status")!="approved"]
+            return {"releaseReady":not missing and not failed,"missing":missing,"failed":failed,"evidenceRefs":[by_name[name].get("ref") for name in required if name in by_name]}
+      hints: *id001
+    check:
+      id: python.statsmodels.statsmodels_10.statistical-model-report.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.statsmodels.statsmodels_10.statistical-model-report.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_statistical_report
+        cases:
+        - id: accepts-complete-report
+          arguments:
+          - value:
+            - name: estimand
+              status: approved
+              ref: estimand.json
+            - name: design
+              status: approved
+              ref: design.json
+            - name: coefficients
+              status: approved
+              ref: coefficients.json
+            - name: diagnostics
+              status: approved
+              ref: diagnostics.json
+            - name: validation
+              status: approved
+              ref: validation.json
+            - name: claimScope
+              status: approved
+              ref: claimScope.json
+          expectedReturn:
+            releaseReady: true
+            missing: []
+            failed: []
+            evidenceRefs:
+            - estimand.json
+            - design.json
+            - coefficients.json
+            - diagnostics.json
+            - validation.json
+            - claimScope.json
+        - id: reports-gaps
+          arguments:
+          - value:
+            - name: estimand
+              status: approved
+              ref: e
+            - name: design
+              status: failed
+              ref: d
+          expectedReturn:
+            releaseReady: false
+            missing:
+            - coefficients
+            - diagnostics
+            - validation
+            - claimScope
+            failed:
+            - design
+            evidenceRefs:
+            - e
+            - d
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: statsmodels_10-model-comparison-ledger-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - statsmodels_10-statistical-model-report-mastery
+    title: 새 후보 모델 비교에 원장 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 같은 validation rows에서 metric·복잡도·가정 실패를 비교한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 모든 후보가 같은 validation rows를 사용해야 합니다.
+    - 낮은 error와 가정 적합성의 tradeoff를 원장에 남기세요.
+    exercise:
+      prompt: select_statistical_model(models, maximum_failures)를 완성하세요.
+      starterCode: |-
+        def select_statistical_model(models, maximum_failures):
+            raise NotImplementedError
+      solution: |
+        def select_statistical_model(models, maximum_failures):
+            eligible=[model for model in models if len(model.get("assumptionFailures",[]))<=maximum_failures]
+            if not eligible: return {"selected":None,"reason":"no-eligible-model"}
+            selected=min(eligible,key=lambda model:(model["validationError"],model["parameterCount"],model["name"]))
+            return {"selected":selected["name"],"validationError":selected["validationError"],"parameterCount":selected["parameterCount"],"assumptionFailures":selected.get("assumptionFailures",[])}
+      hints: *id002
+    check:
+      id: python.statsmodels.statsmodels_10.model-comparison-ledger.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.statsmodels.statsmodels_10.model-comparison-ledger.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: select_statistical_model
+        cases:
+        - id: selects-low-error-eligible
+          arguments:
+          - value:
+            - name: simple
+              validationError: 3
+              parameterCount: 2
+              assumptionFailures: []
+            - name: complex
+              validationError: 2
+              parameterCount: 10
+              assumptionFailures:
+              - heteroskedasticity
+          - value: 1
+          expectedReturn:
+            selected: complex
+            validationError: 2
+            parameterCount: 10
+            assumptionFailures:
+            - heteroskedasticity
+        - id: breaks-error-tie-by-complexity
+          arguments:
+          - value:
+            - name: a
+              validationError: 2
+              parameterCount: 5
+              assumptionFailures: []
+            - name: b
+              validationError: 2
+              parameterCount: 2
+              assumptionFailures: []
+          - value: 0
+          expectedReturn:
+            selected: b
+            validationError: 2
+            parameterCount: 2
+            assumptionFailures: []
+        - id: reports-no-eligible
+          arguments:
+          - value:
+            - name: x
+              validationError: 1
+              parameterCount: 1
+              assumptionFailures:
+              - a
+          - value: 0
+          expectedReturn:
+            selected: null
+            reason: no-eligible-model
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: statsmodels_10-statistical-project-release-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - statsmodels_10-model-comparison-ledger-transfer
+    title: 종합 통계 project 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 추정·진단·검증·claim을 분리한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 계수·불확실성·가정 진단을 한 묶음으로 해석하세요.
+    - 통계적 연관을 인과 효과나 개인 확정 예측으로 확대하지 마세요.
+    exercise:
+      prompt: choose_statistical_release_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_statistical_release_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_statistical_release_evidence(situation):
+            table = {'coefficient-claim': {'method': 'estimate interval units', 'evidence': 'design and covariance', 'risk': 'p-value only'}, 'model-adequacy': {'method': 'residual and assumption diagnostics', 'evidence': 'plots tests effect', 'risk': 'single test'}, 'release-conclusion': {'method': 'validation plus claim review', 'evidence': 'out-of-sample and scope', 'risk': 'association as causation'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.statsmodels.statsmodels_10.statistical-project-release.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.statsmodels.statsmodels_10.statistical-project-release.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_statistical_release_evidence
+        cases:
+        - id: recalls-coefficient-claim
+          arguments:
+          - value: coefficient-claim
+          expectedReturn:
+            method: estimate interval units
+            evidence: design and covariance
+            risk: p-value only
+        - id: recalls-model-adequacy
+          arguments:
+          - value: model-adequacy
+          expectedReturn:
+            method: residual and assumption diagnostics
+            evidence: plots tests effect
+            risk: single test
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

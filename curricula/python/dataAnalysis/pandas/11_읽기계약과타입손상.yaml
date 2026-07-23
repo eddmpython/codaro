@@ -289,3 +289,280 @@ sections:
     check:
       noError: 읽기·조인·집계 파이프라인이 끝나야 한다.
       resultCheck: 이름별 합계가 Alice 40, Bob 20이어야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pandas_11-validate-read-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inference-corruption
+    - practice-read-join-pipeline
+    title: 파일 읽기 직후 열 타입 계약 검증하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 문자열로 손상될 수 있는 숫자 열을 명시적으로 변환하고 거절 행을 분리한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - read 성공을 타입 계약 통과로 간주하지 마세요.
+    - 변환 실패와 음수 값의 원래 행 index를 거절 증거로 남기세요.
+    exercise:
+      prompt: validate_read_contract(rows)를 완성해 accepted와 rejected를 반환하세요.
+      starterCode: |-
+        def validate_read_contract(rows):
+            raise NotImplementedError
+      solution: |
+        def validate_read_contract(rows):
+            accepted = []
+            rejected = []
+            for index, row in enumerate(rows):
+                try:
+                    record_id = str(row["id"]).strip()
+                    amount = int(row["amount"])
+                    if not record_id or amount < 0 or isinstance(row["amount"], bool):
+                        raise ValueError
+                    accepted.append({"id": record_id, "amount": amount})
+                except (KeyError, TypeError, ValueError):
+                    rejected.append(index)
+            return {"accepted": accepted, "rejected": rejected}
+      hints: *id001
+    check:
+      id: python.pandas.pandas_11.validate-read-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_11.validate-read-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: validate_read_contract
+        cases:
+        - id: coerces-only-contract-safe-values
+          arguments:
+          - value:
+            - id: ' A '
+              amount: '12'
+            - id: B
+              amount: bad
+            - amount: 3
+            - id: C
+              amount: -1
+          expectedReturn:
+            accepted:
+            - id: A
+              amount: 12
+            rejected:
+            - 1
+            - 2
+            - 3
+        - id: handles-empty-source
+          arguments:
+          - value: []
+          expectedReturn:
+            accepted: []
+            rejected: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pandas_11-detect-type-damage-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_11-validate-read-contract-mastery
+    title: 새 데이터 소스의 관측 타입 손상 탐지하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 기대 schema와 실제 행을 비교해 열별 손상 행 index를 반환한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - bool은 Python에서 int의 하위 타입이므로 숫자 검사에서 따로 제외하세요.
+    - 열이 없는 경우도 타입 손상으로 기록하세요.
+    exercise:
+      prompt: detect_type_damage(rows, schema)를 완성해 damagedByColumn과 cleanRowCount를 반환하세요.
+      starterCode: |-
+        def detect_type_damage(rows, schema):
+            raise NotImplementedError
+      solution: |
+        def detect_type_damage(rows, schema):
+            checks = {
+                "int": lambda value: isinstance(value, int) and not isinstance(value, bool),
+                "number": lambda value: isinstance(value, (int, float)) and not isinstance(value, bool),
+                "str": lambda value: isinstance(value, str),
+                "bool": lambda value: isinstance(value, bool),
+            }
+            if any(kind not in checks for kind in schema.values()):
+                raise ValueError("unknown schema type")
+            damaged = {column: [] for column in schema}
+            clean = 0
+            for index, row in enumerate(rows):
+                row_clean = True
+                for column, kind in schema.items():
+                    if column not in row or not checks[kind](row[column]):
+                        damaged[column].append(index)
+                        row_clean = False
+                clean += row_clean
+            return {"damagedByColumn": damaged, "cleanRowCount": clean}
+      hints: *id002
+    check:
+      id: python.pandas.pandas_11.detect-type-damage.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_11.detect-type-damage.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: detect_type_damage
+        cases:
+        - id: locates-damaged-columns
+          arguments:
+          - value:
+            - id: 1
+              amount: 2.5
+              active: true
+            - id: '2'
+              amount: '3'
+              active: 1
+            - id: 3
+              active: false
+          - value:
+              id: int
+              amount: number
+              active: bool
+          expectedReturn:
+            damagedByColumn:
+              id:
+              - 1
+              amount:
+              - 1
+              - 2
+              active:
+              - 1
+            cleanRowCount: 1
+        - id: handles-empty-source
+          arguments:
+          - value: []
+          - value:
+              id: int
+          expectedReturn:
+            damagedByColumn:
+              id: []
+            cleanRowCount: 0
+        - id: rejects-unknown-schema-kind
+          arguments:
+          - value: []
+          - value:
+              id: uuid
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pandas_11-read-boundary-policy-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_11-detect-type-damage-transfer
+    title: 데이터 읽기 경계의 손상 대응 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 열 누락, 타입 혼합, 날짜 파싱 실패 상황에 맞는 조치와 증거를 선택한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 파일이 열렸다는 사실과 데이터 계약이 유효하다는 사실을 분리하세요.
+    - 손상 값을 추측해 고치지 말고 실패 위치와 정책을 함께 남기세요.
+    exercise:
+      prompt: choose_read_boundary_policy(issue)를 완성해 action, evidence, forbidden을 반환하세요.
+      starterCode: |-
+        def choose_read_boundary_policy(issue):
+            raise NotImplementedError
+      solution: |
+        def choose_read_boundary_policy(issue):
+            table = {
+                "missing-required-column": {"action": "stop-load", "evidence": "expected and actual columns", "forbidden": "invent empty column"},
+                "mixed-numeric-text": {"action": "coerce-with-rejection-log", "evidence": "failed row indexes", "forbidden": "silently keep object type"},
+                "invalid-date": {"action": "parse-with-explicit-format", "evidence": "invalid values and timezone", "forbidden": "guess locale"},
+            }
+            if issue not in table:
+                raise ValueError("unknown read issue")
+            return table[issue]
+      hints: *id003
+    check:
+      id: python.pandas.pandas_11.read-boundary-policy.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_11.read-boundary-policy.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_read_boundary_policy
+        cases:
+        - id: recalls-mixed-type-policy
+          arguments:
+          - value: mixed-numeric-text
+          expectedReturn:
+            action: coerce-with-rejection-log
+            evidence: failed row indexes
+            forbidden: silently keep object type
+        - id: recalls-missing-column-stop
+          arguments:
+          - value: missing-required-column
+          expectedReturn:
+            action: stop-load
+            evidence: expected and actual columns
+            forbidden: invent empty column
+        - id: rejects-unknown-read-issue
+          arguments:
+          - value: slow-file
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

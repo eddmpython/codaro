@@ -7,6 +7,9 @@ meta:
   category: pandas
   difficulty: ⭐⭐⭐⭐⭐
   badge: 심화
+  outcomes: ["pandas.merge"]
+  prerequisites: ["pandas.loadFrame"]
+  estimatedMinutes: 45
   tags:
   - merge
   - concat
@@ -508,3 +511,288 @@ sections:
     content: 다음 시간에는 지금까지 배운 모든 것을 활용하는 실전 프로젝트입니다.
   goal: 정리에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
   why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pandas_09-left-join-records-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_customers
+    - summary
+    title: 두 레코드 표를 key로 left join하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 왼쪽 행을 모두 보존하고 오른쪽 열을 결합하며 중복 key를 명시적으로 거절한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - left join은 왼쪽 행 수를 기본적으로 보존합니다.
+    - many-to-one 계약이면 오른쪽 중복 key를 결합 전에 검사하세요.
+    exercise:
+      prompt: left_join_records(left, right, key, right_fields)를 완성하세요.
+      starterCode: |-
+        def left_join_records(left, right, key, right_fields):
+            raise NotImplementedError
+      solution: |
+        def left_join_records(left, right, key, right_fields):
+            index = {}
+            for row in right:
+                value = row[key]
+                if value in index:
+                    raise ValueError("duplicate right key")
+                index[value] = row
+            result = []
+            for row in left:
+                merged = dict(row)
+                match = index.get(row[key], {})
+                for field in right_fields:
+                    merged[field] = match.get(field)
+                result.append(merged)
+            return result
+      hints: *id001
+    check:
+      id: python.pandas.pandas_09.left-join-records.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_09.left-join-records.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: left_join_records
+        cases:
+        - id: preserves-unmatched-left-row
+          arguments:
+          - value:
+            - id: 1
+              amount: 10
+            - id: 2
+              amount: 20
+          - value:
+            - id: 1
+              owner: Mina
+          - value: id
+          - value:
+            - owner
+          expectedReturn:
+          - id: 1
+            amount: 10
+            owner: Mina
+          - id: 2
+            amount: 20
+            owner: null
+        - id: handles-empty-right
+          arguments:
+          - value:
+            - id: 1
+          - value: []
+          - value: id
+          - value:
+            - label
+          expectedReturn:
+          - id: 1
+            label: null
+        - id: rejects-duplicate-right-key
+          arguments:
+          - value:
+            - id: 1
+          - value:
+            - id: 1
+            - id: 1
+          - value: id
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pandas_09-join-key-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_09-left-join-records-mastery
+    title: 새 고객·주문 표의 join 전 key 품질 감사하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 결합 전에 양쪽 중복 key와 매칭되지 않는 key를 계산해 위험을 드러낸다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - join 결과를 보기 전에 각 표의 key 빈도를 세세요.
+    - unmatchedLeft와 unmatchedRight는 서로 다른 데이터 품질 문제입니다.
+    exercise:
+      prompt: audit_join_keys(left, right, key)를 완성해 duplicateLeft, duplicateRight, unmatchedLeft, unmatchedRight를 반환하세요.
+      starterCode: |-
+        def audit_join_keys(left, right, key):
+            raise NotImplementedError
+      solution: |
+        def audit_join_keys(left, right, key):
+            def counts(rows):
+                result = {}
+                for row in rows:
+                    result[row[key]] = result.get(row[key], 0) + 1
+                return result
+            left_counts = counts(left)
+            right_counts = counts(right)
+            left_keys = set(left_counts)
+            right_keys = set(right_counts)
+            return {
+                "duplicateLeft": sorted(value for value, count in left_counts.items() if count > 1),
+                "duplicateRight": sorted(value for value, count in right_counts.items() if count > 1),
+                "unmatchedLeft": sorted(left_keys - right_keys),
+                "unmatchedRight": sorted(right_keys - left_keys),
+            }
+      hints: *id002
+    check:
+      id: python.pandas.pandas_09.join-key-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_09.join-key-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_join_keys
+        cases:
+        - id: finds-duplicates-and-unmatched
+          arguments:
+          - value:
+            - id: 1
+            - id: 1
+            - id: 2
+          - value:
+            - id: 1
+            - id: 3
+            - id: 3
+          - value: id
+          expectedReturn:
+            duplicateLeft:
+            - 1
+            duplicateRight:
+            - 3
+            unmatchedLeft:
+            - 2
+            unmatchedRight:
+            - 3
+        - id: reports-clean-keys
+          arguments:
+          - value:
+            - id: A
+          - value:
+            - id: A
+          - value: id
+          expectedReturn:
+            duplicateLeft: []
+            duplicateRight: []
+            unmatchedLeft: []
+            unmatchedRight: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pandas_09-join-type-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_09-join-key-audit-transfer
+    title: 보존해야 할 행에 맞는 join 종류 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 분석 질문별 join type, 보존 집합, 확인할 위험을 선택한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 어느 표의 행을 반드시 보존해야 하는지 먼저 문장으로 쓰세요.
+    - join 뒤 행 수 증가는 중복 key의 신호일 수 있습니다.
+    exercise:
+      prompt: choose_join_type(goal)를 완성해 join, preserves, audit를 반환하세요.
+      starterCode: |-
+        def choose_join_type(goal):
+            raise NotImplementedError
+      solution: |
+        def choose_join_type(goal):
+            table = {
+                "only-matched-orders": {"join": "inner", "preserves": "matched keys", "audit": "dropped unmatched rows"},
+                "all-customers-even-without-orders": {"join": "left", "preserves": "all customer rows", "audit": "null order fields"},
+                "all-keys-from-both-sides": {"join": "outer", "preserves": "union of keys", "audit": "left-only and right-only rows"},
+            }
+            if goal not in table:
+                raise ValueError("unknown join goal")
+            return table[goal]
+      hints: *id003
+    check:
+      id: python.pandas.pandas_09.join-type-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_09.join-type-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_join_type
+        cases:
+        - id: recalls-left-join
+          arguments:
+          - value: all-customers-even-without-orders
+          expectedReturn:
+            join: left
+            preserves: all customer rows
+            audit: null order fields
+        - id: recalls-outer-audit
+          arguments:
+          - value: all-keys-from-both-sides
+          expectedReturn:
+            join: outer
+            preserves: union of keys
+            audit: left-only and right-only rows
+        - id: rejects-unclear-goal
+          arguments:
+          - value: merge-everything
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

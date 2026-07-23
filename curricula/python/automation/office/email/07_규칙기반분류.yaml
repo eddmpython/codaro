@@ -311,3 +311,325 @@ sections:
           - "첨부 유무에 따라 다른 분류"
           - "LLM 분류로 업그레이드 (llmBasics 트랙 결합)"
           - "분류 결과를 매일 보고서로 메일 발송 (08강 알림 패턴 결합)"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: email_07-mail-classification-rules-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_rules
+    - extensions
+    title: 규칙 기반 메일 분류의 priority·충돌 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 한 메일에 적용될 rule을 priority와 specificity로 결정하고 모호성을 보고한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 여러 rule이 같게 매치되면 목록 순서로 숨기지 말고 Review로 보내세요.
+    - priority와 condition specificity를 분리해 결정 규칙을 남기세요.
+    exercise:
+      prompt: classify_mail(message, rules)를 완성하세요.
+      starterCode: |-
+        def classify_mail(message, rules):
+            raise NotImplementedError
+      solution: |
+        def classify_mail(message, rules):
+            matches = []
+            for rule in rules:
+                conditions = rule.get("conditions", {})
+                matched = True
+                if "senderDomain" in conditions:
+                    matched = matched and message["from"].lower().endswith("@" + conditions["senderDomain"].lower())
+                if "subjectContains" in conditions:
+                    matched = matched and conditions["subjectContains"].lower() in message.get("subject", "").lower()
+                if matched:
+                    matches.append(rule)
+            if not matches:
+                return {"folder": "Unclassified", "rule": None, "ambiguous": []}
+            matches.sort(key=lambda rule: (-rule["priority"], -len(rule.get("conditions", {})), rule["id"]))
+            best = matches[0]
+            ambiguous = sorted(rule["id"] for rule in matches[1:] if rule["priority"] == best["priority"] and len(rule.get("conditions", {})) == len(best.get("conditions", {})))
+            return {"folder": best["folder"] if not ambiguous else "Review", "rule": best["id"], "ambiguous": ambiguous}
+      hints: *id001
+    check:
+      id: python.email.email_07.mail-classification-rules.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_07.mail-classification-rules.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: classify_mail
+        cases:
+        - id: selects-specific-high-priority-rule
+          arguments:
+          - value:
+              from: a@example.test
+              subject: Invoice July
+          - value:
+            - id: domain
+              priority: 1
+              conditions:
+                senderDomain: example.test
+              folder: Example
+            - id: invoice
+              priority: 2
+              conditions:
+                senderDomain: example.test
+                subjectContains: invoice
+              folder: Invoices
+          expectedReturn:
+            folder: Invoices
+            rule: invoice
+            ambiguous: []
+        - id: reports-ambiguous-equal-rules
+          arguments:
+          - value:
+              from: a@example.test
+              subject: Hello
+          - value:
+            - id: a
+              priority: 1
+              conditions:
+                senderDomain: example.test
+              folder: A
+            - id: b
+              priority: 1
+              conditions:
+                senderDomain: example.test
+              folder: B
+          expectedReturn:
+            folder: Review
+            rule: a
+            ambiguous:
+            - b
+        - id: leaves-unmatched-mail-unclassified
+          arguments:
+          - value:
+              from: a@other.test
+              subject: Hello
+          - value:
+            - id: a
+              priority: 1
+              conditions:
+                senderDomain: example.test
+              folder: A
+          expectedReturn:
+            folder: Unclassified
+            rule: null
+            ambiguous: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: email_07-classification-confusion-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - email_07-mail-classification-rules-mastery
+    title: 새 분류 rule set에 confusion·coverage 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 검수 fixture의 expected와 predicted folder로 정확도와 미분류를 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - rule 수가 아니라 검수 fixture의 expected/predicted confusion을 확인하세요.
+    - Unclassified는 정확도와 별도로 coverage blocker로 처리하세요.
+    exercise:
+      prompt: audit_classification_fixtures(fixtures, minimum_accuracy)를 완성하세요.
+      starterCode: |-
+        def audit_classification_fixtures(fixtures, minimum_accuracy):
+            raise NotImplementedError
+      solution: |
+        def audit_classification_fixtures(fixtures, minimum_accuracy):
+            if not 0 <= minimum_accuracy <= 1:
+                raise ValueError("invalid accuracy threshold")
+            correct = []
+            errors = []
+            unclassified = []
+            for fixture in fixtures:
+                if fixture["predicted"] == "Unclassified":
+                    unclassified.append(fixture["id"])
+                if fixture["predicted"] == fixture["expected"]:
+                    correct.append(fixture["id"])
+                else:
+                    errors.append({"id": fixture["id"], "expected": fixture["expected"], "predicted": fixture["predicted"]})
+            accuracy = 0.0 if not fixtures else round(len(correct) / len(fixtures), 4)
+            return {"accepted": accuracy >= minimum_accuracy and not unclassified, "accuracy": accuracy, "correct": correct, "errors": errors, "unclassified": unclassified}
+      hints: *id002
+    check:
+      id: python.email.email_07.classification-confusion-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_07.classification-confusion-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_classification_fixtures
+        cases:
+        - id: accepts-perfect-fixtures
+          arguments:
+          - value:
+            - id: a
+              expected: Invoice
+              predicted: Invoice
+            - id: b
+              expected: Alert
+              predicted: Alert
+          - value: 1.0
+          expectedReturn:
+            accepted: true
+            accuracy: 1.0
+            correct:
+            - a
+            - b
+            errors: []
+            unclassified: []
+        - id: reports-error-and-unclassified
+          arguments:
+          - value:
+            - id: a
+              expected: Invoice
+              predicted: Other
+            - id: b
+              expected: Alert
+              predicted: Unclassified
+          - value: 0.5
+          expectedReturn:
+            accepted: false
+            accuracy: 0.0
+            correct: []
+            errors:
+            - id: a
+              expected: Invoice
+              predicted: Other
+            - id: b
+              expected: Alert
+              predicted: Unclassified
+            unclassified:
+            - b
+        - id: handles-empty-fixture-set
+          arguments:
+          - value: []
+          - value: 0.0
+          expectedReturn:
+            accepted: true
+            accuracy: 0.0
+            correct: []
+            errors: []
+            unclassified: []
+        - id: rejects-invalid-threshold
+          arguments:
+          - value: []
+          - value: 2.0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: email_07-mail-classification-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - email_07-classification-confusion-audit-transfer
+    title: 규칙 기반 메일 분류 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: priority·ambiguity·fixture confusion 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 메일 API 성공과 올바른 수신자·내용·첨부 전달을 분리해 검증하세요.
+    - 실제 발송 전 dry run과 idempotency identity, 비밀정보 redaction을 적용하세요.
+    exercise:
+      prompt: choose_mail_classification_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_mail_classification_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_mail_classification_evidence(situation):
+            table = {'resolve': {'action': 'rank priority and specificity', 'evidence': 'matched rule list', 'risk': 'rule order dependence'}, 'ambiguity': {'action': 'route equal matches to review', 'evidence': 'ambiguous rule IDs', 'risk': 'wrong folder'}, 'validate': {'action': 'run labeled fixtures', 'evidence': 'accuracy errors unclassified', 'risk': 'untested rule drift'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.email.email_07.mail-classification-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_07.mail-classification-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_mail_classification_evidence
+        cases:
+        - id: recalls-resolve
+          arguments:
+          - value: resolve
+          expectedReturn:
+            action: rank priority and specificity
+            evidence: matched rule list
+            risk: rule order dependence
+        - id: recalls-ambiguity
+          arguments:
+          - value: ambiguity
+          expectedReturn:
+            action: route equal matches to review
+            evidence: ambiguous rule IDs
+            risk: wrong folder
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

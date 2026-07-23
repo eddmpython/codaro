@@ -1,0 +1,574 @@
+schemaVersion: 1
+category: "30days"
+canonicalRows: 30
+lessons:
+  - lessonRef: "30days/day01_헬로월드"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "271e34663498ab8e7a5b75008361dc14b4585cff1f15b9d61bd00ee15b2578a9"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.intro"]
+    prerequisites: []
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day01_헬로월드:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day01_____:v1","retrieve:30days_day01_____:v2","retrieve:30days_day01_____:v3"]
+    transferVariantIds: ["transfer:30days_day01_____:near-v1","transfer:30days_day01_____:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day02_변수와데이터타입"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "631f75623015c5b6db9f6189741c6407027a83a60b4ac32c67da22ec1c7fd3d3"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["computerVision","dataReporting","dataVisualization","geoVisualization","imageProcessing","officeAutomation","pythonFoundation","scriptingAutomation","sqlAnalysis","webMonitoring"]
+    outcomes: ["python.variables"]
+    prerequisites: ["python.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day02_변수와데이터타입:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day02_________:v1","retrieve:30days_day02_________:v2","retrieve:30days_day02_________:v3"]
+    transferVariantIds: ["transfer:30days_day02_________:near-v1","transfer:30days_day02_________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day03_연산자"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "808cc28f38117f47a24fe2ed4e8cf81fe16d51a5af15080f43cba011a0af7abf"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.operators"]
+    prerequisites: ["python.variables"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day03_연산자:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day03____:v1","retrieve:30days_day03____:v2","retrieve:30days_day03____:v3"]
+    transferVariantIds: ["transfer:30days_day03____:near-v1","transfer:30days_day03____:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day04_문자열기초"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "15b0d62b2cbab8d4928bc042532b4f6217dd0579f2a741c26e822b46f4510316"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation","textProcessing"]
+    outcomes: ["python.strings"]
+    prerequisites: ["python.variables"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day04_문자열기초:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day04______:v1","retrieve:30days_day04______:v2","retrieve:30days_day04______:v3"]
+    transferVariantIds: ["transfer:30days_day04______:near-v1","transfer:30days_day04______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day05_문자열인덱싱슬라이싱"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "338dfe86065d3a77f4fb24b9743e661835f2ea5a51ac84db9419082ede435dda"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation","textProcessing"]
+    outcomes: ["python.strings"]
+    prerequisites: ["python.strings"]
+    reinforcesOutcomeIds: ["python.strings"]
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day05_문자열인덱싱슬라이싱:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day05___________:v1","retrieve:30days_day05___________:v2","retrieve:30days_day05___________:v3"]
+    transferVariantIds: ["transfer:30days_day05___________:near-v1","transfer:30days_day05___________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day06_문자열메서드"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "83eb660e3d65164dd3cf3285f4a6fb3b32985e56c4639b783e933f67e9a98a36"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation","textProcessing"]
+    outcomes: ["python.strings"]
+    prerequisites: ["python.strings"]
+    reinforcesOutcomeIds: ["python.strings"]
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day06_문자열메서드:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day06_______:v1","retrieve:30days_day06_______:v2","retrieve:30days_day06_______:v3"]
+    transferVariantIds: ["transfer:30days_day06_______:near-v1","transfer:30days_day06_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day07_리스트기초"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "6dd516d82d2cb430456af4e80c9341978e4af6601169ec8325f98e15492290cc"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.lists"]
+    prerequisites: ["python.variables"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day07_리스트기초:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day07______:v1","retrieve:30days_day07______:v2","retrieve:30days_day07______:v3"]
+    transferVariantIds: ["transfer:30days_day07______:near-v1","transfer:30days_day07______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day08_리스트메서드"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "97169d2f8b172f77424ce7f2dbc18a1870531559c1e06cd26c5f98a84ad58daa"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.lists"]
+    prerequisites: ["python.lists"]
+    reinforcesOutcomeIds: ["python.lists"]
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day08_리스트메서드:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day08_______:v1","retrieve:30days_day08_______:v2","retrieve:30days_day08_______:v3"]
+    transferVariantIds: ["transfer:30days_day08_______:near-v1","transfer:30days_day08_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day09_튜플"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "bef088b1a9dffcf464b5e4cf19fca60d1493731fa12ff0ce5ec8bd47d2ca9849"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.lists"]
+    prerequisites: ["python.lists"]
+    reinforcesOutcomeIds: ["python.lists"]
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day09_튜플:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day09___:v1","retrieve:30days_day09___:v2","retrieve:30days_day09___:v3"]
+    transferVariantIds: ["transfer:30days_day09___:near-v1","transfer:30days_day09___:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day10_집합"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "5bac6babca94506dfeac82d363f8ce528270fddbe5ff26cf9d758e863390712e"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.dictsAndSets"]
+    prerequisites: ["python.lists"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day10_집합:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day10___:v1","retrieve:30days_day10___:v2","retrieve:30days_day10___:v3"]
+    transferVariantIds: ["transfer:30days_day10___:near-v1","transfer:30days_day10___:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day11_딕셔너리기초"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "de5e1a73b12ac2bc8082f82268a4e0245a05de75d9be5e5daa65580ad9a2a001"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.dictsAndSets"]
+    prerequisites: ["python.lists"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day11_딕셔너리기초:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day11_______:v1","retrieve:30days_day11_______:v2","retrieve:30days_day11_______:v3"]
+    transferVariantIds: ["transfer:30days_day11_______:near-v1","transfer:30days_day11_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day12_딕셔너리메서드"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "a30c89eac30d77d28a764faf0816e465d5af689a94dc7524eebb306f4f894526"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.dictsAndSets"]
+    prerequisites: ["python.dictsAndSets"]
+    reinforcesOutcomeIds: ["python.dictsAndSets"]
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day12_딕셔너리메서드:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day12________:v1","retrieve:30days_day12________:v2","retrieve:30days_day12________:v3"]
+    transferVariantIds: ["transfer:30days_day12________:near-v1","transfer:30days_day12________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day13_조건문"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "34a8556afae84ebd0ad8f206715b77d0d25d6fc61256a66576ae93ac53169281"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["dataReporting","dataVisualization","officeAutomation","pythonFoundation","scriptingAutomation","webMonitoring"]
+    outcomes: ["python.controlFlow"]
+    prerequisites: ["python.operators"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day13_조건문:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day13____:v1","retrieve:30days_day13____:v2","retrieve:30days_day13____:v3"]
+    transferVariantIds: ["transfer:30days_day13____:near-v1","transfer:30days_day13____:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day14_반복문"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "5244d4302335658f607e9df7b1150f65ba43982bf030c162e5746a482402be64"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["dataReporting","dataVisualization","officeAutomation","pythonFoundation","scriptingAutomation","webMonitoring"]
+    outcomes: ["python.controlFlow"]
+    prerequisites: ["python.controlFlow","python.lists"]
+    reinforcesOutcomeIds: ["python.controlFlow"]
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day14_반복문:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day14____:v1","retrieve:30days_day14____:v2","retrieve:30days_day14____:v3"]
+    transferVariantIds: ["transfer:30days_day14____:near-v1","transfer:30days_day14____:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day15_함수기초"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "63a4936bfc71909ca180134ebed87c84669845cea0dea14bacdea0aec80c50da"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["aiIntegration","dataReporting","desktopAutomation","documentAutomation","emailAutomation","graphAnalysis","machineLearning","officeAutomation","pdfAutomation","pythonFoundation","scriptingAutomation","standardLibraryMastery","webMonitoring"]
+    outcomes: ["python.functions"]
+    prerequisites: ["python.controlFlow"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day15_함수기초:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day15_____:v1","retrieve:30days_day15_____:v2","retrieve:30days_day15_____:v3"]
+    transferVariantIds: ["transfer:30days_day15_____:near-v1","transfer:30days_day15_____:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day16_함수고급"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "8795e5782ea6fa30d672b42d5de62749d8fd3f775661a072da42f525413e36d9"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["aiIntegration","dataReporting","desktopAutomation","documentAutomation","emailAutomation","graphAnalysis","machineLearning","officeAutomation","pdfAutomation","pythonFoundation","scriptingAutomation","standardLibraryMastery","webMonitoring"]
+    outcomes: ["python.functions"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: ["python.functions"]
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day16_함수고급:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day16_____:v1","retrieve:30days_day16_____:v2","retrieve:30days_day16_____:v3"]
+    transferVariantIds: ["transfer:30days_day16_____:near-v1","transfer:30days_day16_____:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day17_스코프와클로저"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "6eb9e81c9834c5d51ec1191e3d8f9374a4f82a680a48ad3ec47fa945bd841cb9"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["aiIntegration","dataReporting","desktopAutomation","documentAutomation","emailAutomation","graphAnalysis","machineLearning","officeAutomation","pdfAutomation","pythonFoundation","scriptingAutomation","standardLibraryMastery","webMonitoring"]
+    outcomes: ["python.functions"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: ["python.functions"]
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day17_스코프와클로저:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day17________:v1","retrieve:30days_day17________:v2","retrieve:30days_day17________:v3"]
+    transferVariantIds: ["transfer:30days_day17________:near-v1","transfer:30days_day17________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day18_모듈과import"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "3f3543772db43f21d786fdfaa9a465b24837de0199dd9d63db8e913d726d1f3f"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["aiIntegration","documentAutomation","emailAutomation","fileAutomation","imageProcessing","officeAutomation","pdfAutomation","pythonFoundation","scriptingAutomation","standardLibraryMastery"]
+    outcomes: ["python.modulesAndIo"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day18_모듈과import:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day18____import:v1","retrieve:30days_day18____import:v2","retrieve:30days_day18____import:v3"]
+    transferVariantIds: ["transfer:30days_day18____import:near-v1","transfer:30days_day18____import:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day19_파일입출력"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "5575d260403c92bae2c96dc0e6b1b5cc9747223047d2d77190c944331ec3b0cc"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["aiIntegration","documentAutomation","emailAutomation","fileAutomation","imageProcessing","officeAutomation","pdfAutomation","pythonFoundation","scriptingAutomation","standardLibraryMastery"]
+    outcomes: ["python.modulesAndIo"]
+    prerequisites: ["python.modulesAndIo","python.strings"]
+    reinforcesOutcomeIds: ["python.modulesAndIo"]
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day19_파일입출력:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day19______:v1","retrieve:30days_day19______:v2","retrieve:30days_day19______:v3"]
+    transferVariantIds: ["transfer:30days_day19______:near-v1","transfer:30days_day19______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day20_예외처리"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "877c43e5a095b205ebe053aaac95384efc091991e7155ce92aaab54d71b85b67"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["aiIntegration","desktopAutomation","emailAutomation","pdfAutomation","pythonFoundation","scriptingAutomation","systemMonitoring"]
+    outcomes: ["python.errorHandling"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day20_예외처리:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day20_____:v1","retrieve:30days_day20_____:v2","retrieve:30days_day20_____:v3"]
+    transferVariantIds: ["transfer:30days_day20_____:near-v1","transfer:30days_day20_____:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day21_중간종합복습"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "751fd3b9a8e3de718757dd8633620f0056dabdff18980632baada34865f2e4a8"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.controlFlow","python.functions","python.modulesAndIo","python.errorHandling"]
+    prerequisites: ["python.controlFlow","python.functions","python.modulesAndIo","python.errorHandling"]
+    reinforcesOutcomeIds: ["python.controlFlow","python.functions","python.modulesAndIo","python.errorHandling"]
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day21_중간종합복습:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day21_______:v1","retrieve:30days_day21_______:v2","retrieve:30days_day21_______:v3"]
+    transferVariantIds: ["transfer:30days_day21_______:near-v1","transfer:30days_day21_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day22_클래스기초"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "798532db07865d4ad280f3c2b69dc6d4af5e5536817edbe5e7bd276560c882de"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["dataContracts","pythonFoundation"]
+    outcomes: ["python.oop"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day22_클래스기초:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day22______:v1","retrieve:30days_day22______:v2","retrieve:30days_day22______:v3"]
+    transferVariantIds: ["transfer:30days_day22______:near-v1","transfer:30days_day22______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day23_클래스고급"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "f636c4bab9dd9c8af3b2ffeae06291512c0aad0f5e9cc2ce1ed13c4b4808fcb7"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["dataContracts","pythonFoundation"]
+    outcomes: ["python.oop"]
+    prerequisites: ["python.oop"]
+    reinforcesOutcomeIds: ["python.oop"]
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day23_클래스고급:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day23______:v1","retrieve:30days_day23______:v2","retrieve:30days_day23______:v3"]
+    transferVariantIds: ["transfer:30days_day23______:near-v1","transfer:30days_day23______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day24_특수메서드"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "010558931063ffea5a39d574c0fb21d31a3ae0c7ac90dc6f3d3d1885cc8c3cb9"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["dataContracts","pythonFoundation"]
+    outcomes: ["python.oop"]
+    prerequisites: ["python.oop"]
+    reinforcesOutcomeIds: ["python.oop"]
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day24_특수메서드:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day24______:v1","retrieve:30days_day24______:v2","retrieve:30days_day24______:v3"]
+    transferVariantIds: ["transfer:30days_day24______:near-v1","transfer:30days_day24______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day25_프로퍼티와데코레이터"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "4f078aea50c48e3454b06a45e0c62cb66e1f85245a6854d2f83b5e465515337b"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.oop"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day25_프로퍼티와데코레이터:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day25___________:v1","retrieve:30days_day25___________:v2","retrieve:30days_day25___________:v3"]
+    transferVariantIds: ["transfer:30days_day25___________:near-v1","transfer:30days_day25___________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day26_컴프리헨션"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "6b329fde0c981bbe44d960f0c50c9c3b2579197b7f1556f4d571caeaed3ba6ff"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.lists","python.controlFlow"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day26_컴프리헨션:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day26______:v1","retrieve:30days_day26______:v2","retrieve:30days_day26______:v3"]
+    transferVariantIds: ["transfer:30days_day26______:near-v1","transfer:30days_day26______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day27_제너레이터와이터레이터"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "aa9094ced2a5fa800edbacdbdabce1930fed329f98cdf183f18501992103947c"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day27_제너레이터와이터레이터:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day27____________:v1","retrieve:30days_day27____________:v2","retrieve:30days_day27____________:v3"]
+    transferVariantIds: ["transfer:30days_day27____________:near-v1","transfer:30days_day27____________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day28_고급문법종합"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "a5f5bab6adfa9e73623969a0d20ec782db0a0c14f37a166057fbf8156440fac1"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.advancedSyntax"]
+    reinforcesOutcomeIds: ["python.advancedSyntax"]
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day28_고급문법종합:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day28_______:v1","retrieve:30days_day28_______:v2","retrieve:30days_day28_______:v3"]
+    transferVariantIds: ["transfer:30days_day28_______:near-v1","transfer:30days_day28_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day29_알고리즘연습"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "b2c9d16b5ea95199c69c14a6ee0c3590615fce2bb1c0ce82ae2b002f8294b52f"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.advancedSyntax"]
+    reinforcesOutcomeIds: ["python.advancedSyntax"]
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day29_알고리즘연습:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day29_______:v1","retrieve:30days_day29_______:v2","retrieve:30days_day29_______:v3"]
+    transferVariantIds: ["transfer:30days_day29_______:near-v1","transfer:30days_day29_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "30days/day30_최종프로젝트"
+    identityLedgerRef: "identity-ledger/30days.yml"
+    lessonContentHash: "9154961941736442aa2d13fcccb0f779982faf6ea20c4b7a36e19a52d1ba442f"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.projectDelivery"]
+    prerequisites: ["python.advancedSyntax","python.oop","python.errorHandling"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:30days/day30_최종프로젝트:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:30days_day30_______:v1","retrieve:30days_day30_______:v2","retrieve:30days_day30_______:v3"]
+    transferVariantIds: ["transfer:30days_day30_______:near-v1","transfer:30days_day30_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

@@ -32,6 +32,8 @@ def main(argv: list[str] | None = None) -> int:
     runtimeSha256 = sha256File(args.python_runtime_archive)
     channel = args.channel or inferChannel(packageVersion)
     releaseId = args.release_id or packageVersion
+    if args.learning_evidence_reader_version < 1:
+        raise ValueError("learning evidence reader version must be at least 1")
 
     manifest = {
         "manifestVersion": 1,
@@ -39,6 +41,7 @@ def main(argv: list[str] | None = None) -> int:
         "releaseId": releaseId,
         "launcherVersion": launcherVersion,
         "minLauncherVersion": args.min_launcher_version or launcherVersion,
+        "learningEvidenceReaderVersion": args.learning_evidence_reader_version,
         "pythonRuntime": {
             "version": args.python_runtime_version,
             "url": f"{releaseBaseUrl}/{args.python_runtime_asset_name}",
@@ -79,6 +82,7 @@ def buildParser() -> argparse.ArgumentParser:
     parser.add_argument("--package-version", help="Backend package version. Defaults to pyproject project.version.")
     parser.add_argument("--launcher-version", help="Launcher version. Defaults to launcher Cargo.toml package.version.")
     parser.add_argument("--min-launcher-version", help="Minimum launcher version. Defaults to launcher version.")
+    parser.add_argument("--learning-evidence-reader-version", type=int, default=1)
     parser.add_argument("--backend-entry-module", default="codaro.cli")
     parser.add_argument("--backend-console-script", default="codaro")
     parser.add_argument("--backend-wheel-url", required=True, help="Exact backend wheel URL.")

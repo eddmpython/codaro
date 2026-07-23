@@ -1,0 +1,232 @@
+schemaVersion: 1
+category: "duckdb"
+canonicalRows: 12
+lessons:
+  - lessonRef: "duckdb/00_DuckDB소개"
+    identityLedgerRef: "identity-ledger/duckdb.yml"
+    lessonContentHash: "c1d2199c3965bafc71a4bbed63013c0dfded8f7618f7b7604df563d9095a478d"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/18-sql-analysis"
+    eligiblePathIds: ["sqlAnalysis"]
+    outcomes: ["duckdb.intro"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:duckdb/00_DuckDB소개:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:duckdb_00_DuckDB__:v1","retrieve:duckdb_00_DuckDB__:v2","retrieve:duckdb_00_DuckDB__:v3"]
+    transferVariantIds: ["transfer:duckdb_00_DuckDB__:near-v1","transfer:duckdb_00_DuckDB__:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "duckdb/00_MotherDuck소개"
+    identityLedgerRef: "identity-ledger/duckdb.yml"
+    lessonContentHash: "4b8989bfba4b1c5e7ff1b2215d913ea2a6e96aee9c8268b73aac1b671bb7d673"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/18-sql-analysis"
+    eligiblePathIds: ["sqlAnalysis"]
+    outcomes: ["duckdb.intro"]
+    prerequisites: ["duckdb.intro"]
+    reinforcesOutcomeIds: ["duckdb.intro"]
+    runtimeTier: browser
+    checkSpecId: "lesson:duckdb/00_MotherDuck소개:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:duckdb_00_MotherDuck__:v1","retrieve:duckdb_00_MotherDuck__:v2","retrieve:duckdb_00_MotherDuck__:v3"]
+    transferVariantIds: ["transfer:duckdb_00_MotherDuck__:near-v1","transfer:duckdb_00_MotherDuck__:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "duckdb/01_레스토랑팁기초"
+    identityLedgerRef: "identity-ledger/duckdb.yml"
+    lessonContentHash: "94e88150c0186ad5cbf1a6846f20ae9c5b7881fa58de2a6dd340904d461bb58e"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/18-sql-analysis"
+    eligiblePathIds: ["sqlAnalysis"]
+    outcomes: ["duckdb.basicQueries"]
+    prerequisites: ["duckdb.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:duckdb/01_레스토랑팁기초:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:duckdb_01________:v1","retrieve:duckdb_01________:v2","retrieve:duckdb_01________:v3"]
+    transferVariantIds: ["transfer:duckdb_01________:near-v1","transfer:duckdb_01________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "duckdb/02_타이타닉생존통계"
+    identityLedgerRef: "identity-ledger/duckdb.yml"
+    lessonContentHash: "f13f962582f6eeb756a8fe00adcc8a68a2cee98fb4cb06262ce670240c0b0bc8"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/18-sql-analysis"
+    eligiblePathIds: ["sqlAnalysis"]
+    outcomes: ["duckdb.basicQueries","duckdb.aggregation"]
+    prerequisites: ["duckdb.basicQueries"]
+    reinforcesOutcomeIds: ["duckdb.basicQueries"]
+    runtimeTier: browser
+    checkSpecId: "lesson:duckdb/02_타이타닉생존통계:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:duckdb_02_________:v1","retrieve:duckdb_02_________:v2","retrieve:duckdb_02_________:v3"]
+    transferVariantIds: ["transfer:duckdb_02_________:near-v1","transfer:duckdb_02_________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "duckdb/03_팁패턴분석"
+    identityLedgerRef: "identity-ledger/duckdb.yml"
+    lessonContentHash: "51496b3caa40b844f37ae113440b5e4e4c58235226a15b916b4c38bc27ec3b1b"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/18-sql-analysis"
+    eligiblePathIds: ["sqlAnalysis"]
+    outcomes: ["duckdb.aggregation"]
+    prerequisites: ["duckdb.basicQueries"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:duckdb/03_팁패턴분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:duckdb_03______:v1","retrieve:duckdb_03______:v2","retrieve:duckdb_03______:v3"]
+    transferVariantIds: ["transfer:duckdb_03______:near-v1","transfer:duckdb_03______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "duckdb/04_타이타닉심층분석"
+    identityLedgerRef: "identity-ledger/duckdb.yml"
+    lessonContentHash: "dee24696092e00b8ed93e2d47b375bf86b91eeb240c05f4f73366a4248fe88f8"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/18-sql-analysis"
+    eligiblePathIds: ["sqlAnalysis"]
+    outcomes: ["duckdb.aggregation"]
+    prerequisites: ["duckdb.aggregation"]
+    reinforcesOutcomeIds: ["duckdb.aggregation"]
+    runtimeTier: browser
+    checkSpecId: "lesson:duckdb/04_타이타닉심층분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:duckdb_04_________:v1","retrieve:duckdb_04_________:v2","retrieve:duckdb_04_________:v3"]
+    transferVariantIds: ["transfer:duckdb_04_________:near-v1","transfer:duckdb_04_________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "duckdb/05_팁서브쿼리분석"
+    identityLedgerRef: "identity-ledger/duckdb.yml"
+    lessonContentHash: "fbee46e18264ac58b42865847138b2e03c5d90a38339a2c9c0a1ee9a2f76e233"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/18-sql-analysis"
+    eligiblePathIds: ["sqlAnalysis"]
+    outcomes: ["duckdb.window"]
+    prerequisites: ["duckdb.aggregation"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:duckdb/05_팁서브쿼리분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:duckdb_05________:v1","retrieve:duckdb_05________:v2","retrieve:duckdb_05________:v3"]
+    transferVariantIds: ["transfer:duckdb_05________:near-v1","transfer:duckdb_05________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "duckdb/06_CTE단계별분석"
+    identityLedgerRef: "identity-ledger/duckdb.yml"
+    lessonContentHash: "7d690c9ede8f22c97566022e946785ad0ab4913334c8954e754b58c49a33071b"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/18-sql-analysis"
+    eligiblePathIds: ["sqlAnalysis"]
+    outcomes: ["duckdb.window"]
+    prerequisites: ["duckdb.window"]
+    reinforcesOutcomeIds: ["duckdb.window"]
+    runtimeTier: browser
+    checkSpecId: "lesson:duckdb/06_CTE단계별분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:duckdb_06_CTE_____:v1","retrieve:duckdb_06_CTE_____:v2","retrieve:duckdb_06_CTE_____:v3"]
+    transferVariantIds: ["transfer:duckdb_06_CTE_____:near-v1","transfer:duckdb_06_CTE_____:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "duckdb/07_윈도우함수기초"
+    identityLedgerRef: "identity-ledger/duckdb.yml"
+    lessonContentHash: "5cd441f581db68655d02baa28dec02f85df17ad984807da98124a42617e86de9"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/18-sql-analysis"
+    eligiblePathIds: ["sqlAnalysis"]
+    outcomes: ["duckdb.window"]
+    prerequisites: ["duckdb.aggregation"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:duckdb/07_윈도우함수기초:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:duckdb_07________:v1","retrieve:duckdb_07________:v2","retrieve:duckdb_07________:v3"]
+    transferVariantIds: ["transfer:duckdb_07________:near-v1","transfer:duckdb_07________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "duckdb/08_고급윈도우분석"
+    identityLedgerRef: "identity-ledger/duckdb.yml"
+    lessonContentHash: "8dfb6514ed79bb1d3a6a42a6470a1b3ad7372aa111a7b6b1e12b0946c5c94542"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/18-sql-analysis"
+    eligiblePathIds: ["sqlAnalysis"]
+    outcomes: ["duckdb.window"]
+    prerequisites: ["duckdb.window"]
+    reinforcesOutcomeIds: ["duckdb.window"]
+    runtimeTier: browser
+    checkSpecId: "lesson:duckdb/08_고급윈도우분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:duckdb_08________:v1","retrieve:duckdb_08________:v2","retrieve:duckdb_08________:v3"]
+    transferVariantIds: ["transfer:duckdb_08________:near-v1","transfer:duckdb_08________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "duckdb/09_문자열과패턴"
+    identityLedgerRef: "identity-ledger/duckdb.yml"
+    lessonContentHash: "91f9e4b883f0c7f40cd9fc96a22c3263d345dce8c9fe2a5e9b6e6ffe5c4b06d2"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/18-sql-analysis"
+    eligiblePathIds: ["sqlAnalysis"]
+    outcomes: ["duckdb.basicQueries"]
+    prerequisites: ["duckdb.basicQueries"]
+    reinforcesOutcomeIds: ["duckdb.basicQueries"]
+    runtimeTier: browser
+    checkSpecId: "lesson:duckdb/09_문자열과패턴:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:duckdb_09_______:v1","retrieve:duckdb_09_______:v2","retrieve:duckdb_09_______:v3"]
+    transferVariantIds: ["transfer:duckdb_09_______:near-v1","transfer:duckdb_09_______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "duckdb/10_종합프로젝트"
+    identityLedgerRef: "identity-ledger/duckdb.yml"
+    lessonContentHash: "53223035dc48ca1a0507200cb8cf42b6f9a77a2e012d1b3e6b0cad4a63ae99d0"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/18-sql-analysis"
+    eligiblePathIds: ["sqlAnalysis"]
+    outcomes: ["duckdb.basicQueries","duckdb.aggregation","duckdb.window"]
+    prerequisites: ["duckdb.window"]
+    reinforcesOutcomeIds: ["duckdb.window"]
+    runtimeTier: browser
+    checkSpecId: "lesson:duckdb/10_종합프로젝트:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:duckdb_10_______:v1","retrieve:duckdb_10_______:v2","retrieve:duckdb_10_______:v3"]
+    transferVariantIds: ["transfer:duckdb_10_______:near-v1","transfer:duckdb_10_______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

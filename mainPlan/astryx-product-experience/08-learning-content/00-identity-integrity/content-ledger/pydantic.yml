@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "pydantic"
+canonicalRows: 11
+lessons:
+  - lessonRef: "pydantic/00_pydantic소개"
+    identityLedgerRef: "identity-ledger/pydantic.yml"
+    lessonContentHash: "888f8480e10b77b43facb22f5a1de6e7a32e1b8fff35a2c1c3c4f91237619197"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/20-data-contracts"
+    eligiblePathIds: ["dataContracts"]
+    outcomes: ["pydantic.intro"]
+    prerequisites: ["python.oop","python.typing"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:pydantic/00_pydantic소개:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:pydantic_00_pydantic__:v1","retrieve:pydantic_00_pydantic__:v2","retrieve:pydantic_00_pydantic__:v3"]
+    transferVariantIds: ["transfer:pydantic_00_pydantic__:near-v1","transfer:pydantic_00_pydantic__:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pydantic/01_사용자모델만들기"
+    identityLedgerRef: "identity-ledger/pydantic.yml"
+    lessonContentHash: "373f21dac6181310a381b0a9cd4e219fbd3a46773960ad8c6607d09e9fc5d2a5"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/20-data-contracts"
+    eligiblePathIds: ["dataContracts"]
+    outcomes: ["pydantic.intro"]
+    prerequisites: ["pydantic.intro"]
+    reinforcesOutcomeIds: ["pydantic.intro"]
+    runtimeTier: browser
+    checkSpecId: "lesson:pydantic/01_사용자모델만들기:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:pydantic_01_________:v1","retrieve:pydantic_01_________:v2","retrieve:pydantic_01_________:v3"]
+    transferVariantIds: ["transfer:pydantic_01_________:near-v1","transfer:pydantic_01_________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pydantic/02_필드검증기"
+    identityLedgerRef: "identity-ledger/pydantic.yml"
+    lessonContentHash: "f07d697bf7b7c62bd20faca5adc1577eb1595ea1e32a0ee2468c221746147ea0"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/20-data-contracts"
+    eligiblePathIds: ["dataContracts"]
+    outcomes: ["pydantic.validation"]
+    prerequisites: ["pydantic.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:pydantic/02_필드검증기:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:pydantic_02______:v1","retrieve:pydantic_02______:v2","retrieve:pydantic_02______:v3"]
+    transferVariantIds: ["transfer:pydantic_02______:near-v1","transfer:pydantic_02______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pydantic/03_중첩모델설계"
+    identityLedgerRef: "identity-ledger/pydantic.yml"
+    lessonContentHash: "0920f245116811c8498037d8705347245de85c13b67ab556b2e97ceab51a7600"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/20-data-contracts"
+    eligiblePathIds: ["dataContracts"]
+    outcomes: ["pydantic.schemas"]
+    prerequisites: ["pydantic.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:pydantic/03_중첩모델설계:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:pydantic_03_______:v1","retrieve:pydantic_03_______:v2","retrieve:pydantic_03_______:v3"]
+    transferVariantIds: ["transfer:pydantic_03_______:near-v1","transfer:pydantic_03_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pydantic/04_타입변환기"
+    identityLedgerRef: "identity-ledger/pydantic.yml"
+    lessonContentHash: "845b90461230266d6c91d83f5b5d853e5e18ab3a6a5ec7009f4a2b347e9fb161"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/20-data-contracts"
+    eligiblePathIds: ["dataContracts"]
+    outcomes: ["pydantic.validation"]
+    prerequisites: ["pydantic.validation"]
+    reinforcesOutcomeIds: ["pydantic.validation"]
+    runtimeTier: browser
+    checkSpecId: "lesson:pydantic/04_타입변환기:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:pydantic_04______:v1","retrieve:pydantic_04______:v2","retrieve:pydantic_04______:v3"]
+    transferVariantIds: ["transfer:pydantic_04______:near-v1","transfer:pydantic_04______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pydantic/05_설정관리기"
+    identityLedgerRef: "identity-ledger/pydantic.yml"
+    lessonContentHash: "5b9f8563873f7e22d23b05a54be640d0561382c7d4fcddfbde4ba48d08d2761c"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/20-data-contracts"
+    eligiblePathIds: ["dataContracts"]
+    outcomes: ["pydantic.integration"]
+    prerequisites: ["pydantic.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:pydantic/05_설정관리기:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:pydantic_05______:v1","retrieve:pydantic_05______:v2","retrieve:pydantic_05______:v3"]
+    transferVariantIds: ["transfer:pydantic_05______:near-v1","transfer:pydantic_05______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pydantic/06_JSON스키마생성"
+    identityLedgerRef: "identity-ledger/pydantic.yml"
+    lessonContentHash: "53a6a8013d7e35036303f301a65748426ad9845ee981f1bcaa022c913aca5729"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/20-data-contracts"
+    eligiblePathIds: ["dataContracts"]
+    outcomes: ["pydantic.schemas"]
+    prerequisites: ["pydantic.schemas"]
+    reinforcesOutcomeIds: ["pydantic.schemas"]
+    runtimeTier: browser
+    checkSpecId: "lesson:pydantic/06_JSON스키마생성:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:pydantic_06_JSON_____:v1","retrieve:pydantic_06_JSON_____:v2","retrieve:pydantic_06_JSON_____:v3"]
+    transferVariantIds: ["transfer:pydantic_06_JSON_____:near-v1","transfer:pydantic_06_JSON_____:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pydantic/07_커스텀타입정의"
+    identityLedgerRef: "identity-ledger/pydantic.yml"
+    lessonContentHash: "744aa52f1adad777b0eb2f058ece18ac6e1c3a26dbc2530a89a6238c3d20513f"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/20-data-contracts"
+    eligiblePathIds: ["dataContracts"]
+    outcomes: ["pydantic.schemas"]
+    prerequisites: ["pydantic.schemas"]
+    reinforcesOutcomeIds: ["pydantic.schemas"]
+    runtimeTier: browser
+    checkSpecId: "lesson:pydantic/07_커스텀타입정의:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:pydantic_07________:v1","retrieve:pydantic_07________:v2","retrieve:pydantic_07________:v3"]
+    transferVariantIds: ["transfer:pydantic_07________:near-v1","transfer:pydantic_07________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pydantic/08_에러처리기법"
+    identityLedgerRef: "identity-ledger/pydantic.yml"
+    lessonContentHash: "022682019c3410d9f831516afed28d84c77d0947274f13b09bc67b071b550df3"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/20-data-contracts"
+    eligiblePathIds: ["dataContracts"]
+    outcomes: ["pydantic.validation"]
+    prerequisites: ["pydantic.validation"]
+    reinforcesOutcomeIds: ["pydantic.validation"]
+    runtimeTier: browser
+    checkSpecId: "lesson:pydantic/08_에러처리기법:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:pydantic_08_______:v1","retrieve:pydantic_08_______:v2","retrieve:pydantic_08_______:v3"]
+    transferVariantIds: ["transfer:pydantic_08_______:near-v1","transfer:pydantic_08_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pydantic/09_FastAPI통합"
+    identityLedgerRef: "identity-ledger/pydantic.yml"
+    lessonContentHash: "f27f543a9f7e1e4a759f983494bd815248aecf0d10b67b85c5b82497a1aa88e6"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/20-data-contracts"
+    eligiblePathIds: ["dataContracts"]
+    outcomes: ["pydantic.integration"]
+    prerequisites: ["pydantic.integration"]
+    reinforcesOutcomeIds: ["pydantic.integration"]
+    runtimeTier: browser
+    checkSpecId: "lesson:pydantic/09_FastAPI통합:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:pydantic_09_FastAPI__:v1","retrieve:pydantic_09_FastAPI__:v2","retrieve:pydantic_09_FastAPI__:v3"]
+    transferVariantIds: ["transfer:pydantic_09_FastAPI__:near-v1","transfer:pydantic_09_FastAPI__:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pydantic/10_종합데이터파이프라인"
+    identityLedgerRef: "identity-ledger/pydantic.yml"
+    lessonContentHash: "83911a0edb3fc9dfe7738a64ed37e163088e0331073ba04439fbb2b6fafadf2a"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/20-data-contracts"
+    eligiblePathIds: ["dataContracts"]
+    outcomes: ["pydantic.integration"]
+    prerequisites: ["pydantic.integration"]
+    reinforcesOutcomeIds: ["pydantic.integration"]
+    runtimeTier: browser
+    checkSpecId: "lesson:pydantic/10_종합데이터파이프라인:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:pydantic_10___________:v1","retrieve:pydantic_10___________:v2","retrieve:pydantic_10___________:v3"]
+    transferVariantIds: ["transfer:pydantic_10___________:near-v1","transfer:pydantic_10___________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

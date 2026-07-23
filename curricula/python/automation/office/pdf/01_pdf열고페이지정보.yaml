@@ -509,3 +509,301 @@ sections:
           - "작성자별로 PDF를 묶어 별도 폴더에 정리"
           - "메타가 비어있는 PDF만 찾아 일괄 메타 채워 다시 저장"
           - "월별로 만들어진 PDF를 created 기준으로 분류"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pdf_01-pdf-page-info-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_open
+    - extensions
+    title: PDF page count·size·rotation·encryption 정보 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 열기 전에 password 필요 여부와 비정상 geometry를 보고한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 페이지 수만 보지 말고 각 page media box와 rotation을 검사하세요.
+    - 암호화 PDF는 password 제공 상태를 별도 failure로 기록하세요.
+    exercise:
+      prompt: audit_pdf_pages(document, allowed_page_sizes)를 완성하세요.
+      starterCode: |-
+        def audit_pdf_pages(document, allowed_page_sizes):
+            raise NotImplementedError
+      solution: |
+        def audit_pdf_pages(document, allowed_page_sizes):
+            failures = []
+            if document.get("encrypted", False) and not document.get("passwordProvided", False):
+                failures.append("password")
+            invalid_pages = []
+            for page in document.get("pages", []):
+                size = [page.get("width"), page.get("height")]
+                reasons = []
+                if size not in allowed_page_sizes:
+                    reasons.append("size")
+                if page.get("rotation") not in {0, 90, 180, 270}:
+                    reasons.append("rotation")
+                if reasons:
+                    invalid_pages.append({"page": page["number"], "reasons": reasons})
+            if invalid_pages:
+                failures.append("pages")
+            if not document.get("pages"):
+                failures.append("empty")
+            return {"readable": not failures, "failures": failures, "pageCount": len(document.get("pages", [])), "invalidPages": invalid_pages}
+      hints: *id001
+    check:
+      id: python.pdf.pdf_01.pdf-page-info-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_01.pdf-page-info-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_pdf_pages
+        cases:
+        - id: accepts-two-a4-pages
+          arguments:
+          - value:
+              encrypted: false
+              pages:
+              - number: 1
+                width: 595
+                height: 842
+                rotation: 0
+              - number: 2
+                width: 595
+                height: 842
+                rotation: 90
+          - value:
+            - - 595
+              - 842
+          expectedReturn:
+            readable: true
+            failures: []
+            pageCount: 2
+            invalidPages: []
+        - id: reports-password-size-and-rotation
+          arguments:
+          - value:
+              encrypted: true
+              passwordProvided: false
+              pages:
+              - number: 1
+                width: 100
+                height: 100
+                rotation: 45
+          - value:
+            - - 595
+              - 842
+          expectedReturn:
+            readable: false
+            failures:
+            - password
+            - pages
+            pageCount: 1
+            invalidPages:
+            - page: 1
+              reasons:
+              - size
+              - rotation
+        - id: reports-empty-document
+          arguments:
+          - value:
+              pages: []
+          - value:
+            - - 595
+              - 842
+          expectedReturn:
+            readable: false
+            failures:
+            - empty
+            pageCount: 0
+            invalidPages: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pdf_01-pdf-page-fingerprint-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_01-pdf-page-info-audit-mastery
+    title: 새 PDF의 페이지별 fingerprint manifest 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: page text·resource·geometry hash를 순서와 함께 정규화한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 페이지 identity에 geometry·text·resource hash를 분리해 보존하세요.
+    - page number는 1부터 연속인지 검사하세요.
+    exercise:
+      prompt: build_page_manifest(pages)를 완성하세요.
+      starterCode: |-
+        def build_page_manifest(pages):
+            raise NotImplementedError
+      solution: |
+        def build_page_manifest(pages):
+            numbers = [page["number"] for page in pages]
+            if numbers != list(range(1, len(pages) + 1)):
+                raise ValueError("page numbers must be contiguous")
+            entries = []
+            for page in pages:
+                entries.append({"page": page["number"], "geometryHash": page["geometryHash"], "textHash": page["textHash"], "resourceHash": page["resourceHash"]})
+            return {"pageCount": len(entries), "pages": entries}
+      hints: *id002
+    check:
+      id: python.pdf.pdf_01.pdf-page-fingerprint.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_01.pdf-page-fingerprint.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_page_manifest
+        cases:
+        - id: builds-contiguous-manifest
+          arguments:
+          - value:
+            - number: 1
+              geometryHash: g1
+              textHash: t1
+              resourceHash: r1
+            - number: 2
+              geometryHash: g2
+              textHash: t2
+              resourceHash: r2
+          expectedReturn:
+            pageCount: 2
+            pages:
+            - page: 1
+              geometryHash: g1
+              textHash: t1
+              resourceHash: r1
+            - page: 2
+              geometryHash: g2
+              textHash: t2
+              resourceHash: r2
+        - id: handles-empty-document
+          arguments:
+          - value: []
+          expectedReturn:
+            pageCount: 0
+            pages: []
+        - id: rejects-page-number-gap
+          arguments:
+          - value:
+            - number: 2
+              geometryHash: g
+              textHash: t
+              resourceHash: r
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pdf_01-pdf-page-info-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_01-pdf-page-fingerprint-transfer
+    title: PDF page 정보 검증 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 암호화·geometry·page fingerprint 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - PDF 저장 성공과 페이지 내용·geometry·업무 값의 정확성을 분리해 검증하세요.
+    - Web에서는 문서 판단을 연습하고 Local에서는 재개방·render artifact evidence를 남기세요.
+    exercise:
+      prompt: choose_pdf_page_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_pdf_page_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_pdf_page_evidence(situation):
+            table = {'open': {'action': 'check encryption and password', 'evidence': 'document security state', 'risk': 'unreadable input'}, 'geometry': {'action': 'inspect size and rotation', 'evidence': 'page boxes', 'risk': 'unexpected page layout'}, 'identity': {'action': 'hash text resource and geometry', 'evidence': 'ordered page manifest', 'risk': 'page drift'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.pdf.pdf_01.pdf-page-info-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_01.pdf-page-info-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_pdf_page_evidence
+        cases:
+        - id: recalls-open
+          arguments:
+          - value: open
+          expectedReturn:
+            action: check encryption and password
+            evidence: document security state
+            risk: unreadable input
+        - id: recalls-geometry
+          arguments:
+          - value: geometry
+          expectedReturn:
+            action: inspect size and rotation
+            evidence: page boxes
+            risk: unexpected page layout
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

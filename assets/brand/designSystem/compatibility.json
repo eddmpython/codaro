@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "surfaces": [
+    "landing",
+    "editor"
+  ],
+  "sharedPackages": {
+    "@astryxdesign/core": "0.1.6",
+    "@astryxdesign/theme-neutral": "0.1.6",
+    "@stylexjs/stylex": "0.19.0",
+    "lucide-react": "1.25.0",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "typescript": "6.0.3",
+    "yaml": "2.9.0"
+  },
+  "lockPolicy": "Each surface keeps an independent package-lock.json whose resolved package versions must match this manifest."
+}

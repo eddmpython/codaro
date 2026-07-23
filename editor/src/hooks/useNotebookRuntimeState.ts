@@ -4,6 +4,8 @@ import type { ResultMap } from "@/lib/assistantContext";
 import { translate } from "@/lib/localeCopy";
 import {
   removeNotebookCellState,
+  releaseRuntimeSession,
+  RUNTIME_SESSION_RELEASE_REQUEST_EVENT,
   resolveBlockRunCode,
   runNotebookBlock,
   runReactiveNotebook,
@@ -86,9 +88,9 @@ export function useNotebookRuntimeState({
     setAutomationSessions({});
   }, []);
 
-  const runBlock = useCallback(async (block: BlockConfig) => {
+  const runBlock = useCallback(async (block: BlockConfig, sourceOverride?: string) => {
     if (!isExecutableBlock(block)) return;
-    const code = resolveBlockRunCode(block, drafts, { emptySnippetFallback: surface === "curriculum" });
+    const code = sourceOverride ?? resolveBlockRunCode(block, drafts, { emptySnippetFallback: surface === "curriculum" });
     if (surface === "curriculum") {
       selectCurriculumBlock(block.id);
     } else {
@@ -117,8 +119,9 @@ export function useNotebookRuntimeState({
         ));
       }
       if (outcome.result) {
-        const result = outcome.result;
+        const result = { ...outcome.result, sourceCode: code };
         setResults((current) => ({ ...current, [block.id]: result }));
+        setLastRunContent((current) => ({ ...current, [block.id]: code }));
       }
       if (outcome.variables) setVariables(outcome.variables);
       if (outcome.notice) onNotice(outcome.notice);
@@ -225,6 +228,27 @@ export function useNotebookRuntimeState({
     window.addEventListener("codaro:reactive-trigger", handler);
     return () => window.removeEventListener("codaro:reactive-trigger", handler);
   }, [sessionId, notebookRunning, runNotebook]);
+
+  useEffect(() => {
+    if (!sessionId || typeof window === "undefined") return;
+    const release = () => {
+      void releaseRuntimeSession(sessionId, { keepalive: true });
+    };
+    const releaseRequested = (event: Event) => {
+      const detail = (event as CustomEvent<{
+        complete?: (result: { destroyed: boolean; sessionId: string }) => void;
+      }>).detail;
+      void releaseRuntimeSession(sessionId).then((destroyed) => {
+        detail?.complete?.({ destroyed, sessionId });
+      });
+    };
+    window.addEventListener("pagehide", release);
+    window.addEventListener(RUNTIME_SESSION_RELEASE_REQUEST_EVENT, releaseRequested);
+    return () => {
+      window.removeEventListener("pagehide", release);
+      window.removeEventListener(RUNTIME_SESSION_RELEASE_REQUEST_EVENT, releaseRequested);
+    };
+  }, [sessionId]);
 
   return {
     canRun,

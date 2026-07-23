@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "seaborn"
+sourceCount: 11
+lessons:
+  - lessonRef: "seaborn/00_Seaborn소개"
+    sourcePath: "curricula/python/visualization/seaborn/00_Seaborn소개.yaml"
+    metaId: "seaborn_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "seaborn/01_붓꽃품종산점도"
+    sourcePath: "curricula/python/visualization/seaborn/01_붓꽃품종산점도.yaml"
+    metaId: "seaborn_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "seaborn/02_팁데이터분포탐색"
+    sourcePath: "curricula/python/visualization/seaborn/02_팁데이터분포탐색.yaml"
+    metaId: "seaborn_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "seaborn/03_펭귄체중분포비교"
+    sourcePath: "curricula/python/visualization/seaborn/03_펭귄체중분포비교.yaml"
+    metaId: "seaborn_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "seaborn/04_광고비판매액회귀"
+    sourcePath: "curricula/python/visualization/seaborn/04_광고비판매액회귀.yaml"
+    metaId: "seaborn_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "seaborn/05_타이타닉생존분석"
+    sourcePath: "curricula/python/visualization/seaborn/05_타이타닉생존분석.yaml"
+    metaId: "seaborn_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "seaborn/06_항공편승객시계열"
+    sourcePath: "curricula/python/visualization/seaborn/06_항공편승객시계열.yaml"
+    metaId: "seaborn_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "seaborn/07_세계기대수명분석"
+    sourcePath: "curricula/python/visualization/seaborn/07_세계기대수명분석.yaml"
+    metaId: "seaborn_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "seaborn/08_다이아몬드가격분석"
+    sourcePath: "curricula/python/visualization/seaborn/08_다이아몬드가격분석.yaml"
+    metaId: "seaborn_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "seaborn/09_자동차연비종합분석"
+    sourcePath: "curricula/python/visualization/seaborn/09_자동차연비종합분석.yaml"
+    metaId: "seaborn_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "seaborn/10_종합EDA리포트"
+    sourcePath: "curricula/python/visualization/seaborn/10_종합EDA리포트.yaml"
+    metaId: "seaborn_10"
+    registryStatus: registered
+    reviewStatus: pending

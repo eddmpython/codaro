@@ -71,9 +71,6 @@ sections:
     hints:
     - 바꿀 지점은 `text = ...` 오른쪽 값입니다.
     - 실행 뒤 `text` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 대문자 변환에서 `text` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -98,9 +95,6 @@ sections:
     hints:
     - 바꿀 지점은 `msg = ...` 오른쪽 값입니다.
     - 실행 뒤 `msg` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 소문자 변환에서 `msg` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -125,9 +119,6 @@ sections:
     hints:
     - 바꿀 지점은 `phrase = ...` 오른쪽 값입니다.
     - 실행 뒤 `phrase` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 첫 글자 대문자에서 `phrase` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -152,9 +143,6 @@ sections:
     hints:
     - 바꿀 지점은 `sentence = ...` 오른쪽 값입니다.
     - 실행 뒤 `sentence` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 제목 형식에서 `sentence` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -180,9 +168,6 @@ sections:
     hints:
     - 바꿀 지점은 `raw = ...` 오른쪽 값입니다.
     - 실행 뒤 `raw` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 양쪽 공백 제거에서 `raw` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -208,9 +193,6 @@ sections:
     hints:
     - 바꿀 지점은 `left = ...` 오른쪽 값입니다.
     - 실행 뒤 `left` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 한쪽 공백 제거에서 `left` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -236,9 +218,6 @@ sections:
     hints:
     - 바꿀 지점은 `greeting = ...` 오른쪽 값입니다.
     - 실행 뒤 `greeting` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 문자열 치환에서 `greeting` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -264,9 +243,6 @@ sections:
     hints:
     - 바꿀 지점은 `allText = ...` 오른쪽 값입니다.
     - 실행 뒤 `allText` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 여러 개 치환에서 `allText` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -292,9 +268,6 @@ sections:
     hints:
     - 바꿀 지점은 `row = ...` 오른쪽 값입니다.
     - 실행 뒤 `row` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 문자열 나누기에서 `row` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -320,9 +293,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 문자열 합치기에서 `fields` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -347,9 +317,6 @@ sections:
     hints:
     - 바꿀 지점은 `words = ...` 오른쪽 값입니다.
     - 실행 뒤 `words` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 문자열 개수 세기에서 `words` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -375,9 +342,6 @@ sections:
     hints:
     - 바꿀 지점은 `code = ...` 오른쪽 값입니다.
     - 실행 뒤 `code` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 문자열 위치 찾기에서 `code` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -405,9 +369,6 @@ sections:
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
     - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 찾기 실패의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
@@ -433,9 +394,6 @@ sections:
     hints:
     - 바꿀 지점은 `title = ...` 오른쪽 값입니다.
     - 실행 뒤 `title` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 시작 문자 확인에서 `title` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -460,9 +418,6 @@ sections:
     hints:
     - 바꿀 지점은 `file = ...` 오른쪽 값입니다.
     - 실행 뒤 `file` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 끝 문자 확인에서 `file` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -503,9 +458,6 @@ sections:
     hints:
     - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
     - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: '검증 루프: 고객 행 정제하기에서 `rawFileName` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
@@ -532,10 +484,193 @@ sections:
     hints:
     - 바꿀 지점은 `greet = ...` 오른쪽 값입니다.
     - 실행 뒤 `greet` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: Day 6 종합 복습에서 `greet` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Day 6 종합 복습 실행 뒤 `greet` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: day06-normalize-tag-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - method_upper
+    - practice
+    title: 입력 문구를 태그로 정규화하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: strip, lower, replace를 순서대로 적용한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: normalize_tag(text)가 바깥 공백을 지우고 소문자 하이픈 태그를 반환하도록 완성하세요.
+      starterCode: |-
+        def normalize_tag(text):
+            raise NotImplementedError
+      solution: |-
+        def normalize_tag(text):
+            return text.strip().lower().replace(' ', '-')
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day06.normalize-tag.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day06.normalize-tag.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: normalize_tag
+        cases:
+        - id: spaces
+          arguments:
+          - value: '  Learn Python  '
+          expectedReturn: learn-python
+        - id: case
+          arguments:
+          - value: CODARO LAB
+          expectedReturn: codaro-lab
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day06-count-word-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day06-normalize-tag-mastery
+    title: 대소문자와 무관하게 단어 세기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 문자열 메서드를 간단한 텍스트 집계에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: count_word(text, word)가 공백으로 나눈 단어의 대소문자 무관 등장 횟수를 반환하도록 완성하세요.
+      starterCode: |-
+        def count_word(text, word):
+            raise NotImplementedError
+      solution: |-
+        def count_word(text, word):
+            return text.lower().split().count(word.lower())
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day06.count-word.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day06.count-word.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: count_word
+        cases:
+        - id: mixed-case
+          arguments:
+          - value: Python code PYTHON
+          - value: python
+          expectedReturn: 2
+        - id: missing
+          arguments:
+          - value: learn by doing
+          - value: code
+          expectedReturn: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day06-clean-csv-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day06-count-word-transfer
+    title: 쉼표 항목의 공백 정리하기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: split과 strip, join을 기억에서 다시 연결한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: clean_csv(text)가 쉼표로 나눈 항목 공백을 지운 뒤 ', '로 다시 이어 반환하도록 완성하세요.
+      starterCode: |-
+        def clean_csv(text):
+            raise NotImplementedError
+      solution: |-
+        def clean_csv(text):
+            return ', '.join(part.strip() for part in text.split(','))
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day06.clean-csv.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day06.clean-csv.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: clean_csv
+        cases:
+        - id: three
+          arguments:
+          - value: red, green,blue
+          expectedReturn: red, green, blue
+        - id: two
+          arguments:
+          - value: A ,B
+          expectedReturn: A, B
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

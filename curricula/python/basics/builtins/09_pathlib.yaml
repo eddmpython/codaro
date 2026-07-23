@@ -310,3 +310,280 @@ sections:
     type: noError
     noError: pathlib 모듈 종합 복습에서 `currentWorkingDir` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: pathlib 모듈 종합 복습 실행 뒤 `currentWorkingDir` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 09_pathlib-file-manifest-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - directory_navigation
+    - file_operations
+    - workflow_validation
+    title: Path로 파일 매니페스트 만들기
+    subtitle: iterdir와 stat 결과를 구조화
+    goal: 지정 폴더의 파일만 골라 이름, suffix, size를 담은 manifest 목록을 반환한다.
+    why: pathlib 학습은 경로 객체를 예쁘게 쓰는 데서 끝나지 않고, 파일 파이프라인의 입력 원장을 만들 수 있어야 의미가 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 fixture 파일을 만든 뒤 보이지 않던 Path로 다시 호출합니다.
+    tips:
+    - Path(folder).iterdir()로 바로 아래 항목을 순회하세요.
+    - path.is_file()이 아닌 항목은 manifest에서 제외하세요.
+    exercise:
+      prompt: build_file_manifest(folder)가 name, suffix, size를 담은 dict 목록을 이름 순서로 반환하도록 완성하세요.
+      starterCode: |-
+        def build_file_manifest(folder):
+            raise NotImplementedError
+      solution: |-
+        from pathlib import Path
+
+        def build_file_manifest(folder):
+            base = Path(folder)
+            return [
+                {"name": path.name, "suffix": path.suffix, "size": path.stat().st_size}
+                for path in sorted(base.iterdir(), key=lambda item: item.name)
+                if path.is_file()
+            ]
+      hints:
+      - nested 폴더는 파일이 아니므로 제외되어야 합니다.
+      - size는 path.stat().st_size로 읽습니다.
+    check:
+      id: python.builtins.pathlib.file-manifest.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.pathlib.file-pipeline.mastery.behavior.v1.fixture
+      fixtureHash: sha256-g3RHVPHPt8KBgScH9xTnojaPLTEoqo85ntc71a5LFo4=
+      fixture:
+        directories:
+        - input/nested
+        - workspace/reports
+        - workspace/archive
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: input/sales.csv
+          content: id,amount,1,100,2,150
+        - path: input/README.md
+          content: '# dataset'
+        - path: input/nested/errors.log
+          content: ERROR timeout; INFO recovered
+        - path: input/nested/raw.csv
+          content: x,y,1,2
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_file_manifest
+        cases:
+        - id: immediate-files-only
+          arguments:
+          - fixturePath: input
+          expectedReturn:
+          - name: README.md
+            suffix: .md
+            size: 9
+          - name: sales.csv
+            suffix: .csv
+            size: 21
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 09_pathlib-recursive-suffix-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - 09_pathlib-file-manifest-mastery
+    title: 하위 폴더까지 suffix로 파일 찾기
+    subtitle: rglob 결과를 상대경로로 반환
+    goal: root 아래에서 suffix가 일치하는 파일을 모두 찾아 POSIX 상대경로 목록으로 반환한다.
+    why: 웹 학습에서도 로컬 자동화에서도 절대경로를 그대로 보여주기보다 작업 루트 기준 상대경로를 쓰는 편이 안전합니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 바로 아래 파일만 보지 말고 rglob로 하위 폴더까지 찾으세요.
+    tips:
+    - Path(root).rglob(f"*{suffix}")로 재귀 검색을 시작하세요.
+    - 반환값은 Path 객체가 아니라 as_posix() 문자열 목록이어야 합니다.
+    exercise:
+      prompt: find_files_by_suffix(root, suffix)가 suffix와 일치하는 파일의 root 기준 상대경로 목록을 반환하도록 완성하세요.
+      starterCode: |-
+        def find_files_by_suffix(root, suffix):
+            raise NotImplementedError
+      solution: |-
+        from pathlib import Path
+
+        def find_files_by_suffix(root, suffix):
+            base = Path(root)
+            matches = [
+                path.relative_to(base).as_posix()
+                for path in base.rglob(f"*{suffix}")
+                if path.is_file()
+            ]
+            return sorted(matches)
+      hints:
+      - glob는 현재 폴더만 보고 rglob는 하위 폴더까지 봅니다.
+      - relative_to(base)를 먼저 적용한 뒤 as_posix()로 문자열화하세요.
+    check:
+      id: python.builtins.pathlib.recursive-suffix.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.pathlib.file-pipeline.mastery.behavior.v1.fixture
+      fixtureHash: sha256-g3RHVPHPt8KBgScH9xTnojaPLTEoqo85ntc71a5LFo4=
+      fixture:
+        directories:
+        - input/nested
+        - workspace/reports
+        - workspace/archive
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: input/sales.csv
+          content: id,amount,1,100,2,150
+        - path: input/README.md
+          content: '# dataset'
+        - path: input/nested/errors.log
+          content: ERROR timeout; INFO recovered
+        - path: input/nested/raw.csv
+          content: x,y,1,2
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: find_files_by_suffix
+        cases:
+        - id: csv-files
+          arguments:
+          - fixturePath: input
+          - value: .csv
+          expectedReturn:
+          - nested/raw.csv
+          - sales.csv
+        - id: log-files
+          arguments:
+          - fixturePath: input
+          - value: .log
+          expectedReturn:
+          - nested/errors.log
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 09_pathlib-safe-output-path-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 09_pathlib-recursive-suffix-transfer
+    title: 안전한 출력 경로 다시 만들기
+    subtitle: resolve와 relative_to로 경계 확인
+    goal: root 아래의 출력 경로만 허용하고 path, parent, suffix, stem 정보를 반환한다.
+    why: 파일을 쓰는 자동화는 좋은 경로 API보다 안전한 쓰기 경계를 먼저 증명해야 합니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. Path.resolve와 relative_to로 root 밖 이동을 차단하세요.
+    tips:
+    - candidate.relative_to(root_path)가 실패하면 root 밖 경로입니다.
+    - 반환 path는 절대경로여도 verifier가 fixture root 기준 상대경로로 정규화합니다.
+    exercise:
+      prompt: safe_output_path(root, parts)가 path, parent, suffix, stem을 담은 dict를 반환하고 root 밖 경로는 ValueError를 일으키도록 완성하세요.
+      starterCode: |-
+        def safe_output_path(root, parts):
+            raise NotImplementedError
+      solution: |-
+        from pathlib import Path
+
+        def safe_output_path(root, parts):
+            root_path = Path(root).resolve()
+            candidate = root_path.joinpath(*parts).resolve()
+            try:
+                candidate.relative_to(root_path)
+            except ValueError as exc:
+                raise ValueError("path escapes root") from exc
+            return {
+                "path": str(candidate),
+                "parent": candidate.parent.name,
+                "suffix": candidate.suffix,
+                "stem": candidate.stem,
+            }
+      hints:
+      - joinpath 뒤 resolve를 적용해야 상위 폴더 이동이 정리됩니다.
+      - relative_to는 성공하면 경계 안, ValueError면 경계 밖입니다.
+    check:
+      id: python.builtins.pathlib.safe-output-path.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.pathlib.file-pipeline.mastery.behavior.v1.fixture
+      fixtureHash: sha256-g3RHVPHPt8KBgScH9xTnojaPLTEoqo85ntc71a5LFo4=
+      fixture:
+        directories:
+        - input/nested
+        - workspace/reports
+        - workspace/archive
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: input/sales.csv
+          content: id,amount,1,100,2,150
+        - path: input/README.md
+          content: '# dataset'
+        - path: input/nested/errors.log
+          content: ERROR timeout; INFO recovered
+        - path: input/nested/raw.csv
+          content: x,y,1,2
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: safe_output_path
+        cases:
+        - id: report-output
+          arguments:
+          - fixturePath: workspace
+          - value:
+            - reports
+            - daily.txt
+          expectedReturn:
+            path: workspace/reports/daily.txt
+            parent: reports
+            suffix: .txt
+            stem: daily
+        - id: nested-archive-output
+          arguments:
+          - fixturePath: workspace
+          - value:
+            - archive
+            - '2026'
+            - summary.csv
+          expectedReturn:
+            path: workspace/archive/2026/summary.csv
+            parent: '2026'
+            suffix: .csv
+            stem: summary
+        - id: rejects-root-escape
+          arguments:
+          - fixturePath: workspace
+          - value:
+            - ..
+            - outside.txt
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths:
+        - path
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

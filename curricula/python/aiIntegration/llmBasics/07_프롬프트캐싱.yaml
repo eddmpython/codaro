@@ -480,3 +480,293 @@ sections:
   check:
     noError: 모든 호출과 비용 합산이 정상 실행되어야 합니다.
     resultCheck: 결과 사전이 uncached/cached/saved 세 키를 모두 가져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 07_prompt-caching-cache-cost-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - cache_hit_measurement
+    - cached_pricing
+    title: 캐시 토큰 단가를 반영해 비용 계산하기
+    subtitle: cache cost calculator
+    goal: calculate_cache_cost(usage, price)를 완성해 일반 입력, 캐시 생성, 캐시 읽기, 출력 비용을 분리한다.
+    why: 캐싱은 적중 여부만 보면 안 되고 생성 토큰과 읽기 토큰의 단가 차이를 실제 비용으로 환산해야 합니다.
+    explanation: usage에는 input_tokens, cache_creation_input_tokens, cache_read_input_tokens, output_tokens가 들어옵니다. 각 토큰을 백만
+      토큰 단가로 나누어 비용을 계산합니다.
+    tips:
+    - 캐시 생성과 캐시 읽기는 서로 다른 단가를 사용합니다.
+    - UI 표시와 로그 비교를 위해 비용은 소수점 6자리로 고정합니다.
+    exercise:
+      prompt: calculate_cache_cost(usage, price)를 완성해 totalCost, cacheTokens, breakdown을 반환하세요.
+      starterCode: |-
+        def calculate_cache_cost(usage, price):
+            raise NotImplementedError
+      solution: |-
+        def calculate_cache_cost(usage, price):
+            input_tokens = usage.get("input_tokens", 0)
+            creation_tokens = usage.get("cache_creation_input_tokens", 0)
+            read_tokens = usage.get("cache_read_input_tokens", 0)
+            output_tokens = usage.get("output_tokens", 0)
+            breakdown = {
+                "inputCost": round(input_tokens * price["input_per_million"] / 1_000_000, 6),
+                "cacheCreationCost": round(creation_tokens * price["cache_creation_per_million"] / 1_000_000, 6),
+                "cacheReadCost": round(read_tokens * price["cache_read_per_million"] / 1_000_000, 6),
+                "outputCost": round(output_tokens * price["output_per_million"] / 1_000_000, 6),
+            }
+            total = round(sum(breakdown.values()), 6)
+            return {
+                "totalCost": total,
+                "cacheTokens": creation_tokens + read_tokens,
+                "breakdown": breakdown,
+            }
+      hints:
+      - 누락된 usage 필드는 0으로 처리합니다.
+      - totalCost는 breakdown 값의 합으로 계산합니다.
+    check:
+      id: python.llm.prompt-caching.cache-cost.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.prompt-caching.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: calculate_cache_cost
+        cases:
+        - id: separates-cache-cost-components
+          arguments:
+          - value:
+              input_tokens: 1000
+              cache_creation_input_tokens: 2000
+              cache_read_input_tokens: 5000
+              output_tokens: 100
+          - value:
+              input_per_million: 1.0
+              cache_creation_per_million: 1.25
+              cache_read_per_million: 0.1
+              output_per_million: 5.0
+          expectedReturn:
+            totalCost: 0.0045
+            cacheTokens: 7000
+            breakdown:
+              inputCost: 0.001
+              cacheCreationCost: 0.0025
+              cacheReadCost: 0.0005
+              outputCost: 0.0005
+        - id: handles-missing-cache-fields
+          arguments:
+          - value:
+              input_tokens: 1000
+              output_tokens: 100
+          - value:
+              input_per_million: 1.0
+              cache_creation_per_million: 1.25
+              cache_read_per_million: 0.1
+              output_per_million: 5.0
+          expectedReturn:
+            totalCost: 0.0015
+            cacheTokens: 0
+            breakdown:
+              inputCost: 0.001
+              cacheCreationCost: 0.0
+              cacheReadCost: 0.0
+              outputCost: 0.0005
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 07_prompt-caching-mark-blocks-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - cache_control_on
+    - workflow_validation
+    title: 안정적인 시스템 블록에 캐시 마킹하기
+    subtitle: cache block marker
+    goal: mark_cache_blocks(blocks, cache_names)를 완성해 선택된 블록에 cache_control을 추가한다.
+    why: 캐싱은 모든 프롬프트가 아니라 자주 반복되고 잘 변하지 않는 블록에만 적용해야 비용과 정확성이 모두 안정됩니다.
+    explanation: blocks는 name과 text를 가진 시스템 블록 목록입니다. cache_names에 들어 있는 이름만 복사본에 cache_control 값을 추가합니다.
+    tips:
+    - 원본 blocks를 직접 바꾸지 않고 새 사전을 만들어 반환합니다.
+    - 어떤 블록이 마킹되었는지 markedNames를 함께 반환하면 검산이 쉽습니다.
+    exercise:
+      prompt: mark_cache_blocks(blocks, cache_names)를 완성해 blocks, markedNames, blockCount를 반환하세요.
+      starterCode: |-
+        def mark_cache_blocks(blocks, cache_names):
+            raise NotImplementedError
+      solution: |-
+        def mark_cache_blocks(blocks, cache_names):
+            selected = set(cache_names)
+            marked = []
+            marked_names = []
+            for block in blocks:
+                copied = dict(block)
+                if copied.get("name") in selected:
+                    copied["cache_control"] = {"type": "ephemeral"}
+                    marked_names.append(copied["name"])
+                marked.append(copied)
+            return {"blocks": marked, "markedNames": marked_names, "blockCount": len(marked)}
+      hints:
+      - cache_names는 set으로 바꾸면 포함 검사가 단순합니다.
+      - cache_control은 선택된 블록에만 붙입니다.
+    check:
+      id: python.llm.prompt-caching.mark-blocks.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.prompt-caching.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: mark_cache_blocks
+        cases:
+        - id: marks-selected-policy-block
+          arguments:
+          - value:
+            - name: policy
+              text: always answer as JSON
+            - name: question
+              text: summarize today
+          - value:
+            - policy
+          expectedReturn:
+            blocks:
+            - name: policy
+              text: always answer as JSON
+              cache_control:
+                type: ephemeral
+            - name: question
+              text: summarize today
+            markedNames:
+            - policy
+            blockCount: 2
+        - id: leaves-unselected-blocks-plain
+          arguments:
+          - value:
+            - name: short
+              text: hello
+          - value: []
+          expectedReturn:
+            blocks:
+            - name: short
+              text: hello
+            markedNames: []
+            blockCount: 1
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 07_prompt-caching-rule-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 07_prompt-caching-mark-blocks-transfer
+    title: 프롬프트 캐싱 운영 규칙 회상하기
+    subtitle: cache rule recall
+    goal: choose_cache_rule(goal)를 완성해 캐싱 상황별 규칙과 실패 위험을 반환한다.
+    why: 캐싱은 붙이면 끝나는 옵션이 아니라 어떤 프롬프트를 캐시하고 어떤 usage 필드를 읽을지 정하는 운영 규칙입니다.
+    explanation: stable-prefix, ephemeral-control, cache-read-usage, cached-pricing, compare-calls 상황별로 적용할 규칙을 선택하세요.
+    tips:
+    - 자주 바뀌는 사용자 질문은 캐시 대상으로 부적절합니다.
+    - cache_read_input_tokens가 늘어야 반복 호출에서 이득을 봅니다.
+    exercise:
+      prompt: choose_cache_rule(goal)를 완성해 rule, useWhen, risk를 반환하세요.
+      starterCode: |-
+        def choose_cache_rule(goal):
+            raise NotImplementedError
+      solution: |-
+        def choose_cache_rule(goal):
+            table = {
+                "stable-prefix": {"rule": "cache long repeated system content", "useWhen": "policy text repeats", "risk": "wasted setup"},
+                "ephemeral-control": {"rule": "mark cacheable blocks with ephemeral control", "useWhen": "using Messages API cache blocks", "risk": "no cache write"},
+                "cache-read-usage": {"rule": "inspect cache_read_input_tokens", "useWhen": "checking cache hit", "risk": "imaginary savings"},
+                "cached-pricing": {"rule": "price creation and read tokens separately", "useWhen": "showing cost", "risk": "wrong total"},
+                "compare-calls": {"rule": "compare first and repeated calls", "useWhen": "validating cache benefit", "risk": "anecdotal result"},
+            }
+            if goal not in table:
+                raise ValueError("unknown cache goal")
+            return table[goal]
+      hints:
+      - 캐시 적중은 usage 필드로 확인합니다.
+      - 비용 계산에는 일반 입력, 캐시 생성, 캐시 읽기, 출력이 모두 필요합니다.
+    check:
+      id: python.llm.prompt-caching.rule-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.prompt-caching.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_cache_rule
+        cases:
+        - id: recalls-stable-prefix
+          arguments:
+          - value: stable-prefix
+          expectedReturn:
+            rule: cache long repeated system content
+            useWhen: policy text repeats
+            risk: wasted setup
+        - id: recalls-cached-pricing
+          arguments:
+          - value: cached-pricing
+          expectedReturn:
+            rule: price creation and read tokens separately
+            useWhen: showing cost
+            risk: wrong total
+        - id: rejects-unknown-goal
+          arguments:
+          - value: cache-everything
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

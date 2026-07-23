@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "llmBasics"
+sourceCount: 11
+lessons:
+  - lessonRef: "llmBasics/00_LLM통합소개"
+    sourcePath: "curricula/python/aiIntegration/llmBasics/00_LLM통합소개.yaml"
+    metaId: "llmBasics_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "llmBasics/01_첫Claude호출"
+    sourcePath: "curricula/python/aiIntegration/llmBasics/01_첫Claude호출.yaml"
+    metaId: "llmBasics_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "llmBasics/02_시스템프롬프트역할부여"
+    sourcePath: "curricula/python/aiIntegration/llmBasics/02_시스템프롬프트역할부여.yaml"
+    metaId: "llmBasics_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "llmBasics/03_멀티턴대화만들기"
+    sourcePath: "curricula/python/aiIntegration/llmBasics/03_멀티턴대화만들기.yaml"
+    metaId: "llmBasics_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "llmBasics/04_토큰과비용추적"
+    sourcePath: "curricula/python/aiIntegration/llmBasics/04_토큰과비용추적.yaml"
+    metaId: "llmBasics_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "llmBasics/05_스트리밍응답"
+    sourcePath: "curricula/python/aiIntegration/llmBasics/05_스트리밍응답.yaml"
+    metaId: "llmBasics_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "llmBasics/06_JSON구조화출력"
+    sourcePath: "curricula/python/aiIntegration/llmBasics/06_JSON구조화출력.yaml"
+    metaId: "llmBasics_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "llmBasics/07_프롬프트캐싱"
+    sourcePath: "curricula/python/aiIntegration/llmBasics/07_프롬프트캐싱.yaml"
+    metaId: "llmBasics_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "llmBasics/08_도구사용기초"
+    sourcePath: "curricula/python/aiIntegration/llmBasics/08_도구사용기초.yaml"
+    metaId: "llmBasics_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "llmBasics/09_멀티도구라우팅"
+    sourcePath: "curricula/python/aiIntegration/llmBasics/09_멀티도구라우팅.yaml"
+    metaId: "llmBasics_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "llmBasics/10_데이터분석봇"
+    sourcePath: "curricula/python/aiIntegration/llmBasics/10_데이터분석봇.yaml"
+    metaId: "llmBasics_10"
+    registryStatus: registered
+    reviewStatus: pending

@@ -416,3 +416,277 @@ sections:
     check:
       noError: 1차·2차 processAll이 끝나야 한다.
       resultCheck: 최종 done이 1~10을 한 번씩 담아야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: resilience_02-checkpoint-admission-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - checkpoint-file
+    - practice-crash-resume
+    title: 재개 체크포인트의 source identity와 cursor 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 다른 입력·잘못된 cursor·완료 상태의 재실행을 차단한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - checkpoint를 입력 content hash와 묶어 stale resume을 막으세요.
+    - next cursor의 허용 범위와 complete 불변식을 검사하세요.
+    exercise:
+      prompt: audit_checkpoint(checkpoint, source_hash, item_count)를 완성하세요.
+      starterCode: |-
+        def audit_checkpoint(checkpoint, source_hash, item_count):
+            raise NotImplementedError
+      solution: |
+        def audit_checkpoint(checkpoint, source_hash, item_count):
+            failures = []
+            if checkpoint.get("sourceHash") != source_hash:
+                failures.append("source")
+            cursor = checkpoint.get("nextIndex")
+            if not isinstance(cursor, int) or isinstance(cursor, bool) or cursor < 0 or cursor > item_count:
+                failures.append("cursor")
+            if checkpoint.get("status") == "complete" and cursor != item_count:
+                failures.append("completion")
+            return {"accepted": not failures, "failures": failures, "nextIndex": cursor, "remaining": item_count - cursor if isinstance(cursor, int) and not isinstance(cursor, bool) and 0 <= cursor <= item_count else None}
+      hints: *id001
+    check:
+      id: python.resilience.resilience_02.checkpoint-admission.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.resilience.resilience_02.checkpoint-admission.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_checkpoint
+        cases:
+        - id: accepts-resume-cursor
+          arguments:
+          - value:
+              sourceHash: h
+              nextIndex: 3
+              status: running
+          - value: h
+          - value: 10
+          expectedReturn:
+            accepted: true
+            failures: []
+            nextIndex: 3
+            remaining: 7
+        - id: reports-stale-source
+          arguments:
+          - value:
+              sourceHash: old
+              nextIndex: 3
+              status: running
+          - value: h
+          - value: 10
+          expectedReturn:
+            accepted: false
+            failures:
+            - source
+            nextIndex: 3
+            remaining: 7
+        - id: reports-cursor-completion
+          arguments:
+          - value:
+              sourceHash: h
+              nextIndex: 11
+              status: complete
+          - value: h
+          - value: 10
+          expectedReturn:
+            accepted: false
+            failures:
+            - cursor
+            - completion
+            nextIndex: 11
+            remaining: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: resilience_02-resume-batch-plan-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - resilience_02-checkpoint-admission-mastery
+    title: 중단된 배치의 다음 처리 구간 계획하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: cursor·batch size·처리 예산으로 결정론적 구간을 만든다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - resume은 마지막 처리 index가 아니라 다음 처리 index를 저장하세요.
+    - batch size와 남은 실행 예산 중 작은 값으로 구간을 제한하세요.
+    exercise:
+      prompt: plan_resume_batch(next_index, item_count, batch_size, remaining_budget)를 완성하세요.
+      starterCode: |-
+        def plan_resume_batch(next_index, item_count, batch_size, remaining_budget):
+            raise NotImplementedError
+      solution: |
+        def plan_resume_batch(next_index, item_count, batch_size, remaining_budget):
+            if min(next_index, item_count, batch_size, remaining_budget) < 0 or next_index > item_count or batch_size == 0:
+                raise ValueError("invalid resume bounds")
+            take = min(batch_size, remaining_budget, item_count - next_index)
+            end = next_index + take
+            return {"start": next_index, "endExclusive": end, "count": take, "nextIndex": end, "complete": end == item_count}
+      hints: *id002
+    check:
+      id: python.resilience.resilience_02.resume-batch-plan.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.resilience.resilience_02.resume-batch-plan.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_resume_batch
+        cases:
+        - id: plans-bounded-batch
+          arguments:
+          - value: 3
+          - value: 10
+          - value: 4
+          - value: 10
+          expectedReturn:
+            start: 3
+            endExclusive: 7
+            count: 4
+            nextIndex: 7
+            complete: false
+        - id: honors-budget
+          arguments:
+          - value: 3
+          - value: 10
+          - value: 4
+          - value: 2
+          expectedReturn:
+            start: 3
+            endExclusive: 5
+            count: 2
+            nextIndex: 5
+            complete: false
+        - id: finishes-tail
+          arguments:
+          - value: 8
+          - value: 10
+          - value: 5
+          - value: 5
+          expectedReturn:
+            start: 8
+            endExclusive: 10
+            count: 2
+            nextIndex: 10
+            complete: true
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: resilience_02-checkpoint-recovery-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - resilience_02-resume-batch-plan-transfer
+    title: 체크포인트 recovery 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력 고정·cursor commit·resume 검증을 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Web에서 상태 전이와 불변식을 즉시 검증하세요.
+    - Local에서는 실제 crash·restart 뒤 원장과 artifact를 다시 읽어 확인하세요.
+    exercise:
+      prompt: choose_checkpoint_evidence(stage)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_checkpoint_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_checkpoint_evidence(stage):
+            table = {'bind': {'action': 'bind checkpoint to source hash', 'evidence': 'source identity', 'risk': 'resume on changed input'}, 'commit': {'action': 'persist next index after durable effect', 'evidence': 'monotonic cursor', 'risk': 'skip or duplicate item'}, 'resume': {'action': 'validate bounds before continuing', 'evidence': 'remaining work plan', 'risk': 'out-of-range recovery'}}
+            if stage not in table:
+                raise ValueError('unknown stage')
+            return table[stage]
+      hints: *id003
+    check:
+      id: python.resilience.resilience_02.checkpoint-recovery-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.resilience.resilience_02.checkpoint-recovery-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_checkpoint_evidence
+        cases:
+        - id: recalls-bind
+          arguments:
+          - value: bind
+          expectedReturn:
+            action: bind checkpoint to source hash
+            evidence: source identity
+            risk: resume on changed input
+        - id: recalls-commit
+          arguments:
+          - value: commit
+          expectedReturn:
+            action: persist next index after durable effect
+            evidence: monotonic cursor
+            risk: skip or duplicate item
+        - id: recalls-resume
+          arguments:
+          - value: resume
+          expectedReturn:
+            action: validate bounds before continuing
+            evidence: remaining work plan
+            risk: out-of-range recovery
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

@@ -544,3 +544,324 @@ sections:
     type: noError
     noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 02_advanced_decorator-audit-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - parameterized
+    - functools_wraps
+    - workflow_validation
+    title: 인자 있는 데코레이터로 권한과 감사 로그를 함께 검증하기
+    subtitle: parameterized guard decorator
+    goal: 사용자 역할과 필요 역할을 받아 데코레이터 팩토리, wraps, 예외 처리를 포함한 감사 결과를 반환한다.
+    why: 데코레이터는 프레임워크 문법을 외우는 주제가 아니라, 반복되는 운영 규칙을 한 곳에서 검증하게 만드는 설계 도구입니다.
+    explanation: run_guarded_action(user_role, required_role, amount)를 완성해 역할 확인, 성공/거부 이벤트, 원본 함수 메타데이터 보존을 함께 확인하세요.
+    tips:
+    - '@wraps를 쓰지 않으면 functionName과 doc 검증을 통과할 수 없습니다.'
+    - 권한 실패도 events에 남겨 호출 순서를 확인하세요.
+    exercise:
+      prompt: run_guarded_action(user_role, required_role, amount)를 완성해 권한 검사 결과와 감사 이벤트를 반환하세요.
+      starterCode: |-
+        def run_guarded_action(user_role, required_role, amount):
+            raise NotImplementedError
+      solution: |-
+        def run_guarded_action(user_role, required_role, amount):
+            from functools import wraps
+
+            events = []
+
+            def require_role(role):
+                def decorator(func):
+                    @wraps(func)
+                    def wrapper(*args, **kwargs):
+                        events.append(f"check:{role}")
+                        if user_role != role:
+                            events.append("denied")
+                            raise PermissionError("role denied")
+                        events.append("allowed")
+                        return func(*args, **kwargs)
+                    return wrapper
+                return decorator
+
+            @require_role(required_role)
+            def approve_payment(value):
+                """Approve one payment."""
+                events.append(f"approve:{value}")
+                return {"approved": True, "amount": value}
+
+            try:
+                result = approve_payment(amount)
+                status = "ok"
+            except PermissionError as exc:
+                result = {"approved": False, "reason": str(exc)}
+                status = "denied"
+            return {
+                "status": status,
+                "result": result,
+                "events": events,
+                "functionName": approve_payment.__name__,
+                "doc": approve_payment.__doc__,
+            }
+      hints:
+      - 가장 바깥 함수는 role을 받고, 중간 함수는 func를 받습니다.
+      - wrapper 안에서 예외를 내고 바깥 try에서 결과로 바꾸면 테스트하기 쉽습니다.
+    check:
+      id: python.advanced.decorator.audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.decorator.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: run_guarded_action
+        cases:
+        - id: allows-required-role-and-preserves-metadata
+          arguments:
+          - value: admin
+          - value: admin
+          - value: 9000
+          expectedReturn:
+            status: ok
+            result:
+              approved: true
+              amount: 9000
+            events:
+            - check:admin
+            - allowed
+            - approve:9000
+            functionName: approve_payment
+            doc: Approve one payment.
+        - id: denies-wrong-role-with-audit-event
+          arguments:
+          - value: viewer
+          - value: admin
+          - value: 9000
+          expectedReturn:
+            status: denied
+            result:
+              approved: false
+              reason: role denied
+            events:
+            - check:admin
+            - denied
+            functionName: approve_payment
+            doc: Approve one payment.
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 02_advanced_decorator-stack-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - multiple_decorators
+    - method_decorator
+    - workflow_validation
+    title: 다중 데코레이터 호출 순서와 반환값 변화를 추적하기
+    subtitle: decorator stack trace
+    goal: 두 개의 데코레이터가 감싼 함수의 시작, 본문, 종료 순서와 반환값 변화를 trace로 반환한다.
+    why: 다중 데코레이터는 예외가 없어도 순서를 틀리면 인증, 로깅, 트랜잭션 정책이 뒤집히기 때문에 호출 순서를 증명해야 합니다.
+    explanation: trace_decorator_stack(value)를 완성해 outer와 inner의 시작/종료 이벤트, 본문 실행, 최종 반환값을 검증하세요.
+    tips:
+    - 적용은 아래에서 위, 호출은 바깥 wrapper부터 시작합니다.
+    - 음수 입력은 본문까지 가지 않게 ValueError로 거부하세요.
+    exercise:
+      prompt: trace_decorator_stack(value)를 완성해 decorator stack의 이벤트 순서와 최종 result를 반환하세요.
+      starterCode: |-
+        def trace_decorator_stack(value):
+            raise NotImplementedError
+      solution: |-
+        def trace_decorator_stack(value):
+            if value < 0:
+                raise ValueError("value must be non-negative")
+
+            events = []
+
+            def outer(func):
+                def wrapper(amount):
+                    events.append("outer:start")
+                    result = func(amount)
+                    events.append("outer:end")
+                    return result + 1
+                return wrapper
+
+            def inner(func):
+                def wrapper(amount):
+                    events.append("inner:start")
+                    result = func(amount)
+                    events.append("inner:end")
+                    return result * 2
+                return wrapper
+
+            @outer
+            @inner
+            def base(amount):
+                events.append("body")
+                return amount + 3
+
+            result = base(value)
+            return {
+                "events": events,
+                "result": result,
+                "callOrder": "outer-inner-body-inner-outer",
+            }
+      hints:
+      - '@outer가 @inner가 감싼 함수를 다시 감쌉니다.'
+      - result 계산은 body 결과가 inner에서 두 배, outer에서 1 증가합니다.
+    check:
+      id: python.advanced.decorator.stack.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.decorator.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: trace_decorator_stack
+        cases:
+        - id: traces-wrapper-order-and-return-transform
+          arguments:
+          - value: 4
+          expectedReturn:
+            events:
+            - outer:start
+            - inner:start
+            - body
+            - inner:end
+            - outer:end
+            result: 15
+            callOrder: outer-inner-body-inner-outer
+        - id: rejects-negative-input-before-wrapping
+          arguments:
+          - value: -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 02_advanced_decorator-role-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 02_advanced_decorator-stack-transfer
+    title: 데코레이터 문법, 팩토리, wraps 역할 회상하기
+    subtitle: syntax, factory, metadata
+    goal: 개념 이름을 받아 @ 문법의 의미, 데코레이터 팩토리 필요 여부, 메타데이터 보존 여부를 반환한다.
+    why: 시간이 지나도 남아야 할 지식은 문법 모양보다 func = decorator(func), decorator(arg)의 2단계, wraps의 역할입니다.
+    explanation: recall_decorator_concept(concept)를 완성해 syntax, factory, wraps 개념별 핵심 정보를 반환하세요.
+    tips:
+    - '@decorator는 함수 정의 뒤 재할당되는 문법입니다.'
+    - '@decorator(arg)는 arg를 받은 함수가 실제 decorator를 반환해야 합니다.'
+    exercise:
+      prompt: recall_decorator_concept(concept)를 완성해 데코레이터 핵심 개념을 구조화해 반환하세요.
+      starterCode: |-
+        def recall_decorator_concept(concept):
+            raise NotImplementedError
+      solution: |-
+        def recall_decorator_concept(concept):
+            table = {
+                "syntax": {
+                    "meaning": "func = decorator(func)",
+                    "needsFactory": False,
+                    "preservesMetadata": False,
+                },
+                "factory": {
+                    "meaning": "decorator(arg) returns the real decorator",
+                    "needsFactory": True,
+                    "preservesMetadata": False,
+                },
+                "wraps": {
+                    "meaning": "copy original function metadata to wrapper",
+                    "needsFactory": False,
+                    "preservesMetadata": True,
+                },
+            }
+            if concept not in table:
+                raise ValueError("unknown decorator concept")
+            return table[concept]
+      hints:
+      - factory는 인자 있는 데코레이터에서 필요합니다.
+      - wraps는 __name__과 __doc__ 같은 정보를 보존합니다.
+    check:
+      id: python.advanced.decorator.role.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.decorator.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: recall_decorator_concept
+        cases:
+        - id: recalls-parameterized-decorator-factory
+          arguments:
+          - value: factory
+          expectedReturn:
+            meaning: decorator(arg) returns the real decorator
+            needsFactory: true
+            preservesMetadata: false
+        - id: recalls-wraps-metadata-role
+          arguments:
+          - value: wraps
+          expectedReturn:
+            meaning: copy original function metadata to wrapper
+            needsFactory: false
+            preservesMetadata: true
+        - id: rejects-unknown-concept
+          arguments:
+          - value: monkeypatch
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

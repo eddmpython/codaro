@@ -81,9 +81,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 제너레이터 기초의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -109,9 +106,6 @@ sections:
     hints:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 제너레이터 표현식의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
@@ -139,9 +133,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 이터레이터 기초에서 `nums` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -195,9 +186,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 이 코드를 실행하면 어떤 예외가 발생할까요?
-      expectedError: StopIteration
   check:
     type: noError
     noError: 이터레이터 프로토콜의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -243,9 +231,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 고급 제너레이터의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -293,9 +278,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 실전 패턴의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -335,9 +317,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 실무 스트리밍 처리 루프에서 `eventRows` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -372,10 +351,238 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: Day 27 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: Day 27 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: day27-even-generator-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - generator_basic
+    - practice
+    title: yield로 짝수 흐름 만들기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: generator를 소비한 결과가 필요한 값만 포함하게 한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: even_values(limit)가 0 이상 limit 미만의 짝수를 generator로 만들고 목록으로 반환하도록 완성하세요.
+      starterCode: |-
+        def even_values(limit):
+            raise NotImplementedError
+      solution: |-
+        def even_values(limit):
+            def generate():
+                for value in range(limit):
+                    if value % 2 == 0:
+                        yield value
+            return list(generate())
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day27.even-generator.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day27.even-generator.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: even_values
+        cases:
+        - id: six
+          arguments:
+          - value: 6
+          expectedReturn:
+          - 0
+          - 2
+          - 4
+        - id: one
+          arguments:
+          - value: 1
+          expectedReturn:
+          - 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day27-chunk-generator-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day27-even-generator-mastery
+    title: 목록을 일정 크기 묶음으로 지연 생성하기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: yield를 배치 처리 문맥에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: chunk_values(items, size)가 generator로 만든 묶음을 목록으로 반환하도록 완성하세요.
+      starterCode: |-
+        def chunk_values(items, size):
+            raise NotImplementedError
+      solution: |-
+        def chunk_values(items, size):
+            def chunks():
+                for start in range(0, len(items), size):
+                    yield items[start:start + size]
+            return list(chunks())
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day27.chunk-generator.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day27.chunk-generator.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: chunk_values
+        cases:
+        - id: even
+          arguments:
+          - value:
+            - 1
+            - 2
+            - 3
+            - 4
+          - value: 2
+          expectedReturn:
+          - - 1
+            - 2
+          - - 3
+            - 4
+        - id: remainder
+          arguments:
+          - value:
+            - a
+            - b
+            - c
+          - value: 2
+          expectedReturn:
+          - - a
+            - b
+          - - c
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day27-countdown-iterator-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day27-chunk-generator-transfer
+    title: 직접 iterator로 카운트다운 복원하기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: __iter__와 __next__ 상태 변화를 기억에서 구현한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: Countdown과 countdown_values(start)를 완성해 start부터 1까지 목록을 반환하세요.
+      starterCode: |-
+        class Countdown:
+            pass
+
+        def countdown_values(start):
+            raise NotImplementedError
+      solution: |-
+        class Countdown:
+            def __init__(self, start):
+                self.current = start
+
+            def __iter__(self):
+                return self
+
+            def __next__(self):
+                if self.current <= 0:
+                    raise StopIteration
+                value = self.current
+                self.current -= 1
+                return value
+
+        def countdown_values(start):
+            return list(Countdown(start))
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day27.countdown-iterator.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day27.countdown-iterator.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: countdown_values
+        cases:
+        - id: three
+          arguments:
+          - value: 3
+          expectedReturn:
+          - 3
+          - 2
+          - 1
+        - id: zero
+          arguments:
+          - value: 0
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

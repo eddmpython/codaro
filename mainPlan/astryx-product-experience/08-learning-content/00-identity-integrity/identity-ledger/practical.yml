@@ -1,0 +1,9 @@
+schemaVersion: 1
+category: "practical"
+sourceCount: 1
+lessons:
+  - lessonRef: "practical/00_실전파이썬소개"
+    sourcePath: "curricula/python/automation/office/practical/00_실전파이썬소개.yaml"
+    metaId: "00_실전파이썬소개"
+    registryStatus: registered
+    reviewStatus: pending

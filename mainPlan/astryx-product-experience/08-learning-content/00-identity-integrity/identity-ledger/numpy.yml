@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "numpy"
+sourceCount: 11
+lessons:
+  - lessonRef: "numpy/00_NumPy소개"
+    sourcePath: "curricula/python/dataAnalysis/numpy/00_NumPy소개.yaml"
+    metaId: "numpy_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "numpy/01_포켓몬스탯분석"
+    sourcePath: "curricula/python/dataAnalysis/numpy/01_포켓몬스탯분석.yaml"
+    metaId: "numpy_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "numpy/02_기온데이터탐색"
+    sourcePath: "curricula/python/dataAnalysis/numpy/02_기온데이터탐색.yaml"
+    metaId: "numpy_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "numpy/03_지진발생패턴"
+    sourcePath: "curricula/python/dataAnalysis/numpy/03_지진발생패턴.yaml"
+    metaId: "numpy_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "numpy/04_음악특성분석"
+    sourcePath: "curricula/python/dataAnalysis/numpy/04_음악특성분석.yaml"
+    metaId: "numpy_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "numpy/05_BMI계산기"
+    sourcePath: "curricula/python/dataAnalysis/numpy/05_BMI계산기.yaml"
+    metaId: "numpy_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "numpy/06_심장병위험분석"
+    sourcePath: "curricula/python/dataAnalysis/numpy/06_심장병위험분석.yaml"
+    metaId: "numpy_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "numpy/07_대기질시계열"
+    sourcePath: "curricula/python/dataAnalysis/numpy/07_대기질시계열.yaml"
+    metaId: "numpy_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "numpy/08_행복지수국가비교"
+    sourcePath: "curricula/python/dataAnalysis/numpy/08_행복지수국가비교.yaml"
+    metaId: "numpy_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "numpy/09_전복나이예측"
+    sourcePath: "curricula/python/dataAnalysis/numpy/09_전복나이예측.yaml"
+    metaId: "numpy_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "numpy/10_당뇨병종합분석"
+    sourcePath: "curricula/python/dataAnalysis/numpy/10_당뇨병종합분석.yaml"
+    metaId: "numpy_10"
+    registryStatus: registered
+    reviewStatus: pending

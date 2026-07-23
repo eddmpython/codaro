@@ -38,7 +38,7 @@ def curriculumOs() -> SimpleNamespace:
     return SimpleNamespace(taxonomy=lambda: taxonomy, graph=lambda: graph)
 
 
-def testAnalyticsFlowOwnsMasteryAndSnapshotPayloads(tmp_path) -> None:
+def testAnalyticsFlowDoesNotTreatManualValidationAsMastery(tmp_path) -> None:
     tracker = ProgressTracker(tmp_path / "progress.json")
     tracker.markOutcomeValidated("python.variables")
     flow = CurriculumAnalyticsFlow(
@@ -53,10 +53,10 @@ def testAnalyticsFlowOwnsMasteryAndSnapshotPayloads(tmp_path) -> None:
     analytics = flow.analyticsPayload(days=30)
     summary = flow.analyticsSummaryPayload()
 
-    assert mastery.masteredOutcomeCount == 1
+    assert mastery.masteredOutcomeCount == 0
     assert analytics["totalSnapshots"] == 1
     assert summary["available"] is True
-    assert summary["currentMastered"] == 1
+    assert summary["currentMastered"] == 0
 
 
 def testAnalyticsFlowThrottlesRepeatedRefreshes(tmp_path) -> None:
@@ -72,7 +72,7 @@ def testAnalyticsFlowThrottlesRepeatedRefreshes(tmp_path) -> None:
     assert flow.refreshSnapshot() is False
 
 
-def testOutcomeMasteryPayloadFiltersDomainAndRejectsUnknownDomain(tmp_path) -> None:
+def testOutcomeMasteryPayloadIgnoresManualValidationAndRejectsUnknownDomain(tmp_path) -> None:
     tracker = ProgressTracker(tmp_path / "progress.json")
     tracker.markOutcomeValidated("python.variables")
 
@@ -83,7 +83,8 @@ def testOutcomeMasteryPayloadFiltersDomainAndRejectsUnknownDomain(tmp_path) -> N
         minLevel=0.5,
     )
 
-    assert payload["masteredOutcomeIds"] == ["python.variables"]
+    assert payload["masteredOutcomeIds"] == []
+    assert payload["outcomes"] == []
     assert payload["domains"][0]["domainId"] == "pythonBasics"
 
     with pytest.raises(CurriculumAnalyticsError) as excInfo:

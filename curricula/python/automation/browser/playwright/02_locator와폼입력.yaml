@@ -7,6 +7,9 @@ meta:
   audience: Python 기본 문법을 익힌 자동화 입문자
   packages:
     - playwright
+  outcomes: ["automation.browser.formInput"]
+  prerequisites: ["automation.browser.basics"]
+  estimatedMinutes: 45
   tags:
     - playwright
     - locator
@@ -384,3 +387,307 @@ sections:
     check:
       noError: 담당자 입력, 저장 클릭, report 생성이 오류 없이 끝나야 합니다.
       resultCheck: report의 owner 값이 입력한 담당자 이름과 같아야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: playwright_02-locator-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - role-locator
+    - form-completion
+    title: locator의 유일성과 사용자 의미 판정하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: role·label·test id 전략과 실제 match 수를 함께 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - locator 선언뿐 아니라 대상 화면에서 정확히 한 개가 매치되는지 확인하세요.
+    - DOM 구조보다 사용자가 인지하는 role·label을 우선하세요.
+    exercise:
+      prompt: audit_locators(locators)를 완성하세요.
+      starterCode: |-
+        def audit_locators(locators):
+            raise NotImplementedError
+      solution: |
+        def audit_locators(locators):
+            failures = []
+            accepted = []
+            for locator in locators:
+                name = locator["name"]
+                if locator.get("matches") != 1:
+                    failures.append({"name": name, "reason": "not-unique"})
+                    continue
+                if locator.get("strategy") not in {"role", "label", "placeholder", "test-id"}:
+                    failures.append({"name": name, "reason": "brittle-strategy"})
+                    continue
+                accepted.append(name)
+            return {"ready": not failures, "accepted": accepted, "failures": failures}
+      hints: *id001
+    check:
+      id: python.playwright.playwright_02.locator-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.playwright.playwright_02.locator-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_locators
+        cases:
+        - id: accepts-semantic-locators
+          arguments:
+          - value:
+            - name: email
+              strategy: label
+              matches: 1
+            - name: save
+              strategy: role
+              matches: 1
+          expectedReturn:
+            ready: true
+            accepted:
+            - email
+            - save
+            failures: []
+        - id: reports-duplicate-and-css
+          arguments:
+          - value:
+            - name: row
+              strategy: role
+              matches: 3
+            - name: submit
+              strategy: css
+              matches: 1
+          expectedReturn:
+            ready: false
+            accepted: []
+            failures:
+            - name: row
+              reason: not-unique
+            - name: submit
+              reason: brittle-strategy
+        - id: keeps-valid-among-failures
+          arguments:
+          - value:
+            - name: query
+              strategy: placeholder
+              matches: 1
+            - name: missing
+              strategy: test-id
+              matches: 0
+          expectedReturn:
+            ready: false
+            accepted:
+            - query
+            failures:
+            - name: missing
+              reason: not-unique
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: playwright_02-form-action-plan-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - playwright_02-locator-contract-audit-mastery
+    title: 새 폼에 입력·검증 계획 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 필수 필드 누락과 예상 밖 입력을 찾고 입력 순서를 만든다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 입력값과 locator 계약을 분리해 값만 바뀌는 테스트를 재사용하세요.
+    - 예상하지 않은 필드는 조용히 입력하지 말고 계획 단계에서 차단하세요.
+    exercise:
+      prompt: plan_form_actions(fields, values)를 완성하세요.
+      starterCode: |-
+        def plan_form_actions(fields, values):
+            raise NotImplementedError
+      solution: |
+        def plan_form_actions(fields, values):
+            field_names = {field["name"] for field in fields}
+            required = {field["name"] for field in fields if field.get("required")}
+            missing = sorted(name for name in required if name not in values or values[name] in {None, ""})
+            unexpected = sorted(set(values) - field_names)
+            actions = []
+            for field in fields:
+                name = field["name"]
+                if name in values and values[name] not in {None, ""}:
+                    actions.append({"name": name, "locator": field["locator"], "value": values[name]})
+            return {"ready": not missing and not unexpected, "missing": missing, "unexpected": unexpected, "actions": actions}
+      hints: *id002
+    check:
+      id: python.playwright.playwright_02.form-action-plan.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.playwright.playwright_02.form-action-plan.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_form_actions
+        cases:
+        - id: plans-required-and-optional
+          arguments:
+          - value:
+            - name: email
+              locator: label:Email
+              required: true
+            - name: note
+              locator: label:Note
+              required: false
+          - value:
+              email: a@example.test
+              note: hello
+          expectedReturn:
+            ready: true
+            missing: []
+            unexpected: []
+            actions:
+            - name: email
+              locator: label:Email
+              value: a@example.test
+            - name: note
+              locator: label:Note
+              value: hello
+        - id: reports-missing-required
+          arguments:
+          - value:
+            - name: email
+              locator: label:Email
+              required: true
+          - value:
+              email: ''
+          expectedReturn:
+            ready: false
+            missing:
+            - email
+            unexpected: []
+            actions: []
+        - id: reports-unexpected-input
+          arguments:
+          - value:
+            - name: query
+              locator: role:searchbox
+              required: false
+          - value:
+              query: docs
+              admin: true
+          expectedReturn:
+            ready: false
+            missing: []
+            unexpected:
+            - admin
+            actions:
+            - name: query
+              locator: role:searchbox
+              value: docs
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: playwright_02-locator-choice-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - playwright_02-form-action-plan-transfer
+    title: 안정적인 locator 선택 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 접근 가능한 의미와 테스트 전용 계약의 우선순위를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 브라우저 동작 성공과 사용자 목표 달성을 같은 것으로 취급하지 마세요.
+    - 선택한 action과 함께 판정 가능한 evidence와 남는 risk를 기록하세요.
+    exercise:
+      prompt: choose_locator_strategy(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_locator_strategy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_locator_strategy(situation):
+            table = {'named-button': {'action': 'get by role and name', 'evidence': 'unique accessible match', 'risk': 'duplicate label'}, 'labeled-input': {'action': 'get by label', 'evidence': 'label association', 'risk': 'missing accessible name'}, 'nonsemantic-widget': {'action': 'approved test id', 'evidence': 'stable product contract', 'risk': 'implementation coupling'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.playwright.playwright_02.locator-choice-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.playwright.playwright_02.locator-choice-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_locator_strategy
+        cases:
+        - id: recalls-named-button
+          arguments:
+          - value: named-button
+          expectedReturn:
+            action: get by role and name
+            evidence: unique accessible match
+            risk: duplicate label
+        - id: recalls-labeled-input
+          arguments:
+          - value: labeled-input
+          expectedReturn:
+            action: get by label
+            evidence: label association
+            risk: missing accessible name
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

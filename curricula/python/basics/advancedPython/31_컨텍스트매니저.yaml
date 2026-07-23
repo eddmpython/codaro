@@ -3,6 +3,9 @@ meta:
   title: 컨텍스트 매니저
   day: 31
   category: advancedPython
+  outcomes: ["builtins.contextManagers"]
+  prerequisites: ["python.advancedSyntax"]
+  estimatedMinutes: 45
   tags:
   - with
   - 컨텍스트매니저
@@ -344,3 +347,289 @@ sections:
     type: noError
     noError: asyncSection과 asyncio.run이 NameError, TypeError, RuntimeError 없이 실행되어야 합니다.
     resultCheck: events 리스트가 open, before-await, after-await, close 순서로 쌓여 async with가 setup/teardown을 올바른 위치에 배치하는지 보여야 합니다.
+assessment:
+  masteryVariants:
+  - id: 31_context_managers-cleanup-log-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - with-basics
+    - exception-suppression
+    - async-context
+    title: 컨텍스트 매니저로 열기와 정리를 항상 기록하기
+    subtitle: cleanup contract with context manager
+    goal: run_context_sequence(labels, fail_label)를 완성해 각 구간의 enter, body, exit, 예외 기록 순서를 반환한다.
+    why: 컨텍스트 매니저의 핵심은 with 문법이 아니라, 성공과 실패 모두에서 자원 정리가 반드시 실행된다는 계약입니다.
+    explanation: 각 label마다 with 블록을 실행합니다. fail_label과 같은 label에서는 KeyError를 일으키고 밖에서 caught를 기록하세요. __exit__는 예외를 삼키지 않습니다.
+    tips:
+    - __exit__는 예외 타입을 받을 수 있으므로 close 기록에 예외 이름을 남길 수 있습니다.
+    - 예외를 삼키지 않으려면 __exit__가 False를 반환해야 합니다.
+    exercise:
+      prompt: run_context_sequence(labels, fail_label)를 완성해 이벤트 순서를 반환하세요.
+      starterCode: |-
+        def run_context_sequence(labels, fail_label=None):
+            raise NotImplementedError
+      solution: |-
+        def run_context_sequence(labels, fail_label=None):
+            events = []
+
+            class Section:
+                def __init__(self, label):
+                    self.label = label
+
+                def __enter__(self):
+                    events.append(f"open:{self.label}")
+                    return self
+
+                def __exit__(self, exc_type, exc, traceback):
+                    suffix = exc_type.__name__ if exc_type else "ok"
+                    events.append(f"close:{self.label}:{suffix}")
+                    return False
+
+            for label in labels:
+                try:
+                    with Section(label):
+                        events.append(f"body:{label}")
+                        if label == fail_label:
+                            raise KeyError(label)
+                except KeyError:
+                    events.append(f"caught:{label}")
+            return events
+      hints:
+      - close 기록은 body 뒤에 항상 남아야 합니다.
+      - fail_label에서 예외가 발생해도 다음 label 처리는 계속되어야 합니다.
+    check:
+      id: python.advanced.context-managers.cleanup-log.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.context-managers.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: run_context_sequence
+        cases:
+        - id: logs-cleanup-even-when-body-raises
+          arguments:
+          - value:
+            - file
+            - db
+          - value: db
+          expectedReturn:
+          - open:file
+          - body:file
+          - close:file:ok
+          - open:db
+          - body:db
+          - close:db:KeyError
+          - caught:db
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 31_context_managers-dynamic-resources-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - contextmanager-decorator
+    - exitstack-dynamic
+    - exception-suppression
+    title: 동적 리소스 목록을 열고 역순으로 닫기
+    subtitle: dynamic resource cleanup transfer
+    goal: manage_resource_names(names)를 완성해 여러 리소스를 연 순서와 닫힌 역순을 반환한다.
+    why: 단일 파일 with에서 배운 정리 계약을 여러 리소스에 옮길 수 있어야 실제 코드에서 누수 없는 구조를 만들 수 있습니다.
+    explanation: 이름 목록을 순서대로 open에 넣고, 정리는 역순으로 close에 넣으세요. 빈 이름은 ValueError로 거부합니다.
+    tips:
+    - ExitStack이 하는 핵심은 나중에 등록한 정리 작업을 먼저 실행하는 것입니다.
+    - 여기서는 그 계약을 작은 리스트 모델로 검증합니다.
+    exercise:
+      prompt: manage_resource_names(names)를 완성해 opened와 closed를 반환하세요.
+      starterCode: |-
+        def manage_resource_names(names):
+            raise NotImplementedError
+      solution: |-
+        def manage_resource_names(names):
+            if any(not name for name in names):
+                raise ValueError("resource name must not be empty")
+            opened = []
+            cleanup_stack = []
+            for name in names:
+                opened.append(name)
+                cleanup_stack.append(name)
+            closed = []
+            while cleanup_stack:
+                closed.append(cleanup_stack.pop())
+            return {"opened": opened, "closed": closed}
+      hints:
+      - 정리 순서가 열기 순서의 반대인지 확인하세요.
+      - 동적 리소스 수가 0개여도 빈 리스트를 반환하면 됩니다.
+    check:
+      id: python.advanced.context-managers.dynamic-resources.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.context-managers.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: manage_resource_names
+        cases:
+        - id: closes-dynamic-resources-in-reverse-order
+          arguments:
+          - value:
+            - config
+            - database
+            - report
+          expectedReturn:
+            opened:
+            - config
+            - database
+            - report
+            closed:
+            - report
+            - database
+            - config
+        - id: rejects-empty-resource-name
+          arguments:
+          - value:
+            - config
+            - ''
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 31_context_managers-tool-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 31_context_managers-dynamic-resources-transfer
+    title: 컨텍스트 매니저 선택 기준 회상하기
+    subtitle: context manager recall
+    goal: choose_context_tool(need)를 완성해 자원 관리 상황별 도구와 위험을 반환한다.
+    why: 컨텍스트 매니저 학습은 with를 쓰는 법보다, 어떤 자원 정리 문제가 class, contextmanager, ExitStack, async context에 맞는지 판단하는 것입니다.
+    explanation: custom-enter-exit, simple-yield-wrapper, dynamic-resource-count, suppress-known-error, async-cleanup 상황별
+      도구를 선택하세요.
+    tips:
+    - ExitStack은 리소스 개수가 실행 중에 정해질 때 유용합니다.
+    - __exit__가 True를 반환하면 예외가 억제되므로 신중해야 합니다.
+    exercise:
+      prompt: choose_context_tool(need)를 완성해 tool, useWhen, caution을 반환하세요.
+      starterCode: |-
+        def choose_context_tool(need):
+            raise NotImplementedError
+      solution: |-
+        def choose_context_tool(need):
+            table = {
+                "custom-enter-exit": {
+                    "tool": "class-context-manager",
+                    "useWhen": "setup and cleanup need explicit state",
+                    "caution": "__exit__ return value controls exception propagation",
+                },
+                "simple-yield-wrapper": {
+                    "tool": "contextmanager",
+                    "useWhen": "one setup-yield-cleanup flow is enough",
+                    "caution": "cleanup belongs in finally",
+                },
+                "dynamic-resource-count": {
+                    "tool": "ExitStack",
+                    "useWhen": "resource count is only known at runtime",
+                    "caution": "register cleanup immediately after opening",
+                },
+                "suppress-known-error": {
+                    "tool": "__exit__ suppression",
+                    "useWhen": "a specific expected exception should be absorbed",
+                    "caution": "never hide unexpected errors",
+                },
+                "async-cleanup": {
+                    "tool": "async-context-manager",
+                    "useWhen": "setup or cleanup must await",
+                    "caution": "async with must run inside async def",
+                },
+            }
+            if need not in table:
+                raise ValueError("unknown context need")
+            return table[need]
+      hints:
+      - 정리 코드가 동기인지 비동기인지 먼저 구분하세요.
+      - 예외 억제는 범위를 좁혀야 디버깅 가능성이 유지됩니다.
+    check:
+      id: python.advanced.context-managers.tool-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.context-managers.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_context_tool
+        cases:
+        - id: recalls-exitstack-for-dynamic-resources
+          arguments:
+          - value: dynamic-resource-count
+          expectedReturn:
+            tool: ExitStack
+            useWhen: resource count is only known at runtime
+            caution: register cleanup immediately after opening
+        - id: recalls-async-context-for-awaited-cleanup
+          arguments:
+          - value: async-cleanup
+          expectedReturn:
+            tool: async-context-manager
+            useWhen: setup or cleanup must await
+            caution: async with must run inside async def
+        - id: rejects-unknown-need
+          arguments:
+          - value: cleanup-later
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

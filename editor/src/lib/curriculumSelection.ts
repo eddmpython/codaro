@@ -4,6 +4,7 @@ import {
   defaultRegistrySelection,
   registryContents,
   registryLesson,
+  resolveRegistryContentId,
 } from "@/lib/curriculaRegistry";
 import { CUSTOM_CURRICULUM_CATEGORY, type CustomCurriculumEntry } from "@/lib/customCurricula";
 import { draftsFromBlocks } from "@/lib/documentModel";
@@ -82,15 +83,19 @@ export async function loadCurriculumContentsState(
   const result = shouldUseApi()
     ? await optional(() => codaroApi.curriculumContents(selectedCategory), fallback)
     : { data: fallback, online: false };
+  const canonicalContentId = selectedContentId
+    ? await resolveRegistryContentId(selectedCategory, selectedContentId)
+    : null;
   return {
     contents: result.data.contents,
-    selectedContentId: selectedContentOrFirst(result.data, selectedContentId),
+    selectedContentId: selectedContentOrFirst(result.data, canonicalContentId ?? selectedContentId),
   };
 }
 
 export async function lessonFallback(category: string, contentId: string): Promise<CurriculumLessonPayload> {
   const contents = curriculumContentsFallback(category);
-  const resolvedContentId = selectedContentOrFirst(contents, contentId);
+  const canonicalContentId = await resolveRegistryContentId(category, contentId);
+  const resolvedContentId = selectedContentOrFirst(contents, canonicalContentId ?? contentId);
   return (await registryLesson(category, resolvedContentId)) ?? {
     ...fallbackLesson,
     category,

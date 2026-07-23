@@ -7,6 +7,9 @@ meta:
   badge: 중급
   packages:
   - openpyxl
+  outcomes: ["automation.excel.tables"]
+  prerequisites: ["automation.excel.workbook"]
+  estimatedMinutes: 55
   tags:
   - openpyxl
   - Table
@@ -549,3 +552,339 @@ sections:
     - "errorTitle/error 문자열로 사용자에게 친절한 가이드"
     - "freeze_panes = 'A2'로 헤더 고정, 'B2'면 A열까지 고정"
     - "Table을 쓰면 auto_filter가 자동으로 켜진다 - 일반 영역에만 auto_filter.ref 따로 지정"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: openpyxl_09-table-validation-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_table
+    - summary
+    title: Excel table header·range와 data validation 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 빈·중복 header, table 이름 충돌, validation source 누락을 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - table header는 비어 있지 않고 table 안에서 유일해야 합니다.
+    - list validation은 source identity와 적용 range를 함께 검증하세요.
+    exercise:
+      prompt: audit_table_validation(tables, validations)를 완성하세요.
+      starterCode: |-
+        def audit_table_validation(tables, validations):
+            raise NotImplementedError
+      solution: |
+        def audit_table_validation(tables, validations):
+            failures = []
+            table_names = [table["name"] for table in tables]
+            duplicate_tables = sorted({name for name in table_names if table_names.count(name) > 1})
+            invalid_tables = []
+            for table in tables:
+                headers = table.get("headers", [])
+                reasons = []
+                if not headers or any(not header for header in headers) or len(headers) != len(set(headers)):
+                    reasons.append("headers")
+                if not table.get("range"):
+                    reasons.append("range")
+                if reasons:
+                    invalid_tables.append({"name": table["name"], "reasons": reasons})
+            invalid_validations = sorted(item["range"] for item in validations if item.get("type") == "list" and not item.get("source"))
+            if duplicate_tables:
+                failures.append("table-names")
+            if invalid_tables:
+                failures.append("tables")
+            if invalid_validations:
+                failures.append("validations")
+            return {"accepted": not failures, "failures": failures, "duplicateTables": duplicate_tables, "invalidTables": invalid_tables, "invalidValidations": invalid_validations}
+      hints: *id001
+    check:
+      id: python.openpyxl.openpyxl_09.table-validation-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_09.table-validation-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_table_validation
+        cases:
+        - id: accepts-table-and-list-validation
+          arguments:
+          - value:
+            - name: Sales
+              range: A1:B3
+              headers:
+              - Month
+              - Amount
+          - value:
+            - range: A2:A3
+              type: list
+              source:
+              - Jan
+              - Feb
+          expectedReturn:
+            accepted: true
+            failures: []
+            duplicateTables: []
+            invalidTables: []
+            invalidValidations: []
+        - id: reports-duplicate-table-and-headers
+          arguments:
+          - value:
+            - name: T
+              range: A1
+              headers:
+              - A
+              - A
+            - name: T
+              range: B1
+              headers:
+              - B
+          - value: []
+          expectedReturn:
+            accepted: false
+            failures:
+            - table-names
+            - tables
+            duplicateTables:
+            - T
+            invalidTables:
+            - name: T
+              reasons:
+              - headers
+            invalidValidations: []
+        - id: reports-missing-validation-source
+          arguments:
+          - value: []
+          - value:
+            - range: B2:B10
+              type: list
+              source: []
+          expectedReturn:
+            accepted: false
+            failures:
+            - validations
+            duplicateTables: []
+            invalidTables: []
+            invalidValidations:
+            - B2:B10
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: openpyxl_09-table-row-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - openpyxl_09-table-validation-contract-mastery
+    title: 새 Excel table에 source row reconciliation 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: primary key와 row hash로 workbook table과 source를 대조한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - row 순서가 아니라 primary key와 row hash로 table을 대조하세요.
+    - source와 workbook 양쪽의 duplicate key를 따로 보고하세요.
+    exercise:
+      prompt: reconcile_table_rows(source_rows, workbook_rows, key_field)를 완성하세요.
+      starterCode: |-
+        def reconcile_table_rows(source_rows, workbook_rows, key_field):
+            raise NotImplementedError
+      solution: |
+        def reconcile_table_rows(source_rows, workbook_rows, key_field):
+            def index(rows):
+                result = {}
+                duplicates = []
+                for row in rows:
+                    key = row[key_field]
+                    if key in result:
+                        duplicates.append(key)
+                    result[key] = row["rowHash"]
+                return result, sorted(set(duplicates))
+            source, source_duplicates = index(source_rows)
+            workbook, workbook_duplicates = index(workbook_rows)
+            missing = sorted(set(source) - set(workbook))
+            unexpected = sorted(set(workbook) - set(source))
+            changed = sorted(key for key in set(source) & set(workbook) if source[key] != workbook[key])
+            return {"passed": not source_duplicates and not workbook_duplicates and not missing and not unexpected and not changed, "sourceDuplicates": source_duplicates, "workbookDuplicates": workbook_duplicates, "missing": missing, "unexpected": unexpected, "changed": changed}
+      hints: *id002
+    check:
+      id: python.openpyxl.openpyxl_09.table-row-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_09.table-row-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_table_rows
+        cases:
+        - id: accepts-reordered-identical-rows
+          arguments:
+          - value:
+            - id: a
+              rowHash: x
+            - id: b
+              rowHash: y
+          - value:
+            - id: b
+              rowHash: y
+            - id: a
+              rowHash: x
+          - value: id
+          expectedReturn:
+            passed: true
+            sourceDuplicates: []
+            workbookDuplicates: []
+            missing: []
+            unexpected: []
+            changed: []
+        - id: reports-missing-unexpected-and-changed
+          arguments:
+          - value:
+            - id: a
+              rowHash: x
+            - id: b
+              rowHash: y
+          - value:
+            - id: a
+              rowHash: z
+            - id: c
+              rowHash: q
+          - value: id
+          expectedReturn:
+            passed: false
+            sourceDuplicates: []
+            workbookDuplicates: []
+            missing:
+            - b
+            unexpected:
+            - c
+            changed:
+            - a
+        - id: reports-duplicate-primary-key
+          arguments:
+          - value:
+            - id: a
+              rowHash: x
+            - id: a
+              rowHash: x
+          - value: []
+          - value: id
+          expectedReturn:
+            passed: false
+            sourceDuplicates:
+            - a
+            workbookDuplicates: []
+            missing:
+            - a
+            unexpected: []
+            changed: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: openpyxl_09-excel-table-validation-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - openpyxl_09-table-row-reconciliation-transfer
+    title: Excel table·data validation 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: header·validation·row reconciliation 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Workbook 저장 성공과 업무 값·수식·표시의 정확성을 분리해 검증하세요.
+    - Web에서는 문서 계약을 검증하고 Local에서는 재개방한 artifact evidence를 남기세요.
+    exercise:
+      prompt: choose_table_validation_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_table_validation_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_table_validation_evidence(situation):
+            table = {'table': {'action': 'validate unique headers and range', 'evidence': 'table manifest', 'risk': 'ambiguous column'}, 'validation': {'action': 'bind type source and range', 'evidence': 'validation contract', 'risk': 'invalid user input'}, 'rows': {'action': 'reconcile primary key and row hash', 'evidence': 'missing unexpected changed', 'risk': 'silent row drift'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.openpyxl.openpyxl_09.excel-table-validation-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_09.excel-table-validation-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_table_validation_evidence
+        cases:
+        - id: recalls-table
+          arguments:
+          - value: table
+          expectedReturn:
+            action: validate unique headers and range
+            evidence: table manifest
+            risk: ambiguous column
+        - id: recalls-validation
+          arguments:
+          - value: validation
+          expectedReturn:
+            action: bind type source and range
+            evidence: validation contract
+            risk: invalid user input
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

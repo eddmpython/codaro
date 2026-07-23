@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "folium"
+canonicalRows: 11
+lessons:
+  - lessonRef: "folium/00_folium소개"
+    identityLedgerRef: "identity-ledger/folium.yml"
+    lessonContentHash: "6a6ac4edf49139ea7545a69adab0a519aa8d2e25bd3e6ee94f3548fde3b8d8b5"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/06-geo-visualization"
+    eligiblePathIds: ["geoVisualization"]
+    outcomes: ["viz.geoMaps"]
+    prerequisites: ["pandas.loadFrame"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:folium/00_folium소개:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:folium_00_folium__:v1","retrieve:folium_00_folium__:v2","retrieve:folium_00_folium__:v3"]
+    transferVariantIds: ["transfer:folium_00_folium__:near-v1","transfer:folium_00_folium__:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "folium/01_첫지도만들기"
+    identityLedgerRef: "identity-ledger/folium.yml"
+    lessonContentHash: "9dfcee78977e7626cf779dd7ef6d209a7cd218791704f142606bd3781e576773"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/06-geo-visualization"
+    eligiblePathIds: ["geoVisualization"]
+    outcomes: ["viz.geoMaps"]
+    prerequisites: ["viz.geoMaps"]
+    reinforcesOutcomeIds: ["viz.geoMaps"]
+    runtimeTier: browser
+    checkSpecId: "lesson:folium/01_첫지도만들기:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:folium_01_______:v1","retrieve:folium_01_______:v2","retrieve:folium_01_______:v3"]
+    transferVariantIds: ["transfer:folium_01_______:near-v1","transfer:folium_01_______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "folium/02_다양한마커표현"
+    identityLedgerRef: "identity-ledger/folium.yml"
+    lessonContentHash: "c9299a0fab68467dcdb34d5483f1b3fad86a470923d1a657fa46e10d91393dc3"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/06-geo-visualization"
+    eligiblePathIds: ["geoVisualization"]
+    outcomes: ["viz.geoMaps"]
+    prerequisites: ["viz.geoMaps"]
+    reinforcesOutcomeIds: ["viz.geoMaps"]
+    runtimeTier: browser
+    checkSpecId: "lesson:folium/02_다양한마커표현:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:folium_02________:v1","retrieve:folium_02________:v2","retrieve:folium_02________:v3"]
+    transferVariantIds: ["transfer:folium_02________:near-v1","transfer:folium_02________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "folium/03_도형그리기"
+    identityLedgerRef: "identity-ledger/folium.yml"
+    lessonContentHash: "d8678c29ca1f4d3b06ba62f2e476886c3262aaf1a125f9f9c3de6f89b1a8f33e"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/06-geo-visualization"
+    eligiblePathIds: ["geoVisualization"]
+    outcomes: ["viz.geoMaps"]
+    prerequisites: ["viz.geoMaps"]
+    reinforcesOutcomeIds: ["viz.geoMaps"]
+    runtimeTier: browser
+    checkSpecId: "lesson:folium/03_도형그리기:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:folium_03______:v1","retrieve:folium_03______:v2","retrieve:folium_03______:v3"]
+    transferVariantIds: ["transfer:folium_03______:near-v1","transfer:folium_03______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "folium/04_지도스타일변경"
+    identityLedgerRef: "identity-ledger/folium.yml"
+    lessonContentHash: "47566dd42d10e4f2146d3fde198f8d7e844ed84ca05e8f7e9a61f0083c886dff"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/06-geo-visualization"
+    eligiblePathIds: ["geoVisualization"]
+    outcomes: ["viz.geoMaps"]
+    prerequisites: ["viz.geoMaps"]
+    reinforcesOutcomeIds: ["viz.geoMaps"]
+    runtimeTier: browser
+    checkSpecId: "lesson:folium/04_지도스타일변경:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:folium_04________:v1","retrieve:folium_04________:v2","retrieve:folium_04________:v3"]
+    transferVariantIds: ["transfer:folium_04________:near-v1","transfer:folium_04________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "folium/05_레이어관리"
+    identityLedgerRef: "identity-ledger/folium.yml"
+    lessonContentHash: "c71a9e5077d7447e28e4a28d96437fcc3c5c494ecdb7c82f217f6fb8b635de39"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/06-geo-visualization"
+    eligiblePathIds: ["geoVisualization"]
+    outcomes: ["viz.geoMaps"]
+    prerequisites: ["viz.geoMaps"]
+    reinforcesOutcomeIds: ["viz.geoMaps"]
+    runtimeTier: browser
+    checkSpecId: "lesson:folium/05_레이어관리:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:folium_05______:v1","retrieve:folium_05______:v2","retrieve:folium_05______:v3"]
+    transferVariantIds: ["transfer:folium_05______:near-v1","transfer:folium_05______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "folium/06_GeoJSON활용"
+    identityLedgerRef: "identity-ledger/folium.yml"
+    lessonContentHash: "fe129a62d920c43e80c4520f323aafe983b4a4373e80d80028d5b5a1836eea5a"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/06-geo-visualization"
+    eligiblePathIds: ["geoVisualization"]
+    outcomes: ["viz.geoMaps"]
+    prerequisites: ["viz.geoMaps"]
+    reinforcesOutcomeIds: ["viz.geoMaps"]
+    runtimeTier: browser
+    checkSpecId: "lesson:folium/06_GeoJSON활용:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:folium_06_GeoJSON__:v1","retrieve:folium_06_GeoJSON__:v2","retrieve:folium_06_GeoJSON__:v3"]
+    transferVariantIds: ["transfer:folium_06_GeoJSON__:near-v1","transfer:folium_06_GeoJSON__:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "folium/07_단계구분도"
+    identityLedgerRef: "identity-ledger/folium.yml"
+    lessonContentHash: "106ee042a48e3785ab7076e3e850854132bcb79f531820edd96e453b2eb6bff8"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/06-geo-visualization"
+    eligiblePathIds: ["geoVisualization"]
+    outcomes: ["viz.geoMaps"]
+    prerequisites: ["viz.geoMaps"]
+    reinforcesOutcomeIds: ["viz.geoMaps"]
+    runtimeTier: browser
+    checkSpecId: "lesson:folium/07_단계구분도:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:folium_07______:v1","retrieve:folium_07______:v2","retrieve:folium_07______:v3"]
+    transferVariantIds: ["transfer:folium_07______:near-v1","transfer:folium_07______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "folium/08_히트맵"
+    identityLedgerRef: "identity-ledger/folium.yml"
+    lessonContentHash: "94cdf7cc5a0b872e4f5c60e53f011f230e8d977a997a84ce5722adc5f69eb399"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/06-geo-visualization"
+    eligiblePathIds: ["geoVisualization"]
+    outcomes: ["viz.geoMaps"]
+    prerequisites: ["viz.geoMaps"]
+    reinforcesOutcomeIds: ["viz.geoMaps"]
+    runtimeTier: browser
+    checkSpecId: "lesson:folium/08_히트맵:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:folium_08____:v1","retrieve:folium_08____:v2","retrieve:folium_08____:v3"]
+    transferVariantIds: ["transfer:folium_08____:near-v1","transfer:folium_08____:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "folium/09_마커클러스터"
+    identityLedgerRef: "identity-ledger/folium.yml"
+    lessonContentHash: "ff3714de19fcbf70b65044cffb7618a0696b7a9a82112a67ec239329c82c0aee"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/06-geo-visualization"
+    eligiblePathIds: ["geoVisualization"]
+    outcomes: ["viz.geoMaps"]
+    prerequisites: ["viz.geoMaps"]
+    reinforcesOutcomeIds: ["viz.geoMaps"]
+    runtimeTier: browser
+    checkSpecId: "lesson:folium/09_마커클러스터:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:folium_09_______:v1","retrieve:folium_09_______:v2","retrieve:folium_09_______:v3"]
+    transferVariantIds: ["transfer:folium_09_______:near-v1","transfer:folium_09_______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "folium/10_종합지도프로젝트"
+    identityLedgerRef: "identity-ledger/folium.yml"
+    lessonContentHash: "028d131b86ddff8a8fab123fc5fc02c1c0cee7afebdbc9ee24759a57df5058ac"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/06-geo-visualization"
+    eligiblePathIds: ["geoVisualization"]
+    outcomes: ["viz.geoMaps"]
+    prerequisites: ["viz.geoMaps"]
+    reinforcesOutcomeIds: ["viz.geoMaps"]
+    runtimeTier: browser
+    checkSpecId: "lesson:folium/10_종합지도프로젝트:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:folium_10_________:v1","retrieve:folium_10_________:v2","retrieve:folium_10_________:v3"]
+    transferVariantIds: ["transfer:folium_10_________:near-v1","transfer:folium_10_________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

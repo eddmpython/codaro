@@ -1,0 +1,54 @@
+schemaVersion: 1
+category: "watchSched"
+sourceCount: 10
+lessons:
+  - lessonRef: "watchSched/01_watchdog첫감시"
+    sourcePath: "curricula/python/automation/os/watchSched/01_watchdog첫감시.yaml"
+    metaId: "watchSched_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "watchSched/02_이벤트타입구분"
+    sourcePath: "curricula/python/automation/os/watchSched/02_이벤트타입구분.yaml"
+    metaId: "watchSched_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "watchSched/03_디바운스와안정화"
+    sourcePath: "curricula/python/automation/os/watchSched/03_디바운스와안정화.yaml"
+    metaId: "watchSched_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "watchSched/04_재귀감시와필터"
+    sourcePath: "curricula/python/automation/os/watchSched/04_재귀감시와필터.yaml"
+    metaId: "watchSched_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "watchSched/05_schedule간단스케줄"
+    sourcePath: "curricula/python/automation/os/watchSched/05_schedule간단스케줄.yaml"
+    metaId: "watchSched_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "watchSched/06_APScheduler소개"
+    sourcePath: "curricula/python/automation/os/watchSched/06_APScheduler소개.yaml"
+    metaId: "watchSched_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "watchSched/07_cron표현식"
+    sourcePath: "curricula/python/automation/os/watchSched/07_cron표현식.yaml"
+    metaId: "watchSched_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "watchSched/08_영속스케줄"
+    sourcePath: "curricula/python/automation/os/watchSched/08_영속스케줄.yaml"
+    metaId: "watchSched_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "watchSched/09_실패와재시도"
+    sourcePath: "curricula/python/automation/os/watchSched/09_실패와재시도.yaml"
+    metaId: "watchSched_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "watchSched/10_종합폴더감시리포터"
+    sourcePath: "curricula/python/automation/os/watchSched/10_종합폴더감시리포터.yaml"
+    metaId: "watchSched_10"
+    registryStatus: registered
+    reviewStatus: pending

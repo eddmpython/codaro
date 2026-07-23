@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "networkx"
+canonicalRows: 11
+lessons:
+  - lessonRef: "networkx/00_networkx소개"
+    identityLedgerRef: "identity-ledger/networkx.yml"
+    lessonContentHash: "5a38b3ccbd437227068f3a55b901e8b260df71977e16e233d6da736f91db9675"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/10-graph-analysis"
+    eligiblePathIds: ["graphAnalysis"]
+    outcomes: ["graph.intro"]
+    prerequisites: ["python.dictsAndSets"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:networkx/00_networkx소개:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:networkx_00_networkx__:v1","retrieve:networkx_00_networkx__:v2","retrieve:networkx_00_networkx__:v3"]
+    transferVariantIds: ["transfer:networkx_00_networkx__:near-v1","transfer:networkx_00_networkx__:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "networkx/01_첫그래프만들기"
+    identityLedgerRef: "identity-ledger/networkx.yml"
+    lessonContentHash: "e28b53256b5588329cf74f49a322803613982d7f8f7c7264088208a602a03bd5"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/10-graph-analysis"
+    eligiblePathIds: ["graphAnalysis"]
+    outcomes: ["graph.intro"]
+    prerequisites: ["graph.intro"]
+    reinforcesOutcomeIds: ["graph.intro"]
+    runtimeTier: browser
+    checkSpecId: "lesson:networkx/01_첫그래프만들기:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:networkx_01________:v1","retrieve:networkx_01________:v2","retrieve:networkx_01________:v3"]
+    transferVariantIds: ["transfer:networkx_01________:near-v1","transfer:networkx_01________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "networkx/02_방향그래프와가중치"
+    identityLedgerRef: "identity-ledger/networkx.yml"
+    lessonContentHash: "1004174813576401907602a026e9d9a804c7f88c686a0c3fa09f1f40b1b96023"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/10-graph-analysis"
+    eligiblePathIds: ["graphAnalysis"]
+    outcomes: ["graph.intro"]
+    prerequisites: ["graph.intro"]
+    reinforcesOutcomeIds: ["graph.intro"]
+    runtimeTier: browser
+    checkSpecId: "lesson:networkx/02_방향그래프와가중치:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:networkx_02__________:v1","retrieve:networkx_02__________:v2","retrieve:networkx_02__________:v3"]
+    transferVariantIds: ["transfer:networkx_02__________:near-v1","transfer:networkx_02__________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "networkx/03_최단경로찾기"
+    identityLedgerRef: "identity-ledger/networkx.yml"
+    lessonContentHash: "c463ad92bb3dd266d84052378430653fb780378b9c60d352dffbfdd3a23805e9"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/10-graph-analysis"
+    eligiblePathIds: ["graphAnalysis"]
+    outcomes: ["graph.paths"]
+    prerequisites: ["graph.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:networkx/03_최단경로찾기:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:networkx_03_______:v1","retrieve:networkx_03_______:v2","retrieve:networkx_03_______:v3"]
+    transferVariantIds: ["transfer:networkx_03_______:near-v1","transfer:networkx_03_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "networkx/04_중심성분석"
+    identityLedgerRef: "identity-ledger/networkx.yml"
+    lessonContentHash: "2d6d4fa6fe037de65f6367ec122921cb32319cc38920793c9d3858c803acd442"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/10-graph-analysis"
+    eligiblePathIds: ["graphAnalysis"]
+    outcomes: ["graph.paths"]
+    prerequisites: ["graph.paths"]
+    reinforcesOutcomeIds: ["graph.paths"]
+    runtimeTier: browser
+    checkSpecId: "lesson:networkx/04_중심성분석:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:networkx_04______:v1","retrieve:networkx_04______:v2","retrieve:networkx_04______:v3"]
+    transferVariantIds: ["transfer:networkx_04______:near-v1","transfer:networkx_04______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "networkx/05_소셜네트워크분석"
+    identityLedgerRef: "identity-ledger/networkx.yml"
+    lessonContentHash: "2bffa6525a8afb37f9706acabace9ae0e706f16e72ab58fd2aee8c25d5485dee"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/10-graph-analysis"
+    eligiblePathIds: ["graphAnalysis"]
+    outcomes: ["graph.paths","graph.community"]
+    prerequisites: ["graph.paths"]
+    reinforcesOutcomeIds: ["graph.paths"]
+    runtimeTier: browser
+    checkSpecId: "lesson:networkx/05_소셜네트워크분석:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:networkx_05_________:v1","retrieve:networkx_05_________:v2","retrieve:networkx_05_________:v3"]
+    transferVariantIds: ["transfer:networkx_05_________:near-v1","transfer:networkx_05_________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "networkx/06_연결성분석"
+    identityLedgerRef: "identity-ledger/networkx.yml"
+    lessonContentHash: "1721005d7d46043f4505a81afb6d453bb4593951a27fd4e2f8e367b3ab192a4f"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/10-graph-analysis"
+    eligiblePathIds: ["graphAnalysis"]
+    outcomes: ["graph.algorithms"]
+    prerequisites: ["graph.paths"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:networkx/06_연결성분석:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:networkx_06______:v1","retrieve:networkx_06______:v2","retrieve:networkx_06______:v3"]
+    transferVariantIds: ["transfer:networkx_06______:near-v1","transfer:networkx_06______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "networkx/07_커뮤니티탐지"
+    identityLedgerRef: "identity-ledger/networkx.yml"
+    lessonContentHash: "5f94e6cde55553bc733f4e20c187ec572ef3afd003a30a4506356aba5bc6c867"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/10-graph-analysis"
+    eligiblePathIds: ["graphAnalysis"]
+    outcomes: ["graph.community"]
+    prerequisites: ["graph.paths"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:networkx/07_커뮤니티탐지:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:networkx_07_______:v1","retrieve:networkx_07_______:v2","retrieve:networkx_07_______:v3"]
+    transferVariantIds: ["transfer:networkx_07_______:near-v1","transfer:networkx_07_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "networkx/08_그래프알고리즘"
+    identityLedgerRef: "identity-ledger/networkx.yml"
+    lessonContentHash: "5fa5ae6cb53bae4b925e6f4aa55e7d6ced3fb41ab54d1b90ff117ee0e075f831"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/10-graph-analysis"
+    eligiblePathIds: ["graphAnalysis"]
+    outcomes: ["graph.algorithms"]
+    prerequisites: ["graph.algorithms"]
+    reinforcesOutcomeIds: ["graph.algorithms"]
+    runtimeTier: browser
+    checkSpecId: "lesson:networkx/08_그래프알고리즘:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:networkx_08________:v1","retrieve:networkx_08________:v2","retrieve:networkx_08________:v3"]
+    transferVariantIds: ["transfer:networkx_08________:near-v1","transfer:networkx_08________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "networkx/09_랜덤그래프모델"
+    identityLedgerRef: "identity-ledger/networkx.yml"
+    lessonContentHash: "157da30ad711203584c7552b5f42ad4b7ea671594ec60c388de874355bce4cc0"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/10-graph-analysis"
+    eligiblePathIds: ["graphAnalysis"]
+    outcomes: ["graph.algorithms"]
+    prerequisites: ["graph.algorithms"]
+    reinforcesOutcomeIds: ["graph.algorithms"]
+    runtimeTier: browser
+    checkSpecId: "lesson:networkx/09_랜덤그래프모델:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:networkx_09________:v1","retrieve:networkx_09________:v2","retrieve:networkx_09________:v3"]
+    transferVariantIds: ["transfer:networkx_09________:near-v1","transfer:networkx_09________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "networkx/10_종합네트워크프로젝트"
+    identityLedgerRef: "identity-ledger/networkx.yml"
+    lessonContentHash: "b57e75787debdaa8f2943b07df4dbdb146c75c285579e0051be888dcddf940dc"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/10-graph-analysis"
+    eligiblePathIds: ["graphAnalysis"]
+    outcomes: ["graph.paths","graph.community","graph.algorithms"]
+    prerequisites: ["graph.community","graph.algorithms"]
+    reinforcesOutcomeIds: ["graph.community","graph.algorithms"]
+    runtimeTier: browser
+    checkSpecId: "lesson:networkx/10_종합네트워크프로젝트:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:networkx_10___________:v1","retrieve:networkx_10___________:v2","retrieve:networkx_10___________:v3"]
+    transferVariantIds: ["transfer:networkx_10___________:near-v1","transfer:networkx_10___________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

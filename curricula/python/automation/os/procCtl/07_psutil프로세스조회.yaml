@@ -358,3 +358,300 @@ sections:
     check:
       noError: 종합 관찰 dict 생성과 자식 wait가 끝나야 한다.
       resultCheck: observation이 pid, name, cmdline, parent, status 다섯 키를 모두 가져 종합 보고의 표준 형태를 완성해야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: procCtl_07-process-inventory-filter-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - current-process
+    - observation-summary
+    title: process 목록을 PID·create time identity로 필터링하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 이름만 같은 재사용 PID를 피하고 owner·command 계약을 적용한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - PID만 저장하지 말고 create time을 포함한 process identity를 사용하세요.
+    - 프로세스 이름 하나로 종료 대상을 선택하지 마세요.
+    exercise:
+      prompt: filter_process_inventory(processes, criteria)를 완성하세요.
+      starterCode: |-
+        def filter_process_inventory(processes, criteria):
+            raise NotImplementedError
+      solution: |
+        def filter_process_inventory(processes, criteria):
+            matches = []
+            rejected = []
+            for process in processes:
+                reasons = []
+                for key in ["name", "owner"]:
+                    if key in criteria and process.get(key) != criteria[key]:
+                        reasons.append(key)
+                if "commandContains" in criteria and criteria["commandContains"] not in " ".join(process.get("argv", [])):
+                    reasons.append("command")
+                identity = {"pid": process["pid"], "createTime": process["createTime"]}
+                if reasons:
+                    rejected.append({**identity, "reasons": reasons})
+                else:
+                    matches.append(identity)
+            return {"matches": matches, "rejected": rejected}
+      hints: *id001
+    check:
+      id: python.procctl.procCtl_07.process-inventory-filter.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_07.process-inventory-filter.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: filter_process_inventory
+        cases:
+        - id: matches-owner-name-and-command
+          arguments:
+          - value:
+            - pid: 10
+              createTime: 1
+              name: python
+              owner: me
+              argv:
+              - python
+              - job.py
+          - value:
+              name: python
+              owner: me
+              commandContains: job.py
+          expectedReturn:
+            matches:
+            - pid: 10
+              createTime: 1
+            rejected: []
+        - id: reports-rejection-reasons
+          arguments:
+          - value:
+            - pid: 10
+              createTime: 1
+              name: python
+              owner: other
+              argv:
+              - python
+              - other.py
+          - value:
+              name: python
+              owner: me
+              commandContains: job.py
+          expectedReturn:
+            matches: []
+            rejected:
+            - pid: 10
+              createTime: 1
+              reasons:
+              - owner
+              - command
+        - id: matches-empty-criteria
+          arguments:
+          - value:
+            - pid: 1
+              createTime: 5
+          - value: {}
+          expectedReturn:
+            matches:
+            - pid: 1
+              createTime: 5
+            rejected: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: procCtl_07-process-snapshot-diff-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - procCtl_07-process-inventory-filter-mastery
+    title: 새 process snapshot에 시작·종료·재사용 PID 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: PID와 create time 쌍으로 두 시점의 process 변화를 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - snapshot diff도 PID가 아니라 PID·create time 쌍으로 계산하세요.
+    - 재사용 PID는 단순 유지가 아니라 종료와 시작으로 함께 기록하세요.
+    exercise:
+      prompt: diff_process_snapshots(before, after)를 완성하세요.
+      starterCode: |-
+        def diff_process_snapshots(before, after):
+            raise NotImplementedError
+      solution: |
+        def diff_process_snapshots(before, after):
+            before_ids = {(item["pid"], item["createTime"]) for item in before}
+            after_ids = {(item["pid"], item["createTime"]) for item in after}
+            started = sorted([{"pid": pid, "createTime": created} for pid, created in after_ids - before_ids], key=lambda item: (item["pid"], item["createTime"]))
+            stopped = sorted([{"pid": pid, "createTime": created} for pid, created in before_ids - after_ids], key=lambda item: (item["pid"], item["createTime"]))
+            reused = sorted(pid for pid in {item["pid"] for item in before} & {item["pid"] for item in after} if {item["createTime"] for item in before if item["pid"] == pid} != {item["createTime"] for item in after if item["pid"] == pid})
+            return {"started": started, "stopped": stopped, "reusedPids": reused}
+      hints: *id002
+    check:
+      id: python.procctl.procCtl_07.process-snapshot-diff.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_07.process-snapshot-diff.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: diff_process_snapshots
+        cases:
+        - id: finds-start-and-stop
+          arguments:
+          - value:
+            - pid: 1
+              createTime: 10
+          - value:
+            - pid: 2
+              createTime: 20
+          expectedReturn:
+            started:
+            - pid: 2
+              createTime: 20
+            stopped:
+            - pid: 1
+              createTime: 10
+            reusedPids: []
+        - id: finds-reused-pid
+          arguments:
+          - value:
+            - pid: 7
+              createTime: 10
+          - value:
+            - pid: 7
+              createTime: 30
+          expectedReturn:
+            started:
+            - pid: 7
+              createTime: 30
+            stopped:
+            - pid: 7
+              createTime: 10
+            reusedPids:
+            - 7
+        - id: keeps-stable-process
+          arguments:
+          - value:
+            - pid: 1
+              createTime: 10
+          - value:
+            - pid: 1
+              createTime: 10
+          expectedReturn:
+            started: []
+            stopped: []
+            reusedPids: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: procCtl_07-process-inventory-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - procCtl_07-process-snapshot-diff-transfer
+    title: process 조회 identity 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 검색·snapshot diff·소유권 확인 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - process 실행 성공과 업무 결과물 성공을 같은 것으로 처리하지 마세요.
+    - 명령 identity·제한 시간·산출물 evidence·남는 risk를 함께 기록하세요.
+    exercise:
+      prompt: choose_process_identity(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_process_identity(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_process_identity(situation):
+            table = {'search': {'action': 'filter name owner argv', 'evidence': 'PID and create time', 'risk': 'name collision'}, 'diff': {'action': 'compare identity pairs', 'evidence': 'started stopped reused', 'risk': 'PID reuse'}, 'control': {'action': 'revalidate identity before signal', 'evidence': 'fresh create time and owner', 'risk': 'wrong process'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.procctl.procCtl_07.process-inventory-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_07.process-inventory-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_process_identity
+        cases:
+        - id: recalls-search
+          arguments:
+          - value: search
+          expectedReturn:
+            action: filter name owner argv
+            evidence: PID and create time
+            risk: name collision
+        - id: recalls-diff
+          arguments:
+          - value: diff
+          expectedReturn:
+            action: compare identity pairs
+            evidence: started stopped reused
+            risk: PID reuse
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

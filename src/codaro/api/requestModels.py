@@ -82,11 +82,21 @@ class CurriculumProgressRequest(BaseModel):
     totalMissions: int = 0
 
 
-class LearnerPredictionPayload(BaseModel):
-    expectedShape: str = ""
-    expectedDtype: str = ""
-    expectedValue: str = ""
-    expectedError: str = ""
+class CurriculumEvidenceArchiveRequest(BaseModel):
+    archive: dict[str, Any]
+
+
+class CurriculumEvidenceEventRequest(BaseModel):
+    event: dict[str, Any]
+
+
+class CurriculumLearningArchiveRequest(BaseModel):
+    archive: dict[str, Any]
+
+
+class LocalStrongCheckRequest(BaseModel):
+    checkSpec: dict[str, Any]
+    source: str
 
 
 class CheckExerciseRequest(BaseModel):
@@ -102,7 +112,6 @@ class CheckExerciseRequest(BaseModel):
     category: str = ""
     contentId: str = ""
     sectionId: str = ""
-    prediction: LearnerPredictionPayload | None = None
 
 
 class MasterPlanRequest(BaseModel):
@@ -124,43 +133,3 @@ class OutcomeValidationRequest(BaseModel):
 
 class ReviewResultRequest(BaseModel):
     success: bool = True
-
-
-class AssignmentCreateRequest(BaseModel):
-    title: str
-    description: str = ""
-    material: dict[str, Any]
-    dueAt: str | None = None
-    settings: dict[str, Any] | None = None
-
-
-class AssignmentPublishRequest(BaseModel):
-    tutorToken: str
-
-
-class AssignmentJoinRequest(BaseModel):
-    joinCode: str
-    studentTag: str
-    displayName: str = ""
-
-
-class AssignmentEventRequest(BaseModel):
-    assignmentId: str
-    participantId: str
-    participantToken: str
-    eventType: str
-    eventId: str = ""
-    sectionId: str = ""
-    category: str = ""
-    contentId: str = ""
-    payload: dict[str, Any] = Field(default_factory=dict)
-
-
-class AssignmentCommentRequest(BaseModel):
-    assignmentId: str
-    body: str
-    sectionId: str = ""
-    targetParticipantId: str = ""
-    tutorToken: str = ""
-    participantId: str = ""
-    participantToken: str = ""

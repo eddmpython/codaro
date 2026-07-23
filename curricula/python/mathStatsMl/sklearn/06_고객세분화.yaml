@@ -653,3 +653,269 @@ sections:
     type: noError
     noError: 업무 흐름 검증에서 `conservativePipeline` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sklearn_06-cluster-assignment-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 고객을 nearest centroid에 배정하고 거리 근거 남기기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 동점 규칙과 squared distance를 명시한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 거리 metric과 feature scale이 cluster를 결정합니다.
+    - 동점 tie-breaker를 고정해 재현 가능하게 만드세요.
+    exercise:
+      prompt: assign_clusters(points, centroids)를 완성하세요.
+      starterCode: |-
+        def assign_clusters(points, centroids):
+            raise NotImplementedError
+      solution: |
+        def assign_clusters(points, centroids):
+            if not centroids or any(len(point)!=len(centroids[0]) for point in points) or any(len(center)!=len(centroids[0]) for center in centroids): raise ValueError("shape mismatch")
+            result=[]
+            for point in points:
+                distances=[sum((value-center[index])**2 for index,value in enumerate(point)) for center in centroids]
+                cluster=min(range(len(distances)),key=lambda index:(distances[index],index))
+                result.append({"cluster":cluster,"squaredDistance":round(distances[cluster],6)})
+            return result
+      hints: *id001
+    check:
+      id: python.sklearn.sklearn_06.cluster-assignment.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_06.cluster-assignment.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: assign_clusters
+        cases:
+        - id: assigns-nearest-centroid
+          arguments:
+          - value:
+            - - 0
+              - 0
+            - - 9
+              - 9
+          - value:
+            - - 0
+              - 1
+            - - 10
+              - 10
+          expectedReturn:
+          - cluster: 0
+            squaredDistance: 1
+          - cluster: 1
+            squaredDistance: 2
+        - id: breaks-tie-by-index
+          arguments:
+          - value:
+            - - 1
+          - value:
+            - - 0
+            - - 2
+          expectedReturn:
+          - cluster: 0
+            squaredDistance: 1
+        - id: rejects-empty-centroids
+          arguments:
+          - value:
+            - - 1
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sklearn_06-cluster-profile-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_06-cluster-assignment-mastery
+    title: 새 segment에 cluster profile 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: cluster별 count와 feature mean을 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - cluster 이름은 profile을 본 뒤 업무적으로 해석하세요.
+    - segment label을 사람의 본질적 유형으로 표현하지 마세요.
+    exercise:
+      prompt: profile_clusters(points, assignments)를 완성하세요.
+      starterCode: |-
+        def profile_clusters(points, assignments):
+            raise NotImplementedError
+      solution: |
+        def profile_clusters(points, assignments):
+            if len(points)!=len(assignments) or not points: raise ValueError("invalid cluster rows")
+            grouped={}
+            for point,label in zip(points,assignments): grouped.setdefault(label,[]).append(point)
+            return {str(label):{"count":len(rows),"means":[round(sum(row[index] for row in rows)/len(rows),4) for index in range(len(rows[0]))]} for label,rows in sorted(grouped.items())}
+      hints: *id002
+    check:
+      id: python.sklearn.sklearn_06.cluster-profile.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_06.cluster-profile.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: profile_clusters
+        cases:
+        - id: profiles-segments
+          arguments:
+          - value:
+            - - 1
+              - 2
+            - - 3
+              - 4
+            - - 10
+              - 20
+          - value:
+            - 0
+            - 0
+            - 1
+          expectedReturn:
+            '0':
+              count: 2
+              means:
+              - 2.0
+              - 3.0
+            '1':
+              count: 1
+              means:
+              - 10.0
+              - 20.0
+        - id: profiles-one-cluster
+          arguments:
+          - value:
+            - - 2
+              - 4
+          - value:
+            - 5
+          expectedReturn:
+            '5':
+              count: 1
+              means:
+              - 2.0
+              - 4.0
+        - id: rejects-length-mismatch
+          arguments:
+          - value:
+            - - 1
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sklearn_06-clustering-evidence-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_06-cluster-profile-transfer
+    title: 군집화 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 거리·k·해석 안정성을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 학습 데이터와 평가 데이터의 경계를 먼저 확인하세요.
+    - 한 metric이나 예측을 실제 진단·인과 결론으로 확대하지 마세요.
+    exercise:
+      prompt: choose_clustering_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_clustering_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_clustering_evidence(situation):
+            table = {'numeric-segments': {'method': 'scaled k-means', 'evidence': 'inertia silhouette profiles', 'risk': 'scale dominance'}, 'choose-k': {'method': 'stability and business utility', 'evidence': 'multiple seeds', 'risk': 'single elbow'}, 'segment-label': {'method': 'post-hoc profile', 'evidence': 'feature means counts', 'risk': 'stereotyping'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sklearn.sklearn_06.clustering-evidence.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_06.clustering-evidence.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_clustering_evidence
+        cases:
+        - id: recalls-numeric-segments
+          arguments:
+          - value: numeric-segments
+          expectedReturn:
+            method: scaled k-means
+            evidence: inertia silhouette profiles
+            risk: scale dominance
+        - id: recalls-choose-k
+          arguments:
+          - value: choose-k
+          expectedReturn:
+            method: stability and business utility
+            evidence: multiple seeds
+            risk: single elbow
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

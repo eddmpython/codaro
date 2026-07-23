@@ -583,3 +583,281 @@ sections:
     type: noError
     noError: 업무 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 업무 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: polars_05-streaming-session-rank-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: 음악 청취 event를 사용자별 재생 수·시간으로 집계하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: user·track group 집계와 사용자 안 rank를 한 결과로 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - event row를 바로 rank하지 말고 user·track으로 먼저 집계하세요.
+    - rank는 사용자마다 1부터 다시 시작합니다.
+    exercise:
+      prompt: rank_streaming_tracks(events)를 완성해 user별 track, plays, seconds, rank를 반환하세요.
+      starterCode: |-
+        def rank_streaming_tracks(events):
+            raise NotImplementedError
+      solution: |
+        def rank_streaming_tracks(events):
+            grouped = {}
+            for event in events:
+                key = (event["user"], event["track"])
+                bucket = grouped.setdefault(key, {"plays": 0, "seconds": 0})
+                bucket["plays"] += 1
+                bucket["seconds"] += event["seconds"]
+            users = sorted({key[0] for key in grouped})
+            result = []
+            for user in users:
+                tracks = [(track, grouped[(user, track)]) for owner, track in grouped if owner == user]
+                tracks.sort(key=lambda item: (-item[1]["seconds"], -item[1]["plays"], item[0]))
+                for index, (track, values) in enumerate(tracks, start=1):
+                    result.append({"user": user, "track": track, **values, "rank": index})
+            return result
+      hints: *id001
+    check:
+      id: python.polars.polars_05.streaming-session-rank.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_05.streaming-session-rank.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: rank_streaming_tracks
+        cases:
+        - id: aggregates-before-user-rank
+          arguments:
+          - value:
+            - user: u1
+              track: A
+              seconds: 30
+            - user: u1
+              track: A
+              seconds: 20
+            - user: u1
+              track: B
+              seconds: 60
+            - user: u2
+              track: A
+              seconds: 10
+          expectedReturn:
+          - user: u1
+            track: B
+            plays: 1
+            seconds: 60
+            rank: 1
+          - user: u1
+            track: A
+            plays: 2
+            seconds: 50
+            rank: 2
+          - user: u2
+            track: A
+            plays: 1
+            seconds: 10
+            rank: 1
+        - id: handles-empty-events
+          arguments:
+          - value: []
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: polars_05-sessionize-events-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_05-streaming-session-rank-mastery
+    title: 새 event stream을 시간 gap 기준 session으로 나누기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 사용자 group window를 gap이 threshold보다 큰 지점에서 session id 증가로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - user별 time 정렬 뒤 gap을 계산하세요.
+    - gap == threshold는 같은 session에 남깁니다.
+    exercise:
+      prompt: sessionize_events(events, gap_threshold)를 완성해 user, time, session 목록을 반환하세요.
+      starterCode: |-
+        def sessionize_events(events, gap_threshold):
+            raise NotImplementedError
+      solution: |
+        def sessionize_events(events, gap_threshold):
+            if gap_threshold < 0:
+                raise ValueError("gap threshold must be nonnegative")
+            grouped = {}
+            for event in events:
+                grouped.setdefault(event["user"], []).append(event)
+            result = []
+            for user, group in sorted(grouped.items()):
+                previous = None
+                session = 0
+                for event in sorted(group, key=lambda item: item["time"]):
+                    if previous is None or event["time"] - previous > gap_threshold:
+                        session += 1
+                    result.append({"user": user, "time": event["time"], "session": session})
+                    previous = event["time"]
+            return result
+      hints: *id002
+    check:
+      id: python.polars.polars_05.sessionize-events.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_05.sessionize-events.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: sessionize_events
+        cases:
+        - id: splits-on-large-gap-per-user
+          arguments:
+          - value:
+            - user: a
+              time: 20
+            - user: a
+              time: 0
+            - user: a
+              time: 5
+            - user: b
+              time: 100
+          - value: 10
+          expectedReturn:
+          - user: a
+            time: 0
+            session: 1
+          - user: a
+            time: 5
+            session: 1
+          - user: a
+            time: 20
+            session: 2
+          - user: b
+            time: 100
+            session: 1
+        - id: handles-empty-stream
+          arguments:
+          - value: []
+          - value: 10
+          expectedReturn: []
+        - id: rejects-negative-gap
+          arguments:
+          - value: []
+          - value: -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: polars_05-streaming-group-rule-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_05-sessionize-events-transfer
+    title: event stream 집계 단위 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: event, user-track aggregate, session 수준의 key와 증거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 질문에 맞는 row grain을 먼저 고정하세요.
+    - session 결과에는 사용한 gap threshold를 반드시 남기세요.
+    exercise:
+      prompt: choose_streaming_grain(situation)를 완성해 grain, key, evidence를 반환하세요.
+      starterCode: |-
+        def choose_streaming_grain(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_streaming_grain(situation):
+            table = {'raw-play': {'grain': 'event', 'key': 'event id', 'evidence': 'timestamp and duration'}, 'favorite-track': {'grain': 'user-track aggregate', 'key': 'user, track', 'evidence': 'play and second totals'}, 'visit-behavior': {'grain': 'session', 'key': 'user, session id', 'evidence': 'gap threshold'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.polars.polars_05.streaming-group-rule.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_05.streaming-group-rule.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_streaming_grain
+        cases:
+        - id: recalls-raw-play
+          arguments:
+          - value: raw-play
+          expectedReturn:
+            grain: event
+            key: event id
+            evidence: timestamp and duration
+        - id: recalls-favorite-track
+          arguments:
+          - value: favorite-track
+          expectedReturn:
+            grain: user-track aggregate
+            key: user, track
+            evidence: play and second totals
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

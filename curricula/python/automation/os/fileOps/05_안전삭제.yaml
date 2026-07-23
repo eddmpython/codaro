@@ -350,3 +350,308 @@ sections:
     check:
       noError: 함수 정의와 dry-run, 실행 호출이 격리 공간에서 끝나야 한다.
       resultCheck: 종합 결과 dict가 candidates와 removed를 모두 같은 두 경로로 채워야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: fileOps_05-safe-delete-plan-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - unlink-once
+    - dry-run-summary
+    title: 삭제 대상을 quarantine로 이동하는 안전 계획 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 허용 root·보존 기간·manifest가 있는 경우에만 삭제 후보를 준비한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 바로 unlink하지 말고 quarantine 이동과 보존 기간을 먼저 적용하세요.
+    - 열려 있는 파일과 허용 root 밖 path는 삭제 계획에서 제외하세요.
+    exercise:
+      prompt: plan_safe_delete(items, allowed_root, quarantine_root, retention_days)를 완성하세요.
+      starterCode: |-
+        def plan_safe_delete(items, allowed_root, quarantine_root, retention_days):
+            raise NotImplementedError
+      solution: |
+        def plan_safe_delete(items, allowed_root, quarantine_root, retention_days):
+            if retention_days <= 0:
+                raise ValueError("retention must be positive")
+            accepted = []
+            rejected = []
+            prefix = allowed_root.rstrip("/") + "/"
+            for item in items:
+                if not item["path"].startswith(prefix):
+                    rejected.append({"path": item["path"], "reason": "root"})
+                elif item.get("open", False):
+                    rejected.append({"path": item["path"], "reason": "open-file"})
+                else:
+                    destination = quarantine_root.rstrip("/") + "/" + item["path"][len(prefix) :]
+                    accepted.append({"source": item["path"], "quarantine": destination, "hash": item["hash"]})
+            return {"ready": not rejected, "moves": accepted, "rejected": rejected, "retentionDays": retention_days}
+      hints: *id001
+    check:
+      id: python.fileops.fileOps_05.safe-delete-plan.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_05.safe-delete-plan.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_safe_delete
+        cases:
+        - id: plans-quarantine-move
+          arguments:
+          - value:
+            - path: /root/old.txt
+              hash: abc
+              open: false
+          - value: /root
+          - value: /trash
+          - value: 30
+          expectedReturn:
+            ready: true
+            moves:
+            - source: /root/old.txt
+              quarantine: /trash/old.txt
+              hash: abc
+            rejected: []
+            retentionDays: 30
+        - id: rejects-outside-and-open-files
+          arguments:
+          - value:
+            - path: /other/x
+              hash: x
+            - path: /root/open
+              hash: o
+              open: true
+          - value: /root
+          - value: /trash
+          - value: 7
+          expectedReturn:
+            ready: false
+            moves: []
+            rejected:
+            - path: /other/x
+              reason: root
+            - path: /root/open
+              reason: open-file
+            retentionDays: 7
+        - id: rejects-zero-retention
+          arguments:
+          - value: []
+          - value: /root
+          - value: /trash
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: fileOps_05-quarantine-purge-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - fileOps_05-safe-delete-plan-mastery
+    title: 새 quarantine purge에 보존 기간·승인·hash 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 만료되고 manifest hash가 일치하며 승인된 항목만 영구 삭제한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 영구 삭제는 학습 확인 클릭과 달리 명시적 안전 승인이 필요합니다.
+    - quarantine 이후 변경된 파일은 manifest hash 불일치로 purge를 막으세요.
+    exercise:
+      prompt: authorize_quarantine_purge(items, now_day, approved_ids)를 완성하세요.
+      starterCode: |-
+        def authorize_quarantine_purge(items, now_day, approved_ids):
+            raise NotImplementedError
+      solution: |
+        def authorize_quarantine_purge(items, now_day, approved_ids):
+            approved = set(approved_ids)
+            purge = []
+            blocked = []
+            for item in items:
+                reasons = []
+                if item["id"] not in approved:
+                    reasons.append("approval")
+                if item["purgeAfterDay"] > now_day:
+                    reasons.append("retention")
+                if item.get("currentHash") != item.get("manifestHash"):
+                    reasons.append("hash")
+                if reasons:
+                    blocked.append({"id": item["id"], "reasons": reasons})
+                else:
+                    purge.append(item["id"])
+            return {"authorized": purge, "blocked": blocked}
+      hints: *id002
+    check:
+      id: python.fileops.fileOps_05.quarantine-purge-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_05.quarantine-purge-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: authorize_quarantine_purge
+        cases:
+        - id: authorizes-expired-approved-item
+          arguments:
+          - value:
+            - id: a
+              purgeAfterDay: 10
+              currentHash: x
+              manifestHash: x
+          - value: 10
+          - value:
+            - a
+          expectedReturn:
+            authorized:
+            - a
+            blocked: []
+        - id: reports-all-blocking-reasons
+          arguments:
+          - value:
+            - id: a
+              purgeAfterDay: 20
+              currentHash: y
+              manifestHash: x
+          - value: 10
+          - value: []
+          expectedReturn:
+            authorized: []
+            blocked:
+            - id: a
+              reasons:
+              - approval
+              - retention
+              - hash
+        - id: separates-authorized-and-blocked
+          arguments:
+          - value:
+            - id: a
+              purgeAfterDay: 1
+              currentHash: x
+              manifestHash: x
+            - id: b
+              purgeAfterDay: 1
+              currentHash: x
+              manifestHash: x
+          - value: 2
+          - value:
+            - a
+          expectedReturn:
+            authorized:
+            - a
+            blocked:
+            - id: b
+              reasons:
+              - approval
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: fileOps_05-safe-delete-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - fileOps_05-quarantine-purge-audit-transfer
+    title: 안전 삭제 단계 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: quarantine·retention·purge 승인 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 파일 action 전에 root·충돌·dry run 계약을 확인하세요.
+    - 실행 횟수가 아니라 source와 destination artifact identity로 결과를 판정하세요.
+    exercise:
+      prompt: choose_safe_delete_policy(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_safe_delete_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_safe_delete_policy(situation):
+            table = {'prepare': {'action': 'validate root and open state', 'evidence': 'candidate descriptor', 'risk': 'wrong file'}, 'quarantine': {'action': 'move and record hash', 'evidence': 'reversible manifest', 'risk': 'lost recovery'}, 'purge': {'action': 'require expiry hash and approval', 'evidence': 'purge authorization', 'risk': 'irreversible deletion'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.fileops.fileOps_05.safe-delete-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_05.safe-delete-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_safe_delete_policy
+        cases:
+        - id: recalls-prepare
+          arguments:
+          - value: prepare
+          expectedReturn:
+            action: validate root and open state
+            evidence: candidate descriptor
+            risk: wrong file
+        - id: recalls-quarantine
+          arguments:
+          - value: quarantine
+          expectedReturn:
+            action: move and record hash
+            evidence: reversible manifest
+            risk: lost recovery
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

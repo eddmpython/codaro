@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable, Iterable, Mapping
 import time
 
 from .analyticsTimeline import AnalyticsTimeline, buildSnapshot
@@ -26,19 +27,25 @@ class CurriculumAnalyticsFlow:
         learnerStateStore: LearnerStateStore | None,
         analyticsTimeline: AnalyticsTimeline,
         refreshIntervalSeconds: float = 30.0,
+        learningEvents: Callable[[], Iterable[Mapping[str, object]]] | None = None,
     ) -> None:
         self._curriculumOs = curriculumOs
         self._progressTracker = progressTracker
         self._learnerStateStore = learnerStateStore
         self._analyticsTimeline = analyticsTimeline
         self._refreshIntervalSeconds = refreshIntervalSeconds
+        self._learningEvents = learningEvents or (lambda: ())
         self._lastRefreshAt = 0.0
 
     def masteryReport(self) -> MasteryReport:
         taxonomy = self._curriculumOs.taxonomy()
         graph = self._curriculumOs.graph()
-        validated = self._progressTracker.listValidatedOutcomes()
-        return computeMastery(graph, taxonomy, self._progressTracker, validated)
+        return computeMastery(
+            graph,
+            taxonomy,
+            self._progressTracker,
+            learningEvents=self._learningEvents(),
+        )
 
     def unifiedMasteryReport(self) -> UnifiedMasteryReport:
         taxonomy = self._curriculumOs.taxonomy()
@@ -48,6 +55,7 @@ class CurriculumAnalyticsFlow:
             self._learnerStateStore,
             taxonomy,
             graph,
+            learningEvents=self._learningEvents(),
         )
 
     def analyticsPayload(self, *, days: int = 30) -> dict[str, object]:
@@ -106,6 +114,7 @@ def buildOutcomeMasteryPayload(
     progressTracker: ProgressTracker,
     domain: str | None = None,
     minLevel: float = 0.0,
+    learningEvents: Iterable[Mapping[str, object]] = (),
 ) -> dict[str, object]:
     taxonomy = curriculumOs.taxonomy()
     if domain and not taxonomy.domainById(domain):
@@ -117,7 +126,7 @@ def buildOutcomeMasteryPayload(
         curriculumOs.graph(),
         taxonomy,
         progressTracker,
-        progressTracker.listValidatedOutcomes(),
+        learningEvents=learningEvents,
     )
     outcomes = [
         entry.model_dump()

@@ -322,3 +322,261 @@ sections:
     type: noError
     noError: 실습에서 `waitDist` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 실습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: scipy_01-distribution-standardization-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load
+    - practice
+    title: 확률분포 관측값을 z-score로 표준화하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 평균·표준편차 계약을 검사하고 관측값 위치를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 표준편차가 0이면 분포 위치를 정의하지 마세요.
+    - z-score는 단위를 제거하지만 정규성을 증명하지 않습니다.
+    exercise:
+      prompt: standardize_observations(values, mean, std)를 완성하세요.
+      starterCode: |-
+        def standardize_observations(values, mean, std):
+            raise NotImplementedError
+      solution: |
+        def standardize_observations(values, mean, std):
+            if std <= 0: raise ValueError("std must be positive")
+            scores = [round((value-mean)/std, 4) for value in values]
+            return {"scores": scores, "belowMean": sum(score < 0 for score in scores), "aboveMean": sum(score > 0 for score in scores)}
+      hints: *id001
+    check:
+      id: python.scipy.scipy_01.distribution-standardization.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_01.distribution-standardization.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: standardize_observations
+        cases:
+        - id: standardizes-values
+          arguments:
+          - value:
+            - 8
+            - 10
+            - 14
+          - value: 10
+          - value: 2
+          expectedReturn:
+            scores:
+            - -1.0
+            - 0.0
+            - 2.0
+            belowMean: 1
+            aboveMean: 1
+        - id: handles-empty
+          arguments:
+          - value: []
+          - value: 0
+          - value: 1
+          expectedReturn:
+            scores: []
+            belowMean: 0
+            aboveMean: 0
+        - id: rejects-zero-std
+          arguments:
+          - value:
+            - 1
+          - value: 0
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: scipy_01-empirical-quantiles-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_01-distribution-standardization-mastery
+    title: 새 서비스 지연 데이터에 분위수 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 정렬된 표본에서 nearest-rank 분위수와 exceedance count를 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 분위수 method를 nearest-rank로 명시하세요.
+    - 분포 모수와 경험적 분위수를 같은 것으로 부르지 마세요.
+    exercise:
+      prompt: empirical_quantiles(values, probabilities)를 완성하세요.
+      starterCode: |-
+        def empirical_quantiles(values, probabilities):
+            raise NotImplementedError
+      solution: |
+        def empirical_quantiles(values, probabilities):
+            import math
+            if not values or any(not 0 < probability <= 1 for probability in probabilities): raise ValueError("invalid empirical quantile input")
+            ordered = sorted(values)
+            quantiles = {}
+            for probability in probabilities:
+                index = max(0, math.ceil(probability*len(ordered))-1)
+                quantiles[str(probability)] = ordered[index]
+            return {"count": len(ordered), "quantiles": quantiles, "minimum": ordered[0], "maximum": ordered[-1]}
+      hints: *id002
+    check:
+      id: python.scipy.scipy_01.empirical-quantiles.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_01.empirical-quantiles.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: empirical_quantiles
+        cases:
+        - id: computes-nearest-rank
+          arguments:
+          - value:
+            - 5
+            - 1
+            - 9
+            - 3
+          - value:
+            - 0.5
+            - 0.75
+            - 1.0
+          expectedReturn:
+            count: 4
+            quantiles:
+              '0.5': 3
+              '0.75': 5
+              '1.0': 9
+            minimum: 1
+            maximum: 9
+        - id: handles-single-sample
+          arguments:
+          - value:
+            - 7
+          - value:
+            - 0.5
+          expectedReturn:
+            count: 1
+            quantiles:
+              '0.5': 7
+            minimum: 7
+            maximum: 7
+        - id: rejects-empty
+          arguments:
+          - value: []
+          - value:
+            - 0.5
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: scipy_01-distribution-evidence-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_01-empirical-quantiles-transfer
+    title: 분포 증거 선택 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 모수 분포와 경험 분포를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 수치 방법의 입력 가정과 오차 근거를 함께 남기세요.
+    - p-value나 최적화 성공 flag 하나를 결론으로 사용하지 마세요.
+    exercise:
+      prompt: choose_distribution_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_distribution_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_distribution_evidence(situation):
+            table = {'known-normal-model': {'method': 'z-score and CDF', 'evidence': 'mean std assumptions', 'risk': 'unverified normality'}, 'service-tail': {'method': 'empirical quantiles', 'evidence': 'sample window and n', 'risk': 'small tail sample'}, 'rare-event': {'method': 'binomial or Poisson with exposure', 'evidence': 'rate denominator', 'risk': 'independence'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.scipy.scipy_01.distribution-evidence.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_01.distribution-evidence.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_distribution_evidence
+        cases:
+        - id: recalls-known-normal-model
+          arguments:
+          - value: known-normal-model
+          expectedReturn:
+            method: z-score and CDF
+            evidence: mean std assumptions
+            risk: unverified normality
+        - id: recalls-service-tail
+          arguments:
+          - value: service-tail
+          expectedReturn:
+            method: empirical quantiles
+            evidence: sample window and n
+            risk: small tail sample
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

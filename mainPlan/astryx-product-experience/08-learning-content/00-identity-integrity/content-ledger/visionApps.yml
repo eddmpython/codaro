@@ -1,0 +1,194 @@
+schemaVersion: 1
+category: "visionApps"
+canonicalRows: 10
+lessons:
+  - lessonRef: "visionApps/01_문서스캐너"
+    identityLedgerRef: "identity-ledger/visionApps.yml"
+    lessonContentHash: "76e5a0ba56d376ec1393ac7b93b520b6d208be533b875dd72eb71ae571f82421"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/15-vision-automation"
+    eligiblePathIds: ["visionAutomation"]
+    outcomes: ["visionApps.documents"]
+    prerequisites: ["vision.opencvBasics","vision.filters"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:visionApps/01_문서스캐너:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionApps_01______:v1","retrieve:visionApps_01______:v2","retrieve:visionApps_01______:v3"]
+    transferVariantIds: ["transfer:visionApps_01______:near-v1","transfer:visionApps_01______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionApps/02_QR바코드리더"
+    identityLedgerRef: "identity-ledger/visionApps.yml"
+    lessonContentHash: "02482e60b560a809397fbb3ea89abe2b1b3058c635eb7750adb71e9b971cf203"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/15-vision-automation"
+    eligiblePathIds: ["visionAutomation"]
+    outcomes: ["visionApps.documents"]
+    prerequisites: ["vision.opencvBasics"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:visionApps/02_QR바코드리더:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionApps_02_QR_____:v1","retrieve:visionApps_02_QR_____:v2","retrieve:visionApps_02_QR_____:v3"]
+    transferVariantIds: ["transfer:visionApps_02_QR_____:near-v1","transfer:visionApps_02_QR_____:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionApps/03_OCR기초"
+    identityLedgerRef: "identity-ledger/visionApps.yml"
+    lessonContentHash: "26141af95996a5e42026a53bb0a1de5a3337cce987a1bda24150455844ab659b"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/15-vision-automation"
+    eligiblePathIds: ["visionAutomation"]
+    outcomes: ["visionApps.documents"]
+    prerequisites: ["vision.opencvBasics"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:visionApps/03_OCR기초:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionApps_03_OCR__:v1","retrieve:visionApps_03_OCR__:v2","retrieve:visionApps_03_OCR__:v3"]
+    transferVariantIds: ["transfer:visionApps_03_OCR__:near-v1","transfer:visionApps_03_OCR__:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionApps/04_한국어OCR"
+    identityLedgerRef: "identity-ledger/visionApps.yml"
+    lessonContentHash: "730cdadf4e3b78b3401e4574cedfb261aaa9e1446fe5da7ce7a8a5e48bad3e08"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/15-vision-automation"
+    eligiblePathIds: ["visionAutomation"]
+    outcomes: ["visionApps.documents"]
+    prerequisites: ["visionApps.documents"]
+    reinforcesOutcomeIds: ["visionApps.documents"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionApps/04_한국어OCR:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionApps_04____OCR:v1","retrieve:visionApps_04____OCR:v2","retrieve:visionApps_04____OCR:v3"]
+    transferVariantIds: ["transfer:visionApps_04____OCR:near-v1","transfer:visionApps_04____OCR:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionApps/05_얼굴검출모자이크"
+    identityLedgerRef: "identity-ledger/visionApps.yml"
+    lessonContentHash: "135ca3868349defe10e8da739a5dd7cf8aeec8875a0dfc3d92eb6bcaba4f72bd"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/15-vision-automation"
+    eligiblePathIds: ["visionAutomation"]
+    outcomes: ["visionApps.faceMedia"]
+    prerequisites: ["vision.opencvBasics"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:visionApps/05_얼굴검출모자이크:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionApps_05_________:v1","retrieve:visionApps_05_________:v2","retrieve:visionApps_05_________:v3"]
+    transferVariantIds: ["transfer:visionApps_05_________:near-v1","transfer:visionApps_05_________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionApps/06_얼굴임베딩비교"
+    identityLedgerRef: "identity-ledger/visionApps.yml"
+    lessonContentHash: "922e086a898f32ef627702558bd6ed2691f5e24bc5d527395698a583e66c0f7f"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/15-vision-automation"
+    eligiblePathIds: ["visionAutomation"]
+    outcomes: ["visionApps.faceMedia"]
+    prerequisites: ["visionApps.faceMedia"]
+    reinforcesOutcomeIds: ["visionApps.faceMedia"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionApps/06_얼굴임베딩비교:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionApps_06________:v1","retrieve:visionApps_06________:v2","retrieve:visionApps_06________:v3"]
+    transferVariantIds: ["transfer:visionApps_06________:near-v1","transfer:visionApps_06________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionApps/07_이미지중복검출"
+    identityLedgerRef: "identity-ledger/visionApps.yml"
+    lessonContentHash: "fa2318a7b74f1a335a165699211a22b99042eeed514fa236ec5fa14f0df429b3"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/15-vision-automation"
+    eligiblePathIds: ["visionAutomation"]
+    outcomes: ["visionApps.faceMedia"]
+    prerequisites: ["visionApps.faceMedia"]
+    reinforcesOutcomeIds: ["visionApps.faceMedia"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionApps/07_이미지중복검출:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionApps_07________:v1","retrieve:visionApps_07________:v2","retrieve:visionApps_07________:v3"]
+    transferVariantIds: ["transfer:visionApps_07________:near-v1","transfer:visionApps_07________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionApps/08_영상자동썸네일"
+    identityLedgerRef: "identity-ledger/visionApps.yml"
+    lessonContentHash: "35cb2a7b44190c1caf5fc923785d9c7df6cbb5f2767e84d381b9e1f998f9b9ae"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/15-vision-automation"
+    eligiblePathIds: ["visionAutomation"]
+    outcomes: ["visionApps.faceMedia"]
+    prerequisites: ["vision.video"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:visionApps/08_영상자동썸네일:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionApps_08________:v1","retrieve:visionApps_08________:v2","retrieve:visionApps_08________:v3"]
+    transferVariantIds: ["transfer:visionApps_08________:near-v1","transfer:visionApps_08________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionApps/09_화면캡처분석"
+    identityLedgerRef: "identity-ledger/visionApps.yml"
+    lessonContentHash: "621ccb0630e6f2bddf86d8709a872dee17af9a6936ba3ddb4b7475727e70e039"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/15-vision-automation"
+    eligiblePathIds: ["visionAutomation"]
+    outcomes: ["visionApps.faceMedia"]
+    prerequisites: ["visionApps.faceMedia"]
+    reinforcesOutcomeIds: ["visionApps.faceMedia"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionApps/09_화면캡처분석:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionApps_09_______:v1","retrieve:visionApps_09_______:v2","retrieve:visionApps_09_______:v3"]
+    transferVariantIds: ["transfer:visionApps_09_______:near-v1","transfer:visionApps_09_______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionApps/10_종합사진정리기"
+    identityLedgerRef: "identity-ledger/visionApps.yml"
+    lessonContentHash: "354a172b21411f28952b80848b905422fa7185b5cddd624cfaa12a0de8f4ebd1"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/15-vision-automation"
+    eligiblePathIds: ["visionAutomation"]
+    outcomes: ["visionApps.documents","visionApps.faceMedia"]
+    prerequisites: ["visionApps.faceMedia","visionApps.documents"]
+    reinforcesOutcomeIds: ["visionApps.documents","visionApps.faceMedia"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionApps/10_종합사진정리기:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionApps_10________:v1","retrieve:visionApps_10________:v2","retrieve:visionApps_10________:v3"]
+    transferVariantIds: ["transfer:visionApps_10________:near-v1","transfer:visionApps_10________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

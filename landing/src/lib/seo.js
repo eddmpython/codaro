@@ -1,111 +1,34 @@
-import { brand } from "./brand";
+import { brand } from "./brand.js";
 
-/**
- * @typedef {{
- *   title?: string;
- *   description?: string;
- *   date?: string;
- *   url?: string;
- *   thumbnail?: string;
- * }} BlogPostLike
- *
- * @typedef {{
- *   title?: string;
- *   description?: string;
- *   url?: string;
- * }} DocsPageLike
- *
- * @typedef {{
- *   name: string;
- *   url?: string;
- * }} BreadcrumbItem
- *
- * @typedef {{
- *   title?: string;
- *   description?: string;
- *   url?: string;
- *   image?: string;
- *   type?: string;
- * }} MetaInput
- */
-
-export function buildWebsiteJsonLd() {
+export function buildLearningResourceJsonLd(lesson) {
+  if (!lesson?.route || !Number.isFinite(lesson.estimatedMinutes)) return null;
   return {
     "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: brand.name,
-    url: brand.siteUrl,
-    description: brand.description,
-    publisher: buildOrganizationJsonLd(),
-    potentialAction: {
-      "@type": "SearchAction",
-      target: `${brand.siteUrl}/search?q={search_term_string}`,
-      "query-input": "required name=search_term_string",
-    },
+    "@type": "LearningResource",
+    name: lesson.seo?.title || lesson.title,
+    description: lesson.seo?.description || lesson.direction,
+    inLanguage: "ko",
+    url: brand.toSiteUrl(lesson.route),
+    timeRequired: `PT${lesson.estimatedMinutes}M`,
+    learningResourceType: "lesson",
+    teaches: lesson.outcome,
+    isPartOf: { "@id": `${brand.siteUrl}/learn` },
+    provider: { "@id": `${brand.siteUrl}/#organization` },
   };
 }
 
-/**
- * @param {string | undefined} path
- */
-function siteUrl(path) {
-  return brand.toSiteUrl(path || "/");
-}
-
-export function buildOrganizationJsonLd() {
-  return {
-    "@type": "Organization",
-    name: brand.name,
-    url: brand.siteUrl,
-    logo: `${brand.siteUrl}/brand/codaro-character.png`,
-    sameAs: [brand.repoUrl],
-  };
-}
-
-/**
- * @param {BlogPostLike} post
- */
-export function buildBlogPostJsonLd(post) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    headline: post.title,
-    description: post.description || "",
-    datePublished: post.date ? new Date(post.date).toISOString() : undefined,
-    url: siteUrl(post.url),
-    image: post.thumbnail ? siteUrl(post.thumbnail) : brand.toSiteUrl("/brand/codaro-character.png"),
-    author: buildOrganizationJsonLd(),
-    publisher: buildOrganizationJsonLd(),
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": siteUrl(post.url),
-    },
-  };
-}
-
-/**
- * @param {DocsPageLike} page
- */
-export function buildDocsPageJsonLd(page) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "TechArticle",
-    headline: page.title,
-    description: page.description || "",
-    url: siteUrl(page.url),
-    author: buildOrganizationJsonLd(),
-    publisher: buildOrganizationJsonLd(),
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": siteUrl(page.url),
-    },
-  };
-}
-
-/**
- * @param {BreadcrumbItem[]} items
- */
-export function buildBreadcrumbJsonLd(items) {
+export function buildBreadcrumbJsonLd(path, title) {
+  const segments = String(path || "/").split("/").filter(Boolean);
+  if (segments.length === 0) return null;
+  const items = [{ name: "홈", url: brand.toSiteUrl("/") }];
+  let currentPath = "";
+  segments.forEach((segment, index) => {
+    currentPath += `/${segment}`;
+    items.push({
+      name: index === segments.length - 1 ? title : segmentLabel(segment),
+      url: brand.toSiteUrl(currentPath),
+    });
+  });
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -113,63 +36,37 @@ export function buildBreadcrumbJsonLd(items) {
       "@type": "ListItem",
       position: index + 1,
       name: item.name,
-      item: item.url ? siteUrl(item.url) : undefined,
+      item: item.url,
     })),
   };
 }
 
-export function buildSoftwareJsonLd() {
+export function buildFaqPageJsonLd(entries) {
   return {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: brand.name,
-    applicationCategory: "DeveloperApplication",
-    operatingSystem: "Windows",
-    description: brand.description,
-    url: brand.siteUrl,
-    downloadUrl: brand.launcherDownloadUrl,
-    installUrl: brand.releaseUrl,
-    author: buildOrganizationJsonLd(),
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
-    },
+    "@type": "FAQPage",
+    inLanguage: "ko",
+    mainEntity: entries.map((entry) => ({
+      "@type": "Question",
+      name: entry.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: entry.answer,
+      },
+    })),
   };
 }
 
-/**
- * @param {MetaInput} input
- */
-export function buildMeta({ title, description, url, image, type }) {
-  const resolvedTitle = title ? `${title} - ${brand.name}` : brand.name;
-  const resolvedDescription = description || brand.description;
-  const resolvedUrl = url ? siteUrl(url) : brand.siteUrl;
-  const resolvedImage = image || brand.toSiteUrl("/brand/codaro-character.png");
-  const resolvedType = type || "website";
-
+function segmentLabel(segment) {
   return {
-    title: resolvedTitle,
-    description: resolvedDescription,
-    og: {
-      type: resolvedType,
-      title: resolvedTitle,
-      description: resolvedDescription,
-      url: resolvedUrl,
-      image: resolvedImage,
-    },
-    twitter: {
-      card: "summary",
-      title: resolvedTitle,
-      description: resolvedDescription,
-      image: resolvedImage,
-    },
-  };
-}
-
-/**
- * @param {unknown} data
- */
-export function jsonLdScript(data) {
-  return `<script type="application/ld+json">${JSON.stringify(data)}</script>`;
+    learn: "학습",
+    lesson: "레슨",
+    docs: "문서",
+    blog: "Codaro 소식",
+    packs: "공유 팩",
+    tools: "도구",
+    search: "검색",
+    category: "카테고리",
+    series: "시리즈",
+  }[segment] || segment;
 }

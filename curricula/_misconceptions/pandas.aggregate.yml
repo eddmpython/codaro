@@ -9,11 +9,10 @@ misconceptions:
     label: "groupby() 결과를 바로 출력하려고 함"
     summary: "`df.groupby('a')` 는 DataFrameGroupBy 객체일 뿐이라 그냥 출력해도 의미 없는 repr 만 나온다."
     triggers:
-      - kind: predictionMismatch
-        appliesTo: prediction
-        expectedField: value
-        mismatchPattern: "DataFrameGroupBy"
-        description: "예측은 집계된 표, 실제는 lazy 객체 repr."
+      - kind: codePattern
+        appliesTo: code
+        pattern: "\\.groupby\\([^)]*\\)\\s*$"
+        description: "집계 호출 없이 groupby 객체만 마지막 결과로 남김."
     diagnostic:
       message: "`groupby()` 는 그룹 객체만 만듭니다. 실제 집계는 `.sum()`, `.mean()`, `.agg(...)` 같은 후속 호출이 일어나야 합니다."
       references: ["pandas.aggregate"]

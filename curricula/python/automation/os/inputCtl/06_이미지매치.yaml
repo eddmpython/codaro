@@ -305,3 +305,288 @@ sections:
     check:
       noError: locateOrReport 두 호출이 끝나야 한다.
       resultCheck: hit는 found True, miss는 found False여야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: inputCtl_06-image-match-selection-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - build-haystack
+    - locate-report
+    title: 이미지 match 후보의 confidence·모호성 판정하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: threshold 이상 후보가 하나이고 차점과 충분히 벌어질 때만 선택한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - threshold 통과 후보가 여러 개면 첫 번째를 클릭하지 마세요.
+    - 최고 confidence와 차점 margin을 함께 검사하세요.
+    exercise:
+      prompt: select_image_match(candidates, threshold, minimum_margin)를 완성하세요.
+      starterCode: |-
+        def select_image_match(candidates, threshold, minimum_margin):
+            raise NotImplementedError
+      solution: |
+        def select_image_match(candidates, threshold, minimum_margin):
+            eligible = sorted((candidate for candidate in candidates if candidate["confidence"] >= threshold), key=lambda item: (-item["confidence"], item["id"]))
+            if not eligible:
+                return {"selected": None, "reason": "below-threshold", "eligible": []}
+            margin = eligible[0]["confidence"] - eligible[1]["confidence"] if len(eligible) > 1 else 1.0
+            if len(eligible) > 1 and margin < minimum_margin:
+                return {"selected": None, "reason": "ambiguous", "eligible": [item["id"] for item in eligible]}
+            return {"selected": eligible[0]["id"], "reason": "accepted", "eligible": [item["id"] for item in eligible]}
+      hints: *id001
+    check:
+      id: python.inputctl.inputCtl_06.image-match-selection.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_06.image-match-selection.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: select_image_match
+        cases:
+        - id: selects-clear-best-match
+          arguments:
+          - value:
+            - id: a
+              confidence: 0.95
+            - id: b
+              confidence: 0.8
+          - value: 0.7
+          - value: 0.1
+          expectedReturn:
+            selected: a
+            reason: accepted
+            eligible:
+            - a
+            - b
+        - id: rejects-ambiguous-matches
+          arguments:
+          - value:
+            - id: a
+              confidence: 0.91
+            - id: b
+              confidence: 0.9
+          - value: 0.8
+          - value: 0.05
+          expectedReturn:
+            selected: null
+            reason: ambiguous
+            eligible:
+            - a
+            - b
+        - id: rejects-below-threshold
+          arguments:
+          - value:
+            - id: a
+              confidence: 0.5
+          - value: 0.8
+          - value: 0.1
+          expectedReturn:
+            selected: null
+            reason: below-threshold
+            eligible: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: inputCtl_06-template-compatibility-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inputCtl_06-image-match-selection-mastery
+    title: 새 이미지 template에 scale·theme·source 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 현재 화면 조건과 template metadata가 일치하는지 판정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - template은 scale·theme·locale별로 source hash와 함께 관리하세요.
+    - 현재 화면 조건과 다른 template을 confidence만으로 사용하지 마세요.
+    exercise:
+      prompt: audit_template_compatibility(template, screen_state)를 완성하세요.
+      starterCode: |-
+        def audit_template_compatibility(template, screen_state):
+            raise NotImplementedError
+      solution: |
+        def audit_template_compatibility(template, screen_state):
+            failures = []
+            for key in ["scale", "theme", "locale"]:
+                if template.get(key) != screen_state.get(key):
+                    failures.append(key)
+            if not template.get("sourceHash"):
+                failures.append("source-hash")
+            return {"compatible": not failures, "failures": failures, "templateId": template.get("id")}
+      hints: *id002
+    check:
+      id: python.inputctl.inputCtl_06.template-compatibility-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_06.template-compatibility-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_template_compatibility
+        cases:
+        - id: accepts-matching-template
+          arguments:
+          - value:
+              id: save
+              scale: 1.0
+              theme: light
+              locale: ko
+              sourceHash: abc
+          - value:
+              scale: 1.0
+              theme: light
+              locale: ko
+          expectedReturn:
+            compatible: true
+            failures: []
+            templateId: save
+        - id: reports-state-mismatch
+          arguments:
+          - value:
+              id: save
+              scale: 1.0
+              theme: light
+              locale: ko
+              sourceHash: abc
+          - value:
+              scale: 1.25
+              theme: dark
+              locale: en
+          expectedReturn:
+            compatible: false
+            failures:
+            - scale
+            - theme
+            - locale
+            templateId: save
+        - id: reports-unbound-template
+          arguments:
+          - value:
+              id: save
+              scale: 1.0
+              theme: light
+              locale: ko
+          - value:
+              scale: 1.0
+              theme: light
+              locale: ko
+          expectedReturn:
+            compatible: false
+            failures:
+            - source-hash
+            templateId: save
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: inputCtl_06-image-match-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inputCtl_06-template-compatibility-audit-transfer
+    title: 화면 이미지 match 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: template 호환성·threshold·모호성 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 입력 자동화 action 전에 대상·경계·중단 방법을 검증하세요.
+    - 화면 변화와 E-Stop evidence를 남기고 성공을 클릭 발생으로 판단하지 마세요.
+    exercise:
+      prompt: choose_image_match_gate(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_image_match_gate(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_image_match_gate(situation):
+            table = {'template': {'action': 'match scale theme locale', 'evidence': 'source-bound template metadata', 'risk': 'visual drift'}, 'candidate': {'action': 'apply confidence threshold', 'evidence': 'candidate scores', 'risk': 'false match'}, 'ambiguity': {'action': 'require top margin', 'evidence': 'best and runner-up', 'risk': 'wrong duplicate'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.inputctl.inputCtl_06.image-match-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_06.image-match-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_image_match_gate
+        cases:
+        - id: recalls-template
+          arguments:
+          - value: template
+          expectedReturn:
+            action: match scale theme locale
+            evidence: source-bound template metadata
+            risk: visual drift
+        - id: recalls-candidate
+          arguments:
+          - value: candidate
+          expectedReturn:
+            action: apply confidence threshold
+            evidence: candidate scores
+            risk: false match
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

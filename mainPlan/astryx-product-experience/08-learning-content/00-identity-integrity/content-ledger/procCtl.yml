@@ -1,0 +1,194 @@
+schemaVersion: 1
+category: "procCtl"
+canonicalRows: 10
+lessons:
+  - lessonRef: "procCtl/01_subprocess기초"
+    identityLedgerRef: "identity-ledger/procCtl.yml"
+    lessonContentHash: "4830379d175fc27f0d5c16db1be05f40e838ddb4ac18e02d9888d76e51172b3f"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/22-system-monitoring"
+    eligiblePathIds: ["scriptingAutomation","systemMonitoring"]
+    outcomes: ["automation.procCtl"]
+    prerequisites: ["builtins.subprocess"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:procCtl/01_subprocess기초:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:procCtl_01_subprocess__:v1","retrieve:procCtl_01_subprocess__:v2","retrieve:procCtl_01_subprocess__:v3"]
+    transferVariantIds: ["transfer:procCtl_01_subprocess__:near-v1","transfer:procCtl_01_subprocess__:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "procCtl/02_인자전달과인용"
+    identityLedgerRef: "identity-ledger/procCtl.yml"
+    lessonContentHash: "a212be3e45b79bb34e0e497556b258559d831b003f68ef7ad346a55c556b05a5"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/22-system-monitoring"
+    eligiblePathIds: ["scriptingAutomation","systemMonitoring"]
+    outcomes: ["automation.procCtl"]
+    prerequisites: ["automation.procCtl"]
+    reinforcesOutcomeIds: ["automation.procCtl"]
+    runtimeTier: local
+    checkSpecId: "lesson:procCtl/02_인자전달과인용:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:procCtl_02________:v1","retrieve:procCtl_02________:v2","retrieve:procCtl_02________:v3"]
+    transferVariantIds: ["transfer:procCtl_02________:near-v1","transfer:procCtl_02________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "procCtl/03_타임아웃과예외"
+    identityLedgerRef: "identity-ledger/procCtl.yml"
+    lessonContentHash: "04caff394e26ee953fcfb6634a72df563cf6e3bafe99e72429624e912869a832"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/22-system-monitoring"
+    eligiblePathIds: ["scriptingAutomation","systemMonitoring"]
+    outcomes: ["automation.procCtl"]
+    prerequisites: ["automation.procCtl"]
+    reinforcesOutcomeIds: ["automation.procCtl"]
+    runtimeTier: local
+    checkSpecId: "lesson:procCtl/03_타임아웃과예외:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:procCtl_03________:v1","retrieve:procCtl_03________:v2","retrieve:procCtl_03________:v3"]
+    transferVariantIds: ["transfer:procCtl_03________:near-v1","transfer:procCtl_03________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "procCtl/04_파이프와스트리밍"
+    identityLedgerRef: "identity-ledger/procCtl.yml"
+    lessonContentHash: "50c3236c005c0b2504e5f78de72eb7705cb8640a0de19fe7ef630d0b07944461"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/22-system-monitoring"
+    eligiblePathIds: ["scriptingAutomation","systemMonitoring"]
+    outcomes: ["automation.procCtl"]
+    prerequisites: ["automation.procCtl"]
+    reinforcesOutcomeIds: ["automation.procCtl"]
+    runtimeTier: local
+    checkSpecId: "lesson:procCtl/04_파이프와스트리밍:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:procCtl_04_________:v1","retrieve:procCtl_04_________:v2","retrieve:procCtl_04_________:v3"]
+    transferVariantIds: ["transfer:procCtl_04_________:near-v1","transfer:procCtl_04_________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "procCtl/05_환경변수와CWD"
+    identityLedgerRef: "identity-ledger/procCtl.yml"
+    lessonContentHash: "6a731a97a146ced50f7de63c5a2e30a9edf3d45e690988e86d9eeccb414ba8e8"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/22-system-monitoring"
+    eligiblePathIds: ["scriptingAutomation","systemMonitoring"]
+    outcomes: ["automation.procCtl"]
+    prerequisites: ["automation.procCtl"]
+    reinforcesOutcomeIds: ["automation.procCtl"]
+    runtimeTier: local
+    checkSpecId: "lesson:procCtl/05_환경변수와CWD:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:procCtl_05______CWD:v1","retrieve:procCtl_05______CWD:v2","retrieve:procCtl_05______CWD:v3"]
+    transferVariantIds: ["transfer:procCtl_05______CWD:near-v1","transfer:procCtl_05______CWD:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "procCtl/06_외부도구래퍼"
+    identityLedgerRef: "identity-ledger/procCtl.yml"
+    lessonContentHash: "bf8d5cf7a3f014697e046ac4c2b4c4cc0cbe9f322daea1f14be64871a5425024"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/22-system-monitoring"
+    eligiblePathIds: ["scriptingAutomation","systemMonitoring"]
+    outcomes: ["automation.procCtl"]
+    prerequisites: ["automation.procCtl"]
+    reinforcesOutcomeIds: ["automation.procCtl"]
+    runtimeTier: local
+    checkSpecId: "lesson:procCtl/06_외부도구래퍼:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:procCtl_06_______:v1","retrieve:procCtl_06_______:v2","retrieve:procCtl_06_______:v3"]
+    transferVariantIds: ["transfer:procCtl_06_______:near-v1","transfer:procCtl_06_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "procCtl/07_psutil프로세스조회"
+    identityLedgerRef: "identity-ledger/procCtl.yml"
+    lessonContentHash: "e936d4f6405efdb7424972efd4118cacd0a33b1e4523cebc42a71e96adeb75d3"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/22-system-monitoring"
+    eligiblePathIds: ["systemMonitoring"]
+    outcomes: ["automation.procMonitoring"]
+    prerequisites: ["automation.procCtl"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:procCtl/07_psutil프로세스조회:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:procCtl_07_psutil______:v1","retrieve:procCtl_07_psutil______:v2","retrieve:procCtl_07_psutil______:v3"]
+    transferVariantIds: ["transfer:procCtl_07_psutil______:near-v1","transfer:procCtl_07_psutil______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "procCtl/08_시스템자원모니터링"
+    identityLedgerRef: "identity-ledger/procCtl.yml"
+    lessonContentHash: "fed937bac02af4c99065ff40ab450bb376709fe963adc832ce44363fc09dd7b8"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/22-system-monitoring"
+    eligiblePathIds: ["systemMonitoring"]
+    outcomes: ["automation.procMonitoring"]
+    prerequisites: ["automation.procMonitoring"]
+    reinforcesOutcomeIds: ["automation.procMonitoring"]
+    runtimeTier: local
+    checkSpecId: "lesson:procCtl/08_시스템자원모니터링:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:procCtl_08__________:v1","retrieve:procCtl_08__________:v2","retrieve:procCtl_08__________:v3"]
+    transferVariantIds: ["transfer:procCtl_08__________:near-v1","transfer:procCtl_08__________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "procCtl/09_프로세스종료와시그널"
+    identityLedgerRef: "identity-ledger/procCtl.yml"
+    lessonContentHash: "e275aca1157f295551830ba553b2608de05257958a971987c3037d23bd69eb6c"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/22-system-monitoring"
+    eligiblePathIds: ["systemMonitoring"]
+    outcomes: ["automation.procMonitoring"]
+    prerequisites: ["automation.procMonitoring"]
+    reinforcesOutcomeIds: ["automation.procMonitoring"]
+    runtimeTier: local
+    checkSpecId: "lesson:procCtl/09_프로세스종료와시그널:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:procCtl_09___________:v1","retrieve:procCtl_09___________:v2","retrieve:procCtl_09___________:v3"]
+    transferVariantIds: ["transfer:procCtl_09___________:near-v1","transfer:procCtl_09___________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "procCtl/10_종합빌드러너"
+    identityLedgerRef: "identity-ledger/procCtl.yml"
+    lessonContentHash: "58e8aa80e717b476096c675bb09b6b60f05995d956cd972655e228a1ea4fc043"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/22-system-monitoring"
+    eligiblePathIds: ["systemMonitoring"]
+    outcomes: ["automation.procCtl","automation.procMonitoring"]
+    prerequisites: ["automation.procCtl","automation.procMonitoring"]
+    reinforcesOutcomeIds: ["automation.procCtl","automation.procMonitoring"]
+    runtimeTier: local
+    checkSpecId: "lesson:procCtl/10_종합빌드러너:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:procCtl_10_______:v1","retrieve:procCtl_10_______:v2","retrieve:procCtl_10_______:v3"]
+    transferVariantIds: ["transfer:procCtl_10_______:near-v1","transfer:procCtl_10_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

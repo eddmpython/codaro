@@ -4,6 +4,7 @@ import { useLocale } from "@/lib/localeContext";
 import type { CellAiAction } from "@/lib/cellModel";
 import type { AutomationSection, SurfaceMode } from "@/lib/surfaceModel";
 import type { TeacherScope } from "@/lib/teacherScope";
+import type { LearningArchiveMaterialization } from "@/lib/learningArchive";
 import type {
   AiProfile,
   BlockConfig,
@@ -26,6 +27,7 @@ const AutomationView = lazy(() => import("@/components/automation/automationSurf
 const ChatSurface = lazy(() => import("@/components/chat/chatSurface").then((module) => ({ default: module.ChatSurface })));
 const CurrentLearningSurface = lazy(() => import("@/components/app/currentLearningSurface").then((module) => ({ default: module.CurrentLearningSurface })));
 const CurriculumHome = lazy(() => import("@/components/curriculum/curriculumHome").then((module) => ({ default: module.CurriculumHome })));
+const LocalHomeSurface = lazy(() => import("@/components/app/localHomeSurface").then((module) => ({ default: module.LocalHomeSurface })));
 const NotebookSurface = lazy(() => import("@/components/app/notebookSurface").then((module) => ({ default: module.NotebookSurface })));
 const SharePackSurface = lazy(() => import("@/components/share/sharePackSurface").then((module) => ({ default: module.SharePackSurface })));
 
@@ -70,17 +72,19 @@ type MainSurfaceProps = {
   onConnectAi: () => void;
   onDeleteCell: (blockId: string) => void;
   onDraftChange: (blockId: string, value: string) => void;
+  onImportLearningArchive: (archive: LearningArchiveMaterialization) => Promise<void> | void;
   onNewChat: () => void;
-  onOpenAssignmentMaterial?: (document: CodaroDocument, title: string) => void;
   onOpenTerminalCommand: (command: string) => void;
   onPromptChange: (value: string) => void;
   onOpenSharePackCurriculum: (packId: string, path: string, version?: string | null) => Promise<void>;
   onRefreshAutomation: () => void;
   onRenameDocument: (title: string) => void;
   onRejectPendingBlocks: () => void;
-  onRunBlock: (block: BlockConfig) => void;
+  onRunBlock: (block: BlockConfig, sourceOverride?: string) => void;
   onRunNotebook: () => void;
   onRunTask: (task: TaskDefinition) => void;
+  onSelectSurface: (surface: SurfaceMode) => void;
+  onToggleTask: (task: TaskDefinition) => void;
   onSelectBlock: (blockId: string) => void;
   onSelectCategory: (category: string) => void;
   onSelectCurriculumBlock: (blockId: string) => void;
@@ -97,6 +101,28 @@ export function MainSurface(props: MainSurfaceProps) {
 }
 
 function MainSurfaceContent(props: MainSurfaceProps) {
+  if (props.surface === "home") {
+    const selectedLesson = props.contents.find((content) => content.contentId === props.selectedContentId);
+    const selectedCategory = props.categories.find((category) => category.key === props.selectedCategory);
+    const learningLabel = selectedLesson
+      ? `${selectedCategory?.name ?? props.selectedCategory} · ${selectedLesson.title}`
+      : selectedCategory?.name ?? props.selectedCategory;
+    return (
+      <LocalHomeSurface
+        apiOnline={props.apiOnline}
+        auditCount={props.auditCount}
+        document={props.document}
+        eStop={props.eStop}
+        learningLabel={learningLabel}
+        scheduler={props.scheduler}
+        tasks={props.tasks.tasks}
+        onNavigate={props.onSelectSurface}
+        onRefreshAutomation={props.onRefreshAutomation}
+        onToggleEStop={props.onToggleEStop}
+      />
+    );
+  }
+
   if (props.surface === "chat") {
     return (
       <ChatSurface
@@ -195,8 +221,8 @@ function MainSurfaceContent(props: MainSurfaceProps) {
         onCellAsk={props.onCellAsk}
         onConnectAi={props.onConnectAi}
         onDraftChange={props.onDraftChange}
+        onImportLearningArchive={props.onImportLearningArchive}
         onNewChat={props.onNewChat}
-        onOpenAssignmentMaterial={props.onOpenAssignmentMaterial}
         onOpenTerminalCommand={props.onOpenTerminalCommand}
         onPromptChange={props.onPromptChange}
         onRejectPendingBlocks={props.onRejectPendingBlocks}
@@ -219,12 +245,14 @@ function MainSurfaceContent(props: MainSurfaceProps) {
   return (
     <AutomationView
       activeSection={props.automationSection}
+      apiOnline={props.apiOnline}
       auditCount={props.auditCount}
       eStop={props.eStop}
       scheduler={props.scheduler}
       tasks={props.tasks.tasks}
       onRefresh={props.onRefreshAutomation}
       onRunTask={props.onRunTask}
+      onToggleTask={props.onToggleTask}
       onToggleEStop={props.onToggleEStop}
     />
   );

@@ -134,18 +134,17 @@ def createKernelRouter(state: ServerState) -> APIRouter:
 
     @router.delete("/api/kernel/{sessionId}")
     def apiDestroySession(sessionId: str) -> dict[str, bool]:
-        success = state.sessionManager.destroySession(sessionId)
-        if not success:
-            fail(404, "session_not_found", "Session not found.")
-        logger.info(
+        destroyed = state.sessionManager.destroySession(sessionId)
+        log = logger.info if destroyed else logger.debug
+        log(
             "kernel-session %s",
             formatLogFields(
-                action="destroy",
+                action="destroy" if destroyed else "already-destroyed",
                 sessionId=sessionId,
                 totalSessions=state.sessionManager.sessionCount,
             ),
         )
-        return {"destroyed": True}
+        return {"destroyed": destroyed}
 
     @router.post("/api/kernel/{sessionId}/execute-reactive")
     async def apiExecuteReactive(sessionId: str, request: ReactiveExecuteRequest) -> dict[str, Any]:

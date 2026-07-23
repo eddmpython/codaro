@@ -417,3 +417,281 @@ sections:
   check:
     noError: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.'
     resultCheck: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: duckdb_00-embedded-query-boundary-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - workflow_validation
+    title: 임베디드 분석 쿼리의 실행 경계 설계하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 데이터 크기와 결과 크기를 바탕으로 로컬 scan, filter, aggregate, collect 경계를 정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 중간 결과를 Python으로 옮기지 말고 최종 결과만 collect하세요.
+    - 읽는 열과 반환하는 행 수를 각각 제한해야 합니다.
+    exercise:
+      prompt: plan_embedded_query(source_rows, selected_columns, result_rows)를 완성해 실행 계획과 위험을 반환하세요.
+      starterCode: |-
+        def plan_embedded_query(source_rows, selected_columns, result_rows):
+            raise NotImplementedError
+      solution: |
+        def plan_embedded_query(source_rows, selected_columns, result_rows):
+            if source_rows < 0 or result_rows < 0 or not selected_columns:
+                raise ValueError("invalid query estimate")
+            if result_rows > source_rows:
+                raise ValueError("result cannot exceed source")
+            return {
+                "engine": "embedded-columnar",
+                "stages": ["scan", "project", "filter", "aggregate", "collect"],
+                "scanColumns": sorted(set(selected_columns)),
+                "materialize": "final-only",
+                "risk": "large-result" if result_rows > 100000 else "bounded-result",
+            }
+      hints: *id001
+    check:
+      id: python.duckdb.duckdb_00.embedded-query-boundary.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_00.embedded-query-boundary.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_embedded_query
+        cases:
+        - id: plans-bounded-local-query
+          arguments:
+          - value: 1000000
+          - value:
+            - city
+            - amount
+            - city
+          - value: 20
+          expectedReturn:
+            engine: embedded-columnar
+            stages:
+            - scan
+            - project
+            - filter
+            - aggregate
+            - collect
+            scanColumns:
+            - amount
+            - city
+            materialize: final-only
+            risk: bounded-result
+        - id: flags-large-result
+          arguments:
+          - value: 500000
+          - value:
+            - event
+          - value: 150000
+          expectedReturn:
+            engine: embedded-columnar
+            stages:
+            - scan
+            - project
+            - filter
+            - aggregate
+            - collect
+            scanColumns:
+            - event
+            materialize: final-only
+            risk: large-result
+        - id: rejects-impossible-estimate
+          arguments:
+          - value: 10
+          - value:
+            - x
+          - value: 11
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: duckdb_00-columnar-cost-estimate-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - duckdb_00-embedded-query-boundary-mastery
+    title: 새 로그 분석의 columnar scan 비용 추정하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: projection 개념을 행 수·열 크기·선택 열에 따른 scan byte 계산으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - columnar scan 비용은 선택한 열의 byte 합으로 계산하세요.
+    - 0-byte source에서는 비율을 0으로 정의하세요.
+    exercise:
+      prompt: estimate_scan_bytes(row_count, column_bytes, selected)를 완성해 fullBytes, scanBytes, savedRatio를 반환하세요.
+      starterCode: |-
+        def estimate_scan_bytes(row_count, column_bytes, selected):
+            raise NotImplementedError
+      solution: |
+        def estimate_scan_bytes(row_count, column_bytes, selected):
+            if row_count < 0 or any(value < 0 for value in column_bytes.values()):
+                raise ValueError("negative size")
+            missing = sorted(set(selected) - set(column_bytes))
+            if missing:
+                raise ValueError("unknown column")
+            full = row_count * sum(column_bytes.values())
+            scanned = row_count * sum(column_bytes[name] for name in set(selected))
+            saved = 0.0 if full == 0 else round(1 - scanned / full, 4)
+            return {"fullBytes": full, "scanBytes": scanned, "savedRatio": saved}
+      hints: *id002
+    check:
+      id: python.duckdb.duckdb_00.columnar-cost-estimate.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_00.columnar-cost-estimate.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: estimate_scan_bytes
+        cases:
+        - id: estimates-projection-saving
+          arguments:
+          - value: 100
+          - value:
+              id: 8
+              text: 100
+              score: 8
+          - value:
+            - id
+            - score
+          expectedReturn:
+            fullBytes: 11600
+            scanBytes: 1600
+            savedRatio: 0.8621
+        - id: handles-empty-source
+          arguments:
+          - value: 0
+          - value:
+              id: 8
+          - value:
+            - id
+          expectedReturn:
+            fullBytes: 0
+            scanBytes: 0
+            savedRatio: 0.0
+        - id: rejects-unknown-column
+          arguments:
+          - value: 2
+          - value:
+              id: 8
+          - value:
+            - missing
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: duckdb_00-duckdb-engine-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - duckdb_00-columnar-cost-estimate-transfer
+    title: DuckDB 실행 위치 선택 근거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 로컬 파일 분석과 운영 트랜잭션 요청을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 분석용 임베디드 엔진과 다중 사용자 쓰기 DB를 구분하세요.
+    - 웹 과제는 DuckDB 패키지 실행을 주장하지 않습니다.
+    exercise:
+      prompt: choose_duckdb_engine(situation)를 완성해 engine, evidence, boundary를 반환하세요.
+      starterCode: |-
+        def choose_duckdb_engine(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_duckdb_engine(situation):
+            table = {'local-parquet-analysis': {'engine': 'DuckDB', 'evidence': 'query plan and bounded result', 'boundary': 'local process'}, 'concurrent-order-writes': {'engine': 'transactional service', 'evidence': 'write isolation', 'boundary': 'server database'}, 'browser-learning': {'engine': 'portable concept check', 'evidence': 'hidden cases', 'boundary': 'no native package claim'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.duckdb.duckdb_00.duckdb-engine-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_00.duckdb-engine-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_duckdb_engine
+        cases:
+        - id: recalls-local-parquet-analysis
+          arguments:
+          - value: local-parquet-analysis
+          expectedReturn:
+            engine: DuckDB
+            evidence: query plan and bounded result
+            boundary: local process
+        - id: recalls-concurrent-order-writes
+          arguments:
+          - value: concurrent-order-writes
+          expectedReturn:
+            engine: transactional service
+            evidence: write isolation
+            boundary: server database
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

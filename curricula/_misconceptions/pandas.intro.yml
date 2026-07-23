@@ -29,24 +29,6 @@ misconceptions:
         valueByLabel = scores.loc["a"]
         firstByPosition, valueByLabel
 
-  - id: pandas.intro.dataFrameDictAxis
-    label: "dict로 DataFrame 만들 때 행/열 방향 혼동"
-    summary: "`pd.DataFrame({'a': [1,2]})` 가 행 a를 만든다고 예측하지만 실제로는 열 a다."
-    triggers:
-      - kind: predictionMismatch
-        appliesTo: prediction
-        expectedField: shape
-        description: "행/열 수 예측이 뒤바뀜."
-    diagnostic:
-      message: "`pd.DataFrame({key: list})` 는 key 가 열 이름이고 list 가 그 열의 값입니다. 행 방향이 아닙니다."
-      references: ["pandas.intro"]
-    correction:
-      hint: "행 단위로 만들고 싶으면 dict의 list로 만든 뒤 .T 로 전치하거나, `pd.DataFrame.from_records(...)` 를 사용하세요."
-      miniExercise: |
-        import pandas as pd
-        df = pd.DataFrame({"sales": [10, 20, 30], "region": ["A", "B", "C"]})
-        df.shape
-
   - id: pandas.intro.printDataFrame
     label: "print() 또는 display() 없이 마지막 줄 활용 모름"
     summary: "여러 줄 코드의 중간에서 DataFrame 결과를 보려고 print() 를 남발해 노트북이 지저분해진다."

@@ -21,12 +21,6 @@ const CHAT_START_EXAMPLE_DEFINITIONS: readonly ChatStartExampleDefinition[] = [
   { labelKey: "chat.example.automation", promptKey: "chat.example.automation.prompt", surface: "automation" },
 ];
 
-const CURRICULUM_GOAL_EXAMPLE_DEFINITIONS: readonly ChatStartExampleDefinition[] = [
-  { labelKey: "curriculum.goal.example.report", promptKey: "curriculum.goal.example.report.prompt", surface: "curriculum" },
-  { labelKey: "curriculum.goal.example.dashboard", promptKey: "curriculum.goal.example.dashboard.prompt", surface: "curriculum" },
-  { labelKey: "curriculum.goal.example.pandas", promptKey: "curriculum.goal.example.pandas.prompt", surface: "curriculum" },
-];
-
 function translateExampleDefinitions(
   definitions: readonly ChatStartExampleDefinition[],
   t: Translate,
@@ -41,8 +35,4 @@ function translateExampleDefinitions(
 
 export function defaultChatStartExamples(t: Translate): ChatStartExample[] {
   return translateExampleDefinitions(CHAT_START_EXAMPLE_DEFINITIONS, t);
-}
-
-export function curriculumGoalExamples(t: Translate): ChatStartExample[] {
-  return translateExampleDefinitions(CURRICULUM_GOAL_EXAMPLE_DEFINITIONS, t);
 }

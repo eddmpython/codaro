@@ -992,3 +992,328 @@ sections:
     type: noError
     noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 22_behavior_patterns-pricing-strategy-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - strategy_pattern
+    - state_pattern
+    - workflow_validation
+    title: 주문 할인 전략 교체하기
+    subtitle: pricing strategy pattern
+    goal: price_order(order, strategy_name)를 완성해 전략 이름에 따라 할인 계산을 교체하고 같은 반환 계약을 유지한다.
+    why: 행동 패턴의 핵심은 분기문을 없애는 미학이 아니라, 바뀌는 행동을 안전하게 교체하고 결과 계약을 흔들지 않는 것입니다.
+    explanation: standard는 할인 0, vip는 10퍼센트 할인, bulk는 수량이 10개 이상이면 15퍼센트 할인을 적용하세요.
+    tips:
+    - 전략 함수는 같은 입력과 같은 반환 형태를 유지해야 서로 교체할 수 있습니다.
+    - 알 수 없는 전략 이름은 ValueError로 거부해 잘못된 설정을 조용히 넘기지 않습니다.
+    exercise:
+      prompt: price_order(order, strategy_name)를 완성해 subtotal, discount, total, strategy를 반환하세요.
+      starterCode: |-
+        def price_order(order, strategy_name):
+            raise NotImplementedError
+      solution: |-
+        def price_order(order, strategy_name):
+            def standard(order, subtotal):
+                return 0
+
+            def vip(order, subtotal):
+                return round(subtotal * 0.10)
+
+            def bulk(order, subtotal):
+                return round(subtotal * 0.15) if order["quantity"] >= 10 else 0
+
+            strategies = {
+                "standard": standard,
+                "vip": vip,
+                "bulk": bulk,
+            }
+            if strategy_name not in strategies:
+                raise ValueError("unknown pricing strategy")
+            subtotal = order["unitPrice"] * order["quantity"]
+            discount = strategies[strategy_name](order, subtotal)
+            return {
+                "subtotal": subtotal,
+                "discount": discount,
+                "total": subtotal - discount,
+                "strategy": strategy_name,
+            }
+      hints:
+      - 전략 함수들을 딕셔너리에 넣으면 이름으로 행동을 교체할 수 있습니다.
+      - 모든 전략이 같은 의미의 discount 값을 반환해야 결과 조립이 단순해집니다.
+    check:
+      id: python.advanced.behavior-patterns.pricing-strategy.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.behavior-patterns.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: price_order
+        cases:
+        - id: applies-vip-discount
+          arguments:
+          - value:
+              unitPrice: 12000
+              quantity: 3
+          - value: vip
+          expectedReturn:
+            subtotal: 36000
+            discount: 3600
+            total: 32400
+            strategy: vip
+        - id: applies-bulk-discount-only-above-threshold
+          arguments:
+          - value:
+              unitPrice: 5000
+              quantity: 12
+          - value: bulk
+          expectedReturn:
+            subtotal: 60000
+            discount: 9000
+            total: 51000
+            strategy: bulk
+        - id: rejects-unknown-strategy
+          arguments:
+          - value:
+              unitPrice: 1000
+              quantity: 1
+          - value: mystery
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 22_behavior_patterns-command-stack-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - command_pattern
+    - state_pattern
+    - chain_of_responsibility
+    title: 숫자 편집 명령과 undo 스택 실행하기
+    subtitle: command pattern transfer
+    goal: run_command_stack(commands)를 완성해 add, multiply, undo 명령을 실행하고 되돌린 명령을 기록한다.
+    why: 커맨드 패턴은 버튼 클릭 예제가 아니라 실행 기록, 재실행, 취소가 필요한 자동화에서 바로 쓰입니다.
+    explanation: value는 0에서 시작합니다. add와 multiply는 실행 기록에 쌓고, undo는 마지막 실행 명령을 되돌립니다. 되돌릴 명령이 없으면 값을 유지하세요.
+    tips:
+    - undo를 구현하려면 실행한 명령과 이전 값을 함께 저장하는 편이 안전합니다.
+    - 명령이 늘어나도 반환 계약은 value, history, undone으로 유지하세요.
+    exercise:
+      prompt: run_command_stack(commands)를 완성해 최종 value, 실행 history, undone 목록을 반환하세요.
+      starterCode: |-
+        def run_command_stack(commands):
+            raise NotImplementedError
+      solution: |-
+        def run_command_stack(commands):
+            value = 0
+            history = []
+            undone = []
+            for command in commands:
+                action = command["action"]
+                if action == "add":
+                    previous = value
+                    value += command["amount"]
+                    history.append({"action": "add", "previous": previous, "amount": command["amount"]})
+                elif action == "multiply":
+                    previous = value
+                    value *= command["factor"]
+                    history.append({"action": "multiply", "previous": previous, "factor": command["factor"]})
+                elif action == "undo":
+                    if history:
+                        last = history.pop()
+                        value = last["previous"]
+                        undone.append(last["action"])
+                else:
+                    raise ValueError("unknown command")
+            return {
+                "value": value,
+                "history": [item["action"] for item in history],
+                "undone": undone,
+            }
+      hints:
+      - undo는 현재 연산을 역계산하기보다 이전 값을 저장해두는 방식이 더 단순합니다.
+      - history에는 undo 가능한 명령만 넣어야 합니다.
+    check:
+      id: python.advanced.behavior-patterns.command-stack.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.behavior-patterns.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: run_command_stack
+        cases:
+        - id: executes-and-undoes-last-commands
+          arguments:
+          - value:
+            - action: add
+              amount: 5
+            - action: multiply
+              factor: 3
+            - action: add
+              amount: 2
+            - action: undo
+            - action: add
+              amount: 1
+          expectedReturn:
+            value: 16
+            history:
+            - add
+            - multiply
+            - add
+            undone:
+            - add
+        - id: rejects-unknown-command
+          arguments:
+          - value:
+            - action: divide
+              amount: 2
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 22_behavior_patterns-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 22_behavior_patterns-command-stack-transfer
+    title: 행동 패턴 선택 기준 회상하기
+    subtitle: behavioral pattern recall
+    goal: choose_behavior_pattern(need)를 완성해 요구사항별 패턴과 판단 기준을 반환한다.
+    why: 행동 패턴은 객체 사이의 대화 방식과 책임 이동을 설계하는 언어입니다. 이름보다 이벤트, 교체 가능성, 취소, 상태 전이, 처리 체인을 구분해야 합니다.
+    explanation: event-broadcast, switch-algorithm, undoable-action, lifecycle-state, fixed-algorithm-skeleton, routed-handlers
+      상황별 패턴을 선택하세요.
+    tips:
+    - 옵저버는 한 이벤트를 여러 구독자에게 알릴 때 자연스럽습니다.
+    - 책임 연쇄는 처리자가 순서대로 기회를 가져야 할 때 씁니다.
+    exercise:
+      prompt: choose_behavior_pattern(need)를 완성해 pattern, signal, risk를 반환하세요.
+      starterCode: |-
+        def choose_behavior_pattern(need):
+            raise NotImplementedError
+      solution: |-
+        def choose_behavior_pattern(need):
+            table = {
+                "event-broadcast": {
+                    "pattern": "observer",
+                    "signal": "one event fan-outs to many listeners",
+                    "risk": "listener order and failures must be visible",
+                },
+                "switch-algorithm": {
+                    "pattern": "strategy",
+                    "signal": "same input contract needs interchangeable behavior",
+                    "risk": "too many tiny strategies can hide simple branches",
+                },
+                "undoable-action": {
+                    "pattern": "command",
+                    "signal": "actions need history, retry, or undo",
+                    "risk": "commands must capture enough state to reverse safely",
+                },
+                "lifecycle-state": {
+                    "pattern": "state",
+                    "signal": "allowed behavior depends on current status",
+                    "risk": "transitions must be explicit",
+                },
+                "fixed-algorithm-skeleton": {
+                    "pattern": "template-method",
+                    "signal": "steps are fixed but details vary by subclass",
+                    "risk": "inheritance can be heavier than composition",
+                },
+                "routed-handlers": {
+                    "pattern": "chain-of-responsibility",
+                    "signal": "ordered handlers may accept or pass a request",
+                    "risk": "unhandled requests need a clear fallback",
+                },
+            }
+            if need not in table:
+                raise ValueError("unknown behavior need")
+            return table[need]
+      hints:
+      - 이벤트 전파, 알고리즘 교체, 실행 기록은 서로 다른 변화 축입니다.
+      - 패턴을 고를 때 failure visibility도 함께 말해야 합니다.
+    check:
+      id: python.advanced.behavior-patterns.choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.behavior-patterns.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_behavior_pattern
+        cases:
+        - id: recalls-observer-for-broadcast
+          arguments:
+          - value: event-broadcast
+          expectedReturn:
+            pattern: observer
+            signal: one event fan-outs to many listeners
+            risk: listener order and failures must be visible
+        - id: recalls-command-for-undo
+          arguments:
+          - value: undoable-action
+          expectedReturn:
+            pattern: command
+            signal: actions need history, retry, or undo
+            risk: commands must capture enough state to reverse safely
+        - id: rejects-unknown-need
+          arguments:
+          - value: pattern-soup
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

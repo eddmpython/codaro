@@ -67,19 +67,59 @@ sections:
         frame = pd.DataFrame({"sales": [10, 20]})
       hints:
         - dict의 key가 열 이름이다.
-      check:
-        variable: frame
     check:
+      type: noError
       noError: DataFrame 생성 코드가 pandas import, 열 이름, 행 길이 조건을 만족해야 한다.
       resultCheck: frame 변수에 sales 열이 있고, 바꾼 행 값이 DataFrame 결과에 반영되어야 한다.
 ```
+
+위 `noError`와 서술형 `resultCheck`는 weak feedback 계약이다. 실행 성공만으로 lesson completion, mastery, retrieval credit을 만들지 않는다. 현재 구현된 첫 Web strong slice는 다음처럼 versioned output spec을 사용한다.
+
+```yaml
+check:
+  id: python.print.hello-codaro.output.v1
+  version: 1
+  kind: output
+  strength: strong
+  executor: browser-worker
+  timeoutMs: 8000
+  fixtureId: python.print.hello-codaro.fixture.v1
+  fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+  fixture:
+    directories: []
+    env:
+      LANG: C.UTF-8
+      TZ: UTC
+    files: []
+    stdin: []
+  payload:
+    comparator: exact
+    expected: Hello Codaro
+    normalization: trim-final-newline
+```
+
+fixture hash는 key를 정렬한 compact JSON UTF-8 bytes의 SHA-256 SRI다. author gate가 hash를 다시 계산하므로 임의 문자열을 넣어 통과시킬 수 없다. Web의 `browser-worker`는 main 학습 커널과 다른 새 pyproc Worker에서 source를 다시 실행하고 processWorker graph SRI, fixture hash, timeout, teardown을 통과해야 한다. Local의 `local-sandbox`는 같은 spec을 별도 native Python 자식 프로세스에서 실행하며 fixture 전용 임시 디렉터리, fixture 밖 읽기·쓰기 차단, 네트워크·하위 프로세스·동적 코드 거부, timeout 종료를 적용한다. 현재 exact output, variable, callable return과 fixture path behavior를 두 tier에서 지원하며, behavior는 함수 호출 전에 `origin: created` 경로를 만든 module side effect를 거부한다. behavior pass는 file·directory의 byteLength, fileCount, SHA-256뿐 아니라 CSV·JSON table의 format, columns, rowCount와 PNG·JPEG·GIF image의 실제 media type, width, height를 공용 evidence event에 봉인한다. table은 선언한 columns와 실제 columns가 정확히 같아야 하고 image는 파일 header에서 해석한 크기가 expected path와 같아야 한다. 외부 패키지가 필요한 Web spec은 `packageAssets`에 exact name/version, `check-packages/` 아래 same-origin wheel URL, SHA-256 SRI를 기록하고 브라우저가 bytes를 검증한 뒤에만 Worker boot package로 넘긴다. 임의 원격 URL이나 최신 버전 즉석 설치는 strong evidence에 사용할 수 없다. Windows AppContainer broker를 지원된 것처럼 낮춰 쓰지 않으며 `unsupported`는 evidence를 만들지 않는다.
+
+강한 pass는 raw source/output이 아니라 source/result/expected hash, check/fixture ID, canonical lessonRef와 실제 runtime tier를 append-only event로 저장한다. Web은 `runtimeTier: web`과 `web-strong:<fingerprint>`, Local native 검사는 `runtimeTier: local`과 `local-strong:<fingerprint>`를 사용하며 fingerprint에도 tier를 넣어 같은 source의 서로 다른 실행을 충돌로 오해하지 않는다. archive manifest는 event 집합에 따라 `web`, `local`, `mixed`를 기록한다. JSON archive의 canonical event bytes, event-set hash, 개별 payload hash가 모두 맞아야 import할 수 있다. Web은 IndexedDB v3의 metadata header와 evidence store를, Local은 별도 SQLite transaction과 sidecar header를 사용한다. 두 tier 모두 schema/data epoch와 minimum reader floor를 검사한 뒤 `eventId` set union을 수행하고 동일 ID의 다른 payload는 원본을 덮어쓰지 않고 conflicts store에 격리한다. 이전 `web-evidence:` archive ID와 category-scoped legacy lesson alias는 검증 뒤 현재 identity로 이관한다. 이 event archive import는 `progress.json`, lesson completion, outcome credit을 수정하지 않는다. Local behavior artifact descriptor와 pinned package asset descriptor는 봉인됐지만 notebook/document, draft, 전체 virtual FS artifact와 package set archive가 포함되기 전에는 전체 Web-to-Local 학습 archive로 부르지 않는다.
+
+## 숙달, 전이, 지연 검색 계약
+
+`assessment.masteryVariants`, `assessment.transferVariants`, `assessment.retrievalVariants`는 base section 정답을 복사한 추가 문제가 아니다. 각 variant는 `mode`, 실제 `sourceSectionIds`, 독립 starter/solution, strong `CheckSpec`을 가져야 하며 snippet을 포함하지 않는다. mastery는 `unseen: false`, transfer와 retrieval은 `unseen: true`, retrieval은 `minimumDelayHours >= 24`를 추가로 요구한다.
+
+- mastery만 base lesson 마지막에 `혼자 완성하기`로 materialize한다.
+- transfer는 base lesson에 즉시 materialize하지 않는다. source mastery strong event가 저장되면 `새 조건에 적용`으로 자동 제공한다.
+- retrieval도 base lesson에 즉시 materialize하지 않는다. Web·Local 표면 queue가 같은 `lessonRef`의 source strong event 시각을 읽고 delay가 지난 경우에만 `기억에서 다시 풀기`로 자동 제공한다.
+- due 여부를 확인하거나 문제를 펼치는 별도 버튼을 만들지 않는다. route 진입과 evidence 갱신 시 queue가 자동 재계산된다.
+- transfer 또는 retrieval strong event가 저장되면 같은 check ID의 due 카드는 queue에서 빠진다.
+- variant 배열이 존재하거나 ID가 생성됐다는 사실은 학습 evidence가 아니다. strong executor 실제 통과와 append-only event가 있어야 실행 증거로 계산한다.
+- 현재 machine audit의 source 저작 범위는 strong CheckSpec 1,413개/467레슨이며 mastery·transfer·24시간 retrieval은 각각 467레슨이다. 1,400개 assessment solution은 1,398개 behavior와 2개 output 검증으로 실행됐고 실패는 0이다. 467레슨은 모두 `performanceClaim`, `claimScope: portable-concept`, Web/Local tier parity를 명시하며 weak-only는 0이다. 전부의 `independentReview`는 pending이고 승인 수는 0이므로 source coverage와 실제 browser·사람 evidence를 구분한다. Day 1·2·11·15·19·20·22·27·30 progression과 Day 1 Local-native output 검증·Web/Local mixed archive는 실제 Chromium에서 검증했다. pathlib·zip·schedule은 base와 assessment에 저작된 solution 전부가 native sandbox에서 통과했고, `CODARO_PRODUCT_CASE=local-w0-conformance`는 Web Day 1, Local Day 1, pathlib·zip·schedule 12개 base와 3개 assessment behavior, Web import를 18/18로 통과했다. Local native event 16건과 Web strong·legacy migration을 합친 mixed archive 18건을 확인했으며 fileOps/zip behavior evidence는 sandbox 산출물 descriptor를, schedule evidence는 pinned package asset descriptor를 event payload hash에 포함한다. cold package 준비, Windows AppContainer, document·전체 virtual FS/package set archive와 독립 author review가 없으므로 전체 scheduler 또는 mastery 완료로 부르지 않는다.
 
 ## 렌더링 원칙
 
 - 레슨 상단은 `intro.direction`, `intro.benefits`, `intro.diagram`을 읽어 무엇을 공부하는지, 왜 유용한지, 전체 흐름을 보여준다.
 - `intro.diagram.steps`는 제품 화면에서 레슨별 `실무 흐름`으로 렌더링한다. `목표/개념/스니펫/실행` 같은 고정 단계가 아니라 해당 YAML의 섹션 제목과 실제 작업 흐름을 반영해야 한다. `diagram.runtime`은 로컬 실행 환경과 완료 기준을 보존하는 데이터 계약이며, 화면은 필요한 경우에만 이를 보조 정보로 사용한다.
 - 섹션 하나가 학습카드 하나다. 이 섹션 단위 학습카드 원칙 때문에 `sections[].blocks[]`의 작은 카드 반복을 기본 구조로 삼지 않는다.
-- 섹션 카드는 `title → subtitle → goal → why → explanation → tips → snippet → exercise → result → check` 순서로 이어진다.
+- 섹션 흐름은 `title → subtitle → goal → why → explanation → tips → snippet → exercise → result → automatic feedback` 순서로 이어진다. 실행과 별도로 `검증`, `완료`, `제출`을 다시 누르게 하지 않는다.
 - 카드 내부 정보는 라벨, 구획선, 여백으로 구분한다. 카드 안에 또 카드가 덕지덕지 쌓이는 구조는 피한다.
 - `sectionContract:*`로 materialize된 신규 섹션은 작은 block card를 반복 렌더링하지 않고, 하나의 섹션 카드 안에서 예제 스니펫, 직접 입력 실습, 실행 결과, 검증/피드백을 흐름형 band로 보여준다.
 - 카드 헤더와 본문은 같은 제목을 반복하지 않는다. legacy list/prose block에서 첫 목록 항목이나 첫 markdown heading이 셀 제목과 같으면 렌더러가 한 번만 보이게 정리한다.
@@ -87,11 +127,12 @@ sections:
 - 섹션 헤더 번호는 타이틀/서브타이틀 묶음과 높이를 맞춘다. 셀 도움 요청 액션은 hover-only가 아니라 항상 보이는 control로 둔다.
 - 셀 TOC는 push rail이다. overlay flyout으로 같은 아이콘 목록을 한 번 더 띄우지 않는다.
 - structured 섹션의 `exercise` band는 클릭해야 열리는 preview가 아니라 바로 보이는 실제 입력 editor를 가진다. `learning-card-browser` gate는 이 editor가 desktop/mobile에서 보이고 starter code를 렌더링하는지 확인한다.
-- 레슨 overview는 `data-learning-overview`, `data-learning-overview-blueprint`, `data-learning-overview-rail`, `data-learning-overview-part`, `data-learning-workflow-diagram`, `data-learning-workflow-step` marker를 가진다. `learning-card-browser` gate는 방향, 학습 효과, YAML 기반 실무 흐름 step이 desktop/mobile 화면에 보이는지 확인한다.
-- structured section card는 브라우저 검증을 위해 `data-learning-section-card`, `data-learning-section-structured`, `data-learning-section-part` marker를 가진다. 검증 대상 part는 `overview`, `snippet`, `exercise`, `result`, `check`다.
+- 레슨 overview는 `data-learning-overview`, `data-learning-overview-part` marker를 가진다. `learning-card-browser` gate는 방향과 학습 효과가 desktop/mobile 화면에 보이는지 확인한다.
+- structured section은 브라우저 검증을 위해 `data-learning-section-card`, `data-learning-section-structured`, `data-learning-section-part`, `data-learning-check-result`, `data-learning-check-evidence` marker를 가진다. 검증 대상 part는 `overview`, `snippet`, `exercise`, `result`, automatic feedback이다.
 - marker 계약과 editor build는 `uv run python -X utf8 tests/run.py gate learning-card-contract`로 확인한다. 실제 데스크톱/모바일 브라우저 렌더링은 `uv run python -X utf8 tests/run.py gate learning-card-browser`로 확인한다.
 - `snippet`은 예제 스니펫 셀로, `exercise.starterCode`는 학습자가 직접 입력/수정하는 실습 셀로 materialize한다. 렌더러는 이 영역을 `직접 입력 실습` 흐름 안의 실제 에디터로 바로 보여주고, 중복 코드 라벨이나 작성자 배지를 붙이지 않으며 `data-learning-exercise-input-role="student-practice"`를 유지한다.
 - `meta.packages`는 런타임 패키지 preflight의 1차 입력이다. 코드 import 추론은 보조 수단이다.
+- 정적 Web의 코드 자동완성은 `shouldUseApi()`가 false이면 backend `/api/ai/complete`를 호출하지 않는다. Web 학습 실행과 strong check는 backend 연결 없이 끝나야 한다.
 
 ## 의존성 계약
 

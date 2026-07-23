@@ -1,0 +1,3984 @@
+{
+  "schemaVersion": 1,
+  "canonicalIdentity": "category/contentId",
+  "lessons": [
+    {
+      "checkSpecId": "lesson:30days/day01_헬로월드:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "30days/day01_헬로월드",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day02_변수와데이터타입:required:v1",
+      "eligiblePathIds": [
+        "computerVision",
+        "dataReporting",
+        "dataVisualization",
+        "geoVisualization",
+        "imageProcessing",
+        "officeAutomation",
+        "pythonFoundation",
+        "scriptingAutomation",
+        "sqlAnalysis",
+        "webMonitoring"
+      ],
+      "lessonRef": "30days/day02_변수와데이터타입",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day03_연산자:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "30days/day03_연산자",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day04_문자열기초:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation",
+        "textProcessing"
+      ],
+      "lessonRef": "30days/day04_문자열기초",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day05_문자열인덱싱슬라이싱:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation",
+        "textProcessing"
+      ],
+      "lessonRef": "30days/day05_문자열인덱싱슬라이싱",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day06_문자열메서드:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation",
+        "textProcessing"
+      ],
+      "lessonRef": "30days/day06_문자열메서드",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day07_리스트기초:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "30days/day07_리스트기초",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day08_리스트메서드:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "30days/day08_리스트메서드",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day09_튜플:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "30days/day09_튜플",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day10_집합:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "30days/day10_집합",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day11_딕셔너리기초:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "30days/day11_딕셔너리기초",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day12_딕셔너리메서드:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "30days/day12_딕셔너리메서드",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day13_조건문:required:v1",
+      "eligiblePathIds": [
+        "dataReporting",
+        "dataVisualization",
+        "officeAutomation",
+        "pythonFoundation",
+        "scriptingAutomation",
+        "webMonitoring"
+      ],
+      "lessonRef": "30days/day13_조건문",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day14_반복문:required:v1",
+      "eligiblePathIds": [
+        "dataReporting",
+        "dataVisualization",
+        "officeAutomation",
+        "pythonFoundation",
+        "scriptingAutomation",
+        "webMonitoring"
+      ],
+      "lessonRef": "30days/day14_반복문",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day15_함수기초:required:v1",
+      "eligiblePathIds": [
+        "aiIntegration",
+        "dataReporting",
+        "desktopAutomation",
+        "documentAutomation",
+        "emailAutomation",
+        "graphAnalysis",
+        "machineLearning",
+        "officeAutomation",
+        "pdfAutomation",
+        "pythonFoundation",
+        "scriptingAutomation",
+        "standardLibraryMastery",
+        "webMonitoring"
+      ],
+      "lessonRef": "30days/day15_함수기초",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day16_함수고급:required:v1",
+      "eligiblePathIds": [
+        "aiIntegration",
+        "dataReporting",
+        "desktopAutomation",
+        "documentAutomation",
+        "emailAutomation",
+        "graphAnalysis",
+        "machineLearning",
+        "officeAutomation",
+        "pdfAutomation",
+        "pythonFoundation",
+        "scriptingAutomation",
+        "standardLibraryMastery",
+        "webMonitoring"
+      ],
+      "lessonRef": "30days/day16_함수고급",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day17_스코프와클로저:required:v1",
+      "eligiblePathIds": [
+        "aiIntegration",
+        "dataReporting",
+        "desktopAutomation",
+        "documentAutomation",
+        "emailAutomation",
+        "graphAnalysis",
+        "machineLearning",
+        "officeAutomation",
+        "pdfAutomation",
+        "pythonFoundation",
+        "scriptingAutomation",
+        "standardLibraryMastery",
+        "webMonitoring"
+      ],
+      "lessonRef": "30days/day17_스코프와클로저",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day18_모듈과import:required:v1",
+      "eligiblePathIds": [
+        "aiIntegration",
+        "documentAutomation",
+        "emailAutomation",
+        "fileAutomation",
+        "imageProcessing",
+        "officeAutomation",
+        "pdfAutomation",
+        "pythonFoundation",
+        "scriptingAutomation",
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "30days/day18_모듈과import",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day19_파일입출력:required:v1",
+      "eligiblePathIds": [
+        "aiIntegration",
+        "documentAutomation",
+        "emailAutomation",
+        "fileAutomation",
+        "imageProcessing",
+        "officeAutomation",
+        "pdfAutomation",
+        "pythonFoundation",
+        "scriptingAutomation",
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "30days/day19_파일입출력",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day20_예외처리:required:v1",
+      "eligiblePathIds": [
+        "aiIntegration",
+        "desktopAutomation",
+        "emailAutomation",
+        "pdfAutomation",
+        "pythonFoundation",
+        "scriptingAutomation",
+        "systemMonitoring"
+      ],
+      "lessonRef": "30days/day20_예외처리",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day21_중간종합복습:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "30days/day21_중간종합복습",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day22_클래스기초:required:v1",
+      "eligiblePathIds": [
+        "dataContracts",
+        "pythonFoundation"
+      ],
+      "lessonRef": "30days/day22_클래스기초",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day23_클래스고급:required:v1",
+      "eligiblePathIds": [
+        "dataContracts",
+        "pythonFoundation"
+      ],
+      "lessonRef": "30days/day23_클래스고급",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day24_특수메서드:required:v1",
+      "eligiblePathIds": [
+        "dataContracts",
+        "pythonFoundation"
+      ],
+      "lessonRef": "30days/day24_특수메서드",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day25_프로퍼티와데코레이터:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "30days/day25_프로퍼티와데코레이터",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day26_컴프리헨션:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "30days/day26_컴프리헨션",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day27_제너레이터와이터레이터:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "30days/day27_제너레이터와이터레이터",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day28_고급문법종합:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "30days/day28_고급문법종합",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day29_알고리즘연습:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "30days/day29_알고리즘연습",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:30days/day30_최종프로젝트:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "30days/day30_최종프로젝트",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/01_람다와고차함수:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/01_람다와고차함수",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/02_함수데코레이터심화:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/02_함수데코레이터심화",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/03_클로저와상태관리:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/03_클로저와상태관리",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/04_functools완벽가이드:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/04_functools완벽가이드",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/05_itertools마스터:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/05_itertools마스터",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/06_메타클래스:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/06_메타클래스",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/07_디스크립터:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/07_디스크립터",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/08_추상클래스와프로토콜:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/08_추상클래스와프로토콜",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/09_다중상속과MRO:required:v1",
+      "eligiblePathIds": [
+        "dataContracts",
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/09_다중상속과MRO",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/10_slots와메모리최적화:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/10_slots와메모리최적화",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/11_타입힌팅심화:required:v1",
+      "eligiblePathIds": [
+        "dataContracts",
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/11_타입힌팅심화",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/12_dataclasses마스터:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/12_dataclasses마스터",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/13_collections심화:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/13_collections심화",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/14_enum과상수관리:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/14_enum과상수관리",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/15_typing고급:required:v1",
+      "eligiblePathIds": [
+        "dataContracts",
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/15_typing고급",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/16_재귀와분할정복:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/16_재귀와분할정복",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/17_정렬알고리즘:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/17_정렬알고리즘",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/18_탐색알고리즘:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/18_탐색알고리즘",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/19_동적프로그래밍:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/19_동적프로그래밍",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/20_자료구조구현:required:v1",
+      "eligiblePathIds": [
+        "dataContracts",
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/20_자료구조구현",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/21_디자인패턴1:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/21_디자인패턴1",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/22_디자인패턴2:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/22_디자인패턴2",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/23_함수형패턴:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/23_함수형패턴",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/24_메타프로그래밍:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/24_메타프로그래밍",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/25_정규표현식고급:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation",
+        "textProcessing"
+      ],
+      "lessonRef": "advancedPython/25_정규표현식고급",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/26_코드최적화:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/26_코드최적화",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/27_문자열알고리즘:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/27_문자열알고리즘",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/28_수학알고리즘:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/28_수학알고리즘",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/29_클린코드:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/29_클린코드",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/30_종합문제풀이:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/30_종합문제풀이",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/31_컨텍스트매니저:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/31_컨텍스트매니저",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/32_제너레이터심화:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/32_제너레이터심화",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/33_async와코루틴:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/33_async와코루틴",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/34_match와패턴매칭:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/34_match와패턴매칭",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:advancedPython/35_동시성:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "advancedPython/35_동시성",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:altair/00_Altair소개:required:v1",
+      "eligiblePathIds": [
+        "interactiveDashboards"
+      ],
+      "lessonRef": "altair/00_Altair소개",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:altair/01_자동차연비탐색:required:v1",
+      "eligiblePathIds": [
+        "interactiveDashboards"
+      ],
+      "lessonRef": "altair/01_자동차연비탐색",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:altair/02_붓꽃품종구분:required:v1",
+      "eligiblePathIds": [
+        "interactiveDashboards"
+      ],
+      "lessonRef": "altair/02_붓꽃품종구분",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:altair/03_팁데이터분석:required:v1",
+      "eligiblePathIds": [
+        "interactiveDashboards"
+      ],
+      "lessonRef": "altair/03_팁데이터분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:altair/04_펭귄서식지분석:required:v1",
+      "eligiblePathIds": [
+        "interactiveDashboards"
+      ],
+      "lessonRef": "altair/04_펭귄서식지분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:altair/05_타이타닉생존분석:required:v1",
+      "eligiblePathIds": [
+        "interactiveDashboards"
+      ],
+      "lessonRef": "altair/05_타이타닉생존분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:altair/06_항공편분석:required:v1",
+      "eligiblePathIds": [
+        "interactiveDashboards"
+      ],
+      "lessonRef": "altair/06_항공편분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:altair/07_인터랙티브필터:required:v1",
+      "eligiblePathIds": [
+        "interactiveDashboards"
+      ],
+      "lessonRef": "altair/07_인터랙티브필터",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:altair/08_다중뷰연결:required:v1",
+      "eligiblePathIds": [
+        "interactiveDashboards"
+      ],
+      "lessonRef": "altair/08_다중뷰연결",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:altair/09_고급데이터변환:required:v1",
+      "eligiblePathIds": [
+        "interactiveDashboards"
+      ],
+      "lessonRef": "altair/09_고급데이터변환",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:altair/10_종합대시보드:required:v1",
+      "eligiblePathIds": [
+        "interactiveDashboards"
+      ],
+      "lessonRef": "altair/10_종합대시보드",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/01_math:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/01_math",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/02_random:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/02_random",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/03_datetime:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/03_datetime",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/04_time:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/04_time",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/05_collections:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/05_collections",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/06_itertools:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/06_itertools",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/07_functools:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/07_functools",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/08_os:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation",
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/08_os",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/09_pathlib:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation",
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/09_pathlib",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/10_sys:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/10_sys",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/11_glob:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation",
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/11_glob",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/12_shutil:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation",
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/12_shutil",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/13_json:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/13_json",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/14_csv:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/14_csv",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/15_pickle:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/15_pickle",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/16_struct:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/16_struct",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/17_string:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery",
+        "textProcessing"
+      ],
+      "lessonRef": "builtins/17_string",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/18_textwrap:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery",
+        "textProcessing"
+      ],
+      "lessonRef": "builtins/18_textwrap",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/19_difflib:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery",
+        "textProcessing"
+      ],
+      "lessonRef": "builtins/19_difflib",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/20_base64:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery",
+        "textProcessing"
+      ],
+      "lessonRef": "builtins/20_base64",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/21_urllib:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/21_urllib",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/22_email:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/22_email",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/23_asyncio:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/23_asyncio",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/24_argparse:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/24_argparse",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/25_logging:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery",
+        "systemMonitoring"
+      ],
+      "lessonRef": "builtins/25_logging",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/26_unittest:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/26_unittest",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/27_timeit:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery",
+        "systemMonitoring"
+      ],
+      "lessonRef": "builtins/27_timeit",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/28_copy:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation",
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/28_copy",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/29_pprint:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery",
+        "systemMonitoring"
+      ],
+      "lessonRef": "builtins/29_pprint",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/30_inspect:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery",
+        "systemMonitoring"
+      ],
+      "lessonRef": "builtins/30_inspect",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/31_subprocess:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/31_subprocess",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:builtins/32_contextlib:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/32_contextlib",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/33_tempfile:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/33_tempfile",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/34_hashlib:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/34_hashlib",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:builtins/35_zipfile:required:v1",
+      "eligiblePathIds": [
+        "standardLibraryMastery"
+      ],
+      "lessonRef": "builtins/35_zipfile",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:deepVision/01_torchvision입문:required:v1",
+      "eligiblePathIds": [
+        "deepLearningVision"
+      ],
+      "lessonRef": "deepVision/01_torchvision입문",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:deepVision/02_ResNet분류:required:v1",
+      "eligiblePathIds": [
+        "deepLearningVision"
+      ],
+      "lessonRef": "deepVision/02_ResNet분류",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:deepVision/03_임베딩벡터:required:v1",
+      "eligiblePathIds": [
+        "deepLearningVision"
+      ],
+      "lessonRef": "deepVision/03_임베딩벡터",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:deepVision/04_유사도검색:required:v1",
+      "eligiblePathIds": [
+        "deepLearningVision"
+      ],
+      "lessonRef": "deepVision/04_유사도검색",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:deepVision/05_객체탐지:required:v1",
+      "eligiblePathIds": [
+        "deepLearningVision"
+      ],
+      "lessonRef": "deepVision/05_객체탐지",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:deepVision/06_세그멘테이션:required:v1",
+      "eligiblePathIds": [
+        "deepLearningVision"
+      ],
+      "lessonRef": "deepVision/06_세그멘테이션",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:deepVision/07_포즈추정:required:v1",
+      "eligiblePathIds": [
+        "deepLearningVision"
+      ],
+      "lessonRef": "deepVision/07_포즈추정",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:deepVision/08_전이학습:required:v1",
+      "eligiblePathIds": [
+        "deepLearningVision"
+      ],
+      "lessonRef": "deepVision/08_전이학습",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:deepVision/09_모델비교:required:v1",
+      "eligiblePathIds": [
+        "deepLearningVision"
+      ],
+      "lessonRef": "deepVision/09_모델비교",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:deepVision/10_종합사진태깅기:required:v1",
+      "eligiblePathIds": [
+        "deepLearningVision"
+      ],
+      "lessonRef": "deepVision/10_종합사진태깅기",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:devTools/commandLineIntro:required:v1",
+      "eligiblePathIds": [
+        "scriptingAutomation"
+      ],
+      "lessonRef": "devTools/commandLineIntro",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:devTools/gitFirstSteps:required:v1",
+      "eligiblePathIds": [
+        "scriptingAutomation"
+      ],
+      "lessonRef": "devTools/gitFirstSteps",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:devTools/githubIntro:required:v1",
+      "eligiblePathIds": [
+        "scriptingAutomation"
+      ],
+      "lessonRef": "devTools/githubIntro",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:duckdb/00_DuckDB소개:required:v1",
+      "eligiblePathIds": [
+        "sqlAnalysis"
+      ],
+      "lessonRef": "duckdb/00_DuckDB소개",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:duckdb/00_MotherDuck소개:required:v1",
+      "eligiblePathIds": [
+        "sqlAnalysis"
+      ],
+      "lessonRef": "duckdb/00_MotherDuck소개",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:duckdb/01_레스토랑팁기초:required:v1",
+      "eligiblePathIds": [
+        "sqlAnalysis"
+      ],
+      "lessonRef": "duckdb/01_레스토랑팁기초",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:duckdb/02_타이타닉생존통계:required:v1",
+      "eligiblePathIds": [
+        "sqlAnalysis"
+      ],
+      "lessonRef": "duckdb/02_타이타닉생존통계",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:duckdb/03_팁패턴분석:required:v1",
+      "eligiblePathIds": [
+        "sqlAnalysis"
+      ],
+      "lessonRef": "duckdb/03_팁패턴분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:duckdb/04_타이타닉심층분석:required:v1",
+      "eligiblePathIds": [
+        "sqlAnalysis"
+      ],
+      "lessonRef": "duckdb/04_타이타닉심층분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:duckdb/05_팁서브쿼리분석:required:v1",
+      "eligiblePathIds": [
+        "sqlAnalysis"
+      ],
+      "lessonRef": "duckdb/05_팁서브쿼리분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:duckdb/06_CTE단계별분석:required:v1",
+      "eligiblePathIds": [
+        "sqlAnalysis"
+      ],
+      "lessonRef": "duckdb/06_CTE단계별분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:duckdb/07_윈도우함수기초:required:v1",
+      "eligiblePathIds": [
+        "sqlAnalysis"
+      ],
+      "lessonRef": "duckdb/07_윈도우함수기초",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:duckdb/08_고급윈도우분석:required:v1",
+      "eligiblePathIds": [
+        "sqlAnalysis"
+      ],
+      "lessonRef": "duckdb/08_고급윈도우분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:duckdb/09_문자열과패턴:required:v1",
+      "eligiblePathIds": [
+        "sqlAnalysis"
+      ],
+      "lessonRef": "duckdb/09_문자열과패턴",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:duckdb/10_종합프로젝트:required:v1",
+      "eligiblePathIds": [
+        "sqlAnalysis"
+      ],
+      "lessonRef": "duckdb/10_종합프로젝트",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:email/00_email소개:required:v1",
+      "eligiblePathIds": [
+        "emailAutomation"
+      ],
+      "lessonRef": "email/00_email소개",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:email/01_첫메일발송:required:v1",
+      "eligiblePathIds": [
+        "emailAutomation"
+      ],
+      "lessonRef": "email/01_첫메일발송",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:email/02_html과첨부:required:v1",
+      "eligiblePathIds": [
+        "emailAutomation"
+      ],
+      "lessonRef": "email/02_html과첨부",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:email/03_다수수신자와개인화:required:v1",
+      "eligiblePathIds": [
+        "emailAutomation"
+      ],
+      "lessonRef": "email/03_다수수신자와개인화",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:email/04_표와차트삽입:required:v1",
+      "eligiblePathIds": [
+        "emailAutomation"
+      ],
+      "lessonRef": "email/04_표와차트삽입",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:email/05_imap으로받기:required:v1",
+      "eligiblePathIds": [
+        "emailAutomation"
+      ],
+      "lessonRef": "email/05_imap으로받기",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:email/06_첨부자동저장:required:v1",
+      "eligiblePathIds": [
+        "emailAutomation"
+      ],
+      "lessonRef": "email/06_첨부자동저장",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:email/07_규칙기반분류:required:v1",
+      "eligiblePathIds": [
+        "emailAutomation"
+      ],
+      "lessonRef": "email/07_규칙기반분류",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:email/08_스크립트결과알림:required:v1",
+      "eligiblePathIds": [
+        "emailAutomation"
+      ],
+      "lessonRef": "email/08_스크립트결과알림",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:email/09_안전한자격증명관리:required:v1",
+      "eligiblePathIds": [
+        "emailAutomation"
+      ],
+      "lessonRef": "email/09_안전한자격증명관리",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:email/10_주간보고서발송기:required:v1",
+      "eligiblePathIds": [
+        "emailAutomation"
+      ],
+      "lessonRef": "email/10_주간보고서발송기",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:excel/01_xlwings란:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "excel/01_xlwings란",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:excel/02_xlwings설치:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "excel/02_xlwings설치",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:excel/03_xlwingsLite:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "excel/03_xlwingsLite",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:fileOps/01_pathlib경로감각:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation",
+        "scriptingAutomation"
+      ],
+      "lessonRef": "fileOps/01_pathlib경로감각",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:fileOps/02_파일읽고쓰기:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation",
+        "scriptingAutomation"
+      ],
+      "lessonRef": "fileOps/02_파일읽고쓰기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:fileOps/03_디렉터리탐색:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation",
+        "scriptingAutomation"
+      ],
+      "lessonRef": "fileOps/03_디렉터리탐색",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:fileOps/04_복사이동이름변경:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation",
+        "scriptingAutomation"
+      ],
+      "lessonRef": "fileOps/04_복사이동이름변경",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:fileOps/05_안전삭제:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation",
+        "scriptingAutomation"
+      ],
+      "lessonRef": "fileOps/05_안전삭제",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:fileOps/06_zip압축:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation"
+      ],
+      "lessonRef": "fileOps/06_zip압축",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:fileOps/07_백업과동기화:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation"
+      ],
+      "lessonRef": "fileOps/07_백업과동기화",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:fileOps/08_디렉터리정리:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation"
+      ],
+      "lessonRef": "fileOps/08_디렉터리정리",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:fileOps/09_파일메타데이터:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation",
+        "scriptingAutomation"
+      ],
+      "lessonRef": "fileOps/09_파일메타데이터",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:fileOps/10_종합다운로드폴더정리:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation"
+      ],
+      "lessonRef": "fileOps/10_종합다운로드폴더정리",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:folium/00_folium소개:required:v1",
+      "eligiblePathIds": [
+        "geoVisualization"
+      ],
+      "lessonRef": "folium/00_folium소개",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:folium/01_첫지도만들기:required:v1",
+      "eligiblePathIds": [
+        "geoVisualization"
+      ],
+      "lessonRef": "folium/01_첫지도만들기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:folium/02_다양한마커표현:required:v1",
+      "eligiblePathIds": [
+        "geoVisualization"
+      ],
+      "lessonRef": "folium/02_다양한마커표현",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:folium/03_도형그리기:required:v1",
+      "eligiblePathIds": [
+        "geoVisualization"
+      ],
+      "lessonRef": "folium/03_도형그리기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:folium/04_지도스타일변경:required:v1",
+      "eligiblePathIds": [
+        "geoVisualization"
+      ],
+      "lessonRef": "folium/04_지도스타일변경",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:folium/05_레이어관리:required:v1",
+      "eligiblePathIds": [
+        "geoVisualization"
+      ],
+      "lessonRef": "folium/05_레이어관리",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:folium/06_GeoJSON활용:required:v1",
+      "eligiblePathIds": [
+        "geoVisualization"
+      ],
+      "lessonRef": "folium/06_GeoJSON활용",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:folium/07_단계구분도:required:v1",
+      "eligiblePathIds": [
+        "geoVisualization"
+      ],
+      "lessonRef": "folium/07_단계구분도",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:folium/08_히트맵:required:v1",
+      "eligiblePathIds": [
+        "geoVisualization"
+      ],
+      "lessonRef": "folium/08_히트맵",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:folium/09_마커클러스터:required:v1",
+      "eligiblePathIds": [
+        "geoVisualization"
+      ],
+      "lessonRef": "folium/09_마커클러스터",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:folium/10_종합지도프로젝트:required:v1",
+      "eligiblePathIds": [
+        "geoVisualization"
+      ],
+      "lessonRef": "folium/10_종합지도프로젝트",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:inputCtl/01_pyautogui안전장치:required:v1",
+      "eligiblePathIds": [
+        "desktopAutomation"
+      ],
+      "lessonRef": "inputCtl/01_pyautogui안전장치",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:inputCtl/02_화면크기와좌표:required:v1",
+      "eligiblePathIds": [
+        "desktopAutomation"
+      ],
+      "lessonRef": "inputCtl/02_화면크기와좌표",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:inputCtl/03_마우스이동과클릭:required:v1",
+      "eligiblePathIds": [
+        "desktopAutomation"
+      ],
+      "lessonRef": "inputCtl/03_마우스이동과클릭",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:inputCtl/04_키보드입력:required:v1",
+      "eligiblePathIds": [
+        "desktopAutomation"
+      ],
+      "lessonRef": "inputCtl/04_키보드입력",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:inputCtl/05_스크린샷영역:required:v1",
+      "eligiblePathIds": [
+        "desktopAutomation"
+      ],
+      "lessonRef": "inputCtl/05_스크린샷영역",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:inputCtl/06_이미지매치:required:v1",
+      "eligiblePathIds": [
+        "desktopAutomation"
+      ],
+      "lessonRef": "inputCtl/06_이미지매치",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:inputCtl/07_클립보드:required:v1",
+      "eligiblePathIds": [
+        "desktopAutomation"
+      ],
+      "lessonRef": "inputCtl/07_클립보드",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:inputCtl/08_pynput리스너:required:v1",
+      "eligiblePathIds": [
+        "desktopAutomation"
+      ],
+      "lessonRef": "inputCtl/08_pynput리스너",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:inputCtl/09_상태기반자동화:required:v1",
+      "eligiblePathIds": [
+        "desktopAutomation"
+      ],
+      "lessonRef": "inputCtl/09_상태기반자동화",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:inputCtl/10_종합화면점검:required:v1",
+      "eligiblePathIds": [
+        "desktopAutomation"
+      ],
+      "lessonRef": "inputCtl/10_종합화면점검",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:llmBasics/00_LLM통합소개:required:v1",
+      "eligiblePathIds": [
+        "aiIntegration"
+      ],
+      "lessonRef": "llmBasics/00_LLM통합소개",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:llmBasics/01_첫Claude호출:required:v1",
+      "eligiblePathIds": [
+        "aiIntegration"
+      ],
+      "lessonRef": "llmBasics/01_첫Claude호출",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:llmBasics/02_시스템프롬프트역할부여:required:v1",
+      "eligiblePathIds": [
+        "aiIntegration"
+      ],
+      "lessonRef": "llmBasics/02_시스템프롬프트역할부여",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:llmBasics/03_멀티턴대화만들기:required:v1",
+      "eligiblePathIds": [
+        "aiIntegration"
+      ],
+      "lessonRef": "llmBasics/03_멀티턴대화만들기",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:llmBasics/04_토큰과비용추적:required:v1",
+      "eligiblePathIds": [
+        "aiIntegration"
+      ],
+      "lessonRef": "llmBasics/04_토큰과비용추적",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:llmBasics/05_스트리밍응답:required:v1",
+      "eligiblePathIds": [
+        "aiIntegration"
+      ],
+      "lessonRef": "llmBasics/05_스트리밍응답",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:llmBasics/06_JSON구조화출력:required:v1",
+      "eligiblePathIds": [
+        "aiIntegration"
+      ],
+      "lessonRef": "llmBasics/06_JSON구조화출력",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:llmBasics/07_프롬프트캐싱:required:v1",
+      "eligiblePathIds": [
+        "aiIntegration"
+      ],
+      "lessonRef": "llmBasics/07_프롬프트캐싱",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:llmBasics/08_도구사용기초:required:v1",
+      "eligiblePathIds": [
+        "aiIntegration"
+      ],
+      "lessonRef": "llmBasics/08_도구사용기초",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:llmBasics/09_멀티도구라우팅:required:v1",
+      "eligiblePathIds": [
+        "aiIntegration"
+      ],
+      "lessonRef": "llmBasics/09_멀티도구라우팅",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:llmBasics/10_데이터분석봇:required:v1",
+      "eligiblePathIds": [
+        "aiIntegration"
+      ],
+      "lessonRef": "llmBasics/10_데이터분석봇",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:matplotlib/00_Matplotlib소개:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization",
+        "timeSeriesAnalysis",
+        "timeSeriesForecasting"
+      ],
+      "lessonRef": "matplotlib/00_Matplotlib소개",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:matplotlib/01_주가추세분석:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization",
+        "timeSeriesAnalysis",
+        "timeSeriesForecasting"
+      ],
+      "lessonRef": "matplotlib/01_주가추세분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:matplotlib/02_팁데이터분포탐색:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization",
+        "timeSeriesAnalysis",
+        "timeSeriesForecasting"
+      ],
+      "lessonRef": "matplotlib/02_팁데이터분포탐색",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:matplotlib/03_붓꽃품종산점도:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization",
+        "timeSeriesAnalysis",
+        "timeSeriesForecasting"
+      ],
+      "lessonRef": "matplotlib/03_붓꽃품종산점도",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:matplotlib/04_대륙별인구비교:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization",
+        "timeSeriesAnalysis",
+        "timeSeriesForecasting"
+      ],
+      "lessonRef": "matplotlib/04_대륙별인구비교",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:matplotlib/05_펭귄체중분석:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization"
+      ],
+      "lessonRef": "matplotlib/05_펭귄체중분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:matplotlib/06_상관관계히트맵:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization"
+      ],
+      "lessonRef": "matplotlib/06_상관관계히트맵",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:matplotlib/07_시계열다중축차트:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization"
+      ],
+      "lessonRef": "matplotlib/07_시계열다중축차트",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:matplotlib/08_다중패널대시보드:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization"
+      ],
+      "lessonRef": "matplotlib/08_다중패널대시보드",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:matplotlib/09_고급주석차트:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization"
+      ],
+      "lessonRef": "matplotlib/09_고급주석차트",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:matplotlib/10_종합분석리포트:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization"
+      ],
+      "lessonRef": "matplotlib/10_종합분석리포트",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:networkx/00_networkx소개:required:v1",
+      "eligiblePathIds": [
+        "graphAnalysis"
+      ],
+      "lessonRef": "networkx/00_networkx소개",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:networkx/01_첫그래프만들기:required:v1",
+      "eligiblePathIds": [
+        "graphAnalysis"
+      ],
+      "lessonRef": "networkx/01_첫그래프만들기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:networkx/02_방향그래프와가중치:required:v1",
+      "eligiblePathIds": [
+        "graphAnalysis"
+      ],
+      "lessonRef": "networkx/02_방향그래프와가중치",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:networkx/03_최단경로찾기:required:v1",
+      "eligiblePathIds": [
+        "graphAnalysis"
+      ],
+      "lessonRef": "networkx/03_최단경로찾기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:networkx/04_중심성분석:required:v1",
+      "eligiblePathIds": [
+        "graphAnalysis"
+      ],
+      "lessonRef": "networkx/04_중심성분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:networkx/05_소셜네트워크분석:required:v1",
+      "eligiblePathIds": [
+        "graphAnalysis"
+      ],
+      "lessonRef": "networkx/05_소셜네트워크분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:networkx/06_연결성분석:required:v1",
+      "eligiblePathIds": [
+        "graphAnalysis"
+      ],
+      "lessonRef": "networkx/06_연결성분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:networkx/07_커뮤니티탐지:required:v1",
+      "eligiblePathIds": [
+        "graphAnalysis"
+      ],
+      "lessonRef": "networkx/07_커뮤니티탐지",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:networkx/08_그래프알고리즘:required:v1",
+      "eligiblePathIds": [
+        "graphAnalysis"
+      ],
+      "lessonRef": "networkx/08_그래프알고리즘",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:networkx/09_랜덤그래프모델:required:v1",
+      "eligiblePathIds": [
+        "graphAnalysis"
+      ],
+      "lessonRef": "networkx/09_랜덤그래프모델",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:networkx/10_종합네트워크프로젝트:required:v1",
+      "eligiblePathIds": [
+        "graphAnalysis"
+      ],
+      "lessonRef": "networkx/10_종합네트워크프로젝트",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:numpy/00_NumPy소개:required:v1",
+      "eligiblePathIds": [
+        "machineLearning",
+        "scientificComputing",
+        "statisticalAnalysis"
+      ],
+      "lessonRef": "numpy/00_NumPy소개",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:numpy/01_포켓몬스탯분석:required:v1",
+      "eligiblePathIds": [
+        "computerVision",
+        "deepLearningVision",
+        "machineLearning",
+        "scientificComputing"
+      ],
+      "lessonRef": "numpy/01_포켓몬스탯분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:numpy/02_기온데이터탐색:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing",
+        "statisticalAnalysis"
+      ],
+      "lessonRef": "numpy/02_기온데이터탐색",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:numpy/03_지진발생패턴:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing",
+        "statisticalAnalysis"
+      ],
+      "lessonRef": "numpy/03_지진발생패턴",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:numpy/04_음악특성분석:required:v1",
+      "eligiblePathIds": [
+        "computerVision",
+        "deepLearningVision",
+        "machineLearning",
+        "scientificComputing",
+        "statisticalAnalysis"
+      ],
+      "lessonRef": "numpy/04_음악특성분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:numpy/05_BMI계산기:required:v1",
+      "eligiblePathIds": [
+        "computerVision",
+        "deepLearningVision",
+        "machineLearning",
+        "scientificComputing"
+      ],
+      "lessonRef": "numpy/05_BMI계산기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:numpy/06_심장병위험분석:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing",
+        "statisticalAnalysis"
+      ],
+      "lessonRef": "numpy/06_심장병위험분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:numpy/07_대기질시계열:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing",
+        "statisticalAnalysis"
+      ],
+      "lessonRef": "numpy/07_대기질시계열",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:numpy/08_행복지수국가비교:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing",
+        "statisticalAnalysis"
+      ],
+      "lessonRef": "numpy/08_행복지수국가비교",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:numpy/09_전복나이예측:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing"
+      ],
+      "lessonRef": "numpy/09_전복나이예측",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:numpy/10_당뇨병종합분석:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing",
+        "statisticalAnalysis"
+      ],
+      "lessonRef": "numpy/10_당뇨병종합분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:opencv/00_OpenCV소개:required:v1",
+      "eligiblePathIds": [
+        "computerVision",
+        "deepLearningVision",
+        "visionAdvanced",
+        "visionAutomation"
+      ],
+      "lessonRef": "opencv/00_OpenCV소개",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:opencv/01_이미지구조탐색기:required:v1",
+      "eligiblePathIds": [
+        "computerVision",
+        "deepLearningVision",
+        "visionAdvanced",
+        "visionAutomation"
+      ],
+      "lessonRef": "opencv/01_이미지구조탐색기",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:opencv/02_색공간변환기:required:v1",
+      "eligiblePathIds": [
+        "computerVision",
+        "deepLearningVision",
+        "visionAdvanced",
+        "visionAutomation"
+      ],
+      "lessonRef": "opencv/02_색공간변환기",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:opencv/03_기하학적변환기:required:v1",
+      "eligiblePathIds": [
+        "computerVision",
+        "deepLearningVision",
+        "visionAdvanced",
+        "visionAutomation"
+      ],
+      "lessonRef": "opencv/03_기하학적변환기",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:opencv/04_이미지필터랩:required:v1",
+      "eligiblePathIds": [
+        "computerVision"
+      ],
+      "lessonRef": "opencv/04_이미지필터랩",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:opencv/05_에지검출기:required:v1",
+      "eligiblePathIds": [
+        "computerVision"
+      ],
+      "lessonRef": "opencv/05_에지검출기",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:opencv/06_이진화스튜디오:required:v1",
+      "eligiblePathIds": [
+        "computerVision"
+      ],
+      "lessonRef": "opencv/06_이진화스튜디오",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:opencv/07_모폴로지연산기:required:v1",
+      "eligiblePathIds": [
+        "computerVision"
+      ],
+      "lessonRef": "opencv/07_모폴로지연산기",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:opencv/08_히스토그램분석기:required:v1",
+      "eligiblePathIds": [
+        "computerVision",
+        "visionAdvanced",
+        "visionAutomation"
+      ],
+      "lessonRef": "opencv/08_히스토그램분석기",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:opencv/09_컨투어탐지기:required:v1",
+      "eligiblePathIds": [
+        "computerVision",
+        "visionAdvanced",
+        "visionAutomation"
+      ],
+      "lessonRef": "opencv/09_컨투어탐지기",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:opencv/10_종합비전프로젝트:required:v1",
+      "eligiblePathIds": [
+        "computerVision"
+      ],
+      "lessonRef": "opencv/10_종합비전프로젝트",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:openpyxl/00_openpyxl소개:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "openpyxl/00_openpyxl소개",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:openpyxl/01_워크북과시트만들기:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "openpyxl/01_워크북과시트만들기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:openpyxl/02_셀읽기와쓰기:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "openpyxl/02_셀읽기와쓰기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:openpyxl/03_범위와다중시트:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "openpyxl/03_범위와다중시트",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:openpyxl/04_수식과이름영역:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "openpyxl/04_수식과이름영역",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:openpyxl/05_셀서식과숫자포맷:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "openpyxl/05_셀서식과숫자포맷",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:openpyxl/06_조건부서식:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "openpyxl/06_조건부서식",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:openpyxl/07_차트삽입:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "openpyxl/07_차트삽입",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:openpyxl/08_이미지와하이퍼링크:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "openpyxl/08_이미지와하이퍼링크",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:openpyxl/09_표와데이터검증:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "openpyxl/09_표와데이터검증",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:openpyxl/10_월간매출리포트생성기:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "openpyxl/10_월간매출리포트생성기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pandas/00_판다스소개:required:v1",
+      "eligiblePathIds": [
+        "bigDataPipelines",
+        "dataReporting"
+      ],
+      "lessonRef": "pandas/00_판다스소개",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pandas/01_레스토랑팁분석:required:v1",
+      "eligiblePathIds": [
+        "dataReporting",
+        "dataVisualization",
+        "geoVisualization",
+        "interactiveDashboards",
+        "machineLearning",
+        "officeAutomation",
+        "statisticalAnalysis",
+        "timeSeriesAnalysis"
+      ],
+      "lessonRef": "pandas/01_레스토랑팁분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pandas/02_타이타닉생존분석:required:v1",
+      "eligiblePathIds": [
+        "dataReporting",
+        "interactiveDashboards",
+        "machineLearning",
+        "officeAutomation",
+        "timeSeriesAnalysis"
+      ],
+      "lessonRef": "pandas/02_타이타닉생존분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pandas/03_펭귄종비교분석:required:v1",
+      "eligiblePathIds": [
+        "dataReporting",
+        "interactiveDashboards",
+        "officeAutomation",
+        "timeSeriesAnalysis"
+      ],
+      "lessonRef": "pandas/03_펭귄종비교분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pandas/04_붓꽃품종분류:required:v1",
+      "eligiblePathIds": [
+        "dataReporting",
+        "interactiveDashboards",
+        "officeAutomation",
+        "timeSeriesAnalysis"
+      ],
+      "lessonRef": "pandas/04_붓꽃품종분류",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pandas/05_자동차연비분석:required:v1",
+      "eligiblePathIds": [
+        "dataReporting",
+        "interactiveDashboards",
+        "officeAutomation",
+        "timeSeriesAnalysis"
+      ],
+      "lessonRef": "pandas/05_자동차연비분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pandas/06_항공편시계열분석:required:v1",
+      "eligiblePathIds": [
+        "dataReporting",
+        "timeSeriesAnalysis",
+        "timeSeriesForecasting"
+      ],
+      "lessonRef": "pandas/06_항공편시계열분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pandas/07_다이아몬드가격분석:required:v1",
+      "eligiblePathIds": [
+        "dataReporting",
+        "interactiveDashboards",
+        "officeAutomation",
+        "timeSeriesAnalysis"
+      ],
+      "lessonRef": "pandas/07_다이아몬드가격분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pandas/08_교통사고원인분석:required:v1",
+      "eligiblePathIds": [
+        "dataReporting",
+        "interactiveDashboards",
+        "officeAutomation",
+        "timeSeriesAnalysis"
+      ],
+      "lessonRef": "pandas/08_교통사고원인분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pandas/09_두데이터합치기:required:v1",
+      "eligiblePathIds": [
+        "dataReporting"
+      ],
+      "lessonRef": "pandas/09_두데이터합치기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pandas/10_실전종합프로젝트:required:v1",
+      "eligiblePathIds": [
+        "dataReporting"
+      ],
+      "lessonRef": "pandas/10_실전종합프로젝트",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pandas/11_읽기계약과타입손상:required:v1",
+      "eligiblePathIds": [
+        "dataReporting"
+      ],
+      "lessonRef": "pandas/11_읽기계약과타입손상",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pdf/00_pdf소개:required:v1",
+      "eligiblePathIds": [
+        "pdfAutomation"
+      ],
+      "lessonRef": "pdf/00_pdf소개",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:pdf/01_pdf열고페이지정보:required:v1",
+      "eligiblePathIds": [
+        "pdfAutomation"
+      ],
+      "lessonRef": "pdf/01_pdf열고페이지정보",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:pdf/02_pdf병합과분할:required:v1",
+      "eligiblePathIds": [
+        "pdfAutomation"
+      ],
+      "lessonRef": "pdf/02_pdf병합과분할",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:pdf/03_텍스트추출:required:v1",
+      "eligiblePathIds": [
+        "pdfAutomation"
+      ],
+      "lessonRef": "pdf/03_텍스트추출",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:pdf/04_표추출:required:v1",
+      "eligiblePathIds": [
+        "pdfAutomation"
+      ],
+      "lessonRef": "pdf/04_표추출",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:pdf/05_첫pdf생성:required:v1",
+      "eligiblePathIds": [
+        "pdfAutomation"
+      ],
+      "lessonRef": "pdf/05_첫pdf생성",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:pdf/06_한글폰트와스타일:required:v1",
+      "eligiblePathIds": [
+        "pdfAutomation"
+      ],
+      "lessonRef": "pdf/06_한글폰트와스타일",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:pdf/07_표와이미지삽입:required:v1",
+      "eligiblePathIds": [
+        "pdfAutomation"
+      ],
+      "lessonRef": "pdf/07_표와이미지삽입",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:pdf/08_워터마크와암호화:required:v1",
+      "eligiblePathIds": [
+        "pdfAutomation"
+      ],
+      "lessonRef": "pdf/08_워터마크와암호화",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:pdf/09_양식채우기:required:v1",
+      "eligiblePathIds": [
+        "pdfAutomation"
+      ],
+      "lessonRef": "pdf/09_양식채우기",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:pdf/10_월간청구서생성기:required:v1",
+      "eligiblePathIds": [
+        "pdfAutomation"
+      ],
+      "lessonRef": "pdf/10_월간청구서생성기",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:pillow/00_Pillow소개:required:v1",
+      "eligiblePathIds": [
+        "imageProcessing"
+      ],
+      "lessonRef": "pillow/00_Pillow소개",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pillow/01_꽃사진탐색기:required:v1",
+      "eligiblePathIds": [
+        "imageProcessing"
+      ],
+      "lessonRef": "pillow/01_꽃사진탐색기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pillow/02_중국풍경편집기:required:v1",
+      "eligiblePathIds": [
+        "imageProcessing"
+      ],
+      "lessonRef": "pillow/02_중국풍경편집기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pillow/03_흑백사진변환기:required:v1",
+      "eligiblePathIds": [
+        "imageProcessing"
+      ],
+      "lessonRef": "pillow/03_흑백사진변환기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pillow/04_사진필터스튜디오:required:v1",
+      "eligiblePathIds": [
+        "imageProcessing"
+      ],
+      "lessonRef": "pillow/04_사진필터스튜디오",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pillow/05_밝기대비조절기:required:v1",
+      "eligiblePathIds": [
+        "imageProcessing"
+      ],
+      "lessonRef": "pillow/05_밝기대비조절기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pillow/06_RGB채널분석기:required:v1",
+      "eligiblePathIds": [
+        "imageProcessing"
+      ],
+      "lessonRef": "pillow/06_RGB채널분석기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pillow/07_워터마크생성기:required:v1",
+      "eligiblePathIds": [
+        "imageProcessing"
+      ],
+      "lessonRef": "pillow/07_워터마크생성기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pillow/08_도형아트생성기:required:v1",
+      "eligiblePathIds": [
+        "imageProcessing"
+      ],
+      "lessonRef": "pillow/08_도형아트생성기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pillow/09_포토콜라주메이커:required:v1",
+      "eligiblePathIds": [
+        "imageProcessing"
+      ],
+      "lessonRef": "pillow/09_포토콜라주메이커",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pillow/10_종합이미지에디터:required:v1",
+      "eligiblePathIds": [
+        "imageProcessing"
+      ],
+      "lessonRef": "pillow/10_종합이미지에디터",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:playwright/00_playwright소개:required:v1",
+      "eligiblePathIds": [
+        "webMonitoring"
+      ],
+      "lessonRef": "playwright/00_playwright소개",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:playwright/01_첫브라우저실행:required:v1",
+      "eligiblePathIds": [
+        "webMonitoring"
+      ],
+      "lessonRef": "playwright/01_첫브라우저실행",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:playwright/02_locator와폼입력:required:v1",
+      "eligiblePathIds": [
+        "webMonitoring"
+      ],
+      "lessonRef": "playwright/02_locator와폼입력",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:playwright/03_기다림과검증:required:v1",
+      "eligiblePathIds": [
+        "webMonitoring"
+      ],
+      "lessonRef": "playwright/03_기다림과검증",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:playwright/04_스크린샷과증거:required:v1",
+      "eligiblePathIds": [
+        "webMonitoring"
+      ],
+      "lessonRef": "playwright/04_스크린샷과증거",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:playwright/05_네트워크모킹:required:v1",
+      "eligiblePathIds": [
+        "webMonitoring"
+      ],
+      "lessonRef": "playwright/05_네트워크모킹",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:playwright/06_로그인상태와스토리지:required:v1",
+      "eligiblePathIds": [
+        "webMonitoring"
+      ],
+      "lessonRef": "playwright/06_로그인상태와스토리지",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:playwright/07_페이지객체와재사용:required:v1",
+      "eligiblePathIds": [
+        "webMonitoring"
+      ],
+      "lessonRef": "playwright/07_페이지객체와재사용",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:playwright/08_pytest흐름:required:v1",
+      "eligiblePathIds": [
+        "webMonitoring"
+      ],
+      "lessonRef": "playwright/08_pytest흐름",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:playwright/09_트레이스와디버깅:required:v1",
+      "eligiblePathIds": [
+        "webMonitoring"
+      ],
+      "lessonRef": "playwright/09_트레이스와디버깅",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:playwright/10_종합브라우저점검프로젝트:required:v1",
+      "eligiblePathIds": [
+        "webMonitoring"
+      ],
+      "lessonRef": "playwright/10_종합브라우저점검프로젝트",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:plotly/00_Plotly소개:required:v1",
+      "eligiblePathIds": [
+        "interactiveDashboards"
+      ],
+      "lessonRef": "plotly/00_Plotly소개",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:plotly/01_세계기대수명비교:required:v1",
+      "eligiblePathIds": [
+        "interactiveDashboards"
+      ],
+      "lessonRef": "plotly/01_세계기대수명비교",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:plotly/02_팁데이터분포분석:required:v1",
+      "eligiblePathIds": [
+        "interactiveDashboards"
+      ],
+      "lessonRef": "plotly/02_팁데이터분포분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:plotly/03_붓꽃품종분류:required:v1",
+      "eligiblePathIds": [
+        "interactiveDashboards"
+      ],
+      "lessonRef": "plotly/03_붓꽃품종분류",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:plotly/04_GDP기대수명관계:required:v1",
+      "eligiblePathIds": [
+        "interactiveDashboards"
+      ],
+      "lessonRef": "plotly/04_GDP기대수명관계",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:plotly/05_세계인구지도:required:v1",
+      "eligiblePathIds": [
+        "geoVisualization",
+        "interactiveDashboards"
+      ],
+      "lessonRef": "plotly/05_세계인구지도",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:plotly/06_시간에따른세계변화:required:v1",
+      "eligiblePathIds": [
+        "interactiveDashboards"
+      ],
+      "lessonRef": "plotly/06_시간에따른세계변화",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:plotly/07_레스토랑매출분석:required:v1",
+      "eligiblePathIds": [
+        "interactiveDashboards"
+      ],
+      "lessonRef": "plotly/07_레스토랑매출분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:plotly/08_대륙별계층구조:required:v1",
+      "eligiblePathIds": [
+        "interactiveDashboards"
+      ],
+      "lessonRef": "plotly/08_대륙별계층구조",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:plotly/09_주식시계열분석:required:v1",
+      "eligiblePathIds": [
+        "interactiveDashboards"
+      ],
+      "lessonRef": "plotly/09_주식시계열분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:plotly/10_종합대시보드:required:v1",
+      "eligiblePathIds": [
+        "interactiveDashboards"
+      ],
+      "lessonRef": "plotly/10_종합대시보드",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:polars/00_Polars소개:required:v1",
+      "eligiblePathIds": [
+        "bigDataPipelines"
+      ],
+      "lessonRef": "polars/00_Polars소개",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:polars/01_영화평점분석:required:v1",
+      "eligiblePathIds": [
+        "bigDataPipelines"
+      ],
+      "lessonRef": "polars/01_영화평점분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:polars/02_날씨데이터분석:required:v1",
+      "eligiblePathIds": [
+        "bigDataPipelines"
+      ],
+      "lessonRef": "polars/02_날씨데이터분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:polars/03_게임판매분석:required:v1",
+      "eligiblePathIds": [
+        "bigDataPipelines"
+      ],
+      "lessonRef": "polars/03_게임판매분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:polars/04_주식데이터분석:required:v1",
+      "eligiblePathIds": [
+        "bigDataPipelines"
+      ],
+      "lessonRef": "polars/04_주식데이터분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:polars/05_음악스트리밍분석:required:v1",
+      "eligiblePathIds": [
+        "bigDataPipelines"
+      ],
+      "lessonRef": "polars/05_음악스트리밍분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:polars/06_부동산가격분석:required:v1",
+      "eligiblePathIds": [
+        "bigDataPipelines"
+      ],
+      "lessonRef": "polars/06_부동산가격분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:polars/07_스포츠통계분석:required:v1",
+      "eligiblePathIds": [
+        "bigDataPipelines"
+      ],
+      "lessonRef": "polars/07_스포츠통계분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:polars/08_소셜미디어분석:required:v1",
+      "eligiblePathIds": [
+        "bigDataPipelines"
+      ],
+      "lessonRef": "polars/08_소셜미디어분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:polars/09_대용량로그분석:required:v1",
+      "eligiblePathIds": [
+        "bigDataPipelines"
+      ],
+      "lessonRef": "polars/09_대용량로그분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:polars/10_실전종합프로젝트:required:v1",
+      "eligiblePathIds": [
+        "bigDataPipelines"
+      ],
+      "lessonRef": "polars/10_실전종합프로젝트",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:practical/00_실전파이썬소개:required:v1",
+      "eligiblePathIds": [
+        "pythonFoundation"
+      ],
+      "lessonRef": "practical/00_실전파이썬소개",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:procCtl/01_subprocess기초:required:v1",
+      "eligiblePathIds": [
+        "scriptingAutomation",
+        "systemMonitoring"
+      ],
+      "lessonRef": "procCtl/01_subprocess기초",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:procCtl/02_인자전달과인용:required:v1",
+      "eligiblePathIds": [
+        "scriptingAutomation",
+        "systemMonitoring"
+      ],
+      "lessonRef": "procCtl/02_인자전달과인용",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:procCtl/03_타임아웃과예외:required:v1",
+      "eligiblePathIds": [
+        "scriptingAutomation",
+        "systemMonitoring"
+      ],
+      "lessonRef": "procCtl/03_타임아웃과예외",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:procCtl/04_파이프와스트리밍:required:v1",
+      "eligiblePathIds": [
+        "scriptingAutomation",
+        "systemMonitoring"
+      ],
+      "lessonRef": "procCtl/04_파이프와스트리밍",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:procCtl/05_환경변수와CWD:required:v1",
+      "eligiblePathIds": [
+        "scriptingAutomation",
+        "systemMonitoring"
+      ],
+      "lessonRef": "procCtl/05_환경변수와CWD",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:procCtl/06_외부도구래퍼:required:v1",
+      "eligiblePathIds": [
+        "scriptingAutomation",
+        "systemMonitoring"
+      ],
+      "lessonRef": "procCtl/06_외부도구래퍼",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:procCtl/07_psutil프로세스조회:required:v1",
+      "eligiblePathIds": [
+        "systemMonitoring"
+      ],
+      "lessonRef": "procCtl/07_psutil프로세스조회",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:procCtl/08_시스템자원모니터링:required:v1",
+      "eligiblePathIds": [
+        "systemMonitoring"
+      ],
+      "lessonRef": "procCtl/08_시스템자원모니터링",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:procCtl/09_프로세스종료와시그널:required:v1",
+      "eligiblePathIds": [
+        "systemMonitoring"
+      ],
+      "lessonRef": "procCtl/09_프로세스종료와시그널",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:procCtl/10_종합빌드러너:required:v1",
+      "eligiblePathIds": [
+        "systemMonitoring"
+      ],
+      "lessonRef": "procCtl/10_종합빌드러너",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:pydantic/00_pydantic소개:required:v1",
+      "eligiblePathIds": [
+        "dataContracts"
+      ],
+      "lessonRef": "pydantic/00_pydantic소개",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pydantic/01_사용자모델만들기:required:v1",
+      "eligiblePathIds": [
+        "dataContracts"
+      ],
+      "lessonRef": "pydantic/01_사용자모델만들기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pydantic/02_필드검증기:required:v1",
+      "eligiblePathIds": [
+        "dataContracts"
+      ],
+      "lessonRef": "pydantic/02_필드검증기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pydantic/03_중첩모델설계:required:v1",
+      "eligiblePathIds": [
+        "dataContracts"
+      ],
+      "lessonRef": "pydantic/03_중첩모델설계",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pydantic/04_타입변환기:required:v1",
+      "eligiblePathIds": [
+        "dataContracts"
+      ],
+      "lessonRef": "pydantic/04_타입변환기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pydantic/05_설정관리기:required:v1",
+      "eligiblePathIds": [
+        "dataContracts"
+      ],
+      "lessonRef": "pydantic/05_설정관리기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pydantic/06_JSON스키마생성:required:v1",
+      "eligiblePathIds": [
+        "dataContracts"
+      ],
+      "lessonRef": "pydantic/06_JSON스키마생성",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pydantic/07_커스텀타입정의:required:v1",
+      "eligiblePathIds": [
+        "dataContracts"
+      ],
+      "lessonRef": "pydantic/07_커스텀타입정의",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pydantic/08_에러처리기법:required:v1",
+      "eligiblePathIds": [
+        "dataContracts"
+      ],
+      "lessonRef": "pydantic/08_에러처리기법",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pydantic/09_FastAPI통합:required:v1",
+      "eligiblePathIds": [
+        "dataContracts"
+      ],
+      "lessonRef": "pydantic/09_FastAPI통합",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:pydantic/10_종합데이터파이프라인:required:v1",
+      "eligiblePathIds": [
+        "dataContracts"
+      ],
+      "lessonRef": "pydantic/10_종합데이터파이프라인",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:regex/00_정규표현식소개:required:v1",
+      "eligiblePathIds": [
+        "textProcessing"
+      ],
+      "lessonRef": "regex/00_정규표현식소개",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:regex/01_이메일주소추출:required:v1",
+      "eligiblePathIds": [
+        "textProcessing"
+      ],
+      "lessonRef": "regex/01_이메일주소추출",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:regex/02_전화번호형식통일:required:v1",
+      "eligiblePathIds": [
+        "textProcessing"
+      ],
+      "lessonRef": "regex/02_전화번호형식통일",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:regex/03_URL구조분해:required:v1",
+      "eligiblePathIds": [
+        "textProcessing"
+      ],
+      "lessonRef": "regex/03_URL구조분해",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:regex/04_HTML태그제거:required:v1",
+      "eligiblePathIds": [
+        "textProcessing"
+      ],
+      "lessonRef": "regex/04_HTML태그제거",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:regex/05_로그파일분석:required:v1",
+      "eligiblePathIds": [
+        "textProcessing"
+      ],
+      "lessonRef": "regex/05_로그파일분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:regex/06_날짜형식변환:required:v1",
+      "eligiblePathIds": [
+        "textProcessing"
+      ],
+      "lessonRef": "regex/06_날짜형식변환",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:regex/07_개인정보마스킹:required:v1",
+      "eligiblePathIds": [
+        "textProcessing"
+      ],
+      "lessonRef": "regex/07_개인정보마스킹",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:regex/08_텍스트정제토큰화:required:v1",
+      "eligiblePathIds": [
+        "textProcessing"
+      ],
+      "lessonRef": "regex/08_텍스트정제토큰화",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:regex/09_고급패턴매칭:required:v1",
+      "eligiblePathIds": [
+        "textProcessing"
+      ],
+      "lessonRef": "regex/09_고급패턴매칭",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:regex/10_LLM전처리파이프라인:required:v1",
+      "eligiblePathIds": [
+        "textProcessing"
+      ],
+      "lessonRef": "regex/10_LLM전처리파이프라인",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:requests/00_requests소개:required:v1",
+      "eligiblePathIds": [
+        "scriptingAutomation"
+      ],
+      "lessonRef": "requests/00_requests소개",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:requests/01_첫GET요청:required:v1",
+      "eligiblePathIds": [
+        "scriptingAutomation"
+      ],
+      "lessonRef": "requests/01_첫GET요청",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:requests/11_사업자등록상태조회:required:v1",
+      "eligiblePathIds": [
+        "scriptingAutomation"
+      ],
+      "lessonRef": "requests/11_사업자등록상태조회",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:requests/12_공휴일영업일계산:required:v1",
+      "eligiblePathIds": [
+        "scriptingAutomation"
+      ],
+      "lessonRef": "requests/12_공휴일영업일계산",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:requests/13_환율조회환산:required:v1",
+      "eligiblePathIds": [
+        "scriptingAutomation"
+      ],
+      "lessonRef": "requests/13_환율조회환산",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:resilience/01_멱등성과처리원장:required:v1",
+      "eligiblePathIds": [
+        "scriptingAutomation"
+      ],
+      "lessonRef": "resilience/01_멱등성과처리원장",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:resilience/02_재개가능체크포인트:required:v1",
+      "eligiblePathIds": [
+        "scriptingAutomation"
+      ],
+      "lessonRef": "resilience/02_재개가능체크포인트",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:resilience/03_원자적쓰기:required:v1",
+      "eligiblePathIds": [
+        "scriptingAutomation"
+      ],
+      "lessonRef": "resilience/03_원자적쓰기",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:scipy/00_scipy소개:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing",
+        "statisticalAnalysis"
+      ],
+      "lessonRef": "scipy/00_scipy소개",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:scipy/01_확률분포탐색기:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing",
+        "statisticalAnalysis",
+        "timeSeriesForecasting"
+      ],
+      "lessonRef": "scipy/01_확률분포탐색기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:scipy/02_AB테스트분석:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing",
+        "statisticalAnalysis",
+        "timeSeriesForecasting"
+      ],
+      "lessonRef": "scipy/02_AB테스트분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:scipy/03_데이터보간기:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing"
+      ],
+      "lessonRef": "scipy/03_데이터보간기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:scipy/04_곡선피팅마스터:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing"
+      ],
+      "lessonRef": "scipy/04_곡선피팅마스터",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:scipy/05_정규성검정기:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing",
+        "statisticalAnalysis",
+        "timeSeriesForecasting"
+      ],
+      "lessonRef": "scipy/05_정규성검정기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:scipy/06_포트폴리오최적화:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing"
+      ],
+      "lessonRef": "scipy/06_포트폴리오최적화",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:scipy/07_신호필터링:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing"
+      ],
+      "lessonRef": "scipy/07_신호필터링",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:scipy/08_수치적분기:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing"
+      ],
+      "lessonRef": "scipy/08_수치적분기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:scipy/09_스펙트럼분석기:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing"
+      ],
+      "lessonRef": "scipy/09_스펙트럼분석기",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:scipy/10_종합과학프로젝트:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing"
+      ],
+      "lessonRef": "scipy/10_종합과학프로젝트",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:seaborn/00_Seaborn소개:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization"
+      ],
+      "lessonRef": "seaborn/00_Seaborn소개",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:seaborn/01_붓꽃품종산점도:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization"
+      ],
+      "lessonRef": "seaborn/01_붓꽃품종산점도",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:seaborn/02_팁데이터분포탐색:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization"
+      ],
+      "lessonRef": "seaborn/02_팁데이터분포탐색",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:seaborn/03_펭귄체중분포비교:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization"
+      ],
+      "lessonRef": "seaborn/03_펭귄체중분포비교",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:seaborn/04_광고비판매액회귀:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization"
+      ],
+      "lessonRef": "seaborn/04_광고비판매액회귀",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:seaborn/05_타이타닉생존분석:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization"
+      ],
+      "lessonRef": "seaborn/05_타이타닉생존분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:seaborn/06_항공편승객시계열:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization"
+      ],
+      "lessonRef": "seaborn/06_항공편승객시계열",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:seaborn/07_세계기대수명분석:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization"
+      ],
+      "lessonRef": "seaborn/07_세계기대수명분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:seaborn/08_다이아몬드가격분석:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization"
+      ],
+      "lessonRef": "seaborn/08_다이아몬드가격분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:seaborn/09_자동차연비종합분석:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization"
+      ],
+      "lessonRef": "seaborn/09_자동차연비종합분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:seaborn/10_종합EDA리포트:required:v1",
+      "eligiblePathIds": [
+        "dataVisualization"
+      ],
+      "lessonRef": "seaborn/10_종합EDA리포트",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sklearn/00_sklearn소개:required:v1",
+      "eligiblePathIds": [
+        "machineLearning"
+      ],
+      "lessonRef": "sklearn/00_sklearn소개",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sklearn/01_와인품질분류:required:v1",
+      "eligiblePathIds": [
+        "machineLearning"
+      ],
+      "lessonRef": "sklearn/01_와인품질분류",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sklearn/02_유방암진단:required:v1",
+      "eligiblePathIds": [
+        "machineLearning"
+      ],
+      "lessonRef": "sklearn/02_유방암진단",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sklearn/03_당뇨병진행도예측:required:v1",
+      "eligiblePathIds": [
+        "machineLearning"
+      ],
+      "lessonRef": "sklearn/03_당뇨병진행도예측",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sklearn/04_주택가격예측:required:v1",
+      "eligiblePathIds": [
+        "machineLearning"
+      ],
+      "lessonRef": "sklearn/04_주택가격예측",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sklearn/05_손글씨숫자인식:required:v1",
+      "eligiblePathIds": [
+        "machineLearning"
+      ],
+      "lessonRef": "sklearn/05_손글씨숫자인식",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sklearn/06_고객세분화:required:v1",
+      "eligiblePathIds": [
+        "machineLearning"
+      ],
+      "lessonRef": "sklearn/06_고객세분화",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sklearn/07_소나신호분류:required:v1",
+      "eligiblePathIds": [
+        "machineLearning"
+      ],
+      "lessonRef": "sklearn/07_소나신호분류",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sklearn/08_심장병예측:required:v1",
+      "eligiblePathIds": [
+        "machineLearning"
+      ],
+      "lessonRef": "sklearn/08_심장병예측",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sklearn/09_신호탐지최적화:required:v1",
+      "eligiblePathIds": [
+        "machineLearning"
+      ],
+      "lessonRef": "sklearn/09_신호탐지최적화",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sklearn/10_종합ML파이프라인:required:v1",
+      "eligiblePathIds": [
+        "machineLearning"
+      ],
+      "lessonRef": "sklearn/10_종합ML파이프라인",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:statsmodels/00_statsmodels소개:required:v1",
+      "eligiblePathIds": [
+        "statisticalAnalysis"
+      ],
+      "lessonRef": "statsmodels/00_statsmodels소개",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:statsmodels/01_광고비매출예측:required:v1",
+      "eligiblePathIds": [
+        "statisticalAnalysis"
+      ],
+      "lessonRef": "statsmodels/01_광고비매출예측",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:statsmodels/02_부동산가격예측:required:v1",
+      "eligiblePathIds": [
+        "statisticalAnalysis"
+      ],
+      "lessonRef": "statsmodels/02_부동산가격예측",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:statsmodels/03_의료보험비용예측:required:v1",
+      "eligiblePathIds": [
+        "statisticalAnalysis"
+      ],
+      "lessonRef": "statsmodels/03_의료보험비용예측",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:statsmodels/04_항공수요예측:required:v1",
+      "eligiblePathIds": [
+        "statisticalAnalysis",
+        "timeSeriesForecasting"
+      ],
+      "lessonRef": "statsmodels/04_항공수요예측",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:statsmodels/05_고객이탈예측:required:v1",
+      "eligiblePathIds": [
+        "statisticalAnalysis"
+      ],
+      "lessonRef": "statsmodels/05_고객이탈예측",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:statsmodels/06_다중회귀심화:required:v1",
+      "eligiblePathIds": [
+        "statisticalAnalysis"
+      ],
+      "lessonRef": "statsmodels/06_다중회귀심화",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:statsmodels/07_경제지표회귀분석:required:v1",
+      "eligiblePathIds": [
+        "statisticalAnalysis"
+      ],
+      "lessonRef": "statsmodels/07_경제지표회귀분석",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:statsmodels/08_직원퇴사예측:required:v1",
+      "eligiblePathIds": [
+        "statisticalAnalysis"
+      ],
+      "lessonRef": "statsmodels/08_직원퇴사예측",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:statsmodels/09_자전거수요예측:required:v1",
+      "eligiblePathIds": [
+        "statisticalAnalysis",
+        "timeSeriesForecasting"
+      ],
+      "lessonRef": "statsmodels/09_자전거수요예측",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:statsmodels/10_종합프로젝트:required:v1",
+      "eligiblePathIds": [
+        "statisticalAnalysis"
+      ],
+      "lessonRef": "statsmodels/10_종합프로젝트",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sympy/00_sympy소개:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing"
+      ],
+      "lessonRef": "sympy/00_sympy소개",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sympy/01_기초수식계산:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing"
+      ],
+      "lessonRef": "sympy/01_기초수식계산",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sympy/02_대입과계산:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing"
+      ],
+      "lessonRef": "sympy/02_대입과계산",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sympy/03_방정식풀이:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing"
+      ],
+      "lessonRef": "sympy/03_방정식풀이",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sympy/04_미분기초:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing"
+      ],
+      "lessonRef": "sympy/04_미분기초",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sympy/05_적분기초:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing"
+      ],
+      "lessonRef": "sympy/05_적분기초",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sympy/06_극한과급수:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing"
+      ],
+      "lessonRef": "sympy/06_극한과급수",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sympy/07_삼각함수활용:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing"
+      ],
+      "lessonRef": "sympy/07_삼각함수활용",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sympy/08_행렬연산:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing"
+      ],
+      "lessonRef": "sympy/08_행렬연산",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sympy/09_수식시각화:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing"
+      ],
+      "lessonRef": "sympy/09_수식시각화",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:sympy/10_종합수학문제:required:v1",
+      "eligiblePathIds": [
+        "scientificComputing"
+      ],
+      "lessonRef": "sympy/10_종합수학문제",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:visionApps/01_문서스캐너:required:v1",
+      "eligiblePathIds": [
+        "visionAutomation"
+      ],
+      "lessonRef": "visionApps/01_문서스캐너",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionApps/02_QR바코드리더:required:v1",
+      "eligiblePathIds": [
+        "visionAutomation"
+      ],
+      "lessonRef": "visionApps/02_QR바코드리더",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionApps/03_OCR기초:required:v1",
+      "eligiblePathIds": [
+        "visionAutomation"
+      ],
+      "lessonRef": "visionApps/03_OCR기초",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionApps/04_한국어OCR:required:v1",
+      "eligiblePathIds": [
+        "visionAutomation"
+      ],
+      "lessonRef": "visionApps/04_한국어OCR",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionApps/05_얼굴검출모자이크:required:v1",
+      "eligiblePathIds": [
+        "visionAutomation"
+      ],
+      "lessonRef": "visionApps/05_얼굴검출모자이크",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionApps/06_얼굴임베딩비교:required:v1",
+      "eligiblePathIds": [
+        "visionAutomation"
+      ],
+      "lessonRef": "visionApps/06_얼굴임베딩비교",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionApps/07_이미지중복검출:required:v1",
+      "eligiblePathIds": [
+        "visionAutomation"
+      ],
+      "lessonRef": "visionApps/07_이미지중복검출",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionApps/08_영상자동썸네일:required:v1",
+      "eligiblePathIds": [
+        "visionAutomation"
+      ],
+      "lessonRef": "visionApps/08_영상자동썸네일",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionApps/09_화면캡처분석:required:v1",
+      "eligiblePathIds": [
+        "visionAutomation"
+      ],
+      "lessonRef": "visionApps/09_화면캡처분석",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionApps/10_종합사진정리기:required:v1",
+      "eligiblePathIds": [
+        "visionAutomation"
+      ],
+      "lessonRef": "visionApps/10_종합사진정리기",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionBasics/01_픽셀과ndarray:required:v1",
+      "eligiblePathIds": [
+        "visionAdvanced"
+      ],
+      "lessonRef": "visionBasics/01_픽셀과ndarray",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionBasics/02_좌표계함정:required:v1",
+      "eligiblePathIds": [
+        "visionAdvanced"
+      ],
+      "lessonRef": "visionBasics/02_좌표계함정",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionBasics/03_채널구조분해:required:v1",
+      "eligiblePathIds": [
+        "visionAdvanced"
+      ],
+      "lessonRef": "visionBasics/03_채널구조분해",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionBasics/04_색공간직관:required:v1",
+      "eligiblePathIds": [
+        "visionAdvanced"
+      ],
+      "lessonRef": "visionBasics/04_색공간직관",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionBasics/05_슬라이싱과ROI:required:v1",
+      "eligiblePathIds": [
+        "visionAdvanced"
+      ],
+      "lessonRef": "visionBasics/05_슬라이싱과ROI",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionBasics/06_픽셀산술:required:v1",
+      "eligiblePathIds": [
+        "visionAdvanced"
+      ],
+      "lessonRef": "visionBasics/06_픽셀산술",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionBasics/07_룩업테이블:required:v1",
+      "eligiblePathIds": [
+        "visionAdvanced"
+      ],
+      "lessonRef": "visionBasics/07_룩업테이블",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionBasics/08_마스크사고:required:v1",
+      "eligiblePathIds": [
+        "visionAdvanced"
+      ],
+      "lessonRef": "visionBasics/08_마스크사고",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionBasics/09_이미지통계:required:v1",
+      "eligiblePathIds": [
+        "visionAdvanced"
+      ],
+      "lessonRef": "visionBasics/09_이미지통계",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionBasics/10_종합미니보정기:required:v1",
+      "eligiblePathIds": [
+        "visionAdvanced"
+      ],
+      "lessonRef": "visionBasics/10_종합미니보정기",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionFeatures/01_코너검출:required:v1",
+      "eligiblePathIds": [
+        "visionAdvanced"
+      ],
+      "lessonRef": "visionFeatures/01_코너검출",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionFeatures/02_ORB특징점:required:v1",
+      "eligiblePathIds": [
+        "visionAdvanced"
+      ],
+      "lessonRef": "visionFeatures/02_ORB특징점",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionFeatures/03_특징점매칭:required:v1",
+      "eligiblePathIds": [
+        "visionAdvanced"
+      ],
+      "lessonRef": "visionFeatures/03_특징점매칭",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionFeatures/04_호모그래피정렬:required:v1",
+      "eligiblePathIds": [
+        "visionAdvanced"
+      ],
+      "lessonRef": "visionFeatures/04_호모그래피정렬",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionFeatures/05_파노라마스티칭:required:v1",
+      "eligiblePathIds": [
+        "visionAdvanced"
+      ],
+      "lessonRef": "visionFeatures/05_파노라마스티칭",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionFeatures/06_비디오입출력:required:v1",
+      "eligiblePathIds": [
+        "visionAdvanced"
+      ],
+      "lessonRef": "visionFeatures/06_비디오입출력",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionFeatures/07_배경차분:required:v1",
+      "eligiblePathIds": [
+        "visionAdvanced"
+      ],
+      "lessonRef": "visionFeatures/07_배경차분",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionFeatures/08_광학흐름:required:v1",
+      "eligiblePathIds": [
+        "visionAdvanced"
+      ],
+      "lessonRef": "visionFeatures/08_광학흐름",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionFeatures/09_객체트래커:required:v1",
+      "eligiblePathIds": [
+        "visionAdvanced"
+      ],
+      "lessonRef": "visionFeatures/09_객체트래커",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:visionFeatures/10_종합영상ROI추적기:required:v1",
+      "eligiblePathIds": [
+        "visionAdvanced"
+      ],
+      "lessonRef": "visionFeatures/10_종합영상ROI추적기",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:watchSched/01_watchdog첫감시:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation",
+        "systemMonitoring"
+      ],
+      "lessonRef": "watchSched/01_watchdog첫감시",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:watchSched/02_이벤트타입구분:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation",
+        "systemMonitoring"
+      ],
+      "lessonRef": "watchSched/02_이벤트타입구분",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:watchSched/03_디바운스와안정화:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation",
+        "systemMonitoring"
+      ],
+      "lessonRef": "watchSched/03_디바운스와안정화",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:watchSched/04_재귀감시와필터:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation",
+        "systemMonitoring"
+      ],
+      "lessonRef": "watchSched/04_재귀감시와필터",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:watchSched/05_schedule간단스케줄:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation"
+      ],
+      "lessonRef": "watchSched/05_schedule간단스케줄",
+      "runtimeTier": "browser"
+    },
+    {
+      "checkSpecId": "lesson:watchSched/06_APScheduler소개:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation"
+      ],
+      "lessonRef": "watchSched/06_APScheduler소개",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:watchSched/07_cron표현식:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation"
+      ],
+      "lessonRef": "watchSched/07_cron표현식",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:watchSched/08_영속스케줄:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation"
+      ],
+      "lessonRef": "watchSched/08_영속스케줄",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:watchSched/09_실패와재시도:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation"
+      ],
+      "lessonRef": "watchSched/09_실패와재시도",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:watchSched/10_종합폴더감시리포터:required:v1",
+      "eligiblePathIds": [
+        "fileAutomation"
+      ],
+      "lessonRef": "watchSched/10_종합폴더감시리포터",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:word/00_word소개:required:v1",
+      "eligiblePathIds": [
+        "documentAutomation"
+      ],
+      "lessonRef": "word/00_word소개",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:word/01_첫문서만들기:required:v1",
+      "eligiblePathIds": [
+        "documentAutomation"
+      ],
+      "lessonRef": "word/01_첫문서만들기",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:word/02_제목과목록:required:v1",
+      "eligiblePathIds": [
+        "documentAutomation"
+      ],
+      "lessonRef": "word/02_제목과목록",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:word/03_텍스트스타일링:required:v1",
+      "eligiblePathIds": [
+        "documentAutomation"
+      ],
+      "lessonRef": "word/03_텍스트스타일링",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:word/04_표만들기:required:v1",
+      "eligiblePathIds": [
+        "documentAutomation"
+      ],
+      "lessonRef": "word/04_표만들기",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:word/05_이미지와머리말:required:v1",
+      "eligiblePathIds": [
+        "documentAutomation"
+      ],
+      "lessonRef": "word/05_이미지와머리말",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:word/06_스타일과페이지설정:required:v1",
+      "eligiblePathIds": [
+        "documentAutomation"
+      ],
+      "lessonRef": "word/06_스타일과페이지설정",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:word/07_기존문서수정:required:v1",
+      "eligiblePathIds": [
+        "documentAutomation"
+      ],
+      "lessonRef": "word/07_기존문서수정",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:word/08_mailmerge_csv기반:required:v1",
+      "eligiblePathIds": [
+        "documentAutomation"
+      ],
+      "lessonRef": "word/08_mailmerge_csv기반",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:word/09_docxtpl템플릿엔진:required:v1",
+      "eligiblePathIds": [
+        "documentAutomation"
+      ],
+      "lessonRef": "word/09_docxtpl템플릿엔진",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:word/10_회의록자동생성기:required:v1",
+      "eligiblePathIds": [
+        "documentAutomation"
+      ],
+      "lessonRef": "word/10_회의록자동생성기",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:xlwings/00_xlwings소개:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "xlwings/00_xlwings소개",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:xlwings/01_첫엑셀연결:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "xlwings/01_첫엑셀연결",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:xlwings/02_가격표일괄입력:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "xlwings/02_가격표일괄입력",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:xlwings/03_시트탐색과확장:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "xlwings/03_시트탐색과확장",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:xlwings/04_DataFrame왕복:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "xlwings/04_DataFrame왕복",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:xlwings/05_수식과서식:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "xlwings/05_수식과서식",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:xlwings/06_막대차트자동생성:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "xlwings/06_막대차트자동생성",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:xlwings/07_표와동적합계:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "xlwings/07_표와동적합계",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:xlwings/08_월별파일분기합치기:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "xlwings/08_월별파일분기합치기",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:xlwings/09_VBA매크로호출:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "xlwings/09_VBA매크로호출",
+      "runtimeTier": "local"
+    },
+    {
+      "checkSpecId": "lesson:xlwings/10_UDF가격계산기:required:v1",
+      "eligiblePathIds": [
+        "officeAutomation"
+      ],
+      "lessonRef": "xlwings/10_UDF가격계산기",
+      "runtimeTier": "local"
+    }
+  ]
+}

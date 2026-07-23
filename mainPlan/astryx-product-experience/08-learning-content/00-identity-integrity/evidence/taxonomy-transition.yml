@@ -1,0 +1,387 @@
+schemaVersion: 1
+state: draft
+applyState: proposed
+fromHash: b5e9b0b9db4f6ecd89c7be10a5c795f9b991b3ce700d5b5cf044607fc835def2
+toHash: b2747d4d50c062408e9eb6d21e19d7d7224943e32cbbe60efec82736ad7bc5b8
+composerVersionHash: 75fc453f508da3b8709bd0be8a4d36213ec535c7af7d2cd892e20c2aca3e7c06
+sourceSetHash: 9bb45dd94a3540b944f52be8d36585365b63abf0f30ac9fc47c7a4fad15b9b6d
+fromGraphCount: 469
+toGraphCount: 472
+addedOutcomeIds:
+- builtins.tempFiles
+- builtins.hashing
+- builtins.archives
+- python.projectDelivery
+- viz.edaReport
+- automation.browser.audit
+addedLessonRefs:
+- 30days/day30_최종프로젝트
+- builtins/33_tempfile
+- builtins/34_hashlib
+- builtins/35_zipfile
+- playwright/10_종합브라우저점검프로젝트
+- seaborn/10_종합EDA리포트
+pathDiffs:
+- pathId: aiIntegration
+  ledgerPath: 07-remaining-domains/24-ai-integration/lesson-ledger.yml
+  fromCount: 13
+  toCount: 13
+  fromOrderHash: 7d8caf871390dd10b97f501fb3945cc12d496b0bfb9bab2cbb6d2c557d34663b
+  toOrderHash: 7d8caf871390dd10b97f501fb3945cc12d496b0bfb9bab2cbb6d2c557d34663b
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: bigDataPipelines
+  ledgerPath: 07-remaining-domains/19-big-data-pipelines/lesson-ledger.yml
+  fromCount: 11
+  toCount: 11
+  fromOrderHash: 3d8f3d7afffd53780ff1f14e3ece334501f0bd1212126655164d37ca2c6a63c0
+  toOrderHash: 3d8f3d7afffd53780ff1f14e3ece334501f0bd1212126655164d37ca2c6a63c0
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: computerVision
+  ledgerPath: 07-remaining-domains/12-computer-vision/lesson-ledger.yml
+  fromCount: 11
+  toCount: 11
+  fromOrderHash: 1593650f7aace5129313b38d1076e7b03c6ccca493fb8b8a4cc25c1311aa56db
+  toOrderHash: 1593650f7aace5129313b38d1076e7b03c6ccca493fb8b8a4cc25c1311aa56db
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: dataContracts
+  ledgerPath: 07-remaining-domains/20-data-contracts/lesson-ledger.yml
+  fromCount: 11
+  toCount: 11
+  fromOrderHash: 618d7a9d2547b171585e19994d620a8cfb9840cbbe80f6584599e5a07becb682
+  toOrderHash: 618d7a9d2547b171585e19994d620a8cfb9840cbbe80f6584599e5a07becb682
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: dataReporting
+  ledgerPath: 02-data-reporting/lesson-ledger.yml
+  fromCount: 10
+  toCount: 12
+  fromOrderHash: 872368dda10c1cd739352400c2206e21188f2b8adefe984b3cdc326411ef150c
+  toOrderHash: a44450e445225497866ccf8eeadbcbdddc6f4fb6fea967d2d165843647bdba3f
+  addedLessonRefs:
+  - pandas/09_두데이터합치기
+  - pandas/10_실전종합프로젝트
+  droppedLessonRefs: []
+  orderChanges:
+  - lessonRef: pandas/05_자동차연비분석
+    fromOrder: 10
+    toOrder: 11
+- pathId: dataVisualization
+  ledgerPath: 03-data-visualization/lesson-ledger.yml
+  fromCount: 14
+  toCount: 15
+  fromOrderHash: 508f8abbf50aeb58c0974f8679ae509de4ac6dd92c7d2e6a2defef248ee9d8a7
+  toOrderHash: 0b710525a9ff4d8138d557beea064980e0cbc1ac45e4058dd49cc21954614d72
+  addedLessonRefs:
+  - seaborn/10_종합EDA리포트
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: deepLearningVision
+  ledgerPath: 07-remaining-domains/14-deep-learning-vision/lesson-ledger.yml
+  fromCount: 11
+  toCount: 11
+  fromOrderHash: f077afc9cb3bac3b093972a4ac81ef2b98b66272e5597a80381407a4c68f3a4f
+  toOrderHash: f077afc9cb3bac3b093972a4ac81ef2b98b66272e5597a80381407a4c68f3a4f
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: desktopAutomation
+  ledgerPath: 07-remaining-domains/21-desktop-automation/lesson-ledger.yml
+  fromCount: 8
+  toCount: 8
+  fromOrderHash: c43cae4c9d12eaa62f2085f94d87eefd1d0a3bb7aba730c53adb9e87a3137b66
+  toOrderHash: c43cae4c9d12eaa62f2085f94d87eefd1d0a3bb7aba730c53adb9e87a3137b66
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: documentAutomation
+  ledgerPath: 07-remaining-domains/02-document-automation/lesson-ledger.yml
+  fromCount: 16
+  toCount: 16
+  fromOrderHash: 9f91a92146adf44557800116481015ec516e7e21651d4b38178df85cddf37303
+  toOrderHash: 9f91a92146adf44557800116481015ec516e7e21651d4b38178df85cddf37303
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: emailAutomation
+  ledgerPath: 07-remaining-domains/01-email-automation/lesson-ledger.yml
+  fromCount: 16
+  toCount: 16
+  fromOrderHash: 4fd72727028385f3d62473441b82b7612e483a386f416ba3800b4ea68f135069
+  toOrderHash: 4fd72727028385f3d62473441b82b7612e483a386f416ba3800b4ea68f135069
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: fileAutomation
+  ledgerPath: 04-file-automation/lesson-ledger.yml
+  fromCount: 11
+  toCount: 17
+  fromOrderHash: 3817c4283f7672f609ba32e4d0f8befe81c85323068b0c116552c94c17f604f7
+  toOrderHash: 332271c8f85b925dd324743c236cacca2816e8194f842a0ed81003485cb1873c
+  addedLessonRefs:
+  - 30days/day22_클래스기초
+  - 30days/day25_프로퍼티와데코레이터
+  - advancedPython/31_컨텍스트매니저
+  - builtins/33_tempfile
+  - builtins/35_zipfile
+  - fileOps/10_종합다운로드폴더정리
+  droppedLessonRefs: []
+  orderChanges:
+  - lessonRef: watchSched/05_schedule간단스케줄
+    fromOrder: 8
+    toOrder: 9
+  - lessonRef: builtins/08_os
+    fromOrder: 9
+    toOrder: 11
+  - lessonRef: fileOps/01_pathlib경로감각
+    fromOrder: 10
+    toOrder: 13
+  - lessonRef: fileOps/06_zip압축
+    fromOrder: 11
+    toOrder: 16
+- pathId: geoVisualization
+  ledgerPath: 07-remaining-domains/06-geo-visualization/lesson-ledger.yml
+  fromCount: 11
+  toCount: 11
+  fromOrderHash: 98511bb5c434894e336dcba15f83bc854dddd1a158984c57b21ada02626318cb
+  toOrderHash: 98511bb5c434894e336dcba15f83bc854dddd1a158984c57b21ada02626318cb
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: graphAnalysis
+  ledgerPath: 07-remaining-domains/10-graph-analysis/lesson-ledger.yml
+  fromCount: 11
+  toCount: 11
+  fromOrderHash: 98fa3d594cb4a876ad1277aa2986134c2b5d358c4b201354f405a3426b0cd30f
+  toOrderHash: 98fa3d594cb4a876ad1277aa2986134c2b5d358c4b201354f405a3426b0cd30f
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: imageProcessing
+  ledgerPath: 07-remaining-domains/11-image-processing/lesson-ledger.yml
+  fromCount: 9
+  toCount: 9
+  fromOrderHash: b0b9ce760e89fc7f6f88b219ca62848ea225fa3fb7da2b69557b4d6c070102ec
+  toOrderHash: b0b9ce760e89fc7f6f88b219ca62848ea225fa3fb7da2b69557b4d6c070102ec
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: interactiveDashboards
+  ledgerPath: 07-remaining-domains/05-interactive-dashboards/lesson-ledger.yml
+  fromCount: 13
+  toCount: 13
+  fromOrderHash: 90a8ef4262c923ddf6ba4fcd38eb0bdaba70f5b085c95a5daea5aeaa3b091fed
+  toOrderHash: 90a8ef4262c923ddf6ba4fcd38eb0bdaba70f5b085c95a5daea5aeaa3b091fed
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: machineLearning
+  ledgerPath: 07-remaining-domains/08-machine-learning/lesson-ledger.yml
+  fromCount: 15
+  toCount: 15
+  fromOrderHash: 8631e72a44bcd6b47e693302ba4ffae0cbae2910d8e35412cbf88577b4b36f80
+  toOrderHash: 8631e72a44bcd6b47e693302ba4ffae0cbae2910d8e35412cbf88577b4b36f80
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: officeAutomation
+  ledgerPath: 05-office-automation/lesson-ledger.yml
+  fromCount: 18
+  toCount: 19
+  fromOrderHash: 0ba90750817b3ccbeed5b84e1862974d4c7eeba6f04c51a7b809384c54868dd8
+  toOrderHash: 1ab6a20f996464790e47f60665aa5294f4a7845ef5a892828a2170051128fa04
+  addedLessonRefs:
+  - openpyxl/10_월간매출리포트생성기
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: pdfAutomation
+  ledgerPath: 07-remaining-domains/00-pdf-automation/lesson-ledger.yml
+  fromCount: 17
+  toCount: 17
+  fromOrderHash: 708d2f22816a77c6c2ca2ff754dee30dc4aafa4cb23dad71e2bc895a4ab61d57
+  toOrderHash: 708d2f22816a77c6c2ca2ff754dee30dc4aafa4cb23dad71e2bc895a4ab61d57
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: pythonFoundation
+  ledgerPath: 01-python-foundation/lesson-ledger.yml
+  fromCount: 12
+  toCount: 13
+  fromOrderHash: 347fca132270630c106ac2ac14274bd9a75cbab23cb07a14dfcbe2e078fd5401
+  toOrderHash: e7510c315cebba8dfdadf674163ffb1d8453e01bbdcafad42b830926298e917b
+  addedLessonRefs:
+  - 30days/day30_최종프로젝트
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: scientificComputing
+  ledgerPath: 07-remaining-domains/17-scientific-computing/lesson-ledger.yml
+  fromCount: 13
+  toCount: 13
+  fromOrderHash: 165922d4579a5bccfb360e1c017963b3dccf475af3ca29ee86957bda67961abe
+  toOrderHash: 165922d4579a5bccfb360e1c017963b3dccf475af3ca29ee86957bda67961abe
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: scriptingAutomation
+  ledgerPath: 07-remaining-domains/03-scripting-automation/lesson-ledger.yml
+  fromCount: 11
+  toCount: 11
+  fromOrderHash: 6f6880cbc7c8851f9fe633e466397a55e3b8c1694cc237d7c79acf35cb7f272d
+  toOrderHash: 6f6880cbc7c8851f9fe633e466397a55e3b8c1694cc237d7c79acf35cb7f272d
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: sqlAnalysis
+  ledgerPath: 07-remaining-domains/18-sql-analysis/lesson-ledger.yml
+  fromCount: 9
+  toCount: 9
+  fromOrderHash: 88c78604907c4ca6a53ece3b68ca78d898b8ac6442533efae20e442e242e752e
+  toOrderHash: 88c78604907c4ca6a53ece3b68ca78d898b8ac6442533efae20e442e242e752e
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: standardLibraryMastery
+  ledgerPath: 07-remaining-domains/23-standard-library-mastery/lesson-ledger.yml
+  fromCount: 16
+  toCount: 22
+  fromOrderHash: b006893d578ba21f3d7bc2902d3e8be618a858acd73d57bd87dd244ebc061e0d
+  toOrderHash: 05aa78b59b256f39011cba255fb506f1c627e987920ce785de7c8e0589245e95
+  addedLessonRefs:
+  - 30days/day04_문자열기초
+  - 30days/day25_프로퍼티와데코레이터
+  - advancedPython/31_컨텍스트매니저
+  - builtins/34_hashlib
+  - builtins/33_tempfile
+  - builtins/35_zipfile
+  droppedLessonRefs: []
+  orderChanges:
+  - lessonRef: 30days/day07_리스트기초
+    fromOrder: 4
+    toOrder: 5
+  - lessonRef: 30days/day10_집합
+    fromOrder: 5
+    toOrder: 6
+  - lessonRef: 30days/day13_조건문
+    fromOrder: 6
+    toOrder: 7
+  - lessonRef: 30days/day15_함수기초
+    fromOrder: 7
+    toOrder: 8
+  - lessonRef: builtins/05_collections
+    fromOrder: 8
+    toOrder: 9
+  - lessonRef: builtins/13_json
+    fromOrder: 9
+    toOrder: 10
+  - lessonRef: 30days/day18_모듈과import
+    fromOrder: 10
+    toOrder: 11
+  - lessonRef: 30days/day22_클래스기초
+    fromOrder: 11
+    toOrder: 12
+  - lessonRef: builtins/25_logging
+    fromOrder: 12
+    toOrder: 13
+  - lessonRef: builtins/03_datetime
+    fromOrder: 13
+    toOrder: 15
+  - lessonRef: builtins/08_os
+    fromOrder: 14
+    toOrder: 16
+  - lessonRef: builtins/10_sys
+    fromOrder: 15
+    toOrder: 17
+  - lessonRef: builtins/31_subprocess
+    fromOrder: 16
+    toOrder: 18
+- pathId: statisticalAnalysis
+  ledgerPath: 07-remaining-domains/07-statistical-analysis/lesson-ledger.yml
+  fromCount: 15
+  toCount: 15
+  fromOrderHash: 45f4c21554c8bd6a72b87ef215ba02224c0df9f82893924e68ac746348c3115b
+  toOrderHash: 45f4c21554c8bd6a72b87ef215ba02224c0df9f82893924e68ac746348c3115b
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: systemMonitoring
+  ledgerPath: 07-remaining-domains/22-system-monitoring/lesson-ledger.yml
+  fromCount: 12
+  toCount: 12
+  fromOrderHash: f2ee1260387faa425aafc6d1de6ab4e430d657032cdf2b00ef240179d59bfc4a
+  toOrderHash: f2ee1260387faa425aafc6d1de6ab4e430d657032cdf2b00ef240179d59bfc4a
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: textProcessing
+  ledgerPath: 07-remaining-domains/16-text-processing/lesson-ledger.yml
+  fromCount: 7
+  toCount: 7
+  fromOrderHash: 17214293ff98d447dc95f75daf3665ded460ed086cfd0e8a37d897ded7fb088d
+  toOrderHash: 17214293ff98d447dc95f75daf3665ded460ed086cfd0e8a37d897ded7fb088d
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: timeSeriesAnalysis
+  ledgerPath: 07-remaining-domains/04-time-series-analysis/lesson-ledger.yml
+  fromCount: 11
+  toCount: 11
+  fromOrderHash: 8b70702c57309388ec98b2848e3db53542b14d31d7c34dfa7401cda74ddb4a57
+  toOrderHash: 8b70702c57309388ec98b2848e3db53542b14d31d7c34dfa7401cda74ddb4a57
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: timeSeriesForecasting
+  ledgerPath: 07-remaining-domains/09-time-series-forecasting/lesson-ledger.yml
+  fromCount: 16
+  toCount: 16
+  fromOrderHash: 876433baf44572b00c9ac6026fe30b8ec80fcf993445b1b4116110828cd733fc
+  toOrderHash: 876433baf44572b00c9ac6026fe30b8ec80fcf993445b1b4116110828cd733fc
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: visionAdvanced
+  ledgerPath: 07-remaining-domains/13-vision-advanced/lesson-ledger.yml
+  fromCount: 13
+  toCount: 13
+  fromOrderHash: 471730cb19c107f3af20825de8f2f212babd65d7c23fefa530540c4c56949838
+  toOrderHash: 471730cb19c107f3af20825de8f2f212babd65d7c23fefa530540c4c56949838
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: visionAutomation
+  ledgerPath: 07-remaining-domains/15-vision-automation/lesson-ledger.yml
+  fromCount: 12
+  toCount: 12
+  fromOrderHash: 9161d0c36dadc5f757d2ae716049a90ef8e0f1ffa1c2a1efaf0ec1892ef6cc92
+  toOrderHash: 9161d0c36dadc5f757d2ae716049a90ef8e0f1ffa1c2a1efaf0ec1892ef6cc92
+  addedLessonRefs: []
+  droppedLessonRefs: []
+  orderChanges: []
+- pathId: webMonitoring
+  ledgerPath: 06-web-monitoring/lesson-ledger.yml
+  fromCount: 8
+  toCount: 10
+  fromOrderHash: bd510fd550c645cf942bf2b7657415bfdeb63ab68a9c576d97dd3e0c0f7993d2
+  toOrderHash: c9dfb0f416c6d48503f7e1c93a2f6b78b04b654b240d088a5d10216bf7617a4a
+  addedLessonRefs:
+  - playwright/05_네트워크모킹
+  - playwright/10_종합브라우저점검프로젝트
+  droppedLessonRefs: []
+  orderChanges:
+  - lessonRef: 30days/day13_조건문
+    fromOrder: 7
+    toOrder: 8
+  - lessonRef: 30days/day15_함수기초
+    fromOrder: 8
+    toOrder: 9
+review:
+  status: pending
+  reviewerId: null
+  reviewedAt: null
+  evidenceCommit: null

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko" class="dark">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -14,8 +14,15 @@
     <script>
       (function () {
         try {
+          var mode = localStorage.getItem("codaro-theme") || "system";
+          var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          var resolved = mode === "system" ? (prefersDark ? "dark" : "light") : mode;
           var accent = localStorage.getItem("codaro-accent");
-          if (accent && accent !== "zinc") document.documentElement.dataset.accent = accent;
+          if (accent !== "blue" && accent !== "teal") accent = "plum";
+          document.documentElement.classList.toggle("dark", resolved === "dark");
+          document.documentElement.dataset.resolvedTheme = resolved;
+          document.documentElement.dataset.accent = accent;
+          document.documentElement.dataset.density = "studioDense";
         } catch (storageError) {}
       })();
     </script>
@@ -25,7 +32,8 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
-      if ("serviceWorker" in navigator && location.protocol !== "file:") {
+      const isLocalPreview = ["localhost", "127.0.0.1", "::1"].includes(location.hostname);
+      if ("serviceWorker" in navigator && location.protocol !== "file:" && !isLocalPreview) {
         let codaroRefreshing = false;
         navigator.serviceWorker.addEventListener("controllerchange", () => {
           if (codaroRefreshing) return;
@@ -33,7 +41,10 @@
           window.location.reload();
         });
         window.addEventListener("load", () => {
-          navigator.serviceWorker.register("/serviceWorker.js")
+          const serviceWorkerBase = "%BASE_URL%";
+          navigator.serviceWorker.register(`${serviceWorkerBase}serviceWorker.js`, {
+            scope: serviceWorkerBase,
+          })
             .then((registration) => registration.update())
             .catch(() => {});
         });

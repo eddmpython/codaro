@@ -50,6 +50,12 @@ outcomes:
   - id: python.advancedSyntax
     label: 고급 문법
     description: 컴프리헨션, 제너레이터, 데코레이터, 클로저
+  - id: python.projectDelivery
+    label: Python 프로젝트 완성
+    description: 입력 계약, 처리, 오류 경계, 재사용 가능한 산출물을 하나의 프로젝트로 완성
+  - id: python.practicalWorkflow
+    label: 실전 Python 작업 흐름
+    description: 문제를 입력, 처리, 검증, 산출물 단계로 나누어 실행 가능한 Python 작업으로 설계
 
   # === 표준 라이브러리/고급 ===
   - id: python.functools
@@ -108,6 +114,15 @@ outcomes:
   - id: builtins.networking
     label: 표준 네트워크
     description: urllib, email
+  - id: builtins.tempFiles
+    label: 임시 파일과 격리
+    description: tempfile로 임시 자원을 생성하고 수명 주기 안에서 정리
+  - id: builtins.hashing
+    label: 해시와 무결성
+    description: hashlib, hmac, secrets로 데이터 무결성과 안전한 토큰 처리
+  - id: builtins.archives
+    label: 아카이브 처리
+    description: zipfile과 tarfile로 압축 파일을 생성, 검사, 안전하게 추출
 
   # === 수치/심볼릭 ===
   - id: numpy.intro
@@ -221,6 +236,9 @@ outcomes:
   - id: viz.heatmap
     label: 히트맵·상관관계
     description: heatmap, clustermap, 매트릭스
+  - id: viz.edaReport
+    label: EDA 증거 리포트
+    description: 분석 분모, 제외 행, 그룹, 축 범위와 저장된 시각 증거를 함께 구성
   - id: viz.interactive
     label: 인터랙티브 시각화
     description: 줌, 호버, 인터랙티브 대시보드 요소
@@ -342,6 +360,9 @@ outcomes:
   - id: automation.browser.evidence
     label: 스크린샷/증거 캡처
     description: 자동화 산출물로 스크린샷, HTML 저장
+  - id: automation.browser.audit
+    label: 브라우저 점검 감사
+    description: 시나리오, viewport, 접근성, network 증거를 release 판단으로 통합
   - id: automation.browser.session
     label: 로그인 세션 관리
     description: storage_state 저장/복원
@@ -563,6 +584,7 @@ domains:
   - id: dataReporting
     label: 데이터 분석 보고서
     description: 표 데이터를 불러와 가공·요약하고 분석 보고서로 정리한다.
+    capstoneLessonRef: pandas/10_실전종합프로젝트
     targetOutcomes:
       - python.variables
       - python.controlFlow
@@ -576,6 +598,7 @@ domains:
   - id: officeAutomation
     label: 사무 자동화 (엑셀/문서)
     description: 엑셀 반복 작업을 Python으로 자동화하고 보고서를 만든다.
+    capstoneLessonRef: openpyxl/10_월간매출리포트생성기
     targetOutcomes:
       - python.variables
       - python.controlFlow
@@ -646,6 +669,7 @@ domains:
   - id: webMonitoring
     label: 웹 자동화·모니터링
     description: 브라우저로 사이트를 점검하고 스크린샷·결과를 저장한다.
+    capstoneLessonRef: playwright/10_종합브라우저점검프로젝트
     targetOutcomes:
       - python.variables
       - python.controlFlow
@@ -653,6 +677,7 @@ domains:
       - automation.browser.basics
       - automation.browser.formInput
       - automation.browser.evidence
+      - automation.browser.audit
 
   - id: scriptingAutomation
     label: OS·파일·프로세스 자동화
@@ -669,6 +694,7 @@ domains:
   - id: pythonFoundation
     label: Python 기초 완주
     description: 30일 커리큘럼으로 Python 기본기를 끝까지 다진다.
+    capstoneLessonRef: 30days/day30_최종프로젝트
     targetOutcomes:
       - python.intro
       - python.variables
@@ -682,6 +708,7 @@ domains:
       - python.errorHandling
       - python.oop
       - python.advancedSyntax
+      - python.projectDelivery
 
   - id: timeSeriesAnalysis
     label: 시계열 데이터 분석
@@ -696,6 +723,7 @@ domains:
   - id: dataVisualization
     label: 데이터 시각화
     description: 정적·통계·관계 그래프로 데이터 인사이트를 시각화한다.
+    capstoneLessonRef: seaborn/10_종합EDA리포트
     targetOutcomes:
       - python.variables
       - python.controlFlow
@@ -706,6 +734,7 @@ domains:
       - viz.distribution
       - viz.regression
       - viz.heatmap
+      - viz.edaReport
 
   - id: interactiveDashboards
     label: 인터랙티브 대시보드
@@ -884,9 +913,12 @@ domains:
   - id: fileAutomation
     label: 파일·폴더 자동화
     description: 파일 시스템과 감시·스케줄로 폴더 작업을 자동화한다.
+    capstoneLessonRef: fileOps/10_종합다운로드폴더정리
     targetOutcomes:
       - python.modulesAndIo
       - builtins.fileSystem
+      - builtins.tempFiles
+      - builtins.archives
       - automation.fileOps
       - automation.fileBackup
       - automation.watchSched
@@ -915,6 +947,9 @@ domains:
       - builtins.cli
       - builtins.logging
       - builtins.subprocess
+      - builtins.tempFiles
+      - builtins.hashing
+      - builtins.archives
 
   - id: aiIntegration
     label: AI/LLM 통합
@@ -1014,7 +1049,7 @@ lessonOutcomes:
     prerequisites: [python.functions]
     estimatedMinutes: 40
   "30days/day21_중간종합복습":
-    outcomes: []
+    outcomes: [python.controlFlow, python.functions, python.modulesAndIo, python.errorHandling]
     prerequisites:
       - python.controlFlow
       - python.functions
@@ -1050,11 +1085,11 @@ lessonOutcomes:
     prerequisites: [python.advancedSyntax]
     estimatedMinutes: 50
   "30days/day29_알고리즘연습":
-    outcomes: []
+    outcomes: [python.advancedSyntax]
     prerequisites: [python.advancedSyntax]
     estimatedMinutes: 60
   "30days/day30_최종프로젝트":
-    outcomes: []
+    outcomes: [python.projectDelivery]
     prerequisites: [python.advancedSyntax, python.oop, python.errorHandling]
     estimatedMinutes: 90
     lessonRole: project
@@ -1225,43 +1260,51 @@ lessonOutcomes:
   "xlwings/00_xlwings소개":
     outcomes: [automation.excel.intro]
     prerequisites: [python.functions, python.modulesAndIo]
-    estimatedMinutes: 30
+    estimatedMinutes: 25
   "xlwings/01_첫엑셀연결":
     outcomes: [automation.excel.intro, automation.excel.workbook]
-    prerequisites: [automation.excel.intro, python.errorHandling]
-    estimatedMinutes: 45
+    prerequisites: [automation.excel.intro]
+    estimatedMinutes: 40
+    sectionOutcomes:
+      lesson-contract: [automation.excel.intro]
+      open-and-write: [automation.excel.workbook]
+      save-and-reopen: [automation.excel.workbook]
   "xlwings/02_가격표일괄입력":
     outcomes: [automation.excel.workbook]
     prerequisites: [automation.excel.workbook]
-    estimatedMinutes: 50
+    estimatedMinutes: 45
   "xlwings/03_시트탐색과확장":
     outcomes: [automation.excel.workbook]
     prerequisites: [automation.excel.workbook]
-    estimatedMinutes: 55
+    estimatedMinutes: 50
   "xlwings/04_DataFrame왕복":
-    outcomes: [automation.excel.workbook, pandas.intro]
-    prerequisites: [automation.excel.workbook, pandas.intro]
+    outcomes: [automation.excel.workbook]
+    prerequisites: [automation.excel.workbook, pandas.loadFrame]
     estimatedMinutes: 55
   "xlwings/05_수식과서식":
-    outcomes: [automation.excel.workbook]
+    outcomes: [automation.excel.formulas, automation.excel.styles]
     prerequisites: [automation.excel.workbook]
     estimatedMinutes: 55
+    sectionOutcomes:
+      formula-write: [automation.excel.formulas]
+      number-format: [automation.excel.styles]
+      color-and-autofit: [automation.excel.styles]
   "xlwings/06_막대차트자동생성":
-    outcomes: [automation.excel.workbook]
-    prerequisites: [automation.excel.workbook, pandas.intro]
-    estimatedMinutes: 60
-  "xlwings/07_표와동적합계":
-    outcomes: [automation.excel.workbook]
+    outcomes: [automation.excel.charts]
     prerequisites: [automation.excel.workbook]
+    estimatedMinutes: 55
+  "xlwings/07_표와동적합계":
+    outcomes: [automation.excel.tables]
+    prerequisites: [automation.excel.workbook, automation.excel.formulas]
     estimatedMinutes: 60
   "xlwings/08_월별파일분기합치기":
-    outcomes: [automation.excel.workbook, pandas.merge]
-    prerequisites: [automation.excel.workbook, pandas.loadFrame]
+    outcomes: [automation.excel.report]
+    prerequisites: [automation.excel.workbook, automation.excel.tables]
     estimatedMinutes: 70
   "xlwings/09_VBA매크로호출":
     outcomes: [automation.excel.workbook]
     prerequisites: [automation.excel.workbook]
-    estimatedMinutes: 65
+    estimatedMinutes: 55
   "xlwings/10_UDF가격계산기":
     outcomes: [automation.excel.workbook]
     prerequisites: [automation.excel.workbook]
@@ -1397,6 +1440,18 @@ lessonOutcomes:
     outcomes: [builtins.contextManagers]
     prerequisites: [python.advancedSyntax]
     estimatedMinutes: 35
+  "builtins/33_tempfile":
+    outcomes: [builtins.tempFiles]
+    prerequisites: [builtins.fileSystem, builtins.contextManagers]
+    estimatedMinutes: 40
+  "builtins/34_hashlib":
+    outcomes: [builtins.hashing]
+    prerequisites: [python.strings, builtins.fileSystem]
+    estimatedMinutes: 40
+  "builtins/35_zipfile":
+    outcomes: [builtins.archives]
+    prerequisites: [builtins.fileSystem, builtins.contextManagers]
+    estimatedMinutes: 45
 
   # numpy 트랙
   "numpy/00_NumPy소개":
@@ -1521,7 +1576,7 @@ lessonOutcomes:
     prerequisites: [sympy.calculus, matplotlib.basics]
     estimatedMinutes: 45
   "sympy/10_종합수학문제":
-    outcomes: []
+    outcomes: [sympy.equations, sympy.calculus, sympy.matrices]
     prerequisites: [sympy.equations, sympy.calculus, sympy.matrices]
     estimatedMinutes: 70
     lessonRole: project
@@ -1583,7 +1638,7 @@ lessonOutcomes:
     prerequisites: [duckdb.basicQueries]
     estimatedMinutes: 45
   "duckdb/10_종합프로젝트":
-    outcomes: []
+    outcomes: [duckdb.basicQueries, duckdb.aggregation, duckdb.window]
     prerequisites: [duckdb.window]
     estimatedMinutes: 80
     lessonRole: project
@@ -1826,7 +1881,7 @@ lessonOutcomes:
     prerequisites: [viz.regression]
     estimatedMinutes: 65
   "seaborn/10_종합EDA리포트":
-    outcomes: []
+    outcomes: [viz.edaReport]
     prerequisites: [viz.regression, viz.heatmap, viz.distribution]
     estimatedMinutes: 90
     lessonRole: project
@@ -1991,7 +2046,7 @@ lessonOutcomes:
     prerequisites: [scipy.signal]
     estimatedMinutes: 60
   "scipy/10_종합과학프로젝트":
-    outcomes: []
+    outcomes: [scipy.statistics, scipy.optimization, scipy.signal, scipy.integration]
     prerequisites: [scipy.statistics, scipy.optimization, scipy.signal]
     estimatedMinutes: 90
     lessonRole: project
@@ -2052,7 +2107,7 @@ lessonOutcomes:
     prerequisites: [stats.timeSeries]
     estimatedMinutes: 60
   "statsmodels/10_종합프로젝트":
-    outcomes: []
+    outcomes: [stats.regression, stats.diagnostics, stats.timeSeries]
     prerequisites: [stats.regression, stats.diagnostics, stats.timeSeries]
     estimatedMinutes: 90
     lessonRole: project
@@ -2158,7 +2213,7 @@ lessonOutcomes:
     prerequisites: [graph.algorithms]
     estimatedMinutes: 50
   "networkx/10_종합네트워크프로젝트":
-    outcomes: []
+    outcomes: [graph.paths, graph.community, graph.algorithms]
     prerequisites: [graph.community, graph.algorithms]
     estimatedMinutes: 80
     lessonRole: project
@@ -2301,7 +2356,7 @@ lessonOutcomes:
     prerequisites: [automation.procMonitoring]
     estimatedMinutes: 45
   "procCtl/10_종합빌드러너":
-    outcomes: []
+    outcomes: [automation.procCtl, automation.procMonitoring]
     prerequisites: [automation.procCtl, automation.procMonitoring]
     estimatedMinutes: 75
     lessonRole: project
@@ -2344,7 +2399,7 @@ lessonOutcomes:
     prerequisites: [automation.scheduling]
     estimatedMinutes: 40
   "watchSched/10_종합폴더감시리포터":
-    outcomes: []
+    outcomes: [automation.watchSched, automation.scheduling]
     prerequisites: [automation.watchSched, automation.scheduling]
     estimatedMinutes: 75
     lessonRole: project
@@ -2399,7 +2454,7 @@ lessonOutcomes:
     prerequisites: [automation.screenInteraction]
     estimatedMinutes: 55
   "inputCtl/10_종합화면점검":
-    outcomes: []
+    outcomes: [automation.inputCtl, automation.screenInteraction]
     prerequisites: [automation.inputCtl, automation.screenInteraction]
     estimatedMinutes: 75
     lessonRole: project
@@ -2446,7 +2501,7 @@ lessonOutcomes:
     prerequisites: [image.composition]
     estimatedMinutes: 55
   "pillow/10_종합이미지에디터":
-    outcomes: []
+    outcomes: [image.filters, image.composition]
     prerequisites: [image.filters, image.composition]
     estimatedMinutes: 80
     lessonRole: project
@@ -2493,7 +2548,7 @@ lessonOutcomes:
     prerequisites: [vision.filters]
     estimatedMinutes: 55
   "opencv/10_종합비전프로젝트":
-    outcomes: []
+    outcomes: [vision.filters, vision.features]
     prerequisites: [vision.features, vision.filters]
     estimatedMinutes: 90
     lessonRole: project
@@ -2536,7 +2591,7 @@ lessonOutcomes:
     prerequisites: [vision.pixelFoundations]
     estimatedMinutes: 40
   "visionBasics/10_종합미니보정기":
-    outcomes: []
+    outcomes: [vision.pixelFoundations]
     prerequisites: [vision.pixelFoundations]
     estimatedMinutes: 70
     lessonRole: project
@@ -2579,7 +2634,7 @@ lessonOutcomes:
     prerequisites: [vision.video]
     estimatedMinutes: 55
   "visionFeatures/10_종합영상ROI추적기":
-    outcomes: []
+    outcomes: [vision.featureMatching, vision.video]
     prerequisites: [vision.video, vision.featureMatching]
     estimatedMinutes: 80
     lessonRole: project
@@ -2622,7 +2677,7 @@ lessonOutcomes:
     prerequisites: [deepVision.classification]
     estimatedMinutes: 50
   "deepVision/10_종합사진태깅기":
-    outcomes: []
+    outcomes: [deepVision.classification, deepVision.detection]
     prerequisites: [deepVision.detection]
     estimatedMinutes: 90
     lessonRole: project
@@ -2665,7 +2720,7 @@ lessonOutcomes:
     prerequisites: [visionApps.faceMedia]
     estimatedMinutes: 55
   "visionApps/10_종합사진정리기":
-    outcomes: []
+    outcomes: [visionApps.documents, visionApps.faceMedia]
     prerequisites: [visionApps.faceMedia, visionApps.documents]
     estimatedMinutes: 90
     lessonRole: project
@@ -2765,7 +2820,7 @@ lessonOutcomes:
     prerequisites: [python.functions, python.oop]
     estimatedMinutes: 45
   "advancedPython/30_종합문제풀이":
-    outcomes: []
+    outcomes: [python.advancedSyntax, python.designPatterns]
     prerequisites: [python.advancedSyntax, python.designPatterns]
     estimatedMinutes: 90
   "advancedPython/31_컨텍스트매니저":
@@ -2844,7 +2899,7 @@ lessonOutcomes:
     prerequisites: [automation.browser.evidence]
     estimatedMinutes: 50
   "playwright/10_종합브라우저점검프로젝트":
-    outcomes: []
+    outcomes: [automation.browser.audit]
     prerequisites: [automation.browser.testFlow, automation.browser.evidence]
     estimatedMinutes: 80
     lessonRole: project
@@ -2869,13 +2924,27 @@ lessonOutcomes:
     prerequisites: [duckdb.intro]
     estimatedMinutes: 30
   "practical/00_실전파이썬소개":
-    outcomes: []
+    outcomes: [python.practicalWorkflow]
     prerequisites: [python.functions]
     estimatedMinutes: 30
 
+  # 개발 교양 트랙
+  "devTools/commandLineIntro":
+    outcomes: [devLiteracy.commandLine]
+    prerequisites: []
+    estimatedMinutes: 30
+  "devTools/gitFirstSteps":
+    outcomes: [devLiteracy.git, devLiteracy.gitBasics]
+    prerequisites: [devLiteracy.commandLine]
+    estimatedMinutes: 40
+  "devTools/githubIntro":
+    outcomes: [devLiteracy.github]
+    prerequisites: [devLiteracy.gitBasics]
+    estimatedMinutes: 35
+
   # llmBasics 트랙
   "llmBasics/00_LLM통합소개":
-    outcomes: []
+    outcomes: [llm.intro]
     prerequisites: [python.functions, python.modulesAndIo]
     estimatedMinutes: 25
   "llmBasics/01_첫Claude호출":
@@ -2915,32 +2984,173 @@ lessonOutcomes:
     prerequisites: [llm.toolUse]
     estimatedMinutes: 60
   "llmBasics/10_데이터분석봇":
-    outcomes: []
+    outcomes: [llm.structuredOutput, llm.caching, llm.toolUse]
     prerequisites: [llm.toolUse, llm.caching, llm.structuredOutput]
     estimatedMinutes: 90
     lessonRole: project
 
-  # pdf/email/word/requests 프로젝트 트랙
+  # PDF 자동화 트랙
+  "pdf/00_pdf소개":
+    outcomes: [automation.pdf.intro]
+    prerequisites: [python.functions, python.modulesAndIo]
+    estimatedMinutes: 25
+  "pdf/01_pdf열고페이지정보":
+    outcomes: [automation.pdf.read]
+    prerequisites: [automation.pdf.intro]
+    estimatedMinutes: 40
+  "pdf/02_pdf병합과분할":
+    outcomes: [automation.pdf.merge]
+    prerequisites: [automation.pdf.read]
+    estimatedMinutes: 45
+  "pdf/03_텍스트추출":
+    outcomes: [automation.pdf.extract]
+    prerequisites: [automation.pdf.read]
+    estimatedMinutes: 45
+  "pdf/04_표추출":
+    outcomes: [automation.pdf.extract]
+    prerequisites: [automation.pdf.read, pandas.intro]
+    estimatedMinutes: 50
+  "pdf/05_첫pdf생성":
+    outcomes: [automation.pdf.create]
+    prerequisites: [automation.pdf.intro]
+    estimatedMinutes: 45
+  "pdf/06_한글폰트와스타일":
+    outcomes: [automation.pdf.create, automation.pdf.layout]
+    prerequisites: [automation.pdf.create]
+    estimatedMinutes: 50
+  "pdf/07_표와이미지삽입":
+    outcomes: [automation.pdf.layout]
+    prerequisites: [automation.pdf.create]
+    estimatedMinutes: 55
+  "pdf/08_워터마크와암호화":
+    outcomes: [automation.pdf.security]
+    prerequisites: [automation.pdf.merge, automation.pdf.create]
+    estimatedMinutes: 55
+  "pdf/09_양식채우기":
+    outcomes: [automation.pdf.forms]
+    prerequisites: [automation.pdf.read, automation.pdf.create]
+    estimatedMinutes: 55
   "pdf/10_월간청구서생성기":
     outcomes: [automation.pdf.report]
     prerequisites: [automation.pdf.layout, automation.pdf.security]
     estimatedMinutes: 90
     lessonRole: project
+
+  # 이메일 자동화 트랙
+  "email/00_email소개":
+    outcomes: [automation.email.intro]
+    prerequisites: [python.functions, python.modulesAndIo]
+    estimatedMinutes: 25
+  "email/01_첫메일발송":
+    outcomes: [automation.email.send]
+    prerequisites: [automation.email.intro]
+    estimatedMinutes: 40
+  "email/02_html과첨부":
+    outcomes: [automation.email.attachments]
+    prerequisites: [automation.email.send]
+    estimatedMinutes: 50
+  "email/03_다수수신자와개인화":
+    outcomes: [automation.email.bulk]
+    prerequisites: [automation.email.send, python.strings]
+    estimatedMinutes: 55
+  "email/04_표와차트삽입":
+    outcomes: [automation.email.attachments]
+    prerequisites: [automation.email.send, automation.email.attachments]
+    estimatedMinutes: 55
+  "email/05_imap으로받기":
+    outcomes: [automation.email.receive]
+    prerequisites: [automation.email.intro]
+    estimatedMinutes: 55
+  "email/06_첨부자동저장":
+    outcomes: [automation.email.receive, automation.email.attachments]
+    prerequisites: [automation.email.receive, builtins.fileSystem]
+    estimatedMinutes: 50
+  "email/07_규칙기반분류":
+    outcomes: [automation.email.classify]
+    prerequisites: [automation.email.receive, python.controlFlow]
+    estimatedMinutes: 55
+  "email/08_스크립트결과알림":
+    outcomes: [automation.email.notify]
+    prerequisites: [automation.email.send, python.errorHandling]
+    estimatedMinutes: 50
+  "email/09_안전한자격증명관리":
+    outcomes: [automation.email.credentials]
+    prerequisites: [automation.email.send, python.modulesAndIo]
+    estimatedMinutes: 40
   "email/10_주간보고서발송기":
     outcomes: [automation.email.report]
     prerequisites: [automation.email.bulk, automation.email.notify, automation.email.credentials]
     estimatedMinutes: 90
     lessonRole: project
+
+  # Word 자동화 트랙
+  "word/00_word소개":
+    outcomes: [automation.word.intro]
+    prerequisites: [python.functions, python.modulesAndIo]
+    estimatedMinutes: 25
+  "word/01_첫문서만들기":
+    outcomes: [automation.word.paragraphs]
+    prerequisites: [automation.word.intro]
+    estimatedMinutes: 40
+  "word/02_제목과목록":
+    outcomes: [automation.word.paragraphs]
+    prerequisites: [automation.word.paragraphs]
+    estimatedMinutes: 45
+  "word/03_텍스트스타일링":
+    outcomes: [automation.word.runs]
+    prerequisites: [automation.word.paragraphs]
+    estimatedMinutes: 45
+  "word/04_표만들기":
+    outcomes: [automation.word.tables]
+    prerequisites: [automation.word.paragraphs]
+    estimatedMinutes: 50
+  "word/05_이미지와머리말":
+    outcomes: [automation.word.media]
+    prerequisites: [automation.word.paragraphs]
+    estimatedMinutes: 50
+  "word/06_스타일과페이지설정":
+    outcomes: [automation.word.styles]
+    prerequisites: [automation.word.runs]
+    estimatedMinutes: 50
+  "word/07_기존문서수정":
+    outcomes: [automation.word.edit]
+    prerequisites: [automation.word.paragraphs, automation.word.runs]
+    estimatedMinutes: 50
+  "word/08_mailmerge_csv기반":
+    outcomes: [automation.word.mailMerge]
+    prerequisites: [automation.word.tables, pandas.loadFrame]
+    estimatedMinutes: 60
+  "word/09_docxtpl템플릿엔진":
+    outcomes: [automation.word.template]
+    prerequisites: [automation.word.edit, python.strings]
+    estimatedMinutes: 60
   "word/10_회의록자동생성기":
     outcomes: [automation.word.report]
     prerequisites: [automation.word.tables, automation.word.media, automation.word.styles, automation.word.template]
     estimatedMinutes: 90
     lessonRole: project
+
+  # Web API 자동화 트랙
+  "requests/00_requests소개":
+    outcomes: [automation.webApi.intro]
+    prerequisites: [python.functions, python.modulesAndIo]
+    estimatedMinutes: 25
   "requests/01_첫GET요청":
     outcomes: [automation.webApi.get]
     prerequisites: [automation.webApi.intro]
     estimatedMinutes: 40
-    lessonRole: project
+  "requests/11_사업자등록상태조회":
+    outcomes: [automation.webApi.businessStatus]
+    prerequisites: [automation.webApi.get, python.errorHandling]
+    estimatedMinutes: 65
+  "requests/12_공휴일영업일계산":
+    outcomes: [automation.webApi.businessDays]
+    prerequisites: [automation.webApi.get, builtins.datetime]
+    estimatedMinutes: 65
+  "requests/13_환율조회환산":
+    outcomes: [automation.webApi.exchangeRate]
+    prerequisites: [automation.webApi.get, builtins.numericMath]
+    estimatedMinutes: 65
 
   # openpyxl 트랙 - 파일 기반 엑셀 자동화
   "openpyxl/00_openpyxl소개":
@@ -3001,53 +3211,3 @@ lessonOutcomes:
       - automation.excel.tables
     estimatedMinutes: 90
     lessonRole: project
-
-  # xlwings 트랙 - 라이브 Excel 자동화
-  "xlwings/00_xlwings소개":
-    outcomes: [automation.excel.intro]
-    prerequisites: [python.functions, python.modulesAndIo]
-    estimatedMinutes: 25
-  "xlwings/01_첫엑셀연결":
-    outcomes: [automation.excel.intro, automation.excel.workbook]
-    prerequisites: [automation.excel.intro]
-    estimatedMinutes: 40
-    sectionOutcomes:
-      lesson-contract: [automation.excel.intro]
-      open-and-write: [automation.excel.workbook]
-      save-and-reopen: [automation.excel.workbook]
-  "xlwings/02_가격표일괄입력":
-    outcomes: [automation.excel.workbook]
-    prerequisites: [automation.excel.workbook]
-    estimatedMinutes: 45
-  "xlwings/03_시트탐색과확장":
-    outcomes: [automation.excel.workbook]
-    prerequisites: [automation.excel.workbook]
-    estimatedMinutes: 50
-  "xlwings/04_DataFrame왕복":
-    outcomes: [automation.excel.workbook]
-    prerequisites: [automation.excel.workbook, pandas.loadFrame]
-    estimatedMinutes: 55
-  "xlwings/05_수식과서식":
-    outcomes: [automation.excel.formulas, automation.excel.styles]
-    prerequisites: [automation.excel.workbook]
-    estimatedMinutes: 55
-    sectionOutcomes:
-      formula-write: [automation.excel.formulas]
-      number-format: [automation.excel.styles]
-      color-and-autofit: [automation.excel.styles]
-  "xlwings/06_막대차트자동생성":
-    outcomes: [automation.excel.charts]
-    prerequisites: [automation.excel.workbook]
-    estimatedMinutes: 55
-  "xlwings/07_표와동적합계":
-    outcomes: [automation.excel.tables]
-    prerequisites: [automation.excel.workbook, automation.excel.formulas]
-    estimatedMinutes: 60
-  "xlwings/08_월별파일분기합치기":
-    outcomes: [automation.excel.report]
-    prerequisites: [automation.excel.workbook, automation.excel.tables]
-    estimatedMinutes: 70
-  "xlwings/09_VBA매크로호출":
-    outcomes: [automation.excel.workbook]
-    prerequisites: [automation.excel.workbook]
-    estimatedMinutes: 55

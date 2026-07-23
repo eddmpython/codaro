@@ -6,6 +6,9 @@ meta:
   difficulty: medium
   audience: 파일 자동화에 입문하는 Python 학습자
   packages: []
+  outcomes: ["automation.fileBackup"]
+  prerequisites: ["automation.fileBackup"]
+  estimatedMinutes: 70
   tags:
     - project
     - cleanup
@@ -494,3 +497,357 @@ sections:
     check:
       noError: cleanupOnce 두 번 호출과 dict 비교가 끝나야 한다.
       resultCheck: firstReport는 두 항목을 담고 secondReport는 빈 리스트를 담아 종합 멱등 사이클이 완성되어야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: fileOps_10-downloads-cleanup-capstone-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - build-environment
+    - idempotent-cycle
+    title: 다운로드 폴더 정리의 plan·conflict·quarantine 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 분류 move와 오래된 파일 quarantine를 분리하고 충돌 시 실행을 막는다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 다운로드 정리는 실행 전 전체 dry-run plan을 검증하고 그 판정을 JSON audit에 남기세요.
+    - JSON table은 dict 하나가 아니라 동일한 열을 가진 record list로 저장하세요.
+    exercise:
+      prompt: audit_download_cleanup(plan, output_path)를 완성해 판정 결과를 반환하고, output_path에는 같은 결과를 한 행짜리 JSON table로 저장하세요.
+      starterCode: |-
+        def audit_download_cleanup(plan, output_path=None):
+            raise NotImplementedError
+      solution: |
+        import json
+        from pathlib import Path
+
+
+        def audit_download_cleanup(plan, output_path=None):
+            failures = []
+            conflicts = sorted(item["path"] for item in plan.get("items", []) if item.get("destinationExists", False))
+            outside = sorted(item["path"] for item in plan.get("items", []) if not item.get("withinDownloads", False))
+            direct_deletes = sorted(item["path"] for item in plan.get("items", []) if item.get("action") == "delete")
+            if conflicts:
+                failures.append("conflicts")
+            if outside:
+                failures.append("scope")
+            if direct_deletes:
+                failures.append("direct-delete")
+            if not plan.get("dryRun", False):
+                failures.append("dry-run")
+            result = {"ready": not failures, "failures": failures, "conflicts": conflicts, "outside": outside, "directDeletes": direct_deletes}
+            default_path = "output/empty-audit.json" if not plan.get("items", []) else "output/ready-audit.json" if result["ready"] else "output/blocked-audit.json"
+            target = Path(output_path or default_path)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(json.dumps([result], ensure_ascii=False, sort_keys=True, indent=2), encoding="utf-8")
+            return result
+      hints: *id001
+    check:
+      id: python.fileops.fileOps_10.downloads-cleanup-capstone.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_10.downloads-cleanup-capstone.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_download_cleanup
+        cases:
+        - id: accepts-dry-run-move-and-quarantine
+          arguments:
+          - value:
+              dryRun: true
+              items:
+              - path: /Downloads/a.pdf
+                action: move
+                withinDownloads: true
+                destinationExists: false
+              - path: /Downloads/old.zip
+                action: quarantine
+                withinDownloads: true
+                destinationExists: false
+          - value: output/ready-audit.json
+          expectedReturn:
+            ready: true
+            failures: []
+            conflicts: []
+            outside: []
+            directDeletes: []
+        - id: reports-all-blockers
+          arguments:
+          - value:
+              dryRun: false
+              items:
+              - path: /other/a
+                action: delete
+                withinDownloads: false
+                destinationExists: true
+          - value: output/blocked-audit.json
+          expectedReturn:
+            ready: false
+            failures:
+            - conflicts
+            - scope
+            - direct-delete
+            - dry-run
+            conflicts:
+            - /other/a
+            outside:
+            - /other/a
+            directDeletes:
+            - /other/a
+        - id: accepts-empty-dry-run
+          arguments:
+          - value:
+              dryRun: true
+              items: []
+          - value: output/empty-audit.json
+          expectedReturn:
+            ready: true
+            failures: []
+            conflicts: []
+            outside: []
+            directDeletes: []
+        expectedPaths:
+        - path: output/ready-audit.json
+          kind: table
+          origin: created
+          format: json
+          columns:
+          - conflicts
+          - directDeletes
+          - failures
+          - outside
+          - ready
+        - path: output/blocked-audit.json
+          kind: table
+          origin: created
+          format: json
+          columns:
+          - conflicts
+          - directDeletes
+          - failures
+          - outside
+          - ready
+        - path: output/empty-audit.json
+          kind: table
+          origin: created
+          format: json
+          columns:
+          - conflicts
+          - directDeletes
+          - failures
+          - outside
+          - ready
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: fileOps_10-downloads-cleanup-release-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - fileOps_10-downloads-cleanup-capstone-mastery
+    title: 새 다운로드 정리에 artifact·idempotency gate 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 같은 input inventory를 두 번 적용했을 때 두 번째 action 0과 artifact 일치를 검사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 두 번째 실행 action 0으로 정리 작업의 idempotency를 검증하세요.
+    - 같은 input inventory hash에서만 두 run을 비교하세요.
+    exercise:
+      prompt: decide_cleanup_release(first_run, second_run, expected_artifacts)를 완성하세요.
+      starterCode: |-
+        def decide_cleanup_release(first_run, second_run, expected_artifacts):
+            raise NotImplementedError
+      solution: |
+        def decide_cleanup_release(first_run, second_run, expected_artifacts):
+            failures = []
+            if not first_run.get("passed", False):
+                failures.append("first-run")
+            if second_run.get("actionCount") != 0:
+                failures.append("idempotency")
+            observed = set(first_run.get("artifacts", []))
+            missing = sorted(set(expected_artifacts) - observed)
+            unexpected = sorted(observed - set(expected_artifacts))
+            if missing or unexpected:
+                failures.append("artifacts")
+            if first_run.get("inputHash") != second_run.get("inputHash"):
+                failures.append("input-identity")
+            return {"releaseReady": not failures, "failures": failures, "missingArtifacts": missing, "unexpectedArtifacts": unexpected}
+      hints: *id002
+    check:
+      id: python.fileops.fileOps_10.downloads-cleanup-release.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_10.downloads-cleanup-release.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: decide_cleanup_release
+        cases:
+        - id: accepts-idempotent-artifact-result
+          arguments:
+          - value:
+              passed: true
+              artifacts:
+              - docs/a.pdf
+              inputHash: x
+          - value:
+              actionCount: 0
+              inputHash: x
+          - value:
+            - docs/a.pdf
+          expectedReturn:
+            releaseReady: true
+            failures: []
+            missingArtifacts: []
+            unexpectedArtifacts: []
+        - id: reports-run-idempotency-and-artifacts
+          arguments:
+          - value:
+              passed: false
+              artifacts:
+              - extra
+              inputHash: x
+          - value:
+              actionCount: 1
+              inputHash: x
+          - value:
+            - expected
+          expectedReturn:
+            releaseReady: false
+            failures:
+            - first-run
+            - idempotency
+            - artifacts
+            missingArtifacts:
+            - expected
+            unexpectedArtifacts:
+            - extra
+        - id: reports-input-identity-change
+          arguments:
+          - value:
+              passed: true
+              artifacts: []
+              inputHash: a
+          - value:
+              actionCount: 0
+              inputHash: b
+          - value: []
+          expectedReturn:
+            releaseReady: false
+            failures:
+            - input-identity
+            missingArtifacts: []
+            unexpectedArtifacts: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: fileOps_10-downloads-cleanup-capstone-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - fileOps_10-downloads-cleanup-release-transfer
+    title: 다운로드 폴더 정리 종료 조건 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: scope·dry run·quarantine·artifact·idempotency 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 파일 action 전에 root·충돌·dry run 계약을 확인하세요.
+    - 실행 횟수가 아니라 source와 destination artifact identity로 결과를 판정하세요.
+    exercise:
+      prompt: choose_cleanup_gate(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_cleanup_gate(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_cleanup_gate(situation):
+            table = {'plan': {'action': 'classify and detect conflicts in dry run', 'evidence': 'source destination plan', 'risk': 'wrong move'}, 'delete': {'action': 'quarantine with retention', 'evidence': 'reversible manifest', 'risk': 'irreversible loss'}, 'release': {'action': 'reconcile artifacts and rerun', 'evidence': 'zero-action second run', 'risk': 'non-idempotent cleanup'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.fileops.fileOps_10.downloads-cleanup-capstone-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_10.downloads-cleanup-capstone-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_cleanup_gate
+        cases:
+        - id: recalls-plan
+          arguments:
+          - value: plan
+          expectedReturn:
+            action: classify and detect conflicts in dry run
+            evidence: source destination plan
+            risk: wrong move
+        - id: recalls-delete
+          arguments:
+          - value: delete
+          expectedReturn:
+            action: quarantine with retention
+            evidence: reversible manifest
+            risk: irreversible loss
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

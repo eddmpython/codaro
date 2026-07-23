@@ -661,3 +661,265 @@ sections:
     type: noError
     noError: 업무 흐름 검증에서 `allowedMean` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: scipy_08-trapezoid-integral-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load
+    - workflow_validation
+    title: 불균일 x grid의 사다리꼴 적분 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: x 증가와 길이를 검사해 구간별 기여도와 합을 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - x 간격이 균일하다고 가정하지 마세요.
+    - 부호 있는 누적과 절대 면적을 구분하세요.
+    exercise:
+      prompt: trapezoid_integral(x_values, y_values)를 완성하세요.
+      starterCode: |-
+        def trapezoid_integral(x_values, y_values):
+            raise NotImplementedError
+      solution: |
+        def trapezoid_integral(x_values, y_values):
+            if len(x_values) != len(y_values) or len(x_values) < 2 or any(b <= a for a,b in zip(x_values,x_values[1:])): raise ValueError("invalid integration grid")
+            areas = [(x_values[i+1]-x_values[i])*(y_values[i]+y_values[i+1])/2 for i in range(len(x_values)-1)]
+            return {"areas": [round(value,6) for value in areas], "total": round(sum(areas),6), "intervalCount": len(areas)}
+      hints: *id001
+    check:
+      id: python.scipy.scipy_08.trapezoid-integral.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_08.trapezoid-integral.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: trapezoid_integral
+        cases:
+        - id: integrates-nonuniform-grid
+          arguments:
+          - value:
+            - 0
+            - 1
+            - 3
+          - value:
+            - 0
+            - 2
+            - 2
+          expectedReturn:
+            areas:
+            - 1.0
+            - 4.0
+            total: 5.0
+            intervalCount: 2
+        - id: keeps-signed-area
+          arguments:
+          - value:
+            - 0
+            - 1
+            - 2
+          - value:
+            - 1
+            - -1
+            - 1
+          expectedReturn:
+            areas:
+            - 0.0
+            - 0.0
+            total: 0.0
+            intervalCount: 2
+        - id: rejects-unsorted-grid
+          arguments:
+          - value:
+            - 0
+            - 2
+            - 1
+          - value:
+            - 0
+            - 1
+            - 2
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: scipy_08-integration-convergence-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_08-trapezoid-integral-mastery
+    title: 새 수치적분에 grid 수렴 점검 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 연속 refinement 결과 차이를 tolerance로 판정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 한 grid의 값만으로 정확도를 주장하지 마세요.
+    - refinement 간 마지막 차이와 전체 추세를 함께 보세요.
+    exercise:
+      prompt: audit_integration_convergence(estimates, tolerance)를 완성하세요.
+      starterCode: |-
+        def audit_integration_convergence(estimates, tolerance):
+            raise NotImplementedError
+      solution: |
+        def audit_integration_convergence(estimates, tolerance):
+            if len(estimates) < 2 or tolerance <= 0: raise ValueError("need refinement estimates")
+            deltas = [abs(b-a) for a,b in zip(estimates,estimates[1:])]
+            return {"accepted": deltas[-1] <= tolerance, "estimate": estimates[-1], "lastDelta": round(deltas[-1],12), "deltas": [round(value,12) for value in deltas]}
+      hints: *id002
+    check:
+      id: python.scipy.scipy_08.integration-convergence.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_08.integration-convergence.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_integration_convergence
+        cases:
+        - id: accepts-converged-sequence
+          arguments:
+          - value:
+            - 1.5
+            - 1.42
+            - 1.4143
+          - value: 0.01
+          expectedReturn:
+            accepted: true
+            estimate: 1.4143
+            lastDelta: 0.0057
+            deltas:
+            - 0.08
+            - 0.0057
+        - id: rejects-unstable-sequence
+          arguments:
+          - value:
+            - 1
+            - 1.5
+            - 1.2
+          - value: 0.1
+          expectedReturn:
+            accepted: false
+            estimate: 1.2
+            lastDelta: 0.3
+            deltas:
+            - 0.5
+            - 0.3
+        - id: rejects-single-estimate
+          arguments:
+          - value:
+            - 1
+          - value: 0.1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: scipy_08-numerical-integration-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_08-integration-convergence-transfer
+    title: 수치적분 방법 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 표본 grid·함수·특이점을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 수치 방법의 입력 가정과 오차 근거를 함께 남기세요.
+    - p-value나 최적화 성공 flag 하나를 결론으로 사용하지 마세요.
+    exercise:
+      prompt: choose_integration_method(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_integration_method(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_integration_method(situation):
+            table = {'sampled-data': {'method': 'trapezoid', 'evidence': 'x grid and interval contributions', 'risk': 'unsorted x'}, 'smooth-callable': {'method': 'adaptive quadrature', 'evidence': 'error estimate', 'risk': 'hidden singularity'}, 'oscillatory': {'method': 'specialized or refined integration', 'evidence': 'convergence study', 'risk': 'aliasing'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.scipy.scipy_08.numerical-integration-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_08.numerical-integration-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_integration_method
+        cases:
+        - id: recalls-sampled-data
+          arguments:
+          - value: sampled-data
+          expectedReturn:
+            method: trapezoid
+            evidence: x grid and interval contributions
+            risk: unsorted x
+        - id: recalls-smooth-callable
+          arguments:
+          - value: smooth-callable
+          expectedReturn:
+            method: adaptive quadrature
+            evidence: error estimate
+            risk: hidden singularity
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

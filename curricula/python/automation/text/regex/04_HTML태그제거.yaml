@@ -532,3 +532,270 @@ sections:
     type: noError
     noError: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인의 정규식 패턴이 컴파일되고 입력 텍스트가 매치 단계까지 도달해야 합니다.'
     resultCheck: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인 결과의 추출 개수와 매치 문자열이 본문 기대값과 같아야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: regex_04-html-visible-text-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: HTML parser로 보이는 텍스트 추출하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: script·style 내용을 제외하고 block 경계의 텍스트를 순서대로 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - HTML 태그 제거를 `<.*?>` regex 한 줄로 구현하지 마세요.
+    - script·style의 비가시 텍스트를 학습 자료나 검색 corpus에 섞지 마세요.
+    exercise:
+      prompt: extract_visible_text(html_text)를 완성하세요.
+      starterCode: |-
+        def extract_visible_text(html_text):
+            raise NotImplementedError
+      solution: |
+        def extract_visible_text(html_text):
+            from html.parser import HTMLParser
+            class VisibleTextParser(HTMLParser):
+                def __init__(self):
+                    super().__init__()
+                    self.hidden = 0
+                    self.parts = []
+                def handle_starttag(self, tag, attrs):
+                    if tag in {"script", "style"}:
+                        self.hidden += 1
+                def handle_endtag(self, tag):
+                    if tag in {"script", "style"} and self.hidden:
+                        self.hidden -= 1
+                def handle_data(self, data):
+                    value = " ".join(data.split())
+                    if value and not self.hidden:
+                        self.parts.append(value)
+            parser = VisibleTextParser()
+            parser.feed(html_text)
+            return {"text": " ".join(parser.parts), "parts": parser.parts}
+      hints: *id001
+    check:
+      id: python.regex.regex_04.html-visible-text.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_04.html-visible-text.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: extract_visible_text
+        cases:
+        - id: extracts-visible-text
+          arguments:
+          - value: <main><h1>Hello</h1><p>World</p></main>
+          expectedReturn:
+            text: Hello World
+            parts:
+            - Hello
+            - World
+        - id: excludes-script-and-style
+          arguments:
+          - value: <style>.x{}</style><p>Keep</p><script>alert(1)</script>
+          expectedReturn:
+            text: Keep
+            parts:
+            - Keep
+        - id: normalizes-whitespace-and-entities
+          arguments:
+          - value: <p>A&nbsp;  B &amp; C</p>
+          expectedReturn:
+            text: A B & C
+            parts:
+            - A B & C
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: regex_04-html-link-inventory-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_04-html-visible-text-mastery
+    title: 새 HTML 문서에 링크 inventory 추출 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: base URL로 절대화하고 scheme allowlist 밖 링크를 격리한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 상대 URL은 문서의 실제 base URL과 함께 절대화하세요.
+    - '`javascript:` 같은 비 HTTP scheme을 자동 요청 목록에 넣지 마세요.'
+    exercise:
+      prompt: inventory_links(html_text, base_url)를 완성하세요.
+      starterCode: |-
+        def inventory_links(html_text, base_url):
+            raise NotImplementedError
+      solution: |
+        def inventory_links(html_text, base_url):
+            from html.parser import HTMLParser
+            from urllib.parse import urljoin, urlsplit
+            class LinkParser(HTMLParser):
+                def __init__(self):
+                    super().__init__()
+                    self.hrefs = []
+                def handle_starttag(self, tag, attrs):
+                    if tag == "a":
+                        values = dict(attrs)
+                        if values.get("href"):
+                            self.hrefs.append(values["href"])
+            parser = LinkParser()
+            parser.feed(html_text)
+            accepted = []
+            rejected = []
+            for href in parser.hrefs:
+                absolute = urljoin(base_url, href)
+                if urlsplit(absolute).scheme in {"http", "https"}:
+                    accepted.append(absolute)
+                else:
+                    rejected.append({"href": href, "reason": "scheme"})
+            return {"accepted": accepted, "rejected": rejected}
+      hints: *id002
+    check:
+      id: python.regex.regex_04.html-link-inventory.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_04.html-link-inventory.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: inventory_links
+        cases:
+        - id: resolves-relative-links
+          arguments:
+          - value: <a href='/docs'>Docs</a><a href='next'>Next</a>
+          - value: https://example.test/base/
+          expectedReturn:
+            accepted:
+            - https://example.test/docs
+            - https://example.test/base/next
+            rejected: []
+        - id: rejects-script-scheme
+          arguments:
+          - value: <a href='javascript:alert(1)'>Bad</a>
+          - value: https://example.test/
+          expectedReturn:
+            accepted: []
+            rejected:
+            - href: javascript:alert(1)
+              reason: scheme
+        - id: ignores-anchor-without-href
+          arguments:
+          - value: <a>Plain</a>
+          - value: https://example.test/
+          expectedReturn:
+            accepted: []
+            rejected: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: regex_04-html-processing-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_04-html-link-inventory-transfer
+    title: HTML 텍스트 처리 경계 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 보이는 텍스트·링크·sanitization 책임을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - match 수만 보지 말고 정규화 뒤 보존된 의미와 거부된 입력을 함께 확인하세요.
+    - regex가 아닌 전용 parser가 필요한 구조에서는 경계를 명시하세요.
+    exercise:
+      prompt: choose_html_processing(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_html_processing(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_html_processing(situation):
+            table = {'visible-text': {'action': 'HTMLParser excluding script style', 'evidence': 'ordered text parts', 'risk': 'hidden content'}, 'links': {'action': 'parse href then urljoin', 'evidence': 'absolute URL and scheme', 'risk': 'unsafe scheme'}, 'render-user-html': {'action': 'use vetted sanitizer', 'evidence': 'allowed tags and attributes', 'risk': 'XSS'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.regex.regex_04.html-processing-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_04.html-processing-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_html_processing
+        cases:
+        - id: recalls-visible-text
+          arguments:
+          - value: visible-text
+          expectedReturn:
+            action: HTMLParser excluding script style
+            evidence: ordered text parts
+            risk: hidden content
+        - id: recalls-links
+          arguments:
+          - value: links
+          expectedReturn:
+            action: parse href then urljoin
+            evidence: absolute URL and scheme
+            risk: unsafe scheme
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

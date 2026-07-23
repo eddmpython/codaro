@@ -378,3 +378,309 @@ sections:
     noError: 연습 문제의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: 연습 문제 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
   name: practice
+assessment:
+  masteryVariants:
+  - id: 18_textwrap-cli-help-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - basic_wrapping
+    - textwrapper_class
+    - workflow_validation
+    title: CLI 도움말을 줄 폭 안에 맞춰 렌더링하기
+    subtitle: TextWrapper와 들여쓰기 정책
+    goal: command와 description 목록을 정해진 width 안에 맞춰 줄바꿈하고 줄 수, 최대 줄 길이, command 수를 반환한다.
+    why: textwrap 학습은 보기 좋은 문자열을 만드는 데서 끝나지 않고, 터미널 폭을 넘지 않는 운영 출력 계약을 코드로 보장할 때 의미가 생깁니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않는 command 목록을 넘겨 줄 길이와 실패 조건을 함께 검증합니다.
+    tips:
+    - TextWrapper의 initial_indent와 subsequent_indent를 분리하세요.
+    - width가 너무 좁으면 ValueError로 막아야 합니다.
+    exercise:
+      prompt: render_cli_help(commands, width=56)가 text, lineCount, maxLineLength, commandCount를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def render_cli_help(commands, width=56):
+            raise NotImplementedError
+      solution: |-
+        import textwrap
+
+        def render_cli_help(commands, width=56):
+            if width < 36:
+                raise ValueError("width must be at least 36")
+            rows = []
+            for command, description in commands:
+                wrapper = textwrap.TextWrapper(
+                    width=width,
+                    initial_indent=f"  {command:<12} ",
+                    subsequent_indent=" " * 14,
+                )
+                rows.append(wrapper.fill(description))
+            output = "\n".join(rows)
+            lines = output.splitlines()
+            if any(len(line) > width for line in lines):
+                raise ValueError("rendered line exceeded width")
+            return {
+                "text": output,
+                "lineCount": len(lines),
+                "maxLineLength": max((len(line) for line in lines), default=0),
+                "commandCount": len(commands),
+            }
+      hints:
+      - 줄 길이 검사는 렌더링 뒤 splitlines로 확인하세요.
+      - maxLineLength는 비어 있는 입력도 안전하게 처리하세요.
+    check:
+      id: python.builtins.textwrap.cli-help.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.textwrap.formatting.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: render_cli_help
+        cases:
+        - id: renders-help-within-width
+          arguments:
+          - value:
+            - - run
+              - Execute the selected curriculum lesson in the local Python runtime
+            - - verify
+              - Run validation checks and show actionable feedback
+            - - export
+              - Create a formatted report for the current learning session
+          - value: 56
+          expectedReturn:
+            text: |2-
+                run          Execute the selected curriculum lesson in
+                            the local Python runtime
+                verify       Run validation checks and show actionable
+                            feedback
+                export       Create a formatted report for the current
+                            learning session
+            lineCount: 6
+            maxLineLength: 56
+            commandCount: 3
+        - id: rejects-too-narrow-width
+          arguments:
+          - value:
+            - - x
+              - short
+          - value: 20
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 18_textwrap-status-digest-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - 18_textwrap-cli-help-mastery
+    - text_shortening
+    - text_indenting
+    title: 운영 상태 요약을 bullet digest로 포맷하기
+    subtitle: shorten, wrap, hanging indent
+    goal: 긴 제목과 update 목록을 폭 제한 안에 맞춰 제목과 bullet 문자열로 렌더링한다.
+    why: 전이 과제에서는 CLI command 표가 아니라 운영 요약 digest로 옮겨, 같은 줄바꿈 감각을 보고서 텍스트에 적용합니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 제목은 shorten으로 줄이고, 각 update는 bullet과 hanging indent를 유지하세요.
+    tips:
+    - 제목은 공백을 정규화한 뒤 textwrap.shorten으로 줄이세요.
+    - bullet 첫 줄은 `  - `, 이어지는 줄은 네 칸 들여쓰기를 쓰세요.
+    exercise:
+      prompt: format_status_digest(title, updates, width=48)가 text, lineCount, maxLineLength, bulletCount를 담은 dict를 반환하도록
+        완성하세요.
+      starterCode: |-
+        def format_status_digest(title, updates, width=48):
+            raise NotImplementedError
+      solution: |-
+        import textwrap
+
+        def format_status_digest(title, updates, width=48):
+            if width < 30:
+                raise ValueError("width must be at least 30")
+            normalized_title = textwrap.shorten(" ".join(title.split()), width=width, placeholder="...")
+            lines = [normalized_title]
+            for update in updates:
+                text = " ".join(str(update).split())
+                wrapped = textwrap.wrap(text, width=width - 4)
+                if not wrapped:
+                    lines.append("  -")
+                else:
+                    lines.append("  - " + wrapped[0])
+                    lines.extend("    " + line for line in wrapped[1:])
+            rendered = "\n".join(lines)
+            return {
+                "text": rendered,
+                "lineCount": len(lines),
+                "maxLineLength": max((len(line) for line in lines), default=0),
+                "bulletCount": len(updates),
+            }
+      hints:
+      - wrap width는 bullet prefix 길이를 고려해 `width - 4`로 잡으세요.
+      - 공백이 여러 개인 입력은 split과 join으로 먼저 정리하세요.
+    check:
+      id: python.builtins.textwrap.status-digest.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.textwrap.formatting.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: format_status_digest
+        cases:
+        - id: formats-status-digest
+          arguments:
+          - value: Weekly automation rollout status for operations team
+          - value:
+            - Imported 128 files and skipped 3 duplicates after checksum review
+            - Next run should alert only on failed archive writes
+          - value: 48
+          expectedReturn:
+            text: |-
+              Weekly automation rollout status for...
+                - Imported 128 files and skipped 3 duplicates
+                  after checksum review
+                - Next run should alert only on failed archive
+                  writes
+            lineCount: 5
+            maxLineLength: 48
+            bulletCount: 2
+        - id: rejects-narrow-digest-width
+          arguments:
+          - value: x
+          - value:
+            - y
+          - value: 20
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 18_textwrap-note-block-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 18_textwrap-status-digest-transfer
+    title: 들여쓰기 섞인 노트 블록을 다시 읽기 좋게 복원하기
+    subtitle: dedent, fill, paragraph gap
+    goal: 들여쓰기된 여러 문단 문자열을 dedent하고 문단별로 wrap해 paragraph count와 최대 줄 길이를 반환한다.
+    why: 시간이 지나도 textwrap에서 남아야 할 감각은 wrap 호출 하나가 아니라, 원본 들여쓰기와 문단 경계를 보존하며 읽기 폭을 다시 세우는 능력입니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. raw note block을 dedent한 뒤 문단별로 fill하고 빈 줄을 유지하세요.
+    tips:
+    - dedent 후 strip으로 바깥 공백을 제거하세요.
+    - 문단은 빈 줄 기준으로 나누고, 각 문단 내부 공백은 정규화하세요.
+    exercise:
+      prompt: restore_note_block(raw_text, width=42)가 text, paragraphCount, maxLineLength를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def restore_note_block(raw_text, width=42):
+            raise NotImplementedError
+      solution: |-
+        import textwrap
+
+        def restore_note_block(raw_text, width=42):
+            if width < 24:
+                raise ValueError("width must be at least 24")
+            cleaned = textwrap.dedent(raw_text).strip()
+            paragraphs = [part.strip() for part in cleaned.split("\n\n") if part.strip()]
+            rendered = []
+            for paragraph in paragraphs:
+                rendered.append(textwrap.fill(
+                    " ".join(paragraph.split()),
+                    width=width,
+                    subsequent_indent="  ",
+                ))
+            text = "\n\n".join(rendered)
+            return {
+                "text": text,
+                "paragraphCount": len(paragraphs),
+                "maxLineLength": max((len(line) for line in text.splitlines()), default=0),
+            }
+      hints:
+      - textwrap.dedent는 여러 줄 문자열의 공통 들여쓰기를 제거합니다.
+      - paragraph 내부 줄바꿈은 공백 하나로 정규화한 뒤 fill하세요.
+    check:
+      id: python.builtins.textwrap.note-block.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.textwrap.formatting.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: restore_note_block
+        cases:
+        - id: restores-indented-note-block
+          arguments:
+          - value: |-
+              Codaro records every verified run before it changes mastery.
+              A short retry should explain the failed evidence instead of hiding it.
+
+              Retrieval work opens later so the learner proves the idea again.
+          - value: 42
+          expectedReturn:
+            text: |-
+              Codaro records every verified run before
+                it changes mastery. A short retry should
+                explain the failed evidence instead of
+                hiding it.
+
+              Retrieval work opens later so the learner
+                proves the idea again.
+            paragraphCount: 2
+            maxLineLength: 42
+        - id: rejects-narrow-note-width
+          arguments:
+          - value: text
+          - value: 10
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

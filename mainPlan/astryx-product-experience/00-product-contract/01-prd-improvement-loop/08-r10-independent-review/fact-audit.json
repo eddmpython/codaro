@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "roundId": "R10",
+  "state": "draft",
+  "passed": true,
+  "auditComplete": true,
+  "scoreThresholdApplied": false,
+  "productCompletionEligible": false,
+  "roundSealEligible": false,
+  "scope": {
+    "gitCommit": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+    "dirtyDiffHash": "91b85159d87fb5f8170e532cbd51aaaead315131a8aac5e67fedd0818aaa563d",
+    "manifestHash": "dfccbf0402ace180bd660a1a0b466beca1eee762cf8910931c0276a78852bc23",
+    "evaluationBundleHash": "0b4f7118471561faa1f01a288d2dafa9db5194b8b16654a012601b074dd2bd0f"
+  },
+  "facts": {
+    "bundleIntegrity": {
+      "fileCount": 2586,
+      "totalSourceBytes": 80137948,
+      "archiveBytes": 47027488,
+      "archiveEntriesReadOnly": true,
+      "excludedHistoryPathCount": 0,
+      "priorScoresIncluded": false,
+      "priorConclusionsIncluded": false
+    },
+    "requiredPaths": {
+      "checked": 10,
+      "missing": []
+    },
+    "symbols": {
+      "requiredPresent": [
+        "editor/src/lib/curriculumProgressEvent.ts::PROGRESS_UPDATED_EVENT",
+        "editor/src/lib/webLearningEvidence.ts::appendWebStrongCheckEvidenceTransaction",
+        "tests/run.py::PRODUCT_QUALITY_GATES"
+      ],
+      "requiredMissing": [],
+      "rollbackContractSymbolsPresent": [
+        "minimumReaderVersion",
+        "cutoverMarker"
+      ],
+      "rollbackContractSymbolsMissing": [],
+      "rollbackCutoverImplemented": true
+    },
+    "qualityGates": {
+      "count": 36,
+      "names": [
+        "root-clean",
+        "docs",
+        "backend",
+        "architecture-boundary",
+        "design-system-contract",
+        "visual-assets",
+        "learning-method",
+        "learning-evidence-contract",
+        "learning-efficacy-report",
+        "learning-system-readiness",
+        "dogfood-alpha-audit",
+        "product-quality-audit",
+        "automation-ide-audit",
+        "diagnostic-summary-contract",
+        "ai-live-smoke",
+        "provider-settings-browser",
+        "install-launcher-smoke",
+        "runtime-recovery-contract",
+        "runtime-recovery-browser",
+        "pyproc-assets-browser",
+        "pyproc-runtime-fs-browser",
+        "pyproc-asgi-browser",
+        "curriculum-quality-matrix",
+        "repository-simplification",
+        "curriculum-executability",
+        "curriculum-top-tier-audit",
+        "playwright-curriculum-runtime",
+        "onboarding-browser",
+        "web-learning",
+        "landing-public",
+        "local-studio-browser",
+        "product-experience-browser",
+        "frontend-performance-budget",
+        "landing-build",
+        "launcher-test",
+        "learning-content"
+      ],
+      "requiredMissing": [],
+      "planQualityRegistered": true
+    },
+    "learningCoverage": {
+      "lessonCount": 472,
+      "strongCheckSpecCount": 1413,
+      "strongCheckSpecLessonCount": 467,
+      "weakOnlyLessonCount": 0,
+      "masteryAssessmentLessonCount": 467,
+      "transferAssessmentLessonCount": 467,
+      "retrievalAssessmentLessonCount": 467,
+      "failedDomains": [
+        "assessment-claim-and-independent-review"
+      ],
+      "topTierEligible": false,
+      "completionEligible": false
+    },
+    "dependencyBootstrap": {
+      "fixturePath": "tests/product/bootstrapAfterUse.fixture.yml",
+      "expectedFailure": "creation-after-consumption",
+      "detectedArtifactCount": 1,
+      "detectedArtifacts": [
+        "mainPlan/completion-evidence.schema.yml"
+      ],
+      "negativeFixtureRejected": true
+    }
+  },
+  "productGaps": [
+    "0 of 472 lessons remain weak-only",
+    "independent learning, UX, and architecture reports are not assigned or sealed"
+  ]
+}

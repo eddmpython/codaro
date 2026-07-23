@@ -2,7 +2,7 @@ meta:
   outcomeId: python.dictsAndSets
   status: draft
   version: 1
-  note: "초안 - Predict-Run-Reconcile-Adapt 루프 1단계 시드. 사람이 정제 필요."
+  note: "초안 - 실제 코드와 에러로 관찰 가능한 오개념 시드. 사람이 정제 필요."
 
 misconceptions:
   - id: python.dictsAndSets.missingKeyError
@@ -48,10 +48,6 @@ misconceptions:
         appliesTo: code
         pattern: "\\{[^{}]*([\"'][A-Za-z_]\\w*[\"'])\\s*:[^,{}]+,[^{}]*\\1\\s*:"
         description: "딕셔너리 리터럴에서 같은 키가 두 번 등장."
-      - kind: predictionMismatch
-        appliesTo: prediction
-        expectedField: value
-        description: "예측은 에러나 두 값 모두, 실제는 마지막 값만 남음."
     diagnostic:
       message: "딕셔너리 리터럴에 같은 키가 여러 번 적히면 마지막 값으로 덮어쓰기됩니다. 에러는 발생하지 않습니다."
       references: ["python.dictsAndSets"]

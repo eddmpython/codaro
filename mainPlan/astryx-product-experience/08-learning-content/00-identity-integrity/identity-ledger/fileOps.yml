@@ -1,0 +1,54 @@
+schemaVersion: 1
+category: "fileOps"
+sourceCount: 10
+lessons:
+  - lessonRef: "fileOps/01_pathlib경로감각"
+    sourcePath: "curricula/python/automation/os/fileOps/01_pathlib경로감각.yaml"
+    metaId: "fileOps_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "fileOps/02_파일읽고쓰기"
+    sourcePath: "curricula/python/automation/os/fileOps/02_파일읽고쓰기.yaml"
+    metaId: "fileOps_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "fileOps/03_디렉터리탐색"
+    sourcePath: "curricula/python/automation/os/fileOps/03_디렉터리탐색.yaml"
+    metaId: "fileOps_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "fileOps/04_복사이동이름변경"
+    sourcePath: "curricula/python/automation/os/fileOps/04_복사이동이름변경.yaml"
+    metaId: "fileOps_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "fileOps/05_안전삭제"
+    sourcePath: "curricula/python/automation/os/fileOps/05_안전삭제.yaml"
+    metaId: "fileOps_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "fileOps/06_zip압축"
+    sourcePath: "curricula/python/automation/os/fileOps/06_zip압축.yaml"
+    metaId: "fileOps_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "fileOps/07_백업과동기화"
+    sourcePath: "curricula/python/automation/os/fileOps/07_백업과동기화.yaml"
+    metaId: "fileOps_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "fileOps/08_디렉터리정리"
+    sourcePath: "curricula/python/automation/os/fileOps/08_디렉터리정리.yaml"
+    metaId: "fileOps_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "fileOps/09_파일메타데이터"
+    sourcePath: "curricula/python/automation/os/fileOps/09_파일메타데이터.yaml"
+    metaId: "fileOps_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "fileOps/10_종합다운로드폴더정리"
+    sourcePath: "curricula/python/automation/os/fileOps/10_종합다운로드폴더정리.yaml"
+    metaId: "fileOps_10"
+    registryStatus: registered
+    reviewStatus: pending

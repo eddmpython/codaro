@@ -1287,3 +1287,294 @@ sections:
     type: noError
     noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
     resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pydantic_10-validated-data-pipeline-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load
+    - workflow_validation
+    title: 원시 레코드를 검증·중복 제거·집계하는 pipeline 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 각 단계의 accepted·rejected·duplicate 증거와 category 합계를 함께 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - validation 실패와 duplicate 제외를 다른 목록으로 남기세요.
+    - 집계는 accepted 레코드에서만 수행하세요.
+    exercise:
+      prompt: run_validated_pipeline(rows)를 완성해 acceptedCount, rejectedIndexes, duplicateIds, totals를 반환하세요.
+      starterCode: |-
+        def run_validated_pipeline(rows):
+            raise NotImplementedError
+      solution: |
+        def run_validated_pipeline(rows):
+            seen = set()
+            accepted = []
+            rejected = []
+            duplicates = []
+            for index, row in enumerate(rows):
+                try:
+                    row_id = str(row["id"]).strip()
+                    category = str(row["category"]).strip().lower()
+                    amount = int(row["amount"])
+                    if not row_id or not category or amount < 0:
+                        raise ValueError
+                except (KeyError, TypeError, ValueError):
+                    rejected.append(index)
+                    continue
+                if row_id in seen:
+                    duplicates.append(row_id)
+                    continue
+                seen.add(row_id)
+                accepted.append({"id": row_id, "category": category, "amount": amount})
+            totals = {}
+            for row in accepted:
+                totals[row["category"]] = totals.get(row["category"], 0) + row["amount"]
+            return {"acceptedCount": len(accepted), "rejectedIndexes": rejected, "duplicateIds": duplicates, "totals": {key: totals[key] for key in sorted(totals)}}
+      hints: *id001
+    check:
+      id: python.pydantic.pydantic_10.validated-data-pipeline.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_10.validated-data-pipeline.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: run_validated_pipeline
+        cases:
+        - id: keeps-stage-evidence
+          arguments:
+          - value:
+            - id: A
+              category: ' Book '
+              amount: '10'
+            - id: A
+              category: book
+              amount: 20
+            - id: B
+              category: Music
+              amount: 5
+            - id: C
+              amount: 1
+          expectedReturn:
+            acceptedCount: 2
+            rejectedIndexes:
+            - 3
+            duplicateIds:
+            - A
+            totals:
+              book: 10
+              music: 5
+        - id: handles-empty-pipeline
+          arguments:
+          - value: []
+          expectedReturn:
+            acceptedCount: 0
+            rejectedIndexes: []
+            duplicateIds: []
+            totals: {}
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pydantic_10-batch-contract-summary-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pydantic_10-validated-data-pipeline-mastery
+    title: 새 event batch의 schema version과 순서 계약 검증하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 데이터 pipeline을 event version·sequence 중복·payload field 검사로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - version, sequence, payload 계약을 모두 통과한 event만 accepted에 넣으세요.
+    - 중복 sequence도 rejected index로 남기세요.
+    exercise:
+      prompt: validate_event_batch(events, version, required_payload_keys)를 완성하세요.
+      starterCode: |-
+        def validate_event_batch(events, version, required_payload_keys):
+            raise NotImplementedError
+      solution: |
+        def validate_event_batch(events, version, required_payload_keys):
+            accepted = []
+            rejected = []
+            seen_sequences = set()
+            for index, event in enumerate(events):
+                sequence = event.get("sequence")
+                payload = event.get("payload")
+                valid = (
+                    event.get("version") == version
+                    and isinstance(sequence, int) and not isinstance(sequence, bool)
+                    and sequence not in seen_sequences
+                    and isinstance(payload, dict)
+                    and all(key in payload for key in required_payload_keys)
+                )
+                if not valid:
+                    rejected.append(index)
+                    continue
+                seen_sequences.add(sequence)
+                accepted.append(sequence)
+            return {"acceptedSequences": sorted(accepted), "rejectedIndexes": rejected, "nextSequence": max(accepted, default=0) + 1}
+      hints: *id002
+    check:
+      id: python.pydantic.pydantic_10.batch-contract-summary.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_10.batch-contract-summary.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: validate_event_batch
+        cases:
+        - id: validates-version-sequence-and-payload
+          arguments:
+          - value:
+            - version: 2
+              sequence: 2
+              payload:
+                id: B
+            - version: 1
+              sequence: 1
+              payload:
+                id: A
+            - version: 2
+              sequence: 2
+              payload:
+                id: dup
+            - version: 2
+              sequence: 3
+              payload: {}
+          - value: 2
+          - value:
+            - id
+          expectedReturn:
+            acceptedSequences:
+            - 2
+            rejectedIndexes:
+            - 1
+            - 2
+            - 3
+            nextSequence: 3
+        - id: handles-empty-batch
+          arguments:
+          - value: []
+          - value: 1
+          - value:
+            - id
+          expectedReturn:
+            acceptedSequences: []
+            rejectedIndexes: []
+            nextSequence: 1
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pydantic_10-pipeline-evidence-stage-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pydantic_10-batch-contract-summary-transfer
+    title: 검증 pipeline 단계별 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: ingest, validate, transform, persist 단계에 맞는 증거와 실패 위험을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 몇 개의 레코드를 받았고 넘겼는지 추적하세요.
+    - 최종 파일만 남기지 말고 schema version과 read-back 증거를 함께 보존하세요.
+    exercise:
+      prompt: choose_pipeline_evidence(situation)를 완성해 evidence, check, risk를 반환하세요.
+      starterCode: |-
+        def choose_pipeline_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_pipeline_evidence(situation):
+            table = {'ingest': {'evidence': 'source hash and row count', 'check': 'read contract', 'risk': 'source drift'}, 'validate': {'evidence': 'accepted and rejected indexes', 'check': 'field paths', 'risk': 'silent bad rows'}, 'persist': {'evidence': 'artifact hash and schema version', 'check': 'read-back', 'risk': 'unreadable output'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.pydantic.pydantic_10.pipeline-evidence-stage.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_10.pipeline-evidence-stage.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_pipeline_evidence
+        cases:
+        - id: recalls-ingest
+          arguments:
+          - value: ingest
+          expectedReturn:
+            evidence: source hash and row count
+            check: read contract
+            risk: source drift
+        - id: recalls-validate
+          arguments:
+          - value: validate
+          expectedReturn:
+            evidence: accepted and rejected indexes
+            check: field paths
+            risk: silent bad rows
+        - id: rejects-unknown-situation
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

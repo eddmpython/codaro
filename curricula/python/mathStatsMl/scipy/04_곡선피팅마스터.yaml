@@ -423,3 +423,285 @@ sections:
     type: noError
     noError: 업무 흐름 검증에서 `allowedMean` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: scipy_04-linear-fit-residuals-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load
+    - workflow_validation
+    title: 직선 피팅의 계수와 잔차 근거 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 최소제곱 slope·intercept·MAE를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 계수만 반환하지 말고 각 관측의 residual을 남기세요.
+    - 같은 x만 있으면 slope를 식별할 수 없습니다.
+    exercise:
+      prompt: fit_line(x_values, y_values)를 완성하세요.
+      starterCode: |-
+        def fit_line(x_values, y_values):
+            raise NotImplementedError
+      solution: |
+        def fit_line(x_values, y_values):
+            if len(x_values) != len(y_values) or len(x_values) < 2: raise ValueError("invalid fit data")
+            x_mean = sum(x_values)/len(x_values); y_mean = sum(y_values)/len(y_values)
+            denominator = sum((x-x_mean)**2 for x in x_values)
+            if denominator == 0: raise ValueError("constant x")
+            slope = sum((x-x_mean)*(y-y_mean) for x,y in zip(x_values,y_values))/denominator
+            intercept = y_mean-slope*x_mean
+            residuals = [y-(slope*x+intercept) for x,y in zip(x_values,y_values)]
+            return {"slope": round(slope,6), "intercept": round(intercept,6), "mae": round(sum(abs(value) for value in residuals)/len(residuals),6), "residuals": [round(value,6) for value in residuals]}
+      hints: *id001
+    check:
+      id: python.scipy.scipy_04.linear-fit-residuals.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_04.linear-fit-residuals.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: fit_line
+        cases:
+        - id: fits-perfect-line
+          arguments:
+          - value:
+            - 0
+            - 1
+            - 2
+          - value:
+            - 1
+            - 3
+            - 5
+          expectedReturn:
+            slope: 2.0
+            intercept: 1.0
+            mae: 0.0
+            residuals:
+            - 0.0
+            - 0.0
+            - 0.0
+        - id: fits-noisy-line
+          arguments:
+          - value:
+            - 0
+            - 1
+            - 2
+          - value:
+            - 0
+            - 2
+            - 3
+          expectedReturn:
+            slope: 1.5
+            intercept: 0.166667
+            mae: 0.222222
+            residuals:
+            - -0.166667
+            - 0.333333
+            - -0.166667
+        - id: rejects-constant-x
+          arguments:
+          - value:
+            - 1
+            - 1
+          - value:
+            - 2
+            - 3
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: scipy_04-fit-validation-split-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_04-linear-fit-residuals-mastery
+    title: 새 curve fit에 검증 분리 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 시간 순서를 보존한 train·validation split과 누수 위험을 검사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 시계열을 무작위로 섞지 말고 미래 구간을 검증에 두세요.
+    - fit residual과 validation error를 별도 근거로 남기세요.
+    exercise:
+      prompt: plan_fit_validation(rows, validation_count)를 완성하세요.
+      starterCode: |-
+        def plan_fit_validation(rows, validation_count):
+            raise NotImplementedError
+      solution: |
+        def plan_fit_validation(rows, validation_count):
+            if validation_count <= 0 or validation_count >= len(rows): raise ValueError("invalid validation size")
+            ordered = sorted(rows, key=lambda row: row["time"])
+            train = ordered[:-validation_count]; validation = ordered[-validation_count:]
+            return {"trainIds": [row["id"] for row in train], "validationIds": [row["id"] for row in validation], "boundary": validation[0]["time"], "leakage": max(row["time"] for row in train) >= min(row["time"] for row in validation)}
+      hints: *id002
+    check:
+      id: python.scipy.scipy_04.fit-validation-split.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_04.fit-validation-split.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_fit_validation
+        cases:
+        - id: holds-out-latest
+          arguments:
+          - value:
+            - id: c
+              time: 3
+            - id: a
+              time: 1
+            - id: b
+              time: 2
+          - value: 1
+          expectedReturn:
+            trainIds:
+            - a
+            - b
+            validationIds:
+            - c
+            boundary: 3
+            leakage: false
+        - id: holds-out-two
+          arguments:
+          - value:
+            - id: 1
+              time: 1
+            - id: 2
+              time: 2
+            - id: 3
+              time: 3
+            - id: 4
+              time: 4
+          - value: 2
+          expectedReturn:
+            trainIds:
+            - 1
+            - 2
+            validationIds:
+            - 3
+            - 4
+            boundary: 3
+            leakage: false
+        - id: rejects-all-validation
+          arguments:
+          - value:
+            - id: 1
+              time: 1
+          - value: 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: scipy_04-curve-fit-evidence-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_04-fit-validation-split-transfer
+    title: curve fitting 검증 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 계수·잔차·일반화를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 수치 방법의 입력 가정과 오차 근거를 함께 남기세요.
+    - p-value나 최적화 성공 flag 하나를 결론으로 사용하지 마세요.
+    exercise:
+      prompt: choose_fit_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_fit_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_fit_evidence(situation):
+            table = {'parameter-estimation': {'method': 'least squares', 'evidence': 'parameters covariance residuals', 'risk': 'local optimum'}, 'model-shape': {'method': 'candidate comparison', 'evidence': 'validation error', 'risk': 'training fit'}, 'time-series-fit': {'method': 'future holdout', 'evidence': 'split boundary', 'risk': 'temporal leakage'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.scipy.scipy_04.curve-fit-evidence.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_04.curve-fit-evidence.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_fit_evidence
+        cases:
+        - id: recalls-parameter-estimation
+          arguments:
+          - value: parameter-estimation
+          expectedReturn:
+            method: least squares
+            evidence: parameters covariance residuals
+            risk: local optimum
+        - id: recalls-model-shape
+          arguments:
+          - value: model-shape
+          expectedReturn:
+            method: candidate comparison
+            evidence: validation error
+            risk: training fit
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

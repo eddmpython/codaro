@@ -401,3 +401,248 @@ sections:
   check:
     noError: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.'
     resultCheck: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: duckdb_00b-remote-secret-boundary-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - workflow_validation
+    title: MotherDuck 연결 정보와 출력 경계 점검하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 원격 연결 설정에서 token을 출력·쿼리·로그로 내보내지 않고 허용 필드만 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - secret 존재 여부만 확인하고 실제 값은 반환하지 마세요.
+    - 로그 allowlist와 secret denylist를 함께 적용하세요.
+    exercise:
+      prompt: audit_remote_config(config, log_fields)를 완성해 ready, exposed, safeLog를 반환하세요.
+      starterCode: |-
+        def audit_remote_config(config, log_fields):
+            raise NotImplementedError
+      solution: |
+        def audit_remote_config(config, log_fields):
+            secret_names = {"token", "password", "api_key"}
+            exposed = sorted(set(log_fields) & secret_names)
+            safe_log = {name: config.get(name) for name in log_fields if name in config and name not in secret_names}
+            ready = bool(config.get("database")) and bool(config.get("token")) and not exposed
+            return {"ready": ready, "exposed": exposed, "safeLog": safe_log}
+      hints: *id001
+    check:
+      id: python.duckdb.duckdb_00b.remote-secret-boundary.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_00b.remote-secret-boundary.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_remote_config
+        cases:
+        - id: accepts-secret-outside-log
+          arguments:
+          - value:
+              database: learn
+              token: secret
+              region: kr
+          - value:
+            - database
+            - region
+          expectedReturn:
+            ready: true
+            exposed: []
+            safeLog:
+              database: learn
+              region: kr
+        - id: blocks-token-log
+          arguments:
+          - value:
+              database: learn
+              token: secret
+          - value:
+            - database
+            - token
+          expectedReturn:
+            ready: false
+            exposed:
+            - token
+            safeLog:
+              database: learn
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: duckdb_00b-remote-sync-budget-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - duckdb_00b-remote-secret-boundary-mastery
+    title: 새 원격 분석 작업의 전송 예산 세우기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 원격 실행 경계를 업로드 byte, 결과 byte, 반복 횟수의 총 전송량과 cache 판단으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 업로드는 한 번, 결과 다운로드는 실행 횟수만큼 계산하세요.
+    - 반복 실행에서는 immutable 입력을 cache할 수 있습니다.
+    exercise:
+      prompt: plan_remote_sync(upload_bytes, result_bytes, runs, budget_bytes)를 완성하세요.
+      starterCode: |-
+        def plan_remote_sync(upload_bytes, result_bytes, runs, budget_bytes):
+            raise NotImplementedError
+      solution: |
+        def plan_remote_sync(upload_bytes, result_bytes, runs, budget_bytes):
+            values = [upload_bytes, result_bytes, runs, budget_bytes]
+            if any(value < 0 for value in values):
+                raise ValueError("negative budget input")
+            total = upload_bytes + result_bytes * runs
+            return {"totalBytes": total, "withinBudget": total <= budget_bytes, "cacheUpload": runs > 1 and upload_bytes > 0}
+      hints: *id002
+    check:
+      id: python.duckdb.duckdb_00b.remote-sync-budget.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_00b.remote-sync-budget.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_remote_sync
+        cases:
+        - id: reuses-upload-across-runs
+          arguments:
+          - value: 1000
+          - value: 100
+          - value: 3
+          - value: 1500
+          expectedReturn:
+            totalBytes: 1300
+            withinBudget: true
+            cacheUpload: true
+        - id: detects-over-budget
+          arguments:
+          - value: 0
+          - value: 800
+          - value: 2
+          - value: 1000
+          expectedReturn:
+            totalBytes: 1600
+            withinBudget: false
+            cacheUpload: false
+        - id: rejects-negative-byte
+          arguments:
+          - value: -1
+          - value: 0
+          - value: 1
+          - value: 10
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: duckdb_00b-remote-boundary-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - duckdb_00b-remote-sync-budget-transfer
+    title: 원격 분석의 보안·비용 경계 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 비밀값, 대용량 결과, 오프라인 재현 상황의 정책을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 비밀값은 코드와 학습 결과에 포함하지 마세요.
+    - 원격에서는 원본보다 집계 결과를 이동하세요.
+    exercise:
+      prompt: choose_remote_boundary(situation)를 완성해 policy, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_remote_boundary(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_remote_boundary(situation):
+            table = {'credential-config': {'policy': 'environment secret', 'evidence': 'redacted config audit', 'risk': 'token disclosure'}, 'large-result': {'policy': 'aggregate remotely', 'evidence': 'result byte estimate', 'risk': 'egress cost'}, 'offline-reproduction': {'policy': 'local snapshot', 'evidence': 'content hash', 'risk': 'stale data'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.duckdb.duckdb_00b.remote-boundary-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_00b.remote-boundary-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_remote_boundary
+        cases:
+        - id: recalls-credential-config
+          arguments:
+          - value: credential-config
+          expectedReturn:
+            policy: environment secret
+            evidence: redacted config audit
+            risk: token disclosure
+        - id: recalls-large-result
+          arguments:
+          - value: large-result
+          expectedReturn:
+            policy: aggregate remotely
+            evidence: result byte estimate
+            risk: egress cost
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

@@ -321,3 +321,285 @@ sections:
     check:
       noError: 줄 반복과 strip 호출이 정상적으로 끝나야 한다.
       resultCheck: errorLines가 ERR 표시가 있는 두 줄로 채워져 종합 정리 결과가 일관되어야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: fileOps_02-text-file-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - text-write-read
+    - line-by-line
+    title: 텍스트 파일의 encoding·newline·크기 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 읽기 전에 허용 encoding과 byte limit, newline 정책을 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 기본 encoding에 맡기지 말고 입력 파일 계약에 명시하세요.
+    - binary null byte와 최대 byte 크기를 읽기 전에 검사하세요.
+    exercise:
+      prompt: audit_text_file_contract(file_info, contract)를 완성하세요.
+      starterCode: |-
+        def audit_text_file_contract(file_info, contract):
+            raise NotImplementedError
+      solution: |
+        def audit_text_file_contract(file_info, contract):
+            failures = []
+            if file_info.get("encoding") not in contract.get("allowedEncodings", []):
+                failures.append("encoding")
+            if file_info.get("byteLength", 0) > contract.get("maximumBytes", 0):
+                failures.append("size")
+            if file_info.get("newline") not in contract.get("allowedNewlines", []):
+                failures.append("newline")
+            if file_info.get("binaryNullBytes", 0) > 0:
+                failures.append("binary-content")
+            return {"readable": not failures, "failures": failures, "byteLength": file_info.get("byteLength", 0)}
+      hints: *id001
+    check:
+      id: python.fileops.fileOps_02.text-file-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_02.text-file-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_text_file_contract
+        cases:
+        - id: accepts-utf8-lf-file
+          arguments:
+          - value:
+              encoding: utf-8
+              byteLength: 100
+              newline: lf
+              binaryNullBytes: 0
+          - value:
+              allowedEncodings:
+              - utf-8
+              maximumBytes: 1000
+              allowedNewlines:
+              - lf
+              - crlf
+          expectedReturn:
+            readable: true
+            failures: []
+            byteLength: 100
+        - id: reports-all-contract-failures
+          arguments:
+          - value:
+              encoding: cp949
+              byteLength: 2000
+              newline: cr
+              binaryNullBytes: 1
+          - value:
+              allowedEncodings:
+              - utf-8
+              maximumBytes: 1000
+              allowedNewlines:
+              - lf
+          expectedReturn:
+            readable: false
+            failures:
+            - encoding
+            - size
+            - newline
+            - binary-content
+            byteLength: 2000
+        - id: accepts-exact-size-limit
+          arguments:
+          - value:
+              encoding: utf-8
+              byteLength: 10
+              newline: lf
+          - value:
+              allowedEncodings:
+              - utf-8
+              maximumBytes: 10
+              allowedNewlines:
+              - lf
+          expectedReturn:
+            readable: true
+            failures: []
+            byteLength: 10
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: fileOps_02-atomic-text-write-plan-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - fileOps_02-text-file-contract-mastery
+    title: 새 텍스트 출력에 원자적 write 계획 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: temporary path·flush·replace·검증 순서를 destination별로 만든다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - destination에 직접 쓰지 말고 같은 filesystem의 temporary path를 사용하세요.
+    - replace 전후 content hash를 검증하고 동일 내용은 skip하세요.
+    exercise:
+      prompt: plan_atomic_text_write(destination, content_hash, existing_hash)를 완성하세요.
+      starterCode: |-
+        def plan_atomic_text_write(destination, content_hash, existing_hash):
+            raise NotImplementedError
+      solution: |
+        def plan_atomic_text_write(destination, content_hash, existing_hash):
+            if not content_hash:
+                raise ValueError("content hash required")
+            unchanged = existing_hash == content_hash
+            suffix = content_hash[:8]
+            temporary = f"{destination}.tmp-{suffix}"
+            steps = [] if unchanged else ["write-temp", "flush-temp", "verify-temp-hash", "replace-destination", "verify-destination-hash"]
+            return {"action": "skip" if unchanged else "replace", "temporary": None if unchanged else temporary, "steps": steps, "expectedHash": content_hash}
+      hints: *id002
+    check:
+      id: python.fileops.fileOps_02.atomic-text-write-plan.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_02.atomic-text-write-plan.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_atomic_text_write
+        cases:
+        - id: plans-atomic-replace
+          arguments:
+          - value: /out/report.txt
+          - value: abcdef123456
+          - value: old
+          expectedReturn:
+            action: replace
+            temporary: /out/report.txt.tmp-abcdef12
+            steps:
+            - write-temp
+            - flush-temp
+            - verify-temp-hash
+            - replace-destination
+            - verify-destination-hash
+            expectedHash: abcdef123456
+        - id: skips-identical-content
+          arguments:
+          - value: /out/report.txt
+          - value: same
+          - value: same
+          expectedReturn:
+            action: skip
+            temporary: null
+            steps: []
+            expectedHash: same
+        - id: rejects-empty-hash
+          arguments:
+          - value: /out/report.txt
+          - value: ''
+          - value: null
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: fileOps_02-text-file-io-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - fileOps_02-atomic-text-write-plan-transfer
+    title: 텍스트 파일 읽기·쓰기 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: encoding·size·atomic replace evidence를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 파일 action 전에 root·충돌·dry run 계약을 확인하세요.
+    - 실행 횟수가 아니라 source와 destination artifact identity로 결과를 판정하세요.
+    exercise:
+      prompt: choose_text_file_policy(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_text_file_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_text_file_policy(situation):
+            table = {'read': {'action': 'validate encoding newline and byte limit', 'evidence': 'input descriptor', 'risk': 'decode or memory failure'}, 'write': {'action': 'write and fsync temporary', 'evidence': 'temporary hash', 'risk': 'partial destination'}, 'replace': {'action': 'atomic replace then verify', 'evidence': 'destination content hash', 'risk': 'stale or corrupt file'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.fileops.fileOps_02.text-file-io-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_02.text-file-io-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_text_file_policy
+        cases:
+        - id: recalls-read
+          arguments:
+          - value: read
+          expectedReturn:
+            action: validate encoding newline and byte limit
+            evidence: input descriptor
+            risk: decode or memory failure
+        - id: recalls-write
+          arguments:
+          - value: write
+          expectedReturn:
+            action: write and fsync temporary
+            evidence: temporary hash
+            risk: partial destination
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

@@ -1,0 +1,64 @@
+schemaVersion: 1
+category: "pandas"
+sourceCount: 12
+lessons:
+  - lessonRef: "pandas/00_판다스소개"
+    sourcePath: "curricula/python/dataAnalysis/pandas/00_판다스소개.yaml"
+    metaId: "pandas_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pandas/01_레스토랑팁분석"
+    sourcePath: "curricula/python/dataAnalysis/pandas/01_레스토랑팁분석.yaml"
+    metaId: "pandas_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pandas/02_타이타닉생존분석"
+    sourcePath: "curricula/python/dataAnalysis/pandas/02_타이타닉생존분석.yaml"
+    metaId: "pandas_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pandas/03_펭귄종비교분석"
+    sourcePath: "curricula/python/dataAnalysis/pandas/03_펭귄종비교분석.yaml"
+    metaId: "pandas_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pandas/04_붓꽃품종분류"
+    sourcePath: "curricula/python/dataAnalysis/pandas/04_붓꽃품종분류.yaml"
+    metaId: "pandas_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pandas/05_자동차연비분석"
+    sourcePath: "curricula/python/dataAnalysis/pandas/05_자동차연비분석.yaml"
+    metaId: "pandas_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pandas/06_항공편시계열분석"
+    sourcePath: "curricula/python/dataAnalysis/pandas/06_항공편시계열분석.yaml"
+    metaId: "pandas_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pandas/07_다이아몬드가격분석"
+    sourcePath: "curricula/python/dataAnalysis/pandas/07_다이아몬드가격분석.yaml"
+    metaId: "pandas_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pandas/08_교통사고원인분석"
+    sourcePath: "curricula/python/dataAnalysis/pandas/08_교통사고원인분석.yaml"
+    metaId: "pandas_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pandas/09_두데이터합치기"
+    sourcePath: "curricula/python/dataAnalysis/pandas/09_두데이터합치기.yaml"
+    metaId: "pandas_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pandas/10_실전종합프로젝트"
+    sourcePath: "curricula/python/dataAnalysis/pandas/10_실전종합프로젝트.yaml"
+    metaId: "pandas_10"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pandas/11_읽기계약과타입손상"
+    sourcePath: "curricula/python/dataAnalysis/pandas/11_읽기계약과타입손상.yaml"
+    metaId: "pandas_11"
+    registryStatus: registered
+    reviewStatus: pending

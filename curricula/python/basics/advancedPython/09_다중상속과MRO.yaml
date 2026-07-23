@@ -488,3 +488,317 @@ sections:
     type: noError
     noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 09_advanced_mro-order-processor-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - mro_algorithm
+    - diamond_problem
+    - workflow_validation
+    title: MRO에 따라 검증, 감사, 기본 처리 순서를 고정하기
+    subtitle: cooperative super chain
+    goal: 주문 payload를 받아 다중 상속 processor의 MRO와 처리 steps, status를 반환한다.
+    why: 다중 상속은 예외가 없다고 안전한 것이 아니라, 모든 mixin이 cooperative super를 지켜야 업무 처리 순서가 유지됩니다.
+    explanation: run_order_processor(payload)를 완성해 ValidateMixin, AuditMixin, BaseProcessor가 MRO 순서대로 한 번씩 실행되는지 검증하세요.
+    tips:
+    - ValidateMixin이 먼저 실행되어 orderId 누락을 막아야 합니다.
+    - 각 process는 super().process(payload)를 반환해 체인을 이어야 합니다.
+    exercise:
+      prompt: run_order_processor(payload)를 완성해 steps, status, mro를 반환하세요.
+      starterCode: |-
+        def run_order_processor(payload):
+            raise NotImplementedError
+      solution: |-
+        def run_order_processor(payload):
+            class BaseProcessor:
+                def process(self, data):
+                    data["steps"].append("base")
+                    data["status"] = "processed"
+                    return data
+
+            class ValidateMixin:
+                def process(self, data):
+                    if "orderId" not in data:
+                        raise ValueError("orderId is required")
+                    data["steps"].append("validate")
+                    return super().process(data)
+
+            class AuditMixin:
+                def process(self, data):
+                    data["steps"].append("audit")
+                    return super().process(data)
+
+            class OrderProcessor(ValidateMixin, AuditMixin, BaseProcessor):
+                ...
+
+            data = dict(payload)
+            data["steps"] = list(data.get("steps", []))
+            result = OrderProcessor().process(data)
+            return {
+                "steps": result["steps"],
+                "status": result["status"],
+                "mro": [cls.__name__ for cls in OrderProcessor.__mro__[:4]],
+            }
+      hints:
+      - OrderProcessor의 부모 순서가 처리 순서를 결정합니다.
+      - payload를 복사하면 테스트 케이스 입력 부작용을 줄일 수 있습니다.
+    check:
+      id: python.advanced.mro.order-processor.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.mro.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: run_order_processor
+        cases:
+        - id: follows-validate-audit-base-mro
+          arguments:
+          - value:
+              orderId: A-100
+          expectedReturn:
+            steps:
+            - validate
+            - audit
+            - base
+            status: processed
+            mro:
+            - OrderProcessor
+            - ValidateMixin
+            - AuditMixin
+            - BaseProcessor
+        - id: rejects-missing-order-id-before-audit
+          arguments:
+          - value: {}
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 09_advanced_mro-mixin-order-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - super_function
+    - mixin_pattern
+    - composition
+    title: 믹스인 순서 변경이 처리 결과를 어떻게 바꾸는지 비교하기
+    subtitle: mixin order comparison
+    goal: 같은 mixin을 다른 부모 순서로 조합한 두 processor의 steps와 MRO를 비교해 반환한다.
+    why: 전이 과제에서는 단일 정답 순서만 보는 대신, 부모 클래스 순서가 실제 처리 파이프라인을 바꾸는 설계 위험을 확인합니다.
+    explanation: compare_mixin_orders()를 완성해 ValidateFirstProcessor와 AuditFirstProcessor의 steps와 MRO 차이를 반환하세요.
+    tips:
+    - 같은 mixin이라도 class 선언의 부모 순서가 바뀌면 MRO가 바뀝니다.
+    - cooperative super가 없으면 뒤쪽 mixin이 실행되지 않습니다.
+    exercise:
+      prompt: compare_mixin_orders()를 완성해 validateFirst와 auditFirst의 steps, mro를 반환하세요.
+      starterCode: |-
+        def compare_mixin_orders():
+            raise NotImplementedError
+      solution: |-
+        def compare_mixin_orders():
+            class BaseProcessor:
+                def process(self, data):
+                    data["steps"].append("base")
+                    return data
+
+            class ValidateMixin:
+                def process(self, data):
+                    data["steps"].append("validate")
+                    return super().process(data)
+
+            class AuditMixin:
+                def process(self, data):
+                    data["steps"].append("audit")
+                    return super().process(data)
+
+            class ValidateFirstProcessor(ValidateMixin, AuditMixin, BaseProcessor):
+                ...
+
+            class AuditFirstProcessor(AuditMixin, ValidateMixin, BaseProcessor):
+                ...
+
+            def run(processor_cls):
+                result = processor_cls().process({"steps": []})
+                return {
+                    "steps": result["steps"],
+                    "mro": [cls.__name__ for cls in processor_cls.__mro__[:4]],
+                }
+
+            return {
+                "validateFirst": run(ValidateFirstProcessor),
+                "auditFirst": run(AuditFirstProcessor),
+            }
+      hints:
+      - 두 processor는 같은 mixin을 사용하지만 부모 순서만 다릅니다.
+      - steps와 mro를 함께 반환해야 원인을 확인할 수 있습니다.
+    check:
+      id: python.advanced.mro.mixin-order.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.mro.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: compare_mixin_orders
+        cases:
+        - id: compares-two-parent-orders
+          arguments: []
+          expectedReturn:
+            validateFirst:
+              steps:
+              - validate
+              - audit
+              - base
+              mro:
+              - ValidateFirstProcessor
+              - ValidateMixin
+              - AuditMixin
+              - BaseProcessor
+            auditFirst:
+              steps:
+              - audit
+              - validate
+              - base
+              mro:
+              - AuditFirstProcessor
+              - AuditMixin
+              - ValidateMixin
+              - BaseProcessor
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 09_advanced_mro-design-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 09_advanced_mro-mixin-order-transfer
+    title: 상속, 믹스인, 합성, super 체인 선택 기준 회상하기
+    subtitle: inheritance design recall
+    goal: 설계 상황 이름을 받아 권장 도구와 이유, MRO 의존 여부를 반환한다.
+    why: 시간이 지나도 남아야 할 감각은 다중 상속을 쓸 수 있다는 사실보다, is-a 관계와 기능 조합, 교체 가능한 협력 객체를 구분하는 기준입니다.
+    explanation: choose_inheritance_design(situation)를 완성해 stable-is-a, add-small-capability, interchangeable-component, cooperative-chain
+      상황별 선택을 반환하세요.
+    tips:
+    - 변할 수 있는 기능 조합에는 합성이 더 안전한 경우가 많습니다.
+    - mixin은 작고 상태가 적은 기능 추가에 맞습니다.
+    exercise:
+      prompt: choose_inheritance_design(situation)를 완성해 설계 상황별 도구 선택 결과를 반환하세요.
+      starterCode: |-
+        def choose_inheritance_design(situation):
+            raise NotImplementedError
+      solution: |-
+        def choose_inheritance_design(situation):
+            table = {
+                "stable-is-a": {
+                    "choice": "inheritance",
+                    "reason": "child is a durable specialization of parent",
+                    "dependsOnMro": False,
+                },
+                "add-small-capability": {
+                    "choice": "mixin",
+                    "reason": "small reusable behavior can join a class hierarchy",
+                    "dependsOnMro": True,
+                },
+                "interchangeable-component": {
+                    "choice": "composition",
+                    "reason": "behavior should be swapped without changing class hierarchy",
+                    "dependsOnMro": False,
+                },
+                "cooperative-chain": {
+                    "choice": "super chain",
+                    "reason": "every class must call the next implementation once",
+                    "dependsOnMro": True,
+                },
+            }
+            if situation not in table:
+                raise ValueError("unknown inheritance situation")
+            return table[situation]
+      hints:
+      - mixin과 cooperative super는 MRO 순서에 영향을 받습니다.
+      - 합성은 MRO보다 명시적 위임 관계를 사용합니다.
+    check:
+      id: python.advanced.mro.design-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.mro.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_inheritance_design
+        cases:
+        - id: recalls-mixin-mro-dependence
+          arguments:
+          - value: add-small-capability
+          expectedReturn:
+            choice: mixin
+            reason: small reusable behavior can join a class hierarchy
+            dependsOnMro: true
+        - id: recalls-composition-for-swappable-component
+          arguments:
+          - value: interchangeable-component
+          expectedReturn:
+            choice: composition
+            reason: behavior should be swapped without changing class hierarchy
+            dependsOnMro: false
+        - id: rejects-unknown-situation
+          arguments:
+          - value: monkeypatch-base
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

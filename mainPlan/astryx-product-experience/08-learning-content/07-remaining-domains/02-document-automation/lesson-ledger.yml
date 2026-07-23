@@ -1,0 +1,71 @@
+schemaVersion: 1
+pathId: documentAutomation
+composerSnapshotDate: "2026-07-18"
+composerGraphCount: 469
+composerVersionHash: "75fc453f508da3b8709bd0be8a4d36213ec535c7af7d2cd892e20c2aca3e7c06"
+taxonomySnapshotHash: "b5e9b0b9db4f6ecd89c7be10a5c795f9b991b3ce700d5b5cf044607fc835def2"
+sourceSetHash: "5f8d7bb62f23c2e10ed89536f72449613b42d55e7c0a659010a18ebf61ce535e"
+ledgerTool: "uv run python -X utf8 docs/skills/ops/tools/buildLearningLedgers.py --check"
+targetOutcomes:
+  - "python.functions"
+  - "python.modulesAndIo"
+  - "automation.word.intro"
+  - "automation.word.paragraphs"
+  - "automation.word.runs"
+  - "automation.word.tables"
+  - "automation.word.media"
+  - "automation.word.styles"
+  - "automation.word.edit"
+  - "automation.word.mailMerge"
+  - "automation.word.template"
+  - "automation.word.report"
+gaps: []
+lessons:
+  - order: 1
+    lessonRef: "30days/day01_헬로월드"
+    canonicalContentRef: "30days/day01_헬로월드"
+  - order: 2
+    lessonRef: "30days/day02_변수와데이터타입"
+    canonicalContentRef: "30days/day02_변수와데이터타입"
+  - order: 3
+    lessonRef: "30days/day03_연산자"
+    canonicalContentRef: "30days/day03_연산자"
+  - order: 4
+    lessonRef: "30days/day13_조건문"
+    canonicalContentRef: "30days/day13_조건문"
+  - order: 5
+    lessonRef: "30days/day15_함수기초"
+    canonicalContentRef: "30days/day15_함수기초"
+  - order: 6
+    lessonRef: "30days/day18_모듈과import"
+    canonicalContentRef: "30days/day18_모듈과import"
+  - order: 7
+    lessonRef: "word/00_word소개"
+    canonicalContentRef: "word/00_word소개"
+  - order: 8
+    lessonRef: "word/01_첫문서만들기"
+    canonicalContentRef: "word/01_첫문서만들기"
+  - order: 9
+    lessonRef: "word/03_텍스트스타일링"
+    canonicalContentRef: "word/03_텍스트스타일링"
+  - order: 10
+    lessonRef: "word/04_표만들기"
+    canonicalContentRef: "word/04_표만들기"
+  - order: 11
+    lessonRef: "word/05_이미지와머리말"
+    canonicalContentRef: "word/05_이미지와머리말"
+  - order: 12
+    lessonRef: "word/06_스타일과페이지설정"
+    canonicalContentRef: "word/06_스타일과페이지설정"
+  - order: 13
+    lessonRef: "word/07_기존문서수정"
+    canonicalContentRef: "word/07_기존문서수정"
+  - order: 14
+    lessonRef: "word/08_mailmerge_csv기반"
+    canonicalContentRef: "word/08_mailmerge_csv기반"
+  - order: 15
+    lessonRef: "word/09_docxtpl템플릿엔진"
+    canonicalContentRef: "word/09_docxtpl템플릿엔진"
+  - order: 16
+    lessonRef: "word/10_회의록자동생성기"
+    canonicalContentRef: "word/10_회의록자동생성기"

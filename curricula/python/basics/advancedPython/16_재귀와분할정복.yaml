@@ -392,3 +392,305 @@ sections:
     type: noError
     noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 16_recursion_divide_conquer-budget-tree-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - recursion_basics
+    - divide_conquer
+    - workflow_validation
+    title: 조직 예산 트리를 재귀로 집계하기
+    subtitle: recursive tree aggregation
+    goal: summarize_budget_tree(node)를 완성해 조직 트리의 총액, 노드 수, 최대 깊이, 부서별 합계를 반환한다.
+    why: 재귀를 배운 뒤 실무에서 바로 마주치는 구조는 폴더, 조직, 카테고리처럼 깊이가 입력마다 달라지는 트리입니다. 반복문 한 겹으로는 풀리지 않는 입력을 작게 분해해 다시 합치는 힘을 확인합니다.
+    explanation: 각 노드는 name, budget, children을 가질 수 있습니다. 자기 예산과 모든 하위 조직 예산을 더하고, 누락된 name이나 음수 예산은 잘못된 데이터로 거부하세요.
+    tips:
+    - base case는 children이 없거나 빈 리스트인 노드입니다.
+    - 반환해야 하는 전체 total과 부서별 total을 재귀 호출 결과로 합치세요.
+    exercise:
+      prompt: summarize_budget_tree(node)를 완성해 트리 전체 집계와 부서별 집계를 반환하세요.
+      starterCode: |-
+        def summarize_budget_tree(node):
+            raise NotImplementedError
+      solution: |-
+        def summarize_budget_tree(node):
+            if not isinstance(node, dict) or "name" not in node:
+                raise ValueError("node name required")
+
+            rows = []
+
+            def walk(current, depth):
+                if "name" not in current:
+                    raise ValueError("node name required")
+                own_budget = current.get("budget", 0)
+                if own_budget < 0:
+                    raise ValueError("budget must be non-negative")
+                children = current.get("children", [])
+                child_totals = [walk(child, depth + 1) for child in children]
+                total = own_budget + sum(child_totals)
+                rows.append({"name": current["name"], "depth": depth, "total": total})
+                return total
+
+            total = walk(node, 0)
+            return {
+                "root": node["name"],
+                "total": total,
+                "nodeCount": len(rows),
+                "maxDepth": max(row["depth"] for row in rows),
+                "totalsByName": {row["name"]: row["total"] for row in rows},
+            }
+      hints:
+      - 재귀 함수 walk가 현재 노드의 total을 반환하게 만들면 부모 노드에서 합치기 쉽습니다.
+      - 전체 통계는 재귀 중 누적한 rows에서 다시 만들 수 있습니다.
+    check:
+      id: python.advanced.recursion-budget.tree.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.recursion-budget.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_budget_tree
+        cases:
+        - id: aggregates-nested-department-budgets
+          arguments:
+          - value:
+              name: company
+              budget: 100
+              children:
+              - name: platform
+                budget: 40
+              - name: growth
+                budget: 20
+                children:
+                - name: ads
+                  budget: 5
+                - name: content
+                  budget: 7
+          expectedReturn:
+            root: company
+            total: 172
+            nodeCount: 5
+            maxDepth: 2
+            totalsByName:
+              company: 172
+              platform: 40
+              growth: 32
+              ads: 5
+              content: 7
+        - id: rejects-node-without-name
+          arguments:
+          - value:
+              budget: 10
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 16_recursion_divide_conquer-nested-numbers-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - recursion_basics
+    - memoization
+    - iteration_conversion
+    title: 중첩 숫자 묶음을 재귀로 요약하기
+    subtitle: recursive nested data transfer
+    goal: summarize_nested_numbers(value)를 완성해 중첩 리스트 안 숫자의 합계, 잎 개수, 최대 깊이를 반환한다.
+    why: 같은 재귀 원리를 조직 트리가 아닌 임의 중첩 데이터에 옮길 수 있어야, 문법 기억이 아니라 구조 사고로 남습니다.
+    explanation: 입력은 정수 또는 리스트입니다. 정수는 잎 하나이고, 리스트는 내부 원소 결과를 합친 구조입니다. 그 외 타입은 TypeError로 거부하세요.
+    tips:
+    - 정수와 리스트를 서로 다른 base case와 recursive case로 나누세요.
+    - 빈 리스트의 합계와 잎 개수는 0으로 처리하면 부모 계산이 단순해집니다.
+    exercise:
+      prompt: summarize_nested_numbers(value)를 완성해 중첩 구조의 합계, 잎 개수, 최대 깊이를 반환하세요.
+      starterCode: |-
+        def summarize_nested_numbers(value):
+            raise NotImplementedError
+      solution: |-
+        def summarize_nested_numbers(value):
+            if isinstance(value, int):
+                return {"total": value, "leaves": 1, "maxDepth": 0}
+            if isinstance(value, list):
+                if not value:
+                    return {"total": 0, "leaves": 0, "maxDepth": 1}
+                summaries = [summarize_nested_numbers(item) for item in value]
+                return {
+                    "total": sum(item["total"] for item in summaries),
+                    "leaves": sum(item["leaves"] for item in summaries),
+                    "maxDepth": 1 + max(item["maxDepth"] for item in summaries),
+                }
+            raise TypeError("only int or nested list is supported")
+      hints:
+      - int를 먼저 처리해야 리스트가 아닌 값이 재귀로 내려가지 않습니다.
+      - maxDepth는 현재 리스트 깊이 1에 자식의 최대 깊이를 더합니다.
+    check:
+      id: python.advanced.recursion-budget.nested-numbers.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.recursion-budget.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_nested_numbers
+        cases:
+        - id: summarizes-deep-nested-list
+          arguments:
+          - value:
+            - - 1
+              - - 2
+                - 3
+            - - 4
+              - - 5
+          expectedReturn:
+            total: 15
+            leaves: 5
+            maxDepth: 3
+        - id: rejects-string-node
+          arguments:
+          - value:
+            - 1
+            - bad
+          expectedException: TypeError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 16_recursion_divide_conquer-strategy-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 16_recursion_divide_conquer-nested-numbers-transfer
+    title: 재귀, 메모이제이션, 분할정복 선택 기준 회상하기
+    subtitle: recursion strategy recall
+    goal: choose_recursion_strategy(problem)를 완성해 문제 설명별 적절한 접근과 주의점을 반환한다.
+    why: 시간이 지나도 남아야 할 지식은 재귀 코드 모양이 아니라, 어떤 입력 구조에서 재귀가 자연스럽고 어떤 경우 반복이나 메모이제이션이 필요한지 판단하는 기준입니다.
+    explanation: tree-aggregate, overlapping-subproblem, sorted-half-search, long-linear-input, stack-depth-risk 목적에 맞는 전략을
+      선택하세요.
+    tips:
+    - 중복 하위 문제가 반복되면 메모이제이션이 필요합니다.
+    - 매우 긴 선형 입력은 재귀보다 반복 변환이 안전할 때가 많습니다.
+    exercise:
+      prompt: choose_recursion_strategy(problem)를 완성해 접근 이름과 이유를 반환하세요.
+      starterCode: |-
+        def choose_recursion_strategy(problem):
+            raise NotImplementedError
+      solution: |-
+        def choose_recursion_strategy(problem):
+            table = {
+                "tree-aggregate": {
+                    "strategy": "recursion",
+                    "why": "the input branches into child nodes with the same shape",
+                    "risk": "validate the base case for empty children",
+                },
+                "overlapping-subproblem": {
+                    "strategy": "memoization",
+                    "why": "the same subproblem appears many times",
+                    "risk": "cache key must include every changing input",
+                },
+                "sorted-half-search": {
+                    "strategy": "divide-and-conquer",
+                    "why": "each step can discard half of a sorted range",
+                    "risk": "bounds must shrink on every step",
+                },
+                "long-linear-input": {
+                    "strategy": "iteration",
+                    "why": "a loop avoids deep call stacks for simple sequences",
+                    "risk": "keep the accumulator equivalent to the recursive return",
+                },
+                "stack-depth-risk": {
+                    "strategy": "convert-to-loop",
+                    "why": "Python does not optimize tail recursion",
+                    "risk": "preserve the same stopping condition",
+                },
+            }
+            if problem not in table:
+                raise ValueError("unknown recursion problem")
+            return table[problem]
+      hints:
+      - 재귀가 항상 좋은 선택은 아니며 입력 모양과 호출 깊이를 같이 봐야 합니다.
+      - 분할정복은 나눈 문제를 해결하고 다시 합치는 구조입니다.
+    check:
+      id: python.advanced.recursion-budget.strategy-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.recursion-budget.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_recursion_strategy
+        cases:
+        - id: recalls-memoization-for-overlap
+          arguments:
+          - value: overlapping-subproblem
+          expectedReturn:
+            strategy: memoization
+            why: the same subproblem appears many times
+            risk: cache key must include every changing input
+        - id: recalls-loop-for-long-linear-input
+          arguments:
+          - value: long-linear-input
+          expectedReturn:
+            strategy: iteration
+            why: a loop avoids deep call stacks for simple sequences
+            risk: keep the accumulator equivalent to the recursive return
+        - id: rejects-unknown-problem
+          arguments:
+          - value: magical-recursion
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

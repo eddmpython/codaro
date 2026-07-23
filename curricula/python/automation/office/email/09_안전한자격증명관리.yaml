@@ -386,3 +386,292 @@ sections:
           - "비밀번호를 OS 키체인(macOS Keychain, Windows Credential)에 저장"
           - ".env 검증 CLI 도구 (필수 변수 보고)"
           - "환경별 .env (.env.dev, .env.prod) 분기"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: email_09-credential-reference-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load_env
+    - extensions
+    title: 메일 자격증명의 secret reference·scope·rotation 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 값 저장 없이 provider reference와 만료·허용 목적을 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - YAML·코드·로그에는 secret 값이 아니라 provider와 key reference만 남기세요.
+    - 자격증명 purpose와 만료일을 실행 전에 검사하세요.
+    exercise:
+      prompt: audit_credential_reference(reference, now_day, allowed_purposes)를 완성하세요.
+      starterCode: |-
+        def audit_credential_reference(reference, now_day, allowed_purposes):
+            raise NotImplementedError
+      solution: |
+        def audit_credential_reference(reference, now_day, allowed_purposes):
+            failures = []
+            if not reference.get("provider") or not reference.get("key"):
+                failures.append("reference")
+            if "value" in reference:
+                failures.append("embedded-value")
+            if reference.get("purpose") not in allowed_purposes:
+                failures.append("purpose")
+            if reference.get("expiresDay", now_day - 1) <= now_day:
+                failures.append("expired")
+            return {"accepted": not failures, "failures": failures, "identity": f"{reference.get('provider')}:{reference.get('key')}"}
+      hints: *id001
+    check:
+      id: python.email.email_09.credential-reference-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_09.credential-reference-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_credential_reference
+        cases:
+        - id: accepts-scoped-future-reference
+          arguments:
+          - value:
+              provider: os-keyring
+              key: smtp-report
+              purpose: weekly-report
+              expiresDay: 100
+          - value: 50
+          - value:
+            - weekly-report
+          expectedReturn:
+            accepted: true
+            failures: []
+            identity: os-keyring:smtp-report
+        - id: reports-embedded-disallowed-expired-secret
+          arguments:
+          - value:
+              provider: env
+              key: SMTP_PASSWORD
+              value: secret
+              purpose: other
+              expiresDay: 10
+          - value: 10
+          - value:
+            - weekly-report
+          expectedReturn:
+            accepted: false
+            failures:
+            - embedded-value
+            - purpose
+            - expired
+            identity: env:SMTP_PASSWORD
+        - id: reports-missing-reference
+          arguments:
+          - value:
+              purpose: weekly-report
+              expiresDay: 100
+          - value: 1
+          - value:
+            - weekly-report
+          expectedReturn:
+            accepted: false
+            failures:
+            - reference
+            identity: None:None
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: email_09-credential-use-ledger-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - email_09-credential-reference-audit-mastery
+    title: 새 자격증명 사용에 최소 scope·redaction 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 요청 scope가 허용 scope 안이고 로그 잔존이 없는지 판정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 발송 계정에 IMAP read 같은 불필요 scope를 함께 부여하지 마세요.
+    - 사용 ledger에는 secret 값이 아닌 audit ID와 scope만 남기세요.
+    exercise:
+      prompt: audit_credential_use(usage, allowed_scopes)를 완성하세요.
+      starterCode: |-
+        def audit_credential_use(usage, allowed_scopes):
+            raise NotImplementedError
+      solution: |
+        def audit_credential_use(usage, allowed_scopes):
+            requested = set(usage.get("requestedScopes", []))
+            excess = sorted(requested - set(allowed_scopes))
+            failures = []
+            if excess:
+                failures.append("scope")
+            if usage.get("secretResidualFindings", 0) != 0:
+                failures.append("redaction")
+            if not usage.get("auditId"):
+                failures.append("audit-id")
+            return {"accepted": not failures, "failures": failures, "excessScopes": excess, "recordedSecretValue": False}
+      hints: *id002
+    check:
+      id: python.email.email_09.credential-use-ledger.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_09.credential-use-ledger.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_credential_use
+        cases:
+        - id: accepts-minimal-redacted-use
+          arguments:
+          - value:
+              requestedScopes:
+              - smtp-send
+              secretResidualFindings: 0
+              auditId: u1
+          - value:
+            - smtp-send
+          expectedReturn:
+            accepted: true
+            failures: []
+            excessScopes: []
+            recordedSecretValue: false
+        - id: reports-scope-redaction-and-audit-gaps
+          arguments:
+          - value:
+              requestedScopes:
+              - smtp-send
+              - imap-read
+              secretResidualFindings: 1
+              auditId: ''
+          - value:
+            - smtp-send
+          expectedReturn:
+            accepted: false
+            failures:
+            - scope
+            - redaction
+            - audit-id
+            excessScopes:
+            - imap-read
+            recordedSecretValue: false
+        - id: accepts-no-scope-use
+          arguments:
+          - value:
+              requestedScopes: []
+              secretResidualFindings: 0
+              auditId: u2
+          - value: []
+          expectedReturn:
+            accepted: true
+            failures: []
+            excessScopes: []
+            recordedSecretValue: false
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: email_09-mail-credential-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - email_09-credential-use-ledger-transfer
+    title: 메일 자격증명 관리 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: reference·scope·rotation·redaction 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 메일 API 성공과 올바른 수신자·내용·첨부 전달을 분리해 검증하세요.
+    - 실제 발송 전 dry run과 idempotency identity, 비밀정보 redaction을 적용하세요.
+    exercise:
+      prompt: choose_mail_credential_policy(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_mail_credential_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_mail_credential_policy(situation):
+            table = {'store': {'action': 'keep provider key reference', 'evidence': 'secret identity', 'risk': 'embedded credential'}, 'use': {'action': 'request minimal scope', 'evidence': 'scope and audit ID', 'risk': 'overprivilege'}, 'rotate': {'action': 'enforce expiry and revoke old', 'evidence': 'rotation event', 'risk': 'stale credential'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.email.email_09.mail-credential-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.email.email_09.mail-credential-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_mail_credential_policy
+        cases:
+        - id: recalls-store
+          arguments:
+          - value: store
+          expectedReturn:
+            action: keep provider key reference
+            evidence: secret identity
+            risk: embedded credential
+        - id: recalls-use
+          arguments:
+          - value: use
+          expectedReturn:
+            action: request minimal scope
+            evidence: scope and audit ID
+            risk: overprivilege
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

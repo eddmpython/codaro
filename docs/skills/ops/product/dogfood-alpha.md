@@ -28,7 +28,7 @@ Codaro의 다음 기준은 기능을 더 붙였는지가 아니라 첫 사용자
 9. 셀 실행: 실행 전 `packages-check`, 필요 시 `packages-install`, 이후 `cell-call` 순서로 실행한다.
 10. 피드백과 실패 복구: 실행 결과와 검증/피드백을 보고, 실패하면 원인과 다음 행동을 사용자 문장으로 확인한다.
 
-이 흐름의 제품 내비게이션은 `대화 → 현재 학습 → 노트북 → 자동화` 순서로 보인다. 자동화는 첫 화면의 동급 출발점이 아니라, 학습/노트북에서 검증된 셀과 recipe를 저장하고 예약하는 두 번째 loop로 판단한다.
+이 흐름의 제품 내비게이션은 `현재 학습 → 노트북 → 자동화 → 대화` 순서로 보인다. 자동화는 첫 화면의 동급 출발점이 아니라, 학습/노트북에서 검증된 셀과 recipe를 저장하고 예약하는 두 번째 loop로 판단한다.
 
 ## 실패 복구 표면
 
@@ -59,7 +59,7 @@ Codaro의 다음 기준은 기능을 더 붙였는지가 아니라 첫 사용자
 
 `provider-settings-browser`와 `learning-card-browser` 같은 브라우저 gate는 제품 표면 증거다. 로컬 구현이 통과해도 브라우저 gate가 실패하면 사용자가 완주할 수 있다고 말하지 않는다.
 
-`dogfood-alpha-audit`는 `output/test-runner/dogfood-alpha-audit/dogfood-alpha-report.json`에 `gitHead`, `startedAt`, `completedAt`, `durationMs`, `status`, `summary`, `requirementFailures`를 남긴다. `quality-cycle`은 이 report의 fresh 여부와 `payloadGitHead`/`gitHeadMatches`를 대조해야 하며, report가 없거나 현재 커밋과 다르면 “첫 사용자 완주 경로가 검증됐다”고 말하지 않는다.
+`dogfood-alpha-audit`는 `output/test-runner/dogfood-alpha-audit/dogfood-alpha-report.json`에 `gitHead`, `startedAt`, `completedAt`, `durationMs`, `status`, `summary`, `requirementFailures`를 남긴다. 이 report의 점수는 `scoreKind: wiring-coverage`이며 `completionEligible: false`다. `learningPracticeCovered`-는 연습 flow 배선을 뜻할 뿐 strong 완주를 뜻하지 않고, typed `CheckSpec`과 isolated evidence가 없는 현재는 `learningStrongCompletionCovered: false`로 남긴다. `quality-cycle`은 report의 fresh 여부와 `payloadGitHead`/`gitHeadMatches`를 대조해야 하며, report가 없거나 현재 커밋과 다르면 “첫 사용자 완주 경로가 검증됐다”고 말하지 않는다.
 
 ## 운영
 
@@ -72,4 +72,4 @@ Codaro의 다음 기준은 기능을 더 붙였는지가 아니라 첫 사용자
 
 ## 관련 gate
 
-`dogfood-alpha-audit`는 문서와 코드에 10단계 완주 경로, provider/OAuth 복구, live provider smoke, 추천·조합 우선 goal-discovery, 학습카드 완주 UX, workloop/trace, 제품 품질 판단 gate가 연결되어 있는지 확인한다.
+`dogfood-alpha-audit`는 문서와 코드에 첫 사용자 flow, provider/OAuth 복구, live provider smoke 경로, 추천·조합 우선 goal-discovery, 학습카드 연습 UX, workloop/trace, 제품 품질 판단 gate가 연결되어 있는지 확인한다. 이는 wiring audit이며 strong 학습 완주나 실제 provider 품질 점수가 아니다.

@@ -469,3 +469,262 @@ sections:
     content: 다음 시간에는 대용량 데이터(5만 행)를 다루는 방법을 배웁니다.
   goal: 정리에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
   why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pandas_06-monthly-delay-trend-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - summary
+    title: 항공편 월별 평균 지연과 이전 달 변화 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 날짜 순서로 월별 평균 지연을 집계하고 직전 관측 월과의 차이를 남긴다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 입력 행 순서가 아니라 month를 정렬한 뒤 변화를 계산하세요.
+    - 첫 관측 월은 비교 대상이 없으므로 changeFromPrevious가 None입니다.
+    exercise:
+      prompt: monthly_delay_trend(rows)를 완성해 month, meanDelay, changeFromPrevious 목록을 반환하세요.
+      starterCode: |-
+        def monthly_delay_trend(rows):
+            raise NotImplementedError
+      solution: |
+        def monthly_delay_trend(rows):
+            grouped = {}
+            for row in rows:
+                grouped.setdefault(row["month"], []).append(row["delay"])
+            result = []
+            previous = None
+            for month in sorted(grouped):
+                mean = round(sum(grouped[month]) / len(grouped[month]), 2)
+                result.append({
+                    "month": month,
+                    "meanDelay": mean,
+                    "changeFromPrevious": None if previous is None else round(mean - previous, 2),
+                })
+                previous = mean
+            return result
+      hints: *id001
+    check:
+      id: python.pandas.pandas_06.monthly-delay-trend.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_06.monthly-delay-trend.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: monthly_delay_trend
+        cases:
+        - id: sorts-before-computing-change
+          arguments:
+          - value:
+            - month: 2026-02
+              delay: 20
+            - month: 2026-01
+              delay: 10
+            - month: 2026-02
+              delay: 10
+            - month: 2026-03
+              delay: 9
+          expectedReturn:
+          - month: 2026-01
+            meanDelay: 10.0
+            changeFromPrevious: null
+          - month: 2026-02
+            meanDelay: 15.0
+            changeFromPrevious: 5.0
+          - month: 2026-03
+            meanDelay: 9.0
+            changeFromPrevious: -6.0
+        - id: handles-empty-series
+          arguments:
+          - value: []
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pandas_06-rolling-window-average-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_06-monthly-delay-trend-mastery
+    title: 새 센서 시계열에서 이동 평균 계산하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 월별 변화 개념을 고정 길이 window 평균으로 옮기고 window가 완성된 시점만 반환한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 계산 전에 time으로 정렬하세요.
+    - 완성되지 않은 앞쪽 window를 임의로 짧게 평균 내지 마세요.
+    exercise:
+      prompt: rolling_average(points, window)를 완성해 time과 average 목록을 반환하세요.
+      starterCode: |-
+        def rolling_average(points, window):
+            raise NotImplementedError
+      solution: |
+        def rolling_average(points, window):
+            if not isinstance(window, int) or isinstance(window, bool) or window < 1:
+                raise ValueError("window must be a positive integer")
+            ordered = sorted(points, key=lambda point: point["time"])
+            result = []
+            for index in range(window - 1, len(ordered)):
+                values = [point["value"] for point in ordered[index - window + 1:index + 1]]
+                result.append({"time": ordered[index]["time"], "average": round(sum(values) / window, 2)})
+            return result
+      hints: *id002
+    check:
+      id: python.pandas.pandas_06.rolling-window-average.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_06.rolling-window-average.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: rolling_average
+        cases:
+        - id: computes-ordered-window
+          arguments:
+          - value:
+            - time: 3
+              value: 9
+            - time: 1
+              value: 3
+            - time: 2
+              value: 6
+            - time: 4
+              value: 12
+          - value: 3
+          expectedReturn:
+          - time: 3
+            average: 6.0
+          - time: 4
+            average: 9.0
+        - id: returns-no-partial-window
+          arguments:
+          - value:
+            - time: 1
+              value: 3
+          - value: 2
+          expectedReturn: []
+        - id: rejects-zero-window
+          arguments:
+          - value: []
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pandas_06-time-series-order-check-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_06-rolling-window-average-transfer
+    title: 시계열 분석 전 순서와 간격 점검 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 정렬, 중복 시점, 누락 구간 문제마다 필요한 조치와 증거를 선택한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - shift나 diff 전에 시간 정렬을 먼저 증명하세요.
+    - 누락 기간을 0으로 채우는 것과 결측으로 표시하는 것은 다른 판단입니다.
+    exercise:
+      prompt: choose_time_series_check(issue)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_time_series_check(issue):
+            raise NotImplementedError
+      solution: |
+        def choose_time_series_check(issue):
+            table = {
+                "unsorted-time": {"action": "sort-by-time", "evidence": "monotonic timestamp check", "risk": "wrong lag"},
+                "duplicate-time": {"action": "define-aggregation", "evidence": "duplicate count", "risk": "double counting"},
+                "missing-period": {"action": "reindex-and-mark-missing", "evidence": "expected versus observed periods", "risk": "fake continuity"},
+            }
+            if issue not in table:
+                raise ValueError("unknown time-series issue")
+            return table[issue]
+      hints: *id003
+    check:
+      id: python.pandas.pandas_06.time-series-order-check.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_06.time-series-order-check.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_time_series_check
+        cases:
+        - id: recalls-sort-before-lag
+          arguments:
+          - value: unsorted-time
+          expectedReturn:
+            action: sort-by-time
+            evidence: monotonic timestamp check
+            risk: wrong lag
+        - id: recalls-gap-policy
+          arguments:
+          - value: missing-period
+          expectedReturn:
+            action: reindex-and-mark-missing
+            evidence: expected versus observed periods
+            risk: fake continuity
+        - id: rejects-unknown-issue
+          arguments:
+          - value: blue-line
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

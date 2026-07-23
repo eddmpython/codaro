@@ -6,6 +6,9 @@ meta:
   difficulty: easy
   audience: 파일 자동화에 입문하는 Python 학습자
   packages: []
+  outcomes: ["automation.fileOps"]
+  prerequisites: ["builtins.fileSystem"]
+  estimatedMinutes: 35
   tags:
     - pathlib
     - tempfile
@@ -44,52 +47,65 @@ sections:
       - tempfile은 OS의 임시 디렉터리에 폴더를 만들고 with가 끝날 때 즉시 삭제한다.
       - Path(td)로 감싸야 이후에 / 연산자로 자연스럽게 하위 경로를 만들 수 있다.
     snippet: |-
-      import tempfile
       from pathlib import Path
 
-      with tempfile.TemporaryDirectory() as td:
-          base = Path(td)
+      def create_order_workspace(base: Path):
           (base / "주문").mkdir()
-          createdNames = sorted(item.name for item in base.iterdir())
+          return sorted(item.name for item in base.iterdir())
 
-      assert createdNames == ["주문"]
-      createdNames
+      # 실제 학습 검증기는 새 임시 workspace를 base로 넘겨 호출한다.
     exercise:
-      prompt: 임시 폴더 안에 주문과 배송 두 개의 하위 폴더를 만들고 createdNames에 정렬된 두 이름이 들어가도록 코드를 완성하세요.
+      prompt: 전달받은 base 안에 주문과 배송 폴더를 만들고 정렬된 이름 목록을 반환하는 create_order_workspace 함수를 완성하세요. 실행하면 새 임시 workspace에서 함수 반환값과 실제 폴더를 자동 검증합니다.
       starterCode: |-
-        import tempfile
         from pathlib import Path
 
-        with tempfile.TemporaryDirectory() as td:
-            base = Path(td)
-            (base / "___").mkdir()
-            (base / "___").mkdir()
-            createdNames = sorted(item.name for item in base.iterdir())
-
-        assert createdNames == ["배송", "주문"]
-        createdNames
+        def create_order_workspace(base: Path):
+            (base / "___").___()
+            (base / "___").___()
+            return sorted(item.name for item in base.iterdir())
       solution: |-
-        import tempfile
         from pathlib import Path
 
-        with tempfile.TemporaryDirectory() as td:
-            base = Path(td)
+        def create_order_workspace(base: Path):
             (base / "주문").mkdir()
             (base / "배송").mkdir()
-            createdNames = sorted(item.name for item in base.iterdir())
-
-        assert createdNames == ["배송", "주문"]
-        createdNames
+            return sorted(item.name for item in base.iterdir())
       hints:
-        - 한국어 "주문"과 "배송"은 가나다 순으로 정렬하면 "배송"이 먼저 온다.
-        - mkdir 두 번을 호출한 뒤 iterdir로 자식 이름을 모두 읽어 정렬해야 한다.
-      check:
-        type: noError
-        noError: tempfile 컨텍스트 안에서 두 개의 하위 폴더 생성과 iterdir 호출이 오류 없이 끝나야 한다.
-        resultCheck: createdNames 결과가 사전 순으로 정렬된 두 폴더 이름과 정확히 일치해야 한다.
+        - base / "폴더명"으로 하위 Path를 만든 뒤 mkdir을 호출하세요.
+        - 두 폴더를 만든 다음 base.iterdir()의 name을 정렬해 반환하세요.
     check:
-      noError: tempfile.TemporaryDirectory가 정상적으로 진입과 종료를 마치고 base.iterdir가 항목을 반환해야 한다.
-      resultCheck: createdNames에 본문에서 만든 하위 폴더 이름이 정렬된 상태로 담겨 있어야 한다.
+      id: python.pathlib.create-order-workspace.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pathlib.create-order-workspace.fixture.v1
+      fixtureHash: sha256-tr7LliTKvbwyo1aWJAWF2G/rBCZwjbs/VtBoLVzWkUQ=
+      fixture:
+        directories:
+          - workspace
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      payload:
+        entry: create_order_workspace
+        cases:
+          - id: creates-two-folders
+            arguments:
+              - fixturePath: workspace
+            expectedReturn:
+              - 배송
+              - 주문
+        expectedPaths:
+          - path: workspace/배송
+            kind: directory
+            origin: created
+          - path: workspace/주문
+            kind: directory
+            origin: created
   - id: path-parts
     title: 경로 조각으로 분해하기
     structuredPrimary: true
@@ -103,51 +119,83 @@ sections:
     snippet: |-
       from pathlib import Path
 
-      sample = Path("reports/2024/orderSummary.csv")
-      decomposed = {
-          "name": sample.name,
-          "stem": sample.stem,
-          "suffix": sample.suffix,
-          "parts": list(sample.parts),
-      }
-
-      assert decomposed == {
-          "name": "orderSummary.csv",
-          "stem": "orderSummary",
-          "suffix": ".csv",
-          "parts": ["reports", "2024", "orderSummary.csv"],
-      }
-      decomposed
+      def create_report_versions(base: Path):
+          csv_path = base / "reports" / "2024" / "orderSummary.csv"
+          csv_path.parent.mkdir(parents=True)
+          csv_path.write_text("order,total\nA,10\n", encoding="utf-8")
+          json_path = csv_path.with_suffix(".json")
+          json_path.write_text('{"order":"A","total":10}', encoding="utf-8")
+          return {"csv": csv_path.name, "json": json_path.name}
     exercise:
-      prompt: invoice.json 파일을 reports/2025 폴더에 두고, 같은 이름의 yaml 확장자로 바꾼 Path를 jsonPath와 yamlPath 변수에 담아 검증하세요.
+      prompt: 전달받은 base 아래 reports/2025에 invoice.json과 같은 stem의 invoice.yaml을 만들고, 두 이름과 JSON 경로 조각을 반환하는 create_invoice_versions 함수를 완성하세요.
       starterCode: |-
         from pathlib import Path
 
-        jsonPath = Path("___") / "___" / "___"
-        yamlPath = jsonPath.___("___")
-        result = {"jsonName": jsonPath.name, "yamlName": yamlPath.name}
-
-        assert result == {"jsonName": "invoice.json", "yamlName": "invoice.yaml"}
-        result
+        def create_invoice_versions(base: Path):
+            json_path = base / "___" / "___" / "___"
+            json_path.parent.___(parents=True)
+            json_path.write_text("{}", encoding="utf-8")
+            yaml_path = json_path.___(".yaml")
+            yaml_path.write_text("invoice: true\n", encoding="utf-8")
+            return {
+                "jsonName": json_path.name,
+                "yamlName": yaml_path.name,
+                "parts": list(json_path.relative_to(base).parts),
+            }
       solution: |-
         from pathlib import Path
 
-        jsonPath = Path("reports") / "2025" / "invoice.json"
-        yamlPath = jsonPath.with_suffix(".yaml")
-        result = {"jsonName": jsonPath.name, "yamlName": yamlPath.name}
-
-        assert result == {"jsonName": "invoice.json", "yamlName": "invoice.yaml"}
-        result
+        def create_invoice_versions(base: Path):
+            json_path = base / "reports" / "2025" / "invoice.json"
+            json_path.parent.mkdir(parents=True)
+            json_path.write_text("{}", encoding="utf-8")
+            yaml_path = json_path.with_suffix(".yaml")
+            yaml_path.write_text("invoice: true\n", encoding="utf-8")
+            return {
+                "jsonName": json_path.name,
+                "yamlName": yaml_path.name,
+                "parts": list(json_path.relative_to(base).parts),
+            }
       hints:
-        - / 연산자는 좌측 Path와 우측 문자열을 합쳐 새 Path를 만든다.
-        - 확장자를 바꿀 때는 with_suffix 메서드를 쓰고 점을 포함해 ".yaml"처럼 넘긴다.
-      check:
-        type: noError
-        noError: Path 조합과 with_suffix 호출이 TypeError 없이 끝나야 한다.
-        resultCheck: result 딕셔너리의 jsonName과 yamlName이 각각 invoice.json, invoice.yaml과 같아야 한다.
+        - reports, 2025, invoice.json을 / 연산자로 이어 붙이고 parent.mkdir(parents=True)를 호출하세요.
+        - 확장자를 바꿀 때는 with_suffix(".yaml")을 사용하세요.
     check:
-      noError: snippet의 Path 분해 코드가 AttributeError 없이 끝나야 한다.
-      resultCheck: decomposed 딕셔너리가 본문에서 정의한 네 키를 모두 채운 상태여야 한다.
+      id: python.pathlib.create-invoice-versions.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pathlib.create-invoice-versions.fixture.v1
+      fixtureHash: sha256-tr7LliTKvbwyo1aWJAWF2G/rBCZwjbs/VtBoLVzWkUQ=
+      fixture:
+        directories:
+          - workspace
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      payload:
+        entry: create_invoice_versions
+        cases:
+          - id: creates-json-and-yaml
+            arguments:
+              - fixturePath: workspace
+            expectedReturn:
+              jsonName: invoice.json
+              yamlName: invoice.yaml
+              parts:
+                - reports
+                - '2025'
+                - invoice.json
+        expectedPaths:
+          - path: workspace/reports/2025/invoice.json
+            kind: file
+            origin: created
+          - path: workspace/reports/2025/invoice.yaml
+            kind: file
+            origin: created
   - id: relative-absolute
     title: 상대 경로와 절대 경로
     structuredPrimary: true
@@ -159,62 +207,100 @@ sections:
       - Path.is_absolute로 경로가 이미 절대 경로인지 먼저 확인할 수 있다.
       - resolve는 존재하지 않는 경로에도 호출할 수 있으며 cwd만 사용해 변환한다.
     snippet: |-
-      import tempfile
       from pathlib import Path
 
-      with tempfile.TemporaryDirectory() as td:
-          base = Path(td).resolve()
-          target = base / "boards" / "weekly.txt"
-          target.parent.mkdir()
-          target.write_text("ok", encoding="utf-8")
-          relative = target.relative_to(base)
-          recovered = (base / relative).resolve()
-          comparison = {"sameFile": recovered == target, "asPosix": relative.as_posix()}
+      def resolve_inside(base: Path, candidate: str):
+          relative = Path(candidate)
+          if relative.is_absolute() or ".." in relative.parts:
+              raise ValueError("상대 경로만 사용할 수 있습니다")
+          root = base.resolve()
+          resolved = (root / relative).resolve()
+          if not resolved.is_relative_to(root):
+              raise ValueError("작업 폴더 밖 경로입니다")
+          return {"absolute": str(resolved), "relative": relative.as_posix()}
 
-      assert comparison == {"sameFile": True, "asPosix": "boards/weekly.txt"}
-      comparison
+      # checker가 정상 경로와 traversal/absolute 경로를 서로 다른 case로 호출한다.
     exercise:
-      prompt: 상대 경로 reports/today.log를 base에 합쳐 절대 경로로 만들고, 원본 target과 같은 파일을 가리키는지 verified 딕셔너리에 담아 검증하세요.
+      prompt: base 안의 상대 경로만 resolve하고, ../ traversal과 절대 경로는 ValueError로 거부하는 resolve_report 함수를 완성하세요. 정상 경로, 다른 파일, traversal, absolute 네 case가 Run 뒤 자동 검증됩니다.
       starterCode: |-
-        import tempfile
         from pathlib import Path
 
-        with tempfile.TemporaryDirectory() as td:
-            base = Path(td).resolve()
-            target = base / "reports" / "today.log"
-            target.parent.mkdir()
-            target.write_text("daily", encoding="utf-8")
-            relative = Path("___") / "___"
-            recovered = (base / relative).___()
-            verified = {"matches": recovered == target, "posix": relative.as_posix()}
-
-        assert verified == {"matches": True, "posix": "reports/today.log"}
-        verified
+        def resolve_report(base: Path, candidate: str):
+            relative = Path(candidate)
+            if relative.___() or "___" in relative.parts:
+                raise ValueError("상대 경로만 사용할 수 있습니다")
+            root = base.___()
+            resolved = (root / relative).___()
+            if not resolved.is_relative_to(root):
+                raise ValueError("작업 폴더 밖 경로입니다")
+            target = (root / "reports" / "today.log").resolve()
+            return {"matches": resolved == target, "posix": relative.as_posix()}
       solution: |-
-        import tempfile
         from pathlib import Path
 
-        with tempfile.TemporaryDirectory() as td:
-            base = Path(td).resolve()
-            target = base / "reports" / "today.log"
-            target.parent.mkdir()
-            target.write_text("daily", encoding="utf-8")
-            relative = Path("reports") / "today.log"
-            recovered = (base / relative).resolve()
-            verified = {"matches": recovered == target, "posix": relative.as_posix()}
-
-        assert verified == {"matches": True, "posix": "reports/today.log"}
-        verified
+        def resolve_report(base: Path, candidate: str):
+            relative = Path(candidate)
+            if relative.is_absolute() or ".." in relative.parts:
+                raise ValueError("상대 경로만 사용할 수 있습니다")
+            root = base.resolve()
+            resolved = (root / relative).resolve()
+            if not resolved.is_relative_to(root):
+                raise ValueError("작업 폴더 밖 경로입니다")
+            target = (root / "reports" / "today.log").resolve()
+            return {"matches": resolved == target, "posix": relative.as_posix()}
       hints:
-        - reports와 today.log 두 조각을 / 로 이어 상대 경로를 만든다.
-        - resolve를 호출해야 cwd 기반의 절대 경로가 되고 target과 비교가 가능하다.
-      check:
-        type: noError
-        noError: 상대 경로를 base와 합친 뒤 resolve가 OSError 없이 끝나야 한다.
-        resultCheck: verified 딕셔너리에서 matches가 True이고 posix가 reports/today.log여야 한다.
+        - Path.is_absolute와 relative.parts 안의 ".."를 base와 합치기 전에 확인하세요.
+        - resolve한 뒤에도 resolved.is_relative_to(root)로 작업 폴더 안인지 확인하세요.
     check:
-      noError: 임시 폴더 안의 파일 생성과 relative_to 변환이 오류 없이 끝나야 한다.
-      resultCheck: comparison 딕셔너리의 sameFile이 True이고 asPosix가 boards/weekly.txt여야 한다.
+      id: python.pathlib.resolve-report.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pathlib.resolve-report.fixture.v1
+      fixtureHash: sha256-p8WrBOlz/UaReR0B+sr7pv/on4YWt794fEKpUULt6Bo=
+      fixture:
+        directories:
+          - workspace/reports
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+          - path: workspace/reports/today.log
+            content: daily
+        stdin: []
+      payload:
+        entry: resolve_report
+        cases:
+          - id: existing-relative-file
+            arguments:
+              - fixturePath: workspace
+              - value: reports/today.log
+            expectedReturn:
+              matches: true
+              posix: reports/today.log
+          - id: other-relative-file
+            arguments:
+              - fixturePath: workspace
+              - value: reports/tomorrow.log
+            expectedReturn:
+              matches: false
+              posix: reports/tomorrow.log
+          - id: rejects-traversal
+            arguments:
+              - fixturePath: workspace
+              - value: ../secret.txt
+            expectedException: ValueError
+          - id: rejects-absolute
+            arguments:
+              - fixturePath: workspace
+              - value: /tmp/secret.txt
+            expectedException: ValueError
+        expectedPaths:
+          - path: workspace/reports/today.log
+            kind: file
+            origin: fixture
   - id: identity-summary
     title: 경로 정체성 종합 정리
     structuredPrimary: true
@@ -226,74 +312,341 @@ sections:
       - 결과 딕셔너리 키 이름은 자동화 리포트의 열 이름이 되므로 의미 있게 고른다.
       - 검증할 때 expected 딕셔너리를 먼저 만들어 두면 실패 지점을 빨리 찾을 수 있다.
     snippet: |-
-      import tempfile
       from pathlib import Path
 
-      with tempfile.TemporaryDirectory() as td:
-          base = Path(td).resolve()
+      def build_snapshot_identity(base: Path):
           target = base / "snapshots" / "march" / "report.json"
           target.parent.mkdir(parents=True)
           target.write_text("{}", encoding="utf-8")
-          identity = {
+          return {
               "absolute": str(target),
               "relative": target.relative_to(base).as_posix(),
               "stem": target.stem,
               "suffix": target.suffix,
           }
-
-      assert identity["relative"] == "snapshots/march/report.json"
-      assert identity["stem"] == "report"
-      assert identity["suffix"] == ".json"
-      identity
     exercise:
-      prompt: archives/april 폴더 안에 finalSummary.txt 파일을 만들고 absolute, relative, stem, suffix를 묶은 identity 딕셔너리로 정리해 검증하세요.
+      prompt: 전달받은 base 아래 archives/april/finalSummary.txt를 만들고 absolute, relative, stem, suffix를 반환하는 build_archive_identity 함수를 완성하세요. absolute가 fixture 밖을 가리키면 검증에 실패합니다.
       starterCode: |-
-        import tempfile
         from pathlib import Path
 
-        with tempfile.TemporaryDirectory() as td:
-            base = Path(td).resolve()
+        def build_archive_identity(base: Path):
             target = base / "___" / "___" / "___"
-            target.parent.mkdir(parents=True)
+            target.parent.___(parents=True)
             target.write_text("done", encoding="utf-8")
-            identity = {
+            return {
                 "absolute": str(target),
-                "relative": target.relative_to(base).as_posix(),
+                "relative": target.___(base).as_posix(),
                 "stem": target.___,
                 "suffix": target.___,
             }
-
-        assert identity["relative"] == "archives/april/finalSummary.txt"
-        assert identity["stem"] == "finalSummary"
-        assert identity["suffix"] == ".txt"
-        identity
       solution: |-
-        import tempfile
         from pathlib import Path
 
-        with tempfile.TemporaryDirectory() as td:
-            base = Path(td).resolve()
+        def build_archive_identity(base: Path):
             target = base / "archives" / "april" / "finalSummary.txt"
             target.parent.mkdir(parents=True)
             target.write_text("done", encoding="utf-8")
-            identity = {
+            return {
                 "absolute": str(target),
                 "relative": target.relative_to(base).as_posix(),
                 "stem": target.stem,
                 "suffix": target.suffix,
             }
-
-        assert identity["relative"] == "archives/april/finalSummary.txt"
-        assert identity["stem"] == "finalSummary"
-        assert identity["suffix"] == ".txt"
-        identity
       hints:
         - parents=True를 mkdir에 넘겨야 archives/april 두 단계가 한 번에 생긴다.
         - stem은 메서드가 아니라 속성이므로 괄호 없이 target.stem으로 접근한다.
-      check:
-        type: noError
-        noError: mkdir(parents=True)와 write_text 호출이 오류 없이 끝나야 한다.
-        resultCheck: identity의 relative, stem, suffix가 각각 archives/april/finalSummary.txt, finalSummary, .txt여야 한다.
     check:
-      noError: 마지막 섹션의 mkdir, write_text, 딕셔너리 구성이 순서대로 실행되어야 한다.
-      resultCheck: identity 딕셔너리에 absolute, relative, stem, suffix 네 키가 모두 채워져 있어야 한다.
+      id: python.pathlib.build-archive-identity.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pathlib.build-archive-identity.fixture.v1
+      fixtureHash: sha256-tr7LliTKvbwyo1aWJAWF2G/rBCZwjbs/VtBoLVzWkUQ=
+      fixture:
+        directories:
+          - workspace
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      payload:
+        entry: build_archive_identity
+        cases:
+          - id: builds-portable-identity
+            arguments:
+              - fixturePath: workspace
+            expectedReturn:
+              absolute: workspace/archives/april/finalSummary.txt
+              relative: archives/april/finalSummary.txt
+              stem: finalSummary
+              suffix: .txt
+        expectedPaths:
+          - path: workspace/archives/april/finalSummary.txt
+            kind: file
+            origin: created
+        normalizeReturnPaths:
+          - absolute
+assessment:
+  masteryVariants:
+  - id: pathlib-safe-relative-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - temp-base
+    - relative-absolute
+    title: 작업 폴더 안의 상대 경로만 허용하기
+    subtitle: 예시 없이 경로 경계를 완성
+    goal: 상대 경로는 정규화하고 absolute와 상위 폴더 이동은 거부한다.
+    why: 파일 자동화는 올바른 결과뿐 아니라 작업 폴더 밖을 건드리지 않는 경계가 함께 검증돼야 안전하다.
+    explanation: 함수 본문을 완성하면 정상 중첩 경로 두 개와 traversal, absolute 경로를 서로 다른 case로 다시 호출한다.
+    tips:
+    - Path.parts에서 상위 폴더 이동 조각을 먼저 찾으세요.
+    - 반환값은 운영체제와 무관한 POSIX 상대 경로여야 합니다.
+    exercise:
+      prompt: safe_relative_target(base, raw)가 안전한 상대 경로를 POSIX 문자열로 반환하고 absolute 또는 .. 경로에는 ValueError를 내도록 완성하세요.
+      starterCode: |-
+        from pathlib import Path
+
+        def safe_relative_target(base, raw):
+            raise NotImplementedError
+      solution: |-
+        from pathlib import Path
+
+        def safe_relative_target(base, raw):
+            normalized = str(raw).replace("\\", "/")
+            candidate = Path(raw)
+            has_drive_prefix = len(normalized) >= 3 and normalized[1:3] == ":/"
+            if candidate.is_absolute() or normalized.startswith("/") or has_drive_prefix or ".." in candidate.parts:
+                raise ValueError("workspace 밖 경로는 허용하지 않습니다")
+            target = (Path(base) / candidate).resolve()
+            return target.relative_to(Path(base).resolve()).as_posix()
+      hints:
+      - candidate.is_absolute(), 앞쪽 /, drive prefix, candidate.parts를 각각 검사하세요.
+      - base와 결합해 resolve한 뒤 relative_to(base.resolve())로 경계를 확정하세요.
+    check:
+      id: python.pathlib.safe-relative-target.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pathlib.safe-relative-target.mastery.fixture.v1
+      fixtureHash: sha256-tr7LliTKvbwyo1aWJAWF2G/rBCZwjbs/VtBoLVzWkUQ=
+      fixture:
+        directories:
+        - workspace
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: safe_relative_target
+        cases:
+        - id: nested-report
+          arguments:
+          - fixturePath: workspace
+          - value: reports/2026/today.csv
+          expectedReturn: reports/2026/today.csv
+        - id: unicode-name
+          arguments:
+          - fixturePath: workspace
+          - value: 결과/주문.json
+          expectedReturn: 결과/주문.json
+        - id: rejects-traversal
+          arguments:
+          - fixturePath: workspace
+          - value: ../secret.txt
+          expectedException: ValueError
+        - id: rejects-absolute
+          arguments:
+          - fixturePath: workspace
+          - value: C:/outside.txt
+          expectedException: ValueError
+        expectedPaths:
+        - path: workspace
+          kind: directory
+          origin: fixture
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: pathlib-group-suffix-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - pathlib-safe-relative-mastery
+    - path-parts
+    title: 낯선 파일 목록을 확장자별로 묶기
+    subtitle: 경로 분해를 분류 규칙에 적용
+    goal: 여러 상대 경로를 suffix 기준으로 분류하고 이름을 정렬한다.
+    why: 하나의 파일 경로를 읽는 법을 실제 정리 자동화에 옮기려면 다양한 폴더와 대소문자 확장자를 같은 규칙으로 처리해야 한다.
+    explanation: 입력 목록과 확장자 조합을 바꾼 hidden case가 같은 함수를 다시 호출하므로 예시 목록을 하드코딩할 수 없다.
+    tips:
+    - suffix는 소문자로 통일하고 확장자가 없으면 <none>으로 묶으세요.
+    - 각 그룹 안의 경로도 정렬해야 입력 순서가 달라도 결과가 안정적입니다.
+    exercise:
+      prompt: group_paths_by_suffix(paths)가 안전한 상대 경로를 확장자별 dict로 묶고 각 목록을 정렬하도록 완성하세요.
+      starterCode: |-
+        from pathlib import Path
+
+        def group_paths_by_suffix(paths):
+            raise NotImplementedError
+      solution: |-
+        from pathlib import Path
+
+        def group_paths_by_suffix(paths):
+            groups = {}
+            for raw in paths:
+                path = Path(raw)
+                if path.is_absolute() or ".." in path.parts:
+                    raise ValueError("상대 경로만 허용합니다")
+                key = path.suffix.lower() or "<none>"
+                groups.setdefault(key, []).append(path.as_posix())
+            return {key: sorted(values) for key, values in sorted(groups.items())}
+      hints:
+      - key는 path.suffix.lower() or "<none>"으로 만들 수 있습니다.
+      - setdefault로 목록을 만든 뒤 마지막에 key와 value를 각각 정렬하세요.
+    check:
+      id: python.pathlib.group-paths-by-suffix.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pathlib.group-paths-by-suffix.transfer.fixture.v1
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: group_paths_by_suffix
+        cases:
+        - id: mixed-report-files
+          arguments:
+          - value:
+            - reports/b.CSV
+            - notes/readme
+            - reports/a.csv
+            - logs/today.txt
+          expectedReturn:
+            .csv:
+            - reports/a.csv
+            - reports/b.CSV
+            .txt:
+            - logs/today.txt
+            <none>:
+            - notes/readme
+        - id: rejects-parent-hop
+          arguments:
+          - value:
+            - safe.txt
+            - ../outside.csv
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: pathlib-replace-suffixes-retrieval
+    mode: retrieval
+    unseen: true
+    minimumDelayHours: 168
+    sourceSectionIds:
+    - pathlib-group-suffix-transfer
+    title: 하루 뒤 여러 경로의 확장자 바꾸기
+    subtitle: 경로 변환 규칙을 기억에서 복원
+    goal: 안전한 상대 경로 목록의 확장자를 바꾸되 폴더 구조와 stem을 보존한다.
+    why: 시간이 지난 뒤에도 Path 변환과 경계 검사를 함께 재구성해야 실무 자동화에서 문자열 치환으로 돌아가지 않는다.
+    explanation: 정상 확장자 두 종류와 잘못된 새 확장자, traversal 입력을 독립 case로 검사한다.
+    tips:
+    - 새 확장자는 점으로 시작해야 하며 with_suffix는 원래 stem과 parent를 보존합니다.
+    - 목록을 변환하기 전에 모든 입력이 상대 경로인지 확인하세요.
+    exercise:
+      prompt: replace_suffixes(paths, new_suffix)가 각 안전한 상대 경로의 확장자를 바꾼 POSIX 목록을 반환하고 잘못된 입력은 ValueError로 거부하도록 완성하세요.
+      starterCode: |-
+        from pathlib import Path
+
+        def replace_suffixes(paths, new_suffix):
+            raise NotImplementedError
+      solution: |-
+        from pathlib import Path
+
+        def replace_suffixes(paths, new_suffix):
+            if not isinstance(new_suffix, str) or not new_suffix.startswith("."):
+                raise ValueError("확장자는 점으로 시작해야 합니다")
+            result = []
+            for raw in paths:
+                path = Path(raw)
+                if path.is_absolute() or ".." in path.parts:
+                    raise ValueError("상대 경로만 허용합니다")
+                result.append(path.with_suffix(new_suffix).as_posix())
+            return result
+      hints:
+      - new_suffix의 첫 글자를 검사한 뒤 입력 경로를 순회하세요.
+      - path.with_suffix(new_suffix).as_posix()를 결과 목록에 추가하세요.
+    check:
+      id: python.pathlib.replace-suffixes.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pathlib.replace-suffixes.retrieval.fixture.v1
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: replace_suffixes
+        cases:
+        - id: report-formats
+          arguments:
+          - value:
+            - reports/daily.csv
+            - reports/archive.tar.gz
+          - value: .json
+          expectedReturn:
+          - reports/daily.json
+          - reports/archive.tar.json
+        - id: rejects-missing-dot
+          arguments:
+          - value:
+            - reports/daily.csv
+          - value: json
+          expectedException: ValueError
+        - id: rejects-traversal
+          arguments:
+          - value:
+            - ../daily.csv
+          - value: .json
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

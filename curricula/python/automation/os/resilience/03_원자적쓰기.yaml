@@ -404,3 +404,310 @@ sections:
     check:
       noError: 반복 saveState가 끝나야 한다.
       resultCheck: 최종 내용이 step 2이고 임시 파일이 0개여야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: resilience_03-atomic-write-plan-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - unsafe-overwrite
+    - practice-state-updater
+    title: 원자적 쓰기의 temp·flush·replace 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 다른 볼륨 temp와 검증 없는 replace를 차단한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - temp는 target과 같은 디렉터리에 만들어 replace 원자성을 확보하세요.
+    - temp 내용 검증과 fsync 뒤에만 replace하세요.
+    exercise:
+      prompt: audit_atomic_plan(target, temp, steps)를 완성하세요.
+      starterCode: |-
+        def audit_atomic_plan(target, temp, steps):
+            raise NotImplementedError
+      solution: |
+        def audit_atomic_plan(target, temp, steps):
+            from pathlib import PurePosixPath
+            required_order = ["write-temp", "flush", "fsync", "verify-temp", "replace"]
+            failures = []
+            target_path = PurePosixPath(target)
+            temp_path = PurePosixPath(temp)
+            if target_path.parent != temp_path.parent:
+                failures.append("directory")
+            if steps != required_order:
+                failures.append("order")
+            if target == temp:
+                failures.append("identity")
+            return {"ready": not failures, "failures": failures, "sameDirectory": target_path.parent == temp_path.parent, "steps": steps}
+      hints: *id001
+    check:
+      id: python.resilience.resilience_03.atomic-write-plan.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.resilience.resilience_03.atomic-write-plan.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_atomic_plan
+        cases:
+        - id: accepts-same-directory-replace
+          arguments:
+          - value: out/report.json
+          - value: out/.report.json.tmp
+          - value:
+            - write-temp
+            - flush
+            - fsync
+            - verify-temp
+            - replace
+          expectedReturn:
+            ready: true
+            failures: []
+            sameDirectory: true
+            steps:
+            - write-temp
+            - flush
+            - fsync
+            - verify-temp
+            - replace
+        - id: reports-directory
+          arguments:
+          - value: out/report.json
+          - value: tmp/report.tmp
+          - value:
+            - write-temp
+            - flush
+            - fsync
+            - verify-temp
+            - replace
+          expectedReturn:
+            ready: false
+            failures:
+            - directory
+            sameDirectory: false
+            steps:
+            - write-temp
+            - flush
+            - fsync
+            - verify-temp
+            - replace
+        - id: reports-order-and-identity
+          arguments:
+          - value: out/report.json
+          - value: out/report.json
+          - value:
+            - write-temp
+            - replace
+          expectedReturn:
+            ready: false
+            failures:
+            - order
+            - identity
+            sameDirectory: true
+            steps:
+            - write-temp
+            - replace
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: resilience_03-atomic-recovery-decision-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - resilience_03-atomic-write-plan-mastery
+    title: crash 뒤 target·temp 상태에서 복구 행동 결정하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: hash·validity·generation으로 보존 또는 승격을 선택한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - crash recovery는 파일 존재보다 content validity와 generation을 비교하세요.
+    - 검증되지 않은 temp를 target 위로 덮지 마세요.
+    exercise:
+      prompt: decide_atomic_recovery(target, temp, expected_hash)를 완성하세요.
+      starterCode: |-
+        def decide_atomic_recovery(target, temp, expected_hash):
+            raise NotImplementedError
+      solution: |
+        def decide_atomic_recovery(target, temp, expected_hash):
+            target_valid = bool(target and target.get("valid"))
+            temp_valid = bool(temp and temp.get("valid"))
+            if target_valid and target.get("hash") == expected_hash:
+                return {"action": "keep-target", "reason": "expected-committed"}
+            if temp_valid and temp.get("hash") == expected_hash and (not target_valid or temp.get("generation", 0) > target.get("generation", 0)):
+                return {"action": "promote-temp", "reason": "verified-newer-temp"}
+            if target_valid:
+                return {"action": "keep-target", "reason": "last-valid-artifact"}
+            return {"action": "quarantine", "reason": "no-verified-artifact"}
+      hints: *id002
+    check:
+      id: python.resilience.resilience_03.atomic-recovery-decision.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.resilience.resilience_03.atomic-recovery-decision.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: decide_atomic_recovery
+        cases:
+        - id: keeps-expected-target
+          arguments:
+          - value:
+              valid: true
+              hash: h
+              generation: 2
+          - value:
+              valid: true
+              hash: h
+              generation: 3
+          - value: h
+          expectedReturn:
+            action: keep-target
+            reason: expected-committed
+        - id: promotes-verified-temp
+          arguments:
+          - value:
+              valid: true
+              hash: old
+              generation: 1
+          - value:
+              valid: true
+              hash: new
+              generation: 2
+          - value: new
+          expectedReturn:
+            action: promote-temp
+            reason: verified-newer-temp
+        - id: quarantines-invalid-state
+          arguments:
+          - value:
+              valid: false
+              hash: x
+          - value:
+              valid: false
+              hash: new
+          - value: new
+          expectedReturn:
+            action: quarantine
+            reason: no-verified-artifact
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: resilience_03-atomic-write-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - resilience_03-atomic-recovery-decision-transfer
+    title: 원자적 쓰기·복구 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: temp write·durability·replace·recovery를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Web에서 상태 전이와 불변식을 즉시 검증하세요.
+    - Local에서는 실제 crash·restart 뒤 원장과 artifact를 다시 읽어 확인하세요.
+    exercise:
+      prompt: choose_atomic_evidence(stage)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_atomic_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_atomic_evidence(stage):
+            table = {'temp': {'action': 'write unique temp beside target', 'evidence': 'bounded temp path', 'risk': 'partial target'}, 'durable': {'action': 'flush fsync and verify temp', 'evidence': 'temp hash and parse check', 'risk': 'buffered corruption'}, 'replace': {'action': 'atomically replace target', 'evidence': 'generation manifest', 'risk': 'torn update'}, 'recover': {'action': 'choose last verified generation', 'evidence': 'target-temp audit', 'risk': 'promoting invalid data'}}
+            if stage not in table:
+                raise ValueError('unknown stage')
+            return table[stage]
+      hints: *id003
+    check:
+      id: python.resilience.resilience_03.atomic-write-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.resilience.resilience_03.atomic-write-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_atomic_evidence
+        cases:
+        - id: recalls-temp
+          arguments:
+          - value: temp
+          expectedReturn:
+            action: write unique temp beside target
+            evidence: bounded temp path
+            risk: partial target
+        - id: recalls-durable
+          arguments:
+          - value: durable
+          expectedReturn:
+            action: flush fsync and verify temp
+            evidence: temp hash and parse check
+            risk: buffered corruption
+        - id: recalls-replace
+          arguments:
+          - value: replace
+          expectedReturn:
+            action: atomically replace target
+            evidence: generation manifest
+            risk: torn update
+        - id: recalls-recover
+          arguments:
+          - value: recover
+          expectedReturn:
+            action: choose last verified generation
+            evidence: target-temp audit
+            risk: promoting invalid data
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

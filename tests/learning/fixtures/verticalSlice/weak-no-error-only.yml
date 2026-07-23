@@ -1,0 +1,12 @@
+schemaVersion: 1
+scenario: weak-no-error-only
+lessonRef: fileOps/01_pathlib경로감각
+candidateCheck:
+  id: weak-no-error-pathlib
+  kind: noError
+  strength: practice
+  executor: browser-worker
+  payload: {}
+expectedFailure:
+  code: strong-behavior-check-required
+  reason: 실행 오류가 없다는 사실만으로 경로 안전성이나 산출물을 증명할 수 없다.

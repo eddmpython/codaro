@@ -1,0 +1,265 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codaro.dev/contracts/learningArchive.schema.json",
+  "title": "Codaro Learning Archive",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "manifest",
+    "blobs",
+    "document",
+    "drafts",
+    "virtualFs",
+    "packages",
+    "evidence",
+    "automationDrafts",
+    "lineage"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 2 },
+    "kind": { "const": "codaro.learning-archive" },
+    "manifest": { "$ref": "#/$defs/Manifest" },
+    "blobs": {
+      "type": "object",
+      "minProperties": 2,
+      "propertyNames": { "$ref": "#/$defs/Hash" },
+      "additionalProperties": { "$ref": "#/$defs/Blob" }
+    },
+    "document": { "$ref": "#/$defs/DocumentRef" },
+    "drafts": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10000,
+      "items": { "$ref": "#/$defs/DraftRef" }
+    },
+    "virtualFs": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": { "$ref": "#/$defs/VirtualFsEntry" }
+    },
+    "packages": {
+      "type": "array",
+      "maxItems": 256,
+      "items": { "$ref": "#/$defs/PackageRef" }
+    },
+    "evidence": { "$ref": "#/$defs/EvidenceRef" },
+    "automationDrafts": {
+      "type": "array",
+      "maxItems": 256,
+      "items": { "$ref": "#/$defs/AutomationDraft" }
+    },
+    "lineage": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "items": { "$ref": "#/$defs/Lineage" }
+    }
+  },
+  "$defs": {
+    "Hash": {
+      "type": "string",
+      "pattern": "^sha256-[A-Za-z0-9_-]{43}$"
+    },
+    "SafePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*:)(?!.*\\\\).+$"
+    },
+    "Blob": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["encoding", "byteLength", "mediaType", "payload"],
+      "properties": {
+        "encoding": { "const": "base64url" },
+        "byteLength": { "type": "integer", "minimum": 0, "maximum": 134217728 },
+        "mediaType": { "const": "application/octet-stream" },
+        "payload": { "type": "string", "pattern": "^[A-Za-z0-9_-]*$" }
+      }
+    },
+    "Manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "archiveId",
+        "createdAt",
+        "rootHash",
+        "runtimeTier",
+        "importMode",
+        "blobCount",
+        "totalByteLength",
+        "draftCount",
+        "virtualFsEntryCount",
+        "packageCount",
+        "evidenceEventCount",
+        "automationDraftCount"
+      ],
+      "properties": {
+        "archiveId": { "type": "string", "pattern": "^learning-archive:[A-Za-z0-9_-]{43}$" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "rootHash": { "$ref": "#/$defs/Hash" },
+        "runtimeTier": { "enum": ["web", "local", "mixed"] },
+        "importMode": { "const": "atomic-head-swap" },
+        "blobCount": { "type": "integer", "minimum": 2 },
+        "totalByteLength": { "type": "integer", "minimum": 0, "maximum": 536870912 },
+        "draftCount": { "type": "integer", "minimum": 1, "maximum": 10000 },
+        "virtualFsEntryCount": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "packageCount": { "type": "integer", "minimum": 0, "maximum": 256 },
+        "evidenceEventCount": { "type": "integer", "minimum": 1, "maximum": 10000 },
+        "automationDraftCount": { "type": "integer", "minimum": 0, "maximum": 256 }
+      }
+    },
+    "DocumentRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["documentId", "path", "mediaType", "blobHash"],
+      "properties": {
+        "documentId": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "path": { "const": "document/document.json" },
+        "mediaType": { "const": "application/vnd.codaro.document+json" },
+        "blobHash": { "$ref": "#/$defs/Hash" }
+      }
+    },
+    "DraftRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["blockId", "mediaType", "blobHash"],
+      "properties": {
+        "blockId": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "mediaType": { "const": "text/plain; charset=utf-8" },
+        "blobHash": { "$ref": "#/$defs/Hash" }
+      }
+    },
+    "VirtualFsFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "path", "mediaType", "blobHash", "executable"],
+      "properties": {
+        "kind": { "const": "file" },
+        "path": { "$ref": "#/$defs/SafePath" },
+        "mediaType": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "blobHash": { "$ref": "#/$defs/Hash" },
+        "executable": { "type": "boolean" }
+      }
+    },
+    "VirtualFsDirectory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "path"],
+      "properties": {
+        "kind": { "const": "directory" },
+        "path": { "$ref": "#/$defs/SafePath" }
+      }
+    },
+    "VirtualFsEntry": {
+      "oneOf": [
+        { "$ref": "#/$defs/VirtualFsFile" },
+        { "$ref": "#/$defs/VirtualFsDirectory" }
+      ]
+    },
+    "PackageRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "path", "mediaType", "blobHash", "integrity"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+        "version": { "type": "string", "pattern": "^\\d+(?:\\.\\d+){1,3}(?:[-+][A-Za-z0-9.-]+)?$" },
+        "path": { "$ref": "#/$defs/SafePath" },
+        "mediaType": { "const": "application/zip" },
+        "blobHash": { "$ref": "#/$defs/Hash" },
+        "integrity": { "$ref": "#/$defs/Hash" }
+      }
+    },
+    "EvidenceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "mediaType", "blobHash", "eventCount", "eventSetHash", "eventIds"],
+      "properties": {
+        "path": { "const": "evidence/archive.json" },
+        "mediaType": { "const": "application/vnd.codaro.learning-evidence+json" },
+        "blobHash": { "$ref": "#/$defs/Hash" },
+        "eventCount": { "type": "integer", "minimum": 0, "maximum": 10000 },
+        "eventSetHash": { "$ref": "#/$defs/Hash" },
+        "eventIds": {
+          "type": "array",
+          "maxItems": 10000,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "maxLength": 1024 }
+        }
+      }
+    },
+    "TaskDefaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "schedule"],
+      "properties": {
+        "enabled": { "const": false },
+        "schedule": { "type": "null" }
+      }
+    },
+    "AutomationDraft": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "draftId",
+        "name",
+        "description",
+        "recipeBlobHash",
+        "sourceBlockIds",
+        "lineageId",
+        "state",
+        "confirmation",
+        "sideEffectPolicy",
+        "taskDefaults"
+      ],
+      "properties": {
+        "draftId": { "type": "string", "pattern": "^automation-draft:[A-Za-z0-9_-]{43}$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "description": { "type": "string", "maxLength": 4096 },
+        "recipeBlobHash": { "$ref": "#/$defs/Hash" },
+        "sourceBlockIds": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10000,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "maxLength": 255 }
+        },
+        "lineageId": { "type": "string", "pattern": "^lineage:[A-Za-z0-9_-]{43}$" },
+        "state": { "const": "draft" },
+        "confirmation": { "const": "required" },
+        "sideEffectPolicy": { "const": "blocked-until-explicit-confirmation" },
+        "taskDefaults": { "$ref": "#/$defs/TaskDefaults" }
+      }
+    },
+    "Lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lineageId",
+        "lessonRef",
+        "documentBlobHash",
+        "evidenceEventIds",
+        "automationDraftIds"
+      ],
+      "properties": {
+        "lineageId": { "type": "string", "pattern": "^lineage:[A-Za-z0-9_-]{43}$" },
+        "lessonRef": { "type": "string", "pattern": "^[^/]+/.+$", "maxLength": 1024 },
+        "documentBlobHash": { "$ref": "#/$defs/Hash" },
+        "evidenceEventIds": {
+          "type": "array",
+          "maxItems": 10000,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "maxLength": 1024 }
+        },
+        "automationDraftIds": {
+          "type": "array",
+          "maxItems": 256,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^automation-draft:[A-Za-z0-9_-]{43}$" }
+        }
+      }
+    }
+  }
+}

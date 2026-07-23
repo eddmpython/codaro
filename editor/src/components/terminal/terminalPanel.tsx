@@ -5,7 +5,7 @@ import "@xterm/xterm/css/xterm.css";
 import { X } from "lucide-react";
 
 import { useLocale } from "@/lib/localeContext";
-import type { ThemeMode } from "@/lib/surfaceModel";
+import type { ResolvedThemeMode } from "@/styles/generated/codaroTheme";
 import { terminalLaunchInput, type TerminalLaunchIntent } from "@/lib/terminalLaunch";
 
 // 전역 터미널 패널: 백엔드 /ws/terminal(PTY)에 붙어 xterm.js로 실제 로컬 셸을 렌더한다.
@@ -20,7 +20,7 @@ export function TerminalPanel({
   onClose,
 }: {
   launchIntent?: TerminalLaunchIntent | null;
-  themeMode: ThemeMode;
+  themeMode: ResolvedThemeMode;
   onClose: () => void;
 }) {
   const { t } = useLocale();
@@ -138,7 +138,7 @@ export function TerminalPanel({
         </span>
         <button
           aria-label={t("terminal.close")}
-          className="flex size-5 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+          className="flex size-5 items-center justify-center rounded text-muted-foreground hover:bg-accent-surface hover:text-accent-surface-foreground"
           title={t("terminal.close")}
           type="button"
           onClick={onClose}

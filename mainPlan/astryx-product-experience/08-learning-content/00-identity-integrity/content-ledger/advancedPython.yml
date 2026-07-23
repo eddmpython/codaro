@@ -1,0 +1,669 @@
+schemaVersion: 1
+category: "advancedPython"
+canonicalRows: 35
+lessons:
+  - lessonRef: "advancedPython/01_람다와고차함수"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "90a1354cc76939dfd69a864f814de8262575be25a209578803c616a86e4e5538"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/01_람다와고차함수:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_01________:v1","retrieve:advancedPython_01________:v2","retrieve:advancedPython_01________:v3"]
+    transferVariantIds: ["transfer:advancedPython_01________:near-v1","transfer:advancedPython_01________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/02_함수데코레이터심화"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "287bdf85a456de22fdbed74576c980b6733dcb9b7a1578b332452046b01bd02a"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/02_함수데코레이터심화:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_02__________:v1","retrieve:advancedPython_02__________:v2","retrieve:advancedPython_02__________:v3"]
+    transferVariantIds: ["transfer:advancedPython_02__________:near-v1","transfer:advancedPython_02__________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/03_클로저와상태관리"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "a9dd9fd942acd3cbe065a18772b2d1738e6bd544ef3a04839e3ad6a01b5acd3e"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/03_클로저와상태관리:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_03_________:v1","retrieve:advancedPython_03_________:v2","retrieve:advancedPython_03_________:v3"]
+    transferVariantIds: ["transfer:advancedPython_03_________:near-v1","transfer:advancedPython_03_________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/04_functools완벽가이드"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "af9e1c5e422257aa1da8e8db488a7fcf9c401911f4045557781e628f4f9fd358"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.functools"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/04_functools완벽가이드:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_04_functools_____:v1","retrieve:advancedPython_04_functools_____:v2","retrieve:advancedPython_04_functools_____:v3"]
+    transferVariantIds: ["transfer:advancedPython_04_functools_____:near-v1","transfer:advancedPython_04_functools_____:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/05_itertools마스터"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "0f55d73ac808f59afc53f84d3b73cce5cb2da88666f052865d0dbe9fbfcae479"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.itertools"]
+    prerequisites: ["python.advancedSyntax"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/05_itertools마스터:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_05_itertools___:v1","retrieve:advancedPython_05_itertools___:v2","retrieve:advancedPython_05_itertools___:v3"]
+    transferVariantIds: ["transfer:advancedPython_05_itertools___:near-v1","transfer:advancedPython_05_itertools___:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/06_메타클래스"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "f972b42bc0f9aa088a9d1776d258d33157d671bbdc3f098a54bda82e539f6e15"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.designPatterns"]
+    prerequisites: ["python.oop"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/06_메타클래스:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_06______:v1","retrieve:advancedPython_06______:v2","retrieve:advancedPython_06______:v3"]
+    transferVariantIds: ["transfer:advancedPython_06______:near-v1","transfer:advancedPython_06______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/07_디스크립터"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "1278bcf4aaa7effc7e5e74586a3bdf34cd446923428ba95c3f389920aefa85a4"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.designPatterns"]
+    prerequisites: ["python.oop"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/07_디스크립터:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_07______:v1","retrieve:advancedPython_07______:v2","retrieve:advancedPython_07______:v3"]
+    transferVariantIds: ["transfer:advancedPython_07______:near-v1","transfer:advancedPython_07______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/08_추상클래스와프로토콜"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "7b44a2cc90de73a36050c08908872e12f1c8bde29f2449cf695c58d887bb6269"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.designPatterns"]
+    prerequisites: ["python.oop","python.typing"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/08_추상클래스와프로토콜:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_08___________:v1","retrieve:advancedPython_08___________:v2","retrieve:advancedPython_08___________:v3"]
+    transferVariantIds: ["transfer:advancedPython_08___________:near-v1","transfer:advancedPython_08___________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/09_다중상속과MRO"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "89a6b8a71a30440516c902dfedcc488533f026cdab6a417be3b458074d2a8197"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["dataContracts","pythonFoundation"]
+    outcomes: ["python.oop"]
+    prerequisites: ["python.oop"]
+    reinforcesOutcomeIds: ["python.oop"]
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/09_다중상속과MRO:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_09______MRO:v1","retrieve:advancedPython_09______MRO:v2","retrieve:advancedPython_09______MRO:v3"]
+    transferVariantIds: ["transfer:advancedPython_09______MRO:near-v1","transfer:advancedPython_09______MRO:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/10_slots와메모리최적화"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "96f49092f7b40a24832bed2245b0aee53993eddb448473f0efceda46692e3583"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.oop"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/10_slots와메모리최적화:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_10_slots_______:v1","retrieve:advancedPython_10_slots_______:v2","retrieve:advancedPython_10_slots_______:v3"]
+    transferVariantIds: ["transfer:advancedPython_10_slots_______:near-v1","transfer:advancedPython_10_slots_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/11_타입힌팅심화"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "2af25c2f04667831dc46be2619e74029cd9880c22b2ef82f750948de58808e3b"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["dataContracts","pythonFoundation"]
+    outcomes: ["python.typing"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/11_타입힌팅심화:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_11_______:v1","retrieve:advancedPython_11_______:v2","retrieve:advancedPython_11_______:v3"]
+    transferVariantIds: ["transfer:advancedPython_11_______:near-v1","transfer:advancedPython_11_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/12_dataclasses마스터"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "50ee6161c7ede1f0ce4bea580c60ee59f1728e7d878cc09dae8e855cc704f018"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.dataclasses"]
+    prerequisites: ["python.oop","python.typing"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/12_dataclasses마스터:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_12_dataclasses___:v1","retrieve:advancedPython_12_dataclasses___:v2","retrieve:advancedPython_12_dataclasses___:v3"]
+    transferVariantIds: ["transfer:advancedPython_12_dataclasses___:near-v1","transfer:advancedPython_12_dataclasses___:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/13_collections심화"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "5676632d4d818a5b57bc10d59f34130c08d9a09407ab71387ba22e21b61a9302"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.advancedSyntax"]
+    reinforcesOutcomeIds: ["python.advancedSyntax"]
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/13_collections심화:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_13_collections__:v1","retrieve:advancedPython_13_collections__:v2","retrieve:advancedPython_13_collections__:v3"]
+    transferVariantIds: ["transfer:advancedPython_13_collections__:near-v1","transfer:advancedPython_13_collections__:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/14_enum과상수관리"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "558d8aa486b0a848a87e9b0aaec75eb8ea5d4b5e6e956abdc16b6e72861f6a2e"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.oop"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/14_enum과상수관리:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_14_enum_____:v1","retrieve:advancedPython_14_enum_____:v2","retrieve:advancedPython_14_enum_____:v3"]
+    transferVariantIds: ["transfer:advancedPython_14_enum_____:near-v1","transfer:advancedPython_14_enum_____:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/15_typing고급"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "de7cec2f068e8c5a808eebccce09ff319e4619bdcfb8e303ede55aa2d9587ff5"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["dataContracts","pythonFoundation"]
+    outcomes: ["python.typing"]
+    prerequisites: ["python.typing"]
+    reinforcesOutcomeIds: ["python.typing"]
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/15_typing고급:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_15_typing__:v1","retrieve:advancedPython_15_typing__:v2","retrieve:advancedPython_15_typing__:v3"]
+    transferVariantIds: ["transfer:advancedPython_15_typing__:near-v1","transfer:advancedPython_15_typing__:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/16_재귀와분할정복"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "b0950b5d074cb94e2ce2d47c65fdc570ed6714a54a76e16c9708e28ae82c3cb2"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/16_재귀와분할정복:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_16________:v1","retrieve:advancedPython_16________:v2","retrieve:advancedPython_16________:v3"]
+    transferVariantIds: ["transfer:advancedPython_16________:near-v1","transfer:advancedPython_16________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/17_정렬알고리즘"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "7d276d938aa806441649b9e6994af950fcb7e230838d552858ae76390db49384"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.advancedSyntax"]
+    reinforcesOutcomeIds: ["python.advancedSyntax"]
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/17_정렬알고리즘:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_17_______:v1","retrieve:advancedPython_17_______:v2","retrieve:advancedPython_17_______:v3"]
+    transferVariantIds: ["transfer:advancedPython_17_______:near-v1","transfer:advancedPython_17_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/18_탐색알고리즘"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "bd896faa11b8a712a678861aa70ceaa1b1585530978f19dfd36d91063991c20f"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.advancedSyntax"]
+    reinforcesOutcomeIds: ["python.advancedSyntax"]
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/18_탐색알고리즘:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_18_______:v1","retrieve:advancedPython_18_______:v2","retrieve:advancedPython_18_______:v3"]
+    transferVariantIds: ["transfer:advancedPython_18_______:near-v1","transfer:advancedPython_18_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/19_동적프로그래밍"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "5c73e9edf293385dec5d3af8c0bb0d77f5bda463aad3770b60294b82f44292fc"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.advancedSyntax"]
+    reinforcesOutcomeIds: ["python.advancedSyntax"]
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/19_동적프로그래밍:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_19________:v1","retrieve:advancedPython_19________:v2","retrieve:advancedPython_19________:v3"]
+    transferVariantIds: ["transfer:advancedPython_19________:near-v1","transfer:advancedPython_19________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/20_자료구조구현"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "cc7f80c9ffbe292084dcf86b3f187a47471fb7f8330018b1a79c068ed96b2671"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["dataContracts","pythonFoundation"]
+    outcomes: ["python.oop","python.advancedSyntax"]
+    prerequisites: ["python.oop"]
+    reinforcesOutcomeIds: ["python.oop"]
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/20_자료구조구현:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_20_______:v1","retrieve:advancedPython_20_______:v2","retrieve:advancedPython_20_______:v3"]
+    transferVariantIds: ["transfer:advancedPython_20_______:near-v1","transfer:advancedPython_20_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/21_디자인패턴1"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "26dcd088ee3aa804b87000a9cfb58f966948273cf4804d05678f713f2054a726"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.designPatterns"]
+    prerequisites: ["python.oop"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/21_디자인패턴1:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_21______1:v1","retrieve:advancedPython_21______1:v2","retrieve:advancedPython_21______1:v3"]
+    transferVariantIds: ["transfer:advancedPython_21______1:near-v1","transfer:advancedPython_21______1:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/22_디자인패턴2"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "87a85841514804be2e36ddaa893bb71b882987ccfbeeb122d9b5a84601af0398"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.designPatterns"]
+    prerequisites: ["python.designPatterns"]
+    reinforcesOutcomeIds: ["python.designPatterns"]
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/22_디자인패턴2:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_22______2:v1","retrieve:advancedPython_22______2:v2","retrieve:advancedPython_22______2:v3"]
+    transferVariantIds: ["transfer:advancedPython_22______2:near-v1","transfer:advancedPython_22______2:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/23_함수형패턴"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "c1755332f05af7e90c72ddc539d9b85339f86ce833065e2c7bcc4b4214a8ad70"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.functools"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/23_함수형패턴:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_23______:v1","retrieve:advancedPython_23______:v2","retrieve:advancedPython_23______:v3"]
+    transferVariantIds: ["transfer:advancedPython_23______:near-v1","transfer:advancedPython_23______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/24_메타프로그래밍"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "a1cfa783f0f744a95017af358d6db7b57cfa06fa4c777b8598bd279f3ada94f7"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.designPatterns"]
+    prerequisites: ["python.designPatterns"]
+    reinforcesOutcomeIds: ["python.designPatterns"]
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/24_메타프로그래밍:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_24________:v1","retrieve:advancedPython_24________:v2","retrieve:advancedPython_24________:v3"]
+    transferVariantIds: ["transfer:advancedPython_24________:near-v1","transfer:advancedPython_24________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/25_정규표현식고급"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "17c9557cea9fea375e40917d67c57e309e37e1bdee8c11a5a7e599dfe2025dfb"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation","textProcessing"]
+    outcomes: ["automation.regex"]
+    prerequisites: ["automation.regex"]
+    reinforcesOutcomeIds: ["automation.regex"]
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/25_정규표현식고급:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_25________:v1","retrieve:advancedPython_25________:v2","retrieve:advancedPython_25________:v3"]
+    transferVariantIds: ["transfer:advancedPython_25________:near-v1","transfer:advancedPython_25________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/26_코드최적화"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "6b3af09b2fdf89d016b1cfcdbfead8acdef12f3145b93648447d4d3ca7778104"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.advancedSyntax"]
+    reinforcesOutcomeIds: ["python.advancedSyntax"]
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/26_코드최적화:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_26______:v1","retrieve:advancedPython_26______:v2","retrieve:advancedPython_26______:v3"]
+    transferVariantIds: ["transfer:advancedPython_26______:near-v1","transfer:advancedPython_26______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/27_문자열알고리즘"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "5c78c65906e6d89d8960c94b542ef6a896b25a833010cc02a319dc85c89b9a8e"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.strings"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/27_문자열알고리즘:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_27________:v1","retrieve:advancedPython_27________:v2","retrieve:advancedPython_27________:v3"]
+    transferVariantIds: ["transfer:advancedPython_27________:near-v1","transfer:advancedPython_27________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/28_수학알고리즘"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "b6b9a7e8c112a10c9c15cf57c21f670ef0da5fa718fa53c8df090de0038ceb55"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.advancedSyntax"]
+    reinforcesOutcomeIds: ["python.advancedSyntax"]
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/28_수학알고리즘:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_28_______:v1","retrieve:advancedPython_28_______:v2","retrieve:advancedPython_28_______:v3"]
+    transferVariantIds: ["transfer:advancedPython_28_______:near-v1","transfer:advancedPython_28_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/29_클린코드"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "54fd872960caee3a2184d9c7c4a26f47780092b079fb728ff0cbb03518ccda27"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.designPatterns"]
+    prerequisites: ["python.functions","python.oop"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/29_클린코드:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_29_____:v1","retrieve:advancedPython_29_____:v2","retrieve:advancedPython_29_____:v3"]
+    transferVariantIds: ["transfer:advancedPython_29_____:near-v1","transfer:advancedPython_29_____:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/30_종합문제풀이"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "7a5c8de689a0d1fdf162d23c2c10b40190adcb79bf8c33226b043e09bffc8bcb"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax","python.designPatterns"]
+    prerequisites: ["python.advancedSyntax","python.designPatterns"]
+    reinforcesOutcomeIds: ["python.advancedSyntax","python.designPatterns"]
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/30_종합문제풀이:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_30_______:v1","retrieve:advancedPython_30_______:v2","retrieve:advancedPython_30_______:v3"]
+    transferVariantIds: ["transfer:advancedPython_30_______:near-v1","transfer:advancedPython_30_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/31_컨텍스트매니저"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "96d515e9acdded0d8767c86ac4774cf5a7ac9d10c6d476623da1d4aee8a17239"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["builtins.contextManagers"]
+    prerequisites: ["python.advancedSyntax"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/31_컨텍스트매니저:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_31________:v1","retrieve:advancedPython_31________:v2","retrieve:advancedPython_31________:v3"]
+    transferVariantIds: ["transfer:advancedPython_31________:near-v1","transfer:advancedPython_31________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/32_제너레이터심화"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "5a9ba02958d7f76f72398c132518e5ad02d595356e218bfe618ed94aeed0493f"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.advancedSyntax"]
+    reinforcesOutcomeIds: ["python.advancedSyntax"]
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/32_제너레이터심화:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_32________:v1","retrieve:advancedPython_32________:v2","retrieve:advancedPython_32________:v3"]
+    transferVariantIds: ["transfer:advancedPython_32________:near-v1","transfer:advancedPython_32________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/33_async와코루틴"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "fbda149bea2ebc96cf9fd34e4cc3e3556204dabd1fde494e4dcad4fd6e856c04"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["builtins.async"]
+    prerequisites: ["python.advancedSyntax"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/33_async와코루틴:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_33_async____:v1","retrieve:advancedPython_33_async____:v2","retrieve:advancedPython_33_async____:v3"]
+    transferVariantIds: ["transfer:advancedPython_33_async____:near-v1","transfer:advancedPython_33_async____:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/34_match와패턴매칭"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "ae2f17e5cd57231b918ae2d3b541a5782cb6b7f55ebec1682af14f95712acdcb"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.advancedSyntax"]
+    prerequisites: ["python.controlFlow"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/34_match와패턴매칭:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_34_match_____:v1","retrieve:advancedPython_34_match_____:v2","retrieve:advancedPython_34_match_____:v3"]
+    transferVariantIds: ["transfer:advancedPython_34_match_____:near-v1","transfer:advancedPython_34_match_____:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "advancedPython/35_동시성"
+    identityLedgerRef: "identity-ledger/advancedPython.yml"
+    lessonContentHash: "8e1dea9ac0f927b74df9e0781dcfb315f2dde9c437e0f356238dde34901cbf05"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["builtins.async"]
+    prerequisites: ["builtins.async"]
+    reinforcesOutcomeIds: ["builtins.async"]
+    runtimeTier: browser
+    checkSpecId: "lesson:advancedPython/35_동시성:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:advancedPython_35____:v1","retrieve:advancedPython_35____:v2","retrieve:advancedPython_35____:v3"]
+    transferVariantIds: ["transfer:advancedPython_35____:near-v1","transfer:advancedPython_35____:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

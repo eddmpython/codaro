@@ -1,0 +1,28 @@
+schemaVersion: 1
+candidate:
+  pathId: python-foundations
+  targetStage: E2
+  contentHash: sha256-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  curriculumOwner: curriculum-owner
+  learningQaReviewer: learning-qa
+  contentApproved: true
+  representativeParticipants: 8
+  usabilityReportHash: sha256-formative
+  noviceParticipants: 20
+  measures: [pre, post, unseenTransfer]
+  causalClaim: false
+  researchOperations:
+    researchOwner: null
+    privacyOwner: privacy-owner
+    recruitmentChannel: participant-panel
+    budgetCeiling: 5000000
+    schedule: 2026-Q4
+    consentVersion: consent-v1
+    withdrawalRoute: /research/withdraw
+    encryptedRawStore: research-raw-v1
+    accessRoster: research-roster-v1
+    deletionJob: delete-after-90-days
+    preregistrationUrl: https://example.invalid/preregistration
+    preregistrationHash: sha256-preregistration
+expectedFailure:
+  code: missing-research-owner

@@ -1,0 +1,715 @@
+var e=`meta:
+  id: day02
+  title: 변수와 데이터 타입
+  day: 2
+  category: 30days
+  tags:
+  - 변수
+  - 데이터타입
+  - type
+  - len
+  - 형변환
+  - 검증
+  seo:
+    title: 파이썬 변수와 데이터 타입
+    description: 변수에 값을 저장하고 다양한 데이터 타입을 다루는 방법을 배웁니다.
+    keywords:
+    - 변수
+    - variable
+    - int
+    - float
+    - str
+    - bool
+    - type
+intro:
+  emoji: 📦
+  points:
+  - 변수의 개념과 값 저장 방법
+  - 정수, 실수, 문자열, 불린 데이터 타입
+  - type() 함수로 타입 확인하기
+  - len() 함수로 길이 측정하기
+  - 타입 변환 (int, float, str)
+  - 다중 변수 할당 기법
+  direction: 변수와 데이터 타입에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 변수와 데이터 타입 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 변수란? 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 변수명 작성 스타일 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: 변수 값 변경하기 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 변수와 데이터 타입 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 변수와 데이터 타입 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 변수와 데이터 타입 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: variable_concept
+  title: 변수란?
+  structuredPrimary: true
+  subtitle: 데이터를 저장하는 이름표
+  goal: 변수란?에서 \`msg\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    변수(Variable)는 데이터를 저장하는 메모리 공간에 붙인 이름표입니다. 마치 상자에 물건을 넣고 라벨을 붙이는 것과 같습니다. 변수를 사용하면 데이터를 저장했다가 나중에 다시 사용할 수 있습니다. = 기호는 수학의 "같다"가 아니라 "오른쪽 값을 왼쪽 변수에 저장한다"는 의미입니다.
+
+    변수명은 영문자, 숫자, 밑줄(_)만 사용 가능하며, 숫자로 시작할 수 없습니다.
+  snippet: |-
+    msg = 'Python'
+    msg
+  exercise:
+    prompt: 변수란? 예제에서 \`msg\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      msg = 'Python'
+      msg
+    hints:
+    - 바꿀 지점은 \`msg = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`msg\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+  check:
+    type: noError
+    noError: 변수란?에서 \`msg\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 변수란? 실행 뒤 \`msg\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: naming_convention
+  title: 변수명 작성 스타일
+  structuredPrimary: true
+  subtitle: 카멜케이스 vs 스네이크케이스
+  goal: 변수명 작성 스타일에서 print() 입력값이 출력 영역에 어떻게 표시되는지 확인한다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  explanation: |-
+    변수명을 지을 때 단어를 연결하는 방법에는 크게 두 가지 스타일이 있습니다. 카멜케이스(camelCase)는 첫 단어는 소문자로 시작하고 이후 단어의 첫 글자를 대문자로 쓰는 방식입니다. 스네이크케이스(snake_case)는 모든 단어를 소문자로 쓰고 밑줄(_)로 연결하는 방식입니다. 파이썬 공식 스타일 가이드(PEP 8)는 스네이크케이스를 권장하지만, 이 학습 컨텐츠는 작성자의 코딩 스타일에 따라 카멜케이스를 사용합니다.
+
+    이 학습 컨텐츠는 카멜케이스로 작성되었지만, 여러분은 원하는 스타일을 선택하여 사용하세요. 중요한 것은 선택한 스타일을 일관되게 유지하는 것입니다.
+  snippet: |-
+    userName = 'John Doe'
+    user_name = 'Jane Smith'
+    print('카멜케이스 : ', userName, '\\n스네이크케이스 : ', user_name)
+  exercise:
+    prompt: 변수명 작성 스타일 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
+    starterCode: |-
+      userName = 'John Doe'
+      user_name = 'Jane Smith'
+      print('카멜케이스 : ', userName, '\\n스네이크케이스 : ', user_name)
+    hints:
+    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
+    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 변수명 작성 스타일의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
+    resultCheck: 변수명 작성 스타일 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+- id: variable_reassign
+  title: 변수 값 변경하기
+  structuredPrimary: true
+  subtitle: 저장된 값을 새 값으로 교체
+  goal: 변수 값 변경하기에서 \`score\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    변수는 언제든지 새로운 값으로 변경할 수 있습니다. 같은 변수에 새 값을 할당하면 이전 값은 사라지고 새 값으로 대체됩니다. 이것이 "변수(Variable)"라는 이름의 의미입니다.
+
+    변수는 최종적으로 할당된 값을 가집니다.
+  snippet: |-
+    score = 80
+    score = 95
+    score
+  exercise:
+    prompt: 변수 값 변경하기 예제에서 \`score\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      score = 80
+      score = 95
+      score
+    hints:
+    - 바꿀 지점은 \`score = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`score\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+  check:
+    type: noError
+    noError: 변수 값 변경하기에서 \`score\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 변수 값 변경하기 실행 뒤 \`score\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: type_integer
+  title: 정수 타입
+  structuredPrimary: true
+  subtitle: 소수점 없는 숫자
+  goal: 정수 타입에서 \`years\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 정수(Integer)는 소수점이 없는 숫자입니다. 1, 100, -5처럼 양수, 0, 음수 모두 정수입니다. 파이썬에서 정수 타입은 int로 표시됩니다. int는
+    integer(정수)의 줄임말입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    years = 25
+    years
+  exercise:
+    prompt: 정수 타입 예제에서 \`years\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      years = 25
+      years
+    hints:
+    - 바꿀 지점은 \`years = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`years\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 이 변수의 값과 타입(type)은 어떻게 나올까요? 예측한 뒤 type()으로 확인해 보세요.
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+      expectedDtype: int
+  check:
+    type: noError
+    noError: 정수 타입에서 \`years\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 정수 타입 실행 뒤 \`years\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: type_float
+  title: 실수 타입
+  structuredPrimary: true
+  subtitle: 소수점 있는 숫자
+  goal: 실수 타입에서 \`pi\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 실수(Float)는 소수점이 있는 숫자입니다. 3.14, 2.5, -1.5처럼 소수점을 포함한 숫자입니다. 파이썬에서 실수 타입은 float로 표시됩니다.
+    float는 floating point(부동소수점)의 줄임말입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    pi = 3.14159
+    pi
+  exercise:
+    prompt: 실수 타입 예제에서 \`pi\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      pi = 3.14159
+      pi
+    hints:
+    - 바꿀 지점은 \`pi = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`pi\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 이 변수의 값과 타입(type)은 어떻게 나올까요? 예측한 뒤 type()으로 확인해 보세요.
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+      expectedDtype: float
+  check:
+    type: noError
+    noError: 실수 타입에서 \`pi\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 실수 타입 실행 뒤 \`pi\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: type_string
+  title: 문자열 타입
+  structuredPrimary: true
+  subtitle: 따옴표로 감싼 텍스트
+  goal: 문자열 타입에서 \`town\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 문자열(String)은 따옴표로 감싼 텍스트입니다. 'Hello', "Python"처럼 작은따옴표나 큰따옴표로 만듭니다. 문자 하나('A')도 문자열이고,
+    긴 문장도 문자열입니다. 파이썬에서 문자열 타입은 str로 표시됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    town = 'Seoul'
+    town
+  exercise:
+    prompt: 문자열 타입 예제에서 \`town\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      town = 'Seoul'
+      town
+    hints:
+    - 바꿀 지점은 \`town = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`town\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 이 변수의 값과 타입(type)은 어떻게 나올까요? 예측한 뒤 type()으로 확인해 보세요.
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+      expectedDtype: str
+  check:
+    type: noError
+    noError: 문자열 타입에서 \`town\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 문자열 타입 실행 뒤 \`town\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: type_boolean
+  title: 불린 타입
+  structuredPrimary: true
+  subtitle: 참과 거짓
+  goal: 불린 타입에서 \`active\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 불린(Boolean)은 참(True) 또는 거짓(False) 두 가지 값만 가지는 타입입니다. 영국 수학자 조지 불(George Boole)의 이름에서 유래했습니다.
+    True와 False는 첫 글자가 반드시 대문자여야 합니다. 조건 판단, 비교 연산에서 주로 사용됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    active = True
+    active
+  exercise:
+    prompt: 불린 타입 예제에서 \`active\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      active = True
+      active
+    hints:
+    - 바꿀 지점은 \`active = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`active\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 이 변수의 값과 타입(type)은 어떻게 나올까요? 예측한 뒤 type()으로 확인해 보세요.
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+      expectedDtype: bool
+  check:
+    type: noError
+    noError: 불린 타입에서 \`active\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 불린 타입 실행 뒤 \`active\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: type_function
+  title: type() 함수
+  structuredPrimary: true
+  subtitle: 데이터 타입 확인하기
+  goal: type() 함수에서 \`point\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: type() 함수는 값이나 변수의 데이터 타입을 알려줍니다. 괄호 안에 변수나 값을 넣으면 그것의 타입을 반환합니다. 결과는 <class 'int'>, <class
+    'str'> 같은 형태로 표시됩니다. 디버깅이나 타입 확인에 매우 유용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    point = 100
+    type(point)
+  exercise:
+    prompt: type() 함수 예제에서 \`point\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      point = 100
+      type(point)
+    hints:
+    - 바꿀 지점은 \`point = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`point\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: type() 함수에서 \`point\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: type() 함수 실행 뒤 \`point\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: len_function
+  title: len() 함수
+  structuredPrimary: true
+  subtitle: 문자열 길이 측정
+  goal: len() 함수에서 \`email\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    len() 함수는 문자열의 길이(문자 개수)를 반환합니다. len은 length(길이)의 줄임말입니다. 공백, 특수문자, 한글 모두 각각 1로 계산됩니다. 빈 문자열('')의 길이는 0입니다.
+
+    'Hello World'의 길이는 11입니다. 공백도 문자로 계산됩니다.
+  snippet: |-
+    email = 'python@example.com'
+    len(email)
+  exercise:
+    prompt: len() 함수 예제에서 \`email\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      email = 'python@example.com'
+      len(email)
+    hints:
+    - 바꿀 지점은 \`email = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`email\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: len() 함수에서 \`email\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: len() 함수 실행 뒤 \`email\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: convert_to_int
+  title: int() 변환
+  structuredPrimary: true
+  subtitle: 정수로 변환하기
+  goal: int() 변환에서 \`text\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: int() 함수는 다른 타입을 정수로 변환합니다. 문자열 '100'을 숫자 100으로 바꿀 수 있습니다. 단, 문자열은 숫자로만 이루어져 있어야 합니다. 실수를
+    정수로 변환하면 소수점 이하는 버려집니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    text = '100'
+    int(text)
+  exercise:
+    prompt: int() 변환 예제에서 \`text\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      text = '100'
+      int(text)
+    hints:
+    - 바꿀 지점은 \`text = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`text\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: int() 변환에서 \`text\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: int() 변환 실행 뒤 \`text\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: convert_to_float
+  title: float() 변환
+  structuredPrimary: true
+  subtitle: 실수로 변환하기
+  goal: float() 변환에서 \`val\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: float() 함수는 다른 타입을 실수로 변환합니다. 정수 10을 실수 10.0으로 바꿀 수 있습니다. 문자열 '3.14'를 숫자 3.14로 변환할 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    val = 42
+    float(val)
+  exercise:
+    prompt: float() 변환 예제에서 \`val\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      val = 42
+      float(val)
+    hints:
+    - 바꿀 지점은 \`val = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`val\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: float() 변환에서 \`val\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: float() 변환 실행 뒤 \`val\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: convert_to_str
+  title: str() 변환
+  structuredPrimary: true
+  subtitle: 문자열로 변환하기
+  goal: str() 변환에서 \`code\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: str() 함수는 어떤 값이든 문자열로 변환합니다. 숫자 25를 문자열 '25'로 바꿀 수 있습니다. 문자열 연결이나 출력 메시지를 만들 때 자주 사용됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    code = 123
+    str(code)
+  exercise:
+    prompt: str() 변환 예제에서 \`code\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      code = 123
+      str(code)
+    hints:
+    - 바꿀 지점은 \`code = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`code\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: str() 변환에서 \`code\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: str() 변환 실행 뒤 \`code\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: multiple_assign
+  title: 다중 변수 할당
+  structuredPrimary: true
+  subtitle: 한 줄로 여러 변수 선언
+  goal: 다중 변수 할당에서 문자열, 숫자, 변수 같은 예제 값을 바꿨을 때 출력 또는 마지막 표현식 결과가 어떻게 달라지는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 쉼표로 구분하여 한 줄에 여러 변수를 선언할 수 있습니다. 순서대로 매칭되므로 첫 번째 변수에 첫 번째 값이 저장됩니다. 코드를 더 간결하게 만들 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    name, age, city = 'Alice', 25, 'Seoul'
+    name, age, city
+  exercise:
+    prompt: 다중 변수 할당 예제에서 \`name\`, \`age\`, \`city\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      name, age, city = 'Alice', 25, 'Seoul'
+      name, age, city
+    hints:
+    - 바꿀 지점은 = 오른쪽 값들의 순서와 개수입니다.
+    - 실행 뒤 각 변수와 마지막 표시값이 같은 순서로 바뀌었는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 다중 변수 할당에서 \`name\`, \`age\`, \`city\` 할당 개수와 값 순서가 맞아야 합니다.
+    resultCheck: 다중 변수 할당 실행 결과가 출력 또는 마지막 표현식 결과 기준으로 바꾼 입력값을 반영해야 합니다.
+- id: same_value_assign
+  title: 같은 값 할당
+  structuredPrimary: true
+  subtitle: 여러 변수에 동일한 값
+  goal: 같은 값 할당에서 \`a\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: = 연산자를 연결하면 여러 변수에 같은 값을 동시에 할당할 수 있습니다. 모든 변수가 동일한 값을 가지게 됩니다. 초기화할 때 자주 사용하는 패턴입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    a = b = c = 0
+    a
+  exercise:
+    prompt: 같은 값 할당 예제에서 \`a\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      a = b = c = 0
+      a
+    hints:
+    - 바꿀 지점은 \`a = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`a\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+  check:
+    type: noError
+    noError: 같은 값 할당에서 \`a\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 같은 값 할당 실행 뒤 \`a\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: workflow_validation
+  title: '검증 루프: 입력값을 업무 데이터로 바꾸기'
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증
+  goal: '검증 루프: 입력값을 업무 데이터로 바꾸기에서 예상값과 실제 실행 결과를 비교하는 검증 흐름을 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 변수와 타입은 값을 담는 문법이 아니라, 외부에서 들어온 문자열을 계산 가능한 데이터로 바꾸고 검증하는 출발점입니다. 실행 전에 어떤 값이 str/int/float/bool이
+    될지 예측하고, 변환 실패를 직접 확인한 뒤, 업무 리포트에 쓸 수 있는 구조로 정리합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    rawProduct = "notebook"
+    rawPrice = "1200000"
+    rawQuantity = "2"
+    rawMember = "yes"
+
+    productName = rawProduct
+    unitPrice = int(rawPrice)
+    quantity = int(rawQuantity)
+    isMember = rawMember == "yes"
+
+    assert type(productName).__name__ == "str"
+    assert type(unitPrice).__name__ == "int"
+    assert type(quantity).__name__ == "int"
+    assert type(isMember).__name__ == "bool"
+
+    orderSubtotal = unitPrice * quantity
+    orderSubtotal
+  exercise:
+    prompt: '검증 루프: 입력값을 업무 데이터로 바꾸기 예제에서 기대 문자열이나 실제 출력 문구를 바꾸고 assert 비교가 맞는지 확인하세요.'
+    starterCode: |-
+      rawProduct = "notebook"
+      rawPrice = "1200000"
+      rawQuantity = "2"
+      rawMember = "yes"
+
+      productName = rawProduct
+      unitPrice = int(rawPrice)
+      quantity = int(rawQuantity)
+      isMember = rawMember == "yes"
+
+      assert type(productName).__name__ == "str"
+      assert type(unitPrice).__name__ == "int"
+      assert type(quantity).__name__ == "int"
+      assert type(isMember).__name__ == "bool"
+
+      orderSubtotal = unitPrice * quantity
+      orderSubtotal
+    hints:
+    - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
+    - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+  check:
+    type: noError
+    noError: '검증 루프: 입력값을 업무 데이터로 바꾸기에서 \`rawProduct\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
+    resultCheck: '검증 루프: 입력값을 업무 데이터로 바꾸기에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.'
+- id: practice
+  title: Day 2 종합 복습
+  structuredPrimary: true
+  subtitle: 변수와 타입 마스터하기
+  goal: Day 2 종합 복습에서 \`lang\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: Day 2에서 배운 변수, 데이터 타입, 타입 변환을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    name = '홍길동'
+    print('name:', name)
+  exercise:
+    prompt: Day 2 종합 복습 예제에서 \`lang\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      lang = 'Python'
+      lang
+    hints:
+    - 바꿀 지점은 \`lang = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`lang\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+  check:
+    type: noError
+    noError: Day 2 종합 복습에서 \`lang\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: Day 2 종합 복습 실행 뒤 \`lang\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: day02-describe-value-mastery
+    mode: mastery
+    unseen: false
+    sourceSectionIds:
+    - variable_concept
+    - practice
+    title: 값과 타입을 한 줄로 설명하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 값에 맞는 타입 이름과 값을 함께 반환한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: describe_value(value)가 타입이름:값 형식의 문자열을 반환하도록 완성하세요.
+      starterCode: |-
+        def describe_value(value):
+            raise NotImplementedError
+      solution: |-
+        def describe_value(value):
+            return f"{type(value).__name__}:{value}"
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day02.describe-value.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day02.describe-value.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: describe_value
+        cases:
+        - id: integer
+          arguments:
+          - value: 7
+          expectedReturn: int:7
+        - id: text
+          arguments:
+          - value: Codaro
+          expectedReturn: str:Codaro
+        - id: boolean
+          arguments:
+          - value: true
+          expectedReturn: bool:True
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day02-profile-line-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - day02-describe-value-mastery
+    title: 문자 나이를 프로필 문구로 바꾸기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 문자열 입력을 정수로 바꿔 새 출력 형식에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: profile_line(name, age)가 이름(나이) 형식의 문자열을 반환하도록 완성하세요.
+      starterCode: |-
+        def profile_line(name, age):
+            raise NotImplementedError
+      solution: |-
+        def profile_line(name, age):
+            return f"{name}({int(age)})"
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day02.profile-line.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day02.profile-line.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: profile_line
+        cases:
+        - id: text-age
+          arguments:
+          - value: Mina
+          - value: '21'
+          expectedReturn: Mina(21)
+        - id: number-age
+          arguments:
+          - value: Jun
+          - value: 30
+          expectedReturn: Jun(30)
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day02-reassign-score-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - day02-describe-value-mastery
+    title: 점수를 다시 할당해 갱신하기
+    subtitle: 하루 뒤 기억에서 재구성
+    goal: 시간이 지난 뒤 변수 재할당 결과를 스스로 구성한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: reassign_score(start, bonus)가 시작 점수에 보너스를 반영한 최종 값을 반환하도록 완성하세요.
+      starterCode: |-
+        def reassign_score(start, bonus):
+            raise NotImplementedError
+      solution: |-
+        def reassign_score(start, bonus):
+            score = start
+            score += bonus
+            return score
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day02.reassign-score.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day02.reassign-score.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reassign_score
+        cases:
+        - id: positive
+          arguments:
+          - value: 80
+          - value: 15
+          expectedReturn: 95
+        - id: negative
+          arguments:
+          - value: 50
+          - value: -8
+          expectedReturn: 42
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 24
+`;export{e as default};

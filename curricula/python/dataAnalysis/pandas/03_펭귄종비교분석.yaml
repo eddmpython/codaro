@@ -551,3 +551,269 @@ sections:
     content: 다음 시간에는 붓꽃 데이터로 결측치 처리와 새 컬럼 만들기를 배웁니다. assign, apply, map 등 데이터 변환 기술을 익힙니다.
   goal: 이 강의에서 익힌 groupby/agg/query 8가지 패턴을 머릿속에 정리한다.
   why: 같은 패턴이 다음 강의(붓꽃 결측치 처리)와 다음다음 강의(자동차 연비)에서 그대로 반복됩니다. 한 번에 정리해두면 다음 강의를 빠르게 따라갈 수 있습니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pandas_03-species-measurement-summary-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - summary
+    title: 펭귄 종별 측정값과 결측 규모 요약하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 종별 전체 수, 측정된 체중 수, 평균 체중을 함께 계산한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 결측 행을 평균에서 제외하되 전체 count에서는 숨기지 마세요.
+    - 측정값이 하나도 없는 그룹은 평균을 None으로 반환하세요.
+    exercise:
+      prompt: summarize_species_mass(rows)를 완성해 종별 count, measured, meanMass를 반환하세요.
+      starterCode: |-
+        def summarize_species_mass(rows):
+            raise NotImplementedError
+      solution: |
+        def summarize_species_mass(rows):
+            grouped = {}
+            for row in rows:
+                bucket = grouped.setdefault(row["species"], {"count": 0, "values": []})
+                bucket["count"] += 1
+                if row.get("body_mass_g") is not None:
+                    bucket["values"].append(row["body_mass_g"])
+            result = {}
+            for species, bucket in sorted(grouped.items()):
+                values = bucket["values"]
+                result[species] = {
+                    "count": bucket["count"],
+                    "measured": len(values),
+                    "meanMass": round(sum(values) / len(values), 1) if values else None,
+                }
+            return result
+      hints: *id001
+    check:
+      id: python.pandas.pandas_03.species-measurement-summary.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_03.species-measurement-summary.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_species_mass
+        cases:
+        - id: keeps-missingness-visible
+          arguments:
+          - value:
+            - species: Adelie
+              body_mass_g: 3700
+            - species: Adelie
+              body_mass_g: null
+            - species: Gentoo
+              body_mass_g: 5000
+          expectedReturn:
+            Adelie:
+              count: 2
+              measured: 1
+              meanMass: 3700.0
+            Gentoo:
+              count: 1
+              measured: 1
+              meanMass: 5000.0
+        - id: handles-no-rows
+          arguments:
+          - value: []
+          expectedReturn: {}
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pandas_03-group-numeric-comparison-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_03-species-measurement-summary-mastery
+    title: 새 센서 데이터에서 장치별 측정 품질 비교하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 종별 비교 규칙을 임의의 그룹 열과 숫자 열에 적용한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 그룹마다 values와 missing을 분리해서 누적하세요.
+    - 값이 없는 그룹에 min이나 max를 호출하지 마세요.
+    exercise:
+      prompt: compare_numeric_groups(rows, group_key, value_key)를 완성해 그룹별 mean, minimum, maximum, missing을 반환하세요.
+      starterCode: |-
+        def compare_numeric_groups(rows, group_key, value_key):
+            raise NotImplementedError
+      solution: |
+        def compare_numeric_groups(rows, group_key, value_key):
+            grouped = {}
+            for row in rows:
+                bucket = grouped.setdefault(str(row[group_key]), {"values": [], "missing": 0})
+                value = row.get(value_key)
+                if value is None:
+                    bucket["missing"] += 1
+                else:
+                    bucket["values"].append(value)
+            result = {}
+            for key, bucket in sorted(grouped.items()):
+                values = bucket["values"]
+                result[key] = {
+                    "mean": round(sum(values) / len(values), 2) if values else None,
+                    "minimum": min(values) if values else None,
+                    "maximum": max(values) if values else None,
+                    "missing": bucket["missing"],
+                }
+            return result
+      hints: *id002
+    check:
+      id: python.pandas.pandas_03.group-numeric-comparison.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_03.group-numeric-comparison.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: compare_numeric_groups
+        cases:
+        - id: compares-device-readings
+          arguments:
+          - value:
+            - device: A
+              temp: 10
+            - device: A
+              temp: 14
+            - device: B
+              temp: null
+          - value: device
+          - value: temp
+          expectedReturn:
+            A:
+              mean: 12.0
+              minimum: 10
+              maximum: 14
+              missing: 0
+            B:
+              mean: null
+              minimum: null
+              maximum: null
+              missing: 1
+        - id: handles-empty-records
+          arguments:
+          - value: []
+          - value: device
+          - value: temp
+          expectedReturn: {}
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pandas_03-missing-value-policy-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_03-group-numeric-comparison-transfer
+    title: 결측값 처리 기준을 데이터 역할에 맞게 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 식별자, 측정값, 범주형 값의 결측 처리와 남겨야 할 증거를 선택한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 결측을 모두 삭제하는 대신 열의 역할부터 구분하세요.
+    - 처리 결과에는 몇 건을 제외하거나 대체했는지 남겨야 합니다.
+    exercise:
+      prompt: choose_missing_policy(role)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_missing_policy(role):
+            raise NotImplementedError
+      solution: |
+        def choose_missing_policy(role):
+            table = {
+                "identifier": {"action": "reject-row", "evidence": "rejected row index", "risk": "cannot trace entity"},
+                "numeric-measurement": {"action": "exclude-from-aggregate", "evidence": "measured and missing counts", "risk": "biased mean"},
+                "category": {"action": "label-unknown", "evidence": "unknown category count", "risk": "hidden group"},
+            }
+            if role not in table:
+                raise ValueError("unknown data role")
+            return table[role]
+      hints: *id003
+    check:
+      id: python.pandas.pandas_03.missing-value-policy.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_03.missing-value-policy.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_missing_policy
+        cases:
+        - id: recalls-measurement-policy
+          arguments:
+          - value: numeric-measurement
+          expectedReturn:
+            action: exclude-from-aggregate
+            evidence: measured and missing counts
+            risk: biased mean
+        - id: recalls-category-policy
+          arguments:
+          - value: category
+          expectedReturn:
+            action: label-unknown
+            evidence: unknown category count
+            risk: hidden group
+        - id: rejects-unknown-role
+          arguments:
+          - value: mystery
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

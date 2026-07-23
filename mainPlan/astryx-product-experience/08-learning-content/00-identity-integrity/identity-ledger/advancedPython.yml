@@ -1,0 +1,179 @@
+schemaVersion: 1
+category: "advancedPython"
+sourceCount: 35
+lessons:
+  - lessonRef: "advancedPython/01_람다와고차함수"
+    sourcePath: "curricula/python/basics/advancedPython/01_람다와고차함수.yaml"
+    metaId: "01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/02_함수데코레이터심화"
+    sourcePath: "curricula/python/basics/advancedPython/02_함수데코레이터심화.yaml"
+    metaId: "02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/03_클로저와상태관리"
+    sourcePath: "curricula/python/basics/advancedPython/03_클로저와상태관리.yaml"
+    metaId: "03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/04_functools완벽가이드"
+    sourcePath: "curricula/python/basics/advancedPython/04_functools완벽가이드.yaml"
+    metaId: "04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/05_itertools마스터"
+    sourcePath: "curricula/python/basics/advancedPython/05_itertools마스터.yaml"
+    metaId: "05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/06_메타클래스"
+    sourcePath: "curricula/python/basics/advancedPython/06_메타클래스.yaml"
+    metaId: "06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/07_디스크립터"
+    sourcePath: "curricula/python/basics/advancedPython/07_디스크립터.yaml"
+    metaId: "07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/08_추상클래스와프로토콜"
+    sourcePath: "curricula/python/basics/advancedPython/08_추상클래스와프로토콜.yaml"
+    metaId: "08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/09_다중상속과MRO"
+    sourcePath: "curricula/python/basics/advancedPython/09_다중상속과MRO.yaml"
+    metaId: "09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/10_slots와메모리최적화"
+    sourcePath: "curricula/python/basics/advancedPython/10_slots와메모리최적화.yaml"
+    metaId: "10"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/11_타입힌팅심화"
+    sourcePath: "curricula/python/basics/advancedPython/11_타입힌팅심화.yaml"
+    metaId: "11"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/12_dataclasses마스터"
+    sourcePath: "curricula/python/basics/advancedPython/12_dataclasses마스터.yaml"
+    metaId: "12"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/13_collections심화"
+    sourcePath: "curricula/python/basics/advancedPython/13_collections심화.yaml"
+    metaId: "13"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/14_enum과상수관리"
+    sourcePath: "curricula/python/basics/advancedPython/14_enum과상수관리.yaml"
+    metaId: "14"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/15_typing고급"
+    sourcePath: "curricula/python/basics/advancedPython/15_typing고급.yaml"
+    metaId: "15"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/16_재귀와분할정복"
+    sourcePath: "curricula/python/basics/advancedPython/16_재귀와분할정복.yaml"
+    metaId: "16"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/17_정렬알고리즘"
+    sourcePath: "curricula/python/basics/advancedPython/17_정렬알고리즘.yaml"
+    metaId: "17"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/18_탐색알고리즘"
+    sourcePath: "curricula/python/basics/advancedPython/18_탐색알고리즘.yaml"
+    metaId: "18"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/19_동적프로그래밍"
+    sourcePath: "curricula/python/basics/advancedPython/19_동적프로그래밍.yaml"
+    metaId: "19"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/20_자료구조구현"
+    sourcePath: "curricula/python/basics/advancedPython/20_자료구조구현.yaml"
+    metaId: "20"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/21_디자인패턴1"
+    sourcePath: "curricula/python/basics/advancedPython/21_디자인패턴1.yaml"
+    metaId: "21"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/22_디자인패턴2"
+    sourcePath: "curricula/python/basics/advancedPython/22_디자인패턴2.yaml"
+    metaId: "22"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/23_함수형패턴"
+    sourcePath: "curricula/python/basics/advancedPython/23_함수형패턴.yaml"
+    metaId: "23"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/24_메타프로그래밍"
+    sourcePath: "curricula/python/basics/advancedPython/24_메타프로그래밍.yaml"
+    metaId: "24"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/25_정규표현식고급"
+    sourcePath: "curricula/python/basics/advancedPython/25_정규표현식고급.yaml"
+    metaId: "25"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/26_코드최적화"
+    sourcePath: "curricula/python/basics/advancedPython/26_코드최적화.yaml"
+    metaId: "26"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/27_문자열알고리즘"
+    sourcePath: "curricula/python/basics/advancedPython/27_문자열알고리즘.yaml"
+    metaId: "27"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/28_수학알고리즘"
+    sourcePath: "curricula/python/basics/advancedPython/28_수학알고리즘.yaml"
+    metaId: "28"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/29_클린코드"
+    sourcePath: "curricula/python/basics/advancedPython/29_클린코드.yaml"
+    metaId: "29"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/30_종합문제풀이"
+    sourcePath: "curricula/python/basics/advancedPython/30_종합문제풀이.yaml"
+    metaId: "30"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/31_컨텍스트매니저"
+    sourcePath: "curricula/python/basics/advancedPython/31_컨텍스트매니저.yaml"
+    metaId: "31"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/32_제너레이터심화"
+    sourcePath: "curricula/python/basics/advancedPython/32_제너레이터심화.yaml"
+    metaId: "32"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/33_async와코루틴"
+    sourcePath: "curricula/python/basics/advancedPython/33_async와코루틴.yaml"
+    metaId: "33"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/34_match와패턴매칭"
+    sourcePath: "curricula/python/basics/advancedPython/34_match와패턴매칭.yaml"
+    metaId: "34"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "advancedPython/35_동시성"
+    sourcePath: "curricula/python/basics/advancedPython/35_동시성.yaml"
+    metaId: "35"
+    registryStatus: registered
+    reviewStatus: pending

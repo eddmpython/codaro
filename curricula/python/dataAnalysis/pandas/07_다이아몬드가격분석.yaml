@@ -456,3 +456,256 @@ sections:
     content: 다음 시간에는 교통사고 데이터로 순위 분석을 배웁니다.
   goal: 정리에서 DataFrame 입력, 컬럼 선택, 결과 테이블을 연결해 확인한다.
   why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pandas_07-diamond-unit-price-bands-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - summary
+    title: 다이아몬드의 캐럿당 가격과 가격대 분류하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 크기가 다른 보석을 비교하도록 가격을 carat으로 정규화하고 기준 가격대로 나눈다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 원 가격만 비교하지 말고 price / carat으로 단위를 맞추세요.
+    - 경계값은 premium에 포함하는지 prompt의 계약을 그대로 적용하세요.
+    exercise:
+      prompt: diamond_value_bands(rows, premium_threshold)를 완성해 id, pricePerCarat, band 목록을 반환하세요.
+      starterCode: |-
+        def diamond_value_bands(rows, premium_threshold):
+            raise NotImplementedError
+      solution: |
+        def diamond_value_bands(rows, premium_threshold):
+            result = []
+            for row in rows:
+                if row["carat"] <= 0:
+                    raise ValueError("carat must be positive")
+                unit = round(row["price"] / row["carat"], 2)
+                band = "premium" if unit >= premium_threshold else "standard"
+                result.append({"id": row["id"], "pricePerCarat": unit, "band": band})
+            return sorted(result, key=lambda row: row["id"])
+      hints: *id001
+    check:
+      id: python.pandas.pandas_07.diamond-unit-price-bands.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_07.diamond-unit-price-bands.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: diamond_value_bands
+        cases:
+        - id: normalizes-before-banding
+          arguments:
+          - value:
+            - id: B
+              carat: 2
+              price: 9000
+            - id: A
+              carat: 1
+              price: 5000
+          - value: 4800
+          expectedReturn:
+          - id: A
+            pricePerCarat: 5000.0
+            band: premium
+          - id: B
+            pricePerCarat: 4500.0
+            band: standard
+        - id: handles-empty-stock
+          arguments:
+          - value: []
+          - value: 5000
+          expectedReturn: []
+        - id: rejects-zero-carat
+          arguments:
+          - value:
+            - id: X
+              carat: 0
+              price: 10
+          - value: 5
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pandas_07-price-per-unit-comparison-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_07-diamond-unit-price-bands-mastery
+    title: 새 상품 카탈로그에서 단위 가격 비교하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 캐럿당 가격 규칙을 용량이 다른 상품의 단위 가격과 최저가 선택으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 가격과 수량을 같은 통화·단위로 정규화한 뒤 비교하세요.
+    - 동률이면 sku 이름으로 결정해 결과를 안정화하세요.
+    exercise:
+      prompt: best_unit_value(items)를 완성해 각 sku의 unitPrice와 bestSku를 반환하세요.
+      starterCode: |-
+        def best_unit_value(items):
+            raise NotImplementedError
+      solution: |
+        def best_unit_value(items):
+            if any(item["units"] <= 0 for item in items):
+                raise ValueError("units must be positive")
+            prices = {item["sku"]: round(item["price"] / item["units"], 4) for item in items}
+            best = min(prices, key=lambda sku: (prices[sku], sku)) if prices else None
+            return {"unitPrices": {key: prices[key] for key in sorted(prices)}, "bestSku": best}
+      hints: *id002
+    check:
+      id: python.pandas.pandas_07.price-per-unit-comparison.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_07.price-per-unit-comparison.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: best_unit_value
+        cases:
+        - id: finds-lowest-unit-price
+          arguments:
+          - value:
+            - sku: small
+              price: 5
+              units: 2
+            - sku: bulk
+              price: 20
+              units: 10
+          expectedReturn:
+            unitPrices:
+              bulk: 2.0
+              small: 2.5
+            bestSku: bulk
+        - id: reports-empty-catalog
+          arguments:
+          - value: []
+          expectedReturn:
+            unitPrices: {}
+            bestSku: null
+        - id: rejects-invalid-unit-count
+          arguments:
+          - value:
+            - sku: bad
+              price: 1
+              units: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pandas_07-price-outlier-policy-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_07-price-per-unit-comparison-transfer
+    title: 가격 이상치 처리 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력 오류, 희귀 고가품, 단위 손상 상황을 구분해 처리와 증거를 반환한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 값이 크다는 이유만으로 행을 삭제하지 마세요.
+    - 제거, 유지, 변환 판단마다 원본 행과 기준을 증거로 남기세요.
+    exercise:
+      prompt: choose_price_outlier_policy(cause)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_price_outlier_policy(cause):
+            raise NotImplementedError
+      solution: |
+        def choose_price_outlier_policy(cause):
+            table = {
+                "entry-error": {"action": "quarantine-row", "evidence": "source row and rule", "risk": "distorted aggregate"},
+                "rare-premium-item": {"action": "keep-and-segment", "evidence": "category and robust summary", "risk": "erase real market"},
+                "mixed-currency": {"action": "convert-before-analysis", "evidence": "currency and rate date", "risk": "false outlier"},
+            }
+            if cause not in table:
+                raise ValueError("unknown outlier cause")
+            return table[cause]
+      hints: *id003
+    check:
+      id: python.pandas.pandas_07.price-outlier-policy.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_07.price-outlier-policy.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_price_outlier_policy
+        cases:
+        - id: keeps-real-premium-segment
+          arguments:
+          - value: rare-premium-item
+          expectedReturn:
+            action: keep-and-segment
+            evidence: category and robust summary
+            risk: erase real market
+        - id: normalizes-currency
+          arguments:
+          - value: mixed-currency
+          expectedReturn:
+            action: convert-before-analysis
+            evidence: currency and rate date
+            risk: false outlier
+        - id: rejects-unexplained-cause
+          arguments:
+          - value: looks-big
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

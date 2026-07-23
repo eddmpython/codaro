@@ -21,6 +21,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { categoryTitle } from "@/lib/fallbackData";
 import type { SidebarCustomCurriculum } from "@/lib/customCurricula";
@@ -70,6 +71,7 @@ export function CurriculumSidebarTree({
   onDeleteCustomCurriculum,
   text,
 }: CurriculumSidebarTreeProps) {
+  const { isMobile, setOpenMobile } = useSidebar();
   const { expandedCategories, setExpandedCategories, expandedTreeNodes, setExpandedTreeNodes } = useSidebarExpansionState();
   const [deleteTarget, setDeleteTarget] = useState<SidebarCustomCurriculum | null>(null);
   const hasQuery = Boolean(query.trim());
@@ -82,6 +84,14 @@ export function CurriculumSidebarTree({
     () => buildSidebarCurriculumTree(categories, categoryGroups, categoryTree, text.other),
     [categories, categoryGroups, categoryTree, text.other],
   );
+  const navigateToContent = (contentId: string) => {
+    onSelectContent(contentId);
+    if (isMobile) setOpenMobile(false);
+  };
+  const navigateToCustomCurriculum = (id: string) => {
+    onSelectCustomCurriculum(id);
+    if (isMobile) setOpenMobile(false);
+  };
 
   return (
     <>
@@ -95,7 +105,7 @@ export function CurriculumSidebarTree({
                 data-curriculum-home-entry="true"
                 isActive={!selectedContentId}
                 tooltip={text.curriculumHome}
-                onClick={() => onSelectContent("")}
+                onClick={() => navigateToContent("")}
               >
                 <Home />
                 <span>{text.curriculumHome}</span>
@@ -115,7 +125,7 @@ export function CurriculumSidebarTree({
                 selectedContentId={selectedContentId}
                 text={text}
                 onSelectCategory={onSelectCategory}
-                onSelectContent={onSelectContent}
+                onSelectContent={navigateToContent}
                 onToggleCategory={setExpandedCategories}
                 onToggleTreeNode={setExpandedTreeNodes}
               />
@@ -134,7 +144,7 @@ export function CurriculumSidebarTree({
                   className="h-7 pr-8 px-2 text-[13px] [&>svg]:size-3.5"
                   isActive={item.id === selectedCustomCurriculumId}
                   tooltip={item.title}
-                  onClick={() => onSelectCustomCurriculum(item.id)}
+                  onClick={() => navigateToCustomCurriculum(item.id)}
                 >
                   <GraduationCap />
                   <span>{item.title}</span>
@@ -266,7 +276,7 @@ function CurriculumTreeNodeItem({
   onToggleTreeNode: Dispatch<SetStateAction<Record<string, boolean>>>;
   depth?: number;
 }) {
-  const hasSelectedCategory = nodeHasCategory(node, selectedCategory);
+  const hasSelectedCategory = Boolean(selectedContentId) && nodeHasCategory(node, selectedCategory);
   const isExpanded = hasQuery || (expandedTreeNodes[node.id] ?? hasSelectedCategory);
   const childContent = isExpanded ? (
     <SidebarMenuSub className={depth > 0 ? "ml-2" : undefined}>
@@ -323,7 +333,7 @@ function CurriculumTreeNodeItem({
           <ChevronRight className={isExpanded ? "rotate-90 transition-transform" : "transition-transform"} />
           <span>{node.name}</span>
         </SidebarMenuButton>
-        <SidebarMenuBadge className="right-4">{node.count}</SidebarMenuBadge>
+        {selectedContentId ? <SidebarMenuBadge className="right-4">{node.count}</SidebarMenuBadge> : null}
         {childContent}
       </SidebarMenuItem>
     );
@@ -340,7 +350,7 @@ function CurriculumTreeNodeItem({
         >
           <ChevronRight className={isExpanded ? "rotate-90 transition-transform" : "transition-transform"} />
           <span className="truncate">{node.name}</span>
-          <span className="ml-auto text-[11px] text-sidebar-foreground/55">{node.count}</span>
+          {selectedContentId ? <span className="ml-auto text-[11px] text-sidebar-foreground/55">{node.count}</span> : null}
         </button>
       </SidebarMenuSubButton>
       {childContent}
@@ -377,7 +387,7 @@ function CurriculumCategoryItem({
   onSelectContent: (contentId: string) => void;
   onToggleCategory: Dispatch<SetStateAction<Record<string, boolean>>>;
 }) {
-  const isSelectedCategory = category.key === selectedCategory;
+  const isSelectedCategory = Boolean(selectedContentId) && category.key === selectedCategory;
   const isCategoryExpanded = hasQuery || (expandedCategories[category.key] ?? isSelectedCategory);
   const isCategoryOpen = isSelectedCategory && isCategoryExpanded;
   const categoryLabel = category.name || categoryTitle(category.key);
@@ -392,6 +402,7 @@ function CurriculumCategoryItem({
         <button
           aria-expanded={isCategoryOpen}
           className="text-[12px]"
+          data-curriculum-category={category.key}
           type="button"
           onClick={() => {
             if (isSelectedCategory) {
@@ -407,7 +418,7 @@ function CurriculumCategoryItem({
         >
           <ChevronRight className={isCategoryOpen ? "rotate-90 transition-transform" : "transition-transform"} />
           <span className="truncate">{categoryLabel}</span>
-          <span className="ml-auto text-[11px] text-sidebar-foreground/55">{category.count}</span>
+          {selectedContentId ? <span className="ml-auto text-[11px] text-sidebar-foreground/55">{category.count}</span> : null}
         </button>
       </SidebarMenuSubButton>
       {isCategoryOpen ? (
@@ -428,6 +439,7 @@ function CurriculumCategoryItem({
               >
                 <button
                   className="text-[12px]"
+                  data-curriculum-content-id={content.contentId}
                   type="button"
                   onClick={() => onSelectContent(content.contentId)}
                 >

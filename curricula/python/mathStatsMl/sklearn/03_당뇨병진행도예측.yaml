@@ -563,3 +563,269 @@ sections:
     type: noError
     noError: 업무 흐름 검증에서 `conservativePipeline` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sklearn_03-regression-errors-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 당뇨 진행도 회귀의 MAE·RMSE·bias 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: held-out residual의 크기와 방향을 분리한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - MAE와 RMSE를 함께 보고 큰 오차의 영향을 확인하세요.
+    - bias 부호는 예측-실제 정의를 명시하세요.
+    exercise:
+      prompt: regression_metrics(actual, predicted)를 완성하세요.
+      starterCode: |-
+        def regression_metrics(actual, predicted):
+            raise NotImplementedError
+      solution: |
+        def regression_metrics(actual, predicted):
+            if len(actual)!=len(predicted) or not actual: raise ValueError("invalid regression sample")
+            residuals = [guess-truth for truth,guess in zip(actual,predicted)]
+            mae = sum(abs(value) for value in residuals)/len(residuals); rmse=(sum(value*value for value in residuals)/len(residuals))**0.5
+            return {"mae":round(mae,4),"rmse":round(rmse,4),"bias":round(sum(residuals)/len(residuals),4),"residuals":residuals}
+      hints: *id001
+    check:
+      id: python.sklearn.sklearn_03.regression-errors.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_03.regression-errors.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: regression_metrics
+        cases:
+        - id: computes-errors
+          arguments:
+          - value:
+            - 10
+            - 20
+            - 30
+          - value:
+            - 12
+            - 18
+            - 35
+          expectedReturn:
+            mae: 3.0
+            rmse: 3.3166
+            bias: 1.6667
+            residuals:
+            - 2
+            - -2
+            - 5
+        - id: perfect-prediction
+          arguments:
+          - value:
+            - 1
+            - 2
+          - value:
+            - 1
+            - 2
+          expectedReturn:
+            mae: 0.0
+            rmse: 0.0
+            bias: 0.0
+            residuals:
+            - 0
+            - 0
+        - id: rejects-empty
+          arguments:
+          - value: []
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sklearn_03-regression-baseline-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_03-regression-errors-mastery
+    title: 새 연속 target에 baseline 비교 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: train mean baseline을 test에 적용하고 모델 MAE 개선을 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - baseline parameter도 train에서만 계산하세요.
+    - 모델 metric이 baseline보다 나쁜 경우를 숨기지 마세요.
+    exercise:
+      prompt: compare_regression_baseline(train_targets, test_targets, model_predictions)를 완성하세요.
+      starterCode: |-
+        def compare_regression_baseline(train_targets, test_targets, model_predictions):
+            raise NotImplementedError
+      solution: |
+        def compare_regression_baseline(train_targets, test_targets, model_predictions):
+            if not train_targets or len(test_targets)!=len(model_predictions) or not test_targets: raise ValueError("invalid baseline sample")
+            baseline = sum(train_targets)/len(train_targets)
+            baseline_mae = sum(abs(value-baseline) for value in test_targets)/len(test_targets)
+            model_mae = sum(abs(value-guess) for value,guess in zip(test_targets,model_predictions))/len(test_targets)
+            return {"baselineValue":round(baseline,4),"baselineMAE":round(baseline_mae,4),"modelMAE":round(model_mae,4),"improvement":round(baseline_mae-model_mae,4)}
+      hints: *id002
+    check:
+      id: python.sklearn.sklearn_03.regression-baseline.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_03.regression-baseline.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: compare_regression_baseline
+        cases:
+        - id: beats-train-mean
+          arguments:
+          - value:
+            - 10
+            - 20
+          - value:
+            - 12
+            - 18
+          - value:
+            - 13
+            - 17
+          expectedReturn:
+            baselineValue: 15.0
+            baselineMAE: 3.0
+            modelMAE: 1.0
+            improvement: 2.0
+        - id: detects-worse-model
+          arguments:
+          - value:
+            - 0
+            - 0
+          - value:
+            - 1
+            - 1
+          - value:
+            - 5
+            - 5
+          expectedReturn:
+            baselineValue: 0.0
+            baselineMAE: 1.0
+            modelMAE: 4.0
+            improvement: -3.0
+        - id: rejects-empty-train
+          arguments:
+          - value: []
+          - value:
+            - 1
+          - value:
+            - 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sklearn_03-regression-evaluation-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_03-regression-baseline-transfer
+    title: 회귀 평가 근거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 오차·baseline·분포 이동을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 학습 데이터와 평가 데이터의 경계를 먼저 확인하세요.
+    - 한 metric이나 예측을 실제 진단·인과 결론으로 확대하지 마세요.
+    exercise:
+      prompt: choose_regression_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_regression_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_regression_evidence(situation):
+            table = {'typical-error': {'method': 'MAE', 'evidence': 'target units', 'risk': 'tail errors'}, 'large-error-penalty': {'method': 'RMSE', 'evidence': 'residual distribution', 'risk': 'outlier domination'}, 'model-value': {'method': 'held-out baseline comparison', 'evidence': 'same split', 'risk': 'test tuning'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sklearn.sklearn_03.regression-evaluation.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_03.regression-evaluation.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_regression_evidence
+        cases:
+        - id: recalls-typical-error
+          arguments:
+          - value: typical-error
+          expectedReturn:
+            method: MAE
+            evidence: target units
+            risk: tail errors
+        - id: recalls-large-error-penalty
+          arguments:
+          - value: large-error-penalty
+          expectedReturn:
+            method: RMSE
+            evidence: residual distribution
+            risk: outlier domination
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

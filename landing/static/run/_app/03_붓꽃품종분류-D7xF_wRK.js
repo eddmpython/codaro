@@ -1,0 +1,635 @@
+var e=`meta:\r
+  packages:\r
+  - pandas\r
+  - plotly\r
+  id: plotly_03\r
+  title: 붓꽃품종분류\r
+  order: 3\r
+  category: plotly\r
+  difficulty: ⭐⭐\r
+  badge: 기초\r
+  tags:\r
+  - scatter\r
+  - violin\r
+  - size\r
+  - hover\r
+  - trendline\r
+  - scatter_matrix\r
+  seo:\r
+    title: Plotly 산점도와 바이올린 - 붓꽃 품종 분류\r
+    description: Plotly로 붓꽃 품종별 특성을 산점도, 바이올린, 추세선으로 시각화합니다. 최종 산점도 매트릭스로 품종을 구분합니다.\r
+    keywords:\r
+    - plotly scatter\r
+    - 바이올린 플롯\r
+    - 추세선 trendline\r
+    - scatter_matrix\r
+intro:\r
+  emoji: 🌸\r
+  goal: 붓꽃 3품종의 특성을 산점도 매트릭스로 시각화하여 품종을 구분합니다.\r
+  description: 산점도로 두 변수 관계를, 바이올린으로 분포를, 추세선으로 경향성을 파악합니다.\r
+  direction: 붓꽃품종분류에서 데이터를 상호작용 차트로 구성하고 필터와 표시 상태를 검증합니다.\r
+  benefits:\r
+  - 대시보드 데이터 확인 후 인터랙티브 시각화에 맞는 코드 입력을 고릅니다.\r
+  - 붓꽃품종분류 결과를 툴팁과 선택 상태 기준으로 즉시 점검합니다.\r
+  - 완료한 코드를 공유 대시보드에 다시 사용할 수 있습니다.\r
+  diagram:\r
+    steps:\r
+    - label: 1단계. 데이터 불러오기 입력 확인\r
+      detail: 입력 기준(대시보드 데이터)과 필요한 조건을 먼저 고정합니다.\r
+    - label: 2단계. 기본 산점도 처리 실행\r
+      detail: 인터랙티브 시각화 코드를 실행해 중간 결과를 확인합니다.\r
+    - label: 3단계. 품종별 색상 구분 결과 검증\r
+      detail: 툴팁과 선택 상태 기준으로 실행 결과를 비교합니다.\r
+    - label: 붓꽃품종분류 재사용\r
+      detail: 완성 코드를 공유 대시보드에 붙일 수 있게 정리합니다.\r
+    runtime:\r
+    - label: 인터랙티브 차트 환경\r
+      detail: pandas, plotly, statsmodels 기준으로 로컬 Python 실행을 준비합니다.\r
+    - label: 붓꽃품종분류 실행\r
+      detail: 셀을 실행해 툴팁과 선택 상태와 예외 상태를 확인합니다.\r
+    - label: 붓꽃품종분류 완료\r
+      detail: 검증된 코드를 공유 대시보드로 남깁니다.\r
+sections:\r
+- id: step1_load\r
+  title: 1단계. 데이터 불러오기\r
+  structuredPrimary: true\r
+  subtitle: 붓꽃 150송이\r
+  goal: 1단계. 데이터 불러오기에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: px.data.iris()는 머신러닝과 데이터 과학의 고전적인 데이터셋으로, 붓꽃 3품종(setosa, versicolor, virginica)의 꽃잎과 꽃받침\r
+    크기를 측정한 데이터입니다. 각 품종당 50개씩 총 150개의 관측치가 있으며, 4개의 측정값(꽃잎 길이, 꽃잎 너비, 꽃받침 길이, 꽃받침 너비)과 품종 라벨로 구성되어 있습니다.\r
+    이 데이터는 1936년 통계학자 Ronald Fisher가 발표한 이후 분류(classification) 알고리즘의 벤치마크 데이터로 널리 사용되고 있습니다. Plotly Express에\r
+    내장되어 있어 별도로 다운로드할 필요 없이 바로 사용할 수 있습니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    import plotly.express as px\r
+    import pandas as pd\r
+    iris = px.data.iris()\r
+    iris\r
+  exercise:\r
+    prompt: 1단계. 데이터 불러오기 예제에서 \`iris\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      import plotly.express as px\r
+      import pandas as pd\r
+      iris = px.data.iris()\r
+      iris\r
+    hints:\r
+    - 바꿀 지점은 \`iris = ...\` 오른쪽 값입니다.\r
+    - 실행 뒤 \`iris\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 1단계. 데이터 불러오기에서 \`iris\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 1단계. 데이터 불러오기 실행 뒤 \`iris\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.\r
+- id: step2_scatter_basic\r
+  title: 2단계. 기본 산점도\r
+  structuredPrimary: true\r
+  subtitle: 두 변수의 관계\r
+  goal: 2단계. 기본 산점도에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.\r
+  explanation: |-\r
+    산점도(scatter plot)는 두 개의 연속형 변수 간의 관계를 점으로 표현하는 차트입니다. 각 점은 하나의 데이터 행을 나타내며, x축과 y축의 교차점에 배치됩니다. 붓꽃 데이터에서 꽃잎 길이(petal_length)와 꽃잎 너비(petal_width)의 관계를 시각화하면 두 변수가 비례 관계인지, 어떤 패턴이 있는지 한눈에 파악할 수 있습니다. 산점도는 상관관계를 분석하는 가장 직관적인 방법으로, 양의 상관관계(오른쪽 위로 상승), 음의 상관관계(오른쪽 아래로 하강), 무상관(랜덤 분포)을 시각적으로 확인할 수 있습니다. 통계학에서 회귀분석, 이상치 탐지, 변수 선택의 첫 단계로 활용됩니다.\r
+\r
+    px.scatter(데이터, x='x축컬럼', y='y축컬럼')이 기본 형태입니다. 두 변수 사이의 관계를 점으로 표현하며, 각 점은 하나의 데이터 행(관측치)을 의미합니다. x축은 독립변수(설명변수), y축은 종속변수(반응변수)로 배치하는 것이 관례입니다. 점들이 일정한 패턴을 보이면 두 변수 간에 관계가 있다는 증거입니다. 산점도는 선형 회귀, 로지스틱 회귀 등 머신러닝 모델링의 기초가 되는 탐색적 데이터 분석(EDA)의 핵심 도구입니다.\r
+  tips:\r
+  - px.scatter(데이터, x='x축컬럼', y='y축컬럼')이 기본 형태입니다. 두 변수 사이의 관계를 점으로 표현하며, 각 점은 하나의 데이터 행(관측치)을 의미합니다.\r
+    x축은 독립변수(설명변수), y축은 종속변수(반응변수)로 배치하는 것이 관례입니다. 점들이 일정한 패턴을 보이면 두 변수 간에 관계가 있다는 증거입니다. 산점도는 선형 회귀,\r
+    로지스틱 회귀 등 머신러닝 모델링의 기초가 되는 탐색적 데이터 분석(EDA)의 핵심 도구입니다.\r
+  snippet: |-\r
+    figScatterBasic = px.scatter(\r
+        iris,\r
+        x="petal_length",\r
+        y="petal_width",\r
+        title="꽃잎 길이 vs 너비"\r
+    )\r
+    figScatterBasic\r
+  exercise:\r
+    prompt: 2단계. 기본 산점도 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      figScatterBasic = px.scatter(\r
+          iris,\r
+          x="petal_length",\r
+          y="petal_width",\r
+          title="꽃잎 길이 vs 너비"\r
+      )\r
+      figScatterBasic\r
+    hints:\r
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.\r
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 2단계. 기본 산점도의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.\r
+    resultCheck: 2단계. 기본 산점도의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.\r
+- id: step3_scatter_color\r
+  title: 3단계. 품종별 색상 구분\r
+  structuredPrimary: true\r
+  subtitle: color로 그룹 구분\r
+  goal: 3단계. 품종별 색상 구분에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.\r
+  explanation: color 파라미터로 품종별로 다른 색상을 지정하면 산점도에서 각 품종의 패턴을 명확히 구분할 수 있습니다. 이전 프로젝트에서 배운 color 파라미터를 산점도에\r
+    적용하면 범주형 변수를 시각적으로 분리할 수 있습니다. 세 가지 붓꽃 품종(setosa, versicolor, virginica)이 각각 다른 색상으로 표시되어, 꽃잎 길이와\r
+    너비의 조합으로 품종을 구분할 수 있는지 확인할 수 있습니다. 만약 세 품종이 산점도에서 명확히 분리되면 이 두 변수만으로도 품종 분류가 가능하다는 의미입니다. 머신러닝에서 feature\r
+    engineering(특성 공학)의 기초가 됩니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    figScatterColor = px.scatter(\r
+        iris,\r
+        x="petal_length",\r
+        y="petal_width",\r
+        color="species",\r
+        title="품종별 꽃잎 특성"\r
+    )\r
+    figScatterColor\r
+  exercise:\r
+    prompt: 3단계. 품종별 색상 구분 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      figScatterColor = px.scatter(\r
+          iris,\r
+          x="petal_length",\r
+          y="petal_width",\r
+          color="species",\r
+          title="품종별 꽃잎 특성"\r
+      )\r
+      figScatterColor\r
+    hints:\r
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.\r
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 3단계. 품종별 색상 구분의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.\r
+    resultCheck: 3단계. 품종별 색상 구분의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.\r
+- id: step4_scatter_size\r
+  title: 4단계. 크기로 추가 정보 표현\r
+  structuredPrimary: true\r
+  subtitle: size 파라미터\r
+  goal: 4단계. 크기로 추가 정보 표현에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.\r
+  explanation: |-\r
+    size 파라미터를 사용하면 점의 크기에 세 번째 변수를 매핑하여 다차원 데이터를 2D 평면에 표현할 수 있습니다. 산점도는 기본적으로 x축과 y축 두 변수만 표현하지만, color(색상), size(크기), symbol(모양) 등을 추가하면 최대 5~6개 변수를 한 차트에 시각화할 수 있습니다. 여기서는 꽃받침 길이(sepal_length)를 점 크기로 표현하여, 꽃잎 길이/너비/품종/꽃받침 길이 총 4개 변수를 동시에 보여줍니다. 이런 다차원 시각화는 변수 간의 복잡한 관계를 한눈에 파악할 수 있게 해주며, 비즈니스 인텔리전스나 과학 연구에서 핵심 인사이트를 발견하는 데 매우 유용합니다.\r
+\r
+    size='컬럼명'으로 점 크기를 조절합니다. 값이 클수록 점이 커집니다. 3개 이상의 변수를 한 차트에 표현할 때 유용하며, 버블 차트라고도 부릅니다. size_max 파라미터로 점의 최대 크기를 제한할 수 있고, 기본값은 20입니다. 크기가 너무 크면 점들이 겹쳐서 보기 어려우므로 적절한 값을 찾는 것이 중요합니다. 실무에서는 인구(크기)와 GDP(x축), 기대수명(y축), 대륙(색상)을 조합한 Gapminder 차트가 유명한 예시입니다.\r
+  tips:\r
+  - size='컬럼명'으로 점 크기를 조절합니다. 값이 클수록 점이 커집니다. 3개 이상의 변수를 한 차트에 표현할 때 유용하며, 버블 차트라고도 부릅니다. size_max 파라미터로\r
+    점의 최대 크기를 제한할 수 있고, 기본값은 20입니다. 크기가 너무 크면 점들이 겹쳐서 보기 어려우므로 적절한 값을 찾는 것이 중요합니다. 실무에서는 인구(크기)와 GDP(x축),\r
+    기대수명(y축), 대륙(색상)을 조합한 Gapminder 차트가 유명한 예시입니다.\r
+  snippet: |-\r
+    figScatterSize = px.scatter(\r
+        iris,\r
+        x="petal_length",\r
+        y="petal_width",\r
+        color="species",\r
+        size="sepal_length",\r
+        title="품종별 꽃잎 특성 (크기: 꽃받침 길이)"\r
+    )\r
+    figScatterSize\r
+  exercise:\r
+    prompt: 4단계. 크기로 추가 정보 표현 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      figScatterSize = px.scatter(\r
+          iris,\r
+          x="petal_length",\r
+          y="petal_width",\r
+          color="species",\r
+          size="sepal_length",\r
+          title="품종별 꽃잎 특성 (크기: 꽃받침 길이)"\r
+      )\r
+      figScatterSize\r
+    hints:\r
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.\r
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 4단계. 크기로 추가 정보 표현의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.\r
+    resultCheck: 4단계. 크기로 추가 정보 표현의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.\r
+- id: step5_hover\r
+  title: 5단계. 호버 정보 추가\r
+  structuredPrimary: true\r
+  subtitle: hover_data와 hover_name\r
+  goal: 5단계. 호버 정보 추가에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: |-\r
+    Plotly의 인터랙티브 차트에서 마우스를 올리면 기본적으로 x, y 값이 표시되지만, hover_name과 hover_data를 사용하면 추가 정보를 자유롭게 커스터마이징할 수 있습니다. hover_name은 호버 툴팁의 제목으로 표시되며, hover_data는 리스트 형태로 여러 컬럼을 추가할 수 있어 차트에 표시되지 않은 정보도 마우스 오버만으로 확인할 수 있습니다. 예를 들어 산점도에는 2개 변수만 표시되지만, 호버로 4~5개 변수를 모두 제공할 수 있어 정보 밀도를 크게 높일 수 있습니다. 이는 대시보드나 보고서에서 독자가 직접 데이터를 탐색할 수 있게 해주는 핵심 기능입니다.\r
+\r
+    hover_name은 호버 제목, hover_data는 추가 정보입니다. hover_data=['컬럼1', '컬럼2']처럼 리스트로 여러 개 지정합니다.\r
+  snippet: |-\r
+    px.scatter(\r
+        iris,\r
+        x="petal_length",\r
+        y="petal_width",\r
+        color="species",\r
+        size="sepal_length",\r
+        hover_name="species",\r
+        hover_data=["sepal_width"],\r
+        title="품종별 꽃잎 특성"\r
+    )\r
+  exercise:\r
+    prompt: 5단계. 호버 정보 추가 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      px.scatter(\r
+          iris,\r
+          x="petal_length",\r
+          y="petal_width",\r
+          color="species",\r
+          size="sepal_length",\r
+          hover_name="species",\r
+          hover_data=["sepal_width"],\r
+          title="품종별 꽃잎 특성"\r
+      )\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 5단계. 호버 정보 추가에서 \`x\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 5단계. 호버 정보 추가 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.\r
+- id: step6_trendline\r
+  title: 6단계. 추세선 추가\r
+  structuredPrimary: true\r
+  subtitle: trendline 파라미터\r
+  goal: 6단계. 추세선 추가에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: |-\r
+    trendline="ols"(Ordinary Least Squares, 최소제곱법) 파라미터를 추가하면 산점도에 회귀선이 자동으로 그려져 두 변수 간의 선형 관계를 명확히 파악할 수 있습니다. 점들이 회귀선 주변에 밀집되어 있으면 강한 선형 관계를, 멀리 흩어져 있으면 약한 관계를 의미합니다. color 파라미터와 함께 사용하면 각 그룹(품종)마다 별도의 추세선이 그려져, 그룹별로 관계의 강도와 방향이 어떻게 다른지 비교할 수 있습니다. 실무에서는 이런 추세선으로 예측 모델의 방향성을 먼저 확인하거나, 그룹 간 기울기 차이로 상호작용 효과를 탐지합니다.\r
+\r
+    trendline='ols'는 최소제곱법 회귀선입니다. 각 품종별로 별도의 추세선이 그려집니다. 기울기가 비슷하면 비례 관계가 유사합니다.\r
+  snippet: |-\r
+    px.scatter(\r
+        iris,\r
+        x="petal_length",\r
+        y="petal_width",\r
+        color="species",\r
+        trendline="ols",\r
+        title="품종별 꽃잎 특성 (추세선 포함)"\r
+    )\r
+  exercise:\r
+    prompt: 6단계. 추세선 추가 예제에서 \`x\`, \`y\`, \`color\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.\r
+    starterCode: |-\r
+      px.scatter(\r
+          iris,\r
+          x="petal_length",\r
+          y="petal_width",\r
+          color="species",\r
+          trendline="ols",\r
+          title="품종별 꽃잎 특성 (추세선 포함)"\r
+      )\r
+    hints:\r
+    - 바꿀 지점은 \`x = ...\` 오른쪽 값입니다.\r
+    - 실행 뒤 \`x\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 6단계. 추세선 추가에서 \`x\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 6단계. 추세선 추가 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.\r
+- id: step7_violin_basic\r
+  title: 7단계. 바이올린 플롯\r
+  structuredPrimary: true\r
+  subtitle: 분포 형태 시각화\r
+  goal: 7단계. 바이올린 플롯에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: |-\r
+    px.violin()은 데이터의 분포를 바이올린 모양으로 표현하여 박스플롯보다 훨씬 더 풍부한 정보를 제공합니다. 바이올린 플롯은 커널 밀도 추정(Kernel Density Estimation)을 사용하여 데이터가 어느 구간에 얼마나 밀집되어 있는지 곡선의 너비로 보여줍니다. 박스플롯이 5가지 요약 통계(최소, 1사분위, 중앙값, 3사분위, 최대)만 표시하는 반면, 바이올린 플롯은 분포의 전체 형태(단봉 또는 다봉, 왜도 등)를 시각적으로 드러냅니다. 이를 통해 데이터가 정규분포인지, 여러 피크가 있는지, 비대칭인지 등을 직관적으로 파악할 수 있어 고급 통계 분석에 매우 유용합니다.\r
+\r
+    바이올린 플롯은 박스플롯 + 밀도 플롯입니다. 넓은 부분은 데이터가 많이 모여있는 구간입니다.\r
+  snippet: |-\r
+    px.violin(\r
+        iris,\r
+        x="species",\r
+        y="petal_length",\r
+        color="species",\r
+        title="품종별 꽃잎 길이 분포"\r
+    )\r
+  exercise:\r
+    prompt: 7단계. 바이올린 플롯 예제에서 \`x\`, \`y\`, \`color\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.\r
+    starterCode: |-\r
+      px.violin(\r
+          iris,\r
+          x="species",\r
+          y="petal_length",\r
+          color="species",\r
+          title="품종별 꽃잎 길이 분포"\r
+      )\r
+    hints:\r
+    - 바꿀 지점은 \`x = ...\` 오른쪽 값입니다.\r
+    - 실행 뒤 \`x\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 7단계. 바이올린 플롯에서 \`x\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 7단계. 바이올린 플롯 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.\r
+- id: step8_violin_box\r
+  title: 8단계. 바이올린 + 박스\r
+  structuredPrimary: true\r
+  subtitle: box=True\r
+  goal: 8단계. 바이올린 + 박스에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: box=True 파라미터를 추가하면 바이올린 플롯 안에 작은 박스플롯이 함께 표시되어 분포의 형태와 요약 통계를 동시에 파악할 수 있습니다. 바이올린의 곡선은\r
+    전체적인 분포 패턴을 보여주고, 그 안의 박스는 중앙값과 사분위수라는 정확한 수치를 제공하여 두 가지 장점을 결합합니다. 이렇게 하면 분포가 단봉인지 다봉인지 보면서도 정확한\r
+    중심 경향과 산포도를 확인할 수 있어, 단독으로 사용하는 것보다 훨씬 더 많은 정보를 얻을 수 있습니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    px.violin(\r
+        iris,\r
+        x="species",\r
+        y="petal_length",\r
+        color="species",\r
+        box=True,\r
+        title="품종별 꽃잎 길이 분포 (박스 포함)"\r
+    )\r
+  exercise:\r
+    prompt: 8단계. 바이올린 + 박스 예제에서 \`x\`, \`y\`, \`color\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.\r
+    starterCode: |-\r
+      px.violin(\r
+          iris,\r
+          x="species",\r
+          y="petal_length",\r
+          color="species",\r
+          box=True,\r
+          title="품종별 꽃잎 길이 분포 (박스 포함)"\r
+      )\r
+    hints:\r
+    - 바꿀 지점은 \`x = ...\` 오른쪽 값입니다.\r
+    - 실행 뒤 \`x\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 8단계. 바이올린 + 박스에서 \`x\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 8단계. 바이올린 + 박스 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.\r
+- id: step9_violin_points\r
+  title: 9단계. 개별 데이터 포인트\r
+  structuredPrimary: true\r
+  subtitle: points 파라미터\r
+  goal: 9단계. 개별 데이터 포인트에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: points="all" 파라미터를 사용하면 바이올린 플롯 위에 실제 데이터 포인트가 모두 점으로 표시되어 원본 데이터의 분포를 직접 확인할 수 있습니다. 이는\r
+    바이올린의 밀도 곡선과 박스플롯이 요약한 정보가 실제 데이터를 얼마나 잘 대표하는지 검증할 수 있게 해주며, 이상치나 특이한 패턴을 쉽게 발견할 수 있습니다. 데이터 개수가 적을\r
+    때(수십~수백 개)는 모든 점을 표시하는 것이 유용하지만, 수천 개 이상이면 점들이 겹쳐서 오히려 보기 어려울 수 있으므로 상황에 맞게 선택해야 합니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    px.violin(\r
+        iris,\r
+        x="species",\r
+        y="petal_length",\r
+        color="species",\r
+        box=True,\r
+        points="all",\r
+        title="품종별 꽃잎 길이 분포 (전체 데이터)"\r
+    )\r
+  exercise:\r
+    prompt: 9단계. 개별 데이터 포인트 예제에서 \`x\`, \`y\`, \`color\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.\r
+    starterCode: |-\r
+      px.violin(\r
+          iris,\r
+          x="species",\r
+          y="petal_length",\r
+          color="species",\r
+          box=True,\r
+          points="all",\r
+          title="품종별 꽃잎 길이 분포 (전체 데이터)"\r
+      )\r
+    hints:\r
+    - 바꿀 지점은 \`x = ...\` 오른쪽 값입니다.\r
+    - 실행 뒤 \`x\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 9단계. 개별 데이터 포인트에서 \`x\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 9단계. 개별 데이터 포인트 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.\r
+- id: step10_scatter_sepal\r
+  title: 10단계. 꽃받침 특성 분석\r
+  structuredPrimary: true\r
+  subtitle: 다른 변수 조합\r
+  goal: 10단계. 꽃받침 특성 분석에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: 이전 단계에서는 꽃잎(petal) 특성으로 품종을 분석했으니, 이번에는 꽃받침(sepal) 특성으로도 품종 구분이 가능한지 확인합니다. 꽃받침 길이와 너비를\r
+    산점도로 그려보면 꽃잎 데이터와는 다른 패턴을 보일 수 있으며, 어떤 특성이 품종 분류에 더 유용한지 비교할 수 있습니다. 만약 꽃받침만으로는 품종이 잘 구분되지 않는다면, 머신러닝\r
+    모델에서는 꽃잎 특성에 더 높은 가중치를 부여해야 한다는 인사이트를 얻을 수 있습니다. 이런 탐색적 분석은 feature selection(특성 선택)의 기초가 됩니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    px.scatter(\r
+        iris,\r
+        x="sepal_length",\r
+        y="sepal_width",\r
+        color="species",\r
+        size="petal_length",\r
+        hover_data=["petal_width"],\r
+        trendline="ols",\r
+        title="품종별 꽃받침 특성"\r
+    )\r
+  exercise:\r
+    prompt: 10단계. 꽃받침 특성 분석 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      px.scatter(\r
+          iris,\r
+          x="sepal_length",\r
+          y="sepal_width",\r
+          color="species",\r
+          size="petal_length",\r
+          hover_data=["petal_width"],\r
+          trendline="ols",\r
+          title="품종별 꽃받침 특성"\r
+      )\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 10단계. 꽃받침 특성 분석에서 \`x\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 10단계. 꽃받침 특성 분석 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.\r
+- id: step11_matrix\r
+  title: 11단계. 산점도 매트릭스\r
+  structuredPrimary: true\r
+  subtitle: 모든 변수 조합 한눈에\r
+  goal: 11단계. 산점도 매트릭스에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: |-\r
+    px.scatter_matrix()는 여러 변수를 한 번에 분석할 수 있는 강력한 도구로, 모든 수치형 변수 쌍의 산점도를 격자 형태로 배치하여 변수 간 관계를 종합적으로 파악할 수 있게 해줍니다. 대각선에는 각 변수의 히스토그램(또는 밀도 플롯)이 표시되고, 나머지 칸에는 변수 쌍의 산점도가 그려집니다. 4개 변수면 4x4=16개의 서브플롯이 생성되어, 일일이 개별 산점도를 만들 필요 없이 한눈에 모든 관계를 비교할 수 있습니다. 머신러닝에서 특성 간 다중공선성을 확인하거나, 어떤 변수 조합이 타겟 변수를 잘 설명하는지 탐색할 때 필수적인 도구입니다.\r
+\r
+    대각선은 각 변수의 히스토그램, 나머지는 변수 쌍의 산점도입니다. petal_length와 petal_width 조합에서 품종 구분이 가장 뚜렷합니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    px.scatter_matrix(\r
+        iris,\r
+        dimensions=["sepal_length", "sepal_width", "petal_length", "petal_width"],\r
+        color="species",\r
+        title="붓꽃 품종별 특성 산점도 매트릭스"\r
+    )\r
+  exercise:\r
+    prompt: 11단계. 산점도 매트릭스 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      px.scatter_matrix(\r
+          iris,\r
+          dimensions=["sepal_length", "sepal_width", "petal_length", "petal_width"],\r
+          color="species",\r
+          title="붓꽃 품종별 특성 산점도 매트릭스"\r
+      )\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 11단계. 산점도 매트릭스에서 \`dimensions\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 11단계. 산점도 매트릭스 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.\r
+- id: step12_matrix_hover\r
+  title: 12단계. 매트릭스 호버 개선\r
+  structuredPrimary: true\r
+  subtitle: hover_name 추가\r
+  goal: 12단계. 매트릭스 호버 개선에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: 12단계. 매트릭스 호버 개선의 핵심 흐름을 예제 코드로 확인하고, 같은 구조를 직접 실행해 결과를 검증한다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    px.scatter_matrix(\r
+        iris,\r
+        dimensions=["sepal_length", "sepal_width", "petal_length", "petal_width"],\r
+        color="species",\r
+        hover_name="species_id",\r
+        title="붓꽃 품종별 특성 산점도 매트릭스"\r
+    )\r
+  exercise:\r
+    prompt: 12단계. 매트릭스 호버 개선 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      px.scatter_matrix(\r
+          iris,\r
+          dimensions=["sepal_length", "sepal_width", "petal_length", "petal_width"],\r
+          color="species",\r
+          hover_name="species_id",\r
+          title="붓꽃 품종별 특성 산점도 매트릭스"\r
+      )\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 12단계. 매트릭스 호버 개선에서 \`dimensions\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 12단계. 매트릭스 호버 개선 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.\r
+- id: step13_violin_sepal\r
+  title: 13단계. 꽃받침 분포 비교\r
+  structuredPrimary: true\r
+  subtitle: 추가 분석\r
+  goal: 13단계. 꽃받침 분포 비교에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: 바이올린 플롯을 보면 setosa 품종은 꽃받침 너비가 다른 두 품종보다 명확히 넓다는 것을 알 수 있습니다. 반면 versicolor와 virginica는\r
+    꽃받침 너비 분포가 상당히 겹쳐 있어, 이 특성만으로는 두 품종을 정확히 구분하기 어렵습니다. 이는 품종 분류 모델을 만들 때 꽃받침 너비만으로는 충분하지 않으며, 꽃잎 특성을\r
+    함께 사용해야 높은 정확도를 달성할 수 있음을 시사합니다. 실제로 이전 산점도 매트릭스에서 본 것처럼 꽃잎 길이와 너비 조합이 세 품종을 가장 명확히 구분해주었습니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    px.violin(\r
+        iris,\r
+        x="species",\r
+        y="sepal_width",\r
+        color="species",\r
+        box=True,\r
+        points="all",\r
+        title="품종별 꽃받침 너비 분포"\r
+    )\r
+  exercise:\r
+    prompt: 13단계. 꽃받침 분포 비교 예제에서 \`x\`, \`y\`, \`color\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.\r
+    starterCode: |-\r
+      px.violin(\r
+          iris,\r
+          x="species",\r
+          y="sepal_width",\r
+          color="species",\r
+          box=True,\r
+          points="all",\r
+          title="품종별 꽃받침 너비 분포"\r
+      )\r
+    hints:\r
+    - 바꿀 지점은 \`x = ...\` 오른쪽 값입니다.\r
+    - 실행 뒤 \`x\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 13단계. 꽃받침 분포 비교에서 \`x\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 13단계. 꽃받침 분포 비교 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.\r
+- id: practice\r
+  title: 실습\r
+  structuredPrimary: true\r
+  subtitle: 붓꽃 시각화 프로젝트\r
+  goal: 실습에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: |-\r
+    지금까지 배운 모든 시각화 기법을 종합하여 붓꽃 데이터를 다각도로 분석해봅시다. 산점도로 변수 간 관계를 파악하고, 바이올린 플롯으로 분포의 형태를 확인하며, 추세선으로 경향성을 시각화하고, 호버 기능으로 상세 정보를 제공하는 완성도 높은 차트를 만들어봅니다. 각 미션은 서로 다른 변수 조합과 시각화 기법을 사용하여 데이터의 다양한 측면을 탐색하도록 설계되었습니다. 실전에서는 이런 다양한 각도의 분석을 통해 데이터의 숨겨진 패턴과 인사이트를 발견할 수 있습니다.\r
+\r
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.\r
+  snippet: |-\r
+    import plotly.express as px\r
+    import pandas as pd\r
+\r
+    flower = px.data.iris()\r
+  exercise:\r
+    prompt: 실습 예제에서 \`flower\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      import plotly.express as px\r
+      import pandas as pd\r
+\r
+      flower = px.data.iris()\r
+    hints:\r
+    - 바꿀 지점은 \`flower = ...\` 오른쪽 값입니다.\r
+    - 실행 뒤 \`flower\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 실습에서 \`flower\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 실습 실행 뒤 \`flower\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.\r
+- id: summary\r
+  title: 정리\r
+  blocks:\r
+  - type: text\r
+    content: 산점도와 바이올린으로 붓꽃 품종 특성을 시각화했습니다!\r
+  - type: list\r
+    items:\r
+    - px.scatter(df, x, y) - 두 변수 관계를 점으로 표현\r
+    - color='컬럼' - 그룹별 색상 구분\r
+    - size='컬럼' - 점 크기로 추가 변수 표현\r
+    - hover_name, hover_data - 호버 정보 커스터마이징\r
+    - trendline='ols' - 회귀 추세선 추가\r
+    - px.violin(df, x, y, box=True, points='all') - 분포 시각화\r
+    - px.scatter_matrix(df, dimensions) - 모든 변수 조합 산점도\r
+  - type: text\r
+    content: 다음 시간에는 세계 인구 데이터로 애니메이션 차트를 만듭니다. 시간에 따른 변화를 동적으로 표현합니다.\r
+  goal: 정리에서 대시보드 데이터을 바꿨을 때 툴팁과 선택 상태가 어떻게 달라지는지 확인한다.\r
+  why: 인터랙티브 차트는 사용자가 직접 데이터를 탐색할 수 있는 분석 화면을 만듭니다.\r
+- id: workflow_validation\r
+  title: 15단계. 붓꽃 분류 Figure 검증 루프\r
+  structuredPrimary: true\r
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주\r
+  goal: 15단계. 붓꽃 분류 Figure 검증 루프에서 인터랙티브 시각화 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.\r
+  explanation: |-\r
+    산점도, 추세선, 바이올린 플롯은 품종 분리 가능성을 다른 각도에서 보여 줍니다. 품종 컬럼과 Figure trace를 함께 확인해 분류 해석이 깨지지 않게 합니다.\r
+\r
+    분류용 시각화는 색상이 보이는지보다, 어떤 변수 조합이 실제로 집단을 분리하는지 확인하는 것이 핵심입니다.\r
+  snippet: |-\r
+    import plotly.express as px\r
+    from codaro.curriculum.localData import loadLocalDataset\r
+\r
+    irisFlow = loadLocalDataset("iris")\r
+    requiredColumns = {"sepal_length", "sepal_width", "petal_length", "petal_width", "species"}\r
+    missingColumns = requiredColumns - set(irisFlow.columns)\r
+\r
+    assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"\r
+    assert sorted(irisFlow["species"].unique()) == ["setosa", "versicolor", "virginica"]\r
+    assert irisFlow.loc[irisFlow["species"] == "setosa", "petal_length"].max() < irisFlow.loc[irisFlow["species"] != "setosa", "petal_length"].min()\r
+  exercise:\r
+    prompt: 15단계. 붓꽃 분류 Figure 검증 루프 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      import plotly.express as px\r
+      from codaro.curriculum.localData import loadLocalDataset\r
+\r
+      irisFlow = loadLocalDataset("iris")\r
+      requiredColumns = {"sepal_length", "sepal_width", "petal_length", "petal_width", "species"}\r
+      missingColumns = requiredColumns - set(irisFlow.columns)\r
+\r
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"\r
+      assert sorted(irisFlow["species"].unique()) == ["setosa", "versicolor", "virginica"]\r
+      assert irisFlow.loc[irisFlow["species"] == "setosa", "petal_length"].max() < irisFlow.loc[irisFlow["species"] != "setosa", "petal_length"].min()\r
+    hints:\r
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.\r
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 15단계. 붓꽃 분류 Figure 검증 루프의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.\r
+    resultCheck: 15단계. 붓꽃 분류 Figure 검증 루프의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.\r
+`;export{e as default};

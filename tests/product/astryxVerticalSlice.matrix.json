@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "selection": "astryx-journey",
+  "cases": [
+    "landing-home-mobile",
+    "landing-home-desktop",
+    "landing-learn-catalog-desktop",
+    "web-learning-home-mobile",
+    "web-lesson-mobile",
+    "web-run-mobile",
+    "web-run-desktop",
+    "local-learning-home-desktop",
+    "local-strong-learning-desktop",
+    "local-run-minimum",
+    "local-automation-desktop"
+  ],
+  "requiredSurfaces": [
+    "landing-home",
+    "landing-learn",
+    "learning-home",
+    "web-lesson",
+    "web-run",
+    "local-lesson",
+    "local-run",
+    "local-automation"
+  ]
+}

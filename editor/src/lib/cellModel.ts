@@ -132,5 +132,16 @@ export function stripBullet(line: string) {
 }
 
 export function stripMarkdown(line: string) {
-  return line.replace(/[#>*_`[\]()]/g, "").replace(/\s+/g, " ").trim();
+  return line
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/^\s{0,3}#{1,6}\s+/, "")
+    .replace(/^\s*>\s?/, "")
+    .replace(/^\s*(?:[-+*]|\d+\.)\s+/, "")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/__([^_]+)__/g, "$1")
+    .replace(/~~([^~]+)~~/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
 }

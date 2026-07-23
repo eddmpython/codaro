@@ -469,3 +469,254 @@ sections:
     type: noError
     noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
     resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pydantic_01-normalize-user-model-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load
+    - workflow_validation
+    title: 사용자 입력을 일관된 model 값으로 정규화하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: name·email 공백과 대소문자를 정리하고 age 범위를 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 문자열 정규화와 값 범위 검증을 분리해서 읽으세요.
+    - Python의 bool을 정수 id로 받아들이지 마세요.
+    exercise:
+      prompt: normalize_user(payload)를 완성해 id, name, email, age를 반환하세요.
+      starterCode: |-
+        def normalize_user(payload):
+            raise NotImplementedError
+      solution: |
+        def normalize_user(payload):
+            user_id = payload.get("id")
+            age = payload.get("age")
+            if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id < 1:
+                raise ValueError("invalid id")
+            if not isinstance(age, int) or isinstance(age, bool) or not 0 <= age <= 130:
+                raise ValueError("invalid age")
+            name = str(payload.get("name", "")).strip()
+            email = str(payload.get("email", "")).strip().lower()
+            if not name or "@" not in email:
+                raise ValueError("invalid identity")
+            return {"id": user_id, "name": name, "email": email, "age": age}
+      hints: *id001
+    check:
+      id: python.pydantic.pydantic_01.normalize-user-model.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_01.normalize-user-model.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: normalize_user
+        cases:
+        - id: normalizes-valid-user
+          arguments:
+          - value:
+              id: 7
+              name: ' Mina '
+              email: ' MINA@Example.COM '
+              age: 28
+          expectedReturn:
+            id: 7
+            name: Mina
+            email: mina@example.com
+            age: 28
+        - id: rejects-age-outside-range
+          arguments:
+          - value:
+              id: 1
+              name: A
+              email: a@b.c
+              age: 200
+          expectedException: ValueError
+        - id: rejects-bool-id
+          arguments:
+          - value:
+              id: true
+              name: A
+              email: a@b.c
+              age: 20
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pydantic_01-alias-customer-model-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pydantic_01-normalize-user-model-mastery
+    title: 새 고객 payload의 alias를 내부 field로 변환하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: user model 계약을 외부 camelCase 입력과 내부 snake_case 출력으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 외부 alias와 내부 field 이름을 섞지 마세요.
+    - optional boolean의 default를 명시적으로 정하세요.
+    exercise:
+      prompt: normalize_customer(payload)를 완성해 customer_id, display_name, marketing_opt_in을 반환하세요.
+      starterCode: |-
+        def normalize_customer(payload):
+            raise NotImplementedError
+      solution: |
+        def normalize_customer(payload):
+            required = ("customerId", "displayName")
+            if any(key not in payload for key in required):
+                raise ValueError("missing customer field")
+            customer_id = int(payload["customerId"])
+            display_name = str(payload["displayName"]).strip()
+            opt_in = payload.get("marketingOptIn", False)
+            if customer_id < 1 or not display_name or not isinstance(opt_in, bool):
+                raise ValueError("invalid customer")
+            return {"customer_id": customer_id, "display_name": display_name, "marketing_opt_in": opt_in}
+      hints: *id002
+    check:
+      id: python.pydantic.pydantic_01.alias-customer-model.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_01.alias-customer-model.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: normalize_customer
+        cases:
+        - id: maps-aliases-and-default
+          arguments:
+          - value:
+              customerId: '12'
+              displayName: ' Jun '
+          expectedReturn:
+            customer_id: 12
+            display_name: Jun
+            marketing_opt_in: false
+        - id: keeps-explicit-opt-in
+          arguments:
+          - value:
+              customerId: 8
+              displayName: Mina
+              marketingOptIn: true
+          expectedReturn:
+            customer_id: 8
+            display_name: Mina
+            marketing_opt_in: true
+        - id: rejects-missing-name
+          arguments:
+          - value:
+              customerId: 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pydantic_01-model-field-role-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pydantic_01-alias-customer-model-transfer
+    title: model field 역할과 정책 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 식별자, 표시 이름, 비밀값에 맞는 정규화와 출력 정책을 선택한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - field의 역할이 validation과 serialization 정책을 함께 결정합니다.
+    - 비밀값은 유효하더라도 일반 model dump에서 제외하세요.
+    exercise:
+      prompt: choose_field_policy(situation)를 완성해 normalize, serialize, risk를 반환하세요.
+      starterCode: |-
+        def choose_field_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_field_policy(situation):
+            table = {'identifier': {'normalize': 'strict positive integer', 'serialize': 'include', 'risk': 'identity collision'}, 'display-name': {'normalize': 'trim whitespace', 'serialize': 'include', 'risk': 'blank label'}, 'secret': {'normalize': 'preserve exact value', 'serialize': 'exclude', 'risk': 'credential leak'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.pydantic.pydantic_01.model-field-role.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_01.model-field-role.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_field_policy
+        cases:
+        - id: recalls-identifier
+          arguments:
+          - value: identifier
+          expectedReturn:
+            normalize: strict positive integer
+            serialize: include
+            risk: identity collision
+        - id: recalls-display-name
+          arguments:
+          - value: display-name
+          expectedReturn:
+            normalize: trim whitespace
+            serialize: include
+            risk: blank label
+        - id: rejects-unknown-situation
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

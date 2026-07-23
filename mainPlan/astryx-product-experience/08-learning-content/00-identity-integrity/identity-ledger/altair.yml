@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "altair"
+sourceCount: 11
+lessons:
+  - lessonRef: "altair/00_Altair소개"
+    sourcePath: "curricula/python/visualization/altair/00_Altair소개.yaml"
+    metaId: "altair_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "altair/01_자동차연비탐색"
+    sourcePath: "curricula/python/visualization/altair/01_자동차연비탐색.yaml"
+    metaId: "altair_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "altair/02_붓꽃품종구분"
+    sourcePath: "curricula/python/visualization/altair/02_붓꽃품종구분.yaml"
+    metaId: "altair_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "altair/03_팁데이터분석"
+    sourcePath: "curricula/python/visualization/altair/03_팁데이터분석.yaml"
+    metaId: "altair_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "altair/04_펭귄서식지분석"
+    sourcePath: "curricula/python/visualization/altair/04_펭귄서식지분석.yaml"
+    metaId: "altair_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "altair/05_타이타닉생존분석"
+    sourcePath: "curricula/python/visualization/altair/05_타이타닉생존분석.yaml"
+    metaId: "altair_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "altair/06_항공편분석"
+    sourcePath: "curricula/python/visualization/altair/06_항공편분석.yaml"
+    metaId: "altair_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "altair/07_인터랙티브필터"
+    sourcePath: "curricula/python/visualization/altair/07_인터랙티브필터.yaml"
+    metaId: "altair_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "altair/08_다중뷰연결"
+    sourcePath: "curricula/python/visualization/altair/08_다중뷰연결.yaml"
+    metaId: "altair_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "altair/09_고급데이터변환"
+    sourcePath: "curricula/python/visualization/altair/09_고급데이터변환.yaml"
+    metaId: "altair_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "altair/10_종합대시보드"
+    sourcePath: "curricula/python/visualization/altair/10_종합대시보드.yaml"
+    metaId: "altair_10"
+    registryStatus: registered
+    reviewStatus: pending

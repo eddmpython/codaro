@@ -643,3 +643,278 @@ sections:
     type: noError
     noError: 업무 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 업무 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: polars_07-sports-team-standings-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: 경기 결과에서 팀별 승·패·득실차 순위 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: home·away 점수를 양쪽 팀 record로 펼쳐 points와 goal difference를 집계한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 한 경기를 home·away 두 팀 관점의 row로 생각하세요.
+    - points 동률이면 goalDiff, team 순서로 tie-break하세요.
+    exercise:
+      prompt: build_team_standings(matches)를 완성해 team, wins, losses, points, goalDiff 목록을 반환하세요.
+      starterCode: |-
+        def build_team_standings(matches):
+            raise NotImplementedError
+      solution: |
+        def build_team_standings(matches):
+            teams = {}
+            for match in matches:
+                for side, other in (("home", "away"), ("away", "home")):
+                    name = match[side]
+                    scored = match[f"{side}Score"]
+                    conceded = match[f"{other}Score"]
+                    row = teams.setdefault(name, {"wins": 0, "losses": 0, "points": 0, "goalDiff": 0})
+                    row["goalDiff"] += scored - conceded
+                    if scored > conceded:
+                        row["wins"] += 1
+                        row["points"] += 3
+                    elif scored < conceded:
+                        row["losses"] += 1
+            result = [{"team": team, **values} for team, values in teams.items()]
+            return sorted(result, key=lambda row: (-row["points"], -row["goalDiff"], row["team"]))
+      hints: *id001
+    check:
+      id: python.polars.polars_07.sports-team-standings.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_07.sports-team-standings.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_team_standings
+        cases:
+        - id: aggregates-both-sides
+          arguments:
+          - value:
+            - home: A
+              away: B
+              homeScore: 2
+              awayScore: 1
+            - home: B
+              away: C
+              homeScore: 0
+              awayScore: 3
+          expectedReturn:
+          - team: C
+            wins: 1
+            losses: 0
+            points: 3
+            goalDiff: 3
+          - team: A
+            wins: 1
+            losses: 0
+            points: 3
+            goalDiff: 1
+          - team: B
+            wins: 0
+            losses: 2
+            points: 0
+            goalDiff: -4
+        - id: handles-empty-season
+          arguments:
+          - value: []
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: polars_07-player-window-ranking-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_07-sports-team-standings-mastery
+    title: 새 선수 기록에서 팀 내 득점 rank 만들기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 팀 standings 집계를 partition별 dense rank와 동률 처리로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - rank는 team partition마다 다시 시작합니다.
+    - 같은 score는 같은 rank를 받고 다음 rank에는 gap이 생깁니다.
+    exercise:
+      prompt: rank_players_within_team(players)를 완성해 team, player, score, rank 목록을 반환하세요.
+      starterCode: |-
+        def rank_players_within_team(players):
+            raise NotImplementedError
+      solution: |
+        def rank_players_within_team(players):
+            grouped = {}
+            for player in players:
+                grouped.setdefault(player["team"], []).append(player)
+            result = []
+            for team, group in sorted(grouped.items()):
+                ordered = sorted(group, key=lambda row: (-row["score"], row["player"]))
+                previous_score = None
+                rank = 0
+                for index, row in enumerate(ordered, start=1):
+                    if row["score"] != previous_score:
+                        rank = index
+                    result.append({"team": team, "player": row["player"], "score": row["score"], "rank": rank})
+                    previous_score = row["score"]
+            return result
+      hints: *id002
+    check:
+      id: python.polars.polars_07.player-window-ranking.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_07.player-window-ranking.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: rank_players_within_team
+        cases:
+        - id: ranks-with-ties-per-team
+          arguments:
+          - value:
+            - team: A
+              player: Mina
+              score: 10
+            - team: A
+              player: Jun
+              score: 10
+            - team: A
+              player: Sol
+              score: 5
+            - team: B
+              player: Ara
+              score: 7
+          expectedReturn:
+          - team: A
+            player: Jun
+            score: 10
+            rank: 1
+          - team: A
+            player: Mina
+            score: 10
+            rank: 1
+          - team: A
+            player: Sol
+            score: 5
+            rank: 3
+          - team: B
+            player: Ara
+            score: 7
+            rank: 1
+        - id: handles-empty-roster
+          arguments:
+          - value: []
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: polars_07-sports-window-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_07-player-window-ranking-transfer
+    title: 스포츠 통계 window 연산 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 팀 내 rank, 이전 경기, 시즌 누적에 맞는 partition·order를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - window 질문에는 group key와 order key가 모두 필요합니다.
+    - rank와 row number의 동률 처리 차이를 확인하세요.
+    exercise:
+      prompt: choose_sports_window(situation)를 완성해 partitionBy, orderBy, operation을 반환하세요.
+      starterCode: |-
+        def choose_sports_window(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_sports_window(situation):
+            table = {'rank-player-in-team': {'partitionBy': 'team', 'orderBy': 'score desc', 'operation': 'rank'}, 'previous-match-score': {'partitionBy': 'team', 'orderBy': 'date', 'operation': 'shift'}, 'season-running-points': {'partitionBy': 'team', 'orderBy': 'date', 'operation': 'cum_sum'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.polars.polars_07.sports-window-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_07.sports-window-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_sports_window
+        cases:
+        - id: recalls-rank-player-in-team
+          arguments:
+          - value: rank-player-in-team
+          expectedReturn:
+            partitionBy: team
+            orderBy: score desc
+            operation: rank
+        - id: recalls-previous-match-score
+          arguments:
+          - value: previous-match-score
+          expectedReturn:
+            partitionBy: team
+            orderBy: date
+            operation: shift
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

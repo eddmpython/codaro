@@ -3,7 +3,6 @@ from datetime import datetime
 import yaml
 import re
 import os
-import importlib
 from concurrent.futures import ThreadPoolExecutor
 
 contentDir = Path(__file__).parent
@@ -491,7 +490,6 @@ def warmupAllCaches():
     contentCount = 0
     errors = []
     for category in categories:
-        getCategoryIllustration(category)
         getCategoryFullMeta(category)
         for contentId in listContents(category):
             try:
@@ -790,30 +788,6 @@ def getAllContentForSitemap() -> list:
                 continue
 
     return sorted(sitemapItems, key=lambda x: (x['category'], x.get('title', '')))
-
-
-_illustrationCache = {}
-
-
-def getCategoryIllustration(category: str) -> str:
-    if category in _illustrationCache:
-        return _illustrationCache[category]
-    try:
-        module = importlib.import_module(f'.{category}.illustration', 'core.studyPython.content')
-        svg = getattr(module, 'SVG', None)
-        _illustrationCache[category] = svg
-        return svg
-    except:
-        _illustrationCache[category] = None
-        return None
-
-
-def getCategoryCodePreview(category: str) -> str:
-    try:
-        module = importlib.import_module(f'.{category}.illustration', 'core.studyPython.content')
-        return getattr(module, 'CODE_PREVIEW', '')
-    except:
-        return ''
 
 
 def getCategoryContentCount(category: str) -> int:

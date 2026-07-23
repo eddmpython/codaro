@@ -448,3 +448,330 @@ sections:
     type: noError
     noError: 종합 복습의 수정 코드가 추상화 패턴 단계의 마지막 확인 값까지 도달해야 합니다.
     resultCheck: 종합 복습 실행 결과가 호출 결과와 예외 경계 기준으로 바꾼 입력값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 06_advanced_metaclass-command-registry-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - metaclass_basic
+    - metaclass_example
+    - workflow_validation
+    title: 메타클래스로 명령 클래스 계약과 중복 등록을 검증하기
+    subtitle: command registry metaclass
+    goal: 명령 spec 목록을 받아 메타클래스가 commandName과 execute를 강제하고 등록 결과와 실행 결과를 반환한다.
+    why: 메타클래스는 어려운 문법 자체가 목적이 아니라, 클래스가 만들어지는 순간 프레임워크 계약을 깨지 못하게 막을 때 의미가 있습니다.
+    explanation: build_command_registry(command_specs)를 완성해 동적 클래스 생성, 자동 등록, 중복 commandName 거부를 함께 검증하세요.
+    tips:
+    - type(name, bases, namespace)로 Command 하위 클래스를 동적으로 만들 수 있습니다.
+    - commandName이 중복되면 registry를 덮어쓰지 말고 ValueError로 막으세요.
+    exercise:
+      prompt: build_command_registry(command_specs)를 완성해 registered, results, metaclassName을 반환하세요.
+      starterCode: |-
+        def build_command_registry(command_specs):
+            raise NotImplementedError
+      solution: |-
+        def build_command_registry(command_specs):
+            class CommandMeta(type):
+                registry = {}
+
+                def __new__(mcs, name, bases, namespace):
+                    cls = super().__new__(mcs, name, bases, namespace)
+                    if bases:
+                        command_name = namespace.get("commandName")
+                        if not command_name:
+                            raise TypeError("commandName is required")
+                        if "execute" not in namespace:
+                            raise TypeError("execute is required")
+                        if command_name in mcs.registry:
+                            raise ValueError("duplicate commandName")
+                        mcs.registry[command_name] = cls
+                    return cls
+
+            class Command(metaclass=CommandMeta):
+                ...
+
+            def make_execute(result_key):
+                def execute(self, payload):
+                    return {result_key: payload["email"]}
+
+                return execute
+
+            for spec in command_specs:
+                type(
+                    spec["className"],
+                    (Command,),
+                    {
+                        "commandName": spec["commandName"],
+                        "execute": make_execute(spec["resultKey"]),
+                    },
+                )
+
+            return {
+                "registered": sorted(CommandMeta.registry),
+                "results": {
+                    name: CommandMeta.registry[name]().execute({"email": "a@example.com"})
+                    for name in sorted(CommandMeta.registry)
+                },
+                "metaclassName": type(Command).__name__,
+            }
+      hints:
+      - bases가 비어 있으면 루트 Command 클래스이므로 등록하지 않습니다.
+      - make_execute는 반복문의 마지막 spec만 잡지 않도록 result_key를 클로저로 고정합니다.
+    check:
+      id: python.advanced.metaclass.command-registry.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.metaclass.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_command_registry
+        cases:
+        - id: registers-dynamic-command-classes
+          arguments:
+          - value:
+            - className: CreateUser
+              commandName: create_user
+              resultKey: created
+            - className: DisableUser
+              commandName: disable_user
+              resultKey: disabled
+          expectedReturn:
+            registered:
+            - create_user
+            - disable_user
+            results:
+              create_user:
+                created: a@example.com
+              disable_user:
+                disabled: a@example.com
+            metaclassName: CommandMeta
+        - id: rejects-duplicate-command-name
+          arguments:
+          - value:
+            - className: First
+              commandName: sync
+              resultKey: synced
+            - className: Second
+              commandName: sync
+              resultKey: syncedAgain
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 06_advanced_metaclass-init-subclass-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - init_subclass
+    - when_to_use
+    - workflow_validation
+    title: 메타클래스 대신 __init_subclass__로 핸들러 등록하기
+    subtitle: subclass hook registry
+    goal: __init_subclass__ 키워드 인자를 사용해 핸들러를 자동 등록하고 중복 kind 거부 여부를 반환한다.
+    why: 전이 과제에서는 같은 등록 문제를 더 가벼운 도구로 풀어, 메타클래스가 최후의 수단이라는 판단을 연습합니다.
+    explanation: build_subclass_hook_registry()를 완성해 EmailHandler와 SmsHandler를 등록하고 duplicate kind가 거부되는지 확인하세요.
+    tips:
+    - 서브클래스 훅은 부모 클래스에 한 번 정의하면 하위 클래스 생성 때 자동 호출됩니다.
+    - 중복 kind를 감지하면 class 정의 도중 ValueError가 나야 합니다.
+    exercise:
+      prompt: build_subclass_hook_registry()를 완성해 registered, sampleResults, duplicateRejected를 반환하세요.
+      starterCode: |-
+        def build_subclass_hook_registry():
+            raise NotImplementedError
+      solution: |-
+        def build_subclass_hook_registry():
+            class HandlerBase:
+                registry = {}
+
+                def __init_subclass__(cls, kind, **kwargs):
+                    super().__init_subclass__(**kwargs)
+                    if kind in cls.registry:
+                        raise ValueError("duplicate handler kind")
+                    cls.kind = kind
+                    cls.registry[kind] = cls
+
+            class EmailHandler(HandlerBase, kind="email"):
+                def handle(self, message):
+                    return f"email:{message}"
+
+            class SmsHandler(HandlerBase, kind="sms"):
+                def handle(self, message):
+                    return f"sms:{message}"
+
+            duplicate_rejected = False
+            try:
+                class DuplicateEmail(HandlerBase, kind="email"):
+                    def handle(self, message):
+                        return message
+            except ValueError:
+                duplicate_rejected = True
+
+            return {
+                "registered": sorted(HandlerBase.registry),
+                "sampleResults": {
+                    name: HandlerBase.registry[name]().handle("ready")
+                    for name in sorted(HandlerBase.registry)
+                },
+                "duplicateRejected": duplicate_rejected,
+            }
+      hints:
+      - class EmailHandler(HandlerBase, kind="email") 형태로 hook에 키워드 인자를 전달합니다.
+      - DuplicateEmail 정의는 try 안에서 실패해야 합니다.
+    check:
+      id: python.advanced.metaclass.init-subclass.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.metaclass.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_subclass_hook_registry
+        cases:
+        - id: registers-handlers-with-subclass-hook
+          arguments: []
+          expectedReturn:
+            registered:
+            - email
+            - sms
+            sampleResults:
+              email: email:ready
+              sms: sms:ready
+            duplicateRejected: true
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 06_advanced_metaclass-tool-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 06_advanced_metaclass-init-subclass-transfer
+    title: type, 클래스 데코레이터, __init_subclass__, 메타클래스 선택하기
+    subtitle: class creation tool recall
+    goal: 목적 이름을 받아 가장 가벼운 클래스 생성 도구와 선택 이유를 반환한다.
+    why: 시간이 지나도 남아야 할 감각은 메타클래스를 쓸 수 있다는 사실보다, 더 단순한 대안으로 충분한지 먼저 판단하는 기준입니다.
+    explanation: choose_class_creation_tool(goal)를 완성해 dynamic-class, post-process-class, subclass-registry, control-class-creation
+      목적별 도구를 고르세요.
+    tips:
+    - 클래스 생성 후 속성만 붙이면 클래스 데코레이터가 더 단순합니다.
+    - 서브클래스 등록만 필요하면 __init_subclass__가 메타클래스보다 가볍습니다.
+    exercise:
+      prompt: choose_class_creation_tool(goal)를 완성해 목적별 클래스 생성 도구 선택 결과를 반환하세요.
+      starterCode: |-
+        def choose_class_creation_tool(goal):
+            raise NotImplementedError
+      solution: |-
+        def choose_class_creation_tool(goal):
+            table = {
+                "dynamic-class": {
+                    "tool": "type",
+                    "reason": "create a class from name, bases, and namespace",
+                    "complexity": "medium",
+                },
+                "post-process-class": {
+                    "tool": "class decorator",
+                    "reason": "modify a completed class without changing creation rules",
+                    "complexity": "low",
+                },
+                "subclass-registry": {
+                    "tool": "__init_subclass__",
+                    "reason": "run a hook whenever a subclass is defined",
+                    "complexity": "low",
+                },
+                "control-class-creation": {
+                    "tool": "metaclass",
+                    "reason": "validate or rewrite the class during creation",
+                    "complexity": "high",
+                },
+            }
+            if goal not in table:
+                raise ValueError("unknown class creation goal")
+            return table[goal]
+      hints:
+      - 가장 강한 도구부터 고르지 말고 필요한 제어 지점부터 보세요.
+      - 메타클래스는 클래스 객체가 만들어지는 과정을 제어합니다.
+    check:
+      id: python.advanced.metaclass.tool-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.metaclass.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_class_creation_tool
+        cases:
+        - id: recalls-init-subclass-for-registry
+          arguments:
+          - value: subclass-registry
+          expectedReturn:
+            tool: __init_subclass__
+            reason: run a hook whenever a subclass is defined
+            complexity: low
+        - id: recalls-metaclass-for-class-creation-control
+          arguments:
+          - value: control-class-creation
+          expectedReturn:
+            tool: metaclass
+            reason: validate or rewrite the class during creation
+            complexity: high
+        - id: rejects-unknown-goal
+          arguments:
+          - value: monkeypatch-instance
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

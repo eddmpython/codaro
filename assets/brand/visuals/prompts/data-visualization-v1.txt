@@ -1,0 +1,9 @@
+Use case: scientific-educational
+Asset type: Codaro learning catalog domain visual for data visualization
+Primary request: Create a premium editorial educational illustration that compares how the same small dataset becomes a bar chart, line chart, scatter plot, and distribution plot. Show physical-like data tokens feeding four accurate chart forms, with axes and marks but no labels or readable text.
+Scene/backdrop: bright neutral studio workspace with white and charcoal surfaces, teal, coral, yellow, green, and restrained plum accents.
+Style/medium: sophisticated mixed 3D paper-cut and crisp editorial illustration with precise chart geometry, high-end education product art, not childish.
+Composition/framing: wide 16:9, charts arranged in a legible comparison rather than floating cards, clear source dataset at left and visual encodings at right, generous margins.
+Lighting/mood: soft daylight, precise, exploratory, optimistic.
+Constraints: no people, logos, brand names, letters, readable UI text, watermark, gradients, glowing orbs, bokeh, or dark atmospheric background. Chart shapes must be mathematically plausible and easy to distinguish.
+Avoid: generic business dashboard, neon, dominant purple or blue, decorative chart junk.

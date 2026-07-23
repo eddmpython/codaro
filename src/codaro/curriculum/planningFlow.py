@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 
 from .learnerState import LearnerStateStore
@@ -34,6 +35,7 @@ def composeCurriculumMasterPlan(
     progressTracker: ProgressTracker,
     learnerStateStore: LearnerStateStore | None,
     request: CurriculumMasterPlanInput,
+    learningEvents: Iterable[Mapping[str, object]] = (),
 ) -> MasterPlan:
     taxonomy = curriculumOs.taxonomy()
     if request.domain and not taxonomy.domainById(request.domain):
@@ -63,6 +65,7 @@ def composeCurriculumMasterPlan(
         taxonomy,
         progressTracker,
         learnerStateStore=learnerStateStore,
+        learningEvents=learningEvents,
     )
 
 

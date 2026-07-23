@@ -328,6 +328,36 @@
       "prerequisites": [],
       "keywords": ["contextlib", "with", "컨텍스트매니저", "자원관리"],
       "description": "with 문, 사용자 정의 컨텍스트 매니저"
+    },
+    {
+      "id": "33_tempfile",
+      "title": "tempfile - 임시 파일과 격리",
+      "file": "33_tempfile.yaml",
+      "difficulty": "intermediate",
+      "phase": 8,
+      "prerequisites": ["09_pathlib", "32_contextlib"],
+      "keywords": ["tempfile", "TemporaryDirectory", "임시파일", "격리"],
+      "description": "임시 파일과 디렉터리의 생성, 검증, 자동 정리"
+    },
+    {
+      "id": "34_hashlib",
+      "title": "hashlib - 해시와 무결성",
+      "file": "34_hashlib.yaml",
+      "difficulty": "intermediate",
+      "phase": 8,
+      "prerequisites": ["09_pathlib"],
+      "keywords": ["hashlib", "sha256", "hmac", "secrets"],
+      "description": "데이터 해시, 안전한 토큰, 메시지 무결성 검증"
+    },
+    {
+      "id": "35_zipfile",
+      "title": "zipfile - 안전한 아카이브 처리",
+      "file": "35_zipfile.yaml",
+      "difficulty": "intermediate",
+      "phase": 8,
+      "prerequisites": ["09_pathlib", "32_contextlib"],
+      "keywords": ["zipfile", "tarfile", "압축", "아카이브"],
+      "description": "ZIP과 tar.gz 생성, 목록 검증, 안전한 추출"
     }
   ]
 }

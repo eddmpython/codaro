@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codaro.local/contracts/classroomArchive.schema.json",
+  "title": "Codaro retired classroom archive manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "archiveId",
+    "createdAt",
+    "assignmentCount",
+    "eventCount",
+    "invalidRowCount",
+    "redactionCount",
+    "sourceFileCount",
+    "sourceAggregateHash",
+    "sourceFiles",
+    "gitHead"
+  ],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "archiveId": {"type": "string", "format": "uuid"},
+    "createdAt": {"type": "string", "format": "date-time"},
+    "assignmentCount": {"type": "integer", "minimum": 0},
+    "eventCount": {"type": "integer", "minimum": 0},
+    "invalidRowCount": {"type": "integer", "minimum": 0},
+    "redactionCount": {"type": "integer", "minimum": 0},
+    "sourceFileCount": {"type": "integer", "minimum": 0},
+    "sourceAggregateHash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "gitHead": {"type": "string", "minLength": 1},
+    "sourceFiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "kind", "sha256", "validRowCount", "invalidRowCount"],
+        "properties": {
+          "path": {"type": "string", "pattern": "^(assignments|events)/[^/]+\\.(json|jsonl)$"},
+          "kind": {"enum": ["assignment", "event"]},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "validRowCount": {"type": "integer", "minimum": 0},
+          "invalidRowCount": {"type": "integer", "minimum": 0}
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codaro.dev/contracts/learningArtifactDescriptor.schema.json",
+  "title": "Codaro Learning Artifact Descriptor",
+  "oneOf": [
+    { "$ref": "#/$defs/FileSystemArtifact" },
+    { "$ref": "tableArtifactDescriptor.schema.json" },
+    { "$ref": "imageArtifactDescriptor.schema.json" }
+  ],
+  "$defs": {
+    "FileSystemArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "kind",
+        "origin",
+        "path",
+        "byteLength",
+        "contentHash",
+        "fileCount"
+      ],
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "kind": { "enum": ["file", "directory"] },
+        "origin": { "enum": ["created", "fixture"] },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*:).+$"
+        },
+        "byteLength": { "type": "integer", "minimum": 0 },
+        "contentHash": { "type": "string", "pattern": "^sha256-[A-Za-z0-9_-]{43}$" },
+        "fileCount": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "email"
+canonicalRows: 11
+lessons:
+  - lessonRef: "email/00_email소개"
+    identityLedgerRef: "identity-ledger/email.yml"
+    lessonContentHash: "856d16c725e4d148bd12773529e6114dd88a00dd65150496fc446e9c32e128b8"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/01-email-automation"
+    eligiblePathIds: ["emailAutomation"]
+    outcomes: ["automation.email.intro"]
+    prerequisites: ["python.functions","python.modulesAndIo"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:email/00_email소개:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:email_00_email__:v1","retrieve:email_00_email__:v2","retrieve:email_00_email__:v3"]
+    transferVariantIds: ["transfer:email_00_email__:near-v1","transfer:email_00_email__:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "email/01_첫메일발송"
+    identityLedgerRef: "identity-ledger/email.yml"
+    lessonContentHash: "34217d2c5db41a35e820373d0ead7158be487be95e9a2737a2126e66d859b674"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/01-email-automation"
+    eligiblePathIds: ["emailAutomation"]
+    outcomes: ["automation.email.send"]
+    prerequisites: ["automation.email.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:email/01_첫메일발송:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:email_01______:v1","retrieve:email_01______:v2","retrieve:email_01______:v3"]
+    transferVariantIds: ["transfer:email_01______:near-v1","transfer:email_01______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "email/02_html과첨부"
+    identityLedgerRef: "identity-ledger/email.yml"
+    lessonContentHash: "eb56b3a1d636481962913344d290e07dcb54b51243b85c8d0c1ea8f4634ad07b"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/01-email-automation"
+    eligiblePathIds: ["emailAutomation"]
+    outcomes: ["automation.email.attachments"]
+    prerequisites: ["automation.email.send"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:email/02_html과첨부:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:email_02_html___:v1","retrieve:email_02_html___:v2","retrieve:email_02_html___:v3"]
+    transferVariantIds: ["transfer:email_02_html___:near-v1","transfer:email_02_html___:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "email/03_다수수신자와개인화"
+    identityLedgerRef: "identity-ledger/email.yml"
+    lessonContentHash: "43b5bfdb3e01b1c85df78da72e16d43c6702f7c8fbbc63f7a1513532c286e01d"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/01-email-automation"
+    eligiblePathIds: ["emailAutomation"]
+    outcomes: ["automation.email.bulk"]
+    prerequisites: ["automation.email.send"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:email/03_다수수신자와개인화:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:email_03__________:v1","retrieve:email_03__________:v2","retrieve:email_03__________:v3"]
+    transferVariantIds: ["transfer:email_03__________:near-v1","transfer:email_03__________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "email/04_표와차트삽입"
+    identityLedgerRef: "identity-ledger/email.yml"
+    lessonContentHash: "4a2976f1180f25394360d437a3b5f9db03db1eb4cf2dc5491c2bde9282e805d7"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/01-email-automation"
+    eligiblePathIds: ["emailAutomation"]
+    outcomes: ["automation.email.attachments"]
+    prerequisites: ["automation.email.attachments"]
+    reinforcesOutcomeIds: ["automation.email.attachments"]
+    runtimeTier: local
+    checkSpecId: "lesson:email/04_표와차트삽입:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:email_04_______:v1","retrieve:email_04_______:v2","retrieve:email_04_______:v3"]
+    transferVariantIds: ["transfer:email_04_______:near-v1","transfer:email_04_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "email/05_imap으로받기"
+    identityLedgerRef: "identity-ledger/email.yml"
+    lessonContentHash: "c04f04854008d899fcb24eef1b7330459208bf51603ff382c83c2c9c3afeba2e"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/01-email-automation"
+    eligiblePathIds: ["emailAutomation"]
+    outcomes: ["automation.email.receive"]
+    prerequisites: ["automation.email.send"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:email/05_imap으로받기:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:email_05_imap____:v1","retrieve:email_05_imap____:v2","retrieve:email_05_imap____:v3"]
+    transferVariantIds: ["transfer:email_05_imap____:near-v1","transfer:email_05_imap____:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "email/06_첨부자동저장"
+    identityLedgerRef: "identity-ledger/email.yml"
+    lessonContentHash: "754bd253c26fbc0a16ad776acf44294d140bb8b773681ba0011ab96da64abba1"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/01-email-automation"
+    eligiblePathIds: ["emailAutomation"]
+    outcomes: ["automation.email.classify"]
+    prerequisites: ["automation.email.receive"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:email/06_첨부자동저장:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:email_06_______:v1","retrieve:email_06_______:v2","retrieve:email_06_______:v3"]
+    transferVariantIds: ["transfer:email_06_______:near-v1","transfer:email_06_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "email/07_규칙기반분류"
+    identityLedgerRef: "identity-ledger/email.yml"
+    lessonContentHash: "f4d91c4e6891af7090ed792e38749f324e9c46a51f2e5d83e941b7d6607fa713"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/01-email-automation"
+    eligiblePathIds: ["emailAutomation"]
+    outcomes: ["automation.email.classify"]
+    prerequisites: ["automation.email.receive"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:email/07_규칙기반분류:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:email_07_______:v1","retrieve:email_07_______:v2","retrieve:email_07_______:v3"]
+    transferVariantIds: ["transfer:email_07_______:near-v1","transfer:email_07_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "email/08_스크립트결과알림"
+    identityLedgerRef: "identity-ledger/email.yml"
+    lessonContentHash: "1440516cda8d755e7389da03321e7507f11353d336ca9af7bc9ae7891bd13d5b"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/01-email-automation"
+    eligiblePathIds: ["emailAutomation"]
+    outcomes: ["automation.email.notify"]
+    prerequisites: ["automation.email.send"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:email/08_스크립트결과알림:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:email_08_________:v1","retrieve:email_08_________:v2","retrieve:email_08_________:v3"]
+    transferVariantIds: ["transfer:email_08_________:near-v1","transfer:email_08_________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "email/09_안전한자격증명관리"
+    identityLedgerRef: "identity-ledger/email.yml"
+    lessonContentHash: "00c9a2a94cdacf05f6850cbfeee8b1aa31b771a51d44af1935444b21006d70ab"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/01-email-automation"
+    eligiblePathIds: ["emailAutomation"]
+    outcomes: ["automation.email.credentials"]
+    prerequisites: ["automation.email.send"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:email/09_안전한자격증명관리:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:email_09__________:v1","retrieve:email_09__________:v2","retrieve:email_09__________:v3"]
+    transferVariantIds: ["transfer:email_09__________:near-v1","transfer:email_09__________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "email/10_주간보고서발송기"
+    identityLedgerRef: "identity-ledger/email.yml"
+    lessonContentHash: "569fc22f9c86cba2ea3182dcb8cb2f650bcc6b5acd35ddd998c102828d00a281"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/01-email-automation"
+    eligiblePathIds: ["emailAutomation"]
+    outcomes: ["automation.email.report"]
+    prerequisites: ["automation.email.bulk","automation.email.notify","automation.email.credentials"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:email/10_주간보고서발송기:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:email_10_________:v1","retrieve:email_10_________:v2","retrieve:email_10_________:v3"]
+    transferVariantIds: ["transfer:email_10_________:near-v1","transfer:email_10_________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

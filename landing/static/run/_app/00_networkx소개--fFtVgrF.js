@@ -1,0 +1,291 @@
+var e=`meta:\r
+  packages:\r
+  - networkx\r
+  id: networkx_00\r
+  title: NetworkX 소개\r
+  order: 0\r
+  category: networkx\r
+  badge: 소개\r
+  tags:\r
+  - networkx\r
+  - 그래프\r
+  - 네트워크\r
+  - 소개\r
+  seo:\r
+    title: NetworkX 소개 - 파이썬 그래프 분석\r
+    description: NetworkX로 그래프와 네트워크를 분석합니다. 노드, 엣지, 경로, 중심성 등 네트워크 과학의 기초를 배웁니다.\r
+    keywords:\r
+    - networkx\r
+    - 그래프\r
+    - 네트워크\r
+    - 파이썬\r
+    - 소셜네트워크\r
+intro:\r
+  direction: NetworkX 소개에서 노드와 엣지를 모델링하고 경로, 중심성, 연결 구조를 검증합니다.\r
+  benefits:\r
+  - 첫 실행 셀은 assert로 핵심 결과를 고정해 실습 코드가 깨지지 않았는지 확인합니다.\r
+  - 관계 데이터 확인 후 그래프 알고리즘에 맞는 코드 입력을 고릅니다.\r
+  - NetworkX 소개 결과를 노드/엣지와 지표 값 기준으로 즉시 점검합니다.\r
+  - 완료한 코드를 관계 분석 리포트에 다시 사용할 수 있습니다.\r
+  diagram:\r
+    steps:\r
+    - label: NetworkX란? 입력 확인\r
+      detail: 입력 기준(관계 데이터)과 필요한 조건을 먼저 고정합니다.\r
+    - label: 그래프의 종류 처리 실행\r
+      detail: 그래프 알고리즘 코드를 실행해 중간 결과를 확인합니다.\r
+    - label: 실제 네트워크 예시 결과 검증\r
+      detail: 노드/엣지와 지표 값 기준으로 실행 결과를 비교합니다.\r
+    - label: NetworkX 소개 재사용\r
+      detail: 완성 코드를 관계 분석 리포트에 붙일 수 있게 정리합니다.\r
+    runtime:\r
+    - label: 그래프 분석 환경\r
+      detail: networkx 기준으로 로컬 Python 실행을 준비합니다.\r
+    - label: NetworkX 소개 실행\r
+      detail: 셀을 실행해 노드/엣지와 지표 값와 예외 상태를 확인합니다.\r
+    - label: NetworkX 소개 완료\r
+      detail: 검증된 코드를 관계 분석 리포트로 남깁니다.\r
+sections:\r
+- id: what_is_networkx\r
+  title: NetworkX란?\r
+  subtitle: 그래프 분석 라이브러리\r
+  blocks:\r
+  - type: text\r
+    content: NetworkX는 복잡한 네트워크를 쉽게 다루는 파이썬 라이브러리입니다. 2002년 Los Alamos National Laboratory에서 Aric Hagberg,\r
+      Dan Schult, Pieter Swart에 의해 개발되었으며, 현재 네트워크 과학 연구와 실무에서 가장 널리 사용되는 그래프 분석 도구입니다. 사회과학, 생물학, 물리학,\r
+      컴퓨터 과학 등 다양한 분야에서 네트워크 데이터를 분석할 때 표준처럼 사용됩니다.\r
+  - type: text\r
+    content: 그래프(Graph)는 수학과 컴퓨터 과학에서 연결 구조를 표현하는 추상적 모델입니다. 노드(Node, 또는 정점 Vertex)는 사람, 장소, 개념 등 분석 대상이\r
+      되는 개체를 나타내고, 엣지(Edge, 또는 간선)는 친구 관계, 도로 연결, 하이퍼링크 등 개체 간의 관계를 나타냅니다. 이런 추상화 덕분에 전혀 다른 도메인의 문제들을\r
+      동일한 수학적 프레임워크로 분석할 수 있습니다.\r
+  - type: tip\r
+    content: 그래프 이론은 1736년 수학자 레온하르트 오일러가 '쾨니히스베르크 다리 문제'를 해결하면서 탄생했습니다. 당시 프로이센의 쾨니히스베르크(현재 러시아 칼리닌그라드)\r
+      도시에는 7개의 다리가 있었는데, 모든 다리를 정확히 한 번씩만 건너서 도시를 산책할 수 있는지가 문제였습니다. 오일러는 이것이 불가능함을 증명하면서 그래프 이론의 기초를\r
+      세웠습니다.\r
+  goal: NetworkX란?에서 관계 데이터을 바꿨을 때 노드/엣지와 지표 값가 어떻게 달라지는지 확인한다.\r
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.\r
+- id: graph_types\r
+  title: 그래프의 종류\r
+  subtitle: 무방향, 방향, 가중치\r
+  blocks:\r
+  - type: text\r
+    content: '**무방향 그래프(Undirected Graph)**는 엣지에 방향이 없는 그래프입니다. A와 B가 연결되어 있으면 B에서 A로도, A에서 B로도 이동할 수\r
+      있습니다. 페이스북 친구 관계가 대표적인 예시입니다. 내가 누군가의 친구면 그 사람도 내 친구이기 때문입니다. 양방향 도로, 동료 관계, 공저자 관계 등도 무방향 그래프로\r
+      모델링합니다.'\r
+  - type: text\r
+    content: '**방향 그래프(Directed Graph, DiGraph)**는 엣지에 방향이 있는 그래프입니다. A→B 연결이 있다고 해서 B→A 연결이 자동으로 존재하지\r
+      않습니다. 트위터나 인스타그램의 팔로우 관계가 대표적입니다. 내가 연예인을 팔로우한다고 해서 연예인이 나를 팔로우하지는 않습니다. 웹 페이지 링크, 논문 인용, 이메일 발송\r
+      등도 방향 그래프로 모델링합니다.'\r
+  - type: text\r
+    content: '**가중치 그래프(Weighted Graph)**는 엣지에 가중치(숫자 값)가 부여된 그래프입니다. 단순히 연결 여부만 표현하는 것이 아니라 연결의 강도, 비용,\r
+      거리 등을 함께 표현합니다. 도시 간 도로망에서 거리나 소요 시간, 소셜 네트워크에서 상호작용 빈도, 전자상거래에서 고객 간 유사도 점수 등이 가중치가 됩니다. 최단 경로를\r
+      찾을 때 가중치가 중요한 역할을 합니다.'\r
+  - type: tip\r
+    content: NetworkX는 4가지 기본 그래프 클래스를 제공합니다. Graph는 무방향 그래프, DiGraph는 방향 그래프입니다. MultiGraph와 MultiDiGraph는\r
+      같은 노드 쌍 사이에 여러 개의 엣지를 허용하는 다중 그래프입니다. 예를 들어 서울-부산 사이에 KTX, 고속버스, 비행기 등 여러 경로가 있을 때 MultiGraph를 사용합니다.\r
+  goal: 그래프의 종류에서 관계 데이터을 바꿨을 때 노드/엣지와 지표 값가 어떻게 달라지는지 확인한다.\r
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.\r
+- id: real_world_networks\r
+  title: 실제 네트워크 예시\r
+  subtitle: 어디서 사용될까?\r
+  blocks:\r
+  - type: text\r
+    content: '**소셜 네트워크**는 사람들 간의 관계를 분석하는 대표적인 네트워크입니다. 페이스북의 친구 관계, 트위터/인스타그램의 팔로우 관계, 링크드인의 비즈니스 연결,\r
+      카카오톡의 친구 목록 등이 여기에 해당합니다. 네트워크 분석을 통해 가장 영향력 있는 인플루언서를 찾거나, 비슷한 관심사를 가진 사용자 그룹(커뮤니티)을 탐지하거나, 친구\r
+      추천 알고리즘을 만들 수 있습니다.'\r
+  - type: text\r
+    content: '**교통 네트워크**는 물리적인 이동 경로를 분석합니다. 도로망에서 노드는 교차로, 엣지는 도로가 됩니다. 지하철 노선도에서 노드는 역, 엣지는 노선입니다.\r
+      항공 네트워크에서 노드는 공항, 엣지는 항공편입니다. 네비게이션의 최단 경로 안내, 물류 최적화, 교통 혼잡 구간 분석 등에 활용됩니다. 배달 앱이 여러 주문을 효율적으로\r
+      처리하는 경로를 찾는 것도 네트워크 분석입니다.'\r
+  - type: text\r
+    content: '**생물학 네트워크**는 생명 현상의 복잡한 상호작용을 분석합니다. 단백질-단백질 상호작용 네트워크(PPI)에서는 단백질이 노드, 물리적 결합이 엣지입니다.\r
+      유전자 조절 네트워크에서는 유전자가 노드, 조절 관계가 엣지입니다. 뇌의 신경망에서는 뉴런이 노드, 시냅스가 엣지입니다. 이를 통해 질병의 핵심 유전자를 발견하거나, 신약\r
+      타겟을 선정하거나, 뇌 기능을 이해합니다.'\r
+  - type: text\r
+    content: '**정보 네트워크**는 디지털 정보의 연결 구조를 분석합니다. 월드와이드웹(WWW)에서 노드는 웹 페이지, 엣지는 하이퍼링크입니다. 구글의 PageRank 알고리즘은\r
+      웹 그래프 분석으로 탄생했습니다. 학술 논문 인용 네트워크에서는 논문이 노드, 인용 관계가 엣지가 되어 영향력 있는 논문을 찾습니다. 위키피디아 문서 연결을 분석하면 지식의\r
+      구조를 이해할 수 있습니다.'\r
+  goal: 실제 네트워크 예시에서 관계 데이터을 바꿨을 때 노드/엣지와 지표 값가 어떻게 달라지는지 확인한다.\r
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.\r
+- id: key_concepts\r
+  title: 핵심 개념 미리보기\r
+  subtitle: 이 카테고리에서 배울 내용\r
+  blocks:\r
+  - type: text\r
+    content: '**그래프 생성과 탐색**에서는 NetworkX의 기본 사용법을 배웁니다. nx.Graph()로 빈 그래프를 생성하고, add_node()와 add_edge()로\r
+      노드와 엣지를 추가합니다. nodes(), edges(), neighbors() 등의 메서드로 그래프 구조를 탐색하고, 노드/엣지에 속성(attribute)을 부여하는 방법도\r
+      익힙니다. 이것이 모든 네트워크 분석의 기초가 됩니다.'\r
+  - type: text\r
+    content: '**경로 탐색**에서는 두 노드 사이의 연결 관계를 분석합니다. shortest_path()로 최단 경로를 찾고, shortest_path_length()로\r
+      거리(홉 수)를 계산합니다. has_path()로 연결 여부를 확인하고, all_simple_paths()로 가능한 모든 경로를 열거합니다. 가중치 그래프에서는 다익스트라(Dijkstra)\r
+      알고리즘을 사용해 실제 최단 거리를 구합니다.'\r
+  - type: text\r
+    content: '**중심성 분석(Centrality)**에서는 네트워크에서 중요한 노드를 찾는 다양한 방법을 배웁니다. 연결 중심성(Degree)은 연결 수가 많은 노드, 매개\r
+      중심성(Betweenness)은 다른 노드들을 연결하는 다리 역할을 하는 노드, 근접 중심성(Closeness)은 다른 노드들과 평균적으로 가까운 노드, 고유벡터 중심성(Eigenvector)은\r
+      영향력 있는 노드들과 연결된 노드를 찾습니다.'\r
+  - type: text\r
+    content: '**클러스터링과 커뮤니티**에서는 네트워크 내의 군집 구조를 분석합니다. 클러스터링 계수(Clustering Coefficient)는 노드 주변의 삼각형 밀도를\r
+      측정합니다. 내 친구들끼리도 서로 친구인지를 나타냅니다. 커뮤니티 탐지(Community Detection)는 네트워크를 의미 있는 그룹으로 분할합니다. 모듈성(Modularity)\r
+      최적화, 레이블 전파 등의 알고리즘을 사용합니다.'\r
+  - type: text\r
+    content: '**그래프 알고리즘**에서는 컴퓨터 과학의 고전적인 그래프 알고리즘을 실습합니다. BFS(너비 우선 탐색)와 DFS(깊이 우선 탐색)는 그래프 순회의 기본입니다.\r
+      최소 신장 트리(MST)는 모든 노드를 최소 비용으로 연결합니다. 위상 정렬(Topological Sort)은 선후관계가 있는 작업의 순서를 정합니다.'\r
+  - type: text\r
+    content: '**시각화**에서는 matplotlib과 연동하여 네트워크를 그림으로 표현합니다. nx.draw()로 기본 시각화를 하고, spring_layout, circular_layout\r
+      등 다양한 레이아웃 알고리즘으로 노드 배치를 결정합니다. 노드 크기를 중심성에 비례하게 하거나, 커뮤니티별로 다른 색상을 지정하는 등 의미 있는 시각화를 만듭니다.'\r
+  goal: 핵심 개념 미리보기에서 관계 데이터을 바꿨을 때 노드/엣지와 지표 값가 어떻게 달라지는지 확인한다.\r
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.\r
+- id: networkx_features\r
+  title: NetworkX 특징\r
+  subtitle: 왜 NetworkX인가?\r
+  blocks:\r
+  - type: text\r
+    content: '**순수 파이썬으로 작성**되어 C 확장 빌드 부담이 작습니다. Codaro는 meta.packages의 networkx를 보고 uv로 필요한 패키지를 준비한\r
+      뒤, 로컬 Python에서 그래프 생성, 중심성 분석, 경로 탐색을 바로 실습합니다.'\r
+  - type: text\r
+    content: '**수백 개의 알고리즘이 내장**되어 있어 대부분의 네트워크 분석을 직접 구현할 필요가 없습니다. 최단 경로(다익스트라, 벨만-포드, A*), 중심성(연결,\r
+      매개, 근접, 고유벡터, PageRank), 커뮤니티 탐지(모듈성, 레이블 전파), 그래프 매칭, 네트워크 플로우, 이분 그래프, 평면 그래프 등 네트워크 과학의 거의 모든\r
+      알고리즘을 함수 한 줄로 호출할 수 있습니다.'\r
+  - type: text\r
+    content: '**유연한 데이터 모델**을 제공합니다. 노드는 해시 가능한(hashable) 모든 파이썬 객체가 될 수 있습니다. 정수, 문자열, 튜플은 물론이고 사용자 정의\r
+      객체도 노드로 사용할 수 있습니다. 노드와 엣지에 딕셔너리 형태로 속성을 자유롭게 추가할 수 있어서, 사람 노드에 나이/성별/직업 속성을 부여하거나 도로 엣지에 거리/제한속도/차선수\r
+      속성을 부여할 수 있습니다.'\r
+  - type: text\r
+    content: '**유명한 네트워크 데이터셋이 내장**되어 있어 바로 실습을 시작할 수 있습니다. karate_club_graph()는 Wayne Zachary가 1970년대에\r
+      수집한 가라테 클럽 회원 34명의 소셜 네트워크로, 네트워크 과학에서 가장 유명한 데이터입니다. les_miserables_graph()는 빅토르 위고의 소설 레미제라블 등장인물\r
+      77명의 관계를 담고 있습니다. florentine_families_graph()는 15세기 피렌체 명문 가문들의 결혼 관계입니다.'\r
+  - type: tip\r
+    content: 대규모 그래프(수백만 개 이상의 노드)를 다룰 때는 C로 작성된 igraph나 graph-tool이 더 빠릅니다. 하지만 NetworkX는 API가 직관적이고\r
+      문서가 풍부해서 프로토타이핑, 교육, 중소규모 분석에 최적입니다. 실무에서도 데이터 크기가 적당하다면 NetworkX로 충분합니다.\r
+  goal: NetworkX 특징에서 관계 데이터을 바꿨을 때 노드/엣지와 지표 값가 어떻게 달라지는지 확인한다.\r
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.\r
+- id: learning_path\r
+  title: 학습 순서\r
+  subtitle: 10개 프로젝트 로드맵\r
+  blocks:\r
+  - type: text\r
+    content: '**입문 단계 (프로젝트 01-02)**에서는 NetworkX의 기본기를 다집니다. 첫 번째 프로젝트에서는 빈 그래프를 생성하고 노드와 엣지를 추가하는 방법,\r
+      그래프 정보를 조회하는 방법, matplotlib으로 시각화하는 방법을 배웁니다. 두 번째 프로젝트에서는 방향 그래프(DiGraph)와 가중치 그래프를 다루며, 엣지에 속성을\r
+      부여하고 활용하는 방법을 익힙니다.'\r
+  - type: text\r
+    content: '**기초 단계 (프로젝트 03-05)**에서는 네트워크 분석의 핵심 개념을 배웁니다. 세 번째 프로젝트에서는 최단 경로를 찾는 다양한 알고리즘을 실습합니다.\r
+      네 번째 프로젝트에서는 중심성(Centrality) 지표들을 계산하고 비교하여 네트워크에서 중요한 노드를 찾습니다. 다섯 번째 프로젝트에서는 실제 소셜 네트워크 데이터(가라테\r
+      클럽)를 분석하며 배운 개념들을 종합합니다.'\r
+  - type: text\r
+    content: '**중급 단계 (프로젝트 06-08)**에서는 네트워크의 구조적 특성을 깊이 분석합니다. 여섯 번째 프로젝트에서는 연결성(Connectivity)을 분석하여\r
+      네트워크가 얼마나 견고한지 평가합니다. 일곱 번째 프로젝트에서는 커뮤니티 탐지(Community Detection) 알고리즘으로 네트워크 내의 그룹을 발견합니다. 여덟 번째\r
+      프로젝트에서는 BFS, DFS, 최소 신장 트리 등 고전적인 그래프 알고리즘을 실습합니다.'\r
+  - type: text\r
+    content: '**심화 단계 (프로젝트 09-10)**에서는 고급 주제를 다루고 모든 개념을 통합합니다. 아홉 번째 프로젝트에서는 랜덤 그래프 모델을 배웁니다. Erdős-Rényi\r
+      모델은 무작위 연결, Barabási-Albert 모델은 허브가 있는 척도 없는 네트워크, Watts-Strogatz 모델은 작은 세상 네트워크를 생성합니다. 열 번째 프로젝트에서는\r
+      실전 데이터로 종합 네트워크 분석 프로젝트를 수행합니다.'\r
+  - type: tip\r
+    content: 각 프로젝트는 독립적으로 실행할 수 있지만, 순서대로 진행하면 개념이 점진적으로 쌓여서 더 효과적입니다. 앞선 프로젝트에서 배운 개념은 뒤 프로젝트에서 반복 사용되므로,\r
+      자연스럽게 복습과 심화가 이루어집니다.\r
+  goal: 학습 순서에서 관계 데이터을 바꿨을 때 노드/엣지와 지표 값가 어떻게 달라지는지 확인한다.\r
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.\r
+- id: no_data_needed\r
+  title: 데이터셋 불필요\r
+  subtitle: 그래프 직접 생성\r
+  blocks:\r
+  - type: text\r
+    content: 이 카테고리는 외부 CSV나 JSON 파일을 다운로드할 필요가 없습니다. NetworkX는 그래프를 직접 생성하는 함수들과 유명한 네트워크 데이터셋을 내장하고\r
+      있어서, 별도의 데이터 로딩 과정 없이 바로 네트워크 분석을 시작할 수 있습니다. 데이터 전처리에 시간을 쓰지 않고 네트워크 분석 개념 자체에 집중할 수 있는 것이 장점입니다.\r
+  - type: text\r
+    content: '**그래프 생성 함수**들은 특정 구조를 가진 그래프를 한 줄로 만들어줍니다. complete_graph(n)은 n개 노드가 모두 서로 연결된 완전 그래프를\r
+      생성합니다. path_graph(n)은 일렬로 연결된 경로 그래프, cycle_graph(n)은 원형으로 연결된 순환 그래프, star_graph(n)은 중심 노드에서 n개\r
+      노드가 뻗어나가는 별 그래프를 생성합니다. grid_2d_graph(m, n)은 m×n 격자 그래프를 만듭니다.'\r
+  - type: text\r
+    content: '**내장 네트워크 데이터셋**은 실제 연구에 사용된 유명한 네트워크들입니다. karate_club_graph()는 1977년 Wayne Zachary가 수집한\r
+      대학 가라테 클럽 회원 34명의 친분 관계로, 네트워크 과학 논문에서 가장 많이 인용되는 데이터입니다. les_miserables_graph()는 소설 레미제라블에서 같은\r
+      장에 등장하는 인물 77명의 공동 출현 네트워크입니다. florentine_families_graph()는 15세기 피렌체의 15개 명문 가문 간 결혼 및 사업 관계입니다.'\r
+  - type: text\r
+    content: '**랜덤 그래프 생성 함수**들은 특정 확률 모델에 따라 그래프를 생성합니다. erdos_renyi_graph(n, p)는 n개 노드 중 각 노드 쌍이 확률\r
+      p로 연결되는 가장 기본적인 랜덤 그래프입니다. barabasi_albert_graph(n, m)은 ''부익부'' 현상으로 허브가 생기는 척도 없는 네트워크를 생성합니다.\r
+      watts_strogatz_graph(n, k, p)는 높은 클러스터링과 짧은 평균 경로를 가진 ''작은 세상'' 네트워크를 생성합니다.'\r
+  - type: tip\r
+    content: 데이터 로딩 코드 없이 바로 분석을 시작할 수 있어서 학습에 집중할 수 있습니다. 나중에 실전 프로젝트에서 외부 데이터를 사용할 때는 nx.from_pandas_edgelist()나\r
+      nx.read_edgelist() 등으로 데이터프레임이나 파일에서 그래프를 생성할 수 있습니다.\r
+  goal: 데이터셋 불필요에서 관계 데이터을 바꿨을 때 노드/엣지와 지표 값가 어떻게 달라지는지 확인한다.\r
+  why: 그래프 분석은 사람, 장소, 시스템 사이의 관계와 흐름을 수치로 확인합니다.\r
+- id: workflow_validation\r
+  title: 업무 흐름 검증\r
+  structuredPrimary: true\r
+  subtitle: 인수인계 네트워크\r
+  goal: 업무 흐름 검증에서 그래프 알고리즘 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.\r
+  explanation: 실무 네트워크 분석은 그래프를 그리는 데서 끝나지 않습니다. 먼저 병목 후보를 예측하고, 로컬 Python에서 실행한 뒤, 잘못된 노드나 끊어진 경로를 예외로\r
+    처리하고, 핵심 지표를 assert로 검증해야 합니다. 아래 흐름은 영업, 지원, 운영, 재무, 엔지니어링 사이의 인수인계 비용을 네트워크로 보고 개선안을 비교합니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    import networkx as nx\r
+\r
+    handoffEdges = [\r
+        ("sales", "support", 1),\r
+        ("support", "ops", 2),\r
+        ("ops", "finance", 1),\r
+        ("ops", "engineering", 1),\r
+        ("engineering", "infra", 2),\r
+        ("support", "customer_success", 2),\r
+    ]\r
+\r
+    workflowGraph = nx.Graph()\r
+    workflowGraph.add_weighted_edges_from(handoffEdges)\r
+\r
+    expectedNodes = {"sales", "support", "ops", "finance", "engineering", "infra", "customer_success"}\r
+    if set(workflowGraph.nodes()) != expectedNodes:\r
+        raise ValueError("인수인계 네트워크의 부서 목록이 예상과 다릅니다.")\r
+    if any(data["weight"] <= 0 for _, _, data in workflowGraph.edges(data=True)):\r
+        raise ValueError("인수인계 비용은 0보다 커야 합니다.")\r
+\r
+    salesToFinanceCost = nx.shortest_path_length(workflowGraph, "sales", "finance", weight="weight")\r
+    betweenness = nx.betweenness_centrality(workflowGraph, weight="weight")\r
+\r
+    workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()\r
+  exercise:\r
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      experimentGraph = workflowGraph.copy()\r
+      experimentGraph.add_edge("sales", "finance", weight=2)\r
+\r
+      improvedCost = nx.shortest_path_length(experimentGraph, "sales", "finance", weight="weight")\r
+      improvedBetweenness = nx.betweenness_centrality(experimentGraph, weight="weight")\r
+      improvement = salesToFinanceCost - improvedCost\r
+\r
+      assert improvement > 0\r
+      {\r
+          "beforeCost": salesToFinanceCost,\r
+          "afterCost": improvedCost,\r
+          "costImprovement": improvement,\r
+          "opsBetweennessBefore": round(betweenness["ops"], 3),\r
+          "opsBetweennessAfter": round(improvedBetweenness["ops"], 3),\r
+      }\r
+    solution: |-\r
+      import networkx as nx\r
+\r
+      handoffEdges = [\r
+          ("sales", "support", 1),\r
+          ("support", "ops", 2),\r
+          ("ops", "finance", 1),\r
+          ("ops", "engineering", 1),\r
+          ("engineering", "infra", 2),\r
+          ("support", "customer_success", 2),\r
+      ]\r
+\r
+      workflowGraph = nx.Graph()\r
+      workflowGraph.add_weighted_edges_from(handoffEdges)\r
+\r
+      expectedNodes = {"sales", "support", "ops", "finance", "engineering", "infra", "customer_success"}\r
+      if set(workflowGraph.nodes()) != expectedNodes:\r
+          raise ValueError("인수인계 네트워크의 부서 목록이 예상과 다릅니다.")\r
+      if any(data["weight"] <= 0 for _, _, data in workflowGraph.edges(data=True)):\r
+          raise ValueError("인수인계 비용은 0보다 커야 합니다.")\r
+\r
+      workflowGraph.number_of_nodes(), workflowGraph.number_of_edges()\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    noError: 업무 흐름 검증에서 \`experimentGraph\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.\r
+`;export{e as default};

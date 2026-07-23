@@ -399,3 +399,328 @@ sections:
     type: noError
     noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 17_sorting_algorithms-dispatch-priority-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - insertion_sort
+    - merge_sort
+    - python_sort
+    - workflow_validation
+    title: 주문 처리 우선순위를 안정 정렬로 만들기
+    subtitle: stable business sorting
+    goal: prioritize_orders(orders)를 완성해 SLA가 낮은 주문, 생성 시간이 빠른 주문, 금액이 큰 주문 순서로 정렬한 요약을 반환한다.
+    why: 실무 정렬은 숫자를 오름차순으로 놓는 연습보다, 여러 기준을 안정적으로 적용해 업무 순서를 설명 가능하게 만드는 일이 더 많습니다.
+    explanation: 각 주문은 id, sla, createdAt, amount를 가집니다. sla는 낮을수록 급하고, createdAt은 HH:MM 문자열로 비교하며, 같은 시간에서는 amount가 큰 주문을
+      먼저 처리하세요.
+    tips:
+    - sorted의 key에 튜플을 넘기면 여러 기준을 한 번에 표현할 수 있습니다.
+    - 내림차순 기준은 숫자 부호를 바꾸면 key 안에서 같이 다룰 수 있습니다.
+    exercise:
+      prompt: prioritize_orders(orders)를 완성해 정렬된 주문 id 목록과 첫 주문, 전체 개수를 반환하세요.
+      starterCode: |-
+        def prioritize_orders(orders):
+            raise NotImplementedError
+      solution: |-
+        def prioritize_orders(orders):
+            ordered = sorted(
+                orders,
+                key=lambda order: (
+                    order["sla"],
+                    order["createdAt"],
+                    -order.get("amount", 0),
+                    order["id"],
+                ),
+            )
+            return {
+                "orderedIds": [order["id"] for order in ordered],
+                "first": ordered[0]["id"] if ordered else None,
+                "count": len(ordered),
+            }
+      hints:
+      - 필요한 key가 빠지면 KeyError가 나야 잘못된 데이터를 조용히 넘기지 않습니다.
+      - amount만 내림차순이면 -amount를 key에 넣을 수 있습니다.
+    check:
+      id: python.advanced.sorting-orders.priority.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.sorting-orders.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prioritize_orders
+        cases:
+        - id: sorts-by-sla-created-time-and-amount
+          arguments:
+          - value:
+            - id: O-3
+              sla: 2
+              createdAt: 09:20
+              amount: 80000
+            - id: O-1
+              sla: 1
+              createdAt: 09:00
+              amount: 30000
+            - id: O-2
+              sla: 2
+              createdAt: 09:05
+              amount: 120000
+            - id: O-4
+              sla: 1
+              createdAt: 09:10
+              amount: 40000
+          expectedReturn:
+            orderedIds:
+            - O-1
+            - O-4
+            - O-2
+            - O-3
+            first: O-1
+            count: 4
+        - id: rejects-missing-created-time
+          arguments:
+          - value:
+            - id: O-5
+              sla: 1
+              amount: 100
+          expectedException: KeyError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 17_sorting_algorithms-merge-runs-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - merge_sort
+    - quick_sort
+    - python_sort
+    title: 이미 정렬된 두 묶음을 병합하기
+    subtitle: merge sorted runs transfer
+    goal: merge_sorted_runs(left, right)를 완성해 두 정렬 리스트를 병합하고 각 원소가 어느 쪽에서 왔는지 기록한다.
+    why: 정렬 알고리즘을 이해했다면 sorted를 쓰는 상황과, 이미 정렬된 스트림을 추가 비용 없이 병합해야 하는 상황을 구분할 수 있어야 합니다.
+    explanation: left와 right는 오름차순이어야 합니다. 정렬되지 않은 입력은 ValueError로 거부하고, 같은 값은 left 값을 먼저 가져와 안정성을 유지하세요.
+    tips:
+    - 두 포인터 i, j를 움직이면 전체를 다시 정렬하지 않고 병합할 수 있습니다.
+    - 입력이 이미 정렬됐는지 먼저 확인하면 실패 원인을 빠르게 설명할 수 있습니다.
+    exercise:
+      prompt: merge_sorted_runs(left, right)를 완성해 merged, sourcePattern, fromLeft를 반환하세요.
+      starterCode: |-
+        def merge_sorted_runs(left, right):
+            raise NotImplementedError
+      solution: |-
+        def merge_sorted_runs(left, right):
+            def is_sorted(values):
+                return all(values[index] <= values[index + 1] for index in range(len(values) - 1))
+
+            if not is_sorted(left) or not is_sorted(right):
+                raise ValueError("both runs must already be sorted")
+
+            merged = []
+            source = []
+            i = 0
+            j = 0
+            while i < len(left) and j < len(right):
+                if left[i] <= right[j]:
+                    merged.append(left[i])
+                    source.append("L")
+                    i += 1
+                else:
+                    merged.append(right[j])
+                    source.append("R")
+                    j += 1
+            while i < len(left):
+                merged.append(left[i])
+                source.append("L")
+                i += 1
+            while j < len(right):
+                merged.append(right[j])
+                source.append("R")
+                j += 1
+            return {
+                "merged": merged,
+                "sourcePattern": "".join(source),
+                "fromLeft": source.count("L"),
+            }
+      hints:
+      - 같은 값에서 left를 먼저 가져오면 안정 병합이 됩니다.
+      - 병합 뒤 남은 한쪽 리스트도 모두 결과에 붙여야 합니다.
+    check:
+      id: python.advanced.sorting-orders.merge-runs.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.sorting-orders.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: merge_sorted_runs
+        cases:
+        - id: merges-and-records-source-side
+          arguments:
+          - value:
+            - 1
+            - 4
+            - 4
+          - value:
+            - 2
+            - 3
+            - 5
+          expectedReturn:
+            merged:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 4
+            - 5
+            sourcePattern: LRRLLR
+            fromLeft: 3
+        - id: rejects-unsorted-left-run
+          arguments:
+          - value:
+            - 3
+            - 1
+          - value:
+            - 2
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 17_sorting_algorithms-tool-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 17_sorting_algorithms-merge-runs-transfer
+    title: 정렬 알고리즘과 내장 정렬 선택 기준 회상하기
+    subtitle: sorting strategy recall
+    goal: choose_sorting_tool(goal)를 완성해 상황별 정렬 선택과 이유를 반환한다.
+    why: 좋은 학습자는 버블 정렬 코드를 기억하는 데서 멈추지 않고, 데이터 크기, 안정성, 이미 정렬된 정도, 내장 도구의 장점을 보고 선택합니다.
+    explanation: business-priority, teaching-small-array, nearly-sorted, merge-large-runs, in-place-average 목적별로 적절한 선택을 반환하세요.
+    tips:
+    - 실무 복합 기준 정렬은 대부분 sorted와 key 함수가 가장 안전합니다.
+    - 삽입 정렬은 거의 정렬된 작은 데이터에서 설명 가치가 큽니다.
+    exercise:
+      prompt: choose_sorting_tool(goal)를 완성해 tool, stable, useWhen을 반환하세요.
+      starterCode: |-
+        def choose_sorting_tool(goal):
+            raise NotImplementedError
+      solution: |-
+        def choose_sorting_tool(goal):
+            table = {
+                "business-priority": {
+                    "tool": "sorted-key",
+                    "stable": True,
+                    "useWhen": "records need multiple readable business ordering rules",
+                },
+                "teaching-small-array": {
+                    "tool": "bubble-or-selection",
+                    "stable": False,
+                    "useWhen": "the goal is to expose comparison and swap mechanics",
+                },
+                "nearly-sorted": {
+                    "tool": "insertion-sort",
+                    "stable": True,
+                    "useWhen": "most items are already close to the final position",
+                },
+                "merge-large-runs": {
+                    "tool": "merge-sort",
+                    "stable": True,
+                    "useWhen": "two or more sorted runs must be combined predictably",
+                },
+                "in-place-average": {
+                    "tool": "quick-sort",
+                    "stable": False,
+                    "useWhen": "average performance matters and stability is not required",
+                },
+            }
+            if goal not in table:
+                raise ValueError("unknown sorting goal")
+            return table[goal]
+      hints:
+      - stable은 같은 key의 상대 순서가 유지되는지 묻는 기준입니다.
+      - 내장 sorted는 안정 정렬이며 key 함수로 실무 조건을 표현하기 좋습니다.
+    check:
+      id: python.advanced.sorting-orders.tool-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.sorting-orders.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_sorting_tool
+        cases:
+        - id: recalls-sorted-key-for-business-priority
+          arguments:
+          - value: business-priority
+          expectedReturn:
+            tool: sorted-key
+            stable: true
+            useWhen: records need multiple readable business ordering rules
+        - id: recalls-merge-sort-for-runs
+          arguments:
+          - value: merge-large-runs
+          expectedReturn:
+            tool: merge-sort
+            stable: true
+            useWhen: two or more sorted runs must be combined predictably
+        - id: rejects-unknown-goal
+          arguments:
+          - value: random-shuffle
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

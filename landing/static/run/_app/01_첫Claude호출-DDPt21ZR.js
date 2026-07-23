@@ -1,0 +1,557 @@
+var e=`meta:\r
+  packages:\r
+  - anthropic\r
+  id: llmBasics_01\r
+  title: 첫Claude호출\r
+  order: 1\r
+  category: llmBasics\r
+  difficulty: ⭐\r
+  badge: 입문\r
+  tags:\r
+  - anthropic\r
+  - claude\r
+  - messages_api\r
+  - sdk\r
+  - 첫호출\r
+  seo:\r
+    title: anthropic SDK로 Claude 첫 호출 - Messages API 입문\r
+    description: anthropic.Anthropic 클라이언트로 Claude를 처음 호출하고 응답에서 텍스트를 꺼내는 표준 흐름을 만듭니다.\r
+    keywords:\r
+    - anthropic SDK\r
+    - Claude API\r
+    - Messages API\r
+    - claude-haiku-4-5\r
+intro:\r
+  emoji: 🚀\r
+  goal: anthropic SDK로 Claude를 한 번 호출하고 응답에서 텍스트를 꺼내본다.\r
+  description: 클라이언트 초기화 → messages.create 호출 → 응답 객체 파싱이라는 LLM 호출의 기본 흐름을 손에 익힙니다.\r
+  direction: Anthropic 클라이언트 생성, model/max_tokens/messages 인자 구성, content 블록에서 텍스트 추출까지 한 번의 호출 흐름을 완성한다.\r
+  benefits:\r
+  - anthropic 패키지 준비와 ANTHROPIC_API_KEY 환경변수 흐름을 분명히 한다.
+  - Messages API의 필수 인자(model, max_tokens, messages) 셋을 정확한 형태로 기억한다.\r
+  - 응답 객체의 content 블록 구조를 직접 확인하고 텍스트를 안전하게 꺼낸다.\r
+  - 토큰 사용량(usage)을 첫 호출부터 보는 습관을 만든다.\r
+  diagram:\r
+    steps:\r
+    - label: 1단계. 클라이언트 만들기\r
+      detail: anthropic.Anthropic 인스턴스를 생성하고 API 키 로드를 확인한다.\r
+    - label: 2단계. messages.create 호출\r
+      detail: model, max_tokens, messages 세 인자로 한 줄짜리 질문을 보낸다.\r
+    - label: 3단계. 응답 파싱\r
+      detail: response.content[0].text와 response.usage를 꺼내본다.\r
+    - label: 4단계. 모델·토큰 인자 변주\r
+      detail: max_tokens를 줄이거나 messages 내용을 바꿔 응답이 달라지는지 확인한다.\r
+    runtime:\r
+    - label: LLM 호출 환경\r
+      detail: anthropic 패키지와 ANTHROPIC_API_KEY가 준비된 로컬 Python에서 실행한다.\r
+    - label: 첫Claude호출 실행\r
+      detail: 셀을 순서대로 실행해 응답 객체와 usage를 확인한다.\r
+    - label: 첫Claude호출 완료\r
+      detail: 다음 강의의 시스템 프롬프트 추가에 필요한 호출 패턴을 손에 익혔다.\r
+sections:\r
+- id: package_and_key
+  title: 1단계. 패키지 준비와 API 키 확인
+  structuredPrimary: true
+  subtitle: anthropic 패키지와 ANTHROPIC_API_KEY
+  goal: anthropic 패키지가 준비되어 있고 ANTHROPIC_API_KEY 환경변수가 잡혀 있는지 코드로 확인한다.
+  why: 패키지나 키 둘 중 하나만 빠져도 이후 호출이 인증 실패로 멈춥니다. 첫 줄에서 사전 점검 한 번을 코드로 박아두면 시간이 절약됩니다.\r
+  explanation: anthropic 패키지는 Claude API와 통신하는 공식 Python SDK입니다. 강의의 packages 메타와 라이브러리 패널이 현재 Python 환경에
+    준비합니다. ANTHROPIC_API_KEY는 console.anthropic.com에서 발급받은 키를 환경변수로 등록한 값입니다. import anthropic이 성공하고 os.environ에
+    키가 존재하면 호출 준비가 끝난 것입니다.\r
+  tips:\r
+  - API 키 자체를 코드로 출력하지 말고 길이만 확인합니다. 노트북 공유나 git 커밋 사고를 막아줍니다.\r
+  snippet: |-\r
+    import os\r
+    import anthropic\r
+\r
+    hasKey = bool(os.environ.get("ANTHROPIC_API_KEY"))\r
+    sdkVersion = anthropic.__version__\r
+    (hasKey, sdkVersion)\r
+  exercise:\r
+    prompt: hasKey 대신 ANTHROPIC_API_KEY 길이를 함께 출력해 키가 비어 있지 않은지 확인하세요. 키 값 자체는 출력하지 마세요.\r
+    starterCode: |-\r
+      import os\r
+      import anthropic\r
+\r
+      hasKey = bool(os.environ.get("ANTHROPIC_API_KEY"))\r
+      sdkVersion = anthropic.__version__\r
+      (hasKey, sdkVersion)\r
+    hints:\r
+    - os.environ.get("ANTHROPIC_API_KEY", "")의 길이를 len으로 측정합니다.\r
+    - 키 값을 절대 그대로 표현식 결과로 두지 마세요.\r
+  check:\r
+    noError: import anthropic과 os.environ 접근이 ImportError, KeyError 없이 실행되어야 합니다.\r
+    resultCheck: hasKey가 True이고 sdkVersion이 문자열 형태로 반환되어야 합니다.\r
+- id: client_create\r
+  title: 2단계. Anthropic 클라이언트 만들기\r
+  structuredPrimary: true\r
+  subtitle: anthropic.Anthropic()\r
+  goal: anthropic.Anthropic() 호출 한 줄로 클라이언트 인스턴스를 만든다.\r
+  why: 모든 호출은 클라이언트 객체에서 시작합니다. 클라이언트는 API 키, HTTP 세션, 기본 설정을 묶어 보관합니다.\r
+  explanation: anthropic.Anthropic 클래스는 SDK의 진입점입니다. 인자 없이 호출하면 환경변수 ANTHROPIC_API_KEY를 자동으로 읽고, api_key="..." 인자를\r
+    명시하면 코드 안에서 직접 전달도 가능합니다. 환경변수 방식이 비밀 관리 측면에서 안전합니다. 클라이언트는 스레드 안전하므로 한 프로세스에서 하나만 만들어 재사용해도 됩니다.\r
+  tips:\r
+  - 클라이언트 변수명은 client로 통일합니다. 이후 강의 코드와 자연스럽게 이어집니다.\r
+  snippet: |-\r
+    import anthropic\r
+\r
+    client = anthropic.Anthropic()\r
+    type(client).__name__\r
+  exercise:\r
+    prompt: type(client).__name__ 대신 client 객체를 직접 출력해 어떤 정보가 보이는지 확인하세요.\r
+    starterCode: |-\r
+      import anthropic\r
+\r
+      client = anthropic.Anthropic()\r
+      type(client).__name__\r
+    hints:\r
+    - Anthropic 객체는 repr이 짧게 정의되어 클래스명만 보이거나 메서드 안내가 보일 수 있습니다.\r
+    - client.messages 처럼 점 표기법으로 하위 자원을 노출합니다.\r
+  check:\r
+    noError: anthropic.Anthropic() 호출이 인증 예외 없이 끝까지 완료되어야 합니다.\r
+    resultCheck: 결과가 "Anthropic" 같은 클래스명 문자열 또는 동등한 표현이어야 합니다.\r
+- id: first_call\r
+  title: 3단계. messages.create로 첫 호출\r
+  structuredPrimary: true\r
+  subtitle: model, max_tokens, messages 세 인자\r
+  goal: client.messages.create에 model, max_tokens, messages 세 인자만 넘겨 첫 응답을 받는다.\r
+  why: Messages API의 모든 호출은 이 셋을 기본으로 합니다. 다른 인자(system, tools, stream)는 이 위에 얹는 형태로 늘어납니다.\r
+  explanation: model은 사용할 Claude 모델 ID를 문자열로 지정합니다. claude-haiku-4-5는 빠르고 저렴해 학습에 적합합니다. max_tokens는 응답에서\r
+    생성할 최대 토큰 수로, 너무 크게 잡으면 비용이 늘고 너무 작으면 응답이 잘립니다. messages는 사용자/모델의 대화 기록 리스트이며, 입문 단계에서는 user 한 줄만 넣습니다.\r
+  tips:\r
+  - max_tokens는 응답 길이의 상한입니다. 학습용 호출은 256~512로 시작하면 비용과 시간을 모두 통제할 수 있습니다.\r
+  snippet: |-\r
+    import anthropic\r
+\r
+    client = anthropic.Anthropic()\r
+    response = client.messages.create(\r
+        model="claude-haiku-4-5",\r
+        max_tokens=256,\r
+        messages=[\r
+            {"role": "user", "content": "한 문장으로 인사해 주세요."},\r
+        ],\r
+    )\r
+    response.stop_reason\r
+  exercise:\r
+    prompt: max_tokens를 16으로 줄여 응답이 stop_reason="max_tokens"로 끊기는지 확인하세요.\r
+    starterCode: |-\r
+      import anthropic\r
+\r
+      client = anthropic.Anthropic()\r
+      response = client.messages.create(\r
+          model="claude-haiku-4-5",\r
+          max_tokens=256,\r
+          messages=[\r
+              {"role": "user", "content": "한 문장으로 인사해 주세요."},\r
+          ],\r
+      )\r
+      response.stop_reason\r
+    hints:\r
+    - 정상 종료는 stop_reason이 "end_turn"입니다.\r
+    - 토큰 한도로 끊기면 stop_reason이 "max_tokens"가 됩니다.\r
+  check:\r
+    noError: messages.create 호출이 인증·요청 예외 없이 끝까지 완료되어야 합니다.\r
+    resultCheck: stop_reason이 "end_turn" 또는 "max_tokens" 등 SDK 정의값이어야 합니다.\r
+- id: parse_text\r
+  title: 4단계. 응답 텍스트 꺼내기\r
+  structuredPrimary: true\r
+  subtitle: response.content[0].text\r
+  goal: response.content 리스트의 첫 블록에서 text 속성을 꺼내 사용자에게 보여줄 텍스트를 얻는다.\r
+  why: API 응답은 텍스트 한 줄이 아니라 ContentBlock 리스트입니다. 구조를 정확히 알면 도구 사용·이미지 응답 같은 확장 기능을 그대로 받아들일 수 있습니다.\r
+  explanation: response.content는 ContentBlock 인스턴스 리스트입니다. 일반 텍스트 응답은 첫 블록이 TextBlock이며, 이 객체의 .text 속성에 응답\r
+    문자열이 담깁니다. 도구 사용이 끼면 ToolUseBlock 같은 다른 타입이 섞이므로 실전 코드에서는 type 필드를 확인해 안전하게 분기하는 패턴을 씁니다.\r
+  tips:\r
+  - block.type == "text"인 블록만 골라 text를 모으면 도구 응답이 섞여도 안전합니다.\r
+  snippet: |-\r
+    import anthropic\r
+\r
+    client = anthropic.Anthropic()\r
+    response = client.messages.create(\r
+        model="claude-haiku-4-5",\r
+        max_tokens=256,\r
+        messages=[{"role": "user", "content": "Python의 list comprehension을 한 문장으로 설명해 주세요."}],\r
+    )\r
+    answer = "".join(block.text for block in response.content if block.type == "text")\r
+    answer\r
+  exercise:\r
+    prompt: 메시지 내용을 다른 질문으로 바꾸고 answer 문자열이 다른 응답으로 갱신되는지 확인하세요.\r
+    starterCode: |-\r
+      import anthropic\r
+\r
+      client = anthropic.Anthropic()\r
+      response = client.messages.create(\r
+          model="claude-haiku-4-5",\r
+          max_tokens=256,\r
+          messages=[{"role": "user", "content": "Python의 list comprehension을 한 문장으로 설명해 주세요."}],\r
+      )\r
+      answer = "".join(block.text for block in response.content if block.type == "text")\r
+      answer\r
+    hints:\r
+    - 모델 응답은 결정론적이지 않아 같은 질문에도 표현이 살짝 달라질 수 있습니다.\r
+    - join 호출은 여러 텍스트 블록이 있을 때도 안전하게 합쳐줍니다.\r
+  check:\r
+    noError: response.content 순회와 block.text 접근이 AttributeError 없이 실행되어야 합니다.\r
+    resultCheck: answer가 비어있지 않은 문자열이어야 합니다.\r
+- id: inspect_usage\r
+  title: 5단계. 토큰 사용량 확인\r
+  structuredPrimary: true\r
+  subtitle: response.usage\r
+  goal: response.usage.input_tokens와 output_tokens를 꺼내 호출이 소비한 토큰을 본다.\r
+  why: 비용은 토큰으로 계산되므로 첫 호출부터 usage를 보는 습관이 있으면 실험이 비용 가시성과 함께 늘어납니다.\r
+  explanation: response.usage는 입력 토큰(input_tokens)과 출력 토큰(output_tokens) 두 값을 담은 객체입니다. 캐싱이나 도구 사용이 끼면\r
+    cache_creation_input_tokens, cache_read_input_tokens 같은 추가 필드가 따라옵니다. 4번 강의에서 비용 추정 함수를 만들 때 이 객체를 직접\r
+    사용하게 됩니다.\r
+  tips:\r
+  - input_tokens + output_tokens 합을 한눈에 보면 호출 비용 직감이 생깁니다.\r
+  snippet: |-\r
+    import anthropic\r
+\r
+    client = anthropic.Anthropic()\r
+    response = client.messages.create(\r
+        model="claude-haiku-4-5",\r
+        max_tokens=128,\r
+        messages=[{"role": "user", "content": "1+1의 결과만 숫자로 알려줘."}],\r
+    )\r
+    usage = response.usage\r
+    (usage.input_tokens, usage.output_tokens)\r
+  exercise:\r
+    prompt: 같은 호출을 두 번 반복해 input_tokens가 같은지, output_tokens는 응답에 따라 약간 달라지는지 비교하세요.\r
+    starterCode: |-\r
+      import anthropic\r
+\r
+      client = anthropic.Anthropic()\r
+      response = client.messages.create(\r
+          model="claude-haiku-4-5",\r
+          max_tokens=128,\r
+          messages=[{"role": "user", "content": "1+1의 결과만 숫자로 알려줘."}],\r
+      )\r
+      usage = response.usage\r
+      (usage.input_tokens, usage.output_tokens)\r
+    hints:\r
+    - 입력 토큰은 시스템·user 메시지가 같다면 동일합니다.\r
+    - 출력 토큰은 모델 응답 길이에 따라 호출마다 살짝 달라집니다.\r
+  check:\r
+    noError: response.usage 접근이 AttributeError 없이 실행되어야 합니다.\r
+    resultCheck: 두 값이 모두 양의 정수여야 합니다.\r
+- id: workflow_validation\r
+  title: '현업 흐름 검증: 호출 한 번을 함수로 묶기'\r
+  structuredPrimary: true\r
+  subtitle: 예측 → 호출 → 응답 검증 → 함수화\r
+  goal: 한 번의 호출을 askClaude(question, model) 함수로 묶고 assert로 결과 모양을 고정한다.\r
+  why: 자동화 흐름은 항상 함수 한 개로 시작합니다. 함수가 응답 텍스트와 usage를 함께 돌려주도록 만들어 두면 이후 모든 강의에서 재사용할 수 있습니다.\r
+  explanation: 입력은 질문 문자열과 모델 이름, 출력은 텍스트와 usage 튜플로 만듭니다. 응답이 비어 있거나 stop_reason이 예상과 달라도 함수가 깨지지 않도록 텍스트는\r
+    join으로, usage는 객체 그대로 돌려줍니다. 실전에서는 이 함수를 모듈에 두고 자동화 파이프라인의 다른 단계에서 호출합니다.\r
+  tips:\r
+  - 함수 입력으로 model을 받게 만들어 두면 다른 모델로 비교 실험할 때 코드 변경이 적습니다.\r
+  snippet: |-\r
+    import anthropic\r
+\r
+    def askClaude(question: str, model: str = "claude-haiku-4-5") -> tuple[str, object]:\r
+        agent = anthropic.Anthropic()\r
+        result = agent.messages.create(\r
+            model=model,\r
+            max_tokens=256,\r
+            messages=[{"role": "user", "content": question}],\r
+        )\r
+        text = "".join(block.text for block in result.content if block.type == "text")\r
+        return text, result.usage\r
+\r
+    answer, usage = askClaude("파이썬에서 None은 무엇인가요? 한 문장으로 답해주세요.")\r
+    assert isinstance(answer, str) and len(answer) > 0\r
+    assert usage.input_tokens > 0\r
+    assert usage.output_tokens > 0\r
+    (answer[:40], usage.input_tokens, usage.output_tokens)\r
+  exercise:\r
+    prompt: askClaude 함수에 max_tokens 인자를 추가하고 기본값을 256으로 두세요. 호출 시 다른 값을 넘겨 응답 길이가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      import anthropic\r
+\r
+      def askClaude(question: str, model: str = "claude-haiku-4-5") -> tuple[str, object]:\r
+          agent = anthropic.Anthropic()\r
+          result = agent.messages.create(\r
+              model=model,\r
+              max_tokens=256,\r
+              messages=[{"role": "user", "content": question}],\r
+          )\r
+          text = "".join(block.text for block in result.content if block.type == "text")\r
+          return text, result.usage\r
+\r
+      answer, usage = askClaude("파이썬에서 None은 무엇인가요? 한 문장으로 답해주세요.")\r
+      assert isinstance(answer, str) and len(answer) > 0\r
+      assert usage.input_tokens > 0\r
+      assert usage.output_tokens > 0\r
+      (answer[:40], usage.input_tokens, usage.output_tokens)\r
+    hints:\r
+    - def askClaude(question, model=..., maxTokens=256) 형태로 인자를 추가합니다.\r
+    - max_tokens=maxTokens로 API 호출에 전달합니다.\r
+  check:
+    noError: 함수 정의와 호출, assert가 모두 통과해야 합니다.
+    resultCheck: 반환된 answer가 비어있지 않고 두 토큰 값이 모두 양수여야 합니다.
+assessment:
+  masteryVariants:
+  - id: 01_first_llm_call-response-parser-mastery
+    mode: mastery
+    unseen: false
+    sourceSectionIds:
+    - first_call
+    - parse_text
+    - inspect_usage
+    title: fake 응답에서 텍스트와 usage 꺼내기
+    subtitle: response parsing contract
+    goal: parse_message_response(response)를 완성해 text block을 합치고 usage 토큰을 dict로 반환한다.
+    why: 첫 호출의 학습 목표는 네트워크 성공이 아니라, 응답 객체에서 필요한 텍스트와 비용 추적용 usage를 안정적으로 꺼내는 계약입니다.
+    explanation: response는 content block 목록과 usage dict를 가진다고 가정합니다. type이 text인 block만 이어 붙이고 usage의 input_tokens와 output_tokens를 반환하세요.
+    tips:
+    - text block이 없으면 ValueError로 거부하세요.
+    - usage 숫자는 이후 비용 계산 레슨의 입력이 됩니다.
+    exercise:
+      prompt: parse_message_response(response)를 완성해 text와 usage를 반환하세요.
+      starterCode: |-
+        def parse_message_response(response):
+            raise NotImplementedError
+      solution: |-
+        def parse_message_response(response):
+            parts = [
+                block["text"]
+                for block in response.get("content", [])
+                if block.get("type") == "text"
+            ]
+            if not parts:
+                raise ValueError("text block is missing")
+            usage = response["usage"]
+            return {
+                "text": "".join(parts),
+                "usage": {
+                    "input_tokens": usage["input_tokens"],
+                    "output_tokens": usage["output_tokens"],
+                },
+            }
+      hints:
+      - content에는 text가 아닌 block도 섞일 수 있습니다.
+      - response["usage"]가 없으면 KeyError가 나도 괜찮습니다. 잘못된 응답을 숨기지 않는 편이 낫습니다.
+    check:
+      id: python.llm.first-call.response-parser.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.first-call.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: parse_message_response
+        cases:
+        - id: joins-text-blocks-and-keeps-usage
+          arguments:
+          - value:
+              content:
+              - type: text
+                text: Hello
+              - type: tool_use
+                name: lookup
+              - type: text
+                text: " world"
+              usage:
+                input_tokens: 12
+                output_tokens: 5
+          expectedReturn:
+            text: Hello world
+            usage:
+              input_tokens: 12
+              output_tokens: 5
+        - id: rejects-response-without-text
+          arguments:
+          - value:
+              content: []
+              usage:
+                input_tokens: 1
+                output_tokens: 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: 01_first_llm_call-request-builder-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - package_and_key
+    - client_create
+    - workflow_validation
+    title: 첫 호출 request payload 만들기
+    subtitle: message request builder
+    goal: build_message_request(question, model, max_tokens)를 완성해 messages.create에 넘길 dict를 만든다.
+    why: 실제 호출을 하기 전에도 요청 payload를 순수 데이터로 만들 수 있어야 웹에서 학습하고 검증할 수 있습니다.
+    explanation: question은 빈 문자열이면 ValueError입니다. messages에는 user role 한 개를 넣고 max_tokens는 양수여야 합니다.
+    tips:
+    - payload를 dict로 만들면 실제 클라이언트 호출 없이도 테스트할 수 있습니다.
+    - max_tokens가 0 이하이면 API 호출 전에 막아야 합니다.
+    exercise:
+      prompt: build_message_request(question, model, max_tokens)를 완성해 호출 payload를 반환하세요.
+      starterCode: |-
+        def build_message_request(question, model="claude-haiku-4-5", max_tokens=256):
+            raise NotImplementedError
+      solution: |-
+        def build_message_request(question, model="claude-haiku-4-5", max_tokens=256):
+            if not question.strip():
+                raise ValueError("question must not be empty")
+            if max_tokens <= 0:
+                raise ValueError("max_tokens must be positive")
+            return {
+                "model": model,
+                "max_tokens": max_tokens,
+                "messages": [{"role": "user", "content": question}],
+            }
+      hints:
+      - question.strip()으로 공백만 있는 질문을 막을 수 있습니다.
+      - 반환 dict key는 실제 호출 key와 같은 이름을 유지하세요.
+    check:
+      id: python.llm.first-call.request-builder.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.first-call.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_message_request
+        cases:
+        - id: builds-single-user-message-request
+          arguments:
+          - value: 파이썬 None을 한 문장으로 설명해줘
+          - value: claude-haiku-4-5
+          - value: 128
+          expectedReturn:
+            model: claude-haiku-4-5
+            max_tokens: 128
+            messages:
+            - role: user
+              content: 파이썬 None을 한 문장으로 설명해줘
+        - id: rejects-empty-question
+          arguments:
+          - value: "   "
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: 01_first_llm_call-step-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - package_and_key
+    - client_create
+    - first_call
+    - parse_text
+    - inspect_usage
+    title: 첫 호출 구성 요소 회상하기
+    subtitle: first call recall
+    goal: choose_first_call_step(goal)를 완성해 첫 호출 단계별 핵심 확인 항목을 반환한다.
+    why: 시간이 지나도 남아야 할 지식은 예제 한 줄이 아니라, 키 확인, 클라이언트 생성, payload, text parsing, usage 확인의 순서입니다.
+    explanation: credentials, client, payload, text, usage 목표별 확인 항목을 반환하세요.
+    tips:
+    - 키 값 자체는 절대 출력하지 않습니다.
+    - usage는 비용과 한도 추적의 입력입니다.
+    exercise:
+      prompt: choose_first_call_step(goal)를 완성해 step, check, risk를 반환하세요.
+      starterCode: |-
+        def choose_first_call_step(goal):
+            raise NotImplementedError
+      solution: |-
+        def choose_first_call_step(goal):
+            table = {
+                "credentials": {
+                    "step": "environment-check",
+                    "check": "key exists without printing it",
+                    "risk": "secret exposure",
+                },
+                "client": {
+                    "step": "client-create",
+                    "check": "SDK client can be constructed",
+                    "risk": "missing package or key",
+                },
+                "payload": {
+                    "step": "messages-create-arguments",
+                    "check": "model, max_tokens, messages are present",
+                    "risk": "malformed request",
+                },
+                "text": {
+                    "step": "content-parse",
+                    "check": "text blocks are joined",
+                    "risk": "tool blocks mistaken for final text",
+                },
+                "usage": {
+                    "step": "usage-inspect",
+                    "check": "input and output tokens are recorded",
+                    "risk": "invisible cost",
+                },
+            }
+            if goal not in table:
+                raise ValueError("unknown first call goal")
+            return table[goal]
+      hints:
+      - 첫 호출은 네트워크 호출 하나가 아니라 다섯 개의 안전 확인으로 나눠집니다.
+      - text와 usage를 함께 다뤄야 이후 자동화가 안정됩니다.
+    check:
+      id: python.llm.first-call.step-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.first-call.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_first_call_step
+        cases:
+        - id: recalls-payload-required-keys
+          arguments:
+          - value: payload
+          expectedReturn:
+            step: messages-create-arguments
+            check: model, max_tokens, messages are present
+            risk: malformed request
+        - id: recalls-usage-for-cost
+          arguments:
+          - value: usage
+          expectedReturn:
+            step: usage-inspect
+            check: input and output tokens are recorded
+            risk: invisible cost
+        - id: rejects-unknown-goal
+          arguments:
+          - value: lucky-call
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 24
+`;export{e as default};

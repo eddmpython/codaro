@@ -1,0 +1,508 @@
+var e=`meta:\r
+  packages:\r
+  - altair\r
+  - pandas\r
+  id: altair_04\r
+  title: 펭귄서식지분석\r
+  order: 4\r
+  category: altair\r
+  difficulty: ⭐⭐\r
+  badge: 기초\r
+  tags:\r
+  - mark_area\r
+  - layer\r
+  - stack\r
+  - penguins\r
+  seo:\r
+    title: Altair 영역 차트 - 펭귄 서식지 분석\r
+    description: Altair로 영역 차트를 만들고 레이어를 활용합니다. mark_area, layer, 스택 시각화를 배웁니다.\r
+    keywords:\r
+    - altair area\r
+    - mark_area\r
+    - layer\r
+    - stacked chart\r
+intro:\r
+  emoji: 🐧\r
+  goal: 펭귄 3종(Adelie, Chinstrap, Gentoo)의 서식지와 신체 특성을 영역 차트로 분석합니다.\r
+  description: mark_area()로 영역 차트를 만들고, layer(+)로 여러 차트를 겹쳐서 표현합니다.\r
+  direction: 펭귄서식지분석에서 데이터와 인코딩 규칙을 분리해 재사용 가능한 차트를 구성합니다.\r
+  benefits:\r
+  - 정리된 테이블 확인 후 채널 인코딩에 맞는 코드 입력을 고릅니다.\r
+  - 펭귄서식지분석 결과를 스케일과 마크 매핑 기준으로 즉시 점검합니다.\r
+  - 완료한 코드를 선언형 대시보드에 다시 사용할 수 있습니다.\r
+  diagram:\r
+    steps:\r
+    - label: 1단계. 데이터 불러오기 입력 확인\r
+      detail: 입력 기준(정리된 테이블)과 필요한 조건을 먼저 고정합니다.\r
+    - label: 2단계. 기본 영역 차트 처리 실행\r
+      detail: 채널 인코딩 코드를 실행해 중간 결과를 확인합니다.\r
+    - label: 3단계. 스택 영역 차트 결과 검증\r
+      detail: 스케일과 마크 매핑 기준으로 실행 결과를 비교합니다.\r
+    - label: 펭귄서식지분석 재사용\r
+      detail: 완성 코드를 선언형 대시보드에 붙일 수 있게 정리합니다.\r
+    runtime:\r
+    - label: 선언형 차트 환경\r
+      detail: altair, pandas 기준으로 로컬 Python 실행을 준비합니다.\r
+    - label: 펭귄서식지분석 실행\r
+      detail: 셀을 실행해 스케일과 마크 매핑와 예외 상태를 확인합니다.\r
+    - label: 펭귄서식지분석 완료\r
+      detail: 검증된 코드를 선언형 대시보드로 남깁니다.\r
+sections:\r
+- id: step1_load\r
+  title: 1단계. 데이터 불러오기\r
+  structuredPrimary: true\r
+  subtitle: seaborn-data\r
+  goal: 1단계. 데이터 불러오기에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: Codaro 로컬 데이터셋에서 penguins 데이터를 불러옵니다. 남극 3개 섬에 사는 펭귄의 측정 데이터입니다. species(종), island(섬),\r
+    bill_length_mm(부리 길이), bill_depth_mm(부리 깊이), flipper_length_mm(지느러미 길이), body_mass_g(체중), sex(성별)\r
+    컬럼이 있습니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    import altair as alt\r
+    import pandas as pd\r
+    import warnings\r
+    warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')\r
+    from codaro.curriculum.localData import loadLocalDataset\r
+\r
+    penguins = loadLocalDataset("penguins")\r
+  exercise:\r
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      import altair as alt\r
+      import pandas as pd\r
+      import warnings\r
+      warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')\r
+      from codaro.curriculum.localData import loadLocalDataset\r
+\r
+      penguins = loadLocalDataset("penguins")\r
+    hints:\r
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.\r
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.\r
+  check:\r
+    noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.\r
+    resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.\r
+- id: step2_basic_area\r
+  title: 2단계. 기본 영역 차트\r
+  structuredPrimary: true\r
+  subtitle: mark_area()\r
+  goal: 2단계. 기본 영역 차트에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.\r
+  explanation: |-\r
+    mark_area()는 선 아래 영역을 채운 차트를 만듭니다. mark_bar()가 막대를 그리는 것처럼, mark_area()는 영역을 그립니다. 종(species)별 펭귄 수를 영역 차트로 표현합니다. x축에 종, y축에 개수(count())를 배치합니다. 영역 차트는 막대 차트와 비슷하지만 더 부드럽게 보이며, 연속적인 흐름을 표현할 때 유용합니다.\r
+\r
+    mark_area()는 mark_bar()와 비슷하지만 부드러운 곡선으로 영역을 채웁니다. 연속적인 데이터 흐름을 표현할 때 유용합니다.\r
+  snippet: |-\r
+    chartArea = alt.Chart(penguins).mark_area().encode(\r
+        x='species:N',\r
+        y='count()'\r
+    )\r
+    chartArea\r
+  exercise:\r
+    prompt: 2단계. 기본 영역 차트 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      chartArea = alt.Chart(penguins).mark_area().encode(\r
+          x='species:N',\r
+          y='count()'\r
+      )\r
+      chartArea\r
+    hints:\r
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.\r
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.\r
+  check:\r
+    noError: 2단계. 기본 영역 차트의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.\r
+    resultCheck: 2단계. 기본 영역 차트의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.\r
+- id: step3_stacked_area\r
+  title: 3단계. 스택 영역 차트\r
+  structuredPrimary: true\r
+  subtitle: color로 쌓기\r
+  goal: 3단계. 스택 영역 차트에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.\r
+  explanation: |-\r
+    color 인코딩을 추가하면 종별 영역을 구분할 수 있습니다. 로컬 penguins 샘플은 섬마다 한 종만 배치되어 있어 실제 결과는 섬별 단일 색 영역으로 보입니다.\r
+\r
+    Biscoe 섬에는 Gentoo, Dream 섬에는 Chinstrap, Torgersen 섬에는 Adelie 샘플이 들어 있습니다.\r
+  snippet: |-\r
+    chartStacked = alt.Chart(penguins).mark_area().encode(\r
+        x='island:N',\r
+        y='count()',\r
+        color='species:N'\r
+    )\r
+    chartStacked\r
+  exercise:\r
+    prompt: 3단계. 스택 영역 차트 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      chartStacked = alt.Chart(penguins).mark_area().encode(\r
+          x='island:N',\r
+          y='count()',\r
+          color='species:N'\r
+      )\r
+      chartStacked\r
+    hints:\r
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.\r
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.\r
+  check:\r
+    noError: 3단계. 스택 영역 차트의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.\r
+    resultCheck: 3단계. 스택 영역 차트의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.\r
+- id: step4_opacity\r
+  title: 4단계. 투명도 조절\r
+  structuredPrimary: true\r
+  subtitle: opacity 파라미터\r
+  goal: 4단계. 투명도 조절에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.\r
+  explanation: 영역이 겹칠 때 opacity(투명도)를 조절하면 아래 데이터도 볼 수 있습니다. mark_area()에 opacity 파라미터를 추가합니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    chartOpacity = alt.Chart(penguins).mark_area(\r
+        opacity=0.6\r
+    ).encode(\r
+        x='island:N',\r
+        y='count()',\r
+        color='species:N'\r
+    )\r
+    chartOpacity\r
+  exercise:\r
+    prompt: 4단계. 투명도 조절 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      chartOpacity = alt.Chart(penguins).mark_area(\r
+          opacity=0.6\r
+      ).encode(\r
+          x='island:N',\r
+          y='count()',\r
+          color='species:N'\r
+      )\r
+      chartOpacity\r
+    hints:\r
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.\r
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.\r
+  check:\r
+    noError: 4단계. 투명도 조절의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.\r
+    resultCheck: 4단계. 투명도 조절의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.\r
+- id: step5_layer_intro\r
+  title: 5단계. 레이어 개념\r
+  structuredPrimary: true\r
+  subtitle: + 연산자\r
+  goal: 5단계. 레이어 개념에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.\r
+  explanation: |-\r
+    Altair에서 + 연산자로 여러 차트를 겹칠 수 있습니다. 이를 레이어(layer)라고 합니다. 더하기(+) 기호로 차트를 합칩니다. 먼저 scatter라는 변수에 산점도를 만들고, meanLine이라는 변수에 평균선을 만듭니다. 그다음 scatter + meanLine으로 두 차트를 겹칩니다. mark_rule()은 선을 그리는 함수입니다. y만 지정하면 가로선, x만 지정하면 세로선이 됩니다. color='red'로 선 색상을, strokeWidth=2로 선 굵기를 지정합니다.\r
+\r
+    같은 셀 안에서 여러 변수를 만들 수 있습니다. scatter = ... 후 meanLine = ... 후 chartLayer = ...처럼 여러 줄에 걸쳐 변수를 선언합니다. 마지막 줄(chartLayer)이 출력됩니다. 이것은 scatter + meanLine으로 두 차트를 합친 결과입니다.\r
+  tips:\r
+  - 같은 셀 안에서 여러 변수를 만들 수 있습니다. scatter = ... 후 meanLine = ... 후 chartLayer = ...처럼 여러 줄에 걸쳐 변수를 선언합니다.\r
+    마지막 줄(chartLayer)이 출력됩니다. 이것은 scatter + meanLine으로 두 차트를 합친 결과입니다.\r
+  snippet: |-\r
+    scatter = alt.Chart(penguins).mark_circle(opacity=0.6).encode(\r
+        x='bill_length_mm:Q',\r
+        y='bill_depth_mm:Q',\r
+        color='species:N'\r
+    )\r
+\r
+    meanLine = alt.Chart(penguins).mark_rule(color='red', strokeWidth=2).encode(\r
+        y='mean(bill_depth_mm):Q'\r
+    )\r
+\r
+    chartLayer = scatter + meanLine\r
+    chartLayer\r
+  exercise:\r
+    prompt: 5단계. 레이어 개념 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      scatter = alt.Chart(penguins).mark_circle(opacity=0.6).encode(\r
+          x='bill_length_mm:Q',\r
+          y='bill_depth_mm:Q',\r
+          color='species:N'\r
+      )\r
+\r
+      meanLine = alt.Chart(penguins).mark_rule(color='red', strokeWidth=2).encode(\r
+          y='mean(bill_depth_mm):Q'\r
+      )\r
+\r
+      chartLayer = scatter + meanLine\r
+      chartLayer\r
+    hints:\r
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.\r
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.\r
+  check:\r
+    noError: 5단계. 레이어 개념의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.\r
+    resultCheck: 5단계. 레이어 개념의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.\r
+- id: step6_layer_text\r
+  title: 6단계. 텍스트 레이어\r
+  structuredPrimary: true\r
+  subtitle: mark_text()\r
+  goal: 6단계. 텍스트 레이어에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.\r
+  explanation: |-\r
+    막대 차트 위에 값을 텍스트로 표시할 수 있습니다. mark_text()는 텍스트를 그리는 함수입니다. bars 변수에 막대 차트를, text 변수에 텍스트 차트를 만들고, bars + text로 합칩니다. mark_text()의 dy=-10은 텍스트를 위로 10픽셀 이동시킵니다. dy는 delta y(y 변화량)의 약자입니다. 음수는 위로, 양수는 아래로 이동합니다. encode()에서 text='count()'는 표시할 텍스트 내용을 지정합니다. count() 값이 숫자로 표시됩니다.\r
+\r
+    (weightBars + weightText)를 괄호로 감싸고 .properties()를 연결할 수 있습니다. 괄호는 두 차트를 먼저 합친 후 properties를 적용하라는 의미입니다. 괄호 없이 weightBars + weightText.properties(...)처럼 쓰면 weightText에만 properties가 적용됩니다.\r
+  tips:\r
+  - (weightBars + weightText)를 괄호로 감싸고 .properties()를 연결할 수 있습니다. 괄호는 두 차트를 먼저 합친 후 properties를 적용하라는\r
+    의미입니다. 괄호 없이 weightBars + weightText.properties(...)처럼 쓰면 weightText에만 properties가 적용됩니다.\r
+  snippet: |-\r
+    bars = alt.Chart(penguins).mark_bar().encode(\r
+        x='species:N',\r
+        y='count()',\r
+        color='species:N'\r
+    )\r
+\r
+    text = alt.Chart(penguins).mark_text(\r
+        dy=-10,\r
+        fontSize=14\r
+    ).encode(\r
+        x='species:N',\r
+        y='count()',\r
+        text='count()'\r
+    )\r
+\r
+    chartWithText = bars + text\r
+    chartWithText\r
+  exercise:\r
+    prompt: 6단계. 텍스트 레이어 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      bars = alt.Chart(penguins).mark_bar().encode(\r
+          x='species:N',\r
+          y='count()',\r
+          color='species:N'\r
+      )\r
+\r
+      text = alt.Chart(penguins).mark_text(\r
+          dy=-10,\r
+          fontSize=14\r
+      ).encode(\r
+          x='species:N',\r
+          y='count()',\r
+          text='count()'\r
+      )\r
+\r
+      chartWithText = bars + text\r
+      chartWithText\r
+    hints:\r
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.\r
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.\r
+  check:\r
+    noError: 6단계. 텍스트 레이어의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.\r
+    resultCheck: 6단계. 텍스트 레이어의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.\r
+- id: step7_body_analysis\r
+  title: 7단계. 신체 특성 분석\r
+  structuredPrimary: true\r
+  subtitle: 종별 체중 비교\r
+  goal: 7단계. 신체 특성 분석에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.\r
+  explanation: 지금까지 배운 내용으로 펭귄 종별 신체 특성을 분석합니다. 종별 평균 체중을 막대 차트로 시각화하고 텍스트 레이블을 추가합니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    weightBars = alt.Chart(penguins).mark_bar().encode(\r
+        x=alt.X('species:N', title='펭귄 종'),\r
+        y=alt.Y('mean(body_mass_g):Q', title='평균 체중 (g)'),\r
+        color='species:N'\r
+    )\r
+\r
+    weightText = alt.Chart(penguins).mark_text(\r
+        dy=-10,\r
+        fontSize=12\r
+    ).encode(\r
+        x='species:N',\r
+        y='mean(body_mass_g):Q',\r
+        text='mean(body_mass_g):Q'\r
+    )\r
+\r
+    chartWeight = (weightBars + weightText).properties(\r
+        title='펭귄 종별 평균 체중',\r
+        width=300,\r
+        height=250\r
+    )\r
+    chartWeight\r
+  exercise:\r
+    prompt: 7단계. 신체 특성 분석 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      weightBars = alt.Chart(penguins).mark_bar().encode(\r
+          x=alt.X('species:N', title='펭귄 종'),\r
+          y=alt.Y('mean(body_mass_g):Q', title='평균 체중 (g)'),\r
+          color='species:N'\r
+      )\r
+\r
+      weightText = alt.Chart(penguins).mark_text(\r
+          dy=-10,\r
+          fontSize=12\r
+      ).encode(\r
+          x='species:N',\r
+          y='mean(body_mass_g):Q',\r
+          text='mean(body_mass_g):Q'\r
+      )\r
+\r
+      chartWeight = (weightBars + weightText).properties(\r
+          title='펭귄 종별 평균 체중',\r
+          width=300,\r
+          height=250\r
+      )\r
+      chartWeight\r
+    hints:\r
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.\r
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.\r
+  check:\r
+    noError: 7단계. 신체 특성 분석의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.\r
+    resultCheck: 7단계. 신체 특성 분석의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.\r
+- id: step8_final\r
+  title: 8단계. 최종 결과물\r
+  structuredPrimary: true\r
+  subtitle: 펭귄 서식지 대시보드\r
+  goal: 8단계. 최종 결과물에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.\r
+  explanation: |-\r
+    지금까지 배운 모든 개념을 종합해 펭귄 데이터를 시각화합니다. 섬별 펭귄 분포와 신체 특성을 함께 표현합니다.\r
+\r
+    Gentoo 펭귄이 가장 크고 무겁습니다. 지느러미 길이와 체중 사이에 양의 상관관계가 있습니다. 점선은 각 종의 평균 체중을 나타냅니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    dotFinal = alt.Chart(penguins).mark_circle(size=80, opacity=0.7).encode(\r
+        x=alt.X('flipper_length_mm:Q', title='지느러미 길이 (mm)'),\r
+        y=alt.Y('body_mass_g:Q', title='체중 (g)'),\r
+        color=alt.Color('species:N', title='종'),\r
+        shape=alt.Shape('island:N', title='서식지'),\r
+        tooltip=['species', 'island', 'flipper_length_mm', 'body_mass_g', 'sex']\r
+    )\r
+\r
+    speciesMeanRule = alt.Chart(penguins).mark_rule(strokeDash=[4, 4], size=2).encode(\r
+        y=alt.Y('mean(body_mass_g):Q', title='체중 (g)'),\r
+        color=alt.Color('species:N', title='종')\r
+    )\r
+\r
+    dotFinal + speciesMeanRule\r
+  exercise:\r
+    prompt: 8단계. 최종 결과물 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      dotFinal = alt.Chart(penguins).mark_circle(size=80, opacity=0.7).encode(\r
+          x=alt.X('flipper_length_mm:Q', title='지느러미 길이 (mm)'),\r
+          y=alt.Y('body_mass_g:Q', title='체중 (g)'),\r
+          color=alt.Color('species:N', title='종'),\r
+          shape=alt.Shape('island:N', title='서식지'),\r
+          tooltip=['species', 'island', 'flipper_length_mm', 'body_mass_g', 'sex']\r
+      )\r
+\r
+      speciesMeanRule = alt.Chart(penguins).mark_rule(strokeDash=[4, 4], size=2).encode(\r
+          y=alt.Y('mean(body_mass_g):Q', title='체중 (g)'),\r
+          color=alt.Color('species:N', title='종')\r
+      )\r
+\r
+      dotFinal + speciesMeanRule\r
+    hints:\r
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.\r
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.\r
+  check:\r
+    noError: 8단계. 최종 결과물의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.\r
+    resultCheck: 8단계. 최종 결과물의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.\r
+- id: step9_workflow\r
+  title: 9단계. 실무 레이어 차트 검증\r
+  structuredPrimary: true\r
+  subtitle: 예측 → 오류 확인 → 사양 검증 → 기준 실험\r
+  goal: 9단계. 실무 레이어 차트 검증에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 조건 분기는 입력값에 따라 실행 경로가 바뀌므로 결과를 바로 확인해야 합니다.\r
+  explanation: 실무에서는 차트가 화면에 보이는지만 확인하면 부족합니다. 어떤 종이 가장 무거울지 먼저 예측하고, 차트 사양에 레이어·축·툴팁·데이터 행 수가 제대로 들어갔는지\r
+    코드로 검증해야 합니다. 이번 단계에서는 잘못 만든 차트를 일부러 검사에 실패시킨 뒤, 완성 차트가 요구 조건을 만족하는지 확인합니다. 마지막으로 평균 체중 기준을 바꿔 분석\r
+    결과가 어떻게 달라지는지 실험합니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    requiredColumns = {\r
+        "species",\r
+        "island",\r
+        "flipper_length_mm",\r
+        "body_mass_g",\r
+        "sex",\r
+    }\r
+    missingColumns = requiredColumns - set(penguins.columns)\r
+    if missingColumns:\r
+        raise ValueError(f"펭귄 데이터에 필요한 컬럼이 없습니다: {sorted(missingColumns)}")\r
+\r
+    massBySpecies = (\r
+        penguins.groupby("species")["body_mass_g"]\r
+        .mean()\r
+        .round(1)\r
+        .sort_values(ascending=False)\r
+    )\r
+    heaviestSpecies = massBySpecies.index[0]\r
+    speciesCount = penguins["species"].nunique()\r
+\r
+    print("종별 평균 체중:", massBySpecies.to_dict())\r
+    print("예상: 평균 체중이 가장 높은 종은", heaviestSpecies)\r
+  exercise:\r
+    prompt: 9단계. 실무 레이어 차트 검증 예제에서 조건값을 바꾸고 선택되는 분기와 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      requiredColumns = {\r
+          "species",\r
+          "island",\r
+          "flipper_length_mm",\r
+          "body_mass_g",\r
+          "sex",\r
+      }\r
+      missingColumns = requiredColumns - set(penguins.columns)\r
+      if missingColumns:\r
+          raise ValueError(f"펭귄 데이터에 필요한 컬럼이 없습니다: {sorted(missingColumns)}")\r
+\r
+      massBySpecies = (\r
+          penguins.groupby("species")["body_mass_g"]\r
+          .mean()\r
+          .round(1)\r
+          .sort_values(ascending=False)\r
+      )\r
+      heaviestSpecies = massBySpecies.index[0]\r
+      speciesCount = penguins["species"].nunique()\r
+\r
+      print("종별 평균 체중:", massBySpecies.to_dict())\r
+      print("예상: 평균 체중이 가장 높은 종은", heaviestSpecies)\r
+    hints:\r
+    - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.\r
+    - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.\r
+  check:\r
+    noError: 9단계. 실무 레이어 차트 검증의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.\r
+    resultCheck: 9단계. 실무 레이어 차트 검증 분기 결과가 바꾼 조건값에 맞게 달라져야 합니다.\r
+- id: practice\r
+  title: 실습\r
+  structuredPrimary: true\r
+  subtitle: 펭귄 데이터 레이어 프로젝트\r
+  goal: 실습에서 채널 인코딩 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: |-\r
+    이 프로젝트에서 배운 내용을 정리합니다. mark_area()로 영역 차트를, mark_rule()로 선을, mark_text()로 텍스트를 그렸습니다. + 연산자로 여러 차트를 레이어로 겹쳤습니다. 두 차트를 더하면 하나로 합쳐집니다. opacity로 투명도를, dy로 텍스트 위치를, strokeDash로 점선을 설정했습니다. 각 미션에서 이 개념들을 활용해봅시다.\r
+\r
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.\r
+  snippet: |-\r
+    import altair as alt\r
+    import pandas as pd\r
+    from codaro.curriculum.localData import loadLocalDataset\r
+    bird = loadLocalDataset("penguins")\r
+  exercise:\r
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      import altair as alt\r
+      import pandas as pd\r
+      from codaro.curriculum.localData import loadLocalDataset\r
+      bird = loadLocalDataset("penguins")\r
+    hints:\r
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.\r
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.\r
+  check:\r
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.\r
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.\r
+- id: summary\r
+  title: 정리\r
+  blocks:\r
+  - type: text\r
+    content: Altair로 영역 차트와 레이어를 마스터했습니다!\r
+  - type: list\r
+    items:\r
+    - mark_area() - 영역 차트 마크\r
+    - mark_area(opacity) - 투명도 조절\r
+    - mark_rule() - 수평선/수직선\r
+    - mark_text(dy, fontSize) - 텍스트 레이블\r
+    - chart1 + chart2 - 레이어 결합\r
+    - 스택 영역 차트 - color로 자동 스택\r
+  - type: text\r
+    content: 다음 프로젝트에서는 타이타닉 데이터로 facet과 필터를 배웁니다.\r
+  goal: 정리에서 정리된 테이블을 바꿨을 때 스케일과 마크 매핑가 어떻게 달라지는지 확인한다.\r
+  why: 선언형 차트는 데이터 필드와 시각 표현의 관계를 명확하게 관리하게 해줍니다.\r
+`;export{e as default};

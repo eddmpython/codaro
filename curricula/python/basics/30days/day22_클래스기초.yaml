@@ -3,6 +3,9 @@ meta:
   title: 클래스 기초
   day: 22
   category: 30days
+  outcomes: ["python.oop"]
+  prerequisites: ["python.functions"]
+  estimatedMinutes: 45
   tags:
   - 클래스
   - 객체
@@ -77,9 +80,6 @@ sections:
     hints:
     - 바꿀 지점은 `myDog = ...` 오른쪽 값입니다.
     - 실행 뒤 `myDog` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 클래스 정의에서 `myDog` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -113,9 +113,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: init 메서드의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -149,9 +146,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: self 이해하기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -191,9 +185,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 인스턴스 메서드의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -231,9 +222,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 인스턴스 속성의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -271,9 +259,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 여러 인스턴스의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -394,9 +379,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 이 코드를 실행하면 어떤 예외가 발생할까요?
-      expectedError: ValueError
   check:
     type: noError
     noError: '현업 흐름 검증: 주문 객체로 상태와 합계 관리하기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
@@ -428,10 +410,237 @@ sections:
     hints:
     - 바꿀 지점은 `pet = ...` 오른쪽 값입니다.
     - 실행 뒤 `pet` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: Day 22 종합 복습에서 `pet` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Day 22 종합 복습 실행 뒤 `pet` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: day22-counter-class-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - class_basic
+    - practice
+    title: 상태를 가진 Counter 클래스 만들기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 생성자와 인스턴스 메서드로 상태 변화를 표현한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: Counter와 counter_after(start, steps)를 완성해 steps만큼 증가한 최종 값을 반환하세요.
+      starterCode: |-
+        class Counter:
+            pass
+
+        def counter_after(start, steps):
+            raise NotImplementedError
+      solution: |-
+        class Counter:
+            def __init__(self, value):
+                self.value = value
+
+            def increment(self):
+                self.value += 1
+
+        def counter_after(start, steps):
+            counter = Counter(start)
+            for _ in range(steps):
+                counter.increment()
+            return counter.value
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day22.counter-class.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day22.counter-class.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: counter_after
+        cases:
+        - id: three
+          arguments:
+          - value: 5
+          - value: 3
+          expectedReturn: 8
+        - id: none
+          arguments:
+          - value: 10
+          - value: 0
+          expectedReturn: 10
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day22-inventory-item-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day22-counter-class-mastery
+    title: 객체로 재고 항목 합계 만들기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 클래스의 속성과 메서드를 가격 계산 문맥에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: InventoryItem과 item_summary(name, price, quantity)를 완성해 name과 total 딕셔너리를 반환하세요.
+      starterCode: |-
+        class InventoryItem:
+            pass
+
+        def item_summary(name, price, quantity):
+            raise NotImplementedError
+      solution: |-
+        class InventoryItem:
+            def __init__(self, name, price, quantity):
+                self.name = name
+                self.price = price
+                self.quantity = quantity
+
+            def total(self):
+                return self.price * self.quantity
+
+        def item_summary(name, price, quantity):
+            item = InventoryItem(name, price, quantity)
+            return {'name': item.name, 'total': item.total()}
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day22.inventory-item.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day22.inventory-item.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: item_summary
+        cases:
+        - id: pen
+          arguments:
+          - value: pen
+          - value: 1000
+          - value: 3
+          expectedReturn:
+            name: pen
+            total: 3000
+        - id: book
+          arguments:
+          - value: book
+          - value: 7500
+          - value: 2
+          expectedReturn:
+            name: book
+            total: 15000
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day22-temperature-class-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day22-inventory-item-transfer
+    title: 객체의 온도 변환 다시 만들기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 생성자와 계산 메서드를 기억에서 복원한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: Temperature와 fahrenheit_of(celsius)를 완성해 화씨 온도를 반환하세요.
+      starterCode: |-
+        class Temperature:
+            pass
+
+        def fahrenheit_of(celsius):
+            raise NotImplementedError
+      solution: |-
+        class Temperature:
+            def __init__(self, celsius):
+                self.celsius = celsius
+
+            def fahrenheit(self):
+                return self.celsius * 9 / 5 + 32
+
+        def fahrenheit_of(celsius):
+            return Temperature(celsius).fahrenheit()
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day22.temperature-class.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day22.temperature-class.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: fahrenheit_of
+        cases:
+        - id: freezing
+          arguments:
+          - value: 0
+          expectedReturn: 32.0
+        - id: boiling
+          arguments:
+          - value: 100
+          expectedReturn: 212.0
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

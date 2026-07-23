@@ -1,4 +1,0 @@
-export const pageContent = {
-  "html": "<h1>마운팅과 통합</h1>\n<ul>\n<li><code>createServerApp()</code>은 독립 실행 가능하면서 동시에 다른 서버에 마운팅 가능하다.</li>\n<li>FastAPI: <code>app.mount(&quot;/codaro&quot;, createServerApp())</code></li>\n<li>Django: ASGI 라우팅 분기</li>\n<li>Flask: WSGIMiddleware 래핑</li>\n<li>프론트엔드는 <code>&lt;meta name=&quot;codaro-base&quot;&gt;</code> 태그에서 root_path를 자동 감지한다.</li>\n<li>GUI에서 되는 모든 것은 API로도 된다 (시스템적 수정 가능).</li>\n</ul>\n<h2>관련</h2>\n<ul>\n<li>[[execution-engine]] — 엔진 추상화</li>\n<li>[[architecture-overview]] — transport 레이어</li>\n</ul>\n",
-  "text": "마운팅과 통합 은 독립 실행 가능하면서 동시에 다른 서버에 마운팅 가능하다. FastAPI: Django: ASGI 라우팅 분기 Flask: WSGIMiddleware 래핑 프론트엔드는 태그에서 root path를 자동 감지한다. GUI에서 되는 모든 것은 API로도 된다 (시스템적 수정 가능). 관련 [[execution engine]] — 엔진 추상화 [[architecture overview]] — transport 레이어"
-};

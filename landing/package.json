@@ -4,34 +4,38 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
+    "content:generate": "node scripts/cleanGeneratedSource.mjs && node scripts/syncBrand.js && node scripts/syncVisualAssets.js && node scripts/syncPdfWorker.js && node scripts/syncBlogAssets.js prepare && node scripts/generateCurriculum.js && node scripts/generateContent.js && node scripts/generateOgImage.js",
+    "generated:clean": "node scripts/cleanGeneratedSource.mjs",
+    "predev": "npm run content:generate",
     "dev": "vite dev",
-    "prebuild": "node scripts/syncBrand.js && node scripts/syncPdfWorker.js && node scripts/syncBlogAssets.js prepare && node scripts/generateContent.js && node scripts/generateCurriculum.js && node scripts/generateOgImage.js",
+    "prebuild": "npm run content:generate",
     "build": "vite build",
     "postbuild": "node scripts/prerenderReact.js && node scripts/postbuild.js",
-    "check": "node scripts/syncBrand.js && node scripts/syncPdfWorker.js && node scripts/syncBlogAssets.js prepare && node scripts/generateContent.js && node scripts/generateOgImage.js && vite build && node scripts/prerenderReact.js && node scripts/postbuild.js",
+    "check": "npm run content:generate && vite build && node scripts/prerenderReact.js && node scripts/postbuild.js",
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@astryxdesign/cli": "^0.1.4",
+    "@astryxdesign/cli": "0.1.6",
     "@resvg/resvg-js": "^2.6.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.2.0",
-    "typescript": "^6.0.3",
+    "typescript": "6.0.3",
     "vite": "^8.0.16"
   },
   "dependencies": {
-    "@astryxdesign/core": "^0.1.4",
-    "@astryxdesign/theme-neutral": "^0.1.4",
-    "@stylexjs/stylex": "^0.18.3",
+    "@astryxdesign/core": "0.1.6",
+    "@astryxdesign/theme-neutral": "0.1.6",
+    "@stylexjs/stylex": "0.19.0",
     "fflate": "^0.8.2",
-    "lucide-react": "^1.16.0",
+    "gpt-tokenizer": "3.4.0",
+    "lucide-react": "1.25.0",
     "marked": "^16.4.1",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^4.7.76",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
-    "yaml": "^2.8.3"
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "yaml": "2.9.0"
   },
   "overrides": {
     "esbuild": "^0.28.1"

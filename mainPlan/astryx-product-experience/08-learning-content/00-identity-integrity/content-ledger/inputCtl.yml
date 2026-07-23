@@ -1,0 +1,194 @@
+schemaVersion: 1
+category: "inputCtl"
+canonicalRows: 10
+lessons:
+  - lessonRef: "inputCtl/01_pyautogui안전장치"
+    identityLedgerRef: "identity-ledger/inputCtl.yml"
+    lessonContentHash: "128ee500c31219f0d80bb865f1a59062477b520e8bc6df3506f4fb84fd92b843"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/21-desktop-automation"
+    eligiblePathIds: ["desktopAutomation"]
+    outcomes: ["automation.inputCtl"]
+    prerequisites: ["python.errorHandling"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:inputCtl/01_pyautogui안전장치:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:inputCtl_01_pyautogui____:v1","retrieve:inputCtl_01_pyautogui____:v2","retrieve:inputCtl_01_pyautogui____:v3"]
+    transferVariantIds: ["transfer:inputCtl_01_pyautogui____:near-v1","transfer:inputCtl_01_pyautogui____:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "inputCtl/02_화면크기와좌표"
+    identityLedgerRef: "identity-ledger/inputCtl.yml"
+    lessonContentHash: "5c2bb18ea3be7fbf2ac807642fcb303c652bd10994cd9a1d3cdc3154b6aee7ba"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/21-desktop-automation"
+    eligiblePathIds: ["desktopAutomation"]
+    outcomes: ["automation.inputCtl"]
+    prerequisites: ["automation.inputCtl"]
+    reinforcesOutcomeIds: ["automation.inputCtl"]
+    runtimeTier: local
+    checkSpecId: "lesson:inputCtl/02_화면크기와좌표:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:inputCtl_02________:v1","retrieve:inputCtl_02________:v2","retrieve:inputCtl_02________:v3"]
+    transferVariantIds: ["transfer:inputCtl_02________:near-v1","transfer:inputCtl_02________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "inputCtl/03_마우스이동과클릭"
+    identityLedgerRef: "identity-ledger/inputCtl.yml"
+    lessonContentHash: "2a913f820970529f9eeff39876669632b5543a15e2a57b2686b8a8ae648ca545"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/21-desktop-automation"
+    eligiblePathIds: ["desktopAutomation"]
+    outcomes: ["automation.inputCtl"]
+    prerequisites: ["automation.inputCtl"]
+    reinforcesOutcomeIds: ["automation.inputCtl"]
+    runtimeTier: local
+    checkSpecId: "lesson:inputCtl/03_마우스이동과클릭:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:inputCtl_03_________:v1","retrieve:inputCtl_03_________:v2","retrieve:inputCtl_03_________:v3"]
+    transferVariantIds: ["transfer:inputCtl_03_________:near-v1","transfer:inputCtl_03_________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "inputCtl/04_키보드입력"
+    identityLedgerRef: "identity-ledger/inputCtl.yml"
+    lessonContentHash: "0316cfe522af149134d84cb244bc68ed289fc83d9819fdce4a6c97baecbf82dd"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/21-desktop-automation"
+    eligiblePathIds: ["desktopAutomation"]
+    outcomes: ["automation.inputCtl"]
+    prerequisites: ["automation.inputCtl"]
+    reinforcesOutcomeIds: ["automation.inputCtl"]
+    runtimeTier: local
+    checkSpecId: "lesson:inputCtl/04_키보드입력:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:inputCtl_04______:v1","retrieve:inputCtl_04______:v2","retrieve:inputCtl_04______:v3"]
+    transferVariantIds: ["transfer:inputCtl_04______:near-v1","transfer:inputCtl_04______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "inputCtl/05_스크린샷영역"
+    identityLedgerRef: "identity-ledger/inputCtl.yml"
+    lessonContentHash: "6066052010bb2d404cfd208e80ca192bc001f978a1a2bd23a0a2d9187aae0dd6"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/21-desktop-automation"
+    eligiblePathIds: ["desktopAutomation"]
+    outcomes: ["automation.screenInteraction"]
+    prerequisites: ["automation.inputCtl"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:inputCtl/05_스크린샷영역:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:inputCtl_05_______:v1","retrieve:inputCtl_05_______:v2","retrieve:inputCtl_05_______:v3"]
+    transferVariantIds: ["transfer:inputCtl_05_______:near-v1","transfer:inputCtl_05_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "inputCtl/06_이미지매치"
+    identityLedgerRef: "identity-ledger/inputCtl.yml"
+    lessonContentHash: "07d90b33ce2054717035779a52bd41e83150b2d4e5f8b69a0baa8d8ed72e68b2"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/21-desktop-automation"
+    eligiblePathIds: ["desktopAutomation"]
+    outcomes: ["automation.screenInteraction"]
+    prerequisites: ["automation.screenInteraction"]
+    reinforcesOutcomeIds: ["automation.screenInteraction"]
+    runtimeTier: local
+    checkSpecId: "lesson:inputCtl/06_이미지매치:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:inputCtl_06______:v1","retrieve:inputCtl_06______:v2","retrieve:inputCtl_06______:v3"]
+    transferVariantIds: ["transfer:inputCtl_06______:near-v1","transfer:inputCtl_06______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "inputCtl/07_클립보드"
+    identityLedgerRef: "identity-ledger/inputCtl.yml"
+    lessonContentHash: "1027405beb24859048080ff5b85fad9f384f3d740ff5d7fb77decc6930114999"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/21-desktop-automation"
+    eligiblePathIds: ["desktopAutomation"]
+    outcomes: ["automation.screenInteraction"]
+    prerequisites: ["automation.inputCtl"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:inputCtl/07_클립보드:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:inputCtl_07_____:v1","retrieve:inputCtl_07_____:v2","retrieve:inputCtl_07_____:v3"]
+    transferVariantIds: ["transfer:inputCtl_07_____:near-v1","transfer:inputCtl_07_____:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "inputCtl/08_pynput리스너"
+    identityLedgerRef: "identity-ledger/inputCtl.yml"
+    lessonContentHash: "7604b52d7306268bbd1efb8818cf671bc31edcc49ecd87ec8f996a2e6ef05109"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/21-desktop-automation"
+    eligiblePathIds: ["desktopAutomation"]
+    outcomes: ["automation.inputCtl"]
+    prerequisites: ["automation.inputCtl"]
+    reinforcesOutcomeIds: ["automation.inputCtl"]
+    runtimeTier: local
+    checkSpecId: "lesson:inputCtl/08_pynput리스너:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:inputCtl_08_pynput___:v1","retrieve:inputCtl_08_pynput___:v2","retrieve:inputCtl_08_pynput___:v3"]
+    transferVariantIds: ["transfer:inputCtl_08_pynput___:near-v1","transfer:inputCtl_08_pynput___:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "inputCtl/09_상태기반자동화"
+    identityLedgerRef: "identity-ledger/inputCtl.yml"
+    lessonContentHash: "58b7e9227f3c2cc733485ee6aed5b7beaf4a7636ad8a54a5330d21e156b8e435"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/21-desktop-automation"
+    eligiblePathIds: ["desktopAutomation"]
+    outcomes: ["automation.screenInteraction"]
+    prerequisites: ["automation.screenInteraction"]
+    reinforcesOutcomeIds: ["automation.screenInteraction"]
+    runtimeTier: local
+    checkSpecId: "lesson:inputCtl/09_상태기반자동화:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:inputCtl_09________:v1","retrieve:inputCtl_09________:v2","retrieve:inputCtl_09________:v3"]
+    transferVariantIds: ["transfer:inputCtl_09________:near-v1","transfer:inputCtl_09________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "inputCtl/10_종합화면점검"
+    identityLedgerRef: "identity-ledger/inputCtl.yml"
+    lessonContentHash: "963528d70ee3a0b1b9af32673009a5b0182998c7500f9d1015f295cfb15262b6"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/21-desktop-automation"
+    eligiblePathIds: ["desktopAutomation"]
+    outcomes: ["automation.inputCtl","automation.screenInteraction"]
+    prerequisites: ["automation.inputCtl","automation.screenInteraction"]
+    reinforcesOutcomeIds: ["automation.inputCtl","automation.screenInteraction"]
+    runtimeTier: local
+    checkSpecId: "lesson:inputCtl/10_종합화면점검:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:inputCtl_10_______:v1","retrieve:inputCtl_10_______:v2","retrieve:inputCtl_10_______:v3"]
+    transferVariantIds: ["transfer:inputCtl_10_______:near-v1","transfer:inputCtl_10_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

@@ -13,6 +13,7 @@ from codaro.curriculum.sectionContract import lessonContractFromYaml, sectionCon
 
 ROOT = Path(__file__).resolve().parents[2]
 CURRICULA_DIR = ROOT / "curricula" / "python"
+DAY_ONE = CURRICULA_DIR / "basics" / "30days" / "day01_헬로월드.yaml"
 INSTALL_STAGE_PHRASES = (
     "설치 예제",
     "설치 실습",
@@ -104,6 +105,130 @@ def testLessonContractExtractsStructuredSectionFields() -> None:
     assert sectionContractGaps(section) == []
 
 
+def testSectionOutcomeIdsPreferSectionThenMetaMappingThenLessonFallback() -> None:
+    content = {
+        "meta": {
+            "outcomes": ["lesson.outcome"],
+            "sectionOutcomes": {"mapped": ["mapped.outcome"]},
+        },
+        "sections": [
+            {"id": "direct", "outcomeIds": ["direct.outcome"]},
+            {"id": "mapped"},
+            {"id": "fallback"},
+        ],
+    }
+
+    contract = lessonContractFromYaml(content)
+
+    assert [section.outcomeIds for section in contract.sections] == [
+        ["direct.outcome"],
+        ["mapped.outcome"],
+        ["lesson.outcome"],
+    ]
+
+
+def testConverterWiresTaxonomyOutcomeFallbackIntoSectionPayload(tmp_path: Path) -> None:
+    taxonomyPath = tmp_path / "_taxonomy.yml"
+    taxonomyPath.write_text(
+        yaml.safe_dump({
+            "outcomes": [
+                {"id": "lesson.outcome", "label": "lesson"},
+                {"id": "section.outcome", "label": "section"},
+            ],
+            "lessonOutcomes": {
+                "test/lesson": {
+                    "outcomes": ["lesson.outcome", "section.outcome"],
+                    "sectionOutcomes": {"mapped": ["section.outcome"]},
+                },
+            },
+        }, sort_keys=False),
+        encoding="utf-8",
+    )
+    content = {
+        "meta": {"title": "Taxonomy fallback"},
+        "sections": [
+            {"id": "mapped", "title": "Mapped"},
+            {"id": "fallback", "title": "Fallback"},
+        ],
+    }
+
+    document, _solutions = yamlToDocument(
+        content,
+        "test",
+        "lesson",
+        taxonomyPath=taxonomyPath,
+    )
+    contracts = [
+        block.payload["sectionContract"]
+        for block in document.blocks
+        if block.sourceType == "section" and isinstance(block.payload, dict)
+    ]
+
+    assert contracts[0]["outcomeIds"] == ["section.outcome"]
+    assert contracts[1]["outcomeIds"] == ["lesson.outcome", "section.outcome"]
+
+
+def testDayOneKeepsTransferAndDelayedRetrievalOutOfBaseLesson() -> None:
+    content = yaml.safe_load(DAY_ONE.read_text(encoding="utf-8"))
+    document, solutions = yamlToDocument(content, "30days", "day01")
+    sectionContracts = [
+        block.payload.get("sectionContract")
+        for block in document.blocks
+        if block.sourceType == "section" and isinstance(block.payload, dict)
+    ]
+    masteryContracts = [
+        contract
+        for contract in sectionContracts
+        if isinstance(contract, dict) and contract.get("assessmentMode") == "mastery"
+    ]
+
+    assert len(masteryContracts) == 1
+    assert masteryContracts[0]["id"] == "hello_world"
+    assert not any(
+        isinstance(contract, dict) and contract.get("assessmentMode") in {"transfer", "retrieval"}
+        for contract in sectionContracts
+    )
+    assert not any("Report ready:" in solution for solution in solutions.values())
+    intro = next(block for block in document.blocks if block.sourceType == "intro")
+    assert isinstance(intro.payload, dict)
+    assert intro.payload["assessment"]["transferVariants"][0]["id"] == "report-status-transfer"
+    assert intro.payload["assessment"]["retrievalVariants"][0]["minimumDelayHours"] == 7 * 24
+
+
+def testYamlToDocumentMaterializesMasteryVariantAtLessonEnd() -> None:
+    content = {
+        "meta": {"title": "Mastery lesson"},
+        "sections": [{"id": "learn", "title": "배우기", "snippet": "print('learn')"}],
+        "assessment": {
+            "masteryVariants": [{
+                "id": "mastery-task",
+                "mode": "mastery",
+                "unseen": False,
+                "sourceSectionIds": ["learn"],
+                "title": "혼자 완성하기",
+                "goal": "예시 없이 결과를 완성합니다.",
+                "exercise": {
+                    "prompt": "정확히 mastered를 출력하세요.",
+                    "starterCode": "print('___')",
+                    "solution": "print('mastered')",
+                },
+                "check": {"kind": "output", "strength": "strong"},
+            }],
+        },
+    }
+
+    document, solutions = yamlToDocument(content, "test", "mastery")
+    sectionContracts = [
+        block.payload.get("sectionContract")
+        for block in document.blocks
+        if block.sourceType == "section" and isinstance(block.payload, dict)
+    ]
+
+    assert sectionContracts[-1]["id"] == "mastery-task"
+    assert sectionContracts[-1]["assessmentMode"] == "mastery"
+    assert any("mastered" in solution for solution in solutions.values())
+
+
 def testYamlToDocumentMaterializesStructuredSectionContract() -> None:
     content = {
         "meta": {"title": "Structured lesson", "packages": ["pandas"]},
@@ -151,6 +276,49 @@ def testYamlToDocumentMaterializesStructuredSectionContract() -> None:
     assert exercise.guide.solution == "import pandas as pd\nframe = pd.DataFrame({'x': [1]})"
     assert exercise.guide.checkConfig == {"variable": "frame"}
     assert solutions[exercise.id] == "import pandas as pd\nframe = pd.DataFrame({'x': [1]})"
+
+
+def testYamlToDocumentPreservesNestedStrongCheckSpec() -> None:
+    checkSpec = {
+        "id": "python.print.hello.output.v1",
+        "version": 1,
+        "kind": "output",
+        "strength": "strong",
+        "executor": "browser-worker",
+        "timeoutMs": 8000,
+        "fixtureId": "python.print.hello.fixture.v1",
+        "fixtureHash": "sha256-example",
+        "packageAssets": [{
+            "name": "schedule",
+            "version": "1.2.2",
+            "url": "check-packages/schedule-1.2.2-py3-none-any.whl",
+            "integrity": "sha256-example-wheel",
+        }],
+        "fixture": {"env": {"LANG": "C.UTF-8", "TZ": "UTC"}, "files": [], "stdin": []},
+        "payload": {"comparator": "exact", "expected": "Hello", "normalization": "trim-final-newline"},
+    }
+    content = {
+        "meta": {"title": "Typed check lesson"},
+        "sections": [{
+            "title": "격리 출력 검증",
+            "subtitle": "새 실행기",
+            "goal": "출력을 정확히 만듭니다.",
+            "why": "실행 성공과 정답을 구분합니다.",
+            "explanation": "학생 코드를 새 실행기에서 다시 확인합니다.",
+            "tips": ["문구를 정확히 확인하세요."],
+            "snippet": "print('Hello')",
+            "exercise": {"prompt": "Hello를 출력하세요.", "starterCode": "print('Hi')", "solution": "print('Hello')"},
+            "check": checkSpec,
+        }],
+    }
+
+    contract = lessonContractFromYaml(content)
+    document, _solutions = yamlToDocument(content, "basics", "typed-check")
+    exercise = next(block for block in document.blocks if block.sourceType == "sectionContract:exercise")
+
+    assert contract.sections[0].check == checkSpec
+    assert exercise.guide is not None
+    assert exercise.guide.checkConfig == checkSpec
 
 
 def testLessonRuntimePackagesNormalizeAliasesAndDropStdlib() -> None:

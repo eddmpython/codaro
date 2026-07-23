@@ -5,10 +5,7 @@ from typing import Any
 
 from .checker import debuggingPatternRef, detectErrorClass
 from .exerciseCheck import ExerciseCheckInput, InvalidExerciseCheck, runExerciseCheck
-from .masterySignal import checkSignalStrength, combineEvidence
 from .misconceptionCatalog import matchOutcomes
-from .predictionDiff import ActualResult, comparePrediction, extractErrorClass
-from .sectionContract import LearningPredictContract
 
 
 def recommendNextAction(
@@ -25,7 +22,7 @@ def recommendNextAction(
     provider가 있으면 teacher가 더 풍부히 보강하지만, 없어도 항상 한 가지 다음 행동을 준다.
     """
     if passed and hasMisconception:
-        return {"kind": "reconcilePrediction", "label": "맞혔지만 예측과 다른 점이 있어요 — 왜 그런지 짚어보기"}
+        return {"kind": "explainUnexpectedResult", "label": "결과가 예상과 달랐던 이유 짚어보기"}
     if passed:
         return {"kind": "advance", "label": "다음 단계로 진행하기"}
     if hasMisconception:
@@ -34,22 +31,7 @@ def recommendNextAction(
         return {"kind": "reviewConcept", "label": "개념을 다시 보고 시도하기"}
     if hintLevel < maxHints:
         return {"kind": "nextHint", "label": "다음 힌트 보기"}
-    return {"kind": "retry", "label": "예상한 결과와 비교하며 다시 시도하기"}
-
-
-def _variableShapeDtype(session: Any, variableName: str) -> tuple[str, str]:
-    """실행 후 세션에서 지정 변수의 shape/dtype를 읽는다(없으면 빈 문자열).
-
-    Predict-Run-Reconcile의 shape/dtype 차원은 *명명된 변수*가 있을 때만 채운다 —
-    final-output 추론은 모호하므로, 변수를 짚는 강한 체크(checkType=variable)에 한해
-    정직하게 활성화한다. runtime introspection(H0)이 numpy/pandas에서 채워 흘린 값.
-    """
-    if not variableName:
-        return "", ""
-    for variable in session.getVariables():
-        if variable.name == variableName:
-            return variable.shape, variable.dtype
-    return "", ""
+    return {"kind": "retry", "label": "피드백을 반영해 다시 시도하기"}
 
 
 class CurriculumCheckInvalid(ValueError):
@@ -58,14 +40,6 @@ class CurriculumCheckInvalid(ValueError):
 
 class CurriculumCheckSessionMissing(LookupError):
     pass
-
-
-@dataclass(frozen=True, slots=True)
-class CurriculumCheckPrediction:
-    expectedShape: str = ""
-    expectedDtype: str = ""
-    expectedValue: str = ""
-    expectedError: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -82,7 +56,6 @@ class CurriculumCheckInput:
     category: str = ""
     contentId: str = ""
     sectionId: str = ""
-    prediction: CurriculumCheckPrediction | None = None
 
 
 async def runCurriculumCheckFlow(
@@ -119,69 +92,25 @@ async def runCurriculumCheckFlow(
     autoValidatedOutcomes: list[str] = []
     sectionOutcomes: list[str] = []
     if request.category and request.contentId and request.sectionId:
-        progressTracker.recordSectionResult(
-            request.category,
-            request.contentId,
-            request.sectionId,
-            passed=result.passed,
-            hintLevel=result.hintLevel,
-        )
         graph = curriculumOs.graph()
         lesson = graph.byKey(f"{request.category}/{request.contentId}")
         sectionOutcomes = list(
             lesson.outcomesForSection(request.sectionId) if lesson else []
         )
-        if result.passed and sectionOutcomes:
-            creditedOutcomes, autoValidatedOutcomes = progressTracker.creditCheckPass(
-                request.category,
-                request.contentId,
-                request.sectionId,
-                sectionOutcomes,
-                hintLevel=result.hintLevel,
-            )
     payload["creditedOutcomes"] = creditedOutcomes
     payload["autoValidatedOutcomes"] = autoValidatedOutcomes
 
     misconceptionPayload: list[dict[str, object]] = []
     doneCriterionViolated = False
-    predictionDiffPayload: dict[str, object] | None = None
     if sectionOutcomes:
         errorText = payload.get("detail") or payload.get("studentOutput") or ""
 
-        # 예측-실측 diff를 한 번 계산(payload + mastery 신호 + 진단 매칭 공용).
-        diff = None
-        if request.prediction is not None:
-            predict = LearningPredictContract(
-                expectedShape=request.prediction.expectedShape,
-                expectedDtype=request.prediction.expectedDtype,
-                expectedValue=request.prediction.expectedValue,
-                expectedError=request.prediction.expectedError,
-            )
-            if not predict.isEmpty():
-                actualShape, actualDtype = _variableShapeDtype(session, request.variableName)
-                actual = ActualResult(
-                    value=str(payload.get("studentOutput") or ""),
-                    errorClass=extractErrorClass(str(payload.get("detail") or "")),
-                    shape=actualShape,
-                    dtype=actualDtype,
-                )
-                diff = comparePrediction(predict, actual)
-                predictionDiffPayload = diff.model_dump()
-
-        # 강도 가중 + slip/guess 증거 — 약한 noError는 mastery를 거의 안 움직인다.
-        strength = checkSignalStrength(request.checkType)
-        evidence = combineEvidence(passed=result.passed, diff=diff, strength=strength)
-        for outcomeId in sectionOutcomes:
-            learnerStateStore.recordEvidence(outcomeId, evidence)
-
-        # 진단 매칭 — 실패면 code/error, 예측이 어긋나면 통과여도 silent 오개념 발화.
-        matchPrediction = diff if (diff is not None and diff.overall == "mismatch") else None
-        if (not result.passed) or matchPrediction is not None:
+        # 실패한 실제 코드와 에러를 근거로 오개념을 매칭한다.
+        if not result.passed:
             for outcomeId, entry in matchOutcomes(
                 sectionOutcomes,
-                code=request.studentCode if not result.passed else "",
-                errorText=str(errorText) if not result.passed else "",
-                predictionDiff=matchPrediction,
+                code=request.studentCode,
+                errorText=str(errorText),
             ):
                 hit, repeatStatus = learnerStateStore.recordMisconception(entry.id, outcomeId)
                 if repeatStatus == "repeat":
@@ -198,8 +127,6 @@ async def runCurriculumCheckFlow(
                 })
     payload["misconceptionMatches"] = misconceptionPayload
     payload["doneCriterionViolated"] = doneCriterionViolated
-    payload["predictionDiff"] = predictionDiffPayload
-
     errorContext = " ".join([
         str(payload.get("studentOutput") or ""),
         str(payload.get("detail") or ""),

@@ -1,0 +1,56 @@
+schemaVersion: 1
+auditId: astryx-prd-author-fact-audit-20260718t221800z
+capturedAt: 2026-07-18T22:18:00Z
+auditorRole: remediation-author
+independentEvaluation: false
+canDecidePass: false
+scope:
+  gitCommit: 527e0e2627e7e85f75a2b760b3bf3e59d5b4b184
+  sealed: false
+  dirtyWorktree: true
+staticContract:
+  activeReadmes: 60
+  missingRequiredSections: 0
+  localLinks: 74
+  brokenLinks: 0
+  duplicateCreationOwners: 0
+  pathStateIssues: 0
+  yamlFiles: 120
+  yamlParseFailures: 0
+  emDashOccurrences: 0
+  trailingWhitespaceOccurrences: 0
+  rubricWeight: 100
+  rubricTargetScore: null
+  rubricPassThreshold: null
+  rubricHashMatchesR10Input: true
+  evaluationSchemaMetaValid: true
+  evaluationSchemaSampleValid: true
+  registeredGates: 41
+  negativeFixturesRejected: 1
+repositoryChecks:
+  docsGate: passed
+  gitDiffCheck: passed
+  rootCleanGate: failed-user-owned-vscode
+  completionTransitionTests: passed-8
+  productContractGeneration: passed-6-files
+  editorContractCompile: passed
+  launcherContractCompile: passed
+  planFactAudit: passed
+  planQualityGate: red-r10-evidence-incomplete
+  learningLedgerReplay: blocked-planned-tool-absent
+formalState:
+  productEvidenceMaturity: E1
+  r10State: blocked
+  eligibleRemediationPackets: 0
+  totalRemediationPackets: 6
+  implementedFactAuditCommands: 1
+  assignedIndependentEvaluators: 0
+  requiredIndependentEvaluators: 3
+  evaluationBundleSealed: false
+decision: blocked
+blockingReasons:
+  - B0 tool and fact audit are implemented, but the clean implementation A, evidence E, and transition B commits cannot be prepared while the worktree and root-clean gate are red
+  - B1 migration and sandbox feasibility evidence is absent
+  - B2 three-lesson Web-to-Local vertical-slice evidence is absent
+  - R10 scope, bundle, reports, and independent evaluator roster are not sealed
+  - root-clean is red because of the user-owned untracked .vscode directory

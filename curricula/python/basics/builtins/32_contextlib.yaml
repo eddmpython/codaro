@@ -334,3 +334,319 @@ sections:
     type: noError
     noError: nullcontext와 execute 호출이 NameError나 TypeError 없이 실행되어야 합니다.
     resultCheck: default 리스트는 bound:None이고 labelled 리스트는 bound:placeholder로 두 경우의 as 바인딩 차이가 드러나야 합니다.
+assessment:
+  masteryVariants:
+  - id: 32_contextlib-finally-teardown-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - contextmanager-decorator
+    - closing-cleanup
+    title: '@contextmanager의 finally teardown 순서 증명하기'
+    subtitle: open, body, close, caught
+    goal: contextmanager로 만든 trace가 정상 경로와 예외 경로 모두에서 close 이벤트를 기록하는지 반환한다.
+    why: contextlib 학습의 핵심은 with 문법이 아니라, 예외가 나도 정리 코드가 반드시 실행된다는 실행 순서를 몸에 붙이는 것입니다.
+    explanation: trace_context_events(label, raise_in_body=False)를 완성해 open/body/close/caught 이벤트 순서를 반환하고 빈 label은 ValueError로
+      막으세요.
+    tips:
+    - teardown 코드는 finally 안에 있어야 합니다.
+    - close 이벤트는 caught보다 먼저 기록되어야 합니다.
+    exercise:
+      prompt: trace_context_events(label, raise_in_body=False)를 완성해 정상/예외 경로의 이벤트 순서를 반환하세요.
+      starterCode: |-
+        def trace_context_events(label, raise_in_body=False):
+            raise NotImplementedError
+      solution: |-
+        def trace_context_events(label, raise_in_body=False):
+            from contextlib import contextmanager
+
+            if not label:
+                raise ValueError("label required")
+
+            @contextmanager
+            def trace(name, events):
+                events.append(f"open:{name}")
+                try:
+                    yield name
+                finally:
+                    events.append(f"close:{name}")
+
+            events = []
+            try:
+                with trace(label, events) as bound:
+                    events.append(f"body:{bound}")
+                    if raise_in_body:
+                        raise RuntimeError("boom")
+            except RuntimeError:
+                events.append("caught")
+
+            return {
+                "events": events,
+                "closedBeforeCaught": "caught" not in events or events.index(f"close:{label}") < events.index("caught"),
+                "lastEvent": events[-1],
+            }
+      hints:
+      - try/except는 with 바깥에 두어 정리 뒤 caught가 기록되게 하세요.
+      - events.index로 close와 caught 순서를 확인할 수 있습니다.
+    check:
+      id: python.builtins.contextlib.finally-teardown.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.contextlib.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: trace_context_events
+        cases:
+        - id: closes-before-catch-on-error
+          arguments:
+          - value: task
+          - value: true
+          expectedReturn:
+            events:
+            - open:task
+            - body:task
+            - close:task
+            - caught
+            closedBeforeCaught: true
+            lastEvent: caught
+        - id: rejects-empty-label
+          arguments:
+          - value: ''
+          - value: false
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 32_contextlib-exitstack-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - exitstack
+    - contextmanager-decorator
+    title: 동적 자원 목록을 ExitStack으로 열고 역순 정리 검증하기
+    subtitle: dynamic resources, LIFO cleanup
+    goal: 런타임에 주어진 자원 이름들을 ExitStack에 등록하고 callback과 close가 등록 역순으로 실행되는지 반환한다.
+    why: 전이 과제에서는 고정된 with 중첩에서 동적인 자원 개수로 옮깁니다. 파일, 연결, 임시 자원 수가 실행 때 결정되는 자동화에 필요합니다.
+    explanation: manage_dynamic_resources(names, include_callback=True)를 완성해 open, using, callback, close 이벤트와 close 순서를 반환하세요.
+    tips:
+    - ExitStack은 마지막에 등록한 항목부터 정리합니다.
+    - callback을 마지막에 등록하면 close 이벤트보다 먼저 실행됩니다.
+    exercise:
+      prompt: manage_dynamic_resources(names, include_callback=True)를 완성해 ExitStack의 LIFO 정리 순서를 반환하세요.
+      starterCode: |-
+        def manage_dynamic_resources(names, include_callback=True):
+            raise NotImplementedError
+      solution: |-
+        def manage_dynamic_resources(names, include_callback=True):
+            from contextlib import ExitStack, contextmanager
+
+            if not names:
+                raise ValueError("names required")
+
+            @contextmanager
+            def resource(name, events):
+                events.append(f"open:{name}")
+                try:
+                    yield name
+                finally:
+                    events.append(f"close:{name}")
+
+            events = []
+            with ExitStack() as stack:
+                acquired = [
+                    stack.enter_context(resource(name, events))
+                    for name in names
+                ]
+                if include_callback:
+                    stack.callback(events.append, "callback")
+                events.append("using:" + ",".join(acquired))
+
+            close_order = [
+                event.split(":", 1)[1]
+                for event in events
+                if event.startswith("close:")
+            ]
+            return {
+                "events": events,
+                "closeOrder": close_order,
+                "callbackBeforeFirstClose": (
+                    "callback" in events
+                    and events.index("callback") < next(index for index, event in enumerate(events) if event.startswith("close:"))
+                ),
+            }
+      hints:
+      - closeOrder는 names의 역순이어야 합니다.
+      - callback 등록을 close 등록 뒤에 하면 가장 먼저 실행됩니다.
+    check:
+      id: python.builtins.contextlib.exitstack.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.contextlib.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: manage_dynamic_resources
+        cases:
+        - id: closes-dynamic-resources-in-lifo-order
+          arguments:
+          - value:
+            - a
+            - b
+            - c
+          - value: true
+          expectedReturn:
+            events:
+            - open:a
+            - open:b
+            - open:c
+            - using:a,b,c
+            - callback
+            - close:c
+            - close:b
+            - close:a
+            closeOrder:
+            - c
+            - b
+            - a
+            callbackBeforeFirstClose: true
+        - id: rejects-empty-resource-list
+          arguments:
+          - value: []
+          - value: true
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 32_contextlib-suppress-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 32_contextlib-exitstack-transfer
+    title: suppress가 지정 예외만 흡수한다는 점 회상하기
+    subtitle: narrow exception handling
+    goal: KeyError와 ValueError 흐름을 비교해 suppress(KeyError)가 KeyError만 흡수하고 ValueError는 전파시키는지 반환한다.
+    why: 시간이 지나도 남아야 할 contextlib 감각은 suppress를 넓게 쓰면 버그를 숨기므로, 흡수할 예외를 좁게 지정해야 한다는 점입니다.
+    explanation: simulate_suppress_flow(error_name)를 완성해 key, value, none 경로의 log와 흡수/전파 여부를 반환하세요.
+    tips:
+    - KeyError는 suppress(KeyError)가 흡수합니다.
+    - ValueError는 suppress 대상이 아니므로 바깥 except로 이동합니다.
+    exercise:
+      prompt: simulate_suppress_flow(error_name)를 완성해 suppress(KeyError)의 흡수 대상과 비대상 흐름을 반환하세요.
+      starterCode: |-
+        def simulate_suppress_flow(error_name):
+            raise NotImplementedError
+      solution: |-
+        def simulate_suppress_flow(error_name):
+            from contextlib import suppress
+
+            if error_name not in {"key", "value", "none"}:
+                raise ValueError("unknown error flow")
+
+            log = []
+            try:
+                with suppress(KeyError):
+                    log.append("enter")
+                    if error_name == "key":
+                        raise KeyError("missing")
+                    if error_name == "value":
+                        raise ValueError("bad")
+                    log.append("after")
+            except ValueError as exc:
+                log.append(f"caught:{exc}")
+
+            return {
+                "log": log,
+                "suppressedKeyError": error_name == "key" and log == ["enter"],
+                "propagatedValueError": any(item.startswith("caught:") for item in log),
+            }
+      hints:
+      - suppress 안의 코드가 예외를 만나면 그 뒤 줄은 실행되지 않습니다.
+      - ValueError는 바깥 except에서 caught 로그를 남기게 하세요.
+    check:
+      id: python.builtins.contextlib.suppress.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.contextlib.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: simulate_suppress_flow
+        cases:
+        - id: absorbs-only-key-error
+          arguments:
+          - value: key
+          expectedReturn:
+            log:
+            - enter
+            suppressedKeyError: true
+            propagatedValueError: false
+        - id: propagates-value-error
+          arguments:
+          - value: value
+          expectedReturn:
+            log:
+            - enter
+            - caught:bad
+            suppressedKeyError: false
+            propagatedValueError: true
+        - id: rejects-unknown-flow
+          arguments:
+          - value: timeout
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

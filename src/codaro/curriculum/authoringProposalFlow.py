@@ -59,56 +59,6 @@ def buildVariationProposalPayload(
     }
 
 
-def buildPredictPromptProposalPayload(
-    *,
-    studyLoader: StudyLoader | None,
-    category: str,
-    contentId: str,
-    maxProposals: int = 20,
-) -> dict[str, object]:
-    if not category or not contentId:
-        raise CurriculumAuthoringProposalError(
-            "curriculum_lesson_required",
-            "category and contentId are required",
-        )
-    if studyLoader is None:
-        raise CurriculumAuthoringProposalError(
-            "curriculum_loader_unavailable",
-            "study loader unavailable — curricula path missing",
-        )
-    lesson = _loadLessonContract(studyLoader, category, contentId)
-    drafts: list[dict[str, object]] = []
-    skipped: list[dict[str, str]] = []
-    for section in lesson.sections:
-        exercise = section.exercise
-        if not (exercise.prompt or exercise.starterCode or exercise.solution):
-            continue
-        existing = exercise.predict
-        if existing.prompt and any([
-            existing.expectedShape,
-            existing.expectedDtype,
-            existing.expectedValue,
-            existing.expectedError,
-        ]):
-            skipped.append({"sectionId": section.id, "reason": "predict already filled"})
-            continue
-        drafts.append(predictDraftFromSection(section))
-        if len(drafts) >= maxProposals:
-            break
-
-    return {
-        "category": category,
-        "contentId": contentId,
-        "sectionCount": len(lesson.sections),
-        "drafts": drafts,
-        "skipped": skipped,
-        "next": (
-            "사람이 각 draft를 검토한 뒤 해당 section의 exercise.predict 블록에 채워주세요. "
-            "draft 의 expectedValue/expectedError는 휴리스틱 초안이라 정답이 아닐 수 있습니다."
-        ),
-    }
-
-
 def generateVariationDrafts(baseCode: str, count: int) -> list[dict[str, object]]:
     drafts: list[dict[str, object]] = []
     targetCount = max(1, min(count, 4))
@@ -165,54 +115,6 @@ def generateVariationDrafts(baseCode: str, count: int) -> list[dict[str, object]
         })
 
     return drafts[:targetCount]
-
-
-def predictDraftFromSection(section: LearningSectionContract) -> dict[str, object]:
-    exercise = section.exercise
-    solution = (exercise.solution or "").strip()
-    starter = (exercise.starterCode or "").strip()
-    referenceCode = solution or starter
-    suggestions: dict[str, str] = {
-        "prompt": "이 코드의 출력이 어떻게 될까요? 실행 전에 예측해 보세요.",
-    }
-
-    if not referenceCode:
-        return {
-            "sectionId": section.id,
-            "sectionTitle": section.title,
-            "predict": suggestions,
-            "rationale": "exercise 코드가 비어 있어 prompt 만 기본값으로 제안.",
-        }
-
-    rationale: list[str] = []
-    if "raise " in referenceCode or "raise\n" in referenceCode:
-        suggestions["expectedError"] = "(예외 종류를 적어주세요, 예: ValueError)"
-        rationale.append("raise 문 감지 → expectedError 후보")
-
-    pandasMethodHints = (".head(", ".tail(", ".shape", ".describe(", "DataFrame(", "pd.Series(")
-    if any(hint in referenceCode for hint in pandasMethodHints):
-        suggestions["expectedShape"] = "(행 x 열 형태로 적어주세요, 예: (3, 2))"
-        rationale.append("pandas 객체 조작 감지 → expectedShape 후보")
-
-    numpyMethodHints = ("np.array(", "np.zeros(", "np.ones(", ".dtype", ".astype(")
-    if any(hint in referenceCode for hint in numpyMethodHints):
-        suggestions["expectedDtype"] = "(예: int64, float64, object)"
-        rationale.append("numpy/dtype 조작 감지 → expectedDtype 후보")
-
-    if "print(" in referenceCode:
-        suggestions["expectedValue"] = "(셀 마지막 출력값을 한 줄로 적어주세요)"
-        rationale.append("print() 호출 감지 → expectedValue 후보")
-
-    if "expectedValue" not in suggestions and "expectedError" not in suggestions:
-        suggestions["expectedValue"] = "(셀 마지막 표현식의 결과를 적어주세요)"
-        rationale.append("기본 expectedValue 슬롯 제안")
-
-    return {
-        "sectionId": section.id,
-        "sectionTitle": section.title,
-        "predict": suggestions,
-        "rationale": "; ".join(rationale) if rationale else "기본 prompt 만 제안",
-    }
 
 
 def _loadLessonContract(studyLoader: StudyLoader, category: str, contentId: str):

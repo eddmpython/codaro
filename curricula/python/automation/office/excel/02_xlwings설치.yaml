@@ -188,3 +188,280 @@ sections:
     content: 이번 레슨에서는 xlsx 입력을 DataFrame으로 읽고, 파생 컬럼을 만들고, 정제 결과와 요약을 여러 시트로 저장했습니다.
   goal: 정리에서 워크북과 시트을 바꿨을 때 저장 파일과 셀 값가 어떻게 달라지는지 확인한다.
   why: 엑셀 자동화는 반복 보고서와 정산 파일을 코드로 재현하는 실무 흐름입니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: excel_02-xlwings-environment-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - summary
+    title: xlwings 실행 환경의 재현 가능성 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: Python·패키지·Excel·운영체제 요구를 한 계약으로 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 설치 명령 성공보다 실제 runtime capability를 검사하세요.
+    - Python과 xlwings 버전은 환경 manifest에 고정하세요.
+    exercise:
+      prompt: audit_xlwings_environment(required, observed)를 완성하세요.
+      starterCode: |-
+        def audit_xlwings_environment(required, observed):
+            raise NotImplementedError
+      solution: |
+        def audit_xlwings_environment(required, observed):
+            missing = sorted(key for key, value in required.items() if value is True and not observed.get(key, False))
+            mismatched = sorted(key for key, value in required.items() if not isinstance(value, bool) and observed.get(key) != value)
+            return {"ready": not missing and not mismatched, "missing": missing, "mismatched": mismatched, "observed": {key: observed.get(key) for key in sorted(required)}}
+      hints: *id001
+    check:
+      id: python.excel.excel_02.xlwings-environment-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.excel.excel_02.xlwings-environment-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_xlwings_environment
+        cases:
+        - id: accepts-pinned-environment
+          arguments:
+          - value:
+              python: '3.12'
+              xlwings: '0.31'
+              desktopExcel: true
+          - value:
+              python: '3.12'
+              xlwings: '0.31'
+              desktopExcel: true
+          expectedReturn:
+            ready: true
+            missing: []
+            mismatched: []
+            observed:
+              desktopExcel: true
+              python: '3.12'
+              xlwings: '0.31'
+        - id: reports-package-version
+          arguments:
+          - value:
+              python: '3.12'
+              xlwings: '0.31'
+          - value:
+              python: '3.12'
+              xlwings: '0.30'
+          expectedReturn:
+            ready: false
+            missing: []
+            mismatched:
+            - xlwings
+            observed:
+              python: '3.12'
+              xlwings: '0.30'
+        - id: reports-missing-excel
+          arguments:
+          - value:
+              desktopExcel: true
+          - value:
+              desktopExcel: false
+          expectedReturn:
+            ready: false
+            missing:
+            - desktopExcel
+            mismatched: []
+            observed:
+              desktopExcel: false
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: excel_02-environment-remediation-plan-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - excel_02-xlwings-environment-contract-mastery
+    title: 환경 차이에서 최소 복구 계획 만들기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 누락 capability와 버전 불일치에 정확한 다음 행동을 연결한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 광범위한 재설치보다 실패한 capability만 복구하세요.
+    - 복구 뒤 동일 audit를 다시 실행하도록 표시하세요.
+    exercise:
+      prompt: plan_environment_remediation(audit)를 완성하세요.
+      starterCode: |-
+        def plan_environment_remediation(audit):
+            raise NotImplementedError
+      solution: |
+        def plan_environment_remediation(audit):
+            actions = []
+            for item in sorted(audit.get("missing", [])):
+                actions.append({"target": item, "action": "provision-capability"})
+            for item in sorted(audit.get("mismatched", [])):
+                actions.append({"target": item, "action": "sync-pinned-version"})
+            return {"actions": actions, "retryAudit": bool(actions), "ready": not actions}
+      hints: *id002
+    check:
+      id: python.excel.excel_02.environment-remediation-plan.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.excel.excel_02.environment-remediation-plan.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_environment_remediation
+        cases:
+        - id: keeps-ready-environment
+          arguments:
+          - value:
+              missing: []
+              mismatched: []
+          expectedReturn:
+            actions: []
+            retryAudit: false
+            ready: true
+        - id: plans-capability
+          arguments:
+          - value:
+              missing:
+              - desktopExcel
+              mismatched: []
+          expectedReturn:
+            actions:
+            - target: desktopExcel
+              action: provision-capability
+            retryAudit: true
+            ready: false
+        - id: plans-version-sync
+          arguments:
+          - value:
+              missing:
+              - macroExecution
+              mismatched:
+              - python
+              - xlwings
+          expectedReturn:
+            actions:
+            - target: macroExecution
+              action: provision-capability
+            - target: python
+              action: sync-pinned-version
+            - target: xlwings
+              action: sync-pinned-version
+            retryAudit: true
+            ready: false
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: excel_02-environment-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - excel_02-environment-remediation-plan-transfer
+    title: xlwings 환경 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 버전·capability·smoke test를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 버전 기록과 실제 capability probe를 분리하세요.
+    - smoke test는 사용자의 기존 workbook이 아닌 disposable artifact로 실행하세요.
+    exercise:
+      prompt: choose_environment_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_environment_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_environment_evidence(stage):
+            table = {"versions": {"action": "record pinned runtime versions", "evidence": "environment manifest", "risk": "works only on author machine"}, "capability": {"action": "probe Excel and xlwings availability", "evidence": "capability audit", "risk": "package installed but Excel absent"}, "smoke": {"action": "open save close disposable workbook", "evidence": "lifecycle log", "risk": "broken integration"}}
+            if stage not in table:
+                raise ValueError("unknown stage")
+            return table[stage]
+      hints: *id003
+    check:
+      id: python.excel.excel_02.environment-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.excel.excel_02.environment-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_environment_evidence
+        cases:
+        - id: recalls-versions
+          arguments:
+          - value: versions
+          expectedReturn:
+            action: record pinned runtime versions
+            evidence: environment manifest
+            risk: works only on author machine
+        - id: recalls-capability
+          arguments:
+          - value: capability
+          expectedReturn:
+            action: probe Excel and xlwings availability
+            evidence: capability audit
+            risk: package installed but Excel absent
+        - id: recalls-smoke
+          arguments:
+          - value: smoke
+          expectedReturn:
+            action: open save close disposable workbook
+            evidence: lifecycle log
+            risk: broken integration
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

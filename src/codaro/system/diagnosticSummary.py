@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any, Literal
 
+from codaro.generatedContracts import ARTIFACT_OWNERSHIP_CONTRACT_SHA256
+
 
 DiagnosticCategory = Literal["provider", "runtime", "package", "frontend"]
 DiagnosticSeverity = Literal["info", "warning", "error"]
@@ -111,6 +113,9 @@ def buildDiagnosticExport(
         "items": safeDiagnosticValue(safeSummary.get("items") or []),
         "summary": safeSummary,
         "context": safeDiagnosticValue(context or {}),
+        "contractHashes": {
+            "artifactOwnership": ARTIFACT_OWNERSHIP_CONTRACT_SHA256,
+        },
         "redaction": {
             "secrets": "redacted",
             "policy": "token/apiKey/secret/authorization/oauth/sk values are removed",

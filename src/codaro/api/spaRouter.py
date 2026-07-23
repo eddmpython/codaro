@@ -34,7 +34,10 @@ def createSpaRouter(state: ServerState) -> APIRouter:
             rootPath = request.scope.get("root_path", "")
             injected = indexHtml.replace(
                 "</head>",
-                f'<meta name="codaro-base" content="{rootPath}">\n  </head>',
+                (
+                    f'<meta name="codaro-base" content="{rootPath}">\n'
+                    '  <meta name="codaro-runtime-tier" content="local">\n  </head>'
+                ),
             )
             return HTMLResponse(injected)
 

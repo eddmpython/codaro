@@ -75,10 +75,6 @@ sections:
     hints:
     - 바꿀 지점은 `f = ...` 오른쪽 값입니다.
     - 실행 뒤 `f` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 줄의 문자열은 어떻게 표시될까요?
-      expectedValue: 'File created'
-      expectedDtype: str
   check:
     noError: 파일 열기에서 `f` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 파일 열기 실행 뒤 `f` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
@@ -115,9 +111,6 @@ sections:
     hints:
     - 바꿀 지점은 `writer = ...` 오른쪽 값입니다.
     - 실행 뒤 `writer` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     noError: 파일 읽기에서 `writer` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 파일 읽기 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
@@ -146,9 +139,6 @@ sections:
     hints:
     - 바꿀 지점은 `fileObj = ...` 오른쪽 값입니다.
     - 실행 뒤 `fileObj` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     noError: 파일 쓰기에서 `fileObj` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 파일 쓰기 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
@@ -183,9 +173,6 @@ sections:
     hints:
     - 바꿀 지점은 `data = ...` 오른쪽 값입니다.
     - 실행 뒤 `data` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     noError: with 문에서 `data` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: with 문 실행 뒤 `data` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
@@ -220,9 +207,6 @@ sections:
     hints:
     - 바꿀 지점은 `readData = ...` 오른쪽 값입니다.
     - 실행 뒤 `readData` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     noError: 파일 모드에서 `readData` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 파일 모드 실행 뒤 `readData` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
@@ -261,9 +245,6 @@ sections:
     hints:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     noError: 줄 단위 순회의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
     resultCheck: 줄 단위 순회 반복 결과의 개수나 누적값이 바꾼 반복 대상 기준으로 달라져야 합니다.
@@ -314,9 +295,6 @@ sections:
     hints:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: '검증 루프: 임시 작업 폴더에서 리포트 파일 만들기의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.'
@@ -346,10 +324,226 @@ sections:
     hints:
     - 바꿀 지점은 문자열, 숫자, 변수 같은 예제 값을 만드는 첫 줄과 기초 문법 줄에서 찾으세요.
     - 실행 뒤 출력 또는 마지막 표현식 결과 중 하나가 바꾼 값을 반영하는지 보세요.
-    predict:
-      prompt: 셀 마지막 줄의 문자열은 어떻게 표시될까요?
-      expectedValue: 'File created'
-      expectedDtype: str
   check:
     noError: Day 19 종합 복습의 수정 코드가 기초 문법 단계의 마지막 확인 값까지 도달해야 합니다.
     resultCheck: Day 19 종합 복습 실행 결과가 출력 또는 마지막 표현식 결과 기준으로 바꾼 입력값을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: day19-read-lines-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - open_file
+    - practice
+    title: fixture 파일의 유효한 줄 읽기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 파일을 읽고 빈 줄과 바깥 공백을 정리한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: read_nonempty_lines(path)가 UTF-8 파일의 비어 있지 않은 줄을 공백 없이 목록으로 반환하도록 완성하세요.
+      starterCode: |-
+        def read_nonempty_lines(path):
+            raise NotImplementedError
+      solution: |-
+        def read_nonempty_lines(path):
+            from pathlib import Path
+            return [line.strip() for line in Path(path).read_text(encoding='utf-8').splitlines() if line.strip()]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day19.read-lines.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day19.read-lines.mastery.behavior.v1.fixture
+      fixtureHash: sha256-Yw7O5xDp22cx744gy0Y1FlQheKEtbVwqDzI+wxf9Qng=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: notes.txt
+          content: " first \n\nsecond\n"
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: read_nonempty_lines
+        cases:
+        - id: notes
+          arguments:
+          - fixturePath: notes.txt
+          expectedReturn:
+          - first
+          - second
+        expectedPaths:
+        - path: notes.txt
+          kind: file
+          origin: fixture
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day19-write-uppercase-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day19-read-lines-mastery
+    title: 입력 파일을 대문자 결과 파일로 쓰기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 읽기와 쓰기를 새로운 변환 작업에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: write_uppercase(source_path, output_name)가 내용을 대문자로 저장하고 저장한 문자열을 반환하도록 완성하세요.
+      starterCode: |-
+        def write_uppercase(source_path, output_name):
+            raise NotImplementedError
+      solution: |-
+        def write_uppercase(source_path, output_name):
+            from pathlib import Path
+            content = Path(source_path).read_text(encoding='utf-8').upper()
+            Path(output_name).write_text(content, encoding='utf-8')
+            return content
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day19.write-uppercase.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day19.write-uppercase.transfer.behavior.v1.fixture
+      fixtureHash: sha256-fmP9wDtiPOLQIm5Anm9bs4bEi81QR24pJ0xjQj2Za+8=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: source.txt
+          content: |
+            hello
+            codaro
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: write_uppercase
+        cases:
+        - id: report
+          arguments:
+          - fixturePath: source.txt
+          - value: result.txt
+          expectedReturn: |
+            HELLO
+            CODARO
+        expectedPaths:
+        - path: source.txt
+          kind: file
+          origin: fixture
+        - path: result.txt
+          kind: file
+          origin: created
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day19-append-log-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day19-write-uppercase-transfer
+    title: 기존 로그 끝에 한 줄 추가하기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 파일 mode와 줄바꿈을 기억에서 다시 구성한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: append_log(path, message)가 기존 UTF-8 파일 끝에 message 한 줄을 추가하고 전체 내용을 반환하도록 완성하세요.
+      starterCode: |-
+        def append_log(path, message):
+            raise NotImplementedError
+      solution: |-
+        def append_log(path, message):
+            from pathlib import Path
+            target = Path(path)
+            with target.open('a', encoding='utf-8') as stream:
+                stream.write(message + '\n')
+            return target.read_text(encoding='utf-8')
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day19.append-log.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day19.append-log.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-OxH6HB9Hilr6yml+wSPXchBOEys7kX4uqaB49yZ8skc=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: activity.log
+          content: |
+            start
+        - path: empty.log
+          content: ''
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: append_log
+        cases:
+        - id: done
+          arguments:
+          - fixturePath: activity.log
+          - value: done
+          expectedReturn: |
+            start
+            done
+        - id: first-line
+          arguments:
+          - fixturePath: empty.log
+          - value: first
+          expectedReturn: |
+            first
+        expectedPaths:
+        - path: activity.log
+          kind: file
+          origin: fixture
+        - path: empty.log
+          kind: file
+          origin: fixture
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

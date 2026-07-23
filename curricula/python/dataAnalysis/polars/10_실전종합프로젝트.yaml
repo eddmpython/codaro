@@ -742,3 +742,273 @@ sections:
     type: noError
     noError: 업무 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 업무 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: polars_10-columnar-report-pipeline-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_goal
+    - workflow_validation
+    title: 검증·정제·집계·rank를 잇는 columnar report 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 원시 판매 행에서 schema 오류를 분리하고 region별 total과 rank를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 정제에서 제외한 원래 index를 버리지 마세요.
+    - rank는 집계 total을 계산한 뒤 적용하세요.
+    exercise:
+      prompt: run_columnar_report(rows)를 완성해 rejectedIndexes와 regions를 반환하세요.
+      starterCode: |-
+        def run_columnar_report(rows):
+            raise NotImplementedError
+      solution: |
+        def run_columnar_report(rows):
+            totals = {}
+            rejected = []
+            for index, row in enumerate(rows):
+                amount = row.get("amount")
+                region = str(row.get("region", "")).strip()
+                if not region or not isinstance(amount, (int, float)) or isinstance(amount, bool) or amount < 0:
+                    rejected.append(index)
+                    continue
+                totals[region] = totals.get(region, 0) + amount
+            ordered = sorted(totals.items(), key=lambda item: (-item[1], item[0]))
+            regions = [{"region": region, "total": total, "rank": index} for index, (region, total) in enumerate(ordered, start=1)]
+            return {"rejectedIndexes": rejected, "regions": regions, "acceptedCount": len(rows) - len(rejected)}
+      hints: *id001
+    check:
+      id: python.polars.polars_10.columnar-report-pipeline.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_10.columnar-report-pipeline.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: run_columnar_report
+        cases:
+        - id: keeps-rejection-and-rank-evidence
+          arguments:
+          - value:
+            - region: Seoul
+              amount: 10
+            - region: Busan
+              amount: 20
+            - region: Seoul
+              amount: 15
+            - region: ''
+              amount: 5
+            - region: Busan
+              amount: bad
+          expectedReturn:
+            rejectedIndexes:
+            - 3
+            - 4
+            regions:
+            - region: Seoul
+              total: 25
+              rank: 1
+            - region: Busan
+              total: 20
+              rank: 2
+            acceptedCount: 3
+        - id: handles-empty-report
+          arguments:
+          - value: []
+          expectedReturn:
+            rejectedIndexes: []
+            regions: []
+            acceptedCount: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: polars_10-incremental-batch-merge-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_10-columnar-report-pipeline-mastery
+    title: 새 batch 집계를 기존 snapshot과 idempotent하게 병합하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: columnar report를 processed batch id 원장과 category total 업데이트로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - batch id를 total보다 먼저 확인해 replay를 막으세요.
+    - 입력 snapshot을 직접 mutate하지 말고 새 결과를 반환하세요.
+    exercise:
+      prompt: merge_incremental_batch(snapshot, batch_id, rows)를 완성하세요.
+      starterCode: |-
+        def merge_incremental_batch(snapshot, batch_id, rows):
+            raise NotImplementedError
+      solution: |
+        def merge_incremental_batch(snapshot, batch_id, rows):
+            result = {"processed": list(snapshot.get("processed", [])), "totals": dict(snapshot.get("totals", {}))}
+            if batch_id in result["processed"]:
+                return {**result, "applied": False}
+            for row in rows:
+                result["totals"][row["category"]] = result["totals"].get(row["category"], 0) + row["amount"]
+            result["processed"].append(batch_id)
+            result["processed"].sort()
+            result["totals"] = {key: result["totals"][key] for key in sorted(result["totals"])}
+            return {**result, "applied": True}
+      hints: *id002
+    check:
+      id: python.polars.polars_10.incremental-batch-merge.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_10.incremental-batch-merge.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: merge_incremental_batch
+        cases:
+        - id: applies-new-batch-once
+          arguments:
+          - value:
+              processed:
+              - b1
+              totals:
+                book: 10
+          - value: b2
+          - value:
+            - category: book
+              amount: 5
+            - category: pen
+              amount: 2
+          expectedReturn:
+            processed:
+            - b1
+            - b2
+            totals:
+              book: 15
+              pen: 2
+            applied: true
+        - id: skips-replayed-batch
+          arguments:
+          - value:
+              processed:
+              - b1
+              totals:
+                book: 10
+          - value: b1
+          - value:
+            - category: book
+              amount: 100
+          expectedReturn:
+            processed:
+            - b1
+            totals:
+              book: 10
+            applied: false
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: polars_10-columnar-capstone-evidence-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_10-incremental-batch-merge-transfer
+    title: columnar pipeline 완료 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: source, optimized plan, result, incremental state의 검증 증거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 결과 숫자뿐 아니라 source schema와 실행 plan을 보존하세요.
+    - incremental pipeline은 같은 batch 재실행 결과까지 검증해야 합니다.
+    exercise:
+      prompt: choose_columnar_evidence(situation)를 완성해 evidence, check, risk를 반환하세요.
+      starterCode: |-
+        def choose_columnar_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_columnar_evidence(situation):
+            table = {'source': {'evidence': 'schema hash and row count', 'check': 'required columns', 'risk': 'silent drift'}, 'optimized-plan': {'evidence': 'explain output', 'check': 'pushdown and collect boundary', 'risk': 'eager full scan'}, 'incremental-state': {'evidence': 'processed batch ids', 'check': 'replay returns applied false', 'risk': 'double count'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.polars.polars_10.columnar-capstone-evidence.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_10.columnar-capstone-evidence.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_columnar_evidence
+        cases:
+        - id: recalls-source
+          arguments:
+          - value: source
+          expectedReturn:
+            evidence: schema hash and row count
+            check: required columns
+            risk: silent drift
+        - id: recalls-optimized-plan
+          arguments:
+          - value: optimized-plan
+          expectedReturn:
+            evidence: explain output
+            check: pushdown and collect boundary
+            risk: eager full scan
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

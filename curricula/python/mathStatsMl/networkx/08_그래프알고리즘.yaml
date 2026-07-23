@@ -539,3 +539,262 @@ sections:
   check:
     noError: 업무 흐름 검증에서 `experimentGraph` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: networkx_08-bfs-traversal-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: BFS 탐색 순서와 거리 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 시작 node에서 안정적 BFS order와 hop distance를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - queue에 넣을 때 visited를 표시해 중복 삽입을 막으세요.
+    - 이웃 순서를 정렬해 traversal을 재현하세요.
+    exercise:
+      prompt: bfs_traversal(edges, start)를 완성하세요.
+      starterCode: |-
+        def bfs_traversal(edges, start):
+            raise NotImplementedError
+      solution: |
+        def bfs_traversal(edges, start):
+            adjacency = {}
+            for a, b in edges: adjacency.setdefault(a, set()).add(b); adjacency.setdefault(b, set()).add(a)
+            order = []; distance = {start: 0}; queue = [start]
+            while queue:
+                node = queue.pop(0); order.append(node)
+                for neighbor in sorted(adjacency.get(node, [])):
+                    if neighbor not in distance: distance[neighbor] = distance[node] + 1; queue.append(neighbor)
+            return {"order": order, "distance": {node: distance[node] for node in sorted(distance)}}
+      hints: *id001
+    check:
+      id: python.networkx.networkx_08.bfs-traversal.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_08.bfs-traversal.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: bfs_traversal
+        cases:
+        - id: returns-order-and-distance
+          arguments:
+          - value:
+            - - a
+              - b
+            - - a
+              - c
+            - - b
+              - d
+          - value: a
+          expectedReturn:
+            order:
+            - a
+            - b
+            - c
+            - d
+            distance:
+              a: 0
+              b: 1
+              c: 1
+              d: 2
+        - id: handles-isolated-start
+          arguments:
+          - value: []
+          - value: x
+          expectedReturn:
+            order:
+            - x
+            distance:
+              x: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: networkx_08-topological-order-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_08-bfs-traversal-mastery
+    title: 새 dependency graph에 위상 정렬 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: directed acyclic graph의 실행 순서와 cycle node를 반환한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - indegree 0 node만 ready queue에 넣으세요.
+    - cycle이 있으면 부분 순서를 완료로 보지 마세요.
+    exercise:
+      prompt: topological_order(nodes, edges)를 완성하세요.
+      starterCode: |-
+        def topological_order(nodes, edges):
+            raise NotImplementedError
+      solution: |
+        def topological_order(nodes, edges):
+            outgoing = {node: [] for node in nodes}; indegree = {node: 0 for node in nodes}
+            for source, target in edges: outgoing[source].append(target); indegree[target] += 1
+            ready = sorted(node for node in nodes if indegree[node] == 0); order = []
+            while ready:
+                node = ready.pop(0); order.append(node)
+                for target in sorted(outgoing[node]):
+                    indegree[target] -= 1
+                    if indegree[target] == 0: ready.append(target); ready.sort()
+            cycle = sorted(node for node in nodes if indegree[node] > 0)
+            return {"order": order, "cycleNodes": cycle}
+      hints: *id002
+    check:
+      id: python.networkx.networkx_08.topological-order.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_08.topological-order.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: topological_order
+        cases:
+        - id: orders-dependencies
+          arguments:
+          - value:
+            - build
+            - test
+            - deploy
+          - value:
+            - - build
+              - test
+            - - test
+              - deploy
+          expectedReturn:
+            order:
+            - build
+            - test
+            - deploy
+            cycleNodes: []
+        - id: reports-cycle
+          arguments:
+          - value:
+            - a
+            - b
+          - value:
+            - - a
+              - b
+            - - b
+              - a
+          expectedReturn:
+            order: []
+            cycleNodes:
+            - a
+            - b
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: networkx_08-graph-algorithm-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_08-topological-order-transfer
+    title: graph 알고리즘 선택 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 탐색·순서·경로 질문을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 그래프 알고리즘의 입력 가정과 반환 의미를 함께 기록하세요.
+    - 시각적 모양만으로 구조적 결론을 내리지 마세요.
+    exercise:
+      prompt: choose_graph_algorithm(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_graph_algorithm(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_graph_algorithm(situation):
+            table = {'layers-from-source': {'method': 'BFS', 'evidence': 'hop distance', 'risk': 'weighted edges'}, 'dependency-order': {'method': 'topological sort', 'evidence': 'DAG and indegree', 'risk': 'cycle'}, 'visit-deep-branch': {'method': 'DFS', 'evidence': 'discovery tree', 'risk': 'recursion depth'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.networkx.networkx_08.graph-algorithm-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_08.graph-algorithm-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_graph_algorithm
+        cases:
+        - id: recalls-layers-from-source
+          arguments:
+          - value: layers-from-source
+          expectedReturn:
+            method: BFS
+            evidence: hop distance
+            risk: weighted edges
+        - id: recalls-dependency-order
+          arguments:
+          - value: dependency-order
+          expectedReturn:
+            method: topological sort
+            evidence: DAG and indegree
+            risk: cycle
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

@@ -37,6 +37,11 @@ def testGateNamesAreStable() -> None:
         "docs",
         "backend",
         "architecture-boundary",
+        "design-system-contract",
+        "visual-assets",
+        "learning-method",
+        "learning-evidence-contract",
+        "learning-efficacy-report",
         "teacher-eval",
         "teacher-e2e",
         "assistant-workloop-contract",
@@ -45,6 +50,7 @@ def testGateNamesAreStable() -> None:
         "learning-system-readiness",
         "dogfood-alpha-audit",
         "product-quality-audit",
+        "plan-quality",
         "automation-ide-audit",
         "service-readiness-audit",
         "diagnostic-summary-contract",
@@ -55,12 +61,18 @@ def testGateNamesAreStable() -> None:
         "pyproc-runtime-fs-browser",
         "pyproc-asgi-browser",
         "curriculum-quality-matrix",
+        "learning-content",
         "curriculum-executability",
         "curriculum-top-tier-audit",
         "curriculum-weakness-audit",
-        "predict-contract-strict",
+        "removed-learning-concepts",
+        "repository-simplification",
         "playwright-curriculum-runtime",
         "onboarding-browser",
+        "web-learning",
+        "landing-public",
+        "local-studio-browser",
+        "product-experience-browser",
         "frontend-performance-budget",
         "learning-card-contract",
         "learning-card-browser",
@@ -73,6 +85,8 @@ def testGateNamesAreStable() -> None:
         "app-runtime",
         "mobile-layout",
         "attempts",
+        "path-learning-signal",
+        "path-efficacy-confirmatory",
     }
     assert runner.PREFLIGHT_GATES == (
         "root-clean",
@@ -98,6 +112,11 @@ def testGateNamesAreStable() -> None:
         "docs",
         "backend",
         "architecture-boundary",
+        "design-system-contract",
+        "visual-assets",
+        "learning-method",
+        "learning-evidence-contract",
+        "learning-efficacy-report",
         "learning-system-readiness",
         "dogfood-alpha-audit",
         "product-quality-audit",
@@ -112,13 +131,46 @@ def testGateNamesAreStable() -> None:
         "pyproc-runtime-fs-browser",
         "pyproc-asgi-browser",
         "curriculum-quality-matrix",
+        "repository-simplification",
         "curriculum-executability",
         "curriculum-top-tier-audit",
         "playwright-curriculum-runtime",
         "onboarding-browser",
+        "web-learning",
+        "landing-public",
+        "local-studio-browser",
+        "product-experience-browser",
         "frontend-performance-budget",
         "landing-build",
         "launcher-test",
+        "learning-content",
+    )
+    assert runner.PRODUCT_RELEASE_GATES == (
+        "root-clean",
+        "docs",
+        "backend",
+        "architecture-boundary",
+        "editor-build",
+        "landing-build",
+        "mobile-layout",
+        "frontend-performance-budget",
+        "design-system-contract",
+        "learning-method",
+        "curriculum-quality-matrix",
+        "repository-simplification",
+        "learning-content",
+        "web-learning",
+        "visual-assets",
+        "landing-public",
+        "removed-learning-concepts",
+        "product-experience-browser",
+        "local-studio-browser",
+        "learning-evidence-contract",
+        "learning-efficacy-report",
+        "automation-ide-audit",
+        "launcher-test",
+        "path-learning-signal",
+        "plan-quality",
     )
 
 
@@ -246,7 +298,7 @@ def testUvWithCommandsUseRepoLocalCache(monkeypatch, tmp_path) -> None:
     )
     withEnv = runner.localGateEnvironment("playwright-curriculum-runtime", withArgs)
 
-    assert withArgs == ("uv", "run", "--with", "playwright", "python", "-c", "pass")
+    assert withArgs == ("uv", "run", "--no-sync", "--with", "playwright", "python", "-c", "pass")
     assert "UV_NO_CACHE" not in withEnv
     assert withEnv["UV_CACHE_DIR"].endswith("output\\test-runner\\playwright-curriculum-runtime\\uv-cache") or withEnv[
         "UV_CACHE_DIR"
@@ -259,7 +311,7 @@ def testUvWithCommandsUseRepoLocalCache(monkeypatch, tmp_path) -> None:
     )
     regularEnv = runner.localGateEnvironment("backend", regularArgs)
 
-    assert regularArgs[:3] == ("uv", "--no-cache", "run")
+    assert regularArgs[:4] == ("uv", "--no-cache", "run", "--no-sync")
     assert regularEnv["UV_NO_CACHE"] == "1"
 
 

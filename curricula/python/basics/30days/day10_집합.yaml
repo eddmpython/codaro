@@ -3,6 +3,9 @@ meta:
   title: 집합
   day: 10
   category: 30days
+  outcomes: ["python.dictsAndSets"]
+  prerequisites: ["python.lists"]
+  estimatedMinutes: 30
   tags:
   - 집합
   - 중복제거
@@ -71,9 +74,6 @@ sections:
     hints:
     - 바꿀 지점은 `nums = ...` 오른쪽 값입니다.
     - 실행 뒤 `nums` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 집합이란?에서 `nums` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -99,9 +99,6 @@ sections:
     hints:
     - 바꿀 지점은 `direct = ...` 오른쪽 값입니다.
     - 실행 뒤 `direct` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 집합 생성하기에서 `direct` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -127,9 +124,6 @@ sections:
     hints:
     - 바꿀 지점은 `dups = ...` 오른쪽 값입니다.
     - 실행 뒤 `dups` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 중복 제거 특성에서 `dups` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -159,9 +153,6 @@ sections:
     hints:
     - 바꿀 지점은 `fruits = ...` 오른쪽 값입니다.
     - 실행 뒤 `fruits` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: add() 메서드에서 `fruits` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -189,9 +180,6 @@ sections:
     hints:
     - 바꿀 지점은 `nums = ...` 오른쪽 값입니다.
     - 실행 뒤 `nums` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: remove()와 discard()에서 `nums` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -219,9 +207,6 @@ sections:
     hints:
     - 바꿀 지점은 `items = ...` 오른쪽 값입니다.
     - 실행 뒤 `items` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: clear() 메서드에서 `items` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -249,9 +234,6 @@ sections:
     hints:
     - 바꿀 지점은 `setA = ...` 오른쪽 값입니다.
     - 실행 뒤 `setA` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 합집합 (union)에서 `setA` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -279,9 +261,6 @@ sections:
     hints:
     - 바꿀 지점은 `setA = ...` 오른쪽 값입니다.
     - 실행 뒤 `setA` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 교집합 (intersection)에서 `setA` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -309,9 +288,6 @@ sections:
     hints:
     - 바꿀 지점은 `setA = ...` 오른쪽 값입니다.
     - 실행 뒤 `setA` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 차집합 (difference)에서 `setA` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -339,9 +315,6 @@ sections:
     hints:
     - 바꿀 지점은 `setA = ...` 오른쪽 값입니다.
     - 실행 뒤 `setA` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 대칭차집합 (symmetricdifference)에서 `setA` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -367,9 +340,6 @@ sections:
     hints:
     - 바꿀 지점은 `colors = ...` 오른쪽 값입니다.
     - 실행 뒤 `colors` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: in/not in 연산자에서 `colors` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -395,9 +365,6 @@ sections:
     hints:
     - 바꿀 지점은 `sample = ...` 오른쪽 값입니다.
     - 실행 뒤 `sample` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 집합 길이에서 `sample` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -439,9 +406,6 @@ sections:
     hints:
     - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
     - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: '검증 루프: 권한과 참석자 집합 비교하기에서 `dayOne` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
@@ -467,10 +431,227 @@ sections:
     hints:
     - 바꿀 지점은 `nums = ...` 오른쪽 값입니다.
     - 실행 뒤 `nums` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: Day 10 종합 복습에서 `nums` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Day 10 종합 복습 실행 뒤 `nums` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: day10-common-tags-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - set_intro
+    - practice
+    title: 두 태그 집합의 공통값 찾기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 교집합을 정렬된 결과로 바꿔 안정적으로 반환한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: common_tags(left, right)가 공통 항목을 정렬한 목록으로 반환하도록 완성하세요.
+      starterCode: |-
+        def common_tags(left, right):
+            raise NotImplementedError
+      solution: |-
+        def common_tags(left, right):
+            return sorted(set(left) & set(right))
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day10.common-tags.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day10.common-tags.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: common_tags
+        cases:
+        - id: overlap
+          arguments:
+          - value:
+            - python
+            - web
+          - value:
+            - web
+            - data
+          expectedReturn:
+          - web
+        - id: many
+          arguments:
+          - value:
+            - 3
+            - 1
+            - 2
+          - value:
+            - 2
+            - 3
+            - 4
+          expectedReturn:
+          - 2
+          - 3
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day10-unique-count-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day10-common-tags-mastery
+    title: 중복 응답 수를 고유 개수로 바꾸기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 집합의 중복 제거 성질을 집계 문제에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: unique_count(items)가 중복을 제외한 항목 개수를 반환하도록 완성하세요.
+      starterCode: |-
+        def unique_count(items):
+            raise NotImplementedError
+      solution: |-
+        def unique_count(items):
+            return len(set(items))
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day10.unique-count.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day10.unique-count.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: unique_count
+        cases:
+        - id: numbers
+          arguments:
+          - value:
+            - 1
+            - 1
+            - 2
+            - 3
+            - 3
+          expectedReturn: 3
+        - id: words
+          arguments:
+          - value:
+            - a
+            - b
+            - a
+          expectedReturn: 2
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day10-only-left-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day10-unique-count-transfer
+    title: 왼쪽 집합에만 있는 값 찾기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 차집합 연산을 기억에서 다시 구성한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: only_left(left, right)가 left에만 있는 항목을 정렬한 목록으로 반환하도록 완성하세요.
+      starterCode: |-
+        def only_left(left, right):
+            raise NotImplementedError
+      solution: |-
+        def only_left(left, right):
+            return sorted(set(left) - set(right))
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day10.only-left.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day10.only-left.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: only_left
+        cases:
+        - id: numbers
+          arguments:
+          - value:
+            - 1
+            - 2
+            - 3
+          - value:
+            - 2
+            - 4
+          expectedReturn:
+          - 1
+          - 3
+        - id: words
+          arguments:
+          - value:
+            - red
+            - blue
+          - value:
+            - blue
+          expectedReturn:
+          - red
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

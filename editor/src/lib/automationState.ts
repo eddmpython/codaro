@@ -26,6 +26,8 @@ export type AutomationActionResult = {
   refresh: boolean;
 };
 
+export const AUTOMATION_UPDATED_EVENT = "codaro:automation-updated";
+
 export function fallbackAutomationSnapshot(): AutomationSnapshot {
   return {
     auditCount: 0,
@@ -93,6 +95,25 @@ export async function runAutomationTask(task: TaskDefinition, apiOnline: boolean
       tone: run.status === "success" ? "success" : "warning",
       title: translate("automation.taskStatus.title", { status: statusLabel(run.status) }),
       detail: run.output || run.error || task.name,
+    },
+  };
+}
+
+export async function setAutomationTaskEnabled(
+  task: TaskDefinition,
+  enabled: boolean,
+  apiOnline: boolean,
+): Promise<AutomationActionResult> {
+  if (!apiOnline) {
+    throw new Error(translate("automation.taskRunFailed.title"));
+  }
+  await codaroApi.updateTask(task.id, { enabled });
+  return {
+    refresh: true,
+    notice: {
+      tone: "success",
+      title: enabled ? translate("automation.task.enabled") : translate("automation.task.disabled"),
+      detail: task.name || task.documentPath,
     },
   };
 }

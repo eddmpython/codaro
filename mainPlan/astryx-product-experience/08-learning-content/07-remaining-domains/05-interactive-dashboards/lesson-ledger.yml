@@ -1,0 +1,55 @@
+schemaVersion: 1
+pathId: interactiveDashboards
+composerSnapshotDate: "2026-07-18"
+composerGraphCount: 469
+composerVersionHash: "75fc453f508da3b8709bd0be8a4d36213ec535c7af7d2cd892e20c2aca3e7c06"
+taxonomySnapshotHash: "b5e9b0b9db4f6ecd89c7be10a5c795f9b991b3ce700d5b5cf044607fc835def2"
+sourceSetHash: "5f8d7bb62f23c2e10ed89536f72449613b42d55e7c0a659010a18ebf61ce535e"
+ledgerTool: "uv run python -X utf8 docs/skills/ops/tools/buildLearningLedgers.py --check"
+targetOutcomes:
+  - "pandas.loadFrame"
+  - "pandas.aggregate"
+  - "viz.interactive"
+  - "viz.interactiveAdvanced"
+  - "viz.declarative"
+gaps: []
+lessons:
+  - order: 1
+    lessonRef: "30days/day01_헬로월드"
+    canonicalContentRef: "30days/day01_헬로월드"
+  - order: 2
+    lessonRef: "30days/day02_변수와데이터타입"
+    canonicalContentRef: "30days/day02_변수와데이터타입"
+  - order: 3
+    lessonRef: "30days/day03_연산자"
+    canonicalContentRef: "30days/day03_연산자"
+  - order: 4
+    lessonRef: "30days/day07_리스트기초"
+    canonicalContentRef: "30days/day07_리스트기초"
+  - order: 5
+    lessonRef: "30days/day13_조건문"
+    canonicalContentRef: "30days/day13_조건문"
+  - order: 6
+    lessonRef: "30days/day15_함수기초"
+    canonicalContentRef: "30days/day15_함수기초"
+  - order: 7
+    lessonRef: "pandas/00_판다스소개"
+    canonicalContentRef: "pandas/00_판다스소개"
+  - order: 8
+    lessonRef: "pandas/01_레스토랑팁분석"
+    canonicalContentRef: "pandas/01_레스토랑팁분석"
+  - order: 9
+    lessonRef: "pandas/02_타이타닉생존분석"
+    canonicalContentRef: "pandas/02_타이타닉생존분석"
+  - order: 10
+    lessonRef: "matplotlib/00_Matplotlib소개"
+    canonicalContentRef: "matplotlib/00_Matplotlib소개"
+  - order: 11
+    lessonRef: "plotly/00_Plotly소개"
+    canonicalContentRef: "plotly/00_Plotly소개"
+  - order: 12
+    lessonRef: "altair/00_Altair소개"
+    canonicalContentRef: "altair/00_Altair소개"
+  - order: 13
+    lessonRef: "plotly/09_주식시계열분석"
+    canonicalContentRef: "plotly/09_주식시계열분석"

@@ -351,3 +351,259 @@ sections:
   check:
     noError: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.'
     resultCheck: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sympy_00-symbolic-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - workflow_validation
+    title: 기호식의 변수·정의역 계약 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 식이 참조하는 기호와 허용 정의역을 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 같은 이름의 symbol을 여러 객체로 만들지 마세요.
+    - 양수·실수 같은 assumption은 식 변형 결과를 바꿀 수 있습니다.
+    exercise:
+      prompt: audit_expression(symbols, assumptions, required)를 완성하세요.
+      starterCode: |-
+        def audit_expression(symbols, assumptions, required):
+            raise NotImplementedError
+      solution: |
+        def audit_expression(symbols, assumptions, required):
+            duplicates = sorted({name for name in symbols if symbols.count(name) > 1})
+            missing = sorted(set(required) - set(symbols))
+            unknown = sorted(set(assumptions) - set(symbols))
+            return {"valid": not duplicates and not missing and not unknown, "symbols": sorted(set(symbols)), "duplicates": duplicates, "missing": missing, "unknownAssumptions": unknown}
+      hints: *id001
+    check:
+      id: python.sympy.sympy_00.symbolic-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_00.symbolic-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_expression
+        cases:
+        - id: accepts-explicit-contract
+          arguments:
+          - value:
+            - x
+            - y
+          - value:
+              x: real
+          - value:
+            - x
+          expectedReturn:
+            valid: true
+            symbols:
+            - x
+            - y
+            duplicates: []
+            missing: []
+            unknownAssumptions: []
+        - id: reports-contract-errors
+          arguments:
+          - value:
+            - x
+            - x
+          - value:
+              z: positive
+          - value:
+            - x
+            - y
+          expectedReturn:
+            valid: false
+            symbols:
+            - x
+            duplicates:
+            - x
+            missing:
+            - y
+            unknownAssumptions:
+            - z
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sympy_00-exact-number-policy-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sympy_00-symbolic-contract-mastery
+    title: 새 계산에 exact number 정책 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 정수·유리수·소수 입력에서 exact와 approximate 경계를 고른다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - Python float를 exact 유리수로 가장하지 마세요.
+    - 근사는 최종 표시 경계에서 수행하세요.
+    exercise:
+      prompt: classify_numbers(values)를 완성하세요.
+      starterCode: |-
+        def classify_numbers(values):
+            raise NotImplementedError
+      solution: |
+        def classify_numbers(values):
+            exact = []; approximate = []
+            for value in values:
+                if isinstance(value, bool): raise ValueError("boolean is not a numeric contract")
+                if isinstance(value, int) or isinstance(value, str) and "/" in value: exact.append(value)
+                elif isinstance(value, float): approximate.append(value)
+                else: raise ValueError("unsupported number")
+            return {"exact": exact, "approximate": approximate, "mixed": bool(exact and approximate)}
+      hints: *id002
+    check:
+      id: python.sympy.sympy_00.exact-number-policy.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_00.exact-number-policy.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: classify_numbers
+        cases:
+        - id: separates-exact-and-float
+          arguments:
+          - value:
+            - 1
+            - 1/3
+            - 0.5
+          expectedReturn:
+            exact:
+            - 1
+            - 1/3
+            approximate:
+            - 0.5
+            mixed: true
+        - id: keeps-exact-only
+          arguments:
+          - value:
+            - 2
+            - 3/7
+          expectedReturn:
+            exact:
+            - 2
+            - 3/7
+            approximate: []
+            mixed: false
+        - id: rejects-bool
+          arguments:
+          - value:
+            - true
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sympy_00-symbolic-engine-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sympy_00-exact-number-policy-transfer
+    title: 기호 계산 사용 경계 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: exact algebra와 numeric approximation을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 기호 계산의 가정과 정의역을 결과와 함께 남기세요.
+    - 소수 근삿값과 exact 결과를 구분하세요.
+    exercise:
+      prompt: choose_symbolic_boundary(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_symbolic_boundary(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_symbolic_boundary(situation):
+            table = {'algebraic-proof': {'method': 'symbolic exact', 'evidence': 'simplified difference is zero', 'risk': 'missing assumptions'}, 'large-numeric-array': {'method': 'numeric library', 'evidence': 'tolerance', 'risk': 'symbolic explosion'}, 'final-decimal': {'method': 'evalf at boundary', 'evidence': 'precision', 'risk': 'early rounding'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sympy.sympy_00.symbolic-engine-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_00.symbolic-engine-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_symbolic_boundary
+        cases:
+        - id: recalls-algebraic-proof
+          arguments:
+          - value: algebraic-proof
+          expectedReturn:
+            method: symbolic exact
+            evidence: simplified difference is zero
+            risk: missing assumptions
+        - id: recalls-large-numeric-array
+          arguments:
+          - value: large-numeric-array
+          expectedReturn:
+            method: numeric library
+            evidence: tolerance
+            risk: symbolic explosion
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

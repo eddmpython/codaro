@@ -1,6 +1,7 @@
 import {
   Languages,
   Loader2,
+  Monitor,
   Moon,
   Palette,
   Search,
@@ -31,6 +32,7 @@ import { useLocale } from "@/lib/localeContext";
 import { cn } from "@/lib/utils";
 import { ACCENT_COLORS, type AccentColor, type AutomationSection, type SurfaceMode, type ThemeMode } from "@/lib/surfaceModel";
 import type { CurriculumCategory, CurriculumCategoryTreeNode, CurriculumContentSummary } from "@/types";
+import { accentSwatches } from "@/styles/generated/codaroTheme";
 
 type ProductSidebarProps = {
   categories: CurriculumCategory[];
@@ -41,6 +43,7 @@ type ProductSidebarProps = {
   customCurricula: SidebarCustomCurriculum[];
   query: string;
   referenceLoading: boolean;
+  runtimeTier: "local" | "web";
   selectedAutomationSection: AutomationSection;
   surface: SurfaceMode;
   selectedCategory: string;
@@ -63,13 +66,10 @@ type ProductSidebarProps = {
   onToggleTerminal: () => void;
 };
 
-// 스와치 표시용 고정 색 — index.css html[data-accent] 팔레트의 라이트 값과 동일(oklch).
-const ACCENT_SWATCHES: Record<AccentColor, { label: string; swatch: string }> = {
-  zinc: { label: "기본", swatch: "oklch(0.552 0.016 285.938)" },
-  blue: { label: "블루", swatch: "oklch(0.546 0.245 262.881)" },
-  indigo: { label: "인디고", swatch: "oklch(0.511 0.262 276.966)" },
-  violet: { label: "바이올렛", swatch: "oklch(0.541 0.281 293.009)" },
-  teal: { label: "틸", swatch: "oklch(0.511 0.096 186.391)" },
+const ACCENT_LABELS: Record<AccentColor, string> = {
+  plum: "플럼",
+  blue: "블루",
+  teal: "틸",
 };
 
 export function ProductSidebar({
@@ -81,6 +81,7 @@ export function ProductSidebar({
   customCurricula,
   query,
   referenceLoading,
+  runtimeTier,
   selectedAutomationSection,
   surface,
   selectedCategory,
@@ -103,7 +104,7 @@ export function ProductSidebar({
   onToggleTerminal,
 }: ProductSidebarProps) {
   const { locale, t, toggleLocale } = useLocale();
-  const themeLabel = themeMode === "dark" ? t("sidebar.lightMode") : t("sidebar.darkMode");
+  const themeLabel = themeMode === "system" ? "시스템 테마" : themeMode === "dark" ? "다크 테마" : "라이트 테마";
   const localeLabel = locale === "en" ? t("locale.switchToKorean") : t("locale.switchToEnglish");
 
   return (
@@ -130,28 +131,38 @@ export function ProductSidebar({
           >
             {aiConnecting ? <Loader2 className="size-4 animate-spin" /> : <Settings className="size-4" />}
           </button>
-          <button
-            aria-label={themeLabel}
-            className="flex size-8 shrink-0 items-center justify-center rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:hidden"
-            title={themeLabel}
-            type="button"
-            onClick={onToggleTheme}
-          >
-            {themeMode === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
-          </button>
           <Popover>
             <PopoverTrigger
-              aria-label="강조 색상 선택"
+              aria-label="화면 설정"
               className="flex size-8 shrink-0 items-center justify-center rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:hidden"
-              title="강조 색상"
+              title="화면 설정"
             >
               <Palette className="size-4" />
             </PopoverTrigger>
-            <PopoverContent align="start" className="w-auto p-3" data-accent-palette="true">
-              <div className="text-xs font-medium text-muted-foreground">강조 색상</div>
+            <PopoverContent align="start" className="w-56 p-3" data-accent-palette="true">
+              <div className="text-xs font-semibold text-foreground">화면 설정</div>
+              <div className="mt-2 grid gap-1 border-b pb-2">
+                <button
+                  className="flex h-8 items-center gap-2 rounded-md px-2 text-left text-xs text-foreground hover:bg-muted"
+                  type="button"
+                  onClick={onToggleTheme}
+                >
+                  {themeMode === "system" ? <Monitor className="size-3.5" /> : themeMode === "dark" ? <Sun className="size-3.5" /> : <Moon className="size-3.5" />}
+                  <span>{themeLabel}</span>
+                </button>
+                <button
+                  className="flex h-8 items-center gap-2 rounded-md px-2 text-left text-xs text-foreground hover:bg-muted"
+                  type="button"
+                  onClick={toggleLocale}
+                >
+                  <Languages className="size-3.5" />
+                  <span>{localeLabel}</span>
+                </button>
+              </div>
+              <div className="mt-3 text-xs font-medium text-muted-foreground">강조 색상</div>
               <div className="mt-2 flex items-center gap-2">
                 {ACCENT_COLORS.map((value) => {
-                  const { label, swatch } = ACCENT_SWATCHES[value];
+                  const label = ACCENT_LABELS[value];
                   return (
                     <button
                       aria-label={label}
@@ -161,7 +172,7 @@ export function ProductSidebar({
                       )}
                       data-accent-swatch={value}
                       key={value}
-                      style={{ backgroundColor: swatch }}
+                      style={{ backgroundColor: accentSwatches[value] }}
                       title={label}
                       type="button"
                       onClick={() => onSelectAccentColor(value)}
@@ -171,16 +182,6 @@ export function ProductSidebar({
               </div>
             </PopoverContent>
           </Popover>
-          <button
-            aria-label={localeLabel}
-            className="flex size-8 shrink-0 items-center justify-center rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:hidden"
-            title={localeLabel}
-            type="button"
-            onClick={toggleLocale}
-          >
-            <Languages className="size-4" />
-            <span className="sr-only">{localeLabel}</span>
-          </button>
         </div>
 
         {surface === "curriculum" ? (
@@ -200,7 +201,7 @@ export function ProductSidebar({
       <SidebarContent className="overflow-hidden">
         <ScrollArea className="min-h-0 flex-1">
           <div className="min-w-0 pr-3 group-data-[collapsible=icon]:pr-0">
-            <ProductFlowNav surface={surface} onSurfaceChange={onSurfaceChange} />
+            <ProductFlowNav runtimeTier={runtimeTier} surface={surface} onSurfaceChange={onSurfaceChange} />
 
             <SidebarGroup className="py-0.5" data-product-nav="utility">
               <SidebarGroupContent>

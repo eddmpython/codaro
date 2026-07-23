@@ -74,6 +74,8 @@ class TaskRegistry:
         description: str = "",
         schedule: str | None = None,
         inputs: dict[str, Any] | None = None,
+        *,
+        enabled: bool = True,
     ) -> TaskDefinition:
         task = TaskDefinition(
             name=name,
@@ -81,6 +83,7 @@ class TaskRegistry:
             description=description,
             schedule=schedule,
             inputs=inputs or {},
+            enabled=enabled,
         )
         self._tasks[task.id] = task
         self._save()

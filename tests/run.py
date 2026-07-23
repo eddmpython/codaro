@@ -24,16 +24,75 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
         "output/test-runner/curriculum-quality-matrix/curriculum-quality-report.json",
         "output/test-runner/curriculum-quality-matrix/curriculum-flow-quality-report.json",
         "output/test-runner/curriculum-workflow-architecture/curriculum-workflow-architecture-report.json",
+        "output/test-runner/curriculum-quality-matrix/strong-assessment-solutions-report.json",
+        "output/test-runner/curriculum-quality-matrix/assessment-authoring-quality-report.json",
     ),
     "curriculum-top-tier-audit": ("output/test-runner/curriculum-top-tier-audit/curriculum-top-tier-report.json",),
     "curriculum-weakness-audit": ("output/test-runner/curriculum-weakness-audit/curriculum-weakness-report.json",),
     "curriculum-executability": ("output/test-runner/curriculum-executability/curriculum-executability-report.json",),
-    "predict-contract-strict": ("output/test-runner/predict-contract-strict/predict-contract-strict-report.json",),
+    "removed-learning-concepts": (
+        "output/test-runner/removed-learning-concepts/report.json",
+        "output/test-runner/removed-learning-concepts/classroom-removed-report.json",
+    ),
+    "repository-simplification": (
+        "output/test-runner/repository-simplification/landing-dead-source-report.json",
+        "output/test-runner/repository-simplification/unused-illustrations-report.json",
+        "output/test-runner/repository-simplification/generated-source-policy-report.json",
+        "output/test-runner/repository-simplification/product-module-boundaries-report.json",
+    ),
     "diagnostic-summary-contract": ("output/test-runner/diagnostic-summary-contract/diagnostic-summary-report.json",),
     "dogfood-alpha-audit": ("output/test-runner/dogfood-alpha-audit/dogfood-alpha-report.json",),
+    "product-quality-audit": ("output/test-runner/product-quality-audit/product-quality-report.json",),
     "frontend-performance-budget": ("output/test-runner/frontend-performance-budget/performance-report.json",),
+    "design-system-contract": ("output/test-runner/design-system-contract/design-system-report.json",),
+    "visual-assets": ("output/test-runner/visual-assets/visual-assets-report.json",),
+    "learning-method": ("output/test-runner/learning-method/learning-flow-report.json",),
+    "learning-evidence-contract": (
+        "output/test-runner/learning-evidence-contract/learning-evidence-report.json",
+    ),
+    "learning-efficacy-report": (
+        "output/test-runner/learning-efficacy-report/learning-efficacy-report.json",
+    ),
+    "path-learning-signal": (
+        "output/test-runner/path-learning-signal/path-learning-signal-report.json",
+    ),
+    "path-efficacy-confirmatory": (
+        "output/test-runner/path-efficacy-confirmatory/path-efficacy-confirmatory-report.json",
+    ),
+    "web-learning": (
+        "output/test-runner/web-learning/web-learning-routes-report.json",
+        "output/test-runner/web-learning/web-learning-report.json",
+        "output/test-runner/run-route-state/report.json",
+    ),
+    "landing-public": (
+        "output/test-runner/landing-public/landing-seo-report.json",
+        "output/test-runner/landing-public/public-product-claims-report.json",
+        "output/test-runner/landing-public/landing-hydration-report.json",
+        "output/test-runner/landing-public/landing-public-report.json",
+    ),
+    "local-studio-browser": ("output/test-runner/local-studio-browser/local-studio-report.json",),
+    "learning-content": (
+        "output/test-runner/learning-content/lesson-identity-integrity-report.json",
+        "output/test-runner/learning-content/canonical-content-ledger-report.json",
+        "output/test-runner/learning-content/path-membership-ledgers-report.json",
+        "output/test-runner/learning-content/learning-metadata-coverage-report.json",
+        "output/test-runner/learning-content/scored-check-strength-report.json",
+        "output/test-runner/learning-content/retrieval-task-transfer-report.json",
+        "output/test-runner/learning-content/featured-learning-paths-report.json",
+        "output/test-runner/learning-content/featured-capstone-contracts-report.json",
+        "output/test-runner/curriculum-quality-matrix/strong-assessment-solutions-report.json",
+        "output/test-runner/curriculum-quality-matrix/assessment-authoring-quality-report.json",
+        "output/test-runner/learning-content/learning-content-report.json",
+    ),
+    "product-experience-browser": (
+        "output/test-runner/product-experience-browser/product-experience-report.json",
+    ),
     "install-launcher-smoke": ("output/test-runner/install-launcher-smoke/install-launcher-report.json",),
     "onboarding-browser": ("output/test-runner/onboarding-browser/onboarding-report.json",),
+    "plan-quality": (
+        "output/test-runner/plan-quality/plan-fact-audit.json",
+        "output/test-runner/plan-quality/evaluation-validation.json",
+    ),
     "provider-settings-browser": ("output/test-runner/provider-settings-browser/provider-settings-report.json",),
     "playwright-curriculum-runtime": (
         "output/test-runner/playwright-curriculum-runtime/playwright-curriculum-runtime-report.json",
@@ -43,6 +102,7 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "pyproc-runtime-fs-browser": ("output/test-runner/pyproc-runtime-fs-browser/pyproc-runtime-fs-report.json",),
     "runtime-recovery-browser": ("output/test-runner/runtime-recovery-browser/runtime-recovery-report.json",),
     "quality-cycle": ("output/test-runner/quality-cycle/sequence-summary.json",),
+    "product-release": ("output/test-runner/product-release/sequence-summary.json",),
     "preflight": ("output/test-runner/preflight/sequence-summary.json",),
 }
 
@@ -74,6 +134,9 @@ GATES: dict[str, Gate] = {
         description="운영 문서 포인터와 gate 정의가 현재 저장소 구조와 맞는지 검사한다.",
         commands=(
             command(("uv", "run", "python", "-X", "utf8", "docs/skills/ops/tools/syncAgentsMd.py", "--check")),
+            command(("uv", "run", "python", "-X", "utf8", "docs/skills/ops/tools/genProductContracts.py", "--check")),
+            command(("uv", "run", "python", "-X", "utf8", "docs/skills/ops/tools/buildLearningLedgers.py", "--check")),
+            command(("uv", "run", "python", "-X", "utf8", "docs/skills/ops/tools/buildFeaturedLearningMetadata.py", "--check")),
             command(("uv", "run", "python", "-X", "utf8", "tests/run.py", "audit-self")),
         ),
     ),
@@ -117,7 +180,6 @@ GATES: dict[str, Gate] = {
                 "--tb=short",
             )),
         ),
-        ci_required=False,
     ),
     "widget-bridge": Gate(
         tier="fast",
@@ -198,6 +260,37 @@ GATES: dict[str, Gate] = {
         tier="surface",
         description="제품 품질 기준과 새 내구성 gate 증거를 확인한다.",
         commands=(command(("uv", "run", "python", "-X", "utf8", "tests/product/verifyProductQualityAudit.py")),),
+        ci_required=False,
+    ),
+    "plan-quality": Gate(
+        tier="fast",
+        description="mainPlan 사실, 완료 전이, 독립 평가 보고서 완전성을 점수 threshold 없이 검증한다.",
+        commands=(
+            command((
+                "uv", "run", "python", "-X", "utf8",
+                "docs/skills/ops/tools/buildPrdEvaluationBundle.py", "--check",
+            )),
+            command((
+                "uv", "run", "python", "-X", "utf8",
+                "docs/skills/ops/tools/buildPrdRoundFactAudit.py", "--check",
+            )),
+            command((
+                "uv", "run", "python", "-X", "utf8", "tests/product/verifyPlanFactAudit.py",
+                "--packet", "02-completion-and-gate-bootstrap",
+            )),
+            command((
+                "uv", "run", "python", "-X", "utf8",
+                "docs/skills/ops/tools/genProductContracts.py", "--check",
+            )),
+            command((
+                "uv", "run", "python", "-X", "utf8", "-m", "pytest",
+                "tests/plan/testMainPlanCompletion.py", "tests/product/testPrdEvaluationBundle.py",
+                "tests/product/testPrdEvaluationReport.py",
+                "-q", "--tb=short",
+            )),
+            command(("uv", "run", "python", "-X", "utf8", "tests/product/verifyPrdEvaluationReport.py")),
+        ),
+        blocking=False,
         ci_required=False,
     ),
     "automation-ide-audit": Gate(
@@ -281,7 +374,72 @@ GATES: dict[str, Gate] = {
             command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyCurriculumFlowQuality.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyCurriculumWorkflowArchitecture.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyCardContract.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyStrongAssessmentSolutions.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyAssessmentAuthoringQuality.py")),
         ),
+    ),
+    "learning-content": Gate(
+        tier="fast",
+        description="472개 레슨 identity, canonical content owner, taxonomy path membership와 승인 증거를 확인한다.",
+        commands=(
+            command(("uv", "run", "python", "-X", "utf8", "docs/skills/ops/tools/buildLearningLedgers.py", "--check")),
+            command(("uv", "run", "python", "-X", "utf8", "docs/skills/ops/tools/buildFeaturedLearningMetadata.py", "--check")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyLessonIdentityIntegrity.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyCanonicalContentLedger.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyPathMembershipLedgers.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyLearningMetadataCoverage.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyScoredCheckStrength.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyRetrievalTaskTransfer.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyFeaturedLearningPaths.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyFeaturedCapstoneContracts.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyStrongAssessmentSolutions.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyAssessmentAuthoringQuality.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyLearningContentCompletion.py")),
+        ),
+        ci_required=False,
+    ),
+    "learning-evidence-contract": Gate(
+        tier="fast",
+        description="Web/Local 학습 증거와 전체 document/VFS/package/automation archive의 무결성·원자성을 확인한다.",
+        commands=(
+            command((
+                "uv", "run", "python", "-X", "utf8", "-m", "pytest",
+                "tests/curriculum/testLearningEvidenceArchive.py",
+                "tests/contracts/testLearningArtifactDescriptorContract.py",
+                "tests/contracts/testLearningArchiveContract.py",
+                "tests/learning/testLearningArchive.py",
+                "-q", "--tb=short",
+            )),
+            command(("uv", "run", "python", "-X", "utf8", "tests/learning/verifyLearningEvidenceContract.py")),
+        ),
+    ),
+    "learning-efficacy-report": Gate(
+        tier="fast",
+        description="경로별 E0-E3 효능 보고서 state machine, stale hash, privacy·표본 negative fixture를 확인한다.",
+        commands=(
+            command((
+                "uv", "run", "python", "-X", "utf8", "-m", "pytest",
+                "tests/product/testLearningEfficacyStage.py", "-q", "--tb=short",
+            )),
+            command(("uv", "run", "python", "-X", "utf8", "tests/product/verifyLearningEfficacyReport.py")),
+        ),
+    ),
+    "path-learning-signal": Gate(
+        tier="release",
+        description="대표 6경로의 current-content E2 pre/post/unseen-transfer 사람 근거를 경로별로 확인한다.",
+        commands=(command((
+            "uv", "run", "python", "-X", "utf8", "tests/product/verifyPathEfficacyEvidence.py",
+            "--stage", "E2",
+        )),),
+        ci_required=False,
+    ),
+    "path-efficacy-confirmatory": Gate(
+        tier="release",
+        description="대표 6경로의 current-content E3 powered confirmatory 사람 근거를 경로별로 확인한다.",
+        commands=(command((
+            "uv", "run", "python", "-X", "utf8", "tests/product/verifyPathEfficacyEvidence.py",
+            "--stage", "E3",
+        )),),
         ci_required=False,
     ),
     "curriculum-top-tier-audit": Gate(
@@ -302,11 +460,23 @@ GATES: dict[str, Gate] = {
         commands=(command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/auditCurriculumExecutability.py"), timeoutSeconds=900),),
         ci_required=False,
     ),
-    "predict-contract-strict": Gate(
+    "removed-learning-concepts": Gate(
         tier="fast",
-        description="strict 카테고리(tests/_predictStrictCategories.txt)의 exercise step에 LearningPredictContract가 채워졌는지 검사한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/curriculum/verifyPredictContractStrict.py")),),
-        ci_required=False,
+        description="제거된 학습자 예측과 active classroom 구현이 다시 들어오지 않고 로컬 archive migration만 남는지 검사한다.",
+        commands=(
+            command(("uv", "run", "python", "-X", "utf8", "tests/learning/verifyRemovedLearningConcepts.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/architecture/verifyClassroomRemoved.py")),
+        ),
+    ),
+    "repository-simplification": Gate(
+        tier="fast",
+        description="legacy landing source, unused curriculum illustration modules, and tracked landing generated modules remain removed.",
+        commands=(
+            command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyLandingDeadSourceRemoved.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/assets/verifyUnusedIllustrationsRemoved.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyGeneratedSourcePolicy.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyProductModuleBoundaries.py")),
+        ),
     ),
     "playwright-curriculum-runtime": Gate(
         tier="fast",
@@ -341,6 +511,117 @@ GATES: dict[str, Gate] = {
             command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyFrontendPerformanceBudget.py")),
         ),
         ci_required=False,
+    ),
+    "design-system-contract": Gate(
+        tier="surface",
+        description="Landing, Learn, Run, Local의 Astryx pin, token, font, layer, direct-learning 계약을 확인한다.",
+        commands=(
+            command(("uv", "run", "python", "-X", "utf8", "tests/assets/testBuildDesignSystem.py")),
+            command(("uv", "run", "python", "-X", "utf8", "assets/brand/tools/buildDesignSystem.py", "--check")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyDesignSystemContract.py")),
+        ),
+    ),
+    "visual-assets": Gate(
+        tier="surface",
+        description="공용 visual manifest, source provenance, AVIF/WebP 파생물, 앱 mirror, 용량 예산을 확인한다.",
+        commands=(
+            command(("uv", "run", "--with", "pillow", "python", "-X", "utf8", "-m", "pytest", "tests/assets/testVisualAssetManifest.py", "tests/assets/testBuildVisualAssets.py", "-q", "--tb=short")),
+            command(("uv", "run", "--with", "pillow", "python", "-X", "utf8", "assets/brand/tools/buildVisualAssets.py", "--check")),
+            command(("node", "scripts/syncVisualAssets.js", "--check"), cwd="landing"),
+            command(("node", "scripts/syncVisualAssets.mjs", "--check"), cwd="editor"),
+            command(("uv", "run", "python", "-X", "utf8", "tests/assets/verifyVisualAssetBudget.py")),
+        ),
+    ),
+    "learning-method": Gate(
+        tier="surface",
+        description="실행 뒤 자동 검증, inline hint, strong evidence와 다음 section까지 불필요한 확인 클릭 0회를 확인한다.",
+        commands=(
+            command(("npm", "run", "build"), cwd="editor"),
+            command((
+                "uv",
+                "run",
+                "--with",
+                "playwright",
+                "python",
+                "-X",
+                "utf8",
+                "tests/learning/verifyLearningFlowFriction.py",
+            ), timeoutSeconds=360),
+        ),
+    ),
+    "product-experience-browser": Gate(
+        tier="surface",
+        description="Landing, Learn, Web Lesson/Run, Local Run/Automation 대표 Chromium 매트릭스의 실제 렌더링과 겹침을 확인한다.",
+        commands=(
+            command(("npm", "run", "build"), cwd="landing"),
+            command(("npm", "run", "build"), cwd="editor"),
+            command((
+                "uv",
+                "run",
+                "--with",
+                "playwright",
+                "python",
+                "-X",
+                "utf8",
+                "tests/surface/verifyProductExperiencePlaywright.py",
+            ), timeoutSeconds=1200),
+        ),
+    ),
+    "web-learning": Gate(
+        tier="surface",
+        description="공개 학습 route부터 Web Run 편집·자동 강검증·resume·archive까지 설치 없는 학습 흐름을 확인한다.",
+        commands=(
+            command(("npm", "run", "build"), cwd="landing"),
+            command((
+                "uv", "run", "python", "-X", "utf8", "-m", "pytest",
+                "tests/learning/testGeneratedLearningCatalog.py", "-q", "--tb=short",
+            )),
+            command(("uv", "run", "python", "-X", "utf8", "tests/learning/verifyWebLearningRoutes.py")),
+            command(("npm", "run", "build"), cwd="editor"),
+            command(("node", "scripts/verifyRunRouteState.mjs"), cwd="editor"),
+            command((
+                "uv", "run", "python", "-X", "utf8", "-m", "pytest",
+                "tests/contracts/testRunRouteStateContract.py", "-q", "--tb=short",
+            )),
+            command((
+                "uv", "run", "--with", "playwright", "python", "-X", "utf8",
+                "tests/surface/verifyRunRouteStatePlaywright.py",
+            ), timeoutSeconds=300),
+            command(("uv", "run", "python", "-X", "utf8", "tests/learning/verifyLearningSectionCardContract.py")),
+            command((
+                "uv", "run", "--with", "playwright", "python", "-X", "utf8",
+                "tests/learning/verifyWebLearningPlaywright.py",
+            ), timeoutSeconds=1200),
+        ),
+    ),
+    "landing-public": Gate(
+        tier="surface",
+        description="Landing·Learn 공개 route의 실제 media, Web-first CTA, SEO, lazy docs와 responsive 렌더를 확인한다.",
+        commands=(
+            command(("npm", "run", "build"), cwd="landing"),
+            command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyLandingDocsBundleSplit.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyLandingSeo.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyPublicProductClaims.py")),
+            command((
+                "uv", "run", "--with", "playwright", "python", "-X", "utf8",
+                "tests/surface/verifyLandingHydration.py",
+            ), timeoutSeconds=300),
+            command((
+                "uv", "run", "--with", "playwright", "python", "-X", "utf8",
+                "tests/surface/verifyLandingExperiencePlaywright.py",
+            ), timeoutSeconds=1200),
+        ),
+    ),
+    "local-studio-browser": Gate(
+        tier="surface",
+        description="Local 학습·강검증·archive·native file/zip/schedule·Automation·최소 창을 실제 브라우저 fixture로 확인한다.",
+        commands=(
+            command(("npm", "run", "build"), cwd="editor"),
+            command((
+                "uv", "run", "--with", "playwright", "python", "-X", "utf8",
+                "tests/automation/verifyAutomationStudioPlaywright.py",
+            ), timeoutSeconds=1200),
+        ),
     ),
     "learning-card-contract": Gate(
         tier="surface",
@@ -398,6 +679,11 @@ PRODUCT_QUALITY_GATES = (
     "docs",
     "backend",
     "architecture-boundary",
+    "design-system-contract",
+    "visual-assets",
+    "learning-method",
+    "learning-evidence-contract",
+    "learning-efficacy-report",
     "learning-system-readiness",
     "dogfood-alpha-audit",
     "product-quality-audit",
@@ -412,13 +698,46 @@ PRODUCT_QUALITY_GATES = (
     "pyproc-runtime-fs-browser",
     "pyproc-asgi-browser",
     "curriculum-quality-matrix",
+    "repository-simplification",
     "curriculum-executability",
     "curriculum-top-tier-audit",
     "playwright-curriculum-runtime",
     "onboarding-browser",
+    "web-learning",
+    "landing-public",
+    "local-studio-browser",
+    "product-experience-browser",
     "frontend-performance-budget",
     "landing-build",
     "launcher-test",
+    "learning-content",
+)
+PRODUCT_RELEASE_GATES = (
+    "root-clean",
+    "docs",
+    "backend",
+    "architecture-boundary",
+    "editor-build",
+    "landing-build",
+    "mobile-layout",
+    "frontend-performance-budget",
+    "design-system-contract",
+    "learning-method",
+    "curriculum-quality-matrix",
+    "repository-simplification",
+    "learning-content",
+    "web-learning",
+    "visual-assets",
+    "landing-public",
+    "removed-learning-concepts",
+    "product-experience-browser",
+    "local-studio-browser",
+    "learning-evidence-contract",
+    "learning-efficacy-report",
+    "automation-ide-audit",
+    "launcher-test",
+    "path-learning-signal",
+    "plan-quality",
 )
 TIER_ORDER = ("fast", "surface", "release", "experiment")
 
@@ -577,10 +896,18 @@ def localGateArgs(gateName: str, gateCommand: GateCommand) -> tuple[str, ...]:
 
 def normalizeUvArgs(args: tuple[str, ...]) -> tuple[str, ...]:
     if len(args) >= 2 and args[0] == "uv" and args[1] == "run":
+        nextArgs = addUvRunNoSync(args)
         if uvCommandUsesWith(args):
-            return args
-        return ("uv", "--no-cache", *args[1:])
+            return nextArgs
+        return ("uv", "--no-cache", *nextArgs[1:])
     return args
+
+
+def addUvRunNoSync(args: tuple[str, ...]) -> tuple[str, ...]:
+    if "--no-sync" in args:
+        return args
+    runIndex = args.index("run")
+    return (*args[: runIndex + 1], "--no-sync", *args[runIndex + 1 :])
 
 
 def uvCommandUsesWith(args: tuple[str, ...]) -> bool:
@@ -957,6 +1284,9 @@ def listGates() -> int:
     print("quality-cycle:")
     for name in PRODUCT_QUALITY_GATES:
         print(f"  {name}")
+    print("product-release:")
+    for name in PRODUCT_RELEASE_GATES:
+        print(f"  {name}")
     return 0
 
 
@@ -971,8 +1301,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 40:
-        failures.append(f"expected 40 gates, found {len(GATES)}")
+    if len(GATES) != 54:
+        failures.append(f"expected 54 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:
@@ -981,6 +1311,10 @@ def auditSelf() -> int:
     unknownProductQuality = [name for name in PRODUCT_QUALITY_GATES if name not in gateNames]
     if unknownProductQuality:
         failures.append(f"unknown product quality gates: {', '.join(unknownProductQuality)}")
+
+    unknownProductRelease = [name for name in PRODUCT_RELEASE_GATES if name not in gateNames]
+    if unknownProductRelease:
+        failures.append(f"unknown product release gates: {', '.join(unknownProductRelease)}")
 
     unknownTiers = sorted({gate.tier for gate in GATES.values()} - set(TIER_ORDER))
     if unknownTiers:
@@ -1022,6 +1356,7 @@ def buildParser() -> argparse.ArgumentParser:
     subparsers.add_parser("preflight", help="run the default local preflight gates")
     subparsers.add_parser("change-cycle", help="run gates selected from changed files")
     subparsers.add_parser("quality-cycle", help="run the product quality gate sequence")
+    subparsers.add_parser("product-release", help="run the release gate sequence without hiding path evidence failures")
     subparsers.add_parser("audit-self", help="validate runner, docs, and CI wiring")
 
     gateParser = subparsers.add_parser("gate", help="run one named gate")
@@ -1050,6 +1385,8 @@ def main(argv: list[str] | None = None) -> int:
         return runGateSequence(gates, sequenceName="change-cycle")
     if args.command == "quality-cycle":
         return runGateSequence(PRODUCT_QUALITY_GATES, sequenceName="quality-cycle")
+    if args.command == "product-release":
+        return runGateSequence(PRODUCT_RELEASE_GATES, sequenceName="product-release")
     if args.command == "audit-self":
         return auditSelf()
     if args.command == "gate":

@@ -599,3 +599,334 @@ sections:
           - "체크박스·라디오 버튼 필드 추가 (canvas.acroForm.checkbox 활용)"
           - "AcroForm 필드 위치를 회사 양식에 맞춰 좌표 조정"
           - "기존 받은 양식 PDF의 모든 필드 이름을 자동 추출해 입력 도우미 dict 템플릿 생성"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pdf_09-pdf-form-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_make_form
+    - extensions
+    title: PDF form field의 이름·type·required·default 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 중복 field와 type에 맞지 않는 default 값을 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - form field name은 문서 전체에서 유일해야 합니다.
+    - checkbox·choice default가 field type 계약에 맞는지 검사하세요.
+    exercise:
+      prompt: audit_pdf_form_fields(fields)를 완성하세요.
+      starterCode: |-
+        def audit_pdf_form_fields(fields):
+            raise NotImplementedError
+      solution: |
+        def audit_pdf_form_fields(fields):
+            failures = []
+            names = [field["name"] for field in fields]
+            duplicates = sorted({name for name in names if names.count(name) > 1})
+            invalid = []
+            for field in fields:
+                reasons = []
+                field_type = field.get("type")
+                value = field.get("default")
+                if field_type not in {"text", "checkbox", "choice"}:
+                    reasons.append("type")
+                elif field_type == "checkbox" and value is not None and not isinstance(value, bool):
+                    reasons.append("default")
+                elif field_type == "choice" and value is not None and value not in field.get("options", []):
+                    reasons.append("default")
+                if field.get("required", False) and value in {None, ""}:
+                    reasons.append("required-default")
+                if reasons:
+                    invalid.append({"name": field["name"], "reasons": reasons})
+            if duplicates:
+                failures.append("duplicates")
+            if invalid:
+                failures.append("fields")
+            return {"accepted": not failures, "failures": failures, "duplicates": duplicates, "invalid": invalid}
+      hints: *id001
+    check:
+      id: python.pdf.pdf_09.pdf-form-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_09.pdf-form-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_pdf_form_fields
+        cases:
+        - id: accepts-text-checkbox-and-choice
+          arguments:
+          - value:
+            - name: name
+              type: text
+              required: true
+              default: A
+            - name: agree
+              type: checkbox
+              default: false
+            - name: region
+              type: choice
+              options:
+              - KR
+              - US
+              default: KR
+          expectedReturn:
+            accepted: true
+            failures: []
+            duplicates: []
+            invalid: []
+        - id: reports-duplicate-and-required-default
+          arguments:
+          - value:
+            - name: name
+              type: text
+              required: true
+              default: ''
+            - name: name
+              type: text
+              default: B
+          expectedReturn:
+            accepted: false
+            failures:
+            - duplicates
+            - fields
+            duplicates:
+            - name
+            invalid:
+            - name: name
+              reasons:
+              - required-default
+        - id: reports-invalid-choice-default
+          arguments:
+          - value:
+            - name: region
+              type: choice
+              options:
+              - KR
+              default: US
+          expectedReturn:
+            accepted: false
+            failures:
+            - fields
+            duplicates: []
+            invalid:
+            - name: region
+              reasons:
+              - default
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pdf_09-pdf-form-fill-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_09-pdf-form-contract-mastery
+    title: 새 PDF form 입력에 type·required·unknown field 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: form schema와 값 dict를 대조해 fill plan을 만든다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 값 dict의 unknown field를 조용히 무시하지 마세요.
+    - required·checkbox·choice type을 fill 전에 검사하세요.
+    exercise:
+      prompt: audit_form_values(fields, values)를 완성하세요.
+      starterCode: |-
+        def audit_form_values(fields, values):
+            raise NotImplementedError
+      solution: |
+        def audit_form_values(fields, values):
+            schema = {field["name"]: field for field in fields}
+            unknown = sorted(set(values) - set(schema))
+            missing = sorted(field["name"] for field in fields if field.get("required", False) and values.get(field["name"]) in {None, ""})
+            invalid = []
+            for name, value in values.items():
+                if name not in schema:
+                    continue
+                field = schema[name]
+                if field["type"] == "checkbox" and not isinstance(value, bool):
+                    invalid.append(name)
+                elif field["type"] == "choice" and value not in field.get("options", []):
+                    invalid.append(name)
+            return {"ready": not unknown and not missing and not invalid, "unknown": unknown, "missing": missing, "invalid": sorted(invalid), "fill": sorted(name for name in values if name in schema and name not in invalid)}
+      hints: *id002
+    check:
+      id: python.pdf.pdf_09.pdf-form-fill-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_09.pdf-form-fill-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_form_values
+        cases:
+        - id: accepts-valid-form-values
+          arguments:
+          - value:
+            - name: name
+              type: text
+              required: true
+            - name: agree
+              type: checkbox
+          - value:
+              name: A
+              agree: true
+          expectedReturn:
+            ready: true
+            unknown: []
+            missing: []
+            invalid: []
+            fill:
+            - agree
+            - name
+        - id: reports-unknown-missing-and-invalid
+          arguments:
+          - value:
+            - name: name
+              type: text
+              required: true
+            - name: agree
+              type: checkbox
+          - value:
+              name: ''
+              agree: 'yes'
+              extra: 1
+          expectedReturn:
+            ready: false
+            unknown:
+            - extra
+            missing:
+            - name
+            invalid:
+            - agree
+            fill:
+            - name
+        - id: reports-invalid-choice
+          arguments:
+          - value:
+            - name: region
+              type: choice
+              options:
+              - KR
+          - value:
+              region: US
+          expectedReturn:
+            ready: false
+            unknown: []
+            missing: []
+            invalid:
+            - region
+            fill: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pdf_09-pdf-form-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_09-pdf-form-fill-audit-transfer
+    title: PDF form 채우기 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: field schema·value type·재개방 evidence를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - PDF 저장 성공과 페이지 내용·geometry·업무 값의 정확성을 분리해 검증하세요.
+    - Web에서는 문서 판단을 연습하고 Local에서는 재개방·render artifact evidence를 남기세요.
+    exercise:
+      prompt: choose_pdf_form_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_pdf_form_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_pdf_form_evidence(situation):
+            table = {'schema': {'action': 'validate unique names types and defaults', 'evidence': 'field manifest', 'risk': 'ambiguous form'}, 'fill': {'action': 'reject unknown missing invalid values', 'evidence': 'fill plan', 'risk': 'wrong field value'}, 'verify': {'action': 'reopen and read filled fields', 'evidence': 'observed field values', 'risk': 'unsaved form data'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.pdf.pdf_09.pdf-form-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_09.pdf-form-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_pdf_form_evidence
+        cases:
+        - id: recalls-schema
+          arguments:
+          - value: schema
+          expectedReturn:
+            action: validate unique names types and defaults
+            evidence: field manifest
+            risk: ambiguous form
+        - id: recalls-fill
+          arguments:
+          - value: fill
+          expectedReturn:
+            action: reject unknown missing invalid values
+            evidence: fill plan
+            risk: wrong field value
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

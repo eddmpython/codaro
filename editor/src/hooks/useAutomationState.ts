@@ -1,8 +1,10 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
+  AUTOMATION_UPDATED_EVENT,
   fallbackAutomationSnapshot,
   loadAutomationSnapshot,
   runAutomationTask,
+  setAutomationTaskEnabled,
   toggleAutomationStop,
 } from "@/lib/automationState";
 import { translate } from "@/lib/localeCopy";
@@ -35,6 +37,12 @@ export function useAutomationState({
     applyAutomationSnapshot(await loadAutomationSnapshot());
   }, [applyAutomationSnapshot]);
 
+  useEffect(() => {
+    const refresh = () => void refreshAutomation();
+    window.addEventListener(AUTOMATION_UPDATED_EVENT, refresh);
+    return () => window.removeEventListener(AUTOMATION_UPDATED_EVENT, refresh);
+  }, [refreshAutomation]);
+
   const toggleEStop = useCallback(async () => {
     try {
       const result = await toggleAutomationStop(eStop, apiOnline);
@@ -64,6 +72,20 @@ export function useAutomationState({
     }
   }, [apiOnline, onNotice, refreshAutomation]);
 
+  const toggleTask = useCallback(async (task: TaskDefinition) => {
+    try {
+      const result = await setAutomationTaskEnabled(task, !task.enabled, apiOnline);
+      onNotice(result.notice);
+      if (result.refresh) await refreshAutomation();
+    } catch (error) {
+      onNotice({
+        tone: "error",
+        title: translate("automation.taskRunFailed.title"),
+        detail: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }, [apiOnline, onNotice, refreshAutomation]);
+
   return {
     auditCount,
     automationSection,
@@ -73,6 +95,7 @@ export function useAutomationState({
     scheduler,
     setAutomationSection,
     tasks,
+    toggleTask,
     toggleEStop,
   };
 }

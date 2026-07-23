@@ -1,0 +1,752 @@
+var e=`meta:\r
+  packages:\r
+  - altair\r
+  - matplotlib\r
+  - numpy\r
+  - pandas\r
+  - plotly\r
+  - scikit-learn\r
+  - seaborn\r
+  - statsmodels\r
+  id: statsmodels_05\r
+  title: 고객이탈예측\r
+  order: 5\r
+  category: statsmodels\r
+  difficulty: ⭐⭐⭐\r
+  badge: 중급\r
+  dataSource: codaro-local:churn\r
+  tags:\r
+  - 로지스틱회귀\r
+  - Logit\r
+  - ROC\r
+  - AUC\r
+  - 고객이탈\r
+  - 분류\r
+  seo:\r
+    title: statsmodels 로지스틱 회귀 - 통신사 고객 이탈 예측\r
+    description: 로지스틱 회귀로 고객 이탈 확률을 예측합니다. Logit 모델, ROC 곡선, 혼동 행렬을 배웁니다.\r
+    keywords:\r
+    - statsmodels\r
+    - 로지스틱회귀\r
+    - Logit\r
+    - 고객이탈\r
+    - ROC곡선\r
+    - AUC\r
+    - 분류모델\r
+intro:\r
+  emoji: 📞\r
+  goal: 고객의 서비스 이용 패턴으로 이탈 여부를 예측합니다.\r
+  description: 7,043명의 통신사 고객 데이터로 계약 기간, 요금제, 지원 문의 등으로 이탈 확률을 예측합니다. 고객 유지 전략과 이탈 방지 캠페인에 활용할 수 있습니다.\r
+  direction: 고객이탈예측에서 입력, 처리, 검증을 하나의 실행 가능한 코드 흐름으로 연결합니다.\r
+  benefits:\r
+  - 입력 데이터 확인 후 핵심 처리에 맞는 코드 입력을 고릅니다.\r
+  - 고객이탈예측 결과를 출력과 상태 기준으로 즉시 점검합니다.\r
+  - 완료한 코드를 업무 자동화 조각에 다시 사용할 수 있습니다.\r
+  diagram:\r
+    steps:\r
+    - label: 1단계. 데이터 불러오기 입력 확인\r
+      detail: 입력 기준(입력 데이터)과 필요한 조건을 먼저 고정합니다.\r
+    - label: 2단계. 데이터 미리보기 처리 실행\r
+      detail: 핵심 처리 코드를 실행해 중간 결과를 확인합니다.\r
+    - label: 3단계. 이탈률 확인 결과 검증\r
+      detail: 출력과 상태 기준으로 실행 결과를 비교합니다.\r
+    - label: 고객이탈예측 재사용\r
+      detail: 완성 코드를 업무 자동화 조각에 붙일 수 있게 정리합니다.\r
+    runtime:\r
+    - label: 업무 코드 환경\r
+      detail: altair, matplotlib, numpy, pandas 기준으로 로컬 Python 실행을 준비합니다.\r
+    - label: 고객이탈예측 실행\r
+      detail: 셀을 실행해 출력과 상태와 예외 상태를 확인합니다.\r
+    - label: 고객이탈예측 완료\r
+      detail: 검증된 코드를 업무 자동화 조각로 남깁니다.\r
+sections:\r
+- id: step1_load\r
+  title: 1단계. 데이터 불러오기\r
+  structuredPrimary: true\r
+  subtitle: 통신사 고객 이탈 데이터\r
+  goal: 1단계. 데이터 불러오기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: Telco Customer Churn 데이터셋은 7,043명의 통신사 고객 정보와 이탈 여부(Churn)를 담은 IBM의 공개 데이터입니다. 21개 특성에는\r
+    인구통계(성별, 고령 여부), 계정 정보(가입 기간, 계약 유형, 결제 방식), 서비스 이용 내역(인터넷, 보안, 기술지원 등)이 포함됩니다. Churn이 Yes이면 이탈 고객,\r
+    No이면 유지 고객으로, 이 데이터로 어떤 요인이 이탈에 영향을 미치는지 분석하면 고객 유지 전략, 이탈 방지 캠페인 대상 선정, 프로모션 설계에 활용할 수 있습니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    import pandas as pd\r
+    import numpy as np\r
+    import statsmodels.api as sm\r
+    from statsmodels.formula.api import logit\r
+    from codaro.curriculum.localData import loadLocalDataset\r
+\r
+    churnData = loadLocalDataset("churn")\r
+    churnData.shape\r
+  exercise:\r
+    prompt: 1단계. 데이터 불러오기 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      import pandas as pd\r
+      import numpy as np\r
+      import statsmodels.api as sm\r
+      from statsmodels.formula.api import logit\r
+      from codaro.curriculum.localData import loadLocalDataset\r
+\r
+      churnData = loadLocalDataset("churn")\r
+      churnData.shape\r
+    hints:\r
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.\r
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 1단계. 데이터 불러오기의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.\r
+    resultCheck: 1단계. 데이터 불러오기의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.\r
+- id: step2_head\r
+  title: 2단계. 데이터 미리보기\r
+  structuredPrimary: true\r
+  subtitle: 컬럼 구조 확인\r
+  goal: 2단계. 데이터 미리보기에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.\r
+  explanation: 'tenure(가입 기간, 월), MonthlyCharges(월 요금, 달러), Contract(계약 유형: Month-to-month/One year/Two\r
+    year), TechSupport(기술지원 가입 여부), Churn(이탈 여부: Yes/No) 등이 있습니다. 01-04 프로젝트에서 배운 데이터 탐색 기법을 이탈 예측에 적용합니다.\r
+    Churn은 Yes/No 문자열 변수로, 로지스틱 회귀를 위해 1/0 숫자로 변환해야 합니다. 이진 분류(binary classification) 문제의 전형적인 데이터 구조입니다.'\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: churnData.head()\r
+  exercise:\r
+    prompt: 2단계. 데이터 미리보기 예제에서 입력값을 바꾸고 마지막 확인 값이 달라지는지 확인하세요.\r
+    starterCode: churnData.head()\r
+    hints:\r
+    - 바꿀 지점은 입력 데이터을 만드는 첫 줄과 핵심 처리 줄에서 찾으세요.\r
+    - 실행 뒤 출력과 상태 중 하나가 바꾼 값을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 2단계. 데이터 미리보기의 수정 코드가 핵심 처리 단계의 마지막 확인 값까지 도달해야 합니다.\r
+    resultCheck: 2단계. 데이터 미리보기 실행 결과가 출력과 상태 기준으로 바꾼 입력값을 반영해야 합니다.\r
+- id: step3_churn_rate\r
+  title: 3단계. 이탈률 확인\r
+  structuredPrimary: true\r
+  subtitle: 클래스 불균형 체크\r
+  goal: 3단계. 이탈률 확인에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: |-\r
+    전체 고객 중 몇 퍼센트가 이탈했는지 확인합니다. value_counts(normalize=True)로 각 범주의 비율을 계산하면 약 26.5%가 이탈 고객입니다. 이탈률이 너무 낮으면(예: 1%) 모델이 '모두 유지'로 예측해도 99% 정확도가 나오는 클래스 불균형(class imbalance) 문제가 발생합니다. 26.5%는 적절한 수준이지만, 실무에서는 오버샘플링이나 가중치 부여로 불균형을 보정하기도 합니다.\r
+\r
+    value_counts(normalize=True)는 각 범주의 비율을 반환합니다. False가 아니라 True를 쓰면 개수 대신 비율이 나옵니다. .1%는 소수점 1자리 퍼센트 형식입니다. 예를 들어 0.265는 26.5%로 표시됩니다.\r
+  tips:\r
+  - value_counts(normalize=True)는 각 범주의 비율을 반환합니다. False가 아니라 True를 쓰면 개수 대신 비율이 나옵니다. .1%는 소수점 1자리 퍼센트\r
+    형식입니다. 예를 들어 0.265는 26.5%로 표시됩니다.\r
+  snippet: |-\r
+    churnRate = churnData['Churn'].value_counts(normalize=True)\r
+    churnRate\r
+    f"이탈률: {churnRate['Yes']:.1%}"\r
+  exercise:\r
+    prompt: 3단계. 이탈률 확인 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      churnRate = churnData['Churn'].value_counts(normalize=True)\r
+      churnRate\r
+      f"이탈률: {churnRate['Yes']:.1%}"\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 3단계. 이탈률 확인에서 \`churnRate\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 3단계. 이탈률 확인 실행 뒤 \`churnRate\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.\r
+- id: step4_preprocessing\r
+  title: 4단계. 데이터 전처리\r
+  structuredPrimary: true\r
+  subtitle: Churn을 0/1로 변환\r
+  goal: 4단계. 데이터 전처리에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.\r
+  explanation: |-\r
+    Churn이 Yes/No 문자열이므로 1/0 숫자로 변환합니다. Yes=1(이탈), No=0(유지)으로 매핑하며, 로지스틱 회귀의 종속변수는 반드시 0 또는 1이어야 합니다. (조건식).astype(int) 패턴으로 간단히 변환할 수 있으며, 03 프로젝트의 get_dummies()보다 이진 변수에 효율적입니다. 이 과정은 분류 모델의 필수 전처리 단계입니다.\r
+\r
+    (churnData['Churn'] == 'Yes')는 조건식으로, 각 행의 Churn 값이 'Yes'인지 비교하여 맞으면 True, 틀리면 False를 반환하는 불리언(Boolean) Series를 만듭니다. ==(등호 2개)는 비교 연산자로 "같은지 확인"하며, =(등호 1개)는 할당 연산자로 "값을 저장"하는 것과 다릅니다. astype(int)는 데이터 타입을 정수(integer)로 변환하는 메서드로, True는 1, False는 0으로 변환됩니다. 이 방법은 Yes/No, Male/Female, True/False 같은 이진(binary) 변수를 0/1 숫자로 바꿀 때 매우 유용하며, 03 프로젝트의 get_dummies()보다 간단합니다.\r
+  tips:\r
+  - (churnData['Churn'] == 'Yes')는 조건식으로, 각 행의 Churn 값이 'Yes'인지 비교하여 맞으면 True, 틀리면 False를 반환하는 불리언(Boolean)\r
+    Series를 만듭니다. ==(등호 2개)는 비교 연산자로 "같은지 확인"하며, =(등호 1개)는 할당 연산자로 "값을 저장"하는 것과 다릅니다. astype(int)는 데이터\r
+    타입을 정수(integer)로 변환하는 메서드로, True는 1, False는 0으로 변환됩니다. 이 방법은 Yes/No, Male/Female, True/False 같은 이진(binary)\r
+    변수를 0/1 숫자로 바꿀 때 매우 유용하며, 03 프로젝트의 get_dummies()보다 간단합니다.\r
+  snippet: |-\r
+    churnData['ChurnBinary'] = (churnData['Churn'] == 'Yes').astype(int)\r
+    churnData[['Churn', 'ChurnBinary']].head()\r
+  exercise:\r
+    prompt: 4단계. 데이터 전처리 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      churnData['ChurnBinary'] = (churnData['Churn'] == 'Yes').astype(int)\r
+      churnData[['Churn', 'ChurnBinary']].head()\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 4단계. 데이터 전처리의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.\r
+    resultCheck: 4단계. 데이터 전처리 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.\r
+- id: step5_select_features\r
+  title: 5단계. 주요 변수 선택\r
+  structuredPrimary: true\r
+  subtitle: 수치형 변수 우선\r
+  goal: 5단계. 주요 변수 선택에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: |-\r
+    먼저 수치형 변수 3개로 간단한 기본 모델을 만듭니다. tenure(가입 기간, 월), MonthlyCharges(월 요금), TotalCharges(총 요금)를 선택합니다. 수치형 변수는 전처리 없이 바로 회귀에 투입할 수 있어 빠른 프로토타입에 적합합니다. 02 프로젝트에서 배운 특성 선택 개념을 이탈 예측에 적용하며, 기본 모델 성능을 확인한 후 범주형 변수(Contract, TechSupport 등)를 추가하여 개선할 수 있습니다.\r
+\r
+    to_numeric()은 문자열이나 다른 타입을 숫자(numeric) 타입으로 변환하는 pandas 함수입니다. TotalCharges 컬럼에 ' '(공백) 같은 숫자가 아닌 값이 섞여 있을 수 있으므로 변환이 필요합니다. errors='coerce'는 변환 실패 시 에러를 발생시키지 않고 NaN(Not a Number, 결측값)으로 처리하는 옵션입니다. 예를 들어 '1000'은 1000으로, ' '는 NaN으로 변환됩니다. dropna()는 NaN이 있는 행을 제거하는 메서드로, subset=['TotalCharges']는 해당 컬럼에 NaN이 있는 행만 제거하고 다른 컬럼의 NaN은 무시합니다. 데이터 품질 관리의 필수 단계입니다.\r
+  tips:\r
+  - to_numeric()은 문자열이나 다른 타입을 숫자(numeric) 타입으로 변환하는 pandas 함수입니다. TotalCharges 컬럼에 ' '(공백) 같은 숫자가 아닌\r
+    값이 섞여 있을 수 있으므로 변환이 필요합니다. errors='coerce'는 변환 실패 시 에러를 발생시키지 않고 NaN(Not a Number, 결측값)으로 처리하는 옵션입니다.\r
+    예를 들어 '1000'은 1000으로, ' '는 NaN으로 변환됩니다. dropna()는 NaN이 있는 행을 제거하는 메서드로, subset=['TotalCharges']는 해당\r
+    컬럼에 NaN이 있는 행만 제거하고 다른 컬럼의 NaN은 무시합니다. 데이터 품질 관리의 필수 단계입니다.\r
+  snippet: |-\r
+    churnNumeric = churnData.copy()\r
+    churnNumeric['TotalCharges'] = pd.to_numeric(churnNumeric['TotalCharges'], errors='coerce')\r
+    churnClean = churnNumeric.dropna(subset=['TotalCharges'])\r
+\r
+    features = ['tenure', 'MonthlyCharges', 'TotalCharges']\r
+    X = churnClean[features]\r
+    y = churnClean['ChurnBinary']\r
+  exercise:\r
+    prompt: 5단계. 주요 변수 선택 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      churnNumeric = churnData.copy()\r
+      churnNumeric['TotalCharges'] = pd.to_numeric(churnNumeric['TotalCharges'], errors='coerce')\r
+      churnClean = churnNumeric.dropna(subset=['TotalCharges'])\r
+\r
+      features = ['tenure', 'MonthlyCharges', 'TotalCharges']\r
+      X = churnClean[features]\r
+      y = churnClean['ChurnBinary']\r
+    hints:\r
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.\r
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 5단계. 주요 변수 선택의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.\r
+    resultCheck: 5단계. 주요 변수 선택의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.\r
+- id: step6_add_constant\r
+  title: 6단계. 상수항 추가\r
+  structuredPrimary: true\r
+  subtitle: 절편 계산\r
+  goal: 6단계. 상수항 추가에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: 01-04 프로젝트에서 배운 것처럼 add_constant()로 절편용 컬럼을 추가합니다. 로지스틱 회귀도 OLS와 마찬가지로 절편이 필요하며, 절편은 모든\r
+    독립변수가 0일 때의 기본 이탈 확률(의 로짓 값)을 의미합니다. statsmodels의 모든 회귀 모델(OLS, Logit, ARIMA 등)에 공통으로 적용되는 필수 단계입니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: XWithConst = sm.add_constant(X)\r
+  exercise:\r
+    prompt: 6단계. 상수항 추가 예제에서 \`XWithConst\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.\r
+    starterCode: XWithConst = sm.add_constant(X)\r
+    hints:\r
+    - 바꿀 지점은 \`XWithConst = ...\` 오른쪽 값입니다.\r
+    - 실행 뒤 \`XWithConst\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 6단계. 상수항 추가에서 \`XWithConst\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 6단계. 상수항 추가 실행 뒤 \`XWithConst\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.\r
+- id: step7_logit_model\r
+  title: 7단계. 로지스틱 회귀 모델 학습\r
+  structuredPrimary: true\r
+  subtitle: Logit 함수\r
+  goal: 7단계. 로지스틱 회귀 모델 학습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: |-\r
+    Logit()은 로지스틱 회귀(logistic regression) 모델로, 이진 분류(binary classification) 문제를 해결하는 대표적인 통계 기법입니다. OLS는 연속값(예: 매출, 가격)을 예측하지만, Logit은 0/1 확률(예: 이탈/유지, 합격/불합격)을 예측합니다. 로지스틱 회귀는 로짓 함수 logit(p) = log(p/(1-p))를 사용하여 확률 p를 -∞~+∞ 범위로 변환한 후 선형 회귀를 적용하고, 역변환으로 0~1 사이 확률을 얻습니다. fit()으로 학습하는 방법은 01 프로젝트의 OLS와 동일하지만, 최대우도추정(Maximum Likelihood Estimation)을 사용하여 계수를 추정합니다. 예를 들어 이탈 확률 0.7은 70% 확률로 이탈한다는 뜻이며, 임계값 0.5를 기준으로 0/1 분류로 변환할 수 있습니다. 로지스틱 회귀는 해석이 쉽고 계산이 빠르며 확률을 제공하여 비즈니스 의사결정에 매우 유용합니다.\r
+\r
+    Logit()은 로지스틱 회귀(logistic regression)를 수행하는 statsmodels 클래스입니다. 로짓(logit) 함수는 log(p/(1-p))로 정의되며, 확률 p(0~1)를 -∞~+∞로 변환하여 선형 회귀를 적용 가능하게 만듭니다. 예를 들어 p=0.5이면 logit(0.5)=log(1)=0, p=0.9이면 logit(0.9)=log(9)≈2.2입니다. fit()으로 최대우도추정(Maximum Likelihood)으로 각 변수의 계수를 학습하며, 01 프로젝트의 OLS와 사용법은 같지만 내부 알고리즘이 다릅니다. summary()는 01 프로젝트와 형식이 같지만, Pseudo R²(유사 결정계수)가 나오며 이는 일반 R²와 계산 방식이 다르지만 해석은 비슷합니다(0~1, 높을수록 좋음).\r
+  tips:\r
+  - Logit()은 로지스틱 회귀(logistic regression)를 수행하는 statsmodels 클래스입니다. 로짓(logit) 함수는 log(p/(1-p))로 정의되며,\r
+    확률 p(0~1)를 -∞~+∞로 변환하여 선형 회귀를 적용 가능하게 만듭니다. 예를 들어 p=0.5이면 logit(0.5)=log(1)=0, p=0.9이면 logit(0.9)=log(9)≈2.2입니다.\r
+    fit()으로 최대우도추정(Maximum Likelihood)으로 각 변수의 계수를 학습하며, 01 프로젝트의 OLS와 사용법은 같지만 내부 알고리즘이 다릅니다. summary()는\r
+    01 프로젝트와 형식이 같지만, Pseudo R²(유사 결정계수)가 나오며 이는 일반 R²와 계산 방식이 다르지만 해석은 비슷합니다(0~1, 높을수록 좋음).\r
+  snippet: |-\r
+    logitModel = sm.Logit(y, XWithConst)\r
+    logitFit = logitModel.fit()\r
+    logitFit.summary()\r
+  exercise:\r
+    prompt: 7단계. 로지스틱 회귀 모델 학습 예제에서 \`logitModel\`, \`logitFit\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.\r
+    starterCode: |-\r
+      logitModel = sm.Logit(y, XWithConst)\r
+      logitFit = logitModel.fit()\r
+      logitFit.summary()\r
+    hints:\r
+    - 바꿀 지점은 \`logitModel = ...\` 오른쪽 값입니다.\r
+    - 실행 뒤 \`logitModel\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 7단계. 로지스틱 회귀 모델 학습에서 \`logitModel\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 7단계. 로지스틱 회귀 모델 학습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.\r
+- id: step8_coefficients\r
+  title: 8단계. 계수 해석\r
+  structuredPrimary: true\r
+  subtitle: 승산비(Odds Ratio)\r
+  goal: 8단계. 계수 해석에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: |-\r
+    로지스틱 회귀 계수는 승산비(Odds Ratio, OR)로 해석하며, 이는 일반 회귀와 다른 특수한 해석 방법입니다. 승산(odds)은 확률 p를 p/(1-p)로 변환한 값으로, 예를 들어 이탈 확률 0.6이면 승산은 0.6/0.4 = 1.5입니다. 로지스틱 회귀 계수 β를 exp(β)로 변환하면 승산비가 되며, 이는 해당 변수가 1 증가할 때 승산이 몇 배 변하는지 나타냅니다. tenure 계수가 -0.06이면 exp(-0.06) = 0.94로, 가입 기간 1개월 증가 시 이탈 승산이 0.94배, 즉 6% 감소합니다. OR=1은 영향 없음, OR>1은 양의 영향(이탈 증가), OR<1은 음의 영향(이탈 감소)을 의미합니다. 예를 들어 MonthlyCharges의 OR=1.02면 월 요금 1달러 증가 시 이탈 승산이 1.02배, 즉 2% 증가하며, 이는 고객이 요금에 민감하다는 의미입니다.\r
+\r
+    승산비(Odds Ratio, OR)는 exp(계수)로 계산하며, 로지스틱 회귀 계수를 해석하는 핵심 방법입니다. exp()는 자연상수 e의 거듭제곱으로, 03 프로젝트에서 배운 로그의 역함수입니다. OR=1은 영향 없음(기준선), OR>1은 양의 영향(이탈 증가), OR<1은 음의 영향(이탈 감소)을 의미합니다. 예를 들어 tenure 계수가 -0.06이면 exp(-0.06)=0.94로, 가입 기간 1개월 증가 시 이탈 승산이 0.94배, 즉 6% 감소합니다. MonthlyCharges 계수가 0.02면 exp(0.02)=1.02로, 월 요금 1달러 증가 시 이탈 승산이 1.02배, 즉 2% 증가합니다. np.exp()는 배열 전체에 exp()를 적용하는 numpy 함수입니다.\r
+  tips:\r
+  - 승산비(Odds Ratio, OR)는 exp(계수)로 계산하며, 로지스틱 회귀 계수를 해석하는 핵심 방법입니다. exp()는 자연상수 e의 거듭제곱으로, 03 프로젝트에서 배운\r
+    로그의 역함수입니다. OR=1은 영향 없음(기준선), OR>1은 양의 영향(이탈 증가), OR<1은 음의 영향(이탈 감소)을 의미합니다. 예를 들어 tenure 계수가 -0.06이면\r
+    exp(-0.06)=0.94로, 가입 기간 1개월 증가 시 이탈 승산이 0.94배, 즉 6% 감소합니다. MonthlyCharges 계수가 0.02면 exp(0.02)=1.02로,\r
+    월 요금 1달러 증가 시 이탈 승산이 1.02배, 즉 2% 증가합니다. np.exp()는 배열 전체에 exp()를 적용하는 numpy 함수입니다.\r
+  snippet: |-\r
+    oddsRatios = np.exp(logitFit.params)\r
+    oddsRatios\r
+  exercise:\r
+    prompt: 8단계. 계수 해석 예제에서 \`oddsRatios\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      oddsRatios = np.exp(logitFit.params)\r
+      oddsRatios\r
+    hints:\r
+    - 바꿀 지점은 \`oddsRatios = ...\` 오른쪽 값입니다.\r
+    - 실행 뒤 \`oddsRatios\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 8단계. 계수 해석에서 \`oddsRatios\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 8단계. 계수 해석 실행 뒤 \`oddsRatios\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.\r
+- id: step9_predict_prob\r
+  title: 9단계. 이탈 확률 예측\r
+  structuredPrimary: true\r
+  subtitle: predict() 함수\r
+  goal: 9단계. 이탈 확률 예측에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: 학습된 모델로 각 고객의 이탈 확률을 예측합니다. 01-04 프로젝트에서 배운 predict()를 로지스틱 회귀에 적용하면, OLS와 달리 0~1 사이 확률이\r
+    반환됩니다. 예를 들어 0.73이면 해당 고객이 73% 확률로 이탈할 것으로 예상됩니다. 일반적으로 0.5 이상이면 이탈 예상 고객으로 분류하지만, 비즈니스 상황에 따라 임계값을\r
+    조정할 수 있습니다. 확률 출력은 로지스틱 회귀의 큰 장점으로, 위험도에 따른 차등 대응이 가능합니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    churnProb = logitFit.predict(XWithConst)\r
+    churnClean = churnClean.copy()\r
+    churnClean['ChurnProb'] = churnProb\r
+    churnClean[['tenure', 'MonthlyCharges', 'ChurnBinary', 'ChurnProb']].head(10)\r
+  exercise:\r
+    prompt: 9단계. 이탈 확률 예측 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      churnProb = logitFit.predict(XWithConst)\r
+      churnClean = churnClean.copy()\r
+      churnClean['ChurnProb'] = churnProb\r
+      churnClean[['tenure', 'MonthlyCharges', 'ChurnBinary', 'ChurnProb']].head(10)\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 9단계. 이탈 확률 예측에서 \`churnProb\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 9단계. 이탈 확률 예측 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.\r
+- id: step10_threshold\r
+  title: 10단계. 임계값 설정\r
+  structuredPrimary: true\r
+  subtitle: 0.5 기준 분류\r
+  goal: 10단계. 임계값 설정에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.\r
+  explanation: |-\r
+    확률을 0/1 예측(이탈/유지)으로 변환하려면 임계값(threshold)이 필요합니다. 기본적으로 0.5를 사용하며, 확률 ≥ 0.5이면 이탈(1), < 0.5이면 유지(0)로 분류합니다. 그러나 비즈니스 상황에 따라 조정이 가능합니다. 이탈 방지가 매우 중요하면 0.3으로 낮춰서 더 많은 고객을 위험군으로 분류하고, 프로모션 비용을 절약하려면 0.7로 높여서 확실한 이탈 예상 고객만 선별할 수 있습니다. 이 트레이드오프는 ROC 곡선으로 시각화됩니다.\r
+\r
+    비교 연산으로 확률이 0.5 이상이면 True, 미만이면 False를 반환합니다. 크거나 같다 연산자는 0.5를 포함합니다. astype(int)로 True는 1(이탈 예측), False는 0(유지 예측)으로 변환합니다. 임계값을 낮추면 더 많은 고객을 이탈로 예측하여 민감도가 높아지지만 정밀도는 낮아지는 트레이드오프가 발생합니다.\r
+  tips:\r
+  - 비교 연산으로 확률이 0.5 이상이면 True, 미만이면 False를 반환합니다. 크거나 같다 연산자는 0.5를 포함합니다. astype(int)로 True는 1(이탈 예측),\r
+    False는 0(유지 예측)으로 변환합니다. 임계값을 낮추면 더 많은 고객을 이탈로 예측하여 민감도가 높아지지만 정밀도는 낮아지는 트레이드오프가 발생합니다.\r
+  snippet: |-\r
+    churnClean['ChurnPred'] = (churnProb >= 0.5).astype(int)\r
+    churnClean[['ChurnBinary', 'ChurnProb', 'ChurnPred']].head(10)\r
+  exercise:\r
+    prompt: 10단계. 임계값 설정 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      churnClean['ChurnPred'] = (churnProb >= 0.5).astype(int)\r
+      churnClean[['ChurnBinary', 'ChurnProb', 'ChurnPred']].head(10)\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 10단계. 임계값 설정의 시퀀스 접근이 IndexError 없이 실행되어야 합니다.\r
+    resultCheck: 10단계. 임계값 설정 결과가 바꾼 리스트 값이나 인덱스 기준으로 달라져야 합니다.\r
+- id: step11_confusion_matrix\r
+  title: 11단계. 혼동 행렬\r
+  structuredPrimary: true\r
+  subtitle: 분류 성능 평가\r
+  goal: 11단계. 혼동 행렬에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: |-\r
+    혼동 행렬(Confusion Matrix)은 분류 모델의 성능을 평가하는 2x2 표로, 실제 값(행)과 예측 값(열)을 교차시켜 4가지 경우를 보여줍니다. TP(True Positive, 실제 1, 예측 1)는 이탈 고객을 이탈로 맞춘 것, TN(True Negative, 실제 0, 예측 0)은 유지 고객을 유지로 맞춘 것, FP(False Positive, 실제 0, 예측 1)는 유지 고객을 이탈로 잘못 예측한 것(1종 오류), FN(False Negative, 실제 1, 예측 0)은 이탈 고객을 유지로 잘못 예측한 것(2종 오류)입니다. 이 4개 값으로 정확도(Accuracy), 정밀도(Precision), 재현율(Recall), F1 점수를 계산하며, 이탈 예측에서는 FN을 줄이는 것(재현율 향상)이 비즈니스적으로 중요합니다.\r
+\r
+    sklearn.metrics에서 confusion_matrix를 import하여 사용합니다. sklearn은 scikit-learn의 약자로, 머신러닝 라이브러리입니다. cm은 2x2 배열(array)로 반환되며, cm[0,0]은 첫 번째 행 첫 번째 열로 TN(True Negative), cm[0,1]은 FP, cm[1,0]은 FN, cm[1,1]은 TP(True Positive)입니다. [행, 열] 순서로 인덱싱하며, 인덱스는 0부터 시작합니다. 대각선(TN, TP)은 정확히 예측한 경우이고, 비대각선(FP, FN)은 오류입니다. 혼동 행렬의 합은 전체 데이터 개수와 같으며, TN+TP+FP+FN = 전체 고객 수입니다.\r
+  tips:\r
+  - sklearn.metrics에서 confusion_matrix를 import하여 사용합니다. sklearn은 scikit-learn의 약자로, 머신러닝 라이브러리입니다. cm은\r
+    2x2 배열(array)로 반환되며, cm[0,0]은 첫 번째 행 첫 번째 열로 TN(True Negative), cm[0,1]은 FP, cm[1,0]은 FN, cm[1,1]은\r
+    TP(True Positive)입니다. [행, 열] 순서로 인덱싱하며, 인덱스는 0부터 시작합니다. 대각선(TN, TP)은 정확히 예측한 경우이고, 비대각선(FP, FN)은 오류입니다.\r
+    혼동 행렬의 합은 전체 데이터 개수와 같으며, TN+TP+FP+FN = 전체 고객 수입니다.\r
+  snippet: |-\r
+    from sklearn.metrics import confusion_matrix\r
+\r
+    cm = confusion_matrix(churnClean['ChurnBinary'], churnClean['ChurnPred'])\r
+    cm\r
+    f"TN: {cm[0,0]}, FP: {cm[0,1]}"\r
+    f"FN: {cm[1,0]}, TP: {cm[1,1]}"\r
+  exercise:\r
+    prompt: 11단계. 혼동 행렬 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      from sklearn.metrics import confusion_matrix\r
+\r
+      cm = confusion_matrix(churnClean['ChurnBinary'], churnClean['ChurnPred'])\r
+      cm\r
+      f"TN: {cm[0,0]}, FP: {cm[0,1]}"\r
+      f"FN: {cm[1,0]}, TP: {cm[1,1]}"\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 11단계. 혼동 행렬에서 \`cm\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 11단계. 혼동 행렬 실행 뒤 \`cm\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.\r
+- id: step12_cm_viz\r
+  title: 12단계. 혼동 행렬 시각화\r
+  structuredPrimary: true\r
+  subtitle: 히트맵\r
+  goal: 12단계. 혼동 행렬 시각화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.\r
+  explanation: |-\r
+    혼동 행렬을 히트맵으로 시각화하면 분류 성능을 직관적으로 파악할 수 있습니다. 대각선(TN, TP)의 색이 진할수록 정확히 예측한 경우가 많고, 비대각선(FP, FN)이 밝을수록 오류가 적습니다.\r
+\r
+    annot=True는 각 셀에 숫자를 표시, fmt='d'는 정수 형식, cmap='Blues'는 파란색 계열 색상입니다. 대각선이 진할수록 좋은 모델입니다.\r
+  snippet: |-\r
+    import seaborn as sns\r
+    import matplotlib.pyplot as plt\r
+\r
+    cmFig, cmAx = plt.subplots(figsize=(6, 5))\r
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=cmAx,\r
+                xticklabels=['Pred: Stay', 'Pred: Churn'],\r
+                yticklabels=['Actual: Stay', 'Actual: Churn'])\r
+    cmAx.set_xlabel('Predicted')\r
+    cmAx.set_ylabel('Actual')\r
+    cmAx.set_title('Confusion Matrix')\r
+    cmFig\r
+  exercise:\r
+    prompt: 12단계. 혼동 행렬 시각화 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      import seaborn as sns\r
+      import matplotlib.pyplot as plt\r
+\r
+      cmFig, cmAx = plt.subplots(figsize=(6, 5))\r
+      sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=cmAx,\r
+                  xticklabels=['Pred: Stay', 'Pred: Churn'],\r
+                  yticklabels=['Actual: Stay', 'Actual: Churn'])\r
+      cmAx.set_xlabel('Predicted')\r
+      cmAx.set_ylabel('Actual')\r
+      cmAx.set_title('Confusion Matrix')\r
+      cmFig\r
+    hints:\r
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.\r
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 12단계. 혼동 행렬 시각화의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.\r
+    resultCheck: 12단계. 혼동 행렬 시각화의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.\r
+- id: step13_accuracy\r
+  title: 13단계. 정확도와 재현율\r
+  structuredPrimary: true\r
+  subtitle: 평가 지표 계산\r
+  goal: 13단계. 정확도와 재현율에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: |-\r
+    정확도(Accuracy)는 전체 예측 중 맞춘 비율로 (TP+TN) / 전체 = 맞춘 개수 / 전체 고객 수를 의미하며, 가장 직관적인 지표입니다. 정밀도(Precision)는 이탈로 예측한 것 중 실제 이탈의 비율로 TP / (TP+FP) = 실제 이탈 / 이탈 예측으로, "예측이 얼마나 정확한가"를 나타냅니다. 재현율(Recall, Sensitivity, TPR)은 실제 이탈 고객 중 이탈로 예측한 비율로 TP / (TP+FN) = 찾은 이탈 / 실제 이탈로, "이탈 고객을 얼마나 놓치지 않고 찾았는가"를 나타냅니다. 이탈 예측에서는 재현율이 가장 중요한데, 이탈 고객을 놓치면(FN) 고객 손실이 발생하여 비즈니스 손해가 크기 때문입니다. 정밀도와 재현율은 트레이드오프 관계로, 하나를 높이면 다른 하나가 낮아지는 경향이 있습니다.\r
+\r
+    sklearn.metrics의 함수들은 혼동 행렬로부터 자동으로 지표를 계산합니다. Accuracy는 맞춘 것을 전체로 나눈 값, Precision은 진짜 이탈을 이탈 예측으로 나눈 값, Recall은 찾은 이탈을 실제 이탈로 나눈 값입니다. Recall이 0.3이면 실제 이탈 고객 10명 중 3명만 찾고 7명을 놓친다는 뜻입니다. f-string은 변수를 문자열에 삽입하는 파이썬 문법입니다.\r
+  tips:\r
+  - sklearn.metrics의 함수들은 혼동 행렬로부터 자동으로 지표를 계산합니다. Accuracy는 맞춘 것을 전체로 나눈 값, Precision은 진짜 이탈을 이탈 예측으로\r
+    나눈 값, Recall은 찾은 이탈을 실제 이탈로 나눈 값입니다. Recall이 0.3이면 실제 이탈 고객 10명 중 3명만 찾고 7명을 놓친다는 뜻입니다. f-string은\r
+    변수를 문자열에 삽입하는 파이썬 문법입니다.\r
+  snippet: |-\r
+    from sklearn.metrics import accuracy_score, precision_score, recall_score\r
+\r
+    accuracy = accuracy_score(churnClean['ChurnBinary'], churnClean['ChurnPred'])\r
+    precision = precision_score(churnClean['ChurnBinary'], churnClean['ChurnPred'])\r
+    recall = recall_score(churnClean['ChurnBinary'], churnClean['ChurnPred'])\r
+\r
+    f"Accuracy: {accuracy:.3f}"\r
+    f"Precision: {precision:.3f}"\r
+    f"Recall: {recall:.3f}"\r
+  exercise:\r
+    prompt: 13단계. 정확도와 재현율 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      from sklearn.metrics import accuracy_score, precision_score, recall_score\r
+\r
+      accuracy = accuracy_score(churnClean['ChurnBinary'], churnClean['ChurnPred'])\r
+      precision = precision_score(churnClean['ChurnBinary'], churnClean['ChurnPred'])\r
+      recall = recall_score(churnClean['ChurnBinary'], churnClean['ChurnPred'])\r
+\r
+      f"Accuracy: {accuracy:.3f}"\r
+      f"Precision: {precision:.3f}"\r
+      f"Recall: {recall:.3f}"\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 13단계. 정확도와 재현율에서 \`accuracy\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 13단계. 정확도와 재현율 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.\r
+- id: step14_roc_curve\r
+  title: 14단계. ROC 곡선\r
+  structuredPrimary: true\r
+  subtitle: 임계값별 성능\r
+  goal: 14단계. ROC 곡선에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 차트는 데이터와 표시 설정을 함께 확인해야 보고서에서 잘못된 해석을 줄일 수 있습니다.\r
+  explanation: |-\r
+    ROC(Receiver Operating Characteristic) 곡선은 분류 모델의 성능을 평가하는 핵심 도구로, 임계값을 0부터 1까지 변화시키며 TPR(재현율, True Positive Rate)과 FPR(위양성률, False Positive Rate)을 그린 그래프입니다. X축은 FPR(실제 0인데 1로 잘못 예측한 비율), Y축은 TPR(실제 1을 1로 맞춘 비율)로, 왼쪽 위 모서리에 가까울수록 좋은 모델입니다. 곡선 아래 면적(AUC, Area Under Curve)은 0.5~1.0 사이 값으로, 0.5는 동전 던지기처럼 랜덤한 분류, 1.0은 완벽한 분류를 의미합니다. 실무에서 AUC > 0.8이면 좋은 모델, > 0.9이면 매우 우수한 모델로 평가되며, 이탈 예측에서 AUC 0.84는 비즈니스 활용 가능한 수준입니다. ROC 곡선을 통해 임계값 조정 시 재현율과 정밀도의 트레이드오프를 시각적으로 확인할 수 있습니다.\r
+\r
+    roc_curve()는 임계값을 변화시키며 FPR(x축)과 TPR(y축, 재현율)을 계산합니다. roc_auc_score()는 ROC 곡선 아래 면적(AUC)으로, 1.0에 가까울수록 좋습니다. AUC 0.5는 랜덤 추측(회색 대각선), 0.7~0.8은 양호, 0.8~0.9는 우수, 0.9 이상은 매우 우수한 모델입니다. 이탈 방지 캠페인에서 재현율이 중요하면 곡선의 오른쪽 영역(높은 재현율)에서 임계값을 선택하고, 정밀도가 중요하면 왼쪽 영역(낮은 FPR)에서 선택합니다.\r
+  tips:\r
+  - roc_curve()는 임계값을 변화시키며 FPR(x축)과 TPR(y축, 재현율)을 계산합니다. roc_auc_score()는 ROC 곡선 아래 면적(AUC)으로, 1.0에 가까울수록\r
+    좋습니다. AUC 0.5는 랜덤 추측(회색 대각선), 0.7~0.8은 양호, 0.8~0.9는 우수, 0.9 이상은 매우 우수한 모델입니다. 이탈 방지 캠페인에서 재현율이 중요하면\r
+    곡선의 오른쪽 영역(높은 재현율)에서 임계값을 선택하고, 정밀도가 중요하면 왼쪽 영역(낮은 FPR)에서 선택합니다.\r
+  snippet: |-\r
+    import plotly.graph_objects as go\r
+    from sklearn.metrics import roc_curve, roc_auc_score\r
+\r
+    fpr, tpr, thresholds = roc_curve(churnClean['ChurnBinary'], churnProb)\r
+    auc = roc_auc_score(churnClean['ChurnBinary'], churnProb)\r
+\r
+    rocFig = go.Figure()\r
+    rocFig.add_trace(go.Scatter(x=fpr, y=tpr, mode='lines', name=f'ROC Curve (AUC = {auc:.3f})', line=dict(color='blue', width=2)))\r
+    rocFig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode='lines', name='Random', line=dict(color='gray', dash='dash')))\r
+    rocFig.update_layout(title='ROC Curve',\r
+                         xaxis_title='False Positive Rate',\r
+                         yaxis_title='True Positive Rate (Recall)',\r
+                         showlegend=True)\r
+    rocFig.show()\r
+  exercise:\r
+    prompt: 14단계. ROC 곡선 예제에서 데이터 값이나 축/마크 설정을 바꾸고 차트 표현이 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      import plotly.graph_objects as go\r
+      from sklearn.metrics import roc_curve, roc_auc_score\r
+\r
+      fpr, tpr, thresholds = roc_curve(churnClean['ChurnBinary'], churnProb)\r
+      auc = roc_auc_score(churnClean['ChurnBinary'], churnProb)\r
+\r
+      rocFig = go.Figure()\r
+      rocFig.add_trace(go.Scatter(x=fpr, y=tpr, mode='lines', name=f'ROC Curve (AUC = {auc:.3f})', line=dict(color='blue', width=2)))\r
+      rocFig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode='lines', name='Random', line=dict(color='gray', dash='dash')))\r
+      rocFig.update_layout(title='ROC Curve',\r
+                           xaxis_title='False Positive Rate',\r
+                           yaxis_title='True Positive Rate (Recall)',\r
+                           showlegend=True)\r
+      rocFig.show()\r
+    hints:\r
+    - 바꿀 지점은 x/y 데이터, 색상, 축 제목, 마크 설정 줄에서 찾으세요.\r
+    - 실행 뒤 축, 범례, 표시 범위, 저장 결과가 바꾼 설정을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 14단계. ROC 곡선의 차트 객체와 축/마크 설정이 생성 단계까지 도달해야 합니다.\r
+    resultCheck: 14단계. ROC 곡선의 축, 범례, 마크, 저장 결과가 바꾼 데이터나 설정을 반영해야 합니다.\r
+- id: step15_odds_ratio_viz\r
+  title: 15단계. 승산비 시각화\r
+  structuredPrimary: true\r
+  subtitle: 변수별 영향력\r
+  goal: 15단계. 승산비 시각화에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: |-\r
+    승산비를 막대 그래프로 시각화하면 어떤 변수가 이탈에 가장 큰 영향을 미치는지 직관적으로 파악할 수 있습니다. OR > 1은 이탈 증가, OR < 1은 이탈 감소를 의미합니다.\r
+\r
+    빨간색(OR > 1)은 이탈 위험 증가, 녹색(OR < 1)은 이탈 위험 감소입니다. 검은 점선(OR=1)은 영향 없음을 나타냅니다.\r
+  snippet: |-\r
+    import altair as alt\r
+\r
+    orData = pd.DataFrame({\r
+        'variable': oddsRatios.index.drop('const'),\r
+        'odds_ratio': oddsRatios.drop('const').values\r
+    })\r
+    orData['effect'] = orData['odds_ratio'].apply(lambda x: 'Increase' if x > 1 else 'Decrease')\r
+\r
+    orChart = alt.Chart(orData).mark_bar().encode(\r
+        x=alt.X('odds_ratio:Q', title='Odds Ratio', scale=alt.Scale(domain=[0.9, 1.1])),\r
+        y=alt.Y('variable:N', sort='-x', title='Variable'),\r
+        color=alt.Color('effect:N', scale=alt.Scale(domain=['Increase', 'Decrease'], range=['#e74c3c', '#2ecc71'])),\r
+        tooltip=['variable', 'odds_ratio', 'effect']\r
+    ).properties(width=400, height=200, title='Odds Ratio by Variable')\r
+\r
+    refLine = alt.Chart(pd.DataFrame({'x': [1]})).mark_rule(color='black', strokeDash=[3, 3]).encode(x='x:Q')\r
+    orChart + refLine\r
+  exercise:\r
+    prompt: 15단계. 승산비 시각화 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      import altair as alt\r
+\r
+      orData = pd.DataFrame({\r
+          'variable': oddsRatios.index.drop('const'),\r
+          'odds_ratio': oddsRatios.drop('const').values\r
+      })\r
+      orData['effect'] = orData['odds_ratio'].apply(lambda x: 'Increase' if x > 1 else 'Decrease')\r
+\r
+      orChart = alt.Chart(orData).mark_bar().encode(\r
+          x=alt.X('odds_ratio:Q', title='Odds Ratio', scale=alt.Scale(domain=[0.9, 1.1])),\r
+          y=alt.Y('variable:N', sort='-x', title='Variable'),\r
+          color=alt.Color('effect:N', scale=alt.Scale(domain=['Increase', 'Decrease'], range=['#e74c3c', '#2ecc71'])),\r
+          tooltip=['variable', 'odds_ratio', 'effect']\r
+      ).properties(width=400, height=200, title='Odds Ratio by Variable')\r
+\r
+      refLine = alt.Chart(pd.DataFrame({'x': [1]})).mark_rule(color='black', strokeDash=[3, 3]).encode(x='x:Q')\r
+      orChart + refLine\r
+    hints:\r
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.\r
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.\r
+  check:\r
+    noError: 15단계. 승산비 시각화의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.\r
+    resultCheck: 15단계. 승산비 시각화 분기 결과가 바꾼 조건값에 맞게 달라져야 합니다.\r
+- id: step16_feature_importance\r
+  title: 16단계. 변수 중요도\r
+  structuredPrimary: true\r
+  subtitle: p-value 확인\r
+  goal: 16단계. 변수 중요도에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.\r
+  explanation: summary()에서 각 변수의 p-value를 확인하여 통계적 유의성을 판단합니다. p-value < 0.05이면 해당 변수가 이탈에 통계적으로 유의미한\r
+    영향을 미친다는 뜻입니다. 01 프로젝트에서 배운 summary 해석을 로지스틱 회귀에 적용하며, p-value가 작을수록 해당 변수의 영향이 확실합니다. 예를 들어 tenure의\r
+    p-value가 0.000이면 가입 기간이 이탈에 미치는 영향은 우연이 아니라 실제로 존재한다는 강력한 증거입니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    pvalues = logitFit.pvalues.drop('const').sort_values()\r
+    pvalues\r
+  exercise:\r
+    prompt: 16단계. 변수 중요도 예제에서 \`pvalues\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      pvalues = logitFit.pvalues.drop('const').sort_values()\r
+      pvalues\r
+    hints:\r
+    - 바꿀 지점은 \`pvalues = ...\` 오른쪽 값입니다.\r
+    - 실행 뒤 \`pvalues\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 16단계. 변수 중요도에서 \`pvalues\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 16단계. 변수 중요도 실행 뒤 \`pvalues\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.\r
+- id: practice\r
+  title: 실습\r
+  structuredPrimary: true\r
+  subtitle: 고객 이탈 예측 프로젝트\r
+  goal: 실습에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 표 데이터는 컬럼, 행 수, 요약값을 함께 확인해야 분석 결과를 믿고 재사용할 수 있습니다.\r
+  explanation: |-\r
+    통신사 고객 관리팀이 되어 이탈 위험 고객을 찾아냅니다. 각 미션은 데이터 로딩부터 전처리, Logit 모델링, ROC 분석까지 전체 과정을 독립적으로 수행합니다. 01-04 프로젝트의 회귀 기법과 이번 프로젝트의 로지스틱 회귀를 모두 활용합니다.\r
+\r
+    각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.\r
+  snippet: |-\r
+    import pandas as pd\r
+    import numpy as np\r
+    import statsmodels.api as sm\r
+    from codaro.curriculum.localData import loadLocalDataset\r
+\r
+    ctrData = loadLocalDataset("churn")\r
+    ctrData['ChurnBinary'] = (ctrData['Churn'] == 'Yes').astype(int)\r
+    ctrData['TotalCharges'] = pd.to_numeric(ctrData['TotalCharges'], errors='coerce')\r
+    ctrData = ctrData.dropna(subset=['TotalCharges'])\r
+    ctrData.shape\r
+  exercise:\r
+    prompt: 실습 예제에서 데이터셋 이름, 컬럼, 행 값 중 하나를 바꾸고 DataFrame 결과가 어떻게 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      import pandas as pd\r
+      import numpy as np\r
+      import statsmodels.api as sm\r
+      from codaro.curriculum.localData import loadLocalDataset\r
+\r
+      ctrData = loadLocalDataset("churn")\r
+      ctrData['ChurnBinary'] = (ctrData['Churn'] == 'Yes').astype(int)\r
+      ctrData['TotalCharges'] = pd.to_numeric(ctrData['TotalCharges'], errors='coerce')\r
+      ctrData = ctrData.dropna(subset=['TotalCharges'])\r
+      ctrData.shape\r
+    hints:\r
+    - 바꿀 지점은 데이터 생성/로드 줄이나 컬럼 선택 줄에서 찾으세요.\r
+    - 실행 뒤 shape, 컬럼 목록, head()/집계 결과 중 하나가 바뀐 입력을 반영하는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.\r
+    resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.\r
+- id: summary\r
+  title: 정리\r
+  subtitle: 다섯 번째 프로젝트 완료!\r
+  blocks:\r
+  - type: text\r
+    content: 이번 프로젝트에서는 통신사 고객 7,043명의 데이터로 이탈 여부를 예측했습니다. Logit 로지스틱 회귀로 가입 기간, 월 요금 등으로 이탈 확률을 계산했고,\r
+      ROC 곡선으로 AUC 0.84를 달성했습니다. 혼동 행렬로 재현율과 정밀도를 평가하고, 승산비로 각 변수의 영향력을 해석했습니다. 이제 고객 이탈 위험도를 측정하고, 이탈\r
+      방지 캠페인 대상을 선정하며, 유지 프로그램의 효과를 예측할 수 있습니다.\r
+  - type: list\r
+    items:\r
+    - Logit - 로지스틱 회귀 모델 (0/1 분류)\r
+    - 승산비 - exp(계수)로 영향력 해석\r
+    - 혼동 행렬 - TP, TN, FP, FN으로 성능 평가\r
+    - ROC 곡선 - 임계값별 재현율과 FPR\r
+    - AUC - ROC 곡선 아래 면적 (0.5~1.0)\r
+    - 임계값 - 확률을 0/1 분류로 변환\r
+    - 재현율 - 실제 이탈 중 맞춘 비율\r
+    - 정밀도 - 이탈 예측 중 실제 이탈 비율\r
+  - type: text\r
+    content: 다음 프로젝트에서는 월마트 매출 데이터로 외생변수를 포함한 시계열 회귀를 배웁니다. 실업률, CPI 같은 경제 지표로 주간 매출을 예측해봅니다.\r
+  goal: 정리에서 입력 데이터을 바꿨을 때 출력과 상태가 어떻게 달라지는지 확인한다.\r
+  why: 작게 실행하고 검증하는 흐름은 코드를 업무에 가져가기 위한 기본 조건입니다.\r
+- id: workflow_validation\r
+  title: 업무 흐름 검증\r
+  structuredPrimary: true\r
+  subtitle: 회귀 리포트 품질 게이트\r
+  goal: 업무 흐름 검증에서 핵심 처리 흐름을 코드로 실행하고 결과를 확인한다.\r
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.\r
+  explanation: statsmodels 학습의 핵심은 모델을 만들고 summary를 보는 데서 끝나지 않는 것입니다. 먼저 어떤 변수가 유의할지 예측하고, 로컬 데이터의 컬럼과\r
+    결측치를 검증하고, 회귀 결과가 보고서에 들어갈 수준인지 R², F-test, 잔차 진단으로 확인해야 합니다. 마지막에는 변수를 빼는 변주로 모델 선택의 근거를 비교합니다.\r
+  tips:\r
+  - 작게 실행하고 결과를 바로 확인하세요.\r
+  snippet: |-\r
+    import pandas as pd\r
+    import statsmodels.api as sm\r
+    from statsmodels.stats.diagnostic import het_breuschpagan\r
+    from codaro.curriculum.localData import loadLocalDataset\r
+\r
+    marketingData = loadLocalDataset("advertising")\r
+    requiredColumns = ["TV", "Radio", "Newspaper", "Sales"]\r
+\r
+    missingColumns = [column for column in requiredColumns if column not in marketingData.columns]\r
+    if missingColumns:\r
+        raise ValueError(f"필수 컬럼이 없습니다: {missingColumns}")\r
+    if marketingData[requiredColumns].isna().any().any():\r
+        raise ValueError("회귀분석 전 결측치를 처리해야 합니다.")\r
+\r
+    reportY = marketingData["Sales"]\r
+    reportX = sm.add_constant(marketingData[["TV", "Radio", "Newspaper"]])\r
+    reportModel = sm.OLS(reportY, reportX).fit()\r
+\r
+    marketingData[requiredColumns].head()\r
+  exercise:\r
+    prompt: 업무 흐름 검증 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.\r
+    starterCode: |-\r
+      compactX = sm.add_constant(marketingData[["TV", "Radio"]])\r
+      compactModel = sm.OLS(reportY, compactX).fit()\r
+      r2Drop = reportModel.rsquared - compactModel.rsquared\r
+\r
+      assert compactModel.rsquared >= 0.95\r
+      {\r
+          "fullR2": round(reportModel.rsquared, 3),\r
+          "compactR2": round(compactModel.rsquared, 3),\r
+          "r2Drop": round(r2Drop, 3),\r
+          "fullAIC": round(reportModel.aic, 1),\r
+          "compactAIC": round(compactModel.aic, 1),\r
+      }\r
+    solution: |-\r
+      import pandas as pd\r
+      import statsmodels.api as sm\r
+      from statsmodels.stats.diagnostic import het_breuschpagan\r
+      from codaro.curriculum.localData import loadLocalDataset\r
+\r
+      marketingData = loadLocalDataset("advertising")\r
+      requiredColumns = ["TV", "Radio", "Newspaper", "Sales"]\r
+\r
+      missingColumns = [column for column in requiredColumns if column not in marketingData.columns]\r
+      if missingColumns:\r
+          raise ValueError(f"필수 컬럼이 없습니다: {missingColumns}")\r
+      if marketingData[requiredColumns].isna().any().any():\r
+          raise ValueError("회귀분석 전 결측치를 처리해야 합니다.")\r
+\r
+      marketingData[requiredColumns].head()\r
+    hints:\r
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.\r
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.\r
+  check:\r
+    type: noError\r
+    noError: 업무 흐름 검증에서 \`compactX\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.\r
+    resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.\r
+`;export{e as default};

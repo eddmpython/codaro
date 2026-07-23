@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codaro.dev/contracts/design-system-tokens.schema.json",
+  "title": "Codaro Astryx design tokens",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "astryx",
+    "semanticRoles",
+    "astryxTokens",
+    "typography",
+    "motion",
+    "radius",
+    "syntax",
+    "density",
+    "accents"
+  ],
+  "properties": {
+    "$schema": {"type": "string"},
+    "version": {"const": 1},
+    "astryx": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["core", "themeNeutral", "cli", "stylex", "themeName"],
+      "properties": {
+        "core": {"const": "0.1.6"},
+        "themeNeutral": {"const": "0.1.6"},
+        "cli": {"const": "0.1.6"},
+        "stylex": {"const": "0.19.0"},
+        "themeName": {"const": "codaro"}
+      }
+    },
+    "semanticRoles": {
+      "type": "object",
+      "minProperties": 12,
+      "additionalProperties": {"type": "string", "pattern": "^--[a-z0-9-]+$"}
+    },
+    "astryxTokens": {
+      "type": "object",
+      "minProperties": 30,
+      "patternProperties": {
+        "^--[a-z0-9-]+$": {"$ref": "#/$defs/tokenValue"}
+      },
+      "additionalProperties": false
+    },
+    "typography": {"type": "object"},
+    "motion": {"type": "object"},
+    "radius": {"type": "object"},
+    "syntax": {"type": "object"},
+    "density": {
+      "type": "object",
+      "required": ["public", "learningComfortable", "studioDense"],
+      "additionalProperties": {
+        "type": "object",
+        "patternProperties": {
+          "^--[a-z0-9-]+$": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "accents": {
+      "type": "object",
+      "required": ["plum", "blue", "teal"],
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["accent", "muted", "onAccent"],
+        "properties": {
+          "accent": {"$ref": "#/$defs/modePair"},
+          "muted": {"$ref": "#/$defs/modePair"},
+          "onAccent": {"$ref": "#/$defs/modePair"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "modePair": {
+      "type": "array",
+      "prefixItems": [{"type": "string"}, {"type": "string"}],
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "tokenValue": {
+      "oneOf": [
+        {"type": "string"},
+        {"$ref": "#/$defs/modePair"}
+      ]
+    }
+  }
+}

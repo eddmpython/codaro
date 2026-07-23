@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "matplotlib"
+sourceCount: 11
+lessons:
+  - lessonRef: "matplotlib/00_Matplotlib소개"
+    sourcePath: "curricula/python/visualization/matplotlib/00_Matplotlib소개.yaml"
+    metaId: "matplotlib_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "matplotlib/01_주가추세분석"
+    sourcePath: "curricula/python/visualization/matplotlib/01_주가추세분석.yaml"
+    metaId: "matplotlib_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "matplotlib/02_팁데이터분포탐색"
+    sourcePath: "curricula/python/visualization/matplotlib/02_팁데이터분포탐색.yaml"
+    metaId: "matplotlib_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "matplotlib/03_붓꽃품종산점도"
+    sourcePath: "curricula/python/visualization/matplotlib/03_붓꽃품종산점도.yaml"
+    metaId: "matplotlib_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "matplotlib/04_대륙별인구비교"
+    sourcePath: "curricula/python/visualization/matplotlib/04_대륙별인구비교.yaml"
+    metaId: "matplotlib_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "matplotlib/05_펭귄체중분석"
+    sourcePath: "curricula/python/visualization/matplotlib/05_펭귄체중분석.yaml"
+    metaId: "matplotlib_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "matplotlib/06_상관관계히트맵"
+    sourcePath: "curricula/python/visualization/matplotlib/06_상관관계히트맵.yaml"
+    metaId: "matplotlib_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "matplotlib/07_시계열다중축차트"
+    sourcePath: "curricula/python/visualization/matplotlib/07_시계열다중축차트.yaml"
+    metaId: "matplotlib_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "matplotlib/08_다중패널대시보드"
+    sourcePath: "curricula/python/visualization/matplotlib/08_다중패널대시보드.yaml"
+    metaId: "matplotlib_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "matplotlib/09_고급주석차트"
+    sourcePath: "curricula/python/visualization/matplotlib/09_고급주석차트.yaml"
+    metaId: "matplotlib_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "matplotlib/10_종합분석리포트"
+    sourcePath: "curricula/python/visualization/matplotlib/10_종합분석리포트.yaml"
+    metaId: "matplotlib_10"
+    registryStatus: registered
+    reviewStatus: pending

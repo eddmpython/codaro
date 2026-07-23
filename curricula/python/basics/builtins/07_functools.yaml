@@ -411,3 +411,358 @@ sections:
     type: noError
     noError: functools 모듈 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: functools 모듈 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 07_functools-currency-orders-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - partial
+    - workflow_validation
+    - practice
+    title: 통화별 주문 금액을 원화로 변환하기
+    subtitle: partial로 환율과 수수료 고정
+    goal: 주문 행에서 특정 통화만 골라 고정된 환율과 수수료로 KRW 값과 합계를 반환한다.
+    why: partial은 같은 변환 규칙을 여러 행에 재사용할 때 설정값을 함수 호출마다 반복하지 않게 해줍니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 주문 목록과 환율표로 다시 호출합니다.
+    tips:
+    - convert_to_krw에 currency, fee_rate, rates를 partial로 고정하세요.
+    - 반환값은 변환된 개별 값과 합계를 모두 담아야 합니다.
+    exercise:
+      prompt: summarize_currency_orders(rows, currency, fee_rate, rates)가 currency, count, values, totalKrw를 담은 dict를 반환하도록
+        완성하세요.
+      starterCode: |-
+        def summarize_currency_orders(rows, currency, fee_rate, rates):
+            raise NotImplementedError
+      solution: |-
+        from functools import partial
+
+        def convert_to_krw(amount, currency, fee_rate, rates):
+            return round(amount * rates[currency] * (1 + fee_rate), 2)
+
+        def summarize_currency_orders(rows, currency, fee_rate, rates):
+            converter = partial(convert_to_krw, currency=currency, fee_rate=fee_rate, rates=rates)
+            converted = [converter(row["amount"]) for row in rows if row["currency"] == currency]
+            return {
+                "currency": currency,
+                "count": len(converted),
+                "values": converted,
+                "totalKrw": round(sum(converted), 2),
+            }
+      hints:
+      - 필터링할 통화와 변환할 통화를 같은 currency 인자로 맞추세요.
+      - fee_rate는 0.015처럼 비율 값으로 들어옵니다.
+    check:
+      id: python.builtins.functools.currency-orders.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.functools.currency-orders.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_currency_orders
+        cases:
+        - id: usd-with-fee
+          arguments:
+          - value:
+            - amount: 10
+              currency: USD
+            - amount: 1000
+              currency: JPY
+            - amount: 3
+              currency: USD
+          - value: USD
+          - value: 0.015
+          - value:
+              USD: 1350.0
+              JPY: 9.0
+              EUR: 1450.0
+          expectedReturn:
+            currency: USD
+            count: 2
+            values:
+            - 13702.5
+            - 4110.75
+            totalKrw: 17813.25
+        - id: eur-with-fee
+          arguments:
+          - value:
+            - amount: 2
+              currency: EUR
+            - amount: 5
+              currency: USD
+            - amount: 1.5
+              currency: EUR
+          - value: EUR
+          - value: 0.02
+          - value:
+              USD: 1350.0
+              JPY: 9.0
+              EUR: 1450.0
+          expectedReturn:
+            currency: EUR
+            count: 2
+            values:
+            - 2958.0
+            - 2218.5
+            totalKrw: 5176.5
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 07_functools-weighted-signals-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - 07_functools-currency-orders-mastery
+    title: 가중 신호 점수 계산하기
+    subtitle: reduce를 집계 계약에 적용
+    goal: 신호 목록의 weight와 score를 누적해 weightedScore를 반환하고 총 weight 0은 거부한다.
+    why: reduce는 단순 합보다 "누적 상태를 어떤 규칙으로 줄이는가"가 드러날 때 학습 가치가 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 통화 변환이 아니라 다른 집계 계약에 누적 개념을 옮기세요.
+    tips:
+    - totalWeight와 weightedTotal을 별도로 누적하세요.
+    - totalWeight가 0이면 나눌 수 없으므로 ValueError를 일으키세요.
+    exercise:
+      prompt: score_weighted_signals(signals)가 signalCount, totalWeight, weightedScore를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def score_weighted_signals(signals):
+            raise NotImplementedError
+      solution: |-
+        from functools import reduce
+
+        def score_weighted_signals(signals):
+            total_weight = reduce(lambda total, row: total + row["weight"], signals, 0)
+            if total_weight == 0:
+                raise ValueError("total weight must be positive")
+            weighted_total = reduce(
+                lambda total, row: total + row["score"] * row["weight"],
+                signals,
+                0,
+            )
+            return {
+                "signalCount": len(signals),
+                "totalWeight": total_weight,
+                "weightedScore": round(weighted_total / total_weight, 2),
+            }
+      hints:
+      - reduce의 세 번째 인자는 빈 목록에도 안전한 초기값입니다.
+      - weightedScore는 소수점 둘째 자리까지 반올림하세요.
+    check:
+      id: python.builtins.functools.weighted-signals.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.functools.weighted-signals.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: score_weighted_signals
+        cases:
+        - id: integer-weights
+          arguments:
+          - value:
+            - score: 80
+              weight: 2
+            - score: 95
+              weight: 1
+            - score: 70
+              weight: 3
+          expectedReturn:
+            signalCount: 3
+            totalWeight: 6
+            weightedScore: 77.5
+        - id: fractional-weights
+          arguments:
+          - value:
+            - score: 100
+              weight: 1.5
+            - score: 60
+              weight: 0.5
+          expectedReturn:
+            signalCount: 2
+            totalWeight: 2.0
+            weightedScore: 90.0
+        - id: rejects-zero-weight
+          arguments:
+          - value:
+            - score: 100
+              weight: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 07_functools-route-cache-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 07_functools-weighted-signals-transfer
+    title: 반복 경로 비용을 캐시로 줄이기
+    subtitle: lru_cache의 hit와 miss 확인
+    goal: 반복 route 요청의 거리 조회를 캐시하고 비용 목록과 cache hit, miss 수를 반환한다.
+    why: 캐시는 붙이는 것으로 끝이 아니라 같은 인자 재호출에서 실제 조회가 줄었는지 증거로 확인해야 합니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. 해시 가능한 start, end 인자만 cached 함수에 넘기세요.
+    tips:
+    - 거리표 dict는 cached 함수 바깥 closure에 두고, cached 함수 인자는 start와 end만 사용하세요.
+    - cache_info().hits와 misses를 반환값에 포함하세요.
+    exercise:
+      prompt: summarize_route_costs(distance_pairs, route_requests, cost_per_km)가 costs, cacheHits, cacheMisses, rawLookups를
+        담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def summarize_route_costs(distance_pairs, route_requests, cost_per_km):
+            raise NotImplementedError
+      solution: |-
+        from functools import lru_cache
+
+        def summarize_route_costs(distance_pairs, route_requests, cost_per_km):
+            distance_map = {(start, end): km for start, end, km in distance_pairs}
+            lookup_counter = {"count": 0}
+
+            @lru_cache(maxsize=None)
+            def route_distance(start, end):
+                lookup_counter["count"] += 1
+                return distance_map[(start, end)]
+
+            costs = []
+            for start, end in route_requests:
+                km = route_distance(start, end)
+                costs.append({
+                    "route": f"{start}->{end}",
+                    "km": km,
+                    "cost": round(km * cost_per_km, 2),
+                })
+            cache_info = route_distance.cache_info()
+            return {
+                "costs": costs,
+                "cacheHits": cache_info.hits,
+                "cacheMisses": cache_info.misses,
+                "rawLookups": lookup_counter["count"],
+            }
+      hints:
+      - 같은 start, end가 두 번째로 나오면 raw lookup이 늘지 않아야 합니다.
+      - dict나 list를 cached 함수 인자로 넘기면 해시할 수 없어 실패합니다.
+    check:
+      id: python.builtins.functools.route-cache.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.functools.route-cache.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_route_costs
+        cases:
+        - id: repeated-route
+          arguments:
+          - value:
+            - - A
+              - B
+              - 12.5
+            - - B
+              - C
+              - 8.0
+          - value:
+            - - A
+              - B
+            - - B
+              - C
+            - - A
+              - B
+          - value: 1200
+          expectedReturn:
+            costs:
+            - route: A->B
+              km: 12.5
+              cost: 15000.0
+            - route: B->C
+              km: 8.0
+              cost: 9600.0
+            - route: A->B
+              km: 12.5
+              cost: 15000.0
+            cacheHits: 1
+            cacheMisses: 2
+            rawLookups: 2
+        - id: two-repeated-routes
+          arguments:
+          - value:
+            - - home
+              - hub
+              - 3.2
+            - - hub
+              - office
+              - 5.5
+          - value:
+            - - home
+              - hub
+            - - home
+              - hub
+            - - hub
+              - office
+            - - hub
+              - office
+          - value: 900
+          expectedReturn:
+            costs:
+            - route: home->hub
+              km: 3.2
+              cost: 2880.0
+            - route: home->hub
+              km: 3.2
+              cost: 2880.0
+            - route: hub->office
+              km: 5.5
+              cost: 4950.0
+            - route: hub->office
+              km: 5.5
+              cost: 4950.0
+            cacheHits: 2
+            cacheMisses: 2
+            rawLookups: 2
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

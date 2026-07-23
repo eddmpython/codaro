@@ -166,6 +166,7 @@ def testDiagnosticExportPackagesRedactedSummaryAndContext(monkeypatch) -> None:
     assert export["summaryText"] == export["summary"]["summaryText"]
     assert export["readableActions"] == ["API 키 입력"]
     assert export["context"]["package"]["installer"] == "uv"
+    assert len(export["contractHashes"]["artifactOwnership"]) == 64
     assert export["context"]["provider"]["authorization"] == "[redacted]"
     assert export["context"]["provider"]["access_token"] == "[redacted]"
     assert "sk-exportenv123456" not in encoded

@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "word"
+canonicalRows: 11
+lessons:
+  - lessonRef: "word/00_word소개"
+    identityLedgerRef: "identity-ledger/word.yml"
+    lessonContentHash: "f95ba38e9ecf6f43d1df872ffa7a8091d13f596ac6a906f8accac4eeb8a142d7"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/02-document-automation"
+    eligiblePathIds: ["documentAutomation"]
+    outcomes: ["automation.word.intro"]
+    prerequisites: ["python.functions","python.modulesAndIo"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:word/00_word소개:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:word_00_word__:v1","retrieve:word_00_word__:v2","retrieve:word_00_word__:v3"]
+    transferVariantIds: ["transfer:word_00_word__:near-v1","transfer:word_00_word__:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "word/01_첫문서만들기"
+    identityLedgerRef: "identity-ledger/word.yml"
+    lessonContentHash: "71a78aa7fb0e89f1b21935e2f7911577afc8f0963cf3bd127e1a2c9fec69270c"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/02-document-automation"
+    eligiblePathIds: ["documentAutomation"]
+    outcomes: ["automation.word.paragraphs"]
+    prerequisites: ["automation.word.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:word/01_첫문서만들기:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:word_01_______:v1","retrieve:word_01_______:v2","retrieve:word_01_______:v3"]
+    transferVariantIds: ["transfer:word_01_______:near-v1","transfer:word_01_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "word/02_제목과목록"
+    identityLedgerRef: "identity-ledger/word.yml"
+    lessonContentHash: "b19f59beb12ea4281ae3b90e4748de44038d681b3e83785dbb85d9a696cc4c15"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/02-document-automation"
+    eligiblePathIds: ["documentAutomation"]
+    outcomes: ["automation.word.paragraphs"]
+    prerequisites: ["automation.word.paragraphs"]
+    reinforcesOutcomeIds: ["automation.word.paragraphs"]
+    runtimeTier: local
+    checkSpecId: "lesson:word/02_제목과목록:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:word_02______:v1","retrieve:word_02______:v2","retrieve:word_02______:v3"]
+    transferVariantIds: ["transfer:word_02______:near-v1","transfer:word_02______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "word/03_텍스트스타일링"
+    identityLedgerRef: "identity-ledger/word.yml"
+    lessonContentHash: "253199bc4a0b2e0d323244e01eaf1fed7f5310ef9f7a6ccee5e0e74449b066ba"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/02-document-automation"
+    eligiblePathIds: ["documentAutomation"]
+    outcomes: ["automation.word.runs"]
+    prerequisites: ["automation.word.paragraphs"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:word/03_텍스트스타일링:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:word_03________:v1","retrieve:word_03________:v2","retrieve:word_03________:v3"]
+    transferVariantIds: ["transfer:word_03________:near-v1","transfer:word_03________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "word/04_표만들기"
+    identityLedgerRef: "identity-ledger/word.yml"
+    lessonContentHash: "4aa5a100f0f4f95c5493ed98c251b7218c309d1ea4acc83d9c59dd85695a4614"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/02-document-automation"
+    eligiblePathIds: ["documentAutomation"]
+    outcomes: ["automation.word.tables"]
+    prerequisites: ["automation.word.paragraphs"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:word/04_표만들기:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:word_04_____:v1","retrieve:word_04_____:v2","retrieve:word_04_____:v3"]
+    transferVariantIds: ["transfer:word_04_____:near-v1","transfer:word_04_____:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "word/05_이미지와머리말"
+    identityLedgerRef: "identity-ledger/word.yml"
+    lessonContentHash: "3c60f4e9b8d7ee528fb03aeac47ee9528dcc8aa3bf8701c60f06f8e916763726"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/02-document-automation"
+    eligiblePathIds: ["documentAutomation"]
+    outcomes: ["automation.word.media"]
+    prerequisites: ["automation.word.paragraphs"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:word/05_이미지와머리말:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:word_05________:v1","retrieve:word_05________:v2","retrieve:word_05________:v3"]
+    transferVariantIds: ["transfer:word_05________:near-v1","transfer:word_05________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "word/06_스타일과페이지설정"
+    identityLedgerRef: "identity-ledger/word.yml"
+    lessonContentHash: "b84c6d4f9d7326e50f30721ba7aecf65e49e31310d8953ab2614634fd549e7f5"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/02-document-automation"
+    eligiblePathIds: ["documentAutomation"]
+    outcomes: ["automation.word.styles"]
+    prerequisites: ["automation.word.runs"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:word/06_스타일과페이지설정:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:word_06__________:v1","retrieve:word_06__________:v2","retrieve:word_06__________:v3"]
+    transferVariantIds: ["transfer:word_06__________:near-v1","transfer:word_06__________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "word/07_기존문서수정"
+    identityLedgerRef: "identity-ledger/word.yml"
+    lessonContentHash: "328a57a36eb61b65cb73c5a0c697687bed6710fd4cbf5f8b67e97dd6cf72da5c"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/02-document-automation"
+    eligiblePathIds: ["documentAutomation"]
+    outcomes: ["automation.word.edit"]
+    prerequisites: ["automation.word.styles"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:word/07_기존문서수정:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:word_07_______:v1","retrieve:word_07_______:v2","retrieve:word_07_______:v3"]
+    transferVariantIds: ["transfer:word_07_______:near-v1","transfer:word_07_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "word/08_mailmerge_csv기반"
+    identityLedgerRef: "identity-ledger/word.yml"
+    lessonContentHash: "c64663241e898e8f2e78918daa29b554a61f0b87e9754dc2f18d0e0c3b001821"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/02-document-automation"
+    eligiblePathIds: ["documentAutomation"]
+    outcomes: ["automation.word.mailMerge"]
+    prerequisites: ["automation.word.edit"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:word/08_mailmerge_csv기반:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:word_08_mailmerge_csv__:v1","retrieve:word_08_mailmerge_csv__:v2","retrieve:word_08_mailmerge_csv__:v3"]
+    transferVariantIds: ["transfer:word_08_mailmerge_csv__:near-v1","transfer:word_08_mailmerge_csv__:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "word/09_docxtpl템플릿엔진"
+    identityLedgerRef: "identity-ledger/word.yml"
+    lessonContentHash: "75b9f991e767db91ba0144b6c8fe0a5fbdadb73932bfaf031e5bd09fa368db16"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/02-document-automation"
+    eligiblePathIds: ["documentAutomation"]
+    outcomes: ["automation.word.template"]
+    prerequisites: ["automation.word.edit"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:word/09_docxtpl템플릿엔진:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:word_09_docxtpl_____:v1","retrieve:word_09_docxtpl_____:v2","retrieve:word_09_docxtpl_____:v3"]
+    transferVariantIds: ["transfer:word_09_docxtpl_____:near-v1","transfer:word_09_docxtpl_____:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "word/10_회의록자동생성기"
+    identityLedgerRef: "identity-ledger/word.yml"
+    lessonContentHash: "fd0e358c8b3b8c0be99bfe95c883eec434a7c776beb3299f456d366f93177ccd"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/02-document-automation"
+    eligiblePathIds: ["documentAutomation"]
+    outcomes: ["automation.word.report"]
+    prerequisites: ["automation.word.tables","automation.word.media","automation.word.styles","automation.word.template"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:word/10_회의록자동생성기:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:word_10_________:v1","retrieve:word_10_________:v2","retrieve:word_10_________:v3"]
+    transferVariantIds: ["transfer:word_10_________:near-v1","transfer:word_10_________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

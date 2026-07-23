@@ -70,9 +70,6 @@ sections:
     hints:
     - 바꿀 지점은 `nums = ...` 오른쪽 값입니다.
     - 실행 뒤 `nums` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 튜플이란?에서 `nums` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -98,9 +95,6 @@ sections:
     hints:
     - 바꿀 지점은 `digits = ...` 오른쪽 값입니다.
     - 실행 뒤 `digits` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 다양한 튜플 생성에서 `digits` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -126,9 +120,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 튜플 인덱싱에서 `palette` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -154,9 +145,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 튜플 슬라이싱에서 `digits` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -190,9 +178,6 @@ sections:
     hints:
     - 바꿀 지점은 각 print()의 따옴표 안 문구나 출력 변수에서 찾으세요.
     - 실행 뒤 줄 수와 순서가 유지되고, 수정한 줄만 의도대로 바뀌었는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 튜플의 불변성의 각 print() 호출이 따옴표와 괄호 조건을 만족하고 순서대로 출력되어야 합니다.
@@ -220,9 +205,6 @@ sections:
     hints:
     - 바꿀 지점은 `left = ...` 오른쪽 값입니다.
     - 실행 뒤 `left` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 튜플 연결과 반복에서 `left` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -248,9 +230,6 @@ sections:
     hints:
     - 바꿀 지점은 `weekdays = ...` 오른쪽 값입니다.
     - 실행 뒤 `weekdays` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: in/not in 연산자에서 `weekdays` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -276,9 +255,6 @@ sections:
     hints:
     - 바꿀 지점은 `coords = ...` 오른쪽 값입니다.
     - 실행 뒤 `coords` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 튜플 패킹에서 `coords` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -306,9 +282,6 @@ sections:
     hints:
     - 바꿀 지점은 `point = ...` 오른쪽 값입니다.
     - 실행 뒤 `point` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 튜플 언패킹에서 `point` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -334,9 +307,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 튜플과 리스트 변환에서 `items` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -362,9 +332,6 @@ sections:
     hints:
     - 바꿀 지점은 `sample = ...` 오른쪽 값입니다.
     - 실행 뒤 `sample` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 튜플 메서드에서 `sample` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -390,9 +357,6 @@ sections:
     hints:
     - 바꿀 지점은 `week = ...` 오른쪽 값입니다.
     - 실행 뒤 `week` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 튜플 길이에서 `week` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -434,9 +398,6 @@ sections:
     hints:
     - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
     - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: '검증 루프: 변경되면 안 되는 설정값 다루기에서 `topLeft` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
@@ -462,10 +423,214 @@ sections:
     hints:
     - 바꿀 지점은 `tpl = ...` 오른쪽 값입니다.
     - 실행 뒤 `tpl` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: Day 9 종합 복습에서 `tpl` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Day 9 종합 복습 실행 뒤 `tpl` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: day09-coordinate-label-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - tuple_intro
+    - practice
+    title: 좌표 튜플을 문구로 바꾸기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 튜플 언패킹으로 x와 y를 분리한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: coordinate_label(point)가 'x,y' 형식의 문자열을 반환하도록 완성하세요.
+      starterCode: |-
+        def coordinate_label(point):
+            raise NotImplementedError
+      solution: |-
+        def coordinate_label(point):
+            x, y = point
+            return f"{x},{y}"
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day09.coordinate-label.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day09.coordinate-label.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: coordinate_label
+        cases:
+        - id: positive
+          arguments:
+          - value:
+            - 3
+            - 5
+          expectedReturn: 3,5
+        - id: negative
+          arguments:
+          - value:
+            - -1
+            - 2
+          expectedReturn: -1,2
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day09-swap-pair-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day09-coordinate-label-mastery
+    title: 두 값을 새 순서로 교환하기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 튜플 언패킹을 값 교환 문제에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: swap_pair(pair)가 두 값의 순서를 바꾼 튜플을 반환하도록 완성하세요.
+      starterCode: |-
+        def swap_pair(pair):
+            raise NotImplementedError
+      solution: |-
+        def swap_pair(pair):
+            left, right = pair
+            return right, left
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day09.swap-pair.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day09.swap-pair.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: swap_pair
+        cases:
+        - id: numbers
+          arguments:
+          - value:
+            - 1
+            - 2
+          expectedReturn:
+          - 2
+          - 1
+        - id: words
+          arguments:
+          - value:
+            - first
+            - second
+          expectedReturn:
+          - second
+          - first
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day09-record-dict-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day09-swap-pair-transfer
+    title: 고정 순서 레코드 다시 해석하기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 튜플의 위치 의미를 기억해 이름 있는 dict로 바꾼다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: 'record_to_dict(record)가 (name, score)를 {''name'': ..., ''score'': ...}로 반환하도록 완성하세요.'
+      starterCode: |-
+        def record_to_dict(record):
+            raise NotImplementedError
+      solution: |-
+        def record_to_dict(record):
+            name, score = record
+            return {'name': name, 'score': score}
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day09.record-dict.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day09.record-dict.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: record_to_dict
+        cases:
+        - id: first
+          arguments:
+          - value:
+            - Mina
+            - 92
+          expectedReturn:
+            name: Mina
+            score: 92
+        - id: second
+          arguments:
+          - value:
+            - Jun
+            - 80
+          expectedReturn:
+            name: Jun
+            score: 80
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

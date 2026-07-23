@@ -112,6 +112,10 @@ impl LauncherPaths {
     pub fn state_dir(&self) -> PathBuf {
         self.root.join("state")
     }
+
+    pub fn learning_evidence_store_header_path(&self) -> PathBuf {
+        self.state_dir().join("learning-evidence-store-header.json")
+    }
 }
 
 fn default_python_executable_path(runtime_root: &Path) -> PathBuf {

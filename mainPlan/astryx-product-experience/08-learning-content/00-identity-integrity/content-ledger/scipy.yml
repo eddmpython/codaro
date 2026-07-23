@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "scipy"
+canonicalRows: 11
+lessons:
+  - lessonRef: "scipy/00_scipy소개"
+    identityLedgerRef: "identity-ledger/scipy.yml"
+    lessonContentHash: "5883342cd50bc4950933088b2337a57ff1a1be4936175b8d060b83686c96cea2"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing","statisticalAnalysis"]
+    outcomes: ["scipy.intro"]
+    prerequisites: ["numpy.arrayOps"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:scipy/00_scipy소개:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:scipy_00_scipy__:v1","retrieve:scipy_00_scipy__:v2","retrieve:scipy_00_scipy__:v3"]
+    transferVariantIds: ["transfer:scipy_00_scipy__:near-v1","transfer:scipy_00_scipy__:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "scipy/01_확률분포탐색기"
+    identityLedgerRef: "identity-ledger/scipy.yml"
+    lessonContentHash: "4bb623ba619b34eed64a1374d9024a53d5c6a1696802d291c892c4c0b9af04fb"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing","statisticalAnalysis","timeSeriesForecasting"]
+    outcomes: ["scipy.statistics"]
+    prerequisites: ["scipy.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:scipy/01_확률분포탐색기:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:scipy_01________:v1","retrieve:scipy_01________:v2","retrieve:scipy_01________:v3"]
+    transferVariantIds: ["transfer:scipy_01________:near-v1","transfer:scipy_01________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "scipy/02_AB테스트분석"
+    identityLedgerRef: "identity-ledger/scipy.yml"
+    lessonContentHash: "d7e5561172afadbb1c034c6af89df0b8923f1f3c6b90aefa09bb903cc2c2683f"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing","statisticalAnalysis","timeSeriesForecasting"]
+    outcomes: ["scipy.statistics"]
+    prerequisites: ["scipy.statistics"]
+    reinforcesOutcomeIds: ["scipy.statistics"]
+    runtimeTier: browser
+    checkSpecId: "lesson:scipy/02_AB테스트분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:scipy_02_AB_____:v1","retrieve:scipy_02_AB_____:v2","retrieve:scipy_02_AB_____:v3"]
+    transferVariantIds: ["transfer:scipy_02_AB_____:near-v1","transfer:scipy_02_AB_____:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "scipy/03_데이터보간기"
+    identityLedgerRef: "identity-ledger/scipy.yml"
+    lessonContentHash: "593acf53cdc7a7f7ea655d67d9c76d331d1c4b6fe21039a990eed409a12c39a3"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing"]
+    outcomes: ["scipy.optimization"]
+    prerequisites: ["scipy.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:scipy/03_데이터보간기:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:scipy_03_______:v1","retrieve:scipy_03_______:v2","retrieve:scipy_03_______:v3"]
+    transferVariantIds: ["transfer:scipy_03_______:near-v1","transfer:scipy_03_______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "scipy/04_곡선피팅마스터"
+    identityLedgerRef: "identity-ledger/scipy.yml"
+    lessonContentHash: "f8b6cdff0a0a876eb13fc23129ec1a29a88c38b57e6235950f57f706ace43c64"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing"]
+    outcomes: ["scipy.optimization"]
+    prerequisites: ["scipy.optimization"]
+    reinforcesOutcomeIds: ["scipy.optimization"]
+    runtimeTier: browser
+    checkSpecId: "lesson:scipy/04_곡선피팅마스터:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:scipy_04________:v1","retrieve:scipy_04________:v2","retrieve:scipy_04________:v3"]
+    transferVariantIds: ["transfer:scipy_04________:near-v1","transfer:scipy_04________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "scipy/05_정규성검정기"
+    identityLedgerRef: "identity-ledger/scipy.yml"
+    lessonContentHash: "b06a9a010ec483fca4a9fff192954a594cb78770c1fd974f858d948a416859bc"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing","statisticalAnalysis","timeSeriesForecasting"]
+    outcomes: ["scipy.statistics"]
+    prerequisites: ["scipy.statistics"]
+    reinforcesOutcomeIds: ["scipy.statistics"]
+    runtimeTier: browser
+    checkSpecId: "lesson:scipy/05_정규성검정기:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:scipy_05_______:v1","retrieve:scipy_05_______:v2","retrieve:scipy_05_______:v3"]
+    transferVariantIds: ["transfer:scipy_05_______:near-v1","transfer:scipy_05_______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "scipy/06_포트폴리오최적화"
+    identityLedgerRef: "identity-ledger/scipy.yml"
+    lessonContentHash: "14146284b0dc90de818d036590081bb1036fe9f0a9d5c27794bd04a01a5a2c0d"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing"]
+    outcomes: ["scipy.optimization"]
+    prerequisites: ["scipy.optimization"]
+    reinforcesOutcomeIds: ["scipy.optimization"]
+    runtimeTier: browser
+    checkSpecId: "lesson:scipy/06_포트폴리오최적화:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:scipy_06_________:v1","retrieve:scipy_06_________:v2","retrieve:scipy_06_________:v3"]
+    transferVariantIds: ["transfer:scipy_06_________:near-v1","transfer:scipy_06_________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "scipy/07_신호필터링"
+    identityLedgerRef: "identity-ledger/scipy.yml"
+    lessonContentHash: "7ec62cdd66faf3ff2f5f1d7e033d6680a85bfd96fb34b1e8516bf214e15e2de2"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing"]
+    outcomes: ["scipy.signal"]
+    prerequisites: ["scipy.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:scipy/07_신호필터링:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:scipy_07______:v1","retrieve:scipy_07______:v2","retrieve:scipy_07______:v3"]
+    transferVariantIds: ["transfer:scipy_07______:near-v1","transfer:scipy_07______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "scipy/08_수치적분기"
+    identityLedgerRef: "identity-ledger/scipy.yml"
+    lessonContentHash: "5831831ee84061a8a163e3321c25badc58ea31337a282e95edb55c1f68dffce1"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing"]
+    outcomes: ["scipy.integration"]
+    prerequisites: ["scipy.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:scipy/08_수치적분기:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:scipy_08______:v1","retrieve:scipy_08______:v2","retrieve:scipy_08______:v3"]
+    transferVariantIds: ["transfer:scipy_08______:near-v1","transfer:scipy_08______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "scipy/09_스펙트럼분석기"
+    identityLedgerRef: "identity-ledger/scipy.yml"
+    lessonContentHash: "1662f2f105bd8f1a69086c987df1bda63c97c60a3f70d0b8a3baa6288e9ebf99"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing"]
+    outcomes: ["scipy.signal"]
+    prerequisites: ["scipy.signal"]
+    reinforcesOutcomeIds: ["scipy.signal"]
+    runtimeTier: browser
+    checkSpecId: "lesson:scipy/09_스펙트럼분석기:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:scipy_09________:v1","retrieve:scipy_09________:v2","retrieve:scipy_09________:v3"]
+    transferVariantIds: ["transfer:scipy_09________:near-v1","transfer:scipy_09________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "scipy/10_종합과학프로젝트"
+    identityLedgerRef: "identity-ledger/scipy.yml"
+    lessonContentHash: "3583ad3da3fdc6029d88fdb625c9d2b9618759f24ee0e42fc59436576a52edd1"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing"]
+    outcomes: ["scipy.statistics","scipy.optimization","scipy.signal","scipy.integration"]
+    prerequisites: ["scipy.statistics","scipy.optimization","scipy.signal"]
+    reinforcesOutcomeIds: ["scipy.statistics","scipy.optimization","scipy.signal"]
+    runtimeTier: browser
+    checkSpecId: "lesson:scipy/10_종합과학프로젝트:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:scipy_10_________:v1","retrieve:scipy_10_________:v2","retrieve:scipy_10_________:v3"]
+    transferVariantIds: ["transfer:scipy_10_________:near-v1","transfer:scipy_10_________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

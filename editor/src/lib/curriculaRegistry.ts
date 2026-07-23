@@ -11,12 +11,22 @@ import type {
   CurriculumLessonPayload,
   ExecutionKind,
 } from "@/types";
+import type {
+  LessonProgressContract,
+  LessonRetrievalContract,
+} from "@/lib/curriculumLearningProjection";
 import { installablePackageName } from "@/lib/packageInference";
 
-const rawCurricula = import.meta.glob("../../../curricula/python/**/*.yaml", {
+const rawCurricula = import.meta.glob([
+  "../../../curricula/python/**/*.yaml",
+  "../../../curricula/python/**/*.yml",
+], {
   import: "default",
   query: "?raw",
 }) as Record<string, () => Promise<string>>;
+const loadRawTaxonomy = Object.entries(rawCurricula).find(([path]) => (
+  path.replace(/\\/g, "/").endsWith("/curricula/python/_taxonomy.yml")
+))?.[1];
 
 type RegistryLesson = {
   category: string;
@@ -32,7 +42,7 @@ type LearningExerciseContract = {
   prompt: string;
   starterCode: string;
   solution: string;
-  check: Record<string, string>;
+  check: Record<string, unknown>;
   hints: string[];
   difficulty: string;
 };
@@ -47,9 +57,19 @@ type LearningSectionContract = {
   tips: string[];
   snippet: string;
   exercise: LearningExerciseContract;
-  check: Record<string, string>;
+  check: Record<string, unknown>;
   rawBlocks: YamlMap[];
   contractGaps: string[];
+  assessmentMode: string;
+  sourceSectionIds: string[];
+  unseen: boolean;
+  minimumDelayHours: number;
+  outcomeIds: string[];
+};
+
+type LessonOutcomeBinding = {
+  lessonOutcomeIds: string[];
+  sectionOutcomeIds: Record<string, string[]>;
 };
 
 type LearningLessonContract = {
@@ -345,6 +365,8 @@ const lessons = Object.entries(rawCurricula)
   });
 
 const lessonPayloadCache = new Map<string, CurriculumLessonPayload>();
+const lessonMetaIdCache = new Map<string, Promise<string>>();
+const lessonProgressContractCache = new Map<string, Promise<LessonProgressContract | null>>();
 
 export function registryCategories(): CurriculumCategoriesPayload {
   const grouped = groupLessons();
@@ -384,23 +406,27 @@ export function registryContents(category: string): CurriculumContentsPayload {
 }
 
 export async function registryLesson(category: string, contentId: string): Promise<CurriculumLessonPayload | null> {
-  const lesson = lessons.find((item) => item.category === category && item.contentId === contentId);
+  const canonicalContentId = await resolveRegistryContentId(category, contentId);
+  if (!canonicalContentId) return null;
+  const lesson = lessons.find((item) => item.category === category && item.contentId === canonicalContentId);
   if (!lesson) return null;
 
-  const cacheKey = `${category}/${contentId}`;
+  const cacheKey = `${category}/${canonicalContentId}`;
   const cached = lessonPayloadCache.get(cacheKey);
   if (cached) return cached;
 
   const raw = await lesson.loadRaw();
-  const document = documentFromCurriculumYaml(raw, category, contentId, lesson.title);
+  const yaml = parseYaml(raw);
+  const outcomeBinding = await lessonOutcomeBinding(yaml, category, canonicalContentId);
+  const document = documentFromCurriculumYaml(raw, category, canonicalContentId, lesson.title, outcomeBinding);
   const categoryLessons = lessons.filter((item) => item.category === category);
-  const index = categoryLessons.findIndex((item) => item.contentId === contentId);
+  const index = categoryLessons.findIndex((item) => item.contentId === canonicalContentId);
 
   const payload = {
     document,
     solutions: {},
     category,
-    contentId,
+    contentId: canonicalContentId,
     prevNext: {
       prev: index > 0 ? { contentId: categoryLessons[index - 1].contentId, title: categoryLessons[index - 1].title } : null,
       next: index >= 0 && index < categoryLessons.length - 1
@@ -410,6 +436,99 @@ export async function registryLesson(category: string, contentId: string): Promi
   };
   lessonPayloadCache.set(cacheKey, payload);
   return payload;
+}
+
+export function registryLessonProgressContract(
+  category: string,
+  contentId: string,
+): Promise<LessonProgressContract | null> {
+  const cacheKey = `${category}/${contentId}`;
+  const cached = lessonProgressContractCache.get(cacheKey);
+  if (cached) return cached;
+  const pending = resolveRegistryContentId(category, contentId).then(async (canonicalContentId) => {
+    if (!canonicalContentId) return null;
+    const lesson = lessons.find((item) => item.category === category && item.contentId === canonicalContentId);
+    if (!lesson) return null;
+    const yaml = parseYaml(await lesson.loadRaw());
+    const outcomeBinding = await lessonOutcomeBinding(yaml, category, canonicalContentId);
+    const assessment = mapValue(yaml.assessment);
+    const retrievals = arrayOfMaps(assessment.retrievalVariants).map((variant, index): LessonRetrievalContract => {
+      const contract = sectionContractFromYaml(
+        { ...variant, assessmentMode: "retrieval" },
+        index + 1,
+        outcomeBinding,
+      );
+      return {
+        checkId: textValue(mapValue(variant.check).id),
+        minimumDelayHours: Math.max(24, contract.minimumDelayHours),
+        outcomeIds: contract.outcomeIds,
+        sectionId: contract.id,
+        sourceSectionIds: contract.sourceSectionIds,
+      };
+    });
+    return {
+      category,
+      contentId: canonicalContentId,
+      lessonRef: `${category}/${canonicalContentId}`,
+      requiredOutcomeIds: outcomeBinding.lessonOutcomeIds,
+      retrievals,
+      title: lessonTitle(yaml) || lesson.title,
+    };
+  });
+  lessonProgressContractCache.set(cacheKey, pending);
+  return pending;
+}
+
+export async function registryAssessmentBlocks(category: string, contentId: string): Promise<BlockConfig[]> {
+  const canonicalContentId = await resolveRegistryContentId(category, contentId);
+  const lesson = lessons.find((item) => item.category === category && item.contentId === canonicalContentId);
+  if (!lesson) return [];
+  const yaml = parseYaml(await lesson.loadRaw());
+  const outcomeBinding = await lessonOutcomeBinding(yaml, category, lesson.contentId);
+  const assessment = mapValue(yaml.assessment);
+  const candidateSections: YamlMap[] = [
+    ...arrayOfMaps(assessment.transferVariants).map((variant) => ({
+      ...variant,
+      assessmentMode: "transfer",
+    })),
+    ...arrayOfMaps(assessment.retrievalVariants).map((variant) => ({
+      ...variant,
+      assessmentMode: "retrieval",
+    })),
+  ];
+  if (!candidateSections.length) return [];
+  const contract = learningContractFromYaml(
+    { ...yaml, sections: candidateSections },
+    lessonTitle(yaml) || lesson.title,
+    outcomeBinding,
+  );
+  return ensureUniqueBlockIds(blocksFromLearningSections(candidateSections, contract.sections));
+}
+
+export async function resolveRegistryContentId(category: string, contentId: string): Promise<string | null> {
+  const categoryLessons = lessons.filter((lesson) => lesson.category === category);
+  if (categoryLessons.some((lesson) => lesson.contentId === contentId)) return contentId;
+
+  const likelyMatches = categoryLessons.filter((lesson) => lesson.contentId.startsWith(`${contentId}_`));
+  const candidates = likelyMatches.length ? likelyMatches : categoryLessons;
+  const aliases = await Promise.all(candidates.map(async (lesson) => ({
+    alias: await registryLessonMetaId(lesson),
+    contentId: lesson.contentId,
+  })));
+  const matches = aliases.filter((entry) => entry.alias === contentId);
+  return matches.length === 1 ? matches[0].contentId : null;
+}
+
+function registryLessonMetaId(lesson: RegistryLesson): Promise<string> {
+  const cacheKey = `${lesson.category}/${lesson.contentId}`;
+  const cached = lessonMetaIdCache.get(cacheKey);
+  if (cached) return cached;
+  const pending = lesson.loadRaw().then((raw) => {
+    const yaml = parseYaml(raw);
+    return textValue(mapValue(yaml.meta).id);
+  });
+  lessonMetaIdCache.set(cacheKey, pending);
+  return pending;
 }
 
 export function defaultRegistrySelection() {
@@ -424,10 +543,23 @@ function groupLessons() {
   }, {});
 }
 
-function documentFromCurriculumYaml(raw: string, category: string, contentId: string, fallbackTitle: string): CodaroDocument {
+function documentFromCurriculumYaml(
+  raw: string,
+  category: string,
+  contentId: string,
+  fallbackTitle: string,
+  outcomeBinding: LessonOutcomeBinding,
+): CodaroDocument {
   const yaml = parseYaml(raw);
+  const assessment = mapValue(yaml.assessment);
+  const masterySections: YamlMap[] = arrayOfMaps(assessment.masteryVariants).map((variant) => ({
+    ...variant,
+    assessmentMode: "mastery",
+  }));
+  const sections = [...arrayOfMaps(yaml.sections), ...masterySections];
+  const materializedYaml = { ...yaml, sections };
   const baseTitle = lessonTitle(yaml) || fallbackTitle;
-  const learningContract = learningContractFromYaml(yaml, baseTitle);
+  const learningContract = learningContractFromYaml(materializedYaml, baseTitle, outcomeBinding);
   const title = learningContract.meta.title || baseTitle;
   const blocks: BlockConfig[] = [];
   const intro = mapValue(yaml.intro);
@@ -441,14 +573,43 @@ function documentFromCurriculumYaml(raw: string, category: string, contentId: st
   blocks.push(markdownBlock({
     content: introMarkdown(title, displayIntro),
     displayKind: "hero",
-    payload: { title, ...displayIntro, learningContract },
+    payload: { title, ...displayIntro, learningContract, assessment },
     role: "title",
     sourceType: "intro",
     title,
   }));
 
-  for (const [index, section] of arrayOfMaps(yaml.sections).entries()) {
-    const sectionContract = learningContract.sections[index] ?? sectionContractFromYaml(section, index + 1);
+  blocks.push(...blocksFromLearningSections(sections, learningContract.sections));
+
+  return {
+    id: `curriculum-${category}-${contentId}`,
+    title,
+    blocks: ensureUniqueBlockIds(blocks.length ? blocks : [markdownBlock({ content: `# ${title}`, role: "title", title })]),
+    metadata: {
+      sourceFormat: "curriculum",
+      tags: [category, contentId],
+    },
+    runtime: {
+      defaultEngine: "local",
+      reactiveMode: "hybrid",
+      packages: learningContract.meta.packages,
+    },
+    app: {
+      title,
+      layout: "learning",
+      hideCode: false,
+      entryBlockIds: [],
+    },
+  };
+}
+
+function blocksFromLearningSections(
+  sections: YamlMap[],
+  contracts: LearningSectionContract[] = [],
+): BlockConfig[] {
+  const blocks: BlockConfig[] = [];
+  for (const [index, section] of sections.entries()) {
+    const sectionContract = contracts[index] ?? sectionContractFromYaml(section, index + 1);
     const sourceBlocks = arrayOfMaps(section.blocks);
     const sectionTitle = textValue(section.title) || sectionContract.title;
     const sectionSubtitle = textValue(section.subtitle) || sectionContract.subtitle;
@@ -477,27 +638,7 @@ function documentFromCurriculumYaml(raw: string, category: string, contentId: st
       blocks.push(...convertYamlBlock(block));
     }
   }
-
-  return {
-    id: `curriculum-${category}-${contentId}`,
-    title,
-    blocks: ensureUniqueBlockIds(blocks.length ? blocks : [markdownBlock({ content: `# ${title}`, role: "title", title })]),
-    metadata: {
-      sourceFormat: "curriculum",
-      tags: [category, contentId],
-    },
-    runtime: {
-      defaultEngine: "local",
-      reactiveMode: "hybrid",
-      packages: learningContract.meta.packages,
-    },
-    app: {
-      title,
-      layout: "learning",
-      hideCode: false,
-      entryBlockIds: [],
-    },
-  };
+  return blocks;
 }
 
 function convertYamlBlock(block: YamlMap, parentRole?: CellRole): BlockConfig[] {
@@ -894,11 +1035,51 @@ function parseYaml(raw: string): YamlMap {
   return mapValue(parsed);
 }
 
+let taxonomyPayloadPromise: Promise<YamlMap> | null = null;
+
+async function lessonOutcomeBinding(
+  yaml: YamlMap,
+  category: string,
+  contentId: string,
+): Promise<LessonOutcomeBinding> {
+  const meta = mapValue(yaml.meta);
+  const taxonomy = await taxonomyPayload();
+  const taxonomyRecord = mapValue(mapValue(taxonomy.lessonOutcomes)[`${category}/${contentId}`]);
+  const metaOutcomes = uniqueTextList(meta.outcomes);
+  const taxonomyOutcomes = uniqueTextList(taxonomyRecord.outcomes);
+  const metaSections = sectionOutcomeMap(meta.sectionOutcomes);
+  const taxonomySections = sectionOutcomeMap(taxonomyRecord.sectionOutcomes);
+  return {
+    lessonOutcomeIds: metaOutcomes.length ? metaOutcomes : taxonomyOutcomes,
+    sectionOutcomeIds: isMap(meta.sectionOutcomes) ? metaSections : taxonomySections,
+  };
+}
+
+function taxonomyPayload(): Promise<YamlMap> {
+  taxonomyPayloadPromise ??= loadRawTaxonomy
+    ? loadRawTaxonomy().then(parseYaml)
+    : Promise.resolve({});
+  return taxonomyPayloadPromise;
+}
+
+function sectionOutcomeMap(value: unknown): Record<string, string[]> {
+  if (!isMap(value)) return {};
+  return Object.fromEntries(
+    Object.entries(value)
+      .map(([sectionId, outcomeIds]) => [sectionId, uniqueTextList(outcomeIds)] as const)
+      .filter(([, outcomeIds]) => outcomeIds.length),
+  );
+}
+
 function lessonTitle(yaml: YamlMap) {
   return textValue(mapValue(yaml.meta).title ?? yaml.title);
 }
 
-function learningContractFromYaml(yaml: YamlMap, fallbackTitle: string): LearningLessonContract {
+function learningContractFromYaml(
+  yaml: YamlMap,
+  fallbackTitle: string,
+  outcomeBinding: LessonOutcomeBinding = { lessonOutcomeIds: [], sectionOutcomeIds: {} },
+): LearningLessonContract {
   const meta = mapValue(yaml.meta);
   const intro = mapValue(yaml.intro);
   const runtime = mapValue(yaml.runtime);
@@ -915,18 +1096,27 @@ function learningContractFromYaml(yaml: YamlMap, fallbackTitle: string): Learnin
       benefits: uniqueTextList(intro.benefits ?? intro.points ?? intro.outcomes),
       diagram: diagramValue(intro.diagram ?? intro.flow ?? intro.architecture),
     },
-    sections: arrayOfMaps(yaml.sections).map((section, index) => sectionContractFromYaml(section, index + 1)),
+    sections: arrayOfMaps(yaml.sections).map((section, index) => (
+      sectionContractFromYaml(section, index + 1, outcomeBinding)
+    )),
   };
 }
 
-function sectionContractFromYaml(section: YamlMap, index: number): LearningSectionContract {
+function sectionContractFromYaml(
+  section: YamlMap,
+  index: number,
+  outcomeBinding: LessonOutcomeBinding = { lessonOutcomeIds: [], sectionOutcomeIds: {} },
+): LearningSectionContract {
   const rawBlocks = arrayOfMaps(section.blocks);
   const directExercise = exerciseContract(section.exercise);
   const inferredExercise = firstExerciseFromBlocks(rawBlocks);
   const exercise = hasExerciseData(directExercise) ? directExercise : inferredExercise;
   const check = checkMap(section.check);
+  const id = textValue(section.id) || `section-${index}`;
+  const directOutcomeIds = uniqueTextList(section.outcomeIds ?? section.outcomes);
+  const mappedOutcomeIds = outcomeBinding.sectionOutcomeIds[id] ?? [];
   const contract = {
-    id: textValue(section.id) || `section-${index}`,
+    id,
     title: textValue(section.title) || `${index}단계`,
     subtitle: textValue(section.subtitle),
     goal: textValue(section.goal ?? section.study ?? section.objective),
@@ -938,6 +1128,13 @@ function sectionContractFromYaml(section: YamlMap, index: number): LearningSecti
     check: Object.keys(check).length ? check : exercise.check,
     rawBlocks,
     contractGaps: [],
+    assessmentMode: textValue(section.assessmentMode ?? section.mode),
+    sourceSectionIds: uniqueTextList(section.sourceSectionIds),
+    unseen: section.unseen === true,
+    minimumDelayHours: nonNegativeInteger(section.minimumDelayHours),
+    outcomeIds: directOutcomeIds.length
+      ? directOutcomeIds
+      : mappedOutcomeIds.length ? mappedOutcomeIds : outcomeBinding.lessonOutcomeIds,
   };
   return {
     ...contract,
@@ -1029,7 +1226,7 @@ function sectionContractGaps(section: LearningSectionContract) {
   if (!section.why) gaps.push("why");
   if (!section.explanation) gaps.push("explanation");
   if (!section.tips.length) gaps.push("tips");
-  if (!section.snippet) gaps.push("snippet");
+  if (!section.snippet && !["mastery", "transfer", "retrieval"].includes(section.assessmentMode)) gaps.push("snippet");
   if (!section.exercise.prompt) gaps.push("exercise.prompt");
   if (!section.exercise.starterCode) gaps.push("exercise.starterCode");
   if (!Object.keys(section.check).length && !Object.keys(section.exercise.check).length) gaps.push("check");
@@ -1109,8 +1306,8 @@ function labeledMarkdown(label: string, content: string) {
   return content ? `### ${label}\n${content}` : "";
 }
 
-function structuredCheckMarkdown(check: Record<string, string>) {
-  return ["### 검증 기준", ...Object.entries(check).map(([key, value]) => `- **${checkLabel(key)}**: ${value}`)].join("\n");
+function structuredCheckMarkdown(check: Record<string, unknown>) {
+  return ["### 검증 기준", ...Object.entries(check).map(([key, value]) => `- **${checkLabel(key)}**: ${textValue(value)}`)].join("\n");
 }
 
 function checkLabel(key: string) {
@@ -1155,14 +1352,9 @@ function tipsFromBlocks(blocks: YamlMap[]) {
   return uniqueValues(tips);
 }
 
-function checkMap(value: unknown): Record<string, string> {
+function checkMap(value: unknown): Record<string, unknown> {
   if (isMap(value)) {
-    const result: Record<string, string> = {};
-    Object.entries(value).forEach(([key, item]) => {
-      const text = textValue(item);
-      if (text) result[key] = text;
-    });
-    return result;
+    return { ...value };
   }
   const text = textValue(value);
   return text ? { description: text } : {};
@@ -1504,6 +1696,11 @@ function installablePackageList(value: unknown): string[] {
 
 function uniqueValues(values: string[]) {
   return Array.from(new Set(values.map((value) => value.trim()).filter(Boolean)));
+}
+
+function nonNegativeInteger(value: unknown) {
+  const number = typeof value === "number" ? value : Number(textValue(value));
+  return Number.isFinite(number) ? Math.max(0, Math.trunc(number)) : 0;
 }
 
 function textValue(value: unknown): string {

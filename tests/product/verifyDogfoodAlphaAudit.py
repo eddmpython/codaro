@@ -68,16 +68,15 @@ DOGFOOD_REQUIREMENTS = (
                 "DOGFOOD_REQUIREMENTS",
                 "first-user-flow-is-versioned",
                 "learning-goal-discovery-before-authoring",
-                "learning-card-completion-path",
+                "learning-card-verified-practice-path",
                 "product-quality-judgement-gates",
             )),
             ("editor/src/lib/chatStartExamples.ts", (
                 "CHAT_START_EXAMPLE_DEFINITIONS",
+                "defaultChatStartExamples",
                 "chat.example.pandas.prompt",
                 "chat.example.browser.prompt",
                 "chat.example.automation.prompt",
-                "curriculumGoalExamples",
-                "curriculum.goal.example.pandas.prompt",
                 "surface: \"curriculum\"",
                 "surface: \"automation\"",
                 "flowRole: surfaceFlowRole(example.surface)",
@@ -255,15 +254,16 @@ DOGFOOD_REQUIREMENTS = (
         ),
     ),
     DogfoodRequirement(
-        requirementId="learning-card-completion-path",
-        requirement="Structured lessons render one section card with snippet copy, direct exercise editor, result, and check.",
+        requirementId="learning-card-automatic-evidence-path",
+        requirement="Structured lessons render direct practice, automatic feedback, and isolated-check evidence persistence without false lesson completion.",
         evidenceChecks=(
             ("docs/skills/architecture/learning-yaml-contract.md", (
-                "title → subtitle → goal → why → explanation → tips → snippet → exercise → result → check",
+                "title → subtitle → goal → why → explanation → tips → snippet → exercise → result → automatic feedback",
                 "우측 상단 복사 버튼",
                 "바로 보이는 실제 입력 editor",
                 "data-learning-exercise-input-role=\"student-practice\"",
                 "data-learning-section-card",
+                "data-learning-check-evidence",
             )),
             ("docs/skills/architecture/frontend-product-surface.md", (
                 "실제 입력 에디터를 바로 보여준다",
@@ -277,12 +277,31 @@ DOGFOOD_REQUIREMENTS = (
                 "data-code-payload-copy",
                 "data-cell-ai-popover",
                 "Codaro avatar",
+                "listWebStrongCheckEvidence",
+                "duplicate Web progress writer remains",
+                "appendWebStrongCheckEvidenceTransaction",
+                "recordLessonMissionComplete",
+                "AssignmentRoomPanel",
+            )),
+            ("editor/src/components/curriculum/curriculumSurface.tsx", (
+                "storeStrongLearningEvidence",
+                "PROGRESS_UPDATED_EVENT",
+            )),
+            ("tests/surface/verifyProductExperiencePlaywright.py", (
+                '\"initialCheckState\": \"mismatch\"',
+                'data-learning-check-result=\"verified\"',
+                "failed learning attempt recorded progress",
+                "staged check evidence falsely completed a lesson",
+                "verifiedStrongChecks",
+                "webStrongEvidenceEventCount",
             )),
         ),
         forbiddenChecks=(
             ("docs/skills/architecture/frontend-product-surface.md", (
                 "클릭해서 직접 입력하세요",
+                "현재 학습 상단의 과제 패널",
             )),
+            ("editor/src/lib/api.ts", ("/api/classroom/",)),
         ),
     ),
     DogfoodRequirement(
@@ -447,12 +466,16 @@ DOGFOOD_REQUIREMENTS = (
                 "requiredScore",
                 "requirementFailures",
                 "dogfood alpha audit score",
+                '"scoreKind": "wiring-coverage"',
+                '"completionEligible": False',
             )),
             ("docs/skills/ops/product/dogfood-alpha.md", (
                 "목표 완료 선언",
                 "gate 결과",
                 "credential",
                 "브라우저 gate",
+                "scoreKind: wiring-coverage",
+                "completionEligible: false",
             )),
         ),
     ),
@@ -481,7 +504,7 @@ def main() -> int:
         print(json.dumps(payload, ensure_ascii=False, indent=2), file=sys.stderr)
         return 1
 
-    print(f"ok: dogfood alpha audit score {payload['score']}/{payload['maxScore']}")
+    print(f"ok: dogfood alpha wiring coverage {payload['score']}/{payload['maxScore']}")
     print(json.dumps(payload, ensure_ascii=False, indent=2))
     return 0
 
@@ -492,10 +515,12 @@ def buildAuditPayload(results: tuple[dict[str, Any], ...]) -> dict[str, Any]:
     payload = {
         "score": score,
         "maxScore": len(results),
+        "scoreKind": "wiring-coverage",
         "minimumScore": MINIMUM_SCORE,
         "requiredScore": len(results),
         "requirementFailures": requirementFailures,
         "passed": score >= MINIMUM_SCORE and not requirementFailures,
+        "completionEligible": False,
         "requirements": list(results),
     }
     return payload
@@ -513,7 +538,8 @@ def dogfoodAuditSummary(results: tuple[dict[str, Any], ...]) -> dict[str, Any]:
         "firstUserFlowCovered": "first-user-flow-is-versioned" in passedIds,
         "goalDiscoveryCovered": "learning-goal-discovery-before-authoring" in passedIds,
         "providerRecoveryCovered": "provider-oauth-recovery-boundary" in passedIds,
-        "learningCompletionCovered": "learning-card-completion-path" in passedIds,
+        "learningPracticeCovered": "learning-card-verified-practice-path" in passedIds,
+        "learningStrongCompletionCovered": False,
         "workloopTraceCovered": "workloop-trace-progress-path" in passedIds,
         "runtimeRecoveryCovered": "runtime-failure-recovery-path" in passedIds,
         "automationSecondLoopCovered": "automation-second-loop-provider-e2e" in passedIds,

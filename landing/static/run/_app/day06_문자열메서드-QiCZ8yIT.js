@@ -1,0 +1,712 @@
+var e=`meta:
+  id: day06
+  title: 문자열 메서드
+  day: 6
+  category: 30days
+  tags:
+  - 문자열
+  - 메서드
+  - strip
+  - split
+  - join
+  - 데이터정제
+  - 검증
+  seo:
+    title: 파이썬 문자열 메서드 완벽 가이드
+    description: upper, lower, split, join, replace, strip, find, count 등 유용한 문자열 메서드를 배웁니다.
+    keywords:
+    - 문자열 메서드
+    - string method
+    - upper
+    - lower
+    - split
+intro:
+  emoji: 🛠️
+  points:
+  - 대소문자 변환 메서드
+  - 공백 제거와 문자열 정리
+  - 문자열 치환과 검색
+  - 문자열 분할과 개수 세기
+  direction: 문자열 메서드에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 문자열 메서드 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 대문자 변환 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 소문자 변환 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: 첫 글자 대문자 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 문자열 메서드 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 문자열 메서드 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 문자열 메서드 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: method_upper
+  title: 대문자 변환
+  structuredPrimary: true
+  subtitle: upper()로 모두 대문자로
+  goal: 대문자 변환에서 \`text\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: upper() 메서드는 문자열의 모든 문자를 대문자로 변환합니다. 영문자만 영향을 받으며, 숫자나 특수문자는 그대로 유지됩니다. 원본 문자열은 변경되지 않고
+    새로운 문자열을 반환합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    text = 'hello python'
+    text.upper()
+  exercise:
+    prompt: 대문자 변환 예제에서 \`text\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      text = 'hello python'
+      text.upper()
+    hints:
+    - 바꿀 지점은 \`text = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`text\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 대문자 변환에서 \`text\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 대문자 변환 실행 뒤 \`text\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: method_lower
+  title: 소문자 변환
+  structuredPrimary: true
+  subtitle: lower()로 모두 소문자로
+  goal: 소문자 변환에서 \`msg\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: lower() 메서드는 문자열의 모든 문자를 소문자로 변환합니다. 대소문자 구분 없이 비교할 때 자주 사용됩니다. 원본 문자열은 그대로 유지됩니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    msg = 'HELLO PYTHON'
+    msg.lower()
+  exercise:
+    prompt: 소문자 변환 예제에서 \`msg\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      msg = 'HELLO PYTHON'
+      msg.lower()
+    hints:
+    - 바꿀 지점은 \`msg = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`msg\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 소문자 변환에서 \`msg\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 소문자 변환 실행 뒤 \`msg\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: method_capitalize
+  title: 첫 글자 대문자
+  structuredPrimary: true
+  subtitle: capitalize()로 첫 문자만 대문자
+  goal: 첫 글자 대문자에서 \`phrase\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: capitalize() 메서드는 문자열의 첫 번째 문자만 대문자로 만들고 나머지는 모두 소문자로 변환합니다. 문장의 시작을 정리할 때 유용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    phrase = 'hello PYTHON'
+    phrase.capitalize()
+  exercise:
+    prompt: 첫 글자 대문자 예제에서 \`phrase\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      phrase = 'hello PYTHON'
+      phrase.capitalize()
+    hints:
+    - 바꿀 지점은 \`phrase = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`phrase\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 첫 글자 대문자에서 \`phrase\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 첫 글자 대문자 실행 뒤 \`phrase\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: method_title
+  title: 제목 형식
+  structuredPrimary: true
+  subtitle: title()로 각 단어 첫 글자 대문자
+  goal: 제목 형식에서 \`sentence\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: title() 메서드는 각 단어의 첫 글자를 대문자로 만듭니다. 공백이나 특수문자로 구분된 각 단어마다 적용됩니다. 제목이나 이름을 정리할 때 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    sentence = 'hello python programming'
+    sentence.title()
+  exercise:
+    prompt: 제목 형식 예제에서 \`sentence\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      sentence = 'hello python programming'
+      sentence.title()
+    hints:
+    - 바꿀 지점은 \`sentence = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`sentence\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 제목 형식에서 \`sentence\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 제목 형식 실행 뒤 \`sentence\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: method_strip
+  title: 양쪽 공백 제거
+  structuredPrimary: true
+  subtitle: strip()으로 공백 정리
+  goal: 양쪽 공백 제거에서 \`raw\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: strip() 메서드는 문자열 양쪽 끝의 공백을 제거합니다. 사용자 입력을 정리하거나 데이터를 깔끔하게 만들 때 자주 사용됩니다. 문자열 중간의 공백은 제거하지
+    않습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    raw = '   hello python   '
+    raw.strip()
+  exercise:
+    prompt: 양쪽 공백 제거 예제에서 \`raw\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      raw = '   hello python   '
+      raw.strip()
+    hints:
+    - 바꿀 지점은 \`raw = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`raw\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 양쪽 공백 제거에서 \`raw\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 양쪽 공백 제거 실행 뒤 \`raw\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: method_lstrip_rstrip
+  title: 한쪽 공백 제거
+  structuredPrimary: true
+  subtitle: lstrip(), rstrip()으로 한쪽만 제거
+  goal: 한쪽 공백 제거에서 \`left\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: lstrip()은 왼쪽 공백만, rstrip()은 오른쪽 공백만 제거합니다. l은 left(왼쪽), r은 right(오른쪽)를 의미합니다. 특정 방향의 공백만
+    제거할 때 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    left = '   hello   '
+    left.lstrip()
+  exercise:
+    prompt: 한쪽 공백 제거 예제에서 \`left\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      left = '   hello   '
+      left.lstrip()
+    hints:
+    - 바꿀 지점은 \`left = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`left\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 한쪽 공백 제거에서 \`left\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 한쪽 공백 제거 실행 뒤 \`left\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: method_replace
+  title: 문자열 치환
+  structuredPrimary: true
+  subtitle: replace()로 문자 바꾸기
+  goal: 문자열 치환에서 \`greeting\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: replace() 메서드는 문자열 안의 특정 부분을 다른 문자열로 바꿉니다. replace(찾을문자, 바꿀문자) 형태로 사용하며, 모든 일치하는 부분을 바꿉니다.
+    원본은 변경되지 않습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    greeting = 'Hello World'
+    greeting.replace('World', 'Python')
+  exercise:
+    prompt: 문자열 치환 예제에서 \`greeting\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      greeting = 'Hello World'
+      greeting.replace('World', 'Python')
+    hints:
+    - 바꿀 지점은 \`greeting = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`greeting\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 문자열 치환에서 \`greeting\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 문자열 치환 실행 뒤 \`greeting\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: method_replace_all
+  title: 여러 개 치환
+  structuredPrimary: true
+  subtitle: 모든 일치 항목 바꾸기
+  goal: 여러 개 치환에서 \`allText\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: replace()는 기본적으로 일치하는 모든 부분을 바꿉니다. 같은 문자가 여러 번 나와도 모두 치환됩니다. 공백을 다른 문자로 바꾸거나 특정 패턴을 제거할
+    때 유용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    allText = 'apple apple orange apple'
+    allText.replace('apple', 'banana')
+  exercise:
+    prompt: 여러 개 치환 예제에서 \`allText\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      allText = 'apple apple orange apple'
+      allText.replace('apple', 'banana')
+    hints:
+    - 바꿀 지점은 \`allText = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`allText\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 여러 개 치환에서 \`allText\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 여러 개 치환 실행 뒤 \`allText\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: method_split
+  title: 문자열 나누기
+  structuredPrimary: true
+  subtitle: split()으로 구분자 기준 분리
+  goal: 문자열 나누기에서 \`row\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: split() 메서드는 문자열을 특정 구분자 기준으로 나누어 리스트를 만듭니다. 쉼표로 구분된 CSV 한 줄, 공백으로 나뉜 단어, 하이픈이 들어간 코드처럼
+    정해진 패턴을 데이터로 바꿀 때 자주 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    row = 'kim@example.com,paid,15000'
+    row.split(',')
+  exercise:
+    prompt: 문자열 나누기 예제에서 \`row\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      row = 'kim@example.com,paid,15000'
+      row.split(',')
+    hints:
+    - 바꿀 지점은 \`row = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`row\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 문자열 나누기에서 \`row\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 문자열 나누기 실행 뒤 \`row\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: method_join
+  title: 문자열 합치기
+  structuredPrimary: true
+  subtitle: join()으로 리스트를 문자열로 조립
+  goal: 문자열 합치기에서 \`fields\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: join() 메서드는 문자열 리스트를 하나의 문자열로 합칩니다. 어떤 구분자를 사이에 넣을지 먼저 쓰고, 그 뒤에 합칠 리스트를 넘깁니다. split()으로
+    나눈 데이터를 다시 저장 형식으로 만들 때 함께 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    fields = ['kim@example.com', 'paid', '15000']
+    '|'.join(fields)
+  exercise:
+    prompt: 문자열 합치기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      fields = ['kim@example.com', 'paid', '15000']
+      '|'.join(fields)
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 문자열 합치기에서 \`fields\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 문자열 합치기 실행 뒤 \`fields\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: method_count
+  title: 문자열 개수 세기
+  structuredPrimary: true
+  subtitle: count()로 등장 횟수 확인
+  goal: 문자열 개수 세기에서 \`words\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: count() 메서드는 문자열에서 특정 문자나 문자열이 몇 번 등장하는지 셉니다. 결과는 정수로 반환되며, 없으면 0을 반환합니다. 대소문자를 구분합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    words = 'hello hello world hello'
+    words.count('hello')
+  exercise:
+    prompt: 문자열 개수 세기 예제에서 \`words\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      words = 'hello hello world hello'
+      words.count('hello')
+    hints:
+    - 바꿀 지점은 \`words = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`words\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 문자열 개수 세기에서 \`words\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 문자열 개수 세기 실행 뒤 \`words\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: method_find
+  title: 문자열 위치 찾기
+  structuredPrimary: true
+  subtitle: find()로 첫 등장 위치 확인
+  goal: 문자열 위치 찾기에서 \`code\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: find() 메서드는 문자열에서 특정 문자나 문자열이 처음 나타나는 위치(인덱스)를 반환합니다. 찾지 못하면 -1을 반환합니다. 문자열의 위치를 확인할 때
+    사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    code = 'Hello Python Programming'
+    code.find('Python')
+  exercise:
+    prompt: 문자열 위치 찾기 예제에서 \`code\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      code = 'Hello Python Programming'
+      code.find('Python')
+    hints:
+    - 바꿀 지점은 \`code = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`code\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 문자열 위치 찾기에서 \`code\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 문자열 위치 찾기 실행 뒤 \`code\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: method_find_notfound
+  title: 찾기 실패
+  structuredPrimary: true
+  subtitle: 없는 문자 찾을 때
+  goal: 찾기 실패에서 print() 입력값이 출력 영역에 어떻게 표시되는지 확인한다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  explanation: find() 메서드로 문자열을 찾지 못하면 -1을 반환합니다. 이를 활용하여 특정 문자열의 존재 여부를 확인할 수 있습니다. in 연산자와 비슷하지만 위치
+    정보도 함께 얻을 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    text = 'Hello World'
+    result = text.find('Python')
+    print('found:', result)
+  exercise:
+    prompt: 찾기 실패 예제에서 따옴표 안 문구나 출력 변수를 바꾸고 출력이 그대로 바뀌는지 확인하세요.
+    starterCode: |-
+      text = 'Hello World'
+      result = text.find('Python')
+      print('found:', result)
+    hints:
+    - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
+    - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 찾기 실패의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
+    resultCheck: 찾기 실패 출력 영역에 직접 바꾼 문자열이나 값이 그대로 나타나야 합니다.
+- id: method_startswith
+  title: 시작 문자 확인
+  structuredPrimary: true
+  subtitle: startswith()로 시작 여부 확인
+  goal: 시작 문자 확인에서 \`title\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: startswith() 메서드는 문자열이 특정 문자로 시작하는지 확인합니다. 결과는 True 또는 False입니다. URL이 http로 시작하는지, 파일명이
+    특정 문자로 시작하는지 등을 확인할 때 유용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    title = 'Python Programming'
+    title.startswith('Python')
+  exercise:
+    prompt: 시작 문자 확인 예제에서 \`title\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      title = 'Python Programming'
+      title.startswith('Python')
+    hints:
+    - 바꿀 지점은 \`title = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`title\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 시작 문자 확인에서 \`title\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 시작 문자 확인 실행 뒤 \`title\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: method_endswith
+  title: 끝 문자 확인
+  structuredPrimary: true
+  subtitle: endswith()로 종료 여부 확인
+  goal: 끝 문자 확인에서 \`file\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: endswith() 메서드는 문자열이 특정 문자로 끝나는지 확인합니다. 파일 확장자 확인이나 문장 부호 확인 등에 자주 사용됩니다. 결과는 True 또는 False입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    file = 'script.py'
+    file.endswith('.py')
+  exercise:
+    prompt: 끝 문자 확인 예제에서 \`file\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      file = 'script.py'
+      file.endswith('.py')
+    hints:
+    - 바꿀 지점은 \`file = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`file\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 끝 문자 확인에서 \`file\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 끝 문자 확인 실행 뒤 \`file\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: workflow_validation
+  title: '검증 루프: 고객 행 정제하기'
+  structuredPrimary: true
+  subtitle: 공백, 대소문자, 쉼표 형식을 업무 데이터로 정리
+  goal: '검증 루프: 고객 행 정제하기에서 예상값과 실제 실행 결과를 비교하는 검증 흐름을 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 문자열 메서드는 입력값을 보기 좋게 꾸미는 기능이 아니라, 사람이 넣은 거친 텍스트를 프로그램이 믿고 처리할 수 있는 데이터로 바꾸는 도구입니다. 공백 제거,
+    대소문자 통일, 구분자 검사, 숫자 변환까지 한 흐름으로 묶어야 실무에서 다시 쓸 수 있습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    rawLine = '  KIM@Example.COM ,  PAID ,  15000원  '
+    fields = rawLine.split(',')
+
+    email = fields[0].strip().lower()
+    status = fields[1].strip().lower()
+    amountText = fields[2].strip().replace(',', '').replace('원', '')
+    amount = int(amountText)
+    cleanLine = '|'.join([email, status, str(amount)])
+
+    assert email == 'kim@example.com'
+    assert status == 'paid'
+    assert amount == 15000
+    assert cleanLine == 'kim@example.com|paid|15000'
+  exercise:
+    prompt: '검증 루프: 고객 행 정제하기 예제에서 기대 문자열이나 실제 출력 문구를 바꾸고 assert 비교가 맞는지 확인하세요.'
+    starterCode: |-
+      rawFileName = '  Sales Report 2026 FINAL.CSV  '
+      cleanFileName = rawFileName.strip().lower().replace(' ', '_')
+
+      assert cleanFileName == 'sales_report_2026_final.csv'
+      assert cleanFileName.endswith('.csv')
+      cleanFileName
+    hints:
+    - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
+    - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+  check:
+    type: noError
+    noError: '검증 루프: 고객 행 정제하기에서 \`rawFileName\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
+    resultCheck: '검증 루프: 고객 행 정제하기에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.'
+- id: practice
+  title: Day 6 종합 복습
+  structuredPrimary: true
+  subtitle: 문자열 메서드 마스터하기
+  goal: Day 6 종합 복습에서 \`greet\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: Day 6에서 배운 문자열 메서드를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로
+    어떤 순서로 해도 괜찮습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    file1 = 'document.pdf'
+    isPdf = file1.endswith('.pdf')
+    print('is_pdf:', isPdf)
+  exercise:
+    prompt: Day 6 종합 복습 예제에서 \`greet\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      greet = 'hello world'
+      greet.upper()
+    hints:
+    - 바꿀 지점은 \`greet = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`greet\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: Day 6 종합 복습에서 \`greet\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: Day 6 종합 복습 실행 뒤 \`greet\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: day06-normalize-tag-mastery
+    mode: mastery
+    unseen: false
+    sourceSectionIds:
+    - method_upper
+    - practice
+    title: 입력 문구를 태그로 정규화하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: strip, lower, replace를 순서대로 적용한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: normalize_tag(text)가 바깥 공백을 지우고 소문자 하이픈 태그를 반환하도록 완성하세요.
+      starterCode: |-
+        def normalize_tag(text):
+            raise NotImplementedError
+      solution: |-
+        def normalize_tag(text):
+            return text.strip().lower().replace(' ', '-')
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day06.normalize-tag.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day06.normalize-tag.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: normalize_tag
+        cases:
+        - id: spaces
+          arguments:
+          - value: '  Learn Python  '
+          expectedReturn: learn-python
+        - id: case
+          arguments:
+          - value: CODARO LAB
+          expectedReturn: codaro-lab
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day06-count-word-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - day06-normalize-tag-mastery
+    title: 대소문자와 무관하게 단어 세기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 문자열 메서드를 간단한 텍스트 집계에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: count_word(text, word)가 공백으로 나눈 단어의 대소문자 무관 등장 횟수를 반환하도록 완성하세요.
+      starterCode: |-
+        def count_word(text, word):
+            raise NotImplementedError
+      solution: |-
+        def count_word(text, word):
+            return text.lower().split().count(word.lower())
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day06.count-word.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day06.count-word.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: count_word
+        cases:
+        - id: mixed-case
+          arguments:
+          - value: Python code PYTHON
+          - value: python
+          expectedReturn: 2
+        - id: missing
+          arguments:
+          - value: learn by doing
+          - value: code
+          expectedReturn: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day06-clean-csv-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - day06-normalize-tag-mastery
+    title: 쉼표 항목의 공백 정리하기
+    subtitle: 하루 뒤 기억에서 재구성
+    goal: split과 strip, join을 기억에서 다시 연결한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: clean_csv(text)가 쉼표로 나눈 항목 공백을 지운 뒤 ', '로 다시 이어 반환하도록 완성하세요.
+      starterCode: |-
+        def clean_csv(text):
+            raise NotImplementedError
+      solution: |-
+        def clean_csv(text):
+            return ', '.join(part.strip() for part in text.split(','))
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day06.clean-csv.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day06.clean-csv.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: clean_csv
+        cases:
+        - id: three
+          arguments:
+          - value: red, green,blue
+          expectedReturn: red, green, blue
+        - id: two
+          arguments:
+          - value: A ,B
+          expectedReturn: A, B
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 24
+`;export{e as default};

@@ -515,3 +515,306 @@ sections:
     check:
       noError: 종합 리포트 작성과 복원이 격리 공간에서 끝나야 한다.
       resultCheck: restored가 steps와 generatedAt 두 키를 모두 가져 종합 정리 결과가 영속화되어야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: procCtl_10-build-runner-dag-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pipeline-input
+    - report-save-cycle
+    title: 빌드 step 의존성 DAG와 실행 순서 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 누락 의존성과 cycle을 거부하고 결정적 topological order를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - step 목록 순서를 의존성 순서로 가정하지 말고 DAG를 계산하세요.
+    - 누락 dependency와 cycle을 process 실행 전에 거부하세요.
+    exercise:
+      prompt: plan_build_steps(steps)를 완성하세요.
+      starterCode: |-
+        def plan_build_steps(steps):
+            raise NotImplementedError
+      solution: |
+        def plan_build_steps(steps):
+            names = {step["name"] for step in steps}
+            missing = sorted({dependency for step in steps for dependency in step.get("needs", []) if dependency not in names})
+            if missing:
+                raise ValueError("missing dependency")
+            needs = {step["name"]: set(step.get("needs", [])) for step in steps}
+            order = []
+            while needs:
+                ready = sorted(name for name, dependencies in needs.items() if not dependencies)
+                if not ready:
+                    raise ValueError("dependency cycle")
+                for name in ready:
+                    order.append(name)
+                    needs.pop(name)
+                for dependencies in needs.values():
+                    dependencies.difference_update(ready)
+            return {"order": order, "stepCount": len(order)}
+      hints: *id001
+    check:
+      id: python.procctl.procCtl_10.build-runner-dag.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_10.build-runner-dag.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_build_steps
+        cases:
+        - id: orders-dependent-steps
+          arguments:
+          - value:
+            - name: test
+              needs:
+              - lint
+            - name: lint
+              needs: []
+            - name: package
+              needs:
+              - test
+          expectedReturn:
+            order:
+            - lint
+            - test
+            - package
+            stepCount: 3
+        - id: orders-independent-steps-by-name
+          arguments:
+          - value:
+            - name: b
+              needs: []
+            - name: a
+              needs: []
+          expectedReturn:
+            order:
+            - a
+            - b
+            stepCount: 2
+        - id: rejects-missing-dependency
+          arguments:
+          - value:
+            - name: test
+              needs:
+              - build
+          expectedException: ValueError
+        - id: rejects-cycle
+          arguments:
+          - value:
+            - name: a
+              needs:
+              - b
+            - name: b
+              needs:
+              - a
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: procCtl_10-build-run-evidence-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - procCtl_10-build-runner-dag-mastery
+    title: 새 빌드 실행에 step·artifact 증거 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 실패 뒤 downstream 실행과 산출물 누락을 찾아 전체 결과를 판정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - step 실패 뒤 실행된 downstream step를 green count에 포함하지 마세요.
+    - 빌드 성공은 필수 artifact identity와 함께 판정하세요.
+    exercise:
+      prompt: audit_build_run(results, expected_artifacts)를 완성하세요.
+      starterCode: |-
+        def audit_build_run(results, expected_artifacts):
+            raise NotImplementedError
+      solution: |
+        def audit_build_run(results, expected_artifacts):
+            failures = []
+            first_failed_index = next((index for index, result in enumerate(results) if not result["passed"]), None)
+            executed_after_failure = []
+            if first_failed_index is not None:
+                failures.append("step")
+                executed_after_failure = [result["name"] for result in results[first_failed_index + 1 :] if result.get("executed", True)]
+                if executed_after_failure:
+                    failures.append("continued-after-failure")
+            artifacts = {artifact for result in results for artifact in result.get("artifacts", [])}
+            missing = sorted(set(expected_artifacts) - artifacts)
+            if missing:
+                failures.append("artifacts")
+            return {"passed": not failures, "failures": failures, "executedAfterFailure": executed_after_failure, "missingArtifacts": missing}
+      hints: *id002
+    check:
+      id: python.procctl.procCtl_10.build-run-evidence.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_10.build-run-evidence.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_build_run
+        cases:
+        - id: accepts-green-build-with-artifact
+          arguments:
+          - value:
+            - name: test
+              passed: true
+              artifacts: []
+            - name: package
+              passed: true
+              artifacts:
+              - app.zip
+          - value:
+            - app.zip
+          expectedReturn:
+            passed: true
+            failures: []
+            executedAfterFailure: []
+            missingArtifacts: []
+        - id: reports-continuation-and-missing-artifact
+          arguments:
+          - value:
+            - name: test
+              passed: false
+            - name: package
+              passed: true
+              executed: true
+          - value:
+            - app.zip
+          expectedReturn:
+            passed: false
+            failures:
+            - step
+            - continued-after-failure
+            - artifacts
+            executedAfterFailure:
+            - package
+            missingArtifacts:
+            - app.zip
+        - id: reports-stopped-failure
+          arguments:
+          - value:
+            - name: test
+              passed: false
+          - value: []
+          expectedReturn:
+            passed: false
+            failures:
+            - step
+            executedAfterFailure: []
+            missingArtifacts: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: procCtl_10-build-runner-capstone-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - procCtl_10-build-run-evidence-transfer
+    title: 종합 빌드 runner 종료 조건 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: DAG·sandbox·step·artifact 증거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - process 실행 성공과 업무 결과물 성공을 같은 것으로 처리하지 마세요.
+    - 명령 identity·제한 시간·산출물 evidence·남는 risk를 함께 기록하세요.
+    exercise:
+      prompt: choose_build_runner_gate(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_build_runner_gate(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_build_runner_gate(situation):
+            table = {'plan': {'action': 'validate dependency DAG', 'evidence': 'deterministic order', 'risk': 'cycle or missing step'}, 'execute': {'action': 'run each step in bounded context', 'evidence': 'argv duration return code', 'risk': 'ambient environment'}, 'release': {'action': 'verify all steps and artifacts', 'evidence': 'source-bound build manifest', 'risk': 'stale artifact'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.procctl.procCtl_10.build-runner-capstone-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_10.build-runner-capstone-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_build_runner_gate
+        cases:
+        - id: recalls-plan
+          arguments:
+          - value: plan
+          expectedReturn:
+            action: validate dependency DAG
+            evidence: deterministic order
+            risk: cycle or missing step
+        - id: recalls-execute
+          arguments:
+          - value: execute
+          expectedReturn:
+            action: run each step in bounded context
+            evidence: argv duration return code
+            risk: ambient environment
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

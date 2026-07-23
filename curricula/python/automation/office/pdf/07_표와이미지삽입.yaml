@@ -627,3 +627,338 @@ sections:
           - "이미지 대신 matplotlib png를 삽입해 차트 포함 보고서"
           - "여러 표를 한 페이지에 두 개 컬럼으로 배치 (Frame 활용)"
           - "표 셀에 색상 강조(예: 합계 행 노랑)로 한눈에 들어오는 양식"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pdf_07-pdf-table-image-layout-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_doc_template
+    - extensions
+    title: PDF 표·이미지 block의 page box 배치 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: block overlap·overflow와 이미지 caption/alt 누락을 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - block bounding box로 overflow와 overlap을 render 전에 검사하세요.
+    - 이미지는 caption과 alt text를 모두 제공하세요.
+    exercise:
+      prompt: audit_pdf_blocks(blocks, content_box)를 완성하세요.
+      starterCode: |-
+        def audit_pdf_blocks(blocks, content_box):
+            raise NotImplementedError
+      solution: |
+        def audit_pdf_blocks(blocks, content_box):
+            failures = []
+            overflow = []
+            invalid_images = []
+            overlaps = []
+            for block in blocks:
+                if block["x"] < 0 or block["y"] < 0 or block["x"] + block["width"] > content_box["width"] or block["y"] + block["height"] > content_box["height"]:
+                    overflow.append(block["id"])
+                if block["kind"] == "image" and (not block.get("caption") or not block.get("altText")):
+                    invalid_images.append(block["id"])
+            for index, left in enumerate(blocks):
+                for right in blocks[index + 1 :]:
+                    if left["x"] < right["x"] + right["width"] and right["x"] < left["x"] + left["width"] and left["y"] < right["y"] + right["height"] and right["y"] < left["y"] + left["height"]:
+                        overlaps.append([left["id"], right["id"]])
+            if overflow:
+                failures.append("overflow")
+            if invalid_images:
+                failures.append("image-text")
+            if overlaps:
+                failures.append("overlap")
+            return {"accepted": not failures, "failures": failures, "overflow": sorted(overflow), "invalidImages": sorted(invalid_images), "overlaps": overlaps}
+      hints: *id001
+    check:
+      id: python.pdf.pdf_07.pdf-table-image-layout.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_07.pdf-table-image-layout.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_pdf_blocks
+        cases:
+        - id: accepts-separated-table-and-image
+          arguments:
+          - value:
+            - id: table
+              kind: table
+              x: 0
+              y: 0
+              width: 100
+              height: 50
+            - id: chart
+              kind: image
+              x: 0
+              y: 60
+              width: 100
+              height: 50
+              caption: Sales
+              altText: Sales chart
+          - value:
+              width: 200
+              height: 200
+          expectedReturn:
+            accepted: true
+            failures: []
+            overflow: []
+            invalidImages: []
+            overlaps: []
+        - id: reports-overflow-and-missing-image-text
+          arguments:
+          - value:
+            - id: chart
+              kind: image
+              x: 90
+              y: 0
+              width: 20
+              height: 20
+              caption: ''
+              altText: ''
+          - value:
+              width: 100
+              height: 100
+          expectedReturn:
+            accepted: false
+            failures:
+            - overflow
+            - image-text
+            overflow:
+            - chart
+            invalidImages:
+            - chart
+            overlaps: []
+        - id: reports-overlap
+          arguments:
+          - value:
+            - id: a
+              kind: table
+              x: 0
+              y: 0
+              width: 50
+              height: 50
+            - id: b
+              kind: table
+              x: 25
+              y: 25
+              width: 50
+              height: 50
+          - value:
+              width: 100
+              height: 100
+          expectedReturn:
+            accepted: false
+            failures:
+            - overlap
+            overflow: []
+            invalidImages: []
+            overlaps:
+            - - a
+              - b
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pdf_07-rendered-block-evidence-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_07-pdf-table-image-layout-mastery
+    title: 새 PDF render에 block visibility·clipping 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 계획 block마다 rendered pixel bbox와 visible ratio를 대조한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - PDF 구조 존재와 실제 render visibility를 분리해 검증하세요.
+    - block별 visible ratio와 non-white pixel을 evidence로 남기세요.
+    exercise:
+      prompt: audit_rendered_blocks(planned_ids, rendered, minimum_visible_ratio)를 완성하세요.
+      starterCode: |-
+        def audit_rendered_blocks(planned_ids, rendered, minimum_visible_ratio):
+            raise NotImplementedError
+      solution: |
+        def audit_rendered_blocks(planned_ids, rendered, minimum_visible_ratio):
+            rendered_map = {item["id"]: item for item in rendered}
+            missing = sorted(set(planned_ids) - set(rendered_map))
+            clipped = sorted(block_id for block_id in planned_ids if block_id in rendered_map and rendered_map[block_id].get("visibleRatio", 0) < minimum_visible_ratio)
+            blank = sorted(block_id for block_id in planned_ids if block_id in rendered_map and rendered_map[block_id].get("nonWhitePixels", 0) == 0)
+            return {"passed": not missing and not clipped and not blank, "missing": missing, "clipped": clipped, "blank": blank}
+      hints: *id002
+    check:
+      id: python.pdf.pdf_07.rendered-block-evidence.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_07.rendered-block-evidence.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_rendered_blocks
+        cases:
+        - id: accepts-visible-rendered-blocks
+          arguments:
+          - value:
+            - table
+            - chart
+          - value:
+            - id: table
+              visibleRatio: 1.0
+              nonWhitePixels: 100
+            - id: chart
+              visibleRatio: 0.99
+              nonWhitePixels: 200
+          - value: 0.95
+          expectedReturn:
+            passed: true
+            missing: []
+            clipped: []
+            blank: []
+        - id: reports-missing-clipped-and-blank
+          arguments:
+          - value:
+            - missing
+            - clip
+            - blank
+          - value:
+            - id: clip
+              visibleRatio: 0.5
+              nonWhitePixels: 10
+            - id: blank
+              visibleRatio: 1.0
+              nonWhitePixels: 0
+          - value: 0.9
+          expectedReturn:
+            passed: false
+            missing:
+            - missing
+            clipped:
+            - clip
+            blank:
+            - blank
+        - id: accepts-threshold-boundary
+          arguments:
+          - value:
+            - x
+          - value:
+            - id: x
+              visibleRatio: 0.9
+              nonWhitePixels: 1
+          - value: 0.9
+          expectedReturn:
+            passed: true
+            missing: []
+            clipped: []
+            blank: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pdf_07-pdf-table-image-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_07-rendered-block-evidence-transfer
+    title: PDF 표·이미지 배치 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: geometry·설명·render visibility 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - PDF 저장 성공과 페이지 내용·geometry·업무 값의 정확성을 분리해 검증하세요.
+    - Web에서는 문서 판단을 연습하고 Local에서는 재개방·render artifact evidence를 남기세요.
+    exercise:
+      prompt: choose_pdf_block_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_pdf_block_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_pdf_block_evidence(situation):
+            table = {'layout': {'action': 'audit block boxes', 'evidence': 'overflow and overlap pairs', 'risk': 'clipped content'}, 'meaning': {'action': 'add caption and alt text', 'evidence': 'image text alternatives', 'risk': 'image-only information'}, 'render': {'action': 'measure block visible pixels', 'evidence': 'visible ratio and non-white pixels', 'risk': 'blank artifact'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.pdf.pdf_07.pdf-table-image-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_07.pdf-table-image-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_pdf_block_evidence
+        cases:
+        - id: recalls-layout
+          arguments:
+          - value: layout
+          expectedReturn:
+            action: audit block boxes
+            evidence: overflow and overlap pairs
+            risk: clipped content
+        - id: recalls-meaning
+          arguments:
+          - value: meaning
+          expectedReturn:
+            action: add caption and alt text
+            evidence: image text alternatives
+            risk: image-only information
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

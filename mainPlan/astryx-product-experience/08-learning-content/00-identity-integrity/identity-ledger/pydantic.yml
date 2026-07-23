@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "pydantic"
+sourceCount: 11
+lessons:
+  - lessonRef: "pydantic/00_pydantic소개"
+    sourcePath: "curricula/python/dataAnalysis/pydantic/00_pydantic소개.yaml"
+    metaId: "pydantic_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pydantic/01_사용자모델만들기"
+    sourcePath: "curricula/python/dataAnalysis/pydantic/01_사용자모델만들기.yaml"
+    metaId: "pydantic_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pydantic/02_필드검증기"
+    sourcePath: "curricula/python/dataAnalysis/pydantic/02_필드검증기.yaml"
+    metaId: "pydantic_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pydantic/03_중첩모델설계"
+    sourcePath: "curricula/python/dataAnalysis/pydantic/03_중첩모델설계.yaml"
+    metaId: "pydantic_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pydantic/04_타입변환기"
+    sourcePath: "curricula/python/dataAnalysis/pydantic/04_타입변환기.yaml"
+    metaId: "pydantic_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pydantic/05_설정관리기"
+    sourcePath: "curricula/python/dataAnalysis/pydantic/05_설정관리기.yaml"
+    metaId: "pydantic_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pydantic/06_JSON스키마생성"
+    sourcePath: "curricula/python/dataAnalysis/pydantic/06_JSON스키마생성.yaml"
+    metaId: "pydantic_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pydantic/07_커스텀타입정의"
+    sourcePath: "curricula/python/dataAnalysis/pydantic/07_커스텀타입정의.yaml"
+    metaId: "pydantic_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pydantic/08_에러처리기법"
+    sourcePath: "curricula/python/dataAnalysis/pydantic/08_에러처리기법.yaml"
+    metaId: "pydantic_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pydantic/09_FastAPI통합"
+    sourcePath: "curricula/python/dataAnalysis/pydantic/09_FastAPI통합.yaml"
+    metaId: "pydantic_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "pydantic/10_종합데이터파이프라인"
+    sourcePath: "curricula/python/dataAnalysis/pydantic/10_종합데이터파이프라인.yaml"
+    metaId: "pydantic_10"
+    registryStatus: registered
+    reviewStatus: pending

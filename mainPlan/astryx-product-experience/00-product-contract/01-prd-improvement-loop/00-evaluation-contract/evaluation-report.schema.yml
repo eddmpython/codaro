@@ -1,0 +1,196 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: astryx-prd-evaluation-report-v1
+type: object
+additionalProperties: false
+required:
+  - schemaVersion
+  - evaluationId
+  - roundId
+  - discipline
+  - evaluatorId
+  - rubricVersion
+  - rubricHash
+  - evaluationBundleHash
+  - scopeGitCommit
+  - scopeDirtyDiffHash
+  - scopeManifestHash
+  - scopePaths
+  - excludedPriorReports
+  - promptAudit
+  - startedAt
+  - completedAt
+  - dimensions
+  - findings
+  - totalScore
+  - productEvidenceMaturity
+  - limitations
+properties:
+  schemaVersion:
+    const: 1
+  evaluationId:
+    type: string
+    minLength: 1
+  roundId:
+    type: string
+    pattern: ^R[0-9]+$
+  discipline:
+    enum: [learning, ux, architecture]
+  evaluatorId:
+    type: string
+    minLength: 1
+  rubricVersion:
+    type: integer
+    minimum: 1
+  rubricHash:
+    $ref: '#/$defs/sha256'
+  evaluationBundleHash:
+    $ref: '#/$defs/sha256'
+  scopeGitCommit:
+    type: string
+    pattern: ^(?:[a-f0-9]{40}|[a-f0-9]{64})$
+  scopeDirtyDiffHash:
+    $ref: '#/$defs/sha256'
+  scopeManifestHash:
+    $ref: '#/$defs/sha256'
+  scopePaths:
+    type: array
+    minItems: 1
+    uniqueItems: true
+    items:
+      type: string
+      minLength: 1
+  excludedPriorReports:
+    type: array
+    minItems: 1
+    uniqueItems: true
+    items:
+      type: string
+      minLength: 1
+  promptAudit:
+    type: object
+    additionalProperties: false
+    required: [targetScorePresent, priorScorePresent, desiredConclusionPresent]
+    properties:
+      targetScorePresent:
+        const: false
+      priorScorePresent:
+        const: false
+      desiredConclusionPresent:
+        const: false
+  startedAt:
+    type: string
+    format: date-time
+  completedAt:
+    type: string
+    format: date-time
+  dimensions:
+    type: object
+    minProperties: 7
+    maxProperties: 7
+    propertyNames:
+      enum:
+        - learnerValue
+        - currentStateAccuracy
+        - decisionCompleteness
+        - dependencyOwnership
+        - feasibilityCapacity
+        - testRollback
+        - measurementRelease
+    additionalProperties:
+      $ref: '#/$defs/dimensionScore'
+  findings:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [findingId, severity, title, claim, evidenceRefs, counterEvidence, impact]
+      properties:
+        findingId:
+          type: string
+          pattern: ^[A-Z]+-[0-9]+$
+        severity:
+          enum: [P0, P1, P2]
+        title:
+          type: string
+          minLength: 1
+        claim:
+          type: string
+          minLength: 1
+        evidenceRefs:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/$defs/evidenceRef'
+        counterEvidence:
+          type: array
+          minItems: 1
+          items:
+            type: string
+        impact:
+          type: string
+          minLength: 1
+  totalScore:
+    type: number
+    minimum: 0
+    maximum: 100
+  productEvidenceMaturity:
+    type: object
+    additionalProperties: false
+    required: [stage, rationale, evidenceRefs]
+    properties:
+      stage:
+        enum: [E0, E1, E2, E3, E4]
+      rationale:
+        type: string
+        minLength: 1
+      evidenceRefs:
+        type: array
+        minItems: 1
+        items:
+          $ref: '#/$defs/evidenceRef'
+  limitations:
+    type: array
+    items:
+      type: string
+$defs:
+  dimensionScore:
+    type: object
+    additionalProperties: false
+    required: [score, maxScore, evidenceRefs, counterEvidence]
+    properties:
+      score:
+        type: number
+        minimum: 0
+      maxScore:
+        type: number
+        exclusiveMinimum: 0
+      evidenceRefs:
+        type: array
+        minItems: 1
+        items:
+          $ref: '#/$defs/evidenceRef'
+      counterEvidence:
+        type: array
+        minItems: 1
+        items:
+          type: string
+  sha256:
+    type: string
+    pattern: ^[a-f0-9]{64}$
+  evidenceRef:
+    type: object
+    additionalProperties: false
+    required: [path]
+    properties:
+      path:
+        type: string
+        minLength: 1
+      line:
+        type: integer
+        minimum: 1
+      symbol:
+        type: string
+      command:
+        type: string
+      resultHash:
+        $ref: '#/$defs/sha256'

@@ -1,0 +1,194 @@
+schemaVersion: 1
+category: "deepVision"
+canonicalRows: 10
+lessons:
+  - lessonRef: "deepVision/01_torchvision입문"
+    identityLedgerRef: "identity-ledger/deepVision.yml"
+    lessonContentHash: "b0147e3da23e904c00af118218f1d0fb29b7ca72dd39922a358d9d2b24511b8f"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/14-deep-learning-vision"
+    eligiblePathIds: ["deepLearningVision"]
+    outcomes: ["deepVision.classification"]
+    prerequisites: ["numpy.arrayOps","vision.opencvBasics"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:deepVision/01_torchvision입문:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:deepVision_01_torchvision__:v1","retrieve:deepVision_01_torchvision__:v2","retrieve:deepVision_01_torchvision__:v3"]
+    transferVariantIds: ["transfer:deepVision_01_torchvision__:near-v1","transfer:deepVision_01_torchvision__:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "deepVision/02_ResNet분류"
+    identityLedgerRef: "identity-ledger/deepVision.yml"
+    lessonContentHash: "269f76dae097dba11ddbb00238efbd2f49029ff3f0c6a1fc897f726b598081a4"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/14-deep-learning-vision"
+    eligiblePathIds: ["deepLearningVision"]
+    outcomes: ["deepVision.classification"]
+    prerequisites: ["deepVision.classification"]
+    reinforcesOutcomeIds: ["deepVision.classification"]
+    runtimeTier: local
+    checkSpecId: "lesson:deepVision/02_ResNet분류:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:deepVision_02_ResNet__:v1","retrieve:deepVision_02_ResNet__:v2","retrieve:deepVision_02_ResNet__:v3"]
+    transferVariantIds: ["transfer:deepVision_02_ResNet__:near-v1","transfer:deepVision_02_ResNet__:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "deepVision/03_임베딩벡터"
+    identityLedgerRef: "identity-ledger/deepVision.yml"
+    lessonContentHash: "3ee6e16e41d1c61b5821047ab62ddb083411f36fdb32556dd09b0dc3125a2206"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/14-deep-learning-vision"
+    eligiblePathIds: ["deepLearningVision"]
+    outcomes: ["deepVision.classification"]
+    prerequisites: ["deepVision.classification"]
+    reinforcesOutcomeIds: ["deepVision.classification"]
+    runtimeTier: local
+    checkSpecId: "lesson:deepVision/03_임베딩벡터:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:deepVision_03______:v1","retrieve:deepVision_03______:v2","retrieve:deepVision_03______:v3"]
+    transferVariantIds: ["transfer:deepVision_03______:near-v1","transfer:deepVision_03______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "deepVision/04_유사도검색"
+    identityLedgerRef: "identity-ledger/deepVision.yml"
+    lessonContentHash: "3c4287908b697987773ef685504a4a978cee00d9c631503084086087fc5f2530"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/14-deep-learning-vision"
+    eligiblePathIds: ["deepLearningVision"]
+    outcomes: ["deepVision.classification"]
+    prerequisites: ["deepVision.classification"]
+    reinforcesOutcomeIds: ["deepVision.classification"]
+    runtimeTier: local
+    checkSpecId: "lesson:deepVision/04_유사도검색:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:deepVision_04______:v1","retrieve:deepVision_04______:v2","retrieve:deepVision_04______:v3"]
+    transferVariantIds: ["transfer:deepVision_04______:near-v1","transfer:deepVision_04______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "deepVision/05_객체탐지"
+    identityLedgerRef: "identity-ledger/deepVision.yml"
+    lessonContentHash: "9c6297e7943730f173c0fa4b74d9aedf023d6a2b032c62d9a44023c77868be2b"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/14-deep-learning-vision"
+    eligiblePathIds: ["deepLearningVision"]
+    outcomes: ["deepVision.detection"]
+    prerequisites: ["deepVision.classification"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:deepVision/05_객체탐지:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:deepVision_05_____:v1","retrieve:deepVision_05_____:v2","retrieve:deepVision_05_____:v3"]
+    transferVariantIds: ["transfer:deepVision_05_____:near-v1","transfer:deepVision_05_____:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "deepVision/06_세그멘테이션"
+    identityLedgerRef: "identity-ledger/deepVision.yml"
+    lessonContentHash: "9006056ab8aa020189624d6349c2ec0c82a523817c81207abd5b8f77fffe9687"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/14-deep-learning-vision"
+    eligiblePathIds: ["deepLearningVision"]
+    outcomes: ["deepVision.detection"]
+    prerequisites: ["deepVision.detection"]
+    reinforcesOutcomeIds: ["deepVision.detection"]
+    runtimeTier: local
+    checkSpecId: "lesson:deepVision/06_세그멘테이션:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:deepVision_06_______:v1","retrieve:deepVision_06_______:v2","retrieve:deepVision_06_______:v3"]
+    transferVariantIds: ["transfer:deepVision_06_______:near-v1","transfer:deepVision_06_______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "deepVision/07_포즈추정"
+    identityLedgerRef: "identity-ledger/deepVision.yml"
+    lessonContentHash: "edee57095908339b18f5efdd574aba3f345e237b7e5205c8cc96224924d23899"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/14-deep-learning-vision"
+    eligiblePathIds: ["deepLearningVision"]
+    outcomes: ["deepVision.detection"]
+    prerequisites: ["deepVision.detection"]
+    reinforcesOutcomeIds: ["deepVision.detection"]
+    runtimeTier: local
+    checkSpecId: "lesson:deepVision/07_포즈추정:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:deepVision_07_____:v1","retrieve:deepVision_07_____:v2","retrieve:deepVision_07_____:v3"]
+    transferVariantIds: ["transfer:deepVision_07_____:near-v1","transfer:deepVision_07_____:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "deepVision/08_전이학습"
+    identityLedgerRef: "identity-ledger/deepVision.yml"
+    lessonContentHash: "dc3f7ed9e7743aeb1a7b4bf932cc973310fa8092b03d05249962a0806bbb5f31"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/14-deep-learning-vision"
+    eligiblePathIds: ["deepLearningVision"]
+    outcomes: ["deepVision.classification"]
+    prerequisites: ["deepVision.classification","ml.intro"]
+    reinforcesOutcomeIds: ["deepVision.classification"]
+    runtimeTier: local
+    checkSpecId: "lesson:deepVision/08_전이학습:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:deepVision_08_____:v1","retrieve:deepVision_08_____:v2","retrieve:deepVision_08_____:v3"]
+    transferVariantIds: ["transfer:deepVision_08_____:near-v1","transfer:deepVision_08_____:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "deepVision/09_모델비교"
+    identityLedgerRef: "identity-ledger/deepVision.yml"
+    lessonContentHash: "33647d345c23583c15fed839e9279822523312f6312b6e1ea041daad3fa4d114"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/14-deep-learning-vision"
+    eligiblePathIds: ["deepLearningVision"]
+    outcomes: ["deepVision.classification"]
+    prerequisites: ["deepVision.classification"]
+    reinforcesOutcomeIds: ["deepVision.classification"]
+    runtimeTier: local
+    checkSpecId: "lesson:deepVision/09_모델비교:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:deepVision_09_____:v1","retrieve:deepVision_09_____:v2","retrieve:deepVision_09_____:v3"]
+    transferVariantIds: ["transfer:deepVision_09_____:near-v1","transfer:deepVision_09_____:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "deepVision/10_종합사진태깅기"
+    identityLedgerRef: "identity-ledger/deepVision.yml"
+    lessonContentHash: "dfa58f8792b84ec89367eb6c8f5b752e71d89645e8ca8b99a539fa662b6b9e5f"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/14-deep-learning-vision"
+    eligiblePathIds: ["deepLearningVision"]
+    outcomes: ["deepVision.classification","deepVision.detection"]
+    prerequisites: ["deepVision.detection"]
+    reinforcesOutcomeIds: ["deepVision.detection"]
+    runtimeTier: local
+    checkSpecId: "lesson:deepVision/10_종합사진태깅기:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:deepVision_10________:v1","retrieve:deepVision_10________:v2","retrieve:deepVision_10________:v3"]
+    transferVariantIds: ["transfer:deepVision_10________:near-v1","transfer:deepVision_10________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

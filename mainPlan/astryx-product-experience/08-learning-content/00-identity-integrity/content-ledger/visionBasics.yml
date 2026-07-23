@@ -1,0 +1,194 @@
+schemaVersion: 1
+category: "visionBasics"
+canonicalRows: 10
+lessons:
+  - lessonRef: "visionBasics/01_픽셀과ndarray"
+    identityLedgerRef: "identity-ledger/visionBasics.yml"
+    lessonContentHash: "e7092e1fe9d027d13699d06e953f1016f7869fe2b71cc64262502472beaa541e"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/13-vision-advanced"
+    eligiblePathIds: ["visionAdvanced"]
+    outcomes: ["vision.pixelFoundations"]
+    prerequisites: ["numpy.arrayOps"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:visionBasics/01_픽셀과ndarray:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionBasics_01____ndarray:v1","retrieve:visionBasics_01____ndarray:v2","retrieve:visionBasics_01____ndarray:v3"]
+    transferVariantIds: ["transfer:visionBasics_01____ndarray:near-v1","transfer:visionBasics_01____ndarray:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionBasics/02_좌표계함정"
+    identityLedgerRef: "identity-ledger/visionBasics.yml"
+    lessonContentHash: "66c6702e0061e9816632307ef5c70d2987534493ba3f241c0fc274337d55dd09"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/13-vision-advanced"
+    eligiblePathIds: ["visionAdvanced"]
+    outcomes: ["vision.pixelFoundations"]
+    prerequisites: ["vision.pixelFoundations"]
+    reinforcesOutcomeIds: ["vision.pixelFoundations"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionBasics/02_좌표계함정:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionBasics_02______:v1","retrieve:visionBasics_02______:v2","retrieve:visionBasics_02______:v3"]
+    transferVariantIds: ["transfer:visionBasics_02______:near-v1","transfer:visionBasics_02______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionBasics/03_채널구조분해"
+    identityLedgerRef: "identity-ledger/visionBasics.yml"
+    lessonContentHash: "b889e476e52eb093ad185d35cddecbe036bbdd9074c11d4d26e504e82551dc7a"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/13-vision-advanced"
+    eligiblePathIds: ["visionAdvanced"]
+    outcomes: ["vision.pixelFoundations"]
+    prerequisites: ["vision.pixelFoundations"]
+    reinforcesOutcomeIds: ["vision.pixelFoundations"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionBasics/03_채널구조분해:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionBasics_03_______:v1","retrieve:visionBasics_03_______:v2","retrieve:visionBasics_03_______:v3"]
+    transferVariantIds: ["transfer:visionBasics_03_______:near-v1","transfer:visionBasics_03_______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionBasics/04_색공간직관"
+    identityLedgerRef: "identity-ledger/visionBasics.yml"
+    lessonContentHash: "7e2657ee21343f6a266033dea3c03d621424ed32d56b591ef466d380b614623e"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/13-vision-advanced"
+    eligiblePathIds: ["visionAdvanced"]
+    outcomes: ["vision.pixelFoundations"]
+    prerequisites: ["vision.pixelFoundations"]
+    reinforcesOutcomeIds: ["vision.pixelFoundations"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionBasics/04_색공간직관:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionBasics_04______:v1","retrieve:visionBasics_04______:v2","retrieve:visionBasics_04______:v3"]
+    transferVariantIds: ["transfer:visionBasics_04______:near-v1","transfer:visionBasics_04______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionBasics/05_슬라이싱과ROI"
+    identityLedgerRef: "identity-ledger/visionBasics.yml"
+    lessonContentHash: "11128a1d97779b13c3a517ae070d419e2894aff0775adeb72efabe866d4bf0b7"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/13-vision-advanced"
+    eligiblePathIds: ["visionAdvanced"]
+    outcomes: ["vision.pixelFoundations"]
+    prerequisites: ["vision.pixelFoundations"]
+    reinforcesOutcomeIds: ["vision.pixelFoundations"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionBasics/05_슬라이싱과ROI:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionBasics_05______ROI:v1","retrieve:visionBasics_05______ROI:v2","retrieve:visionBasics_05______ROI:v3"]
+    transferVariantIds: ["transfer:visionBasics_05______ROI:near-v1","transfer:visionBasics_05______ROI:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionBasics/06_픽셀산술"
+    identityLedgerRef: "identity-ledger/visionBasics.yml"
+    lessonContentHash: "a13be93eb410d1a14f0ae6623d13c8aad1071907644cd9419fe63cfb853074e4"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/13-vision-advanced"
+    eligiblePathIds: ["visionAdvanced"]
+    outcomes: ["vision.pixelFoundations"]
+    prerequisites: ["vision.pixelFoundations"]
+    reinforcesOutcomeIds: ["vision.pixelFoundations"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionBasics/06_픽셀산술:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionBasics_06_____:v1","retrieve:visionBasics_06_____:v2","retrieve:visionBasics_06_____:v3"]
+    transferVariantIds: ["transfer:visionBasics_06_____:near-v1","transfer:visionBasics_06_____:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionBasics/07_룩업테이블"
+    identityLedgerRef: "identity-ledger/visionBasics.yml"
+    lessonContentHash: "049347f75164fa3a8d973933e1be6ac9cf46389df45813b0d0ac1a75a075e4ee"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/13-vision-advanced"
+    eligiblePathIds: ["visionAdvanced"]
+    outcomes: ["vision.pixelFoundations"]
+    prerequisites: ["vision.pixelFoundations"]
+    reinforcesOutcomeIds: ["vision.pixelFoundations"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionBasics/07_룩업테이블:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionBasics_07______:v1","retrieve:visionBasics_07______:v2","retrieve:visionBasics_07______:v3"]
+    transferVariantIds: ["transfer:visionBasics_07______:near-v1","transfer:visionBasics_07______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionBasics/08_마스크사고"
+    identityLedgerRef: "identity-ledger/visionBasics.yml"
+    lessonContentHash: "4c75cda7d726fb90eaf12282aedbad15016134e9bdb58120d8372d131742c857"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/13-vision-advanced"
+    eligiblePathIds: ["visionAdvanced"]
+    outcomes: ["vision.pixelFoundations"]
+    prerequisites: ["vision.pixelFoundations"]
+    reinforcesOutcomeIds: ["vision.pixelFoundations"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionBasics/08_마스크사고:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionBasics_08______:v1","retrieve:visionBasics_08______:v2","retrieve:visionBasics_08______:v3"]
+    transferVariantIds: ["transfer:visionBasics_08______:near-v1","transfer:visionBasics_08______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionBasics/09_이미지통계"
+    identityLedgerRef: "identity-ledger/visionBasics.yml"
+    lessonContentHash: "b38922aad24e6d3bc706b260d6658306c667deb9dda199037832f1c5008555ae"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/13-vision-advanced"
+    eligiblePathIds: ["visionAdvanced"]
+    outcomes: ["vision.pixelFoundations"]
+    prerequisites: ["vision.pixelFoundations"]
+    reinforcesOutcomeIds: ["vision.pixelFoundations"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionBasics/09_이미지통계:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionBasics_09______:v1","retrieve:visionBasics_09______:v2","retrieve:visionBasics_09______:v3"]
+    transferVariantIds: ["transfer:visionBasics_09______:near-v1","transfer:visionBasics_09______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "visionBasics/10_종합미니보정기"
+    identityLedgerRef: "identity-ledger/visionBasics.yml"
+    lessonContentHash: "12d2c022fe36d5dc44523d4360a9ea34ae552d30ce3c4b90ac208875b694684b"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/13-vision-advanced"
+    eligiblePathIds: ["visionAdvanced"]
+    outcomes: ["vision.pixelFoundations"]
+    prerequisites: ["vision.pixelFoundations"]
+    reinforcesOutcomeIds: ["vision.pixelFoundations"]
+    runtimeTier: local
+    checkSpecId: "lesson:visionBasics/10_종합미니보정기:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:visionBasics_10________:v1","retrieve:visionBasics_10________:v2","retrieve:visionBasics_10________:v3"]
+    transferVariantIds: ["transfer:visionBasics_10________:near-v1","transfer:visionBasics_10________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

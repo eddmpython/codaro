@@ -501,3 +501,313 @@ sections:
     type: noError
     noError: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인의 정규식 패턴이 컴파일되고 입력 텍스트가 매치 단계까지 도달해야 합니다.'
     resultCheck: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인 결과의 추출 개수와 매치 문자열이 본문 기대값과 같아야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: regex_09-named-pattern-extraction-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 여러 named pattern의 겹치는 match 조정하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 우선순위와 span 길이로 겹침을 해소하고 선택·거부 근거를 남긴다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 여러 pattern을 순서대로 치환하지 말고 원본 span에서 충돌을 조정하세요.
+    - 겹침 해소 우선순위와 거부된 match를 report에 남기세요.
+    exercise:
+      prompt: resolve_pattern_matches(matches)를 완성하세요.
+      starterCode: |-
+        def resolve_pattern_matches(matches):
+            raise NotImplementedError
+      solution: |
+        def resolve_pattern_matches(matches):
+            ordered = sorted(matches, key=lambda item: (item["start"], -item.get("priority", 0), -(item["end"] - item["start"]), item["name"]))
+            selected = []
+            rejected = []
+            for match in ordered:
+                overlap = any(match["start"] < item["end"] and item["start"] < match["end"] for item in selected)
+                compact = {key: match[key] for key in ["name", "start", "end"]}
+                if overlap:
+                    rejected.append({**compact, "reason": "overlap"})
+                else:
+                    selected.append(compact)
+            return {"selected": selected, "rejected": rejected}
+      hints: *id001
+    check:
+      id: python.regex.regex_09.named-pattern-extraction.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_09.named-pattern-extraction.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: resolve_pattern_matches
+        cases:
+        - id: prefers-higher-priority-overlap
+          arguments:
+          - value:
+            - name: date
+              start: 0
+              end: 10
+              priority: 2
+            - name: year
+              start: 0
+              end: 4
+              priority: 1
+          expectedReturn:
+            selected:
+            - name: date
+              start: 0
+              end: 10
+            rejected:
+            - name: year
+              start: 0
+              end: 4
+              reason: overlap
+        - id: keeps-non-overlapping-matches
+          arguments:
+          - value:
+            - name: a
+              start: 0
+              end: 2
+            - name: b
+              start: 3
+              end: 5
+          expectedReturn:
+            selected:
+            - name: a
+              start: 0
+              end: 2
+            - name: b
+              start: 3
+              end: 5
+            rejected: []
+        - id: prefers-longer-equal-priority
+          arguments:
+          - value:
+            - name: short
+              start: 0
+              end: 2
+              priority: 1
+            - name: long
+              start: 0
+              end: 5
+              priority: 1
+          expectedReturn:
+            selected:
+            - name: long
+              start: 0
+              end: 5
+            rejected:
+            - name: short
+              start: 0
+              end: 2
+              reason: overlap
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: regex_09-pattern-coverage-matrix-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_09-named-pattern-extraction-mastery
+    title: 새 고급 pattern에 fixture coverage 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: pattern별 positive·negative·boundary fixture 존재 여부를 행렬로 검사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - happy path fixture 수가 아니라 pattern별 세 종류 coverage를 비교하세요.
+    - 등록되지 않은 pattern 이름의 fixture도 drift로 실패시키세요.
+    exercise:
+      prompt: audit_pattern_coverage(pattern_names, fixtures)를 완성하세요.
+      starterCode: |-
+        def audit_pattern_coverage(pattern_names, fixtures):
+            raise NotImplementedError
+      solution: |
+        def audit_pattern_coverage(pattern_names, fixtures):
+            required = {"positive", "negative", "boundary"}
+            matrix = {}
+            missing = {}
+            for name in pattern_names:
+                kinds = {fixture["kind"] for fixture in fixtures if fixture["pattern"] == name}
+                matrix[name] = sorted(kinds)
+                absent = sorted(required - kinds)
+                if absent:
+                    missing[name] = absent
+            unknown = sorted({fixture["pattern"] for fixture in fixtures} - set(pattern_names))
+            return {"complete": not missing and not unknown, "matrix": matrix, "missing": missing, "unknownPatterns": unknown}
+      hints: *id002
+    check:
+      id: python.regex.regex_09.pattern-coverage-matrix.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_09.pattern-coverage-matrix.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_pattern_coverage
+        cases:
+        - id: accepts-full-matrix
+          arguments:
+          - value:
+            - email
+          - value:
+            - pattern: email
+              kind: positive
+            - pattern: email
+              kind: negative
+            - pattern: email
+              kind: boundary
+          expectedReturn:
+            complete: true
+            matrix:
+              email:
+              - boundary
+              - negative
+              - positive
+            missing: {}
+            unknownPatterns: []
+        - id: reports-missing-kinds
+          arguments:
+          - value:
+            - date
+          - value:
+            - pattern: date
+              kind: positive
+          expectedReturn:
+            complete: false
+            matrix:
+              date:
+              - positive
+            missing:
+              date:
+              - boundary
+              - negative
+            unknownPatterns: []
+        - id: reports-unknown-pattern
+          arguments:
+          - value: []
+          - value:
+            - pattern: extra
+              kind: positive
+          expectedReturn:
+            complete: false
+            matrix: {}
+            missing: {}
+            unknownPatterns:
+            - extra
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: regex_09-advanced-pattern-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_09-pattern-coverage-matrix-transfer
+    title: 고급 pattern matching 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: named group·overlap·fixture matrix 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - match 수만 보지 말고 정규화 뒤 보존된 의미와 거부된 입력을 함께 확인하세요.
+    - regex가 아닌 전용 parser가 필요한 구조에서는 경계를 명시하세요.
+    exercise:
+      prompt: choose_advanced_pattern_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_advanced_pattern_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_advanced_pattern_evidence(situation):
+            table = {'capture': {'action': 'use named groups', 'evidence': 'semantic group dictionary', 'risk': 'numeric group drift'}, 'overlap': {'action': 'resolve spans by explicit priority', 'evidence': 'selected and rejected matches', 'risk': 'double counting'}, 'coverage': {'action': 'require positive negative boundary', 'evidence': 'per-pattern matrix', 'risk': 'happy-path bias'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.regex.regex_09.advanced-pattern-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_09.advanced-pattern-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_advanced_pattern_evidence
+        cases:
+        - id: recalls-capture
+          arguments:
+          - value: capture
+          expectedReturn:
+            action: use named groups
+            evidence: semantic group dictionary
+            risk: numeric group drift
+        - id: recalls-overlap
+          arguments:
+          - value: overlap
+          expectedReturn:
+            action: resolve spans by explicit priority
+            evidence: selected and rejected matches
+            risk: double counting
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

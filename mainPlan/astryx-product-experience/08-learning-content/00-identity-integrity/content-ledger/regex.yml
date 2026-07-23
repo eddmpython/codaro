@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "regex"
+canonicalRows: 11
+lessons:
+  - lessonRef: "regex/00_정규표현식소개"
+    identityLedgerRef: "identity-ledger/regex.yml"
+    lessonContentHash: "6ceeee029d2478095be8ab4b0456f9ce79a8a515ab8e0c364f7a9f02a0c5bf82"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/16-text-processing"
+    eligiblePathIds: ["textProcessing"]
+    outcomes: ["automation.regex"]
+    prerequisites: ["python.strings"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:regex/00_정규표현식소개:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:regex_00________:v1","retrieve:regex_00________:v2","retrieve:regex_00________:v3"]
+    transferVariantIds: ["transfer:regex_00________:near-v1","transfer:regex_00________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "regex/01_이메일주소추출"
+    identityLedgerRef: "identity-ledger/regex.yml"
+    lessonContentHash: "39ad6def58d97f202bb2af2906e2e3dba6ebad86cb57699c700f4c2a15c4ef97"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/16-text-processing"
+    eligiblePathIds: ["textProcessing"]
+    outcomes: ["automation.regex","automation.textExtraction"]
+    prerequisites: ["automation.regex"]
+    reinforcesOutcomeIds: ["automation.regex"]
+    runtimeTier: browser
+    checkSpecId: "lesson:regex/01_이메일주소추출:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:regex_01________:v1","retrieve:regex_01________:v2","retrieve:regex_01________:v3"]
+    transferVariantIds: ["transfer:regex_01________:near-v1","transfer:regex_01________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "regex/02_전화번호형식통일"
+    identityLedgerRef: "identity-ledger/regex.yml"
+    lessonContentHash: "077a99e951e24c7b09ade9c1da13ee0ea93247517e91f9a8cda33fb123965054"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/16-text-processing"
+    eligiblePathIds: ["textProcessing"]
+    outcomes: ["automation.textExtraction"]
+    prerequisites: ["automation.regex"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:regex/02_전화번호형식통일:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:regex_02_________:v1","retrieve:regex_02_________:v2","retrieve:regex_02_________:v3"]
+    transferVariantIds: ["transfer:regex_02_________:near-v1","transfer:regex_02_________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "regex/03_URL구조분해"
+    identityLedgerRef: "identity-ledger/regex.yml"
+    lessonContentHash: "b889c9e5170f977ab7c66d29e213466bf60db8b3b00ebd155aa7f2ccfec5573a"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/16-text-processing"
+    eligiblePathIds: ["textProcessing"]
+    outcomes: ["automation.textExtraction"]
+    prerequisites: ["automation.textExtraction"]
+    reinforcesOutcomeIds: ["automation.textExtraction"]
+    runtimeTier: browser
+    checkSpecId: "lesson:regex/03_URL구조분해:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:regex_03_URL____:v1","retrieve:regex_03_URL____:v2","retrieve:regex_03_URL____:v3"]
+    transferVariantIds: ["transfer:regex_03_URL____:near-v1","transfer:regex_03_URL____:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "regex/04_HTML태그제거"
+    identityLedgerRef: "identity-ledger/regex.yml"
+    lessonContentHash: "ac3923216c47a0a50ef8e2f4837f36f64eb7d86e8ed3bc5a593fd54e8a43eb1e"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/16-text-processing"
+    eligiblePathIds: ["textProcessing"]
+    outcomes: ["automation.textExtraction"]
+    prerequisites: ["automation.textExtraction"]
+    reinforcesOutcomeIds: ["automation.textExtraction"]
+    runtimeTier: browser
+    checkSpecId: "lesson:regex/04_HTML태그제거:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:regex_04_HTML____:v1","retrieve:regex_04_HTML____:v2","retrieve:regex_04_HTML____:v3"]
+    transferVariantIds: ["transfer:regex_04_HTML____:near-v1","transfer:regex_04_HTML____:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "regex/05_로그파일분석"
+    identityLedgerRef: "identity-ledger/regex.yml"
+    lessonContentHash: "7c3db39b1b6cfce09e523a4e7e0dd8a6b7e3389cca3c9d2d9e1986a282e931fb"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/16-text-processing"
+    eligiblePathIds: ["textProcessing"]
+    outcomes: ["automation.textExtraction"]
+    prerequisites: ["automation.textExtraction"]
+    reinforcesOutcomeIds: ["automation.textExtraction"]
+    runtimeTier: browser
+    checkSpecId: "lesson:regex/05_로그파일분석:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:regex_05_______:v1","retrieve:regex_05_______:v2","retrieve:regex_05_______:v3"]
+    transferVariantIds: ["transfer:regex_05_______:near-v1","transfer:regex_05_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "regex/06_날짜형식변환"
+    identityLedgerRef: "identity-ledger/regex.yml"
+    lessonContentHash: "52f87ae0798cfaf87c908809d0b30b79f34296895518c3a8edfefa36cd68e592"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/16-text-processing"
+    eligiblePathIds: ["textProcessing"]
+    outcomes: ["automation.textExtraction"]
+    prerequisites: ["automation.textExtraction"]
+    reinforcesOutcomeIds: ["automation.textExtraction"]
+    runtimeTier: browser
+    checkSpecId: "lesson:regex/06_날짜형식변환:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:regex_06_______:v1","retrieve:regex_06_______:v2","retrieve:regex_06_______:v3"]
+    transferVariantIds: ["transfer:regex_06_______:near-v1","transfer:regex_06_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "regex/07_개인정보마스킹"
+    identityLedgerRef: "identity-ledger/regex.yml"
+    lessonContentHash: "bce8e5db617cb8407c5d4a5a82a55cf7e9b14367507bb60968165654e965c4c8"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/16-text-processing"
+    eligiblePathIds: ["textProcessing"]
+    outcomes: ["automation.llmPreprocess"]
+    prerequisites: ["automation.textExtraction"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:regex/07_개인정보마스킹:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:regex_07________:v1","retrieve:regex_07________:v2","retrieve:regex_07________:v3"]
+    transferVariantIds: ["transfer:regex_07________:near-v1","transfer:regex_07________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "regex/08_텍스트정제토큰화"
+    identityLedgerRef: "identity-ledger/regex.yml"
+    lessonContentHash: "49a18bed3c044c4cf7101b28d1a432147ab65c53fd21a6a4c6f9150840f1b201"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/16-text-processing"
+    eligiblePathIds: ["textProcessing"]
+    outcomes: ["automation.llmPreprocess"]
+    prerequisites: ["automation.llmPreprocess"]
+    reinforcesOutcomeIds: ["automation.llmPreprocess"]
+    runtimeTier: browser
+    checkSpecId: "lesson:regex/08_텍스트정제토큰화:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:regex_08_________:v1","retrieve:regex_08_________:v2","retrieve:regex_08_________:v3"]
+    transferVariantIds: ["transfer:regex_08_________:near-v1","transfer:regex_08_________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "regex/09_고급패턴매칭"
+    identityLedgerRef: "identity-ledger/regex.yml"
+    lessonContentHash: "3f642e2cf7ff48f62b3a40d0d92a1e5bd29a744cac7e0547343602d631b84146"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/16-text-processing"
+    eligiblePathIds: ["textProcessing"]
+    outcomes: ["automation.regex"]
+    prerequisites: ["automation.textExtraction"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:regex/09_고급패턴매칭:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:regex_09_______:v1","retrieve:regex_09_______:v2","retrieve:regex_09_______:v3"]
+    transferVariantIds: ["transfer:regex_09_______:near-v1","transfer:regex_09_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "regex/10_LLM전처리파이프라인"
+    identityLedgerRef: "identity-ledger/regex.yml"
+    lessonContentHash: "e9f49d493e1e42e9fb76d4d7197f100fdc9a0aebd3a2a89984f1a4d8102fdc93"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/16-text-processing"
+    eligiblePathIds: ["textProcessing"]
+    outcomes: ["automation.llmPreprocess"]
+    prerequisites: ["automation.llmPreprocess"]
+    reinforcesOutcomeIds: ["automation.llmPreprocess"]
+    runtimeTier: browser
+    checkSpecId: "lesson:regex/10_LLM전처리파이프라인:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:regex_10_LLM________:v1","retrieve:regex_10_LLM________:v2","retrieve:regex_10_LLM________:v3"]
+    transferVariantIds: ["transfer:regex_10_LLM________:near-v1","transfer:regex_10_LLM________:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

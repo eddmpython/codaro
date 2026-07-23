@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "pillow"
+canonicalRows: 11
+lessons:
+  - lessonRef: "pillow/00_Pillow소개"
+    identityLedgerRef: "identity-ledger/pillow.yml"
+    lessonContentHash: "fc6374035aee98d7ebdd0e5581088058c34354bfb5f33231b26913b61e112f31"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/11-image-processing"
+    eligiblePathIds: ["imageProcessing"]
+    outcomes: ["image.pillowBasics"]
+    prerequisites: ["python.modulesAndIo"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:pillow/00_Pillow소개:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:pillow_00_Pillow__:v1","retrieve:pillow_00_Pillow__:v2","retrieve:pillow_00_Pillow__:v3"]
+    transferVariantIds: ["transfer:pillow_00_Pillow__:near-v1","transfer:pillow_00_Pillow__:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pillow/01_꽃사진탐색기"
+    identityLedgerRef: "identity-ledger/pillow.yml"
+    lessonContentHash: "413aefea9cbdaf53cc0e51beefe611d246654e2aef7405ffc5081113d39af689"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/11-image-processing"
+    eligiblePathIds: ["imageProcessing"]
+    outcomes: ["image.pillowBasics"]
+    prerequisites: ["image.pillowBasics"]
+    reinforcesOutcomeIds: ["image.pillowBasics"]
+    runtimeTier: browser
+    checkSpecId: "lesson:pillow/01_꽃사진탐색기:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:pillow_01_______:v1","retrieve:pillow_01_______:v2","retrieve:pillow_01_______:v3"]
+    transferVariantIds: ["transfer:pillow_01_______:near-v1","transfer:pillow_01_______:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pillow/02_중국풍경편집기"
+    identityLedgerRef: "identity-ledger/pillow.yml"
+    lessonContentHash: "32d703d3b0396434700b8d06dc26671dda5918ff8e21f8a07e54b0ec7f1e4093"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/11-image-processing"
+    eligiblePathIds: ["imageProcessing"]
+    outcomes: ["image.pillowBasics"]
+    prerequisites: ["image.pillowBasics"]
+    reinforcesOutcomeIds: ["image.pillowBasics"]
+    runtimeTier: browser
+    checkSpecId: "lesson:pillow/02_중국풍경편집기:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:pillow_02________:v1","retrieve:pillow_02________:v2","retrieve:pillow_02________:v3"]
+    transferVariantIds: ["transfer:pillow_02________:near-v1","transfer:pillow_02________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pillow/03_흑백사진변환기"
+    identityLedgerRef: "identity-ledger/pillow.yml"
+    lessonContentHash: "11646590412555f550b4ed8747b230f96803328fc09f1667a54c86b25074f50d"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/11-image-processing"
+    eligiblePathIds: ["imageProcessing"]
+    outcomes: ["image.filters"]
+    prerequisites: ["image.pillowBasics"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:pillow/03_흑백사진변환기:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:pillow_03________:v1","retrieve:pillow_03________:v2","retrieve:pillow_03________:v3"]
+    transferVariantIds: ["transfer:pillow_03________:near-v1","transfer:pillow_03________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pillow/04_사진필터스튜디오"
+    identityLedgerRef: "identity-ledger/pillow.yml"
+    lessonContentHash: "50c950e46f3e2523e1b548ffbfd67cd512a9950f74c23fad1192b9a76f7a4c22"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/11-image-processing"
+    eligiblePathIds: ["imageProcessing"]
+    outcomes: ["image.filters"]
+    prerequisites: ["image.filters"]
+    reinforcesOutcomeIds: ["image.filters"]
+    runtimeTier: browser
+    checkSpecId: "lesson:pillow/04_사진필터스튜디오:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:pillow_04_________:v1","retrieve:pillow_04_________:v2","retrieve:pillow_04_________:v3"]
+    transferVariantIds: ["transfer:pillow_04_________:near-v1","transfer:pillow_04_________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pillow/05_밝기대비조절기"
+    identityLedgerRef: "identity-ledger/pillow.yml"
+    lessonContentHash: "933e018c9897a39f1b143512dcc5ea33558ff424c9e1faeaec37ed1fcdc19f3f"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/11-image-processing"
+    eligiblePathIds: ["imageProcessing"]
+    outcomes: ["image.filters"]
+    prerequisites: ["image.filters"]
+    reinforcesOutcomeIds: ["image.filters"]
+    runtimeTier: browser
+    checkSpecId: "lesson:pillow/05_밝기대비조절기:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:pillow_05________:v1","retrieve:pillow_05________:v2","retrieve:pillow_05________:v3"]
+    transferVariantIds: ["transfer:pillow_05________:near-v1","transfer:pillow_05________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pillow/06_RGB채널분석기"
+    identityLedgerRef: "identity-ledger/pillow.yml"
+    lessonContentHash: "ed524bbef5a3d59f4f1b5c6eb1ea7dfef7117f35f18895c6b66171ee0442abc5"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/11-image-processing"
+    eligiblePathIds: ["imageProcessing"]
+    outcomes: ["image.filters"]
+    prerequisites: ["image.filters"]
+    reinforcesOutcomeIds: ["image.filters"]
+    runtimeTier: browser
+    checkSpecId: "lesson:pillow/06_RGB채널분석기:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:pillow_06_RGB_____:v1","retrieve:pillow_06_RGB_____:v2","retrieve:pillow_06_RGB_____:v3"]
+    transferVariantIds: ["transfer:pillow_06_RGB_____:near-v1","transfer:pillow_06_RGB_____:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pillow/07_워터마크생성기"
+    identityLedgerRef: "identity-ledger/pillow.yml"
+    lessonContentHash: "a24cf67a8219416a0cd2517c9a63f486f06b5611dd72861dfecc65f335472aab"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/11-image-processing"
+    eligiblePathIds: ["imageProcessing"]
+    outcomes: ["image.composition"]
+    prerequisites: ["image.pillowBasics"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:pillow/07_워터마크생성기:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:pillow_07________:v1","retrieve:pillow_07________:v2","retrieve:pillow_07________:v3"]
+    transferVariantIds: ["transfer:pillow_07________:near-v1","transfer:pillow_07________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pillow/08_도형아트생성기"
+    identityLedgerRef: "identity-ledger/pillow.yml"
+    lessonContentHash: "241f0323985cc83d7e20c213a002a218b3988b83656894d80923541f95fb7e09"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/11-image-processing"
+    eligiblePathIds: ["imageProcessing"]
+    outcomes: ["image.composition"]
+    prerequisites: ["image.composition"]
+    reinforcesOutcomeIds: ["image.composition"]
+    runtimeTier: browser
+    checkSpecId: "lesson:pillow/08_도형아트생성기:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:pillow_08________:v1","retrieve:pillow_08________:v2","retrieve:pillow_08________:v3"]
+    transferVariantIds: ["transfer:pillow_08________:near-v1","transfer:pillow_08________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pillow/09_포토콜라주메이커"
+    identityLedgerRef: "identity-ledger/pillow.yml"
+    lessonContentHash: "eed73fc6ab8420acc482248be99453a3a6c8c25b218e12ee12460a5d73105e12"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/11-image-processing"
+    eligiblePathIds: ["imageProcessing"]
+    outcomes: ["image.composition"]
+    prerequisites: ["image.composition"]
+    reinforcesOutcomeIds: ["image.composition"]
+    runtimeTier: browser
+    checkSpecId: "lesson:pillow/09_포토콜라주메이커:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:pillow_09_________:v1","retrieve:pillow_09_________:v2","retrieve:pillow_09_________:v3"]
+    transferVariantIds: ["transfer:pillow_09_________:near-v1","transfer:pillow_09_________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "pillow/10_종합이미지에디터"
+    identityLedgerRef: "identity-ledger/pillow.yml"
+    lessonContentHash: "3ea0d86c4d31cce4072993398e29fec0b5783b10386d7eb429687bc548551819"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/11-image-processing"
+    eligiblePathIds: ["imageProcessing"]
+    outcomes: ["image.filters","image.composition"]
+    prerequisites: ["image.filters","image.composition"]
+    reinforcesOutcomeIds: ["image.filters","image.composition"]
+    runtimeTier: browser
+    checkSpecId: "lesson:pillow/10_종합이미지에디터:required:v1"
+    checkKinds: ["image","behavior"]
+    retrievalVariantIds: ["retrieve:pillow_10_________:v1","retrieve:pillow_10_________:v2","retrieve:pillow_10_________:v3"]
+    transferVariantIds: ["transfer:pillow_10_________:near-v1","transfer:pillow_10_________:far-v1"]
+    artifactDecision: rendered-image
+    visualDecision: required-result-and-encoding
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

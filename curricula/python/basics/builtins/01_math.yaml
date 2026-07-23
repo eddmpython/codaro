@@ -327,3 +327,236 @@ sections:
     type: noError
     noError: math 모듈 종합 복습에서 `sqrtValue` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: math 모듈 종합 복습 실행 뒤 `sqrtValue` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 01_math-circle-summary-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - basic_functions
+    - constants
+    - practice
+    title: 반지름으로 원 계산 요약 만들기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: math.pi와 math.tau를 사용해 반지름 하나에서 지름, 면적, 둘레를 안정적으로 반환한다.
+    why: 숫자가 출력되는지만 보면 계산식이 맞는지 알 수 없습니다. 여러 반지름에서 같은 계약이 성립해야 math 상수를 실제 계산에 쓸 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 반지름으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 부동소수점 값은 문제에서 요구한 자리수로 반올림하세요.
+    exercise:
+      prompt: build_circle_summary(radius)가 지름, 면적, 둘레를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        import math
+
+        def build_circle_summary(radius):
+            raise NotImplementedError
+      solution: |-
+        import math
+
+        def build_circle_summary(radius):
+            return {
+                "diameter": radius * 2,
+                "area": round(math.pi * radius ** 2, 2),
+                "circumference": round(math.tau * radius, 2),
+            }
+      hints:
+      - math.pi는 면적, math.tau는 둘레 계산에 바로 쓸 수 있습니다.
+      - 반환 key 이름이 계약과 정확히 같아야 합니다.
+    check:
+      id: python.builtins.math.circle-summary.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.math.circle-summary.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_circle_summary
+        cases:
+        - id: radius-three
+          arguments:
+          - value: 3
+          expectedReturn:
+            diameter: 6
+            area: 28.27
+            circumference: 18.85
+        - id: radius-half
+          arguments:
+          - value: 0.5
+          expectedReturn:
+            diameter: 1.0
+            area: 0.79
+            circumference: 3.14
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 01_math-distance-cost-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - 01_math-circle-summary-mastery
+    title: 거리 기반 배송 비용 계산하기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: math.hypot과 math.ceil을 조합해 좌표 거리와 청구 단위 비용을 계산한다.
+    why: 같은 수학 함수를 업무 규칙에 옮겨야 계산 예제를 실제 자동화 판단으로 바꿀 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 예시가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 거리 계산은 math.hypot으로 만들고 청구 단위는 math.ceil로 올림 처리하세요.
+    - cost는 올림된 단위 수와 단가의 곱입니다.
+    exercise:
+      prompt: shipping_distance_cost(x, y, unit_cost)가 거리, 청구 단위, 비용을 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        import math
+
+        def shipping_distance_cost(x, y, unit_cost):
+            raise NotImplementedError
+      solution: |-
+        import math
+
+        def shipping_distance_cost(x, y, unit_cost):
+            distance = math.hypot(x, y)
+            billable_units = math.ceil(distance)
+            return {
+                "distance": round(distance, 2),
+                "billableUnits": billable_units,
+                "cost": billable_units * unit_cost,
+            }
+      hints:
+      - math.hypot(3, 4)는 5.0을 반환합니다.
+      - 반환 key 이름과 대소문자가 검사 계약과 같아야 합니다.
+    check:
+      id: python.builtins.math.distance-cost.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.math.distance-cost.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: shipping_distance_cost
+        cases:
+        - id: five-units
+          arguments:
+          - value: 3
+          - value: 4
+          - value: 1200
+          expectedReturn:
+            distance: 5.0
+            billableUnits: 5
+            cost: 6000
+        - id: thirteen-units
+          arguments:
+          - value: 5
+          - value: 12
+          - value: 750
+          expectedReturn:
+            distance: 13.0
+            billableUnits: 13
+            cost: 9750
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 01_math-safe-log-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 01_math-distance-cost-transfer
+    title: 로그 입력 조건 다시 구성하기
+    subtitle: 하루 뒤 기억에서 재구성
+    goal: math.log의 입력 제약을 기억에서 복원하고 잘못된 값은 ValueError로 거부한다.
+    why: 로그 함수는 정상 예시만 보면 위험한 입력 조건을 놓치기 쉽습니다. 시간이 지난 뒤에도 domain error를 스스로 막아야 실무 계산에 쓸 수 있습니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - value와 base는 양수여야 하고 base는 1이면 안 됩니다.
+    - 정상 결과는 소수점 넷째 자리까지 반올림하세요.
+    exercise:
+      prompt: safe_log_scale(value, base)가 유효한 로그값을 반환하고 잘못된 입력은 ValueError를 일으키도록 완성하세요.
+      starterCode: |-
+        import math
+
+        def safe_log_scale(value, base):
+            raise NotImplementedError
+      solution: |-
+        import math
+
+        def safe_log_scale(value, base):
+            if value <= 0 or base <= 0 or base == 1:
+                raise ValueError("log input must be positive and base cannot be 1")
+            return round(math.log(value, base), 4)
+      hints:
+      - math.log(value, base)는 밑을 지정할 수 있습니다.
+      - 잘못된 입력을 조용히 0으로 바꾸면 검증이 통과하지 않습니다.
+    check:
+      id: python.builtins.math.safe-log.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.math.safe-log.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: safe_log_scale
+        cases:
+        - id: powers-of-two
+          arguments:
+          - value: 8
+          - value: 2
+          expectedReturn: 3.0
+        - id: powers-of-ten
+          arguments:
+          - value: 100
+          - value: 10
+          expectedReturn: 2.0
+        - id: rejects-negative
+          arguments:
+          - value: -1
+          - value: 10
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

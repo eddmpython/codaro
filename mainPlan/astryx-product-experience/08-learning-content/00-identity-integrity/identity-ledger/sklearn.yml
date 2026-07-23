@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "sklearn"
+sourceCount: 11
+lessons:
+  - lessonRef: "sklearn/00_sklearn소개"
+    sourcePath: "curricula/python/mathStatsMl/sklearn/00_sklearn소개.yaml"
+    metaId: "sklearn_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "sklearn/01_와인품질분류"
+    sourcePath: "curricula/python/mathStatsMl/sklearn/01_와인품질분류.yaml"
+    metaId: "sklearn_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "sklearn/02_유방암진단"
+    sourcePath: "curricula/python/mathStatsMl/sklearn/02_유방암진단.yaml"
+    metaId: "sklearn_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "sklearn/03_당뇨병진행도예측"
+    sourcePath: "curricula/python/mathStatsMl/sklearn/03_당뇨병진행도예측.yaml"
+    metaId: "sklearn_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "sklearn/04_주택가격예측"
+    sourcePath: "curricula/python/mathStatsMl/sklearn/04_주택가격예측.yaml"
+    metaId: "sklearn_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "sklearn/05_손글씨숫자인식"
+    sourcePath: "curricula/python/mathStatsMl/sklearn/05_손글씨숫자인식.yaml"
+    metaId: "sklearn_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "sklearn/06_고객세분화"
+    sourcePath: "curricula/python/mathStatsMl/sklearn/06_고객세분화.yaml"
+    metaId: "sklearn_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "sklearn/07_소나신호분류"
+    sourcePath: "curricula/python/mathStatsMl/sklearn/07_소나신호분류.yaml"
+    metaId: "sklearn_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "sklearn/08_심장병예측"
+    sourcePath: "curricula/python/mathStatsMl/sklearn/08_심장병예측.yaml"
+    metaId: "sklearn_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "sklearn/09_신호탐지최적화"
+    sourcePath: "curricula/python/mathStatsMl/sklearn/09_신호탐지최적화.yaml"
+    metaId: "sklearn_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "sklearn/10_종합ML파이프라인"
+    sourcePath: "curricula/python/mathStatsMl/sklearn/10_종합ML파이프라인.yaml"
+    metaId: "sklearn_10"
+    registryStatus: registered
+    reviewStatus: pending

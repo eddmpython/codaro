@@ -1,19 +1,28 @@
 from __future__ import annotations
 
 import json
+import subprocess
 import sys
+import time
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[2]
 MINIMUM_SCORE = 9
+REPORT_PATH = ROOT / "output" / "test-runner" / "product-quality-audit" / "product-quality-report.json"
 PRODUCT_QUALITY_GATES = (
     "root-clean",
     "docs",
     "backend",
     "architecture-boundary",
+    "design-system-contract",
+    "visual-assets",
+    "learning-method",
+    "learning-evidence-contract",
+    "learning-efficacy-report",
     "learning-system-readiness",
     "dogfood-alpha-audit",
     "product-quality-audit",
@@ -32,6 +41,10 @@ PRODUCT_QUALITY_GATES = (
     "curriculum-top-tier-audit",
     "playwright-curriculum-runtime",
     "onboarding-browser",
+    "web-learning",
+    "landing-public",
+    "local-studio-browser",
+    "product-experience-browser",
     "frontend-performance-budget",
     "landing-build",
     "launcher-test",
@@ -589,7 +602,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
         requirementId="frontend-performance-budget",
         requirement="Editor and landing bundle splitting are enforced after build without forcing React into a circular split.",
         evidenceChecks=(
-            ("editor/vite.config.ts", ("manualChunks", "@codemirror", "yaml", "vendor")),
+            ("editor/vite.config.ts", ("rolldownOptions", "codeSplitting", "@codemirror", "yaml", "vendor")),
             ("docs/skills/ops/product/service-candidate.md", ("React와 일반 vendor를 억지로 나눠 순환 chunk를 만들지 않는다",)),
             ("docs/skills/ops/product/service-candidate.md", ("docsPages/page*.js", "nav chunk")),
             ("docs/skills/ops/product/service-candidate.md", ("output/test-runner/frontend-performance-budget/performance-report.json", "gitHead")),
@@ -698,7 +711,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "frontendNoticeCovered",
                 "onboardingExportCovered",
             )),
-            ("editor/src/lib/api.ts", (
+            ("editor/src/lib/api/systemApi.ts", (
                 "systemDiagnostics",
                 "/api/system/diagnostics",
                 "systemDiagnosticsExport",
@@ -732,7 +745,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "시작 진단 필요",
                 "진단 복사",
             )),
-            ("editor/src/types.ts", (
+            ("editor/src/types/system.ts", (
                 "DiagnosticSummary",
                 "DiagnosticExportPayload",
                 "\"provider\" | \"runtime\" | \"package\" | \"frontend\"",
@@ -948,13 +961,25 @@ PRODUCT_QUALITY_REQUIREMENTS = (
 
 
 def main() -> int:
+    startedAt = datetime.now(UTC).isoformat(timespec="seconds")
+    started = time.monotonic()
     results = tuple(requirement.evaluate() for requirement in PRODUCT_QUALITY_REQUIREMENTS)
     payload = buildAuditPayload(results)
+    payload.update({
+        "status": "passed" if payload["passed"] else "failed",
+        "gitHead": currentGitHead(),
+        "startedAt": startedAt,
+        "completedAt": datetime.now(UTC).isoformat(timespec="seconds"),
+        "durationMs": round((time.monotonic() - started) * 1000),
+        "reportPath": str(REPORT_PATH.relative_to(ROOT)).replace("\\", "/"),
+    })
+    REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    REPORT_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(payload, ensure_ascii=False, indent=2))
     if payload["requirementFailures"]:
         print("FAIL: product quality audit requirements are incomplete", file=sys.stderr)
         return 1
-    print(f"ok: product quality audit score {payload['score']}/{payload['maxScore']}")
+    print(f"ok: product quality wiring coverage {payload['score']}/{payload['maxScore']}")
     return 0
 
 
@@ -975,12 +1000,30 @@ def buildAuditPayload(results: tuple[dict[str, Any], ...]) -> dict[str, Any]:
         "gate": "product-quality-audit",
         "score": score,
         "maxScore": 10,
+        "scoreKind": "wiring-coverage",
         "minimumScore": MINIMUM_SCORE,
         "requiredScore": MINIMUM_SCORE,
         "passed": not requirementFailures,
+        "completionEligible": False,
+        "productQualityScore": None,
         "requirements": results,
         "requirementFailures": requirementFailures,
     }
+
+
+def currentGitHead() -> str | None:
+    try:
+        result = subprocess.run(
+            ("git", "rev-parse", "HEAD"),
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=True,
+        )
+    except (FileNotFoundError, OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        return None
+    return result.stdout.strip() or None
 
 
 def fileNeedleReport(relPath: str, needles: tuple[str, ...]) -> tuple[list[str], list[str]]:

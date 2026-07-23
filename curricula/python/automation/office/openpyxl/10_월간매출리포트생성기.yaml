@@ -8,6 +8,9 @@ meta:
   packages:
   - openpyxl
   - pandas
+  outcomes: ["automation.excel.report"]
+  prerequisites: ["automation.excel.workbook","automation.excel.formulas","automation.excel.styles","automation.excel.conditional","automation.excel.charts","automation.excel.tables"]
+  estimatedMinutes: 90
   tags:
   - openpyxl
   - 리포트
@@ -701,3 +704,408 @@ sections:
   - type: text
     content: |-
       이 함수의 호출 인터페이스(path, frame)를 그대로 두면, 매월 다른 데이터로 같은 보고서를 자동으로 만들 수 있습니다. 다음 단계는 이 함수를 스케줄러나 메일 자동화에 붙이는 것입니다 - 그건 자동화 카테고리의 다른 강의에서 다룹니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: openpyxl_10-monthly-sales-report-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_input_contract
+    - summary
+    title: 월간 매출 workbook의 원천·요약·chart·formula reconciliation 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 원천 합계와 요약 합계, 월 coverage, 필수 artifact를 함께 판정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 요약 sheet 총합을 원천 row에서 월별로 다시 계산하고 같은 판정을 JSON audit에 보존하세요.
+    - 실제 xlsx 졸업 증거와 Web의 reconciliation table을 혼동하지 마세요.
+    exercise:
+      prompt: audit_monthly_sales_report(source_rows, summary_rows, artifact_manifest, required_months, output_path)를 완성해
+        reconciliation 결과를 반환하고, output_path에는 같은 결과를 한 행짜리 JSON table로 저장하세요.
+      starterCode: |-
+        def audit_monthly_sales_report(source_rows, summary_rows, artifact_manifest, required_months, output_path=None):
+            raise NotImplementedError
+      solution: |
+        import json
+        from pathlib import Path
+
+
+        def audit_monthly_sales_report(source_rows, summary_rows, artifact_manifest, required_months, output_path=None):
+            source_totals = {}
+            for row in source_rows:
+                source_totals[row["month"]] = source_totals.get(row["month"], 0) + row["amount"]
+            summary_totals = {row["month"]: row["amount"] for row in summary_rows}
+            missing_months = sorted(set(required_months) - set(summary_totals))
+            mismatches = sorted(month for month in set(source_totals) | set(summary_totals) if source_totals.get(month, 0) != summary_totals.get(month, 0))
+            required_artifacts = {"RawTable", "SummaryTable", "MonthlyChart", "TotalFormula"}
+            missing_artifacts = sorted(required_artifacts - set(artifact_manifest))
+            failures = []
+            if missing_months:
+                failures.append("month-coverage")
+            if mismatches:
+                failures.append("totals")
+            if missing_artifacts:
+                failures.append("artifacts")
+            result = {"passed": not failures, "failures": failures, "missingMonths": missing_months, "mismatchedMonths": mismatches, "missingArtifacts": missing_artifacts, "sourceGrandTotal": sum(source_totals.values()), "summaryGrandTotal": sum(summary_totals.values())}
+            unexpected_months = set(summary_totals) - set(required_months)
+            default_path = "output/reconciled-report.json" if result["passed"] else "output/unexpected-month-report.json" if unexpected_months else "output/gap-report.json"
+            target = Path(output_path or default_path)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(json.dumps([result], ensure_ascii=False, sort_keys=True, indent=2), encoding="utf-8")
+            return result
+      hints: *id001
+    check:
+      id: python.openpyxl.openpyxl_10.monthly-sales-report.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_10.monthly-sales-report.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_monthly_sales_report
+        cases:
+        - id: accepts-reconciled-two-month-report
+          arguments:
+          - value:
+            - month: 2026-01
+              amount: 10
+            - month: 2026-01
+              amount: 5
+            - month: 2026-02
+              amount: 20
+          - value:
+            - month: 2026-01
+              amount: 15
+            - month: 2026-02
+              amount: 20
+          - value:
+            - RawTable
+            - SummaryTable
+            - MonthlyChart
+            - TotalFormula
+          - value:
+            - 2026-01
+            - 2026-02
+          - value: output/reconciled-report.json
+          expectedReturn:
+            passed: true
+            failures: []
+            missingMonths: []
+            mismatchedMonths: []
+            missingArtifacts: []
+            sourceGrandTotal: 35
+            summaryGrandTotal: 35
+        - id: reports-month-total-and-artifact-gaps
+          arguments:
+          - value:
+            - month: 2026-01
+              amount: 10
+          - value:
+            - month: 2026-01
+              amount: 9
+          - value:
+            - RawTable
+          - value:
+            - 2026-01
+            - 2026-02
+          - value: output/gap-report.json
+          expectedReturn:
+            passed: false
+            failures:
+            - month-coverage
+            - totals
+            - artifacts
+            missingMonths:
+            - 2026-02
+            mismatchedMonths:
+            - 2026-01
+            missingArtifacts:
+            - MonthlyChart
+            - SummaryTable
+            - TotalFormula
+            sourceGrandTotal: 10
+            summaryGrandTotal: 9
+        - id: reports-unexpected-summary-month-total
+          arguments:
+          - value: []
+          - value:
+            - month: 2026-03
+              amount: 1
+          - value:
+            - RawTable
+            - SummaryTable
+            - MonthlyChart
+            - TotalFormula
+          - value: []
+          - value: output/unexpected-month-report.json
+          expectedReturn:
+            passed: false
+            failures:
+            - totals
+            missingMonths: []
+            mismatchedMonths:
+            - 2026-03
+            missingArtifacts: []
+            sourceGrandTotal: 0
+            summaryGrandTotal: 1
+        expectedPaths:
+        - path: output/reconciled-report.json
+          kind: table
+          origin: created
+          format: json
+          columns:
+          - failures
+          - mismatchedMonths
+          - missingArtifacts
+          - missingMonths
+          - passed
+          - sourceGrandTotal
+          - summaryGrandTotal
+        - path: output/gap-report.json
+          kind: table
+          origin: created
+          format: json
+          columns:
+          - failures
+          - mismatchedMonths
+          - missingArtifacts
+          - missingMonths
+          - passed
+          - sourceGrandTotal
+          - summaryGrandTotal
+        - path: output/unexpected-month-report.json
+          kind: table
+          origin: created
+          format: json
+          columns:
+          - failures
+          - mismatchedMonths
+          - missingArtifacts
+          - missingMonths
+          - passed
+          - sourceGrandTotal
+          - summaryGrandTotal
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: openpyxl_10-monthly-report-release-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - openpyxl_10-monthly-sales-report-mastery
+    title: 새 월간 workbook의 재개방·idempotency release gate 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 같은 source hash에서 두 번 생성한 workbook의 business·structure hash를 비교한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 source에서 반복 생성한 workbook과 business hash를 비교하세요.
+    - 각 run은 저장 후 재개방과 업무 reconciliation을 모두 통과해야 합니다.
+    exercise:
+      prompt: decide_monthly_report_release(runs, current_source_hash)를 완성하세요.
+      starterCode: |-
+        def decide_monthly_report_release(runs, current_source_hash):
+            raise NotImplementedError
+      solution: |
+        def decide_monthly_report_release(runs, current_source_hash):
+            current = [run for run in runs if run["sourceHash"] == current_source_hash]
+            stale = sorted(run["id"] for run in runs if run["sourceHash"] != current_source_hash)
+            failures = []
+            if len(current) < 2:
+                failures.append("repeat-evidence")
+            if any(not run.get("reopened", False) or not run.get("businessPassed", False) for run in current):
+                failures.append("verification")
+            workbook_hashes = {run["workbookHash"] for run in current}
+            business_hashes = {run["businessHash"] for run in current}
+            if len(workbook_hashes) != 1 or len(business_hashes) != 1:
+                failures.append("determinism")
+            return {"releaseReady": not failures and not stale, "failures": failures, "staleRuns": stale, "currentRunCount": len(current)}
+      hints: *id002
+    check:
+      id: python.openpyxl.openpyxl_10.monthly-report-release.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_10.monthly-report-release.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: decide_monthly_report_release
+        cases:
+        - id: accepts-two-current-deterministic-runs
+          arguments:
+          - value:
+            - id: a
+              sourceHash: s
+              reopened: true
+              businessPassed: true
+              workbookHash: w
+              businessHash: b
+            - id: b
+              sourceHash: s
+              reopened: true
+              businessPassed: true
+              workbookHash: w
+              businessHash: b
+          - value: s
+          expectedReturn:
+            releaseReady: true
+            failures: []
+            staleRuns: []
+            currentRunCount: 2
+        - id: reports-single-unverified-run
+          arguments:
+          - value:
+            - id: a
+              sourceHash: s
+              reopened: false
+              businessPassed: false
+              workbookHash: w
+              businessHash: b
+          - value: s
+          expectedReturn:
+            releaseReady: false
+            failures:
+            - repeat-evidence
+            - verification
+            staleRuns: []
+            currentRunCount: 1
+        - id: reports-nondeterministic-and-stale
+          arguments:
+          - value:
+            - id: old
+              sourceHash: old
+              reopened: true
+              businessPassed: true
+              workbookHash: w
+              businessHash: b
+            - id: a
+              sourceHash: s
+              reopened: true
+              businessPassed: true
+              workbookHash: w1
+              businessHash: b
+            - id: b
+              sourceHash: s
+              reopened: true
+              businessPassed: true
+              workbookHash: w2
+              businessHash: b
+          - value: s
+          expectedReturn:
+            releaseReady: false
+            failures:
+            - determinism
+            staleRuns:
+            - old
+            currentRunCount: 2
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: openpyxl_10-monthly-sales-capstone-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - openpyxl_10-monthly-report-release-transfer
+    title: 월간 매출 workbook 종료 조건 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 원천·요약·artifact·재개방·반복 생성 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Workbook 저장 성공과 업무 값·수식·표시의 정확성을 분리해 검증하세요.
+    - Web에서는 문서 계약을 검증하고 Local에서는 재개방한 artifact evidence를 남기세요.
+    exercise:
+      prompt: choose_monthly_report_gate(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_monthly_report_gate(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_monthly_report_gate(situation):
+            table = {'business': {'action': 'recompute monthly totals from source', 'evidence': 'month and grand-total reconciliation', 'risk': 'wrong summary'}, 'artifact': {'action': 'reopen tables formulas and chart', 'evidence': 'workbook manifest', 'risk': 'valid but incomplete xlsx'}, 'release': {'action': 'repeat with same source hash', 'evidence': 'deterministic workbook and business hashes', 'risk': 'non-idempotent report'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.openpyxl.openpyxl_10.monthly-sales-capstone-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.openpyxl.openpyxl_10.monthly-sales-capstone-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_monthly_report_gate
+        cases:
+        - id: recalls-business
+          arguments:
+          - value: business
+          expectedReturn:
+            action: recompute monthly totals from source
+            evidence: month and grand-total reconciliation
+            risk: wrong summary
+        - id: recalls-artifact
+          arguments:
+          - value: artifact
+          expectedReturn:
+            action: reopen tables formulas and chart
+            evidence: workbook manifest
+            risk: valid but incomplete xlsx
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

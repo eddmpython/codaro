@@ -1,8 +1,7 @@
 """Misconception Catalog — outcome 별 학습자 오개념 사전.
 
-학습자의 코드/에러/예측 결과를 카탈로그 trigger와 매칭해 misconception을 식별한다.
-catalog 본문은 사람이 정제하지만, schema와 loader는 결정적이다. Predict-Run-Reconcile-Adapt
-루프(`docs/skills/architecture/teacher-tool-loop.md`)의 1단계 입력이다.
+학습자의 제출 코드와 실행 에러를 카탈로그 trigger와 매칭해 misconception을 식별한다.
+catalog 본문은 사람이 정제하지만, schema와 loader는 결정적이다.
 
 저장 위치: `curricula/_misconceptions/<outcomeId>.yml`.
 """
@@ -15,11 +14,8 @@ from typing import Iterable, Literal
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from .predictionDiff import PredictionDiff
-
-
-TriggerKind = Literal["codePattern", "errorPattern", "predictionMismatch"]
-TriggerScope = Literal["code", "error", "prediction"]
+TriggerKind = Literal["codePattern", "errorPattern"]
+TriggerScope = Literal["code", "error"]
 CatalogStatus = Literal["draft", "reviewed", "approved"]
 
 
@@ -28,19 +24,15 @@ class MisconceptionTrigger(BaseModel):
 
     - codePattern: 학습자 제출 코드에 대한 정규식.
     - errorPattern: 실행 시 발생한 traceback/메시지에 대한 정규식.
-    - predictionMismatch: 학습자가 적은 예측과 실제 결과가 다른 방식.
-      `expectedField`("value"|"shape"|"dtype"|"errorClass") + 선택적 `mismatchPattern` 정규식.
     """
     model_config = ConfigDict(extra="forbid")
 
     kind: TriggerKind
     appliesTo: TriggerScope
     pattern: str | None = None
-    expectedField: str | None = None
-    mismatchPattern: str | None = None
     description: str = ""
 
-    @field_validator("pattern", "mismatchPattern")
+    @field_validator("pattern")
     @classmethod
     def _validateRegex(cls, value: str | None) -> str | None:
         if value is None:
@@ -63,11 +55,6 @@ class MisconceptionTrigger(BaseModel):
                 errors.append(f"errorPattern trigger must appliesTo=error, got {self.appliesTo}")
             if not self.pattern:
                 errors.append("errorPattern trigger requires 'pattern'")
-        elif self.kind == "predictionMismatch":
-            if self.appliesTo != "prediction":
-                errors.append(f"predictionMismatch trigger must appliesTo=prediction, got {self.appliesTo}")
-            if not self.expectedField:
-                errors.append("predictionMismatch trigger requires 'expectedField'")
         return errors
 
 
@@ -213,45 +200,11 @@ def matchErrorPattern(catalog: MisconceptionCatalog, errorText: str) -> list[Mis
     return hits
 
 
-_PREDICTION_FIELD_ALIASES = {"errorClass": "error"}
-
-
-def matchPredictionMismatch(
-    catalog: MisconceptionCatalog, diff: PredictionDiff
-) -> list[MisconceptionEntry]:
-    """예측-실측 diff에 대해 predictionMismatch trigger를 매칭한다.
-
-    예외 없이 틀리는(noError 통과) silent 오개념 — 학습자가 예측을 잠갔는데
-    어긋난 차원이 트리거의 expectedField와 일치하면 발화한다. mismatchPattern이
-    있으면 실측 값(actual)에도 매칭돼야 한다.
-    """
-    fieldByName = {field.field: field for field in diff.fields}
-    hits: list[MisconceptionEntry] = []
-    for entry in catalog.misconceptions:
-        for trigger in entry.triggers:
-            if trigger.kind != "predictionMismatch" or not trigger.expectedField:
-                continue
-            fieldName = _PREDICTION_FIELD_ALIASES.get(
-                trigger.expectedField, trigger.expectedField
-            )
-            field = fieldByName.get(fieldName)
-            if field is None or field.status != "mismatch":
-                continue
-            if trigger.mismatchPattern and not re.search(
-                trigger.mismatchPattern, field.actual
-            ):
-                continue
-            hits.append(entry)
-            break
-    return hits
-
-
 def matchOutcomes(
     outcomeIds: Iterable[str],
     *,
     code: str = "",
     errorText: str = "",
-    predictionDiff: PredictionDiff | None = None,
     catalogDir: Path | None = None,
 ) -> list[tuple[str, MisconceptionEntry]]:
     """outcomeId 목록에 대해 catalog를 로드해 code/error에서 misconception을 매칭한다.
@@ -275,8 +228,6 @@ def matchOutcomes(
             candidates.extend(matchCodePattern(catalog, code))
         if errorText:
             candidates.extend(matchErrorPattern(catalog, errorText))
-        if predictionDiff is not None:
-            candidates.extend(matchPredictionMismatch(catalog, predictionDiff))
         for entry in candidates:
             if entry.id in seen:
                 continue

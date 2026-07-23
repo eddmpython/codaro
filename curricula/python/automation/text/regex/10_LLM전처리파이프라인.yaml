@@ -770,3 +770,319 @@ sections:
     type: noError
     noError: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인의 정규식 패턴이 컴파일되고 입력 텍스트가 매치 단계까지 도달해야 합니다.'
     resultCheck: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인 결과의 추출 개수와 매치 문자열이 본문 기대값과 같아야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: regex_10-llm-chunk-provenance-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: LLM 입력 chunk에 원문 provenance와 겹침 계약 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: token 목록을 고정 크기·겹침으로 나누고 source span을 보존한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - chunk 본문만 저장하지 말고 source ID와 token start/end를 함께 보존하세요.
+    - overlap이 size 이상이면 진행하지 못하므로 계약 단계에서 거부하세요.
+    exercise:
+      prompt: chunk_tokens(tokens, size, overlap, source_id)를 완성하세요.
+      starterCode: |-
+        def chunk_tokens(tokens, size, overlap, source_id):
+            raise NotImplementedError
+      solution: |
+        def chunk_tokens(tokens, size, overlap, source_id):
+            if size <= 0 or overlap < 0 or overlap >= size:
+                raise ValueError("invalid chunk contract")
+            step = size - overlap
+            chunks = []
+            for start in range(0, len(tokens), step):
+                values = tokens[start : start + size]
+                if not values:
+                    break
+                chunks.append({"id": f"{source_id}:{start}-{start + len(values)}", "sourceId": source_id, "start": start, "end": start + len(values), "tokens": values})
+                if start + size >= len(tokens):
+                    break
+            return chunks
+      hints: *id001
+    check:
+      id: python.regex.regex_10.llm-chunk-provenance.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_10.llm-chunk-provenance.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: chunk_tokens
+        cases:
+        - id: chunks-with-overlap
+          arguments:
+          - value:
+            - a
+            - b
+            - c
+            - d
+            - e
+          - value: 3
+          - value: 1
+          - value: doc
+          expectedReturn:
+          - id: doc:0-3
+            sourceId: doc
+            start: 0
+            end: 3
+            tokens:
+            - a
+            - b
+            - c
+          - id: doc:2-5
+            sourceId: doc
+            start: 2
+            end: 5
+            tokens:
+            - c
+            - d
+            - e
+        - id: handles-short-document
+          arguments:
+          - value:
+            - a
+          - value: 3
+          - value: 0
+          - value: one
+          expectedReturn:
+          - id: one:0-1
+            sourceId: one
+            start: 0
+            end: 1
+            tokens:
+            - a
+        - id: handles-empty-document
+          arguments:
+          - value: []
+          - value: 3
+          - value: 1
+          - value: empty
+          expectedReturn: []
+        - id: rejects-overlap-equal-size
+          arguments:
+          - value:
+            - a
+          - value: 2
+          - value: 2
+          - value: doc
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: regex_10-llm-preprocessing-release-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_10-llm-chunk-provenance-mastery
+    title: 새 LLM 전처리 산출물에 release 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: PII 잔존, 빈 chunk, provenance 누락, prompt injection flag를 검사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 전처리된 text가 깨끗해 보여도 source span과 PII scan 결과를 검사하세요.
+    - 문서 안의 지시문을 시스템 instruction으로 승격하지 않도록 별도 flag를 남기세요.
+    exercise:
+      prompt: audit_llm_chunks(chunks)를 완성하세요.
+      starterCode: |-
+        def audit_llm_chunks(chunks):
+            raise NotImplementedError
+      solution: |
+        def audit_llm_chunks(chunks):
+            failures = []
+            pii = sorted(chunk["id"] for chunk in chunks if chunk.get("piiFindings", 0) > 0)
+            empty = sorted(chunk["id"] for chunk in chunks if not chunk.get("text", "").strip())
+            missing_provenance = sorted(chunk.get("id", "<missing>") for chunk in chunks if not chunk.get("sourceId") or "start" not in chunk or "end" not in chunk)
+            injections = sorted(chunk["id"] for chunk in chunks if chunk.get("instructionLike", False))
+            if pii:
+                failures.append("pii")
+            if empty:
+                failures.append("empty")
+            if missing_provenance:
+                failures.append("provenance")
+            if injections:
+                failures.append("instruction-boundary")
+            return {"releaseReady": not failures, "failures": failures, "pii": pii, "empty": empty, "missingProvenance": missing_provenance, "instructionLike": injections}
+      hints: *id002
+    check:
+      id: python.regex.regex_10.llm-preprocessing-release-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_10.llm-preprocessing-release-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_llm_chunks
+        cases:
+        - id: accepts-clean-provenanced-chunk
+          arguments:
+          - value:
+            - id: a:0-2
+              sourceId: a
+              start: 0
+              end: 2
+              text: safe
+              piiFindings: 0
+              instructionLike: false
+          expectedReturn:
+            releaseReady: true
+            failures: []
+            pii: []
+            empty: []
+            missingProvenance: []
+            instructionLike: []
+        - id: reports-pii-empty-and-injection
+          arguments:
+          - value:
+            - id: bad
+              sourceId: a
+              start: 0
+              end: 0
+              text: ' '
+              piiFindings: 2
+              instructionLike: true
+          expectedReturn:
+            releaseReady: false
+            failures:
+            - pii
+            - empty
+            - instruction-boundary
+            pii:
+            - bad
+            empty:
+            - bad
+            missingProvenance: []
+            instructionLike:
+            - bad
+        - id: reports-missing-provenance
+          arguments:
+          - value:
+            - id: x
+              text: content
+          expectedReturn:
+            releaseReady: false
+            failures:
+            - provenance
+            pii: []
+            empty: []
+            missingProvenance:
+            - x
+            instructionLike: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: regex_10-llm-preprocessing-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_10-llm-preprocessing-release-audit-transfer
+    title: LLM 전처리 pipeline 종료 조건 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 정제·chunk·안전·provenance evidence를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - match 수만 보지 말고 정규화 뒤 보존된 의미와 거부된 입력을 함께 확인하세요.
+    - regex가 아닌 전용 parser가 필요한 구조에서는 경계를 명시하세요.
+    exercise:
+      prompt: choose_llm_preprocessing_gate(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_llm_preprocessing_gate(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_llm_preprocessing_gate(situation):
+            table = {'clean': {'action': 'normalize and mask before chunking', 'evidence': 'transformation counts', 'risk': 'PII residual'}, 'chunk': {'action': 'preserve source token spans', 'evidence': 'source-bound chunk IDs', 'risk': 'lost citation'}, 'release': {'action': 'audit PII empty and instruction boundary', 'evidence': 'zero blocking findings', 'risk': 'prompt injection'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.regex.regex_10.llm-preprocessing-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_10.llm-preprocessing-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_llm_preprocessing_gate
+        cases:
+        - id: recalls-clean
+          arguments:
+          - value: clean
+          expectedReturn:
+            action: normalize and mask before chunking
+            evidence: transformation counts
+            risk: PII residual
+        - id: recalls-chunk
+          arguments:
+          - value: chunk
+          expectedReturn:
+            action: preserve source token spans
+            evidence: source-bound chunk IDs
+            risk: lost citation
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

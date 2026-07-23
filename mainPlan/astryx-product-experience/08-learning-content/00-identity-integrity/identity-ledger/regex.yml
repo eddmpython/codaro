@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "regex"
+sourceCount: 11
+lessons:
+  - lessonRef: "regex/00_정규표현식소개"
+    sourcePath: "curricula/python/automation/text/regex/00_정규표현식소개.yaml"
+    metaId: "regex_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "regex/01_이메일주소추출"
+    sourcePath: "curricula/python/automation/text/regex/01_이메일주소추출.yaml"
+    metaId: "regex_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "regex/02_전화번호형식통일"
+    sourcePath: "curricula/python/automation/text/regex/02_전화번호형식통일.yaml"
+    metaId: "regex_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "regex/03_URL구조분해"
+    sourcePath: "curricula/python/automation/text/regex/03_URL구조분해.yaml"
+    metaId: "regex_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "regex/04_HTML태그제거"
+    sourcePath: "curricula/python/automation/text/regex/04_HTML태그제거.yaml"
+    metaId: "regex_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "regex/05_로그파일분석"
+    sourcePath: "curricula/python/automation/text/regex/05_로그파일분석.yaml"
+    metaId: "regex_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "regex/06_날짜형식변환"
+    sourcePath: "curricula/python/automation/text/regex/06_날짜형식변환.yaml"
+    metaId: "regex_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "regex/07_개인정보마스킹"
+    sourcePath: "curricula/python/automation/text/regex/07_개인정보마스킹.yaml"
+    metaId: "regex_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "regex/08_텍스트정제토큰화"
+    sourcePath: "curricula/python/automation/text/regex/08_텍스트정제토큰화.yaml"
+    metaId: "regex_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "regex/09_고급패턴매칭"
+    sourcePath: "curricula/python/automation/text/regex/09_고급패턴매칭.yaml"
+    metaId: "regex_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "regex/10_LLM전처리파이프라인"
+    sourcePath: "curricula/python/automation/text/regex/10_LLM전처리파이프라인.yaml"
+    metaId: "regex_10"
+    registryStatus: registered
+    reviewStatus: pending

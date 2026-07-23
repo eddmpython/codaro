@@ -490,3 +490,382 @@ sections:
     type: noError
     noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 11_advanced_typing-repository-contract-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - generic_class
+    - typevar
+    - protocol_typing
+    - workflow_validation
+    title: Generic 저장소와 Callable 필터로 주문 조회 계약 검증하기
+    subtitle: typed repository behavior
+    goal: 주문 record 목록과 status를 받아 Generic repository, Protocol key 계약, Callable 필터가 만든 결과를 반환한다.
+    why: 타입 힌트는 런타임을 대신하지 않으므로, 타입으로 표현한 계약과 실행 검증이 같은 규칙을 말하는지 확인해야 합니다.
+    explanation: run_typed_order_repository(records, status)를 완성해 key가 있는 record만 저장하고, status 필터와 overload get의 fallback
+      흐름을 검증하세요.
+    tips:
+    - Repository의 TypeVar는 key()를 가진 객체로 제한하세요.
+    - Callable이 아닌 predicate는 TypeError로 막아야 합니다.
+    exercise:
+      prompt: run_typed_order_repository(records, status)를 완성해 keys, pickedIds, fallbackStatus, predicateRejected를 반환하세요.
+      starterCode: |-
+        def run_typed_order_repository(records, status):
+            raise NotImplementedError
+      solution: |-
+        def run_typed_order_repository(records, status):
+            from typing import Callable, Generic, Protocol, TypeVar, overload
+
+            class HasKey(Protocol):
+                def key(self) -> str:
+                    ...
+
+            T = TypeVar("T", bound=HasKey)
+
+            class Repository(Generic[T]):
+                def __init__(self):
+                    self._items: dict[str, T] = {}
+
+                def add(self, item: T) -> None:
+                    self._items[item.key()] = item
+
+                def all(self) -> list[T]:
+                    return list(self._items.values())
+
+                @overload
+                def get(self, key: str) -> T | None:
+                    ...
+
+                @overload
+                def get(self, key: str, default: T) -> T:
+                    ...
+
+                def get(self, key: str, default: T | None = None) -> T | None:
+                    return self._items.get(key, default)
+
+            class OrderRecord:
+                def __init__(self, order_id: str, amount: int, status: str):
+                    self.order_id = order_id
+                    self.amount = amount
+                    self.status = status
+
+                def key(self) -> str:
+                    return self.order_id
+
+            def pick(items: list[T], predicate: Callable[[T], bool]) -> list[T]:
+                if not callable(predicate):
+                    raise TypeError("predicate must be callable")
+                return [item for item in items if predicate(item)]
+
+            repo = Repository[OrderRecord]()
+            for record in records:
+                repo.add(OrderRecord(record["orderId"], record["amount"], record["status"]))
+
+            picked = pick(repo.all(), lambda order: order.status == status)
+            fallback = OrderRecord("missing", 0, "missing")
+            predicate_rejected = False
+            try:
+                pick(repo.all(), "not-callable")
+            except TypeError:
+                predicate_rejected = True
+
+            return {
+                "keys": sorted(item.key() for item in repo.all()),
+                "pickedIds": [item.order_id for item in picked],
+                "fallbackStatus": repo.get("not-found", fallback).status,
+                "predicateRejected": predicate_rejected,
+            }
+      hints:
+      - TypeVar bound는 정적 힌트이고, 런타임에서는 key 호출 실패를 직접 보게 됩니다.
+      - '@overload 정의 뒤 실제 구현은 한 번만 작성합니다.'
+    check:
+      id: python.advanced.typing.repository-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.typing.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: run_typed_order_repository
+        cases:
+        - id: stores-and-filters-typed-records
+          arguments:
+          - value:
+            - orderId: A-100
+              amount: 48000
+              status: paid
+            - orderId: A-101
+              amount: 0
+              status: draft
+            - orderId: A-102
+              amount: 25000
+              status: paid
+          - value: paid
+          expectedReturn:
+            keys:
+            - A-100
+            - A-101
+            - A-102
+            pickedIds:
+            - A-100
+            - A-102
+            fallbackStatus: missing
+            predicateRejected: true
+        - id: rejects-record-without-key-field
+          arguments:
+          - value:
+            - amount: 1000
+              status: paid
+          - value: paid
+          expectedException: KeyError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 11_advanced_typing-renderable-pipeline-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - protocol_typing
+    - callable
+    - overload
+    title: Protocol과 Callable로 렌더링 파이프라인 계약 만들기
+    subtitle: structural rendering pipeline
+    goal: widget spec 목록을 받아 render 메서드를 가진 객체만 렌더링하고 transform Callable을 적용한 결과를 반환한다.
+    why: 전이 과제에서는 저장소 예시 밖에서 Protocol과 Callable을 조합해, 상속하지 않은 객체도 구조가 맞으면 파이프라인에 들어올 수 있음을 확인합니다.
+    explanation: render_widget_specs(specs, uppercase=False)를 완성해 Label과 Button 객체를 만들고, 모르는 kind는 ValueError로 거부하세요.
+    tips:
+    - runtime_checkable Protocol은 메서드 존재만 확인합니다.
+    - transform은 Callable로 받고, uppercase 옵션에 따라 다른 함수를 넣으세요.
+    exercise:
+      prompt: render_widget_specs(specs, uppercase=False)를 완성해 html, protocolChecks, count를 반환하세요.
+      starterCode: |-
+        def render_widget_specs(specs, uppercase=False):
+            raise NotImplementedError
+      solution: |-
+        def render_widget_specs(specs, uppercase=False):
+            from typing import Callable, Protocol, runtime_checkable
+
+            @runtime_checkable
+            class Renderable(Protocol):
+                def render(self) -> str:
+                    ...
+
+            class Label:
+                def __init__(self, text):
+                    self.text = text
+
+                def render(self) -> str:
+                    return f"<span>{self.text}</span>"
+
+            class Button:
+                def __init__(self, text):
+                    self.text = text
+
+                def render(self) -> str:
+                    return f"<button>{self.text}</button>"
+
+            def apply(items: list[Renderable], transform: Callable[[str], str]) -> list[str]:
+                if not callable(transform):
+                    raise TypeError("transform must be callable")
+                return [transform(item.render()) for item in items]
+
+            widgets = []
+            for spec in specs:
+                if spec["kind"] == "label":
+                    widgets.append(Label(spec["text"]))
+                elif spec["kind"] == "button":
+                    widgets.append(Button(spec["text"]))
+                else:
+                    raise ValueError("unknown widget kind")
+
+            transform = str.upper if uppercase else (lambda value: value)
+            return {
+                "html": apply(widgets, transform),
+                "protocolChecks": [isinstance(widget, Renderable) for widget in widgets],
+                "count": len(widgets),
+            }
+      hints:
+      - Label과 Button은 Renderable을 상속하지 않아도 render가 있으면 통과합니다.
+      - uppercase가 true면 transform 함수만 바꾸고 객체 모델은 유지하세요.
+    check:
+      id: python.advanced.typing.renderable-pipeline.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.typing.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: render_widget_specs
+        cases:
+        - id: renders-structural-protocol-objects
+          arguments:
+          - value:
+            - kind: label
+              text: Total
+            - kind: button
+              text: Save
+          - value: false
+          expectedReturn:
+            html:
+            - <span>Total</span>
+            - <button>Save</button>
+            protocolChecks:
+            - true
+            - true
+            count: 2
+        - id: applies-callable-transform
+          arguments:
+          - value:
+            - kind: label
+              text: Total
+          - value: true
+          expectedReturn:
+            html:
+            - <SPAN>TOTAL</SPAN>
+            protocolChecks:
+            - true
+            count: 1
+        - id: rejects-unknown-widget-kind
+          arguments:
+          - value:
+            - kind: input
+              text: Name
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 11_advanced_typing-tool-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 11_advanced_typing-renderable-pipeline-transfer
+    title: Generic, TypeVar, Protocol, overload, Callable 선택 기준 회상하기
+    subtitle: typing tool recall
+    goal: 목적 이름을 받아 적절한 typing 도구와 런타임 영향 여부를 반환한다.
+    why: 시간이 지나도 남아야 할 지식은 타입 도구 이름보다, 같은 타입 관계를 보존할지, 구조적 계약을 받을지, 함수 시그니처를 표현할지의 판단 기준입니다.
+    explanation: choose_typing_tool(goal)를 완성해 preserve-item-type, structural-contract, value-specific-return, function-parameter
+      목적별 도구를 고르세요.
+    tips:
+    - TypeVar는 입력과 출력의 타입 관계를 보존할 때 씁니다.
+    - overload는 타입 체커 힌트이며 실제 구현은 별도로 필요합니다.
+    exercise:
+      prompt: choose_typing_tool(goal)를 완성해 목적별 typing 도구 선택 결과를 반환하세요.
+      starterCode: |-
+        def choose_typing_tool(goal):
+            raise NotImplementedError
+      solution: |-
+        def choose_typing_tool(goal):
+            table = {
+                "preserve-item-type": {
+                    "tool": "TypeVar with Generic",
+                    "runtimeEffect": False,
+                    "useWhen": "container or function returns the same logical item type",
+                },
+                "structural-contract": {
+                    "tool": "Protocol",
+                    "runtimeEffect": False,
+                    "useWhen": "object only needs required attributes or methods",
+                },
+                "value-specific-return": {
+                    "tool": "overload",
+                    "runtimeEffect": False,
+                    "useWhen": "return type changes by argument type or literal value",
+                },
+                "function-parameter": {
+                    "tool": "Callable",
+                    "runtimeEffect": False,
+                    "useWhen": "a function accepts another callable",
+                },
+            }
+            if goal not in table:
+                raise ValueError("unknown typing goal")
+            return table[goal]
+      hints:
+      - 대부분의 typing 도구는 런타임 검증을 자동으로 제공하지 않습니다.
+      - Protocol도 runtime_checkable 없이는 isinstance에 사용할 수 없습니다.
+    check:
+      id: python.advanced.typing.tool-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.typing.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_typing_tool
+        cases:
+        - id: recalls-typevar-for-preserved-item-type
+          arguments:
+          - value: preserve-item-type
+          expectedReturn:
+            tool: TypeVar with Generic
+            runtimeEffect: false
+            useWhen: container or function returns the same logical item type
+        - id: recalls-protocol-for-structural-contract
+          arguments:
+          - value: structural-contract
+          expectedReturn:
+            tool: Protocol
+            runtimeEffect: false
+            useWhen: object only needs required attributes or methods
+        - id: rejects-unknown-goal
+          arguments:
+          - value: enforce-runtime-schema
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

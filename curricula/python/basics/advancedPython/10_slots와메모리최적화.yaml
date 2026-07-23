@@ -469,3 +469,290 @@ sections:
     type: noError
     noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 10_advanced_slots-event-model-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - slots_basic
+    - memory_comparison
+    - workflow_validation
+    title: 일반 이벤트와 slotted 이벤트의 속성 계약 차이 검증하기
+    subtitle: fixed event model contract
+    goal: event id와 amount를 받아 일반 객체와 slotted 객체의 __dict__ 존재, 동적 속성 차단, 크기 관계를 반환한다.
+    why: slots의 핵심은 속성 접근 속도보다 대량 객체의 필드 계약을 고정하고 동적 속성 추가를 막는 선택이라는 점입니다.
+    explanation: inspect_slotted_event(event_id, amount)를 완성해 일반 객체는 extra 속성을 받을 수 있고 slotted 객체는 AttributeError로 막는지 확인하세요.
+    tips:
+    - sys.getsizeof 값은 환경마다 다를 수 있으므로 정확한 byte 대신 관계 boolean을 반환하세요.
+    - slotted 객체에 선언되지 않은 extra를 넣으면 AttributeError가 나야 합니다.
+    exercise:
+      prompt: inspect_slotted_event(event_id, amount)를 완성해 normalHasDict, slottedHasDict, dynamicBlocked, sizeWithinBudget,
+        value를 반환하세요.
+      starterCode: |-
+        def inspect_slotted_event(event_id, amount):
+            raise NotImplementedError
+      solution: |-
+        def inspect_slotted_event(event_id, amount):
+            import sys
+
+            class NormalEvent:
+                def __init__(self, event_id, amount):
+                    self.event_id = event_id
+                    self.amount = amount
+
+            class SlottedEvent:
+                __slots__ = ("event_id", "amount")
+
+                def __init__(self, event_id, amount):
+                    self.event_id = event_id
+                    self.amount = amount
+
+            normal = NormalEvent(event_id, amount)
+            slotted = SlottedEvent(event_id, amount)
+            normal.extra = "allowed"
+            dynamic_blocked = False
+            try:
+                slotted.extra = "blocked"
+            except AttributeError:
+                dynamic_blocked = True
+
+            return {
+                "normalHasDict": hasattr(normal, "__dict__"),
+                "slottedHasDict": hasattr(slotted, "__dict__"),
+                "dynamicBlocked": dynamic_blocked,
+                "sizeWithinBudget": sys.getsizeof(slotted) <= sys.getsizeof(normal) + 128,
+                "value": f"{slotted.event_id}:{slotted.amount}",
+            }
+      hints:
+      - __slots__에 없는 이름은 인스턴스 속성으로 추가할 수 없습니다.
+      - 메모리 크기는 interpreter 차이를 고려해 넉넉한 관계로 비교하세요.
+    check:
+      id: python.advanced.slots.event-model.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.slots.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: inspect_slotted_event
+        cases:
+        - id: blocks-dynamic-attributes-on-slotted-object
+          arguments:
+          - value: E-100
+          - value: 12000
+          expectedReturn:
+            normalHasDict: true
+            slottedHasDict: false
+            dynamicBlocked: true
+            sizeWithinBudget: true
+            value: E-100:12000
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 10_advanced_slots-dataclass-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - slots_inheritance
+    - slots_limitations
+    - workflow_validation
+    title: dataclass(slots=True)로 지표 샘플의 필드 계약 고정하기
+    subtitle: slotted dataclass metric
+    goal: 지표 이름과 값을 받아 slotted dataclass가 __dict__ 없이 동작하고 동적 속성을 거부하는지 반환한다.
+    why: 전이 과제에서는 직접 __slots__를 쓰는 방식 밖으로 나와, 현대 Python에서 dataclass(slots=True)를 선택하는 실무 흐름을 확인합니다.
+    explanation: inspect_slotted_metric(name, value)를 완성해 value 검증, dataclass slots, 동적 속성 차단, 선언 슬롯 목록을 반환하세요.
+    tips:
+    - 음수 value는 지표 샘플로 받지 말고 ValueError로 막으세요.
+    - dataclass(slots=True)는 자동으로 __slots__를 구성합니다.
+    exercise:
+      prompt: inspect_slotted_metric(name, value)를 완성해 hasDict, dynamicBlocked, slots, pair를 반환하세요.
+      starterCode: |-
+        def inspect_slotted_metric(name, value):
+            raise NotImplementedError
+      solution: |-
+        def inspect_slotted_metric(name, value):
+            from dataclasses import dataclass
+
+            if value < 0:
+                raise ValueError("value must be non-negative")
+
+            @dataclass(slots=True)
+            class MetricSample:
+                name: str
+                value: int
+
+            metric = MetricSample(name, value)
+            dynamic_blocked = False
+            try:
+                metric.extra = "blocked"
+            except AttributeError:
+                dynamic_blocked = True
+
+            return {
+                "hasDict": hasattr(metric, "__dict__"),
+                "dynamicBlocked": dynamic_blocked,
+                "slots": list(MetricSample.__slots__),
+                "pair": [metric.name, metric.value],
+            }
+      hints:
+      - slots=True dataclass도 선언되지 않은 속성은 받지 않습니다.
+      - __slots__는 클래스에 저장됩니다.
+    check:
+      id: python.advanced.slots.dataclass.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.slots.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: inspect_slotted_metric
+        cases:
+        - id: creates-slotted-dataclass-metric
+          arguments:
+          - value: paidRevenue
+          - value: 12000
+          expectedReturn:
+            hasDict: false
+            dynamicBlocked: true
+            slots:
+            - name
+            - value
+            pair:
+            - paidRevenue
+            - 12000
+        - id: rejects-negative-metric-value
+          arguments:
+          - value: loss
+          - value: -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 10_advanced_slots-fit-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 10_advanced_slots-dataclass-transfer
+    title: slots가 맞는 상황과 피해야 할 상황 회상하기
+    subtitle: slots fit recall
+    goal: 상황 이름을 받아 권장 모델 선택, 동적 속성 허용 여부, weakref 필요 처리를 반환한다.
+    why: 시간이 지나도 남아야 할 지식은 __slots__ 문법보다, 대량 고정 필드에는 맞고 자유로운 확장 객체에는 맞지 않는다는 판단 기준입니다.
+    explanation: choose_slots_fit(situation)를 완성해 massive-fixed-record, dynamic-fields, weakref-needed 상황별 선택을 반환하세요.
+    tips:
+    - weakref가 필요하면 __weakref__ 슬롯을 명시해야 합니다.
+    - 런타임에 임의 필드를 붙이는 모델에는 slots가 맞지 않을 수 있습니다.
+    exercise:
+      prompt: choose_slots_fit(situation)를 완성해 상황별 slots 선택 기준을 반환하세요.
+      starterCode: |-
+        def choose_slots_fit(situation):
+            raise NotImplementedError
+      solution: |-
+        def choose_slots_fit(situation):
+            table = {
+                "massive-fixed-record": {
+                    "choice": "slots",
+                    "allowsDynamicAttributes": False,
+                    "weakrefSlot": False,
+                },
+                "dynamic-fields": {
+                    "choice": "regular class",
+                    "allowsDynamicAttributes": True,
+                    "weakrefSlot": False,
+                },
+                "weakref-needed": {
+                    "choice": "slots with __weakref__",
+                    "allowsDynamicAttributes": False,
+                    "weakrefSlot": True,
+                },
+            }
+            if situation not in table:
+                raise ValueError("unknown slots situation")
+            return table[situation]
+      hints:
+      - slots는 필드가 고정된 대량 객체에 가장 잘 맞습니다.
+      - __dict__를 slots에 넣으면 동적 속성은 가능하지만 메모리 이점이 줄어듭니다.
+    check:
+      id: python.advanced.slots.fit.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.slots.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_slots_fit
+        cases:
+        - id: recalls-slots-for-fixed-records
+          arguments:
+          - value: massive-fixed-record
+          expectedReturn:
+            choice: slots
+            allowsDynamicAttributes: false
+            weakrefSlot: false
+        - id: recalls-regular-class-for-dynamic-fields
+          arguments:
+          - value: dynamic-fields
+          expectedReturn:
+            choice: regular class
+            allowsDynamicAttributes: true
+            weakrefSlot: false
+        - id: rejects-unknown-situation
+          arguments:
+          - value: always-faster
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

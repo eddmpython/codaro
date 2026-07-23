@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "xlwings"
+sourceCount: 11
+lessons:
+  - lessonRef: "xlwings/00_xlwings소개"
+    sourcePath: "curricula/python/automation/office/xlwings/00_xlwings소개.yaml"
+    metaId: "xlwings_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "xlwings/01_첫엑셀연결"
+    sourcePath: "curricula/python/automation/office/xlwings/01_첫엑셀연결.yaml"
+    metaId: "xlwings_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "xlwings/02_가격표일괄입력"
+    sourcePath: "curricula/python/automation/office/xlwings/02_가격표일괄입력.yaml"
+    metaId: "xlwings_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "xlwings/03_시트탐색과확장"
+    sourcePath: "curricula/python/automation/office/xlwings/03_시트탐색과확장.yaml"
+    metaId: "xlwings_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "xlwings/04_DataFrame왕복"
+    sourcePath: "curricula/python/automation/office/xlwings/04_DataFrame왕복.yaml"
+    metaId: "xlwings_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "xlwings/05_수식과서식"
+    sourcePath: "curricula/python/automation/office/xlwings/05_수식과서식.yaml"
+    metaId: "xlwings_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "xlwings/06_막대차트자동생성"
+    sourcePath: "curricula/python/automation/office/xlwings/06_막대차트자동생성.yaml"
+    metaId: "xlwings_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "xlwings/07_표와동적합계"
+    sourcePath: "curricula/python/automation/office/xlwings/07_표와동적합계.yaml"
+    metaId: "xlwings_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "xlwings/08_월별파일분기합치기"
+    sourcePath: "curricula/python/automation/office/xlwings/08_월별파일분기합치기.yaml"
+    metaId: "xlwings_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "xlwings/09_VBA매크로호출"
+    sourcePath: "curricula/python/automation/office/xlwings/09_VBA매크로호출.yaml"
+    metaId: "xlwings_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "xlwings/10_UDF가격계산기"
+    sourcePath: "curricula/python/automation/office/xlwings/10_UDF가격계산기.yaml"
+    metaId: "xlwings_10"
+    registryStatus: registered
+    reviewStatus: pending

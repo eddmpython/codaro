@@ -584,3 +584,290 @@ sections:
     type: noError
     noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: numpy_04-minmax-music-features-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - practice
+    title: 음악 feature별 min-max 정규화하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 열별 최소·최대를 사용해 서로 다른 단위의 feature를 0~1 범위로 맞춘다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 정규화 범위는 row가 아니라 각 column에서 계산하세요.
+    - 최대와 최소가 같은 열은 0으로 고정해 0 나눗셈을 피하세요.
+    exercise:
+      prompt: minmax_features(matrix)를 완성해 normalized와 ranges를 반환하세요.
+      starterCode: |-
+        def minmax_features(matrix):
+            raise NotImplementedError
+      solution: |
+        def minmax_features(matrix):
+            if not matrix or not matrix[0] or any(len(row) != len(matrix[0]) for row in matrix):
+                raise ValueError("rectangular matrix required")
+            columns = list(zip(*matrix))
+            ranges = [[min(column), max(column)] for column in columns]
+            normalized = []
+            for row in matrix:
+                normalized.append([
+                    0.0 if high == low else round((value - low) / (high - low), 3)
+                    for value, (low, high) in zip(row, ranges)
+                ])
+            return {"normalized": normalized, "ranges": ranges}
+      hints: *id001
+    check:
+      id: python.numpy.numpy_04.minmax-music-features.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_04.minmax-music-features.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: minmax_features
+        cases:
+        - id: normalizes-by-column
+          arguments:
+          - value:
+            - - 10
+              - 100
+            - - 20
+              - 150
+            - - 30
+              - 200
+          expectedReturn:
+            normalized:
+            - - 0.0
+              - 0.0
+            - - 0.5
+              - 0.5
+            - - 1.0
+              - 1.0
+            ranges:
+            - - 10
+              - 30
+            - - 100
+              - 200
+        - id: handles-constant-column
+          arguments:
+          - value:
+            - - 5
+              - 1
+            - - 5
+              - 3
+          expectedReturn:
+            normalized:
+            - - 0.0
+              - 0.0
+            - - 0.0
+              - 1.0
+            ranges:
+            - - 5
+              - 5
+            - - 1
+              - 3
+        - id: rejects-empty-matrix
+          arguments:
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: numpy_04-cosine-track-similarity-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_04-minmax-music-features-mastery
+    title: 새 트랙 vector의 cosine similarity 계산하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: feature 정규화를 방향 기반 유사도와 가장 가까운 track 선택으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - cosine similarity는 vector 크기가 아니라 방향을 비교합니다.
+    - 0 vector는 방향이 없으므로 명시적으로 거절하세요.
+    exercise:
+      prompt: rank_cosine_similarity(query, tracks)를 완성해 similarities와 nearest를 반환하세요.
+      starterCode: |-
+        def rank_cosine_similarity(query, tracks):
+            raise NotImplementedError
+      solution: |
+        def rank_cosine_similarity(query, tracks):
+            import math
+            query_norm = math.sqrt(sum(value * value for value in query))
+            if query_norm == 0:
+                raise ValueError("zero query vector")
+            similarities = {}
+            for name, vector in tracks.items():
+                if len(vector) != len(query):
+                    raise ValueError("shape mismatch")
+                norm = math.sqrt(sum(value * value for value in vector))
+                if norm == 0:
+                    raise ValueError("zero track vector")
+                similarities[name] = round(sum(a * b for a, b in zip(query, vector)) / (query_norm * norm), 4)
+            nearest = max(similarities, key=lambda name: (similarities[name], name)) if similarities else None
+            return {"similarities": {key: similarities[key] for key in sorted(similarities)}, "nearest": nearest}
+      hints: *id002
+    check:
+      id: python.numpy.numpy_04.cosine-track-similarity.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_04.cosine-track-similarity.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: rank_cosine_similarity
+        cases:
+        - id: ranks-by-direction
+          arguments:
+          - value:
+            - 1
+            - 0
+          - value:
+              same:
+              - 2
+              - 0
+              diagonal:
+              - 1
+              - 1
+              opposite:
+              - -1
+              - 0
+          expectedReturn:
+            similarities:
+              diagonal: 0.7071
+              opposite: -1.0
+              same: 1.0
+            nearest: same
+        - id: handles-no-tracks
+          arguments:
+          - value:
+            - 1
+          - value: {}
+          expectedReturn:
+            similarities: {}
+            nearest: null
+        - id: rejects-zero-query
+          arguments:
+          - value:
+            - 0
+            - 0
+          - value:
+              x:
+              - 1
+              - 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: numpy_04-feature-scaling-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_04-cosine-track-similarity-transfer
+    title: feature scale 방법 선택 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: bounded 값, outlier가 있는 값, 방향 비교에 맞는 변환을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 모든 feature에 같은 scaling을 기계적으로 적용하지 마세요.
+    - validation/test 데이터로 scaling 기준을 다시 계산하면 leakage입니다.
+    exercise:
+      prompt: choose_feature_scaling(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_feature_scaling(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_feature_scaling(situation):
+            table = {'known-bounds': {'method': 'min-max', 'evidence': 'training min and max', 'risk': 'future values outside range'}, 'outlier-heavy': {'method': 'robust scaling', 'evidence': 'median and IQR', 'risk': 'mean distorted'}, 'compare-direction': {'method': 'unit norm', 'evidence': 'vector norm', 'risk': 'zero vector'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.numpy.numpy_04.feature-scaling-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_04.feature-scaling-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_feature_scaling
+        cases:
+        - id: recalls-known-bounds
+          arguments:
+          - value: known-bounds
+          expectedReturn:
+            method: min-max
+            evidence: training min and max
+            risk: future values outside range
+        - id: recalls-outlier-heavy
+          arguments:
+          - value: outlier-heavy
+          expectedReturn:
+            method: robust scaling
+            evidence: median and IQR
+            risk: mean distorted
+        - id: rejects-unknown-situation
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

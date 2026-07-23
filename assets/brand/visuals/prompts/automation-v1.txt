@@ -1,0 +1,9 @@
+Use case: productivity-visual
+Asset type: Codaro learning catalog domain visual for practical automation
+Primary request: Create a premium editorial educational illustration that shows a verified code recipe becoming a repeatable workflow: input files arrive, a dry-run checkpoint validates changes, a schedule clock triggers the workflow, a spreadsheet and report are produced, and an audit trail records the result. No readable text.
+Scene/backdrop: bright neutral operational workbench with white and charcoal surfaces, teal, coral, yellow, green, and restrained plum accents.
+Style/medium: sophisticated mixed 3D paper-cut and crisp editorial illustration, tactile folders, recipe sheets, switches, clock, and output artifacts, high-end productivity product art.
+Composition/framing: wide 16:9, coherent left-to-right loop with the safety checkpoint visually prominent, generous margins, no decorative card grid.
+Lighting/mood: soft daylight, dependable, efficient, calm.
+Constraints: no people, logos, brand names, letters, readable UI text, watermark, gradients, glowing orbs, bokeh, or dark atmospheric background. Show automation as controlled and auditable, not magical.
+Avoid: conveyor-belt factory cliché, robots, neon, dominant purple or blue, excessive rounded cards.

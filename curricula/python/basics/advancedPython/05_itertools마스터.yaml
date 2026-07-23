@@ -342,3 +342,326 @@ sections:
     type: noError
     noError: 종합 복습에서 `evens` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 종합 복습 실행 뒤 `evens` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 05_advanced_itertools-paid-sales-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - groupby
+    - accumulate
+    - workflow_validation
+    title: 정렬 후 groupby로 채널별 유료 매출 요약 만들기
+    subtitle: sorted groupby revenue report
+    goal: 판매 이벤트 목록을 받아 paid 이벤트만 채널별로 묶고 주문 수, 매출, 평균 주문액, 채널 순서를 반환한다.
+    why: itertools의 groupby는 SQL처럼 알아서 같은 키를 모아주지 않기 때문에, 정렬과 그룹 이터레이터 소비를 함께 검증해야 합니다.
+    explanation: summarize_paid_sales_by_channel(events)를 완성해 status가 paid인 이벤트만 channel 기준으로 정렬한 뒤 groupby로 요약하세요.
+    tips:
+    - groupby 전에 channel로 정렬해야 같은 채널이 하나의 그룹이 됩니다.
+    - amount가 음수이면 매출 데이터가 깨진 것이므로 ValueError로 막으세요.
+    exercise:
+      prompt: summarize_paid_sales_by_channel(events)를 완성해 채널별 orders, revenue, averageOrder, channelOrder를 반환하세요.
+      starterCode: |-
+        def summarize_paid_sales_by_channel(events):
+            raise NotImplementedError
+      solution: |-
+        def summarize_paid_sales_by_channel(events):
+            from itertools import groupby
+
+            for event in events:
+                if event["amount"] < 0:
+                    raise ValueError("amount must be non-negative")
+
+            paid_events = sorted(
+                (event for event in events if event["status"] == "paid"),
+                key=lambda event: event["channel"],
+            )
+            summary = {}
+            for channel, grouped_events in groupby(paid_events, key=lambda event: event["channel"]):
+                group_list = list(grouped_events)
+                revenue = sum(event["amount"] for event in group_list)
+                summary[channel] = {
+                    "orders": len(group_list),
+                    "revenue": revenue,
+                    "averageOrder": revenue // len(group_list),
+                }
+            return {
+                "summary": summary,
+                "channelOrder": list(summary),
+            }
+      hints:
+      - grouped_events는 한 번 순회하면 소진되므로 list로 고정하세요.
+      - 평균은 정수 나눗셈으로 반환하세요.
+    check:
+      id: python.advanced.itertools.paid-sales.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.itertools.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_paid_sales_by_channel
+        cases:
+        - id: groups-paid-events-after-sorting
+          arguments:
+          - value:
+            - channel: online
+              amount: 120000
+              status: paid
+            - channel: offline
+              amount: 80000
+              status: paid
+            - channel: online
+              amount: 45000
+              status: paid
+            - channel: online
+              amount: 30000
+              status: refund
+            - channel: partner
+              amount: 55000
+              status: paid
+            - channel: offline
+              amount: 70000
+              status: paid
+          expectedReturn:
+            summary:
+              offline:
+                orders: 2
+                revenue: 150000
+                averageOrder: 75000
+              online:
+                orders: 2
+                revenue: 165000
+                averageOrder: 82500
+              partner:
+                orders: 1
+                revenue: 55000
+                averageOrder: 55000
+            channelOrder:
+            - offline
+            - online
+            - partner
+        - id: rejects-negative-amount
+          arguments:
+          - value:
+            - channel: online
+              amount: -1
+              status: paid
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 05_advanced_itertools-variant-grid-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - infinite_iterators
+    - terminating_iterators
+    - combinatoric
+    title: product와 islice로 상품 옵션 조합 미리보기 만들기
+    subtitle: bounded variant preview
+    goal: 색상, 사이즈, 차단 조합을 받아 가능한 옵션 전체 수와 제한된 미리보기 목록을 반환한다.
+    why: 전이 과제에서는 itertools를 매출 요약 밖으로 옮겨, 많은 조합을 만들 때 필요한 만큼만 보여주는 실무 감각을 확인합니다.
+    explanation: build_variant_grid(colors, sizes, blocked, limit=4)를 완성해 product로 조합을 만들고 blocked를 제외한 뒤 islice로 preview를
+      제한하세요.
+    tips:
+    - colors나 sizes가 비어 있으면 조합 의미가 없으므로 ValueError로 막으세요.
+    - blocked는 color-size 문자열 기준으로 비교하세요.
+    exercise:
+      prompt: build_variant_grid(colors, sizes, blocked, limit=4)를 완성해 preview, totalCount, blockedCount를 반환하세요.
+      starterCode: |-
+        def build_variant_grid(colors, sizes, blocked, limit=4):
+            raise NotImplementedError
+      solution: |-
+        def build_variant_grid(colors, sizes, blocked, limit=4):
+            from itertools import islice, product
+
+            if not colors or not sizes:
+                raise ValueError("colors and sizes are required")
+            blocked_set = set(blocked)
+            variants = [
+                f"{color}-{size}"
+                for color, size in product(colors, sizes)
+                if f"{color}-{size}" not in blocked_set
+            ]
+            return {
+                "preview": list(islice(iter(variants), limit)),
+                "totalCount": len(variants),
+                "blockedCount": len(blocked_set),
+            }
+      hints:
+      - product(colors, sizes)는 색상과 사이즈의 모든 순서쌍을 만듭니다.
+      - islice로 preview 개수를 제한하세요.
+    check:
+      id: python.advanced.itertools.variant-grid.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.itertools.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_variant_grid
+        cases:
+        - id: builds-bounded-preview-and-counts
+          arguments:
+          - value:
+            - red
+            - blue
+          - value:
+            - S
+            - M
+            - L
+          - value:
+            - blue-L
+          - value: 4
+          expectedReturn:
+            preview:
+            - red-S
+            - red-M
+            - red-L
+            - blue-S
+            totalCount: 5
+            blockedCount: 1
+        - id: rejects-empty-colors
+          arguments:
+          - value: []
+          - value:
+            - S
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 05_advanced_itertools-tool-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 05_advanced_itertools-variant-grid-transfer
+    title: groupby, islice, zip_longest, accumulate 사용처 회상하기
+    subtitle: iterator tool recall
+    goal: 목적 이름을 받아 적절한 itertools 도구와 정렬 또는 종료 제한 필요 여부를 반환한다.
+    why: 시간이 지나도 남아야 할 지식은 함수 목록보다, 무한 이터레이터 제한과 groupby 정렬 조건처럼 실수를 막는 선택 기준입니다.
+    explanation: choose_itertools_tool(goal)를 완성해 group-contiguous, limit-infinite, fill-shorter-zip, running-total 목적별 도구를
+      고르세요.
+    tips:
+    - groupby는 같은 key가 붙어 있어야 제대로 묶입니다.
+    - count, cycle 같은 무한 이터레이터에는 islice 같은 제한 도구가 필요합니다.
+    exercise:
+      prompt: choose_itertools_tool(goal)를 완성해 목적별 itertools 도구 선택 결과를 반환하세요.
+      starterCode: |-
+        def choose_itertools_tool(goal):
+            raise NotImplementedError
+      solution: |-
+        def choose_itertools_tool(goal):
+            table = {
+                "group-contiguous": {
+                    "tool": "groupby",
+                    "requiresSortedInput": True,
+                    "preventsInfiniteLoop": False,
+                },
+                "limit-infinite": {
+                    "tool": "islice",
+                    "requiresSortedInput": False,
+                    "preventsInfiniteLoop": True,
+                },
+                "fill-shorter-zip": {
+                    "tool": "zip_longest",
+                    "requiresSortedInput": False,
+                    "preventsInfiniteLoop": False,
+                },
+                "running-total": {
+                    "tool": "accumulate",
+                    "requiresSortedInput": False,
+                    "preventsInfiniteLoop": False,
+                },
+            }
+            if goal not in table:
+                raise ValueError("unknown itertools goal")
+            return table[goal]
+      hints:
+      - groupby의 핵심 주의점은 정렬 또는 같은 key의 연속성입니다.
+      - islice는 무한 시퀀스에서 필요한 개수만 꺼낼 때 씁니다.
+    check:
+      id: python.advanced.itertools.tool-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.itertools.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_itertools_tool
+        cases:
+        - id: recalls-groupby-sorted-input-risk
+          arguments:
+          - value: group-contiguous
+          expectedReturn:
+            tool: groupby
+            requiresSortedInput: true
+            preventsInfiniteLoop: false
+        - id: recalls-islice-for-infinite-iterator
+          arguments:
+          - value: limit-infinite
+          expectedReturn:
+            tool: islice
+            requiresSortedInput: false
+            preventsInfiniteLoop: true
+        - id: rejects-unknown-goal
+          arguments:
+          - value: mutate-list
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

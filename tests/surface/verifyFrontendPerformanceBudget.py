@@ -24,13 +24,12 @@ MAX_SINGLE_JS_BYTES = 400_000
 MAX_ENTRY_JS_BYTES = 320_000
 MAX_TOTAL_JS_BYTES = 7_500_000
 MAX_APP_SHELL_JS_BYTES = MAX_TOTAL_JS_BYTES
-# Coarse growth guard on the SUM of fully lazy-loaded per-lesson chunks. Each lesson chunk is
-# fetched only when its lesson opens (~25KB avg, ~64KB max), so this total does not affect
-# first-load UX — the upfront guard is MAX_APP_SHELL_JS_BYTES (~22% used) and the per-lesson
-# UX guard is MAX_SINGLE_JS_BYTES (both stay tight). The curriculum legitimately grows lesson
-# by lesson and crossed 12MB; this ceiling carries headroom for continued additions while still
-# catching a runaway regression. Raise it as the curriculum keeps growing.
-MAX_LAZY_CURRICULUM_JS_BYTES = 13_500_000
+# Curriculum lessons are independent lazy chunks. Guard the authored corpus, per-lesson transfer,
+# and bundling overhead separately so adding a useful lesson does not consume app-shell budget.
+MAX_LAZY_CURRICULUM_SOURCE_BYTES = 25_000_000
+MAX_AVERAGE_LAZY_CURRICULUM_JS_BYTES = 50_000
+MAX_SINGLE_LAZY_CURRICULUM_JS_BYTES = 100_000
+MAX_LAZY_CURRICULUM_BUNDLE_RATIO = 1.08
 MAX_CSS_BYTES = 160_000
 REQUIRED_CHUNK_LABELS = ("codemirror", "vendor", "yaml", "curriculumSurface")
 
@@ -52,7 +51,15 @@ def curriculumLessonStems() -> set[str]:
     # 레슨 YAML은 카테고리 트리 하위(curricula/python/<카테고리>/<하위>/<레슨>.yaml)에
     # 임의 깊이로 놓이므로 재귀로 모은다. 비재귀 glob은 트리 재구조화 이후 레슨을 놓쳐
     # lazy 청크를 app shell로 잘못 집계한다.
-    return {path.stem for path in CURRICULA_ROOT.glob("**/*.yaml")}
+    return {path.stem for path in CURRICULA_ROOT.glob("**/*.yaml") if path.name != "schema.yaml"}
+
+
+def curriculumSourceBytes() -> int:
+    return sum(
+        path.stat().st_size
+        for path in CURRICULA_ROOT.glob("**/*.yaml")
+        if path.name != "schema.yaml"
+    )
 
 
 def isLazyCurriculumChunk(name: str, lessonStems: set[str]) -> bool:
@@ -82,6 +89,14 @@ def main() -> int:
     totalJsBytes = sum(item["bytes"] for item in chunkStats)
     appShellJsBytes = sum(item["bytes"] for item in appShellChunks)
     lazyCurriculumJsBytes = sum(item["bytes"] for item in lazyCurriculumChunks)
+    lazyCurriculumAverageBytes = (
+        round(lazyCurriculumJsBytes / len(lazyCurriculumChunks)) if lazyCurriculumChunks else 0
+    )
+    lazyCurriculumBiggestBytes = max((item["bytes"] for item in lazyCurriculumChunks), default=0)
+    lazyCurriculumSourceBytes = curriculumSourceBytes()
+    lazyCurriculumBundleRatio = (
+        lazyCurriculumJsBytes / lazyCurriculumSourceBytes if lazyCurriculumSourceBytes else 0.0
+    )
     biggestJs = max((item["bytes"] for item in chunkStats), default=0)
     entryJsBytes = max((item["bytes"] for item in chunkStats if item["name"].startswith("index-")), default=0)
     totalCssBytes = sum(item["bytes"] for item in cssStats)
@@ -92,9 +107,25 @@ def main() -> int:
         failures.append(f"entry JS chunk {entryJsBytes} exceeds budget {MAX_ENTRY_JS_BYTES}")
     if appShellJsBytes > MAX_APP_SHELL_JS_BYTES:
         failures.append(f"app shell JS {appShellJsBytes} exceeds baseline budget {MAX_APP_SHELL_JS_BYTES}")
-    if lazyCurriculumJsBytes > MAX_LAZY_CURRICULUM_JS_BYTES:
+    if lazyCurriculumSourceBytes > MAX_LAZY_CURRICULUM_SOURCE_BYTES:
         failures.append(
-            f"lazy curriculum JS {lazyCurriculumJsBytes} exceeds content budget {MAX_LAZY_CURRICULUM_JS_BYTES}"
+            f"curriculum source {lazyCurriculumSourceBytes} exceeds corpus budget "
+            f"{MAX_LAZY_CURRICULUM_SOURCE_BYTES}"
+        )
+    if lazyCurriculumAverageBytes > MAX_AVERAGE_LAZY_CURRICULUM_JS_BYTES:
+        failures.append(
+            f"average lazy curriculum JS {lazyCurriculumAverageBytes} exceeds per-lesson budget "
+            f"{MAX_AVERAGE_LAZY_CURRICULUM_JS_BYTES}"
+        )
+    if lazyCurriculumBiggestBytes > MAX_SINGLE_LAZY_CURRICULUM_JS_BYTES:
+        failures.append(
+            f"largest lazy curriculum JS {lazyCurriculumBiggestBytes} exceeds per-lesson budget "
+            f"{MAX_SINGLE_LAZY_CURRICULUM_JS_BYTES}"
+        )
+    if lazyCurriculumBundleRatio > MAX_LAZY_CURRICULUM_BUNDLE_RATIO:
+        failures.append(
+            f"lazy curriculum bundle ratio {lazyCurriculumBundleRatio:.3f} exceeds overhead budget "
+            f"{MAX_LAZY_CURRICULUM_BUNDLE_RATIO:.3f}"
         )
     if totalCssBytes > MAX_CSS_BYTES:
         failures.append(f"total CSS {totalCssBytes} exceeds budget {MAX_CSS_BYTES}")
@@ -105,7 +136,7 @@ def main() -> int:
             failures.append(f"expected a named {label} chunk in built assets")
 
     configText = VITE_CONFIG.read_text(encoding="utf-8")
-    for token in ("manualChunks", "@codemirror", "@radix-ui", "vendor"):
+    for token in ("codeSplitting", "@codemirror", "@radix-ui", "vendor"):
         if token not in configText:
             failures.append(f"vite config missing performance split token {token}")
 
@@ -133,7 +164,10 @@ def main() -> int:
         "maxEntryJsBytes": MAX_ENTRY_JS_BYTES,
         "maxTotalJsBytes": MAX_TOTAL_JS_BYTES,
         "maxAppShellJsBytes": MAX_APP_SHELL_JS_BYTES,
-        "maxLazyCurriculumJsBytes": MAX_LAZY_CURRICULUM_JS_BYTES,
+        "maxLazyCurriculumSourceBytes": MAX_LAZY_CURRICULUM_SOURCE_BYTES,
+        "maxAverageLazyCurriculumJsBytes": MAX_AVERAGE_LAZY_CURRICULUM_JS_BYTES,
+        "maxSingleLazyCurriculumJsBytes": MAX_SINGLE_LAZY_CURRICULUM_JS_BYTES,
+        "maxLazyCurriculumBundleRatio": MAX_LAZY_CURRICULUM_BUNDLE_RATIO,
         "totalJsBudgetScope": "app-shell-excluding-lazy-curriculum-chunks",
         "maxCssBytes": MAX_CSS_BYTES,
         "chunkCount": len(jsFiles),
@@ -141,6 +175,10 @@ def main() -> int:
         "appShellJsBytes": appShellJsBytes,
         "lazyCurriculumJsBytes": lazyCurriculumJsBytes,
         "lazyCurriculumChunkCount": len(lazyCurriculumChunks),
+        "lazyCurriculumSourceBytes": lazyCurriculumSourceBytes,
+        "lazyCurriculumAverageBytes": lazyCurriculumAverageBytes,
+        "lazyCurriculumBiggestBytes": lazyCurriculumBiggestBytes,
+        "lazyCurriculumBundleRatio": round(lazyCurriculumBundleRatio, 4),
         "biggestJsBytes": biggestJs,
         "entryJsBytes": entryJsBytes,
         "totalCssBytes": totalCssBytes,

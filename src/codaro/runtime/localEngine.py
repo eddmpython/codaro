@@ -89,6 +89,7 @@ class LocalEngine(ExecutionEngine):
                 return
 
         try:
+            executionTimeout = self._resourceLimits.maxExecutionSeconds
             response = await asyncio.wait_for(
                 loop.run_in_executor(
                     self._ipcExecutor,
@@ -100,13 +101,13 @@ class LocalEngine(ExecutionEngine):
                     startInterruptCount,
                     emitEvent,
                 ),
-                timeout=EXECUTION_TIMEOUT_SECONDS,
+                timeout=executionTimeout if executionTimeout > 0 else None,
             )
         except asyncio.TimeoutError:
             self.interrupt()
             response = {
                 "type": "error",
-                "data": f"Execution timed out after {EXECUTION_TIMEOUT_SECONDS} seconds.",
+                "data": f"Execution timed out after {executionTimeout} seconds.",
                 "stdout": "",
                 "stderr": "",
                 "status": "error",

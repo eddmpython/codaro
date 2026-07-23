@@ -1,8 +1,0 @@
-# Predict-strict 카테고리 목록 — 한 줄에 하나, # 주석 허용.
-# 여기 등록된 카테고리는 모든 exercise step에 predict.prompt + 최소 1개 expected 필드 필수.
-# 신규 카테고리는 백필 완료 후 추가, 변경 사유는 커밋 메시지에 명시할 것.
-#
-# "실행 전 예측" 학습자 카드를 제거하면서 비활성화 — 화면에 안 보이는 predict 계약을 강제할
-# 이유가 없다. 백엔드 predict 인프라(comparePrediction·record-prediction-result)는 AI 교사
-# 도구 경로용으로 보존되지만, 커리큘럼 표면 강제는 해제한다.
-# basics/30days

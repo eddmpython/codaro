@@ -1,0 +1,74 @@
+schemaVersion: 1
+pathId: pdfAutomation
+composerSnapshotDate: "2026-07-18"
+composerGraphCount: 469
+composerVersionHash: "75fc453f508da3b8709bd0be8a4d36213ec535c7af7d2cd892e20c2aca3e7c06"
+taxonomySnapshotHash: "b5e9b0b9db4f6ecd89c7be10a5c795f9b991b3ce700d5b5cf044607fc835def2"
+sourceSetHash: "5f8d7bb62f23c2e10ed89536f72449613b42d55e7c0a659010a18ebf61ce535e"
+ledgerTool: "uv run python -X utf8 docs/skills/ops/tools/buildLearningLedgers.py --check"
+targetOutcomes:
+  - "python.functions"
+  - "python.errorHandling"
+  - "python.modulesAndIo"
+  - "automation.pdf.intro"
+  - "automation.pdf.read"
+  - "automation.pdf.merge"
+  - "automation.pdf.extract"
+  - "automation.pdf.create"
+  - "automation.pdf.layout"
+  - "automation.pdf.security"
+  - "automation.pdf.forms"
+  - "automation.pdf.report"
+gaps: []
+lessons:
+  - order: 1
+    lessonRef: "30days/day01_헬로월드"
+    canonicalContentRef: "30days/day01_헬로월드"
+  - order: 2
+    lessonRef: "30days/day02_변수와데이터타입"
+    canonicalContentRef: "30days/day02_변수와데이터타입"
+  - order: 3
+    lessonRef: "30days/day03_연산자"
+    canonicalContentRef: "30days/day03_연산자"
+  - order: 4
+    lessonRef: "30days/day04_문자열기초"
+    canonicalContentRef: "30days/day04_문자열기초"
+  - order: 5
+    lessonRef: "30days/day13_조건문"
+    canonicalContentRef: "30days/day13_조건문"
+  - order: 6
+    lessonRef: "30days/day15_함수기초"
+    canonicalContentRef: "30days/day15_함수기초"
+  - order: 7
+    lessonRef: "30days/day18_모듈과import"
+    canonicalContentRef: "30days/day18_모듈과import"
+  - order: 8
+    lessonRef: "30days/day20_예외처리"
+    canonicalContentRef: "30days/day20_예외처리"
+  - order: 9
+    lessonRef: "pdf/00_pdf소개"
+    canonicalContentRef: "pdf/00_pdf소개"
+  - order: 10
+    lessonRef: "pdf/01_pdf열고페이지정보"
+    canonicalContentRef: "pdf/01_pdf열고페이지정보"
+  - order: 11
+    lessonRef: "pdf/02_pdf병합과분할"
+    canonicalContentRef: "pdf/02_pdf병합과분할"
+  - order: 12
+    lessonRef: "pdf/03_텍스트추출"
+    canonicalContentRef: "pdf/03_텍스트추출"
+  - order: 13
+    lessonRef: "pdf/05_첫pdf생성"
+    canonicalContentRef: "pdf/05_첫pdf생성"
+  - order: 14
+    lessonRef: "pdf/07_표와이미지삽입"
+    canonicalContentRef: "pdf/07_표와이미지삽입"
+  - order: 15
+    lessonRef: "pdf/08_워터마크와암호화"
+    canonicalContentRef: "pdf/08_워터마크와암호화"
+  - order: 16
+    lessonRef: "pdf/09_양식채우기"
+    canonicalContentRef: "pdf/09_양식채우기"
+  - order: 17
+    lessonRef: "pdf/10_월간청구서생성기"
+    canonicalContentRef: "pdf/10_월간청구서생성기"

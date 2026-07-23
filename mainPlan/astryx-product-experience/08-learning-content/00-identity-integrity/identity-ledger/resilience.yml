@@ -1,0 +1,19 @@
+schemaVersion: 1
+category: "resilience"
+sourceCount: 3
+lessons:
+  - lessonRef: "resilience/01_멱등성과처리원장"
+    sourcePath: "curricula/python/automation/os/resilience/01_멱등성과처리원장.yaml"
+    metaId: "resilience_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "resilience/02_재개가능체크포인트"
+    sourcePath: "curricula/python/automation/os/resilience/02_재개가능체크포인트.yaml"
+    metaId: "resilience_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "resilience/03_원자적쓰기"
+    sourcePath: "curricula/python/automation/os/resilience/03_원자적쓰기.yaml"
+    metaId: "resilience_03"
+    registryStatus: registered
+    reviewStatus: pending

@@ -647,3 +647,275 @@ sections:
     type: noError
     noError: 업무 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 업무 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: polars_09-large-log-aggregation-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_generate
+    - workflow_validation
+    title: 대용량 로그를 level·service별 count와 오류율로 집계하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 원본 message를 모두 materialize하지 않고 필요한 group count와 error rate를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 집계에 쓰지 않는 message 열은 scanColumns에서 제외하세요.
+    - error count와 total을 함께 반환해 rate를 재검산할 수 있게 하세요.
+    exercise:
+      prompt: aggregate_logs(rows)를 완성해 services와 scannedColumns를 반환하세요.
+      starterCode: |-
+        def aggregate_logs(rows):
+            raise NotImplementedError
+      solution: |
+        def aggregate_logs(rows):
+            grouped = {}
+            for row in rows:
+                bucket = grouped.setdefault(row["service"], {"total": 0, "levels": {}})
+                bucket["total"] += 1
+                bucket["levels"][row["level"]] = bucket["levels"].get(row["level"], 0) + 1
+            services = {}
+            for service, bucket in sorted(grouped.items()):
+                errors = bucket["levels"].get("ERROR", 0)
+                services[service] = {"total": bucket["total"], "levels": {key: bucket["levels"][key] for key in sorted(bucket["levels"])}, "errorRate": round(errors / bucket["total"], 3)}
+            return {"services": services, "scannedColumns": ["level", "service"]}
+      hints: *id001
+    check:
+      id: python.polars.polars_09.large-log-aggregation.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_09.large-log-aggregation.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: aggregate_logs
+        cases:
+        - id: aggregates-needed-columns-only
+          arguments:
+          - value:
+            - service: api
+              level: INFO
+              message: ok
+            - service: api
+              level: ERROR
+              message: bad
+            - service: worker
+              level: INFO
+              message: done
+          expectedReturn:
+            services:
+              api:
+                total: 2
+                levels:
+                  ERROR: 1
+                  INFO: 1
+                errorRate: 0.5
+              worker:
+                total: 1
+                levels:
+                  INFO: 1
+                errorRate: 0.0
+            scannedColumns:
+            - level
+            - service
+        - id: handles-empty-log
+          arguments:
+          - value: []
+          expectedReturn:
+            services: {}
+            scannedColumns:
+            - level
+            - service
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: polars_09-log-schema-drift-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_09-large-log-aggregation-mastery
+    title: 새 로그 batch의 schema drift와 type 손상 탐지하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 대용량 scan 전에 기대 열·추가 열·잘못된 type의 row index를 반환한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 전체 schema drift와 개별 row type damage를 분리하세요.
+    - 대용량 처리를 시작하기 전에 scan schema를 먼저 확인하세요.
+    exercise:
+      prompt: audit_log_schema(rows, required_types)를 완성해 missingColumns, extraColumns, damagedRows를 반환하세요.
+      starterCode: |-
+        def audit_log_schema(rows, required_types):
+            raise NotImplementedError
+      solution: |
+        def audit_log_schema(rows, required_types):
+            type_map = {"str": str, "int": int}
+            if any(kind not in type_map for kind in required_types.values()):
+                raise ValueError("unknown type")
+            observed = set().union(*(set(row) for row in rows)) if rows else set()
+            missing = sorted(set(required_types) - observed)
+            extra = sorted(observed - set(required_types))
+            damaged = []
+            for index, row in enumerate(rows):
+                if any(key not in row or not isinstance(row[key], type_map[kind]) or (kind == "int" and isinstance(row[key], bool)) for key, kind in required_types.items()):
+                    damaged.append(index)
+            return {"missingColumns": missing, "extraColumns": extra, "damagedRows": damaged}
+      hints: *id002
+    check:
+      id: python.polars.polars_09.log-schema-drift.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_09.log-schema-drift.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_log_schema
+        cases:
+        - id: finds-schema-and-row-damage
+          arguments:
+          - value:
+            - service: api
+              status: 200
+              debug: true
+            - service: worker
+              status: ok
+          - value:
+              service: str
+              status: int
+              requestId: str
+          expectedReturn:
+            missingColumns:
+            - requestId
+            extraColumns:
+            - debug
+            damagedRows:
+            - 0
+            - 1
+        - id: reports-empty-source-gaps
+          arguments:
+          - value: []
+          - value:
+              service: str
+          expectedReturn:
+            missingColumns:
+            - service
+            extraColumns: []
+            damagedRows: []
+        - id: rejects-unknown-type
+          arguments:
+          - value: []
+          - value:
+              x: uuid
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: polars_09-large-log-plan-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_09-log-schema-drift-transfer
+    title: 대용량 로그 query plan 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: scan projection, early filter, group aggregate, global sort의 비용과 증거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 원본 row를 모두 Python으로 가져오기 전에 engine plan을 줄이세요.
+    - explain plan과 실제 결과 row count를 함께 확인하세요.
+    exercise:
+      prompt: choose_log_plan(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_log_plan(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_log_plan(situation):
+            table = {'few-needed-columns': {'action': 'projection pushdown', 'evidence': 'scan column list', 'risk': 'read full payload'}, 'narrow-time-window': {'action': 'predicate pushdown', 'evidence': 'time filter in plan', 'risk': 'filter after collect'}, 'top-errors': {'action': 'group then limited sort', 'evidence': 'group cardinality', 'risk': 'global raw-row sort'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.polars.polars_09.large-log-plan.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_09.large-log-plan.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_log_plan
+        cases:
+        - id: recalls-few-needed-columns
+          arguments:
+          - value: few-needed-columns
+          expectedReturn:
+            action: projection pushdown
+            evidence: scan column list
+            risk: read full payload
+        - id: recalls-narrow-time-window
+          arguments:
+          - value: narrow-time-window
+          expectedReturn:
+            action: predicate pushdown
+            evidence: time filter in plan
+            risk: filter after collect
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

@@ -20,7 +20,8 @@ def buildParser() -> argparse.ArgumentParser:
             "  codaro notebook.py\n"
             "  codaro app notebook.py\n"
             "  codaro export notebook.py --format ipynb\n"
-            "  codaro pack inspect ./my-pack"
+            "  codaro pack inspect ./my-pack\n"
+            "  codaro classroom audit"
         ),
         formatter_class=argparse.RawTextHelpFormatter,
     )
@@ -71,6 +72,21 @@ def buildParser() -> argparse.ArgumentParser:
     packExportParser.add_argument("source_dir", help="Pack directory containing codaroPack.yaml.")
     packExportParser.add_argument("--output", required=True, help="Output zip path.")
 
+    classroomParser = subparsers.add_parser(
+        "classroom",
+        help="Audit or archive data from the retired classroom feature.",
+    )
+    classroomSubparsers = classroomParser.add_subparsers(dest="classroom_command", required=True)
+    classroomSubparsers.add_parser("audit", help="Count local retired classroom records.")
+    classroomExportParser = classroomSubparsers.add_parser("export", help="Export a redacted local archive.")
+    classroomExportParser.add_argument("--output", required=True, help="Output ZIP path.")
+    classroomVerifyParser = classroomSubparsers.add_parser("verify", help="Verify an exported archive.")
+    classroomVerifyParser.add_argument("archive", help="Archive ZIP path.")
+    classroomPurgeParser = classroomSubparsers.add_parser("purge", help="Purge verified retired classroom data.")
+    classroomPurgeParser.add_argument("--archive", required=True, help="Verified archive ZIP path.")
+    classroomPurgeParser.add_argument("--confirm-hash", default="", help="Exact detached SHA-256 for user purge.")
+    classroomPurgeParser.add_argument("--reason", required=True, choices=["user", "expired"])
+
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--no-browser", action="store_true")
@@ -99,6 +115,10 @@ def main() -> None:
 
     if command == "pack":
         _handlePack(args)
+        return
+
+    if command == "classroom":
+        _handleClassroom(args)
         return
 
     if command == "export":
@@ -229,12 +249,44 @@ def _handlePack(args) -> None:
     raise ValueError(f"Unsupported pack command: {args.pack_command}")
 
 
+def _handleClassroom(args) -> None:
+    from .migrations import (
+        ClassroomMigrationError,
+        auditClassroomArchive,
+        exportClassroomArchive,
+        purgeClassroomArchive,
+        resumeClassroomPurge,
+        verifyClassroomArchive,
+    )
+
+    try:
+        if args.classroom_command == "audit":
+            result = auditClassroomArchive()
+        elif args.classroom_command == "export":
+            result = exportClassroomArchive(args.output)
+        elif args.classroom_command == "verify":
+            result = verifyClassroomArchive(args.archive)
+        elif args.classroom_command == "purge":
+            resumed = resumeClassroomPurge()
+            result = resumed if resumed["count"] else purgeClassroomArchive(
+                args.archive,
+                args.confirm_hash,
+                args.reason,
+            )
+        else:
+            raise ValueError(f"Unsupported classroom command: {args.classroom_command}")
+    except ClassroomMigrationError as error:
+        print(f"Classroom migration failed: {error}", file=sys.stderr)
+        raise SystemExit(1) from error
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+
+
 def normalizeArgs(rawArgs: list[str]) -> list[str]:
     if not rawArgs:
         return ["edit"]
 
     command = rawArgs[0].lower()
-    knownCommands = {"edit", "run", "app", "export", "task", "pack"}
+    knownCommands = {"edit", "run", "app", "export", "task", "pack", "classroom"}
 
     if command == "app":
         return ["run", *rawArgs[1:]]

@@ -1,0 +1,9 @@
+Use case: scientific-educational
+Asset type: Codaro learning catalog domain visual for data analysis
+Primary request: Create a premium editorial educational illustration that makes data analysis tangible: raw table tiles flow through cleaning and grouping steps into a clear comparison chart and a compact report artifact. Use abstract rows, columns, missing-value gaps, filters, and grouped stacks with no readable text.
+Scene/backdrop: bright neutral studio workspace with white, charcoal, teal, coral, yellow, and leaf-green accents.
+Style/medium: sophisticated mixed 3D paper-cut and crisp editorial illustration, realistic paper and ceramic textures, high-end education product art, not childish.
+Composition/framing: wide 16:9, coherent left-to-right analysis pipeline, generous safe edges, every object fully visible.
+Lighting/mood: soft daylight, analytical, calm, high clarity.
+Constraints: no people, logos, brand names, letters, readable UI text, watermark, gradients, glowing orbs, bokeh, or dark atmospheric background. The visual must teach the relationship between raw data, cleaning, grouping, comparison, and a result.
+Avoid: generic dashboard screenshot, neon cyberpunk, dominant purple or blue, excessive rounded cards.

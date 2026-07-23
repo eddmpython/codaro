@@ -1,0 +1,19 @@
+schemaVersion: 1
+category: "devTools"
+sourceCount: 3
+lessons:
+  - lessonRef: "devTools/commandLineIntro"
+    sourcePath: "curricula/python/devLiteracy/devTools/commandLineIntro.yaml"
+    metaId: "devTools_commandLineIntro"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "devTools/gitFirstSteps"
+    sourcePath: "curricula/python/devLiteracy/devTools/gitFirstSteps.yaml"
+    metaId: "devTools_gitFirstSteps"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "devTools/githubIntro"
+    sourcePath: "curricula/python/devLiteracy/devTools/githubIntro.yaml"
+    metaId: "devTools_githubIntro"
+    registryStatus: registered
+    reviewStatus: pending

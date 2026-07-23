@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "statsmodels"
+sourceCount: 11
+lessons:
+  - lessonRef: "statsmodels/00_statsmodels소개"
+    sourcePath: "curricula/python/mathStatsMl/statsmodels/00_statsmodels소개.yaml"
+    metaId: "statsmodels_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "statsmodels/01_광고비매출예측"
+    sourcePath: "curricula/python/mathStatsMl/statsmodels/01_광고비매출예측.yaml"
+    metaId: "statsmodels_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "statsmodels/02_부동산가격예측"
+    sourcePath: "curricula/python/mathStatsMl/statsmodels/02_부동산가격예측.yaml"
+    metaId: "statsmodels_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "statsmodels/03_의료보험비용예측"
+    sourcePath: "curricula/python/mathStatsMl/statsmodels/03_의료보험비용예측.yaml"
+    metaId: "statsmodels_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "statsmodels/04_항공수요예측"
+    sourcePath: "curricula/python/mathStatsMl/statsmodels/04_항공수요예측.yaml"
+    metaId: "statsmodels_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "statsmodels/05_고객이탈예측"
+    sourcePath: "curricula/python/mathStatsMl/statsmodels/05_고객이탈예측.yaml"
+    metaId: "statsmodels_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "statsmodels/06_다중회귀심화"
+    sourcePath: "curricula/python/mathStatsMl/statsmodels/06_다중회귀심화.yaml"
+    metaId: "statsmodels_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "statsmodels/07_경제지표회귀분석"
+    sourcePath: "curricula/python/mathStatsMl/statsmodels/07_경제지표회귀분석.yaml"
+    metaId: "statsmodels_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "statsmodels/08_직원퇴사예측"
+    sourcePath: "curricula/python/mathStatsMl/statsmodels/08_직원퇴사예측.yaml"
+    metaId: "statsmodels_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "statsmodels/09_자전거수요예측"
+    sourcePath: "curricula/python/mathStatsMl/statsmodels/09_자전거수요예측.yaml"
+    metaId: "statsmodels_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "statsmodels/10_종합프로젝트"
+    sourcePath: "curricula/python/mathStatsMl/statsmodels/10_종합프로젝트.yaml"
+    metaId: "statsmodels_10"
+    registryStatus: registered
+    reviewStatus: pending

@@ -403,3 +403,268 @@ sections:
   check:
     noError: 두 번의 호출과 비용 계산이 정상 실행되어야 합니다.
     resultCheck: short cost ≤ long cost 관계가 assertion을 통과해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 04_token_cost-cost-function-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - inspect_usage
+    - price_table
+    - cost_function
+    title: usage 객체로 호출 비용 계산하기
+    subtitle: token cost calculation
+    goal: calculate_call_cost(usage, model_name, price_table)를 완성해 입력, 출력, 총 비용과 토큰 수를 반환한다.
+    why: 비용 추적은 모델 호출 뒤 usage를 읽고, 모델별 단가표에 대입하는 계산을 정확히 할 때 자동화 가능한 지표가 됩니다.
+    explanation: input_tokens와 output_tokens를 각각 백만 토큰 단가로 계산하고, 모든 비용은 소수점 6자리로 반올림합니다.
+    tips:
+    - 단가표에 없는 모델은 조용히 0으로 처리하지 말고 실패시킵니다.
+    - 비용 계산과 토큰 수 요약을 한 반환값에 묶으면 UI와 로그가 같은 데이터를 씁니다.
+    exercise:
+      prompt: calculate_call_cost(usage, model_name, price_table)를 완성해 비용 breakdown을 반환하세요.
+      starterCode: |-
+        def calculate_call_cost(usage, model_name, price_table):
+            raise NotImplementedError
+      solution: |-
+        def calculate_call_cost(usage, model_name, price_table):
+            if model_name not in price_table:
+                raise ValueError("unknown model")
+            rate = price_table[model_name]
+            input_tokens = int(usage.get("input_tokens", 0))
+            output_tokens = int(usage.get("output_tokens", 0))
+            input_cost = input_tokens * rate["input_per_million"] / 1_000_000
+            output_cost = output_tokens * rate["output_per_million"] / 1_000_000
+            total_cost = input_cost + output_cost
+            return {
+                "inputCost": round(input_cost, 6),
+                "outputCost": round(output_cost, 6),
+                "totalCost": round(total_cost, 6),
+                "tokens": {"input": input_tokens, "output": output_tokens},
+            }
+      hints:
+      - usage는 dict라고 가정하고 get으로 토큰 기본값을 읽습니다.
+      - 백만 토큰 단가이므로 1_000_000으로 나눕니다.
+    check:
+      id: python.llm.token-cost.cost-function.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.token-cost.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: calculate_call_cost
+        cases:
+        - id: calculates-input-output-and-total-cost
+          arguments:
+          - value:
+              input_tokens: 1000
+              output_tokens: 200
+          - value: claude-haiku-4-5
+          - value:
+              claude-haiku-4-5:
+                input_per_million: 1.0
+                output_per_million: 5.0
+          expectedReturn:
+            inputCost: 0.001
+            outputCost: 0.001
+            totalCost: 0.002
+            tokens:
+              input: 1000
+              output: 200
+        - id: rejects-unknown-model
+          arguments:
+          - value:
+              input_tokens: 10
+              output_tokens: 10
+          - value: missing-model
+          - value:
+              claude-haiku-4-5:
+                input_per_million: 1.0
+                output_per_million: 5.0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 04_token_cost-experiment-summary-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - cost_logger
+    - workflow_validation
+    title: 여러 호출의 비용 실험 요약하기
+    subtitle: cost experiment summary
+    goal: summarize_cost_experiment(rows)를 완성해 총비용, 최저 비용 호출, 최고 비용 호출을 반환한다.
+    why: max_tokens나 캐시 정책을 비교하려면 개별 호출을 보는 데서 끝나지 않고 실험 단위로 합산해야 합니다.
+    explanation: rows는 label과 cost_usd를 가진 호출 목록입니다. 빈 실험은 비교할 수 없으므로 ValueError를 발생시킵니다.
+    tips:
+    - min과 max는 같은 데이터에서 label만 뽑아도 충분합니다.
+    - 총비용은 로그와 UI가 흔들리지 않도록 소수점 6자리로 고정합니다.
+    exercise:
+      prompt: summarize_cost_experiment(rows)를 완성해 실험 요약 사전을 반환하세요.
+      starterCode: |-
+        def summarize_cost_experiment(rows):
+            raise NotImplementedError
+      solution: |-
+        def summarize_cost_experiment(rows):
+            if not rows:
+                raise ValueError("rows must not be empty")
+            total = round(sum(row["cost_usd"] for row in rows), 6)
+            cheapest = min(rows, key=lambda row: row["cost_usd"])
+            most_expensive = max(rows, key=lambda row: row["cost_usd"])
+            return {
+                "totalCost": total,
+                "cheapest": cheapest["label"],
+                "mostExpensive": most_expensive["label"],
+                "callCount": len(rows),
+            }
+      hints:
+      - 비용 비교는 token count가 아니라 cost_usd 기준으로 합니다.
+      - rows가 비어 있으면 min과 max가 실패하므로 먼저 막습니다.
+    check:
+      id: python.llm.token-cost.experiment-summary.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.token-cost.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_cost_experiment
+        cases:
+        - id: summarizes-three-cost-rows
+          arguments:
+          - value:
+            - label: short
+              cost_usd: 0.001
+            - label: long
+              cost_usd: 0.004
+            - label: cached
+              cost_usd: 0.0007
+          expectedReturn:
+            totalCost: 0.0057
+            cheapest: cached
+            mostExpensive: long
+            callCount: 3
+        - id: rejects-empty-experiment
+          arguments:
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 04_token_cost-rule-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 04_token_cost-experiment-summary-transfer
+    title: 토큰 비용 관리 기준 회상하기
+    subtitle: cost rule recall
+    goal: choose_cost_tracking_rule(goal)를 완성해 비용 추적 상황별 규칙과 위험을 반환한다.
+    why: 비용은 호출 후 확인하는 장식이 아니라, max_tokens, 모델 선택, 예산 경보를 결정하는 운영 신호입니다.
+    explanation: usage-inspection, price-table, max-tokens, budget-alert, compare-runs 상황별 규칙을 선택하세요.
+    tips:
+    - usage를 저장하지 않으면 나중에 비용을 재구성하기 어렵습니다.
+    - 모델별 단가가 다르면 같은 토큰 수라도 비용이 달라집니다.
+    exercise:
+      prompt: choose_cost_tracking_rule(goal)를 완성해 rule, useWhen, risk를 반환하세요.
+      starterCode: |-
+        def choose_cost_tracking_rule(goal):
+            raise NotImplementedError
+      solution: |-
+        def choose_cost_tracking_rule(goal):
+            table = {
+                "usage-inspection": {"rule": "read input and output tokens", "useWhen": "every model call completes", "risk": "invisible spend"},
+                "price-table": {"rule": "map usage to model rates", "useWhen": "cost must be shown", "risk": "wrong estimate"},
+                "max-tokens": {"rule": "cap output length deliberately", "useWhen": "answer length can vary", "risk": "budget drift"},
+                "budget-alert": {"rule": "compare total cost with threshold", "useWhen": "runs are automated", "risk": "runaway loop"},
+                "compare-runs": {"rule": "summarize cost by experiment label", "useWhen": "prompt variants compete", "risk": "anecdotal choice"},
+            }
+            if goal not in table:
+                raise ValueError("unknown cost goal")
+            return table[goal]
+      hints:
+      - 비용이 중요한 곳에서는 호출마다 usage를 기록합니다.
+      - 예산 경보는 자동화 루프에 특히 필요합니다.
+    check:
+      id: python.llm.token-cost.rule-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.token-cost.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_cost_tracking_rule
+        cases:
+        - id: recalls-usage-inspection
+          arguments:
+          - value: usage-inspection
+          expectedReturn:
+            rule: read input and output tokens
+            useWhen: every model call completes
+            risk: invisible spend
+        - id: recalls-budget-alert
+          arguments:
+          - value: budget-alert
+          expectedReturn:
+            rule: compare total cost with threshold
+            useWhen: runs are automated
+            risk: runaway loop
+        - id: rejects-unknown-goal
+          arguments:
+          - value: guess-later
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

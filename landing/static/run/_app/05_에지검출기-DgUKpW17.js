@@ -1,0 +1,513 @@
+var e=`meta:\r
+  packages:\r
+  - numpy\r
+  - opencv-python\r
+  - scikit-learn\r
+  id: opencv_05\r
+  title: 에지검출기\r
+  order: 5\r
+  category: opencv\r
+  difficulty: ⭐⭐\r
+  badge: 기초\r
+  tags:\r
+  - OpenCV\r
+  - Canny\r
+  - Sobel\r
+  - Laplacian\r
+  - 에지\r
+  - 경계\r
+  seo:\r
+    title: OpenCV 기초 - 에지 검출기\r
+    description: OpenCV의 Canny/Sobel/Laplacian으로 에지를 검출하고 임계값 효과를 정량 비교합니다.\r
+    keywords:\r
+    - OpenCV\r
+    - Canny\r
+    - Sobel\r
+    - Laplacian\r
+    - 에지검출\r
+intro:\r
+  emoji: 📐\r
+  goal: 같은 그레이스케일 입력에 Canny/Sobel/Laplacian 세 검출기를 적용해 임계값과 보간 옵션이 검출 결과에 어떤 영향을 주는지 손으로 확인합니다.\r
+  description: 에지 검출은 "밝기가 어디서 갑자기 바뀌는가"를 잡아내는 작업입니다. 1차 미분(Sobel), 2차 미분(Laplacian), 다단계 알고리즘(Canny) 세 접근의 차이를 같은 입력에서 비교합니다.\r
+  direction: 합성 도형 입력으로 정답 위치를 미리 알고 검증한 뒤, 실제 사진에 적용해 임계값 변경이 검출 픽셀 수에 어떻게 반영되는지 확인합니다.\r
+  benefits:\r
+  - cv2.Canny의 두 임계값이 hysteresis 동작에 어떻게 작용하는지 직접 비교합니다.\r
+  - cv2.Sobel의 dx/dy 인자로 수직 vs 수평 에지를 분리해 봅니다.\r
+  - LoG(Gaussian + Laplacian) 패턴을 손으로 짜 노이즈 민감성을 다룹니다.\r
+  - 임계값 안전 검증 함수로 잘못된 입력을 차단합니다.\r
+  diagram:\r
+    steps:\r
+    - label: 합성 도형 입력 만들기\r
+      detail: 흰 직사각형이 있는 작은 흑백 캔버스로 정답 에지 픽셀 수를 직접 계산해 둡니다.\r
+    - label: Canny 에지 검출\r
+      detail: low/high 두 임계값을 바꿔 가며 검출 픽셀 수가 어떻게 변하는지 확인합니다.\r
+    - label: Sobel 방향성 분해\r
+      detail: dx=1 sobel과 dy=1 sobel을 분리해 수직·수평 에지가 각각 잡히는지 봅니다.\r
+    - label: Laplacian과 LoG\r
+      detail: 노이즈가 있는 입력에서 Gaussian 없이 Laplacian만 적용했을 때의 노이즈 폭발을 확인합니다.\r
+    - label: 임계값 가드 함수\r
+      detail: low<high 같은 입력 안전 조건을 함수 입구에서 ValueError로 강제합니다.\r
+    runtime:\r
+    - label: opencv-python 패키지\r
+      detail: meta.packages의 opencv-python이 가상환경에 있어야 cv2.Canny/Sobel/Laplacian이 import됩니다.\r
+    - label: 그레이스케일 입력\r
+      detail: 에지 검출은 거의 항상 그레이스케일에서 합니다. 컬러 적용은 채널별로 따로 한 뒤 합칩니다.\r
+    - label: 합성 입력 활용\r
+      detail: 정답이 정해진 합성 입력에서 검증한 뒤 실제 사진으로 일반화합니다.\r
+sections:\r
+- id: step1_load\r
+  title: 1단계. 그레이스케일 기준 입력\r
+  structuredPrimary: true\r
+  subtitle: 검출 전 채널 정리\r
+  goal: china 샘플을 BGR로 받은 뒤 cv2.COLOR_BGR2GRAY로 단채널로 줄여 shape/dtype을 dict로 확인합니다.\r
+  why: 에지 검출 함수는 단채널 uint8 입력을 가정합니다. 컬러로 그대로 넣으면 함수에 따라 채널별 결과가 합쳐져 직관과 다른 그림이 나옵니다. 첫 단계에서 입력 형식을 명시적으로 굳혀야 다음 셀들이 안전해집니다.\r
+  explanation: |-\r
+    sklearn china RGB → cvtColor BGR → cvtColor GRAY 순서로 그레이스케일을 만듭니다. 결과 shape는 (H, W)로 채널 축이 사라집니다.\r
+    매번 cvtColor 두 번을 부르는 것이 번거롭더라도, "이미지가 어디서 BGR이 되고 어디서 GRAY가 됐는지" 명시적으로 추적하는 게 디버깅에 좋습니다.\r
+    이 셀이 만드는 grayPhoto가 이후 모든 검출 셀의 입력입니다.\r
+  tips:\r
+  - cv2.imread(path, cv2.IMREAD_GRAYSCALE)로 처음부터 그레이스케일로 받을 수도 있습니다. sklearn 샘플은 RGB라 변환이 필요합니다.\r
+  - 그레이스케일 변환 후 dtype은 uint8이 유지됩니다. 0~255 범위의 밝기 값입니다.\r
+  snippet: |-\r
+    import cv2\r
+    from sklearn.datasets import load_sample_image\r
+\r
+    edgePhotoBgr = cv2.cvtColor(load_sample_image('china.jpg'), cv2.COLOR_RGB2BGR)\r
+    grayPhoto = cv2.cvtColor(edgePhotoBgr, cv2.COLOR_BGR2GRAY)\r
+\r
+    {\r
+        'inputShape': edgePhotoBgr.shape,\r
+        'grayShape': grayPhoto.shape,\r
+        'grayDtype': str(grayPhoto.dtype),\r
+        'grayMean': round(float(grayPhoto.mean()), 1),\r
+    }\r
+  exercise:\r
+    prompt: flower 샘플로 같은 흐름을 만들고 grayShape가 (427, 640)인지 확인하세요.\r
+    starterCode: |-\r
+      import cv2\r
+      from sklearn.datasets import load_sample_image\r
+\r
+      flowerBgr = cv2.cvtColor(load_sample_image('flower.jpg'), cv2.COLOR_RGB2BGR)\r
+      flowerGray = cv2.cvtColor(flowerBgr, cv2.COLOR_BGR2___)\r
+\r
+      {'grayShape': flowerGray.shape, 'grayDtype': str(flowerGray.dtype)}\r
+    hints:\r
+    - cvtColor 코드는 cv2.COLOR_BGR2GRAY입니다.\r
+    - 빈칸에는 GRAY가 들어갑니다.\r
+    check:\r
+      noError: cvtColor 두 호출이 NameError 없이 끝나야 합니다.\r
+      resultCheck: grayShape가 (427, 640)이고 grayDtype이 'uint8'이어야 합니다.\r
+  check:\r
+    noError: cvtColor 두 호출과 dict 구성이 끝나야 합니다.\r
+    resultCheck: inputShape가 (427, 640, 3), grayShape가 (427, 640)이어야 합니다.\r
+- id: step2_canny\r
+  title: 2단계. Canny 임계값 효과\r
+  structuredPrimary: true\r
+  subtitle: low/high 두 인자의 hysteresis\r
+  goal: 같은 grayPhoto에 (low, high) 임계값을 (50, 150), (100, 200), (10, 50) 세 조합으로 적용해 검출된 에지 픽셀 수가 어떻게 변하는지 비교합니다.\r
+  why: Canny는 두 임계값으로 hysteresis를 만듭니다. high 이상은 강한 에지, low~high 사이는 강한 에지와 연결된 경우에만 살아남고, low 미만은 즉시 탈락합니다. 임계값을 바꿔 가며 픽셀 수 변화를 직접 보면 두 인자의 의미가 한 번에 잡힙니다.\r
+  explanation: |-\r
+    cv2.Canny(image, threshold1, threshold2)는 1986년 John Canny가 제안한 다단계 알고리즘입니다. 내부적으로 (1) Gaussian 블러 → (2) Sobel 그래디언트 → (3) 비최대 억제 → (4) 이중 임계값 hysteresis를 거칩니다.\r
+    출력은 (H, W) uint8로 에지 픽셀은 255, 비에지는 0입니다. 픽셀 수는 (canny == 255).sum()으로 쉽게 셀 수 있습니다.\r
+    임계값을 크게 잡으면 약한 에지가 사라져 픽셀 수가 줄고, 작게 잡으면 노이즈성 에지까지 살아납니다. 일반 사진 기준 (50, 150)이 안전한 시작점입니다.\r
+  tips:\r
+  - cv2.Canny는 threshold1 < threshold2 순서를 가정합니다. 반대로 주면 알고리즘이 의도와 다르게 동작합니다.\r
+  - hysteresis 덕분에 같은 high에서도 low를 낮추면 연결된 약한 에지가 함께 살아납니다.\r
+  snippet: |-\r
+    import cv2\r
+    from sklearn.datasets import load_sample_image\r
+\r
+    cannySource = cv2.cvtColor(load_sample_image('china.jpg'), cv2.COLOR_RGB2BGR)\r
+    cannyGray = cv2.cvtColor(cannySource, cv2.COLOR_BGR2GRAY)\r
+\r
+    canny50_150 = cv2.Canny(cannyGray, 50, 150)\r
+    canny100_200 = cv2.Canny(cannyGray, 100, 200)\r
+    canny10_50 = cv2.Canny(cannyGray, 10, 50)\r
+\r
+    {\r
+        'shape': canny50_150.shape,\r
+        'edgePx_50_150': int((canny50_150 == 255).sum()),\r
+        'edgePx_100_200': int((canny100_200 == 255).sum()),\r
+        'edgePx_10_50': int((canny10_50 == 255).sum()),\r
+        'tighterIsFewer': int((canny100_200 == 255).sum()) < int((canny50_150 == 255).sum()),\r
+    }\r
+  exercise:\r
+    prompt: 같은 입력에 (200, 250) 매우 엄격한 임계값을 적용해 에지 픽셀 수가 (100, 200) 결과보다 명백히 더 작아지는지 확인하세요.\r
+    starterCode: |-\r
+      import cv2\r
+      from sklearn.datasets import load_sample_image\r
+\r
+      strictSource = cv2.cvtColor(load_sample_image('china.jpg'), cv2.COLOR_RGB2BGR)\r
+      strictGray = cv2.cvtColor(strictSource, cv2.COLOR_BGR2GRAY)\r
+\r
+      cannyMid = cv2.Canny(strictGray, 100, 200)\r
+      cannyStrict = cv2.Canny(strictGray, 200, ___)\r
+\r
+      midCount = int((cannyMid == 255).sum())\r
+      strictCount = int((cannyStrict == 255).sum())\r
+      {'midCount': midCount, 'strictCount': strictCount, 'strictIsFewer': strictCount < midCount}\r
+    hints:\r
+    - high 자리에는 low보다 큰 값이 들어가야 합니다.\r
+    - 빈칸에는 250이 들어갑니다.\r
+    check:\r
+      noError: Canny 두 호출이 끝나야 합니다.\r
+      resultCheck: strictIsFewer가 True이고 strictCount가 midCount보다 명백히 작아야 합니다.\r
+  check:\r
+    noError: Canny 세 호출과 픽셀 카운트가 끝나야 합니다.\r
+    resultCheck: tighterIsFewer가 True이고 edgePx_100_200이 edgePx_50_150보다 작아야 합니다.\r
+- id: step3_sobel\r
+  title: 3단계. Sobel로 방향성 분해\r
+  structuredPrimary: true\r
+  subtitle: dx=1 (수직 에지), dy=1 (수평 에지)\r
+  goal: 수직선과 수평선이 모두 들어 있는 합성 입력에 cv2.Sobel을 dx=1과 dy=1로 각각 적용해 한쪽이 다른 쪽 에지를 거의 잡지 않는 것을 확인합니다.\r
+  why: Sobel은 방향별 그래디언트를 따로 줍니다. 수직 에지(좌우 밝기 차이)는 dx=1에서, 수평 에지(상하 밝기 차이)는 dy=1에서 잡힙니다. 이 분리를 한 번 보면 "Sobel은 방향성, Laplacian은 무방향" 차이가 한 번에 머리에 들어옵니다.\r
+  explanation: |-\r
+    cv2.Sobel(image, ddepth, dx, dy, ksize)에서 dx, dy는 미분 차수입니다. dx=1, dy=0이면 x방향(가로) 미분으로 수직 에지를, dx=0, dy=1이면 y방향(세로) 미분으로 수평 에지를 강조합니다.\r
+    ddepth=cv2.CV_64F는 결과의 자료형입니다. 미분 결과가 음수일 수 있어 uint8이 아닌 부동소수점을 씁니다. 시각화나 후속 처리를 위해 cv2.convertScaleAbs로 절댓값 + uint8로 변환합니다.\r
+    합성 입력에서 검증하면 정답이 정확합니다. 십자(+) 모양 입력에서 dx=1 Sobel은 세로 막대만, dy=1 Sobel은 가로 막대만 강조해야 합니다.\r
+  tips:\r
+  - ksize는 보통 3 또는 5를 씁니다. 클수록 부드러워지지만 위치 정확도가 떨어집니다.\r
+  - dx와 dy를 결합하려면 cv2.magnitude(sobelX, sobelY)로 그래디언트 크기를 계산합니다.\r
+  snippet: |-\r
+    import cv2\r
+    import numpy as np\r
+\r
+    crossInput = np.zeros((40, 60), dtype=np.uint8)\r
+    crossInput[18:22, :] = 255\r
+    crossInput[:, 28:32] = 255\r
+\r
+    sobelDx = cv2.Sobel(crossInput, cv2.CV_64F, 1, 0, ksize=3)\r
+    sobelDy = cv2.Sobel(crossInput, cv2.CV_64F, 0, 1, ksize=3)\r
+\r
+    {\r
+        'dxSum': int(cv2.convertScaleAbs(sobelDx).sum()),\r
+        'dySum': int(cv2.convertScaleAbs(sobelDy).sum()),\r
+        'dxStrongerOnVerticalBar': float(cv2.convertScaleAbs(sobelDx)[:, 27:33].sum()) > float(cv2.convertScaleAbs(sobelDy)[:, 27:33].sum()),\r
+        'dyStrongerOnHorizontalBar': float(cv2.convertScaleAbs(sobelDy)[17:23, :].sum()) > float(cv2.convertScaleAbs(sobelDx)[17:23, :].sum()),\r
+    }\r
+  exercise:\r
+    prompt: 같은 입력에 cv2.magnitude로 dx/dy를 결합한 종합 그래디언트를 만들고, 그 결과의 표준편차가 dx 단독과 dy 단독보다 큰지 확인하세요.\r
+    starterCode: |-\r
+      import cv2\r
+      import numpy as np\r
+\r
+      magInput = np.zeros((40, 60), dtype=np.uint8)\r
+      magInput[18:22, :] = 255\r
+      magInput[:, 28:32] = 255\r
+\r
+      magDx = cv2.Sobel(magInput, cv2.CV_64F, 1, 0, ksize=3)\r
+      magDy = cv2.Sobel(magInput, cv2.CV_64F, 0, ___, ksize=3)\r
+      magnitude = cv2.magnitude(magDx, magDy)\r
+\r
+      magnitudeStd = float(magnitude.std())\r
+      {'magnitudeStd': round(magnitudeStd, 2), 'isPositive': magnitudeStd > 0}\r
+    hints:\r
+    - dy 차수는 1이 들어갑니다.\r
+    - 빈칸에는 1이 들어갑니다.\r
+    check:\r
+      noError: Sobel과 magnitude 호출이 끝나야 합니다.\r
+      resultCheck: magnitudeStd가 양수이고 isPositive가 True여야 합니다.\r
+  check:\r
+    noError: Sobel 두 호출과 카운트가 끝나야 합니다.\r
+    resultCheck: dxStrongerOnVerticalBar와 dyStrongerOnHorizontalBar가 모두 True여야 합니다.\r
+- id: step4_laplacian\r
+  title: 4단계. Laplacian과 LoG\r
+  structuredPrimary: true\r
+  subtitle: 2차 미분의 노이즈 민감성\r
+  goal: 노이즈가 섞인 입력에 Laplacian만 적용한 결과와 GaussianBlur 후 Laplacian(LoG)을 적용한 결과의 표준편차를 비교해 노이즈가 어떻게 줄어드는지 봅니다.\r
+  why: Laplacian은 2차 미분이라 노이즈에 매우 민감합니다. GaussianBlur로 한 번 부드럽게 만든 뒤 Laplacian을 적용하는 LoG 패턴이 표준이라, 두 결과를 한 셀에서 비교해 둬야 운영 코드에서 바로 LoG를 떠올릴 수 있습니다.\r
+  explanation: |-\r
+    Laplacian은 두 번 미분이라 그래디언트의 변화율(곡률에 가까움)을 잡습니다. 픽셀 한 칸 차이로 값이 크게 흔들리기 때문에 노이즈도 같은 정도로 증폭됩니다.\r
+    GaussianBlur는 인접 픽셀을 평균화해 노이즈를 줄입니다. 이 결과에 Laplacian을 적용하면 노이즈로 인한 가짜 에지가 사라지고 실제 구조의 에지만 남습니다.\r
+    결과의 표준편차는 "값이 얼마나 흩어져 있는가"의 지표라 노이즈가 줄면 그만큼 작아집니다. Laplacian 단독 vs LoG의 표준편차 비교가 이 차이를 정량화합니다.\r
+  tips:\r
+  - LoG는 Laplacian of Gaussian의 약자입니다. 한 번 부드럽게 만든 뒤 2차 미분을 적용한다는 의미입니다.\r
+  - GaussianBlur의 ksize를 키우면 노이즈는 더 줄지만 약한 에지도 함께 사라집니다.\r
+  snippet: |-\r
+    import cv2\r
+    import numpy as np\r
+\r
+    logRng = np.random.default_rng(42)\r
+    logClean = np.full((96, 128), 120, dtype=np.uint8)\r
+    cv2.rectangle(logClean, (32, 24), (96, 72), 190, -1)\r
+    logNoisy = np.clip(\r
+        logClean.astype(np.int16) + logRng.normal(0, 18, logClean.shape).astype(np.int16),\r
+        0,\r
+        255,\r
+    ).astype(np.uint8)\r
+\r
+    rawLap = cv2.Laplacian(logNoisy, cv2.CV_64F)\r
+    logBlurred = cv2.GaussianBlur(logNoisy, (5, 5), 0)\r
+    logLap = cv2.Laplacian(logBlurred, cv2.CV_64F)\r
+\r
+    {\r
+        'rawLapStd': round(float(rawLap.std()), 2),\r
+        'logLapStd': round(float(logLap.std()), 2),\r
+        'logIsQuieter': float(logLap.std()) < float(rawLap.std()),\r
+    }\r
+  exercise:\r
+    prompt: GaussianBlur ksize를 (9, 9)로 더 강하게 주면 LoG 결과의 표준편차가 (5, 5) 케이스보다 작아지는지 확인하세요.\r
+    starterCode: |-\r
+      import cv2\r
+      import numpy as np\r
+\r
+      strongRng = np.random.default_rng(42)\r
+      strongClean = np.full((96, 128), 120, dtype=np.uint8)\r
+      cv2.rectangle(strongClean, (32, 24), (96, 72), 190, -1)\r
+      strongNoisy = np.clip(\r
+          strongClean.astype(np.int16) + strongRng.normal(0, 18, strongClean.shape).astype(np.int16),\r
+          0,\r
+          255,\r
+      ).astype(np.uint8)\r
+\r
+      strongBlur = cv2.GaussianBlur(strongNoisy, (___, 9), 0)\r
+      strongLap = cv2.Laplacian(strongBlur, cv2.CV_64F)\r
+      {'strongLapStd': round(float(strongLap.std()), 2)}\r
+    hints:\r
+    - 정사각 커널이라 두 인자 모두 9입니다.\r
+    - 빈칸에는 9가 들어갑니다.\r
+    check:\r
+      noError: GaussianBlur와 Laplacian 호출이 끝나야 합니다.\r
+      resultCheck: strongLapStd가 양수이고 0~20 사이여야 합니다.\r
+  check:\r
+    noError: 두 Laplacian 호출이 끝나야 합니다.\r
+    resultCheck: logIsQuieter가 True이고 logLapStd가 rawLapStd보다 명백히 작아야 합니다.\r
+- id: step5_compare\r
+  title: 5단계. 세 검출기 한 줄 비교\r
+  structuredPrimary: true\r
+  subtitle: 같은 입력 × 세 알고리즘\r
+  goal: 같은 그레이스케일 입력에 Canny/Sobel magnitude/LoG 세 검출기를 적용해 검출 픽셀 수와 표준편차를 한 dict로 모아 비교합니다.\r
+  why: 세 검출기는 출력 형식과 강도가 모두 다릅니다. 한 dict에 모아 두면 "Canny는 이진, Sobel은 강도, Laplacian은 부호 있는 변화율"의 차이를 숫자로 한 번에 본다는 점에서 의미 있습니다.\r
+  explanation: |-\r
+    Canny는 이진 출력이라 (count == 255).sum()으로 에지 픽셀 수를 직접 셉니다. Sobel/Laplacian은 강도 출력이라 표준편차나 합으로 "전체 에지 강도"를 측정합니다.\r
+    셋 다 같은 입력으로 비교하므로 결과 dict는 "Canny에서 N픽셀 검출 = Sobel에서 표준편차 M = LoG에서 표준편차 K"라는 형태로 같은 사진을 다르게 본 결과가 됩니다.\r
+    실무에서는 사진 종류에 따라 어떤 검출기를 쓸지 다릅니다. Canny는 컨투어 추출, Sobel은 그래디언트 기반 특징, Laplacian/LoG는 블롭 검출 같은 곳에 자주 쓰입니다.\r
+  tips:\r
+  - "Canny + cv2.findContours가 객체 윤곽 추출의 표준 조합입니다."\r
+  - Sobel x/y를 magnitude로 결합하면 방향 정보가 사라집니다. 방향이 필요하면 cv2.phase를 함께 씁니다.\r
+  snippet: |-\r
+    import cv2\r
+    import numpy as np\r
+    from sklearn.datasets import load_sample_image\r
+\r
+    compareBgr = cv2.cvtColor(load_sample_image('china.jpg'), cv2.COLOR_RGB2BGR)\r
+    compareGray = cv2.cvtColor(compareBgr, cv2.COLOR_BGR2GRAY)\r
+\r
+    compareCanny = cv2.Canny(compareGray, 50, 150)\r
+    compareSobelX = cv2.Sobel(compareGray, cv2.CV_64F, 1, 0, ksize=3)\r
+    compareSobelY = cv2.Sobel(compareGray, cv2.CV_64F, 0, 1, ksize=3)\r
+    compareSobelMag = cv2.magnitude(compareSobelX, compareSobelY)\r
+    compareBlurred = cv2.GaussianBlur(compareGray, (5, 5), 0)\r
+    compareLog = cv2.Laplacian(compareBlurred, cv2.CV_64F)\r
+\r
+    {\r
+        'cannyEdgePx': int((compareCanny == 255).sum()),\r
+        'sobelMagStd': round(float(compareSobelMag.std()), 1),\r
+        'logStd': round(float(compareLog.std()), 1),\r
+        'inputShape': compareGray.shape,\r
+    }\r
+  exercise:\r
+    prompt: Canny에 더 엄격한 (100, 200) 임계값을 적용해 cannyEdgePx가 줄어드는지, Sobel/LoG는 임계값에 무관하므로 동일한 값이 나오는지 확인하세요.\r
+    starterCode: |-\r
+      import cv2\r
+      import numpy as np\r
+      from sklearn.datasets import load_sample_image\r
+\r
+      tightBgr = cv2.cvtColor(load_sample_image('china.jpg'), cv2.COLOR_RGB2BGR)\r
+      tightGray = cv2.cvtColor(tightBgr, cv2.COLOR_BGR2GRAY)\r
+      tightCanny = cv2.Canny(tightGray, 100, ___)\r
+      {'tightCannyPx': int((tightCanny == 255).sum())}\r
+    hints:\r
+    - high 임계값은 low보다 커야 합니다.\r
+    - 빈칸에는 200이 들어갑니다.\r
+    check:\r
+      noError: Canny 호출이 끝나야 합니다.\r
+      resultCheck: tightCannyPx가 양의 정수이고 50_000보다 작아야 합니다.\r
+  check:\r
+    noError: 세 검출기 호출이 끝나야 합니다.\r
+    resultCheck: cannyEdgePx가 양의 정수이고 sobelMagStd, logStd 둘 다 양수여야 합니다.\r
+- id: step6_color\r
+  title: 6단계. 에지 오버레이\r
+  structuredPrimary: true\r
+  subtitle: 검출 결과를 원본 위에 빨강으로\r
+  goal: Canny 결과를 boolean 마스크로 만들어 원본 컬러 이미지 위에 빨강([255, 0, 0])으로 덮어 씌우고, 마스크 픽셀 수와 평균 컬러를 확인합니다.\r
+  why: 에지 검출 결과는 따로 보면 단조롭지만 원본 위에 겹치면 어떤 구조가 잡혔는지 즉시 보입니다. 마스크 기반 컬러 오버레이는 보고서/대시보드에서 가장 자주 쓰이는 시각화 패턴입니다.\r
+  explanation: |-\r
+    canny > 0은 boolean 마스크(2D)입니다. 컬러 이미지 (H, W, 3)에 fancy indexing image[mask] = [R, G, B]을 적용하면 마스크가 True인 픽셀의 세 채널을 동시에 덮어 씁니다.\r
+    원본을 보존하려면 .copy()를 먼저 만들고 오버레이를 그 사본에 적용해야 합니다. view를 그대로 쓰면 원본 사진이 영구 변경됩니다.\r
+    마스크 픽셀 수와 오버레이 후 평균 RGB를 보면 "얼마나 많은 픽셀이 빨강으로 바뀌었나"가 정량화됩니다. 빨강 영역이 많을수록 (R, G, B) 평균에서 R이 커지고 G, B는 줄어듭니다.\r
+  tips:\r
+  - 컬러 이미지는 sklearn 샘플(RGB)을 그대로 imshow에 쓸 수 있습니다. 별도 cvtColor 불필요.\r
+  - 오버레이 색을 BGR ([0, 0, 255])로 두면 imshow에서 파랑으로 보입니다. RGB 이미지 위에 빨강을 그리려면 [255, 0, 0]을 씁니다.\r
+  snippet: |-\r
+    import cv2\r
+    import numpy as np\r
+    from sklearn.datasets import load_sample_image\r
+\r
+    overlayRgb = load_sample_image('china.jpg').copy()\r
+    overlayGray = cv2.cvtColor(cv2.cvtColor(overlayRgb, cv2.COLOR_RGB2BGR), cv2.COLOR_BGR2GRAY)\r
+    overlayCanny = cv2.Canny(overlayGray, 50, 150)\r
+\r
+    overlayMask = overlayCanny > 0\r
+    overlayRgb[overlayMask] = [255, 0, 0]\r
+\r
+    {\r
+        'maskPixels': int(overlayMask.sum()),\r
+        'meanRgbOriginal': tuple(round(float(c), 1) for c in load_sample_image('china.jpg').mean(axis=(0, 1))),\r
+        'meanRgbOverlay': tuple(round(float(c), 1) for c in overlayRgb.mean(axis=(0, 1))),\r
+        'rWentUp': float(overlayRgb[..., 0].mean()) > float(load_sample_image('china.jpg')[..., 0].mean()),\r
+    }\r
+  exercise:\r
+    prompt: 오버레이 색을 녹색([0, 255, 0])으로 바꿔서 마스크 위치의 G 채널 평균이 원본보다 명백히 커지는지 확인하세요.\r
+    starterCode: |-\r
+      import cv2\r
+      import numpy as np\r
+      from sklearn.datasets import load_sample_image\r
+\r
+      greenRgb = load_sample_image('china.jpg').copy()\r
+      greenGray = cv2.cvtColor(cv2.cvtColor(greenRgb, cv2.COLOR_RGB2BGR), cv2.COLOR_BGR2GRAY)\r
+      greenCanny = cv2.Canny(greenGray, 50, 150)\r
+      greenMask = greenCanny > 0\r
+      greenRgb[greenMask] = [0, ___, 0]\r
+\r
+      gOriginal = float(load_sample_image('china.jpg')[..., 1].mean())\r
+      gOverlay = float(greenRgb[..., 1].mean())\r
+      {'gOriginal': round(gOriginal, 1), 'gOverlay': round(gOverlay, 1), 'gWentUp': gOverlay > gOriginal}\r
+    hints:\r
+    - 녹색 채널 값은 0~255 사이입니다.\r
+    - 빈칸에는 255가 들어갑니다.\r
+    check:\r
+      noError: 오버레이 적용이 IndexError 없이 끝나야 합니다.\r
+      resultCheck: gWentUp이 True이고 gOverlay가 gOriginal보다 명백히 커야 합니다.\r
+  check:\r
+    noError: 오버레이 적용과 평균 계산이 끝나야 합니다.\r
+    resultCheck: maskPixels가 양수이고 rWentUp이 True여야 합니다.\r
+- id: practice\r
+  title: 실습 - flower에 LoG 적용\r
+  structuredPrimary: true\r
+  subtitle: 다른 입력에서 일반화\r
+  goal: flower 샘플에 LoG(GaussianBlur + Laplacian)를 적용해 결과 통계가 china 입력과 어떻게 다른지 dict로 비교합니다.\r
+  why: 같은 알고리즘을 다른 입력에 적용해 봐야 알고리즘이 "사진 종류"에 어떻게 반응하는지 감각이 생깁니다. 꽃 사진은 풍경 사진보다 색 변화가 단순해 LoG 표준편차가 다르게 나옵니다.\r
+  explanation: |-\r
+    flower 사진은 단일 꽃이 가운데 있는 단순한 구조라 china 풍경 사진보다 강한 에지가 적습니다. 같은 LoG 함수의 표준편차로 이 차이를 정량화할 수 있습니다.\r
+    함수로 묶어 두면 새 입력을 받아도 같은 형식의 dict를 돌려줘 비교가 단순해집니다. 자동화에서 자주 쓰는 패턴입니다.\r
+    실습 결과 dict는 두 입력의 LoG 통계 차이를 명시적으로 비교할 수 있게 만듭니다.\r
+  tips:\r
+  - LoG 표준편차는 "이 사진에 강한 구조 변화가 얼마나 많은가"의 거친 지표로 자주 쓰입니다.\r
+  - 같은 함수를 다양한 입력에 돌리는 패턴은 회귀 테스트와 운영 모니터링 모두에 유용합니다.\r
+  snippet: |-\r
+    import cv2\r
+    import numpy as np\r
+    from sklearn.datasets import load_sample_image\r
+\r
+\r
+    def logStats(name: str) -> dict:\r
+        bgr = cv2.cvtColor(load_sample_image(name), cv2.COLOR_RGB2BGR)\r
+        gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)\r
+        blurred = cv2.GaussianBlur(gray, (5, 5), 0)\r
+        lap = cv2.Laplacian(blurred, cv2.CV_64F)\r
+        return {\r
+            'name': name,\r
+            'logStd': round(float(lap.std()), 2),\r
+            'logAbsMean': round(float(np.abs(lap).mean()), 2),\r
+        }\r
+\r
+\r
+    [logStats('china.jpg'), logStats('flower.jpg')]\r
+  exercise:\r
+    prompt: GaussianBlur ksize를 (9, 9)로 키운 logStats9 함수를 만들어 두 샘플의 logStd가 (5, 5) 케이스보다 모두 작아지는지 확인하세요.\r
+    starterCode: |-\r
+      import cv2\r
+      import numpy as np\r
+      from sklearn.datasets import load_sample_image\r
+\r
+\r
+      def logStats9(name: str) -> dict:\r
+          bgr = cv2.cvtColor(load_sample_image(name), cv2.COLOR_RGB2BGR)\r
+          gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)\r
+          blurred = cv2.GaussianBlur(gray, (___, 9), 0)\r
+          lap = cv2.Laplacian(blurred, cv2.CV_64F)\r
+          return {'name': name, 'logStd': round(float(lap.std()), 2)}\r
+\r
+\r
+      [logStats9('china.jpg'), logStats9('flower.jpg')]\r
+    hints:\r
+    - 정사각 커널이므로 두 인자 모두 9입니다.\r
+    - 빈칸에는 9가 들어갑니다.\r
+    check:\r
+      noError: logStats9 정의와 두 호출이 끝나야 합니다.\r
+      resultCheck: 결과가 두 dict의 리스트이고 각각 logStd가 양수여야 합니다.\r
+  check:\r
+    noError: logStats 정의와 두 호출이 끝나야 합니다.\r
+    resultCheck: 결과 길이가 2이고 두 dict 모두 logStd가 양수여야 합니다.\r
+- id: workflow_validation\r
+  title: 7단계. 임계값 가드와 합성 검증\r
+  structuredPrimary: true\r
+  subtitle: 입력 안전 + 정답 픽셀 수 비교\r
+  goal: validateCannyThresholds 함수가 잘못된 임계값에 ValueError를 던지는지 검증한 뒤, 정답을 미리 알 수 있는 합성 도형 입력에서 검출 픽셀 수가 기대 범위에 들어가는지 확인합니다.\r
+  why: Canny low/high를 거꾸로 주거나 음수를 주면 결과가 이상해도 함수가 조용히 통과합니다. 함수 입구에서 명확한 ValueError를 던지면 그 한 줄에서 잘못된 호출이 막힙니다. 합성 입력은 정답이 정해져 회귀 테스트로 그대로 쓸 수 있습니다.\r
+  explanation: |-\r
+    validateCannyThresholds는 (1) 두 값이 양수인지, (2) low < high인지 두 조건을 검사합니다. f-string으로 실제 받은 값을 메시지에 포함시키면 호출자가 즉시 원인을 알 수 있습니다.\r
+    합성 입력은 100×140 흑백 캔버스에 직사각형 한 개를 그린 형태입니다. Canny 결과의 에지 픽셀 수는 직사각형 둘레 근처에 집중되어 약 (둘레) 픽셀 정도가 나옵니다.\r
+    합성 검증은 알고리즘이 정상 동작하는지 회귀 테스트할 때 쓰는 표준 패턴입니다. 실제 사진은 정답이 없으니 합성으로 알고리즘을, 사진으로 일반화를 검증합니다.\r
+  tips:\r
+  - 합성 입력의 직사각형은 cv2.rectangle((x1, y1), (x2, y2), color, thickness)로 그립니다. thickness=-1은 채우기입니다.\r
+  - 검증 함수가 정상 입력에 True를 돌려주는 동시에 잘못된 입력에 ValueError를 던지는 게 표준 패턴입니다.\r
+  snippet: |-\r
+    import cv2\r
+    import numpy as np\r
+\r
+\r
+    def validateCannyThresholds(low: int, high: int) -> bool:\r
+        if low <= 0 or high <= 0:\r
+            raise ValueError(f"임계값은 양수여야 합니다: low={low}, high={high}")\r
+        if low >= high:\r
+            raise ValueError(f"low < high 순서 위반: low={low}, high={high}")\r
+        return True\r
+\r
+\r
+    validCanvas = np.zeros((100, 140), dtype=np.uint8)\r
+    cv2.rectangle(validCanvas, (30, 25), (110, 75), 255, -1)\r
+    validCanny = cv2.Canny(validCanvas, 50, 150)\r
+\r
+    okThreshold = validateCannyThresholds(50, 150)\r
+    try:\r
+        validateCannyThresholds(150, 50)\r
+        reversedMessage = 'unexpected pass'\r
+    except ValueError as exc:\r
+        reversedMessage = str(exc)\r
+\r
+    {\r
+        'okThreshold': okThreshold,\r
+        'reversedMessage': reversedMessage,\r
+        'edgePixelCount': int((validCanny == 255).sum()),\r
+        'hasReasonableEdges': 100 < int((validCanny == 255).sum()) < 10000,\r
+    }\r
+  exercise:\r
+    prompt: validateCannyThresholds에 음수 low를 넣어 ValueError가 잡히는지, 그 메시지에 '양수' 단서가 포함되는지 확인하세요.\r
+    starterCode: |-\r
+      def validateCannyThresholds(low: int, high: int) -> bool:\r
+          if low <= 0 or high <= 0:\r
+              raise ValueError(f"임계값은 양수여야 합니다: low={low}, high={high}")\r
+          if low >= high:\r
+              raise ValueError(f"low < high 순서 위반: low={low}, high={high}")\r
+          return True\r
+\r
+\r
+      try:\r
+          validateCannyThresholds(___, 100)\r
+          negativeMessage = 'unexpected pass'\r
+      except ValueError as exc:\r
+          negativeMessage = str(exc)\r
+\r
+      {'negativeMessage': negativeMessage, 'hasPositiveHint': '양수' in negativeMessage}\r
+    hints:\r
+    - 음수면 첫 번째 분기에서 잡힙니다.\r
+    - 빈칸에는 -5가 들어갑니다.\r
+    check:\r
+      noError: validateCannyThresholds 정의가 끝나야 합니다.\r
+      resultCheck: hasPositiveHint가 True이고 negativeMessage 안에 '-5'가 포함되어야 합니다.\r
+  check:\r
+    noError: validateCannyThresholds와 Canny 호출이 끝나야 합니다.\r
+    resultCheck: okThreshold가 True, reversedMessage에 'low < high' 단서가 있고 hasReasonableEdges가 True여야 합니다.\r
+`;export{e as default};

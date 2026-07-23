@@ -1,0 +1,72 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: codaro-main-plan-completion-transition-v1
+type: object
+additionalProperties: false
+required:
+  - schemaVersion
+  - transitionKind
+  - nonce
+  - transitionId
+  - initiativeId
+  - packetId
+  - implementationCommit
+  - evidenceCommit
+  - fromPath
+  - toPath
+  - evidencePath
+  - evidenceHash
+  - preparedAt
+properties:
+  schemaVersion:
+    const: 1
+  transitionKind:
+    enum: [complete, correction]
+  nonce:
+    type: string
+    format: uuid
+  transitionId:
+    $ref: '#/$defs/sha256'
+  initiativeId:
+    $ref: '#/$defs/kebabId'
+  packetId:
+    $ref: '#/$defs/kebabId'
+  implementationCommit:
+    $ref: '#/$defs/gitCommit'
+  evidenceCommit:
+    $ref: '#/$defs/gitCommit'
+  fromPath:
+    type: string
+    pattern: ^mainPlan/.+
+  toPath:
+    type: string
+    pattern: ^mainPlan/.+/_done/.+
+  evidencePath:
+    type: string
+    pattern: ^mainPlan/.+/_done/.+/completion-evidence\.yml$
+  evidenceHash:
+    $ref: '#/$defs/sha256'
+  preparedAt:
+    type: string
+    format: date-time
+  correctsTransitionId:
+    $ref: '#/$defs/sha256'
+allOf:
+  - if:
+      properties:
+        transitionKind:
+          const: correction
+    then:
+      required: [correctsTransitionId]
+    else:
+      not:
+        required: [correctsTransitionId]
+$defs:
+  kebabId:
+    type: string
+    pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
+  gitCommit:
+    type: string
+    pattern: ^(?:[a-f0-9]{40}|[a-f0-9]{64})$
+  sha256:
+    type: string
+    pattern: ^[a-f0-9]{64}$

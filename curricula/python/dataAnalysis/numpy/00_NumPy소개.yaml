@@ -409,3 +409,284 @@ sections:
     type: noError
     noError: '현업 흐름 검증: 매출 배열을 벡터화로 점검하기에서 `sales` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
     resultCheck: '현업 흐름 검증: 매출 배열을 벡터화로 점검하기에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: numpy_00-numeric-matrix-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - workflow_validation
+    title: 숫자 matrix의 shape·dtype·범위 읽기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 중첩 list가 직사각형인지 검증하고 행·열·숫자 종류·최솟값·최댓값을 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - shape는 [행 수, 열 수] 순서입니다.
+    - float 값이 하나라도 있으면 공통 dtype을 float로 봅니다.
+    exercise:
+      prompt: inspect_numeric_matrix(matrix)를 완성해 shape, dtype, minimum, maximum을 반환하세요.
+      starterCode: |-
+        def inspect_numeric_matrix(matrix):
+            raise NotImplementedError
+      solution: |
+        def inspect_numeric_matrix(matrix):
+            if not isinstance(matrix, list) or not matrix:
+                raise ValueError("non-empty matrix required")
+            width = len(matrix[0])
+            if width == 0 or any(not isinstance(row, list) or len(row) != width for row in matrix):
+                raise ValueError("ragged matrix")
+            values = [value for row in matrix for value in row]
+            if any(not isinstance(value, (int, float)) or isinstance(value, bool) for value in values):
+                raise TypeError("numeric values required")
+            dtype = "float" if any(isinstance(value, float) for value in values) else "int"
+            return {"shape": [len(matrix), width], "dtype": dtype, "minimum": min(values), "maximum": max(values)}
+      hints: *id001
+    check:
+      id: python.numpy.numpy_00.numeric-matrix-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_00.numeric-matrix-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: inspect_numeric_matrix
+        cases:
+        - id: reads-shape-and-promoted-dtype
+          arguments:
+          - value:
+            - - 1
+              - 2
+            - - 3.5
+              - 4
+          expectedReturn:
+            shape:
+            - 2
+            - 2
+            dtype: float
+            minimum: 1
+            maximum: 4
+        - id: keeps-integer-dtype
+          arguments:
+          - value:
+            - - 2
+              - -1
+              - 5
+          expectedReturn:
+            shape:
+            - 1
+            - 3
+            dtype: int
+            minimum: -1
+            maximum: 5
+        - id: rejects-ragged-matrix
+          arguments:
+          - value:
+            - - 1
+              - 2
+            - - 3
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: numpy_00-reshape-and-transpose-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_00-numeric-matrix-contract-mastery
+    title: 새 sensor vector를 matrix로 reshape하고 transpose하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: shape 개념을 flat values의 row-major 재배치와 축 교환으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - reshape는 값 순서를 바꾸지 않고 row-major로 배치합니다.
+    - transpose의 각 행은 원 matrix의 한 열입니다.
+    exercise:
+      prompt: reshape_and_transpose(values, rows)를 완성해 matrix, transpose, shape를 반환하세요.
+      starterCode: |-
+        def reshape_and_transpose(values, rows):
+            raise NotImplementedError
+      solution: |
+        def reshape_and_transpose(values, rows):
+            if not isinstance(rows, int) or isinstance(rows, bool) or rows < 1 or len(values) % rows:
+                raise ValueError("incompatible shape")
+            columns = len(values) // rows
+            matrix = [list(values[index * columns:(index + 1) * columns]) for index in range(rows)]
+            transposed = [[matrix[row][column] for row in range(rows)] for column in range(columns)]
+            return {"matrix": matrix, "transpose": transposed, "shape": [rows, columns]}
+      hints: *id002
+    check:
+      id: python.numpy.numpy_00.reshape-and-transpose.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_00.reshape-and-transpose.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reshape_and_transpose
+        cases:
+        - id: reshapes-row-major-and-transposes
+          arguments:
+          - value:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+          - value: 2
+          expectedReturn:
+            matrix:
+            - - 1
+              - 2
+              - 3
+            - - 4
+              - 5
+              - 6
+            transpose:
+            - - 1
+              - 4
+            - - 2
+              - 5
+            - - 3
+              - 6
+            shape:
+            - 2
+            - 3
+        - id: handles-single-row
+          arguments:
+          - value:
+            - 7
+            - 8
+          - value: 1
+          expectedReturn:
+            matrix:
+            - - 7
+              - 8
+            transpose:
+            - - 7
+            - - 8
+            shape:
+            - 1
+            - 2
+        - id: rejects-incompatible-size
+          arguments:
+          - value:
+            - 1
+            - 2
+            - 3
+          - value: 2
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: numpy_00-array-axis-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_00-reshape-and-transpose-transfer
+    title: 배열 질문에 맞는 axis 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 행별·열별·전체 집계에서 줄어드는 축과 결과 shape를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - axis 번호는 남는 축이 아니라 줄어드는 축을 가리킵니다.
+    - 작은 2x3 예시로 결과 shape를 먼저 적어보세요.
+    exercise:
+      prompt: choose_array_axis(situation)를 완성해 axis, resultShape, meaning을 반환하세요.
+      starterCode: |-
+        def choose_array_axis(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_array_axis(situation):
+            table = {'sum-each-row': {'axis': 1, 'resultShape': 'rows', 'meaning': 'collapse columns'}, 'mean-each-column': {'axis': 0, 'resultShape': 'columns', 'meaning': 'collapse rows'}, 'global-maximum': {'axis': None, 'resultShape': 'scalar', 'meaning': 'collapse all dimensions'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.numpy.numpy_00.array-axis-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_00.array-axis-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_array_axis
+        cases:
+        - id: recalls-sum-each-row
+          arguments:
+          - value: sum-each-row
+          expectedReturn:
+            axis: 1
+            resultShape: rows
+            meaning: collapse columns
+        - id: recalls-mean-each-column
+          arguments:
+          - value: mean-each-column
+          expectedReturn:
+            axis: 0
+            resultShape: columns
+            meaning: collapse rows
+        - id: rejects-unknown-situation
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

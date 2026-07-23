@@ -1,0 +1,33 @@
+{
+  "policyId": "mastery-policy-v1",
+  "version": 1,
+  "creditEventKind": "CreditGranted",
+  "nonCreditEventKinds": [
+    "RunObserved",
+    "CheckEvaluated",
+    "SupportProvided",
+    "MigrationImported",
+    "StrongCheckVerified"
+  ],
+  "modePriority": [
+    "acquisition",
+    "reinforcement",
+    "capstone",
+    "transfer",
+    "retrieval"
+  ],
+  "scores": {
+    "unproven": 0.0,
+    "practicing": 0.25,
+    "independent": 0.6,
+    "transfer": 0.8,
+    "mastered": 1.0
+  },
+  "independentMaxHintLevel": 1,
+  "higherStageMaxHintLevel": 0,
+  "minimumDistinctTaskVariantsForMastered": 3,
+  "retrievalWindowDays": {
+    "minimum": 7,
+    "maximum": 14
+  }
+}

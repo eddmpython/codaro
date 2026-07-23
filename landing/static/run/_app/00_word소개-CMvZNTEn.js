@@ -1,0 +1,147 @@
+var e=`meta:\r
+  id: word_00\r
+  title: Word 자동화 소개\r
+  order: 0\r
+  category: word\r
+  badge: 읽기\r
+  packages:\r
+    - python-docx\r
+    - docxtpl\r
+  tags:\r
+    - python-docx\r
+    - docxtpl\r
+    - mail merge\r
+    - 한글\r
+  outcomes:\r
+    - automation.word.intro\r
+  prerequisites:\r
+    - python.functions\r
+    - python.modulesAndIo\r
+  estimatedMinutes: 25\r
+  seo:\r
+    title: "Word 자동화 소개 - python-docx + docxtpl로 양식 문서 자동화"\r
+    description: "근로계약서·회의록·가정통신문 같은 양식화된 docx를 데이터에서 자동 생성. 10개 프로젝트로 mail merge까지."\r
+    keywords:\r
+      - python-docx\r
+      - docxtpl\r
+      - mail merge\r
+      - 근로계약서 자동화\r
+\r
+intro:\r
+  direction: "근로계약서·회의록·가정통신문 같은 양식화된 Word 문서를 데이터에서 자동 생성한다. python-docx + docxtpl 두 라이브러리로 mail merge까지."\r
+  benefits:\r
+    - "HR 인사담당자의 근로계약서 N장, 학교 행정의 가정통신문 200장 자동 생성."\r
+    - "한국 사무환경 특화 - 한글 폰트(맑은 고딕) East Asian font 패턴, 한국 양식 사례."\r
+    - "docxtpl Jinja 템플릿으로 영업 제안서·회의록 자동 채우기."\r
+  diagram:\r
+    steps:\r
+      - label: "1. Document 기본"\r
+        detail: "Document, add_paragraph, add_heading, save."\r
+      - label: "2. 표·이미지·머리말"\r
+        detail: "add_table, add_picture, sections.header/footer."\r
+      - label: "3. 자리표시자 치환"\r
+        detail: "기존 docx 열고 {이름} 같은 자리표시자 치환."\r
+      - label: "4. mail merge"\r
+        detail: "CSV → 다수 docx + docxtpl Jinja 템플릿."\r
+    runtime:\r
+      - label: "라이브러리"\r
+        detail: "meta.packages의 python-docx, docxtpl을 라이브러리 패널에서 준비합니다. 둘 다 MIT/LGPL."\r
+      - label: "검증"\r
+        detail: "모든 결과 docx를 다시 Document로 열어 단락·표·이미지 단위 assert."\r
+\r
+sections:\r
+  - id: position\r
+    title: "1. Word 자동화가 차지하는 자리"\r
+    blocks:\r
+      - type: text\r
+        content: |-\r
+          한국 기업에서 보고서·계약서·회의록·안내문은 docx 양식이 표준입니다. 100명 신입사원의 근로계약서, 200명 학생의 가정통신문, 매주 회의 회의록은 모두 양식이 같고 데이터만 다른 반복 작업입니다. python-docx + docxtpl 두 라이브러리로 mail merge까지 한 흐름에 끝납니다.\r
+      - type: text\r
+        content: |-\r
+          본 트랙은 openpyxl이 엑셀의 자리를 차지한 것처럼 Word docx의 자리를 차지합니다. 단순 텍스트 작성부터 표·이미지·머리말까지 90%는 python-docx로, 템플릿 → 데이터 주입(mail merge)은 docxtpl이 압도적으로 깔끔합니다.\r
+\r
+  - id: library_map\r
+    title: "2. 두 라이브러리의 자리"\r
+    blocks:\r
+      - type: table\r
+        headers: ["라이브러리", "역할", "사용 강의", "라이선스"]\r
+        rows:\r
+          - ["python-docx", "단락, 표, 이미지, 스타일, 머리말/꼬리말", "01-10", "MIT"]\r
+          - ["docxtpl", "Jinja2 기반 템플릿 채우기 (mail merge)", "09·10", "LGPL"]\r
+      - type: note\r
+        title: "왜 pywin32·mammoth를 쓰지 않나"\r
+        content: "pywin32(Win32 COM)는 Windows 전용이고 Word 앱 설치가 필요해 서버·CI 호환성이 낮습니다. mammoth는 docx→HTML 변환 특화로 생성 용도가 아닙니다. 본 트랙은 두 라이브러리만으로 portability를 유지합니다."\r
+\r
+  - id: limits\r
+    title: "3. python-docx가 다루지 않는 것"\r
+    blocks:\r
+      - type: text\r
+        content: |-\r
+          학습 도중 막히지 않도록 본 트랙 한계를 먼저 명시합니다.\r
+      - type: list\r
+        style: bullet\r
+        items:\r
+          - "목차(TOC) 자동 생성 불가 - docx에 TOC 필드만 삽입, Word에서 사용자가 '필드 업데이트'로 채워야 함."\r
+          - "동적 페이지번호는 sections.header에 단순 텍스트만. 동적 번호는 XML 직접 편집 필요(05강에서 패턴만)."\r
+          - "수식·추적 변경·차트 직접 생성 불가. 차트는 matplotlib png를 add_picture로."\r
+      - type: tip\r
+        content: "한계는 회피 가능합니다. 차트는 matplotlib png 삽입, PDF 변환은 LibreOffice headless 명령(10강 마지막 안내)."\r
+\r
+  - id: persona_match\r
+    title: "4. 누가 어느 강의에서 답을 얻나"\r
+    blocks:\r
+      - type: table\r
+        headers: ["페르소나", "주간 Word 작업", "이 트랙 졸업 시 산출물"]\r
+        rows:\r
+          - ["HR 인사담당자", "신입 N명 근로계약서 양식 채우기", "08·09강 - CSV → 근로계약서 N장 자동"]\r
+          - ["영업 박과장", "제안서 양식에 고객사·금액 매번 교체", "07·09강 - docxtpl Jinja for-loop"]\r
+          - ["학교 행정 김선생님", "가정통신문 200명 학생별 발송", "08강 - mail merge 패턴"]\r
+          - ["컨설팅 이대표", "매주 회의록 양식 채우기", "10강 - 회의 메모 JSON → 회의록 docx"]\r
+\r
+  - id: korean_fonts\r
+    title: "5. 한글 East Asian font 함정"\r
+    blocks:\r
+      - type: text\r
+        content: |-\r
+          docx에서 한글 폰트는 두 가지 설정이 모두 필요합니다. run.font.name = '맑은 고딕'만으로는 한글 부분이 기본 영문 폰트로 렌더링됩니다. East Asian font 별도 설정이 의무입니다.\r
+      - type: code\r
+        title: "East Asian font 패턴"\r
+        content: |-\r
+          from docx.oxml.ns import qn\r
+\r
+          run.font.name = "맑은 고딕"\r
+          run._element.rPr.rFonts.set(qn("w:eastAsia"), "맑은 고딕")\r
+      - type: text\r
+        content: |-\r
+          03강(텍스트 스타일링)에 이 패턴이 의무 tip으로 등장하고, 06강 스타일 정의 함수에 흡수됩니다. 한 번 익히면 트랙 전체에서 자연스럽게 재사용.\r
+\r
+  - id: capability_map\r
+    title: "6. 10개 프로젝트로 다루는 능력"\r
+    blocks:\r
+      - type: table\r
+        headers: ["프로젝트", "핵심 능력", "산출물"]\r
+        rows:\r
+          - ["01 첫 문서 만들기", "Document, add_paragraph, save", "Hello docx"]\r
+          - ["02 제목과 목록", "add_heading, List Bullet/Number", "보고서 목차 골격"]\r
+          - ["03 텍스트 스타일링", "run, font + East Asian", "한글 강조 문단"]\r
+          - ["04 표 만들기", "add_table, cell, merge_cells", "비교표 3×4"]\r
+          - ["05 이미지와 머리말", "add_picture, sections header/footer", "로고+페이지번호"]\r
+          - ["06 스타일과 페이지 설정", "styles.add_style, Pt/Inches", "사내 양식 스타일"]\r
+          - ["07 기존 문서 수정", "Document(path), 자리표시자 치환", "{성명} 치환"]\r
+          - ["08 CSV mail merge", "다수 docx 생성", "가정통신문 200건"]\r
+          - ["09 docxtpl 템플릿 엔진", "Jinja {{ }}, {% for %}", "영업 제안서 for-loop 견적"]\r
+          - ["10 회의록 자동 생성기", "전 개념 종합", "회의 메모 JSON → 회의록 docx"]\r
+\r
+  - id: contract\r
+    title: "7. 학습 계약"\r
+    blocks:\r
+      - type: list\r
+        style: bullet\r
+        items:\r
+          - "모든 결과 docx는 TemporaryDirectory에 저장하고 Document로 다시 열어 assert."\r
+          - "03강 East Asian font 패턴이 06강 스타일 정의 함수에 흡수, 이후 모든 강의에서 재사용."\r
+          - "07강 자리표시자 형식은 {{name}} Jinja 스타일로 통일 - 09강 docxtpl과 자연스럽게 연결."\r
+          - "10강 회의록은 데이터(JSON) → 표·머리말·서명란 docx 한 함수에 모든 패턴 결합."\r
+      - type: tip\r
+        content: "본 트랙을 시작하기 전에 라이브러리 패널에서 python-docx와 docxtpl 준비 상태를 확인하세요."\r
+`;export{e as default};

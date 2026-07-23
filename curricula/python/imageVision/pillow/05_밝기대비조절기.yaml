@@ -501,3 +501,322 @@ sections:
   check:
     noError: validateEnhanceFactor와 enhance 호출이 끝나야 합니다.
     resultCheck: brightnessIncreased가 True이고 negMessage에 '양수' 단서가 포함되어야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pillow_05-brightness_contrast-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: 밝기·대비 조절기 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: brightness·contrast factor와 clip 정책을 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_brightness_contrast_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_brightness_contrast_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_brightness_contrast_contract(value):
+            required = ['brightness', 'contrast', 'clipMode']
+            rules = [{'id': 'brightness', 'field': 'brightness', 'kind': 'range', 'min': 0, 'max': 3}, {'id': 'contrast', 'field': 'contrast', 'kind': 'range', 'min': 0, 'max': 3}, {'id': 'clip-mode', 'field': 'clipMode', 'kind': 'enum', 'values': ['saturate']}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'brightness_contrast', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.pillow.pillow_05.brightness_contrast-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pillow.pillow_05.brightness_contrast-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_brightness_contrast_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              brightness: 1.1
+              contrast: 1.2
+              clipMode: saturate
+          expectedReturn:
+            accepted: true
+            topic: brightness_contrast
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              contrast: 1.2
+              clipMode: saturate
+          expectedReturn:
+            accepted: false
+            topic: brightness_contrast
+            missing:
+            - brightness
+            violations:
+            - brightness
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              brightness: -1
+              contrast: 5
+              clipMode: wrap
+          expectedReturn:
+            accepted: false
+            topic: brightness_contrast
+            missing: []
+            violations:
+            - brightness
+            - clip-mode
+            - contrast
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pillow_05-brightness_contrast-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pillow_05-brightness_contrast-contract-audit-mastery
+    title: 밝기·대비 조절기 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_brightness_contrast_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_brightness_contrast_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_brightness_contrast_result(expected, observed):
+            identity = ['sourceHash', 'recipeHash']
+            metrics = {'clippedRatio': 0.01}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'brightness_contrast', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.pillow.pillow_05.brightness_contrast-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pillow.pillow_05.brightness_contrast-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_brightness_contrast_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              sourceHash: bc1
+              recipeHash: b11-c12
+              clippedRatio: 0.04
+          - value:
+              sourceHash: bc1
+              recipeHash: b11-c12
+              clippedRatio: 0.045
+          expectedReturn:
+            passed: true
+            topic: brightness_contrast
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              sourceHash: bc1
+              recipeHash: b11-c12
+              clippedRatio: 0.04
+          - value:
+              sourceHash: bc2
+              recipeHash: bad
+              clippedRatio: 0.4
+          expectedReturn:
+            passed: false
+            topic: brightness_contrast
+            missing: []
+            identityMismatch:
+            - recipeHash
+            - sourceHash
+            metricDrift:
+            - clippedRatio
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              sourceHash: bc1
+              recipeHash: b11-c12
+              clippedRatio: 0.04
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: brightness_contrast
+            missing:
+            - clippedRatio
+            - recipeHash
+            - sourceHash
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pillow_05-brightness_contrast-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pillow_05-brightness_contrast-result-reconciliation-transfer
+    title: 밝기·대비 조절기 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_brightness_contrast_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_brightness_contrast_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_brightness_contrast_evidence(stage):
+            stages = {'source': {'action': 'admit brightness contrast source', 'evidence': 'factors and clip policy', 'risk': 'unsafe or misread image'}, 'edit': {'action': 'apply bounded brightness contrast edit', 'evidence': 'enhancement trace', 'risk': 'quality or geometry loss'}, 'artifact': {'action': 'reopen brightness contrast artifact', 'evidence': 'histogram and clipped ratio', 'risk': 'corrupt or visually wrong output'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.pillow.pillow_05.brightness_contrast-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pillow.pillow_05.brightness_contrast-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_brightness_contrast_evidence
+        cases:
+        - id: recalls-source
+          arguments:
+          - value: source
+          expectedReturn:
+            action: admit brightness contrast source
+            evidence: factors and clip policy
+            risk: unsafe or misread image
+        - id: recalls-edit
+          arguments:
+          - value: edit
+          expectedReturn:
+            action: apply bounded brightness contrast edit
+            evidence: enhancement trace
+            risk: quality or geometry loss
+        - id: recalls-artifact
+          arguments:
+          - value: artifact
+          expectedReturn:
+            action: reopen brightness contrast artifact
+            evidence: histogram and clipped ratio
+            risk: corrupt or visually wrong output
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

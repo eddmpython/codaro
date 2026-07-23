@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "folium"
+sourceCount: 11
+lessons:
+  - lessonRef: "folium/00_folium소개"
+    sourcePath: "curricula/python/visualization/folium/00_folium소개.yaml"
+    metaId: "folium_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "folium/01_첫지도만들기"
+    sourcePath: "curricula/python/visualization/folium/01_첫지도만들기.yaml"
+    metaId: "folium_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "folium/02_다양한마커표현"
+    sourcePath: "curricula/python/visualization/folium/02_다양한마커표현.yaml"
+    metaId: "folium_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "folium/03_도형그리기"
+    sourcePath: "curricula/python/visualization/folium/03_도형그리기.yaml"
+    metaId: "folium_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "folium/04_지도스타일변경"
+    sourcePath: "curricula/python/visualization/folium/04_지도스타일변경.yaml"
+    metaId: "folium_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "folium/05_레이어관리"
+    sourcePath: "curricula/python/visualization/folium/05_레이어관리.yaml"
+    metaId: "folium_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "folium/06_GeoJSON활용"
+    sourcePath: "curricula/python/visualization/folium/06_GeoJSON활용.yaml"
+    metaId: "folium_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "folium/07_단계구분도"
+    sourcePath: "curricula/python/visualization/folium/07_단계구분도.yaml"
+    metaId: "folium_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "folium/08_히트맵"
+    sourcePath: "curricula/python/visualization/folium/08_히트맵.yaml"
+    metaId: "folium_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "folium/09_마커클러스터"
+    sourcePath: "curricula/python/visualization/folium/09_마커클러스터.yaml"
+    metaId: "folium_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "folium/10_종합지도프로젝트"
+    sourcePath: "curricula/python/visualization/folium/10_종합지도프로젝트.yaml"
+    metaId: "folium_10"
+    registryStatus: registered
+    reviewStatus: pending

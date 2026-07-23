@@ -417,3 +417,260 @@ sections:
     noError: 연습 문제에서 `text` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 연습 문제 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
   name: practice
+assessment:
+  masteryVariants:
+  - id: 20_base64-data-url-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - standard_base64
+    - practical
+    - workflow_validation
+    title: 바이너리 파일을 data URL로 만들고 왕복 검증하기
+    subtitle: b64encode와 strict decode
+    goal: 이미지 bytes를 Base64 data URL로 만들고 decode 결과가 원본 bytes와 같은지 반환한다.
+    why: base64 학습은 문자열 인코딩을 보는 데서 끝나지 않고, 텍스트 채널로 옮긴 바이너리가 손상 없이 복원되는지 검증할 때 실무 가치가 생깁니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않는 binary fixture 파일을 넘겨 data URL과 왕복 검증을 함께 확인합니다.
+    tips:
+    - 파일은 read_bytes로 읽고 b64encode 결과는 ascii 문자열로 바꾸세요.
+    - 검증 decode에는 validate=True를 사용하세요.
+    exercise:
+      prompt: create_data_url_summary(path, mime_type='image/png')가 dataUrl, mimeType, byteLength, decodedMatches를 담은 dict를
+        반환하도록 완성하세요.
+      starterCode: |-
+        def create_data_url_summary(path, mime_type="image/png"):
+            raise NotImplementedError
+      solution: |-
+        import base64
+        from pathlib import Path
+
+        def create_data_url_summary(path, mime_type="image/png"):
+            raw = Path(path).read_bytes()
+            encoded = base64.b64encode(raw).decode("ascii")
+            data_url = f"data:{mime_type};base64,{encoded}"
+            restored = base64.b64decode(encoded.encode("ascii"), validate=True)
+            return {
+                "dataUrl": data_url,
+                "mimeType": mime_type,
+                "byteLength": len(raw),
+                "decodedMatches": restored == raw,
+            }
+      hints:
+      - data URL은 `data:{mime_type};base64,{encoded}` 형식입니다.
+      - encoded 문자열을 다시 decode해 원본 bytes와 비교하세요.
+    check:
+      id: python.builtins.base64.data-url.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.base64.payload.behavior.v1.fixture
+      fixtureHash: sha256-QhxVZYje40b77PdWWmQBwfDikvD1zzNcQ+YHXm8tE/I=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: input/sample.png
+          contentBase64: iVBORw0KGgo=
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: create_data_url_summary
+        cases:
+        - id: creates-png-data-url
+          arguments:
+          - fixturePath: input/sample.png
+          - value: image/png
+          expectedReturn:
+            dataUrl: data:image/png;base64,iVBORw0KGgo=
+            mimeType: image/png
+            byteLength: 8
+            decodedMatches: true
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 20_base64-url-token-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - 20_base64-data-url-mastery
+    - urlsafe_base64
+    title: URL-safe JSON token을 패딩 없이 만들고 복원하기
+    subtitle: urlsafe_b64encode와 padding 복구
+    goal: JSON payload를 정렬된 bytes로 만들고 padding 없는 URL-safe Base64 token으로 인코딩한 뒤 복원 결과를 반환한다.
+    why: 전이 과제에서는 이미지 data URL이 아니라 쿼리 문자열·토큰 전달 문제로 옮겨, padding 복구와 JSON 왕복을 함께 다룹니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. padding을 제거해 반환하되 decode할 때는 길이에 맞게 복구하세요.
+    tips:
+    - json.dumps에는 sort_keys=True와 separators를 써서 bytes를 안정화하세요.
+    - padding 길이는 `(-len(token)) % 4`로 계산할 수 있습니다.
+    exercise:
+      prompt: encode_payload_token(data)가 token, paddingLength, restored, rawByteLength를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def encode_payload_token(data):
+            raise NotImplementedError
+      solution: |-
+        import base64
+        import json
+
+        def encode_payload_token(data):
+            raw = json.dumps(
+                data,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+            token = base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
+            padding = (-len(token)) % 4
+            restored_raw = base64.urlsafe_b64decode((token + "=" * padding).encode("ascii"))
+            return {
+                "token": token,
+                "paddingLength": padding,
+                "restored": json.loads(restored_raw.decode("utf-8")),
+                "rawByteLength": len(raw),
+            }
+      hints:
+      - URL-safe token에서는 `+`, `/` 대신 `-`, `_`가 쓰입니다.
+      - decode 전에 필요한 `=` padding을 다시 붙이세요.
+    check:
+      id: python.builtins.base64.url-token.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.base64.payload.behavior.v1.fixture
+      fixtureHash: sha256-QhxVZYje40b77PdWWmQBwfDikvD1zzNcQ+YHXm8tE/I=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: input/sample.png
+          contentBase64: iVBORw0KGgo=
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: encode_payload_token
+        cases:
+        - id: encodes-json-token
+          arguments:
+          - value:
+              lesson: base64
+              status: verified
+              scores:
+              - 95
+              - 88
+              - 91
+          expectedReturn:
+            token: eyJsZXNzb24iOiJiYXNlNjQiLCJzY29yZXMiOls5NSw4OCw5MV0sInN0YXR1cyI6InZlcmlmaWVkIn0
+            paddingLength: 1
+            restored:
+              lesson: base64
+              scores:
+              - 95
+              - 88
+              - 91
+              status: verified
+            rawByteLength: 59
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 20_base64-strict-decode-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 20_base64-url-token-transfer
+    title: Base64 문자열을 엄격하게 복원하고 fingerprint 확인하기
+    subtitle: validate=True와 오류 변환
+    goal: encoded 문자열을 bytes로 복원해 byteLength, text, sha256 prefix를 반환하고 잘못된 문자는 ValueError로 거부한다.
+    why: 시간이 지나도 base64에서 남아야 할 감각은 인코딩 결과보다, 손상된 입력을 조용히 통과시키지 않는 strict decode 습관입니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. 이번에는 fixture 파일이 아니라 encoded 문자열 자체를 검증하세요.
+    tips:
+    - 표준 Base64 decode에는 validate=True를 쓰세요.
+    - binascii.Error를 ValueError로 감싸면 호출자가 실패 경로를 단순하게 다룰 수 있습니다.
+    exercise:
+      prompt: inspect_base64_blob(encoded)가 byteLength, text, sha256을 담은 dict를 반환하고 invalid payload는 ValueError로 막도록 완성하세요.
+      starterCode: |-
+        def inspect_base64_blob(encoded):
+            raise NotImplementedError
+      solution: |-
+        import base64
+        import binascii
+        import hashlib
+
+        def inspect_base64_blob(encoded):
+            try:
+                raw = base64.b64decode(encoded.encode("ascii"), validate=True)
+            except (binascii.Error, ValueError) as exc:
+                raise ValueError("invalid base64 payload") from exc
+            return {
+                "byteLength": len(raw),
+                "text": raw.decode("utf-8"),
+                "sha256": hashlib.sha256(raw).hexdigest()[:16],
+            }
+      hints:
+      - encoded 입력은 ascii로 바꾼 뒤 decode하세요.
+      - hash 전체가 아니라 앞 16자리만 반환해도 fingerprint 비교에 충분합니다.
+    check:
+      id: python.builtins.base64.strict-decode.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.base64.payload.behavior.v1.fixture
+      fixtureHash: sha256-QhxVZYje40b77PdWWmQBwfDikvD1zzNcQ+YHXm8tE/I=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: input/sample.png
+          contentBase64: iVBORw0KGgo=
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: inspect_base64_blob
+        cases:
+        - id: decodes-valid-text
+          arguments:
+          - value: SGVsbG8gUHl0aG9u
+          expectedReturn:
+            byteLength: 12
+            text: Hello Python
+            sha256: d20d392094845f2d
+        - id: rejects-invalid-base64
+          arguments:
+          - value: SGVsbG8*
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

@@ -1,0 +1,689 @@
+var e=`meta:
+  id: day08
+  title: 리스트메서드
+  day: 8
+  category: 30days
+  tags:
+  - 리스트
+  - append
+  - remove
+  - sort
+  - queue
+  - 원본변경
+  - 검증
+  seo:
+    title: 파이썬 리스트 메서드 - 리스트 조작 완벽 가이드
+    description: append, insert, remove, pop, sort, reverse 등 리스트 메서드를 배웁니다.
+    keywords:
+    - 리스트메서드
+    - append
+    - insert
+    - remove
+    - pop
+    - sort
+intro:
+  emoji: 🔧
+  points:
+  - append/insert로 요소 추가
+  - remove/pop으로 요소 삭제
+  - sort/reverse로 정렬과 뒤집기
+  - extend/copy로 리스트 확장과 복사
+  direction: 리스트메서드에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 리스트메서드 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 리스트 메서드란? 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: append() 메서드 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: insert() 메서드 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 리스트메서드 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 리스트메서드 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 리스트메서드 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: method_intro
+  title: 리스트 메서드란?
+  structuredPrimary: true
+  subtitle: 리스트를 조작하는 내장 함수
+  goal: 리스트 메서드란?에서 \`nums\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    메서드(Method)는 객체가 가지고 있는 함수입니다. 리스트에는 요소를 추가, 삭제, 정렬하는 다양한 메서드가 내장되어 있습니다. 메서드는 리스트 이름 뒤에 점(.)을 찍고 메서드 이름을 쓰는 형식으로 사용합니다. 대부분의 리스트 메서드는 원본 리스트를 직접 변경하며 None을 반환합니다.
+
+    메서드는 원본을 변경하므로 사용 후 리스트가 달라집니다.
+  snippet: |-
+    nums = [1, 2, 3]
+    nums.append(4)
+    nums
+  exercise:
+    prompt: 리스트 메서드란? 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      nums = [1, 2, 3]
+      nums.append(4)
+      nums
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+  check:
+    type: noError
+    noError: 리스트 메서드란?에서 \`nums\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 리스트 메서드란? 실행 뒤 \`nums\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: append_method
+  title: append() 메서드
+  structuredPrimary: true
+  subtitle: 리스트 끝에 요소 추가
+  goal: append() 메서드에서 \`fruits\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    append() 메서드는 리스트의 끝에 새로운 요소를 추가합니다. 괄호 안에 추가할 값을 넣으면 리스트 마지막에 그 값이 추가됩니다. 원본 리스트가 직접 변경되며, None을 반환합니다. 리스트를 점진적으로 만들어갈 때 가장 많이 사용하는 메서드입니다.
+
+    append()는 한 번에 하나의 요소만 추가합니다.
+  snippet: |-
+    fruits = ['사과', '바나나']
+    fruits.append('오렌지')
+    fruits.append('포도')
+    fruits
+  exercise:
+    prompt: append() 메서드 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      fruits = ['사과', '바나나']
+      fruits.append('오렌지')
+      fruits.append('포도')
+      fruits
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+  check:
+    type: noError
+    noError: append() 메서드에서 \`fruits\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: append() 메서드 실행 뒤 \`fruits\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: insert_method
+  title: insert() 메서드
+  structuredPrimary: true
+  subtitle: 원하는 위치에 요소 추가
+  goal: insert() 메서드에서 \`colors\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    insert() 메서드는 리스트의 특정 위치에 요소를 추가합니다. 첫 번째 인수로 인덱스를, 두 번째 인수로 추가할 값을 받습니다. 그 위치에 값이 삽입되고, 기존 요소들은 뒤로 밀립니다. append()와 달리 원하는 위치에 정확히 추가할 수 있습니다.
+
+    insert(0, 값)은 리스트 맨 앞에 추가합니다.
+  snippet: |-
+    colors = ['빨강', '파랑']
+    colors.insert(1, '초록')
+    colors
+  exercise:
+    prompt: insert() 메서드 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      colors = ['빨강', '파랑']
+      colors.insert(1, '초록')
+      colors
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+  check:
+    type: noError
+    noError: insert() 메서드에서 \`colors\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: insert() 메서드 실행 뒤 \`colors\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: remove_method
+  title: remove() 메서드
+  structuredPrimary: true
+  subtitle: 값으로 요소 삭제
+  goal: remove() 메서드에서 \`items\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    remove() 메서드는 리스트에서 특정 값을 찾아 삭제합니다. 괄호 안에 삭제할 값을 넣으면 그 값이 처음 나타나는 위치에서 제거됩니다. 같은 값이 여러 개 있어도 첫 번째 것만 삭제됩니다. 값이 리스트에 없으면 에러가 발생합니다.
+
+    값이 여러 개 있어도 첫 번째 것만 삭제됩니다.
+  snippet: |-
+    items = ['사과', '바나나', '오렌지', '바나나']
+    items.remove('바나나')
+    items
+  exercise:
+    prompt: remove() 메서드 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      items = ['사과', '바나나', '오렌지', '바나나']
+      items.remove('바나나')
+      items
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+  check:
+    type: noError
+    noError: remove() 메서드에서 \`items\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: remove() 메서드 실행 뒤 \`items\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: pop_method
+  title: pop() 메서드
+  structuredPrimary: true
+  subtitle: 인덱스로 요소 삭제하고 반환
+  goal: pop() 메서드에서 \`nums\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    pop() 메서드는 리스트에서 특정 인덱스의 요소를 제거하고 그 값을 반환합니다. 괄호 안에 인덱스를 넣으면 그 위치의 요소가 삭제됩니다. 인덱스를 생략하면 마지막 요소가 삭제됩니다. remove()와 달리 삭제된 값을 받을 수 있어 유용합니다.
+
+    pop()은 스택(stack) 자료구조 구현에 자주 사용됩니다.
+  snippet: |-
+    nums = [10, 20, 30, 40, 50]
+    nums.pop()
+  exercise:
+    prompt: pop() 메서드 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      nums = [10, 20, 30, 40, 50]
+      nums.pop()
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: pop() 메서드에서 \`nums\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: pop() 메서드 실행 뒤 \`nums\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: clear_method
+  title: clear() 메서드
+  structuredPrimary: true
+  subtitle: 모든 요소 삭제
+  goal: clear() 메서드에서 \`nums\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    clear() 메서드는 리스트의 모든 요소를 삭제하여 빈 리스트로 만듭니다. 리스트 자체는 그대로 유지되고 내용만 비워집니다. 리스트를 초기화할 때 사용합니다. 변수에 []를 할당하는 것과 비슷하지만, 같은 리스트를 참조하는 다른 변수가 있을 때 차이가 있습니다.
+
+    clear()는 리스트를 재사용할 때 유용합니다.
+  snippet: |-
+    nums = [1, 2, 3, 4, 5]
+    nums.clear()
+    nums
+  exercise:
+    prompt: clear() 메서드 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      nums = [1, 2, 3, 4, 5]
+      nums.clear()
+      nums
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+  check:
+    type: noError
+    noError: clear() 메서드에서 \`nums\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: clear() 메서드 실행 뒤 \`nums\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: extend_method
+  title: extend() 메서드
+  structuredPrimary: true
+  subtitle: 리스트 합치기
+  goal: extend() 메서드에서 \`base\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    extend() 메서드는 리스트에 다른 리스트의 모든 요소를 추가합니다. + 연산자와 비슷하지만, + 는 새 리스트를 만들고 extend()는 원본 리스트를 변경합니다. 여러 요소를 한 번에 추가할 때 append()를 반복하는 것보다 효율적입니다.
+
+    append([4,5,6])은 리스트를 통째로 추가하지만, extend([4,5,6])은 요소들을 개별적으로 추가합니다.
+  snippet: |-
+    base = [1, 2, 3]
+    extra = [4, 5, 6]
+    base.extend(extra)
+    base
+  exercise:
+    prompt: extend() 메서드 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      base = [1, 2, 3]
+      extra = [4, 5, 6]
+      base.extend(extra)
+      base
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+  check:
+    type: noError
+    noError: extend() 메서드에서 \`base\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: extend() 메서드 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: sort_method
+  title: sort() 메서드
+  structuredPrimary: true
+  subtitle: 리스트 정렬
+  goal: sort() 메서드에서 \`data\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    sort() 메서드는 리스트의 요소를 오름차순으로 정렬합니다. 숫자는 작은 것부터, 문자열은 사전 순으로 정렬됩니다. reverse=True 인수를 주면 내림차순으로 정렬됩니다. 원본 리스트가 직접 변경되며, None을 반환합니다.
+
+    sorted() 함수는 원본을 유지하고 정렬된 새 리스트를 반환합니다.
+  snippet: |-
+    data = [5, 2, 8, 1, 9]
+    data.sort()
+    data
+  exercise:
+    prompt: sort() 메서드 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      data = [5, 2, 8, 1, 9]
+      data.sort()
+      data
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+  check:
+    type: noError
+    noError: sort() 메서드에서 \`data\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: sort() 메서드 실행 뒤 \`data\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: reverse_method
+  title: reverse() 메서드
+  structuredPrimary: true
+  subtitle: 리스트 뒤집기
+  goal: reverse() 메서드에서 \`chars\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    reverse() 메서드는 리스트의 순서를 완전히 뒤집습니다. 첫 번째와 마지막, 두 번째와 끝에서 두 번째 같은 식으로 위치를 바꿉니다. 정렬과는 다르며, 단순히 순서만 반대로 만듭니다. 원본 리스트가 직접 변경됩니다.
+
+    [::-1] 슬라이싱도 리스트를 뒤집지만 새 리스트를 만듭니다.
+  snippet: |-
+    chars = ['A', 'B', 'C', 'D', 'E']
+    chars.reverse()
+    chars
+  exercise:
+    prompt: reverse() 메서드 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      chars = ['A', 'B', 'C', 'D', 'E']
+      chars.reverse()
+      chars
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+  check:
+    type: noError
+    noError: reverse() 메서드에서 \`chars\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: reverse() 메서드 실행 뒤 \`chars\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: copy_method
+  title: copy() 메서드
+  structuredPrimary: true
+  subtitle: 리스트 복사
+  goal: copy() 메서드에서 \`orig\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    copy() 메서드는 리스트의 얕은 복사본을 만듭니다. 원본과 똑같은 내용의 새로운 리스트가 생성됩니다. 단순히 변수에 할당(=)하면 같은 리스트를 참조하지만, copy()는 완전히 독립적인 리스트를 만듭니다. 한쪽을 변경해도 다른 쪽에 영향을 주지 않습니다.
+
+    list[:] 슬라이싱도 복사본을 만듭니다.
+  snippet: |-
+    orig = [1, 2, 3]
+    copy = orig.copy()
+    copy.append(4)
+    copy
+  exercise:
+    prompt: copy() 메서드 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      orig = [1, 2, 3]
+      copy = orig.copy()
+      copy.append(4)
+      copy
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+  check:
+    type: noError
+    noError: copy() 메서드에서 \`orig\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: copy() 메서드 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: count_method
+  title: count() 메서드
+  structuredPrimary: true
+  subtitle: 요소 개수 세기
+  goal: count() 메서드에서 \`nums\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    count() 메서드는 리스트에서 특정 값이 몇 번 나타나는지 세어줍니다. 괄호 안에 찾을 값을 넣으면 그 값의 개수를 반환합니다. 값이 없으면 0을 반환합니다. 리스트를 변경하지 않고 정보만 알려줍니다.
+
+    count()는 데이터 분석에서 빈도 계산에 유용합니다.
+  snippet: |-
+    nums = [1, 2, 3, 2, 4, 2, 5]
+    nums.count(2)
+  exercise:
+    prompt: count() 메서드 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      nums = [1, 2, 3, 2, 4, 2, 5]
+      nums.count(2)
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: count() 메서드에서 \`nums\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: count() 메서드 실행 뒤 \`nums\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: index_method
+  title: index() 메서드
+  structuredPrimary: true
+  subtitle: 요소 위치 찾기
+  goal: index() 메서드에서 \`fruits\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    index() 메서드는 리스트에서 특정 값이 처음 나타나는 위치의 인덱스를 반환합니다. 같은 값이 여러 개 있어도 첫 번째 위치만 알려줍니다. 값이 리스트에 없으면 에러가 발생합니다. 요소의 위치를 알아야 할 때 사용합니다.
+
+    in 연산자로 값의 존재 여부를 먼저 확인한 후 index()를 사용하면 안전합니다.
+  snippet: |-
+    fruits = ['사과', '바나나', '오렌지', '바나나']
+    fruits.index('바나나')
+  exercise:
+    prompt: index() 메서드 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      fruits = ['사과', '바나나', '오렌지', '바나나']
+      fruits.index('바나나')
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: index() 메서드에서 \`fruits\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: index() 메서드 실행 뒤 \`fruits\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+- id: workflow_validation
+  title: '검증 루프: 주문 처리 큐 관리하기'
+  structuredPrimary: true
+  subtitle: 리스트 메서드의 원본 변경을 업무 흐름으로 확인
+  goal: '검증 루프: 주문 처리 큐 관리하기에서 예상값과 실제 실행 결과를 비교하는 검증 흐름을 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 리스트 메서드는 값을 추가하고 지우는 기능 목록이 아닙니다. 주문 처리 큐처럼 순서가 중요하고 상태가 계속 바뀌는 데이터를 다룰 때, 어떤 메서드가 원본을
+    바꾸는지와 실패 조건을 검증해야 합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    orderQueue = ['ORD-1001', 'ORD-1002']
+    orderQueue.append('ORD-1003')
+    orderQueue.insert(0, 'URG-9001')
+
+    processedOrder = orderQueue.pop(0)
+    orderQueue.remove('ORD-1002')
+
+    assert processedOrder == 'URG-9001'
+    assert orderQueue == ['ORD-1001', 'ORD-1003']
+    assert len(orderQueue) == 2
+  exercise:
+    prompt: '검증 루프: 주문 처리 큐 관리하기 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.'
+    starterCode: |-
+      pendingTasks = ['메일 발송', '입금 확인', '송장 출력']
+      doneTasks = []
+
+      doneTasks.append(pendingTasks.pop(0))
+      doneTasks.append(pendingTasks.pop(0))
+
+      assert doneTasks == ['메일 발송', '입금 확인']
+      assert pendingTasks == ['송장 출력']
+      doneTasks
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+  check:
+    type: noError
+    noError: '검증 루프: 주문 처리 큐 관리하기에서 \`pendingTasks\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
+    resultCheck: '검증 루프: 주문 처리 큐 관리하기에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.'
+- id: practice
+  title: Day 8 종합 복습
+  structuredPrimary: true
+  subtitle: 리스트 메서드 마스터하기
+  goal: Day 8 종합 복습에서 \`lst\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: Day 8에서 배운 리스트 메서드를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로
+    어떤 순서로 해도 괜찮습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    nums = [10, 20, 30, 40]
+    last = nums.pop()
+    print('list:', nums)
+  exercise:
+    prompt: Day 8 종합 복습 예제에서 리스트 항목이나 인덱스를 바꾸고 선택 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      lst = [1, 2, 3]
+      lst.append(4)
+      lst.append(5)
+      lst
+    hints:
+    - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
+    - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+  check:
+    type: noError
+    noError: Day 8 종합 복습에서 \`lst\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: Day 8 종합 복습 실행 뒤 \`lst\` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: day08-prepare-queue-mastery
+    mode: mastery
+    unseen: false
+    sourceSectionIds:
+    - method_intro
+    - practice
+    title: 원본을 지키며 작업 큐 준비하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 리스트 덧붙이기와 정렬 결과를 새 목록으로 반환한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: prepare_queue(items)가 review를 더하고 정렬한 새 목록을 반환하도록 완성하세요.
+      starterCode: |-
+        def prepare_queue(items):
+            raise NotImplementedError
+      solution: |-
+        def prepare_queue(items):
+            queue = items.copy()
+            queue.append('review')
+            queue.sort()
+            return queue
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day08.prepare-queue.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day08.prepare-queue.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_queue
+        cases:
+        - id: tasks
+          arguments:
+          - value:
+            - write
+            - plan
+          expectedReturn:
+          - plan
+          - review
+          - write
+        - id: empty
+          arguments:
+          - value: []
+          expectedReturn:
+          - review
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day08-insert-priority-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - day08-prepare-queue-mastery
+    title: 우선 항목을 목록 맨 앞에 넣기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: insert의 위치 개념을 작업 우선순위에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: insert_priority(items, item)가 item을 맨 앞에 둔 새 목록을 반환하도록 완성하세요.
+      starterCode: |-
+        def insert_priority(items, item):
+            raise NotImplementedError
+      solution: |-
+        def insert_priority(items, item):
+            result = items.copy()
+            result.insert(0, item)
+            return result
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day08.insert-priority.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day08.insert-priority.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: insert_priority
+        cases:
+        - id: numbers
+          arguments:
+          - value:
+            - 2
+            - 3
+          - value: 1
+          expectedReturn:
+          - 1
+          - 2
+          - 3
+        - id: words
+          arguments:
+          - value:
+            - later
+          - value: now
+          expectedReturn:
+          - now
+          - later
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day08-remove-all-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - day08-prepare-queue-mastery
+    title: 특정 값을 모두 제외하기
+    subtitle: 하루 뒤 기억에서 재구성
+    goal: 목록 순회 결과를 새 리스트에 모으는 방식을 회상한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: remove_all(items, target)가 target과 다른 항목만 남긴 새 목록을 반환하도록 완성하세요.
+      starterCode: |-
+        def remove_all(items, target):
+            raise NotImplementedError
+      solution: |-
+        def remove_all(items, target):
+            return [item for item in items if item != target]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day08.remove-all.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day08.remove-all.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: remove_all
+        cases:
+        - id: duplicates
+          arguments:
+          - value:
+            - 1
+            - 2
+            - 1
+            - 3
+          - value: 1
+          expectedReturn:
+          - 2
+          - 3
+        - id: missing
+          arguments:
+          - value:
+            - a
+            - b
+          - value: x
+          expectedReturn:
+          - a
+          - b
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 24
+`;export{e as default};

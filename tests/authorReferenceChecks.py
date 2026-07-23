@@ -1,9 +1,8 @@
 """레퍼런스-솔루션 러너 — 약한 체크를 강한 체크로 올리는 *작성 보조*(dev tooling).
 
 각 레슨의 `exercise.solution`을 engine 포착 primitive(captureDocument)로 실행해
-관찰된 사실(stdout/명명 변수/shape/dtype)로부터:
-  1. predict 초안(expectedShape/expectedDtype/expectedValue)을 채우고,
-  2. brittleness를 인지한 강한 체크 후보를 제안한다.
+관찰된 사실(stdout/명명 변수/shape/dtype)으로 brittleness를 인지한 강한 체크
+후보를 제안한다.
 
 **제안만 출력한다. YAML을 절대 수정하지 않는다. endpoint가 아니다.**
 커리큘럼은 사람이 한 강의씩 작성하므로(CLAUDE.md), 이 도구는 사람이 검수·패치할
@@ -34,22 +33,10 @@ class CheckProposal:
 
 
 @dataclass(frozen=True, slots=True)
-class PredictDraft:
-    expectedShape: str = ""
-    expectedDtype: str = ""
-    expectedValue: str = ""
-    expectedError: str = ""
-
-    def isEmpty(self) -> bool:
-        return not any([self.expectedShape, self.expectedDtype, self.expectedValue, self.expectedError])
-
-
-@dataclass(frozen=True, slots=True)
 class SectionProposal:
     sectionId: str
     currentCheckType: str
     check: CheckProposal
-    predict: PredictDraft
     notes: list[str] = field(default_factory=list)
 
 
@@ -98,26 +85,9 @@ def proposeCheck(capture: Any, currentCheckType: str) -> CheckProposal:
     )
 
 
-def proposePredict(capture: Any, primary: Any | None) -> PredictDraft:
-    """predict 초안 — author-side 채점 키이므로 솔루션에서 채워도 학습자에게 노출 안 됨(안전)."""
-    if capture.status == "error":
-        return PredictDraft()
-    if primary is not None:
-        return PredictDraft(
-            expectedShape=getattr(primary, "shape", "") or "",
-            expectedDtype=getattr(primary, "dtype", "") or "",
-            expectedValue=_clip(primary.repr),
-        )
-    stdout = capture.stdout.strip()
-    if stdout:
-        return PredictDraft(expectedValue=_clip(stdout))
-    return PredictDraft()
-
-
 def proposeSection(sectionId: str, capture: Any, currentCheckType: str) -> SectionProposal:
     primary = pickPrimaryVariable(list(capture.variables))
     check = proposeCheck(capture, currentCheckType)
-    predict = proposePredict(capture, primary)
     notes: list[str] = []
     if currentCheckType in STRONG_CHECK_TYPES:
         notes.append(f"이미 강한 체크({currentCheckType}) — 제안은 교차검증용.")
@@ -127,7 +97,6 @@ def proposeSection(sectionId: str, capture: Any, currentCheckType: str) -> Secti
         sectionId=sectionId,
         currentCheckType=currentCheckType or "(없음)",
         check=check,
-        predict=predict,
         notes=notes,
     )
 
@@ -145,19 +114,6 @@ def formatProposal(lessonKey: str, proposal: SectionProposal) -> str:
         + f" (confidence={proposal.check.confidence})",
         f"    근거: {proposal.check.rationale}",
     ]
-    if not proposal.predict.isEmpty():
-        lines.append(
-            "  predict 초안: "
-            + ", ".join(
-                f"{key}={value!r}"
-                for key, value in (
-                    ("expectedShape", proposal.predict.expectedShape),
-                    ("expectedDtype", proposal.predict.expectedDtype),
-                    ("expectedValue", proposal.predict.expectedValue),
-                )
-                if value
-            )
-        )
     for note in proposal.notes:
         lines.append(f"  · {note}")
     return "\n".join(lines)

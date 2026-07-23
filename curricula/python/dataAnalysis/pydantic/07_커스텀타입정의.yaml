@@ -752,3 +752,233 @@ sections:
     type: noError
     noError: '현업 흐름 검증: 주문 입력 계약과 배치 검증의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
     resultCheck: '현업 흐름 검증: 주문 입력 계약과 배치 검증 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pydantic_07-custom-order-id-type-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load
+    - workflow_validation
+    title: 업무 식별자를 custom type 계약으로 파싱하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: O-YYYY-NNNN 형식을 검증하고 year·sequence로 분해한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 정규식 통과 뒤에도 sequence 의미 범위를 검사하세요.
+    - 내부 표현은 한 canonical 형식으로 반환하세요.
+    exercise:
+      prompt: parse_order_id(value)를 완성해 canonical, year, sequence를 반환하세요.
+      starterCode: |-
+        def parse_order_id(value):
+            raise NotImplementedError
+      solution: |
+        def parse_order_id(value):
+            import re
+            match = re.fullmatch(r"O-(20\d{2})-(\d{4})", str(value).strip().upper())
+            if not match:
+                raise ValueError("invalid order id")
+            year = int(match.group(1))
+            sequence = int(match.group(2))
+            if sequence < 1:
+                raise ValueError("sequence must be positive")
+            return {"canonical": f"O-{year}-{sequence:04d}", "year": year, "sequence": sequence}
+      hints: *id001
+    check:
+      id: python.pydantic.pydantic_07.custom-order-id-type.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_07.custom-order-id-type.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: parse_order_id
+        cases:
+        - id: normalizes-valid-id
+          arguments:
+          - value: ' o-2026-0042 '
+          expectedReturn:
+            canonical: O-2026-0042
+            year: 2026
+            sequence: 42
+        - id: rejects-zero-sequence
+          arguments:
+          - value: O-2026-0000
+          expectedException: ValueError
+        - id: rejects-wrong-shape
+          arguments:
+          - value: 2026-42
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pydantic_07-custom-coordinate-type-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pydantic_07-custom-order-id-type-mastery
+    title: 새 좌표 문자열을 범위가 있는 값 객체로 변환하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: custom id parsing을 위도·경도 문자열과 범위 검증으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 문자열 분리 실패와 숫자 변환 실패를 하나의 명확한 계약 오류로 바꾸세요.
+    - 파싱 뒤 위도·경도 범위를 각각 검사하세요.
+    exercise:
+      prompt: parse_coordinate(value)를 완성해 latitude, longitude, canonical을 반환하세요.
+      starterCode: |-
+        def parse_coordinate(value):
+            raise NotImplementedError
+      solution: |
+        def parse_coordinate(value):
+            try:
+                latitude_text, longitude_text = str(value).split(",", 1)
+                latitude = float(latitude_text.strip())
+                longitude = float(longitude_text.strip())
+            except (TypeError, ValueError) as error:
+                raise ValueError("invalid coordinate") from error
+            if not -90 <= latitude <= 90 or not -180 <= longitude <= 180:
+                raise ValueError("coordinate out of range")
+            return {"latitude": latitude, "longitude": longitude, "canonical": f"{latitude:.4f},{longitude:.4f}"}
+      hints: *id002
+    check:
+      id: python.pydantic.pydantic_07.custom-coordinate-type.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_07.custom-coordinate-type.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: parse_coordinate
+        cases:
+        - id: parses-and-normalizes
+          arguments:
+          - value: 37.5665, 126.9780
+          expectedReturn:
+            latitude: 37.5665
+            longitude: 126.978
+            canonical: 37.5665,126.9780
+        - id: accepts-boundary
+          arguments:
+          - value: -90,180
+          expectedReturn:
+            latitude: -90.0
+            longitude: 180.0
+            canonical: -90.0000,180.0000
+        - id: rejects-out-of-range
+          arguments:
+          - value: 91,0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pydantic_07-custom-type-decision-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pydantic_07-custom-coordinate-type-transfer
+    title: custom type이 필요한 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 반복 형식·범위·canonicalization이 필요한 값과 단순 field validator를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 여러 model에서 반복되는 값 의미는 custom type으로 모으세요.
+    - 한 field의 단순 범위까지 모두 custom class로 만들 필요는 없습니다.
+    exercise:
+      prompt: choose_custom_type(situation)를 완성해 choice, reason, evidence를 반환하세요.
+      starterCode: |-
+        def choose_custom_type(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_custom_type(situation):
+            table = {'reused-business-id': {'choice': 'custom type', 'reason': 'shared parse and canonical rules', 'evidence': 'round-trip examples'}, 'one-model-positive-count': {'choice': 'field constraint', 'reason': 'local numeric range', 'evidence': 'boundary cases'}, 'secret-string': {'choice': 'secret type', 'reason': 'redacted representation', 'evidence': 'no plaintext dump'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.pydantic.pydantic_07.custom-type-decision.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pydantic.pydantic_07.custom-type-decision.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_custom_type
+        cases:
+        - id: recalls-reused-business-id
+          arguments:
+          - value: reused-business-id
+          expectedReturn:
+            choice: custom type
+            reason: shared parse and canonical rules
+            evidence: round-trip examples
+        - id: recalls-one-model-positive-count
+          arguments:
+          - value: one-model-positive-count
+          expectedReturn:
+            choice: field constraint
+            reason: local numeric range
+            evidence: boundary cases
+        - id: rejects-unknown-situation
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

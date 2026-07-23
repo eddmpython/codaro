@@ -2,29 +2,9 @@ meta:
   outcomeId: python.advancedSyntax
   status: draft
   version: 1
-  note: "초안 - Predict-Run-Reconcile-Adapt 루프 1단계 시드. 사람이 정제 필요."
+  note: "초안 - 실제 코드와 에러로 관찰 가능한 오개념 시드. 사람이 정제 필요."
 
 misconceptions:
-  - id: python.advancedSyntax.generatorConsumedOnce
-    label: "제너레이터를 두 번 순회"
-    summary: "동일 제너레이터를 두 번 for 돌리면 두 번째는 비어 있다."
-    triggers:
-      - kind: predictionMismatch
-        appliesTo: prediction
-        expectedField: value
-        description: "두 번째 순회의 결과를 첫 번째와 같다고 예측."
-    diagnostic:
-      message: "제너레이터는 한 번 소진되면 다시 처음으로 돌아가지 않습니다. 두 번 쓰려면 list로 미리 변환하거나, 호출마다 새 제너레이터를 만드세요."
-      references: ["python.advancedSyntax"]
-    correction:
-      hint: "한 번만 쓰면 메모리 효율, 두 번 이상이면 `list(gen)` 으로 고정하거나 generator function을 다시 호출."
-      miniExercise: |
-        def evens(limit):
-            return (x for x in range(limit) if x % 2 == 0)
-        first = list(evens(10))
-        second = list(evens(10))
-        first, second
-
   - id: python.advancedSyntax.comprehensionForSideEffect
     label: "부수효과만을 위해 list comprehension 사용"
     summary: "[print(x) for x in items] 처럼 결과를 버리는데 list를 만든다."
@@ -53,10 +33,6 @@ misconceptions:
         appliesTo: code
         pattern: "lambda\\s*:[^\\]\\)]*\\bfor\\s+\\w+\\s+in\\b"
         description: "comprehension 안에서 외부 변수를 닫는 lambda."
-      - kind: predictionMismatch
-        appliesTo: prediction
-        expectedField: value
-        description: "예측은 [0, 1, 2], 실제는 [2, 2, 2]."
     diagnostic:
       message: "Python의 클로저는 변수를 값이 아니라 **이름**으로 캡처합니다. 루프 변수는 마지막 값으로 고정되어 모든 lambda가 같은 결과를 냅니다."
       references: ["python.advancedSyntax", "python.functions"]

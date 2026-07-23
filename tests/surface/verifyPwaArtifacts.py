@@ -56,17 +56,23 @@ def main() -> int:
 
     if swCandidates:
         swText = swCandidates[0].read_text(encoding="utf-8", errors="replace")
-        required = ("navigationNetworkFirst", "assetCacheFirst", "networkFirst", 'pathname.startsWith("/_app/")')
+        required = (
+            "navigationNetworkFirst",
+            "assetCacheFirst",
+            "networkFirst",
+            'pathname.startsWith(scopedPath("_app/"))',
+            "SCOPE_PATH",
+        )
         for token in required:
             if token not in swText:
                 failures.append(f"serviceWorker.js missing {token}")
-        if "caches.match(\"/index.html\")" not in swText:
+        if 'caches.match(scopedPath("index.html"))' not in swText:
             failures.append("serviceWorker.js missing navigation-only offline fallback")
         for fnName in ("shellCacheFirst", "assetCacheFirst"):
             fnMatch = re.search(rf"async function {fnName}\([^)]*\) \{{(?P<body>.*?)\n\}}", swText, flags=re.S)
             if not fnMatch:
                 failures.append(f"serviceWorker.js missing {fnName} function body")
-            elif "caches.match(\"/index.html\")" in fnMatch.group("body"):
+            elif 'caches.match(scopedPath("index.html"))' in fnMatch.group("body"):
                 failures.append(f"serviceWorker.js must not use index.html fallback in {fnName}")
 
     if failures:

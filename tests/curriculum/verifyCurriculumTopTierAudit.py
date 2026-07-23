@@ -104,6 +104,8 @@ STRUCTURED_SECTION_FIELDS = (
     "exercise",
     "check",
 )
+STRONG_CHECK_KINDS = {"output", "variable", "file", "table", "image", "behavior"}
+WEAK_CHECK_KINDS = {"noError", "contains"}
 
 
 @dataclass(frozen=True)
@@ -125,14 +127,19 @@ def main() -> int:
         if domain["score"] < MINIMUM_SCORE or domain["requirementFailures"]
     ]
     overallScore = round(sum(float(domain["score"]) for domain in domains) / len(domains), 2) if domains else 0.0
+    topTierEligible = not failedDomains
     payload = {
         "gate": "curriculum-top-tier-audit",
-        "passed": not failedDomains,
-        "status": "passed" if not failedDomains else "failed",
+        "passed": topTierEligible,
+        "status": "passed" if topTierEligible else "failed",
         "score": overallScore,
+        "scoreKind": "audit-requirement-coverage",
         "maxScore": 10,
         "minimumScore": MINIMUM_SCORE,
         "requiredScore": MINIMUM_SCORE,
+        "curriculumQualityScore": None,
+        "topTierEligible": topTierEligible,
+        "completionEligible": False,
         "startedAt": startedAt,
         "completedAt": utcTimestamp(),
         "durationMs": round((time.monotonic() - started) * 1000),
@@ -152,9 +159,9 @@ def main() -> int:
     REPORT_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(payload, ensure_ascii=False, indent=2))
     if failedDomains:
-        print("FAIL: curriculum top-tier audit has domains below 9.0", file=sys.stderr)
+        print("FAIL: curriculum is not top-tier eligible; inspect requirementFailures", file=sys.stderr)
         return 1
-    print(f"ok: curriculum top-tier audit score {overallScore}/10")
+    print(f"ok: curriculum top-tier audit requirement coverage {overallScore}/10")
     return 0
 
 
@@ -185,6 +192,7 @@ def evaluateLesson(path: Path) -> dict[str, Any]:
     sourceStructured = bool(structuredSections)
     orientation = isOrientation(rel, path.parent.name, content)
     introSignals = introSignalSummary(text, content, declaredPackages, orientation)
+    evidenceProfile = learningEvidenceProfile(content)
     conversionFailures: list[str] = []
     documentRuntimePackages: list[str] = []
     solutionCount = 0
@@ -221,6 +229,7 @@ def evaluateLesson(path: Path) -> dict[str, Any]:
         "externalUrlCount": len(re.findall(r"https?://", text)),
         "conversionFailures": conversionFailures,
         "introSignals": introSignals,
+        "evidenceProfile": evidenceProfile,
     }
 
 
@@ -336,6 +345,144 @@ def structuredCodeCount(content: dict[str, Any]) -> int:
     return count
 
 
+def learningEvidenceProfile(content: dict[str, Any]) -> dict[str, Any]:
+    checks = lessonChecks(content)
+    deterministicPracticeChecks = [check for check in checks if isDeterministicPracticeCheck(check)]
+    strongChecks = [check for check in checks if isStrongCheckSpec(check)]
+    weakChecks = [
+        check
+        for check in checks
+        if check not in deterministicPracticeChecks
+        and check not in strongChecks
+        and isWeakCheck(check)
+    ]
+    assessment = content.get("assessment") if isinstance(content.get("assessment"), dict) else {}
+    masteryVariants = validAssessmentVariants(assessment.get("masteryVariants"), "mastery")
+    transferVariants = validAssessmentVariants(assessment.get("transferVariants"), "transfer")
+    retrievalVariants = validAssessmentVariants(assessment.get("retrievalVariants"), "retrieval")
+    authoredVariants = masteryVariants + transferVariants + retrievalVariants
+    review = assessment.get("review") if isinstance(assessment.get("review"), dict) else {}
+    independentReviewApproved = (
+        review.get("status") == "approved"
+        and bool(textValue(review.get("reviewerRole")))
+        and bool(textValue(review.get("evidenceRef")))
+        and bool(re.fullmatch(r"[0-9a-f]{64}", textValue(review.get("reviewedContentHash"))))
+    )
+    sectionMasteryChecks = [
+        section.get("check")
+        for section in structuredSections(content)
+        if section.get("assessmentMode") == "mastery"
+        and isinstance(section.get("check"), dict)
+        and isStrongCheckSpec(section["check"])
+    ]
+    return {
+        "checkCount": len(checks),
+        "deterministicPracticeCheckCount": len(deterministicPracticeChecks),
+        "strongCheckCount": len(strongChecks),
+        "weakCheckCount": len(weakChecks),
+        "hasMasteryAssessment": bool(masteryVariants or sectionMasteryChecks),
+        "hasTransferAssessment": bool(transferVariants),
+        "hasRetrievalAssessment": bool(retrievalVariants),
+        "hasPerformanceClaim": bool(textValue(assessment.get("performanceClaim"))),
+        "hasExplicitClaimScope": bool(authoredVariants) and all(
+            bool(textValue(variant.get("claimScope"))) for variant in authoredVariants
+        ),
+        "independentReviewApproved": independentReviewApproved,
+    }
+
+
+def validAssessmentVariants(value: Any, mode: str) -> list[dict[str, Any]]:
+    if not isinstance(value, list):
+        return []
+    valid: list[dict[str, Any]] = []
+    for variant in value:
+        if not isinstance(variant, dict):
+            continue
+        exercise = variant.get("exercise") if isinstance(variant.get("exercise"), dict) else {}
+        sourceSectionIds = variant.get("sourceSectionIds")
+        check = variant.get("check") if isinstance(variant.get("check"), dict) else {}
+        expectedUnseen = True
+        if not (
+            textValue(variant.get("id"))
+            and variant.get("mode") == mode
+            and variant.get("unseen") is expectedUnseen
+            and isinstance(sourceSectionIds, list)
+            and bool(sourceSectionIds)
+            and all(textValue(sectionId) for sectionId in sourceSectionIds)
+            and not textValue(variant.get("snippet"))
+            and textValue(exercise.get("prompt"))
+            and textValue(exercise.get("starterCode"))
+            and textValue(exercise.get("solution"))
+            and isStrongCheckSpec(check)
+        ):
+            continue
+        if mode == "retrieval" and (
+            not isinstance(variant.get("minimumDelayHours"), int)
+            or isinstance(variant.get("minimumDelayHours"), bool)
+            or int(variant["minimumDelayHours"]) < 7 * 24
+        ):
+            continue
+        valid.append(variant)
+    return valid
+
+
+def lessonChecks(content: dict[str, Any]) -> list[dict[str, Any]]:
+    checks: list[dict[str, Any]] = []
+    sections = content.get("sections")
+    if not isinstance(sections, list):
+        return checks
+    for section in sections:
+        if not isinstance(section, dict):
+            continue
+        sectionCheck = section.get("check")
+        if isinstance(sectionCheck, dict):
+            checks.append(sectionCheck)
+        exercise = section.get("exercise")
+        if isinstance(exercise, dict) and isinstance(exercise.get("check"), dict):
+            checks.append(exercise["check"])
+    assessment = content.get("assessment") if isinstance(content.get("assessment"), dict) else {}
+    for mode, key in (
+        ("mastery", "masteryVariants"),
+        ("transfer", "transferVariants"),
+        ("retrieval", "retrievalVariants"),
+    ):
+        for variant in validAssessmentVariants(assessment.get(key), mode):
+            checks.append(variant["check"])
+    return checks
+
+
+def isDeterministicPracticeCheck(check: dict[str, Any]) -> bool:
+    return (
+        check.get("type") == "outputExact"
+        and check.get("evidence") == "practice"
+        and bool(textValue(check.get("outputExact")))
+    )
+
+
+def isStrongCheckSpec(check: dict[str, Any]) -> bool:
+    kind = check.get("kind") or check.get("type")
+    payload = check.get("payload") if isinstance(check.get("payload"), dict) else {}
+    return (
+        kind in STRONG_CHECK_KINDS
+        and check.get("strength") == "strong"
+        and check.get("version") == 1
+        and check.get("executor") in {"browser-worker", "local-sandbox"}
+        and bool(textValue(check.get("fixtureId")))
+        and bool(textValue(check.get("fixtureHash")))
+        and bool(payload)
+    )
+
+
+def isWeakCheck(check: dict[str, Any]) -> bool:
+    kind = check.get("kind") or check.get("type")
+    return (
+        kind in WEAK_CHECK_KINDS
+        or "noError" in check
+        or "resultCheck" in check
+        or "requiredPatterns" in check
+    )
+
+
 def summarizeLessons(lessons: list[dict[str, Any]]) -> dict[str, Any]:
     orientationLessons = [lesson for lesson in lessons if lesson.get("orientation")]
     packageLessons = [lesson for lesson in lessons if lesson.get("declaredPackages")]
@@ -351,6 +498,46 @@ def summarizeLessons(lessons: list[dict[str, Any]]) -> dict[str, Any]:
         if lesson.get("declaredPackages")
         and isinstance(lesson.get("introSignals"), dict)
         and lesson["introSignals"].get("hasRuntimePrep") is True
+    ]
+    deterministicPracticeLessons = [
+        lesson
+        for lesson in lessons
+        if int(lesson.get("evidenceProfile", {}).get("deterministicPracticeCheckCount", 0)) > 0
+    ]
+    strongCheckSpecLessons = [
+        lesson
+        for lesson in lessons
+        if int(lesson.get("evidenceProfile", {}).get("strongCheckCount", 0)) > 0
+    ]
+    weakOnlyLessons = [
+        lesson
+        for lesson in lessons
+        if int(lesson.get("evidenceProfile", {}).get("weakCheckCount", 0)) > 0
+        and int(lesson.get("evidenceProfile", {}).get("strongCheckCount", 0)) == 0
+    ]
+    masteryAssessmentLessons = [
+        lesson
+        for lesson in lessons
+        if lesson.get("evidenceProfile", {}).get("hasMasteryAssessment") is True
+    ]
+    transferAssessmentLessons = [
+        lesson
+        for lesson in lessons
+        if lesson.get("evidenceProfile", {}).get("hasTransferAssessment") is True
+    ]
+    retrievalAssessmentLessons = [
+        lesson
+        for lesson in lessons
+        if lesson.get("evidenceProfile", {}).get("hasRetrievalAssessment") is True
+    ]
+    performanceClaimLessons = [
+        lesson for lesson in lessons if lesson.get("evidenceProfile", {}).get("hasPerformanceClaim") is True
+    ]
+    explicitClaimScopeLessons = [
+        lesson for lesson in lessons if lesson.get("evidenceProfile", {}).get("hasExplicitClaimScope") is True
+    ]
+    independentReviewLessons = [
+        lesson for lesson in lessons if lesson.get("evidenceProfile", {}).get("independentReviewApproved") is True
     ]
     return {
         "lessonCount": len(lessons),
@@ -382,6 +569,34 @@ def summarizeLessons(lessons: list[dict[str, Any]]) -> dict[str, Any]:
             for lesson in lessons
             if lesson.get("hasPractice") and int(lesson.get("solutionCount", 0)) == 0
         ),
+        "deterministicPracticeLessonCount": len(deterministicPracticeLessons),
+        "deterministicPracticeCheckCount": sum(
+            int(lesson.get("evidenceProfile", {}).get("deterministicPracticeCheckCount", 0))
+            for lesson in lessons
+        ),
+        "strongCheckSpecLessonCount": len(strongCheckSpecLessons),
+        "strongCheckSpecLessonRatio": ratio(len(strongCheckSpecLessons), len(lessons)),
+        "strongCheckSpecCount": sum(
+            int(lesson.get("evidenceProfile", {}).get("strongCheckCount", 0))
+            for lesson in lessons
+        ),
+        "weakOnlyLessonCount": len(weakOnlyLessons),
+        "weakCheckCount": sum(
+            int(lesson.get("evidenceProfile", {}).get("weakCheckCount", 0))
+            for lesson in lessons
+        ),
+        "masteryAssessmentLessonCount": len(masteryAssessmentLessons),
+        "masteryAssessmentLessonRatio": ratio(len(masteryAssessmentLessons), len(lessons)),
+        "transferAssessmentLessonCount": len(transferAssessmentLessons),
+        "transferAssessmentLessonRatio": ratio(len(transferAssessmentLessons), len(lessons)),
+        "retrievalAssessmentLessonCount": len(retrievalAssessmentLessons),
+        "retrievalAssessmentLessonRatio": ratio(len(retrievalAssessmentLessons), len(lessons)),
+        "performanceClaimLessonCount": len(performanceClaimLessons),
+        "performanceClaimLessonRatio": ratio(len(performanceClaimLessons), len(lessons)),
+        "explicitClaimScopeLessonCount": len(explicitClaimScopeLessons),
+        "explicitClaimScopeLessonRatio": ratio(len(explicitClaimScopeLessons), len(lessons)),
+        "independentReviewApprovedLessonCount": len(independentReviewLessons),
+        "independentReviewApprovedLessonRatio": ratio(len(independentReviewLessons), len(lessons)),
         "directPipInstallLessonCount": sum(1 for lesson in lessons if lesson.get("directPipInstall")),
         "badInstallCopyLessonCount": sum(1 for lesson in lessons if lesson.get("badInstallCopy")),
         "misleadingImportSetupCopyLessonCount": sum(1 for lesson in lessons if lesson.get("misleadingImportSetupCopy")),
@@ -420,6 +635,58 @@ def buildDomains(summary: dict[str, Any], lessons: list[dict[str, Any]]) -> list
             textContains("curriculum flow verifier checks code count", "tests/curriculum/verifyCurriculumFlowQuality.py", "non-orientation lesson needs executable code flow"),
             textContains("curriculum flow verifier checks completion signal", "tests/curriculum/verifyCurriculumFlowQuality.py", "lesson needs a completion"),
             textContains("exercise checker exists", "src/codaro/curriculum/exerciseCheck.py", "runExerciseCheck"),
+        )),
+        domain("strong-evidence-transfer-and-retrieval", (
+            ratioAtLeast(
+                "strong evidence lesson coverage",
+                int(summary["strongCheckSpecLessonCount"]),
+                int(summary["lessonCount"]),
+                0.90,
+            ),
+            summaryEquals("no weak-only lesson checks remain", summary, "weakOnlyLessonCount", 0),
+            ratioAtLeast(
+                "mastery assessment coverage",
+                int(summary["masteryAssessmentLessonCount"]),
+                int(summary["lessonCount"]),
+                0.90,
+            ),
+            ratioAtLeast(
+                "transfer assessment coverage",
+                int(summary["transferAssessmentLessonCount"]),
+                int(summary["lessonCount"]),
+                0.90,
+            ),
+            ratioAtLeast(
+                "retrieval assessment coverage",
+                int(summary["retrievalAssessmentLessonCount"]),
+                int(summary["lessonCount"]),
+                0.90,
+            ),
+        )),
+        domain("assessment-claim-and-independent-review", (
+            ratioAtLeast(
+                "assessment performance claim coverage",
+                int(summary["performanceClaimLessonCount"]),
+                int(summary["lessonCount"]),
+                0.90,
+            ),
+            ratioAtLeast(
+                "explicit assessment claim scope coverage",
+                int(summary["explicitClaimScopeLessonCount"]),
+                int(summary["lessonCount"]),
+                0.90,
+            ),
+            ratioAtLeast(
+                "independent assessment review approval coverage",
+                int(summary["independentReviewApprovedLessonCount"]),
+                int(summary["lessonCount"]),
+                0.90,
+            ),
+            textContains(
+                "assessment authoring quality gate is wired",
+                "tests/run.py",
+                "tests/curriculum/verifyAssessmentAuthoringQuality.py",
+            ),
         )),
         domain("intro-onboarding-and-outcomes", (
             ratioAtLeast(
@@ -541,6 +808,39 @@ def ratioAtLeast(label: str, numerator: int, denominator: int, minimum: float) -
 
 def actionableGaps(lessons: list[dict[str, Any]]) -> dict[str, Any]:
     return {
+        "coverageByTopLevel": coverageByPathPrefix(lessons, 1),
+        "coverageByTrack": coverageByPathPrefix(lessons, 2)[:30],
+        "deterministicPracticeLessons": [
+            lesson["path"]
+            for lesson in lessons
+            if int(lesson.get("evidenceProfile", {}).get("deterministicPracticeCheckCount", 0)) > 0
+        ][:30],
+        "weakOnlyLessonSample": [
+            lesson["path"]
+            for lesson in lessons
+            if int(lesson.get("evidenceProfile", {}).get("weakCheckCount", 0)) > 0
+            and int(lesson.get("evidenceProfile", {}).get("strongCheckCount", 0)) == 0
+        ][:30],
+        "strongCheckSpecLessons": [
+            lesson["path"]
+            for lesson in lessons
+            if int(lesson.get("evidenceProfile", {}).get("strongCheckCount", 0)) > 0
+        ][:30],
+        "masteryAssessmentLessons": [
+            lesson["path"]
+            for lesson in lessons
+            if lesson.get("evidenceProfile", {}).get("hasMasteryAssessment") is True
+        ][:30],
+        "transferAssessmentLessons": [
+            lesson["path"]
+            for lesson in lessons
+            if lesson.get("evidenceProfile", {}).get("hasTransferAssessment") is True
+        ][:30],
+        "retrievalAssessmentLessons": [
+            lesson["path"]
+            for lesson in lessons
+            if lesson.get("evidenceProfile", {}).get("hasRetrievalAssessment") is True
+        ][:30],
         "legacyOnlyLessons": [
             lesson["path"]
             for lesson in lessons
@@ -611,6 +911,42 @@ def actionableGaps(lessons: list[dict[str, Any]]) -> dict[str, Any]:
             if int(lesson.get("externalUrlCount", 0)) > 0
         ][:30],
     }
+
+
+def coverageByPathPrefix(lessons: list[dict[str, Any]], depth: int) -> list[dict[str, Any]]:
+    rows: dict[str, dict[str, Any]] = {}
+    for lesson in lessons:
+        parts = Path(str(lesson["path"])).parts[:depth]
+        if not parts:
+            continue
+        key = "/".join(parts)
+        row = rows.setdefault(key, {
+            "prefix": key,
+            "lessonCount": 0,
+            "weakOnlyLessonCount": 0,
+            "strongCheckSpecLessonCount": 0,
+            "masteryAssessmentLessonCount": 0,
+            "transferAssessmentLessonCount": 0,
+            "retrievalAssessmentLessonCount": 0,
+        })
+        profile = lesson.get("evidenceProfile", {})
+        strongCount = int(profile.get("strongCheckCount", 0))
+        weakCount = int(profile.get("weakCheckCount", 0))
+        row["lessonCount"] += 1
+        if weakCount > 0 and strongCount == 0:
+            row["weakOnlyLessonCount"] += 1
+        if strongCount > 0:
+            row["strongCheckSpecLessonCount"] += 1
+        if profile.get("hasMasteryAssessment") is True:
+            row["masteryAssessmentLessonCount"] += 1
+        if profile.get("hasTransferAssessment") is True:
+            row["transferAssessmentLessonCount"] += 1
+        if profile.get("hasRetrievalAssessment") is True:
+            row["retrievalAssessmentLessonCount"] += 1
+    return sorted(
+        rows.values(),
+        key=lambda row: (-int(row["weakOnlyLessonCount"]), str(row["prefix"])),
+    )
 
 
 def countPackageOrientationLessons(lessons: list[dict[str, Any]]) -> int:

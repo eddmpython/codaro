@@ -546,3 +546,262 @@ sections:
   check:
     noError: 업무 흐름 검증에서 `experimentGraph` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: networkx_10-network-risk-report-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: network project 위험 보고서 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: component, isolate, degree, bridge를 한 구조 보고서로 통합한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 한 지표 대신 연결성·고립·hub를 함께 보고하세요.
+    - 구조 위험과 실제 장애 기록을 구분하세요.
+    exercise:
+      prompt: network_risk_report(nodes, edges)를 완성하세요.
+      starterCode: |-
+        def network_risk_report(nodes, edges):
+            raise NotImplementedError
+      solution: |
+        def network_risk_report(nodes, edges):
+            adjacency = {node: set() for node in nodes}
+            for a, b in edges: adjacency[a].add(b); adjacency[b].add(a)
+            isolates = sorted(node for node in nodes if not adjacency[node])
+            remaining = set(nodes); sizes = []
+            while remaining:
+                queue = [next(iter(remaining))]; seen = set(queue)
+                while queue:
+                    for neighbor in adjacency[queue.pop()]:
+                        if neighbor not in seen: seen.add(neighbor); queue.append(neighbor)
+                remaining -= seen; sizes.append(len(seen))
+            degrees = {node: len(adjacency[node]) for node in nodes}
+            hubs = sorted(node for node in nodes if degrees[node] == max(degrees.values(), default=0) and degrees[node] > 0)
+            return {"nodeCount": len(nodes), "edgeCount": len(edges), "componentSizes": sorted(sizes, reverse=True), "isolates": isolates, "maxDegreeNodes": hubs}
+      hints: *id001
+    check:
+      id: python.networkx.networkx_10.network-risk-report.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_10.network-risk-report.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: network_risk_report
+        cases:
+        - id: summarizes-structure
+          arguments:
+          - value:
+            - a
+            - b
+            - c
+            - d
+          - value:
+            - - a
+              - b
+            - - b
+              - c
+          expectedReturn:
+            nodeCount: 4
+            edgeCount: 2
+            componentSizes:
+            - 3
+            - 1
+            isolates:
+            - d
+            maxDegreeNodes:
+            - b
+        - id: handles-empty
+          arguments:
+          - value: []
+          - value: []
+          expectedReturn:
+            nodeCount: 0
+            edgeCount: 0
+            componentSizes: []
+            isolates: []
+            maxDegreeNodes: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: networkx_10-resilience-plan-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_10-network-risk-report-mastery
+    title: 새 서비스 network에 복원력 설계 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: node 역할과 단일 실패 여부를 바탕으로 우선 보강 대상을 정렬한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 우선순위 공식과 입력 필드를 공개하세요.
+    - 구조 score는 운영 영향 검토를 대체하지 않습니다.
+    exercise:
+      prompt: prioritize_resilience(nodes)를 완성하세요.
+      starterCode: |-
+        def prioritize_resilience(nodes):
+            raise NotImplementedError
+      solution: |
+        def prioritize_resilience(nodes):
+            result = []
+            for node in nodes:
+                score = node.get("dependents", 0) * 2 + int(node.get("singlePoint", False)) * 5 - node.get("redundancy", 0)
+                action = "add redundancy" if node.get("singlePoint", False) else "monitor" if score > 2 else "accept"
+                result.append({"node": node["id"], "score": score, "action": action})
+            return sorted(result, key=lambda row: (-row["score"], row["node"]))
+      hints: *id002
+    check:
+      id: python.networkx.networkx_10.resilience-plan.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_10.resilience-plan.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prioritize_resilience
+        cases:
+        - id: prioritizes-single-point
+          arguments:
+          - value:
+            - id: db
+              dependents: 3
+              singlePoint: true
+              redundancy: 0
+            - id: cache
+              dependents: 2
+              singlePoint: false
+              redundancy: 1
+          expectedReturn:
+          - node: db
+            score: 11
+            action: add redundancy
+          - node: cache
+            score: 3
+            action: monitor
+        - id: accepts-low-risk
+          arguments:
+          - value:
+            - id: x
+              dependents: 1
+              singlePoint: false
+              redundancy: 2
+          expectedReturn:
+          - node: x
+            score: 0
+            action: accept
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: networkx_10-network-project-evidence-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_10-resilience-plan-transfer
+    title: network project 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 구조·모델·운영 결론의 증거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 그래프 알고리즘의 입력 가정과 반환 의미를 함께 기록하세요.
+    - 시각적 모양만으로 구조적 결론을 내리지 마세요.
+    exercise:
+      prompt: choose_network_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_network_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_network_evidence(situation):
+            table = {'structural-summary': {'method': 'components centrality bridges', 'evidence': 'graph snapshot hash', 'risk': 'stale topology'}, 'model-comparison': {'method': 'baseline distribution', 'evidence': 'multiple simulations', 'risk': 'single seed'}, 'operational-action': {'method': 'structure plus incident data', 'evidence': 'validated impact', 'risk': 'centrality-only decision'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.networkx.networkx_10.network-project-evidence.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_10.network-project-evidence.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_network_evidence
+        cases:
+        - id: recalls-structural-summary
+          arguments:
+          - value: structural-summary
+          expectedReturn:
+            method: components centrality bridges
+            evidence: graph snapshot hash
+            risk: stale topology
+        - id: recalls-model-comparison
+          arguments:
+          - value: model-comparison
+          expectedReturn:
+            method: baseline distribution
+            evidence: multiple simulations
+            risk: single seed
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

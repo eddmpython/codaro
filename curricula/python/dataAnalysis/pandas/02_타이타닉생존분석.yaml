@@ -8,6 +8,9 @@ meta:
   difficulty: ⭐⭐
   badge: 입문
   dataSource: codaro-local:titanic
+  outcomes: ["pandas.filterSelect","pandas.aggregate"]
+  prerequisites: ["pandas.loadFrame"]
+  estimatedMinutes: 60
   tags:
   - titanic
   - 필터링
@@ -515,3 +518,257 @@ sections:
     content: 다음 시간에는 펭귄 데이터로 groupby를 배웁니다. 그룹별로 통계를 한 번에 구하는 강력한 기능입니다.
   goal: 이 강의에서 익힌 필터링/value_counts/loc·iloc 6가지 패턴을 머릿속에 정리한다.
   why: 같은 패턴이 다음 강의(펭귄 groupby)와 후속 모든 데이터 분석 트랙에서 그대로 반복됩니다. 한 번 정리해두면 다음 강의가 빠르게 진입합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pandas_02-survival-rate-by-group-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - summary
+    title: 승객 그룹별 생존율과 표본 수 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 선택한 그룹 열마다 전체 수, 생존 수, 생존율을 함께 집계한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 생존율만 반환하지 말고 분모가 되는 count를 함께 남기세요.
+    - 그룹 key는 JSON 증거에서 안정적으로 비교하도록 문자열로 정규화하세요.
+    exercise:
+      prompt: survival_by_group(rows, group_key)를 완성해 그룹별 count, survived, rate를 반환하세요.
+      starterCode: |-
+        def survival_by_group(rows, group_key):
+            raise NotImplementedError
+      solution: |
+        def survival_by_group(rows, group_key):
+            grouped = {}
+            for row in rows:
+                key = str(row[group_key])
+                bucket = grouped.setdefault(key, {"count": 0, "survived": 0})
+                bucket["count"] += 1
+                bucket["survived"] += 1 if row["survived"] else 0
+            return {
+                key: {**value, "rate": round(value["survived"] / value["count"], 3)}
+                for key, value in sorted(grouped.items())
+            }
+      hints: *id001
+    check:
+      id: python.pandas.pandas_02.survival-rate-by-group.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_02.survival-rate-by-group.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: survival_by_group
+        cases:
+        - id: groups-class-rates
+          arguments:
+          - value:
+            - class: 1
+              survived: 1
+            - class: 1
+              survived: 0
+            - class: 3
+              survived: 0
+          - value: class
+          expectedReturn:
+            '1':
+              count: 2
+              survived: 1
+              rate: 0.5
+            '3':
+              count: 1
+              survived: 0
+              rate: 0.0
+        - id: handles-empty-input
+          arguments:
+          - value: []
+          - value: class
+          expectedReturn: {}
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pandas_02-outcome-rate-comparison-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_02-survival-rate-by-group-mastery
+    title: 새 캠페인 데이터에서 세그먼트별 성공률 비교하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 생존율 집계 구조를 캠페인 세그먼트와 boolean outcome에 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - outcome 값은 bool로 해석하되 그룹별 전체 수를 별도로 누적하세요.
+    - 비율이 높아도 표본 수가 작을 수 있으므로 counts를 버리지 마세요.
+    exercise:
+      prompt: compare_outcome_rates(rows, segment_key, outcome_key)를 완성해 rates와 leader를 반환하세요.
+      starterCode: |-
+        def compare_outcome_rates(rows, segment_key, outcome_key):
+            raise NotImplementedError
+      solution: |
+        def compare_outcome_rates(rows, segment_key, outcome_key):
+            counts = {}
+            for row in rows:
+                key = str(row[segment_key])
+                bucket = counts.setdefault(key, [0, 0])
+                bucket[0] += 1
+                bucket[1] += bool(row[outcome_key])
+            rates = {key: round(success / count, 3) for key, (count, success) in sorted(counts.items())}
+            leader = max(rates, key=lambda key: (rates[key], key)) if rates else None
+            return {"rates": rates, "leader": leader, "counts": {key: value[0] for key, value in sorted(counts.items())}}
+      hints: *id002
+    check:
+      id: python.pandas.pandas_02.outcome-rate-comparison.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_02.outcome-rate-comparison.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: compare_outcome_rates
+        cases:
+        - id: compares-campaigns
+          arguments:
+          - value:
+            - campaign: A
+              clicked: true
+            - campaign: A
+              clicked: false
+            - campaign: B
+              clicked: true
+          - value: campaign
+          - value: clicked
+          expectedReturn:
+            rates:
+              A: 0.5
+              B: 1.0
+            leader: B
+            counts:
+              A: 2
+              B: 1
+        - id: handles-empty-campaign
+          arguments:
+          - value: []
+          - value: campaign
+          - value: clicked
+          expectedReturn:
+            rates: {}
+            leader: null
+            counts: {}
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pandas_02-rate-denominator-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pandas_02-outcome-rate-comparison-transfer
+    title: 비율 질문에서 올바른 분모를 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 전체 비율, 그룹 내 비율, 조건부 비율의 분모를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - ‘그룹 안에서’라는 말이 있으면 분모도 해당 그룹으로 제한됩니다.
+    - 조건부 질문은 조건을 분자에만 적용하지 않도록 주의하세요.
+    exercise:
+      prompt: choose_rate_denominator(question)를 완성해 numerator, denominator, groupBy를 반환하세요.
+      starterCode: |-
+        def choose_rate_denominator(question):
+            raise NotImplementedError
+      solution: |
+        def choose_rate_denominator(question):
+            table = {
+                "overall-survival": {"numerator": "survived rows", "denominator": "all rows", "groupBy": None},
+                "survival-within-class": {"numerator": "survived rows in class", "denominator": "all rows in class", "groupBy": "class"},
+                "female-share-among-survivors": {"numerator": "female survived rows", "denominator": "all survived rows", "groupBy": None},
+            }
+            if question not in table:
+                raise ValueError("unknown rate question")
+            return table[question]
+      hints: *id003
+    check:
+      id: python.pandas.pandas_02.rate-denominator-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pandas.pandas_02.rate-denominator-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_rate_denominator
+        cases:
+        - id: recalls-within-group-denominator
+          arguments:
+          - value: survival-within-class
+          expectedReturn:
+            numerator: survived rows in class
+            denominator: all rows in class
+            groupBy: class
+        - id: distinguishes-share-among-survivors
+          arguments:
+          - value: female-share-among-survivors
+          expectedReturn:
+            numerator: female survived rows
+            denominator: all survived rows
+            groupBy: null
+        - id: rejects-undefined-question
+          arguments:
+          - value: survival-vibes
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

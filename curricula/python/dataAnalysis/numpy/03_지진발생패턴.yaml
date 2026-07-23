@@ -544,3 +544,258 @@ sections:
     type: noError
     noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: numpy_03-earthquake-magnitude-bands-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - practice
+    title: 지진 magnitude를 구간화하고 최고 사건 찾기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: magnitude 기준으로 minor·moderate·strong count와 strongest event를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 구간 경계 4와 6이 어느 band에 속하는지 명시적으로 구현하세요.
+    - count와 strongest event는 다른 축의 결과입니다.
+    exercise:
+      prompt: summarize_earthquakes(events)를 완성해 bands와 strongestId를 반환하세요.
+      starterCode: |-
+        def summarize_earthquakes(events):
+            raise NotImplementedError
+      solution: |
+        def summarize_earthquakes(events):
+            bands = {"minor": 0, "moderate": 0, "strong": 0}
+            for event in events:
+                magnitude = event["magnitude"]
+                if magnitude < 0:
+                    raise ValueError("negative magnitude")
+                band = "minor" if magnitude < 4 else "moderate" if magnitude < 6 else "strong"
+                bands[band] += 1
+            strongest = max(events, key=lambda event: (event["magnitude"], event["id"])) if events else None
+            return {"bands": bands, "strongestId": strongest["id"] if strongest else None}
+      hints: *id001
+    check:
+      id: python.numpy.numpy_03.earthquake-magnitude-bands.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_03.earthquake-magnitude-bands.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_earthquakes
+        cases:
+        - id: counts-magnitude-bands
+          arguments:
+          - value:
+            - id: E1
+              magnitude: 3.2
+            - id: E2
+              magnitude: 5.5
+            - id: E3
+              magnitude: 6.0
+          expectedReturn:
+            bands:
+              minor: 1
+              moderate: 1
+              strong: 1
+            strongestId: E3
+        - id: handles-empty-events
+          arguments:
+          - value: []
+          expectedReturn:
+            bands:
+              minor: 0
+              moderate: 0
+              strong: 0
+            strongestId: null
+        - id: rejects-negative-magnitude
+          arguments:
+          - value:
+            - id: X
+              magnitude: -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: numpy_03-spatial-grid-counts-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_03-earthquake-magnitude-bands-mastery
+    title: 새 위치 event를 고정 grid cell로 집계하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: magnitude vector 분석을 latitude·longitude 공간 binning으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 음수 좌표에서 int 절삭과 floor가 다름을 주의하세요.
+    - cell key 형식을 고정해 결과를 안정적으로 비교하세요.
+    exercise:
+      prompt: count_spatial_cells(events, cell_size)를 완성해 cells와 densestCell을 반환하세요.
+      starterCode: |-
+        def count_spatial_cells(events, cell_size):
+            raise NotImplementedError
+      solution: |
+        def count_spatial_cells(events, cell_size):
+            import math
+            if cell_size <= 0:
+                raise ValueError("cell size must be positive")
+            cells = {}
+            for event in events:
+                key = f"{math.floor(event['lat'] / cell_size)}:{math.floor(event['lon'] / cell_size)}"
+                cells[key] = cells.get(key, 0) + 1
+            ordered = {key: cells[key] for key in sorted(cells)}
+            densest = max(cells, key=lambda key: (cells[key], key)) if cells else None
+            return {"cells": ordered, "densestCell": densest}
+      hints: *id002
+    check:
+      id: python.numpy.numpy_03.spatial-grid-counts.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_03.spatial-grid-counts.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: count_spatial_cells
+        cases:
+        - id: bins-events-by-floor
+          arguments:
+          - value:
+            - lat: 1.2
+              lon: 2.8
+            - lat: 1.9
+              lon: 2.1
+            - lat: -0.1
+              lon: 2.0
+          - value: 1
+          expectedReturn:
+            cells:
+              '-1:2': 1
+              '1:2': 2
+            densestCell: '1:2'
+        - id: handles-empty-space
+          arguments:
+          - value: []
+          - value: 5
+          expectedReturn:
+            cells: {}
+            densestCell: null
+        - id: rejects-zero-cell
+          arguments:
+          - value: []
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: numpy_03-earthquake-analysis-caution-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_03-spatial-grid-counts-transfer
+    title: 지진 수치 해석의 핵심 주의점 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: magnitude, count, 위치 density 질문의 scale과 증거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - magnitude는 단순 선형 크기가 아닙니다.
+    - 지역 count 비교에는 관측 기간과 영역 크기가 필요합니다.
+    exercise:
+      prompt: choose_earthquake_caution(situation)를 완성해 caution, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_earthquake_caution(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_earthquake_caution(situation):
+            table = {'compare-magnitude': {'caution': 'logarithmic scale', 'evidence': 'raw magnitude', 'risk': 'treat one unit as linear'}, 'compare-region-count': {'caution': 'observation window', 'evidence': 'time and area bounds', 'risk': 'unequal exposure'}, 'map-density': {'caution': 'cell size', 'evidence': 'bin definition', 'risk': 'arbitrary hotspot'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.numpy.numpy_03.earthquake-analysis-caution.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_03.earthquake-analysis-caution.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_earthquake_caution
+        cases:
+        - id: recalls-compare-magnitude
+          arguments:
+          - value: compare-magnitude
+          expectedReturn:
+            caution: logarithmic scale
+            evidence: raw magnitude
+            risk: treat one unit as linear
+        - id: recalls-compare-region-count
+          arguments:
+          - value: compare-region-count
+          expectedReturn:
+            caution: observation window
+            evidence: time and area bounds
+            risk: unequal exposure
+        - id: rejects-unknown-situation
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

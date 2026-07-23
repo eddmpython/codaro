@@ -311,36 +311,6 @@ TOOL_PROPOSE_VARIATION = ToolDef(
 )
 
 
-TOOL_PROPOSE_PREDICT_PROMPTS = ToolDef(
-    name="propose-predict-prompts",
-    description=(
-        "Propose LearningPredictContract drafts (prompt + expectedShape/dtype/value/error) "
-        "for every exercise step in one lesson that currently lacks a filled predict block. "
-        "Returns drafts ONLY — does not write the YAML. Author must review and apply. "
-        "Use before backfilling a strict category."
-    ),
-    parameters={
-        "type": "object",
-        "properties": {
-            "category": {
-                "type": "string",
-                "description": "Lesson category id (e.g. '30days').",
-            },
-            "contentId": {
-                "type": "string",
-                "description": "Lesson content id (filename without .yaml).",
-            },
-            "maxProposals": {
-                "type": "integer",
-                "description": "Max section drafts to return (default 20).",
-            },
-        },
-        "required": ["category", "contentId"],
-    },
-    handler="proposePredictPrompts",
-)
-
-
 TOOL_PROPOSE_CURRICULUM_DRAFT = ToolDef(
     name="propose-curriculum-draft",
     description=(

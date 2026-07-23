@@ -126,6 +126,33 @@ def testListPackagesUsesProjectPython(monkeypatch, tmp_path: Path) -> None:
     assert packages == [packageOps.PackageInfo(name="CodaroPkg", version="1.2.3")]
 
 
+def testListPackagesCoalescesRepeatedReadsForSameEnvironment(monkeypatch, tmp_path: Path) -> None:
+    pythonPath = tmp_path / "python.exe"
+    pythonPath.write_text("", encoding="utf-8")
+    calls = 0
+
+    def fakeRun(command, **kwargs):
+        nonlocal calls
+        del kwargs
+        calls += 1
+        return subprocess.CompletedProcess(
+            command,
+            0,
+            stdout='[{"name": "schedule", "version": "1.2.0"}]',
+            stderr="",
+        )
+
+    packageOps.invalidatePackageListCache()
+    monkeypatch.setattr(packageOps, "getProjectPythonPath", lambda: pythonPath)
+    monkeypatch.setattr(packageOps.subprocess, "run", fakeRun)
+
+    first = _run(packageOps.listPackages())
+    second = _run(packageOps.listPackages())
+
+    assert first == second == [packageOps.PackageInfo(name="schedule", version="1.2.0")]
+    assert calls == 1
+
+
 def testInstallPackageReportsMissingEnvironment(monkeypatch) -> None:
     def fakeProjectPython():
         raise packageOps.PackageEnvironmentError(

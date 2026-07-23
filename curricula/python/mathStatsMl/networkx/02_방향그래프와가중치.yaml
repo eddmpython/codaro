@@ -520,3 +520,276 @@ sections:
   check:
     noError: 업무 흐름 검증에서 `experimentGraph` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: networkx_02-directed-weight-balance-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 방향·가중 graph의 유입과 유출 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: node별 in/out degree와 weight 합을 분리한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - degree와 weight 합은 서로 다른 지표입니다.
+    - source와 target 역할을 바꾸지 마세요.
+    exercise:
+      prompt: directed_balance(nodes, edges)를 완성하세요.
+      starterCode: |-
+        def directed_balance(nodes, edges):
+            raise NotImplementedError
+      solution: |
+        def directed_balance(nodes, edges):
+            result = {node: {"inDegree": 0, "outDegree": 0, "inWeight": 0, "outWeight": 0} for node in nodes}
+            for source, target, weight in edges:
+                if source not in result or target not in result or weight < 0:
+                    raise ValueError("invalid weighted edge")
+                result[source]["outDegree"] += 1
+                result[source]["outWeight"] += weight
+                result[target]["inDegree"] += 1
+                result[target]["inWeight"] += weight
+            return {node: result[node] for node in sorted(result)}
+      hints: *id001
+    check:
+      id: python.networkx.networkx_02.directed-weight-balance.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_02.directed-weight-balance.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: directed_balance
+        cases:
+        - id: separates-in-and-out
+          arguments:
+          - value:
+            - a
+            - b
+          - value:
+            - - a
+              - b
+              - 3
+            - - b
+              - a
+              - 1
+          expectedReturn:
+            a:
+              inDegree: 1
+              outDegree: 1
+              inWeight: 1
+              outWeight: 3
+            b:
+              inDegree: 1
+              outDegree: 1
+              inWeight: 3
+              outWeight: 1
+        - id: keeps-zero-node
+          arguments:
+          - value:
+            - x
+          - value: []
+          expectedReturn:
+            x:
+              inDegree: 0
+              outDegree: 0
+              inWeight: 0
+              outWeight: 0
+        - id: rejects-negative-weight
+          arguments:
+          - value:
+            - a
+          - value:
+            - - a
+              - a
+              - -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: networkx_02-flow-anomaly-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_02-directed-weight-balance-mastery
+    title: 새 자금 흐름에 방향 graph 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: node별 순유입과 총량을 계산해 큰 imbalance를 찾는다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - net과 total volume을 함께 보여주세요.
+    - 큰 순유입이 곧 이상 거래라는 인과 주장은 하지 마세요.
+    exercise:
+      prompt: flow_anomalies(nodes, edges, threshold)를 완성하세요.
+      starterCode: |-
+        def flow_anomalies(nodes, edges, threshold):
+            raise NotImplementedError
+      solution: |
+        def flow_anomalies(nodes, edges, threshold):
+            flow = {node: {"in": 0, "out": 0} for node in nodes}
+            for source, target, amount in edges:
+                flow[source]["out"] += amount
+                flow[target]["in"] += amount
+            result = []
+            for node, values in sorted(flow.items()):
+                net = values["in"] - values["out"]
+                if abs(net) >= threshold:
+                    result.append({"node": node, "net": net, "volume": values["in"] + values["out"]})
+            return result
+      hints: *id002
+    check:
+      id: python.networkx.networkx_02.flow-anomaly.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_02.flow-anomaly.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: flow_anomalies
+        cases:
+        - id: finds-imbalances
+          arguments:
+          - value:
+            - a
+            - b
+            - c
+          - value:
+            - - a
+              - b
+              - 10
+            - - b
+              - c
+              - 2
+          - value: 5
+          expectedReturn:
+          - node: a
+            net: -10
+            volume: 10
+          - node: b
+            net: 8
+            volume: 12
+        - id: returns-none-below-threshold
+          arguments:
+          - value:
+            - a
+            - b
+          - value:
+            - - a
+              - b
+              - 1
+          - value: 2
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: networkx_02-directed-weight-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_02-flow-anomaly-transfer
+    title: 방향과 가중치 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 경로 의미에 맞는 edge 속성을 고른다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 그래프 알고리즘의 입력 가정과 반환 의미를 함께 기록하세요.
+    - 시각적 모양만으로 구조적 결론을 내리지 마세요.
+    exercise:
+      prompt: choose_edge_semantics(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_edge_semantics(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_edge_semantics(situation):
+            table = {'follows': {'method': 'directed unweighted', 'evidence': 'source target', 'risk': 'symmetrizing'}, 'distance': {'method': 'weighted', 'evidence': 'unit', 'risk': 'negative value'}, 'event-count': {'method': 'aggregate or multiedge', 'evidence': 'event grain', 'risk': 'lost multiplicity'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.networkx.networkx_02.directed-weight-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_02.directed-weight-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_edge_semantics
+        cases:
+        - id: recalls-follows
+          arguments:
+          - value: follows
+          expectedReturn:
+            method: directed unweighted
+            evidence: source target
+            risk: symmetrizing
+        - id: recalls-distance
+          arguments:
+          - value: distance
+          expectedReturn:
+            method: weighted
+            evidence: unit
+            risk: negative value
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

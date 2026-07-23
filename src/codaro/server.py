@@ -19,7 +19,7 @@ from .api import (
     createAiRouter,
     createAutomationRouter,
     createBootstrapRouter,
-    createClassroomRouter,
+    createClassroomRetirementRouter,
     createCurriculumRouter,
     createDocumentRouter,
     createExtensionRouter,
@@ -80,6 +80,12 @@ class EditorBuildStatus:
 
 class EditorBuildError(RuntimeError):
     pass
+
+
+def createServerEventLoop() -> asyncio.AbstractEventLoop:
+    if os.name == "nt":
+        return asyncio.SelectorEventLoop()
+    return asyncio.new_event_loop()
 
 
 def _displayPath(path: Path) -> str:
@@ -295,10 +301,10 @@ def createServerApp(
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://giscus.app; "
+            "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://giscus.app https://cdn.jsdelivr.net; "
             "style-src 'self' 'unsafe-inline'; "
             "img-src 'self' data: blob:; "
-            "connect-src 'self' ws: wss:; "
+            "connect-src 'self' ws: wss: https://cdn.jsdelivr.net; "
             "font-src 'self' data:; "
             "frame-src https://giscus.app; "
             "frame-ancestors 'none'"
@@ -339,7 +345,7 @@ def createServerApp(
     app.include_router(createTerminalRouter(state))
     app.include_router(createWorkspaceRouter(state))
     app.include_router(createCurriculumRouter(state))
-    app.include_router(createClassroomRouter(state))
+    app.include_router(createClassroomRetirementRouter())
     app.include_router(createSpaRouter(state))
     return app
 
@@ -409,7 +415,13 @@ def runServer(
             "startup %s",
             formatLogFields(action="port-fallback", requested=port, bound=resolvedPort, host=host),
         )
-    uvicorn.run(app, host=host, port=resolvedPort, log_level="warning")
+    uvicorn.run(
+        app,
+        host=host,
+        port=resolvedPort,
+        log_level="warning",
+        loop=createServerEventLoop,
+    )
 
 
 def resolveBindablePort(host: str, port: int, *, maxAttempts: int = 10, logger: Any = None) -> int:

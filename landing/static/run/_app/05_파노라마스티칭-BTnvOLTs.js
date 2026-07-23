@@ -1,0 +1,305 @@
+var e=`meta:\r
+  id: visionFeatures_05\r
+  title: 파노라마 스티칭\r
+  order: 5\r
+  category: visionFeatures\r
+  difficulty: ⭐⭐⭐⭐\r
+  badge: 중급\r
+  packages:\r
+  - matplotlib\r
+  - numpy\r
+  - opencv-python\r
+  - scikit-learn\r
+  tags:\r
+  - opencv\r
+  - 스티칭\r
+  - panorama\r
+  - Stitcher\r
+  - 호모그래피\r
+  seo:\r
+    title: 비전 특징점 - 파노라마 스티칭\r
+    description: 여러 장의 부분 사진을 호모그래피로 정렬해 파노라마 한 장을 만듭니다.\r
+    keywords:\r
+    - 파노라마\r
+    - stitcher\r
+    - panorama\r
+    - 호모그래피\r
+    - opencv\r
+intro:\r
+  emoji: 🖼\r
+  goal: 같은 장면을 부분 부분 찍은 사진들을 호모그래피로 정렬해 한 장의 파노라마로 만듭니다.\r
+  description: |-\r
+    파노라마는 매칭과 호모그래피를 실제 응용으로 연결하는 가장 직관적인 예제입니다. 이 강의는 OpenCV가 제공하는 고수준 cv2.Stitcher와, 직접 만든 두 장 합성 함수 두 가지 방식을 동시에 비교하며 스티칭의 내부 동작을 이해합니다.\r
+  direction: 합성된 두 장(원본의 왼쪽 절반과 회전·이동한 오른쪽 절반)으로 파노라마 한 장을 만듭니다.\r
+  benefits:\r
+  - cv2.Stitcher로 한 줄 파노라마를 만들 수 있습니다.\r
+  - 직접 만든 함수로 호모그래피 정렬 + 단순 합성을 구현할 수 있습니다.\r
+  - 결과의 봉합선(seam)이 보이는 이유와 개선 방향을 이해합니다.\r
+  diagram:\r
+    steps:\r
+    - label: 1단계. 부분 이미지 두 장 만들기\r
+      detail: china의 좌측과 우측을 살짝 다르게 자릅니다.\r
+    - label: 2단계. cv2.Stitcher 한 줄\r
+      detail: 고수준 API로 즉시 결과 얻기.\r
+    - label: 3단계. 직접 정렬 함수\r
+      detail: 매칭 → H → warpPerspective.\r
+    - label: 4단계. 캔버스에 합치기\r
+      detail: 두 장을 같은 캔버스에 놓고 평균합니다.\r
+    - label: 5단계. Stitcher와 비교\r
+      detail: 두 결과의 차이를 시각으로 확인합니다.\r
+    runtime:\r
+    - label: 비전 환경\r
+      detail: opencv-python의 Stitcher와 warpPerspective를 사용합니다.\r
+    - label: 검증 흐름\r
+      detail: assert와 시각 비교로 학습 결과가 기대값과 같은지 확인합니다.\r
+sections:\r
+- id: make_pair\r
+  title: 1단계. 부분 이미지 두 장 만들기\r
+  structuredPrimary: true\r
+  subtitle: 좌측 60%와 우측 60%\r
+  goal: 한 사진에서 좌측 60%와 우측 60%를 잘라 중앙에서 겹치는 두 장을 만듭니다.\r
+  why: 같은 장면의 두 부분 사진을 자체적으로 만들어 외부 데이터 의존을 없앱니다.\r
+  explanation: |-\r
+    \`left = china[:, : int(w * 0.6)]\` 는 좌측 60%, \`right = china[:, int(w * 0.4):]\` 는 우측 60% 입니다. 중앙 20% 가 겹쳐서 매칭 가능 영역이 됩니다.\r
+\r
+    여기에 우측 부분을 살짝 회전하면 실제 카메라가 약간 다른 각도로 찍은 효과와 비슷한 학습용 쌍이 만들어집니다.\r
+  tips:\r
+  - 겹치는 영역이 너무 좁으면 매칭이 빈약해 스티칭이 실패합니다. 20% 이상 겹쳐 두는 것이 안전합니다.\r
+  snippet: |-\r
+    import cv2\r
+    import numpy as np\r
+    import matplotlib.pyplot as plt\r
+    from sklearn.datasets import load_sample_image\r
+\r
+    china = load_sample_image('china.jpg')\r
+    h, w = china.shape[:2]\r
+    leftHalf = china[:, : int(w * 0.6)].copy()\r
+    rightCut = china[:, int(w * 0.4):].copy()\r
+    rotMat = cv2.getRotationMatrix2D((rightCut.shape[1] / 2, h / 2), angle=5, scale=1.0)\r
+    rightHalf = cv2.warpAffine(rightCut, rotMat, (rightCut.shape[1], h))\r
+    leftHalf.shape, rightHalf.shape\r
+  exercise:\r
+    prompt: 두 부분 이미지를 1x2 그리드로 출력하세요.\r
+    starterCode: |-\r
+      fig, axes = plt.subplots(1, 2, figsize=(12, 5))\r
+      axes[0].imshow(leftHalf)\r
+      axes[0].set_title('left')\r
+      axes[1].imshow(rightHalf)\r
+      axes[1].set_title('right (rotated 5°)')\r
+      for axis in axes:\r
+          axis.axis('off')\r
+      fig\r
+    hints:\r
+    - imshow와 axis off 두 줄만 반복합니다.\r
+    - 오른쪽 사진이 약간 기울어진 모습이 보여야 합니다.\r
+  check:\r
+    noError: 잘라내기와 회전이 오류 없이 끝나야 합니다.\r
+    resultCheck: leftHalf.shape의 너비가 rightHalf.shape의 너비와 같은 정도여야 합니다.\r
+- id: high_level_stitcher\r
+  title: 2단계. cv2.Stitcher 한 줄\r
+  structuredPrimary: true\r
+  subtitle: 고수준 API\r
+  goal: cv2.Stitcher.create로 즉시 파노라마를 만듭니다.\r
+  why: OpenCV가 제공하는 가장 간단한 방법을 먼저 시도하는 것이 표준입니다.\r
+  explanation: |-\r
+    \`stitcher = cv2.Stitcher.create(cv2.Stitcher_PANORAMA)\` 후 \`status, panorama = stitcher.stitch([left, right])\` 가 끝입니다. 성공하면 status == cv2.Stitcher_OK 이고 panorama 가 결과입니다.\r
+\r
+    내부에서는 특징점 검출, 매칭, 호모그래피 추정, 블렌딩이 모두 일어납니다. 실패 사례 진단을 위해 status 코드를 확인하는 습관이 좋습니다.\r
+  tips:\r
+  - Stitcher는 단순한 매칭으로는 실패할 수 있는 어려운 케이스(겹침 부족 등)에서 자동으로 거부합니다.\r
+  snippet: |-\r
+    stitcher = cv2.Stitcher.create(cv2.Stitcher_PANORAMA)\r
+    status, panorama = stitcher.stitch([leftHalf, rightHalf])\r
+    status, None if panorama is None else panorama.shape\r
+  exercise:\r
+    prompt: 결과가 성공이면 시각화하고, 실패면 상태 코드를 그대로 출력하세요.\r
+    starterCode: |-\r
+      if status == cv2.Stitcher_OK:\r
+          fig = plt.figure(figsize=(10, 5))\r
+          plt.imshow(cv2.cvtColor(panorama, ___))\r
+          plt.axis('off')\r
+          fig\r
+      else:\r
+          status\r
+    hints:\r
+    - Stitcher는 BGR로 반환하므로 표시 전에 BGR2RGB가 필요합니다.\r
+    - 상태 코드의 의미는 OpenCV 문서를 참조합니다.\r
+  check:\r
+    noError: Stitcher 호출이 오류 없이 끝나야 합니다.\r
+    resultCheck: status가 정수여야 합니다.\r
+- id: align_direct\r
+  title: 3단계. 직접 정렬 함수\r
+  structuredPrimary: true\r
+  subtitle: ORB + 호모그래피\r
+  goal: 4강에서 배운 흐름으로 두 사진의 호모그래피를 직접 추정합니다.\r
+  why: 직접 만들면 봉합·블렌딩 단계가 분명히 보이고 디버깅이 쉬워집니다.\r
+  explanation: |-\r
+    함수 한 개에 ORB 추출, BFMatcher, knnMatch + Lowe ratio, findHomography를 담습니다. 그 결과 두 사진의 호모그래피 H를 얻습니다.\r
+\r
+    Stitcher가 내부에서 하는 일과 같은 단계입니다. 잘 동작하면 둘의 결과가 비슷해야 합니다.\r
+  tips:\r
+  - 함수로 묶어 두면 다른 이미지에도 같은 정렬을 적용할 수 있습니다.\r
+  snippet: |-\r
+    def estimateHomography(imgA, imgB):\r
+        orb = cv2.ORB_create(nfeatures=1500)\r
+        ga = cv2.cvtColor(imgA, cv2.COLOR_RGB2GRAY)\r
+        gb = cv2.cvtColor(imgB, cv2.COLOR_RGB2GRAY)\r
+        kpA, descA = orb.detectAndCompute(ga, mask=None)\r
+        kpB, descB = orb.detectAndCompute(gb, mask=None)\r
+        bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)\r
+        knn = bf.knnMatch(descA, descB, k=2)\r
+        good = [m1 for m1, m2 in knn if m1.distance < 0.75 * m2.distance]\r
+        if len(good) < 8:\r
+            return None, len(good)\r
+        src = np.array([kpA[m.queryIdx].pt for m in good], dtype=np.float32).reshape(-1, 1, 2)\r
+        dst = np.array([kpB[m.trainIdx].pt for m in good], dtype=np.float32).reshape(-1, 1, 2)\r
+        H, _ = cv2.findHomography(src, dst, cv2.RANSAC, 4.0)\r
+        return H, len(good)\r
+\r
+    H, goodCount = estimateHomography(rightHalf, leftHalf)\r
+    H.shape, goodCount\r
+  exercise:\r
+    prompt: estimateHomography의 nfeatures를 500으로 줄였을 때 goodCount가 어떻게 변하는지 확인하세요(임시로 함수 변형이 부담스러우면 nfeatures를 직접 호출에서 바꾸세요).\r
+    starterCode: |-\r
+      orb500 = cv2.ORB_create(nfeatures=___)\r
+      ga = cv2.cvtColor(rightHalf, cv2.COLOR_RGB2GRAY)\r
+      gb = cv2.cvtColor(leftHalf, cv2.COLOR_RGB2GRAY)\r
+      kpA, descA = orb500.detectAndCompute(ga, mask=None)\r
+      kpB, descB = orb500.detectAndCompute(gb, mask=None)\r
+      bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)\r
+      knn = bf.knnMatch(descA, descB, k=2)\r
+      good500 = [m1 for m1, m2 in knn if m1.distance < 0.75 * m2.distance]\r
+      len(good500)\r
+    hints:\r
+    - 키포인트가 적으면 매칭 후보도 적습니다.\r
+    - 빈칸은 500입니다.\r
+  check:\r
+    noError: 함수 호출이 오류 없이 끝나야 합니다.\r
+    resultCheck: H가 (3, 3) 모양의 ndarray여야 합니다.\r
+- id: blend_canvas\r
+  title: 4단계. 큰 캔버스에 두 사진 합치기\r
+  structuredPrimary: true\r
+  subtitle: warpPerspective + 평균\r
+  goal: 두 사진을 정렬해 가로로 긴 캔버스에 합치고 평균 합성으로 봉합합니다.\r
+  why: 단순 합성은 봉합선이 보이지만 어떻게 동작하는지 가장 직관적으로 보여 줍니다.\r
+  explanation: |-\r
+    먼저 right 이미지가 들어갈 만한 크기의 캔버스를 만들고, left를 그대로 붙이고, right를 H로 변환해 같은 캔버스에 그립니다. 두 이미지의 픽셀이 있는 영역은 평균을 취합니다.\r
+\r
+    Stitcher가 사용하는 multi-band blending에 비하면 거칠지만, 학습용으로는 충분합니다.\r
+  tips:\r
+  - 캔버스 너비는 두 이미지 너비의 합 정도로 두면 보통 안전합니다.\r
+  snippet: |-\r
+    canvasW = leftHalf.shape[1] + rightHalf.shape[1]\r
+    canvas = np.zeros((h, canvasW, 3), dtype=np.uint8)\r
+    canvas[:, :leftHalf.shape[1]] = leftHalf\r
+    warpedRight = cv2.warpPerspective(rightHalf, H, (canvasW, h))\r
+    maskRight = (warpedRight.sum(axis=2) > 0)\r
+    maskLeft = (canvas.sum(axis=2) > 0)\r
+    bothMask = maskRight & maskLeft\r
+    blended = canvas.astype(np.float32)\r
+    blended[maskRight & ~bothMask] = warpedRight[maskRight & ~bothMask]\r
+    blended[bothMask] = (blended[bothMask] + warpedRight[bothMask].astype(np.float32)) / 2.0\r
+    blended = blended.clip(0, 255).astype(np.uint8)\r
+    fig = plt.figure(figsize=(12, 5))\r
+    plt.imshow(blended)\r
+    plt.axis('off')\r
+    fig\r
+  exercise:\r
+    prompt: 평균 합성 대신 right 사진만 우선되는(maskRight 영역은 무조건 warpedRight) 합성을 만드세요.\r
+    starterCode: |-\r
+      naive = canvas.copy()\r
+      naive[maskRight] = warpedRight[___]\r
+      fig2 = plt.figure(figsize=(12, 5))\r
+      plt.imshow(naive)\r
+      plt.axis('off')\r
+      fig2\r
+    hints:\r
+    - 빈칸은 maskRight 입니다.\r
+    - 결과는 right 영역이 left 영역을 가립니다.\r
+  check:\r
+    noError: 캔버스 합성이 오류 없이 끝나야 합니다.\r
+    resultCheck: blended.shape이 (h, canvasW, 3)이어야 합니다.\r
+- id: compare_two\r
+  title: 5단계. Stitcher와 직접 합성 비교\r
+  structuredPrimary: true\r
+  subtitle: 결과 두 장 나란히\r
+  goal: Stitcher 결과와 직접 만든 결과를 나란히 비교합니다.\r
+  why: 단순 평균 합성의 한계와 Stitcher의 블렌딩이 어떤 차이를 만드는지 직접 봐야 합니다.\r
+  explanation: |-\r
+    Stitcher는 봉합선을 자연스럽게 가리도록 multi-band blending을 적용합니다. 직접 만든 평균 합성은 같은 영역에서 빛 차이가 분명히 보일 수 있습니다.\r
+\r
+    어떤 추가 작업이 필요할지(노출 보정, 멀티밴드 블렌딩)는 두 결과의 차이를 보고 정합니다.\r
+  tips:\r
+  - Stitcher가 실패하면 비교를 생략하고 직접 결과만 출력하면 됩니다.\r
+  snippet: |-\r
+    fig, axes = plt.subplots(2, 1, figsize=(12, 8))\r
+    axes[0].imshow(blended)\r
+    axes[0].set_title('manual average blend')\r
+    if status == cv2.Stitcher_OK:\r
+        axes[1].imshow(cv2.cvtColor(panorama, cv2.COLOR_BGR2RGB))\r
+        axes[1].set_title('cv2.Stitcher')\r
+    else:\r
+        axes[1].imshow(np.zeros_like(blended))\r
+        axes[1].set_title(f'Stitcher failed status={status}')\r
+    for axis in axes:\r
+        axis.axis('off')\r
+    fig\r
+  exercise:\r
+    prompt: blended에서 봉합선(left와 right가 겹치는 중앙 영역)을 가장자리 박스로 표시하세요.\r
+    starterCode: |-\r
+      seamMask = bothMask\r
+      seamRows = np.where(seamMask.any(axis=1))[0]\r
+      seamCols = np.where(seamMask.any(axis=0))[0]\r
+      y1, y2 = seamRows.min(), seamRows.max()\r
+      x1, x2 = seamCols.min(), seamCols.max()\r
+      marked = blended.copy()\r
+      cv2.rectangle(marked, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), thickness=___)\r
+      fig2 = plt.figure(figsize=(12, 5))\r
+      plt.imshow(marked)\r
+      plt.axis('off')\r
+      fig2\r
+    hints:\r
+    - 빈칸은 정수 두께입니다.\r
+    - 봉합 영역의 색이 분명히 달라 보입니다.\r
+  check:\r
+    noError: 비교 시각화가 오류 없이 끝나야 합니다.\r
+    resultCheck: figure가 마지막 줄에 평가되어야 합니다.\r
+- id: practice\r
+  title: 실습\r
+  structuredPrimary: true\r
+  subtitle: 더 어려운 케이스로 도전\r
+  goal: 더 큰 회전·이동으로 두 장을 만들어 정렬과 합성을 시도합니다.\r
+  why: 변환이 강해지면 매칭과 정렬이 어려워지는 한계를 직접 확인해야 알고리즘 선택 감각이 생깁니다.\r
+  explanation: |-\r
+    각 미션은 import문부터 시작하지만, 위 예제를 실행했다면 import는 생략해도 됩니다.\r
+  tips:\r
+  - 어려운 케이스는 inlier 비율이 50% 미만으로 떨어지기 쉽습니다.\r
+  snippet: |-\r
+    hardRotMat = cv2.getRotationMatrix2D((rightCut.shape[1] / 2, h / 2), angle=15, scale=1.0)\r
+    hardRight = cv2.warpAffine(rightCut, hardRotMat, (rightCut.shape[1], h))\r
+    hardH, hardGood = estimateHomography(hardRight, leftHalf)\r
+    None if hardH is None else hardH.shape, hardGood\r
+  exercise:\r
+    prompt: "미션1: hardRight를 leftHalf와 합성하는 hardBlended 이미지를 만들고 표시하세요. 미션2: 위 strict (각도 15도)와 easy (각도 5도) 결과를 1x2 그리드로 비교하세요."\r
+    starterCode: |-\r
+      hardCanvas = np.zeros((h, canvasW, 3), dtype=np.uint8)\r
+      hardCanvas[:, :leftHalf.shape[1]] = leftHalf\r
+      hardWarpedRight = cv2.warpPerspective(hardRight, hardH, (canvasW, h))\r
+      hardMaskRight = (hardWarpedRight.sum(axis=2) > 0)\r
+      hardMaskLeft = (hardCanvas.sum(axis=2) > 0)\r
+      hardBoth = hardMaskRight & hardMaskLeft\r
+      hardBlended = hardCanvas.astype(np.float32)\r
+      hardBlended[hardMaskRight & ~hardBoth] = hardWarpedRight[hardMaskRight & ~hardBoth]\r
+      hardBlended[hardBoth] = (hardBlended[hardBoth] + hardWarpedRight[hardBoth].astype(np.float32)) / 2.0\r
+      hardBlended = hardBlended.clip(0, 255).astype(np.uint8)\r
+      fig = plt.figure(figsize=(12, 5))\r
+      plt.imshow(hardBlended)\r
+      plt.axis('off')\r
+      fig\r
+    hints:\r
+    - 변환이 강해지면 봉합 영역이 더 두드러집니다.\r
+    - estimateHomography가 None을 반환하면 매칭 부족이 원인입니다.\r
+  check:\r
+    noError: 합성이 오류 없이 끝나야 합니다.\r
+    resultCheck: hardBlended.shape이 (h, canvasW, 3)이어야 합니다.\r
+`;export{e as default};

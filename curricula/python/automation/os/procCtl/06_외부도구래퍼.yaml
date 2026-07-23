@@ -390,3 +390,318 @@ sections:
     check:
       noError: 종합 래퍼 함수와 사전 검사가 한 흐름에서 끝나야 한다.
       resultCheck: first와 second 두 호출의 stdout이 본문에서 지정한 문자열과 정확히 같아야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: procCtl_06-tool-wrapper-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - which-check
+    - combined-wrapper
+    title: 외부 도구 wrapper의 version·input·output 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 도구 version 범위와 필수 input/output, timeout을 실행 전에 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 도구 이름이 같아도 version이 다르면 별도 contract로 판정하세요.
+    - wrapper는 argv뿐 아니라 필수 output과 timeout까지 소유해야 합니다.
+    exercise:
+      prompt: audit_tool_wrapper(contract, invocation)를 완성하세요.
+      starterCode: |-
+        def audit_tool_wrapper(contract, invocation):
+            raise NotImplementedError
+      solution: |
+        def audit_tool_wrapper(contract, invocation):
+            failures = []
+            if invocation.get("version") not in contract.get("allowedVersions", []):
+                failures.append("version")
+            missing_inputs = sorted(set(contract.get("requiredInputs", [])) - set(invocation.get("inputs", [])))
+            if missing_inputs:
+                failures.append("inputs")
+            missing_outputs = sorted(set(contract.get("requiredOutputs", [])) - set(invocation.get("expectedOutputs", [])))
+            if missing_outputs:
+                failures.append("outputs")
+            if invocation.get("timeoutMs", 0) <= 0 or invocation.get("timeoutMs", 0) > contract.get("maximumTimeoutMs", 0):
+                failures.append("timeout")
+            return {"ready": not failures, "failures": failures, "missingInputs": missing_inputs, "missingOutputs": missing_outputs}
+      hints: *id001
+    check:
+      id: python.procctl.procCtl_06.tool-wrapper-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_06.tool-wrapper-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_tool_wrapper
+        cases:
+        - id: accepts-versioned-wrapper
+          arguments:
+          - value:
+              allowedVersions:
+              - '1.2'
+              requiredInputs:
+              - source
+              requiredOutputs:
+              - report
+              maximumTimeoutMs: 5000
+          - value:
+              version: '1.2'
+              inputs:
+              - source
+              expectedOutputs:
+              - report
+              timeoutMs: 1000
+          expectedReturn:
+            ready: true
+            failures: []
+            missingInputs: []
+            missingOutputs: []
+        - id: reports-contract-gaps
+          arguments:
+          - value:
+              allowedVersions:
+              - '1.2'
+              requiredInputs:
+              - source
+              requiredOutputs:
+              - report
+              maximumTimeoutMs: 5000
+          - value:
+              version: '2.0'
+              inputs: []
+              expectedOutputs: []
+              timeoutMs: 6000
+          expectedReturn:
+            ready: false
+            failures:
+            - version
+            - inputs
+            - outputs
+            - timeout
+            missingInputs:
+            - source
+            missingOutputs:
+            - report
+        - id: reports-zero-timeout
+          arguments:
+          - value:
+              allowedVersions:
+              - '1'
+              maximumTimeoutMs: 10
+          - value:
+              version: '1'
+              timeoutMs: 0
+          expectedReturn:
+            ready: false
+            failures:
+            - timeout
+            missingInputs: []
+            missingOutputs: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: procCtl_06-tool-output-schema-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - procCtl_06-tool-wrapper-contract-mastery
+    title: 새 외부 도구 출력에 schema 검증 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 필수 field·type과 unknown field 정책으로 파싱 결과를 감사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - stdout JSON 파싱 성공과 wrapper schema 충족을 별도 판정하세요.
+    - unknown field 허용 여부를 version별 계약으로 명시하세요.
+    exercise:
+      prompt: audit_tool_output(output, schema, allow_unknown)를 완성하세요.
+      starterCode: |-
+        def audit_tool_output(output, schema, allow_unknown):
+            raise NotImplementedError
+      solution: |
+        def audit_tool_output(output, schema, allow_unknown):
+            missing = sorted(set(schema) - set(output))
+            wrong_types = sorted(key for key, type_name in schema.items() if key in output and type(output[key]).__name__ != type_name)
+            unknown = sorted(set(output) - set(schema)) if not allow_unknown else []
+            failures = []
+            if missing:
+                failures.append("missing")
+            if wrong_types:
+                failures.append("types")
+            if unknown:
+                failures.append("unknown")
+            return {"accepted": not failures, "failures": failures, "missing": missing, "wrongTypes": wrong_types, "unknown": unknown}
+      hints: *id002
+    check:
+      id: python.procctl.procCtl_06.tool-output-schema.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_06.tool-output-schema.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_tool_output
+        cases:
+        - id: accepts-schema
+          arguments:
+          - value:
+              count: 2
+              ok: true
+          - value:
+              count: int
+              ok: bool
+          - value: false
+          expectedReturn:
+            accepted: true
+            failures: []
+            missing: []
+            wrongTypes: []
+            unknown: []
+        - id: reports-missing-type-and-unknown
+          arguments:
+          - value:
+              count: '2'
+              extra: 1
+          - value:
+              count: int
+              ok: bool
+          - value: false
+          expectedReturn:
+            accepted: false
+            failures:
+            - missing
+            - types
+            - unknown
+            missing:
+            - ok
+            wrongTypes:
+            - count
+            unknown:
+            - extra
+        - id: allows-unknown-fields
+          arguments:
+          - value:
+              count: 2
+              extra: 1
+          - value:
+              count: int
+          - value: true
+          expectedReturn:
+            accepted: true
+            failures: []
+            missing: []
+            wrongTypes: []
+            unknown: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: procCtl_06-external-tool-wrapper-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - procCtl_06-tool-output-schema-transfer
+    title: 외부 도구 wrapper 책임 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: version·실행·출력 schema 책임을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - process 실행 성공과 업무 결과물 성공을 같은 것으로 처리하지 마세요.
+    - 명령 identity·제한 시간·산출물 evidence·남는 risk를 함께 기록하세요.
+    exercise:
+      prompt: choose_tool_wrapper_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_tool_wrapper_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_tool_wrapper_evidence(situation):
+            table = {'version': {'action': 'probe and allowlist exact version', 'evidence': 'tool identity', 'risk': 'behavior drift'}, 'invoke': {'action': 'build typed argv with timeout', 'evidence': 'invocation manifest', 'risk': 'shell coupling'}, 'parse': {'action': 'validate output schema', 'evidence': 'field and type audit', 'risk': 'silent format drift'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.procctl.procCtl_06.external-tool-wrapper-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.procctl.procCtl_06.external-tool-wrapper-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_tool_wrapper_evidence
+        cases:
+        - id: recalls-version
+          arguments:
+          - value: version
+          expectedReturn:
+            action: probe and allowlist exact version
+            evidence: tool identity
+            risk: behavior drift
+        - id: recalls-invoke
+          arguments:
+          - value: invoke
+          expectedReturn:
+            action: build typed argv with timeout
+            evidence: invocation manifest
+            risk: shell coupling
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

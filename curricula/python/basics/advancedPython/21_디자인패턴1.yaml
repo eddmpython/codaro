@@ -697,3 +697,341 @@ sections:
     type: noError
     noError: 종합 연습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 종합 연습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 21_design_patterns_creational-exporter-factory-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - factory
+    - adapter
+    - workflow_validation
+    title: 리포트 내보내기 팩토리와 어댑터 만들기
+    subtitle: exporter factory and adapter
+    goal: export_report(rows, format_name)를 완성해 CSV, JSON, workbook 내보내기를 같은 인터페이스로 처리한다.
+    why: 디자인 패턴은 이름 암기가 아니라 변경 지점을 분리하는 도구입니다. 포맷이 늘어나는 리포트 내보내기에서 생성 로직과 legacy API 연결을 분리하는지 확인합니다.
+    explanation: csv와 json은 팩토리에서 exporter를 고르고, workbook은 기존 makeWorkbook API를 export 인터페이스로 감싸는 어댑터를 사용하세요.
+    tips:
+    - 팩토리는 format_name을 보고 적절한 객체를 생성하는 책임만 갖습니다.
+    - 어댑터는 기존 객체를 바꾸지 않고 새 인터페이스에 맞춰 감쌉니다.
+    exercise:
+      prompt: export_report(rows, format_name)를 완성해 format, pattern, payload를 반환하세요.
+      starterCode: |-
+        def export_report(rows, format_name):
+            raise NotImplementedError
+      solution: |-
+        def export_report(rows, format_name):
+            class CsvExporter:
+                def export(self, rows):
+                    if not rows:
+                        return []
+                    header = list(rows[0].keys())
+                    lines = [",".join(header)]
+                    for row in rows:
+                        lines.append(",".join(str(row[key]) for key in header))
+                    return lines
+
+            class JsonExporter:
+                def export(self, rows):
+                    return [dict(row) for row in rows]
+
+            class LegacyWorkbookApi:
+                def make_workbook(self, rows):
+                    return {"sheet": "orders", "rowCount": len(rows), "rows": [dict(row) for row in rows]}
+
+            class WorkbookAdapter:
+                def __init__(self, legacy_api):
+                    self.legacy_api = legacy_api
+
+                def export(self, rows):
+                    return self.legacy_api.make_workbook(rows)
+
+            registry = {
+                "csv": CsvExporter,
+                "json": JsonExporter,
+                "workbook": lambda: WorkbookAdapter(LegacyWorkbookApi()),
+            }
+            if format_name not in registry:
+                raise ValueError("unsupported export format")
+            exporter = registry[format_name]()
+            return {
+                "format": format_name,
+                "pattern": "adapter" if format_name == "workbook" else "factory",
+                "payload": exporter.export(rows),
+            }
+      hints:
+      - registry 값은 클래스일 수도 있고 객체를 만드는 함수일 수도 있습니다.
+      - workbook은 legacy API 반환값을 그대로 payload로 돌려줘도 됩니다.
+    check:
+      id: python.advanced.design-patterns.exporter-factory.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.design-patterns.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: export_report
+        cases:
+        - id: exports-csv-through-factory
+          arguments:
+          - value:
+            - id: O-1
+              amount: 12000
+            - id: O-2
+              amount: 8000
+          - value: csv
+          expectedReturn:
+            format: csv
+            pattern: factory
+            payload:
+            - id,amount
+            - O-1,12000
+            - O-2,8000
+        - id: exports-workbook-through-adapter
+          arguments:
+          - value:
+            - id: O-1
+              amount: 12000
+          - value: workbook
+          expectedReturn:
+            format: workbook
+            pattern: adapter
+            payload:
+              sheet: orders
+              rowCount: 1
+              rows:
+              - id: O-1
+                amount: 12000
+        - id: rejects-unknown-format
+          arguments:
+          - value: []
+          - value: pdf
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 21_design_patterns_creational-prototype-template-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - builder
+    - prototype
+    - decorator_pattern
+    title: 알림 템플릿을 프로토타입으로 복제하고 옵션 덮어쓰기
+    subtitle: prototype clone transfer
+    goal: clone_notification_template(template, overrides)를 완성해 중첩 템플릿을 복제하고 일부 설정만 바꾼다.
+    why: 생성 패턴을 다른 맥락으로 옮기려면 새 객체를 처음부터 만들지, 기존 구성을 복제해 바꿀지 판단할 수 있어야 합니다.
+    explanation: template은 channels, copy, flags 같은 중첩 dict와 list를 가질 수 있습니다. 원본을 바꾸지 말고 깊은 복제본에 overrides를 적용하세요.
+    tips:
+    - 리스트와 딕셔너리는 얕은 복사만으로는 내부 값이 공유될 수 있습니다.
+    - overrides는 최상위 key를 바꾸는 것으로 제한하면 동작을 명확하게 검증할 수 있습니다.
+    exercise:
+      prompt: clone_notification_template(template, overrides)를 완성해 복제 결과와 원본 채널을 반환하세요.
+      starterCode: |-
+        def clone_notification_template(template, overrides):
+            raise NotImplementedError
+      solution: |-
+        def clone_notification_template(template, overrides):
+            def clone(value):
+                if isinstance(value, dict):
+                    return {key: clone(item) for key, item in value.items()}
+                if isinstance(value, list):
+                    return [clone(item) for item in value]
+                return value
+
+            result = clone(template)
+            for key, value in overrides.items():
+                result[key] = clone(value)
+            return {
+                "template": result,
+                "originalChannels": list(template.get("channels", [])),
+                "sameObject": result is template,
+            }
+      hints:
+      - dict와 list를 만나면 내부 원소까지 다시 clone 해야 합니다.
+      - 원본이 바뀌지 않았는지 함께 반환하면 prototype의 의미를 확인할 수 있습니다.
+    check:
+      id: python.advanced.design-patterns.prototype-template.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.design-patterns.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: clone_notification_template
+        cases:
+        - id: clones-template-with-overridden-copy
+          arguments:
+          - value:
+              channels:
+              - email
+              - sms
+              copy:
+                title: Payment received
+                body: Thanks
+              flags:
+                urgent: false
+          - value:
+              copy:
+                title: Refund created
+                body: We are processing it
+          expectedReturn:
+            template:
+              channels:
+              - email
+              - sms
+              copy:
+                title: Refund created
+                body: We are processing it
+              flags:
+                urgent: false
+            originalChannels:
+            - email
+            - sms
+            sameObject: false
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 21_design_patterns_creational-pattern-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 21_design_patterns_creational-prototype-template-transfer
+    title: 생성·구조 패턴 선택 기준 회상하기
+    subtitle: creational structural pattern recall
+    goal: choose_design_pattern(need)를 완성해 요구사항별 패턴과 남용 위험을 반환한다.
+    why: 패턴 학습은 패턴을 많이 쓰는 것이 아니라, 문제의 변경 지점과 책임 경계를 보고 쓰지 않을 때까지 판단하는 데 목적이 있습니다.
+    explanation: one-shared-instance, choose-product, stepwise-config, legacy-interface, add-behavior, clone-template 상황별
+      패턴을 선택하세요.
+    tips:
+    - 싱글톤은 테스트와 상태 공유 위험이 있어 꼭 필요한 경우에만 씁니다.
+    - 어댑터는 기존 인터페이스를 새 인터페이스에 맞추는 구조 패턴입니다.
+    exercise:
+      prompt: choose_design_pattern(need)를 완성해 pattern, useWhen, risk를 반환하세요.
+      starterCode: |-
+        def choose_design_pattern(need):
+            raise NotImplementedError
+      solution: |-
+        def choose_design_pattern(need):
+            table = {
+                "one-shared-instance": {
+                    "pattern": "singleton",
+                    "useWhen": "one process-wide coordinator must be shared",
+                    "risk": "hidden global state can make tests brittle",
+                },
+                "choose-product": {
+                    "pattern": "factory",
+                    "useWhen": "a key or config decides which object to create",
+                    "risk": "registry drift hides unsupported choices",
+                },
+                "stepwise-config": {
+                    "pattern": "builder",
+                    "useWhen": "an object has many optional construction steps",
+                    "risk": "a plain dataclass may be simpler",
+                },
+                "legacy-interface": {
+                    "pattern": "adapter",
+                    "useWhen": "old API must satisfy a new interface",
+                    "risk": "adapter should not leak legacy method names",
+                },
+                "add-behavior": {
+                    "pattern": "decorator",
+                    "useWhen": "behavior is layered around an existing object",
+                    "risk": "too many layers make debugging hard",
+                },
+                "clone-template": {
+                    "pattern": "prototype",
+                    "useWhen": "new objects mostly copy an existing template",
+                    "risk": "shallow copy can share mutable internals",
+                },
+            }
+            if need not in table:
+                raise ValueError("unknown design need")
+            return table[need]
+      hints:
+      - 변경될 축이 생성 방식인지, 인터페이스인지, 동작 추가인지 먼저 구분하세요.
+      - 패턴 이름보다 남용 위험까지 말할 수 있어야 실무 판단입니다.
+    check:
+      id: python.advanced.design-patterns.pattern-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.design-patterns.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_design_pattern
+        cases:
+        - id: recalls-factory-for-product-choice
+          arguments:
+          - value: choose-product
+          expectedReturn:
+            pattern: factory
+            useWhen: a key or config decides which object to create
+            risk: registry drift hides unsupported choices
+        - id: recalls-adapter-for-legacy-interface
+          arguments:
+          - value: legacy-interface
+          expectedReturn:
+            pattern: adapter
+            useWhen: old API must satisfy a new interface
+            risk: adapter should not leak legacy method names
+        - id: rejects-unknown-need
+          arguments:
+          - value: pattern-for-everything
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

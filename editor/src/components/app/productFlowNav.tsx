@@ -1,6 +1,7 @@
 import {
   FileCode2,
   GraduationCap,
+  Home,
   MessageSquare,
   Workflow,
 } from "lucide-react";
@@ -14,11 +15,12 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useLocale } from "@/lib/localeContext";
-import { PRODUCT_SIDEBAR_FLOW_ITEMS } from "@/lib/surfaceModel";
+import { productSidebarFlowItems } from "@/lib/surfaceModel";
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import { cn } from "@/lib/utils";
 
 type ProductFlowNavProps = {
+  runtimeTier: "local" | "web";
   surface: SurfaceMode;
   onSurfaceChange: (surface: SurfaceMode) => void;
 };
@@ -30,6 +32,7 @@ const sidebarSurfaceIcons: SidebarSurfaceIconMap = {
   chat: MessageSquare,
   curriculum: GraduationCap,
   editor: FileCode2,
+  home: Home,
 };
 
 function sidebarIconForSurface(surface: SurfaceMode): ComponentType<{ className?: string }> {
@@ -40,16 +43,16 @@ function sidebarIconForSurface(surface: SurfaceMode): ComponentType<{ className?
   return Icon;
 }
 
-export function ProductFlowNav({ surface, onSurfaceChange }: ProductFlowNavProps) {
+export function ProductFlowNav({ runtimeTier, surface, onSurfaceChange }: ProductFlowNavProps) {
   const { t } = useLocale();
-  const navItems = PRODUCT_SIDEBAR_FLOW_ITEMS.map((item) => ({
+  const navItems = productSidebarFlowItems(runtimeTier).map((item) => ({
     ...item,
     Icon: sidebarIconForSurface(item.value),
     label: t(item.labelKey),
   }));
 
   return (
-    <SidebarGroup className="py-0.5" data-product-flow-hierarchy="chat-first" data-product-nav="flow">
+    <SidebarGroup className="py-0.5" data-product-flow-hierarchy="runtime-ordered" data-product-nav="flow">
       <SidebarGroupContent>
         <SidebarMenu>
           {navItems.map(({ Icon, beta, flowRole, flowStep, label, value }) => (
@@ -68,7 +71,7 @@ export function ProductFlowNav({ surface, onSurfaceChange }: ProductFlowNavProps
               <SidebarMenuButton
                 className={cn(
                   "h-8 px-2 text-[13px] [&>svg]:size-3.5",
-                  flowRole === "entry" && "font-medium",
+                  flowStep === 1 && "font-medium",
                   flowRole === "secondLoop" && "border-t border-sidebar-border/60 bg-sidebar-accent/20",
                 )}
                 isActive={surface === value}
@@ -79,7 +82,7 @@ export function ProductFlowNav({ surface, onSurfaceChange }: ProductFlowNavProps
                   aria-hidden="true"
                   className={cn(
                     "flex size-4 shrink-0 items-center justify-center rounded-full border border-sidebar-border bg-sidebar text-[10px] font-medium text-sidebar-foreground/55 group-data-[collapsible=icon]:hidden",
-                    flowRole === "entry" && "border-sidebar-foreground/35 text-sidebar-foreground",
+                    flowStep === 1 && "border-sidebar-foreground/35 text-sidebar-foreground",
                     flowRole === "secondLoop" && "border-sidebar-border/90 bg-sidebar-accent text-sidebar-foreground/70",
                   )}
                   data-product-flow-marker="true"

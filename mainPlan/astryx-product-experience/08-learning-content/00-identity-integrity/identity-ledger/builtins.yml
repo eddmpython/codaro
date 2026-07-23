@@ -1,0 +1,179 @@
+schemaVersion: 1
+category: "builtins"
+sourceCount: 35
+lessons:
+  - lessonRef: "builtins/01_math"
+    sourcePath: "curricula/python/basics/builtins/01_math.yaml"
+    metaId: "01_math"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/02_random"
+    sourcePath: "curricula/python/basics/builtins/02_random.yaml"
+    metaId: "02_random"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/03_datetime"
+    sourcePath: "curricula/python/basics/builtins/03_datetime.yaml"
+    metaId: "03_datetime"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/04_time"
+    sourcePath: "curricula/python/basics/builtins/04_time.yaml"
+    metaId: "04_time"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/05_collections"
+    sourcePath: "curricula/python/basics/builtins/05_collections.yaml"
+    metaId: "05_collections"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/06_itertools"
+    sourcePath: "curricula/python/basics/builtins/06_itertools.yaml"
+    metaId: "06_itertools"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/07_functools"
+    sourcePath: "curricula/python/basics/builtins/07_functools.yaml"
+    metaId: "07_functools"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/08_os"
+    sourcePath: "curricula/python/basics/builtins/08_os.yaml"
+    metaId: "08_os"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/09_pathlib"
+    sourcePath: "curricula/python/basics/builtins/09_pathlib.yaml"
+    metaId: "09_pathlib"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/10_sys"
+    sourcePath: "curricula/python/basics/builtins/10_sys.yaml"
+    metaId: "10_sys"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/11_glob"
+    sourcePath: "curricula/python/basics/builtins/11_glob.yaml"
+    metaId: "11_glob"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/12_shutil"
+    sourcePath: "curricula/python/basics/builtins/12_shutil.yaml"
+    metaId: "12_shutil"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/13_json"
+    sourcePath: "curricula/python/basics/builtins/13_json.yaml"
+    metaId: "13_json"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/14_csv"
+    sourcePath: "curricula/python/basics/builtins/14_csv.yaml"
+    metaId: "14_csv"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/15_pickle"
+    sourcePath: "curricula/python/basics/builtins/15_pickle.yaml"
+    metaId: "15_pickle"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/16_struct"
+    sourcePath: "curricula/python/basics/builtins/16_struct.yaml"
+    metaId: "16_struct"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/17_string"
+    sourcePath: "curricula/python/basics/builtins/17_string.yaml"
+    metaId: "17_string"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/18_textwrap"
+    sourcePath: "curricula/python/basics/builtins/18_textwrap.yaml"
+    metaId: "18_textwrap"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/19_difflib"
+    sourcePath: "curricula/python/basics/builtins/19_difflib.yaml"
+    metaId: "19_difflib"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/20_base64"
+    sourcePath: "curricula/python/basics/builtins/20_base64.yaml"
+    metaId: "20_base64"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/21_urllib"
+    sourcePath: "curricula/python/basics/builtins/21_urllib.yaml"
+    metaId: "21_urllib"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/22_email"
+    sourcePath: "curricula/python/basics/builtins/22_email.yaml"
+    metaId: "22_email"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/23_asyncio"
+    sourcePath: "curricula/python/basics/builtins/23_asyncio.yaml"
+    metaId: "23_asyncio"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/24_argparse"
+    sourcePath: "curricula/python/basics/builtins/24_argparse.yaml"
+    metaId: "24_argparse"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/25_logging"
+    sourcePath: "curricula/python/basics/builtins/25_logging.yaml"
+    metaId: "25_logging"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/26_unittest"
+    sourcePath: "curricula/python/basics/builtins/26_unittest.yaml"
+    metaId: "26_unittest"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/27_timeit"
+    sourcePath: "curricula/python/basics/builtins/27_timeit.yaml"
+    metaId: "27_timeit"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/28_copy"
+    sourcePath: "curricula/python/basics/builtins/28_copy.yaml"
+    metaId: "28_copy"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/29_pprint"
+    sourcePath: "curricula/python/basics/builtins/29_pprint.yaml"
+    metaId: "29_pprint"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/30_inspect"
+    sourcePath: "curricula/python/basics/builtins/30_inspect.yaml"
+    metaId: "30_inspect"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/31_subprocess"
+    sourcePath: "curricula/python/basics/builtins/31_subprocess.yaml"
+    metaId: "31"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/32_contextlib"
+    sourcePath: "curricula/python/basics/builtins/32_contextlib.yaml"
+    metaId: "32"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/33_tempfile"
+    sourcePath: "curricula/python/basics/builtins/33_tempfile.yaml"
+    metaId: "33"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/34_hashlib"
+    sourcePath: "curricula/python/basics/builtins/34_hashlib.yaml"
+    metaId: "34"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "builtins/35_zipfile"
+    sourcePath: "curricula/python/basics/builtins/35_zipfile.yaml"
+    metaId: "35"
+    registryStatus: registered
+    reviewStatus: pending

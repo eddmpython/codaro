@@ -17,27 +17,14 @@ class BlockExecution(BaseModel):
     lastOutput: str | None = None
 
 
-class PredictConfig(BaseModel):
-    """Predict-Run-Reconcile-Adapt 루프 1단계 — exercise 셀에서 학습자가 적는 예측.
-
-    각 필드 비어 있으면 해당 차원은 예측하지 않은 것으로 본다.
-    """
-    prompt: str = ""
-    expectedShape: str = ""
-    expectedDtype: str = ""
-    expectedValue: str = ""
-    expectedError: str = ""
-
-
 class GuideConfig(BaseModel):
     exerciseType: str = "fillBlank"
     hints: list[str] = Field(default_factory=list)
-    checkConfig: dict[str, str | list[str]] = Field(default_factory=dict)
+    checkConfig: dict[str, Any] = Field(default_factory=dict)
     difficulty: str = "easy"
     solution: str = ""
     description: str = ""
     studentAnswer: str = ""
-    predict: PredictConfig | None = None
 
 
 class BlockConfig(BaseModel):

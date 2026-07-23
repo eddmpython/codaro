@@ -335,3 +335,261 @@ sections:
     type: noError
     noError: time 모듈 종합 복습에서 `currentTimestamp` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: time 모듈 종합 복습 실행 뒤 `currentTimestamp` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 04_time-latency-summary-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - performance_measurement
+    - workflow_validation
+    - practice
+    title: 지연 샘플 SLA 요약 만들기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 초 단위 지연 샘플을 ms로 변환하고 평균, 최대값, SLA 통과 여부를 반환한다.
+    why: 시간 측정은 실제 대기를 오래 하는 것보다 수집된 샘플을 같은 기준으로 판단하는 능력이 중요합니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 지연 샘플과 SLA 기준으로 다시 호출합니다.
+    tips:
+    - 초 단위 샘플에 1000을 곱해 ms 단위로 바꾸세요.
+    - 평균은 소수점 둘째 자리까지 반올림하세요.
+    exercise:
+      prompt: summarize_latencies(seconds_samples, sla_ms)가 count, averageMs, maxMs, withinSla를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def summarize_latencies(seconds_samples, sla_ms):
+            raise NotImplementedError
+      solution: |-
+        def summarize_latencies(seconds_samples, sla_ms):
+            milliseconds = [round(sample * 1000, 2) for sample in seconds_samples]
+            return {
+                "count": len(milliseconds),
+                "averageMs": round(sum(milliseconds) / len(milliseconds), 2),
+                "maxMs": max(milliseconds),
+                "withinSla": max(milliseconds) <= sla_ms,
+            }
+      hints:
+      - max(milliseconds)가 SLA 기준보다 작거나 같으면 통과입니다.
+      - 초 단위와 ms 단위를 섞으면 case가 맞지 않습니다.
+    check:
+      id: python.builtins.time.latency-summary.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.time.latency-summary.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_latencies
+        cases:
+        - id: within-sla
+          arguments:
+          - value:
+            - 0.012
+            - 0.018
+            - 0.041
+            - 0.025
+            - 0.033
+          - value: 50
+          expectedReturn:
+            count: 5
+            averageMs: 25.8
+            maxMs: 41.0
+            withinSla: true
+        - id: over-sla
+          arguments:
+          - value:
+            - 0.04
+            - 0.052
+          - value: 50
+          expectedReturn:
+            count: 2
+            averageMs: 46.0
+            maxMs: 52.0
+            withinSla: false
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 04_time-elapsed-timeout-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - 04_time-latency-summary-mastery
+    title: 경과 시간으로 timeout 판정하기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 시작과 종료 초 값을 ms 차이로 바꾸고 timeout 여부와 남은 시간을 계산한다.
+    why: 실무 자동화에서는 실제 sleep보다 관측된 시작, 종료 시각으로 제한 시간을 판정하는 코드가 더 자주 필요합니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 예시가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - finish_seconds에서 start_seconds를 뺀 뒤 1000을 곱하세요.
+    - 남은 시간은 음수가 아니라 0으로 막아야 합니다.
+    exercise:
+      prompt: classify_elapsed(start_seconds, finish_seconds, limit_ms)가 elapsedMs, timedOut, remainingMs를 담은 dict를 반환하도록
+        완성하세요.
+      starterCode: |-
+        def classify_elapsed(start_seconds, finish_seconds, limit_ms):
+            raise NotImplementedError
+      solution: |-
+        def classify_elapsed(start_seconds, finish_seconds, limit_ms):
+            elapsed_ms = round((finish_seconds - start_seconds) * 1000, 2)
+            return {
+                "elapsedMs": elapsed_ms,
+                "timedOut": elapsed_ms > limit_ms,
+                "remainingMs": max(0, round(limit_ms - elapsed_ms, 2)),
+            }
+      hints:
+      - timedOut은 경과 시간이 limit_ms보다 큰 경우에만 True입니다.
+      - round 위치를 맞춰야 expected 값과 일치합니다.
+    check:
+      id: python.builtins.time.elapsed-timeout.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.time.elapsed-timeout.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: classify_elapsed
+        cases:
+        - id: still-inside-limit
+          arguments:
+          - value: 10.0
+          - value: 10.125
+          - value: 200
+          expectedReturn:
+            elapsedMs: 125.0
+            timedOut: false
+            remainingMs: 75.0
+        - id: over-limit
+          arguments:
+          - value: 10.0
+          - value: 10.35
+          - value: 200
+          expectedReturn:
+            elapsedMs: 350.0
+            timedOut: true
+            remainingMs: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 04_time-retry-schedule-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 04_time-elapsed-timeout-transfer
+    title: 재시도 시각표 다시 구성하기
+    subtitle: 하루 뒤 기억에서 재구성
+    goal: 시작 타임스탬프와 지연 목록에서 각 재시도 시각과 최종 시각을 계산하고 음수 지연은 거부한다.
+    why: 시간을 두고도 sleep을 직접 호출하지 않고 schedule을 먼저 계산할 수 있어야 자동화 루프가 안전해집니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - delays를 순서대로 누적하고 각 순간을 moments에 기록하세요.
+    - 음수 지연은 잘못된 설정이므로 ValueError를 일으키세요.
+    exercise:
+      prompt: retry_schedule(start_timestamp, delays)가 attempts, finalTimestamp, moments를 담은 dict를 반환하고 음수 지연은 ValueError를
+        일으키도록 완성하세요.
+      starterCode: |-
+        def retry_schedule(start_timestamp, delays):
+            raise NotImplementedError
+      solution: |-
+        def retry_schedule(start_timestamp, delays):
+            current = start_timestamp
+            moments = []
+            for delay in delays:
+                if delay < 0:
+                    raise ValueError("delay must not be negative")
+                current += delay
+                moments.append(round(current, 3))
+            return {"attempts": len(delays), "finalTimestamp": round(current, 3), "moments": moments}
+      hints:
+      - 각 delay는 이전 시각에 누적됩니다.
+      - finalTimestamp는 마지막 moments 값과 같아야 합니다.
+    check:
+      id: python.builtins.time.retry-schedule.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.time.retry-schedule.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: retry_schedule
+        cases:
+        - id: exponential-like-delays
+          arguments:
+          - value: 1000.0
+          - value:
+            - 0.1
+            - 0.2
+            - 0.4
+          expectedReturn:
+            attempts: 3
+            finalTimestamp: 1000.7
+            moments:
+            - 1000.1
+            - 1000.3
+            - 1000.7
+        - id: simple-delays
+          arguments:
+          - value: 5.5
+          - value:
+            - 1.0
+            - 1.5
+          expectedReturn:
+            attempts: 2
+            finalTimestamp: 8.0
+            moments:
+            - 6.5
+            - 8.0
+        - id: rejects-negative-delay
+          arguments:
+          - value: 1.0
+          - value:
+            - 0.5
+            - -0.1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

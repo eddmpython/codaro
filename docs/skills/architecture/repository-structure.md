@@ -35,13 +35,14 @@ codaro/
 ├── .github/          # CI, Pages, release, security workflow
 ├── .githooks/        # local commit, branch, push guard
 ├── assets/           # brand and reusable product assets
+├── contracts/        # cross-surface wire schema source and artifact ownership manifest
 ├── curricula/        # built-in curriculum YAML registry
 ├── demos/            # public launch demos and quickstart material
 ├── docs/             # skills SSOT and public blog source
 ├── editor/           # product UI surface
 ├── landing/          # GitHub Pages and docs/blog web surface
 ├── launcher/         # desktop launcher, packaging notes, release updater
-├── mainPlan/         # long-horizon initiative design tree (이니셔티브별 폴더 + _done 격리)
+├── mainPlan/         # initiative/workstream design tree (작업별 내부 _done + 완료 initiative root _done)
 ├── notebooks/        # distributable notebooks derived from curricula
 ├── src/              # Python package source
 └── tests/            # 도메인 트리(tests/<domain>/): pytest suites + 같은 도메인 verify/audit 드라이버 + gate runner(run.py) + root enforcer(verifyRootClean.py) + 공유 인프라 + _attempts 샌드박스(git 미추적·로컬 전용)
@@ -55,6 +56,7 @@ Root files are limited to package metadata and public project documents. Example
 
 | Path | Meaning |
 | --- | --- |
+| `.agents/`, `.claude/`, `.vscode/` | 개인 에이전트와 편집기 설정. Git 추적 대상이나 제품 SSOT가 아님 |
 | `.venv/`, `.venv-wsl/` | Python 실행 환경 |
 | `.ruff_cache/` | Ruff cache |
 | `dist/` | local packaging output before release upload |
@@ -75,10 +77,13 @@ Root files are limited to package metadata and public project documents. Example
 | Product philosophy, architecture, ops rules | `docs/skills/` |
 | Long-form public posts | `docs/blog/` |
 | Built-in learning YAML | `curricula/` |
+| Python·TypeScript·Rust shared wire schema source | `contracts/` |
 | Derived distributable notebooks | `notebooks/` |
 | Public runnable demos | `demos/` |
 | Desktop launcher and update logic | `launcher/` |
-| Long-horizon initiative design docs | `mainPlan/<initiative>/` (완료·폐기는 `mainPlan/_done/`) |
+| Long-horizon initiative design docs | `mainPlan/<initiative>/<NN-workstream>/README.md` |
+| Completed workstream | `mainPlan/<initiative>/_done/<NN-workstream>/README.md` |
+| Completed initiative | `mainPlan/_done/<initiative>/` |
 | Brand source assets | `assets/` |
 | Tests and verifiers | `tests/` |
 | Gate scratch/logs/reports | `output/test-runner/<gate>/` |
@@ -91,6 +96,8 @@ Root files are limited to package metadata and public project documents. Example
 3. `tests/verifyRootClean.py`의 allowlist 또는 required list를 같은 변경에서 갱신한다.
 4. 문서 인덱스가 필요한 경우 `docs/skills/README.md`, `CLAUDE.md`, `docs/skills/architecture/ssot-map.md`를 함께 연결한다.
 5. `uv run python -X utf8 tests/run.py gate root-clean`과 `uv run python -X utf8 tests/run.py gate docs`로 구조와 문서 wiring을 확인한다.
+
+`mainPlan/`의 완료 상태는 문구가 아니라 경로가 기준이다. 활성 workstream을 완료라고 표시하지 않고, 구현과 검증이 끝난 폴더만 initiative 내부 `_done/`으로 이동한다. 전체 workstream과 최종 품질 게이트가 끝난 initiative만 root `_done/`으로 이동한다. 세부 규칙은 `mainPlan/README.md`를 따른다.
 
 ## Forbidden Root Drift
 

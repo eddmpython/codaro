@@ -1,0 +1,9 @@
+Use case: scientific-educational
+Asset type: Codaro learning catalog domain visual for developer literacy
+Primary request: Create a premium editorial educational illustration that explains how source files, folders, a terminal command, version history, tests, packages, and documentation fit together in a small software project. Use tactile file sheets, a folder tree, branching version tokens, a test checklist, and a package box with no readable text.
+Scene/backdrop: bright neutral studio desk with white and charcoal surfaces, teal, coral, yellow, green, and restrained plum accents.
+Style/medium: sophisticated mixed 3D paper-cut and crisp editorial illustration, precise structured relationships, high-end education product art, not childish.
+Composition/framing: wide 16:9 project map with clear hierarchy from repository to files to run/test/package, generous safe edges.
+Lighting/mood: soft daylight, organized, empowering, high clarity.
+Constraints: no people, logos, brand names, letters, readable UI text, watermark, gradients, glowing orbs, bokeh, or dark atmospheric background.
+Avoid: generic laptop-only coding scene, neon cyberpunk, dominant purple or blue, excessive rounded cards.

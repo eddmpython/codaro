@@ -667,3 +667,283 @@ sections:
     type: noError
     noError: validateOrderFrame이 정상 입력에는 True를 반환해야 합니다.
     resultCheck: 잘못된 입력에는 ValueError가 발생하고 정상 입력에는 통과해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: polars_06-real-estate-unit-price-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: 부동산 면적당 가격과 지역별 중앙값 비교하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 면적을 검증해 unitPrice를 만들고 지역별 중앙값과 premium listing을 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 원 가격이 아니라 면적당 가격으로 비교하세요.
+    - premium은 전체가 아니라 같은 region median을 기준으로 판단하세요.
+    exercise:
+      prompt: real_estate_unit_prices(rows, premium_ratio)를 완성하세요.
+      starterCode: |-
+        def real_estate_unit_prices(rows, premium_ratio):
+            raise NotImplementedError
+      solution: |
+        def real_estate_unit_prices(rows, premium_ratio):
+            if premium_ratio < 1:
+                raise ValueError("premium ratio must be at least one")
+            normalized = []
+            for row in rows:
+                if row["area"] <= 0:
+                    raise ValueError("area must be positive")
+                normalized.append({**row, "unitPrice": row["price"] / row["area"]})
+            regions = sorted({row["region"] for row in normalized})
+            medians = {}
+            for region in regions:
+                values = sorted(row["unitPrice"] for row in normalized if row["region"] == region)
+                middle = len(values) // 2
+                medians[region] = round(values[middle] if len(values) % 2 else (values[middle - 1] + values[middle]) / 2, 2)
+            premium = sorted(row["id"] for row in normalized if row["unitPrice"] >= medians[row["region"]] * premium_ratio)
+            return {"medians": medians, "premiumIds": premium}
+      hints: *id001
+    check:
+      id: python.polars.polars_06.real-estate-unit-price.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_06.real-estate-unit-price.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: real_estate_unit_prices
+        cases:
+        - id: normalizes-and-compares-within-region
+          arguments:
+          - value:
+            - id: A
+              region: north
+              price: 100
+              area: 10
+            - id: B
+              region: north
+              price: 240
+              area: 10
+            - id: C
+              region: south
+              price: 90
+              area: 10
+          - value: 1.4
+          expectedReturn:
+            medians:
+              north: 17.0
+              south: 9.0
+            premiumIds:
+            - B
+        - id: handles-empty-listings
+          arguments:
+          - value: []
+          - value: 1
+          expectedReturn:
+            medians: {}
+            premiumIds: []
+        - id: rejects-zero-area
+          arguments:
+          - value:
+            - id: X
+              region: r
+              price: 1
+              area: 0
+          - value: 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: polars_06-property-join-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_06-real-estate-unit-price-mastery
+    title: 새 매물·지역 통계 join의 unmatched와 중복 감사하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: unit price 분석을 many-to-one 지역 metadata 결합과 key 품질 검사로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - dimension table의 key uniqueness를 join 전에 확인하세요.
+    - unmatched 매물을 조용히 버리지 말고 id 목록으로 남기세요.
+    exercise:
+      prompt: join_property_regions(properties, regions)를 완성해 rows, unmatched, duplicateRegions를 반환하세요.
+      starterCode: |-
+        def join_property_regions(properties, regions):
+            raise NotImplementedError
+      solution: |
+        def join_property_regions(properties, regions):
+            counts = {}
+            for row in regions:
+                counts[row["region"]] = counts.get(row["region"], 0) + 1
+            duplicates = sorted(key for key, count in counts.items() if count > 1)
+            if duplicates:
+                return {"rows": [], "unmatched": [], "duplicateRegions": duplicates}
+            index = {row["region"]: row for row in regions}
+            joined = []
+            unmatched = []
+            for row in properties:
+                if row["region"] not in index:
+                    unmatched.append(row["id"])
+                else:
+                    joined.append({**row, "population": index[row["region"]]["population"]})
+            return {"rows": joined, "unmatched": unmatched, "duplicateRegions": []}
+      hints: *id002
+    check:
+      id: python.polars.polars_06.property-join-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_06.property-join-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: join_property_regions
+        cases:
+        - id: joins-and-keeps-unmatched-evidence
+          arguments:
+          - value:
+            - id: A
+              region: r1
+            - id: B
+              region: r2
+          - value:
+            - region: r1
+              population: 100
+          expectedReturn:
+            rows:
+            - id: A
+              region: r1
+              population: 100
+            unmatched:
+            - B
+            duplicateRegions: []
+        - id: blocks-duplicate-dimension-key
+          arguments:
+          - value:
+            - id: A
+              region: r1
+          - value:
+            - region: r1
+              population: 1
+            - region: r1
+              population: 2
+          expectedReturn:
+            rows: []
+            unmatched: []
+            duplicateRegions:
+            - r1
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: polars_06-property-comparison-grain-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_06-property-join-audit-transfer
+    title: 부동산 비교의 올바른 grain 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 매물, 지역, 시간 단위 질문에 맞는 key와 정규화 지표를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 질문마다 한 row가 무엇을 뜻하는지 먼저 고정하세요.
+    - 지역 비교에는 매물 수와 기간을 함께 표시하세요.
+    exercise:
+      prompt: choose_property_grain(situation)를 완성해 grain, metric, evidence를 반환하세요.
+      starterCode: |-
+        def choose_property_grain(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_property_grain(situation):
+            table = {'compare-listings': {'grain': 'listing', 'metric': 'price per area', 'evidence': 'area unit'}, 'compare-regions': {'grain': 'region aggregate', 'metric': 'median unit price', 'evidence': 'listing count'}, 'price-trend': {'grain': 'region-month', 'metric': 'median change', 'evidence': 'time window'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.polars.polars_06.property-comparison-grain.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_06.property-comparison-grain.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_property_grain
+        cases:
+        - id: recalls-compare-listings
+          arguments:
+          - value: compare-listings
+          expectedReturn:
+            grain: listing
+            metric: price per area
+            evidence: area unit
+        - id: recalls-compare-regions
+          arguments:
+          - value: compare-regions
+          expectedReturn:
+            grain: region aggregate
+            metric: median unit price
+            evidence: listing count
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

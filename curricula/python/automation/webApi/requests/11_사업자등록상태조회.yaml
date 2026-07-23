@@ -433,3 +433,317 @@ sections:
           - "분기 마감마다 watchSched로 자동 실행하고 결과를 email 트랙으로 담당자에게 발송."
           - "100건 초과 거래처는 b_no를 100개씩 끊어 배치 호출(일 100만건 한도 내)."
           - "조회 결과를 거래처 마스터와 대사해 신규 폐업 거래처만 변화분으로 통보."
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: requests_11-business-status-normalization-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - choose_method
+    - practice
+    title: 사업자등록번호와 상태 응답 정규화하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 번호 형식과 응답 identity를 맞춰 상태·조회 시각을 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 표시용 하이픈을 제거하되 10자리 identity 검증은 유지하세요.
+    - 응답 순서를 신뢰하지 말고 요청 번호와 명시적으로 join하세요.
+    exercise:
+      prompt: normalize_business_status(requested_numbers, responses)를 완성하세요.
+      starterCode: |-
+        def normalize_business_status(requested_numbers, responses):
+            raise NotImplementedError
+      solution: |
+        def normalize_business_status(requested_numbers, responses):
+            def normalize(value):
+                digits = "".join(character for character in value if character.isdigit())
+                if len(digits) != 10:
+                    raise ValueError("business number must have 10 digits")
+                return digits
+            requested = [normalize(value) for value in requested_numbers]
+            by_number = {normalize(item["number"]): item for item in responses}
+            missing = [number for number in requested if number not in by_number]
+            records = []
+            for number in requested:
+                if number in by_number:
+                    item = by_number[number]
+                    records.append({"number": number, "status": item["status"], "checkedAt": item["checkedAt"]})
+            return {"complete": not missing, "records": records, "missing": missing}
+      hints: *id001
+    check:
+      id: python.requests.requests_11.business-status-normalization.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.requests.requests_11.business-status-normalization.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: normalize_business_status
+        cases:
+        - id: normalizes-and-orders-records
+          arguments:
+          - value:
+            - 123-45-67890
+            - '1111122222'
+          - value:
+            - number: 111-11-22222
+              status: active
+              checkedAt: '2026-07-22'
+            - number: '1234567890'
+              status: closed
+              checkedAt: '2026-07-22'
+          expectedReturn:
+            complete: true
+            records:
+            - number: '1234567890'
+              status: closed
+              checkedAt: '2026-07-22'
+            - number: '1111122222'
+              status: active
+              checkedAt: '2026-07-22'
+            missing: []
+        - id: reports-missing-response
+          arguments:
+          - value:
+            - '1234567890'
+            - '1111122222'
+          - value:
+            - number: '1234567890'
+              status: active
+              checkedAt: '2026-07-22'
+          expectedReturn:
+            complete: false
+            records:
+            - number: '1234567890'
+              status: active
+              checkedAt: '2026-07-22'
+            missing:
+            - '1111122222'
+        - id: rejects-invalid-number
+          arguments:
+          - value:
+            - '123'
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: requests_11-business-status-batch-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - requests_11-business-status-normalization-mastery
+    title: 새 대량 조회에 누락·중복·민감정보 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: batch 결과의 identity 완전성과 보존 가능한 필드를 판정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - batch 개수만 비교하지 말고 요청 identity와 응답 identity를 집합으로 대조하세요.
+    - 업무에 필요하지 않은 대표자 등 민감 필드는 결과에 보존하지 마세요.
+    exercise:
+      prompt: audit_business_batch(requested, returned, allowed_fields)를 완성하세요.
+      starterCode: |-
+        def audit_business_batch(requested, returned, allowed_fields):
+            raise NotImplementedError
+      solution: |
+        def audit_business_batch(requested, returned, allowed_fields):
+            requested_set = set(requested)
+            counts = {}
+            leaked = []
+            for row in returned:
+                number = row["number"]
+                counts[number] = counts.get(number, 0) + 1
+                extra = sorted(set(row) - set(allowed_fields))
+                if extra:
+                    leaked.append({"number": number, "fields": extra})
+            missing = sorted(requested_set - set(counts))
+            unexpected = sorted(set(counts) - requested_set)
+            duplicates = sorted(number for number, count in counts.items() if count > 1)
+            return {"accepted": not missing and not unexpected and not duplicates and not leaked, "missing": missing, "unexpected": unexpected, "duplicates": duplicates, "leaked": leaked}
+      hints: *id002
+    check:
+      id: python.requests.requests_11.business-status-batch-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.requests.requests_11.business-status-batch-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_business_batch
+        cases:
+        - id: accepts-minimal-results
+          arguments:
+          - value:
+            - a
+            - b
+          - value:
+            - number: a
+              status: active
+            - number: b
+              status: closed
+          - value:
+            - number
+            - status
+          expectedReturn:
+            accepted: true
+            missing: []
+            unexpected: []
+            duplicates: []
+            leaked: []
+        - id: reports-identity-problems
+          arguments:
+          - value:
+            - a
+            - b
+          - value:
+            - number: a
+              status: active
+            - number: a
+              status: active
+            - number: c
+              status: active
+          - value:
+            - number
+            - status
+          expectedReturn:
+            accepted: false
+            missing:
+            - b
+            unexpected:
+            - c
+            duplicates:
+            - a
+            leaked: []
+        - id: reports-extra-sensitive-field
+          arguments:
+          - value:
+            - a
+          - value:
+            - number: a
+              status: active
+              ownerName: Kim
+          - value:
+            - number
+            - status
+          expectedReturn:
+            accepted: false
+            missing: []
+            unexpected: []
+            duplicates: []
+            leaked:
+            - number: a
+              fields:
+              - ownerName
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: requests_11-business-status-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - requests_11-business-status-batch-audit-transfer
+    title: 사업자 상태 조회 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 번호 identity·상태 시점·개인정보 최소화 원칙을 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - HTTP 성공과 업무 데이터의 유효성을 별도 근거로 판정하세요.
+    - 요청 action과 함께 재현 가능한 evidence와 남는 risk를 기록하세요.
+    exercise:
+      prompt: choose_business_status_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_business_status_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_business_status_evidence(situation):
+            table = {'single': {'action': 'normalize and identity-match', 'evidence': 'number status checkedAt', 'risk': 'wrong response order'}, 'batch': {'action': 'audit missing duplicate unexpected', 'evidence': 'identity reconciliation', 'risk': 'partial success'}, 'archive': {'action': 'retain minimal fields', 'evidence': 'allowed-field manifest', 'risk': 'personal data leakage'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.requests.requests_11.business-status-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.requests.requests_11.business-status-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_business_status_evidence
+        cases:
+        - id: recalls-single
+          arguments:
+          - value: single
+          expectedReturn:
+            action: normalize and identity-match
+            evidence: number status checkedAt
+            risk: wrong response order
+        - id: recalls-batch
+          arguments:
+          - value: batch
+          expectedReturn:
+            action: audit missing duplicate unexpected
+            evidence: identity reconciliation
+            risk: partial success
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

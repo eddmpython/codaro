@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import asyncio
 import json
+import os
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -26,7 +28,7 @@ import codaro.system.localDiagnostics as localDiagnosticsModule
 from codaro.document import createEmptyDocument
 from codaro.kernel.protocol import WsExecuteMessage
 from codaro.runtime import LocalEngine
-from codaro.server import createServerApp
+from codaro.server import createServerApp, createServerEventLoop
 from codaro.system import packageOps
 
 
@@ -117,6 +119,31 @@ def testKernelCreateAndExecute() -> None:
     assert "x" in varNames
 
     client.delete(f"/api/kernel/{sessionId}")
+
+
+def testKernelDestroyIsIdempotent() -> None:
+    client = TestClient(createServerApp())
+    sessionId = client.post("/api/kernel/create", json={}).json()["sessionId"]
+
+    first = client.delete(f"/api/kernel/{sessionId}")
+    repeated = client.delete(f"/api/kernel/{sessionId}")
+
+    assert first.status_code == 200
+    assert first.json() == {"destroyed": True}
+    assert repeated.status_code == 200
+    assert repeated.json() == {"destroyed": False}
+    assert client.get("/api/kernel/sessions").json() == []
+
+
+def testServerEventLoopFactory() -> None:
+    loop = createServerEventLoop()
+    try:
+        if os.name == "nt":
+            assert isinstance(loop, asyncio.SelectorEventLoop)
+        else:
+            assert isinstance(loop, asyncio.AbstractEventLoop)
+    finally:
+        loop.close()
 
 
 def testKernelStatePersistence() -> None:
@@ -1069,11 +1096,13 @@ def testSpaClientRouteFallsBackToIndexHtml(tmp_path: Path) -> None:
     root = client.get("/")
     assert root.status_code == 200
     assert "text/html" in root.headers["content-type"]
+    assert '<meta name="codaro-runtime-tier" content="local">' in root.text
 
     # Extensionless paths are client routes → index.html, not 404.
     route = client.get("/curriculum")
     assert route.status_code == 200
     assert "text/html" in route.headers["content-type"]
+    assert '<meta name="codaro-runtime-tier" content="local">' in route.text
 
 
 def testHarvestCodeEndpointMaterializesTask(tmp_path: Path, monkeypatch) -> None:

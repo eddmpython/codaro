@@ -83,6 +83,12 @@ def main(argv: list[str] | None = None) -> int:
         cli.waitEval(jsTextPresent("Hello World"), "default curriculum lesson")
         defaultLesson = recordCheck(checks, "curriculum-default-lesson", cli.eval(jsAssertCurriculumDefaultLesson()))
         exerciseCheck = recordCheck(checks, "curriculum-exercise-check", cli.eval(jsAssertExerciseCheck()))
+        falseCompletionCalls = [
+            call for call in api.calls
+            if call in {"POST /api/curriculum/check", "POST /api/curriculum/progress"}
+        ]
+        if falseCompletionCalls:
+            raise VerificationError("practice execution called a legacy completion API: " + ", ".join(falseCompletionCalls))
         sidebar = recordCheck(checks, "curriculum-sidebar-groups", cli.eval(jsAssertCurriculumSidebarGroups()))
         sidebarClearance = recordCheck(checks, "curriculum-sidebar-scrollbar-clearance", cli.eval(jsAssertCurriculumSidebarScrollbarClearance()))
         sidebarToggle = recordCheck(checks, "curriculum-sidebar-toggle", cli.eval(jsAssertCurriculumSidebarToggle()))
@@ -417,10 +423,6 @@ class OnboardingStubApi:
                                 "hitCount": 2,
                             }],
                             "doneCriterionViolated": True,
-                            "predictionDiff": {
-                                "overall": "mismatch",
-                                "fields": [{"field": "value", "status": "mismatch", "expected": "world", "actual": "hi", "note": "예측과 실제 출력이 다릅니다."}],
-                            },
                             "nextAction": {"kind": "studyCorrection", "label": "교정 코드를 보고 다시 풀기"},
                         })
                     else:
@@ -436,7 +438,6 @@ class OnboardingStubApi:
                             "autoValidatedOutcomes": [],
                             "misconceptionMatches": [],
                             "doneCriterionViolated": False,
-                            "predictionDiff": None,
                             "nextAction": {"kind": "advance", "label": "다음 단계로 진행하기"},
                         })
                 else:
@@ -509,7 +510,7 @@ def jsAssertFallbackOnboarding() -> str:
   const accessibleSidebarTriggers = [...document.querySelectorAll('button')]
     .filter((button) => button.textContent?.includes('사이드바 전환'));
   const rail = document.querySelector('[data-sidebar="rail"]');
-  const required = ['Codaro로 무엇을 만들까요?', '목표부터 말하세요', 'Provider 연결', '시작 진단 필요', '진단 복사', 'Pandas 실습', '브라우저 자동화 배우기', '검증 후 자동화'];
+  const required = ['Codaro로 무엇을 만들까요?', '목표부터 말하세요', 'Provider 연결', '진단 복사', 'Pandas 실습', '브라우저 자동화 배우기', '검증 후 자동화'];
   const missing = required.filter((item) => !text.includes(item));
   if (missing.length) throw new Error('fallback onboarding missing: ' + missing.join(', '));
   if (!providerButton || providerButton.disabled) throw new Error('Provider 연결 button is missing or disabled');
@@ -544,13 +545,11 @@ def jsClickDiagnosticExportCopy() -> str:
 (async () => {
   const button = document.querySelector('[data-diagnostic-export-copy="true"]');
   if (!button) throw new Error('diagnostic export copy button missing');
+  const response = await fetch('/api/system/diagnostics/export');
+  if (!response.ok) throw new Error('diagnostic export request failed');
+  const payload = await response.json();
+  const copied = JSON.stringify(payload);
   button.click();
-  const deadline = Date.now() + 4000;
-  while (!window.__codaroCopiedDiagnosticExport && Date.now() < deadline) {
-    await new Promise((resolve) => setTimeout(resolve, 80));
-  }
-  const copied = String(window.__codaroCopiedDiagnosticExport || '');
-  if (!copied) throw new Error('diagnostic export was not copied');
   if (!copied.includes('codaro-local-diagnostic-export')) throw new Error('diagnostic export kind missing');
   if (!copied.includes('Provider 연결')) throw new Error('diagnostic readable action missing');
   if (copied.includes('oauth-secret-value') || copied.includes('sk-onboarding-secret')) throw new Error('diagnostic export leaked secret');
@@ -632,39 +631,35 @@ def jsAssertCurriculumHome() -> str:
   }
   if (!home) throw new Error('curriculum home did not render after clicking home entry');
   const text = home.innerText;
-  if (!text.includes('완료')) throw new Error('curriculum home progress copy missing');
+  if (!text.includes('코드로 증명')) throw new Error('curriculum home outcome-first heading missing');
   const mastery = document.querySelector('[data-curriculum-home-mastery="true"]');
   if (!mastery) throw new Error('curriculum home mastery stat missing');
-  if (!mastery.textContent || !mastery.textContent.includes('숙달한 개념')) throw new Error('curriculum home mastery label missing');
+  if (!mastery.textContent || !mastery.textContent.includes('강한 검증')) throw new Error('curriculum home strong evidence label missing');
   const resume = document.querySelector('[data-curriculum-home-resume="true"]');
   if (!resume) throw new Error('curriculum home resume CTA missing');
   if (!resume.textContent || !resume.textContent.includes('이어서 학습')) throw new Error('curriculum home resume label missing');
-  const cards = document.querySelectorAll('[data-curriculum-home-category]');
-  if (cards.length < 1) throw new Error('curriculum home category cards missing');
-  const journey = document.querySelector('[data-curriculum-home-journey="true"]');
-  if (!journey) throw new Error('curriculum home learning journey missing');
-  const tracks = journey.querySelectorAll('[data-curriculum-home-journey-track]');
-  if (tracks.length < 2) throw new Error('curriculum home journey tracks missing');
-  const active = journey.querySelector('[data-journey-state="active"]');
-  if (!active) throw new Error('curriculum home journey active track missing');
-  const next = document.querySelector('[data-curriculum-home-journey-next="true"]');
-  if (!next) throw new Error('curriculum home journey next CTA missing');
-  if (!next.textContent || !next.textContent.includes('다음 단계')) throw new Error('curriculum home journey next label missing');
+  const goals = document.querySelector('[data-curriculum-home-goals="true"]');
+  if (!goals) throw new Error('curriculum home goal map missing');
+  const goalGroups = goals.querySelectorAll('[data-curriculum-home-goal-group]');
+  if (goalGroups.length < 1) throw new Error('curriculum home goal groups missing');
+  const routes = goals.querySelectorAll('button[data-curriculum-home-category][data-learning-control-intent="navigation"]');
+  if (routes.length < 1) throw new Error('curriculum home goal navigation missing');
+  if (document.querySelector('[data-curriculum-home-progress="true"]')) {
+    throw new Error('bulk lesson progress must not dominate the learning home');
+  }
   const reviews = document.querySelector('[data-curriculum-home-reviews="true"]');
   if (!reviews) throw new Error('curriculum home review section missing');
-  if (!reviews.textContent || !reviews.textContent.includes('복습할 시간')) throw new Error('curriculum home review label missing');
+  if (!reviews.textContent || !reviews.textContent.includes('다시 풀 문제')) throw new Error('curriculum home retrieval-task label missing');
   const reviewItems = reviews.querySelectorAll('[data-curriculum-home-review]');
   if (reviewItems.length < 1) throw new Error('curriculum home review items missing');
-  const reviewPass = reviews.querySelector('[data-curriculum-home-review-pass="true"]');
-  if (!reviewPass) throw new Error('curriculum home review recall-pass button missing');
-  const reviewLapse = reviews.querySelector('[data-curriculum-home-review-lapse="true"]');
-  if (!reviewLapse) throw new Error('curriculum home review recall-lapse button missing');
-  const weakAreas = document.querySelector('[data-curriculum-home-weak-areas="true"]');
-  if (!weakAreas) throw new Error('curriculum home weak-areas section missing');
-  if (!weakAreas.textContent || !weakAreas.textContent.includes('집중하면 좋은 영역')) throw new Error('weak-areas label missing');
-  const weakItem = weakAreas.querySelector('[data-weak-area]');
-  if (!weakItem) throw new Error('weak-area item missing');
-  if (weakItem.disabled) throw new Error('weak-area with a lesson should be clickable');
+  const reviewOpen = reviews.querySelector('[data-curriculum-home-review-open="true"]');
+  if (!reviewOpen || reviewOpen.disabled) throw new Error('runnable retrieval-task navigation missing');
+  if (reviews.querySelector('[data-curriculum-home-review-pass], [data-curriculum-home-review-lapse]')) {
+    throw new Error('self-rating controls must not change review state');
+  }
+  if (document.querySelector('[data-curriculum-home-weak-areas="true"]')) {
+    throw new Error('unapproved weakness surface must not render');
+  }
   return 'curriculum-home-ok';
 })()
 """)
@@ -678,47 +673,16 @@ def jsAssertExerciseCheck() -> str:
   const runBtn = exercise.querySelector('button[aria-label="셀 실행"]');
   if (!runBtn) throw new Error('exercise run button missing');
   runBtn.click();
-  let checkBtn = null;
+  let result = null;
   for (let i = 0; i < 80; i++) {
-    checkBtn = document.querySelector('[data-learning-exercise-check="true"]');
-    if (checkBtn) break;
+    result = exercise.querySelector('[data-learning-check-result="verified"]');
+    if (result) break;
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
-  if (!checkBtn) throw new Error('verify button did not appear after running the exercise');
-  checkBtn.click();
-  let failPanel = null;
-  for (let i = 0; i < 80; i++) {
-    failPanel = document.querySelector('[data-check-result="fail"]');
-    if (failPanel) break;
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  }
-  if (!failPanel) throw new Error('failing check panel did not render');
-  if (!failPanel.querySelector('[data-check-result-misconceptions="true"]')) throw new Error('misconception diagnosis missing on fail');
-  const askBtn = failPanel.querySelector('[data-check-ask-assistant="true"]');
-  if (!askBtn) throw new Error('ask-assistant button missing on fail');
-  if (askBtn.getAttribute('data-ask-emphasized') !== 'true') throw new Error('ask-assistant should be emphasized on repeated struggle');
-  if (!failPanel.querySelector('[data-misconception-apply-correction="true"]')) throw new Error('apply-correction button missing on fail');
-  const correctionDetails = failPanel.querySelector('[data-misconception-id] details');
-  if (!correctionDetails || !correctionDetails.open) throw new Error('repeated misconception correction should auto-expand');
-  const failNext = failPanel.querySelector('[data-check-next-action="studyCorrection"]');
-  if (!failNext) throw new Error('studyCorrection next-action missing on fail');
-  checkBtn.click();
-  let passPanel = null;
-  for (let i = 0; i < 80; i++) {
-    passPanel = document.querySelector('[data-check-result="success"]');
-    if (passPanel) break;
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  }
-  if (!passPanel) throw new Error('passing check panel did not render after retry');
-  if (!passPanel.textContent || !passPanel.textContent.includes('검증 통과')) throw new Error('check pass label missing');
-  if (!passPanel.querySelector('[data-check-next-action]')) throw new Error('check next-action missing on pass');
-  let completed = null;
-  for (let i = 0; i < 40; i++) {
-    completed = document.querySelector('[data-lesson-completed="true"]');
-    if (completed) break;
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  }
-  if (!completed) throw new Error('lesson completion celebration missing after final pass');
+  if (!result) throw new Error('automatic practice verification did not render after execution');
+  if (!result.textContent || !result.textContent.includes('연습 검증 통과')) throw new Error('automatic practice verification label missing');
+  if (document.querySelector('[data-learning-exercise-check="true"]')) throw new Error('redundant verify button returned');
+  if (document.querySelector('[data-lesson-completed="true"]')) throw new Error('practice-only evidence falsely completed the lesson');
   return 'exercise-check-ok';
 })()
 """)
@@ -953,12 +917,11 @@ def curriculumLessonPayload() -> dict[str, Any]:
                     "guide": {
                         "exerciseType": "code",
                         "hints": ["print 함수를 사용하세요"],
-                        "checkConfig": {"type": "output", "expectedCode": "print('hello')"},
+                        "checkConfig": {"type": "outputExact", "evidence": "practice", "outputExact": "hello"},
                         "difficulty": "easy",
                         "solution": "print('hello')",
                         "description": "hello를 출력하세요",
                         "studentAnswer": "",
-                        "predict": {"prompt": "무엇이 출력될까요?", "expectedValue": "hello"},
                     },
                 },
             ],

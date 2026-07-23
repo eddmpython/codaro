@@ -648,3 +648,286 @@ sections:
     type: noError
     noError: 실습의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 실습의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: numpy_10-standardize-diabetes-features-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - practice
+    title: 당뇨 feature를 학습 mean·scale로 표준화하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 각 column에 (value-mean)/scale을 적용하고 0 scale을 거절한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - means와 scales는 학습 데이터에서 고정된 값이어야 합니다.
+    - test 행마다 새 mean을 계산하지 마세요.
+    exercise:
+      prompt: standardize_features(matrix, means, scales)를 완성해 standardized와 shape를 반환하세요.
+      starterCode: |-
+        def standardize_features(matrix, means, scales):
+            raise NotImplementedError
+      solution: |
+        def standardize_features(matrix, means, scales):
+            if len(means) != len(scales) or any(scale <= 0 for scale in scales) or any(len(row) != len(means) for row in matrix):
+                raise ValueError("invalid standardization contract")
+            standardized = [[round((value - mean) / scale, 3) for value, mean, scale in zip(row, means, scales)] for row in matrix]
+            return {"standardized": standardized, "shape": [len(matrix), len(means)]}
+      hints: *id001
+    check:
+      id: python.numpy.numpy_10.standardize-diabetes-features.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_10.standardize-diabetes-features.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: standardize_features
+        cases:
+        - id: applies-training-parameters
+          arguments:
+          - value:
+            - - 10
+              - 100
+            - - 14
+              - 80
+          - value:
+            - 12
+            - 90
+          - value:
+            - 2
+            - 10
+          expectedReturn:
+            standardized:
+            - - -1.0
+              - 1.0
+            - - 1.0
+              - -1.0
+            shape:
+            - 2
+            - 2
+        - id: handles-empty-rows
+          arguments:
+          - value: []
+          - value:
+            - 0
+            - 0
+          - value:
+            - 1
+            - 1
+          expectedReturn:
+            standardized: []
+            shape:
+            - 0
+            - 2
+        - id: rejects-zero-scale
+          arguments:
+          - value:
+            - - 1
+          - value:
+            - 0
+          - value:
+            - 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: numpy_10-score-threshold-classifier-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_10-standardize-diabetes-features-mastery
+    title: 새 표준화 feature에 선형 score와 threshold 적용하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 표준화 결과를 score·probability 없이도 투명한 이진 분류 규칙으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - score와 label을 둘 다 남겨 threshold 영향을 확인하세요.
+    - score == threshold인 경계는 positive에 포함합니다.
+    exercise:
+      prompt: classify_linear_scores(matrix, weights, bias, threshold)를 완성해 scores, labels, positiveIndexes를 반환하세요.
+      starterCode: |-
+        def classify_linear_scores(matrix, weights, bias, threshold):
+            raise NotImplementedError
+      solution: |
+        def classify_linear_scores(matrix, weights, bias, threshold):
+            if any(len(row) != len(weights) for row in matrix):
+                raise ValueError("shape mismatch")
+            scores = [round(bias + sum(value * weight for value, weight in zip(row, weights)), 3) for row in matrix]
+            labels = [1 if score >= threshold else 0 for score in scores]
+            return {"scores": scores, "labels": labels, "positiveIndexes": [index for index, label in enumerate(labels) if label == 1]}
+      hints: *id002
+    check:
+      id: python.numpy.numpy_10.score-threshold-classifier.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_10.score-threshold-classifier.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: classify_linear_scores
+        cases:
+        - id: applies-score-threshold
+          arguments:
+          - value:
+            - - 1
+              - 2
+            - - -1
+              - 0
+            - - 0.5
+              - 0.5
+          - value:
+            - 1
+            - 0.5
+          - value: 0
+          - value: 1
+          expectedReturn:
+            scores:
+            - 2.0
+            - -1.0
+            - 0.75
+            labels:
+            - 1
+            - 0
+            - 0
+            positiveIndexes:
+            - 0
+        - id: includes-threshold-boundary
+          arguments:
+          - value:
+            - - 1
+          - value:
+            - 1
+          - value: 0
+          - value: 1
+          expectedReturn:
+            scores:
+            - 1
+            labels:
+            - 1
+            positiveIndexes:
+            - 0
+        - id: rejects-shape-mismatch
+          arguments:
+          - value:
+            - - 1
+              - 2
+          - value:
+            - 1
+          - value: 0
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: numpy_10-ml-pipeline-leakage-check-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - numpy_10-score-threshold-classifier-transfer
+    title: ML pipeline의 leakage 방지 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: scaling, threshold tuning, final test 단계에서 허용 데이터와 증거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 전처리 parameter도 model parameter처럼 training data에서만 학습하세요.
+    - test 결과를 보고 threshold를 바꾸면 더 이상 final test가 아닙니다.
+    exercise:
+      prompt: choose_pipeline_split_policy(situation)를 완성해 fitOn, evaluateOn, forbidden을 반환하세요.
+      starterCode: |-
+        def choose_pipeline_split_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_pipeline_split_policy(situation):
+            table = {'fit-scaler': {'fitOn': 'training rows', 'evaluateOn': 'validation transform', 'forbidden': 'all-data mean'}, 'choose-threshold': {'fitOn': 'validation predictions', 'evaluateOn': 'business metric', 'forbidden': 'test tuning'}, 'final-report': {'fitOn': 'frozen pipeline', 'evaluateOn': 'untouched test rows', 'forbidden': 'repeated peeking'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.numpy.numpy_10.ml-pipeline-leakage-check.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.numpy.numpy_10.ml-pipeline-leakage-check.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_pipeline_split_policy
+        cases:
+        - id: recalls-fit-scaler
+          arguments:
+          - value: fit-scaler
+          expectedReturn:
+            fitOn: training rows
+            evaluateOn: validation transform
+            forbidden: all-data mean
+        - id: recalls-choose-threshold
+          arguments:
+          - value: choose-threshold
+          expectedReturn:
+            fitOn: validation predictions
+            evaluateOn: business metric
+            forbidden: test tuning
+        - id: rejects-unknown-situation
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

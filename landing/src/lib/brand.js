@@ -6,9 +6,9 @@ export const basePath = viteBase === "/" ? "" : viteBase.replace(/\/$/, "");
 
 export const brand = {
   name: "Codaro",
-  tagline: "Code, learning, and automation in one local studio.",
+  tagline: "Learn Python in the browser. Automate real work locally.",
   description:
-    "Codaro is a local-first programmable studio for learning Python, running notebook-style code, and turning repeatable work into desktop automation.",
+    "Codaro teaches Python in the browser with executable, strongly checked lessons, then extends the same work into local files, packages, schedules, and automation.",
   siteUrl: "https://eddmpython.github.io/codaro",
   basePath: "/codaro",
   repoUrl: "https://github.com/eddmpython/codaro",
@@ -42,7 +42,7 @@ export const brand = {
     const pathWithoutBase = resolvedPath.startsWith(this.basePath)
       ? resolvedPath.slice(this.basePath.length) || "/"
       : resolvedPath;
-    return pathWithoutBase === "/" ? this.siteUrl : `${this.siteUrl}${pathWithoutBase}`;
+    return pathWithoutBase === "/" ? `${this.siteUrl}/` : `${this.siteUrl}${pathWithoutBase}`;
   },
   get resources() {
     return [
@@ -63,7 +63,7 @@ export const brand = {
       },
       {
         title: "Search",
-        description: "Find Codaro documentation and writing from one place.",
+        description: "Find Codaro lessons, documentation, and writing from one place.",
         href: `${basePath}/search`,
       },
     ];

@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "playwright"
+sourceCount: 11
+lessons:
+  - lessonRef: "playwright/00_playwright소개"
+    sourcePath: "curricula/python/automation/browser/playwright/00_playwright소개.yaml"
+    metaId: "playwright_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "playwright/01_첫브라우저실행"
+    sourcePath: "curricula/python/automation/browser/playwright/01_첫브라우저실행.yaml"
+    metaId: "playwright_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "playwright/02_locator와폼입력"
+    sourcePath: "curricula/python/automation/browser/playwright/02_locator와폼입력.yaml"
+    metaId: "playwright_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "playwright/03_기다림과검증"
+    sourcePath: "curricula/python/automation/browser/playwright/03_기다림과검증.yaml"
+    metaId: "playwright_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "playwright/04_스크린샷과증거"
+    sourcePath: "curricula/python/automation/browser/playwright/04_스크린샷과증거.yaml"
+    metaId: "playwright_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "playwright/05_네트워크모킹"
+    sourcePath: "curricula/python/automation/browser/playwright/05_네트워크모킹.yaml"
+    metaId: "playwright_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "playwright/06_로그인상태와스토리지"
+    sourcePath: "curricula/python/automation/browser/playwright/06_로그인상태와스토리지.yaml"
+    metaId: "playwright_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "playwright/07_페이지객체와재사용"
+    sourcePath: "curricula/python/automation/browser/playwright/07_페이지객체와재사용.yaml"
+    metaId: "playwright_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "playwright/08_pytest흐름"
+    sourcePath: "curricula/python/automation/browser/playwright/08_pytest흐름.yaml"
+    metaId: "playwright_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "playwright/09_트레이스와디버깅"
+    sourcePath: "curricula/python/automation/browser/playwright/09_트레이스와디버깅.yaml"
+    metaId: "playwright_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "playwright/10_종합브라우저점검프로젝트"
+    sourcePath: "curricula/python/automation/browser/playwright/10_종합브라우저점검프로젝트.yaml"
+    metaId: "playwright_10"
+    registryStatus: registered
+    reviewStatus: pending

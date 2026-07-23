@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "opencv"
+sourceCount: 11
+lessons:
+  - lessonRef: "opencv/00_OpenCV소개"
+    sourcePath: "curricula/python/imageVision/opencv/00_OpenCV소개.yaml"
+    metaId: "opencv_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "opencv/01_이미지구조탐색기"
+    sourcePath: "curricula/python/imageVision/opencv/01_이미지구조탐색기.yaml"
+    metaId: "opencv_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "opencv/02_색공간변환기"
+    sourcePath: "curricula/python/imageVision/opencv/02_색공간변환기.yaml"
+    metaId: "opencv_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "opencv/03_기하학적변환기"
+    sourcePath: "curricula/python/imageVision/opencv/03_기하학적변환기.yaml"
+    metaId: "opencv_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "opencv/04_이미지필터랩"
+    sourcePath: "curricula/python/imageVision/opencv/04_이미지필터랩.yaml"
+    metaId: "opencv_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "opencv/05_에지검출기"
+    sourcePath: "curricula/python/imageVision/opencv/05_에지검출기.yaml"
+    metaId: "opencv_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "opencv/06_이진화스튜디오"
+    sourcePath: "curricula/python/imageVision/opencv/06_이진화스튜디오.yaml"
+    metaId: "opencv_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "opencv/07_모폴로지연산기"
+    sourcePath: "curricula/python/imageVision/opencv/07_모폴로지연산기.yaml"
+    metaId: "opencv_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "opencv/08_히스토그램분석기"
+    sourcePath: "curricula/python/imageVision/opencv/08_히스토그램분석기.yaml"
+    metaId: "opencv_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "opencv/09_컨투어탐지기"
+    sourcePath: "curricula/python/imageVision/opencv/09_컨투어탐지기.yaml"
+    metaId: "opencv_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "opencv/10_종합비전프로젝트"
+    sourcePath: "curricula/python/imageVision/opencv/10_종합비전프로젝트.yaml"
+    metaId: "opencv_10"
+    registryStatus: registered
+    reviewStatus: pending

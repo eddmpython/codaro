@@ -1,0 +1,74 @@
+schemaVersion: 1
+artifacts:
+  - artifactId: artifact-ownership
+    role: source
+    owner: product-architecture
+    sourcePath: contracts/artifactOwnership.schema.json
+    surfacePaths:
+      - src/codaro/generatedContracts/artifactOwnership.py
+      - src/codaro/generatedContracts/artifactOwnership.schema.json
+      - editor/src/lib/generatedContracts/artifactOwnership.ts
+      - launcher/codaro-launcher/src/generated_contracts/artifact_ownership.rs
+  - artifactId: learning-artifact-descriptor
+    role: source
+    owner: learning-runtime
+    sourcePath: contracts/learningArtifactDescriptor.schema.json
+    surfacePaths:
+      - src/codaro/curriculum/localStrongCheck.py
+      - src/codaro/curriculum/evidenceArchive.py
+      - editor/src/lib/webLearningEvidence.ts
+  - artifactId: table-artifact-descriptor
+    role: source
+    owner: learning-runtime
+    sourcePath: contracts/tableArtifactDescriptor.schema.json
+    surfacePaths:
+      - src/codaro/curriculum/_localStrongCheckWorker.py
+      - tests/contracts/testTableArtifactDescriptorContract.py
+  - artifactId: image-artifact-descriptor
+    role: source
+    owner: learning-runtime
+    sourcePath: contracts/imageArtifactDescriptor.schema.json
+    surfacePaths:
+      - editor/src/lib/browserLearningCheckExecutor.ts
+      - tests/contracts/testImageArtifactDescriptorContract.py
+  - artifactId: learning-archive
+    role: source
+    owner: learning-runtime
+    sourcePath: contracts/learningArchive.schema.json
+    surfacePaths:
+      - src/codaro/curriculum/learningArchive.py
+      - editor/src/lib/learningArchive.ts
+      - tests/contracts/testLearningArchiveContract.py
+  - artifactId: public-learning-catalog
+    role: source
+    owner: curriculum-architecture
+    sourcePath: contracts/publicLearningCatalog.json
+    surfacePaths:
+      - landing/scripts/generateCurriculum.js
+      - landing/src/lib/curriculumLessons.js
+  - artifactId: run-route-state
+    role: source
+    owner: product-architecture
+    sourcePath: contracts/runRouteState.schema.json
+    surfacePaths:
+      - editor/src/lib/runRouteState.ts
+      - editor/src/hooks/useSurfaceRoute.ts
+      - landing/src/lib/publicRouting.js
+      - tests/contracts/testRunRouteStateContract.py
+  - artifactId: learning-event
+    role: source
+    owner: learning-runtime
+    sourcePath: contracts/learningEvent.schema.json
+    surfacePaths:
+      - src/codaro/curriculum/learningEvent.py
+      - editor/src/lib/learningEvent.ts
+      - tests/learning/testCanonicalMasteryPolicy.py
+  - artifactId: mastery-policy-v1
+    role: source
+    owner: learning-runtime
+    sourcePath: contracts/masteryPolicy.v1.json
+    surfacePaths:
+      - src/codaro/generatedContracts/masteryPolicy.v1.json
+      - editor/src/lib/generatedContracts/masteryPolicy.v1.json
+      - src/codaro/curriculum/masteryPolicy.py
+      - editor/src/lib/masteryPolicy.ts

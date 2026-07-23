@@ -1,0 +1,873 @@
+var e=`meta:
+  id: day30
+  title: 최종 프로젝트
+  day: 30
+  category: 30days
+  tags:
+  - 최종프로젝트
+  - 통합실습
+  - 로컬파일
+  - 객체지향
+  - 데이터처리
+  - 검증
+  seo:
+    title: 파이썬 최종 프로젝트 - 30일 완성
+    description: 30일간 배운 모든 파이썬 문법을 종합하여 실전 프로젝트를 완성합니다.
+    keywords:
+    - 최종프로젝트
+    - final project
+    - 종합
+    - 실전
+    - 파이썬완성
+intro:
+  emoji: 🎓
+  points:
+  - 30일간 배운 모든 개념 통합
+  - 실전 프로젝트 구현
+  - 문제 해결 능력 완성
+  - 파이썬 마스터 달성
+  direction: 최종 프로젝트에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 최종 프로젝트 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 텍스트 처리 프로젝트 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 데이터 관리 프로젝트 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: 게임 로직 프로젝트 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 최종 프로젝트 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 최종 프로젝트 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 최종 프로젝트 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: text_processing
+  title: 텍스트 처리 프로젝트
+  structuredPrimary: true
+  subtitle: 문자열과 파일 다루기
+  goal: 텍스트 처리 프로젝트에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    텍스트 처리는 파이썬의 대표적인 활용 분야입니다. 파일 읽기, 문자열 조작, 단어 카운팅, 텍스트 분석 등을 조합하여 실용적인 프로그램을 만들 수 있습니다. 딕셔너리와 리스트를 활용하여 효율적으로 데이터를 관리합니다.
+
+    텍스트 처리는 웹 크롤링, 데이터 분석, 자연어 처리의 기초입니다.
+  snippet: |-
+    def analyzeWords(text):
+        words = text.lower().split()
+        frequency = {}
+        for word in words:
+            cleaned = word.strip('.,!?')
+            if cleaned:
+                frequency[cleaned] = frequency.get(cleaned, 0) + 1
+        return frequency
+
+    sampleText = 'hello world hello python world'
+    analyzeWords(sampleText)
+  exercise:
+    prompt: 텍스트 처리 프로젝트 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def analyzeWords(text):
+          words = text.lower().split()
+          frequency = {}
+          for word in words:
+              cleaned = word.strip('.,!?')
+              if cleaned:
+                  frequency[cleaned] = frequency.get(cleaned, 0) + 1
+          return frequency
+
+      sampleText = 'hello world hello python world'
+      analyzeWords(sampleText)
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 텍스트 처리 프로젝트의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 텍스트 처리 프로젝트 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: data_management
+  title: 데이터 관리 프로젝트
+  structuredPrimary: true
+  subtitle: 자료구조 활용하기
+  goal: 데이터 관리 프로젝트에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    데이터 관리는 리스트, 딕셔너리, 세트를 조합하여 효율적으로 정보를 저장하고 조회하는 것입니다. 학생 성적 관리, 재고 관리, 주소록 등 실생활 문제를 자료구조로 해결할 수 있습니다. 클래스를 사용하면 더욱 체계적으로 관리할 수 있습니다.
+
+    적절한 자료구조를 선택하면 프로그램의 효율성이 크게 향상됩니다.
+  snippet: |-
+    class GradeBook:
+        def __init__(self):
+            self.students = {}
+
+        def addScore(self, name, score):
+            if name not in self.students:
+                self.students[name] = []
+            self.students[name].append(score)
+
+        def getAverage(self, name):
+            if name in self.students:
+                scores = self.students[name]
+                return sum(scores) / len(scores)
+            return 0
+
+    gb = GradeBook()
+    gb.addScore('Alice', 90)
+    gb.addScore('Alice', 85)
+    gb.getAverage('Alice')
+  exercise:
+    prompt: 데이터 관리 프로젝트 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      class GradeBook:
+          def __init__(self):
+              self.students = {}
+
+          def addScore(self, name, score):
+              if name not in self.students:
+                  self.students[name] = []
+              self.students[name].append(score)
+
+          def getAverage(self, name):
+              if name in self.students:
+                  scores = self.students[name]
+                  return sum(scores) / len(scores)
+              return 0
+
+      gb = GradeBook()
+      gb.addScore('Alice', 90)
+      gb.addScore('Alice', 85)
+      gb.getAverage('Alice')
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 데이터 관리 프로젝트의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 데이터 관리 프로젝트 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: game_logic
+  title: 게임 로직 프로젝트
+  structuredPrimary: true
+  subtitle: 알고리즘으로 게임 만들기
+  goal: 게임 로직 프로젝트에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    게임 로직은 조건문, 반복문, 함수를 조합하여 규칙을 구현합니다. 숫자 맞추기, 가위바위보, 틱택토 등 간단한 게임을 만들면서 프로그래밍 논리를 익힐 수 있습니다. 난수 생성과 사용자 입력 처리가 핵심입니다.
+
+    게임 로직은 조건문과 반복문을 연습하기에 좋은 주제입니다.
+  snippet: |-
+    def playRPS(player1, player2):
+        wins = {
+            'rock': 'scissors',
+            'scissors': 'paper',
+            'paper': 'rock'
+        }
+        if player1 == player2:
+            return 'draw'
+        elif wins[player1] == player2:
+            return 'player1'
+        else:
+            return 'player2'
+
+    playRPS('rock', 'scissors')
+  exercise:
+    prompt: 게임 로직 프로젝트 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def playRPS(player1, player2):
+          wins = {
+              'rock': 'scissors',
+              'scissors': 'paper',
+              'paper': 'rock'
+          }
+          if player1 == player2:
+              return 'draw'
+          elif wins[player1] == player2:
+              return 'player1'
+          else:
+              return 'player2'
+
+      playRPS('rock', 'scissors')
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 게임 로직 프로젝트의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 게임 로직 프로젝트 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: file_operations
+  title: 파일 처리 프로젝트
+  structuredPrimary: true
+  subtitle: 데이터 저장과 불러오기
+  goal: 파일 처리 프로젝트에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    파일 처리는 데이터를 영구적으로 저장하고 불러오는 기능입니다. CSV 파일 읽기, JSON 형식 저장, 로그 파일 작성 등 실무에서 자주 사용됩니다. with 문을 사용하여 안전하게 파일을 관리하고, 예외 처리로 오류를 방지합니다.
+
+    파일 처리는 데이터 영속성을 위한 필수 기능입니다.
+  snippet: |-
+    def parseCSV(content):
+        lines = content.strip().split('\\n')
+        header = lines[0].split(',')
+        data = []
+        for line in lines[1:]:
+            values = line.split(',')
+            row = dict(zip(header, values))
+            data.append(row)
+        return data
+
+    csvContent = 'name,age\\nAlice,25\\nBob,30'
+    parseCSV(csvContent)
+  exercise:
+    prompt: 파일 처리 프로젝트 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def parseCSV(content):
+          lines = content.strip().split('\\n')
+          header = lines[0].split(',')
+          data = []
+          for line in lines[1:]:
+              values = line.split(',')
+              row = dict(zip(header, values))
+              data.append(row)
+          return data
+
+      csvContent = 'name,age\\nAlice,25\\nBob,30'
+      parseCSV(csvContent)
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 파일 처리 프로젝트의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 파일 처리 프로젝트 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: object_oriented
+  title: 객체지향 프로젝트
+  structuredPrimary: true
+  subtitle: 클래스로 모델링하기
+  goal: 객체지향 프로젝트에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    객체지향 프로그래밍은 현실 세계를 클래스와 객체로 모델링합니다. 은행 계좌, 도서관 시스템, 쇼핑카트 등을 클래스로 설계하면 코드의 재사용성과 유지보수성이 향상됩니다. 상속과 캡슐화를 활용하여 체계적인 프로그램을 작성합니다.
+
+    클래스는 관련된 데이터와 기능을 하나로 묶어 관리합니다.
+  snippet: |-
+    class BankAccount:
+        def __init__(self, owner, balance=0):
+            self.owner = owner
+            self.balance = balance
+
+        def deposit(self, amount):
+            if amount > 0:
+                self.balance = self.balance + amount
+                return True
+            return False
+
+        def withdraw(self, amount):
+            if 0 < amount <= self.balance:
+                self.balance = self.balance - amount
+                return True
+            return False
+
+    account = BankAccount('Alice', 1000)
+    account.deposit(500)
+    account.withdraw(300)
+    account.balance
+  exercise:
+    prompt: 객체지향 프로젝트 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      class BankAccount:
+          def __init__(self, owner, balance=0):
+              self.owner = owner
+              self.balance = balance
+
+          def deposit(self, amount):
+              if amount > 0:
+                  self.balance = self.balance + amount
+                  return True
+              return False
+
+          def withdraw(self, amount):
+              if 0 < amount <= self.balance:
+                  self.balance = self.balance - amount
+                  return True
+              return False
+
+      account = BankAccount('Alice', 1000)
+      account.deposit(500)
+      account.withdraw(300)
+      account.balance
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 객체지향 프로젝트의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 객체지향 프로젝트 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: algorithm_projects
+  title: 알고리즘 프로젝트
+  structuredPrimary: true
+  subtitle: 효율적인 문제 해결
+  goal: 알고리즘 프로젝트에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: |-
+    알고리즘 프로젝트는 정렬, 검색, 재귀를 조합하여 복잡한 문제를 해결합니다. 데이터 필터링, 패턴 찾기, 최적화 등 실무에서 자주 마주치는 문제들을 효율적으로 처리하는 방법을 배웁니다. 시간 복잡도를 고려하여 최적의 알고리즘을 선택합니다.
+
+    알고리즘은 문제를 효율적으로 해결하는 절차입니다.
+  snippet: |-
+    def uniqueSorted(arr):
+        seen = set()
+        unique = []
+        for item in arr:
+            if item not in seen:
+                seen.add(item)
+                unique.append(item)
+        return sorted(unique)
+
+    mixedData = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3]
+    uniqueSorted(mixedData)
+  exercise:
+    prompt: 알고리즘 프로젝트 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def uniqueSorted(arr):
+          seen = set()
+          unique = []
+          for item in arr:
+              if item not in seen:
+                  seen.add(item)
+                  unique.append(item)
+          return sorted(unique)
+
+      mixedData = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3]
+      uniqueSorted(mixedData)
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 알고리즘 프로젝트의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: 알고리즘 프로젝트 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+- id: workflow_validation
+  title: '현업 흐름 검증: 로컬 주문 리포트 미니 프로젝트'
+  structuredPrimary: true
+  subtitle: 입력 → 객체화 → 집계 → 파일 저장 → 재실행 검증
+  goal: '현업 흐름 검증: 로컬 주문 리포트 미니 프로젝트에서 예상값과 실제 실행 결과를 비교하는 검증 흐름을 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 최종 프로젝트는 문법을 많이 나열하는 것이 아니라, 작은 프로그램을 끝까지 완성하는 것입니다. 아래 흐름은 CSV 문자열을 객체로 바꾸고, 결제 주문만 집계한
+    뒤 로컬 파일에 리포트를 저장하고 다시 읽어 검증합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    from pathlib import Path
+    import tempfile
+
+    class OrderLine:
+        def __init__(self, orderId, customer, sku, price, quantity, status):
+            if price <= 0:
+                raise ValueError("price must be positive")
+            if quantity <= 0:
+                raise ValueError("quantity must be positive")
+
+            self.orderId = orderId
+            self.customer = customer
+            self.sku = sku
+            self.price = price
+            self.quantity = quantity
+            self.status = status
+
+        @property
+        def amount(self):
+            return self.price * self.quantity
+
+    def parseInt(value, fieldName):
+        try:
+            return int(value)
+        except ValueError as exc:
+            raise ValueError(f"invalid number for {fieldName}: {value}") from exc
+
+    def parseOrderCsv(csvText):
+        lines = [line.strip() for line in csvText.strip().splitlines() if line.strip()]
+        headers = [header.strip() for header in lines[0].split(",")]
+        requiredHeaders = ["orderId", "customer", "sku", "price", "quantity", "status"]
+        if headers != requiredHeaders:
+            raise ValueError(f"unexpected headers: {headers}")
+
+        orderLines = []
+        for line in lines[1:]:
+            values = [value.strip() for value in line.split(",")]
+            row = dict(zip(headers, values))
+            orderLines.append(OrderLine(
+                row["orderId"],
+                row["customer"],
+                row["sku"],
+                parseInt(row["price"], "price"),
+                parseInt(row["quantity"], "quantity"),
+                row["status"].lower(),
+            ))
+        return orderLines
+
+    def summarizePaidOrders(orderLines):
+        paidLines = [line for line in orderLines if line.status == "paid"]
+        revenueByCustomer = {}
+        for line in paidLines:
+            revenueByCustomer[line.customer] = revenueByCustomer.get(line.customer, 0) + line.amount
+
+        topCustomer = None
+        if revenueByCustomer:
+            topCustomer = max(revenueByCustomer.items(), key=lambda item: item[1])[0]
+
+        return {
+            "paidCount": len(paidLines),
+            "paidRevenue": sum(line.amount for line in paidLines),
+            "revenueByCustomer": revenueByCustomer,
+            "topCustomer": topCustomer,
+        }
+
+    csvText = """orderId,customer,sku,price,quantity,status
+    A-100,kim,keyboard,50000,1,paid
+    A-101,lee,mouse,20000,2,pending
+    A-102,kim,monitor,180000,1,paid
+    """
+
+    orderLines = parseOrderCsv(csvText)
+    summary = summarizePaidOrders(orderLines)
+
+    assert summary["paidCount"] == 2
+    assert summary["paidRevenue"] == 230000
+    assert summary["revenueByCustomer"] == {"kim": 230000}
+    assert summary["topCustomer"] == "kim"
+
+    with tempfile.TemporaryDirectory() as tempDir:
+        reportPath = Path(tempDir) / "orderReport.txt"
+        reportPath.write_text(
+            f"paidCount={summary['paidCount']}\\npaidRevenue={summary['paidRevenue']}",
+            encoding="utf-8",
+        )
+        savedReport = reportPath.read_text(encoding="utf-8")
+
+    assert "paidCount=2" in savedReport
+    assert "paidRevenue=230000" in savedReport
+
+    try:
+        parseOrderCsv("orderId,customer,sku,price,quantity,status\\nA-999,kim,item,unknown,1,paid")
+    except ValueError as exc:
+        assert "invalid number" in str(exc)
+
+    print("최종 프로젝트 흐름 통과")
+  exercise:
+    prompt: '현업 흐름 검증: 로컬 주문 리포트 미니 프로젝트 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.'
+    starterCode: |-
+      from pathlib import Path
+      import tempfile
+
+      class OrderLine:
+          def __init__(self, orderId, customer, sku, price, quantity, status):
+              if price <= 0:
+                  raise ValueError("price must be positive")
+              if quantity <= 0:
+                  raise ValueError("quantity must be positive")
+
+              self.orderId = orderId
+              self.customer = customer
+              self.sku = sku
+              self.price = price
+              self.quantity = quantity
+              self.status = status
+
+          @property
+          def amount(self):
+              return self.price * self.quantity
+
+      def parseInt(value, fieldName):
+          try:
+              return int(value)
+          except ValueError as exc:
+              raise ValueError(f"invalid number for {fieldName}: {value}") from exc
+
+      def parseOrderCsv(csvText):
+          lines = [line.strip() for line in csvText.strip().splitlines() if line.strip()]
+          headers = [header.strip() for header in lines[0].split(",")]
+          requiredHeaders = ["orderId", "customer", "sku", "price", "quantity", "status"]
+          if headers != requiredHeaders:
+              raise ValueError(f"unexpected headers: {headers}")
+
+          orderLines = []
+          for line in lines[1:]:
+              values = [value.strip() for value in line.split(",")]
+              row = dict(zip(headers, values))
+              orderLines.append(OrderLine(
+                  row["orderId"],
+                  row["customer"],
+                  row["sku"],
+                  parseInt(row["price"], "price"),
+                  parseInt(row["quantity"], "quantity"),
+                  row["status"].lower(),
+              ))
+          return orderLines
+
+      def summarizePaidOrders(orderLines):
+          paidLines = [line for line in orderLines if line.status == "paid"]
+          revenueByCustomer = {}
+          for line in paidLines:
+              revenueByCustomer[line.customer] = revenueByCustomer.get(line.customer, 0) + line.amount
+
+          topCustomer = None
+          if revenueByCustomer:
+              topCustomer = max(revenueByCustomer.items(), key=lambda item: item[1])[0]
+
+          return {
+              "paidCount": len(paidLines),
+              "paidRevenue": sum(line.amount for line in paidLines),
+              "revenueByCustomer": revenueByCustomer,
+              "topCustomer": topCustomer,
+          }
+
+      csvText = """orderId,customer,sku,price,quantity,status
+      A-100,kim,keyboard,50000,1,paid
+      A-101,lee,mouse,20000,2,pending
+      A-102,kim,monitor,180000,1,paid
+      """
+
+      orderLines = parseOrderCsv(csvText)
+      summary = summarizePaidOrders(orderLines)
+
+      assert summary["paidCount"] == 2
+      assert summary["paidRevenue"] == 230000
+      assert summary["revenueByCustomer"] == {"kim": 230000}
+      assert summary["topCustomer"] == "kim"
+
+      with tempfile.TemporaryDirectory() as tempDir:
+          reportPath = Path(tempDir) / "orderReport.txt"
+          reportPath.write_text(
+              f"paidCount={summary['paidCount']}\\npaidRevenue={summary['paidRevenue']}",
+              encoding="utf-8",
+          )
+          savedReport = reportPath.read_text(encoding="utf-8")
+
+      assert "paidCount=2" in savedReport
+      assert "paidRevenue=230000" in savedReport
+
+      try:
+          parseOrderCsv("orderId,customer,sku,price,quantity,status\\nA-999,kim,item,unknown,1,paid")
+      except ValueError as exc:
+          assert "invalid number" in str(exc)
+
+      print("최종 프로젝트 흐름 통과")
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    predict:
+      prompt: 이 코드를 실행하면 어떤 예외가 발생할까요?
+      expectedError: ValueError
+  check:
+    noError: '현업 흐름 검증: 로컬 주문 리포트 미니 프로젝트의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
+    resultCheck: '현업 흐름 검증: 로컬 주문 리포트 미니 프로젝트 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.'
+- id: practice
+  title: Day 30 최종 복습
+  structuredPrimary: true
+  subtitle: 30일 완성 프로젝트
+  goal: Day 30 최종 복습에서 함수 입력과 반환값이 호출 결과로 연결되는지 확인한다.
+  why: 함수 입력과 반환값을 작게 확인하면 이후 코드에서 같은 동작을 안전하게 재사용할 수 있습니다.
+  explanation: 30일간 배운 모든 파이썬 문법을 종합하여 실전 프로젝트를 완성합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전하며 파이썬 마스터가 되어보세요.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    def reverseWords(sentence):
+        words = sentence.split()
+        reversed_words = []
+        for word in words:
+            reversed_words.append(word[::-1])
+        return ' '.join(reversed_words)
+
+    reverseWords('hello world python')
+  exercise:
+    prompt: Day 30 최종 복습 예제에서 함수 인자나 return 식을 바꾸고 같은 호출이 다른 값을 돌려주는지 확인하세요.
+    starterCode: |-
+      def reverseWords(sentence):
+          words = sentence.split()
+          reversed_words = []
+          for word in words:
+              reversed_words.append(word[::-1])
+          return ' '.join(reversed_words)
+
+      reverseWords('hello world python')
+    hints:
+    - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
+    - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: Day 30 최종 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
+    resultCheck: Day 30 최종 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: day30-sales-report-mastery
+    mode: mastery
+    unseen: false
+    sourceSectionIds:
+    - text_processing
+    - practice
+    title: CSV 두 종류를 JSON 보고서로 변환하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 파일 읽기, 숫자 변환, 집계, 산출물 저장을 하나의 capstone으로 완성한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: build_sales_report(source_path, output_name)가 CSV item,amount를 읽어 count, total, average JSON을 저장하고 같은 딕셔너리를
+        반환하도록 완성하세요.
+      starterCode: |-
+        def build_sales_report(source_path, output_name):
+            raise NotImplementedError
+      solution: |-
+        def build_sales_report(source_path, output_name):
+            import csv
+            import json
+            from pathlib import Path
+            with Path(source_path).open(encoding='utf-8', newline='') as stream:
+                rows = list(csv.DictReader(stream))
+            amounts = [int(row['amount']) for row in rows]
+            report = {
+                'count': len(amounts),
+                'total': sum(amounts),
+                'average': sum(amounts) / len(amounts) if amounts else 0,
+            }
+            Path(output_name).write_text(json.dumps(report, ensure_ascii=False, sort_keys=True), encoding='utf-8')
+            return report
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day30.sales-report.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day30.sales-report.mastery.behavior.v1.fixture
+      fixtureHash: sha256-ryx2Y6JbI/ENxR5KudfXYARxzgQEfGuS2W7sfTs1P0M=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: sales-a.csv
+          content: |
+            item,amount
+            pen,1000
+            book,2500
+        - path: sales-b.csv
+          content: |
+            item,amount
+            a,100
+            b,200
+            c,300
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_sales_report
+        cases:
+        - id: first
+          arguments:
+          - fixturePath: sales-a.csv
+          - value: report-a.json
+          expectedReturn:
+            count: 2
+            total: 3500
+            average: 1750.0
+        - id: second
+          arguments:
+          - fixturePath: sales-b.csv
+          - value: report-b.json
+          expectedReturn:
+            count: 3
+            total: 600
+            average: 200.0
+        expectedPaths:
+        - path: sales-a.csv
+          kind: file
+          origin: fixture
+        - path: sales-b.csv
+          kind: file
+          origin: fixture
+        - path: report-a.json
+          kind: file
+          origin: created
+        - path: report-b.json
+          kind: file
+          origin: created
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day30-status-summary-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - day30-sales-report-mastery
+    title: 로그 상태를 집계해 새 요약 만들기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: capstone의 집계 흐름을 상태 레코드에 옮긴다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: status_summary(rows)가 status별 개수와 전체 건수를 반환하도록 완성하세요.
+      starterCode: |-
+        def status_summary(rows):
+            raise NotImplementedError
+      solution: |-
+        def status_summary(rows):
+            counts = {}
+            for row in rows:
+                status = row['status']
+                counts[status] = counts.get(status, 0) + 1
+            return {'total': len(rows), 'statuses': counts}
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day30.status-summary.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day30.status-summary.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: status_summary
+        cases:
+        - id: mixed
+          arguments:
+          - value:
+            - status: ok
+            - status: fail
+            - status: ok
+          expectedReturn:
+            total: 3
+            statuses:
+              ok: 2
+              fail: 1
+        - id: empty
+          arguments:
+          - value: []
+          expectedReturn:
+            total: 0
+            statuses: {}
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day30-validate-pipeline-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - day30-sales-report-mastery
+    title: 입력 정제와 오류 분리 다시 구성하기
+    subtitle: 하루 뒤 기억에서 재구성
+    goal: 여러 기초 개념을 기억에서 결합해 파이프라인 결과를 만든다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: validate_pipeline(rows)가 양의 정수 amount만 합산하고 invalid 행 수를 함께 반환하도록 완성하세요.
+      starterCode: |-
+        def validate_pipeline(rows):
+            raise NotImplementedError
+      solution: |-
+        def validate_pipeline(rows):
+            valid = []
+            invalid = 0
+            for row in rows:
+                try:
+                    amount = int(row['amount'])
+                    if amount <= 0:
+                        raise ValueError
+                    valid.append(amount)
+                except (KeyError, TypeError, ValueError):
+                    invalid += 1
+            return {'valid_count': len(valid), 'total': sum(valid), 'invalid_count': invalid}
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day30.validate-pipeline.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day30.validate-pipeline.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: validate_pipeline
+        cases:
+        - id: mixed
+          arguments:
+          - value:
+            - amount: '10'
+            - amount: bad
+            - {}
+            - amount: '5'
+          expectedReturn:
+            valid_count: 2
+            total: 15
+            invalid_count: 2
+        - id: nonpositive
+          arguments:
+          - value:
+            - amount: '0'
+            - amount: '-2'
+          expectedReturn:
+            valid_count: 0
+            total: 0
+            invalid_count: 2
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 24
+`;export{e as default};

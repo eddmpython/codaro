@@ -1,0 +1,257 @@
+var e=`meta:
+  id: playwright_00
+  title: Playwright 소개
+  order: 0
+  category: playwright
+  difficulty: easy
+  audience: Python 기본 문법을 익힌 자동화 입문자
+  packages:
+    - playwright
+  tags:
+    - playwright
+    - 브라우저자동화
+    - 웹검증
+    - 로컬실행
+intro:
+  direction: Playwright로 로컬 HTML을 열고 사용자 관점의 클릭, 입력, 검증, 증거 저장 흐름을 익힌다.
+  benefits:
+    - 실제 브라우저에서 화면 상태를 코드로 확인할 수 있다.
+    - 웹 업무 점검을 클릭과 assert가 포함된 자동화 루틴으로 바꿀 수 있다.
+    - 네트워크 없는 로컬 HTML로 안정적인 실습을 반복할 수 있다.
+    - 완성한 점검 코드를 자동화 태스크와 테스트 코드로 확장할 수 있다.
+  diagram:
+    steps:
+      - label: 브라우저 점검 목표 고정
+        detail: 제목, 버튼, 상태 문구처럼 사용자가 보는 기준을 먼저 적고 자동화 대상으로 좁힙니다.
+      - label: 로컬 HTML에서 첫 페이지 실행
+        detail: 네트워크 의존 없이 page.set_content로 화면을 만들고 Chromium에서 상태를 읽습니다.
+      - label: 사용자 관점 locator 확인
+        detail: role, label, text 기준으로 요소를 찾고 클릭 결과를 assert로 비교합니다.
+      - label: 자동화 루틴으로 재사용
+        detail: 검증된 흐름을 스크린샷, JSON 리포트, pytest 함수로 확장할 준비를 합니다.
+    runtime:
+      - label: Playwright 패키지 확인
+        detail: meta.packages의 playwright를 packages-check로 확인하고 누락되면 uv 기반 설치 흐름으로 준비합니다.
+      - label: 브라우저 바이너리 확인
+        detail: Python 패키지와 별개로 Chromium 실행 가능 여부를 첫 코드 셀에서 확인합니다.
+      - label: 로컬 셀 실행
+        detail: 네트워크 없는 HTML과 assert 기준으로 첫 브라우저 자동화를 검증합니다.
+sections:
+  - id: outcome-map
+    title: 만들 수 있는 자동화 산출물
+    structuredPrimary: true
+    subtitle: 화면 점검에서 업무 루틴까지
+    goal: Playwright 트랙을 끝내면 어떤 웹 점검 산출물을 만들 수 있는지 코드 변수로 정리한다.
+    why: 학습 범위를 산출물 기준으로 잡으면 locator 문법 암기에 머물지 않고 실제 업무 자동화로 이어진다.
+    explanation: Playwright는 페이지를 열고 요소를 찾는 도구를 넘어 화면 상태를 검증하고 증거를 남기는 자동화 도구입니다. 이 트랙은 외부 사이트 대신 로컬 HTML을 사용해 실패 원인을 제어하면서 배웁니다. 마지막에는 점검 결과와 스크린샷을 남기는 작은 브라우저 점검 프로젝트까지 연결합니다.
+    tips:
+      - 먼저 사람이 확인할 화면 기준을 짧은 문장으로 적습니다.
+      - 자동화 산출물은 스크린샷, 상태 JSON, 재사용 함수처럼 다시 실행 가능한 형태로 남깁니다.
+    snippet: |-
+      outcomes = [
+          "로컬 HTML 화면을 열고 제목과 문구를 검증한다",
+          "접근성 이름 기반 locator로 버튼과 입력칸을 조작한다",
+          "스크린샷과 JSON 상태 리포트를 scratch 경로에 저장한다",
+          "네트워크 응답을 mock해 실패와 성공 상태를 반복 검증한다",
+      ]
+
+      assert len(outcomes) == 4
+      assert any("스크린샷" in item for item in outcomes)
+      outcomes
+    exercise:
+      prompt: 자동화 산출물 목록에 본인이 만들고 싶은 웹 점검 결과를 하나 추가하고 개수를 검증하세요.
+      starterCode: |-
+        outcomes = [
+            "로컬 HTML 화면을 열고 제목과 문구를 검증한다",
+            "접근성 이름 기반 locator로 버튼과 입력칸을 조작한다",
+            "스크린샷과 JSON 상태 리포트를 scratch 경로에 저장한다",
+            "네트워크 응답을 mock해 실패와 성공 상태를 반복 검증한다",
+            "___",
+        ]
+
+        assert len(outcomes) == ___
+        outcomes
+      solution: |-
+        outcomes = [
+            "로컬 HTML 화면을 열고 제목과 문구를 검증한다",
+            "접근성 이름 기반 locator로 버튼과 입력칸을 조작한다",
+            "스크린샷과 JSON 상태 리포트를 scratch 경로에 저장한다",
+            "네트워크 응답을 mock해 실패와 성공 상태를 반복 검증한다",
+            "로그인 뒤 대시보드 상태를 매일 점검한다",
+        ]
+
+        assert len(outcomes) == 5
+        assert outcomes[-1].startswith("로그인")
+        outcomes
+      hints:
+        - 마지막 문자열은 실제로 반복하고 싶은 웹 업무 기준으로 작성하세요.
+        - assert의 숫자는 리스트 항목 수와 같아야 합니다.
+    check:
+      noError: outcomes 리스트와 assert가 SyntaxError 없이 실행되어야 합니다.
+      resultCheck: 추가한 산출물 문자열과 리스트 길이 검증이 같은 기준을 가리켜야 합니다.
+  - id: first-browser-preflight
+    title: 첫 브라우저 실행 확인
+    structuredPrimary: true
+    subtitle: package import와 Chromium launch
+    goal: Playwright Python API로 Chromium을 열고 로컬 HTML 제목을 읽어 실행 준비 상태를 확인한다.
+    why: Playwright는 Python 패키지 설치와 브라우저 실행 준비가 모두 맞아야 실제 자동화가 동작한다.
+    explanation: 이 섹션은 가장 작은 브라우저 실행 smoke입니다. page.set_content는 외부 사이트를 열지 않고 HTML을 브라우저에 직접 넣습니다. 그래서 네트워크가 없어도 Playwright API, 브라우저 실행, 페이지 읽기까지 한 번에 검증할 수 있습니다.
+    tips:
+      - 처음에는 외부 URL 대신 page.set_content로 실행 변수를 줄입니다.
+      - browser.close를 호출해 다음 셀 실행에 영향을 주지 않게 합니다.
+    snippet: |-
+      from playwright.sync_api import sync_playwright
+
+      with sync_playwright() as p:
+          browser = p.chromium.launch(headless=True)
+          page = browser.new_page()
+          page.set_content("<html><head><title>Codaro smoke</title></head><body>ready</body></html>")
+          title = page.title()
+          browser.close()
+
+      assert title == "Codaro smoke"
+      title
+    exercise:
+      prompt: HTML title과 assert 값을 함께 바꿔 첫 브라우저 실행 검증을 통과시키세요.
+      starterCode: |-
+        from playwright.sync_api import sync_playwright
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.set_content("<html><head><title>___</title></head><body>ready</body></html>")
+            title = page.title()
+            browser.close()
+
+        assert title == "___"
+        title
+      solution: |-
+        from playwright.sync_api import sync_playwright
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.set_content("<html><head><title>Playwright ready</title></head><body>ready</body></html>")
+            title = page.title()
+            browser.close()
+
+        assert title == "Playwright ready"
+        title
+      hints:
+        - title 태그 안의 문자열과 assert 오른쪽 문자열은 같아야 합니다.
+        - launch가 실패하면 Python 패키지와 별개로 브라우저 바이너리 준비 상태를 확인해야 합니다.
+    check:
+      noError: sync_playwright import, Chromium launch, page.title 호출이 오류 없이 끝나야 합니다.
+      resultCheck: 읽은 title 값이 HTML에 넣은 title 문자열과 정확히 일치해야 합니다.
+  - id: local-html-contract
+    title: 로컬 HTML 실습 계약
+    structuredPrimary: true
+    subtitle: 외부 사이트 대신 고정 화면 사용
+    goal: 실습용 HTML을 문자열로 만들고 화면에 보여야 할 기준을 assert로 고정한다.
+    why: 외부 사이트에 의존하면 네트워크, 디자인 변경, 로그인 상태 때문에 학습 결과가 흔들린다.
+    explanation: 좋은 브라우저 자동화 학습은 처음부터 외부 사이트를 클릭하지 않습니다. 먼저 통제 가능한 HTML을 만들고, 사용자가 보는 제목과 상태 문구를 기준으로 성공 조건을 정합니다. 이후 실제 사이트로 확장할 때도 이 기준을 유지하면 실패 원인을 빠르게 좁힐 수 있습니다.
+    tips:
+      - 학습 HTML은 버튼, 입력칸, 상태 문구처럼 자동화할 요소만 포함합니다.
+      - 기준 문자열은 코드 상단에 변수로 두면 나중에 바꾸기 쉽습니다.
+    snippet: |-
+      pageTitle = "주문 점검"
+      expectedStatus = "대기"
+      html = f"""
+      <main>
+        <h1>{pageTitle}</h1>
+        <p data-testid="status">{expectedStatus}</p>
+      </main>
+      """
+
+      assert "<h1>주문 점검</h1>" in html
+      assert expectedStatus in html
+      html
+    exercise:
+      prompt: 화면 제목과 상태 문구를 바꾸고, HTML 문자열에 두 값이 모두 들어 있는지 검증하세요.
+      starterCode: |-
+        pageTitle = "___"
+        expectedStatus = "___"
+        html = f"""
+        <main>
+          <h1>{pageTitle}</h1>
+          <p data-testid="status">{expectedStatus}</p>
+        </main>
+        """
+
+        assert pageTitle in html
+        assert ___ in html
+        html
+      solution: |-
+        pageTitle = "배송 점검"
+        expectedStatus = "확인 필요"
+        html = f"""
+        <main>
+          <h1>{pageTitle}</h1>
+          <p data-testid="status">{expectedStatus}</p>
+        </main>
+        """
+
+        assert pageTitle in html
+        assert expectedStatus in html
+        html
+      hints:
+        - f-string 안의 중괄호 변수 이름과 위에서 만든 변수 이름이 같아야 합니다.
+        - assert는 화면에 있어야 하는 값이 HTML에 포함됐는지 보는 계약입니다.
+    check:
+      noError: pageTitle, expectedStatus, html 변수가 NameError 없이 만들어져야 합니다.
+      resultCheck: assert가 바꾼 제목과 상태 문구를 모두 확인해야 합니다.
+  - id: first-completion-check
+    title: 소개 레슨 완료 점검
+    structuredPrimary: true
+    subtitle: 실행 준비와 학습 기준 확정
+    goal: 브라우저 smoke, 로컬 HTML 계약, 산출물 목록을 하나의 준비 상태 딕셔너리로 검증한다.
+    why: 트랙 시작 전에 무엇을 준비했고 무엇을 만들지 명확히 해야 이후 레슨의 실패 원인을 구분할 수 있다.
+    explanation: 마지막 소개 섹션은 설치 설명이 아니라 실행 가능한 준비 점검입니다. 패키지, 브라우저, 로컬 HTML, 산출물 기준을 딕셔너리로 묶고 assert로 확인합니다. 이 패턴은 실제 자동화 프로젝트에서도 시작 체크리스트로 재사용할 수 있습니다.
+    tips:
+      - 준비 상태는 불리언 값으로 남기면 후속 자동화에서 조건 분기에 사용할 수 있습니다.
+      - 완료 기준에는 "무엇을 만들 수 있는가"와 "첫 실행이 통과했는가"가 함께 있어야 합니다.
+    snippet: |-
+      readiness = {
+          "packageDeclared": "playwright",
+          "browserSmoke": True,
+          "usesLocalHtml": True,
+          "outputs": ["screenshot", "json-report", "pytest-check"],
+      }
+
+      assert readiness["packageDeclared"] == "playwright"
+      assert readiness["browserSmoke"] is True
+      assert "json-report" in readiness["outputs"]
+      readiness
+    exercise:
+      prompt: readiness에 본인 완료 기준을 하나 추가하고, outputs 목록에 포함됐는지 검증하세요.
+      starterCode: |-
+        readiness = {
+            "packageDeclared": "playwright",
+            "browserSmoke": True,
+            "usesLocalHtml": True,
+            "outputs": ["screenshot", "json-report", "pytest-check", "___"],
+        }
+
+        assert readiness["packageDeclared"] == "playwright"
+        assert readiness["browserSmoke"] is True
+        assert "___" in readiness["outputs"]
+        readiness
+      solution: |-
+        readiness = {
+            "packageDeclared": "playwright",
+            "browserSmoke": True,
+            "usesLocalHtml": True,
+            "outputs": ["screenshot", "json-report", "pytest-check", "daily-health-check"],
+        }
+
+        assert readiness["packageDeclared"] == "playwright"
+        assert readiness["browserSmoke"] is True
+        assert "daily-health-check" in readiness["outputs"]
+        readiness
+      hints:
+        - outputs에 추가한 문자열과 assert의 문자열을 같게 맞추세요.
+        - 준비 상태 딕셔너리는 이후 종합 프로젝트의 체크리스트가 됩니다.
+    check:
+      noError: readiness 딕셔너리와 세 assert가 Playwright 준비 상태 키를 모두 평가해야 합니다.
+      resultCheck: outputs 목록에 추가한 완료 기준이 assert로 확인되어야 합니다.
+`;export{e as default};

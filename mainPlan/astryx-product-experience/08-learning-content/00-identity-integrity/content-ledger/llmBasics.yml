@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "llmBasics"
+canonicalRows: 11
+lessons:
+  - lessonRef: "llmBasics/00_LLM통합소개"
+    identityLedgerRef: "identity-ledger/llmBasics.yml"
+    lessonContentHash: "82168bb73fac6a7f6bece3ccb147f39cdd1ca9287471593b1e9b081e14802e28"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/24-ai-integration"
+    eligiblePathIds: ["aiIntegration"]
+    outcomes: ["llm.intro"]
+    prerequisites: ["python.functions","python.modulesAndIo"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:llmBasics/00_LLM통합소개:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:llmBasics_00_LLM____:v1","retrieve:llmBasics_00_LLM____:v2","retrieve:llmBasics_00_LLM____:v3"]
+    transferVariantIds: ["transfer:llmBasics_00_LLM____:near-v1","transfer:llmBasics_00_LLM____:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "llmBasics/01_첫Claude호출"
+    identityLedgerRef: "identity-ledger/llmBasics.yml"
+    lessonContentHash: "22626041211689227c1b0d040003c87b07d5ce18c602bd01f365159650550e5e"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/24-ai-integration"
+    eligiblePathIds: ["aiIntegration"]
+    outcomes: ["llm.intro"]
+    prerequisites: ["python.functions","python.modulesAndIo"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:llmBasics/01_첫Claude호출:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:llmBasics_01__Claude__:v1","retrieve:llmBasics_01__Claude__:v2","retrieve:llmBasics_01__Claude__:v3"]
+    transferVariantIds: ["transfer:llmBasics_01__Claude__:near-v1","transfer:llmBasics_01__Claude__:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "llmBasics/02_시스템프롬프트역할부여"
+    identityLedgerRef: "identity-ledger/llmBasics.yml"
+    lessonContentHash: "1ada47a67921cafcbd0f2e19bac396aca5786346852decbfe4ffbafc8929de4e"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/24-ai-integration"
+    eligiblePathIds: ["aiIntegration"]
+    outcomes: ["llm.intro"]
+    prerequisites: ["llm.intro"]
+    reinforcesOutcomeIds: ["llm.intro"]
+    runtimeTier: local
+    checkSpecId: "lesson:llmBasics/02_시스템프롬프트역할부여:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:llmBasics_02____________:v1","retrieve:llmBasics_02____________:v2","retrieve:llmBasics_02____________:v3"]
+    transferVariantIds: ["transfer:llmBasics_02____________:near-v1","transfer:llmBasics_02____________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "llmBasics/03_멀티턴대화만들기"
+    identityLedgerRef: "identity-ledger/llmBasics.yml"
+    lessonContentHash: "79dc4d829c7e5cce3e03f73a03d0275c2278f6b4f6dfbbb7923c39a5b83f5b56"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/24-ai-integration"
+    eligiblePathIds: ["aiIntegration"]
+    outcomes: ["llm.conversations"]
+    prerequisites: ["llm.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:llmBasics/03_멀티턴대화만들기:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:llmBasics_03_________:v1","retrieve:llmBasics_03_________:v2","retrieve:llmBasics_03_________:v3"]
+    transferVariantIds: ["transfer:llmBasics_03_________:near-v1","transfer:llmBasics_03_________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "llmBasics/04_토큰과비용추적"
+    identityLedgerRef: "identity-ledger/llmBasics.yml"
+    lessonContentHash: "9609ff01c9d45af6ea716f92905c325f606b7c84649c61508b1b35824dcf0944"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/24-ai-integration"
+    eligiblePathIds: ["aiIntegration"]
+    outcomes: ["llm.conversations"]
+    prerequisites: ["llm.conversations"]
+    reinforcesOutcomeIds: ["llm.conversations"]
+    runtimeTier: local
+    checkSpecId: "lesson:llmBasics/04_토큰과비용추적:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:llmBasics_04________:v1","retrieve:llmBasics_04________:v2","retrieve:llmBasics_04________:v3"]
+    transferVariantIds: ["transfer:llmBasics_04________:near-v1","transfer:llmBasics_04________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "llmBasics/05_스트리밍응답"
+    identityLedgerRef: "identity-ledger/llmBasics.yml"
+    lessonContentHash: "07768e6c2e3a4cc733c5c8cc18e412be1e8fec91b4e095ba4c11c93df5e6300d"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/24-ai-integration"
+    eligiblePathIds: ["aiIntegration"]
+    outcomes: ["llm.streaming"]
+    prerequisites: ["llm.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:llmBasics/05_스트리밍응답:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:llmBasics_05_______:v1","retrieve:llmBasics_05_______:v2","retrieve:llmBasics_05_______:v3"]
+    transferVariantIds: ["transfer:llmBasics_05_______:near-v1","transfer:llmBasics_05_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "llmBasics/06_JSON구조화출력"
+    identityLedgerRef: "identity-ledger/llmBasics.yml"
+    lessonContentHash: "3f38e80a47aa79d3ef45989c14b188d30e2178f26a78b097adf64b57df324467"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/24-ai-integration"
+    eligiblePathIds: ["aiIntegration"]
+    outcomes: ["llm.structuredOutput"]
+    prerequisites: ["llm.conversations","python.errorHandling"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:llmBasics/06_JSON구조화출력:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:llmBasics_06_JSON_____:v1","retrieve:llmBasics_06_JSON_____:v2","retrieve:llmBasics_06_JSON_____:v3"]
+    transferVariantIds: ["transfer:llmBasics_06_JSON_____:near-v1","transfer:llmBasics_06_JSON_____:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "llmBasics/07_프롬프트캐싱"
+    identityLedgerRef: "identity-ledger/llmBasics.yml"
+    lessonContentHash: "c9cef985ac509e9795c2b946108bdc338742217ef424fe32e0ffca22d3fae31f"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/24-ai-integration"
+    eligiblePathIds: ["aiIntegration"]
+    outcomes: ["llm.caching"]
+    prerequisites: ["llm.conversations"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:llmBasics/07_프롬프트캐싱:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:llmBasics_07_______:v1","retrieve:llmBasics_07_______:v2","retrieve:llmBasics_07_______:v3"]
+    transferVariantIds: ["transfer:llmBasics_07_______:near-v1","transfer:llmBasics_07_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "llmBasics/08_도구사용기초"
+    identityLedgerRef: "identity-ledger/llmBasics.yml"
+    lessonContentHash: "bb632789fc68bc4fcac6eb33657d6fc5bd60de8acd4bc8c20c23631ed0cdfc02"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/24-ai-integration"
+    eligiblePathIds: ["aiIntegration"]
+    outcomes: ["llm.toolUse"]
+    prerequisites: ["llm.structuredOutput"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:llmBasics/08_도구사용기초:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:llmBasics_08_______:v1","retrieve:llmBasics_08_______:v2","retrieve:llmBasics_08_______:v3"]
+    transferVariantIds: ["transfer:llmBasics_08_______:near-v1","transfer:llmBasics_08_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "llmBasics/09_멀티도구라우팅"
+    identityLedgerRef: "identity-ledger/llmBasics.yml"
+    lessonContentHash: "c0c062a5f921be54e49c6599bc5ca16eff09cf21cceb3f7fe50a898a586706c1"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/24-ai-integration"
+    eligiblePathIds: ["aiIntegration"]
+    outcomes: ["llm.toolUse"]
+    prerequisites: ["llm.toolUse"]
+    reinforcesOutcomeIds: ["llm.toolUse"]
+    runtimeTier: local
+    checkSpecId: "lesson:llmBasics/09_멀티도구라우팅:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:llmBasics_09________:v1","retrieve:llmBasics_09________:v2","retrieve:llmBasics_09________:v3"]
+    transferVariantIds: ["transfer:llmBasics_09________:near-v1","transfer:llmBasics_09________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "llmBasics/10_데이터분석봇"
+    identityLedgerRef: "identity-ledger/llmBasics.yml"
+    lessonContentHash: "c6b83f8aad3d593e37d38cbad5e1a9175670fb08888086e1105b78342410d064"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/24-ai-integration"
+    eligiblePathIds: ["aiIntegration"]
+    outcomes: ["llm.structuredOutput","llm.caching","llm.toolUse"]
+    prerequisites: ["llm.toolUse","llm.caching","llm.structuredOutput"]
+    reinforcesOutcomeIds: ["llm.structuredOutput","llm.caching","llm.toolUse"]
+    runtimeTier: local
+    checkSpecId: "lesson:llmBasics/10_데이터분석봇:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:llmBasics_10_______:v1","retrieve:llmBasics_10_______:v2","retrieve:llmBasics_10_______:v3"]
+    transferVariantIds: ["transfer:llmBasics_10_______:near-v1","transfer:llmBasics_10_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

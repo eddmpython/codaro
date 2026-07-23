@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import time
+
 import pytest
 import codaro.runtime.processSupervisor as processSupervisorModule
 from codaro.runtime.processSupervisor import ProcessSupervisor, ResourceLimits, ResourceSnapshot
@@ -96,6 +98,24 @@ class TestProcessSupervisor:
         supervisor._emitEvent("resource-exceeded", {"reason": "timeout"})
 
         assert [call[0] for call in calls] == ["info"]
+
+    def test_longLivedIdleWorkerIsNotKilledAsAnExecutionTimeout(self, monkeypatch):
+        supervisor = ProcessSupervisor(
+            ResourceLimits(maxExecutionSeconds=1, heartbeatTimeoutSeconds=0),
+        )
+        supervisor._startedAt = time.monotonic() - 60
+        killed = []
+        process = object()
+        monkeypatch.setattr(
+            supervisor,
+            "_readProcessStats",
+            lambda _process: ResourceSnapshot(memoryMb=0, alive=True, uptime=60),
+        )
+        monkeypatch.setattr(supervisor, "_killProcess", lambda target: killed.append(target))
+
+        supervisor._checkLimits(process)  # type: ignore[arg-type]
+
+        assert killed == []
 
 
 class TestLocalEngineIntegration:

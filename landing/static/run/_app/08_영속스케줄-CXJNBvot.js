@@ -1,0 +1,330 @@
+var e=`meta:
+  id: watchSched_08
+  title: 영속 스케줄 저장
+  order: 8
+  category: watchSched
+  difficulty: easy
+  audience: 폴더 이벤트와 스케줄 자동화에 입문하는 Python 학습자
+  packages: []
+  tags:
+    - persistence
+    - json
+    - jobs
+intro:
+  direction: 스케줄 정의를 JSON 파일로 저장하고 다시 읽어 복원하는 흐름으로 영속 스케줄 자동화의 표준 패턴을 익힌다.
+  benefits:
+    - 스케줄 dict를 직렬화하기 좋은 형태로 정의한다.
+    - tempfile 안에서 JSON으로 저장하고 복원해 영속성을 검증한다.
+    - 같은 dict 형식을 두 번 저장해도 안전하게 동작한다.
+    - 종합 함수가 영속 사이클을 한 번에 처리한다.
+  diagram:
+    steps:
+      - label: 스케줄 dict 정의
+        detail: 트리거 타입과 인자, 다음 실행 시각을 dict 리스트로 표현한다.
+      - label: JSON 저장
+        detail: tempfile 폴더 안 last.json에 ensure_ascii=False로 저장한다.
+      - label: JSON 복원
+        detail: read_text와 json.loads로 dict를 그대로 복원한다.
+      - label: 종합 사이클 검증
+        detail: 한 함수가 저장과 복원을 한 번에 수행하고 원본과 일치하는지 확인한다.
+    runtime:
+      - label: 표준 라이브러리만
+        detail: json, pathlib, tempfile만 사용한다.
+      - label: assert 기반 검증
+        detail: 복원 dict와 원본 dict를 assert로 비교한다.
+sections:
+  - id: schedule-shape
+    title: 영속 스케줄 모양
+    structuredPrimary: true
+    subtitle: dict 리스트 표현
+    goal: 스케줄을 직렬화하기 좋은 dict 리스트 형태로 정의한다.
+    why: 자동화는 사람이 읽고 편집할 수 있는 영속 형태가 가장 안전하므로 단순 dict로 표현한다.
+    explanation: 한 작업은 name, trigger, args 같은 키로 표현한다. trigger는 cron 또는 interval 같은 짧은 문자열이고 args는 위치 인자 리스트다. 같은 키 구조를 자동화 코드 전반에서 유지하면 직렬화가 단순하다.
+    tips:
+      - dict 키는 영문 카멜케이스 또는 스네이크 케이스로 통일한다.
+      - args 값은 항상 리스트로 두어 직렬화 후에도 형이 보존된다.
+    snippet: |-
+      schedule = [
+          {"name": "daily-report", "trigger": "cron", "hour": 9, "minute": 0},
+          {"name": "every-10-min", "trigger": "interval", "minutes": 10},
+      ]
+      summary = {"count": len(schedule), "names": [job["name"] for job in schedule]}
+
+      assert summary == {"count": 2, "names": ["daily-report", "every-10-min"]}
+      summary
+    exercise:
+      prompt: 같은 형식으로 morning과 hourly 두 작업을 정의해 names 리스트가 ["morning", "hourly"]가 되는지 검증하세요.
+      starterCode: |-
+        schedule = [
+            {"name": "___", "trigger": "cron", "hour": 8, "minute": 0},
+            {"name": "___", "trigger": "interval", "minutes": 60},
+        ]
+        summary = {"count": len(schedule), "names": [job["name"] for job in schedule]}
+
+        assert summary == {"count": 2, "names": ["morning", "hourly"]}
+        summary
+      solution: |-
+        schedule = [
+            {"name": "morning", "trigger": "cron", "hour": 8, "minute": 0},
+            {"name": "hourly", "trigger": "interval", "minutes": 60},
+        ]
+        summary = {"count": len(schedule), "names": [job["name"] for job in schedule]}
+
+        assert summary == {"count": 2, "names": ["morning", "hourly"]}
+        summary
+      hints:
+        - 두 작업 이름은 morning과 hourly다.
+        - 리스트 컴프리헨션은 dict의 name 키를 그대로 모은다.
+      check:
+        type: noError
+        noError: dict 리스트 구성이 끝나야 한다.
+        resultCheck: summary가 count 2와 두 이름 리스트를 정확히 담아야 한다.
+    check:
+      noError: 스케줄 dict 구성과 names 추출이 끝나야 한다.
+      resultCheck: summary가 count 2와 두 이름 리스트를 정확히 담아야 한다.
+  - id: save-json
+    title: JSON으로 저장
+    structuredPrimary: true
+    subtitle: tempfile 격리 폴더
+    goal: 스케줄 dict 리스트를 tempfile 안 JSON 파일로 저장한다.
+    why: 자동화 스케줄은 디스크에 남아 있어야 재시작 후에도 같은 작업이 이어진다.
+    explanation: json.dumps에 ensure_ascii=False와 indent=2를 두면 사람이 읽기 좋은 한글 JSON이 된다. tempfile.TemporaryDirectory 안에서 schedule.json을 만들면 정리도 자동이다. write_text는 한 줄로 저장을 마친다.
+    tips:
+      - JSON은 사람과 도구 모두에게 가장 자연스러운 영속 포맷이다.
+      - indent=2를 빼면 한 줄로 저장되어 사람 편집에 불리하다.
+    snippet: |-
+      import json
+      import tempfile
+      from pathlib import Path
+
+      schedule = [
+          {"name": "daily-report", "trigger": "cron", "hour": 9, "minute": 0},
+      ]
+
+      with tempfile.TemporaryDirectory() as td:
+          target = Path(td) / "schedule.json"
+          target.write_text(json.dumps(schedule, ensure_ascii=False, indent=2), encoding="utf-8")
+          saved = target.read_text(encoding="utf-8")
+
+      assert "daily-report" in saved
+      assert saved.startswith("[")
+      saved[:30]
+    exercise:
+      prompt: 두 작업을 가진 schedule을 저장하고 saved 문자열에 두 이름이 모두 포함되는지 검증하세요.
+      starterCode: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+        schedule = [
+            {"name": "alpha", "trigger": "cron", "hour": 8, "minute": 0},
+            {"name": "beta", "trigger": "interval", "minutes": 30},
+        ]
+
+        with tempfile.TemporaryDirectory() as td:
+            target = Path(td) / "schedule.json"
+            target.write_text(json.dumps(schedule, ensure_ascii=___, indent=2), encoding="utf-8")
+            saved = target.read_text(encoding="utf-8")
+
+        assert "alpha" in saved
+        assert "beta" in saved
+        saved[:40]
+      solution: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+        schedule = [
+            {"name": "alpha", "trigger": "cron", "hour": 8, "minute": 0},
+            {"name": "beta", "trigger": "interval", "minutes": 30},
+        ]
+
+        with tempfile.TemporaryDirectory() as td:
+            target = Path(td) / "schedule.json"
+            target.write_text(json.dumps(schedule, ensure_ascii=False, indent=2), encoding="utf-8")
+            saved = target.read_text(encoding="utf-8")
+
+        assert "alpha" in saved
+        assert "beta" in saved
+        saved[:40]
+      hints:
+        - ensure_ascii 인자에 False를 넘기면 한글이 그대로 저장된다.
+        - 두 이름이 saved 문자열에 모두 포함되는지 확인한다.
+      check:
+        type: noError
+        noError: JSON 저장과 읽기가 IOError 없이 끝나야 한다.
+        resultCheck: saved 문자열에 두 이름이 모두 포함되어야 한다.
+    check:
+      noError: JSON 저장과 다시 읽기가 끝나야 한다.
+      resultCheck: saved 문자열이 [로 시작하고 daily-report를 포함해야 한다.
+  - id: load-json
+    title: JSON 복원
+    structuredPrimary: true
+    subtitle: json.loads로 dict 다시 받기
+    goal: 저장한 JSON을 json.loads로 복원해 원본 dict와 동일한지 확인한다.
+    why: 자동화 영속성은 저장과 복원이 100퍼센트 동일해야 운영자가 신뢰할 수 있다.
+    explanation: read_text로 받은 문자열을 json.loads에 넘기면 원본 dict 리스트가 돌아온다. 비교는 == 연산자로 수행하며 dict와 list 모두 깊은 비교를 한다. 같은 입력은 항상 같은 출력을 만들어야 한다.
+    tips:
+      - JSON 직렬화 가능한 값은 int, float, str, bool, None, list, dict 한정이다.
+      - tuple은 list로 변환되므로 비교에 주의한다.
+    snippet: |-
+      import json
+      import tempfile
+      from pathlib import Path
+
+      schedule = [
+          {"name": "daily-report", "trigger": "cron", "hour": 9, "minute": 0},
+      ]
+
+      with tempfile.TemporaryDirectory() as td:
+          target = Path(td) / "schedule.json"
+          target.write_text(json.dumps(schedule, ensure_ascii=False), encoding="utf-8")
+          restored = json.loads(target.read_text(encoding="utf-8"))
+
+      assert restored == schedule
+      restored
+    exercise:
+      prompt: 두 작업을 저장하고 복원해 원본 schedule과 정확히 같은 dict 리스트가 돌아오는지 검증하세요.
+      starterCode: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+        schedule = [
+            {"name": "alpha", "trigger": "cron", "hour": 8},
+            {"name": "beta", "trigger": "interval", "minutes": 30},
+        ]
+
+        with tempfile.TemporaryDirectory() as td:
+            target = Path(td) / "schedule.json"
+            target.write_text(json.dumps(schedule, ensure_ascii=False), encoding="utf-8")
+            restored = json.___(target.read_text(encoding="utf-8"))
+
+        assert restored == schedule
+        restored
+      solution: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+        schedule = [
+            {"name": "alpha", "trigger": "cron", "hour": 8},
+            {"name": "beta", "trigger": "interval", "minutes": 30},
+        ]
+
+        with tempfile.TemporaryDirectory() as td:
+            target = Path(td) / "schedule.json"
+            target.write_text(json.dumps(schedule, ensure_ascii=False), encoding="utf-8")
+            restored = json.loads(target.read_text(encoding="utf-8"))
+
+        assert restored == schedule
+        restored
+      hints:
+        - 복원 함수 이름은 json.loads다.
+        - 원본과 복원 dict는 == 연산자로 깊은 비교가 가능하다.
+      check:
+        type: noError
+        noError: json.loads 호출이 JSONDecodeError 없이 끝나야 한다.
+        resultCheck: restored가 원본 schedule과 정확히 같아야 한다.
+    check:
+      noError: 복원 호출과 비교가 끝나야 한다.
+      resultCheck: restored가 원본 schedule과 정확히 같아야 한다.
+  - id: persist-cycle
+    title: 영속 사이클 종합 정리
+    structuredPrimary: true
+    subtitle: 저장과 복원 함수
+    goal: 한 함수에서 저장과 복원을 묶어 자동화 표준 영속 사이클을 만든다.
+    why: 종합 사이클을 함수로 두면 다음 단계가 같은 입력에서 항상 같은 출력을 받을 수 있어 자동화의 신뢰가 커진다.
+    explanation: persistRoundtrip 함수는 schedule dict 리스트와 base 폴더를 받아 JSON으로 저장하고 즉시 복원해 dict로 돌려준다. 결과는 saved 길이와 복원 dict를 한 dict에 담아 보고한다. 같은 입력으로 두 번 호출하면 같은 dict 형태를 유지한다.
+    tips:
+      - 함수 시작에서 base 폴더의 reports 디렉터리를 보장하면 다른 함수와 충돌이 줄어든다.
+      - 복원된 dict의 키 순서는 JSON 표준상 일정하지 않을 수 있어 == 비교만 사용한다.
+    snippet: |-
+      import json
+      from pathlib import Path
+
+
+      def persistRoundtrip(schedule: list, base: Path) -> dict:
+          target = base / "schedule.json"
+          target.write_text(json.dumps(schedule, ensure_ascii=False, indent=2), encoding="utf-8")
+          restored = json.loads(target.read_text(encoding="utf-8"))
+          return {"size": target.stat().st_size, "matches": restored == schedule, "restored": restored}
+
+
+      import tempfile
+
+      with tempfile.TemporaryDirectory() as td:
+          report = persistRoundtrip(
+              [{"name": "morning", "trigger": "cron", "hour": 8, "minute": 0}],
+              Path(td),
+          )
+
+      assert report["matches"] is True
+      assert report["size"] > 0
+      assert report["restored"][0]["name"] == "morning"
+      report["matches"]
+    exercise:
+      prompt: persistRoundtrip을 두 작업이 든 schedule에 호출해 matches가 True이고 size가 양수가 되는지 종합 검증하세요.
+      starterCode: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+
+        def persistRoundtrip(schedule: list, base: Path) -> dict:
+            target = base / "schedule.json"
+            target.write_text(json.dumps(schedule, ensure_ascii=False, indent=2), encoding="utf-8")
+            restored = json.loads(target.read_text(encoding="utf-8"))
+            return {"size": target.stat().st_size, "matches": restored == ___, "restored": restored}
+
+
+        with tempfile.TemporaryDirectory() as td:
+            report = persistRoundtrip(
+                [
+                    {"name": "morning", "trigger": "cron", "hour": 8, "minute": 0},
+                    {"name": "evening", "trigger": "cron", "hour": 18, "minute": 0},
+                ],
+                Path(td),
+            )
+
+        assert report["matches"] is True
+        assert report["size"] > 0
+        assert len(report["restored"]) == 2
+        report["matches"]
+      solution: |-
+        import json
+        import tempfile
+        from pathlib import Path
+
+
+        def persistRoundtrip(schedule: list, base: Path) -> dict:
+            target = base / "schedule.json"
+            target.write_text(json.dumps(schedule, ensure_ascii=False, indent=2), encoding="utf-8")
+            restored = json.loads(target.read_text(encoding="utf-8"))
+            return {"size": target.stat().st_size, "matches": restored == schedule, "restored": restored}
+
+
+        with tempfile.TemporaryDirectory() as td:
+            report = persistRoundtrip(
+                [
+                    {"name": "morning", "trigger": "cron", "hour": 8, "minute": 0},
+                    {"name": "evening", "trigger": "cron", "hour": 18, "minute": 0},
+                ],
+                Path(td),
+            )
+
+        assert report["matches"] is True
+        assert report["size"] > 0
+        assert len(report["restored"]) == 2
+        report["matches"]
+      hints:
+        - 함수 인자 변수 이름은 schedule이다.
+        - matches는 복원 dict와 원본을 == 로 비교한 결과다.
+      check:
+        type: noError
+        noError: persistRoundtrip 호출이 종합 정리 흐름으로 끝나야 한다.
+        resultCheck: report dict의 matches가 True이고 restored 길이가 2여야 한다.
+    check:
+      noError: 영속 사이클 함수가 격리 공간에서 끝나야 한다.
+      resultCheck: report dict의 matches가 True이고 restored가 원본과 동일해야 한다.
+`;export{e as default};

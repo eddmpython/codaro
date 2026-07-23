@@ -593,3 +593,262 @@ sections:
     type: noError
     noError: 업무 흐름 검증의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 업무 흐름 검증의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: polars_03-game-sales-pivot-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: 플랫폼·지역별 게임 판매를 pivot 형태로 집계하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: long rows를 플랫폼 행과 지역 열의 합계 matrix로 바꾸고 row totals를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 같은 platform·region 조합이 여러 행이면 먼저 합산하세요.
+    - 관측이 없는 조합은 0으로 채우되 region 열 목록을 별도로 남기세요.
+    exercise:
+      prompt: pivot_game_sales(rows)를 완성해 regions, rows를 반환하세요.
+      starterCode: |-
+        def pivot_game_sales(rows):
+            raise NotImplementedError
+      solution: |
+        def pivot_game_sales(rows):
+            regions = sorted({row["region"] for row in rows})
+            platforms = sorted({row["platform"] for row in rows})
+            result = []
+            for platform in platforms:
+                values = {region: sum(row["sales"] for row in rows if row["platform"] == platform and row["region"] == region) for region in regions}
+                result.append({"platform": platform, **values, "total": sum(values.values())})
+            return {"regions": regions, "rows": result}
+      hints: *id001
+    check:
+      id: python.polars.polars_03.game-sales-pivot.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_03.game-sales-pivot.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: pivot_game_sales
+        cases:
+        - id: pivots-and-sums-duplicates
+          arguments:
+          - value:
+            - platform: PC
+              region: EU
+              sales: 2
+            - platform: PC
+              region: EU
+              sales: 1
+            - platform: Switch
+              region: JP
+              sales: 4
+          expectedReturn:
+            regions:
+            - EU
+            - JP
+            rows:
+            - platform: PC
+              EU: 3
+              JP: 0
+              total: 3
+            - platform: Switch
+              EU: 0
+              JP: 4
+              total: 4
+        - id: handles-empty-sales
+          arguments:
+          - value: []
+          expectedReturn:
+            regions: []
+            rows: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: polars_03-market-share-by-platform-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_03-game-sales-pivot-mastery
+    title: 새 판매 matrix에서 지역 내 플랫폼 점유율 계산하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: pivot 합계를 지역별 분모가 다른 share와 선두 플랫폼으로 전이한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 점유율 분모는 전체 세계 판매가 아니라 각 region 합계입니다.
+    - share와 leader를 같은 group 결과에서 계산하세요.
+    exercise:
+      prompt: regional_market_share(rows)를 완성해 shares와 leaders를 반환하세요.
+      starterCode: |-
+        def regional_market_share(rows):
+            raise NotImplementedError
+      solution: |
+        def regional_market_share(rows):
+            regions = sorted({row["region"] for row in rows})
+            shares = {}
+            leaders = {}
+            for region in regions:
+                totals = {}
+                for row in rows:
+                    if row["region"] == region:
+                        totals[row["platform"]] = totals.get(row["platform"], 0) + row["sales"]
+                denominator = sum(totals.values())
+                if denominator <= 0:
+                    raise ValueError("region total must be positive")
+                shares[region] = {key: round(totals[key] / denominator, 3) for key in sorted(totals)}
+                leaders[region] = max(totals, key=lambda key: (totals[key], key))
+            return {"shares": shares, "leaders": leaders}
+      hints: *id002
+    check:
+      id: python.polars.polars_03.market-share-by-platform.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_03.market-share-by-platform.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: regional_market_share
+        cases:
+        - id: computes-region-specific-denominator
+          arguments:
+          - value:
+            - region: EU
+              platform: PC
+              sales: 3
+            - region: EU
+              platform: Switch
+              sales: 1
+            - region: JP
+              platform: Switch
+              sales: 2
+          expectedReturn:
+            shares:
+              EU:
+                PC: 0.75
+                Switch: 0.25
+              JP:
+                Switch: 1.0
+            leaders:
+              EU: PC
+              JP: Switch
+        - id: handles-empty-markets
+          arguments:
+          - value: []
+          expectedReturn:
+            shares: {}
+            leaders: {}
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: polars_03-reshape-operation-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - polars_03-market-share-by-platform-transfer
+    title: long·wide 변환 연산 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: pivot, melt, explode가 바꾸는 행·열 구조를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 변환 전 unique key가 보장되는지 확인하세요.
+    - reshape 뒤 예상 행 수와 identifier 열을 검증하세요.
+    exercise:
+      prompt: choose_reshape_operation(situation)를 완성해 operation, inputShape, risk를 반환하세요.
+      starterCode: |-
+        def choose_reshape_operation(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_reshape_operation(situation):
+            table = {'categories-to-columns': {'operation': 'pivot', 'inputShape': 'long', 'risk': 'duplicate key needs aggregate'}, 'columns-to-category-rows': {'operation': 'melt', 'inputShape': 'wide', 'risk': 'lose identifier columns'}, 'list-items-to-rows': {'operation': 'explode', 'inputShape': 'list column', 'risk': 'row count expansion'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.polars.polars_03.reshape-operation-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.polars.polars_03.reshape-operation-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_reshape_operation
+        cases:
+        - id: recalls-categories-to-columns
+          arguments:
+          - value: categories-to-columns
+          expectedReturn:
+            operation: pivot
+            inputShape: long
+            risk: duplicate key needs aggregate
+        - id: recalls-columns-to-category-rows
+          arguments:
+          - value: columns-to-category-rows
+          expectedReturn:
+            operation: melt
+            inputShape: wide
+            risk: lose identifier columns
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

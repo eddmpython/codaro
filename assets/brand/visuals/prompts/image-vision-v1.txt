@@ -1,0 +1,9 @@
+Use case: scientific-educational
+Asset type: Codaro learning catalog domain visual for image processing and computer vision
+Primary request: Create a premium editorial educational illustration that shows an image moving through pixels, color channels, crop and transform operations, edge detection, segmentation, and object measurement. Use a simple photographed fruit-and-shape still life as the source, then accurate visual processing stages with no labels or readable text.
+Scene/backdrop: bright neutral studio workspace with white and charcoal surfaces, teal, coral, yellow, green, and restrained plum accents.
+Style/medium: sophisticated mixed 3D paper-cut and crisp editorial illustration, tactile photo tiles and precise pixel grids, high-end education product art, not childish.
+Composition/framing: wide 16:9 left-to-right vision pipeline, each transformation clearly related to the same source image, generous safe edges.
+Lighting/mood: soft daylight, observant, technical, clear.
+Constraints: no people, faces, logos, brand names, letters, readable UI text, watermark, gradients, glowing orbs, bokeh, or dark atmospheric background. Keep segmentation and edges visually accurate.
+Avoid: surveillance imagery, robot eyes, neon AI clichés, dominant purple or blue, excessive rounded cards.

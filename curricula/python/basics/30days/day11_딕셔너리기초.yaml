@@ -70,9 +70,6 @@ sections:
     hints:
     - 바꿀 지점은 `lang = ...` 오른쪽 값입니다.
     - 실행 뒤 `lang` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 딕셔너리란?에서 `lang` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -98,9 +95,6 @@ sections:
     hints:
     - 바꿀 지점은 `person = ...` 오른쪽 값입니다.
     - 실행 뒤 `person` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 딕셔너리 생성하기에서 `person` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -126,9 +120,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 키로 값 접근하기에서 `dev` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -156,9 +147,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 키로 값 수정하기에서 `laptop` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -186,9 +174,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 새 키값 쌍 추가하기에서 `member` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -216,9 +201,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: del로 키값 삭제에서 `alpha` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -244,9 +226,6 @@ sections:
     hints:
     - 바꿀 지점은 `grades = ...` 오른쪽 값입니다.
     - 실행 뒤 `grades` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: in/not in 연산자에서 `grades` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -272,9 +251,6 @@ sections:
     hints:
     - 바꿀 지점은 `profile = ...` 오른쪽 값입니다.
     - 실행 뒤 `profile` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 딕셔너리 길이에서 `profile` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -302,9 +278,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 여러 키값 접근에서 `full` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -336,9 +309,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 중첩 딕셔너리에서 `team` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -389,9 +359,6 @@ sections:
     check:
       noError: try/except와 frozenset 할당이 NameError 없이 끝나야 합니다.
       resultCheck: listMessage 안에 'unhashable' 단서가 있고 frozensetValue가 'frozenset ok'여야 합니다.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 세 가지 키 타입 딕셔너리 정의가 TypeError 없이 끝나야 합니다.
@@ -437,9 +404,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: '검증 루프: 주문 레코드 만들고 필수 필드 확인에서 `storesByCoord` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
@@ -465,10 +429,225 @@ sections:
     hints:
     - 바꿀 지점은 `info = ...` 오른쪽 값입니다.
     - 실행 뒤 `info` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: Day 11 종합 복습에서 `info` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Day 11 종합 복습 실행 뒤 `info` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: day11-select-fields-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - dict_intro
+    - practice
+    title: 딕셔너리에서 필요한 필드만 고르기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: key 목록을 따라 새 딕셔너리를 구성한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: select_fields(record, fields)가 fields에 있는 key만 새 딕셔너리로 반환하도록 완성하세요.
+      starterCode: |-
+        def select_fields(record, fields):
+            raise NotImplementedError
+      solution: |-
+        def select_fields(record, fields):
+            return {field: record[field] for field in fields}
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day11.select-fields.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day11.select-fields.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: select_fields
+        cases:
+        - id: profile
+          arguments:
+          - value:
+              name: Mina
+              age: 21
+              city: Seoul
+          - value:
+            - name
+            - city
+          expectedReturn:
+            name: Mina
+            city: Seoul
+        - id: score
+          arguments:
+          - value:
+              id: 7
+              score: 92
+          - value:
+            - score
+          expectedReturn:
+            score: 92
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day11-merge-inventory-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day11-select-fields-mastery
+    title: 재고 수정값을 원본에 합치기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 딕셔너리 병합을 재고 갱신 문맥에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: merge_inventory(base, updates)가 원본을 바꾸지 않고 수정값을 반영한 새 딕셔너리를 반환하도록 완성하세요.
+      starterCode: |-
+        def merge_inventory(base, updates):
+            raise NotImplementedError
+      solution: |-
+        def merge_inventory(base, updates):
+            result = base.copy()
+            result.update(updates)
+            return result
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day11.merge-inventory.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day11.merge-inventory.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: merge_inventory
+        cases:
+        - id: replace
+          arguments:
+          - value:
+              pen: 3
+              book: 2
+          - value:
+              pen: 5
+          expectedReturn:
+            pen: 5
+            book: 2
+        - id: add
+          arguments:
+          - value:
+              pen: 1
+          - value:
+              note: 4
+          expectedReturn:
+            pen: 1
+            note: 4
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day11-invert-mapping-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day11-merge-inventory-transfer
+    title: key와 value 관계 뒤집기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 딕셔너리 순회를 기억에서 다시 구성한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: invert_mapping(mapping)이 각 value를 key로, 기존 key를 value로 바꾼 딕셔너리를 반환하도록 완성하세요.
+      starterCode: |-
+        def invert_mapping(mapping):
+            raise NotImplementedError
+      solution: |-
+        def invert_mapping(mapping):
+            return {value: key for key, value in mapping.items()}
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day11.invert-mapping.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day11.invert-mapping.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: invert_mapping
+        cases:
+        - id: letters
+          arguments:
+          - value:
+              a: 1
+              b: 2
+          expectedReturn:
+            '1': a
+            '2': b
+        - id: labels
+          arguments:
+          - value:
+              kr: Korea
+              jp: Japan
+          expectedReturn:
+            Korea: kr
+            Japan: jp
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

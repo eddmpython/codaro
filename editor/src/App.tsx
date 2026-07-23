@@ -4,6 +4,7 @@ import {
   initialBootstrapState,
 } from "@/lib/appBootstrap";
 import { MainSurface } from "@/components/app/mainSurface";
+import { useCodaroDesign } from "@/lib/codaroDesign";
 import { ProductSidebar } from "@/components/app/productSidebar";
 import { ProviderReconnectBar } from "@/components/app/providerReconnectBar";
 import { TopControls } from "@/components/app/topBar";
@@ -30,8 +31,11 @@ import { useLocaleState } from "@/hooks/useLocaleState";
 import { useViewportInsets } from "@/hooks/useViewportInsets";
 import { LocaleProvider } from "@/lib/localeContext";
 import { isExecutableBlock } from "@/lib/cellModel";
+import { focusCurriculumRouteSection } from "@/components/curriculum/curriculumNavigation";
 import { loadSharePackCurriculum } from "@/lib/sharePackOperations";
 import { loadSystemDiagnosticExport } from "@/lib/systemDiagnostics";
+import type { LearningArchiveMaterialization } from "@/lib/learningArchive";
+import { lessonKeyFromRef, lessonRefFromKey } from "@/lib/runRouteState";
 import { providerProfileReady } from "@/lib/providerProfile";
 import { WidgetSessionProvider } from "@/lib/widgetSession";
 import { installBrowserPythonRuntimeDiagnostics } from "@/lib/browserPythonRuntime";
@@ -45,7 +49,17 @@ import type {
   LoadState,
 } from "@/types";
 
+const CURRICULUM_HOME_ROUTE = "__curriculum-home__";
+
 function App() {
+  const [surface, setSurface, runRouteState, navigateRunRoute, routeRestoreRevision] = useSurfaceRoute();
+  const initialRouteLesson = lessonRefFromKey(runRouteState.lessonKey);
+  const initialCurriculumSelection = useRef(
+    initialRouteLesson ?? (surface === "curriculum"
+      ? { category: initialBootstrapState.selectedCategory, contentId: "" }
+      : null),
+  ).current;
+  const restoringLessonKeyRef = useRef<string | null>(null);
   const localeState = useLocaleState();
   const viewportInsets = useViewportInsets();
   useEffect(() => {
@@ -75,7 +89,14 @@ function App() {
     window.addEventListener("codaro:reactive-trigger", handler);
     return () => window.removeEventListener("codaro:reactive-trigger", handler);
   }, []);
-  const [surface, setSurface] = useSurfaceRoute();
+  const { setDesignSurface } = useCodaroDesign();
+  useEffect(() => {
+    if (surface === "home") setDesignSurface("automation");
+    else if (surface === "curriculum") setDesignSurface("curriculum");
+    else if (surface === "editor") setDesignSurface("notebook");
+    else if (surface === "automation") setDesignSurface("automation");
+    else setDesignSurface("chat");
+  }, [setDesignSurface, surface]);
   const [loadState, setLoadState] = useState<LoadState>("loading");
   // apiOnline 은 부트스트랩 1회가 아니라 라이브 연결 스토어가 소유한다(세션 중간 끊김 감지).
   const connection = useConnectionStatus();
@@ -102,6 +123,7 @@ function App() {
   const {
     applyBootstrapCurriculumState,
     applyCurriculumSelectionState,
+    applyImportedLearningArchiveState,
     categories,
     categoryGroups,
     categoryTree,
@@ -109,16 +131,97 @@ function App() {
     contentsLoading,
     curriculumDocument,
     referenceLoading,
+    restoreCurriculumRouteState,
     selectCurriculumCategoryState,
     selectCurriculumContentState,
+    selectCurriculumLessonState,
     selectedCategory,
     selectedContentId,
     selectedCurriculumBlockId,
     setSelectedCurriculumBlockId,
   } = useCurriculumLibraryState({
+    initialSelection: initialCurriculumSelection,
     onDraftUpdates: applyDraftUpdates,
     onNotice: applyNotice,
   });
+
+  useEffect(() => {
+    if (surface !== "curriculum") {
+      restoringLessonKeyRef.current = null;
+      return;
+    }
+    const routeLesson = lessonRefFromKey(runRouteState.lessonKey);
+    if (!routeLesson) {
+      if (!selectedContentId) {
+        restoringLessonKeyRef.current = null;
+        return;
+      }
+      restoringLessonKeyRef.current = CURRICULUM_HOME_ROUTE;
+      restoreCurriculumRouteState({ category: selectedCategory, contentId: "" });
+      return;
+    }
+    const selectedLessonKey = lessonKeyFromRef(selectedCategory, selectedContentId);
+    if (selectedLessonKey === runRouteState.lessonKey) {
+      restoringLessonKeyRef.current = null;
+      return;
+    }
+    restoringLessonKeyRef.current = runRouteState.lessonKey;
+    restoreCurriculumRouteState(routeLesson);
+  }, [restoreCurriculumRouteState, routeRestoreRevision, runRouteState.lessonKey, surface]);
+
+  useEffect(() => {
+    if (surface !== "curriculum") return;
+    if (restoringLessonKeyRef.current === CURRICULUM_HOME_ROUTE) {
+      if (!selectedContentId) restoringLessonKeyRef.current = null;
+      return;
+    }
+    const selectedLessonKey = lessonKeyFromRef(selectedCategory, selectedContentId);
+    if (!selectedLessonKey) return;
+    if (restoringLessonKeyRef.current) {
+      if (restoringLessonKeyRef.current === selectedLessonKey) restoringLessonKeyRef.current = null;
+      return;
+    }
+    const lessonChanged = runRouteState.lessonKey !== selectedLessonKey;
+    navigateRunRoute({
+      lessonKey: selectedLessonKey,
+      sectionId: lessonChanged ? null : runRouteState.sectionId,
+    }, "replace");
+  }, [navigateRunRoute, runRouteState.lessonKey, runRouteState.sectionId, selectedCategory, selectedContentId, surface]);
+
+  useEffect(() => {
+    if (surface !== "curriculum" || !runRouteState.sectionId || !curriculumDocument) return;
+    if (!curriculumDocument.blocks.some((block) => block.id === runRouteState.sectionId)) return;
+    setSelectedCurriculumBlockId(runRouteState.sectionId);
+    focusCurriculumRouteSection(runRouteState.sectionId);
+  }, [curriculumDocument, routeRestoreRevision, runRouteState.sectionId, setSelectedCurriculumBlockId, surface]);
+
+  const selectCurriculumRouteBlock = useCallback((blockId: string) => {
+    setSelectedCurriculumBlockId(blockId);
+    navigateRunRoute({ sectionId: blockId }, "replace");
+  }, [navigateRunRoute, setSelectedCurriculumBlockId]);
+
+  const navigateCurriculumSelection = useCallback((category: string, contentId: string) => {
+    const lessonKey = lessonKeyFromRef(category, contentId);
+    if (!lessonKey) {
+      if (!contentId) {
+        navigateRunRoute({
+          surface: "curriculum",
+          lessonKey: null,
+          sectionId: null,
+          documentId: null,
+          taskId: null,
+        }, "push");
+      }
+      return;
+    }
+    navigateRunRoute((current) => ({
+      surface: "curriculum",
+      lessonKey,
+      sectionId: current.lessonKey === lessonKey ? current.sectionId : null,
+      documentId: null,
+      taskId: null,
+    }), "push");
+  }, [navigateRunRoute]);
   const {
     customCurricula,
     findCustomCurriculum,
@@ -132,7 +235,7 @@ function App() {
     onNotice: applyNotice,
   });
   const [toolCatalog, setToolCatalog] = useState(initialBootstrapState.toolCatalog);
-  const { themeMode, toggleThemeMode } = useThemeMode();
+  const { resolvedTheme, themeMode, toggleThemeMode } = useThemeMode();
   const { accentColor, selectAccentColor } = useAccentColor();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [assistantCollapsed, setAssistantCollapsed] = useState(false);
@@ -145,6 +248,7 @@ function App() {
     scheduler,
     setAutomationSection,
     tasks,
+    toggleTask,
     toggleEStop,
   } = useAutomationState({ apiOnline, onNotice: applyNotice });
   const {
@@ -188,6 +292,7 @@ function App() {
     selectCustomCurriculum,
     selectCurriculumCategory,
     selectCurriculumContent,
+    selectCurriculumLesson,
     setQuery,
     sidebarCustomCurricula,
   } = useCurriculumNavigationState({
@@ -199,8 +304,10 @@ function App() {
     saveCustomCurriculumEntry,
     selectCurriculumCategoryState,
     selectCurriculumContentState,
+    selectCurriculumLessonState,
     setSelectedCustomCurriculumId,
     setSurface,
+    onNavigateCurriculum: navigateCurriculumSelection,
     onNotice: applyNotice,
   });
 
@@ -228,7 +335,7 @@ function App() {
     document: activeDocument,
     drafts,
     onNotice: applyNotice,
-    selectCurriculumBlock: setSelectedCurriculumBlockId,
+    selectCurriculumBlock: selectCurriculumRouteBlock,
     selectNotebookBlock: selectBlock,
     selectedBlock,
     surface,
@@ -260,6 +367,19 @@ function App() {
     resetRuntimeState();
     clearPendingChanges();
   }, [applyNotebookDocument, clearPendingChanges, resetRuntimeState]);
+
+  const applyLearningArchive = useCallback(async (archive: LearningArchiveMaterialization) => {
+    const selection = await applyImportedLearningArchiveState(archive);
+    resetRuntimeState();
+    clearPendingChanges();
+    navigateRunRoute({
+      surface: "curriculum",
+      lessonKey: `${selection.category}/${selection.contentId}`,
+      sectionId: archive.document.blocks.find(isExecutableBlock)?.id ?? archive.document.blocks[0]?.id ?? null,
+      documentId: archive.document.id,
+      taskId: null,
+    }, "replace");
+  }, [applyImportedLearningArchiveState, clearPendingChanges, navigateRunRoute, resetRuntimeState]);
 
   const activeDocumentRef = useRef(activeDocument);
   const runBlockRef = useRef(runBlock);
@@ -297,14 +417,6 @@ function App() {
     saveCustomCurriculumDocumentEntry,
   ]);
 
-  const openAssignmentMaterial = useCallback((materialDocument: CodaroDocument, title: string) => {
-    const entry = saveCustomCurriculumDocumentEntry(materialDocument, title || materialDocument.title);
-    openCustomCurriculum(entry, { showNotice: true });
-  }, [
-    openCustomCurriculum,
-    saveCustomCurriculumDocumentEntry,
-  ]);
-
   const {
     askAssistant,
     askCellAssistant,
@@ -325,7 +437,7 @@ function App() {
     openCurriculum: openCustomCurriculum,
     saveCurriculum: saveCustomCurriculum,
     selectedBlock,
-    selectCurriculumBlock: setSelectedCurriculumBlockId,
+    selectCurriculumBlock: selectCurriculumRouteBlock,
     selectNotebookBlock: selectBlock,
     sessionId,
     setPendingBlocks,
@@ -368,7 +480,14 @@ function App() {
       sessionId={sessionId}
       onUiValueChange={({ blockId, elementId, value }) => setUiValue(blockId ?? "", elementId, value)}
     >
-    <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
+    <SidebarProvider
+      data-run-route-lesson-key={runRouteState.lessonKey ?? undefined}
+      data-run-route-path={runRouteState.pathId ?? undefined}
+      data-run-route-runtime={runRouteState.runtimeTier}
+      data-run-route-section={runRouteState.sectionId ?? undefined}
+      open={sidebarOpen}
+      onOpenChange={setSidebarOpen}
+    >
       <ProductSidebar
         categories={filteredCategories}
         categoryGroups={categoryGroups}
@@ -378,6 +497,7 @@ function App() {
         customCurricula={sidebarCustomCurricula}
         query={query}
         referenceLoading={referenceLoading}
+        runtimeTier={runRouteState.runtimeTier}
         selectedAutomationSection={automationSection}
         surface={surface}
         selectedCategory={selectedCategory}
@@ -449,6 +569,7 @@ function App() {
               onConnectAi={connectAiProvider}
               onCellAsk={askCellAssistant}
               onDraftChange={updateDraft}
+              onImportLearningArchive={applyLearningArchive}
               onDeleteCell={(blockId) => {
                 cleanupCellDefinitions(blockId);
                 deleteNotebookCell(blockId);
@@ -459,19 +580,17 @@ function App() {
               onRejectPendingBlocks={rejectPendingBlocks}
               onRefreshAutomation={refreshAutomation}
               onRenameDocument={renameNotebookDocument}
-              onOpenAssignmentMaterial={openAssignmentMaterial}
               onOpenSharePackCurriculum={openSharePackCurriculum}
               notebookRunning={notebookRunning}
               onRunBlock={runBlock}
               onRunNotebook={runNotebook}
               onRunTask={runTask}
+              onSelectSurface={selectSurface}
+              onToggleTask={toggleTask}
               onSelectBlock={selectBlock}
               onSelectCategory={selectCurriculumCategory}
-              onSelectCurriculumBlock={setSelectedCurriculumBlockId}
-              onSelectCurriculumLesson={(category, contentId) => {
-                selectCurriculumCategory(category);
-                selectCurriculumContent(contentId);
-              }}
+              onSelectCurriculumBlock={selectCurriculumRouteBlock}
+              onSelectCurriculumLesson={selectCurriculumLesson}
               onToggleEStop={toggleEStop}
             />
         </div>
@@ -485,7 +604,7 @@ function App() {
           <div className="h-72 min-h-0 shrink-0">
             <TerminalPanel
               launchIntent={terminalLaunchIntent}
-              themeMode={themeMode}
+              themeMode={resolvedTheme}
               onClose={() => setTerminalOpen(false)}
             />
           </div>

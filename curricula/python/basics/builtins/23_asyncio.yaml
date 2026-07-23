@@ -522,3 +522,276 @@ sections:
     type: noError
     noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 23_asyncio-limited-queue-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - workflow_validation
+    title: 제한된 비동기 작업 큐를 await 가능한 함수로 검증하기
+    subtitle: Semaphore와 gather
+    goal: 작업 목록을 동시성 제한으로 처리하고 성공 결과, 실패 이름, 최대 동시 실행 수를 반환한다.
+    why: 숙달 검증은 asyncio.run 호출 암기가 아니라, coroutine entry가 실제로 await되어 결과와 실패를 같은 증거로 남기는지 확인합니다.
+    explanation: async run_limited_queue(items, max_concurrent=2)를 완성해 Semaphore로 동시성을 제한하고 gather(return_exceptions=True)
+      결과를 요약하세요.
+    tips:
+    - max_concurrent가 1보다 작으면 ValueError로 막으세요.
+    - 실패한 작업은 예외를 삼키지 말고 errorNames에 이름으로 남기세요.
+    exercise:
+      prompt: async run_limited_queue(items, max_concurrent=2)를 완성해 results, errorNames, maxConcurrentSeen을 반환하세요.
+      starterCode: |-
+        async def run_limited_queue(items, max_concurrent=2):
+            raise NotImplementedError
+      solution: |-
+        import asyncio
+
+        async def run_limited_queue(items, max_concurrent=2):
+            if max_concurrent < 1:
+                raise ValueError("max_concurrent must be positive")
+            semaphore = asyncio.Semaphore(max_concurrent)
+            active = 0
+            max_seen = 0
+
+            async def process(item):
+                nonlocal active, max_seen
+                async with semaphore:
+                    active += 1
+                    max_seen = max(max_seen, active)
+                    await asyncio.sleep(item.get("delay", 0))
+                    active -= 1
+                    if item.get("fail"):
+                        raise ValueError(item["name"])
+                    return {"name": item["name"], "status": "ok"}
+
+            gathered = await asyncio.gather(
+                *(process(item) for item in items),
+                return_exceptions=True,
+            )
+            return {
+                "results": [item for item in gathered if isinstance(item, dict)],
+                "errorNames": [str(item) for item in gathered if isinstance(item, ValueError)],
+                "maxConcurrentSeen": max_seen,
+            }
+      hints:
+      - async 함수 자체를 반환하지 말고 await가 끝난 dict를 반환하세요.
+      - gather의 결과 순서는 입력 coroutine 순서와 같습니다.
+    check:
+      id: python.builtins.asyncio.limited-queue.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.asyncio.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: run_limited_queue
+        cases:
+        - id: limits-concurrency-and-keeps-errors
+          arguments:
+          - value:
+            - name: load-users
+              delay: 0.01
+            - name: load-lessons
+              delay: 0.01
+            - name: sync-report
+              delay: 0.01
+              fail: true
+          - value: 2
+          expectedReturn:
+            results:
+            - name: load-users
+              status: ok
+            - name: load-lessons
+              status: ok
+            errorNames:
+            - sync-report
+            maxConcurrentSeen: 2
+        - id: rejects-zero-concurrency
+          arguments:
+          - value:
+            - name: load-users
+              delay: 0
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 23_asyncio-timeout-summary-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - timeouts
+    - concurrent_tasks
+    title: 비동기 작업별 timeout 결과를 순서대로 요약하기
+    subtitle: wait_for와 gather
+    goal: jobs 목록을 동시에 실행하고 timeout 안에 끝난 작업과 시간 초과 작업을 같은 list로 반환한다.
+    why: 전이 과제에서는 큐 제한에서 timeout 정책으로 옮겨, 성공과 실패를 UI가 바로 표시할 수 있는 구조로 정리합니다.
+    explanation: async summarize_timeouts(jobs, timeout)를 완성해 각 작업의 name, status, result를 입력 순서대로 반환하세요.
+    tips:
+    - asyncio.wait_for는 지정 시간 안에 끝나지 않으면 TimeoutError를 냅니다.
+    - gather는 동시에 실행하되 결과 list는 입력 순서를 유지합니다.
+    exercise:
+      prompt: async summarize_timeouts(jobs, timeout)를 완성해 빠른 작업은 ok, 느린 작업은 timeout으로 반환하세요.
+      starterCode: |-
+        async def summarize_timeouts(jobs, timeout):
+            raise NotImplementedError
+      solution: |-
+        import asyncio
+
+        async def summarize_timeouts(jobs, timeout):
+            async def run_job(job):
+                try:
+                    result = await asyncio.wait_for(
+                        asyncio.sleep(job["delay"], result=job["name"].upper()),
+                        timeout,
+                    )
+                    return {"name": job["name"], "status": "ok", "result": result}
+                except TimeoutError:
+                    return {"name": job["name"], "status": "timeout", "result": ""}
+
+            return await asyncio.gather(*(run_job(job) for job in jobs))
+      hints:
+      - TimeoutError를 밖으로 던지면 전체 gather 결과를 잃습니다.
+      - 각 작업 결과를 같은 dict shape으로 맞추면 UI와 로그가 읽기 쉬워집니다.
+    check:
+      id: python.builtins.asyncio.timeout-summary.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.asyncio.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_timeouts
+        cases:
+        - id: separates-fast-and-slow-jobs
+          arguments:
+          - value:
+            - name: fast
+              delay: 0
+            - name: slow
+              delay: 0.03
+          - value: 0.01
+          expectedReturn:
+          - name: fast
+            status: ok
+            result: FAST
+          - name: slow
+            status: timeout
+            result: ''
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 23_asyncio-gather-order-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 23_asyncio-timeout-summary-transfer
+    title: 완료 순서가 달라도 gather 반환 순서가 유지되는지 회상하기
+    subtitle: create_task와 gather 순서
+    goal: 지연 시간이 다른 작업을 동시에 실행하되 입력 index 순서대로 결과 list를 반환한다.
+    why: 시간이 지나도 남아야 할 asyncio 감각은 빠른 작업이 먼저 끝나도 gather 반환은 입력 순서라는 점입니다.
+    explanation: async collect_ordered_results(names)가 index, name, label을 가진 dict list를 입력 순서대로 반환하게 완성하세요.
+    tips:
+    - delay를 일부러 다르게 줘도 gather 결과는 입력 coroutine 순서입니다.
+    - label에는 index와 name을 함께 넣어 순서를 눈으로 확인하세요.
+    exercise:
+      prompt: async collect_ordered_results(names)를 완성해 서로 다른 delay 뒤에도 입력 순서대로 label을 반환하세요.
+      starterCode: |-
+        async def collect_ordered_results(names):
+            raise NotImplementedError
+      solution: |-
+        import asyncio
+
+        async def collect_ordered_results(names):
+            async def worker(index, name):
+                await asyncio.sleep(0.002 * (len(names) - index))
+                return {"index": index, "name": name, "label": f"{index}:{name}"}
+
+            return await asyncio.gather(
+                *(worker(index, name) for index, name in enumerate(names))
+            )
+      hints:
+      - create_task를 쓰지 않아도 gather가 coroutine들을 schedule합니다.
+      - 완료 순서가 아니라 입력 순서를 기대값으로 잡으세요.
+    check:
+      id: python.builtins.asyncio.gather-order.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.asyncio.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: collect_ordered_results
+        cases:
+        - id: keeps-input-order
+          arguments:
+          - value:
+            - alpha
+            - beta
+            - gamma
+          expectedReturn:
+          - index: 0
+            name: alpha
+            label: 0:alpha
+          - index: 1
+            name: beta
+            label: 1:beta
+          - index: 2
+            name: gamma
+            label: 2:gamma
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

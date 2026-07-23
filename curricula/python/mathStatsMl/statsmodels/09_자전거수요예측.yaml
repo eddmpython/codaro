@@ -811,3 +811,255 @@ sections:
     type: noError
     noError: 업무 흐름 검증에서 `compactX` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: statsmodels_09-count-overdispersion-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: 자전거 수요 count의 overdispersion 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 평균과 표본 분산 비율로 Poisson 가정을 점검한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - Poisson은 평균과 분산이 비슷하다는 가정을 가집니다.
+    - overdispersion이면 standard error와 interval이 과도하게 좁아질 수 있습니다.
+    exercise:
+      prompt: count_dispersion(values)를 완성하세요.
+      starterCode: |-
+        def count_dispersion(values):
+            raise NotImplementedError
+      solution: |
+        def count_dispersion(values):
+            if len(values)<2 or any(value<0 or int(value)!=value for value in values): raise ValueError("invalid counts")
+            mean=sum(values)/len(values); variance=sum((value-mean)**2 for value in values)/(len(values)-1)
+            return {"count":len(values),"mean":round(mean,4),"sampleVariance":round(variance,4),"dispersion":None if mean==0 else round(variance/mean,4),"overdispersed":mean>0 and variance/mean>1.5}
+      hints: *id001
+    check:
+      id: python.statsmodels.statsmodels_09.count-overdispersion.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.statsmodels.statsmodels_09.count-overdispersion.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: count_dispersion
+        cases:
+        - id: detects-overdispersion
+          arguments:
+          - value:
+            - 0
+            - 0
+            - 0
+            - 8
+          expectedReturn:
+            count: 4
+            mean: 2.0
+            sampleVariance: 16.0
+            dispersion: 8.0
+            overdispersed: true
+        - id: detects-near-poisson
+          arguments:
+          - value:
+            - 0
+            - 1
+            - 1
+            - 2
+          expectedReturn:
+            count: 4
+            mean: 1.0
+            sampleVariance: 0.6667
+            dispersion: 0.6667
+            overdispersed: false
+        - id: rejects-negative
+          arguments:
+          - value:
+            - 0
+            - -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: statsmodels_09-count-exposure-rate-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - statsmodels_09-count-overdispersion-mastery
+    title: 새 count 모델에 exposure offset 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 관측 시간별 count를 rate로 정규화하고 log exposure를 반환한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - count가 관측 시간·인구 exposure에 비례하면 offset을 사용하세요.
+    - raw count와 rate를 비교하지 마세요.
+    exercise:
+      prompt: count_exposure_rows(counts, exposures)를 완성하세요.
+      starterCode: |-
+        def count_exposure_rows(counts, exposures):
+            raise NotImplementedError
+      solution: |
+        def count_exposure_rows(counts, exposures):
+            import math
+            if len(counts)!=len(exposures) or any(count<0 for count in counts) or any(value<=0 for value in exposures): raise ValueError("invalid exposure rows")
+            return [{"count":count,"exposure":exposure,"rate":round(count/exposure,6),"logExposure":round(math.log(exposure),6)} for count,exposure in zip(counts,exposures)]
+      hints: *id002
+    check:
+      id: python.statsmodels.statsmodels_09.count-exposure-rate.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.statsmodels.statsmodels_09.count-exposure-rate.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: count_exposure_rows
+        cases:
+        - id: normalizes-different-exposure
+          arguments:
+          - value:
+            - 10
+            - 10
+          - value:
+            - 1
+            - 2
+          expectedReturn:
+          - count: 10
+            exposure: 1
+            rate: 10.0
+            logExposure: 0.0
+          - count: 10
+            exposure: 2
+            rate: 5.0
+            logExposure: 0.693147
+        - id: handles-zero-count
+          arguments:
+          - value:
+            - 0
+          - value:
+            - 4
+          expectedReturn:
+          - count: 0
+            exposure: 4
+            rate: 0.0
+            logExposure: 1.386294
+        - id: rejects-zero-exposure
+          arguments:
+          - value:
+            - 1
+          - value:
+            - 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: statsmodels_09-bike-count-model-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - statsmodels_09-count-exposure-rate-transfer
+    title: 자전거 count 모델 선택 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: count·dispersion·exposure를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 계수·불확실성·가정 진단을 한 묶음으로 해석하세요.
+    - 통계적 연관을 인과 효과나 개인 확정 예측으로 확대하지 마세요.
+    exercise:
+      prompt: choose_count_model(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_count_model(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_count_model(situation):
+            table = {'poisson-like': {'method': 'Poisson GLM', 'evidence': 'mean variance residuals', 'risk': 'overdispersion'}, 'overdispersed': {'method': 'negative binomial', 'evidence': 'dispersion estimate', 'risk': 'Poisson intervals'}, 'different-exposure': {'method': 'log exposure offset', 'evidence': 'rate denominator', 'risk': 'raw count comparison'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.statsmodels.statsmodels_09.bike-count-model.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.statsmodels.statsmodels_09.bike-count-model.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_count_model
+        cases:
+        - id: recalls-poisson-like
+          arguments:
+          - value: poisson-like
+          expectedReturn:
+            method: Poisson GLM
+            evidence: mean variance residuals
+            risk: overdispersion
+        - id: recalls-overdispersed
+          arguments:
+          - value: overdispersed
+          expectedReturn:
+            method: negative binomial
+            evidence: dispersion estimate
+            risk: Poisson intervals
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

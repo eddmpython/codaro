@@ -597,3 +597,318 @@ sections:
           다음 레슨에서는 같은 데이터를 pandas DataFrame과 양방향으로 변환하는 options() 컨버터를 배웁니다. list-of-lists로 다루던 표를 진짜 분석 가능한 DataFrame으로 끌어올립니다.
     goal: 다중 시트 워크북을 만들고 요약하는 패턴을 한 번 완성한 채로 다음 레슨에 진입한다.
     why: 이 패턴은 월별 보고서, 부서별 정산, 종목별 통계 등 실무 자동화의 가장 흔한 모양이다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: xlwings_03-sheet-expansion-plan-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - build-events
+    - summary
+    title: 시트 탐색과 확장 계획 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 동명 시트·금지 이름·무단 삭제를 차단한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 시트 create와 delete 집합을 쓰기 전에 계산하세요.
+    - 삭제는 별도의 이름 allowlist를 요구하세요.
+    exercise:
+      prompt: plan_sheet_changes(existing, requested, delete_allowlist)를 완성하세요.
+      starterCode: |-
+        def plan_sheet_changes(existing, requested, delete_allowlist):
+            raise NotImplementedError
+      solution: |
+        def plan_sheet_changes(existing, requested, delete_allowlist):
+            existing_names = [item["name"] for item in existing]
+            requested_names = [item["name"] for item in requested]
+            invalid = sorted(name for name in requested_names if not name or len(name) > 31 or any(char in name for char in "[]:*?/\\"))
+            duplicates = sorted({name for name in requested_names if requested_names.count(name) > 1})
+            create = [name for name in requested_names if name not in existing_names]
+            delete = [name for name in existing_names if name not in requested_names]
+            unauthorized = sorted(name for name in delete if name not in delete_allowlist)
+            return {"ready": not invalid and not duplicates and not unauthorized, "create": create, "delete": delete, "invalid": invalid, "duplicates": duplicates, "unauthorizedDelete": unauthorized}
+      hints: *id001
+    check:
+      id: python.xlwings.xlwings_03.sheet-expansion-plan.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.xlwings.xlwings_03.sheet-expansion-plan.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_sheet_changes
+        cases:
+        - id: plans-bounded-create
+          arguments:
+          - value:
+            - name: Raw
+          - value:
+            - name: Raw
+            - name: Summary
+          - value: []
+          expectedReturn:
+            ready: true
+            create:
+            - Summary
+            delete: []
+            invalid: []
+            duplicates: []
+            unauthorizedDelete: []
+        - id: reports-duplicate-invalid
+          arguments:
+          - value: []
+          - value:
+            - name: Bad/Name
+            - name: Bad/Name
+          - value: []
+          expectedReturn:
+            ready: false
+            create:
+            - Bad/Name
+            - Bad/Name
+            delete: []
+            invalid:
+            - Bad/Name
+            - Bad/Name
+            duplicates:
+            - Bad/Name
+            unauthorizedDelete: []
+        - id: requires-delete-authorization
+          arguments:
+          - value:
+            - name: Raw
+            - name: Old
+          - value:
+            - name: Raw
+          - value: []
+          expectedReturn:
+            ready: false
+            create: []
+            delete:
+            - Old
+            invalid: []
+            duplicates: []
+            unauthorizedDelete:
+            - Old
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: xlwings_03-sheet-structure-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - xlwings_03-sheet-expansion-plan-mastery
+    title: 확장한 workbook 구조 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 시트 순서·visibility·active 상태를 계획과 비교한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 재개방한 시트 순서를 그대로 비교하세요.
+    - visibility와 active sheet는 별도 상태로 검증하세요.
+    exercise:
+      prompt: reconcile_sheet_structure(planned, observed, planned_active, observed_active)를 완성하세요.
+      starterCode: |-
+        def reconcile_sheet_structure(planned, observed, planned_active, observed_active):
+            raise NotImplementedError
+      solution: |
+        def reconcile_sheet_structure(planned, observed, planned_active, observed_active):
+            failures = []
+            planned_names = [item["name"] for item in planned]
+            observed_names = [item["name"] for item in observed]
+            visibility_mismatch = sorted(item["name"] for item in planned for current in observed if item["name"] == current["name"] and item.get("visible", True) != current.get("visible", True))
+            if planned_names != observed_names:
+                failures.append("order")
+            if visibility_mismatch:
+                failures.append("visibility")
+            if planned_active != observed_active:
+                failures.append("active")
+            return {"passed": not failures, "failures": failures, "plannedNames": planned_names, "observedNames": observed_names, "visibilityMismatch": visibility_mismatch}
+      hints: *id002
+    check:
+      id: python.xlwings.xlwings_03.sheet-structure-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.xlwings.xlwings_03.sheet-structure-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_sheet_structure
+        cases:
+        - id: accepts-structure
+          arguments:
+          - value:
+            - name: Raw
+            - name: Summary
+          - value:
+            - name: Raw
+            - name: Summary
+          - value: Summary
+          - value: Summary
+          expectedReturn:
+            passed: true
+            failures: []
+            plannedNames:
+            - Raw
+            - Summary
+            observedNames:
+            - Raw
+            - Summary
+            visibilityMismatch: []
+        - id: reports-order-active
+          arguments:
+          - value:
+            - name: Raw
+            - name: Summary
+          - value:
+            - name: Summary
+            - name: Raw
+          - value: Summary
+          - value: Raw
+          expectedReturn:
+            passed: false
+            failures:
+            - order
+            - active
+            plannedNames:
+            - Raw
+            - Summary
+            observedNames:
+            - Summary
+            - Raw
+            visibilityMismatch: []
+        - id: reports-visibility
+          arguments:
+          - value:
+            - name: Raw
+              visible: true
+          - value:
+            - name: Raw
+              visible: false
+          - value: Raw
+          - value: Raw
+          expectedReturn:
+            passed: false
+            failures:
+            - visibility
+            plannedNames:
+            - Raw
+            observedNames:
+            - Raw
+            visibilityMismatch:
+            - Raw
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: xlwings_03-sheet-expansion-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - xlwings_03-sheet-structure-reconciliation-transfer
+    title: 시트 확장 안전 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 계획·권한·구조 대조를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Web에서는 Excel 자동화 판단을 작은 함수로 즉시 검증하세요.
+    - Local에서는 실제 Excel 프로세스와 workbook artifact 증거를 별도로 남기세요.
+    exercise:
+      prompt: choose_sheet_change_evidence(stage)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_sheet_change_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_sheet_change_evidence(stage):
+            table = {'plan': {'action': 'compute create and delete sets', 'evidence': 'sheet change plan', 'risk': 'implicit destructive change'}, 'authorize': {'action': 'allowlist sheet deletions', 'evidence': 'delete authorization', 'risk': 'lost worksheet'}, 'reconcile': {'action': 'compare reopened order visibility active', 'evidence': 'sheet structure report', 'risk': 'wrong workbook state'}}
+            if stage not in table:
+                raise ValueError('unknown stage')
+            return table[stage]
+      hints: *id003
+    check:
+      id: python.xlwings.xlwings_03.sheet-expansion-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.xlwings.xlwings_03.sheet-expansion-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_sheet_change_evidence
+        cases:
+        - id: recalls-plan
+          arguments:
+          - value: plan
+          expectedReturn:
+            action: compute create and delete sets
+            evidence: sheet change plan
+            risk: implicit destructive change
+        - id: recalls-authorize
+          arguments:
+          - value: authorize
+          expectedReturn:
+            action: allowlist sheet deletions
+            evidence: delete authorization
+            risk: lost worksheet
+        - id: recalls-reconcile
+          arguments:
+          - value: reconcile
+          expectedReturn:
+            action: compare reopened order visibility active
+            evidence: sheet structure report
+            risk: wrong workbook state
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

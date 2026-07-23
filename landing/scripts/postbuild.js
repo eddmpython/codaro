@@ -1,6 +1,7 @@
 import { writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { learningPathLabel, lessonRef, runtimeLabel, summarizeLessonBody } from "./lessonDiscovery.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const landingRoot = resolve(__dirname, "..");
@@ -8,7 +9,29 @@ const buildRoot = resolve(landingRoot, "build");
 
 const { posts } = await import(pathToFileURL(resolve(landingRoot, "src", "lib", "generated", "posts.js")));
 const { docsPages } = await import(pathToFileURL(resolve(landingRoot, "src", "lib", "generated", "docsNav.js")));
+const { curriculumLessons, curriculumLessonCount } = await import(pathToFileURL(resolve(landingRoot, "src", "lib", "generated", "curriculum.js")));
 const docsPagesWithContent = await Promise.all(docsPages.map(loadDocsPageContent));
+const curriculumLessonsWithContent = await Promise.all(curriculumLessons.map(loadLessonContent));
+const browserLessonCount = curriculumLessons.filter((lesson) => lesson.runtimeTier === "browser").length;
+const localLessonCount = curriculumLessons.length - browserLessonCount;
+
+const uniqueLessonRoutes = new Set(curriculumLessonsWithContent.map((lesson) => lesson.route));
+const uniqueLessonRefs = new Set(curriculumLessonsWithContent.map(lessonRef));
+const invalidLesson = curriculumLessonsWithContent.find((lesson) => (
+  !lesson.route
+  || !["browser", "local"].includes(lesson.runtimeTier)
+  || !Array.isArray(lesson.eligiblePathIds)
+  || !lesson.eligiblePathIds.length
+  || !summarizeLessonBody(lesson)
+));
+if (
+  curriculumLessonsWithContent.length !== curriculumLessonCount
+  || uniqueLessonRoutes.size !== curriculumLessonCount
+  || uniqueLessonRefs.size !== curriculumLessonCount
+  || invalidLesson
+) {
+  throw new Error(`[postbuild] public lesson mirror contract mismatch: lessons=${curriculumLessonsWithContent.length} routes=${uniqueLessonRoutes.size} refs=${uniqueLessonRefs.size} expected=${curriculumLessonCount}`);
+}
 
 const siteUrl = "https://eddmpython.github.io/codaro";
 const basePath = "/codaro";
@@ -27,7 +50,8 @@ function sitePath(pathValue) {
 
 function absoluteUrl(pathValue) {
   const path = sitePath(pathValue);
-  return path === "/" ? siteUrl : `${siteUrl}${path}`;
+  const encoded = path.split("/").map((segment) => encodeURIComponent(segment)).join("/");
+  return path === "/" ? siteUrl : `${siteUrl}${encoded}`;
 }
 
 const latestPostDate = posts[0]?.date || new Date().toISOString().slice(0, 10);
@@ -36,6 +60,7 @@ const defaultImage = `${siteUrl}/brand/codaro-character.png`;
 
 const urls = [
   { loc: `${siteUrl}/`, changefreq: "weekly", priority: "1.0", lastmod: buildDate, image: defaultImage, imageCaption: "Codaro 마스코트" },
+  { loc: `${siteUrl}/learn`, changefreq: "weekly", priority: "0.9", lastmod: buildDate, image: defaultImage, imageCaption: "Codaro 공개 Python 학습" },
   { loc: `${siteUrl}/docs`, changefreq: "weekly", priority: "0.9", lastmod: buildDate },
   { loc: `${siteUrl}/packs`, changefreq: "weekly", priority: "0.8", lastmod: buildDate },
   { loc: `${siteUrl}/docs/blog`, changefreq: "weekly", priority: "0.8", lastmod: latestPostDate },
@@ -52,6 +77,12 @@ const urls = [
     loc: absoluteUrl(page.url),
     changefreq: "monthly",
     priority: "0.7",
+    lastmod: buildDate,
+  })),
+  ...curriculumLessons.map((lesson) => ({
+    loc: absoluteUrl(lesson.route),
+    changefreq: "monthly",
+    priority: lesson.runtimeTier === "browser" ? "0.8" : "0.7",
     lastmod: buildDate,
   })),
 ];
@@ -107,11 +138,28 @@ writeFileSync(resolve(buildRoot, "feed.xml"), atom, "utf-8");
 
 const docsMirror = docsPages.map((page) => `- [${page.title}](${absoluteUrl(page.url)}) — ${page.description}`);
 const blogMirror = posts.map((post) => `- [${post.title}](${absoluteUrl(post.url)}) — ${post.description}`);
+const lessonMirror = curriculumLessonsWithContent.map((lesson) => (
+  `- [${lesson.title}](${absoluteUrl(lesson.route)}) | Runtime: ${runtimeLabel(lesson.runtimeTier)} | Learning paths: ${learningPathLabel(lesson)} | Summary: ${summarizeLessonBody(lesson, 360)}`
+));
+const fullLessonMirror = curriculumLessonsWithContent.map((lesson) => [
+  `## Lesson: ${lesson.title}`,
+  "",
+  `URL: ${absoluteUrl(lesson.route)}`,
+  `Canonical lesson: ${lessonRef(lesson)}`,
+  `Public route: ${lesson.route}`,
+  `Runtime: ${runtimeLabel(lesson.runtimeTier)} (${lesson.runtimeTier})`,
+  `Learning paths: ${learningPathLabel(lesson)}`,
+  `Estimated time: ${lesson.estimatedMinutes} minutes`,
+  `Outcomes: ${(lesson.outcome || []).join(", ")}`,
+  `Prerequisites: ${(lesson.prerequisites || []).join(", ") || "None"}`,
+  "",
+  `Body summary: ${summarizeLessonBody(lesson, 5000)}`,
+].join("\n"));
 
 const llmsPreamble = [
   "# Codaro",
   "",
-  "> Codaro is a local-first programmable studio for Python learning, reactive notebook execution, and personal desktop automation. Chat, editor, curriculum, and automation surfaces share one document model and one engine.",
+  "> Codaro is a programmable studio for Python learning in the browser and stronger local automation. Browser-supported lessons include reading, execution, strong checks, and saved progress; Local extends the same work into files, packages, schedules, and resident automation.",
   "",
   "Codaro runs on the user's own Python interpreter (Python 3.12+, managed by `uv`). Notebooks are stored in Percent Format (`# %%` cell boundaries) so the same `.py` file is executable as a script, openable in VS Code / Spyder / Jupytext, and convertible to / from `.ipynb`. An AST analyzer infers each cell's defined and used variables to provide transparent scope isolation and reactive re-execution of dependent cells.",
   "",
@@ -123,14 +171,16 @@ const llmsPreamble = [
   "",
   "## Product surfaces",
   "",
-  "- **Chat** — natural-language entry point for learning goals, code requests, automation requests.",
+  `- **Learn** — ${browserLessonCount} browser-supported lessons can be read, edited, executed, strongly checked, and resumed without installing Codaro. ${localLessonCount} capability-specific lessons are clearly marked as requiring Local.`,
+  "- **Run** — the browser learning workspace opens the same canonical lesson and automatically updates results, feedback, evidence, and progress after execution.",
+  "- **Chat** — optional natural-language help for learning goals, code requests, and automation requests.",
   "- **Editor** — empty notebook with Python and Markdown cells; reactive re-execution; variable inspector.",
   "- **Curriculum** — built-in YAML lessons across `basics`, `dataAnalysis`, `visualization`, `imageVision`, `mathStatsMl`, `automation`. AI-generated curricula go through the same `yamlToDocument` converter as the built-ins.",
   "- **Automation** — any `.py` is a runnable task. Triggers include schedule (`@every_5m`, `@daily`), webhook, and manual. Multiple tasks can compose into DAG workflows. All actions are written to a JSONL audit log and stoppable via emergency stop (E-Stop).",
   "",
   "## Distinctive design choices",
   "",
-  "- **Local-first runtime** — no browser sandbox, no WebAssembly fallback. Per-lesson packages declared in `meta.packages` and installed lazily through uv preflight.",
+  "- **Tier-honest runtime** — browser-supported lessons use the pinned pyproc runtime and structured strong checks. Lessons that require native files, packages, schedules, or operating-system capabilities are explicitly marked Local instead of being weakened into browser previews.",
   "- **AI sensory system** — Vision (OpenCV + dxcam/mss screen capture, PaddleOCR/EasyOCR text recognition), Voice (Whisper → CommandParser), Input (PyAutoGUI + InputGuard rate/region limits). Record-then-replay converts user actions into percent-format Python.",
   "- **Mountable** — `createServerApp()` can be embedded into FastAPI / Django / Flask. The rule is: every GUI action is also an API.",
   "- **External channels** — MessageBridge to Slack, Discord, and custom webhooks for trigger-and-notify when away from the desktop.",
@@ -142,6 +192,7 @@ const llmsPreamble = [
   "## Canonical URLs",
   "",
   "- Site: https://eddmpython.github.io/codaro/",
+  "- Learn: https://eddmpython.github.io/codaro/learn",
   "- Repository: https://github.com/eddmpython/codaro",
   "- Latest release: https://github.com/eddmpython/codaro/releases/latest",
   "- Sitemap: https://eddmpython.github.io/codaro/sitemap.xml",
@@ -151,17 +202,17 @@ const llmsPreamble = [
 
 writeFileSync(
   resolve(buildRoot, "llms.txt"),
-  [...llmsPreamble, "## Docs", ...docsMirror, "", "## Writing", ...blogMirror, ""].join("\n"),
+  [...llmsPreamble, "## Public lessons", ...lessonMirror, "", "## Docs", ...docsMirror, "", "## Writing", ...blogMirror, ""].join("\n"),
   "utf-8",
 );
 
 writeFileSync(
   resolve(buildRoot, "llms-full.txt"),
-  ["# Codaro Full Site Mirror", "", ...posts.map((post) => `## ${post.title}\n\nURL: ${absoluteUrl(post.url)}\n\n${stripHtml(post.html)}`), ...docsPagesWithContent.map((page) => `## ${page.title}\n\nURL: ${absoluteUrl(page.url)}\n\n${stripHtml(page.html)}`), ""].join("\n\n"),
+  ["# Codaro Full Site Mirror", "", "# Public lessons", ...fullLessonMirror, "# Writing", ...posts.map((post) => `## ${post.title}\n\nURL: ${absoluteUrl(post.url)}\n\n${stripHtml(post.html)}`), "# Docs", ...docsPagesWithContent.map((page) => `## ${page.title}\n\nURL: ${absoluteUrl(page.url)}\n\n${stripHtml(page.html)}`), ""].join("\n\n"),
   "utf-8",
 );
 
-console.log(`[postbuild] sitemap=${urls.length} feed=${posts.length} docs=${docsPages.length}`);
+console.log(`[postbuild] sitemap=${urls.length} lessons=${curriculumLessons.length} feed=${posts.length} docs=${docsPages.length}`);
 
 async function loadDocsPageContent(page) {
   const moduleUrl = pathToFileURL(resolve(
@@ -174,4 +225,17 @@ async function loadDocsPageContent(page) {
   ));
   const { pageContent } = await import(moduleUrl);
   return { ...page, ...pageContent };
+}
+
+async function loadLessonContent(lesson) {
+  const moduleUrl = pathToFileURL(resolve(
+    landingRoot,
+    "src",
+    "lib",
+    "generated",
+    "curriculumLessons",
+    `${lesson.contentModule}.js`,
+  ));
+  const { default: lessonContent } = await import(moduleUrl);
+  return lessonContent;
 }

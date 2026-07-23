@@ -419,3 +419,273 @@ sections:
     type: noError
     noError: 실습에서 `pageA` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 실습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: scipy_02-ab-proportion-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load
+    - practice
+    title: A/B 전환율의 효과크기와 pooled z 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 성공·노출 분모를 검사하고 rate difference와 z를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - absolute lift와 relative lift를 함께 보여주세요.
+    - 검정 통계량과 실무 효과크기를 분리하세요.
+    exercise:
+      prompt: compare_proportions(success_a, total_a, success_b, total_b)를 완성하세요.
+      starterCode: |-
+        def compare_proportions(success_a, total_a, success_b, total_b):
+            raise NotImplementedError
+      solution: |
+        def compare_proportions(success_a, total_a, success_b, total_b):
+            import math
+            if total_a <= 0 or total_b <= 0 or not 0 <= success_a <= total_a or not 0 <= success_b <= total_b: raise ValueError("invalid conversion counts")
+            rate_a = success_a/total_a; rate_b = success_b/total_b
+            pooled = (success_a+success_b)/(total_a+total_b)
+            standard_error = math.sqrt(pooled*(1-pooled)*(1/total_a+1/total_b))
+            z = 0.0 if standard_error == 0 else (rate_b-rate_a)/standard_error
+            return {"rateA": round(rate_a,4), "rateB": round(rate_b,4), "absoluteLift": round(rate_b-rate_a,4), "relativeLift": None if rate_a == 0 else round((rate_b-rate_a)/rate_a,4), "z": round(z,4)}
+      hints: *id001
+    check:
+      id: python.scipy.scipy_02.ab-proportion-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_02.ab-proportion-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: compare_proportions
+        cases:
+        - id: computes-lift-and-z
+          arguments:
+          - value: 20
+          - value: 100
+          - value: 30
+          - value: 100
+          expectedReturn:
+            rateA: 0.2
+            rateB: 0.3
+            absoluteLift: 0.1
+            relativeLift: 0.5
+            z: 1.633
+        - id: handles-zero-baseline
+          arguments:
+          - value: 0
+          - value: 50
+          - value: 5
+          - value: 50
+          expectedReturn:
+            rateA: 0.0
+            rateB: 0.1
+            absoluteLift: 0.1
+            relativeLift: null
+            z: 2.2942
+        - id: rejects-invalid-count
+          arguments:
+          - value: 6
+          - value: 5
+          - value: 1
+          - value: 5
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: scipy_02-ab-balance-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_02-ab-proportion-evidence-mastery
+    title: 새 실험에 배정·오염 점검 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: variant 배정 비율과 중복 사용자를 검사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 검정 전에 randomization과 sample ratio mismatch를 확인하세요.
+    - 같은 사용자가 두 variant를 경험하면 독립 표본이 아닙니다.
+    exercise:
+      prompt: audit_experiment_assignments(assignments, expected_ratio, tolerance)를 완성하세요.
+      starterCode: |-
+        def audit_experiment_assignments(assignments, expected_ratio, tolerance):
+            raise NotImplementedError
+      solution: |
+        def audit_experiment_assignments(assignments, expected_ratio, tolerance):
+            users = {}; duplicates = []
+            for row in assignments:
+                if row["user"] in users and users[row["user"]] != row["variant"]: duplicates.append(row["user"])
+                users[row["user"]] = row["variant"]
+            counts = {"A": 0, "B": 0}
+            for variant in users.values():
+                if variant not in counts: raise ValueError("unknown variant")
+                counts[variant] += 1
+            total = sum(counts.values()); observed = 0.0 if not total else counts["B"]/total
+            return {"accepted": not duplicates and abs(observed-expected_ratio) <= tolerance, "counts": counts, "observedBRatio": round(observed,4), "crossVariantUsers": sorted(set(duplicates))}
+      hints: *id002
+    check:
+      id: python.scipy.scipy_02.ab-balance-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_02.ab-balance-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_experiment_assignments
+        cases:
+        - id: accepts-balanced-assignment
+          arguments:
+          - value:
+            - user: 1
+              variant: A
+            - user: 2
+              variant: B
+          - value: 0.5
+          - value: 0.1
+          expectedReturn:
+            accepted: true
+            counts:
+              A: 1
+              B: 1
+            observedBRatio: 0.5
+            crossVariantUsers: []
+        - id: rejects-cross-variant-user
+          arguments:
+          - value:
+            - user: 1
+              variant: A
+            - user: 1
+              variant: B
+            - user: 2
+              variant: B
+          - value: 0.5
+          - value: 0.5
+          expectedReturn:
+            accepted: false
+            counts:
+              A: 0
+              B: 2
+            observedBRatio: 1.0
+            crossVariantUsers:
+            - 1
+        - id: rejects-unknown-variant
+          arguments:
+          - value:
+            - user: 1
+              variant: C
+          - value: 0.5
+          - value: 0.1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: scipy_02-ab-test-decision-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_02-ab-balance-audit-transfer
+    title: A/B 검정 해석 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 배정 품질·효과·불확실성을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 수치 방법의 입력 가정과 오차 근거를 함께 남기세요.
+    - p-value나 최적화 성공 flag 하나를 결론으로 사용하지 마세요.
+    exercise:
+      prompt: choose_ab_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_ab_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_ab_evidence(situation):
+            table = {'conversion-difference': {'method': 'two-proportion test', 'evidence': 'counts rates lift interval', 'risk': 'peeking'}, 'continuous-revenue': {'method': 'mean or robust comparison', 'evidence': 'distribution and effect', 'risk': 'heavy tail'}, 'assignment-health': {'method': 'sample-ratio audit', 'evidence': 'unique users per variant', 'risk': 'cross exposure'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.scipy.scipy_02.ab-test-decision.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_02.ab-test-decision.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_ab_evidence
+        cases:
+        - id: recalls-conversion-difference
+          arguments:
+          - value: conversion-difference
+          expectedReturn:
+            method: two-proportion test
+            evidence: counts rates lift interval
+            risk: peeking
+        - id: recalls-continuous-revenue
+          arguments:
+          - value: continuous-revenue
+          expectedReturn:
+            method: mean or robust comparison
+            evidence: distribution and effect
+            risk: heavy tail
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

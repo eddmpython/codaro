@@ -105,6 +105,8 @@ jobs:
           required_wheel_entries = {
               "codaro/webBuild/index.html",
               "codaro/curricula/python/__init__.py",
+              "codaro/generatedContracts/artifactOwnership.py",
+              "codaro/generatedContracts/artifactOwnership.schema.json",
           }
           missing = sorted(required_wheel_entries - wheel_names)
           if missing:
@@ -120,6 +122,8 @@ jobs:
               raise SystemExit("sdist missing src/codaro/webBuild/index.html")
           if not any(name.endswith("/src/codaro/curricula/python/__init__.py") for name in sdist_names):
               raise SystemExit("sdist missing built-in curriculum package")
+          if not any(name.endswith("/src/codaro/generatedContracts/artifactOwnership.schema.json") for name in sdist_names):
+              raise SystemExit("sdist missing generated product contract schema")
           PY
 
       - name: Verify wheel install
@@ -166,6 +170,7 @@ jobs:
           assert callable(codaro.main)
           assert (files("codaro") / "webBuild" / "index.html").is_file()
           assert (files("codaro") / "curricula" / "python" / "__init__.py").is_file()
+          assert (files("codaro") / "generatedContracts" / "artifactOwnership.schema.json").is_file()
           assert any((files("codaro") / "curricula" / "python").glob("*.yaml"))
           print(f"codaro {version} uv add resources ok")
           PY

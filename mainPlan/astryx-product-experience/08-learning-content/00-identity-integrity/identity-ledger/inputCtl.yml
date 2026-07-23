@@ -1,0 +1,54 @@
+schemaVersion: 1
+category: "inputCtl"
+sourceCount: 10
+lessons:
+  - lessonRef: "inputCtl/01_pyautogui안전장치"
+    sourcePath: "curricula/python/automation/os/inputCtl/01_pyautogui안전장치.yaml"
+    metaId: "inputCtl_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "inputCtl/02_화면크기와좌표"
+    sourcePath: "curricula/python/automation/os/inputCtl/02_화면크기와좌표.yaml"
+    metaId: "inputCtl_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "inputCtl/03_마우스이동과클릭"
+    sourcePath: "curricula/python/automation/os/inputCtl/03_마우스이동과클릭.yaml"
+    metaId: "inputCtl_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "inputCtl/04_키보드입력"
+    sourcePath: "curricula/python/automation/os/inputCtl/04_키보드입력.yaml"
+    metaId: "inputCtl_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "inputCtl/05_스크린샷영역"
+    sourcePath: "curricula/python/automation/os/inputCtl/05_스크린샷영역.yaml"
+    metaId: "inputCtl_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "inputCtl/06_이미지매치"
+    sourcePath: "curricula/python/automation/os/inputCtl/06_이미지매치.yaml"
+    metaId: "inputCtl_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "inputCtl/07_클립보드"
+    sourcePath: "curricula/python/automation/os/inputCtl/07_클립보드.yaml"
+    metaId: "inputCtl_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "inputCtl/08_pynput리스너"
+    sourcePath: "curricula/python/automation/os/inputCtl/08_pynput리스너.yaml"
+    metaId: "inputCtl_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "inputCtl/09_상태기반자동화"
+    sourcePath: "curricula/python/automation/os/inputCtl/09_상태기반자동화.yaml"
+    metaId: "inputCtl_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "inputCtl/10_종합화면점검"
+    sourcePath: "curricula/python/automation/os/inputCtl/10_종합화면점검.yaml"
+    metaId: "inputCtl_10"
+    registryStatus: registered
+    reviewStatus: pending

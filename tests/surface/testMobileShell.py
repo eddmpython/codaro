@@ -22,10 +22,12 @@ def testServiceWorkerImplementsBothStrategies() -> None:
     assert "navigationNetworkFirst" in source
     assert "assetCacheFirst" in source
     assert "networkFirst" in source
-    assert "/api/" in source
-    assert "/ws/" in source
-    assert 'caches.match("/index.html")' in source
-    assert "url.pathname.startsWith(\"/_app/\")" in source
+    assert 'scopedPath("api/")' in source
+    assert 'scopedPath("ws/")' in source
+    assert 'caches.match(scopedPath("index.html"))' in source
+    assert 'url.pathname.startsWith(scopedPath("_app/"))' in source
+    assert "codaro-shell-v3:${SCOPE_PATH}" in source
+    assert "codaro-runtime-v3:${SCOPE_PATH}" in source
 
 
 def testIndexHasMobileMetaTags() -> None:
@@ -37,6 +39,7 @@ def testIndexHasMobileMetaTags() -> None:
         'rel="manifest"',
         'apple-mobile-web-app-capable',
         "serviceWorker.register",
+        "scope: serviceWorkerBase",
     ):
         assert fragment in html, f"index.html missing mobile fragment: {fragment}"
 

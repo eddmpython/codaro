@@ -1,0 +1,61 @@
+schemaVersion: 1
+category: "excel"
+canonicalRows: 3
+lessons:
+  - lessonRef: "excel/01_xlwings란"
+    identityLedgerRef: "identity-ledger/excel.yml"
+    lessonContentHash: "84c5459411e866304a14c7a2a5ae758b7c5700c90b0bfca9ca7a215363da9a67"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.intro"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:excel/01_xlwings란:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:excel_01_xlwings_:v1","retrieve:excel_01_xlwings_:v2","retrieve:excel_01_xlwings_:v3"]
+    transferVariantIds: ["transfer:excel_01_xlwings_:near-v1","transfer:excel_01_xlwings_:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "excel/02_xlwings설치"
+    identityLedgerRef: "identity-ledger/excel.yml"
+    lessonContentHash: "b22ae409b2873bcf0983c978dd32770383edda84be8357157e693cfa7e1779c7"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.intro"]
+    prerequisites: ["automation.excel.intro"]
+    reinforcesOutcomeIds: ["automation.excel.intro"]
+    runtimeTier: local
+    checkSpecId: "lesson:excel/02_xlwings설치:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:excel_02_xlwings__:v1","retrieve:excel_02_xlwings__:v2","retrieve:excel_02_xlwings__:v3"]
+    transferVariantIds: ["transfer:excel_02_xlwings__:near-v1","transfer:excel_02_xlwings__:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "excel/03_xlwingsLite"
+    identityLedgerRef: "identity-ledger/excel.yml"
+    lessonContentHash: "5f66ab5f50ffffa192922a79701db9f37864cbee8d266eb1f75641596d07a959"
+    disposition: migrate
+    ownerPacket: "05-office-automation"
+    eligiblePathIds: ["officeAutomation"]
+    outcomes: ["automation.excel.workbook"]
+    prerequisites: ["automation.excel.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:excel/03_xlwingsLite:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:excel_03_xlwingsLite:v1","retrieve:excel_03_xlwingsLite:v2","retrieve:excel_03_xlwingsLite:v3"]
+    transferVariantIds: ["transfer:excel_03_xlwingsLite:near-v1","transfer:excel_03_xlwingsLite:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

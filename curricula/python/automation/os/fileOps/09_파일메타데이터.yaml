@@ -337,3 +337,303 @@ sections:
     check:
       noError: describeFile 호출과 stat, datetime 변환이 한 흐름에서 끝나야 한다.
       resultCheck: record 딕셔너리가 path, size, modifiedAt, mode 네 키를 모두 채우고 본문 기대값과 같아야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: fileOps_09-file-metadata-descriptor-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - file-size
+    - combined-record
+    title: 파일 metadata를 portable artifact descriptor로 정규화하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: path·kind·size·modified time·content hash·mode를 검증 가능한 구조로 만든다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - artifact path는 root 상대 identity로 저장하세요.
+    - modified time만이 아니라 content hash와 byte length를 함께 기록하세요.
+    exercise:
+      prompt: normalize_file_metadata(metadata, root)를 완성하세요.
+      starterCode: |-
+        def normalize_file_metadata(metadata, root):
+            raise NotImplementedError
+      solution: |
+        def normalize_file_metadata(metadata, root):
+            from pathlib import PurePosixPath
+            path = PurePosixPath(metadata["path"])
+            try:
+                relative = path.relative_to(PurePosixPath(root)).as_posix()
+            except ValueError as error:
+                raise ValueError("path outside root") from error
+            if metadata.get("size", -1) < 0 or not metadata.get("contentHash"):
+                raise ValueError("invalid metadata")
+            return {"path": relative, "kind": metadata.get("kind", "file"), "byteLength": metadata["size"], "modifiedNs": metadata["modifiedNs"], "contentHash": metadata["contentHash"], "mode": metadata.get("mode")}
+      hints: *id001
+    check:
+      id: python.fileops.fileOps_09.file-metadata-descriptor.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_09.file-metadata-descriptor.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: normalize_file_metadata
+        cases:
+        - id: normalizes-relative-descriptor
+          arguments:
+          - value:
+              path: /root/sub/a.txt
+              size: 5
+              modifiedNs: 10
+              contentHash: abc
+              mode: '0644'
+          - value: /root
+          expectedReturn:
+            path: sub/a.txt
+            kind: file
+            byteLength: 5
+            modifiedNs: 10
+            contentHash: abc
+            mode: '0644'
+        - id: preserves-explicit-kind
+          arguments:
+          - value:
+              path: /root/folder
+              kind: directory
+              size: 0
+              modifiedNs: 1
+              contentHash: tree
+          - value: /root
+          expectedReturn:
+            path: folder
+            kind: directory
+            byteLength: 0
+            modifiedNs: 1
+            contentHash: tree
+            mode: null
+        - id: rejects-outside-root
+          arguments:
+          - value:
+              path: /other/a
+              size: 1
+              modifiedNs: 1
+              contentHash: x
+          - value: /root
+          expectedException: ValueError
+        - id: rejects-negative-size
+          arguments:
+          - value:
+              path: /root/a
+              size: -1
+              modifiedNs: 1
+              contentHash: x
+          - value: /root
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: fileOps_09-metadata-policy-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - fileOps_09-file-metadata-descriptor-mastery
+    title: 새 artifact metadata에 크기·나이·permission 정책 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 정책 위반을 path별 사유로 분리한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - metadata 정책의 threshold를 report와 함께 보존하세요.
+    - 한 파일의 복수 위반 사유를 첫 번째 하나로 숨기지 마세요.
+    exercise:
+      prompt: audit_metadata_policy(items, now_ns, policy)를 완성하세요.
+      starterCode: |-
+        def audit_metadata_policy(items, now_ns, policy):
+            raise NotImplementedError
+      solution: |
+        def audit_metadata_policy(items, now_ns, policy):
+            violations = []
+            for item in items:
+                reasons = []
+                if item["byteLength"] > policy["maximumBytes"]:
+                    reasons.append("size")
+                if now_ns - item["modifiedNs"] > policy["maximumAgeNs"]:
+                    reasons.append("age")
+                if item.get("mode") in policy.get("blockedModes", []):
+                    reasons.append("mode")
+                if reasons:
+                    violations.append({"path": item["path"], "reasons": reasons})
+            return {"accepted": not violations, "violations": violations, "itemCount": len(items)}
+      hints: *id002
+    check:
+      id: python.fileops.fileOps_09.metadata-policy-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_09.metadata-policy-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_metadata_policy
+        cases:
+        - id: accepts-within-policy
+          arguments:
+          - value:
+            - path: a
+              byteLength: 10
+              modifiedNs: 90
+              mode: '0644'
+          - value: 100
+          - value:
+              maximumBytes: 20
+              maximumAgeNs: 20
+              blockedModes:
+              - '0777'
+          expectedReturn:
+            accepted: true
+            violations: []
+            itemCount: 1
+        - id: reports-size-age-and-mode
+          arguments:
+          - value:
+            - path: a
+              byteLength: 30
+              modifiedNs: 50
+              mode: '0777'
+          - value: 100
+          - value:
+              maximumBytes: 20
+              maximumAgeNs: 20
+              blockedModes:
+              - '0777'
+          expectedReturn:
+            accepted: false
+            violations:
+            - path: a
+              reasons:
+              - size
+              - age
+              - mode
+            itemCount: 1
+        - id: handles-empty-items
+          arguments:
+          - value: []
+          - value: 100
+          - value:
+              maximumBytes: 1
+              maximumAgeNs: 1
+          expectedReturn:
+            accepted: true
+            violations: []
+            itemCount: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: fileOps_09-file-metadata-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - fileOps_09-metadata-policy-audit-transfer
+    title: 파일 metadata 활용 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: identity·변경·정책 판정 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 파일 action 전에 root·충돌·dry run 계약을 확인하세요.
+    - 실행 횟수가 아니라 source와 destination artifact identity로 결과를 판정하세요.
+    exercise:
+      prompt: choose_metadata_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_metadata_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_metadata_evidence(situation):
+            table = {'identity': {'action': 'record relative path size and hash', 'evidence': 'artifact descriptor', 'risk': 'absolute path leakage'}, 'change': {'action': 'compare content hash', 'evidence': 'before after descriptors', 'risk': 'mtime-only decision'}, 'policy': {'action': 'audit size age and mode', 'evidence': 'path reasons thresholds', 'risk': 'hidden permission issue'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.fileops.fileOps_09.file-metadata-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_09.file-metadata-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_metadata_evidence
+        cases:
+        - id: recalls-identity
+          arguments:
+          - value: identity
+          expectedReturn:
+            action: record relative path size and hash
+            evidence: artifact descriptor
+            risk: absolute path leakage
+        - id: recalls-change
+          arguments:
+          - value: change
+          expectedReturn:
+            action: compare content hash
+            evidence: before after descriptors
+            risk: mtime-only decision
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

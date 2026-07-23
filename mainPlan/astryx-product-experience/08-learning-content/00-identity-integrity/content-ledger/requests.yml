@@ -1,0 +1,99 @@
+schemaVersion: 1
+category: "requests"
+canonicalRows: 5
+lessons:
+  - lessonRef: "requests/00_requests소개"
+    identityLedgerRef: "identity-ledger/requests.yml"
+    lessonContentHash: "093992f4bf555687d8d62422fe3e8417f2a39a58b8bec5b4fa172ef022c65e9a"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/03-scripting-automation"
+    eligiblePathIds: ["scriptingAutomation"]
+    outcomes: ["automation.webApi.intro"]
+    prerequisites: ["python.functions","python.modulesAndIo"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:requests/00_requests소개:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:requests_00_requests__:v1","retrieve:requests_00_requests__:v2","retrieve:requests_00_requests__:v3"]
+    transferVariantIds: ["transfer:requests_00_requests__:near-v1","transfer:requests_00_requests__:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "requests/01_첫GET요청"
+    identityLedgerRef: "identity-ledger/requests.yml"
+    lessonContentHash: "77fd612cd7895743a72d9b384dc5591a35c69cc72295bdf67f10223c94b0641c"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/03-scripting-automation"
+    eligiblePathIds: ["scriptingAutomation"]
+    outcomes: ["automation.webApi.get"]
+    prerequisites: ["automation.webApi.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:requests/01_첫GET요청:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:requests_01__GET__:v1","retrieve:requests_01__GET__:v2","retrieve:requests_01__GET__:v3"]
+    transferVariantIds: ["transfer:requests_01__GET__:near-v1","transfer:requests_01__GET__:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "requests/11_사업자등록상태조회"
+    identityLedgerRef: "identity-ledger/requests.yml"
+    lessonContentHash: "29548a6d0bd68fafac0d4214fdccdd44585ce4564909364b2821e4b15a4bedfa"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/03-scripting-automation"
+    eligiblePathIds: ["scriptingAutomation"]
+    outcomes: ["automation.webApi.businessStatus"]
+    prerequisites: ["automation.webApi.get"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:requests/11_사업자등록상태조회:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:requests_11__________:v1","retrieve:requests_11__________:v2","retrieve:requests_11__________:v3"]
+    transferVariantIds: ["transfer:requests_11__________:near-v1","transfer:requests_11__________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "requests/12_공휴일영업일계산"
+    identityLedgerRef: "identity-ledger/requests.yml"
+    lessonContentHash: "6cf895e953c8dd36962296d37ea0ac1a47aad5a8c29a37fba6f9a71c47d85456"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/03-scripting-automation"
+    eligiblePathIds: ["scriptingAutomation"]
+    outcomes: ["automation.webApi.businessDays"]
+    prerequisites: ["automation.webApi.get"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:requests/12_공휴일영업일계산:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:requests_12_________:v1","retrieve:requests_12_________:v2","retrieve:requests_12_________:v3"]
+    transferVariantIds: ["transfer:requests_12_________:near-v1","transfer:requests_12_________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "requests/13_환율조회환산"
+    identityLedgerRef: "identity-ledger/requests.yml"
+    lessonContentHash: "bea9172ad563bb9131ee52f75ca8af85963b5697ad9f9d8774077a13041307aa"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/03-scripting-automation"
+    eligiblePathIds: ["scriptingAutomation"]
+    outcomes: ["automation.webApi.exchangeRate"]
+    prerequisites: ["automation.webApi.get"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:requests/13_환율조회환산:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:requests_13_______:v1","retrieve:requests_13_______:v2","retrieve:requests_13_______:v3"]
+    transferVariantIds: ["transfer:requests_13_______:near-v1","transfer:requests_13_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

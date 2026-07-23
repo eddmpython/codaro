@@ -425,3 +425,268 @@ sections:
   check:
     noError: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.'
     resultCheck: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sympy_10-quadratic-optimization-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 종합 문제의 이차함수 최적점 검증하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 정의역 안 vertex와 두 endpoint를 비교해 최소값을 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - stationary point만 보지 말고 정의역 endpoint도 비교하세요.
+    - 도함수 0이 최소인지 이차항 부호로 확인하세요.
+    exercise:
+      prompt: minimize_quadratic(a, b, c, lower, upper)를 완성하세요.
+      starterCode: |-
+        def minimize_quadratic(a, b, c, lower, upper):
+            raise NotImplementedError
+      solution: |
+        def minimize_quadratic(a, b, c, lower, upper):
+            if lower > upper: raise ValueError("invalid domain")
+            candidates = [lower, upper]
+            if a != 0:
+                vertex = -b/(2*a)
+                if lower <= vertex <= upper: candidates.append(vertex)
+            scored = [(a*x*x+b*x+c, x) for x in candidates]
+            value, x = min(scored)
+            return {"x": x, "value": value, "candidates": sorted(set(candidates))}
+      hints: *id001
+    check:
+      id: python.sympy.sympy_10.quadratic-optimization.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_10.quadratic-optimization.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: minimize_quadratic
+        cases:
+        - id: finds-interior-minimum
+          arguments:
+          - value: 1
+          - value: -4
+          - value: 5
+          - value: 0
+          - value: 5
+          expectedReturn:
+            x: 2.0
+            value: 1.0
+            candidates:
+            - 0
+            - 2.0
+            - 5
+        - id: uses-boundary-for-concave
+          arguments:
+          - value: -1
+          - value: 0
+          - value: 0
+          - value: -2
+          - value: 1
+          expectedReturn:
+            x: -2
+            value: -4
+            candidates:
+            - -2
+            - 0.0
+            - 1
+        - id: rejects-domain
+          arguments:
+          - value: 1
+          - value: 0
+          - value: 0
+          - value: 2
+          - value: 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sympy_10-solution-residual-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sympy_10-quadratic-optimization-mastery
+    title: 새 수학 pipeline에 검산 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 후보 해를 원 식에 대입해 tolerance 내 residual과 실패 항목을 반환한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 해를 구한 방법과 독립적으로 원 식 residual을 계산하세요.
+    - tolerance를 0으로 고정하지 말고 숫자 표현에 맞추세요.
+    exercise:
+      prompt: audit_solutions(coefficients, candidates, tolerance)를 완성하세요.
+      starterCode: |-
+        def audit_solutions(coefficients, candidates, tolerance):
+            raise NotImplementedError
+      solution: |
+        def audit_solutions(coefficients, candidates, tolerance):
+            rows = []
+            for value in candidates:
+                residual = abs(sum(coefficient*value**power for power, coefficient in enumerate(coefficients)))
+                rows.append({"value": value, "residual": round(residual,12), "valid": residual <= tolerance})
+            return {"rows": rows, "allValid": all(row["valid"] for row in rows)}
+      hints: *id002
+    check:
+      id: python.sympy.sympy_10.solution-residual.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_10.solution-residual.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_solutions
+        cases:
+        - id: validates-roots
+          arguments:
+          - value:
+            - -1
+            - 0
+            - 1
+          - value:
+            - -1
+            - 1
+          - value: 1.0e-09
+          expectedReturn:
+            rows:
+            - value: -1
+              residual: 0
+              valid: true
+            - value: 1
+              residual: 0
+              valid: true
+            allValid: true
+        - id: reports-invalid-candidate
+          arguments:
+          - value:
+            - -2
+            - 1
+          - value:
+            - 0
+            - 2
+          - value: 0
+          expectedReturn:
+            rows:
+            - value: 0
+              residual: 2
+              valid: false
+            - value: 2
+              residual: 0
+              valid: true
+            allValid: false
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sympy_10-math-project-evidence-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sympy_10-solution-residual-transfer
+    title: 종합 수학 문제 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 기호 결과·정의역·검산을 한 chain으로 묶는다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 기호 계산의 가정과 정의역을 결과와 함께 남기세요.
+    - 소수 근삿값과 exact 결과를 구분하세요.
+    exercise:
+      prompt: choose_math_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_math_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_math_evidence(situation):
+            table = {'closed-form-solution': {'method': 'symbolic derivation', 'evidence': 'substitution residual', 'risk': 'missing branches'}, 'domain-optimization': {'method': 'critical points plus boundaries', 'evidence': 'candidate ledger', 'risk': 'stationary-only'}, 'reported-decimal': {'method': 'exact then approximate', 'evidence': 'precision and exact source', 'risk': 'early rounding'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sympy.sympy_10.math-project-evidence.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_10.math-project-evidence.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_math_evidence
+        cases:
+        - id: recalls-closed-form-solution
+          arguments:
+          - value: closed-form-solution
+          expectedReturn:
+            method: symbolic derivation
+            evidence: substitution residual
+            risk: missing branches
+        - id: recalls-domain-optimization
+          arguments:
+          - value: domain-optimization
+          expectedReturn:
+            method: critical points plus boundaries
+            evidence: candidate ledger
+            risk: stationary-only
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

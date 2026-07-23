@@ -290,3 +290,833 @@ sections:
   check:
     noError: 그리드 출력이 오류 없이 끝나야 합니다.
     resultCheck: 4개 셀이 모두 다른 이미지로 출력되어야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: visionBasics_07-lookup_table-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - identity_lut
+    - practice
+    title: 룩업 테이블 입력 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 256-entry LUT와 uint8 index 계약을 검증한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지를 실행하기 전에 shape·dtype·좌표·threshold 계약을 데이터로 검증하세요.
+    - Web에서는 불변식 판단을 실행하고 Local에서는 실제 픽셀·렌더 artifact를 확인하세요.
+    exercise:
+      prompt: audit_lookup_table_contract(value)를 완성해 주제별 입력 불변식 위반을 반환하세요.
+      starterCode: |-
+        def audit_lookup_table_contract(value):
+            raise NotImplementedError
+      solution: |
+        def audit_lookup_table_contract(value):
+            required = ['values', 'inputDtype', 'outputDtype']
+            rules = [{'id': 'lut-length', 'field': 'values', 'kind': 'length', 'value': 256}, {'id': 'input-dtype', 'field': 'inputDtype', 'kind': 'enum', 'values': ['uint8']}, {'id': 'output-dtype', 'field': 'outputDtype', 'kind': 'enum', 'values': ['uint8', 'float32']}]
+            missing = sorted(field for field in required if field not in value)
+            violations = []
+            for rule in rules:
+                field = rule["field"]
+                current = value.get(field)
+                kind = rule["kind"]
+                failed = False
+                if kind == "range":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < rule["min"] or current > rule["max"]
+                elif kind == "enum":
+                    failed = current not in rule["values"]
+                elif kind == "odd":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current <= 0 or current % 2 == 0
+                elif kind == "positive":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current <= 0
+                elif kind == "unit-interval":
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or current < 0 or current > 1
+                elif kind == "not-equal":
+                    failed = current == value.get(rule["other"])
+                elif kind == "ordered":
+                    other = value.get(rule["other"])
+                    failed = not isinstance(current, (int, float)) or isinstance(current, bool) or not isinstance(other, (int, float)) or isinstance(other, bool) or current >= other
+                elif kind == "length":
+                    failed = not isinstance(current, (list, tuple)) or len(current) != rule["value"]
+                elif kind == "divisible":
+                    failed = not isinstance(current, int) or isinstance(current, bool) or current % rule["value"] != 0
+                elif kind == "nonempty":
+                    failed = not isinstance(current, (str, list, tuple, dict)) or len(current) == 0
+                if failed:
+                    violations.append(rule["id"])
+            violations.sort()
+            return {"accepted": not missing and not violations, "topic": 'lookup_table', "missing": missing, "violations": violations}
+      hints: *id001
+    check:
+      id: python.vision-basics.visionBasics_07.lookup_table-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_07.lookup_table-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_lookup_table_contract
+        cases:
+        - id: accepts-valid-contract
+          arguments:
+          - value:
+              values:
+              - 0
+              - 1
+              - 2
+              - 3
+              - 4
+              - 5
+              - 6
+              - 7
+              - 8
+              - 9
+              - 10
+              - 11
+              - 12
+              - 13
+              - 14
+              - 15
+              - 16
+              - 17
+              - 18
+              - 19
+              - 20
+              - 21
+              - 22
+              - 23
+              - 24
+              - 25
+              - 26
+              - 27
+              - 28
+              - 29
+              - 30
+              - 31
+              - 32
+              - 33
+              - 34
+              - 35
+              - 36
+              - 37
+              - 38
+              - 39
+              - 40
+              - 41
+              - 42
+              - 43
+              - 44
+              - 45
+              - 46
+              - 47
+              - 48
+              - 49
+              - 50
+              - 51
+              - 52
+              - 53
+              - 54
+              - 55
+              - 56
+              - 57
+              - 58
+              - 59
+              - 60
+              - 61
+              - 62
+              - 63
+              - 64
+              - 65
+              - 66
+              - 67
+              - 68
+              - 69
+              - 70
+              - 71
+              - 72
+              - 73
+              - 74
+              - 75
+              - 76
+              - 77
+              - 78
+              - 79
+              - 80
+              - 81
+              - 82
+              - 83
+              - 84
+              - 85
+              - 86
+              - 87
+              - 88
+              - 89
+              - 90
+              - 91
+              - 92
+              - 93
+              - 94
+              - 95
+              - 96
+              - 97
+              - 98
+              - 99
+              - 100
+              - 101
+              - 102
+              - 103
+              - 104
+              - 105
+              - 106
+              - 107
+              - 108
+              - 109
+              - 110
+              - 111
+              - 112
+              - 113
+              - 114
+              - 115
+              - 116
+              - 117
+              - 118
+              - 119
+              - 120
+              - 121
+              - 122
+              - 123
+              - 124
+              - 125
+              - 126
+              - 127
+              - 128
+              - 129
+              - 130
+              - 131
+              - 132
+              - 133
+              - 134
+              - 135
+              - 136
+              - 137
+              - 138
+              - 139
+              - 140
+              - 141
+              - 142
+              - 143
+              - 144
+              - 145
+              - 146
+              - 147
+              - 148
+              - 149
+              - 150
+              - 151
+              - 152
+              - 153
+              - 154
+              - 155
+              - 156
+              - 157
+              - 158
+              - 159
+              - 160
+              - 161
+              - 162
+              - 163
+              - 164
+              - 165
+              - 166
+              - 167
+              - 168
+              - 169
+              - 170
+              - 171
+              - 172
+              - 173
+              - 174
+              - 175
+              - 176
+              - 177
+              - 178
+              - 179
+              - 180
+              - 181
+              - 182
+              - 183
+              - 184
+              - 185
+              - 186
+              - 187
+              - 188
+              - 189
+              - 190
+              - 191
+              - 192
+              - 193
+              - 194
+              - 195
+              - 196
+              - 197
+              - 198
+              - 199
+              - 200
+              - 201
+              - 202
+              - 203
+              - 204
+              - 205
+              - 206
+              - 207
+              - 208
+              - 209
+              - 210
+              - 211
+              - 212
+              - 213
+              - 214
+              - 215
+              - 216
+              - 217
+              - 218
+              - 219
+              - 220
+              - 221
+              - 222
+              - 223
+              - 224
+              - 225
+              - 226
+              - 227
+              - 228
+              - 229
+              - 230
+              - 231
+              - 232
+              - 233
+              - 234
+              - 235
+              - 236
+              - 237
+              - 238
+              - 239
+              - 240
+              - 241
+              - 242
+              - 243
+              - 244
+              - 245
+              - 246
+              - 247
+              - 248
+              - 249
+              - 250
+              - 251
+              - 252
+              - 253
+              - 254
+              - 255
+              inputDtype: uint8
+              outputDtype: uint8
+          expectedReturn:
+            accepted: true
+            topic: lookup_table
+            missing: []
+            violations: []
+        - id: reports-missing-field
+          arguments:
+          - value:
+              inputDtype: uint8
+              outputDtype: uint8
+          expectedReturn:
+            accepted: false
+            topic: lookup_table
+            missing:
+            - values
+            violations:
+            - lut-length
+        - id: reports-topic-invariants
+          arguments:
+          - value:
+              values:
+              - 0
+              - 1
+              - 2
+              - 3
+              - 4
+              - 5
+              - 6
+              - 7
+              - 8
+              - 9
+              - 10
+              - 11
+              - 12
+              - 13
+              - 14
+              - 15
+              - 16
+              - 17
+              - 18
+              - 19
+              - 20
+              - 21
+              - 22
+              - 23
+              - 24
+              - 25
+              - 26
+              - 27
+              - 28
+              - 29
+              - 30
+              - 31
+              - 32
+              - 33
+              - 34
+              - 35
+              - 36
+              - 37
+              - 38
+              - 39
+              - 40
+              - 41
+              - 42
+              - 43
+              - 44
+              - 45
+              - 46
+              - 47
+              - 48
+              - 49
+              - 50
+              - 51
+              - 52
+              - 53
+              - 54
+              - 55
+              - 56
+              - 57
+              - 58
+              - 59
+              - 60
+              - 61
+              - 62
+              - 63
+              - 64
+              - 65
+              - 66
+              - 67
+              - 68
+              - 69
+              - 70
+              - 71
+              - 72
+              - 73
+              - 74
+              - 75
+              - 76
+              - 77
+              - 78
+              - 79
+              - 80
+              - 81
+              - 82
+              - 83
+              - 84
+              - 85
+              - 86
+              - 87
+              - 88
+              - 89
+              - 90
+              - 91
+              - 92
+              - 93
+              - 94
+              - 95
+              - 96
+              - 97
+              - 98
+              - 99
+              - 100
+              - 101
+              - 102
+              - 103
+              - 104
+              - 105
+              - 106
+              - 107
+              - 108
+              - 109
+              - 110
+              - 111
+              - 112
+              - 113
+              - 114
+              - 115
+              - 116
+              - 117
+              - 118
+              - 119
+              - 120
+              - 121
+              - 122
+              - 123
+              - 124
+              - 125
+              - 126
+              - 127
+              - 128
+              - 129
+              - 130
+              - 131
+              - 132
+              - 133
+              - 134
+              - 135
+              - 136
+              - 137
+              - 138
+              - 139
+              - 140
+              - 141
+              - 142
+              - 143
+              - 144
+              - 145
+              - 146
+              - 147
+              - 148
+              - 149
+              - 150
+              - 151
+              - 152
+              - 153
+              - 154
+              - 155
+              - 156
+              - 157
+              - 158
+              - 159
+              - 160
+              - 161
+              - 162
+              - 163
+              - 164
+              - 165
+              - 166
+              - 167
+              - 168
+              - 169
+              - 170
+              - 171
+              - 172
+              - 173
+              - 174
+              - 175
+              - 176
+              - 177
+              - 178
+              - 179
+              - 180
+              - 181
+              - 182
+              - 183
+              - 184
+              - 185
+              - 186
+              - 187
+              - 188
+              - 189
+              - 190
+              - 191
+              - 192
+              - 193
+              - 194
+              - 195
+              - 196
+              - 197
+              - 198
+              - 199
+              - 200
+              - 201
+              - 202
+              - 203
+              - 204
+              - 205
+              - 206
+              - 207
+              - 208
+              - 209
+              - 210
+              - 211
+              - 212
+              - 213
+              - 214
+              - 215
+              - 216
+              - 217
+              - 218
+              - 219
+              - 220
+              - 221
+              - 222
+              - 223
+              - 224
+              - 225
+              - 226
+              - 227
+              - 228
+              - 229
+              - 230
+              - 231
+              - 232
+              - 233
+              - 234
+              - 235
+              - 236
+              - 237
+              - 238
+              - 239
+              - 240
+              - 241
+              - 242
+              - 243
+              - 244
+              - 245
+              - 246
+              - 247
+              - 248
+              - 249
+              - 250
+              - 251
+              - 252
+              - 253
+              - 254
+              inputDtype: float32
+              outputDtype: int64
+          expectedReturn:
+            accepted: false
+            topic: lookup_table
+            missing: []
+            violations:
+            - input-dtype
+            - lut-length
+            - output-dtype
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: visionBasics_07-lookup_table-result-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionBasics_07-lookup_table-contract-audit-mastery
+    title: 룩업 테이블 결과를 새 입력에 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: artifact identity와 수치 metric을 허용 오차 안에서 함께 검증한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 같은 파일명보다 source hash·frame ID 같은 안정적인 identity를 비교하세요.
+    - 정확히 같아야 하는 값과 tolerance가 필요한 metric을 분리하세요.
+    exercise:
+      prompt: reconcile_lookup_table_result(expected, observed)를 완성하세요.
+      starterCode: |-
+        def reconcile_lookup_table_result(expected, observed):
+            raise NotImplementedError
+      solution: |
+        def reconcile_lookup_table_result(expected, observed):
+            identity = ['sourceHash', 'lutHash']
+            metrics = {'distinctOutputCount': 0}
+            required = set(identity) | set(metrics)
+            missing = sorted(required - set(observed))
+            identity_mismatch = sorted(field for field in identity if field in observed and observed[field] != expected.get(field))
+            metric_drift = []
+            for field, tolerance in metrics.items():
+                if field not in observed:
+                    continue
+                actual = observed[field]
+                target = expected.get(field)
+                if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not isinstance(target, (int, float)) or isinstance(target, bool) or abs(actual - target) > tolerance:
+                    metric_drift.append(field)
+            metric_drift.sort()
+            return {"passed": not missing and not identity_mismatch and not metric_drift, "topic": 'lookup_table', "missing": missing, "identityMismatch": identity_mismatch, "metricDrift": metric_drift}
+      hints: *id002
+    check:
+      id: python.vision-basics.visionBasics_07.lookup_table-result-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_07.lookup_table-result-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: reconcile_lookup_table_result
+        cases:
+        - id: accepts-reconciled-result
+          arguments:
+          - value:
+              sourceHash: l1
+              lutHash: lut-a
+              distinctOutputCount: 200
+          - value:
+              sourceHash: l1
+              lutHash: lut-a
+              distinctOutputCount: 200
+          expectedReturn:
+            passed: true
+            topic: lookup_table
+            missing: []
+            identityMismatch: []
+            metricDrift: []
+        - id: reports-identity-or-metric-drift
+          arguments:
+          - value:
+              sourceHash: l1
+              lutHash: lut-a
+              distinctOutputCount: 200
+          - value:
+              sourceHash: l2
+              lutHash: lut-b
+              distinctOutputCount: 120
+          expectedReturn:
+            passed: false
+            topic: lookup_table
+            missing: []
+            identityMismatch:
+            - lutHash
+            - sourceHash
+            metricDrift:
+            - distinctOutputCount
+        - id: reports-missing-result-fields
+          arguments:
+          - value:
+              sourceHash: l1
+              lutHash: lut-a
+              distinctOutputCount: 200
+          - value: {}
+          expectedReturn:
+            passed: false
+            topic: lookup_table
+            missing:
+            - distinctOutputCount
+            - lutHash
+            - sourceHash
+            identityMismatch: []
+            metricDrift: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: visionBasics_07-lookup_table-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - visionBasics_07-lookup_table-result-reconciliation-transfer
+    title: 룩업 테이블 검증 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 입력·처리·결과 단계의 action, evidence, risk를 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 각 단계가 남기는 관찰 가능한 증거를 먼저 떠올리세요.
+    - 패키지 호출 성공과 비전 결과의 정확성을 같은 증거로 보지 마세요.
+    exercise:
+      prompt: choose_lookup_table_evidence(stage)를 완성하세요.
+      starterCode: |-
+        def choose_lookup_table_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_lookup_table_evidence(stage):
+            stages = {'input': {'action': 'validate lookup-table input contract', 'evidence': '256-value LUT manifest', 'risk': 'misinterpreted pixels'}, 'process': {'action': 'apply bounded lookup-table operation', 'evidence': 'indexed mapping trace', 'risk': 'silent shape or range drift'}, 'result': {'action': 'reconcile lookup-table result', 'evidence': 'distinct output count', 'risk': 'plausible but wrong image'}}
+            if stage not in stages:
+                raise ValueError('unknown vision stage')
+            return stages[stage]
+      hints: *id003
+    check:
+      id: python.vision-basics.visionBasics_07.lookup_table-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.vision-basics.visionBasics_07.lookup_table-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_lookup_table_evidence
+        cases:
+        - id: recalls-input
+          arguments:
+          - value: input
+          expectedReturn:
+            action: validate lookup-table input contract
+            evidence: 256-value LUT manifest
+            risk: misinterpreted pixels
+        - id: recalls-process
+          arguments:
+          - value: process
+          expectedReturn:
+            action: apply bounded lookup-table operation
+            evidence: indexed mapping trace
+            risk: silent shape or range drift
+        - id: recalls-result
+          arguments:
+          - value: result
+          expectedReturn:
+            action: reconcile lookup-table result
+            evidence: distinct output count
+            risk: plausible but wrong image
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

@@ -2,29 +2,9 @@ meta:
   outcomeId: python.functions
   status: draft
   version: 1
-  note: "초안 - Predict-Run-Reconcile-Adapt 루프 1단계 시드. 사람이 정제 필요."
+  note: "초안 - 실제 코드와 에러로 관찰 가능한 오개념 시드. 사람이 정제 필요."
 
 misconceptions:
-  - id: python.functions.missingReturn
-    label: "return 없이 결과를 받으려 함"
-    summary: "함수에 return이 없는데 result = f()로 받아 None이 들어 있다."
-    triggers:
-      - kind: predictionMismatch
-        appliesTo: prediction
-        expectedField: value
-        mismatchPattern: "None"
-        description: "예측은 값, 실제는 None."
-    diagnostic:
-      message: "return 문이 없는 함수는 자동으로 None을 반환합니다. print만 있고 return이 없으면 값을 받을 수 없습니다."
-      references: ["python.functions"]
-    correction:
-      hint: "함수에서 값을 돌려주려면 `return value` 를 명시하세요."
-      miniExercise: |
-        def double(value):
-            return value * 2
-        result = double(7)
-        result
-
   - id: python.functions.mutableDefaultArg
     label: "기본 인자에 mutable 객체"
     summary: "def f(items=[]): items.append(x) 패턴에서 호출이 누적된다."
@@ -33,10 +13,6 @@ misconceptions:
         appliesTo: code
         pattern: "def\\s+\\w+\\([^)]*=\\s*(\\[\\]|\\{\\})"
         description: "기본 인자 자리에 list/dict 리터럴."
-      - kind: predictionMismatch
-        appliesTo: prediction
-        expectedField: value
-        description: "함수를 두 번 호출했을 때 두 번째가 깨끗할 거라 예측, 실제는 누적."
     diagnostic:
       message: "기본 인자는 함수 정의 시 단 한 번 평가됩니다. mutable 기본값은 호출 간에 공유돼 예상치 못한 누적을 일으킵니다."
       references: ["python.functions", "python.lists"]

@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "playwright"
+canonicalRows: 11
+lessons:
+  - lessonRef: "playwright/00_playwright소개"
+    identityLedgerRef: "identity-ledger/playwright.yml"
+    lessonContentHash: "f1a09af1eff9bc54cf10ee537106b2e1595014e5d98001c6555dbd937534bbe5"
+    disposition: migrate
+    ownerPacket: "06-web-monitoring"
+    eligiblePathIds: ["webMonitoring"]
+    outcomes: ["automation.browser.basics"]
+    prerequisites: ["python.functions","python.modulesAndIo"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:playwright/00_playwright소개:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:playwright_00_playwright__:v1","retrieve:playwright_00_playwright__:v2","retrieve:playwright_00_playwright__:v3"]
+    transferVariantIds: ["transfer:playwright_00_playwright__:near-v1","transfer:playwright_00_playwright__:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "playwright/01_첫브라우저실행"
+    identityLedgerRef: "identity-ledger/playwright.yml"
+    lessonContentHash: "ff3435d0f600a96b9614af01e87adb0968db21c8bfabc00cf0afc604e9acb4dc"
+    disposition: migrate
+    ownerPacket: "06-web-monitoring"
+    eligiblePathIds: ["webMonitoring"]
+    outcomes: ["automation.browser.basics"]
+    prerequisites: ["automation.browser.basics"]
+    reinforcesOutcomeIds: ["automation.browser.basics"]
+    runtimeTier: local
+    checkSpecId: "lesson:playwright/01_첫브라우저실행:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:playwright_01________:v1","retrieve:playwright_01________:v2","retrieve:playwright_01________:v3"]
+    transferVariantIds: ["transfer:playwright_01________:near-v1","transfer:playwright_01________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "playwright/02_locator와폼입력"
+    identityLedgerRef: "identity-ledger/playwright.yml"
+    lessonContentHash: "348d26f580c5c68a4704ca91e1f573bb6b9ecee4a2fd4c25a570e92494471186"
+    disposition: migrate
+    ownerPacket: "06-web-monitoring"
+    eligiblePathIds: ["webMonitoring"]
+    outcomes: ["automation.browser.formInput"]
+    prerequisites: ["automation.browser.basics"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:playwright/02_locator와폼입력:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:playwright_02_locator____:v1","retrieve:playwright_02_locator____:v2","retrieve:playwright_02_locator____:v3"]
+    transferVariantIds: ["transfer:playwright_02_locator____:near-v1","transfer:playwright_02_locator____:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "playwright/03_기다림과검증"
+    identityLedgerRef: "identity-ledger/playwright.yml"
+    lessonContentHash: "a518cbdcc1868f9ea808f00f2e18aacbca48fd6a889b2ec9bba40ffcfa1e6bc4"
+    disposition: migrate
+    ownerPacket: "06-web-monitoring"
+    eligiblePathIds: ["webMonitoring"]
+    outcomes: ["automation.browser.formInput"]
+    prerequisites: ["automation.browser.formInput"]
+    reinforcesOutcomeIds: ["automation.browser.formInput"]
+    runtimeTier: local
+    checkSpecId: "lesson:playwright/03_기다림과검증:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:playwright_03_______:v1","retrieve:playwright_03_______:v2","retrieve:playwright_03_______:v3"]
+    transferVariantIds: ["transfer:playwright_03_______:near-v1","transfer:playwright_03_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "playwright/04_스크린샷과증거"
+    identityLedgerRef: "identity-ledger/playwright.yml"
+    lessonContentHash: "8f75bedcc6fc71e856696b3ed825ee50b15c80594c30fa06c27bed2f1b76440d"
+    disposition: migrate
+    ownerPacket: "06-web-monitoring"
+    eligiblePathIds: ["webMonitoring"]
+    outcomes: ["automation.browser.evidence"]
+    prerequisites: ["automation.browser.basics"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:playwright/04_스크린샷과증거:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:playwright_04________:v1","retrieve:playwright_04________:v2","retrieve:playwright_04________:v3"]
+    transferVariantIds: ["transfer:playwright_04________:near-v1","transfer:playwright_04________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "playwright/05_네트워크모킹"
+    identityLedgerRef: "identity-ledger/playwright.yml"
+    lessonContentHash: "cdc6f38cc89c6f2cb089e195c0a948e92ecc9dfd702cd6f6cef016a376d7f1ee"
+    disposition: migrate
+    ownerPacket: "06-web-monitoring"
+    eligiblePathIds: ["webMonitoring"]
+    outcomes: ["automation.browser.testFlow"]
+    prerequisites: ["automation.browser.formInput"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:playwright/05_네트워크모킹:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:playwright_05_______:v1","retrieve:playwright_05_______:v2","retrieve:playwright_05_______:v3"]
+    transferVariantIds: ["transfer:playwright_05_______:near-v1","transfer:playwright_05_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "playwright/06_로그인상태와스토리지"
+    identityLedgerRef: "identity-ledger/playwright.yml"
+    lessonContentHash: "538471644a4057129176b4d601b89b014c14a4f6bb251eea2c57d21a9d2c6d21"
+    disposition: migrate
+    ownerPacket: "06-web-monitoring"
+    eligiblePathIds: ["webMonitoring"]
+    outcomes: ["automation.browser.session"]
+    prerequisites: ["automation.browser.formInput"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:playwright/06_로그인상태와스토리지:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:playwright_06___________:v1","retrieve:playwright_06___________:v2","retrieve:playwright_06___________:v3"]
+    transferVariantIds: ["transfer:playwright_06___________:near-v1","transfer:playwright_06___________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "playwright/07_페이지객체와재사용"
+    identityLedgerRef: "identity-ledger/playwright.yml"
+    lessonContentHash: "fd73bea8412fe448b2d153d28d8483e8a32a4eaec786bb17c5b857b31f3506e3"
+    disposition: migrate
+    ownerPacket: "06-web-monitoring"
+    eligiblePathIds: ["webMonitoring"]
+    outcomes: ["automation.browser.testFlow"]
+    prerequisites: ["automation.browser.formInput","python.oop"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:playwright/07_페이지객체와재사용:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:playwright_07__________:v1","retrieve:playwright_07__________:v2","retrieve:playwright_07__________:v3"]
+    transferVariantIds: ["transfer:playwright_07__________:near-v1","transfer:playwright_07__________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "playwright/08_pytest흐름"
+    identityLedgerRef: "identity-ledger/playwright.yml"
+    lessonContentHash: "82100839c9e85725397c1acb4ab6bf1885cfb206117909aa31597289860fa0fd"
+    disposition: migrate
+    ownerPacket: "06-web-monitoring"
+    eligiblePathIds: ["webMonitoring"]
+    outcomes: ["automation.browser.testFlow"]
+    prerequisites: ["automation.browser.formInput","automation.browser.evidence"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:playwright/08_pytest흐름:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:playwright_08_pytest__:v1","retrieve:playwright_08_pytest__:v2","retrieve:playwright_08_pytest__:v3"]
+    transferVariantIds: ["transfer:playwright_08_pytest__:near-v1","transfer:playwright_08_pytest__:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "playwright/09_트레이스와디버깅"
+    identityLedgerRef: "identity-ledger/playwright.yml"
+    lessonContentHash: "1aa8dbc356eecd4a415d6b48940afc199a9d86c7d6ec938f202a9240457db266"
+    disposition: migrate
+    ownerPacket: "06-web-monitoring"
+    eligiblePathIds: ["webMonitoring"]
+    outcomes: ["automation.browser.evidence"]
+    prerequisites: ["automation.browser.evidence"]
+    reinforcesOutcomeIds: ["automation.browser.evidence"]
+    runtimeTier: local
+    checkSpecId: "lesson:playwright/09_트레이스와디버깅:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:playwright_09_________:v1","retrieve:playwright_09_________:v2","retrieve:playwright_09_________:v3"]
+    transferVariantIds: ["transfer:playwright_09_________:near-v1","transfer:playwright_09_________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "playwright/10_종합브라우저점검프로젝트"
+    identityLedgerRef: "identity-ledger/playwright.yml"
+    lessonContentHash: "2d69a73f830d97ab3a18ae6a72a1bd9d32e34407b09785fe294be7db862436ca"
+    disposition: migrate
+    ownerPacket: "06-web-monitoring"
+    eligiblePathIds: ["webMonitoring"]
+    outcomes: ["automation.browser.audit"]
+    prerequisites: ["automation.browser.testFlow","automation.browser.evidence"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:playwright/10_종합브라우저점검프로젝트:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:playwright_10_____________:v1","retrieve:playwright_10_____________:v2","retrieve:playwright_10_____________:v3"]
+    transferVariantIds: ["transfer:playwright_10_____________:near-v1","transfer:playwright_10_____________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

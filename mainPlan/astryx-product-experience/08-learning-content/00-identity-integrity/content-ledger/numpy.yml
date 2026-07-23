@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "numpy"
+canonicalRows: 11
+lessons:
+  - lessonRef: "numpy/00_NumPy소개"
+    identityLedgerRef: "identity-ledger/numpy.yml"
+    lessonContentHash: "6c865ed5868a0e5c9fba4a129785d04635bce93b728ace65c25bdcbf26904a47"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["machineLearning","scientificComputing","statisticalAnalysis"]
+    outcomes: ["numpy.intro"]
+    prerequisites: ["python.lists","python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:numpy/00_NumPy소개:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:numpy_00_NumPy__:v1","retrieve:numpy_00_NumPy__:v2","retrieve:numpy_00_NumPy__:v3"]
+    transferVariantIds: ["transfer:numpy_00_NumPy__:near-v1","transfer:numpy_00_NumPy__:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "numpy/01_포켓몬스탯분석"
+    identityLedgerRef: "identity-ledger/numpy.yml"
+    lessonContentHash: "3c353baa592797196947e824ad12977780f580c161c735ff827376e92e155d15"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["computerVision","deepLearningVision","machineLearning","scientificComputing"]
+    outcomes: ["numpy.arrayOps"]
+    prerequisites: ["numpy.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:numpy/01_포켓몬스탯분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:numpy_01________:v1","retrieve:numpy_01________:v2","retrieve:numpy_01________:v3"]
+    transferVariantIds: ["transfer:numpy_01________:near-v1","transfer:numpy_01________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "numpy/02_기온데이터탐색"
+    identityLedgerRef: "identity-ledger/numpy.yml"
+    lessonContentHash: "0ba1cb99f05700587ce3c3ca878af0cde610fe566a619e528d821178ee98c871"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing","statisticalAnalysis"]
+    outcomes: ["numpy.statistics"]
+    prerequisites: ["numpy.arrayOps"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:numpy/02_기온데이터탐색:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:numpy_02________:v1","retrieve:numpy_02________:v2","retrieve:numpy_02________:v3"]
+    transferVariantIds: ["transfer:numpy_02________:near-v1","transfer:numpy_02________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "numpy/03_지진발생패턴"
+    identityLedgerRef: "identity-ledger/numpy.yml"
+    lessonContentHash: "171fac243ddd6dc55e3dcf3a907ac730fde06c8281ca6ed92ef3d89a2bd849a1"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing","statisticalAnalysis"]
+    outcomes: ["numpy.statistics"]
+    prerequisites: ["numpy.statistics"]
+    reinforcesOutcomeIds: ["numpy.statistics"]
+    runtimeTier: browser
+    checkSpecId: "lesson:numpy/03_지진발생패턴:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:numpy_03_______:v1","retrieve:numpy_03_______:v2","retrieve:numpy_03_______:v3"]
+    transferVariantIds: ["transfer:numpy_03_______:near-v1","transfer:numpy_03_______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "numpy/04_음악특성분석"
+    identityLedgerRef: "identity-ledger/numpy.yml"
+    lessonContentHash: "1e5f2b6a34a21dcb625ae8a9c3b46f0a77bcd1857d51cac34dbf12206617b938"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["computerVision","deepLearningVision","machineLearning","scientificComputing","statisticalAnalysis"]
+    outcomes: ["numpy.arrayOps","numpy.statistics"]
+    prerequisites: ["numpy.statistics"]
+    reinforcesOutcomeIds: ["numpy.statistics"]
+    runtimeTier: browser
+    checkSpecId: "lesson:numpy/04_음악특성분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:numpy_04_______:v1","retrieve:numpy_04_______:v2","retrieve:numpy_04_______:v3"]
+    transferVariantIds: ["transfer:numpy_04_______:near-v1","transfer:numpy_04_______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "numpy/05_BMI계산기"
+    identityLedgerRef: "identity-ledger/numpy.yml"
+    lessonContentHash: "4826349047d756519739e87e0f7a19fa23a1c1fbd81df6ae108413b8deb07584"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["computerVision","deepLearningVision","machineLearning","scientificComputing"]
+    outcomes: ["numpy.arrayOps"]
+    prerequisites: ["numpy.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:numpy/05_BMI계산기:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:numpy_05_BMI___:v1","retrieve:numpy_05_BMI___:v2","retrieve:numpy_05_BMI___:v3"]
+    transferVariantIds: ["transfer:numpy_05_BMI___:near-v1","transfer:numpy_05_BMI___:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "numpy/06_심장병위험분석"
+    identityLedgerRef: "identity-ledger/numpy.yml"
+    lessonContentHash: "16f6794d090a3fc567f0732450e4c448b382dde3a95c0098fb82ae42aac69a8f"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing","statisticalAnalysis"]
+    outcomes: ["numpy.statistics"]
+    prerequisites: ["numpy.statistics"]
+    reinforcesOutcomeIds: ["numpy.statistics"]
+    runtimeTier: browser
+    checkSpecId: "lesson:numpy/06_심장병위험분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:numpy_06________:v1","retrieve:numpy_06________:v2","retrieve:numpy_06________:v3"]
+    transferVariantIds: ["transfer:numpy_06________:near-v1","transfer:numpy_06________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "numpy/07_대기질시계열"
+    identityLedgerRef: "identity-ledger/numpy.yml"
+    lessonContentHash: "8d287e1c18cb779d8b5527926218968aa177d281c9bf65d4e5c45e8696444c40"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing","statisticalAnalysis"]
+    outcomes: ["numpy.statistics"]
+    prerequisites: ["numpy.statistics"]
+    reinforcesOutcomeIds: ["numpy.statistics"]
+    runtimeTier: browser
+    checkSpecId: "lesson:numpy/07_대기질시계열:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:numpy_07_______:v1","retrieve:numpy_07_______:v2","retrieve:numpy_07_______:v3"]
+    transferVariantIds: ["transfer:numpy_07_______:near-v1","transfer:numpy_07_______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "numpy/08_행복지수국가비교"
+    identityLedgerRef: "identity-ledger/numpy.yml"
+    lessonContentHash: "968d4d31953afe5bcef74030acf9b036d86defc4a2da3e4fe1550b71e2170eab"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing","statisticalAnalysis"]
+    outcomes: ["numpy.statistics"]
+    prerequisites: ["numpy.statistics"]
+    reinforcesOutcomeIds: ["numpy.statistics"]
+    runtimeTier: browser
+    checkSpecId: "lesson:numpy/08_행복지수국가비교:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:numpy_08_________:v1","retrieve:numpy_08_________:v2","retrieve:numpy_08_________:v3"]
+    transferVariantIds: ["transfer:numpy_08_________:near-v1","transfer:numpy_08_________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "numpy/09_전복나이예측"
+    identityLedgerRef: "identity-ledger/numpy.yml"
+    lessonContentHash: "0469fdf7fc652ef872c2ecf2cc2c0a26a32a4a23d630ca10f7e0b4fe9d936871"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing"]
+    outcomes: ["numpy.linearAlgebra"]
+    prerequisites: ["numpy.arrayOps"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:numpy/09_전복나이예측:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:numpy_09_______:v1","retrieve:numpy_09_______:v2","retrieve:numpy_09_______:v3"]
+    transferVariantIds: ["transfer:numpy_09_______:near-v1","transfer:numpy_09_______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "numpy/10_당뇨병종합분석"
+    identityLedgerRef: "identity-ledger/numpy.yml"
+    lessonContentHash: "a908e5c80850e0e69c18f5ef21c1d42d8be14dda81a7d9f14be3306a42e7c070"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing","statisticalAnalysis"]
+    outcomes: ["numpy.linearAlgebra","numpy.statistics"]
+    prerequisites: ["numpy.linearAlgebra"]
+    reinforcesOutcomeIds: ["numpy.linearAlgebra"]
+    runtimeTier: browser
+    checkSpecId: "lesson:numpy/10_당뇨병종합분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:numpy_10________:v1","retrieve:numpy_10________:v2","retrieve:numpy_10________:v3"]
+    transferVariantIds: ["transfer:numpy_10________:near-v1","transfer:numpy_10________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

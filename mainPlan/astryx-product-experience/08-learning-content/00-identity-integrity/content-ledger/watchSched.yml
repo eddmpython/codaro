@@ -1,0 +1,194 @@
+schemaVersion: 1
+category: "watchSched"
+canonicalRows: 10
+lessons:
+  - lessonRef: "watchSched/01_watchdog첫감시"
+    identityLedgerRef: "identity-ledger/watchSched.yml"
+    lessonContentHash: "9a79227232299e2477bdd1e6aeacfdb982bd912412bedf81797380a36b9bd0fa"
+    disposition: migrate
+    ownerPacket: "04-file-automation"
+    eligiblePathIds: ["fileAutomation","systemMonitoring"]
+    outcomes: ["automation.watchSched"]
+    prerequisites: ["python.functions","builtins.fileSystem"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:watchSched/01_watchdog첫감시:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:watchSched_01_watchdog___:v1","retrieve:watchSched_01_watchdog___:v2","retrieve:watchSched_01_watchdog___:v3"]
+    transferVariantIds: ["transfer:watchSched_01_watchdog___:near-v1","transfer:watchSched_01_watchdog___:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "watchSched/02_이벤트타입구분"
+    identityLedgerRef: "identity-ledger/watchSched.yml"
+    lessonContentHash: "0a72f9f86a0cfbdac69565bd2d0c384c099d9f9d39293035f7d2b8ad6de260a6"
+    disposition: migrate
+    ownerPacket: "04-file-automation"
+    eligiblePathIds: ["fileAutomation","systemMonitoring"]
+    outcomes: ["automation.watchSched"]
+    prerequisites: ["automation.watchSched"]
+    reinforcesOutcomeIds: ["automation.watchSched"]
+    runtimeTier: local
+    checkSpecId: "lesson:watchSched/02_이벤트타입구분:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:watchSched_02________:v1","retrieve:watchSched_02________:v2","retrieve:watchSched_02________:v3"]
+    transferVariantIds: ["transfer:watchSched_02________:near-v1","transfer:watchSched_02________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "watchSched/03_디바운스와안정화"
+    identityLedgerRef: "identity-ledger/watchSched.yml"
+    lessonContentHash: "c522ea10bad9c744b8baf819fd9cd2fecdcbc098488a13656b0ccc5aa9741e02"
+    disposition: migrate
+    ownerPacket: "04-file-automation"
+    eligiblePathIds: ["fileAutomation","systemMonitoring"]
+    outcomes: ["automation.watchSched"]
+    prerequisites: ["automation.watchSched"]
+    reinforcesOutcomeIds: ["automation.watchSched"]
+    runtimeTier: local
+    checkSpecId: "lesson:watchSched/03_디바운스와안정화:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:watchSched_03_________:v1","retrieve:watchSched_03_________:v2","retrieve:watchSched_03_________:v3"]
+    transferVariantIds: ["transfer:watchSched_03_________:near-v1","transfer:watchSched_03_________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "watchSched/04_재귀감시와필터"
+    identityLedgerRef: "identity-ledger/watchSched.yml"
+    lessonContentHash: "af79997a9a7f902ad61a2a5d107bab0767dc4a839e5fa85bcb51ac975d2af7af"
+    disposition: migrate
+    ownerPacket: "04-file-automation"
+    eligiblePathIds: ["fileAutomation","systemMonitoring"]
+    outcomes: ["automation.watchSched"]
+    prerequisites: ["automation.watchSched"]
+    reinforcesOutcomeIds: ["automation.watchSched"]
+    runtimeTier: local
+    checkSpecId: "lesson:watchSched/04_재귀감시와필터:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:watchSched_04________:v1","retrieve:watchSched_04________:v2","retrieve:watchSched_04________:v3"]
+    transferVariantIds: ["transfer:watchSched_04________:near-v1","transfer:watchSched_04________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "watchSched/05_schedule간단스케줄"
+    identityLedgerRef: "identity-ledger/watchSched.yml"
+    lessonContentHash: "500811e7352878222c41042e1045b6c4f9f871d08cf566f4732d4150209cdbaa"
+    disposition: migrate
+    ownerPacket: "04-file-automation"
+    eligiblePathIds: ["fileAutomation"]
+    outcomes: ["automation.scheduling"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:watchSched/05_schedule간단스케줄:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:watchSched_05_schedule_____:v1","retrieve:watchSched_05_schedule_____:v2","retrieve:watchSched_05_schedule_____:v3"]
+    transferVariantIds: ["transfer:watchSched_05_schedule_____:near-v1","transfer:watchSched_05_schedule_____:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "watchSched/06_APScheduler소개"
+    identityLedgerRef: "identity-ledger/watchSched.yml"
+    lessonContentHash: "0490df37274a37ac052d4193597b7550b841b94950adc44e0f2b8c0b5d3ad625"
+    disposition: migrate
+    ownerPacket: "04-file-automation"
+    eligiblePathIds: ["fileAutomation"]
+    outcomes: ["automation.scheduling"]
+    prerequisites: ["automation.scheduling"]
+    reinforcesOutcomeIds: ["automation.scheduling"]
+    runtimeTier: local
+    checkSpecId: "lesson:watchSched/06_APScheduler소개:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:watchSched_06_APScheduler__:v1","retrieve:watchSched_06_APScheduler__:v2","retrieve:watchSched_06_APScheduler__:v3"]
+    transferVariantIds: ["transfer:watchSched_06_APScheduler__:near-v1","transfer:watchSched_06_APScheduler__:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "watchSched/07_cron표현식"
+    identityLedgerRef: "identity-ledger/watchSched.yml"
+    lessonContentHash: "df9b9e916cafc49f39e325a9697b1a9ba30cdfe4c9b192e0c905f16ca55602d7"
+    disposition: migrate
+    ownerPacket: "04-file-automation"
+    eligiblePathIds: ["fileAutomation"]
+    outcomes: ["automation.scheduling"]
+    prerequisites: ["automation.scheduling"]
+    reinforcesOutcomeIds: ["automation.scheduling"]
+    runtimeTier: local
+    checkSpecId: "lesson:watchSched/07_cron표현식:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:watchSched_07_cron___:v1","retrieve:watchSched_07_cron___:v2","retrieve:watchSched_07_cron___:v3"]
+    transferVariantIds: ["transfer:watchSched_07_cron___:near-v1","transfer:watchSched_07_cron___:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "watchSched/08_영속스케줄"
+    identityLedgerRef: "identity-ledger/watchSched.yml"
+    lessonContentHash: "b2c6f1134c855265f3db138f6eeb75fe11354f7f8927197f7d37ef9fb182bc71"
+    disposition: migrate
+    ownerPacket: "04-file-automation"
+    eligiblePathIds: ["fileAutomation"]
+    outcomes: ["automation.scheduling"]
+    prerequisites: ["automation.scheduling"]
+    reinforcesOutcomeIds: ["automation.scheduling"]
+    runtimeTier: local
+    checkSpecId: "lesson:watchSched/08_영속스케줄:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:watchSched_08______:v1","retrieve:watchSched_08______:v2","retrieve:watchSched_08______:v3"]
+    transferVariantIds: ["transfer:watchSched_08______:near-v1","transfer:watchSched_08______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "watchSched/09_실패와재시도"
+    identityLedgerRef: "identity-ledger/watchSched.yml"
+    lessonContentHash: "e166427f776eac2ad50128b0346e6c6c00c82ef468d50cdcecf66da26568cd75"
+    disposition: migrate
+    ownerPacket: "04-file-automation"
+    eligiblePathIds: ["fileAutomation"]
+    outcomes: ["automation.scheduling"]
+    prerequisites: ["automation.scheduling"]
+    reinforcesOutcomeIds: ["automation.scheduling"]
+    runtimeTier: local
+    checkSpecId: "lesson:watchSched/09_실패와재시도:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:watchSched_09_______:v1","retrieve:watchSched_09_______:v2","retrieve:watchSched_09_______:v3"]
+    transferVariantIds: ["transfer:watchSched_09_______:near-v1","transfer:watchSched_09_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "watchSched/10_종합폴더감시리포터"
+    identityLedgerRef: "identity-ledger/watchSched.yml"
+    lessonContentHash: "44f99d43bc8e7567bb51c3de59c7c56d380e9d632d21053570a473a21e9393a3"
+    disposition: migrate
+    ownerPacket: "04-file-automation"
+    eligiblePathIds: ["fileAutomation"]
+    outcomes: ["automation.watchSched","automation.scheduling"]
+    prerequisites: ["automation.watchSched","automation.scheduling"]
+    reinforcesOutcomeIds: ["automation.watchSched","automation.scheduling"]
+    runtimeTier: local
+    checkSpecId: "lesson:watchSched/10_종합폴더감시리포터:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:watchSched_10__________:v1","retrieve:watchSched_10__________:v2","retrieve:watchSched_10__________:v3"]
+    transferVariantIds: ["transfer:watchSched_10__________:near-v1","transfer:watchSched_10__________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

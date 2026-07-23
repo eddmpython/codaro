@@ -1,0 +1,54 @@
+schemaVersion: 1
+category: "deepVision"
+sourceCount: 10
+lessons:
+  - lessonRef: "deepVision/01_torchvision입문"
+    sourcePath: "curricula/python/imageVision/deepVision/01_torchvision입문.yaml"
+    metaId: "deepVision_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "deepVision/02_ResNet분류"
+    sourcePath: "curricula/python/imageVision/deepVision/02_ResNet분류.yaml"
+    metaId: "deepVision_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "deepVision/03_임베딩벡터"
+    sourcePath: "curricula/python/imageVision/deepVision/03_임베딩벡터.yaml"
+    metaId: "deepVision_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "deepVision/04_유사도검색"
+    sourcePath: "curricula/python/imageVision/deepVision/04_유사도검색.yaml"
+    metaId: "deepVision_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "deepVision/05_객체탐지"
+    sourcePath: "curricula/python/imageVision/deepVision/05_객체탐지.yaml"
+    metaId: "deepVision_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "deepVision/06_세그멘테이션"
+    sourcePath: "curricula/python/imageVision/deepVision/06_세그멘테이션.yaml"
+    metaId: "deepVision_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "deepVision/07_포즈추정"
+    sourcePath: "curricula/python/imageVision/deepVision/07_포즈추정.yaml"
+    metaId: "deepVision_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "deepVision/08_전이학습"
+    sourcePath: "curricula/python/imageVision/deepVision/08_전이학습.yaml"
+    metaId: "deepVision_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "deepVision/09_모델비교"
+    sourcePath: "curricula/python/imageVision/deepVision/09_모델비교.yaml"
+    metaId: "deepVision_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "deepVision/10_종합사진태깅기"
+    sourcePath: "curricula/python/imageVision/deepVision/10_종합사진태깅기.yaml"
+    metaId: "deepVision_10"
+    registryStatus: registered
+    reviewStatus: pending

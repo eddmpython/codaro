@@ -488,3 +488,295 @@ sections:
   check:
     noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 04_advanced_functools-cached-currency-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - partial_function
+    - lru_cache
+    - workflow_validation
+    title: partial과 lru_cache로 세금 포함 금액 리포트 만들기
+    subtitle: cached currency formatter
+    goal: 가격 목록과 세율을 받아 세금 포함 금액 문자열, 반복 호출 cache hit, miss 수를 반환한다.
+    why: functools는 함수 이름 암기가 아니라, 인자 고정과 캐시를 조합해 반복 계산을 읽기 쉬운 유틸리티로 만드는 데 가치가 있습니다.
+    explanation: build_taxed_currency_report(prices, tax_rate)를 완성해 partial로 통화 포매터를 만들고 lru_cache로 중복 가격 계산을 재사용하세요.
+    tips:
+    - 같은 price가 반복되면 cache_info().hits가 증가해야 합니다.
+    - 빈 prices는 빈 rendered와 repeated None으로 처리하세요.
+    exercise:
+      prompt: build_taxed_currency_report(prices, tax_rate)를 완성해 rendered, repeated, cacheHits, cacheMisses를 반환하세요.
+      starterCode: |-
+        def build_taxed_currency_report(prices, tax_rate):
+            raise NotImplementedError
+      solution: |-
+        def build_taxed_currency_report(prices, tax_rate):
+            from functools import lru_cache, partial
+
+            def format_currency(value, currency):
+                return f"{currency}{value:,}"
+
+            won = partial(format_currency, currency="₩")
+
+            @lru_cache(maxsize=4)
+            def tax_included(price):
+                return int(price * (1 + tax_rate))
+
+            rendered = [won(tax_included(price)) for price in prices]
+            repeated = won(tax_included(prices[0])) if prices else None
+            info = tax_included.cache_info()
+            return {
+                "rendered": rendered,
+                "repeated": repeated,
+                "cacheHits": info.hits,
+                "cacheMisses": info.misses,
+            }
+      hints:
+      - partial은 currency 인자를 미리 고정하는 데 쓰세요.
+      - cache_info()는 hits와 misses를 named tuple처럼 제공합니다.
+    check:
+      id: python.advanced.functools.cached-currency.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.functools.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_taxed_currency_report
+        cases:
+        - id: formats-repeated-prices-with-cache-stats
+          arguments:
+          - value:
+            - 1000
+            - 2000
+            - 1000
+          - value: 0.1
+          expectedReturn:
+            rendered:
+            - ₩1,100
+            - ₩2,200
+            - ₩1,100
+            repeated: ₩1,100
+            cacheHits: 2
+            cacheMisses: 2
+        - id: handles-empty-price-list
+          arguments:
+          - value: []
+          - value: 0.1
+          expectedReturn:
+            rendered: []
+            repeated: null
+            cacheHits: 0
+            cacheMisses: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 04_advanced_functools-singledispatch-render-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - singledispatch
+    - partial_function
+    - workflow_validation
+    title: singledispatch로 int, list, dict 값을 일관된 문자열로 렌더링하기
+    subtitle: typed renderer utility
+    goal: 여러 타입이 섞인 값을 받아 타입별 renderer를 적용한 문자열 목록을 반환한다.
+    why: 전이 과제에서는 functools를 리포트 금액 밖으로 옮겨, 타입별 처리를 if 사슬 대신 등록 가능한 함수로 나누는 감각을 확인합니다.
+    explanation: render_typed_values(values)를 완성해 int, list, dict, 기본 타입을 singledispatch로 처리하세요.
+    tips:
+    - dict는 key 순서가 흔들리지 않게 sorted(value.items())를 쓰세요.
+    - list renderer는 내부 항목도 render 함수로 재귀 렌더링해야 합니다.
+    exercise:
+      prompt: render_typed_values(values)를 완성해 타입별 렌더링 결과 목록을 반환하세요.
+      starterCode: |-
+        def render_typed_values(values):
+            raise NotImplementedError
+      solution: |-
+        def render_typed_values(values):
+            from functools import singledispatch
+
+            @singledispatch
+            def render(value):
+                return str(value)
+
+            @render.register
+            def _(value: int):
+                return f"#{value}"
+
+            @render.register
+            def _(value: list):
+                return "[" + "|".join(render(item) for item in value) + "]"
+
+            @render.register
+            def _(value: dict):
+                return ", ".join(f"{key}={render(item)}" for key, item in sorted(value.items()))
+
+            return [render(value) for value in values]
+      hints:
+      - singledispatch는 첫 번째 인자의 타입으로 구현을 고릅니다.
+      - dict 안에 list가 있으면 list renderer가 다시 호출되어야 합니다.
+    check:
+      id: python.advanced.functools.singledispatch-render.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.functools.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: render_typed_values
+        cases:
+        - id: renders-nested-dict-and-list-by-type
+          arguments:
+          - value:
+            - 3
+            - b: 2
+              a:
+              - 1
+              - 2
+            - x
+          expectedReturn:
+          - '#3'
+          - a=[#1|#2], b=#2
+          - x
+        - id: renders-empty-list
+          arguments:
+          - value:
+            - []
+          expectedReturn:
+          - '[]'
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 04_advanced_functools-tool-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 04_advanced_functools-singledispatch-render-transfer
+    title: partial, lru_cache, wraps, singledispatch 사용처 회상하기
+    subtitle: functools tool recall
+    goal: 목적 이름을 받아 적절한 functools 도구와 사용 이유, 상태성 여부를 반환한다.
+    why: 시간이 지나도 남아야 할 지식은 각 도구의 이름보다 인자 고정, 반복 계산 캐싱, 메타데이터 보존, 타입별 분기의 선택 기준입니다.
+    explanation: choose_functools_tool(goal)를 완성해 fix-argument, cache-repeat, keep-metadata, dispatch-by-type 목적별 도구를 고르세요.
+    tips:
+    - wraps는 실행 결과를 바꾸기보다 함수 정보를 보존합니다.
+    - lru_cache는 내부 cache 상태를 가집니다.
+    exercise:
+      prompt: choose_functools_tool(goal)를 완성해 목적별 functools 도구 선택 결과를 반환하세요.
+      starterCode: |-
+        def choose_functools_tool(goal):
+            raise NotImplementedError
+      solution: |-
+        def choose_functools_tool(goal):
+            table = {
+                "fix-argument": {
+                    "tool": "partial",
+                    "useWhen": "pre-fill one or more function arguments",
+                    "stateful": False,
+                },
+                "cache-repeat": {
+                    "tool": "lru_cache",
+                    "useWhen": "reuse results for the same hashable arguments",
+                    "stateful": True,
+                },
+                "keep-metadata": {
+                    "tool": "wraps",
+                    "useWhen": "preserve __name__ and __doc__ inside decorators",
+                    "stateful": False,
+                },
+                "dispatch-by-type": {
+                    "tool": "singledispatch",
+                    "useWhen": "choose implementation from the first argument type",
+                    "stateful": False,
+                },
+            }
+            if goal not in table:
+                raise ValueError("unknown functools goal")
+            return table[goal]
+      hints:
+      - partial은 새 함수를 만들지만 cache를 만들지는 않습니다.
+      - lru_cache는 인자가 hashable이어야 합니다.
+    check:
+      id: python.advanced.functools.tool-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.functools.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_functools_tool
+        cases:
+        - id: recalls-partial-for-fixed-arguments
+          arguments:
+          - value: fix-argument
+          expectedReturn:
+            tool: partial
+            useWhen: pre-fill one or more function arguments
+            stateful: false
+        - id: recalls-lru-cache-for-repeated-calls
+          arguments:
+          - value: cache-repeat
+          expectedReturn:
+            tool: lru_cache
+            useWhen: reuse results for the same hashable arguments
+            stateful: true
+        - id: rejects-unknown-goal
+          arguments:
+          - value: monkeypatch-runtime
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

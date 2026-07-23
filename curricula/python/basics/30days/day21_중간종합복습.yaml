@@ -71,9 +71,6 @@ sections:
     hints:
     - 바꿀 지점은 `phrase = ...` 오른쪽 값입니다.
     - 실행 뒤 `phrase` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 자료구조 복습에서 `phrase` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -99,10 +96,6 @@ sections:
     hints:
     - 바꿀 지점은 if 조건식에 들어가는 비교값이나 boolean 값에서 찾으세요.
     - 실행 뒤 true/false 분기 중 어떤 코드가 평가됐는지 출력이나 변수값으로 확인하세요.
-    predict:
-      prompt: score = 85 일 때 삼항 조건식이 어떤 문자열을 반환할까요?
-      expectedValue: "'B'"
-      expectedDtype: str
   check:
     type: noError
     noError: 제어문 복습의 조건식과 들여쓰기가 맞아 선택한 분기가 실행되어야 합니다.
@@ -132,9 +125,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 함수 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -166,9 +156,6 @@ sections:
     hints:
     - 바꿀 지점은 `radius = ...` 오른쪽 값입니다.
     - 실행 뒤 `radius` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 모듈과 파일 복습에서 `radius` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -203,9 +190,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 예외 처리 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
@@ -239,9 +223,6 @@ sections:
     hints:
     - 바꿀 지점은 for 오른쪽의 리스트, range(), 슬라이스, 조건에서 찾으세요.
     - 실행 뒤 반복 횟수, 누적값, 만들어진 리스트 길이가 바뀐 입력을 반영하는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 통합 실전 문제의 반복 대상과 들여쓰기가 맞아 루프가 끝까지 실행되어야 합니다.
@@ -391,9 +372,6 @@ sections:
     hints:
     - 바꿀 지점은 def 줄의 매개변수, 함수 본문, 함수 호출 인자에서 찾으세요.
     - 실행 뒤 반환값이나 출력값이 바꾼 인자/계산식과 맞는지 보세요.
-    predict:
-      prompt: 이 코드를 실행하면 어떤 예외가 발생할까요?
-      expectedError: KeyError
   check:
     type: noError
     noError: '현업 흐름 검증: 주문 데이터를 정제하고 리포트 만들기의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.'
@@ -419,9 +397,6 @@ sections:
     hints:
     - 바꿀 지점은 `text = ...` 오른쪽 값입니다.
     - 실행 뒤 `text` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: Day 21 종합 복습에서 `text` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -439,3 +414,232 @@ sections:
     - 약점
     - 자동화
     aiFollowup: 학습자가 고른 약한 영역에 해당하는 Day 강의 ID 1-2개를 안내하고 자동화 아이디어를 한 줄 짧게 강화한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: day21-summarize-orders-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - data_structures_review
+    - reflection
+    title: 주문 목록을 한 번에 요약하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 리스트와 딕셔너리, 조건, 합계를 결합한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: summarize_orders(orders)가 주문 수, 전체 금액, paid 주문 수를 딕셔너리로 반환하도록 완성하세요.
+      starterCode: |-
+        def summarize_orders(orders):
+            raise NotImplementedError
+      solution: |-
+        def summarize_orders(orders):
+            return {
+                'count': len(orders),
+                'total': sum(order['amount'] for order in orders),
+                'paid': sum(1 for order in orders if order['status'] == 'paid'),
+            }
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day21.summarize-orders.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day21.summarize-orders.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_orders
+        cases:
+        - id: mixed
+          arguments:
+          - value:
+            - amount: 1000
+              status: paid
+            - amount: 2500
+              status: pending
+          expectedReturn:
+            count: 2
+            total: 3500
+            paid: 1
+        - id: empty
+          arguments:
+          - value: []
+          expectedReturn:
+            count: 0
+            total: 0
+            paid: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day21-group-totals-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day21-summarize-orders-mastery
+    title: 범주별 금액 합계 만들기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 반복 누적을 처음 보는 레코드 그룹화에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: group_totals(rows)가 category별 amount 합계를 딕셔너리로 반환하도록 완성하세요.
+      starterCode: |-
+        def group_totals(rows):
+            raise NotImplementedError
+      solution: |-
+        def group_totals(rows):
+            totals = {}
+            for row in rows:
+                category = row['category']
+                totals[category] = totals.get(category, 0) + row['amount']
+            return totals
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day21.group-totals.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day21.group-totals.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: group_totals
+        cases:
+        - id: sales
+          arguments:
+          - value:
+            - category: book
+              amount: 10
+            - category: pen
+              amount: 3
+            - category: book
+              amount: 7
+          expectedReturn:
+            book: 17
+            pen: 3
+        - id: single
+          arguments:
+          - value:
+            - category: file
+              amount: 5
+          expectedReturn:
+            file: 5
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day21-normalize-records-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day21-group-totals-transfer
+    title: 튜플 레코드를 정렬된 문구로 정리하기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 컬렉션 문법을 기억에서 다시 연결한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: normalize_records(records)가 (name, score)를 score 내림차순의 'name:score' 목록으로 반환하도록 완성하세요.
+      starterCode: |-
+        def normalize_records(records):
+            raise NotImplementedError
+      solution: |-
+        def normalize_records(records):
+            ordered = sorted(records, key=lambda item: item[1], reverse=True)
+            return [f"{name}:{score}" for name, score in ordered]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day21.normalize-records.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day21.normalize-records.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: normalize_records
+        cases:
+        - id: scores
+          arguments:
+          - value:
+            - - Mina
+              - 80
+            - - Jun
+              - 95
+          expectedReturn:
+          - Jun:95
+          - Mina:80
+        - id: tie-order
+          arguments:
+          - value:
+            - - A
+              - 10
+            - - B
+              - 20
+            - - C
+              - 15
+          expectedReturn:
+          - B:20
+          - C:15
+          - A:10
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

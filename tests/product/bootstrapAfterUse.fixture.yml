@@ -1,0 +1,14 @@
+schemaVersion: 1
+caseId: bootstrap-after-use
+expectedFailure: creation-after-consumption
+milestones:
+  B0: 0
+  B1: 1
+artifacts:
+  - path: mainPlan/completion-evidence.schema.yml
+    creationOwner:
+      packet: 02-completion-and-gate-bootstrap
+      milestone: B1
+    consumers:
+      - packet: 03-learning-vertical-slice
+        milestone: B0

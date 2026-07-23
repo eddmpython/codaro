@@ -455,3 +455,291 @@ sections:
     check:
       noError: 종합 패턴 함수와 자식 파일 작성이 끝나야 한다.
       resultCheck: report dict의 matched가 csv 두 개만 정렬된 형태로 담아야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: watchSched_04-recursive-watch-filter-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pattern-handler
+    - filter-summary
+    title: 재귀 감시 path의 include·exclude·depth 판정하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: root 상대 path를 기준으로 directory 제외와 최대 depth를 적용한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 문자열 prefix가 아니라 root 상대 path 구조로 scope를 검사하세요.
+    - 생성 output directory와 최대 재귀 depth를 명시하세요.
+    exercise:
+      prompt: filter_recursive_paths(paths, root, excluded_parts, maximum_depth)를 완성하세요.
+      starterCode: |-
+        def filter_recursive_paths(paths, root, excluded_parts, maximum_depth):
+            raise NotImplementedError
+      solution: |
+        def filter_recursive_paths(paths, root, excluded_parts, maximum_depth):
+            from pathlib import PurePosixPath
+            root_path = PurePosixPath(root)
+            accepted = []
+            rejected = []
+            for value in paths:
+                path = PurePosixPath(value)
+                try:
+                    relative = path.relative_to(root_path)
+                except ValueError:
+                    rejected.append({"path": value, "reason": "root"})
+                    continue
+                if any(part in excluded_parts for part in relative.parts[:-1]):
+                    rejected.append({"path": value, "reason": "excluded"})
+                elif len(relative.parts) - 1 > maximum_depth:
+                    rejected.append({"path": value, "reason": "depth"})
+                else:
+                    accepted.append(value)
+            return {"accepted": accepted, "rejected": rejected}
+      hints: *id001
+    check:
+      id: python.watchsched.watchSched_04.recursive-watch-filter.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.watchsched.watchSched_04.recursive-watch-filter.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: filter_recursive_paths
+        cases:
+        - id: accepts-within-depth
+          arguments:
+          - value:
+            - /root/a.txt
+            - /root/sub/b.txt
+          - value: /root
+          - value:
+            - output
+          - value: 1
+          expectedReturn:
+            accepted:
+            - /root/a.txt
+            - /root/sub/b.txt
+            rejected: []
+        - id: rejects-excluded-directory
+          arguments:
+          - value:
+            - /root/output/a.txt
+          - value: /root
+          - value:
+            - output
+          - value: 3
+          expectedReturn:
+            accepted: []
+            rejected:
+            - path: /root/output/a.txt
+              reason: excluded
+        - id: rejects-depth-and-root
+          arguments:
+          - value:
+            - /root/a/b/c.txt
+            - /other/x.txt
+          - value: /root
+          - value: []
+          - value: 1
+          expectedReturn:
+            accepted: []
+            rejected:
+            - path: /root/a/b/c.txt
+              reason: depth
+            - path: /other/x.txt
+              reason: root
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: watchSched_04-symlink-watch-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - watchSched_04-recursive-watch-filter-mastery
+    title: 새 재귀 감시에 symlink 경계 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: resolved target이 허용 root 밖이거나 cycle identity를 만들면 차단한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - symlink path가 root 안이어도 resolved target을 다시 검사하세요.
+    - 같은 target으로 이어지는 중복 link는 반복 감시를 막기 위해 격리하세요.
+    exercise:
+      prompt: audit_watch_links(links, allowed_root)를 완성하세요.
+      starterCode: |-
+        def audit_watch_links(links, allowed_root):
+            raise NotImplementedError
+      solution: |
+        def audit_watch_links(links, allowed_root):
+            accepted = []
+            rejected = []
+            seen_targets = set()
+            prefix = allowed_root.rstrip("/") + "/"
+            for link in links:
+                target = link["target"]
+                if not (target == allowed_root or target.startswith(prefix)):
+                    rejected.append({"path": link["path"], "reason": "target-outside-root"})
+                elif target in seen_targets:
+                    rejected.append({"path": link["path"], "reason": "duplicate-target"})
+                else:
+                    accepted.append(link["path"])
+                    seen_targets.add(target)
+            return {"accepted": accepted, "rejected": rejected}
+      hints: *id002
+    check:
+      id: python.watchsched.watchSched_04.symlink-watch-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.watchsched.watchSched_04.symlink-watch-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_watch_links
+        cases:
+        - id: accepts-in-root-link
+          arguments:
+          - value:
+            - path: /root/link
+              target: /root/data
+          - value: /root
+          expectedReturn:
+            accepted:
+            - /root/link
+            rejected: []
+        - id: rejects-outside-target
+          arguments:
+          - value:
+            - path: /root/link
+              target: /secret
+          - value: /root
+          expectedReturn:
+            accepted: []
+            rejected:
+            - path: /root/link
+              reason: target-outside-root
+        - id: rejects-duplicate-target
+          arguments:
+          - value:
+            - path: /root/a
+              target: /root/data
+            - path: /root/b
+              target: /root/data
+          - value: /root
+          expectedReturn:
+            accepted:
+            - /root/a
+            rejected:
+            - path: /root/b
+              reason: duplicate-target
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: watchSched_04-recursive-watch-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - watchSched_04-symlink-watch-audit-transfer
+    title: 재귀 감시 경계 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: depth·exclude·symlink target 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - event나 시간이 발생했다는 사실보다 처리 identity와 결과 evidence를 검증하세요.
+    - 중복·지연·재시작 상황에서 같은 업무 결과가 보존되는지 확인하세요.
+    exercise:
+      prompt: choose_recursive_watch_gate(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_recursive_watch_gate(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_recursive_watch_gate(situation):
+            table = {'depth': {'action': 'bound root-relative depth', 'evidence': 'relative parts', 'risk': 'unbounded tree'}, 'exclude': {'action': 'exclude output cache temp', 'evidence': 'directory allow and deny list', 'risk': 'self-trigger loop'}, 'symlink': {'action': 'resolve and deduplicate target', 'evidence': 'link and target identities', 'risk': 'root escape or cycle'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.watchsched.watchSched_04.recursive-watch-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.watchsched.watchSched_04.recursive-watch-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_recursive_watch_gate
+        cases:
+        - id: recalls-depth
+          arguments:
+          - value: depth
+          expectedReturn:
+            action: bound root-relative depth
+            evidence: relative parts
+            risk: unbounded tree
+        - id: recalls-exclude
+          arguments:
+          - value: exclude
+          expectedReturn:
+            action: exclude output cache temp
+            evidence: directory allow and deny list
+            risk: self-trigger loop
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

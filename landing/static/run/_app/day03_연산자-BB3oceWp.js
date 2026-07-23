@@ -1,0 +1,801 @@
+var e=`meta:
+  id: day03
+  title: 연산자
+  day: 3
+  category: 30days
+  tags:
+  - 연산자
+  - 산술연산
+  - 비교연산
+  - 논리연산
+  - 멤버십
+  - 검증
+  seo:
+    title: 파이썬 연산자 완벽 가이드
+    description: 산술, 비교, 논리, 멤버십 연산자를 배우고 연산자 우선순위를 이해합니다.
+    keywords:
+    - 연산자
+    - operator
+    - 산술연산
+    - 비교연산
+    - 논리연산
+intro:
+  emoji: 🔢
+  points:
+  - 산술 연산자로 수학 계산하기
+  - 비교 연산자로 값 비교하기
+  - 논리 연산자로 조건 조합하기
+  - 멤버십 연산자로 포함 여부 확인하기
+  direction: 연산자에서 입력값, 처리 로직, 출력 확인을 작은 스크립트로 연결합니다.
+  benefits:
+  - 문자열, 숫자, 변수 같은 예제 값 확인 후 기초 문법에 맞는 코드 입력을 고릅니다.
+  - 연산자 결과를 출력 또는 마지막 표현식 결과 기준으로 즉시 점검합니다.
+  - 완료한 코드를 작은 자동화 스크립트에 다시 사용할 수 있습니다.
+  diagram:
+    steps:
+    - label: 덧셈 연산자 입력 확인
+      detail: 입력 기준(문자열, 숫자, 변수 같은 예제 값)과 필요한 조건을 먼저 고정합니다.
+    - label: 뺄셈 연산자 처리 실행
+      detail: 기초 문법 코드를 실행해 중간 결과를 확인합니다.
+    - label: 곱셈 연산자 결과 검증
+      detail: 출력 또는 마지막 표현식 결과 기준으로 실행 결과를 비교합니다.
+    - label: 연산자 재사용
+      detail: 완성 코드를 작은 자동화 스크립트에 붙일 수 있게 정리합니다.
+    runtime:
+    - label: 기초 자동화 환경
+      detail: 표준 라이브러리 기준으로 로컬 Python 실행을 준비합니다.
+    - label: 연산자 실행
+      detail: 셀을 실행해 출력 또는 마지막 표현식 결과와 예외 상태를 확인합니다.
+    - label: 연산자 완료
+      detail: 검증된 코드를 작은 자동화 스크립트로 남깁니다.
+sections:
+- id: add_operator
+  title: 덧셈 연산자
+  structuredPrimary: true
+  subtitle: + 기호로 더하기
+  goal: 덧셈 연산자에서 \`itemA\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    덧셈 연산자(+)는 두 숫자를 더합니다. 정수끼리, 소수끼리, 정수와 소수를 섞어서도 계산할 수 있습니다. 결과는 자동으로 화면에 표시됩니다.
+
+    결과를 변수에 저장하려면 result = price + qty처럼 사용합니다.
+  snippet: |-
+    itemA = 10
+    itemB = 20
+    itemA + itemB
+  exercise:
+    prompt: 덧셈 연산자 예제에서 \`itemA\`, \`itemB\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      itemA = 10
+      itemB = 20
+      itemA + itemB
+    hints:
+    - 바꿀 지점은 \`itemA = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`itemA\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 덧셈 연산자에서 \`itemA\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 덧셈 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: sub_operator
+  title: 뺄셈 연산자
+  structuredPrimary: true
+  subtitle: '- 기호로 빼기'
+  goal: 뺄셈 연산자에서 \`budget\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 뺄셈 연산자(-)는 앞 숫자에서 뒤 숫자를 뺍니다. 음수 결과도 가능하며, 순서가 중요합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    budget = 100
+    spent = 35
+    budget - spent
+  exercise:
+    prompt: 뺄셈 연산자 예제에서 \`budget\`, \`spent\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      budget = 100
+      spent = 35
+      budget - spent
+    hints:
+    - 바꿀 지점은 \`budget = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`budget\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 뺄셈 연산자에서 \`budget\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 뺄셈 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: mul_operator
+  title: 곱셈 연산자
+  structuredPrimary: true
+  subtitle: '* 기호로 곱하기'
+  goal: 곱셈 연산자에서 \`width\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 곱셈 연산자(*)는 두 숫자를 곱합니다. 수학에서는 ×를 사용하지만, 프로그래밍에서는 *를 사용합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    width = 7
+    height = 8
+    width * height
+  exercise:
+    prompt: 곱셈 연산자 예제에서 \`width\`, \`height\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      width = 7
+      height = 8
+      width * height
+    hints:
+    - 바꿀 지점은 \`width = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`width\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 곱셈 연산자에서 \`width\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 곱셈 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: div_operator
+  title: 나눗셈 연산자
+  structuredPrimary: true
+  subtitle: / 기호로 나누기
+  goal: 나눗셈 연산자에서 \`dividend\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    나눗셈 연산자(/)는 앞 숫자를 뒤 숫자로 나눕니다. 결과는 항상 소수(float)로 나옵니다. 정수 나누기 정수도 결과는 소수입니다.
+
+    결과가 3.3333...처럼 소수로 나옵니다.
+  snippet: |-
+    dividend = 10
+    divisor = 3
+    dividend / divisor
+  exercise:
+    prompt: 나눗셈 연산자 예제에서 \`dividend\`, \`divisor\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      dividend = 10
+      divisor = 3
+      dividend / divisor
+    hints:
+    - 바꿀 지점은 \`dividend = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`dividend\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 나눗셈 연산자에서 \`dividend\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 나눗셈 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: floordiv_operator
+  title: 몫 연산자
+  structuredPrimary: true
+  subtitle: // 기호로 몫 구하기
+  goal: 몫 연산자에서 \`items\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 몫 연산자(//)는 나눗셈의 몫만 구합니다. 소수점 이하는 버리고 정수 부분만 반환합니다. 10 // 3 = 3 (나머지 1은 버림)
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    items = 17
+    boxes = 5
+    items // boxes
+  exercise:
+    prompt: 몫 연산자 예제에서 \`items\`, \`boxes\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      items = 17
+      boxes = 5
+      items // boxes
+    hints:
+    - 바꿀 지점은 \`items = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`items\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 몫 연산자에서 \`items\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 몫 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: mod_operator
+  title: 나머지 연산자
+  structuredPrimary: true
+  subtitle: '% 기호로 나머지 구하기'
+  goal: 나머지 연산자에서 \`coins\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    나머지 연산자(%)는 나눗셈의 나머지를 구합니다. 10 % 3 = 1 (10을 3으로 나누면 몫 3, 나머지 1) 짝수/홀수 판별, 배수 확인 등에 자주 사용됩니다.
+
+    val % 2가 0이면 짝수, 1이면 홀수입니다.
+  snippet: |-
+    coins = 17
+    slots = 5
+    coins % slots
+  exercise:
+    prompt: 나머지 연산자 예제에서 \`coins\`, \`slots\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      coins = 17
+      slots = 5
+      coins % slots
+    hints:
+    - 바꿀 지점은 \`coins = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`coins\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 나머지 연산자에서 \`coins\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 나머지 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: pow_operator
+  title: 거듭제곱 연산자
+  structuredPrimary: true
+  subtitle: '** 기호로 제곱 계산'
+  goal: 거듭제곱 연산자에서 \`base\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 거듭제곱 연산자(**)는 앞 숫자를 뒤 숫자만큼 거듭제곱합니다. 2 ** 3 = 8 (2 × 2 × 2) 수학의 2³를 프로그래밍에서는 2 ** 3으로 씁니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    base = 2
+    power = 10
+    base ** power
+  exercise:
+    prompt: 거듭제곱 연산자 예제에서 \`base\`, \`power\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      base = 2
+      power = 10
+      base ** power
+    hints:
+    - 바꿀 지점은 \`base = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`base\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 거듭제곱 연산자에서 \`base\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 거듭제곱 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: compare_equal
+  title: 같음 비교 연산자
+  structuredPrimary: true
+  subtitle: == 기호로 같은지 확인
+  goal: 같음 비교 연산자에서 \`left\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    같음 연산자(==)는 두 값이 같은지 비교합니다. 같으면 True, 다르면 False를 반환합니다. 주의: 대입(=)과 비교(==)는 다릅니다!
+
+    = 하나는 대입, == 두 개는 비교입니다.
+  snippet: |-
+    left = 10
+    right = 10
+    left == right
+  exercise:
+    prompt: 같음 비교 연산자 예제에서 \`left\`, \`right\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      left = 10
+      right = 10
+      left == right
+    hints:
+    - 바꿀 지점은 \`left = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`left\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 같음 비교 연산자에서 \`left\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 같음 비교 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: compare_notequal
+  title: 다름 비교 연산자
+  structuredPrimary: true
+  subtitle: '!= 기호로 다른지 확인'
+  goal: 다름 비교 연산자에서 \`first\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 다름 연산자(!=)는 두 값이 다른지 비교합니다. 다르면 True, 같으면 False를 반환합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    first = 5
+    second = 8
+    first != second
+  exercise:
+    prompt: 다름 비교 연산자 예제에서 \`first\`, \`second\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      first = 5
+      second = 8
+      first != second
+    hints:
+    - 바꿀 지점은 \`first = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`first\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 다름 비교 연산자에서 \`first\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 다름 비교 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: compare_greater
+  title: 크기 비교 연산자
+  structuredPrimary: true
+  subtitle: '> < >= <= 기호로 크기 비교'
+  goal: 크기 비교 연산자에서 \`val\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 크기 비교 연산자는 두 값의 대소를 비교합니다. > (크다), < (작다), >= (크거나 같다), <= (작거나 같다) 결과는 True 또는 False입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    val = 15
+    target = 10
+    val > target
+  exercise:
+    prompt: 크기 비교 연산자 예제에서 \`val\`, \`target\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      val = 15
+      target = 10
+      val > target
+    hints:
+    - 바꿀 지점은 \`val = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`val\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 크기 비교 연산자에서 \`val\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 크기 비교 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: logical_and
+  title: and 논리 연산자
+  structuredPrimary: true
+  subtitle: 모두 참이어야 참
+  goal: and 논리 연산자에서 \`adult\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: and 연산자는 양쪽 조건이 모두 True일 때만 True를 반환합니다. 하나라도 False면 결과는 False입니다. '그리고'의 의미입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    adult = True
+    valid = True
+    adult and valid
+  exercise:
+    prompt: and 논리 연산자 예제에서 \`adult\`, \`valid\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      adult = True
+      valid = True
+      adult and valid
+    hints:
+    - 바꿀 지점은 \`adult = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`adult\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: and 논리 연산자에서 \`adult\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: and 논리 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: logical_or
+  title: or 논리 연산자
+  structuredPrimary: true
+  subtitle: 하나만 참이어도 참
+  goal: or 논리 연산자에서 \`cash\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: or 연산자는 양쪽 조건 중 하나만 True여도 True를 반환합니다. 둘 다 False일 때만 False입니다. '또는'의 의미입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    cash = True
+    card = False
+    cash or card
+  exercise:
+    prompt: or 논리 연산자 예제에서 \`cash\`, \`card\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      cash = True
+      card = False
+      cash or card
+    hints:
+    - 바꿀 지점은 \`cash = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`cash\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: or 논리 연산자에서 \`cash\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: or 논리 연산자 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+- id: logical_not
+  title: not 논리 연산자
+  structuredPrimary: true
+  subtitle: 참과 거짓 반전
+  goal: not 논리 연산자에서 \`rain\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: not 연산자는 True를 False로, False를 True로 바꿉니다. 조건의 반대를 표현할 때 사용합니다. '아니다'의 의미입니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    rain = True
+    not rain
+  exercise:
+    prompt: not 논리 연산자 예제에서 \`rain\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      rain = True
+      not rain
+    hints:
+    - 바꿀 지점은 \`rain = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`rain\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: not 논리 연산자에서 \`rain\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: not 논리 연산자 실행 뒤 \`rain\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: membership_in
+  title: in 멤버십 연산자
+  structuredPrimary: true
+  subtitle: 포함 여부 확인
+  goal: in 멤버십 연산자에서 \`lang\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: |-
+    in 연산자는 왼쪽 값이 오른쪽 문자열에 포함되어 있는지 확인합니다. 포함되어 있으면 True, 없으면 False를 반환합니다. 문자열에서 특정 문자나 단어를 찾을 때 사용합니다.
+
+    'not in'을 사용하면 포함되지 않았는지 확인할 수 있습니다.
+  snippet: |-
+    lang = 'Python'
+    'th' in lang
+  exercise:
+    prompt: in 멤버십 연산자 예제에서 \`lang\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      lang = 'Python'
+      'th' in lang
+    hints:
+    - 바꿀 지점은 \`lang = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`lang\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: in 멤버십 연산자에서 \`lang\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: in 멤버십 연산자 실행 뒤 \`lang\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: compound_assign
+  title: 복합 대입 연산자
+  structuredPrimary: true
+  subtitle: 연산과 대입을 한번에
+  goal: 복합 대입 연산자에서 \`balance\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: 복합 대입 연산자는 연산과 대입을 동시에 합니다. x += 5는 x = x + 5와 같은 의미입니다. 코드를 더 간결하게 만들어줍니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    balance = 50
+    balance += 10
+    balance
+  exercise:
+    prompt: 복합 대입 연산자 예제에서 \`balance\` 할당값을 바꾸고 아래 표시 결과가 달라지는지 확인하세요.
+    starterCode: |-
+      balance = 50
+      balance += 10
+      balance
+    hints:
+    - 바꿀 지점은 \`balance = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`balance\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+  check:
+    type: noError
+    noError: 복합 대입 연산자에서 \`balance\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: 복합 대입 연산자 실행 뒤 \`balance\` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+- id: operator_priority
+  title: 연산자 우선순위
+  structuredPrimary: true
+  subtitle: 계산 순서 이해하기
+  goal: 연산자 우선순위에서 여러 print() 호출의 출력 순서와 줄 수를 확인한다.
+  why: 출력 확인은 코드가 의도대로 실행됐는지 가장 작게 점검하는 방법입니다.
+  explanation: |-
+    여러 연산자가 함께 사용될 때 계산 순서가 정해져 있습니다. 수학처럼 곱셈/나눗셈이 덧셈/뺄셈보다 먼저 계산됩니다. 괄호를 사용하면 우선순위를 변경할 수 있습니다.
+
+    헷갈릴 때는 괄호를 사용하면 명확해집니다.
+  snippet: |-
+    raw = 2 + 3 * 4
+    grouped = (2 + 3) * 4
+    print('without_paren:', raw)
+    print('with_paren:', grouped)
+  exercise:
+    prompt: 연산자 우선순위 예제에서 출력 문장 하나를 바꾸고 출력 줄 순서와 바뀐 줄을 확인하세요.
+    starterCode: |-
+      raw = 2 + 3 * 4
+      grouped = (2 + 3) * 4
+      print('without_paren:', raw)
+      print('with_paren:', grouped)
+    hints:
+    - 바꿀 지점은 각 print()의 따옴표 안 문구나 출력 변수에서 찾으세요.
+    - 실행 뒤 줄 수와 순서가 유지되고, 수정한 줄만 의도대로 바뀌었는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: 연산자 우선순위의 각 print() 호출이 따옴표와 괄호 조건을 만족하고 순서대로 출력되어야 합니다.
+    resultCheck: 연산자 우선순위 출력 줄 수와 순서가 유지되고, 바꾼 줄의 문구가 출력 영역에 나타나야 합니다.
+- id: workflow_validation
+  title: '검증 루프: 주문 계산식과 승인 조건'
+  structuredPrimary: true
+  subtitle: 예측 → 실행 → 오류 수정 → 검증
+  goal: '검증 루프: 주문 계산식과 승인 조건에서 예상값과 실제 실행 결과를 비교하는 검증 흐름을 확인한다.'
+  why: 예상값과 실제 결과를 코드로 비교하면 눈으로만 확인하는 실수를 줄일 수 있습니다.
+  explanation: 연산자는 계산 결과를 맞히는 문법 문제가 아니라, 업무 규칙을 숫자와 조건식으로 정확히 옮기는 도구입니다. 실행 전에는 소계, 할인, 세금, 승인 여부를 먼저
+    예측하고, 괄호 하나가 결과를 어떻게 바꾸는지 검증해야 합니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    unitPrice = 12000
+    quantity = 4
+    discountRate = 10
+    taxRate = 8
+
+    subtotal = unitPrice * quantity
+    discount = subtotal * discountRate / 100
+    taxableAmount = subtotal - discount
+    tax = taxableAmount * taxRate / 100
+    total = taxableAmount + tax
+
+    assert subtotal == 48000
+    assert discount == 4800
+    assert total == 46656
+    total
+  exercise:
+    prompt: '검증 루프: 주문 계산식과 승인 조건 예제에서 기대 문자열이나 실제 출력 문구를 바꾸고 assert 비교가 맞는지 확인하세요.'
+    starterCode: |-
+      unitPrice = 12000
+      quantity = 4
+      discountRate = 10
+      taxRate = 8
+
+      subtotal = unitPrice * quantity
+      discount = subtotal * discountRate / 100
+      taxableAmount = subtotal - discount
+      tax = taxableAmount * taxRate / 100
+      total = taxableAmount + tax
+
+      assert subtotal == 48000
+      assert discount == 4800
+      assert total == 46656
+      total
+    hints:
+    - 바꿀 지점은 expected 값과 실제 print()/계산 호출입니다.
+    - 실행 뒤 기대값과 실제 결과가 같을 때만 검증이 통과하는지 보세요.
+    predict:
+      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
+      expectedValue: (직접 실행해 본 값을 적어주세요)
+  check:
+    type: noError
+    noError: '검증 루프: 주문 계산식과 승인 조건에서 \`unitPrice\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
+    resultCheck: '검증 루프: 주문 계산식과 승인 조건에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.'
+- id: practice
+  title: Day 3 종합 복습
+  structuredPrimary: true
+  subtitle: 연산자 마스터하기
+  goal: Day 3 종합 복습에서 \`apples\` 값이 이후 출력이나 확인 결과와 어떻게 연결되는지 확인한다.
+  why: 변수 값 확인은 이후 계산, 조건, 출력에서 잘못된 입력을 빨리 찾게 해줍니다.
+  explanation: Day 3에서 배운 연산자들을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤
+    순서로 해도 괜찮습니다.
+  tips:
+  - 작게 실행하고 결과를 바로 확인하세요.
+  snippet: |-
+    math = 85
+    english = 90
+    total = math + english
+    print('total:', total)
+  exercise:
+    prompt: Day 3 종합 복습 예제에서 \`apples\`, \`oranges\` 값 중 하나를 바꾸고 마지막 표시 결과가 맞는지 확인하세요.
+    starterCode: |-
+      apples = 15
+      oranges = 25
+      apples + oranges
+    hints:
+    - 바꿀 지점은 \`apples = ...\` 오른쪽 값입니다.
+    - 실행 뒤 \`apples\` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
+    predict:
+      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
+      expectedValue: (직접 실행해 본 결과를 적어주세요)
+  check:
+    type: noError
+    noError: Day 3 종합 복습에서 \`apples\` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
+    resultCheck: Day 3 종합 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: day03-calculate-mastery
+    mode: mastery
+    unseen: false
+    sourceSectionIds:
+    - add_operator
+    - practice
+    title: 연산 기호에 맞춰 계산하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 산술 연산자를 조건과 결합해 정확한 값을 반환한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: calculate(a, b, operator)가 +, -, * 연산을 처리하도록 완성하세요.
+      starterCode: |-
+        def calculate(a, b, operator):
+            raise NotImplementedError
+      solution: |-
+        def calculate(a, b, operator):
+            if operator == '+':
+                return a + b
+            if operator == '-':
+                return a - b
+            if operator == '*':
+                return a * b
+            raise ValueError('unsupported operator')
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day03.calculate.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day03.calculate.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: calculate
+        cases:
+        - id: add
+          arguments:
+          - value: 8
+          - value: 3
+          - value: +
+          expectedReturn: 11
+        - id: subtract
+          arguments:
+          - value: 8
+          - value: 3
+          - value: '-'
+          expectedReturn: 5
+        - id: multiply
+          arguments:
+          - value: 8
+          - value: 3
+          - value: '*'
+          expectedReturn: 24
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day03-final-price-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - day03-calculate-mastery
+    title: 할인율을 최종 가격에 적용하기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 백분율 계산을 처음 보는 가격 문맥에 옮긴다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: final_price(price, discount_percent)가 정수 가격의 할인 적용 결과를 반환하도록 완성하세요.
+      starterCode: |-
+        def final_price(price, discount_percent):
+            raise NotImplementedError
+      solution: |-
+        def final_price(price, discount_percent):
+            return price * (100 - discount_percent) // 100
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day03.final-price.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day03.final-price.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: final_price
+        cases:
+        - id: ten-percent
+          arguments:
+          - value: 20000
+          - value: 10
+          expectedReturn: 18000
+        - id: quarter
+          arguments:
+          - value: 8000
+          - value: 25
+          expectedReturn: 6000
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day03-inside-range-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - day03-calculate-mastery
+    title: 범위 안인지 다시 판단하기
+    subtitle: 하루 뒤 기억에서 재구성
+    goal: 비교 연산과 논리 연산을 기억에서 다시 조합한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: inside_range(value, low, high)가 양 끝을 포함한 범위 여부를 반환하도록 완성하세요.
+      starterCode: |-
+        def inside_range(value, low, high):
+            raise NotImplementedError
+      solution: |-
+        def inside_range(value, low, high):
+            return low <= value <= high
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day03.inside-range.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day03.inside-range.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: inside_range
+        cases:
+        - id: inside
+          arguments:
+          - value: 5
+          - value: 1
+          - value: 10
+          expectedReturn: true
+        - id: edge
+          arguments:
+          - value: 10
+          - value: 1
+          - value: 10
+          expectedReturn: true
+        - id: outside
+          arguments:
+          - value: 11
+          - value: 1
+          - value: 10
+          expectedReturn: false
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 24
+`;export{e as default};

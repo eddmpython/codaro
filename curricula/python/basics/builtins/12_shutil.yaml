@@ -407,3 +407,292 @@ sections:
     type: noError
     noError: shutil 모듈 종합 복습에서 `tempDir` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: shutil 모듈 종합 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 12_shutil-copy-selected-files-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - file_operations
+    - practical_use
+    - workflow_validation
+    title: 선택한 파일만 안전하게 복사하기
+    subtitle: copy2와 대상 폴더 검증
+    goal: source 폴더에서 지정한 파일만 dest 폴더로 복사하고 복사된 파일 목록과 개수를 반환한다.
+    why: shutil 학습은 전체 폴더를 무작정 복제하기보다, 어떤 파일을 어디로 복사했는지 증거를 남길 때 자동화로 이어집니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 fixture 프로젝트를 만든 뒤 보이지 않던 source와 dest 경로로 다시 호출합니다.
+    tips:
+    - os.makedirs(dest_dir, exist_ok=True)로 대상 폴더를 먼저 준비하세요.
+    - shutil.copy2는 파일 내용과 메타데이터 복사를 함께 처리합니다.
+    exercise:
+      prompt: copy_selected_files(source_dir, dest_dir, names)가 copied, destFiles, fileCount를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def copy_selected_files(source_dir, dest_dir, names):
+            raise NotImplementedError
+      solution: |-
+        import os
+        import shutil
+
+        def copy_selected_files(source_dir, dest_dir, names):
+            os.makedirs(dest_dir, exist_ok=True)
+            copied = []
+            for name in names:
+                source = os.path.join(source_dir, name)
+                if not os.path.isfile(source):
+                    raise FileNotFoundError(name)
+                shutil.copy2(source, os.path.join(dest_dir, name))
+                copied.append(name)
+            return {
+                "copied": copied,
+                "destFiles": sorted(os.listdir(dest_dir)),
+                "fileCount": len(copied),
+            }
+      hints:
+      - source에 없는 파일은 조용히 건너뛰지 말고 실패시켜야 합니다.
+      - destFiles는 실제 복사 결과를 다시 읽어 반환하세요.
+    check:
+      id: python.builtins.shutil.copy-selected-files.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.shutil.project-backup.mastery.behavior.v1.fixture
+      fixtureHash: sha256-0LzM86cVBIXv7A+z/Zq3j0GxAOJ43Zq+zA7RCaHy4Kk=
+      fixture:
+        directories:
+        - project/src
+        - project/data
+        - output
+        - archives
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: project/src/main.py
+          content: print('hello')
+        - path: project/src/utils.py
+          content: VALUE = 42
+        - path: project/data/sample.csv
+          content: id,value,1,10
+        - path: project/README.md
+          content: project readme
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: copy_selected_files
+        cases:
+        - id: copy-python-files
+          arguments:
+          - fixturePath: project/src
+          - fixturePath: output/src-copy
+          - value:
+            - main.py
+            - utils.py
+          expectedReturn:
+            copied:
+            - main.py
+            - utils.py
+            destFiles:
+            - main.py
+            - utils.py
+            fileCount: 2
+        - id: rejects-missing-file
+          arguments:
+          - fixturePath: project/src
+          - fixturePath: output/missing-copy
+          - value:
+            - missing.py
+          expectedException: FileNotFoundError
+        expectedPaths:
+        - path: output/src-copy/main.py
+          kind: file
+        - path: output/src-copy/utils.py
+          kind: file
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 12_shutil-zip-archive-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - 12_shutil-copy-selected-files-mastery
+    title: 프로젝트 폴더를 zip 아카이브로 만들기
+    subtitle: make_archive 결과 경로 검증
+    goal: source 폴더를 zip으로 압축하고 생성된 archive 경로와 포함 파일 수를 반환한다.
+    why: 백업 자동화는 압축 파일이 생성됐다는 사실과 압축 대상 파일 수를 함께 확인해야 신뢰할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 복사 대신 압축 결과물을 만들어 검증하세요.
+    tips:
+    - archive_base에는 .zip 확장자를 붙이지 않고 shutil.make_archive에 넘깁니다.
+    - 파일 수는 source_dir을 os.walk로 다시 세어 반환하세요.
+    exercise:
+      prompt: make_project_zip(source_dir, archive_base)가 path, exists, sourceFileCount를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def make_project_zip(source_dir, archive_base):
+            raise NotImplementedError
+      solution: |-
+        import os
+        import shutil
+
+        def make_project_zip(source_dir, archive_base):
+            file_count = sum(len(files) for _, _, files in os.walk(source_dir))
+            archive_path = shutil.make_archive(archive_base, "zip", source_dir)
+            return {
+                "path": archive_path,
+                "exists": os.path.exists(archive_path),
+                "sourceFileCount": file_count,
+            }
+      hints:
+      - make_archive가 실제 생성한 경로를 반환값으로 받으세요.
+      - archive_base는 fixture 안의 archives 폴더 아래로 넘겨집니다.
+    check:
+      id: python.builtins.shutil.zip-archive.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.shutil.project-backup.mastery.behavior.v1.fixture
+      fixtureHash: sha256-0LzM86cVBIXv7A+z/Zq3j0GxAOJ43Zq+zA7RCaHy4Kk=
+      fixture:
+        directories:
+        - project/src
+        - project/data
+        - output
+        - archives
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: project/src/main.py
+          content: print('hello')
+        - path: project/src/utils.py
+          content: VALUE = 42
+        - path: project/data/sample.csv
+          content: id,value,1,10
+        - path: project/README.md
+          content: project readme
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: make_project_zip
+        cases:
+        - id: archive-project
+          arguments:
+          - fixturePath: project
+          - fixturePath: archives/project-backup
+          expectedReturn:
+            path: archives/project-backup.zip
+            exists: true
+            sourceFileCount: 4
+        expectedPaths:
+        - path: archives/project-backup.zip
+          kind: file
+        normalizeReturnPaths:
+        - path
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 12_shutil-backup-copytree-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 12_shutil-zip-archive-transfer
+    title: 기존 백업을 덮어쓰지 않고 staging하기
+    subtitle: copytree 충돌 방지와 결과 검증
+    goal: root 아래 source_dir_name을 backup_name으로 copytree하되 대상이 이미 있으면 ValueError를 일으킨다.
+    why: 시간이 지난 뒤에도 shutil의 핵심은 빠른 복사보다 되돌릴 수 없는 덮어쓰기를 막는 백업 정책입니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. 대상 존재 여부를 먼저 확인하고 copytree 결과를 검증하세요.
+    tips:
+    - destination.exists()가 True이면 copytree를 호출하지 말고 실패시키세요.
+    - 반환 path는 verifier가 fixture root 기준 상대경로로 정규화합니다.
+    exercise:
+      prompt: stage_backup(root, source_dir_name, backup_name)가 path, fileCount, copied를 담은 dict를 반환하고 기존 대상은 거부하도록 완성하세요.
+      starterCode: |-
+        def stage_backup(root, source_dir_name, backup_name):
+            raise NotImplementedError
+      solution: |-
+        from pathlib import Path
+        import shutil
+
+        def stage_backup(root, source_dir_name, backup_name):
+            root_path = Path(root)
+            source = root_path / source_dir_name
+            destination = root_path / backup_name
+            if destination.exists():
+                raise ValueError("backup already exists")
+            shutil.copytree(source, destination)
+            file_count = sum(1 for path in destination.rglob("*") if path.is_file())
+            return {"path": str(destination), "fileCount": file_count, "copied": destination.exists()}
+      hints:
+      - copytree는 대상 폴더가 이미 있으면 실패하므로 그 전에 명시적으로 검사하세요.
+      - rglob("*")와 is_file()로 복사된 파일 수를 세세요.
+    check:
+      id: python.builtins.shutil.backup-copytree.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.shutil.project-backup.mastery.behavior.v1.fixture
+      fixtureHash: sha256-0LzM86cVBIXv7A+z/Zq3j0GxAOJ43Zq+zA7RCaHy4Kk=
+      fixture:
+        directories:
+        - project/src
+        - project/data
+        - output
+        - archives
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: project/src/main.py
+          content: print('hello')
+        - path: project/src/utils.py
+          content: VALUE = 42
+        - path: project/data/sample.csv
+          content: id,value,1,10
+        - path: project/README.md
+          content: project readme
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: stage_backup
+        cases:
+        - id: creates-project-backup
+          arguments:
+          - fixturePath: .
+          - value: project
+          - value: output/project-backup
+          expectedReturn:
+            path: output/project-backup
+            fileCount: 4
+            copied: true
+        - id: rejects-existing-backup
+          arguments:
+          - fixturePath: .
+          - value: project
+          - value: output/project-backup
+          expectedException: ValueError
+        expectedPaths:
+        - path: output/project-backup/src/main.py
+          kind: file
+        - path: output/project-backup/data/sample.csv
+          kind: file
+        normalizeReturnPaths:
+        - path
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

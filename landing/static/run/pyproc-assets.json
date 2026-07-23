@@ -1,0 +1,342 @@
+{
+  "version": 1,
+  "packageRoot": "/codaro/run/vendor/pyproc/",
+  "policy": {
+    "sameOriginRequired": true,
+    "preserveRelativeImports": true,
+    "runtimePreflight": true,
+    "note": "src/ 트리의 상대 import 구조를 보존해 같은 오리진에 배포한다. Worker/SW 엔트리포인트만 CDN 교차 오리진으로 두면 실패한다."
+  },
+  "entrypoints": [
+    {
+      "role": "processWorker",
+      "path": "src/processOs/worker.js",
+      "kind": "module-worker",
+      "sameOrigin": true,
+      "usedBy": [
+        "PyProc",
+        "SyscallBridge"
+      ],
+      "reason": "프로세스 OS 워커와 subprocess 워커 엔트리포인트",
+      "url": "/codaro/run/vendor/pyproc/src/processOs/worker.js",
+      "graph": [
+        "src/processOs/ipc.js",
+        "src/processOs/worker.js"
+      ],
+      "integrity": "sha256-3ijhVlMCUPMHd6CgZ4LBo7ffE8mHlt9PcZakse9uaTs=",
+      "bytes": 11271
+    },
+    {
+      "role": "sharedKernelHost",
+      "path": "src/processOs/sharedKernelHost.js",
+      "kind": "shared-worker",
+      "sameOrigin": true,
+      "usedBy": [
+        "SharedKernel"
+      ],
+      "reason": "탭 밖 공유 커널 SharedWorker 엔트리포인트",
+      "url": "/codaro/run/vendor/pyproc/src/processOs/sharedKernelHost.js",
+      "graph": [
+        "src/processOs/sharedKernelHost.js"
+      ],
+      "integrity": "sha256-CTBQwkmh1eS7p5/9wCjSCy0N+8oFIwC6TQwLj2lM3d0=",
+      "bytes": 2383
+    },
+    {
+      "role": "machineWorker",
+      "path": "src/processOs/machineWorker.js",
+      "kind": "module-worker",
+      "sameOrigin": true,
+      "usedBy": [
+        "MachineContainer"
+      ],
+      "reason": "컨테이너 커널과 중첩 컨테이너 워커 엔트리포인트",
+      "url": "/codaro/run/vendor/pyproc/src/processOs/machineWorker.js",
+      "graph": [
+        "src/capabilities/asgiServer.js",
+        "src/capabilities/deviceFs.js",
+        "src/capabilities/fileSystem.js",
+        "src/capabilities/gpuCompute.js",
+        "src/capabilities/init.js",
+        "src/capabilities/machineJournal.js",
+        "src/capabilities/reactive.js",
+        "src/capabilities/socketBridge.js",
+        "src/capabilities/syscallBridge.js",
+        "src/capabilities/terminal.js",
+        "src/capabilities/wheelCache.js",
+        "src/processOs/machineWorker.js",
+        "src/runtime/assets.js",
+        "src/runtime/engines/pyodideEngine.js",
+        "src/runtime/memoryCapability.js",
+        "src/runtime/preflight.js",
+        "src/runtime/runtime.js"
+      ],
+      "integrity": "sha256-Nj3U5BcZ5URtyCiuBrLS9ev+EKagnmfj6S542XlHzu8=",
+      "bytes": 4692
+    },
+    {
+      "role": "wasiWorker",
+      "path": "src/runtime/engines/wasi/wasiWorker.js",
+      "kind": "module-worker",
+      "sameOrigin": true,
+      "usedBy": [
+        "WasiSession"
+      ],
+      "reason": "non-Pyodide CPython WASI 세션 워커 엔트리포인트",
+      "url": "/codaro/run/vendor/pyproc/src/runtime/engines/wasi/wasiWorker.js",
+      "graph": [
+        "src/runtime/engines/wasi/browserWasiShim.js",
+        "src/runtime/engines/wasi/wasiProtocol.js",
+        "src/runtime/engines/wasi/wasiReplDriver.js",
+        "src/runtime/engines/wasi/wasiWorker.js"
+      ],
+      "integrity": "sha256-tKbH6TcMmCtmb+Y7AMAUWkUhWn103uD1f1Ev83TLx+U=",
+      "bytes": 8744
+    },
+    {
+      "role": "pyprocServiceWorker",
+      "path": "src/capabilities/pyprocSw.js",
+      "kind": "service-worker",
+      "sameOrigin": true,
+      "usedBy": [
+        "VirtualOrigin",
+        "COI bootstrap",
+        "offline core cache"
+      ],
+      "reason": "가상 오리진, COOP/COEP 주입, 오프라인 코어 캐시 서비스 워커",
+      "url": "/codaro/run/vendor/pyproc/src/capabilities/pyprocSw.js",
+      "graph": [
+        "src/capabilities/pyprocSw.js"
+      ],
+      "integrity": "sha256-EYL1dXqCxhO/6E4NsSKWNLs+tDwtugDPT90p1UUtd1I=",
+      "bytes": 9959
+    }
+  ],
+  "files": [
+    {
+      "path": "src/capabilities/asgiServer.js",
+      "url": "/codaro/run/vendor/pyproc/src/capabilities/asgiServer.js",
+      "bytes": 4740,
+      "integrity": "sha256-GWjYwYOXX0s5l5VOYQEcuaV7y2VIAjFQgchVNxgCQsU=",
+      "roles": [
+        "machineWorker"
+      ]
+    },
+    {
+      "path": "src/capabilities/deviceFs.js",
+      "url": "/codaro/run/vendor/pyproc/src/capabilities/deviceFs.js",
+      "bytes": 6245,
+      "integrity": "sha256-CwMVKT08iIsy4+R8Ulcb+bAMMnFUPdW8jmZ/Y855WPo=",
+      "roles": [
+        "machineWorker"
+      ]
+    },
+    {
+      "path": "src/capabilities/fileSystem.js",
+      "url": "/codaro/run/vendor/pyproc/src/capabilities/fileSystem.js",
+      "bytes": 2001,
+      "integrity": "sha256-B3EQMOb3PnuEW+3Q+T50vW3yc9s42CcGjEy4lO7lTBw=",
+      "roles": [
+        "machineWorker"
+      ]
+    },
+    {
+      "path": "src/capabilities/gpuCompute.js",
+      "url": "/codaro/run/vendor/pyproc/src/capabilities/gpuCompute.js",
+      "bytes": 21354,
+      "integrity": "sha256-wGi1J3/Jm7tgCExqeZxF/+dLs64mwF0ZGGWSzqYh5os=",
+      "roles": [
+        "machineWorker"
+      ]
+    },
+    {
+      "path": "src/capabilities/init.js",
+      "url": "/codaro/run/vendor/pyproc/src/capabilities/init.js",
+      "bytes": 1594,
+      "integrity": "sha256-0uKT7ZSyvKIY3oAA4zdsM6NT/0e2Q5DlT88ou+oECqI=",
+      "roles": [
+        "machineWorker"
+      ]
+    },
+    {
+      "path": "src/capabilities/machineJournal.js",
+      "url": "/codaro/run/vendor/pyproc/src/capabilities/machineJournal.js",
+      "bytes": 11588,
+      "integrity": "sha256-wJR4WgMV0+UhF8CgKwZaYrCDl4oZOc7c+tiZkwPvN7w=",
+      "roles": [
+        "machineWorker"
+      ]
+    },
+    {
+      "path": "src/capabilities/pyprocSw.js",
+      "url": "/codaro/run/vendor/pyproc/src/capabilities/pyprocSw.js",
+      "bytes": 9959,
+      "integrity": "sha256-EYL1dXqCxhO/6E4NsSKWNLs+tDwtugDPT90p1UUtd1I=",
+      "roles": [
+        "pyprocServiceWorker"
+      ]
+    },
+    {
+      "path": "src/capabilities/reactive.js",
+      "url": "/codaro/run/vendor/pyproc/src/capabilities/reactive.js",
+      "bytes": 8125,
+      "integrity": "sha256-SOSS/zeMFAmrBBqEJLX9eHTY/Wt1w4wMW/ySDA3uAkw=",
+      "roles": [
+        "machineWorker"
+      ]
+    },
+    {
+      "path": "src/capabilities/socketBridge.js",
+      "url": "/codaro/run/vendor/pyproc/src/capabilities/socketBridge.js",
+      "bytes": 7109,
+      "integrity": "sha256-oPK6oCOV1uzPBUWgtWb75Wv2KAbR14wSTCeKaUPgifU=",
+      "roles": [
+        "machineWorker"
+      ]
+    },
+    {
+      "path": "src/capabilities/syscallBridge.js",
+      "url": "/codaro/run/vendor/pyproc/src/capabilities/syscallBridge.js",
+      "bytes": 7736,
+      "integrity": "sha256-a7LzTpWx0PxZjjM0U+vdYSf0pFdrTbTFL3/Wu0fXmlo=",
+      "roles": [
+        "machineWorker"
+      ]
+    },
+    {
+      "path": "src/capabilities/terminal.js",
+      "url": "/codaro/run/vendor/pyproc/src/capabilities/terminal.js",
+      "bytes": 3702,
+      "integrity": "sha256-54MEwrFNubN2LeQe6rzMswtpqD3gY2Z8p5seKb/HwCY=",
+      "roles": [
+        "machineWorker"
+      ]
+    },
+    {
+      "path": "src/capabilities/wheelCache.js",
+      "url": "/codaro/run/vendor/pyproc/src/capabilities/wheelCache.js",
+      "bytes": 2510,
+      "integrity": "sha256-6A190vWp0K0sZA3359x4Sr4AOtOhdy51t1ZDw0kAym0=",
+      "roles": [
+        "machineWorker"
+      ]
+    },
+    {
+      "path": "src/processOs/ipc.js",
+      "url": "/codaro/run/vendor/pyproc/src/processOs/ipc.js",
+      "bytes": 9865,
+      "integrity": "sha256-GiQvSOjfaxSAH869BqTuDjd3kXDZclyZ152a3rPucno=",
+      "roles": [
+        "processWorker"
+      ]
+    },
+    {
+      "path": "src/processOs/machineWorker.js",
+      "url": "/codaro/run/vendor/pyproc/src/processOs/machineWorker.js",
+      "bytes": 4692,
+      "integrity": "sha256-Nj3U5BcZ5URtyCiuBrLS9ev+EKagnmfj6S542XlHzu8=",
+      "roles": [
+        "machineWorker"
+      ]
+    },
+    {
+      "path": "src/processOs/sharedKernelHost.js",
+      "url": "/codaro/run/vendor/pyproc/src/processOs/sharedKernelHost.js",
+      "bytes": 2383,
+      "integrity": "sha256-CTBQwkmh1eS7p5/9wCjSCy0N+8oFIwC6TQwLj2lM3d0=",
+      "roles": [
+        "sharedKernelHost"
+      ]
+    },
+    {
+      "path": "src/processOs/worker.js",
+      "url": "/codaro/run/vendor/pyproc/src/processOs/worker.js",
+      "bytes": 11271,
+      "integrity": "sha256-3ijhVlMCUPMHd6CgZ4LBo7ffE8mHlt9PcZakse9uaTs=",
+      "roles": [
+        "processWorker"
+      ]
+    },
+    {
+      "path": "src/runtime/assets.js",
+      "url": "/codaro/run/vendor/pyproc/src/runtime/assets.js",
+      "bytes": 9765,
+      "integrity": "sha256-ofIP/KlDWs5tbCHNkcbjyGQiEF9kJgoq44PptvR6bHs=",
+      "roles": [
+        "machineWorker"
+      ]
+    },
+    {
+      "path": "src/runtime/engines/pyodideEngine.js",
+      "url": "/codaro/run/vendor/pyproc/src/runtime/engines/pyodideEngine.js",
+      "bytes": 5587,
+      "integrity": "sha256-/a6Hbaf7xf7IV1DXRF9Iy/PraMlKXedCULTbFhokgRw=",
+      "roles": [
+        "machineWorker"
+      ]
+    },
+    {
+      "path": "src/runtime/engines/wasi/browserWasiShim.js",
+      "url": "/codaro/run/vendor/pyproc/src/runtime/engines/wasi/browserWasiShim.js",
+      "bytes": 28952,
+      "integrity": "sha256-xiXTxBiMh7mlEPia7giQ40XmsyxQdZhg7dqQYu1A8w0=",
+      "roles": [
+        "wasiWorker"
+      ]
+    },
+    {
+      "path": "src/runtime/engines/wasi/wasiProtocol.js",
+      "url": "/codaro/run/vendor/pyproc/src/runtime/engines/wasi/wasiProtocol.js",
+      "bytes": 1718,
+      "integrity": "sha256-Da9WdYnlR4SCX/sfvTO2pq42eF6WcUXNkiCQFlG+Doo=",
+      "roles": [
+        "wasiWorker"
+      ]
+    },
+    {
+      "path": "src/runtime/engines/wasi/wasiReplDriver.js",
+      "url": "/codaro/run/vendor/pyproc/src/runtime/engines/wasi/wasiReplDriver.js",
+      "bytes": 2805,
+      "integrity": "sha256-jpgN7sdmQ7nv28MNqTtTC4/mdxaQ1sdyJgo3Y1kLhKk=",
+      "roles": [
+        "wasiWorker"
+      ]
+    },
+    {
+      "path": "src/runtime/engines/wasi/wasiWorker.js",
+      "url": "/codaro/run/vendor/pyproc/src/runtime/engines/wasi/wasiWorker.js",
+      "bytes": 8744,
+      "integrity": "sha256-tKbH6TcMmCtmb+Y7AMAUWkUhWn103uD1f1Ev83TLx+U=",
+      "roles": [
+        "wasiWorker"
+      ]
+    },
+    {
+      "path": "src/runtime/memoryCapability.js",
+      "url": "/codaro/run/vendor/pyproc/src/runtime/memoryCapability.js",
+      "bytes": 2573,
+      "integrity": "sha256-JzKfGr5Nx2enBPYSmbB0FFb5niNGV3nVm78XREK9oy0=",
+      "roles": [
+        "machineWorker"
+      ]
+    },
+    {
+      "path": "src/runtime/preflight.js",
+      "url": "/codaro/run/vendor/pyproc/src/runtime/preflight.js",
+      "bytes": 3744,
+      "integrity": "sha256-MFjj0U6C/41XoK9C0+VoApAG7532WhxKbKOZEVbkP8M=",
+      "roles": [
+        "machineWorker"
+      ]
+    },
+    {
+      "path": "src/runtime/runtime.js",
+      "url": "/codaro/run/vendor/pyproc/src/runtime/runtime.js",
+      "bytes": 14902,
+      "integrity": "sha256-F/y2j2mQLFnrRRt76JORMvBCEQY4tfkBmCopC2k4AWo=",
+      "roles": [
+        "machineWorker"
+      ]
+    }
+  ]
+}

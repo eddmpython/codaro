@@ -513,3 +513,303 @@ sections:
     type: noError
     noError: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인의 정규식 패턴이 컴파일되고 입력 텍스트가 매치 단계까지 도달해야 합니다.'
     resultCheck: '현업 흐름 검증: 연락처 텍스트 정제 파이프라인 결과의 추출 개수와 매치 문자열이 본문 기대값과 같아야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: regex_00-regex-contract-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - intro
+    - workflow_validation
+    title: 정규표현식의 anchor·group·fixture 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: pattern이 전체 입력 계약과 필요한 named group을 표현하는지 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 부분 검색과 전체 형식 검증을 같은 `match`로 취급하지 마세요.
+    - 숫자 group 번호 대신 업무 의미가 드러나는 named group을 사용하세요.
+    exercise:
+      prompt: audit_regex_contract(pattern, required_groups, samples)를 완성하세요.
+      starterCode: |-
+        def audit_regex_contract(pattern, required_groups, samples):
+            raise NotImplementedError
+      solution: |
+        def audit_regex_contract(pattern, required_groups, samples):
+            import re
+            compiled = re.compile(pattern)
+            failures = []
+            if not pattern.startswith("^") or not pattern.endswith("$"):
+                failures.append("anchors")
+            missing_groups = sorted(set(required_groups) - set(compiled.groupindex))
+            if missing_groups:
+                failures.append("groups")
+            mismatches = []
+            for sample in samples:
+                matched = compiled.fullmatch(sample["text"]) is not None
+                if matched != sample["valid"]:
+                    mismatches.append(sample["id"])
+            if mismatches:
+                failures.append("fixtures")
+            return {"accepted": not failures, "failures": failures, "missingGroups": missing_groups, "mismatches": mismatches}
+      hints: *id001
+    check:
+      id: python.regex.regex_00.regex-contract-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_00.regex-contract-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_regex_contract
+        cases:
+        - id: accepts-anchored-named-pattern
+          arguments:
+          - value: ^(?P<code>[A-Z]{2})-(?P<number>\d{3})$
+          - value:
+            - code
+            - number
+          - value:
+            - id: ok
+              text: AB-123
+              valid: true
+            - id: bad
+              text: xAB-123
+              valid: false
+          expectedReturn:
+            accepted: true
+            failures: []
+            missingGroups: []
+            mismatches: []
+        - id: reports-anchor-group-and-fixture
+          arguments:
+          - value: '[A-Z]+'
+          - value:
+            - code
+          - value:
+            - id: digits
+              text: '123'
+              valid: true
+          expectedReturn:
+            accepted: false
+            failures:
+            - anchors
+            - groups
+            - fixtures
+            missingGroups:
+            - code
+            mismatches:
+            - digits
+        - id: reports-only-fixture-gap
+          arguments:
+          - value: ^(?P<value>\d+)$
+          - value:
+            - value
+          - value:
+            - id: letters
+              text: abc
+              valid: true
+          expectedReturn:
+            accepted: false
+            failures:
+            - fixtures
+            missingGroups: []
+            mismatches:
+            - letters
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: regex_00-regex-risk-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_00-regex-contract-audit-mastery
+    title: 새 pattern에 성능·가독성 위험 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 중첩 반복, 무제한 wildcard, fixture 한계를 휴리스틱으로 보고한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 중첩 quantifier는 긴 실패 입력에서 반드시 별도 benchmark하세요.
+    - 평균 길이 fixture만 두지 말고 허용 최대 길이를 포함하세요.
+    exercise:
+      prompt: audit_regex_risks(pattern, maximum_length, fixture_lengths)를 완성하세요.
+      starterCode: |-
+        def audit_regex_risks(pattern, maximum_length, fixture_lengths):
+            raise NotImplementedError
+      solution: |
+        def audit_regex_risks(pattern, maximum_length, fixture_lengths):
+            import re
+            if maximum_length <= 0:
+                raise ValueError("maximum length must be positive")
+            risks = []
+            if re.search(r"\([^)]*[+*][^)]*\)[+*]", pattern):
+                risks.append("nested-quantifier")
+            if ".*" in pattern and not pattern.startswith("^"):
+                risks.append("unbounded-prefix")
+            if not fixture_lengths or max(fixture_lengths) < maximum_length:
+                risks.append("boundary-not-tested")
+            return {"safeToBenchmark": "nested-quantifier" not in risks, "risks": risks, "maximumLength": maximum_length}
+      hints: *id002
+    check:
+      id: python.regex.regex_00.regex-risk-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_00.regex-risk-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_regex_risks
+        cases:
+        - id: accepts-bounded-tested-pattern
+          arguments:
+          - value: ^[A-Z]{1,4}\d{1,6}$
+          - value: 20
+          - value:
+            - 0
+            - 5
+            - 20
+          expectedReturn:
+            safeToBenchmark: true
+            risks: []
+            maximumLength: 20
+        - id: reports-nested-and-boundary
+          arguments:
+          - value: ^(a+)+$
+          - value: 100
+          - value:
+            - 10
+          expectedReturn:
+            safeToBenchmark: false
+            risks:
+            - nested-quantifier
+            - boundary-not-tested
+            maximumLength: 100
+        - id: reports-unbounded-prefix
+          arguments:
+          - value: .*token=(\w+)$
+          - value: 50
+          - value:
+            - 50
+          expectedReturn:
+            safeToBenchmark: true
+            risks:
+            - unbounded-prefix
+            maximumLength: 50
+        - id: rejects-invalid-bound
+          arguments:
+          - value: ^x$
+          - value: 0
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: regex_00-regex-foundation-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - regex_00-regex-risk-audit-transfer
+    title: 정규표현식 적용 경계 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 검색·전체 검증·구조 parser 사용 시점을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - match 수만 보지 말고 정규화 뒤 보존된 의미와 거부된 입력을 함께 확인하세요.
+    - regex가 아닌 전용 parser가 필요한 구조에서는 경계를 명시하세요.
+    exercise:
+      prompt: choose_regex_boundary(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_regex_boundary(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_regex_boundary(situation):
+            table = {'search': {'action': 'find explicit token pattern', 'evidence': 'span and named groups', 'risk': 'false positive'}, 'validate': {'action': 'fullmatch bounded format', 'evidence': 'valid and invalid fixtures', 'risk': 'partial match'}, 'structured-data': {'action': 'use dedicated parser', 'evidence': 'parsed structure', 'risk': 'regex grammar drift'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.regex.regex_00.regex-foundation-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.regex.regex_00.regex-foundation-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_regex_boundary
+        cases:
+        - id: recalls-search
+          arguments:
+          - value: search
+          expectedReturn:
+            action: find explicit token pattern
+            evidence: span and named groups
+            risk: false positive
+        - id: recalls-validate
+          arguments:
+          - value: validate
+          expectedReturn:
+            action: fullmatch bounded format
+            evidence: valid and invalid fixtures
+            risk: partial match
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

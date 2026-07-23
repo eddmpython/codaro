@@ -1,0 +1,540 @@
+{
+  "schemaVersion": 1,
+  "sourceManifestHash": "sha256-0120570f9692411ce8fa6d013609ecd3b8ddb8b31650c4c67fb549777f60fca1",
+  "assets": [
+    {
+      "id": "runLearningDetail",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run-learning-detail.png",
+      "sourceHash": "sha256-5f004b2afa8f2b997f710c5b64c4ab25a93dce5b8c1680db2016848f5c1bf762",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "local-strong-learning-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 900,
+        "height": 760,
+        "aspectRatio": 1.184211,
+        "focalPoint": {
+          "x": 0.66,
+          "y": 0.45
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-proof",
+          "learn-proof",
+          "documentation"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          900
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "Codaro 로컬 학습 화면에서 헬로월드 설명, 코드 예제, 강한 검증 상태가 한 흐름에 표시된 모습",
+        "caption": "설명, 실행 가능한 코드, 자동 검증이 같은 레슨 화면에서 이어집니다.",
+        "learningQuestion": "학습자는 설명을 읽은 뒤 어느 코드 영역을 바꾸고 실행해야 하는가?",
+        "decisionShown": "레슨 설명과 실행 및 검증 위치의 관계",
+        "lessonRefs": [
+          "30일완성/헬로월드"
+        ]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 900,
+          "height": 760
+        },
+        "theme": "dark",
+        "locale": "ko-KR"
+      },
+      "outputs": [
+        {
+          "byteLength": 14079,
+          "format": "avif",
+          "height": 405,
+          "integrity": "sha256-7cb6c5ee515dea55c437f5f39ac611e0cbaed4e2b59ba2a46c861de50c40308a",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-480-5f004b2afa8f.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 15120,
+          "format": "webp",
+          "height": 405,
+          "integrity": "sha256-c5f6c012f2645e6e3467c5ffc522d08f41e5129df48ee9d17ccfe74d628d2984",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-480-5f004b2afa8f.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 27324,
+          "format": "avif",
+          "height": 608,
+          "integrity": "sha256-e3af74fd161bf76961af6fdcf7275284727249e4dd1e48931b3936f9bfda8e66",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-720-5f004b2afa8f.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 30980,
+          "format": "webp",
+          "height": 608,
+          "integrity": "sha256-c1ce5e8c4b82aef97f91cdabc46211762793f5441b3d54fafc7b3ac5408560ef",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-720-5f004b2afa8f.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 30133,
+          "format": "avif",
+          "height": 760,
+          "integrity": "sha256-ee60fa0d932480acfb29e094d74bb2f0e81f6e0146848c3b79fe4c47a57d5ed2",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-900-5f004b2afa8f.avif",
+          "width": 900
+        },
+        {
+          "byteLength": 42934,
+          "format": "webp",
+          "height": 760,
+          "integrity": "sha256-749ce4ee27fba44ca0c5a0e91f067efcd69042516e99971ea8a2a9fa8a06ca5b",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-900-5f004b2afa8f.webp",
+          "width": 900
+        }
+      ]
+    },
+    {
+      "id": "runLearningMobile",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run-learning-mobile.png",
+      "sourceHash": "sha256-bc3c80e69c771493171151988e1d095589fa9dce06aa97b531fa7a251f5fbc09",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-lesson-mobile",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 390,
+        "height": 844,
+        "aspectRatio": 0.462085,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.42
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-mobile-proof",
+          "learn-mobile-proof"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          390
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "390픽셀 너비의 Codaro 웹 레슨에서 학습 개요와 첫 학습 섹션이 열린 읽기 흐름으로 이어지는 모습",
+        "caption": "모바일에서도 별도 확인 단계 없이 학습 목표 다음에 실습이 이어집니다.",
+        "learningQuestion": "작은 화면에서도 현재 학습 목표와 다음 실습을 동시에 찾을 수 있는가?",
+        "decisionShown": "모바일 레슨의 정보 우선순위",
+        "lessonRefs": [
+          "30일완성/헬로월드"
+        ]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark",
+        "locale": "ko-KR"
+      },
+      "outputs": [
+        {
+          "byteLength": 22715,
+          "format": "avif",
+          "height": 844,
+          "integrity": "sha256-5b0c6fe249862423ff2c4496657c6739584e980048cb05539a5357c5c41cdc27",
+          "publicPath": "/visuals/files/runLearningMobile/runLearningMobile-390-bc3c80e69c77.avif",
+          "width": 390
+        },
+        {
+          "byteLength": 31978,
+          "format": "webp",
+          "height": 844,
+          "integrity": "sha256-9448e6bbde2d4bb54ceb994682b7a8ef5e8a3b4862977bce85b9ab63b9310572",
+          "publicPath": "/visuals/files/runLearningMobile/runLearningMobile-390-bc3c80e69c77.webp",
+          "width": 390
+        }
+      ]
+    },
+    {
+      "id": "webRunDesktop",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/web-run-desktop.png",
+      "sourceHash": "sha256-24a3746e0ef831559d1f62b1f579b677d032c7d85708842a424943f9e51cd355",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-run-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1440,
+        "height": 900,
+        "aspectRatio": 1.6,
+        "focalPoint": {
+          "x": 0.52,
+          "y": 0.34
+        },
+        "safeTextRegion": {
+          "x": 0.2,
+          "y": 0.32,
+          "width": 0.48,
+          "height": 0.48
+        },
+        "fit": "cover",
+        "background": "surface",
+        "proofUsage": [
+          "landing-hero-background",
+          "web-run-proof"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          720,
+          1080,
+          1440
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "설치 없이 브라우저 Python 셀을 실행하는 Codaro Web Run 전체 화면",
+        "caption": "Web Run은 브라우저 파일과 지원 패키지를 사용해 설치 없이 Python 셀을 실행합니다.",
+        "learningQuestion": "웹 실행 환경과 로컬 실행 환경의 권한 차이는 어디에 표시되는가?",
+        "decisionShown": "Web Run의 실행 계층과 지원 범위",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "theme": "dark",
+        "locale": "ko-KR"
+      },
+      "outputs": [
+        {
+          "byteLength": 6473,
+          "format": "avif",
+          "height": 450,
+          "integrity": "sha256-847f9d99477da8acf874622d51accd617fdc17bd51c554d7c6851dae11807f25",
+          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-720-24a3746e0ef8.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 7020,
+          "format": "webp",
+          "height": 450,
+          "integrity": "sha256-f646abb2355bc166d1c86332ed6f16ff79b34d2915d72e98cdbe269cf7b18dd0",
+          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-720-24a3746e0ef8.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 11642,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-49e437dcf59fe166c10eb0e35697fe4338e315beb48cec62142cdd1664bc5416",
+          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-1080-24a3746e0ef8.avif",
+          "width": 1080
+        },
+        {
+          "byteLength": 12910,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-e304c04cd6a619c647412bc1b2087ba4182c5c2eb53395eca373b048d9f8d912",
+          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-1080-24a3746e0ef8.webp",
+          "width": 1080
+        },
+        {
+          "byteLength": 14060,
+          "format": "avif",
+          "height": 900,
+          "integrity": "sha256-275485043b84d3445a3b4bbd69d0268a6d5f6678afda51ff26784fcb24856d2d",
+          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-1440-24a3746e0ef8.avif",
+          "width": 1440
+        },
+        {
+          "byteLength": 20014,
+          "format": "webp",
+          "height": 900,
+          "integrity": "sha256-90b84bd6ff6a0a3793dc109e3a203e98b729a65b5bf2a41dfd735f5795214563",
+          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-1440-24a3746e0ef8.webp",
+          "width": 1440
+        }
+      ]
+    },
+    {
+      "id": "localNotebookDesktop",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/local-notebook-desktop.png",
+      "sourceHash": "sha256-f63d588e284f23c6ca9615344f5d90498a2b61fbf9cf3c43c94504cf001ee3a1",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "local-run-minimum",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 900,
+        "height": 640,
+        "aspectRatio": 1.40625,
+        "focalPoint": {
+          "x": 0.66,
+          "y": 0.3
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-local-proof",
+          "local-empty-state"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          600,
+          900
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "Codaro Local Studio에서 시스템 Python과 프로젝트 파일 및 터미널이 연결된 빈 노트북 화면",
+        "caption": "Local Studio는 같은 셀 모델에 실제 프로젝트 파일과 시스템 Python을 연결합니다.",
+        "learningQuestion": "웹에서 검증한 코드를 실제 프로젝트 파일로 옮길 때 어떤 실행 계층이 바뀌는가?",
+        "decisionShown": "Local Studio의 런타임 및 파일 권한 확장",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 900,
+          "height": 640
+        },
+        "theme": "dark",
+        "locale": "ko-KR"
+      },
+      "outputs": [
+        {
+          "byteLength": 4958,
+          "format": "avif",
+          "height": 427,
+          "integrity": "sha256-e41f9b3ab2c76078917033aa18b2e52c3c8da0f1f019a4338caf86e27909973a",
+          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-600-f63d588e284f.avif",
+          "width": 600
+        },
+        {
+          "byteLength": 5682,
+          "format": "webp",
+          "height": 427,
+          "integrity": "sha256-dd86c158e076a220f6fc4b4b0de94ec12aadf7ebd5dc31212b37cf2a4ddbef0f",
+          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-600-f63d588e284f.webp",
+          "width": 600
+        },
+        {
+          "byteLength": 7479,
+          "format": "avif",
+          "height": 640,
+          "integrity": "sha256-2210abb3c67efd2dd89feab78ca7becce47eba5523a2281987496e6b8c9bee77",
+          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-900-f63d588e284f.avif",
+          "width": 900
+        },
+        {
+          "byteLength": 10086,
+          "format": "webp",
+          "height": 640,
+          "integrity": "sha256-0fb52d52e70c5ab437b636bb1732a3eeee35c469a1ddf051ead8f4b15fe8252d",
+          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-900-f63d588e284f.webp",
+          "width": 900
+        }
+      ]
+    },
+    {
+      "id": "localAutomationDesktop",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/local-automation-desktop.png",
+      "sourceHash": "sha256-ef79a29c5749e213e971d5edc8b8e161b12e23ce24409376c559663f9b66a79b",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "local-automation-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1440,
+        "height": 900,
+        "aspectRatio": 1.6,
+        "focalPoint": {
+          "x": 0.62,
+          "y": 0.45
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-automation-proof",
+          "local-automation-empty-state"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          720,
+          1080,
+          1440
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "Codaro Local 자동화 화면에서 브라우저 루틴, 파일 정리, 엑셀 반복 작업과 예약 태스크 상태가 보이는 모습",
+        "caption": "검증된 셀과 recipe는 로컬에서 파일 작업과 예약 실행으로 확장됩니다.",
+        "learningQuestion": "반복 실행할 수 있는 코드와 아직 학습 중인 코드를 어떻게 구분하는가?",
+        "decisionShown": "검증된 코드가 자동화 recipe와 task로 승격되는 경계",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "theme": "dark",
+        "locale": "ko-KR"
+      },
+      "outputs": [
+        {
+          "byteLength": 13845,
+          "format": "avif",
+          "height": 450,
+          "integrity": "sha256-579adb07108db2b9f8de97d0f885bf2405497df5ef1ecf0e49ad74c1f6fa9429",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-720-ef79a29c5749.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 14188,
+          "format": "webp",
+          "height": 450,
+          "integrity": "sha256-f7a921e517afb3df3b98b887c1086b5aea4277d7810d529e1dbe17799e9da307",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-720-ef79a29c5749.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 26349,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-9ae5296d09b3b1467182daec8ab2c84b1631ad813e2daf1ec51e1d3b27b1fd06",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-ef79a29c5749.avif",
+          "width": 1080
+        },
+        {
+          "byteLength": 28382,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-44dcd46a266fc75ded4dc45c454114f09cd0a0ec114559bc00452a2db8132b4d",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-ef79a29c5749.webp",
+          "width": 1080
+        },
+        {
+          "byteLength": 31711,
+          "format": "avif",
+          "height": 900,
+          "integrity": "sha256-d896f5fafa72e8f93bf5341046405508c91acedd952d4c88ce6acc258012631b",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-ef79a29c5749.avif",
+          "width": 1440
+        },
+        {
+          "byteLength": 44624,
+          "format": "webp",
+          "height": 900,
+          "integrity": "sha256-251dbaa307d98c6babbdce65e2b7e33a515941890f9d4c2462c0742e3fa3b50f",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-ef79a29c5749.webp",
+          "width": 1440
+        }
+      ]
+    }
+  ]
+}

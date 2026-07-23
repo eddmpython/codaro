@@ -23,6 +23,7 @@ pub struct BackendLaunchConfig {
     backend_python_path: PathBuf,
     editor_root: PathBuf,
     logs_dir: PathBuf,
+    learning_evidence_store_header_path: PathBuf,
     workspace_root: PathBuf,
     uv_executable: Option<PathBuf>,
     release_id: String,
@@ -47,6 +48,7 @@ impl BackendLaunchConfig {
             editor_root: resolve_editor_root(paths, state, &backend_python_path),
             backend_python_path,
             logs_dir: paths.logs_dir(),
+            learning_evidence_store_header_path: paths.learning_evidence_store_header_path(),
             workspace_root,
             uv_executable: resolve_uv_executable(paths, state),
             release_id: state.release_id.clone(),
@@ -79,6 +81,10 @@ impl BackendLaunchConfig {
         command.env("PYTHONPATH", &self.backend_python_path);
         command.env("CODARO_WEB_BUILD_ROOT", &self.editor_root);
         command.env("CODARO_LAUNCHER_LOG_DIR", &self.logs_dir);
+        command.env(
+            "CODARO_LEARNING_STORE_HEADER_PATH",
+            &self.learning_evidence_store_header_path,
+        );
         if let Some(uv_executable) = &self.uv_executable {
             command.env("CODARO_UV_EXE", uv_executable);
         }
@@ -279,6 +285,7 @@ mod tests {
             backend_entry_module: "codaro.cli".into(),
             backend_console_script: "codaro".into(),
             editor_version: "0.3.0".into(),
+            learning_evidence_reader_version: 1,
             runtime_version: "3.12.12".into(),
             installed_at_unix_seconds: 1234,
         };
@@ -308,6 +315,10 @@ mod tests {
         );
         assert!(preview.python_path.contains("site-packages"));
         assert!(preview.program.contains("python"));
+        assert_eq!(
+            config.learning_evidence_store_header_path,
+            paths.learning_evidence_store_header_path()
+        );
         assert!(
             preview
                 .current_dir
@@ -345,6 +356,7 @@ mod tests {
             backend_entry_module: "codaro.cli".into(),
             backend_console_script: "codaro".into(),
             editor_version: "0.3.0".into(),
+            learning_evidence_reader_version: 1,
             runtime_version: "3.12.12".into(),
             installed_at_unix_seconds: 1234,
         };

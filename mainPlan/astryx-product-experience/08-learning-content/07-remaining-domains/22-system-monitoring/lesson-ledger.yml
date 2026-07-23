@@ -1,0 +1,52 @@
+schemaVersion: 1
+pathId: systemMonitoring
+composerSnapshotDate: "2026-07-18"
+composerGraphCount: 469
+composerVersionHash: "75fc453f508da3b8709bd0be8a4d36213ec535c7af7d2cd892e20c2aca3e7c06"
+taxonomySnapshotHash: "b5e9b0b9db4f6ecd89c7be10a5c795f9b991b3ce700d5b5cf044607fc835def2"
+sourceSetHash: "5f8d7bb62f23c2e10ed89536f72449613b42d55e7c0a659010a18ebf61ce535e"
+ledgerTool: "uv run python -X utf8 docs/skills/ops/tools/buildLearningLedgers.py --check"
+targetOutcomes:
+  - "python.errorHandling"
+  - "automation.procCtl"
+  - "automation.procMonitoring"
+  - "automation.watchSched"
+  - "builtins.logging"
+gaps: []
+lessons:
+  - order: 1
+    lessonRef: "30days/day01_헬로월드"
+    canonicalContentRef: "30days/day01_헬로월드"
+  - order: 2
+    lessonRef: "watchSched/02_이벤트타입구분"
+    canonicalContentRef: "watchSched/02_이벤트타입구분"
+  - order: 3
+    lessonRef: "30days/day02_변수와데이터타입"
+    canonicalContentRef: "30days/day02_변수와데이터타입"
+  - order: 4
+    lessonRef: "30days/day03_연산자"
+    canonicalContentRef: "30days/day03_연산자"
+  - order: 5
+    lessonRef: "30days/day13_조건문"
+    canonicalContentRef: "30days/day13_조건문"
+  - order: 6
+    lessonRef: "30days/day15_함수기초"
+    canonicalContentRef: "30days/day15_함수기초"
+  - order: 7
+    lessonRef: "30days/day18_모듈과import"
+    canonicalContentRef: "30days/day18_모듈과import"
+  - order: 8
+    lessonRef: "30days/day20_예외처리"
+    canonicalContentRef: "30days/day20_예외처리"
+  - order: 9
+    lessonRef: "builtins/25_logging"
+    canonicalContentRef: "builtins/25_logging"
+  - order: 10
+    lessonRef: "builtins/31_subprocess"
+    canonicalContentRef: "builtins/31_subprocess"
+  - order: 11
+    lessonRef: "procCtl/01_subprocess기초"
+    canonicalContentRef: "procCtl/01_subprocess기초"
+  - order: 12
+    lessonRef: "procCtl/07_psutil프로세스조회"
+    canonicalContentRef: "procCtl/07_psutil프로세스조회"

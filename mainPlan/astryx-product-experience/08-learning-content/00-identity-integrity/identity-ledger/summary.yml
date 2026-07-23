@@ -1,0 +1,30 @@
+schemaVersion: 1
+snapshotDate: '2026-07-23'
+canonicalIdentity: category/contentId
+sourceRows: 472
+categoryFiles: 41
+registeredRows: 472
+missingRegistryRows: 0
+pendingHumanReviewRows: 472
+approvedHumanReviewRows: 0
+metaIdMismatchRows: 441
+globalDuplicateAliasCount: 5
+globalDuplicateAliases:
+  '31':
+  - advancedPython/31_컨텍스트매니저
+  - builtins/31_subprocess
+  '32':
+  - advancedPython/32_제너레이터심화
+  - builtins/32_contextlib
+  '33':
+  - advancedPython/33_async와코루틴
+  - builtins/33_tempfile
+  '34':
+  - advancedPython/34_match와패턴매칭
+  - builtins/34_hashlib
+  '35':
+  - advancedPython/35_동시성
+  - builtins/35_zipfile
+missingLessonRefs: []
+migrationLedger: 00-identity-integrity/evidence/legacy-alias-migration.yml
+completionRule: registeredRows=472 and pendingHumanReviewRows=0 with evidence commits

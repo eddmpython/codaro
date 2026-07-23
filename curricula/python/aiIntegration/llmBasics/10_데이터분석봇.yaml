@@ -518,3 +518,283 @@ sections:
   check:
     noError: bot.ask 호출과 assertion이 모두 정상 실행되어야 합니다.
     resultCheck: insight 사전이 네 키를 가지고 metrics가 비어 있지 않아야 합니다.
+assessment:
+  masteryVariants:
+  - id: 10_data-bot-numeric-summary-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - data_tools
+    title: 인라인 데이터의 수치 컬럼 요약하기
+    subtitle: numeric summary
+    goal: summarize_numeric_column(rows, column)를 완성해 count, mean, min, max를 반환한다.
+    why: 분석 봇도 계산 자체는 결정적 코드로 검증할 수 있어야 결과를 믿고 다음 단계로 넘길 수 있습니다.
+    explanation: rows는 사전 목록이고 column은 수치 컬럼 이름입니다. 컬럼이 없거나 값이 숫자로 변환되지 않으면 ValueError를 발생시킵니다.
+    tips:
+    - mean은 소수점 3자리로 고정해 화면과 테스트가 흔들리지 않게 합니다.
+    - 빈 rows는 분석할 표본이 없으므로 실패로 처리합니다.
+    exercise:
+      prompt: summarize_numeric_column(rows, column)를 완성해 column, count, mean, min, max를 반환하세요.
+      starterCode: |-
+        def summarize_numeric_column(rows, column):
+            raise NotImplementedError
+      solution: |-
+        def summarize_numeric_column(rows, column):
+            values = []
+            for row in rows:
+                if column not in row:
+                    raise ValueError("column missing")
+                try:
+                    values.append(float(row[column]))
+                except (TypeError, ValueError) as exc:
+                    raise ValueError("column must be numeric") from exc
+            if not values:
+                raise ValueError("rows must not be empty")
+            return {
+                "column": column,
+                "count": len(values),
+                "mean": round(sum(values) / len(values), 3),
+                "min": min(values),
+                "max": max(values),
+            }
+      hints:
+      - 값을 모두 float로 바꾼 뒤 집계합니다.
+      - 비어 있는 데이터와 누락 컬럼은 같은 성공 흐름에 넣지 않습니다.
+    check:
+      id: python.llm.data-bot.numeric-summary.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.data-bot.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_numeric_column
+        cases:
+        - id: summarizes-total-bill-column
+          arguments:
+          - value:
+            - total_bill: 10
+              tip: 1.5
+            - total_bill: 20
+              tip: 3.0
+            - total_bill: 15
+              tip: 2.0
+          - value: total_bill
+          expectedReturn:
+            column: total_bill
+            count: 3
+            mean: 15.0
+            min: 10.0
+            max: 20.0
+        - id: rejects-missing-column
+          arguments:
+          - value:
+            - total_bill: 10
+          - value: tip
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 10_data-bot-group-mean-answer-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - json_finish
+    - analysis_bot
+    title: 그룹 평균 결과를 분석 응답 사전으로 만들기
+    subtitle: group mean answer
+    goal: answer_group_mean(rows, group_column, target_column)를 완성해 question, dataset, insight, metrics를 반환한다.
+    why: 웹에서도 학습자가 바로 분석 흐름을 확인하려면 데이터 도구 결과가 구조화 응답으로 닫혀야 합니다.
+    explanation: group_column별로 target_column 평균을 계산하고 가장 평균이 높은 그룹을 insight에 담습니다. 결과는 다음 화면이나 저장 단계가 바로 사용할 수 있는 사전입니다.
+    tips:
+    - metrics 값은 소수점 3자리로 고정합니다.
+    - best group은 평균값이 가장 큰 그룹입니다.
+    exercise:
+      prompt: answer_group_mean(rows, group_column, target_column)를 완성해 구조화 분석 응답을 반환하세요.
+      starterCode: |-
+        def answer_group_mean(rows, group_column, target_column):
+            raise NotImplementedError
+      solution: |-
+        def answer_group_mean(rows, group_column, target_column):
+            groups = {}
+            for row in rows:
+                if group_column not in row or target_column not in row:
+                    raise ValueError("required column missing")
+                group = str(row[group_column])
+                try:
+                    value = float(row[target_column])
+                except (TypeError, ValueError) as exc:
+                    raise ValueError("target column must be numeric") from exc
+                groups.setdefault(group, []).append(value)
+            if not groups:
+                raise ValueError("rows must not be empty")
+            metrics = {
+                group: round(sum(values) / len(values), 3)
+                for group, values in groups.items()
+            }
+            best_group = max(metrics, key=metrics.get)
+            return {
+                "question": "group mean",
+                "dataset": "inline",
+                "insight": f"{best_group} highest",
+                "metrics": metrics,
+            }
+      hints:
+      - 그룹별 리스트를 만든 뒤 평균을 계산합니다.
+      - 구조화 응답은 question, dataset, insight, metrics 네 키를 유지합니다.
+    check:
+      id: python.llm.data-bot.group-mean-answer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.data-bot.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: answer_group_mean
+        cases:
+        - id: returns-structured-group-mean-answer
+          arguments:
+          - value:
+            - time: Lunch
+              total_bill: 12
+            - time: Lunch
+              total_bill: 18
+            - time: Dinner
+              total_bill: 30
+            - time: Dinner
+              total_bill: 20
+          - value: time
+          - value: total_bill
+          expectedReturn:
+            question: group mean
+            dataset: inline
+            insight: Dinner highest
+            metrics:
+              Lunch: 15.0
+              Dinner: 25.0
+        - id: rejects-empty-rows
+          arguments:
+          - value: []
+          - value: day
+          - value: tip
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 10_data-bot-component-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 10_data-bot-group-mean-answer-transfer
+    title: 분석 봇 구성 요소 회상하기
+    subtitle: analysis bot recall
+    goal: choose_analysis_bot_component(goal)를 완성해 분석 봇 상황별 구성 요소와 실패 위험을 반환한다.
+    why: 종합 봇은 데이터 도구, 캐시 시스템, JSON 마감, 사용량 추적, 로컬 데이터 경계가 함께 맞아야 학습과 자동화가 이어집니다.
+    explanation: data-tools, cached-system, json-finish, usage-tracking, local-dataset 상황별로 적용할 규칙을 선택하세요.
+    tips:
+    - 데이터 계산은 도구가 맡고 모델은 흐름 선택과 설명을 맡습니다.
+    - JSON 마감은 저장, 시각화, 다음 자동화 단계로 넘기는 계약입니다.
+    exercise:
+      prompt: choose_analysis_bot_component(goal)를 완성해 rule, useWhen, risk를 반환하세요.
+      starterCode: |-
+        def choose_analysis_bot_component(goal):
+            raise NotImplementedError
+      solution: |-
+        def choose_analysis_bot_component(goal):
+            table = {
+                "data-tools": {"rule": "expose load summarize and group operations", "useWhen": "question needs dataset facts", "risk": "hallucinated numbers"},
+                "cached-system": {"rule": "cache stable analysis policy", "useWhen": "bot handles repeated questions", "risk": "high repeated cost"},
+                "json-finish": {"rule": "finish with question dataset insight metrics keys", "useWhen": "result feeds UI or storage", "risk": "unusable text"},
+                "usage-tracking": {"rule": "record tokens and cache fields per ask", "useWhen": "bot runs often", "risk": "unknown spend"},
+                "local-dataset": {"rule": "read from approved local dataset names", "useWhen": "browser or local lesson runs", "risk": "untrusted input"},
+            }
+            if goal not in table:
+                raise ValueError("unknown analysis bot goal")
+            return table[goal]
+      hints:
+      - 수치 근거는 데이터 도구에서 나와야 합니다.
+      - 결과는 사람이 읽는 문장과 코드가 쓰는 사전을 동시에 만족해야 합니다.
+    check:
+      id: python.llm.data-bot.component-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.data-bot.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_analysis_bot_component
+        cases:
+        - id: recalls-data-tools-component
+          arguments:
+          - value: data-tools
+          expectedReturn:
+            rule: expose load summarize and group operations
+            useWhen: question needs dataset facts
+            risk: hallucinated numbers
+        - id: recalls-json-finish-component
+          arguments:
+          - value: json-finish
+          expectedReturn:
+            rule: finish with question dataset insight metrics keys
+            useWhen: result feeds UI or storage
+            risk: unusable text
+        - id: rejects-unknown-goal
+          arguments:
+          - value: one-click-magic
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

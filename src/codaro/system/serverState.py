@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import os
 from pathlib import Path
 
-from ..classroom.assignmentStore import AssignmentStore
 from ..curriculum.analyticsTimeline import AnalyticsTimeline
+from ..curriculum.evidenceArchive import LearningEvidenceArchiveStore
 from ..curriculum.learnerState import LearnerStateStore
 from ..curriculum.osCache import CurriculumOsCache
 from ..curriculum.progress import ProgressTracker
@@ -29,7 +30,8 @@ class ServerState:
     curriculumOs: CurriculumOsCache
     learnerStateStore: LearnerStateStore
     analyticsTimeline: AnalyticsTimeline
-    assignmentStore: AssignmentStore
+    learningEvidenceArchiveStore: LearningEvidenceArchiveStore
+    learningArchiveRoot: Path
 
 
 def createServerState(
@@ -42,6 +44,16 @@ def createServerState(
     webBuildRoot: Path,
 ) -> ServerState:
     studyLoader = StudyLoader(str(studyRoot)) if studyRoot.exists() else None
+    codaroHome = Path(os.environ.get("CODARO_HOME", Path.home() / ".codaro")).expanduser().resolve()
+    progressPath = codaroHome / "progress.json"
+    learnerStatePath = codaroHome / "learnerState.db"
+    learningEvidenceArchiveStore = LearningEvidenceArchiveStore(
+        codaroHome / "learningEvidence.sqlite3",
+        legacyLearnerStatePath=learnerStatePath,
+        legacyProgressPath=progressPath,
+        lessonRefResolver=studyLoader.resolveLessonRef if studyLoader is not None else None,
+    )
+    learningEvidenceArchiveStore.initialize()
     return ServerState(
         mode=mode,
         documentPath=documentPath,
@@ -56,9 +68,10 @@ def createServerState(
             workspaceRoot=workspaceRoot,
         ),
         studyLoader=studyLoader,
-        progressTracker=ProgressTracker(),
+        progressTracker=ProgressTracker(progressPath),
         curriculumOs=CurriculumOsCache(studyLoader),
-        learnerStateStore=LearnerStateStore(),
+        learnerStateStore=LearnerStateStore(learnerStatePath),
         analyticsTimeline=AnalyticsTimeline(),
-        assignmentStore=AssignmentStore(),
+        learningEvidenceArchiveStore=learningEvidenceArchiveStore,
+        learningArchiveRoot=codaroHome / "learningArchives",
     )

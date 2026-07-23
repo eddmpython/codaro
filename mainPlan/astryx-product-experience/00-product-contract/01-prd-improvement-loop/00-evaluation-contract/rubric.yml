@@ -1,0 +1,51 @@
+schemaVersion: 1
+rubricId: astryx-prd-integrity
+rubricVersion: 1
+scoreScale: 100
+targetScore: null
+passThreshold: null
+rules:
+  requireCurrentEvidence: true
+  requireCounterEvidence: true
+  preserveRawScores: true
+  separateProductEvidenceMaturity: true
+  blockOnSeverity: [P0, P1]
+dimensions:
+  - id: learnerValue
+    title: learner value
+    weight: 20
+    evidenceRequired: user journey, learning mechanism, friction budget, measurable outcome
+  - id: currentStateAccuracy
+    title: current state accuracy
+    weight: 15
+    evidenceRequired: current path, symbol, data command, deployment fact
+  - id: decisionCompleteness
+    title: decision and SSOT completeness
+    weight: 15
+    evidenceRequired: canonical owner, schema boundary, forbidden duplicate state
+  - id: dependencyOwnership
+    title: dependency and ownership
+    weight: 15
+    evidenceRequired: acyclic order, bootstrap before use, one creation owner per artifact
+  - id: feasibilityCapacity
+    title: feasibility and capacity
+    weight: 15
+    evidenceRequired: prototype or bounded spike, staffing, operational capacity, failure boundary
+  - id: testRollback
+    title: test and rollback
+    weight: 10
+    evidenceRequired: positive and negative fixture, compatibility reader, rollback invariant
+  - id: measurementRelease
+    title: measurement and release
+    weight: 10
+    evidenceRequired: staged release, evidence freshness, decision rule, owner and expiry
+severity:
+  P0: plan contradiction or missing safety, migration, or dependency decision that blocks all implementation
+  P1: defect that blocks the owning workstream or makes its acceptance evidence unreliable
+  P2: bounded ambiguity or optimization with an owner and review point that does not block the dependency
+productEvidenceMaturity:
+  E0: no executable or human evidence for the claim
+  E1: synthetic contract, fixture, or static artifact evidence only
+  E2: one end-to-end vertical slice with current implementation, automated checks, and human review
+  E3: representative paths and supported viewport or runtime matrix with current evidence
+  E4: full declared scope plus real-user operational evidence and freshness controls

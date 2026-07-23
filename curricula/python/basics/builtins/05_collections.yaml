@@ -361,3 +361,351 @@ sections:
     type: noError
     noError: collections 모듈 종합 복습에서 `items` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: collections 모듈 종합 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 05_collections-ticket-backlog-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - counter
+    - workflow_validation
+    - practice
+    title: 티켓 상태와 우선순위 집계하기
+    subtitle: Counter 결과를 검증 가능한 dict로 반환
+    goal: 티켓 행 목록에서 상태별 개수, 우선순위별 개수, 최다 상태를 계산해 반환한다.
+    why: Counter는 눈으로 확인하는 표가 아니라 운영 상태를 다음 판단에 넘기는 집계 결과를 만들어야 쓸모가 생깁니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 티켓 목록으로 다시 호출합니다.
+    tips:
+    - Counter 결과는 dict로 바꿔 반환하고, 키 순서를 안정적으로 만들려면 sorted를 사용하세요.
+    - most_common(1)은 가장 많이 등장한 상태와 개수를 한 쌍으로 돌려줍니다.
+    exercise:
+      prompt: summarize_ticket_backlog(rows)가 total, statusCounts, priorityCounts, topStatus를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def summarize_ticket_backlog(rows):
+            raise NotImplementedError
+      solution: |-
+        from collections import Counter
+
+        def summarize_ticket_backlog(rows):
+            status_counts = Counter(row["status"] for row in rows)
+            priority_counts = Counter(row["priority"] for row in rows)
+            return {
+                "total": len(rows),
+                "statusCounts": dict(sorted(status_counts.items())),
+                "priorityCounts": dict(sorted(priority_counts.items())),
+                "topStatus": list(status_counts.most_common(1)[0]),
+            }
+      hints:
+      - status와 priority는 서로 다른 Counter로 세야 합니다.
+      - topStatus는 이름과 개수를 모두 담아야 합니다.
+    check:
+      id: python.builtins.collections.ticket-backlog.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.collections.ticket-backlog.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_ticket_backlog
+        cases:
+        - id: mixed-statuses
+          arguments:
+          - value:
+            - ticketId: T-1
+              status: open
+              priority: high
+            - ticketId: T-2
+              status: done
+              priority: medium
+            - ticketId: T-3
+              status: open
+              priority: low
+            - ticketId: T-4
+              status: blocked
+              priority: high
+          expectedReturn:
+            total: 4
+            statusCounts:
+              blocked: 1
+              done: 1
+              open: 2
+            priorityCounts:
+              high: 2
+              low: 1
+              medium: 1
+            topStatus:
+            - open
+            - 2
+        - id: review-heavy
+          arguments:
+          - value:
+            - ticketId: A-1
+              status: review
+              priority: low
+            - ticketId: A-2
+              status: review
+              priority: low
+            - ticketId: A-3
+              status: open
+              priority: high
+            - ticketId: A-4
+              status: review
+              priority: medium
+            - ticketId: A-5
+              status: open
+              priority: high
+          expectedReturn:
+            total: 5
+            statusCounts:
+              open: 2
+              review: 3
+            priorityCounts:
+              high: 2
+              low: 2
+              medium: 1
+            topStatus:
+            - review
+            - 3
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 05_collections-owner-rollup-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - 05_collections-ticket-backlog-mastery
+    title: 담당자별 티켓 묶음과 점수 합계 만들기
+    subtitle: defaultdict를 다른 운영 데이터에 적용
+    goal: 담당자별 티켓 목록과 포인트 합계를 누락 키 초기화 없이 계산한다.
+    why: 집계 코드는 새 담당자가 등장할 때마다 if 문을 늘리는 방식보다 기본값 컨테이너로 구조를 먼저 세우는 편이 안전합니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 데이터가 아니라 반환 계약을 기준으로 작성하세요.
+    tips:
+    - tickets_by_owner는 defaultdict(list), points_by_owner는 defaultdict(int)가 어울립니다.
+    - 반환 dict의 owner 순서를 안정화하면 검증 결과를 읽기 쉽습니다.
+    exercise:
+      prompt: build_owner_rollup(rows)가 owner별 tickets와 points를 담은 중첩 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def build_owner_rollup(rows):
+            raise NotImplementedError
+      solution: |-
+        from collections import defaultdict
+
+        def build_owner_rollup(rows):
+            tickets_by_owner = defaultdict(list)
+            points_by_owner = defaultdict(int)
+            for row in rows:
+                owner = row["owner"]
+                tickets_by_owner[owner].append(row["ticketId"])
+                points_by_owner[owner] += int(row["points"])
+            return {
+                owner: {"tickets": tickets_by_owner[owner], "points": points_by_owner[owner]}
+                for owner in sorted(tickets_by_owner)
+            }
+      hints:
+      - 같은 owner가 여러 번 나오면 tickets에는 순서대로 추가하고 points는 누적하세요.
+      - defaultdict를 dict처럼 반환해도 JSON 가능한 기본 타입만 담기면 검증할 수 있습니다.
+    check:
+      id: python.builtins.collections.owner-rollup.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.collections.owner-rollup.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_owner_rollup
+        cases:
+        - id: two-owners
+          arguments:
+          - value:
+            - ticketId: T-101
+              owner: min
+              points: 3
+            - ticketId: T-102
+              owner: seo
+              points: 5
+            - ticketId: T-103
+              owner: min
+              points: 8
+          expectedReturn:
+            min:
+              tickets:
+              - T-101
+              - T-103
+              points: 11
+            seo:
+              tickets:
+              - T-102
+              points: 5
+        - id: sorted-owners
+          arguments:
+          - value:
+            - ticketId: B-1
+              owner: jin
+              points: 2
+            - ticketId: B-2
+              owner: ari
+              points: 7
+            - ticketId: B-3
+              owner: jin
+              points: 4
+            - ticketId: B-4
+              owner: ari
+              points: 1
+          expectedReturn:
+            ari:
+              tickets:
+              - B-2
+              - B-4
+              points: 8
+            jin:
+              tickets:
+              - B-1
+              - B-3
+              points: 6
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 05_collections-recent-statuses-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 05_collections-owner-rollup-transfer
+    title: 최근 상태 창 다시 구성하기
+    subtitle: deque와 Counter를 하루 뒤 재사용
+    goal: 이벤트 목록에서 최근 N개 상태만 유지하고 상태별 개수와 error 비율을 계산한다.
+    why: 스트림 처리와 모니터링에서는 전체 로그보다 최근 창을 정확히 유지하는 능력이 더 중요합니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. deque(maxlen)과 Counter 흐름을 예시 없이 복원하세요.
+    tips:
+    - deque(maxlen=window_size)는 새 항목이 들어오면 오래된 항목을 자동 제거합니다.
+    - window_size가 0 이하이면 잘못된 설정이므로 ValueError를 일으키세요.
+    exercise:
+      prompt: summarize_recent_statuses(events, window_size)가 windowSize, recent, statusCounts, errorRate를 반환하고 잘못된 window_size는
+        거부하도록 완성하세요.
+      starterCode: |-
+        def summarize_recent_statuses(events, window_size):
+            raise NotImplementedError
+      solution: |-
+        from collections import Counter, deque
+
+        def summarize_recent_statuses(events, window_size):
+            if window_size <= 0:
+                raise ValueError("window_size must be positive")
+            recent = deque(maxlen=window_size)
+            for event in events:
+                recent.append(event["status"])
+            counts = Counter(recent)
+            error_count = counts["error"]
+            return {
+                "windowSize": window_size,
+                "recent": list(recent),
+                "statusCounts": dict(sorted(counts.items())),
+                "errorRate": round(error_count / len(recent), 2) if recent else 0,
+            }
+      hints:
+      - recent에는 전체 events가 아니라 마지막 window_size개 상태만 남아야 합니다.
+      - Counter에서 없는 키를 읽으면 0이므로 error가 없는 경우도 안전합니다.
+    check:
+      id: python.builtins.collections.recent-statuses.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.collections.recent-statuses.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_recent_statuses
+        cases:
+        - id: trimmed-window
+          arguments:
+          - value:
+            - status: ok
+            - status: error
+            - status: ok
+            - status: error
+            - status: error
+          - value: 3
+          expectedReturn:
+            windowSize: 3
+            recent:
+            - ok
+            - error
+            - error
+            statusCounts:
+              error: 2
+              ok: 1
+            errorRate: 0.67
+        - id: window-larger-than-events
+          arguments:
+          - value:
+            - status: ok
+            - status: ok
+            - status: warn
+            - status: error
+          - value: 5
+          expectedReturn:
+            windowSize: 5
+            recent:
+            - ok
+            - ok
+            - warn
+            - error
+            statusCounts:
+              error: 1
+              ok: 2
+              warn: 1
+            errorRate: 0.25
+        - id: rejects-empty-window
+          arguments:
+          - value:
+            - status: ok
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

@@ -630,3 +630,260 @@ sections:
   check:
     noError: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트의 SQL 컬럼, 테이블명, 조건식이 쿼리 엔진에서 해석되어야 합니다.'
     resultCheck: '현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트 쿼리 결과의 행 수, 컬럼명, 집계값이 바꾼 SQL 조건을 반영해야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: duckdb_01-select-where-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: SELECT·WHERE 결과 계약 구현하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 필수 열을 검사하고 조건을 통과한 행만 projection 순서대로 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - WHERE 비교 열도 schema 계약에 포함하세요.
+    - projection은 필터가 끝난 뒤 적용하세요.
+    exercise:
+      prompt: select_where(rows, column, minimum, projection)를 완성하세요.
+      starterCode: |-
+        def select_where(rows, column, minimum, projection):
+            raise NotImplementedError
+      solution: |
+        def select_where(rows, column, minimum, projection):
+            required = set(projection) | {column}
+            if any(not required <= set(row) for row in rows):
+                raise ValueError("schema mismatch")
+            return [{name: row[name] for name in projection} for row in rows if row[column] >= minimum]
+      hints: *id001
+    check:
+      id: python.duckdb.duckdb_01.select-where-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_01.select-where-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: select_where
+        cases:
+        - id: filters-tip-rows
+          arguments:
+          - value:
+            - day: Fri
+              total: 18
+              tip: 3
+            - day: Sat
+              total: 10
+              tip: 1
+          - value: tip
+          - value: 2
+          - value:
+            - day
+            - tip
+          expectedReturn:
+          - day: Fri
+            tip: 3
+        - id: keeps-threshold-equality
+          arguments:
+          - value:
+            - id: 1
+              score: 5
+          - value: score
+          - value: 5
+          - value:
+            - id
+          expectedReturn:
+          - id: 1
+        - id: rejects-missing-column
+          arguments:
+          - value:
+            - id: 1
+          - value: score
+          - value: 0
+          - value:
+            - id
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: duckdb_01-ordered-limit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - duckdb_01-select-where-contract-mastery
+    title: 새 주문 데이터에 ORDER BY·LIMIT 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 필터 결과를 복합 정렬하고 제한하되 동점 순서를 안정화한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - WHERE가 먼저, ORDER BY가 다음, LIMIT가 마지막입니다.
+    - 동점에는 id 같은 안정적인 두 번째 key를 두세요.
+    exercise:
+      prompt: top_orders(rows, status, limit)를 완성해 amount 내림차순, id 오름차순으로 반환하세요.
+      starterCode: |-
+        def top_orders(rows, status, limit):
+            raise NotImplementedError
+      solution: |
+        def top_orders(rows, status, limit):
+            if limit < 0:
+                raise ValueError("negative limit")
+            selected = [row for row in rows if row.get("status") == status]
+            selected.sort(key=lambda row: (-row["amount"], row["id"]))
+            return [{"id": row["id"], "amount": row["amount"]} for row in selected[:limit]]
+      hints: *id002
+    check:
+      id: python.duckdb.duckdb_01.ordered-limit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_01.ordered-limit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: top_orders
+        cases:
+        - id: orders-and-limits
+          arguments:
+          - value:
+            - id: 2
+              amount: 50
+              status: paid
+            - id: 1
+              amount: 50
+              status: paid
+            - id: 3
+              amount: 90
+              status: open
+          - value: paid
+          - value: 1
+          expectedReturn:
+          - id: 1
+            amount: 50
+        - id: returns-empty-status
+          arguments:
+          - value:
+            - id: 1
+              amount: 5
+              status: open
+          - value: paid
+          - value: 3
+          expectedReturn: []
+        - id: rejects-negative-limit
+          arguments:
+          - value: []
+          - value: paid
+          - value: -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: duckdb_01-row-operation-order-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - duckdb_01-ordered-limit-transfer
+    title: 기본 SQL 연산 순서 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 필터, projection, 정렬, 제한의 논리적 책임을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 행 조건과 출력 열 선택을 분리하세요.
+    - top N은 정렬 근거가 없으면 재현되지 않습니다.
+    exercise:
+      prompt: choose_row_operation(situation)를 완성해 stage, evidence, pitfall을 반환하세요.
+      starterCode: |-
+        def choose_row_operation(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_row_operation(situation):
+            table = {'remove-low-tips': {'stage': 'WHERE', 'evidence': 'row predicate', 'pitfall': 'filter after limit'}, 'keep-two-columns': {'stage': 'SELECT', 'evidence': 'output schema', 'pitfall': 'scan every unused column'}, 'top-five': {'stage': 'ORDER BY then LIMIT', 'evidence': 'stable sort keys', 'pitfall': 'limit before sort'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.duckdb.duckdb_01.row-operation-order.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.duckdb.duckdb_01.row-operation-order.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_row_operation
+        cases:
+        - id: recalls-remove-low-tips
+          arguments:
+          - value: remove-low-tips
+          expectedReturn:
+            stage: WHERE
+            evidence: row predicate
+            pitfall: filter after limit
+        - id: recalls-keep-two-columns
+          arguments:
+          - value: keep-two-columns
+          expectedReturn:
+            stage: SELECT
+            evidence: output schema
+            pitfall: scan every unused column
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

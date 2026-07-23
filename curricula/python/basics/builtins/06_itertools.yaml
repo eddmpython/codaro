@@ -359,3 +359,313 @@ sections:
     type: noError
     noError: itertools 모듈 종합 복습에서 `countUp` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: itertools 모듈 종합 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 06_itertools-chunk-records-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - filtering
+    - practical
+    - workflow_validation
+    title: iterator를 일정 크기 배치로 나누기
+    subtitle: islice로 한 번씩만 소비
+    goal: 입력 iterable을 지정한 크기의 batch 목록으로 나누고 잘못된 크기는 거부한다.
+    why: 대량 데이터를 한 번에 리스트로 펼치지 않고 필요한 만큼만 소비해야 웹과 로컬 학습 실행이 모두 안정적입니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 record 목록과 batch 크기로 다시 호출합니다.
+    tips:
+    - iterator = iter(records)로 하나의 반복자를 만들고 islice로 size개씩 소비하세요.
+    - 빈 batch가 나오면 반복을 끝내야 합니다.
+    exercise:
+      prompt: chunk_records(records, size)가 records를 size 단위의 list 묶음으로 반환하고 size <= 0이면 ValueError를 일으키도록 완성하세요.
+      starterCode: |-
+        def chunk_records(records, size):
+            raise NotImplementedError
+      solution: |-
+        from itertools import islice
+
+        def chunk_records(records, size):
+            if size <= 0:
+                raise ValueError("size must be positive")
+            iterator = iter(records)
+            batches = []
+            while True:
+                batch = list(islice(iterator, size))
+                if not batch:
+                    break
+                batches.append(batch)
+            return batches
+      hints:
+      - islice(iterator, size)는 iterator의 다음 size개만 가져옵니다.
+      - records 전체를 미리 복사하지 않아도 됩니다.
+    check:
+      id: python.builtins.itertools.chunk-records.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.itertools.chunk-records.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: chunk_records
+        cases:
+        - id: uneven-string-records
+          arguments:
+          - value:
+            - O-1
+            - O-2
+            - O-3
+            - O-4
+            - O-5
+          - value: 2
+          expectedReturn:
+          - - O-1
+            - O-2
+          - - O-3
+            - O-4
+          - - O-5
+        - id: numeric-records
+          arguments:
+          - value:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+          - value: 4
+          expectedReturn:
+          - - 1
+            - 2
+            - 3
+            - 4
+          - - 5
+            - 6
+        - id: rejects-zero-size
+          arguments:
+          - value:
+            - O-1
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 06_itertools-campaign-pairs-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - 06_itertools-chunk-records-mastery
+    title: 캠페인과 채널 조합을 제한해서 만들기
+    subtitle: product 결과를 islice로 절단
+    goal: 캠페인과 채널의 모든 조합 중 앞에서부터 limit개만 문자열 목록으로 반환한다.
+    why: 조합 탐색은 쉽게 폭발하므로 생성과 동시에 제한하는 습관이 실무 자동화 비용을 줄입니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 전체 product를 무작정 펼치지 말고 필요한 수만 소비하세요.
+    tips:
+    - product(campaigns, channels)는 campaign이 바깥쪽 순서로 반복됩니다.
+    - limit이 음수면 잘못된 설정이므로 ValueError를 일으키세요.
+    exercise:
+      prompt: first_campaign_channel_pairs(campaigns, channels, limit)가 "campaign:channel" 문자열을 limit개까지 반환하도록 완성하세요.
+      starterCode: |-
+        def first_campaign_channel_pairs(campaigns, channels, limit):
+            raise NotImplementedError
+      solution: |-
+        from itertools import islice, product
+
+        def first_campaign_channel_pairs(campaigns, channels, limit):
+            if limit < 0:
+                raise ValueError("limit must not be negative")
+            return [
+                f"{campaign}:{channel}"
+                for campaign, channel in islice(product(campaigns, channels), limit)
+            ]
+      hints:
+      - product 결과를 list로 전부 만든 뒤 자르는 방식보다 islice로 먼저 제한하세요.
+      - 반환값은 tuple이 아니라 문자열 목록입니다.
+    check:
+      id: python.builtins.itertools.campaign-pairs.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.itertools.campaign-pairs.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: first_campaign_channel_pairs
+        cases:
+        - id: limited-cartesian-product
+          arguments:
+          - value:
+            - launch
+            - winback
+          - value:
+            - email
+            - sms
+            - push
+          - value: 4
+          expectedReturn:
+          - launch:email
+          - launch:sms
+          - launch:push
+          - winback:email
+        - id: limit-larger-than-product
+          arguments:
+          - value:
+            - a
+            - b
+            - c
+          - value:
+            - web
+          - value: 5
+          expectedReturn:
+          - a:web
+          - b:web
+          - c:web
+        - id: rejects-negative-limit
+          arguments:
+          - value:
+            - a
+          - value:
+            - web
+          - value: -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 06_itertools-region-amounts-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 06_itertools-campaign-pairs-transfer
+    title: 지역별 누적 매출 다시 구성하기
+    subtitle: groupby 정렬 조건과 accumulate 복원
+    goal: 주문 행을 region 기준으로 정렬한 뒤 지역별 total과 running 누적값을 반환한다.
+    why: groupby는 정렬을 잊으면 같은 지역이 여러 조각으로 갈라지므로, 하루 뒤에도 이 전제부터 복원해야 합니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. 정렬, groupby, accumulate 순서를 다시 세우세요.
+    tips:
+    - groupby 전에 sorted(rows, key=lambda row: row["region"])를 먼저 적용하세요.
+    - accumulate(amounts)의 마지막 값이 지역 total입니다.
+    exercise:
+      prompt: summarize_region_amounts(rows)가 region, total, running을 담은 dict 목록을 region 오름차순으로 반환하도록 완성하세요.
+      starterCode: |-
+        def summarize_region_amounts(rows):
+            raise NotImplementedError
+      solution: |-
+        from itertools import accumulate, groupby
+
+        def summarize_region_amounts(rows):
+            ordered = sorted(rows, key=lambda row: row["region"])
+            summary = []
+            for region, group in groupby(ordered, key=lambda row: row["region"]):
+                amounts = [row["amount"] for row in group]
+                running = list(accumulate(amounts))
+                summary.append({"region": region, "total": running[-1], "running": running})
+            return summary
+      hints:
+      - rows가 비어 있으면 for 루프가 돌지 않아 빈 list가 반환됩니다.
+      - running은 지역 안에서 입력 순서대로 누적한 금액 목록입니다.
+    check:
+      id: python.builtins.itertools.region-amounts.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.itertools.region-amounts.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_region_amounts
+        cases:
+        - id: unsorted-regions
+          arguments:
+          - value:
+            - region: KR
+              amount: 120
+            - region: US
+              amount: 80
+            - region: KR
+              amount: 150
+            - region: JP
+              amount: 60
+          expectedReturn:
+          - region: JP
+            total: 60
+            running:
+            - 60
+          - region: KR
+            total: 270
+            running:
+            - 120
+            - 270
+          - region: US
+            total: 80
+            running:
+            - 80
+        - id: already-adjacent
+          arguments:
+          - value:
+            - region: EU
+              amount: 30
+            - region: EU
+              amount: 20
+            - region: APAC
+              amount: 50
+          expectedReturn:
+          - region: APAC
+            total: 50
+            running:
+            - 50
+          - region: EU
+            total: 50
+            running:
+            - 30
+            - 50
+        - id: empty-rows
+          arguments:
+          - value: []
+          expectedReturn: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

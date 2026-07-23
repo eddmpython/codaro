@@ -360,3 +360,310 @@ sections:
   check:
     noError: json 모듈 종합 복습에서 `person` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: json 모듈 종합 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 13_json-public-config-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - basic_serialization
+    - workflow_validation
+    - practice
+    title: 공개 설정 JSON 정규화하기
+    subtitle: 필수 구조 검증과 비밀 키 제거
+    goal: 설정 dict를 검증하고 password, token 같은 비밀 키를 제거한 공개 설정 요약을 반환한다.
+    why: JSON 학습은 문자열 변환보다 외부에서 온 설정을 검증하고 공개 가능한 형태로 바꾸는 능력이 실제 제품에 더 직접적입니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 설정 dict로 다시 호출합니다.
+    tips:
+    - app, features, limits 필드 타입을 먼저 확인하세요.
+    - 공개 결과에는 token과 password가 남아 있으면 안 됩니다.
+    exercise:
+      prompt: normalize_public_config(config)가 appName, version, features, maxUsers, publicKeys를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def normalize_public_config(config):
+            raise NotImplementedError
+      solution: |-
+        def normalize_public_config(config):
+            if not isinstance(config.get("app"), dict):
+                raise ValueError("app must be an object")
+            if not isinstance(config.get("features"), list):
+                raise ValueError("features must be a list")
+            if not isinstance(config.get("limits"), dict):
+                raise ValueError("limits must be an object")
+            public_config = {
+                key: value
+                for key, value in config.items()
+                if key not in {"password", "token"}
+            }
+            return {
+                "appName": public_config["app"]["name"],
+                "version": public_config["app"]["version"],
+                "features": sorted(public_config["features"]),
+                "maxUsers": public_config["limits"]["maxUsers"],
+                "publicKeys": sorted(public_config),
+            }
+      hints:
+      - 외부 JSON을 이미 dict로 받은 상태라고 생각하고 구조부터 확인하세요.
+      - features는 순서를 안정화하기 위해 sorted로 반환하세요.
+    check:
+      id: python.builtins.json.public-config.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.json.output-roundtrip.behavior.v1.fixture
+      fixtureHash: sha256-a8vNUnXz7mslkw9j500ecOVAV+chLErOuyiQo/6hQdU=
+      fixture:
+        directories:
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: normalize_public_config
+        cases:
+        - id: removes-token
+          arguments:
+          - value:
+              app:
+                name: Codaro
+                version: 1.0.0
+              features:
+              - automation
+              - curriculum
+              limits:
+                maxUsers: 25
+              token: secret-token
+          expectedReturn:
+            appName: Codaro
+            version: 1.0.0
+            features:
+            - automation
+            - curriculum
+            maxUsers: 25
+            publicKeys:
+            - app
+            - features
+            - limits
+        - id: removes-password
+          arguments:
+          - value:
+              app:
+                name: Learn
+                version: 2.1.0
+              features:
+              - web
+              - local
+              limits:
+                maxUsers: 10
+              password: hidden
+          expectedReturn:
+            appName: Learn
+            version: 2.1.0
+            features:
+            - local
+            - web
+            maxUsers: 10
+            publicKeys:
+            - app
+            - features
+            - limits
+        - id: rejects-missing-features
+          arguments:
+          - value:
+              app:
+                name: Bad
+              limits:
+                maxUsers: 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 13_json-api-response-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - 13_json-public-config-mastery
+    title: API 응답 문자열을 실행 가능한 요약으로 바꾸기
+    subtitle: loads와 누락 필드 방어
+    goal: JSON 응답 문자열에서 status, users, active를 읽어 userCount와 activeRate를 반환한다.
+    why: 웹 학습에서 JSON은 API 응답을 받아 다음 행동으로 연결하는 형식이므로, 파싱 실패와 구조 누락을 함께 다뤄야 합니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 설정 dict가 아니라 JSON 문자열을 직접 파싱하세요.
+    tips:
+    - json.loads가 실패하면 JSONDecodeError가 발생합니다.
+    - activeRate는 active / users를 소수점 둘째 자리까지 반올림하세요.
+    exercise:
+      prompt: summarize_api_response(payload)가 status, userCount, activeRate를 담은 dict를 반환하고 잘못된 구조는 ValueError를 일으키도록 완성하세요.
+      starterCode: |-
+        def summarize_api_response(payload):
+            raise NotImplementedError
+      solution: |-
+        import json
+
+        def summarize_api_response(payload):
+            parsed = json.loads(payload)
+            data = parsed.get("data")
+            if not isinstance(data, dict) or "users" not in data or "active" not in data:
+                raise ValueError("data.users and data.active are required")
+            users = data["users"]
+            active = data["active"]
+            return {
+                "status": parsed.get("status", "unknown"),
+                "userCount": users,
+                "activeRate": round(active / users, 2) if users else 0,
+            }
+      hints:
+      - JSON 문법 오류와 구조 오류는 서로 다른 실패입니다.
+      - users가 0이면 나누지 말고 activeRate를 0으로 두세요.
+    check:
+      id: python.builtins.json.api-response.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.json.output-roundtrip.behavior.v1.fixture
+      fixtureHash: sha256-a8vNUnXz7mslkw9j500ecOVAV+chLErOuyiQo/6hQdU=
+      fixture:
+        directories:
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_api_response
+        cases:
+        - id: success-response
+          arguments:
+          - value: '{"status":"success","data":{"users":150,"active":120}}'
+          expectedReturn:
+            status: success
+            userCount: 150
+            activeRate: 0.8
+        - id: zero-users
+          arguments:
+          - value: '{"status":"empty","data":{"users":0,"active":0}}'
+          expectedReturn:
+            status: empty
+            userCount: 0
+            activeRate: 0
+        - id: rejects-missing-data
+          arguments:
+          - value: '{"status":"bad"}'
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 13_json-write-report-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 13_json-api-response-transfer
+    title: JSON 리포트를 저장하고 다시 읽기
+    subtitle: dump, load, sort_keys round-trip
+    goal: data를 JSON 파일로 저장한 뒤 다시 읽어 roundTrip, keys, path를 반환한다.
+    why: 시간이 지난 뒤에도 JSON 저장은 파일을 썼다는 사실보다 다시 읽어도 같은 데이터인지 확인하는 습관이 핵심입니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. 저장, 읽기, 검증 흐름을 예시 없이 다시 조립하세요.
+    tips:
+    - target_path.parent.mkdir(parents=True, exist_ok=True)로 폴더를 준비하세요.
+    - ensure_ascii=False와 sort_keys=True를 같이 사용하면 한국어와 key 순서가 안정적입니다.
+    exercise:
+      prompt: write_json_report(target_path, data)가 path, roundTrip, keys를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def write_json_report(target_path, data):
+            raise NotImplementedError
+      solution: |-
+        import json
+        from pathlib import Path
+
+        def write_json_report(target_path, data):
+            path = Path(target_path)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            with path.open("w", encoding="utf-8") as file:
+                json.dump(data, file, ensure_ascii=False, sort_keys=True, indent=2)
+            with path.open("r", encoding="utf-8") as file:
+                loaded = json.load(file)
+            return {"path": str(path), "roundTrip": loaded == data, "keys": sorted(loaded)}
+      hints:
+      - 파일을 쓴 뒤 같은 경로를 다시 열어 json.load로 검증하세요.
+      - 반환 path는 verifier가 fixture root 기준 상대경로로 정규화합니다.
+    check:
+      id: python.builtins.json.write-report.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.json.output-roundtrip.behavior.v1.fixture
+      fixtureHash: sha256-a8vNUnXz7mslkw9j500ecOVAV+chLErOuyiQo/6hQdU=
+      fixture:
+        directories:
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: write_json_report
+        cases:
+        - id: writes-summary
+          arguments:
+          - fixturePath: output/summary.json
+          - value:
+              status: ok
+              count: 3
+              label: 학습
+          expectedReturn:
+            path: output/summary.json
+            roundTrip: true
+            keys:
+            - count
+            - label
+            - status
+        - id: writes-nested
+          arguments:
+          - fixturePath: output/reports/detail.json
+          - value:
+              app:
+                name: Codaro
+              enabled: true
+          expectedReturn:
+            path: output/reports/detail.json
+            roundTrip: true
+            keys:
+            - app
+            - enabled
+        expectedPaths:
+        - path: output/summary.json
+          kind: file
+        - path: output/reports/detail.json
+          kind: file
+        normalizeReturnPaths:
+        - path
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

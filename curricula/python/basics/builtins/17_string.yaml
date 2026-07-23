@@ -307,3 +307,276 @@ sections:
     type: noError
     noError: string 모듈 종합 복습에서 `letters` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: string 모듈 종합 복습 실행 뒤 `letters` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 17_string-invite-template-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - string_constants
+    - template_strings
+    - workflow_validation
+    title: 초대 코드 정책을 검증하고 메시지 만들기
+    subtitle: string 상수와 Template 치환
+    goal: 초대 record의 code를 안전한 alphabet으로 검증하고 Template으로 개인화 메시지를 만든다.
+    why: string 모듈은 상수를 외우는 도구가 아니라, 허용 문자 정책과 템플릿 출력을 한 함수 안에서 검증할 때 학습 효과가 생깁니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않는 record 목록과 template을 넘겨 정상 메시지와 실패 케이스를 함께 검증합니다.
+    tips:
+    - '`0`, `O`, `1`, `I`는 혼동을 줄이기 위해 허용하지 마세요.'
+    - Template.substitute는 누락 값이 있으면 즉시 실패합니다.
+    exercise:
+      prompt: render_invite_messages(template_text, records)가 개인화 메시지 list를 반환하고 정책 밖 code는 ValueError로 막도록 완성하세요.
+      starterCode: |-
+        def render_invite_messages(template_text, records):
+            raise NotImplementedError
+      solution: |-
+        import string
+
+        SAFE_ALPHABET = "".join(
+            char for char in string.ascii_uppercase + string.digits
+            if char not in {"0", "O", "1", "I"}
+        )
+
+        def render_invite_messages(template_text, records):
+            template = string.Template(template_text)
+            messages = []
+            for record in records:
+                code = record["code"]
+                if len(code) < 6 or any(char not in SAFE_ALPHABET for char in code):
+                    raise ValueError("invite code does not match policy")
+                messages.append(template.substitute(
+                    name=record["name"],
+                    team=record["team"],
+                    code=code,
+                ))
+            return messages
+      hints:
+      - SAFE_ALPHABET을 먼저 만들고 code의 모든 글자가 포함되는지 확인하세요.
+      - Template.substitute에는 name, team, code를 명시적으로 넘기세요.
+    check:
+      id: python.builtins.string.invite-template.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.string.invite.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: render_invite_messages
+        cases:
+        - id: renders-valid-invites
+          arguments:
+          - value: Hi $name, join $team with code $code.
+          - value:
+            - name: Mina
+              team: Ops
+              code: AB23CD
+            - name: Joon
+              team: Data
+              code: ZXCV99
+          expectedReturn:
+          - Hi Mina, join Ops with code AB23CD.
+          - Hi Joon, join Data with code ZXCV99.
+        - id: rejects-confusing-code
+          arguments:
+          - value: Hi $name, join $team with code $code.
+          - value:
+            - name: Sol
+              team: QA
+              code: A0BCD2
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 17_string-code-policy-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - 17_string-invite-template-mastery
+    - character_validation
+    title: 초대 코드 묶음의 실패 이유 감사하기
+    subtitle: 허용 문자와 길이 정책 분리
+    goal: code 목록을 검사해 validCount, invalid reason, alphabetSize를 반환한다.
+    why: 전이 과제에서는 메시지 생성 없이 정책 검사만 분리해, 같은 string 상수 지식을 배치 검증 도구로 옮깁니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 이번에는 record dict가 아니라 code 문자열 목록만 보고 실패 이유를 남기세요.
+    tips:
+    - 짧은 code와 허용되지 않은 문자를 각각 reason으로 남기세요.
+    - invalid 문자는 중복 제거 후 정렬하면 검증이 안정됩니다.
+    exercise:
+      prompt: summarize_invite_codes(codes)가 validCount, invalid, alphabetSize를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def summarize_invite_codes(codes):
+            raise NotImplementedError
+      solution: |-
+        import string
+
+        SAFE_ALPHABET = "".join(
+            char for char in string.ascii_uppercase + string.digits
+            if char not in {"0", "O", "1", "I"}
+        )
+
+        def summarize_invite_codes(codes):
+            valid = []
+            invalid = []
+            for code in codes:
+                reasons = []
+                if len(code) < 6:
+                    reasons.append("short")
+                bad_chars = sorted({char for char in code if char not in SAFE_ALPHABET})
+                if bad_chars:
+                    reasons.append("invalid:" + "".join(bad_chars))
+                if reasons:
+                    invalid.append(f"{code}:{'|'.join(reasons)}")
+                else:
+                    valid.append(code)
+            return {
+                "validCount": len(valid),
+                "invalid": invalid,
+                "alphabetSize": len(SAFE_ALPHABET),
+            }
+      hints:
+      - '`set`으로 bad char 중복을 제거하고 sorted로 순서를 고정하세요.'
+      - 유효 code와 invalid code를 따로 모으면 count와 reason을 동시에 만들기 쉽습니다.
+    check:
+      id: python.builtins.string.code-policy.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.string.invite.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_invite_codes
+        cases:
+        - id: audits-code-policy
+          arguments:
+          - value:
+            - ABCD23
+            - A0CD23
+            - AB12
+            - ZXCV99
+          expectedReturn:
+            validCount: 2
+            invalid:
+            - A0CD23:invalid:0
+            - AB12:short|invalid:1
+            alphabetSize: 32
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 17_string-template-preview-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 17_string-code-policy-transfer
+    title: 누락 placeholder를 남긴 채 템플릿 미리보기
+    subtitle: safe_substitute와 Template pattern
+    goal: Template.safe_substitute 결과와 누락 placeholder 목록을 함께 반환하고 invalid template은 거부한다.
+    why: 시간이 지나도 Template에서 남아야 할 감각은 값을 치환하는 법뿐 아니라, 아직 채울 수 없는 변수를 화면에 안전하게 남기는 방법입니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. substitute가 아니라 safe_substitute로 preview를 만들고 누락 field를 찾아내세요.
+    tips:
+    - Template.pattern에서 named 또는 braced group을 읽어 placeholder 이름을 얻을 수 있습니다.
+    - missing 목록은 템플릿 등장 순서를 유지하세요.
+    exercise:
+      prompt: preview_template(template_text, values)가 rendered와 missing을 담은 dict를 반환하고 invalid placeholder는 ValueError로 막도록
+        완성하세요.
+      starterCode: |-
+        def preview_template(template_text, values):
+            raise NotImplementedError
+      solution: |-
+        import string
+
+        def preview_template(template_text, values):
+            template = string.Template(template_text)
+            rendered = template.safe_substitute(values)
+            missing = []
+            for match in template.pattern.finditer(template_text):
+                if match.group("invalid") is not None:
+                    raise ValueError("invalid template placeholder")
+                name = match.group("named") or match.group("braced")
+                if name and name not in values and name not in missing:
+                    missing.append(name)
+            return {"rendered": rendered, "missing": missing}
+      hints:
+      - safe_substitute는 누락 값을 `$name` 형태로 남겨 preview에 쓸 수 있습니다.
+      - missing에 같은 placeholder가 두 번 들어가지 않게 확인하세요.
+    check:
+      id: python.builtins.string.template-preview.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.string.invite.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: preview_template
+        cases:
+        - id: previews-missing-code
+          arguments:
+          - value: Hello $name, use $code for ${team}.
+          - value:
+              name: Mina
+              team: Ops
+          expectedReturn:
+            rendered: Hello Mina, use $code for Ops.
+            missing:
+            - code
+        - id: rejects-invalid-template
+          arguments:
+          - value: Hello $
+          - value:
+              name: Mina
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

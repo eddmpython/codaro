@@ -413,3 +413,331 @@ sections:
     type: noError
     noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 15_advanced_typing-payment-contract-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - literal
+    - typeddict
+    - annotated
+    - newtype
+    - workflow_validation
+    title: Literal과 TypedDict로 결제 요청 데이터 계약 검증하기
+    subtitle: payment payload contract
+    goal: 결제 payload를 받아 필수 키, 허용 currency/method, 금액 범위, Annotated 메타데이터를 검증해 요약을 반환한다.
+    why: 고급 typing은 타입 체커 장식이 아니라 API 경계에서 허용 값과 딕셔너리 구조를 명시하고 런타임 검증과 나란히 두는 데 가치가 있습니다.
+    explanation: validate_payment_payload(payload)를 완성해 Literal 허용값, TypedDict 필수 키, NewType order id, Annotated positive
+      metadata를 함께 확인하세요.
+    tips:
+    - Literal 허용값은 get_args로 런타임 검증에 재사용할 수 있습니다.
+    - TypedDict는 런타임에는 dict이므로 필수 키 검증은 직접 해야 합니다.
+    exercise:
+      prompt: validate_payment_payload(payload)를 완성해 orderId, accepted, metadata, maxAmount를 반환하세요.
+      starterCode: |-
+        def validate_payment_payload(payload):
+            raise NotImplementedError
+      solution: |-
+        def validate_payment_payload(payload):
+            from typing import Annotated, Final, Literal, NewType, TypedDict, get_args, get_origin
+
+            OrderId = NewType("OrderId", str)
+            Currency = Literal["KRW", "USD"]
+            Method = Literal["card", "bank"]
+            PositiveAmount = Annotated[int, "positive"]
+            MAX_AMOUNT: Final[int] = 1_000_000
+
+            class PaymentPayload(TypedDict):
+                orderId: str
+                amount: int
+                currency: Currency
+                method: Method
+
+            required = set(PaymentPayload.__annotations__)
+            missing = required - payload.keys()
+            if missing:
+                raise KeyError(f"missing keys: {sorted(missing)}")
+            if payload["currency"] not in get_args(Currency):
+                raise ValueError("unsupported currency")
+            if payload["method"] not in get_args(Method):
+                raise ValueError("unsupported method")
+            if not 0 < payload["amount"] <= MAX_AMOUNT:
+                raise ValueError("amount out of range")
+
+            order_id = OrderId(payload["orderId"])
+            return {
+                "orderId": order_id,
+                "accepted": True,
+                "metadata": list(get_args(PositiveAmount)[1:]),
+                "originIsAnnotated": get_origin(PositiveAmount) is Annotated,
+                "maxAmount": MAX_AMOUNT,
+            }
+      hints:
+      - NewType은 런타임 변환을 하지 않지만 의미 있는 타입 이름을 붙입니다.
+      - Annotated의 첫 번째 인자는 실제 타입이고 이후 값이 메타데이터입니다.
+    check:
+      id: python.advanced.typing-payment.contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.typing-payment.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: validate_payment_payload
+        cases:
+        - id: validates-payment-contract
+          arguments:
+          - value:
+              orderId: O-100
+              amount: 49000
+              currency: KRW
+              method: card
+          expectedReturn:
+            orderId: O-100
+            accepted: true
+            metadata:
+            - positive
+            originIsAnnotated: true
+            maxAmount: 1000000
+        - id: rejects-unsupported-currency
+          arguments:
+          - value:
+              orderId: O-100
+              amount: 49000
+              currency: EUR
+              method: card
+          expectedException: ValueError
+        - id: rejects-missing-required-key
+          arguments:
+          - value:
+              orderId: O-100
+              amount: 49000
+              currency: KRW
+          expectedException: KeyError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 15_advanced_typing-typeguard-tags-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - type_guards
+    - literal
+    - final
+    title: TypeGuard로 태그 배치와 혼합 배치를 구분하기
+    subtitle: runtime narrowing with TypeGuard
+    goal: 여러 배치를 받아 모든 항목이 문자열인 배치는 join하고 혼합 배치는 mixed로 표시한다.
+    why: 전이 과제에서는 결제 payload 밖에서 TypeGuard를 사용해 단순 isinstance보다 복잡한 리스트 내부 조건으로 타입을 좁히는 감각을 확인합니다.
+    explanation: summarize_tag_batches(batches)를 완성해 list[str]로 좁혀진 배치와 혼합 배치를 서로 다르게 처리하세요.
+    tips:
+    - TypeGuard 함수는 True일 때만 이후 코드에서 더 좁은 타입으로 해석됩니다.
+    - 빈 배치는 태그로 의미가 없으므로 ValueError로 막으세요.
+    exercise:
+      prompt: summarize_tag_batches(batches)를 완성해 joined, mixedCount, batchCount를 반환하세요.
+      starterCode: |-
+        def summarize_tag_batches(batches):
+            raise NotImplementedError
+      solution: |-
+        def summarize_tag_batches(batches):
+            from typing import Final, TypeGuard
+
+            EMPTY_MARKER: Final[str] = "empty"
+
+            def is_string_list(value: list[object]) -> TypeGuard[list[str]]:
+                return bool(value) and all(isinstance(item, str) for item in value)
+
+            joined = []
+            mixed_count = 0
+            for batch in batches:
+                if not batch:
+                    raise ValueError(EMPTY_MARKER)
+                if is_string_list(batch):
+                    joined.append(",".join(batch))
+                else:
+                    mixed_count += 1
+                    joined.append("mixed")
+            return {
+                "joined": joined,
+                "mixedCount": mixed_count,
+                "batchCount": len(batches),
+            }
+      hints:
+      - all(isinstance(...)) 조건이 True일 때만 문자열 join이 안전합니다.
+      - Final은 런타임 보호가 아니라 상수 의도 표시입니다.
+    check:
+      id: python.advanced.typing-payment.typeguard-tags.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.typing-payment.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_tag_batches
+        cases:
+        - id: separates-string-and-mixed-batches
+          arguments:
+          - value:
+            - - paid
+              - vip
+            - - 1
+              - draft
+            - - retry
+          expectedReturn:
+            joined:
+            - paid,vip
+            - mixed
+            - retry
+            mixedCount: 1
+            batchCount: 3
+        - id: rejects-empty-batch
+          arguments:
+          - value:
+            - []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 15_advanced_typing-advanced-tool-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 15_advanced_typing-typeguard-tags-transfer
+    title: Literal, Final, TypedDict, Annotated, NewType, TypeGuard 선택 기준 회상하기
+    subtitle: advanced typing recall
+    goal: 목적 이름을 받아 적절한 고급 typing 도구와 런타임 영향 여부를 반환한다.
+    why: 시간이 지나도 남아야 할 지식은 고급 typing 목록보다, 허용값 제한, 딕셔너리 구조, 의미 타입, 타입 좁히기처럼 각각 해결하는 문제가 다르다는 점입니다.
+    explanation: choose_advanced_typing_tool(goal)를 완성해 allowed-values, constant-intent, dict-shape, metadata, semantic-id,
+      narrow-list 목적별 도구를 고르세요.
+    tips:
+    - TypedDict는 dict 구조를 타입으로 표현하지만 런타임 검증은 직접 해야 합니다.
+    - TypeGuard는 사용자 정의 조건으로 타입을 좁히는 함수에 씁니다.
+    exercise:
+      prompt: choose_advanced_typing_tool(goal)를 완성해 목적별 고급 typing 도구 선택 결과를 반환하세요.
+      starterCode: |-
+        def choose_advanced_typing_tool(goal):
+            raise NotImplementedError
+      solution: |-
+        def choose_advanced_typing_tool(goal):
+            table = {
+                "allowed-values": {
+                    "tool": "Literal",
+                    "runtimeEffect": False,
+                    "useWhen": "only specific string or number values are allowed",
+                },
+                "constant-intent": {
+                    "tool": "Final",
+                    "runtimeEffect": False,
+                    "useWhen": "a name should not be reassigned by convention and type checker",
+                },
+                "dict-shape": {
+                    "tool": "TypedDict",
+                    "runtimeEffect": False,
+                    "useWhen": "a dict has known required keys and value types",
+                },
+                "metadata": {
+                    "tool": "Annotated",
+                    "runtimeEffect": False,
+                    "useWhen": "attach validation or documentation metadata to a type",
+                },
+                "semantic-id": {
+                    "tool": "NewType",
+                    "runtimeEffect": False,
+                    "useWhen": "same base type has different domain meaning",
+                },
+                "narrow-list": {
+                    "tool": "TypeGuard",
+                    "runtimeEffect": False,
+                    "useWhen": "a boolean function proves a narrower type",
+                },
+            }
+            if goal not in table:
+                raise ValueError("unknown advanced typing goal")
+            return table[goal]
+      hints:
+      - 대부분의 고급 typing 도구는 타입 체커를 위한 신호입니다.
+      - 런타임 경계에서는 타입 힌트와 별개로 검증 코드를 작성해야 합니다.
+    check:
+      id: python.advanced.typing-payment.advanced-tool-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.typing-payment.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_advanced_typing_tool
+        cases:
+        - id: recalls-typeddict-for-dict-shape
+          arguments:
+          - value: dict-shape
+          expectedReturn:
+            tool: TypedDict
+            runtimeEffect: false
+            useWhen: a dict has known required keys and value types
+        - id: recalls-typeguard-for-narrowing
+          arguments:
+          - value: narrow-list
+          expectedReturn:
+            tool: TypeGuard
+            runtimeEffect: false
+            useWhen: a boolean function proves a narrower type
+        - id: rejects-unknown-goal
+          arguments:
+          - value: runtime-database-schema
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

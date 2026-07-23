@@ -526,3 +526,315 @@ sections:
     type: noError
     noError: 종합 연습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 종합 연습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 27_string_algorithms-kmp-search-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - brute_force
+    - kmp
+    - workflow_validation
+    title: KMP로 겹치는 문자열 패턴 위치 찾기
+    subtitle: kmp overlapping matches
+    goal: find_pattern_positions(text, pattern)를 완성해 KMP LPS 배열과 겹치는 매칭 위치를 반환한다.
+    why: 문자열 검색은 단순 find 호출보다, 실패했을 때 어디부터 다시 비교할지 아는 것이 성능과 정확도를 좌우합니다.
+    explanation: pattern이 비어 있으면 ValueError로 거부하고, KMP로 모든 시작 인덱스와 lps 배열을 반환하세요.
+    tips:
+    - LPS는 pattern의 접두사와 접미사가 얼마나 겹치는지 저장합니다.
+    - 매칭 뒤 patternIndex를 lps의 이전 값으로 돌리면 겹치는 매칭도 찾을 수 있습니다.
+    exercise:
+      prompt: find_pattern_positions(text, pattern)를 완성해 matches와 lps를 반환하세요.
+      starterCode: |-
+        def find_pattern_positions(text, pattern):
+            raise NotImplementedError
+      solution: |-
+        def find_pattern_positions(text, pattern):
+            if not pattern:
+                raise ValueError("pattern must not be empty")
+
+            lps = [0] * len(pattern)
+            length = 0
+            index = 1
+            while index < len(pattern):
+                if pattern[index] == pattern[length]:
+                    length += 1
+                    lps[index] = length
+                    index += 1
+                elif length:
+                    length = lps[length - 1]
+                else:
+                    index += 1
+
+            matches = []
+            text_index = 0
+            pattern_index = 0
+            while text_index < len(text):
+                if text[text_index] == pattern[pattern_index]:
+                    text_index += 1
+                    pattern_index += 1
+                    if pattern_index == len(pattern):
+                        matches.append(text_index - pattern_index)
+                        pattern_index = lps[pattern_index - 1]
+                elif pattern_index:
+                    pattern_index = lps[pattern_index - 1]
+                else:
+                    text_index += 1
+            return {"matches": matches, "lps": lps}
+      hints:
+      - pattern_index가 0보다 클 때 mismatch가 나면 lps로 되돌아갑니다.
+      - 빈 pattern을 허용하면 pattern[0] 접근에서 의미 없는 오류가 납니다.
+    check:
+      id: python.advanced.string-algorithms.kmp-search.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.string-algorithms.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: find_pattern_positions
+        cases:
+        - id: finds-overlapping-patterns
+          arguments:
+          - value: banana
+          - value: ana
+          expectedReturn:
+            matches:
+            - 1
+            - 3
+            lps:
+            - 0
+            - 0
+            - 1
+        - id: rejects-empty-pattern
+          arguments:
+          - value: abc
+          - value: ''
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 27_string_algorithms-sku-autocomplete-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - trie
+    - string_processing
+    - workflow_validation
+    title: SKU 목록을 prefix 자동완성으로 찾기
+    subtitle: trie autocomplete transfer
+    goal: autocomplete_skus(skus, prefix, limit)를 완성해 prefix와 일치하는 SKU를 정렬된 제한 개수로 반환한다.
+    why: KMP 검색에서 배운 문자열 사고를 자동완성으로 옮기면, 전체 텍스트 매칭과 prefix 탐색의 차이를 판단할 수 있습니다.
+    explanation: Trie를 구성해 prefix가 있는 위치까지 이동한 뒤 하위 단어를 수집하세요. prefix가 없으면 빈 suggestions를 반환합니다.
+    tips:
+    - 끝나는 단어에는 terminal 표시를 둬야 prefix 자체가 SKU일 때도 찾을 수 있습니다.
+    - 결과를 정렬하고 limit으로 자르면 입력 순서와 무관하게 안정됩니다.
+    exercise:
+      prompt: autocomplete_skus(skus, prefix, limit)를 완성해 suggestions, count, prefix를 반환하세요.
+      starterCode: |-
+        def autocomplete_skus(skus, prefix, limit):
+            raise NotImplementedError
+      solution: |-
+        def autocomplete_skus(skus, prefix, limit):
+            if limit < 0:
+                raise ValueError("limit must be non-negative")
+            root = {}
+            terminal = "_terminal"
+            for sku in skus:
+                node = root
+                for char in sku:
+                    node = node.setdefault(char, {})
+                node[terminal] = sku
+
+            node = root
+            for char in prefix:
+                if char not in node:
+                    return {"prefix": prefix, "suggestions": [], "count": 0}
+                node = node[char]
+
+            suggestions = []
+
+            def collect(current):
+                if terminal in current:
+                    suggestions.append(current[terminal])
+                for char in sorted(key for key in current if key != terminal):
+                    collect(current[char])
+
+            collect(node)
+            suggestions = suggestions[:limit]
+            return {"prefix": prefix, "suggestions": suggestions, "count": len(suggestions)}
+      hints:
+      - Trie node는 dict로 충분히 표현할 수 있습니다.
+      - limit이 0이면 suggestions도 빈 리스트여야 합니다.
+    check:
+      id: python.advanced.string-algorithms.sku-autocomplete.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.string-algorithms.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: autocomplete_skus
+        cases:
+        - id: returns-prefix-matches-in-sorted-order
+          arguments:
+          - value:
+            - SKU-200
+            - ABC-1
+            - SKU-100
+            - SKU-101
+          - value: SKU-1
+          - value: 5
+          expectedReturn:
+            prefix: SKU-1
+            suggestions:
+            - SKU-100
+            - SKU-101
+            count: 2
+        - id: rejects-negative-limit
+          arguments:
+          - value: []
+          - value: SKU
+          - value: -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 27_string_algorithms-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 27_string_algorithms-sku-autocomplete-transfer
+    title: 문자열 알고리즘 선택 기준 회상하기
+    subtitle: string algorithm recall
+    goal: choose_string_algorithm(need)를 완성해 상황별 알고리즘과 전제 조건을 반환한다.
+    why: 문자열 알고리즘은 외워서 구현하는 목록이 아니라, 패턴 길이, 반복 검색, prefix 탐색, 해시 충돌 같은 조건을 보고 선택하는 도구입니다.
+    explanation: one-off-small-search, repeated-pattern-search, many-pattern-hash, prefix-autocomplete, normalize-and-compare
+      상황별 선택을 반환하세요.
+    tips:
+    - KMP는 같은 pattern으로 긴 text를 안정적으로 검색할 때 좋습니다.
+    - Trie는 prefix 공유가 많은 사전형 데이터에 잘 맞습니다.
+    exercise:
+      prompt: choose_string_algorithm(need)를 완성해 algorithm, useWhen, caution을 반환하세요.
+      starterCode: |-
+        def choose_string_algorithm(need):
+            raise NotImplementedError
+      solution: |-
+        def choose_string_algorithm(need):
+            table = {
+                "one-off-small-search": {
+                    "algorithm": "brute-force-or-in",
+                    "useWhen": "text is small and clarity matters most",
+                    "caution": "growth can become expensive",
+                },
+                "repeated-pattern-search": {
+                    "algorithm": "kmp",
+                    "useWhen": "a pattern should be searched without backing up text",
+                    "caution": "lps construction must handle overlaps",
+                },
+                "many-pattern-hash": {
+                    "algorithm": "rabin-karp",
+                    "useWhen": "rolling hashes can compare many windows",
+                    "caution": "hash collisions require verification",
+                },
+                "prefix-autocomplete": {
+                    "algorithm": "trie",
+                    "useWhen": "many words share prefixes",
+                    "caution": "memory use grows with characters stored",
+                },
+                "normalize-and-compare": {
+                    "algorithm": "string-processing",
+                    "useWhen": "case, spacing, or punctuation must be standardized",
+                    "caution": "normalization rules must be explicit",
+                },
+            }
+            if need not in table:
+                raise ValueError("unknown string need")
+            return table[need]
+      hints:
+      - prefix 문제와 substring 문제를 먼저 구분하세요.
+      - 해시 기반 검색은 충돌 가능성을 검증해야 합니다.
+    check:
+      id: python.advanced.string-algorithms.choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.string-algorithms.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_string_algorithm
+        cases:
+        - id: recalls-kmp-for-repeated-search
+          arguments:
+          - value: repeated-pattern-search
+          expectedReturn:
+            algorithm: kmp
+            useWhen: a pattern should be searched without backing up text
+            caution: lps construction must handle overlaps
+        - id: recalls-trie-for-autocomplete
+          arguments:
+          - value: prefix-autocomplete
+          expectedReturn:
+            algorithm: trie
+            useWhen: many words share prefixes
+            caution: memory use grows with characters stored
+        - id: rejects-unknown-need
+          arguments:
+          - value: search-everything
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

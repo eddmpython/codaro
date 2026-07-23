@@ -540,3 +540,234 @@ sections:
   check:
     noError: 업무 흐름 검증에서 `experimentGraph` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: networkx_09-random-model-expectation-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 랜덤 graph 모델의 기대 통계 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: Erdos-Renyi n,p의 기대 edge 수와 평균 degree를 계산한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - undirected 가능한 edge 수는 n(n-1)/2입니다.
+    - 기대값은 한 번 생성한 graph의 실제값과 다를 수 있습니다.
+    exercise:
+      prompt: er_expectation(n, probability)를 완성하세요.
+      starterCode: |-
+        def er_expectation(n, probability):
+            raise NotImplementedError
+      solution: |
+        def er_expectation(n, probability):
+            if n < 0 or not 0 <= probability <= 1:
+                raise ValueError("invalid model parameters")
+            expected_edges = n * (n - 1) / 2 * probability
+            return {"expectedEdges": round(expected_edges, 3), "expectedMeanDegree": round(max(0, n - 1) * probability, 3)}
+      hints: *id001
+    check:
+      id: python.networkx.networkx_09.random-model-expectation.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_09.random-model-expectation.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: er_expectation
+        cases:
+        - id: computes-er-expectation
+          arguments:
+          - value: 5
+          - value: 0.5
+          expectedReturn:
+            expectedEdges: 5.0
+            expectedMeanDegree: 2.0
+        - id: handles-empty-model
+          arguments:
+          - value: 0
+          - value: 0.7
+          expectedReturn:
+            expectedEdges: 0.0
+            expectedMeanDegree: 0.0
+        - id: rejects-probability
+          arguments:
+          - value: 3
+          - value: 1.1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: networkx_09-degree-model-gap-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_09-random-model-expectation-mastery
+    title: 새 관측 graph와 random baseline 비교하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 관측 평균 degree와 model 기대값의 차이를 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - undirected 평균 degree는 2m/n입니다.
+    - 한 summary gap만으로 생성 모델을 확정하지 마세요.
+    exercise:
+      prompt: compare_degree_baseline(node_count, edge_count, probability)를 완성하세요.
+      starterCode: |-
+        def compare_degree_baseline(node_count, edge_count, probability):
+            raise NotImplementedError
+      solution: |
+        def compare_degree_baseline(node_count, edge_count, probability):
+            if node_count < 0 or edge_count < 0 or not 0 <= probability <= 1:
+                raise ValueError("invalid graph summary")
+            observed = 0.0 if node_count == 0 else 2 * edge_count / node_count
+            expected = max(0, node_count - 1) * probability
+            return {"observedMeanDegree": round(observed, 3), "expectedMeanDegree": round(expected, 3), "gap": round(observed - expected, 3)}
+      hints: *id002
+    check:
+      id: python.networkx.networkx_09.degree-model-gap.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_09.degree-model-gap.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: compare_degree_baseline
+        cases:
+        - id: compares-to-baseline
+          arguments:
+          - value: 10
+          - value: 20
+          - value: 0.2
+          expectedReturn:
+            observedMeanDegree: 4.0
+            expectedMeanDegree: 1.8
+            gap: 2.2
+        - id: handles-zero-nodes
+          arguments:
+          - value: 0
+          - value: 0
+          - value: 0.5
+          expectedReturn:
+            observedMeanDegree: 0.0
+            expectedMeanDegree: 0.0
+            gap: 0.0
+        - id: rejects-negative-edge
+          arguments:
+          - value: 2
+          - value: -1
+          - value: 0.2
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: networkx_09-random-graph-model-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_09-degree-model-gap-transfer
+    title: 랜덤 graph 모델 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: baseline 생성 가정과 실제 구조를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 그래프 알고리즘의 입력 가정과 반환 의미를 함께 기록하세요.
+    - 시각적 모양만으로 구조적 결론을 내리지 마세요.
+    exercise:
+      prompt: choose_random_model(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_random_model(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_random_model(situation):
+            table = {'independent-edges': {'method': 'Erdos-Renyi', 'evidence': 'n and p', 'risk': 'no clustering'}, 'fixed-degree-sequence': {'method': 'configuration model', 'evidence': 'degree distribution', 'risk': 'parallel edges'}, 'preferential-growth': {'method': 'Barabasi-Albert', 'evidence': 'growth process', 'risk': 'mechanism overclaim'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.networkx.networkx_09.random-graph-model.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_09.random-graph-model.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_random_model
+        cases:
+        - id: recalls-independent-edges
+          arguments:
+          - value: independent-edges
+          expectedReturn:
+            method: Erdos-Renyi
+            evidence: n and p
+            risk: no clustering
+        - id: recalls-fixed-degree-sequence
+          arguments:
+          - value: fixed-degree-sequence
+          expectedReturn:
+            method: configuration model
+            evidence: degree distribution
+            risk: parallel edges
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

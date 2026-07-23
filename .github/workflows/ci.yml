@@ -45,8 +45,38 @@ jobs:
       - name: Run docs gate
         run: uv run python -X utf8 tests/run.py gate docs
 
+      - name: Run architecture boundary gate
+        run: uv run python -X utf8 tests/run.py gate architecture-boundary
+
+      - name: Observe plan quality bootstrap
+        if: matrix.python-version == '3.12'
+        continue-on-error: true
+        run: uv run python -X utf8 tests/run.py gate plan-quality
+
       - name: Run backend gate
         run: uv run python -X utf8 tests/run.py gate backend
+
+      - name: Run learning evidence contract
+        if: matrix.python-version == '3.12'
+        run: uv run python -X utf8 tests/run.py gate learning-evidence-contract
+
+      - name: Verify removed learning concepts
+        if: matrix.python-version == '3.12'
+        run: uv run python -X utf8 tests/run.py gate removed-learning-concepts
+
+      - name: Run learning efficacy report contract
+        if: matrix.python-version == '3.12'
+        run: uv run python -X utf8 tests/run.py gate learning-efficacy-report
+
+      - name: Run curriculum quality matrix
+        if: matrix.python-version == '3.12'
+        timeout-minutes: 20
+        run: uv run python -X utf8 tests/run.py gate curriculum-quality-matrix
+
+      - name: Verify repository simplification
+        if: matrix.python-version == '3.12'
+        timeout-minutes: 10
+        run: uv run python -X utf8 tests/run.py gate repository-simplification
 
       - name: Run widget-bridge gate
         run: uv run python -X utf8 tests/run.py gate widget-bridge
@@ -95,10 +125,76 @@ jobs:
 
       - name: Install
         working-directory: landing
-        run: npm install
+        run: npm ci
 
       - name: Build
         run: python -X utf8 tests/run.py gate landing-build
+
+  experience:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install Python dependencies
+        run: uv sync --extra dev --python 3.12
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: |
+            editor/package-lock.json
+            landing/package-lock.json
+
+      - name: Install editor
+        working-directory: editor
+        run: npm ci
+
+      - name: Install landing
+        working-directory: landing
+        run: npm ci
+
+      - name: Install Chromium
+        timeout-minutes: 15
+        run: uv run --with playwright python -m playwright install --with-deps chromium
+
+      - name: Verify visual assets
+        timeout-minutes: 15
+        run: uv run python -X utf8 tests/run.py gate visual-assets
+
+      - name: Verify Astryx design system
+        timeout-minutes: 15
+        run: uv run python -X utf8 tests/run.py gate design-system-contract
+
+      - name: Verify direct learning method
+        timeout-minutes: 15
+        run: uv run python -X utf8 tests/run.py gate learning-method
+
+      - name: Verify Web learning
+        timeout-minutes: 25
+        run: uv run python -X utf8 tests/run.py gate web-learning
+
+      - name: Verify public landing
+        timeout-minutes: 25
+        run: uv run python -X utf8 tests/run.py gate landing-public
+
+      - name: Verify Local Studio
+        timeout-minutes: 30
+        run: uv run python -X utf8 tests/run.py gate local-studio-browser
+
+      - name: Verify full product experience
+        timeout-minutes: 30
+        run: uv run python -X utf8 tests/run.py gate product-experience-browser
 
   launcher:
     # 다운로드 엔진(타임아웃/재시도/resume mock 테스트)과 provision 경로를 실제 배포 타깃인

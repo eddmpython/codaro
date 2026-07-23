@@ -492,3 +492,338 @@ sections:
     type: noError
     noError: 종합 복습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 종합 복습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 30_inspect-callable-contract-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - signatures
+    - practical
+    - workflow_validation
+    title: callable signature에서 필수 인자와 keyword-only 옵션 읽기
+    subtitle: inspect.signature contract
+    goal: 샘플 callable의 signature를 inspect로 읽어 필수 인자, keyword-only 인자, 반환 annotation, docstring 여부를 반환한다.
+    why: inspect를 배우는 이유는 내부를 구경하는 것이 아니라, 실행 전에 함수 호출 계약을 안전하게 판정하기 위해서입니다.
+    explanation: describe_callable_contract(action_name)를 완성해 action_name에 맞는 샘플 함수를 고르고 inspect.signature와 inspect.getdoc
+      결과를 요약하세요.
+    tips:
+    - inspect.Signature.empty를 사용하면 default나 annotation 누락을 구분할 수 있습니다.
+    - keyword-only 인자는 param.kind가 inspect.Parameter.KEYWORD_ONLY인지 확인하세요.
+    exercise:
+      prompt: describe_callable_contract(action_name)를 완성해 함수 signature와 계약 요약을 반환하세요.
+      starterCode: |-
+        def describe_callable_contract(action_name):
+            raise NotImplementedError
+      solution: |-
+        def describe_callable_contract(action_name):
+            import inspect
+
+            def normalize_order(payload: dict, context: dict, *, dry_run: bool = False) -> dict:
+                """Normalize an order payload."""
+                return {"ok": True}
+
+            actions = {"normalize_order": normalize_order}
+            if action_name not in actions:
+                raise ValueError("unknown action")
+
+            func = actions[action_name]
+            sig = inspect.signature(func)
+            params = list(sig.parameters.values())
+            required = [
+                param.name
+                for param in params
+                if param.default is inspect.Signature.empty
+                and param.kind
+                in {
+                    inspect.Parameter.POSITIONAL_ONLY,
+                    inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                    inspect.Parameter.KEYWORD_ONLY,
+                }
+            ]
+            keyword_only = [
+                param.name
+                for param in params
+                if param.kind is inspect.Parameter.KEYWORD_ONLY
+            ]
+            return_annotation = sig.return_annotation
+            if isinstance(return_annotation, str):
+                return_annotation_name = return_annotation
+            else:
+                return_annotation_name = return_annotation.__name__
+            return {
+                "name": func.__name__,
+                "signature": str(sig),
+                "requiredParameters": required,
+                "keywordOnly": keyword_only,
+                "returnAnnotation": return_annotation_name,
+                "hasDoc": bool(inspect.getdoc(func)),
+            }
+      hints:
+      - parameters.values()는 정의 순서를 보존합니다.
+      - str(signature) 결과를 그대로 반환하면 사람에게 보여줄 계약 문자열이 됩니다.
+    check:
+      id: python.builtins.inspect.callable-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.inspect.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: describe_callable_contract
+        cases:
+        - id: reports-normalize-order-contract
+          arguments:
+          - value: normalize_order
+          expectedReturn:
+            name: normalize_order
+            signature: '(payload: ''dict'', context: ''dict'', *, dry_run: ''bool'' = False) -> ''dict'''
+            requiredParameters:
+            - payload
+            - context
+            keywordOnly:
+            - dry_run
+            returnAnnotation: dict
+            hasDoc: true
+        - id: rejects-unknown-action
+          arguments:
+          - value: missing_action
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 30_inspect-hook-validator-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - members
+    - practical
+    - workflow_validation
+    title: 훅 registry에서 실행 전 계약을 inspect로 검증하기
+    subtitle: validate plugin hook
+    goal: registry의 hook 함수를 inspect.signature와 get_type_hints로 검사하고 실행 가능한 계약 요약을 반환한다.
+    why: 전이 과제에서는 inspect를 문서 생성에서 실행 전 안전장치로 옮깁니다. 잘못된 hook을 실행 전에 막아야 자동화가 안정됩니다.
+    explanation: validate_hook_registry(hook_name)를 완성해 payload/context/return 타입 힌트와 인자 이름이 맞는 hook만 통과시키세요.
+    tips:
+    - get_type_hints(func)는 annotation 객체를 실제 타입으로 해석합니다.
+    - 계약이 틀린 hook은 ValueError를 발생시키세요.
+    exercise:
+      prompt: validate_hook_registry(hook_name)를 완성해 유효한 hook의 signature, annotations, docstring 요약을 반환하세요.
+      starterCode: |-
+        def validate_hook_registry(hook_name):
+            raise NotImplementedError
+      solution: |-
+        def validate_hook_registry(hook_name):
+            import inspect
+            from typing import get_type_hints
+
+            def ingest_row(payload: dict, context: dict) -> dict:
+                """Convert one row into normalized output."""
+                return {"row": payload, "source": context.get("source")}
+
+            def broken_hook(payload):
+                return payload
+
+            registry = {
+                "ingest_row": ingest_row,
+                "broken_hook": broken_hook,
+            }
+            if hook_name not in registry:
+                raise ValueError("unknown hook")
+
+            func = registry[hook_name]
+            sig = inspect.signature(func)
+            params = list(sig.parameters.values())
+            hints = get_type_hints(func)
+            valid = (
+                len(params) >= 2
+                and params[0].name == "payload"
+                and params[1].name == "context"
+                and hints.get("payload") is dict
+                and hints.get("context") is dict
+                and hints.get("return") is dict
+            )
+            if not valid:
+                raise ValueError("invalid hook contract")
+
+            return {
+                "name": func.__name__,
+                "signature": str(sig),
+                "requiredParameters": [param.name for param in params[:2]],
+                "annotations": {
+                    key: value.__name__
+                    for key, value in hints.items()
+                },
+                "docFirstLine": inspect.getdoc(func).splitlines()[0],
+                "isFunction": inspect.isfunction(func),
+            }
+      hints:
+      - params[0]과 params[1] 이름을 직접 검사하세요.
+      - annotation은 문자열이 아니라 dict 타입 객체인지 비교하세요.
+    check:
+      id: python.builtins.inspect.hook-validator.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.inspect.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: validate_hook_registry
+        cases:
+        - id: accepts-valid-ingest-hook
+          arguments:
+          - value: ingest_row
+          expectedReturn:
+            name: ingest_row
+            signature: '(payload: ''dict'', context: ''dict'') -> ''dict'''
+            requiredParameters:
+            - payload
+            - context
+            annotations:
+              payload: dict
+              context: dict
+              return: dict
+            docFirstLine: Convert one row into normalized output.
+            isFunction: true
+        - id: rejects-broken-hook
+          arguments:
+          - value: broken_hook
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 30_inspect-object-kind-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 30_inspect-hook-validator-transfer
+    title: function, class, bound method의 inspect 판별 차이 회상하기
+    subtitle: isfunction, isclass, ismethod
+    goal: 런타임 객체 종류를 골라 inspect.isfunction, isclass, ismethod, signature 결과를 반환한다.
+    why: 시간이 지나도 남아야 할 inspect 감각은 callable이라고 모두 같은 객체가 아니며, bound method는 self가 이미 묶인 signature를 보인다는 점입니다.
+    explanation: classify_runtime_object(object_kind)를 완성해 function, class, bound_method 샘플 중 하나를 inspect로 판별하고 signature
+      문자열을 반환하세요.
+    tips:
+    - bound method는 inspect.ismethod가 True입니다.
+    - 같은 run 메서드라도 class에서 보는 함수와 instance에서 보는 bound method의 signature는 다릅니다.
+    exercise:
+      prompt: classify_runtime_object(object_kind)를 완성해 객체 종류별 inspect 판별 결과를 반환하세요.
+      starterCode: |-
+        def classify_runtime_object(object_kind):
+            raise NotImplementedError
+      solution: |-
+        def classify_runtime_object(object_kind):
+            import inspect
+
+            class DemoAction:
+                def run(self, payload, context):
+                    return payload
+
+            def plain_action(payload, context):
+                return payload
+
+            demo = DemoAction()
+            objects = {
+                "function": plain_action,
+                "class": DemoAction,
+                "bound_method": demo.run,
+            }
+            if object_kind not in objects:
+                raise ValueError("unknown object kind")
+
+            target = objects[object_kind]
+            return {
+                "isFunction": inspect.isfunction(target),
+                "isClass": inspect.isclass(target),
+                "isMethod": inspect.ismethod(target),
+                "signature": str(inspect.signature(target)),
+            }
+      hints:
+      - instance.method는 bound method로 판정됩니다.
+      - class 객체도 callable일 수 있지만 isfunction은 False입니다.
+    check:
+      id: python.builtins.inspect.object-kind.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.inspect.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: classify_runtime_object
+        cases:
+        - id: recognizes-bound-method-signature
+          arguments:
+          - value: bound_method
+          expectedReturn:
+            isFunction: false
+            isClass: false
+            isMethod: true
+            signature: (payload, context)
+        - id: recognizes-class-object
+          arguments:
+          - value: class
+          expectedReturn:
+            isFunction: false
+            isClass: true
+            isMethod: false
+            signature: ()
+        - id: rejects-unknown-kind
+          arguments:
+          - value: module
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

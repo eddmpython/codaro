@@ -464,3 +464,278 @@ sections:
   check:
     noError: 업무 흐름 검증에서 `experimentGraph` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: networkx_05-mutual-friends-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 소셜 graph의 공통 이웃 추천 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 직접 친구와 자기 자신을 제외하고 mutual friend 수로 후보를 정렬한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 직접 연결된 사람을 추천에서 제외하세요.
+    - mutual count는 친밀도나 안전성을 증명하지 않습니다.
+    exercise:
+      prompt: recommend_friends(nodes, edges, person)를 완성하세요.
+      starterCode: |-
+        def recommend_friends(nodes, edges, person):
+            raise NotImplementedError
+      solution: |
+        def recommend_friends(nodes, edges, person):
+            adjacency = {node: set() for node in nodes}
+            for a, b in edges:
+                adjacency[a].add(b); adjacency[b].add(a)
+            if person not in adjacency:
+                raise ValueError("unknown person")
+            candidates = []
+            for node in nodes:
+                if node != person and node not in adjacency[person]:
+                    count = len(adjacency[person] & adjacency[node])
+                    if count:
+                        candidates.append({"person": node, "mutual": count})
+            return sorted(candidates, key=lambda row: (-row["mutual"], row["person"]))
+      hints: *id001
+    check:
+      id: python.networkx.networkx_05.mutual-friends.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_05.mutual-friends.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: recommend_friends
+        cases:
+        - id: ranks-mutual-friends
+          arguments:
+          - value:
+            - a
+            - b
+            - c
+            - d
+          - value:
+            - - a
+              - b
+            - - a
+              - c
+            - - b
+              - d
+            - - c
+              - d
+          - value: a
+          expectedReturn:
+          - person: d
+            mutual: 2
+        - id: returns-no-candidate
+          arguments:
+          - value:
+            - a
+            - b
+          - value:
+            - - a
+              - b
+          - value: a
+          expectedReturn: []
+        - id: rejects-unknown
+          arguments:
+          - value:
+            - a
+          - value: []
+          - value: x
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: networkx_05-ego-network-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_05-mutual-friends-mastery
+    title: 새 협업망에 ego network 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 중심 node에서 radius 이내 node와 induced edge를 반환한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 선택 node 사이의 모든 induced edge를 보존하세요.
+    - radius는 hop 거리입니다.
+    exercise:
+      prompt: ego_network(edges, center, radius)를 완성하세요.
+      starterCode: |-
+        def ego_network(edges, center, radius):
+            raise NotImplementedError
+      solution: |
+        def ego_network(edges, center, radius):
+            adjacency = {}
+            for a, b in edges:
+                adjacency.setdefault(a, set()).add(b); adjacency.setdefault(b, set()).add(a)
+            distance = {center: 0}; queue = [center]
+            while queue:
+                node = queue.pop(0)
+                if distance[node] == radius: continue
+                for neighbor in adjacency.get(node, []):
+                    if neighbor not in distance:
+                        distance[neighbor] = distance[node] + 1; queue.append(neighbor)
+            selected = set(distance)
+            kept = sorted([sorted([a, b]) for a, b in edges if a in selected and b in selected])
+            return {"nodes": sorted(selected), "edges": kept}
+      hints: *id002
+    check:
+      id: python.networkx.networkx_05.ego-network.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_05.ego-network.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: ego_network
+        cases:
+        - id: keeps-induced-edges
+          arguments:
+          - value:
+            - - a
+              - b
+            - - b
+              - c
+            - - a
+              - c
+            - - c
+              - d
+          - value: a
+          - value: 1
+          expectedReturn:
+            nodes:
+            - a
+            - b
+            - c
+            edges:
+            - - a
+              - b
+            - - a
+              - c
+            - - b
+              - c
+        - id: keeps-center-alone
+          arguments:
+          - value: []
+          - value: x
+          - value: 2
+          expectedReturn:
+            nodes:
+            - x
+            edges: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: networkx_05-social-analysis-scope-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - networkx_05-ego-network-transfer
+    title: 소셜 분석 범위 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 추천·ego·privacy 질문을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 그래프 알고리즘의 입력 가정과 반환 의미를 함께 기록하세요.
+    - 시각적 모양만으로 구조적 결론을 내리지 마세요.
+    exercise:
+      prompt: choose_social_scope(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_social_scope(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_social_scope(situation):
+            table = {'friend-candidate': {'method': 'common neighbors', 'evidence': 'mutual count', 'risk': 'privacy inference'}, 'local-context': {'method': 'ego graph', 'evidence': 'radius and boundary', 'risk': 'missing outside structure'}, 'influence-claim': {'method': 'centrality plus validation', 'evidence': 'outcome correlation', 'risk': 'structural determinism'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.networkx.networkx_05.social-analysis-scope.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.networkx.networkx_05.social-analysis-scope.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_social_scope
+        cases:
+        - id: recalls-friend-candidate
+          arguments:
+          - value: friend-candidate
+          expectedReturn:
+            method: common neighbors
+            evidence: mutual count
+            risk: privacy inference
+        - id: recalls-local-context
+          arguments:
+          - value: local-context
+          expectedReturn:
+            method: ego graph
+            evidence: radius and boundary
+            risk: missing outside structure
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

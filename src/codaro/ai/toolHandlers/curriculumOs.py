@@ -10,7 +10,6 @@ from typing import Any
 
 from ...curriculum.authoringProposalFlow import (
     CurriculumAuthoringProposalError,
-    buildPredictPromptProposalPayload,
     buildVariationProposalPayload,
 )
 from ...curriculum.catalogFlow import buildCurriculumTaxonomyPayload
@@ -261,22 +260,6 @@ class CurriculumOsToolHandlers:
                 contentId=contentId,
                 sectionId=sectionId,
                 count=count,
-            )
-        except CurriculumAuthoringProposalError as error:
-            return {"error": error.message, "code": error.code}
-
-    async def _handle_proposePredictPrompts(self, args: dict[str, Any]) -> dict[str, Any]:
-        category = str(args.get("category") or "").strip()
-        contentId = str(args.get("contentId") or "").strip()
-        maxProposals = args.get("maxProposals") or 20
-        if not isinstance(maxProposals, int) or maxProposals <= 0:
-            maxProposals = 20
-        try:
-            return buildPredictPromptProposalPayload(
-                studyLoader=_studyLoader(),
-                category=category,
-                contentId=contentId,
-                maxProposals=maxProposals,
             )
         except CurriculumAuthoringProposalError as error:
             return {"error": error.message, "code": error.code}

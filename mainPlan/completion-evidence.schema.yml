@@ -1,0 +1,97 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: codaro-main-plan-completion-evidence-v1
+type: object
+additionalProperties: false
+required:
+  - schemaVersion
+  - initiativeId
+  - packetId
+  - completedAt
+  - gitCommit
+  - implementationPaths
+  - gates
+  - reviews
+  - docsUpdated
+  - parentIndexUpdated
+  - residualRisks
+properties:
+  schemaVersion:
+    const: 1
+  initiativeId:
+    $ref: '#/$defs/kebabId'
+  packetId:
+    $ref: '#/$defs/kebabId'
+  completedAt:
+    type: string
+    format: date-time
+  gitCommit:
+    $ref: '#/$defs/gitCommit'
+  implementationPaths:
+    type: array
+    minItems: 1
+    uniqueItems: true
+    items:
+      type: string
+      minLength: 1
+  gates:
+    type: array
+    minItems: 1
+    items:
+      type: object
+      additionalProperties: false
+      required: [name, reportPath, reportHash, gitHead, passedAt]
+      properties:
+        name:
+          type: string
+          pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
+        reportPath:
+          type: string
+          minLength: 1
+        reportHash:
+          $ref: '#/$defs/sha256'
+        gitHead:
+          $ref: '#/$defs/gitCommit'
+        passedAt:
+          type: string
+          format: date-time
+  reviews:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [kind, reviewerRole, status, assetPath, ledgerHash, reviewedAt]
+      properties:
+        kind:
+          enum: [visual, content, accessibility, security]
+        reviewerRole:
+          type: string
+          minLength: 1
+        status:
+          const: approved
+        assetPath:
+          type: string
+          minLength: 1
+        ledgerHash:
+          $ref: '#/$defs/sha256'
+        reviewedAt:
+          type: string
+          format: date-time
+  docsUpdated:
+    const: true
+  parentIndexUpdated:
+    const: true
+  residualRisks:
+    type: array
+    items:
+      type: string
+      minLength: 1
+$defs:
+  kebabId:
+    type: string
+    pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
+  gitCommit:
+    type: string
+    pattern: ^(?:[a-f0-9]{40}|[a-f0-9]{64})$
+  sha256:
+    type: string
+    pattern: ^[a-f0-9]{64}$

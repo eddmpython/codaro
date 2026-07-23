@@ -309,3 +309,313 @@ sections:
     check:
       noError: buildKeyboardListener 호출과 콜백 두 호출이 끝나야 한다.
       resultCheck: pressed가 ['a']이고 두 번째 호출이 False여야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: inputCtl_08-listener-scope-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - key-constants
+    - listener-builder
+    title: 키보드·마우스 listener의 수집 범위와 종료 조건 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 허용 event·대상 앱·최대 시간·stop chord가 없는 listener를 차단한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 전역 listener를 무기한 실행하지 말고 앱·event·시간을 제한하세요.
+    - typed text는 저장하지 않고 event count와 timestamp만 보존하세요.
+    exercise:
+      prompt: audit_listener_scope(scope)를 완성하세요.
+      starterCode: |-
+        def audit_listener_scope(scope):
+            raise NotImplementedError
+      solution: |
+        def audit_listener_scope(scope):
+            failures = []
+            if not scope.get("eventKinds"):
+                failures.append("events")
+            if not scope.get("targetApps"):
+                failures.append("apps")
+            if scope.get("maximumSeconds", 0) <= 0:
+                failures.append("duration")
+            if not scope.get("stopChord"):
+                failures.append("stop-chord")
+            if scope.get("recordText", False):
+                failures.append("text-capture")
+            return {"ready": not failures, "failures": failures, "retention": "counts-and-timestamps-only"}
+      hints: *id001
+    check:
+      id: python.inputctl.inputCtl_08.listener-scope-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_08.listener-scope-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_listener_scope
+        cases:
+        - id: accepts-bounded-listener
+          arguments:
+          - value:
+              eventKinds:
+              - click
+              targetApps:
+              - Editor
+              maximumSeconds: 30
+              stopChord: ctrl+shift+s
+              recordText: false
+          expectedReturn:
+            ready: true
+            failures: []
+            retention: counts-and-timestamps-only
+        - id: reports-unbounded-text-capture
+          arguments:
+          - value:
+              eventKinds: []
+              targetApps: []
+              maximumSeconds: 0
+              stopChord: ''
+              recordText: true
+          expectedReturn:
+            ready: false
+            failures:
+            - events
+            - apps
+            - duration
+            - stop-chord
+            - text-capture
+            retention: counts-and-timestamps-only
+        - id: rejects-key-text-recording
+          arguments:
+          - value:
+              eventKinds:
+              - key
+              targetApps:
+              - Editor
+              maximumSeconds: 5
+              stopChord: esc
+              recordText: true
+          expectedReturn:
+            ready: false
+            failures:
+            - text-capture
+            retention: counts-and-timestamps-only
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: inputCtl_08-listener-event-summary-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inputCtl_08-listener-scope-audit-mastery
+    title: 새 listener event에 앱 이탈·stop 이후 수집 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: stop 시점과 허용 앱을 기준으로 보존 가능한 event만 집계한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - stop event 이후 도착한 callback을 보존하지 마세요.
+    - 허용 앱 밖 event는 원문 없이 ID와 거부 사유만 남기세요.
+    exercise:
+      prompt: summarize_listener_events(events, allowed_apps, stop_at)를 완성하세요.
+      starterCode: |-
+        def summarize_listener_events(events, allowed_apps, stop_at):
+            raise NotImplementedError
+      solution: |
+        def summarize_listener_events(events, allowed_apps, stop_at):
+            accepted = []
+            rejected = []
+            for event in events:
+                if event["at"] > stop_at:
+                    rejected.append({"id": event["id"], "reason": "after-stop"})
+                elif event["app"] not in allowed_apps:
+                    rejected.append({"id": event["id"], "reason": "app"})
+                else:
+                    accepted.append(event)
+            counts = {}
+            for event in accepted:
+                counts[event["kind"]] = counts.get(event["kind"], 0) + 1
+            return {"counts": counts, "acceptedIds": [event["id"] for event in accepted], "rejected": rejected}
+      hints: *id002
+    check:
+      id: python.inputctl.inputCtl_08.listener-event-summary.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_08.listener-event-summary.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_listener_events
+        cases:
+        - id: counts-allowed-events
+          arguments:
+          - value:
+            - id: a
+              at: 1
+              app: Editor
+              kind: click
+            - id: b
+              at: 2
+              app: Editor
+              kind: key
+          - value:
+            - Editor
+          - value: 5
+          expectedReturn:
+            counts:
+              click: 1
+              key: 1
+            acceptedIds:
+            - a
+            - b
+            rejected: []
+        - id: rejects-app-and-after-stop
+          arguments:
+          - value:
+            - id: a
+              at: 1
+              app: Mail
+              kind: click
+            - id: b
+              at: 10
+              app: Editor
+              kind: key
+          - value:
+            - Editor
+          - value: 5
+          expectedReturn:
+            counts: {}
+            acceptedIds: []
+            rejected:
+            - id: a
+              reason: app
+            - id: b
+              reason: after-stop
+        - id: includes-event-at-stop
+          arguments:
+          - value:
+            - id: a
+              at: 5
+              app: Editor
+              kind: click
+          - value:
+            - Editor
+          - value: 5
+          expectedReturn:
+            counts:
+              click: 1
+            acceptedIds:
+            - a
+            rejected: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: inputCtl_08-listener-privacy-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inputCtl_08-listener-event-summary-transfer
+    title: 입력 listener 개인정보 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 범위·중단·최소 보존 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 입력 자동화 action 전에 대상·경계·중단 방법을 검증하세요.
+    - 화면 변화와 E-Stop evidence를 남기고 성공을 클릭 발생으로 판단하지 마세요.
+    exercise:
+      prompt: choose_listener_policy(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_listener_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_listener_policy(situation):
+            table = {'scope': {'action': 'limit event apps and duration', 'evidence': 'listener contract', 'risk': 'global surveillance'}, 'stop': {'action': 'register visible stop chord', 'evidence': 'stop timestamp', 'risk': 'unbounded capture'}, 'retain': {'action': 'store counts not text', 'evidence': 'aggregated event summary', 'risk': 'keystroke leakage'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.inputctl.inputCtl_08.listener-privacy-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_08.listener-privacy-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_listener_policy
+        cases:
+        - id: recalls-scope
+          arguments:
+          - value: scope
+          expectedReturn:
+            action: limit event apps and duration
+            evidence: listener contract
+            risk: global surveillance
+        - id: recalls-stop
+          arguments:
+          - value: stop
+          expectedReturn:
+            action: register visible stop chord
+            evidence: stop timestamp
+            risk: unbounded capture
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

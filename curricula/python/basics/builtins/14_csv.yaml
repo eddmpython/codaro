@@ -439,3 +439,322 @@ sections:
   check:
     noError: csv 모듈 종합 복습에서 `basicCsv` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: csv 모듈 종합 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 14_csv-paid-orders-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - dict_operations
+    - practical
+    - workflow_validation
+    title: 주문 CSV에서 결제 완료 행 집계하기
+    subtitle: DictReader와 필수 컬럼 검증
+    goal: 주문 CSV를 읽어 필수 컬럼을 확인하고 paid 주문 수, 총액, 지역 목록을 반환한다.
+    why: CSV 학습은 행을 읽는 데서 끝나지 않고 컬럼 누락과 숫자 변환을 방어하면서 업무 지표를 만드는 데서 가치가 생깁니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 fixture CSV를 만든 뒤 보이지 않던 파일 경로로 다시 호출합니다.
+    tips:
+    - DictReader의 fieldnames에서 필수 컬럼이 있는지 먼저 확인하세요.
+    - amount는 문자열이므로 int로 변환한 뒤 집계하세요.
+    exercise:
+      prompt: summarize_paid_orders(path)가 paidCount, paidTotal, regions를 담은 dict를 반환하고 필수 컬럼 누락은 ValueError로 막도록 완성하세요.
+      starterCode: |-
+        def summarize_paid_orders(path):
+            raise NotImplementedError
+      solution: |-
+        import csv
+
+        def summarize_paid_orders(path):
+            with open(path, "r", newline="", encoding="utf-8") as file:
+                reader = csv.DictReader(file)
+                required = {"orderId", "region", "amount", "status"}
+                if not required.issubset(reader.fieldnames or []):
+                    raise ValueError("required columns missing")
+                paid_total = 0
+                paid_count = 0
+                regions = set()
+                for row in reader:
+                    amount = int(row["amount"])
+                    if amount <= 0:
+                        raise ValueError("amount must be positive")
+                    if row["status"] == "paid":
+                        paid_count += 1
+                        paid_total += amount
+                        regions.add(row["region"])
+            return {"paidCount": paid_count, "paidTotal": paid_total, "regions": sorted(regions)}
+      hints:
+      - status가 paid인 행만 집계하세요.
+      - regions는 중복을 제거한 뒤 정렬해서 반환하세요.
+    check:
+      id: python.builtins.csv.paid-orders.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.csv.orders.mastery.behavior.v1.fixture
+      fixtureHash: sha256-qyC+9gaJ+toD6YovimHo3NeikjJ1bLBzUau8SoFrp0A=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: input/orders.csv
+          content: |-
+            orderId,region,amount,status
+            A001,Seoul,120000,paid
+            A002,Busan,45000,pending
+            A003,Seoul,99000,paid
+        - path: input/bad_orders.csv
+          content: |-
+            orderId,amount
+            B001,10
+        - path: input/people.tsv
+          content: "name\tage\tcity\nAlice\t30\tSeoul\nBob\t25\tBusan"
+        - path: input/products.psv
+          content: |-
+            product|amount|status
+            laptop|1200|paid
+            mouse|25|pending
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_paid_orders
+        cases:
+        - id: paid-order-summary
+          arguments:
+          - fixturePath: input/orders.csv
+          expectedReturn:
+            paidCount: 2
+            paidTotal: 219000
+            regions:
+            - Seoul
+        - id: rejects-missing-columns
+          arguments:
+          - fixturePath: input/bad_orders.csv
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 14_csv-region-summary-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - 14_csv-paid-orders-mastery
+    title: 지역별 주문 합계를 CSV로 저장하기
+    subtitle: DictReader에서 DictWriter로 이동
+    goal: 주문 CSV를 읽어 region별 total을 계산하고 새 CSV 파일로 저장한다.
+    why: CSV 자동화는 읽기에서 끝나지 않고, 검증된 요약 파일을 다시 다른 도구가 읽을 수 있게 써야 실무 흐름이 완성됩니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 이번에는 집계 결과를 파일로 남기세요.
+    tips:
+    - DictWriter에 fieldnames=["region", "total"]를 지정하고 writeheader를 호출하세요.
+    - 반환 path는 verifier가 fixture root 기준 상대경로로 정규화합니다.
+    exercise:
+      prompt: write_region_summary(source_path, target_path)가 path, rowCount, totals를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def write_region_summary(source_path, target_path):
+            raise NotImplementedError
+      solution: |-
+        import csv
+        from pathlib import Path
+
+        def write_region_summary(source_path, target_path):
+            totals = {}
+            with open(source_path, "r", newline="", encoding="utf-8") as file:
+                reader = csv.DictReader(file)
+                for row in reader:
+                    totals[row["region"]] = totals.get(row["region"], 0) + int(row["amount"])
+            target = Path(target_path)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            with target.open("w", newline="", encoding="utf-8") as file:
+                writer = csv.DictWriter(file, fieldnames=["region", "total"])
+                writer.writeheader()
+                for region in sorted(totals):
+                    writer.writerow({"region": region, "total": totals[region]})
+            return {"path": str(target), "rowCount": len(totals), "totals": dict(sorted(totals.items()))}
+      hints:
+      - amount는 int로 바꿔 더해야 합니다.
+      - 출력 CSV는 region 오름차순으로 쓰면 검증과 리뷰가 쉬워집니다.
+    check:
+      id: python.builtins.csv.region-summary.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.csv.orders.mastery.behavior.v1.fixture
+      fixtureHash: sha256-qyC+9gaJ+toD6YovimHo3NeikjJ1bLBzUau8SoFrp0A=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: input/orders.csv
+          content: |-
+            orderId,region,amount,status
+            A001,Seoul,120000,paid
+            A002,Busan,45000,pending
+            A003,Seoul,99000,paid
+        - path: input/bad_orders.csv
+          content: |-
+            orderId,amount
+            B001,10
+        - path: input/people.tsv
+          content: "name\tage\tcity\nAlice\t30\tSeoul\nBob\t25\tBusan"
+        - path: input/products.psv
+          content: |-
+            product|amount|status
+            laptop|1200|paid
+            mouse|25|pending
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: write_region_summary
+        cases:
+        - id: writes-region-summary
+          arguments:
+          - fixturePath: input/orders.csv
+          - fixturePath: output/region-summary.csv
+          expectedReturn:
+            path: output/region-summary.csv
+            rowCount: 2
+            totals:
+              Busan: 45000
+              Seoul: 219000
+        expectedPaths:
+        - path: output/region-summary.csv
+          kind: file
+        normalizeReturnPaths:
+        - path
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 14_csv-sniff-delimiter-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 14_csv-region-summary-transfer
+    title: 구분자를 감지하고 행 수를 다시 확인하기
+    subtitle: Sniffer와 reader 재구성
+    goal: CSV 계열 파일의 delimiter를 감지하고 header, rowCount, firstRow를 반환한다.
+    why: 시간이 지나도 CSV 실무에서 자주 막히는 지점은 쉼표가 아닌 구분자를 제대로 감지하는 능력입니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. sample을 읽고 seek(0) 후 같은 파일을 다시 reader에 넘기세요.
+    tips:
+    - csv.Sniffer().sniff(sample)로 dialect를 추론하세요.
+    - header는 첫 행, firstRow는 첫 데이터 행입니다.
+    exercise:
+      prompt: sniff_delimiter_summary(path)가 delimiter, header, rowCount, firstRow를 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def sniff_delimiter_summary(path):
+            raise NotImplementedError
+      solution: |-
+        import csv
+
+        def sniff_delimiter_summary(path):
+            with open(path, "r", newline="", encoding="utf-8") as file:
+                sample = file.read(1024)
+                file.seek(0)
+                dialect = csv.Sniffer().sniff(sample)
+                rows = list(csv.reader(file, dialect))
+            header = rows[0] if rows else []
+            data_rows = rows[1:]
+            return {
+                "delimiter": dialect.delimiter,
+                "header": header,
+                "rowCount": len(data_rows),
+                "firstRow": data_rows[0] if data_rows else [],
+            }
+      hints:
+      - sample을 읽은 뒤 file.seek(0)을 하지 않으면 실제 reader가 빈 결과를 받을 수 있습니다.
+      - rowCount는 header를 제외한 데이터 행 수입니다.
+    check:
+      id: python.builtins.csv.sniff-delimiter.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.csv.orders.mastery.behavior.v1.fixture
+      fixtureHash: sha256-qyC+9gaJ+toD6YovimHo3NeikjJ1bLBzUau8SoFrp0A=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: input/orders.csv
+          content: |-
+            orderId,region,amount,status
+            A001,Seoul,120000,paid
+            A002,Busan,45000,pending
+            A003,Seoul,99000,paid
+        - path: input/bad_orders.csv
+          content: |-
+            orderId,amount
+            B001,10
+        - path: input/people.tsv
+          content: "name\tage\tcity\nAlice\t30\tSeoul\nBob\t25\tBusan"
+        - path: input/products.psv
+          content: |-
+            product|amount|status
+            laptop|1200|paid
+            mouse|25|pending
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: sniff_delimiter_summary
+        cases:
+        - id: tab-separated
+          arguments:
+          - fixturePath: input/people.tsv
+          expectedReturn:
+            delimiter: "\t"
+            header:
+            - name
+            - age
+            - city
+            rowCount: 2
+            firstRow:
+            - Alice
+            - '30'
+            - Seoul
+        - id: pipe-separated
+          arguments:
+          - fixturePath: input/products.psv
+          expectedReturn:
+            delimiter: '|'
+            header:
+            - product
+            - amount
+            - status
+            rowCount: 2
+            firstRow:
+            - laptop
+            - '1200'
+            - paid
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

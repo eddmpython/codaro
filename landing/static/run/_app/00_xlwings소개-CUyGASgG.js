@@ -1,0 +1,301 @@
+var e=`meta:
+  id: xlwings_00
+  title: xlwings 소개
+  order: 0
+  category: xlwings
+  difficulty: easy
+  audience: Excel이 설치된 PC에서 반복 업무를 Python으로 자동화하고 싶은 실무자
+  packages:
+    - xlwings
+  tags:
+    - xlwings
+    - 엑셀자동화
+    - 라이브제어
+    - 로컬Python
+    - 업무자동화
+  seo:
+    title: xlwings 소개 - 살아있는 Excel을 Python으로 제어하기
+    description: "openpyxl과 다른 길: xlwings로 실행 중인 Excel을 라이브 제어하는 자동화 트랙을 시작합니다."
+    keywords:
+      - xlwings
+      - Excel
+      - 자동화
+      - COM
+      - 라이브제어
+intro:
+  direction: xlwings로 실행 중인 Excel 프로세스를 Python에서 안전하게 열고, 셀에 값을 쓰고, 정리하는 흐름을 익힌다.
+  benefits:
+    - 살아있는 Excel을 라이브로 제어해 수식 결과와 차트가 보이는 자동화를 만들 수 있다.
+    - "openpyxl(파일 기반)과 xlwings(앱 기반) 중 언제 무엇을 쓸지 판단 기준을 갖는다."
+    - "with xw.App(visible=False) 패턴으로 좀비 Excel 프로세스 없이 안전한 자동화를 시작할 수 있다."
+    - 트랙 후반의 차트, 표, UDF로 가는 진입로를 첫 레슨에서 확보한다.
+  diagram:
+    steps:
+      - label: 사용 시나리오 고정
+        detail: 매일 받는 매출 파일에 정해진 규칙으로 값과 수식을 채우고 차트를 갱신하는 업무를 자동화 대상으로 좁힌다.
+      - label: xlwings 첫 connect 확인
+        detail: visible=False로 백그라운드 Excel을 띄우고, 빈 워크북의 셀에 값을 한 번 써서 라이브 제어가 동작하는지 본다.
+      - label: openpyxl과의 사용 경계 학습
+        detail: 같은 xlsx 파일이라도 "파일만 만들면 끝"인지 "수식과 차트가 살아 있어야 하는지"에 따라 도구가 달라진다는 점을 정리한다.
+      - label: 안전 패턴 고정
+        detail: "with xw.App(...) as app: 컨텍스트로 시작과 종료를 묶어 좀비 Excel 프로세스가 남지 않게 한다."
+    runtime:
+      - label: xlwings 패키지 확인
+        detail: meta.packages의 xlwings를 라이브러리 패널에서 확인하고, 없으면 현재 실행 환경에 준비한다.
+      - label: Excel 실행 확인
+        detail: xlwings는 Excel 본체를 제어하므로 Windows/macOS에 Excel이 설치되어 있어야 동작한다. Linux/CI에서는 openpyxl 트랙을 권장한다.
+      - label: 라이브 셀 실행
+        detail: visible=False로 띄운 백그라운드 Excel에 값을 쓰고 assert로 결과를 확인한다.
+sections:
+  - id: track-promise
+    title: 이 트랙이 약속하는 자동화 산출물
+    structuredPrimary: true
+    subtitle: 살아있는 Excel을 제어하는 결과물 목록
+    goal: xlwings 트랙을 끝내면 만들 수 있는 자동화 산출물 5가지를 코드 변수로 고정한다.
+    why: 학습 목표를 "API 외우기"가 아니라 "최종 산출물"로 잡아야 매일 반복하는 업무에 진짜 적용할 수 있다.
+    explanation: |-
+      xlwings는 단순히 셀에 값을 쓰는 라이브러리가 아닙니다. 사용자가 매일 여는 Excel 파일을 그대로 두고, Python이 그 위에 새 값과 수식과 차트를 얹는 도구입니다. 이 트랙은 첫 연결부터 시작해 가격표 입력, 차트 자동화, 표(ListObject), VBA 매크로 호출, 그리고 UDF로 사용자 정의 함수 만들기까지 10개 프로젝트로 이어집니다.
+      각 프로젝트는 결과 파일과 검증 코드가 함께 산출되며, 그대로 본인의 업무 파일에 옮겨 쓸 수 있도록 설계되어 있습니다.
+    tips:
+      - 산출물 목록을 먼저 적으면 "어디까지 배우면 충분한가"가 명확해집니다.
+      - 트랙을 끝까지 따라가지 않더라도, 첫 4개 레슨만 마쳐도 매출 파일 입력 자동화는 충분히 가능합니다.
+    snippet: |-
+      xlwingsOutcomes = [
+          "백그라운드 Excel을 열고 셀에 값을 쓰고 안전하게 종료한다",
+          "상품 가격표 2D 데이터를 한 번에 Range에 일괄 입력한다",
+          "pandas DataFrame을 Excel 시트와 양방향으로 왕복한다",
+          "매출 데이터로 막대 차트와 표(Table)를 자동 생성한다",
+          "@xw.func로 Excel 수식으로 호출되는 Python UDF를 만든다",
+      ]
+
+      assert len(xlwingsOutcomes) == 5
+      assert any("차트" in item for item in xlwingsOutcomes)
+      xlwingsOutcomes
+    exercise:
+      prompt: 본인이 매일 하는 Excel 작업 중 자동화하고 싶은 것을 산출물 목록에 하나 추가하고, 개수를 검증하세요.
+      starterCode: |-
+        xlwingsOutcomes = [
+            "백그라운드 Excel을 열고 셀에 값을 쓰고 안전하게 종료한다",
+            "상품 가격표 2D 데이터를 한 번에 Range에 일괄 입력한다",
+            "pandas DataFrame을 Excel 시트와 양방향으로 왕복한다",
+            "매출 데이터로 막대 차트와 표(Table)를 자동 생성한다",
+            "@xw.func로 Excel 수식으로 호출되는 Python UDF를 만든다",
+            "___",
+        ]
+
+        assert len(xlwingsOutcomes) == ___
+        xlwingsOutcomes
+      solution: |-
+        xlwingsOutcomes = [
+            "백그라운드 Excel을 열고 셀에 값을 쓰고 안전하게 종료한다",
+            "상품 가격표 2D 데이터를 한 번에 Range에 일괄 입력한다",
+            "pandas DataFrame을 Excel 시트와 양방향으로 왕복한다",
+            "매출 데이터로 막대 차트와 표(Table)를 자동 생성한다",
+            "@xw.func로 Excel 수식으로 호출되는 Python UDF를 만든다",
+            "월별 매출 파일 12개를 분기별 파일로 통합한다",
+        ]
+
+        assert len(xlwingsOutcomes) == 6
+        assert "통합" in xlwingsOutcomes[-1]
+        xlwingsOutcomes
+      hints:
+        - 마지막 문자열은 실제 본인이 매주 또는 매월 반복하는 Excel 업무에서 가져오세요.
+        - assert의 숫자는 리스트 항목 수와 같아야 합니다.
+    check:
+      noError: xlwingsOutcomes 리스트와 두 assert가 SyntaxError 없이 실행되어야 합니다.
+      resultCheck: 추가한 산출물 문자열과 리스트 길이 검증이 같은 기준을 가리켜야 합니다.
+
+  - id: when-xlwings-vs-openpyxl
+    title: xlwings를 쓸 때 vs openpyxl을 쓸 때
+    structuredPrimary: true
+    subtitle: 같은 .xlsx, 다른 사용 경계
+    goal: 같은 매출 파일을 다룰 때 xlwings와 openpyxl 중 어느 쪽이 맞는지 결정하는 판단 기준을 변수로 정리한다.
+    why: 도구 선택을 미리 정하지 않으면 "수식 결과가 0으로 보인다", "차트가 안 그려진다"는 실패를 매번 다시 디버깅하게 된다.
+    explanation: |-
+      openpyxl은 xlsx 파일을 코드로 만들고 읽는 라이브러리입니다. Excel 본체를 실행하지 않으므로 Linux 서버나 CI에서도 동작하지만, =SUM() 같은 수식의 계산 결과는 채우지 못합니다. 파일을 열어야 Excel이 계산합니다.
+      xlwings는 정반대 길입니다. Excel을 백그라운드로 띄워 그 위에서 모든 작업을 처리합니다. 수식은 즉시 계산되고, 차트는 실제 그려지며, VBA 매크로도 호출할 수 있습니다. 단점은 Excel이 설치된 PC에서만 동작한다는 것입니다.
+      "파일을 만들기만 하면 되는가" vs "수식 결과와 차트가 살아있어야 하는가"가 핵심 갈림길입니다.
+    tips:
+      - 사용자에게 메일로 보내는 보고서가 목적이면 openpyxl로도 충분한 경우가 많습니다.
+      - 사용자가 그 파일을 열어 직접 확인하고 수정하는 작업까지 자동화한다면 xlwings 쪽이 맞습니다.
+    snippet: |-
+      decisionTable = {
+          "수식 결과가 즉시 보여야 한다": "xlwings",
+          "차트와 피벗을 코드로 만든다": "xlwings",
+          "Linux 서버/CI에서 실행한다": "openpyxl",
+          "VBA 매크로를 Python에서 호출한다": "xlwings",
+          "Excel 없이 xlsx 파일만 생성한다": "openpyxl",
+          "사용자 정의 함수(UDF)를 만든다": "xlwings",
+      }
+
+      xlwingsCases = [reason for reason, tool in decisionTable.items() if tool == "xlwings"]
+      assert len(xlwingsCases) == 4
+      decisionTable
+    exercise:
+      prompt: 본인의 업무 상황을 하나 더 적고, xlwings/openpyxl 중 어느 쪽이 맞는지 판단해 추가하세요.
+      starterCode: |-
+        decisionTable = {
+            "수식 결과가 즉시 보여야 한다": "xlwings",
+            "차트와 피벗을 코드로 만든다": "xlwings",
+            "Linux 서버/CI에서 실행한다": "openpyxl",
+            "VBA 매크로를 Python에서 호출한다": "xlwings",
+            "Excel 없이 xlsx 파일만 생성한다": "openpyxl",
+            "사용자 정의 함수(UDF)를 만든다": "xlwings",
+            "___": "___",
+        }
+
+        assert "___" in decisionTable
+        decisionTable
+      solution: |-
+        decisionTable = {
+            "수식 결과가 즉시 보여야 한다": "xlwings",
+            "차트와 피벗을 코드로 만든다": "xlwings",
+            "Linux 서버/CI에서 실행한다": "openpyxl",
+            "VBA 매크로를 Python에서 호출한다": "xlwings",
+            "Excel 없이 xlsx 파일만 생성한다": "openpyxl",
+            "사용자 정의 함수(UDF)를 만든다": "xlwings",
+            "거래처에 보내는 보고서를 자동 생성한다": "openpyxl",
+        }
+
+        assert "거래처에 보내는 보고서를 자동 생성한다" in decisionTable
+        decisionTable
+      hints:
+        - 본인의 업무가 "파일 생성"인지 "라이브 조작"인지를 먼저 구분하세요.
+        - 사용자가 그 파일을 직접 열어 보는지, 코드가 만든 파일을 그대로 전달하는지가 갈림길입니다.
+    check:
+      noError: decisionTable 딕셔너리와 assert가 KeyError 없이 평가되어야 합니다.
+      resultCheck: 추가한 업무 상황이 딕셔너리에 들어 있고 도구 선택이 일관되어야 합니다.
+
+  - id: first-connect-smoke
+    title: 첫 백그라운드 Excel 연결 smoke
+    structuredPrimary: true
+    subtitle: with xw.App과 좀비 프로세스 방지
+    goal: visible=False로 백그라운드 Excel을 띄우고 A1에 값을 쓴 뒤 안전하게 종료하는 첫 연결 smoke를 통과한다.
+    why: xlwings의 가장 흔한 실패는 작업 도중 예외가 발생해 Excel.exe가 종료되지 않고 메모리에 남는 좀비 프로세스다. 시작부터 컨텍스트 매니저 패턴을 굳혀야 한다.
+    explanation: |-
+      xw.App은 Excel 본체를 실행하는 클래스입니다. visible=False로 만들면 작업표시줄에 Excel 창이 보이지 않은 채 백그라운드에서 동작합니다.
+      가장 안전한 사용법은 "with xw.App(...) as app:" 컨텍스트 매니저로 감싸는 것입니다. 중간에 예외가 발생해도 with 블록을 빠져나갈 때 app.quit()이 자동으로 호출되어 Excel 프로세스가 정리됩니다.
+      app.books.add()는 빈 워크북을 새로 만들고, book.sheets.active로 활성 시트에 접근합니다. sheet["A1"].value는 셀에 값을 쓰는 가장 짧은 표현입니다.
+    tips:
+      - 학습 단계에서는 visible=False로 두면 Excel 창이 떠서 화면을 가리지 않습니다. 결과를 직접 보고 싶으면 True로 바꾸세요.
+      - 절대로 with 블록 없이 app = xw.App()을 만들지 마세요. 예외 한 번에 좀비 Excel이 누적됩니다.
+    snippet: |-
+      import xlwings as xw
+
+      with xw.App(visible=False) as app:
+          book = app.books.add()
+          sheet = book.sheets.active
+          sheet["A1"].value = "xlwings smoke"
+          firstValue = sheet["A1"].value
+          sheetName = sheet.name
+
+      assert firstValue == "xlwings smoke"
+      assert sheetName in {"Sheet1", "Sheet"}
+      firstValue
+    exercise:
+      prompt: A1에 쓸 값과 시트 이름 변수를 본인이 자주 쓰는 워크북 이름으로 바꾸고, assert 두 줄도 같이 맞추세요.
+      starterCode: |-
+        import xlwings as xw
+
+        with xw.App(visible=False) as app:
+            book = app.books.add()
+            sheet = book.sheets.active
+            sheet["A1"].value = "___"
+            firstValue = sheet["A1"].value
+            sheetName = sheet.name
+
+        assert firstValue == "___"
+        assert sheetName in {"Sheet1", "Sheet"}
+        firstValue
+      solution: |-
+        import xlwings as xw
+
+        with xw.App(visible=False) as app:
+            book = app.books.add()
+            sheet = book.sheets.active
+            sheet["A1"].value = "2026년 5월 매출 보고서"
+            firstValue = sheet["A1"].value
+            sheetName = sheet.name
+
+        assert firstValue == "2026년 5월 매출 보고서"
+        assert sheetName in {"Sheet1", "Sheet"}
+        firstValue
+      hints:
+        - sheet에 쓰는 문자열과 assert 오른쪽 문자열은 정확히 같아야 합니다.
+        - 기본 시트 이름은 한국어 Excel에서는 "Sheet1", 일부 환경에서는 "Sheet"로 잡힙니다. set으로 비교하면 두 경우 모두 통과합니다.
+    check:
+      noError: xlwings import, App 컨텍스트, 셀 R/W가 NameError나 ImportError 없이 끝나야 합니다.
+      resultCheck: A1에 쓴 값이 다시 읽은 값과 정확히 같고, 시트 이름이 기본값 중 하나여야 합니다.
+
+  - id: readiness-checklist
+    title: 트랙 시작 준비 체크리스트
+    structuredPrimary: true
+    subtitle: 환경, 패턴, 산출물 묶기
+    goal: 패키지 준비, Excel 본체 실행 가능, 컨텍스트 매니저 패턴, 산출물 목록 네 가지를 하나의 준비 딕셔너리로 검증한다.
+    why: 자동화 트랙을 시작할 때 환경과 산출물 기준을 먼저 묶어 두면, 이후 레슨에서 발생하는 실패가 환경 문제인지 코드 문제인지 빠르게 구분할 수 있다.
+    explanation: |-
+      준비 점검은 환경 가이드를 따라가는 것이 아니라 실행 가능한 상태를 코드로 확인하는 단계입니다. xlwings 패키지가 import되는지, Excel을 띄울 수 있는지, 컨텍스트 매니저로 정리가 되는지, 그리고 트랙에서 어떤 산출물을 만들지가 한 변수에 묶여야 합니다.
+      이 패턴은 이후 모든 레슨의 시작 셀로 재사용할 수 있으며, 실무에서도 자동화 스크립트의 "preflight" 셀로 그대로 옮겨 쓸 수 있습니다.
+    tips:
+      - readiness 딕셔너리는 이후 종합 프로젝트(10번 레슨)에서 시작 체크 함수로 발전합니다.
+      - 모든 값을 명시적으로 채우세요. 모호한 None은 "아직 안 확인했다"는 빚으로 남습니다.
+    snippet: |-
+      import xlwings as xw
+
+      with xw.App(visible=False) as app:
+          appAlive = app.pid is not None
+
+      readiness = {
+          "packageDeclared": "xlwings",
+          "excelLaunchable": appAlive,
+          "usesContextManager": True,
+          "outputs": ["price-table", "chart", "table-with-formula", "udf", "report-bot"],
+      }
+
+      assert readiness["packageDeclared"] == "xlwings"
+      assert readiness["excelLaunchable"] is True
+      assert "udf" in readiness["outputs"]
+      readiness
+    exercise:
+      prompt: outputs 목록에 본인이 만들고 싶은 자동화 산출물을 하나 추가하고, assert로 확인하세요.
+      starterCode: |-
+        import xlwings as xw
+
+        with xw.App(visible=False) as app:
+            appAlive = app.pid is not None
+
+        readiness = {
+            "packageDeclared": "xlwings",
+            "excelLaunchable": appAlive,
+            "usesContextManager": True,
+            "outputs": ["price-table", "chart", "table-with-formula", "udf", "report-bot", "___"],
+        }
+
+        assert readiness["packageDeclared"] == "xlwings"
+        assert readiness["excelLaunchable"] is True
+        assert "___" in readiness["outputs"]
+        readiness
+      solution: |-
+        import xlwings as xw
+
+        with xw.App(visible=False) as app:
+            appAlive = app.pid is not None
+
+        readiness = {
+            "packageDeclared": "xlwings",
+            "excelLaunchable": appAlive,
+            "usesContextManager": True,
+            "outputs": ["price-table", "chart", "table-with-formula", "udf", "report-bot", "daily-sales-summary"],
+        }
+
+        assert readiness["packageDeclared"] == "xlwings"
+        assert readiness["excelLaunchable"] is True
+        assert "daily-sales-summary" in readiness["outputs"]
+        readiness
+      hints:
+        - outputs에 추가한 문자열과 assert의 문자열은 정확히 같아야 합니다.
+        - appAlive가 False로 나오면 Excel 설치 또는 라이선스 상태를 확인해야 합니다.
+    check:
+      noError: readiness 딕셔너리와 세 assert가 KeyError 없이 평가되어야 합니다.
+      resultCheck: outputs에 추가한 자동화 산출물이 assert로 확인되어야 합니다.
+`;export{e as default};

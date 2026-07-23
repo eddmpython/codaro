@@ -1,0 +1,20 @@
+schemaVersion: 1
+snapshotDate: "2026-07-23"
+canonicalRows: 472
+uniqueLessonRefs: 472
+unownedRows: 0
+emptyOutcomeRows: 0
+reinforcementRows: 245
+dispositionCounts: {migrate: 472, merge: 0, archive: 0}
+sourceSetHash: "9bb45dd94a3540b944f52be8d36585365b63abf0f30ac9fc47c7a4fad15b9b6d"
+baselineTaxonomyHash: "b5e9b0b9db4f6ecd89c7be10a5c795f9b991b3ce700d5b5cf044607fc835def2"
+composerVersionHash: "82c325cd14b0d6fc2767a2780e69f500d4496e444c3c2271b830179e70be6446"
+plannedTaxonomyOutcomeIds: ["builtins.tempFiles","builtins.hashing","builtins.archives","python.projectDelivery","viz.edaReport","automation.browser.audit"]
+taxonomyTransitionReport: "00-identity-integrity/evidence/taxonomy-transition.yml"
+targetTaxonomyHash: null
+targetTaxonomyHashStatus: "required-after-identity-integrity"
+ownerPacketCounts: {"01-python-foundation":66,"07-remaining-domains/05-interactive-dashboards":22,"07-remaining-domains/23-standard-library-mastery":35,"07-remaining-domains/14-deep-learning-vision":10,"07-remaining-domains/03-scripting-automation":11,"07-remaining-domains/18-sql-analysis":12,"07-remaining-domains/01-email-automation":11,"05-office-automation":25,"04-file-automation":20,"07-remaining-domains/06-geo-visualization":11,"07-remaining-domains/21-desktop-automation":10,"07-remaining-domains/24-ai-integration":11,"03-data-visualization":22,"07-remaining-domains/10-graph-analysis":11,"07-remaining-domains/17-scientific-computing":33,"07-remaining-domains/12-computer-vision":11,"02-data-reporting":12,"07-remaining-domains/00-pdf-automation":11,"07-remaining-domains/11-image-processing":11,"06-web-monitoring":11,"07-remaining-domains/19-big-data-pipelines":11,"07-remaining-domains/22-system-monitoring":10,"07-remaining-domains/20-data-contracts":11,"07-remaining-domains/16-text-processing":11,"07-remaining-domains/08-machine-learning":11,"07-remaining-domains/07-statistical-analysis":11,"07-remaining-domains/15-vision-automation":10,"07-remaining-domains/13-vision-advanced":20,"07-remaining-domains/02-document-automation":11}
+ledgerTool: "uv run python -X utf8 docs/skills/ops/tools/buildLearningLedgers.py --check"
+ledgerToolStatus: "implemented-check-and-write"
+evidenceMaturity: "E0-plan-artifact"
+completionRule: "canonicalRows=472, unownedRows=0, emptyOutcomeRows=0, targetTaxonomyHash is 64-hex and transition approved, all path rows reference canonical row, authorReviewStatus=approved, evidence commit current"

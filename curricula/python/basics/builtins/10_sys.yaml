@@ -282,3 +282,272 @@ sections:
     type: noError
     noError: sys 모듈 종합 복습에서 `versionPrefix` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: sys 모듈 종합 복습 실행 뒤 `versionPrefix` 값, 출력, 또는 type() 확인이 바꾼 리스트 값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 10_sys-argv-parser-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - exit_and_args
+    - workflow_validation
+    - practice
+    title: 명령행 인자에서 입력 파일과 제한값 읽기
+    subtitle: sys.argv 구조를 함수 계약으로 검증
+    goal: argv 목록에서 --input과 --limit 값을 찾아 dict로 반환하고 누락이나 잘못된 숫자는 거부한다.
+    why: sys.argv는 전역 상태지만, 학습자가 함수 인자로 분리해 검증할 수 있어야 웹과 로컬 자동화가 같은 방식으로 안전해집니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 argv 목록으로 다시 호출합니다.
+    tips:
+    - argv[0]은 스크립트 이름이므로 옵션 검색은 전체 목록에서 key 위치를 찾아도 됩니다.
+    - --limit 값은 int로 변환하고 1 이상인지 확인하세요.
+    exercise:
+      prompt: parse_cli_args(argv)가 input, limit, extraArgs를 담은 dict를 반환하고 잘못된 argv는 ValueError를 일으키도록 완성하세요.
+      starterCode: |-
+        def parse_cli_args(argv):
+            raise NotImplementedError
+      solution: |-
+        def parse_cli_args(argv):
+            if "--input" not in argv or "--limit" not in argv:
+                raise ValueError("required options missing")
+            input_index = argv.index("--input") + 1
+            limit_index = argv.index("--limit") + 1
+            if input_index >= len(argv) or limit_index >= len(argv):
+                raise ValueError("option value missing")
+            limit = int(argv[limit_index])
+            if limit <= 0:
+                raise ValueError("limit must be positive")
+            consumed = {"--input", argv[input_index], "--limit", argv[limit_index]}
+            return {
+                "input": argv[input_index],
+                "limit": limit,
+                "extraArgs": [item for item in argv[1:] if item not in consumed],
+            }
+      hints:
+      - index("--input") + 1 위치가 실제 입력 파일입니다.
+      - int 변환이나 양수 검증 실패는 ValueError로 막으세요.
+    check:
+      id: python.builtins.sys.argv-parser.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.sys.argv-parser.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: parse_cli_args
+        cases:
+        - id: basic-options
+          arguments:
+          - value:
+            - report.py
+            - --input
+            - data.csv
+            - --limit
+            - '25'
+          expectedReturn:
+            input: data.csv
+            limit: 25
+            extraArgs: []
+        - id: preserves-extra-args
+          arguments:
+          - value:
+            - report.py
+            - --verbose
+            - --input
+            - orders.csv
+            - --limit
+            - '5'
+          expectedReturn:
+            input: orders.csv
+            limit: 5
+            extraArgs:
+            - --verbose
+        - id: rejects-missing-limit
+          arguments:
+          - value:
+            - report.py
+            - --input
+            - data.csv
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 10_sys-path-preview-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - 10_sys-argv-parser-mastery
+    title: sys.path 변경을 미리 보고 복구하기
+    subtitle: 전역 상태를 건드린 뒤 원복
+    goal: 주어진 경로들을 sys.path 앞에 넣은 preview를 반환하되 함수 종료 전에 원래 sys.path로 복구한다.
+    why: sys.path 수정은 강력하지만 전역 상태를 오염시키므로, 추가와 복구를 한 함수 안에서 다루는 습관이 필요합니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 명령행 인자 대신 모듈 검색 경로 상태 관리로 개념을 옮기세요.
+    tips:
+    - original = list(sys.path)로 복구용 복사본을 먼저 만드세요.
+    - finally에서 sys.path[:] = original로 같은 list 객체 내용을 되돌리세요.
+    exercise:
+      prompt: preview_sys_path_insert(path_entries)가 preview와 restored를 담은 dict를 반환하고 sys.path를 복구하도록 완성하세요.
+      starterCode: |-
+        def preview_sys_path_insert(path_entries):
+            raise NotImplementedError
+      solution: |-
+        import sys
+
+        def preview_sys_path_insert(path_entries):
+            original = list(sys.path)
+            try:
+                for entry in reversed(path_entries):
+                    if entry not in sys.path:
+                        sys.path.insert(0, entry)
+                preview = sys.path[:len(path_entries)]
+            finally:
+                sys.path[:] = original
+            return {"preview": preview, "restored": sys.path == original}
+      hints:
+      - reversed(path_entries)를 쓰면 최종 preview 순서가 입력 순서와 같습니다.
+      - return 전에 sys.path가 원래 값과 같아야 합니다.
+    check:
+      id: python.builtins.sys.path-preview.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.sys.path-preview.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: preview_sys_path_insert
+        cases:
+        - id: two-paths
+          arguments:
+          - value:
+            - /app/plugins
+            - /app/shared
+          expectedReturn:
+            preview:
+            - /app/plugins
+            - /app/shared
+            restored: true
+        - id: one-path
+          arguments:
+          - value:
+            - /tmp/codaro
+          expectedReturn:
+            preview:
+            - /tmp/codaro
+            restored: true
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 10_sys-runtime-report-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 10_sys-path-preview-transfer
+    title: 런타임 진단 리포트 다시 구성하기
+    subtitle: version_info와 argv를 함께 판정
+    goal: 현재 Python이 최소 버전을 만족하는지, 구현체 이름과 argv 요약을 dict로 반환한다.
+    why: 하루 뒤에도 정확한 버전 문자열보다 "이 환경에서 실행해도 되는가"를 판정하는 코드가 더 중요합니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. 현재 sys 값을 직접 읽되, 비교 결과는 안정적인 boolean으로 반환하세요.
+    tips:
+    - sys.version_info의 major, minor만 최소 버전과 비교하세요.
+    - argv가 비어 있으면 scriptName은 빈 문자열로 처리하세요.
+    exercise:
+      prompt: build_runtime_report(min_major, min_minor, argv)가 meetsMinimum, implementation, scriptName, argumentCount를 반환하도록
+        완성하세요.
+      starterCode: |-
+        def build_runtime_report(min_major, min_minor, argv):
+            raise NotImplementedError
+      solution: |-
+        import sys
+
+        def build_runtime_report(min_major, min_minor, argv):
+            current = (sys.version_info.major, sys.version_info.minor)
+            return {
+                "meetsMinimum": current >= (min_major, min_minor),
+                "implementation": sys.implementation.name,
+                "scriptName": argv[0] if argv else "",
+                "argumentCount": max(0, len(argv) - 1),
+            }
+      hints:
+      - 현재 버전 tuple과 최소 버전 tuple을 직접 비교할 수 있습니다.
+      - argv[0]은 실행 파일 또는 스크립트 이름입니다.
+    check:
+      id: python.builtins.sys.runtime-report.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.sys.runtime-report.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_runtime_report
+        cases:
+        - id: current-version-accepted
+          arguments:
+          - value: 3
+          - value: 10
+          - value:
+            - report.py
+            - --input
+            - data.csv
+          expectedReturn:
+            meetsMinimum: true
+            implementation: cpython
+            scriptName: report.py
+            argumentCount: 2
+        - id: impossible-version-rejected
+          arguments:
+          - value: 99
+          - value: 0
+          - value: []
+          expectedReturn:
+            meetsMinimum: false
+            implementation: cpython
+            scriptName: ''
+            argumentCount: 0
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

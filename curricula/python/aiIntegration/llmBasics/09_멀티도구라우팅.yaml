@@ -490,3 +490,283 @@ sections:
   check:
     noError: 호출과 assertion이 모두 정상 실행되어야 합니다.
     resultCheck: outcome["called"]에 두 도구 이름이 모두 포함되어야 합니다.
+assessment:
+  masteryVariants:
+  - id: 09_multi-tool-dispatch-call-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - dispatcher
+    title: 도구 이름으로 핸들러 라우팅하기
+    subtitle: tool dispatcher
+    goal: dispatch_tool_call(call)를 완성해 get_weather와 list_holidays 호출을 서로 다른 결과로 라우팅한다.
+    why: 멀티 도구에서는 모델이 고른 이름을 로컬 핸들러로 정확히 연결하는 dispatcher가 핵심입니다.
+    explanation: call은 name과 input을 가진 도구 호출 사전입니다. 알려진 두 도구는 정규화된 결과를 반환하고, 모르는 도구나 필수 인자 누락은 ValueError로 막습니다.
+    tips:
+    - 핸들러별 필수 인자를 먼저 확인합니다.
+    - 반환 사전에 tool 이름을 넣어 추적 가능하게 만듭니다.
+    exercise:
+      prompt: dispatch_tool_call(call)를 완성해 도구별 실행 결과 사전을 반환하세요.
+      starterCode: |-
+        def dispatch_tool_call(call):
+            raise NotImplementedError
+      solution: |-
+        def dispatch_tool_call(call):
+            name = call.get("name")
+            payload = dict(call.get("input", {}))
+            if name == "get_weather":
+                city = payload.get("city")
+                if not city:
+                    raise ValueError("city is required")
+                return {"tool": "get_weather", "input": {"city": city}, "text": f"{city}: 맑음"}
+            if name == "list_holidays":
+                if "year" not in payload:
+                    raise ValueError("year is required")
+                year = int(payload["year"])
+                return {
+                    "tool": "list_holidays",
+                    "input": {"year": year},
+                    "items": ["New Year", "Chuseok"],
+                }
+            raise ValueError("unknown tool")
+      hints:
+      - call["input"]은 도구별로 다른 키를 가집니다.
+      - 모르는 도구 이름은 조용히 무시하지 않습니다.
+    check:
+      id: python.llm.multi-tool.dispatch-call.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.multi-tool.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: dispatch_tool_call
+        cases:
+        - id: dispatches-weather-tool
+          arguments:
+          - value:
+              name: get_weather
+              input:
+                city: 서울
+          expectedReturn:
+            tool: get_weather
+            input:
+              city: 서울
+            text: '서울: 맑음'
+        - id: dispatches-holiday-tool
+          arguments:
+          - value:
+              name: list_holidays
+              input:
+                year: 2025
+          expectedReturn:
+            tool: list_holidays
+            input:
+              year: 2025
+            items:
+            - New Year
+            - Chuseok
+        - id: rejects-unknown-tool
+          arguments:
+          - value:
+              name: send_email
+              input:
+                to: user@example.com
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 09_multi-tool-count-calls-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - error_handling
+    - toolkit_class
+    title: 멀티 도구 호출과 오류를 집계하기
+    subtitle: tool call telemetry
+    goal: count_tool_calls(calls)를 완성해 허용된 도구별 호출 수와 오류 목록을 반환한다.
+    why: 학습 화면과 자동화 로그는 도구가 실제로 어떻게 선택되었는지 즉시 보여줘야 합니다.
+    explanation: calls는 여러 tool_use 요청 목록입니다. 허용된 도구 이름은 횟수를 누적하고, 모르는 도구는 errors에 남겨 errorCount로 집계합니다.
+    tips:
+    - called는 도구 이름별 카운트 사전입니다.
+    - 오류도 데이터로 남겨야 다음 학습 피드백을 만들 수 있습니다.
+    exercise:
+      prompt: count_tool_calls(calls)를 완성해 called, errorCount, errors를 반환하세요.
+      starterCode: |-
+        def count_tool_calls(calls):
+            raise NotImplementedError
+      solution: |-
+        def count_tool_calls(calls):
+            allowed = {"get_weather", "list_holidays"}
+            called = {}
+            errors = []
+            for call in calls:
+                name = call.get("name")
+                if name not in allowed:
+                    errors.append({"name": str(name), "error": "unknown tool"})
+                    continue
+                called[name] = called.get(name, 0) + 1
+            return {"called": called, "errorCount": len(errors), "errors": errors}
+      hints:
+      - 허용 목록을 set으로 두면 분기가 명확합니다.
+      - 모르는 도구도 로그에 남기고 반복은 계속합니다.
+    check:
+      id: python.llm.multi-tool.count-calls.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.multi-tool.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: count_tool_calls
+        cases:
+        - id: counts-known-tools-and-errors
+          arguments:
+          - value:
+            - name: get_weather
+              input:
+                city: 서울
+            - name: list_holidays
+              input:
+                year: 2025
+            - name: get_weather
+              input:
+                city: 부산
+            - name: send_email
+              input:
+                to: user@example.com
+          expectedReturn:
+            called:
+              get_weather: 2
+              list_holidays: 1
+            errorCount: 1
+            errors:
+            - name: send_email
+              error: unknown tool
+        - id: handles-empty-call-list
+          arguments:
+          - value: []
+          expectedReturn:
+            called: {}
+            errorCount: 0
+            errors: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 09_multi-tool-rule-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 09_multi-tool-count-calls-transfer
+    title: 멀티 도구 라우팅 규칙 회상하기
+    subtitle: multi tool recall
+    goal: choose_multi_tool_rule(goal)를 완성해 멀티 도구 상황별 규칙과 실패 위험을 반환한다.
+    why: 도구가 늘어날수록 스키마 등록, dispatcher, 검증, 오류 회신, 호출 집계가 분리되어야 운영이 안정됩니다.
+    explanation: registry, dispatcher, validation, error-result, call-count 상황별로 적용할 규칙을 선택하세요.
+    tips:
+    - registry와 dispatcher가 어긋나면 등록된 도구를 실행하지 못합니다.
+    - 오류도 tool_result로 돌려주면 모델이 흐름을 이어갈 수 있습니다.
+    exercise:
+      prompt: choose_multi_tool_rule(goal)를 완성해 rule, useWhen, risk를 반환하세요.
+      starterCode: |-
+        def choose_multi_tool_rule(goal):
+            raise NotImplementedError
+      solution: |-
+        def choose_multi_tool_rule(goal):
+            table = {
+                "registry": {"rule": "keep tool schemas in one list", "useWhen": "exposing multiple tools", "risk": "missing tool"},
+                "dispatcher": {"rule": "map tool name to local handler", "useWhen": "tool_use arrives", "risk": "wrong handler"},
+                "validation": {"rule": "validate required inputs per tool", "useWhen": "before calling handler", "risk": "handler crash"},
+                "error-result": {"rule": "return structured error for recoverable failures", "useWhen": "handler cannot run", "risk": "dead loop"},
+                "call-count": {"rule": "count selected tools by name", "useWhen": "auditing routing quality", "risk": "invisible behavior"},
+            }
+            if goal not in table:
+                raise ValueError("unknown multi tool goal")
+            return table[goal]
+      hints:
+      - 멀티 도구의 품질은 선택된 도구 목록으로 검산합니다.
+      - 입력 검증은 dispatcher 안쪽에서 도구별로 처리합니다.
+    check:
+      id: python.llm.multi-tool.rule-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.multi-tool.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_multi_tool_rule
+        cases:
+        - id: recalls-dispatcher-rule
+          arguments:
+          - value: dispatcher
+          expectedReturn:
+            rule: map tool name to local handler
+            useWhen: tool_use arrives
+            risk: wrong handler
+        - id: recalls-call-count-rule
+          arguments:
+          - value: call-count
+          expectedReturn:
+            rule: count selected tools by name
+            useWhen: auditing routing quality
+            risk: invisible behavior
+        - id: rejects-unknown-goal
+          arguments:
+          - value: one-big-function
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

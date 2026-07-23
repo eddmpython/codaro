@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "plotly"
+sourceCount: 11
+lessons:
+  - lessonRef: "plotly/00_Plotly소개"
+    sourcePath: "curricula/python/visualization/plotly/00_Plotly소개.yaml"
+    metaId: "plotly_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "plotly/01_세계기대수명비교"
+    sourcePath: "curricula/python/visualization/plotly/01_세계기대수명비교.yaml"
+    metaId: "plotly_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "plotly/02_팁데이터분포분석"
+    sourcePath: "curricula/python/visualization/plotly/02_팁데이터분포분석.yaml"
+    metaId: "plotly_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "plotly/03_붓꽃품종분류"
+    sourcePath: "curricula/python/visualization/plotly/03_붓꽃품종분류.yaml"
+    metaId: "plotly_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "plotly/04_GDP기대수명관계"
+    sourcePath: "curricula/python/visualization/plotly/04_GDP기대수명관계.yaml"
+    metaId: "plotly_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "plotly/05_세계인구지도"
+    sourcePath: "curricula/python/visualization/plotly/05_세계인구지도.yaml"
+    metaId: "plotly_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "plotly/06_시간에따른세계변화"
+    sourcePath: "curricula/python/visualization/plotly/06_시간에따른세계변화.yaml"
+    metaId: "plotly_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "plotly/07_레스토랑매출분석"
+    sourcePath: "curricula/python/visualization/plotly/07_레스토랑매출분석.yaml"
+    metaId: "plotly_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "plotly/08_대륙별계층구조"
+    sourcePath: "curricula/python/visualization/plotly/08_대륙별계층구조.yaml"
+    metaId: "plotly_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "plotly/09_주식시계열분석"
+    sourcePath: "curricula/python/visualization/plotly/09_주식시계열분석.yaml"
+    metaId: "plotly_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "plotly/10_종합대시보드"
+    sourcePath: "curricula/python/visualization/plotly/10_종합대시보드.yaml"
+    metaId: "plotly_10"
+    registryStatus: registered
+    reviewStatus: pending

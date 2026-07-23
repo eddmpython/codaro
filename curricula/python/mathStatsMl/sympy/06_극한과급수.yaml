@@ -387,3 +387,243 @@ sections:
   check:
     noError: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기의 기호, 수식, 대입값이 SymPy 계산 단계까지 도달해야 합니다.'
     resultCheck: '현업 흐름 검증: 손익분기 수식을 기호로 검증하기 결과식, 해, 미분/적분 값이 바꾼 수식 기준과 맞아야 합니다.'
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sympy_06-geometric-series-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_import
+    - workflow_validation
+    title: 등비급수 부분합과 수렴 판단하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 첫 항·공비·항 수로 부분합과 무한 수렴값을 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 부분합과 무한합을 같은 값으로 부르지 마세요.
+    - 무한 등비급수는 |r|<1일 때만 수렴합니다.
+    exercise:
+      prompt: geometric_series(first, ratio, count)를 완성하세요.
+      starterCode: |-
+        def geometric_series(first, ratio, count):
+            raise NotImplementedError
+      solution: |
+        def geometric_series(first, ratio, count):
+            if count < 0: raise ValueError("negative count")
+            partial = sum(first*ratio**index for index in range(count))
+            limit = first/(1-ratio) if abs(ratio) < 1 else None
+            return {"partial": partial, "converges": abs(ratio) < 1, "limit": limit}
+      hints: *id001
+    check:
+      id: python.sympy.sympy_06.geometric-series.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_06.geometric-series.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: geometric_series
+        cases:
+        - id: computes-convergent-series
+          arguments:
+          - value: 1
+          - value: 0.5
+          - value: 3
+          expectedReturn:
+            partial: 1.75
+            converges: true
+            limit: 2.0
+        - id: marks-divergent
+          arguments:
+          - value: 2
+          - value: 1
+          - value: 4
+          expectedReturn:
+            partial: 8
+            converges: false
+            limit: null
+        - id: rejects-negative-count
+          arguments:
+          - value: 1
+          - value: 0
+          - value: -1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sympy_06-rational-leading-limit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sympy_06-geometric-series-mastery
+    title: 새 유리함수 극한에 차수 비교 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: x→infinity에서 분자·분모 leading term으로 극한을 판정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 최고차항의 차수를 먼저 비교하세요.
+    - 양방향 infinity와 x→+infinity를 구분하세요.
+    exercise:
+      prompt: rational_infinity_limit(num_degree, num_lead, den_degree, den_lead)를 완성하세요.
+      starterCode: |-
+        def rational_infinity_limit(num_degree, num_lead, den_degree, den_lead):
+            raise NotImplementedError
+      solution: |
+        def rational_infinity_limit(num_degree, num_lead, den_degree, den_lead):
+            if den_lead == 0 or num_degree < 0 or den_degree < 0: raise ValueError("invalid leading term")
+            if num_degree < den_degree: return 0.0
+            if num_degree == den_degree: return num_lead/den_lead
+            sign = 1 if num_lead/den_lead > 0 else -1
+            return "infinity" if sign > 0 else "-infinity"
+      hints: *id002
+    check:
+      id: python.sympy.sympy_06.rational-leading-limit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_06.rational-leading-limit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: rational_infinity_limit
+        cases:
+        - id: lower-degree-goes-zero
+          arguments:
+          - value: 1
+          - value: 2
+          - value: 2
+          - value: 3
+          expectedReturn: 0.0
+        - id: equal-degree-ratio
+          arguments:
+          - value: 2
+          - value: 6
+          - value: 2
+          - value: 3
+          expectedReturn: 2.0
+        - id: higher-degree-diverges
+          arguments:
+          - value: 3
+          - value: -1
+          - value: 1
+          - value: 2
+          expectedReturn: -infinity
+        - id: rejects-zero-denominator-lead
+          arguments:
+          - value: 1
+          - value: 1
+          - value: 2
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sympy_06-limit-series-choice-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sympy_06-rational-leading-limit-transfer
+    title: 극한과 급수 판단 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 수렴 조건과 계산 방법을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 기호 계산의 가정과 정의역을 결과와 함께 남기세요.
+    - 소수 근삿값과 exact 결과를 구분하세요.
+    exercise:
+      prompt: choose_limit_method(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_limit_method(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_limit_method(situation):
+            table = {'geometric-sum': {'method': 'ratio test', 'evidence': 'absolute ratio below one', 'risk': 'partial sum as limit'}, 'rational-infinity': {'method': 'leading degrees', 'evidence': 'leading coefficients', 'risk': 'lower terms'}, 'indeterminate-form': {'method': "simplify or L'Hopital with conditions", 'evidence': 'form after substitution', 'risk': 'automatic rule'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sympy.sympy_06.limit-series-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sympy.sympy_06.limit-series-choice.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_limit_method
+        cases:
+        - id: recalls-geometric-sum
+          arguments:
+          - value: geometric-sum
+          expectedReturn:
+            method: ratio test
+            evidence: absolute ratio below one
+            risk: partial sum as limit
+        - id: recalls-rational-infinity
+          arguments:
+          - value: rational-infinity
+          expectedReturn:
+            method: leading degrees
+            evidence: leading coefficients
+            risk: lower terms
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

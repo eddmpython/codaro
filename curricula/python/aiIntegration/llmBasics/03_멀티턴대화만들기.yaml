@@ -386,3 +386,253 @@ sections:
   check:
     noError: 다섯 번의 호출이 모두 정상 실행되어야 합니다.
     resultCheck: missing 리스트가 비어 있어야 합니다.
+assessment:
+  masteryVariants:
+  - id: 03_multi_turn-history-append-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - stateless
+    - accumulate
+    - chat_session
+    title: 멀티턴 history에 user와 assistant 턴 누적하기
+    subtitle: chat history contract
+    goal: append_chat_turn(history, user_text, assistant_text)를 완성해 기존 history를 보존하고 새 두 턴이 붙은 목록을 반환한다.
+    why: 멀티턴 대화의 본질은 모델이 기억한다는 착각이 아니라, 호출자가 messages history를 다시 보내 상태를 구성한다는 점입니다.
+    explanation: 입력 history는 바꾸지 말고 복사본에 user, assistant 순서로 새 턴을 붙이세요. 빈 user_text는 ValueError입니다.
+    tips:
+    - 기존 history를 직접 append하면 호출자가 가진 원본도 변합니다.
+    - role 순서가 user 다음 assistant인지 확인하세요.
+    exercise:
+      prompt: append_chat_turn(history, user_text, assistant_text)를 완성해 새 history와 원본 길이를 반환하세요.
+      starterCode: |-
+        def append_chat_turn(history, user_text, assistant_text):
+            raise NotImplementedError
+      solution: |-
+        def append_chat_turn(history, user_text, assistant_text):
+            if not user_text.strip():
+                raise ValueError("user_text must not be empty")
+            next_history = [dict(message) for message in history]
+            next_history.append({"role": "user", "content": user_text})
+            next_history.append({"role": "assistant", "content": assistant_text})
+            return {"history": next_history, "originalLength": len(history)}
+      hints:
+      - dict(message)로 각 메시지를 복사하면 원본 mutation을 줄일 수 있습니다.
+      - assistant_text가 빈 문자열이어도 응답 실패를 별도 단계에서 처리할 수 있게 여기서는 구조만 유지합니다.
+    check:
+      id: python.llm.multi-turn.history-append.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.multi-turn.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: append_chat_turn
+        cases:
+        - id: appends-user-and-assistant-turns
+          arguments:
+          - value:
+            - role: user
+              content: 내 이름은 민준이야
+            - role: assistant
+              content: 기억할게요
+          - value: 내 직업은 데이터 분석가야
+          - value: 데이터 분석가라고 저장했어요
+          expectedReturn:
+            history:
+            - role: user
+              content: 내 이름은 민준이야
+            - role: assistant
+              content: 기억할게요
+            - role: user
+              content: 내 직업은 데이터 분석가야
+            - role: assistant
+              content: 데이터 분석가라고 저장했어요
+            originalLength: 2
+        - id: rejects-empty-user-text
+          arguments:
+          - value: []
+          - value: ''
+          - value: ok
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 03_multi_turn-memory-check-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - extend_turns
+    - workflow_validation
+    title: 마지막 응답이 필요한 사실을 회상했는지 검사하기
+    subtitle: chat memory verification
+    goal: check_memory_keywords(final_answer, keywords)를 완성해 누락 키워드와 통과 여부를 반환한다.
+    why: 멀티턴 회상은 느낌이 아니라, 필요한 사실이 마지막 답변에 들어 있는지 자동으로 확인해야 학습 증거가 됩니다.
+    explanation: keywords의 모든 항목이 final_answer에 포함되어야 passed가 true입니다. 대소문자는 그대로 비교합니다.
+    tips:
+    - missing 목록이 비어 있으면 통과입니다.
+    - 키워드는 모델이 그대로 사용할 가능성이 높은 명사를 고릅니다.
+    exercise:
+      prompt: check_memory_keywords(final_answer, keywords)를 완성해 passed와 missing을 반환하세요.
+      starterCode: |-
+        def check_memory_keywords(final_answer, keywords):
+            raise NotImplementedError
+      solution: |-
+        def check_memory_keywords(final_answer, keywords):
+            missing = [keyword for keyword in keywords if keyword not in final_answer]
+            return {"passed": not missing, "missing": missing, "keywordCount": len(keywords)}
+      hints:
+      - missing 리스트를 만들면 실패 원인을 바로 보여줄 수 있습니다.
+      - bool(missing)이 아니라 not missing이 통과 조건입니다.
+    check:
+      id: python.llm.multi-turn.memory-check.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.multi-turn.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: check_memory_keywords
+        cases:
+        - id: passes-when-all-keywords-are-present
+          arguments:
+          - value: 민준님은 데이터 분석가이고 pandas를 사용합니다.
+          - value:
+            - 민준
+            - 데이터 분석가
+            - pandas
+          expectedReturn:
+            passed: true
+            missing: []
+            keywordCount: 3
+        - id: reports-missing-keywords
+          arguments:
+          - value: 민준님은 pandas를 사용합니다.
+          - value:
+            - 민준
+            - 데이터 분석가
+          expectedReturn:
+            passed: false
+            missing:
+            - 데이터 분석가
+            keywordCount: 2
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 03_multi_turn-rule-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 03_multi_turn-memory-check-transfer
+    title: 멀티턴 대화 상태 관리 기준 회상하기
+    subtitle: multi-turn recall
+    goal: choose_multi_turn_rule(need)를 완성해 history 관리 상황별 규칙과 위험을 반환한다.
+    why: 멀티턴에서 오래 남아야 할 지식은 모델이 자동으로 기억하지 않으며, 호출자가 보낸 messages가 상태라는 점입니다.
+    explanation: stateless-api, append-assistant, trim-history, verify-memory, encapsulate-session 상황별 규칙을 선택하세요.
+    tips:
+    - assistant 응답도 다음 호출 history에 넣어야 맥락이 이어집니다.
+    - history가 길어지면 요약이나 windowing 정책이 필요합니다.
+    exercise:
+      prompt: choose_multi_turn_rule(need)를 완성해 rule, useWhen, risk를 반환하세요.
+      starterCode: |-
+        def choose_multi_turn_rule(need):
+            raise NotImplementedError
+      solution: |-
+        def choose_multi_turn_rule(need):
+            table = {
+                "stateless-api": {"rule": "send prior messages again", "useWhen": "context must continue", "risk": "missing facts"},
+                "append-assistant": {"rule": "store model replies too", "useWhen": "later turns refer to previous answers", "risk": "one-sided history"},
+                "trim-history": {"rule": "summarize or window old turns", "useWhen": "history grows too long", "risk": "lost details"},
+                "verify-memory": {"rule": "assert required keywords or facts", "useWhen": "a fact must be recalled", "risk": "false confidence"},
+                "encapsulate-session": {"rule": "wrap history updates in a class", "useWhen": "several calls share state", "risk": "hidden mutation"},
+            }
+            if need not in table:
+                raise ValueError("unknown multi-turn need")
+            return table[need]
+      hints:
+      - 상태는 서버가 아니라 messages 배열에 있습니다.
+      - 기억 검증은 자동 check와 함께 있어야 합니다.
+    check:
+      id: python.llm.multi-turn.rule-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.llm.multi-turn.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_multi_turn_rule
+        cases:
+        - id: recalls-stateless-api-rule
+          arguments:
+          - value: stateless-api
+          expectedReturn:
+            rule: send prior messages again
+            useWhen: context must continue
+            risk: missing facts
+        - id: recalls-memory-verification
+          arguments:
+          - value: verify-memory
+          expectedReturn:
+            rule: assert required keywords or facts
+            useWhen: a fact must be recalled
+            risk: false confidence
+        - id: rejects-unknown-need
+          arguments:
+          - value: model-remembers-forever
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "polars"
+sourceCount: 11
+lessons:
+  - lessonRef: "polars/00_Polars소개"
+    sourcePath: "curricula/python/dataAnalysis/polars/00_Polars소개.yaml"
+    metaId: "polars_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "polars/01_영화평점분석"
+    sourcePath: "curricula/python/dataAnalysis/polars/01_영화평점분석.yaml"
+    metaId: "polars_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "polars/02_날씨데이터분석"
+    sourcePath: "curricula/python/dataAnalysis/polars/02_날씨데이터분석.yaml"
+    metaId: "polars_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "polars/03_게임판매분석"
+    sourcePath: "curricula/python/dataAnalysis/polars/03_게임판매분석.yaml"
+    metaId: "polars_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "polars/04_주식데이터분석"
+    sourcePath: "curricula/python/dataAnalysis/polars/04_주식데이터분석.yaml"
+    metaId: "polars_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "polars/05_음악스트리밍분석"
+    sourcePath: "curricula/python/dataAnalysis/polars/05_음악스트리밍분석.yaml"
+    metaId: "polars_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "polars/06_부동산가격분석"
+    sourcePath: "curricula/python/dataAnalysis/polars/06_부동산가격분석.yaml"
+    metaId: "polars_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "polars/07_스포츠통계분석"
+    sourcePath: "curricula/python/dataAnalysis/polars/07_스포츠통계분석.yaml"
+    metaId: "polars_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "polars/08_소셜미디어분석"
+    sourcePath: "curricula/python/dataAnalysis/polars/08_소셜미디어분석.yaml"
+    metaId: "polars_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "polars/09_대용량로그분석"
+    sourcePath: "curricula/python/dataAnalysis/polars/09_대용량로그분석.yaml"
+    metaId: "polars_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "polars/10_실전종합프로젝트"
+    sourcePath: "curricula/python/dataAnalysis/polars/10_실전종합프로젝트.yaml"
+    metaId: "polars_10"
+    registryStatus: registered
+    reviewStatus: pending

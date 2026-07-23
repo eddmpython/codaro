@@ -675,7 +675,7 @@ function TableWidget({ descriptor }: { descriptor: WidgetDescriptor }) {
       </table>
       {totalPages > 1 ? (
         <div className="flex items-center justify-between border-t bg-muted/20 px-2 py-1 text-[10px]">
-          <button type="button" className="rounded px-2 py-0.5 hover:bg-accent" onClick={() => setPage(Math.max(0, page - 1))}>
+          <button type="button" className="rounded px-2 py-0.5 hover:bg-accent-surface" onClick={() => setPage(Math.max(0, page - 1))}>
             이전
           </button>
           <span>
@@ -683,7 +683,7 @@ function TableWidget({ descriptor }: { descriptor: WidgetDescriptor }) {
           </span>
           <button
             type="button"
-            className="rounded px-2 py-0.5 hover:bg-accent"
+            className="rounded px-2 py-0.5 hover:bg-accent-surface"
             onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
           >
             다음

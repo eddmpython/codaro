@@ -1,0 +1,94 @@
+name: Release Quality
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  product-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux launcher dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install Python dependencies
+        run: uv sync --extra dev --python 3.12
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: |
+            editor/package-lock.json
+            landing/package-lock.json
+
+      - name: Install editor
+        working-directory: editor
+        run: npm ci
+
+      - name: Install landing
+        working-directory: landing
+        run: npm ci
+
+      - name: Install Chromium
+        timeout-minutes: 15
+        run: uv run --with playwright python -m playwright install --with-deps chromium
+
+      - name: Run product release sequence
+        timeout-minutes: 90
+        run: uv run python -X utf8 tests/run.py product-release
+
+      - name: Upload release quality evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: product-release-evidence
+          path: output/test-runner/
+
+  confirmatory-efficacy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install Python dependencies
+        run: uv sync --extra dev --python 3.12
+
+      - name: Verify featured-path E3 evidence
+        run: uv run python -X utf8 tests/run.py gate path-efficacy-confirmatory
+
+      - name: Upload confirmatory evidence report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: path-efficacy-confirmatory
+          path: output/test-runner/path-efficacy-confirmatory/

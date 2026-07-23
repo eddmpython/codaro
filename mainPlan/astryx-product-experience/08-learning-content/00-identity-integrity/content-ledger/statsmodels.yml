@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "statsmodels"
+canonicalRows: 11
+lessons:
+  - lessonRef: "statsmodels/00_statsmodels소개"
+    identityLedgerRef: "identity-ledger/statsmodels.yml"
+    lessonContentHash: "df501f22399cb6f14379f648e0b97378e0bcfc5f6233ee324274f4eff10ad1c8"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/07-statistical-analysis"
+    eligiblePathIds: ["statisticalAnalysis"]
+    outcomes: ["stats.regression"]
+    prerequisites: ["pandas.loadFrame","numpy.intro"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:statsmodels/00_statsmodels소개:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:statsmodels_00_statsmodels__:v1","retrieve:statsmodels_00_statsmodels__:v2","retrieve:statsmodels_00_statsmodels__:v3"]
+    transferVariantIds: ["transfer:statsmodels_00_statsmodels__:near-v1","transfer:statsmodels_00_statsmodels__:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "statsmodels/01_광고비매출예측"
+    identityLedgerRef: "identity-ledger/statsmodels.yml"
+    lessonContentHash: "a15339e10bf89aa9ecee79938baf2e19849de9da7a4de21381ecb72c982c46fd"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/07-statistical-analysis"
+    eligiblePathIds: ["statisticalAnalysis"]
+    outcomes: ["stats.regression"]
+    prerequisites: ["stats.regression"]
+    reinforcesOutcomeIds: ["stats.regression"]
+    runtimeTier: browser
+    checkSpecId: "lesson:statsmodels/01_광고비매출예측:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:statsmodels_01________:v1","retrieve:statsmodels_01________:v2","retrieve:statsmodels_01________:v3"]
+    transferVariantIds: ["transfer:statsmodels_01________:near-v1","transfer:statsmodels_01________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "statsmodels/02_부동산가격예측"
+    identityLedgerRef: "identity-ledger/statsmodels.yml"
+    lessonContentHash: "01cb545fc6ef67ba3623951e85458ee8f70be7e1a69b584d7c883cfb62cda888"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/07-statistical-analysis"
+    eligiblePathIds: ["statisticalAnalysis"]
+    outcomes: ["stats.regression"]
+    prerequisites: ["stats.regression"]
+    reinforcesOutcomeIds: ["stats.regression"]
+    runtimeTier: browser
+    checkSpecId: "lesson:statsmodels/02_부동산가격예측:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:statsmodels_02________:v1","retrieve:statsmodels_02________:v2","retrieve:statsmodels_02________:v3"]
+    transferVariantIds: ["transfer:statsmodels_02________:near-v1","transfer:statsmodels_02________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "statsmodels/03_의료보험비용예측"
+    identityLedgerRef: "identity-ledger/statsmodels.yml"
+    lessonContentHash: "bf23fd0462f697934723115c79144bd9d6a09b55e730fb2011776544010a887f"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/07-statistical-analysis"
+    eligiblePathIds: ["statisticalAnalysis"]
+    outcomes: ["stats.regression"]
+    prerequisites: ["stats.regression"]
+    reinforcesOutcomeIds: ["stats.regression"]
+    runtimeTier: browser
+    checkSpecId: "lesson:statsmodels/03_의료보험비용예측:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:statsmodels_03_________:v1","retrieve:statsmodels_03_________:v2","retrieve:statsmodels_03_________:v3"]
+    transferVariantIds: ["transfer:statsmodels_03_________:near-v1","transfer:statsmodels_03_________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "statsmodels/04_항공수요예측"
+    identityLedgerRef: "identity-ledger/statsmodels.yml"
+    lessonContentHash: "154a0b0a9765025efb90952b11414e5fb9e91b60a47be42f0ac9859829d3bd70"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/07-statistical-analysis"
+    eligiblePathIds: ["statisticalAnalysis","timeSeriesForecasting"]
+    outcomes: ["stats.timeSeries"]
+    prerequisites: ["stats.regression","pandas.timeSeries"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:statsmodels/04_항공수요예측:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:statsmodels_04_______:v1","retrieve:statsmodels_04_______:v2","retrieve:statsmodels_04_______:v3"]
+    transferVariantIds: ["transfer:statsmodels_04_______:near-v1","transfer:statsmodels_04_______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "statsmodels/05_고객이탈예측"
+    identityLedgerRef: "identity-ledger/statsmodels.yml"
+    lessonContentHash: "dcfb3c92a82673cdc62806a6e6c58316bd263420385d035ae4e0d99ad8493e04"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/07-statistical-analysis"
+    eligiblePathIds: ["statisticalAnalysis"]
+    outcomes: ["stats.regression"]
+    prerequisites: ["stats.regression"]
+    reinforcesOutcomeIds: ["stats.regression"]
+    runtimeTier: browser
+    checkSpecId: "lesson:statsmodels/05_고객이탈예측:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:statsmodels_05_______:v1","retrieve:statsmodels_05_______:v2","retrieve:statsmodels_05_______:v3"]
+    transferVariantIds: ["transfer:statsmodels_05_______:near-v1","transfer:statsmodels_05_______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "statsmodels/06_다중회귀심화"
+    identityLedgerRef: "identity-ledger/statsmodels.yml"
+    lessonContentHash: "2b57fcfcea3edd0c0541efafcb7ab26578a14c1533b4e65112fed1164cb6ad86"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/07-statistical-analysis"
+    eligiblePathIds: ["statisticalAnalysis"]
+    outcomes: ["stats.regression","stats.diagnostics"]
+    prerequisites: ["stats.regression"]
+    reinforcesOutcomeIds: ["stats.regression"]
+    runtimeTier: browser
+    checkSpecId: "lesson:statsmodels/06_다중회귀심화:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:statsmodels_06_______:v1","retrieve:statsmodels_06_______:v2","retrieve:statsmodels_06_______:v3"]
+    transferVariantIds: ["transfer:statsmodels_06_______:near-v1","transfer:statsmodels_06_______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "statsmodels/07_경제지표회귀분석"
+    identityLedgerRef: "identity-ledger/statsmodels.yml"
+    lessonContentHash: "b0f1ab6ce8296ea9d4caa29d6133059824e1db5a77fc76783282be0aa1463a1b"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/07-statistical-analysis"
+    eligiblePathIds: ["statisticalAnalysis"]
+    outcomes: ["stats.regression"]
+    prerequisites: ["stats.regression"]
+    reinforcesOutcomeIds: ["stats.regression"]
+    runtimeTier: browser
+    checkSpecId: "lesson:statsmodels/07_경제지표회귀분석:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:statsmodels_07_________:v1","retrieve:statsmodels_07_________:v2","retrieve:statsmodels_07_________:v3"]
+    transferVariantIds: ["transfer:statsmodels_07_________:near-v1","transfer:statsmodels_07_________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "statsmodels/08_직원퇴사예측"
+    identityLedgerRef: "identity-ledger/statsmodels.yml"
+    lessonContentHash: "cc9fcaf4387c25c5f2ba908d59b3cf023c5c6a1760685e8e37a1c1bbb94b6b4e"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/07-statistical-analysis"
+    eligiblePathIds: ["statisticalAnalysis"]
+    outcomes: ["stats.diagnostics"]
+    prerequisites: ["stats.diagnostics"]
+    reinforcesOutcomeIds: ["stats.diagnostics"]
+    runtimeTier: browser
+    checkSpecId: "lesson:statsmodels/08_직원퇴사예측:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:statsmodels_08_______:v1","retrieve:statsmodels_08_______:v2","retrieve:statsmodels_08_______:v3"]
+    transferVariantIds: ["transfer:statsmodels_08_______:near-v1","transfer:statsmodels_08_______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "statsmodels/09_자전거수요예측"
+    identityLedgerRef: "identity-ledger/statsmodels.yml"
+    lessonContentHash: "0ceefa25cd1bc3621c61b3c394e921d57b013d112b5c722e2e8c7ca129c2fe9e"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/07-statistical-analysis"
+    eligiblePathIds: ["statisticalAnalysis","timeSeriesForecasting"]
+    outcomes: ["stats.timeSeries"]
+    prerequisites: ["stats.timeSeries"]
+    reinforcesOutcomeIds: ["stats.timeSeries"]
+    runtimeTier: browser
+    checkSpecId: "lesson:statsmodels/09_자전거수요예측:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:statsmodels_09________:v1","retrieve:statsmodels_09________:v2","retrieve:statsmodels_09________:v3"]
+    transferVariantIds: ["transfer:statsmodels_09________:near-v1","transfer:statsmodels_09________:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "statsmodels/10_종합프로젝트"
+    identityLedgerRef: "identity-ledger/statsmodels.yml"
+    lessonContentHash: "461757bff69cfe7254dc54c5edb1ef4914853e028aafdd2baf2b005a1e10c966"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/07-statistical-analysis"
+    eligiblePathIds: ["statisticalAnalysis"]
+    outcomes: ["stats.regression","stats.diagnostics","stats.timeSeries"]
+    prerequisites: ["stats.regression","stats.diagnostics","stats.timeSeries"]
+    reinforcesOutcomeIds: ["stats.regression","stats.diagnostics","stats.timeSeries"]
+    runtimeTier: browser
+    checkSpecId: "lesson:statsmodels/10_종합프로젝트:required:v1"
+    checkKinds: ["table","behavior"]
+    retrievalVariantIds: ["retrieve:statsmodels_10_______:v1","retrieve:statsmodels_10_______:v2","retrieve:statsmodels_10_______:v3"]
+    transferVariantIds: ["transfer:statsmodels_10_______:near-v1","transfer:statsmodels_10_______:far-v1"]
+    artifactDecision: table-or-report
+    visualDecision: required-data-shape-or-before-after
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

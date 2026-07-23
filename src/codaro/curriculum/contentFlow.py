@@ -99,7 +99,7 @@ def loadCurriculumContentPayload(
             "Content not found.",
             statusCode=404,
         ) from exc
-    progressTracker.markAccessed(category, contentId)
+    progressTracker.markAccessed(category, payload.contentId)
     return CurriculumContentResult(
         payload=payload.response(),
         blockCount=payload.blockCount,

@@ -5,17 +5,19 @@ import { fileURLToPath } from "node:url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(__dirname, "..", "..");
 const mascotRoot = resolve(projectRoot, "assets", "brand", "mascot");
+const screenshotRoot = resolve(projectRoot, "assets", "brand", "screenshots");
 const staticRoot = resolve(projectRoot, "landing", "static");
 
 const brandFiles = [
-  ["codaro-character.png", "brand/codaro-character.png"],
-  ["work/avatar-full.png", "brand/avatar-hero.png"],
-  ["work/avatar-face.png", "brand/avatar-face.png"],
-  ["work/avatar-small.png", "brand/avatar-small.png"],
+  [resolve(mascotRoot, "codaro-character.png"), "brand/codaro-character.png"],
+  [resolve(mascotRoot, "work/avatar-full.png"), "brand/avatar-hero.png"],
+  [resolve(mascotRoot, "work/avatar-face.png"), "brand/avatar-face.png"],
+  [resolve(mascotRoot, "work/avatar-small.png"), "brand/avatar-small.png"],
+  [resolve(screenshotRoot, "chatHome.webp"), "brand/chatHome.webp"],
+  [resolve(screenshotRoot, "curriculumSurface.webp"), "brand/curriculumSurface.webp"],
 ];
 
-for (const [sourceName, targetRelative] of brandFiles) {
-  const sourcePath = resolve(mascotRoot, sourceName);
+for (const [sourcePath, targetRelative] of brandFiles) {
   if (!existsSync(sourcePath)) {
     throw new Error(`Missing brand asset: ${sourcePath}`);
   }

@@ -22,13 +22,23 @@ type UseCurriculumNavigationStateOptions = {
   removeCustomCurriculumEntry: (id: string) => void;
   saveCustomCurriculumEntry: (blocks: BlockConfig[], title?: string) => CustomCurriculumEntry | null;
   selectCurriculumCategoryState: (category: string) => {
+    selectedCategory: string;
+    selectedContentId: string;
     selectedCustomCurriculumId: string;
   };
   selectCurriculumContentState: (contentId: string) => {
+    selectedCategory: string;
+    selectedContentId: string;
+    selectedCustomCurriculumId: string;
+  };
+  selectCurriculumLessonState: (category: string, contentId: string) => {
+    selectedCategory: string;
+    selectedContentId: string;
     selectedCustomCurriculumId: string;
   };
   setSelectedCustomCurriculumId: (id: string) => void;
   setSurface: (surface: SurfaceMode) => void;
+  onNavigateCurriculum: (category: string, contentId: string) => void;
   onNotice: (notice: AppNotice) => void;
 };
 
@@ -41,8 +51,10 @@ export function useCurriculumNavigationState({
   saveCustomCurriculumEntry,
   selectCurriculumCategoryState,
   selectCurriculumContentState,
+  selectCurriculumLessonState,
   setSelectedCustomCurriculumId,
   setSurface,
+  onNavigateCurriculum,
   onNotice,
 }: UseCurriculumNavigationStateOptions) {
   const [query, setQuery] = useState("");
@@ -83,14 +95,23 @@ export function useCurriculumNavigationState({
   const selectCurriculumCategory = useCallback((key: string) => {
     const selection = selectCurriculumCategoryState(key);
     setSelectedCustomCurriculumId(selection.selectedCustomCurriculumId);
+    onNavigateCurriculum(selection.selectedCategory, selection.selectedContentId);
     setSurface("curriculum");
-  }, [selectCurriculumCategoryState, setSelectedCustomCurriculumId, setSurface]);
+  }, [onNavigateCurriculum, selectCurriculumCategoryState, setSelectedCustomCurriculumId, setSurface]);
 
   const selectCurriculumContent = useCallback((contentId: string) => {
     const selection = selectCurriculumContentState(contentId);
     setSelectedCustomCurriculumId(selection.selectedCustomCurriculumId);
+    onNavigateCurriculum(selection.selectedCategory, selection.selectedContentId);
     setSurface("curriculum");
-  }, [selectCurriculumContentState, setSelectedCustomCurriculumId, setSurface]);
+  }, [onNavigateCurriculum, selectCurriculumContentState, setSelectedCustomCurriculumId, setSurface]);
+
+  const selectCurriculumLesson = useCallback((category: string, contentId: string) => {
+    const selection = selectCurriculumLessonState(category, contentId);
+    setSelectedCustomCurriculumId(selection.selectedCustomCurriculumId);
+    onNavigateCurriculum(selection.selectedCategory, selection.selectedContentId);
+    setSurface("curriculum");
+  }, [onNavigateCurriculum, selectCurriculumLessonState, setSelectedCustomCurriculumId, setSurface]);
 
   const selectCustomCurriculum = useCallback((id: string) => {
     const entry = findCustomCurriculum(id);
@@ -105,13 +126,14 @@ export function useCurriculumNavigationState({
     const fallbackCategory = categories[0]?.key ?? "30days";
     const selection = selectCurriculumCategoryState(fallbackCategory);
     setSelectedCustomCurriculumId(selection.selectedCustomCurriculumId);
+    onNavigateCurriculum(selection.selectedCategory, selection.selectedContentId);
     setSurface("curriculum");
     onNotice({
       tone: "success",
       title: "나만의 커리큘럼 삭제됨",
       detail: entry.title,
     });
-  }, [categories, findCustomCurriculum, onNotice, removeCustomCurriculumEntry, selectCurriculumCategoryState, setSelectedCustomCurriculumId, setSurface]);
+  }, [categories, findCustomCurriculum, onNavigateCurriculum, onNotice, removeCustomCurriculumEntry, selectCurriculumCategoryState, setSelectedCustomCurriculumId, setSurface]);
 
   return {
     deleteCustomCurriculum,
@@ -122,6 +144,7 @@ export function useCurriculumNavigationState({
     selectCustomCurriculum,
     selectCurriculumCategory,
     selectCurriculumContent,
+    selectCurriculumLesson,
     setQuery,
     sidebarCustomCurricula,
   };

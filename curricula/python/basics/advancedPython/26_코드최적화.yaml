@@ -529,3 +529,297 @@ sections:
     type: noError
     noError: 종합 연습의 함수 정의, 매개변수, 호출 인자가 NameError나 TypeError 조건을 피해야 합니다.
     resultCheck: 종합 연습 함수 호출 결과가 바꾼 인자나 반환식 기준으로 달라져야 합니다.
+assessment:
+  masteryVariants:
+  - id: 26_code_optimization-deduplicate-orders-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - time_complexity
+    - data_structure
+    - workflow_validation
+    title: 중복 주문을 순서 보존 set으로 최적화하기
+    subtitle: optimized deduplication
+    goal: deduplicate_orders_with_metrics(order_ids)를 완성해 입력 순서를 유지하면서 중복을 제거하고 검사 횟수와 중복 수를 반환한다.
+    why: 최적화는 빠른 척하는 코드가 아니라, 같은 결과를 유지하면서 병목이 되는 연산 수를 줄였다는 증거를 남기는 일입니다.
+    explanation: order_ids는 list여야 합니다. set으로 이미 본 주문을 추적하되, 결과 목록은 최초 등장 순서를 유지하세요.
+    tips:
+    - list membership은 길이에 따라 느려지지만 set membership은 조회 비용이 작습니다.
+    - 최적화 결과에는 uniqueIds뿐 아니라 checks와 duplicateCount를 함께 반환하세요.
+    exercise:
+      prompt: deduplicate_orders_with_metrics(order_ids)를 완성해 uniqueIds, duplicateCount, checks를 반환하세요.
+      starterCode: |-
+        def deduplicate_orders_with_metrics(order_ids):
+            raise NotImplementedError
+      solution: |-
+        def deduplicate_orders_with_metrics(order_ids):
+            if not isinstance(order_ids, list):
+                raise TypeError("order_ids must be a list")
+            seen = set()
+            unique_ids = []
+            duplicate_count = 0
+            checks = 0
+            for order_id in order_ids:
+                checks += 1
+                if order_id in seen:
+                    duplicate_count += 1
+                else:
+                    seen.add(order_id)
+                    unique_ids.append(order_id)
+            return {
+                "uniqueIds": unique_ids,
+                "duplicateCount": duplicate_count,
+                "checks": checks,
+            }
+      hints:
+      - seen은 membership 확인용이고 unique_ids는 순서 보존용입니다.
+      - 타입이 list가 아니면 문자열도 반복 가능하므로 먼저 TypeError로 막으세요.
+    check:
+      id: python.advanced.optimization.deduplicate-orders.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.optimization.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: deduplicate_orders_with_metrics
+        cases:
+        - id: removes-duplicates-with-stable-order
+          arguments:
+          - value:
+            - O-1
+            - O-2
+            - O-1
+            - O-3
+            - O-2
+          expectedReturn:
+            uniqueIds:
+            - O-1
+            - O-2
+            - O-3
+            duplicateCount: 2
+            checks: 5
+        - id: rejects-non-list-input
+          arguments:
+          - value: O-1,O-2
+          expectedException: TypeError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 26_code_optimization-shipping-cache-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - memory_opt
+    - builtin_func
+    - caching
+    title: 배송 견적 계산을 요청 키로 캐싱하기
+    subtitle: memoized quote calculation
+    goal: quote_shipments(requests)를 완성해 같은 zone과 weight 조합의 견적을 한 번만 계산한다.
+    why: 중복 제거에서 배운 set과 dict 사고를 계산 캐싱으로 옮기면, 최적화가 자료구조 선택과 상태 저장의 문제라는 점이 분명해집니다.
+    explanation: 각 요청은 zone과 weight를 가집니다. 견적은 zone 기본값에 weight * 100을 더한 값이며, 같은 키는 cache에서 재사용하세요.
+    tips:
+    - dict key는 (zone, weight) 튜플처럼 불변 값으로 만들면 됩니다.
+    - computedCount는 실제로 새 견적을 계산한 횟수만 세세요.
+    exercise:
+      prompt: quote_shipments(requests)를 완성해 quotes, computedCount, cacheKeys를 반환하세요.
+      starterCode: |-
+        def quote_shipments(requests):
+            raise NotImplementedError
+      solution: |-
+        def quote_shipments(requests):
+            base_by_zone = {"A": 1000, "B": 1500, "C": 2000}
+            cache = {}
+            quotes = []
+            computed_count = 0
+            for request in requests:
+                key = (request["zone"], request["weight"])
+                if key not in cache:
+                    if request["zone"] not in base_by_zone:
+                        raise ValueError("unknown zone")
+                    cache[key] = base_by_zone[request["zone"]] + request["weight"] * 100
+                    computed_count += 1
+                quotes.append(cache[key])
+            return {
+                "quotes": quotes,
+                "computedCount": computed_count,
+                "cacheKeys": [f"{zone}:{weight}" for zone, weight in sorted(cache)],
+            }
+      hints:
+      - requests 길이가 아니라 고유 key 개수가 computedCount가 됩니다.
+      - cacheKeys를 정렬하면 결과가 항상 같은 순서로 나옵니다.
+    check:
+      id: python.advanced.optimization.shipping-cache.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.optimization.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: quote_shipments
+        cases:
+        - id: reuses-quote-for-repeated-zone-weight
+          arguments:
+          - value:
+            - zone: A
+              weight: 3
+            - zone: B
+              weight: 2
+            - zone: A
+              weight: 3
+          expectedReturn:
+            quotes:
+            - 1300
+            - 1700
+            - 1300
+            computedCount: 2
+            cacheKeys:
+            - A:3
+            - B:2
+        - id: rejects-unknown-zone
+          arguments:
+          - value:
+            - zone: Z
+              weight: 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 26_code_optimization-strategy-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 26_code_optimization-shipping-cache-transfer
+    title: 최적화 전략 선택 기준 회상하기
+    subtitle: optimization strategy recall
+    goal: choose_optimization_strategy(symptom)를 완성해 병목 증상별 접근과 검증 방법을 반환한다.
+    why: 최적화에서 오래 남아야 할 지식은 트릭 목록이 아니라, 측정, 자료구조, 알고리즘, 캐싱, 메모리의 우선순위를 판단하는 기준입니다.
+    explanation: repeated-membership, repeated-expensive-call, large-intermediate-list, slow-python-loop, wrong-algorithm
+      상황별 전략을 선택하세요.
+    tips:
+    - 최적화 전후에는 항상 같은 결과를 보존하는 검증이 있어야 합니다.
+    - 캐싱은 입력 key와 무효화 조건이 명확할 때만 안전합니다.
+    exercise:
+      prompt: choose_optimization_strategy(symptom)를 완성해 strategy, proof, risk를 반환하세요.
+      starterCode: |-
+        def choose_optimization_strategy(symptom):
+            raise NotImplementedError
+      solution: |-
+        def choose_optimization_strategy(symptom):
+            table = {
+                "repeated-membership": {
+                    "strategy": "use-set-or-dict",
+                    "proof": "membership checks stop growing with result length",
+                    "risk": "sets do not preserve duplicates",
+                },
+                "repeated-expensive-call": {
+                    "strategy": "cache-by-input-key",
+                    "proof": "computed count is lower than request count",
+                    "risk": "stale cache returns outdated results",
+                },
+                "large-intermediate-list": {
+                    "strategy": "stream-or-generator",
+                    "proof": "peak stored items drops",
+                    "risk": "one-shot iterators can be consumed accidentally",
+                },
+                "slow-python-loop": {
+                    "strategy": "use-builtins",
+                    "proof": "same output with less Python-level work",
+                    "risk": "readability can suffer if over-compressed",
+                },
+                "wrong-algorithm": {
+                    "strategy": "change-complexity-class",
+                    "proof": "growth rate improves as input scales",
+                    "risk": "new algorithm may need stricter preconditions",
+                },
+            }
+            if symptom not in table:
+                raise ValueError("unknown optimization symptom")
+            return table[symptom]
+      hints:
+      - 증상이 반복 조회인지, 반복 계산인지, 메모리 폭증인지 먼저 나누세요.
+      - proof는 단순 시간 감상이 아니라 수치나 성장률로 남겨야 합니다.
+    check:
+      id: python.advanced.optimization.strategy-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.optimization.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_optimization_strategy
+        cases:
+        - id: recalls-set-for-repeated-membership
+          arguments:
+          - value: repeated-membership
+          expectedReturn:
+            strategy: use-set-or-dict
+            proof: membership checks stop growing with result length
+            risk: sets do not preserve duplicates
+        - id: recalls-cache-for-expensive-calls
+          arguments:
+          - value: repeated-expensive-call
+          expectedReturn:
+            strategy: cache-by-input-key
+            proof: computed count is lower than request count
+            risk: stale cache returns outdated results
+        - id: rejects-unknown-symptom
+          arguments:
+          - value: make-it-fast
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

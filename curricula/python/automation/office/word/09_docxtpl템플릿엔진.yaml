@@ -333,3 +333,308 @@ sections:
           - "표 행 동적 추가 ({% tr for %})"
           - "이미지 동적 삽입 ({{ logo | image }})"
           - "08강 mailMerge와 결합 - docxtpl 기반 N장 생성"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: word_09-template-placeholder-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_simple
+    - extensions
+    title: docxtpl placeholder 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 미정의·미사용·민감 placeholder를 렌더 전에 찾는다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - template field 집합과 context key 집합을 양방향 비교하세요.
+    - 민감 필드는 명시적 allowlist 없이는 템플릿 context에 넣지 마세요.
+    exercise:
+      prompt: audit_placeholders(template_fields, context, allowed_sensitive_fields)를 완성하세요.
+      starterCode: |-
+        def audit_placeholders(template_fields, context, allowed_sensitive_fields):
+            raise NotImplementedError
+      solution: |
+        def audit_placeholders(template_fields, context, allowed_sensitive_fields):
+            fields = set(template_fields)
+            keys = set(context)
+            missing = sorted(fields - keys)
+            extra = sorted(keys - fields)
+            sensitive = sorted(key for key in keys if key.lower() in {"password", "token", "secret", "ssn"} and key not in allowed_sensitive_fields)
+            failures = []
+            if missing:
+                failures.append("missing-context")
+            if extra:
+                failures.append("unused-context")
+            if sensitive:
+                failures.append("sensitive-field")
+            return {"accepted": not failures, "failures": failures, "missing": missing, "extra": extra, "sensitive": sensitive}
+      hints: *id001
+    check:
+      id: python.word.word_09.template-placeholder-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_09.template-placeholder-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_placeholders
+        cases:
+        - id: accepts-complete-context
+          arguments:
+          - value:
+            - name
+            - date
+          - value:
+              name: A
+              date: '2026-07-22'
+          - value: []
+          expectedReturn:
+            accepted: true
+            failures: []
+            missing: []
+            extra: []
+            sensitive: []
+        - id: reports-missing-and-extra
+          arguments:
+          - value:
+            - name
+            - date
+          - value:
+              name: A
+              note: N
+          - value: []
+          expectedReturn:
+            accepted: false
+            failures:
+            - missing-context
+            - unused-context
+            missing:
+            - date
+            extra:
+            - note
+            sensitive: []
+        - id: reports-sensitive-key
+          arguments:
+          - value:
+            - name
+            - token
+          - value:
+              name: A
+              token: raw
+          - value: []
+          expectedReturn:
+            accepted: false
+            failures:
+            - sensitive-field
+            missing: []
+            extra: []
+            sensitive:
+            - token
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: word_09-template-render-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - word_09-template-placeholder-audit-mastery
+    title: 다른 템플릿의 렌더 결과 완전성 검증하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 남은 placeholder·필수 문구·페이지 수를 함께 검사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 렌더 뒤 `{{ ... }}` 잔여 패턴을 자동 검사하세요.
+    - XML 텍스트뿐 아니라 실제 페이지 수와 필수 문구를 검증하세요.
+    exercise:
+      prompt: audit_template_render(text, required_phrases, page_count, max_pages)를 완성하세요.
+      starterCode: |-
+        def audit_template_render(text, required_phrases, page_count, max_pages):
+            raise NotImplementedError
+      solution: |
+        def audit_template_render(text, required_phrases, page_count, max_pages):
+            import re
+            unresolved = sorted(set(re.findall(r"{{\s*([^{}]+?)\s*}}", text)))
+            missing_phrases = sorted(phrase for phrase in required_phrases if phrase not in text)
+            failures = []
+            if unresolved:
+                failures.append("placeholders")
+            if missing_phrases:
+                failures.append("required-text")
+            if page_count < 1 or page_count > max_pages:
+                failures.append("pagination")
+            return {"passed": not failures, "failures": failures, "unresolved": unresolved, "missingPhrases": missing_phrases, "pageCount": page_count}
+      hints: *id002
+    check:
+      id: python.word.word_09.template-render-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_09.template-render-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_template_render
+        cases:
+        - id: accepts-complete-render
+          arguments:
+          - value: '계약서
+
+              고객 A
+
+              서명'
+          - value:
+            - 계약서
+            - 서명
+          - value: 2
+          - value: 3
+          expectedReturn:
+            passed: true
+            failures: []
+            unresolved: []
+            missingPhrases: []
+            pageCount: 2
+        - id: reports-placeholder-and-text
+          arguments:
+          - value: 고객 {{ name }}
+          - value:
+            - 서명
+          - value: 1
+          - value: 2
+          expectedReturn:
+            passed: false
+            failures:
+            - placeholders
+            - required-text
+            unresolved:
+            - name
+            missingPhrases:
+            - 서명
+            pageCount: 1
+        - id: reports-pagination
+          arguments:
+          - value: 완료
+          - value: []
+          - value: 5
+          - value: 3
+          expectedReturn:
+            passed: false
+            failures:
+            - pagination
+            unresolved: []
+            missingPhrases: []
+            pageCount: 5
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: word_09-template-release-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - word_09-template-render-audit-transfer
+    title: Word 템플릿 릴리스 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: schema·context·render 검증을 기억에서 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Web에서는 문서 구조와 업무 불변식을 즉시 검증하세요.
+    - Local에서는 저장한 docx를 재개방하고 렌더 결과까지 증거로 남기세요.
+    exercise:
+      prompt: choose_template_evidence(stage)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_template_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_template_evidence(stage):
+            choices = {'schema': {'action': 'extract template field set', 'evidence': 'placeholder schema', 'risk': 'unknown inputs'}, 'context': {'action': 'allow only required safe keys', 'evidence': 'context audit', 'risk': 'secret leakage'}, 'render': {'action': 'scan text and pages after render', 'evidence': 'placeholder and pagination report', 'risk': 'unfinished document'}}
+            if stage not in choices:
+                raise ValueError('unknown stage')
+            return choices[stage]
+      hints: *id003
+    check:
+      id: python.word.word_09.template-release-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_09.template-release-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_template_evidence
+        cases:
+        - id: recalls-schema
+          arguments:
+          - value: schema
+          expectedReturn:
+            action: extract template field set
+            evidence: placeholder schema
+            risk: unknown inputs
+        - id: recalls-context
+          arguments:
+          - value: context
+          expectedReturn:
+            action: allow only required safe keys
+            evidence: context audit
+            risk: secret leakage
+        - id: recalls-final-stage
+          arguments:
+          - value: render
+          expectedReturn:
+            action: scan text and pages after render
+            evidence: placeholder and pagination report
+            risk: unfinished document
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

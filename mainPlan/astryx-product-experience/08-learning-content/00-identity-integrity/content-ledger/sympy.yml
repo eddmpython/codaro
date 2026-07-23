@@ -1,0 +1,213 @@
+schemaVersion: 1
+category: "sympy"
+canonicalRows: 11
+lessons:
+  - lessonRef: "sympy/00_sympy소개"
+    identityLedgerRef: "identity-ledger/sympy.yml"
+    lessonContentHash: "f58b0834b48e8a150f020950717bd5f9a75a7fca6495fe24b4844aefb24fb6c1"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing"]
+    outcomes: ["sympy.symbolic"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:sympy/00_sympy소개:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:sympy_00_sympy__:v1","retrieve:sympy_00_sympy__:v2","retrieve:sympy_00_sympy__:v3"]
+    transferVariantIds: ["transfer:sympy_00_sympy__:near-v1","transfer:sympy_00_sympy__:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "sympy/01_기초수식계산"
+    identityLedgerRef: "identity-ledger/sympy.yml"
+    lessonContentHash: "caaa443831f05cde7753b2d09b9788263cd6b78da2022da2e8cb928816404b43"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing"]
+    outcomes: ["sympy.symbolic"]
+    prerequisites: ["sympy.symbolic"]
+    reinforcesOutcomeIds: ["sympy.symbolic"]
+    runtimeTier: browser
+    checkSpecId: "lesson:sympy/01_기초수식계산:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:sympy_01_______:v1","retrieve:sympy_01_______:v2","retrieve:sympy_01_______:v3"]
+    transferVariantIds: ["transfer:sympy_01_______:near-v1","transfer:sympy_01_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "sympy/02_대입과계산"
+    identityLedgerRef: "identity-ledger/sympy.yml"
+    lessonContentHash: "90b3080e4a08011a1d2e4d2fff0434a54c00df3e42d5af3f77bd1b16a868a951"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing"]
+    outcomes: ["sympy.symbolic"]
+    prerequisites: ["sympy.symbolic"]
+    reinforcesOutcomeIds: ["sympy.symbolic"]
+    runtimeTier: browser
+    checkSpecId: "lesson:sympy/02_대입과계산:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:sympy_02______:v1","retrieve:sympy_02______:v2","retrieve:sympy_02______:v3"]
+    transferVariantIds: ["transfer:sympy_02______:near-v1","transfer:sympy_02______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "sympy/03_방정식풀이"
+    identityLedgerRef: "identity-ledger/sympy.yml"
+    lessonContentHash: "9fefa2f7914e2866ba9a93a7183fdbd661e98527a7efb705af16d0e6b45c1eff"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing"]
+    outcomes: ["sympy.equations"]
+    prerequisites: ["sympy.symbolic"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:sympy/03_방정식풀이:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:sympy_03______:v1","retrieve:sympy_03______:v2","retrieve:sympy_03______:v3"]
+    transferVariantIds: ["transfer:sympy_03______:near-v1","transfer:sympy_03______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "sympy/04_미분기초"
+    identityLedgerRef: "identity-ledger/sympy.yml"
+    lessonContentHash: "dc326b2401a8b5b9b5d33bfc7690e99981ce3b4a0877eb9882422259af6240ba"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing"]
+    outcomes: ["sympy.calculus"]
+    prerequisites: ["sympy.symbolic"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:sympy/04_미분기초:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:sympy_04_____:v1","retrieve:sympy_04_____:v2","retrieve:sympy_04_____:v3"]
+    transferVariantIds: ["transfer:sympy_04_____:near-v1","transfer:sympy_04_____:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "sympy/05_적분기초"
+    identityLedgerRef: "identity-ledger/sympy.yml"
+    lessonContentHash: "407110a7d99daaa77b167780cf22d7b5f83efa7924b1551833d18c3fe76f873f"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing"]
+    outcomes: ["sympy.calculus"]
+    prerequisites: ["sympy.calculus"]
+    reinforcesOutcomeIds: ["sympy.calculus"]
+    runtimeTier: browser
+    checkSpecId: "lesson:sympy/05_적분기초:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:sympy_05_____:v1","retrieve:sympy_05_____:v2","retrieve:sympy_05_____:v3"]
+    transferVariantIds: ["transfer:sympy_05_____:near-v1","transfer:sympy_05_____:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "sympy/06_극한과급수"
+    identityLedgerRef: "identity-ledger/sympy.yml"
+    lessonContentHash: "a597233c17381eac07fe4e6a2ea6a72540811e542fa509f029f5f358703af0c7"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing"]
+    outcomes: ["sympy.calculus"]
+    prerequisites: ["sympy.calculus"]
+    reinforcesOutcomeIds: ["sympy.calculus"]
+    runtimeTier: browser
+    checkSpecId: "lesson:sympy/06_극한과급수:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:sympy_06______:v1","retrieve:sympy_06______:v2","retrieve:sympy_06______:v3"]
+    transferVariantIds: ["transfer:sympy_06______:near-v1","transfer:sympy_06______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "sympy/07_삼각함수활용"
+    identityLedgerRef: "identity-ledger/sympy.yml"
+    lessonContentHash: "cc9519772a60da538824517de20db20328a47505aad1d952a4095f3a2b7f4487"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing"]
+    outcomes: ["sympy.symbolic"]
+    prerequisites: ["sympy.calculus"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:sympy/07_삼각함수활용:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:sympy_07_______:v1","retrieve:sympy_07_______:v2","retrieve:sympy_07_______:v3"]
+    transferVariantIds: ["transfer:sympy_07_______:near-v1","transfer:sympy_07_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "sympy/08_행렬연산"
+    identityLedgerRef: "identity-ledger/sympy.yml"
+    lessonContentHash: "82dceb19cf04b3dbe923888efe956660863a0cc079cf91909caef9dc2142e4cb"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing"]
+    outcomes: ["sympy.matrices"]
+    prerequisites: ["sympy.symbolic"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:sympy/08_행렬연산:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:sympy_08_____:v1","retrieve:sympy_08_____:v2","retrieve:sympy_08_____:v3"]
+    transferVariantIds: ["transfer:sympy_08_____:near-v1","transfer:sympy_08_____:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "sympy/09_수식시각화"
+    identityLedgerRef: "identity-ledger/sympy.yml"
+    lessonContentHash: "084238f8cfe5f38299e747877ee14a5ec311c2104876893e95470219163581c1"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing"]
+    outcomes: ["sympy.symbolic"]
+    prerequisites: ["sympy.calculus","matplotlib.basics"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:sympy/09_수식시각화:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:sympy_09______:v1","retrieve:sympy_09______:v2","retrieve:sympy_09______:v3"]
+    transferVariantIds: ["transfer:sympy_09______:near-v1","transfer:sympy_09______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "sympy/10_종합수학문제"
+    identityLedgerRef: "identity-ledger/sympy.yml"
+    lessonContentHash: "b82a8b92f132f82e9e74c410c832627d4e56b692d09b8970aab6a3546cdaf46c"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/17-scientific-computing"
+    eligiblePathIds: ["scientificComputing"]
+    outcomes: ["sympy.equations","sympy.calculus","sympy.matrices"]
+    prerequisites: ["sympy.equations","sympy.calculus","sympy.matrices"]
+    reinforcesOutcomeIds: ["sympy.equations","sympy.calculus","sympy.matrices"]
+    runtimeTier: browser
+    checkSpecId: "lesson:sympy/10_종합수학문제:required:v1"
+    checkKinds: ["output","variable","behavior"]
+    retrievalVariantIds: ["retrieve:sympy_10_______:v1","retrieve:sympy_10_______:v2","retrieve:sympy_10_______:v3"]
+    transferVariantIds: ["transfer:sympy_10_______:near-v1","transfer:sympy_10_______:far-v1"]
+    artifactDecision: runtime-value
+    visualDecision: not-required-code-output-sufficient
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

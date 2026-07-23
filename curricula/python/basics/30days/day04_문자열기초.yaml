@@ -3,6 +3,9 @@ meta:
   title: 문자열 기초
   day: 4
   category: 30days
+  outcomes: ["python.strings"]
+  prerequisites: ["python.variables"]
+  estimatedMinutes: 35
   tags:
   - 문자열
   - f-string
@@ -72,9 +75,6 @@ sections:
     hints:
     - 바꿀 지점은 `first = ...` 오른쪽 값입니다.
     - 실행 뒤 `first` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 문자열 연결에서 `first` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -100,9 +100,6 @@ sections:
     hints:
     - 바꿀 지점은 `word = ...` 오른쪽 값입니다.
     - 실행 뒤 `word` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 문자열 반복에서 `word` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -127,9 +124,6 @@ sections:
     hints:
     - 바꿀 지점은 `text = ...` 오른쪽 값입니다.
     - 실행 뒤 `text` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 문자열 길이에서 `text` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -157,9 +151,6 @@ sections:
     hints:
     - 바꿀 지점은 `name = ...` 오른쪽 값입니다.
     - 실행 뒤 `name` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: fstring 포맷팅에서 `name` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -185,9 +176,6 @@ sections:
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
     - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 줄바꿈 문자의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
@@ -212,9 +200,6 @@ sections:
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
     - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 탭 문자의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
@@ -240,9 +225,6 @@ sections:
     hints:
     - 바꿀 지점은 `quote = ...` 오른쪽 값입니다.
     - 실행 뒤 `quote` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 따옴표 문자에서 `quote` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -267,9 +249,6 @@ sections:
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
     - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 백슬래시 문자의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
@@ -298,9 +277,6 @@ sections:
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
     - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 여러 줄 문자열의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
@@ -325,9 +301,6 @@ sections:
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
     - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 원시 문자열의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
@@ -353,9 +326,6 @@ sections:
     hints:
     - 바꿀 지점은 `phrase = ...` 오른쪽 값입니다.
     - 실행 뒤 `phrase` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 문자열 포함 확인에서 `phrase` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -380,9 +350,6 @@ sections:
     hints:
     - 바꿀 지점은 `sentence = ...` 오른쪽 값입니다.
     - 실행 뒤 `sentence` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 문자열 미포함 확인에서 `sentence` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -433,9 +400,6 @@ sections:
     hints:
     - 바꿀 지점은 `level`, `orderId`, `amount`, f-string 포맷 조각입니다.
     - 실행 뒤 `receipt` 문자열의 접두사, 주문번호, 금액 표기가 바꾼 입력을 반영하는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: '검증 루프: 영수증 문자열을 안전하게 만들기에서 `level` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
@@ -462,10 +426,193 @@ sections:
     hints:
     - 바꿀 지점은 `first = ...` 오른쪽 값입니다.
     - 실행 뒤 `first` 값, 출력, 또는 type() 확인이 입력한 값과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: Day 4 종합 복습에서 `first` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: Day 4 종합 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: day04-introduce-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - string_concat
+    - practice
+    title: 두 문자열로 소개 문장 만들기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 문자열 보간으로 입력값을 정확한 문장에 배치한다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: introduce(name, language)가 '이름 learns 언어' 문장을 반환하도록 완성하세요.
+      starterCode: |-
+        def introduce(name, language):
+            raise NotImplementedError
+      solution: |-
+        def introduce(name, language):
+            return f"{name} learns {language}"
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day04.introduce.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day04.introduce.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: introduce
+        cases:
+        - id: python
+          arguments:
+          - value: Mina
+          - value: Python
+          expectedReturn: Mina learns Python
+        - id: rust
+          arguments:
+          - value: Jun
+          - value: Rust
+          expectedReturn: Jun learns Rust
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day04-initials-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day04-introduce-mastery
+    title: 여러 단어에서 이니셜 만들기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 문자열 분리와 결합을 이름 축약 문제에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: initials(full_name)가 각 단어 첫 글자를 대문자로 이어 반환하도록 완성하세요.
+      starterCode: |-
+        def initials(full_name):
+            raise NotImplementedError
+      solution: |-
+        def initials(full_name):
+            return ''.join(part[0].upper() for part in full_name.split())
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day04.initials.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day04.initials.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: initials
+        cases:
+        - id: two-words
+          arguments:
+          - value: ada lovelace
+          expectedReturn: AL
+        - id: three-words
+          arguments:
+          - value: kim min su
+          expectedReturn: KMS
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day04-quote-text-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day04-initials-transfer
+    title: 따옴표가 포함된 문자열 다시 만들기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 문자열 경계와 따옴표 표현을 기억에서 복원한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: quote_text(text)가 입력 양쪽에 큰따옴표를 붙여 반환하도록 완성하세요.
+      starterCode: |-
+        def quote_text(text):
+            raise NotImplementedError
+      solution: |-
+        def quote_text(text):
+            return f'"{text}"'
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day04.quote-text.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day04.quote-text.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: quote_text
+        cases:
+        - id: word
+          arguments:
+          - value: Codaro
+          expectedReturn: '"Codaro"'
+        - id: sentence
+          arguments:
+          - value: learn by doing
+          expectedReturn: '"learn by doing"'
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

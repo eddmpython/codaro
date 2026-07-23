@@ -827,3 +827,333 @@ sections:
           - "결제 상태 dashboard 한 페이지 추가 (송장 발행 / 입금 완료 / 미수)"
           - "openpyxl 트랙과 결합 - 청구서 발행 로그를 xlsx 대시보드로 자동 정리"
           - "llmBasics 트랙과 결합 - 청구 내역 LLM 요약 코멘트를 청구서 상단에 자동 삽입"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pdf_10-invoice-reconciliation-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_data
+    - extensions
+    title: 월간 청구서의 line item·세금·총액 reconciliation 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 수량·단가 합과 세율, 표시 총액, invoice identity를 판정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 금액 계산은 Decimal과 명시한 반올림 정책을 사용하세요.
+    - invoice/customer identity와 subtotal·tax·total을 모두 검증하세요.
+    exercise:
+      prompt: audit_invoice(invoice)를 완성하세요.
+      starterCode: |-
+        def audit_invoice(invoice):
+            raise NotImplementedError
+      solution: |
+        def audit_invoice(invoice):
+            from decimal import Decimal, ROUND_HALF_UP
+            failures = []
+            if not invoice.get("invoiceId") or not invoice.get("customerId"):
+                failures.append("identity")
+            subtotal = sum(Decimal(str(item["quantity"])) * Decimal(str(item["unitPrice"])) for item in invoice.get("items", []))
+            tax = (subtotal * Decimal(str(invoice["taxRate"]))).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            total = subtotal + tax
+            if Decimal(str(invoice.get("displayedSubtotal", 0))) != subtotal:
+                failures.append("subtotal")
+            if Decimal(str(invoice.get("displayedTax", 0))) != tax:
+                failures.append("tax")
+            if Decimal(str(invoice.get("displayedTotal", 0))) != total:
+                failures.append("total")
+            return {"passed": not failures, "failures": failures, "computedSubtotal": format(subtotal, ".2f"), "computedTax": format(tax, ".2f"), "computedTotal": format(total, ".2f")}
+      hints: *id001
+    check:
+      id: python.pdf.pdf_10.invoice-reconciliation.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_10.invoice-reconciliation.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_invoice
+        cases:
+        - id: accepts-reconciled-invoice
+          arguments:
+          - value:
+              invoiceId: I1
+              customerId: C1
+              items:
+              - quantity: 2
+                unitPrice: '10.00'
+              - quantity: 1
+                unitPrice: '5.50'
+              taxRate: '0.1'
+              displayedSubtotal: '25.50'
+              displayedTax: '2.55'
+              displayedTotal: '28.05'
+          expectedReturn:
+            passed: true
+            failures: []
+            computedSubtotal: '25.50'
+            computedTax: '2.55'
+            computedTotal: '28.05'
+        - id: reports-identity-and-amount-mismatches
+          arguments:
+          - value:
+              invoiceId: ''
+              customerId: ''
+              items:
+              - quantity: 1
+                unitPrice: 10
+              taxRate: '0.1'
+              displayedSubtotal: 9
+              displayedTax: 0
+              displayedTotal: 9
+          expectedReturn:
+            passed: false
+            failures:
+            - identity
+            - subtotal
+            - tax
+            - total
+            computedSubtotal: '10.00'
+            computedTax: '1.00'
+            computedTotal: '11.00'
+        - id: rounds-tax-half-up
+          arguments:
+          - value:
+              invoiceId: I
+              customerId: C
+              items:
+              - quantity: 1
+                unitPrice: '0.05'
+              taxRate: '0.1'
+              displayedSubtotal: '0.05'
+              displayedTax: '0.01'
+              displayedTotal: '0.06'
+          expectedReturn:
+            passed: true
+            failures: []
+            computedSubtotal: '0.05'
+            computedTax: '0.01'
+            computedTotal: '0.06'
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pdf_10-invoice-pdf-release-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_10-invoice-reconciliation-mastery
+    title: 새 청구서 PDF의 text·render·security·중복 release gate 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: invoice identity별 현재 source artifact가 한 개이고 모든 검증을 통과했는지 판정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - invoice identity마다 현재 source artifact가 정확히 하나인지 검사하세요.
+    - text·render·security 검증을 모두 통과해야 release하세요.
+    exercise:
+      prompt: decide_invoice_release(artifacts, current_source_hash)를 완성하세요.
+      starterCode: |-
+        def decide_invoice_release(artifacts, current_source_hash):
+            raise NotImplementedError
+      solution: |
+        def decide_invoice_release(artifacts, current_source_hash):
+            current = [item for item in artifacts if item["sourceHash"] == current_source_hash]
+            stale = sorted(item["id"] for item in artifacts if item["sourceHash"] != current_source_hash)
+            counts = {}
+            failures = []
+            invalid = []
+            for item in current:
+                counts[item["invoiceId"]] = counts.get(item["invoiceId"], 0) + 1
+                if not item.get("textPassed") or not item.get("renderPassed") or not item.get("securityPassed"):
+                    invalid.append(item["id"])
+            duplicates = sorted(invoice_id for invoice_id, count in counts.items() if count > 1)
+            if duplicates:
+                failures.append("duplicates")
+            if invalid:
+                failures.append("verification")
+            if not current:
+                failures.append("current-artifacts")
+            return {"releaseReady": not failures and not stale, "failures": failures, "staleArtifacts": stale, "duplicateInvoices": duplicates, "invalidArtifacts": sorted(invalid)}
+      hints: *id002
+    check:
+      id: python.pdf.pdf_10.invoice-pdf-release.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_10.invoice-pdf-release.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: decide_invoice_release
+        cases:
+        - id: accepts-one-verified-current-invoice
+          arguments:
+          - value:
+            - id: a
+              invoiceId: I1
+              sourceHash: s
+              textPassed: true
+              renderPassed: true
+              securityPassed: true
+          - value: s
+          expectedReturn:
+            releaseReady: true
+            failures: []
+            staleArtifacts: []
+            duplicateInvoices: []
+            invalidArtifacts: []
+        - id: reports-duplicate-and-invalid-invoice
+          arguments:
+          - value:
+            - id: a
+              invoiceId: I1
+              sourceHash: s
+              textPassed: true
+              renderPassed: false
+              securityPassed: true
+            - id: b
+              invoiceId: I1
+              sourceHash: s
+              textPassed: true
+              renderPassed: true
+              securityPassed: true
+          - value: s
+          expectedReturn:
+            releaseReady: false
+            failures:
+            - duplicates
+            - verification
+            staleArtifacts: []
+            duplicateInvoices:
+            - I1
+            invalidArtifacts:
+            - a
+        - id: reports-stale-and-no-current-artifact
+          arguments:
+          - value:
+            - id: old
+              invoiceId: I1
+              sourceHash: old
+              textPassed: true
+              renderPassed: true
+              securityPassed: true
+          - value: s
+          expectedReturn:
+            releaseReady: false
+            failures:
+            - current-artifacts
+            staleArtifacts:
+            - old
+            duplicateInvoices: []
+            invalidArtifacts: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pdf_10-invoice-pdf-capstone-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_10-invoice-pdf-release-transfer
+    title: 월간 청구서 PDF 종료 조건 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 금액·identity·text·render·security·중복 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - PDF 저장 성공과 페이지 내용·geometry·업무 값의 정확성을 분리해 검증하세요.
+    - Web에서는 문서 판단을 연습하고 Local에서는 재개방·render artifact evidence를 남기세요.
+    exercise:
+      prompt: choose_invoice_pdf_gate(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_invoice_pdf_gate(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_invoice_pdf_gate(situation):
+            table = {'amount': {'action': 'recompute line subtotal tax total', 'evidence': 'Decimal reconciliation', 'risk': 'wrong invoice amount'}, 'artifact': {'action': 'reopen text and render pages', 'evidence': 'required text and visible blocks', 'risk': 'blank or clipped invoice'}, 'release': {'action': 'require one secured artifact per invoice', 'evidence': 'source-bound invoice manifest', 'risk': 'duplicate or stale bill'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.pdf.pdf_10.invoice-pdf-capstone-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_10.invoice-pdf-capstone-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_invoice_pdf_gate
+        cases:
+        - id: recalls-amount
+          arguments:
+          - value: amount
+          expectedReturn:
+            action: recompute line subtotal tax total
+            evidence: Decimal reconciliation
+            risk: wrong invoice amount
+        - id: recalls-artifact
+          arguments:
+          - value: artifact
+          expectedReturn:
+            action: reopen text and render pages
+            evidence: required text and visible blocks
+            risk: blank or clipped invoice
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

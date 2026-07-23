@@ -1,0 +1,316 @@
+var e=`meta:\r
+  id: word_05\r
+  title: 이미지와 머리말\r
+  order: 5\r
+  category: word\r
+  difficulty: ⭐⭐\r
+  badge: 기초\r
+  packages:\r
+    - python-docx\r
+    - pillow\r
+  tags:\r
+    - add_picture\r
+    - sections\r
+    - header\r
+    - footer\r
+  outcomes:\r
+    - automation.word.media\r
+  prerequisites:\r
+    - automation.word.paragraphs\r
+  estimatedMinutes: 45\r
+  seo:\r
+    title: "Word 이미지와 머리말 - add_picture, sections.header/footer"\r
+    description: "회사 로고와 페이지 머리말·꼬리말을 코드로 적용. 한국 공문서 양식의 핵심."\r
+    keywords:\r
+      - python-docx add_picture\r
+      - sections header\r
+      - 머리말 페이지번호\r
+\r
+intro:\r
+  direction: "회사 로고를 본문 또는 머리말에 삽입하고, 모든 페이지에 머리말·꼬리말을 적용한다."\r
+  benefits:\r
+    - "사내 표준 양식 - 모든 보고서에 일관된 로고·머리말·페이지번호 자동 적용."\r
+    - "add_picture(path, width=Inches(N))로 비율 유지 삽입."\r
+    - "sections.header/footer 패턴으로 모든 페이지에 자동 반복."\r
+  diagram:\r
+    steps:\r
+      - label: "1. add_picture"\r
+        detail: "doc.add_picture(path, width=Inches(2))로 이미지 삽입."\r
+      - label: "2. sections.header"\r
+        detail: "doc.sections[0].header.paragraphs[0].text = '...'."\r
+      - label: "3. footer 페이지번호"\r
+        detail: "단순 텍스트 또는 XML 필드 (동적 번호는 한계)."\r
+    runtime:\r
+      - label: "이미지 자산"\r
+        detail: "강의에서는 즉석 단색 PNG 생성."\r
+      - label: "검증"\r
+        detail: "재오픈 후 inline_shapes / sections.header.text assert."\r
+\r
+sections:\r
+  - id: step1_picture\r
+    title: "1단계. add_picture로 로고 삽입"\r
+    structuredPrimary: true\r
+    subtitle: "doc.add_picture(path, width)"\r
+    goal: "단색 PNG를 본문에 삽입한다."\r
+    why: "보고서 상단 로고는 사내 표준의 표지이자 외부 발송 시 첫인상입니다. 코드 한 줄로 모든 문서에 일관된 로고가 박히면 디자인팀 의존 없이 양식 통일이 가능합니다."\r
+    explanation: |-\r
+      doc.add_picture(path, width=Inches(2))로 폭 2인치 이미지 삽입. height 미지정 시 비율 유지.\r
+    tips:\r
+      - "PNG가 가장 호환성 좋습니다. SVG는 일부 Word 버전에서 미지원."\r
+    snippet: |-\r
+      from pathlib import Path\r
+      from tempfile import TemporaryDirectory\r
+      from docx import Document\r
+      from docx.shared import Inches\r
+      from PIL import Image as PILImage\r
+\r
+      workdir = TemporaryDirectory()\r
+      base = Path(workdir.name)\r
+      imgPath = base / "logo.png"\r
+      PILImage.new("RGB", (120, 40), color=(48, 84, 150)).save(imgPath)\r
+\r
+      docxPath = base / "with_logo.docx"\r
+      doc = Document()\r
+      doc.add_picture(str(imgPath), width=Inches(2))\r
+      doc.add_paragraph("로고 아래 본문")\r
+      doc.save(docxPath)\r
+\r
+      reopened = Document(docxPath)\r
+      len(reopened.inline_shapes)\r
+    exercise:\r
+      prompt: "이미지 width를 Inches(1.5)로 줄이세요."\r
+      starterCode: |-\r
+        from pathlib import Path\r
+        from tempfile import TemporaryDirectory\r
+        from docx import Document\r
+        from docx.shared import Inches\r
+        from PIL import Image as PILImage\r
+\r
+        workdir = TemporaryDirectory()\r
+        base = Path(workdir.name)\r
+        imgPath = base / "logo.png"\r
+        PILImage.new("RGB", (120, 40), color=(48, 84, 150)).save(imgPath)\r
+        docxPath = base / "logo.docx"\r
+        doc = Document()\r
+        doc.add_picture(str(imgPath), width=Inches(___))\r
+        doc.save(docxPath)\r
+        len(Document(docxPath).inline_shapes)\r
+      hints:\r
+        - "숫자 1.5."\r
+    check:\r
+      noError: "Inches 인자는 숫자."\r
+      resultCheck: "출력 1."\r
+\r
+  - id: step2_header\r
+    title: "2단계. sections.header에 회사명"\r
+    structuredPrimary: true\r
+    subtitle: "doc.sections[0].header"\r
+    goal: "모든 페이지 상단에 '주식회사 Codaro' 머리말이 들어가게 한다."\r
+    why: "공문서·보고서의 상단 식별자는 표준입니다. 한 번 설정하면 모든 페이지에 자동 적용."\r
+    explanation: |-\r
+      doc.sections[0].header는 Header 객체. paragraphs[0].text에 내용 설정.\r
+    tips:\r
+      - "section이 여러 개면 각 section의 header를 따로 설정해야 합니다."\r
+    snippet: |-\r
+      from pathlib import Path\r
+      from tempfile import TemporaryDirectory\r
+      from docx import Document\r
+\r
+      workdir = TemporaryDirectory()\r
+      docxPath = Path(workdir.name) / "hdr.docx"\r
+\r
+      doc = Document()\r
+      header = doc.sections[0].header\r
+      header.paragraphs[0].text = "주식회사 Codaro"\r
+      doc.add_paragraph("본문")\r
+      doc.save(docxPath)\r
+\r
+      reopened = Document(docxPath)\r
+      reopened.sections[0].header.paragraphs[0].text\r
+    exercise:\r
+      prompt: "header를 'Codaro 사내 문서'로 바꾸세요."\r
+      starterCode: |-\r
+        from pathlib import Path\r
+        from tempfile import TemporaryDirectory\r
+        from docx import Document\r
+\r
+        workdir = TemporaryDirectory()\r
+        docxPath = Path(workdir.name) / "h.docx"\r
+\r
+        doc = Document()\r
+        doc.sections[0].header.paragraphs[0].text = ___\r
+        doc.save(docxPath)\r
+        Document(docxPath).sections[0].header.paragraphs[0].text\r
+      hints:\r
+        - "문자열 'Codaro 사내 문서'."\r
+    check:\r
+      noError: "header text는 문자열."\r
+      resultCheck: "출력 'Codaro 사내 문서'."\r
+\r
+  - id: validation\r
+    title: "3단계. 검증 - 로고 + 머리말 통합"\r
+    structuredPrimary: true\r
+    subtitle: "buildBrandedDoc + inline_shapes/header.text"\r
+    goal: "로고와 머리말이 모두 포함된 함수의 결과를 검증한다."\r
+    why: "사내 양식 함수가 본 트랙의 모든 보고서 베이스가 됩니다."\r
+    explanation: |-\r
+      buildBrandedDoc(path, company, logoPath, body)이 머리말 + 로고 + 본문을 한 흐름에. 결과의 inline_shapes 수와 header 텍스트 단위 assert.\r
+    snippet: |-\r
+      from pathlib import Path\r
+      from tempfile import TemporaryDirectory\r
+      from docx import Document\r
+      from docx.shared import Inches\r
+      from PIL import Image as PILImage\r
+\r
+      def buildBrandedDoc(path, company, logoPath, body):\r
+          doc = Document()\r
+          doc.sections[0].header.paragraphs[0].text = company\r
+          doc.add_picture(str(logoPath), width=Inches(2))\r
+          doc.add_paragraph(body)\r
+          doc.save(path)\r
+\r
+      vault = TemporaryDirectory()\r
+      base = Path(vault.name)\r
+      imgPath = base / "logo.png"\r
+      PILImage.new("RGB", (120, 40), color=(48, 84, 150)).save(imgPath)\r
+      docxPath = base / "branded.docx"\r
+      buildBrandedDoc(docxPath, "주식회사 Codaro", imgPath, "월간 보고서 본문")\r
+\r
+      reopened = Document(docxPath)\r
+      assert reopened.sections[0].header.paragraphs[0].text == "주식회사 Codaro"\r
+      assert len(reopened.inline_shapes) == 1\r
+      len(reopened.inline_shapes)\r
+    exercise:\r
+      prompt: "buildBrandedDoc 본체를 직접 작성하세요 - 머리말 회사명 + 로고(width Inches(2)) + 본문 단락이 모두 들어가야 합니다."\r
+      starterCode: |-\r
+        from pathlib import Path\r
+        from tempfile import TemporaryDirectory\r
+        from docx import Document\r
+        from docx.shared import Inches\r
+        from PIL import Image as PILImage\r
+\r
+        def buildBrandedDoc(path, company, logoPath, body):\r
+            doc = Document()\r
+            ___  # 1) 머리말 첫 단락 text를 company로\r
+            ___  # 2) logoPath를 width=Inches(2)로 add_picture\r
+            ___  # 3) body를 단락으로 추가\r
+            doc.save(path)\r
+\r
+        vault = TemporaryDirectory()\r
+        base = Path(vault.name)\r
+        imgPath = base / "logo.png"\r
+        PILImage.new("RGB", (120, 40), color=(48, 84, 150)).save(imgPath)\r
+        docxPath = base / "b.docx"\r
+        buildBrandedDoc(docxPath, "Codaro Lab", imgPath, "월간 보고서")\r
+\r
+        reopened = Document(docxPath)\r
+        reopened.sections[0].header.paragraphs[0].text, len(reopened.inline_shapes)\r
+      hints:\r
+        - "doc.sections[0].header.paragraphs[0].text = company"\r
+        - "doc.add_picture(str(logoPath), width=Inches(2))"\r
+        - "doc.add_paragraph(body)"\r
+    check:\r
+      noError: "세 줄을 모두 채워야 검증 통과."\r
+      resultCheck: "('Codaro Lab', 1) 출력."\r
+\r
+  - id: practice\r
+    title: "실습 - 종합 미션"\r
+    subtitle: "회사 양식 보고서 베이스"\r
+    goal: "로고 + 머리말 + 꼬리말 페이지번호가 들어간 보고서 베이스 함수를 만든다."\r
+    why: "06강 스타일 함수와 결합돼 사내 표준 양식이 완성됩니다."\r
+    explanation: |-\r
+      미션: brandedReportTemplate(path, company, logoPath) 함수. 머리말·로고·꼬리말(페이지 번호 자리)까지.\r
+    snippet: |-\r
+      from docx import Document\r
+    exercise:\r
+      prompt: "미션을 직접 작성한 뒤 expansion 정답과 비교하세요."\r
+      starterCode: |-\r
+        ___\r
+      hints:\r
+        - "꼬리말 텍스트는 단순 'Page N' 형태 (동적 번호는 본 트랙 한계)."\r
+    check:\r
+      noError: "함수 정의."\r
+      resultCheck: "header + image + footer 모두 검증."\r
+    blocks:\r
+      - type: expansion\r
+        title: "미션: 양식 베이스"\r
+        blocks:\r
+          - type: code\r
+            title: "함수 정의와 검증"\r
+            content: |-\r
+              from pathlib import Path\r
+              from tempfile import TemporaryDirectory\r
+              from docx import Document\r
+              from docx.shared import Inches\r
+              from PIL import Image as PILImage\r
+\r
+              def brandedReportTemplate(path, company, logoPath, footerText="문서 식별번호: -"):\r
+                  doc = Document()\r
+                  doc.sections[0].header.paragraphs[0].text = company\r
+                  doc.sections[0].footer.paragraphs[0].text = footerText\r
+                  doc.add_picture(str(logoPath), width=Inches(2))\r
+                  doc.add_paragraph("월간 보고서")\r
+                  doc.save(path)\r
+                  return path\r
+\r
+              missionDir = TemporaryDirectory()\r
+              base = Path(missionDir.name)\r
+              imgPath = base / "logo.png"\r
+              PILImage.new("RGB", (120, 40), color=(48, 84, 150)).save(imgPath)\r
+              docxPath = base / "tmpl.docx"\r
+              brandedReportTemplate(docxPath, "주식회사 Codaro", imgPath, "사내전용 - 외부 유출 금지")\r
+\r
+              reopened = Document(docxPath)\r
+              assert reopened.sections[0].header.paragraphs[0].text == "주식회사 Codaro"\r
+              assert "사내전용" in reopened.sections[0].footer.paragraphs[0].text\r
+              assert len(reopened.inline_shapes) == 1\r
+              reopened.sections[0].footer.paragraphs[0].text\r
+      - type: expansion\r
+        title: "미션 2: 머리말에 로고 직접 삽입 (텍스트 옆 로고)"\r
+        blocks:\r
+          - type: code\r
+            title: "함수 정의와 검증"\r
+            content: |-\r
+              from pathlib import Path\r
+              from tempfile import TemporaryDirectory\r
+              from docx import Document\r
+              from docx.shared import Inches\r
+              from PIL import Image as PILImage\r
+\r
+              def buildHeaderLogoDoc(path, company, logoPath, body):\r
+                  doc = Document()\r
+                  headerPara = doc.sections[0].header.paragraphs[0]\r
+                  logoRun = headerPara.add_run()\r
+                  logoRun.add_picture(str(logoPath), width=Inches(0.8))\r
+                  textRun = headerPara.add_run(f"  {company}")\r
+                  textRun.bold = True\r
+                  doc.add_paragraph(body)\r
+                  doc.save(path)\r
+                  return path\r
+\r
+              missionDir = TemporaryDirectory()\r
+              base = Path(missionDir.name)\r
+              imgPath = base / "logo.png"\r
+              PILImage.new("RGB", (80, 30), color=(48, 84, 150)).save(imgPath)\r
+              docxPath = base / "header_logo.docx"\r
+              buildHeaderLogoDoc(docxPath, "주식회사 Codaro", imgPath, "본문")\r
+\r
+              reopened = Document(docxPath)\r
+              header = reopened.sections[0].header\r
+              assert "주식회사 Codaro" in header.paragraphs[0].text\r
+              headerRuns = header.paragraphs[0].runs\r
+              assert len(headerRuns) >= 2\r
+              header.paragraphs[0].text\r
+\r
+  - id: extensions\r
+    title: "확장 변주"\r
+    blocks:\r
+      - type: list\r
+        style: bullet\r
+        items:\r
+          - "다른 첫 페이지 머리말 (sections[0].different_first_page_header_footer)"\r
+          - "홀수/짝수 페이지 머리말 다르게"\r
+          - "꼬리말에 자동 페이지번호 (XML field 'PAGE')"\r
+          - "로고를 머리말 안에 삽입 (header.paragraphs[0].add_run().add_picture)"\r
+          - "여러 section으로 분리해 부서별 다른 머리말"\r
+`;export{e as default};

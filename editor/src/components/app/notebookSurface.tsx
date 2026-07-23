@@ -51,7 +51,7 @@ export type NotebookSurfaceProps = {
   onPromptChange: (value: string) => void;
   onRejectPendingBlocks: () => void;
   onRenameDocument: (title: string) => void;
-  onRunBlock: (block: BlockConfig) => void;
+  onRunBlock: (block: BlockConfig, sourceOverride?: string) => void;
   onRunNotebook: () => void;
   onSelectBlock: (blockId: string) => void;
 };
@@ -65,6 +65,7 @@ export function NotebookSurface(props: NotebookSurfaceProps) {
       )}
     >
       <NotebookPanel
+        apiOnline={props.apiOnline}
         canRun={props.canRun}
         cellHelpByBlockId={props.cellHelpByBlockId}
         diagnostics={props.diagnostics}
@@ -87,7 +88,11 @@ export function NotebookSurface(props: NotebookSurfaceProps) {
         onRunNotebook={props.onRunNotebook}
         onSelectBlock={props.onSelectBlock}
       />
-      {props.assistantCollapsed ? null : <NotebookInspector {...props} />}
+      {props.assistantCollapsed ? null : (
+        <div className="hidden min-h-0 xl:block" data-notebook-assistant-shell="desktop">
+          <NotebookInspector {...props} />
+        </div>
+      )}
     </div>
   );
 }
@@ -123,8 +128,8 @@ function NotebookInspector(props: NotebookSurfaceProps) {
                 title={item.label}
                 type="button"
                 className={cn(
-                  "flex size-8 shrink-0 items-center justify-center rounded-md border border-transparent text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring",
-                  tab === item.value && "border-border bg-accent text-foreground shadow-sm",
+                  "flex size-8 shrink-0 items-center justify-center rounded-md border border-transparent text-muted-foreground transition-colors hover:bg-accent-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring",
+                  tab === item.value && "border-border bg-accent-surface text-foreground shadow-sm",
                 )}
                 onClick={() => setTab(item.value)}
               >

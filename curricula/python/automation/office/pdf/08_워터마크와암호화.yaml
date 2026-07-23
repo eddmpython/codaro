@@ -680,3 +680,317 @@ sections:
           - "암호화 PDF의 비밀번호를 자동 생성해 이메일로 함께 발송 (Email 트랙 결합)"
           - "워터마크를 좌상단·우하단 두 위치에 동시 배치"
           - "06강 한글 폰트로 한글 워터마크 ('사내전용', '복사금지') 적용"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pdf_08-pdf-security-contract-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_make_watermark
+    - extensions
+    title: PDF watermark·암호화·permission 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 보안 등급에 필요한 watermark와 user/owner password 분리, permission을 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - user와 owner password는 서로 다른 secret reference로 관리하세요.
+    - watermark는 암호화를 대체하지 않으며 permission도 allowlist로 제한하세요.
+    exercise:
+      prompt: audit_pdf_security(security, policy)를 완성하세요.
+      starterCode: |-
+        def audit_pdf_security(security, policy):
+            raise NotImplementedError
+      solution: |
+        def audit_pdf_security(security, policy):
+            failures = []
+            if policy.get("requireWatermark") and not security.get("watermarkText"):
+                failures.append("watermark")
+            if policy.get("requireEncryption") and not security.get("encrypted", False):
+                failures.append("encryption")
+            if security.get("encrypted", False) and security.get("userPasswordRef") == security.get("ownerPasswordRef"):
+                failures.append("password-separation")
+            excessive = sorted(set(security.get("permissions", [])) - set(policy.get("allowedPermissions", [])))
+            if excessive:
+                failures.append("permissions")
+            if "userPassword" in security or "ownerPassword" in security:
+                failures.append("embedded-secret")
+            return {"accepted": not failures, "failures": failures, "excessivePermissions": excessive}
+      hints: *id001
+    check:
+      id: python.pdf.pdf_08.pdf-security-contract.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_08.pdf-security-contract.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_pdf_security
+        cases:
+        - id: accepts-watermarked-encrypted-policy
+          arguments:
+          - value:
+              watermarkText: CONFIDENTIAL
+              encrypted: true
+              userPasswordRef: user-ref
+              ownerPasswordRef: owner-ref
+              permissions:
+              - print
+          - value:
+              requireWatermark: true
+              requireEncryption: true
+              allowedPermissions:
+              - print
+          expectedReturn:
+            accepted: true
+            failures: []
+            excessivePermissions: []
+        - id: reports-missing-security-and-password-separation
+          arguments:
+          - value:
+              watermarkText: ''
+              encrypted: true
+              userPasswordRef: same
+              ownerPasswordRef: same
+              permissions:
+              - copy
+          - value:
+              requireWatermark: true
+              requireEncryption: true
+              allowedPermissions: []
+          expectedReturn:
+            accepted: false
+            failures:
+            - watermark
+            - password-separation
+            - permissions
+            excessivePermissions:
+            - copy
+        - id: reports-unencrypted-embedded-secret
+          arguments:
+          - value:
+              encrypted: false
+              userPassword: secret
+              permissions: []
+          - value:
+              requireWatermark: false
+              requireEncryption: true
+              allowedPermissions: []
+          expectedReturn:
+            accepted: false
+            failures:
+            - encryption
+            - embedded-secret
+            excessivePermissions: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pdf_08-pdf-security-result-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_08-pdf-security-contract-mastery
+    title: 새 보안 PDF의 재개방·permission 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: password별 open 결과와 추출/인쇄 permission을 정책과 대조한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 실제 PDF를 user/owner/무암호 세 방식으로 재개방해 정책을 검증하세요.
+    - password 값이 log나 metadata에 남지 않았는지 residual scan을 수행하세요.
+    exercise:
+      prompt: audit_security_result(result, expected_permissions)를 완성하세요.
+      starterCode: |-
+        def audit_security_result(result, expected_permissions):
+            raise NotImplementedError
+      solution: |
+        def audit_security_result(result, expected_permissions):
+            failures = []
+            if not result.get("opensWithUserPassword", False):
+                failures.append("user-password")
+            if not result.get("opensWithOwnerPassword", False):
+                failures.append("owner-password")
+            if result.get("opensWithoutPassword", False):
+                failures.append("unencrypted-open")
+            observed = set(result.get("permissions", []))
+            missing = sorted(set(expected_permissions) - observed)
+            unexpected = sorted(observed - set(expected_permissions))
+            if missing or unexpected:
+                failures.append("permissions")
+            if result.get("secretResidualFindings", 0) != 0:
+                failures.append("secret-residual")
+            return {"passed": not failures, "failures": failures, "missingPermissions": missing, "unexpectedPermissions": unexpected}
+      hints: *id002
+    check:
+      id: python.pdf.pdf_08.pdf-security-result.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_08.pdf-security-result.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_security_result
+        cases:
+        - id: accepts-encrypted-permission-result
+          arguments:
+          - value:
+              opensWithUserPassword: true
+              opensWithOwnerPassword: true
+              opensWithoutPassword: false
+              permissions:
+              - print
+              secretResidualFindings: 0
+          - value:
+            - print
+          expectedReturn:
+            passed: true
+            failures: []
+            missingPermissions: []
+            unexpectedPermissions: []
+        - id: reports-password-and-permission-failures
+          arguments:
+          - value:
+              opensWithUserPassword: false
+              opensWithOwnerPassword: false
+              opensWithoutPassword: true
+              permissions:
+              - copy
+          - value:
+            - print
+          expectedReturn:
+            passed: false
+            failures:
+            - user-password
+            - owner-password
+            - unencrypted-open
+            - permissions
+            missingPermissions:
+            - print
+            unexpectedPermissions:
+            - copy
+        - id: reports-secret-residual
+          arguments:
+          - value:
+              opensWithUserPassword: true
+              opensWithOwnerPassword: true
+              opensWithoutPassword: false
+              permissions: []
+              secretResidualFindings: 1
+          - value: []
+          expectedReturn:
+            passed: false
+            failures:
+            - secret-residual
+            missingPermissions: []
+            unexpectedPermissions: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pdf_08-pdf-security-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_08-pdf-security-result-transfer
+    title: PDF watermark·암호화 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 분류 표시·password·permission·재개방 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - PDF 저장 성공과 페이지 내용·geometry·업무 값의 정확성을 분리해 검증하세요.
+    - Web에서는 문서 판단을 연습하고 Local에서는 재개방·render artifact evidence를 남기세요.
+    exercise:
+      prompt: choose_pdf_security_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_pdf_security_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_pdf_security_evidence(situation):
+            table = {'watermark': {'action': 'render classification mark', 'evidence': 'watermark text and page coverage', 'risk': 'visual mark only'}, 'encrypt': {'action': 'use separate secret references', 'evidence': 'encryption configuration', 'risk': 'embedded password'}, 'verify': {'action': 'reopen with password matrix', 'evidence': 'open results and permissions', 'risk': 'misconfigured security'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.pdf.pdf_08.pdf-security-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_08.pdf-security-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_pdf_security_evidence
+        cases:
+        - id: recalls-watermark
+          arguments:
+          - value: watermark
+          expectedReturn:
+            action: render classification mark
+            evidence: watermark text and page coverage
+            risk: visual mark only
+        - id: recalls-encrypt
+          arguments:
+          - value: encrypt
+          expectedReturn:
+            action: use separate secret references
+            evidence: encryption configuration
+            risk: embedded password
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

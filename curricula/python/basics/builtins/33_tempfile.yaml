@@ -3,6 +3,9 @@ meta:
   title: tempfile
   day: 33
   category: builtins
+  outcomes: ["builtins.tempFiles"]
+  prerequisites: ["builtins.fileSystem","builtins.contextManagers"]
+  estimatedMinutes: 40
   tags:
   - tempfile
   - TemporaryDirectory
@@ -295,3 +298,310 @@ sections:
     type: noError
     noError: summarizeAll과 TemporaryDirectory 조합이 NameError나 FileNotFoundError 없이 실행되어야 합니다.
     resultCheck: summary가 warnings 2, errors 1, total 5를 정확히 담아야 두 파일이 합쳐 처리된 것입니다.
+assessment:
+  masteryVariants:
+  - id: 33_tempfile-workspace-cleanup-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - temp-directory
+    - practice-pattern
+    title: TemporaryDirectory 안에서 로그를 처리하고 cleanup 증명하기
+    subtitle: isolated workspace
+    goal: TemporaryDirectory에 입력 파일과 summary 파일을 만들고 with 종료 후 임시 폴더가 삭제되었는지 반환한다.
+    why: tempfile의 숙달 기준은 파일을 만들었다가 아니라, 학습/테스트 IO가 저장소 밖 격리 공간에서 끝나고 흔적이 남지 않는 것입니다.
+    explanation: summarize_log_in_temp_workspace(log_text)를 완성해 임시 폴더 안에서 로그를 집계하고 filesDuring, summary, cleanedUpAfterBlock을
+      반환하세요.
+    tips:
+    - with 블록 안에서만 root.iterdir()를 호출하세요.
+    - with 종료 뒤에는 Path(workspace).exists()가 False여야 합니다.
+    exercise:
+      prompt: summarize_log_in_temp_workspace(log_text)를 완성해 임시 workspace에서 로그를 처리하고 cleanup 여부를 반환하세요.
+      starterCode: |-
+        def summarize_log_in_temp_workspace(log_text):
+            raise NotImplementedError
+      solution: |-
+        def summarize_log_in_temp_workspace(log_text):
+            import tempfile
+            from pathlib import Path
+
+            if not log_text.strip():
+                raise ValueError("log_text required")
+
+            with tempfile.TemporaryDirectory() as workspace:
+                root = Path(workspace)
+                log_path = root / "input.log"
+                summary_path = root / "summary.txt"
+                log_path.write_text(log_text, encoding="utf-8")
+                lines = log_path.read_text(encoding="utf-8").splitlines()
+                summary = {
+                    "warnings": sum(1 for line in lines if "WARN" in line),
+                    "errors": sum(1 for line in lines if "ERROR" in line),
+                    "total": len(lines),
+                }
+                summary_path.write_text(str(summary), encoding="utf-8")
+                files_during = sorted(path.name for path in root.iterdir())
+                root_exists_during = root.exists()
+
+            return {
+                "summary": summary,
+                "filesDuring": files_during,
+                "rootExistsDuring": root_exists_during,
+                "cleanedUpAfterBlock": not Path(workspace).exists(),
+            }
+      hints:
+      - summary는 with 안에서 계산하고 반환값에 저장해 두세요.
+      - cleanup 확인은 with 바깥에서 해야 합니다.
+    check:
+      id: python.builtins.tempfile.workspace-cleanup.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.tempfile.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_log_in_temp_workspace
+        cases:
+        - id: summarizes-and-cleans-temp-workspace
+          arguments:
+          - value: |
+              INFO start
+              WARN slow
+              ERROR boom
+              INFO done
+          expectedReturn:
+            summary:
+              warnings: 1
+              errors: 1
+              total: 4
+            filesDuring:
+            - input.log
+            - summary.txt
+            rootExistsDuring: true
+            cleanedUpAfterBlock: true
+        - id: rejects-empty-log-text
+          arguments:
+          - value: '   '
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 33_tempfile-named-file-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - named-temp-file
+    - failure-cleanup
+    title: delete=False 임시 파일을 명시적으로 정리하기
+    subtitle: named file lifecycle
+    goal: NamedTemporaryFile(delete=False)로 경로가 필요한 임시 파일을 만들고 with 종료 후 직접 unlink해 정리 여부를 반환한다.
+    why: 전이 과제에서는 자동 삭제 파일에서 외부 도구가 경로를 필요로 하는 흐름으로 옮깁니다. 이때 호출자가 cleanup 책임을 져야 합니다.
+    explanation: write_named_temp_then_cleanup(contents, suffix=".log")를 완성해 파일을 쓰고, with 이후 존재 여부를 확인한 뒤 unlink로 정리하세요.
+    tips:
+    - delete=False는 with 종료 후 파일이 남습니다.
+    - cleanup은 finally나 명시 unlink로 끝까지 보장해야 합니다.
+    exercise:
+      prompt: write_named_temp_then_cleanup(contents, suffix=".log")를 완성해 delete=False 파일의 명시 정리 결과를 반환하세요.
+      starterCode: |-
+        def write_named_temp_then_cleanup(contents, suffix=".log"):
+            raise NotImplementedError
+      solution: |-
+        def write_named_temp_then_cleanup(contents, suffix=".log"):
+            import tempfile
+            from pathlib import Path
+
+            if not suffix.startswith("."):
+                raise ValueError("suffix must start with dot")
+
+            path = None
+            try:
+                with tempfile.NamedTemporaryFile(mode="w+", delete=False, suffix=suffix, encoding="utf-8") as handle:
+                    handle.write(contents)
+                    handle.flush()
+                    handle.seek(0)
+                    read_back = handle.read().splitlines()
+                    path = Path(handle.name)
+                exists_after_block = path.exists()
+                suffix_matched = path.name.endswith(suffix)
+                return {
+                    "readBack": read_back,
+                    "existsAfterBlock": exists_after_block,
+                    "suffixMatched": suffix_matched,
+                    "cleanedUp": cleanup_temp_path(path),
+                }
+            finally:
+                if path is not None and path.exists():
+                    path.unlink()
+
+        def cleanup_temp_path(path):
+            path.unlink()
+            return not path.exists()
+      hints:
+      - read_back은 with 안에서 읽어 두세요.
+      - finally는 반환 중간에 예외가 나도 파일이 남지 않게 합니다.
+    check:
+      id: python.builtins.tempfile.named-file.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.tempfile.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: write_named_temp_then_cleanup
+        cases:
+        - id: writes-reads-and-unlinks-named-temp-file
+          arguments:
+          - value: |
+              alpha
+              beta
+          - value: .trace
+          expectedReturn:
+            readBack:
+            - alpha
+            - beta
+            existsAfterBlock: true
+            suffixMatched: true
+            cleanedUp: true
+        - id: rejects-suffix-without-dot
+          arguments:
+          - value: data
+          - value: log
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 33_tempfile-strategy-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 33_tempfile-named-file-transfer
+    title: 임시 자원 목적에 맞는 tempfile 도구 회상하기
+    subtitle: auto cleanup vs manual lifecycle
+    goal: 작업 범위와 경로 필요 여부를 받아 TemporaryDirectory, NamedTemporaryFile, mkdtemp 중 맞는 전략을 반환한다.
+    why: 시간이 지나도 남아야 할 tempfile 감각은 자동 정리가 필요한지, 이름 있는 파일이 필요한지, 수명이 with 블록을 넘는지를 구분하는 것입니다.
+    explanation: choose_tempfile_strategy(scope, needs_path) 를 완성해 with-block, named-file, long-lived-dir 상황별 도구와 cleanup
+      주체를 반환하세요.
+    tips:
+    - 한 함수 안에서 끝나는 폴더 작업은 TemporaryDirectory가 기본입니다.
+    - with 블록 밖까지 살아야 하는 디렉터리는 mkdtemp와 명시 cleanup이 필요합니다.
+    exercise:
+      prompt: choose_tempfile_strategy(scope, needs_path)를 완성해 임시 자원 전략과 cleanup 책임을 반환하세요.
+      starterCode: |-
+        def choose_tempfile_strategy(scope, needs_path):
+            raise NotImplementedError
+      solution: |-
+        def choose_tempfile_strategy(scope, needs_path):
+            if scope == "long-lived-dir":
+                return {
+                    "tool": "mkdtemp",
+                    "autoCleanup": False,
+                    "cleanupOwner": "caller",
+                    "reason": "lifecycle crosses one with block",
+                }
+            if scope == "single-file" and needs_path:
+                return {
+                    "tool": "NamedTemporaryFile",
+                    "autoCleanup": True,
+                    "cleanupOwner": "context-manager",
+                    "reason": "file path is needed during one block",
+                }
+            if scope == "with-block":
+                return {
+                    "tool": "TemporaryDirectory",
+                    "autoCleanup": True,
+                    "cleanupOwner": "context-manager",
+                    "reason": "isolated workspace ends inside one block",
+                }
+            raise ValueError("unknown tempfile strategy")
+      hints:
+      - needs_path는 파일 경로를 다른 함수나 외부 도구에 넘기는지 판단하는 신호입니다.
+      - mkdtemp는 자동 정리가 없다는 점을 반환값에 드러내세요.
+    check:
+      id: python.builtins.tempfile.strategy.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.tempfile.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_tempfile_strategy
+        cases:
+        - id: selects-manual-cleanup-for-long-lived-dir
+          arguments:
+          - value: long-lived-dir
+          - value: true
+          expectedReturn:
+            tool: mkdtemp
+            autoCleanup: false
+            cleanupOwner: caller
+            reason: lifecycle crosses one with block
+        - id: selects-context-managed-named-file
+          arguments:
+          - value: single-file
+          - value: true
+          expectedReturn:
+            tool: NamedTemporaryFile
+            autoCleanup: true
+            cleanupOwner: context-manager
+            reason: file path is needed during one block
+        - id: rejects-unknown-strategy
+          arguments:
+          - value: permanent-output
+          - value: false
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

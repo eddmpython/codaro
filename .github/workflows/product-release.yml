@@ -101,6 +101,10 @@ jobs:
               raise SystemExit("codaro/webBuild/_app/ assets missing from wheel")
           if "codaro/curricula/python/__init__.py" not in names:
               raise SystemExit("codaro/curricula/python/__init__.py missing from wheel")
+          if "codaro/generatedContracts/artifactOwnership.py" not in names:
+              raise SystemExit("generated product contract type missing from wheel")
+          if "codaro/generatedContracts/artifactOwnership.schema.json" not in names:
+              raise SystemExit("generated product contract schema missing from wheel")
           lessonCount = sum(
               1 for name in names
               if name.startswith("codaro/curricula/python/") and name.endswith(".yaml")

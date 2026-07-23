@@ -432,3 +432,308 @@ sections:
           다음 마지막 레슨에서는 @xw.func 데코레이터로 Python 함수를 Excel 수식으로 만드는 UDF를 다루고, 지금까지 배운 모든 패턴을 한 워크북으로 묶는 종합 프로젝트로 마무리합니다.
     goal: VBA와 Python을 양방향으로 잇는 패턴을 한 번 완성한 채로 마지막 레슨에 진입한다.
     why: 회사의 기존 VBA 자산을 Python으로 흡수하려면 두 도구를 함께 다루는 감각이 필요하다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: xlwings_09-macro-call-authorization-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - vba-trust-note
+    - summary
+    title: VBA 매크로 호출의 서명·allowlist·인자 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 알 수 없는 workbook·macro·가변 인자를 차단한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - macro name뿐 아니라 workbook content hash와 signature를 검사하세요.
+    - 인자 수와 schema를 호출 전에 제한하세요.
+    exercise:
+      prompt: authorize_macro_call(request, policy)를 완성하세요.
+      starterCode: |-
+        def authorize_macro_call(request, policy):
+            raise NotImplementedError
+      solution: |
+        def authorize_macro_call(request, policy):
+            failures = []
+            if request.get("workbookHash") not in policy.get("allowedWorkbookHashes", []):
+                failures.append("workbook")
+            if request.get("macro") not in policy.get("allowedMacros", []):
+                failures.append("macro")
+            if len(request.get("args", [])) > policy.get("maxArgs", 0):
+                failures.append("arguments")
+            if policy.get("requireSignature") and not request.get("signatureValid"):
+                failures.append("signature")
+            return {"authorized": not failures, "failures": failures, "macro": request.get("macro"), "argumentCount": len(request.get("args", []))}
+      hints: *id001
+    check:
+      id: python.xlwings.xlwings_09.macro-call-authorization.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.xlwings.xlwings_09.macro-call-authorization.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: authorize_macro_call
+        cases:
+        - id: accepts-signed-allowlisted-call
+          arguments:
+          - value:
+              workbookHash: h
+              macro: BuildReport
+              args:
+              - 2026-01
+              signatureValid: true
+          - value:
+              allowedWorkbookHashes:
+              - h
+              allowedMacros:
+              - BuildReport
+              maxArgs: 2
+              requireSignature: true
+          expectedReturn:
+            authorized: true
+            failures: []
+            macro: BuildReport
+            argumentCount: 1
+        - id: reports-workbook-and-macro
+          arguments:
+          - value:
+              workbookHash: x
+              macro: DeleteAll
+              args: []
+          - value:
+              allowedWorkbookHashes:
+              - h
+              allowedMacros:
+              - BuildReport
+              maxArgs: 1
+              requireSignature: false
+          expectedReturn:
+            authorized: false
+            failures:
+            - workbook
+            - macro
+            macro: DeleteAll
+            argumentCount: 0
+        - id: reports-args-and-signature
+          arguments:
+          - value:
+              workbookHash: h
+              macro: BuildReport
+              args:
+              - 1
+              - 2
+              signatureValid: false
+          - value:
+              allowedWorkbookHashes:
+              - h
+              allowedMacros:
+              - BuildReport
+              maxArgs: 1
+              requireSignature: true
+          expectedReturn:
+            authorized: false
+            failures:
+            - arguments
+            - signature
+            macro: BuildReport
+            argumentCount: 2
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: xlwings_09-macro-effect-reconciliation-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - xlwings_09-macro-call-authorization-mastery
+    title: 매크로 실행 전후의 허용된 변경 집합 대조하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 의도하지 않은 sheet·cell 변경을 찾는다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 매크로 실행 전후 workbook diff를 target 주소로 기록하세요.
+    - 허용 패턴 밖의 변경이 하나라도 있으면 릴리스하지 마세요.
+    exercise:
+      prompt: audit_macro_effects(changes, allowed_patterns)를 완성하세요.
+      starterCode: |-
+        def audit_macro_effects(changes, allowed_patterns):
+            raise NotImplementedError
+      solution: |
+        def audit_macro_effects(changes, allowed_patterns):
+            import fnmatch
+            authorized = []
+            unauthorized = []
+            for change in changes:
+                target = change["target"]
+                if any(fnmatch.fnmatchcase(target, pattern) for pattern in allowed_patterns):
+                    authorized.append(target)
+                else:
+                    unauthorized.append(target)
+            return {"passed": not unauthorized, "authorized": sorted(authorized), "unauthorized": sorted(unauthorized), "changeCount": len(changes)}
+      hints: *id002
+    check:
+      id: python.xlwings.xlwings_09.macro-effect-reconciliation.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.xlwings.xlwings_09.macro-effect-reconciliation.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_macro_effects
+        cases:
+        - id: accepts-bounded-effects
+          arguments:
+          - value:
+            - target: Summary!B2
+            - target: Summary!C2
+          - value:
+            - Summary!*2
+          expectedReturn:
+            passed: true
+            authorized:
+            - Summary!B2
+            - Summary!C2
+            unauthorized: []
+            changeCount: 2
+        - id: reports-foreign-sheet
+          arguments:
+          - value:
+            - target: Raw!A1
+          - value:
+            - Summary!*
+          expectedReturn:
+            passed: false
+            authorized: []
+            unauthorized:
+            - Raw!A1
+            changeCount: 1
+        - id: separates-mixed-effects
+          arguments:
+          - value:
+            - target: Summary!B2
+            - target: Config!A1
+          - value:
+            - Summary!*
+          expectedReturn:
+            passed: false
+            authorized:
+            - Summary!B2
+            unauthorized:
+            - Config!A1
+            changeCount: 2
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: xlwings_09-macro-safety-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - xlwings_09-macro-effect-reconciliation-transfer
+    title: VBA 호출 안전 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 승인·실행·효과 대조를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Web에서는 Excel 자동화 판단을 작은 함수로 즉시 검증하세요.
+    - Local에서는 실제 Excel 프로세스와 workbook artifact 증거를 별도로 남기세요.
+    exercise:
+      prompt: choose_macro_evidence(stage)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_macro_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_macro_evidence(stage):
+            table = {'authorize': {'action': 'verify workbook hash macro allowlist signature', 'evidence': 'call authorization', 'risk': 'untrusted code'}, 'execute': {'action': 'run with bounded args and timeout', 'evidence': 'redacted invocation log', 'risk': 'hung Excel'}, 'reconcile': {'action': 'diff workbook against allowed effects', 'evidence': 'target change report', 'risk': 'collateral edits'}}
+            if stage not in table:
+                raise ValueError('unknown stage')
+            return table[stage]
+      hints: *id003
+    check:
+      id: python.xlwings.xlwings_09.macro-safety-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.xlwings.xlwings_09.macro-safety-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_macro_evidence
+        cases:
+        - id: recalls-authorize
+          arguments:
+          - value: authorize
+          expectedReturn:
+            action: verify workbook hash macro allowlist signature
+            evidence: call authorization
+            risk: untrusted code
+        - id: recalls-execute
+          arguments:
+          - value: execute
+          expectedReturn:
+            action: run with bounded args and timeout
+            evidence: redacted invocation log
+            risk: hung Excel
+        - id: recalls-reconcile
+          arguments:
+          - value: reconcile
+          expectedReturn:
+            action: diff workbook against allowed effects
+            evidence: target change report
+            risk: collateral edits
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

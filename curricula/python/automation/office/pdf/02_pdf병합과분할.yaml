@@ -521,3 +521,309 @@ sections:
           - "월별 보고서 PDF를 1분기·2분기 단위로 자동 묶음"
           - "특정 페이지만 빼고 합치기 (목차·표지 제거 후 본문만)"
           - "한 PDF의 짝수 페이지만 또는 홀수 페이지만 추출"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: pdf_02-pdf-merge-plan-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_writer
+    - extensions
+    title: PDF 병합의 source page provenance 계획하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 각 output page가 정확히 하나의 source page를 참조하는지 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - output 순서마다 source document와 source page를 기록하세요.
+    - 병합에서 누락·중복·범위 밖 page를 모두 검사하세요.
+    exercise:
+      prompt: audit_merge_plan(sources, output_pages)를 완성하세요.
+      starterCode: |-
+        def audit_merge_plan(sources, output_pages):
+            raise NotImplementedError
+      solution: |
+        def audit_merge_plan(sources, output_pages):
+            available = {(source["id"], page) for source in sources for page in range(1, source["pageCount"] + 1)}
+            references = [(page["sourceId"], page["sourcePage"]) for page in output_pages]
+            invalid = sorted([list(reference) for reference in references if reference not in available])
+            duplicates = sorted([list(reference) for reference in set(references) if references.count(reference) > 1])
+            missing = sorted([list(reference) for reference in available - set(references)])
+            return {"accepted": not invalid and not duplicates and not missing, "invalid": invalid, "duplicates": duplicates, "missing": missing, "outputPageCount": len(output_pages)}
+      hints: *id001
+    check:
+      id: python.pdf.pdf_02.pdf-merge-plan.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_02.pdf-merge-plan.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_merge_plan
+        cases:
+        - id: accepts-complete-two-source-merge
+          arguments:
+          - value:
+            - id: a
+              pageCount: 2
+            - id: b
+              pageCount: 1
+          - value:
+            - sourceId: a
+              sourcePage: 1
+            - sourceId: a
+              sourcePage: 2
+            - sourceId: b
+              sourcePage: 1
+          expectedReturn:
+            accepted: true
+            invalid: []
+            duplicates: []
+            missing: []
+            outputPageCount: 3
+        - id: reports-duplicate-and-missing-page
+          arguments:
+          - value:
+            - id: a
+              pageCount: 2
+          - value:
+            - sourceId: a
+              sourcePage: 1
+            - sourceId: a
+              sourcePage: 1
+          expectedReturn:
+            accepted: false
+            invalid: []
+            duplicates:
+            - - a
+              - 1
+            missing:
+            - - a
+              - 2
+            outputPageCount: 2
+        - id: reports-invalid-reference
+          arguments:
+          - value:
+            - id: a
+              pageCount: 1
+          - value:
+            - sourceId: a
+              sourcePage: 2
+          expectedReturn:
+            accepted: false
+            invalid:
+            - - a
+              - 2
+            duplicates: []
+            missing:
+            - - a
+              - 1
+            outputPageCount: 1
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: pdf_02-pdf-split-plan-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_02-pdf-merge-plan-mastery
+    title: 새 PDF 분할에 page coverage·파일명 충돌 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 모든 source page가 정확히 한 output part에 속하는지 판정한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 분할 plan에서 source page 전체 coverage를 집합으로 검사하세요.
+    - output filename 충돌도 실제 write 전에 차단하세요.
+    exercise:
+      prompt: audit_split_plan(page_count, parts)를 완성하세요.
+      starterCode: |-
+        def audit_split_plan(page_count, parts):
+            raise NotImplementedError
+      solution: |
+        def audit_split_plan(page_count, parts):
+            assignments = []
+            names = []
+            for part in parts:
+                names.append(part["fileName"])
+                assignments.extend((page, part["fileName"]) for page in part["pages"])
+            page_numbers = [page for page, _ in assignments]
+            missing = sorted(set(range(1, page_count + 1)) - set(page_numbers))
+            duplicates = sorted({page for page in page_numbers if page_numbers.count(page) > 1})
+            invalid = sorted({page for page in page_numbers if page < 1 or page > page_count})
+            duplicate_names = sorted({name for name in names if names.count(name) > 1})
+            return {"accepted": not missing and not duplicates and not invalid and not duplicate_names, "missing": missing, "duplicates": duplicates, "invalid": invalid, "duplicateNames": duplicate_names}
+      hints: *id002
+    check:
+      id: python.pdf.pdf_02.pdf-split-plan.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_02.pdf-split-plan.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_split_plan
+        cases:
+        - id: accepts-full-split-coverage
+          arguments:
+          - value: 3
+          - value:
+            - fileName: part1.pdf
+              pages:
+              - 1
+              - 2
+            - fileName: part2.pdf
+              pages:
+              - 3
+          expectedReturn:
+            accepted: true
+            missing: []
+            duplicates: []
+            invalid: []
+            duplicateNames: []
+        - id: reports-missing-and-duplicate-page
+          arguments:
+          - value: 3
+          - value:
+            - fileName: a.pdf
+              pages:
+              - 1
+              - 1
+          expectedReturn:
+            accepted: false
+            missing:
+            - 2
+            - 3
+            duplicates:
+            - 1
+            invalid: []
+            duplicateNames: []
+        - id: reports-invalid-page-and-name-collision
+          arguments:
+          - value: 1
+          - value:
+            - fileName: a.pdf
+              pages:
+              - 1
+            - fileName: a.pdf
+              pages:
+              - 2
+          expectedReturn:
+            accepted: false
+            missing: []
+            duplicates: []
+            invalid:
+            - 2
+            duplicateNames:
+            - a.pdf
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: pdf_02-pdf-merge-split-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - pdf_02-pdf-split-plan-transfer
+    title: PDF 병합·분할 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: source provenance·coverage·output collision 근거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - PDF 저장 성공과 페이지 내용·geometry·업무 값의 정확성을 분리해 검증하세요.
+    - Web에서는 문서 판단을 연습하고 Local에서는 재개방·render artifact evidence를 남기세요.
+    exercise:
+      prompt: choose_pdf_page_operation(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_pdf_page_operation(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_pdf_page_operation(situation):
+            table = {'merge': {'action': 'map each output page to source page', 'evidence': 'page provenance manifest', 'risk': 'missing or duplicate page'}, 'split': {'action': 'partition full source page set', 'evidence': 'part page lists', 'risk': 'coverage gap'}, 'write': {'action': 'check output filename collisions', 'evidence': 'destination plan', 'risk': 'overwrite'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.pdf.pdf_02.pdf-merge-split-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.pdf.pdf_02.pdf-merge-split-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_pdf_page_operation
+        cases:
+        - id: recalls-merge
+          arguments:
+          - value: merge
+          expectedReturn:
+            action: map each output page to source page
+            evidence: page provenance manifest
+            risk: missing or duplicate page
+        - id: recalls-split
+          arguments:
+          - value: split
+          expectedReturn:
+            action: partition full source page set
+            evidence: part page lists
+            risk: coverage gap
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

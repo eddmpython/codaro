@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from functools import lru_cache
+from pathlib import Path
 import re
 from typing import Any
 import uuid
@@ -10,15 +12,14 @@ from ..document.models import (
     CodaroDocument,
     DocumentMetadata,
     GuideConfig,
-    PredictConfig,
     RuntimeConfig,
 )
 from .sectionContract import (
-    LearningPredictContract,
     LearningSectionContract,
     lessonContractFromYaml,
     sectionHasStructuredFields,
 )
+from .taxonomy import CurriculumTaxonomy, loadTaxonomy
 
 
 TITLE_TYPES = {"mainHeader", "sectionHeader", "sectionTitle"}
@@ -31,13 +32,30 @@ CALLOUT_TYPES = {"tip", "tipCard", "note", "info", "warning", "codeDescription",
 CONCEPT_ROW_TYPES = {"conceptRow"}
 
 
-def yamlToDocument(content: dict, category: str, contentId: str) -> tuple[CodaroDocument, dict[str, str]]:
+def yamlToDocument(
+    content: dict,
+    category: str,
+    contentId: str,
+    *,
+    taxonomyPath: str | Path | None = None,
+) -> tuple[CodaroDocument, dict[str, str]]:
     meta = _mapValue(content.get("meta"))
     intro = _mapValue(content.get("intro"))
-    sections = _arrayOfMaps(content.get("sections"))
+    assessment = _mapValue(content.get("assessment"))
+    masterySections = [
+        {**variant, "assessmentMode": "mastery"}
+        for variant in _arrayOfMaps(assessment.get("masteryVariants"))
+    ]
+    sections = [*_arrayOfMaps(content.get("sections")), *masterySections]
+    materializedContent = {**content, "sections": sections}
 
     title = _textValue(meta.get("title")) or contentId
-    lessonContract = lessonContractFromYaml(content, fallbackTitle=title)
+    taxonomy = _cachedTaxonomy(str(Path(taxonomyPath).resolve()) if taxonomyPath else None)
+    lessonContract = lessonContractFromYaml(
+        materializedContent,
+        fallbackTitle=title,
+        taxonomyRecord=taxonomy.lessonRecord(category, contentId),
+    )
     contractPayload = lessonContract.model_dump(mode="json")
     title = lessonContract.meta.title or title
     displayIntro = intro or {
@@ -51,7 +69,7 @@ def yamlToDocument(content: dict, category: str, contentId: str) -> tuple[Codaro
             role="title",
             sourceType="intro",
             title=title,
-            payload={"title": title, **displayIntro, "learningContract": contractPayload},
+            payload={"title": title, **displayIntro, "learningContract": contractPayload, "assessment": assessment},
         )
     ]
     solutions: dict[str, str] = {}
@@ -100,6 +118,11 @@ def yamlToDocument(content: dict, category: str, contentId: str) -> tuple[Codaro
         ),
         solutions,
     )
+
+
+@lru_cache(maxsize=8)
+def _cachedTaxonomy(path: str | None) -> CurriculumTaxonomy:
+    return loadTaxonomy(path)
 
 
 def _convertStructuredSection(section: LearningSectionContract, solutions: dict[str, str]) -> list[BlockConfig]:
@@ -153,7 +176,6 @@ def _convertStructuredSection(section: LearningSectionContract, solutions: dict[
                 difficulty=exercise.difficulty or "easy",
                 solution=solutionCode,
                 description=exercise.prompt or section.goal or "직접 코드를 입력하고 실행하세요.",
-                predict=_predictConfig(exercise.predict),
             ),
         )
         result.append(exerciseCell)
@@ -162,7 +184,7 @@ def _convertStructuredSection(section: LearningSectionContract, solutions: dict[
 
     # 검증 기준을 학습자용 카드로 덤프하지 않는다 — check 설정(noError/resultCheck)은 내부 채점
     # 메타이지 학습 콘텐츠가 아니다. 채점은 exercise 셀의 checkConfig가 담당하고(위), 학습자는
-    # "검증" 버튼 결과(CheckResultPanel)로 피드백을 받는다. 성공 조건이 필요하면 작성자가
+    # 실행 직후 학습 surface의 자동 평가 결과로 피드백을 받는다. 성공 조건이 필요하면 작성자가
     # exercise.prompt/goal에 학습자 언어로 적는다(자동 생성 jargon 금지).
     return result
 
@@ -1112,39 +1134,6 @@ def _difficultyFromTitle(title: str) -> str:
 def _checkConfig(block: dict[str, Any]) -> dict[str, str]:
     check = _mapValue(block.get("check") or block.get("checkConfig"))
     return {str(key): _textValue(value) for key, value in check.items()}
-
-
-def _isPlaceholderPredict(value: str) -> bool:
-    """예측 값이 작성 안내 placeholder인지 — "(…적어주세요)" 류. 실제 기대값엔 이런 말이 없다."""
-    return "주세요" in value or "적어" in value
-
-
-def _cleanPredictField(value: str) -> str:
-    return "" if _isPlaceholderPredict(value) else value
-
-
-def _predictConfig(predict: LearningPredictContract | None) -> PredictConfig | None:
-    """exercise.predict 를 프론트용으로 정규화한다.
-
-    작성 안내 placeholder("(셀 마지막 출력값을 적어주세요)" 등)는 실제 기대값이 아니라 작성 미완
-    표시이므로 빈 값으로 떨군다 — 그래야 카드가 그 차원을 숨기고(grain 정합), placeholder를 hint로
-    echo하지 않는다. 정규화 후 실제 예측 대상이 하나도 없으면 None(카드를 아예 안 띄움).
-    """
-    if predict is None or predict.isEmpty():
-        return None
-    shape = _cleanPredictField(predict.expectedShape)
-    dtype = _cleanPredictField(predict.expectedDtype)
-    value = _cleanPredictField(predict.expectedValue)
-    error = _cleanPredictField(predict.expectedError)
-    if not any([predict.prompt, shape, dtype, value, error]):
-        return None
-    return PredictConfig(
-        prompt=predict.prompt,
-        expectedShape=shape,
-        expectedDtype=dtype,
-        expectedValue=value,
-        expectedError=error,
-    )
 
 
 def _structuredCheckConfig(

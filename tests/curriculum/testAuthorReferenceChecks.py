@@ -8,7 +8,6 @@ from authorReferenceChecks import (
     PROPOSAL_CONFIDENCE,
     pickPrimaryVariable,
     proposeCheck,
-    proposePredict,
     proposeSection,
 )
 
@@ -61,24 +60,6 @@ def testProposeCheckSideEffectFallsBackNoError() -> None:
     proposal = proposeCheck(_capture(), "noError")
     assert proposal.checkType == "noError"
     assert not proposal.requiresAlternative
-
-
-def testProposePredictFillsShapeDtypeValue() -> None:
-    capture = _capture(variables=[_var("arr", repr="[[0 0]]", shape="(3, 5)", dtype="int64")])
-    primary = pickPrimaryVariable(list(capture.variables))
-    draft = proposePredict(capture, primary)
-    assert draft.expectedShape == "(3, 5)"
-    assert draft.expectedDtype == "int64"
-    assert draft.expectedValue == "[[0 0]]"
-
-
-def testProposePredictStdoutValue() -> None:
-    draft = proposePredict(_capture(stdout="  42  "), None)
-    assert draft.expectedValue == "42"
-
-
-def testProposePredictErrorEmpty() -> None:
-    assert proposePredict(_capture(status="error"), None).isEmpty()
 
 
 def testProposeSectionFlagsAlreadyStrongAndAlternative() -> None:

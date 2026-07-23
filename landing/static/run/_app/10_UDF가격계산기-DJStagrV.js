@@ -1,0 +1,474 @@
+var e=`meta:
+  id: xlwings_10
+  title: UDF 운동 계산기와 헬스 일일 보고서
+  order: 10
+  category: xlwings
+  badge: 심화
+  difficulty: hard
+  audience: 트랙의 모든 패턴을 익혔고, UDF와 종합 자동화 봇으로 마무리하고 싶은 학습자
+  packages:
+    - xlwings
+    - pandas
+  tags:
+    - xlwings
+    - UDF
+    - 종합
+    - 헬스
+    - 보고서봇
+  seo:
+    title: xlwings UDF와 헬스 일일 보고서 - 종합 자동화 프로젝트
+    description: "@xw.func UDF로 BMI/체지방률/칼로리 계산을 Excel 수식으로 만들고, 트랙의 모든 패턴을 묶어 일일 운동 보고서 봇을 완성한다."
+    keywords:
+      - xlwings
+      - UDF
+      - "@xw.func"
+      - BMI
+      - 보고서봇
+intro:
+  direction: "@xw.func 데코레이터로 BMI·칼로리 계산을 Excel 수식으로 만들고, 트랙에서 배운 모든 패턴(2D 입력, DataFrame 왕복, 수식, 서식, 차트, 표, 매크로)을 묶어 일일 운동 보고서 봇을 완성한다."
+  benefits:
+    - "@xw.func로 BMI 계산기를 Excel 수식이 되도록 만들고 Python에서도 같은 함수로 호출하는 UDF 구조를 익힌다."
+    - 회원 운동 기록 → 처리 → 표 + 차트 + 합계 + 서식이 한 번에 들어가는 종합 헬스 보고서 봇을 만든다.
+    - 매일 같은 코드를 호출해 새 운동 데이터로 보고서를 재생성하는 자동화 사이클을 완성한다.
+    - 트랙의 마지막 산출물로 본인의 실무 자동화에 그대로 가져갈 수 있는 템플릿을 확보한다.
+  diagram:
+    steps:
+      - label: 1단계. UDF 정의와 구조 학습
+        detail: "@xw.func 데코레이터를 붙인 BMI/칼로리 계산 함수가 Excel UDF가 되는 구조를 코드 모양으로 익힌다."
+      - label: 2단계. 종합 헬스 보고서 봇 첫 빌드
+        detail: 운동 기록 DataFrame을 받아 raw + summary + chart 시트를 한 워크북에 만드는 builder 함수를 정의한다.
+      - label: 3단계. 매일 호출 가능한 자동화 사이클
+        detail: 같은 builder를 다른 날짜와 데이터로 두 번 호출해 일일 자동화 사이클을 검증한다.
+      - label: 4단계. 실습
+        detail: BMI UDF 모음과 회원 월간 보고서 봇 두 시나리오를 직접 만든다.
+    runtime:
+      - label: 환경 확인
+        detail: xlwings, pandas가 모두 import 가능해야 한다.
+      - label: UDF는 add-in 환경에서 동작
+        detail: 실제로 Excel 셀에서 UDF를 호출하려면 xlwings add-in 설치와 import 모듈 설정이 필요하다. 이번 레슨에서는 함수 정의와 구조 검증까지 다룬다.
+      - label: 종합 봇 산출물
+        detail: 모든 처리는 with xw.App 블록 안에서 끝내고, 결과 워크북은 TemporaryDirectory에 저장한다.
+sections:
+  - id: define-udf
+    title: 1단계. UDF 정의와 호출 구조
+    structuredPrimary: true
+    subtitle: "@xw.func 데코레이터"
+    goal: "@xw.func로 데코레이트한 BMI/칼로리 계산 함수가 Excel UDF가 되는 구조를 익히고, Python에서 직접 호출해 동작을 확인한다."
+    why: UDF는 Python 함수를 Excel 셀의 수식 형태로 노출하는 통로다. add-in 환경에서는 셀에서 호출되지만, 함수 자체는 일반 Python에서도 동일하게 호출 가능하다.
+    explanation: |-
+      "@xw.func"는 함수가 Excel UDF로 등록될 수 있다는 표시를 다는 데코레이터입니다. 함수 본문은 일반 Python과 같이 동작하므로 단위 테스트도 그대로 가능합니다.
+      실제 Excel 셀에서 =bmi(70, 1.75)처럼 호출하려면 xlwings add-in이 설치되고 모듈 경로가 설정되어야 합니다. 학습 단계에서는 Python에서 함수를 직접 호출해 로직을 검증합니다.
+      이 패턴은 회사에서 자주 쓰는 계산식(BMI, 체지방률, 운동 칼로리 등)을 한 곳에 모아 Excel 사용자와 Python 자동화가 같은 정의를 공유하게 만듭니다.
+    tips:
+      - "@xw.func 함수에 타입 힌트를 붙이면 xlwings가 자동으로 Excel ↔ Python 타입 변환을 처리합니다."
+      - UDF 안에서는 외부 상태에 의존하지 마세요. 입력만 보고 출력을 결정하는 순수 함수가 안전합니다.
+    snippet: |-
+      import xlwings as xw
+
+      @xw.func
+      def bmi(weightKg: float, heightM: float) -> float:
+          return round(weightKg / (heightM ** 2), 2)
+
+      @xw.func
+      def runCalories(weightKg: float, minutes: float, pace: float = 1.0) -> float:
+          baseRate = 0.063
+          return round(weightKg * minutes * baseRate * pace, 1)
+
+      bmiList = [bmi(70, 1.75), bmi(58, 1.62), bmi(82, 1.80)]
+      calorieList = [runCalories(70, 30), runCalories(58, 45, 1.2), runCalories(82, 60, 0.8)]
+
+      assert bmiList == [22.86, 22.10, 25.31]
+      assert calorieList == [132.3, 197.3, 248.0]
+      {"bmi": bmiList, "calories": calorieList}
+    exercise:
+      prompt: 체지방률을 추정하는 UDF bodyFatEstimate(bmi, age, sex)를 만들어 보세요. 남성은 1.20*bmi + 0.23*age - 16.2, 여성은 1.20*bmi + 0.23*age - 5.4 공식을 씁니다.
+      starterCode: |-
+        import xlwings as xw
+
+        @xw.func
+        def bmi(weightKg: float, heightM: float) -> float:
+            return round(weightKg / (heightM ** 2), 2)
+
+        @xw.func
+        def bodyFatEstimate(bmiValue: float, age: int, sex: str) -> float:
+            base = 1.20 * bmiValue + 0.23 * age
+            offset = ___ if sex == "M" else ___
+            return round(base - offset, 2)
+
+        fatList = [
+            bodyFatEstimate(22.86, 30, "M"),
+            bodyFatEstimate(22.10, 28, "F"),
+            bodyFatEstimate(25.31, 45, "M"),
+        ]
+
+        assert fatList == [18.13, 27.56, 24.52]
+        fatList
+      solution: |-
+        import xlwings as xw
+
+        @xw.func
+        def bmi(weightKg: float, heightM: float) -> float:
+            return round(weightKg / (heightM ** 2), 2)
+
+        @xw.func
+        def bodyFatEstimate(bmiValue: float, age: int, sex: str) -> float:
+            base = 1.20 * bmiValue + 0.23 * age
+            offset = 16.2 if sex == "M" else 5.4
+            return round(base - offset, 2)
+
+        fatList = [
+            bodyFatEstimate(22.86, 30, "M"),
+            bodyFatEstimate(22.10, 28, "F"),
+            bodyFatEstimate(25.31, 45, "M"),
+        ]
+
+        assert fatList == [18.13, 27.56, 24.52]
+        fatList
+      hints:
+        - 남성은 16.2를 빼고, 여성은 5.4를 뺍니다.
+        - "예시 계산: 1.20*22.86 + 0.23*30 - 16.2 = 27.432 + 6.9 - 16.2 = 18.132 ≈ 18.13."
+    check:
+      noError: "@xw.func 데코레이터와 함수 정의/호출이 NameError 없이 끝나야 합니다."
+      resultCheck: UDF 함수의 결과가 수동 계산 결과와 정확히 일치해야 합니다.
+
+  - id: report-bot-builder
+    title: 2단계. 일일 헬스 보고서 봇 builder 함수
+    structuredPrimary: true
+    subtitle: 입력 DataFrame → raw + summary + chart 워크북
+    goal: 회원 운동 기록 DataFrame과 날짜를 받아 raw 시트, summary 시트, 차트가 들어간 보고서 워크북을 만드는 builder 함수를 정의한다.
+    why: 매일 같은 자동화를 호출 가능한 함수 하나로 묶으면 스케줄러나 다른 시스템에서 그대로 부를 수 있다.
+    explanation: |-
+      builder 함수는 입력(DataFrame, 날짜, 저장 경로)을 받아 결과 파일을 만드는 단일 책임 함수입니다. 함수 안에서 with xw.App을 열고 모든 처리를 끝낸 뒤 닫습니다.
+      트랙에서 배운 패턴을 한 함수에 모읍니다: DataFrame 입력, 표(ListObject) 승격, 합계 행, 차트 자동 생성, 통화/날짜 서식, autofit, 그리고 마지막 정리.
+      이 함수가 입력만 다르면 매번 같은 모양의 보고서를 만들어 내는지가 종합 자동화의 검증 기준입니다.
+    tips:
+      - 빌더는 입력만 보고 출력을 결정해야 합니다. 외부 파일 경로를 함수 안에 하드코딩하지 마세요.
+      - 함수가 길어지면 sub 함수(차트만, 표만)로 분리해도 됩니다. 이번에는 한 함수에 모았습니다.
+    snippet: |-
+      import pandas as pd
+      import xlwings as xw
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+
+      def buildDailyFitnessReport(dailyDf: pd.DataFrame, reportDate: str, outputPath: Path) -> Path:
+          summaryDf = dailyDf.groupby("exercise", as_index=False)["calories"].sum().sort_values("calories", ascending=False)
+          with xw.App(visible=False) as bApp:
+              bBook = bApp.books.add()
+              rawSheet = bBook.sheets.active
+              rawSheet.name = "raw"
+              rawSheet["A1"].value = f"피트니스 일일 보고서 {reportDate}"
+              rawSheet["A1"].font.bold = True
+              rawSheet["A3"].options(index=False).value = dailyDf
+              rawTable = rawSheet.tables.add(source=rawSheet["A3"].expand("table"), name="rawTable")
+              rawTable.show_totals = True
+              rawTable.range.api.ListColumns(1).TotalsCalculation = 0
+              rawTable.range.api.ListColumns(2).TotalsCalculation = 6
+              rawTable.range.api.ListColumns(3).TotalsCalculation = 6
+
+              summarySheet = bBook.sheets.add("summary")
+              summarySheet["A1"].options(index=False).value = summaryDf
+
+              chart = summarySheet.charts.add(left=300, top=10, width=360, height=240)
+              chart.set_source_data(summarySheet["A1"].expand("table"))
+              chart.chart_type = "column_clustered"
+              chart.name = "summaryChart"
+
+              for s in bBook.sheets:
+                  s.autofit()
+              bBook.save(str(outputPath))
+              bBook.close()
+          return outputPath
+
+      sampleDf = pd.DataFrame({
+          "exercise": ["running", "cycling", "running", "yoga", "cycling", "running"],
+          "minutes": [30, 45, 25, 60, 50, 35],
+          "calories": [285, 480, 240, 180, 530, 330],
+      })
+      botTemp = TemporaryDirectory()
+      botPath = Path(botTemp.name) / "fitness_2026-05-28.xlsx"
+      builtPath = buildDailyFitnessReport(sampleDf, "2026-05-28", botPath)
+
+      with xw.App(visible=False) as verifyApp:
+          vBook = verifyApp.books.open(str(builtPath))
+          sheetNames = [s.name for s in vBook.sheets]
+          summaryRows = vBook.sheets["summary"]["A1"].expand("table").value
+          vBook.close()
+
+      assert sheetNames == ["raw", "summary"]
+      assert summaryRows[0] == ["exercise", "calories"]
+      assert summaryRows[1][0] == "cycling"
+      {"sheets": sheetNames, "topExercise": summaryRows[1][0]}
+    exercise:
+      prompt: builder가 dailyDf 안에 있는 exercise 종류 수(고유값 개수)도 summary 시트의 A 셀 위에 라벨로 추가하도록 확장하는 방법을 한 줄 노트로 적으세요.
+      starterCode: |-
+        # summary 시트에 "운동 종류 수: X" 라벨을 A1에 넣고 DataFrame을 A3부터 쓰도록 builder를 확장하는 메모.
+        extensionNote = "summarySheet['A1'].value = f'운동 종류 수 ___'; A3에 DataFrame"
+
+        assert "운동 종류 수" in extensionNote
+        assert "A3" in extensionNote
+        extensionNote
+      solution: |-
+        extensionNote = "summarySheet['A1'].value = f'운동 종류 수 {dailyDf[\\"exercise\\"].nunique()}'; A3에 DataFrame"
+
+        assert "운동 종류 수" in extensionNote
+        assert "A3" in extensionNote
+        extensionNote
+      hints:
+        - "DataFrame['exercise'].nunique()로 고유값 개수를 얻습니다."
+        - chart의 set_source_data도 새 위치(A3 expand)에 맞게 같이 갱신해야 차트가 올바른 영역을 봅니다.
+    check:
+      noError: builder 함수 정의와 호출이 ValueError 없이 끝나고 결과 파일이 만들어져야 합니다.
+      resultCheck: 결과 워크북의 시트 이름과 첫 헤더, 최상위 운동이 입력 데이터 기준과 일치해야 합니다.
+
+  - id: daily-cycle
+    title: 3단계. 매일 자동화 사이클 검증
+    structuredPrimary: true
+    subtitle: 같은 builder를 두 날짜로 호출
+    goal: 같은 builder 함수를 다른 날짜와 데이터로 두 번 호출해 두 보고서가 독립적으로 생성되는지 확인한다.
+    why: 자동화는 한 번 동작이 아니라 매일 동작해야 한다. 사이클 검증으로 함수가 입력 변화에 강건한지 검증한다.
+    explanation: |-
+      자동화의 마지막 신뢰는 "내일도 같은 코드가 동작하는가"입니다. 이 단계에서는 같은 builder를 두 다른 입력으로 호출하고, 두 결과 파일이 각각 의도한 모양을 가지는지 검증합니다.
+      두 날짜(5월 28일, 5월 29일)와 두 입력 DataFrame을 준비하고, 각각의 보고서 파일이 독립적으로 만들어지는지 확인합니다.
+      마지막에는 두 파일을 같이 열어 누적 운동 칼로리(두 날의 합)를 계산하는 사용 시나리오까지 보여줍니다.
+    tips:
+      - 자동화 사이클은 보통 매일 한 번 호출됩니다. 호출 시점과 무관하게 같은 결과가 나와야 합니다.
+      - 파일명에 날짜를 넣으면 과거 보고서를 그대로 보존하면서 매일 새 파일을 만들 수 있습니다.
+    snippet: |-
+      import pandas as pd
+      import xlwings as xw
+      from pathlib import Path
+      from tempfile import TemporaryDirectory
+
+      def buildDailyFitnessReport(dailyDf: pd.DataFrame, reportDate: str, outputPath: Path) -> Path:
+          summaryDf = dailyDf.groupby("exercise", as_index=False)["calories"].sum().sort_values("calories", ascending=False)
+          with xw.App(visible=False) as bApp:
+              bBook = bApp.books.add()
+              bBook.sheets.active.name = "raw"
+              bBook.sheets["raw"]["A1"].value = f"피트니스 일일 보고서 {reportDate}"
+              bBook.sheets["raw"]["A3"].options(index=False).value = dailyDf
+              bBook.sheets.add("summary")["A1"].options(index=False).value = summaryDf
+              bBook.save(str(outputPath))
+              bBook.close()
+          return outputPath
+
+      cycleTemp = TemporaryDirectory()
+      cycleRoot = Path(cycleTemp.name)
+      day1Df = pd.DataFrame({"exercise": ["running", "cycling", "running"], "minutes": [30, 45, 25], "calories": [285, 480, 240]})
+      day2Df = pd.DataFrame({"exercise": ["yoga", "swimming", "running", "yoga"], "minutes": [60, 40, 35, 30], "calories": [180, 320, 330, 90]})
+
+      day1Path = buildDailyFitnessReport(day1Df, "2026-05-28", cycleRoot / "fitness_2026-05-28.xlsx")
+      day2Path = buildDailyFitnessReport(day2Df, "2026-05-29", cycleRoot / "fitness_2026-05-29.xlsx")
+
+      grandCalories = 0
+      with xw.App(visible=False) as cycleReadApp:
+          for p in [day1Path, day2Path]:
+              cBook = cycleReadApp.books.open(str(p))
+              cSummary = cBook.sheets["summary"]["A1"].expand("table").value
+              grandCalories += sum(int(row[1]) for row in cSummary[1:])
+              cBook.close()
+
+      assert day1Path.exists() and day2Path.exists()
+      assert grandCalories == 1925
+      {"day1": day1Path.name, "day2": day2Path.name, "grand": grandCalories}
+    exercise:
+      prompt: 3일 치 데이터(2026-05-30)를 추가로 만들고, 누적 운동 칼로리를 다시 계산하세요. 3일 합산이 정확한 값과 일치하는지 확인합니다.
+      starterCode: |-
+        import pandas as pd
+        import xlwings as xw
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+
+        def buildDailyFitnessReport(dailyDf, reportDate, outputPath):
+            summaryDf = dailyDf.groupby("exercise", as_index=False)["calories"].sum().sort_values("calories", ascending=False)
+            with xw.App(visible=False) as bApp:
+                bBook = bApp.books.add()
+                bBook.sheets.active.name = "raw"
+                bBook.sheets["raw"]["A3"].options(index=False).value = dailyDf
+                bBook.sheets.add("summary")["A1"].options(index=False).value = summaryDf
+                bBook.save(str(outputPath))
+                bBook.close()
+            return outputPath
+
+        cycleTemp = TemporaryDirectory()
+        cycleRoot = Path(cycleTemp.name)
+        day1Df = pd.DataFrame({"exercise": ["running", "cycling"], "minutes": [30, 45], "calories": [285, 480]})
+        day2Df = pd.DataFrame({"exercise": ["yoga", "swimming"], "minutes": [60, 40], "calories": [180, 320]})
+        day3Df = pd.DataFrame({"exercise": ["running", "cycling", "yoga"], "minutes": [40, 50, 30], "calories": [380, ___, ___]})
+
+        day1Path = buildDailyFitnessReport(day1Df, "2026-05-28", cycleRoot / "fitness_2026-05-28.xlsx")
+        day2Path = buildDailyFitnessReport(day2Df, "2026-05-29", cycleRoot / "fitness_2026-05-29.xlsx")
+        day3Path = buildDailyFitnessReport(day3Df, "2026-05-30", cycleRoot / "fitness_2026-05-30.xlsx")
+
+        grandCalories = 0
+        with xw.App(visible=False) as readApp:
+            for p in [day1Path, day2Path, day3Path]:
+                bk = readApp.books.open(str(p))
+                rows = bk.sheets["summary"]["A1"].expand("table").value
+                grandCalories += sum(int(r[1]) for r in rows[1:])
+                bk.close()
+
+        assert grandCalories == 2225
+        grandCalories
+      solution: |-
+        import pandas as pd
+        import xlwings as xw
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+
+        def buildDailyFitnessReport(dailyDf, reportDate, outputPath):
+            summaryDf = dailyDf.groupby("exercise", as_index=False)["calories"].sum().sort_values("calories", ascending=False)
+            with xw.App(visible=False) as bApp:
+                bBook = bApp.books.add()
+                bBook.sheets.active.name = "raw"
+                bBook.sheets["raw"]["A3"].options(index=False).value = dailyDf
+                bBook.sheets.add("summary")["A1"].options(index=False).value = summaryDf
+                bBook.save(str(outputPath))
+                bBook.close()
+            return outputPath
+
+        cycleTemp = TemporaryDirectory()
+        cycleRoot = Path(cycleTemp.name)
+        day1Df = pd.DataFrame({"exercise": ["running", "cycling"], "minutes": [30, 45], "calories": [285, 480]})
+        day2Df = pd.DataFrame({"exercise": ["yoga", "swimming"], "minutes": [60, 40], "calories": [180, 320]})
+        day3Df = pd.DataFrame({"exercise": ["running", "cycling", "yoga"], "minutes": [40, 50, 30], "calories": [380, 500, 80]})
+
+        day1Path = buildDailyFitnessReport(day1Df, "2026-05-28", cycleRoot / "fitness_2026-05-28.xlsx")
+        day2Path = buildDailyFitnessReport(day2Df, "2026-05-29", cycleRoot / "fitness_2026-05-29.xlsx")
+        day3Path = buildDailyFitnessReport(day3Df, "2026-05-30", cycleRoot / "fitness_2026-05-30.xlsx")
+
+        grandCalories = 0
+        with xw.App(visible=False) as readApp:
+            for p in [day1Path, day2Path, day3Path]:
+                bk = readApp.books.open(str(p))
+                rows = bk.sheets["summary"]["A1"].expand("table").value
+                grandCalories += sum(int(r[1]) for r in rows[1:])
+                bk.close()
+
+        assert grandCalories == 2225
+        grandCalories
+      hints:
+        - "1일: 765, 2일: 500, 3일: 960, 합: 2225."
+        - 3일 데이터 calories 총합이 960이 되도록 500 + 80 = 580 ... 380 + 580 = 960.
+    check:
+      noError: 세 번의 builder 호출과 누적 합 계산이 FileNotFoundError 없이 끝나야 합니다.
+      resultCheck: 세 보고서 파일이 모두 존재하고 누적 칼로리가 입력 데이터의 총합과 일치해야 합니다.
+
+  - id: practice
+    title: 4단계. 실습
+    subtitle: UDF와 종합 봇 직접 만들기
+    blocks:
+      - type: text
+        content: |-
+          마지막 두 미션은 트랙 전체를 마무리합니다. BMI/체지방률 UDF 조합과 회원 월간 보고서 봇을 본인 시나리오로 직접 만들어 보세요.
+      - type: tip
+        content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되어 있으므로 import문은 생략해도 됩니다.
+      - type: expansion
+        title: "미션1: BMI + 체지방률 + 적정체중 UDF 모음"
+        blocks:
+          - type: code
+            title: 세 UDF를 묶어 종합 헬스 계산기
+            content: |-
+              import xlwings as xw
+
+              @xw.func
+              def bmi(weightKg: float, heightM: float) -> float:
+                  return round(weightKg / (heightM ** 2), 2)
+
+              @xw.func
+              def idealWeight(heightM: float) -> float:
+                  return round(22 * heightM ** 2, 1)
+
+              @xw.func
+              def healthSummary(weightKg: float, heightM: float, age: int) -> dict:
+                  bmiValue = bmi(weightKg, heightM)
+                  ideal = idealWeight(heightM)
+                  return {
+                      "bmi": bmiValue,
+                      "idealWeight": ideal,
+                      "delta": round(weightKg - ideal, 1),
+                      "category": "normal" if 18.5 <= bmiValue < 25 else ("under" if bmiValue < 18.5 else "over"),
+                  }
+
+              cases = [
+                  healthSummary(70, 1.75, 30),
+                  healthSummary(58, 1.62, 28),
+                  healthSummary(82, 1.80, 45),
+              ]
+
+              assert cases[0]["category"] == "normal"
+              assert cases[2]["category"] == "over"
+              cases
+      - type: expansion
+        title: "미션2: 회원 월간 운동 보고서 봇"
+        blocks:
+          - type: code
+            title: 회원별 builder 함수 정의 + 두 회원 호출
+            content: |-
+              import pandas as pd
+              import xlwings as xw
+              from pathlib import Path
+              from tempfile import TemporaryDirectory
+
+              def buildMemberReport(memberDf: pd.DataFrame, memberName: str, outputPath: Path) -> Path:
+                  totalMinutes = int(memberDf["minutes"].sum())
+                  totalCalories = int(memberDf["calories"].sum())
+                  sessions = len(memberDf)
+                  with xw.App(visible=False) as bApp:
+                      bBook = bApp.books.add()
+                      bBook.sheets.active.name = "sessions"
+                      bBook.sheets["sessions"]["A1"].value = f"{memberName} 월간 운동 보고서"
+                      bBook.sheets["sessions"]["A3"].options(index=False).value = memberDf
+                      summary = bBook.sheets.add("summary")
+                      summary["A1"].value = [["sessions", "totalMinutes", "totalCalories"], [sessions, totalMinutes, totalCalories]]
+                      summary["A2:C2"].number_format = "#,##0"
+                      summary.autofit()
+                      bBook.save(str(outputPath))
+                      bBook.close()
+                  return outputPath
+
+              mem1Df = pd.DataFrame({
+                  "date": ["2026-05-01", "2026-05-08", "2026-05-15", "2026-05-22"],
+                  "exercise": ["running", "cycling", "running", "yoga"],
+                  "minutes": [40, 60, 35, 50],
+                  "calories": [380, 600, 330, 150],
+              })
+              mem2Df = pd.DataFrame({
+                  "date": ["2026-05-02", "2026-05-09", "2026-05-16"],
+                  "exercise": ["swimming", "running", "cycling"],
+                  "minutes": [45, 30, 55],
+                  "calories": [360, 285, 540],
+              })
+
+              finalTemp = TemporaryDirectory()
+              finalRoot = Path(finalTemp.name)
+              mem1Path = buildMemberReport(mem1Df, "김지원", finalRoot / "member_kim.xlsx")
+              mem2Path = buildMemberReport(mem2Df, "이서연", finalRoot / "member_lee.xlsx")
+
+              with xw.App(visible=False) as verifyApp:
+                  combinedCalories = 0
+                  for p in [mem1Path, mem2Path]:
+                      vBook = verifyApp.books.open(str(p))
+                      sRow = vBook.sheets["summary"]["A1:C2"].value
+                      combinedCalories += int(sRow[1][2])
+                      vBook.close()
+
+              assert combinedCalories == 2645
+              {"kim": mem1Path.name, "lee": mem2Path.name, "combined": combinedCalories}
+
+  - id: summary
+    title: 정리
+    subtitle: xlwings 트랙 완주
+    blocks:
+      - type: text
+        content: |-
+          xlwings 트랙을 완주하셨습니다. 10개 프로젝트에서 배운 패턴을 정리하면:
+          App/Book/Sheet 컨텍스트, 셀과 2D Range R/W, expand 영역 인식, DataFrame 왕복, 수식과 서식, 차트 자동 생성, Excel 표(ListObject)와 동적 합계, 다중 워크북 통합, VBA 매크로 호출, 그리고 UDF와 종합 보고서 봇입니다.
+          이 모든 패턴은 본인의 실무 자동화에 한 줄씩 옮겨 쓸 수 있도록 설계되었습니다. 매일 반복하는 Excel 업무 하나를 골라 이번 트랙의 builder 패턴으로 함수 하나에 묶어 보세요.
+      - type: text
+        title: 다음으로 가는 길
+        content: |-
+          xlwings는 Excel이 설치된 PC의 자동화를 위한 도구입니다. Linux 서버나 CI에서 자동화가 필요하면 같은 카테고리의 openpyxl 트랙으로 가세요.
+          Python 자동화 전반을 더 익히려면 playwright(브라우저), fileOps(파일·폴더), procCtl(프로세스), watchSched(스케줄), inputCtl(GUI) 트랙으로 확장할 수 있습니다.
+    goal: 트랙을 완주하고 본인의 첫 자동화 봇을 함수 하나로 묶을 수 있다.
+    why: 자동화의 가치는 "매일 반복되는 한 작업을 한 함수 호출로 줄이는 것"이다. 트랙은 그 능력을 만들기 위해 설계되었다.
+`;export{e as default};

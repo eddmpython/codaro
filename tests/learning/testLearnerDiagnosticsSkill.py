@@ -1,8 +1,4 @@
-"""learner-diagnostics teacher skill 등록 확인.
-
-Predict-Run-Reconcile-Adapt 루프의 진단 도구가 teacher orchestrator가 받는
-system prompt와 registry validation 양쪽에서 노출되는지 검증한다.
-"""
+"""learner-diagnostics teacher skill registration tests."""
 from __future__ import annotations
 
 from codaro.ai.conversation import buildSystemPrompt
@@ -19,7 +15,7 @@ def testLearnerDiagnosticsSkillExists() -> None:
 
 
 def testLearnerDiagnosticsRequiredToolsRegistered() -> None:
-    """4 진단 도구 모두 registry 검증을 통과해야 한다 (등록 + manifest 메타데이터)."""
+    """진단 도구 모두 registry 검증을 통과해야 한다."""
     issues = validateTeacherSkills()
     relevant = [
         issue
@@ -32,10 +28,8 @@ def testLearnerDiagnosticsRequiredToolsRegistered() -> None:
 def testLearnerDiagnosticsSkillIsInTeacherPrompt() -> None:
     prompt = teacherSkillPrompt()
     assert "learner-diagnostics" in prompt
-    # 4개 도구 라벨이 모두 prompt 안에 있어야 한다
     for toolName in (
         "read-learner-state",
-        "record-prediction-result",
         "match-misconception",
         "suggest-next-step",
     ):

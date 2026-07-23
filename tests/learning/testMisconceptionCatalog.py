@@ -1,8 +1,4 @@
-"""Misconception Catalog 무결성/스키마 테스트.
-
-Predict-Run-Reconcile-Adapt 루프 1단계의 시드 카탈로그가 schema/cross-ref/
-trigger 규칙을 모두 만족하는지 검사한다.
-"""
+"""Misconception Catalog integrity and matching tests."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -18,10 +14,8 @@ from codaro.curriculum.misconceptionCatalog import (
     matchCodePattern,
     matchErrorPattern,
     matchOutcomes,
-    matchPredictionMismatch,
     validateCatalogs,
 )
-from codaro.curriculum.predictionDiff import FieldDiff, PredictionDiff
 from codaro.curriculum.taxonomy import loadTaxonomy
 
 
@@ -371,40 +365,6 @@ def testErrorPatternMatchesExcelZeroIndexedCell() -> None:
     hits = matchErrorPattern(catalog, "ValueError: Row or column values must be at least 1")
     ids = {hit.id for hit in hits}
     assert "automation.excel.workbook.zeroIndexedCell" in ids
-
-
-def _valueDiff(actual: str, *, status: str = "mismatch") -> PredictionDiff:
-    return PredictionDiff(
-        overall=status,
-        fields=[FieldDiff(field="value", status=status, expected="[1, 2, 3]", actual=actual)],
-    )
-
-
-def testMatchPredictionMismatchFiresOnValueMismatch() -> None:
-    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "numpy.arrayOps.yml")
-    hits = matchPredictionMismatch(catalog, _valueDiff("[99, 2, 3]"))
-    ids = {hit.id for hit in hits}
-    assert "numpy.arrayOps.viewVsCopy" in ids
-
-
-def testMatchPredictionMismatchSkipsNonMismatchedField() -> None:
-    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "numpy.arrayOps.yml")
-    hits = matchPredictionMismatch(catalog, _valueDiff("[1, 2, 3]", status="skipped"))
-    assert hits == []
-
-
-def testMatchPredictionMismatchHonorsMismatchPattern() -> None:
-    catalog = loadCatalog(DEFAULT_CATALOG_DIR / "pandas.aggregate.yml")
-    miss = matchPredictionMismatch(catalog, _valueDiff("42"))
-    assert "pandas.aggregate.groupbyResultIsLazy" not in {hit.id for hit in miss}
-    hit = matchPredictionMismatch(catalog, _valueDiff("<pandas.DataFrameGroupBy object>"))
-    assert "pandas.aggregate.groupbyResultIsLazy" in {entry.id for entry in hit}
-
-
-def testMatchOutcomesUsesPredictionDiff() -> None:
-    hits = matchOutcomes(["numpy.arrayOps"], predictionDiff=_valueDiff("[99, 2, 3]"))
-    assert ("numpy.arrayOps", ) == tuple({outcomeId for outcomeId, _ in hits})
-    assert "numpy.arrayOps.viewVsCopy" in {entry.id for _, entry in hits}
 
 
 def testCodePatternMatchesBareExcept() -> None:

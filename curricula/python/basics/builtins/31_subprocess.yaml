@@ -318,3 +318,290 @@ sections:
     type: noError
     noError: runCheck와 subprocess 호출이 NameError나 KeyError 없이 실행되어야 합니다.
     resultCheck: 결과 dict가 returncode별로 reason을 분기해 a/b는 표 매핑이 적용되고 c는 default 메시지가 들어가야 합니다.
+assessment:
+  masteryVariants:
+  - id: 31_subprocess-run-plan-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - run-basics
+    - check-and-timeout
+    title: subprocess.run 호출 계획을 안전한 옵션 dict로 만들기
+    subtitle: args, capture, check, timeout
+    goal: executable과 Python 한 줄 코드를 받아 shell=False 리스트 인자, capture_output, text, check, timeout 설정을 반환한다.
+    why: 웹 학습에서는 외부 프로세스를 직접 띄우지 않아도, 안전한 subprocess.run 호출 구조를 정확히 설계하는 능력을 검증할 수 있습니다.
+    explanation: plan_subprocess_run(executable, script, timeout=5)를 완성해 실행 전 계획을 dict로 만들고, 비어 있는 명령이나 0 이하 timeout은 ValueError로
+      막으세요.
+    tips:
+    - args는 문자열 하나가 아니라 리스트여야 합니다.
+    - 자동화 기본값은 shell=False, capture_output=True, text=True, check=True입니다.
+    exercise:
+      prompt: plan_subprocess_run(executable, script, timeout=5)를 완성해 안전한 subprocess.run 옵션 계획을 반환하세요.
+      starterCode: |-
+        def plan_subprocess_run(executable, script, timeout=5):
+            raise NotImplementedError
+      solution: |-
+        def plan_subprocess_run(executable, script, timeout=5):
+            if not executable or not script.strip():
+                raise ValueError("executable and script required")
+            if timeout <= 0:
+                raise ValueError("timeout must be positive")
+            args = [executable, "-c", script]
+            return {
+                "args": args,
+                "argCount": len(args),
+                "captureOutput": True,
+                "text": True,
+                "check": True,
+                "timeout": timeout,
+                "shell": False,
+            }
+      hints:
+      - script는 "-c" 뒤의 한 인자로 유지하세요.
+      - timeout은 외부 명령이 멈췄을 때 전체 자동화가 같이 멈추지 않게 하는 안전장치입니다.
+    check:
+      id: python.builtins.subprocess.run-plan.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.subprocess.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_subprocess_run
+        cases:
+        - id: builds-captured-checked-run-plan
+          arguments:
+          - value: python
+          - value: print('ok')
+          - value: 3
+          expectedReturn:
+            args:
+            - python
+            - -c
+            - print('ok')
+            argCount: 3
+            captureOutput: true
+            text: true
+            check: true
+            timeout: 3
+            shell: false
+        - id: rejects-zero-timeout
+          arguments:
+          - value: python
+          - value: print('ok')
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 31_subprocess-safe-user-arg-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - shell-injection
+    - run-basics
+    title: 사용자 입력을 셸 문자열이 아닌 argv 한 칸으로 보존하기
+    subtitle: no shell interpolation
+    goal: base_args와 사용자 입력을 받아 shell=False 호출 계획을 만들고, 셸 메타문자가 있어도 user_arg가 한 인자로 남는지 반환한다.
+    why: 전이 과제에서는 subprocess 지식을 보안 감각으로 옮깁니다. 사용자 입력을 문자열로 이어 붙이지 않는 것이 핵심입니다.
+    explanation: build_safe_user_command(base_args, user_arg)를 완성해 base_args 뒤에 user_arg를 한 인자로 붙이고 shell=False, userArgIndex,
+      containsShellMetachar를 반환하세요.
+    tips:
+    - 세미콜론이나 파이프 문자가 있어도 리스트 인자에서는 명령 구분자로 해석되지 않습니다.
+    - base_args가 비어 있으면 실행할 프로그램이 없으므로 ValueError로 막으세요.
+    exercise:
+      prompt: build_safe_user_command(base_args, user_arg)를 완성해 사용자 입력을 한 argv 칸으로 보존하는 안전 계획을 반환하세요.
+      starterCode: |-
+        def build_safe_user_command(base_args, user_arg):
+            raise NotImplementedError
+      solution: |-
+        def build_safe_user_command(base_args, user_arg):
+            if not isinstance(base_args, list) or not base_args:
+                raise ValueError("base_args required")
+            text = str(user_arg)
+            args = list(base_args) + [text]
+            return {
+                "args": args,
+                "shell": False,
+                "userArgIndex": len(base_args),
+                "userArgPreserved": args[len(base_args)] == text,
+                "containsShellMetachar": any(char in text for char in ";&|"),
+                "willInvokeShell": False,
+            }
+      hints:
+      - user_arg를 split하지 마세요.
+      - base_args를 직접 수정하지 말고 새 list를 만드세요.
+    check:
+      id: python.builtins.subprocess.safe-user-arg.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.subprocess.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: build_safe_user_command
+        cases:
+        - id: keeps-injection-payload-as-one-argument
+          arguments:
+          - value:
+            - python
+            - -m
+            - codaro_tool
+          - value: alpha; echo INJECTED
+          expectedReturn:
+            args:
+            - python
+            - -m
+            - codaro_tool
+            - alpha; echo INJECTED
+            shell: false
+            userArgIndex: 3
+            userArgPreserved: true
+            containsShellMetachar: true
+            willInvokeShell: false
+        - id: rejects-empty-base-args
+          arguments:
+          - value: []
+          - value: anything
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 31_subprocess-returncode-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 31_subprocess-safe-user-arg-transfer
+    title: CompletedProcess 결과 dict에서 성공과 실패 분기 회상하기
+    subtitle: returncode, stdout, stderr
+    goal: CompletedProcess 모양의 dict와 오류 표를 받아 status, reason, stdoutLines, stderr를 반환한다.
+    why: 시간이 지나도 남아야 할 subprocess 감각은 returncode 0은 성공, 0이 아니면 stderr와 매핑 표로 실패 원인을 설명해야 한다는 점입니다.
+    explanation: classify_process_result(result, error_table)를 완성해 returncode를 기준으로 ok/fail을 나누고 stdout/stderr를 사람이 읽을 수 있는
+      dict로 정리하세요.
+    tips:
+    - stderr가 비어 있어도 returncode가 0이 아니면 실패입니다.
+    - error_table에 없는 코드는 unknown failure로 처리하세요.
+    exercise:
+      prompt: classify_process_result(result, error_table)를 완성해 returncode 기반 성공/실패 요약을 반환하세요.
+      starterCode: |-
+        def classify_process_result(result, error_table):
+            raise NotImplementedError
+      solution: |-
+        def classify_process_result(result, error_table):
+            if "returncode" not in result:
+                raise ValueError("returncode required")
+            returncode = result["returncode"]
+            stdout = result.get("stdout", "")
+            stderr = result.get("stderr", "")
+            stdout_lines = stdout.splitlines()
+            if returncode == 0:
+                return {
+                    "status": "ok",
+                    "returncode": 0,
+                    "stdoutLines": stdout_lines,
+                    "stderr": stderr.strip(),
+                    "reason": "",
+                }
+            reason = error_table.get(returncode, error_table.get(str(returncode), "unknown failure"))
+            return {
+                "status": "fail",
+                "returncode": returncode,
+                "stdoutLines": stdout_lines,
+                "stderr": stderr.strip() or "(no stderr)",
+                "reason": reason,
+            }
+      hints:
+      - stdout는 여러 줄 결과일 수 있으므로 splitlines()로 보존하세요.
+      - 실패 분기에서는 stderr가 비었을 때도 fallback 문자열을 채우세요.
+    check:
+      id: python.builtins.subprocess.returncode.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.subprocess.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: classify_process_result
+        cases:
+        - id: classifies-nonzero-returncode-with-stderr
+          arguments:
+          - value:
+              args:
+              - python
+              - -m
+              - codaro_tool
+              returncode: 3
+              stdout: ''
+              stderr: |
+                missing dependency
+          - value:
+              '2': input error
+              '3': external dependency failed
+          expectedReturn:
+            status: fail
+            returncode: 3
+            stdoutLines: []
+            stderr: missing dependency
+            reason: external dependency failed
+        - id: rejects-result-without-returncode
+          arguments:
+          - value:
+              stdout: ok
+          - value: {}
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

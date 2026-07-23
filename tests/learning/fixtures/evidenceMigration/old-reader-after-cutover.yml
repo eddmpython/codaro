@@ -1,0 +1,17 @@
+schemaVersion: 1
+scenario: old-reader-after-cutover
+storeHeader:
+  schemaVersion: 1
+  dataEpoch: 1
+  minimumReaderVersion: 1
+  legacySnapshotHash: sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  cutoverMarker:
+    eventId: learning-evidence-cutover:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    occurredAt: 2026-07-22T00:00:00Z
+candidateRelease:
+  releaseId: legacy-reader-zero
+  learningEvidenceReaderVersion: 0
+expectedFailure:
+  code: learning-evidence-reader-too-old
+  messageContains: Rollback blocked
+  storeUnchanged: true

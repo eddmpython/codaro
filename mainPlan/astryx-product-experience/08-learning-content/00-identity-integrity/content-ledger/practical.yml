@@ -1,0 +1,23 @@
+schemaVersion: 1
+category: "practical"
+canonicalRows: 1
+lessons:
+  - lessonRef: "practical/00_실전파이썬소개"
+    identityLedgerRef: "identity-ledger/practical.yml"
+    lessonContentHash: "a7f24514bb97f705875b24ac8e6d83eec3ac29be47083d5710c827622c0d8508"
+    disposition: migrate
+    ownerPacket: "01-python-foundation"
+    eligiblePathIds: ["pythonFoundation"]
+    outcomes: ["python.practicalWorkflow"]
+    prerequisites: ["python.functions"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:practical/00_실전파이썬소개:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:practical_00________:v1","retrieve:practical_00________:v2","retrieve:practical_00________:v3"]
+    transferVariantIds: ["transfer:practical_00________:near-v1","transfer:practical_00________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

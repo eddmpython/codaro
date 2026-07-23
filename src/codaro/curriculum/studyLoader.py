@@ -109,6 +109,7 @@ class StudyLoader:
         self._contentIdCache: dict[str, list[str]] = {}
         self._metaCache: dict[str, dict] = {}
         self._categoryIndexCache: dict[str, list[dict] | None] = {}
+        self._legacyAliasCache: dict[str, dict[str, tuple[str, ...]]] = {}
         self._summaryCache: dict[str, list[StudySummary]] = {}
         self._prevNextCache: dict[str, dict] = {}
 
@@ -171,6 +172,7 @@ class StudyLoader:
         return list(self._summaryCache[category])
 
     def loadStudy(self, category: str, contentId: str) -> dict:
+        contentId = self.resolveContentId(category, contentId)
         cacheKey = f"{category}/{contentId}"
         if cacheKey in self._cache:
             return self._cache[cacheKey]
@@ -183,6 +185,7 @@ class StudyLoader:
         return content
 
     def getPrevNext(self, category: str, contentId: str) -> dict:
+        contentId = self.resolveContentId(category, contentId)
         cacheKey = f"{category}/{contentId}"
         if cacheKey in self._prevNextCache:
             return dict(self._prevNextCache[cacheKey])
@@ -195,6 +198,46 @@ class StudyLoader:
         nxt = {"contentId": ids[idx + 1], "title": contents[idx + 1].title} if idx < len(ids) - 1 else None
         self._prevNextCache[cacheKey] = {"prev": prev, "next": nxt}
         return dict(self._prevNextCache[cacheKey])
+
+    def resolveContentId(self, category: str, contentId: str) -> str:
+        """Resolve a category-scoped legacy meta.id to the canonical file stem."""
+        contentIds = self._listContentIds(category)
+        if contentId in contentIds:
+            return contentId
+        aliases = self._legacyAliases(category, contentIds)
+        matches = aliases.get(contentId, ())
+        if len(matches) == 1:
+            return matches[0]
+        if len(matches) > 1:
+            joined = ", ".join(matches)
+            raise ValueError(f"Ambiguous curriculum alias {category}/{contentId}: {joined}")
+        return contentId
+
+    def resolveLessonRef(self, lessonRef: str) -> str:
+        parts = lessonRef.split("/")
+        if len(parts) != 2 or not all(parts):
+            raise ValueError(f"Invalid curriculum lessonRef: {lessonRef}")
+        category, contentId = parts
+        canonicalId = self.resolveContentId(category, contentId)
+        return f"{category}/{canonicalId}"
+
+    def _legacyAliases(self, category: str, contentIds: list[str]) -> dict[str, tuple[str, ...]]:
+        cached = self._legacyAliasCache.get(category)
+        if cached is not None:
+            return cached
+        candidates: dict[str, list[str]] = {}
+        for canonicalId in contentIds:
+            try:
+                meta = _readMetaHeader(self._getStudyPath(category, canonicalId))
+            except FileNotFoundError:
+                continue
+            alias = meta.get("id")
+            if not isinstance(alias, str) or not alias or alias == canonicalId:
+                continue
+            candidates.setdefault(alias, []).append(canonicalId)
+        aliases = {alias: tuple(sorted(matches)) for alias, matches in candidates.items()}
+        self._legacyAliasCache[category] = aliases
+        return aliases
 
     def _listContentIds(self, category: str) -> list[str]:
         if category in self._contentIdCache:

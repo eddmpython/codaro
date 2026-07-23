@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codaro.dev/contracts/imageArtifactDescriptor.schema.json",
+  "title": "Codaro Image Artifact Descriptor",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "origin",
+    "path",
+    "mediaType",
+    "byteLength",
+    "contentHash",
+    "width",
+    "height"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "kind": { "const": "image" },
+    "origin": { "enum": ["created", "fixture"] },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*:).+$"
+    },
+    "mediaType": { "enum": ["image/png", "image/jpeg", "image/gif"] },
+    "byteLength": { "type": "integer", "minimum": 0 },
+    "contentHash": { "type": "string", "pattern": "^sha256-[A-Za-z0-9_-]{43}$" },
+    "width": { "type": "integer", "minimum": 1 },
+    "height": { "type": "integer", "minimum": 1 }
+  }
+}

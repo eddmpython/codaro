@@ -499,8 +499,8 @@ def _collectVariables(registry: dict[str, object]) -> list[dict[str, object]]:
 def _introspectShapeDtype(value: object) -> tuple[str, str]:
     """numpy/pandas/polars 값의 shape/dtype를 문자열로 포착(없으면 빈 문자열).
 
-    Predict-Run-Reconcile 루프의 shape/dtype 차원 입력. getattr만 쓰므로
-    임의 사용자 객체에서도 예외 없이 안전하다(shape/dtype 미보유 → "").
+    변수 탐색기의 shape/dtype 관측값. getattr만 쓰므로 임의 사용자 객체에서도
+    예외 없이 안전하다(shape/dtype 미보유 시 빈 문자열).
     """
     moduleName = type(value).__module__
     if not moduleName.startswith(("numpy", "pandas", "polars")):

@@ -313,3 +313,309 @@ sections:
           - "꼬리말에 자동 페이지번호 (XML field 'PAGE')"
           - "로고를 머리말 안에 삽입 (header.paragraphs[0].add_run().add_picture)"
           - "여러 section으로 분리해 부서별 다른 머리말"
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: word_05-document-media-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_picture
+    - extensions
+    title: 이미지·머리말·꼬리말 접근성 계약 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 누락된 대체 설명과 과도한 이미지 폭을 찾는다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 이미지의 alt는 장식 설명이 아니라 전달하는 정보를 적으세요.
+    - 이미지 폭을 page width가 아니라 margin을 뺀 usable width와 비교하세요.
+    exercise:
+      prompt: audit_document_media(page_width, margins, images, header, footer)를 완성하세요.
+      starterCode: |-
+        def audit_document_media(page_width, margins, images, header, footer):
+            raise NotImplementedError
+      solution: |
+        def audit_document_media(page_width, margins, images, header, footer):
+            usable = page_width - margins[0] - margins[1]
+            missing_alt = sorted(image["id"] for image in images if not str(image.get("alt", "")).strip())
+            too_wide = sorted(image["id"] for image in images if image.get("width", 0) > usable)
+            failures = []
+            if usable <= 0:
+                failures.append("page-width")
+            if missing_alt:
+                failures.append("alt-text")
+            if too_wide:
+                failures.append("image-width")
+            if not str(header).strip() or "{page}" not in str(footer):
+                failures.append("navigation")
+            return {"accepted": not failures, "failures": failures, "usableWidth": usable, "missingAlt": missing_alt, "tooWide": too_wide}
+      hints: *id001
+    check:
+      id: python.word.word_05.document-media-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_05.document-media-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_document_media
+        cases:
+        - id: accepts-accessible-media
+          arguments:
+          - value: 600
+          - value:
+            - 60
+            - 60
+          - value:
+            - id: chart
+              width: 480
+              alt: 월별 매출 막대차트
+          - value: 월간 보고
+          - value: '{page} / {pages}'
+          expectedReturn:
+            accepted: true
+            failures: []
+            usableWidth: 480
+            missingAlt: []
+            tooWide: []
+        - id: reports-alt-width-navigation
+          arguments:
+          - value: 500
+          - value:
+            - 50
+            - 50
+          - value:
+            - id: hero
+              width: 450
+              alt: ''
+          - value: ''
+          - value: confidential
+          expectedReturn:
+            accepted: false
+            failures:
+            - alt-text
+            - image-width
+            - navigation
+            usableWidth: 400
+            missingAlt:
+            - hero
+            tooWide:
+            - hero
+        - id: reports-invalid-page
+          arguments:
+          - value: 100
+          - value:
+            - 60
+            - 60
+          - value: []
+          - value: 제목
+          - value: '{page}'
+          expectedReturn:
+            accepted: false
+            failures:
+            - page-width
+            usableWidth: -20
+            missingAlt: []
+            tooWide: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: word_05-media-placement-plan-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - word_05-document-media-audit-mastery
+    title: 새 문서의 이미지 배치 계획 만들기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: aspect ratio를 지키며 본문 폭 안의 렌더 크기를 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 원본 비율을 유지한 render width와 height를 함께 계산하세요.
+    - 잘못된 치수는 조용히 건너뛰지 말고 ID를 보고하세요.
+    exercise:
+      prompt: plan_media_placement(images, usable_width)를 완성하세요.
+      starterCode: |-
+        def plan_media_placement(images, usable_width):
+            raise NotImplementedError
+      solution: |
+        def plan_media_placement(images, usable_width):
+            placed = []
+            invalid = []
+            for image in images:
+                width = image.get("width", 0)
+                height = image.get("height", 0)
+                if width <= 0 or height <= 0:
+                    invalid.append(image["id"])
+                    continue
+                render_width = min(width, usable_width)
+                render_height = round(height * render_width / width, 2)
+                placed.append({"id": image["id"], "width": render_width, "height": render_height, "scaled": render_width != width})
+            return {"placements": placed, "invalid": sorted(invalid), "complete": not invalid}
+      hints: *id002
+    check:
+      id: python.word.word_05.media-placement-plan.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_05.media-placement-plan.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_media_placement
+        cases:
+        - id: keeps-small-image
+          arguments:
+          - value:
+            - id: a
+              width: 200
+              height: 100
+          - value: 400
+          expectedReturn:
+            placements:
+            - id: a
+              width: 200
+              height: 100.0
+              scaled: false
+            invalid: []
+            complete: true
+        - id: scales-large-image
+          arguments:
+          - value:
+            - id: a
+              width: 800
+              height: 400
+          - value: 500
+          expectedReturn:
+            placements:
+            - id: a
+              width: 500
+              height: 250.0
+              scaled: true
+            invalid: []
+            complete: true
+        - id: reports-invalid-image
+          arguments:
+          - value:
+            - id: bad
+              width: 0
+              height: 10
+          - value: 500
+          expectedReturn:
+            placements: []
+            invalid:
+            - bad
+            complete: false
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: word_05-media-accessibility-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - word_05-media-placement-plan-transfer
+    title: Word 이미지·머리말 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 접근성·기하·페이지 탐색 증거를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Web에서는 문서 구조와 업무 불변식을 즉시 검증하세요.
+    - Local에서는 저장한 docx를 재개방하고 렌더 결과까지 증거로 남기세요.
+    exercise:
+      prompt: choose_media_evidence(stage)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_media_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_media_evidence(stage):
+            choices = {'accessibility': {'action': 'write informational alt text', 'evidence': 'image-alt manifest', 'risk': 'meaning lost to nonvisual reader'}, 'geometry': {'action': 'fit within usable page width', 'evidence': 'render dimensions', 'risk': 'cropped image'}, 'navigation': {'action': 'add stable header and page fields', 'evidence': 'rendered page sequence', 'risk': 'unidentified pages'}}
+            if stage not in choices:
+                raise ValueError('unknown stage')
+            return choices[stage]
+      hints: *id003
+    check:
+      id: python.word.word_05.media-accessibility-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.word.word_05.media-accessibility-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_media_evidence
+        cases:
+        - id: recalls-accessibility
+          arguments:
+          - value: accessibility
+          expectedReturn:
+            action: write informational alt text
+            evidence: image-alt manifest
+            risk: meaning lost to nonvisual reader
+        - id: recalls-geometry
+          arguments:
+          - value: geometry
+          expectedReturn:
+            action: fit within usable page width
+            evidence: render dimensions
+            risk: cropped image
+        - id: recalls-final-stage
+          arguments:
+          - value: navigation
+          expectedReturn:
+            action: add stable header and page fields
+            evidence: rendered page sequence
+            risk: unidentified pages
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

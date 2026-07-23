@@ -48,6 +48,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "httpx>=0.28.1",
+    "pillow>=12.2.0",
     "pytest>=9.0.2",
     "watchdog>=6.0.0",
 ]
@@ -92,6 +93,7 @@ select = [
 
 [tool.ruff.lint.per-file-ignores]
 "src/codaro/runtime/localWorker.py" = ["BLE001", "S110"]
+"src/codaro/curriculum/_localStrongCheckWorker.py" = ["BLE001"]
 "src/codaro/outputDescriptor.py" = ["BLE001"]
 "src/codaro/serverLog.py" = ["BLE001", "S110"]
 "src/codaro/errorGuard.py" = ["BLE001"]

@@ -665,3 +665,278 @@ sections:
     type: noError
     noError: 업무 흐름 검증에서 `conservativePipeline` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sklearn_08-heart-risk-calibration-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_data
+    - workflow_validation
+    title: 심장 위험 예측의 calibration bin 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 확률 bin별 평균 예측과 실제 발생률을 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - score를 확률이라 부르려면 calibration 근거가 필요합니다.
+    - 빈 bin과 작은 bin을 숨기지 마세요.
+    exercise:
+      prompt: calibration_bins(probabilities, outcomes, boundaries)를 완성하세요.
+      starterCode: |-
+        def calibration_bins(probabilities, outcomes, boundaries):
+            raise NotImplementedError
+      solution: |
+        def calibration_bins(probabilities, outcomes, boundaries):
+            if len(probabilities)!=len(outcomes) or any(not 0<=value<=1 for value in probabilities+outcomes): raise ValueError("invalid probability rows")
+            bins=[]
+            for lower,upper in zip(boundaries,boundaries[1:]):
+                rows=[(p,y) for p,y in zip(probabilities,outcomes) if lower<=p<(upper if upper<1 else upper+1e-12)]
+                bins.append({"lower":lower,"upper":upper,"count":len(rows),"meanProbability":None if not rows else round(sum(p for p,_ in rows)/len(rows),4),"eventRate":None if not rows else round(sum(y for _,y in rows)/len(rows),4)})
+            return bins
+      hints: *id001
+    check:
+      id: python.sklearn.sklearn_08.heart-risk-calibration.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_08.heart-risk-calibration.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: calibration_bins
+        cases:
+        - id: computes-reliability-bins
+          arguments:
+          - value:
+            - 0.1
+            - 0.2
+            - 0.8
+            - 0.9
+          - value:
+            - 0
+            - 1
+            - 1
+            - 1
+          - value:
+            - 0
+            - 0.5
+            - 1
+          expectedReturn:
+          - lower: 0
+            upper: 0.5
+            count: 2
+            meanProbability: 0.15
+            eventRate: 0.5
+          - lower: 0.5
+            upper: 1
+            count: 2
+            meanProbability: 0.85
+            eventRate: 1.0
+        - id: keeps-empty-bin
+          arguments:
+          - value:
+            - 0.1
+          - value:
+            - 0
+          - value:
+            - 0
+            - 0.5
+            - 1
+          expectedReturn:
+          - lower: 0
+            upper: 0.5
+            count: 1
+            meanProbability: 0.1
+            eventRate: 0.0
+          - lower: 0.5
+            upper: 1
+            count: 0
+            meanProbability: null
+            eventRate: null
+        - id: rejects-invalid-probability
+          arguments:
+          - value:
+            - 1.2
+          - value:
+            - 1
+          - value:
+            - 0
+            - 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sklearn_08-subgroup-diagnostic-metrics-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_08-heart-risk-calibration-mastery
+    title: 새 환자 subgroup에 성능 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: group별 sensitivity와 support를 분리한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - subgroup metric 옆에 positive support를 남기세요.
+    - 작은 subgroup 차이를 확정적 편향 결론으로 과장하지 마세요.
+    exercise:
+      prompt: subgroup_sensitivity(rows)를 완성하세요.
+      starterCode: |-
+        def subgroup_sensitivity(rows):
+            raise NotImplementedError
+      solution: |
+        def subgroup_sensitivity(rows):
+            grouped={}
+            for row in rows:
+                bucket=grouped.setdefault(row["group"],{"positive":0,"truePositive":0,"count":0})
+                bucket["count"]+=1
+                if row["actual"]==1:
+                    bucket["positive"]+=1; bucket["truePositive"]+=int(row["predicted"]==1)
+            return {group:{"count":b["count"],"positiveSupport":b["positive"],"sensitivity":None if b["positive"]==0 else round(b["truePositive"]/b["positive"],4)} for group,b in sorted(grouped.items())}
+      hints: *id002
+    check:
+      id: python.sklearn.sklearn_08.subgroup-diagnostic-metrics.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_08.subgroup-diagnostic-metrics.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: subgroup_sensitivity
+        cases:
+        - id: reports-subgroup-gaps
+          arguments:
+          - value:
+            - group: A
+              actual: 1
+              predicted: 1
+            - group: A
+              actual: 1
+              predicted: 0
+            - group: B
+              actual: 0
+              predicted: 0
+          expectedReturn:
+            A:
+              count: 2
+              positiveSupport: 2
+              sensitivity: 0.5
+            B:
+              count: 1
+              positiveSupport: 0
+              sensitivity: null
+        - id: handles-empty
+          arguments:
+          - value: []
+          expectedReturn: {}
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sklearn_08-heart-risk-evidence-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_08-subgroup-diagnostic-metrics-transfer
+    title: 심장 위험 모델 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 확률·subgroup·임상 경계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 학습 데이터와 평가 데이터의 경계를 먼저 확인하세요.
+    - 한 metric이나 예측을 실제 진단·인과 결론으로 확대하지 마세요.
+    exercise:
+      prompt: choose_heart_model_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_heart_model_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_heart_model_evidence(situation):
+            table = {'risk-probability': {'method': 'calibration audit', 'evidence': 'reliability bins', 'risk': 'uncalibrated score'}, 'subgroup-safety': {'method': 'support-aware metrics', 'evidence': 'counts sensitivity specificity', 'risk': 'small samples'}, 'patient-use': {'method': 'clinician-reviewed decision support', 'evidence': 'external validation', 'risk': 'diagnostic claim'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sklearn.sklearn_08.heart-risk-evidence.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_08.heart-risk-evidence.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_heart_model_evidence
+        cases:
+        - id: recalls-risk-probability
+          arguments:
+          - value: risk-probability
+          expectedReturn:
+            method: calibration audit
+            evidence: reliability bins
+            risk: uncalibrated score
+        - id: recalls-subgroup-safety
+          arguments:
+          - value: subgroup-safety
+          expectedReturn:
+            method: support-aware metrics
+            evidence: counts sensitivity specificity
+            risk: small samples
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

@@ -417,3 +417,324 @@ sections:
           - "ttb(받으실 때)·tts(보내실 때)까지 함께 받아 송금 수수료 시나리오를 구분."
           - "원화 환산 결과를 openpyxl로 통화별 소계·총계 엑셀로 산출."
           - "월말 외화자산 평가: 보유 외화 잔액 × 말일 매매기준율로 평가액을 자동 산출."
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: requests_13-exchange-rate-conversion-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - parse_rate
+    - practice
+    title: 환율 quote 방향과 반올림 정책으로 금액 환산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: base·quote·rate·as-of를 검사해 Decimal 금액과 근거를 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 환율 숫자만 보지 말고 base/quote 방향을 먼저 검사하세요.
+    - 금액 계산은 float 대신 Decimal과 명시한 반올림 자리수를 사용하세요.
+    exercise:
+      prompt: convert_currency(amount, from_currency, to_currency, quote, places)를 완성하세요.
+      starterCode: |-
+        def convert_currency(amount, from_currency, to_currency, quote, places):
+            raise NotImplementedError
+      solution: |
+        def convert_currency(amount, from_currency, to_currency, quote, places):
+            from decimal import Decimal, ROUND_HALF_UP
+            if places < 0 or Decimal(str(amount)) < 0:
+                raise ValueError("invalid conversion input")
+            rate = Decimal(str(quote["rate"]))
+            if rate <= 0:
+                raise ValueError("rate must be positive")
+            if quote["base"] == from_currency and quote["quote"] == to_currency:
+                raw = Decimal(str(amount)) * rate
+                direction = "multiply"
+            elif quote["base"] == to_currency and quote["quote"] == from_currency:
+                raw = Decimal(str(amount)) / rate
+                direction = "divide"
+            else:
+                raise ValueError("currency pair mismatch")
+            unit = Decimal("1").scaleb(-places)
+            return {"amount": format(raw.quantize(unit, rounding=ROUND_HALF_UP), f".{places}f"), "currency": to_currency, "direction": direction, "rate": str(quote["rate"]), "asOf": quote["asOf"]}
+      hints: *id001
+    check:
+      id: python.requests.requests_13.exchange-rate-conversion.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.requests.requests_13.exchange-rate-conversion.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: convert_currency
+        cases:
+        - id: multiplies-direct-quote
+          arguments:
+          - value: 100
+          - value: USD
+          - value: KRW
+          - value:
+              base: USD
+              quote: KRW
+              rate: '1350.25'
+              asOf: '2026-07-22T09:00:00Z'
+          - value: 0
+          expectedReturn:
+            amount: '135025'
+            currency: KRW
+            direction: multiply
+            rate: '1350.25'
+            asOf: '2026-07-22T09:00:00Z'
+        - id: divides-inverse-quote
+          arguments:
+          - value: 1350
+          - value: KRW
+          - value: USD
+          - value:
+              base: USD
+              quote: KRW
+              rate: '1350'
+              asOf: '2026-07-22T09:00:00Z'
+          - value: 2
+          expectedReturn:
+            amount: '1.00'
+            currency: USD
+            direction: divide
+            rate: '1350'
+            asOf: '2026-07-22T09:00:00Z'
+        - id: rejects-pair-mismatch
+          arguments:
+          - value: 10
+          - value: EUR
+          - value: KRW
+          - value:
+              base: USD
+              quote: KRW
+              rate: 1300
+              asOf: now
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: requests_13-exchange-rate-freshness-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - requests_13-exchange-rate-conversion-mastery
+    title: 새 환율 응답에 freshness·provider 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 조회 시점과 quote 시점 차이, provider, 통화쌍 중복을 검사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 환율 값과 함께 provider·as-of·허용 최대 나이를 저장하세요.
+    - 같은 통화쌍의 복수 quote를 조용히 마지막 값으로 덮지 마세요.
+    exercise:
+      prompt: audit_rate_feed(quotes, now_epoch, maximum_age, allowed_providers)를 완성하세요.
+      starterCode: |-
+        def audit_rate_feed(quotes, now_epoch, maximum_age, allowed_providers):
+            raise NotImplementedError
+      solution: |
+        def audit_rate_feed(quotes, now_epoch, maximum_age, allowed_providers):
+            failures = []
+            stale = []
+            untrusted = []
+            pairs = []
+            for quote in quotes:
+                pair = f"{quote['base']}/{quote['quote']}"
+                pairs.append(pair)
+                if now_epoch - quote["asOfEpoch"] > maximum_age or quote["asOfEpoch"] > now_epoch:
+                    stale.append(pair)
+                if quote["provider"] not in allowed_providers:
+                    untrusted.append(pair)
+            duplicates = sorted({pair for pair in pairs if pairs.count(pair) > 1})
+            if stale:
+                failures.append("freshness")
+            if untrusted:
+                failures.append("provider")
+            if duplicates:
+                failures.append("duplicates")
+            return {"accepted": not failures, "failures": failures, "stale": stale, "untrusted": untrusted, "duplicates": duplicates}
+      hints: *id002
+    check:
+      id: python.requests.requests_13.exchange-rate-freshness-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.requests.requests_13.exchange-rate-freshness-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_rate_feed
+        cases:
+        - id: accepts-fresh-trusted-quotes
+          arguments:
+          - value:
+            - base: USD
+              quote: KRW
+              asOfEpoch: 990
+              provider: central
+          - value: 1000
+          - value: 20
+          - value:
+            - central
+          expectedReturn:
+            accepted: true
+            failures: []
+            stale: []
+            untrusted: []
+            duplicates: []
+        - id: reports-stale-and-untrusted
+          arguments:
+          - value:
+            - base: EUR
+              quote: KRW
+              asOfEpoch: 900
+              provider: unknown
+          - value: 1000
+          - value: 30
+          - value:
+            - central
+          expectedReturn:
+            accepted: false
+            failures:
+            - freshness
+            - provider
+            stale:
+            - EUR/KRW
+            untrusted:
+            - EUR/KRW
+            duplicates: []
+        - id: reports-duplicate-pair
+          arguments:
+          - value:
+            - base: USD
+              quote: KRW
+              asOfEpoch: 990
+              provider: central
+            - base: USD
+              quote: KRW
+              asOfEpoch: 995
+              provider: central
+          - value: 1000
+          - value: 20
+          - value:
+            - central
+          expectedReturn:
+            accepted: false
+            failures:
+            - duplicates
+            stale: []
+            untrusted: []
+            duplicates:
+            - USD/KRW
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: requests_13-exchange-rate-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - requests_13-exchange-rate-freshness-audit-transfer
+    title: 환율 조회·환산 근거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 통화 방향·정밀도·시점 위험에 맞는 검증을 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - HTTP 성공과 업무 데이터의 유효성을 별도 근거로 판정하세요.
+    - 요청 action과 함께 재현 가능한 evidence와 남는 risk를 기록하세요.
+    exercise:
+      prompt: choose_exchange_rate_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_exchange_rate_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_exchange_rate_evidence(situation):
+            table = {'direction': {'action': 'match base and quote', 'evidence': 'multiply or divide decision', 'risk': 'inverted conversion'}, 'amount': {'action': 'use Decimal and currency places', 'evidence': 'rounding policy', 'risk': 'float drift'}, 'freshness': {'action': 'validate provider and as-of', 'evidence': 'age and source', 'risk': 'stale financial value'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.requests.requests_13.exchange-rate-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.requests.requests_13.exchange-rate-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_exchange_rate_evidence
+        cases:
+        - id: recalls-direction
+          arguments:
+          - value: direction
+          expectedReturn:
+            action: match base and quote
+            evidence: multiply or divide decision
+            risk: inverted conversion
+        - id: recalls-amount
+          arguments:
+          - value: amount
+          expectedReturn:
+            action: use Decimal and currency places
+            evidence: rounding policy
+            risk: float drift
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

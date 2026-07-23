@@ -1,0 +1,61 @@
+schemaVersion: 1
+category: "resilience"
+canonicalRows: 3
+lessons:
+  - lessonRef: "resilience/01_멱등성과처리원장"
+    identityLedgerRef: "identity-ledger/resilience.yml"
+    lessonContentHash: "5604161f841dc286f615503b35b0dab3452e20d3079e55b6c5ebe39b6af2b35d"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/03-scripting-automation"
+    eligiblePathIds: ["scriptingAutomation"]
+    outcomes: ["automation.resilience.idempotency"]
+    prerequisites: ["automation.fileOps"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:resilience/01_멱등성과처리원장:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:resilience_01_________:v1","retrieve:resilience_01_________:v2","retrieve:resilience_01_________:v3"]
+    transferVariantIds: ["transfer:resilience_01_________:near-v1","transfer:resilience_01_________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "resilience/02_재개가능체크포인트"
+    identityLedgerRef: "identity-ledger/resilience.yml"
+    lessonContentHash: "786107065b6bb1dc85d23fc6a7b60d0045c4296986eb0b8f67f051b25c0ba4c1"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/03-scripting-automation"
+    eligiblePathIds: ["scriptingAutomation"]
+    outcomes: ["automation.resilience.checkpoint"]
+    prerequisites: ["automation.resilience.idempotency"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:resilience/02_재개가능체크포인트:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:resilience_02__________:v1","retrieve:resilience_02__________:v2","retrieve:resilience_02__________:v3"]
+    transferVariantIds: ["transfer:resilience_02__________:near-v1","transfer:resilience_02__________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "resilience/03_원자적쓰기"
+    identityLedgerRef: "identity-ledger/resilience.yml"
+    lessonContentHash: "710a194fa4aeaba92f5e7e7508c40659a661668344d66254a1138517e4e78f6a"
+    disposition: migrate
+    ownerPacket: "07-remaining-domains/03-scripting-automation"
+    eligiblePathIds: ["scriptingAutomation"]
+    outcomes: ["automation.resilience.atomicWrite"]
+    prerequisites: ["automation.fileOps"]
+    reinforcesOutcomeIds: []
+    runtimeTier: local
+    checkSpecId: "lesson:resilience/03_원자적쓰기:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:resilience_03______:v1","retrieve:resilience_03______:v2","retrieve:resilience_03______:v3"]
+    transferVariantIds: ["transfer:resilience_03______:near-v1","transfer:resilience_03______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

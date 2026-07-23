@@ -1,0 +1,194 @@
+schemaVersion: 1
+category: "fileOps"
+canonicalRows: 10
+lessons:
+  - lessonRef: "fileOps/01_pathlib경로감각"
+    identityLedgerRef: "identity-ledger/fileOps.yml"
+    lessonContentHash: "f9e5a58ecd6af3763f1fd2b699ea613592fa0c5942d985c29530bd45253f567b"
+    disposition: migrate
+    ownerPacket: "04-file-automation"
+    eligiblePathIds: ["fileAutomation","scriptingAutomation"]
+    outcomes: ["automation.fileOps"]
+    prerequisites: ["builtins.fileSystem"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:fileOps/01_pathlib경로감각:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:fileOps_01_pathlib____:v1","retrieve:fileOps_01_pathlib____:v2","retrieve:fileOps_01_pathlib____:v3"]
+    transferVariantIds: ["transfer:fileOps_01_pathlib____:near-v1","transfer:fileOps_01_pathlib____:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "fileOps/02_파일읽고쓰기"
+    identityLedgerRef: "identity-ledger/fileOps.yml"
+    lessonContentHash: "3d76d3314784a367a7748fa542fc5e383c772022325b032acb5975abe895b824"
+    disposition: migrate
+    ownerPacket: "04-file-automation"
+    eligiblePathIds: ["fileAutomation","scriptingAutomation"]
+    outcomes: ["automation.fileOps"]
+    prerequisites: ["automation.fileOps"]
+    reinforcesOutcomeIds: ["automation.fileOps"]
+    runtimeTier: browser
+    checkSpecId: "lesson:fileOps/02_파일읽고쓰기:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:fileOps_02_______:v1","retrieve:fileOps_02_______:v2","retrieve:fileOps_02_______:v3"]
+    transferVariantIds: ["transfer:fileOps_02_______:near-v1","transfer:fileOps_02_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "fileOps/03_디렉터리탐색"
+    identityLedgerRef: "identity-ledger/fileOps.yml"
+    lessonContentHash: "c29ea5246913f3c943cb093751860712c0ba15d6d0bc99901394b4309b51e5b4"
+    disposition: migrate
+    ownerPacket: "04-file-automation"
+    eligiblePathIds: ["fileAutomation","scriptingAutomation"]
+    outcomes: ["automation.fileOps"]
+    prerequisites: ["automation.fileOps"]
+    reinforcesOutcomeIds: ["automation.fileOps"]
+    runtimeTier: browser
+    checkSpecId: "lesson:fileOps/03_디렉터리탐색:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:fileOps_03_______:v1","retrieve:fileOps_03_______:v2","retrieve:fileOps_03_______:v3"]
+    transferVariantIds: ["transfer:fileOps_03_______:near-v1","transfer:fileOps_03_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "fileOps/04_복사이동이름변경"
+    identityLedgerRef: "identity-ledger/fileOps.yml"
+    lessonContentHash: "ccd65da0a925c92a33903e600037ee9a3c8f32eb3557c9ef795cc510c4b7490b"
+    disposition: migrate
+    ownerPacket: "04-file-automation"
+    eligiblePathIds: ["fileAutomation","scriptingAutomation"]
+    outcomes: ["automation.fileOps"]
+    prerequisites: ["automation.fileOps"]
+    reinforcesOutcomeIds: ["automation.fileOps"]
+    runtimeTier: browser
+    checkSpecId: "lesson:fileOps/04_복사이동이름변경:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:fileOps_04_________:v1","retrieve:fileOps_04_________:v2","retrieve:fileOps_04_________:v3"]
+    transferVariantIds: ["transfer:fileOps_04_________:near-v1","transfer:fileOps_04_________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "fileOps/05_안전삭제"
+    identityLedgerRef: "identity-ledger/fileOps.yml"
+    lessonContentHash: "0aaaa48c1e1f65de6b660af7064f5b0506854ec3d7c7aa75ca8e9d5e4a6ec4d8"
+    disposition: migrate
+    ownerPacket: "04-file-automation"
+    eligiblePathIds: ["fileAutomation","scriptingAutomation"]
+    outcomes: ["automation.fileOps"]
+    prerequisites: ["automation.fileOps"]
+    reinforcesOutcomeIds: ["automation.fileOps"]
+    runtimeTier: browser
+    checkSpecId: "lesson:fileOps/05_안전삭제:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:fileOps_05_____:v1","retrieve:fileOps_05_____:v2","retrieve:fileOps_05_____:v3"]
+    transferVariantIds: ["transfer:fileOps_05_____:near-v1","transfer:fileOps_05_____:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "fileOps/06_zip압축"
+    identityLedgerRef: "identity-ledger/fileOps.yml"
+    lessonContentHash: "64342e0c83d6ad83676fd606faac89c3df5a4708dd64b14159b57821fc88c047"
+    disposition: migrate
+    ownerPacket: "04-file-automation"
+    eligiblePathIds: ["fileAutomation"]
+    outcomes: ["automation.fileBackup"]
+    prerequisites: ["automation.fileOps"]
+    reinforcesOutcomeIds: []
+    runtimeTier: browser
+    checkSpecId: "lesson:fileOps/06_zip압축:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:fileOps_06_zip__:v1","retrieve:fileOps_06_zip__:v2","retrieve:fileOps_06_zip__:v3"]
+    transferVariantIds: ["transfer:fileOps_06_zip__:near-v1","transfer:fileOps_06_zip__:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "fileOps/07_백업과동기화"
+    identityLedgerRef: "identity-ledger/fileOps.yml"
+    lessonContentHash: "016a6d56e16b987edae64fceb6cfa52c25a02a1d1a72c094b91ee9eccdd6a8e1"
+    disposition: migrate
+    ownerPacket: "04-file-automation"
+    eligiblePathIds: ["fileAutomation"]
+    outcomes: ["automation.fileBackup"]
+    prerequisites: ["automation.fileBackup"]
+    reinforcesOutcomeIds: ["automation.fileBackup"]
+    runtimeTier: browser
+    checkSpecId: "lesson:fileOps/07_백업과동기화:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:fileOps_07_______:v1","retrieve:fileOps_07_______:v2","retrieve:fileOps_07_______:v3"]
+    transferVariantIds: ["transfer:fileOps_07_______:near-v1","transfer:fileOps_07_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "fileOps/08_디렉터리정리"
+    identityLedgerRef: "identity-ledger/fileOps.yml"
+    lessonContentHash: "b2535e7cd07823780fe3b933efb49c087512d889a5e9b6db4662cd81fbd70500"
+    disposition: migrate
+    ownerPacket: "04-file-automation"
+    eligiblePathIds: ["fileAutomation"]
+    outcomes: ["automation.fileBackup"]
+    prerequisites: ["automation.fileBackup"]
+    reinforcesOutcomeIds: ["automation.fileBackup"]
+    runtimeTier: browser
+    checkSpecId: "lesson:fileOps/08_디렉터리정리:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:fileOps_08_______:v1","retrieve:fileOps_08_______:v2","retrieve:fileOps_08_______:v3"]
+    transferVariantIds: ["transfer:fileOps_08_______:near-v1","transfer:fileOps_08_______:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "fileOps/09_파일메타데이터"
+    identityLedgerRef: "identity-ledger/fileOps.yml"
+    lessonContentHash: "c00abb860ad2f45f6744721b89905f47d45dd88750dc8a4c6b59a5165976ce4e"
+    disposition: migrate
+    ownerPacket: "04-file-automation"
+    eligiblePathIds: ["fileAutomation","scriptingAutomation"]
+    outcomes: ["automation.fileOps"]
+    prerequisites: ["automation.fileOps"]
+    reinforcesOutcomeIds: ["automation.fileOps"]
+    runtimeTier: browser
+    checkSpecId: "lesson:fileOps/09_파일메타데이터:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:fileOps_09________:v1","retrieve:fileOps_09________:v2","retrieve:fileOps_09________:v3"]
+    transferVariantIds: ["transfer:fileOps_09________:near-v1","transfer:fileOps_09________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done
+  - lessonRef: "fileOps/10_종합다운로드폴더정리"
+    identityLedgerRef: "identity-ledger/fileOps.yml"
+    lessonContentHash: "092e9bac7860fddb4665a2ef20bf5358a5ab4fb89f6eb6c2c87e140ae960e1a6"
+    disposition: migrate
+    ownerPacket: "04-file-automation"
+    eligiblePathIds: ["fileAutomation"]
+    outcomes: ["automation.fileBackup"]
+    prerequisites: ["automation.fileBackup"]
+    reinforcesOutcomeIds: ["automation.fileBackup"]
+    runtimeTier: browser
+    checkSpecId: "lesson:fileOps/10_종합다운로드폴더정리:required:v1"
+    checkKinds: ["file","behavior"]
+    retrievalVariantIds: ["retrieve:fileOps_10___________:v1","retrieve:fileOps_10___________:v2","retrieve:fileOps_10___________:v3"]
+    transferVariantIds: ["transfer:fileOps_10___________:near-v1","transfer:fileOps_10___________:far-v1"]
+    artifactDecision: file-or-audit
+    visualDecision: required-before-after-or-state-flow
+    reviewerRoles: [curriculum-owner, learning-qa, design-owner]
+    authorReviewStatus: planned
+    evidenceCommitRequirement: required-before-done

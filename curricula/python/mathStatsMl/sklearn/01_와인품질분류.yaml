@@ -587,3 +587,300 @@ sections:
     type: noError
     noError: 업무 흐름 검증에서 `conservativePipeline` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: sklearn_01-multiclass-confusion-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_package_ready
+    - workflow_validation
+    title: 와인 다중분류 confusion matrix와 macro recall 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: label 순서를 고정하고 class별 recall과 macro 평균을 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - accuracy 대신 각 class의 recall을 분리하세요.
+    - test에 없는 class는 recall 0이 아니라 None입니다.
+    exercise:
+      prompt: multiclass_recall(actual, predicted, labels)를 완성하세요.
+      starterCode: |-
+        def multiclass_recall(actual, predicted, labels):
+            raise NotImplementedError
+      solution: |
+        def multiclass_recall(actual, predicted, labels):
+            if len(actual) != len(predicted) or not labels: raise ValueError("invalid labels")
+            matrix = {label:{other:0 for other in labels} for label in labels}
+            for truth,guess in zip(actual,predicted):
+                if truth not in matrix or guess not in matrix: raise ValueError("unknown class")
+                matrix[truth][guess] += 1
+            recalls = {}
+            for label in labels:
+                total = sum(matrix[label].values()); recalls[str(label)] = None if total == 0 else round(matrix[label][label]/total,4)
+            present = [value for value in recalls.values() if value is not None]
+            serialized = {str(label):{str(other):matrix[label][other] for other in labels} for label in labels}
+            return {"matrix":serialized,"recalls":recalls,"macroRecall":None if not present else round(sum(present)/len(present),4)}
+      hints: *id001
+    check:
+      id: python.sklearn.sklearn_01.multiclass-confusion.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_01.multiclass-confusion.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: multiclass_recall
+        cases:
+        - id: computes-class-recall
+          arguments:
+          - value:
+            - 0
+            - 0
+            - 1
+            - 2
+          - value:
+            - 0
+            - 1
+            - 1
+            - 1
+          - value:
+            - 0
+            - 1
+            - 2
+          expectedReturn:
+            matrix:
+              '0':
+                '0': 1
+                '1': 1
+                '2': 0
+              '1':
+                '0': 0
+                '1': 1
+                '2': 0
+              '2':
+                '0': 0
+                '1': 1
+                '2': 0
+            recalls:
+              '0': 0.5
+              '1': 1.0
+              '2': 0.0
+            macroRecall: 0.5
+        - id: keeps-absent-class
+          arguments:
+          - value:
+            - 0
+          - value:
+            - 0
+          - value:
+            - 0
+            - 1
+          expectedReturn:
+            matrix:
+              '0':
+                '0': 1
+                '1': 0
+              '1':
+                '0': 0
+                '1': 0
+            recalls:
+              '0': 1.0
+              '1': null
+            macroRecall: 1.0
+        - id: rejects-unknown
+          arguments:
+          - value:
+            - 0
+          - value:
+            - 2
+          - value:
+            - 0
+            - 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: sklearn_01-standardization-fit-boundary-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_01-multiclass-confusion-mastery
+    title: 새 feature scaling에 train-only fit 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: train mean/std로 train과 test를 변환한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - test 값으로 mean·std를 다시 맞추지 마세요.
+    - scaler parameter도 모델 artifact의 일부입니다.
+    exercise:
+      prompt: standardize_split(train, test)를 완성하세요.
+      starterCode: |-
+        def standardize_split(train, test):
+            raise NotImplementedError
+      solution: |
+        def standardize_split(train, test):
+            if not train: raise ValueError("empty train")
+            mean = sum(train)/len(train); variance = sum((value-mean)**2 for value in train)/len(train); std = variance**0.5
+            if std == 0: raise ValueError("zero train variance")
+            scale = lambda values:[round((value-mean)/std,4) for value in values]
+            return {"mean":round(mean,4),"std":round(std,4),"train":scale(train),"test":scale(test)}
+      hints: *id002
+    check:
+      id: python.sklearn.sklearn_01.standardization-fit-boundary.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_01.standardization-fit-boundary.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: standardize_split
+        cases:
+        - id: fits-on-train-only
+          arguments:
+          - value:
+            - 0
+            - 2
+          - value:
+            - 100
+          expectedReturn:
+            mean: 1.0
+            std: 1.0
+            train:
+            - -1.0
+            - 1.0
+            test:
+            - 99.0
+        - id: scales-empty-test
+          arguments:
+          - value:
+            - 1
+            - 3
+          - value: []
+          expectedReturn:
+            mean: 2.0
+            std: 1.0
+            train:
+            - -1.0
+            - 1.0
+            test: []
+        - id: rejects-zero-variance
+          arguments:
+          - value:
+            - 2
+            - 2
+          - value:
+            - 3
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: sklearn_01-wine-classification-evidence-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - sklearn_01-standardization-fit-boundary-transfer
+    title: 다중분류 평가 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: class 불균형과 전처리 경계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 학습 데이터와 평가 데이터의 경계를 먼저 확인하세요.
+    - 한 metric이나 예측을 실제 진단·인과 결론으로 확대하지 마세요.
+    exercise:
+      prompt: choose_multiclass_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_multiclass_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_multiclass_evidence(situation):
+            table = {'balanced-classes': {'method': 'confusion and macro metrics', 'evidence': 'per-class counts', 'risk': 'accuracy only'}, 'scaled-features': {'method': 'pipeline scaler', 'evidence': 'train-fitted parameters', 'risk': 'test fit'}, 'probability-output': {'method': 'calibration audit', 'evidence': 'reliability by class', 'risk': 'score as probability'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.sklearn.sklearn_01.wine-classification-evidence.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.sklearn.sklearn_01.wine-classification-evidence.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_multiclass_evidence
+        cases:
+        - id: recalls-balanced-classes
+          arguments:
+          - value: balanced-classes
+          expectedReturn:
+            method: confusion and macro metrics
+            evidence: per-class counts
+            risk: accuracy only
+        - id: recalls-scaled-features
+          arguments:
+          - value: scaled-features
+          expectedReturn:
+            method: pipeline scaler
+            evidence: train-fitted parameters
+            risk: test fit
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

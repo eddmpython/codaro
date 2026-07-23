@@ -27,26 +27,6 @@ misconceptions:
         df = pd.read_csv(StringIO(sample))
         df
 
-  - id: pandas.loadFrame.headerAsRow
-    label: "헤더가 없는데 첫 행을 헤더로 해석"
-    summary: "헤더 없는 CSV를 그대로 읽으면 첫 데이터 행이 column 이름이 된다."
-    triggers:
-      - kind: predictionMismatch
-        appliesTo: prediction
-        expectedField: shape
-        description: "row 수가 1 적게 나옴 (첫 행이 헤더로 흡수됨)."
-    diagnostic:
-      message: "`pd.read_csv` 는 기본적으로 첫 행을 헤더로 봅니다. 헤더가 없으면 데이터 한 줄을 잃습니다."
-      references: ["pandas.loadFrame"]
-    correction:
-      hint: "헤더 없는 CSV는 `header=None` 으로 읽고, 필요하면 `names=['a', 'b']` 로 직접 이름을 줍니다."
-      miniExercise: |
-        import pandas as pd
-        from io import StringIO
-        sample = "1,a\\n2,b\\n3,c"
-        df = pd.read_csv(StringIO(sample), header=None, names=["num", "letter"])
-        df
-
   - id: pandas.loadFrame.indexColumnDuplicated
     label: "index_col 모르고 인덱스 컬럼이 데이터로 들어옴"
     summary: "DataFrame.shape 가 예상보다 컬럼이 1개 더 많고, 'Unnamed: 0' 같은 컬럼이 보인다."

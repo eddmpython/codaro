@@ -1,4 +1,4 @@
-"""Diagnostics tool handler 테스트 — Predict-Run-Reconcile-Adapt 루프 4단계.
+"""Diagnostics tool handler tests.
 
 teacher-e2e golden 시나리오: 학습자가 misconception을 한 번 보이면 진단·교정,
 같은 misconception이 두 번째 매칭되면 doneCriterionViolated=True가 떠야 한다.
@@ -49,43 +49,6 @@ def testReadLearnerStateForSingleOutcome(
     result = _run(handlers._handle_readLearnerState({"outcomeId": "python.variables"}))
     assert result["outcomeId"] == "python.variables"
     assert result["mastery"]["successCount"] == 1
-
-
-def testRecordPredictionResultMatch(handlers: DiagnosticsToolHandlers) -> None:
-    result = _run(handlers._handle_recordPredictionResult({
-        "outcomeId": "python.variables",
-        "predict": {"expectedValue": "42"},
-        "actual": {"value": "42"},
-    }))
-    assert result["diff"]["overall"] == "match"
-    assert result["mastery"]["successCount"] == 1
-
-
-def testRecordPredictionResultMismatchDecrementsMastery(
-    handlers: DiagnosticsToolHandlers,
-) -> None:
-    _run(handlers._handle_recordPredictionResult({
-        "outcomeId": "python.variables",
-        "predict": {"expectedValue": "42"},
-        "actual": {"value": "42"},
-    }))
-    second = _run(handlers._handle_recordPredictionResult({
-        "outcomeId": "python.variables",
-        "predict": {"expectedValue": "42"},
-        "actual": {"value": "43"},
-    }))
-    assert second["diff"]["overall"] == "mismatch"
-    assert second["mastery"]["failureCount"] == 1
-
-
-def testRecordPredictionResultRequiresOutcomeId(
-    handlers: DiagnosticsToolHandlers,
-) -> None:
-    result = _run(handlers._handle_recordPredictionResult({
-        "predict": {},
-        "actual": {},
-    }))
-    assert "error" in result
 
 
 def testMatchMisconceptionFromCodePattern(
@@ -192,12 +155,11 @@ def testSuggestNextStepAppliesCorrectionOnRepeat(
 def testTeacherE2eGoldenFullCycle(
     handlers: DiagnosticsToolHandlers,
 ) -> None:
-    """teacher-e2e golden 시나리오 — read → match → record → suggest.
+    """teacher-e2e golden scenario: match, guide, and detect repetition.
 
     1) 학습자가 잘못된 코드 제출 → misconception 매치 (new).
-    2) record-prediction-result로 mismatch 기록 → mastery 하락.
-    3) suggest-next-step → replayOutcome 권고.
-    4) 학습자가 다시 같은 misconception → repeat → doneCriterionViolated.
+    2) suggest-next-step → 교정 권고.
+    3) 학습자가 다시 같은 misconception → repeat → doneCriterionViolated.
     """
     # 1) 첫 매치
     match1 = _run(handlers._handle_matchMisconception({
@@ -208,21 +170,13 @@ def testTeacherE2eGoldenFullCycle(
     assert match1["matches"][0]["repeatStatus"] == "new"
     assert not match1["doneCriterionViolated"]
 
-    # 2) prediction mismatch 기록
-    pred1 = _run(handlers._handle_recordPredictionResult({
-        "outcomeId": "python.variables",
-        "predict": {"expectedValue": "5"},
-        "actual": {"errorClass": "SyntaxError"},
-    }))
-    assert pred1["diff"]["overall"] == "mismatch"
-
-    # 3) suggest-next-step → 같은 outcome 반복 (교정 권고)
+    # 2) 같은 outcome에 바로 교정 권고
     suggest1 = _run(handlers._handle_suggestNextStep({
         "currentOutcomeId": "python.variables",
     }))
     assert suggest1["action"] == "applyCorrection"
 
-    # 4) 두 번째 동일 misconception → done 기준 위반
+    # 3) 두 번째 동일 misconception → done 기준 위반
     match2 = _run(handlers._handle_matchMisconception({
         "outcomeIds": ["python.variables"],
         "code": "5 = x",

@@ -5,26 +5,6 @@ meta:
   note: "초안 - loc/iloc, boolean masking, chained assignment 등 데이터 분석 핵심 오개념."
 
 misconceptions:
-  - id: pandas.filterSelect.locIlocConfusion
-    label: "loc와 iloc의 슬라이싱 끝 포함 여부 헷갈림"
-    summary: "`df.iloc[0:3]` 은 0,1,2 (3 제외) 인데 `df.loc[0:3]` 은 0,1,2,3 (3 포함)이다."
-    triggers:
-      - kind: predictionMismatch
-        appliesTo: prediction
-        expectedField: shape
-        description: "row 수가 1 차이 - loc/iloc 슬라이싱 의미 차이를 모름."
-    diagnostic:
-      message: "위치 기반 `iloc[a:b]` 은 Python 슬라이싱처럼 b를 **제외**, label 기반 `loc[a:b]` 은 b를 **포함**합니다."
-      references: ["pandas.filterSelect", "pandas.intro"]
-    correction:
-      hint: "헷갈리면 boolean mask 가 더 안전합니다: `df[df.index.isin([0, 1, 2])]`."
-      miniExercise: |
-        import pandas as pd
-        df = pd.DataFrame({"v": [10, 20, 30, 40]})
-        byPosition = df.iloc[0:3]
-        byLabel = df.loc[0:3]
-        len(byPosition), len(byLabel)
-
   - id: pandas.filterSelect.booleanWithAnd
     label: "boolean mask에 and/or 사용"
     summary: "`df[(df.a > 0) and (df.b < 5)]` 처럼 Python and 를 써서 ValueError 또는 잘못된 결과."

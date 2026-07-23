@@ -7,6 +7,7 @@ import re
 import shutil
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -15,10 +16,13 @@ from pydantic import BaseModel
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 PACKAGE_LIST_TIMEOUT_SECONDS = 30
+PACKAGE_LIST_CACHE_SECONDS = 30
 PACKAGE_VERSION_TIMEOUT_SECONDS = 10
 INSTALL_TIMEOUT_SECONDS = 600
 UNINSTALL_TIMEOUT_SECONDS = 120
 _STDLIB_MODULE_NAMES = set(getattr(sys, "stdlib_module_names", ()))
+_packageListCache: dict[str, tuple[float, tuple[PackageInfo, ...]]] = {}
+_packageListLock = threading.Lock()
 
 
 class PackageInfo(BaseModel):
@@ -236,6 +240,17 @@ async def listPackages() -> list[PackageInfo]:
 
 def _listSync() -> list[PackageInfo]:
     pythonPath = getProjectPythonPath()
+    cacheKey = str(pythonPath.resolve())
+    with _packageListLock:
+        cached = _packageListCache.get(cacheKey)
+        if cached is not None and time.monotonic() - cached[0] < PACKAGE_LIST_CACHE_SECONDS:
+            return [item.model_copy() for item in cached[1]]
+        packages = _listPackagesForPython(pythonPath)
+        _packageListCache[cacheKey] = (time.monotonic(), tuple(packages))
+        return [item.model_copy() for item in packages]
+
+
+def _listPackagesForPython(pythonPath: Path) -> list[PackageInfo]:
     script = """
 import importlib.metadata as metadata
 import json
@@ -291,6 +306,11 @@ print(json.dumps(sorted(seen.values(), key=lambda item: item["name"].lower())))
         ) from error
 
     return [PackageInfo.model_validate(item) for item in payload]
+
+
+def invalidatePackageListCache() -> None:
+    with _packageListLock:
+        _packageListCache.clear()
 
 
 _VALID_PACKAGE_NAME = re.compile(r"^[A-Za-z0-9]([A-Za-z0-9._-]*[A-Za-z0-9])?(\[.*\])?(([<>=!~]+)[\d.*]+)?$")
@@ -426,7 +446,10 @@ def _installSync(name: str) -> InstallResult:
         return _packageResult(name, False, f"uv pip install failed: {error}", startedAt, environment=environment)
 
     output = (result.stdout + "\n" + result.stderr).strip()
-    return _packageResult(name, result.returncode == 0, output, startedAt, environment=environment)
+    succeeded = result.returncode == 0
+    if succeeded:
+        invalidatePackageListCache()
+    return _packageResult(name, succeeded, output, startedAt, environment=environment)
 
 
 async def uninstallPackage(name: str) -> InstallResult:
@@ -461,7 +484,10 @@ def _uninstallSync(name: str) -> InstallResult:
         )
 
     output = (result.stdout + "\n" + result.stderr).strip()
-    return _packageResult(name, result.returncode == 0, output, startedAt, environment=environment)
+    succeeded = result.returncode == 0
+    if succeeded:
+        invalidatePackageListCache()
+    return _packageResult(name, succeeded, output, startedAt, environment=environment)
 
 
 def installedPackageVersion(name: str, *, pythonPath: Path) -> str | None:

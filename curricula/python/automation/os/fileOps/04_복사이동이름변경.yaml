@@ -383,3 +383,281 @@ sections:
     check:
       noError: 함수 정의와 copy2 호출이 격리 공간에서 정상적으로 끝나야 한다.
       resultCheck: 최종 이름이 report_1.txt이고 archive에 두 파일이 모두 존재해야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: fileOps_04-file-transfer-plan-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - copy-with-meta
+    - collision-strategy
+    title: 복사·이동·이름변경의 충돌 정책 계획하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: source identity와 destination 존재 여부, overwrite 정책으로 action을 결정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - destination 충돌을 조용히 overwrite하지 말고 정책으로 판정하세요.
+    - overwrite가 허용돼도 기존 destination backup을 먼저 계획하세요.
+    exercise:
+      prompt: plan_file_transfer(operation, source, destination, destination_exists, overwrite)를 완성하세요.
+      starterCode: |-
+        def plan_file_transfer(operation, source, destination, destination_exists, overwrite):
+            raise NotImplementedError
+      solution: |
+        def plan_file_transfer(operation, source, destination, destination_exists, overwrite):
+            if operation not in {"copy", "move", "rename"}:
+                raise ValueError("unknown operation")
+            if source == destination:
+                return {"ready": False, "action": "skip", "reason": "same-path", "requiresBackup": False}
+            if destination_exists and not overwrite:
+                return {"ready": False, "action": "conflict", "reason": "destination-exists", "requiresBackup": False}
+            return {"ready": True, "action": operation, "reason": "planned", "requiresBackup": destination_exists and overwrite}
+      hints: *id001
+    check:
+      id: python.fileops.fileOps_04.file-transfer-plan.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_04.file-transfer-plan.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_file_transfer
+        cases:
+        - id: plans-copy-to-empty-destination
+          arguments:
+          - value: copy
+          - value: /a
+          - value: /b
+          - value: false
+          - value: false
+          expectedReturn:
+            ready: true
+            action: copy
+            reason: planned
+            requiresBackup: false
+        - id: reports-existing-conflict
+          arguments:
+          - value: move
+          - value: /a
+          - value: /b
+          - value: true
+          - value: false
+          expectedReturn:
+            ready: false
+            action: conflict
+            reason: destination-exists
+            requiresBackup: false
+        - id: requires-backup-before-overwrite
+          arguments:
+          - value: rename
+          - value: /a
+          - value: /b
+          - value: true
+          - value: true
+          expectedReturn:
+            ready: true
+            action: rename
+            reason: planned
+            requiresBackup: true
+        - id: rejects-unknown-operation
+          arguments:
+          - value: merge
+          - value: /a
+          - value: /b
+          - value: false
+          - value: false
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: fileOps_04-file-transfer-result-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - fileOps_04-file-transfer-plan-mastery
+    title: 새 복사·이동 결과에 source/destination hash 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: operation별 source 잔존 조건과 destination content hash를 검사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 복사와 이동의 source 잔존 조건을 구분하세요.
+    - destination path 존재뿐 아니라 content hash와 단일 개수를 검사하세요.
+    exercise:
+      prompt: audit_file_transfer_result(operation, expected_hash, result)를 완성하세요.
+      starterCode: |-
+        def audit_file_transfer_result(operation, expected_hash, result):
+            raise NotImplementedError
+      solution: |
+        def audit_file_transfer_result(operation, expected_hash, result):
+            failures = []
+            if result.get("destinationHash") != expected_hash:
+                failures.append("destination-hash")
+            should_keep_source = operation == "copy"
+            if result.get("sourceExists", False) != should_keep_source:
+                failures.append("source-state")
+            if result.get("destinationCount") != 1:
+                failures.append("destination-count")
+            return {"passed": not failures, "failures": failures, "sourceKept": result.get("sourceExists", False)}
+      hints: *id002
+    check:
+      id: python.fileops.fileOps_04.file-transfer-result.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_04.file-transfer-result.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_file_transfer_result
+        cases:
+        - id: accepts-copy-result
+          arguments:
+          - value: copy
+          - value: abc
+          - value:
+              destinationHash: abc
+              sourceExists: true
+              destinationCount: 1
+          expectedReturn:
+            passed: true
+            failures: []
+            sourceKept: true
+        - id: accepts-move-result
+          arguments:
+          - value: move
+          - value: abc
+          - value:
+              destinationHash: abc
+              sourceExists: false
+              destinationCount: 1
+          expectedReturn:
+            passed: true
+            failures: []
+            sourceKept: false
+        - id: reports-corrupt-duplicate-move
+          arguments:
+          - value: move
+          - value: abc
+          - value:
+              destinationHash: bad
+              sourceExists: true
+              destinationCount: 2
+          expectedReturn:
+            passed: false
+            failures:
+            - destination-hash
+            - source-state
+            - destination-count
+            sourceKept: true
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: fileOps_04-file-transfer-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - fileOps_04-file-transfer-result-transfer
+    title: 복사·이동·이름변경 안전 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 충돌·backup·결과 hash evidence를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 파일 action 전에 root·충돌·dry run 계약을 확인하세요.
+    - 실행 횟수가 아니라 source와 destination artifact identity로 결과를 판정하세요.
+    exercise:
+      prompt: choose_file_transfer_policy(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_file_transfer_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_file_transfer_policy(situation):
+            table = {'conflict': {'action': 'apply explicit overwrite policy', 'evidence': 'source destination identities', 'risk': 'silent replacement'}, 'overwrite': {'action': 'backup existing destination', 'evidence': 'backup descriptor', 'risk': 'irreversible loss'}, 'verify': {'action': 'compare destination hash and source state', 'evidence': 'operation result', 'risk': 'partial move'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.fileops.fileOps_04.file-transfer-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.fileops.fileOps_04.file-transfer-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_file_transfer_policy
+        cases:
+        - id: recalls-conflict
+          arguments:
+          - value: conflict
+          expectedReturn:
+            action: apply explicit overwrite policy
+            evidence: source destination identities
+            risk: silent replacement
+        - id: recalls-overwrite
+          arguments:
+          - value: overwrite
+          expectedReturn:
+            action: backup existing destination
+            evidence: backup descriptor
+            risk: irreversible loss
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

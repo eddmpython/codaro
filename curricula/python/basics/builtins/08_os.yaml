@@ -2,6 +2,9 @@ meta:
   id: 08_os
   title: os - 운영체제 인터페이스
   category: builtins
+  outcomes: ["builtins.fileSystem"]
+  prerequisites: ["python.modulesAndIo"]
+  estimatedMinutes: 35
   tags:
   - os
   - 파일
@@ -320,3 +323,272 @@ sections:
     type: noError
     noError: os 모듈 종합 복습에서 `userDocsPath` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: os 모듈 종합 복습 실행 뒤 `userDocsPath` 값, 출력, 또는 type() 확인이 바꾼 입력값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 08_os-extension-sizes-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - directory_operations
+    - file_operations
+    - workflow_validation
+    title: 폴더 안 파일을 확장자별로 요약하기
+    subtitle: listdir, isfile, splitext, getsize 검증
+    goal: 지정한 폴더의 파일만 읽어 확장자별 총 바이트 크기를 반환한다.
+    why: os 파일 자동화는 실제 파일을 바꾸기 전, 대상이 무엇이고 얼마나 있는지 안전하게 요약하는 단계가 먼저입니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 fixture 파일을 만든 뒤 보이지 않던 폴더 경로로 다시 호출합니다.
+    tips:
+    - os.listdir(folder) 결과에서 디렉터리는 제외하고 파일만 집계하세요.
+    - 확장자가 없는 파일은 "<none>" 키로 모을 수 있게 처리하세요.
+    exercise:
+      prompt: summarize_extension_sizes(folder)가 파일 확장자별 크기 합계를 dict로 반환하도록 완성하세요.
+      starterCode: |-
+        def summarize_extension_sizes(folder):
+            raise NotImplementedError
+      solution: |-
+        import os
+
+        def summarize_extension_sizes(folder):
+            summary = {}
+            for filename in sorted(os.listdir(folder)):
+                path = os.path.join(folder, filename)
+                if not os.path.isfile(path):
+                    continue
+                extension = os.path.splitext(filename)[1] or "<none>"
+                summary[extension] = summary.get(extension, 0) + os.path.getsize(path)
+            return dict(sorted(summary.items()))
+      hints:
+      - os.path.isfile(path)로 폴더를 건너뛰세요.
+      - 같은 확장자가 여러 번 나오면 기존 값에 더해야 합니다.
+    check:
+      id: python.builtins.os.extension-sizes.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.os.safe-files.mastery.behavior.v1.fixture
+      fixtureHash: sha256-oqn6cusCzZpicilKBhtcDZiOREh1ssqsNwS+d1ab4r4=
+      fixture:
+        directories:
+        - input
+        - workspace/reports
+        - workspace/archive
+        env:
+          CODARO_STAGE: web
+          CODARO_REGION: KR
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: input/sales.csv
+          content: id,amount,1,100,2,150
+        - path: input/notes.txt
+          content: daily notes
+        - path: input/error.log
+          content: ERROR failed; INFO ok
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_extension_sizes
+        cases:
+        - id: fixture-input-folder
+          arguments:
+          - fixturePath: input
+          expectedReturn:
+            .csv: 21
+            .log: 21
+            .txt: 11
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 08_os-env-config-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - 08_os-extension-sizes-mastery
+    title: 실행 환경 설정을 안전하게 읽기
+    subtitle: getenv 기본값으로 누락 처리
+    goal: 필요한 환경 변수 목록을 읽고 없으면 지정한 기본값을 넣어 반환한다.
+    why: 웹과 로컬 자동화는 같은 코드라도 환경값이 다르므로, 누락을 예외가 아니라 명시적인 설정 상태로 다뤄야 합니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. fixture env에서 제공되는 값과 누락된 값을 함께 처리하세요.
+    tips:
+    - os.getenv(key, default)는 없는 key에 default를 돌려줍니다.
+    - 반환 dict에는 요청받은 key를 모두 포함하세요.
+    exercise:
+      prompt: collect_env_config(keys, default="missing")가 key별 환경값 또는 기본값을 담은 dict를 반환하도록 완성하세요.
+      starterCode: |-
+        def collect_env_config(keys, default="missing"):
+            raise NotImplementedError
+      solution: |-
+        import os
+
+        def collect_env_config(keys, default="missing"):
+            return {key: os.getenv(key, default) for key in keys}
+      hints:
+      - os.environ[key]를 직접 쓰면 누락된 값에서 KeyError가 납니다.
+      - default 인자가 호출마다 달라질 수 있습니다.
+    check:
+      id: python.builtins.os.env-config.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.os.safe-files.mastery.behavior.v1.fixture
+      fixtureHash: sha256-oqn6cusCzZpicilKBhtcDZiOREh1ssqsNwS+d1ab4r4=
+      fixture:
+        directories:
+        - input
+        - workspace/reports
+        - workspace/archive
+        env:
+          CODARO_STAGE: web
+          CODARO_REGION: KR
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: input/sales.csv
+          content: id,amount,1,100,2,150
+        - path: input/notes.txt
+          content: daily notes
+        - path: input/error.log
+          content: ERROR failed; INFO ok
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: collect_env_config
+        cases:
+        - id: reads-present-and-missing
+          arguments:
+          - value:
+            - CODARO_STAGE
+            - CODARO_REGION
+            - CODARO_MODE
+          expectedReturn:
+            CODARO_STAGE: web
+            CODARO_REGION: KR
+            CODARO_MODE: missing
+        - id: custom-default
+          arguments:
+          - value:
+            - CODARO_MODE
+          - value: browser
+          expectedReturn:
+            CODARO_MODE: browser
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 08_os-safe-join-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 08_os-env-config-transfer
+    title: 루트 밖으로 나가지 않는 경로 만들기
+    subtitle: abspath와 commonpath로 traversal 차단
+    goal: root와 path parts를 결합하되 root 밖으로 나가는 경로는 ValueError로 거부한다.
+    why: 로컬 자동화로 이어지는 학습에서는 경로 결합보다 먼저 안전 경계 안에 남는지 증명해야 합니다.
+    explanation: 숙달 근거가 저장된 지 24시간이 지나면 자동으로 열립니다. 문자열 join 결과를 신뢰하지 말고 절대경로와 commonpath를 확인하세요.
+    tips:
+    - os.path.abspath로 root와 candidate를 모두 정규화하세요.
+    - os.path.commonpath([root_path, candidate])가 root_path와 같아야 합니다.
+    exercise:
+      prompt: safe_join_under_root(root, parts)가 path, basename, parent를 담은 dict를 반환하고 root 밖 경로는 ValueError를 일으키도록 완성하세요.
+      starterCode: |-
+        def safe_join_under_root(root, parts):
+            raise NotImplementedError
+      solution: |-
+        import os
+
+        def safe_join_under_root(root, parts):
+            root_path = os.path.abspath(root)
+            candidate = os.path.abspath(os.path.join(root_path, *parts))
+            if os.path.commonpath([root_path, candidate]) != root_path:
+                raise ValueError("path escapes root")
+            return {
+                "path": candidate,
+                "basename": os.path.basename(candidate),
+                "parent": os.path.basename(os.path.dirname(candidate)),
+            }
+      hints:
+      - 상위 폴더로 올라가는 parts는 join 이후에 반드시 정규화해 판단하세요.
+      - 반환 path는 절대경로여도 verifier가 fixture root 기준 상대경로로 정규화합니다.
+    check:
+      id: python.builtins.os.safe-join.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.os.safe-files.mastery.behavior.v1.fixture
+      fixtureHash: sha256-oqn6cusCzZpicilKBhtcDZiOREh1ssqsNwS+d1ab4r4=
+      fixture:
+        directories:
+        - input
+        - workspace/reports
+        - workspace/archive
+        env:
+          CODARO_STAGE: web
+          CODARO_REGION: KR
+          LANG: C.UTF-8
+          TZ: UTC
+        files:
+        - path: input/sales.csv
+          content: id,amount,1,100,2,150
+        - path: input/notes.txt
+          content: daily notes
+        - path: input/error.log
+          content: ERROR failed; INFO ok
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: safe_join_under_root
+        cases:
+        - id: nested-report-path
+          arguments:
+          - fixturePath: workspace
+          - value:
+            - reports
+            - daily.csv
+          expectedReturn:
+            path: workspace/reports/daily.csv
+            basename: daily.csv
+            parent: reports
+        - id: deeper-archive-path
+          arguments:
+          - fixturePath: workspace
+          - value:
+            - archive
+            - '2026'
+            - summary.txt
+          expectedReturn:
+            path: workspace/archive/2026/summary.txt
+            basename: summary.txt
+            parent: '2026'
+        - id: rejects-parent-traversal
+          arguments:
+          - fixturePath: workspace
+          - value:
+            - ..
+            - outside.txt
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths:
+        - path
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

@@ -367,3 +367,334 @@ sections:
   check:
     noError: 종합 복습에서 `Color` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 종합 복습 실행 뒤 각 변수와 마지막 표시값이 바꾼 순서와 값을 반영해야 합니다.
+assessment:
+  masteryVariants:
+  - id: 13_advanced_collections-ticket-queue-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - namedtuple
+    - defaultdict
+    - counter
+    - deque
+    - chainmap
+    - workflow_validation
+    title: collections 자료구조로 지원 티켓 분류와 우선순위 큐 만들기
+    subtitle: support ticket queue
+    goal: 티켓 dict 목록과 설정 override를 받아 카테고리 그룹, 빈도, 우선순위 첫 티켓, SLA 설정을 반환한다.
+    why: collections는 외울 모듈이 아니라 namedtuple, defaultdict, Counter, deque, ChainMap 중 문제에 맞는 자료구조를 선택하는 훈련입니다.
+    explanation: summarize_ticket_queue(ticket_rows, overrides)를 완성해 티켓을 이름 있는 레코드로 만들고 카테고리별 그룹, 빈도, 큐, 설정 우선순위를 검증하세요.
+    tips:
+    - defaultdict(list)는 카테고리별 append에서 키 존재 검사를 없앱니다.
+    - ChainMap은 override를 첫 번째 dict로 두어야 설정 우선순위가 맞습니다.
+    exercise:
+      prompt: summarize_ticket_queue(ticket_rows, overrides)를 완성해 byCategory, topCategory, firstTicket, slaHours, remainingQueue를
+        반환하세요.
+      starterCode: |-
+        def summarize_ticket_queue(ticket_rows, overrides):
+            raise NotImplementedError
+      solution: |-
+        def summarize_ticket_queue(ticket_rows, overrides):
+            from collections import ChainMap, Counter, defaultdict, deque, namedtuple
+
+            Ticket = namedtuple("Ticket", ["id", "category", "priority"])
+            tickets = [Ticket(row["id"], row["category"], row["priority"]) for row in ticket_rows]
+
+            by_category = defaultdict(list)
+            for ticket in tickets:
+                by_category[ticket.category].append(ticket.id)
+
+            category_counts = Counter(ticket.category for ticket in tickets)
+            queue = deque(sorted(tickets, key=lambda ticket: ticket.priority, reverse=True))
+            defaults = {"slaHours": 24, "assignee": "support"}
+            config = ChainMap(dict(overrides), defaults)
+            first_ticket = queue.popleft()
+
+            return {
+                "byCategory": {key: value for key, value in sorted(by_category.items())},
+                "topCategory": category_counts.most_common(1)[0],
+                "firstTicket": first_ticket.id,
+                "slaHours": config["slaHours"],
+                "remainingQueue": [ticket.id for ticket in queue],
+            }
+      hints:
+      - namedtuple은 id, category, priority를 이름으로 읽게 해줍니다.
+      - deque.popleft()는 다음 처리 티켓을 큐 왼쪽에서 꺼냅니다.
+    check:
+      id: python.advanced.collections.ticket-queue.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.collections.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_ticket_queue
+        cases:
+        - id: groups-counts-and-queues-tickets
+          arguments:
+          - value:
+            - id: T-1
+              category: payment
+              priority: 2
+            - id: T-2
+              category: login
+              priority: 1
+            - id: T-3
+              category: payment
+              priority: 3
+            - id: T-4
+              category: report
+              priority: 2
+          - value:
+              slaHours: 4
+          expectedReturn:
+            byCategory:
+              login:
+              - T-2
+              payment:
+              - T-1
+              - T-3
+              report:
+              - T-4
+            topCategory:
+            - payment
+            - 2
+            firstTicket: T-3
+            slaHours: 4
+            remainingQueue:
+            - T-1
+            - T-4
+            - T-2
+        - id: rejects-row-missing-priority
+          arguments:
+          - value:
+            - id: T-1
+              category: payment
+          - value: {}
+          expectedException: KeyError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 13_advanced_collections-sliding-window-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - deque
+    - counter
+    - ordereddict
+    title: deque로 고정 길이 슬라이딩 윈도우 합계 만들기
+    subtitle: bounded rolling window
+    goal: 숫자 목록과 window size를 받아 각 단계의 window와 합계, 최종 window를 반환한다.
+    why: 전이 과제에서는 티켓 큐 밖으로 collections를 옮겨, deque(maxlen)가 오래된 값을 자동으로 밀어내는 스트리밍 처리 감각을 확인합니다.
+    explanation: compute_sliding_window(values, window_size)를 완성해 window_size가 찬 뒤부터 각 윈도우의 합계를 기록하세요.
+    tips:
+    - window_size가 0 이하이면 ValueError로 막으세요.
+    - deque(maxlen=window_size)는 새 값이 들어올 때 가장 오래된 값을 자동 제거합니다.
+    exercise:
+      prompt: compute_sliding_window(values, window_size)를 완성해 windows, totals, finalWindow를 반환하세요.
+      starterCode: |-
+        def compute_sliding_window(values, window_size):
+            raise NotImplementedError
+      solution: |-
+        def compute_sliding_window(values, window_size):
+            from collections import deque
+
+            if window_size <= 0:
+                raise ValueError("window_size must be positive")
+            window = deque(maxlen=window_size)
+            windows = []
+            totals = []
+            for value in values:
+                window.append(value)
+                if len(window) == window_size:
+                    snapshot = list(window)
+                    windows.append(snapshot)
+                    totals.append(sum(snapshot))
+            return {
+                "windows": windows,
+                "totals": totals,
+                "finalWindow": list(window),
+            }
+      hints:
+      - len(window)가 window_size와 같을 때만 완성된 window입니다.
+      - maxlen 때문에 직접 popleft를 호출하지 않아도 됩니다.
+    check:
+      id: python.advanced.collections.sliding-window.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.collections.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: compute_sliding_window
+        cases:
+        - id: computes-bounded-rolling-windows
+          arguments:
+          - value:
+            - 4
+            - 2
+            - 7
+            - 1
+          - value: 3
+          expectedReturn:
+            windows:
+            - - 4
+              - 2
+              - 7
+            - - 2
+              - 7
+              - 1
+            totals:
+            - 13
+            - 10
+            finalWindow:
+            - 2
+            - 7
+            - 1
+        - id: rejects-invalid-window-size
+          arguments:
+          - value:
+            - 1
+          - value: 0
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 13_advanced_collections-tool-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 13_advanced_collections-sliding-window-transfer
+    title: namedtuple, defaultdict, Counter, deque, ChainMap 선택 기준 회상하기
+    subtitle: collections tool recall
+    goal: 목적 이름을 받아 적절한 collections 자료구조와 핵심 장점을 반환한다.
+    why: 시간이 지나도 남아야 할 지식은 모듈 목록보다, 그룹화·빈도·양방향 큐·설정 계층처럼 문제에 맞는 자료구조 선택 기준입니다.
+    explanation: choose_collection_tool(goal)를 완성해 named-record, group-by-key, count-frequency, queue-both-ends, layered-config
+      목적별 도구를 고르세요.
+    tips:
+    - defaultdict는 없는 키에 기본 컨테이너를 자동으로 만듭니다.
+    - ChainMap은 원본 dict를 복사하지 않고 계층 조회를 제공합니다.
+    exercise:
+      prompt: choose_collection_tool(goal)를 완성해 목적별 collections 도구 선택 결과를 반환하세요.
+      starterCode: |-
+        def choose_collection_tool(goal):
+            raise NotImplementedError
+      solution: |-
+        def choose_collection_tool(goal):
+            table = {
+                "named-record": {
+                    "tool": "namedtuple",
+                    "advantage": "tuple storage with named fields",
+                    "mutable": False,
+                },
+                "group-by-key": {
+                    "tool": "defaultdict(list)",
+                    "advantage": "append without checking whether the key exists",
+                    "mutable": True,
+                },
+                "count-frequency": {
+                    "tool": "Counter",
+                    "advantage": "count hashable values and ask for most_common",
+                    "mutable": True,
+                },
+                "queue-both-ends": {
+                    "tool": "deque",
+                    "advantage": "O(1) append and pop on both ends",
+                    "mutable": True,
+                },
+                "layered-config": {
+                    "tool": "ChainMap",
+                    "advantage": "lookup through several dict layers without copying",
+                    "mutable": True,
+                },
+            }
+            if goal not in table:
+                raise ValueError("unknown collections goal")
+            return table[goal]
+      hints:
+      - 빈도는 Counter, 순차 처리 큐는 deque가 보통 먼저 떠올라야 합니다.
+      - 설정 override는 ChainMap의 앞쪽 dict가 우선합니다.
+    check:
+      id: python.advanced.collections.tool-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.advanced.collections.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_collection_tool
+        cases:
+        - id: recalls-counter-for-frequency
+          arguments:
+          - value: count-frequency
+          expectedReturn:
+            tool: Counter
+            advantage: count hashable values and ask for most_common
+            mutable: true
+        - id: recalls-chainmap-for-layered-config
+          arguments:
+          - value: layered-config
+          expectedReturn:
+            tool: ChainMap
+            advantage: lookup through several dict layers without copying
+            mutable: true
+        - id: rejects-unknown-goal
+          arguments:
+          - value: sorted-table
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

@@ -1,0 +1,59 @@
+schemaVersion: 1
+category: "email"
+sourceCount: 11
+lessons:
+  - lessonRef: "email/00_email소개"
+    sourcePath: "curricula/python/automation/office/email/00_email소개.yaml"
+    metaId: "email_00"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "email/01_첫메일발송"
+    sourcePath: "curricula/python/automation/office/email/01_첫메일발송.yaml"
+    metaId: "email_01"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "email/02_html과첨부"
+    sourcePath: "curricula/python/automation/office/email/02_html과첨부.yaml"
+    metaId: "email_02"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "email/03_다수수신자와개인화"
+    sourcePath: "curricula/python/automation/office/email/03_다수수신자와개인화.yaml"
+    metaId: "email_03"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "email/04_표와차트삽입"
+    sourcePath: "curricula/python/automation/office/email/04_표와차트삽입.yaml"
+    metaId: "email_04"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "email/05_imap으로받기"
+    sourcePath: "curricula/python/automation/office/email/05_imap으로받기.yaml"
+    metaId: "email_05"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "email/06_첨부자동저장"
+    sourcePath: "curricula/python/automation/office/email/06_첨부자동저장.yaml"
+    metaId: "email_06"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "email/07_규칙기반분류"
+    sourcePath: "curricula/python/automation/office/email/07_규칙기반분류.yaml"
+    metaId: "email_07"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "email/08_스크립트결과알림"
+    sourcePath: "curricula/python/automation/office/email/08_스크립트결과알림.yaml"
+    metaId: "email_08"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "email/09_안전한자격증명관리"
+    sourcePath: "curricula/python/automation/office/email/09_안전한자격증명관리.yaml"
+    metaId: "email_09"
+    registryStatus: registered
+    reviewStatus: pending
+  - lessonRef: "email/10_주간보고서발송기"
+    sourcePath: "curricula/python/automation/office/email/10_주간보고서발송기.yaml"
+    metaId: "email_10"
+    registryStatus: registered
+    reviewStatus: pending

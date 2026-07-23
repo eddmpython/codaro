@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="manifest" href="/codaro/run/manifest.json" />
+    <link rel="icon" href="/codaro/run/favicon.png" type="image/png" sizes="512x512" />
+    <link rel="apple-touch-icon" href="/codaro/run/favicon.png" />
+    <script>
+      (function () {
+        try {
+          var mode = localStorage.getItem("codaro-theme") || "system";
+          var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          var resolved = mode === "system" ? (prefersDark ? "dark" : "light") : mode;
+          var accent = localStorage.getItem("codaro-accent");
+          if (accent !== "blue" && accent !== "teal") accent = "plum";
+          document.documentElement.classList.toggle("dark", resolved === "dark");
+          document.documentElement.dataset.resolvedTheme = resolved;
+          document.documentElement.dataset.accent = accent;
+          document.documentElement.dataset.density = "studioDense";
+        } catch (storageError) {}
+      })();
+    </script>
+    <title>Codaro</title>
+    <script type="module" crossorigin src="/codaro/run/_app/index-lotEV7Zw.js"></script>
+    <link rel="modulepreload" crossorigin href="/codaro/run/_app/rolldown-runtime-QTnfLwEv.js">
+    <link rel="modulepreload" crossorigin href="/codaro/run/_app/yaml-D7qTo-hJ.js">
+    <link rel="modulepreload" crossorigin href="/codaro/run/_app/curriculumSurface-BQBNJfwO.js">
+    <link rel="modulepreload" crossorigin href="/codaro/run/_app/icons-BKRph3bF.js">
+    <link rel="modulepreload" crossorigin href="/codaro/run/_app/vendor-C6vUqHFS.js">
+    <link rel="modulepreload" crossorigin href="/codaro/run/_app/radix-NhxMn7n7.js">
+    <link rel="modulepreload" crossorigin href="/codaro/run/_app/xterm-CqT7F6QM.js">
+    <link rel="stylesheet" crossorigin href="/codaro/run/_app/vendor-BylNkWiU.css">
+    <link rel="stylesheet" crossorigin href="/codaro/run/_app/xterm-kHJ-D0s7.css">
+    <link rel="stylesheet" crossorigin href="/codaro/run/_app/index-CusNO6tB.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      const isLocalPreview = ["localhost", "127.0.0.1", "::1"].includes(location.hostname);
+      if ("serviceWorker" in navigator && location.protocol !== "file:" && !isLocalPreview) {
+        let codaroRefreshing = false;
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          if (codaroRefreshing) return;
+          codaroRefreshing = true;
+          window.location.reload();
+        });
+        window.addEventListener("load", () => {
+          const serviceWorkerBase = "/codaro/run/";
+          navigator.serviceWorker.register(`${serviceWorkerBase}serviceWorker.js`, {
+            scope: serviceWorkerBase,
+          })
+            .then((registration) => registration.update())
+            .catch(() => {});
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -440,3 +440,268 @@ sections:
           다음 레슨에서는 같은 패턴 위에 2D 데이터(리스트 안의 리스트)를 한 번에 Range에 쓰는 일괄 입력으로 확장합니다. 가로 한 줄을 쓰는 방법을 익혔으므로, 세로 방향으로 여러 줄을 한 번에 쓰는 변형이 자연스럽게 이어집니다.
     goal: 계약-쓰기-저장-검증의 4단계 사이클을 한 번 완성한 채로 다음 레슨에 진입한다.
     why: 자동화 사이클을 첫 레슨에 굳히면 이후 10개 프로젝트 내내 같은 골격에 새 개념만 추가하면 된다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: xlwings_01-excel-session-identity-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - lesson-contract
+    - summary
+    title: Excel app·workbook 연결의 정체성 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 여러 인스턴스와 동명이 workbook에서 잘못된 대상을 차단한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - PID와 정규화된 절대 workbook path를 함께 비교하세요.
+    - 일치 항목이 정확히 하나가 아니면 자동화를 시작하지 마세요.
+    exercise:
+      prompt: select_excel_session(sessions, expected_pid, expected_path)를 완성하세요.
+      starterCode: |-
+        def select_excel_session(sessions, expected_pid, expected_path):
+            raise NotImplementedError
+      solution: |
+        def select_excel_session(sessions, expected_pid, expected_path):
+            matches = [item for item in sessions if item.get("pid") == expected_pid and item.get("workbookPath", "").lower() == expected_path.lower()]
+            if len(matches) != 1:
+                return {"selected": None, "matchCount": len(matches), "ready": False}
+            selected = matches[0]
+            return {"selected": {"pid": selected["pid"], "workbookPath": selected["workbookPath"]}, "matchCount": 1, "ready": True}
+      hints: *id001
+    check:
+      id: python.xlwings.xlwings_01.excel-session-identity.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.xlwings.xlwings_01.excel-session-identity.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: select_excel_session
+        cases:
+        - id: selects-exact-session
+          arguments:
+          - value:
+            - pid: 10
+              workbookPath: C:/work/report.xlsx
+          - value: 10
+          - value: c:/work/report.xlsx
+          expectedReturn:
+            selected:
+              pid: 10
+              workbookPath: C:/work/report.xlsx
+            matchCount: 1
+            ready: true
+        - id: rejects-name-only-collision
+          arguments:
+          - value:
+            - pid: 10
+              workbookPath: C:/a/report.xlsx
+            - pid: 11
+              workbookPath: D:/b/report.xlsx
+          - value: 10
+          - value: D:/b/report.xlsx
+          expectedReturn:
+            selected: null
+            matchCount: 0
+            ready: false
+        - id: rejects-duplicate-session-record
+          arguments:
+          - value:
+            - pid: 10
+              workbookPath: a.xlsx
+            - pid: 10
+              workbookPath: a.xlsx
+          - value: 10
+          - value: a.xlsx
+          expectedReturn:
+            selected: null
+            matchCount: 2
+            ready: false
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: xlwings_01-app-lifecycle-plan-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - xlwings_01-excel-session-identity-mastery
+    title: 새 Excel 세션의 수명주기 계획 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 자신이 만든 app만 종료하도록 ownership을 계산한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - created_here ownership을 app과 workbook 각각 기록하세요.
+    - 사용자가 열어 둔 Excel 전체를 quit하지 마세요.
+    exercise:
+      prompt: plan_app_cleanup(created_app, opened_workbook, save_requested)를 완성하세요.
+      starterCode: |-
+        def plan_app_cleanup(created_app, opened_workbook, save_requested):
+            raise NotImplementedError
+      solution: |
+        def plan_app_cleanup(created_app, opened_workbook, save_requested):
+            actions = []
+            if opened_workbook and save_requested:
+                actions.append("save-workbook")
+            if opened_workbook:
+                actions.append("close-owned-workbook")
+            if created_app:
+                actions.append("quit-owned-app")
+            return {"actions": actions, "mayQuitExcel": bool(created_app), "mayCloseWorkbook": bool(opened_workbook)}
+      hints: *id002
+    check:
+      id: python.xlwings.xlwings_01.app-lifecycle-plan.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.xlwings.xlwings_01.app-lifecycle-plan.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: plan_app_cleanup
+        cases:
+        - id: cleans-owned-session
+          arguments:
+          - value: true
+          - value: true
+          - value: true
+          expectedReturn:
+            actions:
+            - save-workbook
+            - close-owned-workbook
+            - quit-owned-app
+            mayQuitExcel: true
+            mayCloseWorkbook: true
+        - id: preserves-borrowed-app
+          arguments:
+          - value: false
+          - value: true
+          - value: false
+          expectedReturn:
+            actions:
+            - close-owned-workbook
+            mayQuitExcel: false
+            mayCloseWorkbook: true
+        - id: does-nothing-with-borrowed-state
+          arguments:
+          - value: false
+          - value: false
+          - value: true
+          expectedReturn:
+            actions: []
+            mayQuitExcel: false
+            mayCloseWorkbook: false
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: xlwings_01-excel-session-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - xlwings_01-app-lifecycle-plan-transfer
+    title: Excel 연결 안전 원칙 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 대상 선택·ownership·cleanup 증거를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - Web에서는 Excel 자동화 판단을 작은 함수로 즉시 검증하세요.
+    - Local에서는 실제 Excel 프로세스와 workbook artifact 증거를 별도로 남기세요.
+    exercise:
+      prompt: choose_session_evidence(stage)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_session_evidence(stage):
+            raise NotImplementedError
+      solution: |
+        def choose_session_evidence(stage):
+            table = {'select': {'action': 'match pid and absolute workbook path', 'evidence': 'single target record', 'risk': 'wrong workbook'}, 'own': {'action': 'record who created app and workbook', 'evidence': 'ownership flags', 'risk': 'closing user work'}, 'cleanup': {'action': 'close only owned resources', 'evidence': 'ordered cleanup log', 'risk': 'orphan Excel process'}}
+            if stage not in table:
+                raise ValueError('unknown stage')
+            return table[stage]
+      hints: *id003
+    check:
+      id: python.xlwings.xlwings_01.excel-session-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.xlwings.xlwings_01.excel-session-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_session_evidence
+        cases:
+        - id: recalls-select
+          arguments:
+          - value: select
+          expectedReturn:
+            action: match pid and absolute workbook path
+            evidence: single target record
+            risk: wrong workbook
+        - id: recalls-own
+          arguments:
+          - value: own
+          expectedReturn:
+            action: record who created app and workbook
+            evidence: ownership flags
+            risk: closing user work
+        - id: recalls-cleanup
+          arguments:
+          - value: cleanup
+          expectedReturn:
+            action: close only owned resources
+            evidence: ordered cleanup log
+            risk: orphan Excel process
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

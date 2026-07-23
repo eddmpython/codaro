@@ -7,6 +7,9 @@ meta:
   audience: Python 기본 문법을 익힌 자동화 입문자
   packages:
     - playwright
+  outcomes: ["automation.browser.basics"]
+  prerequisites: ["automation.browser.basics"]
+  estimatedMinutes: 40
   tags:
     - playwright
     - chromium
@@ -306,3 +309,292 @@ sections:
     check:
       noError: result 딕셔너리가 세 키를 모두 가진 상태로 만들어져야 합니다.
       resultCheck: title, heading, status 값이 HTML에서 읽은 실제 값과 일치해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: playwright_01-navigation-result-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - page-title
+    - completion-object
+    title: 첫 탐색의 status·origin·redirect 증거 판정하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 응답 연쇄에서 최종 URL과 HTTP 실패, origin 이탈을 함께 찾는다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - page가 열렸다는 사실 외에 response status와 최종 origin을 검사하세요.
+    - 허용한 redirect chain과 의도하지 않은 외부 이동을 구분하세요.
+    exercise:
+      prompt: audit_navigation(responses, allowed_origins)를 완성하세요.
+      starterCode: |-
+        def audit_navigation(responses, allowed_origins):
+            raise NotImplementedError
+      solution: |
+        def audit_navigation(responses, allowed_origins):
+            from urllib.parse import urlsplit
+            if not responses:
+                raise ValueError("empty response chain")
+            failures = []
+            hops = []
+            for response in responses:
+                url = response["url"]
+                parts = urlsplit(url)
+                origin = f"{parts.scheme}://{parts.netloc}"
+                hops.append({"url": url, "status": response["status"], "origin": origin})
+                if response["status"] >= 400:
+                    failures.append(f"http-{response['status']}")
+                if origin not in allowed_origins:
+                    failures.append("origin")
+            final = hops[-1]
+            return {"ok": not failures, "finalUrl": final["url"], "finalStatus": final["status"], "hops": len(hops), "failures": failures}
+      hints: *id001
+    check:
+      id: python.playwright.playwright_01.navigation-result-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.playwright.playwright_01.navigation-result-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_navigation
+        cases:
+        - id: accepts-allowed-redirect
+          arguments:
+          - value:
+            - url: https://example.test/start
+              status: 302
+            - url: https://example.test/home
+              status: 200
+          - value:
+            - https://example.test
+          expectedReturn:
+            ok: true
+            finalUrl: https://example.test/home
+            finalStatus: 200
+            hops: 2
+            failures: []
+        - id: reports-origin-and-http
+          arguments:
+          - value:
+            - url: https://example.test/start
+              status: 302
+            - url: https://login.test/fail
+              status: 503
+          - value:
+            - https://example.test
+          expectedReturn:
+            ok: false
+            finalUrl: https://login.test/fail
+            finalStatus: 503
+            hops: 2
+            failures:
+            - http-503
+            - origin
+        - id: rejects-empty-chain
+          arguments:
+          - value: []
+          - value:
+            - https://example.test
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: playwright_01-semantic-page-probe-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - playwright_01-navigation-result-audit-mastery
+    title: 새 페이지에 의미 기반 첫 상태 점검 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 제목·주요 landmark·console 오류로 탐색 직후 상태를 요약한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - DOM 전체 문자열보다 title과 landmark 같은 사용자 의미를 먼저 확인하세요.
+    - console error를 화면 assertion과 별도 증거로 남기세요.
+    exercise:
+      prompt: summarize_page_probe(probe)를 완성하세요.
+      starterCode: |-
+        def summarize_page_probe(probe):
+            raise NotImplementedError
+      solution: |
+        def summarize_page_probe(probe):
+            failures = []
+            if not probe.get("title", "").strip():
+                failures.append("title")
+            if probe.get("mainLandmarks", 0) != 1:
+                failures.append("main-landmark")
+            severe = [item for item in probe.get("console", []) if item.get("level") in {"error", "assert"}]
+            if severe:
+                failures.append("console")
+            return {
+                "usable": not failures,
+                "failures": failures,
+                "title": probe.get("title", ""),
+                "severeConsole": [item.get("text", "") for item in severe],
+            }
+      hints: *id002
+    check:
+      id: python.playwright.playwright_01.semantic-page-probe.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.playwright.playwright_01.semantic-page-probe.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_page_probe
+        cases:
+        - id: accepts-semantic-shell
+          arguments:
+          - value:
+              title: Orders
+              mainLandmarks: 1
+              console:
+              - level: info
+                text: ready
+          expectedReturn:
+            usable: true
+            failures: []
+            title: Orders
+            severeConsole: []
+        - id: reports-empty-shell-and-console
+          arguments:
+          - value:
+              title: ' '
+              mainLandmarks: 0
+              console:
+              - level: error
+                text: boot failed
+          expectedReturn:
+            usable: false
+            failures:
+            - title
+            - main-landmark
+            - console
+            title: ' '
+            severeConsole:
+            - boot failed
+        - id: reports-duplicate-main
+          arguments:
+          - value:
+              title: Home
+              mainLandmarks: 2
+              console: []
+          expectedReturn:
+            usable: false
+            failures:
+            - main-landmark
+            title: Home
+            severeConsole: []
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: playwright_01-navigation-evidence-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - playwright_01-semantic-page-probe-transfer
+    title: 첫 브라우저 탐색 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 화면 표시·응답 실패·외부 이동을 서로 다른 증거로 판정한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 브라우저 동작 성공과 사용자 목표 달성을 같은 것으로 취급하지 마세요.
+    - 선택한 action과 함께 판정 가능한 evidence와 남는 risk를 기록하세요.
+    exercise:
+      prompt: choose_navigation_evidence(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_navigation_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_navigation_evidence(situation):
+            table = {'page-shell': {'action': 'assert title and main landmark', 'evidence': 'semantic snapshot', 'risk': 'empty client shell'}, 'redirect-chain': {'action': 'record every response', 'evidence': 'status and final origin', 'risk': 'unexpected identity provider'}, 'console-failure': {'action': 'collect severe console messages', 'evidence': 'message and page state', 'risk': 'silent boot failure'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.playwright.playwright_01.navigation-evidence-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.playwright.playwright_01.navigation-evidence-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_navigation_evidence
+        cases:
+        - id: recalls-page-shell
+          arguments:
+          - value: page-shell
+          expectedReturn:
+            action: assert title and main landmark
+            evidence: semantic snapshot
+            risk: empty client shell
+        - id: recalls-redirect-chain
+          arguments:
+          - value: redirect-chain
+          expectedReturn:
+            action: record every response
+            evidence: status and final origin
+            risk: unexpected identity provider
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

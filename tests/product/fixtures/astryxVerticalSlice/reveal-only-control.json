@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "candidate": {
+    "surface": "learning-section",
+    "control": {
+      "label": "다음 힌트 보기",
+      "intent": "reveal-only"
+    },
+    "contentAlreadyAvailableFromRunState": true
+  },
+  "expectedFailure": {
+    "code": "redundant-reveal-control",
+    "reason": "실행 상태로 이미 제공할 수 있는 도움을 추가 확인 클릭 뒤에 숨길 수 없습니다."
+  }
+}

@@ -301,3 +301,302 @@ sections:
     check:
       noError: subprocess 실행과 completion 생성이 오류 없이 끝나야 합니다.
       resultCheck: completion이 returncode 0과 passedText True를 가져야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: playwright_08-pytest-fixture-isolation-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - test-function
+    - pytest-completion
+    title: pytest 브라우저 fixture 격리 계획 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 테스트별 context와 shared mutable state 위험을 판정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - browser process 재사용과 browser context 상태 공유를 구분하세요.
+    - mutable context는 function scope로 격리해 순서 의존을 제거하세요.
+    exercise:
+      prompt: audit_fixture_isolation(fixtures, tests)를 완성하세요.
+      starterCode: |-
+        def audit_fixture_isolation(fixtures, tests):
+            raise NotImplementedError
+      solution: |
+        def audit_fixture_isolation(fixtures, tests):
+            fixture_map = {fixture["name"]: fixture for fixture in fixtures}
+            failures = []
+            assignments = []
+            for test in tests:
+                name = test["fixture"]
+                fixture = fixture_map.get(name)
+                if fixture is None:
+                    failures.append({"test": test["id"], "reason": "missing-fixture"})
+                    continue
+                if fixture.get("scope") != "function" and fixture.get("mutable", False):
+                    failures.append({"test": test["id"], "reason": "shared-mutable-context"})
+                    continue
+                assignments.append({"test": test["id"], "fixture": name})
+            return {"isolated": not failures, "assignments": assignments, "failures": failures}
+      hints: *id001
+    check:
+      id: python.playwright.playwright_08.pytest-fixture-isolation.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.playwright.playwright_08.pytest-fixture-isolation.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_fixture_isolation
+        cases:
+        - id: accepts-function-context
+          arguments:
+          - value:
+            - name: context
+              scope: function
+              mutable: true
+          - value:
+            - id: a
+              fixture: context
+            - id: b
+              fixture: context
+          expectedReturn:
+            isolated: true
+            assignments:
+            - test: a
+              fixture: context
+            - test: b
+              fixture: context
+            failures: []
+        - id: reports-shared-mutable-context
+          arguments:
+          - value:
+            - name: context
+              scope: session
+              mutable: true
+          - value:
+            - id: checkout
+              fixture: context
+          expectedReturn:
+            isolated: false
+            assignments: []
+            failures:
+            - test: checkout
+              reason: shared-mutable-context
+        - id: reports-missing-fixture
+          arguments:
+          - value: []
+          - value:
+            - id: login
+              fixture: page
+          expectedReturn:
+            isolated: false
+            assignments: []
+            failures:
+            - test: login
+              reason: missing-fixture
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: playwright_08-test-run-summary-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - playwright_08-pytest-fixture-isolation-mastery
+    title: 새 pytest 실행 결과에 실패·재시도 감사 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 최종 pass와 최초 실패를 분리해 flaky·quarantine 상태를 보고한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 재시도 뒤 pass를 첫 실행 pass와 같은 green으로 합치지 마세요.
+    - 테스트별 attempt 순서를 보존해 flaky 원인을 추적하세요.
+    exercise:
+      prompt: summarize_test_run(results)를 완성하세요.
+      starterCode: |-
+        def summarize_test_run(results):
+            raise NotImplementedError
+      solution: |
+        def summarize_test_run(results):
+            by_test = {}
+            for result in results:
+                by_test.setdefault(result["test"], []).append(result["status"])
+            flaky = []
+            failed = []
+            passed = []
+            for test, statuses in sorted(by_test.items()):
+                if statuses[-1] != "passed":
+                    failed.append(test)
+                elif any(status != "passed" for status in statuses[:-1]):
+                    flaky.append(test)
+                else:
+                    passed.append(test)
+            return {"green": not failed and not flaky, "passed": passed, "flaky": flaky, "failed": failed, "attempts": len(results)}
+      hints: *id002
+    check:
+      id: python.playwright.playwright_08.test-run-summary.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.playwright.playwright_08.test-run-summary.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: summarize_test_run
+        cases:
+        - id: accepts-first-attempt-passes
+          arguments:
+          - value:
+            - test: a
+              status: passed
+            - test: b
+              status: passed
+          expectedReturn:
+            green: true
+            passed:
+            - a
+            - b
+            flaky: []
+            failed: []
+            attempts: 2
+        - id: reports-retry-pass-as-flaky
+          arguments:
+          - value:
+            - test: checkout
+              status: failed
+            - test: checkout
+              status: passed
+          expectedReturn:
+            green: false
+            passed: []
+            flaky:
+            - checkout
+            failed: []
+            attempts: 2
+        - id: reports-final-failure
+          arguments:
+          - value:
+            - test: login
+              status: passed
+            - test: search
+              status: failed
+            - test: search
+              status: failed
+          expectedReturn:
+            green: false
+            passed:
+            - login
+            flaky: []
+            failed:
+            - search
+            attempts: 3
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: playwright_08-pytest-browser-flow-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - playwright_08-test-run-summary-transfer
+    title: pytest 브라우저 흐름 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: fixture scope·병렬 실행·retry 결과의 품질 경계를 복원한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 브라우저 동작 성공과 사용자 목표 달성을 같은 것으로 취급하지 마세요.
+    - 선택한 action과 함께 판정 가능한 evidence와 남는 risk를 기록하세요.
+    exercise:
+      prompt: choose_pytest_browser_policy(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_pytest_browser_policy(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_pytest_browser_policy(situation):
+            table = {'mutable-context': {'action': 'function-scoped context', 'evidence': 'fresh storage per test', 'risk': 'order dependency'}, 'parallel-run': {'action': 'unique account and artifact paths', 'evidence': 'worker identity', 'risk': 'cross-test collision'}, 'retry-pass': {'action': 'mark flaky and retain first trace', 'evidence': 'all attempts', 'risk': 'hidden instability'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.playwright.playwright_08.pytest-browser-flow-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.playwright.playwright_08.pytest-browser-flow-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_pytest_browser_policy
+        cases:
+        - id: recalls-mutable-context
+          arguments:
+          - value: mutable-context
+          expectedReturn:
+            action: function-scoped context
+            evidence: fresh storage per test
+            risk: order dependency
+        - id: recalls-parallel-run
+          arguments:
+          - value: parallel-run
+          expectedReturn:
+            action: unique account and artifact paths
+            evidence: worker identity
+            risk: cross-test collision
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

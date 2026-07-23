@@ -1,4 +1,4 @@
-"""Diagnostic tool handlers — Predict-Run-Reconcile-Adapt 루프 4단계.
+"""Diagnostic tool handlers for evidence-grounded learner guidance.
 
 AI teacher가 학습자 상태를 읽고 misconception을 매칭해 다음 발자국을 derive한다.
 모든 handler는 결정적이며, 외부 상태는 [[learnerState]] store와 [[misconceptionCatalog]]
@@ -18,10 +18,6 @@ from ...curriculum.misconceptionCatalog import (
     matchCodePattern,
     matchErrorPattern,
 )
-from ...curriculum.predictionDiff import ActualResult, comparePrediction
-from ...curriculum.sectionContract import LearningPredictContract
-
-
 _storeLock = Lock()
 _learnerStateStore: LearnerStateStore | None = None
 _catalogCache: dict[str, MisconceptionCatalog | None] = {}
@@ -77,26 +73,6 @@ class DiagnosticsToolHandlers:
             "misconceptions": [hit.model_dump() for hit in snapshot.misconceptions],
             "execution": snapshot.execution.model_dump(),
             "repeatedMisconceptionCount": len(repeats),
-        }
-
-    async def _handle_recordPredictionResult(self, args: dict[str, Any]) -> dict[str, Any]:
-        outcomeId = args.get("outcomeId")
-        if not outcomeId or not isinstance(outcomeId, str):
-            return {"error": "outcomeId is required"}
-        predictRaw = args.get("predict") or {}
-        actualRaw = args.get("actual") or {}
-        if not isinstance(predictRaw, dict) or not isinstance(actualRaw, dict):
-            return {"error": "predict and actual must be objects"}
-
-        predict = LearningPredictContract.model_validate(predictRaw)
-        actual = ActualResult.model_validate(actualRaw)
-        diff = comparePrediction(predict, actual)
-        mastery = _store().recordPredictionResult(outcomeId, diff)
-
-        return {
-            "outcomeId": outcomeId,
-            "diff": diff.model_dump(),
-            "mastery": mastery.model_dump(),
         }
 
     async def _handle_matchMisconception(self, args: dict[str, Any]) -> dict[str, Any]:

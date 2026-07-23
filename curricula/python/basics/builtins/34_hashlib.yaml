@@ -291,3 +291,278 @@ sections:
     type: noError
     noError: pbkdf2_hmac 호출이 NameError나 TypeError 없이 실행되어야 합니다.
     resultCheck: iterationsAffectKey가 True이고 lengthSame이 True여야 KDF가 iterations에 민감한 것입니다.
+assessment:
+  masteryVariants:
+  - id: 34_hashlib-chunked-digest-mastery
+    mode: mastery
+    unseen: true
+    sourceSectionIds:
+    - hash-small
+    - hash-streaming
+    title: 작은 조각들을 update로 누적해 같은 SHA-256 만들기
+    subtitle: chunked hashing
+    goal: 문자열 chunk 목록을 sha256.update로 누적하고 한 번에 해시한 값과 같은지 반환한다.
+    why: hashlib 숙달은 hexdigest를 외우는 것이 아니라, 큰 데이터도 chunk로 누적해 같은 무결성 값을 만들 수 있음을 아는 것입니다.
+    explanation: digest_text_chunks(chunks)를 완성해 각 chunk를 utf-8로 encode해 update하고 digest, digestLength, matchesDirect를 반환하세요.
+    tips:
+    - chunk 순서가 바뀌면 digest도 바뀝니다.
+    - hexdigest는 SHA-256 기준 64자입니다.
+    exercise:
+      prompt: digest_text_chunks(chunks)를 완성해 chunk 누적 digest와 direct digest 비교 결과를 반환하세요.
+      starterCode: |-
+        def digest_text_chunks(chunks):
+            raise NotImplementedError
+      solution: |-
+        def digest_text_chunks(chunks):
+            import hashlib
+
+            if not chunks:
+                raise ValueError("chunks required")
+
+            digest = hashlib.sha256()
+            for chunk in chunks:
+                digest.update(str(chunk).encode("utf-8"))
+            chunked = digest.hexdigest()
+            direct = hashlib.sha256("".join(str(chunk) for chunk in chunks).encode("utf-8")).hexdigest()
+            return {
+                "digest": chunked,
+                "digestLength": len(chunked),
+                "matchesDirect": chunked == direct,
+                "chunkCount": len(chunks),
+            }
+      hints:
+      - hashlib.sha256() 객체는 update를 여러 번 호출할 수 있습니다.
+      - 직접 해시와 chunked 해시가 같아야 합니다.
+    check:
+      id: python.builtins.hashlib.chunked-digest.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.hashlib.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: digest_text_chunks
+        cases:
+        - id: matches-direct-sha256-for-text-chunks
+          arguments:
+          - value:
+            - co
+            - da
+            - ro
+          expectedReturn:
+            digest: 7804ccd8a4fd4f1dd8dc6cf273a437a2c1c5f596b77598a5fb3b73d9345b93fd
+            digestLength: 64
+            matchesDirect: true
+            chunkCount: 3
+        - id: rejects-empty-chunk-list
+          arguments:
+          - value: []
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  transferVariants:
+  - id: 34_hashlib-hmac-transfer
+    mode: transfer
+    unseen: true
+    sourceSectionIds:
+    - hmac-verify
+    - hash-small
+    title: 공유 키 HMAC 서명을 재계산해 메시지 변조 판정하기
+    subtitle: keyed integrity check
+    goal: key, message, provided_signature을 받아 HMAC-SHA256을 재계산하고 compare_digest 결과를 반환한다.
+    why: 전이 과제에서는 단순 해시에서 키 기반 무결성 검증으로 옮깁니다. 메시지만 같아도 키가 없으면 올바른 서명을 만들 수 없습니다.
+    explanation: verify_hmac_signature(key_text, message_text, provided_signature)를 완성해 expectedSignature, valid, signatureLength를
+      반환하세요.
+    tips:
+    - 비교에는 == 대신 hmac.compare_digest를 사용하세요.
+    - key와 message는 utf-8 bytes로 바꿔 hmac.new에 넣으세요.
+    exercise:
+      prompt: verify_hmac_signature(key_text, message_text, provided_signature)를 완성해 HMAC 검증 결과를 반환하세요.
+      starterCode: |-
+        def verify_hmac_signature(key_text, message_text, provided_signature):
+            raise NotImplementedError
+      solution: |-
+        def verify_hmac_signature(key_text, message_text, provided_signature):
+            import hmac
+
+            if not key_text:
+                raise ValueError("key required")
+            expected = hmac.new(
+                key_text.encode("utf-8"),
+                message_text.encode("utf-8"),
+                digestmod="sha256",
+            ).hexdigest()
+            return {
+                "expectedSignature": expected,
+                "valid": hmac.compare_digest(expected, provided_signature),
+                "signatureLength": len(expected),
+            }
+      hints:
+      - 같은 key와 message만 같은 HMAC을 만듭니다.
+      - provided_signature이 틀리면 valid는 False여야 합니다.
+    check:
+      id: python.builtins.hashlib.hmac.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.hashlib.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: verify_hmac_signature
+        cases:
+        - id: accepts-matching-shared-key-signature
+          arguments:
+          - value: shared-secret
+          - value: transfer:100
+          - value: e86747ef59cc0db2bc1004cee9a819fee6f2fae9d2749a1e15cf9ea51ebf40cf
+          expectedReturn:
+            expectedSignature: e86747ef59cc0db2bc1004cee9a819fee6f2fae9d2749a1e15cf9ea51ebf40cf
+            valid: true
+            signatureLength: 64
+        - id: rejects-empty-key
+          arguments:
+          - value: ''
+          - value: transfer:100
+          - value: e86747ef59cc0db2bc1004cee9a819fee6f2fae9d2749a1e15cf9ea51ebf40cf
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  retrievalVariants:
+  - id: 34_hashlib-tool-choice-retrieval
+    mode: retrieval
+    unseen: true
+    sourceSectionIds:
+    - 34_hashlib-hmac-transfer
+    title: 보안 목적별 hashlib, hmac, secrets 도구 선택 회상하기
+    subtitle: choose the right primitive
+    goal: session-token, cache-key, signed-message, password-storage 목적에 맞는 표준 라이브러리 도구와 이유를 반환한다.
+    why: 시간이 지나도 남아야 할 감각은 아무 해시나 쓰는 것이 아니라, 토큰은 secrets, 캐시 키는 hashlib, 서명 검증은 HMAC, 비밀번호는 KDF라는 구분입니다.
+    explanation: choose_security_primitive(purpose)를 완성해 목적별 tool, deterministic 여부, secretRequired 여부를 반환하세요.
+    tips:
+    - session token은 예측 불가능해야 하므로 secrets가 맞습니다.
+    - password storage는 빠른 sha256이 아니라 pbkdf2_hmac 같은 KDF가 필요합니다.
+    exercise:
+      prompt: choose_security_primitive(purpose)를 완성해 보안 목적별 올바른 표준 라이브러리 도구를 반환하세요.
+      starterCode: |-
+        def choose_security_primitive(purpose):
+            raise NotImplementedError
+      solution: |-
+        def choose_security_primitive(purpose):
+            choices = {
+                "session-token": {
+                    "tool": "secrets.token_urlsafe",
+                    "deterministic": False,
+                    "secretRequired": False,
+                    "reason": "unpredictable token",
+                },
+                "cache-key": {
+                    "tool": "hashlib.sha256",
+                    "deterministic": True,
+                    "secretRequired": False,
+                    "reason": "same content needs same digest",
+                },
+                "signed-message": {
+                    "tool": "hmac.compare_digest",
+                    "deterministic": True,
+                    "secretRequired": True,
+                    "reason": "verify keyed integrity",
+                },
+                "password-storage": {
+                    "tool": "hashlib.pbkdf2_hmac",
+                    "deterministic": True,
+                    "secretRequired": True,
+                    "reason": "slow password key derivation with salt",
+                },
+            }
+            if purpose not in choices:
+                raise ValueError("unknown security purpose")
+            return choices[purpose]
+      hints:
+      - random은 보안 토큰 목적의 답이 아닙니다.
+      - HMAC은 공유 secret key가 있어야 의미가 있습니다.
+    check:
+      id: python.builtins.hashlib.tool-choice.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.builtins.hashlib.empty.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_security_primitive
+        cases:
+        - id: selects-secrets-for-session-token
+          arguments:
+          - value: session-token
+          expectedReturn:
+            tool: secrets.token_urlsafe
+            deterministic: false
+            secretRequired: false
+            reason: unpredictable token
+        - id: selects-kdf-for-password-storage
+          arguments:
+          - value: password-storage
+          expectedReturn:
+            tool: hashlib.pbkdf2_hmac
+            deterministic: true
+            secretRequired: true
+            reason: slow password key derivation with salt
+        - id: rejects-unknown-purpose
+          arguments:
+          - value: random-report-id
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 행동과 데이터 계약을 검증하고, 외부 package·파일 artifact가 필요한 실행은 lesson Run 및 Local
+    evidence로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-existing-assessment
+    solutionVerification: required
+    independentReview: pending

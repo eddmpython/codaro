@@ -1,4 +1,4 @@
-"""Diagnostic tool definitions — Predict-Run-Reconcile-Adapt 루프 4단계.
+"""Diagnostic tool definitions for evidence-grounded learner guidance.
 
 AI teacher가 학습자 mental model 상태를 읽고 갱신하기 위한 도구들.
 [[teacher-tool-loop]]의 diagnosis lane 입구다.
@@ -28,49 +28,10 @@ TOOL_READ_LEARNER_STATE = ToolDef(
 )
 
 
-TOOL_RECORD_PREDICTION_RESULT = ToolDef(
-    name="record-prediction-result",
-    description=(
-        "Record the diff between a learner's prediction and the actual execution "
-        "result for a given outcome. match → mastery+, mismatch → mastery-. "
-        "Returns the updated mastery for that outcome."
-    ),
-    parameters={
-        "type": "object",
-        "properties": {
-            "outcomeId": {"type": "string"},
-            "predict": {
-                "type": "object",
-                "description": "LearningPredictContract shape — expected fields.",
-                "properties": {
-                    "prompt": {"type": "string"},
-                    "expectedShape": {"type": "string"},
-                    "expectedDtype": {"type": "string"},
-                    "expectedValue": {"type": "string"},
-                    "expectedError": {"type": "string"},
-                },
-            },
-            "actual": {
-                "type": "object",
-                "description": "ActualResult — observed fields after execution.",
-                "properties": {
-                    "shape": {"type": "string"},
-                    "dtype": {"type": "string"},
-                    "value": {"type": "string"},
-                    "errorClass": {"type": "string"},
-                },
-            },
-        },
-        "required": ["outcomeId", "predict", "actual"],
-    },
-    handler="recordPredictionResult",
-)
-
-
 TOOL_MATCH_MISCONCEPTION = ToolDef(
     name="match-misconception",
     description=(
-        "Match a learner's submitted code, error traceback, or prediction "
+        "Match a learner's submitted code or error traceback "
         "against the misconception catalog for one or more outcomes. Records "
         "each matched misconception as a hit and reports whether it is a new "
         "or repeat occurrence (repeats are the done criterion to avoid)."

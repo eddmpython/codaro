@@ -1,0 +1,1527 @@
+{
+  "schemaVersion": 1,
+  "sourceManifestHash": "sha256-618b6ef931e0b93e5ba8851b0a47c1b7c6ff8588b0d1b6305c1d101d1b31e414",
+  "assets": [
+    {
+      "id": "runLearningDetail",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run-learning-detail.png",
+      "sourceHash": "sha256-5f004b2afa8f2b997f710c5b64c4ab25a93dce5b8c1680db2016848f5c1bf762",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "local-strong-learning-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 900,
+        "height": 760,
+        "aspectRatio": 1.184211,
+        "focalPoint": {
+          "x": 0.66,
+          "y": 0.45
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-proof",
+          "learn-proof",
+          "documentation"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          720,
+          900
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "Codaro 로컬 학습 화면에서 헬로월드 설명, 코드 예제, 강한 검증 상태가 한 흐름에 표시된 모습",
+        "caption": "설명, 실행 가능한 코드, 자동 검증이 같은 레슨 화면에서 이어집니다.",
+        "learningQuestion": "학습자는 설명을 읽은 뒤 어느 코드 영역을 바꾸고 실행해야 하는가?",
+        "decisionShown": "레슨 설명과 실행 및 검증 위치의 관계",
+        "lessonRefs": [
+          "30일완성/헬로월드"
+        ]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 900,
+          "height": 760
+        },
+        "theme": "dark",
+        "locale": "ko-KR"
+      },
+      "outputs": [
+        {
+          "byteLength": 14079,
+          "format": "avif",
+          "height": 405,
+          "integrity": "sha256-7cb6c5ee515dea55c437f5f39ac611e0cbaed4e2b59ba2a46c861de50c40308a",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-480-5f004b2afa8f.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 15120,
+          "format": "webp",
+          "height": 405,
+          "integrity": "sha256-c5f6c012f2645e6e3467c5ffc522d08f41e5129df48ee9d17ccfe74d628d2984",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-480-5f004b2afa8f.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 27324,
+          "format": "avif",
+          "height": 608,
+          "integrity": "sha256-e3af74fd161bf76961af6fdcf7275284727249e4dd1e48931b3936f9bfda8e66",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-720-5f004b2afa8f.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 30980,
+          "format": "webp",
+          "height": 608,
+          "integrity": "sha256-c1ce5e8c4b82aef97f91cdabc46211762793f5441b3d54fafc7b3ac5408560ef",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-720-5f004b2afa8f.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 30133,
+          "format": "avif",
+          "height": 760,
+          "integrity": "sha256-ee60fa0d932480acfb29e094d74bb2f0e81f6e0146848c3b79fe4c47a57d5ed2",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-900-5f004b2afa8f.avif",
+          "width": 900
+        },
+        {
+          "byteLength": 42934,
+          "format": "webp",
+          "height": 760,
+          "integrity": "sha256-749ce4ee27fba44ca0c5a0e91f067efcd69042516e99971ea8a2a9fa8a06ca5b",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-900-5f004b2afa8f.webp",
+          "width": 900
+        }
+      ]
+    },
+    {
+      "id": "runLearningMobile",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/run-learning-mobile.png",
+      "sourceHash": "sha256-bc3c80e69c771493171151988e1d095589fa9dce06aa97b531fa7a251f5fbc09",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-lesson-mobile",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 390,
+        "height": 844,
+        "aspectRatio": 0.462085,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.42
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-mobile-proof",
+          "learn-mobile-proof"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          390
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "390픽셀 너비의 Codaro 웹 레슨에서 학습 개요와 첫 학습 섹션이 열린 읽기 흐름으로 이어지는 모습",
+        "caption": "모바일에서도 별도 확인 단계 없이 학습 목표 다음에 실습이 이어집니다.",
+        "learningQuestion": "작은 화면에서도 현재 학습 목표와 다음 실습을 동시에 찾을 수 있는가?",
+        "decisionShown": "모바일 레슨의 정보 우선순위",
+        "lessonRefs": [
+          "30일완성/헬로월드"
+        ]
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "theme": "dark",
+        "locale": "ko-KR"
+      },
+      "outputs": [
+        {
+          "byteLength": 22715,
+          "format": "avif",
+          "height": 844,
+          "integrity": "sha256-5b0c6fe249862423ff2c4496657c6739584e980048cb05539a5357c5c41cdc27",
+          "publicPath": "/visuals/files/runLearningMobile/runLearningMobile-390-bc3c80e69c77.avif",
+          "width": 390
+        },
+        {
+          "byteLength": 31978,
+          "format": "webp",
+          "height": 844,
+          "integrity": "sha256-9448e6bbde2d4bb54ceb994682b7a8ef5e8a3b4862977bce85b9ab63b9310572",
+          "publicPath": "/visuals/files/runLearningMobile/runLearningMobile-390-bc3c80e69c77.webp",
+          "width": 390
+        }
+      ]
+    },
+    {
+      "id": "webRunDesktop",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/web-run-desktop.png",
+      "sourceHash": "sha256-24a3746e0ef831559d1f62b1f579b677d032c7d85708842a424943f9e51cd355",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "web-run-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1440,
+        "height": 900,
+        "aspectRatio": 1.6,
+        "focalPoint": {
+          "x": 0.52,
+          "y": 0.34
+        },
+        "safeTextRegion": {
+          "x": 0.2,
+          "y": 0.32,
+          "width": 0.48,
+          "height": 0.48
+        },
+        "fit": "cover",
+        "background": "surface",
+        "proofUsage": [
+          "landing-hero-background",
+          "web-run-proof"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          720,
+          1080,
+          1440
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "설치 없이 브라우저 Python 셀을 실행하는 Codaro Web Run 전체 화면",
+        "caption": "Web Run은 브라우저 파일과 지원 패키지를 사용해 설치 없이 Python 셀을 실행합니다.",
+        "learningQuestion": "웹 실행 환경과 로컬 실행 환경의 권한 차이는 어디에 표시되는가?",
+        "decisionShown": "Web Run의 실행 계층과 지원 범위",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "theme": "dark",
+        "locale": "ko-KR"
+      },
+      "outputs": [
+        {
+          "byteLength": 6473,
+          "format": "avif",
+          "height": 450,
+          "integrity": "sha256-847f9d99477da8acf874622d51accd617fdc17bd51c554d7c6851dae11807f25",
+          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-720-24a3746e0ef8.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 7020,
+          "format": "webp",
+          "height": 450,
+          "integrity": "sha256-f646abb2355bc166d1c86332ed6f16ff79b34d2915d72e98cdbe269cf7b18dd0",
+          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-720-24a3746e0ef8.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 11642,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-49e437dcf59fe166c10eb0e35697fe4338e315beb48cec62142cdd1664bc5416",
+          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-1080-24a3746e0ef8.avif",
+          "width": 1080
+        },
+        {
+          "byteLength": 12910,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-e304c04cd6a619c647412bc1b2087ba4182c5c2eb53395eca373b048d9f8d912",
+          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-1080-24a3746e0ef8.webp",
+          "width": 1080
+        },
+        {
+          "byteLength": 14060,
+          "format": "avif",
+          "height": 900,
+          "integrity": "sha256-275485043b84d3445a3b4bbd69d0268a6d5f6678afda51ff26784fcb24856d2d",
+          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-1440-24a3746e0ef8.avif",
+          "width": 1440
+        },
+        {
+          "byteLength": 20014,
+          "format": "webp",
+          "height": 900,
+          "integrity": "sha256-90b84bd6ff6a0a3793dc109e3a203e98b729a65b5bf2a41dfd735f5795214563",
+          "publicPath": "/visuals/files/webRunDesktop/webRunDesktop-1440-24a3746e0ef8.webp",
+          "width": 1440
+        }
+      ]
+    },
+    {
+      "id": "localNotebookDesktop",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/local-notebook-desktop.png",
+      "sourceHash": "sha256-f63d588e284f23c6ca9615344f5d90498a2b61fbf9cf3c43c94504cf001ee3a1",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "local-run-minimum",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 900,
+        "height": 640,
+        "aspectRatio": 1.40625,
+        "focalPoint": {
+          "x": 0.66,
+          "y": 0.3
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-local-proof",
+          "local-empty-state"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          600,
+          900
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "Codaro Local Studio에서 시스템 Python과 프로젝트 파일 및 터미널이 연결된 빈 노트북 화면",
+        "caption": "Local Studio는 같은 셀 모델에 실제 프로젝트 파일과 시스템 Python을 연결합니다.",
+        "learningQuestion": "웹에서 검증한 코드를 실제 프로젝트 파일로 옮길 때 어떤 실행 계층이 바뀌는가?",
+        "decisionShown": "Local Studio의 런타임 및 파일 권한 확장",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 900,
+          "height": 640
+        },
+        "theme": "dark",
+        "locale": "ko-KR"
+      },
+      "outputs": [
+        {
+          "byteLength": 4958,
+          "format": "avif",
+          "height": 427,
+          "integrity": "sha256-e41f9b3ab2c76078917033aa18b2e52c3c8da0f1f019a4338caf86e27909973a",
+          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-600-f63d588e284f.avif",
+          "width": 600
+        },
+        {
+          "byteLength": 5682,
+          "format": "webp",
+          "height": 427,
+          "integrity": "sha256-dd86c158e076a220f6fc4b4b0de94ec12aadf7ebd5dc31212b37cf2a4ddbef0f",
+          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-600-f63d588e284f.webp",
+          "width": 600
+        },
+        {
+          "byteLength": 7479,
+          "format": "avif",
+          "height": 640,
+          "integrity": "sha256-2210abb3c67efd2dd89feab78ca7becce47eba5523a2281987496e6b8c9bee77",
+          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-900-f63d588e284f.avif",
+          "width": 900
+        },
+        {
+          "byteLength": 10086,
+          "format": "webp",
+          "height": 640,
+          "integrity": "sha256-0fb52d52e70c5ab437b636bb1732a3eeee35c469a1ddf051ead8f4b15fe8252d",
+          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-900-f63d588e284f.webp",
+          "width": 900
+        }
+      ]
+    },
+    {
+      "id": "localAutomationDesktop",
+      "kind": "productScreenshot",
+      "sourceType": "playwrightCapture",
+      "sourcePath": "assets/brand/visuals/product/local-automation-desktop.png",
+      "sourceHash": "sha256-f64373a73e1cfab14fe888463eff3984241684d23c23570c3c1858068b71c48d",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro product capture pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "local-automation-desktop",
+        "promptHash": null,
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1440,
+        "height": 900,
+        "aspectRatio": 1.6,
+        "focalPoint": {
+          "x": 0.62,
+          "y": 0.45
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "surface",
+        "proofUsage": [
+          "landing-automation-proof",
+          "local-automation-operational-state"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          720,
+          1080,
+          1440
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "Codaro Local 자동화 화면에서 브라우저 루틴, 파일 정리, 엑셀 반복 작업과 예약 태스크 상태가 보이는 모습",
+        "caption": "검증된 셀과 recipe는 로컬에서 파일 작업과 예약 실행으로 확장됩니다.",
+        "learningQuestion": "반복 실행할 수 있는 코드와 아직 학습 중인 코드를 어떻게 구분하는가?",
+        "decisionShown": "검증된 코드가 자동화 recipe와 task로 승격되는 경계",
+        "lessonRefs": []
+      },
+      "capture": {
+        "browser": "chromium",
+        "browserVersion": "149.0.7827.55",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "theme": "dark",
+        "locale": "ko-KR"
+      },
+      "outputs": [
+        {
+          "byteLength": 17079,
+          "format": "avif",
+          "height": 450,
+          "integrity": "sha256-e44c0bd252977fbe76001dfb9d4029d88172235333549d1d7eae48f58a7a6817",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-720-f64373a73e1c.avif",
+          "width": 720
+        },
+        {
+          "byteLength": 18044,
+          "format": "webp",
+          "height": 450,
+          "integrity": "sha256-db92b37b863523ea7da5455c66d35ccb349d306b3167701c8250adfba7eb8bda",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-720-f64373a73e1c.webp",
+          "width": 720
+        },
+        {
+          "byteLength": 33269,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-45726ae2a51c1535d777a7187682e5f03d718b2a0451b246726f42f192ece318",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-f64373a73e1c.avif",
+          "width": 1080
+        },
+        {
+          "byteLength": 35764,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-9da997a43e83692ca8b6e6c2f2c81a3a85725bc39f408d5d1f9443de40ed61cf",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1080-f64373a73e1c.webp",
+          "width": 1080
+        },
+        {
+          "byteLength": 38551,
+          "format": "avif",
+          "height": 900,
+          "integrity": "sha256-7782dc1914ef6d876ddea2684da96b9dd5baf494a80bbfa262ac8e56c943928a",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-f64373a73e1c.avif",
+          "width": 1440
+        },
+        {
+          "byteLength": 55136,
+          "format": "webp",
+          "height": 900,
+          "integrity": "sha256-9d3bec946d60a5af8807140fb5baeffc87aff09cded45bb3c81dbd619c9a7b0f",
+          "publicPath": "/visuals/files/localAutomationDesktop/localAutomationDesktop-1440-f64373a73e1c.webp",
+          "width": 1440
+        }
+      ]
+    },
+    {
+      "id": "pythonFundamentals",
+      "kind": "instructional",
+      "sourceType": "generatedRaster",
+      "sourcePath": "assets/brand/visuals/learning/python-fundamentals-v1.png",
+      "sourceHash": "sha256-209adca76258d3aa9f5ae79b7d9e24916861f49b125ce007db3449da97757fb4",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro visual authoring pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "python-fundamentals-domain-v1",
+        "promptHash": "sha256-45246801d7843b7af2cc0174e818e81a9d9e0d1925a4e7b738222dce3e4e5d38",
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1672,
+        "height": 941,
+        "aspectRatio": 1.776833,
+        "focalPoint": {
+          "x": 0.58,
+          "y": 0.55
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "light-neutral",
+        "proofUsage": [
+          "learning-domain-basics",
+          "lesson-context"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          840,
+          1200,
+          1672
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR",
+          "en-US"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "밝은 작업대에서 변수, 문자열, 리스트, 제어 흐름을 색상 타일과 연결선으로 설명한 파이썬 기초 학습 이미지",
+        "caption": "값의 종류가 컬렉션과 제어 흐름으로 이어지는 파이썬 기초 구조입니다.",
+        "learningQuestion": "하나의 값은 어떤 과정을 거쳐 컬렉션과 반복 흐름으로 확장되는가?",
+        "decisionShown": "변수, 자료형, 컬렉션, 제어 흐름의 선후 관계",
+        "lessonRefs": [
+          "30days/day02_변수와데이터타입",
+          "30days/day07_리스트기초"
+        ]
+      },
+      "outputs": [
+        {
+          "byteLength": 11504,
+          "format": "avif",
+          "height": 270,
+          "integrity": "sha256-e301f55fab41699e4745282a8038e6830e028804eb69bce49fbe10ae400bb388",
+          "publicPath": "/visuals/files/pythonFundamentals/pythonFundamentals-480-209adca76258.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 16338,
+          "format": "webp",
+          "height": 270,
+          "integrity": "sha256-371c84bb92bdb3af61a78d786a892276d888dc6b45bd6600e5b0a4e39e2d5270",
+          "publicPath": "/visuals/files/pythonFundamentals/pythonFundamentals-480-209adca76258.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 26158,
+          "format": "avif",
+          "height": 473,
+          "integrity": "sha256-16cdfc1e1427035a58236359168c50b1850ee4390efbc91630efe04b976db179",
+          "publicPath": "/visuals/files/pythonFundamentals/pythonFundamentals-840-209adca76258.avif",
+          "width": 840
+        },
+        {
+          "byteLength": 35382,
+          "format": "webp",
+          "height": 473,
+          "integrity": "sha256-d462be2df7630399756a9e1a19141ba0dfc55ee769cccb3bfc054da0a7788b08",
+          "publicPath": "/visuals/files/pythonFundamentals/pythonFundamentals-840-209adca76258.webp",
+          "width": 840
+        },
+        {
+          "byteLength": 46892,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-628cc31e5e6cf5c0cdf9329e8c058b3aa0f428bb4779fb39138550a9cd0667b9",
+          "publicPath": "/visuals/files/pythonFundamentals/pythonFundamentals-1200-209adca76258.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 59198,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-5f232eeb3978d33d47f1e1035592daf6ad7302a7193ee01b575b12ab052974b8",
+          "publicPath": "/visuals/files/pythonFundamentals/pythonFundamentals-1200-209adca76258.webp",
+          "width": 1200
+        },
+        {
+          "byteLength": 81676,
+          "format": "avif",
+          "height": 941,
+          "integrity": "sha256-72991a39ea7aeafee7e778687807a1dfba69b802cc94cf25b1c36fd62998978e",
+          "publicPath": "/visuals/files/pythonFundamentals/pythonFundamentals-1672-209adca76258.avif",
+          "width": 1672
+        },
+        {
+          "byteLength": 93774,
+          "format": "webp",
+          "height": 941,
+          "integrity": "sha256-615e16e4ba2b2f2057ff6d433b3170e4ded028d2b3a45c10f62b2e681cff6eb9",
+          "publicPath": "/visuals/files/pythonFundamentals/pythonFundamentals-1672-209adca76258.webp",
+          "width": 1672
+        }
+      ]
+    },
+    {
+      "id": "dataAnalysis",
+      "kind": "instructional",
+      "sourceType": "generatedRaster",
+      "sourcePath": "assets/brand/visuals/learning/data-analysis-v1.png",
+      "sourceHash": "sha256-b0ac8b2e66927c41d410f959896410f0a492827eabab47b6306f350f853b0c58",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro visual authoring pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "data-analysis-domain-v1",
+        "promptHash": "sha256-c737f07e956cf2e3c97cdec7ff696187f3585c3d665865623c2873a344bba484",
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1672,
+        "height": 941,
+        "aspectRatio": 1.776833,
+        "focalPoint": {
+          "x": 0.54,
+          "y": 0.48
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "light-neutral",
+        "proofUsage": [
+          "learning-domain-data-analysis",
+          "lesson-context"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          840,
+          1200,
+          1672
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR",
+          "en-US"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "원본 표가 정리, 그룹화, 비교 차트, 보고서로 이어지는 데이터 분석 학습 이미지",
+        "caption": "원본 데이터를 정리하고 묶어 비교 가능한 결과로 바꾸는 분석 흐름입니다.",
+        "learningQuestion": "원본 행은 어떤 변환을 거쳐 비교 가능한 결과가 되는가?",
+        "decisionShown": "정리, 그룹화, 비교, 보고의 분석 순서",
+        "lessonRefs": []
+      },
+      "outputs": [
+        {
+          "byteLength": 11281,
+          "format": "avif",
+          "height": 270,
+          "integrity": "sha256-615dfb198d1a13fd82f4ea75fcad0a68989723a421fbdcb86901c6eb995096e7",
+          "publicPath": "/visuals/files/dataAnalysis/dataAnalysis-480-b0ac8b2e6692.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 14340,
+          "format": "webp",
+          "height": 270,
+          "integrity": "sha256-8ead9345daff9a49a75f68af636854f4caf44ba8b455f88be283613df9e922c5",
+          "publicPath": "/visuals/files/dataAnalysis/dataAnalysis-480-b0ac8b2e6692.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 25442,
+          "format": "avif",
+          "height": 473,
+          "integrity": "sha256-5416761f91d9a2a069506e6ea3414b07c857573f674e70cfee4c2840602b6207",
+          "publicPath": "/visuals/files/dataAnalysis/dataAnalysis-840-b0ac8b2e6692.avif",
+          "width": 840
+        },
+        {
+          "byteLength": 31002,
+          "format": "webp",
+          "height": 473,
+          "integrity": "sha256-e8215ca785c1773ea81cc4fe1d767dd0ac02789f0548eae229b6da5a6ad6105d",
+          "publicPath": "/visuals/files/dataAnalysis/dataAnalysis-840-b0ac8b2e6692.webp",
+          "width": 840
+        },
+        {
+          "byteLength": 44129,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-e257c79b3fe12bab5361cf68f21d369a8f50933cf55f160559ac75e0d34b30eb",
+          "publicPath": "/visuals/files/dataAnalysis/dataAnalysis-1200-b0ac8b2e6692.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 52892,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-b49dca518c376c2461b227584f796f021444286c7aff11765a3a2d989555c715",
+          "publicPath": "/visuals/files/dataAnalysis/dataAnalysis-1200-b0ac8b2e6692.webp",
+          "width": 1200
+        },
+        {
+          "byteLength": 76155,
+          "format": "avif",
+          "height": 941,
+          "integrity": "sha256-44569cc141aecedad12160a5c4ea662680dc8ac16c566f82ddc0918e93bb2583",
+          "publicPath": "/visuals/files/dataAnalysis/dataAnalysis-1672-b0ac8b2e6692.avif",
+          "width": 1672
+        },
+        {
+          "byteLength": 84020,
+          "format": "webp",
+          "height": 941,
+          "integrity": "sha256-8c9d74b2627c363591505adb993a232b9b1870a7994e103557ad84a3da0a2fed",
+          "publicPath": "/visuals/files/dataAnalysis/dataAnalysis-1672-b0ac8b2e6692.webp",
+          "width": 1672
+        }
+      ]
+    },
+    {
+      "id": "dataVisualization",
+      "kind": "instructional",
+      "sourceType": "generatedRaster",
+      "sourcePath": "assets/brand/visuals/learning/data-visualization-v1.png",
+      "sourceHash": "sha256-5248dc1b6fb113b1ba93c003d507db6bc20fbd7680b9f1d8abc1ac8c803dc509",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro visual authoring pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "data-visualization-domain-v1",
+        "promptHash": "sha256-e850f31ca2c0d2bb88f54fe8d763a0bdeec70ed29732a5d466f8746a04ed35f1",
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1672,
+        "height": 941,
+        "aspectRatio": 1.776833,
+        "focalPoint": {
+          "x": 0.58,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "light-neutral",
+        "proofUsage": [
+          "learning-domain-visualization",
+          "lesson-context"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          840,
+          1200,
+          1672
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR",
+          "en-US"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "같은 데이터가 막대, 선, 산점도, 분포 차트로 달리 표현되는 시각화 학습 이미지",
+        "caption": "같은 값도 질문에 따라 적합한 시각적 표현이 달라집니다.",
+        "learningQuestion": "비교, 변화, 관계, 분포에는 각각 어떤 차트가 맞는가?",
+        "decisionShown": "데이터 질문과 시각적 인코딩의 대응",
+        "lessonRefs": []
+      },
+      "outputs": [
+        {
+          "byteLength": 9259,
+          "format": "avif",
+          "height": 270,
+          "integrity": "sha256-b83e1f53a6e0e802c7715d3bfa0f917b9178fcaacbee7b124b2016a3ec53e0d2",
+          "publicPath": "/visuals/files/dataVisualization/dataVisualization-480-5248dc1b6fb1.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 11586,
+          "format": "webp",
+          "height": 270,
+          "integrity": "sha256-05a6093f8f69d62e68b10d1dcece77511a2a1aea5e10eea6ccdbbcf66dc13098",
+          "publicPath": "/visuals/files/dataVisualization/dataVisualization-480-5248dc1b6fb1.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 19738,
+          "format": "avif",
+          "height": 473,
+          "integrity": "sha256-2f8ada81eeaa68893bd90aab89fe6bcbeec3ada3a13802bcd89e8b882734c173",
+          "publicPath": "/visuals/files/dataVisualization/dataVisualization-840-5248dc1b6fb1.avif",
+          "width": 840
+        },
+        {
+          "byteLength": 22296,
+          "format": "webp",
+          "height": 473,
+          "integrity": "sha256-f0fcd60a89425eb0bf4715eaf21eda32bed42ac0539a355688be9288160e0f1c",
+          "publicPath": "/visuals/files/dataVisualization/dataVisualization-840-5248dc1b6fb1.webp",
+          "width": 840
+        },
+        {
+          "byteLength": 32610,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-e2ce17f156b4c4d4440d77bad6413f2c063cede019ccf08a5877d3e66ff978ba",
+          "publicPath": "/visuals/files/dataVisualization/dataVisualization-1200-5248dc1b6fb1.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 35912,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-e2338ec66ffae1c020e1a79d45b1d3222b6f86e82f15b528cd99485df5c51273",
+          "publicPath": "/visuals/files/dataVisualization/dataVisualization-1200-5248dc1b6fb1.webp",
+          "width": 1200
+        },
+        {
+          "byteLength": 56904,
+          "format": "avif",
+          "height": 941,
+          "integrity": "sha256-d2e25e0420922475b97eddd072946295beaa7770e9f6a00f439f18eb14bea516",
+          "publicPath": "/visuals/files/dataVisualization/dataVisualization-1672-5248dc1b6fb1.avif",
+          "width": 1672
+        },
+        {
+          "byteLength": 59218,
+          "format": "webp",
+          "height": 941,
+          "integrity": "sha256-fbf7f238509eb4ed4580bc309ef9c0c4357a186499aab5d2ea10a025cca0fea4",
+          "publicPath": "/visuals/files/dataVisualization/dataVisualization-1672-5248dc1b6fb1.webp",
+          "width": 1672
+        }
+      ]
+    },
+    {
+      "id": "statisticsMachineLearning",
+      "kind": "instructional",
+      "sourceType": "generatedRaster",
+      "sourcePath": "assets/brand/visuals/learning/statistics-ml-v1.png",
+      "sourceHash": "sha256-d6e581dafc4f7321429f12a8895e28915532d7a5679f649fdc80194f546d64eb",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro visual authoring pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "statistics-machine-learning-domain-v1",
+        "promptHash": "sha256-882f948c62f95971f176cc50ee33b87daead4134ea0bcd2130c9bcba9ac4d0a5",
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1672,
+        "height": 941,
+        "aspectRatio": 1.776833,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.48
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "light-neutral",
+        "proofUsage": [
+          "learning-domain-math-stats-ml",
+          "lesson-context"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          840,
+          1200,
+          1672
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR",
+          "en-US"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "표본, 분포, 적합 곡선, 결정 경계, 평가 결과를 단계별로 보여 주는 통계와 머신러닝 학습 이미지",
+        "caption": "표본의 불확실성을 모델에 반영하고 별도 데이터로 판단을 검증합니다.",
+        "learningQuestion": "모델의 적합과 일반화는 어떤 서로 다른 근거로 판단하는가?",
+        "decisionShown": "표본, 적합, 분리, 평가의 모델링 순서",
+        "lessonRefs": []
+      },
+      "outputs": [
+        {
+          "byteLength": 11922,
+          "format": "avif",
+          "height": 270,
+          "integrity": "sha256-1314621abbc7ade0c95eb9a1354a51066def15ebc782f065eb6435c61148f298",
+          "publicPath": "/visuals/files/statisticsMachineLearning/statisticsMachineLearning-480-d6e581dafc4f.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 15054,
+          "format": "webp",
+          "height": 270,
+          "integrity": "sha256-d5f604e2c26ede39cf092042a1c2fd2e7bc29ac7c579397e4f4f0187dfd80b68",
+          "publicPath": "/visuals/files/statisticsMachineLearning/statisticsMachineLearning-480-d6e581dafc4f.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 27472,
+          "format": "avif",
+          "height": 473,
+          "integrity": "sha256-65952ad98de804835e65ca404a3594051bb45602e18efa465c3ec6555eca4ad9",
+          "publicPath": "/visuals/files/statisticsMachineLearning/statisticsMachineLearning-840-d6e581dafc4f.avif",
+          "width": 840
+        },
+        {
+          "byteLength": 32676,
+          "format": "webp",
+          "height": 473,
+          "integrity": "sha256-d435d9c8326bd8d79088b45e57ff9a4ac1d3fdd9ba550e781831537b7a538260",
+          "publicPath": "/visuals/files/statisticsMachineLearning/statisticsMachineLearning-840-d6e581dafc4f.webp",
+          "width": 840
+        },
+        {
+          "byteLength": 48588,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-15b2d32c93f92023c2b208e56d91b4c12ce022c216af232b3616f0be5182dfbc",
+          "publicPath": "/visuals/files/statisticsMachineLearning/statisticsMachineLearning-1200-d6e581dafc4f.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 54260,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-6b3d9ce0e94bd6be14c64a6ab738aae3eb626b2124575e4311a33a765656687b",
+          "publicPath": "/visuals/files/statisticsMachineLearning/statisticsMachineLearning-1200-d6e581dafc4f.webp",
+          "width": 1200
+        },
+        {
+          "byteLength": 86267,
+          "format": "avif",
+          "height": 941,
+          "integrity": "sha256-289b26c21d6c2d4d1c478ab80ad309088622378ca42546c41f29bd34823c1c9f",
+          "publicPath": "/visuals/files/statisticsMachineLearning/statisticsMachineLearning-1672-d6e581dafc4f.avif",
+          "width": 1672
+        },
+        {
+          "byteLength": 92566,
+          "format": "webp",
+          "height": 941,
+          "integrity": "sha256-f270f2851ed12f093e60190e5636f48f96e7acf8da12b0dab82ab76e603f70c6",
+          "publicPath": "/visuals/files/statisticsMachineLearning/statisticsMachineLearning-1672-d6e581dafc4f.webp",
+          "width": 1672
+        }
+      ]
+    },
+    {
+      "id": "imageVision",
+      "kind": "instructional",
+      "sourceType": "generatedRaster",
+      "sourcePath": "assets/brand/visuals/learning/image-vision-v1.png",
+      "sourceHash": "sha256-1b1922d95f3dfcf836d24fa8c3e11c7c02c79f8a20f968f2c89d21609fed17b2",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro visual authoring pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "image-vision-domain-v1",
+        "promptHash": "sha256-73fc05ae505bab09936dba44d712c45d882f7bafe4b9634a5b0bdb4055abd3ab",
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1672,
+        "height": 941,
+        "aspectRatio": 1.776833,
+        "focalPoint": {
+          "x": 0.56,
+          "y": 0.48
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "light-neutral",
+        "proofUsage": [
+          "learning-domain-image-vision",
+          "lesson-context"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          840,
+          1200,
+          1672
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR",
+          "en-US"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "과일 사진이 픽셀과 색 채널, 변환, 윤곽, 분할 결과로 이어지는 이미지 처리 학습 이미지",
+        "caption": "하나의 이미지를 픽셀 수준에서 변환하고 경계와 객체로 해석하는 흐름입니다.",
+        "learningQuestion": "원본 픽셀은 어떤 변환을 거쳐 측정 가능한 객체가 되는가?",
+        "decisionShown": "픽셀, 변환, 윤곽, 분할, 측정의 처리 순서",
+        "lessonRefs": []
+      },
+      "outputs": [
+        {
+          "byteLength": 14421,
+          "format": "avif",
+          "height": 270,
+          "integrity": "sha256-0ce6e6300a1f31a1416431431e13d99612939bb2b082abc70551dd75e6bc4374",
+          "publicPath": "/visuals/files/imageVision/imageVision-480-1b1922d95f3d.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 19532,
+          "format": "webp",
+          "height": 270,
+          "integrity": "sha256-0c87a6ef1932e92d90927e09d7c0654d47d0457d6dcf1628b21155ced1de2c96",
+          "publicPath": "/visuals/files/imageVision/imageVision-480-1b1922d95f3d.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 32974,
+          "format": "avif",
+          "height": 473,
+          "integrity": "sha256-a162917dbfeb4c125bc531586f428137ae5620364f6eaa5f88544e5be9cbf69b",
+          "publicPath": "/visuals/files/imageVision/imageVision-840-1b1922d95f3d.avif",
+          "width": 840
+        },
+        {
+          "byteLength": 43094,
+          "format": "webp",
+          "height": 473,
+          "integrity": "sha256-14caa8d3e02ce128c388b6bc7d247bfec9e8034f4de17e70b2efe1a80185f77e",
+          "publicPath": "/visuals/files/imageVision/imageVision-840-1b1922d95f3d.webp",
+          "width": 840
+        },
+        {
+          "byteLength": 56217,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-1d40c9fb17521e19cdf91c0f13941aafedb12e0cb35fb9f6d3931519f528cfa5",
+          "publicPath": "/visuals/files/imageVision/imageVision-1200-1b1922d95f3d.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 70918,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-33b7713451abf7828989e418bdae1ecf46cca51f8750775dbd8b2d125d28e2da",
+          "publicPath": "/visuals/files/imageVision/imageVision-1200-1b1922d95f3d.webp",
+          "width": 1200
+        },
+        {
+          "byteLength": 90697,
+          "format": "avif",
+          "height": 941,
+          "integrity": "sha256-81fc84b76a58ec50da73d90ef48786f46f115fb0e2a3f68c4ff0f8223cfaedab",
+          "publicPath": "/visuals/files/imageVision/imageVision-1672-1b1922d95f3d.avif",
+          "width": 1672
+        },
+        {
+          "byteLength": 107846,
+          "format": "webp",
+          "height": 941,
+          "integrity": "sha256-a38ed926d7223cb728e70f89387a3b44bde87597a64c712574a77623d606bbfd",
+          "publicPath": "/visuals/files/imageVision/imageVision-1672-1b1922d95f3d.webp",
+          "width": 1672
+        }
+      ]
+    },
+    {
+      "id": "learningAutomation",
+      "kind": "instructional",
+      "sourceType": "generatedRaster",
+      "sourcePath": "assets/brand/visuals/learning/automation-v1.png",
+      "sourceHash": "sha256-a21d2e9766461642abe4dfc44073c44d58709fd483c51ab73b5682ed9fb2c482",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro visual authoring pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "learning-automation-domain-v1",
+        "promptHash": "sha256-2f378e592935ce87e9eed1ae357053602f5e9a625cf8a656d28f5dbff71165b7",
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1672,
+        "height": 941,
+        "aspectRatio": 1.776833,
+        "focalPoint": {
+          "x": 0.54,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "light-neutral",
+        "proofUsage": [
+          "learning-domain-automation",
+          "lesson-context"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          840,
+          1200,
+          1672
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR",
+          "en-US"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "입력 파일, 검증된 recipe, 안전 점검, 예약, 보고서, 감사 기록이 반복 흐름으로 연결된 자동화 학습 이미지",
+        "caption": "검증된 코드는 안전 점검과 기록을 포함한 반복 작업으로 확장됩니다.",
+        "learningQuestion": "반복 실행 전에 어떤 검증과 안전 경계가 필요한가?",
+        "decisionShown": "입력, dry-run, 예약, 산출물, 감사의 자동화 흐름",
+        "lessonRefs": []
+      },
+      "outputs": [
+        {
+          "byteLength": 10173,
+          "format": "avif",
+          "height": 270,
+          "integrity": "sha256-fc5aa25d690eac16c33aa5b3d48915adaea4aff47ef717348c6866fb1b5e89fc",
+          "publicPath": "/visuals/files/learningAutomation/learningAutomation-480-a21d2e976646.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 12224,
+          "format": "webp",
+          "height": 270,
+          "integrity": "sha256-fd8ead676c5e4b9c39ffb9545f4eea89b764ef7d01297420eefe6a7330000672",
+          "publicPath": "/visuals/files/learningAutomation/learningAutomation-480-a21d2e976646.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 21616,
+          "format": "avif",
+          "height": 473,
+          "integrity": "sha256-1a5ee27465d6f03216f2b14fa50b824179c797cc597fe8b2d4426cb84ece8d87",
+          "publicPath": "/visuals/files/learningAutomation/learningAutomation-840-a21d2e976646.avif",
+          "width": 840
+        },
+        {
+          "byteLength": 26626,
+          "format": "webp",
+          "height": 473,
+          "integrity": "sha256-513db4fb6035d181de0e723b60b68631f5c95c2878d08c4360cb3f43b1ffc628",
+          "publicPath": "/visuals/files/learningAutomation/learningAutomation-840-a21d2e976646.webp",
+          "width": 840
+        },
+        {
+          "byteLength": 39915,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-815bba1701824f2e2b0d52f38ae920a91a8fa142bf2f965d4e49ccd58f4f1bde",
+          "publicPath": "/visuals/files/learningAutomation/learningAutomation-1200-a21d2e976646.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 44458,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-b3ef89f2c7c4e763eb30951cc3630710433a2298b9d0e13335388d865de97a23",
+          "publicPath": "/visuals/files/learningAutomation/learningAutomation-1200-a21d2e976646.webp",
+          "width": 1200
+        },
+        {
+          "byteLength": 81422,
+          "format": "avif",
+          "height": 941,
+          "integrity": "sha256-3ee3472a88c1ce22fe59ae03b0aa23d471cc5742e41182459ef4c53d8f27d885",
+          "publicPath": "/visuals/files/learningAutomation/learningAutomation-1672-a21d2e976646.avif",
+          "width": 1672
+        },
+        {
+          "byteLength": 81240,
+          "format": "webp",
+          "height": 941,
+          "integrity": "sha256-76b73aa18fad216a6f08b5bdfe149d93e2d0c49460b880329416d8a27887f7c1",
+          "publicPath": "/visuals/files/learningAutomation/learningAutomation-1672-a21d2e976646.webp",
+          "width": 1672
+        }
+      ]
+    },
+    {
+      "id": "developerLiteracy",
+      "kind": "instructional",
+      "sourceType": "generatedRaster",
+      "sourcePath": "assets/brand/visuals/learning/developer-literacy-v1.png",
+      "sourceHash": "sha256-9990255713daf2a6fe88169aaf2fe0f78d79b155d02dc807ddda39e79a1424da",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro visual authoring pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "developer-literacy-domain-v1",
+        "promptHash": "sha256-85e38fd1ca4b81e80c950874eb38b7ad64a9fe79549dc36514be63d4bed709aa",
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1672,
+        "height": 941,
+        "aspectRatio": 1.776833,
+        "focalPoint": {
+          "x": 0.5,
+          "y": 0.5
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "light-neutral",
+        "proofUsage": [
+          "learning-domain-developer-literacy",
+          "lesson-context"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          840,
+          1200,
+          1672
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR",
+          "en-US"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "저장소와 폴더, 소스 파일, 터미널, 버전 이력, 테스트, 패키지, 문서의 관계를 보여 주는 개발 학습 이미지",
+        "caption": "작은 소프트웨어 프로젝트를 구성하는 파일, 실행, 검증, 배포의 관계입니다.",
+        "learningQuestion": "소스 변경은 어떤 검증과 패키징 단계를 거쳐 공유되는가?",
+        "decisionShown": "저장소, 실행, 테스트, 패키지, 문서의 프로젝트 구조",
+        "lessonRefs": []
+      },
+      "outputs": [
+        {
+          "byteLength": 9979,
+          "format": "avif",
+          "height": 270,
+          "integrity": "sha256-0905d56585552ada51d01246a8366eb988810e361e36039d41bfa1ae9df94db8",
+          "publicPath": "/visuals/files/developerLiteracy/developerLiteracy-480-9990255713da.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 12560,
+          "format": "webp",
+          "height": 270,
+          "integrity": "sha256-6f5b5d9d55af3ab7054be335ddb9e7301eb7c92b036712490237b263b98bfd11",
+          "publicPath": "/visuals/files/developerLiteracy/developerLiteracy-480-9990255713da.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 20194,
+          "format": "avif",
+          "height": 473,
+          "integrity": "sha256-b99f90899d9b4900f861dc1c8e4c26dbdd2fd6a08a7142980b58bd9c497368ca",
+          "publicPath": "/visuals/files/developerLiteracy/developerLiteracy-840-9990255713da.avif",
+          "width": 840
+        },
+        {
+          "byteLength": 25048,
+          "format": "webp",
+          "height": 473,
+          "integrity": "sha256-b76b85f78787c3e1b1b771e182233cd67197fe378ab238b4e51911182be8f8a2",
+          "publicPath": "/visuals/files/developerLiteracy/developerLiteracy-840-9990255713da.webp",
+          "width": 840
+        },
+        {
+          "byteLength": 32719,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-eb3d7a35d4976f5abf5d20b126ccb2fa41014dc0c53495e20cb70c197de305f4",
+          "publicPath": "/visuals/files/developerLiteracy/developerLiteracy-1200-9990255713da.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 39052,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-7d3b5be47a4404aedb4035e9484ff4c8475bb47abc9e283e9664a0ddc071544e",
+          "publicPath": "/visuals/files/developerLiteracy/developerLiteracy-1200-9990255713da.webp",
+          "width": 1200
+        },
+        {
+          "byteLength": 56732,
+          "format": "avif",
+          "height": 941,
+          "integrity": "sha256-92bbc46f2fac5202abeb17b6394d1f3922382b3b5a45875bc753990e7bbbf9da",
+          "publicPath": "/visuals/files/developerLiteracy/developerLiteracy-1672-9990255713da.avif",
+          "width": 1672
+        },
+        {
+          "byteLength": 64212,
+          "format": "webp",
+          "height": 941,
+          "integrity": "sha256-2d809a76d05c0bf8f69b845f970b45d25e86a552d336404edbdf13322086c8fd",
+          "publicPath": "/visuals/files/developerLiteracy/developerLiteracy-1672-9990255713da.webp",
+          "width": 1672
+        }
+      ]
+    },
+    {
+      "id": "aiIntegration",
+      "kind": "instructional",
+      "sourceType": "generatedRaster",
+      "sourcePath": "assets/brand/visuals/learning/ai-integration-v1.png",
+      "sourceHash": "sha256-37e84d22dbb900c25cb41555f02f92442bbc4e56c9e4103bf39aa58ba4f76423",
+      "sourceGitHead": "527e0e2627e7e85f75a2b760b3bf3e59d5b4b184",
+      "provenance": {
+        "author": "Codaro visual authoring pipeline",
+        "license": "proprietary-project",
+        "licenseUrl": null,
+        "fixtureId": "ai-integration-domain-v1",
+        "promptHash": "sha256-51f558f4635cfe113f30a3771b3d16437bd96f712cb726b65347c3f0e32c7479",
+        "lessonContentHash": null
+      },
+      "rendering": {
+        "width": 1672,
+        "height": 941,
+        "aspectRatio": 1.776833,
+        "focalPoint": {
+          "x": 0.52,
+          "y": 0.48
+        },
+        "safeTextRegion": null,
+        "fit": "contain",
+        "background": "light-neutral",
+        "proofUsage": [
+          "learning-domain-ai-integration",
+          "lesson-context"
+        ]
+      },
+      "variants": {
+        "formats": [
+          "avif",
+          "webp"
+        ],
+        "responsiveWidths": [
+          480,
+          840,
+          1200,
+          1672
+        ],
+        "lightDark": "single",
+        "locales": [
+          "ko-KR",
+          "en-US"
+        ],
+        "offlineIncluded": true
+      },
+      "learning": {
+        "alt": "입력과 문서가 검색, 모델, 도구 호출, 출처가 있는 응답, 평가로 이어지는 AI 통합 학습 이미지",
+        "caption": "출처와 도구 경계를 유지하면서 모델 응답을 실제 작업과 평가로 연결합니다.",
+        "learningQuestion": "모델의 응답을 근거와 도구 실행, 평가에 어떻게 묶는가?",
+        "decisionShown": "입력, 검색, 모델, 도구, 출처, 평가의 통합 경계",
+        "lessonRefs": []
+      },
+      "outputs": [
+        {
+          "byteLength": 9552,
+          "format": "avif",
+          "height": 270,
+          "integrity": "sha256-487e8b063b2e0ae51904d09726f1d7fb3e84b65152176fc932325fe54d54ba8b",
+          "publicPath": "/visuals/files/aiIntegration/aiIntegration-480-37e84d22dbb9.avif",
+          "width": 480
+        },
+        {
+          "byteLength": 12406,
+          "format": "webp",
+          "height": 270,
+          "integrity": "sha256-dfcb1ffdef2acd20bf9c2d042bbd95ca5635dece63a317e0bf966fcd81944b93",
+          "publicPath": "/visuals/files/aiIntegration/aiIntegration-480-37e84d22dbb9.webp",
+          "width": 480
+        },
+        {
+          "byteLength": 18226,
+          "format": "avif",
+          "height": 473,
+          "integrity": "sha256-6c0f92b0edb93e78a489b119835e2a2573f5c21bd32778d01806e61e5165a1be",
+          "publicPath": "/visuals/files/aiIntegration/aiIntegration-840-37e84d22dbb9.avif",
+          "width": 840
+        },
+        {
+          "byteLength": 24094,
+          "format": "webp",
+          "height": 473,
+          "integrity": "sha256-3993d20323c7bb9f095a2ca38ffac2153f34130cf64ea32d42e0835a8b6240bb",
+          "publicPath": "/visuals/files/aiIntegration/aiIntegration-840-37e84d22dbb9.webp",
+          "width": 840
+        },
+        {
+          "byteLength": 30314,
+          "format": "avif",
+          "height": 675,
+          "integrity": "sha256-3e66bb9877bdb37e9ec300aff4053d1d628afb324ea2fbaf4e297f1d997a383b",
+          "publicPath": "/visuals/files/aiIntegration/aiIntegration-1200-37e84d22dbb9.avif",
+          "width": 1200
+        },
+        {
+          "byteLength": 37968,
+          "format": "webp",
+          "height": 675,
+          "integrity": "sha256-26d910cfb52aacdea7f8d458ae98d409cdc7e35e615b3aebd8040db9296d90f2",
+          "publicPath": "/visuals/files/aiIntegration/aiIntegration-1200-37e84d22dbb9.webp",
+          "width": 1200
+        },
+        {
+          "byteLength": 50577,
+          "format": "avif",
+          "height": 941,
+          "integrity": "sha256-625c4658d09cdda578b789aa135b5bb3c844a3500a6ac4fbc687cec45c7d118c",
+          "publicPath": "/visuals/files/aiIntegration/aiIntegration-1672-37e84d22dbb9.avif",
+          "width": 1672
+        },
+        {
+          "byteLength": 59516,
+          "format": "webp",
+          "height": 941,
+          "integrity": "sha256-5060a88db1b54da6744c98c5cc94a634afd63caccb78e070a71abfad61cc4fdd",
+          "publicPath": "/visuals/files/aiIntegration/aiIntegration-1672-37e84d22dbb9.webp",
+          "width": 1672
+        }
+      ]
+    }
+  ]
+}

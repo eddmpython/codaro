@@ -576,3 +576,295 @@ sections:
   check:
     noError: 10단계. 다중 뷰 연결 검증 루프의 DataFrame 입력, 컬럼 참조, 행 길이 조건이 맞아야 합니다.
     resultCheck: 10단계. 다중 뷰 연결 검증 루프의 shape, 컬럼 목록, head()/집계 결과가 바꾼 데이터 조건을 반영해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: altair_08-linked-multiview-data-evidence-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - step1_load
+    - workflow_validation
+    title: 다중 view 연결 데이터 증거 만들기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 선택이 서로 다른 grain의 view에 올바르게 전파되는가에 답하기 전에 usable·excluded 분모와 축 범위를 고정한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 차트에 들어가지 않은 NULL 행도 excludedCount로 보존하세요.
+    - 축 범위와 그룹별 표본 수 없이 모양만 해석하지 마세요.
+    exercise:
+      prompt: prepare_linked_multiview(rows)를 완성해 차트에 실제 사용된 행 수, 제외 수, 그룹 수, 두 축 범위를 반환하세요.
+      starterCode: |-
+        def prepare_linked_multiview(rows):
+            raise NotImplementedError
+      solution: |
+        def prepare_linked_multiview(rows):
+            required = ['period', 'metric', 'view']
+            if any(not set(required) <= set(row) for row in rows):
+                raise ValueError("chart schema mismatch")
+            usable = [row for row in rows if all(row[name] is not None for name in required)]
+            groups = {}
+            group_field = 'view'
+            for row in usable:
+                key = "all" if group_field is None else str(row[group_field])
+                groups[key] = groups.get(key, 0) + 1
+            x_values = [row['period'] for row in usable]
+            y_values = [row['metric'] for row in usable]
+            return {
+                "usableCount": len(usable),
+                "excludedCount": len(rows) - len(usable),
+                "groupCounts": {key: groups[key] for key in sorted(groups)},
+                "xExtent": None if not x_values else [min(x_values), max(x_values)],
+                "yExtent": None if not y_values else [min(y_values), max(y_values)],
+            }
+      hints: *id001
+    check:
+      id: python.altair.altair_08.linked-multiview-data-evidence.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.altair.altair_08.linked-multiview-data-evidence.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: prepare_linked_multiview
+        cases:
+        - id: summarizes-visible-data
+          arguments:
+          - value:
+            - period: 1
+              metric: 10
+              view: overview
+            - period: 2
+              metric: 15
+              view: overview
+            - period: 1
+              metric: 3
+              view: detail
+          expectedReturn:
+            usableCount: 3
+            excludedCount: 0
+            groupCounts:
+              detail: 1
+              overview: 2
+            xExtent:
+            - 1
+            - 2
+            yExtent:
+            - 3
+            - 15
+        - id: handles-empty-data
+          arguments:
+          - value: []
+          expectedReturn:
+            usableCount: 0
+            excludedCount: 0
+            groupCounts: {}
+            xExtent: null
+            yExtent: null
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: altair_08-linked-multiview-encoding-transfer-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - altair_08-linked-multiview-data-evidence-mastery
+    title: 다중 view 연결 인코딩 계약을 새 문맥에 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: overview 기간 brush가 category summary와 row detail에 같은 scope로 전달된다라는 새 문맥에서도 mark·axis·transform·interaction 책임을 재현한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 표현 mark만 맞아도 충분하지 않습니다. 축·그룹·변환을 함께 검사하세요.
+    - description은 보이지 않는 사용자와 차트를 열 수 없는 상황의 핵심 증거입니다.
+    exercise:
+      prompt: audit_linked_multiview(candidate)를 완성해 주어진 차트 사양의 오류와 기대 encoding을 반환하세요.
+      starterCode: |-
+        def audit_linked_multiview(candidate):
+            raise NotImplementedError
+      solution: |
+        def audit_linked_multiview(candidate):
+            expected = {'mark': 'linked-views', 'x': 'period', 'y': 'metric', 'group': 'view', 'transforms': ['grain-contract', 'shared-selection'], 'interaction': 'linked-filter'}
+            errors = []
+            for name in ["mark", "x", "y", "group", "transforms", "interaction"]:
+                actual = sorted(candidate.get(name, [])) if name == "transforms" else candidate.get(name)
+                if actual != expected[name]:
+                    errors.append(name)
+            if not str(candidate.get("description", "")).strip():
+                errors.append("description")
+            return {"valid": not errors, "errors": errors, "encoding": expected}
+      hints: *id002
+    check:
+      id: python.altair.altair_08.linked-multiview-encoding-transfer.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.altair.altair_08.linked-multiview-encoding-transfer.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_linked_multiview
+        cases:
+        - id: accepts-complete-encoding
+          arguments:
+          - value:
+              mark: linked-views
+              x: period
+              y: metric
+              group: view
+              transforms:
+              - grain-contract
+              - shared-selection
+              interaction: linked-filter
+              description: overview 기간 brush가 category summary와 row detail에 같은 scope로 전달된다
+          expectedReturn:
+            valid: true
+            errors: []
+            encoding:
+              mark: linked-views
+              x: period
+              y: metric
+              group: view
+              transforms:
+              - grain-contract
+              - shared-selection
+              interaction: linked-filter
+        - id: reports-misleading-encoding
+          arguments:
+          - value:
+              mark: table
+              x: metric
+              y: period
+              group: null
+              transforms: []
+              interaction: none
+              description: ''
+          expectedReturn:
+            valid: false
+            errors:
+            - mark
+            - x
+            - y
+            - group
+            - transforms
+            - interaction
+            - description
+            encoding:
+              mark: linked-views
+              x: period
+              y: metric
+              group: view
+              transforms:
+              - grain-contract
+              - shared-selection
+              interaction: linked-filter
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: altair_08-linked-multiview-interpretation-retrieval-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - altair_08-linked-multiview-encoding-transfer-transfer
+    title: 다중 view 연결 해석 위험 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 선택이 서로 다른 grain의 view에 올바르게 전파되는가을 다시 판단할 때 차트 선택과 증거 한계를 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 차트가 보여주는 패턴과 인과 주장을 구분하세요.
+    - 축·분모·결측·표본 수 중 무엇이 해석을 바꾸는지 명시하세요.
+    exercise:
+      prompt: choose_linked_multiview(situation)를 완성해 encoding, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_linked_multiview(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_linked_multiview(situation):
+            table = {'overview-to-detail': {'encoding': 'brush filter', 'evidence': 'scope count per view', 'risk': 'grain mismatch'}, 'highlight-only': {'encoding': 'conditional opacity', 'evidence': 'unselected context remains', 'risk': 'filter confusion'}, 'independent-views': {'encoding': 'separate parameters', 'evidence': 'named controls', 'risk': 'parameter collision'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.altair.altair_08.linked-multiview-interpretation-retrieval.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.altair.altair_08.linked-multiview-interpretation-retrieval.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_linked_multiview
+        cases:
+        - id: recalls-overview-to-detail
+          arguments:
+          - value: overview-to-detail
+          expectedReturn:
+            encoding: brush filter
+            evidence: scope count per view
+            risk: grain mismatch
+        - id: recalls-highlight-only
+          arguments:
+          - value: highlight-only
+          expectedReturn:
+            encoding: conditional opacity
+            evidence: unselected context remains
+            risk: filter confusion
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

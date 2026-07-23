@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "candidate": {
+    "studentSource": "def inspect_frames(): ...",
+    "studentAndExpectedShareRuntimePayload": true,
+    "workerPayloadKeys": [
+      "source",
+      "expectedReturn",
+      "expectedException"
+    ]
+  },
+  "expectedFailure": {
+    "code": "shared-student-expected-namespace",
+    "reason": "학생 코드가 실행되는 process 또는 Worker payload에 기대 반환값과 기대 예외를 함께 전달할 수 없습니다."
+  }
+}

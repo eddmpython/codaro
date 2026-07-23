@@ -283,3 +283,312 @@ sections:
     check:
       noError: captureRegion 호출이 끝나야 한다.
       resultCheck: size가 (80, 60)이고 fileBytes가 양수이고 path가 capture.png로 끝나야 한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: inputCtl_05-screenshot-region-audit-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - full-screenshot
+    - capture-report
+    title: 스크린샷 region의 화면 경계·pixel budget 감사하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: 양수 크기와 containment, 최대 pixel 수를 검사한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 전체 화면 대신 필요한 UI region만 캡처해 민감정보와 비용을 줄이세요.
+    - region containment와 pixel budget을 캡처 전에 검사하세요.
+    exercise:
+      prompt: audit_screenshot_region(region, screen, maximum_pixels)를 완성하세요.
+      starterCode: |-
+        def audit_screenshot_region(region, screen, maximum_pixels):
+            raise NotImplementedError
+      solution: |
+        def audit_screenshot_region(region, screen, maximum_pixels):
+            failures = []
+            if region["width"] <= 0 or region["height"] <= 0:
+                failures.append("size")
+            contained = region["x"] >= screen["x"] and region["y"] >= screen["y"] and region["x"] + region["width"] <= screen["x"] + screen["width"] and region["y"] + region["height"] <= screen["y"] + screen["height"]
+            if not contained:
+                failures.append("bounds")
+            pixels = max(0, region["width"]) * max(0, region["height"])
+            if pixels > maximum_pixels:
+                failures.append("pixel-budget")
+            return {"accepted": not failures, "failures": failures, "pixels": pixels, "contained": contained}
+      hints: *id001
+    check:
+      id: python.inputctl.inputCtl_05.screenshot-region-audit.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_05.screenshot-region-audit.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_screenshot_region
+        cases:
+        - id: accepts-contained-region
+          arguments:
+          - value:
+              x: 10
+              y: 10
+              width: 100
+              height: 50
+          - value:
+              x: 0
+              y: 0
+              width: 200
+              height: 100
+          - value: 10000
+          expectedReturn:
+            accepted: true
+            failures: []
+            pixels: 5000
+            contained: true
+        - id: reports-bounds-and-budget
+          arguments:
+          - value:
+              x: 150
+              y: 0
+              width: 100
+              height: 100
+          - value:
+              x: 0
+              y: 0
+              width: 200
+              height: 100
+          - value: 5000
+          expectedReturn:
+            accepted: false
+            failures:
+            - bounds
+            - pixel-budget
+            pixels: 10000
+            contained: false
+        - id: reports-zero-size
+          arguments:
+          - value:
+              x: 0
+              y: 0
+              width: 0
+              height: 10
+          - value:
+              x: 0
+              y: 0
+              width: 100
+              height: 100
+          - value: 1000
+          expectedReturn:
+            accepted: false
+            failures:
+            - size
+            pixels: 0
+            contained: true
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: inputCtl_05-screenshot-mask-plan-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inputCtl_05-screenshot-region-audit-mastery
+    title: 새 화면 증거에 민감 region mask 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: 필수 mask 누락과 화면 전체를 가리는 과도한 mask를 찾는다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - 민감 region은 selector·ID 단위로 mask하고 화면 전체를 가리지 마세요.
+    - required mask 목록과 실제 적용 목록을 evidence에 남기세요.
+    exercise:
+      prompt: audit_screenshot_masks(capture, masks, required_mask_ids)를 완성하세요.
+      starterCode: |-
+        def audit_screenshot_masks(capture, masks, required_mask_ids):
+            raise NotImplementedError
+      solution: |
+        def audit_screenshot_masks(capture, masks, required_mask_ids):
+            ids = {mask["id"] for mask in masks}
+            missing = sorted(set(required_mask_ids) - ids)
+            capture_area = capture["width"] * capture["height"]
+            excessive = []
+            for mask in masks:
+                area = mask["width"] * mask["height"]
+                if capture_area and area / capture_area > 0.5:
+                    excessive.append(mask["id"])
+            failures = []
+            if missing:
+                failures.append("missing-mask")
+            if excessive:
+                failures.append("excessive-mask")
+            return {"accepted": not failures, "failures": failures, "missing": missing, "excessive": sorted(excessive)}
+      hints: *id002
+    check:
+      id: python.inputctl.inputCtl_05.screenshot-mask-plan.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_05.screenshot-mask-plan.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_screenshot_masks
+        cases:
+        - id: accepts-targeted-mask
+          arguments:
+          - value:
+              width: 100
+              height: 100
+          - value:
+            - id: email
+              width: 20
+              height: 10
+          - value:
+            - email
+          expectedReturn:
+            accepted: true
+            failures: []
+            missing: []
+            excessive: []
+        - id: reports-missing-mask
+          arguments:
+          - value:
+              width: 100
+              height: 100
+          - value: []
+          - value:
+            - token
+          expectedReturn:
+            accepted: false
+            failures:
+            - missing-mask
+            missing:
+            - token
+            excessive: []
+        - id: reports-screen-covering-mask
+          arguments:
+          - value:
+              width: 100
+              height: 100
+          - value:
+            - id: all
+              width: 90
+              height: 90
+          - value:
+            - all
+          expectedReturn:
+            accepted: false
+            failures:
+            - excessive-mask
+            missing: []
+            excessive:
+            - all
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: inputCtl_05-screenshot-region-recall-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - inputCtl_05-screenshot-mask-plan-transfer
+    title: 스크린샷 region 품질 기준 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 경계·민감정보·시각 evidence 역할을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 입력 자동화 action 전에 대상·경계·중단 방법을 검증하세요.
+    - 화면 변화와 E-Stop evidence를 남기고 성공을 클릭 발생으로 판단하지 마세요.
+    exercise:
+      prompt: choose_screenshot_region(situation)를 완성해 action, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_screenshot_region(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_screenshot_region(situation):
+            table = {'bounds': {'action': 'validate contained positive region', 'evidence': 'screen and region geometry', 'risk': 'off-screen capture'}, 'privacy': {'action': 'mask targeted sensitive regions', 'evidence': 'mask IDs and areas', 'risk': 'secret exposure'}, 'evidence': {'action': 'bind state viewport and hash', 'evidence': 'capture manifest', 'risk': 'unidentified screenshot'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.inputctl.inputCtl_05.screenshot-region-recall.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.inputctl.inputCtl_05.screenshot-region-recall.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_screenshot_region
+        cases:
+        - id: recalls-bounds
+          arguments:
+          - value: bounds
+          expectedReturn:
+            action: validate contained positive region
+            evidence: screen and region geometry
+            risk: off-screen capture
+        - id: recalls-privacy
+          arguments:
+          - value: privacy
+          expectedReturn:
+            action: mask targeted sensitive regions
+            evidence: mask IDs and areas
+            risk: secret exposure
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

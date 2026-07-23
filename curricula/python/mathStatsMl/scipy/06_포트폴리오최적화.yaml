@@ -600,3 +600,279 @@ sections:
     type: noError
     noError: 업무 흐름 검증에서 `allowedMean` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
     resultCheck: 업무 흐름 검증에서 기대값과 실제 결과가 같으면 검증이 통과하고, 다르면 실패해야 합니다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 웹에서는 외부 패키지 없이 분석 판단과 데이터 계약을 검증하고, 실제 패키지 API와 산출물은 lesson Run 및 Local 실습 증거로 분리합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: scipy_06-portfolio-moments-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - load
+    - workflow_validation
+    title: 포트폴리오 기대수익과 분산 계산하기
+    subtitle: 새 입력으로 핵심 분석 재현
+    goal: weight 합과 covariance shape를 검사해 risk-return을 반환한다.
+    why: worked example을 복사하지 않고 새 레코드에서 같은 분석 판단을 재현해야 개념 숙달을 확인할 수 있습니다.
+    explanation: 브라우저의 격리된 Python Worker가 보이지 않던 정상·경계·오류 입력으로 함수를 다시 호출합니다.
+    tips: &id001
+    - 분산은 covariance의 off-diagonal 항까지 포함합니다.
+    - 과거 기대수익을 보장 수익으로 표현하지 마세요.
+    exercise:
+      prompt: portfolio_metrics(weights, returns, covariance)를 완성하세요.
+      starterCode: |-
+        def portfolio_metrics(weights, returns, covariance):
+            raise NotImplementedError
+      solution: |
+        def portfolio_metrics(weights, returns, covariance):
+            n = len(weights)
+            if n == 0 or len(returns) != n or len(covariance) != n or any(len(row) != n for row in covariance): raise ValueError("shape mismatch")
+            if abs(sum(weights)-1) > 1e-9: raise ValueError("weights must sum to one")
+            expected = sum(weight*ret for weight,ret in zip(weights,returns))
+            variance = sum(weights[i]*covariance[i][j]*weights[j] for i in range(n) for j in range(n))
+            return {"expectedReturn": round(expected,6), "variance": round(variance,6), "volatility": round(variance**0.5,6)}
+      hints: *id001
+    check:
+      id: python.scipy.scipy_06.portfolio-moments.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_06.portfolio-moments.mastery.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: portfolio_metrics
+        cases:
+        - id: computes-two-asset-metrics
+          arguments:
+          - value:
+            - 0.5
+            - 0.5
+          - value:
+            - 0.1
+            - 0.2
+          - value:
+            - - 0.04
+              - 0.01
+            - - 0.01
+              - 0.09
+          expectedReturn:
+            expectedReturn: 0.15
+            variance: 0.0375
+            volatility: 0.193649
+        - id: computes-single-asset
+          arguments:
+          - value:
+            - 1.0
+          - value:
+            - 0.08
+          - value:
+            - - 0.0225
+          expectedReturn:
+            expectedReturn: 0.08
+            variance: 0.0225
+            volatility: 0.15
+        - id: rejects-weight-sum
+          arguments:
+          - value:
+            - 0.4
+            - 0.4
+          - value:
+            - 0.1
+            - 0.2
+          - value:
+            - - 1
+              - 0
+            - - 0
+              - 1
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: scipy_06-portfolio-constraint-audit-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_06-portfolio-moments-mastery
+    title: 새 최적화 결과에 제약 검증 전이하기
+    subtitle: 다른 업무 문맥으로 판단 전이
+    goal: weight bounds, 합, 집중도 제한을 검사한다.
+    why: 같은 판단을 다른 데이터 계약과 업무 질문으로 옮겨야 특정 예제 암기와 전이를 구분할 수 있습니다.
+    explanation: 숙달 근거가 저장되면 별도 확인 클릭 없이 열리는 새 문맥 과제입니다.
+    tips: &id002
+    - optimizer 성공 뒤 제약식을 독립적으로 다시 계산하세요.
+    - 목적함수 최적과 투자 적합성을 같은 것으로 부르지 마세요.
+    exercise:
+      prompt: audit_portfolio_weights(weights, lower, upper, maximum_concentration)를 완성하세요.
+      starterCode: |-
+        def audit_portfolio_weights(weights, lower, upper, maximum_concentration):
+            raise NotImplementedError
+      solution: |
+        def audit_portfolio_weights(weights, lower, upper, maximum_concentration):
+            failures = []
+            if abs(sum(weights)-1) > 1e-6: failures.append("sum")
+            if any(weight < lower or weight > upper for weight in weights): failures.append("bounds")
+            concentration = sum(weight*weight for weight in weights)
+            if concentration > maximum_concentration: failures.append("concentration")
+            return {"accepted": not failures, "failures": failures, "sum": round(sum(weights),6), "concentration": round(concentration,6)}
+      hints: *id002
+    check:
+      id: python.scipy.scipy_06.portfolio-constraint-audit.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_06.portfolio-constraint-audit.transfer.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: audit_portfolio_weights
+        cases:
+        - id: accepts-diversified-weights
+          arguments:
+          - value:
+            - 0.5
+            - 0.5
+          - value: 0
+          - value: 0.7
+          - value: 0.6
+          expectedReturn:
+            accepted: true
+            failures: []
+            sum: 1.0
+            concentration: 0.5
+        - id: rejects-concentrated-result
+          arguments:
+          - value:
+            - 0.9
+            - 0.1
+          - value: 0
+          - value: 1
+          - value: 0.7
+          expectedReturn:
+            accepted: false
+            failures:
+            - concentration
+            sum: 1.0
+            concentration: 0.82
+        - id: reports-sum-and-bounds
+          arguments:
+          - value:
+            - 1.2
+            - -0.1
+          - value: 0
+          - value: 1
+          - value: 2
+          expectedReturn:
+            accepted: false
+            failures:
+            - sum
+            - bounds
+            sum: 1.1
+            concentration: 1.45
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: scipy_06-portfolio-optimization-evidence-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - scipy_06-portfolio-constraint-audit-transfer
+    title: 포트폴리오 최적화 증거 회상하기
+    subtitle: 7일 뒤 기준을 기억에서 복원
+    goal: 목적함수·제약·불확실성을 구분한다.
+    why: 시간을 둔 뒤 핵심 기준을 다시 구성해야 단기 모방과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일 뒤 자동으로 열리며, worked example은 다시 노출하지 않습니다.
+    tips: &id003
+    - 수치 방법의 입력 가정과 오차 근거를 함께 남기세요.
+    - p-value나 최적화 성공 flag 하나를 결론으로 사용하지 마세요.
+    exercise:
+      prompt: choose_portfolio_evidence(situation)를 완성해 method, evidence, risk를 반환하세요.
+      starterCode: |-
+        def choose_portfolio_evidence(situation):
+            raise NotImplementedError
+      solution: |
+        def choose_portfolio_evidence(situation):
+            table = {'risk-return': {'method': 'mean covariance optimization', 'evidence': 'weights constraints frontier', 'risk': 'estimation error'}, 'no-short': {'method': 'bounded optimization', 'evidence': 'weight audit', 'risk': 'solver tolerance'}, 'deployment': {'method': 'out-of-sample backtest', 'evidence': 'costs turnover drawdown', 'risk': 'lookahead'}}
+            if situation not in table:
+                raise ValueError('unknown situation')
+            return table[situation]
+      hints: *id003
+    check:
+      id: python.scipy.scipy_06.portfolio-optimization-evidence.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.scipy.scipy_06.portfolio-optimization-evidence.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-5H2hz41NNRiQqR7gqqk7c7FuxPecIr+coT1+YyQEi2s=
+      fixture:
+        directories:
+        - input
+        - output
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: choose_portfolio_evidence
+        cases:
+        - id: recalls-risk-return
+          arguments:
+          - value: risk-return
+          expectedReturn:
+            method: mean covariance optimization
+            evidence: weights constraints frontier
+            risk: estimation error
+        - id: recalls-no-short
+          arguments:
+          - value: no-short
+          expectedReturn:
+            method: bounded optimization
+            evidence: weight audit
+            risk: solver tolerance
+        - id: rejects-unknown
+          arguments:
+          - value: unknown
+          expectedException: ValueError
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168

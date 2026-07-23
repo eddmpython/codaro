@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codaro.dev/contracts/visual-asset-manifest.schema.json",
+  "title": "Codaro VisualAssetManifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "assets"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "assets": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/asset" }
+    }
+  },
+  "$defs": {
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "sourceType",
+        "sourcePath",
+        "sourceHash",
+        "sourceGitHead",
+        "provenance",
+        "rendering",
+        "variants",
+        "learning"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][A-Za-z0-9]+$" },
+        "kind": {
+          "enum": ["productScreenshot", "outcomeProof", "instructional", "brandCharacter", "socialPreview", "video"]
+        },
+        "sourceType": {
+          "enum": ["playwrightCapture", "generatedRaster", "authoredRaster", "licensedMedia", "videoCapture"]
+        },
+        "sourcePath": { "type": "string", "minLength": 1 },
+        "sourceHash": { "type": "string", "pattern": "^sha256-[0-9a-f]{64}$" },
+        "sourceGitHead": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "provenance": { "$ref": "#/$defs/provenance" },
+        "rendering": { "$ref": "#/$defs/rendering" },
+        "variants": { "$ref": "#/$defs/variants" },
+        "learning": { "$ref": "#/$defs/learning" },
+        "capture": { "$ref": "#/$defs/capture" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["author", "license", "licenseUrl", "fixtureId"],
+      "properties": {
+        "author": { "type": "string", "minLength": 1 },
+        "license": { "type": "string", "minLength": 1 },
+        "licenseUrl": { "type": ["string", "null"] },
+        "fixtureId": { "type": "string", "minLength": 1 },
+        "promptHash": { "type": ["string", "null"] },
+        "lessonContentHash": { "type": ["string", "null"] }
+      }
+    },
+    "rendering": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height", "aspectRatio", "focalPoint", "safeTextRegion", "fit", "background", "proofUsage"],
+      "properties": {
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "aspectRatio": { "type": "number", "exclusiveMinimum": 0 },
+        "focalPoint": { "$ref": "#/$defs/point" },
+        "safeTextRegion": { "anyOf": [{ "$ref": "#/$defs/region" }, { "type": "null" }] },
+        "fit": { "enum": ["contain", "cover", "natural"] },
+        "background": { "type": "string", "minLength": 1 },
+        "proofUsage": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number", "minimum": 0, "maximum": 1 },
+        "y": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "region": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "number", "minimum": 0, "maximum": 1 },
+        "y": { "type": "number", "minimum": 0, "maximum": 1 },
+        "width": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+        "height": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
+      }
+    },
+    "variants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["formats", "responsiveWidths", "lightDark", "locales", "offlineIncluded"],
+      "properties": {
+        "formats": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["avif", "webp"] }
+        },
+        "responsiveWidths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "integer", "minimum": 240, "maximum": 2560 }
+        },
+        "lightDark": { "enum": ["single", "paired", "adaptive"] },
+        "locales": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 2 } },
+        "offlineIncluded": { "type": "boolean" }
+      }
+    },
+    "learning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["alt", "caption", "learningQuestion", "decisionShown", "lessonRefs"],
+      "properties": {
+        "alt": { "type": "string", "minLength": 1 },
+        "caption": { "type": "string", "minLength": 1 },
+        "learningQuestion": { "type": "string" },
+        "decisionShown": { "type": "string" },
+        "lessonRefs": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["browser", "browserVersion", "viewport", "theme", "locale"],
+      "properties": {
+        "browser": { "const": "chromium" },
+        "browserVersion": { "type": "string", "minLength": 1 },
+        "viewport": { "$ref": "#/$defs/viewport" },
+        "theme": { "enum": ["light", "dark"] },
+        "locale": { "type": "string", "minLength": 2 }
+      }
+    },
+    "viewport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "type": "integer", "minimum": 240 },
+        "height": { "type": "integer", "minimum": 320 }
+      }
+    }
+  }
+}

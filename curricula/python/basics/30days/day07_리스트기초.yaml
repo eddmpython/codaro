@@ -3,6 +3,9 @@ meta:
   title: 리스트기초
   day: 7
   category: 30days
+  outcomes: ["python.lists"]
+  prerequisites: ["python.variables"]
+  estimatedMinutes: 40
   tags:
   - 리스트
   - 인덱싱
@@ -70,9 +73,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 리스트란?에서 `items` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -98,9 +98,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: 다양한 리스트 생성에서 `nums` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -126,9 +123,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 리스트 인덱싱에서 `basket` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -154,9 +148,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 음수 인덱싱에서 `values` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -182,9 +173,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 리스트 슬라이싱에서 `rainbow` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -210,9 +198,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 슬라이싱 step에서 `sequence` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -238,9 +223,6 @@ sections:
     hints:
     - 바꿀 지점은 print() 안의 문자열, 변수명, 쉼표로 연결된 값입니다.
     - 실행 뒤 출력 영역에 수정한 문구나 값이 빠짐없이 보이는지 확인하세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 리스트 수정의 print() 호출이 따옴표와 괄호 조건을 만족하고 출력되어야 합니다.
@@ -266,9 +248,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 리스트 길이에서 `goods` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -296,9 +275,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 리스트 연결에서 `front` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -324,9 +300,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: 리스트 반복에서 `base` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -352,9 +325,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀을 실행하면 출력 영역과 마지막 표현식에 무엇이 표시될까요?
-      expectedValue: (직접 실행해 본 결과를 적어주세요)
   check:
     type: noError
     noError: in/not in 연산자에서 `bucket` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -399,9 +369,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: '검증 루프: 재고 목록 정합성 확인에서 `dailyTasks` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.'
@@ -427,9 +394,6 @@ sections:
     hints:
     - 바꿀 지점은 대괄호 안의 항목, 인덱스, 슬라이스 범위입니다.
     - 실행 뒤 선택된 값, 길이, 순서가 바꾼 리스트 기준과 맞는지 보세요.
-    predict:
-      prompt: 셀 마지막 표현식의 값은 어떻게 표시될까요?
-      expectedValue: (직접 실행해 본 값을 적어주세요)
   check:
     type: noError
     noError: Day 7 종합 복습에서 `nums` 할당문의 오른쪽 값이 SyntaxError 없이 평가되어야 합니다.
@@ -448,3 +412,225 @@ sections:
     - 인덱싱
     - 슬라이싱
     aiFollowup: 학습자가 적은 헷갈림 지점에 대해 다음 day08(리스트 메서드) 또는 day26(컴프리헨션)에서 어떻게 다시 다루는지 안내한다.
+assessment:
+  schemaVersion: 1
+  performanceClaim: 브라우저의 격리된 Python Worker가 숨은 입력으로 핵심 Python 행동을 검증하고, 파일 산출물이 있는 과제는 Local 재실행 증거를 추가로 요구합니다.
+  tierParity:
+    web: portable-concept
+    local: package-practice-and-artifact
+  supportPolicy: 첫 실패는 실제 반환값과 계약 차이를 inline으로 보여주고 정답 전체는 자동 노출하지 않습니다.
+  authoring:
+    source: curated-blueprint
+    solutionVerification: required
+    independentReview: pending
+  masteryVariants:
+  - id: day07-score-summary-mastery
+    mode: mastery
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - list_intro
+    - reflection
+    title: 점수 목록의 핵심 값 요약하기
+    subtitle: 예시 없이 핵심 규칙 완성
+    goal: 리스트에서 최솟값, 최댓값, 합계를 순서대로 만든다.
+    why: 앞 예시를 복사하지 않고 여러 입력에서 같은 규칙이 성립해야 개념을 익혔다고 볼 수 있습니다.
+    explanation: 함수 본문을 완성하면 격리된 Python Worker가 보이지 않던 여러 입력으로 다시 호출합니다.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: score_summary(scores)가 [최솟값, 최댓값, 합계]를 반환하도록 완성하세요.
+      starterCode: |-
+        def score_summary(scores):
+            raise NotImplementedError
+      solution: |-
+        def score_summary(scores):
+            return [min(scores), max(scores), sum(scores)]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day07.score-summary.mastery.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day07.score-summary.mastery.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: score_summary
+        cases:
+        - id: mixed
+          arguments:
+          - value:
+            - 30
+            - 10
+            - 20
+          expectedReturn:
+          - 10
+          - 30
+          - 60
+        - id: single
+          arguments:
+          - value:
+            - 7
+          expectedReturn:
+          - 7
+          - 7
+          - 7
+        expectedPaths: []
+        normalizeReturnPaths: []
+  transferVariants:
+  - id: day07-rotate-left-transfer
+    mode: transfer
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day07-score-summary-mastery
+    title: 목록을 원하는 칸만큼 회전하기
+    subtitle: 처음 보는 조건에 개념 적용
+    goal: 슬라이싱을 변경 가능한 항목 목록에 적용한다.
+    why: 같은 문법을 처음 보는 데이터와 업무 조건에 옮겨야 실제 활용 능력을 확인할 수 있습니다.
+    explanation: 숙달 검증이 저장된 뒤 자동으로 열리는 새 조건 과제입니다. 앞 정답 문구가 아니라 입력과 반환 계약을 읽으세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: rotate_left(items, steps)가 목록을 왼쪽으로 steps칸 회전한 새 목록을 반환하도록 완성하세요.
+      starterCode: |-
+        def rotate_left(items, steps):
+            raise NotImplementedError
+      solution: |-
+        def rotate_left(items, steps):
+            steps %= len(items)
+            return items[steps:] + items[:steps]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day07.rotate-left.transfer.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day07.rotate-left.transfer.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: rotate_left
+        cases:
+        - id: one
+          arguments:
+          - value:
+            - 1
+            - 2
+            - 3
+            - 4
+          - value: 1
+          expectedReturn:
+          - 2
+          - 3
+          - 4
+          - 1
+        - id: wrapped
+          arguments:
+          - value:
+            - a
+            - b
+            - c
+          - value: 4
+          expectedReturn:
+          - b
+          - c
+          - a
+        expectedPaths: []
+        normalizeReturnPaths: []
+  retrievalVariants:
+  - id: day07-second-last-retrieval
+    mode: retrieval
+    unseen: true
+    claimScope: portable-concept
+    reviewStatus: machine-verified-pending-independent-review
+    sourceSectionIds:
+    - day07-rotate-left-transfer
+    title: 두 위치의 목록 값 다시 고르기
+    subtitle: 7일 뒤 기억에서 재구성
+    goal: 양수와 음수 인덱스를 리스트에서 다시 사용한다.
+    why: 시간을 두고 다시 구성해야 잠깐 본 코드를 따라 쓴 것과 장기 기억을 구분할 수 있습니다.
+    explanation: 전이 과제를 통과한 지 7일이 지나면 자동으로 열립니다. 예시 없이 함수 계약부터 복원하세요.
+    tips:
+    - 함수 이름과 매개변수는 바꾸지 말고 본문만 완성하세요.
+    - 첫 실패에서는 표시된 실제 반환값과 계약의 차이 한 가지부터 고치세요.
+    exercise:
+      prompt: second_and_last(items)가 두 번째 값과 마지막 값을 새 목록으로 반환하도록 완성하세요.
+      starterCode: |-
+        def second_and_last(items):
+            raise NotImplementedError
+      solution: |-
+        def second_and_last(items):
+            return [items[1], items[-1]]
+      hints:
+      - 반환값의 타입과 순서가 문제의 계약과 같은지 먼저 확인하세요.
+      - 한 예시를 하드코딩하면 다른 격리 입력에서 통과하지 않습니다.
+    check:
+      id: python.30days.day07.second-last.retrieval.behavior.v1
+      version: 1
+      kind: behavior
+      strength: strong
+      executor: browser-worker
+      timeoutMs: 8000
+      fixtureId: python.30days.day07.second-last.retrieval.behavior.v1.fixture
+      fixtureHash: sha256-EUE3dsIaRrkQcqkx52hMvHYX4XSUaDqh+aRH0f9shqI=
+      fixture:
+        directories: []
+        env:
+          LANG: C.UTF-8
+          TZ: UTC
+        files: []
+        stdin: []
+      packageAssets: []
+      payload:
+        entry: second_and_last
+        cases:
+        - id: numbers
+          arguments:
+          - value:
+            - 5
+            - 6
+            - 7
+            - 8
+          expectedReturn:
+          - 6
+          - 8
+        - id: words
+          arguments:
+          - value:
+            - first
+            - middle
+            - last
+          expectedReturn:
+          - middle
+          - last
+        expectedPaths: []
+        normalizeReturnPaths: []
+    minimumDelayHours: 168
