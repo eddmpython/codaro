@@ -2510,34 +2510,60 @@ mod tests {
 
     fn write_python_wrapper(runtime_dir: &Path, python: &Path) {
         if cfg!(windows) {
-            fs::write(
-                runtime_dir.join("python.cmd"),
-                format!("@echo off\r\n\"{}\" %*\r\n", python.display()),
-            )
-            .unwrap();
+            let wrapper_path = runtime_dir.join("python.cmd");
+            let wrapper = format!("@echo off\r\n\"{}\" %*\r\n", python.display());
+            if wrapper_path.exists() {
+                assert_eq!(fs::read_to_string(&wrapper_path).unwrap(), wrapper);
+            } else {
+                fs::write(wrapper_path, wrapper).unwrap();
+            }
             return;
         }
 
         let bin_dir = runtime_dir.join("bin");
         fs::create_dir_all(&bin_dir).unwrap();
         let wrapper_path = bin_dir.join("python3");
+        let wrapper = format!("#!/bin/sh\nexec \"{}\" \"$@\"\n", python.display());
         #[cfg(unix)]
         {
-            if std::os::unix::fs::symlink(python, &wrapper_path).is_ok() {
-                return;
+            match std::os::unix::fs::symlink(python, &wrapper_path) {
+                Ok(()) => return,
+                Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
+                    let metadata = fs::symlink_metadata(&wrapper_path).unwrap();
+                    if metadata.file_type().is_symlink() {
+                        assert_eq!(fs::read_link(&wrapper_path).unwrap(), python);
+                    } else {
+                        assert_eq!(fs::read_to_string(&wrapper_path).unwrap(), wrapper);
+                    }
+                    return;
+                }
+                Err(_) => {}
             }
         }
-        fs::write(
-            &wrapper_path,
-            format!("#!/bin/sh\nexec \"{}\" \"$@\"\n", python.display()),
-        )
-        .unwrap();
+        fs::write(&wrapper_path, wrapper).unwrap();
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt;
             let permissions = fs::Permissions::from_mode(0o755);
             fs::set_permissions(&wrapper_path, permissions).unwrap();
         }
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn write_python_wrapper_reuses_existing_symlink_without_mutating_target() {
+        let temp_dir = tempdir().unwrap();
+        let runtime_dir = temp_dir.path().join("runtime");
+        let python = temp_dir.path().join("python3");
+        let original = "#!/bin/sh\nexit 0\n";
+        fs::write(&python, original).unwrap();
+
+        write_python_wrapper(&runtime_dir, &python);
+        write_python_wrapper(&runtime_dir, &python);
+
+        let wrapper_path = runtime_dir.join("bin").join("python3");
+        assert_eq!(fs::read_link(wrapper_path).unwrap(), python);
+        assert_eq!(fs::read_to_string(python).unwrap(), original);
     }
 
     fn write_fake_backend_module(site_packages_dir: &Path, behavior: FakeBackendBehavior) {
