@@ -1,5 +1,12 @@
 # 01 Theme Runtime And Layers
 
+<!-- completion-record:v1 -->
+> 완료일: 2026-07-26T16:56:43+00:00
+> 구현 커밋: `9d87517bf2ebb8b7fc7cc85d73b06f717c2dc638`
+> 통과 게이트: theme-runtime-browser
+> 남은 위험: 전체 viewport·font·contrast·keyboard·screen-reader와 Firefox/WebKit/WebView2 검수는 04-visual-accessibility-gates에서 계속 차단한다.; 이 전이는 공용 theme runtime 계약만 봉인하며 Landing·Learning, Run·Local migration이나 design foundation workstream 완료를 뜻하지 않는다.
+> 증거: [`completion-evidence.yml`](completion-evidence.yml)
+
 상태: 진행
 
 ## 목표
