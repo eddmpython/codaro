@@ -1,0 +1,63 @@
+schemaVersion: 1
+initiativeId: astryx-product-experience
+packetId: run-and-local-migration
+completedAt: "2026-07-26T19:47:50+00:00"
+gitCommit: f33b9d2a1b06b4c088a778d3d964d1d992e9d96d
+implementationPaths:
+  - .github/workflows/ci.yml
+  - docs/skills/ops/foundation/testing-and-gates.md
+  - docs/skills/ops/product/service-candidate.md
+  - editor/src/components/automation/automationSurface.tsx
+  - editor/src/lib/localeCopy.ts
+  - mainPlan/astryx-product-experience/01-design-foundation/03-run-and-local-migration/README.md
+  - mainPlan/astryx-product-experience/03-product-shell/01-notebook-workbench/README.md
+  - tests/product/verifyProductQualityAudit.py
+  - tests/run.py
+  - tests/runtime/testRunEntrypoint.py
+  - tests/surface/testProductSurfaceContract.py
+  - tests/surface/verifyProductExperiencePlaywright.py
+  - tests/surface/verifyRunLocalStatePlaywright.py
+gates:
+  - name: run-local-state-browser
+    reportPath: mainPlan/astryx-product-experience/01-design-foundation/03-run-and-local-migration/evidence/run-local-state-report.json
+    reportHash: 37c3d8ebd49be660cb803ab013415f83f6d2b5f7e060eeee09c9dae6bbfdd580
+    gitHead: f33b9d2a1b06b4c088a778d3d964d1d992e9d96d
+    passedAt: "2026-07-26T19:12:40+00:00"
+  - name: product-experience-browser
+    reportPath: mainPlan/astryx-product-experience/01-design-foundation/03-run-and-local-migration/evidence/product-experience-report.json
+    reportHash: 323a552d0e6382114c7c7fada7aa22a4fef250dd64275a8ada842bf0362a81ef
+    gitHead: f33b9d2a1b06b4c088a778d3d964d1d992e9d96d
+    passedAt: "2026-07-26T19:21:04+00:00"
+  - name: preflight
+    reportPath: mainPlan/astryx-product-experience/01-design-foundation/03-run-and-local-migration/evidence/preflight-report.json
+    reportHash: 438955127951ff273062b99b401eb67a20125806f1c9d27c67d399051b4bd344
+    gitHead: f33b9d2a1b06b4c088a778d3d964d1d992e9d96d
+    passedAt: "2026-07-26T19:30:51+00:00"
+  - name: pages-deployment
+    reportPath: mainPlan/astryx-product-experience/01-design-foundation/03-run-and-local-migration/evidence/pages-deployment-report.json
+    reportHash: 6ec72c1f6835ae3070b62ef5273b662aea80d79f3925eea47eb6a1f3148e88b8
+    gitHead: f33b9d2a1b06b4c088a778d3d964d1d992e9d96d
+    passedAt: "2026-07-26T19:34:00+00:00"
+  - name: security-workflow
+    reportPath: mainPlan/astryx-product-experience/01-design-foundation/03-run-and-local-migration/evidence/security-workflow-report.json
+    reportHash: 858e93a96487deec3c589c90d54f1235efeffd5c2b6776fea983e0f08cae7cac
+    gitHead: f33b9d2a1b06b4c088a778d3d964d1d992e9d96d
+    passedAt: "2026-07-26T19:35:06+00:00"
+  - name: ci-experience
+    reportPath: mainPlan/astryx-product-experience/01-design-foundation/03-run-and-local-migration/evidence/ci-experience-report.json
+    reportHash: fd0706c576769dc7768ef05f063c341a5bfe53b24700ab41eebd97c732bf2430
+    gitHead: f33b9d2a1b06b4c088a778d3d964d1d992e9d96d
+    passedAt: "2026-07-26T19:47:50+00:00"
+reviews:
+  - kind: visual
+    reviewerRole: 제품 시각 검토
+    status: approved
+    assetPath: mainPlan/astryx-product-experience/01-design-foundation/03-run-and-local-migration/evidence/visual-review.json
+    ledgerHash: 8b06ab198c5212fb4bc34e11a9dc71af9940e8e150ab2e51d047b81945e14d33
+    reviewedAt: "2026-07-26T19:47:50+00:00"
+docsUpdated: true
+parentIndexUpdated: true
+residualRisks:
+  - 실제 설치된 Local WebView2의 긴 notebook과 공개 Web 사이 같은 문서 왕복은 Notebook Workbench에서 계속 차단한다.
+  - keyboard-only, screen reader, forced-colors, Firefox, WebKit 전수 판정은 04-visual-accessibility-gates가 계속 차단한다.
+  - 원격 push가 보고한 기본 브랜치 Dependabot 경고 16건은 13 high, 3 moderate이며 이 디자인 packet이 종속성 위험 해소를 주장하지 않는다.
