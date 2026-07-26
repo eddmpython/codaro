@@ -1,0 +1,33 @@
+schemaVersion: 1
+initiativeId: astryx-product-experience
+packetId: token-and-package-contract
+completedAt: "2026-07-26T16:00:54+00:00"
+gitCommit: 38587105aa278a5aaf97773f8dd9870da820f375
+implementationPaths:
+  - assets/brand/designSystem/compatibility.json
+  - assets/brand/designSystem/tokens.json
+  - assets/brand/designSystem/tokens.schema.json
+  - assets/brand/designSystem/fontManifest.json
+  - assets/brand/tools/buildDesignSystem.py
+  - landing/package.json
+  - landing/package-lock.json
+  - editor/package.json
+  - editor/package-lock.json
+  - tests/assets/testBuildDesignSystem.py
+  - tests/surface/verifyDesignSystemContract.py
+  - tests/surface/testDesignSystemContractReport.py
+  - mainPlan/astryx-product-experience/01-design-foundation/00-token-and-package-contract/README.md
+  - mainPlan/astryx-product-experience/01-design-foundation/README.md
+  - mainPlan/astryx-product-experience/01-design-foundation/_done/README.md
+gates:
+  - name: design-system-contract
+    reportPath: mainPlan/astryx-product-experience/01-design-foundation/00-token-and-package-contract/evidence/design-system-report.json
+    reportHash: b1fd302ac87d3b9b81a0307408d8da7c2fc6775a92369a9095652c0d6313b2d9
+    gitHead: 38587105aa278a5aaf97773f8dd9870da820f375
+    passedAt: "2026-07-26T16:00:23+00:00"
+reviews: []
+docsUpdated: true
+parentIndexUpdated: true
+residualRisks:
+  - 실제 light/dark/system·viewport·보조기술 검수는 04-visual-accessibility-gates에서 계속 차단한다.
+  - 이 전이는 token·package source 계약만 봉인하며 design foundation workstream 완료를 뜻하지 않는다.
