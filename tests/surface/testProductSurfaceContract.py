@@ -145,6 +145,19 @@ def testLearningHomeAndLessonRenderInstructionalVisualsWithoutRevealControls() -
     assert "all 8 instructional learning-domain visuals must render" in browserGate
 
 
+def testNotebookAutosaveUsesLocaleIndependentActiveCellMarker() -> None:
+    notebookPanel = _read("editor/src/components/notebook/notebookPanel.tsx")
+    autosaveGate = _read("tests/surface/verifyNotebookAutosavePlaywright.py")
+
+    assert 'data-notebook-active-cell="true"' in notebookPanel
+    assert "data-notebook-active-index={selectedBlockIndex >= 0 ? selectedBlockIndex + 1 : 0}" in notebookPanel
+    assert "data-notebook-cell-count={document.blocks.length}" in notebookPanel
+    assert 'querySelector("[data-notebook-active-cell=true]")' in autosaveGate
+    assert 'activeCell?.dataset.notebookActiveIndex === "1"' in autosaveGate
+    assert 'activeCell?.dataset.notebookCellCount === "1"' in autosaveGate
+    assert 'includes("셀 1 / 1")' not in autosaveGate
+
+
 def testAppDelegatesProductSurfaceSelectionPolicy() -> None:
     app = _read("editor/src/App.tsx")
     selectionHook = _read("editor/src/hooks/useProductSurfaceSelection.ts")

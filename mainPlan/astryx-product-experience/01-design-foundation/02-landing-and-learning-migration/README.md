@@ -36,10 +36,14 @@
 
 ## 테스트
 
-- `design-system-contract`
-- `learning-card-browser`
-- `learning-system-readiness`
-- Landing desktop screenshot review 완료, mobile/full mode matrix는 후속
+- `design-system-contract`: Landing·Learning·Run이 생성된 Astryx token과 공용 SNS registry를 소비하는지 확인한다.
+- `web-learning`: 472개 canonical route·lazy payload·sitemap·검색 일치, deep link, 자동 저장 reload, Web Run과 390px/1440px 대표 브라우저 화면을 확인한다.
+- `landing-public`: Home·Learn의 Web-first CTA, 실제 media, SEO, hydration과 390px/1440px 반응형 화면을 확인한다.
+- 전체 contrast·keyboard·screen-reader·Firefox·WebKit·WebView2 수동 matrix는 [04 visual/accessibility gates](../04-visual-accessibility-gates/)가 소유한다.
+
+## 배포 증거
+
+구현 commit을 먼저 `main`에 push하고 같은 commit을 source로 삼은 `Deploy Pages` run의 build·deploy 성공을 evidence commit에 보존한다. 이전 commit의 성공 배포나 working tree의 로컬 결과를 현재 구현의 배포 증거로 재사용하지 않는다.
 
 ## 롤백
 
@@ -47,4 +51,6 @@ URL parser와 initial selection을 함께 되돌린다. Landing 링크만 남겨
 
 ## 평가
 
-대표 화면과 472개 canonical direct lesson은 구현됐다. Home·Learn 390px/1440px에서 image/text overlap과 lesson row 가독성을 검토하고 mobile hero 아래 다음 band가 보이도록 교정했다. 전체 접근성 수동 matrix와 실제 Pages 배포가 남아 완료가 아니다.
+현재 source에는 실제 제품 capture를 쓰는 Web-first Home, domain별 대표 경로를 우선하는 Learn, 472개 canonical direct lesson, URL 초기 선택과 별도 확인 없는 본문 전환이 구현됐다. Home·Learn과 학습 본문은 390px/1440px에서 image/text overlap, 가로 overflow, 이름 없는 버튼, 깨진 이미지가 0인지 브라우저 gate가 검사한다. Web 학습 자동 저장 검증은 번역된 문구 대신 `data-notebook-active-cell` 의미 표식을 사용해 locale과 무관하게 reload 복원을 판정한다.
+
+이 packet은 clean 구현 commit의 `web-learning`·`landing-public`, 동일 commit의 실제 Pages 배포, 별도 evidence commit과 A→E→B 완료 전이가 모두 확인되기 전까지 진행 상태다. 전체 접근성 수동 matrix는 04의 잔여 범위이며 이 packet에 중복 완료 조건으로 두지 않는다.

@@ -548,8 +548,8 @@ def main() -> int:
     )
     require(
         topBarText,
-        'surface !== "curriculum" && showStatusNotice',
-        "curriculum diagnostic export suppression",
+        'surface !== "curriculum" && surface !== "editor" && showStatusNotice',
+        "curriculum and editor diagnostic export suppression",
         failures,
     )
 

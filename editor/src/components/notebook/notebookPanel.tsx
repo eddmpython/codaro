@@ -225,7 +225,13 @@ export function NotebookPanel({
         runningBlockId={runningBlockId}
         onRunNotebook={onRunNotebook}
       />
-      <span aria-hidden="true" className="notebookActiveCell">
+      <span
+        aria-hidden="true"
+        className="notebookActiveCell"
+        data-notebook-active-cell="true"
+        data-notebook-active-index={selectedBlockIndex >= 0 ? selectedBlockIndex + 1 : 0}
+        data-notebook-cell-count={document.blocks.length}
+      >
         {activeCellLabel}
       </span>
       <div className="notebookPendingArea">

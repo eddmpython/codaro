@@ -492,7 +492,8 @@ def main(argv: list[str] | None = None) -> int:
                         && editors.every(
                           editor => !(editor.textContent || "").includes("autosave_round_trip"),
                         )
-                        && (activeCell?.textContent || "").includes("셀 1 / 1");
+                        && activeCell?.dataset.notebookActiveIndex === "1"
+                        && activeCell?.dataset.notebookCellCount === "1";
                     }""",
                     timeout=20_000,
                 )
