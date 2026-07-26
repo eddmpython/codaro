@@ -138,7 +138,7 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 | `plan-quality` | initiative owner | no | independent R10 | evaluation report schema·rubric hash·독립성·plan fact audit |
 | `product-release` | release owner | no | release | 모든 required gate와 current human evidence aggregate |
 
-신규 gate는 [00 bootstrap](../00-product-contract/01-prd-improvement-loop/02-completion-and-gate-bootstrap/)에서 현재 runner의 `tests/run.py.Gate`로 non-blocking red 상태부터 등록한다. negative fixture와 실제 red report가 없으면 green 승격하지 않는다. machine gate는 구현 green 뒤 `ci_required=True`, 사람 모집과 최종 수동 aggregate는 `False`다. artifact path는 기존 `GATE_ARTIFACTS`에 등록하고 owner는 이 표와 testing SSOT가 소유한다. `GateSpec`이라는 새 타입이나 gate별 동일 이름 CI job을 만들지 않는다.
+신규 gate는 [00 bootstrap](../00-product-contract/01-prd-improvement-loop/_done/02-completion-and-gate-bootstrap/)에서 현재 runner의 `tests/run.py.Gate`로 non-blocking red 상태부터 등록한다. negative fixture와 실제 red report가 없으면 green 승격하지 않는다. machine gate는 구현 green 뒤 `ci_required=True`, 사람 모집과 최종 수동 aggregate는 `False`다. artifact path는 기존 `GATE_ARTIFACTS`에 등록하고 owner는 이 표와 testing SSOT가 소유한다. `GateSpec`이라는 새 타입이나 gate별 동일 이름 CI job을 만들지 않는다.
 
 `tests/product/verifyPrdEvaluationReport.py`는 latest round의 세 raw report, frozen rubric hash, scope, 이전 score 제외, 항목 합산과 canonical finding을 검증한다. `tests/product/verifyPlanFactAudit.py`는 path·symbol·gate membership·dependency version/peer·lesson count·bootstrap order를 실제 worktree에서 따로 검사한다. 점수표 parser만으로 `plan-quality`를 통과할 수 없다.
 
@@ -177,7 +177,7 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 9. 모든 workstream evidence를 확인하고 00 bootstrap에서 만든 completion tool로 순서대로 내부 `_done/`으로 이동한다.
 10. 이 문서 자체를 `_done/10-quality-release/`로 이동한 뒤 initiative 전체를 root `_done/`으로 이동한다. 6경로 모두의 E3는 `effectVerified` 홍보 조건이며 shell artifact 배포 조건과 분리한다.
 
-완료 이동 도구와 schema의 생성 owner는 10이 아니라 [00 bootstrap](../00-product-contract/01-prd-improvement-loop/02-completion-and-gate-bootstrap/)이다. 10은 이미 구현된 two-commit transition, report hash, nonce uniqueness, concurrent merge rejection을 최종 재검증할 뿐 새 completion protocol을 도입하지 않는다.
+완료 이동 도구와 schema의 생성 owner는 10이 아니라 [00 bootstrap](../00-product-contract/01-prd-improvement-loop/_done/02-completion-and-gate-bootstrap/)이다. 10은 이미 구현된 A→E→B transition, report hash, nonce uniqueness, concurrent merge rejection을 최종 재검증할 뿐 새 completion protocol을 도입하지 않는다.
 
 ## 영향 파일
 

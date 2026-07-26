@@ -2,7 +2,7 @@
 
 상태: 진행
 
-전문 평가 기록은 [PRD improvement loop](00-product-contract/01-prd-improvement-loop/)가 제품 PRD와 분리해 관리한다. 과거 점수·결론·remediation 문서는 blind evaluator 입력에 넣지 않으며, 어떤 역사 점수도 현재 완료 판정을 대신하지 않는다. 현재 top-level 활성 workstream은 11개, `_done` 이동은 0개다. R8의 100점은 동일 평가자 자기수렴으로 무효 처리한 역사 기록이며, 현재 PRD에는 독립 점수도 R10 통과 판정도 없다.
+전문 평가 기록은 [PRD improvement loop](00-product-contract/01-prd-improvement-loop/)가 제품 PRD와 분리해 관리한다. 과거 점수·결론·remediation 문서는 blind evaluator 입력에 넣지 않으며, 어떤 역사 점수도 현재 완료 판정을 대신하지 않는다. 현재 top-level 활성 workstream은 11개, top-level `_done` 이동은 0개이며 내부 completion bootstrap packet 1개만 정식 전이를 마쳤다. R8의 100점은 동일 평가자 자기수렴으로 무효 처리한 역사 기록이며, 현재 PRD에는 독립 점수도 R10 통과 판정도 없다.
 
 ## 목표
 
@@ -38,23 +38,23 @@ Codaro를 다운로드 중심 랜딩과 별도 로컬 앱의 조합으로 보지
 | SEO | sitemap 61 URL, 개별 레슨 URL 0개 | 공개 문서 기반은 좋지만 교육 콘텐츠가 검색 자산으로 서지 못한다. |
 | 웹 실행 | `/app/`에 editor 빌드와 브라우저 Python 런타임 존재 | 다시 만들 대상이 아니라 Run 표면으로 승격할 기반이다. |
 
-## 2026-07-23 구현 snapshot
+## 2026-07-26 구현 snapshot
 
 이 표는 위 출발점 이후 현재 source에서 확인한 구현 사실이다. machine gate 통과와 제품·학습 효과 완료를 구분하며, red 종료 조건을 숨기지 않는다.
 
 | 영역 | 현재 구현 | 현재 판정 |
 | --- | --- | --- |
-| Astryx 공용 기반 | Landing과 editor가 exact `@astryxdesign/* 0.1.6`, StyleX `0.19.0`, 공용 token/provenance와 cascade layer를 소비한다. | `design-system-contract` green. 실제 모든 engine·AT matrix 완료는 아님 |
+| Astryx 공용 기반 | Landing과 editor가 exact `@astryxdesign/* 0.1.6`, StyleX `0.19.0`, 공용 token/provenance와 cascade layer를 소비한다. | source contract command는 green이지만 canonical report에 `gitHead`가 없어 quality-cycle artifact 계약은 red. 실제 모든 engine·AT matrix 완료도 아님 |
 | Landing·Learn | 실제 Run desktop/mobile 캡처를 hero와 proof에 사용하고 첫 CTA를 웹 학습으로 연결한다. `/learn`은 추천 경로와 읽히는 lesson row를 제공하며 472개 canonical lesson route를 prerender, sitemap, 검색 index와 JSON-LD에 연결한다. 공개 catalog는 browser 310개, Local 162개 capability를 그대로 표시한다. | source build·정적 route·SEO·hydration·대표 desktop/mobile browser 검증은 green. UX source commit `ebf6ad0c`는 Pages run `30016124910`과 deployment `5574251178`로 공개 배포됐고 실제 lesson URL의 Chromium 1280x720 smoke에서 가로 overflow·중복 ID·비학습 visible element가 모두 0이었다. |
-| Run·Local shell | 같은 React 학습 surface와 Astryx theme를 쓰며 runtime capability rail로 Web과 Local 파일·예약·E-Stop 능력을 구분한다. `RunRouteState@1`이 surface, lesson, section, document, task와 runtime tier를 URL, history, session storage에 보존한다. Web 기본 surface는 `curriculum`, Local 기본 surface는 최근 학습·notebook과 automation operation strip을 여는 `home`이며 Automation은 task, detail, run inspector 중심의 operational layout을 쓴다. | 공식 `product-experience-browser` 63/63과 `local-studio-browser` 26/26 green. 두 최신 browser log의 `ConnectionReset`, `Proactor`, `Win10054`는 모두 0이다. 공개 Web lesson에서 top control lane 36px, 짧은 editor 39.09/62.19px, 60줄 editor 352px 내부 scroll, 정상 출력 `Hello Codaro`만 표시, 오류의 내부 경로·Traceback 노출 0을 재검증했다. 실제 WebView2·Firefox·WebKit·forced-colors 수동 matrix는 남음 |
+| Run·Local shell | 같은 React 학습 surface와 Astryx theme를 쓰며 runtime capability rail로 Web과 Local 파일·예약·E-Stop 능력을 구분한다. `RunRouteState@1`이 surface, lesson, section, document, task와 runtime tier를 URL, history, session storage에 보존한다. Web 기본 surface는 `curriculum`, Local 기본 surface는 최근 학습·notebook과 automation operation strip을 여는 `home`이며 Automation은 task, detail, run inspector 중심의 operational layout을 쓴다. | 마지막 직접 검사는 제품 66/66과 Local 26/26이었지만 current HEAD canonical report가 아니다. 저장된 제품 report는 이전 SNS 기대 순서 때문에 65/66 failed이고 현재 집중 재검사만 green이다. 실제 WebView2·Firefox·WebKit·forced-colors 수동 matrix는 남음 |
 | 학습 홈·카드 | 전체 472개 완료율과 category card grid를 제거하고 만들 결과 중심 goal map과 열린 section row로 바꿨다. 목표·핵심 개념·편집 셀·자동 feedback이 한 흐름에 보인다. | `learning-card-contract`, `learning-method` green |
-| 불필요한 클릭 | 실행 뒤 별도 검증·제출·완료·hint reveal을 제거했다. 실패 시 다음 수정과 필요한 hint를 inline으로 자동 제공하고 transfer·retrieval은 evidence 조건에 따라 자동 나타난다. | 최신 63-case report의 금지 학습 control 0. legacy `CheckResultPanel` 삭제 |
+| 불필요한 클릭 | 실행 뒤 별도 검증·제출·완료·hint reveal을 제거했다. 실패 시 다음 수정과 필요한 hint를 inline으로 자동 제공하고 transfer·retrieval은 evidence 조건에 따라 자동 나타난다. | 마지막 통과한 66-case 검사에서 금지 학습 control 0. legacy `CheckResultPanel` 삭제 |
 | 학습 평가 source | 472레슨 중 strong CheckSpec 1,413개/467레슨, mastery·transfer·retrieval 각 467레슨이다. 1,400개 solution variant(behavior 1,398, output 2)의 실행 실패는 0이다. performance claim과 명시적 claim scope는 467레슨이며 weak-only는 0이다. 전수 executability의 real bug·YAML load error·undeclared package 0 기준은 별도 gate가 소유한다. | `curriculum-quality-matrix` green. identity 승인 0/472, content 승인 0/472, taxonomy 승인 0/7, independent assessment 승인 0/467이므로 `curriculum-top-tier-audit`와 `learning-content`는 red |
 | Evidence·mastery | `LearningEvent`와 `MasteryPolicy@1`이 Python·TypeScript 공용 계약과 golden vector를 사용한다. legacy 0.6/0.4 blend와 별도 mastery writer는 제거했고 Web IndexedDB·Local SQLite event를 같은 reducer로 투영한다. | canonical contract와 최신 Chromium 통합은 green이다. 사람 assessment 승인과 실제 장기 retrieval 효능은 미완료 |
-| Web↔Local archive | `kind=codaro.learning-archive`, `schemaVersion=2`가 document, draft, virtual FS와 file·directory·table·image bytes, package bytes, evidence, lineage, disabled·unscheduled automation draft를 SHA-256 content-addressed blob으로 묶는다. Web은 IndexedDB에 full archive를 자동 보존하고 reload에서 복원하며 Local은 검증 뒤 immutable object와 `HEAD`를 원자 교체해 reload하고 evidence merge 실패 시 이전 `HEAD`를 복원한다. | Python contract·materialization·rollback과 Web/Local UI/API lifecycle, reload/race와 Day 19 artifact transfer browser flow는 최신 63/63에 포함돼 green이다. 실제 배포 round trip과 독립 보안 검수는 미완료 |
+| Web↔Local archive | `kind=codaro.learning-archive`, `schemaVersion=2`가 document, draft, virtual FS와 file·directory·table·image bytes, package bytes, evidence, lineage, disabled·unscheduled automation draft를 SHA-256 content-addressed blob으로 묶는다. Web은 IndexedDB에 full archive를 자동 보존하고 reload에서 복원하며 Local은 검증 뒤 immutable object와 `HEAD`를 원자 교체해 reload하고 evidence merge 실패 시 이전 `HEAD`를 복원한다. | Python contract·materialization·rollback과 Web/Local UI/API lifecycle, reload/race와 Day 19 artifact transfer는 마지막 66-case 검사에 포함됐다. current HEAD 전체 재기준선, 실제 배포 round trip과 독립 보안 검수는 미완료 |
 | 시각 자산 | 공용 manifest, provenance/checksum, AVIF/WebP variant, 실제 Web lesson·Run 캡처와 새 Local automation operational UI 캡처를 양쪽 앱에서 소비한다. 8개 학습 domain의 `generatedRaster` instructional asset과 learning question·decision·lesson context를 등록했고, `learningVisualAssets.ts`의 domain/category mapping을 통해 `CurriculumHome`과 `CurriculumOverview`에서 `LearningDomainVisual`로 자동 렌더한다. | `visual-assets` green. instructional asset의 lesson anchor 사람 승인, outcome proof, 전체 shot list와 사람 자산 검수는 남음 |
 | 저장소 단순화 | 학습자 예측 계약·도구·332개 YAML block과 active classroom backend/frontend를 삭제했다. dead Landing source와 unused illustration을 제거했고 lifecycle generated-source policy, Landing/editor module boundary, 양쪽 exact package pin을 적용했다. | `removed-learning-concepts`, `repository-simplification` green. upstream 독립 검수와 완료 전이 증거가 없어 09 workstream은 active |
-| 완료 전이 | initiative work item의 `_done` 이동은 0개다. `_done/README.md`는 규칙 placeholder일 뿐 완료 항목이 아니다. | draft R10 fact audit는 통과했지만 seal-eligible scope가 아니며 evaluator 3명·raw report·finding ledger가 없어 `plan-quality` red. 현재 제품 점수나 완료 판정 없음 |
+| 완료 전이 | completion bootstrap packet이 A `cac1cc9d` → E `9afa9ab6` → B `ab20f822`로 내부 `_done` 이동했고 transition ledger 첫 행이 검증됐다. top-level workstream 이동은 0개다. | completion protocol은 green·CI required. evaluator 3명·raw report·finding ledger가 없어 `plan-quality`는 계속 red이며 현재 제품 점수나 완료 판정 없음 |
 
 ## 제품 원칙
 
@@ -87,14 +87,14 @@ Codaro를 다운로드 중심 랜딩과 별도 로컬 앱의 조합으로 보지
 
 `의존`은 선행 폴더 전체의 `_done`을 뜻하지 않고 아래 00 milestone의 증거 경계를 뜻한다. 이 표의 원래 의도는 B3 전 W1+ source 확장까지 막는 것이었지만 실제 구현은 그 순서를 지키지 않았다. R10 전에 strong assessment 467레슨, public route 472개, 대표 visual과 legacy 제거가 source에 들어왔다. 이미 구현된 코드를 없던 일로 하거나 되돌려 순서를 가장하지 않는다.
 
-따라서 B0~B3는 지금부터 **승인과 완료 전이 gate**로 적용한다. 선행 구현은 모두 provisional machine coverage이며, B3 전에는 W1+ 사람 승인, 경로 공개 승격, 독립 품질 주장, packet·workstream `_done` 이동에 사용할 수 없다. 결함 수정과 machine 검증은 계속하되 새 일괄 변환으로 사람 검수 부채를 늘리지 않는다.
+따라서 B0~B3는 지금부터 **승인과 완료 전이 gate**로 적용한다. 선행 구현은 모두 provisional machine coverage이며, B3 전에는 W1+ 사람 승인, 경로 공개 승격, 독립 품질 주장, top-level product workstream `_done` 이동에 사용할 수 없다. R10 입력을 만드는 remediation packet은 구현 봉인을 뜻하는 A→E→B 내부 전이를 먼저 남길 수 있다. 결함 수정과 machine 검증은 계속하되 새 일괄 변환으로 사람 검수 부채를 늘리지 않는다.
 
 | 00 milestone | 원래 unlock evidence | 현재 적용 |
 | --- | --- | --- |
-| B0 bootstrap | evaluation contract, product contract, completion tool, fact-audit gate의 red-to-green evidence | downstream source는 이미 존재하지만 B0 evidence 없이는 completion transition 불가 |
+| B0 bootstrap | evaluation contract, product contract, completion tool, fact-audit gate의 red-to-green evidence | completion bootstrap은 첫 A→E→B 전이 완료. 나머지 product contract remediation은 별도 evidence 필요 |
 | B1 feasibility | downgrade-safe evidence migration과 browser·Windows check sandbox 실측 판정 | 구현된 check 범위는 provisional이며 미검증 tier를 strong completion으로 승격 불가 |
 | B2 W0 evidence | 세 레슨 Landing -> Web -> Local 여정, 자동 검사, 사람 검수, Astryx·AT matrix | machine W0만으로 대체 불가, current evidence bundle 봉인 전 R10 제출 불가 |
-| B3 independent review | 새 평가자 3명의 raw report, fact audit, P0·P1 response와 completion transition | 선행 구현된 W1+의 사람 승인·공개 승격·`_done`; source 확장은 이미 provisional 상태로 발생 |
+| B3 independent review | 새 평가자 3명의 raw report, fact audit, P0·P1 response와 completion transition | 선행 구현된 W1+의 사람 승인·공개 승격·top-level `_done`; source 확장은 이미 provisional 상태로 발생 |
 
 | 순서 | 작업 폴더 | 의존 | 종료 조건 |
 | --- | --- | --- | --- |
@@ -162,7 +162,7 @@ path 상태 어휘는 다음처럼 고정한다. `기존`, `수정`, `소비`는
 ## 테스트
 
 - 모든 작업 폴더의 지정 테스트를 해당 폴더 이동 전에 실행한다.
-- `PRODUCT_RELEASE_GATES` 순서는 `root-clean`, `docs`, `backend`, `architecture-boundary`, `editor-build`, `landing-build`, `mobile-layout`, `frontend-performance-budget`, `design-system-contract`, `learning-method`, `curriculum-quality-matrix`, `repository-simplification`, `learning-content`, `web-learning`, `visual-assets`, `landing-public`, `removed-learning-concepts`, `product-experience-browser`, `local-studio-browser`, `learning-evidence-contract`, `learning-efficacy-report`, `automation-ide-audit`, `launcher-test`, `path-learning-signal`, `plan-quality`다. 이 release aggregate에는 사람 증거가 비어 있어 red인 `learning-content`, `path-learning-signal`, `plan-quality`도 의도적으로 포함되며, `path-efficacy-confirmatory`는 featured path 승격 조건으로 별도 실행한다.
+- `PRODUCT_RELEASE_GATES` 순서는 `root-clean`, `docs`, `backend`, `architecture-boundary`, `editor-build`, `landing-build`, `mobile-layout`, `frontend-performance-budget`, `design-system-contract`, `learning-method`, `curriculum-quality-matrix`, `repository-simplification`, `learning-content`, `web-learning`, `visual-assets`, `landing-public`, `removed-learning-concepts`, `product-experience-browser`, `astryx-journey`, `local-studio-browser`, `learning-evidence-contract`, `learning-efficacy-report`, `automation-ide-audit`, `launcher-test`, `path-learning-signal`, `plan-quality`다. 이 release aggregate에는 사람 증거가 비어 있어 red인 `learning-content`, `path-learning-signal`, `plan-quality`도 의도적으로 포함되며, `path-efficacy-confirmatory`는 featured path 승격 조건으로 별도 실행한다.
 - viewport 매트릭스는 Web 320x568·360x740·390x844·768x1024·1440x900·1680x1050, 실제 Local WebView2 900x640·1024x768·1440x900이며 light, dark와 forced-colors를 캡처한다.
 
 ## 롤백

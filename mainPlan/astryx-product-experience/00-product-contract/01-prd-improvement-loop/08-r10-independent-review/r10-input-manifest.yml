@@ -38,13 +38,18 @@ remediations:
   - ARCH-02
   - ARCH-04
   owner: product architecture
-  state: implementationInProgress
+  state: completed
   factAuditCommand: uv run python -X utf8 tests/product/verifyPlanFactAudit.py --packet 02-completion-and-gate-bootstrap
   factAuditCommandState: implemented
   negativeFixture: tests/product/bootstrapAfterUse.fixture.yml
   negativeFixtureState: present
-  closureEvidence: null
-  eligibleForR10: false
+  closureEvidence:
+    path: mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/_done/02-completion-and-gate-bootstrap/completion-evidence.yml
+    implementationCommit: cac1cc9db96b3d42f5c8a728c2e3051f81cc611e
+    evidenceCommit: 9afa9ab60cea682d97eb6f3f08caab8a90e0ced8
+    transitionCommit: ab20f822d016de94051cafeeec8c6770c236be29
+    transitionId: be19623ed7a1c000820d991867007ad837eae81fb518121202ff67b2c481349d
+  eligibleForR10: true
 - packet: 03-learning-vertical-slice
   primaryFindings:
   - LEARN-01
