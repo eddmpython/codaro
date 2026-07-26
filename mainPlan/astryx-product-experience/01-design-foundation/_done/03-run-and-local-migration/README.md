@@ -7,7 +7,7 @@
 > 남은 위험: 실제 설치된 Local WebView2의 긴 notebook과 공개 Web 사이 같은 문서 왕복은 Notebook Workbench에서 계속 차단한다.; keyboard-only, screen reader, forced-colors, Firefox, WebKit 전수 판정은 04-visual-accessibility-gates가 계속 차단한다.; 원격 push가 보고한 기본 브랜치 Dependabot 경고 16건은 13 high, 3 moderate이며 이 디자인 packet이 종속성 위험 해소를 주장하지 않는다.
 > 증거: [`completion-evidence.yml`](completion-evidence.yml)
 
-상태: 진행
+상태: 완료
 
 ## 목표
 
