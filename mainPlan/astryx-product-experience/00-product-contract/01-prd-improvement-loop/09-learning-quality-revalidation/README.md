@@ -44,7 +44,7 @@ Day 1 Web vertical slice에서는 mastery strong evidence 뒤 전이 과제가 �
 
 - `uv run python -X utf8 tests/curriculum/verifyCurriculumTopTierAudit.py`
 - `uv run python -X utf8 tests/learning/verifyLearningSectionCardContract.py`
-- `uv run --with playwright python -X utf8 tests/surface/verifyProductExperiencePlaywright.py`
+- `uv run python -X utf8 tests/surface/verifyProductExperiencePlaywright.py`
 - `uv run python -X utf8 docs/skills/ops/tools/buildLearningLedgers.py --check`
 - `uv run python -X utf8 tests/run.py gate plan-quality`
 - `git diff --check`

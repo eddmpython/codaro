@@ -49,6 +49,7 @@ dependencies = [
 dev = [
     "httpx>=0.28.1",
     "pillow>=12.2.0",
+    "playwright==1.61.0",
     "pytest>=9.0.2",
     "watchdog>=6.0.0",
 ]

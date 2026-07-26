@@ -39,6 +39,7 @@ def testGateNamesAreStable() -> None:
         "architecture-boundary",
         "design-system-contract",
         "theme-runtime-browser",
+        "visual-accessibility-browser",
         "visual-assets",
         "learning-method",
         "learning-evidence-contract",
@@ -103,6 +104,9 @@ def testGateNamesAreStable() -> None:
     assert runner.GATE_ARTIFACTS["theme-runtime-browser"] == (
         "output/test-runner/theme-runtime-browser/theme-runtime-report.json",
     )
+    assert runner.GATE_ARTIFACTS["visual-accessibility-browser"] == (
+        "output/test-runner/visual-accessibility-browser/visual-accessibility-report.json",
+    )
     assert runner.GATE_ARTIFACTS["run-local-state-browser"] == (
         "output/test-runner/run-local-state-browser/run-local-state-report.json",
     )
@@ -140,6 +144,7 @@ def testGateNamesAreStable() -> None:
         "architecture-boundary",
         "design-system-contract",
         "theme-runtime-browser",
+        "visual-accessibility-browser",
         "visual-assets",
         "learning-method",
         "learning-evidence-contract",
@@ -185,6 +190,7 @@ def testGateNamesAreStable() -> None:
         "frontend-performance-budget",
         "design-system-contract",
         "theme-runtime-browser",
+        "visual-accessibility-browser",
         "learning-method",
         "curriculum-quality-matrix",
         "repository-simplification",

@@ -29,7 +29,7 @@ Day 2·11·15·19·20·22·27·30 progression, Seaborn semantic artifact capston
 - `npm run check --prefix editor`
 - `npm run build --prefix editor`
 - `uv run python -X utf8 tests/learning/verifyLearningSectionCardContract.py`
-- `uv run --with playwright python -X utf8 tests/surface/verifyProductExperiencePlaywright.py`
+- `uv run python -X utf8 tests/surface/verifyProductExperiencePlaywright.py`
 
 ## 롤백
 

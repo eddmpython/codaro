@@ -37,12 +37,13 @@ Landing, Learn, Run, Local이 같은 Astryx 토큰, 테마 상태, 폰트, 밀�
 - `uv run python -X utf8 tests/run.py gate landing-public`: 같은 A에서 Chromium 5/5, failure 0과 SEO·hydration을 봉인하고 Pages run `30213073075`, CI run `30213073100`, E `7a78861a` → B `d1c82d75` 정식 전이 완료
 - `uv run python -X utf8 tests/run.py gate run-local-state-browser`: clean implementation `f33b9d2a`에서 Web·Local 6/6, failure 0, 320px·900×640 overflow 0, 실제 실행 상태 전이를 봉인
 - `uv run python -X utf8 tests/run.py gate product-experience-browser`: 같은 A에서 Chromium 68/68, failure 0을 봉인하고 Pages run `30217071291`, Security run `30217071274`, CI run `30217071352`, E `b0627a22` → B `a3536a0f` 정식 전이 완료
+- `uv run python -X utf8 tests/run.py gate visual-accessibility-browser`: locked Playwright 1.61.0의 Chromium·Firefox·WebKit 대표 12/12, failure 0. 320·390·900·1440px, light/dark, forced-colors, reduced-motion, font·contrast·keyboard 후원 dialog를 검사하며 clean A evidence와 transition은 진행 중
 - `uv run python -X utf8 tests/run.py gate learning-card-browser`: 통과
 - `uv run python -X utf8 tests/learning/verifyLearningSystemReadiness.py`: `14/14`, `passed: true`. 이는 readiness 계약 만점이지 전체 제품 완료나 학습 효과 점수가 아니다.
 - Landing과 Editor production build: 통과
 - Home·Learn 390px/1440px와 Local automation 대표 시각 감사: image/text overlap 0, lesson row 가독성·mobile next-band framing·active state 교정. 전체 수동 AT matrix는 미완료
 
-00의 token·package contract, 01의 theme runtime contract, 02의 Landing·Learning migration, 03의 Run·Local migration은 각각 clean implementation commit, evidence commit과 completion transition을 마쳤다. 실제 전체 시각·접근성 검토는 04가 소유하므로 사람 보조기술·다중 엔진 검토를 00~03에 중복 선행 조건으로 걸지 않는다. 04는 계속 active이며 workstream 전체 증거는 아직 작업 중이다.
+00의 token·package contract, 01의 theme runtime contract, 02의 Landing·Learning migration, 03의 Run·Local migration은 각각 clean implementation commit, evidence commit과 completion transition을 마쳤다. 04의 대표 3-engine machine matrix와 키보드 후원 dialog 검사는 구현됐지만 clean implementation commit, 원격 required check, evidence commit과 completion transition 전이다. 실제 WebView2·사람 보조기술·OS zoom·IME 검수는 10 Quality Release의 수동 evidence 범위이며 04 machine gate의 통과로 대신 주장하지 않는다.
 
 ## 롤백
 

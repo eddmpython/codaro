@@ -20,6 +20,7 @@ PRODUCT_QUALITY_GATES = (
     "architecture-boundary",
     "design-system-contract",
     "theme-runtime-browser",
+    "visual-accessibility-browser",
     "visual-assets",
     "learning-method",
     "learning-evidence-contract",

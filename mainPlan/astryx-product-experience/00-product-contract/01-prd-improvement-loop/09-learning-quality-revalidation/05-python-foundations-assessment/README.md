@@ -37,7 +37,7 @@ Day 2·11·15·19·20·22·27·30 대표 progression, Seaborn semantic artifact 
 - `uv run python -X utf8 docs/skills/ops/tools/upgradePython30DaysAssessments.py`
 - `uv run pytest tests/curriculum/testCurriculumSectionContract.py -q`
 - `uv run python -X utf8 tests/learning/verifyLearningSectionCardContract.py`
-- `CODARO_PRODUCT_CASE=web-day2-progression-desktop uv run --with playwright python -X utf8 tests/surface/verifyProductExperiencePlaywright.py`
+- `CODARO_PRODUCT_CASE=web-day2-progression-desktop uv run python -X utf8 tests/surface/verifyProductExperiencePlaywright.py`
 - `uv run python -X utf8 tests/curriculum/verifyCurriculumTopTierAudit.py`는 전체 이관 전까지 의도적으로 실패해야 한다.
 
 ## 롤백

@@ -34,7 +34,7 @@ taxonomy transition proposal은 baseline `b5e9...def2`와 target `f6b0...d8efc`,
 - duplicate legacy alias는 category 없이는 해석하지 않고 명시적 migration error 반환
 - URL, browser IndexedDB, local SQLite, archive import/export가 같은 key를 round-trip
 - `uv run pytest -q tests/curriculum/testCurriculum.py -k LegacyMetaId`
-- `CODARO_PRODUCT_CASE=web-day2-progression-desktop uv run --with playwright python -X utf8 tests/surface/verifyProductExperiencePlaywright.py`
+- `CODARO_PRODUCT_CASE=web-day2-progression-desktop uv run python -X utf8 tests/surface/verifyProductExperiencePlaywright.py`
 - `uv run python -X utf8 tests/run.py gate learning-content`
 
 ## 롤백

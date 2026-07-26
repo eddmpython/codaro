@@ -52,9 +52,9 @@ jobs:
         working-directory: landing
         run: npm ci
 
-      - name: Install Chromium
+      - name: Install locked browser matrix
         timeout-minutes: 15
-        run: uv run --with playwright python -m playwright install --with-deps chromium
+        run: uv run python -m playwright install --with-deps chromium firefox webkit
 
       - name: Run product release sequence
         timeout-minutes: 90

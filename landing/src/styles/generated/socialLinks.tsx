@@ -111,6 +111,7 @@ export function SocialLinks({
 
 function SupportDialog({open, onClose}: {open: boolean; onClose: () => void}) {
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const dialogRef = useRef<HTMLElement | null>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -118,7 +119,35 @@ function SupportDialog({open, onClose}: {open: boolean; onClose: () => void}) {
     if (!open) return undefined;
     returnFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const dialog = dialogRef.current;
+      const focusable = dialog
+        ? Array.from(
+            dialog.querySelectorAll<HTMLElement>(
+              'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+            ),
+          ).filter((element) => element.getClientRects().length > 0)
+        : [];
+      if (focusable.length === 0) {
+        event.preventDefault();
+        closeButtonRef.current?.focus();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+      if (event.shiftKey && (active === first || !dialog?.contains(active))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (active === last || !dialog?.contains(active))) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener("keydown", handleKeyDown);
     window.requestAnimationFrame(() => closeButtonRef.current?.focus());
@@ -145,7 +174,11 @@ function SupportDialog({open, onClose}: {open: boolean; onClose: () => void}) {
       onMouseDown={onClose}
       role="dialog"
     >
-      <section className="codaroSupportDialog" onMouseDown={(event) => event.stopPropagation()}>
+      <section
+        className="codaroSupportDialog"
+        onMouseDown={(event) => event.stopPropagation()}
+        ref={dialogRef}
+      >
         <header className="codaroSupportHeader">
           <h2>{supportCenter.title}</h2>
           <button

@@ -565,6 +565,7 @@ export function SocialLinks({
 
 function SupportDialog({open, onClose}: {open: boolean; onClose: () => void}) {
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const dialogRef = useRef<HTMLElement | null>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -572,7 +573,35 @@ function SupportDialog({open, onClose}: {open: boolean; onClose: () => void}) {
     if (!open) return undefined;
     returnFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const dialog = dialogRef.current;
+      const focusable = dialog
+        ? Array.from(
+            dialog.querySelectorAll<HTMLElement>(
+              'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+            ),
+          ).filter((element) => element.getClientRects().length > 0)
+        : [];
+      if (focusable.length === 0) {
+        event.preventDefault();
+        closeButtonRef.current?.focus();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+      if (event.shiftKey && (active === first || !dialog?.contains(active))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (active === last || !dialog?.contains(active))) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener("keydown", handleKeyDown);
     window.requestAnimationFrame(() => closeButtonRef.current?.focus());
@@ -599,7 +628,11 @@ function SupportDialog({open, onClose}: {open: boolean; onClose: () => void}) {
       onMouseDown={onClose}
       role="dialog"
     >
-      <section className="codaroSupportDialog" onMouseDown={(event) => event.stopPropagation()}>
+      <section
+        className="codaroSupportDialog"
+        onMouseDown={(event) => event.stopPropagation()}
+        ref={dialogRef}
+      >
         <header className="codaroSupportHeader">
           <h2>{supportCenter.title}</h2>
           <button
@@ -771,6 +804,18 @@ def renderSharedComponentCss() -> str:
     color: #e96787 !important;
   }
 
+  @media (forced-colors: active) {
+    [data-social-link="codaro"] {
+      border: 1px solid ButtonText !important;
+    }
+  }
+}
+
+/*
+ * The support center is rendered through a portal under document.body.
+ * Keep its product layout outside cascade layers so application chunks cannot
+ * establish a different layer order and let their reset collapse its spacing.
+ */
   .codaroSupportBackdrop {
     position: fixed;
     z-index: 300;
@@ -788,8 +833,9 @@ def renderSharedComponentCss() -> str:
     overflow: hidden auto;
     border: 1px solid #2d2d34;
     border-radius: 12px;
-    background: #111114;
-    color: #f4f4f5;
+    background: #111114 !important;
+    color: #f4f4f5 !important;
+    color-scheme: dark;
     box-shadow: 0 24px 80px rgba(0, 0, 0, 0.56);
   }
 
@@ -809,6 +855,7 @@ def renderSharedComponentCss() -> str:
 
   .codaroSupportHeader h2 {
     margin: 0;
+    color: #f4f4f5 !important;
     font-size: 15px;
     line-height: 1;
     font-weight: 650;
@@ -823,7 +870,7 @@ def renderSharedComponentCss() -> str:
     border: 0;
     border-radius: 7px;
     background: transparent;
-    color: #96969f;
+    color: #a5a5ae !important;
     cursor: pointer;
   }
 
@@ -874,7 +921,7 @@ def renderSharedComponentCss() -> str:
 
   .codaroSupportHero p {
     margin: 0;
-    color: #b2b2bb;
+    color: #c2c2ca !important;
     font-size: 13px;
     line-height: 1.72;
     word-break: keep-all;
@@ -887,7 +934,7 @@ def renderSharedComponentCss() -> str:
 
   .codaroSupportSection h3 {
     margin: 0;
-    color: #777780;
+    color: #a5a5ae !important;
     font-size: 10px;
     line-height: 1;
     font-weight: 650;
@@ -910,7 +957,7 @@ def renderSharedComponentCss() -> str:
     border: 1px solid #2b2b31;
     border-radius: 8px;
     background: #18181c;
-    color: #c9c9d0;
+    color: #c9c9d0 !important;
     font-size: 12px;
     text-decoration: none;
   }
@@ -938,7 +985,7 @@ def renderSharedComponentCss() -> str:
     gap: 16px;
     padding: 0 14px;
     border-bottom: 1px solid #28282e;
-    color: #f1f1f3;
+    color: #f1f1f3 !important;
     font-size: 12px;
     text-decoration: none;
   }
@@ -953,13 +1000,14 @@ def renderSharedComponentCss() -> str:
   }
 
   .codaroSupportRow strong {
+    color: #f1f1f3 !important;
     font-size: 12px;
     font-weight: 580;
   }
 
   .codaroSupportRow > span,
   .codaroSupportRow > div > span {
-    color: #85858f;
+    color: #a5a5ae !important;
     font-size: 11px;
   }
 
@@ -977,7 +1025,7 @@ def renderSharedComponentCss() -> str:
     border-radius: 6px;
     padding: 7px 9px;
     background: #222228;
-    color: #d6d6dc;
+    color: #d6d6dc !important;
     font: inherit;
     cursor: pointer;
   }
@@ -989,14 +1037,14 @@ def renderSharedComponentCss() -> str:
   }
 
   .codaroSupportAccount button span:last-child {
-    color: #9b7cf8;
+    color: #a88bff !important;
     font-size: 10px;
     font-weight: 650;
   }
 
   .codaroSupportNote {
     margin: -6px 0 0;
-    color: #696972;
+    color: #9898a2 !important;
     font-size: 10px;
     line-height: 1.6;
     text-align: center;
@@ -1023,13 +1071,6 @@ def renderSharedComponentCss() -> str:
       padding-block: 12px;
     }
   }
-
-  @media (forced-colors: active) {
-    [data-social-link="codaro"] {
-      border: 1px solid ButtonText !important;
-    }
-  }
-}
 '''
 
 

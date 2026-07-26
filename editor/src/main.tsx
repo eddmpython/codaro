@@ -8,8 +8,8 @@ import "./styles/layers.css";
 import "@astryxdesign/core/reset.css";
 import "@astryxdesign/theme-neutral/theme.css";
 import "./styles/generated/fonts.css";
-import "./styles/generated/codaroTheme.css";
 import "./index.css";
+import "./styles/generated/codaroTheme.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

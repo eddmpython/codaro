@@ -580,6 +580,18 @@
     color: #e96787 !important;
   }
 
+  @media (forced-colors: active) {
+    [data-social-link="codaro"] {
+      border: 1px solid ButtonText !important;
+    }
+  }
+}
+
+/*
+ * The support center is rendered through a portal under document.body.
+ * Keep its product layout outside cascade layers so application chunks cannot
+ * establish a different layer order and let their reset collapse its spacing.
+ */
   .codaroSupportBackdrop {
     position: fixed;
     z-index: 300;
@@ -597,8 +609,9 @@
     overflow: hidden auto;
     border: 1px solid #2d2d34;
     border-radius: 12px;
-    background: #111114;
-    color: #f4f4f5;
+    background: #111114 !important;
+    color: #f4f4f5 !important;
+    color-scheme: dark;
     box-shadow: 0 24px 80px rgba(0, 0, 0, 0.56);
   }
 
@@ -618,6 +631,7 @@
 
   .codaroSupportHeader h2 {
     margin: 0;
+    color: #f4f4f5 !important;
     font-size: 15px;
     line-height: 1;
     font-weight: 650;
@@ -632,7 +646,7 @@
     border: 0;
     border-radius: 7px;
     background: transparent;
-    color: #96969f;
+    color: #a5a5ae !important;
     cursor: pointer;
   }
 
@@ -683,7 +697,7 @@
 
   .codaroSupportHero p {
     margin: 0;
-    color: #b2b2bb;
+    color: #c2c2ca !important;
     font-size: 13px;
     line-height: 1.72;
     word-break: keep-all;
@@ -696,7 +710,7 @@
 
   .codaroSupportSection h3 {
     margin: 0;
-    color: #777780;
+    color: #a5a5ae !important;
     font-size: 10px;
     line-height: 1;
     font-weight: 650;
@@ -719,7 +733,7 @@
     border: 1px solid #2b2b31;
     border-radius: 8px;
     background: #18181c;
-    color: #c9c9d0;
+    color: #c9c9d0 !important;
     font-size: 12px;
     text-decoration: none;
   }
@@ -747,7 +761,7 @@
     gap: 16px;
     padding: 0 14px;
     border-bottom: 1px solid #28282e;
-    color: #f1f1f3;
+    color: #f1f1f3 !important;
     font-size: 12px;
     text-decoration: none;
   }
@@ -762,13 +776,14 @@
   }
 
   .codaroSupportRow strong {
+    color: #f1f1f3 !important;
     font-size: 12px;
     font-weight: 580;
   }
 
   .codaroSupportRow > span,
   .codaroSupportRow > div > span {
-    color: #85858f;
+    color: #a5a5ae !important;
     font-size: 11px;
   }
 
@@ -786,7 +801,7 @@
     border-radius: 6px;
     padding: 7px 9px;
     background: #222228;
-    color: #d6d6dc;
+    color: #d6d6dc !important;
     font: inherit;
     cursor: pointer;
   }
@@ -798,14 +813,14 @@
   }
 
   .codaroSupportAccount button span:last-child {
-    color: #9b7cf8;
+    color: #a88bff !important;
     font-size: 10px;
     font-weight: 650;
   }
 
   .codaroSupportNote {
     margin: -6px 0 0;
-    color: #696972;
+    color: #9898a2 !important;
     font-size: 10px;
     line-height: 1.6;
     text-align: center;
@@ -832,10 +847,3 @@
       padding-block: 12px;
     }
   }
-
-  @media (forced-colors: active) {
-    [data-social-link="codaro"] {
-      border: 1px solid ButtonText !important;
-    }
-  }
-}

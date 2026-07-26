@@ -60,6 +60,9 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "theme-runtime-browser": (
         "output/test-runner/theme-runtime-browser/theme-runtime-report.json",
     ),
+    "visual-accessibility-browser": (
+        "output/test-runner/visual-accessibility-browser/visual-accessibility-report.json",
+    ),
     "visual-assets": ("output/test-runner/visual-assets/visual-assets-report.json",),
     "learning-method": ("output/test-runner/learning-method/learning-flow-report.json",),
     "learning-evidence-contract": (
@@ -214,7 +217,7 @@ GATES: dict[str, Gate] = {
             command(("uv", "run", "python", "-X", "utf8", "tests/runtime/testTracebackParser.py")),
             command(("uv", "run", "python", "-X", "utf8", "docs/skills/ops/tools/genWidgetTypes.py", "--check")),
             command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyWidgetBridgeRoundTrip.py")),
-            command(("uv", "run", "--with", "playwright", "python", "-X", "utf8", "tests/runtime/verifyPlaywrightAppRuntime.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/runtime/verifyPlaywrightAppRuntime.py")),
         ),
     ),
     "app-runtime": Gate(
@@ -224,7 +227,7 @@ GATES: dict[str, Gate] = {
             command(("uv", "run", "python", "-X", "utf8", "tests/runtime/testAppRuntime.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/teacher/testTeacherToolBridge.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/teacher/testOauthTokenRefresh.py")),
-            command(("uv", "run", "--with", "playwright", "python", "-X", "utf8", "tests/runtime/verifyPlaywrightDogfood.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/runtime/verifyPlaywrightDogfood.py")),
         ),
     ),
     "mobile-layout": Gate(
@@ -234,7 +237,7 @@ GATES: dict[str, Gate] = {
             command(("uv", "run", "python", "-X", "utf8", "tests/surface/testMobileShell.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyMobileLayout.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyPwaArtifacts.py")),
-            command(("uv", "run", "--with", "playwright", "python", "-X", "utf8", "tests/surface/verifyPlaywrightMobile.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyPlaywrightMobile.py")),
         ),
     ),
     "teacher-eval": Gate(
@@ -517,10 +520,6 @@ GATES: dict[str, Gate] = {
             command((
                 "uv",
                 "run",
-                "--with",
-                "playwright",
-                "--with",
-                "pytest",
                 "python",
                 "-X",
                 "utf8",
@@ -562,12 +561,26 @@ GATES: dict[str, Gate] = {
             command((
                 "uv",
                 "run",
-                "--with",
-                "playwright",
                 "python",
                 "-X",
                 "utf8",
                 "tests/surface/verifyThemeRuntimePlaywright.py",
+            ), timeoutSeconds=1200),
+        ),
+    ),
+    "visual-accessibility-browser": Gate(
+        tier="surface",
+        description="Landing, Learn, Run, Local의 3-engine 반응형, font, contrast, keyboard modal, forced-colors 접근성 계약을 확인한다.",
+        commands=(
+            command(("npm", "run", "build"), cwd="landing"),
+            command(("npm", "run", "build"), cwd="editor"),
+            command((
+                "uv",
+                "run",
+                "python",
+                "-X",
+                "utf8",
+                "tests/surface/verifyVisualAccessibilityPlaywright.py",
             ), timeoutSeconds=1200),
         ),
     ),
@@ -590,8 +603,6 @@ GATES: dict[str, Gate] = {
             command((
                 "uv",
                 "run",
-                "--with",
-                "playwright",
                 "python",
                 "-X",
                 "utf8",
@@ -608,8 +619,6 @@ GATES: dict[str, Gate] = {
             command((
                 "uv",
                 "run",
-                "--with",
-                "playwright",
                 "python",
                 "-X",
                 "utf8",
@@ -641,7 +650,7 @@ GATES: dict[str, Gate] = {
             command(("uv", "run", "python", "-X", "utf8", "tests/learning/verifyWebLearningRoutes.py")),
             command(("npm", "run", "build"), cwd="editor"),
             command((
-                "uv", "run", "--with", "playwright", "python", "-X", "utf8",
+                "uv", "run", "python", "-X", "utf8",
                 "tests/surface/verifyNotebookAutosavePlaywright.py", "--reuse-build",
             ), timeoutSeconds=300),
             command(("node", "scripts/verifyRunRouteState.mjs"), cwd="editor"),
@@ -650,12 +659,12 @@ GATES: dict[str, Gate] = {
                 "tests/contracts/testRunRouteStateContract.py", "-q", "--tb=short",
             )),
             command((
-                "uv", "run", "--with", "playwright", "python", "-X", "utf8",
+                "uv", "run", "python", "-X", "utf8",
                 "tests/surface/verifyRunRouteStatePlaywright.py",
             ), timeoutSeconds=300),
             command(("uv", "run", "python", "-X", "utf8", "tests/learning/verifyLearningSectionCardContract.py")),
             command((
-                "uv", "run", "--with", "playwright", "python", "-X", "utf8",
+                "uv", "run", "python", "-X", "utf8",
                 "tests/learning/verifyWebLearningPlaywright.py",
             ), timeoutSeconds=1200),
         ),
@@ -669,11 +678,11 @@ GATES: dict[str, Gate] = {
             command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyLandingSeo.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyPublicProductClaims.py")),
             command((
-                "uv", "run", "--with", "playwright", "python", "-X", "utf8",
+                "uv", "run", "python", "-X", "utf8",
                 "tests/surface/verifyLandingHydration.py",
             ), timeoutSeconds=300),
             command((
-                "uv", "run", "--with", "playwright", "python", "-X", "utf8",
+                "uv", "run", "python", "-X", "utf8",
                 "tests/surface/verifyLandingExperiencePlaywright.py",
             ), timeoutSeconds=1200),
         ),
@@ -684,7 +693,7 @@ GATES: dict[str, Gate] = {
         commands=(
             command(("npm", "run", "build"), cwd="editor"),
             command((
-                "uv", "run", "--with", "playwright", "python", "-X", "utf8",
+                "uv", "run", "python", "-X", "utf8",
                 "tests/automation/verifyAutomationStudioPlaywright.py",
             ), timeoutSeconds=1200),
         ),
@@ -695,7 +704,7 @@ GATES: dict[str, Gate] = {
         commands=(
             command(("npm", "run", "build"), cwd="editor"),
             command((
-                "uv", "run", "--with", "playwright", "python", "-X", "utf8",
+                "uv", "run", "python", "-X", "utf8",
                 "tests/surface/verifyRunLocalStatePlaywright.py",
             ), timeoutSeconds=600),
         ),
@@ -758,6 +767,7 @@ PRODUCT_QUALITY_GATES = (
     "architecture-boundary",
     "design-system-contract",
     "theme-runtime-browser",
+    "visual-accessibility-browser",
     "visual-assets",
     "learning-method",
     "learning-evidence-contract",
@@ -803,6 +813,7 @@ PRODUCT_RELEASE_GATES = (
     "frontend-performance-budget",
     "design-system-contract",
     "theme-runtime-browser",
+    "visual-accessibility-browser",
     "learning-method",
     "curriculum-quality-matrix",
     "repository-simplification",
@@ -1673,8 +1684,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 58:
-        failures.append(f"expected 58 gates, found {len(GATES)}")
+    if len(GATES) != 59:
+        failures.append(f"expected 59 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:
