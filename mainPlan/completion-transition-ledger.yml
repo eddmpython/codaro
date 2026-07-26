@@ -1,2 +1,15 @@
 schemaVersion: 1
-transitions: []
+transitions:
+- schemaVersion: 1
+  transitionKind: complete
+  nonce: 9873b957-6e25-418d-9411-657ece1f2f64
+  transitionId: be19623ed7a1c000820d991867007ad837eae81fb518121202ff67b2c481349d
+  initiativeId: astryx-product-experience
+  packetId: completion-and-gate-bootstrap
+  implementationCommit: cac1cc9db96b3d42f5c8a728c2e3051f81cc611e
+  evidenceCommit: 9afa9ab60cea682d97eb6f3f08caab8a90e0ced8
+  fromPath: mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/02-completion-and-gate-bootstrap
+  toPath: mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/_done/02-completion-and-gate-bootstrap
+  evidencePath: mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/_done/02-completion-and-gate-bootstrap/completion-evidence.yml
+  evidenceHash: 810205a35c869ec4e789cda3387dac374dd8d990b0d19f5438ab47bfbc32ef72
+  preparedAt: '2026-07-26T15:14:04+00:00'
