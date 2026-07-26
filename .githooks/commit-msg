@@ -1,5 +1,5 @@
 #!/bin/sh
-# Block commit messages that expose tool or contributor traces.
+# Enforce factual commit records and block tool or contributor traces.
 message_file="$1"
 
 if [ -z "$message_file" ] || [ ! -f "$message_file" ]; then
@@ -16,5 +16,36 @@ if grep -Eiq '(gpt|chatgpt|openai|codex|claude|anthropic|generated[[:space:]]+by
   echo "blocked: commit message must not contain tool, generated-by, or contributor trace terms" >&2
   exit 1
 fi
+
+subject=$(sed -n '1p' "$message_file")
+
+case "$subject" in
+  Merge\ *|Revert\ \"*|revert:\ Revert\ \"*)
+    exit 0
+    ;;
+esac
+
+if [ -z "$subject" ]; then
+  echo "blocked: commit subject is missing" >&2
+  exit 1
+fi
+
+for section in "상황:" "변경:" "영향:" "검증:"; do
+  if ! grep -Fqx "$section" "$message_file"; then
+    echo "blocked: commit body must include required section: $section" >&2
+    exit 1
+  fi
+
+  section_text=$(awk -v target="$section" '
+    $0 == target { capture = 1; next }
+    capture && ($0 == "상황:" || $0 == "변경:" || $0 == "영향:" || $0 == "검증:") { exit }
+    capture && $0 !~ /^[[:space:]]*$/ && $0 !~ /^[[:space:]]*#/ { print; exit }
+  ' "$message_file")
+
+  if [ -z "$section_text" ]; then
+    echo "blocked: commit body section must contain a factual description: $section" >&2
+    exit 1
+  fi
+done
 
 exit 0
