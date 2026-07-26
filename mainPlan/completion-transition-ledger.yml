@@ -13,3 +13,16 @@ transitions:
   evidencePath: mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/_done/02-completion-and-gate-bootstrap/completion-evidence.yml
   evidenceHash: 810205a35c869ec4e789cda3387dac374dd8d990b0d19f5438ab47bfbc32ef72
   preparedAt: '2026-07-26T15:14:04+00:00'
+- schemaVersion: 1
+  transitionKind: complete
+  nonce: 959cb9da-308e-4469-9523-34f4171962f2
+  transitionId: 47841800ce2c1de9c1da78bd6ec43ce5c231acb53a1d0a3ca3fd55263a9ca32d
+  initiativeId: astryx-product-experience
+  packetId: token-and-package-contract
+  implementationCommit: 38587105aa278a5aaf97773f8dd9870da820f375
+  evidenceCommit: 49ccc06372ab0631edca983a4bf7df549becda59
+  fromPath: mainPlan/astryx-product-experience/01-design-foundation/00-token-and-package-contract
+  toPath: mainPlan/astryx-product-experience/01-design-foundation/_done/00-token-and-package-contract
+  evidencePath: mainPlan/astryx-product-experience/01-design-foundation/_done/00-token-and-package-contract/completion-evidence.yml
+  evidenceHash: 68ed514a8764836928630830e3164f2bec06e5b2cd6a3953c6050ed9a12d8d12
+  preparedAt: '2026-07-26T16:08:59+00:00'

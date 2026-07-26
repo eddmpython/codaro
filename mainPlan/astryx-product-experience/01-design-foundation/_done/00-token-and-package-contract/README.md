@@ -1,5 +1,12 @@
 # 00 Token And Package Contract
 
+<!-- completion-record:v1 -->
+> 완료일: 2026-07-26T16:00:54+00:00
+> 구현 커밋: `38587105aa278a5aaf97773f8dd9870da820f375`
+> 통과 게이트: design-system-contract
+> 남은 위험: 실제 light/dark/system·viewport·보조기술 검수는 04-visual-accessibility-gates에서 계속 차단한다.; 이 전이는 token·package source 계약만 봉인하며 design foundation workstream 완료를 뜻하지 않는다.
+> 증거: [`completion-evidence.yml`](completion-evidence.yml)
+
 상태: 진행
 
 ## 목표
