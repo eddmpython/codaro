@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: a94e912ce19565d01fe585e22d2f1195cd09b71e
+  gitCommit: 32b016bea4d9e5a803d5e24ce51d77b7364dc5db
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: 9122ed1eabd9f470a58eb3f7e93e701deeb9aed1b087e1d3d86bd0176af10b32
-  fileCount: 2676
-  totalBytes: 88202021
+  manifestHash: 2fa2bf4d6564208d5c13cc45be610a5eb2d768b22c7e2529a2f3241a699e0720
+  fileCount: 2675
+  totalBytes: 88200786
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: d8a6560669c32df6e05256503597b621c0abbe8d5263e04e5b493bea6fad88e9
-  bytes: 88717559
+  sha256: aa57e8701a37dfb4b4fac7455767acde30772c18aa00d89f72697a5869f2bc99
+  bytes: 88716058
   format: zip
   compression: stored
   compressionMethod: 0
@@ -10089,11 +10089,6 @@ files:
   bytes: 930
   kind: repository
   sourcePath: launcher/codaro-launcher/src/webview.rs
-- path: mainPlan/astryx-product-experience/01-design-foundation/00-token-and-package-contract/README.md
-  sha256: b0c593d567c6c095510f346af36156c1a653084b5653d65767393573155add90
-  bytes: 1590
-  kind: repository
-  sourcePath: mainPlan/astryx-product-experience/01-design-foundation/00-token-and-package-contract/README.md
 - path: mainPlan/astryx-product-experience/01-design-foundation/01-theme-runtime-and-layers/README.md
   sha256: 9c6ec8090c5b3049bf0464d0bf0347f6fe0e390c1459c876063f83ee28b9f224
   bytes: 1553
@@ -10115,8 +10110,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/01-design-foundation/04-visual-accessibility-gates/README.md
 - path: mainPlan/astryx-product-experience/01-design-foundation/README.md
-  sha256: 172324f139d0b2889e943f3a6d210872c77a0a057d952f91f01bdb1e7ba3590d
-  bytes: 3247
+  sha256: 48edfb58ce81a0ae8065ecb210bcb9742c9a91c25476988c3f6af163995dfa64
+  bytes: 3518
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/01-design-foundation/README.md
 - path: mainPlan/astryx-product-experience/02-learning-method/README.md
@@ -10965,8 +10960,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/10-quality-release/README.md
 - path: mainPlan/astryx-product-experience/README.md
-  sha256: 02ec4b02e440e163d81e4b4b8f30b5e7f0f2cbc297a90a9f5245cdbe99c8cc00
-  bytes: 26959
+  sha256: 5d4eddbe8faf6b5d1f913e5616f2c60fe7271695e992f9f437f7a0b095aa9119
+  bytes: 27043
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/README.md
 - path: pyproject.toml
