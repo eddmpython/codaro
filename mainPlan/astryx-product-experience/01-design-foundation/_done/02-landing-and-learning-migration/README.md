@@ -1,5 +1,12 @@
 # 02 Landing And Learning Migration
 
+<!-- completion-record:v1 -->
+> 완료일: 2026-07-26T17:56:30+00:00
+> 구현 커밋: `a9f3903bb80e7efb603e899bb2e757cd7a97e44b`
+> 통과 게이트: web-learning-routes, run-route-state, web-learning, landing-seo, public-product-claims, landing-hydration, landing-public, pages-deployment, ci-experience
+> 남은 위험: 전체 contrast·keyboard·screen-reader·Firefox·WebKit·WebView2 수동 matrix는 04-visual-accessibility-gates에서 계속 차단한다.; Run·Local의 전체 capability state와 320px 최소 폭 봉인은 03-run-and-local-migration에서 계속 진행한다.; 현재 세션의 연결 브라우저 목록이 비어 공개 URL 수동 클릭은 수행하지 못했으며, 동일 clean A의 Chromium 상호작용 보고서와 Pages build·deploy 성공을 각각 보존했다.
+> 증거: [`completion-evidence.yml`](completion-evidence.yml)
+
 상태: 진행
 
 ## 목표
