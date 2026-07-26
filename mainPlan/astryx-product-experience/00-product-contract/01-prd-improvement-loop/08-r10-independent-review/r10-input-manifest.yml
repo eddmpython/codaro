@@ -19,10 +19,10 @@ scope:
 draftBundle:
   manifestPath: mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/08-r10-independent-review/evaluation-bundle.manifest.yml
   archivePath: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  gitCommit: 003854a885a339919a291508cd0b02be04267bbb
+  gitCommit: 573f7aa35a4b2e5e8b9d1e3572f464a5fb8fd73c
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: e4889f7cb1bcb4553e696273db6d000002b12049ad3abd5c73e35ecc364d585f
-  evaluationBundleHash: 441828621ada94477796381597fcf871102245229d659c390f18fa2bd557ec7f
+  manifestHash: b85e016b66b2ed52b3286e703a3f2ff0f5112913904a72d47e87bde7b7c33239
+  evaluationBundleHash: 692177db18d31104e6f12c49efa2f8fdcef8ae57e5678d507a98e6b2e8b8c79c
   fileCount: 2675
   bundleIntegrityState: passed
   sealEligible: false
@@ -183,8 +183,7 @@ remediations:
     productExperienceBrowserCases: 54
   eligibleForR10: false
 blockingReasons:
-- packet 02 completion bootstrap has a verified clean A/E/B transition; packets 03 through 07 and 09 have no independent
-  closure
+- packet 02 completion bootstrap has a verified clean A/E/B transition; packets 03 through 07 and 09 have no independent closure
 - learning ledgers are reproducible and weak-only coverage is 0, but independent assessment approval coverage is 0 of 472
   lessons
 - author-fact-audit.snapshot.yml is non-independent and cannot decide pass

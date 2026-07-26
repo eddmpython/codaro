@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: 003854a885a339919a291508cd0b02be04267bbb
+  gitCommit: 573f7aa35a4b2e5e8b9d1e3572f464a5fb8fd73c
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: e4889f7cb1bcb4553e696273db6d000002b12049ad3abd5c73e35ecc364d585f
+  manifestHash: b85e016b66b2ed52b3286e703a3f2ff0f5112913904a72d47e87bde7b7c33239
   fileCount: 2675
-  totalBytes: 88228881
+  totalBytes: 88249963
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: 441828621ada94477796381597fcf871102245229d659c390f18fa2bd557ec7f
-  bytes: 88743939
+  sha256: 692177db18d31104e6f12c49efa2f8fdcef8ae57e5678d507a98e6b2e8b8c79c
+  bytes: 88765021
   format: zip
   compression: stored
   compressionMethod: 0
@@ -71,8 +71,8 @@ contracts:
   sha256: 3a7e5a28de2b81c7ee2b2f81c41f3bbedb8dd58efe3a6c23ee65b4cd57254dec
 files:
 - path: .github/workflows/ci.yml
-  sha256: c391842e8c8d4b7ea968456d96bda752537d5acf884fda5f47799eafbd58cf42
-  bytes: 8020
+  sha256: 2287b7a7eb89cbb70cb5e7b62ef2e3ab46fae012b568044ee0e1f92753bbaa64
+  bytes: 8068
   kind: repository
   sourcePath: .github/workflows/ci.yml
 - path: .github/workflows/launcher-release.yml
@@ -3731,8 +3731,8 @@ files:
   kind: repository
   sourcePath: docs/skills/ops/foundation/environment.md
 - path: docs/skills/ops/foundation/testing-and-gates.md
-  sha256: 122530e02bdc38d487e52de60b344e57b8c517b14a98be131294ccf4b8501557
-  bytes: 50913
+  sha256: 5a25657a3836f250e1c9e2b06d03b7b6930b7760737fc150dce0749445cd7008
+  bytes: 52590
   kind: repository
   sourcePath: docs/skills/ops/foundation/testing-and-gates.md
 - path: docs/skills/ops/product/branding.md
@@ -10945,8 +10945,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/09-repository-simplification/README.md
 - path: mainPlan/astryx-product-experience/10-quality-release/README.md
-  sha256: 0ddc88b2e873364503e8f0ad2981a6c6fe6b2cee9083f144f7ccd9f73140e0bf
-  bytes: 30092
+  sha256: 2abf548c8addd814b96ea058ff06856a597a2c89d3bf38960fc3bec35e3bcc96
+  bytes: 31060
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/10-quality-release/README.md
 - path: mainPlan/astryx-product-experience/README.md
@@ -12965,8 +12965,8 @@ files:
   kind: repository
   sourcePath: tests/product/fixtures/releaseResearch/missing-research-owner.yml
 - path: tests/product/testAstryxJourneyAudit.py
-  sha256: 9b59d507ac26a3fbd8261cba7f740b467c5babd2dd4c6f3fddb5aaacbf36953f
-  bytes: 3500
+  sha256: 8e13eb11b87a26cca2ea56f2e621137dc55cbcaff6f978e04360b5d885376a3f
+  bytes: 5816
   kind: repository
   sourcePath: tests/product/testAstryxJourneyAudit.py
 - path: tests/product/testAstryxJourneyMatrix.py
@@ -12990,8 +12990,8 @@ files:
   kind: repository
   sourcePath: tests/product/testPrdEvaluationReport.py
 - path: tests/product/verifyAstryxJourneyAudit.py
-  sha256: c79f595c9176a78888b70301e2e9d872f9dc9964dbf809df6fbb2c673d720718
-  bytes: 11539
+  sha256: c9a1f9e6c01a4ad21550fc6f5b3a511ca11418310e64411915e52cee01243664
+  bytes: 12346
   kind: repository
   sourcePath: tests/product/verifyAstryxJourneyAudit.py
 - path: tests/product/verifyCheckSandboxFeasibility.py
@@ -13045,8 +13045,8 @@ files:
   kind: repository
   sourcePath: tests/product/verifyReleaseResearchOperations.py
 - path: tests/run.py
-  sha256: d77ff938937d0573fefe0e254cb3d5a6ab01485058ab192ae0188e40353c6e2a
-  bytes: 63533
+  sha256: 0ba3f33c8a319da14baba0e2cd6d2aa8247c6006a741e163c1f5043683635319
+  bytes: 73504
   kind: repository
   sourcePath: tests/run.py
 - path: tests/runtime/testAppRuntime.py
@@ -13100,8 +13100,8 @@ files:
   kind: repository
   sourcePath: tests/runtime/testReactiveMarkdown.py
 - path: tests/runtime/testRunEntrypoint.py
-  sha256: 3e5ebc2f4413aef7b2f1fdea2da64f8529ba05d2f9cc05c59f9f6ada80c17930
-  bytes: 19613
+  sha256: ace9387084e3b4af4fdade9a1418513767f96ec7c24383edc9592e69b5c43adf
+  bytes: 24908
   kind: repository
   sourcePath: tests/runtime/testRunEntrypoint.py
 - path: tests/runtime/testRuntime.py
