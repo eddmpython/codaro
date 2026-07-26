@@ -92,6 +92,9 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     ),
     "install-launcher-smoke": ("output/test-runner/install-launcher-smoke/install-launcher-report.json",),
     "onboarding-browser": ("output/test-runner/onboarding-browser/onboarding-report.json",),
+    "completion-bootstrap": (
+        "output/test-runner/completion-bootstrap/completion-bootstrap-report.json",
+    ),
     "plan-quality": (
         "output/test-runner/plan-quality/plan-fact-audit.json",
         "output/test-runner/plan-quality/evaluation-validation.json",
@@ -264,6 +267,13 @@ GATES: dict[str, Gate] = {
         description="제품 품질 기준과 새 내구성 gate 증거를 확인한다.",
         commands=(command(("uv", "run", "python", "-X", "utf8", "tests/product/verifyProductQualityAudit.py")),),
         ci_required=False,
+    ),
+    "completion-bootstrap": Gate(
+        tier="fast",
+        description="mainPlan 완료 schema, 전이 도구, ledger, fact audit와 negative fixture를 clean commit에서 검증한다.",
+        commands=(command((
+            "uv", "run", "python", "-X", "utf8", "tests/plan/verifyCompletionBootstrap.py",
+        )),),
     ),
     "plan-quality": Gate(
         tier="fast",
@@ -1322,8 +1332,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 55:
-        failures.append(f"expected 55 gates, found {len(GATES)}")
+    if len(GATES) != 56:
+        failures.append(f"expected 56 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

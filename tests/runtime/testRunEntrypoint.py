@@ -50,6 +50,7 @@ def testGateNamesAreStable() -> None:
         "learning-system-readiness",
         "dogfood-alpha-audit",
         "product-quality-audit",
+        "completion-bootstrap",
         "plan-quality",
         "automation-ide-audit",
         "service-readiness-audit",

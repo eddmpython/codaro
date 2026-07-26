@@ -51,6 +51,7 @@ uv run python -X utf8 tests/run.py gate product-experience-browser
 uv run python -X utf8 tests/run.py gate astryx-journey
 uv run python -X utf8 tests/run.py gate dogfood-alpha-audit
 uv run python -X utf8 tests/run.py gate product-quality-audit
+uv run python -X utf8 tests/run.py gate completion-bootstrap
 uv run python -X utf8 tests/run.py gate plan-quality
 uv run python -X utf8 tests/run.py gate automation-ide-audit
 uv run python -X utf8 tests/run.py gate diagnostic-summary-contract
@@ -100,6 +101,7 @@ uv run python -X utf8 tests/run.py gate attempts
 | --- | --- | --- |
 | `docs` | fast | 운영 문서 포인터, gate 정의, CI 연결 상태를 확인한다. |
 | `root-clean` | fast | 저장소 루트가 canonical tree와 맞고 로컬 실습 파일, 로그, 임시 산출물이 남지 않았는지 확인한다. |
+| `completion-bootstrap` | fast | clean implementation commit에서 mainPlan 완료 schema, 전이 도구, ledger, fact audit, bootstrap negative fixture와 A→E→B round-trip을 검증한다. R10 사람 평가를 선행 요구하지 않는다. |
 | `plan-quality` | fast | mainPlan 사실 감사, 완료 전이 negative fixture, 독립 평가 보고서 완전성을 목표 점수나 통과 점수 없이 검사한다. Bootstrap 동안 non-blocking red로 관찰하고 R10 증거가 green인 뒤에만 blocking·CI required로 승격한다. |
 | `backend` | fast | Python backend 전체 테스트를 실행한다. `tests/_attempts`는 `--ignore`로 수집하지 않는다. |
 | `attempts` | experiment | 운영과 분리된 `tests/_attempts` 실험 샌드박스를 실행한다. preflight/quality-cycle/CI 비포함이며 `tier` 스윕에도 끼지 않는다. |
@@ -225,3 +227,4 @@ uv run python -X utf8 tests/run.py gate attempts
 - `landing-build`는 공개 문서 surface가 generated docs 본문 HTML을 nav chunk에 싣지 않는지도 확인한다. `docsNav.js`는 metadata와 `contentModule`만 담고, 각 문서 본문은 `landing/src/lib/generated/docsPages/page*.js`로 분리되어 slug route에서 동적 로딩되어야 한다. `docs/skills` 핵심 SSOT 문구가 generated docs에 반영되지 않은 stale 상태도 실패로 본다.
 - 기존 부채를 새 테스트로 한 번에 해결하지 못하면 별도 baseline 또는 명시적 TODO 문서로 분리한다.
 - CI YAML은 세부 명령을 소유하지 않고 `tests/run.py gate <name>`만 호출한다.
+- `completion-bootstrap`은 완료 protocol을 소비할 다른 packet보다 먼저 green·CI required로 고정한다. 독립 R10 보고서 완전성은 downstream `plan-quality`가 계속 차단하며 bootstrap packet의 선행 조건으로 되돌리지 않는다.

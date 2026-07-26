@@ -45,13 +45,13 @@ mainPlan/
 
 완료는 세 commit으로 처리한다. commit A는 구현을 고정한다. clean A에서 gate를 실행한 report는 `gitHead=A`를 기록하고, commit E는 report snapshot과 `completion-evidence.yml`만 추가해 `completion-evidence.yml.gitCommit=A`를 고정한다. 같은 파일 안에 자기 commit hash를 쓰는 것은 Git hash 구조상 불가능하므로 E 자신의 hash를 evidence 본문에 넣지 않는다. `docs/skills/ops/tools/completeMainPlanPacket.py --implementation-commit A --evidence-commit E`는 `E^=A`, E의 report hash와 schema를 검증한 뒤 packet move, parent link, active index, `mainPlan/completion-transition-ledger.yml` row를 준비하며 이 변경만 commit B로 만든다. row schema는 `schemaVersion`, UUIDv4 `nonce`, `transitionId`, initiative/packet ID, implementation commit, evidence commit, from/to path, evidence hash, preparedAt을 요구한다. `transitionId`는 RFC 8785 JCS object `{initiativeId,packetId,implementationCommit,evidenceCommit,nonce}` UTF-8 bytes의 SHA-256으로 계산한다. nonce와 transition ID는 전역 unique이고 같은 initiative/packet 또는 from path의 row는 하나뿐이다. `tests/plan/verifyMainPlanCompletion.py --transition-head B`는 `B^=E`, `E^=A`이고 B diff가 허용된 이동·index·evidence·ledger뿐인지 확인한다. evidence가 자기 자신인 E나 B hash를 요구하지 않으며 Git history와 nonce로 transition commit을 식별한다. concurrent branch가 같은 packet transition 두 개를 만들면 자동 winner를 고르지 않고 merge gate가 실패하며 한 branch를 merge 전에 rebase/drop해야 한다. active status 허위 완료, evidence 없는 `_done`, stale A/E, 끊긴 parent link는 모두 차단한다.
 
-현재 이 schema와 tool의 bootstrap owner는 `astryx-product-experience/00-product-contract/01-prd-improvement-loop/02-completion-and-gate-bootstrap/`이다. commit A에 tool·schema를 구현하고, clean A에서 gate를 실행해 commit E에 bootstrap packet evidence를 고정한 뒤 A에 포함된 tool로 commit B를 준비한다. manual `_done` 예외는 없으며 bootstrap이 끝나기 전 다른 활성 packet을 `_done`으로 이동하지 않는다.
+현재 이 schema와 tool의 bootstrap owner는 `astryx-product-experience/00-product-contract/01-prd-improvement-loop/02-completion-and-gate-bootstrap/`이다. commit A에 tool·schema를 구현하고, clean A에서 `completion-bootstrap` gate를 실행해 commit E에 bootstrap packet evidence를 고정한 뒤 A에 포함된 tool로 commit B를 준비한다. `plan-quality`의 독립 R10 평가는 이 protocol의 downstream 소비자이므로 bootstrap 전이의 선행 조건이 아니다. manual `_done` 예외는 없으며 bootstrap이 끝나기 전 다른 활성 packet을 `_done`으로 이동하지 않는다.
 
 ## 활성 이니셔티브
 
 | 이니셔티브 | 상태 | 목표 |
 | --- | --- | --- |
-| [astryx-product-experience](astryx-product-experience/) | 설계 | Astryx 공용 디자인 시스템으로 랜딩, 웹 Run, 로컬 제품, 학습 경험을 하나의 고품질 제품군으로 통합한다. |
+| [astryx-product-experience](astryx-product-experience/) | 진행 | Astryx 공용 디자인 시스템으로 랜딩, 웹 Run, 로컬 제품, 학습 경험을 하나의 고품질 제품군으로 통합한다. |
 
 ## 완료 판정 예시
 

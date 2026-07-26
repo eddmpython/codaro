@@ -134,6 +134,7 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 | `learning-efficacy-report` | research/product | yes | every change | protocol/report schema와 stale 판정 fixture |
 | `path-learning-signal` | research/product | no | path beta graduation | E2 pre/post·unseen transfer와 운영 evidence |
 | `path-efficacy-confirmatory` | research/product | no | featured path graduation | 해당 path E3 pre/post·retention·transfer report |
+| `completion-bootstrap` | initiative owner | yes | every change | completion schema·tool·ledger·negative fixture와 clean A→E→B round-trip |
 | `plan-quality` | initiative owner | no | independent R10 | evaluation report schema·rubric hash·독립성·plan fact audit |
 | `product-release` | release owner | no | release | 모든 required gate와 current human evidence aggregate |
 

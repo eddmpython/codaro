@@ -115,8 +115,8 @@ Codaro를 다운로드 중심 랜딩과 별도 로컬 앱의 조합으로 보지
 1. 원래 계획은 B0 evaluation contract와 completion bootstrap, B1 migration·sandbox, B2 W0 사람·시각 증거, B3 독립 평가 순서였다.
 2. 실제로는 B2 사람·AT 증거와 B3가 닫히기 전에 Astryx surface, 467레슨 strong assessment, 472개 public route, full archive, legacy 제거까지 machine 구현이 선행됐다.
 3. 이 deviation은 구현 성과를 취소하지 않지만 gate 위반을 해소하지도 않는다. source coverage, solution 실행, Chromium 기준선은 사람 content review, 독립 평가, 학습 효과와 다른 증거다.
-4. 최신 통합 aggregate는 공식 63/63과 Local 26/26으로 green이다. 현재 우선순위는 identity 0/472, content 0/472, taxonomy 0/7, independent assessment 0/467의 review 부채를 원장에 그대로 드러내고 current scope의 독립 R10 raw report bundle을 생성하는 것이다.
-5. B3 전에는 추가 machine 결함 수정과 검증은 계속할 수 있다. 그러나 W1+를 승인·featured·released로 표시하거나 어떤 packet도 `_done`으로 이동할 수 없다.
+4. 마지막 실행 기준 통합 제품 검사는 66/66, Local 선택군은 26/26으로 green이지만 저장된 canonical aggregate는 현재 HEAD와 다르므로 새 완료 증거로 재사용하지 않는다. 현재 우선순위는 identity 0/472, content 0/472, taxonomy 0/7, independent assessment 0/467의 review 부채를 원장에 그대로 드러내고 current scope의 독립 R10 raw report bundle을 생성하는 것이다.
+5. B3 전에도 B0 completion bootstrap과 R10 입력을 만드는 remediation packet은 clean A→E→B 증거로 내부 `_done` 전이할 수 있다. 이 전이는 구현 봉인이지 독립 평가 승인이나 제품 출시 판정이 아니다. W1+를 승인·featured·released로 표시하거나 top-level product workstream을 `_done`으로 이동하는 일은 B3와 각 workstream의 사람 증거가 계속 차단한다.
 6. B3 뒤에는 이미 존재하는 source를 다시 대량 생성하지 않는다. 대표 경로부터 author review와 formative 검증을 수행하고, 나머지 domain은 레슨별 검수와 evidence commit을 채운다. 효능 검증은 경로별 candidate -> formative -> confirmatory graduation으로 진행한다.
 
 `01-design-foundation`과 `02-learning-method`, `03-product-shell`, 04·05·06·07·09의 machine 구현은 원래 unlock 순서보다 앞서 진행됐다. 이 선행 구현을 완료 증거로 승격하지 않는다. 08의 lesson anchor author review와 06/01 instructional asset 승인이 끝나기 전 해당 path를 `_done` 처리하지 않으며, 06/02·03 product capture도 사람 검수와 current commit evidence를 별도로 요구한다. `09-repository-simplification`의 삭제 역시 B3 전에 실행됐으므로 machine gate green만으로 `_done` 처리하지 않고 R10과 completion transition을 기다린다.

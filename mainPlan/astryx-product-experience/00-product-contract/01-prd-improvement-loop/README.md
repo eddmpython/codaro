@@ -48,7 +48,7 @@ Product evidence maturity는 `E0 없음`, `E1 synthetic`, `E2 vertical slice`, `
 
 ## 완료 처리
 
-각 packet은 문서만 다듬었다고 완료되지 않는다. packet에 적힌 fact audit와 negative fixture를 통과하고, 신규 evaluator가 해당 finding을 재현하지 못한 경우에만 내부 `_done/`으로 이동할 수 있다. 모든 packet이 이동돼도 제품 workstream 00~10은 별도 구현 증거가 없으면 활성 상태다.
+각 remediation packet은 문서만 다듬었다고 완료되지 않는다. packet에 적힌 fact audit와 negative fixture를 clean implementation commit에서 통과하고, report와 completion evidence를 별도 evidence commit에 고정한 뒤 completion tool이 A→E→B 전이를 검증해야 내부 `_done/`으로 이동한다. 이 이동은 해당 remediation 구현을 봉인하는 판정이며 독립 R10 승인이나 제품 출시 승격이 아니다. R10은 이 봉인된 입력을 신규 evaluator가 다시 반증하는 downstream round이고, 같은 finding이 재현되면 기존 transition을 지우지 않고 새 remediation packet과 correction 기록을 만든다. 모든 packet이 이동돼도 제품 workstream 00~10은 별도 구현·사람·출시 증거가 없으면 활성 상태다.
 
 ## 영향 파일
 

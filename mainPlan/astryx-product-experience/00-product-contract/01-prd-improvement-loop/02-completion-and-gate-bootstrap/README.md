@@ -9,7 +9,7 @@
 ## bootstrap 순서
 
 1. commit A에 `mainPlan/completion-evidence.schema.yml`, transition ledger schema, packet completion tool과 verifier를 고정한다.
-2. clean A에서 gate를 실행하고 A를 가리키는 report와 bootstrap packet evidence만 commit E에 고정한다. 자기 commit hash를 같은 파일 안에 쓰는 불가능한 self-reference를 요구하지 않는다.
+2. clean A에서 `completion-bootstrap` gate를 실행하고 A를 가리키는 report와 bootstrap packet evidence만 commit E에 고정한다. 독립 평가가 필요한 `plan-quality`는 downstream R10 gate이며 bootstrap 증거로 사용하지 않는다. 자기 commit hash를 같은 파일 안에 쓰는 불가능한 self-reference를 요구하지 않는다.
 3. A에 포함된 새 tool을 clean E에서 실행해 `E^=A`를 확인하고 이 bootstrap packet의 move와 transition row를 준비해 그 변경만 commit B로 만든다. manual transition 예외는 두지 않는다.
 4. 신규 product gate는 runner에 non-blocking red로 먼저 등록하고 negative fixture가 실제로 실패하는지 증명한다.
 5. owner workstream이 green evidence를 만든 뒤에만 blocking·CI required로 승격한다.
@@ -23,6 +23,7 @@ Python·TypeScript·Rust가 함께 소비하는 wire schema source는 root `cont
 - 신규 `mainPlan/completion-transition.schema.yml`, `mainPlan/completion-transition-ledger.yml`
 - 신규 `docs/skills/ops/tools/completeMainPlanPacket.py`
 - 신규 `tests/plan/verifyMainPlanCompletion.py`
+- 신규 `tests/plan/verifyCompletionBootstrap.py`
 - 신규 `tests/product/verifyPlanFactAudit.py`
 - 선행 산출물 소비 `tests/product/verifyPrdEvaluationReport.py` (생성 owner는 `00-evaluation-contract`); 신규 `tests/product/bootstrapAfterUse.fixture.yml`
 - 신규 `contracts/artifactOwnership.schema.json`, `contracts/artifactOwners.yml`
@@ -35,6 +36,7 @@ Python·TypeScript·Rust가 함께 소비하는 wire schema source는 root `cont
 ## 영향 함수·심볼
 
 - 신규 `prepareCompletionTransition`, `verifyCompletionTransition`, `verifyPlanFacts`
+- 신규 `GATES["completion-bootstrap"]`, `GATE_ARTIFACTS["completion-bootstrap"]`
 - 신규 `GATES["plan-quality"]`, `GATE_ARTIFACTS["plan-quality"]`
 - 신규 `ArtifactOwner`, `ArtifactRole`
 
