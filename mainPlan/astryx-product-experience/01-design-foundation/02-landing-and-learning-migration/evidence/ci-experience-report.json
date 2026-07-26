@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "gate": "ci-experience",
+  "status": "passed",
+  "passed": true,
+  "gitHead": "a9f3903bb80e7efb603e899bb2e757cd7a97e44b",
+  "completedAt": "2026-07-26T17:56:30+00:00",
+  "workflow": {
+    "id": 30213073100,
+    "name": "CI",
+    "event": "push",
+    "runNumber": 652,
+    "runAttempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "createdAt": "2026-07-26T17:40:33+00:00",
+    "startedAt": "2026-07-26T17:40:33+00:00",
+    "completedAt": "2026-07-26T17:56:31+00:00",
+    "url": "https://github.com/eddmpython/codaro/actions/runs/30213073100"
+  },
+  "jobs": {
+    "editor": {
+      "id": 89822482169,
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-07-26T17:40:36+00:00",
+      "completedAt": "2026-07-26T17:41:03+00:00",
+      "url": "https://github.com/eddmpython/codaro/actions/runs/30213073100/job/89822482169"
+    },
+    "landing": {
+      "id": 89822482196,
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-07-26T17:40:36+00:00",
+      "completedAt": "2026-07-26T17:41:16+00:00",
+      "url": "https://github.com/eddmpython/codaro/actions/runs/30213073100/job/89822482196"
+    },
+    "experience": {
+      "id": 89822482197,
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-07-26T17:40:36+00:00",
+      "completedAt": "2026-07-26T17:56:30+00:00",
+      "durationMs": 954000,
+      "url": "https://github.com/eddmpython/codaro/actions/runs/30213073100/job/89822482197",
+      "steps": [
+        {
+          "name": "Verify Web learning",
+          "status": "completed",
+          "conclusion": "success",
+          "startedAt": "2026-07-26T17:43:19+00:00",
+          "completedAt": "2026-07-26T17:45:20+00:00"
+        },
+        {
+          "name": "Verify public landing",
+          "status": "completed",
+          "conclusion": "success",
+          "startedAt": "2026-07-26T17:45:20+00:00",
+          "completedAt": "2026-07-26T17:46:08+00:00"
+        },
+        {
+          "name": "Verify Local Studio",
+          "status": "completed",
+          "conclusion": "success",
+          "startedAt": "2026-07-26T17:46:08+00:00",
+          "completedAt": "2026-07-26T17:48:00+00:00"
+        },
+        {
+          "name": "Verify full product experience",
+          "status": "completed",
+          "conclusion": "success",
+          "startedAt": "2026-07-26T17:48:00+00:00",
+          "completedAt": "2026-07-26T17:54:32+00:00"
+        },
+        {
+          "name": "Verify Astryx dual-theme journey",
+          "status": "completed",
+          "conclusion": "success",
+          "startedAt": "2026-07-26T17:54:32+00:00",
+          "completedAt": "2026-07-26T17:56:25+00:00"
+        }
+      ]
+    }
+  }
+}

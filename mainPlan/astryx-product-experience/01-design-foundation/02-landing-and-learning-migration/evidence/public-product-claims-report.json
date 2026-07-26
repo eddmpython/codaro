@@ -1,0 +1,30 @@
+{
+  "gate": "public-product-claims",
+  "passed": true,
+  "status": "passed",
+  "startedAt": "2026-07-26T17:45:20+00:00",
+  "completedAt": "2026-07-26T17:45:20+00:00",
+  "durationMs": 953,
+  "gitHead": "a9f3903bb80e7efb603e899bb2e757cd7a97e44b",
+  "summary": {
+    "catalogLessons": 472,
+    "renderedRuntimeCounts": {
+      "browser": 310,
+      "local": 162
+    },
+    "searchRuntimeCounts": {
+      "browser": 310,
+      "local": 162
+    },
+    "llmsRuntimeCounts": {
+      "browser": 310,
+      "local": 162
+    },
+    "llmsFullRuntimeCounts": {
+      "browser": 310,
+      "local": 162
+    }
+  },
+  "failures": [],
+  "reportPath": "output/test-runner/landing-public/public-product-claims-report.json"
+}

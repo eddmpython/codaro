@@ -1,0 +1,27 @@
+{
+  "gate": "web-learning-routes",
+  "passed": true,
+  "status": "passed",
+  "startedAt": "2026-07-26T17:41:18+00:00",
+  "completedAt": "2026-07-26T17:41:19+00:00",
+  "durationMs": 469,
+  "gitHead": "a9f3903bb80e7efb603e899bb2e757cd7a97e44b",
+  "summary": {
+    "contractLessons": 472,
+    "generatedLessons": 472,
+    "lazyPayloads": 472,
+    "prerenderedRoutes": 472,
+    "sitemapRoutes": 472,
+    "searchRoutes": 472,
+    "runtimeCounts": {
+      "browser": 310,
+      "local": 162
+    },
+    "searchRuntimeCounts": {
+      "browser": 310,
+      "local": 162
+    }
+  },
+  "failures": [],
+  "reportPath": "output/test-runner/web-learning/web-learning-routes-report.json"
+}

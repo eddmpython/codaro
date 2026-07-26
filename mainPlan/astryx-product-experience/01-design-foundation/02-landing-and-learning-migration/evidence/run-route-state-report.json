@@ -1,0 +1,162 @@
+{
+  "gate": "run-route-state",
+  "passed": true,
+  "completedAt": "2026-07-26T17:42:56.842459+00:00",
+  "durationMs": 64234,
+  "observations": {
+    "bareRun": {
+      "contentId": null,
+      "lessonKey": null,
+      "pathId": null,
+      "runtimeTier": "web",
+      "urlRuntimeTier": "web",
+      "surface": "curriculum",
+      "hash": "#curriculum",
+      "pathname": "/",
+      "historyLength": 2
+    },
+    "direct": {
+      "contentId": "day01_헬로월드",
+      "lessonKey": "30days/day01_헬로월드",
+      "pathId": "pythonFoundation",
+      "runtimeTier": "web",
+      "urlRuntimeTier": "web",
+      "surface": "curriculum",
+      "hash": "#curriculum",
+      "pathname": "/",
+      "historyLength": 2
+    },
+    "reloaded": {
+      "contentId": "day01_헬로월드",
+      "lessonKey": "30days/day01_헬로월드",
+      "pathId": "pythonFoundation",
+      "runtimeTier": "web",
+      "urlRuntimeTier": "web",
+      "surface": "curriculum",
+      "hash": "#curriculum",
+      "pathname": "/",
+      "historyLength": 2
+    },
+    "secondLesson": {
+      "contentId": "day02_변수와데이터타입",
+      "lessonKey": "30days/day02_변수와데이터타입",
+      "pathId": "pythonFoundation",
+      "runtimeTier": "web",
+      "urlRuntimeTier": "web",
+      "surface": "curriculum",
+      "hash": "#curriculum",
+      "pathname": "/",
+      "historyLength": 3
+    },
+    "restored": {
+      "contentId": "day01_헬로월드",
+      "lessonKey": "30days/day01_헬로월드",
+      "pathId": "pythonFoundation",
+      "runtimeTier": "web",
+      "urlRuntimeTier": "web",
+      "surface": "curriculum",
+      "hash": "#curriculum",
+      "pathname": "/",
+      "historyLength": 3
+    },
+    "localHandoff": {
+      "contentId": "day01_헬로월드",
+      "lessonKey": "30days/day01_헬로월드",
+      "pathId": "pythonFoundation",
+      "runtimeTier": "local",
+      "urlRuntimeTier": "local",
+      "surface": "curriculum",
+      "hash": "#curriculum",
+      "pathname": "/",
+      "historyLength": 2
+    },
+    "webHomeCanonical": {
+      "contentId": null,
+      "lessonKey": null,
+      "pathId": null,
+      "runtimeTier": "web",
+      "urlRuntimeTier": "web",
+      "surface": "curriculum",
+      "hash": "#curriculum",
+      "pathname": "/",
+      "historyLength": 2
+    },
+    "localHome": {
+      "contentId": null,
+      "lessonKey": null,
+      "pathId": null,
+      "runtimeTier": "local",
+      "urlRuntimeTier": "local",
+      "surface": "home",
+      "hash": "#home",
+      "pathname": "/",
+      "historyLength": 2
+    },
+    "localHomeRestored": {
+      "contentId": null,
+      "lessonKey": null,
+      "pathId": null,
+      "runtimeTier": "local",
+      "urlRuntimeTier": "local",
+      "surface": "home",
+      "hash": "#home",
+      "pathname": "/",
+      "historyLength": 3
+    },
+    "mobileChatAlias": {
+      "direct": {
+        "contentId": null,
+        "lessonKey": null,
+        "pathId": null,
+        "runtimeTier": "local",
+        "urlRuntimeTier": "local",
+        "surface": "chat",
+        "hash": "#chat",
+        "pathname": "/m/chat",
+        "historyLength": 2
+      },
+      "destinations": [
+        "curriculum",
+        "editor",
+        "automation",
+        "chat"
+      ],
+      "activeDestination": "chat",
+      "editor": {
+        "contentId": null,
+        "lessonKey": null,
+        "pathId": null,
+        "runtimeTier": "local",
+        "urlRuntimeTier": "local",
+        "surface": "editor",
+        "hash": "#editor",
+        "pathname": "/",
+        "historyLength": 3
+      },
+      "restored": {
+        "contentId": null,
+        "lessonKey": null,
+        "pathId": null,
+        "runtimeTier": "local",
+        "urlRuntimeTier": "local",
+        "surface": "chat",
+        "hash": "#chat",
+        "pathname": "/m/chat",
+        "historyLength": 3
+      },
+      "focusedLearning": {
+        "contentId": "day01_헬로월드",
+        "lessonKey": "30days/day01_헬로월드",
+        "pathId": null,
+        "runtimeTier": "local",
+        "urlRuntimeTier": "local",
+        "surface": "curriculum",
+        "hash": "#curriculum",
+        "pathname": "/",
+        "historyLength": 3
+      }
+    }
+  },
+  "failures": [],
+  "gitHead": "a9f3903bb80e7efb603e899bb2e757cd7a97e44b"
+}
