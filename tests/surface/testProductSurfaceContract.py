@@ -468,7 +468,8 @@ def testMainAndChatSurfacesDoNotAbsorbRoutingOrTreeInternals() -> None:
     for expected in (
         "NotebookPanel",
         "TeacherPanel",
-        "xl:grid-cols-[minmax(0,1fr)_380px]",
+        "absolute inset-y-0 right-0",
+        "w-[380px]",
         "onRunNotebook",
         "onAddCell",
     ):

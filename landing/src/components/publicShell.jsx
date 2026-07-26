@@ -1,4 +1,4 @@
-import { ChevronDown, Menu, Monitor, Moon, Search, Sun, X } from "lucide-react";
+import { ChevronDown, Menu, Moon, Search, Sun, X } from "lucide-react";
 import { useState } from "react";
 import { brand } from "../lib/brand.js";
 import { appPath } from "../lib/publicRouting.js";
@@ -12,7 +12,7 @@ const primaryNavigation = [
 
 export function Header({ currentPath, onNavigate, themeMode, resolvedTheme, onToggleTheme }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const themeLabel = themeMode === "system" ? "시스템 테마" : themeMode === "dark" ? "다크 테마" : "라이트 테마";
+  const themeLabel = resolvedTheme === "dark" ? "라이트 모드로" : "다크 모드로";
   const navigate = (event, path) => {
     setMenuOpen(false);
     onNavigate(event, appPath(path));
@@ -62,22 +62,20 @@ export function Header({ currentPath, onNavigate, themeMode, resolvedTheme, onTo
             <a href={appPath("/tools")} onClick={(event) => navigate(event, "/tools")}>도구</a>
           </div>
         </details>
-        <SocialLinks className="publicSocialLinks" label="Codaro SNS" />
         <button
           className="publicIconCommand"
           type="button"
           onClick={onToggleTheme}
-          title={`${themeLabel} - 테마 전환`}
-          aria-label={`${themeLabel}. 다음 테마로 전환`}
+          title={themeLabel}
+          aria-label={themeLabel}
         >
-          {themeMode === "system" ? (
-            <Monitor size={17} aria-hidden="true" />
-          ) : resolvedTheme === "dark" ? (
+          {resolvedTheme === "dark" ? (
             <Sun size={17} aria-hidden="true" />
           ) : (
             <Moon size={17} aria-hidden="true" />
           )}
         </button>
+        <SocialLinks className="publicSocialLinks" label="Codaro SNS" />
         <button
           className="publicIconCommand publicMenuToggle"
           type="button"
@@ -157,7 +155,7 @@ export function Footer() {
           <ul>
             <li><a href={appPath("/docs/blog")}>Codaro 소식</a></li>
             <li><a href={appPath("/search")}>검색</a></li>
-            <li><a href="https://buymeacoffee.com/eddmpython" rel="noopener noreferrer" target="_blank">후원하기</a></li>
+            <li><a href="https://github.com/eddmpython/codaro/discussions" rel="noopener noreferrer" target="_blank">토론</a></li>
           </ul>
         </div>
       </div>

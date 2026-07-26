@@ -256,8 +256,13 @@ function App() {
   const [toolCatalog, setToolCatalog] = useState(initialBootstrapState.toolCatalog);
   const { resolvedTheme, themeMode, toggleThemeMode } = useThemeMode();
   const { accentColor, selectAccentColor } = useAccentColor();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => surface !== "editor");
   const [assistantCollapsed, setAssistantCollapsed] = useState(true);
+  useEffect(() => {
+    if (surface !== "editor") return;
+    setSidebarOpen(false);
+    setAssistantCollapsed(true);
+  }, [surface]);
   const {
     auditCount,
     automationSection,
@@ -561,15 +566,21 @@ function App() {
 
       <SidebarInset className="relative flex h-svh min-h-0 min-w-0 flex-col overflow-hidden">
         <div
-          className="relative h-9 shrink-0 border-b border-border bg-background"
+          className={surface === "editor"
+            ? "relative h-12 shrink-0 bg-background"
+            : "relative h-9 shrink-0 border-b border-border bg-background"}
           data-top-control-lane="true"
         >
           <TopControls
             assistantCollapsed={assistantCollapsed}
+            notebookTitle={surface === "editor" ? document.title : undefined}
             notice={notice}
+            resolvedTheme={resolvedTheme}
             showSidebarTrigger
             surface={surface}
             onCopyDiagnosticExport={copyDiagnosticExport}
+            onRenameNotebook={renameNotebookDocument}
+            onToggleTheme={toggleThemeMode}
             onToggleAssistant={() => setAssistantCollapsed((current) => !current)}
           />
         </div>
@@ -621,7 +632,6 @@ function App() {
               onPromptChange={setPrompt}
               onRejectPendingBlocks={rejectPendingBlocks}
               onRefreshAutomation={refreshAutomation}
-              onRenameDocument={renameNotebookDocument}
               onOpenSharePackCurriculum={openSharePackCurriculum}
               notebookRunning={notebookRunning}
               notebookPersistence={notebookPersistence}

@@ -101,12 +101,13 @@ const codeCellEditorTheme = EditorView.theme({
     padding: "0.5rem 0",
   },
   ".cm-line": {
-    padding: "0 0.875rem",
+    padding: "0 0.75rem",
   },
   ".cm-gutters": {
-    backgroundColor: "var(--color-background-muted, var(--muted))",
-    borderRight: "1px solid var(--color-border, var(--border))",
+    backgroundColor: "transparent",
+    borderRight: "0",
     color: "var(--color-text-secondary, var(--muted-foreground))",
+    minWidth: "38px",
   },
   ".cm-lineNumbers .cm-gutterElement": {
     padding: "0 0.5rem",
@@ -174,7 +175,6 @@ export function NotebookPanel({
   onCellAsk,
   onDeleteCell,
   onDraftChange,
-  onRenameDocument,
   onRejectPendingBlocks,
   onRunBlock,
   onRunNotebook,
@@ -198,7 +198,6 @@ export function NotebookPanel({
   onCellAsk: (action: CellAiAction, block: BlockConfig, question?: string) => void;
   onDeleteCell: (blockId: string) => void;
   onDraftChange: (blockId: string, value: string) => void;
-  onRenameDocument: (title: string) => void;
   onRejectPendingBlocks: () => void;
   onRunBlock: (block: BlockConfig, sourceOverride?: string) => void;
   onRunNotebook: () => void;
@@ -224,10 +223,7 @@ export function NotebookPanel({
         notebookRunning={notebookRunning}
         persistence={persistence}
         runningBlockId={runningBlockId}
-        title={document.title}
-        onCommitTitle={onRenameDocument}
         onRunNotebook={onRunNotebook}
-        onTitleChange={onRenameDocument}
       />
       <span aria-hidden="true" className="notebookActiveCell">
         {activeCellLabel}

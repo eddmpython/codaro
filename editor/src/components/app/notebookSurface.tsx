@@ -52,7 +52,6 @@ export type NotebookSurfaceProps = {
   onNewChat: () => void;
   onPromptChange: (value: string) => void;
   onRejectPendingBlocks: () => void;
-  onRenameDocument: (title: string) => void;
   onRunBlock: (block: BlockConfig, sourceOverride?: string) => void;
   onRunNotebook: () => void;
   onSelectBlock: (blockId: string) => void;
@@ -61,10 +60,7 @@ export type NotebookSurfaceProps = {
 export function NotebookSurface(props: NotebookSurfaceProps) {
   return (
     <div
-      className={cn(
-        "grid h-full min-h-0 grid-cols-1",
-        !props.assistantCollapsed && "xl:grid-cols-[minmax(0,1fr)_380px]",
-      )}
+      className="relative h-full min-h-0"
     >
       <NotebookPanel
         apiOnline={props.apiOnline}
@@ -85,14 +81,13 @@ export function NotebookSurface(props: NotebookSurfaceProps) {
         onAcceptPendingBlocks={props.onAcceptPendingBlocks}
         onCellAsk={props.onCellAsk}
         onDeleteCell={props.onDeleteCell}
-        onRenameDocument={props.onRenameDocument}
         onRejectPendingBlocks={props.onRejectPendingBlocks}
         onRunBlock={props.onRunBlock}
         onRunNotebook={props.onRunNotebook}
         onSelectBlock={props.onSelectBlock}
       />
       {props.assistantCollapsed ? null : (
-        <div className="hidden min-h-0 xl:block" data-notebook-assistant-shell="desktop">
+        <div className="absolute inset-y-0 right-0 z-40 hidden w-[380px] min-h-0 shadow-[-16px_0_48px_rgba(0,0,0,0.16)] xl:block" data-notebook-assistant-shell="desktop">
           <NotebookInspector {...props} />
         </div>
       )}
@@ -108,18 +103,12 @@ const INSPECTOR_TABS: ReadonlyArray<{ value: InspectorTab; label: string; Icon: 
   { value: "graph", label: "의존성", Icon: GitBranch },
 ];
 
-const FLOATING_TOP_CONTROLS_SAFE_AREA = "xl:pt-10";
-
-// 우측 컬럼 — 선택기는 에디터 경계 레일에 두고, SNS 컨트롤이 떠 있는 상단 줄은 비워 둔다.
 function NotebookInspector(props: NotebookSurfaceProps) {
   const [tab, setTab] = useState<InspectorTab>("tutor");
   const codeBlocks = props.document.blocks;
   return (
     <div
-      className={cn(
-        "grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] border-t bg-background xl:grid-cols-[40px_minmax(0,1fr)] xl:grid-rows-1 xl:border-l xl:border-t-0",
-        FLOATING_TOP_CONTROLS_SAFE_AREA,
-      )}
+      className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] border-t bg-background xl:grid-cols-[40px_minmax(0,1fr)] xl:grid-rows-1 xl:border-l xl:border-t-0"
     >
       <div className="flex items-center gap-1 border-b px-2 py-1.5 xl:flex-col xl:border-b-0 xl:border-r xl:px-1 xl:py-2">
         {INSPECTOR_TABS.map((item) => (

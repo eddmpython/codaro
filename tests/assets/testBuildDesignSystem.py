@@ -41,13 +41,15 @@ class BuildDesignSystemTest(unittest.TestCase):
         source = GENERATOR.renderSocialLinks(self.socialLinks)
         self.assertEqual(
             [link["id"] for link in self.socialLinks["links"]],
-            ["github", "youtube", "threads", "support"],
+            ["github", "support", "youtube", "threads"],
         )
         self.assertIn("socialLinksSourceHash", source)
         self.assertIn("https://github.com/eddmpython/codaro", source)
         self.assertIn("https://www.youtube.com/@eddmpython", source)
         self.assertIn("https://www.threads.net/@eddmpython", source)
         self.assertIn("https://buymeacoffee.com/eddmpython", source)
+        self.assertIn('data-support-dialog="codaro"', source)
+        self.assertIn("1002-0421-4626", source)
 
     def testSocialLinksRejectUnapprovedOrder(self) -> None:
         invalid = deepcopy(self.socialLinks)

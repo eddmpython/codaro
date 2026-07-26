@@ -5,8 +5,10 @@ import {
   Clock3,
   Clipboard,
   ClipboardCheck,
+  Moon,
   PanelRightClose,
   PanelRightOpen,
+  Sun,
   XCircle,
 } from "lucide-react";
 
@@ -26,17 +28,25 @@ import type { AppNotice } from "@/types";
 // 노트북 실행 버튼은 에디터 본문(NotebookPanel)으로 이동했다.
 export function TopControls({
   assistantCollapsed,
+  notebookTitle,
   notice,
+  resolvedTheme,
   showSidebarTrigger,
   surface,
   onCopyDiagnosticExport,
+  onRenameNotebook,
+  onToggleTheme,
   onToggleAssistant,
 }: {
   assistantCollapsed: boolean;
+  notebookTitle?: string;
   notice: AppNotice;
+  resolvedTheme: "light" | "dark";
   showSidebarTrigger: boolean;
   surface: SurfaceMode;
   onCopyDiagnosticExport?: () => Promise<void>;
+  onRenameNotebook?: (title: string) => void;
+  onToggleTheme: () => void;
   onToggleAssistant: () => void;
 }) {
   const { t } = useLocale();
@@ -52,13 +62,31 @@ export function TopControls({
       ) : null}
 
       {showStatusNotice ? (
-        <div className="absolute left-1/2 top-1.5 z-20 hidden -translate-x-1/2 xl:block">
+        <div
+          className={cn(
+            "absolute top-1.5 z-20 hidden xl:block",
+            surface === "editor" ? "left-12" : "left-1/2 -translate-x-1/2",
+          )}
+        >
           <StatusNotice notice={notice} />
         </div>
       ) : null}
 
+      {surface === "editor" && notebookTitle && onRenameNotebook ? (
+        <div className="absolute left-1/2 top-1/2 z-20 hidden -translate-x-1/2 -translate-y-1/2 sm:block">
+          <input
+            aria-label="노트북 파일명"
+            className="h-7 w-[clamp(140px,24vw,320px)] border-0 border-b border-transparent bg-transparent px-2 text-center font-mono text-xs text-muted-foreground outline-none hover:text-foreground focus:border-primary focus:text-foreground"
+            data-notebook-title="topbar"
+            value={notebookTitle}
+            onBlur={(event) => onRenameNotebook(normalizeNotebookFilename(event.target.value))}
+            onChange={(event) => onRenameNotebook(event.target.value)}
+          />
+        </div>
+      ) : null}
+
       <div className="absolute right-2 top-1.5 z-30 flex items-center gap-0.5">
-        {surface !== "curriculum" && showStatusNotice && onCopyDiagnosticExport ? (
+        {surface !== "curriculum" && surface !== "editor" && showStatusNotice && onCopyDiagnosticExport ? (
           <div className="hidden xl:block" data-topbar-diagnostic="desktop">
             <DiagnosticExportButton onCopyDiagnosticExport={onCopyDiagnosticExport} />
           </div>
@@ -72,10 +100,23 @@ export function TopControls({
             {assistantCollapsed ? <PanelRightOpen /> : <PanelRightClose />}
           </TopBarIconButton>
         ) : null}
+        <TopBarIconButton
+          label={resolvedTheme === "dark" ? "라이트 모드로" : "다크 모드로"}
+          onClick={onToggleTheme}
+          variant="ghost"
+        >
+          {resolvedTheme === "dark" ? <Sun /> : <Moon />}
+        </TopBarIconButton>
         <SocialLinks label="Codaro SNS" />
       </div>
     </>
   );
+}
+
+function normalizeNotebookFilename(value: string) {
+  const trimmed = value.trim() || "notebook.py";
+  if (trimmed.toLowerCase().endsWith(".py")) return trimmed;
+  return `${trimmed.replace(/\.[^/.]+$/, "")}.py`;
 }
 
 function DiagnosticExportButton({ onCopyDiagnosticExport }: { onCopyDiagnosticExport: () => Promise<void> }) {

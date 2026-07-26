@@ -78,7 +78,6 @@ type MainSurfaceProps = {
   onPromptChange: (value: string) => void;
   onOpenSharePackCurriculum: (packId: string, path: string, version?: string | null) => Promise<void>;
   onRefreshAutomation: () => void;
-  onRenameDocument: (title: string) => void;
   onRejectPendingBlocks: () => void;
   onRunBlock: (block: BlockConfig, sourceOverride?: string) => void;
   onRunNotebook: () => void;
@@ -182,7 +181,6 @@ function MainSurfaceContent(props: MainSurfaceProps) {
         onNewChat={props.onNewChat}
         onPromptChange={props.onPromptChange}
         onRejectPendingBlocks={props.onRejectPendingBlocks}
-        onRenameDocument={props.onRenameDocument}
         onRunBlock={props.onRunBlock}
         onRunNotebook={props.onRunNotebook}
         onSelectBlock={props.onSelectBlock}

@@ -4,58 +4,21 @@
     display: grid;
     height: 100%;
     min-height: 0;
-    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
     overflow: hidden;
     background: var(--color-background-body);
     color: var(--color-text-primary);
   }
 
-  [data-astryx-theme="codaro"] .notebookCommandBar {
-    display: grid;
+  [data-astryx-theme="codaro"] .notebookRuntimeStatusBar {
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    z-index: 20;
     min-width: 0;
-    min-height: 48px;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    align-items: center;
-    padding: var(--spacing-1-5) var(--spacing-4);
-    background: var(--color-background-body);
-    border-bottom: 1px solid var(--color-border-subtle);
-  }
-
-  [data-astryx-theme="codaro"] .notebookDocumentIdentity {
-    grid-column: 2;
-    min-width: 0;
-  }
-
-  [data-astryx-theme="codaro"] .notebookTitleInput {
-    width: clamp(140px, 24vw, 320px);
-    min-width: 0;
-    min-height: 30px;
-    border: 0;
-    border-bottom: 1px solid transparent;
-    border-radius: 0;
-    outline: none;
-    padding: 0 var(--spacing-2);
-    background: transparent;
-    color: var(--color-text-secondary);
-    font-family: var(--font-family-code);
-    font-size: 12px;
-    font-weight: var(--font-weight-normal);
-    line-height: 1.5;
-    text-align: center;
-  }
-
-  [data-astryx-theme="codaro"] .notebookTitleInput:hover {
-    color: var(--color-text-primary);
-  }
-
-  [data-astryx-theme="codaro"] .notebookTitleInput:focus-visible {
-    border-bottom-color: var(--color-accent);
-    color: var(--color-text-primary);
   }
 
   [data-astryx-theme="codaro"] .notebookDocumentStatus {
-    grid-column: 1;
-    grid-row: 1;
     display: flex;
     min-width: 0;
     align-items: center;
@@ -139,20 +102,23 @@
   [data-astryx-theme="codaro"] .notebookViewport {
     height: 100%;
     min-height: 0;
-    background: var(--color-background-muted);
+    background: var(--color-background-body);
+  }
+
+  [data-astryx-theme="codaro"] .notebookViewport [data-slot="scroll-area-viewport"] > div {
+    display: block !important;
+    min-width: 100%;
   }
 
   [data-astryx-theme="codaro"] .notebookDocument {
     display: grid;
-    width: min(100%, 1040px);
+    width: min(100%, 1120px);
     min-height: 100%;
     min-width: 0;
-    margin-inline: auto;
+    margin-inline: auto !important;
     gap: 16px;
-    padding: 32px 56px 100px;
-    border-inline: 1px solid var(--color-border-subtle);
-    background: var(--color-background-body);
-    box-shadow: 0 0 32px color-mix(in srgb, var(--color-shadow) 24%, transparent);
+    padding: 30px 40px 100px !important;
+    background: transparent;
   }
 
   [data-astryx-theme="codaro"] .notebookCell,
@@ -423,16 +389,6 @@
   }
 
   @media (max-width: 760px) {
-    [data-astryx-theme="codaro"] .notebookCommandBar {
-      min-height: 46px;
-      padding: var(--spacing-1) var(--spacing-2);
-      padding-left: 44px;
-    }
-
-    [data-astryx-theme="codaro"] .notebookTitleInput {
-      width: min(42vw, 180px);
-    }
-
     [data-astryx-theme="codaro"] .notebookDocumentStatus {
       max-width: 36vw;
       overflow: hidden;
@@ -449,9 +405,7 @@
 
     [data-astryx-theme="codaro"] .notebookDocument {
       gap: 18px;
-      padding: 20px var(--spacing-2) 84px;
-      border-inline: 0;
-      box-shadow: none;
+      padding: 20px var(--spacing-2) 84px !important;
     }
 
     [data-astryx-theme="codaro"] .notebookCellMeta {

@@ -84,9 +84,8 @@ export function CodaroThemeProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const cycleThemeMode = useCallback(() => {
-    const nextIndex = (themeModes.indexOf(themeMode) + 1) % themeModes.length;
-    setThemeMode(themeModes[nextIndex]);
-  }, [setThemeMode, themeMode]);
+    setThemeMode(resolvedTheme === "dark" ? "light" : "dark");
+  }, [resolvedTheme, setThemeMode]);
 
   const selectAccentId = useCallback((nextAccent: AccentId) => {
     const normalized = normalizeAccentId(nextAccent);

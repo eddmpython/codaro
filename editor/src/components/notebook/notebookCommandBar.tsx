@@ -13,20 +13,14 @@ export function NotebookCommandBar({
   notebookRunning,
   persistence,
   runningBlockId,
-  title,
-  onCommitTitle,
   onRunNotebook,
-  onTitleChange,
 }: {
   apiOnline: boolean;
   canRun: boolean;
   notebookRunning: boolean;
   persistence: NotebookPersistenceState;
   runningBlockId: string | null;
-  title: string;
-  onCommitTitle: (title: string) => void;
   onRunNotebook: () => void;
-  onTitleChange: (title: string) => void;
 }) {
   const running = notebookRunning || runningBlockId !== null;
   const persistenceView = notebookPersistenceView(persistence);
@@ -37,7 +31,7 @@ export function NotebookCommandBar({
   return (
     <>
       <header
-        className="notebookCommandBar"
+        className="notebookRuntimeStatusBar"
         data-notebook-runtime={apiOnline ? "local" : "web"}
       >
         <div className="notebookDocumentStatus" aria-label="실행 및 저장 상태">
@@ -67,16 +61,6 @@ export function NotebookCommandBar({
               <span>{persistenceView.label}</span>
             </span>
           ) : null}
-        </div>
-
-        <div className="notebookDocumentIdentity">
-          <input
-            aria-label="노트북 파일명"
-            className="notebookTitleInput"
-            value={title}
-            onBlur={(event) => onCommitTitle(normalizeNotebookFilename(event.target.value))}
-            onChange={(event) => onTitleChange(event.target.value)}
-          />
         </div>
       </header>
 
@@ -120,10 +104,4 @@ function notebookPersistenceView(persistence: NotebookPersistenceState): {
     detail: "입력이 멈추면 변경 내용을 자동 저장합니다.",
     label: "저장 대기",
   };
-}
-
-function normalizeNotebookFilename(value: string) {
-  const trimmed = value.trim() || "notebook.py";
-  if (trimmed.toLowerCase().endsWith(".py")) return trimmed;
-  return `${trimmed.replace(/\.[^/.]+$/, "")}.py`;
 }

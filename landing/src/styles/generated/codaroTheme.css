@@ -557,6 +557,263 @@
     outline-offset: 1px !important;
   }
 
+  [data-social-link-id="support"] {
+    color: #e96787 !important;
+  }
+
+  .codaroSupportBackdrop {
+    position: fixed;
+    z-index: 300;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(3, 3, 5, 0.76);
+    backdrop-filter: blur(8px);
+  }
+
+  .codaroSupportDialog {
+    width: min(560px, 100%);
+    max-height: min(780px, calc(100svh - 48px));
+    overflow: hidden auto;
+    border: 1px solid #2d2d34;
+    border-radius: 12px;
+    background: #111114;
+    color: #f4f4f5;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.56);
+  }
+
+  .codaroSupportHeader {
+    position: sticky;
+    z-index: 1;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 58px;
+    padding: 0 18px 0 22px;
+    border-bottom: 1px solid #29292f;
+    background: rgba(17, 17, 20, 0.96);
+    backdrop-filter: blur(12px);
+  }
+
+  .codaroSupportHeader h2 {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+  }
+
+  .codaroSupportClose {
+    display: grid;
+    width: 30px;
+    height: 30px;
+    place-items: center;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: #96969f;
+    cursor: pointer;
+  }
+
+  .codaroSupportClose:hover,
+  .codaroSupportClose:focus-visible {
+    background: #222228;
+    color: #ffffff;
+  }
+
+  .codaroSupportClose:focus-visible {
+    outline: 2px solid #9b7cf8;
+    outline-offset: 1px;
+  }
+
+  .codaroSupportClose svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .codaroSupportBody {
+    display: grid;
+    gap: 26px;
+    padding: 26px 22px 22px;
+  }
+
+  .codaroSupportHero {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .codaroSupportHeart {
+    display: grid;
+    width: 48px;
+    height: 48px;
+    place-items: center;
+    border: 1px solid rgba(233, 103, 135, 0.26);
+    border-radius: 50%;
+    background: rgba(233, 103, 135, 0.1);
+    color: #ec7894;
+  }
+
+  .codaroSupportHeart svg {
+    width: 23px;
+    height: 23px;
+  }
+
+  .codaroSupportHero p {
+    margin: 0;
+    color: #b2b2bb;
+    font-size: 13px;
+    line-height: 1.72;
+    word-break: keep-all;
+  }
+
+  .codaroSupportSection {
+    display: grid;
+    gap: 10px;
+  }
+
+  .codaroSupportSection h3 {
+    margin: 0;
+    color: #777780;
+    font-size: 10px;
+    line-height: 1;
+    font-weight: 650;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .codaroSupportWays {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .codaroSupportWays a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 0;
+    padding: 11px 12px;
+    border: 1px solid #2b2b31;
+    border-radius: 8px;
+    background: #18181c;
+    color: #c9c9d0;
+    font-size: 12px;
+    text-decoration: none;
+  }
+
+  .codaroSupportWays a:hover,
+  .codaroSupportWays a:focus-visible {
+    border-color: #484852;
+    background: #1d1d22;
+    color: #ffffff;
+  }
+
+  .codaroSupportRows {
+    display: grid;
+    overflow: hidden;
+    border: 1px solid #2b2b31;
+    border-radius: 9px;
+    background: #17171b;
+  }
+
+  .codaroSupportRow {
+    display: flex;
+    min-height: 52px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 14px;
+    border-bottom: 1px solid #28282e;
+    color: #f1f1f3;
+    font-size: 12px;
+    text-decoration: none;
+  }
+
+  .codaroSupportRow:last-child {
+    border-bottom: 0;
+  }
+
+  .codaroSupportRow:hover,
+  .codaroSupportRow:focus-visible {
+    background: #1d1d22;
+  }
+
+  .codaroSupportRow strong {
+    font-size: 12px;
+    font-weight: 580;
+  }
+
+  .codaroSupportRow > span,
+  .codaroSupportRow > div > span {
+    color: #85858f;
+    font-size: 11px;
+  }
+
+  .codaroSupportAccount > div {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .codaroSupportAccount button {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    border: 0;
+    border-radius: 6px;
+    padding: 7px 9px;
+    background: #222228;
+    color: #d6d6dc;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .codaroSupportAccount button:hover,
+  .codaroSupportAccount button:focus-visible {
+    background: #2b2b32;
+    color: #ffffff;
+  }
+
+  .codaroSupportAccount button span:last-child {
+    color: #9b7cf8;
+    font-size: 10px;
+    font-weight: 650;
+  }
+
+  .codaroSupportNote {
+    margin: -6px 0 0;
+    color: #696972;
+    font-size: 10px;
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  @media (max-width: 560px) {
+    .codaroSupportBackdrop {
+      align-items: end;
+      padding: 12px;
+    }
+
+    .codaroSupportDialog {
+      max-height: calc(100svh - 24px);
+      border-radius: 12px;
+    }
+
+    .codaroSupportWays {
+      grid-template-columns: 1fr;
+    }
+
+    .codaroSupportAccount {
+      align-items: flex-start;
+      flex-direction: column;
+      padding-block: 12px;
+    }
+  }
+
   @media (forced-colors: active) {
     [data-social-link="codaro"] {
       border: 1px solid ButtonText !important;

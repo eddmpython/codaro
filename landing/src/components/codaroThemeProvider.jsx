@@ -75,8 +75,8 @@ export function CodaroThemeProvider({ children, initialSurface = "landing" }) {
   }, []);
 
   const cycleThemeMode = useCallback(() => {
-    setThemeMode(themeModes[(themeModes.indexOf(themeMode) + 1) % themeModes.length]);
-  }, [setThemeMode, themeMode]);
+    setThemeMode(resolvedTheme === "dark" ? "light" : "dark");
+  }, [resolvedTheme, setThemeMode]);
 
   useBrowserLayoutEffect(() => {
     const root = document.documentElement;

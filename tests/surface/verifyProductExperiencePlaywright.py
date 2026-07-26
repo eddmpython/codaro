@@ -1859,6 +1859,9 @@ async ({ surface, expectedTier }) => {
     : null;
   const rail = document.querySelector("[data-runtime-tier]");
   const routeRuntime = document.querySelector("[data-run-route-runtime]");
+  const notebookDocument = document.querySelector(".notebookDocument");
+  const notebookDocumentRect = notebookDocument?.getBoundingClientRect();
+  const notebookDocumentStyle = notebookDocument ? getComputedStyle(notebookDocument) : null;
   let webProgressLessonCount = 0;
   let webVerifiedPracticeCount = 0;
   let webVerifiedStrongCheckCount = 0;
@@ -2005,6 +2008,13 @@ async ({ surface, expectedTier }) => {
     retrievalSectionCount: document.querySelectorAll('[data-learning-section-mode="retrieval"]').length,
     assignmentToolCount: document.querySelectorAll("[data-learning-assignment-tools]").length,
     notebookInputCount: document.querySelectorAll("[data-notebook-input='code']").length,
+    notebookDocumentGeometry: notebookDocumentRect && notebookDocumentStyle ? {
+      left: Math.round(notebookDocumentRect.left),
+      right: Math.round(notebookDocumentRect.right),
+      width: Math.round(notebookDocumentRect.width),
+      paddingTop: Math.round(parseFloat(notebookDocumentStyle.paddingTop)),
+      paddingLeft: Math.round(parseFloat(notebookDocumentStyle.paddingLeft)),
+    } : null,
     notebookBlankInputCount: [...document.querySelectorAll("[data-notebook-input='code'] .cm-content")]
       .filter((editor) => !editorText(editor)).length,
     visibleNotebookCellToolCount: [...document.querySelectorAll(".notebookCellMeta")]
@@ -2099,7 +2109,7 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
         failures.append(f"{name}: {audit['missingImageAlt']} visible image(s) have no alt attribute")
     if audit["rootTheme"] != "codaro":
         failures.append(f"{name}: Codaro Astryx theme scope is missing")
-    if audit["visibleSocialLinkIds"] != ["github", "youtube", "threads", "support"]:
+    if audit["visibleSocialLinkIds"] != ["github", "support", "youtube", "threads"]:
         failures.append(
             f"{name}: shared SNS rail is missing or reordered: {audit['visibleSocialLinkIds']}"
         )
@@ -2292,6 +2302,25 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
                     f"got {audit['notebookBlankInputCount']}"
                 )
             viewportWidth = int((case.get("viewport") or {}).get("width") or 0)
+            notebookGeometry = audit.get("notebookDocumentGeometry")
+            if viewportWidth > 760:
+                if not notebookGeometry:
+                    failures.append(f"{name}: centered notebook document geometry is missing")
+                else:
+                    availableLeft = 48
+                    expectedCenter = availableLeft + (viewportWidth - availableLeft) / 2
+                    actualCenter = (
+                        notebookGeometry["left"] + notebookGeometry["right"]
+                    ) / 2
+                    if notebookGeometry["width"] > 1120 or abs(actualCenter - expectedCenter) > 3:
+                        failures.append(
+                            f"{name}: notebook canvas is not centered at the 1120px document width: "
+                            f"{notebookGeometry}"
+                        )
+                    if notebookGeometry["paddingTop"] < 24 or notebookGeometry["paddingLeft"] < 32:
+                        failures.append(
+                            f"{name}: notebook canvas lost DartLab document spacing: {notebookGeometry}"
+                        )
             if viewportWidth > 760 and audit["visibleNotebookCellToolCount"]:
                 failures.append(
                     f"{name}: {audit['visibleNotebookCellToolCount']} cell toolbars are visible "
@@ -3614,6 +3643,26 @@ def runBrowserMatrix(
                     screenshotPath.parent.mkdir(parents=True, exist_ok=True)
                     page.screenshot(path=str(screenshotPath), full_page=False)
                     if case.get("verifyNotebookRunAdvance"):
+                        page.get_by_role("button", name="후원·기여").click()
+                        page.wait_for_selector('[data-support-dialog="codaro"]', timeout=5_000)
+                        accountNumber = page.locator('[data-support-account-number="codaro"]').inner_text()
+                        if accountNumber != "1002-0421-4626":
+                            raise AssertionError(f"support dialog account drifted: {accountNumber}")
+                        supportScreenshotPath = SCREENSHOT_ROOT / colorScheme / f"{case['name']}-support.png"
+                        page.screenshot(path=str(supportScreenshotPath), full_page=False)
+                        page.keyboard.press("Escape")
+                        page.wait_for_selector('[data-support-dialog="codaro"]', state="detached", timeout=5_000)
+                        beforeTheme = page.locator("html").get_attribute("data-theme")
+                        themeButton = page.get_by_role(
+                            "button",
+                            name="라이트 모드로" if beforeTheme == "dark" else "다크 모드로",
+                        )
+                        themeButton.click()
+                        page.wait_for_function(
+                            "(previous) => document.documentElement.dataset.theme !== previous",
+                            arg=beforeTheme,
+                            timeout=5_000,
+                        )
                         firstNotebookEditor = page.locator(
                             "[data-notebook-input='code'] .cm-content"
                         ).first

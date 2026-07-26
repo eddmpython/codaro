@@ -332,7 +332,7 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
     )
     require(
         'data-notebook-assistant-shell="desktop"' in notebookSurface
-        and 'className="hidden min-h-0 xl:block"' in notebookSurface,
+        and 'className="absolute inset-y-0 right-0 z-40 hidden w-[380px] min-h-0 shadow-[-16px_0_48px_rgba(0,0,0,0.16)] xl:block"' in notebookSurface,
         "mobile notebook must not place the desktop assistant below the first cells",
         failures,
     )
@@ -393,9 +393,10 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
         and "../styles/generated/socialLinks.tsx" in publicShell
         and 'data-top-control-lane="true"' in app
         and '{surface === "curriculum" ? null : (' in app
-        and 'className="relative h-9 shrink-0 border-b border-border bg-background"' in app
+        and '? "relative h-12 shrink-0 bg-background"' in app
+        and ': "relative h-9 shrink-0 border-b border-border bg-background"' in app
         and 'data-topbar-diagnostic="desktop"' in topBar
-        and 'surface !== "curriculum" && showStatusNotice' in topBar
+        and 'surface !== "curriculum" && surface !== "editor" && showStatusNotice' in topBar
         and 'const showStatusNotice = surface !== "curriculum"' in topBar
         and 'className="hidden xl:block"' in topBar,
         "all public, learning, notebook, Local, and mobile route aliases must share the Astryx social link registry",

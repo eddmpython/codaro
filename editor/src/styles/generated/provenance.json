@@ -9,7 +9,7 @@
   "fontManifestSha256": "68183a5d36a3fa290499a97cf85978b71f22c2d05f2d9269b8c4b1934b899d69",
   "generator": "assets/brand/tools/buildDesignSystem.py",
   "socialLinksSource": "assets/brand/designSystem/socialLinks.json",
-  "socialLinksSourceSha256": "c2001f00faa34c6d16d8792cc6b94dc1ab7f1f19f3870f50a666294f0ab4bf10",
+  "socialLinksSourceSha256": "6a012b8023c296798bb82303b3ae0337f26c13b5041e573e524286291c661438",
   "source": "assets/brand/designSystem/tokens.json",
   "sourceSha256": "14b3dbae1d2981c02dc5ea131020993da5920b51c6d457b45a799990a16c998c"
 }
