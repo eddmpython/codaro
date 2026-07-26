@@ -75,6 +75,75 @@ def testCurrentSourceBuildsLandingBeforeEditor(
     }
 
 
+def testCurrentSourceBuildsUseRunnerReceiptPolicyWhenRequested(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    audit = loadAudit()
+    landingRoot = tmp_path / "landing"
+    editorRoot = tmp_path / "editor"
+    landingOutput = tmp_path / "landing/build/index.html"
+    editorOutput = tmp_path / "src/codaro/webBuild/index.html"
+    landingRoot.mkdir(parents=True)
+    editorRoot.mkdir()
+    calls: list[tuple[tuple[str, ...], Path, str | None]] = []
+
+    def fakeRun(args: tuple[str, ...], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        cwd = Path(str(kwargs["cwd"]))
+        environment = kwargs["env"]
+        assert isinstance(environment, dict)
+        calls.append((args, cwd, environment.get(audit.FRONTEND_BUILD_REUSE_ENV)))
+        output = landingOutput if "landing-build" in args else editorOutput
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text("<!doctype html>", encoding="utf-8")
+        return subprocess.CompletedProcess(args=args, returncode=0, stdout="verified", stderr="")
+
+    monkeypatch.setattr(audit, "ROOT", tmp_path)
+    monkeypatch.setattr(
+        audit,
+        "SOURCE_BUILDS",
+        (
+            ("landing", landingRoot, landingOutput),
+            ("editor", editorRoot, editorOutput),
+        ),
+    )
+    monkeypatch.setenv(audit.FRONTEND_BUILD_REUSE_ENV, "1")
+    monkeypatch.setattr(audit.subprocess, "run", fakeRun)
+
+    facts = audit.buildCurrentSources()
+
+    assert calls == [
+        (
+            (
+                sys.executable,
+                "-X",
+                "utf8",
+                "tests/run.py",
+                "gate",
+                "landing-build",
+            ),
+            tmp_path,
+            "1",
+        ),
+        (
+            (
+                sys.executable,
+                "-X",
+                "utf8",
+                "tests/run.py",
+                "gate",
+                "editor-build",
+            ),
+            tmp_path,
+            "1",
+        ),
+    ]
+    assert facts["landing"]["command"] == "tests/run.py gate landing-build"
+    assert facts["editor"]["command"] == "tests/run.py gate editor-build"
+    assert facts["landing"]["reusePolicy"] == "exact-receipt-or-fresh-build"
+    assert facts["editor"]["reusePolicy"] == "exact-receipt-or-fresh-build"
+
+
 def testAuditMainBuildsBeforeJourneyAndBindsGitHead(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,

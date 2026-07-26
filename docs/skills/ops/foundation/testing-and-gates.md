@@ -96,6 +96,14 @@ uv run python -X utf8 tests/run.py gate attempts
 - gate sequence summary는 command log size/mtime이 안정된 뒤 기록해 child process가 stdout handle을 늦게 닫아도 다음 gate에서 bytes evidence가 흔들리지 않게 한다.
 - `output/test-runner`는 disposable 실행 작업공간이며 제품 SSOT나 커밋 대상이 아니다.
 
+## 프론트 빌드 재사용
+
+개별 `gate editor-build`, `gate landing-build`는 기본적으로 매번 새 빌드를 실행한다. `change-cycle`, `quality-cycle`, `product-release`, `tier`처럼 한 runner가 여러 gate를 순서대로 실행할 때와 CI `experience` job에서는 같은 Landing/editor 빌드를 반복하지 않도록 `output/test-runner/frontend-build-reuse/`의 영수증을 사용할 수 있다.
+
+재사용은 폴더 존재나 수정 시각으로 결정하지 않는다. 현재 Git HEAD, HEAD 대비 staged·unstaged binary diff, ignore되지 않은 untracked 파일 내용, Node/npm 실행 파일과 버전, `package.json`·lockfile·설치된 `node_modules/.package-lock.json`, 빌드에 영향을 주는 `CODARO_WEB_*`·`CODARO_PYPROC_*`·`NODE_ENV`·`CI`, 실제 산출물 트리의 경로·크기·SHA-256이 영수증과 전부 같아야 한다. 하나라도 다르거나 `index.html`이 없으면 새 빌드를 실행하고 성공한 시점의 계약으로 영수증을 원자적으로 교체한다. 따라서 재사용은 검증 범위를 줄이지 않으며, 뒤따르는 browser·bundle·SEO 검사는 같은 산출물에 그대로 실행된다.
+
+별도 프로세스로 gate를 연속 호출하는 CI job은 `CODARO_FRONTEND_BUILD_REUSE=1`을 job 범위에만 설정한다. 로컬에서 이 값을 직접 설정할 수도 있지만 일반 단일 gate의 기본값은 fresh build다. Astryx journey 안의 중첩 Landing/editor 확인도 같은 named gate를 다시 호출하므로 직접 `npm` 빌드로 이 계약을 우회하지 않는다.
+
 ## Gate 목록
 
 | Gate | Tier | 역할 |
@@ -104,7 +112,7 @@ uv run python -X utf8 tests/run.py gate attempts
 | `root-clean` | fast | 저장소 루트가 canonical tree와 맞고 로컬 실습 파일, 로그, 임시 산출물이 남지 않았는지 확인한다. |
 | `completion-bootstrap` | fast | clean implementation commit에서 mainPlan 완료 schema, 전이 도구, ledger, fact audit, bootstrap negative fixture와 A→E→B round-trip을 검증한다. R10 사람 평가를 선행 요구하지 않는다. |
 | `plan-quality` | fast | mainPlan 사실 감사, 완료 전이 negative fixture, 독립 평가 보고서 완전성을 목표 점수나 통과 점수 없이 검사한다. Bootstrap 동안 non-blocking red로 관찰하고 R10 증거가 green인 뒤에만 blocking·CI required로 승격한다. |
-| `backend` | fast | Python backend 전체 테스트를 실행한다. `tests/_attempts`는 `--ignore`로 수집하지 않는다. |
+| `backend` | fast | Python backend 전체 테스트를 실행한다. `tests/_attempts`는 `--ignore`로 수집하지 않고, 0.25초 이상 걸린 항목 중 가장 느린 25개를 출력해 preflight 병목을 관찰한다. |
 | `attempts` | experiment | 운영과 분리된 `tests/_attempts` 실험 샌드박스를 실행한다. preflight/quality-cycle/CI 비포함이며 `tier` 스윕에도 끼지 않는다. |
 | `architecture-boundary` | fast | core→engine→domain→transport→entry 의존 방향과 router/domain 경계를 집중 확인한다. |
 | `teacher-eval` | fast | teacher tool policy, trace, golden eval 계약을 빠르게 확인한다. |

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 from datetime import UTC, datetime
+import hashlib
 import json
 import os
 import re
@@ -17,6 +18,17 @@ ROOT = Path(__file__).resolve().parents[1]
 GATE_DOC = ROOT / "docs" / "skills" / "ops" / "foundation" / "testing-and-gates.md"
 CI_WORKFLOW = ROOT / ".github" / "workflows" / "ci.yml"
 GATE_WORK_ROOT = ROOT / "output" / "test-runner"
+FRONTEND_BUILD_REUSE_ENV = "CODARO_FRONTEND_BUILD_REUSE"
+FRONTEND_BUILD_RECEIPT_VERSION = 1
+FRONTEND_BUILD_ENV_KEYS = (
+    "CI",
+    "CODARO_PYPROC_ASSET_BASE",
+    "CODARO_PYPROC_PACKAGE_ROOT",
+    "CODARO_WEB_BASE",
+    "CODARO_WEB_OUT",
+    "NODE_ENV",
+)
+_sequenceFrontendBuildReuse = False
 GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "ai-live-smoke": ("output/test-runner/ai-live-smoke/live-smoke-report.json",),
     "automation-ide-audit": ("output/test-runner/automation-ide-audit/automation-ide-report.json",),
@@ -160,6 +172,7 @@ GATES: dict[str, Gate] = {
         commands=(command((
             "uv", "run", "python", "-X", "utf8", "-m", "pytest",
             "tests/", "--ignore=tests/_attempts", "-q", "--tb=short",
+            "--durations=25", "--durations-min=0.25",
         )),),
     ),
     "attempts": Gate(
@@ -837,10 +850,267 @@ def changedCycleGates(paths: tuple[str, ...] | None = None) -> tuple[str, ...]:
     return tuple(gates)
 
 
+def frontendBuildReuseEnabled() -> bool:
+    configured = os.environ.get(FRONTEND_BUILD_REUSE_ENV, "").strip().lower()
+    return _sequenceFrontendBuildReuse or configured in {"1", "true", "yes", "on"}
+
+
+def frontendBuildProject(
+    gateCommand: GateCommand,
+    commandArgs: tuple[str, ...],
+) -> str | None:
+    if len(commandArgs) != 3 or Path(commandArgs[0]).name.lower() not in {"npm", "npm.cmd"}:
+        return None
+    if commandArgs[1:] != ("run", "build"):
+        return None
+    try:
+        workingDirectory = (ROOT / gateCommand.cwd).resolve()
+    except OSError:
+        return None
+    for project in ("landing", "editor"):
+        try:
+            projectDirectory = (ROOT / project).resolve()
+        except OSError:
+            continue
+        if workingDirectory == projectDirectory:
+            return project
+    return None
+
+
+def frontendBuildOutputRoot(project: str, env: dict[str, str]) -> Path:
+    if project == "landing":
+        return ROOT / "landing" / "build"
+    configured = env.get("CODARO_WEB_OUT", "").strip()
+    if not configured:
+        return ROOT / "src" / "codaro" / "webBuild"
+    configuredPath = Path(configured)
+    if configuredPath.is_absolute():
+        return configuredPath
+    return ROOT / "editor" / configuredPath
+
+
+def hashFile(path: Path) -> str | None:
+    digest = hashlib.sha256()
+    try:
+        with path.open("rb") as source:
+            while chunk := source.read(1024 * 1024):
+                digest.update(chunk)
+    except OSError:
+        return None
+    return digest.hexdigest()
+
+
+def repositoryStateFingerprint() -> str | None:
+    digest = hashlib.sha256()
+    commands = (
+        ("git", "rev-parse", "HEAD"),
+        ("git", "diff", "--binary", "HEAD", "--"),
+        ("git", "-c", "core.quotepath=false", "ls-files", "-z", "--others", "--exclude-standard", "--"),
+    )
+    outputs: list[bytes] = []
+    for args in commands:
+        try:
+            result = subprocess.run(
+                args,
+                cwd=ROOT,
+                check=True,
+                capture_output=True,
+                timeout=120,
+            )
+        except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
+            return None
+        outputs.append(result.stdout)
+    digest.update(b"head\0")
+    digest.update(outputs[0])
+    digest.update(b"\0diff\0")
+    digest.update(outputs[1])
+    digest.update(b"\0untracked\0")
+    for rawPath in sorted(item for item in outputs[2].split(b"\0") if item):
+        try:
+            relativePath = rawPath.decode("utf-8")
+            path = ROOT / relativePath
+            contentHash = hashFile(path)
+        except (OSError, UnicodeError):
+            return None
+        if contentHash is None:
+            return None
+        digest.update(rawPath)
+        digest.update(b"\0")
+        digest.update(contentHash.encode("ascii"))
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def executableFingerprint(name: str) -> dict[str, object] | None:
+    executable = shutil.which(name)
+    if not executable:
+        return None
+    path = Path(executable)
+    try:
+        stat = path.stat()
+        versionResult = subprocess.run(
+            (executable, "--version"),
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=30,
+        )
+    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        return None
+    return {
+        "path": str(path.resolve()),
+        "size": stat.st_size,
+        "modifiedAtNs": stat.st_mtime_ns,
+        "version": versionResult.stdout.strip(),
+    }
+
+
+def frontendRuntimeFingerprint(project: str, commandArgs: tuple[str, ...]) -> dict[str, object] | None:
+    npm = executableFingerprint(commandArgs[0])
+    node = executableFingerprint("node")
+    if npm is None or node is None:
+        return None
+    projectRoot = ROOT / project
+    dependencyFiles: dict[str, str | None] = {}
+    for relativePath in ("package.json", "package-lock.json", "node_modules/.package-lock.json"):
+        path = projectRoot / relativePath
+        dependencyFiles[relativePath] = hashFile(path) if path.is_file() else None
+    return {
+        "npm": npm,
+        "node": node,
+        "dependencyFiles": dependencyFiles,
+    }
+
+
+def treeContentFingerprint(root: Path) -> dict[str, object] | None:
+    if not (root / "index.html").is_file():
+        return None
+    digest = hashlib.sha256()
+    fileCount = 0
+    byteCount = 0
+    try:
+        paths = sorted(path for path in root.rglob("*") if path.is_file())
+        for path in paths:
+            relativePath = path.relative_to(root).as_posix()
+            contentHash = hashFile(path)
+            if contentHash is None:
+                return None
+            size = path.stat().st_size
+            digest.update(relativePath.encode("utf-8"))
+            digest.update(b"\0")
+            digest.update(str(size).encode("ascii"))
+            digest.update(b"\0")
+            digest.update(contentHash.encode("ascii"))
+            digest.update(b"\0")
+            fileCount += 1
+            byteCount += size
+    except OSError:
+        return None
+    return {
+        "sha256": digest.hexdigest(),
+        "fileCount": fileCount,
+        "byteCount": byteCount,
+    }
+
+
+def frontendBuildSnapshot(
+    project: str,
+    commandArgs: tuple[str, ...],
+    env: dict[str, str],
+) -> dict[str, object] | None:
+    sourceFingerprint = repositoryStateFingerprint()
+    runtimeFingerprint = frontendRuntimeFingerprint(project, commandArgs)
+    outputRoot = frontendBuildOutputRoot(project, env)
+    outputFingerprint = treeContentFingerprint(outputRoot)
+    if sourceFingerprint is None or runtimeFingerprint is None or outputFingerprint is None:
+        return None
+    try:
+        outputPath = outputRoot.resolve().relative_to(ROOT.resolve()).as_posix()
+    except (OSError, ValueError):
+        outputPath = str(outputRoot.resolve())
+    return {
+        "sourceSha256": sourceFingerprint,
+        "runtime": runtimeFingerprint,
+        "environment": {key: env.get(key) for key in FRONTEND_BUILD_ENV_KEYS},
+        "output": {
+            "path": outputPath,
+            **outputFingerprint,
+        },
+    }
+
+
+def frontendBuildReceiptPath(project: str) -> Path:
+    return GATE_WORK_ROOT / "frontend-build-reuse" / f"{project}.json"
+
+
+def loadFrontendBuildReceipt(project: str) -> dict[str, object] | None:
+    path = frontendBuildReceiptPath(project)
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    if (
+        not isinstance(payload, dict)
+        or payload.get("schemaVersion") != FRONTEND_BUILD_RECEIPT_VERSION
+        or payload.get("project") != project
+        or not isinstance(payload.get("snapshot"), dict)
+    ):
+        return None
+    return payload
+
+
+def writeFrontendBuildReceipt(
+    project: str,
+    commandArgs: tuple[str, ...],
+    env: dict[str, str],
+) -> bool:
+    snapshot = frontendBuildSnapshot(project, commandArgs, env)
+    if snapshot is None:
+        return False
+    path = frontendBuildReceiptPath(project)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "schemaVersion": FRONTEND_BUILD_RECEIPT_VERSION,
+        "project": project,
+        "recordedAt": utcTimestamp(),
+        "snapshot": snapshot,
+    }
+    temporaryPath = path.with_name(f".{path.name}.{os.getpid()}.{time.time_ns()}.tmp")
+    try:
+        temporaryPath.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        temporaryPath.replace(path)
+    except OSError:
+        try:
+            temporaryPath.unlink(missing_ok=True)
+        except OSError:
+            pass
+        return False
+    return True
+
+
+def canReuseFrontendBuild(
+    project: str,
+    commandArgs: tuple[str, ...],
+    env: dict[str, str],
+) -> bool:
+    receipt = loadFrontendBuildReceipt(project)
+    if receipt is None:
+        return False
+    snapshot = frontendBuildSnapshot(project, commandArgs, env)
+    return snapshot is not None and receipt["snapshot"] == snapshot
+
+
 def runCommand(gateName: str, gateCommand: GateCommand) -> int:
     cwd = ROOT / gateCommand.cwd
     commandArgs = localGateArgs(gateName, gateCommand)
     env = localGateEnvironment(gateName, commandArgs)
+    frontendProject = frontendBuildProject(gateCommand, commandArgs)
     executable = shutil.which(commandArgs[0])
     args = (executable, *commandArgs[1:]) if executable else commandArgs
     displayCwd = gateCommand.cwd
@@ -851,6 +1121,19 @@ def runCommand(gateName: str, gateCommand: GateCommand) -> int:
         log.write(f"[{gateName}] {displayCwd}> {' '.join(commandArgs)}\n")
         log.write(f"cwd: {displayPath(cwd)}\n\n")
         log.flush()
+        if (
+            frontendProject is not None
+            and frontendBuildReuseEnabled()
+            and canReuseFrontendBuild(frontendProject, commandArgs, env)
+        ):
+            log.write(
+                "frontend build: reused exact source/runtime/environment/output receipt "
+                f"for {frontendProject}\n"
+            )
+            log.write("exit: 0\n")
+            log.flush()
+            print(f"[{gateName}] exact {frontendProject} build reused", flush=True)
+            return 0
         try:
             process = subprocess.Popen(
                 args,
@@ -873,6 +1156,13 @@ def runCommand(gateName: str, gateCommand: GateCommand) -> int:
             returnCode = 124
         log.write(f"\nexit: {returnCode}\n")
         log.flush()
+    if returnCode == 0 and frontendProject is not None:
+        recorded = writeFrontendBuildReceipt(frontendProject, commandArgs, env)
+        if not recorded:
+            print(
+                f"[{gateName}] build passed, but {frontendProject} reuse receipt was not recorded",
+                file=sys.stderr,
+            )
     if returnCode != 0:
         print(f"[{gateName}] command log: {displayPath(logPath)}", file=sys.stderr)
         printLogTail(logPath)
@@ -930,6 +1220,8 @@ def localGateEnvironment(gateName: str, commandArgs: tuple[str, ...]) -> dict[st
         env["TMPDIR"] = str(scratchDir)
     env["PYTHONUTF8"] = "1"
     env["PYTHONIOENCODING"] = "utf-8"
+    if _sequenceFrontendBuildReuse:
+        env[FRONTEND_BUILD_REUSE_ENV] = "1"
     if uvCommandUsesWith(commandArgs):
         cacheDir = runRoot / "uv-cache"
         cacheDir.mkdir(parents=True, exist_ok=True)
@@ -1012,6 +1304,16 @@ def runGate(gateName: str) -> int:
 
 
 def runGateSequence(gateNames: tuple[str, ...], *, sequenceName: str = "gate-sequence") -> int:
+    global _sequenceFrontendBuildReuse
+    previousReuse = _sequenceFrontendBuildReuse
+    _sequenceFrontendBuildReuse = True
+    try:
+        return runGateSequenceWithReuse(gateNames, sequenceName=sequenceName)
+    finally:
+        _sequenceFrontendBuildReuse = previousReuse
+
+
+def runGateSequenceWithReuse(gateNames: tuple[str, ...], *, sequenceName: str) -> int:
     startedAt = time.monotonic()
     sequenceStartedAt = utcTimestamp()
     sequenceGitHead = currentGitHead()

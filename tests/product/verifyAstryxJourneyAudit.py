@@ -17,6 +17,7 @@ PRODUCT_BROWSER_PATH = ROOT / "tests/surface/verifyProductExperiencePlaywright.p
 PRODUCT_BROWSER_REPORT_ROOT = ROOT / "output/test-runner/astryx-journey"
 REPORT_PATH = ROOT / "output/test-runner/astryx-journey/astryx-journey-report.json"
 NPM_COMMAND = "npm.cmd" if os.name == "nt" else "npm"
+FRONTEND_BUILD_REUSE_ENV = "CODARO_FRONTEND_BUILD_REUSE"
 SOURCE_BUILDS = (
     ("landing", ROOT / "landing", ROOT / "landing/build/index.html"),
     ("editor", ROOT / "editor", ROOT / "src/codaro/webBuild/index.html"),
@@ -56,11 +57,33 @@ def currentGitHead() -> str:
 
 def buildCurrentSources() -> dict[str, dict[str, Any]]:
     facts: dict[str, dict[str, Any]] = {}
+    reuseRequested = os.environ.get(FRONTEND_BUILD_REUSE_ENV, "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
     for name, workingDirectory, outputPath in SOURCE_BUILDS:
+        if reuseRequested:
+            command = (
+                sys.executable,
+                "-X",
+                "utf8",
+                "tests/run.py",
+                "gate",
+                f"{name}-build",
+            )
+            commandLabel = f"tests/run.py gate {name}-build"
+            commandDirectory = ROOT
+        else:
+            command = (NPM_COMMAND, "run", "build")
+            commandLabel = "npm run build"
+            commandDirectory = workingDirectory
         try:
             result = subprocess.run(
-                (NPM_COMMAND, "run", "build"),
-                cwd=workingDirectory,
+                command,
+                cwd=commandDirectory,
+                env=os.environ.copy(),
                 capture_output=True,
                 text=True,
                 encoding="utf-8",
@@ -75,10 +98,12 @@ def buildCurrentSources() -> dict[str, dict[str, Any]]:
         if not outputPath.is_file():
             raise ValueError(f"{name} current-source build output is missing")
         facts[name] = {
-            "command": "npm run build",
+            "command": commandLabel,
             "outputPath": outputPath.relative_to(ROOT).as_posix(),
             "passed": True,
         }
+        if reuseRequested:
+            facts[name]["reusePolicy"] = "exact-receipt-or-fresh-build"
     return facts
 
 

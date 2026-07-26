@@ -341,6 +341,146 @@ def testUvWithCommandsUseRepoLocalCache(monkeypatch, tmp_path) -> None:
     assert regularEnv["UV_NO_CACHE"] == "1"
 
 
+def testBackendGateReportsSlowestTestsWithoutReducingCoverage() -> None:
+    runner = loadRunner()
+    args = runner.GATES["backend"].commands[0].args
+
+    assert "--durations=25" in args
+    assert "--durations-min=0.25" in args
+    assert "tests/" in args
+    assert "--ignore=tests/_attempts" in args
+
+
+def testFrontendBuildReceiptRequiresExactSourceAndOutput(
+    monkeypatch,
+    tmp_path,
+) -> None:
+    runner = loadRunner()
+    outputRoot = tmp_path / "src" / "codaro" / "webBuild"
+    outputRoot.mkdir(parents=True)
+    (outputRoot / "index.html").write_text("<!doctype html><title>first</title>", encoding="utf-8")
+    source = {"sha256": "source-a"}
+
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    monkeypatch.setattr(runner, "GATE_WORK_ROOT", tmp_path / "output" / "test-runner")
+    monkeypatch.setattr(runner, "repositoryStateFingerprint", lambda: source["sha256"])
+    monkeypatch.setattr(
+        runner,
+        "frontendRuntimeFingerprint",
+        lambda project, args: {
+            "project": project,
+            "command": list(args),
+            "node": "22.0.0",
+            "npm": "10.0.0",
+        },
+    )
+    commandArgs = ("npm", "run", "build")
+    environment: dict[str, str] = {}
+
+    assert runner.writeFrontendBuildReceipt("editor", commandArgs, environment) is True
+    assert runner.canReuseFrontendBuild("editor", commandArgs, environment) is True
+
+    source["sha256"] = "source-b"
+    assert runner.canReuseFrontendBuild("editor", commandArgs, environment) is False
+
+    source["sha256"] = "source-a"
+    (outputRoot / "index.html").write_text("<!doctype html><title>changed</title>", encoding="utf-8")
+    assert runner.canReuseFrontendBuild("editor", commandArgs, environment) is False
+
+
+def testFrontendBuildReceiptRejectsBuildEnvironmentDrift(
+    monkeypatch,
+    tmp_path,
+) -> None:
+    runner = loadRunner()
+    outputRoot = tmp_path / "src" / "codaro" / "webBuild"
+    outputRoot.mkdir(parents=True)
+    (outputRoot / "index.html").write_text("<!doctype html>", encoding="utf-8")
+
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    monkeypatch.setattr(runner, "GATE_WORK_ROOT", tmp_path / "output" / "test-runner")
+    monkeypatch.setattr(runner, "repositoryStateFingerprint", lambda: "source")
+    monkeypatch.setattr(runner, "frontendRuntimeFingerprint", lambda project, args: {"runtime": "stable"})
+    commandArgs = ("npm", "run", "build")
+
+    assert runner.writeFrontendBuildReceipt(
+        "editor",
+        commandArgs,
+        {"CODARO_WEB_BASE": "/run/"},
+    ) is True
+    assert runner.canReuseFrontendBuild(
+        "editor",
+        commandArgs,
+        {"CODARO_WEB_BASE": "/run/"},
+    ) is True
+    assert runner.canReuseFrontendBuild(
+        "editor",
+        commandArgs,
+        {"CODARO_WEB_BASE": "/other/"},
+    ) is False
+
+
+def testDirectGateNeedsExplicitFrontendReuseOptIn(monkeypatch) -> None:
+    runner = loadRunner()
+    monkeypatch.setattr(runner, "_sequenceFrontendBuildReuse", False)
+    monkeypatch.delenv(runner.FRONTEND_BUILD_REUSE_ENV, raising=False)
+
+    assert runner.frontendBuildReuseEnabled() is False
+
+    monkeypatch.setenv(runner.FRONTEND_BUILD_REUSE_ENV, "1")
+    assert runner.frontendBuildReuseEnabled() is True
+
+
+def testFrontendBuildRunCommandWritesFreshReuseLog(
+    monkeypatch,
+    capsys,
+    tmp_path,
+) -> None:
+    runner = loadRunner()
+    (tmp_path / "editor").mkdir()
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    monkeypatch.setattr(runner, "GATE_WORK_ROOT", tmp_path / "output" / "test-runner")
+    monkeypatch.setenv(runner.FRONTEND_BUILD_REUSE_ENV, "1")
+    monkeypatch.setattr(runner, "canReuseFrontendBuild", lambda project, args, env: project == "editor")
+
+    assert runner.runCommand(
+        "editor-build",
+        runner.GateCommand(args=("npm", "run", "build"), cwd="editor"),
+    ) == 0
+
+    captured = capsys.readouterr()
+    assert "exact editor build reused" in captured.out
+    logs = sorted((tmp_path / "output" / "test-runner" / "editor-build" / "logs").glob("*.log"))
+    assert len(logs) == 1
+    logText = logs[0].read_text(encoding="utf-8")
+    assert "reused exact source/runtime/environment/output receipt for editor" in logText
+    assert "exit: 0" in logText
+
+
+def testGateSequenceEnablesFrontendReuseAndRestoresDefault(
+    monkeypatch,
+    tmp_path,
+) -> None:
+    runner = loadRunner()
+    observations: list[tuple[bool, str | None]] = []
+
+    def fakeRunGate(name: str) -> int:
+        environment = runner.localGateEnvironment(name, ("npm", "run", "build"))
+        observations.append((
+            runner.frontendBuildReuseEnabled(),
+            environment.get(runner.FRONTEND_BUILD_REUSE_ENV),
+        ))
+        return 0
+
+    monkeypatch.setattr(runner, "GATE_WORK_ROOT", tmp_path)
+    monkeypatch.setattr(runner, "runGate", fakeRunGate)
+    monkeypatch.delenv(runner.FRONTEND_BUILD_REUSE_ENV, raising=False)
+
+    assert runner.runGateSequence(("editor-build",), sequenceName="reuse-sequence") == 0
+    assert observations == [(True, "1")]
+    assert runner.frontendBuildReuseEnabled() is False
+
+
 def testRunCommandTimesOutWithLog(monkeypatch, capsys, tmp_path) -> None:
     runner = loadRunner()
     monkeypatch.setattr(runner, "ROOT", tmp_path)
