@@ -8,16 +8,16 @@
   "productCompletionEligible": false,
   "roundSealEligible": false,
   "scope": {
-    "gitCommit": "573f7aa35a4b2e5e8b9d1e3572f464a5fb8fd73c",
+    "gitCommit": "525692a4f1e816894c0893c2b83f584d51287cdd",
     "dirtyDiffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
-    "manifestHash": "b85e016b66b2ed52b3286e703a3f2ff0f5112913904a72d47e87bde7b7c33239",
-    "evaluationBundleHash": "692177db18d31104e6f12c49efa2f8fdcef8ae57e5678d507a98e6b2e8b8c79c"
+    "manifestHash": "3d39406157e7c69c3573353c106010ecd4c0325dcc8ef23be829b03be453fe7e",
+    "evaluationBundleHash": "fce8c8d1e325a1d50cce82fde1ed1f4c0081ea6d75ef9183fbd94fe65b8e40a1"
   },
   "facts": {
     "bundleIntegrity": {
       "fileCount": 2675,
-      "totalSourceBytes": 88249963,
-      "archiveBytes": 88765021,
+      "totalSourceBytes": 88264156,
+      "archiveBytes": 88779122,
       "archiveEntriesReadOnly": true,
       "excludedHistoryPathCount": 0,
       "priorScoresIncluded": false,
@@ -42,7 +42,7 @@
       "rollbackCutoverImplemented": true
     },
     "qualityGates": {
-      "count": 38,
+      "count": 39,
       "names": [
         "root-clean",
         "docs",
@@ -76,6 +76,7 @@
         "web-learning",
         "landing-public",
         "local-studio-browser",
+        "run-local-state-browser",
         "product-experience-browser",
         "astryx-journey",
         "frontend-performance-budget",
