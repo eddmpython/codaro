@@ -37,7 +37,7 @@ Landing, Learn, Run, Local이 같은 Astryx 토큰, 테마 상태, 폰트, 밀�
 - Landing과 Editor production build: 통과
 - Home·Learn 390px/1440px와 Local automation 대표 시각 감사: image/text overlap 0, lesson row 가독성·mobile next-band framing·active state 교정. 전체 수동 AT matrix는 미완료
 
-이 증거는 작업 중 결과다. clean implementation commit, evidence commit, 시각 검토, completion transition이 없으므로 어떤 packet도 아직 `_done`이 아니다.
+이 증거는 작업 중 결과다. packet별 clean implementation commit, evidence commit과 completion transition이 필요하다. 00의 token·package contract는 기계 검증 범위이며, 실제 시각·접근성 검토는 04가 소유한다. 따라서 사람 시각 검토를 00에 중복 선행 조건으로 걸지 않는다.
 
 ## 롤백
 
@@ -49,4 +49,4 @@ source token과 generated mirror를 같은 변경 단위로 되돌리고, runtim
 
 ## 평가
 
-모든 활성 packet이 구현·테스트·문서·시각 검토를 마치고 completion evidence와 함께 `_done/`으로 이동해야 이 workstream을 완료로 본다.
+모든 활성 packet이 구현·테스트·문서와 각 packet이 명시한 검토를 마치고 completion evidence와 함께 `_done/`으로 이동해야 이 workstream을 완료로 본다. 02~04의 화면·접근성 검토를 00의 source contract 완료와 혼합하지 않는다.
