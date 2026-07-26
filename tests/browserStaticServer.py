@@ -9,6 +9,7 @@ import urllib.parse
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from typing import Literal
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,9 +17,16 @@ WEB_BUILD = ROOT / "src" / "codaro" / "webBuild"
 
 
 class StaticAppServer:
-    def __init__(self, *, port: int, apiBaseUrl: str | None = None) -> None:
+    def __init__(
+        self,
+        *,
+        port: int,
+        apiBaseUrl: str | None = None,
+        runtimeTier: Literal["web", "local"] | None = None,
+    ) -> None:
         self.port = port
         self.apiBaseUrl = apiBaseUrl.rstrip("/") if apiBaseUrl else None
+        self.runtimeTier = runtimeTier or ("local" if apiBaseUrl else None)
         self.baseUrl = f"http://127.0.0.1:{port}"
         self._server = ThreadingHTTPServer(("127.0.0.1", port), self._handler())
         self._thread = threading.Thread(target=self._server.serve_forever, daemon=True)
@@ -35,6 +43,7 @@ class StaticAppServer:
 
     def _handler(self) -> type[BaseHTTPRequestHandler]:
         apiBaseUrl = self.apiBaseUrl
+        runtimeTier = self.runtimeTier
         webRoot = WEB_BUILD.resolve()
 
         class Handler(BaseHTTPRequestHandler):
@@ -76,10 +85,10 @@ class StaticAppServer:
                     return
 
                 data = target.read_bytes()
-                if apiBaseUrl and target.name == "index.html" and b'codaro-runtime-tier' not in data:
+                if runtimeTier and target.name == "index.html" and b'codaro-runtime-tier' not in data:
                     data = data.replace(
                         b"</head>",
-                        b'<meta name="codaro-runtime-tier" content="local"></head>',
+                        f'<meta name="codaro-runtime-tier" content="{runtimeTier}"></head>'.encode(),
                         1,
                     )
                 contentType = mimetypes.guess_type(target.name)[0] or "application/octet-stream"
@@ -88,7 +97,11 @@ class StaticAppServer:
                 self.send_header("Content-Length", str(len(data)))
                 self.end_headers()
                 if sendBody:
-                    self.wfile.write(data)
+                    try:
+                        self.wfile.write(data)
+                    except (BrokenPipeError, ConnectionAbortedError, ConnectionResetError):
+                        # Browser gates may close a context while non-critical assets are still in flight.
+                        return
 
             def _targetPath(self, path: str) -> Path | None:
                 if path in {"", "/"}:

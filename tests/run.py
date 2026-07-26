@@ -45,6 +45,9 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "product-quality-audit": ("output/test-runner/product-quality-audit/product-quality-report.json",),
     "frontend-performance-budget": ("output/test-runner/frontend-performance-budget/performance-report.json",),
     "design-system-contract": ("output/test-runner/design-system-contract/design-system-report.json",),
+    "theme-runtime-browser": (
+        "output/test-runner/theme-runtime-browser/theme-runtime-report.json",
+    ),
     "visual-assets": ("output/test-runner/visual-assets/visual-assets-report.json",),
     "learning-method": ("output/test-runner/learning-method/learning-flow-report.json",),
     "learning-evidence-contract": (
@@ -534,6 +537,24 @@ GATES: dict[str, Gate] = {
             command(("uv", "run", "python", "-X", "utf8", "tests/surface/verifyDesignSystemContract.py")),
         ),
     ),
+    "theme-runtime-browser": Gate(
+        tier="surface",
+        description="Landing, Learn, Run, Local의 light/dark/system, 저장 지속성, density/accent, reduced-motion 런타임을 Chromium에서 확인한다.",
+        commands=(
+            command(("npm", "run", "build"), cwd="landing"),
+            command(("npm", "run", "build"), cwd="editor"),
+            command((
+                "uv",
+                "run",
+                "--with",
+                "playwright",
+                "python",
+                "-X",
+                "utf8",
+                "tests/surface/verifyThemeRuntimePlaywright.py",
+            ), timeoutSeconds=1200),
+        ),
+    ),
     "visual-assets": Gate(
         tier="surface",
         description="공용 visual manifest, source provenance, AVIF/WebP 파생물, 앱 mirror, 용량 예산을 확인한다.",
@@ -709,6 +730,7 @@ PRODUCT_QUALITY_GATES = (
     "backend",
     "architecture-boundary",
     "design-system-contract",
+    "theme-runtime-browser",
     "visual-assets",
     "learning-method",
     "learning-evidence-contract",
@@ -752,6 +774,7 @@ PRODUCT_RELEASE_GATES = (
     "mobile-layout",
     "frontend-performance-budget",
     "design-system-contract",
+    "theme-runtime-browser",
     "learning-method",
     "curriculum-quality-matrix",
     "repository-simplification",
@@ -1332,8 +1355,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 56:
-        failures.append(f"expected 56 gates, found {len(GATES)}")
+    if len(GATES) != 57:
+        failures.append(f"expected 57 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

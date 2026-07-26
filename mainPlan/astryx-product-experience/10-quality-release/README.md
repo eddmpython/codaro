@@ -117,6 +117,7 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 | --- | --- | --- | --- | --- |
 | `architecture-boundary` | platform | yes | every change | browser/local 경계와 dependency 방향 |
 | `design-system-contract` | design system | yes | every change | Astryx version, token, component/state matrix |
+| `theme-runtime-browser` | design system | yes | every change | Landing·Learn·Run·Local mode, persistence, density/accent, reduced motion |
 | `learning-evidence-contract` | learning platform | yes | every change | 단일 evidence, dedup, mastery policy |
 | `learning-method` | learning product | yes | every change | 자동 feedback·hint·next, learning relevance와 control intent |
 | `learning-content` | curriculum | no | human approval completion | identity와 472개 ledger aggregate, 현재 identity/content 0/472·taxonomy 0/7·independent assessment 0/467 |
@@ -144,7 +145,8 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 
 | Gate command membership | 실행 파일 |
 | --- | --- |
-| `design-system-contract` | `verifyDesignSystemContract.py`, `verifyAstryxFoundationPlaywright.py`, `verifyAstryxBrowserTierPlaywright.py` |
+| `design-system-contract` | `testBuildDesignSystem.py`, `buildDesignSystem.py --check`, `verifyDesignSystemContract.py` |
+| `theme-runtime-browser` | Landing·Editor production build, `verifyThemeRuntimePlaywright.py`의 8-case Chromium runtime matrix |
 | `learning-evidence-contract` | evidence uniqueness, canonical mastery, Python/TS conformance, legacy writer removal tests |
 | `learning-method` | method Playwright, flow friction, visible-element learning relevance, control intent, scheduler, meaningful attempt, sandbox tests |
 | `learning-content` | 472 identity, featured/remaining ledger, check strength, metadata, retrieval/transfer tests |
@@ -162,7 +164,7 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 
 `product-browser-webview2-evergreen`은 hosted `windows-latest`의 current stable smoke다. release blocker `product-browser-webview2-win10`은 labels `[self-hosted, windows, x64, codaro-win10-22h2, interactive]`인 Windows 10 22H2 image에서만 실행한다. `tests/product/webview2-runtime.lock.json`은 release preparation에서 승인한 Microsoft Fixed Version의 exact version, release date, official archive URL, SHA-256, executable SHA-256과 설치 경로를 고정하며 release date가 30일보다 오래되면 refresh review 없이는 실패한다. minimum supported runtime compatibility는 이 release-candidate lock과 분리한 격리 matrix에서 검증하고 오래된 runtime을 release 기본 설치물로 되살리지 않는다. preflight는 OS build `19045`, x64, session 0 아님, interactive user desktop, fixed executable hash와 lock freshness를 검사하고 하나라도 다르면 skip이 아니라 실패한다. scheduled와 release workflow 모두 이 self-hosted job을 요구한다. 모든 job은 `npm ci`, uv, deterministic backend fixture를 설치하고 engine별 report를 합치되 한 engine 실패를 숨기지 않는다. 신규 `.github/workflows/release-quality.yml`의 수동 workflow가 `path-learning-signal`, `path-efficacy-confirmatory`, `product-release`를 실행한다. landing job은 `npm install`을 `npm ci`로 바꾸며 `npm run build`가 npm lifecycle의 prebuild·postbuild까지 한 번씩 실행한다.
 
-표의 `product-release`는 개별 `Gate`가 아니라 `PRODUCT_RELEASE_GATES` tuple, `product-release` CLI subparser, `GATE_ARTIFACTS["product-release"]`를 가진 sequence다. 기존 quick `preflight`를 재정의하지 않는다. 현재 순서는 `root-clean`, `docs`, `backend`, `architecture-boundary`, `editor-build`, `landing-build`, `mobile-layout`, `frontend-performance-budget`, `design-system-contract`, `learning-method`, `curriculum-quality-matrix`, `repository-simplification`, `learning-content`, `web-learning`, `visual-assets`, `landing-public`, `removed-learning-concepts`, `product-experience-browser`, `local-studio-browser`, `learning-evidence-contract`, `learning-efficacy-report`, `automation-ide-audit`, `launcher-test`, `path-learning-signal`, `plan-quality`다. non-required인 사람·독립 증거 gate도 release aggregate에서는 실행하고 하위 실패를 aggregate success로 바꾸지 않는다. `path-efficacy-confirmatory`는 featured path 승격 조건이며 shell artifact 배포 sequence와 분리한다.
+표의 `product-release`는 개별 `Gate`가 아니라 `PRODUCT_RELEASE_GATES` tuple, `product-release` CLI subparser, `GATE_ARTIFACTS["product-release"]`를 가진 sequence다. 기존 quick `preflight`를 재정의하지 않는다. 현재 순서는 `root-clean`, `docs`, `backend`, `architecture-boundary`, `editor-build`, `landing-build`, `mobile-layout`, `frontend-performance-budget`, `design-system-contract`, `theme-runtime-browser`, `learning-method`, `curriculum-quality-matrix`, `repository-simplification`, `learning-content`, `web-learning`, `visual-assets`, `landing-public`, `removed-learning-concepts`, `product-experience-browser`, `astryx-journey`, `local-studio-browser`, `learning-evidence-contract`, `learning-efficacy-report`, `automation-ide-audit`, `launcher-test`, `path-learning-signal`, `plan-quality`다. non-required인 사람·독립 증거 gate도 release aggregate에서는 실행하고 하위 실패를 aggregate success로 바꾸지 않는다. `path-efficacy-confirmatory`는 featured path 승격 조건이며 shell artifact 배포 sequence와 분리한다.
 
 ## 구현 순서
 
@@ -232,7 +234,7 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 - `uv run python -X utf8 tests/run.py gate editor-build`
 - `uv run python -X utf8 tests/run.py gate landing-build`
 - `uv run python -X utf8 tests/run.py gate product-quality-audit`
-- 신규 staged gate `design-system-contract`, `learning-method`, `learning-content`, `web-learning`, `visual-assets`, `landing-public`, `removed-learning-concepts`, `product-experience-browser`, `learning-evidence-contract`, `learning-efficacy-report`, `path-learning-signal`, `path-efficacy-confirmatory`, `plan-quality`
+- 신규 staged gate `design-system-contract`, `theme-runtime-browser`, `learning-method`, `learning-content`, `web-learning`, `visual-assets`, `landing-public`, `removed-learning-concepts`, `product-experience-browser`, `learning-evidence-contract`, `learning-efficacy-report`, `path-learning-signal`, `path-efficacy-confirmatory`, `plan-quality`
 - 신규 release sequence `PRODUCT_RELEASE_GATES`와 CLI `product-release`
 - `learning-method` gate는 금지 label 목록을 만들지 않고 role, event handler, destination, data marker, progress mutation을 함께 검사한다.
 - quick check: `uv run python -X utf8 tests/run.py preflight`

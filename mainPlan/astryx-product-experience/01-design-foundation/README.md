@@ -32,12 +32,13 @@ Landing, Learn, Run, Local이 같은 Astryx 토큰, 테마 상태, 폰트, 밀�
 ## 테스트
 
 - `uv run python -X utf8 tests/run.py gate design-system-contract`: 정적 계약과 current-head artifact metadata 통과
+- `uv run python -X utf8 tests/run.py gate theme-runtime-browser`: 전용 Chromium 8-case gate 구현, clean implementation commit evidence 전 working-tree 집중 실행 8/8
 - `uv run python -X utf8 tests/run.py gate learning-card-browser`: 통과
 - `uv run python -X utf8 tests/learning/verifyLearningSystemReadiness.py`: `14/14`, `passed: true`. 이는 readiness 계약 만점이지 전체 제품 완료나 학습 효과 점수가 아니다.
 - Landing과 Editor production build: 통과
 - Home·Learn 390px/1440px와 Local automation 대표 시각 감사: image/text overlap 0, lesson row 가독성·mobile next-band framing·active state 교정. 전체 수동 AT matrix는 미완료
 
-이 증거는 작업 중 결과다. packet별 clean implementation commit, evidence commit과 completion transition이 필요하다. 00의 token·package contract는 기계 검증 범위이며, 실제 시각·접근성 검토는 04가 소유한다. 따라서 사람 시각 검토를 00에 중복 선행 조건으로 걸지 않는다.
+이 증거는 작업 중 결과다. packet별 clean implementation commit, evidence commit과 completion transition이 필요하다. 00의 token·package contract와 01의 theme runtime contract는 기계 검증 범위이며, 실제 전체 시각·접근성 검토는 04가 소유한다. 따라서 사람 시각 검토를 00·01에 중복 선행 조건으로 걸지 않는다.
 
 ## 롤백
 

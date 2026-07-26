@@ -19,6 +19,7 @@ PRODUCT_QUALITY_GATES = (
     "backend",
     "architecture-boundary",
     "design-system-contract",
+    "theme-runtime-browser",
     "visual-assets",
     "learning-method",
     "learning-evidence-contract",

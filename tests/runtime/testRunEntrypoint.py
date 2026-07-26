@@ -38,6 +38,7 @@ def testGateNamesAreStable() -> None:
         "backend",
         "architecture-boundary",
         "design-system-contract",
+        "theme-runtime-browser",
         "visual-assets",
         "learning-method",
         "learning-evidence-contract",
@@ -98,6 +99,9 @@ def testGateNamesAreStable() -> None:
     assert runner.GATE_ARTIFACTS["astryx-journey"] == (
         "output/test-runner/astryx-journey/astryx-journey-report.json",
     )
+    assert runner.GATE_ARTIFACTS["theme-runtime-browser"] == (
+        "output/test-runner/theme-runtime-browser/theme-runtime-report.json",
+    )
     assert runner.GATES["astryx-journey"].commands == (
         runner.GateCommand(
             args=(
@@ -131,6 +135,7 @@ def testGateNamesAreStable() -> None:
         "backend",
         "architecture-boundary",
         "design-system-contract",
+        "theme-runtime-browser",
         "visual-assets",
         "learning-method",
         "learning-evidence-contract",
@@ -174,6 +179,7 @@ def testGateNamesAreStable() -> None:
         "mobile-layout",
         "frontend-performance-budget",
         "design-system-contract",
+        "theme-runtime-browser",
         "learning-method",
         "curriculum-quality-matrix",
         "repository-simplification",

@@ -24,9 +24,11 @@ Landing, Run, Local이 같은 `light | dark | system`, resolved theme, density, 
 ## 영향 파일
 
 - `landing/src/components/codaroThemeProvider.jsx`
-- `editor/src/components/app/codaroThemeProvider.tsx`
+- `editor/src/lib/codaroDesign.tsx`
 - `landing/src/styles/layers.css`, `editor/src/styles/layers.css`
 - `landing/src/main.jsx`, `editor/src/main.tsx`, `editor/index.html`
+- `tests/surface/verifyThemeRuntimePlaywright.py`
+- `tests/browserStaticServer.py`, `tests/run.py`, `.github/workflows/ci.yml`
 
 ## 영향 함수·심볼
 
@@ -37,7 +39,8 @@ Landing, Run, Local이 같은 `light | dark | system`, resolved theme, density, 
 
 - `tests/surface/verifyDesignSystemContract.py`
 - `npm run build` in Landing and Editor
-- 후속: light/dark/system과 reduced motion browser matrix
+- `uv run python -X utf8 tests/run.py gate theme-runtime-browser`
+- Chromium 8-case: Landing·Learn·Run·Local, 저장 light/dark, system live switch, toggle reload, public/learningComfortable/studioDense, plum/blue/teal, reduced motion
 
 ## 롤백
 
@@ -45,4 +48,4 @@ provider와 generated theme import를 한 단위로 되돌린다. legacy storage
 
 ## 평가
 
-정적 계약은 통과했다. 실제 브라우저 mode matrix가 남아 있어 완료가 아니다.
+정적 계약에 더해 전용 Chromium 8-case runtime gate를 구현했고 working-tree 집중 실행은 8/8, failure 0이었다. 이 결과는 아직 clean implementation commit 기준의 completion evidence가 아니므로 상태와 폴더는 진행으로 유지한다. 전체 viewport·contrast·keyboard·screen-reader·Firefox/WebKit/WebView2 검수는 이 packet이 아니라 04가 계속 소유한다.

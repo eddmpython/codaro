@@ -17,15 +17,17 @@
 ## 구현 순서
 
 1. 정적 `design-system-contract`를 먼저 고정한다.
-2. Landing/Editor 브라우저 fixture와 screenshot을 만든다.
-3. font load, CSS feature tier, reduced motion을 검사한다.
-4. 접근성 tree와 focus order를 확인한다.
+2. `theme-runtime-browser`로 Landing·Learn·Run·Local의 공용 mode/density/accent/motion runtime을 고정한다.
+3. Landing/Editor 전체 viewport fixture와 screenshot을 만든다.
+4. font load, CSS feature tier, contrast와 reduced motion의 시각 결과를 검사한다.
+5. 접근성 tree와 focus order를 확인한다.
 
 ## 영향 파일
 
 - `tests/assets/testBuildDesignSystem.py`
 - `tests/surface/verifyDesignSystemContract.py`
-- 후속 `tests/surface/verifyAstryxFoundationPlaywright.py`
+- `tests/surface/verifyThemeRuntimePlaywright.py`
+- 후속 전체 visual/accessibility matrix verifier와 수동 AT evidence
 - `tests/run.py`, testing gate 문서
 
 ## 영향 함수·심볼
@@ -36,8 +38,9 @@
 ## 테스트
 
 - `uv run python -X utf8 tests/run.py gate design-system-contract`
+- `uv run python -X utf8 tests/run.py gate theme-runtime-browser`
 - `uv run python -X utf8 tests/run.py gate learning-card-browser`
-- 후속 Astryx visual/accessibility browser gate
+- 후속 전체 Astryx visual/accessibility·browser-tier gate와 수동 AT matrix
 
 ## 롤백
 
@@ -45,4 +48,4 @@ gate 기준을 지우지 않는다. 일시적 예외는 owner, 만료 조건, �
 
 ## 평가
 
-정적 gate와 학습 browser gate는 통과했다. 전체 theme/mobile/font/accessibility matrix가 남아 완료가 아니다.
+정적 gate와 공용 테마 런타임 8-case, 학습 browser gate는 구현됐다. `theme-runtime-browser`는 runtime SSOT만 증명하므로 전체 mobile/font/contrast/keyboard/screen-reader와 Firefox/WebKit/WebView2 matrix는 여전히 남아 있고 이 packet은 완료가 아니다.
