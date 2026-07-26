@@ -462,22 +462,31 @@ def testGateSequenceEnablesFrontendReuseAndRestoresDefault(
     tmp_path,
 ) -> None:
     runner = loadRunner()
-    observations: list[tuple[bool, str | None]] = []
+    observations: list[tuple[str, bool, str | None]] = []
 
     def fakeRunGate(name: str) -> int:
         environment = runner.localGateEnvironment(name, ("npm", "run", "build"))
         observations.append((
+            name,
             runner.frontendBuildReuseEnabled(),
             environment.get(runner.FRONTEND_BUILD_REUSE_ENV),
         ))
         return 0
 
     monkeypatch.setattr(runner, "GATE_WORK_ROOT", tmp_path)
+    monkeypatch.setattr(runner, "GATE_ARTIFACTS", {})
     monkeypatch.setattr(runner, "runGate", fakeRunGate)
     monkeypatch.delenv(runner.FRONTEND_BUILD_REUSE_ENV, raising=False)
 
-    assert runner.runGateSequence(("editor-build",), sequenceName="reuse-sequence") == 0
-    assert observations == [(True, "1")]
+    assert runner.runGateSequence(
+        ("backend", "editor-build", "astryx-journey"),
+        sequenceName="reuse-sequence",
+    ) == 0
+    assert observations == [
+        ("backend", True, None),
+        ("editor-build", True, None),
+        ("astryx-journey", True, "1"),
+    ]
     assert runner.frontendBuildReuseEnabled() is False
 
 

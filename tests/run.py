@@ -1220,7 +1220,7 @@ def localGateEnvironment(gateName: str, commandArgs: tuple[str, ...]) -> dict[st
         env["TMPDIR"] = str(scratchDir)
     env["PYTHONUTF8"] = "1"
     env["PYTHONIOENCODING"] = "utf-8"
-    if _sequenceFrontendBuildReuse:
+    if _sequenceFrontendBuildReuse and gateName == "astryx-journey":
         env[FRONTEND_BUILD_REUSE_ENV] = "1"
     if uvCommandUsesWith(commandArgs):
         cacheDir = runRoot / "uv-cache"
