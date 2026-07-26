@@ -25,6 +25,7 @@ import {
 import { tags } from "@lezer/highlight";
 import { combineErrorSources } from "@/lib/tracebackParser";
 import "@/components/notebook/notebookPanel.css";
+import "@/components/app/workCell.css";
 import {
   Loader2,
   MessageSquare,
@@ -40,7 +41,6 @@ import {
   LoadingInline,
   PendingNotebookBar,
 } from "@/components/app/appPrimitives";
-import { RuntimeCapabilityRail } from "@/components/app/runtimeCapabilityRail";
 import { CellAiActions } from "@/components/app/cellAiActions";
 import { NotebookCommandBar } from "@/components/notebook/notebookCommandBar";
 import { Button } from "@/components/ui/button";
@@ -66,15 +66,6 @@ import { cn } from "@/lib/utils";
 import type { BlockConfig, CodaroDocument, ExecutionResult, ReactiveDiagnostics } from "@/types";
 
 type ResultMap = Record<string, ExecutionResult>;
-
-const SCRATCH_STARTER_CODE = `prices = [12000, 18500, 7600]
-total = sum(prices)
-count = len(prices)
-average = total / count
-
-print("항목 수:", count)
-print("합계:", total)
-print("평균:", round(average))`;
 
 const codaroSyntaxHighlightStyle = HighlightStyle.define([
   { tag: tags.keyword, color: "var(--color-syntax-keyword)" },
@@ -102,11 +93,12 @@ const codeCellEditorTheme = EditorView.theme({
   ".cm-scroller": {
     fontFamily: "var(--font-family-code)",
     lineHeight: "1.65",
+    minHeight: "40px",
     overflow: "auto",
   },
   ".cm-content": {
-    minHeight: "6.5rem",
-    padding: "0.75rem 0",
+    minHeight: "0",
+    padding: "0.5rem 0",
   },
   ".cm-line": {
     padding: "0 0.875rem",
@@ -214,30 +206,10 @@ export function NotebookPanel({
 }) {
   const staleSet = new Set(staleBlockIds);
   const cyclePaths = formatCyclePaths(diagnostics.cycles);
-  const scratchSeededRef = useRef(false);
   const selectedBlockIndex = document.blocks.findIndex((block) => block.id === selectedBlockId);
   const activeCellLabel = selectedBlockIndex >= 0
     ? `셀 ${selectedBlockIndex + 1} / ${document.blocks.length}`
     : `${document.blocks.length}개 셀`;
-
-  useEffect(() => {
-    if (scratchSeededRef.current) return;
-    const starterBlock = document.blocks[0];
-    const starterDraft = starterBlock ? drafts[starterBlock.id] ?? starterBlock.content : "";
-    const untouchedScratch = (
-      document.id === "new-notebook"
-      && document.title === "새노트북.py"
-      && document.blocks.length === 1
-      && starterBlock?.type === "code"
-      && !starterDraft.trim()
-    );
-    if (!untouchedScratch || !starterBlock) return;
-
-    scratchSeededRef.current = true;
-    onDraftChange(starterBlock.id, SCRATCH_STARTER_CODE);
-    onRenameDocument("scratch.py");
-    onSelectBlock(starterBlock.id);
-  }, [document, drafts, onDraftChange, onRenameDocument, onSelectBlock]);
 
   return (
     <section
@@ -247,22 +219,19 @@ export function NotebookPanel({
       data-notebook-storage-status={persistence.phase}
     >
       <NotebookCommandBar
-        activeCellLabel={activeCellLabel}
         apiOnline={apiOnline}
         canRun={canRun}
         notebookRunning={notebookRunning}
         persistence={persistence}
         runningBlockId={runningBlockId}
         title={document.title}
-        onAddCodeCell={() => onAddCell("code", selectedBlockId || undefined, "after")}
-        onAddMarkdownCell={() => onAddCell("markdown", selectedBlockId || undefined, "after")}
         onCommitTitle={onRenameDocument}
         onRunNotebook={onRunNotebook}
         onTitleChange={onRenameDocument}
       />
-      <div className="notebookRuntimeRail">
-        <RuntimeCapabilityRail apiOnline={apiOnline} surface="notebook" />
-      </div>
+      <span aria-hidden="true" className="notebookActiveCell">
+        {activeCellLabel}
+      </span>
       <div className="notebookPendingArea">
         <PendingNotebookBar
           pendingBlocks={pendingBlocks}
@@ -278,29 +247,45 @@ export function NotebookPanel({
 
       <ScrollArea className="notebookViewport">
         <div className="notebookDocument">
-          {document.blocks.length ? document.blocks.map((block, blockIndex) => (
-            <DocumentBlock
-              autoFocus={blockIndex === 0 && block.id === selectedBlockId}
-              block={block}
-              canRun={canRun && (!isExecutableBlock(block) || Boolean((drafts[block.id] ?? block.content).trim()))}
-              draft={drafts[block.id] ?? block.content}
-              isSelected={block.id === selectedBlockId}
-              key={block.id}
-              result={results[block.id]}
-              cellHelp={cellHelpByBlockId[block.id]}
-              isRunning={runningBlockId === block.id}
-              isStale={staleSet.has(block.id)}
-              inCycle={blockInCycle(diagnostics, block.id)}
-              showInsertBefore={blockIndex === 0}
-              diagnosticChips={cellDiagnosticChips(diagnostics, block.id)}
-              onCellAsk={(action, question) => onCellAsk(action, block, question)}
-              onDelete={() => onDeleteCell(block.id)}
-              onDraftChange={(value) => onDraftChange(block.id, value)}
-              onInsertCell={(type, placement) => onAddCell(type, block.id, placement)}
-              onRun={(sourceOverride) => onRunBlock(block, sourceOverride)}
-              onSelect={() => onSelectBlock(block.id)}
-            />
-          )) : (
+          {document.blocks.length ? (
+            <>
+              {document.blocks.map((block, blockIndex) => (
+                <DocumentBlock
+                  autoFocus={block.id === selectedBlockId}
+                  block={block}
+                  canRun={canRun && (!isExecutableBlock(block) || Boolean((drafts[block.id] ?? block.content).trim()))}
+                  draft={drafts[block.id] ?? block.content}
+                  isSelected={block.id === selectedBlockId}
+                  key={block.id}
+                  result={results[block.id]}
+                  cellHelp={cellHelpByBlockId[block.id]}
+                  isRunning={runningBlockId === block.id}
+                  isStale={staleSet.has(block.id)}
+                  inCycle={blockInCycle(diagnostics, block.id)}
+                  showInsertBefore={blockIndex === 0}
+                  diagnosticChips={cellDiagnosticChips(diagnostics, block.id)}
+                  onCellAsk={(action, question) => onCellAsk(action, block, question)}
+                  onDelete={() => onDeleteCell(block.id)}
+                  onDraftChange={(value) => onDraftChange(block.id, value)}
+                  onInsertCell={(type, placement) => onAddCell(type, block.id, placement)}
+                  onRun={(sourceOverride) => onRunBlock(block, sourceOverride)}
+                  onRunAndAdvance={(sourceOverride) => {
+                    onRunBlock(block, sourceOverride);
+                    const nextBlock = document.blocks[blockIndex + 1];
+                    if (nextBlock) {
+                      onSelectBlock(nextBlock.id);
+                      return;
+                    }
+                    onAddCell("code", block.id, "after");
+                  }}
+                  onSelect={() => onSelectBlock(block.id)}
+                />
+              ))}
+              <NotebookAppendActions
+                onAddCell={(type) => onAddCell(type, document.blocks.at(-1)?.id, "after")}
+              />
+            </>
+          ) : (
             <EmptyNotebookActions onAddCell={(type) => onAddCell(type)} />
           )}
         </div>
@@ -474,6 +459,7 @@ export function CodeCellEditor({
   onChange,
   onFocus,
   onRun,
+  onRunAndAdvance,
   completionContext,
   errorLines,
   aiComments,
@@ -487,6 +473,7 @@ export function CodeCellEditor({
   onChange: (value: string) => void;
   onFocus: () => void;
   onRun?: (source: string) => void;
+  onRunAndAdvance?: (source: string) => void;
   completionContext?: CompletionContextProvider;
   errorLines?: number[];
   aiComments?: AiLineComment[];
@@ -497,14 +484,16 @@ export function CodeCellEditor({
   const onChangeRef = useRef(onChange);
   const onFocusRef = useRef(onFocus);
   const onRunRef = useRef(onRun);
+  const onRunAndAdvanceRef = useRef(onRunAndAdvance);
   const completionContextRef = useRef(completionContext);
 
   useEffect(() => {
     onChangeRef.current = onChange;
     onFocusRef.current = onFocus;
     onRunRef.current = onRun;
+    onRunAndAdvanceRef.current = onRunAndAdvance;
     completionContextRef.current = completionContext;
-  }, [onChange, onFocus, onRun, completionContext]);
+  }, [onChange, onFocus, onRun, onRunAndAdvance, completionContext]);
 
   const aiCompletionSource = async (context: CompletionContext): Promise<CompletionResult | null> => {
     const word = context.matchBefore(/[\w.]*/);
@@ -562,6 +551,18 @@ export function CodeCellEditor({
         aiCommentGutter,
         Prec.high(keymap.of([
           {
+            key: "Shift-Enter",
+            run: () => {
+              const source = viewRef.current?.state.doc.toString() ?? "";
+              if (onRunAndAdvanceRef.current) {
+                onRunAndAdvanceRef.current(source);
+              } else {
+                onRunRef.current?.(source);
+              }
+              return true;
+            },
+          },
+          {
             key: "Mod-Enter",
             run: () => {
               onRunRef.current?.(viewRef.current?.state.doc.toString() ?? "");
@@ -595,15 +596,16 @@ export function CodeCellEditor({
       parent: hostRef.current,
     });
 
-    if (autoFocus) {
-      window.requestAnimationFrame(() => viewRef.current?.focus());
-    }
-
     return () => {
       viewRef.current?.destroy();
       viewRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    if (!autoFocus) return;
+    window.requestAnimationFrame(() => viewRef.current?.focus());
+  }, [autoFocus]);
 
   useEffect(() => {
     const view = viewRef.current;
@@ -668,6 +670,7 @@ function DocumentBlock({
   onDelete,
   onInsertCell,
   onRun,
+  onRunAndAdvance,
   onSelect,
   onCellAsk,
 }: {
@@ -688,6 +691,7 @@ function DocumentBlock({
   onDraftChange: (value: string) => void;
   onInsertCell: (type: "code" | "markdown", placement: "before" | "after") => void;
   onRun: (sourceOverride?: string) => void;
+  onRunAndAdvance: (sourceOverride?: string) => void;
   onSelect: () => void;
 }) {
   const persistentAutomation = isPersistentAutomationBlock(block);
@@ -715,6 +719,10 @@ function DocumentBlock({
     onRun(draftRef.current);
   };
 
+  const runAndAdvanceCurrentDraft = () => {
+    onRunAndAdvance(draftRef.current);
+  };
+
   if (block.type === "markdown") {
     const markdownData = result?.data as { html?: unknown } | null | undefined;
     const markdownHtml = markdownData && typeof markdownData.html === "string" ? markdownData.html : "";
@@ -722,14 +730,14 @@ function DocumentBlock({
     const showPreview = !isSelected && Boolean(markdownHtml);
     return (
       <section
-        className="notebookCell group"
+        className="astryxWorkCell notebookCell group"
         data-notebook-cell="markdown"
         data-notebook-cell-selected={isSelected ? "true" : "false"}
         data-notebook-cell-status={resultStatus}
+        data-work-cell-selected={isSelected ? "true" : "false"}
       >
         <CellMetaBar
           status={resultStatus}
-          title={cellTitle}
           type="markdown"
           selected={isSelected}
           cellHelp={cellHelp}
@@ -744,7 +752,7 @@ function DocumentBlock({
           <InsertCellButton placement="after" onInsertCell={onInsertCell} className="notebookInsertAfter" />
           {showPreview ? (
             <div
-              className="notebookMarkdownPreview prose prose-sm"
+              className="astryxWorkCellFrame notebookMarkdownPreview prose prose-sm"
               data-notebook-markdown-preview="true"
               onClick={onSelect}
               dangerouslySetInnerHTML={{ __html: markdownHtml }}
@@ -752,7 +760,7 @@ function DocumentBlock({
           ) : (
             <Textarea
               className={cn(
-                "notebookMarkdownEditor",
+                "astryxWorkCellFrame notebookMarkdownEditor",
                 isSelected && "notebookMarkdownEditorSelected",
               )}
               placeholder="Markdown을 입력하세요. {변수}로 값 보간."
@@ -768,17 +776,18 @@ function DocumentBlock({
 
   return (
     <section
-      className="notebookCell group"
+      className="astryxWorkCell notebookCell group"
       data-automation-session-cell={persistentAutomation ? "true" : undefined}
       data-notebook-cell="code"
       data-notebook-cell-selected={isSelected ? "true" : "false"}
       data-notebook-cell-status={resultStatus}
+      data-work-cell-running={isRunning ? "true" : "false"}
+      data-work-cell-selected={isSelected ? "true" : "false"}
     >
       <CellMetaBar
         canRun={canRun}
         running={isRunning}
         status={resultStatus}
-        title={cellTitle}
         type="code"
         selected={isSelected}
         cellHelp={cellHelp}
@@ -794,7 +803,7 @@ function DocumentBlock({
         <InsertCellButton placement="after" onInsertCell={onInsertCell} className="notebookInsertAfter" />
         <div
           className={cn(
-            "notebookCodeFrame",
+            "astryxWorkCellFrame notebookCodeFrame",
             isSelected && "notebookCodeFrameSelected",
           )}
           data-notebook-input="code"
@@ -807,6 +816,7 @@ function DocumentBlock({
             onChange={updateDraft}
             onFocus={onSelect}
             onRun={onRun}
+            onRunAndAdvance={runAndAdvanceCurrentDraft}
             errorLines={combineErrorSources(
               typeof result?.data === "string" ? result?.data : null,
               result?.stderr,
@@ -817,12 +827,12 @@ function DocumentBlock({
         </div>
       </div>
       {result ? (
-        <div className="notebookCellOutput">
+        <div className="astryxWorkCellOutput notebookCellOutput">
           <ExecutionOutput result={result} />
         </div>
       ) : null}
       {isRunning && !result ? (
-        <div className="notebookCellOutput">
+        <div className="astryxWorkCellOutput notebookCellOutput">
           <LoadingInline label="셀 실행 중" />
         </div>
       ) : null}
@@ -834,7 +844,6 @@ function CellMetaBar({
   canRun = false,
   running = false,
   status,
-  title,
   type,
   selected,
   cellHelp,
@@ -846,7 +855,6 @@ function CellMetaBar({
   canRun?: boolean;
   running?: boolean;
   status: string;
-  title: string;
   type: "code" | "markdown";
   selected: boolean;
   cellHelp?: CellAiHelpState;
@@ -855,19 +863,8 @@ function CellMetaBar({
   onDelete: () => void;
   onRun?: () => void;
 }) {
-  const Icon = type === "code" ? TerminalSquare : MessageSquare;
-
   return (
     <div className="notebookCellMeta">
-      <div
-        className={cn(
-          "notebookCellKind",
-          selected && "notebookCellKindSelected",
-        )}
-      >
-        <Icon className="size-3.5 shrink-0" />
-        <span className="truncate">{title}</span>
-      </div>
       <div className="notebookCellActions">
         {diagnosticChips.map((chip) => (
           <span
@@ -895,7 +892,7 @@ function CellMetaBar({
         {type === "code" ? (
           <IconButton
             className={cn(
-              "notebookCellRunButton size-11 sm:size-8 [&_svg]:size-4",
+              "astryxWorkCellAction notebookCellRunButton size-11 sm:size-8 [&_svg]:size-4",
               selected && "notebookCellRunButtonSelected",
             )}
             disabled={!canRun}
@@ -983,6 +980,25 @@ function EmptyNotebookActions({
         <MessageSquare className="size-3.5" />
         Markdown 셀
       </Button>
+    </div>
+  );
+}
+
+function NotebookAppendActions({
+  onAddCell,
+}: {
+  onAddCell: (type: "code" | "markdown") => void;
+}) {
+  return (
+    <div className="notebookAppendActions" role="toolbar" aria-label="노트북 셀 추가">
+      <button className="notebookAppendButton" type="button" onClick={() => onAddCell("code")}>
+        <Plus className="size-3.5" />
+        Python
+      </button>
+      <button className="notebookAppendButton" type="button" onClick={() => onAddCell("markdown")}>
+        <MessageSquare className="size-3.5" />
+        Markdown
+      </button>
     </div>
   );
 }

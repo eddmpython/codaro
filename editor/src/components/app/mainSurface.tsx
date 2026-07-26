@@ -73,6 +73,7 @@ type MainSurfaceProps = {
   onConnectAi: () => void;
   onDeleteCell: (blockId: string) => void;
   onDraftChange: (blockId: string, value: string) => void;
+  onNavigateCurriculumBlock: (blockId: string) => void;
   onNewChat: () => void;
   onPromptChange: (value: string) => void;
   onOpenSharePackCurriculum: (packId: string, path: string, version?: string | null) => Promise<void>;
@@ -209,6 +210,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
         selectedContentId={props.selectedContentId}
         selectedCurriculumBlockId={props.selectedCurriculumBlockId}
         onDraftChange={props.onDraftChange}
+        onNavigateCurriculumBlock={props.onNavigateCurriculumBlock}
         onRunBlock={props.onRunBlock}
         onSelectCurriculumBlock={props.onSelectCurriculumBlock}
       />

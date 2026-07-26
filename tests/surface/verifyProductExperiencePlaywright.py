@@ -1545,6 +1545,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "surface": "web-run",
             "expectedTier": "web",
             "waitFor": "[data-notebook-input='code']",
+            "expectMinimalNotebook": True,
         },
         {
             "name": "web-run-desktop",
@@ -1553,6 +1554,8 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "surface": "web-run",
             "expectedTier": "web",
             "waitFor": "[data-notebook-input='code']",
+            "expectMinimalNotebook": True,
+            "verifyNotebookRunAdvance": True,
         },
         {
             "name": "local-strong-learning-desktop",
@@ -1742,6 +1745,11 @@ async ({ surface, expectedTier }) => {
     || element.textContent
     || ""
   ).replace(/\\s+/g, " ").trim();
+  const editorText = (element) => {
+    const clone = element.cloneNode(true);
+    clone.querySelectorAll(".cm-placeholder").forEach((placeholder) => placeholder.remove());
+    return (clone.textContent || "").trim();
+  };
   const actions = [...document.querySelectorAll("button, a[href], input, textarea, select")]
     .map((element) => {
       const rect = visibleRect(element);
@@ -1914,6 +1922,14 @@ async ({ surface, expectedTier }) => {
     retrievalSectionCount: document.querySelectorAll('[data-learning-section-mode="retrieval"]').length,
     assignmentToolCount: document.querySelectorAll("[data-learning-assignment-tools]").length,
     notebookInputCount: document.querySelectorAll("[data-notebook-input='code']").length,
+    notebookBlankInputCount: [...document.querySelectorAll("[data-notebook-input='code'] .cm-content")]
+      .filter((editor) => !editorText(editor)).length,
+    visibleNotebookCellToolCount: [...document.querySelectorAll(".notebookCellMeta")]
+      .filter((element) => (
+        visible(element) && Number(getComputedStyle(element).opacity || "1") > 0.1
+      )).length,
+    visibleNotebookStatusCount: [...document.querySelectorAll(".notebookStatusItem")]
+      .filter(visible).length,
     automationSurfaceCount: document.querySelectorAll("[data-automation-loop='second-loop']").length,
     automationOperationStripCount: document.querySelectorAll("[data-automation-operation-strip='true']").length,
     automationRunInspectorCount: document.querySelectorAll("[data-automation-run-inspector='true']").length,
@@ -2137,8 +2153,25 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
             )
         if audit["webEvidenceConflictCount"]:
             failures.append(f"{name}: clean Web-to-Local import created an evidence conflict")
-    elif surface in ("web-run", "local-run") and audit["notebookInputCount"] < 1:
-        failures.append(f"{name}: runnable notebook input did not render")
+    elif surface in ("web-run", "local-run"):
+        if audit["notebookInputCount"] < 1:
+            failures.append(f"{name}: runnable notebook input did not render")
+        if case.get("expectMinimalNotebook"):
+            if audit["notebookBlankInputCount"] != 1:
+                failures.append(
+                    f"{name}: default notebook must contain one blank code input, "
+                    f"got {audit['notebookBlankInputCount']}"
+                )
+            if audit["visibleNotebookCellToolCount"]:
+                failures.append(
+                    f"{name}: {audit['visibleNotebookCellToolCount']} cell toolbars are visible "
+                    "without a direct toolbar interaction"
+                )
+            if audit["visibleNotebookStatusCount"]:
+                failures.append(
+                    f"{name}: {audit['visibleNotebookStatusCount']} normal runtime or persistence "
+                    "statuses are permanently visible"
+                )
     elif surface == "local-home":
         requiredCounts = {
             "home surface": audit["localHomeSurfaceCount"],
@@ -2301,6 +2334,7 @@ def runBrowserMatrix(
                     )
                 page = context.new_page()
                 webArtifactEvidence: dict[str, Any] | None = None
+                notebookRunAdvanceVerified = False
                 localCheckTransport = {"aborted": 0, "expectedConsoleErrors": 0, "requests": 0}
                 consoleErrors: list[dict[str, str]] = []
                 assetFailures: list[str] = []
@@ -3446,6 +3480,45 @@ def runBrowserMatrix(
                     screenshotPath = SCREENSHOT_ROOT / colorScheme / f"{case['name']}.png"
                     screenshotPath.parent.mkdir(parents=True, exist_ok=True)
                     page.screenshot(path=str(screenshotPath), full_page=False)
+                    if case.get("verifyNotebookRunAdvance"):
+                        firstNotebookEditor = page.locator(
+                            "[data-notebook-input='code'] .cm-content"
+                        ).first
+                        firstNotebookText = firstNotebookEditor.evaluate(
+                            """
+                            (editor) => {
+                              const clone = editor.cloneNode(true);
+                              clone.querySelectorAll('.cm-placeholder')
+                                .forEach((placeholder) => placeholder.remove());
+                              return (clone.textContent || '').trim();
+                            }
+                            """
+                        )
+                        if firstNotebookText:
+                            raise AssertionError("free notebook did not start with a blank code cell")
+                        firstNotebookEditor.fill("print('shift advance verified')", timeout=20_000)
+                        firstNotebookEditor.press("Shift+Enter", timeout=20_000)
+                        page.wait_for_function(
+                            """
+                            () => {
+                              const cells = [...document.querySelectorAll('[data-notebook-cell]')];
+                              if (cells.length !== 2) return false;
+                              const selected = document.querySelector(
+                                '[data-notebook-cell-selected="true"]'
+                              );
+                              const nextEditor = cells[1].querySelector('.cm-content');
+                              return selected === cells[1] && document.activeElement === nextEditor;
+                            }
+                            """,
+                            timeout=20_000,
+                        )
+                        page.wait_for_function(
+                            """
+                            () => document.body.innerText.includes('shift advance verified')
+                            """,
+                            timeout=120_000,
+                        )
+                        notebookRunAdvanceVerified = True
                     page.wait_for_timeout(100)
                     consoleErrorSnapshot = list(consoleErrors)
                     httpFailureSnapshot = list(httpFailures)
@@ -3467,6 +3540,7 @@ def runBrowserMatrix(
                             "httpFailures": httpFailureSnapshot,
                             "assetFailures": assetFailureSnapshot,
                             "webArtifactEvidence": webArtifactEvidence,
+                            "notebookRunAdvanceVerified": notebookRunAdvanceVerified,
                             "failures": caseFailures,
                             "screenshot": str(screenshotPath.relative_to(ROOT)).replace("\\", "/"),
                         }

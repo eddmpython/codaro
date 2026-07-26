@@ -105,7 +105,7 @@ export function CurriculumView({
             </div>
           ) : null}
 
-          <div>
+          <div className="space-y-10 pb-16 pt-8" data-learning-section-stack="true">
             {curriculumSections.sections.map((section, index) => (
               <CurriculumSectionCard
                 canRun={canRun}

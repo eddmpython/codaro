@@ -1,9 +1,11 @@
 @layer components {
   [data-astryx-theme="codaro"] .notebookStudio {
+    position: relative;
     display: grid;
     height: 100%;
     min-height: 0;
-    grid-template-rows: auto auto auto minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    overflow: hidden;
     background: var(--color-background-body);
     color: var(--color-text-primary);
   }
@@ -11,127 +13,117 @@
   [data-astryx-theme="codaro"] .notebookCommandBar {
     display: grid;
     min-width: 0;
-    min-height: 56px;
-    grid-template-columns: minmax(220px, 1fr) auto auto;
+    min-height: 48px;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
-    gap: var(--spacing-4);
-    border-bottom: 1px solid var(--color-border);
-    padding: var(--spacing-2) var(--spacing-4);
-    background: var(--color-background-surface);
-  }
-
-  [data-astryx-theme="codaro"] .notebookDocumentIdentity,
-  [data-astryx-theme="codaro"] .notebookDocumentStatus,
-  [data-astryx-theme="codaro"] .notebookCommandTools,
-  [data-astryx-theme="codaro"] .notebookStatusItem,
-  [data-astryx-theme="codaro"] .notebookCellKind,
-  [data-astryx-theme="codaro"] .notebookCellActions {
-    display: flex;
-    min-width: 0;
-    align-items: center;
+    padding: var(--spacing-1-5) var(--spacing-4);
+    background: var(--color-background-body);
   }
 
   [data-astryx-theme="codaro"] .notebookDocumentIdentity {
-    gap: var(--spacing-2);
-  }
-
-  [data-astryx-theme="codaro"] .notebookDocumentIcon {
-    width: 20px;
-    height: 20px;
-    flex: none;
-    color: var(--color-icon-accent);
-  }
-
-  [data-astryx-theme="codaro"] .notebookDocumentName {
-    display: flex;
+    grid-column: 2;
     min-width: 0;
-    align-items: baseline;
-    gap: var(--spacing-3);
   }
 
   [data-astryx-theme="codaro"] .notebookTitleInput {
-    width: clamp(118px, 22vw, 280px);
+    width: clamp(140px, 24vw, 320px);
     min-width: 0;
-    min-height: 32px;
+    min-height: 30px;
     border: 0;
     border-bottom: 1px solid transparent;
     border-radius: 0;
     outline: none;
-    padding: 0 var(--spacing-1);
+    padding: 0 var(--spacing-2);
     background: transparent;
-    color: var(--color-text-primary);
+    color: var(--color-text-secondary);
     font-family: var(--font-family-code);
-    font-size: 14px;
+    font-size: 12px;
     font-weight: var(--font-weight-normal);
     line-height: 1.5;
+    text-align: center;
   }
 
   [data-astryx-theme="codaro"] .notebookTitleInput:hover {
-    border-bottom-color: var(--color-border-emphasized);
+    color: var(--color-text-primary);
   }
 
   [data-astryx-theme="codaro"] .notebookTitleInput:focus-visible {
     border-bottom-color: var(--color-accent);
-    box-shadow: 0 2px 0 var(--color-accent);
-  }
-
-  [data-astryx-theme="codaro"] .notebookActiveCell {
-    flex: none;
-    color: var(--color-text-secondary);
-    font-family: var(--font-family-code);
-    font-size: 12px;
-    font-weight: var(--font-weight-normal);
+    color: var(--color-text-primary);
   }
 
   [data-astryx-theme="codaro"] .notebookDocumentStatus {
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    min-width: 0;
+    align-items: center;
     gap: var(--spacing-1);
+    justify-self: start;
+  }
+
+  [data-astryx-theme="codaro"] .notebookPersistenceProbe,
+  [data-astryx-theme="codaro"] .notebookActiveCell {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
   }
 
   [data-astryx-theme="codaro"] .notebookStatusItem {
-    min-height: 30px;
+    display: inline-flex;
+    min-height: 28px;
+    align-items: center;
     gap: var(--spacing-1-5);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-element);
     padding: 0 var(--spacing-2);
-    background: var(--color-background-card);
     color: var(--color-text-secondary);
-    font-size: 12px;
-    font-weight: var(--font-weight-normal);
+    font-size: 11px;
     white-space: nowrap;
   }
 
   [data-astryx-theme="codaro"] .notebookStatusItem svg {
-    width: 14px;
-    height: 14px;
+    width: 13px;
+    height: 13px;
     color: var(--color-icon-accent);
   }
 
-  [data-astryx-theme="codaro"] .notebookPersistenceStatus svg {
-    color: var(--color-icon-secondary);
+  [data-astryx-theme="codaro"] .notebookPersistenceStatus[data-notebook-persistence="error"] {
+    color: var(--color-error);
   }
 
-  [data-astryx-theme="codaro"] .notebookCommandTools {
-    justify-content: flex-end;
-    gap: var(--spacing-1);
+  [data-astryx-theme="codaro"] .notebookPersistenceStatus[data-notebook-persistence="error"] svg {
+    color: var(--color-error);
+  }
+
+  [data-astryx-theme="codaro"] .notebookFloatingTools {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    z-index: 30;
+    display: flex;
+    align-items: center;
   }
 
   [data-astryx-theme="codaro"] .notebookRunAllButton {
-    gap: var(--spacing-2);
-    border-radius: var(--radius-element);
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-full);
+    padding: 0;
     background: var(--color-accent);
     color: var(--color-on-accent);
-    font-size: 13px;
-    font-weight: var(--font-weight-bold);
-    box-shadow: none;
+    box-shadow: var(--shadow-low);
   }
 
   [data-astryx-theme="codaro"] .notebookRunAllButton:hover {
     background: color-mix(in oklab, var(--color-accent) 88%, var(--color-text-primary));
   }
 
-  [data-astryx-theme="codaro"] .notebookRuntimeRail {
-    min-width: 0;
-    background: var(--color-background-surface);
+  [data-astryx-theme="codaro"] .notebookRunAllButton svg {
+    width: 17px;
+    height: 17px;
   }
 
   [data-astryx-theme="codaro"] .notebookPendingArea {
@@ -151,85 +143,64 @@
 
   [data-astryx-theme="codaro"] .notebookDocument {
     display: grid;
-    width: min(100%, 960px);
+    width: min(100%, 1040px);
     min-width: 0;
     margin-inline: auto;
-    gap: var(--spacing-6);
-    padding: var(--spacing-5) var(--spacing-6) 96px;
+    gap: 16px;
+    padding: 32px 56px 100px;
   }
 
-  [data-astryx-theme="codaro"] .notebookCell {
-    position: relative;
-    min-width: 0;
-    padding-left: 40px;
-  }
-
-  [data-astryx-theme="codaro"] .notebookCell::before {
-    position: absolute;
-    top: 38px;
-    bottom: 0;
-    left: 27px;
-    width: 2px;
-    border-radius: var(--radius-full);
-    background: var(--color-border);
-    content: "";
-    transition: background-color var(--duration-fast) ease;
-  }
-
-  [data-astryx-theme="codaro"] .notebookCell[data-notebook-cell-selected="true"]::before {
-    background: var(--color-accent);
-  }
-
+  [data-astryx-theme="codaro"] .notebookCell,
   [data-astryx-theme="codaro"] .notebookCellBody {
     position: relative;
     min-width: 0;
-    min-height: 112px;
+  }
+
+  [data-astryx-theme="codaro"] .notebookCellBody,
+  [data-astryx-theme="codaro"] .notebookCodeFrame {
+    min-height: 40px;
   }
 
   [data-astryx-theme="codaro"] .notebookCellMeta {
+    position: absolute;
+    top: -13px;
+    right: 8px;
+    z-index: 16;
     display: flex;
-    min-width: 0;
-    min-height: 38px;
+    width: auto;
+    min-height: 28px;
     align-items: center;
-    gap: var(--spacing-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-element);
+    padding: 2px var(--spacing-1);
+    background: var(--color-background-popover);
+    box-shadow: var(--shadow-low);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-fast) ease;
   }
 
-  [data-astryx-theme="codaro"] .notebookCellKind {
-    gap: var(--spacing-1-5);
-    color: var(--color-text-secondary);
-    font-size: 12px;
-    font-weight: var(--font-weight-normal);
-  }
-
-  [data-astryx-theme="codaro"] .notebookCellKind svg {
-    width: 16px;
-    height: 16px;
-    flex: none;
-    color: var(--color-icon-secondary);
-  }
-
-  [data-astryx-theme="codaro"] .notebookCellKindSelected {
-    color: var(--color-text-primary);
-  }
-
-  [data-astryx-theme="codaro"] .notebookCellKindSelected svg {
-    color: var(--color-icon-accent);
+  [data-astryx-theme="codaro"] .notebookCell:hover .notebookCellMeta,
+  [data-astryx-theme="codaro"] .notebookCellMeta:focus-within {
+    opacity: 0.98;
+    pointer-events: auto;
   }
 
   [data-astryx-theme="codaro"] .notebookCellActions {
-    margin-left: auto;
-    flex: none;
+    display: flex;
+    min-width: 0;
+    align-items: center;
     gap: var(--spacing-1);
   }
 
   [data-astryx-theme="codaro"] .notebookCellDiagnostic,
   [data-astryx-theme="codaro"] .notebookCellStatus {
     display: inline-flex;
-    min-height: 26px;
+    min-height: 22px;
     align-items: center;
     border-radius: var(--radius-element);
-    padding: 0 var(--spacing-2);
-    font-size: 11px;
+    padding: 0 var(--spacing-1-5);
+    font-size: 10px;
     font-weight: var(--font-weight-normal);
     line-height: 1;
   }
@@ -256,83 +227,57 @@
     color: var(--color-text-secondary);
   }
 
-  [data-astryx-theme="codaro"] .notebookCellRunButton {
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-element);
-    background: var(--color-background-card);
-    color: var(--color-icon-primary);
-  }
-
-  [data-astryx-theme="codaro"] .notebookCellRunButtonSelected {
-    border-color: var(--color-border-purple);
-    background: var(--color-accent-muted);
-    color: var(--color-icon-accent);
-  }
-
+  [data-astryx-theme="codaro"] .notebookCellRunButton,
   [data-astryx-theme="codaro"] .notebookCellDeleteButton {
+    width: 28px;
+    height: 28px;
     border-radius: var(--radius-element);
     color: var(--color-icon-secondary);
   }
 
-  [data-astryx-theme="codaro"] .notebookCodeFrame {
-    min-height: 112px;
-    overflow: hidden;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-container);
-    background: var(--color-syntax-background);
-    box-shadow: none;
-    transition:
-      border-color var(--duration-fast) ease,
-      box-shadow var(--duration-fast) ease;
-  }
-
-  [data-astryx-theme="codaro"] .notebookCodeFrame:hover {
-    border-color: var(--color-border-emphasized);
-  }
-
-  [data-astryx-theme="codaro"] .notebookCodeFrameSelected {
+  [data-astryx-theme="codaro"] .notebookCellRunButtonSelected {
     border-color: var(--color-accent);
-    box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-accent) 20%, transparent);
+    background: var(--color-accent-muted);
+    color: var(--color-icon-accent);
   }
 
-  [data-astryx-theme="codaro"] .notebookCellOutput {
-    margin-top: var(--spacing-2);
+  [data-astryx-theme="codaro"] .notebookCellActions [data-cell-ai-help-trigger="always-visible"] {
+    width: 28px;
+    height: 28px;
+    gap: 0;
+    padding: 0;
+  }
+
+  [data-astryx-theme="codaro"] .notebookCellActions [data-cell-ai-help-trigger="always-visible"] span {
+    display: none;
+  }
+
+  [data-astryx-theme="codaro"] .notebookCodeFrame {
+    border-radius: var(--radius-element);
   }
 
   [data-astryx-theme="codaro"] .notebookCellOutput [data-execution-output="true"] {
-    border: 1px solid var(--color-border);
-    border-left: 3px solid var(--color-success);
-    border-radius: var(--radius-container);
-    padding: var(--spacing-4);
-    background: var(--color-background-surface);
+    padding: var(--spacing-3);
     color: var(--color-text-primary);
-  }
-
-  [data-astryx-theme="codaro"] .notebookCellOutput [data-execution-output-status="error"] {
-    border-left-color: var(--color-error);
-    background: var(--color-error-muted);
   }
 
   [data-astryx-theme="codaro"] .notebookCellOutput [data-execution-output="true"] pre {
     color: var(--color-text-primary);
-    font-size: 14px;
-    line-height: 1.65;
+    font-family: var(--font-family-code);
+    font-size: 13px;
+    line-height: 1.6;
   }
 
   [data-astryx-theme="codaro"] .notebookMarkdownPreview,
   [data-astryx-theme="codaro"] .notebookMarkdownEditor {
-    min-height: 96px;
     width: 100%;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-container);
-    padding: var(--spacing-3) var(--spacing-4);
-    background: var(--color-background-surface);
+    min-height: 42px;
+    padding: var(--spacing-2) var(--spacing-3);
     color: var(--color-text-primary);
     font-family: var(--font-family-body);
-    font-size: 15px;
+    font-size: 14px;
     font-weight: var(--font-weight-normal);
-    line-height: 1.7;
-    box-shadow: none;
+    line-height: 1.65;
   }
 
   [data-astryx-theme="codaro"] .notebookMarkdownPreview {
@@ -344,37 +289,33 @@
     resize: vertical;
   }
 
-  [data-astryx-theme="codaro"] .notebookMarkdownEditorSelected {
-    border-color: var(--color-accent);
-    box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-accent) 20%, transparent);
-  }
-
   [data-astryx-theme="codaro"] .notebookInsertControl {
     position: absolute;
-    left: -34px;
+    left: -36px;
     z-index: 12;
-    opacity: 0.42;
+    opacity: 0;
+    pointer-events: none;
     transition: opacity var(--duration-fast) ease;
   }
 
   [data-astryx-theme="codaro"] .notebookInsertBefore {
-    top: 0;
+    top: -10px;
   }
 
   [data-astryx-theme="codaro"] .notebookInsertAfter {
-    bottom: 0;
+    bottom: -10px;
   }
 
   [data-astryx-theme="codaro"] .notebookCell:hover .notebookInsertControl,
-  [data-astryx-theme="codaro"] .notebookCell[data-notebook-cell-selected="true"] .notebookInsertControl,
   [data-astryx-theme="codaro"] .notebookInsertControl:focus-within {
     opacity: 1;
+    pointer-events: auto;
   }
 
   [data-astryx-theme="codaro"] .notebookInsertPrimary {
     display: flex;
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     align-items: center;
     justify-content: center;
     border: 1px solid var(--color-border);
@@ -388,11 +329,6 @@
   [data-astryx-theme="codaro"] .notebookInsertPrimary:focus-visible {
     border-color: var(--color-accent);
     color: var(--color-icon-accent);
-  }
-
-  [data-astryx-theme="codaro"] .notebookInsertPrimary svg {
-    width: 16px;
-    height: 16px;
   }
 
   [data-astryx-theme="codaro"] .notebookInsertMenu {
@@ -440,82 +376,66 @@
 
   [data-astryx-theme="codaro"] .notebookEmptyActions {
     display: flex;
-    min-height: 160px;
+    min-height: 96px;
     align-items: center;
     justify-content: center;
     gap: var(--spacing-2);
-    border-block: 1px solid var(--color-border);
   }
 
   [data-astryx-theme="codaro"] .notebookEmptyAction {
-    min-height: 40px;
+    min-height: 38px;
     gap: var(--spacing-2);
     padding-inline: var(--spacing-3);
-    font-size: 13px;
+    font-size: 12px;
   }
 
-  @media (min-width: 1280px) {
-    [data-astryx-theme="codaro"] .notebookCommandBar {
-      padding-right: 330px;
-    }
+  [data-astryx-theme="codaro"] .notebookAppendActions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
+    padding-top: var(--spacing-2);
+  }
+
+  [data-astryx-theme="codaro"] .notebookAppendButton {
+    display: inline-flex;
+    min-height: 34px;
+    align-items: center;
+    gap: var(--spacing-1-5);
+    border: 1px dashed var(--color-border-emphasized);
+    border-radius: var(--radius-element);
+    padding: 0 var(--spacing-3);
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  [data-astryx-theme="codaro"] .notebookAppendButton:hover,
+  [data-astryx-theme="codaro"] .notebookAppendButton:focus-visible {
+    border-color: var(--color-accent);
+    color: var(--color-text-accent);
   }
 
   @media (max-width: 760px) {
     [data-astryx-theme="codaro"] .notebookCommandBar {
-      min-height: 56px;
-      grid-template-columns: minmax(94px, 1fr) auto auto;
-      gap: var(--spacing-1);
-      padding: var(--spacing-1-5) var(--spacing-2);
+      min-height: 46px;
+      padding: var(--spacing-1) var(--spacing-2);
       padding-left: 44px;
     }
 
-    [data-astryx-theme="codaro"] .notebookDocumentIcon,
-    [data-astryx-theme="codaro"] .notebookActiveCell {
-      display: none;
-    }
-
     [data-astryx-theme="codaro"] .notebookTitleInput {
-      width: 100%;
-      max-width: 150px;
-      font-size: 13px;
+      width: min(42vw, 180px);
     }
 
     [data-astryx-theme="codaro"] .notebookDocumentStatus {
-      gap: 2px;
+      max-width: 36vw;
+      overflow: hidden;
     }
 
     [data-astryx-theme="codaro"] .notebookStatusItem {
-      min-height: 32px;
-      gap: var(--spacing-1);
-      padding-inline: var(--spacing-1-5);
-      font-size: 11px;
-    }
-
-    [data-astryx-theme="codaro"] .notebookStatusItem svg {
-      width: 13px;
-      height: 13px;
-    }
-
-    [data-astryx-theme="codaro"] .notebookPersistenceStatus span {
-      font-size: 0;
-    }
-
-    [data-astryx-theme="codaro"] .notebookPersistenceStatus span::after {
-      font-size: 11px;
-      content: "세션";
-    }
-
-    [data-astryx-theme="codaro"] .notebookMarkdownCommand {
-      display: none;
-    }
-
-    [data-astryx-theme="codaro"] .notebookRunAllButton span {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
+      padding-inline: var(--spacing-1);
+      font-size: 10px;
     }
 
     [data-astryx-theme="codaro"] .notebookPendingArea {
@@ -523,141 +443,38 @@
     }
 
     [data-astryx-theme="codaro"] .notebookDocument {
-      gap: var(--spacing-5);
-      padding: var(--spacing-4) var(--spacing-2) 80px;
-    }
-
-    [data-astryx-theme="codaro"] .notebookCell {
-      padding-left: 34px;
-    }
-
-    [data-astryx-theme="codaro"] .notebookCell::before {
-      left: 23px;
+      gap: 18px;
+      padding: 20px var(--spacing-2) 84px;
     }
 
     [data-astryx-theme="codaro"] .notebookCellMeta {
-      min-height: 44px;
+      top: -12px;
+      right: 6px;
     }
 
     [data-astryx-theme="codaro"] .notebookCellDiagnostic {
       display: none;
     }
 
-    [data-astryx-theme="codaro"] .notebookCellStatus {
-      padding-inline: var(--spacing-1-5);
-    }
-
     [data-astryx-theme="codaro"] .notebookInsertControl {
-      left: -30px;
-      opacity: 0.8;
+      display: none;
     }
 
-    [data-astryx-theme="codaro"] .notebookCodeFrame,
-    [data-astryx-theme="codaro"] .notebookCellBody {
-      min-height: 120px;
+    [data-astryx-theme="codaro"] .notebookFloatingTools {
+      right: 12px;
+      bottom: 12px;
     }
 
-    [data-astryx-theme="codaro"] .notebookCellOutput [data-execution-output="true"] {
-      padding: var(--spacing-3);
-    }
-  }
-
-  @media (max-width: 420px) {
-    [data-astryx-theme="codaro"] .notebookCommandBar {
-      grid-template-columns: minmax(88px, 1fr) auto auto;
-    }
-
-    [data-astryx-theme="codaro"] .notebookStatusItem:first-child span {
-      font-size: 0;
-    }
-
-    [data-astryx-theme="codaro"] .notebookStatusItem:first-child span::after {
-      font-size: 11px;
-      content: "Web";
-    }
-
-    [data-astryx-theme="codaro"] .notebookStatusItem[data-notebook-runtime="local"]:first-child span::after {
-      content: "Local";
+    [data-astryx-theme="codaro"] .notebookRunAllButton {
+      width: 44px;
+      height: 44px;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    [data-astryx-theme="codaro"] .notebookCell::before,
-    [data-astryx-theme="codaro"] .notebookCodeFrame,
+    [data-astryx-theme="codaro"] .notebookCellMeta,
     [data-astryx-theme="codaro"] .notebookInsertControl {
       transition: none;
-    }
-  }
-}
-
-@layer utilities {
-  [data-astryx-theme="codaro"] .notebookRuntimeRail [data-runtime-capability-rail="notebook"] {
-    display: grid;
-    grid-template-columns: minmax(190px, 1.45fr) repeat(3, minmax(0, 0.8fr));
-    border-top: 0;
-    background: var(--color-background-surface);
-  }
-
-  [data-astryx-theme="codaro"] .notebookRuntimeRail [data-runtime-capability-rail="notebook"] > div {
-    min-height: 42px;
-    border-top: 0;
-    padding: var(--spacing-1-5) var(--spacing-3);
-    background: transparent;
-    color: var(--color-text-secondary);
-    font-size: 11px;
-    font-weight: var(--font-weight-normal);
-  }
-
-  [data-astryx-theme="codaro"] .notebookRuntimeRail [data-runtime-capability-rail="notebook"] > div:first-child {
-    grid-column: auto;
-  }
-
-  [data-astryx-theme="codaro"] .notebookRuntimeRail [data-runtime-capability-rail="notebook"] > div:first-child > span {
-    width: 28px;
-    height: 28px;
-    border-radius: var(--radius-element);
-  }
-
-  [data-astryx-theme="codaro"] .notebookRuntimeRail [data-runtime-capability-rail="notebook"] > div:first-child > div > div:first-child {
-    display: none;
-  }
-
-  [data-astryx-theme="codaro"] .notebookRuntimeRail [data-runtime-capability-rail="notebook"] > div:first-child > div > div:last-child > strong {
-    font-size: 13px;
-  }
-
-  [data-astryx-theme="codaro"] .notebookCellActions [data-cell-ai-help-trigger="always-visible"] {
-    min-width: 40px;
-    height: 32px;
-    border-radius: var(--radius-element);
-    padding-inline: var(--spacing-2);
-    font-size: 11px;
-    font-weight: var(--font-weight-bold);
-  }
-
-  @media (max-width: 760px) {
-    [data-astryx-theme="codaro"] .notebookRuntimeRail [data-runtime-capability-rail="notebook"] {
-      grid-template-columns: auto repeat(3, auto);
-      overflow-x: auto;
-    }
-
-    [data-astryx-theme="codaro"] .notebookRuntimeRail [data-runtime-capability-rail="notebook"] > div {
-      min-height: 40px;
-      justify-content: flex-start;
-      padding-inline: var(--spacing-2);
-      white-space: nowrap;
-    }
-
-    [data-astryx-theme="codaro"] .notebookRuntimeRail [data-runtime-capability-rail="notebook"] > div:first-child {
-      gap: var(--spacing-1-5);
-    }
-
-    [data-astryx-theme="codaro"] .notebookRuntimeRail [data-runtime-capability-rail="notebook"] > div:first-child > div > div:last-child > span {
-      display: none;
-    }
-
-    [data-astryx-theme="codaro"] .notebookCellActions [data-cell-ai-help-trigger="always-visible"] {
-      height: 36px;
     }
   }
 }

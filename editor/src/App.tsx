@@ -194,12 +194,24 @@ function App() {
     }, "replace");
   }, [navigateRunRoute, runRouteState.lessonKey, runRouteState.sectionId, selectedCategory, selectedContentId, surface]);
 
+  const suppressedCurriculumRouteFocusRef = useRef<string | null>(null);
+
   useEffect(() => {
     if (surface !== "curriculum" || !runRouteState.sectionId || !curriculumDocument) return;
     if (!curriculumDocument.blocks.some((block) => block.id === runRouteState.sectionId)) return;
     setSelectedCurriculumBlockId(runRouteState.sectionId);
+    if (suppressedCurriculumRouteFocusRef.current === runRouteState.sectionId) {
+      suppressedCurriculumRouteFocusRef.current = null;
+      return;
+    }
     focusCurriculumRouteSection(runRouteState.sectionId);
   }, [curriculumDocument, routeRestoreRevision, runRouteState.sectionId, setSelectedCurriculumBlockId, surface]);
+
+  const activateCurriculumBlock = useCallback((blockId: string) => {
+    setSelectedCurriculumBlockId(blockId);
+    suppressedCurriculumRouteFocusRef.current = blockId;
+    navigateRunRoute({ sectionId: blockId }, "replace");
+  }, [navigateRunRoute, setSelectedCurriculumBlockId]);
 
   const selectCurriculumRouteBlock = useCallback((blockId: string) => {
     setSelectedCurriculumBlockId(blockId);
@@ -348,7 +360,7 @@ function App() {
     document: activeDocument,
     drafts,
     onNotice: applyNotice,
-    selectCurriculumBlock: selectCurriculumRouteBlock,
+    selectCurriculumBlock: activateCurriculumBlock,
     selectNotebookBlock: selectBlock,
     selectedBlock,
     surface,
@@ -618,7 +630,8 @@ function App() {
               onToggleTask={toggleTask}
               onSelectBlock={selectBlock}
               onSelectCategory={selectCurriculumCategory}
-              onSelectCurriculumBlock={selectCurriculumRouteBlock}
+              onNavigateCurriculumBlock={selectCurriculumRouteBlock}
+              onSelectCurriculumBlock={activateCurriculumBlock}
               onSelectCurriculumLesson={selectCurriculumLesson}
               onToggleEStop={toggleEStop}
             />

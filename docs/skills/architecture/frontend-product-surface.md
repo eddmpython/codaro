@@ -92,7 +92,7 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 
 - 대화: conversation, 생성된 curriculum/automation 초안, 적용 대기 중인 노트북 변경
 - 현재 학습: `curricula/` 레슨 트리, YAML에서 전개된 학습 셀, 셀 바로가기 TOC, 접을 수 있는 Codaro 패널
-- 노트북: 빈 노트북, Python/Markdown 셀, 셀 바로 아래 실행 결과, 접을 수 있는 Codaro 패널
+- 노트북: 빈 코드 셀, Python/Markdown 셀, 셀 바로 아래 실행 결과, 필요할 때 여는 Codaro 패널
 - 자동화: 검증된 셀/recipe를 저장하고 예약하는 두 번째 loop. `Codaro 자동화`, `나만의 자동화`, 태스크 예약과 실행 상태를 보여준다.
 - 과제방의 frontend와 active backend 도메인은 제거했다. 학습 실행·검증·진도 event는 classroom API, session, outbox를 import하지 않는다. 한 호환 release의 HTTP `410 Gone` 안내와 local-owner archive migration만 제품 밖 경계에 남는다.
 - tool call과 컨텍스트는 사용자가 검토해야 할 때 action log/diff/detail로 열 수 있게 한다. 학습 화면의 기본 우측 패널로 고정하지 않는다.
@@ -109,9 +109,15 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 
 - 에디터는 빈 노트북에서 시작한다.
 - 기본 생성 버튼은 Python 셀과 Markdown 셀만 둔다.
+- 자유 노트북은 예제 코드를 자동 삽입하지 않는다. 설명과 starter code는 현재 학습이 소유하고, 노트북은 사용자가 바로 입력할 수 있는 빈 코드 셀 하나로 시작한다.
+- 노트북 첫 화면은 가운데 정렬한 파일명, 입력 셀, 하단 셀 추가, 가장자리 전체 실행만 기본 노출한다. 셀 종류, 삭제, 셀 실행, 도움 요청은 셀 hover·focus 문맥에서 드러낸다.
+- runtime과 저장 방식은 `data-notebook-*` 계약으로 계속 측정하되, 정상·저장 완료 상태를 상시 배지나 rail로 장식하지 않는다. 실행 중, 저장 중, 저장 실패처럼 사용자의 다음 행동에 영향을 주는 상태만 화면에 표시한다.
+- `Shift+Enter`는 현재 코드 셀을 실행하고 다음 셀로 이동한다. 마지막 셀이면 빈 코드 셀을 하나 만들고 그 셀로 이동한다. `Ctrl+Enter`와 `Mod+Enter`는 현재 셀에 머문 채 실행한다.
 - 학습셀, 타이틀셀, 설명셀, 실행셀, 시각화셀 같은 전용 의미는 별도 물리 타입을 남발하지 않고 셀 메타데이터(`role`, `displayKind`, `executionKind`, `payload`)로 표현한다.
 - 에디터는 코드 셀, 실행 결과, 런타임 상태가 한 화면에서 끊기지 않아야 한다.
 - 실행 버튼, 셀 추가, 검색, 명령 팔레트 같은 기본 행동은 shadcn 버튼/탭/패널 패턴 위에서 만든다. 저장/동기화는 명확한 제품 흐름이 생기기 전까지 전역 헤더 액션으로 두지 않는다.
+- 노트북과 현재 학습의 실행 셀 frame, 선택 상태, output, action은 `editor/src/components/app/workCell.css`의 `astryxWorkCell*` primitive를 함께 사용한다. 각 표면이 border, radius, output 계층을 따로 복제하면 실패다.
+- Web Run과 Local은 모두 `NotebookSurface → NotebookPanel → DocumentBlock` 컴포넌트 트리를 사용한다. `apiOnline`은 실행·저장 capability만 바꾸며 별도 로컬 노트북 디자인을 만들지 않는다.
 - 코드 편집 영역은 별도 엔진 영역으로 보고, 주변 크롬은 shadcn/ui 컴포넌트로 구성한다.
 - 출력은 셀 바로 아래에 붙이며, 실행 상태는 셀 안에서 먼저 확인할 수 있어야 한다.
 

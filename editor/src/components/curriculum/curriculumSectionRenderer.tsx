@@ -50,7 +50,7 @@ export function CurriculumSectionCard({
   return (
     <section
       aria-label={`${section.title} 학습 섹션`}
-      className="border-b border-border bg-background text-card-foreground"
+      className="border-y border-border bg-background text-card-foreground"
       data-learning-section-card={section.id}
       data-learning-section-mode={readPayloadText(section.contract?.assessmentMode) || "acquisition"}
       data-learning-section-structured={structured ? "true" : "false"}
@@ -396,9 +396,12 @@ export function StructuredSectionLearningBody({
 
       {exercise ? (
         <div
+          className="astryxWorkCell"
           data-learning-execution-count={exerciseResult?.executionCount ?? 0}
           data-learning-execution-state={exerciseRunning ? "running" : "idle"}
           data-learning-section-part="exercise"
+          data-work-cell-running={exerciseRunning ? "true" : "false"}
+          data-work-cell-selected={exerciseSelected ? "true" : "false"}
           id={cellDomId(exercise.id)}
           onClick={() => onSelectBlock(exercise.id)}
         >
@@ -414,7 +417,7 @@ export function StructuredSectionLearningBody({
             </div>
             <div className="flex shrink-0 items-center">
               <IconButton
-                className="size-7 rounded-md [&_svg]:size-3.5"
+                className="astryxWorkCellAction size-8 [&_svg]:size-3.5"
                 disabled={!canRun || exerciseRunning}
                 label="셀 실행"
                 variant="outline"
@@ -430,7 +433,7 @@ export function StructuredSectionLearningBody({
 
           <div className="mt-3">
             <div
-              className="rounded-lg border border-border bg-code transition-colors hover:border-ring/60 focus-within:border-ring"
+              className="astryxWorkCellFrame"
               data-learning-exercise-input="editor"
               data-learning-exercise-input-role="student-practice"
               data-learning-exercise-input-state={exerciseSelected ? "selected" : "ready"}
@@ -448,7 +451,7 @@ export function StructuredSectionLearningBody({
           </div>
 
           {exerciseResult || exerciseRunning ? (
-            <div className="mt-3" data-learning-section-part="result">
+            <div className="astryxWorkCellOutput" data-learning-section-part="result">
               {exerciseResult ? <ExecutionOutput result={exerciseResult} /> : <LoadingInline label="셀 실행 중" />}
             </div>
           ) : null}

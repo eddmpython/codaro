@@ -190,6 +190,8 @@ def testNotebookAutosaveOwnsPersistenceAndHonestStatusContract() -> None:
     assert '"저장 실패"' in commandBar
     assert '"저장 중"' in commandBar
     assert '"저장 대기"' in commandBar
-    assert '"파일 저장됨"' in commandBar
-    assert '"브라우저 저장됨"' in commandBar
+    assert '"파일 저장됨"' not in commandBar
+    assert '"브라우저 저장됨"' not in commandBar
+    assert "notebookPersistenceProbe" in commandBar
+    assert 'const showPersistence = persistence.phase === "saving"' in commandBar
     assert "세션 자동 반영" not in commandBar

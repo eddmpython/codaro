@@ -8,6 +8,7 @@ import { Loader2, Play } from "lucide-react";
 import { isRecord, readPayloadText } from "./curriculumSurfaceHelpers";
 import type { RenderCodeCellEditor } from "./curriculumSurfaceModels";
 import { cellDomId } from "./curriculumNavigation";
+import "@/components/app/workCell.css";
 
 export function CurriculumLearningCell({
   block,
@@ -99,13 +100,16 @@ export function CurriculumLearningCell({
   return (
     <section
       className={cn(
+        "astryxWorkCell",
         embedded
           ? "relative -ml-4 min-w-0 scroll-mt-4 border-l-2 border-transparent pl-4"
-          : "min-w-0 rounded-lg border bg-card text-card-foreground",
+          : "min-w-0 rounded-md border bg-card text-card-foreground",
         embedded && isSelected && "border-accent-brand",
       )}
       data-learning-cell={embedded ? "embedded" : "standalone"}
       data-selected={isSelected ? "true" : "false"}
+      data-work-cell-running={isRunning ? "true" : "false"}
+      data-work-cell-selected={isSelected ? "true" : "false"}
       id={cellDomId(block.id)}
     >
       <div className={cn("min-w-0", !embedded && "p-5")}>
@@ -114,7 +118,7 @@ export function CurriculumLearningCell({
             <span className="block whitespace-normal break-words text-[15px] font-bold leading-6 text-foreground">{blockLabel(block)}</span>
           </button>
           <IconButton
-            className="size-7 rounded-md [&_svg]:size-3.5"
+            className="astryxWorkCellAction size-8 [&_svg]:size-3.5"
             disabled={!canRun}
             label="셀 실행"
             variant="ghost"
@@ -132,7 +136,7 @@ export function CurriculumLearningCell({
             <p className="max-w-3xl text-md font-normal text-foreground">{stripMarkdown(block.guide.description)}</p>
           ) : null}
           <div
-            className="rounded-lg border border-border bg-code transition-colors hover:border-ring/60 focus-within:border-ring"
+            className="astryxWorkCellFrame"
             data-learning-code-input="editor"
             data-learning-code-input-role={isSnippetCode ? "student-practice" : "code-edit"}
             data-learning-code-input-state={isSelected ? "selected" : "ready"}
@@ -148,8 +152,16 @@ export function CurriculumLearningCell({
               onRun: runCurrentDraft,
             })}
           </div>
-          {result ? <ExecutionOutput result={result} /> : null}
-          {isRunning && !result ? <LoadingInline label="셀 실행 중" /> : null}
+          {result ? (
+            <div className="astryxWorkCellOutput">
+              <ExecutionOutput result={result} />
+            </div>
+          ) : null}
+          {isRunning && !result ? (
+            <div className="astryxWorkCellOutput">
+              <LoadingInline label="셀 실행 중" />
+            </div>
+          ) : null}
         </div>
       </div>
     </section>

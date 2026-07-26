@@ -38,6 +38,7 @@ export type CurrentLearningSurfaceProps = {
   selectedContentId: string;
   selectedCurriculumBlockId: string;
   onDraftChange: (blockId: string, value: string) => void;
+  onNavigateCurriculumBlock: (blockId: string) => void;
   onRunBlock: (block: BlockConfig, sourceOverride?: string) => void;
   onSelectCurriculumBlock: (blockId: string) => void;
 };
@@ -128,7 +129,7 @@ export function CurrentLearningSurface(props: CurrentLearningSurfaceProps) {
           expanded={tocExpanded}
           selectedBlockId={props.selectedCurriculumBlockId}
           onExpandedChange={setTocExpanded}
-          onSelectBlock={props.onSelectCurriculumBlock}
+          onSelectBlock={props.onNavigateCurriculumBlock}
         />
       ) : null}
     </div>

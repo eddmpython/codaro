@@ -46,6 +46,7 @@ def runChecks() -> list[CheckResult]:
     results.append(checkUseMobileBreakpoint())
     results.append(checkResponsiveCoverage())
     results.append(checkNotebookInsertControls())
+    results.append(checkNotebookSurfaceSsot())
     results.append(checkViewportInsetsHook())
     results.append(checkPrefersDarkHook())
     results.append(checkVitePwaConfig())
@@ -151,22 +152,63 @@ def checkNotebookInsertControls() -> CheckResult:
         '"notebookInsertControl group/insert"',
         'className="notebookInsertPrimary"',
         'className="notebookInsertMenu"',
+        'className="notebookAppendActions"',
+        'key: "Shift-Enter"',
+        "onRunAndAdvance",
     )
     missing = [fragment for fragment in required if fragment not in source]
     styleRequired = (
         ".notebookCellBody {",
-        ".notebookCodeFrame,",
+        ".notebookFloatingTools {",
+        ".notebookDocument {",
+        ".notebookCellMeta {",
         ".notebookInsertControl {",
-        "min-height: 120px;",
+        "min-height: 40px;",
     )
     missing.extend(fragment for fragment in styleRequired if fragment not in styles)
+    forbidden = (
+        "min-height: 120px;",
+        ".notebookRuntimeRail",
+        "SCRATCH_STARTER_CODE",
+    )
+    present = [fragment for fragment in forbidden if fragment in f"{source}\n{styles}"]
+    missing.extend(f"forbidden legacy contract: {fragment}" for fragment in present)
     stableFrames = source.count('className="notebookCellBody"') >= 2
     if not stableFrames:
         missing.append("stable code and markdown insert frames")
     return CheckResult(
         name="notebook-insert-controls",
         ok=not missing,
-        detail="single insert control per boundary with stable mobile spacing"
+        detail="contextual insert controls, compact cells, and run-advance keyboard flow"
+        if not missing
+        else f"missing: {', '.join(missing)}",
+    )
+
+
+def checkNotebookSurfaceSsot() -> CheckResult:
+    notebookPanel = (SRC / "components" / "notebook" / "notebookPanel.tsx").read_text(encoding="utf-8")
+    commandBar = (SRC / "components" / "notebook" / "notebookCommandBar.tsx").read_text(encoding="utf-8")
+    notebookSurface = (SRC / "components" / "app" / "notebookSurface.tsx").read_text(encoding="utf-8")
+    learningCell = (SRC / "components" / "curriculum" / "curriculumLearningCell.tsx").read_text(encoding="utf-8")
+    workCell = (SRC / "components" / "app" / "workCell.css").read_text(encoding="utf-8")
+    required = (
+        ("notebook shared work-cell import", notebookPanel, 'import "@/components/app/workCell.css"'),
+        ("learning shared work-cell import", learningCell, 'import "@/components/app/workCell.css"'),
+        ("notebook shared frame", notebookPanel, "astryxWorkCellFrame notebookCodeFrame"),
+        ("learning shared frame", learningCell, 'className="astryxWorkCellFrame"'),
+        ("shared output primitive", workCell, ".astryxWorkCellOutput"),
+        ("single notebook panel tree", notebookSurface, "<NotebookPanel"),
+        ("runtime is capability data", commandBar, "data-notebook-runtime={apiOnline ? \"local\" : \"web\"}"),
+        ("quiet persistence disclosure", commandBar, 'const showPersistence = persistence.phase === "saving"'),
+    )
+    missing = [label for label, source, fragment in required if fragment not in source]
+    notebookPanelCount = notebookSurface.count("<NotebookPanel")
+    if notebookPanelCount != 1:
+        missing.append(f"expected one NotebookPanel tree, found {notebookPanelCount}")
+    return CheckResult(
+        name="notebook-surface-ssot",
+        ok=not missing,
+        detail="Web and Local share one notebook tree and one work-cell visual primitive"
         if not missing
         else f"missing: {', '.join(missing)}",
     )
