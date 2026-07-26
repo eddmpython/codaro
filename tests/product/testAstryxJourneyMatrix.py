@@ -33,7 +33,7 @@ def testAstryxRunnerConsumesTheSealedMatrixInOrder() -> None:
     matrix, cases = selectedCases()
 
     assert [case["name"] for case in cases] == matrix["cases"]
-    assert len(cases) == 12
+    assert len(cases) == 14
     assert matrix["colorSchemes"] == ["dark", "light"]
     assert set(matrix["requiredSurfaces"]) <= {case["surface"] for case in cases}
 
@@ -62,6 +62,8 @@ def testAstryxJourneyPinsResponsiveAndLocalMinimumAnchors() -> None:
     assert casesByName["landing-home-desktop"]["viewport"] == {"width": 1440, "height": 900}
     assert casesByName["web-learning-home-mobile"]["viewport"]["width"] == 390
     assert casesByName["web-lesson-mobile"]["viewport"]["width"] == 390
+    assert casesByName["web-chat-mobile"]["viewport"]["width"] == 390
+    assert casesByName["web-automation-mobile"]["viewport"]["width"] == 390
     assert casesByName["web-run-mobile"]["viewport"]["width"] == 390
     assert casesByName["web-run-desktop"]["viewport"]["width"] == 1440
     assert casesByName["local-run-minimum"]["viewport"] == {"width": 900, "height": 640}

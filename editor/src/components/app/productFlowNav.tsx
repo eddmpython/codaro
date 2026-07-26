@@ -1,12 +1,4 @@
-import {
-  FileCode2,
-  GraduationCap,
-  Home,
-  MessageSquare,
-  Workflow,
-} from "lucide-react";
-import type { ComponentType } from "react";
-
+import { productSurfaceIcon } from "@/components/app/productSurfaceVisuals";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -25,29 +17,11 @@ type ProductFlowNavProps = {
   onSurfaceChange: (surface: SurfaceMode) => void;
 };
 
-type SidebarSurfaceIconMap = Partial<Record<SurfaceMode, ComponentType<{ className?: string }>>>;
-
-const sidebarSurfaceIcons: SidebarSurfaceIconMap = {
-  automation: Workflow,
-  chat: MessageSquare,
-  curriculum: GraduationCap,
-  editor: FileCode2,
-  home: Home,
-};
-
-function sidebarIconForSurface(surface: SurfaceMode): ComponentType<{ className?: string }> {
-  const Icon = sidebarSurfaceIcons[surface];
-  if (!Icon) {
-    throw new Error(`Unsupported sidebar surface: ${surface}`);
-  }
-  return Icon;
-}
-
 export function ProductFlowNav({ runtimeTier, surface, onSurfaceChange }: ProductFlowNavProps) {
   const { t } = useLocale();
   const navItems = productSidebarFlowItems(runtimeTier).map((item) => ({
     ...item,
-    Icon: sidebarIconForSurface(item.value),
+    Icon: productSurfaceIcon(item.value),
     label: t(item.labelKey),
   }));
 

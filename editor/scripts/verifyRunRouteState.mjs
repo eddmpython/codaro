@@ -67,8 +67,24 @@ const explicitBareSurface = route.runRouteStateFromLocation(
 assert.equal(explicitBareSurface.surface, "editor");
 assert.equal(explicitBareSurface.lessonKey, null);
 
+const mobileChatAlias = route.runRouteStateFromLocation(
+  { hash: "", pathname: "/m/chat", search: "" },
+  "local",
+  { fallbackSurface: "home", resumeState: direct },
+);
+assert.equal(mobileChatAlias.surface, "chat");
+assert.equal(mobileChatAlias.runtimeTier, "local");
+assert.equal(route.isMobileChatPathname("/m/chat"), true);
+assert.equal(route.isMobileChatPathname("/m/chat/"), true);
+assert.equal(route.isMobileChatPathname("/not-m/chat-extra"), false);
+assert.equal(route.runRoutePathname(mobileChatAlias, "/m/chat"), "/m/chat");
+assert.equal(
+  route.runRoutePathname({ ...mobileChatAlias, surface: "editor" }, "/m/chat"),
+  "/",
+);
+
 assert.equal(route.lessonKeyFromRef("30days", "day01_헬로월드"), "30days/day01_헬로월드");
 assert.equal(route.lessonKeyFromRef("bad/category", "lesson"), null);
 assert.equal(route.lessonRefFromKey("too/many/parts"), null);
 
-console.log("ok: RunRouteState parse, canonical serialization, runtime conversion, and resume semantics verified");
+console.log("ok: RunRouteState parse, canonical serialization, mobile chat alias, runtime conversion, and resume semantics verified");

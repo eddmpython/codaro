@@ -3,6 +3,7 @@ import type { StrongLearningCheckSpecV1 } from "@/lib/learningCheckSpec";
 
 const LOCAL_CHECK_TRANSPORT_ATTEMPTS = 2;
 const LOCAL_CHECK_TRANSPORT_GRACE_MS = 5_000;
+const LOCAL_CHECK_TRANSPORT_RETRY_DELAY_MS = 250;
 
 export async function executeLocalStrongCheck(
   spec: StrongLearningCheckSpecV1,
@@ -46,6 +47,7 @@ async function requestLocalStrongCheck(
       if (!isRetryableTransportError(error) || attempt === LOCAL_CHECK_TRANSPORT_ATTEMPTS - 1) {
         throw error;
       }
+      await waitForTransportRecovery();
     } finally {
       window.clearTimeout(timeoutId);
     }
@@ -56,4 +58,10 @@ async function requestLocalStrongCheck(
 function isRetryableTransportError(error: unknown): boolean {
   if (error instanceof CodaroApiError) return error.status >= 500;
   return error instanceof TypeError || (error instanceof Error && error.name === "AbortError");
+}
+
+function waitForTransportRecovery() {
+  return new Promise<void>((resolve) => {
+    window.setTimeout(resolve, LOCAL_CHECK_TRANSPORT_RETRY_DELAY_MS);
+  });
 }

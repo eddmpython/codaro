@@ -190,7 +190,7 @@ Codaro에서 기준 파일은 아래 순서로 본다. 같은 의미의 규칙�
 | assistant stream protocol | `editor/src/lib/assistantStream.ts` | provider SSE event parsing, done/error response 누적 기준 |
 | assistant message state | `editor/src/lib/assistantConversationState.ts` | stream event와 response를 assistant message state로 변환 |
 | assistant provider turn | `editor/src/lib/assistantProviderTurn.ts` | provider stream 호출과 stream event를 message state에 연결 |
-| mobile chat turn | `editor/src/lib/mobileChatTurn.ts` | 모바일 채팅 route의 teacher chat API 호출 경계 |
+| mobile chat alias | `editor/src/lib/runRouteState.ts` | `/m/chat`을 별도 화면 트리 없이 공용 ProductShell의 chat surface로 정규화 |
 | assistant artifact routing | `editor/src/lib/assistantArtifactRouting.ts` | provider/local 답변 산출물을 현재 학습 또는 노트북으로 여는 surface, pending target, application payload shape 결정 |
 | assistant response plan | `editor/src/lib/assistantResponsePlan.ts` | provider 응답과 tool 결과를 에디터 적용, pending blocks, 나만의 커리큘럼 저장/표면 전환 계획으로 변환하되 직접 저장하지 않는다 |
 | assistant local turn | `editor/src/lib/assistantLocalTurn.ts` | provider 미연결 시 local fallback 저장, notice, pending reset 결정 |

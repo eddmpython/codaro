@@ -143,6 +143,64 @@ def main() -> int:
                 assertSnapshot(local, FIRST_CONTENT_ID, failures, "local handoff", runtimeTier="local")
                 if local["pathId"] != PATH_ID:
                     failures.append("local handoff did not preserve the learning path context")
+
+                mobileChatPage = browser.new_page(viewport={"width": 390, "height": 844})
+                mobileChatPage.goto(
+                    f"http://127.0.0.1:{localPort}/m/chat",
+                    wait_until="networkidle",
+                    timeout=45_000,
+                )
+                mobileChatPage.wait_for_selector('[data-product-surface-view="chat"]')
+                mobileChatPage.wait_for_selector('[data-product-mobile-nav="true"]')
+                mobileChat = snapshot(mobileChatPage)
+                mobileDestinations = mobileChatPage.locator(
+                    "[data-product-mobile-surface]"
+                ).evaluate_all(
+                    "(elements) => elements.map((element) => element.getAttribute('data-product-mobile-surface'))"
+                )
+                activeMobileDestination = mobileChatPage.locator(
+                    '[data-product-mobile-surface][aria-current="page"]'
+                ).get_attribute("data-product-mobile-surface")
+                if mobileChat["surface"] != "chat" or mobileChat["pathname"] != "/m/chat":
+                    failures.append("/m/chat did not resolve to the shared chat surface alias")
+                if mobileDestinations != ["curriculum", "editor", "automation", "chat"]:
+                    failures.append(f"/m/chat mobile destinations drifted: {mobileDestinations}")
+                if activeMobileDestination != "chat":
+                    failures.append("/m/chat did not expose chat as the active mobile destination")
+
+                mobileChatPage.locator('[data-product-mobile-surface="editor"]').click()
+                mobileChatPage.wait_for_selector('[data-product-surface-view="editor"]')
+                mobileChatPage.wait_for_function(
+                    """() => document.activeElement?.getAttribute('data-product-surface-view') === 'editor'"""
+                )
+                mobileEditor = snapshot(mobileChatPage)
+                if mobileEditor["surface"] != "editor" or mobileEditor["pathname"] != "/":
+                    failures.append("/m/chat did not canonicalize the pathname when leaving chat")
+
+                mobileChatPage.go_back(wait_until="networkidle", timeout=45_000)
+                mobileChatPage.wait_for_selector('[data-product-surface-view="chat"]')
+                mobileChatRestored = snapshot(mobileChatPage)
+                if mobileChatRestored["surface"] != "chat" or mobileChatRestored["pathname"] != "/m/chat":
+                    failures.append("browser back did not restore the /m/chat alias")
+
+                mobileChatPage.locator('[data-product-mobile-surface="curriculum"]').click()
+                mobileChatPage.wait_for_selector('[data-product-surface-view="curriculum"]')
+                mobileChatPage.wait_for_function(
+                    """() => document.activeElement?.getAttribute('data-product-surface-view') === 'curriculum'"""
+                )
+                focusedLearning = snapshot(mobileChatPage)
+                if mobileChatPage.locator('[data-product-mobile-nav="true"]').count() != 0:
+                    failures.append("mobile destination navigation leaked into focused learning")
+                if focusedLearning["surface"] != "curriculum" or focusedLearning["pathname"] != "/":
+                    failures.append("mobile curriculum navigation did not open the focused learning shell")
+                observations["mobileChatAlias"] = {
+                    "direct": mobileChat,
+                    "destinations": mobileDestinations,
+                    "activeDestination": activeMobileDestination,
+                    "editor": mobileEditor,
+                    "restored": mobileChatRestored,
+                    "focusedLearning": focusedLearning,
+                }
             finally:
                 browser.close()
     except (FileNotFoundError, OSError, RuntimeError) as exc:
@@ -182,6 +240,7 @@ def snapshot(page: Any) -> dict[str, Any]:
             urlRuntimeTier: params.get('runtime'),
             surface: params.get('surface'),
             hash: location.hash,
+            pathname: location.pathname,
             historyLength: history.length,
           };
         }

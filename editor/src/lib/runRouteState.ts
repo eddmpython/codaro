@@ -79,7 +79,8 @@ export function runRouteStateFromLocation(
 ): RunRouteState {
   const params = new URLSearchParams(location.search);
   const pathLessonKey = lessonKeyFromPathname(location.pathname);
-  const hasExplicitRoute = Boolean(pathLessonKey) || ROUTE_PARAM_NAMES.some((name) => params.has(name));
+  const mobileChatAlias = isMobileChatPathname(location.pathname);
+  const hasExplicitRoute = Boolean(pathLessonKey) || mobileChatAlias || ROUTE_PARAM_NAMES.some((name) => params.has(name));
   if (!hasExplicitRoute && options.resumeState) {
     return normalizeRunRouteState(
       { ...options.resumeState, runtimeTier },
@@ -95,6 +96,8 @@ export function runRouteStateFromLocation(
     ? requestedSurface
     : lessonKey
       ? "curriculum"
+      : mobileChatAlias
+        ? "chat"
       : isRunRouteSurface(hashSurface)
         ? hashSurface
         : options.fallbackSurface;
@@ -181,6 +184,10 @@ export function writeRunRouteState(state: RunRouteState, mode: RunRouteNavigatio
 }
 
 export function runRoutePathname(state: RunRouteState, currentPathname: string): string {
+  if (isMobileChatPathname(currentPathname)) {
+    if (state.surface === "chat") return currentPathname;
+    return mobileChatBasePath(currentPathname);
+  }
   if (state.runtimeTier !== "web") return currentPathname;
   const currentLessonKey = lessonKeyFromPathname(currentPathname);
   if (!currentLessonKey) return currentPathname;
@@ -201,6 +208,10 @@ export function runRouteStatesEqual(left: RunRouteState, right: RunRouteState): 
 
 export function isRunRouteSurface(value: unknown): value is RunRouteSurface {
   return typeof value === "string" && RUN_ROUTE_SURFACES.includes(value as RunRouteSurface);
+}
+
+export function isMobileChatPathname(pathname: string | undefined): boolean {
+  return Boolean(pathname && /(?:^|\/)m\/chat\/?$/.test(pathname));
 }
 
 function lessonKeyFromParams(params: URLSearchParams): string | null {
@@ -227,6 +238,11 @@ function webBasePath(pathname: string): string {
   const marker = pathname.match(/^(.*?)(?:\/(?:learn\/lesson|run|app))(?:\/|$)/);
   const basePath = marker?.[1]?.replace(/\/+$/, "") || "";
   return basePath;
+}
+
+function mobileChatBasePath(pathname: string): string {
+  const prefix = pathname.replace(/\/m\/chat\/?$/, "").replace(/\/+$/, "");
+  return `${prefix || ""}/`;
 }
 
 function normalizeLessonKey(value: unknown): string | null {

@@ -94,9 +94,15 @@ type MainSurfaceProps = {
 
 export function MainSurface(props: MainSurfaceProps) {
   return (
-    <Suspense fallback={<SurfaceLoading />}>
-      <MainSurfaceContent {...props} />
-    </Suspense>
+    <div
+      className="h-full min-h-0 min-w-0 outline-none"
+      data-product-surface-view={props.surface}
+      tabIndex={-1}
+    >
+      <Suspense fallback={<SurfaceLoading />}>
+        <MainSurfaceContent {...props} />
+      </Suspense>
+    </div>
   );
 }
 

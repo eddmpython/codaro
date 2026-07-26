@@ -820,7 +820,9 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "url": f"http://127.0.0.1:{localPort}/m/chat",
             "viewport": {"width": 390, "height": 844},
             "surface": "mobile-chat",
-            "waitFor": "[data-route='mobile-chat']",
+            "waitFor": "[data-product-surface-view='chat']",
+            "expectMobileProductNav": True,
+            "expectedMobileSurface": "chat",
         },
         {
             "name": "local-learning-home-desktop",
@@ -1546,6 +1548,26 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             ),
         },
         {
+            "name": "web-chat-mobile",
+            "url": f"http://127.0.0.1:{webPort}/?surface=chat#chat",
+            "viewport": {"width": 390, "height": 844},
+            "surface": "web-chat",
+            "expectedTier": "web",
+            "waitFor": "[data-product-surface-view='chat']",
+            "expectMobileProductNav": True,
+            "expectedMobileSurface": "chat",
+        },
+        {
+            "name": "web-automation-mobile",
+            "url": f"http://127.0.0.1:{webPort}/?surface=automation#automation",
+            "viewport": {"width": 390, "height": 844},
+            "surface": "web-automation",
+            "expectedTier": "web",
+            "waitFor": "[data-product-surface-view='automation']",
+            "expectMobileProductNav": True,
+            "expectedMobileSurface": "automation",
+        },
+        {
             "name": "web-run-mobile",
             "url": f"http://127.0.0.1:{webPort}/?surface=editor#editor",
             "viewport": {"width": 390, "height": 844},
@@ -1553,6 +1575,8 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "expectedTier": "web",
             "waitFor": "[data-notebook-input='code']",
             "expectMinimalNotebook": True,
+            "expectMobileProductNav": True,
+            "expectedMobileSurface": "editor",
         },
         {
             "name": "web-run-desktop",
@@ -1710,7 +1734,8 @@ async ({ surface, expectedTier }) => {
       && rect.width > 0
       && rect.height > 0
       && style.display !== "none"
-      && style.visibility !== "hidden";
+      && style.visibility !== "hidden"
+      && Number(style.opacity || "1") > 0.1;
   };
   const inViewport = (element) => {
     if (!visible(element)) return false;
@@ -1804,9 +1829,34 @@ async ({ surface, expectedTier }) => {
     .filter(inViewport);
   const visibleSocialLinkIds = visibleSocialLinks
     .map((link) => link.getAttribute("data-social-link-id"));
+  const visibleSocialLinkVisuals = visibleSocialLinks.map((link) => {
+    const rect = link.getBoundingClientRect();
+    const style = getComputedStyle(link);
+    return {
+      id: link.getAttribute("data-social-link-id"),
+      color: style.color,
+      opacity: style.opacity,
+      x: Math.round(rect.x),
+      y: Math.round(rect.y),
+      width: Math.round(rect.width),
+      height: Math.round(rect.height),
+    };
+  });
   const socialLinksInTopLane = visibleSocialLinks.every(
     (link) => link.getBoundingClientRect().top >= 0 && link.getBoundingClientRect().bottom <= 80
   );
+  const visibleMobileProductDestinations = [...document.querySelectorAll(
+    "[data-product-mobile-surface]"
+  )].filter(inViewport);
+  const visibleMobileProductDestinationIds = visibleMobileProductDestinations.map(
+    (item) => item.getAttribute("data-product-mobile-surface")
+  );
+  const activeMobileProductDestinationIds = visibleMobileProductDestinations
+    .filter((item) => item.getAttribute("aria-current") === "page")
+    .map((item) => item.getAttribute("data-product-mobile-surface"));
+  const minimumMobileProductTargetHeight = visibleMobileProductDestinations.length
+    ? Math.min(...visibleMobileProductDestinations.map((item) => item.getBoundingClientRect().height))
+    : null;
   const rail = document.querySelector("[data-runtime-tier]");
   const routeRuntime = document.querySelector("[data-run-route-runtime]");
   let webProgressLessonCount = 0;
@@ -1837,6 +1887,9 @@ async ({ surface, expectedTier }) => {
   webCompletedLessonCount = Number(
     progressHeader?.getAttribute('data-curriculum-header-completed') || 0
   );
+  const activeProductSurfaceView = document.querySelector(
+    "[data-product-surface-view]"
+  )?.getAttribute("data-product-surface-view") || null;
   try {
     const evidenceStore = await new Promise((resolve, reject) => {
       const request = indexedDB.open("codaro-learning-evidence-v1", 3);
@@ -1935,7 +1988,18 @@ async ({ surface, expectedTier }) => {
       '[data-social-links="codaro"][data-social-links-source="design-system"]'
     ).length,
     visibleSocialLinkIds,
+    visibleSocialLinkVisuals,
     socialLinksInTopLane,
+    visibleMobileProductDestinationIds,
+    activeMobileProductDestinationIds,
+    minimumMobileProductTargetHeight,
+    activeProductSurfaceView,
+    chatTextareaCount: document.querySelectorAll(
+      "[data-product-surface-view='chat'] textarea"
+    ).length,
+    chatSendCount: document.querySelectorAll(
+      "[data-product-surface-view='chat'] button[type='submit']"
+    ).length,
     lessonSectionCount: document.querySelectorAll("[data-learning-section-card]").length,
     transferSectionCount: document.querySelectorAll('[data-learning-section-mode="transfer"]').length,
     retrievalSectionCount: document.querySelectorAll('[data-learning-section-mode="retrieval"]').length,
@@ -2041,6 +2105,33 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
         )
     if not audit["socialLinksSourceCount"] or not audit["socialLinksInTopLane"]:
         failures.append(f"{name}: shared SNS rail is not visible in the upper control lane")
+    if case.get("expectMobileProductNav"):
+        expectedDestinations = ["curriculum", "editor", "automation", "chat"]
+        if audit["visibleMobileProductDestinationIds"] != expectedDestinations:
+            failures.append(
+                f"{name}: mobile product navigation drifted: "
+                f"{audit['visibleMobileProductDestinationIds']}"
+            )
+        expectedActive = [case["expectedMobileSurface"]]
+        if audit["activeMobileProductDestinationIds"] != expectedActive:
+            failures.append(
+                f"{name}: expected active mobile destination {expectedActive}, "
+                f"got {audit['activeMobileProductDestinationIds']}"
+            )
+        if (audit["minimumMobileProductTargetHeight"] or 0) < 44:
+            failures.append(
+                f"{name}: mobile product target is shorter than 44px: "
+                f"{audit['minimumMobileProductTargetHeight']}"
+            )
+    elif (
+        int((case.get("viewport") or {}).get("width") or 0) <= 760
+        and case["surface"] in {"learning-home", "web-lesson"}
+        and audit["visibleMobileProductDestinationIds"]
+    ):
+        failures.append(
+            f"{name}: product destination navigation leaked into focused learning: "
+            f"{audit['visibleMobileProductDestinationIds']}"
+        )
     expectedTier = case.get("expectedTier")
     if expectedTier and audit["runtimeTier"] != expectedTier:
         failures.append(f"{name}: expected runtime tier {expectedTier}, got {audit['runtimeTier']}")
@@ -2062,6 +2153,19 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
             failures.append(f"{name}: canonical interactive lesson workspace is incomplete")
         if audit["forbiddenLearningControls"]:
             failures.append(f"{name}: redundant public learning controls {audit['forbiddenLearningControls']}")
+    elif surface in {"mobile-chat", "web-chat"}:
+        if (
+            audit["activeProductSurfaceView"] != "chat"
+            or audit["chatTextareaCount"] != 1
+            or audit["chatSendCount"] != 1
+        ):
+            failures.append(f"{name}: shared chat surface wiring is incomplete")
+    elif surface == "web-automation":
+        if (
+            audit["activeProductSurfaceView"] != "automation"
+            or audit["automationSurfaceCount"] != 1
+        ):
+            failures.append(f"{name}: shared automation surface wiring is incomplete")
     elif surface == "learning-home":
         if audit["learningGoalMapCount"] != 1 or audit["learningGoalRouteCount"] < 1:
             failures.append(f"{name}: outcome-first goal navigation did not render")
@@ -3277,7 +3381,8 @@ def runBrowserMatrix(
                             state = lastCheck.get_attribute("data-learning-check-result") if lastCheck.count() else "missing"
                             detail = lastCheck.inner_text()[:800] if lastCheck.count() else "no check feedback"
                             raise AssertionError(
-                                f"Local solution did not verify; final state={state}: {detail}"
+                                "Local solution did not verify; "
+                                f"final state={state}: {detail}; transport={localCheckTransport}"
                             ) from verificationError
                         verifiedCheck = page.locator('[data-learning-check-result="verified"]').last
                         verifiedExecutor = verifiedCheck.get_attribute("data-learning-check-executor")

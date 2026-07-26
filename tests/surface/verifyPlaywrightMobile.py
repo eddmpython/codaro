@@ -119,13 +119,22 @@ def runPlaywrightViewports() -> dict[str, Any]:
             mobileChatPage = mobileChatContext.new_page()
             try:
                 mobileChatPage.goto(f"http://127.0.0.1:{port}/m/chat", wait_until="domcontentloaded", timeout=15000)
-                mobileChatPage.wait_for_selector("[data-route='mobile-chat']", timeout=10000)
-                inputCount = mobileChatPage.locator("[data-mobile-chat-input='true']").count()
-                sendCount = mobileChatPage.locator("[data-mobile-chat-send='true']").count()
+                mobileChatPage.wait_for_selector("[data-product-surface-view='chat']", timeout=10000)
+                mobileChatPage.wait_for_selector("[data-product-mobile-nav='true']", timeout=10000)
+                inputCount = mobileChatPage.locator("[data-product-surface-view='chat'] textarea").count()
+                sendCount = mobileChatPage.locator("[data-product-surface-view='chat'] button[type='submit']").count()
+                mobileDestinations = mobileChatPage.locator("[data-product-mobile-surface]").evaluate_all(
+                    "(elements) => elements.map((element) => element.getAttribute('data-product-mobile-surface'))"
+                )
+                activeDestination = mobileChatPage.locator(
+                    "[data-product-mobile-surface][aria-current='page']"
+                ).get_attribute("data-product-mobile-surface")
                 result["mobileChat"] = {
                     "mounted": True,
                     "hasInput": inputCount == 1,
                     "hasSendButton": sendCount == 1,
+                    "destinations": mobileDestinations,
+                    "activeDestination": activeDestination,
                 }
             except Exception as chatError:
                 result["mobileChat"] = {"mounted": False, "error": str(chatError)[:200]}
@@ -159,6 +168,10 @@ def main() -> int:
             failures.append(f"/m/chat route did not mount: {mobileChat.get('error')}")
         elif not mobileChat.get("hasInput") or not mobileChat.get("hasSendButton"):
             failures.append(f"/m/chat route missing input/send: {mobileChat}")
+        elif mobileChat.get("destinations") != ["curriculum", "editor", "automation", "chat"]:
+            failures.append(f"/m/chat route mobile navigation drifted: {mobileChat}")
+        elif mobileChat.get("activeDestination") != "chat":
+            failures.append(f"/m/chat route did not activate chat navigation: {mobileChat}")
 
     report = {
         "startedAt": startedAt,

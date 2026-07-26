@@ -271,7 +271,6 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
     editorSocialLinks = (ROOT / "editor/src/styles/generated/socialLinks.tsx").read_text(encoding="utf-8")
     landingSocialLinks = (ROOT / "landing/src/styles/generated/socialLinks.tsx").read_text(encoding="utf-8")
     publicShell = (ROOT / "landing/src/components/publicShell.jsx").read_text(encoding="utf-8")
-    mobileChat = (ROOT / "editor/src/routes/mobileChat.tsx").read_text(encoding="utf-8")
     productSidebar = (ROOT / "editor/src/components/app/productSidebar.tsx").read_text(encoding="utf-8")
     app = (ROOT / "editor/src/App.tsx").read_text(encoding="utf-8")
     editorCss = (ROOT / "editor/src/index.css").read_text(encoding="utf-8")
@@ -380,7 +379,6 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
     )
     require(
         '<SocialLinks label="Codaro SNS" />' in topBar
-        and '<SocialLinks label="Codaro SNS" />' in mobileChat
         and '<SocialLinks className="publicSocialLinks" label="Codaro SNS" />' in publicShell
         and '<SocialLinks className="footerSocialLinks" />' in publicShell
         and all(
@@ -400,7 +398,7 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
         and 'surface !== "curriculum" && showStatusNotice' in topBar
         and 'const showStatusNotice = surface !== "curriculum"' in topBar
         and 'className="hidden xl:block"' in topBar,
-        "all public, learning, notebook, Local, and mobile shells must share the Astryx social link registry",
+        "all public, learning, notebook, Local, and mobile route aliases must share the Astryx social link registry",
         failures,
     )
 

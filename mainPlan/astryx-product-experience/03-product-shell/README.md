@@ -11,6 +11,8 @@
 
 현재 공용 셸은 `RuntimeCapabilityRail`로 Web Run과 Local Studio capability를 같은 component tree에서 나눈다. 정적 Web은 `codaro-runtime-tier=web`, Local FastAPI SPA router는 `codaro-runtime-tier=local`을 주입하고 canonical lesson은 별도 `codaro-lesson-runtime-tier`로 browser와 Local 필요 범위를 설명한다. `RunRouteState@1` schema와 TypeScript adapter가 surface, path, lesson, section, document, task, runtime tier를 정규화하고 URL query, `history.state`, `popstate`, session storage를 연결한다. `/learn/lesson/<category>/<contentId>/`는 pathname에서 같은 `LessonRef`를 복원해 문서와 실행 학습실을 함께 소유하고 `/run/`은 자유 Notebook으로 분리됐다. `DEFAULT_SURFACE`와 1급 nav도 학습 우선으로 바뀌었다. route contract, `design-system-contract`, Light/Dark 대표 Chromium matrix가 green이며 `main@3a18dd97` Pages 배포에서 Home, Learn, Lesson, Run direct load와 실제 Web Python 출력까지 확인했다. Local WebView2와 전체 keyboard/AT matrix가 남아 있어 상태는 `진행`이며 `_done`이 아니다.
 
+현재 구현은 `PRODUCT_SURFACE_NAV`에서 파생한 데스크톱·모바일 목적지와 공용 아이콘 projection을 사용한다. 모바일 Web은 safe-area 하단 내비게이션으로 학습·노트북·자동화·대화를 전환하고, 학습 집중 모드와 가상 키보드가 열린 동안에는 이를 숨긴다. `/m/chat` 별도 component tree와 전용 turn 경계는 제거했으며 공용 ProductShell의 `chat` alias, 상단 SNS, provider 대화 흐름을 그대로 사용한다.
+
 ## 목표
 
 웹 Run과 Local이 하나의 Astryx AppShell, TopNav, SideNav, command/search, settings 구조를 사용하게 한다. 기존 React state, hooks, runtime, route 조립은 보존하고 지속 셸부터 점진적으로 옮긴다.
@@ -102,7 +104,7 @@ Local과 Web은 같은 token·component·state blueprint를 쓰되 지원 viewpo
 - `editor/src/lib/surfaceModel.ts`
 - `editor/src/lib/localeCopy.ts`
 - `editor/src/hooks/useProductSurfaceSelection.ts`
-- `editor/src/routes/mobileChat.tsx`
+- 삭제 `editor/src/routes/mobileChat.tsx`, `editor/src/lib/mobileChatTurn.ts`: 공용 ProductShell과 중복되던 모바일 전용 화면·전송 경계 제거
 - `editor/src/lib/assistantArtifactRouting.ts`
 - `editor/src/lib/pendingChanges.ts`
 - `editor/src/hooks/useThemeMode.ts`

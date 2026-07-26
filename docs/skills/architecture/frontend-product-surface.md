@@ -25,9 +25,11 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 - 사이드바 표면 순서는 `현재 학습 → 노트북 → 자동화 → 대화`다. 이 순서는 네 앱을 동급으로 늘어놓는 메뉴가 아니라, 학습에서 검증한 작업을 노트북과 자동화로 확장하고 대화를 지원 도구로 쓰는 흐름이다.
 - `editor/src/lib/surfaceModel.ts`의 `PRODUCT_SURFACE_NAV`가 표면 순서, 표시 이름 key, 제품 흐름 역할(`entry`/`learning`/`notebook`/`secondLoop`/`support`), 사이드바 노출 여부의 기준이다. `PRODUCT_SIDEBAR_NAV`는 보이는 표면만, `PRODUCT_SIDEBAR_FLOW_ITEMS`는 여기서 파생한 사이드바 흐름 단계다. 컴포넌트가 별도 배열로 표면 순서, 숨김 정책, 단계 번호를 복사하면 실패다.
 - `editor/src/components/app/productSidebar.tsx`는 sidebar shell이다. flow nav는 `productFlowNav.tsx`, 학습 tree는 `curriculumSidebarTree.tsx`, 자동화 tree는 `automationSidebarTree.tsx`가 맡는다.
+- 768px 미만의 제품 화면은 `productMobileNav.tsx`가 `surfaceModel.ts`에서 파생한 Web 네 표면을 safe-area 하단 내비게이션으로 보여준다. 현재 학습은 집중 모드이므로 이 내비게이션을 숨기고 공용 상단 SNS와 사이드바 진입만 유지한다.
+- `/m/chat`은 별도 route 컴포넌트가 아니라 `runRouteState.ts`가 공용 ProductShell의 `chat` surface로 정규화하는 호환 alias다.
 - 제품 내부 실행/편집 단위는 notebook과 cell로 구분한다. 제품 UI와 프론트 코드의 기본 명칭도 노트북/셀을 기준으로 둔다.
 - 폐기된 이전 편집기는 참고/레거시 판단 대상일 뿐, 현재 저장소의 제품 기준으로 보지 않는다.
-- 제품 기본 진입은 **대화**다.
+- 제품 기본 진입은 **현재 학습**이다.
 - 대화 요청 범위는 `editor/src/lib/teacherScope.ts`가 분류한다. 학습 요청은 현재 학습으로, 셀 질문은 노트북/현재 셀로, 자동화 작성 요청은 커리큘럼 저장이 아니라 노트북 pending 변경으로 먼저 간다.
 - 제품 흐름은 `대화 → YAML curriculum → 현재 학습 카드 → 셀 read/write/call → 노트북 검증 → 자동화/태스크`다.
 - 분할 모드는 1급 표면에서 제외한다. 필요하면 특정 화면 안의 고급 레이아웃으로만 다룬다.
@@ -51,6 +53,8 @@ Codaro의 프론트는 두 폴더 경계로 나눈다.
 | `editor/src/lib/surfaceModel.ts` | `현재 학습 → 노트북 → 자동화 → 대화` 순서, flow role, visible/hidden, 기본 표면 |
 | `editor/src/lib/runRouteState.ts` | lesson/path/runtime을 포함한 `/run/` URL, 저장소 resume, push/replace/popstate 복원 |
 | `editor/src/components/app/productFlowNav.tsx` | `PRODUCT_SIDEBAR_FLOW_ITEMS`만 읽어 사이드바 흐름 nav 렌더링 |
+| `editor/src/components/app/productMobileNav.tsx` | `surfaceModel.ts`에서 파생한 Web 네 표면을 모바일 safe-area 내비게이션으로 렌더링. 학습 집중 모드와 키보드 열림 상태에서는 숨김 |
+| `editor/src/components/app/productSurfaceVisuals.ts` | 데스크톱 사이드바와 모바일 내비게이션이 공유하는 표면 아이콘 projection |
 | `editor/src/components/app/productSidebar.tsx` | sidebar shell, terminal utility, 현재 표면의 focused tree 배치 |
 | `editor/src/components/app/mainSurface.tsx` | 표면 선택과 큰 레이아웃 조립. 요청 분류, assistant 산출물 라우팅, pending 적용 로직, 현재 학습/노트북 내부 조립 금지 |
 | `editor/src/components/app/notebookSurface.tsx` | 노트북 표면 조립. 빈 노트북 편집, 셀 실행, pending notebook bar, 우측 teacher panel 배치 |

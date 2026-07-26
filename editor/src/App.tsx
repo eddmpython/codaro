@@ -6,6 +6,7 @@ import {
 import { MainSurface } from "@/components/app/mainSurface";
 import { useCodaroDesign } from "@/lib/codaroDesign";
 import { ProductSidebar } from "@/components/app/productSidebar";
+import { ProductMobileNav } from "@/components/app/productMobileNav";
 import { ProviderReconnectBar } from "@/components/app/providerReconnectBar";
 import { TopControls } from "@/components/app/topBar";
 import { ProviderSettingsSheet } from "@/components/assistant/providerSettingsSheet";
@@ -515,6 +516,7 @@ function App() {
       onUiValueChange={({ blockId, elementId, value }) => setUiValue(blockId ?? "", elementId, value)}
     >
     <SidebarProvider
+      data-active-product-surface={surface}
       data-run-route-lesson-key={runRouteState.lessonKey ?? undefined}
       data-run-route-path={runRouteState.pathId ?? undefined}
       data-run-route-runtime={runRouteState.runtimeTier}
@@ -654,6 +656,12 @@ function App() {
             />
           </div>
         ) : null}
+        <ProductMobileNav
+          keyboardOpen={viewportInsets.isKeyboardOpen}
+          runtimeTier={runRouteState.runtimeTier}
+          surface={surface}
+          onSurfaceChange={selectSurface}
+        />
       </SidebarInset>
 
       {surface === "curriculum" ? null : (

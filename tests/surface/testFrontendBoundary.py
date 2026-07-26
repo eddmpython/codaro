@@ -159,20 +159,27 @@ def testSystemDiagnosticsOwnsDiagnosticExportBoundary() -> None:
     assert "codaroApi.systemDiagnosticsExport" in source
 
 
-def testMobileChatRouteDoesNotCallTransportApiDirectly() -> None:
-    source = _read("editor/src/routes/mobileChat.tsx")
+def testMobileChatAliasUsesTheSharedProductShell() -> None:
+    main = _read("editor/src/main.tsx")
+    route = _read("editor/src/lib/runRouteState.ts")
 
-    assert 'from "@/lib/api"' not in source
-    assert "codaroApi" not in source
-    assert "sendMobileChatTurn" in source
+    assert "MobileChat" not in main
+    assert "isMobileChatRoute" not in main
+    assert "<App />" in main
+    assert "isMobileChatPathname(location.pathname)" in route
+    assert 'mobileChatAlias\n        ? "chat"' in route
+    assert not (ROOT / "editor/src/routes/mobileChat.tsx").exists()
+    assert not (ROOT / "editor/src/lib/mobileChatTurn.ts").exists()
 
 
-def testMobileChatTurnOwnsTeacherChatBoundary() -> None:
-    source = _read("editor/src/lib/mobileChatTurn.ts")
+def testLocalStrongCheckWaitsBeforeItsSingleTransportRetry() -> None:
+    source = _read("editor/src/lib/localLearningCheckExecutor.ts")
 
-    assert 'import { codaroApi } from "@/lib/api"' in source
-    assert "codaroApi.teacherChat" in source
-    assert 'role: "teacher"' in source
+    assert "const LOCAL_CHECK_TRANSPORT_ATTEMPTS = 2" in source
+    assert "const LOCAL_CHECK_TRANSPORT_RETRY_DELAY_MS = 250" in source
+    assert "await waitForTransportRecovery()" in source
+    assert source.index("await waitForTransportRecovery()") < source.index("finally {")
+    assert "window.setTimeout(resolve, LOCAL_CHECK_TRANSPORT_RETRY_DELAY_MS)" in source
 
 
 def testCurriculumProgressHookDoesNotCallTransportApiDirectly() -> None:

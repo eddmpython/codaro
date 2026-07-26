@@ -163,6 +163,8 @@ def testAppDelegatesProductSurfaceSelectionPolicy() -> None:
 def testProductSidebarRendersCentralSurfaceNavOnly() -> None:
     source = _read("editor/src/components/app/productSidebar.tsx")
     flowNav = _read("editor/src/components/app/productFlowNav.tsx")
+    mobileNav = _read("editor/src/components/app/productMobileNav.tsx")
+    visuals = _read("editor/src/components/app/productSurfaceVisuals.ts")
     curriculumTree = _read("editor/src/components/app/curriculumSidebarTree.tsx")
 
     assert "ProductFlowNav" in source
@@ -181,9 +183,24 @@ def testProductSidebarRendersCentralSurfaceNavOnly() -> None:
     assert "surfaceIcons" not in source
     assert "categoryTitle" not in source
     assert "productSidebarFlowItems(runtimeTier)" in flowNav
-    assert "sidebarSurfaceIcons" in flowNav
-    assert "sidebarIconForSurface" in flowNav
-    assert "Unsupported sidebar surface" in flowNav
+    assert "productSurfaceIcon(item.value)" in flowNav
+    assert "PRODUCT_SURFACE_ICONS" not in flowNav
+    assert "productSidebarFlowItems(\"web\")" in mobileNav
+    assert "productSurfaceIcon(item.value)" in mobileNav
+    assert 'from "@/components/ui/button"' in mobileNav
+    assert "<Button" in mobileNav
+    assert 'data-product-mobile-nav="true"' in mobileNav
+    assert 'data-product-mobile-surface={item.value}' in mobileNav
+    assert 'aria-current={active ? "page" : undefined}' in mobileNav
+    assert 'surface === "curriculum"' in mobileNav
+    assert "keyboardOpen" in mobileNav
+    assert "grid-cols-4" in mobileNav
+    assert "min-h-12" in mobileNav
+    assert "env(safe-area-inset-bottom)" in mobileNav
+    assert "focusProductSurface(item.value)" in mobileNav
+    assert "requestAnimationFrame" in mobileNav
+    assert "PRODUCT_SURFACE_ICONS" in visuals
+    assert "Unsupported product navigation surface" in visuals
     assert "PackageOpen" not in flowNav
     assert "share:" not in flowNav
     assert "PRODUCT_SIDEBAR_NAV" not in flowNav
@@ -200,6 +217,23 @@ def testProductSidebarRendersCentralSurfaceNavOnly() -> None:
     assert 'flowRole === "secondLoop" && "border-t border-sidebar-border/60 bg-sidebar-accent/20"' in flowNav
     assert source.index("<ProductFlowNav") < source.index('data-product-nav="utility"')
     assert source.index('data-product-nav="utility"') < source.index('tooltip={t("terminal.title")}')
+
+
+def testAppMountsOneResponsiveProductShellForEveryRouteAlias() -> None:
+    app = _read("editor/src/App.tsx")
+    main = _read("editor/src/main.tsx")
+    mainSurface = _read("editor/src/components/app/mainSurface.tsx")
+
+    assert "<ProductMobileNav" in app
+    assert "keyboardOpen={viewportInsets.isKeyboardOpen}" in app
+    assert "runtimeTier={runRouteState.runtimeTier}" in app
+    assert "surface={surface}" in app
+    assert "onSurfaceChange={selectSurface}" in app
+    assert "data-active-product-surface={surface}" in app
+    assert "data-product-surface-view={props.surface}" in mainSurface
+    assert "tabIndex={-1}" in mainSurface
+    assert "MobileChat" not in main
+    assert "<App />" in main
 
 
 def testProductSidebarKeepsSurfaceTreesInFocusedFiles() -> None:
