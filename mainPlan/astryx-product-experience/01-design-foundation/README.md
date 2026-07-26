@@ -31,7 +31,7 @@ Landing, Learn, Run, Local이 같은 Astryx 토큰, 테마 상태, 폰트, 밀�
 
 ## 테스트
 
-- `uv run python -X utf8 tests/run.py gate design-system-contract`: 통과
+- `uv run python -X utf8 tests/run.py gate design-system-contract`: 정적 계약과 current-head artifact metadata 통과
 - `uv run python -X utf8 tests/run.py gate learning-card-browser`: 통과
 - `uv run python -X utf8 tests/learning/verifyLearningSystemReadiness.py`: `14/14`, `passed: true`. 이는 readiness 계약 만점이지 전체 제품 완료나 학습 효과 점수가 아니다.
 - Landing과 Editor production build: 통과

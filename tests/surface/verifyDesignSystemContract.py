@@ -4,7 +4,9 @@ from datetime import UTC, datetime
 import hashlib
 import json
 import re
+import subprocess
 import sys
+import time
 from pathlib import Path
 
 
@@ -23,6 +25,25 @@ def canonicalJson(value: object) -> str:
 def sha256(data: bytes | str) -> str:
     payload = data.encode("utf-8") if isinstance(data, str) else data
     return hashlib.sha256(payload).hexdigest()
+
+
+def utcTimestamp() -> str:
+    return datetime.now(UTC).isoformat(timespec="seconds")
+
+
+def currentGitHead() -> str | None:
+    try:
+        result = subprocess.run(
+            ("git", "rev-parse", "HEAD"),
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        return None
+    return result.stdout.strip() or None
 
 
 def require(condition: bool, message: str, failures: list[str]) -> None:
@@ -411,7 +432,34 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
     require(oversizedRadius is None, "representative landing CSS exceeds the 8px radius ceiling", failures)
 
 
+def buildReportPayload(
+    *,
+    tokens: dict[str, object],
+    compatibility: dict[str, object],
+    failures: list[str],
+    startedAt: str,
+    durationMs: int,
+) -> dict[str, object]:
+    return {
+        "schemaVersion": 1,
+        "gate": "design-system-contract",
+        "passed": not failures,
+        "status": "passed" if not failures else "failed",
+        "gitHead": currentGitHead(),
+        "startedAt": startedAt,
+        "completedAt": utcTimestamp(),
+        "durationMs": durationMs,
+        "reportPath": REPORT_PATH.relative_to(ROOT).as_posix(),
+        "sourceSha256": sha256(canonicalJson(tokens)),
+        "astryx": tokens["astryx"],
+        "sharedPackages": compatibility["sharedPackages"],
+        "failures": failures,
+    }
+
+
 def main() -> int:
+    startedAt = utcTimestamp()
+    started = time.monotonic()
     failures: list[str] = []
     tokens = json.loads((DESIGN_ROOT / "tokens.json").read_text(encoding="utf-8"))
     fontManifest = json.loads((DESIGN_ROOT / "fontManifest.json").read_text(encoding="utf-8"))
@@ -424,16 +472,13 @@ def main() -> int:
     verifyEntryPoints(failures)
     verifyRepresentativeSurfaces(failures)
 
-    payload = {
-        "gate": "design-system-contract",
-        "passed": not failures,
-        "status": "passed" if not failures else "failed",
-        "completedAt": datetime.now(UTC).isoformat(),
-        "sourceSha256": sha256(canonicalJson(tokens)),
-        "astryx": tokens["astryx"],
-        "sharedPackages": compatibility["sharedPackages"],
-        "failures": failures,
-    }
+    payload = buildReportPayload(
+        tokens=tokens,
+        compatibility=compatibility,
+        failures=failures,
+        startedAt=startedAt,
+        durationMs=round((time.monotonic() - started) * 1000),
+    )
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     REPORT_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(payload, ensure_ascii=False, indent=2))
