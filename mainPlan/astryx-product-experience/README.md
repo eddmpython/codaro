@@ -2,7 +2,7 @@
 
 상태: 진행
 
-전문 평가 기록은 [PRD improvement loop](00-product-contract/01-prd-improvement-loop/)가 제품 PRD와 분리해 관리한다. 과거 점수·결론·remediation 문서는 blind evaluator 입력에 넣지 않으며, 어떤 역사 점수도 현재 완료 판정을 대신하지 않는다. 현재 top-level 활성 workstream은 11개, top-level `_done` 이동은 0개이며 내부 completion bootstrap packet 1개만 정식 전이를 마쳤다. R8의 100점은 동일 평가자 자기수렴으로 무효 처리한 역사 기록이며, 현재 PRD에는 독립 점수도 R10 통과 판정도 없다.
+전문 평가 기록은 [PRD improvement loop](00-product-contract/01-prd-improvement-loop/)가 제품 PRD와 분리해 관리한다. 과거 점수·결론·remediation 문서는 blind evaluator 입력에 넣지 않으며, 어떤 역사 점수도 현재 완료 판정을 대신하지 않는다. 현재 top-level 활성 workstream은 11개, top-level `_done` 이동은 0개이며 내부 completion bootstrap과 design token·package contract 2개가 정식 전이를 마쳤다. R8의 100점은 동일 평가자 자기수렴으로 무효 처리한 역사 기록이며, 현재 PRD에는 독립 점수도 R10 통과 판정도 없다.
 
 ## 목표
 
@@ -54,7 +54,7 @@ Codaro를 다운로드 중심 랜딩과 별도 로컬 앱의 조합으로 보지
 | Web↔Local archive | `kind=codaro.learning-archive`, `schemaVersion=2`가 document, draft, virtual FS와 file·directory·table·image bytes, package bytes, evidence, lineage, disabled·unscheduled automation draft를 SHA-256 content-addressed blob으로 묶는다. Web은 IndexedDB에 full archive를 자동 보존하고 reload에서 복원하며 Local은 검증 뒤 immutable object와 `HEAD`를 원자 교체해 reload하고 evidence merge 실패 시 이전 `HEAD`를 복원한다. | Python contract·materialization·rollback과 Web/Local UI/API lifecycle, reload/race와 Day 19 artifact transfer는 마지막 66-case 검사에 포함됐다. current HEAD 전체 재기준선, 실제 배포 round trip과 독립 보안 검수는 미완료 |
 | 시각 자산 | 공용 manifest, provenance/checksum, AVIF/WebP variant, 실제 Web lesson·Run 캡처와 새 Local automation operational UI 캡처를 양쪽 앱에서 소비한다. 8개 학습 domain의 `generatedRaster` instructional asset과 learning question·decision·lesson context를 등록했고, `learningVisualAssets.ts`의 domain/category mapping을 통해 `CurriculumHome`과 `CurriculumOverview`에서 `LearningDomainVisual`로 자동 렌더한다. | `visual-assets` green. instructional asset의 lesson anchor 사람 승인, outcome proof, 전체 shot list와 사람 자산 검수는 남음 |
 | 저장소 단순화 | 학습자 예측 계약·도구·332개 YAML block과 active classroom backend/frontend를 삭제했다. dead Landing source와 unused illustration을 제거했고 lifecycle generated-source policy, Landing/editor module boundary, 양쪽 exact package pin을 적용했다. | `removed-learning-concepts`, `repository-simplification` green. upstream 독립 검수와 완료 전이 증거가 없어 09 workstream은 active |
-| 완료 전이 | completion bootstrap packet이 A `cac1cc9d` → E `9afa9ab6` → B `ab20f822`로 내부 `_done` 이동했고 transition ledger 첫 행이 검증됐다. top-level workstream 이동은 0개다. | completion protocol은 green·CI required. evaluator 3명·raw report·finding ledger가 없어 `plan-quality`는 계속 red이며 현재 제품 점수나 완료 판정 없음 |
+| 완료 전이 | completion bootstrap A `cac1cc9d` → E `9afa9ab6` → B `ab20f822`, design token·package A `38587105` → E `49ccc063` → B `e27a513e`가 내부 `_done` 이동했고 transition ledger 2행이 검증됐다. top-level workstream 이동은 0개다. | completion protocol은 green·CI required. evaluator 3명·raw report·finding ledger가 없어 `plan-quality`는 계속 red이며 현재 제품 점수나 완료 판정 없음 |
 
 ## 제품 원칙
 
