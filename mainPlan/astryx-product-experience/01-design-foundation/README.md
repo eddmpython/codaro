@@ -26,7 +26,7 @@ Landing, Learn, Run, Local이 같은 Astryx 토큰, 테마 상태, 폰트, 밀�
 | 00 | [token-and-package-contract](_done/00-token-and-package-contract/) | 완료 | exact pin, schema, font provenance, deterministic mirror gate |
 | 01 | [theme-runtime-and-layers](_done/01-theme-runtime-and-layers/) | 완료 | shared theme storage, density/accent runtime, layer order, light/dark/system |
 | 02 | [landing-and-learning-migration](_done/02-landing-and-learning-migration/) | 완료 | 웹 우선 홈과 읽히는 학습 카탈로그, 실제 제품 이미지, direct lesson |
-| 03 | [run-and-local-migration](03-run-and-local-migration/) | 진행 | Run/Local 대표 surface가 같은 token과 각 density로 시각 검증 |
+| 03 | [run-and-local-migration](_done/03-run-and-local-migration/) | 진행 | Run/Local 대표 surface가 같은 token과 각 density로 시각 검증 |
 | 04 | [visual-accessibility-gates](04-visual-accessibility-gates/) | 진행 | desktop/mobile, reduced motion, font, overflow, contrast, browser tier gate |
 
 ## 테스트

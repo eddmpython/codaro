@@ -52,3 +52,16 @@ transitions:
   evidencePath: mainPlan/astryx-product-experience/01-design-foundation/_done/02-landing-and-learning-migration/completion-evidence.yml
   evidenceHash: 89c29e86f00dcbc093611348be811096bd72defa892f56e5b77ea6123ab91c41
   preparedAt: '2026-07-26T17:58:49+00:00'
+- schemaVersion: 1
+  transitionKind: complete
+  nonce: d322baab-ccf8-49cc-a2f4-e77c02431c01
+  transitionId: 24532b78203d33ef73607e9c63ae4e4fc9afab96fda59b0ca892eee42de0982e
+  initiativeId: astryx-product-experience
+  packetId: run-and-local-migration
+  implementationCommit: f33b9d2a1b06b4c088a778d3d964d1d992e9d96d
+  evidenceCommit: b0627a2210cb2b42628ab21876fa7b2307bc9bd0
+  fromPath: mainPlan/astryx-product-experience/01-design-foundation/03-run-and-local-migration
+  toPath: mainPlan/astryx-product-experience/01-design-foundation/_done/03-run-and-local-migration
+  evidencePath: mainPlan/astryx-product-experience/01-design-foundation/_done/03-run-and-local-migration/completion-evidence.yml
+  evidenceHash: c1f4c7266ba026c5899529f1276ac8747e886eac994a665303c6df5d4764f790
+  preparedAt: '2026-07-26T19:52:23+00:00'
