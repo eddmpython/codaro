@@ -7,7 +7,7 @@
 > 남은 위험: 전체 contrast·keyboard·screen-reader·Firefox·WebKit·WebView2 수동 matrix는 04-visual-accessibility-gates에서 계속 차단한다.; Run·Local의 전체 capability state와 320px 최소 폭 봉인은 03-run-and-local-migration에서 계속 진행한다.; 현재 세션의 연결 브라우저 목록이 비어 공개 URL 수동 클릭은 수행하지 못했으며, 동일 clean A의 Chromium 상호작용 보고서와 Pages build·deploy 성공을 각각 보존했다.
 > 증거: [`completion-evidence.yml`](completion-evidence.yml)
 
-상태: 진행
+상태: 완료
 
 ## 목표
 
@@ -46,7 +46,7 @@
 - `design-system-contract`: Landing·Learning·Run이 생성된 Astryx token과 공용 SNS registry를 소비하는지 확인한다.
 - `web-learning`: 472개 canonical route·lazy payload·sitemap·검색 일치, deep link, 자동 저장 reload, Web Run과 390px/1440px 대표 브라우저 화면을 확인한다.
 - `landing-public`: Home·Learn의 Web-first CTA, 실제 media, SEO, hydration과 390px/1440px 반응형 화면을 확인한다.
-- 전체 contrast·keyboard·screen-reader·Firefox·WebKit·WebView2 수동 matrix는 [04 visual/accessibility gates](../04-visual-accessibility-gates/)가 소유한다.
+- 전체 contrast·keyboard·screen-reader·Firefox·WebKit·WebView2 수동 matrix는 [04 visual/accessibility gates](../../04-visual-accessibility-gates/)가 소유한다.
 
 ## 배포 증거
 
@@ -60,4 +60,4 @@ URL parser와 initial selection을 함께 되돌린다. Landing 링크만 남겨
 
 현재 source에는 실제 제품 capture를 쓰는 Web-first Home, domain별 대표 경로를 우선하는 Learn, 472개 canonical direct lesson, URL 초기 선택과 별도 확인 없는 본문 전환이 구현됐다. Home·Learn과 학습 본문은 390px/1440px에서 image/text overlap, 가로 overflow, 이름 없는 버튼, 깨진 이미지가 0인지 브라우저 gate가 검사한다. Web 학습 자동 저장 검증은 번역된 문구 대신 `data-notebook-active-cell` 의미 표식을 사용해 locale과 무관하게 reload 복원을 판정한다.
 
-이 packet은 clean 구현 commit의 `web-learning`·`landing-public`, 동일 commit의 실제 Pages 배포, 별도 evidence commit과 A→E→B 완료 전이가 모두 확인되기 전까지 진행 상태다. 전체 접근성 수동 matrix는 04의 잔여 범위이며 이 packet에 중복 완료 조건으로 두지 않는다.
+clean 구현 A `a9f3903b`에서 `web-learning` 10/10, `landing-public` 5/5, 472개 canonical route와 자동저장 reload 복원을 다시 확인했다. 같은 A의 Pages run `30213073075`와 CI run `30213073100`이 성공했고, 9개 보고서를 E `7a78861a`에 봉인한 뒤 B `d1c82d75`로 정식 완료 전이했다. 전체 접근성 수동 matrix와 Run·Local의 320px 전체 상태 검증은 각각 04와 03의 잔여 범위이며 이 packet의 완료 근거로 가장하지 않는다.
