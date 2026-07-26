@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: 43b92db11cfaa9873e70656cd86ef351f1811067
+  gitCommit: a94e912ce19565d01fe585e22d2f1195cd09b71e
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: 15659de950212f770971b64b2d0f0640b9c7435787b28b6678f52ae4fc3da160
-  fileCount: 2669
-  totalBytes: 87959208
+  manifestHash: 9122ed1eabd9f470a58eb3f7e93e701deeb9aed1b087e1d3d86bd0176af10b32
+  fileCount: 2676
+  totalBytes: 88202021
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: 31a5b44a4eac03ab520945bc0566d5c161eca68de2cdbbd0be9d8d0d91080f29
-  bytes: 88473526
+  sha256: d8a6560669c32df6e05256503597b621c0abbe8d5263e04e5b493bea6fad88e9
+  bytes: 88717559
   format: zip
   compression: stored
   compressionMethod: 0
@@ -20,8 +20,6 @@ roundReadiness:
   sealEligible: false
   roundReady: false
   sealBlockingReasons:
-  - 02-completion-and-gate-bootstrap closure evidence is absent
-  - 02-completion-and-gate-bootstrap is not eligible for R10
   - 03-learning-vertical-slice is not eligible for R10
   - 04-evidence-migration is not eligible for R10
   - 05-check-sandbox-feasibility is not eligible for R10
@@ -33,8 +31,6 @@ roundReadiness:
   - learning evaluator is unassigned
   - ux evaluator is unassigned
   blockingReasons:
-  - 02-completion-and-gate-bootstrap closure evidence is absent
-  - 02-completion-and-gate-bootstrap is not eligible for R10
   - 03-learning-vertical-slice is not eligible for R10
   - 04-evidence-migration is not eligible for R10
   - 05-check-sandbox-feasibility is not eligible for R10
@@ -75,8 +71,8 @@ contracts:
   sha256: 3a7e5a28de2b81c7ee2b2f81c41f3bbedb8dd58efe3a6c23ee65b4cd57254dec
 files:
 - path: .github/workflows/ci.yml
-  sha256: 946f96a3e38e916a6196cce6fcb8386803cdd3d7d23c1582ed21fa618c07ec11
-  bytes: 7704
+  sha256: 852b6f3f68916f05d9b5bf8edcfa5a740a9f3daf22ad8ea6bb6e9b57601a1a17
+  bytes: 7874
   kind: repository
   sourcePath: .github/workflows/ci.yml
 - path: .github/workflows/launcher-release.yml
@@ -174,8 +170,13 @@ files:
   bytes: 12840
   kind: repository
   sourcePath: assets/brand/designSystem/fonts/SpaceGrotesk-700.woff2
+- path: assets/brand/designSystem/socialLinks.json
+  sha256: 92b79b4f8de423b3282aae22296c153a888654b67b0ef98e164893862d9c8547
+  bytes: 3895
+  kind: repository
+  sourcePath: assets/brand/designSystem/socialLinks.json
 - path: assets/brand/designSystem/tokens.json
-  sha256: 312343e4f2531ad5c1a023ddcf451589b9298516cb7f9f24ca934147676c917b
+  sha256: e634187ec078ef049c4a5ef0ef90530eeb8eaee476c24b3b0db26fc371937c1a
   bytes: 7924
   kind: repository
   sourcePath: assets/brand/designSystem/tokens.json
@@ -230,8 +231,8 @@ files:
   kind: repository
   sourcePath: assets/brand/tools/buildBrandAssets.py
 - path: assets/brand/tools/buildDesignSystem.py
-  sha256: 3509338c63f8283d5478fcca49ced97bc86563f76dd639b5a9999597fde13c84
-  bytes: 23810
+  sha256: a6c3d8aa6c57ed557a1b4c15ae391538e9ca504125bb25f7fff24431b7cbe569
+  bytes: 41387
   kind: repository
   sourcePath: assets/brand/tools/buildDesignSystem.py
 - path: assets/brand/tools/buildVisualAssets.py
@@ -3580,8 +3581,8 @@ files:
   kind: repository
   sourcePath: docs/skills/architecture/execution-engine.md
 - path: docs/skills/architecture/frontend-product-surface.md
-  sha256: 9898ef6d5546af5a61ac6736deebbf6bb935ff17246f1b2dcf2896367444fdbd
-  bytes: 18880
+  sha256: aab3370adbfb1b3ce7d45fa16fabd661c9cbb32ba2180f15065d1e930d926895
+  bytes: 21208
   kind: repository
   sourcePath: docs/skills/architecture/frontend-product-surface.md
 - path: docs/skills/architecture/learning-yaml-contract.md
@@ -3610,8 +3611,8 @@ files:
   kind: repository
   sourcePath: docs/skills/architecture/share-pack-distribution.md
 - path: docs/skills/architecture/ssot-map.md
-  sha256: 186bae59d3487720010dfe72a23def8945ba95065d496f85534fd3423a98be7b
-  bytes: 23716
+  sha256: ec5ef638d6204a35e6ff4a7321d7dfc7d219190d2a2cad4b41f36cdd9685203c
+  bytes: 24215
   kind: repository
   sourcePath: docs/skills/architecture/ssot-map.md
 - path: docs/skills/architecture/teacher-tool-loop.md
@@ -3730,13 +3731,13 @@ files:
   kind: repository
   sourcePath: docs/skills/ops/foundation/environment.md
 - path: docs/skills/ops/foundation/testing-and-gates.md
-  sha256: 65842e284aa5c26a7f0d90e7d4941758270e5ff5240c40e9d75858f596322175
-  bytes: 49008
+  sha256: 5e4a0d430af1a9b87cf87e61cc8b1b7d351a54b2dab890d61a3fc3af33a9996e
+  bytes: 49694
   kind: repository
   sourcePath: docs/skills/ops/foundation/testing-and-gates.md
 - path: docs/skills/ops/product/branding.md
-  sha256: 7bb67c9bc859fc528ba1902ea8f20dd7abc8ed917d7b38a223091ae6e91d67ce
-  bytes: 5590
+  sha256: 2f44a36ae5e226e0527b4152e1e861a575789d5f4ab698e80c7e3fa8ee6147e0
+  bytes: 7209
   kind: repository
   sourcePath: docs/skills/ops/product/branding.md
 - path: docs/skills/ops/product/contentPipeline.md
@@ -3765,8 +3766,8 @@ files:
   kind: repository
   sourcePath: docs/skills/ops/product/world-class-blueprint.md
 - path: docs/skills/ops/release/git-and-release.md
-  sha256: 7c0d37150994c5ed3a70c88a6f2db3cf7ef2ecda5cfe41a011b62faa1fb60255
-  bytes: 18256
+  sha256: 63aea268fa074d41f8e8edc1680044f87feff401d2034897bd02a9cf28c02a57
+  bytes: 21852
   kind: repository
   sourcePath: docs/skills/ops/release/git-and-release.md
 - path: docs/skills/ops/release/licensing.md
@@ -4810,13 +4811,13 @@ files:
   kind: repository
   sourcePath: editor/scripts/verifyLearningArchiveState.mjs
 - path: editor/scripts/verifyRunRouteState.mjs
-  sha256: 62dbe44a95e0e51dcd665576232a0f290b9cab010c8271d5163d6f852597201c
-  bytes: 2875
+  sha256: 9fdf7512ebba4821131e6a46b185a79ed4a0aaa5c60faad08ae4f8a476066b73
+  bytes: 3536
   kind: repository
   sourcePath: editor/scripts/verifyRunRouteState.mjs
 - path: editor/src/App.tsx
-  sha256: 065015da79c882cf1453b4d51ef2054716da7f76681adc95bb3acc7a886ed175
-  bytes: 25058
+  sha256: 9eac777a72ff1f329eadf3d0bec0864feb06b09a30765c11ba9d92746f18ca81
+  bytes: 26760
   kind: repository
   sourcePath: editor/src/App.tsx
 - path: editor/src/components/app/appErrorBoundary.tsx
@@ -4825,8 +4826,8 @@ files:
   kind: repository
   sourcePath: editor/src/components/app/appErrorBoundary.tsx
 - path: editor/src/components/app/appPrimitives.tsx
-  sha256: 53d20b540615c2462c97e119588c4c9bec7917df3ea5b8e7eb54f74c28b6b2b5
-  bytes: 13283
+  sha256: 7fd28317978dcfa8bd5f74f37daef15914558cc44217c4e3b6c6b55caa1f4ef2
+  bytes: 12093
   kind: repository
   sourcePath: editor/src/components/app/appPrimitives.tsx
 - path: editor/src/components/app/automationSidebarTree.tsx
@@ -4845,13 +4846,13 @@ files:
   kind: repository
   sourcePath: editor/src/components/app/codaroThemeProvider.tsx
 - path: editor/src/components/app/currentLearningSurface.tsx
-  sha256: 9cc7d1935c3e774c8ea3e1d126d1dcab19f653e48490f03c4426e42b66003ec1
-  bytes: 9080
+  sha256: aa542b152c20b7729d8d7ffc49a59afccda6eb4d270f850c8b3eaa1f91b6ab26
+  bytes: 8345
   kind: repository
   sourcePath: editor/src/components/app/currentLearningSurface.tsx
 - path: editor/src/components/app/curriculumSidebarTree.tsx
-  sha256: 7367c9d395cb53f0e9a795c65ce6726517063118c4b134d997e3e91a7a544253
-  bytes: 18242
+  sha256: 2218f77b5704cde3affb897a3220e9a9e2276bd3a0f756972af6293a03fe049c
+  bytes: 15394
   kind: repository
   sourcePath: editor/src/components/app/curriculumSidebarTree.tsx
 - path: editor/src/components/app/learningCellCatalog.tsx
@@ -4865,25 +4866,35 @@ files:
   kind: repository
   sourcePath: editor/src/components/app/localHomeSurface.tsx
 - path: editor/src/components/app/mainSurface.tsx
-  sha256: 08c51c61e70f9cc2ac4596a78bbee7538e39081e7f266a2444f37c54661060eb
-  bytes: 10186
+  sha256: 0f9db06a8d260f9571e92352e077d9df85409abd1bf3f67281fdc005c5144c7c
+  bytes: 9374
   kind: repository
   sourcePath: editor/src/components/app/mainSurface.tsx
 - path: editor/src/components/app/notebookSurface.tsx
-  sha256: 2d9c906673e3673976e5c778a836ec4702cf3ac1c2dfdcd1a8f2cefe18bbcc54
-  bytes: 7315
+  sha256: b488d6a61363e7a73308c75f9df3d16f7cf0b5a11d23e2d187cfa5a75d7b9607
+  bytes: 6952
   kind: repository
   sourcePath: editor/src/components/app/notebookSurface.tsx
 - path: editor/src/components/app/productFlowNav.tsx
-  sha256: ca535971dda70868592cf940b8a12cfeb9f3b8e08c553a95a1c0f2d63c6e320b
-  bytes: 3997
+  sha256: 7a032fca18f9e58b2d29acf41732b822f30d09d9e8714a7900f3ff24a0f16c0f
+  bytes: 3420
   kind: repository
   sourcePath: editor/src/components/app/productFlowNav.tsx
+- path: editor/src/components/app/productMobileNav.tsx
+  sha256: 43bada22ae6bef6591ce5edc9106625829338c7889ae22a7af78b08adee64803
+  bytes: 3159
+  kind: repository
+  sourcePath: editor/src/components/app/productMobileNav.tsx
 - path: editor/src/components/app/productSidebar.tsx
-  sha256: 9ab86a1872c68fde722dae44f888c1a13eb323a801c6c80dac36f32c105533ed
-  bytes: 11489
+  sha256: 371d6768668e22ada00960cb5b415a12f3c9b0ea79293e3c3660b57c5e1971a3
+  bytes: 17440
   kind: repository
   sourcePath: editor/src/components/app/productSidebar.tsx
+- path: editor/src/components/app/productSurfaceVisuals.ts
+  sha256: d01dac63b8d1f5c65659b0b96144c508e639118b7f0303acd3daee5f380c5f1e
+  bytes: 622
+  kind: repository
+  sourcePath: editor/src/components/app/productSurfaceVisuals.ts
 - path: editor/src/components/app/providerReconnectBar.tsx
   sha256: 00f7a57e8dd7a85a6aff4a70285c99ee8dc7df540362926745b2eb4cec018b06
   bytes: 2911
@@ -4894,16 +4905,16 @@ files:
   bytes: 4686
   kind: repository
   sourcePath: editor/src/components/app/runtimeCapabilityRail.tsx
-- path: editor/src/components/app/socialLinks.tsx
-  sha256: 7be7bd4a0d90ec9db067e30fa7ac5c1a73054bdad8e1e0ea5d05c22179bb1c37
-  bytes: 4412
-  kind: repository
-  sourcePath: editor/src/components/app/socialLinks.tsx
 - path: editor/src/components/app/topBar.tsx
-  sha256: 1b1f7cd88731227dd9bfe82238b432a0aa6539a182354e4f5c72dd14ec98a8d2
-  bytes: 6390
+  sha256: 5adcab68c2ad7379036179cc4002bc427dde581cba84d7b489961cc5604dc629
+  bytes: 7126
   kind: repository
   sourcePath: editor/src/components/app/topBar.tsx
+- path: editor/src/components/app/workCell.css
+  sha256: 7729fd290c16a571b90cce8d7b30c3b4ba14ee803e2b1ea50d8caa91edcd8531
+  bytes: 2382
+  kind: repository
+  sourcePath: editor/src/components/app/workCell.css
 - path: editor/src/components/assistant/assistantMarkdown.tsx
   sha256: 433fc0dafa5a63e8525be9a55861b408331c51f71db035077c71b8fb602a7e7d
   bytes: 3962
@@ -4950,18 +4961,18 @@ files:
   kind: repository
   sourcePath: editor/src/components/chat/chatSurface.tsx
 - path: editor/src/components/curriculum/curriculumDependencyPanel.tsx
-  sha256: 71aa637f3c6dad863c4d76a8b9b3f124c3ae4da7a89142d6a9819095be4ed325
-  bytes: 10936
+  sha256: cee21f9f255dc697e1d44d1ab1aec8b50f32a371872a0f29f17ce8a977ec816a
+  bytes: 6527
   kind: repository
   sourcePath: editor/src/components/curriculum/curriculumDependencyPanel.tsx
 - path: editor/src/components/curriculum/curriculumHome.tsx
-  sha256: ca83fc0fdb4d110dcfa4c959997b9de921832d5de77ffa3140b174aa85e7f0c5
-  bytes: 12596
+  sha256: b9e7b7b3bf5657902ecac6b25b4d4e9469a8c3d14089febfa0249849213087ba
+  bytes: 12603
   kind: repository
   sourcePath: editor/src/components/curriculum/curriculumHome.tsx
 - path: editor/src/components/curriculum/curriculumLearningCell.tsx
-  sha256: 7b83e57e233cb9eeb82a5766c194a0548271e76c3ab992673b0a9904a9fa2d35
-  bytes: 10604
+  sha256: 83f02e40bc24e236c5eee8477212b787aeb27fdbd59390d4d45add8ac84461a7
+  bytes: 7518
   kind: repository
   sourcePath: editor/src/components/curriculum/curriculumLearningCell.tsx
 - path: editor/src/components/curriculum/curriculumMarkdownBody.tsx
@@ -4990,28 +5001,28 @@ files:
   kind: repository
   sourcePath: editor/src/components/curriculum/curriculumMarkdownRichText.tsx
 - path: editor/src/components/curriculum/curriculumNavigation.ts
-  sha256: ec6fb713f7dfa935e1ea70ff3548333dec8e128059a37dead5712dc43b60796d
-  bytes: 2278
+  sha256: 32d615a6e3fb5e8d5ab8e6eeb42e91139e70000d927e2aa0b9fc910dfb52fc24
+  bytes: 1323
   kind: repository
   sourcePath: editor/src/components/curriculum/curriculumNavigation.ts
 - path: editor/src/components/curriculum/curriculumOverview.tsx
-  sha256: 424e0cff7e1da4b50ec7e54eaeac1d9ace58dad590c8d1c5951e45d09da52759
-  bytes: 18907
+  sha256: 6f8eaa5c20d8ae3cf9853ebeff0b15495262c6fef9ce0dc3ae80c8b569caf20d
+  bytes: 20845
   kind: repository
   sourcePath: editor/src/components/curriculum/curriculumOverview.tsx
 - path: editor/src/components/curriculum/curriculumProgressBadge.tsx
-  sha256: 261287584494e2c7e028d74a1ca3badae39ad1f8c91692620b90c83427bc92c7
-  bytes: 1283
+  sha256: 04bbd083e809b4dd918ed2cecad0d44d45e78a8bfae1bafbb2ca60385f7310f3
+  bytes: 1272
   kind: repository
   sourcePath: editor/src/components/curriculum/curriculumProgressBadge.tsx
 - path: editor/src/components/curriculum/curriculumSectionRenderer.tsx
-  sha256: 64605aa5b5c990f26f247a2d4890e8d3e197b82f4c96fb046947b6344cb754ac
-  bytes: 24639
+  sha256: 3eb98bb4476940fdf18ddbf277c55e8973d563e3f28aad994cbbc3b8208d8771
+  bytes: 22935
   kind: repository
   sourcePath: editor/src/components/curriculum/curriculumSectionRenderer.tsx
 - path: editor/src/components/curriculum/curriculumSurface.tsx
-  sha256: 550d6a16c8ae74e6645dd3bfb87b6cc7dca8f5230c659838c77fe0b4b2d37752
-  bytes: 5915
+  sha256: bb194abd2aa5125d4711b3d36ab9fc86fbbbf20240fa05e04336debb85814945
+  bytes: 4988
   kind: repository
   sourcePath: editor/src/components/curriculum/curriculumSurface.tsx
 - path: editor/src/components/curriculum/curriculumSurfaceHelpers.ts
@@ -5020,13 +5031,13 @@ files:
   kind: repository
   sourcePath: editor/src/components/curriculum/curriculumSurfaceHelpers.ts
 - path: editor/src/components/curriculum/curriculumSurfaceModels.ts
-  sha256: f8dc79f2b3b0a8166bcbbc0898ab6de7ffc6858e6f582e53405e5773669fe10c
-  bytes: 816
+  sha256: 0d396eb5a90ebec34ab683a84d49f1e4d6198283bcad753670a233886df43afc
+  bytes: 837
   kind: repository
   sourcePath: editor/src/components/curriculum/curriculumSurfaceModels.ts
 - path: editor/src/components/curriculum/curriculumToc.tsx
-  sha256: eccd82d4bf9927a5d06726eb7c944ecfb6f2eef3e4b82314ea54337782906b0f
-  bytes: 3360
+  sha256: edb2230f8bcc9a0649a8b08e9e19460cf8e2ce986d251f34f84b3f9da99f8a37
+  bytes: 4071
   kind: repository
   sourcePath: editor/src/components/curriculum/curriculumToc.tsx
 - path: editor/src/components/curriculum/learningDomainVisual.tsx
@@ -5045,18 +5056,18 @@ files:
   kind: repository
   sourcePath: editor/src/components/notebook/dependencyGraphPanel.tsx
 - path: editor/src/components/notebook/notebookCommandBar.tsx
-  sha256: 278821d1e6fc5ba9ae172c5a08994a201a7b9ff05355c1807e117e0b1f69009e
-  bytes: 5420
+  sha256: a1d8e72ec4a3a406fb5a53902ab1100c4002962a546a83c173fbcf4555880bf6
+  bytes: 3356
   kind: repository
   sourcePath: editor/src/components/notebook/notebookCommandBar.tsx
 - path: editor/src/components/notebook/notebookPanel.css
-  sha256: fa51574a5bdf92d1e661fbc6a7ba7504c2d8e0ac38fc7d57dcb3682b1d8f4d7d
-  bytes: 18665
+  sha256: 59fc4cfe41a4be69470a897796e7fc8273cf8ab9700ec83ae9ce9025ee162cf8
+  bytes: 11869
   kind: repository
   sourcePath: editor/src/components/notebook/notebookPanel.css
 - path: editor/src/components/notebook/notebookPanel.tsx
-  sha256: b446bb8d4d8ad00bc64ec6dad447740f35a79d3045c4b06e4cdce95d716c8087
-  bytes: 30419
+  sha256: 7e71e1c3bd94fa961cf630dd73b8f701b3480522b3e93e10ba69bd68a7880333
+  bytes: 31629
   kind: repository
   sourcePath: editor/src/components/notebook/notebookPanel.tsx
 - path: editor/src/components/notebook/variableExplorerPanel.tsx
@@ -5195,8 +5206,8 @@ files:
   kind: repository
   sourcePath: editor/src/hooks/useCurriculumLibraryState.ts
 - path: editor/src/hooks/useCurriculumNavigationState.ts
-  sha256: 3b1221b66a0b3f9a4e45babdc71b7005d3af628dea1d56909444175b50d0be50
-  bytes: 6231
+  sha256: 146a0a9a2a5c1ba9596cc968d06a78cc9eb57209a942a3a990bea2d2a8ad5436
+  bytes: 6237
   kind: repository
   sourcePath: editor/src/hooks/useCurriculumNavigationState.ts
 - path: editor/src/hooks/useCurriculumProgress.ts
@@ -5380,10 +5391,15 @@ files:
   kind: repository
   sourcePath: editor/src/lib/assistantTypes.ts
 - path: editor/src/lib/automationCellRuntime.ts
-  sha256: c5a91699cbcd679f671ed35d923368937511d545ca1bea7089d0ddc3c696da4a
-  bytes: 3180
+  sha256: 74af3664b238549b430486e30a76854670dc0b41f8cb35c200f804a79d966db4
+  bytes: 2992
   kind: repository
   sourcePath: editor/src/lib/automationCellRuntime.ts
+- path: editor/src/lib/automationPresentation.ts
+  sha256: 5339ed136eb2df9f27c8525636905716a171aa2c3625dba82dff7cf78b560dbc
+  bytes: 8608
+  kind: repository
+  sourcePath: editor/src/lib/automationPresentation.ts
 - path: editor/src/lib/automationState.ts
   sha256: d224a011e25c39cddd9867804bb3c4de29cd3d87c51810a08d6760dd51fc93d2
   bytes: 3496
@@ -5430,8 +5446,8 @@ files:
   kind: repository
   sourcePath: editor/src/lib/chatStartExamples.ts
 - path: editor/src/lib/codaroDesign.tsx
-  sha256: bf5886be2d4df15031ce251ae061e51d6bb0cebea66f756fb57ea000feb2b5fc
-  bytes: 5024
+  sha256: fdff8b43524111b07dbbac52245f1ef011b60c748459c8c9a94cd30f90c0144c
+  bytes: 4971
   kind: repository
   sourcePath: editor/src/lib/codaroDesign.tsx
 - path: editor/src/lib/codeCompletion.ts
@@ -5470,8 +5486,8 @@ files:
   kind: repository
   sourcePath: editor/src/lib/curriculumLearningState.ts
 - path: editor/src/lib/curriculumPackagePreparation.ts
-  sha256: dc01afb7d0e9bd838c52776dc998217d9a841063ae314e7fd83c5ac1955ca01e
-  bytes: 2459
+  sha256: 1119a1a0dbfce3321f206b810b927ba21cbfa242ada00e307e9ef3e110e47757
+  bytes: 1856
   kind: repository
   sourcePath: editor/src/lib/curriculumPackagePreparation.ts
 - path: editor/src/lib/curriculumProgress.ts
@@ -5555,8 +5571,8 @@ files:
   kind: repository
   sourcePath: editor/src/lib/learningArchive.ts
 - path: editor/src/lib/learningAttemptCheck.ts
-  sha256: 654b0dbd063073a74a1182e756633a80b9c069293296e7aa4ac388162a3f2090
-  bytes: 4264
+  sha256: a4d08ec76846a861029f0d57ec0206e6a683fec57e083c2ae418247c13b90aa1
+  bytes: 6355
   kind: repository
   sourcePath: editor/src/lib/learningAttemptCheck.ts
 - path: editor/src/lib/learningCheckSpec.ts
@@ -5585,8 +5601,8 @@ files:
   kind: repository
   sourcePath: editor/src/lib/localFallback.ts
 - path: editor/src/lib/localLearningCheckExecutor.ts
-  sha256: 81ad86b33ae6757050ff739a89c82df900e46be482fc87a6f47fad2dfe511169
-  bytes: 1860
+  sha256: 774edd139d3b519ea8826413cb4c41ac3d5ffe2a2fbc342ecb2852404ed3d9b3
+  bytes: 2109
   kind: repository
   sourcePath: editor/src/lib/localLearningCheckExecutor.ts
 - path: editor/src/lib/localRuntime.ts
@@ -5600,8 +5616,8 @@ files:
   kind: repository
   sourcePath: editor/src/lib/localeContext.tsx
 - path: editor/src/lib/localeCopy.ts
-  sha256: e9ffd4a4400a3fd1a749a4a4f01e9fcbc587dd7c190282ed94ed716fb196c2a0
-  bytes: 44818
+  sha256: 991bb5a7b77caeb90c22d632fe0ec9e2d1dd8f528ce106f75299f2f95b4823b9
+  bytes: 46763
   kind: repository
   sourcePath: editor/src/lib/localeCopy.ts
 - path: editor/src/lib/masteryPolicy.ts
@@ -5609,11 +5625,6 @@ files:
   bytes: 13714
   kind: repository
   sourcePath: editor/src/lib/masteryPolicy.ts
-- path: editor/src/lib/mobileChatTurn.ts
-  sha256: 56a32464eb5068b26f1ab86d71f935aadf909581327122c5df0548e82b4993be
-  bytes: 475
-  kind: repository
-  sourcePath: editor/src/lib/mobileChatTurn.ts
 - path: editor/src/lib/notebookPersistence.ts
   sha256: 2730b30a30fe4ad3ec3b732afd4b30a9a2b62f990314e3d7c26748dcc498d8ff
   bytes: 5047
@@ -5660,8 +5671,8 @@ files:
   kind: repository
   sourcePath: editor/src/lib/reactiveDiagnostics.ts
 - path: editor/src/lib/runRouteState.ts
-  sha256: 5365302d4ecf3c552782bf0e854a5ea9fa776924f201c8809b05d901fafe25f0
-  bytes: 10404
+  sha256: d6f222444eee510b3f710dfbdefc40414d79d76ea3df1638f699853af2878638
+  bytes: 11001
   kind: repository
   sourcePath: editor/src/lib/runRouteState.ts
 - path: editor/src/lib/sharePackOperations.ts
@@ -5695,8 +5706,8 @@ files:
   kind: repository
   sourcePath: editor/src/lib/toolCallDocuments.ts
 - path: editor/src/lib/tracebackParser.ts
-  sha256: 1d16702684a6b4531bba46ec3dc85fe817137c47f372608d2e3e0afb4bcf724a
-  bytes: 1723
+  sha256: e5296252f8148e1816ec4b0f90b8cd41d787ccd2fc11d962fc6b76ad1f6c454f
+  bytes: 5698
   kind: repository
   sourcePath: editor/src/lib/tracebackParser.ts
 - path: editor/src/lib/utils.ts
@@ -5735,32 +5746,27 @@ files:
   kind: repository
   sourcePath: editor/src/lib/workLoop.ts
 - path: editor/src/main.tsx
-  sha256: f113460369024b16ac3d63f48467146fc4a53ea0b7e0e6fe236b7c11e64f5542
-  bytes: 850
+  sha256: dffa1ab075164853f134f6840aaa6dabfcff117f79f2b129a997113b77f807cf
+  bytes: 653
   kind: repository
   sourcePath: editor/src/main.tsx
-- path: editor/src/routes/mobileChat.tsx
-  sha256: 7428e554b1fe886ad0688486370a50c182fed199ef48ac15adf2d959be3b38ee
-  bytes: 4007
-  kind: repository
-  sourcePath: editor/src/routes/mobileChat.tsx
 - path: editor/src/styles/generated/codaro.d.ts
-  sha256: 3fc827139b05cec377f70ff5dc9518dc82652cce3cf51b967dcb57c299f357f3
+  sha256: 1bf67db5e54a3e0c09b4373acf1b6f40fb5f0ffedc77babc5cfc31d50f6f286f
   bytes: 505
   kind: repository
   sourcePath: editor/src/styles/generated/codaro.d.ts
 - path: editor/src/styles/generated/codaro.js
-  sha256: 35dbddc54a2e13da5a089bb50a6ebf62d093a381335e1bc995fc4992dacfb8a3
+  sha256: b709558f1fb0f7131387f3c65bce151161350e066b93bd44c7adb95a748ac6ea
   bytes: 11366
   kind: repository
   sourcePath: editor/src/styles/generated/codaro.js
 - path: editor/src/styles/generated/codaroTheme.css
-  sha256: e58001e3ab7e1536026ed485d4dfb030ce788e94e5d5d7a23616500520cbde70
-  bytes: 19703
+  sha256: f734f9125b4973036b3216316d4b69e919d70d3ac8e2205f41491dba4a57e60d
+  bytes: 25868
   kind: repository
   sourcePath: editor/src/styles/generated/codaroTheme.css
 - path: editor/src/styles/generated/codaroTheme.ts
-  sha256: 32dcc72e06e3f1536afc84ab8c9f61ab5f7c4244016f25a8bce926186a70f80c
+  sha256: 5580c7af8205082f575ba7d11706f97ae300cce35879b9cc4ac8af9ff6ba4d6a
   bytes: 1533
   kind: repository
   sourcePath: editor/src/styles/generated/codaroTheme.ts
@@ -5770,10 +5776,15 @@ files:
   kind: repository
   sourcePath: editor/src/styles/generated/fonts.css
 - path: editor/src/styles/generated/provenance.json
-  sha256: 53949c310d75d177fc3bad6db7bcd0d93f228957c3f313aac73c828eba400af2
-  bytes: 431
+  sha256: c5f56629a451e2e164ed23700967556771fabf2b2d60492d46ff230874370622
+  bytes: 597
   kind: repository
   sourcePath: editor/src/styles/generated/provenance.json
+- path: editor/src/styles/generated/socialLinks.tsx
+  sha256: 24c378d6968cfb044be3b98d477ec3f5e7b6cd49ef19086b1d2275850023b5a5
+  bytes: 11182
+  kind: repository
+  sourcePath: editor/src/styles/generated/socialLinks.tsx
 - path: editor/src/styles/layers.css
   sha256: 7f70940c8e5f62cacf1e23784ef682568fa55d713feaaa19d6a0547cd57f5f5c
   bytes: 77
@@ -5830,8 +5841,8 @@ files:
   kind: repository
   sourcePath: editor/tsconfig.json
 - path: editor/vite.config.ts
-  sha256: 5964aa46303f70505d6eb6e8c6aaa5d5d537bec900b9f0f8d9a246a28d0c9cbf
-  bytes: 2240
+  sha256: 75f5e065a438884a72d01d94d8efd940546a57986f7a0064669182be0c252cf2
+  bytes: 2390
   kind: repository
   sourcePath: editor/vite.config.ts
 - path: evaluation-contract/evaluation-report.schema.yml
@@ -5854,8 +5865,8 @@ files:
   kind: repository
   sourcePath: landing/DEV.md
 - path: landing/index.html
-  sha256: aaead81c91029be0067cdb5b8c5cc83d833bf1a4b1352b6d3ff454bdf4d4519b
-  bytes: 9772
+  sha256: 9c9dac0052a85a9e4b00a02bfa0f5de36cc3f3580134b2ecc1b271a7e1d25b6e
+  bytes: 10084
   kind: repository
   sourcePath: landing/index.html
 - path: landing/jsconfig.json
@@ -5914,8 +5925,8 @@ files:
   kind: repository
   sourcePath: landing/scripts/postbuild.js
 - path: landing/scripts/prerenderReact.js
-  sha256: 1905274990e6dd576cf6ec9608d80c61aff16aa512297cc203c4a7d32218d004
-  bytes: 30399
+  sha256: 7b0c828c0adada204c9e3625d72ff7a78a4828138944e6359e09bfaf4829313e
+  bytes: 30340
   kind: repository
   sourcePath: landing/scripts/prerenderReact.js
 - path: landing/scripts/removeLegacySource.mjs
@@ -5924,8 +5935,8 @@ files:
   kind: repository
   sourcePath: landing/scripts/removeLegacySource.mjs
 - path: landing/scripts/splitLandingRoutes.mjs
-  sha256: 10231fb2710f3260b3687d642335f79128e5b98d52fd9bfc1acea44b09688e5a
-  bytes: 7281
+  sha256: d0eb274a0e1baff8f950242cf019c9b46a3650269ab1abc71e39dbba109d82ed
+  bytes: 7294
   kind: repository
   sourcePath: landing/scripts/splitLandingRoutes.mjs
 - path: landing/scripts/syncBlogAssets.js
@@ -5949,13 +5960,13 @@ files:
   kind: repository
   sourcePath: landing/scripts/syncVisualAssets.js
 - path: landing/src/App.jsx
-  sha256: d79d9e6c366ca3a7bee106b8a48d2e8f3aaf2b01e2c796b695ad4a47c37fea6c
-  bytes: 5179
+  sha256: 445f8392a29183331483e9ac6f238baf4122be790d73e513498d88f50c5303ef
+  bytes: 5445
   kind: repository
   sourcePath: landing/src/App.jsx
 - path: landing/src/components/codaroThemeProvider.jsx
-  sha256: 27c1b4fe43ba9fdcc5889acae63cdfa57215f9164a324f63f957cee411075b92
-  bytes: 4138
+  sha256: 1f6e446553312c4e567396f2b82b435da880d2ccbdcad3d55d3fc034b3ae9c01
+  bytes: 4380
   kind: repository
   sourcePath: landing/src/components/codaroThemeProvider.jsx
 - path: landing/src/components/productVisual.jsx
@@ -5964,8 +5975,8 @@ files:
   kind: repository
   sourcePath: landing/src/components/productVisual.jsx
 - path: landing/src/components/publicShell.jsx
-  sha256: 5e7724823fa003ebf5a9048d0279d1907dfd1c4ec9ee7d85611fa3151fbc09b3
-  bytes: 11229
+  sha256: 391d6e712bc448748bfade12bf4b93639fd5f755e1be17f743aed64216f18c9f
+  bytes: 7287
   kind: repository
   sourcePath: landing/src/components/publicShell.jsx
 - path: landing/src/lib/brand.js
@@ -5984,8 +5995,8 @@ files:
   kind: repository
   sourcePath: landing/src/lib/faq.js
 - path: landing/src/lib/publicMeta.js
-  sha256: b85be95d44b4cf62ca37b8347abdfa2afed6628af2b7ab7038fe724b07739096
-  bytes: 1033
+  sha256: 623c2105610ab4b0105c0dc06847c0113c0b222255611ddd05e6ad4df0038d03
+  bytes: 1266
   kind: repository
   sourcePath: landing/src/lib/publicMeta.js
 - path: landing/src/lib/publicRouting.js
@@ -6073,24 +6084,29 @@ files:
   bytes: 1542
   kind: repository
   sourcePath: landing/src/lib/tools/uuid.js
+- path: landing/src/lib/useBrowserLayoutEffect.js
+  sha256: f118eb29ab334aba8a7a4fad70a6b5e0646e22f57b1637a0200fc6c04ba836af
+  bytes: 156
+  kind: repository
+  sourcePath: landing/src/lib/useBrowserLayoutEffect.js
 - path: landing/src/lib/visualAssets.js
   sha256: 86f3433207d487e2ecfdf5aff0d1bce821ea9d7178b69658890563d477bebdd8
   bytes: 1474
   kind: repository
   sourcePath: landing/src/lib/visualAssets.js
 - path: landing/src/main.jsx
-  sha256: b854c355e0159e255cd45b51dbd968ab46b808767bccb8bccc07955575278509
-  bytes: 1361
+  sha256: 3595668891e86114fe61fa3c204037ac7df248344d905f8f675e60678d9edf36
+  bytes: 1516
   kind: repository
   sourcePath: landing/src/main.jsx
 - path: landing/src/pages/home.jsx
-  sha256: c619a05bb5bd8f069efb1e76852a897157eddd1844275fdc052673a402044933
-  bytes: 10442
+  sha256: 5a96fd3f3cbfc5eab725c32402fc998dc34613cdb9b27c3e5e27790e99a6e542
+  bytes: 10886
   kind: repository
   sourcePath: landing/src/pages/home.jsx
 - path: landing/src/pages/learn.jsx
-  sha256: 423de7ebed24f594d977a4e439a11c9f4395ba3ff177f8ee570fd7671489c253
-  bytes: 17227
+  sha256: f2b4c6884c207928f3a554661b8a78cb903cd22c2ba7ccfdf9ebd5a54e326e0e
+  bytes: 17484
   kind: repository
   sourcePath: landing/src/pages/learn.jsx
 - path: landing/src/pages/lesson.jsx
@@ -6114,8 +6130,8 @@ files:
   kind: repository
   sourcePath: landing/src/routes/packRoutes.jsx
 - path: landing/src/routes/resolvePublicRoute.jsx
-  sha256: 4edd57ecfcd2d74d325a6253c58b0485e49466c6eaf6ad8201003b7507f0cdb8
-  bytes: 3417
+  sha256: aa7ccec34277f86cae8960553ced2f6ff3227e75565b0c9db9e234164d36bd43
+  bytes: 3439
   kind: repository
   sourcePath: landing/src/routes/resolvePublicRoute.jsx
 - path: landing/src/routes/routePrimitives.jsx
@@ -6124,8 +6140,8 @@ files:
   kind: repository
   sourcePath: landing/src/routes/routePrimitives.jsx
 - path: landing/src/routes/searchRoutes.jsx
-  sha256: de718f155804607aaf429caaec001491de3c13e52d50269defa5b147b99d9657
-  bytes: 2201
+  sha256: c18918aa98859a0b6551fb9fb3fe2d71bc082ce94d4dcbb19adbd9bbd01b118b
+  bytes: 3897
   kind: repository
   sourcePath: landing/src/routes/searchRoutes.jsx
 - path: landing/src/routes/toolRoutes.jsx
@@ -6134,32 +6150,27 @@ files:
   kind: repository
   sourcePath: landing/src/routes/toolRoutes.jsx
 - path: landing/src/styles.css
-  sha256: 7ae2b0bd723b0bc65682dcb0e4f9d6c6546f0e1732702ba3fc2209f4a05fe8be
-  bytes: 22637
+  sha256: 0c2bcaac54c7ecf375b8112a939952e6da5825595e83795258ec913f0cf2b13f
+  bytes: 23237
   kind: repository
   sourcePath: landing/src/styles.css
-- path: landing/src/styles/brandTokens.css
-  sha256: 3dc98ced137aa2b23c14c1b2d94153df405c04575d234f11c9440c9b269f126b
-  bytes: 612
-  kind: repository
-  sourcePath: landing/src/styles/brandTokens.css
 - path: landing/src/styles/generated/codaro.d.ts
-  sha256: 3fc827139b05cec377f70ff5dc9518dc82652cce3cf51b967dcb57c299f357f3
+  sha256: 1bf67db5e54a3e0c09b4373acf1b6f40fb5f0ffedc77babc5cfc31d50f6f286f
   bytes: 505
   kind: repository
   sourcePath: landing/src/styles/generated/codaro.d.ts
 - path: landing/src/styles/generated/codaro.js
-  sha256: 35dbddc54a2e13da5a089bb50a6ebf62d093a381335e1bc995fc4992dacfb8a3
+  sha256: b709558f1fb0f7131387f3c65bce151161350e066b93bd44c7adb95a748ac6ea
   bytes: 11366
   kind: repository
   sourcePath: landing/src/styles/generated/codaro.js
 - path: landing/src/styles/generated/codaroTheme.css
-  sha256: 400e3b49c0b73d2aedea2d53b5d9a90c975d6abea576160cd0c7f13c91b035cd
-  bytes: 18792
+  sha256: e2fae405d4c9c279d3ad656cf5f6ad1e0505fda1dbe3c75d31749f25f7a30eb8
+  bytes: 24957
   kind: repository
   sourcePath: landing/src/styles/generated/codaroTheme.css
 - path: landing/src/styles/generated/codaroTheme.ts
-  sha256: 32dcc72e06e3f1536afc84ab8c9f61ab5f7c4244016f25a8bce926186a70f80c
+  sha256: 5580c7af8205082f575ba7d11706f97ae300cce35879b9cc4ac8af9ff6ba4d6a
   bytes: 1533
   kind: repository
   sourcePath: landing/src/styles/generated/codaroTheme.ts
@@ -6169,13 +6180,18 @@ files:
   kind: repository
   sourcePath: landing/src/styles/generated/fonts.css
 - path: landing/src/styles/generated/provenance.json
-  sha256: 53949c310d75d177fc3bad6db7bcd0d93f228957c3f313aac73c828eba400af2
-  bytes: 431
+  sha256: c5f56629a451e2e164ed23700967556771fabf2b2d60492d46ff230874370622
+  bytes: 597
   kind: repository
   sourcePath: landing/src/styles/generated/provenance.json
+- path: landing/src/styles/generated/socialLinks.tsx
+  sha256: 24c378d6968cfb044be3b98d477ec3f5e7b6cd49ef19086b1d2275850023b5a5
+  bytes: 11182
+  kind: repository
+  sourcePath: landing/src/styles/generated/socialLinks.tsx
 - path: landing/src/styles/homeAstryx.css
-  sha256: 8cd5850847bd4ad90cd0e4bf749c7aa4b572baca8d7c30ea36cd3a66d60ae5cf
-  bytes: 15130
+  sha256: ad74c2e4ee4d1c4b252251fd96b8734fde10bde92c47154a3336b994fd9f0ae1
+  bytes: 14597
   kind: repository
   sourcePath: landing/src/styles/homeAstryx.css
 - path: landing/src/styles/layers.css
@@ -6194,8 +6210,8 @@ files:
   kind: repository
   sourcePath: landing/src/styles/lessonAstryx.css
 - path: landing/src/styles/publicShell.css
-  sha256: 8a9e336911b3d1517c30f677139494761fd3debc0b8d50593758e3293a8a1c8b
-  bytes: 4936
+  sha256: e5634ec90a243c9d55c43d04a66750e7a32e910c56b43b0db3f5a68b019b6dba
+  bytes: 5233
   kind: repository
   sourcePath: landing/src/styles/publicShell.css
 - path: landing/static/brand/apple-touch-icon.png
@@ -8513,26 +8529,26 @@ files:
   bytes: 118496
   kind: repository
   sourcePath: landing/static/run/_app/_taxonomy-DDgHWMkX.js
-- path: landing/static/run/_app/assistantPanel-Bb1nBs2O.js
-  sha256: d4139c0e9a1b03da170f3f5e4f581263400720b3b0eb17bda2aeda4bcee030b2
-  bytes: 15637
+- path: landing/static/run/_app/assistantPanel-7Ji6MTJq.js
+  sha256: ec3b1e64cb841a6aa3ccaba5cca90423d3a26faff9c7627f20bd92cb001b12d1
+  bytes: 15678
   kind: repository
-  sourcePath: landing/static/run/_app/assistantPanel-Bb1nBs2O.js
-- path: landing/static/run/_app/automationOperationStrip-B-L99T9S.js
-  sha256: d17e133e7bde6ada349f74d4c1fccd09c5132523e32b444f612d3b49f077664e
-  bytes: 2372
+  sourcePath: landing/static/run/_app/assistantPanel-7Ji6MTJq.js
+- path: landing/static/run/_app/automationOperationStrip-C7XgPGmE.js
+  sha256: ef7e74ef000d599c732f74a1240f73ad09d52c7852774d62df75afa14e7d1fbc
+  bytes: 2422
   kind: repository
-  sourcePath: landing/static/run/_app/automationOperationStrip-B-L99T9S.js
-- path: landing/static/run/_app/automationSurface-C_NeqnIA.js
-  sha256: 1bc726dd5c81b3ef71f2f9d8dbd6824901c0c379ada8cde2d55afaaeda92995e
-  bytes: 20379
+  sourcePath: landing/static/run/_app/automationOperationStrip-C7XgPGmE.js
+- path: landing/static/run/_app/automationSurface-CDZoTleH.js
+  sha256: 76f6bc102c8a82c2273db3f04b2897f345cde99554cc4e4d167e0180281346cc
+  bytes: 23464
   kind: repository
-  sourcePath: landing/static/run/_app/automationSurface-C_NeqnIA.js
-- path: landing/static/run/_app/chatSurface-ac0qxMDS.js
-  sha256: 3387e737b9719d7083706cc02184f16dc09d23cc841fa9f8fb6c65e6f1b430d1
-  bytes: 2769
+  sourcePath: landing/static/run/_app/automationSurface-CDZoTleH.js
+- path: landing/static/run/_app/chatSurface-DBdJygGl.js
+  sha256: 8c498e791b90cde73415214603e99e5f9746ad8bdbf952c12b4c3257dbfc2030
+  bytes: 2814
   kind: repository
-  sourcePath: landing/static/run/_app/chatSurface-ac0qxMDS.js
+  sourcePath: landing/static/run/_app/chatSurface-DBdJygGl.js
 - path: landing/static/run/_app/codemirror-tHBIJIl9.js
   sha256: dc3e8a85c462c2f27f99007abc1bc1b1527ccdb59eacc6af93ae6c55caa9e350
   bytes: 388923
@@ -8543,21 +8559,31 @@ files:
   bytes: 12917
   kind: repository
   sourcePath: landing/static/run/_app/commandLineIntro-Ct6KJMkO.js
-- path: landing/static/run/_app/currentLearningSurface-ZLpIDnlG.js
-  sha256: 01bb351a295c648b46a49471f4471f406a3cdff3026c97ff05c76d84794941a9
-  bytes: 3987
+- path: landing/static/run/_app/currentLearningSurface-C_Dsy4K4.js
+  sha256: 4d7f643d3be943b1b968820e9e273c9f57a956d16b5cc38f862474f7603e8ef6
+  bytes: 3814
   kind: repository
-  sourcePath: landing/static/run/_app/currentLearningSurface-ZLpIDnlG.js
-- path: landing/static/run/_app/curriculumHome-C_pQXMmS.js
-  sha256: af66ff0cb3546b0baa1fef3472d33ab03f5d68d80444bf8d3b3480686dbb4e4e
-  bytes: 8192
+  sourcePath: landing/static/run/_app/currentLearningSurface-C_Dsy4K4.js
+- path: landing/static/run/_app/curriculumHome-BLKQTGwp.js
+  sha256: b380cc38e95ae205becaca92315e9ecbeee5121d61f879f6ebbe5b052926ed8e
+  bytes: 8233
   kind: repository
-  sourcePath: landing/static/run/_app/curriculumHome-C_pQXMmS.js
-- path: landing/static/run/_app/curriculumSurface-B9TYhEu8.js
-  sha256: 75a1d22be05fdd958e7ac45b083bd967f9f058612eeefabc574871e68cd9c3ef
-  bytes: 443785
+  sourcePath: landing/static/run/_app/curriculumHome-BLKQTGwp.js
+- path: landing/static/run/_app/curriculumMarkdown-C0gJgSJb.js
+  sha256: e228ece6be6d10cadc3d625d855171610f10b9ba5124612ec3a11f554d3990bc
+  bytes: 141015
   kind: repository
-  sourcePath: landing/static/run/_app/curriculumSurface-B9TYhEu8.js
+  sourcePath: landing/static/run/_app/curriculumMarkdown-C0gJgSJb.js
+- path: landing/static/run/_app/curriculumSurface-Cy-8Uqlk.css
+  sha256: 4158c910bd22261895b07ff6b84c3b955773b4c3aa9d7edcfdd2ec5864e5cdb6
+  bytes: 2011
+  kind: repository
+  sourcePath: landing/static/run/_app/curriculumSurface-Cy-8Uqlk.css
+- path: landing/static/run/_app/curriculumSurface-soV6dlXL.js
+  sha256: 308ae605dd2b011b21ce9445383332da02a5b5707b3ae2163d5c05ccbdbf6c9f
+  bytes: 301275
+  kind: repository
+  sourcePath: landing/static/run/_app/curriculumSurface-soV6dlXL.js
 - path: landing/static/run/_app/day01_헬로월드-BycDPuh9.js
   sha256: 65f7a1fbd706ed399dcd459fafb889a1b1759b7cddf39381f2eb6db7ecdecac5
   bytes: 21881
@@ -8718,76 +8744,71 @@ files:
   bytes: 15263
   kind: repository
   sourcePath: landing/static/run/_app/githubIntro-BrIR9T7s.js
-- path: landing/static/run/_app/icons-ClhTmGVS.js
-  sha256: 701f97bb076b5bbd859a8d14ee1ed35d11f722dc981d2fe77b5b5ddf66d42e91
-  bytes: 16213
+- path: landing/static/run/_app/icons-DMzBiHhA.js
+  sha256: 8ad7e13b3286b511df61fb862b7be73fedf8c7ed44ecec2d54d1ac859592c37c
+  bytes: 16047
   kind: repository
-  sourcePath: landing/static/run/_app/icons-ClhTmGVS.js
-- path: landing/static/run/_app/index-CWPvf3-h.css
-  sha256: ecbca3471a486496812aea26d84edc7661e65f3c8d36f257460dd32175d080e9
-  bytes: 100451
+  sourcePath: landing/static/run/_app/icons-DMzBiHhA.js
+- path: landing/static/run/_app/index-6fGw2t8p.css
+  sha256: f0a2d1671bd383542ad7b8685c2992588aa08e61da21dc20f8accee7f96f2c53
+  bytes: 105809
   kind: repository
-  sourcePath: landing/static/run/_app/index-CWPvf3-h.css
-- path: landing/static/run/_app/index-DnXIeFVM.js
-  sha256: de6227e6450122b6fb02f44e9b44cfd23ba8cdc56001db2abb7cbfedab39d3ff
-  bytes: 181621
+  sourcePath: landing/static/run/_app/index-6fGw2t8p.css
+- path: landing/static/run/_app/index-Cm_3AmLx.js
+  sha256: 658b00e89c35aec678a8cc295add8d650e4703dc5b6be08d2fb7c2c73bfc6d30
+  bytes: 194934
   kind: repository
-  sourcePath: landing/static/run/_app/index-DnXIeFVM.js
-- path: landing/static/run/_app/localHomeSurface-BzU2vdOc.js
-  sha256: 7f02c213a1dc4ba441c230b0690daf0a96cfde4aa40662d1becf54f0692657d1
-  bytes: 6816
+  sourcePath: landing/static/run/_app/index-Cm_3AmLx.js
+- path: landing/static/run/_app/localHomeSurface-Cy5lxpIi.js
+  sha256: 1af87876706ec6c4a43e2ab577a85930e50f04e15c735a5c3320627c2e9218d1
+  bytes: 6860
   kind: repository
-  sourcePath: landing/static/run/_app/localHomeSurface-BzU2vdOc.js
+  sourcePath: landing/static/run/_app/localHomeSurface-Cy5lxpIi.js
 - path: landing/static/run/_app/machineWorker-DTHx9gcb.js
   sha256: 1904eb4c3d7518d27c1fa3bd8303f016946aa01e035126cd1ec2e53ed99c968c
   bytes: 47105
   kind: repository
   sourcePath: landing/static/run/_app/machineWorker-DTHx9gcb.js
-- path: landing/static/run/_app/notebookSurface-DlpjHaTu.js
-  sha256: 1f13fde7443fe46311c21b4001f28ccb0cdb01fc976403e35ad4870d4e1503c5
-  bytes: 8900
+- path: landing/static/run/_app/notebookPanel-B8toUgDi.css
+  sha256: 530ab79f0519158a1fd890e98f020032ad7e31d5de3f103afad3450ed73e8f3c
+  bytes: 9450
   kind: repository
-  sourcePath: landing/static/run/_app/notebookSurface-DlpjHaTu.js
-- path: landing/static/run/_app/radix-DDRH_7-_.js
-  sha256: 09045161194412abdd9e19296947b8d8ec4ed74719f4d38d2441d4e206b56483
-  bytes: 29849
+  sourcePath: landing/static/run/_app/notebookPanel-B8toUgDi.css
+- path: landing/static/run/_app/notebookPanel-B_o0oOmI.js
+  sha256: 6a17b2f258105ae881d9373c8d47c0c2f3aa3730c353a82dc7e2967b829c2778
+  bytes: 20862
   kind: repository
-  sourcePath: landing/static/run/_app/radix-DDRH_7-_.js
+  sourcePath: landing/static/run/_app/notebookPanel-B_o0oOmI.js
+- path: landing/static/run/_app/notebookSurface-BwnRqU4Z.js
+  sha256: 047fc2b5e5b0a0857aed2d27272a77e95c5d7471dcac0156163eb91b145d05f3
+  bytes: 8928
+  kind: repository
+  sourcePath: landing/static/run/_app/notebookSurface-BwnRqU4Z.js
+- path: landing/static/run/_app/radix-BL4vKO4s.js
+  sha256: a8a6a48b3012e94abb966b3712fe06ee6f9e0d9edaecc75d0fdb00ed028e060a
+  bytes: 29889
+  kind: repository
+  sourcePath: landing/static/run/_app/radix-BL4vKO4s.js
 - path: landing/static/run/_app/rolldown-runtime-QTnfLwEv.js
   sha256: 5db5ba82eef00d1dee7e86e663098c9427d01183a88d357437daff295aec3e75
   bytes: 694
   kind: repository
   sourcePath: landing/static/run/_app/rolldown-runtime-QTnfLwEv.js
-- path: landing/static/run/_app/runtimeCapabilityRail-B2XB4P6B.js
-  sha256: 2c3750564d19490bc163735fef0bf17141f92428f6c4f6ed075e97acebd34cc5
-  bytes: 3233
-  kind: repository
-  sourcePath: landing/static/run/_app/runtimeCapabilityRail-B2XB4P6B.js
 - path: landing/static/run/_app/schema-43LlYS0G.js
   sha256: d28afd68249cc4e916f35e43056d676e9d2a2265e328fc560f1b80c426561ed6
   bytes: 9719
   kind: repository
   sourcePath: landing/static/run/_app/schema-43LlYS0G.js
-- path: landing/static/run/_app/sharePackSurface-BZJXrCcN.js
-  sha256: 6501fd2fb94cee18906d9e17e339b706f0a4f34cf3dddbc5e1e08f8def133e24
-  bytes: 12126
+- path: landing/static/run/_app/sharePackSurface-BFo05bHL.js
+  sha256: 43d9684819df03b1812275c3e61209c239d451aed948af9e5a880252a254ea3b
+  bytes: 12166
   kind: repository
-  sourcePath: landing/static/run/_app/sharePackSurface-BZJXrCcN.js
-- path: landing/static/run/_app/teacherPanel-BjbicoVH.js
-  sha256: 5bcf1911da4ccfbd1fa4474171812de2f17ca57abbb999e8da1bb1441151dbbe
-  bytes: 17715
+  sourcePath: landing/static/run/_app/sharePackSurface-BFo05bHL.js
+- path: landing/static/run/_app/vendor-BQnMssn_.js
+  sha256: 0db0449ce5ade21daa7e7fbb691c9c61b34bad9da509f4884949f03f595c1da3
+  bytes: 331941
   kind: repository
-  sourcePath: landing/static/run/_app/teacherPanel-BjbicoVH.js
-- path: landing/static/run/_app/teacherPanel-C0iKzBuh.css
-  sha256: 4118baa48b038b42d06484588b146bedbd11a98318954c70c87325e320932991
-  bytes: 15083
-  kind: repository
-  sourcePath: landing/static/run/_app/teacherPanel-C0iKzBuh.css
-- path: landing/static/run/_app/vendor-BNq0_UX0.js
-  sha256: 14c675f99a206910c8b0b639d2fbdcce913db6d10ac734888c23a60f0b854e2e
-  bytes: 291836
-  kind: repository
-  sourcePath: landing/static/run/_app/vendor-BNq0_UX0.js
+  sourcePath: landing/static/run/_app/vendor-BQnMssn_.js
 - path: landing/static/run/_app/vendor-BylNkWiU.css
   sha256: 1ffe19fb45c3578391d2a51b2016aef363cad33a265d8526e650b053e8d89bbc
   bytes: 22017
@@ -8879,8 +8900,8 @@ files:
   kind: repository
   sourcePath: landing/static/run/fonts/SpaceGrotesk-700.woff2
 - path: landing/static/run/index.html
-  sha256: 390ae999a82ab6ee5a21fe75fc15bb2adf9b38f6ffb6e138415da5b8607bbf93
-  bytes: 3776
+  sha256: 89f8cc1c5c798fa86a72029894073b3f9099630629900f1c6c1f93a92493a5bc
+  bytes: 3969
   kind: repository
   sourcePath: landing/static/run/index.html
 - path: landing/static/run/manifest.json
@@ -10094,8 +10115,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/01-design-foundation/04-visual-accessibility-gates/README.md
 - path: mainPlan/astryx-product-experience/01-design-foundation/README.md
-  sha256: d4d82e0978fac953d31dac789da468e2f676332ff06b5d0ba3cebdf2aa9ee3d3
-  bytes: 3199
+  sha256: 172324f139d0b2889e943f3a6d210872c77a0a057d952f91f01bdb1e7ba3590d
+  bytes: 3247
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/01-design-foundation/README.md
 - path: mainPlan/astryx-product-experience/02-learning-method/README.md
@@ -10109,13 +10130,13 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/03-product-shell/00-astryx-proof-shell/README.md
 - path: mainPlan/astryx-product-experience/03-product-shell/01-notebook-workbench/README.md
-  sha256: 92d91505f80d383fe0a9089f75e4a1d84469af66c18035a9f2d73fd7df00bb3f
-  bytes: 6795
+  sha256: b495f15080fbe1dbd9e8b9234bdab72c32e73e3b1faa48bb5bd95fed15e71645
+  bytes: 8491
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/03-product-shell/01-notebook-workbench/README.md
 - path: mainPlan/astryx-product-experience/03-product-shell/README.md
-  sha256: 4546d4459c1188b2e5ffd647183695722a33761db4939e3f33d3c37aaec4621c
-  bytes: 10892
+  sha256: 6c9238ddd4822813fa83142314f94de6d5cd4dca320448c8c21b4e90a4f19b57
+  bytes: 11520
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/03-product-shell/README.md
 - path: mainPlan/astryx-product-experience/04-web-learning/00-learn-explorer/README.md
@@ -10169,8 +10190,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/07-landing-experience/00-proof-studio-landing/README.md
 - path: mainPlan/astryx-product-experience/07-landing-experience/README.md
-  sha256: 935f3c89ebc5416bda80d09008e523de041ea7f8172b1c365aac8f100079be4e
-  bytes: 9738
+  sha256: 88fece85789c43c8fb773323ca746cd7d08b872a471c96c940034758c0936230
+  bytes: 9818
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/07-landing-experience/README.md
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/README.md
@@ -10939,13 +10960,13 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/09-repository-simplification/README.md
 - path: mainPlan/astryx-product-experience/10-quality-release/README.md
-  sha256: 0beb476ea40d44b251e94f27cdf303c6247f205c8d5209cd4e5b8ed4b8d01235
-  bytes: 26697
+  sha256: a513a8355ac1aa2471b19e5f3eab42eb40f9975f409d0d5fb37b90b271fcaba3
+  bytes: 29767
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/10-quality-release/README.md
 - path: mainPlan/astryx-product-experience/README.md
-  sha256: 58f62f94305f79184ebeb34e5dc7f59c9a7dab8d89f5cbe6b5ed64cbcbc951a1
-  bytes: 24657
+  sha256: 02ec4b02e440e163d81e4b4b8f30b5e7f0f2cbc297a90a9f5245cdbe99c8cc00
+  bytes: 26959
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/README.md
 - path: pyproject.toml
@@ -12279,8 +12300,8 @@ files:
   kind: repository
   sourcePath: tests/architecture/verifyClassroomRemoved.py
 - path: tests/assets/testBuildDesignSystem.py
-  sha256: 21df9164d60bb35f64b1ed1cbd78dce03fee94fd10424e22a15374edd6a91155
-  bytes: 3864
+  sha256: 7d754a0790e8175ca24e2ee34b21f8b2a3e1fac29636d7cd33c1e2028a2d49e6
+  bytes: 5102
   kind: repository
   sourcePath: tests/assets/testBuildDesignSystem.py
 - path: tests/assets/testBuildVisualAssets.py
@@ -12464,8 +12485,8 @@ files:
   kind: repository
   sourcePath: tests/automation/testVoiceSpeaker.py
 - path: tests/automation/verifyAutomationIdeAudit.py
-  sha256: 0f1daae63ba5c2f6e9953a5f13f75b68e9d073fa77d1dd7719f4976ae245d9fe
-  bytes: 26751
+  sha256: 1e940f36030dc0d34007792d6cfa66db550ebf1e3c2cd11b3e3c6238eefacf5e
+  bytes: 27317
   kind: repository
   sourcePath: tests/automation/verifyAutomationIdeAudit.py
 - path: tests/automation/verifyAutomationStudioPlaywright.py
@@ -12869,8 +12890,8 @@ files:
   kind: repository
   sourcePath: tests/learning/testQualityAnalytics.py
 - path: tests/learning/verifyLearningCardPlaywright.py
-  sha256: e6cd86612127e1e5084c99521d3b0407a710a99f2e2401db1650a7541db44592
-  bytes: 34639
+  sha256: e356711f00d957164e143ed44ff22c18ae737a2e0e7121ee473a86e09b6cccbd
+  bytes: 47563
   kind: repository
   sourcePath: tests/learning/verifyLearningCardPlaywright.py
 - path: tests/learning/verifyLearningEvidenceContract.py
@@ -12884,13 +12905,13 @@ files:
   kind: repository
   sourcePath: tests/learning/verifyLearningFlowFriction.py
 - path: tests/learning/verifyLearningSectionCardContract.py
-  sha256: bf8bace002daee876242c861cae622c626c3a38c09c946801fbf65b9204ff643
-  bytes: 43860
+  sha256: 7d068da29673bacb50b8562c3d0a23b77e973f72cc6537844d93d4f14f165135
+  bytes: 51020
   kind: repository
   sourcePath: tests/learning/verifyLearningSectionCardContract.py
 - path: tests/learning/verifyLearningSystemReadiness.py
-  sha256: 238eb9a45fc201a46b82199e301dbdda15fe7a215b9eb2d6dab5772270f61b74
-  bytes: 32267
+  sha256: 4da5f8491646cf959679797befbe4f2b0f1e8579f799c72b1ab2cb3c4316df1c
+  bytes: 33648
   kind: repository
   sourcePath: tests/learning/verifyLearningSystemReadiness.py
 - path: tests/learning/verifyRemovedLearningConcepts.py
@@ -12923,19 +12944,24 @@ files:
   bytes: 10302
   kind: repository
   sourcePath: tests/plan/testMainPlanCompletion.py
+- path: tests/plan/verifyCompletionBootstrap.py
+  sha256: f996ea41a560e7311bab2c88939cc046f2f65b23f4bc1ce5a3bf84dadf441cdc
+  bytes: 5986
+  kind: repository
+  sourcePath: tests/plan/verifyCompletionBootstrap.py
 - path: tests/plan/verifyMainPlanCompletion.py
   sha256: 4dfa3a76dec3a19b1d5d547a36adfc1b357f1ed380be7aa5ac8f1424867f9581
   bytes: 10482
   kind: repository
   sourcePath: tests/plan/verifyMainPlanCompletion.py
 - path: tests/playwrightCli.py
-  sha256: 2331f1752e6452e5fd4fb6c614559fc1dd17eeb10ca263c110243c0783836e42
-  bytes: 5097
+  sha256: e4b63091bf15b8bdddcea1855d47e880837777aff4bcd4f4881f49b7ac3dbd3a
+  bytes: 5230
   kind: repository
   sourcePath: tests/playwrightCli.py
 - path: tests/product/astryxVerticalSlice.matrix.json
-  sha256: 79ba834d3a30332a06b494ce69d9ce2e35446b072513b6aa9ba636f58aa77274
-  bytes: 689
+  sha256: 7f30d2d6160f29ee5bd080a41cb750be888e1f08c8915b86010bbbfbea6f72a1
+  bytes: 779
   kind: repository
   sourcePath: tests/product/astryxVerticalSlice.matrix.json
 - path: tests/product/bootstrapAfterUse.fixture.yml
@@ -12959,8 +12985,8 @@ files:
   kind: repository
   sourcePath: tests/product/testAstryxJourneyAudit.py
 - path: tests/product/testAstryxJourneyMatrix.py
-  sha256: cef1e10a715f8cc689a10c383c8e788973f957c183739a88e02f760f50662024
-  bytes: 2861
+  sha256: b79615f11b9d82d9f866b698a9f11a68fe6c4406fa930b6d30c33a4e8e75cca3
+  bytes: 3007
   kind: repository
   sourcePath: tests/product/testAstryxJourneyMatrix.py
 - path: tests/product/testLearningEfficacyStage.py
@@ -13024,8 +13050,8 @@ files:
   kind: repository
   sourcePath: tests/product/verifyPrdEvaluationReport.py
 - path: tests/product/verifyProductQualityAudit.py
-  sha256: 40a784df286a5ba4758026c57fea88f084b4a149b6810616ac0f7b0a166a8498
-  bytes: 46647
+  sha256: 1b248b5254c0b2e2cdf813259d9070ae6f169c15821ce32e895308e6623de1be
+  bytes: 46646
   kind: repository
   sourcePath: tests/product/verifyProductQualityAudit.py
 - path: tests/product/verifyReleaseResearchOperations.py
@@ -13034,8 +13060,8 @@ files:
   kind: repository
   sourcePath: tests/product/verifyReleaseResearchOperations.py
 - path: tests/run.py
-  sha256: 1eb98cb2879c4cb2764ab45be479873267a72daf7a464b89ec41f1b91e26982a
-  bytes: 62228
+  sha256: 3710e4f7d103dcbb906a1d2cd8cdcd0e4283ac2e8ee85ff59e2f55b9c4614e32
+  bytes: 62682
   kind: repository
   sourcePath: tests/run.py
 - path: tests/runtime/testAppRuntime.py
@@ -13089,8 +13115,8 @@ files:
   kind: repository
   sourcePath: tests/runtime/testReactiveMarkdown.py
 - path: tests/runtime/testRunEntrypoint.py
-  sha256: 633bfc32a6468ea287c162cd5580acdd6376153182cbec19a6b963aaa7437459
-  bytes: 19335
+  sha256: 37a65b676cf294fe23775573847e5419106f6d618fa92ccb81423491ac22b8a4
+  bytes: 19367
   kind: repository
   sourcePath: tests/runtime/testRunEntrypoint.py
 - path: tests/runtime/testRuntime.py
@@ -13139,8 +13165,8 @@ files:
   kind: repository
   sourcePath: tests/runtime/testTracebackParser.py
 - path: tests/runtime/verifyEditorRuntimePreflight.py
-  sha256: c7f1d2f3b84bc350b82cfb185c9e7c128622b631c0f909bb219377b9ea0fb729
-  bytes: 24888
+  sha256: 7e9fd38d1e137c8e1fc4159fdcf849c47132979b9fbeeb4ecb7c1a0357a44d0b
+  bytes: 39171
   kind: repository
   sourcePath: tests/runtime/verifyEditorRuntimePreflight.py
 - path: tests/runtime/verifyPlaywrightAppRuntime.py
@@ -13149,8 +13175,8 @@ files:
   kind: repository
   sourcePath: tests/runtime/verifyPlaywrightAppRuntime.py
 - path: tests/runtime/verifyPlaywrightDogfood.py
-  sha256: 1d06a677dfb91eba394107c225855a2eb1385c23a65f906af5a416528d3d4805
-  bytes: 8616
+  sha256: 1e6a115e5f29aa4643ecbca054b68914fd1824ccb2f8a2dbb1f4e19c078dba54
+  bytes: 9191
   kind: repository
   sourcePath: tests/runtime/verifyPlaywrightDogfood.py
 - path: tests/runtime/verifyRuntimeRecoveryContract.py
@@ -13178,14 +13204,19 @@ files:
   bytes: 4459
   kind: repository
   sourcePath: tests/share/testSharePackMechanism.py
+- path: tests/surface/testDesignSystemContractReport.py
+  sha256: acb04ae0c4a1b02b69da7b69d3a54fafec9c6f514a47b05e1c8d16829da820c0
+  bytes: 1578
+  kind: repository
+  sourcePath: tests/surface/testDesignSystemContractReport.py
 - path: tests/surface/testFrontendBoundary.py
-  sha256: 2a0abd5e8627db3ae4c94d046fbc3534263022f017abd6c1af805e9b517f6280
-  bytes: 20998
+  sha256: 531c097ed4e0a1dde6ffe80c40f80f95fee37882d0a5c9f99b7efef004160fe0
+  bytes: 22897
   kind: repository
   sourcePath: tests/surface/testFrontendBoundary.py
 - path: tests/surface/testLearningEvidenceStatusContract.py
-  sha256: 5c7e3cec511df1a8139cb5a90863ca581934b01fd8da11627587b171b66f6aeb
-  bytes: 1581
+  sha256: a1e734f3732f84ee71f43e4907a9d43cfc4b447c1493c8abef937eadb544806c
+  bytes: 1598
   kind: repository
   sourcePath: tests/surface/testLearningEvidenceStatusContract.py
 - path: tests/surface/testMobileShell.py
@@ -13194,13 +13225,13 @@ files:
   kind: repository
   sourcePath: tests/surface/testMobileShell.py
 - path: tests/surface/testNotebookPersistence.py
-  sha256: 235d07f321226a3ed6bae87c6cfab9dd209b118966f9b40438689d202ec72399
-  bytes: 6893
+  sha256: c88f424c77da327b6253dfbf29b9385cf916ae2bee500a8bf09a3dc5e3de3a47
+  bytes: 7035
   kind: repository
   sourcePath: tests/surface/testNotebookPersistence.py
 - path: tests/surface/testProductSurfaceContract.py
-  sha256: 0f55065c9da2385f5c507cd321bfd478313ac95b48f1b9960e580c30897e5493
-  bytes: 22971
+  sha256: 43e52712e02ea658bd4cfca30eae68dfc81055b8994472548c27026a13df20f9
+  bytes: 25451
   kind: repository
   sourcePath: tests/surface/testProductSurfaceContract.py
 - path: tests/surface/testProviderSettingsContract.py
@@ -13224,13 +13255,13 @@ files:
   kind: repository
   sourcePath: tests/surface/testWidgetInputs.py
 - path: tests/surface/verifyDesignSystemContract.py
-  sha256: 811a8ac328c62b9d8e3813cc83b56fd2e14312807e3d305ef6cbfee368774993
-  bytes: 17496
+  sha256: 64c099aeda415092eb6ee667e97c590a7bea4ec764b1051bfcadeca0af2d7a1d
+  bytes: 23498
   kind: repository
   sourcePath: tests/surface/verifyDesignSystemContract.py
 - path: tests/surface/verifyFrontendPerformanceBudget.py
-  sha256: 79898e5f8415c49bc9e82c3fd763ac023b965f076049132d3076794a37da2fc2
-  bytes: 9476
+  sha256: 472315b7ed6181d1fa3ad76cf0c2530725ba6caf766fced3458cf8da6afe35d2
+  bytes: 9520
   kind: repository
   sourcePath: tests/surface/verifyFrontendPerformanceBudget.py
 - path: tests/surface/verifyGeneratedSourcePolicy.py
@@ -13244,8 +13275,8 @@ files:
   kind: repository
   sourcePath: tests/surface/verifyLandingDeadSourceRemoved.py
 - path: tests/surface/verifyLandingDocsBundleSplit.py
-  sha256: 96bbd0163cd1b529d054aa05a77af9528cd10fac31609fa331f3e2ebdc7add34
-  bytes: 11041
+  sha256: 86a3c5adfc789f469d03af316a8f96a1ee48191384fc9541d3a9305939342e52
+  bytes: 11051
   kind: repository
   sourcePath: tests/surface/verifyLandingDocsBundleSplit.py
 - path: tests/surface/verifyLandingExperiencePlaywright.py
@@ -13254,8 +13285,8 @@ files:
   kind: repository
   sourcePath: tests/surface/verifyLandingExperiencePlaywright.py
 - path: tests/surface/verifyLandingHydration.py
-  sha256: 2a52734e06e829c4f663dcf76d3c9dfd85bcfdd8bf839a6ea553644081c63e34
-  bytes: 15830
+  sha256: fa076e88e904eec8c11b2ac1fc4ee528b8e1d7c80e0fcec6800c42923cd0b35b
+  bytes: 28958
   kind: repository
   sourcePath: tests/surface/verifyLandingHydration.py
 - path: tests/surface/verifyLandingSeo.py
@@ -13264,8 +13295,8 @@ files:
   kind: repository
   sourcePath: tests/surface/verifyLandingSeo.py
 - path: tests/surface/verifyMobileLayout.py
-  sha256: e5a758510889daf195e225aac473bbf9b01c1b6dcfc362e15944f9db75dc0d84
-  bytes: 7930
+  sha256: 1664b98ff88d58a88ef7bfd386cbc1ad40524c95247400e66054cc93f6237e50
+  bytes: 10309
   kind: repository
   sourcePath: tests/surface/verifyMobileLayout.py
 - path: tests/surface/verifyNotebookAutosavePlaywright.py
@@ -13274,18 +13305,18 @@ files:
   kind: repository
   sourcePath: tests/surface/verifyNotebookAutosavePlaywright.py
 - path: tests/surface/verifyOnboardingPlaywright.py
-  sha256: 4b731405e6efe3c17ec6517cec9fc10cd00a14eb7ddf2c51064bddd3639184ed
-  bytes: 44073
+  sha256: 3d0d79df0844f8fddf728323b4123da5615a793ddfa5c577cd7fdfad22ccd934
+  bytes: 58942
   kind: repository
   sourcePath: tests/surface/verifyOnboardingPlaywright.py
 - path: tests/surface/verifyPlaywrightMobile.py
-  sha256: 4888695455caf95bf02be79b6b4f18028bb70b491474f714faf754863ec1db29
-  bytes: 7692
+  sha256: 0f99120ffb5b44156c64a703fe154a994f18eae75b970f615a67776cf85f7eec
+  bytes: 8724
   kind: repository
   sourcePath: tests/surface/verifyPlaywrightMobile.py
 - path: tests/surface/verifyProductExperiencePlaywright.py
-  sha256: f7e3062cf44a14c5e6374000995bd7b5e31f463fdbde862072b938296578d29d
-  bytes: 180690
+  sha256: 3f856b2a632ba3af11ba05d3896a815a0d5063d3983f09d9fdb431a9b528453f
+  bytes: 201234
   kind: repository
   sourcePath: tests/surface/verifyProductExperiencePlaywright.py
 - path: tests/surface/verifyProductModuleBoundaries.py
@@ -13324,8 +13355,8 @@ files:
   kind: repository
   sourcePath: tests/surface/verifyPyprocRuntimeFsPlaywright.py
 - path: tests/surface/verifyRunRouteStatePlaywright.py
-  sha256: 4724fa31b2ab89d96fd6b041cc7427984461cd2e1967f6897476a8affe73ad3f
-  bytes: 10013
+  sha256: c3fdb723e2a6f36cf19fd87f0af8ecbcc68261328992f894ddac89c8d62723a0
+  bytes: 13818
   kind: repository
   sourcePath: tests/surface/verifyRunRouteStatePlaywright.py
 - path: tests/surface/verifyWidgetBridgeRoundTrip.py
