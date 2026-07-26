@@ -19,11 +19,11 @@ scope:
 draftBundle:
   manifestPath: mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/08-r10-independent-review/evaluation-bundle.manifest.yml
   archivePath: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  gitCommit: 7f57e332fedd8a0ebeff78e9359372770964a228
+  gitCommit: 003854a885a339919a291508cd0b02be04267bbb
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: 97b89ef3ed95da782379355b668e6ae72276cf32e849ecc5312ff45543812ba0
-  evaluationBundleHash: afcccd26942159956738581a93add26e0ac50234664e0454bf0144f3ee500840
-  fileCount: 2676
+  manifestHash: e4889f7cb1bcb4553e696273db6d000002b12049ad3abd5c73e35ecc364d585f
+  evaluationBundleHash: 441828621ada94477796381597fcf871102245229d659c390f18fa2bd557ec7f
+  fileCount: 2675
   bundleIntegrityState: passed
   sealEligible: false
 excludedEvaluatorInputs:
@@ -183,8 +183,8 @@ remediations:
     productExperienceBrowserCases: 54
   eligibleForR10: false
 blockingReasons:
-- packet 02 has implementation and negative-fixture evidence but no clean A/E/B completion transition; packets 03 through
-  07 and 09 have no independent closure
+- packet 02 completion bootstrap has a verified clean A/E/B transition; packets 03 through 07 and 09 have no independent
+  closure
 - learning ledgers are reproducible and weak-only coverage is 0, but independent assessment approval coverage is 0 of 472
   lessons
 - author-fact-audit.snapshot.yml is non-independent and cannot decide pass

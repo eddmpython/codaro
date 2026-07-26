@@ -8,7 +8,7 @@ R9가 드러낸 결함을 문서 작성자가 스스로 닫았다고 선언하�
 
 ## 현재 준비 상태
 
-2026-07-26 `buildPrdEvaluationBundle.py --write`는 source commit `7f57e332`에서 2,676개 파일을 history-free ZIP으로 다시 생성했다. current draft의 archive SHA-256은 `afcccd26942159956738581a93add26e0ac50234664e0454bf0144f3ee500840`이고 manifest hash는 `97b89ef3ed95da782379355b668e6ae72276cf32e849ecc5312ff45543812ba0`이며, bundle builder와 fact audit `--check`가 같은 범위를 재현했다. ZIP의 모든 entry는 읽기 전용이며 specialist review, PRD 개선 이력, `_done`, output·dist·build·cache를 포함하지 않는 원칙을 유지한다. 이 최신화는 draft 입력 무결성만 뜻하며 evaluator 제출이나 round seal이 아니다.
+2026-07-26 `buildPrdEvaluationBundle.py --write`는 네 번째 내부 완료 상태를 반영한 source commit `003854a8`에서 2,675개 파일을 history-free ZIP으로 다시 생성했다. current draft의 archive SHA-256은 `441828621ada94477796381597fcf871102245229d659c390f18fa2bd557ec7f`이고 manifest hash는 `e4889f7cb1bcb4553e696273db6d000002b12049ad3abd5c73e35ecc364d585f`이며, bundle builder와 fact audit `--check`가 같은 범위를 재현했다. ZIP의 모든 entry는 읽기 전용이며 specialist review, PRD 개선 이력, `_done`, output·dist·build·cache를 포함하지 않는 원칙을 유지한다. 이 최신화는 draft 입력 무결성만 뜻하며 evaluator 제출이나 round seal이 아니다.
 
 current bundle integrity와 draft fact audit도 R10 통과가 아니다. draft 범위는 최신이지만 입력 manifest와 scope는 unsealed이고 03~07·09 remediation closure, 세 명의 독립 evaluator 배정·독립성·conflict 확인, raw report 3개와 finding ledger가 없다. Local·Web reader floor, canonical mastery, full archive와 weak-only 0은 machine 구현 사실일 뿐 독립 검수와 전 release compatibility matrix를 대신하지 않는다. 따라서 manifest는 `state: draft`, `sealEligible: false`이며 현재 R10 점수와 통과 판정은 없다. `--seal`은 current bundle, 각 remediation closure evidence·fact audit·negative fixture와 세 evaluator의 독립성·conflict·서명이 모두 유효할 때만 성공해야 한다.
 

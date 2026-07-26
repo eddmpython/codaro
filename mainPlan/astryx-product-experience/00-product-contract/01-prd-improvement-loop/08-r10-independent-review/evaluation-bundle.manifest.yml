@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: 7f57e332fedd8a0ebeff78e9359372770964a228
+  gitCommit: 003854a885a339919a291508cd0b02be04267bbb
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: 97b89ef3ed95da782379355b668e6ae72276cf32e849ecc5312ff45543812ba0
-  fileCount: 2676
-  totalBytes: 88229393
+  manifestHash: e4889f7cb1bcb4553e696273db6d000002b12049ad3abd5c73e35ecc364d585f
+  fileCount: 2675
+  totalBytes: 88228881
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: afcccd26942159956738581a93add26e0ac50234664e0454bf0144f3ee500840
-  bytes: 88744725
+  sha256: 441828621ada94477796381597fcf871102245229d659c390f18fa2bd557ec7f
+  bytes: 88743939
   format: zip
   compression: stored
   compressionMethod: 0
@@ -5066,8 +5066,8 @@ files:
   kind: repository
   sourcePath: editor/src/components/notebook/notebookPanel.css
 - path: editor/src/components/notebook/notebookPanel.tsx
-  sha256: 7e71e1c3bd94fa961cf630dd73b8f701b3480522b3e93e10ba69bd68a7880333
-  bytes: 31629
+  sha256: 7f9008d39768b2562b64faa796147167d4945a40d5c6ee03494f8c226b5fc868
+  bytes: 31841
   kind: repository
   sourcePath: editor/src/components/notebook/notebookPanel.tsx
 - path: editor/src/components/notebook/variableExplorerPanel.tsx
@@ -10089,11 +10089,6 @@ files:
   bytes: 930
   kind: repository
   sourcePath: launcher/codaro-launcher/src/webview.rs
-- path: mainPlan/astryx-product-experience/01-design-foundation/02-landing-and-learning-migration/README.md
-  sha256: 9cfbcd08ef480e4f9a4c18f468b344bec7c0bb5a4c29bba6aa4a96d843a961bd
-  bytes: 1992
-  kind: repository
-  sourcePath: mainPlan/astryx-product-experience/01-design-foundation/02-landing-and-learning-migration/README.md
 - path: mainPlan/astryx-product-experience/01-design-foundation/03-run-and-local-migration/README.md
   sha256: 4ea85ab56d09ed8d05a437dc21827dc73c43a988b87a43af5f3cdbd5f822d047
   bytes: 2509
@@ -10105,8 +10100,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/01-design-foundation/04-visual-accessibility-gates/README.md
 - path: mainPlan/astryx-product-experience/01-design-foundation/README.md
-  sha256: 8a3182a11516e034998c4f1abba30466b1ae52af8cdd0a72ee3a61d3b7d61991
-  bytes: 3784
+  sha256: 90dda21d52e44562b45da4d0b58eb8dc6bdebf0066a54b2581ef601e280f2b9e
+  bytes: 4209
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/01-design-foundation/README.md
 - path: mainPlan/astryx-product-experience/02-learning-method/README.md
@@ -10955,8 +10950,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/10-quality-release/README.md
 - path: mainPlan/astryx-product-experience/README.md
-  sha256: 511a5e06bebcf61fcc35bd3cb0e420138d980b89c8bcbeceb0883de042ff3cfa
-  bytes: 27415
+  sha256: b0a0aeeef4bf85897e5f21f29d6fd991a3e433d68221218103fdb7214183473d
+  bytes: 27383
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/README.md
 - path: pyproject.toml
@@ -12895,8 +12890,8 @@ files:
   kind: repository
   sourcePath: tests/learning/verifyLearningFlowFriction.py
 - path: tests/learning/verifyLearningSectionCardContract.py
-  sha256: 7d068da29673bacb50b8562c3d0a23b77e973f72cc6537844d93d4f14f165135
-  bytes: 51020
+  sha256: a5099ece734b4b1c560093173ea907a976821657df50c4057773eeaa7c5ee4d5
+  bytes: 51055
   kind: repository
   sourcePath: tests/learning/verifyLearningSectionCardContract.py
 - path: tests/learning/verifyLearningSystemReadiness.py
@@ -13220,8 +13215,8 @@ files:
   kind: repository
   sourcePath: tests/surface/testNotebookPersistence.py
 - path: tests/surface/testProductSurfaceContract.py
-  sha256: 43e52712e02ea658bd4cfca30eae68dfc81055b8994472548c27026a13df20f9
-  bytes: 25451
+  sha256: 50c98852b344958a5b65bf960e0fba670162b2dd52b9b3bb460e9cc686457aa3
+  bytes: 26224
   kind: repository
   sourcePath: tests/surface/testProductSurfaceContract.py
 - path: tests/surface/testProviderSettingsContract.py
@@ -13295,8 +13290,8 @@ files:
   kind: repository
   sourcePath: tests/surface/verifyMobileLayout.py
 - path: tests/surface/verifyNotebookAutosavePlaywright.py
-  sha256: b9cf00a2811c18c554d107be81354f521af62f6d7100bf946393ff981bb4447b
-  bytes: 21297
+  sha256: da8ac7c0d7e23a2f9a6ea1770476d6c869dea1ec917dff1827aa6d8f53e40a43
+  bytes: 21364
   kind: repository
   sourcePath: tests/surface/verifyNotebookAutosavePlaywright.py
 - path: tests/surface/verifyOnboardingPlaywright.py
