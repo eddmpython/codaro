@@ -16,11 +16,12 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useLocale } from "@/lib/localeContext";
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import { cn } from "@/lib/utils";
+import { SocialLinks } from "@/styles/generated/socialLinks";
 import type { AppNotice } from "@/types";
 
-// 얇은 전용 레인 안에 현재 작업과 관련된 컨트롤만 둔다.
+// 얇은 전용 레인 안에 현재 작업과 공용 제품 정체성에 필요한 컨트롤만 둔다.
 // - 좌상단: 사이드바 토글
-// - 우상단: 에디터 어시스턴트 패널 토글
+// - 우상단: 전 표면 공용 SNS와 데스크톱 전용 진단/어시스턴트
 // - 상단 중앙: 진단/상태 알림(에러·경고일 때만)
 // 노트북 실행 버튼은 에디터 본문(NotebookPanel)으로 이동했다.
 export function TopControls({
@@ -71,6 +72,7 @@ export function TopControls({
             {assistantCollapsed ? <PanelRightOpen /> : <PanelRightClose />}
           </TopBarIconButton>
         ) : null}
+        <SocialLinks label="Codaro SNS" />
       </div>
     </>
   );

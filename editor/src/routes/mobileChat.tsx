@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { sendMobileChatTurn } from "@/lib/mobileChatTurn";
 import { useViewportInsets } from "@/hooks/useViewportInsets";
+import { SocialLinks } from "@/styles/generated/socialLinks";
 
 type ChatLine = { role: "user" | "assistant"; text: string };
 
@@ -51,11 +52,14 @@ export function MobileChat() {
       className="flex h-dvh w-full flex-col bg-background"
       style={{ paddingBottom: insets.isKeyboardOpen ? 0 : "env(safe-area-inset-bottom)" }}
     >
-      <header className="flex items-center justify-between border-b px-3 py-2 text-sm font-semibold">
-        <span>Codaro 모바일 채팅</span>
-        <a href="/" className="text-xs text-muted-foreground underline-offset-2 hover:underline">
-          데스크톱
-        </a>
+      <header className="flex h-11 shrink-0 items-center justify-between gap-2 border-b px-2 text-sm font-semibold">
+        <span className="min-w-0 truncate">Codaro 채팅</span>
+        <div className="flex shrink-0 items-center gap-1">
+          <a href="/" className="text-xs text-muted-foreground underline-offset-2 hover:underline">
+            데스크톱
+          </a>
+          <SocialLinks label="Codaro SNS" />
+        </div>
       </header>
       <main className="flex-1 overflow-y-auto px-3 py-2" data-mobile-chat-log="true">
         {lines.length === 0 ? (
@@ -101,6 +105,7 @@ export function MobileChat() {
           <Button
             type="button"
             size="icon"
+            aria-label="메시지 보내기"
             disabled={!draft.trim() || sending}
             onClick={() => void send()}
             data-mobile-chat-send="true"

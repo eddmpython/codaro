@@ -18,6 +18,7 @@
     align-items: center;
     padding: var(--spacing-1-5) var(--spacing-4);
     background: var(--color-background-body);
+    border-bottom: 1px solid var(--color-border-subtle);
   }
 
   [data-astryx-theme="codaro"] .notebookDocumentIdentity {
@@ -138,16 +139,20 @@
   [data-astryx-theme="codaro"] .notebookViewport {
     height: 100%;
     min-height: 0;
-    background: var(--color-background-body);
+    background: var(--color-background-muted);
   }
 
   [data-astryx-theme="codaro"] .notebookDocument {
     display: grid;
     width: min(100%, 1040px);
+    min-height: 100%;
     min-width: 0;
     margin-inline: auto;
     gap: 16px;
     padding: 32px 56px 100px;
+    border-inline: 1px solid var(--color-border-subtle);
+    background: var(--color-background-body);
+    box-shadow: 0 0 32px color-mix(in srgb, var(--color-shadow) 24%, transparent);
   }
 
   [data-astryx-theme="codaro"] .notebookCell,
@@ -445,11 +450,21 @@
     [data-astryx-theme="codaro"] .notebookDocument {
       gap: 18px;
       padding: 20px var(--spacing-2) 84px;
+      border-inline: 0;
+      box-shadow: none;
     }
 
     [data-astryx-theme="codaro"] .notebookCellMeta {
-      top: -12px;
-      right: 6px;
+      position: relative;
+      top: auto;
+      right: auto;
+      width: max-content;
+      margin: 0 4px 4px auto;
+      border-color: transparent;
+      background: transparent;
+      box-shadow: none;
+      opacity: 1;
+      pointer-events: auto;
     }
 
     [data-astryx-theme="codaro"] .notebookCellDiagnostic {

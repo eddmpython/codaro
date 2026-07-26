@@ -816,6 +816,13 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "waitFor": "[data-learning-lesson-ref='30days/day01_헬로월드']",
         },
         {
+            "name": "local-mobile-chat",
+            "url": f"http://127.0.0.1:{localPort}/m/chat",
+            "viewport": {"width": 390, "height": 844},
+            "surface": "mobile-chat",
+            "waitFor": "[data-route='mobile-chat']",
+        },
+        {
             "name": "local-learning-home-desktop",
             "url": (
                 f"http://127.0.0.1:{localPort}/?surface=curriculum"
@@ -1793,6 +1800,13 @@ async ({ surface, expectedTier }) => {
     .map(actionName)
     .filter((label) => forbiddenLearningLabels.has(label));
   const missingImageAlt = visibleImages.filter((image) => !image.hasAttribute("alt")).length;
+  const visibleSocialLinks = [...document.querySelectorAll('[data-social-link="codaro"]')]
+    .filter(inViewport);
+  const visibleSocialLinkIds = visibleSocialLinks
+    .map((link) => link.getAttribute("data-social-link-id"));
+  const socialLinksInTopLane = visibleSocialLinks.every(
+    (link) => link.getBoundingClientRect().top >= 0 && link.getBoundingClientRect().bottom <= 80
+  );
   const rail = document.querySelector("[data-runtime-tier]");
   const routeRuntime = document.querySelector("[data-run-route-runtime]");
   let webProgressLessonCount = 0;
@@ -1917,6 +1931,11 @@ async ({ surface, expectedTier }) => {
     visibleImageCount: visibleImages.length,
     brokenImages,
     missingImageAlt,
+    socialLinksSourceCount: document.querySelectorAll(
+      '[data-social-links="codaro"][data-social-links-source="design-system"]'
+    ).length,
+    visibleSocialLinkIds,
+    socialLinksInTopLane,
     lessonSectionCount: document.querySelectorAll("[data-learning-section-card]").length,
     transferSectionCount: document.querySelectorAll('[data-learning-section-mode="transfer"]').length,
     retrievalSectionCount: document.querySelectorAll('[data-learning-section-mode="retrieval"]').length,
@@ -2016,6 +2035,12 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
         failures.append(f"{name}: {audit['missingImageAlt']} visible image(s) have no alt attribute")
     if audit["rootTheme"] != "codaro":
         failures.append(f"{name}: Codaro Astryx theme scope is missing")
+    if audit["visibleSocialLinkIds"] != ["github", "youtube", "threads", "support"]:
+        failures.append(
+            f"{name}: shared SNS rail is missing or reordered: {audit['visibleSocialLinkIds']}"
+        )
+    if not audit["socialLinksSourceCount"] or not audit["socialLinksInTopLane"]:
+        failures.append(f"{name}: shared SNS rail is not visible in the upper control lane")
     expectedTier = case.get("expectedTier")
     if expectedTier and audit["runtimeTier"] != expectedTier:
         failures.append(f"{name}: expected runtime tier {expectedTier}, got {audit['runtimeTier']}")
@@ -2162,11 +2187,14 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
                     f"{name}: default notebook must contain one blank code input, "
                     f"got {audit['notebookBlankInputCount']}"
                 )
-            if audit["visibleNotebookCellToolCount"]:
+            viewportWidth = int((case.get("viewport") or {}).get("width") or 0)
+            if viewportWidth > 760 and audit["visibleNotebookCellToolCount"]:
                 failures.append(
                     f"{name}: {audit['visibleNotebookCellToolCount']} cell toolbars are visible "
                     "without a direct toolbar interaction"
                 )
+            if viewportWidth <= 760 and audit["visibleNotebookCellToolCount"] < 1:
+                failures.append(f"{name}: mobile notebook must expose a touch-safe cell toolbar")
             if audit["visibleNotebookStatusCount"]:
                 failures.append(
                     f"{name}: {audit['visibleNotebookStatusCount']} normal runtime or persistence "

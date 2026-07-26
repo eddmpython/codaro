@@ -56,9 +56,15 @@ def verifyPackagePins(app: str, compatibility: dict[str, object], failures: list
         require(lockEntry.get("version") == version, f"{app} lock pin drift: {name}", failures)
 
 
-def verifyGeneratedArtifacts(tokens: dict[str, object], fontManifest: dict[str, object], failures: list[str]) -> None:
+def verifyGeneratedArtifacts(
+    tokens: dict[str, object],
+    fontManifest: dict[str, object],
+    socialLinks: dict[str, object],
+    failures: list[str],
+) -> None:
     expectedSourceHash = sha256(canonicalJson(tokens))
-    sharedFiles = ("codaro.js", "codaro.d.ts", "codaroTheme.ts", "provenance.json")
+    expectedSocialLinksHash = sha256(canonicalJson(socialLinks))
+    sharedFiles = ("codaro.js", "codaro.d.ts", "codaroTheme.ts", "provenance.json", "socialLinks.tsx")
     for fileName in sharedFiles:
         landingBytes = (ROOT / "landing" / "src" / "styles" / "generated" / fileName).read_bytes()
         editorBytes = (ROOT / "editor" / "src" / "styles" / "generated" / fileName).read_bytes()
@@ -68,6 +74,11 @@ def verifyGeneratedArtifacts(tokens: dict[str, object], fontManifest: dict[str, 
         generatedRoot = ROOT / app / "src" / "styles" / "generated"
         provenance = json.loads((generatedRoot / "provenance.json").read_text(encoding="utf-8"))
         require(provenance.get("sourceSha256") == expectedSourceHash, f"{app} provenance source hash drift", failures)
+        require(
+            provenance.get("socialLinksSourceSha256") == expectedSocialLinksHash,
+            f"{app} social link provenance hash drift",
+            failures,
+        )
         css = (generatedRoot / "codaroTheme.css").read_text(encoding="utf-8")
         for token in (
             ':scope[data-density="public"]',
@@ -77,6 +88,8 @@ def verifyGeneratedArtifacts(tokens: dict[str, object], fontManifest: dict[str, 
             ':scope[data-accent="blue"]',
             ':scope[data-accent="teal"]',
             "prefers-reduced-motion: reduce",
+            '[data-social-links="codaro"]',
+            '[data-social-link="codaro"]',
         ):
             require(token in css, f"{app} generated theme missing {token}", failures)
 
@@ -140,9 +153,11 @@ def verifyEntryPoints(failures: list[str]) -> None:
                 failures,
             )
         else:
+            socialLinksSource = (ROOT / "editor/src/styles/generated/socialLinks.tsx").read_text(encoding="utf-8")
             require(
-                '"@astryxdesign/core/astryx.css"' not in entry,
-                "editor must not load unused Astryx component CSS",
+                '"@astryxdesign/core/astryx.css"' not in entry
+                and '@astryxdesign/core/IconButton' in socialLinksSource,
+                "editor must render the shared Astryx IconButton rail without loading unrelated component CSS",
                 failures,
             )
         html = (ROOT / app / "index.html").read_text(encoding="utf-8")
@@ -253,6 +268,10 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
     automationRunInspector = (ROOT / "editor/src/components/automation/automationRunInspector.tsx").read_text(encoding="utf-8")
     mainSurface = (ROOT / "editor/src/components/app/mainSurface.tsx").read_text(encoding="utf-8")
     topBar = (ROOT / "editor/src/components/app/topBar.tsx").read_text(encoding="utf-8")
+    editorSocialLinks = (ROOT / "editor/src/styles/generated/socialLinks.tsx").read_text(encoding="utf-8")
+    landingSocialLinks = (ROOT / "landing/src/styles/generated/socialLinks.tsx").read_text(encoding="utf-8")
+    publicShell = (ROOT / "landing/src/components/publicShell.jsx").read_text(encoding="utf-8")
+    mobileChat = (ROOT / "editor/src/routes/mobileChat.tsx").read_text(encoding="utf-8")
     productSidebar = (ROOT / "editor/src/components/app/productSidebar.tsx").read_text(encoding="utf-8")
     app = (ROOT / "editor/src/App.tsx").read_text(encoding="utf-8")
     editorCss = (ROOT / "editor/src/index.css").read_text(encoding="utf-8")
@@ -262,7 +281,6 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
             for assetId in (
                 "webRunDesktop",
                 "runLearningDetail",
-                "runLearningMobile",
                 "localNotebookDesktop",
                 "localAutomationDesktop",
             )
@@ -271,7 +289,7 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
         failures,
     )
     require(
-        'href={curriculumUrl}' in home and 'label="웹에서 바로 학습"' in home,
+        'href={curriculumUrl}' in home and 'label="웹에서 첫 레슨 실행"' in home,
         "home must prioritize direct web learning",
         failures,
     )
@@ -361,10 +379,20 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
         failures,
     )
     require(
-        'data-topbar-external-links="desktop"' not in topBar
-        and "SocialLinks" not in topBar
-        and "CODARO_LINKS" not in topBar
-        and "topbar.githubStar" not in topBar
+        '<SocialLinks label="Codaro SNS" />' in topBar
+        and '<SocialLinks label="Codaro SNS" />' in mobileChat
+        and '<SocialLinks className="publicSocialLinks" label="Codaro SNS" />' in publicShell
+        and '<SocialLinks className="footerSocialLinks" />' in publicShell
+        and all(
+            '@astryxdesign/core/IconButton' in source
+            and 'data-social-links="codaro"' in source
+            and 'data-social-links-source="design-system"' in source
+            and 'data-social-link="codaro"' in source
+            for source in (editorSocialLinks, landingSocialLinks)
+        )
+        and editorSocialLinks == landingSocialLinks
+        and "@/styles/generated/socialLinks" in topBar
+        and "../styles/generated/socialLinks.tsx" in publicShell
         and 'data-top-control-lane="true"' in app
         and '{surface === "curriculum" ? null : (' in app
         and 'className="relative h-9 shrink-0 border-b border-border bg-background"' in app
@@ -372,7 +400,7 @@ def verifyRepresentativeSurfaces(failures: list[str]) -> None:
         and 'surface !== "curriculum" && showStatusNotice' in topBar
         and 'const showStatusNotice = surface !== "curriculum"' in topBar
         and 'className="hidden xl:block"' in topBar,
-        "product top controls must reserve a layout lane and exclude external marketing links",
+        "all public, learning, notebook, Local, and mobile shells must share the Astryx social link registry",
         failures,
     )
 
@@ -388,10 +416,11 @@ def main() -> int:
     failures: list[str] = []
     tokens = json.loads((DESIGN_ROOT / "tokens.json").read_text(encoding="utf-8"))
     fontManifest = json.loads((DESIGN_ROOT / "fontManifest.json").read_text(encoding="utf-8"))
+    socialLinks = json.loads((DESIGN_ROOT / "socialLinks.json").read_text(encoding="utf-8"))
     compatibility = json.loads(COMPATIBILITY_PATH.read_text(encoding="utf-8"))
     for app in APPS:
         verifyPackagePins(app, compatibility, failures)
-    verifyGeneratedArtifacts(tokens, fontManifest, failures)
+    verifyGeneratedArtifacts(tokens, fontManifest, socialLinks, failures)
     verifySemanticCssReferences(tokens, failures)
     verifyEntryPoints(failures)
     verifyRepresentativeSurfaces(failures)

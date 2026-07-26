@@ -19,10 +19,10 @@ Astryx migration을 보기 좋은 screenshot 몇 장으로 끝내지 않는다. 
 
 ### 학습 관련성
 
-- 학습 surface의 모든 보이는 요소는 목표 이해, 학습 자료·개념, 코드 작성·실행, 결과 해석, 자동 feedback, 다음 학습 이동 중 하나에 직접 기여해야 한다.
+- 학습 surface의 모든 보이는 요소는 목표 이해, 학습 자료·개념, 코드 작성·실행, 결과 해석, 자동 feedback, 다음 학습 이동 중 하나에 직접 기여해야 한다. 제품 전체에 동일하게 노출하도록 승인된 compact SNS rail은 우상단 공용 shell identity 예외다.
 - 이 목록에 직접 기여하지 않는 visible element는 제품 결함으로 기록하고 즉시 제거한다. 하나라도 남으면 release와 `_done` 전이를 모두 차단한다.
-- 관리·홍보·진단·내부 상태 UI는 학습 surface에서 0개여야 한다. 내부 경로, runtime artifact, 실행 일련번호, 운영 badge도 사용자에게 노출하지 않는다.
-- `surface=curriculum`은 focus mode다. 제품 전환 nav, terminal utility, Provider·제품 설정, diagnostic export, 전역 Teacher panel, 셀별 수동 AI control을 렌더하지 않는다. 브랜드에는 Local `home` 또는 Web `editor`로 나가는 단 하나의 실제 escape action만 둔다.
+- SNS rail을 제외한 관리·홍보·진단·내부 상태 UI는 학습 surface에서 0개여야 한다. 내부 경로, runtime artifact, 실행 일련번호, 운영 badge도 사용자에게 노출하지 않는다.
+- `surface=curriculum`은 focus mode다. 제품 전환 nav, terminal utility, Provider·제품 설정, diagnostic export, 전역 Teacher panel, 셀별 수동 AI control을 렌더하지 않는다. 브랜드에는 Local `home` 또는 Web `editor`로 나가는 단 하나의 실제 escape action과 공용 우상단 SNS rail만 둔다.
 - archive import/export와 사용자 커리큘럼 삭제는 학습 surface가 아니라 비학습 surface의 `제품 설정 > 학습 데이터`에서만 제공한다. 자동 저장은 계속 동작하며 실제 저장 실패만 현재 학습 맥락 안에 다음 행동과 함께 표시한다.
 - 와이드 화면의 학습 목차는 본문 위로 떠서 덮지 않고 grid track 안에서 48px에서 288px로 확장된다. hover와 keyboard focus 양쪽에서 본문·상단 control과 교차가 0이어야 하며 좁은 화면에서는 숨긴다.
 - 확인·제출 버튼 0 같은 단순 control 개수로 통과시키지 않는다. 실행·중지·다시 시도·학습 이동처럼 학습자의 명시적 의도가 필요한 control은 허용하되, 각 요소의 `learning relevance` 근거가 없으면 실패다.

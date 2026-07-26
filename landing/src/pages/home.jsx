@@ -77,97 +77,103 @@ function firstLessonHref() {
 }
 
 export function HomePage() {
-  // Product contract tests intentionally follow this symbol. It now points at the first editable lesson.
   const curriculumUrl = firstLessonHref();
 
   return (
     <main className="homeAstryx homeV3">
       <section className="homeProductHero" aria-labelledby="home-title">
-        <ProductVisual
-          assetId="webRunDesktop"
-          className="homeProductHeroImage homeProductHeroImageDesktop"
-          eager
-          width={1440}
-        />
-        <ProductVisual
-          assetId="runLearningMobile"
-          className="homeProductHeroImage homeProductHeroImageMobile"
-          eager
-          width={390}
-        />
-        <div className="homeShell homeProductHeroContent">
-          <Badge variant="neutral" label="WEB LEARNING · LOCAL AUTOMATION" />
-          <Heading id="home-title" level={1}>Codaro</Heading>
-          <p className="homeProductStatement">
-            Python을 읽는 데서 멈추지 않고,<br />
-            직접 바꾸고 실행해 결과로 증명합니다.
-          </p>
-          <div className="homeHeroActions">
-            <Button
-              as="a"
-              href={curriculumUrl}
-              variant="primary"
-              size="lg"
-              label="웹에서 바로 학습"
-              icon={<Play size={18} aria-hidden="true" />}
+        <div className="homeShell homeHeroLayout">
+          <div className="homeProductHeroContent">
+            <Badge variant="neutral" label="PYTHON, PROVEN BY RUNNING" />
+            <Heading id="home-title" level={1}>Codaro</Heading>
+            <p className="homeProductStatement">
+              배우는 순간 실행하고,<br />
+              실행한 결과로 이해를 증명하세요.
+            </p>
+            <p className="homeProductDetail">
+              설명, 편집 가능한 코드, 실제 Python 출력과 자동 검증이 하나의 흐름으로 이어집니다.
+              설치 없이 Web에서 시작하고 필요한 순간 Local 자동화로 확장합니다.
+            </p>
+            <div className="homeHeroActions">
+              <Button
+                as="a"
+                className="homeHeroPrimaryAction"
+                href={curriculumUrl}
+                variant="primary"
+                size="lg"
+                label="웹에서 첫 레슨 실행"
+                icon={<Play size={18} aria-hidden="true" />}
+              />
+              <Button
+                as="a"
+                className="homeHeroSecondaryAction"
+                href={appPath("/learn")}
+                variant="secondary"
+                size="lg"
+                label="학습 경로 보기"
+                icon={<Globe2 size={18} aria-hidden="true" />}
+              />
+            </div>
+            <a className="homeLocalLink" href={brand.launcherDownloadUrl}>
+              <Download size={16} aria-hidden="true" />
+              Windows Local 받기
+              <ArrowRight size={15} aria-hidden="true" />
+            </a>
+          </div>
+          <div className="homeHeroProductFrame">
+            <div className="homeHeroProductBar">
+              <span><Globe2 size={14} aria-hidden="true" /> CODARO WEB</span>
+              <span>실제 제품 화면</span>
+            </div>
+            <ProductVisual
+              assetId="webRunDesktop"
+              className="homeHeroProductVisual homeHeroProductVisualDesktop"
+              eager
+              width={1440}
             />
-            <Button
-              as="a"
-              href={appPath("/learn")}
-              variant="secondary"
-              size="lg"
-              label="학습 경로 둘러보기"
-              icon={<Globe2 size={18} aria-hidden="true" />}
+            <ProductVisual
+              assetId="runLearningMobile"
+              className="homeHeroProductVisual homeHeroProductVisualMobile"
+              eager
+              width={390}
             />
-          </div>
-          <a className="homeLocalLink" href={brand.launcherDownloadUrl}>
-            <Download size={16} aria-hidden="true" />
-            Windows Local 받기
-            <ArrowRight size={15} aria-hidden="true" />
-          </a>
-        </div>
-        <div className="homeHeroWorkbench" aria-label="브라우저 Python 실행 예시">
-          <div className="homeHeroWorkbenchBar">
-            <span><Code2 size={15} aria-hidden="true" /> 첫 Python 프로그램</span>
-            <span><Globe2 size={14} aria-hidden="true" /> Web 준비됨</span>
-          </div>
-          <div className="homeHeroCode">
-            <span aria-hidden="true">1</span>
-            <code><b>name</b> = <em>&quot;Codaro&quot;</em></code>
-            <span aria-hidden="true">2</span>
-            <code><b>print</b>(f<em>&quot;Hello, {"{name}"}&quot;</em>)</code>
-          </div>
-          <div className="homeHeroOutput">
-            <span>실행 결과</span>
-            <code>Hello, Codaro</code>
-          </div>
-          <div className="homeHeroCheck">
-            <CheckCircle2 size={17} aria-hidden="true" />
-            <span><strong>검증 통과</strong> 출력 값과 문자열 형식이 모두 맞습니다.</span>
+            <dl className="homeHeroProofRail">
+              <div><dt>Web lesson</dt><dd>{curriculumRuntimeCounts.browser}</dd></div>
+              <div><dt>Local lesson</dt><dd>{curriculumRuntimeCounts.local}</dd></div>
+              <div><dt>Flow</dt><dd>Code → Proof</dd></div>
+            </dl>
           </div>
         </div>
       </section>
 
       <section className="homeProofLoop" aria-labelledby="proof-loop-title">
-        <div className="homeShell">
-          <header className="homeSectionHeading homeSectionHeadingCompact">
-            <span className="homeKicker">LEARN BY PROOF</span>
-            <Heading id="proof-loop-title" level={2}>한 화면에서 이해하고, 바꾸고, 검증합니다.</Heading>
-            <Text color="secondary">
-              확인 버튼으로 학습을 끊지 않습니다. 실행하면 필요한 결과와 다음 단계가 같은 흐름에 나타납니다.
-            </Text>
-          </header>
-          <ol className="homeProofSteps">
-            {proofSteps.map((step, index) => (
-              <li key={step.label}>
-                <span className="homeProofIndex">{String(index + 1).padStart(2, "0")}</span>
-                <step.icon size={20} aria-hidden="true" />
-                <small>{step.label}</small>
-                <strong>{step.title}</strong>
-                <p>{step.copy}</p>
-              </li>
-            ))}
-          </ol>
+        <div className="homeShell homeProofLayout">
+          <div className="homeProofProduct">
+            <ProductVisual assetId="runLearningDetail" className="homeProofProductVisual" width={900} />
+            <p><CheckCircle2 size={16} aria-hidden="true" /> 설명부터 실행 결과까지, 실제 Codaro 레슨 한 화면입니다.</p>
+          </div>
+          <div>
+            <header className="homeSectionHeading homeSectionHeadingCompact">
+              <span className="homeKicker">LEARN BY PROOF</span>
+              <Heading id="proof-loop-title" level={2}>한 화면에서 이해하고, 바꾸고, 검증합니다.</Heading>
+              <Text color="secondary">
+                확인 버튼으로 학습을 끊지 않습니다. 실행하면 필요한 결과와 다음 단계가 같은 흐름에 나타납니다.
+              </Text>
+            </header>
+            <ol className="homeProofSteps">
+              {proofSteps.map((step, index) => (
+                <li key={step.label}>
+                  <span className="homeProofIndex">{String(index + 1).padStart(2, "0")}</span>
+                  <step.icon size={18} aria-hidden="true" />
+                  <span>
+                    <small>{step.label}</small>
+                    <strong>{step.title}</strong>
+                    <p>{step.copy}</p>
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
       </section>
 

@@ -1,31 +1,31 @@
 @layer components {
 
 :root {
-  --background: #f5f6f8;
-  --background-2: #eceff3;
-  --foreground: #18191d;
-  --card: #ffffff;
-  --card-foreground: #18191d;
-  --muted: #eceff3;
-  --muted-foreground: #5d626d;
-  --border: #d9dde3;
-  --border-strong: #b7bdc7;
-  --border-brand: #c99ab9;
-  --primary: #6d2857;
-  --primary-foreground: #ffffff;
-  --brand-emphasis: #6d2857;
-  --brand-emphasis-soft: #f5e8f1;
-  --brand-emphasis-foreground: #ffffff;
-  --verified: #08786a;
-  --good: #08786a;
-  --warning: #855600;
-  --radius-sm: 3px;
-  --radius: 6px;
-  --radius-lg: 8px;
-  --radius-pill: 999px;
-  --shadow: 0 12px 28px rgba(23, 23, 27, 0.12);
-  --shadow-sm: 0 1px 2px rgba(23, 23, 27, 0.05), 0 4px 12px rgba(23, 23, 27, 0.04);
-  --shadow-brand: 0 0 0 1px var(--border-brand), 0 10px 32px rgba(109, 40, 87, 0.16);
+  --background: var(--color-background-body);
+  --background-2: var(--color-background-muted);
+  --foreground: var(--color-text-primary);
+  --card: var(--color-background-card);
+  --card-foreground: var(--color-text-primary);
+  --muted: var(--color-background-muted);
+  --muted-foreground: var(--color-text-secondary);
+  --border: var(--color-border);
+  --border-strong: var(--color-border-emphasized);
+  --border-brand: var(--color-border-accent);
+  --primary: var(--color-accent);
+  --primary-foreground: var(--color-on-accent);
+  --brand-emphasis: var(--color-accent);
+  --brand-emphasis-soft: var(--color-accent-muted);
+  --brand-emphasis-foreground: var(--color-on-accent);
+  --verified: var(--color-success);
+  --good: var(--color-success);
+  --warning: var(--color-warning);
+  --radius-sm: var(--radius-inner);
+  --radius: var(--radius-element);
+  --radius-lg: var(--radius-container);
+  --radius-pill: var(--radius-full);
+  --shadow: var(--shadow-med);
+  --shadow-sm: var(--shadow-low);
+  --shadow-brand: 0 0 0 1px var(--border-brand), 0 14px 40px color-mix(in srgb, var(--color-accent) 16%, transparent);
   --mascot-glow: none;
   --header-bg: rgba(245, 246, 248, 0.92);
   --header-fg: #18191d;
@@ -36,10 +36,9 @@
   --paper-border: #d9dde3;
   --code: #f8f9fa;
   --code-fg: #18191d;
-  --font-sans: "Pretendard", ui-sans-serif, system-ui, -apple-system,
-    "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-  --font-display: "Space Grotesk", "Pretendard", sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  --font-sans: var(--font-family-body);
+  --font-display: var(--font-family-heading);
+  --font-mono: var(--font-family-code);
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-sans);
@@ -49,27 +48,9 @@
 }
 
 :root[data-resolved-theme="dark"] {
-  --background: #151619;
-  --background-2: #202226;
-  --foreground: #f5f6f8;
-  --card: #1b1c20;
-  --card-foreground: #f5f6f8;
-  --muted: #202226;
-  --muted-foreground: #aeb3bd;
-  --border: #34373d;
-  --border-strong: #535760;
-  --border-brand: #9c6f8e;
-  --primary: #e4a9d2;
-  --primary-foreground: #24141f;
-  --brand-emphasis: #e4a9d2;
-  --brand-emphasis-soft: #3b2635;
-  --brand-emphasis-foreground: #24141f;
-  --verified: #79d8c8;
-  --good: #79d8c8;
-  --warning: #f1c36d;
   --shadow: 0 12px 28px rgba(0, 0, 0, 0.38);
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.16);
-  --shadow-brand: 0 0 0 1px var(--border-brand), 0 10px 32px rgba(228, 169, 210, 0.1);
+  --shadow-brand: 0 0 0 1px var(--border-brand), 0 14px 40px color-mix(in srgb, var(--color-accent) 12%, transparent);
   --header-bg: rgba(21, 22, 25, 0.92);
   --header-fg: #f5f6f8;
   --paper: #222327;

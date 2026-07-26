@@ -35,8 +35,8 @@
 
 ## Public navigation 계약
 
-- desktop 순서는 brand home, `학습`, `문서`, `소식`, `Run 열기`, search icon, resource menu다. resource menu에 `팩`과 `도구`를 둔다.
-- mobile은 같은 순서를 Astryx `Layer` menu에 유지하고 `웹에서 시작`을 첫 command로 둔다. 별도 mobile 정보 구조를 만들지 않는다.
+- desktop은 brand home, `학습`, `노트북`, `자동화`, 새 노트북, search icon, resource menu와 공용 SNS rail을 둔다. resource menu에 `문서`, `소식`, `팩`, `도구`를 둔다.
+- mobile은 탐색 항목을 menu에 유지하고 `웹에서 시작`을 첫 command로 둔다. 공용 SNS rail은 menu 안에 숨기지 않고 우상단에 항상 보이게 한다.
 - active는 `/` exact, `/learn`과 lesson prefix, `/docs` prefix, `/docs/blog` longest-prefix 순으로 하나만 표시한다. `Run 열기`와 search는 active nav가 아니라 command다.
 - Local 다운로드는 header primary nav가 아니라 footer와 capability 전환 맥락에 둔다.
 
@@ -46,7 +46,7 @@
 - fake terminal, fake editor, emoji icon을 제거한다.
 - 실제 product image는 어둡게 blur하거나 과도하게 crop하지 않는다.
 - docs/blog/search는 읽기 폭, sticky local nav, 검색과 코드 가독성을 통일한다.
-- floating social/download control은 제거하고 명령은 header/footer의 예측 가능한 위치에 둔다.
+- floating social/download control은 제거하고 SNS는 공용 Header 우상단과 Footer의 예측 가능한 위치에 둔다.
 - mobile action은 44px hit target과 두 줄 label overflow를 보장한다.
 
 ## Layout blueprint

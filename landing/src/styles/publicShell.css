@@ -110,6 +110,11 @@
   gap: 4px;
 }
 
+.publicSocialLinks {
+  margin-inline: 2px;
+  padding-inline: 2px;
+}
+
 .publicRunCommand {
   border-left: 1px solid var(--color-border);
   margin-left: 4px;
@@ -212,6 +217,15 @@
     display: none;
   }
 
+  .publicCommands {
+    gap: 0;
+  }
+
+  .publicSocialLinks {
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+
   .publicMenuToggle {
     display: inline-grid;
   }
@@ -244,6 +258,16 @@
     border-bottom-color: var(--color-border-emphasized);
     color: var(--color-text-primary);
     font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .publicHeaderInner {
+    gap: 8px;
+  }
+
+  .publicBrand span {
+    display: none;
   }
 }
 
