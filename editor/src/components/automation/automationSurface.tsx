@@ -204,6 +204,9 @@ export function AutomationView({
                         "grid min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-2 px-2 py-2.5",
                         template.runtime === "local" && !apiOnline && "opacity-60",
                       )}
+                      data-runtime-availability={
+                        template.runtime === "local" && !apiOnline ? "local-required" : "available"
+                      }
                       data-runtime-requirement={template.runtime}
                       key={template.titleKey}
                     >
@@ -211,7 +214,15 @@ export function AutomationView({
                       <div className="min-w-0">
                         <div className="flex min-w-0 items-center gap-1.5">
                           <span className="truncate text-xs font-medium">{t(template.titleKey)}</span>
-                          <Badge className="ml-auto" variant="outline">{t(template.tagKey)}</Badge>
+                          <Badge
+                            className="ml-auto"
+                            data-runtime-requirement-label={template.runtime}
+                            variant="outline"
+                          >
+                            {template.runtime === "local" && !apiOnline
+                              ? t("automation.template.localRequired")
+                              : t(template.tagKey)}
+                          </Badge>
                         </div>
                         <p className="mt-1 line-clamp-2 text-[10px] leading-4 text-muted-foreground">
                           {t(template.descriptionKey)}

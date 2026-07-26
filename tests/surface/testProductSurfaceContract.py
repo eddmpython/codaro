@@ -357,6 +357,9 @@ def testAutomationSurfaceFramesAutomationAsSecondLoop() -> None:
     assert "automation.codaro.description" in source
     assert "automation.custom.description" in source
     assert "automation.empty.detail" in source
+    assert "data-runtime-availability={" in source
+    assert 'data-runtime-requirement-label={template.runtime}' in source
+    assert 't("automation.template.localRequired")' in source
     assert '@/components/ui/card' not in source
 
     assert 'data-automation-operation-strip="true"' in operationStrip
@@ -372,6 +375,25 @@ def testAutomationSurfaceFramesAutomationAsSecondLoop() -> None:
     assert 'kind="stderr"' in runInspector
     assert "POST /api/tasks/{encodeURIComponent(task.id)}/run" in runInspector
     assert '@/components/ui/card' not in runInspector
+
+
+def testRunLocalStateBrowserOwnsCompactAndExecutionStateEvidence() -> None:
+    verifier = _read("tests/surface/verifyProductExperiencePlaywright.py")
+    wrapper = _read("tests/surface/verifyRunLocalStatePlaywright.py")
+
+    assert '"name": "web-automation-compact"' in verifier
+    assert '"name": "web-run-compact"' in verifier
+    assert '"viewport": {"width": 320, "height": 720}' in verifier
+    assert '"verifyNotebookExecutionStates": True' in verifier
+    assert '"expectMinimalNotebook": True' in verifier
+    assert '"expectLocalRequiredTemplates": True' in verifier
+    assert '"expectAvailableLocalTemplates": True' in verifier
+    assert 'selectedCase == "run-local-state"' in verifier
+    assert "verifyNotebookExecutionStates(" in verifier
+    assert 'STATE_CASES = {"web-run-desktop", "local-run-minimum"}' in wrapper
+    assert '"statusSequence": ["running", "success", "running", "error"]' in verifier
+    assert '"CODARO_PRODUCT_CASE"] = "run-local-state"' in wrapper
+    assert '"CODARO_PRODUCT_GATE"] = "run-local-state-browser"' in wrapper
 
 
 def testProductSurfaceDocsNameTheSameFlow() -> None:

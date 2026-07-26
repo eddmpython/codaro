@@ -86,6 +86,9 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
         "output/test-runner/landing-public/landing-public-report.json",
     ),
     "local-studio-browser": ("output/test-runner/local-studio-browser/local-studio-report.json",),
+    "run-local-state-browser": (
+        "output/test-runner/run-local-state-browser/run-local-state-report.json",
+    ),
     "learning-content": (
         "output/test-runner/learning-content/lesson-identity-integrity-report.json",
         "output/test-runner/learning-content/canonical-content-ledger-report.json",
@@ -686,6 +689,17 @@ GATES: dict[str, Gate] = {
             ), timeoutSeconds=1200),
         ),
     ),
+    "run-local-state-browser": Gate(
+        tier="surface",
+        description="Web·Local 공용 노트북의 320px 최소 폭과 실행 중·성공·오류, Local-required 자동화 상태를 독립 브라우저 report로 확인한다.",
+        commands=(
+            command(("npm", "run", "build"), cwd="editor"),
+            command((
+                "uv", "run", "--with", "playwright", "python", "-X", "utf8",
+                "tests/surface/verifyRunLocalStatePlaywright.py",
+            ), timeoutSeconds=600),
+        ),
+    ),
     "learning-card-contract": Gate(
         tier="surface",
         description="structured learning section card marker와 editor build를 확인한다.",
@@ -770,6 +784,7 @@ PRODUCT_QUALITY_GATES = (
     "web-learning",
     "landing-public",
     "local-studio-browser",
+    "run-local-state-browser",
     "product-experience-browser",
     "astryx-journey",
     "frontend-performance-budget",
@@ -799,6 +814,7 @@ PRODUCT_RELEASE_GATES = (
     "product-experience-browser",
     "astryx-journey",
     "local-studio-browser",
+    "run-local-state-browser",
     "learning-evidence-contract",
     "learning-efficacy-report",
     "automation-ide-audit",
@@ -1657,8 +1673,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 57:
-        failures.append(f"expected 57 gates, found {len(GATES)}")
+    if len(GATES) != 58:
+        failures.append(f"expected 58 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

@@ -220,6 +220,10 @@ jobs:
         timeout-minutes: 30
         run: uv run python -X utf8 tests/run.py gate local-studio-browser
 
+      - name: Verify Run and Local states
+        timeout-minutes: 15
+        run: uv run python -X utf8 tests/run.py gate run-local-state-browser
+
       - name: Verify full product experience
         timeout-minutes: 30
         run: uv run python -X utf8 tests/run.py gate product-experience-browser

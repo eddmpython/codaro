@@ -763,6 +763,99 @@ def releaseLocalKernelSessions(page: Any, case: dict[str, Any], localPort: int) 
                     )
 
 
+def verifyNotebookExecutionStates(
+    page: Any,
+    case: dict[str, Any],
+    colorScheme: str,
+) -> dict[str, Any]:
+    editors = page.locator("[data-notebook-input='code'] .cm-content")
+    if editors.count() < 1:
+        raise AssertionError("notebook execution state check needs a code editor")
+    editor = editors.last
+    targetCell = page.locator("[data-notebook-cell]").last
+    targetCellHandle = targetCell.element_handle()
+    if targetCellHandle is None:
+        raise AssertionError("notebook execution state target cell is missing")
+    successMarker = f"{case['name']} success"
+    errorMarker = f"{case['name']} error"
+    stateScreenshots: dict[str, str] = {}
+
+    def captureState(state: str) -> None:
+        screenshotPath = SCREENSHOT_ROOT / colorScheme / f"{case['name']}-{state}.png"
+        screenshotPath.parent.mkdir(parents=True, exist_ok=True)
+        page.screenshot(path=str(screenshotPath), full_page=False)
+        stateScreenshots[state] = str(screenshotPath.relative_to(ROOT)).replace("\\", "/")
+
+    editor.fill(
+        "import time\n"
+        "time.sleep(1.0)\n"
+        f"print({successMarker!r})",
+        timeout=20_000,
+    )
+    editor.press("Control+Enter", timeout=20_000)
+    page.wait_for_selector(
+        "[data-notebook-cell-status='running']",
+        state="attached",
+        timeout=20_000,
+    )
+    page.wait_for_selector(".notebookStatusItem", state="visible", timeout=20_000)
+    captureState("running")
+    page.wait_for_function(
+        """
+        ({ element, marker }) => {
+          const status = element.getAttribute('data-notebook-cell-status');
+          const output = element.querySelector('.notebookCellOutput');
+          return ['success', 'done'].includes(status)
+            && output
+            && output.innerText.includes(marker);
+        }
+        """,
+        arg={"element": targetCellHandle, "marker": successMarker},
+        timeout=120_000,
+    )
+    page.wait_for_selector(".notebookStatusItem", state="hidden", timeout=20_000)
+    captureState("success")
+
+    editor.fill(
+        "import time\n"
+        "time.sleep(1.0)\n"
+        f"raise RuntimeError({errorMarker!r})",
+        timeout=20_000,
+    )
+    editor.press("Control+Enter", timeout=20_000)
+    page.wait_for_selector(
+        "[data-notebook-cell-status='running']",
+        state="attached",
+        timeout=20_000,
+    )
+    page.wait_for_selector(".notebookStatusItem", state="visible", timeout=20_000)
+    page.wait_for_function(
+        """
+        ({ element, marker }) => {
+          const output = element.querySelector('.notebookCellOutput');
+          return element.getAttribute('data-notebook-cell-status') === 'error'
+            && output
+            && output.innerText.includes(marker);
+        }
+        """,
+        arg={"element": targetCellHandle, "marker": errorMarker},
+        timeout=120_000,
+    )
+    page.wait_for_selector(".notebookStatusItem", state="hidden", timeout=20_000)
+    captureState("error")
+
+    finalStatus = targetCell.get_attribute("data-notebook-cell-status")
+    if finalStatus != "error":
+        raise AssertionError(f"notebook error state did not settle: {finalStatus}")
+    return {
+        "errorMarker": errorMarker,
+        "finalStatus": finalStatus,
+        "screenshots": stateScreenshots,
+        "statusSequence": ["running", "success", "running", "error"],
+        "successMarker": successMarker,
+    }
+
+
 def installChromium() -> tuple[bool, str]:
     try:
         result = subprocess.run(
@@ -1568,6 +1661,28 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "expectedMobileSurface": "automation",
         },
         {
+            "name": "web-automation-compact",
+            "url": f"http://127.0.0.1:{webPort}/?surface=automation#automation",
+            "viewport": {"width": 320, "height": 720},
+            "surface": "web-automation",
+            "expectedTier": "web",
+            "waitFor": "[data-product-surface-view='automation']",
+            "expectLocalRequiredTemplates": True,
+            "expectMobileProductNav": True,
+            "expectedMobileSurface": "automation",
+        },
+        {
+            "name": "web-run-compact",
+            "url": f"http://127.0.0.1:{webPort}/?surface=editor#editor",
+            "viewport": {"width": 320, "height": 720},
+            "surface": "web-run",
+            "expectedTier": "web",
+            "waitFor": "[data-notebook-input='code']",
+            "expectMinimalNotebook": True,
+            "expectMobileProductNav": True,
+            "expectedMobileSurface": "editor",
+        },
+        {
             "name": "web-run-mobile",
             "url": f"http://127.0.0.1:{webPort}/?surface=editor#editor",
             "viewport": {"width": 390, "height": 844},
@@ -1586,6 +1701,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "expectedTier": "web",
             "waitFor": "[data-notebook-input='code']",
             "expectMinimalNotebook": True,
+            "verifyNotebookExecutionStates": True,
             "verifyNotebookRunAdvance": True,
         },
         {
@@ -1626,6 +1742,8 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "surface": "local-run",
             "expectedTier": "local",
             "waitFor": "[data-notebook-input='code']",
+            "expectMinimalNotebook": True,
+            "verifyNotebookExecutionStates": True,
         },
         {
             "name": "local-home-minimum",
@@ -1655,6 +1773,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "surface": "local-automation",
             "expectedTier": "local",
             "waitFor": "[data-automation-loop='second-loop']",
+            "expectAvailableLocalTemplates": True,
             "verifyAutomationOperations": True,
         },
         {
@@ -1859,6 +1978,12 @@ async ({ surface, expectedTier }) => {
     : null;
   const rail = document.querySelector("[data-runtime-tier]");
   const routeRuntime = document.querySelector("[data-run-route-runtime]");
+  const localRequiredTemplates = [...document.querySelectorAll(
+    '[data-runtime-requirement="local"][data-runtime-availability="local-required"]'
+  )];
+  const availableLocalTemplates = [...document.querySelectorAll(
+    '[data-runtime-requirement="local"][data-runtime-availability="available"]'
+  )];
   const notebookDocument = document.querySelector(".notebookDocument");
   const notebookDocumentRect = notebookDocument?.getBoundingClientRect();
   const notebookDocumentStyle = notebookDocument ? getComputedStyle(notebookDocument) : null;
@@ -2033,6 +2158,12 @@ async ({ surface, expectedTier }) => {
     automationRunCommandCount: document.querySelectorAll("[data-automation-run-command='true']").length,
     automationStdoutCount: document.querySelectorAll("[data-automation-run-stream='stdout']").length,
     automationStderrCount: document.querySelectorAll("[data-automation-run-stream='stderr']").length,
+    localRequiredTemplateCount: localRequiredTemplates.length,
+    localRequiredTemplateLabels: localRequiredTemplates.map(
+      (template) => template.querySelector('[data-runtime-requirement-label="local"]')
+        ?.textContent?.replace(/\\s+/g, " ").trim() || ""
+    ),
+    availableLocalTemplateCount: availableLocalTemplates.length,
     localHomeSurfaceCount: document.querySelectorAll("[data-local-home-surface='true']").length,
     localHomeRuntimeOnlineCount: document.querySelectorAll("[data-local-runtime-state='online']").length,
     localHomeResumeCount: document.querySelectorAll("[data-local-home-resume='true']").length,
@@ -2145,6 +2276,24 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
     expectedTier = case.get("expectedTier")
     if expectedTier and audit["runtimeTier"] != expectedTier:
         failures.append(f"{name}: expected runtime tier {expectedTier}, got {audit['runtimeTier']}")
+    if case.get("expectLocalRequiredTemplates"):
+        if audit["localRequiredTemplateCount"] != 3:
+            failures.append(
+                f"{name}: expected 3 Local-required templates, "
+                f"got {audit['localRequiredTemplateCount']}"
+            )
+        if audit["localRequiredTemplateLabels"] != ["Local 필요"] * 3:
+            failures.append(
+                f"{name}: Local-required labels are unclear: "
+                f"{audit['localRequiredTemplateLabels']}"
+            )
+    if case.get("expectAvailableLocalTemplates"):
+        if audit["localRequiredTemplateCount"] or audit["availableLocalTemplateCount"] != 3:
+            failures.append(
+                f"{name}: Local-connected template availability drifted: "
+                f"required={audit['localRequiredTemplateCount']}, "
+                f"available={audit['availableLocalTemplateCount']}"
+            )
 
     surface = case["surface"]
     if surface == "landing-home":
@@ -2449,6 +2598,15 @@ def runBrowserMatrix(
                         "landing-learn-desktop",
                         "landing-public-lesson-desktop",
                     }
+                elif selectedCase == "run-local-state":
+                    selectedNames = {
+                        "web-automation-compact",
+                        "web-run-compact",
+                        "web-run-desktop",
+                        "local-run-minimum",
+                        "local-home-minimum",
+                        "local-automation-minimum",
+                    }
                 elif selectedCase == "local-studio":
                     selectedNames = {"web-lesson-mobile"}
                     selectedNames.update(
@@ -2496,6 +2654,7 @@ def runBrowserMatrix(
                 page = context.new_page()
                 webArtifactEvidence: dict[str, Any] | None = None
                 notebookRunAdvanceVerified = False
+                notebookStateEvidence: dict[str, Any] | None = None
                 localCheckTransport = {"aborted": 0, "expectedConsoleErrors": 0, "requests": 0}
                 consoleErrors: list[dict[str, str]] = []
                 assetFailures: list[str] = []
@@ -3652,17 +3811,6 @@ def runBrowserMatrix(
                         page.screenshot(path=str(supportScreenshotPath), full_page=False)
                         page.keyboard.press("Escape")
                         page.wait_for_selector('[data-support-dialog="codaro"]', state="detached", timeout=5_000)
-                        beforeTheme = page.locator("html").get_attribute("data-theme")
-                        themeButton = page.get_by_role(
-                            "button",
-                            name="라이트 모드로" if beforeTheme == "dark" else "다크 모드로",
-                        )
-                        themeButton.click()
-                        page.wait_for_function(
-                            "(previous) => document.documentElement.dataset.theme !== previous",
-                            arg=beforeTheme,
-                            timeout=5_000,
-                        )
                         firstNotebookEditor = page.locator(
                             "[data-notebook-input='code'] .cm-content"
                         ).first
@@ -3701,6 +3849,24 @@ def runBrowserMatrix(
                             timeout=120_000,
                         )
                         notebookRunAdvanceVerified = True
+                    if case.get("verifyNotebookExecutionStates"):
+                        notebookStateEvidence = verifyNotebookExecutionStates(
+                            page,
+                            case,
+                            colorScheme,
+                        )
+                    if case.get("verifyNotebookRunAdvance"):
+                        beforeTheme = page.locator("html").get_attribute("data-theme")
+                        themeButton = page.get_by_role(
+                            "button",
+                            name="라이트 모드로" if beforeTheme == "dark" else "다크 모드로",
+                        )
+                        themeButton.click()
+                        page.wait_for_function(
+                            "(previous) => document.documentElement.dataset.theme !== previous",
+                            arg=beforeTheme,
+                            timeout=5_000,
+                        )
                     page.wait_for_timeout(100)
                     consoleErrorSnapshot = list(consoleErrors)
                     httpFailureSnapshot = list(httpFailures)
@@ -3723,6 +3889,7 @@ def runBrowserMatrix(
                             "assetFailures": assetFailureSnapshot,
                             "webArtifactEvidence": webArtifactEvidence,
                             "notebookRunAdvanceVerified": notebookRunAdvanceVerified,
+                            "notebookStateEvidence": notebookStateEvidence,
                             "failures": caseFailures,
                             "screenshot": str(screenshotPath.relative_to(ROOT)).replace("\\", "/"),
                         }

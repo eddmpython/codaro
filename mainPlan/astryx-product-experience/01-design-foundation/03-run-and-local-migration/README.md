@@ -11,7 +11,10 @@
 - chat, notebook, curriculum, automation, terminal 대표 surface
 - Web browser runtime과 Local Python/PTY/automation capability 상태
 - `studioDense`와 `learningComfortable`의 실제 적용
-- Local-required, runtime boot, package loading, running, error, success 상태
+- Local-required, 실행 준비, running, error, success 상태
+- Web 320px와 Local launcher 최소 900×640의 overflow·control overlap
+
+실제 WebView2, Firefox, WebKit, forced-colors, keyboard-only, screen reader 전수 판정은 [04 visual/accessibility gates](../04-visual-accessibility-gates/)가 소유한다. 이 packet은 그 범위를 중복 완료 조건으로 두지 않는다.
 
 ## 구현 순서
 
@@ -36,7 +39,8 @@
 - `editor-build`
 - `design-system-contract`
 - `learning-card-contract`, `learning-card-browser`, `learning-system-readiness` 14/14
-- 신규 Run/Local visual state matrix와 320px overflow gate
+- `run-local-state-browser`: Web 320×720, Web 1440×900, Local 900×640의 6-case 독립 matrix
+- `product-experience-browser`: 전체 대표 surface 회귀와 공용 shell 계약
 - runtime preflight, browser Python, terminal/local capability contract
 
 ## 롤백
@@ -45,6 +49,10 @@ surface별로 migration한다. 공용 provider와 token generator는 유지한�
 
 ## 평가
 
-공용 runtime 연결과 Web/Local 자동 판별 capability rail을 notebook과 automation에 구현했다. Web Run은 실제 브라우저 Python 셀 실행, `/home/web/codaro` 실행 기록, Python `open()` 공유를 확인했고, Local Studio는 실제 loopback API 연결에서 시스템 Python·프로젝트 파일·터미널 capability 전환을 확인했다. 390px notebook/automation은 가로 overflow 0, desktop assistant 숨김, 상단 control 겹침 0을 확인했다. 자동화는 nested Card를 제거하고 local-required template을 자동 표시한다.
+Web Run과 Local Studio는 같은 Editor bundle, Notebook 컴포넌트 트리, Astryx token과 공용 우상단 SNS·테마 control을 쓴다. 노트북에는 capability rail을 상시 표시하지 않는다. 빈 셀과 파일명, 셀 추가, 전체 실행만 남기고 정상 runtime·저장 완료 상태는 숨긴다. 실행 중·오류처럼 사용자가 알아야 하는 상태와 셀 아래 출력만 점진적으로 표시한다.
 
-남은 조건은 같은 Git head에서 Web/Local 전체 state matrix, 320px 최소 폭, keyboard/screen-reader, runtime loading/error/success/localRequired, landing-to-local 여정과 독립 browser gate를 artifact로 봉인하는 것이다. 현재 수동 캡처와 하위 gate 통과만으로는 release 증거가 아니므로 상태는 계속 `진행`이며 `_done`으로 이동하지 않는다.
+`run-local-state-browser`는 같은 Editor build에서 Web 자동화·Run 320×720, Web Run 1440×900, Local Run·Home·자동화 900×640을 연다. Web과 Local의 실제 Python 셀을 `running → success → running → error`로 전이하고 상태별 screenshot을 남긴다. Web 자동화에는 `Local 필요` 3건, Local 연결 뒤에는 가용 3건을 요구한다. 여섯 화면 모두 공용 SNS ID `github`, `support`, `youtube`, `threads`, 상단 lane, 이름 없는 버튼 0, overlap 0, 가로 overflow 0을 검사한다.
+
+Web Run은 브라우저 Python과 가상 파일 시스템을 사용하고, Local Studio는 실제 loopback API의 시스템 Python·프로젝트 파일·터미널 capability를 사용한다. 두 환경의 capability 차이는 자동화 표면과 필요한 안내에서만 드러내며 기본 노트북을 상태판으로 만들지 않는다.
+
+이 packet의 종료 조건은 clean 구현 commit과 동일한 `gitHead`를 기록한 `run-local-state-browser`, 전체 `product-experience-browser`, 관련 정적·runtime 회귀와 completion evidence다. 실제 설치된 Local WebView2의 긴 문서 왕복은 Notebook Workbench, 키보드·screen reader·다중 browser 전수 판정은 04가 계속 차단한다. 이들은 제품 전체의 잔여 위험이지만 이 packet의 중복 선행 조건은 아니다.

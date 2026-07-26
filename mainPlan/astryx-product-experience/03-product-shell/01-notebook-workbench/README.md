@@ -37,12 +37,14 @@
 - mobile 44px 실행 control과 desktop 우측 하단 실행 영역을 적용했다.
 - 노트북과 현재 학습 실행 셀은 `workCell.css`의 frame, output, action primitive를 함께 사용한다.
 - Web Run과 Local은 `apiOnline`으로 실행·저장 capability만 나누고 같은 Notebook 컴포넌트 트리와 CSS를 사용한다.
-- Chromium 149.0.7827.55에서 Web Run desktop 1440×900, mobile 390×844의 Dark·Light 네 case와 Local Run 900×640 Dark case가 통과했다.
-- Web desktop·mobile 감사에서 빈 code input 1개, 기본 노출 cell toolbar 0개, 기본 노출 runtime·persistence status 0개, overlap 0개, horizontal overflow 0px를 확인했다.
+- Chromium 149.0.7827.55에서 Web Run desktop 1440×900, mobile 320×720·390×844의 Dark 대표 case와 390×844 Light case, Local Run 900×640 Dark case가 통과했다.
+- Web desktop·mobile 감사에서 빈 code input 1개, 기본 노출 runtime·persistence status 0개, overlap 0개, horizontal overflow 0px를 확인했다. 320px에서는 문맥형 cell action과 48px mobile product navigation target을 유지한다.
 - Web desktop에서 빈 첫 셀에 코드를 입력하고 `Shift+Enter`를 누른 뒤 출력 생성, 두 번째 빈 code cell 생성, 두 번째 editor 선택과 DOM focus를 확인했다.
 - Local Run은 같은 Notebook 컴포넌트와 CSS로 렌더링됐고 Local kernel session 생성·종료와 runtime tier `local`을 확인했다.
+- Web desktop과 Local minimum에서 실제 Python 셀을 `running → success → running → error`로 전이하고, 정상 상태는 다시 숨기며 성공·오류 결과가 해당 셀 아래에 표시되는지 확인했다.
+- Run·Local·자동화 6-case 모두 공용 우상단 SNS `github`, `support`, `youtube`, `threads`와 같은 theme runtime을 사용한다. Web 자동화의 Local 전용 template은 `Local 필요`, Local 연결 뒤 같은 template은 가용 상태다.
 - 시각 증거는 `output/test-runner/product-experience-browser/screenshots/{dark,light}/web-run-{desktop,mobile}.png`, Local 증거는 `output/test-runner/product-experience-browser/screenshots/dark/local-run-minimum.png`에 남겼다.
-- 기계 판정은 `output/test-runner/notebook-redesign/`의 Web Dark·Light와 Local report에 남겼다.
+- 기계 판정은 `output/test-runner/notebook-redesign/`의 Web Dark·Light와 Local report, `output/test-runner/run-local-state-browser/run-local-state-report.json`에 남겼다.
 
 ## 남은 조건
 
@@ -79,6 +81,7 @@
 - `uv run python -X utf8 -m pytest tests/surface/testNotebookPersistence.py tests/runtime/testServerApi.py tests/document/testDocumentAtomicSave.py`: 브라우저 저장 fail-closed, keepalive byte 한도, Local unique path·revision·Jupyter 원본 보호·원자 저장 실패 보존
 - `uv run python -X utf8 tests/product/verifyAstryxJourneyAudit.py`: `web-run-mobile`, `web-run-desktop`, `local-run-minimum` 대표 case
 - `uv run python -X utf8 tests/run.py gate mobile-layout`: 44px mobile 실행 control과 responsive layout 계약
+- `uv run python -X utf8 tests/run.py gate run-local-state-browser`: Web 320px와 Local 900×640, 실제 실행 상태 전이, 공용 SNS·테마, Local-required 상태
 - `uv run python -X utf8 tests/run.py gate product-experience-browser`: Notebook 실행과 출력, overlap, horizontal overflow 감사
 - 실제 긴 문서의 keyboard 순서와 screen reader reading order는 별도 사람 검수로 남긴다.
 
@@ -98,6 +101,6 @@
 ### PM 관점
 
 - `/run/` 첫 진입에서 불필요한 badge와 sample code 없이 편집 가능한 빈 셀이 바로 보이고, 실행 결과는 별도 확인 command 없이 cell 아래에 나타난다.
-- 공개 Web과 Local 설치본의 같은-document round trip 증거가 남아 있어 상태는 `진행`이다.
+- 공용 source와 loopback Local 상태의 동일 컴포넌트·실행 전이는 기계 검증됐다. 그러나 배포된 공개 Web에서 실제 설치된 Local WebView2로 같은 문서를 넘기고 다시 여는 round trip 증거가 남아 있어 상태는 `진행`이다.
 
 완료 전에는 `_done`으로 이동하지 않는다.

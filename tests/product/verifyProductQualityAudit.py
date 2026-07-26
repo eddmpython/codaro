@@ -45,6 +45,7 @@ PRODUCT_QUALITY_GATES = (
     "web-learning",
     "landing-public",
     "local-studio-browser",
+    "run-local-state-browser",
     "product-experience-browser",
     "astryx-journey",
     "frontend-performance-budget",
