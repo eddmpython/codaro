@@ -33,7 +33,7 @@ whenToUse: 새 UI 컴포넌트 추가, 색/반지름/그림자 변경, 랜딩/�
 - Codaro 이름, 아바타, 마스코트, 로고, pose sheet, 브랜드 자산은 `TRADEMARKS.md` 기준으로 전권 보유한다.
 - 교육 콘텐츠 라이선스는 브랜드 자산 재사용 권한을 주지 않는다.
 - 제품 favicon/avatar source는 `editor/public/brand/`다.
-- 제품 색상/반지름/테두리 source of truth는 `editor/src/index.css`의 shadcn token layer다.
+- 제품 색상/반지름/테두리 source of truth는 `assets/brand/designSystem/tokens.json`이다. `editor/src/index.css`의 shadcn token layer는 생성된 Astryx semantic token을 연결하는 호환 bridge다.
 - GitHub Pages 문서 표면은 `landing/`의 React + Vite 정적 사이트로 운영한다.
   - 문서와 글쓰기는 `docs/` 기준의 같은 React 표면에서 운영한다.
 
@@ -45,9 +45,14 @@ whenToUse: 새 UI 컴포넌트 추가, 색/반지름/그림자 변경, 랜딩/�
 - 목표 공용 source는 `assets/brand/designSystem/tokens.json`이며 landing과 editor는 생성된 mirror를 사용한다. 한 제품 표면이 다른 표면의 내부 CSS나 컴포넌트를 직접 import하지 않는다.
 - landing, Learn, Web Run, Local은 Astryx Theme와 같은 semantic token을 사용한다. Web Run과 Local은 같은 editor component tree를 쓰고 capability만 분리한다.
 - 두 앱의 root provider는 `data-astryx-theme="codaro"` 경계를 소유한다. generated density/accent override는 이 경계 안의 `:scope[data-density]`, `:scope[data-accent]`에서 현재 root에도 적용되어야 한다.
-- landing은 Astryx `Button`, `Badge`, typography component를 렌더링하므로 `@astryxdesign/core/astryx.css`를 불러온다. editor는 현재 Astryx Theme와 semantic token만 소비하므로 전체 component stylesheet를 불러오지 않는다. editor가 Astryx component를 실제 도입할 때만 필요한 component CSS를 성능 예산과 함께 다시 검토한다.
+- landing은 Astryx `Button`, `Badge`, typography, `IconButton` component를 렌더링하므로 전체 `@astryxdesign/core/astryx.css`를 Theme와 neutral theme 사이에 불러온다. editor도 공용 SNS rail에서 Astryx `IconButton`을 실제 렌더링하지만 전체 component CSS는 불러오지 않는다. SNS에 필요한 28px ghost-button 시각 계약은 공용 생성 CSS로 제한해 editor 성능 예산을 지킨다.
 - Astryx brand accent는 `--color-accent`다. shadcn/Tailwind의 subdued hover surface는 `--color-accent-surface`를 쓰며 `--color-accent: var(--accent)`로 brand token을 덮어쓰지 않는다.
-- compact editor에서는 파일명과 실행 action이 먼저다. 외부 링크, 진단 복사, desktop assistant toggle은 `xl` 미만에서 숨겨 상단 control이 겹치지 않게 한다.
+- compact editor에서는 파일명과 실행 action이 먼저다. 진단 복사와 desktop assistant toggle은 `xl` 미만에서 숨기지만 공용 SNS rail은 320px 이상 모든 표면의 우상단에 유지한다.
+- SNS와 외부 링크의 SSOT는 `assets/brand/designSystem/socialLinks.json`이다.
+  - 링크 순서, 사용자-facing label, URL, SVG path는 이 registry만 수정한다.
+  - `assets/brand/tools/buildDesignSystem.py`가 landing과 editor의 `styles/generated/socialLinks.tsx`를 동일 byte로 생성한다.
+  - landing과 editor는 각 app bundle 안에서 생성된 같은 Astryx `IconButton` component를 사용한다. 한 제품 표면의 내부 component를 다른 표면에서 직접 import하지 않는다.
+  - 공개 Header와 Footer, Web Run과 Local의 공용 top control lane, 독립 모바일 채팅 Header에서 `data-social-links="codaro"` 계약을 항상 렌더링한다.
 - 제품 section을 떠 있는 card로 만들거나 card 안에 card를 넣지 않는다. card는 반복 항목, modal, 실제 도구 frame에만 사용한다.
 - 실제 제품 screenshot과 학습 결과 이미지를 mascot보다 우선하는 product proof로 사용한다. fake terminal, fake editor, emoji primary icon을 새로 만들지 않는다.
 - 예측 카드는 학습 경험에 다시 도입하지 않는다. 학습 흐름은 설명, 직접 수정, 실행, 오류 수정, 강한 검증, 실무 변주다.

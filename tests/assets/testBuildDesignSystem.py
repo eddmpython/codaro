@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 GENERATOR_PATH = ROOT / "assets" / "brand" / "tools" / "buildDesignSystem.py"
 TOKEN_PATH = ROOT / "assets" / "brand" / "designSystem" / "tokens.json"
 FONT_MANIFEST_PATH = ROOT / "assets" / "brand" / "designSystem" / "fontManifest.json"
+SOCIAL_LINKS_PATH = ROOT / "assets" / "brand" / "designSystem" / "socialLinks.json"
 
 
 def loadGenerator():
@@ -29,10 +30,30 @@ class BuildDesignSystemTest(unittest.TestCase):
     def setUp(self) -> None:
         self.tokens = json.loads(TOKEN_PATH.read_text(encoding="utf-8"))
         self.fontManifest = json.loads(FONT_MANIFEST_PATH.read_text(encoding="utf-8"))
+        self.socialLinks = json.loads(SOCIAL_LINKS_PATH.read_text(encoding="utf-8"))
 
     def testCurrentSourcesValidate(self) -> None:
         GENERATOR.validateTokenDocument(self.tokens)
         GENERATOR.validateFontManifest(self.fontManifest)
+        GENERATOR.validateSocialLinks(self.socialLinks)
+
+    def testSocialLinksKeepOneOrderedSharedRegistry(self) -> None:
+        source = GENERATOR.renderSocialLinks(self.socialLinks)
+        self.assertEqual(
+            [link["id"] for link in self.socialLinks["links"]],
+            ["github", "youtube", "threads", "support"],
+        )
+        self.assertIn("socialLinksSourceHash", source)
+        self.assertIn("https://github.com/eddmpython/codaro", source)
+        self.assertIn("https://www.youtube.com/@eddmpython", source)
+        self.assertIn("https://www.threads.net/@eddmpython", source)
+        self.assertIn("https://buymeacoffee.com/eddmpython", source)
+
+    def testSocialLinksRejectUnapprovedOrder(self) -> None:
+        invalid = deepcopy(self.socialLinks)
+        invalid["links"].reverse()
+        with self.assertRaisesRegex(GENERATOR.DesignSystemError, "approved shared order"):
+            GENERATOR.validateSocialLinks(invalid)
 
     def testRadiusCeilingRejectsOversizedContainer(self) -> None:
         invalid = deepcopy(self.tokens)
@@ -45,7 +66,7 @@ class BuildDesignSystemTest(unittest.TestCase):
         self.assertIn('type DensityMode = "public" | "learningComfortable" | "studioDense"', runtimeTypes)
         self.assertIn('type AccentId = "plum" | "blue" | "teal"', runtimeTypes)
         self.assertIn('surface === "curriculum" || surface === "lesson"', runtimeTypes)
-        self.assertIn('accentSwatches = {"plum":"#6d2857","blue":"#1559aa","teal":"#08786a"}', runtimeTypes)
+        self.assertIn('accentSwatches = {"plum":"#4f46c8","blue":"#1559aa","teal":"#08786a"}', runtimeTypes)
         self.assertIn('themeCanvasColors = {"light":"#f5f6f8","dark":"#151619"}', runtimeTypes)
         self.assertIn('themeSurfaceColors = {"light":"#ffffff","dark":"#222327"}', runtimeTypes)
         self.assertIn('themeInkColors = {"light":"#18191d","dark":"#f5f6f8"}', runtimeTypes)

@@ -33,6 +33,8 @@ Codaro에서 기준 파일은 아래 순서로 본다. 같은 의미의 규칙�
 | 표면 조립 | `editor/src/components/app/mainSurface.tsx` | surface별 화면 조립 |
 | 제품 사이드바 shell | `editor/src/components/app/productSidebar.tsx` | provider/theme/locale/search/utility와 표면별 sidebar tree를 조립하는 shell |
 | 제품 flow nav | `editor/src/components/app/productFlowNav.tsx` | `PRODUCT_SIDEBAR_FLOW_ITEMS`를 렌더링하는 `현재 학습 → 노트북 → 자동화 → 대화` flow nav |
+| Astryx 제품 토큰 | `assets/brand/designSystem/tokens.json`, `assets/brand/tools/buildDesignSystem.py` | landing과 editor가 공유하는 색상, 반지름, typography, density, accent와 생성 mirror 기준 |
+| 공용 SNS rail | `assets/brand/designSystem/socialLinks.json`, `assets/brand/tools/buildDesignSystem.py`, 양쪽 `src/styles/generated/socialLinks.tsx` | 링크 순서·라벨·URL·SVG path와 동일 byte Astryx `IconButton` component의 SSOT |
 | 채팅 시작 예시 | `editor/src/lib/chatStartExamples.ts` | 빈 채팅 화면의 시작 prompt 순서와 dogfood-first 학습→검증→자동화 흐름 |
 | 학습 sidebar tree | `editor/src/components/app/curriculumSidebarTree.tsx` | Codaro 커리큘럼, 나만의 커리큘럼, lesson tree, 삭제 dialog |
 | 자동화 sidebar tree | `editor/src/components/app/automationSidebarTree.tsx` | 자동화 표면 내부의 Codaro/나만의 자동화/task 하위 탐색 |
