@@ -10,7 +10,7 @@ Local이 Web evidence를 가져오기만 하는 소비자가 아니라 같은 st
 
 Python 자식 프로세스 한 경로만으로 W0 Local 동등성을 주장하지 않는다. Windows AppContainer check broker 또는 동등한 OS 격리 경계와 경합 없는 cold `schedule` 준비가 남아 있다. full learning archive v2는 document, drafts, 전체 virtual FS와 package bytes, evidence, lineage, disabled automation draft를 SHA-256 blob으로 내보내고 Local atomic import 실패 시 이전 `HEAD`를 복원한다. 아직 실제 설치본 Web-to-Local-to-Web round trip과 capstone automation dry-run·audit의 독립 검수가 없다.
 
-이 조건과 Web-to-Local-to-Web round trip, conflict quarantine, downgrade-safe migration이 모두 통과하기 전에는 `_done`이 아니다.
+이 조건과 Web-to-Local-to-Web round trip, conflict quarantine, downgrade-safe migration이 모두 통과하기 전에는 TODO가 남아 있다.
 
 ## 영향 파일
 

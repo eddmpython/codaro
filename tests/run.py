@@ -116,9 +116,6 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
         "output/test-runner/product-browser-webview2-evergreen/webview2-product-smoke-report.json",
     ),
     "onboarding-browser": ("output/test-runner/onboarding-browser/onboarding-report.json",),
-    "completion-bootstrap": (
-        "output/test-runner/completion-bootstrap/completion-bootstrap-report.json",
-    ),
     "evaluation-contract": (
         "output/test-runner/evaluation-contract/evaluation-contract-report.json",
     ),
@@ -296,13 +293,6 @@ GATES: dict[str, Gate] = {
         commands=(command(("uv", "run", "python", "-X", "utf8", "tests/product/verifyProductQualityAudit.py")),),
         ci_required=False,
     ),
-    "completion-bootstrap": Gate(
-        tier="fast",
-        description="mainPlan 완료 schema, 전이 도구, ledger, fact audit와 negative fixture를 clean commit에서 검증한다.",
-        commands=(command((
-            "uv", "run", "python", "-X", "utf8", "tests/plan/verifyCompletionBootstrap.py",
-        )),),
-    ),
     "evaluation-contract": Gate(
         tier="fast",
         description="목표 점수 없는 평가 rubric, closed report schema, raw report·bundle negative fixture를 clean commit에서 검증한다.",
@@ -312,7 +302,7 @@ GATES: dict[str, Gate] = {
     ),
     "plan-quality": Gate(
         tier="fast",
-        description="mainPlan 사실, 완료 전이, 독립 평가 보고서 완전성을 점수 threshold 없이 검증한다.",
+        description="mainPlan TODO 정책, 현재 사실, 독립 평가 보고서 완전성을 점수 threshold 없이 검증한다.",
         commands=(
             command((
                 "uv", "run", "python", "-X", "utf8",
@@ -324,7 +314,6 @@ GATES: dict[str, Gate] = {
             )),
             command((
                 "uv", "run", "python", "-X", "utf8", "tests/product/verifyPlanFactAudit.py",
-                "--packet", "02-completion-and-gate-bootstrap",
             )),
             command((
                 "uv", "run", "python", "-X", "utf8",
@@ -332,7 +321,7 @@ GATES: dict[str, Gate] = {
             )),
             command((
                 "uv", "run", "python", "-X", "utf8", "-m", "pytest",
-                "tests/plan/testMainPlanCompletion.py", "tests/product/testPrdEvaluationBundle.py",
+                "tests/plan/testMainPlanTodoPolicy.py", "tests/product/testPrdEvaluationBundle.py",
                 "tests/product/testPrdEvaluationReport.py",
                 "-q", "--tb=short",
             )),
@@ -1713,8 +1702,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 61:
-        failures.append(f"expected 61 gates, found {len(GATES)}")
+    if len(GATES) != 60:
+        failures.append(f"expected 60 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

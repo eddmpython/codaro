@@ -28,4 +28,4 @@ taxonomy domain `statisticalAnalysis`의 target outcome과 prerequisite closure�
 
 ## 평가
 
-ledger 모든 행의 author review와 evidence commit이 채워지고 domain strong capstone이 통과해야 내부 `_done`으로 이동한다.
+ledger 모든 행의 author review와 evidence commit이 채워지고 domain strong capstone이 통과해야 해당 TODO를 삭제한다.

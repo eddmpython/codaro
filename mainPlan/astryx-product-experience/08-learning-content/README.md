@@ -91,7 +91,7 @@ public catalog와 route generator는 472개 canonical `LessonRef`를 모두 공�
 
 ## 증분 출시선
 
-W1~W5는 이제 source 생성 순서가 아니라 사람 승인과 공개 승격 순서다. R10 전에 467레슨 assessment와 472개 public route가 이미 구현됐지만 identity review 0/472, content review 0/472, taxonomy approval 0/7, independent assessment approval 0/467이므로 어떤 후속 wave도 출시된 상태가 아니다. 기존 source는 provisional로 유지하고, wave 종료는 author review·실행 증거·사람 검수와 completion transition으로만 판정한다.
+W1~W5는 이제 source 생성 순서가 아니라 사람 승인과 공개 승격 순서다. R10 전에 467레슨 assessment와 472개 public route가 이미 구현됐지만 identity review 0/472, content review 0/472, taxonomy approval 0/7, independent assessment approval 0/467이므로 어떤 후속 wave도 출시된 상태가 아니다. 기존 source는 provisional로 유지하고, wave 종료는 author review·실행 증거·사람 검수와 TODO 삭제으로만 판정한다.
 
 | Wave | 범위 | 종료 조건 |
 | --- | --- | --- |
@@ -104,7 +104,7 @@ W1~W5는 이제 source 생성 순서가 아니라 사람 승인과 공개 승격
 | W4 | 나머지 대표 3경로 | 경로별 사람 승인과 독립 공개 |
 | W5 | remaining domain과 472 전체 | 전수 author review, strong 또는 보조 레슨 판정, domain별 렌더 fixture |
 
-`packet _done`과 `path released`를 분리한다. 실패한 path만 beta 또는 비공개로 남기고 검증된 path를 막지 않는다. 대표 경로 결과를 나머지 domain의 사용성 증거로 복사하지 않는다.
+`packet TODO 삭제`와 `path released`를 분리한다. 실패한 path만 beta 또는 비공개로 남기고 검증된 path를 막지 않는다. 대표 경로 결과를 나머지 domain의 사용성 증거로 복사하지 않는다.
 
 ## 작업 패킷
 
@@ -129,9 +129,9 @@ W1~W5는 이제 source 생성 순서가 아니라 사람 승인과 공개 승격
 
 `buildLearningLedgers.py --write`는 `planComposer` output과 source metadata를 mainPlan ledger에만 기록하고 `curricula/`를 쓰지 않는다. path ledger header와 canonical summary에 `composerVersionHash`, `taxonomySnapshotHash` 또는 baseline/target taxonomy hash, `sourceSetHash`, schema version을 남긴다. `--check`는 재계산 결과와 byte-level diff, 승인된 taxonomy transition, canonical 472 ownership, outcome 공백 0, `reinforcesOutcomeIds=outcomes∩prerequisites`, path reverse membership, path 금지 field 0, source hash를 검사하며 불일치 시 non-zero다. 콘텐츠 문장, check answer, visual은 이 도구가 생성하지 않는다.
 
-`docs/skills/ops/tools/buildLearningLedgers.py --write`와 `--check`는 현재 source에서 byte-identical ledger를 재생성·검사한다. 그러나 이 재현성은 ownership·범위와 source hash의 기계 증거일 뿐 reviewer 승인이나 completion evidence가 아니다. negative fixture, taxonomy transition 승인, packet별 content review가 함께 통과하기 전에는 W0 lesson edit, path `_done`, R10 closure evidence로 사용할 수 없다.
+`docs/skills/ops/tools/buildLearningLedgers.py --write`와 `--check`는 현재 source에서 byte-identical ledger를 재생성·검사한다. 그러나 이 재현성은 ownership·범위와 source hash의 기계 증거일 뿐 reviewer 승인이나 종료 조건 검증이 아니다. negative fixture, taxonomy transition 승인, packet별 content review가 함께 통과하기 전에는 W0 lesson edit, path TODO 삭제, R10 closure evidence로 사용할 수 없다.
 
-패킷 구현, 콘텐츠 검수, 테스트와 증거 commit이 끝나면 해당 폴더를 이 workstream의 `_done/`으로 이동한다. 8개 패킷이 모두 이동되기 전에는 `08-learning-content`를 initiative `_done/`으로 옮기지 않는다.
+패킷 구현, 콘텐츠 검수, 테스트와 증거 commit이 끝나면 해당 TODO를 삭제한다. 8개 패킷이 모두 삭제되기 전에는 `08-learning-content` TODO를 유지한다.
 
 ## 영향 파일
 

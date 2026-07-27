@@ -2,7 +2,7 @@
 
 상태: 진행
 
-2026-07-22 `fileOps/01_pathlib경로감각`, `fileOps/06_zip압축`, `watchSched/05_schedule간단스케줄`은 각각 4개씩 12개 base `behavior` CheckSpec과 총 19개 base case를 가진다. 저자 solution 12개는 Local native sandbox에서 통과했고, `weak no-error only` fixture는 strong behavior 근거가 될 수 없다고 거부된다. 세 레슨에는 서로 다른 mastery·transfer·24시간 retrieval variant 9개를 직접 저작했고 solution 9개도 Local native sandbox의 fixture·hidden case를 통과했다. Chromium Web 3-case에서 mastery 저장 뒤 transfer 자동 노출을 확인했고 pathlib는 24시간 retrieval 자동 노출·저장·제거까지 통과했다. 같은 assessment mastery 3개를 Local UI에서 다시 실행한 3-case도 `local-sandbox`, native evidence 1→2→3, artifact/package 봉인, transfer 자동 노출을 통과했다. 독립적인 사람 학습성 검수가 없으므로 `completionEligible=false`이며 이 packet은 `_done`이 아니다.
+2026-07-22 `fileOps/01_pathlib경로감각`, `fileOps/06_zip압축`, `watchSched/05_schedule간단스케줄`은 각각 4개씩 12개 base `behavior` CheckSpec과 총 19개 base case를 가진다. 저자 solution 12개는 Local native sandbox에서 통과했고, `weak no-error only` fixture는 strong behavior 근거가 될 수 없다고 거부된다. 세 레슨에는 서로 다른 mastery·transfer·24시간 retrieval variant 9개를 직접 저작했고 solution 9개도 Local native sandbox의 fixture·hidden case를 통과했다. Chromium Web 3-case에서 mastery 저장 뒤 transfer 자동 노출을 확인했고 pathlib는 24시간 retrieval 자동 노출·저장·제거까지 통과했다. 같은 assessment mastery 3개를 Local UI에서 다시 실행한 3-case도 `local-sandbox`, native evidence 1→2→3, artifact/package 봉인, transfer 자동 노출을 통과했다. 독립적인 사람 학습성 검수가 없으므로 `completionEligible=false`이며 이 packet은 TODO가 남아 있다.
 
 ## 목표
 

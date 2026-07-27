@@ -23,7 +23,14 @@ ROUND_ROOT = (
 BUNDLE_BUILDER_PATH = ROOT / "docs/skills/ops/tools/buildPrdEvaluationBundle.py"
 TOP_TIER_AUDIT_PATH = ROOT / "tests/curriculum/verifyCurriculumTopTierAudit.py"
 FACT_AUDIT_PATH = ROUND_ROOT / "fact-audit.json"
-BOOTSTRAP_FIXTURE_PATH = ROOT / "tests/product/bootstrapAfterUse.fixture.yml"
+MAIN_PLAN_ROOT = ROOT / "mainPlan"
+RETIRED_COMPLETION_PATHS = (
+    ROOT / "mainPlan/completion-evidence.schema.yml",
+    ROOT / "mainPlan/completion-transition.schema.yml",
+    ROOT / "mainPlan/completion-transition-ledger.yml",
+    ROOT / "docs/skills/ops/tools/completeMainPlanPacket.py",
+    ROOT / "tests/plan/verifyMainPlanCompletion.py",
+)
 REQUIRED_BUNDLE_PATHS = (
     "README.md",
     "mainPlan/astryx-product-experience/README.md",
@@ -102,36 +109,24 @@ def qualityGateNames(source: str) -> tuple[str, ...]:
     raise FactAuditError("PRODUCT_QUALITY_GATES is absent from tests/run.py")
 
 
-def bootstrapFixtureFacts() -> dict[str, Any]:
-    fixture = loadMapping(BOOTSTRAP_FIXTURE_PATH)
-    milestones = fixture.get("milestones")
-    artifacts = fixture.get("artifacts")
-    if not isinstance(milestones, dict) or not isinstance(artifacts, list):
-        raise FactAuditError("bootstrap negative fixture is malformed")
-    detected: list[str] = []
-    for artifact in artifacts:
-        if not isinstance(artifact, dict):
-            raise FactAuditError("bootstrap artifact must be a mapping")
-        owner = artifact.get("creationOwner")
-        consumers = artifact.get("consumers")
-        if not isinstance(owner, dict) or not isinstance(consumers, list):
-            raise FactAuditError("bootstrap artifact must define owner and consumers")
-        ownerOrder = milestones.get(owner.get("milestone"))
-        if not isinstance(ownerOrder, int):
-            raise FactAuditError("bootstrap owner milestone is unknown")
-        for consumer in consumers:
-            consumerOrder = milestones.get(consumer.get("milestone")) if isinstance(consumer, dict) else None
-            if not isinstance(consumerOrder, int):
-                raise FactAuditError("bootstrap consumer milestone is unknown")
-            if consumerOrder < ownerOrder:
-                detected.append(str(artifact.get("path")))
-    expected = fixture.get("expectedFailure")
+def mainPlanTodoPolicyFacts() -> dict[str, Any]:
+    doneDirectories = sorted(
+        path.relative_to(ROOT).as_posix()
+        for path in MAIN_PLAN_ROOT.rglob("*")
+        if path.is_dir() and path.name == "_done"
+    )
+    retiredPathsPresent = sorted(
+        path.relative_to(ROOT).as_posix()
+        for path in RETIRED_COMPLETION_PATHS
+        if path.exists()
+    )
     return {
-        "fixturePath": BOOTSTRAP_FIXTURE_PATH.relative_to(ROOT).as_posix(),
-        "expectedFailure": expected,
-        "detectedArtifactCount": len(detected),
-        "detectedArtifacts": sorted(detected),
-        "negativeFixtureRejected": bool(detected),
+        "todoOnly": not doneDirectories and not retiredPathsPresent,
+        "doneDirectoryCount": len(doneDirectories),
+        "doneDirectories": doneDirectories,
+        "retiredCompletionPathCount": len(retiredPathsPresent),
+        "retiredCompletionPaths": retiredPathsPresent,
+        "policyTestPresent": (ROOT / "tests/plan/testMainPlanTodoPolicy.py").is_file(),
     }
 
 
@@ -239,9 +234,9 @@ def buildPrdRoundFactAudit() -> dict[str, Any]:
     if symbols["requiredMissing"]:
         raise FactAuditError("required current symbols are absent: " + ", ".join(symbols["requiredMissing"]))
     learning = learningCoverageFacts()
-    bootstrap = bootstrapFixtureFacts()
-    if not bootstrap["negativeFixtureRejected"]:
-        raise FactAuditError("bootstrap negative fixture unexpectedly passed")
+    todoPolicy = mainPlanTodoPolicyFacts()
+    if not todoPolicy["todoOnly"] or not todoPolicy["policyTestPresent"]:
+        raise FactAuditError("mainPlan TODO-only policy is not satisfied")
     scope = actualManifest["scope"]
     archive = actualManifest["archive"]
     productGaps = [
@@ -284,7 +279,7 @@ def buildPrdRoundFactAudit() -> dict[str, Any]:
                 "planQualityRegistered": planQualityRegistered,
             },
             "learningCoverage": learning,
-            "dependencyBootstrap": bootstrap,
+            "mainPlanTodoPolicy": todoPolicy,
         },
         "productGaps": productGaps,
     }

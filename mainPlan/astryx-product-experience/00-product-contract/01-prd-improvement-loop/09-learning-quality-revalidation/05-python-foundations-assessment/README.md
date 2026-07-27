@@ -12,7 +12,7 @@ Day 1은 출력 mastery, 새로운 보고 상태 전이, 24시간 출력 검색�
 
 Day 2·11·15·19·20·22·27·30 대표 progression, Seaborn semantic artifact capstone과 pathlib·zip·schedule base·assessment Web·Local 흐름, canonical lesson binding, retrieval fixture와 Day 19 archive artifact transfer를 포함한 공식 63-case Chromium 행렬은 63/63으로 통과했다. 이 통합 green은 사람 대상 학습성이나 모든 Day의 개별 브라우저 증거를 대신하지 않는다.
 
-현재 전체 machine audit는 strong 467/472, strong spec 1,413, weak-only 0, mastery/transfer/retrieval 각각 467/472다. Python Foundations 100레슨에는 세 단계 assessment source가 저작됐지만 대표 browser progression과 전체 source coverage는 동일한 증거가 아니다. independent assessment 승인 0/467, 사람 학습성 검수와 독립 R10 조건이 남아 있으므로 이 패킷은 `_done`이 아니다. 다음 범위는 사람 검수와 독립 평가다.
+현재 전체 machine audit는 strong 467/472, strong spec 1,413, weak-only 0, mastery/transfer/retrieval 각각 467/472다. Python Foundations 100레슨에는 세 단계 assessment source가 저작됐지만 대표 browser progression과 전체 source coverage는 동일한 증거가 아니다. independent assessment 승인 0/467, 사람 학습성 검수와 독립 R10 조건이 남아 있으므로 이 패킷은 TODO가 남아 있다. 다음 범위는 사람 검수와 독립 평가다.
 
 ## 영향 파일
 
@@ -56,4 +56,4 @@ fixture hash, check ID, solution 실행 결과, TypeScript/Python materializer�
 
 ## 완료 처리
 
-Day 1~30의 세 평가 단계 source, solution 실행 검산과 최신 63/63 브라우저 표본은 확보됐다. independent assessment 승인, 사람 학습성 검수, 독립 R10과 실제 Local WebView2 artifact parity가 현재 범위를 승인할 때만 `_done`으로 이동한다.
+Day 1~30의 세 평가 단계 source, solution 실행 검산과 최신 63/63 브라우저 표본은 확보됐다. independent assessment 승인, 사람 학습성 검수, 독립 R10과 실제 Local WebView2 artifact parity가 현재 범위를 승인할 때만 TODO를 삭제한다.

@@ -30,7 +30,7 @@ Day 1 Web vertical slice에서는 mastery strong evidence 뒤 전이 과제가 �
 3. 오답, 수정, 강한 판정, 증거 저장, reload, Web·Local 이관을 실제 브라우저와 저장소에서 검증한다.
 4. 감사와 원장을 다시 생성한다. 실패가 남으면 상태를 `진행`으로 유지한다.
 5. current commit 증거를 독립 평가에 제출한다. 작성자가 점수나 결론을 지정하지 않는다.
-6. P0·P1이 재현되지 않고 패킷 종료 조건이 모두 충족된 경우에만 해당 폴더를 `_done`으로 이동한다.
+6. P0·P1이 재현되지 않고 패킷 종료 조건이 모두 충족된 경우에만 해당 폴더를 TODO를 삭제한다.
 
 ## 완료 금지 조건
 
@@ -81,4 +81,4 @@ Python과 TypeScript materializer가 같은 YAML을 다르게 해석하지 않�
 
 ## 완료 처리
 
-각 하위 packet은 자체 증거가 모두 green일 때만 이 폴더의 `_done/`으로 이동한다. 00~05가 모두 이동하고 독립 R10이 현재 commit을 승인하기 전에는 이 packet도, 상위 PRD loop도 완료가 아니다.
+각 하위 packet은 자체 증거가 모두 green일 때만 해당 TODO를 삭제한다. 00~05 TODO가 모두 삭제되고 독립 R10이 현재 commit을 승인하기 전에는 이 packet도, 상위 PRD loop도 완료가 아니다.

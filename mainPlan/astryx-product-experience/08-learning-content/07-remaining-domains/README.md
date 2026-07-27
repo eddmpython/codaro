@@ -17,7 +17,7 @@ domain을 risk와 prerequisite graph 기준으로 작은 review packet으로 나
 - [textProcessing](16-text-processing/), [scientificComputing](17-scientific-computing/), [sqlAnalysis](18-sql-analysis/), [bigDataPipelines](19-big-data-pipelines/)
 - [dataContracts](20-data-contracts/), [desktopAutomation](21-desktop-automation/), [systemMonitoring](22-system-monitoring/), [standardLibraryMastery](23-standard-library-mastery/), [aiIntegration](24-ai-integration/)
 
-각 domain folder의 `lesson-ledger.yml`은 현재 `planComposer` closure의 membership과 canonical content reference를 소유한다. 실제 lesson requirement와 source owner는 `../00-identity-integrity/content-ledger/`의 472 unique row만 가진다. 25개 domain packet이 모두 이 folder의 `_done/`으로 이동되기 전에는 `07-remaining-domains`도 완료가 아니다.
+각 domain folder의 `lesson-ledger.yml`은 현재 `planComposer` closure의 membership과 canonical content reference를 소유한다. 실제 lesson requirement와 source owner는 `../00-identity-integrity/content-ledger/`의 472 unique row만 가진다. 25개 domain TODO가 모두 삭제되기 전에는 `07-remaining-domains` TODO를 유지한다.
 
 ## 영향 파일
 
@@ -43,4 +43,4 @@ domain 안에서도 한 레슨 또는 review 가능한 작은 closure 단위 com
 
 ## 평가
 
-“전체 적용” 보고서만으로 완료하지 않는다. 472개 모든 ledger 행에 reviewer, evidence commit, current content hash가 있어야 `_done`이다.
+“전체 적용” 보고서만으로 완료하지 않는다. 472개 모든 ledger 행에 reviewer, evidence commit, current content hash가 있어야 삭제 조건을 충족한다.

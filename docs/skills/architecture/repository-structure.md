@@ -42,7 +42,7 @@ codaro/
 ├── editor/           # product UI surface
 ├── landing/          # GitHub Pages and docs/blog web surface
 ├── launcher/         # desktop launcher, packaging notes, release updater
-├── mainPlan/         # initiative/workstream design tree (작업별 내부 _done + 완료 initiative root _done)
+├── mainPlan/         # 미완료 initiative/workstream만 두는 임시 TODO tree
 ├── notebooks/        # distributable notebooks derived from curricula
 ├── src/              # Python package source
 └── tests/            # 도메인 트리(tests/<domain>/): pytest suites + 같은 도메인 verify/audit 드라이버 + gate runner(run.py) + root enforcer(verifyRootClean.py) + 공유 인프라 + _attempts 샌드박스(git 미추적·로컬 전용)
@@ -83,9 +83,8 @@ Root files are limited to package metadata, repository behavior contracts, and p
 | Derived distributable notebooks | `notebooks/` |
 | Public runnable demos | `demos/` |
 | Desktop launcher and update logic | `launcher/` |
-| Long-horizon initiative design docs | `mainPlan/<initiative>/<NN-workstream>/README.md` |
-| Completed workstream | `mainPlan/<initiative>/_done/<NN-workstream>/README.md` |
-| Completed initiative | `mainPlan/_done/<initiative>/` |
+| Long-horizon unfinished initiative TODO | `mainPlan/<initiative>/<NN-workstream>/README.md` |
+| Completed or abandoned plan item | 폴더를 삭제하고 이유·변경·검증을 상세 commit message에 기록 |
 | Brand source assets | `assets/` |
 | Tests and verifiers | `tests/` |
 | Gate scratch/logs/reports | `output/test-runner/<gate>/` |
@@ -99,7 +98,7 @@ Root files are limited to package metadata, repository behavior contracts, and p
 4. 문서 인덱스가 필요한 경우 `docs/skills/README.md`, `CLAUDE.md`, `docs/skills/architecture/ssot-map.md`를 함께 연결한다.
 5. `uv run python -X utf8 tests/run.py gate root-clean`과 `uv run python -X utf8 tests/run.py gate docs`로 구조와 문서 wiring을 확인한다.
 
-`mainPlan/`의 완료 상태는 문구가 아니라 경로가 기준이다. 활성 workstream을 완료라고 표시하지 않고, 구현과 검증이 끝난 폴더만 initiative 내부 `_done/`으로 이동한다. 전체 workstream과 최종 품질 게이트가 끝난 initiative만 root `_done/`으로 이동한다. 세부 규칙은 `mainPlan/README.md`를 따른다.
+`mainPlan/`은 완료 기록 저장소가 아니다. 구현과 검증이 끝난 packet·workstream은 parent 인덱스와 함께 삭제하고, 전체 변경과 검증 사실은 commit message에 기록한다. 장기간 소비되는 계약은 `contracts/`, 운영 규칙은 `docs/skills/`, 실행 보고서는 `output/test-runner/`가 소유한다. 세부 규칙은 `mainPlan/README.md`를 따른다.
 
 ## Forbidden Root Drift
 

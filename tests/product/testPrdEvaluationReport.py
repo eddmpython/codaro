@@ -51,7 +51,7 @@ def completeReport(verifier: ModuleType) -> dict[str, object]:
         "scopeDirtyDiffHash": SHA,
         "scopeManifestHash": SHA,
         "scopePaths": ["mainPlan/astryx-product-experience"],
-        "excludedPriorReports": ["mainPlan/**/00-specialist-review/**"],
+        "excludedPriorReports": ["mainPlan/**/01-prd-improvement-loop/**"],
         "promptAudit": {
             "targetScorePresent": False,
             "priorScorePresent": False,
@@ -137,7 +137,7 @@ def completeFactAudit() -> dict[str, object]:
                 "topTierEligible": False,
                 "completionEligible": False,
             },
-            "dependencyBootstrap": {"negativeFixtureRejected": True},
+            "mainPlanTodoPolicy": {"todoOnly": True, "policyTestPresent": True},
         },
     }
 

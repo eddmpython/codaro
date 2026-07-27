@@ -4,7 +4,7 @@ roundState: blocked
 sealed: false
 preparedAt: 2026-07-18 04:48:06+00:00
 rubric:
-  path: mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/_done/00-evaluation-contract/rubric.yml
+  path: contracts/prdEvaluationRubric.yml
   version: 1
   sha256: 0150ee794a4fd567e3462d059d46192e4f22d8fc56c0a452ce4e347c2582f08d
   targetScore: null
@@ -15,41 +15,22 @@ scope:
   dirtyDiffHash: null
   manifestHash: null
   evaluationBundleHash: null
-  reason: active remediation packets and current worktree are not completion-sealed
+  reason: active remediation packets and current worktree are not ready for an independent round
 draftBundle:
   manifestPath: mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/08-r10-independent-review/evaluation-bundle.manifest.yml
   archivePath: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  gitCommit: 300f372420212d2b85abfba4ab53f1b190e1405a
-  dirtyDiffHash: 5d90fa86ffcc239c25d107cb8b5ba6fb382d02a176e6c2e16b02272049bf6e27
-  manifestHash: fa823a8cfcd3cc2572cd5a4f49f94c6d573c40094d322810c55a5da04f2c147c
-  evaluationBundleHash: f23c2db33d7797857335ac3e0418809b47860edf2a4092b8b21053623f591817
-  fileCount: 2679
+  gitCommit: 0d7cd1241cc78c64b5dd0c878904da31dff65ba7
+  dirtyDiffHash: 69355f2d255e860e26cf4104753e7f7d4f03e2d58aabc5935141d0f0abcea3e8
+  manifestHash: a85fa6361b09dccb9d1d669dd3830c9f15a5693a51f11555c0611e13a9649c9a
+  evaluationBundleHash: 05c155eb858e350efd53942b37e650cc2cb2ea05a36916462e266357dc32f44a
+  fileCount: 2678
   bundleIntegrityState: passed
   sealEligible: false
 excludedEvaluatorInputs:
-- mainPlan/astryx-product-experience/00-product-contract/00-specialist-review/**
 - mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/**
 - prior score summaries and conclusions
 - generated output, build, and cache directories
 remediations:
-- packet: 02-completion-and-gate-bootstrap
-  primaryFindings:
-  - GOV-01
-  - ARCH-02
-  - ARCH-04
-  owner: product architecture
-  state: completed
-  factAuditCommand: uv run python -X utf8 tests/product/verifyPlanFactAudit.py --packet 02-completion-and-gate-bootstrap
-  factAuditCommandState: implemented
-  negativeFixture: tests/product/bootstrapAfterUse.fixture.yml
-  negativeFixtureState: present
-  closureEvidence:
-    path: mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/_done/02-completion-and-gate-bootstrap/completion-evidence.yml
-    implementationCommit: cac1cc9db96b3d42f5c8a728c2e3051f81cc611e
-    evidenceCommit: 9afa9ab60cea682d97eb6f3f08caab8a90e0ced8
-    transitionCommit: ab20f822d016de94051cafeeec8c6770c236be29
-    transitionId: be19623ed7a1c000820d991867007ad837eae81fb518121202ff67b2c481349d
-  eligibleForR10: true
 - packet: 03-learning-vertical-slice
   primaryFindings:
   - LEARN-01

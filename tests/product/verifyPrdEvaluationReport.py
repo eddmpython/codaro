@@ -21,9 +21,8 @@ ROUND_ROOT = (
     / "01-prd-improvement-loop"
     / "08-r10-independent-review"
 )
-CONTRACT_ROOT = ROUND_ROOT.parent / "_done" / "00-evaluation-contract"
-RUBRIC_PATH = CONTRACT_ROOT / "rubric.yml"
-SCHEMA_PATH = CONTRACT_ROOT / "evaluation-report.schema.yml"
+RUBRIC_PATH = ROOT / "contracts" / "prdEvaluationRubric.yml"
+SCHEMA_PATH = ROOT / "contracts" / "prdEvaluationReport.schema.yml"
 INPUT_PATH = ROUND_ROOT / "r10-input-manifest.yml"
 ROSTER_PATH = ROUND_ROOT / "evaluator-roster.yml"
 BUNDLE_PATH = ROUND_ROOT / "evaluation-bundle.manifest.yml"
@@ -32,7 +31,6 @@ FINDING_LEDGER_PATH = ROUND_ROOT / "finding-ledger.yml"
 REPORT_PATH = ROOT / "output" / "test-runner" / "plan-quality" / "evaluation-validation.json"
 DISCIPLINES = ("learning", "ux", "architecture")
 FORBIDDEN_BUNDLE_PREFIXES = (
-    "mainPlan/astryx-product-experience/00-product-contract/00-specialist-review/",
     "mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/",
 )
 FORBIDDEN_BUNDLE_SEGMENTS = {
@@ -40,7 +38,7 @@ FORBIDDEN_BUNDLE_SEGMENTS = {
     "build", "coverage", "dist", "node_modules", "output",
 }
 REQUIRED_FACT_DOMAINS = {
-    "bundleIntegrity", "requiredPaths", "symbols", "qualityGates", "learningCoverage", "dependencyBootstrap",
+    "bundleIntegrity", "requiredPaths", "symbols", "qualityGates", "learningCoverage", "mainPlanTodoPolicy",
 }
 DIMENSION_IDS = (
     "learnerValue",
@@ -414,9 +412,13 @@ def validateFactAudit(factAudit: dict[str, Any], inputManifest: dict[str, Any]) 
         or qualityGates.get("planQualityRegistered") is not True
     ):
         failures.append("round fact audit gate registry check failed")
-    dependency = facts.get("dependencyBootstrap")
-    if not isinstance(dependency, dict) or dependency.get("negativeFixtureRejected") is not True:
-        failures.append("round fact audit bootstrap negative fixture check failed")
+    todoPolicy = facts.get("mainPlanTodoPolicy")
+    if (
+        not isinstance(todoPolicy, dict)
+        or todoPolicy.get("todoOnly") is not True
+        or todoPolicy.get("policyTestPresent") is not True
+    ):
+        failures.append("round fact audit mainPlan TODO-only policy check failed")
     learning = facts.get("learningCoverage")
     requiredLearningFields = {
         "lessonCount", "strongCheckSpecCount", "strongCheckSpecLessonCount", "weakOnlyLessonCount",

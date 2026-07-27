@@ -8,7 +8,7 @@ R9가 드러낸 결함을 문서 작성자가 스스로 닫았다고 선언하�
 
 ## 현재 준비 상태
 
-2026-07-27 `buildPrdEvaluationBundle.py --write`는 여섯 번째 내부 완료 상태, Run·Local 독립 6/6, 전체 제품 68/68, Chromium·Firefox·WebKit 12/12와 프론트 build 재사용 배선을 반영한 source commit `0f0ee5e8`에서 2,676개 파일을 history-free ZIP으로 다시 생성했다. current draft의 archive SHA-256은 `8fb416c233bc1a709d3f81478a1eddd9889f3076b4bd3cbce8ab68ff9a2ebe94`이고 manifest hash는 `abc0722a283144424ea3641206f3b8c584366d39b379e648dd2aecebe285ca7e`이며, bundle builder와 fact audit `--check`가 같은 범위를 재현했다. ZIP의 모든 entry는 읽기 전용이며 specialist review, PRD 개선 이력, `_done`, output·dist·build·cache를 포함하지 않는 원칙을 유지한다. 이 최신화는 draft 입력 무결성만 뜻하며 evaluator 제출이나 round seal이 아니다.
+`buildPrdEvaluationBundle.py --write`는 현재 제품 source와 미완료 제품 TODO만 history-free ZIP으로 만든다. ZIP의 모든 entry는 읽기 전용이며 specialist review, PRD 개선 이력, 완료 기록, output·dist·build·cache를 포함하지 않는다. bundle hash와 file count는 current source에서 다시 생성한 manifest가 소유하며, 이 무결성은 evaluator 제출이나 round seal을 뜻하지 않는다.
 
 current bundle integrity와 draft fact audit도 R10 통과가 아니다. draft 범위는 최신이지만 입력 manifest와 scope는 unsealed이고 03~07·09 remediation closure, 세 명의 독립 evaluator 배정·독립성·conflict 확인, raw report 3개와 finding ledger가 없다. Local·Web reader floor, canonical mastery, full archive와 weak-only 0은 machine 구현 사실일 뿐 독립 검수와 전 release compatibility matrix를 대신하지 않는다. 따라서 manifest는 `state: draft`, `sealEligible: false`이며 현재 R10 점수와 통과 판정은 없다. `--seal`은 current bundle, 각 remediation closure evidence·fact audit·negative fixture와 세 evaluator의 독립성·conflict·서명이 모두 유효할 때만 성공해야 한다.
 
@@ -17,7 +17,7 @@ current bundle integrity와 draft fact audit도 R10 통과가 아니다. draft �
 - 02~07 각 finding의 상태, 수정 path, fact audit command, negative fixture, owner가 `r10-input-manifest.yml`에 고정돼 있다.
 - rubric version·hash와 평가 scope commit·dirty diff hash를 제출 전에 고정한다.
 - evaluator에게 전체 worktree 접근을 주지 않는다. `buildPrdEvaluationBundle.py`가 만든 read-only bundle만 제공한다.
-- bundle은 current product PRD와 current source·test·curriculum·build manifest를 포함하되 `00-specialist-review/**`, `01-prd-improvement-loop/**`, 이전 score summary, output·build·cache를 물리적으로 제외한다.
+- bundle은 current product PRD와 current source·test·curriculum·build manifest를 포함하되 `01-prd-improvement-loop/**`, 이전 score summary, output·build·cache를 물리적으로 제외한다.
 - evaluator용 rubric은 history 문장이 없는 versioned `rubric.yml`만 bundle에 넣고 source path·SHA-256을 manifest에 기록한다.
 - 학습, UX, 아키텍처 평가자는 서로의 초안과 점수를 제출 전까지 보지 않는다.
 - remediation 작성자와 이전 round 평가자는 R10 evaluator가 될 수 없다.
@@ -50,7 +50,7 @@ PRD 점수는 구현 완료 판정이 아니다. E2 이상은 실행 가능한 v
 
 ## 완료 조건
 
-세 raw report, fact audit, canonical finding ledger, remediation response가 모두 같은 evaluation bundle hash, scope Git commit, dirty diff hash와 scope manifest hash를 참조해야 한다. evaluator roster의 conflict가 0이고 bundle exclusion audit가 통과해야 한다. 결과가 높다는 이유로 완료하지 않는다. 02의 completion tool이 artifact hash와 허용 diff를 검증하고 이 packet을 `_done/`으로 이동한 transition row를 만들기 전에는 상태를 `완료`로 바꾸지 않는다.
+세 raw report, fact audit, canonical finding ledger, remediation response가 모두 같은 evaluation bundle hash, scope Git commit, dirty diff hash와 scope manifest hash를 참조해야 한다. evaluator roster의 conflict가 0이고 bundle exclusion audit가 통과해야 한다. 결과가 높다는 이유로 완료하지 않는다. 모든 종료 조건과 사람 검수가 충족되면 이 packet TODO를 삭제하고 실제 hash와 검증 결과를 commit message에 남긴다.
 
 ## 영향 파일
 
@@ -80,7 +80,7 @@ PRD 점수는 구현 완료 판정이 아니다. E2 이상은 실행 가능한 v
 - 근거 없는 점수, 재현 불가 path·symbol, 중복 canonical finding, 누락된 counter-evidence 거부
 - rubric dimension 누락·중복·unknown ID, scope hash 불일치, evidence reference 없는 product maturity 거부
 - 낮아진 총점과 새 P0가 손실 없이 round 결과에 남는 positive fixture
-- 소비 `uv run python -X utf8 tests/run.py gate plan-quality` (생성 owner는 02-completion-and-gate-bootstrap)
+- 소비 `uv run python -X utf8 tests/run.py gate plan-quality` (현재 runner와 plan fact audit가 소유)
 
 ## 롤백
 

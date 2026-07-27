@@ -2,7 +2,7 @@
 
 상태: 진행
 
-최신 source의 공식 Chromium `product-experience-browser`는 Landing·Learn과 Web/Local 학습·대화·노트북·자동화 68개 case를 68/68으로 통과했고 `run-local-state-browser` 6/6, `local-studio-browser` 26/26도 green이다. locked Playwright 1.61.0의 Chromium·Firefox·WebKit 대표 12/12에서 320·390·900·1440px overflow 0, light/dark, forced-colors, reduced-motion과 keyboard dialog를 확인했다. `product-browser-webview2-evergreen`은 current-commit wheel을 gate 전용 제품 홈에 격리 설치하고 실제 native WebView2 `Edg/150.0.4078.99`를 열어 Windows 11 build 26200의 Local Home 900x640, Notebook 1024x768, Automation 1440x900과 공용 후원 dialog, 합성 Web-origin archive와 실제 공개 Web archive 왕복까지 6/6으로 통과했다. 세 화면 모두 native client와 DOM viewport가 정확히 일치하고 가로 overflow와 상단 control overlap은 0이며 테마 토글, 공용 SNS, 계좌번호 `1002-0421-4626` 후원 dialog도 green이다. Notebook의 접힌 제품 레일은 text fragment 0이고 툴팁 기반 접근성 이름을 유지하며, 기본 연결 안내와 도구 패널 visible count도 각각 0이다. Chromium 1440x900 Web Run은 테마 다음 설정 control과 공용 SNS 순서를 확인하고 설정 버튼의 실제 open·close를 통과했다. `main@088a5df1` Pages의 Day 1에서 코드를 편집하고 browser strong check와 근거 저장을 통과해 내려받은 파일은 설치형 Local에서 같은 root hash와 Web runtime identity로 커밋됐고, 초안 reload와 source evidence set, 재내보내기 payload가 보존됐다. 합성 archive의 virtual FS·package·automation draft 의미 보존, disabled·unscheduled 작업 채택과 workspace 경계도 별도 case가 유지한다. resize 이벤트의 physical size를 logical size로 다시 해석하던 launcher DPI 결함은 physical bounds 계약으로 수정했다. 이 증거는 Windows 10 22H2 Fixed Version lock, 200%·400% zoom, IME와 수동 screen-reader matrix를 대신하지 않는다. machine audit는 strong CheckSpec 1,413개/467레슨, weak-only 0, mastery·transfer·retrieval 각 467/472지만 identity/content 승인 각 0/472, taxonomy 승인 0/7, independent assessment 승인 0/467이다. 독립 R10 raw report와 독립 보안 검수도 없으므로 이 workstream은 `진행`이며 `_done`이 아니다.
+최신 source의 공식 Chromium `product-experience-browser`는 Landing·Learn과 Web/Local 학습·대화·노트북·자동화 68개 case를 68/68으로 통과했고 `run-local-state-browser` 6/6, `local-studio-browser` 26/26도 green이다. locked Playwright 1.61.0의 Chromium·Firefox·WebKit 대표 12/12에서 320·390·900·1440px overflow 0, light/dark, forced-colors, reduced-motion과 keyboard dialog를 확인했다. `product-browser-webview2-evergreen`은 current-commit wheel을 gate 전용 제품 홈에 격리 설치하고 실제 native WebView2 `Edg/150.0.4078.99`를 열어 Windows 11 build 26200의 Local Home 900x640, Notebook 1024x768, Automation 1440x900과 공용 후원 dialog, 합성 Web-origin archive와 실제 공개 Web archive 왕복까지 6/6으로 통과했다. 세 화면 모두 native client와 DOM viewport가 정확히 일치하고 가로 overflow와 상단 control overlap은 0이며 테마 토글, 공용 SNS, 계좌번호 `1002-0421-4626` 후원 dialog도 green이다. Notebook의 접힌 제품 레일은 text fragment 0이고 툴팁 기반 접근성 이름을 유지하며, 기본 연결 안내와 도구 패널 visible count도 각각 0이다. Chromium 1440x900 Web Run은 테마 다음 설정 control과 공용 SNS 순서를 확인하고 설정 버튼의 실제 open·close를 통과했다. `main@088a5df1` Pages의 Day 1에서 코드를 편집하고 browser strong check와 근거 저장을 통과해 내려받은 파일은 설치형 Local에서 같은 root hash와 Web runtime identity로 커밋됐고, 초안 reload와 source evidence set, 재내보내기 payload가 보존됐다. 합성 archive의 virtual FS·package·automation draft 의미 보존, disabled·unscheduled 작업 채택과 workspace 경계도 별도 case가 유지한다. resize 이벤트의 physical size를 logical size로 다시 해석하던 launcher DPI 결함은 physical bounds 계약으로 수정했다. 이 증거는 Windows 10 22H2 Fixed Version lock, 200%·400% zoom, IME와 수동 screen-reader matrix를 대신하지 않는다. machine audit는 strong CheckSpec 1,413개/467레슨, weak-only 0, mastery·transfer·retrieval 각 467/472지만 identity/content 승인 각 0/472, taxonomy 승인 0/7, independent assessment 승인 0/467이다. 독립 R10 raw report와 독립 보안 검수도 없으므로 이 workstream은 `진행`이며 TODO가 남아 있다.
 
 2026-07-27 focused 회귀는 Web·Local 학습 홈의 빈 사용자 커리큘럼 그룹 0, 저장 fixture가 있을 때 그룹 1과 항목 선택, 접힌 제품 레일의 설정 trigger 표시·open, 삭제 dialog의 배경 `aria-hidden` 격리와 focus trap을 확인했다. `product-experience-browser`의 학습 홈 2개, Day 1 desktop, mobile lesson, Web Run, Local notebook, Local automation 7개 focused case와 `verifyLearningCardPlaywright.py`가 통과했다. 대표 제품 캡처 5개와 source set hash를 current source에 맞췄다. 이 focused 결과를 68-case 전체 재실행이나 native WebView2 재검증으로 계산하지 않으며, quality workstream 상태는 계속 `진행`이다.
 
@@ -22,7 +22,7 @@ Astryx migration을 보기 좋은 screenshot 몇 장으로 끝내지 않는다. 
 ### 학습 관련성
 
 - 학습 surface의 모든 보이는 요소는 목표 이해, 학습 자료·개념, 코드 작성·실행, 결과 해석, 자동 feedback, 다음 학습 이동 중 하나에 직접 기여해야 한다. 제품 전체에 동일하게 노출하도록 승인된 compact SNS rail은 우상단 공용 shell identity 예외다.
-- 이 목록에 직접 기여하지 않는 visible element는 제품 결함으로 기록하고 즉시 제거한다. 하나라도 남으면 release와 `_done` 전이를 모두 차단한다.
+- 이 목록에 직접 기여하지 않는 visible element는 제품 결함으로 기록하고 즉시 제거한다. 하나라도 남으면 release와 TODO 삭제를 모두 차단한다.
 - SNS rail을 제외한 관리·홍보·진단·내부 상태 UI는 학습 surface에서 0개여야 한다. 내부 경로, runtime artifact, 실행 일련번호, 운영 badge도 사용자에게 노출하지 않는다.
 - `surface=curriculum`은 focus mode다. 제품 전환 nav, terminal utility, Provider·제품 설정, diagnostic export, 전역 Teacher panel, 셀별 수동 AI control을 렌더하지 않는다. 브랜드에는 Local `home` 또는 Web `editor`로 나가는 단 하나의 실제 escape action과 공용 우상단 SNS rail만 둔다.
 - archive import/export와 사용자 커리큘럼 삭제는 학습 surface가 아니라 비학습 surface의 `제품 설정 > 학습 데이터`에서만 제공한다. 자동 저장은 계속 동작하며 실제 저장 실패만 현재 학습 맥락 안에 다음 행동과 함께 표시한다.
@@ -108,10 +108,10 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 
 ### 계획 품질
 
-- [evaluation contract](../00-product-contract/01-prd-improvement-loop/_done/00-evaluation-contract/)에 따라 신규 전문 평가자가 목표 점수와 이전 round 결론 없이 PRD integrity와 product evidence maturity를 분리 평가한다.
+- [`contracts/prdEvaluationRubric.yml`](../../../contracts/prdEvaluationRubric.yml)과 [`contracts/prdEvaluationReport.schema.yml`](../../../contracts/prdEvaluationReport.schema.yml)에 따라 신규 전문 평가자가 목표 점수와 이전 round 결론 없이 PRD integrity와 product evidence maturity를 분리 평가한다.
 - 평가자는 실제 경로, 심볼, gate registry, dependency peer, 레슨 수와 identity를 다시 대조하고 raw report·rubric hash·fact audit를 남긴다.
 - 숫자 threshold는 착수 조건이 아니다. 현재 코드와 충돌하는 P0와 해당 dependency의 plan-internal P1이 0이고 bootstrap·vertical slice feasibility가 자기충족적일 때만 착수한다.
-- 계획 평가 통과는 제품 완료가 아니다. 구현·검수·효능 gate가 끝난 작업만 `_done`으로 이동한다.
+- 계획 평가 통과는 제품 완료가 아니다. 구현·검수·효능 gate가 끝난 작업만 TODO를 삭제한다.
 
 ## Gate Registry
 
@@ -139,11 +139,10 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 | `learning-efficacy-report` | research/product | yes | every change | protocol/report schema와 stale 판정 fixture |
 | `path-learning-signal` | research/product | no | path beta graduation | E2 pre/post·unseen transfer와 운영 evidence |
 | `path-efficacy-confirmatory` | research/product | no | featured path graduation | 해당 path E3 pre/post·retention·transfer report |
-| `completion-bootstrap` | initiative owner | yes | every change | completion schema·tool·ledger·negative fixture와 clean A→E→B round-trip |
 | `plan-quality` | initiative owner | no | independent R10 | evaluation report schema·rubric hash·독립성·plan fact audit |
 | `product-release` | release owner | no | release | 모든 required gate와 current human evidence aggregate |
 
-신규 gate는 [00 bootstrap](../00-product-contract/01-prd-improvement-loop/_done/02-completion-and-gate-bootstrap/)에서 현재 runner의 `tests/run.py.Gate`로 non-blocking red 상태부터 등록한다. negative fixture와 실제 red report가 없으면 green 승격하지 않는다. machine gate는 구현 green 뒤 `ci_required=True`, 사람 모집과 최종 수동 aggregate는 `False`다. artifact path는 기존 `GATE_ARTIFACTS`에 등록하고 owner는 이 표와 testing SSOT가 소유한다. `GateSpec`이라는 새 타입이나 gate별 동일 이름 CI job을 만들지 않는다.
+신규 gate는 현재 runner의 `tests/run.py.Gate`로 non-blocking red 상태부터 등록한다. negative fixture와 실제 red report가 없으면 green 승격하지 않는다. machine gate는 구현 green 뒤 `ci_required=True`, 사람 모집과 최종 수동 aggregate는 `False`다. artifact path는 기존 `GATE_ARTIFACTS`에 등록하고 owner는 이 표와 testing SSOT가 소유한다. `GateSpec`이라는 새 타입이나 gate별 동일 이름 CI job을 만들지 않는다.
 
 `tests/product/verifyPrdEvaluationReport.py`는 latest round의 세 raw report, frozen rubric hash, scope, 이전 score 제외, 항목 합산과 canonical finding을 검증한다. `tests/product/verifyPlanFactAudit.py`는 path·symbol·gate membership·dependency version/peer·lesson count·bootstrap order를 실제 worktree에서 따로 검사한다. 점수표 parser만으로 `plan-quality`를 통과할 수 없다.
 
@@ -183,14 +182,12 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 6. 실제 배포 URL에서 route, asset, service worker, browser runtime smoke를 실행한다.
 7. prediction/classroom/dead source가 실제로 제거됐는지 negative gate를 실행한다.
 8. 각 path를 E0 -> E1 -> E2 순서로 독립 승격하고 E3를 완료한 path만 featured로 표시한다.
-9. 모든 workstream evidence를 확인하고 00 bootstrap에서 만든 completion tool로 순서대로 내부 `_done/`으로 이동한다.
-10. 이 문서 자체를 `_done/10-quality-release/`로 이동한 뒤 initiative 전체를 root `_done/`으로 이동한다. 6경로 모두의 E3는 `effectVerified` 홍보 조건이며 shell artifact 배포 조건과 분리한다.
-
-완료 이동 도구와 schema의 생성 owner는 10이 아니라 [00 bootstrap](../00-product-contract/01-prd-improvement-loop/_done/02-completion-and-gate-bootstrap/)이다. 10은 이미 구현된 A→E→B transition, report hash, nonce uniqueness, concurrent merge rejection을 최종 재검증할 뿐 새 completion protocol을 도입하지 않는다.
+9. 각 workstream의 구현·검증·사람 evidence를 확인하고 종료 조건을 충족한 TODO를 parent 인덱스와 함께 삭제한다.
+10. 이 문서의 모든 종료 조건이 충족되면 `10-quality-release` TODO를 삭제하고, initiative에 남은 일이 없으면 initiative 폴더도 삭제한다. 6경로 모두의 E3는 `effectVerified` 홍보 조건이며 shell artifact 배포 조건과 분리한다.
 
 ## 영향 파일
 
-- 선행 산출물 소비 `tests/surface/verifyDesignSystemContract.py` (생성 owner는 `01-design-foundation`)
+- 선행 산출물 소비 `tests/surface/verifyDesignSystemContract.py` (공용 design-system contract 검증)
 - 신규 `tests/surface/verifyProductExperiencePlaywright.py`
 - 신규 `tests/surface/verifyProductAccessibility.py`
 - 선행 산출물 소비 `tests/product/manual-at.matrix.yml`, `tests/product/verifyManualAtMatrix.py` (생성 owner는 00의 Astryx journey evidence packet)
@@ -204,10 +201,8 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 - 선행 산출물 소비 `tests/architecture/verifyClassroomRemoved.py` (생성 owner는 `09-repository-simplification`)
 - 선행 산출물 소비 `tests/curriculum/verifyScoredCheckStrength.py` (생성 owner는 `08-learning-content`)
 - 신규 `tests/learning/verifyLearningEfficacyReport.py`
-- 선행 산출물 소비 `tests/product/verifyPrdEvaluationReport.py` (생성 owner는 00 evaluation contract), `tests/product/verifyPlanFactAudit.py` (생성 owner는 00 bootstrap)
-- 선행 산출물 소비 `tests/plan/verifyMainPlanCompletion.py` (생성 owner는 00 bootstrap)
-- 선행 산출물 소비 `mainPlan/completion-evidence.schema.yml`, completion transition schema·ledger (생성 owner는 00 bootstrap)
-- 선행 산출물 소비 `docs/skills/ops/tools/completeMainPlanPacket.py` (생성 owner는 00 bootstrap)
+- 선행 산출물 소비 `tests/product/verifyPrdEvaluationReport.py`, `tests/product/verifyPlanFactAudit.py`
+- 선행 산출물 소비 `tests/plan/testMainPlanTodoPolicy.py`
 - 신규 `tests/product/browser-matrix.lock.json`, `tests/product/webview2-runtime.lock.json`
 - 신규 `tests/product/verifyWebView2ProductSmoke.py`
 - 신규 `docs/skills/ops/tools/installBrowserMatrix.py`, `tests/product/verifyBrowserMatrixLock.py`
@@ -254,7 +249,7 @@ E3 primary 기준은 해당 경로 build pass rate의 active-vs-waitlist differe
 - 성능 budget은 기존 수치를 느슨하게 올려 통과시키지 않는다. 기능상 필수 증가면 chunk 분해 근거와 before/after report를 문서화한다.
 - 실제 배포 smoke 실패 시 Pages를 이전 green artifact로 되돌리고 새 service worker cache version을 재사용하지 않는다.
 - efficacy report는 표본이나 기준을 사후 변경해 통과시키지 않는다. 콘텐츠 hash가 바뀌면 해당 경로 pilot을 다시 수행한다.
-- `_done` 이동은 squash하지 않는다. 어떤 증거로 완료됐는지 git history에서 추적 가능해야 한다.
+- 완료 TODO를 삭제한 commit message에는 변경 전 상황, 구현, 사용자 영향과 검증 명령을 구체적으로 남겨 `git log`에서 추적 가능하게 한다.
 
 ## 평가
 

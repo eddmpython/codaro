@@ -2,7 +2,7 @@
 
 상태: 진행
 
-2026-07-22 현재 supported subset machine audit는 통과한다. Web은 SRI를 확인한 pyproc module graph에서 check마다 fresh Worker를 만들고 종료하며, Local은 `python -I` 격리 process와 audit hook으로 fixture 밖 read/write, network, child process, dynamic code, timeout을 거부한다. 두 tier의 runtime payload에서 `expectedReturn`·`expectedException`을 제거해 학생 frame introspection이 기대값에 닿지 않게 했고 Local 실제 probe와 pathlib Web assessment가 이를 검증했다. browser opaque-origin iframe·Firefox/WebKit matrix와 Windows AppContainer·restricted token·Job Object·broker는 구현되지 않았으므로 `completionEligible=false`이며 `_done`이 아니다.
+2026-07-22 현재 supported subset machine audit는 통과한다. Web은 SRI를 확인한 pyproc module graph에서 check마다 fresh Worker를 만들고 종료하며, Local은 `python -I` 격리 process와 audit hook으로 fixture 밖 read/write, network, child process, dynamic code, timeout을 거부한다. 두 tier의 runtime payload에서 `expectedReturn`·`expectedException`을 제거해 학생 frame introspection이 기대값에 닿지 않게 했고 Local 실제 probe와 pathlib Web assessment가 이를 검증했다. browser opaque-origin iframe·Firefox/WebKit matrix와 Windows AppContainer·restricted token·Job Object·broker는 구현되지 않았으므로 `completionEligible=false`이며 TODO가 남아 있다.
 
 ## 목표
 

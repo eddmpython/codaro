@@ -17,23 +17,19 @@ import yaml
 ROOT = Path(__file__).resolve().parents[2]
 INITIATIVE = ROOT / "mainPlan" / "astryx-product-experience"
 LOOP = INITIATIVE / "00-product-contract" / "01-prd-improvement-loop"
-RUBRIC_PATH = LOOP / "_done" / "00-evaluation-contract" / "rubric.yml"
-EVALUATION_SCHEMA_PATH = LOOP / "_done" / "00-evaluation-contract" / "evaluation-report.schema.yml"
-R10_MANIFEST_PATH = LOOP / "08-r10-independent-review" / "r10-input-manifest.yml"
-NEGATIVE_FIXTURE_PATH = ROOT / "tests" / "product" / "bootstrapAfterUse.fixture.yml"
+RUBRIC_PATH = ROOT / "contracts" / "prdEvaluationRubric.yml"
+EVALUATION_SCHEMA_PATH = ROOT / "contracts" / "prdEvaluationReport.schema.yml"
 REPORT_PATH = ROOT / "output" / "test-runner" / "plan-quality" / "plan-fact-audit.json"
 REQUIRED_SECTIONS = ("## 목표", "## 영향 파일", "## 영향 함수·심볼", "## 테스트", "## 롤백", "## 평가")
-IMPLEMENTED_B0_PATHS = (
-    "mainPlan/completion-evidence.schema.yml",
-    "mainPlan/completion-transition.schema.yml",
-    "mainPlan/completion-transition-ledger.yml",
-    "docs/skills/ops/tools/completeMainPlanPacket.py",
+REQUIRED_POLICY_PATHS = (
+    "mainPlan/README.md",
     "docs/skills/ops/tools/genProductContracts.py",
     "contracts/artifactOwnership.schema.json",
     "contracts/artifactOwners.yml",
-    "tests/plan/verifyMainPlanCompletion.py",
+    "contracts/prdEvaluationRubric.yml",
+    "contracts/prdEvaluationReport.schema.yml",
+    "tests/plan/testMainPlanTodoPolicy.py",
     "tests/product/verifyPlanFactAudit.py",
-    "tests/product/bootstrapAfterUse.fixture.yml",
 )
 
 
@@ -78,7 +74,7 @@ def utcTimestamp() -> str:
 
 
 def activeReadmes() -> tuple[Path, ...]:
-    return tuple(sorted(path for path in INITIATIVE.rglob("README.md") if "_done" not in path.parts))
+    return tuple(sorted(INITIATIVE.rglob("README.md")))
 
 
 def packetReadmes(readmes: tuple[Path, ...]) -> tuple[Path, ...]:
@@ -86,7 +82,6 @@ def packetReadmes(readmes: tuple[Path, ...]) -> tuple[Path, ...]:
         path
         for path in readmes
         if path != INITIATIVE / "README.md"
-        and path.parent.name != "00-specialist-review"
         and re.match(r"^[0-9]{2}-", path.parent.name)
     )
 
@@ -220,69 +215,7 @@ def evaluationSchemaFailures() -> list[str]:
     return failures
 
 
-def auditDependencyFixture(path: Path) -> list[str]:
-    fixture = loadMapping(path)
-    milestones = fixture.get("milestones")
-    artifacts = fixture.get("artifacts")
-    if not isinstance(milestones, dict) or not isinstance(artifacts, list):
-        raise PlanFactError(f"invalid dependency fixture: {relativePath(path)}")
-    failures: list[str] = []
-    for artifact in artifacts:
-        if not isinstance(artifact, dict):
-            raise PlanFactError("dependency fixture artifact must be a mapping")
-        owner = artifact.get("creationOwner")
-        consumers = artifact.get("consumers")
-        if not isinstance(owner, dict) or not isinstance(consumers, list):
-            raise PlanFactError("dependency fixture must define one owner and consumers")
-        ownerOrder = milestones.get(owner.get("milestone"))
-        if not isinstance(ownerOrder, int):
-            raise PlanFactError("dependency fixture creation milestone is unknown")
-        for consumer in consumers:
-            consumerOrder = milestones.get(consumer.get("milestone")) if isinstance(consumer, dict) else None
-            if not isinstance(consumerOrder, int):
-                raise PlanFactError("dependency fixture consumer milestone is unknown")
-            if consumerOrder < ownerOrder:
-                failures.append(
-                    f"creation-after-consumption: {artifact.get('path')} is consumed before its creation owner"
-                )
-    return failures
-
-
-def negativeFixtureFailures() -> tuple[int, list[str]]:
-    if not NEGATIVE_FIXTURE_PATH.is_file():
-        return 0, [f"negative fixture is absent: {relativePath(NEGATIVE_FIXTURE_PATH)}"]
-    fixture = loadMapping(NEGATIVE_FIXTURE_PATH)
-    detected = auditDependencyFixture(NEGATIVE_FIXTURE_PATH)
-    expected = fixture.get("expectedFailure")
-    if not detected:
-        return 1, ["negative bootstrap-after-use fixture unexpectedly passed"]
-    if not isinstance(expected, str) or not any(failure.startswith(expected) for failure in detected):
-        return 1, [f"negative fixture did not produce {expected}"]
-    return 1, []
-
-
-def packetManifestFailures(packetId: str | None) -> list[str]:
-    if packetId is None:
-        return []
-    manifest = loadMapping(R10_MANIFEST_PATH)
-    remediations = manifest.get("remediations")
-    if not isinstance(remediations, list):
-        return ["R10 remediations must be a list"]
-    packet = next((item for item in remediations if isinstance(item, dict) and item.get("packet") == packetId), None)
-    if packet is None:
-        return [f"R10 remediation packet is missing: {packetId}"]
-    failures: list[str] = []
-    if packet.get("factAuditCommandState") != "implemented":
-        failures.append(f"{packetId} factAuditCommandState must be implemented")
-    if packet.get("negativeFixtureState") != "present":
-        failures.append(f"{packetId} negativeFixtureState must be present")
-    fixturePath = packet.get("negativeFixture")
-    if not isinstance(fixturePath, str) or not (ROOT / fixturePath).is_file():
-        failures.append(f"{packetId} negative fixture path is absent")
-    return failures
-
-
-def verifyPlanFacts(packetId: str | None = None) -> dict[str, Any]:
+def verifyPlanFacts() -> dict[str, Any]:
     readmes = activeReadmes()
     packets = packetReadmes(readmes)
     linkCount, brokenLinks = markdownLinkFacts(readmes)
@@ -290,8 +223,7 @@ def verifyPlanFacts(packetId: str | None = None) -> dict[str, Any]:
     emDashCount, trailingCount, hygieneFailures = textHygieneFacts(readmes)
     duplicateCount, ownerFailures = creationOwnerFacts(packets)
     rubric, currentRubricFailures = rubricFacts()
-    fixtureCount, fixtureFailures = negativeFixtureFailures()
-    implementationFailures = [f"B0 artifact is absent: {path}" for path in IMPLEMENTED_B0_PATHS if not (ROOT / path).exists()]
+    policyFailures = [f"required plan policy artifact is absent: {path}" for path in REQUIRED_POLICY_PATHS if not (ROOT / path).exists()]
     failures = (
         requiredSectionFailures(packets)
         + brokenLinks
@@ -301,14 +233,11 @@ def verifyPlanFacts(packetId: str | None = None) -> dict[str, Any]:
         + ownerFailures
         + currentRubricFailures
         + evaluationSchemaFailures()
-        + fixtureFailures
-        + packetManifestFailures(packetId)
-        + implementationFailures
+        + policyFailures
     )
     return {
         "passed": not failures,
         "scope": relativePath(INITIATIVE),
-        "packet": packetId,
         "facts": {
             "activeReadmes": len(readmes),
             "packetReadmes": len(packets),
@@ -320,8 +249,7 @@ def verifyPlanFacts(packetId: str | None = None) -> dict[str, Any]:
             "trailingWhitespaceOccurrences": trailingCount,
             "duplicateCreationOwners": duplicateCount,
             "registeredGates": len(registeredGateNames()),
-            "negativeFixtureCount": fixtureCount,
-            "negativeFixturesRejected": fixtureCount - len(fixtureFailures),
+            "todoPolicyArtifacts": len(REQUIRED_POLICY_PATHS),
             "rubric": rubric,
         },
         "failures": sorted(set(failures)),
@@ -329,9 +257,7 @@ def verifyPlanFacts(packetId: str | None = None) -> dict[str, Any]:
 
 
 def buildParser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Audit mainPlan claims against current repository facts.")
-    parser.add_argument("--packet", help="Require a remediation packet's fact-audit wiring to be implemented.")
-    return parser
+    return argparse.ArgumentParser(description="Audit mainPlan claims against current repository facts.")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -339,9 +265,9 @@ def main(argv: list[str] | None = None) -> int:
     startedAt = utcTimestamp()
     started = time.monotonic()
     try:
-        result = verifyPlanFacts(args.packet)
+        result = verifyPlanFacts()
     except PlanFactError as exc:
-        result = {"passed": False, "scope": relativePath(INITIATIVE), "packet": args.packet, "facts": {}, "failures": [str(exc)]}
+        result = {"passed": False, "scope": relativePath(INITIATIVE), "facts": {}, "failures": [str(exc)]}
     payload = {
         "schemaVersion": 1,
         "gate": "plan-quality",
@@ -364,7 +290,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     print(
         f"ok: plan facts valid ({payload['facts']['activeReadmes']} readmes, "
-        f"{payload['facts']['negativeFixturesRejected']} negative fixtures rejected)"
+        f"{payload['facts']['todoPolicyArtifacts']} policy artifacts)"
     )
     return 0
 

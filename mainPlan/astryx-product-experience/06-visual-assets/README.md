@@ -2,7 +2,7 @@
 
 상태: 진행
 
-현재 공용 manifest와 source/AVIF/WebP variant pipeline을 만들고 실제 Web Run desktop, mobile lesson, Run learning detail, Local notebook과 automation operational UI capture를 Landing과 Run/Local에서 함께 소비하도록 연결했다. Landing hero가 실제 제품 화면이라고 표시하면서도 현재 제품과 다른 과거의 3열 편집기 화면을 보여 주던 결함을 확인했고, `main@c5618bf6`의 Chromium 제품 화면 5종으로 source와 파생 variant를 교체했다. 각 capture는 UI·token·학습 콘텐츠 source 목록과 `sourceSetHash`를 가지며, source가 달라진 뒤 캡처를 갱신하지 않으면 `buildVisualAssets.py --check`와 `visual-assets` gate가 실패한다. 8개 학습 domain의 `generatedRaster` instructional asset은 learning question, decision, lesson context와 함께 manifest에 등록됐다. `learningVisualAssets.ts`가 8개 domain과 lesson category를 연결하고 `LearningDomainVisual`이 `CurriculumHome`의 domain band와 `CurriculumOverview`의 lesson overview에서 이미지, 질문, 판단 기준을 자동 렌더한다. 그러나 instructional asset의 lesson anchor 사람 승인, outcome proof, light/dark 쌍 캡처, 사람 자산 검수와 전체 shot list가 남아 있으므로 상태는 `진행`이며 `_done`이 아니다.
+현재 공용 manifest와 source/AVIF/WebP variant pipeline을 만들고 실제 Web Run desktop, mobile lesson, Run learning detail, Local notebook과 automation operational UI capture를 Landing과 Run/Local에서 함께 소비하도록 연결했다. Landing hero가 실제 제품 화면이라고 표시하면서도 현재 제품과 다른 과거의 3열 편집기 화면을 보여 주던 결함을 확인했고, `main@c5618bf6`의 Chromium 제품 화면 5종으로 source와 파생 variant를 교체했다. 각 capture는 UI·token·학습 콘텐츠 source 목록과 `sourceSetHash`를 가지며, source가 달라진 뒤 캡처를 갱신하지 않으면 `buildVisualAssets.py --check`와 `visual-assets` gate가 실패한다. 8개 학습 domain의 `generatedRaster` instructional asset은 learning question, decision, lesson context와 함께 manifest에 등록됐다. `learningVisualAssets.ts`가 8개 domain과 lesson category를 연결하고 `LearningDomainVisual`이 `CurriculumHome`의 domain band와 `CurriculumOverview`의 lesson overview에서 이미지, 질문, 판단 기준을 자동 렌더한다. 그러나 instructional asset의 lesson anchor 사람 승인, outcome proof, light/dark 쌍 캡처, 사람 자산 검수와 전체 shot list가 남아 있으므로 상태는 `진행`이며 TODO가 남아 있다.
 
 ## 목표
 
@@ -20,12 +20,12 @@
 
 | 순서 | packet | 시작 의존 | 종료 조건 |
 | --- | --- | --- | --- |
-| 00 | [manifest-pipeline](00-manifest-pipeline/) | `01-design-foundation` | source, provenance, variant, budget가 schema와 generator로 고정됨 |
+| 00 | [manifest-pipeline](00-manifest-pipeline/) | 공용 design contract | source, provenance, variant, budget가 schema와 generator로 고정됨 |
 | 01 | [instructional-assets](01-instructional-assets/) | 해당 `08-learning-content` path ledger·anchor author review | 대표 경로의 outcome visual이 승인된 section의 학습 판단을 실제로 도움 |
 | 02 | [run-captures](02-run-captures/) | `04-web-learning` fixture green | 실제 desktop/mobile proof를 캡처함 |
 | 03 | [local-captures](03-local-captures/) | `05-local-studio` fixture green | automation/notebook 상태 proof를 캡처함 |
 
-각 packet은 구현, asset review, budget, accessibility 검사가 끝난 뒤 이 workstream의 `_done/`으로 이동한다. 네 packet이 모두 이동되기 전에는 `06-visual-assets`를 initiative `_done/`으로 이동하지 않는다.
+각 packet은 구현, asset review, budget, accessibility 검사가 끝나면 해당 TODO를 삭제한다. 네 packet이 모두 삭제되기 전에는 `06-visual-assets` TODO를 유지한다.
 
 ## 필수 shot list
 

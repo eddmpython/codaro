@@ -32,10 +32,7 @@ def testScopeAllowlistIncludesProductEvidenceAndRejectsHistory() -> None:
     assert builder.isPathIncluded("curricula/python/schema.yaml")
     assert builder.isPathIncluded("mainPlan/astryx-product-experience/04-web-learning/README.md")
     assert not builder.isPathIncluded(
-        "mainPlan/astryx-product-experience/00-product-contract/00-specialist-review/README.md"
-    )
-    assert not builder.isPathIncluded(
-        "mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/01-r9-baseline/README.md"
+        "mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/README.md"
     )
     assert not builder.isPathIncluded("editor/dist/assets/index.js")
     assert not builder.isPathIncluded("output/test-runner/report.json")
@@ -243,7 +240,7 @@ def testExplicitExcludedPathIsRejected() -> None:
 
     with pytest.raises(builder.BundleError, match="excluded history"):
         builder.verifyExcludedPriorReports(
-            ["mainPlan/astryx-product-experience/00-product-contract/00-specialist-review/report.yml"]
+            ["mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/report.yml"]
         )
 
 
@@ -277,9 +274,7 @@ def testSealTransitionBindsAllScopeHashes() -> None:
 
     assert sealed["roundState"] == "ready"
     assert sealed["sealed"] is True
-    assert sealed["rubric"]["path"].endswith(
-        "01-prd-improvement-loop/_done/00-evaluation-contract/rubric.yml"
-    )
+    assert sealed["rubric"]["path"] == "contracts/prdEvaluationRubric.yml"
     assert sealed["scope"] == {
         "sealState": "sealed",
         "gitCommit": "1" * 40,
@@ -310,9 +305,7 @@ def testDraftTransitionRefreshesBundleFactsWithoutSealing() -> None:
 
     assert draft["roundState"] == "blocked"
     assert draft["sealed"] is False
-    assert draft["rubric"]["path"].endswith(
-        "01-prd-improvement-loop/_done/00-evaluation-contract/rubric.yml"
-    )
+    assert draft["rubric"]["path"] == "contracts/prdEvaluationRubric.yml"
     assert draft["draftBundle"] == {
         "manifestPath": builder.relativePath(builder.MANIFEST_PATH),
         "archivePath": "output/bundle.zip",

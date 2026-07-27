@@ -2,7 +2,7 @@
 
 상태: 진행
 
-학습자 예측 계약·도구·332개 YAML block과 active classroom backend/frontend를 삭제했다. progress refresh는 독립 `curriculumProgressEvent.ts`가 소유한다. 기존 classroom 데이터는 local-owner archive migration으로 보존·검증·삭제할 수 있고 HTTP는 한 호환 release 동안 `410 Gone`만 반환한다. dead Landing source와 unused illustration을 제거했고 lifecycle generated-source policy, Landing/editor module boundary, 양쪽 exact package pin을 적용했다. `removed-learning-concepts`와 `repository-simplification` machine gate는 green이지만 선행 workstream의 독립 승인과 completion transition evidence가 없다. 따라서 machine 범위 구현 뒤에도 상태는 `진행`이며 `_done`으로 이동하지 않는다.
+학습자 예측 계약·도구·332개 YAML block과 active classroom backend/frontend를 삭제했다. progress refresh는 독립 `curriculumProgressEvent.ts`가 소유한다. 기존 classroom 데이터는 local-owner archive migration으로 보존·검증·삭제할 수 있고 HTTP는 한 호환 release 동안 `410 Gone`만 반환한다. dead Landing source와 unused illustration을 제거했고 lifecycle generated-source policy, Landing/editor module boundary, 양쪽 exact package pin을 적용했다. `removed-learning-concepts`와 `repository-simplification` machine gate는 green이지만 선행 workstream의 독립 승인과 TODO 삭제 evidence가 없다. 따라서 machine 범위 구현 뒤에도 상태는 `진행`이며 TODO 삭제하지 않는다.
 
 ## 목표
 

@@ -2,7 +2,7 @@
 
 상태: 진행
 
-현재 8개 학습 domain의 `generatedRaster` 자산이 learning question, decision, lesson context와 함께 공용 manifest에 등록됐다. `learningVisualAssets.ts`의 8-domain/category mapping과 `LearningDomainVisual`을 통해 `CurriculumHome`은 8개 domain visual band를, `CurriculumOverview`는 현재 lesson에 맞는 visual, 질문, 판단 기준을 별도 reveal 클릭 없이 자동 렌더한다. `visual-assets` gate는 green이지만 이는 asset과 현재 surface integration의 기계 계약만 증명한다. lesson anchor author review, 사람 자산 승인, outcome proof와 접근성 눈검수가 남아 있어 `_done`이 아니다.
+현재 8개 학습 domain의 `generatedRaster` 자산이 learning question, decision, lesson context와 함께 공용 manifest에 등록됐다. `learningVisualAssets.ts`의 8-domain/category mapping과 `LearningDomainVisual`을 통해 `CurriculumHome`은 8개 domain visual band를, `CurriculumOverview`는 현재 lesson에 맞는 visual, 질문, 판단 기준을 별도 reveal 클릭 없이 자동 렌더한다. `visual-assets` gate는 green이지만 이는 asset과 현재 surface integration의 기계 계약만 증명한다. lesson anchor author review, 사람 자산 승인, outcome proof와 접근성 눈검수가 남아 있어 TODO가 남아 있다.
 
 ## 목표
 

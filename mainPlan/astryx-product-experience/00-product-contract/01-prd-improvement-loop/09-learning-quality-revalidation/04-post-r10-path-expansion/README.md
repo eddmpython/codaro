@@ -8,7 +8,7 @@ R10이 W0와 선행 확장 사이의 계획·증거 모순을 반증한 뒤, 이
 
 원래 계획은 R10 green 뒤에만 strong check, unseen transfer, delayed retrieval source를 대표 경로로 확장하는 것이었다. 실제로는 R10 전에 467레슨 assessment와 472개 public route가 구현됐다. 이 source를 되돌리거나 아직 없다고 기록하지 않는다. 다만 identity/content review 각 0/472, taxonomy approval 0/7, independent assessment approval 0/467이므로 모두 provisional이며 승인된 W1+가 아니다.
 
-R10 뒤 순서는 새 bulk source 생성이 아니라 file automation, data reporting, browser automation, document automation, data visualization, AI workflow의 author review와 formative 학습성 검증이다. 대표 경로 E3와 confirmatory 효능 증거 전에는 나머지 domain의 전수 사람 승인과 공개 승격을 시작하지 않는다. 빈 variant ID 생성, weak check 재명명, 새 472개 일괄 문구 치환은 금지한다. 현재 R10 전이므로 이 승인 packet은 차단 상태이며 `_done`이 아니다.
+R10 뒤 순서는 새 bulk source 생성이 아니라 file automation, data reporting, browser automation, document automation, data visualization, AI workflow의 author review와 formative 학습성 검증이다. 대표 경로 E3와 confirmatory 효능 증거 전에는 나머지 domain의 전수 사람 승인과 공개 승격을 시작하지 않는다. 빈 variant ID 생성, weak check 재명명, 새 472개 일괄 문구 치환은 금지한다. 현재 R10 전이므로 이 승인 packet은 차단 상태이며 TODO가 남아 있다.
 
 ## 영향 파일
 

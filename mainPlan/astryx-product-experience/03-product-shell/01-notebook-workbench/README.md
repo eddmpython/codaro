@@ -119,4 +119,4 @@
 - `/run/` 첫 진입에서 불필요한 badge와 sample code 없이 편집 가능한 빈 셀이 바로 보이고, 실행 결과는 별도 확인 command 없이 cell 아래에 나타난다.
 - 공용 source와 실제 설치형 Local WebView2의 동일 컴포넌트·실행 전이, 공개 Web archive의 Local 수입·reload·재내보내기는 기계 검증됐다. 그러나 Local 재내보내기 파일의 공개 Web 재수입과 수동 보조기술 검수가 남아 있어 상태는 `진행`이다.
 
-완료 전에는 `_done`으로 이동하지 않는다.
+완료 전에는 TODO 삭제하지 않는다.

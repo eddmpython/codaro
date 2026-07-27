@@ -24,8 +24,8 @@ ROUND_ROOT = ROOT / LOOP / "08-r10-independent-review"
 INPUT_PATH = ROUND_ROOT / "r10-input-manifest.yml"
 ROSTER_PATH = ROUND_ROOT / "evaluator-roster.yml"
 MANIFEST_PATH = ROUND_ROOT / "evaluation-bundle.manifest.yml"
-RUBRIC_SOURCE = ROOT / LOOP / "_done/00-evaluation-contract/rubric.yml"
-SCHEMA_SOURCE = ROOT / LOOP / "_done/00-evaluation-contract/evaluation-report.schema.yml"
+RUBRIC_SOURCE = ROOT / "contracts/prdEvaluationRubric.yml"
+SCHEMA_SOURCE = ROOT / "contracts/prdEvaluationReport.schema.yml"
 ARCHIVE_PATH = ROOT / "output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip"
 
 ROOT_FILES = {
@@ -52,7 +52,6 @@ PRODUCT_PLAN_PREFIXES = tuple(
 )
 PRODUCT_PLAN_ROOT = f"{INITIATIVE}/README.md"
 FORBIDDEN_PREFIXES = (
-    f"{INITIATIVE}/00-product-contract/00-specialist-review/",
     f"{INITIATIVE}/00-product-contract/01-prd-improvement-loop/",
 )
 FORBIDDEN_SEGMENTS = {
@@ -212,7 +211,7 @@ def isPathIncluded(path: str) -> bool:
     if normalized == PRODUCT_PLAN_ROOT:
         return True
     if any(normalized.startswith(prefix) for prefix in PRODUCT_PLAN_PREFIXES):
-        return "_done" not in parts
+        return True
     if normalized in ROOT_FILES:
         return True
     return any(normalized.startswith(prefix) for prefix in SOURCE_PREFIXES)

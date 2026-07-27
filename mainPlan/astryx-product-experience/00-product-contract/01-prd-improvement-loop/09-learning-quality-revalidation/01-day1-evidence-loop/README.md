@@ -8,7 +8,7 @@ Day 1에서 숙달, 처음 보는 전이, 24시간 지연 검색을 하나의 We
 
 Day 1의 mastery, unseen transfer, 24시간 delayed retrieval을 하나의 Web evidence 흐름으로 검증한다. 전이는 mastery strong evidence가 저장되기 전에는 렌더하지 않고, retrieval은 원천 strong evidence가 due가 되기 전에는 렌더하지 않는다. 둘 다 조건이 충족되면 자동으로 나타나며 별도 확인·펼치기 버튼을 만들지 않는다.
 
-Day 2·11·15·19·20·22·27·30 progression, Seaborn semantic artifact capstone, pathlib·zip·schedule base·assessment Web·Local flow, Local 자동 evidence append와 Day 19 archive transfer를 포함한 공식 63-case Chromium 매트릭스는 63/63으로 통과했다. 남은 종료 조건은 current commit report 봉인, Day 1 사람 학습성 검수, independent assessment 승인과 독립 평가 입력 연결이다. 따라서 `_done`이 아니다.
+Day 2·11·15·19·20·22·27·30 progression, Seaborn semantic artifact capstone, pathlib·zip·schedule base·assessment Web·Local flow, Local 자동 evidence append와 Day 19 archive transfer를 포함한 공식 63-case Chromium 매트릭스는 63/63으로 통과했다. 남은 종료 조건은 current commit report 봉인, Day 1 사람 학습성 검수, independent assessment 승인과 독립 평가 입력 연결이다. 따라서 TODO가 남아 있다.
 
 ## 영향 파일
 

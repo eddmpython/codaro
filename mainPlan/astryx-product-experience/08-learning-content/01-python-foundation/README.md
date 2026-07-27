@@ -8,7 +8,7 @@
 
 `planComposer` 결과를 시작점으로 삼되 각 레슨을 사람이 직접 읽고 overview, worked example, guided Lab, independent Lab, retrieval variant, transfer, strong check를 레슨별 ledger에 승인한다. starter와 정답 복제, weak-only check, 실행 전 prediction을 허용하지 않는다.
 
-현재 featured capstone `30days/day30_최종프로젝트`는 서로 다른 경로의 JSON file 2개를 만들고 artifact descriptor로 검증한다. 대표 경로 aggregate의 `featured-capstone-contracts` machine 판정은 6/6이며 이 경로는 Local 졸업이 필요하지 않다. 그러나 packet 소유 66개 canonical row의 사람 review, 실제 learner evidence와 독립 assessment 승인은 완료되지 않았으므로 이 machine 판정만으로 `_done`이 아니다.
+현재 featured capstone `30days/day30_최종프로젝트`는 서로 다른 경로의 JSON file 2개를 만들고 artifact descriptor로 검증한다. 대표 경로 aggregate의 `featured-capstone-contracts` machine 판정은 6/6이며 이 경로는 Local 졸업이 필요하지 않다. 그러나 packet 소유 66개 canonical row의 사람 review, 실제 learner evidence와 독립 assessment 승인은 완료되지 않았으므로 이 machine 판정만으로 TODO가 남아 있다.
 
 ## 영향 파일
 
@@ -35,4 +35,4 @@
 
 ## 평가
 
-경로의 모든 ledger 행과 canonical 소유 66개 행에 reviewer와 evidence commit이 있고 Web에서 첫 실행부터 전이 과제까지 완료될 때만 `_done`으로 이동한다.
+경로의 모든 ledger 행과 canonical 소유 66개 행에 reviewer와 evidence commit이 있고 Web에서 첫 실행부터 전이 과제까지 완료될 때만 TODO를 삭제한다.

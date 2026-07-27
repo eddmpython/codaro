@@ -80,3 +80,17 @@ artifacts:
       - editor/src/lib/generatedContracts/masteryPolicy.v1.json
       - src/codaro/curriculum/masteryPolicy.py
       - editor/src/lib/masteryPolicy.ts
+  - artifactId: prd-evaluation-rubric
+    role: source
+    owner: product-architecture
+    sourcePath: contracts/prdEvaluationRubric.yml
+    surfacePaths:
+      - docs/skills/ops/tools/buildPrdEvaluationBundle.py
+      - tests/product/verifyPlanFactAudit.py
+  - artifactId: prd-evaluation-report
+    role: source
+    owner: product-architecture
+    sourcePath: contracts/prdEvaluationReport.schema.yml
+    surfacePaths:
+      - tests/product/verifyPrdEvaluationContract.py
+      - tests/product/verifyPrdEvaluationReport.py

@@ -6,9 +6,9 @@
 
 - [Proof Studio Landing](00-proof-studio-landing/)
 
-이 폴더의 machine gate와 사람 화면 검수, 실제 Pages 배포 증거가 모두 같은 commit을 가리킬 때만 `_done` 전이를 검토한다.
+이 폴더의 machine gate와 사람 화면 검수, 실제 Pages 배포 증거가 모두 같은 commit을 가리킬 때만 TODO 삭제를 검토한다.
 
-현재 Home은 첫 CTA를 canonical interactive lesson으로 연결하고 공개 `/learn`은 이어하기, 검색, 여섯 outcome path와 Web 310개·Local 162개의 capability 경계를 보여 준다. 472개 canonical lesson route가 route별 본문 module, 제목·description·breadcrumb·JSON-LD, sitemap과 검색 index로 prerender되며 같은 URL에서 interactive editor가 시작된다. 다만 hero의 `실제 제품 화면`이 현재 Run과 다른 과거의 runtime rail·assistant panel 3열 화면을 보여 주고 있었다. 이 캡처를 `main@c5618bf6`의 한 개 빈 셀 중심 Web Run 화면으로 교체하고, 학습 detail·mobile·Local notebook·automation proof도 같은 기준 시점으로 갱신했다. capture source 집합이 달라지면 시각 자산 gate가 실패하므로 Landing이 다시 오래된 제품 화면을 계속 광고할 수 없다. 검색 유입, 수동 접근성 검수, light/dark 전체 쌍과 사람 브랜드 검수가 남아 있어 상태는 `진행`이며 `_done`이 아니다.
+현재 Home은 첫 CTA를 canonical interactive lesson으로 연결하고 공개 `/learn`은 이어하기, 검색, 여섯 outcome path와 Web 310개·Local 162개의 capability 경계를 보여 준다. 472개 canonical lesson route가 route별 본문 module, 제목·description·breadcrumb·JSON-LD, sitemap과 검색 index로 prerender되며 같은 URL에서 interactive editor가 시작된다. 다만 hero의 `실제 제품 화면`이 현재 Run과 다른 과거의 runtime rail·assistant panel 3열 화면을 보여 주고 있었다. 이 캡처를 `main@c5618bf6`의 한 개 빈 셀 중심 Web Run 화면으로 교체하고, 학습 detail·mobile·Local notebook·automation proof도 같은 기준 시점으로 갱신했다. capture source 집합이 달라지면 시각 자산 gate가 실패하므로 Landing이 다시 오래된 제품 화면을 계속 광고할 수 없다. 검색 유입, 수동 접근성 검수, light/dark 전체 쌍과 사람 브랜드 검수가 남아 있어 상태는 `진행`이며 TODO가 남아 있다.
 
 ## 목표
 

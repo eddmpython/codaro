@@ -10,7 +10,7 @@ runtime graph는 `builtins/33_tempfile`, `34_hashlib`, `35_zipfile`을 각각 �
 
 legacy lessonRef가 들어온 Web IndexedDB archive와 Local SQLite import는 원본 hash를 먼저 검증한 뒤 canonical stem으로 다시 봉인하고, UI는 이관 건수를 자동 알린다. Day 1 Web event, Day 1 Local-native event, mixed archive 재내보내기·reload가 실제 Chromium에서 왕복했다. `buildLearningLedgers.py --write`는 실제 registry와 원장을 472/472로 동기화했고 `meta.id != stem` 441행, 전역 중복 alias 5개의 exact migration ledger를 생성했다. category-scoped collision은 0이고 category 없는 중복 alias는 migration error다.
 
-taxonomy transition proposal은 baseline `b5e9...def2`와 target `f6b0...d8efc`, graph 469에서 472, 신규 outcome·lesson 각 3개, 31개 path의 add/drop/order hash를 기록한다. 실제 변경 path는 `fileAutomation`과 `standardLibraryMastery` 두 개다. review는 아직 pending이고 apply state는 proposed이므로 31개 path header와 target hash는 갱신하지 않았다. `--apply-taxonomy-transition`은 승인 전 실행을 거부한다. identity·content review 0/472, alias·taxonomy 승인과 apply가 남아 있으므로 이 packet은 `_done`이 아니다.
+taxonomy transition proposal은 baseline `b5e9...def2`와 target `f6b0...d8efc`, graph 469에서 472, 신규 outcome·lesson 각 3개, 31개 path의 add/drop/order hash를 기록한다. 실제 변경 path는 `fileAutomation`과 `standardLibraryMastery` 두 개다. review는 아직 pending이고 apply state는 proposed이므로 31개 path header와 target hash는 갱신하지 않았다. `--apply-taxonomy-transition`은 승인 전 실행을 거부한다. identity·content review 0/472, alias·taxonomy 승인과 apply가 남아 있으므로 이 packet은 TODO가 남아 있다.
 
 ## 영향 파일
 

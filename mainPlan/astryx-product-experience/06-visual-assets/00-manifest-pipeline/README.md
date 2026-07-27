@@ -6,7 +6,7 @@
 
 모든 product, outcome, instructional, social asset을 source와 provenance가 추적되는 하나의 manifest로 관리하고 Landing과 Editor가 같은 ID를 해석하게 한다.
 
-현재 `manifest.json`과 schema, deterministic build, AVIF/WebP responsive variants, Landing/Editor generated mirror가 구현돼 있다. 사람 provenance 검수와 completion evidence가 없어 `_done`은 아니다.
+현재 `manifest.json`과 schema, deterministic build, AVIF/WebP responsive variants, Landing/Editor generated mirror가 구현돼 있다. 사람 provenance 검수와 종료 조건 검증이 없어 TODO가 남아 있다.
 
 ## 구현 순서
 
