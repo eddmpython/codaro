@@ -4,87 +4,58 @@
 
 ## 목표
 
-472개 레슨을 한 번에 나열하지 않고 이어하기, 여섯 결과 경로, 검색과 필터로 필요한 학습에 바로 진입한다.
-
-## 범위
-
-- 첫 화면에 compact heading, 이어하기, 검색 제공
-- 결과 경로마다 완성 결과, Web과 Local 범위, 첫 레슨 표시
-- 기본 DOM에는 추천 시작점만 렌더
-- 검색과 필터 결과는 최대 30개까지 렌더
-- 검색 또는 필터가 활성화되면 결과 경로와 도메인 탐색보다 일치 레슨을 먼저 렌더
-- 레슨 행에서 시간, 결과, runtime, 강한 검증 가능 여부 표시
-
-## 종료 조건
-
-- 초기 action count 80 이하
-- 초기 lesson row 12개 이하
-- 검색, runtime, path filter 접근성과 keyboard flow 통과
-- 390x844 첫 화면에서 제목, 이어하기, 검색이 모두 보임
-- 결과 경로와 레슨 링크가 canonical interactive lesson으로 연결됨
-
-## 현재 증거
-
-- 첫 화면을 이어하기, 검색, Web/Local 수량과 여섯 결과 경로 중심으로 다시 구성했다.
-- 초기 추천 행은 3개, 검색 결과는 최대 30개로 제한하고 모든 진입 링크를 canonical interactive lesson으로 연결했다.
-- Light/Dark Landing Learn desktop/mobile Chromium case와 `landing-public` 계약이 통과했다.
-- Pages `main@3a18dd97`의 `/learn/` direct load에서 Web 310, Local 162, 전체 472와 이어하기, 검색, 결과 경로가 실제 배포물에 표시됨을 확인했다.
-- 390x844 공개 화면에서 제목, 이어하기, 검색, 첫 결과 경로가 한 흐름에 보이고 horizontal overflow가 0임을 확인했다.
-- 검색어, runtime, 결과 경로를 `q`, `runtime`, `path` query로 보존하고 direct URL과 reload에서 같은 explorer 상태를 복원한다. 기존의 다른 query와 hash는 유지한다.
-- Chromium에서 `pandas` 검색 결과 17개와 URL `?q=pandas`를 확인하고 reload 뒤 검색어, 결과 수, 행 수가 모두 같은지 `landing-public` 회귀로 검증했다.
-- 검색 또는 필터가 활성화되면 여섯 결과 경로와 도메인 탭을 숨기고 compact filter 바로 아래에 일치 레슨을 평면 목록으로 배치한다. 기본 상태의 여섯 결과 경로와 추천 레슨 구조는 유지한다.
-- `pandas` 검색에서 1440x900과 390x844 모두 첫 일치 레슨이 같은 viewport 안에 들어온다. 모바일 검색 중에는 이어하기 카드를 접어 현재 첫 레슨 146px를 노출하며, 최소 96px와 horizontal overflow 0을 Chromium 회귀가 직접 검증한다.
-- query hydration이 지연된 `?path=dataReporting` direct load에서 추천 경로와 필터를 route query guard에 연결해 CLS를 0.2511에서 0.0으로 낮췄다.
-- 한국어 조합 입력 중에는 URL을 갱신하지 않고 composition 종료 뒤 한 번 반영하며 검색 입력과 결과 목록, 결과 수를 접근성 속성으로 연결했다.
+실제 검색 유입과 보조기술 환경에서 학습자가 목표, 이어하기, 검색 결과와 Web·Local 범위를 이해하고 canonical lesson으로 바로 진입할 수 있는지 사람 기준으로 검수한 뒤 이 TODO를 삭제한다.
 
 ## 남은 조건
 
-- 실제 검색 유입과 keyboard, screen reader, 한국어 IME 수동 검수. composition event와 상태 복원은 자동 검증했지만 실제 입력기와 보조 기술의 사람 검수는 포함하지 않는다.
-- 결과 경로별 사람 콘텐츠 검수
+- 실제 검색 유입 URL에서 query와 filter 상태가 이해 가능한지 검수한다.
+- keyboard만으로 검색, runtime filter, path filter와 lesson 진입을 수행한다.
+- screen reader에서 검색 입력, 결과 수, 결과 목록과 현재 filter 관계가 순서대로 전달되는지 검수한다.
+- 한국어 IME 조합 중 query나 결과가 불안정하게 갱신되지 않는지 실제 입력기로 확인한다.
+- 여섯 결과 경로의 이름, 결과물 설명, Web·Local 범위와 추천 레슨을 사람 콘텐츠 검수한다.
+
+## 구현 순서
+
+1. 대표 검색 유입과 filter deep link를 keyboard, screen reader, 한국어 IME로 검수한다.
+2. 여섯 결과 경로를 콘텐츠 owner가 검수한다.
+3. 발견한 결함을 explorer와 공용 lesson metadata owner에서 수정한다.
+4. 관련 browser gate와 사람 검수를 다시 통과한 뒤 이 packet과 parent index 링크를 삭제한다.
 
 ## 영향 파일
 
-- `landing/src/pages/learn.jsx`: 이어하기, 검색, 여섯 결과 경로, 검색 우선 lesson row, URL 상태 복원과 composition 처리
-- `landing/src/styles/learnExplorer.css`: public learning density와 desktop/mobile layout
-- `landing/src/lib/curriculumLessons.js`, `landing/src/lib/generated/curriculum.js`: 472개 lesson과 runtime·outcome metadata
-- `landing/src/lib/visualAssets.js`, `assets/brand/visuals/manifest.json`: 결과 경로별 instructional image resolution
-- `landing/scripts/prerenderReact.js`: Learn route SSR, canonical link와 검색·sitemap 산출물 연결
-- `tests/learning/verifyWebLearningRoutes.py`, `tests/surface/verifyLandingExperiencePlaywright.py`: route count와 공개 화면 증거
+- `landing/src/pages/learn.jsx`
+- `landing/src/styles/learnExplorer.css`
+- `landing/src/lib/curriculumLessons.js`
+- `landing/src/lib/generated/curriculum.js`
+- `tests/surface/verifyLandingExperiencePlaywright.py`
+- `tests/learning/verifyWebLearningRoutes.py`
 
 ## 영향 함수·심볼
 
 - `LearnPage`
 - `LessonRow`
-- `pathDefinitions`, `guidedPaths`, `featuredLessons`
-- `lessonHref`, `interactiveLessonHref`, `trackLabel`
-- `resolveVisualAsset`
-- `renderApplication`, `collectionJsonLd`, `writeRoute`
+- `pathDefinitions`
+- `lessonHref`
+- `interactiveLessonHref`
 
 ## 테스트
 
-- `uv run python -X utf8 tests/learning/verifyWebLearningRoutes.py`: contract, generated, prerender, sitemap, search lesson 각 472개와 Web 310·Local 162 분류
-- `uv run python -X utf8 tests/run.py gate landing-public`: 공개 문서, SEO, hydration 14개 경로, Light/Dark Landing 화면 검증
-- `CODARO_PRODUCT_CASE=landing-public uv run python -X utf8 tests/surface/verifyProductExperiencePlaywright.py`: 390x844·1440x900 Learn, 초기 lesson row 3개, image·overflow·link 감사와 `pandas` 검색 URL·reload 복원, 검색 상태의 결과 우선 배치
-- `uv run python -X utf8 tests/run.py gate web-learning`: Learn에서 canonical lesson으로 이어지는 대표 Chromium 여정
-- `uv run python -X utf8 tests/product/verifyAstryxJourneyAudit.py`: public Learn과 Web learning home의 공용 Astryx·금지 control 계약
-- 실제 검색 유입, keyboard, screen reader, 한국어 IME와 경로별 사람 콘텐츠 품질은 이 machine evidence에 포함되지 않는다.
+- `uv run python -X utf8 tests/run.py gate landing-public`
+- `uv run python -X utf8 tests/run.py gate web-learning`
+- `CODARO_PRODUCT_CASE=landing-public uv run python -X utf8 tests/surface/verifyProductExperiencePlaywright.py`
+- 실제 검색 유입, keyboard, screen reader, 한국어 IME와 경로별 콘텐츠 사람 검수
 
 ## 롤백
 
-- Learn 정보 구조와 CSS를 함께 되돌려도 472개 canonical lesson URL과 생성 catalog는 유지한다.
-- 검색·filter 실패 시 전체 472개를 초기 DOM에 다시 렌더하지 않고 추천 3개와 direct canonical link를 보존한다.
-- visual asset이 실패해도 경로명, 결과 설명, runtime, 첫 lesson link가 읽히는 fallback을 유지한다.
+- 검색 접근성 수정이 query 공유나 reload 복원을 깨뜨리면 해당 수정만 되돌리고 TODO를 유지한다.
+- 콘텐츠 수정에서도 canonical lesson identity와 Web·Local capability 사실을 바꾸지 않는다.
 
 ## 평가
 
 ### 개발자 관점
 
-- catalog identity와 UI filter를 분리하고 초기 3개, 검색 최대 30개로 DOM 비용을 제한했다. explorer 선택은 URL에 남아 공유와 새로고침에서 복원된다.
-- route·responsive Chromium과 composition source 계약은 green이지만 실제 keyboard, IME, screen reader 수동 검증은 남아 있다.
+- 자동 composition event 검사는 실제 입력기와 보조기술의 event·announcement 순서를 대신하지 않는다.
 
 ### PM 관점
 
-- 설치 전에 목표와 결과를 고르고 canonical lesson으로 바로 진입할 수 있으며 Web·Local 범위를 숨기지 않는다.
-- 여섯 결과 경로의 사람 콘텐츠 검수가 끝나지 않았으므로 상태는 `진행`이고 완료 또는 품질 점수 근거가 아니다.
-
-완료 전에는 TODO 삭제하지 않는다.
+- 사용자가 검색 결과가 무엇인지, 어느 환경에서 수행할 수 있는지 이해하지 못하면 이 TODO를 삭제하지 않는다.

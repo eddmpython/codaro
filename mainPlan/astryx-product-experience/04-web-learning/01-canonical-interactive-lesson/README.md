@@ -4,89 +4,56 @@
 
 ## 목표
 
-`/learn/lesson/<category>/<contentId>`가 SEO 문서와 실행 학습실을 함께 소유하는 유일한 레슨 URL이 된다.
-
-## 범위
-
-- canonical HTML에 제목, direction, outcome, 첫 worked example, exercise prompt SSR
-- 같은 URL에서 editor shell hydrate
-- pathname에서 `LessonRef`와 path, section 복원
-- code 수정 후 Run 한 번으로 output, check, hint, evidence, 다음 section 자동 갱신
-- `/run/`은 자유 노트북 전용으로 분리
-- Local 전용 레슨은 같은 문서를 읽되 capability와 전환 이유를 즉시 표시
-
-## 종료 조건
-
-- Home, Learn, 검색에서 레슨 진입 클릭 1회
-- 별도 레슨 실행, 확인, 해설 보기, 다음 section 열기 command 0개
-- direct URL과 reload에서 같은 lesson, section, draft 복원
-- canonical, JSON-LD, 실제 semantic body 검증 통과
-- Pages direct reload와 cold load smoke 통과
-
-## 현재 증거
-
-- 472개 canonical route가 semantic SSR 문서와 같은 URL의 interactive editor를 함께 제공한다.
-- pathname에서 `LessonRef`를 복원하고 code, output, 자동 검증, hint, evidence, 다음 학습을 같은 surface에 연결했다.
-- `web-learning`, `learning-method`, hydration, SEO, public claim과 Light/Dark canonical lesson Chromium case가 통과했다.
-- Pages `main@3a18dd97`의 Day 1 canonical URL을 direct cold load해 H1 `헬로월드`, `codaro-runtime-tier=web`, `codaro-lesson-runtime-tier=browser`와 편집 가능한 학습실이 같은 URL에서 복원됨을 확인했다.
-- 실제 배포 화면에서 instructional image, 학습 목표, 첫 editable exercise와 자동 기록 안내가 별도 reveal command 없이 노출됨을 확인했다.
-- 공개 레슨의 4:3 시각 프레임 안에서 16:9 원본 이미지가 고유 높이만 차지해 아래에 빈 면을 남기던 결함을 수정했다. 이미지가 프레임 너비와 높이를 채우고 중앙 기준으로 잘리도록 고정했다.
-- Day 1 canonical lesson의 실제 desktop·mobile 화면을 점검해 따옴표 없는 `#` 뒤 지시가 YAML 주석으로 사라지고 `첫 줄은`만 표시되던 결함을 찾았다. 원문을 인용 scalar로 고치고 같은 화면에서 완전한 실습 지시 한 문장과 잘린 문장 0개를 검사한다.
-- 472개 curricula 원문의 학습자 노출 scalar를 전수 검사해 따옴표 없는 inline `#`가 다시 들어오면 source 계약에서 실패하도록 고정했다.
-- `landing-public`과 `web-learning` 전체 게이트가 연속 통과해 공개 문서, interactive editor, Run, 자동 check, 저장과 reload 복원을 함께 확인했다.
+대표 학습자가 canonical lesson에서 설명, 코드 수정, 실행, 자동 feedback과 다음 학습을 이해 가능한 한 흐름으로 수행하는지 keyboard와 screen reader를 포함해 검수한 뒤 이 TODO를 삭제한다.
 
 ## 남은 조건
 
-- keyboard, screen reader와 대표 학습자의 사람 학습성 검수
+- keyboard만으로 lesson 진입, section 이동, 코드 편집, 실행과 다음 학습 이동을 수행한다.
+- screen reader에서 제목, 목표, section, 편집기, 출력, 자동 feedback과 진행 상태가 맥락 순서대로 전달되는지 검수한다.
+- 초보 대표 학습자가 별도 시작·확인·해설 reveal 없이 첫 실습과 수정 방향을 이해하는지 검수한다.
+- 검수 중 발견한 focus 유실, 중복 announcement, 설명과 실습의 단절을 수정한다.
+
+## 구현 순서
+
+1. 대표 browser lesson을 keyboard와 screen reader로 검수한다.
+2. 초보 대표 학습자가 설명부터 첫 strong check까지 수행하게 한다.
+3. 발견한 결함을 공용 curriculum renderer와 관련 lesson source에서 수정한다.
+4. 관련 gate와 같은 사람 검수를 다시 통과한 뒤 이 packet과 parent index 링크를 삭제한다.
 
 ## 영향 파일
 
-- `landing/scripts/prerenderReact.js`: 472개 lesson의 semantic SSR body와 같은 URL의 interactive editor shell 생성
-- `landing/src/pages/lesson.jsx`: public lesson metadata와 non-JavaScript 읽기 surface
-- `landing/src/styles/lessonAstryx.css`: instructional image의 4:3 프레임 채움과 중앙 crop
-- `landing/src/lib/curriculumLessons.js`, `landing/src/lib/generated/curriculum.js`: canonical `LessonRef`와 lesson payload
-- `editor/src/lib/runRouteState.ts`: pathname에서 lesson identity와 path·section·runtime tier 복원
-- `editor/src/App.tsx`, `editor/src/components/app/currentLearningSurface.tsx`: canonical lesson URL에서 학습 surface hydrate
-- `editor/src/components/curriculum/curriculumSurface.tsx`, `editor/src/components/curriculum/curriculumSectionRenderer.tsx`: 목표, 예제, editable exercise, output, 자동 verification
-- `curricula/python/basics/30days/day01_헬로월드.yaml`: 주석 실습의 `#`를 포함한 전체 지시문
-- `tests/learning/verifyWebLearningRoutes.py`, `tests/surface/verifyLandingSeo.py`, `tests/surface/verifyLandingHydration.py`: route·SEO·hydration 계약
-- `tests/curriculum/testCurriculumSectionContract.py`, `tests/surface/verifyProductExperiencePlaywright.py`: 원문 scalar와 실제 모바일 렌더링의 지시문 보존 계약
+- `editor/src/components/curriculum/curriculumOverview.tsx`
+- `editor/src/components/curriculum/curriculumSectionRenderer.tsx`
+- `editor/src/components/curriculum/curriculumSurface.tsx`
+- `editor/src/lib/runRouteState.ts`
+- `landing/src/pages/lesson.jsx`
+- `tests/surface/verifyProductExperiencePlaywright.py`
 
 ## 영향 함수·심볼
 
-- `renderInteractiveLessonShell`, `lessonInitialDocumentHtml`, `lessonInitialDocumentCss`
-- `renderShell`, `writeRoute`, `techArticleJsonLd`
-- `lessonKeyFromRef`, `lessonRefFromKey`, `runRouteStateFromLocation`, `runRoutePathname`
-- `App`, `CurrentLearningSurface`, `CurriculumSurface`, `CurriculumSectionRenderer`
+- `LearningOverviewHeader`
+- `CurriculumSectionRenderer`
+- `CurriculumSurface`
+- `runRouteStateFromLocation`
 
 ## 테스트
 
-- `uv run python -X utf8 tests/learning/verifyWebLearningRoutes.py`: 472 canonical route, lazy payload, sitemap, search identity 일치
-- `uv run python -X utf8 tests/run.py gate landing-public`: canonical, JSON-LD, semantic body, hydration, direct cold load와 instructional image 프레임 대표 case
-- `uv run python -X utf8 tests/run.py gate web-learning`: code 수정, Run, output, automatic check와 reload resume
-- `uv run python -X utf8 tests/run.py gate learning-method`: 실행 뒤 별도 check·hint reveal·다음 section open command 0개
-- `uv run python -X utf8 tests/product/verifyAstryxJourneyAudit.py`: Web lesson mobile과 public lesson desktop의 금지 control·image proof
-- `uv run pytest -q tests/curriculum/testCurriculumSectionContract.py`: 472개 curricula의 학습자 노출 scalar와 Day 1 완전한 prompt 보존
-- `CODARO_PRODUCT_CASE=web-lesson-mobile` 제품 브라우저 검증: 완전한 주석 실습 지시 1개, 잘린 `첫 줄은` 문단 0개
-- keyboard, screen reader와 대표 학습자의 이해·전이 검수는 아직 사람 증거가 없다.
+- `uv run python -X utf8 tests/run.py gate web-learning`
+- `uv run python -X utf8 tests/run.py gate learning-method`
+- `CODARO_PRODUCT_CASE=web-lesson-mobile uv run python -X utf8 tests/surface/verifyProductExperiencePlaywright.py`
+- keyboard, screen reader와 초보 대표 학습자의 사람 검수
 
 ## 롤백
 
-- interactive hydration에 회귀가 있으면 editor shell 결합만 되돌리고 canonical URL, semantic SSR body, sitemap은 유지한다.
-- route parser rollback에서도 `LessonRef={category, contentId}`와 기존 public link를 다른 identity로 바꾸지 않는다.
-- `/run/`은 자유 Notebook 역할을 유지하며 canonical lesson 실패를 `/run/` redirect로 숨기지 않는다.
-- progress·draft 복원 실패 시 저장 데이터를 삭제하지 않고 reader 변경을 되돌린다.
+- 접근성 수정이 route, draft, evidence 복원을 깨뜨리면 해당 수정만 되돌리고 TODO를 유지한다.
+- 사람 검수 실패를 별도 시작·확인·다음 section reveal control 추가로 우회하지 않는다.
 
 ## 평가
 
 ### 개발자 관점
 
-- SEO 문서와 실행 학습실이 동일한 canonical URL과 `LessonRef`를 사용하며 route·hydration machine contract는 green이다.
-- representative Chromium만 검증됐고 keyboard, screen reader, 사람 학습성 검수는 남아 있어 완료 자격이 없다.
+- 자동 browser flow는 screen reader 발화 순서와 실제 학습자의 이해를 대신하지 않는다.
 
 ### PM 관점
 
-- 검색이나 Learn에서 한 번 진입하면 설명, 수정, 실행, 출력, 자동 검증을 같은 맥락에서 수행한다.
-- 472개 route 생성 성공은 472개 lesson의 사람 품질 승인이 아니므로 상태는 `진행`으로 유지한다.
-
-완료 전에는 TODO 삭제하지 않는다.
+- 대표 학습자가 같은 맥락에서 첫 실습과 자동 feedback을 이해하지 못하면 이 TODO를 삭제하지 않는다.

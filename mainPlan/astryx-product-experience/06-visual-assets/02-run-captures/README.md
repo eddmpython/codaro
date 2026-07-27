@@ -6,7 +6,7 @@
 
 완성된 Web 학습과 Notebook 표면을 실제 fixture로 캡처해 Landing과 docs의 제품 proof로 사용한다.
 
-현재 Web Run desktop, 390px mobile lesson과 learning detail source를 `main@c5618bf6`의 Chromium 제품 화면으로 다시 캡처해 manifest와 Landing에 연결했다. 특히 Landing hero에서 과거의 runtime rail·assistant panel이 붙은 3열 편집기 캡처를 제거하고, 현재 제품과 동일한 한 개의 빈 셀·셀 추가·실행 컨트롤 중심 화면으로 교체했다. 세 capture가 참조하는 editor·token·curriculum source path 집합과 hash를 manifest에 고정해 UI source가 바뀌면 캡처도 반드시 갱신되게 했다. 전체 상태 shot, light/dark 쌍 눈검수와 종료 조건 검증이 남아 있어 TODO가 남아 있다.
+남은 종료 조건은 전체 상태 shot, light/dark 쌍 눈검수와 현재 제품 source를 기준으로 한 사람 검수다.
 
 ## 구현 순서
 

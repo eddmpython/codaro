@@ -23,7 +23,7 @@ mainPlan/
 2. 작업 폴더 이름은 `NN-kebab-name`을 쓴다. 번호는 현재 의존 순서이며 작업 삭제 뒤 번호를 다시 맞추기 위한 대규모 rename은 하지 않는다.
 3. 각 작업 폴더의 `README.md`는 목표, 범위, 구현 순서와 함께 `영향 파일`, `영향 함수·심볼`, `테스트`, `롤백`, `평가`를 반드시 포함한다.
 4. 상태는 `설계`, `대기`, `진행`, `차단`만 쓴다. 완료된 작업은 상태 문구나 체크 표시로 남기지 않고 해당 TODO 항목과 폴더를 삭제한다.
-5. 일부 하위 항목만 끝났다면 완료된 행과 설명을 TODO에서 제거하고 남은 일, 현재 blocker, 다음 검증만 유지한다.
+5. 일부 하위 항목만 끝났다면 완료된 행과 설명을 TODO에서 제거하고 남은 일, 현재 blocker, 다음 검증만 유지한다. `현재 증거`, `현재 구현`, `구현 snapshot`, 날짜별 작업 기록처럼 끝난 일을 설명하는 section을 만들지 않는다.
 6. 작업 삭제는 구현, 지정 테스트, 필요한 시각·사람 검토, 관련 문서 갱신이 모두 끝난 변경과 함께 처리한다. 종료 조건이 하나라도 남으면 TODO를 삭제하지 않는다.
 7. 하위 packet이 모두 삭제되면 빈 parent workstream도 삭제한다. initiative의 모든 일이 끝나면 initiative 폴더도 삭제하고 `mainPlan/README.md`의 활성 목록에서 제거한다.
 8. 범위를 폐기할 때도 별도 보관 폴더를 만들지 않는다. 폐기한 이유, 대체 결정, 사용자 영향은 삭제를 포함한 commit message에 기록한다.
@@ -49,7 +49,7 @@ mainPlan/
 실행한 명령, 통과·실패 결과와 확인한 수치를 적는다.
 ```
 
-각 commit message가 하나의 완료 기록이고, 이 기록들이 쌓인 `git log`가 전체 완료 이력이다. mainPlan 안에 commit hash, gate report 사본, transition ledger, completion evidence를 중복 보관하지 않는다.
+각 commit message가 하나의 완료 기록이고, 이 기록들이 쌓인 `git log`가 전체 완료 이력이다. mainPlan 안에 commit hash, workflow run ID, 통과 수치, gate report 사본, transition ledger, completion evidence를 중복 보관하지 않는다.
 
 ## 변경 절차
 

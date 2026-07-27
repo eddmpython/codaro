@@ -8,15 +8,6 @@
 
 계획 자체의 current-code 정합성과 실행 가능성은 [PRD improvement loop](01-prd-improvement-loop/)가 목표 점수 없이 평가한다. 같은 scope hash의 raw report와 fact audit가 있고 plan-internal P0·P1이 닫히기 전에는 이 workstream을 TODO 삭제하지 않는다.
 
-## 현재 구현 상태
-
-- `contracts/learningEvent.schema.json`, `contracts/masteryPolicy.v1.json`, `contracts/runRouteState.schema.json`, `contracts/learningArchive.schema.json`이 공용 계약 source다.
-- Python `MasteryPolicy`와 TypeScript `MasteryPolicy`가 같은 generated policy와 golden vector를 소비한다. `outcomeMastery`는 이 reducer를 호출하며 legacy completion/access weight와 0.6/0.4 blend는 mastery writer에서 제거됐다.
-- `RunRouteState@1`이 Web과 Local의 surface, `LessonRef`, section, document, task, runtime tier를 정규화하고 URL, history, session storage를 연결한다. 기본 제품 surface는 `curriculum`이다.
-- learning archive v2는 document, drafts, virtual FS와 package 실제 bytes, evidence, lineage, automation draft를 content-addressed blob으로 묶는다. Web materialization과 Local immutable object/atomic `HEAD` import가 구현됐고 automation draft는 명시적 실행 전까지 disabled·unscheduled다.
-
-이는 계약과 구현이 착수됐다는 뜻이다. R10 독립 평가, 사람 assessment 승인, 실제 배포와 downgrade release matrix가 없으므로 이 workstream은 `진행`이며 TODO가 남아 있다.
-
 ## 제품 capability
 
 | 기능 | Web Run | Local | 표면 규칙 |

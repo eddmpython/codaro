@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import re
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -15,6 +16,11 @@ FORBIDDEN_COMPLETION_PATHS = (
     "tests/plan/testMainPlanCompletion.py",
     "tests/product/bootstrapAfterUse.fixture.yml",
 )
+FORBIDDEN_HISTORY_HEADINGS = re.compile(
+    r"^##\s+(?:현재\s+(?:증거|구현(?:\s+상태)?)|(?:\d{4}-\d{2}-\d{2}\s+)?구현\s+snapshot)\s*$",
+    re.MULTILINE,
+)
+FORBIDDEN_COMMIT_SNAPSHOT = re.compile(r"\bmain@[0-9a-f]{7,40}\b")
 
 
 def testMainPlanContainsOnlyUnfinishedTodoTree() -> None:
@@ -45,6 +51,30 @@ def testMainPlanDocumentsDoNotDescribeDoneStorage() -> None:
             continue
         text = path.read_text(encoding="utf-8")
         if "_done" in text or "completion-evidence" in text or "completion transition" in text:
+            offenders.append(path.relative_to(ROOT).as_posix())
+
+    assert offenders == []
+
+
+def testActiveTodoDocumentsDoNotKeepCompletionHistorySections() -> None:
+    offenders = []
+    for path in sorted(MAIN_PLAN.rglob("*.md")):
+        if path == MAIN_PLAN / "README.md":
+            continue
+        text = path.read_text(encoding="utf-8")
+        if FORBIDDEN_HISTORY_HEADINGS.search(text):
+            offenders.append(path.relative_to(ROOT).as_posix())
+
+    assert offenders == []
+
+
+def testActiveTodoDocumentsDoNotStoreCommitSnapshots() -> None:
+    offenders = []
+    for path in sorted(MAIN_PLAN.rglob("*.md")):
+        if path == MAIN_PLAN / "README.md":
+            continue
+        text = path.read_text(encoding="utf-8")
+        if FORBIDDEN_COMMIT_SNAPSHOT.search(text):
             offenders.append(path.relative_to(ROOT).as_posix())
 
     assert offenders == []
