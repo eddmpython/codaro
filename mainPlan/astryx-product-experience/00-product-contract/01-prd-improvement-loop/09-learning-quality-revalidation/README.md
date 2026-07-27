@@ -79,6 +79,6 @@ Python과 TypeScript materializer가 같은 YAML을 다르게 해석하지 않�
 
 핵심 지표는 클릭 수나 레슨 열람 수가 아니라 오답 수정 뒤 강한 검증, 새 조건 전이, 시간이 지난 검색 수행이다. due 학습은 사용자가 펼치지 않아도 맥락 안에 자동 제공한다.
 
-## 완료 처리
+## TODO 삭제 조건
 
 각 하위 packet은 자체 증거가 모두 green일 때만 해당 TODO를 삭제한다. 00~05 TODO가 모두 삭제되고 독립 R10이 현재 commit을 승인하기 전에는 이 packet도, 상위 PRD loop도 완료가 아니다.

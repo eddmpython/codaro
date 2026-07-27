@@ -82,7 +82,7 @@ Codaro를 다운로드 중심 랜딩과 별도 로컬 앱의 조합으로 보지
 
 path 상태 어휘는 다음처럼 고정한다. `기존`, `수정`, `소비`는 baseline scope에 실제 존재해야 한다. `신규`는 현재 workstream의 생성 owner다. `선행 산출물 소비`는 baseline에는 없지만 명시한 선행 owner와 unlock gate가 만든 뒤 이 workstream이 사용하는 path다. `현재 초안`은 PRD loop에서 이미 생성했지만 아직 종료 조건 검증이 없는 평가 artifact다. fact audit는 이 기대 상태를 path existence와 대조한다.
 
-## 완료 처리
+## TODO 삭제 조건
 
 작업의 구현·검증·사람 승인 조건이 모두 충족되면 해당 TODO 폴더와 parent 인덱스 행을 삭제한다. `10-quality-release`를 포함한 모든 TODO가 삭제되기 전에는 이니셔티브를 완료라고 부르지 않는다. 마지막 작업이 끝나면 이니셔티브 폴더와 `mainPlan/README.md`의 활성 행도 삭제한다.
 

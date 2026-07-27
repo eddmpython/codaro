@@ -21,6 +21,11 @@ FORBIDDEN_HISTORY_HEADINGS = re.compile(
     re.MULTILINE,
 )
 FORBIDDEN_COMMIT_SNAPSHOT = re.compile(r"\bmain@[0-9a-f]{7,40}\b")
+FORBIDDEN_COMPLETION_STATE = re.compile(
+    r"^상태:\s*(?:완료|done|completed)\s*$",
+    re.IGNORECASE | re.MULTILINE,
+)
+CHECKED_TODO = re.compile(r"^\s*[-*]\s+\[[xX]\]\s+", re.MULTILINE)
 
 
 def testMainPlanContainsOnlyUnfinishedTodoTree() -> None:
@@ -75,6 +80,18 @@ def testActiveTodoDocumentsDoNotStoreCommitSnapshots() -> None:
             continue
         text = path.read_text(encoding="utf-8")
         if FORBIDDEN_COMMIT_SNAPSHOT.search(text):
+            offenders.append(path.relative_to(ROOT).as_posix())
+
+    assert offenders == []
+
+
+def testFinishedStateIsDeletedInsteadOfMarkedDone() -> None:
+    offenders = []
+    for path in sorted(MAIN_PLAN.rglob("*.md")):
+        if path == MAIN_PLAN / "README.md":
+            continue
+        text = path.read_text(encoding="utf-8")
+        if FORBIDDEN_COMPLETION_STATE.search(text) or CHECKED_TODO.search(text):
             offenders.append(path.relative_to(ROOT).as_posix())
 
     assert offenders == []

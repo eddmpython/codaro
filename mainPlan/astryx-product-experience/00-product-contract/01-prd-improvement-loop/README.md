@@ -43,7 +43,7 @@ Product evidence maturity는 `E0 없음`, `E1 synthetic`, `E2 vertical slice`, `
 
 평가 계약은 `contracts/`에 있다. 04가 downgrade-safe rollback을 구현하고, 05 feasibility가 허용한 범위에서 03·06과 top-level 제품 경로의 W0 증거를 만든다. 09는 Day 1 전이·검색과 W0 Local parity를 다시 감사해 08의 독립 평가 입력을 갱신한다. 현재 source는 R10 전에 467레슨의 strong assessment와 472개 public route까지 확장됐다. 이 구현을 숨기거나 되돌리지는 않지만, machine source coverage는 승인된 W1, E3, 사람 content review나 종료 조건 검증이 아니다. R10 미실시는 추가 machine 개선을 멈추는 조건이 아니라 독립 품질과 공개 승격을 주장하지 못하게 하는 판정 경계다. 07은 candidate release와 경로별 효능 승격을 분리하고, 03~07·09 closure evidence가 없는 상태에서는 R10 input을 seal하지 않는다.
 
-## 완료 처리
+## TODO 삭제 조건
 
 각 remediation packet은 문서만 다듬었다고 완료되지 않는다. packet에 적힌 fact audit와 negative fixture를 current implementation commit에서 통과하고 사람 검수 조건까지 충족해야 한다. 조건을 모두 충족한 packet은 parent 인덱스와 함께 삭제하며 실제 변경, 보고서 hash, 검증 명령은 상세 commit message에 남긴다. R10은 고정된 입력을 신규 evaluator가 다시 반증하는 downstream round이고, 같은 finding이 재현되면 새 remediation TODO를 만든다. 모든 packet이 삭제돼도 제품 workstream은 별도 구현·사람·출시 증거가 없으면 활성 상태다.
 

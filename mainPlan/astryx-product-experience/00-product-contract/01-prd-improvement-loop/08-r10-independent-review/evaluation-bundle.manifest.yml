@@ -4,14 +4,14 @@ state: draft
 scope:
   sealState: draft
   gitCommit: 3a773a7b9427fed3c50138dcc28c830cc23b7932
-  dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: c33fb6aea45e56881beaa260760d9ddab59d7d3b164ff547996fb7cd262e1660
+  dirtyDiffHash: f606ed736b316494d84c231bca774d3cc17ccd12991a6f58eb740846c9ad649d
+  manifestHash: 2986cbbdf6df21552564aaddb35b292f39a0ec908268bcb6c1043ea2a4bc9204
   fileCount: 2681
-  totalBytes: 88231589
+  totalBytes: 88214416
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: 69aff37fbbd4ea62032064d998b8c9d8dad02d431604fee4bf1e13d738cfea82
-  bytes: 88747401
+  sha256: da3e383695c35e04010238afafe40a440ec37a8488c0822b4081ab4b7c43ab6d
+  bytes: 88730228
   format: zip
   compression: stored
   compressionMethod: 0
@@ -10944,8 +10944,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/evidence/featured-capstones.yml
 - path: mainPlan/astryx-product-experience/09-repository-simplification/README.md
-  sha256: 8c6aa2218a0fd97818b2c85e8eeb1ceed6473c97d404fbcc7259d08183cce008
-  bytes: 20561
+  sha256: d860c722c371045bdac5491fb1c7b01d876c62422afec129a2fc3b84b6ca5dc3
+  bytes: 2773
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/09-repository-simplification/README.md
 - path: mainPlan/astryx-product-experience/10-quality-release/README.md
@@ -10954,8 +10954,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/10-quality-release/README.md
 - path: mainPlan/astryx-product-experience/README.md
-  sha256: cc563d3364d2268f52239b185396cce58314e454cfb1c5cf49caa1294f27ac4e
-  bytes: 14976
+  sha256: 0faa85b51b1ca397d59d35848c246b25b2fee9b24bc12c880fdb483db8128705
+  bytes: 14981
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/README.md
 - path: pyproject.toml
@@ -12939,8 +12939,8 @@ files:
   kind: repository
   sourcePath: tests/migrations/testClassroomArchive.py
 - path: tests/plan/testMainPlanTodoPolicy.py
-  sha256: 3c3d5aab81b6be58bb645587de3a3395174535b6b7ee7ad43c2b4f493e60d9a0
-  bytes: 2646
+  sha256: f5eeb33d74ad6bb101089033bf2ccc95899f45783a5f9898644574f329224263
+  bytes: 3256
   kind: repository
   sourcePath: tests/plan/testMainPlanTodoPolicy.py
 - path: tests/playwrightCli.py
