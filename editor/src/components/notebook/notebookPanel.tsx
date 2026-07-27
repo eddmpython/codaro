@@ -167,6 +167,39 @@ const contentFitCodeCellEditorTheme = EditorView.theme({
   },
 });
 
+function keepNotebookCellClearOfFloatingTools(cell: Element | null): void {
+  if (!(cell instanceof HTMLElement)) return;
+  const viewport = document.querySelector(
+    '.notebookViewport [data-slot="scroll-area-viewport"]',
+  );
+  if (!(viewport instanceof HTMLElement)) return;
+
+  const cellRect = cell.getBoundingClientRect();
+  const visibleControlRects = [
+    ...document.querySelectorAll<HTMLElement>(
+      ".notebookFloatingTools, .notebookWidthTools",
+    ),
+  ]
+    .filter((element) => {
+      const rect = element.getBoundingClientRect();
+      const style = window.getComputedStyle(element);
+      return rect.width > 0
+        && rect.height > 0
+        && style.visibility !== "hidden"
+        && style.display !== "none";
+    })
+    .map((element) => element.getBoundingClientRect())
+    .filter((rect) => (
+      Math.min(cellRect.right, rect.right) - Math.max(cellRect.left, rect.left) > 1
+      && Math.min(cellRect.bottom, rect.bottom) - Math.max(cellRect.top, rect.top) > 1
+    ));
+  if (!visibleControlRects.length) return;
+
+  const firstControlTop = Math.min(...visibleControlRects.map((rect) => rect.top));
+  const clearance = 16;
+  viewport.scrollTop += Math.max(0, cellRect.bottom - firstControlTop + clearance);
+}
+
 export function NotebookPanel({
   apiOnline,
   canRun,
@@ -679,13 +712,19 @@ export function CodeCellEditor({
 
   useEffect(() => {
     if (!autoFocus) return;
+    let revealFrame = 0;
     const focusFrame = window.requestAnimationFrame(() => {
       viewRef.current?.focus();
-      hostRef.current
-        ?.closest("[data-notebook-cell]")
-        ?.scrollIntoView({ block: "nearest" });
+      const cell = hostRef.current?.closest("[data-notebook-cell]") ?? null;
+      cell?.scrollIntoView({ block: "nearest" });
+      revealFrame = window.requestAnimationFrame(() => {
+        keepNotebookCellClearOfFloatingTools(cell);
+      });
     });
-    return () => window.cancelAnimationFrame(focusFrame);
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      window.cancelAnimationFrame(revealFrame);
+    };
   }, [autoFocus]);
 
   useEffect(() => {
@@ -801,13 +840,19 @@ function DocumentBlock({
 
   useEffect(() => {
     if (!autoFocus || block.type !== "markdown") return;
+    let revealFrame = 0;
     const focusFrame = window.requestAnimationFrame(() => {
       markdownEditorRef.current?.focus();
-      markdownEditorRef.current
-        ?.closest("[data-notebook-cell]")
-        ?.scrollIntoView({ block: "nearest" });
+      const cell = markdownEditorRef.current?.closest("[data-notebook-cell]") ?? null;
+      cell?.scrollIntoView({ block: "nearest" });
+      revealFrame = window.requestAnimationFrame(() => {
+        keepNotebookCellClearOfFloatingTools(cell);
+      });
     });
-    return () => window.cancelAnimationFrame(focusFrame);
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      window.cancelAnimationFrame(revealFrame);
+    };
   }, [autoFocus, block.type]);
 
   const updateDraft = (value: string) => {

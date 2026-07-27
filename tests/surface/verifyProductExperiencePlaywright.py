@@ -1097,15 +1097,60 @@ def verifyLongNotebookKeyboardNavigation(
           }
           const viewportRect = viewport.getBoundingClientRect();
           const selectedRect = selected.getBoundingClientRect();
+          const visible = (element) => {
+            if (!(element instanceof HTMLElement)) return false;
+            const rect = element.getBoundingClientRect();
+            const style = getComputedStyle(element);
+            return rect.width > 0
+              && rect.height > 0
+              && style.visibility !== 'hidden'
+              && style.display !== 'none';
+          };
+          const controlOverlaps = [
+            ...document.querySelectorAll('.notebookFloatingTools, .notebookWidthTools')
+          ]
+            .filter(visible)
+            .filter((element) => {
+              const rect = element.getBoundingClientRect();
+              return Math.min(selectedRect.right, rect.right)
+                  - Math.max(selectedRect.left, rect.left) > 1
+                && Math.min(selectedRect.bottom, rect.bottom)
+                  - Math.max(selectedRect.top, rect.top) > 1;
+            })
+            .map((element) => element.getAttribute('aria-label') || element.className);
           return {
+            controlRects: [
+              ...document.querySelectorAll('.notebookFloatingTools, .notebookWidthTools')
+            ].filter(visible).map((element) => {
+              const rect = element.getBoundingClientRect();
+              return {
+                label: element.getAttribute('aria-label') || element.className,
+                top: rect.top,
+                bottom: rect.bottom,
+                left: rect.left,
+                right: rect.right,
+              };
+            }),
+            selectedRect: {
+              top: selectedRect.top,
+              bottom: selectedRect.bottom,
+              left: selectedRect.left,
+              right: selectedRect.right,
+            },
             scrollTop: viewport.scrollTop,
             selectedVisible: selectedRect.top >= viewportRect.top - 1
               && selectedRect.top < viewportRect.bottom,
+            controlOverlaps,
           };
         }"""
     )
     if not topSnapshot["selectedVisible"]:
         raise AssertionError("keyboard navigation did not reveal the first notebook cell")
+    if topSnapshot["controlOverlaps"]:
+        raise AssertionError(
+            "keyboard navigation left the first notebook cell behind controls: "
+            f"{topSnapshot['controlOverlaps']}"
+        )
 
     for expectedIndex in range(1, targetCellCount):
         page.keyboard.press("Control+End")
@@ -1138,15 +1183,60 @@ def verifyLongNotebookKeyboardNavigation(
           }
           const viewportRect = viewport.getBoundingClientRect();
           const selectedRect = selected.getBoundingClientRect();
+          const visible = (element) => {
+            if (!(element instanceof HTMLElement)) return false;
+            const rect = element.getBoundingClientRect();
+            const style = getComputedStyle(element);
+            return rect.width > 0
+              && rect.height > 0
+              && style.visibility !== 'hidden'
+              && style.display !== 'none';
+          };
+          const controlOverlaps = [
+            ...document.querySelectorAll('.notebookFloatingTools, .notebookWidthTools')
+          ]
+            .filter(visible)
+            .filter((element) => {
+              const rect = element.getBoundingClientRect();
+              return Math.min(selectedRect.right, rect.right)
+                  - Math.max(selectedRect.left, rect.left) > 1
+                && Math.min(selectedRect.bottom, rect.bottom)
+                  - Math.max(selectedRect.top, rect.top) > 1;
+            })
+            .map((element) => element.getAttribute('aria-label') || element.className);
           return {
+            controlRects: [
+              ...document.querySelectorAll('.notebookFloatingTools, .notebookWidthTools')
+            ].filter(visible).map((element) => {
+              const rect = element.getBoundingClientRect();
+              return {
+                label: element.getAttribute('aria-label') || element.className,
+                top: rect.top,
+                bottom: rect.bottom,
+                left: rect.left,
+                right: rect.right,
+              };
+            }),
+            selectedRect: {
+              top: selectedRect.top,
+              bottom: selectedRect.bottom,
+              left: selectedRect.left,
+              right: selectedRect.right,
+            },
             scrollTop: viewport.scrollTop,
             selectedVisible: selectedRect.bottom <= viewportRect.bottom + 1
               && selectedRect.bottom > viewportRect.top,
+            controlOverlaps,
           };
         }"""
     )
     if not bottomSnapshot["selectedVisible"]:
         raise AssertionError("keyboard navigation did not reveal the final notebook cell")
+    if bottomSnapshot["controlOverlaps"]:
+        raise AssertionError(
+            "keyboard navigation left the final notebook cell behind controls: "
+            f"{bottomSnapshot['controlOverlaps']}"
+        )
     if not markdownVisited:
         raise AssertionError("keyboard navigation did not focus the Markdown textarea")
 
@@ -1172,6 +1262,10 @@ def verifyLongNotebookKeyboardNavigation(
             throw new Error('notebook line visual targets are missing');
           }
           return {
+            activeElementClass: document.activeElement?.className ?? null,
+            activeElementTag: document.activeElement?.tagName ?? null,
+            selectedContainsActive: selectedCell?.contains(document.activeElement) ?? false,
+            selectedEditorClass: selectedCell?.querySelector('.cm-editor')?.className ?? null,
             selectedLineBackground: getComputedStyle(selectedLine).backgroundColor,
             unselectedLineBackground: getComputedStyle(unselectedLine).backgroundColor,
             selectedFrameBorder: getComputedStyle(selectedFrame).borderColor,
@@ -2076,6 +2170,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "expectMinimalNotebook": True,
             "expectMobileProductNav": True,
             "expectedMobileSurface": "editor",
+            "verifyNotebookKeyboardNavigation": True,
         },
         {
             "name": "web-run-mobile",
@@ -2087,6 +2182,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "expectMinimalNotebook": True,
             "expectMobileProductNav": True,
             "expectedMobileSurface": "editor",
+            "verifyNotebookKeyboardNavigation": True,
         },
         {
             "name": "web-run-desktop",

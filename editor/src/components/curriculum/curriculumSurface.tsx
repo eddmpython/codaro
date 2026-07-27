@@ -66,7 +66,8 @@ export function CurriculumView({
         const dueBlocks = await dueAssessmentBlocks(document.blocks, candidates, events);
         if (active) setAssessmentBlocks(dueBlocks);
       }).catch((error: unknown) => {
-        if (active) setAssessmentBlocks([]);
+        if (!active) return;
+        setAssessmentBlocks([]);
         console.error("learning assessment queue refresh failed", error);
       });
     };

@@ -194,6 +194,10 @@
     min-width: 0;
   }
 
+  [data-astryx-theme="codaro"] .notebookCell {
+    scroll-margin-block: 30px 100px;
+  }
+
   [data-astryx-theme="codaro"] .notebookCellBody,
   [data-astryx-theme="codaro"] .notebookCodeFrame {
     min-height: 40px;

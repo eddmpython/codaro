@@ -15,7 +15,6 @@
 
 ## 다음 검증
 
-- Windows 11의 current Evergreen WebView2에서 `product-browser-webview2-evergreen`을 먼저 통과시킨다.
 - 같은 설치본과 1024×768 viewport에서 NVDA 또는 Narrator의 실제 발화 순서를 기록한다.
 - 같은 설치본의 Code·Markdown 셀에서 한글 IME 조합과 경계 이동을 사람 입력으로 검수한다.
 - 남은 조건이 모두 충족되면 이 packet과 parent index의 링크를 삭제하고, 구현·검수 사실은 상세 commit message에 기록한다.

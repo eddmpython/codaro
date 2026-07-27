@@ -340,17 +340,36 @@ def testLongNotebookKeyboardNavigationSharesCodeAndMarkdownBoundaries() -> None:
         "notebookKeyboardNavigationEvidence",
         "12-cell notebook did not create a long scrollable document",
         "keyboard navigation did not focus the Markdown textarea",
+        "keyboard navigation left the final notebook cell behind controls",
     ):
         assert marker in productGate
-    assert productGate.count('"verifyNotebookKeyboardNavigation": True') == 2
+    assert productGate.count('"verifyNotebookKeyboardNavigation": True') == 4
+    for caseName in (
+        '"name": "web-run-compact"',
+        '"name": "web-run-mobile"',
+        '"name": "web-run-desktop"',
+        '"name": "local-run-minimum"',
+    ):
+        assert caseName in productGate
     for marker in (
         "verify_long_notebook_keyboard_navigation",
         '"local-notebook-keyboard-12-cells"',
         '"markdownFocusedUp"',
         '"markdownFocusedDown"',
+        '"lastCellUnobscured"',
         "12-cell Code and Markdown keyboard boundary navigation with focus scrolling",
     ):
         assert marker in webviewGate
+
+
+def testLearningAssessmentRefreshIgnoresUnmountedRequestFailures() -> None:
+    curriculumSurface = _read("editor/src/components/curriculum/curriculumSurface.tsx")
+    inactiveGuard = curriculumSurface.index("if (!active) return;")
+    errorLog = curriculumSurface.index(
+        'console.error("learning assessment queue refresh failed", error);'
+    )
+
+    assert inactiveGuard < errorLog
 
 
 def testLocalLearningArchiveReturnsToWebWithoutChangingPortableContent() -> None:

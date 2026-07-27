@@ -4,6 +4,7 @@ import asyncio
 import json
 import os
 from pathlib import Path
+import sys
 from types import SimpleNamespace
 
 import pytest
@@ -1317,6 +1318,34 @@ def testSpaServesExistingAssetWithRealMime(tmp_path: Path) -> None:
     assert response.status_code == 200
     assert "javascript" in response.headers["content-type"]
     assert "html" not in response.headers["content-type"]
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows extended-length path contract")
+def testSpaServesExistingAssetBeyondWindowsMaxPath(tmp_path: Path) -> None:
+    buildRoot = tmp_path / ("webBuild-" + "x" * 170)
+    extendedRoot = Path(f"\\\\?\\{buildRoot.resolve()}")
+    (extendedRoot / "_app").mkdir(parents=True)
+    (extendedRoot / "index.html").write_text(
+        "<html><head></head><body>codaro</body></html>", encoding="utf-8"
+    )
+    relativeAsset = (
+        Path("visuals")
+        / "files"
+        / "pythonFoundationOutcome"
+        / "pythonFoundationOutcome-480-f6dc75e2fa34.avif"
+    )
+    extendedAsset = extendedRoot / relativeAsset
+    extendedAsset.parent.mkdir(parents=True)
+    extendedAsset.write_bytes(b"long-path-visual")
+    assert len(str(buildRoot / relativeAsset)) > 260
+
+    app = FastAPI()
+    app.include_router(createSpaRouter(SimpleNamespace(webBuildRoot=buildRoot)))
+    response = TestClient(app).get(f"/{relativeAsset.as_posix()}")
+
+    assert response.status_code == 200
+    assert response.content == b"long-path-visual"
+    assert response.headers["content-type"] == "image/avif"
 
 
 def testSpaMissingAssetReturns404NotIndexHtml(tmp_path: Path) -> None:

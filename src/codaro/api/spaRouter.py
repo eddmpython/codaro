@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from fastapi import APIRouter, Request
@@ -11,19 +12,22 @@ from ..system.serverState import ServerState
 def createSpaRouter(state: ServerState) -> APIRouter:
     router = APIRouter()
 
-    indexPath = state.webBuildRoot / "index.html"
-    assetsPath = state.webBuildRoot / "_app"
+    webBuildRoot = state.webBuildRoot.resolve()
+    indexPath = _filesystemPath(webBuildRoot / "index.html")
+    assetsPath = _filesystemPath(webBuildRoot / "_app")
 
     if indexPath.is_file() and assetsPath.is_dir():
         indexHtml = indexPath.read_text(encoding="utf-8")
 
         @router.get("/{fullPath:path}", response_model=None)
         def spa(fullPath: str, request: Request) -> FileResponse | HTMLResponse | PlainTextResponse:
-            filePath = state.webBuildRoot / fullPath
-            if fullPath and filePath.is_file():
-                if not filePath.resolve().is_relative_to(state.webBuildRoot.resolve()):
+            if fullPath:
+                resolvedPath = (webBuildRoot / fullPath).resolve()
+                if not resolvedPath.is_relative_to(webBuildRoot):
                     return PlainTextResponse("Not Found", status_code=404)
-                return FileResponse(filePath)
+                filePath = _filesystemPath(resolvedPath)
+                if filePath.is_file():
+                    return FileResponse(filePath)
             # A request for a missing file that carries an extension (a hashed build
             # asset, favicon, source map, …) must 404. Falling back to index.html
             # makes the browser receive text/html where it expected JS/CSS; with
@@ -51,3 +55,11 @@ def createSpaRouter(state: ServerState) -> APIRouter:
         }
 
     return router
+
+
+def _filesystemPath(path: Path) -> Path:
+    resolved = path.resolve()
+    raw = str(resolved)
+    if os.name == "nt" and not raw.startswith("\\\\?\\"):
+        return Path(f"\\\\?\\{raw}")
+    return resolved

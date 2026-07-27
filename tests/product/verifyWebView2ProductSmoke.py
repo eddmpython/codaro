@@ -55,6 +55,7 @@ def main() -> int:
     app_port: int | None = None
     cdp_port: int | None = None
     deployed_archive: dict[str, Any] | None = None
+    resource_failures: list[dict[str, Any]] = []
 
     try:
         require_windows()
@@ -78,6 +79,28 @@ def main() -> int:
                 console_errors: list[str] = []
                 page.on("console", lambda message: console_errors.append(message.text) if message.type == "error" else None)
                 page.on("pageerror", lambda error: console_errors.append(str(error)))
+                page.on(
+                    "response",
+                    lambda response: resource_failures.append({
+                        "kind": "http",
+                        "method": response.request.method,
+                        "resourceType": response.request.resource_type,
+                        "status": response.status,
+                        "url": response.url,
+                    }) if response.status >= 400 else None,
+                )
+                page.on(
+                    "requestfailed",
+                    lambda request: resource_failures.append({
+                        "error": request.failure,
+                        "kind": "network",
+                        "method": request.method,
+                        "resourceType": request.resource_type,
+                        "url": request.url,
+                    }) if request.resource_type in {
+                        "document", "font", "image", "manifest", "script", "stylesheet"
+                    } else None,
+                )
 
                 case_specs = (
                     ("local-home-900x640", "home", 900, 640, "[data-local-home-surface='true']"),
@@ -131,6 +154,12 @@ def main() -> int:
                     )
                 if console_errors:
                     failures.extend(f"WebView2 console: {message}" for message in console_errors)
+                if resource_failures:
+                    failures.extend(
+                        "WebView2 resource: "
+                        + json.dumps(failure, ensure_ascii=False, sort_keys=True)
+                        for failure in resource_failures
+                    )
             finally:
                 browser.close()
     except Exception as exc:
@@ -172,6 +201,7 @@ def main() -> int:
         },
         "caseCount": len(cases),
         "cases": cases,
+        "resourceFailures": resource_failures,
         "failures": failures,
         "claimScope": {
             "covered": [
@@ -600,8 +630,10 @@ def verify_long_notebook_keyboard_navigation(
         "longDocument": initial_scroll["scrollHeight"] > initial_scroll["clientHeight"],
         "firstCellReached": top_state["selectedIndex"] == 0,
         "firstCellVisible": bool(top_state["selectedVisible"]),
+        "firstCellUnobscured": not top_state["controlOverlaps"],
         "lastCellReached": bottom_state["selectedIndex"] == target_count - 1,
         "lastCellVisible": bool(bottom_state["selectedVisible"]),
+        "lastCellUnobscured": not bottom_state["controlOverlaps"],
         "markdownFocusedUp": markdown_up,
         "markdownFocusedDown": markdown_down,
     }
@@ -641,10 +673,50 @@ def notebook_navigation_viewport_state(page: Page) -> dict[str, Any]:
           }
           const viewportRect = viewport.getBoundingClientRect();
           const selectedRect = selected.getBoundingClientRect();
+          const visible = (element) => {
+            if (!(element instanceof HTMLElement)) return false;
+            const rect = element.getBoundingClientRect();
+            const style = getComputedStyle(element);
+            return rect.width > 0
+              && rect.height > 0
+              && style.visibility !== 'hidden'
+              && style.display !== 'none';
+          };
+          const controlOverlaps = [
+            ...document.querySelectorAll('.notebookFloatingTools, .notebookWidthTools')
+          ]
+            .filter(visible)
+            .filter((element) => {
+              const rect = element.getBoundingClientRect();
+              return Math.min(selectedRect.right, rect.right)
+                  - Math.max(selectedRect.left, rect.left) > 1
+                && Math.min(selectedRect.bottom, rect.bottom)
+                  - Math.max(selectedRect.top, rect.top) > 1;
+            })
+            .map((element) => element.getAttribute('aria-label') || element.className);
           return {
+            controlRects: [
+              ...document.querySelectorAll('.notebookFloatingTools, .notebookWidthTools')
+            ].filter(visible).map((element) => {
+              const rect = element.getBoundingClientRect();
+              return {
+                label: element.getAttribute('aria-label') || element.className,
+                top: rect.top,
+                bottom: rect.bottom,
+                left: rect.left,
+                right: rect.right,
+              };
+            }),
+            selectedRect: {
+              top: selectedRect.top,
+              bottom: selectedRect.bottom,
+              left: selectedRect.left,
+              right: selectedRect.right,
+            },
             selectedIndex: cells.indexOf(selected),
             selectedVisible: selectedRect.top < viewportRect.bottom
               && selectedRect.bottom > viewportRect.top,
+            controlOverlaps,
             scrollTop: viewport.scrollTop,
           };
         }"""
