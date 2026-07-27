@@ -448,7 +448,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/outcomes/dataReportOutcome.png",
       "sourceHash": "sha256-ec957d18c47b7601355a4ae34fa065f024becf24178692e66a8055663ddc3ff7",
-      "sourceGitHead": "ff030c0c418812c18c3aadac4c7757112bbe0676",
+      "sourceGitHead": "ff476a02f52a1875273252a251dff7047896ded6",
       "provenance": {
         "author": "Codaro outcome capture pipeline",
         "license": "proprietary-project",
@@ -523,7 +523,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/outcomes/fileAutomationOutcome.png",
       "sourceHash": "sha256-ce17121e083ea0e261de403e19eaefb5c5ed9e59b493d57dd40c13974468d728",
-      "sourceGitHead": "ff030c0c418812c18c3aadac4c7757112bbe0676",
+      "sourceGitHead": "ff476a02f52a1875273252a251dff7047896ded6",
       "provenance": {
         "author": "Codaro outcome capture pipeline",
         "license": "proprietary-project",
@@ -598,7 +598,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/outcomes/officeAutomationOutcome.png",
       "sourceHash": "sha256-f1c770d50406d59749e42c04c5a24c4359cca201c38290ffb904981423a98197",
-      "sourceGitHead": "ff030c0c418812c18c3aadac4c7757112bbe0676",
+      "sourceGitHead": "ff476a02f52a1875273252a251dff7047896ded6",
       "provenance": {
         "author": "Codaro outcome capture pipeline",
         "license": "proprietary-project",
@@ -673,7 +673,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/outcomes/webMonitoringOutcome.png",
       "sourceHash": "sha256-9fc0240d4f0ffd145d15c4d013fd0a73d2237078791806bc8f924458a6d5d00d",
-      "sourceGitHead": "ff030c0c418812c18c3aadac4c7757112bbe0676",
+      "sourceGitHead": "ff476a02f52a1875273252a251dff7047896ded6",
       "provenance": {
         "author": "Codaro outcome capture pipeline",
         "license": "proprietary-project",
@@ -748,7 +748,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/outcomes/pythonFoundationOutcome.png",
       "sourceHash": "sha256-f6dc75e2fa349545a7a1d399f3121af390d3307bd09478ce628283999244c1d3",
-      "sourceGitHead": "751e43f7032bb43ef3898fddc9cec9173f98c852",
+      "sourceGitHead": "ff476a02f52a1875273252a251dff7047896ded6",
       "provenance": {
         "author": "Codaro outcome capture pipeline",
         "license": "proprietary-project",
@@ -823,7 +823,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/outcomes/dataVisualizationOutcome.png",
       "sourceHash": "sha256-3e10f67c139c1d2d0866588d82e31db62fb59f4128f874235fbd55ee2794e61f",
-      "sourceGitHead": "751e43f7032bb43ef3898fddc9cec9173f98c852",
+      "sourceGitHead": "ff476a02f52a1875273252a251dff7047896ded6",
       "provenance": {
         "author": "Codaro outcome capture pipeline",
         "license": "proprietary-project",
