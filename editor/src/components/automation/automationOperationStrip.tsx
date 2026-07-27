@@ -34,7 +34,7 @@ export function AutomationOperationStrip({
   const { t } = useLocale();
   return (
     <section
-      className="sticky top-0 z-20 overflow-x-auto border-y border-border bg-background/95 backdrop-blur-sm"
+      className="sticky top-0 z-20 min-h-14 overflow-x-auto border-y border-border bg-background"
       data-automation-estop-state={eStop.active ? "active" : "clear"}
       data-automation-operation-strip="true"
     >

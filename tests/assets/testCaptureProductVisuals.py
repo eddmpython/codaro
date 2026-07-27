@@ -6,6 +6,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
+from PIL import Image
+
 
 ROOT = Path(__file__).resolve().parents[2]
 CAPTURE_TOOL_PATH = ROOT / "tests" / "assets" / "captureProductVisuals.py"
@@ -66,6 +68,52 @@ class CaptureProductVisualsTest(unittest.TestCase):
                     f"sha256-{CAPTURE_TOOL.sha256Path(sourcePath)}",
                     asset["sourceHash"],
                 )
+
+    def testPixelComparisonAllowsOnlyTinyRoundedBorderRasterNoise(self) -> None:
+        with tempfile.TemporaryDirectory(prefix="codaro-pixel-comparison-") as directory:
+            root = Path(directory)
+            expectedPath = root / "expected.png"
+            withinTolerancePath = root / "within-tolerance.png"
+            tooManyPixelsPath = root / "too-many-pixels.png"
+            tooMuchDeltaPath = root / "too-much-delta.png"
+            expected = Image.new("RGBA", (10, 10), (20, 21, 24, 255))
+            expected.save(expectedPath)
+
+            withinTolerance = expected.copy()
+            for x in range(CAPTURE_TOOL.MAX_RASTER_NOISE_PIXELS):
+                withinTolerance.putpixel((x, 0), (28, 21, 24, 255))
+            withinTolerance.save(withinTolerancePath)
+            comparison = CAPTURE_TOOL.pngPixelComparison(
+                expectedPath,
+                withinTolerancePath,
+            )
+            self.assertTrue(comparison["equivalent"])
+            self.assertFalse(comparison["byteExact"])
+            self.assertEqual(comparison["differingPixelCount"], 8)
+            self.assertEqual(comparison["maxChannelDelta"], 8)
+
+            tooManyPixels = withinTolerance.copy()
+            tooManyPixels.putpixel((8, 0), (28, 21, 24, 255))
+            tooManyPixels.save(tooManyPixelsPath)
+            self.assertFalse(
+                CAPTURE_TOOL.pngPixelComparison(
+                    expectedPath,
+                    tooManyPixelsPath,
+                )["equivalent"]
+            )
+
+            tooMuchDelta = expected.copy()
+            tooMuchDelta.putpixel(
+                (0, 0),
+                (20 + CAPTURE_TOOL.MAX_RASTER_CHANNEL_DELTA + 1, 21, 24, 255),
+            )
+            tooMuchDelta.save(tooMuchDeltaPath)
+            self.assertFalse(
+                CAPTURE_TOOL.pngPixelComparison(
+                    expectedPath,
+                    tooMuchDeltaPath,
+                )["equivalent"]
+            )
 
     def testLocalAutomationFixtureHasStableIdsTimesAndBytes(self) -> None:
         with tempfile.TemporaryDirectory(prefix="codaro-automation-fixture-a-") as first:

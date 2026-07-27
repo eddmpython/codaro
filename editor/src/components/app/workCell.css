@@ -25,7 +25,6 @@
   [data-astryx-theme="codaro"] .astryxWorkCell[data-work-cell-selected="true"] .astryxWorkCellFrame,
   [data-astryx-theme="codaro"] .astryxWorkCellFrame:focus-within {
     border-color: var(--color-accent);
-    box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-accent) 42%, transparent);
   }
 
   [data-astryx-theme="codaro"] .astryxWorkCell[data-work-cell-running="true"] .astryxWorkCellFrame {

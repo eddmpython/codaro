@@ -4743,14 +4743,59 @@ def runBrowserMatrix(
                         }
                         """
                     )
-                    page.wait_for_timeout(800)
+                    page.evaluate("() => document.fonts ? document.fonts.ready : Promise.resolve()")
+                    if case["surface"] in {"local-run", "web-run"}:
+                        selectedNotebookEditor = page.locator(
+                            '[data-notebook-cell-selected="true"] .cm-content'
+                        ).first
+                        if selectedNotebookEditor.count():
+                            selectedNotebookEditor.focus()
+                    page.evaluate(
+                        """
+                        () => new Promise((resolve) => requestAnimationFrame(
+                          () => requestAnimationFrame(resolve)
+                        ))
+                        """
+                    )
+                    proofLayoutEvidence = page.evaluate(
+                        """
+                        () => {
+                          const rectFor = (selector) => {
+                            const element = document.querySelector(selector);
+                            if (!(element instanceof HTMLElement)) return null;
+                            const rect = element.getBoundingClientRect();
+                            return Object.fromEntries(
+                              ['top', 'right', 'bottom', 'left', 'width', 'height'].map(
+                                (key) => [key, Math.round(rect[key] * 1000) / 1000]
+                              )
+                            );
+                          };
+                          return {
+                            automationHeader: rectFor(
+                              '[data-automation-loop="second-loop"] > div > header'
+                            ),
+                            runtimeRail: rectFor('[data-runtime-capability-rail]'),
+                            operationStrip: rectFor('[data-automation-operation-strip="true"]'),
+                            automationStudio: rectFor('[data-automation-studio-layout="true"]'),
+                            selectedNotebookFrame: rectFor(
+                              '[data-notebook-cell-selected="true"] .astryxWorkCellFrame'
+                            ),
+                          };
+                        }
+                        """
+                    )
                     audit = page.evaluate(
                         AUDIT_SCRIPT,
                         {"surface": case["surface"], "expectedTier": case.get("expectedTier")},
                     )
                     screenshotPath = SCREENSHOT_ROOT / colorScheme / f"{case['name']}.png"
                     screenshotPath.parent.mkdir(parents=True, exist_ok=True)
-                    page.screenshot(path=str(screenshotPath), full_page=False)
+                    page.screenshot(
+                        path=str(screenshotPath),
+                        animations="disabled",
+                        caret="hide",
+                        full_page=False,
+                    )
                     if case.get("verifyNotebookTools"):
                         notebookToolsToggle = page.locator('[data-notebook-tools-toggle="true"]')
                         if not notebookToolsToggle.is_visible():
@@ -4916,6 +4961,7 @@ def runBrowserMatrix(
                             "notebookKeyboardNavigationEvidence": (
                                 notebookKeyboardNavigationEvidence
                             ),
+                            "proofLayoutEvidence": proofLayoutEvidence,
                             "failures": caseFailures,
                             "screenshot": str(screenshotPath.relative_to(ROOT)).replace("\\", "/"),
                         }

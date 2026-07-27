@@ -38,7 +38,7 @@ export function RuntimeCapabilityRail({
   return (
     <section
       aria-label={copy.aria}
-      className="grid grid-cols-3 border-y border-border bg-muted/25 xl:grid-cols-[minmax(260px,1.55fr)_repeat(3,minmax(0,0.8fr))]"
+      className="grid min-h-14 grid-cols-3 border-y border-border bg-muted/25 xl:grid-cols-[minmax(260px,1.55fr)_repeat(3,minmax(0,0.8fr))]"
       data-runtime-capability-rail={surface}
       data-runtime-tier={tier}
     >

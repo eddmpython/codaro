@@ -116,7 +116,7 @@ export function AutomationView({
     <ScrollArea className="h-full min-h-0">
       <div className="p-3 sm:p-4 xl:pt-12" data-automation-loop="second-loop" data-automation-source="validated-cell-recipe">
         <div className="mx-auto max-w-[1500px] space-y-3">
-          <header className="flex min-w-0 items-start gap-3 pl-9">
+          <header className="flex min-h-12 min-w-0 items-start gap-3 pl-9">
             <div className="min-w-0 flex-1">
               <h1 className="text-lg font-semibold tracking-normal">{t("automation.section.title")}</h1>
               <p className="mt-1 max-w-4xl text-xs leading-5 text-muted-foreground">

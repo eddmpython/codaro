@@ -26,6 +26,8 @@ CAPTURE_OWNER_PATHS = (
     "tests/surface/verifyProductExperiencePlaywright.py",
 )
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+MAX_RASTER_NOISE_PIXELS = 8
+MAX_RASTER_CHANNEL_DELTA = 10
 
 
 class ProductVisualCaptureError(RuntimeError):
@@ -164,6 +166,43 @@ def pngDimensions(path: Path) -> tuple[int, int]:
     return struct.unpack(">II", header[16:24])
 
 
+def pngPixelComparison(expectedPath: Path, actualPath: Path) -> dict[str, Any]:
+    from PIL import Image, ImageChops
+
+    with Image.open(expectedPath) as expectedImage, Image.open(actualPath) as actualImage:
+        expected = expectedImage.convert("RGBA")
+        actual = actualImage.convert("RGBA")
+        if expected.size != actual.size:
+            return {
+                "equivalent": False,
+                "byteExact": False,
+                "differingPixelCount": None,
+                "maxChannelDelta": None,
+                "expectedSize": list(expected.size),
+                "actualSize": list(actual.size),
+            }
+        difference = ImageChops.difference(expected, actual)
+        differingPixelCount = 0
+        maxChannelDelta = 0
+        differenceBytes = difference.tobytes()
+        for offset in range(0, len(differenceBytes), 4):
+            pixelDelta = max(differenceBytes[offset:offset + 4])
+            if pixelDelta:
+                differingPixelCount += 1
+                maxChannelDelta = max(maxChannelDelta, pixelDelta)
+        return {
+            "equivalent": (
+                differingPixelCount <= MAX_RASTER_NOISE_PIXELS
+                and maxChannelDelta <= MAX_RASTER_CHANNEL_DELTA
+            ),
+            "byteExact": differingPixelCount == 0,
+            "differingPixelCount": differingPixelCount,
+            "maxChannelDelta": maxChannelDelta,
+            "expectedSize": list(expected.size),
+            "actualSize": list(actual.size),
+        }
+
+
 def displayPath(path: Path) -> str:
     try:
         return path.resolve().relative_to(ROOT).as_posix()
@@ -280,11 +319,15 @@ def checkCaptures(
         if capture is None:
             continue
         sourcePath = (ROOT / str(asset["sourcePath"])).resolve()
-        if sourcePath.read_bytes() != capture["screenshotPath"].read_bytes():
+        comparison = pngPixelComparison(sourcePath, capture["screenshotPath"])
+        capture["pixelComparison"] = comparison
+        if not comparison["equivalent"]:
             failures.append(
                 f"{assetId}: canonical product proof differs from fresh fixture "
                 f"(source sha256-{sha256Path(sourcePath)}, "
-                f"capture sha256-{capture['screenshotHash']})"
+                f"capture sha256-{capture['screenshotHash']}, "
+                f"pixels {comparison['differingPixelCount']}, "
+                f"max channel delta {comparison['maxChannelDelta']})"
             )
         if asset["capture"]["browserVersion"] != capture["browserVersion"]:
             failures.append(
@@ -366,6 +409,7 @@ def writeReport(
                 "viewport": capture["viewport"],
                 "browserVersion": capture["browserVersion"],
                 "sourceHash": f"sha256-{capture['screenshotHash']}",
+                "pixelComparison": capture.get("pixelComparison"),
                 "reportPath": displayPath(capture["reportPath"]),
                 "redactionSignals": capture["redactionSignals"],
             }

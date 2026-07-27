@@ -564,6 +564,7 @@ def testAutomationSurfaceFramesAutomationAsSecondLoop() -> None:
     assert "md:grid-cols-[minmax(220px,280px)_minmax(0,1fr)]" in source
     assert "xl:grid-cols-[280px_minmax(380px,1fr)_360px]" in source
     assert '<AutomationOperationStrip' in source
+    assert 'className="flex min-h-12 min-w-0 items-start gap-3 pl-9"' in source
     assert '<AutomationRunInspector' in source
     assert "automation.codaro.description" in source
     assert "automation.custom.description" in source
@@ -576,6 +577,9 @@ def testAutomationSurfaceFramesAutomationAsSecondLoop() -> None:
     assert 'data-automation-operation-strip="true"' in operationStrip
     assert 'data-automation-estop-control="true"' in operationStrip
     assert "onClick={onToggleEStop}" in operationStrip
+    assert "bg-background" in operationStrip
+    assert "min-h-14" in operationStrip
+    assert "backdrop-blur" not in operationStrip
     assert '@/components/ui/card' not in operationStrip
 
     assert 'data-automation-run-inspector="true"' in runInspector
@@ -605,6 +609,25 @@ def testRunLocalStateBrowserOwnsCompactAndExecutionStateEvidence() -> None:
     assert '"statusSequence": ["running", "success", "running", "error"]' in verifier
     assert '"CODARO_PRODUCT_CASE"] = "run-local-state"' in wrapper
     assert '"CODARO_PRODUCT_GATE"] = "run-local-state-browser"' in wrapper
+
+
+def testProductProofCaptureWaitsForFontsAndPinsNotebookFocus() -> None:
+    verifier = _read("tests/surface/verifyProductExperiencePlaywright.py")
+    workCell = _read("editor/src/components/app/workCell.css")
+
+    assert "document.fonts ? document.fonts.ready : Promise.resolve()" in verifier
+    assert "'[data-notebook-cell-selected=\"true\"] .cm-content'" in verifier
+    assert "selectedNotebookEditor.focus()" in verifier
+    assert "requestAnimationFrame(resolve)" in verifier
+    assert 'animations="disabled"' in verifier
+    assert 'caret="hide"' in verifier
+    assert '"proofLayoutEvidence": proofLayoutEvidence' in verifier
+    assert "automationStudio: rectFor" in verifier
+    selectedFrameRule = workCell.split(
+        '[data-astryx-theme="codaro"] .astryxWorkCell[data-work-cell-running="true"]'
+    )[0].rsplit("{", 1)[-1]
+    assert "border-color: var(--color-accent);" in selectedFrameRule
+    assert "box-shadow" not in selectedFrameRule
 
 
 def testProductSurfaceDocsNameTheSameFlow() -> None:
