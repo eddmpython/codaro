@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: 6d96ce834756bc852f6572522b90a9e69d819ea0
+  gitCommit: 49161f5f2b7a6cfa13749cfe536727fa703c0762
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: 4ae21516fc6074b838346ebc96f958be80223750fe79639f182dc9b2f9ba13e8
-  fileCount: 2682
-  totalBytes: 88314760
+  manifestHash: e73b5306a17fc53d1a9667ae147e07e83cdb52f9dd6812cc8a0a760009b0ce45
+  fileCount: 2761
+  totalBytes: 89220511
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: 8e64fc99291430ded7ec80160046031a01eb49cef06f9bdda1704d369c26e027
-  bytes: 88830718
+  sha256: 6745dd5311716f7cfb457ace9776499bd2da91df30871706aebde2800228a657
+  bytes: 89756861
   format: zip
   compression: stored
   compressionMethod: 0
@@ -239,6 +239,11 @@ files:
   bytes: 19627
   kind: repository
   sourcePath: assets/brand/tools/buildVisualAssets.py
+- path: assets/brand/tools/captureOutcomeProofs.py
+  sha256: c736954205086d644b81daf3ac6412a4365588f904a2b67349bd25a67ed59f45
+  bytes: 21076
+  kind: repository
+  sourcePath: assets/brand/tools/captureOutcomeProofs.py
 - path: assets/brand/tools/viteLayerOrder.mjs
   sha256: 84969e93444c250310a62f93979d165f3b15d3867b9170342f35c08e640326a8
   bytes: 564
@@ -324,6 +329,36 @@ files:
   bytes: 31002
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/dataAnalysis/dataAnalysis-840-b0ac8b2e6692.webp
+- path: assets/brand/visuals/generated/files/dataReportOutcome/dataReportOutcome-1200-ec957d18c47b.avif
+  sha256: 45dbbdd22708a81ce366c4d4dd245959e94c0002accc47fdc33f1619af22baa8
+  bytes: 12151
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/dataReportOutcome/dataReportOutcome-1200-ec957d18c47b.avif
+- path: assets/brand/visuals/generated/files/dataReportOutcome/dataReportOutcome-1200-ec957d18c47b.webp
+  sha256: 97d666ec9432909bedd088ae1eda0afd0ad3810e9beabf5661bd419fead54595
+  bytes: 17602
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/dataReportOutcome/dataReportOutcome-1200-ec957d18c47b.webp
+- path: assets/brand/visuals/generated/files/dataReportOutcome/dataReportOutcome-480-ec957d18c47b.avif
+  sha256: ad4cfd2da09c0937368b52fe592e541f3ff8abbbf99dc767872271bf6945ead0
+  bytes: 4384
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/dataReportOutcome/dataReportOutcome-480-ec957d18c47b.avif
+- path: assets/brand/visuals/generated/files/dataReportOutcome/dataReportOutcome-480-ec957d18c47b.webp
+  sha256: 9cbeebb6c112489b64f30c54c7c2f399d55efa241dcd51939b508e0261bb1e62
+  bytes: 4352
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/dataReportOutcome/dataReportOutcome-480-ec957d18c47b.webp
+- path: assets/brand/visuals/generated/files/dataReportOutcome/dataReportOutcome-720-ec957d18c47b.avif
+  sha256: 3fd5b0b2ad1c37bf60dcb394522ddefe58c2e6e04839e7583f25e15de2d7adec
+  bytes: 7581
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/dataReportOutcome/dataReportOutcome-720-ec957d18c47b.avif
+- path: assets/brand/visuals/generated/files/dataReportOutcome/dataReportOutcome-720-ec957d18c47b.webp
+  sha256: efdfabe6fe5b4ac2ad1a94ffe0a7a91e82083426c19f4fac2381451627dd65ca
+  bytes: 7648
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/dataReportOutcome/dataReportOutcome-720-ec957d18c47b.webp
 - path: assets/brand/visuals/generated/files/dataVisualization/dataVisualization-1200-5248dc1b6fb1.avif
   sha256: e2ce17f156b4c4d4440d77bad6413f2c063cede019ccf08a5877d3e66ff978ba
   bytes: 32610
@@ -404,6 +439,36 @@ files:
   bytes: 25048
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/developerLiteracy/developerLiteracy-840-9990255713da.webp
+- path: assets/brand/visuals/generated/files/fileAutomationOutcome/fileAutomationOutcome-1200-ce17121e083e.avif
+  sha256: 94eb73ae689d6e1db7f20bf345b1115508ae71b1b85f9c8811bd4e85bc526a6b
+  bytes: 11598
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/fileAutomationOutcome/fileAutomationOutcome-1200-ce17121e083e.avif
+- path: assets/brand/visuals/generated/files/fileAutomationOutcome/fileAutomationOutcome-1200-ce17121e083e.webp
+  sha256: 47f3123bd0ba66f59551cb9f3a8b05d445c1c54754f037d99b78f4e3fc536087
+  bytes: 15630
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/fileAutomationOutcome/fileAutomationOutcome-1200-ce17121e083e.webp
+- path: assets/brand/visuals/generated/files/fileAutomationOutcome/fileAutomationOutcome-480-ce17121e083e.avif
+  sha256: 2afd0380e6d521d0b45e28e4b927e566e1ab485b31f1236d781c6079d7f8547c
+  bytes: 3966
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/fileAutomationOutcome/fileAutomationOutcome-480-ce17121e083e.avif
+- path: assets/brand/visuals/generated/files/fileAutomationOutcome/fileAutomationOutcome-480-ce17121e083e.webp
+  sha256: 667359fb4bdcfe73b3b42762e550f29c1344451b537b6e5ceca35bcfda720dd9
+  bytes: 3874
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/fileAutomationOutcome/fileAutomationOutcome-480-ce17121e083e.webp
+- path: assets/brand/visuals/generated/files/fileAutomationOutcome/fileAutomationOutcome-720-ce17121e083e.avif
+  sha256: 9eb0c6a6494dd8f70c34db0adb78000815213842a3db6011f05e272e324dbcd4
+  bytes: 6698
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/fileAutomationOutcome/fileAutomationOutcome-720-ce17121e083e.avif
+- path: assets/brand/visuals/generated/files/fileAutomationOutcome/fileAutomationOutcome-720-ce17121e083e.webp
+  sha256: e8bc9e3f5304b950c082fadc01ddb6249b45cb536562ddb64a2d9c51f7972510
+  bytes: 6872
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/fileAutomationOutcome/fileAutomationOutcome-720-ce17121e083e.webp
 - path: assets/brand/visuals/generated/files/imageVision/imageVision-1200-1b1922d95f3d.avif
   sha256: 1d40c9fb17521e19cdf91c0f13941aafedb12e0cb35fb9f6d3931519f528cfa5
   bytes: 56217
@@ -534,6 +599,36 @@ files:
   bytes: 7312
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.webp
+- path: assets/brand/visuals/generated/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.avif
+  sha256: e1c1747baa5415975d0cb3cbfb3623c7d56be54a03b351e9bfb2af72ea5e49b2
+  bytes: 15691
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.avif
+- path: assets/brand/visuals/generated/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.webp
+  sha256: 74eb34130edb28daec5cf8399bc022a4aca905c4d894153580978278fa22cba7
+  bytes: 20968
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.webp
+- path: assets/brand/visuals/generated/files/officeAutomationOutcome/officeAutomationOutcome-480-f1c770d50406.avif
+  sha256: 44c9bed4b2cf597c90182b63aa2d231de0d48a897dcd0f36f0a43ba5327b5881
+  bytes: 5322
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/officeAutomationOutcome/officeAutomationOutcome-480-f1c770d50406.avif
+- path: assets/brand/visuals/generated/files/officeAutomationOutcome/officeAutomationOutcome-480-f1c770d50406.webp
+  sha256: ede776527e99aece692cd97982d2104d51fbb584e7d2f850a0bcd1ac973fe2bc
+  bytes: 5274
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/officeAutomationOutcome/officeAutomationOutcome-480-f1c770d50406.webp
+- path: assets/brand/visuals/generated/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.avif
+  sha256: a755d1f1aac03b7847bb4adbd920fd336e17337fc451b1bfb161247e03c5c488
+  bytes: 9103
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.avif
+- path: assets/brand/visuals/generated/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.webp
+  sha256: 0002c7a17aa74c1047ed2401e4010c03b7eed33e4de9473605c801aa0107c66c
+  bytes: 9322
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.webp
 - path: assets/brand/visuals/generated/files/pythonFundamentals/pythonFundamentals-1200-209adca76258.avif
   sha256: 628cc31e5e6cf5c0cdf9329e8c058b3aa0f428bb4779fb39138550a9cd0667b9
   bytes: 46892
@@ -654,6 +749,36 @@ files:
   bytes: 32676
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/statisticsMachineLearning/statisticsMachineLearning-840-d6e581dafc4f.webp
+- path: assets/brand/visuals/generated/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.avif
+  sha256: 32d5c78b289a61e9f5c4cfce017064cf9f20698eb5009a4b112539b6000432ac
+  bytes: 11895
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.avif
+- path: assets/brand/visuals/generated/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.webp
+  sha256: cd8a308afee85e345cd7c964d988da1177891aa09c7d0aa1f047cf625e805509
+  bytes: 15896
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.webp
+- path: assets/brand/visuals/generated/files/webMonitoringOutcome/webMonitoringOutcome-480-9fc0240d4f0f.avif
+  sha256: 3fcbe8f5d1b392a04cc508d9d188582ef75cf18cf739cc31bf59793c9a3007ba
+  bytes: 3970
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/webMonitoringOutcome/webMonitoringOutcome-480-9fc0240d4f0f.avif
+- path: assets/brand/visuals/generated/files/webMonitoringOutcome/webMonitoringOutcome-480-9fc0240d4f0f.webp
+  sha256: db60bf3bb022ddc201eef5fc8b9422637cee14b5f1ecb3bc03bdb401f37b7e5a
+  bytes: 3904
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/webMonitoringOutcome/webMonitoringOutcome-480-9fc0240d4f0f.webp
+- path: assets/brand/visuals/generated/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.avif
+  sha256: 4feaed9dbba456df71745dcb3ab0986c39c9e74b86963b6799ab718e338540e7
+  bytes: 6866
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.avif
+- path: assets/brand/visuals/generated/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
+  sha256: 1e19a8dbb1d5e568f8139404b5307e391393acfc80af173d2b6bfa8cc9ca57ee
+  bytes: 6882
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: assets/brand/visuals/generated/files/webRunDesktop/webRunDesktop-1080-ec95ae8add82.avif
   sha256: 75704e0d16ea2ab837897aa67eedc05cf53f999da262e31bfc118fe85fcdf6eb
   bytes: 4877
@@ -685,8 +810,8 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/webRunDesktop/webRunDesktop-720-ec95ae8add82.webp
 - path: assets/brand/visuals/generated/manifest.json
-  sha256: 1f185d02632be4badfcc22147c7e64cdbb7c82ae737c558aaf2d8f8131b76232
-  bytes: 60312
+  sha256: 653e9718f626b34ecdce6e044b7f16b8ac00ad5d87100b80284ae3ab16d4f4fe
+  bytes: 78689
   kind: repository
   sourcePath: assets/brand/visuals/generated/manifest.json
 - path: assets/brand/visuals/learning/ai-integration-v1.png
@@ -730,8 +855,8 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/learning/statistics-ml-v1.png
 - path: assets/brand/visuals/manifest.json
-  sha256: 3811743e165e3cea4354bc5d37ec0848f9ff9b9cbfed2aecbdca2dcf3b72569e
-  bytes: 31150
+  sha256: f1e96516948779c09706c0ec72892857dd64f16008ccef4541f558d4d1d14aa7
+  bytes: 41439
   kind: repository
   sourcePath: assets/brand/visuals/manifest.json
 - path: assets/brand/visuals/manifest.schema.json
@@ -739,6 +864,31 @@ files:
   bytes: 6032
   kind: repository
   sourcePath: assets/brand/visuals/manifest.schema.json
+- path: assets/brand/visuals/outcomes/dataReportOutcome.png
+  sha256: ec957d18c47b7601355a4ae34fa065f024becf24178692e66a8055663ddc3ff7
+  bytes: 36909
+  kind: repository
+  sourcePath: assets/brand/visuals/outcomes/dataReportOutcome.png
+- path: assets/brand/visuals/outcomes/fileAutomationOutcome.png
+  sha256: ce17121e083ea0e261de403e19eaefb5c5ed9e59b493d57dd40c13974468d728
+  bytes: 37480
+  kind: repository
+  sourcePath: assets/brand/visuals/outcomes/fileAutomationOutcome.png
+- path: assets/brand/visuals/outcomes/fixtures.json
+  sha256: 467e49d818b8c24953f64fe8fb2595ce9fa3cdf98634300b4137140492e97208
+  bytes: 1748
+  kind: repository
+  sourcePath: assets/brand/visuals/outcomes/fixtures.json
+- path: assets/brand/visuals/outcomes/officeAutomationOutcome.png
+  sha256: f1c770d50406d59749e42c04c5a24c4359cca201c38290ffb904981423a98197
+  bytes: 47453
+  kind: repository
+  sourcePath: assets/brand/visuals/outcomes/officeAutomationOutcome.png
+- path: assets/brand/visuals/outcomes/webMonitoringOutcome.png
+  sha256: 9fc0240d4f0ffd145d15c4d013fd0a73d2237078791806bc8f924458a6d5d00d
+  bytes: 36324
+  kind: repository
+  sourcePath: assets/brand/visuals/outcomes/webMonitoringOutcome.png
 - path: assets/brand/visuals/product/local-automation-desktop.png
   sha256: 49cedaaade407224a83a59e6f6809351d9cb162fcb32192bbb6fbc3a36d2b2ec
   bytes: 145196
@@ -3630,8 +3780,8 @@ files:
   kind: repository
   sourcePath: docs/skills/architecture/share-pack-distribution.md
 - path: docs/skills/architecture/ssot-map.md
-  sha256: ab78acdfab5f498b245e1a3803ac233f89273df974b818749369205721cbafc6
-  bytes: 24454
+  sha256: f753ba28497eb120d91c3538b74c9ad5bf65aea116ec16286c8bee1d35294fd2
+  bytes: 24776
   kind: repository
   sourcePath: docs/skills/architecture/ssot-map.md
 - path: docs/skills/architecture/teacher-tool-loop.md
@@ -3755,8 +3905,8 @@ files:
   kind: repository
   sourcePath: docs/skills/ops/foundation/testing-and-gates.md
 - path: docs/skills/ops/product/branding.md
-  sha256: b0609f927a28f28e83b42325f71e1d96479a7403f0e02d7012cec1577ec4cac7
-  bytes: 9498
+  sha256: 742a716fd59c1d09eedbb01f62605a8308cced8daf59d2bb0405cb395cda6903
+  bytes: 10216
   kind: repository
   sourcePath: docs/skills/ops/product/branding.md
 - path: docs/skills/ops/product/contentPipeline.md
@@ -4429,6 +4579,36 @@ files:
   bytes: 31002
   kind: repository
   sourcePath: editor/public/visuals/files/dataAnalysis/dataAnalysis-840-b0ac8b2e6692.webp
+- path: editor/public/visuals/files/dataReportOutcome/dataReportOutcome-1200-ec957d18c47b.avif
+  sha256: 45dbbdd22708a81ce366c4d4dd245959e94c0002accc47fdc33f1619af22baa8
+  bytes: 12151
+  kind: repository
+  sourcePath: editor/public/visuals/files/dataReportOutcome/dataReportOutcome-1200-ec957d18c47b.avif
+- path: editor/public/visuals/files/dataReportOutcome/dataReportOutcome-1200-ec957d18c47b.webp
+  sha256: 97d666ec9432909bedd088ae1eda0afd0ad3810e9beabf5661bd419fead54595
+  bytes: 17602
+  kind: repository
+  sourcePath: editor/public/visuals/files/dataReportOutcome/dataReportOutcome-1200-ec957d18c47b.webp
+- path: editor/public/visuals/files/dataReportOutcome/dataReportOutcome-480-ec957d18c47b.avif
+  sha256: ad4cfd2da09c0937368b52fe592e541f3ff8abbbf99dc767872271bf6945ead0
+  bytes: 4384
+  kind: repository
+  sourcePath: editor/public/visuals/files/dataReportOutcome/dataReportOutcome-480-ec957d18c47b.avif
+- path: editor/public/visuals/files/dataReportOutcome/dataReportOutcome-480-ec957d18c47b.webp
+  sha256: 9cbeebb6c112489b64f30c54c7c2f399d55efa241dcd51939b508e0261bb1e62
+  bytes: 4352
+  kind: repository
+  sourcePath: editor/public/visuals/files/dataReportOutcome/dataReportOutcome-480-ec957d18c47b.webp
+- path: editor/public/visuals/files/dataReportOutcome/dataReportOutcome-720-ec957d18c47b.avif
+  sha256: 3fd5b0b2ad1c37bf60dcb394522ddefe58c2e6e04839e7583f25e15de2d7adec
+  bytes: 7581
+  kind: repository
+  sourcePath: editor/public/visuals/files/dataReportOutcome/dataReportOutcome-720-ec957d18c47b.avif
+- path: editor/public/visuals/files/dataReportOutcome/dataReportOutcome-720-ec957d18c47b.webp
+  sha256: efdfabe6fe5b4ac2ad1a94ffe0a7a91e82083426c19f4fac2381451627dd65ca
+  bytes: 7648
+  kind: repository
+  sourcePath: editor/public/visuals/files/dataReportOutcome/dataReportOutcome-720-ec957d18c47b.webp
 - path: editor/public/visuals/files/dataVisualization/dataVisualization-1200-5248dc1b6fb1.avif
   sha256: e2ce17f156b4c4d4440d77bad6413f2c063cede019ccf08a5877d3e66ff978ba
   bytes: 32610
@@ -4509,6 +4689,36 @@ files:
   bytes: 25048
   kind: repository
   sourcePath: editor/public/visuals/files/developerLiteracy/developerLiteracy-840-9990255713da.webp
+- path: editor/public/visuals/files/fileAutomationOutcome/fileAutomationOutcome-1200-ce17121e083e.avif
+  sha256: 94eb73ae689d6e1db7f20bf345b1115508ae71b1b85f9c8811bd4e85bc526a6b
+  bytes: 11598
+  kind: repository
+  sourcePath: editor/public/visuals/files/fileAutomationOutcome/fileAutomationOutcome-1200-ce17121e083e.avif
+- path: editor/public/visuals/files/fileAutomationOutcome/fileAutomationOutcome-1200-ce17121e083e.webp
+  sha256: 47f3123bd0ba66f59551cb9f3a8b05d445c1c54754f037d99b78f4e3fc536087
+  bytes: 15630
+  kind: repository
+  sourcePath: editor/public/visuals/files/fileAutomationOutcome/fileAutomationOutcome-1200-ce17121e083e.webp
+- path: editor/public/visuals/files/fileAutomationOutcome/fileAutomationOutcome-480-ce17121e083e.avif
+  sha256: 2afd0380e6d521d0b45e28e4b927e566e1ab485b31f1236d781c6079d7f8547c
+  bytes: 3966
+  kind: repository
+  sourcePath: editor/public/visuals/files/fileAutomationOutcome/fileAutomationOutcome-480-ce17121e083e.avif
+- path: editor/public/visuals/files/fileAutomationOutcome/fileAutomationOutcome-480-ce17121e083e.webp
+  sha256: 667359fb4bdcfe73b3b42762e550f29c1344451b537b6e5ceca35bcfda720dd9
+  bytes: 3874
+  kind: repository
+  sourcePath: editor/public/visuals/files/fileAutomationOutcome/fileAutomationOutcome-480-ce17121e083e.webp
+- path: editor/public/visuals/files/fileAutomationOutcome/fileAutomationOutcome-720-ce17121e083e.avif
+  sha256: 9eb0c6a6494dd8f70c34db0adb78000815213842a3db6011f05e272e324dbcd4
+  bytes: 6698
+  kind: repository
+  sourcePath: editor/public/visuals/files/fileAutomationOutcome/fileAutomationOutcome-720-ce17121e083e.avif
+- path: editor/public/visuals/files/fileAutomationOutcome/fileAutomationOutcome-720-ce17121e083e.webp
+  sha256: e8bc9e3f5304b950c082fadc01ddb6249b45cb536562ddb64a2d9c51f7972510
+  bytes: 6872
+  kind: repository
+  sourcePath: editor/public/visuals/files/fileAutomationOutcome/fileAutomationOutcome-720-ce17121e083e.webp
 - path: editor/public/visuals/files/imageVision/imageVision-1200-1b1922d95f3d.avif
   sha256: 1d40c9fb17521e19cdf91c0f13941aafedb12e0cb35fb9f6d3931519f528cfa5
   bytes: 56217
@@ -4639,6 +4849,36 @@ files:
   bytes: 7312
   kind: repository
   sourcePath: editor/public/visuals/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.webp
+- path: editor/public/visuals/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.avif
+  sha256: e1c1747baa5415975d0cb3cbfb3623c7d56be54a03b351e9bfb2af72ea5e49b2
+  bytes: 15691
+  kind: repository
+  sourcePath: editor/public/visuals/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.avif
+- path: editor/public/visuals/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.webp
+  sha256: 74eb34130edb28daec5cf8399bc022a4aca905c4d894153580978278fa22cba7
+  bytes: 20968
+  kind: repository
+  sourcePath: editor/public/visuals/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.webp
+- path: editor/public/visuals/files/officeAutomationOutcome/officeAutomationOutcome-480-f1c770d50406.avif
+  sha256: 44c9bed4b2cf597c90182b63aa2d231de0d48a897dcd0f36f0a43ba5327b5881
+  bytes: 5322
+  kind: repository
+  sourcePath: editor/public/visuals/files/officeAutomationOutcome/officeAutomationOutcome-480-f1c770d50406.avif
+- path: editor/public/visuals/files/officeAutomationOutcome/officeAutomationOutcome-480-f1c770d50406.webp
+  sha256: ede776527e99aece692cd97982d2104d51fbb584e7d2f850a0bcd1ac973fe2bc
+  bytes: 5274
+  kind: repository
+  sourcePath: editor/public/visuals/files/officeAutomationOutcome/officeAutomationOutcome-480-f1c770d50406.webp
+- path: editor/public/visuals/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.avif
+  sha256: a755d1f1aac03b7847bb4adbd920fd336e17337fc451b1bfb161247e03c5c488
+  bytes: 9103
+  kind: repository
+  sourcePath: editor/public/visuals/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.avif
+- path: editor/public/visuals/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.webp
+  sha256: 0002c7a17aa74c1047ed2401e4010c03b7eed33e4de9473605c801aa0107c66c
+  bytes: 9322
+  kind: repository
+  sourcePath: editor/public/visuals/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.webp
 - path: editor/public/visuals/files/pythonFundamentals/pythonFundamentals-1200-209adca76258.avif
   sha256: 628cc31e5e6cf5c0cdf9329e8c058b3aa0f428bb4779fb39138550a9cd0667b9
   bytes: 46892
@@ -4759,6 +4999,36 @@ files:
   bytes: 32676
   kind: repository
   sourcePath: editor/public/visuals/files/statisticsMachineLearning/statisticsMachineLearning-840-d6e581dafc4f.webp
+- path: editor/public/visuals/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.avif
+  sha256: 32d5c78b289a61e9f5c4cfce017064cf9f20698eb5009a4b112539b6000432ac
+  bytes: 11895
+  kind: repository
+  sourcePath: editor/public/visuals/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.avif
+- path: editor/public/visuals/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.webp
+  sha256: cd8a308afee85e345cd7c964d988da1177891aa09c7d0aa1f047cf625e805509
+  bytes: 15896
+  kind: repository
+  sourcePath: editor/public/visuals/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.webp
+- path: editor/public/visuals/files/webMonitoringOutcome/webMonitoringOutcome-480-9fc0240d4f0f.avif
+  sha256: 3fcbe8f5d1b392a04cc508d9d188582ef75cf18cf739cc31bf59793c9a3007ba
+  bytes: 3970
+  kind: repository
+  sourcePath: editor/public/visuals/files/webMonitoringOutcome/webMonitoringOutcome-480-9fc0240d4f0f.avif
+- path: editor/public/visuals/files/webMonitoringOutcome/webMonitoringOutcome-480-9fc0240d4f0f.webp
+  sha256: db60bf3bb022ddc201eef5fc8b9422637cee14b5f1ecb3bc03bdb401f37b7e5a
+  bytes: 3904
+  kind: repository
+  sourcePath: editor/public/visuals/files/webMonitoringOutcome/webMonitoringOutcome-480-9fc0240d4f0f.webp
+- path: editor/public/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.avif
+  sha256: 4feaed9dbba456df71745dcb3ab0986c39c9e74b86963b6799ab718e338540e7
+  bytes: 6866
+  kind: repository
+  sourcePath: editor/public/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.avif
+- path: editor/public/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
+  sha256: 1e19a8dbb1d5e568f8139404b5307e391393acfc80af173d2b6bfa8cc9ca57ee
+  bytes: 6882
+  kind: repository
+  sourcePath: editor/public/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: editor/public/visuals/files/webRunDesktop/webRunDesktop-1080-ec95ae8add82.avif
   sha256: 75704e0d16ea2ab837897aa67eedc05cf53f999da262e31bfc118fe85fcdf6eb
   bytes: 4877
@@ -4790,8 +5060,8 @@ files:
   kind: repository
   sourcePath: editor/public/visuals/files/webRunDesktop/webRunDesktop-720-ec95ae8add82.webp
 - path: editor/public/visuals/manifest.json
-  sha256: 1f185d02632be4badfcc22147c7e64cdbb7c82ae737c558aaf2d8f8131b76232
-  bytes: 60312
+  sha256: 653e9718f626b34ecdce6e044b7f16b8ac00ad5d87100b80284ae3ab16d4f4fe
+  bytes: 78689
   kind: repository
   sourcePath: editor/public/visuals/manifest.json
 - path: editor/scripts/generatePyprocAssets.mjs
@@ -5060,8 +5330,8 @@ files:
   kind: repository
   sourcePath: editor/src/components/curriculum/curriculumToc.tsx
 - path: editor/src/components/curriculum/learningDomainVisual.tsx
-  sha256: 343b24b990f02d9facc214e38a6fc4b6e945ae4fbfdbb23f5dfb9f7a0b83adc5
-  bytes: 3109
+  sha256: ee195f82230f629c0e1673b9e88f351f4ade5aff2ba491b98e751f3d89a03d4b
+  bytes: 3463
   kind: repository
   sourcePath: editor/src/components/curriculum/learningDomainVisual.tsx
 - path: editor/src/components/curriculum/lessonComments.tsx
@@ -5610,8 +5880,8 @@ files:
   kind: repository
   sourcePath: editor/src/lib/learningEvidenceOperations.ts
 - path: editor/src/lib/learningVisualAssets.ts
-  sha256: 9471b96c1bcd4c8730170a03290474a7d94de8a4228bd2d18c6096ac9a539a49
-  bytes: 2852
+  sha256: 76d5d7cc571531e3cdb54eca4b51d2b520183cb1f3eb3e607889c9e0fbab2449
+  bytes: 4037
   kind: repository
   sourcePath: editor/src/lib/learningVisualAssets.ts
 - path: editor/src/lib/localFallback.ts
@@ -5994,8 +6264,8 @@ files:
   kind: repository
   sourcePath: landing/src/components/codaroThemeProvider.jsx
 - path: landing/src/components/productVisual.jsx
-  sha256: f499a6bef6e7349e9cd92f01670aff9586592238dc4e9aea23859721601cf9aa
-  bytes: 733
+  sha256: f22616544142b1a51b710f134fdd853ef1375d8512b9d162a0a732f4d2c91e73
+  bytes: 792
   kind: repository
   sourcePath: landing/src/components/productVisual.jsx
 - path: landing/src/components/publicShell.jsx
@@ -6124,13 +6394,13 @@ files:
   kind: repository
   sourcePath: landing/src/main.jsx
 - path: landing/src/pages/home.jsx
-  sha256: 5a96fd3f3cbfc5eab725c32402fc998dc34613cdb9b27c3e5e27790e99a6e542
-  bytes: 10886
+  sha256: ad021abd6d94c1b62301cd0cfc3f91131402d636770dd1d837d49de2c15e7133
+  bytes: 10885
   kind: repository
   sourcePath: landing/src/pages/home.jsx
 - path: landing/src/pages/learn.jsx
-  sha256: 73108dea9968af4977fc42f6264502dd6dcf75592ab2ea4df18af4dd6a8c8c50
-  bytes: 21689
+  sha256: 8553f228397ee8c774a02c2890fb2f74e596adb0ead259643360d8d378a4df2d
+  bytes: 21710
   kind: repository
   sourcePath: landing/src/pages/learn.jsx
 - path: landing/src/pages/lesson.jsx
@@ -6214,13 +6484,13 @@ files:
   kind: repository
   sourcePath: landing/src/styles/generated/socialLinks.tsx
 - path: landing/src/styles/homeAstryx.css
-  sha256: ad74c2e4ee4d1c4b252251fd96b8734fde10bde92c47154a3336b994fd9f0ae1
-  bytes: 14597
+  sha256: a6b3e59151b14a397c2951d3662d920e4b8208fc5cf852ea086bdfebe36f7d05
+  bytes: 14680
   kind: repository
   sourcePath: landing/src/styles/homeAstryx.css
 - path: landing/src/styles/learnExplorer.css
-  sha256: b1a5232f02e0813697e9a5a6bfbd4bd7f1c87e31595258c1f5aa4af64a148c5e
-  bytes: 16640
+  sha256: d25f92c0043cb16c6f20d1c37be67f0b977feec8f6b3318fae273c923f7cb7be
+  bytes: 16722
   kind: repository
   sourcePath: landing/src/styles/learnExplorer.css
 - path: landing/src/styles/lessonAstryx.css
@@ -9613,6 +9883,36 @@ files:
   bytes: 31002
   kind: repository
   sourcePath: landing/static/visuals/files/dataAnalysis/dataAnalysis-840-b0ac8b2e6692.webp
+- path: landing/static/visuals/files/dataReportOutcome/dataReportOutcome-1200-ec957d18c47b.avif
+  sha256: 45dbbdd22708a81ce366c4d4dd245959e94c0002accc47fdc33f1619af22baa8
+  bytes: 12151
+  kind: repository
+  sourcePath: landing/static/visuals/files/dataReportOutcome/dataReportOutcome-1200-ec957d18c47b.avif
+- path: landing/static/visuals/files/dataReportOutcome/dataReportOutcome-1200-ec957d18c47b.webp
+  sha256: 97d666ec9432909bedd088ae1eda0afd0ad3810e9beabf5661bd419fead54595
+  bytes: 17602
+  kind: repository
+  sourcePath: landing/static/visuals/files/dataReportOutcome/dataReportOutcome-1200-ec957d18c47b.webp
+- path: landing/static/visuals/files/dataReportOutcome/dataReportOutcome-480-ec957d18c47b.avif
+  sha256: ad4cfd2da09c0937368b52fe592e541f3ff8abbbf99dc767872271bf6945ead0
+  bytes: 4384
+  kind: repository
+  sourcePath: landing/static/visuals/files/dataReportOutcome/dataReportOutcome-480-ec957d18c47b.avif
+- path: landing/static/visuals/files/dataReportOutcome/dataReportOutcome-480-ec957d18c47b.webp
+  sha256: 9cbeebb6c112489b64f30c54c7c2f399d55efa241dcd51939b508e0261bb1e62
+  bytes: 4352
+  kind: repository
+  sourcePath: landing/static/visuals/files/dataReportOutcome/dataReportOutcome-480-ec957d18c47b.webp
+- path: landing/static/visuals/files/dataReportOutcome/dataReportOutcome-720-ec957d18c47b.avif
+  sha256: 3fd5b0b2ad1c37bf60dcb394522ddefe58c2e6e04839e7583f25e15de2d7adec
+  bytes: 7581
+  kind: repository
+  sourcePath: landing/static/visuals/files/dataReportOutcome/dataReportOutcome-720-ec957d18c47b.avif
+- path: landing/static/visuals/files/dataReportOutcome/dataReportOutcome-720-ec957d18c47b.webp
+  sha256: efdfabe6fe5b4ac2ad1a94ffe0a7a91e82083426c19f4fac2381451627dd65ca
+  bytes: 7648
+  kind: repository
+  sourcePath: landing/static/visuals/files/dataReportOutcome/dataReportOutcome-720-ec957d18c47b.webp
 - path: landing/static/visuals/files/dataVisualization/dataVisualization-1200-5248dc1b6fb1.avif
   sha256: e2ce17f156b4c4d4440d77bad6413f2c063cede019ccf08a5877d3e66ff978ba
   bytes: 32610
@@ -9693,6 +9993,36 @@ files:
   bytes: 25048
   kind: repository
   sourcePath: landing/static/visuals/files/developerLiteracy/developerLiteracy-840-9990255713da.webp
+- path: landing/static/visuals/files/fileAutomationOutcome/fileAutomationOutcome-1200-ce17121e083e.avif
+  sha256: 94eb73ae689d6e1db7f20bf345b1115508ae71b1b85f9c8811bd4e85bc526a6b
+  bytes: 11598
+  kind: repository
+  sourcePath: landing/static/visuals/files/fileAutomationOutcome/fileAutomationOutcome-1200-ce17121e083e.avif
+- path: landing/static/visuals/files/fileAutomationOutcome/fileAutomationOutcome-1200-ce17121e083e.webp
+  sha256: 47f3123bd0ba66f59551cb9f3a8b05d445c1c54754f037d99b78f4e3fc536087
+  bytes: 15630
+  kind: repository
+  sourcePath: landing/static/visuals/files/fileAutomationOutcome/fileAutomationOutcome-1200-ce17121e083e.webp
+- path: landing/static/visuals/files/fileAutomationOutcome/fileAutomationOutcome-480-ce17121e083e.avif
+  sha256: 2afd0380e6d521d0b45e28e4b927e566e1ab485b31f1236d781c6079d7f8547c
+  bytes: 3966
+  kind: repository
+  sourcePath: landing/static/visuals/files/fileAutomationOutcome/fileAutomationOutcome-480-ce17121e083e.avif
+- path: landing/static/visuals/files/fileAutomationOutcome/fileAutomationOutcome-480-ce17121e083e.webp
+  sha256: 667359fb4bdcfe73b3b42762e550f29c1344451b537b6e5ceca35bcfda720dd9
+  bytes: 3874
+  kind: repository
+  sourcePath: landing/static/visuals/files/fileAutomationOutcome/fileAutomationOutcome-480-ce17121e083e.webp
+- path: landing/static/visuals/files/fileAutomationOutcome/fileAutomationOutcome-720-ce17121e083e.avif
+  sha256: 9eb0c6a6494dd8f70c34db0adb78000815213842a3db6011f05e272e324dbcd4
+  bytes: 6698
+  kind: repository
+  sourcePath: landing/static/visuals/files/fileAutomationOutcome/fileAutomationOutcome-720-ce17121e083e.avif
+- path: landing/static/visuals/files/fileAutomationOutcome/fileAutomationOutcome-720-ce17121e083e.webp
+  sha256: e8bc9e3f5304b950c082fadc01ddb6249b45cb536562ddb64a2d9c51f7972510
+  bytes: 6872
+  kind: repository
+  sourcePath: landing/static/visuals/files/fileAutomationOutcome/fileAutomationOutcome-720-ce17121e083e.webp
 - path: landing/static/visuals/files/imageVision/imageVision-1200-1b1922d95f3d.avif
   sha256: 1d40c9fb17521e19cdf91c0f13941aafedb12e0cb35fb9f6d3931519f528cfa5
   bytes: 56217
@@ -9823,6 +10153,36 @@ files:
   bytes: 7312
   kind: repository
   sourcePath: landing/static/visuals/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.webp
+- path: landing/static/visuals/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.avif
+  sha256: e1c1747baa5415975d0cb3cbfb3623c7d56be54a03b351e9bfb2af72ea5e49b2
+  bytes: 15691
+  kind: repository
+  sourcePath: landing/static/visuals/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.avif
+- path: landing/static/visuals/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.webp
+  sha256: 74eb34130edb28daec5cf8399bc022a4aca905c4d894153580978278fa22cba7
+  bytes: 20968
+  kind: repository
+  sourcePath: landing/static/visuals/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.webp
+- path: landing/static/visuals/files/officeAutomationOutcome/officeAutomationOutcome-480-f1c770d50406.avif
+  sha256: 44c9bed4b2cf597c90182b63aa2d231de0d48a897dcd0f36f0a43ba5327b5881
+  bytes: 5322
+  kind: repository
+  sourcePath: landing/static/visuals/files/officeAutomationOutcome/officeAutomationOutcome-480-f1c770d50406.avif
+- path: landing/static/visuals/files/officeAutomationOutcome/officeAutomationOutcome-480-f1c770d50406.webp
+  sha256: ede776527e99aece692cd97982d2104d51fbb584e7d2f850a0bcd1ac973fe2bc
+  bytes: 5274
+  kind: repository
+  sourcePath: landing/static/visuals/files/officeAutomationOutcome/officeAutomationOutcome-480-f1c770d50406.webp
+- path: landing/static/visuals/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.avif
+  sha256: a755d1f1aac03b7847bb4adbd920fd336e17337fc451b1bfb161247e03c5c488
+  bytes: 9103
+  kind: repository
+  sourcePath: landing/static/visuals/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.avif
+- path: landing/static/visuals/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.webp
+  sha256: 0002c7a17aa74c1047ed2401e4010c03b7eed33e4de9473605c801aa0107c66c
+  bytes: 9322
+  kind: repository
+  sourcePath: landing/static/visuals/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.webp
 - path: landing/static/visuals/files/pythonFundamentals/pythonFundamentals-1200-209adca76258.avif
   sha256: 628cc31e5e6cf5c0cdf9329e8c058b3aa0f428bb4779fb39138550a9cd0667b9
   bytes: 46892
@@ -9943,6 +10303,36 @@ files:
   bytes: 32676
   kind: repository
   sourcePath: landing/static/visuals/files/statisticsMachineLearning/statisticsMachineLearning-840-d6e581dafc4f.webp
+- path: landing/static/visuals/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.avif
+  sha256: 32d5c78b289a61e9f5c4cfce017064cf9f20698eb5009a4b112539b6000432ac
+  bytes: 11895
+  kind: repository
+  sourcePath: landing/static/visuals/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.avif
+- path: landing/static/visuals/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.webp
+  sha256: cd8a308afee85e345cd7c964d988da1177891aa09c7d0aa1f047cf625e805509
+  bytes: 15896
+  kind: repository
+  sourcePath: landing/static/visuals/files/webMonitoringOutcome/webMonitoringOutcome-1200-9fc0240d4f0f.webp
+- path: landing/static/visuals/files/webMonitoringOutcome/webMonitoringOutcome-480-9fc0240d4f0f.avif
+  sha256: 3fcbe8f5d1b392a04cc508d9d188582ef75cf18cf739cc31bf59793c9a3007ba
+  bytes: 3970
+  kind: repository
+  sourcePath: landing/static/visuals/files/webMonitoringOutcome/webMonitoringOutcome-480-9fc0240d4f0f.avif
+- path: landing/static/visuals/files/webMonitoringOutcome/webMonitoringOutcome-480-9fc0240d4f0f.webp
+  sha256: db60bf3bb022ddc201eef5fc8b9422637cee14b5f1ecb3bc03bdb401f37b7e5a
+  bytes: 3904
+  kind: repository
+  sourcePath: landing/static/visuals/files/webMonitoringOutcome/webMonitoringOutcome-480-9fc0240d4f0f.webp
+- path: landing/static/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.avif
+  sha256: 4feaed9dbba456df71745dcb3ab0986c39c9e74b86963b6799ab718e338540e7
+  bytes: 6866
+  kind: repository
+  sourcePath: landing/static/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.avif
+- path: landing/static/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
+  sha256: 1e19a8dbb1d5e568f8139404b5307e391393acfc80af173d2b6bfa8cc9ca57ee
+  bytes: 6882
+  kind: repository
+  sourcePath: landing/static/visuals/files/webMonitoringOutcome/webMonitoringOutcome-720-9fc0240d4f0f.webp
 - path: landing/static/visuals/files/webRunDesktop/webRunDesktop-1080-ec95ae8add82.avif
   sha256: 75704e0d16ea2ab837897aa67eedc05cf53f999da262e31bfc118fe85fcdf6eb
   bytes: 4877
@@ -9974,8 +10364,8 @@ files:
   kind: repository
   sourcePath: landing/static/visuals/files/webRunDesktop/webRunDesktop-720-ec95ae8add82.webp
 - path: landing/static/visuals/manifest.json
-  sha256: 1f185d02632be4badfcc22147c7e64cdbb7c82ae737c558aaf2d8f8131b76232
-  bytes: 60312
+  sha256: 653e9718f626b34ecdce6e044b7f16b8ac00ad5d87100b80284ae3ab16d4f4fe
+  bytes: 78689
   kind: repository
   sourcePath: landing/static/visuals/manifest.json
 - path: landing/vite.config.js
@@ -10154,8 +10544,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/06-visual-assets/00-manifest-pipeline/README.md
 - path: mainPlan/astryx-product-experience/06-visual-assets/01-instructional-assets/README.md
-  sha256: 601deb957804be8436e3bcccca2526bfeb7c57b3dc7f6cf966b9c6e846326c47
-  bytes: 2969
+  sha256: 1b49d27af909a469469760746aec0f434f6bf5403f5c50e8f723812197c79020
+  bytes: 2937
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/06-visual-assets/01-instructional-assets/README.md
 - path: mainPlan/astryx-product-experience/06-visual-assets/02-run-captures/README.md
@@ -10169,8 +10559,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/06-visual-assets/03-local-captures/README.md
 - path: mainPlan/astryx-product-experience/06-visual-assets/README.md
-  sha256: 57896ea1a2a4749b9b194e174028146d456aefab37cf909af65fa89f66a4e76c
-  bytes: 8894
+  sha256: 8eb1ecd0e2ebdd2e9b16b58eea4ac47b5966b83462e1293726dc51a3c12990d9
+  bytes: 8351
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/06-visual-assets/README.md
 - path: mainPlan/astryx-product-experience/07-landing-experience/00-proof-studio-landing/README.md
@@ -12308,6 +12698,11 @@ files:
   bytes: 1666
   kind: repository
   sourcePath: tests/assets/testBuildVisualAssets.py
+- path: tests/assets/testCaptureOutcomeProofs.py
+  sha256: ad69d9ff7d97f971f5071c835b6c67b054004dd92f6278b630969d891a5fa8d4
+  bytes: 3118
+  kind: repository
+  sourcePath: tests/assets/testCaptureOutcomeProofs.py
 - path: tests/assets/testCaptureProductVisuals.py
   sha256: c054812d5ebe01ed816aa209cd73b9b3736e45311fadbdd0f7338f79b6d7b165
   bytes: 6978
@@ -13064,8 +13459,8 @@ files:
   kind: repository
   sourcePath: tests/product/verifyWebView2ProductSmoke.py
 - path: tests/run.py
-  sha256: 20c41aec99740563746b69bc8c8435adde5ba6b83b537fea25ff63dfc818bfb4
-  bytes: 75822
+  sha256: 750278f583dd332ec809ecfe80745819cfe382e3dd1f8c9dad5d82255ccb82b9
+  bytes: 76130
   kind: repository
   sourcePath: tests/run.py
 - path: tests/runtime/testAppRuntime.py
@@ -13234,8 +13629,8 @@ files:
   kind: repository
   sourcePath: tests/surface/testNotebookPersistence.py
 - path: tests/surface/testProductSurfaceContract.py
-  sha256: 83eb656dbd49baa52a6dd65f07b1d58ab35e404df9232c3c38d309468523add1
-  bytes: 39362
+  sha256: 7edb0b059f121aa4120976daacf50ac5c3fbb9e0532324ba8582fdeb6636f288
+  bytes: 40384
   kind: repository
   sourcePath: tests/surface/testProductSurfaceContract.py
 - path: tests/surface/testProviderSettingsContract.py
@@ -13329,8 +13724,8 @@ files:
   kind: repository
   sourcePath: tests/surface/verifyPlaywrightMobile.py
 - path: tests/surface/verifyProductExperiencePlaywright.py
-  sha256: 675ffd94b211ad0f58d0aceeffaf18eaa93b2a9a0b34626bd20b63e1c62631f5
-  bytes: 269451
+  sha256: c587f43cd51d850bff2e315973ea4d52c7adb07cba0a47037b6509118a579030
+  bytes: 269749
   kind: repository
   sourcePath: tests/surface/verifyProductExperiencePlaywright.py
 - path: tests/surface/verifyProductModuleBoundaries.py
