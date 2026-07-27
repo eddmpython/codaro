@@ -143,6 +143,30 @@ def testLearningArchivePreservesDraftBeforeFirstVerifiedEvent() -> None:
     assert materialized.evidenceArchive["events"] == []
 
 
+def testLearningArchiveCanonicalizesLegacyEvidenceExportTime() -> None:
+    firstEvidence = evidenceArchive()
+    secondEvidence = deepcopy(firstEvidence)
+    firstEvidence["manifest"]["createdAt"] = "2026-07-23T00:01:00+00:00"
+    secondEvidence["manifest"]["createdAt"] = "2026-07-28T09:00:00+09:00"
+    buildArgs = {
+        "document": {
+            "blocks": [{"content": "print(1)", "id": "cell-1", "type": "code"}],
+            "id": "document-1",
+            "title": "동일 문서",
+        },
+        "drafts": {"cell-1": "print(1)\n"},
+        "lessonRef": "30days/day01_헬로월드",
+        "createdAt": "2026-07-23T00:02:00+00:00",
+    }
+
+    first = buildLearningArchive(evidenceArchive=firstEvidence, **buildArgs)
+    second = buildLearningArchive(evidenceArchive=secondEvidence, **buildArgs)
+    materialized = materializeLearningArchive(first)
+
+    assert first["manifest"]["rootHash"] == second["manifest"]["rootHash"]
+    assert materialized.evidenceArchive["manifest"]["createdAt"] == "2026-07-23T00:00:00.000Z"
+
+
 def testLearningArchiveRejectsMalformedDocumentBeforeImportSideEffects() -> None:
     with pytest.raises(LearningArchiveError, match="document block"):
         buildLearningArchive(

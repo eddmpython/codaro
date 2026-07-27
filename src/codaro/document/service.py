@@ -12,7 +12,7 @@ from .models import AppConfig, BlockConfig, CodaroDocument, DocumentMetadata, Ru
 
 
 def _writeTextAtomically(path: Path, text: str) -> None:
-    temporaryPath = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
+    temporaryPath = path.with_name(f".codaro-{uuid.uuid4().hex[:12]}.tmp")
     temporaryCreated = False
     existingMode = stat.S_IMODE(path.stat().st_mode) if path.exists() else None
 

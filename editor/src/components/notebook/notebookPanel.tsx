@@ -226,20 +226,9 @@ export function NotebookPanel({
       data-notebook-storage={persistence.mode === "local" ? "local-file" : "browser"}
       data-notebook-storage-status={persistence.phase}
     >
-      <NotebookCommandBar
-        apiOnline={apiOnline}
-        canRun={canRun}
-        notebookRunning={notebookRunning}
-        persistence={persistence}
-        reactiveEnabled={reactiveEnabled}
-        runningBlockId={runningBlockId}
-        width={width}
-        onRunNotebook={onRunNotebook}
-        onToggleReactive={onToggleReactive}
-        onWidthChange={setWidth}
-      />
       <span
-        aria-hidden="true"
+        aria-atomic="true"
+        aria-live="polite"
         className="notebookActiveCell"
         data-notebook-active-cell="true"
         data-notebook-active-index={selectedBlockIndex >= 0 ? selectedBlockIndex + 1 : 0}
@@ -261,7 +250,12 @@ export function NotebookPanel({
       </div>
 
       <ScrollArea className="notebookViewport">
-        <div className="notebookDocument" data-notebook-width={width}>
+        <div
+          aria-label="노트북 셀"
+          className="notebookDocument"
+          data-notebook-width={width}
+          role="list"
+        >
           {document.blocks.length ? (
             <>
               {document.blocks.map((block, blockIndex) => (
@@ -277,7 +271,9 @@ export function NotebookPanel({
                   isRunning={runningBlockId === block.id}
                   isStale={staleSet.has(block.id)}
                   inCycle={blockInCycle(diagnostics, block.id)}
+                  position={blockIndex + 1}
                   showInsertBefore={blockIndex === 0}
+                  total={document.blocks.length}
                   diagnosticChips={cellDiagnosticChips(diagnostics, block.id)}
                   onCellAsk={(action, question) => onCellAsk(action, block, question)}
                   onDelete={() => onDeleteCell(block.id)}
@@ -305,6 +301,18 @@ export function NotebookPanel({
           )}
         </div>
       </ScrollArea>
+      <NotebookCommandBar
+        apiOnline={apiOnline}
+        canRun={canRun}
+        notebookRunning={notebookRunning}
+        persistence={persistence}
+        reactiveEnabled={reactiveEnabled}
+        runningBlockId={runningBlockId}
+        width={width}
+        onRunNotebook={onRunNotebook}
+        onToggleReactive={onToggleReactive}
+        onWidthChange={setWidth}
+      />
     </section>
   );
 }
@@ -677,7 +685,9 @@ function DocumentBlock({
   isRunning,
   isStale = false,
   inCycle = false,
+  position,
   showInsertBefore = false,
+  total,
   diagnosticChips = [],
   result,
   cellHelp,
@@ -697,7 +707,9 @@ function DocumentBlock({
   isRunning: boolean;
   isStale?: boolean;
   inCycle?: boolean;
+  position: number;
   showInsertBefore?: boolean;
+  total: number;
   diagnosticChips?: CellDiagnosticChip[];
   result?: ExecutionResult;
   cellHelp?: CellAiHelpState;
@@ -717,6 +729,7 @@ function DocumentBlock({
       : block.type === "automation"
         ? "Automation"
         : "Python";
+  const cellAriaLabel = `${cellTitle} 셀 ${position} / ${total}`;
   // 우선순위: 실행 중 → 순환(conflict, 빨강) → stale(오래됨) → 실행 결과 → 대기.
   const resultStatus = isRunning ? "running" : inCycle ? "conflict" : isStale ? "stale" : result?.status ?? "idle";
   const draftRef = useRef(draft);
@@ -745,21 +758,16 @@ function DocumentBlock({
     const showPreview = !isSelected && Boolean(markdownHtml);
     return (
       <section
+        aria-label={cellAriaLabel}
+        aria-posinset={position}
+        aria-setsize={total}
         className="astryxWorkCell notebookCell group"
         data-notebook-cell="markdown"
         data-notebook-cell-selected={isSelected ? "true" : "false"}
         data-notebook-cell-status={resultStatus}
         data-work-cell-selected={isSelected ? "true" : "false"}
+        role="listitem"
       >
-        <CellMetaBar
-          status={resultStatus}
-          type="markdown"
-          selected={isSelected}
-          cellHelp={cellHelp}
-          diagnosticChips={diagnosticChips}
-          onCellAsk={onCellAsk}
-          onDelete={onDelete}
-        />
         <div className="notebookCellBody">
           {showInsertBefore ? (
             <InsertCellButton placement="before" onInsertCell={onInsertCell} className="notebookInsertBefore" />
@@ -785,12 +793,24 @@ function DocumentBlock({
             />
           )}
         </div>
+        <CellMetaBar
+          status={resultStatus}
+          type="markdown"
+          selected={isSelected}
+          cellHelp={cellHelp}
+          diagnosticChips={diagnosticChips}
+          onCellAsk={onCellAsk}
+          onDelete={onDelete}
+        />
       </section>
     );
   }
 
   return (
     <section
+      aria-label={cellAriaLabel}
+      aria-posinset={position}
+      aria-setsize={total}
       className="astryxWorkCell notebookCell group"
       data-automation-session-cell={persistentAutomation ? "true" : undefined}
       data-notebook-cell="code"
@@ -798,19 +818,8 @@ function DocumentBlock({
       data-notebook-cell-status={resultStatus}
       data-work-cell-running={isRunning ? "true" : "false"}
       data-work-cell-selected={isSelected ? "true" : "false"}
+      role="listitem"
     >
-      <CellMetaBar
-        canRun={canRun}
-        running={isRunning}
-        status={resultStatus}
-        type="code"
-        selected={isSelected}
-        cellHelp={cellHelp}
-        diagnosticChips={diagnosticChips}
-        onCellAsk={onCellAsk}
-        onDelete={onDelete}
-        onRun={runCurrentDraft}
-      />
       <div className="notebookCellBody">
         {showInsertBefore ? (
           <InsertCellButton placement="before" onInsertCell={onInsertCell} className="notebookInsertBefore" />
@@ -851,6 +860,18 @@ function DocumentBlock({
           <LoadingInline label="셀 실행 중" />
         </div>
       ) : null}
+      <CellMetaBar
+        canRun={canRun}
+        running={isRunning}
+        status={resultStatus}
+        type="code"
+        selected={isSelected}
+        cellHelp={cellHelp}
+        diagnosticChips={diagnosticChips}
+        onCellAsk={onCellAsk}
+        onDelete={onDelete}
+        onRun={runCurrentDraft}
+      />
     </section>
   );
 }

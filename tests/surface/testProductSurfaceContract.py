@@ -183,6 +183,7 @@ def testNotebookAutosaveUsesLocaleIndependentActiveCellMarker() -> None:
     autosaveGate = _read("tests/surface/verifyNotebookAutosavePlaywright.py")
 
     assert 'data-notebook-active-cell="true"' in notebookPanel
+    assert 'aria-live="polite"' in notebookPanel
     assert "data-notebook-active-index={selectedBlockIndex >= 0 ? selectedBlockIndex + 1 : 0}" in notebookPanel
     assert "data-notebook-cell-count={document.blocks.length}" in notebookPanel
     assert 'querySelector("[data-notebook-active-cell=true]")' in autosaveGate
@@ -225,6 +226,46 @@ def testNotebookKeepsMobileTitleAndCollapsesSecondaryCellActions() -> None:
     assert "unrelated reconnect prompt leaked into the default notebook" in productGate
     assert '"verifyNotebookTools": True' in productGate
     assert "notebookToolsVerified" in productGate
+
+
+def testNotebookReadingOrderFollowsTheVisibleDocumentFlow() -> None:
+    notebookPanel = _read("editor/src/components/notebook/notebookPanel.tsx")
+    productGate = _read("tests/surface/verifyProductExperiencePlaywright.py")
+
+    assert 'aria-label="노트북 셀"' in notebookPanel
+    assert 'role="list"' in notebookPanel
+    assert "aria-label={cellAriaLabel}" in notebookPanel
+    assert "aria-posinset={position}" in notebookPanel
+    assert "aria-setsize={total}" in notebookPanel
+    assert notebookPanel.index('<ScrollArea className="notebookViewport">') < notebookPanel.index(
+        "<NotebookCommandBar"
+    )
+    codeCellStart = notebookPanel.index('data-notebook-cell="code"')
+    codeCellBody = notebookPanel.index('className="notebookCellBody"', codeCellStart)
+    codeCellOutput = notebookPanel.index("result ? (", codeCellBody)
+    codeCellActions = notebookPanel.index("<CellMetaBar", codeCellOutput)
+    assert codeCellBody < codeCellOutput < codeCellActions
+    for marker in (
+        "notebookCellReadingOrder",
+        "notebookFooterReadingOrder",
+        "notebook document semantics are incomplete",
+        "notebook cell reading order is invalid",
+        "notebook footer controls precede the document in reading order",
+    ):
+        assert marker in productGate
+
+
+def testLocalLearningArchiveReturnsToWebWithoutChangingPortableContent() -> None:
+    productGate = _read("tests/surface/verifyProductExperiencePlaywright.py")
+
+    for marker in (
+        "verifyLocalArchiveWebRoundTrip",
+        "Local-to-Web round trip changed the archive root hash",
+        "Local-to-Web round trip changed the evidence event set",
+        "Local-to-Web round trip changed portable payload bytes",
+        "localArchiveWebRoundTripEvidence",
+    ):
+        assert marker in productGate
 
 
 def testReconnectPromptsStayOnSurfacesWhereTheyAreActionable() -> None:

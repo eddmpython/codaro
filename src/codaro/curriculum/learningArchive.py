@@ -16,6 +16,7 @@ from typing import Any, TypeVar
 from .evidenceArchive import (
     EvidenceArchiveError,
     digestBytes,
+    evidenceArchiveCreatedAt,
     stableJson,
     validateLearningEvidenceArchive,
 )
@@ -228,6 +229,13 @@ def buildLearningArchive(
         normalizedEvidence = validateLearningEvidenceArchive(evidenceArchive)
     except EvidenceArchiveError as error:
         raise LearningArchiveError(f"학습 archive evidence가 유효하지 않습니다: {error}") from error
+    normalizedEvidence = {
+        **normalizedEvidence,
+        "manifest": {
+            **normalizedEvidence["manifest"],
+            "createdAt": evidenceArchiveCreatedAt(normalizedEvidence["events"]),
+        },
+    }
     evidenceEvents = normalizedEvidence["events"]
     evidenceBytes = stableJson(normalizedEvidence).encode("utf-8")
     evidenceEventIds = sorted(str(event["eventId"]) for event in evidenceEvents)

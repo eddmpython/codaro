@@ -362,6 +362,20 @@ def testEvidenceArchiveKeepsWebAndLocalAttemptsDistinct() -> None:
     }
 
 
+def testEvidenceArchiveCreatedAtIsDerivedFromTheEventSet() -> None:
+    earlier = evidenceEvent(runtimeTier="web")
+    later = evidenceEvent(runtimeTier="local")
+    later["occurredAt"] = "2026-07-20T09:30:45.123456+09:00"
+    later = sealEvidenceEvent({key: value for key, value in later.items() if key != "payloadHash"})
+
+    first = buildLearningEvidenceArchive([later, earlier])
+    second = buildLearningEvidenceArchive([earlier, later])
+
+    assert first == second
+    assert first["manifest"]["createdAt"] == "2026-07-20T00:30:45.123Z"
+    assert buildLearningEvidenceArchive([])["manifest"]["createdAt"] == "1970-01-01T00:00:00.000Z"
+
+
 def testEvidenceArchivePreservesLocalArtifactDescriptors(tmp_path: Path) -> None:
     artifacts = [{
         "byteLength": 13,

@@ -178,6 +178,7 @@ const MAX_ARCHIVE_EVENTS = 10_000;
 const MAX_EVENT_ARTIFACTS = 64;
 const MAX_EVENT_PACKAGES = 16;
 const MAX_CANONICAL_EVENTS = 4;
+const EMPTY_ARCHIVE_CREATED_AT = "1970-01-01T00:00:00.000Z";
 
 const strongEvidenceAttemptFingerprint = async (
   event: Pick<StrongEvidenceCore,
@@ -345,7 +346,7 @@ export async function buildWebLearningEvidenceArchive(): Promise<WebLearningEvid
     kind: ARCHIVE_KIND,
     manifest: {
       archiveId: `learning-evidence:${hashValue}`,
-      createdAt: new Date().toISOString(),
+      createdAt: evidenceArchiveCreatedAt(events),
       eventCount: events.length,
       eventSetHash,
       files: [{
@@ -359,6 +360,15 @@ export async function buildWebLearningEvidenceArchive(): Promise<WebLearningEvid
     },
     schemaVersion: 1,
   };
+}
+
+function evidenceArchiveCreatedAt(events: WebLearningEvidenceEvent[]): string {
+  if (!events.length) return EMPTY_ARCHIVE_CREATED_AT;
+  const timestamps = events.map((event) => Date.parse(event.occurredAt));
+  if (timestamps.some(Number.isNaN)) {
+    throw new Error("학습 증거 event의 occurredAt이 ISO 8601 timestamp가 아닙니다.");
+  }
+  return new Date(Math.max(...timestamps)).toISOString();
 }
 
 export async function serializeWebLearningEvidenceArchive(): Promise<string> {

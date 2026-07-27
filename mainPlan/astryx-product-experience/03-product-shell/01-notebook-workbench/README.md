@@ -54,6 +54,8 @@
 - 연결 이력이 없는 외부 제공자 안내와 끊어진 연결 안내는 대화 surface에서만 보인다. backend offline은 실행과 저장에 직접 영향을 주므로 비학습 surface 전체에 유지하고, 집중 학습 surface에는 연결 안내를 렌더하지 않는다.
 - 2026-07-27 production build 뒤 Chromium `web-run-desktop` 1440×900 Dark에서 기본 연결 안내 0개, 닫힌 도구 패널 0개를 확인하고 설정 버튼의 `aria-pressed=false → true → false`와 패널 mount·detach를 실제 클릭으로 검증했다.
 - 같은 source를 포함한 current-commit wheel을 설치한 Windows 11 build 26200, WebView2 `Edg/150.0.4078.99`의 Local Notebook 1024×768에서 연결 안내 0개, 기본 도구 패널 0개, overflow 0px, 공용 SNS 순서와 테마 control을 확인했다.
+- 노트북 문서는 `list`, 셀은 순번이 있는 `listitem`, active cell은 `aria-live=polite` 상태로 노출한다. DOM 읽기 순서는 셀 입력, 출력, 문맥 action, 문서 하단 폭·실행 control 순서이며 Chromium 149의 Web Run desktop에서 실제 순서를 검사했다.
+- Chromium 149의 Day 1 `Web → Local → Web` 왕복은 Local 재내보내기 뒤 Web이 증거 3개와 초안, `mixed` runtime identity를 복원하고 같은 root hash와 portable payload bytes를 다시 내보내는지 확인했다.
 - 시각 증거는 `output/test-runner/product-experience-browser/screenshots/{dark,light}/web-run-{desktop,mobile}.png`, Local 증거는 `output/test-runner/product-experience-browser/screenshots/dark/local-run-minimum.png`에 남겼다.
 - 기계 판정은 `output/test-runner/notebook-redesign/`의 Web Dark·Light와 Local report, `output/test-runner/run-local-state-browser/run-local-state-report.json`에 남겼다.
 
@@ -61,7 +63,6 @@
 
 - 실제 WebView2 기본 notebook 1024x768, 공용 테마·SNS와 native client·DOM 크기 일치는 자동 검증됐다.
 - 실제 WebView2에서 긴 notebook, keyboard-only cell 이동, screen reader reading order, IME 수동 검수
-- Local 재내보내기 파일을 공개 Web이 다시 수입하는 역방향 round trip 증거
 
 ## 영향 파일
 
@@ -117,6 +118,6 @@
 ### PM 관점
 
 - `/run/` 첫 진입에서 불필요한 badge와 sample code 없이 편집 가능한 빈 셀이 바로 보이고, 실행 결과는 별도 확인 command 없이 cell 아래에 나타난다.
-- 공용 source와 실제 설치형 Local WebView2의 동일 컴포넌트·실행 전이, 공개 Web archive의 Local 수입·reload·재내보내기는 기계 검증됐다. 그러나 Local 재내보내기 파일의 공개 Web 재수입과 수동 보조기술 검수가 남아 있어 상태는 `진행`이다.
+- 공용 source와 실제 설치형 Local WebView2의 동일 컴포넌트·실행 전이, 공개 Web archive의 Local 수입·reload·재내보내기와 다시 Web으로 돌아오는 왕복은 기계 검증됐다. 그러나 실제 긴 문서의 keyboard-only 이동, IME와 screen reader 수동 검수가 남아 있어 상태는 `진행`이다.
 
 완료 전에는 TODO 삭제하지 않는다.

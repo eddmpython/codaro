@@ -55,7 +55,7 @@ def testSaveDocumentAtomicallyWritesEveryFormat(
     assert loaded.metadata.sourceFormat == sourceFormat
     assert loaded.blocks[0].content == "value = 42"
     assert events == ["fsync", "replace"]
-    assert list(tmp_path.glob(f".{path.name}.*.tmp")) == []
+    assert list(tmp_path.glob(".codaro-*.tmp")) == []
 
 
 @pytest.mark.parametrize("failurePoint", ["fsync", "replace"])
@@ -89,4 +89,19 @@ def testSaveDocumentFailurePreservesExistingFileAndCleansTemporaryFile(
         saveDocument(str(path), document)
 
     assert path.read_bytes() == originalBytes
-    assert list(tmp_path.glob(f".{path.name}.*.tmp")) == []
+    assert list(tmp_path.glob(".codaro-*.tmp")) == []
+
+
+def testSaveDocumentTemporaryNameDoesNotRepeatLongDestinationName(tmp_path: Path) -> None:
+    parentPadding = max(1, 175 - len(str(tmp_path)) - 1)
+    nested = tmp_path / ("p" * parentPadding)
+    path = nested / f"learning-automation-{'d' * 48}.py"
+    document = createEmptyDocument("Long path lesson")
+    document.metadata.sourceFormat = "percent"
+    document.blocks[0].content = "value = 42"
+
+    savedPath = saveDocument(str(path), document)
+
+    assert savedPath == path.resolve()
+    assert loadDocument(str(savedPath)).blocks[0].content == "value = 42"
+    assert list(path.parent.glob(".codaro-*.tmp")) == []

@@ -889,12 +889,13 @@ async function normalizeEvidenceArchive(value: unknown): Promise<EvidenceArchive
       || file.contentHash !== eventSetHash || file.byteLength !== encodeText(canonicalEvents).byteLength) {
     throw new Error("학습 evidence archive manifest가 event bytes와 일치하지 않습니다.");
   }
+  timestamp(manifest.createdAt, "evidence createdAt");
   return {
     events,
     kind: "codaro.learning-evidence-archive",
     manifest: {
       archiveId: String(manifest.archiveId),
-      createdAt: timestamp(manifest.createdAt, "evidence createdAt"),
+      createdAt: evidenceArchiveCreatedAt(events),
       eventCount: events.length,
       eventSetHash,
       files: [{
@@ -908,6 +909,12 @@ async function normalizeEvidenceArchive(value: unknown): Promise<EvidenceArchive
     },
     schemaVersion: 1,
   };
+}
+
+function evidenceArchiveCreatedAt(events: Array<Record<string, unknown>>): string {
+  if (!events.length) return "1970-01-01T00:00:00.000Z";
+  const timestamps = events.map((event) => Date.parse(timestamp(event.occurredAt, "evidence occurredAt")));
+  return new Date(Math.max(...timestamps)).toISOString();
 }
 
 async function addBlob(blobs: Map<string, LearningArchiveBlob>, payload: Uint8Array): Promise<string> {

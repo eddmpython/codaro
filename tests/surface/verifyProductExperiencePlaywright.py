@@ -554,6 +554,80 @@ def waitForCommittedBrowserLearningArchive(page: Any, lessonRef: str, rootHash: 
     )
 
 
+def verifyLocalArchiveWebRoundTrip(
+    page: Any,
+    *,
+    archiveBytes: bytes,
+    draftSource: str,
+    expectedEvidenceCount: int,
+    webPort: int,
+) -> dict[str, Any]:
+    localArchive = json.loads(archiveBytes.decode("utf-8"))
+    localPortablePayloads = portableLearningArchivePayloads(localArchive)
+    localEvidence = learningArchiveJsonPayload(localArchive, "evidence")
+    localEventIds = sorted(str(event["eventId"]) for event in localEvidence.get("events", []))
+    localRootHash = str(localArchive.get("manifest", {}).get("rootHash", ""))
+    if len(localEventIds) != expectedEvidenceCount or not localRootHash.startswith("sha256-"):
+        raise AssertionError("Local re-export is missing its evidence set or root hash")
+
+    webLessonUrl = (
+        f"http://127.0.0.1:{webPort}/?surface=curriculum"
+        f"&category=30days&lesson={quote('day01_헬로월드')}"
+        "&path=pythonFoundation&runtime=web#curriculum"
+    )
+    page.goto(webLessonUrl, wait_until="domcontentloaded", timeout=30_000)
+    waitForLearningLessonRoute(page, "day01_헬로월드")
+    page.wait_for_selector("[data-learning-section-card]", timeout=30_000)
+    openLearningDataSettings(page)
+    page.locator('[data-learning-archive-import-input="true"]').set_input_files({
+        "name": "codaro-local-learning-archive.json",
+        "mimeType": "application/json",
+        "buffer": archiveBytes,
+    })
+    waitForLearningLessonRoute(page, "day01_헬로월드")
+    waitForWebLearningEvidenceEventCount(page, expectedEvidenceCount)
+    page.wait_for_function(
+        """
+        (expected) => Array.from(document.querySelectorAll('.cm-content'))
+          .some((editor) => editor.textContent?.includes(expected))
+        """,
+        arg=draftSource,
+        timeout=20_000,
+    )
+
+    openLearningDataSettings(page)
+    workspaceSummary = page.locator('[data-learning-archive-workspace-summary="true"]:visible')
+    workspaceSummary.wait_for(state="visible", timeout=20_000)
+    workspaceSummaryText = workspaceSummary.inner_text()
+    if "Web + Local" not in workspaceSummaryText:
+        raise AssertionError(
+            f"Web did not preserve the Local archive runtime identity: {workspaceSummaryText!r}"
+        )
+    with page.expect_download(timeout=20_000) as webDownloadInfo:
+        page.get_by_role("button", name="학습 작업 내보내기").click()
+    webArchivePath = webDownloadInfo.value.path()
+    if webArchivePath is None:
+        raise AssertionError("Web re-export after Local import has no local path")
+    webArchive = json.loads(Path(webArchivePath).read_text(encoding="utf-8"))
+    webEvidence = learningArchiveJsonPayload(webArchive, "evidence")
+    webEventIds = sorted(str(event["eventId"]) for event in webEvidence.get("events", []))
+    webRootHash = str(webArchive.get("manifest", {}).get("rootHash", ""))
+    if webRootHash != localRootHash:
+        raise AssertionError(
+            f"Local-to-Web round trip changed the archive root hash: {localRootHash} != {webRootHash}"
+        )
+    if webEventIds != localEventIds:
+        raise AssertionError("Local-to-Web round trip changed the evidence event set")
+    if portableLearningArchivePayloads(webArchive) != localPortablePayloads:
+        raise AssertionError("Local-to-Web round trip changed portable payload bytes")
+    return {
+        "evidenceEventCount": len(webEventIds),
+        "portablePayloadsPreserved": True,
+        "rootHash": webRootHash,
+        "runtimeTier": webArchive.get("manifest", {}).get("runtimeTier"),
+    }
+
+
 def portableLearningArchivePayloads(archive: dict[str, Any]) -> dict[str, Any]:
     return {
         "automation": {
@@ -713,7 +787,7 @@ def startLocalServer() -> tuple[Any, threading.Thread, int, tempfile.TemporaryDi
 
 
 def releaseLocalKernelSessions(page: Any, case: dict[str, Any], localPort: int) -> list[str]:
-    if urlsplit(str(case.get("url", ""))).port != localPort or page.is_closed():
+    if page.is_closed() or urlsplit(page.url).port != localPort:
         return []
     return page.evaluate(
         """
@@ -2005,6 +2079,44 @@ async ({ surface, expectedTier }) => {
   const reactiveNotebookControl = document.querySelector('[data-notebook-reactive-toggle="true"]');
   const notebookTitle = document.querySelector('[data-notebook-title="topbar"]');
   const notebookCellMenus = [...document.querySelectorAll('[data-notebook-cell-menu="true"]')];
+  const notebookCells = [...document.querySelectorAll('[data-notebook-cell]')];
+  const notebookCellReadingOrder = notebookCells.map((cell) => {
+    const content = cell.querySelector(
+      "[data-notebook-input='code'] .cm-content, .notebookMarkdownEditor, .notebookMarkdownPreview"
+    );
+    const output = cell.querySelector(".notebookCellOutput");
+    const actions = cell.querySelector(".notebookCellMeta");
+    const follows = (left, right) => Boolean(
+      left && right && (left.compareDocumentPosition(right) & Node.DOCUMENT_POSITION_FOLLOWING)
+    );
+    return {
+      label: cell.getAttribute("aria-label"),
+      position: cell.getAttribute("aria-posinset"),
+      role: cell.getAttribute("role"),
+      setSize: cell.getAttribute("aria-setsize"),
+      contentBeforeOutput: !output || follows(content, output),
+      contentBeforeActions: follows(content, output || actions),
+      outputBeforeActions: !output || follows(output, actions),
+    };
+  });
+  const notebookFirstCell = notebookCells[0] || null;
+  const notebookWidthTools = document.querySelector('[aria-label="노트북 셀 폭"]');
+  const notebookExecutionTools = document.querySelector('[aria-label="노트북 실행"]');
+  const notebookFooterReadingOrder = {
+    cellBeforeExecutionTools: Boolean(
+      notebookFirstCell
+      && notebookExecutionTools
+      && (notebookFirstCell.compareDocumentPosition(notebookExecutionTools)
+        & Node.DOCUMENT_POSITION_FOLLOWING)
+    ),
+    cellBeforeWidthTools: Boolean(
+      notebookFirstCell
+      && notebookWidthTools
+      && (notebookFirstCell.compareDocumentPosition(notebookWidthTools)
+        & Node.DOCUMENT_POSITION_FOLLOWING)
+    ),
+  };
+  const notebookActiveCellStatus = document.querySelector('[data-notebook-active-cell="true"]');
   const notebookCellMenuTargets = notebookCellMenus.map((menu) => {
     const trigger = menu.querySelector(".notebookCellMoreTrigger");
     const cell = menu.closest("[data-notebook-cell]");
@@ -2224,6 +2336,11 @@ async ({ surface, expectedTier }) => {
     } : null,
     notebookBlankInputCount: [...document.querySelectorAll("[data-notebook-input='code'] .cm-content")]
       .filter((editor) => !editorText(editor)).length,
+    notebookCellReadingOrder,
+    notebookFooterReadingOrder,
+    notebookListRole: notebookDocument?.getAttribute("role") || null,
+    notebookListLabel: notebookDocument?.getAttribute("aria-label") || null,
+    notebookActiveCellLive: notebookActiveCellStatus?.getAttribute("aria-live") || null,
     notebookBrandCount: document.querySelectorAll('[data-notebook-brand="codaro"]').length,
     notebookTitleVisible: Boolean(notebookTitle && inViewport(notebookTitle)),
     notebookToolsToggleCount: document.querySelectorAll('[data-notebook-tools-toggle="true"]').length,
@@ -2655,6 +2772,45 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
                 failures.append(
                     f"{name}: notebook append controls drifted: {audit['notebookAppendLabels']}"
                 )
+            if (
+                audit["notebookListRole"] != "list"
+                or audit["notebookListLabel"] != "노트북 셀"
+                or audit["notebookActiveCellLive"] != "polite"
+            ):
+                failures.append(
+                    f"{name}: notebook document semantics are incomplete: "
+                    f"role={audit['notebookListRole']}, "
+                    f"label={audit['notebookListLabel']}, "
+                    f"live={audit['notebookActiveCellLive']}"
+                )
+            invalidReadingOrder = [
+                item
+                for item in audit["notebookCellReadingOrder"]
+                if (
+                    item["role"] != "listitem"
+                    or not item["label"]
+                    or item["position"] is None
+                    or item["setSize"] is None
+                    or not item["contentBeforeOutput"]
+                    or not item["contentBeforeActions"]
+                    or not item["outputBeforeActions"]
+                )
+            ]
+            if invalidReadingOrder:
+                failures.append(
+                    f"{name}: notebook cell reading order is invalid: {invalidReadingOrder}"
+                )
+            if (
+                not audit["notebookFooterReadingOrder"]["cellBeforeExecutionTools"]
+                or (
+                    audit["notebookWidthControlCount"] > 0
+                    and not audit["notebookFooterReadingOrder"]["cellBeforeWidthTools"]
+                )
+            ):
+                failures.append(
+                    f"{name}: notebook footer controls precede the document in reading order: "
+                    f"{audit['notebookFooterReadingOrder']}"
+                )
             viewportWidth = int((case.get("viewport") or {}).get("width") or 0)
             notebookGeometry = audit.get("notebookDocumentGeometry")
             if viewportWidth > 760:
@@ -2886,6 +3042,7 @@ def runBrowserMatrix(
                 page = context.new_page()
                 webArtifactEvidence: dict[str, Any] | None = None
                 learnSearchEvidence: dict[str, Any] | None = None
+                localArchiveWebRoundTripEvidence: dict[str, Any] | None = None
                 notebookRunAdvanceVerified = False
                 notebookToolsVerified = False
                 notebookStateEvidence: dict[str, Any] | None = None
@@ -4193,9 +4350,16 @@ def runBrowserMatrix(
                             raise AssertionError("Local re-export did not preserve mixed runtime identity")
                         if portableLearningArchivePayloads(local_archive) != portableLearningArchivePayloads(web_learning_archive):
                             raise AssertionError("Local re-export did not preserve portable Web payload bytes")
+                        releaseLocalKernelSessions(page, case, localPort)
+                        localArchiveWebRoundTripEvidence = verifyLocalArchiveWebRoundTrip(
+                            page,
+                            archiveBytes=Path(local_archive_path).read_bytes(),
+                            draftSource=webLearningArchiveDraftSource,
+                            expectedEvidenceCount=importedEvidenceExpected,
+                            webPort=webPort,
+                        )
                         localEvidenceExpected = importedEvidenceExpected
                         case["expectedEvidenceCount"] = localEvidenceExpected
-                        releaseLocalKernelSessions(page, case, localPort)
                         page.goto(case["url"], wait_until="domcontentloaded", timeout=30_000)
                         page.wait_for_selector("[data-learning-section-card]", timeout=30_000)
                         waitForLocalLearningEvidenceEventCount(page, localEvidenceExpected)
@@ -4363,6 +4527,7 @@ def runBrowserMatrix(
                             "httpFailures": httpFailureSnapshot,
                             "assetFailures": assetFailureSnapshot,
                             "learnSearchEvidence": learnSearchEvidence,
+                            "localArchiveWebRoundTripEvidence": localArchiveWebRoundTripEvidence,
                             "webArtifactEvidence": webArtifactEvidence,
                             "notebookRunAdvanceVerified": notebookRunAdvanceVerified,
                             "notebookToolsVerified": notebookToolsVerified,

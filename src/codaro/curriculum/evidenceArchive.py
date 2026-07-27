@@ -24,6 +24,7 @@ from .learningEvent import (
 
 ARCHIVE_KIND = "codaro.learning-evidence-archive"
 ARCHIVE_EVENT_PATH = "evidence/events.json"
+EMPTY_ARCHIVE_CREATED_AT = "1970-01-01T00:00:00.000Z"
 MAX_ARCHIVE_EVENTS = 10_000
 SHA256_PATTERN = re.compile(r"^sha256-(?:[A-Za-z0-9_-]{43}|[A-Za-z0-9+/]{43}=)$")
 STRONG_EVENT_FIELDS = (
@@ -564,7 +565,7 @@ def buildLearningEvidenceArchive(events: list[dict[str, Any]]) -> dict[str, Any]
         "kind": ARCHIVE_KIND,
         "manifest": {
             "archiveId": f"learning-evidence:{eventSetHash.removeprefix('sha256-')}",
-            "createdAt": utcTimestamp(),
+            "createdAt": evidenceArchiveCreatedAt(normalized),
             "eventCount": len(normalized),
             "eventSetHash": eventSetHash,
             "files": [
@@ -580,6 +581,26 @@ def buildLearningEvidenceArchive(events: list[dict[str, Any]]) -> dict[str, Any]
         },
         "schemaVersion": 1,
     }
+
+
+def evidenceArchiveCreatedAt(events: Iterable[Mapping[str, Any]]) -> str:
+    latest: datetime | None = None
+    for event in events:
+        rawOccurredAt = event.get("occurredAt")
+        if not isinstance(rawOccurredAt, str):
+            raise EvidenceArchiveError("학습 증거 event의 occurredAt이 유효하지 않습니다.")
+        try:
+            occurredAt = datetime.fromisoformat(rawOccurredAt.replace("Z", "+00:00"))
+        except ValueError as error:
+            raise EvidenceArchiveError("학습 증거 event의 occurredAt이 ISO 8601 timestamp가 아닙니다.") from error
+        if occurredAt.tzinfo is None:
+            raise EvidenceArchiveError("학습 증거 event의 occurredAt에 timezone이 없습니다.")
+        occurredAt = occurredAt.astimezone(UTC)
+        if latest is None or occurredAt > latest:
+            latest = occurredAt
+    if latest is None:
+        return EMPTY_ARCHIVE_CREATED_AT
+    return latest.isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
 
 def validateLearningEvidenceArchive(value: object) -> dict[str, Any]:
