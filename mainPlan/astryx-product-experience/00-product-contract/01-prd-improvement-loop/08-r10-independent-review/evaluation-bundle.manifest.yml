@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: 49161f5f2b7a6cfa13749cfe536727fa703c0762
+  gitCommit: fe67c4757ef80702fea8e5a94049451d9878906d
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: e73b5306a17fc53d1a9667ae147e07e83cdb52f9dd6812cc8a0a760009b0ce45
-  fileCount: 2761
-  totalBytes: 89220511
+  manifestHash: 8ae1694ec0aff840ae457246f20afe0d614ba29c210cd633c012bfaa9600b5d1
+  fileCount: 2799
+  totalBytes: 89551769
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: 6745dd5311716f7cfb457ace9776499bd2da91df30871706aebde2800228a657
-  bytes: 89756861
+  sha256: 94fd74e5fd6ca4cb649918c6d32155628e7d01d55d840859f991bcb98131b00e
+  bytes: 90098557
   format: zip
   compression: stored
   compressionMethod: 0
@@ -240,8 +240,8 @@ files:
   kind: repository
   sourcePath: assets/brand/tools/buildVisualAssets.py
 - path: assets/brand/tools/captureOutcomeProofs.py
-  sha256: c736954205086d644b81daf3ac6412a4365588f904a2b67349bd25a67ed59f45
-  bytes: 21076
+  sha256: 6a57a5b3fea2df32f6c49d5a693a2a54e7ec61bc17a8ca3834b321d30bbe383a
+  bytes: 28907
   kind: repository
   sourcePath: assets/brand/tools/captureOutcomeProofs.py
 - path: assets/brand/tools/viteLayerOrder.mjs
@@ -399,6 +399,36 @@ files:
   bytes: 22296
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/dataVisualization/dataVisualization-840-5248dc1b6fb1.webp
+- path: assets/brand/visuals/generated/files/dataVisualizationOutcome/dataVisualizationOutcome-1200-3e10f67c139c.avif
+  sha256: 1709289a37ee0049f4cb502cd3b0a9f0c484e0fdb448c34793386f9827ededbf
+  bytes: 12185
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/dataVisualizationOutcome/dataVisualizationOutcome-1200-3e10f67c139c.avif
+- path: assets/brand/visuals/generated/files/dataVisualizationOutcome/dataVisualizationOutcome-1200-3e10f67c139c.webp
+  sha256: dede08af71f14bb0db124f91f0c48b28524a5ce86201829c012364ebc800e6c6
+  bytes: 16062
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/dataVisualizationOutcome/dataVisualizationOutcome-1200-3e10f67c139c.webp
+- path: assets/brand/visuals/generated/files/dataVisualizationOutcome/dataVisualizationOutcome-480-3e10f67c139c.avif
+  sha256: 8de5cb1f7bb344fff9c57316e28442315b414a39220ea82e6ec8a2c16be3831a
+  bytes: 4115
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/dataVisualizationOutcome/dataVisualizationOutcome-480-3e10f67c139c.avif
+- path: assets/brand/visuals/generated/files/dataVisualizationOutcome/dataVisualizationOutcome-480-3e10f67c139c.webp
+  sha256: 35a6793c204eb0555aece4b9dc7bdf645590264b09b9d92190737d67d18c70f4
+  bytes: 4112
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/dataVisualizationOutcome/dataVisualizationOutcome-480-3e10f67c139c.webp
+- path: assets/brand/visuals/generated/files/dataVisualizationOutcome/dataVisualizationOutcome-720-3e10f67c139c.avif
+  sha256: dce23a4c47832f5b517bdf7a65bc4e103f522ffa7ba93520cb103987ea43f133
+  bytes: 7133
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/dataVisualizationOutcome/dataVisualizationOutcome-720-3e10f67c139c.avif
+- path: assets/brand/visuals/generated/files/dataVisualizationOutcome/dataVisualizationOutcome-720-3e10f67c139c.webp
+  sha256: 288b3a7aef168041839c5db50fd90895faae68a4fa5ce6ecd7c3c2d9f5166420
+  bytes: 7286
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/dataVisualizationOutcome/dataVisualizationOutcome-720-3e10f67c139c.webp
 - path: assets/brand/visuals/generated/files/developerLiteracy/developerLiteracy-1200-9990255713da.avif
   sha256: eb3d7a35d4976f5abf5d20b126ccb2fa41014dc0c53495e20cb70c197de305f4
   bytes: 32719
@@ -579,26 +609,26 @@ files:
   bytes: 18552
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/localAutomationDesktop/localAutomationDesktop-720-49cedaaade40.webp
-- path: assets/brand/visuals/generated/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.avif
-  sha256: 133ebd556ccea1933b7c64032bfa375dd3d647c5bbcf063557bd44d78b7eb2ad
-  bytes: 3742
+- path: assets/brand/visuals/generated/files/localNotebookDesktop/localNotebookDesktop-600-c059e045cf19.avif
+  sha256: c0a3f6a26a751e0f6b44b61fa47cd265df7662adef06905d0f33d5d0d88244a1
+  bytes: 3768
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.avif
-- path: assets/brand/visuals/generated/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.webp
-  sha256: 1fdc00e3d0227c4cc57ebbfee266eb6f3d6daf66d5ccfe3872bd5c1877143e11
+  sourcePath: assets/brand/visuals/generated/files/localNotebookDesktop/localNotebookDesktop-600-c059e045cf19.avif
+- path: assets/brand/visuals/generated/files/localNotebookDesktop/localNotebookDesktop-600-c059e045cf19.webp
+  sha256: db68890aa1ed206ccd8e33618785b3bd248a89fb6aa222ff2b8977be768b6c01
   bytes: 4118
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.webp
-- path: assets/brand/visuals/generated/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.avif
+  sourcePath: assets/brand/visuals/generated/files/localNotebookDesktop/localNotebookDesktop-600-c059e045cf19.webp
+- path: assets/brand/visuals/generated/files/localNotebookDesktop/localNotebookDesktop-900-c059e045cf19.avif
   sha256: 28a51ebf9343d3007ec3b95113fd6829456e35556a6776ded27c53d7113ae15b
   bytes: 5239
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.avif
-- path: assets/brand/visuals/generated/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.webp
-  sha256: cc7e967dd2ddbe81d2eef0bb3490e37e32b68dd1c4aa439b63fdf879dac1b992
+  sourcePath: assets/brand/visuals/generated/files/localNotebookDesktop/localNotebookDesktop-900-c059e045cf19.avif
+- path: assets/brand/visuals/generated/files/localNotebookDesktop/localNotebookDesktop-900-c059e045cf19.webp
+  sha256: 670a537d9c7c636f10a01bf7b42d404d109601d67105def512b3cec00430ed0f
   bytes: 7312
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.webp
+  sourcePath: assets/brand/visuals/generated/files/localNotebookDesktop/localNotebookDesktop-900-c059e045cf19.webp
 - path: assets/brand/visuals/generated/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.avif
   sha256: e1c1747baa5415975d0cb3cbfb3623c7d56be54a03b351e9bfb2af72ea5e49b2
   bytes: 15691
@@ -629,6 +659,36 @@ files:
   bytes: 9322
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.webp
+- path: assets/brand/visuals/generated/files/pythonFoundationOutcome/pythonFoundationOutcome-1200-f6dc75e2fa34.avif
+  sha256: 458bd6022191cd84cf00c6d4b6ed0aff8e4abbf0729a3b25e38c2486dc7578be
+  bytes: 14760
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/pythonFoundationOutcome/pythonFoundationOutcome-1200-f6dc75e2fa34.avif
+- path: assets/brand/visuals/generated/files/pythonFoundationOutcome/pythonFoundationOutcome-1200-f6dc75e2fa34.webp
+  sha256: 19ed667ce49b03d158cbfd78a8f70b837d063f9b9995ee126dc672844ce4c366
+  bytes: 19632
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/pythonFoundationOutcome/pythonFoundationOutcome-1200-f6dc75e2fa34.webp
+- path: assets/brand/visuals/generated/files/pythonFoundationOutcome/pythonFoundationOutcome-480-f6dc75e2fa34.avif
+  sha256: d58c81a2efd8710fa1f250fb14a856128754a4d85d2f707227223dc40a04a41b
+  bytes: 4909
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/pythonFoundationOutcome/pythonFoundationOutcome-480-f6dc75e2fa34.avif
+- path: assets/brand/visuals/generated/files/pythonFoundationOutcome/pythonFoundationOutcome-480-f6dc75e2fa34.webp
+  sha256: a4c6f89562ca1761ee02db21c310f079f8c35643c868523538b363b301ab97a5
+  bytes: 5044
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/pythonFoundationOutcome/pythonFoundationOutcome-480-f6dc75e2fa34.webp
+- path: assets/brand/visuals/generated/files/pythonFoundationOutcome/pythonFoundationOutcome-720-f6dc75e2fa34.avif
+  sha256: df3e6a090930b2f16abe391e9bb2337c6e56cc56a2912e6635c576b60ed9c69f
+  bytes: 8415
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/pythonFoundationOutcome/pythonFoundationOutcome-720-f6dc75e2fa34.avif
+- path: assets/brand/visuals/generated/files/pythonFoundationOutcome/pythonFoundationOutcome-720-f6dc75e2fa34.webp
+  sha256: 4dd060319a5fc02b785becedf06962997c156e128b96d671499c3da3bc80f61a
+  bytes: 8566
+  kind: repository
+  sourcePath: assets/brand/visuals/generated/files/pythonFoundationOutcome/pythonFoundationOutcome-720-f6dc75e2fa34.webp
 - path: assets/brand/visuals/generated/files/pythonFundamentals/pythonFundamentals-1200-209adca76258.avif
   sha256: 628cc31e5e6cf5c0cdf9329e8c058b3aa0f428bb4779fb39138550a9cd0667b9
   bytes: 46892
@@ -669,46 +729,46 @@ files:
   bytes: 35382
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/pythonFundamentals/pythonFundamentals-840-209adca76258.webp
-- path: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-480-fd6b4e127c3a.avif
-  sha256: 405147d6213e95edf57a435ef51131fb0f554913f0fe8556d538725b9633e907
-  bytes: 12320
+- path: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-480-2f441656b1ec.avif
+  sha256: f9c821346fb3f8e7fbcd711e66e698b41dfb69a49a1474ac007dfb2fe3f98fb4
+  bytes: 12151
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-480-fd6b4e127c3a.avif
-- path: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-480-fd6b4e127c3a.webp
-  sha256: b8f75a043547a5ef99494817960aef42c35ad27e7ba426ce68b7fbc47a0c6c61
-  bytes: 13890
+  sourcePath: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-480-2f441656b1ec.avif
+- path: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-480-2f441656b1ec.webp
+  sha256: e4a38debc4f8c2e85fe4e9b5220f4b7c91a332c5500104bab1d1e54fd033ffbb
+  bytes: 12628
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-480-fd6b4e127c3a.webp
-- path: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-720-fd6b4e127c3a.avif
-  sha256: b47eb298694760208c774cc18d59e7e6de08d269b363c48dbbe508a5e04118f0
-  bytes: 24566
+  sourcePath: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-480-2f441656b1ec.webp
+- path: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-720-2f441656b1ec.avif
+  sha256: febab39d0ed5f2e303b8d0f3b10a2fdf7a782d7f35a673e0408d64238c3a2682
+  bytes: 23545
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-720-fd6b4e127c3a.avif
-- path: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-720-fd6b4e127c3a.webp
-  sha256: 328ced4a1ac1a991fda33ebee7f20cd0b7715c0dbe80a12f76a41e1b3e4205d0
-  bytes: 27278
+  sourcePath: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-720-2f441656b1ec.avif
+- path: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-720-2f441656b1ec.webp
+  sha256: 50b0f602911cbf1fac8d995da24bb6f81af11c4a41ee888253ce61983c75906c
+  bytes: 25874
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-720-fd6b4e127c3a.webp
-- path: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-900-fd6b4e127c3a.avif
-  sha256: 13855d67b1c299dc0c06dadaaea70f8874c1be0c7cf164f4d8833b9bab42738d
-  bytes: 26747
+  sourcePath: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-720-2f441656b1ec.webp
+- path: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-900-2f441656b1ec.avif
+  sha256: 1dee68626dcb8b85006d0b5c1389f84e1e81f0b85e8e0a231170240a85994d71
+  bytes: 25480
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-900-fd6b4e127c3a.avif
-- path: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-900-fd6b4e127c3a.webp
-  sha256: 299b228b65ab1c76980d0325a6ce45f62b575b19948d78e98cd2265318283ad5
-  bytes: 39148
+  sourcePath: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-900-2f441656b1ec.avif
+- path: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-900-2f441656b1ec.webp
+  sha256: f0e15045bdc1608944a65aee14e4d380593b301e9fed8f36e122fb2000c860d2
+  bytes: 36756
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-900-fd6b4e127c3a.webp
-- path: assets/brand/visuals/generated/files/runLearningMobile/runLearningMobile-390-e7788b2b16fb.avif
-  sha256: a4457599b2174de3fad4942d2f032035ad58df729e64e9a7ed37851eb82ccbbf
-  bytes: 20028
+  sourcePath: assets/brand/visuals/generated/files/runLearningDetail/runLearningDetail-900-2f441656b1ec.webp
+- path: assets/brand/visuals/generated/files/runLearningMobile/runLearningMobile-390-b0d6b9b74eb7.avif
+  sha256: 19f8e66a6aa69ae49fbd63b7d8c2fa21b396d477212dca2191ebd989615f51bd
+  bytes: 17796
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/runLearningMobile/runLearningMobile-390-e7788b2b16fb.avif
-- path: assets/brand/visuals/generated/files/runLearningMobile/runLearningMobile-390-e7788b2b16fb.webp
-  sha256: 9b7ca692f9d89760dd1c826a2b426b87399300a5528c835a02077c96bc55d391
-  bytes: 27836
+  sourcePath: assets/brand/visuals/generated/files/runLearningMobile/runLearningMobile-390-b0d6b9b74eb7.avif
+- path: assets/brand/visuals/generated/files/runLearningMobile/runLearningMobile-390-b0d6b9b74eb7.webp
+  sha256: 052491dbec14308bfaf81b8b2fa3bd5336e6340679a956c3951ba49bfa5dd886
+  bytes: 24482
   kind: repository
-  sourcePath: assets/brand/visuals/generated/files/runLearningMobile/runLearningMobile-390-e7788b2b16fb.webp
+  sourcePath: assets/brand/visuals/generated/files/runLearningMobile/runLearningMobile-390-b0d6b9b74eb7.webp
 - path: assets/brand/visuals/generated/files/statisticsMachineLearning/statisticsMachineLearning-1200-d6e581dafc4f.avif
   sha256: 15b2d32c93f92023c2b208e56d91b4c12ce022c216af232b3616f0be5182dfbc
   bytes: 48588
@@ -810,8 +870,8 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/generated/files/webRunDesktop/webRunDesktop-720-ec95ae8add82.webp
 - path: assets/brand/visuals/generated/manifest.json
-  sha256: 653e9718f626b34ecdce6e044b7f16b8ac00ad5d87100b80284ae3ab16d4f4fe
-  bytes: 78689
+  sha256: c0e453221091b0ba4ed3d47f7cbbcc1272075a5aff1b0eae4f6608bb6710ee74
+  bytes: 88050
   kind: repository
   sourcePath: assets/brand/visuals/generated/manifest.json
 - path: assets/brand/visuals/learning/ai-integration-v1.png
@@ -855,8 +915,8 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/learning/statistics-ml-v1.png
 - path: assets/brand/visuals/manifest.json
-  sha256: f1e96516948779c09706c0ec72892857dd64f16008ccef4541f558d4d1d14aa7
-  bytes: 41439
+  sha256: ac15e2eee961eebe76b600c75f572e93375eee1cb32911417368071c95f35bd4
+  bytes: 46678
   kind: repository
   sourcePath: assets/brand/visuals/manifest.json
 - path: assets/brand/visuals/manifest.schema.json
@@ -869,14 +929,19 @@ files:
   bytes: 36909
   kind: repository
   sourcePath: assets/brand/visuals/outcomes/dataReportOutcome.png
+- path: assets/brand/visuals/outcomes/dataVisualizationOutcome.png
+  sha256: 3e10f67c139c1d2d0866588d82e31db62fb59f4128f874235fbd55ee2794e61f
+  bytes: 36464
+  kind: repository
+  sourcePath: assets/brand/visuals/outcomes/dataVisualizationOutcome.png
 - path: assets/brand/visuals/outcomes/fileAutomationOutcome.png
   sha256: ce17121e083ea0e261de403e19eaefb5c5ed9e59b493d57dd40c13974468d728
   bytes: 37480
   kind: repository
   sourcePath: assets/brand/visuals/outcomes/fileAutomationOutcome.png
 - path: assets/brand/visuals/outcomes/fixtures.json
-  sha256: 467e49d818b8c24953f64fe8fb2595ce9fa3cdf98634300b4137140492e97208
-  bytes: 1748
+  sha256: 0f9c69dd3bb63c0031d7f5e4972c7eaca5e5de2d06f519ca3752df8689c16a59
+  bytes: 2653
   kind: repository
   sourcePath: assets/brand/visuals/outcomes/fixtures.json
 - path: assets/brand/visuals/outcomes/officeAutomationOutcome.png
@@ -884,6 +949,11 @@ files:
   bytes: 47453
   kind: repository
   sourcePath: assets/brand/visuals/outcomes/officeAutomationOutcome.png
+- path: assets/brand/visuals/outcomes/pythonFoundationOutcome.png
+  sha256: f6dc75e2fa349545a7a1d399f3121af390d3307bd09478ce628283999244c1d3
+  bytes: 45098
+  kind: repository
+  sourcePath: assets/brand/visuals/outcomes/pythonFoundationOutcome.png
 - path: assets/brand/visuals/outcomes/webMonitoringOutcome.png
   sha256: 9fc0240d4f0ffd145d15c4d013fd0a73d2237078791806bc8f924458a6d5d00d
   bytes: 36324
@@ -895,18 +965,18 @@ files:
   kind: repository
   sourcePath: assets/brand/visuals/product/local-automation-desktop.png
 - path: assets/brand/visuals/product/local-notebook-desktop.png
-  sha256: 4193c65fda8b6f17727e124ddc645f5e35d1d2cd9f764d54dfc3db2f2f06cce7
+  sha256: c059e045cf19c3b1e261e4cf925db74d0f36c05c087ca3bf86ac9032b372f3cb
   bytes: 21845
   kind: repository
   sourcePath: assets/brand/visuals/product/local-notebook-desktop.png
 - path: assets/brand/visuals/product/run-learning-detail.png
-  sha256: fd6b4e127c3ad5ceda895786707caae7d54784cef7f37f092c82a95e819dc889
-  bytes: 126328
+  sha256: 2f441656b1ecd410c05d8110b9b9c7ca6c98916eaba5e815a3f4bfa86e5b0e13
+  bytes: 88511
   kind: repository
   sourcePath: assets/brand/visuals/product/run-learning-detail.png
 - path: assets/brand/visuals/product/run-learning-mobile.png
-  sha256: e7788b2b16fb9f19d9b0b2364a88e46f693aea61fe80637ea7fb6b70b3c793b0
-  bytes: 112897
+  sha256: b0d6b9b74eb79963a7a0c5611744be2fd779405e799d2206f0a6f996b005ac5c
+  bytes: 59367
   kind: repository
   sourcePath: assets/brand/visuals/product/run-learning-mobile.png
 - path: assets/brand/visuals/product/web-run-desktop.png
@@ -4649,6 +4719,36 @@ files:
   bytes: 22296
   kind: repository
   sourcePath: editor/public/visuals/files/dataVisualization/dataVisualization-840-5248dc1b6fb1.webp
+- path: editor/public/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-1200-3e10f67c139c.avif
+  sha256: 1709289a37ee0049f4cb502cd3b0a9f0c484e0fdb448c34793386f9827ededbf
+  bytes: 12185
+  kind: repository
+  sourcePath: editor/public/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-1200-3e10f67c139c.avif
+- path: editor/public/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-1200-3e10f67c139c.webp
+  sha256: dede08af71f14bb0db124f91f0c48b28524a5ce86201829c012364ebc800e6c6
+  bytes: 16062
+  kind: repository
+  sourcePath: editor/public/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-1200-3e10f67c139c.webp
+- path: editor/public/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-480-3e10f67c139c.avif
+  sha256: 8de5cb1f7bb344fff9c57316e28442315b414a39220ea82e6ec8a2c16be3831a
+  bytes: 4115
+  kind: repository
+  sourcePath: editor/public/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-480-3e10f67c139c.avif
+- path: editor/public/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-480-3e10f67c139c.webp
+  sha256: 35a6793c204eb0555aece4b9dc7bdf645590264b09b9d92190737d67d18c70f4
+  bytes: 4112
+  kind: repository
+  sourcePath: editor/public/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-480-3e10f67c139c.webp
+- path: editor/public/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-720-3e10f67c139c.avif
+  sha256: dce23a4c47832f5b517bdf7a65bc4e103f522ffa7ba93520cb103987ea43f133
+  bytes: 7133
+  kind: repository
+  sourcePath: editor/public/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-720-3e10f67c139c.avif
+- path: editor/public/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-720-3e10f67c139c.webp
+  sha256: 288b3a7aef168041839c5db50fd90895faae68a4fa5ce6ecd7c3c2d9f5166420
+  bytes: 7286
+  kind: repository
+  sourcePath: editor/public/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-720-3e10f67c139c.webp
 - path: editor/public/visuals/files/developerLiteracy/developerLiteracy-1200-9990255713da.avif
   sha256: eb3d7a35d4976f5abf5d20b126ccb2fa41014dc0c53495e20cb70c197de305f4
   bytes: 32719
@@ -4829,26 +4929,26 @@ files:
   bytes: 18552
   kind: repository
   sourcePath: editor/public/visuals/files/localAutomationDesktop/localAutomationDesktop-720-49cedaaade40.webp
-- path: editor/public/visuals/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.avif
-  sha256: 133ebd556ccea1933b7c64032bfa375dd3d647c5bbcf063557bd44d78b7eb2ad
-  bytes: 3742
+- path: editor/public/visuals/files/localNotebookDesktop/localNotebookDesktop-600-c059e045cf19.avif
+  sha256: c0a3f6a26a751e0f6b44b61fa47cd265df7662adef06905d0f33d5d0d88244a1
+  bytes: 3768
   kind: repository
-  sourcePath: editor/public/visuals/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.avif
-- path: editor/public/visuals/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.webp
-  sha256: 1fdc00e3d0227c4cc57ebbfee266eb6f3d6daf66d5ccfe3872bd5c1877143e11
+  sourcePath: editor/public/visuals/files/localNotebookDesktop/localNotebookDesktop-600-c059e045cf19.avif
+- path: editor/public/visuals/files/localNotebookDesktop/localNotebookDesktop-600-c059e045cf19.webp
+  sha256: db68890aa1ed206ccd8e33618785b3bd248a89fb6aa222ff2b8977be768b6c01
   bytes: 4118
   kind: repository
-  sourcePath: editor/public/visuals/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.webp
-- path: editor/public/visuals/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.avif
+  sourcePath: editor/public/visuals/files/localNotebookDesktop/localNotebookDesktop-600-c059e045cf19.webp
+- path: editor/public/visuals/files/localNotebookDesktop/localNotebookDesktop-900-c059e045cf19.avif
   sha256: 28a51ebf9343d3007ec3b95113fd6829456e35556a6776ded27c53d7113ae15b
   bytes: 5239
   kind: repository
-  sourcePath: editor/public/visuals/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.avif
-- path: editor/public/visuals/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.webp
-  sha256: cc7e967dd2ddbe81d2eef0bb3490e37e32b68dd1c4aa439b63fdf879dac1b992
+  sourcePath: editor/public/visuals/files/localNotebookDesktop/localNotebookDesktop-900-c059e045cf19.avif
+- path: editor/public/visuals/files/localNotebookDesktop/localNotebookDesktop-900-c059e045cf19.webp
+  sha256: 670a537d9c7c636f10a01bf7b42d404d109601d67105def512b3cec00430ed0f
   bytes: 7312
   kind: repository
-  sourcePath: editor/public/visuals/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.webp
+  sourcePath: editor/public/visuals/files/localNotebookDesktop/localNotebookDesktop-900-c059e045cf19.webp
 - path: editor/public/visuals/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.avif
   sha256: e1c1747baa5415975d0cb3cbfb3623c7d56be54a03b351e9bfb2af72ea5e49b2
   bytes: 15691
@@ -4879,6 +4979,36 @@ files:
   bytes: 9322
   kind: repository
   sourcePath: editor/public/visuals/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.webp
+- path: editor/public/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-1200-f6dc75e2fa34.avif
+  sha256: 458bd6022191cd84cf00c6d4b6ed0aff8e4abbf0729a3b25e38c2486dc7578be
+  bytes: 14760
+  kind: repository
+  sourcePath: editor/public/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-1200-f6dc75e2fa34.avif
+- path: editor/public/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-1200-f6dc75e2fa34.webp
+  sha256: 19ed667ce49b03d158cbfd78a8f70b837d063f9b9995ee126dc672844ce4c366
+  bytes: 19632
+  kind: repository
+  sourcePath: editor/public/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-1200-f6dc75e2fa34.webp
+- path: editor/public/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-480-f6dc75e2fa34.avif
+  sha256: d58c81a2efd8710fa1f250fb14a856128754a4d85d2f707227223dc40a04a41b
+  bytes: 4909
+  kind: repository
+  sourcePath: editor/public/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-480-f6dc75e2fa34.avif
+- path: editor/public/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-480-f6dc75e2fa34.webp
+  sha256: a4c6f89562ca1761ee02db21c310f079f8c35643c868523538b363b301ab97a5
+  bytes: 5044
+  kind: repository
+  sourcePath: editor/public/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-480-f6dc75e2fa34.webp
+- path: editor/public/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-720-f6dc75e2fa34.avif
+  sha256: df3e6a090930b2f16abe391e9bb2337c6e56cc56a2912e6635c576b60ed9c69f
+  bytes: 8415
+  kind: repository
+  sourcePath: editor/public/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-720-f6dc75e2fa34.avif
+- path: editor/public/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-720-f6dc75e2fa34.webp
+  sha256: 4dd060319a5fc02b785becedf06962997c156e128b96d671499c3da3bc80f61a
+  bytes: 8566
+  kind: repository
+  sourcePath: editor/public/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-720-f6dc75e2fa34.webp
 - path: editor/public/visuals/files/pythonFundamentals/pythonFundamentals-1200-209adca76258.avif
   sha256: 628cc31e5e6cf5c0cdf9329e8c058b3aa0f428bb4779fb39138550a9cd0667b9
   bytes: 46892
@@ -4919,46 +5049,46 @@ files:
   bytes: 35382
   kind: repository
   sourcePath: editor/public/visuals/files/pythonFundamentals/pythonFundamentals-840-209adca76258.webp
-- path: editor/public/visuals/files/runLearningDetail/runLearningDetail-480-fd6b4e127c3a.avif
-  sha256: 405147d6213e95edf57a435ef51131fb0f554913f0fe8556d538725b9633e907
-  bytes: 12320
+- path: editor/public/visuals/files/runLearningDetail/runLearningDetail-480-2f441656b1ec.avif
+  sha256: f9c821346fb3f8e7fbcd711e66e698b41dfb69a49a1474ac007dfb2fe3f98fb4
+  bytes: 12151
   kind: repository
-  sourcePath: editor/public/visuals/files/runLearningDetail/runLearningDetail-480-fd6b4e127c3a.avif
-- path: editor/public/visuals/files/runLearningDetail/runLearningDetail-480-fd6b4e127c3a.webp
-  sha256: b8f75a043547a5ef99494817960aef42c35ad27e7ba426ce68b7fbc47a0c6c61
-  bytes: 13890
+  sourcePath: editor/public/visuals/files/runLearningDetail/runLearningDetail-480-2f441656b1ec.avif
+- path: editor/public/visuals/files/runLearningDetail/runLearningDetail-480-2f441656b1ec.webp
+  sha256: e4a38debc4f8c2e85fe4e9b5220f4b7c91a332c5500104bab1d1e54fd033ffbb
+  bytes: 12628
   kind: repository
-  sourcePath: editor/public/visuals/files/runLearningDetail/runLearningDetail-480-fd6b4e127c3a.webp
-- path: editor/public/visuals/files/runLearningDetail/runLearningDetail-720-fd6b4e127c3a.avif
-  sha256: b47eb298694760208c774cc18d59e7e6de08d269b363c48dbbe508a5e04118f0
-  bytes: 24566
+  sourcePath: editor/public/visuals/files/runLearningDetail/runLearningDetail-480-2f441656b1ec.webp
+- path: editor/public/visuals/files/runLearningDetail/runLearningDetail-720-2f441656b1ec.avif
+  sha256: febab39d0ed5f2e303b8d0f3b10a2fdf7a782d7f35a673e0408d64238c3a2682
+  bytes: 23545
   kind: repository
-  sourcePath: editor/public/visuals/files/runLearningDetail/runLearningDetail-720-fd6b4e127c3a.avif
-- path: editor/public/visuals/files/runLearningDetail/runLearningDetail-720-fd6b4e127c3a.webp
-  sha256: 328ced4a1ac1a991fda33ebee7f20cd0b7715c0dbe80a12f76a41e1b3e4205d0
-  bytes: 27278
+  sourcePath: editor/public/visuals/files/runLearningDetail/runLearningDetail-720-2f441656b1ec.avif
+- path: editor/public/visuals/files/runLearningDetail/runLearningDetail-720-2f441656b1ec.webp
+  sha256: 50b0f602911cbf1fac8d995da24bb6f81af11c4a41ee888253ce61983c75906c
+  bytes: 25874
   kind: repository
-  sourcePath: editor/public/visuals/files/runLearningDetail/runLearningDetail-720-fd6b4e127c3a.webp
-- path: editor/public/visuals/files/runLearningDetail/runLearningDetail-900-fd6b4e127c3a.avif
-  sha256: 13855d67b1c299dc0c06dadaaea70f8874c1be0c7cf164f4d8833b9bab42738d
-  bytes: 26747
+  sourcePath: editor/public/visuals/files/runLearningDetail/runLearningDetail-720-2f441656b1ec.webp
+- path: editor/public/visuals/files/runLearningDetail/runLearningDetail-900-2f441656b1ec.avif
+  sha256: 1dee68626dcb8b85006d0b5c1389f84e1e81f0b85e8e0a231170240a85994d71
+  bytes: 25480
   kind: repository
-  sourcePath: editor/public/visuals/files/runLearningDetail/runLearningDetail-900-fd6b4e127c3a.avif
-- path: editor/public/visuals/files/runLearningDetail/runLearningDetail-900-fd6b4e127c3a.webp
-  sha256: 299b228b65ab1c76980d0325a6ce45f62b575b19948d78e98cd2265318283ad5
-  bytes: 39148
+  sourcePath: editor/public/visuals/files/runLearningDetail/runLearningDetail-900-2f441656b1ec.avif
+- path: editor/public/visuals/files/runLearningDetail/runLearningDetail-900-2f441656b1ec.webp
+  sha256: f0e15045bdc1608944a65aee14e4d380593b301e9fed8f36e122fb2000c860d2
+  bytes: 36756
   kind: repository
-  sourcePath: editor/public/visuals/files/runLearningDetail/runLearningDetail-900-fd6b4e127c3a.webp
-- path: editor/public/visuals/files/runLearningMobile/runLearningMobile-390-e7788b2b16fb.avif
-  sha256: a4457599b2174de3fad4942d2f032035ad58df729e64e9a7ed37851eb82ccbbf
-  bytes: 20028
+  sourcePath: editor/public/visuals/files/runLearningDetail/runLearningDetail-900-2f441656b1ec.webp
+- path: editor/public/visuals/files/runLearningMobile/runLearningMobile-390-b0d6b9b74eb7.avif
+  sha256: 19f8e66a6aa69ae49fbd63b7d8c2fa21b396d477212dca2191ebd989615f51bd
+  bytes: 17796
   kind: repository
-  sourcePath: editor/public/visuals/files/runLearningMobile/runLearningMobile-390-e7788b2b16fb.avif
-- path: editor/public/visuals/files/runLearningMobile/runLearningMobile-390-e7788b2b16fb.webp
-  sha256: 9b7ca692f9d89760dd1c826a2b426b87399300a5528c835a02077c96bc55d391
-  bytes: 27836
+  sourcePath: editor/public/visuals/files/runLearningMobile/runLearningMobile-390-b0d6b9b74eb7.avif
+- path: editor/public/visuals/files/runLearningMobile/runLearningMobile-390-b0d6b9b74eb7.webp
+  sha256: 052491dbec14308bfaf81b8b2fa3bd5336e6340679a956c3951ba49bfa5dd886
+  bytes: 24482
   kind: repository
-  sourcePath: editor/public/visuals/files/runLearningMobile/runLearningMobile-390-e7788b2b16fb.webp
+  sourcePath: editor/public/visuals/files/runLearningMobile/runLearningMobile-390-b0d6b9b74eb7.webp
 - path: editor/public/visuals/files/statisticsMachineLearning/statisticsMachineLearning-1200-d6e581dafc4f.avif
   sha256: 15b2d32c93f92023c2b208e56d91b4c12ce022c216af232b3616f0be5182dfbc
   bytes: 48588
@@ -5060,8 +5190,8 @@ files:
   kind: repository
   sourcePath: editor/public/visuals/files/webRunDesktop/webRunDesktop-720-ec95ae8add82.webp
 - path: editor/public/visuals/manifest.json
-  sha256: 653e9718f626b34ecdce6e044b7f16b8ac00ad5d87100b80284ae3ab16d4f4fe
-  bytes: 78689
+  sha256: c0e453221091b0ba4ed3d47f7cbbcc1272075a5aff1b0eae4f6608bb6710ee74
+  bytes: 88050
   kind: repository
   sourcePath: editor/public/visuals/manifest.json
 - path: editor/scripts/generatePyprocAssets.mjs
@@ -5880,8 +6010,8 @@ files:
   kind: repository
   sourcePath: editor/src/lib/learningEvidenceOperations.ts
 - path: editor/src/lib/learningVisualAssets.ts
-  sha256: 76d5d7cc571531e3cdb54eca4b51d2b520183cb1f3eb3e607889c9e0fbab2449
-  bytes: 4037
+  sha256: 4892e60cdb850c27798a1bfc2b17c54f635840b5ea600d73391b36c69baec426
+  bytes: 4374
   kind: repository
   sourcePath: editor/src/lib/learningVisualAssets.ts
 - path: editor/src/lib/localFallback.ts
@@ -6399,8 +6529,8 @@ files:
   kind: repository
   sourcePath: landing/src/pages/home.jsx
 - path: landing/src/pages/learn.jsx
-  sha256: 8553f228397ee8c774a02c2890fb2f74e596adb0ead259643360d8d378a4df2d
-  bytes: 21710
+  sha256: 567e160df5a8d5ce4d81cb414ee28c5c0b62274f6b72cee119c762eecb672785
+  bytes: 21722
   kind: repository
   sourcePath: landing/src/pages/learn.jsx
 - path: landing/src/pages/lesson.jsx
@@ -9953,6 +10083,36 @@ files:
   bytes: 22296
   kind: repository
   sourcePath: landing/static/visuals/files/dataVisualization/dataVisualization-840-5248dc1b6fb1.webp
+- path: landing/static/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-1200-3e10f67c139c.avif
+  sha256: 1709289a37ee0049f4cb502cd3b0a9f0c484e0fdb448c34793386f9827ededbf
+  bytes: 12185
+  kind: repository
+  sourcePath: landing/static/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-1200-3e10f67c139c.avif
+- path: landing/static/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-1200-3e10f67c139c.webp
+  sha256: dede08af71f14bb0db124f91f0c48b28524a5ce86201829c012364ebc800e6c6
+  bytes: 16062
+  kind: repository
+  sourcePath: landing/static/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-1200-3e10f67c139c.webp
+- path: landing/static/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-480-3e10f67c139c.avif
+  sha256: 8de5cb1f7bb344fff9c57316e28442315b414a39220ea82e6ec8a2c16be3831a
+  bytes: 4115
+  kind: repository
+  sourcePath: landing/static/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-480-3e10f67c139c.avif
+- path: landing/static/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-480-3e10f67c139c.webp
+  sha256: 35a6793c204eb0555aece4b9dc7bdf645590264b09b9d92190737d67d18c70f4
+  bytes: 4112
+  kind: repository
+  sourcePath: landing/static/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-480-3e10f67c139c.webp
+- path: landing/static/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-720-3e10f67c139c.avif
+  sha256: dce23a4c47832f5b517bdf7a65bc4e103f522ffa7ba93520cb103987ea43f133
+  bytes: 7133
+  kind: repository
+  sourcePath: landing/static/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-720-3e10f67c139c.avif
+- path: landing/static/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-720-3e10f67c139c.webp
+  sha256: 288b3a7aef168041839c5db50fd90895faae68a4fa5ce6ecd7c3c2d9f5166420
+  bytes: 7286
+  kind: repository
+  sourcePath: landing/static/visuals/files/dataVisualizationOutcome/dataVisualizationOutcome-720-3e10f67c139c.webp
 - path: landing/static/visuals/files/developerLiteracy/developerLiteracy-1200-9990255713da.avif
   sha256: eb3d7a35d4976f5abf5d20b126ccb2fa41014dc0c53495e20cb70c197de305f4
   bytes: 32719
@@ -10133,26 +10293,26 @@ files:
   bytes: 18552
   kind: repository
   sourcePath: landing/static/visuals/files/localAutomationDesktop/localAutomationDesktop-720-49cedaaade40.webp
-- path: landing/static/visuals/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.avif
-  sha256: 133ebd556ccea1933b7c64032bfa375dd3d647c5bbcf063557bd44d78b7eb2ad
-  bytes: 3742
+- path: landing/static/visuals/files/localNotebookDesktop/localNotebookDesktop-600-c059e045cf19.avif
+  sha256: c0a3f6a26a751e0f6b44b61fa47cd265df7662adef06905d0f33d5d0d88244a1
+  bytes: 3768
   kind: repository
-  sourcePath: landing/static/visuals/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.avif
-- path: landing/static/visuals/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.webp
-  sha256: 1fdc00e3d0227c4cc57ebbfee266eb6f3d6daf66d5ccfe3872bd5c1877143e11
+  sourcePath: landing/static/visuals/files/localNotebookDesktop/localNotebookDesktop-600-c059e045cf19.avif
+- path: landing/static/visuals/files/localNotebookDesktop/localNotebookDesktop-600-c059e045cf19.webp
+  sha256: db68890aa1ed206ccd8e33618785b3bd248a89fb6aa222ff2b8977be768b6c01
   bytes: 4118
   kind: repository
-  sourcePath: landing/static/visuals/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.webp
-- path: landing/static/visuals/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.avif
+  sourcePath: landing/static/visuals/files/localNotebookDesktop/localNotebookDesktop-600-c059e045cf19.webp
+- path: landing/static/visuals/files/localNotebookDesktop/localNotebookDesktop-900-c059e045cf19.avif
   sha256: 28a51ebf9343d3007ec3b95113fd6829456e35556a6776ded27c53d7113ae15b
   bytes: 5239
   kind: repository
-  sourcePath: landing/static/visuals/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.avif
-- path: landing/static/visuals/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.webp
-  sha256: cc7e967dd2ddbe81d2eef0bb3490e37e32b68dd1c4aa439b63fdf879dac1b992
+  sourcePath: landing/static/visuals/files/localNotebookDesktop/localNotebookDesktop-900-c059e045cf19.avif
+- path: landing/static/visuals/files/localNotebookDesktop/localNotebookDesktop-900-c059e045cf19.webp
+  sha256: 670a537d9c7c636f10a01bf7b42d404d109601d67105def512b3cec00430ed0f
   bytes: 7312
   kind: repository
-  sourcePath: landing/static/visuals/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.webp
+  sourcePath: landing/static/visuals/files/localNotebookDesktop/localNotebookDesktop-900-c059e045cf19.webp
 - path: landing/static/visuals/files/officeAutomationOutcome/officeAutomationOutcome-1200-f1c770d50406.avif
   sha256: e1c1747baa5415975d0cb3cbfb3623c7d56be54a03b351e9bfb2af72ea5e49b2
   bytes: 15691
@@ -10183,6 +10343,36 @@ files:
   bytes: 9322
   kind: repository
   sourcePath: landing/static/visuals/files/officeAutomationOutcome/officeAutomationOutcome-720-f1c770d50406.webp
+- path: landing/static/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-1200-f6dc75e2fa34.avif
+  sha256: 458bd6022191cd84cf00c6d4b6ed0aff8e4abbf0729a3b25e38c2486dc7578be
+  bytes: 14760
+  kind: repository
+  sourcePath: landing/static/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-1200-f6dc75e2fa34.avif
+- path: landing/static/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-1200-f6dc75e2fa34.webp
+  sha256: 19ed667ce49b03d158cbfd78a8f70b837d063f9b9995ee126dc672844ce4c366
+  bytes: 19632
+  kind: repository
+  sourcePath: landing/static/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-1200-f6dc75e2fa34.webp
+- path: landing/static/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-480-f6dc75e2fa34.avif
+  sha256: d58c81a2efd8710fa1f250fb14a856128754a4d85d2f707227223dc40a04a41b
+  bytes: 4909
+  kind: repository
+  sourcePath: landing/static/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-480-f6dc75e2fa34.avif
+- path: landing/static/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-480-f6dc75e2fa34.webp
+  sha256: a4c6f89562ca1761ee02db21c310f079f8c35643c868523538b363b301ab97a5
+  bytes: 5044
+  kind: repository
+  sourcePath: landing/static/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-480-f6dc75e2fa34.webp
+- path: landing/static/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-720-f6dc75e2fa34.avif
+  sha256: df3e6a090930b2f16abe391e9bb2337c6e56cc56a2912e6635c576b60ed9c69f
+  bytes: 8415
+  kind: repository
+  sourcePath: landing/static/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-720-f6dc75e2fa34.avif
+- path: landing/static/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-720-f6dc75e2fa34.webp
+  sha256: 4dd060319a5fc02b785becedf06962997c156e128b96d671499c3da3bc80f61a
+  bytes: 8566
+  kind: repository
+  sourcePath: landing/static/visuals/files/pythonFoundationOutcome/pythonFoundationOutcome-720-f6dc75e2fa34.webp
 - path: landing/static/visuals/files/pythonFundamentals/pythonFundamentals-1200-209adca76258.avif
   sha256: 628cc31e5e6cf5c0cdf9329e8c058b3aa0f428bb4779fb39138550a9cd0667b9
   bytes: 46892
@@ -10223,46 +10413,46 @@ files:
   bytes: 35382
   kind: repository
   sourcePath: landing/static/visuals/files/pythonFundamentals/pythonFundamentals-840-209adca76258.webp
-- path: landing/static/visuals/files/runLearningDetail/runLearningDetail-480-fd6b4e127c3a.avif
-  sha256: 405147d6213e95edf57a435ef51131fb0f554913f0fe8556d538725b9633e907
-  bytes: 12320
+- path: landing/static/visuals/files/runLearningDetail/runLearningDetail-480-2f441656b1ec.avif
+  sha256: f9c821346fb3f8e7fbcd711e66e698b41dfb69a49a1474ac007dfb2fe3f98fb4
+  bytes: 12151
   kind: repository
-  sourcePath: landing/static/visuals/files/runLearningDetail/runLearningDetail-480-fd6b4e127c3a.avif
-- path: landing/static/visuals/files/runLearningDetail/runLearningDetail-480-fd6b4e127c3a.webp
-  sha256: b8f75a043547a5ef99494817960aef42c35ad27e7ba426ce68b7fbc47a0c6c61
-  bytes: 13890
+  sourcePath: landing/static/visuals/files/runLearningDetail/runLearningDetail-480-2f441656b1ec.avif
+- path: landing/static/visuals/files/runLearningDetail/runLearningDetail-480-2f441656b1ec.webp
+  sha256: e4a38debc4f8c2e85fe4e9b5220f4b7c91a332c5500104bab1d1e54fd033ffbb
+  bytes: 12628
   kind: repository
-  sourcePath: landing/static/visuals/files/runLearningDetail/runLearningDetail-480-fd6b4e127c3a.webp
-- path: landing/static/visuals/files/runLearningDetail/runLearningDetail-720-fd6b4e127c3a.avif
-  sha256: b47eb298694760208c774cc18d59e7e6de08d269b363c48dbbe508a5e04118f0
-  bytes: 24566
+  sourcePath: landing/static/visuals/files/runLearningDetail/runLearningDetail-480-2f441656b1ec.webp
+- path: landing/static/visuals/files/runLearningDetail/runLearningDetail-720-2f441656b1ec.avif
+  sha256: febab39d0ed5f2e303b8d0f3b10a2fdf7a782d7f35a673e0408d64238c3a2682
+  bytes: 23545
   kind: repository
-  sourcePath: landing/static/visuals/files/runLearningDetail/runLearningDetail-720-fd6b4e127c3a.avif
-- path: landing/static/visuals/files/runLearningDetail/runLearningDetail-720-fd6b4e127c3a.webp
-  sha256: 328ced4a1ac1a991fda33ebee7f20cd0b7715c0dbe80a12f76a41e1b3e4205d0
-  bytes: 27278
+  sourcePath: landing/static/visuals/files/runLearningDetail/runLearningDetail-720-2f441656b1ec.avif
+- path: landing/static/visuals/files/runLearningDetail/runLearningDetail-720-2f441656b1ec.webp
+  sha256: 50b0f602911cbf1fac8d995da24bb6f81af11c4a41ee888253ce61983c75906c
+  bytes: 25874
   kind: repository
-  sourcePath: landing/static/visuals/files/runLearningDetail/runLearningDetail-720-fd6b4e127c3a.webp
-- path: landing/static/visuals/files/runLearningDetail/runLearningDetail-900-fd6b4e127c3a.avif
-  sha256: 13855d67b1c299dc0c06dadaaea70f8874c1be0c7cf164f4d8833b9bab42738d
-  bytes: 26747
+  sourcePath: landing/static/visuals/files/runLearningDetail/runLearningDetail-720-2f441656b1ec.webp
+- path: landing/static/visuals/files/runLearningDetail/runLearningDetail-900-2f441656b1ec.avif
+  sha256: 1dee68626dcb8b85006d0b5c1389f84e1e81f0b85e8e0a231170240a85994d71
+  bytes: 25480
   kind: repository
-  sourcePath: landing/static/visuals/files/runLearningDetail/runLearningDetail-900-fd6b4e127c3a.avif
-- path: landing/static/visuals/files/runLearningDetail/runLearningDetail-900-fd6b4e127c3a.webp
-  sha256: 299b228b65ab1c76980d0325a6ce45f62b575b19948d78e98cd2265318283ad5
-  bytes: 39148
+  sourcePath: landing/static/visuals/files/runLearningDetail/runLearningDetail-900-2f441656b1ec.avif
+- path: landing/static/visuals/files/runLearningDetail/runLearningDetail-900-2f441656b1ec.webp
+  sha256: f0e15045bdc1608944a65aee14e4d380593b301e9fed8f36e122fb2000c860d2
+  bytes: 36756
   kind: repository
-  sourcePath: landing/static/visuals/files/runLearningDetail/runLearningDetail-900-fd6b4e127c3a.webp
-- path: landing/static/visuals/files/runLearningMobile/runLearningMobile-390-e7788b2b16fb.avif
-  sha256: a4457599b2174de3fad4942d2f032035ad58df729e64e9a7ed37851eb82ccbbf
-  bytes: 20028
+  sourcePath: landing/static/visuals/files/runLearningDetail/runLearningDetail-900-2f441656b1ec.webp
+- path: landing/static/visuals/files/runLearningMobile/runLearningMobile-390-b0d6b9b74eb7.avif
+  sha256: 19f8e66a6aa69ae49fbd63b7d8c2fa21b396d477212dca2191ebd989615f51bd
+  bytes: 17796
   kind: repository
-  sourcePath: landing/static/visuals/files/runLearningMobile/runLearningMobile-390-e7788b2b16fb.avif
-- path: landing/static/visuals/files/runLearningMobile/runLearningMobile-390-e7788b2b16fb.webp
-  sha256: 9b7ca692f9d89760dd1c826a2b426b87399300a5528c835a02077c96bc55d391
-  bytes: 27836
+  sourcePath: landing/static/visuals/files/runLearningMobile/runLearningMobile-390-b0d6b9b74eb7.avif
+- path: landing/static/visuals/files/runLearningMobile/runLearningMobile-390-b0d6b9b74eb7.webp
+  sha256: 052491dbec14308bfaf81b8b2fa3bd5336e6340679a956c3951ba49bfa5dd886
+  bytes: 24482
   kind: repository
-  sourcePath: landing/static/visuals/files/runLearningMobile/runLearningMobile-390-e7788b2b16fb.webp
+  sourcePath: landing/static/visuals/files/runLearningMobile/runLearningMobile-390-b0d6b9b74eb7.webp
 - path: landing/static/visuals/files/statisticsMachineLearning/statisticsMachineLearning-1200-d6e581dafc4f.avif
   sha256: 15b2d32c93f92023c2b208e56d91b4c12ce022c216af232b3616f0be5182dfbc
   bytes: 48588
@@ -10364,8 +10554,8 @@ files:
   kind: repository
   sourcePath: landing/static/visuals/files/webRunDesktop/webRunDesktop-720-ec95ae8add82.webp
 - path: landing/static/visuals/manifest.json
-  sha256: 653e9718f626b34ecdce6e044b7f16b8ac00ad5d87100b80284ae3ab16d4f4fe
-  bytes: 78689
+  sha256: c0e453221091b0ba4ed3d47f7cbbcc1272075a5aff1b0eae4f6608bb6710ee74
+  bytes: 88050
   kind: repository
   sourcePath: landing/static/visuals/manifest.json
 - path: landing/vite.config.js
@@ -10544,8 +10734,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/06-visual-assets/00-manifest-pipeline/README.md
 - path: mainPlan/astryx-product-experience/06-visual-assets/01-instructional-assets/README.md
-  sha256: 1b49d27af909a469469760746aec0f434f6bf5403f5c50e8f723812197c79020
-  bytes: 2937
+  sha256: 691ffe401a7a6e1d83d05788e30757a480be3c93ceb3a553804d258b0aecc841
+  bytes: 1669
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/06-visual-assets/01-instructional-assets/README.md
 - path: mainPlan/astryx-product-experience/06-visual-assets/02-run-captures/README.md
@@ -10559,8 +10749,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/06-visual-assets/03-local-captures/README.md
 - path: mainPlan/astryx-product-experience/06-visual-assets/README.md
-  sha256: 8eb1ecd0e2ebdd2e9b16b58eea4ac47b5966b83462e1293726dc51a3c12990d9
-  bytes: 8351
+  sha256: a929253b9c6eddd3b8ef6b04b26b0c58c194b6a1d502b41b000eb9c3ecf7a5e0
+  bytes: 8140
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/06-visual-assets/README.md
 - path: mainPlan/astryx-product-experience/07-landing-experience/00-proof-studio-landing/README.md
@@ -12699,8 +12889,8 @@ files:
   kind: repository
   sourcePath: tests/assets/testBuildVisualAssets.py
 - path: tests/assets/testCaptureOutcomeProofs.py
-  sha256: ad69d9ff7d97f971f5071c835b6c67b054004dd92f6278b630969d891a5fa8d4
-  bytes: 3118
+  sha256: 752c60a538dcca4812c2aa355cdda9d182719ee6081c432d8de74ec7cfdec5ca
+  bytes: 3911
   kind: repository
   sourcePath: tests/assets/testCaptureOutcomeProofs.py
 - path: tests/assets/testCaptureProductVisuals.py
@@ -13629,8 +13819,8 @@ files:
   kind: repository
   sourcePath: tests/surface/testNotebookPersistence.py
 - path: tests/surface/testProductSurfaceContract.py
-  sha256: 7edb0b059f121aa4120976daacf50ac5c3fbb9e0532324ba8582fdeb6636f288
-  bytes: 40384
+  sha256: d057cd0be0676a115a23024ca2be03806db0b50efba6e669e18197d509d4e46a
+  bytes: 40757
   kind: repository
   sourcePath: tests/surface/testProductSurfaceContract.py
 - path: tests/surface/testProviderSettingsContract.py
@@ -13724,8 +13914,8 @@ files:
   kind: repository
   sourcePath: tests/surface/verifyPlaywrightMobile.py
 - path: tests/surface/verifyProductExperiencePlaywright.py
-  sha256: c587f43cd51d850bff2e315973ea4d52c7adb07cba0a47037b6509118a579030
-  bytes: 269749
+  sha256: 632f5448d5bce14c55da5fee4e8bff2462a24ab1a6bfbdc07924fb4fb6306210
+  bytes: 271266
   kind: repository
   sourcePath: tests/surface/verifyProductExperiencePlaywright.py
 - path: tests/surface/verifyProductModuleBoundaries.py
