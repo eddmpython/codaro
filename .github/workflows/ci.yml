@@ -70,6 +70,10 @@ jobs:
         if: matrix.python-version == '3.12'
         run: uv run python -X utf8 tests/run.py gate completion-bootstrap
 
+      - name: Verify PRD evaluation contract
+        if: matrix.python-version == '3.12'
+        run: uv run python -X utf8 tests/run.py gate evaluation-contract
+
       - name: Observe plan quality bootstrap
         if: matrix.python-version == '3.12'
         continue-on-error: true

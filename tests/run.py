@@ -116,6 +116,9 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "completion-bootstrap": (
         "output/test-runner/completion-bootstrap/completion-bootstrap-report.json",
     ),
+    "evaluation-contract": (
+        "output/test-runner/evaluation-contract/evaluation-contract-report.json",
+    ),
     "plan-quality": (
         "output/test-runner/plan-quality/plan-fact-audit.json",
         "output/test-runner/plan-quality/evaluation-validation.json",
@@ -295,6 +298,13 @@ GATES: dict[str, Gate] = {
         description="mainPlan 완료 schema, 전이 도구, ledger, fact audit와 negative fixture를 clean commit에서 검증한다.",
         commands=(command((
             "uv", "run", "python", "-X", "utf8", "tests/plan/verifyCompletionBootstrap.py",
+        )),),
+    ),
+    "evaluation-contract": Gate(
+        tier="fast",
+        description="목표 점수 없는 평가 rubric, closed report schema, raw report·bundle negative fixture를 clean commit에서 검증한다.",
+        commands=(command((
+            "uv", "run", "python", "-X", "utf8", "tests/product/verifyPrdEvaluationContract.py",
         )),),
     ),
     "plan-quality": Gate(
@@ -831,6 +841,7 @@ PRODUCT_RELEASE_GATES = (
     "automation-ide-audit",
     "launcher-test",
     "path-learning-signal",
+    "evaluation-contract",
     "plan-quality",
 )
 TIER_ORDER = ("fast", "surface", "release", "experiment")
@@ -1684,8 +1695,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 59:
-        failures.append(f"expected 59 gates, found {len(GATES)}")
+    if len(GATES) != 60:
+        failures.append(f"expected 60 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

@@ -55,6 +55,7 @@ uv run python -X utf8 tests/run.py gate astryx-journey
 uv run python -X utf8 tests/run.py gate dogfood-alpha-audit
 uv run python -X utf8 tests/run.py gate product-quality-audit
 uv run python -X utf8 tests/run.py gate completion-bootstrap
+uv run python -X utf8 tests/run.py gate evaluation-contract
 uv run python -X utf8 tests/run.py gate plan-quality
 uv run python -X utf8 tests/run.py gate automation-ide-audit
 uv run python -X utf8 tests/run.py gate diagnostic-summary-contract
@@ -114,6 +115,7 @@ uv run python -X utf8 tests/run.py gate attempts
 | `docs` | fast | 운영 문서 포인터, gate 정의, CI 연결 상태를 확인한다. |
 | `root-clean` | fast | 저장소 루트가 canonical tree와 맞고 로컬 실습 파일, 로그, 임시 산출물이 남지 않았는지 확인한다. |
 | `completion-bootstrap` | fast | clean implementation commit에서 mainPlan 완료 schema, 전이 도구, ledger, fact audit, bootstrap negative fixture와 A→E→B round-trip을 검증한다. R10 사람 평가를 선행 요구하지 않는다. |
+| `evaluation-contract` | fast | clean implementation commit에서 목표 점수 없는 frozen rubric, closed raw report schema, bundle exclusion과 raw report·scope·maturity negative fixture를 검증한다. 독립 evaluator 배정과 R10 report 생성은 실행하지 않는다. |
 | `plan-quality` | fast | mainPlan 사실 감사, 완료 전이 negative fixture, 독립 평가 보고서 완전성을 목표 점수나 통과 점수 없이 검사한다. Bootstrap 동안 non-blocking red로 관찰하고 R10 증거가 green인 뒤에만 blocking·CI required로 승격한다. |
 | `backend` | fast | Python backend 전체 테스트를 실행한다. `tests/_attempts`는 `--ignore`로 수집하지 않고, 0.25초 이상 걸린 항목 중 가장 느린 25개를 출력해 preflight 병목을 관찰한다. |
 | `attempts` | experiment | 운영과 분리된 `tests/_attempts` 실험 샌드박스를 실행한다. preflight/quality-cycle/CI 비포함이며 `tier` 스윕에도 끼지 않는다. |
@@ -250,3 +252,4 @@ uv run python -X utf8 tests/run.py gate attempts
 - 기존 부채를 새 테스트로 한 번에 해결하지 못하면 별도 baseline 또는 명시적 TODO 문서로 분리한다.
 - CI YAML은 세부 명령을 소유하지 않고 `tests/run.py gate <name>`만 호출한다.
 - `completion-bootstrap`은 완료 protocol을 소비할 다른 packet보다 먼저 green·CI required로 고정한다. 독립 R10 보고서 완전성은 downstream `plan-quality`가 계속 차단하며 bootstrap packet의 선행 조건으로 되돌리지 않는다.
+- `evaluation-contract`은 rubric·report schema·negative fixture 자체만 봉인한다. sealed bundle, evaluator roster, raw report와 finding ledger는 `08-r10-independent-review`가 소유하며 이 downstream 산출물을 계약 packet의 완료 조건으로 되돌리지 않는다.

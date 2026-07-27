@@ -6,7 +6,7 @@
 
 전문 평가가 점수표 채우기가 아니라 재현 가능한 반증 절차가 되게 한다. 평가자에게 목표 점수를 주지 않고, PRD integrity와 product evidence를 분리하며, raw report와 fact audit를 round 폴더에 고정한다.
 
-rubric, report schema, bundle/fact-audit 도구와 draft snapshot은 구현돼 있다. 그러나 2026-07-23 통합 source를 대상으로 한 sealed bundle, 독립 evaluator 세 명과 raw report가 없어 현재 유효한 독립 점수는 없다. 따라서 상태는 `진행`이며 `_done`이 아니다.
+rubric, report schema, bundle/fact-audit 도구와 draft snapshot은 구현돼 있다. 전용 `evaluation-contract` gate는 clean commit에서 frozen rubric, closed schema, raw report·bundle negative fixture와 gate registry를 검증하고 current commit report를 만든다. sealed bundle, 독립 evaluator 세 명과 raw report가 없어 현재 유효한 독립 점수가 없다는 사실은 그대로지만, 이는 [08 R10 independent review](../08-r10-independent-review/)의 실행 조건이지 이 계약 packet의 완료 조건이 아니다. 이 packet은 clean A report와 A→E→B 전이 전까지 `진행`이다.
 
 ## report 계약
 
@@ -26,12 +26,21 @@ report schema의 `dimensions`는 rubric version 1의 dimension ID를 object key�
 - lesson·taxonomy·check 수치의 재현 command와 snapshot hash
 - dependency graph cycle, bootstrap-before-use, rollback reader compatibility
 
+## 완료 경계
+
+- 이 packet은 rubric·schema·verifier·negative fixture·CI gate가 current clean commit에서 재현되면 계약 구현을 봉인할 수 있다.
+- 실제 평가 round의 sealed scope, evaluator roster, raw report 3개, fact audit와 finding ledger는 `08-r10-independent-review`가 소유한다.
+- 계약 완료는 R10 통과, 제품 점수, 독립 evaluator 승인 또는 product evidence maturity를 주장하지 않는다.
+- `plan-quality`는 R10 산출물이 없으면 계속 red일 수 있으며, 이를 `evaluation-contract`의 실패로 되돌려 순환 의존을 만들지 않는다.
+
 ## 영향 파일
 
-- 현재 초안 `mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/00-evaluation-contract/evaluation-report.schema.yml`
-- 현재 초안 `mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/00-evaluation-contract/rubric.yml`
+- 계약 `mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/00-evaluation-contract/evaluation-report.schema.yml`
+- 계약 `mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/00-evaluation-contract/rubric.yml`
 - 현재 비판정 snapshot `mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/00-evaluation-contract/author-fact-audit.snapshot.yml`
-- 신규 `tests/product/verifyPrdEvaluationReport.py`
+- 구현 `tests/product/verifyPrdEvaluationReport.py`
+- 신규 `tests/product/verifyPrdEvaluationContract.py`
+- 신규 `tests/product/testPrdEvaluationContract.py`
 - 계약 정의 `tests/product/verifyPlanFactAudit.py` (생성 owner는 02-completion-and-gate-bootstrap)
 - 수정 `tests/run.py`, `.github/workflows/ci.yml`
 - 수정 `docs/skills/ops/foundation/testing-and-gates.md`
@@ -50,6 +59,7 @@ report schema의 `dimensions`는 rubric version 1의 dimension ID를 object key�
 - rubric에 target score·pass threshold가 생기거나 dimension 합이 100이 아니면 거부
 - 점수 100 표만 있고 raw report가 없는 round 거부
 - 실제 path·symbol·gate가 틀린 synthetic plan을 fact audit가 거부
+- `uv run python -X utf8 tests/run.py gate evaluation-contract`
 
 ## 롤백
 
