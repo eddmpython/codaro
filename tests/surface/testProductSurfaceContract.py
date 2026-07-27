@@ -158,6 +158,22 @@ def testNotebookAutosaveUsesLocaleIndependentActiveCellMarker() -> None:
     assert 'includes("셀 1 / 1")' not in autosaveGate
 
 
+def testNotebookKeepsMobileTitleAndCollapsesSecondaryCellActions() -> None:
+    topBar = _read("editor/src/components/app/topBar.tsx")
+    notebookPanel = _read("editor/src/components/notebook/notebookPanel.tsx")
+    notebookStyles = _read("editor/src/components/notebook/notebookPanel.css")
+
+    assert 'left-11 right-[9.5rem]' in topBar
+    assert 'data-notebook-title="topbar"' in topBar
+    assert 'data-notebook-cell-menu="true"' in notebookPanel
+    assert 'aria-label="셀 작업 더보기"' in notebookPanel
+    assert 'role="button"' in notebookPanel
+    assert ".notebookCellMoreMenu {" in notebookStyles
+    assert ".notebookCodeFrame .cm-content {" in notebookStyles
+    assert "min-height: 52px;" in notebookStyles
+    assert "padding-right: 104px;" in notebookStyles
+
+
 def testAppDelegatesProductSurfaceSelectionPolicy() -> None:
     app = _read("editor/src/App.tsx")
     selectionHook = _read("editor/src/hooks/useProductSurfaceSelection.ts")

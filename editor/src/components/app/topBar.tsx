@@ -90,10 +90,10 @@ export function TopControls({
       ) : null}
 
       {surface === "editor" && notebookTitle && onRenameNotebook ? (
-        <div className="absolute left-1/2 top-1/2 z-20 hidden -translate-x-1/2 -translate-y-1/2 sm:block">
+        <div className="absolute left-11 right-[9.5rem] top-1.5 z-20 sm:left-1/2 sm:right-auto sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2">
           <input
             aria-label="노트북 파일명"
-            className="h-7 w-[clamp(140px,24vw,320px)] border-0 border-b border-transparent bg-transparent px-2 text-center font-mono text-xs text-muted-foreground outline-none hover:text-foreground focus:border-primary focus:text-foreground"
+            className="h-7 w-full border-0 border-b border-transparent bg-transparent px-1 text-center font-mono text-[11px] text-muted-foreground outline-none hover:text-foreground focus:border-primary focus:text-foreground sm:w-[clamp(140px,24vw,320px)] sm:px-2 sm:text-xs"
             data-notebook-title="topbar"
             value={notebookTitle}
             onBlur={(event) => onRenameNotebook(normalizeNotebookTitle(event.target.value))}

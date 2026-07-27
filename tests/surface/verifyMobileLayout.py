@@ -153,6 +153,7 @@ def checkNotebookInsertControls() -> CheckResult:
         'className="notebookInsertPrimary"',
         'className="notebookInsertMenu"',
         'className="notebookAppendActions"',
+        'data-notebook-cell-menu="true"',
         'key: "Shift-Enter"',
         "onRunAndAdvance",
     )
@@ -162,6 +163,7 @@ def checkNotebookInsertControls() -> CheckResult:
         ".notebookFloatingTools {",
         ".notebookDocument {",
         ".notebookCellMeta {",
+        ".notebookCellMoreMenu {",
         ".notebookInsertControl {",
         "min-height: 40px;",
     )

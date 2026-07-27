@@ -39,6 +39,7 @@
 - Local 파일은 같은 디렉터리의 임시 파일을 flush·fsync한 뒤 `os.replace`로 교체한다. write, fsync, replace 실패 시 마지막 정상 파일과 원본 mode를 보존하고 임시 파일을 정리한다.
 - `.ipynb` 자동 저장은 출력, metadata, attachment, execution count, magic이 있는 원본을 byte-for-byte 보존하고 같은 디렉터리의 고유 `*.codaro.py` 사본으로 승격한다. 수동 Jupyter round trip은 별도 범위다.
 - mobile 44px 실행 control과 desktop 36px 우측 하단 실행 영역을 적용했다.
+- mobile에서도 편집 가능한 문서 제목과 공용 테마·SNS 레인을 유지한다. 320px·390px에서 제목과 우상단 control의 겹침은 0이고, 셀 실행과 44px overflow trigger는 셀 프레임 안에 둔다. 도움·삭제는 overflow를 열기 전에는 화면과 접근성 트리에서 숨긴다.
 - 노트북과 현재 학습 실행 셀은 `workCell.css`의 frame, output, action primitive를 함께 사용한다.
 - Web Run과 Local은 `apiOnline`으로 실행·저장 capability만 나누고 같은 Notebook 컴포넌트 트리와 CSS를 사용한다.
 - Chromium 149.0.7827.55에서 Web Run desktop 1440×900, mobile 320×720·390×844의 Dark 대표 case와 390×844 Light case, Local Run 900×640 Dark case가 통과했다.
@@ -48,6 +49,7 @@
 - Web desktop과 Local minimum에서 실제 Python 셀을 `running → success → running → error`로 전이하고, 정상 상태는 다시 숨기며 성공·오류 결과가 해당 셀 아래에 표시되는지 확인했다.
 - Run·Local·자동화 6-case 모두 공용 우상단 SNS `github`, `support`, `youtube`, `threads`와 같은 theme runtime을 사용한다. 최소 노트북 case는 `Codaro notebook`, 세 폭 control, reactive control, `+ Code`, `+ Markdown`을 함께 검사한다. Web 자동화의 Local 전용 template은 `Local 필요`, Local 연결 뒤 같은 template은 가용 상태다.
 - Chromium, Firefox, WebKit 12-case 시각 접근성 검사에서 theme control, SNS 순서, 키보드 focus, 후원 팝업 focus trap, 정확한 계좌번호 `1002-0421-4626`, Dark·Light 대비와 320px 이상 가로 overflow 0px를 확인했다.
+- 2026-07-27 프로덕션 산출물 기준 `web-run-compact` Dark, `web-run-mobile` Light, `web-run-desktop` Dark, `local-run-minimum` Dark가 Chromium 149에서 각각 통과했다. 모바일 case는 제목 노출, 닫힌 셀 보조 메뉴, 44px trigger의 셀 내부 배치까지 검사한다.
 - 시각 증거는 `output/test-runner/product-experience-browser/screenshots/{dark,light}/web-run-{desktop,mobile}.png`, Local 증거는 `output/test-runner/product-experience-browser/screenshots/dark/local-run-minimum.png`에 남겼다.
 - 기계 판정은 `output/test-runner/notebook-redesign/`의 Web Dark·Light와 Local report, `output/test-runner/run-local-state-browser/run-local-state-report.json`에 남겼다.
 

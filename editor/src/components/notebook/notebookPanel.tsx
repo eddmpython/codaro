@@ -29,6 +29,7 @@ import "@/components/app/workCell.css";
 import {
   Loader2,
   MessageSquare,
+  MoreHorizontal,
   Play,
   Plus,
   TerminalSquare,
@@ -920,18 +921,34 @@ function CellMetaBar({
             {running ? <Loader2 className="animate-spin" /> : <Play />}
           </IconButton>
         ) : null}
-        <CellAiActions compact helpState={cellHelp} selected={selected} onAsk={onCellAsk} />
-        <IconButton
-          className="notebookCellDeleteButton size-9 sm:size-8 [&_svg]:size-4"
-          label="셀 삭제"
-          variant="ghost"
-          onClick={(event) => {
-            event.stopPropagation();
-            onDelete();
-          }}
+        <details
+          className="notebookCellMore"
+          data-notebook-cell-menu="true"
+          onClick={(event) => event.stopPropagation()}
         >
-          <Trash2 />
-        </IconButton>
+          <summary
+            aria-label="셀 작업 더보기"
+            className="notebookCellMoreTrigger"
+            role="button"
+            title="셀 작업 더보기"
+          >
+            <MoreHorizontal aria-hidden="true" />
+          </summary>
+          <div className="notebookCellMoreMenu">
+            <CellAiActions compact helpState={cellHelp} selected={selected} onAsk={onCellAsk} />
+            <IconButton
+              className="notebookCellDeleteButton size-9 sm:size-8 [&_svg]:size-4"
+              label="셀 삭제"
+              variant="ghost"
+              onClick={(event) => {
+                event.stopPropagation();
+                onDelete();
+              }}
+            >
+              <Trash2 />
+            </IconButton>
+          </div>
+        </details>
       </div>
     </div>
   );

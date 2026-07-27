@@ -1987,6 +1987,25 @@ async ({ surface, expectedTier }) => {
   const notebookDocument = document.querySelector(".notebookDocument");
   const notebookDocumentRect = notebookDocument?.getBoundingClientRect();
   const notebookDocumentStyle = notebookDocument ? getComputedStyle(notebookDocument) : null;
+  const notebookTitle = document.querySelector('[data-notebook-title="topbar"]');
+  const notebookCellMenus = [...document.querySelectorAll('[data-notebook-cell-menu="true"]')];
+  const notebookCellMenuTargets = notebookCellMenus.map((menu) => {
+    const trigger = menu.querySelector(".notebookCellMoreTrigger");
+    const cell = menu.closest("[data-notebook-cell]");
+    const triggerRect = trigger?.getBoundingClientRect();
+    const cellRect = cell?.getBoundingClientRect();
+    return {
+      height: triggerRect?.height || 0,
+      insideCell: Boolean(
+        triggerRect
+        && cellRect
+        && triggerRect.top >= cellRect.top - 1
+        && triggerRect.right <= cellRect.right + 1
+        && triggerRect.bottom <= cellRect.bottom + 1
+      ),
+      width: triggerRect?.width || 0,
+    };
+  });
   const notebookTopLaneItems = [
     ["brand", document.querySelector('[data-notebook-brand="codaro"]')],
     ["notice", document.querySelector('[data-topbar-status-notice="editor"]')],
@@ -2164,6 +2183,7 @@ async ({ surface, expectedTier }) => {
     notebookBlankInputCount: [...document.querySelectorAll("[data-notebook-input='code'] .cm-content")]
       .filter((editor) => !editorText(editor)).length,
     notebookBrandCount: document.querySelectorAll('[data-notebook-brand="codaro"]').length,
+    notebookTitleVisible: Boolean(notebookTitle && inViewport(notebookTitle)),
     notebookTopLaneOverlaps,
     notebookWidthControlCount: document.querySelectorAll("[data-notebook-width-option]").length,
     notebookReactiveToggleCount: document.querySelectorAll('[data-notebook-reactive-toggle="true"]').length,
@@ -2173,6 +2193,14 @@ async ({ surface, expectedTier }) => {
       .filter((element) => (
         visible(element) && Number(getComputedStyle(element).opacity || "1") > 0.1
       )).length,
+    notebookCellMenuCount: notebookCellMenus.length,
+    openNotebookCellMenuCount: notebookCellMenus.filter((menu) => menu.hasAttribute("open")).length,
+    notebookCellMenuTargets,
+    visibleNotebookSecondaryActionCount: [
+      ...document.querySelectorAll(
+        '[data-cell-ai-help-trigger="always-visible"], .notebookCellDeleteButton'
+      ),
+    ].filter((element) => !element.closest("details:not([open])") && visible(element)).length,
     visibleNotebookStatusCount: [...document.querySelectorAll(".notebookStatusItem")]
       .filter(visible).length,
     automationSurfaceCount: document.querySelectorAll("[data-automation-loop='second-loop']").length,
@@ -2521,6 +2549,33 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
                 )
             if viewportWidth <= 760 and audit["visibleNotebookCellToolCount"] < 1:
                 failures.append(f"{name}: mobile notebook must expose a touch-safe cell toolbar")
+            if viewportWidth <= 760:
+                if not audit["notebookTitleVisible"]:
+                    failures.append(f"{name}: mobile notebook title is not visible")
+                if (
+                    audit["notebookCellMenuCount"] != 1
+                    or audit["openNotebookCellMenuCount"] != 0
+                    or audit["visibleNotebookSecondaryActionCount"] != 0
+                ):
+                    failures.append(
+                        f"{name}: mobile secondary cell actions are not compact by default: "
+                        f"menus={audit['notebookCellMenuCount']}, "
+                        f"open={audit['openNotebookCellMenuCount']}, "
+                        f"visible={audit['visibleNotebookSecondaryActionCount']}"
+                    )
+                invalidMenuTargets = [
+                    target for target in audit["notebookCellMenuTargets"]
+                    if (
+                        target["width"] < 44
+                        or target["height"] < 44
+                        or not target["insideCell"]
+                    )
+                ]
+                if invalidMenuTargets:
+                    failures.append(
+                        f"{name}: mobile cell menu target is outside its frame: "
+                        f"{invalidMenuTargets}"
+                    )
             if audit["visibleNotebookStatusCount"]:
                 failures.append(
                     f"{name}: {audit['visibleNotebookStatusCount']} normal runtime or persistence "
