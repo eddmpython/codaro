@@ -959,13 +959,32 @@ def verify_local_reexport_to_deployed_web_roundtrip(
         page = context.new_page()
         page.on("console", lambda message: console_errors.append(message.text) if message.type == "error" else None)
         page.on("pageerror", lambda error: console_errors.append(str(error)))
-        run_url = f"{DEPLOYED_WEB_URL}/run/?surface=editor"
-        response = page.goto(run_url, wait_until="domcontentloaded", timeout=45_000)
+        lesson_url = str(deployed_archive["sourceUrl"])
+        response = page.goto(lesson_url, wait_until="domcontentloaded", timeout=45_000)
         if response is not None and response.status >= 400:
-            raise VerificationError(f"public Web return workspace returned HTTP {response.status}: {run_url}")
-        page.locator("[data-product-surface-view='editor']:visible").wait_for(
+            raise VerificationError(f"public Web return lesson returned HTTP {response.status}: {lesson_url}")
+        page.wait_for_function(
+            """lessonRef => Boolean(
+              document.querySelector(`[data-public-lesson="${lessonRef}"]`)
+              || document.querySelector(`[data-learning-lesson-ref="${lessonRef}"]`)
+            )""",
+            arg=lesson_ref,
+            timeout=45_000,
+        )
+        if page.locator(f"[data-public-lesson='{lesson_ref}']:visible").count():
+            page.get_by_role("link", name="이 레슨 실행").click(timeout=20_000)
+        page.locator(f"[data-learning-lesson-ref='{lesson_ref}']").wait_for(
             state="visible",
             timeout=45_000,
+        )
+        page.locator("[data-product-brand='escape']:visible").click(timeout=20_000)
+        page.wait_for_function(
+            """() => new URL(window.location.href).searchParams.get("surface") !== "curriculum" """,
+            timeout=20_000,
+        )
+        page.locator("[data-product-surface-view='editor']:visible").wait_for(
+            state="visible",
+            timeout=20_000,
         )
         learning_data = open_learning_data_settings(page)
         learning_data.locator("[data-learning-archive-import-input='true']").set_input_files(
