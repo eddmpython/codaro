@@ -633,6 +633,10 @@ def jsAssertCustomCurriculumDeleteDialog() -> str:
   const itemTitle = {json.dumps(FIXTURE_TITLE)};
   const deleteButtons = () => [...document.querySelectorAll('button')]
     .find((button) => button.getAttribute('aria-label') === `${{itemTitle}} 삭제`);
+  const customGroup = document.querySelector('[data-custom-curriculum-group="true"]');
+  if (!visible(customGroup) || !(customGroup.textContent || '').includes(itemTitle)) {{
+    throw new Error('stored custom curriculum group missing from learning navigation');
+  }}
   const hiddenManagement = deleteButtons();
   if (hiddenManagement) {{
     throw new Error('custom curriculum management must not exist in curriculum DOM');

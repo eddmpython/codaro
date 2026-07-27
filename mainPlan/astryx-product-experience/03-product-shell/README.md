@@ -13,6 +13,8 @@
 
 현재 구현은 `PRODUCT_SURFACE_NAV`에서 파생한 데스크톱·모바일 목적지와 공용 아이콘 projection을 사용한다. 모바일 Web은 safe-area 하단 내비게이션으로 학습·노트북·자동화·대화를 전환하고, 학습 집중 모드와 가상 키보드가 열린 동안에는 이를 숨긴다. `/m/chat` 별도 component tree와 전용 turn 경계는 제거했으며 공용 ProductShell의 `chat` alias, 상단 SNS, provider 대화 흐름을 그대로 사용한다.
 
+2026-07-27 점검에서 접힌 48px 제품 레일이 제품 설정 trigger까지 숨겨 사용자 커리큘럼 삭제와 학습 데이터 관리에 다시 진입할 수 없는 결함을 확인했다. 비학습 surface에서는 레일의 두 번째 아이콘으로 제품 설정을 열도록 복구했고, 학습 focus mode에서는 계속 렌더하지 않는다. 삭제 확인창은 열린 동안 `#root`를 `aria-hidden=true`로 격리하고 닫힐 때 이전 값을 복원한다. 저장 항목이 있는 학습 카드 브라우저 흐름은 설정 진입, 삭제 확인창 focus trap, 배경 격리, 취소 뒤 저장 유지까지 통과했다. 전체 WebView2와 수동 보조기술 matrix는 다시 실행하지 않았으므로 상태는 `진행`이다.
+
 ## 목표
 
 웹 Run과 Local이 하나의 Astryx AppShell, TopNav, SideNav, command/search, settings 구조를 사용하게 한다. 기존 React state, hooks, runtime, route 조립은 보존하고 지속 셸부터 점진적으로 옮긴다.

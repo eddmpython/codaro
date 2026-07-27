@@ -129,6 +129,21 @@ export function ProductSidebar({
     if (learningMode) setDeleteTarget(null);
   }, [learningMode]);
 
+  useEffect(() => {
+    if (!deleteTarget) return;
+    const appRoot = document.getElementById("root");
+    if (!appRoot) return;
+    const previousAriaHidden = appRoot.getAttribute("aria-hidden");
+    appRoot.setAttribute("aria-hidden", "true");
+    return () => {
+      if (previousAriaHidden === null) {
+        appRoot.removeAttribute("aria-hidden");
+        return;
+      }
+      appRoot.setAttribute("aria-hidden", previousAriaHidden);
+    };
+  }, [deleteTarget]);
+
   return (
     <Sidebar
       collapsible="icon"
@@ -136,7 +151,7 @@ export function ProductSidebar({
       variant="sidebar"
     >
       <SidebarHeader>
-        <div className="flex items-center gap-0.5 sm:gap-1">
+        <div className="flex flex-wrap items-center gap-0.5 sm:gap-1">
           <SidebarMenu className="min-w-0 flex-1">
             <SidebarMenuItem>
               <button
@@ -176,8 +191,8 @@ export function ProductSidebar({
             <PopoverTrigger
               aria-label="제품 설정"
               className={cn(
-                "size-8 shrink-0 items-center justify-center rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:hidden",
-                learningMode ? "hidden" : "flex",
+                "size-8 shrink-0 items-center justify-center rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                learningMode ? "hidden" : "flex group-data-[collapsible=icon]:mx-auto",
               )}
               data-product-appearance-settings="true"
               title="제품 설정"
@@ -327,7 +342,6 @@ export function ProductSidebar({
                   selectedContentId={selectedContentId}
                   text={{
                     codaroCurriculum: t("sidebar.codaroCurriculum"),
-                    curriculumEmpty: t("sidebar.curriculumEmpty"),
                     curriculumHome: t("sidebar.curriculumHome"),
                     loading: t("sidebar.curriculumLoading"),
                     myCurriculum: t("sidebar.myCurriculum"),

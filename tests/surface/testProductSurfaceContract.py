@@ -306,6 +306,9 @@ def testProductSidebarRendersCentralSurfaceNavOnly() -> None:
     assert "CustomCurriculumDeleteDialog" not in curriculumTree
     assert "CustomCurriculumDeleteDialog" in source
     assert 'data-product-learning-data-settings="true"' in source
+    assert 'learningMode ? "hidden" : "flex group-data-[collapsible=icon]:mx-auto"' in source
+    assert 'appRoot.setAttribute("aria-hidden", "true")' in source
+    assert 'appRoot.removeAttribute("aria-hidden")' in source
     assert "LearningArchiveMenu" in source
     assert "surfaceIcons" not in source
     assert "categoryTitle" not in source
@@ -385,6 +388,8 @@ def testProductSidebarKeepsSurfaceTreesInFocusedFiles() -> None:
 
 def testCustomCurriculumManagementDoesNotHijackTheLearningRoute() -> None:
     navigationHook = _read("editor/src/hooks/useCurriculumNavigationState.ts")
+    curriculumTree = _read("editor/src/components/app/curriculumSidebarTree.tsx")
+    productSidebar = _read("editor/src/components/app/productSidebar.tsx")
     deleteBody = navigationHook.split(
         "const deleteCustomCurriculum = useCallback",
         maxsplit=1,
@@ -393,6 +398,10 @@ def testCustomCurriculumManagementDoesNotHijackTheLearningRoute() -> None:
     assert "id === selectedCustomCurriculumId" in deleteBody
     assert 'setSurface("curriculum")' not in deleteBody
     assert "onNavigateCurriculum(" not in deleteBody
+    assert "{customItems.length ? (" in curriculumTree
+    assert 'data-custom-curriculum-group="true"' in curriculumTree
+    assert "curriculumEmpty" not in curriculumTree
+    assert "curriculumEmpty" not in productSidebar
 
 
 def testProductSurfaceCopyMatchesFocusedFlow() -> None:

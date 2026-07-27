@@ -39,7 +39,6 @@ type CurriculumSidebarTreeProps = {
   selectedContentId: string;
   text: {
     codaroCurriculum: string;
-    curriculumEmpty: string;
     curriculumHome: string;
     loading: string;
     myCurriculum: string;
@@ -129,32 +128,28 @@ export function CurriculumSidebarTree({
         </SidebarGroupContent>
       </SidebarGroup>
 
-      <SidebarGroup className="py-0.5">
-        <SidebarGroupLabel className="h-6 px-2 text-[11px]">{text.myCurriculum}</SidebarGroupLabel>
-        <SidebarGroupContent>
-          <SidebarMenu>
-            {customItems.length ? customItems.map((item) => (
-              <SidebarMenuItem key={item.id}>
-                <SidebarMenuButton
-                  className="h-7 px-2 text-[13px] [&>svg]:size-3.5"
-                  isActive={item.id === selectedCustomCurriculumId}
-                  tooltip={item.title}
-                  onClick={() => navigateToCustomCurriculum(item.id)}
-                >
-                  <GraduationCap />
-                  <span>{item.title}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            )) : (
-              <SidebarMenuItem>
-                <div className="px-2 py-2 text-xs leading-5 text-sidebar-foreground/60 group-data-[collapsible=icon]:hidden">
-                  {text.curriculumEmpty}
-                </div>
-              </SidebarMenuItem>
-            )}
-          </SidebarMenu>
-        </SidebarGroupContent>
-      </SidebarGroup>
+      {customItems.length ? (
+        <SidebarGroup className="py-0.5" data-custom-curriculum-group="true">
+          <SidebarGroupLabel className="h-6 px-2 text-[11px]">{text.myCurriculum}</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {customItems.map((item) => (
+                <SidebarMenuItem key={item.id}>
+                  <SidebarMenuButton
+                    className="h-7 px-2 text-[13px] [&>svg]:size-3.5"
+                    isActive={item.id === selectedCustomCurriculumId}
+                    tooltip={item.title}
+                    onClick={() => navigateToCustomCurriculum(item.id)}
+                  >
+                    <GraduationCap />
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      ) : null}
     </>
   );
 }

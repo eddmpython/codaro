@@ -2297,6 +2297,9 @@ async ({ surface, expectedTier }) => {
     learningArchiveManagementCount: document.querySelectorAll(
       '[data-learning-archive-management="true"]'
     ).length,
+    customCurriculumGroupCount: document.querySelectorAll(
+      '[data-custom-curriculum-group="true"]'
+    ).length,
     bulkLearningProgressCount: document.querySelectorAll('[data-curriculum-home-progress="true"]').length,
     webProgressLessonCount,
     webVerifiedPracticeCount,
@@ -2420,6 +2423,8 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
         ):
             failures.append(f"{name}: shared automation surface wiring is incomplete")
     elif surface == "learning-home":
+        if audit["customCurriculumGroupCount"]:
+            failures.append(f"{name}: empty custom curriculum promotion leaked into learning navigation")
         if audit["learningGoalMapCount"] != 1 or audit["learningGoalRouteCount"] < 1:
             failures.append(f"{name}: outcome-first goal navigation did not render")
         if audit["learningDomainVisualCount"] < 8:
@@ -2435,6 +2440,8 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
         if audit["bulkLearningProgressCount"]:
             failures.append(f"{name}: bulk lesson progress returned to the learning home")
     elif surface == "web-lesson":
+        if audit["customCurriculumGroupCount"]:
+            failures.append(f"{name}: empty custom curriculum promotion leaked into lesson navigation")
         if audit["lessonSectionCount"] < 1:
             failures.append(f"{name}: lesson sections did not render")
         if case.get("verifyDayOneCommentPrompt") and (
