@@ -630,6 +630,15 @@ def testProductProofCaptureWaitsForFontsAndPinsNotebookFocus() -> None:
     assert "box-shadow" not in selectedFrameRule
 
 
+def testVisualAccessibilityFocusAuditWaitsForWebkitActiveElement() -> None:
+    verifier = _read("tests/surface/verifyVisualAccessibilityPlaywright.py")
+
+    assert "for _ in range(2):" in verifier
+    assert "target.focus()" in verifier
+    assert "requestAnimationFrame(resolve)" in verifier
+    assert 'if active.get("marker") == marker:' in verifier
+
+
 def testProductSurfaceDocsNameTheSameFlow() -> None:
     skillsReadme = _read("docs/skills/README.md")
     frontendDoc = _read("docs/skills/architecture/frontend-product-surface.md")

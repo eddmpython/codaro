@@ -597,8 +597,19 @@ def keyboardDialogAudit(page: Any, case: VisualAccessibilityCase) -> dict[str, A
         ),
     ]
     for marker, target in targets:
-        target.focus()
-        active = activeElementSnapshot(page)
+        active: dict[str, Any] = {}
+        for _ in range(2):
+            target.focus()
+            page.evaluate(
+                """
+                () => new Promise((resolve) => requestAnimationFrame(
+                  () => requestAnimationFrame(resolve)
+                ))
+                """
+            )
+            active = activeElementSnapshot(page)
+            if active.get("marker") == marker:
+                break
         if active.get("marker") == marker:
             focused.append(marker)
             focusIndicators[marker] = {
