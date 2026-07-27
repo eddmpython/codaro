@@ -261,7 +261,8 @@ def launch_native_product(app_port: int, cdp_port: int) -> tuple[subprocess.Pope
     log_path.parent.mkdir(parents=True, exist_ok=True)
     log_handle = log_path.open("w", encoding="utf-8")
     env = os.environ.copy()
-    env["WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS"] = (
+    env["CODARO_WEBVIEW2_TEST_BROWSER_ARGUMENTS"] = (
+        "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection "
         f"--remote-debugging-port={cdp_port} --remote-allow-origins=*"
     )
     command = (

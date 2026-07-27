@@ -607,7 +607,19 @@ fn run_windowed(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
 
     let mut web_ctx = wry::WebContext::new(Some(paths.root().join("webview2")));
     let launch_html = LAUNCH_HTML.replace("{{AVATAR_SRC}}", &avatar_data_uri());
-    let webview = WebViewBuilder::with_web_context(&mut web_ctx)
+    let webview_builder = WebViewBuilder::with_web_context(&mut web_ctx);
+    #[cfg(target_os = "windows")]
+    let webview_builder = {
+        use wry::WebViewBuilderExtWindows;
+
+        match std::env::var("CODARO_WEBVIEW2_TEST_BROWSER_ARGUMENTS") {
+            Ok(arguments) if !arguments.trim().is_empty() => {
+                webview_builder.with_additional_browser_args(arguments)
+            }
+            _ => webview_builder,
+        }
+    };
+    let webview = webview_builder
         .with_background_color((9, 9, 11, 255))
         .with_html(launch_html)
         .build(&window)
