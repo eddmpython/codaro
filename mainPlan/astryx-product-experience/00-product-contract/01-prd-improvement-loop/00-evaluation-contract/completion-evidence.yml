@@ -1,0 +1,31 @@
+schemaVersion: 1
+initiativeId: astryx-product-experience
+packetId: evaluation-contract
+completedAt: "2026-07-27T02:58:31+00:00"
+gitCommit: f2eb8539b1047703b271fc4309bc5147270725a3
+implementationPaths:
+  - mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/00-evaluation-contract/rubric.yml
+  - mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/00-evaluation-contract/evaluation-report.schema.yml
+  - tests/product/verifyPrdEvaluationReport.py
+  - tests/product/verifyPlanFactAudit.py
+  - tests/product/verifyPrdEvaluationContract.py
+  - tests/product/testPrdEvaluationContract.py
+  - tests/product/testPrdEvaluationReport.py
+  - tests/product/testPrdEvaluationBundle.py
+  - tests/run.py
+  - .github/workflows/ci.yml
+  - docs/skills/ops/foundation/testing-and-gates.md
+  - docs/skills/ops/foundation/code-quality.md
+  - mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/00-evaluation-contract/README.md
+gates:
+  - name: evaluation-contract
+    reportPath: mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/00-evaluation-contract/evidence/evaluation-contract-report.json
+    reportHash: 59d15536815989a5994bd4c6214b2c22dce6a3da5540f7472c30cf60b8f8a094
+    gitHead: f2eb8539b1047703b271fc4309bc5147270725a3
+    passedAt: "2026-07-27T02:58:31+00:00"
+reviews: []
+docsUpdated: true
+parentIndexUpdated: true
+residualRisks:
+  - evaluator roster, sealed scope, raw report와 finding ledger는 08-r10-independent-review가 계속 소유한다.
+  - 이 전이는 평가 계약만 봉인하며 R10 통과, 제품 점수 또는 product evidence maturity 승격을 뜻하지 않는다.

@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "gate": "evaluation-contract",
+  "status": "passed",
+  "passed": true,
+  "gitHead": "f2eb8539b1047703b271fc4309bc5147270725a3",
+  "startedAt": "2026-07-27T02:58:23+00:00",
+  "completedAt": "2026-07-27T02:58:31+00:00",
+  "durationMs": 7500,
+  "reportPath": "output/test-runner/evaluation-contract/evaluation-contract-report.json",
+  "cleanWorktree": true,
+  "dirtyPaths": [],
+  "facts": {
+    "rubric": {
+      "path": "mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/00-evaluation-contract/rubric.yml",
+      "sha256": "0150ee794a4fd567e3462d059d46192e4f22d8fc56c0a452ce4e347c2582f08d",
+      "dimensionCount": 7,
+      "dimensionIds": [
+        "learnerValue",
+        "currentStateAccuracy",
+        "decisionCompleteness",
+        "dependencyOwnership",
+        "feasibilityCapacity",
+        "testRollback",
+        "measurementRelease"
+      ],
+      "totalWeight": 100,
+      "targetScore": null,
+      "passThreshold": null
+    },
+    "schema": {
+      "path": "mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/00-evaluation-contract/evaluation-report.schema.yml",
+      "sha256": "3a7e5a28de2b81c7ee2b2f81c41f3bbedb8dd58efe3a6c23ee65b4cd57254dec",
+      "closedObject": true,
+      "requiredEvidenceFields": [
+        "dimensions",
+        "findings",
+        "productEvidenceMaturity",
+        "promptAudit",
+        "totalScore"
+      ],
+      "dimensionIds": [
+        "learnerValue",
+        "currentStateAccuracy",
+        "decisionCompleteness",
+        "dependencyOwnership",
+        "feasibilityCapacity",
+        "testRollback",
+        "measurementRelease"
+      ]
+    }
+  },
+  "checks": [
+    {
+      "name": "gate-registry",
+      "command": [
+        "C:\\Users\\MSI\\OneDrive\\Desktop\\sideProject\\codaro\\.venv\\Scripts\\python.exe",
+        "-X",
+        "utf8",
+        "tests/run.py",
+        "audit-self"
+      ],
+      "returnCode": 0,
+      "durationMs": 281,
+      "stdoutTail": "ok: test gate definitions are aligned",
+      "stderrTail": ""
+    },
+    {
+      "name": "generated-contract-freshness",
+      "command": [
+        "C:\\Users\\MSI\\OneDrive\\Desktop\\sideProject\\codaro\\.venv\\Scripts\\python.exe",
+        "-X",
+        "utf8",
+        "docs/skills/ops/tools/genProductContracts.py",
+        "--check"
+      ],
+      "returnCode": 0,
+      "durationMs": 328,
+      "stdoutTail": "ok: product contracts checked (6 files)",
+      "stderrTail": ""
+    },
+    {
+      "name": "plan-fact-contract",
+      "command": [
+        "C:\\Users\\MSI\\OneDrive\\Desktop\\sideProject\\codaro\\.venv\\Scripts\\python.exe",
+        "-X",
+        "utf8",
+        "tests/product/verifyPlanFactAudit.py"
+      ],
+      "returnCode": 0,
+      "durationMs": 2344,
+      "stdoutTail": "ok: plan facts valid (71 readmes, 1 negative fixtures rejected)",
+      "stderrTail": ""
+    },
+    {
+      "name": "evaluation-contract-fixtures",
+      "command": [
+        "C:\\Users\\MSI\\OneDrive\\Desktop\\sideProject\\codaro\\.venv\\Scripts\\python.exe",
+        "-X",
+        "utf8",
+        "-m",
+        "pytest",
+        "tests/product/testPrdEvaluationContract.py",
+        "tests/product/testPrdEvaluationReport.py",
+        "tests/product/testPrdEvaluationBundle.py",
+        "-q",
+        "--tb=short",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp",
+        "C:\\Users\\MSI\\OneDrive\\Desktop\\sideProject\\codaro\\output\\test-runner\\evaluation-contract\\pytest\\run-10416-1785121104049740300"
+      ],
+      "returnCode": 0,
+      "durationMs": 4218,
+      "stdoutTail": "........................                                                 [100%]\n24 passed in 3.42s",
+      "stderrTail": ""
+    }
+  ],
+  "failures": [],
+  "roundBoundary": {
+    "contractVerified": true,
+    "independentRoundExecuted": false,
+    "independentRoundOwner": "mainPlan/astryx-product-experience/00-product-contract/01-prd-improvement-loop/08-r10-independent-review"
+  }
+}
