@@ -114,6 +114,7 @@ function App() {
   });
   const {
     applyBootstrapCurriculumState,
+    applyCurriculumDraftUpdates,
     applyCurriculumSelectionState,
     applyImportedLearningArchiveState,
     categories,
@@ -122,6 +123,7 @@ function App() {
     contents,
     contentsLoading,
     curriculumDocument,
+    curriculumDrafts,
     referenceLoading,
     restoreCurriculumRouteState,
     selectCurriculumCategoryState,
@@ -131,9 +133,9 @@ function App() {
     selectedContentId,
     selectedCurriculumBlockId,
     setSelectedCurriculumBlockId,
+    updateCurriculumDraft,
   } = useCurriculumLibraryState({
     initialSelection: initialCurriculumSelection,
-    onDraftUpdates: applyDraftUpdates,
     onNotice: applyNotice,
   });
 
@@ -328,6 +330,7 @@ function App() {
   });
 
   const activeDocument = surface === "curriculum" && curriculumDocument ? curriculumDocument : document;
+  const activeDrafts = surface === "curriculum" ? curriculumDrafts : drafts;
   const activeSelectedBlockId = surface === "curriculum" ? selectedCurriculumBlockId : selectedBlockId;
   const selectedBlock = activeDocument.blocks.find((block) => block.id === activeSelectedBlockId) ?? activeDocument.blocks.find(isExecutableBlock) ?? activeDocument.blocks[0];
   const {
@@ -351,7 +354,7 @@ function App() {
   } = useNotebookRuntimeState({
     apiOnline,
     document: activeDocument,
-    drafts,
+    drafts: activeDrafts,
     onNotice: applyNotice,
     selectCurriculumBlock: activateCurriculumBlock,
     selectNotebookBlock: selectBlock,
@@ -366,6 +369,7 @@ function App() {
     setPendingBlocks,
     setPendingTarget,
   } = usePendingChangesState({
+    applyCurriculumDraftUpdates,
     applyDraftUpdates,
     document,
     openCurriculum: openCustomCurriculum,
@@ -449,7 +453,7 @@ function App() {
     apiOnline,
     applyDocument,
     currentResult,
-    drafts,
+    drafts: activeDrafts,
     profile: aiProfile,
     results,
     openCurriculum: openCustomCurriculum,
@@ -517,7 +521,7 @@ function App() {
         contents={contents}
         customCurricula={sidebarCustomCurricula}
         learningDocument={curriculumDocument}
-        learningDrafts={drafts}
+        learningDrafts={curriculumDrafts}
         query={query}
         referenceLoading={referenceLoading}
         runtimeTier={runRouteState.runtimeTier}
@@ -579,7 +583,7 @@ function App() {
               curriculumDocument={curriculumDocument}
               diagnostics={diagnostics}
               document={document}
-              drafts={drafts}
+              drafts={activeDrafts}
               eStop={eStop}
               messages={messages}
               pendingBlocks={pendingBlocks}
@@ -604,7 +608,7 @@ function App() {
               onAcceptPendingBlocks={acceptPendingBlocks}
               onConnectAi={connectAiProvider}
               onCellAsk={askCellAssistant}
-              onDraftChange={updateDraft}
+              onDraftChange={surface === "curriculum" ? updateCurriculumDraft : updateDraft}
               onDeleteCell={(blockId) => {
                 cleanupCellDefinitions(blockId);
                 deleteNotebookCell(blockId);

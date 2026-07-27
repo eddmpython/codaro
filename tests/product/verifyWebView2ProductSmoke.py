@@ -14,6 +14,7 @@ import time
 from pathlib import Path
 from typing import Any
 from urllib.error import URLError
+from urllib.parse import quote
 from urllib.request import Request, urlopen
 
 from playwright.sync_api import Page, sync_playwright
@@ -22,10 +23,12 @@ from playwright.sync_api import Page, sync_playwright
 ROOT = Path(__file__).resolve().parents[2]
 WORK_ROOT = ROOT / "output" / "test-runner" / "product-browser-webview2-evergreen"
 LAUNCHER_ROOT = WORK_ROOT / "launcher-root"
+PRODUCT_HOME = LAUNCHER_ROOT / "user-data"
 WORKSPACE_ROOT = WORK_ROOT / "workspace"
 DIST_ROOT = WORK_ROOT / "dist"
 SCREENSHOT_ROOT = WORK_ROOT / "screenshots"
 REPORT_PATH = WORK_ROOT / "webview2-product-smoke-report.json"
+WEB_ARCHIVE_PATH = WORK_ROOT / "web-origin-learning-archive.json"
 CARGO_TARGET_ROOT = WORK_ROOT / "cargo-target"
 LAUNCHER_EXE = CARGO_TARGET_ROOT / "debug" / "codaro-launcher.exe"
 PYTHON_EXE = ROOT / ".venv" / "Scripts" / "python.exe"
@@ -91,6 +94,13 @@ def main() -> int:
 
                 support_case = verify_support_dialog(page)
                 cases.append(support_case)
+                cases.append(
+                    verify_web_to_local_roundtrip(
+                        page,
+                        hwnd=hwnd,
+                        app_port=app_port,
+                    )
+                )
                 if console_errors:
                     failures.extend(f"WebView2 console: {message}" for message in console_errors)
             finally:
@@ -128,6 +138,7 @@ def main() -> int:
         "install": {
             "launcherExe": display_path(LAUNCHER_EXE),
             "launcherRoot": display_path(LAUNCHER_ROOT),
+            "productHome": display_path(PRODUCT_HOME),
             "packagedWheel": packaged_wheel_evidence(),
             "runtimePython": str(PYTHON_EXE),
         },
@@ -145,10 +156,13 @@ def main() -> int:
                 "1440x900 Local Automation",
                 "shared theme and social controls",
                 "shared support dialog account structure",
+                "isolated installed-product user data",
+                "Web-origin learning archive Local import, reload, re-export, and disabled automation adoption",
             ],
             "notCovered": [
                 "Windows 10 22H2 self-hosted image",
                 "WebView2 Fixed Version lock",
+                "public deployed Web archive export",
                 "manual assistive technology",
                 "IME composition",
                 "200% and 400% zoom",
@@ -261,6 +275,7 @@ def launch_native_product(app_port: int, cdp_port: int) -> tuple[subprocess.Pope
     log_path.parent.mkdir(parents=True, exist_ok=True)
     log_handle = log_path.open("w", encoding="utf-8")
     env = os.environ.copy()
+    env["CODARO_HOME"] = str(PRODUCT_HOME)
     env["CODARO_WEBVIEW2_TEST_BROWSER_ARGUMENTS"] = (
         "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection "
         f"--remote-debugging-port={cdp_port} --remote-allow-origins=*"
@@ -438,6 +453,313 @@ def verify_support_dialog(page: Page) -> dict[str, Any]:
         "passed": not failures,
         "failures": failures,
     }
+
+
+def verify_web_to_local_roundtrip(
+    page: Page,
+    *,
+    hwnd: int,
+    app_port: int,
+) -> dict[str, Any]:
+    archive = build_web_origin_learning_archive(app_port)
+    lesson_ref = archive["lessonRef"]
+    draft_source = archive["draftSource"]
+    draft_id = archive["automationDraftId"]
+    root_hash = archive["rootHash"]
+    url = (
+        f"http://127.0.0.1:{app_port}/?surface=curriculum"
+        f"&category=30days&lesson={quote('day01_헬로월드')}&runtime=local#curriculum"
+    )
+    response = page.goto(url, wait_until="domcontentloaded", timeout=45_000)
+    if response is not None and response.status >= 400:
+        raise VerificationError(f"local-learning-web-archive-roundtrip returned HTTP {response.status}")
+    page.wait_for_selector(
+        f"[data-learning-lesson-ref='{lesson_ref}']",
+        state="visible",
+        timeout=45_000,
+    )
+    dpr = float(page.evaluate("window.devicePixelRatio"))
+    resize_native_client(hwnd, 1024, 768, dpr)
+    page.locator("[data-product-brand='escape']:visible").click()
+    page.wait_for_selector("[data-local-home-surface='true']", state="visible", timeout=20_000)
+    learning_data = open_learning_data_settings(page)
+    learning_data.locator("[data-learning-archive-import-input='true']").set_input_files(
+        str(WEB_ARCHIVE_PATH)
+    )
+    page.wait_for_selector(
+        f"[data-learning-lesson-ref='{lesson_ref}']",
+        state="visible",
+        timeout=45_000,
+    )
+    wait_for_editor_source(page, draft_source)
+    imported = page.evaluate(
+        """async () => {
+          const [archiveResponse, evidenceResponse] = await Promise.all([
+            fetch("/api/curriculum/learning-archive/current"),
+            fetch("/api/curriculum/evidence/summary"),
+          ]);
+          if (!archiveResponse.ok || !evidenceResponse.ok) {
+            throw new Error(`archive APIs failed: ${archiveResponse.status}/${evidenceResponse.status}`);
+          }
+          const archive = await archiveResponse.json();
+          const evidence = await evidenceResponse.json();
+          return {
+            archiveId: archive?.manifest?.archiveId ?? null,
+            rootHash: archive?.manifest?.rootHash ?? null,
+            runtimeTier: archive?.manifest?.runtimeTier ?? null,
+            evidenceEvents: evidence?.events ?? null,
+            evidenceConflicts: evidence?.conflicts ?? null,
+          };
+        }"""
+    )
+    page.reload(wait_until="domcontentloaded", timeout=45_000)
+    page.wait_for_selector(
+        f"[data-learning-lesson-ref='{lesson_ref}']",
+        state="visible",
+        timeout=45_000,
+    )
+    wait_for_editor_source(page, draft_source)
+    draft_restored_after_reload = page.evaluate(
+        """expected => [...document.querySelectorAll(".cm-content")]
+          .some((editor) => editor.textContent?.includes(expected.trim()))""",
+        draft_source,
+    )
+    page.locator("[data-product-brand='escape']:visible").click()
+    page.wait_for_selector("[data-local-home-surface='true']", state="visible", timeout=20_000)
+    learning_data = open_learning_data_settings(page)
+    learning_data.locator("[data-learning-automation-drafts='true']").wait_for(
+        state="visible",
+        timeout=20_000,
+    )
+    learning_data.get_by_role("button", name="자동화로 옮기기").click()
+    learning_data.get_by_text("작업 메뉴에 추가됨", exact=True).wait_for(timeout=20_000)
+    task_snapshot = page.evaluate(
+        """async (draftId) => {
+          const response = await fetch("/api/tasks");
+          if (!response.ok) throw new Error(`task list failed: ${response.status}`);
+          const payload = await response.json();
+          const task = (payload.tasks || []).find((item) => item?.inputs?.sourceDraftId === draftId);
+          return task ? {
+            documentPath: task.documentPath ?? null,
+            enabled: task.enabled,
+            schedule: task.schedule ?? null,
+            sourceDraftId: task.inputs?.sourceDraftId ?? null,
+          } : null;
+        }""",
+        draft_id,
+    )
+    with page.expect_download(timeout=20_000) as download_info:
+        learning_data.locator("button[aria-label^='학습 작업 내보내기']").click()
+    download_path = download_info.value.path()
+    if download_path is None:
+        raise VerificationError("installed Local learning archive re-export has no path")
+    reexported = json.loads(Path(download_path).read_text(encoding="utf-8"))
+    from codaro.curriculum.learningArchive import materializeLearningArchive
+
+    source_materialized = materializeLearningArchive(WEB_ARCHIVE_PATH.read_text(encoding="utf-8"))
+    reexport_materialized = materializeLearningArchive(reexported)
+    portable_payload = (
+        source_materialized.document == reexport_materialized.document
+        and source_materialized.drafts == reexport_materialized.drafts
+        and source_materialized.virtualDirectories == reexport_materialized.virtualDirectories
+        and source_materialized.virtualFiles == reexport_materialized.virtualFiles
+        and source_materialized.packages == reexport_materialized.packages
+        and source_materialized.automationDrafts == reexport_materialized.automationDrafts
+        and source_materialized.evidenceArchive.get("events")
+        == reexport_materialized.evidenceArchive.get("events")
+    )
+    screenshot_path = SCREENSHOT_ROOT / "local-learning-web-archive-roundtrip.png"
+    page.screenshot(path=str(screenshot_path))
+    task_document = (
+        (WORKSPACE_ROOT / str(task_snapshot.get("documentPath", ""))).resolve()
+        if isinstance(task_snapshot, dict)
+        else None
+    )
+    task_document_inside_workspace = False
+    if task_document is not None:
+        try:
+            task_document.relative_to(WORKSPACE_ROOT.resolve())
+            task_document_inside_workspace = task_document.is_file()
+        except ValueError:
+            task_document_inside_workspace = False
+    snapshot = {
+        "lessonRef": lesson_ref,
+        "draftRestoredAfterReload": draft_restored_after_reload,
+        "imported": imported,
+        "task": task_snapshot,
+        "taskDocumentInsideWorkspace": task_document_inside_workspace,
+        "reexportRootHash": reexported.get("manifest", {}).get("rootHash"),
+        "reexportRuntimeTier": reexported.get("manifest", {}).get("runtimeTier"),
+        "portablePayload": portable_payload,
+        "productHome": display_path(PRODUCT_HOME),
+        "productHomeExists": PRODUCT_HOME.is_dir(),
+    }
+    checks = {
+        "isolatedProductHome": PRODUCT_HOME.is_dir(),
+        "archiveCommitted": imported.get("rootHash") == root_hash,
+        "webRuntimeIdentity": imported.get("runtimeTier") == "web",
+        "evidenceImported": imported.get("evidenceEvents") == 1 and imported.get("evidenceConflicts") == 0,
+        "draftReload": bool(snapshot["draftRestoredAfterReload"]),
+        "automationDraftAdopted": isinstance(task_snapshot, dict)
+        and task_snapshot.get("sourceDraftId") == draft_id,
+        "automationDisabled": isinstance(task_snapshot, dict)
+        and task_snapshot.get("enabled") is False
+        and task_snapshot.get("schedule") is None,
+        "automationWorkspaceBoundary": task_document_inside_workspace,
+        "portableReexport": snapshot["portablePayload"]
+        and snapshot["reexportRuntimeTier"] == "web",
+    }
+    failures = [f"{check} check failed" for check, passed in checks.items() if not passed]
+    return {
+        "id": "local-learning-web-archive-roundtrip",
+        "surface": "curriculum",
+        "snapshot": snapshot,
+        "screenshot": display_path(screenshot_path),
+        "checks": checks,
+        "passed": not failures,
+        "failures": failures,
+    }
+
+
+def build_web_origin_learning_archive(app_port: int) -> dict[str, str]:
+    from codaro.curriculum.evidenceArchive import (
+        buildLearningEvidenceArchive,
+        digestText,
+        sealEvidenceEvent,
+    )
+    from codaro.curriculum.learningArchive import (
+        LearningArchiveAutomationDraftInput,
+        LearningArchivePackage,
+        LearningArchiveVirtualFile,
+        buildLearningArchive,
+        serializeLearningArchive,
+    )
+
+    lesson_ref = "30days/day01_헬로월드"
+    content_url = (
+        f"http://127.0.0.1:{app_port}/api/curriculum/content/30days/"
+        f"{quote('day01_헬로월드')}"
+    )
+    content = wait_for_json(content_url, timeout_seconds=30)
+    document = content.get("document")
+    if not isinstance(document, dict) or not isinstance(document.get("blocks"), list):
+        raise VerificationError("installed Local lesson API returned no document")
+    block = next(
+        (
+            item
+            for item in document["blocks"]
+            if isinstance(item, dict)
+            and item.get("type") in {"automation", "code"}
+            and isinstance(item.get("id"), str)
+            and (
+                item.get("role") == "exercise"
+                or item.get("sourceType") == "sectionContract:exercise"
+            )
+        ),
+        None,
+    )
+    if block is None:
+        raise VerificationError("installed Local lesson has no executable archive block")
+    block_id = str(block["id"])
+    draft_source = "print('Web에서 만든 학습 작업을 Local에서 복원했습니다')\n"
+    attempt_fingerprint = digestText("installed-web-to-local-roundtrip")
+    event = sealEvidenceEvent({
+        "attemptFingerprint": attempt_fingerprint,
+        "blockId": block_id,
+        "checkId": "lesson:30days/day01_헬로월드:installed-roundtrip:v1",
+        "eventId": f"web-strong:{attempt_fingerprint}",
+        "executionCount": 1,
+        "expectedHash": digestText("Web to Local\n"),
+        "fixtureHash": digestText("installed-web-to-local-fixture"),
+        "kind": "StrongCheckVerified",
+        "lessonRef": lesson_ref,
+        "occurredAt": "2026-07-27T00:00:00+00:00",
+        "resultHash": digestText("Web to Local\n"),
+        "runtimeTier": "web",
+        "schemaVersion": 1,
+        "sourceHash": digestText(draft_source),
+        "strength": "strong",
+    })
+    archive = buildLearningArchive(
+        document=document,
+        drafts={block_id: draft_source},
+        evidenceArchive=buildLearningEvidenceArchive([event]),
+        lessonRef=lesson_ref,
+        virtualDirectories=("workspace",),
+        virtualFiles=(
+            LearningArchiveVirtualFile(
+                path="workspace/web-learning-note.txt",
+                payload=b"installed Web-to-Local roundtrip\n",
+                mediaType="text/plain",
+            ),
+        ),
+        packages=(
+            LearningArchivePackage(
+                name="portable-demo",
+                version="1.0.0",
+                path="packages/portable_demo-1.0.0-py3-none-any.whl",
+                payload=b"PK\x03\x04installed-roundtrip-wheel",
+            ),
+        ),
+        automationDrafts=(
+            LearningArchiveAutomationDraftInput(
+                name="Web 학습 작업 초안",
+                description="Local에서 확인 뒤 직접 활성화하는 설치본 검증 초안",
+                recipe="DRY_RUN = True\nprint('installed roundtrip')\n",
+                sourceBlockIds=(block_id,),
+            ),
+        ),
+        createdAt="2026-07-27T00:01:00+00:00",
+    )
+    WEB_ARCHIVE_PATH.write_text(serializeLearningArchive(archive), encoding="utf-8")
+    return {
+        "automationDraftId": str(archive["automationDrafts"][0]["draftId"]),
+        "draftSource": draft_source,
+        "lessonRef": lesson_ref,
+        "rootHash": str(archive["manifest"]["rootHash"]),
+    }
+
+
+def open_learning_data_settings(page: Page) -> Any:
+    settings = page.locator("[data-product-appearance-settings='true']:visible")
+    settings.wait_for(state="visible", timeout=20_000)
+    settings.click()
+    learning_data = page.locator("[data-product-learning-data-settings='true']:visible")
+    learning_data.wait_for(state="visible", timeout=20_000)
+    menu = learning_data.locator("[data-learning-archive-menu='true']")
+    if menu.get_attribute("open") is None:
+        menu.locator("summary").click()
+    learning_data.locator("[data-learning-archive-summary='true']").wait_for(
+        state="visible",
+        timeout=20_000,
+    )
+    return learning_data
+
+
+def wait_for_editor_source(page: Page, expected: str) -> None:
+    try:
+        page.wait_for_function(
+            """expected => [...document.querySelectorAll(".cm-content")]
+              .some((editor) => editor.textContent?.includes(expected.trim()))""",
+            arg=expected,
+            timeout=30_000,
+        )
+    except Exception as error:
+        state = page.evaluate(
+            """() => ({
+              activeSurface: document.querySelector("[data-active-product-surface]")
+                ?.getAttribute("data-active-product-surface") ?? null,
+              archiveError: document.querySelector("[data-learning-archive-error]")?.textContent ?? null,
+              editors: [...document.querySelectorAll(".cm-content")]
+                .map((editor) => editor.textContent?.slice(0, 240) ?? ""),
+              lessonRef: document.querySelector("[data-learning-lesson-ref]")
+                ?.getAttribute("data-learning-lesson-ref") ?? null,
+              referenceLoading: document.querySelector("[data-learning-reference-loading]")
+                ?.getAttribute("data-learning-reference-loading") ?? null,
+              url: window.location.href,
+            })"""
+        )
+        raise VerificationError(f"imported learning draft did not render: {state}") from error
 
 
 def webview_page(contexts: list[Any]) -> Page:

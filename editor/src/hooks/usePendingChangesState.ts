@@ -14,6 +14,7 @@ import type { SurfaceMode } from "@/lib/surfaceModel";
 import type { AppNotice, BlockConfig, CodaroDocument } from "@/types";
 
 type UsePendingChangesStateOptions = {
+  applyCurriculumDraftUpdates: (updates: Record<string, string>) => void;
   applyDraftUpdates: (updates: Record<string, string>) => void;
   document: CodaroDocument;
   openCurriculum: (entry: CustomCurriculumEntry, options?: { showNotice?: boolean }) => void;
@@ -25,6 +26,7 @@ type UsePendingChangesStateOptions = {
 };
 
 export function usePendingChangesState({
+  applyCurriculumDraftUpdates,
   applyDraftUpdates,
   document,
   openCurriculum,
@@ -54,7 +56,11 @@ export function usePendingChangesState({
       replaceDocument(application.documentToApply);
     }
     if (Object.keys(application.draftUpdates).length) {
-      applyDraftUpdates(application.draftUpdates);
+      if (savedCurriculum.opened) {
+        applyCurriculumDraftUpdates(application.draftUpdates);
+      } else {
+        applyDraftUpdates(application.draftUpdates);
+      }
     }
     if (application.selectedBlockId) {
       selectNotebookBlock(application.selectedBlockId);
@@ -69,7 +75,7 @@ export function usePendingChangesState({
     if (application.notice) {
       onNotice(application.notice);
     }
-  }, [applyDraftUpdates, onNotice, openCurriculum, replaceDocument, saveCurriculum, selectNotebookBlock, setSurface]);
+  }, [applyCurriculumDraftUpdates, applyDraftUpdates, onNotice, openCurriculum, replaceDocument, saveCurriculum, selectNotebookBlock, setSurface]);
 
   const acceptPendingBlocks = useCallback(() => {
     applyPendingChangesApplication(buildAcceptPendingChangesApplication({

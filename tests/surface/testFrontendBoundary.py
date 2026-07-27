@@ -502,3 +502,17 @@ def testPendingCurriculumChangesOpenCurrentLearningSurface() -> None:
     assert "openOptions: { showNotice: true }" in hook
     assert "openCurriculum(entry, { showNotice: true })" not in hook
     assert "export function saveAndOpenCustomCurriculum" in customCurricula
+
+
+def testCurriculumAndNotebookDraftsHaveSeparateStateOwners() -> None:
+    app = _read("editor/src/App.tsx")
+    curriculumHook = _read("editor/src/hooks/useCurriculumLibraryState.ts")
+    pendingHook = _read("editor/src/hooks/usePendingChangesState.ts")
+
+    assert "const [curriculumDrafts, setCurriculumDrafts]" in curriculumHook
+    assert "setCurriculumDrafts(materialized.drafts)" in curriculumHook
+    assert "onDraftUpdates" not in curriculumHook
+    assert 'const activeDrafts = surface === "curriculum" ? curriculumDrafts : drafts' in app
+    assert "learningDrafts={curriculumDrafts}" in app
+    assert 'onDraftChange={surface === "curriculum" ? updateCurriculumDraft : updateDraft}' in app
+    assert "applyCurriculumDraftUpdates" in pendingHook

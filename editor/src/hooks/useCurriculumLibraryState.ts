@@ -27,13 +27,11 @@ type CurriculumSelectionState = CurriculumSelection & {
 
 type UseCurriculumLibraryStateOptions = {
   initialSelection?: RunRouteLessonRef | null;
-  onDraftUpdates: (updates: Record<string, string>) => void;
   onNotice: (notice: AppNotice) => void;
 };
 
 export function useCurriculumLibraryState({
   initialSelection,
-  onDraftUpdates,
   onNotice,
 }: UseCurriculumLibraryStateOptions) {
   const [categories, setCategories] = useState(initialBootstrapState.categories);
@@ -49,6 +47,7 @@ export function useCurriculumLibraryState({
   const [contentsLoading, setContentsLoading] = useState(false);
   const [referenceLoading, setReferenceLoading] = useState(false);
   const [curriculumDocument, setCurriculumDocument] = useState<CodaroDocument | null>(initialBootstrapState.curriculumDocument);
+  const [curriculumDrafts, setCurriculumDrafts] = useState<Record<string, string>>({});
   const [selectedCurriculumBlockId, setSelectedCurriculumBlockId] = useState(initialBootstrapState.curriculumDocument?.blocks[0]?.id ?? "");
   const importedArchiveLessonRef = useRef<string | null>(null);
   const referenceRequestRevision = useRef(0);
@@ -102,7 +101,7 @@ export function useCurriculumLibraryState({
         if (persisted) {
           const document = persisted.document;
           setCurriculumDocument(document);
-          onDraftUpdates(persisted.drafts);
+          setCurriculumDrafts(persisted.drafts);
           setSelectedCurriculumBlockId(
             document.blocks.find(isExecutableBlock)?.id ?? document.blocks[0]?.id ?? "",
           );
@@ -131,7 +130,7 @@ export function useCurriculumLibraryState({
             ? document.blocks.find(isExecutableBlock)?.id ?? document.blocks[0]?.id ?? ""
             : result.selectedBlockId;
           setCurriculumDocument(document);
-          onDraftUpdates(draftUpdates);
+          setCurriculumDrafts(draftUpdates);
           setSelectedCurriculumBlockId(selectedBlockId);
           setSelectedContentId((current) => current === result.selectedContentId ? current : result.selectedContentId);
           onNotice(persisted ? {
@@ -152,7 +151,7 @@ export function useCurriculumLibraryState({
     return () => {
       cancelled = true;
     };
-  }, [onDraftUpdates, onNotice, selectedCategory, selectedContentId]);
+  }, [onNotice, selectedCategory, selectedContentId]);
 
   const applyBootstrapCurriculumState = useCallback((bootstrap: AppBootstrapState) => {
     setCategories(bootstrap.categories);
@@ -169,11 +168,11 @@ export function useCurriculumLibraryState({
 
   const applyCurriculumSelectionState = useCallback((selection: CurriculumSelectionState) => {
     setCurriculumDocument(selection.document);
-    onDraftUpdates(selection.draftUpdates);
+    setCurriculumDrafts(selection.draftUpdates);
     setSelectedCategory(selection.selectedCategory);
     setSelectedContentId(selection.selectedContentId);
     setSelectedCurriculumBlockId(selection.selectedBlockId);
-  }, [onDraftUpdates]);
+  }, []);
 
   const selectCurriculumCategoryState = useCallback((category: string) => {
     const selection = selectCategory(category);
@@ -212,7 +211,7 @@ export function useCurriculumLibraryState({
     importedArchiveLessonRef.current = lessonChanged ? nextLessonRef : null;
     setReferenceLoading(false);
     setCurriculumDocument(materialized.document);
-    onDraftUpdates(materialized.drafts);
+    setCurriculumDrafts(materialized.drafts);
     setSelectedCategory(selection.category);
     setSelectedContentId(selection.contentId);
     setSelectedCurriculumBlockId(
@@ -221,10 +220,23 @@ export function useCurriculumLibraryState({
         ?? "",
     );
     return selection;
-  }, [onDraftUpdates, selectedCategory, selectedContentId]);
+  }, [selectedCategory, selectedContentId]);
+
+  const applyCurriculumDraftUpdates = useCallback((updates: Record<string, string>) => {
+    if (!Object.keys(updates).length) return;
+    setCurriculumDrafts((current) => ({
+      ...current,
+      ...updates,
+    }));
+  }, []);
+
+  const updateCurriculumDraft = useCallback((blockId: string, value: string) => {
+    setCurriculumDrafts((current) => ({ ...current, [blockId]: value }));
+  }, []);
 
   return {
     applyBootstrapCurriculumState,
+    applyCurriculumDraftUpdates,
     applyCurriculumSelectionState,
     applyImportedLearningArchiveState,
     categories,
@@ -233,6 +245,7 @@ export function useCurriculumLibraryState({
     contents,
     contentsLoading,
     curriculumDocument,
+    curriculumDrafts,
     referenceLoading,
     restoreCurriculumRouteState,
     selectCurriculumCategoryState,
@@ -242,5 +255,6 @@ export function useCurriculumLibraryState({
     selectedContentId,
     selectedCurriculumBlockId,
     setSelectedCurriculumBlockId,
+    updateCurriculumDraft,
   };
 }
