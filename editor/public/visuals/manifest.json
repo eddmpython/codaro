@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "sourceManifestHash": "sha256-3cd62172b8598f0e8eda067304ef01b85701785ef1c8f060b3f507c628fff42e",
+  "sourceManifestHash": "sha256-6abebc554a1ec1e4d93b5b899a93cd6772e771eca552324ead6731404062586b",
   "assets": [
     {
       "id": "runLearningDetail",
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-detail.png",
-      "sourceHash": "sha256-2d625aa4eda5c54df34b0a811a7d88af7bab847cde473f781c0df3988195687c",
-      "sourceGitHead": "271c34e422bfe1210f00108322778fafdc0db810",
+      "sourceHash": "sha256-fd6b4e127c3ad5ceda895786707caae7d54784cef7f37f092c82a95e819dc889",
+      "sourceGitHead": "882bf628e6778447deb32ff7ed4516557f79d7c8",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -89,55 +89,55 @@
           "editor/src/styles",
           "editor/vite.config.ts"
         ],
-        "sourceSetHash": "sha256-8f7065d59320e857743379094e93f8b49d4224a1e7f9b78407262cbd202407fc"
+        "sourceSetHash": "sha256-283ebd3af4a9297458fb833e7c9b1480f1cf82827a1b2e6fc453713886152665"
       },
       "outputs": [
         {
-          "byteLength": 12357,
+          "byteLength": 12320,
           "format": "avif",
           "height": 405,
-          "integrity": "sha256-0bba809a3323dd64bb4440519ecfb2ae27b04b6a002f389caf3245a321108b06",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-480-2d625aa4eda5.avif",
+          "integrity": "sha256-405147d6213e95edf57a435ef51131fb0f554913f0fe8556d538725b9633e907",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-480-fd6b4e127c3a.avif",
           "width": 480
         },
         {
-          "byteLength": 13864,
+          "byteLength": 13890,
           "format": "webp",
           "height": 405,
-          "integrity": "sha256-5403ccd5212816fced1d02a9c290ebbfcdfaa68520a679961cb34e0be7d23896",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-480-2d625aa4eda5.webp",
+          "integrity": "sha256-b8f75a043547a5ef99494817960aef42c35ad27e7ba426ce68b7fbc47a0c6c61",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-480-fd6b4e127c3a.webp",
           "width": 480
         },
         {
-          "byteLength": 24710,
+          "byteLength": 24566,
           "format": "avif",
           "height": 608,
-          "integrity": "sha256-6b8d5d47cea540c83801084445b7fe79bd2810bbd43f30fa500bb4832edbb60b",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-720-2d625aa4eda5.avif",
+          "integrity": "sha256-b47eb298694760208c774cc18d59e7e6de08d269b363c48dbbe508a5e04118f0",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-720-fd6b4e127c3a.avif",
           "width": 720
         },
         {
-          "byteLength": 27468,
+          "byteLength": 27278,
           "format": "webp",
           "height": 608,
-          "integrity": "sha256-cf958ebf12852c947fd753b89136a6fdeb8bdc223b6f0a2e54545689ec45efdc",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-720-2d625aa4eda5.webp",
+          "integrity": "sha256-328ced4a1ac1a991fda33ebee7f20cd0b7715c0dbe80a12f76a41e1b3e4205d0",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-720-fd6b4e127c3a.webp",
           "width": 720
         },
         {
-          "byteLength": 26716,
+          "byteLength": 26747,
           "format": "avif",
           "height": 760,
-          "integrity": "sha256-4b318f0b357c1017ecc2251845bf320bc3a037e81901c845a0895968f82d0b68",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-900-2d625aa4eda5.avif",
+          "integrity": "sha256-13855d67b1c299dc0c06dadaaea70f8874c1be0c7cf164f4d8833b9bab42738d",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-900-fd6b4e127c3a.avif",
           "width": 900
         },
         {
-          "byteLength": 39008,
+          "byteLength": 39148,
           "format": "webp",
           "height": 760,
-          "integrity": "sha256-675bbc7ce6f9ce31fc7de7551f6029c263e2a2a675bff8b781ef779c9522a9d9",
-          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-900-2d625aa4eda5.webp",
+          "integrity": "sha256-299b228b65ab1c76980d0325a6ce45f62b575b19948d78e98cd2265318283ad5",
+          "publicPath": "/visuals/files/runLearningDetail/runLearningDetail-900-fd6b4e127c3a.webp",
           "width": 900
         }
       ]
@@ -147,8 +147,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-mobile.png",
-      "sourceHash": "sha256-7f57fbbe546eed374b2f8b4ce0463557e44373814a0581c6533ab67fedee00ec",
-      "sourceGitHead": "271c34e422bfe1210f00108322778fafdc0db810",
+      "sourceHash": "sha256-e7788b2b16fb9f19d9b0b2364a88e46f693aea61fe80637ea7fb6b70b3c793b0",
+      "sourceGitHead": "882bf628e6778447deb32ff7ed4516557f79d7c8",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -226,23 +226,23 @@
           "editor/src/styles",
           "editor/vite.config.ts"
         ],
-        "sourceSetHash": "sha256-8f7065d59320e857743379094e93f8b49d4224a1e7f9b78407262cbd202407fc"
+        "sourceSetHash": "sha256-283ebd3af4a9297458fb833e7c9b1480f1cf82827a1b2e6fc453713886152665"
       },
       "outputs": [
         {
-          "byteLength": 20167,
+          "byteLength": 20028,
           "format": "avif",
           "height": 844,
-          "integrity": "sha256-a1699553d31d1e9abbf17205dad2d061bd5747ccc1577a62ddd1f316e2ebc860",
-          "publicPath": "/visuals/files/runLearningMobile/runLearningMobile-390-7f57fbbe546e.avif",
+          "integrity": "sha256-a4457599b2174de3fad4942d2f032035ad58df729e64e9a7ed37851eb82ccbbf",
+          "publicPath": "/visuals/files/runLearningMobile/runLearningMobile-390-e7788b2b16fb.avif",
           "width": 390
         },
         {
-          "byteLength": 27906,
+          "byteLength": 27836,
           "format": "webp",
           "height": 844,
-          "integrity": "sha256-2361fbde8258bd873500ed811bf0bbdf3f9099bede0437f2b20beb7bc2f1ab91",
-          "publicPath": "/visuals/files/runLearningMobile/runLearningMobile-390-7f57fbbe546e.webp",
+          "integrity": "sha256-9b7ca692f9d89760dd1c826a2b426b87399300a5528c835a02077c96bc55d391",
+          "publicPath": "/visuals/files/runLearningMobile/runLearningMobile-390-e7788b2b16fb.webp",
           "width": 390
         }
       ]

@@ -6,8 +6,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-detail.png",
-      "sourceHash": "sha256-2d625aa4eda5c54df34b0a811a7d88af7bab847cde473f781c0df3988195687c",
-      "sourceGitHead": "271c34e422bfe1210f00108322778fafdc0db810",
+      "sourceHash": "sha256-fd6b4e127c3ad5ceda895786707caae7d54784cef7f37f092c82a95e819dc889",
+      "sourceGitHead": "882bf628e6778447deb32ff7ed4516557f79d7c8",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -67,7 +67,7 @@
           "editor/src/styles",
           "editor/vite.config.ts"
         ],
-        "sourceSetHash": "sha256-8f7065d59320e857743379094e93f8b49d4224a1e7f9b78407262cbd202407fc"
+        "sourceSetHash": "sha256-283ebd3af4a9297458fb833e7c9b1480f1cf82827a1b2e6fc453713886152665"
       }
     },
     {
@@ -75,8 +75,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-mobile.png",
-      "sourceHash": "sha256-7f57fbbe546eed374b2f8b4ce0463557e44373814a0581c6533ab67fedee00ec",
-      "sourceGitHead": "271c34e422bfe1210f00108322778fafdc0db810",
+      "sourceHash": "sha256-e7788b2b16fb9f19d9b0b2364a88e46f693aea61fe80637ea7fb6b70b3c793b0",
+      "sourceGitHead": "882bf628e6778447deb32ff7ed4516557f79d7c8",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -136,7 +136,7 @@
           "editor/src/styles",
           "editor/vite.config.ts"
         ],
-        "sourceSetHash": "sha256-8f7065d59320e857743379094e93f8b49d4224a1e7f9b78407262cbd202407fc"
+        "sourceSetHash": "sha256-283ebd3af4a9297458fb833e7c9b1480f1cf82827a1b2e6fc453713886152665"
       }
     },
     {
