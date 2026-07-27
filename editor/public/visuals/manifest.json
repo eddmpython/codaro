@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "sourceManifestHash": "sha256-76a856553a50a78ce2133bbc5ccf8bf4f4484248780f182e385d600bf2c28c61",
+  "sourceManifestHash": "sha256-9d05d950e74e8ac35339f54195b5c1a43d44320f561dd1bbdd61fbdfa1abac50",
   "assets": [
     {
       "id": "runLearningDetail",
@@ -8,7 +8,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-detail.png",
       "sourceHash": "sha256-2f441656b1ecd410c05d8110b9b9c7ca6c98916eaba5e815a3f4bfa86e5b0e13",
-      "sourceGitHead": "7545e1279c2f9c24c244b9c741182b512d343b7c",
+      "sourceGitHead": "fd699e46d9112cd4165e3d0730628863d900a3d4",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -150,7 +150,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/run-learning-mobile.png",
       "sourceHash": "sha256-b0d6b9b74eb79963a7a0c5611744be2fd779405e799d2206f0a6f996b005ac5c",
-      "sourceGitHead": "7545e1279c2f9c24c244b9c741182b512d343b7c",
+      "sourceGitHead": "fd699e46d9112cd4165e3d0730628863d900a3d4",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -257,7 +257,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/web-run-desktop.png",
       "sourceHash": "sha256-ec95ae8add825b0270e09dea84157a9809c72f5e3c175e2217efb8fae3529b62",
-      "sourceGitHead": "7545e1279c2f9c24c244b9c741182b512d343b7c",
+      "sourceGitHead": "fd699e46d9112cd4165e3d0730628863d900a3d4",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -396,8 +396,8 @@
       "kind": "productScreenshot",
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/local-notebook-desktop.png",
-      "sourceHash": "sha256-4193c65fda8b6f17727e124ddc645f5e35d1d2cd9f764d54dfc3db2f2f06cce7",
-      "sourceGitHead": "7545e1279c2f9c24c244b9c741182b512d343b7c",
+      "sourceHash": "sha256-c059e045cf19c3b1e261e4cf925db74d0f36c05c087ca3bf86ac9032b372f3cb",
+      "sourceGitHead": "fd699e46d9112cd4165e3d0730628863d900a3d4",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
@@ -476,19 +476,19 @@
       },
       "outputs": [
         {
-          "byteLength": 3742,
+          "byteLength": 3768,
           "format": "avif",
           "height": 427,
-          "integrity": "sha256-133ebd556ccea1933b7c64032bfa375dd3d647c5bbcf063557bd44d78b7eb2ad",
-          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.avif",
+          "integrity": "sha256-c0a3f6a26a751e0f6b44b61fa47cd265df7662adef06905d0f33d5d0d88244a1",
+          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-600-c059e045cf19.avif",
           "width": 600
         },
         {
           "byteLength": 4118,
           "format": "webp",
           "height": 427,
-          "integrity": "sha256-1fdc00e3d0227c4cc57ebbfee266eb6f3d6daf66d5ccfe3872bd5c1877143e11",
-          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-600-4193c65fda8b.webp",
+          "integrity": "sha256-db68890aa1ed206ccd8e33618785b3bd248a89fb6aa222ff2b8977be768b6c01",
+          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-600-c059e045cf19.webp",
           "width": 600
         },
         {
@@ -496,15 +496,15 @@
           "format": "avif",
           "height": 640,
           "integrity": "sha256-28a51ebf9343d3007ec3b95113fd6829456e35556a6776ded27c53d7113ae15b",
-          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.avif",
+          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-900-c059e045cf19.avif",
           "width": 900
         },
         {
           "byteLength": 7312,
           "format": "webp",
           "height": 640,
-          "integrity": "sha256-cc7e967dd2ddbe81d2eef0bb3490e37e32b68dd1c4aa439b63fdf879dac1b992",
-          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-900-4193c65fda8b.webp",
+          "integrity": "sha256-670a537d9c7c636f10a01bf7b42d404d109601d67105def512b3cec00430ed0f",
+          "publicPath": "/visuals/files/localNotebookDesktop/localNotebookDesktop-900-c059e045cf19.webp",
           "width": 900
         }
       ]
@@ -515,7 +515,7 @@
       "sourceType": "playwrightCapture",
       "sourcePath": "assets/brand/visuals/product/local-automation-desktop.png",
       "sourceHash": "sha256-49cedaaade407224a83a59e6f6809351d9cb162fcb32192bbb6fbc3a36d2b2ec",
-      "sourceGitHead": "7545e1279c2f9c24c244b9c741182b512d343b7c",
+      "sourceGitHead": "fd699e46d9112cd4165e3d0730628863d900a3d4",
       "provenance": {
         "author": "Codaro product capture pipeline",
         "license": "proprietary-project",
