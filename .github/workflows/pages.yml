@@ -70,9 +70,68 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: build
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  verify-deployed-web-to-local:
+    runs-on: windows-latest
+    needs: deploy
+    timeout-minutes: 35
+    env:
+      CODARO_DEPLOYED_WEB_URL: ${{ needs.deploy.outputs.page_url }}
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install Python dependencies
+        run: uv sync --extra dev --python 3.12
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: editor/package-lock.json
+
+      - name: Install editor
+        working-directory: editor
+        run: npm ci
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache WebView2 product build
+        uses: actions/cache@v4
+        with:
+          path: output/test-runner/product-browser-webview2-evergreen/cargo-target/
+          key: webview2-cargo-${{ runner.os }}-${{ hashFiles('launcher/Cargo.lock') }}
+
+      - name: Verify deployed Web to installed Local
+        run: uv run python -X utf8 tests/run.py gate product-browser-webview2-evergreen
+
+      - name: Upload deployed product evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployed-web-to-local-evidence
+          path: |
+            output/test-runner/product-browser-webview2-evergreen/webview2-product-smoke-report.json
+            output/test-runner/product-browser-webview2-evergreen/deployed-web-learning-archive.json
+            output/test-runner/product-browser-webview2-evergreen/screenshots/
+            output/test-runner/product-browser-webview2-evergreen/logs/
+          if-no-files-found: error

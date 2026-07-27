@@ -29,9 +29,11 @@ DIST_ROOT = WORK_ROOT / "dist"
 SCREENSHOT_ROOT = WORK_ROOT / "screenshots"
 REPORT_PATH = WORK_ROOT / "webview2-product-smoke-report.json"
 WEB_ARCHIVE_PATH = WORK_ROOT / "web-origin-learning-archive.json"
+DEPLOYED_WEB_ARCHIVE_PATH = WORK_ROOT / "deployed-web-learning-archive.json"
 CARGO_TARGET_ROOT = WORK_ROOT / "cargo-target"
 LAUNCHER_EXE = CARGO_TARGET_ROOT / "debug" / "codaro-launcher.exe"
 PYTHON_EXE = ROOT / ".venv" / "Scripts" / "python.exe"
+DEPLOYED_WEB_URL = os.environ.get("CODARO_DEPLOYED_WEB_URL", "").strip().rstrip("/")
 EXPECTED_SOCIAL_ORDER = ["github", "support", "youtube", "threads"]
 EXPECTED_ACCOUNT_NUMBER = "1002-0421-4626"
 CREATE_NO_WINDOW = 0x08000000
@@ -51,6 +53,7 @@ def main() -> int:
     launcher_log = None
     app_port: int | None = None
     cdp_port: int | None = None
+    deployed_archive: dict[str, Any] | None = None
 
     try:
         require_windows()
@@ -64,6 +67,8 @@ def main() -> int:
         runtime = runtime_evidence(cdp_version, hwnd, launcher_process.pid)
 
         with sync_playwright() as playwright:
+            if DEPLOYED_WEB_URL:
+                deployed_archive = capture_deployed_web_learning_archive(playwright)
             browser = playwright.chromium.connect_over_cdp(f"http://127.0.0.1:{cdp_port}")
             try:
                 page = webview_page(browser.contexts)
@@ -101,6 +106,15 @@ def main() -> int:
                         app_port=app_port,
                     )
                 )
+                if deployed_archive is not None:
+                    cases.append(
+                        verify_deployed_web_to_local_roundtrip(
+                            page,
+                            hwnd=hwnd,
+                            app_port=app_port,
+                            deployed_archive=deployed_archive,
+                        )
+                    )
                 if console_errors:
                     failures.extend(f"WebView2 console: {message}" for message in console_errors)
             finally:
@@ -158,15 +172,16 @@ def main() -> int:
                 "shared support dialog account structure",
                 "isolated installed-product user data",
                 "Web-origin learning archive Local import, reload, re-export, and disabled automation adoption",
-            ],
+            ] + ([
+                "public deployed Web edit, strong verification, archive export, and installed Local roundtrip",
+            ] if deployed_archive is not None else []),
             "notCovered": [
                 "Windows 10 22H2 self-hosted image",
                 "WebView2 Fixed Version lock",
-                "public deployed Web archive export",
                 "manual assistive technology",
                 "IME composition",
                 "200% and 400% zoom",
-            ],
+            ] + ([] if deployed_archive is not None else ["public deployed Web archive export"]),
         },
     }
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -455,6 +470,102 @@ def verify_support_dialog(page: Page) -> dict[str, Any]:
     }
 
 
+def capture_deployed_web_learning_archive(playwright: Any) -> dict[str, Any]:
+    browser = playwright.chromium.launch(channel="msedge", headless=True)
+    console_errors: list[str] = []
+    try:
+        context = browser.new_context(
+            accept_downloads=True,
+            color_scheme="dark",
+            viewport={"width": 1440, "height": 900},
+        )
+        page = context.new_page()
+        page.on("console", lambda message: console_errors.append(message.text) if message.type == "error" else None)
+        page.on("pageerror", lambda error: console_errors.append(str(error)))
+        lesson_url = (
+            f"{DEPLOYED_WEB_URL}/learn/lesson/30days/"
+            f"{quote('day01_헬로월드')}/"
+        )
+        response = page.goto(lesson_url, wait_until="domcontentloaded", timeout=45_000)
+        if response is not None and response.status >= 400:
+            raise VerificationError(f"deployed lesson returned HTTP {response.status}: {lesson_url}")
+        lesson_surface = page.locator(
+            "[data-learning-lesson-ref='30days/day01_헬로월드']"
+        )
+        page.wait_for_function(
+            """() => Boolean(
+              document.querySelector("[data-public-lesson='30days/day01_헬로월드']")
+              || document.querySelector("[data-learning-lesson-ref='30days/day01_헬로월드']")
+            )""",
+            timeout=45_000,
+        )
+        if page.locator("[data-public-lesson='30days/day01_헬로월드']:visible").count():
+            page.get_by_role("link", name="이 레슨 실행").click(timeout=20_000)
+        lesson_surface.wait_for(state="visible", timeout=45_000)
+
+        draft_source = "# deployed public roundtrip\nprint('Hello Codaro')\n"
+        exercise = page.locator("[data-learning-section-part='exercise']").first
+        exercise.locator(".cm-content").first.fill(draft_source, timeout=20_000)
+        exercise.locator("button[aria-label='셀 실행']").first.click(timeout=20_000)
+        exercise.locator("[data-learning-check-result='verified']").wait_for(
+            state="visible",
+            timeout=120_000,
+        )
+        exercise.locator("[data-learning-evidence-state='stored']").wait_for(
+            state="visible",
+            timeout=20_000,
+        )
+
+        page.locator("[data-product-brand='escape']:visible").click(timeout=20_000)
+        page.wait_for_function(
+            """() => new URL(window.location.href).searchParams.get("surface") !== "curriculum" """,
+            timeout=20_000,
+        )
+        learning_data = open_learning_data_settings(page)
+        with page.expect_download(timeout=20_000) as download_info:
+            learning_data.locator("button[aria-label^='학습 작업 내보내기']").click()
+        download = download_info.value
+        download.save_as(str(DEPLOYED_WEB_ARCHIVE_PATH))
+        if not DEPLOYED_WEB_ARCHIVE_PATH.is_file():
+            raise VerificationError("deployed Web learning archive download was not saved")
+
+        from codaro.curriculum.learningArchive import materializeLearningArchive
+
+        archive = json.loads(DEPLOYED_WEB_ARCHIVE_PATH.read_text(encoding="utf-8"))
+        materialized = materializeLearningArchive(archive)
+        lineage = archive.get("lineage", [])
+        lesson_ref = lineage[0].get("lessonRef") if lineage and isinstance(lineage[0], dict) else None
+        root_hash = archive.get("manifest", {}).get("rootHash")
+        if lesson_ref != "30days/day01_헬로월드" or not isinstance(root_hash, str):
+            raise VerificationError("deployed Web archive identity is invalid")
+        if draft_source not in materialized.drafts.values():
+            raise VerificationError("deployed Web archive did not preserve the edited exercise draft")
+        evidence_events = materialized.evidenceArchive.get("events", [])
+        if not any(
+            isinstance(event, dict)
+            and event.get("kind") == "StrongCheckVerified"
+            and event.get("runtimeTier") == "web"
+            for event in evidence_events
+        ):
+            raise VerificationError("deployed Web archive has no stored Web strong-check evidence")
+        screenshot_path = SCREENSHOT_ROOT / "deployed-web-learning-export.png"
+        page.screenshot(path=str(screenshot_path))
+        if console_errors:
+            raise VerificationError(f"deployed Web console errors: {console_errors}")
+        return {
+            "archivePath": display_path(DEPLOYED_WEB_ARCHIVE_PATH),
+            "draftSource": draft_source,
+            "evidenceEvents": len(evidence_events),
+            "lessonRef": lesson_ref,
+            "productUrl": page.url,
+            "rootHash": root_hash,
+            "screenshot": display_path(screenshot_path),
+            "sourceUrl": lesson_url,
+        }
+    finally:
+        browser.close()
+
+
 def verify_web_to_local_roundtrip(
     page: Page,
     *,
@@ -520,8 +631,11 @@ def verify_web_to_local_roundtrip(
     )
     wait_for_editor_source(page, draft_source)
     draft_restored_after_reload = page.evaluate(
-        """expected => [...document.querySelectorAll(".cm-content")]
-          .some((editor) => editor.textContent?.includes(expected.trim()))""",
+        r"""expected => {
+          const normalized = expected.replace(/\s+/g, "");
+          return [...document.querySelectorAll(".cm-content")]
+            .some((editor) => (editor.textContent ?? "").replace(/\s+/g, "").includes(normalized));
+        }""",
         draft_source,
     )
     page.locator("[data-product-brand='escape']:visible").click()
@@ -612,6 +726,158 @@ def verify_web_to_local_roundtrip(
     failures = [f"{check} check failed" for check, passed in checks.items() if not passed]
     return {
         "id": "local-learning-web-archive-roundtrip",
+        "surface": "curriculum",
+        "snapshot": snapshot,
+        "screenshot": display_path(screenshot_path),
+        "checks": checks,
+        "passed": not failures,
+        "failures": failures,
+    }
+
+
+def verify_deployed_web_to_local_roundtrip(
+    page: Page,
+    *,
+    hwnd: int,
+    app_port: int,
+    deployed_archive: dict[str, Any],
+) -> dict[str, Any]:
+    from codaro.curriculum.learningArchive import materializeLearningArchive
+
+    source_archive = json.loads(DEPLOYED_WEB_ARCHIVE_PATH.read_text(encoding="utf-8"))
+    source_materialized = materializeLearningArchive(source_archive)
+    lesson_ref = str(deployed_archive["lessonRef"])
+    draft_source = str(deployed_archive["draftSource"])
+    root_hash = str(deployed_archive["rootHash"])
+    category, content_id = lesson_ref.split("/", 1)
+    url = (
+        f"http://127.0.0.1:{app_port}/?surface=curriculum"
+        f"&category={quote(category)}&lesson={quote(content_id)}&runtime=local#curriculum"
+    )
+    response = page.goto(url, wait_until="domcontentloaded", timeout=45_000)
+    if response is not None and response.status >= 400:
+        raise VerificationError(f"deployed-web-to-local-roundtrip returned HTTP {response.status}")
+    page.wait_for_selector(
+        f"[data-learning-lesson-ref='{lesson_ref}']",
+        state="visible",
+        timeout=45_000,
+    )
+    dpr = float(page.evaluate("window.devicePixelRatio"))
+    resize_native_client(hwnd, 1024, 768, dpr)
+    page.locator("[data-product-brand='escape']:visible").click()
+    page.wait_for_selector("[data-local-home-surface='true']", state="visible", timeout=20_000)
+    learning_data = open_learning_data_settings(page)
+    learning_data.locator("[data-learning-archive-import-input='true']").set_input_files(
+        str(DEPLOYED_WEB_ARCHIVE_PATH)
+    )
+    page.wait_for_selector(
+        f"[data-learning-lesson-ref='{lesson_ref}']",
+        state="visible",
+        timeout=45_000,
+    )
+    wait_for_editor_source(page, draft_source)
+    imported = page.evaluate(
+        """async () => {
+          const [archiveResponse, evidenceResponse] = await Promise.all([
+            fetch("/api/curriculum/learning-archive/current"),
+            fetch("/api/curriculum/evidence/archive"),
+          ]);
+          if (!archiveResponse.ok || !evidenceResponse.ok) {
+            throw new Error(`archive APIs failed: ${archiveResponse.status}/${evidenceResponse.status}`);
+          }
+          const archive = await archiveResponse.json();
+          const evidence = await evidenceResponse.json();
+          return {
+            rootHash: archive?.manifest?.rootHash ?? null,
+            runtimeTier: archive?.manifest?.runtimeTier ?? null,
+            evidenceEvents: evidence?.events ?? [],
+          };
+        }"""
+    )
+    page.reload(wait_until="domcontentloaded", timeout=45_000)
+    page.wait_for_selector(
+        f"[data-learning-lesson-ref='{lesson_ref}']",
+        state="visible",
+        timeout=45_000,
+    )
+    wait_for_editor_source(page, draft_source)
+    draft_restored_after_reload = page.evaluate(
+        r"""expected => {
+          const normalized = expected.replace(/\s+/g, "");
+          return [...document.querySelectorAll(".cm-content")]
+            .some((editor) => (editor.textContent ?? "").replace(/\s+/g, "").includes(normalized));
+        }""",
+        draft_source,
+    )
+    page.locator("[data-product-brand='escape']:visible").click()
+    page.wait_for_selector("[data-local-home-surface='true']", state="visible", timeout=20_000)
+    learning_data = open_learning_data_settings(page)
+    with page.expect_download(timeout=20_000) as download_info:
+        learning_data.locator("button[aria-label^='학습 작업 내보내기']").click()
+    download_path = download_info.value.path()
+    if download_path is None:
+        raise VerificationError("deployed Web archive Local re-export has no path")
+    reexported = json.loads(Path(download_path).read_text(encoding="utf-8"))
+    reexport_materialized = materializeLearningArchive(reexported)
+    source_events = {
+        str(event.get("eventId")): event
+        for event in source_materialized.evidenceArchive.get("events", [])
+        if isinstance(event, dict) and event.get("eventId")
+    }
+    reexport_events = {
+        str(event.get("eventId")): event
+        for event in reexport_materialized.evidenceArchive.get("events", [])
+        if isinstance(event, dict) and event.get("eventId")
+    }
+    source_evidence_preserved = all(
+        reexport_events.get(event_id) == event
+        for event_id, event in source_events.items()
+    )
+    portable_payload = (
+        source_materialized.document == reexport_materialized.document
+        and source_materialized.drafts == reexport_materialized.drafts
+        and source_materialized.virtualDirectories == reexport_materialized.virtualDirectories
+        and source_materialized.virtualFiles == reexport_materialized.virtualFiles
+        and source_materialized.packages == reexport_materialized.packages
+        and source_materialized.automationDrafts == reexport_materialized.automationDrafts
+        and source_evidence_preserved
+    )
+    screenshot_path = SCREENSHOT_ROOT / "deployed-web-to-local-learning-roundtrip.png"
+    page.screenshot(path=str(screenshot_path))
+    imported_events = {
+        str(event.get("eventId")): event
+        for event in imported.get("evidenceEvents", [])
+        if isinstance(event, dict) and event.get("eventId")
+    }
+    snapshot = {
+        "archivePath": deployed_archive["archivePath"],
+        "draftRestoredAfterReload": draft_restored_after_reload,
+        "importedRootHash": imported.get("rootHash"),
+        "importedRuntimeTier": imported.get("runtimeTier"),
+        "lessonRef": lesson_ref,
+        "portablePayload": portable_payload,
+        "publicEvidenceEvents": len(source_events),
+        "publicProductUrl": deployed_archive["productUrl"],
+        "publicScreenshot": deployed_archive["screenshot"],
+        "publicSourceUrl": deployed_archive["sourceUrl"],
+        "reexportEvidenceEvents": len(reexport_events),
+        "reexportRuntimeTier": reexported.get("manifest", {}).get("runtimeTier"),
+    }
+    checks = {
+        "deployedArchiveSaved": DEPLOYED_WEB_ARCHIVE_PATH.is_file(),
+        "archiveCommitted": imported.get("rootHash") == root_hash,
+        "webRuntimeIdentity": imported.get("runtimeTier") == "web",
+        "publicEvidenceImported": all(
+            imported_events.get(event_id) == event
+            for event_id, event in source_events.items()
+        ),
+        "draftReload": bool(draft_restored_after_reload),
+        "portableReexport": portable_payload
+        and reexported.get("manifest", {}).get("runtimeTier") == "web",
+    }
+    failures = [f"{check} check failed" for check, passed in checks.items() if not passed]
+    return {
+        "id": "deployed-web-to-local-learning-roundtrip",
         "surface": "curriculum",
         "snapshot": snapshot,
         "screenshot": display_path(screenshot_path),
@@ -722,6 +988,11 @@ def build_web_origin_learning_archive(app_port: int) -> dict[str, str]:
 
 def open_learning_data_settings(page: Page) -> Any:
     settings = page.locator("[data-product-appearance-settings='true']:visible")
+    if not settings.count():
+        sidebar_trigger = page.locator("[data-sidebar='trigger']:visible").first
+        sidebar_trigger.wait_for(state="visible", timeout=20_000)
+        sidebar_trigger.click()
+        settings = page.locator("[data-product-appearance-settings='true']:visible")
     settings.wait_for(state="visible", timeout=20_000)
     settings.click()
     learning_data = page.locator("[data-product-learning-data-settings='true']:visible")
@@ -739,8 +1010,11 @@ def open_learning_data_settings(page: Page) -> Any:
 def wait_for_editor_source(page: Page, expected: str) -> None:
     try:
         page.wait_for_function(
-            """expected => [...document.querySelectorAll(".cm-content")]
-              .some((editor) => editor.textContent?.includes(expected.trim()))""",
+            r"""expected => {
+              const normalized = expected.replace(/\s+/g, "");
+              return [...document.querySelectorAll(".cm-content")]
+                .some((editor) => (editor.textContent ?? "").replace(/\s+/g, "").includes(normalized));
+            }""",
             arg=expected,
             timeout=30_000,
         )

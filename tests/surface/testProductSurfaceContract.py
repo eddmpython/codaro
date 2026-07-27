@@ -219,6 +219,29 @@ def testNotebookKeepsMobileTitleAndCollapsesSecondaryCellActions() -> None:
     assert "background curriculum notice leaked into the free notebook top lane" in productGate
 
 
+def testPagesDeploymentVerifiesThePublicWebToInstalledLocalPath() -> None:
+    workflow = _read(".github/workflows/pages.yml")
+    verifier = _read("tests/product/verifyWebView2ProductSmoke.py")
+
+    for marker in (
+        "outputs:",
+        "page_url: ${{ steps.deployment.outputs.page_url }}",
+        "verify-deployed-web-to-local:",
+        "needs: deploy",
+        "CODARO_DEPLOYED_WEB_URL: ${{ needs.deploy.outputs.page_url }}",
+        "Verify deployed Web to installed Local",
+        "deployed-web-to-local-evidence",
+    ):
+        assert marker in workflow
+    assert "capture_deployed_web_learning_archive(playwright)" in verifier
+    assert '"deployed-web-to-local-learning-roundtrip"' in verifier
+    assert "public deployed Web edit, strong verification, archive export" in verifier
+    evidence_upload = workflow.split("- name: Upload deployed product evidence", 1)[1]
+    assert "cargo-target/" not in evidence_upload
+    assert "deployed-web-learning-archive.json" in evidence_upload
+    assert "screenshots/" in evidence_upload
+
+
 def testAppDelegatesProductSurfaceSelectionPolicy() -> None:
     app = _read("editor/src/App.tsx")
     selectionHook = _read("editor/src/hooks/useProductSurfaceSelection.ts")
