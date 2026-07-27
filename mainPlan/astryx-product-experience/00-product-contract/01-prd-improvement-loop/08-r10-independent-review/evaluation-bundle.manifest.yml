@@ -3,15 +3,15 @@ roundId: R10
 state: draft
 scope:
   sealState: draft
-  gitCommit: 525692a4f1e816894c0893c2b83f584d51287cdd
+  gitCommit: 0f0ee5e8725bbc8562d3eec3b0e2cbb8ce441f31
   dirtyDiffHash: 4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945
-  manifestHash: 3d39406157e7c69c3573353c106010ecd4c0325dcc8ef23be829b03be453fe7e
-  fileCount: 2675
-  totalBytes: 88264156
+  manifestHash: abc0722a283144424ea3641206f3b8c584366d39b379e648dd2aecebe285ca7e
+  fileCount: 2676
+  totalBytes: 88334914
 archive:
   path: output/test-runner/prd-evaluation-bundle/astryx-r10-evaluation.zip
-  sha256: fce8c8d1e325a1d50cce82fde1ed1f4c0081ea6d75ef9183fbd94fe65b8e40a1
-  bytes: 88779122
+  sha256: 8fb416c233bc1a709d3f81478a1eddd9889f3076b4bd3cbce8ab68ff9a2ebe94
+  bytes: 88849964
   format: zip
   compression: stored
   compressionMethod: 0
@@ -71,8 +71,8 @@ contracts:
   sha256: 3a7e5a28de2b81c7ee2b2f81c41f3bbedb8dd58efe3a6c23ee65b4cd57254dec
 files:
 - path: .github/workflows/ci.yml
-  sha256: 123310ed90910733dd06d1fea91d5b795b09da58dc36090006c24464cc103153
-  bytes: 8216
+  sha256: c8268c469b52dc5a5542cebecea4ff5f41dcbd61615c88607da7a436d61a0dcf
+  bytes: 8386
   kind: repository
   sourcePath: .github/workflows/ci.yml
 - path: .github/workflows/launcher-release.yml
@@ -101,8 +101,8 @@ files:
   kind: repository
   sourcePath: .github/workflows/publish.yml
 - path: .github/workflows/release-quality.yml
-  sha256: 5abe1f56f7a2800e5e945282092fd45e6b564cdf021ac13de92754400a6f78fd
-  bytes: 2422
+  sha256: 47bd1fba0d3fd9c2753b0eb2d2aef46285f0c5d119cc751155ce9d2e030d9d9e
+  bytes: 2432
   kind: repository
   sourcePath: .github/workflows/release-quality.yml
 - path: .github/workflows/release-smoke.yml
@@ -231,8 +231,8 @@ files:
   kind: repository
   sourcePath: assets/brand/tools/buildBrandAssets.py
 - path: assets/brand/tools/buildDesignSystem.py
-  sha256: a6c3d8aa6c57ed557a1b4c15ae391538e9ca504125bb25f7fff24431b7cbe569
-  bytes: 41387
+  sha256: 8bc45bcfe66cf84912218257e2a9693c828556a98260cee6febbde1aff89f040
+  bytes: 42906
   kind: repository
   sourcePath: assets/brand/tools/buildDesignSystem.py
 - path: assets/brand/tools/buildVisualAssets.py
@@ -3731,8 +3731,8 @@ files:
   kind: repository
   sourcePath: docs/skills/ops/foundation/environment.md
 - path: docs/skills/ops/foundation/testing-and-gates.md
-  sha256: e63f6d3ad60794a6b0c5f848b43b673dc65e0c6d7ce1253fc098892e1725eaf9
-  bytes: 53568
+  sha256: fb8ddf88c96fe64a5766d7634b1616a3e1f4da43a12513c1b36e7f15477e8a65
+  bytes: 53684
   kind: repository
   sourcePath: docs/skills/ops/foundation/testing-and-gates.md
 - path: docs/skills/ops/product/branding.md
@@ -3756,8 +3756,8 @@ files:
   kind: repository
   sourcePath: docs/skills/ops/product/learning-efficacy-operations.md
 - path: docs/skills/ops/product/service-candidate.md
-  sha256: de895ec2d802084bf03f07cb2ae9d381b817d90aefcc18fd49192166f2e895c8
-  bytes: 27559
+  sha256: 6665882964c8f99e3aa1c98eb8054b8074f7416e13ffa14e4a8d1c3dd0a71254
+  bytes: 27755
   kind: repository
   sourcePath: docs/skills/ops/product/service-candidate.md
 - path: docs/skills/ops/product/world-class-blueprint.md
@@ -5746,7 +5746,7 @@ files:
   kind: repository
   sourcePath: editor/src/lib/workLoop.ts
 - path: editor/src/main.tsx
-  sha256: dffa1ab075164853f134f6840aaa6dabfcff117f79f2b129a997113b77f807cf
+  sha256: cc09d320728ccc3adb4ec188b6e367f022f48df445b0f4f608e4343135af71de
   bytes: 653
   kind: repository
   sourcePath: editor/src/main.tsx
@@ -5761,8 +5761,8 @@ files:
   kind: repository
   sourcePath: editor/src/styles/generated/codaro.js
 - path: editor/src/styles/generated/codaroTheme.css
-  sha256: f734f9125b4973036b3216316d4b69e919d70d3ac8e2205f41491dba4a57e60d
-  bytes: 25868
+  sha256: ef55e6f1f35506c53cc3c2ee1cf0d0ce1fa94366ab2f993cda7113c7e5bfa717
+  bytes: 26312
   kind: repository
   sourcePath: editor/src/styles/generated/codaroTheme.css
 - path: editor/src/styles/generated/codaroTheme.ts
@@ -5781,8 +5781,8 @@ files:
   kind: repository
   sourcePath: editor/src/styles/generated/provenance.json
 - path: editor/src/styles/generated/socialLinks.tsx
-  sha256: 24c378d6968cfb044be3b98d477ec3f5e7b6cd49ef19086b1d2275850023b5a5
-  bytes: 11182
+  sha256: acf72e04809f98e308a69e3fe823754bb361607c721c600ccdde34332dbcc2dc
+  bytes: 12257
   kind: repository
   sourcePath: editor/src/styles/generated/socialLinks.tsx
 - path: editor/src/styles/layers.css
@@ -6165,8 +6165,8 @@ files:
   kind: repository
   sourcePath: landing/src/styles/generated/codaro.js
 - path: landing/src/styles/generated/codaroTheme.css
-  sha256: e2fae405d4c9c279d3ad656cf5f6ad1e0505fda1dbe3c75d31749f25f7a30eb8
-  bytes: 24957
+  sha256: 7602109c68c5cecad649f8951be6487b0113cac3f364b26142118bb3372e1809
+  bytes: 25401
   kind: repository
   sourcePath: landing/src/styles/generated/codaroTheme.css
 - path: landing/src/styles/generated/codaroTheme.ts
@@ -6185,8 +6185,8 @@ files:
   kind: repository
   sourcePath: landing/src/styles/generated/provenance.json
 - path: landing/src/styles/generated/socialLinks.tsx
-  sha256: 24c378d6968cfb044be3b98d477ec3f5e7b6cd49ef19086b1d2275850023b5a5
-  bytes: 11182
+  sha256: acf72e04809f98e308a69e3fe823754bb361607c721c600ccdde34332dbcc2dc
+  bytes: 12257
   kind: repository
   sourcePath: landing/src/styles/generated/socialLinks.tsx
 - path: landing/src/styles/homeAstryx.css
@@ -10089,14 +10089,9 @@ files:
   bytes: 930
   kind: repository
   sourcePath: launcher/codaro-launcher/src/webview.rs
-- path: mainPlan/astryx-product-experience/01-design-foundation/04-visual-accessibility-gates/README.md
-  sha256: bd592f419e8fe889556c238d30f35040a4a7652f3c0e5853409d59f3a31c68ad
-  bytes: 2120
-  kind: repository
-  sourcePath: mainPlan/astryx-product-experience/01-design-foundation/04-visual-accessibility-gates/README.md
 - path: mainPlan/astryx-product-experience/01-design-foundation/README.md
-  sha256: 69e2fc7cceaa301c37f9f4ca8a6a3e565b75ab202a5c70b841764af61e3572b8
-  bytes: 4706
+  sha256: 157f1fddb2ceaedb72c061fcb34e2a4bab0281bd7a3bd19b887b2f6510b52248
+  bytes: 5388
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/01-design-foundation/README.md
 - path: mainPlan/astryx-product-experience/02-learning-method/README.md
@@ -10175,8 +10170,8 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/07-landing-experience/README.md
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/README.md
-  sha256: c343fb7d22bc851ec016bbfe2b0fb198486a925a62cd0876595d2b64d84cd488
-  bytes: 4333
+  sha256: e1a91e98e0e412af6239a76c8a5ef614b005db79e77639c03c2f10bc523cd6f8
+  bytes: 4315
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/README.md
 - path: mainPlan/astryx-product-experience/08-learning-content/00-identity-integrity/content-ledger/30days.yml
@@ -10940,18 +10935,18 @@ files:
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/09-repository-simplification/README.md
 - path: mainPlan/astryx-product-experience/10-quality-release/README.md
-  sha256: f0178b4c8c55fe5d5b60d2eddfdb4410f38c6c7e210d47372d7f7b75f7ada14e
-  bytes: 31273
+  sha256: 1ad089d8b7d632076e06803d298999dec11ca6fd2484fbb1f354980a60d08b3a
+  bytes: 31786
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/10-quality-release/README.md
 - path: mainPlan/astryx-product-experience/README.md
-  sha256: 63d69113a7fdaa84ce5f8ad077ddc570dab9861d161fe1aed4f6256cec56900b
-  bytes: 27533
+  sha256: 7c69805f36370e9d166f37de95057378423114c15c2e7ea1cc6ae96e8ce2a0be
+  bytes: 27806
   kind: repository
   sourcePath: mainPlan/astryx-product-experience/README.md
 - path: pyproject.toml
-  sha256: 542d68a0ad6c70e413212eeb3bc1476dd93b330db67c1b37c16297d916f8eab3
-  bytes: 2898
+  sha256: 73a918b20610562b30c709a0f5d85196f236e3285bbb787e4c282658bd7c7ab9
+  bytes: 2924
   kind: repository
   sourcePath: pyproject.toml
 - path: src/codaro/DEV.md
@@ -13030,8 +13025,8 @@ files:
   kind: repository
   sourcePath: tests/product/verifyPrdEvaluationReport.py
 - path: tests/product/verifyProductQualityAudit.py
-  sha256: 7d373697757c93be1155f175b4ab55f79d067ebdc52b8fe5f775e6352fd6a726
-  bytes: 46706
+  sha256: 64b90af5ddecbda1e7a5ca722774926bff6f2564ecc8ecf4aa257ee410ae6531
+  bytes: 46742
   kind: repository
   sourcePath: tests/product/verifyProductQualityAudit.py
 - path: tests/product/verifyReleaseResearchOperations.py
@@ -13040,8 +13035,8 @@ files:
   kind: repository
   sourcePath: tests/product/verifyReleaseResearchOperations.py
 - path: tests/run.py
-  sha256: 840dc2cd6ca7bd1d0d159f84f38f95bcd12c2a4e695832ecfefe40cd627359f8
-  bytes: 74228
+  sha256: 057e714809ba1ed62abc6b3580aca2e6f75e8370f63765d55c889b21267936d5
+  bytes: 74546
   kind: repository
   sourcePath: tests/run.py
 - path: tests/runtime/testAppRuntime.py
@@ -13095,8 +13090,8 @@ files:
   kind: repository
   sourcePath: tests/runtime/testReactiveMarkdown.py
 - path: tests/runtime/testRunEntrypoint.py
-  sha256: a8c65fe32b19d5a53dc9edc71fe213b6009cc8eab06896fcf1006aa89f5533be
-  bytes: 25166
+  sha256: 027451798e2cf0809b08df64246e1b64205d47c6d7d3768a13f9c4e25c07960e
+  bytes: 25454
   kind: repository
   sourcePath: tests/runtime/testRunEntrypoint.py
 - path: tests/runtime/testRuntime.py
@@ -13229,6 +13224,11 @@ files:
   bytes: 3485
   kind: repository
   sourcePath: tests/surface/testUiValueBinding.py
+- path: tests/surface/testVisualAccessibilityBrowser.py
+  sha256: ea8778eeb73d3a28081a4061415d068a4243f9820d0b429b0578fbd10d56c698
+  bytes: 2538
+  kind: repository
+  sourcePath: tests/surface/testVisualAccessibilityBrowser.py
 - path: tests/surface/testWidgetBridge.py
   sha256: f8dbd478921ce2fea19196b503062a70b22227e3170f7792abccfe1f5a4b1435
   bytes: 5192
@@ -13354,6 +13354,11 @@ files:
   bytes: 23315
   kind: repository
   sourcePath: tests/surface/verifyThemeRuntimePlaywright.py
+- path: tests/surface/verifyVisualAccessibilityPlaywright.py
+  sha256: 5fd6bf02294dbde5e86a50a2f712235a259cb89a8115b19b9849c8f8f14f97c2
+  bytes: 40141
+  kind: repository
+  sourcePath: tests/surface/verifyVisualAccessibilityPlaywright.py
 - path: tests/surface/verifyWidgetBridgeRoundTrip.py
   sha256: a3dd597353a1c0bf9098c29e29e3194bfc342c155accc4415fbf37a674081f60
   bytes: 4773
@@ -13440,7 +13445,7 @@ files:
   kind: repository
   sourcePath: tests/verifyRootClean.py
 - path: uv.lock
-  sha256: fbb33c1cae7e816fe9581589c1c29f86f1fb8b2a1c26736de718f1124ecdb56a
-  bytes: 322287
+  sha256: 03860dcb512eb04365f3a470ab97035bd68d974e7ff966eb472e8b8a7e5b7f0f
+  bytes: 345319
   kind: repository
   sourcePath: uv.lock
