@@ -7,6 +7,14 @@ from enum import Enum
 from typing import Any
 
 
+DEFAULT_TASK_PERMISSION_SCOPES = [
+    "filesystem.read",
+    "filesystem.write",
+    "network",
+    "process.execute",
+]
+
+
 class TaskStatus(str, Enum):
     PENDING = "pending"
     RUNNING = "running"
@@ -24,9 +32,12 @@ class TaskDefinition:
     schedule: str | None = None
     inputs: dict[str, Any] = field(default_factory=dict)
     outputs: list[str] = field(default_factory=list)
+    permissionScopes: list[str] = field(default_factory=lambda: list(DEFAULT_TASK_PERMISSION_SCOPES))
+    riskLevel: str = "destructive"
+    safetyApproval: dict[str, Any] | None = None
     createdAt: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updatedAt: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
-    enabled: bool = True
+    enabled: bool = False
 
     def serialize(self) -> dict[str, Any]:
         return {
@@ -37,6 +48,9 @@ class TaskDefinition:
             "schedule": self.schedule,
             "inputs": self.inputs,
             "outputs": self.outputs,
+            "permissionScopes": self.permissionScopes,
+            "riskLevel": self.riskLevel,
+            "safetyApproval": self.safetyApproval,
             "createdAt": self.createdAt,
             "updatedAt": self.updatedAt,
             "enabled": self.enabled,

@@ -120,8 +120,8 @@ class CaptureProductVisualsTest(unittest.TestCase):
             with tempfile.TemporaryDirectory(prefix="codaro-automation-fixture-b-") as second:
                 firstRoot = Path(first)
                 secondRoot = Path(second)
-                PRODUCT_RUNNER.seedLocalAutomationFixture(firstRoot)
-                PRODUCT_RUNNER.seedLocalAutomationFixture(secondRoot)
+                PRODUCT_RUNNER.seedLocalAutomationFixture(firstRoot, firstRoot / "workspace")
+                PRODUCT_RUNNER.seedLocalAutomationFixture(secondRoot, secondRoot / "workspace")
                 firstFiles = {
                     path.relative_to(firstRoot).as_posix(): path.read_bytes()
                     for path in firstRoot.rglob("*")

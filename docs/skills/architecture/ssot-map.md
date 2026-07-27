@@ -96,6 +96,7 @@ Codaro에서 기준 파일은 아래 순서로 본다. 같은 의미의 규칙�
 | 기준 | 파일 | 역할 |
 |---|---|---|
 | automation task flow | `src/codaro/automation/taskFlow.py` | task 조회/실행/스케줄/webhook/E-Stop payload와 scheduler 접점의 domain 경계 |
+| automation task safety | `src/codaro/automation/taskSafety.py` | 태스크 권한·위험 확인 receipt와 문서·schedule fingerprint 무효화 기준 |
 | automation plan flow | `src/codaro/automation/planFlow.py` | plan 실행/status/pause/resume payload와 `AutomationLoop` 보관의 domain 경계 |
 | automation workflow flow | `src/codaro/automation/workflowFlow.py` | workflow 조회/생성/삭제/실행/run 조회 payload와 `WorkflowEngine` 접점의 domain 경계 |
 | automation input policy flow | `src/codaro/automation/inputPolicyFlow.py` | input guard 정책 조회/수정 payload와 screen region 변환의 domain 경계 |

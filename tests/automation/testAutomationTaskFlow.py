@@ -11,14 +11,17 @@ from codaro.automation.taskFlow import (
     automationSchedulerStatusPayload,
     automationTaskScheduler,
     clearAutomationStopPayload,
+    confirmAutomationTaskSafetyPayload,
     createAutomationTaskFromCodePayload,
     createAutomationTaskFromRecipePayload,
     createAutomationTaskPayload,
     getAutomationTaskPayload,
     rehydrateAutomationSchedules,
     resetAutomationTaskFlowState,
+    runAutomationTaskPayload,
     setAutomationTaskSchedulePayload,
     triggerAutomationStopPayload,
+    updateAutomationTaskPayload,
 )
 from codaro.automation.taskModel import TaskStatus
 
@@ -90,8 +93,21 @@ def testCreateAutomationTaskFromRecipeRejectsUnsafeRecipe(tmp_path) -> None:
 
 def testRehydrateRestoresSchedulesAfterRestart(tmp_path) -> None:
     async def scenario() -> None:
+        (tmp_path / "report.py").write_text("# %% [code]\nprint('report')\n", encoding="utf-8")
         task = createAutomationTaskPayload(name="Report", documentPath="report.py")
         setAutomationTaskSchedulePayload(task["id"], schedule="@every_1m", workspaceRoot=str(tmp_path))
+        assert automationSchedulerStatusPayload()["jobCount"] == 0
+        confirmed = confirmAutomationTaskSafetyPayload(
+            task["id"],
+            confirmation=task["id"],
+            workspaceRoot=str(tmp_path),
+        )
+        assert confirmed["safety"]["status"] == "approved"
+        updateAutomationTaskPayload(
+            task["id"],
+            enabled=True,
+            workspaceRoot=str(tmp_path),
+        )
         assert automationSchedulerStatusPayload()["jobCount"] == 1
 
         # 재시작 시뮬레이션 — active 잡은 휘발(schedule 문자열은 task에 영속).
@@ -271,10 +287,21 @@ def testListTasksIncludesLastRunStatus() -> None:
 
 def testEStopCancelsScheduledAutomationTasks(tmp_path) -> None:
     async def scenario() -> None:
+        (tmp_path / "report.py").write_text("# %% [code]\nprint('report')\n", encoding="utf-8")
         task = createAutomationTaskPayload(name="Report", documentPath="report.py")
         setAutomationTaskSchedulePayload(
             task["id"],
             schedule="@every_1m",
+            workspaceRoot=str(tmp_path),
+        )
+        confirmAutomationTaskSafetyPayload(
+            task["id"],
+            confirmation=task["id"],
+            workspaceRoot=str(tmp_path),
+        )
+        updateAutomationTaskPayload(
+            task["id"],
+            enabled=True,
             workspaceRoot=str(tmp_path),
         )
 
@@ -286,3 +313,163 @@ def testEStopCancelsScheduledAutomationTasks(tmp_path) -> None:
         assert clearAutomationStopPayload()["active"] is False
 
     asyncio.run(scenario())
+
+
+def testNewTaskIsDisabledUntilExactSafetyConfirmation(tmp_path) -> None:
+    (tmp_path / "report.py").write_text("# %% [code]\nprint('ok')\n", encoding="utf-8")
+    task = createAutomationTaskPayload(
+        name="Report",
+        documentPath="report.py",
+        workspaceRoot=str(tmp_path),
+    )
+
+    assert task["enabled"] is False
+    assert task["safety"]["status"] == "confirmationRequired"
+    assert task["safety"]["reason"] == "not-confirmed"
+    assert task["safety"]["riskLevel"] == "destructive"
+    assert task["safety"]["permissionScopes"] == [
+        "filesystem.read",
+        "filesystem.write",
+        "network",
+        "process.execute",
+    ]
+
+    with pytest.raises(AutomationTaskFlowError) as wrongConfirmation:
+        confirmAutomationTaskSafetyPayload(
+            task["id"],
+            confirmation="confirm",
+            workspaceRoot=str(tmp_path),
+        )
+    assert wrongConfirmation.value.statusCode == 409
+
+    confirmed = confirmAutomationTaskSafetyPayload(
+        task["id"],
+        confirmation=task["id"],
+        workspaceRoot=str(tmp_path),
+    )
+    assert confirmed["enabled"] is False
+    assert confirmed["safety"]["status"] == "approved"
+    assert confirmed["safety"]["approvedAt"]
+
+
+def testManualRunRequiresEnabledCurrentSafetyReceipt(tmp_path) -> None:
+    (tmp_path / "report.py").write_text("# %% [code]\nprint('first')\n", encoding="utf-8")
+    task = createAutomationTaskPayload(
+        name="Report",
+        documentPath="report.py",
+        workspaceRoot=str(tmp_path),
+    )
+
+    with pytest.raises(AutomationTaskFlowError) as disabled:
+        asyncio.run(runAutomationTaskPayload(task["id"], workspaceRoot=str(tmp_path)))
+    assert disabled.value.statusCode == 403
+
+    confirmAutomationTaskSafetyPayload(
+        task["id"],
+        confirmation=task["id"],
+        workspaceRoot=str(tmp_path),
+    )
+    enabled = updateAutomationTaskPayload(
+        task["id"],
+        enabled=True,
+        workspaceRoot=str(tmp_path),
+    )
+    assert enabled["enabled"] is True
+    assert enabled["safety"]["status"] == "approved"
+    run = asyncio.run(runAutomationTaskPayload(task["id"], workspaceRoot=str(tmp_path)))
+    assert run["status"] == "success"
+    assert "first" in run["output"]
+
+    (tmp_path / "report.py").write_text("# %% [code]\nprint('changed')\n", encoding="utf-8")
+    with pytest.raises(AutomationTaskFlowError) as changed:
+        asyncio.run(runAutomationTaskPayload(task["id"], workspaceRoot=str(tmp_path)))
+    assert changed.value.statusCode == 409
+    assert "changed after safety confirmation" in changed.value.message
+
+
+def testScheduleChangeInvalidatesApprovalAndWaitsForReconfirmation(tmp_path) -> None:
+    (tmp_path / "report.py").write_text("# %% [code]\nprint('scheduled')\n", encoding="utf-8")
+    task = createAutomationTaskPayload(
+        name="Report",
+        documentPath="report.py",
+        workspaceRoot=str(tmp_path),
+    )
+    confirmAutomationTaskSafetyPayload(
+        task["id"],
+        confirmation=task["id"],
+        workspaceRoot=str(tmp_path),
+    )
+
+    scheduled = setAutomationTaskSchedulePayload(
+        task["id"],
+        schedule="@every_1m",
+        workspaceRoot=str(tmp_path),
+    )
+    assert scheduled["task"]["enabled"] is False
+    assert scheduled["task"]["safety"]["status"] == "confirmationRequired"
+    assert scheduled["task"]["safety"]["reason"] == "not-confirmed"
+    assert automationSchedulerStatusPayload()["jobCount"] == 0
+
+    with pytest.raises(AutomationTaskFlowError) as enableWithoutConfirmation:
+        updateAutomationTaskPayload(
+            task["id"],
+            enabled=True,
+            workspaceRoot=str(tmp_path),
+        )
+    assert enableWithoutConfirmation.value.statusCode == 409
+
+    confirmAutomationTaskSafetyPayload(
+        task["id"],
+        confirmation=task["id"],
+        workspaceRoot=str(tmp_path),
+    )
+    async def enableScheduled() -> None:
+        updateAutomationTaskPayload(
+            task["id"],
+            enabled=True,
+            workspaceRoot=str(tmp_path),
+        )
+        assert automationSchedulerStatusPayload()["jobCount"] == 1
+
+    asyncio.run(enableScheduled())
+
+
+def testRehydrateDisablesTaskWhenApprovedDocumentChanged(tmp_path) -> None:
+    (tmp_path / "report.py").write_text("# %% [code]\nprint('before')\n", encoding="utf-8")
+    task = createAutomationTaskPayload(
+        name="Report",
+        documentPath="report.py",
+        workspaceRoot=str(tmp_path),
+    )
+    setAutomationTaskSchedulePayload(
+        task["id"],
+        schedule="@every_1m",
+        workspaceRoot=str(tmp_path),
+    )
+    confirmAutomationTaskSafetyPayload(
+        task["id"],
+        confirmation=task["id"],
+        workspaceRoot=str(tmp_path),
+    )
+    async def enableAndStopScheduler() -> None:
+        updateAutomationTaskPayload(
+            task["id"],
+            enabled=True,
+            workspaceRoot=str(tmp_path),
+        )
+        automationTaskScheduler().cancelAll()
+
+    asyncio.run(enableAndStopScheduler())
+    (tmp_path / "report.py").write_text("# %% [code]\nprint('after')\n", encoding="utf-8")
+
+    async def rehydrate() -> dict[str, object]:
+        return rehydrateAutomationSchedules(str(tmp_path))
+
+    restored = asyncio.run(rehydrate())
+
+    assert restored["count"] == 0
+    assert automationSchedulerStatusPayload()["jobCount"] == 0
+    current = getAutomationTaskPayload(task["id"], workspaceRoot=str(tmp_path))
+    assert current["enabled"] is False
+    assert current["safety"]["status"] == "confirmationRequired"
+    assert current["safety"]["reason"] == "definition-changed"

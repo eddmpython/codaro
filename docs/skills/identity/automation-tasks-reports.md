@@ -21,6 +21,15 @@ whenToUse: 스케줄러 설계, 워크플로우 DAG 구현, audit trail 포맷 �
 - 태스크 실행 결과(변수, stdout, 에러)는 리포트 산출물로 조회 가능하다. 리포트는 제품의 1급 표면이 아니라 자동화 결과를 읽기 좋게 보여주는 결과물이다.
 - **비상 정지(E-Stop)**가 모든 자동화를 즉시 중단시킨다.
 
+## 영속 실행 안전
+
+- 새 태스크와 과거 안전 계약이 없는 태스크는 비활성 상태로 시작한다.
+- 태스크를 활성화하기 전에 파일 읽기, 파일 쓰기·삭제, 네트워크, 외부 프로세스 실행 범위와 파괴적 위험을 사용자에게 보여 주고 확인을 받는다.
+- 확인 receipt는 태스크 ID, 실제 문서 bytes, 문서 경로, schedule, permission scope, risk level에 결속한다.
+- 문서나 schedule, permission scope, risk level이 달라지면 기존 receipt를 인정하지 않고 다시 확인할 때까지 실행과 schedule 재무장을 막는다.
+- 수동 실행, webhook, workflow, scheduler callback과 서버 시작 시 schedule 복원은 모두 현재 receipt를 다시 검사한다.
+- E-Stop은 승인된 태스크에도 계속 적용되며, 승인 실패와 무효화는 audit trail에 남긴다.
+
 ## 셀 기반 자동화
 
 자동화도 결국 셀 조합이다. Python 실행 셀에서 시작하되, `executionKind`로 브라우저, OS, 마우스, 이미지, 태스크, 스킬 실행을 구분한다. 이렇게 해야 학습 셀, 실습 셀, 자동화 셀이 같은 notebook/cell 모델 위에서 이어진다.

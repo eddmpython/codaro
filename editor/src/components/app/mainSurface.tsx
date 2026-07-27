@@ -72,6 +72,7 @@ type MainSurfaceProps = {
   onAsk: (messageOverride?: string, scopeOverride?: TeacherScope) => void;
   onCellAsk: (action: CellAiAction, block: BlockConfig, question?: string) => void;
   onConnectAi: () => void;
+  onConfirmTaskSafety: (task: TaskDefinition) => void;
   onDeleteCell: (blockId: string) => void;
   onDraftChange: (blockId: string, value: string) => void;
   onNavigateCurriculumBlock: (blockId: string) => void;
@@ -244,6 +245,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
       scheduler={props.scheduler}
       tasks={props.tasks.tasks}
       onRefresh={props.onRefreshAutomation}
+      onConfirmTaskSafety={props.onConfirmTaskSafety}
       onRunTask={props.onRunTask}
       onToggleTask={props.onToggleTask}
       onToggleEStop={props.onToggleEStop}

@@ -99,6 +99,24 @@ export async function runAutomationTask(task: TaskDefinition, apiOnline: boolean
   };
 }
 
+export async function confirmAutomationTaskSafety(
+  task: TaskDefinition,
+  apiOnline: boolean,
+): Promise<AutomationActionResult> {
+  if (!apiOnline) {
+    throw new Error(translate("automation.taskRunFailed.title"));
+  }
+  await codaroApi.confirmTaskSafety(task.id);
+  return {
+    refresh: true,
+    notice: {
+      tone: "success",
+      title: translate("automation.safety.confirmed"),
+      detail: task.name || task.documentPath,
+    },
+  };
+}
+
 export async function setAutomationTaskEnabled(
   task: TaskDefinition,
   enabled: boolean,

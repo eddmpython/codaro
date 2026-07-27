@@ -6,7 +6,7 @@
 
 Local을 웹의 큰 버전이 아니라 실제 파일, 패키지, terminal, schedule, webhook, GUI automation을 다루는 강한 작업대로 만든다. 디자인은 Run과 같고 capability와 밀도만 확장한다.
 
-착수 의존은 `00-product-contract`, `02-learning-method`, `03-product-shell`, `04-web-learning`이다. 남은 종료 조건은 Windows 10 22H2 Fixed Version lock, scheduler safety와 사람 시각·보조기술 검수다.
+착수 의존은 `00-product-contract`, `02-learning-method`, `03-product-shell`, `04-web-learning`이다. 남은 종료 조건은 Windows 10 22H2 Fixed Version lock과 사람 시각·보조기술 검수다.
 
 ## Local 홈
 
@@ -21,7 +21,6 @@ Local을 웹의 큰 버전이 아니라 실제 파일, 패키지, terminal, sche
 - 좌측 secondary nav: 내 task, workflow, schedule, integrations
 - main: 선택한 task의 코드 또는 recipe, trigger, input, permission
 - run inspector: 상태, 시작/종료, stdout/stderr, 생성 파일, audit event
-- persistent safety: E-Stop, permission scope, destructive action confirmation
 - empty/error/loading/paused/scheduled/running/succeeded/failed 상태를 모두 설계한다.
 - 자동화 설명용 marketing card를 쓰지 않고 반복 작업을 빠르게 scan하고 실행하는 operational layout을 쓴다.
 

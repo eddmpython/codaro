@@ -6,6 +6,10 @@ tasks: () => requestJson<TaskListPayload>("/api/tasks"),
 updateTask: (taskId: string, payload: { enabled?: boolean }) =>
     putJson<TaskDefinition>(`/api/tasks/${encodeURIComponent(taskId)}`, payload),
 runTask: (taskId: string) => postJson<TaskRun>(`/api/tasks/${encodeURIComponent(taskId)}/run`, {}),
+confirmTaskSafety: (taskId: string) =>
+    postJson<TaskDefinition>(`/api/tasks/${encodeURIComponent(taskId)}/safety/confirm`, {
+      confirmation: taskId,
+    }),
 schedulerStatus: () => requestJson<SchedulerStatus>("/api/scheduler/status"),
 eStop: () => requestJson<EStopStatus>("/api/automation/e-stop"),
 triggerEStop: (reason: string) => postJson<EStopStatus>("/api/automation/e-stop", { reason }),

@@ -11,6 +11,7 @@ from .scheduler import TaskScheduler, parseScheduleSeconds
 from .taskModel import TaskDefinition, TaskRun, TaskStatus
 from .taskRegistry import getTaskRegistry
 from .taskRunner import TaskRunner
+from .taskSafety import TaskSafetyError, confirmTaskSafety, requireTaskSafety, taskSafetyStatus
 
 
 def _shouldNotifyRun(run: TaskRun, diff: RunDiff) -> bool:
@@ -70,7 +71,40 @@ class AutomationTaskFlowError(Exception):
 _scheduler: TaskScheduler | None = None
 
 
-def listAutomationTasksPayload() -> dict[str, Any]:
+def _serializeAutomationTask(task: TaskDefinition, *, workspaceRoot: str) -> dict[str, Any]:
+    payload = task.serialize()
+    payload["safety"] = taskSafetyStatus(task, workspaceRoot=workspaceRoot)
+    return payload
+
+
+def _recordTaskSafetyBlocked(task: TaskDefinition, *, reason: str, source: str) -> None:
+    from .audit import getAuditTrail
+
+    getAuditTrail().record(
+        "taskSafetyBlocked",
+        source,
+        {
+            "taskId": task.id,
+            "riskLevel": task.riskLevel,
+            "permissionScopes": list(task.permissionScopes),
+            "reason": reason,
+        },
+        success=False,
+        error=reason,
+    )
+
+
+def _requireTaskReady(task: TaskDefinition, *, workspaceRoot: str, source: str) -> dict[str, Any]:
+    if not task.enabled:
+        raise AutomationTaskFlowError(403, "Task is disabled")
+    try:
+        return requireTaskSafety(task, workspaceRoot=workspaceRoot)
+    except TaskSafetyError as error:
+        _recordTaskSafetyBlocked(task, reason=error.reason, source=source)
+        raise AutomationTaskFlowError(409, error.message) from error
+
+
+def listAutomationTasksPayload(*, workspaceRoot: str = ".") -> dict[str, Any]:
     registry = getTaskRegistry()
     tasks = registry.listTasks()
     entries: list[dict[str, Any]] = []
@@ -78,7 +112,7 @@ def listAutomationTasksPayload() -> dict[str, Any]:
         # 목록에 마지막 실행 상태를 동봉한다 — 프론트가 실패한 자동화를 한눈에 배지로 보여줄 수
         # 있게(단건 조회 getAutomationTaskPayload와 동일한 lastRun 형태로 일관). 무인 실행에서
         # "어떤 자동화가 실패 중인지"를 태스크를 일일이 열지 않고 파악하는 신뢰 신호.
-        entry = task.serialize()
+        entry = _serializeAutomationTask(task, workspaceRoot=workspaceRoot)
         lastRun = registry.getLastRun(task.id)
         if lastRun is not None:
             entry["lastRun"] = lastRun.serialize()
@@ -96,6 +130,7 @@ def createAutomationTaskPayload(
     description: str = "",
     schedule: str | None = None,
     inputs: dict[str, Any] | None = None,
+    workspaceRoot: str = ".",
 ) -> dict[str, Any]:
     task = getTaskRegistry().create(
         name=name,
@@ -104,7 +139,7 @@ def createAutomationTaskPayload(
         schedule=schedule,
         inputs=inputs,
     )
-    return task.serialize()
+    return _serializeAutomationTask(task, workspaceRoot=workspaceRoot)
 
 
 def _harvestSlug(name: str) -> str:
@@ -152,10 +187,11 @@ def createAutomationTaskFromCodePayload(
         documentPath=relPath,
         description=description,
         inputs=inputs,
+        workspaceRoot=workspaceRoot,
     )
     if schedule is not None:
         setAutomationTaskSchedulePayload(payload["id"], schedule=schedule, workspaceRoot=workspaceRoot)
-        payload = getAutomationTaskPayload(payload["id"])
+        payload = getAutomationTaskPayload(payload["id"], workspaceRoot=workspaceRoot)
     return {"created": True, "documentPath": relPath, "task": payload}
 
 
@@ -197,7 +233,7 @@ def createAutomationTaskFromRecipePayload(
     )
     return {
         "created": True,
-        "task": task.serialize(),
+        "task": _serializeAutomationTask(task, workspaceRoot=str(recipePath.parent)),
         "documentPath": str(recipePath),
         "recipeValidation": {
             "percentFormat": recipeValidation.percentFormat,
@@ -206,13 +242,13 @@ def createAutomationTaskFromRecipePayload(
     }
 
 
-def getAutomationTaskPayload(taskId: str) -> dict[str, Any]:
+def getAutomationTaskPayload(taskId: str, *, workspaceRoot: str = ".") -> dict[str, Any]:
     registry = getTaskRegistry()
     task = registry.get(taskId)
     if task is None:
         raise AutomationTaskFlowError(404, "Task not found")
     lastRun = registry.getLastRun(taskId)
-    result = task.serialize()
+    result = _serializeAutomationTask(task, workspaceRoot=workspaceRoot)
     if lastRun:
         result["lastRun"] = lastRun.serialize()
     return result
@@ -225,20 +261,82 @@ def updateAutomationTaskPayload(
     description: str | None = None,
     schedule: str | None = None,
     enabled: bool | None = None,
+    workspaceRoot: str = ".",
 ) -> dict[str, Any]:
-    task = getTaskRegistry().update(
-        taskId,
-        name=name,
-        description=description,
-        schedule=schedule,
-        enabled=enabled,
-    )
+    registry = getTaskRegistry()
+    current = registry.get(taskId)
+    if current is None:
+        raise AutomationTaskFlowError(404, "Task not found")
+
+    changes: dict[str, Any] = {}
+    if name is not None:
+        changes["name"] = name
+    if description is not None:
+        changes["description"] = description
+    if schedule is not None and schedule != current.schedule:
+        if parseScheduleSeconds(schedule) is None:
+            raise AutomationTaskFlowError(400, f"Invalid schedule: {schedule}")
+        changes.update(schedule=schedule, safetyApproval=None, enabled=False)
+        automationTaskScheduler().cancel(taskId)
+    if enabled is not None:
+        if enabled:
+            _requireTaskReady(
+                TaskDefinition(**{**current.serialize(), **changes, "enabled": True}),
+                workspaceRoot=workspaceRoot,
+                source="task-enable",
+            )
+        changes["enabled"] = enabled
+
+    task = registry.update(taskId, **changes)
     if task is None:
         raise AutomationTaskFlowError(404, "Task not found")
-    return task.serialize()
+    if enabled is False:
+        automationTaskScheduler().cancel(taskId)
+    elif enabled is True and task.schedule:
+        _scheduleTaskRun(task.id, task.schedule, workspaceRoot)
+    return _serializeAutomationTask(task, workspaceRoot=workspaceRoot)
+
+
+def confirmAutomationTaskSafetyPayload(
+    taskId: str,
+    *,
+    confirmation: str,
+    workspaceRoot: str,
+) -> dict[str, Any]:
+    from .audit import getAuditTrail
+
+    registry = getTaskRegistry()
+    task = registry.get(taskId)
+    if task is None:
+        raise AutomationTaskFlowError(404, "Task not found")
+    try:
+        approval = confirmTaskSafety(
+            task,
+            confirmation=confirmation,
+            workspaceRoot=workspaceRoot,
+        )
+    except TaskSafetyError as error:
+        _recordTaskSafetyBlocked(task, reason=error.reason, source="task-safety-confirm")
+        raise AutomationTaskFlowError(409, error.message) from error
+
+    task = registry.update(taskId, safetyApproval=approval)
+    if task is None:
+        raise AutomationTaskFlowError(404, "Task not found")
+    getAuditTrail().record(
+        "taskSafetyConfirmed",
+        "task-safety-confirm",
+        {
+            "taskId": task.id,
+            "fingerprint": approval["fingerprint"],
+            "riskLevel": task.riskLevel,
+            "permissionScopes": list(task.permissionScopes),
+        },
+    )
+    return _serializeAutomationTask(task, workspaceRoot=workspaceRoot)
 
 
 def deleteAutomationTaskPayload(taskId: str) -> dict[str, bool]:
+    automationTaskScheduler().cancel(taskId)
     deleted = getTaskRegistry().delete(taskId)
     if not deleted:
         raise AutomationTaskFlowError(404, "Task not found")
@@ -250,6 +348,7 @@ async def runAutomationTaskPayload(taskId: str, *, workspaceRoot: str) -> dict[s
     task = registry.get(taskId)
     if task is None:
         raise AutomationTaskFlowError(404, "Task not found")
+    _requireTaskReady(task, workspaceRoot=workspaceRoot, source="task-manual-run")
     run = await TaskRunner(workspaceRoot=workspaceRoot).run(task)
     registry.addRun(run)
     return run.serialize()
@@ -280,6 +379,17 @@ def _scheduleTaskRun(taskId: str, schedule: str, workspaceRoot: str) -> bool:
         if fresh is None or not fresh.enabled:
             scheduler.cancel(taskId)
             return
+        try:
+            requireTaskSafety(fresh, workspaceRoot=workspaceRoot)
+        except TaskSafetyError as error:
+            registry.update(taskId, enabled=False)
+            scheduler.cancel(taskId)
+            _recordTaskSafetyBlocked(
+                fresh,
+                reason=error.reason,
+                source="task-scheduled-run",
+            )
+            return
         run = await TaskRunner(workspaceRoot=workspaceRoot).run(fresh)
         registry.addRun(run)
         await _notifyTaskCompletion(fresh, run)
@@ -296,12 +406,25 @@ def setAutomationTaskSchedulePayload(
     if parseScheduleSeconds(schedule) is None:
         raise AutomationTaskFlowError(400, f"Invalid schedule: {schedule}")
 
-    task = getTaskRegistry().update(taskId, schedule=schedule)
+    registry = getTaskRegistry()
+    existing = registry.get(taskId)
+    if existing is None:
+        raise AutomationTaskFlowError(404, "Task not found")
+    automationTaskScheduler().cancel(taskId)
+    task = registry.update(
+        taskId,
+        schedule=schedule,
+        safetyApproval=None,
+        enabled=False,
+    )
     if task is None:
         raise AutomationTaskFlowError(404, "Task not found")
 
-    _scheduleTaskRun(taskId, schedule, workspaceRoot)
-    return {"ok": True, "schedule": schedule}
+    return {
+        "ok": True,
+        "schedule": schedule,
+        "task": _serializeAutomationTask(task, workspaceRoot=workspaceRoot),
+    }
 
 
 def rehydrateAutomationSchedules(workspaceRoot: str) -> dict[str, Any]:
@@ -317,6 +440,16 @@ def rehydrateAutomationSchedules(workspaceRoot: str) -> dict[str, Any]:
     for task in registry.listTasks():
         if not task.enabled or not task.schedule:
             continue
+        try:
+            requireTaskSafety(task, workspaceRoot=workspaceRoot)
+        except TaskSafetyError as error:
+            registry.update(task.id, enabled=False)
+            _recordTaskSafetyBlocked(
+                task,
+                reason=error.reason,
+                source="task-schedule-rehydrate",
+            )
+            continue
         if scheduler.isScheduled(task.id):
             continue
         if _scheduleTaskRun(task.id, task.schedule, workspaceRoot):
@@ -328,7 +461,7 @@ def cancelAutomationTaskSchedulePayload(taskId: str) -> dict[str, Any]:
     cancelled = automationTaskScheduler().cancel(taskId)
     if not cancelled:
         raise AutomationTaskFlowError(404, "No active schedule for this task")
-    getTaskRegistry().update(taskId, schedule=None)
+    getTaskRegistry().update(taskId, schedule=None, safetyApproval=None, enabled=False)
     return {"ok": True}
 
 
@@ -345,8 +478,7 @@ async def triggerAutomationWebhookPayload(taskId: str, *, workspaceRoot: str) ->
     task = registry.get(taskId)
     if task is None:
         raise AutomationTaskFlowError(404, "Task not found")
-    if not task.enabled:
-        raise AutomationTaskFlowError(403, "Task is disabled")
+    _requireTaskReady(task, workspaceRoot=workspaceRoot, source="task-webhook-run")
 
     run = await TaskRunner(workspaceRoot=workspaceRoot).run(task)
     registry.addRun(run)

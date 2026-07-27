@@ -41,6 +41,7 @@ from ..automation.taskFlow import (
     automationSchedulerStatusPayload,
     cancelAutomationTaskSchedulePayload,
     clearAutomationStopPayload,
+    confirmAutomationTaskSafetyPayload,
     createAutomationTaskFromCodePayload,
     createAutomationTaskPayload,
     deleteAutomationTaskPayload,
@@ -119,6 +120,10 @@ class ScheduleRequest(BaseModel):
     schedule: str
 
 
+class ConfirmTaskSafetyRequest(BaseModel):
+    confirmation: str
+
+
 class CreateWorkflowRequest(BaseModel):
     name: str
     description: str = ""
@@ -186,7 +191,9 @@ def createAutomationRouter(state: Any) -> APIRouter:
 
     @router.get("/api/tasks")
     def apiListTasks():
-        return listAutomationTasksPayload()
+        return listAutomationTasksPayload(
+            workspaceRoot=str(getattr(state, "workspaceRoot", ".")),
+        )
 
     @router.post("/api/tasks")
     def apiCreateTask(req: CreateTaskRequest):
@@ -196,6 +203,7 @@ def createAutomationRouter(state: Any) -> APIRouter:
             description=req.description,
             schedule=req.schedule,
             inputs=req.inputs,
+            workspaceRoot=str(getattr(state, "workspaceRoot", ".")),
         )
 
     @router.post("/api/tasks/from-code")
@@ -224,12 +232,15 @@ def createAutomationRouter(state: Any) -> APIRouter:
     @router.get("/api/tasks/{taskId}")
     def apiGetTask(taskId: str):
         try:
-            return getAutomationTaskPayload(taskId)
+            return getAutomationTaskPayload(
+                taskId,
+                workspaceRoot=str(getattr(state, "workspaceRoot", ".")),
+            )
         except AutomationTaskFlowError as error:
             failAutomationTaskFlow(error)
 
     @router.put("/api/tasks/{taskId}")
-    def apiUpdateTask(taskId: str, req: UpdateTaskRequest):
+    async def apiUpdateTask(taskId: str, req: UpdateTaskRequest):
         try:
             return updateAutomationTaskPayload(
                 taskId,
@@ -237,6 +248,7 @@ def createAutomationRouter(state: Any) -> APIRouter:
                 description=req.description,
                 schedule=req.schedule,
                 enabled=req.enabled,
+                workspaceRoot=str(getattr(state, "workspaceRoot", ".")),
             )
         except AutomationTaskFlowError as error:
             failAutomationTaskFlow(error)
@@ -253,6 +265,17 @@ def createAutomationRouter(state: Any) -> APIRouter:
         try:
             return await runAutomationTaskPayload(
                 taskId,
+                workspaceRoot=str(getattr(state, "workspaceRoot", ".")),
+            )
+        except AutomationTaskFlowError as error:
+            failAutomationTaskFlow(error)
+
+    @router.post("/api/tasks/{taskId}/safety/confirm")
+    def apiConfirmTaskSafety(taskId: str, req: ConfirmTaskSafetyRequest):
+        try:
+            return confirmAutomationTaskSafetyPayload(
+                taskId,
+                confirmation=req.confirmation,
                 workspaceRoot=str(getattr(state, "workspaceRoot", ".")),
             )
         except AutomationTaskFlowError as error:

@@ -1,7 +1,8 @@
-import { Clock3, Play, TerminalSquare } from "lucide-react";
+import { Clock3, Play, ShieldAlert, TerminalSquare } from "lucide-react";
 
 import { IconButton } from "@/components/app/appPrimitives";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { localeDateFormat } from "@/lib/localeCopy";
 import { useLocale } from "@/lib/localeContext";
@@ -12,17 +13,20 @@ export function AutomationRunInspector({
   apiOnline,
   eStop,
   task,
+  onConfirmTaskSafety,
   onRunTask,
   onToggleTask,
 }: {
   apiOnline: boolean;
   eStop: EStopStatus;
   task: TaskDefinition | null;
+  onConfirmTaskSafety: (task: TaskDefinition) => void;
   onRunTask: (task: TaskDefinition) => void;
   onToggleTask: (task: TaskDefinition) => void;
 }) {
   const { locale, t } = useLocale();
   const run = task?.lastRun ?? null;
+  const safetyApproved = task?.safety.status === "approved";
 
   return (
     <aside
@@ -49,7 +53,7 @@ export function AutomationRunInspector({
                 checked={task.enabled}
                 className="size-4 accent-foreground"
                 data-automation-task-enabled="true"
-                disabled={!apiOnline}
+                disabled={!apiOnline || (!task.enabled && !safetyApproved)}
                 type="checkbox"
                 onChange={() => onToggleTask(task)}
               />
@@ -58,13 +62,66 @@ export function AutomationRunInspector({
             <IconButton
               className="size-8"
               data-automation-run-command="true"
-              disabled={!apiOnline || !task.enabled || eStop.active}
+              disabled={!apiOnline || !task.enabled || !safetyApproved || eStop.active}
               label={t("automation.task.run", { name: task.name || task.documentPath })}
               onClick={() => onRunTask(task)}
             >
               <Play />
             </IconButton>
           </div>
+
+          <section
+            className="px-3 py-3"
+            data-automation-safety-state={task.safety.status}
+          >
+            <div className="flex items-start gap-2">
+              <ShieldAlert className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <h3 className="text-[10px] font-semibold text-muted-foreground">
+                    {t("automation.safety.title")}
+                  </h3>
+                  <Badge
+                    data-automation-risk-level={task.safety.riskLevel}
+                    variant={safetyApproved ? "outline" : "destructive"}
+                  >
+                    {t("automation.safety.destructive")}
+                  </Badge>
+                </div>
+                <p className="mt-1 text-[11px] leading-5 text-foreground">
+                  {safetyDescription(task.safety.reason, safetyApproved, t)}
+                </p>
+                <div
+                  className="mt-2 flex flex-wrap gap-1"
+                  data-automation-permission-scopes="true"
+                >
+                  {task.safety.permissionScopes.map((scope) => (
+                    <Badge key={scope} variant="outline">
+                      {permissionScopeLabel(scope, t)}
+                    </Badge>
+                  ))}
+                </div>
+                {!safetyApproved ? (
+                  <Button
+                    className="mt-3 w-full"
+                    data-automation-safety-confirm="true"
+                    disabled={!apiOnline || task.safety.status === "blocked"}
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => onConfirmTaskSafety(task)}
+                  >
+                    {t("automation.safety.confirm")}
+                  </Button>
+                ) : (
+                  <p className="mt-2 text-[10px] text-muted-foreground">
+                    {t("automation.safety.approvedAt", {
+                      time: formatRunDate(task.safety.approvedAt, locale, t),
+                    })}
+                  </p>
+                )}
+              </div>
+            </div>
+          </section>
 
           <div className="px-3 py-2.5" data-automation-run-endpoint="true">
             <div className="mb-1 flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground">
@@ -204,4 +261,33 @@ function formatDuration(value: number | null | undefined, t: (key: string) => st
   if (value === null || value === undefined) return t("common.none");
   if (value < 1_000) return `${value} ms`;
   return `${(value / 1_000).toFixed(value < 10_000 ? 1 : 0)} s`;
+}
+
+function safetyDescription(
+  reason: string,
+  approved: boolean,
+  t: (key: string, values?: Record<string, string | number>) => string,
+) {
+  if (approved) return t("automation.safety.approvedDetail");
+  const keyByReason: Record<string, string> = {
+    "definition-changed": "automation.safety.definitionChanged",
+    "document-missing": "automation.safety.documentMissing",
+    "document-unreadable": "automation.safety.documentUnreadable",
+    "not-confirmed": "automation.safety.confirmDetail",
+    "permission-changed": "automation.safety.permissionChanged",
+  };
+  return t(keyByReason[reason] ?? "automation.safety.confirmDetail");
+}
+
+function permissionScopeLabel(
+  scope: string,
+  t: (key: string, values?: Record<string, string | number>) => string,
+) {
+  const keyByScope: Record<string, string> = {
+    "filesystem.read": "automation.safety.scopeRead",
+    "filesystem.write": "automation.safety.scopeWrite",
+    network: "automation.safety.scopeNetwork",
+    "process.execute": "automation.safety.scopeProcess",
+  };
+  return t(keyByScope[scope] ?? "automation.safety.scopeUnknown", { scope });
 }

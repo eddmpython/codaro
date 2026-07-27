@@ -35,15 +35,25 @@ class TestTaskDefinition:
         task = TaskDefinition()
         assert task.id.startswith("task-")
         assert task.name == ""
-        assert task.enabled is True
+        assert task.enabled is False
         assert task.schedule is None
+        assert task.riskLevel == "destructive"
+        assert task.permissionScopes == [
+            "filesystem.read",
+            "filesystem.write",
+            "network",
+            "process.execute",
+        ]
+        assert task.safetyApproval is None
 
     def test_serialize(self):
         task = TaskDefinition(name="Test", documentPath="test.py")
         data = task.serialize()
         assert data["name"] == "Test"
         assert data["documentPath"] == "test.py"
-        assert data["enabled"] is True
+        assert data["enabled"] is False
+        assert data["riskLevel"] == "destructive"
+        assert data["safetyApproval"] is None
 
     def test_task_run_serialize(self):
         run = TaskRun(taskId="task-123", status=TaskStatus.SUCCESS, output="hello")
@@ -108,6 +118,37 @@ class TestTaskRegistry:
         loaded = registry2.get(taskId)
         assert loaded is not None
         assert loaded.name == "Persist"
+
+    def test_legacy_enabled_task_is_migrated_fail_closed(self, tmp_path):
+        storagePath = tmp_path / "tasks"
+        storagePath.mkdir(parents=True)
+        legacyTask = TaskDefinition(
+            id="task-legacy",
+            name="Legacy",
+            documentPath="legacy.py",
+            schedule="@daily",
+            enabled=True,
+        ).serialize()
+        legacyTask.pop("permissionScopes")
+        legacyTask.pop("riskLevel")
+        legacyTask.pop("safetyApproval")
+        (storagePath / "index.json").write_text(
+            json.dumps({"tasks": [legacyTask]}),
+            encoding="utf-8",
+        )
+
+        loaded = TaskRegistry(storagePath=storagePath).get("task-legacy")
+
+        assert loaded is not None
+        assert loaded.enabled is False
+        assert loaded.riskLevel == "destructive"
+        assert loaded.permissionScopes == [
+            "filesystem.read",
+            "filesystem.write",
+            "network",
+            "process.execute",
+        ]
+        assert loaded.safetyApproval is None
 
     def test_add_and_get_runs(self, tmp_path):
         registry = self._makeRegistry(tmp_path)

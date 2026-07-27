@@ -64,6 +64,23 @@ export type TaskDefinition = {
   schedule?: string | null;
   enabled: boolean;
   outputs: string[];
+  permissionScopes: string[];
+  riskLevel: "destructive";
+  safetyApproval?: {
+    schemaVersion: number;
+    fingerprint: string;
+    confirmedAt: string;
+    riskLevel: "destructive";
+    permissionScopes: string[];
+  } | null;
+  safety: {
+    status: "approved" | "blocked" | "confirmationRequired";
+    reason: string;
+    riskLevel: "destructive";
+    permissionScopes: string[];
+    fingerprint?: string | null;
+    approvedAt?: string | null;
+  };
   createdAt: string;
   updatedAt: string;
   lastRun?: TaskRun;

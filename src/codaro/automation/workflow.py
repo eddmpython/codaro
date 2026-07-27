@@ -10,6 +10,7 @@ from typing import Any
 from .taskModel import TaskDefinition, TaskRun, TaskStatus
 from .taskRegistry import getTaskRegistry
 from .taskRunner import TaskRunner
+from .taskSafety import TaskSafetyError, requireTaskSafety
 
 logger = logging.getLogger(__name__)
 
@@ -129,6 +130,14 @@ class WorkflowEngine:
                 task = registry.get(step.taskId)
                 if task is None:
                     raise RuntimeError(f"Task not found: {step.taskId}")
+                if not task.enabled:
+                    raise RuntimeError(f"Task is disabled: {step.taskId}")
+                try:
+                    requireTaskSafety(task, workspaceRoot=self._workspaceRoot or ".")
+                except TaskSafetyError as error:
+                    raise RuntimeError(
+                        f"Task safety confirmation required for {step.taskId}: {error.message}"
+                    ) from error
 
                 taskRun = await runner.run(task)
                 registry.addRun(taskRun)

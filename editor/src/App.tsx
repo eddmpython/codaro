@@ -257,6 +257,7 @@ function App() {
   const {
     auditCount,
     automationSection,
+    confirmTaskSafety,
     eStop,
     refreshAutomation,
     runTask,
@@ -613,6 +614,7 @@ function App() {
               onAcceptPendingBlocks={acceptPendingBlocks}
               onConnectAi={connectAiProvider}
               onCellAsk={askCellAssistant}
+              onConfirmTaskSafety={confirmTaskSafety}
               onDraftChange={surface === "curriculum" ? updateCurriculumDraft : updateDraft}
               onDeleteCell={(blockId) => {
                 cleanupCellDefinitions(blockId);

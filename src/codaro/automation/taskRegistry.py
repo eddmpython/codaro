@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from .reportDiff import RunDiff, diffRuns
-from .taskModel import TaskDefinition, TaskRun, TaskStatus
+from .taskModel import DEFAULT_TASK_PERMISSION_SCOPES, TaskDefinition, TaskRun, TaskStatus
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,17 @@ class TaskRegistry:
         try:
             data = json.loads(indexPath.read_text(encoding="utf-8"))
             for entry in data.get("tasks", []):
-                task = TaskDefinition(**entry)
+                normalized = dict(entry)
+                if (
+                    "permissionScopes" not in normalized
+                    or "riskLevel" not in normalized
+                    or "safetyApproval" not in normalized
+                ):
+                    normalized["permissionScopes"] = list(DEFAULT_TASK_PERMISSION_SCOPES)
+                    normalized["riskLevel"] = "destructive"
+                    normalized["safetyApproval"] = None
+                    normalized["enabled"] = False
+                task = TaskDefinition(**normalized)
                 self._tasks[task.id] = task
         except (json.JSONDecodeError, TypeError, KeyError):
             logger.warning("Failed to load task registry from %s", indexPath)
@@ -75,7 +85,9 @@ class TaskRegistry:
         schedule: str | None = None,
         inputs: dict[str, Any] | None = None,
         *,
-        enabled: bool = True,
+        enabled: bool = False,
+        permissionScopes: list[str] | None = None,
+        riskLevel: str = "destructive",
     ) -> TaskDefinition:
         task = TaskDefinition(
             name=name,
@@ -84,6 +96,8 @@ class TaskRegistry:
             schedule=schedule,
             inputs=inputs or {},
             enabled=enabled,
+            permissionScopes=list(permissionScopes or DEFAULT_TASK_PERMISSION_SCOPES),
+            riskLevel=riskLevel,
         )
         self._tasks[task.id] = task
         self._save()
@@ -100,7 +114,7 @@ class TaskRegistry:
         if task is None:
             return None
         for key, value in kwargs.items():
-            if hasattr(task, key) and value is not None:
+            if hasattr(task, key):
                 setattr(task, key, value)
         task.updatedAt = datetime.now(timezone.utc).isoformat()
         self._save()

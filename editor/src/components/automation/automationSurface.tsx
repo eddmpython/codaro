@@ -60,6 +60,7 @@ export function AutomationView({
   scheduler,
   tasks,
   onRefresh,
+  onConfirmTaskSafety,
   onRunTask,
   onToggleTask,
   onToggleEStop,
@@ -71,6 +72,7 @@ export function AutomationView({
   scheduler: SchedulerStatus;
   tasks: TaskDefinition[];
   onRefresh: () => void;
+  onConfirmTaskSafety: (task: TaskDefinition) => void;
   onRunTask: (task: TaskDefinition) => void;
   onToggleTask: (task: TaskDefinition) => void;
   onToggleEStop: () => void;
@@ -246,6 +248,7 @@ export function AutomationView({
                 apiOnline={apiOnline}
                 eStop={eStop}
                 task={selectedTask}
+                onConfirmTaskSafety={onConfirmTaskSafety}
                 onRunTask={onRunTask}
                 onToggleTask={onToggleTask}
               />

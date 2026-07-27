@@ -702,10 +702,26 @@ def startStaticServer(directory: Path, *, landing: bool = False) -> tuple[Thread
     return server, thread, int(server.server_address[1])
 
 
-def seedLocalAutomationFixture(storageRoot: Path) -> None:
+def seedLocalAutomationFixture(storageRoot: Path, workspaceRoot: Path) -> None:
     taskRoot = storageRoot / "tasks"
     runsRoot = taskRoot / "runs"
     runsRoot.mkdir(parents=True, exist_ok=True)
+    automationRoot = workspaceRoot / "automation"
+    automationRoot.mkdir(parents=True, exist_ok=True)
+    (automationRoot / "daily_learning_digest.py").write_text(
+        "# %% [code]\nprint('3개 레슨의 학습 기록을 요약했습니다.')\n",
+        encoding="utf-8",
+    )
+    (automationRoot / "workbook_cleanup.py").write_text(
+        "# %% [code]\nraise FileNotFoundError('입력 워크북을 찾지 못했습니다.')\n",
+        encoding="utf-8",
+    )
+    permissionScopes = [
+        "filesystem.read",
+        "filesystem.write",
+        "network",
+        "process.execute",
+    ]
     tasks = [
         {
             "id": "task-daily-summary",
@@ -717,7 +733,10 @@ def seedLocalAutomationFixture(storageRoot: Path) -> None:
             "outputs": ["stdout", "variables"],
             "createdAt": "2026-07-23T08:00:00+00:00",
             "updatedAt": "2026-07-23T08:00:00+00:00",
-            "enabled": True,
+            "enabled": False,
+            "permissionScopes": permissionScopes,
+            "riskLevel": "destructive",
+            "safetyApproval": None,
         },
         {
             "id": "task-workbook-cleanup",
@@ -730,6 +749,9 @@ def seedLocalAutomationFixture(storageRoot: Path) -> None:
             "createdAt": "2026-07-22T08:00:00+00:00",
             "updatedAt": "2026-07-22T08:00:00+00:00",
             "enabled": False,
+            "permissionScopes": permissionScopes,
+            "riskLevel": "destructive",
+            "safetyApproval": None,
         },
     ]
     runs = {
@@ -773,7 +795,7 @@ def seedLocalAutomationFixture(storageRoot: Path) -> None:
 
 def startLocalServer() -> tuple[Any, threading.Thread, int, tempfile.TemporaryDirectory[str], Path]:
     import uvicorn
-    from codaro.automation.taskRegistry import getTaskRegistry
+    import codaro.automation.taskRegistry as taskRegistryModule
     from codaro.server import createServerApp, createServerEventLoop
 
     stateParent = REPORT_ROOT / "scratch"
@@ -784,9 +806,10 @@ def startLocalServer() -> tuple[Any, threading.Thread, int, tempfile.TemporaryDi
     previousCodaroHome = os.environ.get("CODARO_HOME")
     os.environ["CODARO_HOME"] = localState.name
     try:
-        seedLocalAutomationFixture(Path(localState.name))
+        seedLocalAutomationFixture(Path(localState.name), localWorkspace)
+        taskRegistryModule._registry = None
         app = createServerApp(mode="edit", workspaceRoot=localWorkspace)
-        registry = getTaskRegistry()
+        registry = taskRegistryModule.getTaskRegistry()
         if [task.id for task in registry.listTasks()] != [
             "task-daily-summary",
             "task-workbook-cleanup",
@@ -824,6 +847,21 @@ def startLocalServer() -> tuple[Any, threading.Thread, int, tempfile.TemporaryDi
     thread.join(timeout=3)
     localState.cleanup()
     raise RuntimeError("Local server did not start")
+
+
+def resetLocalAutomationSafetyFixture() -> None:
+    from codaro.automation.taskFlow import automationTaskScheduler
+    from codaro.automation.taskRegistry import getTaskRegistry
+
+    taskId = "task-daily-summary"
+    automationTaskScheduler().cancel(taskId)
+    task = getTaskRegistry().update(
+        taskId,
+        enabled=False,
+        safetyApproval=None,
+    )
+    if task is None:
+        raise RuntimeError("Local automation safety fixture task is missing")
 
 
 def releaseLocalKernelSessions(page: Any, case: dict[str, Any], localPort: int) -> list[str]:
@@ -2665,6 +2703,16 @@ async ({ surface, expectedTier }) => {
     automationTaskDetailCount: document.querySelectorAll("[data-automation-task-detail]").length,
     automationEStopControlCount: document.querySelectorAll("[data-automation-estop-control='true']").length,
     automationRunCommandCount: document.querySelectorAll("[data-automation-run-command='true']").length,
+    automationSafetyState:
+      document.querySelector("[data-automation-safety-state]")?.getAttribute("data-automation-safety-state") || null,
+    automationRiskLevel:
+      document.querySelector("[data-automation-risk-level]")?.getAttribute("data-automation-risk-level") || null,
+    automationPermissionScopeCount: document.querySelectorAll(
+      "[data-automation-permission-scopes='true'] [data-slot='badge']"
+    ).length,
+    automationSafetyConfirmCount: document.querySelectorAll(
+      "[data-automation-safety-confirm='true']"
+    ).length,
     automationStdoutCount: document.querySelectorAll("[data-automation-run-stream='stdout']").length,
     automationStderrCount: document.querySelectorAll("[data-automation-run-stream='stderr']").length,
     localRequiredTemplateCount: localRequiredTemplates.length,
@@ -3177,6 +3225,9 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
             "task detail": audit["automationTaskDetailCount"],
             "E-Stop control": audit["automationEStopControlCount"],
             "run command": audit["automationRunCommandCount"],
+            "safety state": int(bool(audit["automationSafetyState"])),
+            "destructive risk": int(audit["automationRiskLevel"] == "destructive"),
+            "permission scopes": audit["automationPermissionScopeCount"],
             "stdout": audit["automationStdoutCount"],
             "stderr": audit["automationStderrCount"],
         }
@@ -3288,6 +3339,8 @@ def runBrowserMatrix(
                     raise ValueError(f"unknown CODARO_PRODUCT_CASE: {selectedCase}")
             for case in cases:
                 print(f"[product-experience-browser] case {case['name']}", flush=True)
+                if case.get("verifyAutomationOperations"):
+                    resetLocalAutomationSafetyFixture()
                 context = browser.new_context(
                     viewport=case["viewport"],
                     color_scheme=colorScheme,
@@ -3473,6 +3526,64 @@ def runBrowserMatrix(
                         inspector = page.locator("[data-automation-run-inspector='true']")
                         if inspector.get_attribute("data-automation-selected-task") != firstTaskId:
                             raise AssertionError("automation inspector did not select the first task")
+                        safetyPanel = inspector.locator("[data-automation-safety-state]")
+                        runCommand = inspector.locator("[data-automation-run-command='true']")
+                        enabledToggle = inspector.locator("[data-automation-task-enabled='true']")
+                        if (
+                            safetyPanel.get_attribute("data-automation-safety-state")
+                            != "confirmationRequired"
+                            or not runCommand.is_disabled()
+                            or not enabledToggle.is_disabled()
+                        ):
+                            raise AssertionError(
+                                "unconfirmed automation was not blocked before permission review"
+                            )
+                        permissionScopes = inspector.locator(
+                            "[data-automation-permission-scopes='true']"
+                        ).inner_text()
+                        if not all(
+                            label in permissionScopes
+                            for label in ("파일 읽기", "파일 쓰기·삭제", "네트워크", "외부 프로세스")
+                        ):
+                            raise AssertionError(
+                                f"automation permission scope is incomplete: {permissionScopes!r}"
+                            )
+                        inspector.locator("[data-automation-safety-confirm='true']").click(
+                            timeout=20_000
+                        )
+                        page.wait_for_function(
+                            """
+                            () => document.querySelector('[data-automation-safety-state]')
+                              ?.getAttribute('data-automation-safety-state') === 'approved'
+                            """,
+                            timeout=20_000,
+                        )
+                        enabledToggle = inspector.locator("[data-automation-task-enabled='true']")
+                        if enabledToggle.is_disabled():
+                            raise AssertionError(
+                                "approved automation did not expose the enable control"
+                            )
+                        enabledToggle.click(timeout=20_000)
+                        page.wait_for_function(
+                            """
+                            () => document.querySelector('[data-automation-task-enabled="true"]')
+                              ?.checked === true
+                            """,
+                            timeout=20_000,
+                        )
+                        runCommand = inspector.locator("[data-automation-run-command='true']")
+                        if runCommand.is_disabled():
+                            raise AssertionError(
+                                "approved enabled automation did not expose the run command"
+                            )
+                        runCommand.click(timeout=20_000)
+                        page.wait_for_function(
+                            """
+                            () => document.querySelector('[data-automation-run-stream="stdout"]')
+                              ?.textContent?.includes('3개 레슨')
+                            """,
+                            timeout=20_000,
+                        )
                         stdoutText = inspector.locator("[data-automation-run-stream='stdout']").inner_text()
                         if "3개 레슨" not in stdoutText:
                             raise AssertionError("automation inspector did not expose the latest stdout")

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   AUTOMATION_UPDATED_EVENT,
+  confirmAutomationTaskSafety,
   fallbackAutomationSnapshot,
   loadAutomationSnapshot,
   runAutomationTask,
@@ -72,6 +73,20 @@ export function useAutomationState({
     }
   }, [apiOnline, onNotice, refreshAutomation]);
 
+  const confirmTaskSafety = useCallback(async (task: TaskDefinition) => {
+    try {
+      const result = await confirmAutomationTaskSafety(task, apiOnline);
+      onNotice(result.notice);
+      if (result.refresh) await refreshAutomation();
+    } catch (error) {
+      onNotice({
+        tone: "error",
+        title: translate("automation.safety.confirmFailed"),
+        detail: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }, [apiOnline, onNotice, refreshAutomation]);
+
   const toggleTask = useCallback(async (task: TaskDefinition) => {
     try {
       const result = await setAutomationTaskEnabled(task, !task.enabled, apiOnline);
@@ -89,6 +104,7 @@ export function useAutomationState({
   return {
     auditCount,
     automationSection,
+    confirmTaskSafety,
     eStop,
     refreshAutomation,
     runTask,
