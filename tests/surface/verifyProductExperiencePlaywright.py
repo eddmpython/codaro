@@ -975,6 +975,7 @@ def browserCases(landingPort: int, webPort: int, localPort: int) -> list[dict[st
             "verifyEvidenceArchive": True,
             "verifyBrowserArtifactEvidence": True,
             "verifyLegacyProgressMigration": True,
+            "verifyDayOneCommentPrompt": True,
             "expectTransferSection": True,
             "initialCheckState": "mismatch",
             "requireInlineHint": True,
@@ -2047,6 +2048,15 @@ async ({ surface, expectedTier }) => {
     ...document.querySelectorAll("[data-provider-reconnect-bar]")
   ].filter(visible).map((element) => element.getAttribute("data-provider-reconnect-bar"));
   const notebookToolsToggle = document.querySelector('[data-notebook-tools-toggle="true"]');
+  const exactDayOneCommentPrompt = (
+    "첫 줄은 # 주석으로 남기고 빈칸을 바꿔 실행됩니다만 출력하세요."
+  );
+  const dayOneCommentPromptCount = [...document.querySelectorAll("p")]
+    .filter((paragraph) => (paragraph.textContent || "").trim() === exactDayOneCommentPrompt)
+    .length;
+  const truncatedDayOneCommentPromptCount = [...document.querySelectorAll("p")]
+    .filter((paragraph) => (paragraph.textContent || "").trim() === "첫 줄은")
+    .length;
   let webProgressLessonCount = 0;
   let webVerifiedPracticeCount = 0;
   let webVerifiedStrongCheckCount = 0;
@@ -2207,6 +2217,8 @@ async ({ surface, expectedTier }) => {
     notebookToolsToggleCount: document.querySelectorAll('[data-notebook-tools-toggle="true"]').length,
     notebookToolsTogglePressed: notebookToolsToggle?.getAttribute("aria-pressed") || null,
     notebookToolsPanelCount: document.querySelectorAll('[data-notebook-tools-panel="desktop"]').length,
+    dayOneCommentPromptCount,
+    truncatedDayOneCommentPromptCount,
     collapsedSidebarVisibleTextFragments,
     visibleProviderReconnectVariants,
     visibleNotebookNoticeCount: [...document.querySelectorAll('[data-topbar-status-notice="editor"]')]
@@ -2425,6 +2437,15 @@ def auditFailures(case: dict[str, Any], audit: dict[str, Any]) -> list[str]:
     elif surface == "web-lesson":
         if audit["lessonSectionCount"] < 1:
             failures.append(f"{name}: lesson sections did not render")
+        if case.get("verifyDayOneCommentPrompt") and (
+            audit["dayOneCommentPromptCount"] != 1
+            or audit["truncatedDayOneCommentPromptCount"] != 0
+        ):
+            failures.append(
+                f"{name}: Day 1 comment prompt was truncated by YAML parsing: "
+                f"full={audit['dayOneCommentPromptCount']}, "
+                f"truncated={audit['truncatedDayOneCommentPromptCount']}"
+            )
         if (
             audit["learningDomainVisualCount"] != 1
             or audit["learningVisualQuestionCount"] != 1

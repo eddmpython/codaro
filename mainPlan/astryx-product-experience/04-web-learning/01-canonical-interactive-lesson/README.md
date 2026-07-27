@@ -31,6 +31,8 @@
 - Pages `main@3a18dd97`의 Day 1 canonical URL을 direct cold load해 H1 `헬로월드`, `codaro-runtime-tier=web`, `codaro-lesson-runtime-tier=browser`와 편집 가능한 학습실이 같은 URL에서 복원됨을 확인했다.
 - 실제 배포 화면에서 instructional image, 학습 목표, 첫 editable exercise와 자동 기록 안내가 별도 reveal command 없이 노출됨을 확인했다.
 - 공개 레슨의 4:3 시각 프레임 안에서 16:9 원본 이미지가 고유 높이만 차지해 아래에 빈 면을 남기던 결함을 수정했다. 이미지가 프레임 너비와 높이를 채우고 중앙 기준으로 잘리도록 고정했다.
+- Day 1 canonical lesson의 실제 desktop·mobile 화면을 점검해 따옴표 없는 `#` 뒤 지시가 YAML 주석으로 사라지고 `첫 줄은`만 표시되던 결함을 찾았다. 원문을 인용 scalar로 고치고 같은 화면에서 완전한 실습 지시 한 문장과 잘린 문장 0개를 검사한다.
+- 472개 curricula 원문의 학습자 노출 scalar를 전수 검사해 따옴표 없는 inline `#`가 다시 들어오면 source 계약에서 실패하도록 고정했다.
 - `landing-public`과 `web-learning` 전체 게이트가 연속 통과해 공개 문서, interactive editor, Run, 자동 check, 저장과 reload 복원을 함께 확인했다.
 
 ## 남은 조건
@@ -46,7 +48,9 @@
 - `editor/src/lib/runRouteState.ts`: pathname에서 lesson identity와 path·section·runtime tier 복원
 - `editor/src/App.tsx`, `editor/src/components/app/currentLearningSurface.tsx`: canonical lesson URL에서 학습 surface hydrate
 - `editor/src/components/curriculum/curriculumSurface.tsx`, `editor/src/components/curriculum/curriculumSectionRenderer.tsx`: 목표, 예제, editable exercise, output, 자동 verification
+- `curricula/python/basics/30days/day01_헬로월드.yaml`: 주석 실습의 `#`를 포함한 전체 지시문
 - `tests/learning/verifyWebLearningRoutes.py`, `tests/surface/verifyLandingSeo.py`, `tests/surface/verifyLandingHydration.py`: route·SEO·hydration 계약
+- `tests/curriculum/testCurriculumSectionContract.py`, `tests/surface/verifyProductExperiencePlaywright.py`: 원문 scalar와 실제 모바일 렌더링의 지시문 보존 계약
 
 ## 영향 함수·심볼
 
@@ -62,6 +66,8 @@
 - `uv run python -X utf8 tests/run.py gate web-learning`: code 수정, Run, output, automatic check와 reload resume
 - `uv run python -X utf8 tests/run.py gate learning-method`: 실행 뒤 별도 check·hint reveal·다음 section open command 0개
 - `uv run python -X utf8 tests/product/verifyAstryxJourneyAudit.py`: Web lesson mobile과 public lesson desktop의 금지 control·image proof
+- `uv run pytest -q tests/curriculum/testCurriculumSectionContract.py`: 472개 curricula의 학습자 노출 scalar와 Day 1 완전한 prompt 보존
+- `CODARO_PRODUCT_CASE=web-lesson-mobile` 제품 브라우저 검증: 완전한 주석 실습 지시 1개, 잘린 `첫 줄은` 문단 0개
 - keyboard, screen reader와 대표 학습자의 이해·전이 검수는 아직 사람 증거가 없다.
 
 ## 롤백

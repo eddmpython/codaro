@@ -44,6 +44,9 @@ CANONICAL_PACKAGE_NAMES = {
     "yaml": "pyyaml",
 }
 STALE_INSTALL_STAGE_PATTERN = re.compile(r"(?m)^\s*(id:\s*step\d*_install|id:\s*installation|title:\s*\d+단계\.[^\n]*설치)")
+LEARNER_FACING_SCALAR_PATTERN = re.compile(
+    r"^\s*(?:title|subtitle|goal|why|explanation|prompt|description|resultCheck):\s+(.+)$",
+)
 
 
 def testLessonContractExtractsStructuredSectionFields() -> None:
@@ -193,6 +196,31 @@ def testDayOneKeepsTransferAndDelayedRetrievalOutOfBaseLesson() -> None:
     assert isinstance(intro.payload, dict)
     assert intro.payload["assessment"]["transferVariants"][0]["id"] == "report-status-transfer"
     assert intro.payload["assessment"]["retrievalVariants"][0]["minimumDelayHours"] == 7 * 24
+
+
+def testLearnerFacingPlainScalarsDoNotLoseInlineHashText() -> None:
+    failures: list[str] = []
+    for path in sorted(CURRICULA_DIR.rglob("*.yaml")):
+        for lineNumber, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+            match = LEARNER_FACING_SCALAR_PATTERN.match(line)
+            if not match:
+                continue
+            value = match.group(1).lstrip()
+            if value.startswith(("'", '"', "|", ">")):
+                continue
+            if re.search(r"\s#(?:\s|$)", value):
+                failures.append(f"{path.relative_to(ROOT).as_posix()}:{lineNumber}")
+
+    assert failures == [], (
+        "학습자에게 보이는 plain scalar의 # 뒤 문장이 YAML 주석으로 잘립니다. "
+        f"문장 전체를 따옴표로 감싸세요: {failures}"
+    )
+
+    content = yaml.safe_load(DAY_ONE.read_text(encoding="utf-8"))
+    commentSection = next(section for section in content["sections"] if section["id"] == "comment_single")
+    assert commentSection["exercise"]["prompt"] == (
+        "첫 줄은 # 주석으로 남기고 빈칸을 바꿔 실행됩니다만 출력하세요."
+    )
 
 
 def testYamlToDocumentMaterializesMasteryVariantAtLessonEnd() -> None:

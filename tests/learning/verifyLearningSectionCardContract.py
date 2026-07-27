@@ -542,8 +542,8 @@ def main() -> int:
         require(source, token, label, failures)
     require(
         topBarText,
-        'const showAssistantToggle = surface === "editor"',
-        "editor-only assistant toggle",
+        'const showNotebookToolsToggle = surface === "editor"',
+        "editor-only notebook tools toggle",
         failures,
     )
     require(
